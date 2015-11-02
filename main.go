@@ -7,6 +7,7 @@ import (
 	"os"
 	"flag"
 	"regexp"
+	"fmt"
 )
 
 func orPanic(err error) {
@@ -55,9 +56,8 @@ func main() {
 	proxy.OnRequest(goproxy.DstHostIs(*externalSystem)).DoFunc(
 		func(r *http.Request,ctx *goproxy.ProxyCtx)(*http.Request,*http.Response) {
 
-
-
 			log.Info("connection found......")
+			log.Info(fmt.Sprintf("Url path:  %s", r.URL.Path))
 			return r,nil
 		})
 
