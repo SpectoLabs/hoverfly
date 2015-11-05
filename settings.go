@@ -12,7 +12,7 @@ type Configuration struct {
 // AppCondig stores application configuration
 var AppConfig Configuration
 
-func init() {
+func initSettings() {
 	// getting redis connection
 	redisAddress := os.Getenv("RedisAddress")
 	if (redisAddress == "") {
