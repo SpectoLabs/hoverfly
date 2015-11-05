@@ -3,11 +3,24 @@ package main
 import (
 	"os"
 	"strconv"
+	"net/http"
 
 	"github.com/garyburd/redigo/redis"
 	log "github.com/Sirupsen/logrus"
 )
 
+type DBClient struct {
+	pool *redis.Pool
+}
+
+func (d *DBClient) recordRequest(r *http.Request) {
+	log.Debug("Recording request")
+}
+
+func (d *DBClient) getResponse(r *http.Request) *http.Response {
+	log.Debug("Returning response")
+	return nil
+}
 
 
 // getRedisPool returns thread safe Redis connection pool
