@@ -22,15 +22,25 @@ type Configuration struct {
 	ExternalSystem string
 }
 
+const DefaultPort = ":8500"
+
 // AppConfig stores application configuration
 var AppConfig Configuration
 
 func main() {
 	// getting proxy configuration
 	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
-	addr := flag.String("addr", ":8080", "proxy listen address")
 	externalSystem := flag.String("target", "/", "URL path to catch")
 	flag.Parse()
+
+
+	// getting default database
+	port := os.Getenv("ProxyPort")
+	if (port == "") {
+		port = DefaultPort
+	} else {
+		port = fmt.Sprintf(":%s", port)
+	}
 
 
 	// Output to stderr instead of stdout, could also be a file.
@@ -63,5 +73,5 @@ func main() {
 
 
 	proxy.Verbose = *verbose
-	log.Fatal(http.ListenAndServe(*addr, proxy))
+	log.Fatal(http.ListenAndServe(port, proxy))
 }
