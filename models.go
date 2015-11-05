@@ -14,11 +14,11 @@ type DBClient struct {
 }
 
 func (d *DBClient) recordRequest(r *http.Request) {
-	log.Debug("Recording request")
+	log.Info("Recording request")
 }
 
 func (d *DBClient) getResponse(r *http.Request) *http.Response {
-	log.Debug("Returning response")
+	log.Info("Returning response")
 	return nil
 }
 
