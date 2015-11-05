@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/elazarl/goproxy"
 	log "github.com/Sirupsen/logrus"
+
 	"net/http"
 	"os"
 	"flag"
@@ -10,28 +11,19 @@ import (
 	"fmt"
 )
 
-func orPanic(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
-// Initial structure of configuration that is expected from conf.json file
-type Configuration struct {
-	MirageEndpoint string
-	ExternalSystem string
-}
 
 const DefaultPort = ":8500"
 
-// AppConfig stores application configuration
-var AppConfig Configuration
 
 func main() {
 	// getting proxy configuration
 	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
-	externalSystem := flag.String("target", "/", "URL path to catch")
+	record := flag.Bool("record", false, "should proxy record")
+	externalSystem := flag.String("target", "mirage.readthedocs.org", "destination host to catch")
 	flag.Parse()
+
+	// getting settings
+	initSettings()
 
 
 	// getting default database
@@ -47,16 +39,17 @@ func main() {
 	log.SetOutput(os.Stderr)
 	log.SetFormatter(&log.TextFormatter{})
 
-	// getting app config
-	mirageEndpoint := os.Getenv("MirageEndpoint")
-
-	AppConfig.MirageEndpoint = mirageEndpoint
 
 	// app starting
 	log.WithFields(log.Fields{
-		"MirageEndpoint": AppConfig.MirageEndpoint,
+		"RedisAddress": AppConfig.redisAddress,
+		"ProxyPort": port,
 	}).Info("app is starting")
 
+	// getting redis connection
+	d := DBClient{pool: getRedisPool()}
+
+	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile("^.*$"))).
@@ -68,6 +61,13 @@ func main() {
 
 			log.Info("connection found......")
 			log.Info(fmt.Sprintf("Url path:  %s", r.URL.Path))
+			if *record {
+				log.Info("*** RECORD ***")
+				d.recordRequest(r)
+			} else {
+				log.Info("*** PLAYBACK ***")
+				_ = d.getResponse(r)
+			}
 			return r,nil
 		})
 
