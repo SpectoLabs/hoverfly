@@ -76,7 +76,7 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 	log.WithFields(log.Fields{
 	}).Info("Request forwarded!")
 
-	resp.Header.Set("Gen-proxy", "was here")
+	resp.Header.Set("Gen-proxy", "Was-Here")
 	return resp, nil
 
 

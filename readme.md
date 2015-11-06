@@ -1,4 +1,4 @@
-# Generic E2E testing proxy
+# One Proxy to Integrate Them All
 
 -
 
