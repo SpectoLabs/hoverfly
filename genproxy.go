@@ -47,7 +47,8 @@ func main() {
 	}).Info("app is starting")
 
 	// getting redis connection
-	d := DBClient{pool: getRedisPool()}
+	d := DBClient{pool: getRedisPool(),
+	              http: &http.Client{}}
 
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
@@ -61,14 +62,23 @@ func main() {
 
 			log.Info("connection found......")
 			log.Info(fmt.Sprintf("Url path:  %s", r.URL.Path))
+
 			if *record {
 				log.Info("*** RECORD ***")
-				d.recordRequest(r)
+				newResponse, err := d.recordRequest(r)
+				if err != nil {
+					// something bad happened, passing through
+					return r, nil
+				} else{
+					// discarding original requests and returns supplied response
+					return r,newResponse
+				}
+
 			} else {
 				log.Info("*** PLAYBACK ***")
 				_ = d.getResponse(r)
+				return r, nil
 			}
-			return r,nil
 		})
 
 
