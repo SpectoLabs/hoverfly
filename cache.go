@@ -8,6 +8,26 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
+type Cache struct {
+	pool *redis.Pool
+}
+
+// set records a key in cache (redis)
+func (c *Cache) set(key string, value []byte) error {
+	client := c.pool.Get()
+	defer client.Close()
+
+	_, err := client.Do("SET", key, value)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to record request...")
+	} else {
+		log.WithFields(log.Fields{}).Info("Request recorded!")
+	}
+}
+
 // getRedisPool returns thread safe Redis connection pool
 func getRedisPool() *redis.Pool {
 
