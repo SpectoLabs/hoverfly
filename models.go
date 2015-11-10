@@ -1,12 +1,15 @@
 package main
 
 import (
+	"crypto/md5"
+	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"strconv"
-	"net/http"
 
-	"github.com/garyburd/redigo/redis"
 	log "github.com/Sirupsen/logrus"
+	"github.com/garyburd/redigo/redis"
 )
 
 type DBClient struct {
@@ -14,12 +17,26 @@ type DBClient struct {
 	http *http.Client
 }
 
+// req holds structure for request
+type req struct {
+	URL    string
+	Method string
+}
+
+// hash returns unique hash key for request
+// TODO: match on destination, request body, etc..
+func (r *req) hash() string {
+	h := md5.New()
+	io.WriteString(h, fmt.Sprintf("%s%s", r.URL, r.Method))
+	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
 // res structure hold response body from external service, body is not decoded and is supposed
 // to be bytes, however headers should provide all required information for later decoding
 // by the client.
 type res struct {
-	Status  int `json:"status"`
-	Body    []byte `json:"body"`
+	Status  int               `json:"status"`
+	Body    []byte            `json:"body"`
 	Headers map[string]string `json:"headers"`
 }
 
@@ -50,7 +67,6 @@ func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
 	//	}
 }
 
-
 func (d *DBClient) getResponse(r *http.Request) *http.Response {
 	log.Info("Returning response")
 	return nil
@@ -65,20 +81,18 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 
 	if err != nil {
 		log.WithFields(log.Fields{
-			"error": err.Error(),
-			"host": request.Host,
+			"error":  err.Error(),
+			"host":   request.Host,
 			"method": request.Method,
-			"path": request.URL.Path,
+			"path":   request.URL.Path,
 		}).Error("Could not forward request.")
 		return nil, err
 	}
 
-	log.WithFields(log.Fields{
-	}).Info("Request forwarded!")
+	log.WithFields(log.Fields{}).Info("Request forwarded!")
 
 	resp.Header.Set("Gen-proxy", "Was-Here")
 	return resp, nil
-
 
 }
 
@@ -88,9 +102,9 @@ func getRedisPool() *redis.Pool {
 	// getting redis connection
 	maxConnections := 10
 	mc := os.Getenv("MaxConnections")
-	if (mc != "") {
+	if mc != "" {
 		maxCons, err := strconv.Atoi(mc)
-		if (err != nil) {
+		if err != nil {
 			maxConnections = 10
 		} else {
 			maxConnections = maxCons
@@ -107,7 +121,7 @@ func getRedisPool() *redis.Pool {
 		if AppConfig.redisPassword != "" {
 			if _, err := c.Do("AUTH", AppConfig.redisPassword); err != nil {
 				log.WithFields(log.Fields{
-					"Error": err.Error(),
+					"Error":        err.Error(),
 					"PasswordUsed": AppConfig.redisPassword,
 				}).Panic("Failed to authenticate to Redis!")
 				c.Close()
@@ -116,8 +130,6 @@ func getRedisPool() *redis.Pool {
 				log.Info("Authenticated to Redis successfully! ")
 			}
 		}
-
-		return c, err
 
 		return c, err
 	}, maxConnections)
