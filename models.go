@@ -7,11 +7,10 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/garyburd/redigo/redis"
 )
 
 type DBClient struct {
-	pool *redis.Pool
+	cache Cache
 	http *http.Client
 }
 
@@ -59,22 +58,11 @@ func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
 		"hashKey":       key,
 	}).Info("Recording")
 
+
 	// return new response or error here
 	return resp, err
 
-	//	c := d.pool.Get()
-	//	defer c.Close()
-	//
-	//	_, err := c.Do("SET", r.URL.Path, r.Body)
-	//
-	//	if err != nil {
-	//		log.WithFields(log.Fields{
-	//			"error": err.Error(),
-	//		}).Error("Failed to record request...")
-	//	} else {
-	//		log.WithFields(log.Fields{
-	//		}).Info("Request recorded!")
-	//	}
+
 }
 
 // getRequestFingerprint returns request hash

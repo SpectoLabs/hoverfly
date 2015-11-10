@@ -42,9 +42,11 @@ func main() {
 		"ProxyPort":    port,
 	}).Info("app is starting")
 
-	// getting redis connection
-	d := DBClient{pool: getRedisPool(),
-		http: &http.Client{}}
+	// getting connections
+	d := DBClient{
+		cache: &Cache{pool: getRedisPool()},
+		http:  &http.Client{},
+	}
 
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
