@@ -2,8 +2,10 @@ package main
 
 import (
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
@@ -11,7 +13,7 @@ import (
 
 type DBClient struct {
 	cache Cache
-	http *http.Client
+	http  *http.Client
 }
 
 // request holds structure for request
@@ -43,12 +45,21 @@ func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
 	// forwarding request
 	resp, err := d.doRequest(req)
 
+	go d.save(req, resp)
+
+	// return new response or error here
+	return resp, err
+}
+
+func (d *DBClient) save(req *http.Request, resp *http.Response) {
 	// record request here
 	key := getRequestFingerprint(req)
 
+	body, err := ioutil.ReadAll(resp.Body)
+
 	response := res{
 		Status:  resp.StatusCode,
-		Body:    resp.Body,
+		Body:    body,
 		Headers: getHeadersMap(resp.Header),
 	}
 
@@ -58,10 +69,16 @@ func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
 		"hashKey":       key,
 	}).Info("Recording")
 
+	// converting it to json bytes
+	bts, err := json.Marshal(response)
 
-	// return new response or error here
-	return resp, err
-
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to marshal json")
+	} else {
+		d.cache.set(key, bts)
+	}
 
 }
 
@@ -108,5 +125,3 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 	return resp, nil
 
 }
-
-/

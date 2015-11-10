@@ -44,7 +44,7 @@ func main() {
 
 	// getting connections
 	d := DBClient{
-		cache: &Cache{pool: getRedisPool()},
+		cache: Cache{pool: getRedisPool()},
 		http:  &http.Client{},
 	}
 
