@@ -1,12 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/garyburd/redigo/redis"
 )
+
+const prefix = "genproxy:"
 
 type Cache struct {
 	pool *redis.Pool
@@ -17,15 +20,19 @@ func (c *Cache) set(key string, value []byte) error {
 	client := c.pool.Get()
 	defer client.Close()
 
-	_, err := client.Do("SET", key, value)
+	_, err := client.Do("SET", fmt.Sprintf(prefix+key), value)
 
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Failed to record request...")
 	} else {
-		log.WithFields(log.Fields{}).Info("Request recorded!")
+		log.WithFields(log.Fields{
+			"key": fmt.Sprintf(prefix + key),
+		}).Info("Request recorded!")
 	}
+
+	return err
 }
 
 // getRedisPool returns thread safe Redis connection pool
