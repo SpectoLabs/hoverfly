@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"strconv"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/garyburd/redigo/redis"
@@ -17,15 +15,15 @@ type DBClient struct {
 	http *http.Client
 }
 
-// req holds structure for request
-type req struct {
+// request holds structure for request
+type request struct {
 	URL    string
 	Method string
 }
 
 // hash returns unique hash key for request
 // TODO: match on destination, request body, etc..
-func (r *req) hash() string {
+func (r *request) hash() string {
 	h := md5.New()
 	io.WriteString(h, fmt.Sprintf("%s%s", r.URL, r.Method))
 	return fmt.Sprintf("%x", h.Sum(nil))
@@ -42,12 +40,24 @@ type res struct {
 
 // recordRequest saves request for later playback
 func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
-	log.Info("Recording request")
 
 	// forwarding request
 	resp, err := d.doRequest(req)
 
 	// record request here
+	key := getRequestFingerprint(req)
+
+	response := res{
+		Status:  resp.StatusCode,
+		Body:    resp.Body,
+		Headers: getHeadersMap(resp.Header),
+	}
+
+	log.WithFields(log.Fields{
+		"requestURL":    req.URL.Path,
+		"requestMethod": req.Method,
+		"hashKey":       key,
+	}).Info("Recording")
 
 	// return new response or error here
 	return resp, err
@@ -65,6 +75,21 @@ func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
 	//		log.WithFields(log.Fields{
 	//		}).Info("Request recorded!")
 	//	}
+}
+
+// getRequestFingerprint returns request hash
+func getRequestFingerprint(req *http.Request) string {
+	r := request{URL: req.URL.Path, Method: req.Method}
+	return r.hash()
+}
+
+// getHeadersMap converts map[string][]string to map[string]string structure
+func getHeadersMap(hds map[string][]string) map[string]string {
+	headers := make(map[string]string)
+	for key, value := range hds {
+		headers[key] = value[0]
+	}
+	return headers
 }
 
 func (d *DBClient) getResponse(r *http.Request) *http.Response {
@@ -96,45 +121,4 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 
 }
 
-// getRedisPool returns thread safe Redis connection pool
-func getRedisPool() *redis.Pool {
-
-	// getting redis connection
-	maxConnections := 10
-	mc := os.Getenv("MaxConnections")
-	if mc != "" {
-		maxCons, err := strconv.Atoi(mc)
-		if err != nil {
-			maxConnections = 10
-		} else {
-			maxConnections = maxCons
-		}
-	}
-	// getting redis client for state storing
-	redisPool := redis.NewPool(func() (redis.Conn, error) {
-		c, err := redis.Dial("tcp", AppConfig.redisAddress)
-
-		if err != nil {
-			log.WithFields(log.Fields{"Error": err.Error()}).Panic("Failed to create Redis connection pool!")
-			return nil, err
-		}
-		if AppConfig.redisPassword != "" {
-			if _, err := c.Do("AUTH", AppConfig.redisPassword); err != nil {
-				log.WithFields(log.Fields{
-					"Error":        err.Error(),
-					"PasswordUsed": AppConfig.redisPassword,
-				}).Panic("Failed to authenticate to Redis!")
-				c.Close()
-				return nil, err
-			} else {
-				log.Info("Authenticated to Redis successfully! ")
-			}
-		}
-
-		return c, err
-	}, maxConnections)
-
-	defer redisPool.Close()
-
-	return redisPool
-}
+/
