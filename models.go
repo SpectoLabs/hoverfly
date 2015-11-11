@@ -51,10 +51,12 @@ func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
 	return resp, err
 }
 
+// save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (d *DBClient) save(req *http.Request, resp *http.Response) {
 	// record request here
 	key := getRequestFingerprint(req)
 
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 
 	response := res{
