@@ -16,7 +16,7 @@ type Cache struct {
 }
 
 // set records a key in cache (redis)
-func (c *Cache) set(key string, value []byte) error {
+func (c *Cache) set(key string, value interface{}) error {
 
 	client := c.pool.Get()
 	defer client.Close()
@@ -26,14 +26,37 @@ func (c *Cache) set(key string, value []byte) error {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-		}).Error("Failed to record request...")
+			"key":   fmt.Sprintf(prefix + key),
+		}).Error("Failed to SET key...")
 	} else {
 		log.WithFields(log.Fields{
 			"key": fmt.Sprintf(prefix + key),
-		}).Info("Request recorded!")
+		}).Info("Key/value SET successfuly!")
 	}
 
 	return err
+}
+
+// get returns key from cache
+func (c *Cache) get(key string) (interface{}, error) {
+
+	client := c.pool.Get()
+	defer client.Close()
+
+	value, err := client.Do("GET", fmt.Sprintf(prefix+key))
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+			"key":   fmt.Sprintf(prefix + key),
+		}).Error("Failed to GET key...")
+	} else {
+		log.WithFields(log.Fields{
+			"key": fmt.Sprintf(prefix + key),
+		}).Info("Key found!")
+	}
+
+	return value, err
 }
 
 // getRedisPool returns thread safe Redis connection pool
