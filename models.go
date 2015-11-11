@@ -21,6 +21,7 @@ type request struct {
 	details requestDetails
 }
 
+// requestDetails stores information about request, it's used for creating unique hash and also as a payload structure
 type requestDetails struct {
 	Path        string `json:"path"`
 	Method      string `json:"method"`
@@ -29,7 +30,6 @@ type requestDetails struct {
 }
 
 // hash returns unique hash key for request
-// TODO: match on destination, request body, etc..
 func (r *request) hash() string {
 	h := md5.New()
 	io.WriteString(h, fmt.Sprintf("%s%s%s%s", r.details.Destination, r.details.Path, r.details.Method, r.details.Query))
@@ -47,8 +47,8 @@ type response struct {
 
 // Payload structure holds request and response structure
 type Payload struct {
-	Response response       // `json:"response"`
-	Request  requestDetails // `json:"request"`
+	Response response       `json:"response"`
+	Request  requestDetails `json:"request"`
 }
 
 // recordRequest saves request for later playback
