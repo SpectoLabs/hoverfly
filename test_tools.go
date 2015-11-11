@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -39,11 +40,25 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 			return url.Parse(server.URL)
 		},
 	}
-	dbClient := &DBClient{http: &http.Client{Transport: tr} }
 
+	// getting redis configuration
+	redisAddress := os.Getenv("RedisAddress")
+	if redisAddress == "" {
+		redisAddress = ":6379"
+	}
+	AppConfig.redisAddress = redisAddress
 
-//	httpClient := &http.Client{Transport: tr}
+	redisPool := getRedisPool()
+	defer redisPool.Close()
 
-//	client := &Client{httpClient}
+	cache := Cache{pool: redisPool}
+
+	// preparing client
+	dbClient := &DBClient{
+		http:  &http.Client{Transport: tr},
+		cache: cache,
+	}
+
+	//	client := &Client{httpClient}
 	return server, dbClient
 }
