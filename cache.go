@@ -56,6 +56,22 @@ func (c *Cache) getAllKeys() ([]string, error) {
 
 	return values, err
 }
+
+// getAllValues returns values for specified keys
+func (c *Cache) getAllValues(keys []string) (interface{}, error) {
+	if c.prefix == "" {
+		c.prefix = prefix
+	}
+
+	client := c.pool.Get()
+	defer client.Close()
+
+	values, err := client.Do("MGET", keys)
+
+	return values, err
+
+}
+
 // get returns key from cache
 func (c *Cache) get(key string) (interface{}, error) {
 
