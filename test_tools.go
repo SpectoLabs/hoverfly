@@ -49,7 +49,6 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	AppConfig.redisAddress = redisAddress
 
 	redisPool := getRedisPool()
-	//	defer redisPool.Close()
 
 	cache := Cache{pool: redisPool}
 
@@ -58,7 +57,5 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 		http:  &http.Client{Transport: tr},
 		cache: cache,
 	}
-
-	//	client := &Client{httpClient}
 	return server, dbClient
 }
