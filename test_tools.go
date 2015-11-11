@@ -8,6 +8,8 @@ import (
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/garyburd/redigo/redis"
 )
 
 // Client structure to be injected into functions to perform HTTP calls
@@ -50,7 +52,7 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 
 	redisPool := getRedisPool()
 
-	cache := Cache{pool: redisPool}
+	cache := Cache{pool: redisPool, prefix: "genproxy_test:"}
 
 	// preparing client
 	dbClient := &DBClient{
@@ -58,4 +60,23 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 		cache: cache,
 	}
 	return server, dbClient
+}
+
+// teardown does some cleanup after tests
+func teardown() {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.pool.Close()
+
+	// deleting cache
+
+	client := dbClient.cache.pool.Get()
+	defer client.Close()
+
+	values, _ := redis.Strings(client.Do("KEYS", "genproxy_test:*"))
+
+	for _, v := range values {
+		fmt.Println(v)
+		client.Do("DEL", v)
+	}
 }

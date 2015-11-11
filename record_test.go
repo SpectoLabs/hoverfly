@@ -3,8 +3,20 @@ package main
 import (
 	"github.com/garyburd/redigo/redis"
 	"net/http"
+	"os"
 	"testing"
 )
+
+func TestMain(m *testing.M) {
+
+	retCode := m.Run()
+
+	// your func
+	teardown()
+
+	// call with result of m.Run()
+	os.Exit(retCode)
+}
 
 // TestRecordHeader tests whether request gets new header assigned
 func TestRecordHeader(t *testing.T) {
