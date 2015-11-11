@@ -71,8 +71,6 @@ func getRedisPool() *redis.Pool {
 			}
 		}
 
-		log.Info("Redis connection pool created! ")
-
 		return c, err
 	}, maxConnections)
 

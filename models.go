@@ -18,25 +18,33 @@ type DBClient struct {
 
 // request holds structure for request
 type request struct {
-	URL    string
-	Method string
+	Path        string `json:"path"`
+	Method      string `json:"method"`
+	Destination string `json:"destination"`
+	Query       string `json:"query"`
 }
 
 // hash returns unique hash key for request
 // TODO: match on destination, request body, etc..
 func (r *request) hash() string {
 	h := md5.New()
-	io.WriteString(h, fmt.Sprintf("%s%s", r.URL, r.Method))
+	io.WriteString(h, fmt.Sprintf("%s%s%s%s", r.Destination, r.Path, r.Method, r.Query))
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 // res structure hold response body from external service, body is not decoded and is supposed
 // to be bytes, however headers should provide all required information for later decoding
 // by the client.
-type res struct {
+type response struct {
 	Status  int               `json:"status"`
 	Body    []byte            `json:"body"`
 	Headers map[string]string `json:"headers"`
+}
+
+// Payload structure holds request and response structure
+type Payload struct {
+	Response response
+	Request  request
 }
 
 // recordRequest saves request for later playback
@@ -59,15 +67,17 @@ func (d *DBClient) save(req *http.Request, resp *http.Response) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 
-	response := res{
+	response := response{
 		Status:  resp.StatusCode,
 		Body:    body,
 		Headers: getHeadersMap(resp.Header),
 	}
 
 	log.WithFields(log.Fields{
-		"requestURL":    req.URL.Path,
+		"path":          req.URL.Path,
+		"rawQuery":      req.URL.RawQuery,
 		"requestMethod": req.Method,
+		"destination":   req.Host,
 		"hashKey":       key,
 	}).Info("Recording")
 
@@ -86,7 +96,7 @@ func (d *DBClient) save(req *http.Request, resp *http.Response) {
 
 // getRequestFingerprint returns request hash
 func getRequestFingerprint(req *http.Request) string {
-	r := request{URL: req.URL.Path, Method: req.Method}
+	r := request{Path: req.URL.Path, Method: req.Method, Destination: req.Host, Query: req.URL.RawQuery}
 	return r.hash()
 }
 
