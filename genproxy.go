@@ -87,8 +87,8 @@ func main() {
 
 			} else {
 				log.Info("*** PLAYBACK ***")
-				_ = d.getResponse(r)
-				return r, nil
+				newResponse := d.getResponse(r)
+				return r, newResponse
 			}
 		})
 

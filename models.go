@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/garyburd/redigo/redis"
 )
 
 type DBClient struct {
@@ -57,6 +59,7 @@ func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
 	// forwarding request
 	resp, err := d.doRequest(req)
 
+	// do not wait for response - spawning goroutine
 	go d.save(req, resp)
 
 	// return new response or error here
@@ -124,9 +127,45 @@ func getHeadersMap(hds map[string][]string) map[string]string {
 	return headers
 }
 
-func (d *DBClient) getResponse(r *http.Request) *http.Response {
+func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	log.Info("Returning response")
-	return nil
+
+	key := getRequestFingerprint(req)
+	var payload Payload
+
+	payloadBts, err := redis.Bytes(d.cache.get(key))
+
+	if err != nil {
+		// getting cache response
+		err = json.Unmarshal(payloadBts, &payload)
+		if err != nil {
+			log.Error(err)
+			// what now?
+		}
+
+		newResponse := &http.Response{}
+		newResponse.Request = req
+		// adding headers
+		newResponse.Header = make(http.Header)
+		if len(payload.Response.Headers) > 0 {
+			for k, v := range payload.Response.Headers {
+				newResponse.Header.Set(k, v)
+			}
+		}
+		// adding body
+		buf := bytes.NewBuffer(payload.Response.Body)
+		newResponse.ContentLength = int64(buf.Len())
+		newResponse.Body = ioutil.NopCloser(buf)
+
+		newResponse.StatusCode = payload.Response.Status
+
+		return newResponse
+
+	} else {
+		// return error? if we return nil - proxy forwards request to original destination
+		return nil
+	}
+
 }
 
 // doRequest performs original request and returns response that should be returned to client and error (if there is one)

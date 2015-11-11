@@ -21,7 +21,7 @@ func TestRecordHeader(t *testing.T) {
 	expect(t, response.Header.Get("Gen-proxy"), "Was-Here")
 }
 
-// TestRecordingToCache tests cache get/set operations
+// TestRecordingToCache tests cache wrapper get/set operations
 func TestRecordingToCache(t *testing.T) {
 
 	server, dbClient := testTools(200, `{'message': 'here'}`)
