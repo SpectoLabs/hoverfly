@@ -42,6 +42,20 @@ func (c *Cache) set(key string, value interface{}) error {
 	return err
 }
 
+// getAllKeys returns all keys for specified (or default) prefix
+func (c *Cache) getAllKeys() ([]string, error) {
+
+	if c.prefix == "" {
+		c.prefix = prefix
+	}
+
+	client := c.pool.Get()
+	defer client.Close()
+
+	values, err := redis.Strings(client.Do("KEYS", "genproxy_test:*"))
+
+	return values, err
+}
 // get returns key from cache
 func (c *Cache) get(key string) (interface{}, error) {
 
