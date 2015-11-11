@@ -49,7 +49,7 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	AppConfig.redisAddress = redisAddress
 
 	redisPool := getRedisPool()
-	defer redisPool.Close()
+	//	defer redisPool.Close()
 
 	cache := Cache{pool: redisPool}
 
