@@ -18,6 +18,10 @@ type DBClient struct {
 
 // request holds structure for request
 type request struct {
+	details requestDetails
+}
+
+type requestDetails struct {
 	Path        string `json:"path"`
 	Method      string `json:"method"`
 	Destination string `json:"destination"`
@@ -28,7 +32,7 @@ type request struct {
 // TODO: match on destination, request body, etc..
 func (r *request) hash() string {
 	h := md5.New()
-	io.WriteString(h, fmt.Sprintf("%s%s%s%s", r.Destination, r.Path, r.Method, r.Query))
+	io.WriteString(h, fmt.Sprintf("%s%s%s%s", r.details.Destination, r.details.Path, r.details.Method, r.details.Query))
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
@@ -43,8 +47,8 @@ type response struct {
 
 // Payload structure holds request and response structure
 type Payload struct {
-	Response response
-	Request  request
+	Response response       // `json:"response"`
+	Request  requestDetails // `json:"request"`
 }
 
 // recordRequest saves request for later playback
@@ -67,7 +71,7 @@ func (d *DBClient) save(req *http.Request, resp *http.Response) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 
-	response := response{
+	responseObj := response{
 		Status:  resp.StatusCode,
 		Body:    body,
 		Headers: getHeadersMap(resp.Header),
@@ -81,8 +85,18 @@ func (d *DBClient) save(req *http.Request, resp *http.Response) {
 		"hashKey":       key,
 	}).Info("Recording")
 
+	requestObj := requestDetails{
+		Path:        req.URL.Path,
+		Method:      req.Method,
+		Destination: req.Host,
+		Query:       req.URL.RawQuery}
+
+	payload := Payload{
+		Response: responseObj,
+		Request:  requestObj,
+	}
 	// converting it to json bytes
-	bts, err := json.Marshal(response)
+	bts, err := json.Marshal(payload)
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -96,7 +110,8 @@ func (d *DBClient) save(req *http.Request, resp *http.Response) {
 
 // getRequestFingerprint returns request hash
 func getRequestFingerprint(req *http.Request) string {
-	r := request{Path: req.URL.Path, Method: req.Method, Destination: req.Host, Query: req.URL.RawQuery}
+	details := requestDetails{Path: req.URL.Path, Method: req.Method, Destination: req.Host, Query: req.URL.RawQuery}
+	r := request{details: details}
 	return r.hash()
 }
 
