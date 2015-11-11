@@ -42,7 +42,10 @@ func main() {
 		"ProxyPort":    port,
 	}).Info("app is starting")
 
-	cache := Cache{pool: getRedisPool()}
+	redisPool := getRedisPool()
+	defer redisPool.Close()
+
+	cache := Cache{pool: redisPool}
 
 	// getting connections
 	d := DBClient{

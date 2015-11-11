@@ -17,6 +17,7 @@ type Cache struct {
 
 // set records a key in cache (redis)
 func (c *Cache) set(key string, value []byte) error {
+
 	client := c.pool.Get()
 	defer client.Close()
 
@@ -74,8 +75,6 @@ func getRedisPool() *redis.Pool {
 
 		return c, err
 	}, maxConnections)
-
-	defer redisPool.Close()
 
 	return redisPool
 }
