@@ -36,6 +36,28 @@ func (c *Cache) set(key string, value []byte) error {
 	return err
 }
 
+// get returns key from cache
+func (c *Cache) get(key string) (interface{}, error) {
+
+	client := c.pool.Get()
+	defer client.Close()
+
+	value, err := client.Do("GET", fmt.Sprintf(prefix+key))
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+			"key":   fmt.Sprintf(prefix + key),
+		}).Error("Failed to GET key...")
+	} else {
+		log.WithFields(log.Fields{
+			"key": fmt.Sprintf(prefix + key),
+		}).Info("Key found!")
+	}
+
+	return value, err
+}
+
 // getRedisPool returns thread safe Redis connection pool
 func getRedisPool() *redis.Pool {
 
