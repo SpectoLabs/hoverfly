@@ -12,25 +12,30 @@ import (
 const prefix = "genproxy:"
 
 type Cache struct {
-	pool *redis.Pool
+	pool   *redis.Pool
+	prefix string
 }
 
 // set records a key in cache (redis)
 func (c *Cache) set(key string, value interface{}) error {
 
+	if c.prefix == "" {
+		c.prefix = prefix
+	}
+
 	client := c.pool.Get()
 	defer client.Close()
 
-	_, err := client.Do("SET", fmt.Sprintf(prefix+key), value)
+	_, err := client.Do("SET", fmt.Sprintf(c.prefix+key), value)
 
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-			"key":   fmt.Sprintf(prefix + key),
+			"key":   fmt.Sprintf(c.prefix + key),
 		}).Error("Failed to SET key...")
 	} else {
 		log.WithFields(log.Fields{
-			"key": fmt.Sprintf(prefix + key),
+			"key": fmt.Sprintf(c.prefix + key),
 		}).Info("Key/value SET successfuly!")
 	}
 
@@ -40,19 +45,23 @@ func (c *Cache) set(key string, value interface{}) error {
 // get returns key from cache
 func (c *Cache) get(key string) (interface{}, error) {
 
+	if c.prefix == "" {
+		c.prefix = prefix
+	}
+
 	client := c.pool.Get()
 	defer client.Close()
 
-	value, err := client.Do("GET", fmt.Sprintf(prefix+key))
+	value, err := client.Do("GET", fmt.Sprintf(c.prefix+key))
 
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-			"key":   fmt.Sprintf(prefix + key),
+			"key":   fmt.Sprintf(c.prefix + key),
 		}).Error("Failed to GET key...")
 	} else {
 		log.WithFields(log.Fields{
-			"key": fmt.Sprintf(prefix + key),
+			"key": fmt.Sprintf(c.prefix + key),
 		}).Info("Key found!")
 	}
 
