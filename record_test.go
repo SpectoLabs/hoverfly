@@ -6,7 +6,9 @@ import (
 	"testing"
 )
 
+// TestRecordHeader tests whether request gets new header assigned
 func TestRecordHeader(t *testing.T) {
+
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.cache.pool.Close()
@@ -21,6 +23,7 @@ func TestRecordHeader(t *testing.T) {
 
 // TestRecordingToCache tests cache get/set operations
 func TestRecordingToCache(t *testing.T) {
+
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.cache.pool.Close()
@@ -34,4 +37,16 @@ func TestRecordingToCache(t *testing.T) {
 	if err == nil {
 		expect(t, string(value), "value")
 	}
+}
+
+// TestRequestFingerprint tests whether we get correct request ID
+func TestRequestFingerprint(t *testing.T) {
+
+	req, err := http.NewRequest("GET", "http://example.com", nil)
+	expect(t, err, nil)
+
+	fp := getRequestFingerprint(req)
+
+	expect(t, fp, "92a65ed4ca2b7100037a4cba9afd15ea")
+
 }
