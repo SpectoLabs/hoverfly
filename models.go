@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/elazarl/goproxy"
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -135,7 +136,8 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 
 	payloadBts, err := redis.Bytes(d.cache.get(key))
 
-	if err != nil {
+	if err == nil {
+		log.Info("Decoding bytes")
 		// getting cache response
 		err = json.Unmarshal(payloadBts, &payload)
 		if err != nil {
@@ -152,6 +154,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 				newResponse.Header.Set(k, v)
 			}
 		}
+		newResponse.Header.Set("Gen-Proxy", "Playback")
 		// adding body
 		buf := bytes.NewBuffer(payload.Response.Body)
 		newResponse.ContentLength = int64(buf.Len())
@@ -159,11 +162,22 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 
 		newResponse.StatusCode = payload.Response.Status
 
+		log.WithFields(log.Fields{
+			"key":        key,
+			"status":     payload.Response.Status,
+			"bodyLength": newResponse.ContentLength,
+		}).Info("Response found, returning")
+
 		return newResponse
 
 	} else {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to retrieve response from cache")
 		// return error? if we return nil - proxy forwards request to original destination
-		return nil
+		return goproxy.NewResponse(req,
+			goproxy.ContentTypeText, http.StatusPreconditionFailed,
+			"Coudldn't find recorded request, please record it first!")
 	}
 
 }
