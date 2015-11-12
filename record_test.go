@@ -69,7 +69,7 @@ func TestRequestFingerprint(t *testing.T) {
 // TestGetAllRecords
 func TestGetAllRecords(t *testing.T) {
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
+	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.cache.pool.Close()
 
@@ -89,6 +89,7 @@ func TestGetAllRecords(t *testing.T) {
 
 	for _, payload := range payloads {
 		expect(t, payload.Request.Method, "GET")
+		expect(t, payload.Response.Status, 201)
 	}
 
 }
