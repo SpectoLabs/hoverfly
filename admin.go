@@ -8,15 +8,15 @@ import (
 	"github.com/go-zoo/bone"
 )
 
-type RecordedRequests struct {
+// jsonResponse struct encapsulates payload data
+type jsonResponse struct {
 	Data []Payload `json:"data"`
 }
 
+// getBoneRouter returns mux for admin interface
 func getBoneRouter(d DBClient) *bone.Mux {
 	mux := bone.New()
 	mux.Get("/records", http.HandlerFunc(d.AllRecordsHandler))
-	// handling static files
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	return mux
 }
@@ -29,7 +29,7 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		var response RecordedRequests
+		var response jsonResponse
 		response.Data = records
 		b, err := json.Marshal(response)
 
