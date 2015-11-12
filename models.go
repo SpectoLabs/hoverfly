@@ -114,10 +114,8 @@ func (d *DBClient) save(req *http.Request, resp *http.Response) {
 	}
 }
 
-// getAllRecords returns all stored
-func (d *DBClient) getAllRecords() ([]Payload, error) {
-	var payloads []Payload
-
+// getAllRecordsRaw returns raw (json string) for all records
+func (d *DBClient) getAllRecordsRaw() ([]string, error) {
 	keys, err := d.cache.getAllKeys()
 
 	if err == nil {
@@ -128,26 +126,43 @@ func (d *DBClient) getAllRecords() ([]Payload, error) {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
 			}).Error("Failed to get all values")
+			return nil, err
 		} else {
-
-			for _, v := range jsonStrs {
-				var pl Payload
-				err = json.Unmarshal([]byte(v), &pl)
-				if err != nil {
-					log.WithFields(log.Fields{
-						"error": err.Error(),
-						"json":  v,
-					}).Warning("Failed to deserialize json")
-				} else {
-					payloads = append(payloads, pl)
-				}
-			}
+			return jsonStrs, nil
 		}
 
-		return payloads, err
 	} else {
-		return payloads, err
+		return nil, err
 	}
+}
+
+// getAllRecords returns all stored
+func (d *DBClient) getAllRecords() ([]Payload, error) {
+	var payloads []Payload
+
+	jsonStrs, err := d.getAllRecordsRaw()
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to get all values")
+	} else {
+
+		for _, v := range jsonStrs {
+			var pl Payload
+			err = json.Unmarshal([]byte(v), &pl)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error": err.Error(),
+					"json":  v,
+				}).Warning("Failed to deserialize json")
+			} else {
+				payloads = append(payloads, pl)
+			}
+		}
+	}
+
+	return payloads, err
 
 }
 
