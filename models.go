@@ -125,7 +125,7 @@ func (d *DBClient) getAllRecordsRaw() ([]string, error) {
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
-			}).Error("Failed to get all values")
+			}).Error("Failed to get all values (raw)")
 			return nil, err
 		} else {
 			return jsonStrs, nil
