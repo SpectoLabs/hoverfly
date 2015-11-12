@@ -12,13 +12,22 @@ func (d *DBClient) AllRecordsHandler(req *http.Request) *http.Response {
 
 	records, err := d.getAllRecordsRaw()
 
+	// concatenating string
+
 	if err == nil {
 		newResponse := &http.Response{}
 		newResponse.Request = req
 
 		newResponse.Header.Set("Content-Type", "application/json")
+
 		// adding body
-		buf := bytes.NewBufferString(records)
+		var buff bytes.Buffer
+
+		for _, record := range records {
+			buff.WriteString(record)
+		}
+
+		buf := bytes.NewBuffer(buff.Bytes())
 		newResponse.ContentLength = int64(buf.Len())
 		newResponse.Body = ioutil.NopCloser(buf)
 
