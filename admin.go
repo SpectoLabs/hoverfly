@@ -11,6 +11,11 @@ import (
 func (d *DBClient) AllRecordsHandler(req *http.Request) *http.Response {
 
 	records, err := d.getAllRecordsRaw()
+func getBoneRouter(d DBClient) *bone.Mux {
+	mux := bone.New()
+	mux.Get("/records", http.HandlerFunc(d.AllRecordsHandler))
+	// handling static files
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	// concatenating string
 
