@@ -1,50 +1,54 @@
 package main
 
 import (
-	"bytes"
-	"github.com/elazarl/goproxy"
-	"io/ioutil"
 	"net/http"
+
+	"encoding/json"
+	log "github.com/Sirupsen/logrus"
+	"github.com/go-zoo/bone"
 )
 
-// AllRecordsHandler returns JSON content type http response
-func (d *DBClient) AllRecordsHandler(req *http.Request) *http.Response {
+type RecordedRequests struct {
+	Data []Payload `json:"data"`
+}
 
-	records, err := d.getAllRecordsRaw()
 func getBoneRouter(d DBClient) *bone.Mux {
 	mux := bone.New()
 	mux.Get("/records", http.HandlerFunc(d.AllRecordsHandler))
 	// handling static files
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	// concatenating string
+	return mux
+}
+
+// AllRecordsHandler returns JSON content type http response
+func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
+	records, err := d.getAllRecords()
 
 	if err == nil {
-		newResponse := &http.Response{}
-		newResponse.Request = req
 
-		newResponse.Header.Set("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 
-		// adding body
-		var buff bytes.Buffer
+		var response RecordedRequests
+		response.Data = records
+		b, err := json.Marshal(response)
 
-		for _, record := range records {
-			buff.WriteString(record)
+		if err != nil {
+			log.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else {
+			w.Write(b)
+			return
 		}
-
-		buf := bytes.NewBuffer(buff.Bytes())
-		newResponse.ContentLength = int64(buf.Len())
-		newResponse.Body = ioutil.NopCloser(buf)
-
-		newResponse.StatusCode = 200
-
-		return newResponse
-
 	} else {
+		log.WithFields(log.Fields{
+			"Error":        err.Error(),
+			"PasswordUsed": AppConfig.redisPassword,
+		}).Error("Failed to authenticate to Redis!")
 
-		return goproxy.NewResponse(req,
-			goproxy.ContentTypeText, http.StatusInternalServerError,
-			"Failed to retrieve records from cache!")
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(500) // can't process this entity
+		return
 	}
 
 }
