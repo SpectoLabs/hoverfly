@@ -9,6 +9,7 @@ type Configuration struct {
 	redisAddress   string
 	redisPassword  string
 	adminInterface string
+	cachePrefix    string
 }
 
 // AppCondig stores application configuration
@@ -26,4 +27,7 @@ func initSettings() {
 
 	// admin interface port
 	AppConfig.adminInterface = ":8888"
+
+	// cache prefix
+	AppConfig.cachePrefix = "genproxy:"
 }
