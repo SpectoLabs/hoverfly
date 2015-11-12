@@ -52,6 +52,7 @@ type response struct {
 type Payload struct {
 	Response response       `json:"response"`
 	Request  requestDetails `json:"request"`
+	ID       string         `json:"id"`
 }
 
 // recordRequest saves request for later playback
@@ -93,11 +94,13 @@ func (d *DBClient) save(req *http.Request, resp *http.Response) {
 		Path:        req.URL.Path,
 		Method:      req.Method,
 		Destination: req.Host,
-		Query:       req.URL.RawQuery}
+		Query:       req.URL.RawQuery,
+	}
 
 	payload := Payload{
 		Response: responseObj,
 		Request:  requestObj,
+		ID:       key,
 	}
 	// converting it to json bytes
 	bts, err := json.Marshal(payload)
@@ -108,6 +111,42 @@ func (d *DBClient) save(req *http.Request, resp *http.Response) {
 		}).Error("Failed to marshal json")
 	} else {
 		d.cache.set(key, bts)
+	}
+}
+
+// getAllRecords returns all stored
+func (d *DBClient) getAllRecords() ([]Payload, error) {
+	var payloads []Payload
+
+	keys, err := d.cache.getAllKeys()
+
+	if err == nil {
+
+		jsonStrs, err := d.cache.getAllValues(keys)
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Failed to get all values")
+		} else {
+
+			for _, v := range jsonStrs {
+				var pl Payload
+				err = json.Unmarshal([]byte(v), &pl)
+				if err != nil {
+					log.WithFields(log.Fields{
+						"error": err.Error(),
+						"json":  v,
+					}).Warning("Failed to deserialize json")
+				} else {
+					payloads = append(payloads, pl)
+				}
+			}
+		}
+
+		return payloads, err
+	} else {
+		return payloads, err
 	}
 
 }
@@ -128,6 +167,7 @@ func getHeadersMap(hds map[string][]string) map[string]string {
 	return headers
 }
 
+// getResponse returns stored response from cache
 func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	log.Info("Returning response")
 
