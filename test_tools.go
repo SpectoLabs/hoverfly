@@ -76,7 +76,6 @@ func teardown() {
 	values, _ := redis.Strings(client.Do("KEYS", "genproxy_test:*"))
 
 	for _, v := range values {
-		fmt.Println(v)
 		client.Do("DEL", v)
 	}
 }

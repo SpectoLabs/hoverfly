@@ -42,12 +42,45 @@ func (c *Cache) set(key string, value interface{}) error {
 	return err
 }
 
+// getAllKeys returns all keys for specified (or default) prefix
+func (c *Cache) getAllKeys() ([]string, error) {
+
+	client := c.pool.Get()
+	defer client.Close()
+
+	values, err := redis.Strings(client.Do("KEYS", fmt.Sprintf(c.prefix+"*")))
+
+	return values, err
+}
+
+// getAllValues returns values for specified keys
+func (c *Cache) getAllValues(keys []string) ([]string, error) {
+
+	log.WithFields(log.Fields{
+		"keys": keys,
+	}).Info("Getting all supplied values")
+
+	client := c.pool.Get()
+	defer client.Close()
+
+	// preparing keys
+	var args []interface{}
+	for _, k := range keys {
+		args = append(args, k)
+	}
+
+	jsonStr, err := redis.Strings(client.Do("MGET", args...))
+
+	log.WithFields(log.Fields{
+		"keys": keys,
+	}).Info("Returning supplied values")
+
+	return jsonStr, err
+
+}
+
 // get returns key from cache
 func (c *Cache) get(key string) (interface{}, error) {
-
-	if c.prefix == "" {
-		c.prefix = prefix
-	}
 
 	client := c.pool.Get()
 	defer client.Close()
@@ -66,6 +99,21 @@ func (c *Cache) get(key string) (interface{}, error) {
 	}
 
 	return value, err
+}
+
+// delete removes specified entry from cache
+func (c *Cache) delete(key string) error {
+	if c.prefix == "" {
+		c.prefix = prefix
+	}
+
+	client := c.pool.Get()
+	defer client.Close()
+
+	_, err := client.Do("DEL", fmt.Sprintf(c.prefix+key))
+
+	return err
+
 }
 
 // getRedisPool returns thread safe Redis connection pool

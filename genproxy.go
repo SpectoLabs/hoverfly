@@ -2,7 +2,9 @@ package main
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/codegangsta/negroni"
 	"github.com/elazarl/goproxy"
+	"github.com/meatballhat/negroni-logrus"
 
 	"flag"
 	"fmt"
@@ -35,17 +37,11 @@ func main() {
 	log.SetOutput(os.Stderr)
 	log.SetFormatter(&log.TextFormatter{})
 
-	// app starting
-	log.WithFields(log.Fields{
-		"RedisAddress": AppConfig.redisAddress,
-		"Destination":  *destination,
-		"ProxyPort":    port,
-	}).Info("app is starting")
-
 	redisPool := getRedisPool()
 	defer redisPool.Close()
 
-	cache := Cache{pool: redisPool}
+	cache := Cache{pool: redisPool,
+		prefix: AppConfig.cachePrefix}
 
 	// getting connections
 	d := DBClient{
@@ -67,6 +63,7 @@ func main() {
 			}).Info("Got request")
 			return r, nil
 		})
+
 	// hijacking plain connections
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(*destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
@@ -92,6 +89,32 @@ func main() {
 			}
 		})
 
+	go d.startAdminInterface()
+
 	proxy.Verbose = *verbose
-	log.Fatal(http.ListenAndServe(port, proxy))
+
+	// proxy starting message
+	log.WithFields(log.Fields{
+		"RedisAddress": AppConfig.redisAddress,
+		"Destination":  *destination,
+		"ProxyPort":    port,
+	}).Info("Proxy is starting...")
+
+	log.Error(http.ListenAndServe(port, proxy))
+}
+
+func (d *DBClient) startAdminInterface() {
+	// starting admin interface
+	mux := getBoneRouter(*d)
+	n := negroni.Classic()
+	n.Use(negronilogrus.NewMiddleware())
+	n.UseHandler(mux)
+
+	// admin interface starting message
+	log.WithFields(log.Fields{
+		"RedisAddress": AppConfig.redisAddress,
+		"AdminPort":    AppConfig.adminInterface,
+	}).Info("Admin interface is starting...")
+
+	n.Run(AppConfig.adminInterface)
 }
