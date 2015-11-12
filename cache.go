@@ -108,6 +108,21 @@ func (c *Cache) get(key string) (interface{}, error) {
 	return value, err
 }
 
+// delete removes specified entry from cache
+func (c *Cache) delete(key string) error {
+	if c.prefix == "" {
+		c.prefix = prefix
+	}
+
+	client := c.pool.Get()
+	defer client.Close()
+
+	_, err := client.Do("DEL", fmt.Sprintf(c.prefix+key))
+
+	return err
+
+}
+
 // getRedisPool returns thread safe Redis connection pool
 func getRedisPool() *redis.Pool {
 
