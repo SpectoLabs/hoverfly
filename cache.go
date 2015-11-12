@@ -58,7 +58,7 @@ func (c *Cache) getAllKeys() ([]string, error) {
 }
 
 // getAllValues returns values for specified keys
-func (c *Cache) getAllValues(keys []string) (interface{}, error) {
+func (c *Cache) getAllValues(keys []string) ([]string, error) {
 	if c.prefix == "" {
 		c.prefix = prefix
 	}
@@ -66,9 +66,19 @@ func (c *Cache) getAllValues(keys []string) (interface{}, error) {
 	client := c.pool.Get()
 	defer client.Close()
 
-	values, err := client.Do("MGET", keys)
+	// preparing keys
+	var args []interface{}
+	for _, k := range keys {
+		args = append(args, k)
+	}
 
-	return values, err
+	jsonStr, err := redis.Strings(client.Do("MGET", args...))
+
+	log.WithFields(log.Fields{
+		"keys": keys,
+	}).Info("Returning supplied values")
+
+	return jsonStr, err
 
 }
 
