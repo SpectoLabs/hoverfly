@@ -19,7 +19,7 @@ func main() {
 	// getting proxy configuration
 	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
 	record := flag.Bool("record", false, "should proxy record")
-	destination := flag.String("source", "^.*:80$", "destination URI to catch")
+	destination := flag.String("destination", "^.*:80$", "destination URI to catch")
 	flag.Parse()
 
 	// getting settings
