@@ -130,6 +130,7 @@ func getRedisPool() *redis.Pool {
 			maxConnections = maxCons
 		}
 	}
+
 	// getting redis client for state storing
 	redisPool := redis.NewPool(func() (redis.Conn, error) {
 		c, err := redis.Dial("tcp", AppConfig.redisAddress)

@@ -61,11 +61,41 @@ func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
 	// forwarding request
 	resp, err := d.doRequest(req)
 
-	// do not wait for response - spawning goroutine
-	go d.save(req, resp)
+	if err == nil {
+		// do not wait for response - spawning goroutine
+		go d.save(req, resp)
+	}
 
 	// return new response or error here
 	return resp, err
+}
+
+// doRequest performs original request and returns response that should be returned to client and error (if there is one)
+func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
+	// We can't have this set. And it only contains "/pkg/net/http/" anyway
+	request.RequestURI = ""
+
+	resp, err := d.http.Do(request)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":  err.Error(),
+			"host":   request.Host,
+			"method": request.Method,
+			"path":   request.URL.Path,
+		}).Error("Could not forward request.")
+		return nil, err
+	}
+
+	log.WithFields(log.Fields{
+		"host":   request.Host,
+		"method": request.Method,
+		"path":   request.URL.Path,
+	}).Info("Response got successfuly!")
+
+	resp.Header.Set("Gen-proxy", "Was-Here")
+	return resp, nil
+
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
@@ -76,42 +106,55 @@ func (d *DBClient) save(req *http.Request, resp *http.Response) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 
-	responseObj := response{
-		Status:  resp.StatusCode,
-		Body:    body,
-		Headers: getHeadersMap(resp.Header),
-	}
-
-	log.WithFields(log.Fields{
-		"path":          req.URL.Path,
-		"rawQuery":      req.URL.RawQuery,
-		"requestMethod": req.Method,
-		"destination":   req.Host,
-		"hashKey":       key,
-	}).Info("Recording")
-
-	requestObj := requestDetails{
-		Path:        req.URL.Path,
-		Method:      req.Method,
-		Destination: req.Host,
-		Query:       req.URL.RawQuery,
-	}
-
-	payload := Payload{
-		Response: responseObj,
-		Request:  requestObj,
-		ID:       key,
-	}
-	// converting it to json bytes
-	bts, err := json.Marshal(payload)
-
 	if err != nil {
+		responseObj := response{
+			Status:  resp.StatusCode,
+			Body:    body,
+			Headers: getHeadersMap(resp.Header),
+		}
+
 		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Failed to marshal json")
+			"path":          req.URL.Path,
+			"rawQuery":      req.URL.RawQuery,
+			"requestMethod": req.Method,
+			"destination":   req.Host,
+			"hashKey":       key,
+		}).Info("Recording")
+
+		requestObj := requestDetails{
+			Path:        req.URL.Path,
+			Method:      req.Method,
+			Destination: req.Host,
+			Query:       req.URL.RawQuery,
+		}
+
+		payload := Payload{
+			Response: responseObj,
+			Request:  requestObj,
+			ID:       key,
+		}
+		// converting it to json bytes
+		bts, err := json.Marshal(payload)
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Failed to marshal json")
+		} else {
+			d.cache.set(key, bts)
+		}
+
 	} else {
-		d.cache.set(key, bts)
+		log.WithFields(log.Fields{
+			"error":         err.Error(),
+			"path":          req.URL.Path,
+			"rawQuery":      req.URL.RawQuery,
+			"requestMethod": req.Method,
+			"destination":   req.Host,
+			"hashKey":       key,
+		}).Error("Failed to read response body")
 	}
+
 }
 
 // getAllRecordsRaw returns raw (json string) for all records
@@ -234,29 +277,5 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 			goproxy.ContentTypeText, http.StatusPreconditionFailed,
 			"Coudldn't find recorded request, please record it first!")
 	}
-
-}
-
-// doRequest performs original request and returns response that should be returned to client and error (if there is one)
-func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
-	// We can't have this set. And it only contains "/pkg/net/http/" anyway
-	request.RequestURI = ""
-
-	resp, err := d.http.Do(request)
-
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error":  err.Error(),
-			"host":   request.Host,
-			"method": request.Method,
-			"path":   request.URL.Path,
-		}).Error("Could not forward request.")
-		return nil, err
-	}
-
-	log.WithFields(log.Fields{}).Info("Request forwarded!")
-
-	resp.Header.Set("Gen-proxy", "Was-Here")
-	return resp, nil
 
 }
