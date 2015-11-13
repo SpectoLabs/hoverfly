@@ -19,7 +19,7 @@ func main() {
 	// getting proxy configuration
 	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
 	record := flag.Bool("record", false, "should proxy record")
-	destination := flag.String("destination", "^.*:80$", "destination URI to catch")
+	destination := flag.String("destination", ".", "destination URI to catch")
 	flag.Parse()
 
 	// getting settings
@@ -61,6 +61,16 @@ func main() {
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile("^.*$"))).
 		HandleConnect(goproxy.AlwaysMitm)
 
+	// just helper handler to know where request hits proxy or no
+	proxy.OnRequest().DoFunc(
+		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+			log.WithFields(log.Fields{
+				"destination": r.URL.Host,
+			}).Info("Got request")
+
+			return r, nil
+		})
+
 	// hijacking plain connections
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(*destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
@@ -82,7 +92,7 @@ func main() {
 		"ProxyPort":    port,
 	}).Info("Proxy is starting...")
 
-	log.Error(http.ListenAndServe(port, proxy))
+	log.Warn(http.ListenAndServe(port, proxy))
 }
 
 // processRequest - processes incoming requests and based on proxy state (record/playback)

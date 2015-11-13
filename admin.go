@@ -52,7 +52,7 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 		log.WithFields(log.Fields{
 			"Error":        err.Error(),
 			"PasswordUsed": AppConfig.redisPassword,
-		}).Error("Failed to authenticate to Redis!")
+		}).Error("Failed to get data from cache!")
 
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(500) // can't process this entity
