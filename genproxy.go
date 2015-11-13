@@ -28,6 +28,9 @@ func main() {
 	// overriding default settings
 	AppConfig.recordState = *record
 
+	// overriding destination
+	AppConfig.destination = *destination
+
 	// getting default database
 	port := os.Getenv("ProxyPort")
 	if port == "" {

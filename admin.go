@@ -13,10 +13,16 @@ type jsonResponse struct {
 	Data []Payload `json:"data"`
 }
 
+type StateRequest struct {
+	Record      bool   `json:"record"`
+	Destination string `json:"destination"`
+}
+
 // getBoneRouter returns mux for admin interface
 func getBoneRouter(d DBClient) *bone.Mux {
 	mux := bone.New()
 	mux.Get("/records", http.HandlerFunc(d.AllRecordsHandler))
+	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
 
 	return mux
 }
@@ -50,5 +56,15 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(500) // can't process this entity
 		return
 	}
+}
 
+// CurrentStateHandler returns current state
+func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request) {
+	var resp StateRequest
+	resp.Record = AppConfig.recordState
+	resp.Destination = AppConfig.destination
+
+	b, _ := json.Marshal(resp)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Write(b)
 }
