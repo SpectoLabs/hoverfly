@@ -25,6 +25,9 @@ func main() {
 	// getting settings
 	initSettings()
 
+	// overriding default settings
+	AppConfig.recordState = *record
+
 	// getting default database
 	port := os.Getenv("ProxyPort")
 	if port == "" {
@@ -55,15 +58,6 @@ func main() {
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile("^.*$"))).
 		HandleConnect(goproxy.AlwaysMitm)
 
-	proxy.OnRequest().DoFunc(
-		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-			log.WithFields(log.Fields{
-				"SourceIP":    r.RemoteAddr,
-				"Destination": r.RemoteAddr,
-			}).Info("Got request")
-			return r, nil
-		})
-
 	// hijacking plain connections
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(*destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
@@ -71,22 +65,7 @@ func main() {
 			log.Info("connection found......")
 			log.Info(fmt.Sprintf("Url path:  %s", r.URL.Path))
 
-			if *record {
-				log.Info("*** RECORD ***")
-				newResponse, err := d.recordRequest(r)
-				if err != nil {
-					// something bad happened, passing through
-					return r, nil
-				} else {
-					// discarding original requests and returns supplied response
-					return r, newResponse
-				}
-
-			} else {
-				log.Info("*** PLAYBACK ***")
-				newResponse := d.getResponse(r)
-				return r, newResponse
-			}
+			return d.processRequest(r)
 		})
 
 	go d.startAdminInterface()
@@ -101,6 +80,28 @@ func main() {
 	}).Info("Proxy is starting...")
 
 	log.Error(http.ListenAndServe(port, proxy))
+}
+
+// processRequest - processes incoming requests and based on proxy state (record/playback)
+// returns HTTP response.
+func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Response) {
+
+	if AppConfig.recordState {
+		log.Info("*** RECORD ***")
+		newResponse, err := d.recordRequest(req)
+		if err != nil {
+			// something bad happened, passing through
+			return req, nil
+		} else {
+			// discarding original requests and returns supplied response
+			return req, newResponse
+		}
+
+	} else {
+		log.Info("*** PLAYBACK ***")
+		newResponse := d.getResponse(req)
+		return req, newResponse
+	}
 }
 
 func (d *DBClient) startAdminInterface() {

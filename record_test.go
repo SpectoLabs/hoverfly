@@ -66,7 +66,7 @@ func TestRequestFingerprint(t *testing.T) {
 
 }
 
-// TestGetAllRecords
+// TestGetAllRecords - tests recording and then getting responses
 func TestGetAllRecords(t *testing.T) {
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)

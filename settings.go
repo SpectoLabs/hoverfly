@@ -10,6 +10,7 @@ type Configuration struct {
 	redisPassword  string
 	adminInterface string
 	cachePrefix    string
+	recordState    bool
 }
 
 // AppCondig stores application configuration
@@ -30,4 +31,7 @@ func initSettings() {
 
 	// cache prefix
 	AppConfig.cachePrefix = "genproxy:"
+
+	// proxy state
+	// should be taken from cache
 }
