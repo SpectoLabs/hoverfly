@@ -1,0 +1,14 @@
+app:
+  build: .
+  volumes:
+  - .:/app:rw
+  links:
+  - redis:redis
+  ports:
+   - "8500:8500"
+   - "8888:8888"
+  environment:
+  - RedisAddress=redis:6379
+
+redis:
+  image: redis
