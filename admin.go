@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -19,10 +20,15 @@ type StateRequest struct {
 	Destination string `json:"destination"`
 }
 
+type messageResponse struct {
+	Message string `json:"message"`
+}
+
 // getBoneRouter returns mux for admin interface
 func getBoneRouter(d DBClient) *bone.Mux {
 	mux := bone.New()
 	mux.Get("/records", http.HandlerFunc(d.AllRecordsHandler))
+	mux.Delete("/records", http.HandlerFunc(d.DeleteAllRecordsHandler))
 	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
 	mux.Post("/state", http.HandlerFunc(d.stateHandler))
 
@@ -58,6 +64,25 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(500) // can't process this entity
 		return
 	}
+}
+
+func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request) {
+	err := d.deleteAllRecords()
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var response messageResponse
+	if err != nil {
+		response.Message = fmt.Sprintf("Something went wrong: %s", err.Error())
+		w.WriteHeader(500)
+	} else {
+		response.Message = "Proxy cache deleted successfuly"
+		w.WriteHeader(200)
+	}
+	b, err := json.Marshal(response)
+
+	w.Write(b)
+	return
 }
 
 // CurrentStateHandler returns current state
