@@ -167,6 +167,11 @@ func (d *DBClient) getAllRecordsRaw() ([]string, error) {
 
 	if err == nil {
 
+		// checking if there are any records
+		if len(keys) == 0 {
+			return nil, nil
+		}
+
 		jsonStrs, err := d.cache.getAllValues(keys)
 
 		if err != nil {
@@ -195,22 +200,41 @@ func (d *DBClient) getAllRecords() ([]Payload, error) {
 		}).Error("Failed to get all values")
 	} else {
 
-		for _, v := range jsonStrs {
-			var pl Payload
-			err = json.Unmarshal([]byte(v), &pl)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"error": err.Error(),
-					"json":  v,
-				}).Warning("Failed to deserialize json")
-			} else {
-				payloads = append(payloads, pl)
+		if jsonStrs != nil {
+			for _, v := range jsonStrs {
+				var pl Payload
+				err = json.Unmarshal([]byte(v), &pl)
+				if err != nil {
+					log.WithFields(log.Fields{
+						"error": err.Error(),
+						"json":  v,
+					}).Warning("Failed to deserialize json")
+				} else {
+					payloads = append(payloads, pl)
+				}
 			}
 		}
 	}
 
 	return payloads, err
 
+}
+
+// deleteAllRecords deletes all recorded requests
+func (d *DBClient) deleteAllRecords() error {
+	keys, err := d.cache.getAllKeys()
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Warning("Failed to get keys, cannot delete all records")
+		return err
+	} else {
+		for _, v := range keys {
+			d.cache.delete(v)
+		}
+		return nil
+	}
 }
 
 // getRequestFingerprint returns request hash
