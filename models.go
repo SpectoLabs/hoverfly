@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/goproxy"
@@ -23,6 +24,8 @@ type DBClient struct {
 type request struct {
 	details requestDetails
 }
+
+var emptyResp = &http.Response{}
 
 // requestDetails stores information about request, it's used for creating unique hash and also as a payload structure
 type requestDetails struct {
@@ -61,57 +64,101 @@ func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
 	// forwarding request
 	resp, err := d.doRequest(req)
 
-	// do not wait for response - spawning goroutine
-	go d.save(req, resp)
+	if err == nil {
+
+		// getting response body
+		body, err := httputil.DumpResponse(resp, true)
+		if err != nil {
+			// copying the response body did not work
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error": err.Error(),
+				}).Error("Failed to copy response body.")
+			}
+		}
+
+		// saving response body with request/response meta to cache
+		go d.save(req, resp, body)
+	}
 
 	// return new response or error here
 	return resp, err
 }
 
-// save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (d *DBClient) save(req *http.Request, resp *http.Response) {
-	// record request here
-	key := getRequestFingerprint(req)
+// doRequest performs original request and returns response that should be returned to client and error (if there is one)
+func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
+	// We can't have this set. And it only contains "/pkg/net/http/" anyway
+	request.RequestURI = ""
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-
-	responseObj := response{
-		Status:  resp.StatusCode,
-		Body:    body,
-		Headers: getHeadersMap(resp.Header),
-	}
-
-	log.WithFields(log.Fields{
-		"path":          req.URL.Path,
-		"rawQuery":      req.URL.RawQuery,
-		"requestMethod": req.Method,
-		"destination":   req.Host,
-		"hashKey":       key,
-	}).Info("Recording")
-
-	requestObj := requestDetails{
-		Path:        req.URL.Path,
-		Method:      req.Method,
-		Destination: req.Host,
-		Query:       req.URL.RawQuery,
-	}
-
-	payload := Payload{
-		Response: responseObj,
-		Request:  requestObj,
-		ID:       key,
-	}
-	// converting it to json bytes
-	bts, err := json.Marshal(payload)
+	resp, err := d.http.Do(request)
 
 	if err != nil {
 		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Failed to marshal json")
-	} else {
-		d.cache.set(key, bts)
+			"error":  err.Error(),
+			"host":   request.Host,
+			"method": request.Method,
+			"path":   request.URL.Path,
+		}).Error("Could not forward request.")
+		return nil, err
 	}
+
+	log.WithFields(log.Fields{
+		"host":   request.Host,
+		"method": request.Method,
+		"path":   request.URL.Path,
+	}).Info("Response got successfuly!")
+
+	resp.Header.Set("Gen-proxy", "Was-Here")
+	return resp, nil
+
+}
+
+// save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
+func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte) {
+	// record request here
+	key := getRequestFingerprint(req)
+
+	if resp == nil {
+		resp = emptyResp
+	} else {
+		responseObj := response{
+			Status:  resp.StatusCode,
+			Body:    respBody,
+			Headers: getHeadersMap(resp.Header),
+		}
+
+		log.WithFields(log.Fields{
+			"path":          req.URL.Path,
+			"rawQuery":      req.URL.RawQuery,
+			"requestMethod": req.Method,
+			"destination":   req.Host,
+			"hashKey":       key,
+		}).Info("Recording")
+
+		requestObj := requestDetails{
+			Path:        req.URL.Path,
+			Method:      req.Method,
+			Destination: req.Host,
+			Query:       req.URL.RawQuery,
+		}
+
+		payload := Payload{
+			Response: responseObj,
+			Request:  requestObj,
+			ID:       key,
+		}
+		// converting it to json bytes
+		bts, err := json.Marshal(payload)
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Failed to marshal json")
+		} else {
+			d.cache.set(key, bts)
+		}
+	}
+
 }
 
 // getAllRecordsRaw returns raw (json string) for all records
@@ -119,6 +166,11 @@ func (d *DBClient) getAllRecordsRaw() ([]string, error) {
 	keys, err := d.cache.getAllKeys()
 
 	if err == nil {
+
+		// checking if there are any records
+		if len(keys) == 0 {
+			return nil, nil
+		}
 
 		jsonStrs, err := d.cache.getAllValues(keys)
 
@@ -148,22 +200,41 @@ func (d *DBClient) getAllRecords() ([]Payload, error) {
 		}).Error("Failed to get all values")
 	} else {
 
-		for _, v := range jsonStrs {
-			var pl Payload
-			err = json.Unmarshal([]byte(v), &pl)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"error": err.Error(),
-					"json":  v,
-				}).Warning("Failed to deserialize json")
-			} else {
-				payloads = append(payloads, pl)
+		if jsonStrs != nil {
+			for _, v := range jsonStrs {
+				var pl Payload
+				err = json.Unmarshal([]byte(v), &pl)
+				if err != nil {
+					log.WithFields(log.Fields{
+						"error": err.Error(),
+						"json":  v,
+					}).Warning("Failed to deserialize json")
+				} else {
+					payloads = append(payloads, pl)
+				}
 			}
 		}
 	}
 
 	return payloads, err
 
+}
+
+// deleteAllRecords deletes all recorded requests
+func (d *DBClient) deleteAllRecords() error {
+	keys, err := d.cache.getAllKeys()
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Warning("Failed to get keys, cannot delete all records")
+		return err
+	} else {
+		for _, v := range keys {
+			d.cache.delete(v)
+		}
+		return nil
+	}
 }
 
 // getRequestFingerprint returns request hash
@@ -234,29 +305,5 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 			goproxy.ContentTypeText, http.StatusPreconditionFailed,
 			"Coudldn't find recorded request, please record it first!")
 	}
-
-}
-
-// doRequest performs original request and returns response that should be returned to client and error (if there is one)
-func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
-	// We can't have this set. And it only contains "/pkg/net/http/" anyway
-	request.RequestURI = ""
-
-	resp, err := d.http.Do(request)
-
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error":  err.Error(),
-			"host":   request.Host,
-			"method": request.Method,
-			"path":   request.URL.Path,
-		}).Error("Could not forward request.")
-		return nil, err
-	}
-
-	log.WithFields(log.Fields{}).Info("Request forwarded!")
-
-	resp.Header.Set("Gen-proxy", "Was-Here")
-	return resp, nil
 
 }

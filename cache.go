@@ -110,7 +110,7 @@ func (c *Cache) delete(key string) error {
 	client := c.pool.Get()
 	defer client.Close()
 
-	_, err := client.Do("DEL", fmt.Sprintf(c.prefix+key))
+	_, err := client.Do("DEL", key)
 
 	return err
 
@@ -130,12 +130,13 @@ func getRedisPool() *redis.Pool {
 			maxConnections = maxCons
 		}
 	}
+
 	// getting redis client for state storing
 	redisPool := redis.NewPool(func() (redis.Conn, error) {
 		c, err := redis.Dial("tcp", AppConfig.redisAddress)
 
 		if err != nil {
-			log.WithFields(log.Fields{"Error": err.Error()}).Panic("Failed to create Redis connection pool!")
+			log.WithFields(log.Fields{"Error": err.Error()}).Warn("Failed to create Redis connection pool!")
 			return nil, err
 		}
 		if AppConfig.redisPassword != "" {
@@ -143,7 +144,7 @@ func getRedisPool() *redis.Pool {
 				log.WithFields(log.Fields{
 					"Error":        err.Error(),
 					"PasswordUsed": AppConfig.redisPassword,
-				}).Panic("Failed to authenticate to Redis!")
+				}).Warn("Failed to authenticate to Redis!")
 				c.Close()
 				return nil, err
 			} else {

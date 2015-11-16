@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"encoding/json"
@@ -13,10 +15,22 @@ type jsonResponse struct {
 	Data []Payload `json:"data"`
 }
 
+type StateRequest struct {
+	Record      bool   `json:"record"`
+	Destination string `json:"destination"`
+}
+
+type messageResponse struct {
+	Message string `json:"message"`
+}
+
 // getBoneRouter returns mux for admin interface
 func getBoneRouter(d DBClient) *bone.Mux {
 	mux := bone.New()
 	mux.Get("/records", http.HandlerFunc(d.AllRecordsHandler))
+	mux.Delete("/records", http.HandlerFunc(d.DeleteAllRecordsHandler))
+	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
+	mux.Post("/state", http.HandlerFunc(d.stateHandler))
 
 	return mux
 }
@@ -44,11 +58,80 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 		log.WithFields(log.Fields{
 			"Error":        err.Error(),
 			"PasswordUsed": AppConfig.redisPassword,
-		}).Error("Failed to authenticate to Redis!")
+		}).Error("Failed to get data from cache!")
 
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(500) // can't process this entity
 		return
 	}
+}
+
+func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request) {
+	err := d.deleteAllRecords()
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var response messageResponse
+	if err != nil {
+		response.Message = fmt.Sprintf("Something went wrong: %s", err.Error())
+		w.WriteHeader(500)
+	} else {
+		response.Message = "Proxy cache deleted successfuly"
+		w.WriteHeader(200)
+	}
+	b, err := json.Marshal(response)
+
+	w.Write(b)
+	return
+}
+
+// CurrentStateHandler returns current state
+func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request) {
+	var resp StateRequest
+	resp.Record = AppConfig.recordState
+	resp.Destination = AppConfig.destination
+
+	b, _ := json.Marshal(resp)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Write(b)
+}
+
+// stateHandler handles current proxy state
+func (d *DBClient) stateHandler(w http.ResponseWriter, r *http.Request) {
+	var stateRequest StateRequest
+
+	defer r.Body.Close()
+	body, err := ioutil.ReadAll(r.Body)
+
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not read response body!")
+		http.Error(w, "Failed to read request body.", 400)
+		return
+	}
+
+	err = json.Unmarshal(body, &stateRequest)
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(422) // can't process this entity
+		return
+	}
+	log.WithFields(log.Fields{
+		"newState": stateRequest.Record,
+		"body":     string(body),
+	}).Info("Handling state change request!")
+
+	// setting new state
+	AppConfig.recordState = stateRequest.Record
+
+	var resp StateRequest
+	resp.Record = stateRequest.Record
+	resp.Destination = AppConfig.destination
+	b, _ := json.Marshal(resp)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Write(b)
 
 }
