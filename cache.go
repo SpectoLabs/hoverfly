@@ -110,7 +110,7 @@ func (c *Cache) delete(key string) error {
 	client := c.pool.Get()
 	defer client.Close()
 
-	_, err := client.Do("DEL", fmt.Sprintf(c.prefix+key))
+	_, err := client.Do("DEL", key)
 
 	return err
 
