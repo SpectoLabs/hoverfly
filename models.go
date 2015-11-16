@@ -213,6 +213,23 @@ func (d *DBClient) getAllRecords() ([]Payload, error) {
 
 }
 
+// deleteAllRecords deletes all recorded requests
+func (d *DBClient) deleteAllRecords() error {
+	keys, err := d.cache.getAllKeys()
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Warning("Failed to get keys, cannot delete all records")
+		return err
+	} else {
+		for _, v := range keys {
+			d.cache.delete(v)
+		}
+		return nil
+	}
+}
+
 // getRequestFingerprint returns request hash
 func getRequestFingerprint(req *http.Request) string {
 	details := requestDetails{Path: req.URL.Path, Method: req.Method, Destination: req.Host, Query: req.URL.RawQuery}
