@@ -28,7 +28,7 @@ func main() {
 	initSettings()
 
 	// adding influxdb hook
-	go addInfluxLoggingHook()
+	addInfluxLoggingHook()
 
 	// overriding default settings
 	AppConfig.recordState = *record

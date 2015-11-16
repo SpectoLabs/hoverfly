@@ -12,6 +12,8 @@ app:
   - RedisAddress=redis:6379
   - InfluxAddress=influx
   - InfluxDBName=events
+  - INFLUX_USER=root
+  - INFLUX_PWD=root
 
 redis:
   image: redis
@@ -38,7 +40,7 @@ grafana:
       - INFLUXDB_PROTO=http
       - INFLUXDB_HOST=influx
       - INFLUXDB_PORT=8086
-      - INFLUXDB_NAME=events
+      - INFLUXDB_NAME=logrus
       - INFLUXDB_USER=root
       - INFLUXDB_PASS=root
       - INFLUXDB_IS_GRAFANADB=true
