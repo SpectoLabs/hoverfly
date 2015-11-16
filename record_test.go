@@ -93,3 +93,28 @@ func TestGetAllRecords(t *testing.T) {
 	}
 
 }
+
+func TestDeleteAllRecords(t *testing.T) {
+
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.pool.Close()
+
+	// inserting some payloads
+	for i := 0; i < 5; i++ {
+		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
+		expect(t, err, nil)
+		dbClient.recordRequest(req)
+	}
+	// checking that keys are there
+	keys, _ := dbClient.cache.getAllKeys()
+	expect(t, len(keys) > 0, true)
+
+	// deleting
+	err := dbClient.deleteAllRecords()
+	expect(t, err, nil)
+
+	// checking whether all records were deleted
+	keys, _ = dbClient.cache.getAllKeys()
+	expect(t, len(keys), 0)
+}
