@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/goproxy"
@@ -23,6 +24,8 @@ type DBClient struct {
 type request struct {
 	details requestDetails
 }
+
+var emptyResp = &http.Response{}
 
 // requestDetails stores information about request, it's used for creating unique hash and also as a payload structure
 type requestDetails struct {
@@ -62,8 +65,20 @@ func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
 	resp, err := d.doRequest(req)
 
 	if err == nil {
-		// do not wait for response - spawning goroutine
-		go d.save(req, resp)
+
+		// getting response body
+		body, err := httputil.DumpResponse(resp, true)
+		if err != nil {
+			// copying the response body did not work
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error": err.Error(),
+				}).Error("Failed to copy response body.")
+			}
+		}
+
+		// saving response body with request/response meta to cache
+		go d.save(req, resp, body)
 	}
 
 	// return new response or error here
@@ -99,17 +114,16 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (d *DBClient) save(req *http.Request, resp *http.Response) {
+func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte) {
 	// record request here
 	key := getRequestFingerprint(req)
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
+	if resp == nil {
+		resp = emptyResp
+	} else {
 		responseObj := response{
 			Status:  resp.StatusCode,
-			Body:    body,
+			Body:    respBody,
 			Headers: getHeadersMap(resp.Header),
 		}
 
@@ -143,16 +157,6 @@ func (d *DBClient) save(req *http.Request, resp *http.Response) {
 		} else {
 			d.cache.set(key, bts)
 		}
-
-	} else {
-		log.WithFields(log.Fields{
-			"error":         err.Error(),
-			"path":          req.URL.Path,
-			"rawQuery":      req.URL.RawQuery,
-			"requestMethod": req.Method,
-			"destination":   req.Host,
-			"hashKey":       key,
-		}).Error("Failed to read response body")
 	}
 
 }
