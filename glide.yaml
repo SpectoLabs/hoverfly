@@ -1,0 +1,10 @@
+package: main
+import:
+  - package: github.com/garyburd/redigo
+    subpackages:
+      - /redis
+  - package: github.com/Sirupsen/logrus
+  - package: github.com/elazarl/goproxy
+  - package: github.com/meatballhat/negroni-logrus
+  - package: github.com/codegangsta/negroni
+  - package: github.com/go-zoo/bone
