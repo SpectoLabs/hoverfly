@@ -1,11 +1,13 @@
 package main
 
 import (
+	"github.com/Abramovic/logrus_influxdb"
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/elazarl/goproxy"
 	"github.com/meatballhat/negroni-logrus"
 
+	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -24,6 +26,9 @@ func main() {
 
 	// getting settings
 	initSettings()
+
+	// adding influxdb hook
+	addInfluxLoggingHook()
 
 	// overriding default settings
 	AppConfig.recordState = *record
@@ -131,4 +136,46 @@ func (d *DBClient) startAdminInterface() {
 	}).Info("Admin interface is starting...")
 
 	n.Run(AppConfig.adminInterface)
+}
+
+func addInfluxLoggingHook() error {
+	// checking whether app should send logs to influxdb
+	influxdbAddress := os.Getenv("InfluxAddress")
+
+	if influxdbAddress != "" {
+
+		// getting default events database
+		influxDatabaseName := os.Getenv("InfluxDBName")
+		if influxDatabaseName == "" {
+			influxDatabaseName = "events"
+		}
+
+		var maxRetries = 10
+		var errMaxRetriesReached = errors.New("exceeded retry limit")
+		var err error
+		var cont bool
+
+		attempt := 1
+		for {
+			hook, err := logrus_influxdb.NewInfluxDBHook(influxdbAddress, influxDatabaseName, nil)
+			if !cont || err == nil {
+				log.AddHook(hook)
+				log.Info("Hook to InfluxDB added successfuly")
+				break
+			}
+			attempt++
+			if attempt > maxRetries {
+				log.WithFields(log.Fields{
+					"Error":              err.Error(),
+					"InfluxDB":           influxdbAddress,
+					"InfluxDatabaseName": influxDatabaseName,
+				}).Error("Unable to add InfluxDB hook")
+				return errMaxRetriesReached
+			}
+		}
+		return err
+
+	} else {
+		return nil
+	}
 }

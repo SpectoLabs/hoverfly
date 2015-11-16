@@ -8,3 +8,7 @@ import:
   - package: github.com/meatballhat/negroni-logrus
   - package: github.com/codegangsta/negroni
   - package: github.com/go-zoo/bone
+  - package: github.com/influxdb/influxdb
+    subpackages:
+      - /client/v2
+  - package: github.com/Abramovic/logrus_influxdb
