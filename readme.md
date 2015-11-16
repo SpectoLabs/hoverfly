@@ -25,9 +25,11 @@ Start proxy in playback mode:
 
 Access admin panel under default port 8888:
 
-* Recorded requests: GET http://proxy_hostname:8888/records
-* Wipe cache: DELETE http://proxy_hostname:8888/records
-* Get current proxy state: GET http://proxy_hostname:8888/state
+* Recorded requests: GET http://proxy_hostname:8888/records ( __curl http://proxy_hostname:8888/records__ )
+* Wipe cache: DELETE http://proxy_hostname:8888/records ( __curl -X DELETE http://proxy_hostname:8888/records__ ) 
+* Get current proxy state: GET http://proxy_hostname:8888/state ( __curl http://proxy_hostname:8888/state__ )
 * Set proxy state: POST http://proxy_hostname:8888/state, where
    + body to start playback: {"record":false}
    + body to start recording: {"record":true}
+* Exporting recorded requests to a file: __curl http://proxy_hostname:8888/records > requests.json__
+* Importing requests from file: __curl --data "@/path/to/requests.json" http://localhost:8888/records__
