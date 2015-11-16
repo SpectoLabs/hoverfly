@@ -11,7 +11,7 @@ import (
 )
 
 // jsonResponse struct encapsulates payload data
-type jsonResponse struct {
+type recordedRequests struct {
 	Data []Payload `json:"data"`
 }
 
@@ -27,8 +27,11 @@ type messageResponse struct {
 // getBoneRouter returns mux for admin interface
 func getBoneRouter(d DBClient) *bone.Mux {
 	mux := bone.New()
+
 	mux.Get("/records", http.HandlerFunc(d.AllRecordsHandler))
 	mux.Delete("/records", http.HandlerFunc(d.DeleteAllRecordsHandler))
+	mux.Post("/records", http.HandlerFunc(d.ImportRecordsHandler))
+
 	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
 	mux.Post("/state", http.HandlerFunc(d.stateHandler))
 
@@ -43,7 +46,7 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		var response jsonResponse
+		var response recordedRequests
 		response.Data = records
 		b, err := json.Marshal(response)
 
@@ -64,6 +67,57 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(500) // can't process this entity
 		return
 	}
+}
+
+func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request) {
+
+	var requests recordedRequests
+
+	defer req.Body.Close()
+	body, err := ioutil.ReadAll(req.Body)
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	var response messageResponse
+
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not read response body!")
+		response.Message = "Bad request. Nothing to import!"
+		http.Error(w, "Failed to read request body.", 400)
+		return
+	}
+
+	err = json.Unmarshal(body, &requests)
+
+	if err != nil {
+		w.WriteHeader(422) // can't process this entity
+		return
+	}
+
+	payloads := requests.Data
+	if len(payloads) > 0 {
+		for _, pl := range payloads {
+			bts, err := json.Marshal(pl)
+
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error": err.Error(),
+				}).Error("Failed to marshal json")
+			} else {
+				d.cache.set(pl.ID, bts)
+			}
+		}
+		response.Message = fmt.Sprintf("%d requests imported successfully", len(payloads))
+	} else {
+		response.Message = "Bad request. Nothing to import!"
+		w.WriteHeader(400)
+	}
+
+	b, err := json.Marshal(response)
+	w.Write(b)
+
 }
 
 func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request) {
