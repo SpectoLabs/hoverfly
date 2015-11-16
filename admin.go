@@ -30,7 +30,7 @@ func getBoneRouter(d DBClient) *bone.Mux {
 
 	mux.Get("/records", http.HandlerFunc(d.AllRecordsHandler))
 	mux.Delete("/records", http.HandlerFunc(d.DeleteAllRecordsHandler))
-	mux.Put("/records", http.HandlerFunc(d.ImportRecordsHandler))
+	mux.Post("/records", http.HandlerFunc(d.ImportRecordsHandler))
 
 	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
 	mux.Post("/state", http.HandlerFunc(d.stateHandler))
