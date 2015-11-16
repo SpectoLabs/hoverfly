@@ -4,11 +4,13 @@
 
 ## Configuration
 
-Specifying which site to record/playback with regular expression:
-./GenProxy --destination="^.*:80$"
+Specifying which site to record/playback with regular expression (by default it records everything):
+./GenProxy --destination="."
 
 By default proxy is always in playback mode. To switch to record mode, add "--record" flag during startup:
 ./GenProxy --record
+
+Or you can use API call to change proxy state while running.
 
 
 Do a curl request with proxy details: 
@@ -23,4 +25,9 @@ Start proxy in playback mode:
 
 Access admin panel under default port 8888:
 
-* Recorded requests: http://proxy_hostname:8888/records
+* Recorded requests: GET http://proxy_hostname:8888/records
+* Wipe cache: DELETE http://proxy_hostname:8888/records
+* Get current proxy state: GET http://proxy_hostname:8888/state
+* Set proxy state: POST http://proxy_hostname:8888/state, where
+   + body to start playback: {"record":false}
+   + body to start recording: {"record":true}
