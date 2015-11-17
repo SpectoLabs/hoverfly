@@ -5,6 +5,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/elazarl/goproxy"
+	_ "github.com/influxdb/influxdb/client/v2"
 	"github.com/meatballhat/negroni-logrus"
 
 	"errors"
@@ -13,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"time"
 )
 
 const DefaultPort = ":8500"
@@ -28,7 +30,13 @@ func main() {
 	initSettings()
 
 	// adding influxdb hook
-	addInfluxLoggingHook()
+	err := addInfluxLoggingHook()
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"Error": err.Error(),
+		}).Error("Failed to add InfluxDB hook")
+	}
 
 	// overriding default settings
 	AppConfig.recordState = *record
@@ -153,17 +161,20 @@ func addInfluxLoggingHook() error {
 		var maxRetries = 10
 		var errMaxRetriesReached = errors.New("exceeded retry limit")
 		var err error
-		var cont bool
+		//		var cont bool
 
 		attempt := 1
 		for {
-			hook, err := logrus_influxdb.NewInfluxDBHook(influxdbAddress, influxDatabaseName, nil)
-			if !cont || err == nil {
+			hook, err := logrus_influxdb.NewInfluxDBHook("192.168.59.103", "logrus", nil)
+			log.Info("Hook created, next step - adding to logrus")
+			if err == nil {
 				log.AddHook(hook)
 				log.Info("Hook to InfluxDB added successfuly")
 				break
 			}
 			attempt++
+			log.Warn("Failed to connect to InfluxDB, maybe it is not running yet? Waiting...")
+			time.Sleep(5 * time.Second)
 			if attempt > maxRetries {
 				log.WithFields(log.Fields{
 					"Error":              err.Error(),
