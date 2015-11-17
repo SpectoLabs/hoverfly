@@ -1,4 +1,4 @@
-FROM golang:1.5-onbuild
+FROM golang:1.5
 
 MAINTAINER karolis.rusenas@gmail.com
 
