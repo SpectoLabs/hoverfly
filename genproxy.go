@@ -161,11 +161,10 @@ func addInfluxLoggingHook() error {
 		var maxRetries = 10
 		var errMaxRetriesReached = errors.New("exceeded retry limit")
 		var err error
-		//		var cont bool
 
 		attempt := 1
 		for {
-			hook, err := logrus_influxdb.NewInfluxDBHook("192.168.59.103", "logrus", nil)
+			hook, err := logrus_influxdb.NewInfluxDBHook(influxdbAddress, influxDatabaseName, nil)
 			log.Info("Hook created, next step - adding to logrus")
 			if err == nil {
 				log.AddHook(hook)
