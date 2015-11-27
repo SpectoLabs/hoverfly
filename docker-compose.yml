@@ -4,17 +4,12 @@ app:
   - .:/app:rw
   links:
   - redis:redis
-  - influx:influx
   ports:
    - "8500:8500"
    - "8888:8888"
   environment:
   - RedisAddress=redis:6379
   - RedisPassword=very_secret
-  - InfluxAddress=influx
-  - InfluxDBName=events
-  - INFLUX_USER=root
-  - INFLUX_PWD=root
 
 redis:
   image: tutum/redis
@@ -22,30 +17,3 @@ redis:
         - REDIS_PASS=very_secret
         - REDIS_MAXMEMORY_POLICY="allkeys-lru"
         - REDIS_MAXMEMORY="512mb"
-
-influx:
-  image: tutum/influxdb:0.9
-  environment:
-      - ADMIN_USER=root
-      - INFLUXDB_INIT_PWD=root
-      - PRE_CREATE_DB=events
-  ports:
-      - "8083:8083"
-      - "8086:8086"
-
-grafana:
-  image: tutum/grafana
-  links:
-      - influx:influx
-  ports:
-    - "80:80"
-  environment:
-      - HTTP_USER=grafanauser
-      - HTTP_PASS=grafanapass
-      - INFLUXDB_PROTO=http
-      - INFLUXDB_HOST=influx
-      - INFLUXDB_PORT=8086
-      - INFLUXDB_NAME=logrus
-      - INFLUXDB_USER=root
-      - INFLUXDB_PASS=root
-      - INFLUXDB_IS_GRAFANADB=true
