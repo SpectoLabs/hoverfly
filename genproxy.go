@@ -15,6 +15,15 @@ import (
 
 const DefaultPort = ":8500"
 
+// orPanic - wrapper for logging errors
+func orPanic(err error) {
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Panic("Got error.")
+	}
+}
+
 func main() {
 	// getting proxy configuration
 	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
