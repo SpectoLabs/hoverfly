@@ -73,7 +73,7 @@ func main() {
 		HandleConnect(goproxy.AlwaysMitm)
 
 	// enable curl -p for all hosts on port 80
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile("^.*:80$"))).
+	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(*destination))).
 		HijackConnect(func(req *http.Request, client net.Conn, ctx *goproxy.ProxyCtx) {
 		defer func() {
 			if e := recover(); e != nil {
