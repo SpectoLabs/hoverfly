@@ -16,6 +16,7 @@ _test
 *.cgo2.c
 _cgo_defun.c
 _cgo_gotypes.go
+/vendor
 _cgo_export.*
 
 _testmain.go
