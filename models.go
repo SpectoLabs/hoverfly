@@ -46,9 +46,9 @@ func (r *request) hash() string {
 // to be bytes, however headers should provide all required information for later decoding
 // by the client.
 type response struct {
-	Status  int               `json:"status"`
-	Body    []byte            `json:"body"`
-	Headers map[string]string `json:"headers"`
+	Status  int                 `json:"status"`
+	Body    []byte              `json:"body"`
+	Headers map[string][]string `json:"headers"`
 }
 
 // Payload structure holds request and response structure
@@ -122,9 +122,10 @@ func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte)
 		resp = emptyResp
 	} else {
 		responseObj := response{
-			Status:  resp.StatusCode,
-			Body:    respBody,
-			Headers: getHeadersMap(resp.Header),
+			Status: resp.StatusCode,
+			Body:   respBody,
+			//			Headers: getHeadersMap(resp.Header),
+			Headers: resp.Header,
 		}
 
 		log.WithFields(log.Fields{
@@ -244,15 +245,6 @@ func getRequestFingerprint(req *http.Request) string {
 	return r.hash()
 }
 
-// getHeadersMap converts map[string][]string to map[string]string structure
-func getHeadersMap(hds map[string][]string) map[string]string {
-	headers := make(map[string]string)
-	for key, value := range hds {
-		headers[key] = value[0]
-	}
-	return headers
-}
-
 // getResponse returns stored response from cache
 func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	log.Info("Returning response")
@@ -276,8 +268,12 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 		// adding headers
 		newResponse.Header = make(http.Header)
 		if len(payload.Response.Headers) > 0 {
-			for k, v := range payload.Response.Headers {
-				newResponse.Header.Set(k, v)
+			for k, values := range payload.Response.Headers {
+				// headers is a map, appending each value
+				for _, v := range values {
+					newResponse.Header.Add(k, v)
+				}
+
 			}
 		}
 		newResponse.Header.Set("Gen-Proxy", "Playback")
