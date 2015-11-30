@@ -16,6 +16,12 @@ Or you can use API call to change proxy state while running.
 Do a curl request with proxy details: 
 + curl http://mirage.readthedocs.org --proxy http://localhost:8500/
 
+### HTTPS recording
+
+Add ca.pem to your trusted certificates or turn off verification, with curl you can make insecure requests with -k: 
+
++ curl https://www.bbc.co.uk --proxy http://localhost:8500 -k
+
 ### Playback
 
 Start proxy in playback mode:
