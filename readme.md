@@ -1,34 +1,38 @@
-# Hoverfly: Dependencies without the sting
+# Hoverfly: dependencies without the sting
 
 Hoverfly is an experiment in lightweight, open source [service virtualization](https://en.wikipedia.org/wiki/Service_virtualization). Using Hoverfly, you can virtualize your application dependencies to create a self-contained development/test environment. 
 
-Hoverfly is a transparent proxy written in Go. It can record HTTP(s) traffic between an application under test and an external service, and then replace the external service. The only dependency is Redis.
+Hoverfly is a transparent proxy written in Go. It can capture HTTP(s) traffic between an application under test and external services, and then replace the external services. Hoverfly uses Redis for persistence.
 
 
 ## Configuration
 
-Specifying which site to record/playback with regular expression (by default it records everything):
-./hoverfly --destination="."
+Specifying which site to capture/virtualize with regular expression (by default it captures everything):
 
-By default proxy is always in playback mode. To switch to record mode, add "--record" flag during startup:
-./hoverfly --record
+    ./hoverfly --destination="."
+
+By default proxy is always in virtualize mode. To switch to capture mode, add "--capture" flag during startup:
+
+    ./hoverfly --capture
 
 Or you can use API call to change proxy state while running.
 
 
 Do a curl request with proxy details: 
-+ curl http://mirage.readthedocs.org --proxy http://localhost:8500/
 
-### HTTPS recording
+    curl http://mirage.readthedocs.org --proxy http://localhost:8500/
+
+### HTTPS capture
 
 Add ca.pem to your trusted certificates or turn off verification, with curl you can make insecure requests with -k: 
 
-+ curl https://www.bbc.co.uk --proxy http://localhost:8500 -k
+    curl https://www.bbc.co.uk --proxy http://localhost:8500 -k
 
-### Playback
+### Virtualizing services
 
-Start proxy in playback mode:
-./hoverfly
+Start proxy in virtualize mode:
+
+    ./hoverfly
 
 ## API
 
