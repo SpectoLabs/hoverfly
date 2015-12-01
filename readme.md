@@ -1,6 +1,9 @@
-# One Proxy to Integrate Them All
+# Hoverfly: Dependencies without the sting
 
--
+Hoverfly is an experiment in lightweight, open source [service virtualization](https://en.wikipedia.org/wiki/Service_virtualization). Using Hoverfly, you can virtualize your application dependencies to create a self-contained development/test environment. 
+
+Hoverfly is a transparent proxy written in Go. It can record HTTP(s) traffic between an application under test and an external service, and then replace the external service. The only dependency is Redis.
+
 
 ## Configuration
 
@@ -39,3 +42,9 @@ Access administrator API under default port 8888:
    + body to start recording: {"record":true}
 * Exporting recorded requests to a file: __curl http://proxy_hostname:8888/records > requests.json__
 * Importing requests from file: __curl --data "@/path/to/requests.json" http://localhost:8888/records__
+ 
+## License
+
+Apache License version 2.0 [See LICENSE for details](https://github.com/SpectoLabs/hoverfly/blob/master/LICENSE).
+
+(c) [SpectoLabs](https://specto.io) 2015.
