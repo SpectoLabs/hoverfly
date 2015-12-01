@@ -5,10 +5,10 @@
 ## Configuration
 
 Specifying which site to record/playback with regular expression (by default it records everything):
-./GenProxy --destination="."
+./hoverfly --destination="."
 
 By default proxy is always in playback mode. To switch to record mode, add "--record" flag during startup:
-./GenProxy --record
+./hoverfly --record
 
 Or you can use API call to change proxy state while running.
 
@@ -25,11 +25,11 @@ Add ca.pem to your trusted certificates or turn off verification, with curl you 
 ### Playback
 
 Start proxy in playback mode:
-./GenProxy
+./hoverfly
 
 ## API
 
-Access admin panel under default port 8888:
+Access administrator API under default port 8888:
 
 * Recorded requests: GET http://proxy_hostname:8888/records ( __curl http://proxy_hostname:8888/records__ )
 * Wipe cache: DELETE http://proxy_hostname:8888/records ( __curl -X DELETE http://proxy_hostname:8888/records__ ) 
