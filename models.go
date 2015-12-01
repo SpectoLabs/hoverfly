@@ -47,7 +47,7 @@ func (r *request) hash() string {
 // by the client.
 type response struct {
 	Status  int                 `json:"status"`
-	Body    []byte              `json:"body"`
+	Body    string              `json:"body"`
 	Headers map[string][]string `json:"headers"`
 }
 
@@ -122,9 +122,8 @@ func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte)
 		resp = emptyResp
 	} else {
 		responseObj := response{
-			Status: resp.StatusCode,
-			Body:   respBody,
-			//			Headers: getHeadersMap(resp.Header),
+			Status:  resp.StatusCode,
+			Body:    string(respBody),
 			Headers: resp.Header,
 		}
 
@@ -278,7 +277,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 		}
 		newResponse.Header.Set("Gen-Proxy", "Playback")
 		// adding body
-		buf := bytes.NewBuffer(payload.Response.Body)
+		buf := bytes.NewBufferString(payload.Response.Body)
 		newResponse.ContentLength = int64(buf.Len())
 		newResponse.Body = ioutil.NopCloser(buf)
 
