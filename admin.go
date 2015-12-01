@@ -106,7 +106,9 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 					"error": err.Error(),
 				}).Error("Failed to marshal json")
 			} else {
-				d.cache.set(pl.ID, bts)
+				// recalculating request hash and storing it in database
+				r := request{details: pl.Request}
+				d.cache.set(r.hash(), bts)
 			}
 		}
 		response.Message = fmt.Sprintf("%d requests imported successfully", len(payloads))
