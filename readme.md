@@ -51,7 +51,29 @@ Access administrator API under default port 8888:
 ## Middleware
 
 Hoverfly supports (experimental feature) external middleware modules. You can write them in __any language you want!__.
-Middleware is executed when request is matched and response found in cache so for fully dynamic responses where you are 
+These middleware modules are expected to take standard input (stdin) and should write to stdout same structure JSON string.
+Payload example:
+
+```javascript
+{
+	"response": {
+		"status": 200,
+		"body": "body here",
+		"headers": {
+			"Content-Type": ["text/html"],
+			"Date": ["Tue, 01 Dec 2015 16:49:08 GMT"],
+		}
+	},
+	"request": {
+		"path": "/",
+		"method": "GET",
+		"destination": "1stalphaomega.readthedocs.org",
+		"query": ""
+	},
+	"id": "5d4f6b1d9f7c2407f78e4d4e211ec769"
+}
+```
+Middleware is executed only when request is matched so for fully dynamic responses where you are 
 generating response on the fly - just add dummy request through import functionality. 
 
 In order to use your middleware, just add path to executable: 
