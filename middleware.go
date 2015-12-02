@@ -3,25 +3,11 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"os/exec"
 	"strings"
-	"sync"
 
 	log "github.com/Sirupsen/logrus"
 )
-
-type Middleware struct {
-	command string
-	payload Payload
-
-	data chan []byte
-
-	mu sync.Mutex
-
-	Stdin  io.Writer
-	Stdout io.Reader
-}
 
 // To provide input to the pipeline, assign an io.Reader to the first's Stdin.
 func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte, pipeLineError error) {
@@ -67,16 +53,17 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 }
 
 func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
-	m := new(Middleware)
-	m.command = command
-	m.payload = payload
-	m.data = make(chan []byte, 1000)
-
 	commands := strings.Split(command, " ")
+
+	log.WithFields(log.Fields{
+		"commands": commands,
+		"no":       len(commands),
+	}).Info("Found commands")
+
 	cmds := exec.Command(commands[0], commands[1:]...)
 
 	// getting payload
-	bts, err := json.Marshal(m.payload)
+	bts, err := json.Marshal(payload)
 
 	if err != nil {
 		log.WithFields(log.Fields{
