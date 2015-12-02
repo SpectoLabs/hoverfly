@@ -12,6 +12,7 @@ type Configuration struct {
 	cachePrefix    string
 	recordState    bool
 	destination    string
+	middleware     string
 }
 
 // AppCondig stores application configuration
@@ -37,5 +38,9 @@ func initSettings() {
 	//	AppConfig.destination = "get this from cache"
 
 	// proxy state
-	// should be taken from cache
+	// should be taken from cache if we want to make it horizontally scalable (currently not needed)
+
+	// middleware configuration
+	AppConfig.middleware = os.Getenv("HoverflyMiddleware")
+
 }

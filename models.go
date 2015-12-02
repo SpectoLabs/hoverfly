@@ -266,6 +266,28 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 		newResponse.Request = req
 		// adding headers
 		newResponse.Header = make(http.Header)
+
+		// checking for middleware configuration
+		if AppConfig.middleware != "" {
+			newPayload, err := ExecuteMiddleware(AppConfig.middleware, payload)
+
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error":      err.Error(),
+					"middleware": AppConfig.middleware,
+				}).Error("Error during middleware transformation, not modifying response payload!")
+			} else {
+				log.WithFields(log.Fields{
+					"middleware": AppConfig.middleware,
+					"newPayload": newPayload,
+				}).Info("Middleware transformation complete!")
+				// override payload with transformed thing
+				payload = newPayload
+			}
+
+		}
+
+		// applying payload
 		if len(payload.Response.Headers) > 0 {
 			for k, values := range payload.Response.Headers {
 				// headers is a map, appending each value
