@@ -31,7 +31,7 @@ func main() {
 	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
 	record := flag.Bool("record", false, "should proxy record")
 	destination := flag.String("destination", ".", "destination URI to catch")
-	middleware := flag.Bool("middleware", false, "should proxy use middleware")
+	middleware := flag.String("middleware", "", "should proxy use middleware")
 	flag.Parse()
 
 	// getting settings
