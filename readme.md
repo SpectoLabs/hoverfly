@@ -7,13 +7,13 @@ Hoverfly is a transparent proxy written in Go. It can capture HTTP(s) traffic be
 
 ## Configuration
 
-Specifying which site to capture/virtualize with regular expression (by default it captures everything):
+Specifying which site to record/virtualize with regular expression (by default it records everything):
 
     ./hoverfly --destination="."
 
-By default proxy is always in virtualize mode. To switch to capture mode, add "--capture" flag during startup:
+By default proxy is always in virtualize mode. To switch to record mode, add "--record" flag during startup:
 
-    ./hoverfly --capture
+    ./hoverfly --record
 
 Or you can use API call to change proxy state while running.
 
@@ -22,7 +22,7 @@ Do a curl request with proxy details:
 
     curl http://mirage.readthedocs.org --proxy http://localhost:8500/
 
-### HTTPS capture
+### HTTPS record
 
 Add ca.pem to your trusted certificates or turn off verification, with curl you can make insecure requests with -k: 
 
@@ -46,6 +46,79 @@ Access administrator API under default port 8888:
    + body to start recording: {"record":true}
 * Exporting recorded requests to a file: __curl http://proxy_hostname:8888/records > requests.json__
 * Importing requests from file: __curl --data "@/path/to/requests.json" http://localhost:8888/records__
+
+
+## Middleware
+
+Hoverfly supports (experimental feature) external middleware modules. You can write them in __any language you want!__.
+These middleware modules are expected to take standard input (stdin) and should write to stdout same structure JSON string.
+Payload example:
+
+```javascript
+{
+	"response": {
+		"status": 200,
+		"body": "body here",
+		"headers": {
+			"Content-Type": ["text/html"],
+			"Date": ["Tue, 01 Dec 2015 16:49:08 GMT"],
+		}
+	},
+	"request": {
+		"path": "/",
+		"method": "GET",
+		"destination": "1stalphaomega.readthedocs.org",
+		"query": ""
+	},
+	"id": "5d4f6b1d9f7c2407f78e4d4e211ec769"
+}
+```
+Middleware is executed only when request is matched so for fully dynamic responses where you are 
+generating response on the fly - just add dummy request through import functionality. 
+
+In order to use your middleware, just add path to executable: 
+* ./hoverfly --middleware "./examples/middleware/modify_response/modify_response.py" 
+
+Basic example of a Python module to change response body and add 2 second delay:
+
+```python
+#!/usr/bin/env python
+import sys
+import logging
+import json
+from time import sleep
+
+
+logging.basicConfig(filename='middleware.log', level=logging.DEBUG)
+logging.debug('Middleware is called')
+
+
+def main():
+    data = sys.stdin.readlines()
+    # this is a json string in one line so we are interested in that one line
+    payload = data[0]
+    logging.debug(payload)
+
+    payload_dict = json.loads(payload)
+
+    payload_dict['response']['status'] = 201
+    payload_dict['response']['body'] = "body was replaced by middleware"
+
+    # now let' sleep for 2 seconds
+    sleep(2)
+    
+    # returning new payload
+    print(json.dumps(payload_dict))
+
+if __name__ == "__main__":
+    main()
+
+```
+
+Save this file with python extension, _chmod +x_ it and run hoverfly:
+*./hoverfly --middleware "./this_file.py"
+
+
  
 ## License
 
