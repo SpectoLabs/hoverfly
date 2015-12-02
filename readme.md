@@ -7,13 +7,13 @@ Hoverfly is a transparent proxy written in Go. It can capture HTTP(s) traffic be
 
 ## Configuration
 
-Specifying which site to capture/virtualize with regular expression (by default it captures everything):
+Specifying which site to record/virtualize with regular expression (by default it records everything):
 
     ./hoverfly --destination="."
 
-By default proxy is always in virtualize mode. To switch to capture mode, add "--capture" flag during startup:
+By default proxy is always in virtualize mode. To switch to record mode, add "--record" flag during startup:
 
-    ./hoverfly --capture
+    ./hoverfly --record
 
 Or you can use API call to change proxy state while running.
 
@@ -22,7 +22,7 @@ Do a curl request with proxy details:
 
     curl http://mirage.readthedocs.org --proxy http://localhost:8500/
 
-### HTTPS capture
+### HTTPS record
 
 Add ca.pem to your trusted certificates or turn off verification, with curl you can make insecure requests with -k: 
 
