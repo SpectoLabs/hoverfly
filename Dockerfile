@@ -1,8 +1,8 @@
 FROM golang:1.5
 
-MAINTAINER karolis.rusenas@gmail.com
+MAINTAINER karolis.rusenas@opencredo.com
 
-ADD . /go/src/github.com/rusenask/genproxy
+ADD . /go/src/github.com/spectolabs/hoverfly
 
 # provide redis connection details
 # ENV RedisAddress=redis
@@ -10,7 +10,7 @@ ADD . /go/src/github.com/rusenask/genproxy
 
 ENV GO15VENDOREXPERIMENT 1
 
-RUN go install github.com/rusenask/genproxy
+RUN go install github.com/spectolabs/hoverfly
 
 ENTRYPOINT /go/bin/genproxy
 
