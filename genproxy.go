@@ -17,6 +17,12 @@ import (
 
 const DefaultPort = ":8500"
 
+// modes
+const VirtualizeMode = "virtualize"
+const SynthesizeMode = "sinthesize"
+const ModifyMode = "modify"
+const CaptureMode = "capture"
+
 // orPanic - wrapper for logging errors
 func orPanic(err error) {
 	if err != nil {
@@ -27,9 +33,17 @@ func orPanic(err error) {
 }
 
 func main() {
+	// Output to stderr instead of stdout, could also be a file.
+	log.SetOutput(os.Stderr)
+	log.SetFormatter(&log.TextFormatter{})
+
 	// getting proxy configuration
 	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
-	record := flag.Bool("record", false, "should proxy record")
+	// modes
+	capture := flag.Bool("capture", false, "should proxy capture requests")
+	synthesize := flag.Bool("synthesize", false, "should proxy capture requests")
+	modify := flag.Bool("modify", false, "should proxy only modify requests")
+
 	destination := flag.String("destination", ".", "destination URI to catch")
 	middleware := flag.String("middleware", "", "should proxy use middleware")
 	flag.Parse()
@@ -37,11 +51,42 @@ func main() {
 	// getting settings
 	initSettings()
 
-	// overriding default settings
-	AppConfig.recordState = *record
-
 	// overriding default middleware setting
 	AppConfig.middleware = *middleware
+
+	// setting default mode
+	mode := VirtualizeMode
+
+	if *capture {
+		mode = CaptureMode
+		// checking whether user supplied other modes
+		if *synthesize == true || *modify == true {
+			log.Fatal("Two or more modes supplied, check your flags")
+		}
+	} else if *synthesize {
+		mode = SynthesizeMode
+
+		if AppConfig.middleware == "" {
+			log.Fatal("Synthesize mode chosen although middleware not supplied")
+		}
+
+		if *capture == true || *modify == true {
+			log.Fatal("Two or more modes supplied, check your flags")
+		}
+	} else if *modify {
+		mode = ModifyMode
+
+		if AppConfig.middleware == "" {
+			log.Fatal("Modify mode chosen although middleware not supplied")
+		}
+
+		if *capture == true || *synthesize == true {
+			log.Fatal("Two or more modes supplied, check your flags")
+		}
+	}
+
+	// overriding default settings
+	AppConfig.mode = mode
 
 	// overriding destination
 	AppConfig.destination = *destination
@@ -53,10 +98,6 @@ func main() {
 	} else {
 		port = fmt.Sprintf(":%s", port)
 	}
-
-	// Output to stderr instead of stdout, could also be a file.
-	log.SetOutput(os.Stderr)
-	log.SetFormatter(&log.TextFormatter{})
 
 	redisPool := getRedisPool()
 	defer redisPool.Close()
@@ -141,8 +182,8 @@ func main() {
 // returns HTTP response.
 func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Response) {
 
-	if AppConfig.recordState {
-		log.Info("*** RECORD ***")
+	if AppConfig.mode == CaptureMode {
+		log.Info("*** Capture ***")
 		newResponse, err := d.recordRequest(req)
 		if err != nil {
 			// something bad happened, passing through
@@ -152,10 +193,21 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 			return req, newResponse
 		}
 
+	} else if AppConfig.mode == SynthesizeMode {
+		log.Info("*** Sinthesize ***")
+		// do stuff
+		return req, nil
+
+	} else if AppConfig.mode == ModifyMode {
+		log.Info("*** Modify ***")
+		// do stuff
+		return req, nil
+
 	} else {
-		log.Info("*** PLAYBACK ***")
+		log.Info("*** Virtualize ***")
 		newResponse := d.getResponse(req)
 		return req, newResponse
+
 	}
 }
 
