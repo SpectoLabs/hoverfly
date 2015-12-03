@@ -16,7 +16,7 @@ func synthesizeResponse(req *http.Request) *http.Response {
 	request := requestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
-		Destination: req.URL.Path,
+		Destination: req.Host,
 		Query:       req.URL.RawQuery,
 		Body:        bodyStr,
 		RemoteAddr:  req.RemoteAddr,
