@@ -2,6 +2,7 @@
 import sys
 import logging
 import json
+from time import gmtime, strftime
 
 
 logging.basicConfig(filename='middleware_synthetic.log', level=logging.DEBUG)
@@ -17,9 +18,12 @@ def main():
     payload_dict = json.loads(payload)
 
     dest = payload_dict['request']['destination']
+    addr = payload_dict['request']['remoteAddr']
 
     payload_dict['response']['status'] = 200
-    payload_dict['response']['body'] = "You called (%s). I am synthethic service, maybe I could do more?\n" % dest
+    payload_dict['response']['body'] = "You called (%s). I am synthethic service, maybe I could do more?\n" \
+                                       "Current time: %s\n" \
+                                       "Your IP Address: %s\n" % (dest, strftime("%Y-%m-%d %H:%M:%S", gmtime()), addr)
 
     # returning new payload
     print(json.dumps(payload_dict))
