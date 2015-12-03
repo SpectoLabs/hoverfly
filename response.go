@@ -41,3 +41,29 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 		return nil
 	}
 }
+
+func (c *Constructor) reconstructResponse() *http.Response {
+	response := &http.Response{}
+	response.Request = c.request
+
+	// adding headers
+	response.Header = make(http.Header)
+
+	// applying payload
+	if len(c.payload.Response.Headers) > 0 {
+		for k, values := range c.payload.Response.Headers {
+			// headers is a map, appending each value
+			for _, v := range values {
+				response.Header.Add(k, v)
+			}
+
+		}
+	}
+	// adding body, length, status code
+	buf := bytes.NewBufferString(c.payload.Response.Body)
+	response.ContentLength = int64(buf.Len())
+	response.Body = ioutil.NopCloser(buf)
+	response.StatusCode = c.payload.Response.Status
+
+	return response
+}
