@@ -29,10 +29,13 @@ var emptyResp = &http.Response{}
 
 // requestDetails stores information about request, it's used for creating unique hash and also as a payload structure
 type requestDetails struct {
-	Path        string `json:"path"`
-	Method      string `json:"method"`
-	Destination string `json:"destination"`
-	Query       string `json:"query"`
+	Path        string              `json:"path"`
+	Method      string              `json:"method"`
+	Destination string              `json:"destination"`
+	Query       string              `json:"query"`
+	Body        string              `json:"body"`
+	RemoteAddr  string              `json:"remoteAddr"`
+	Headers     map[string][]string `json:"headers"`
 }
 
 // hash returns unique hash key for request
@@ -262,56 +265,21 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 			// what now?
 		}
 
-		newResponse := &http.Response{}
-		newResponse.Request = req
-		// adding headers
-		newResponse.Header = make(http.Header)
+		c := NewConstructor(req, payload)
 
-		// checking for middleware configuration
 		if AppConfig.middleware != "" {
-			newPayload, err := ExecuteMiddleware(AppConfig.middleware, payload)
-
-			if err != nil {
-				log.WithFields(log.Fields{
-					"error":      err.Error(),
-					"middleware": AppConfig.middleware,
-				}).Error("Error during middleware transformation, not modifying response payload!")
-			} else {
-				log.WithFields(log.Fields{
-					"middleware": AppConfig.middleware,
-					"newPayload": newPayload,
-				}).Info("Middleware transformation complete!")
-				// override payload with transformed thing
-				payload = newPayload
-			}
-
+			_ = c.ApplyMiddleware(AppConfig.middleware)
 		}
 
-		// applying payload
-		if len(payload.Response.Headers) > 0 {
-			for k, values := range payload.Response.Headers {
-				// headers is a map, appending each value
-				for _, v := range values {
-					newResponse.Header.Add(k, v)
-				}
-
-			}
-		}
-		newResponse.Header.Set("Gen-Proxy", "Playback")
-		// adding body
-		buf := bytes.NewBufferString(payload.Response.Body)
-		newResponse.ContentLength = int64(buf.Len())
-		newResponse.Body = ioutil.NopCloser(buf)
-
-		newResponse.StatusCode = payload.Response.Status
+		response := c.reconstructResponse()
 
 		log.WithFields(log.Fields{
 			"key":        key,
 			"status":     payload.Response.Status,
-			"bodyLength": newResponse.ContentLength,
+			"bodyLength": response.ContentLength,
 		}).Info("Response found, returning")
 
-		return newResponse
+		return response
 
 	} else {
 		log.WithFields(log.Fields{
