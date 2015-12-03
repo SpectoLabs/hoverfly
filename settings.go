@@ -10,7 +10,6 @@ type Configuration struct {
 	redisPassword  string
 	adminInterface string
 	cachePrefix    string
-	recordState    bool
 	mode           string
 	destination    string
 	middleware     string
