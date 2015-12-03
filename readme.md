@@ -4,6 +4,17 @@ Hoverfly is an experiment in lightweight, open source [service virtualization](h
 
 Hoverfly is a transparent proxy written in Go. It can capture HTTP(s) traffic between an application under test and external services, and then replace the external services. Hoverfly uses Redis for persistence.
 
+## Installation
+
+You can just grab a binary from releases or you can build it yourself. Use [glide](https://github.com/Masterminds/glide) to
+fetch dependencies with:
+* glide up
+
+Then, build it:
+* go build
+Run it:
+* ./hoverfly
+
 
 ## Configuration
 
