@@ -173,6 +173,7 @@ func main() {
 		"RedisAddress": AppConfig.redisAddress,
 		"Destination":  *destination,
 		"ProxyPort":    port,
+		"Mode":         AppConfig.mode,
 	}).Info("Proxy is starting...")
 
 	log.Warn(http.ListenAndServe(port, proxy))
@@ -195,8 +196,8 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 
 	} else if AppConfig.mode == SynthesizeMode {
 		log.Info("*** Sinthesize ***")
-		// do stuff
-		return req, nil
+		response := synthesizeResponse(req)
+		return req, response
 
 	} else if AppConfig.mode == ModifyMode {
 		log.Info("*** Modify ***")
