@@ -29,7 +29,7 @@ func TestRecordHeader(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	expect(t, err, nil)
 
-	response, err := dbClient.recordRequest(req)
+	response, err := dbClient.captureRequest(req)
 
 	expect(t, response.Header.Get("Gen-proxy"), "Was-Here")
 }
@@ -77,7 +77,7 @@ func TestGetAllRecords(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
 		expect(t, err, nil)
-		dbClient.recordRequest(req)
+		dbClient.captureRequest(req)
 	}
 
 	// getting all keys
@@ -104,7 +104,7 @@ func TestDeleteAllRecords(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
 		expect(t, err, nil)
-		dbClient.recordRequest(req)
+		dbClient.captureRequest(req)
 	}
 	// checking that keys are there
 	keys, _ := dbClient.cache.getAllKeys()

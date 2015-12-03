@@ -11,6 +11,7 @@ type Configuration struct {
 	adminInterface string
 	cachePrefix    string
 	recordState    bool
+	mode           string
 	destination    string
 	middleware     string
 }

@@ -59,7 +59,7 @@ type Payload struct {
 }
 
 // recordRequest saves request for later playback
-func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
+func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 
 	// forwarding request
 	resp, err := d.doRequest(req)

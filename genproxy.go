@@ -184,7 +184,7 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 
 	if AppConfig.mode == CaptureMode {
 		log.Info("*** Capture ***")
-		newResponse, err := d.recordRequest(req)
+		newResponse, err := d.captureRequest(req)
 		if err != nil {
 			// something bad happened, passing through
 			return req, nil
