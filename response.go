@@ -18,3 +18,26 @@ func NewConstructor(req *http.Request, payload Payload) Constructor {
 	return c
 }
 
+func (c *Constructor) ApplyMiddleware(middleware string) error {
+
+	newPayload, err := ExecuteMiddleware(middleware, c.payload)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":      err.Error(),
+			"middleware": AppConfig.middleware,
+		}).Error("Error during middleware transformation, not modifying payload!")
+
+		return err
+	} else {
+
+		log.WithFields(log.Fields{
+			"middleware": AppConfig.middleware,
+			"newPayload": newPayload,
+		}).Info("Middleware transformation complete!")
+		// override payload with transformed new payload
+		c.payload = newPayload
+
+		return nil
+	}
+}
