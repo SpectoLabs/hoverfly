@@ -86,9 +86,11 @@ func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
 
 		log.WithFields(log.Fields{
 			"sdtderr": string(stderr),
-		}).Warn("errors from middleware")
+		}).Info("Information from middleware")
 
-	} else if len(mwOutput) > 0 {
+	}
+
+	if len(mwOutput) > 0 {
 		var newPayload Payload
 
 		err = json.Unmarshal(mwOutput, &newPayload)
