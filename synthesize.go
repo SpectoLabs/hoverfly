@@ -7,7 +7,7 @@ import (
 )
 
 // synthesizeResponse calls middleware to populate response data, nothing gets pass proxy
-func synthesizeResponse(req *http.Request) *http.Response {
+func synthesizeResponse(req *http.Request, middleware string) *http.Response {
 
 	b := bufio.NewScanner(req.Body)
 
@@ -26,7 +26,8 @@ func synthesizeResponse(req *http.Request) *http.Response {
 
 	c := NewConstructor(req, payload)
 
-	err := c.ApplyMiddleware(AppConfig.middleware)
+	err := c.ApplyMiddleware(middleware)
+
 	if err != nil {
 		var errorPayload Payload
 		errorPayload.Response.Status = 503
