@@ -67,3 +67,18 @@ func (c *Constructor) reconstructResponse() *http.Response {
 
 	return response
 }
+
+func (c *Constructor) reconstructRequest() *http.Request {
+	request := c.request
+
+	request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(c.payload.Request.Body)))
+	request.RequestURI = ""
+	request.Host = c.payload.Request.Destination
+	request.Method = c.payload.Request.Method
+	request.URL.Path = c.payload.Request.Path
+	request.URL.RawQuery = c.payload.Request.Query
+	request.RemoteAddr = c.payload.Request.RemoteAddr
+	request.Header = c.payload.Request.Headers
+
+	return request
+}
