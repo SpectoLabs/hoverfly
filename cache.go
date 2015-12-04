@@ -36,7 +36,7 @@ func (c *Cache) set(key string, value interface{}) error {
 	} else {
 		log.WithFields(log.Fields{
 			"key": fmt.Sprintf(c.prefix + key),
-		}).Info("Key/value SET successfuly!")
+		}).Debug("Key/value SET successfuly!")
 	}
 
 	return err
@@ -58,7 +58,7 @@ func (c *Cache) getAllValues(keys []string) ([]string, error) {
 
 	log.WithFields(log.Fields{
 		"keys": keys,
-	}).Info("Getting all supplied values")
+	}).Debug("Getting all supplied values")
 
 	client := c.pool.Get()
 	defer client.Close()
@@ -73,7 +73,7 @@ func (c *Cache) getAllValues(keys []string) ([]string, error) {
 
 	log.WithFields(log.Fields{
 		"keys": keys,
-	}).Info("Returning supplied values")
+	}).Debug("Returning supplied values")
 
 	return jsonStr, err
 
@@ -95,7 +95,7 @@ func (c *Cache) get(key string) (interface{}, error) {
 	} else {
 		log.WithFields(log.Fields{
 			"key": fmt.Sprintf(c.prefix + key),
-		}).Info("Key found!")
+		}).Debug("Key found!")
 	}
 
 	return value, err
@@ -136,7 +136,9 @@ func getRedisPool() *redis.Pool {
 		c, err := redis.Dial("tcp", AppConfig.redisAddress)
 
 		if err != nil {
-			log.WithFields(log.Fields{"Error": err.Error()}).Warn("Failed to create Redis connection pool!")
+			log.WithFields(log.Fields{
+				"Error": err.Error(),
+			}).Warn("Failed to create Redis connection pool!")
 			return nil, err
 		}
 		if AppConfig.redisPassword != "" {
@@ -148,7 +150,7 @@ func getRedisPool() *redis.Pool {
 				c.Close()
 				return nil, err
 			} else {
-				log.Info("Authenticated to Redis successfully! ")
+				log.Debug("Authenticated to Redis successfully! ")
 			}
 		}
 

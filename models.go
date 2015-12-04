@@ -247,7 +247,6 @@ func getRequestFingerprint(req *http.Request) string {
 
 // getResponse returns stored response from cache
 func (d *DBClient) getResponse(req *http.Request) *http.Response {
-	log.Info("Returning response")
 
 	key := getRequestFingerprint(req)
 	var payload Payload
@@ -255,7 +254,6 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	payloadBts, err := redis.Bytes(d.cache.get(key))
 
 	if err == nil {
-		log.Info("Decoding bytes")
 		// getting cache response
 		err = json.Unmarshal(payloadBts, &payload)
 		if err != nil {
@@ -275,6 +273,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 			"key":        key,
 			"status":     payload.Response.Status,
 			"bodyLength": response.ContentLength,
+			"mode":       AppConfig.mode,
 		}).Info("Response found, returning")
 
 		return response
@@ -282,6 +281,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	} else {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
+			"mode":  AppConfig.mode,
 		}).Error("Failed to retrieve response from cache")
 		// return error? if we return nil - proxy forwards request to original destination
 		return goproxy.NewResponse(req,
