@@ -144,23 +144,9 @@ func main() {
 		}
 	})
 
-	// just helper handler to know where request hits proxy or no
-	proxy.OnRequest().DoFunc(
-		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-			log.WithFields(log.Fields{
-				"destination": r.URL.Host,
-			}).Info("Got request")
-
-			return r, nil
-		})
-
-	// hijacking plain connections
+	// processing connections
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(*destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-
-			log.Info("connection found......")
-			log.Info(fmt.Sprintf("Url path:  %s", r.URL.Path))
-
 			return d.processRequest(r)
 		})
 
@@ -196,7 +182,7 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 
 	} else if AppConfig.mode == SynthesizeMode {
 		log.Info("*** Sinthesize ***")
-		response := synthesizeResponse(req)
+		response := synthesizeResponse(req, AppConfig.middleware)
 		return req, response
 
 	} else if AppConfig.mode == ModifyMode {
