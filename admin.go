@@ -16,7 +16,7 @@ type recordedRequests struct {
 }
 
 type StateRequest struct {
-	Record      bool   `json:"record"`
+	Mode        string `json:"mode"`
 	Destination string `json:"destination"`
 }
 
@@ -144,7 +144,7 @@ func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 // CurrentStateHandler returns current state
 func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request) {
 	var resp StateRequest
-	resp.Record = AppConfig.recordState
+	resp.Mode = AppConfig.mode
 	resp.Destination = AppConfig.destination
 
 	b, _ := json.Marshal(resp)
@@ -176,15 +176,15 @@ func (d *DBClient) stateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.WithFields(log.Fields{
-		"newState": stateRequest.Record,
+		"newState": stateRequest.Mode,
 		"body":     string(body),
 	}).Info("Handling state change request!")
 
 	// setting new state
-	AppConfig.recordState = stateRequest.Record
+	AppConfig.mode = stateRequest.Mode
 
 	var resp StateRequest
-	resp.Record = stateRequest.Record
+	resp.Mode = stateRequest.Mode
 	resp.Destination = AppConfig.destination
 	b, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

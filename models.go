@@ -1,12 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 
@@ -29,10 +27,13 @@ var emptyResp = &http.Response{}
 
 // requestDetails stores information about request, it's used for creating unique hash and also as a payload structure
 type requestDetails struct {
-	Path        string `json:"path"`
-	Method      string `json:"method"`
-	Destination string `json:"destination"`
-	Query       string `json:"query"`
+	Path        string              `json:"path"`
+	Method      string              `json:"method"`
+	Destination string              `json:"destination"`
+	Query       string              `json:"query"`
+	Body        string              `json:"body"`
+	RemoteAddr  string              `json:"remoteAddr"`
+	Headers     map[string][]string `json:"headers"`
 }
 
 // hash returns unique hash key for request
@@ -59,7 +60,7 @@ type Payload struct {
 }
 
 // recordRequest saves request for later playback
-func (d *DBClient) recordRequest(req *http.Request) (*http.Response, error) {
+func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 
 	// forwarding request
 	resp, err := d.doRequest(req)
@@ -246,7 +247,6 @@ func getRequestFingerprint(req *http.Request) string {
 
 // getResponse returns stored response from cache
 func (d *DBClient) getResponse(req *http.Request) *http.Response {
-	log.Info("Returning response")
 
 	key := getRequestFingerprint(req)
 	var payload Payload
@@ -254,7 +254,6 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	payloadBts, err := redis.Bytes(d.cache.get(key))
 
 	if err == nil {
-		log.Info("Decoding bytes")
 		// getting cache response
 		err = json.Unmarshal(payloadBts, &payload)
 		if err != nil {
@@ -262,60 +261,27 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 			// what now?
 		}
 
-		newResponse := &http.Response{}
-		newResponse.Request = req
-		// adding headers
-		newResponse.Header = make(http.Header)
+		c := NewConstructor(req, payload)
 
-		// checking for middleware configuration
 		if AppConfig.middleware != "" {
-			newPayload, err := ExecuteMiddleware(AppConfig.middleware, payload)
-
-			if err != nil {
-				log.WithFields(log.Fields{
-					"error":      err.Error(),
-					"middleware": AppConfig.middleware,
-				}).Error("Error during middleware transformation, not modifying response payload!")
-			} else {
-				log.WithFields(log.Fields{
-					"middleware": AppConfig.middleware,
-					"newPayload": newPayload,
-				}).Info("Middleware transformation complete!")
-				// override payload with transformed thing
-				payload = newPayload
-			}
-
+			_ = c.ApplyMiddleware(AppConfig.middleware)
 		}
 
-		// applying payload
-		if len(payload.Response.Headers) > 0 {
-			for k, values := range payload.Response.Headers {
-				// headers is a map, appending each value
-				for _, v := range values {
-					newResponse.Header.Add(k, v)
-				}
-
-			}
-		}
-		newResponse.Header.Set("Gen-Proxy", "Playback")
-		// adding body
-		buf := bytes.NewBufferString(payload.Response.Body)
-		newResponse.ContentLength = int64(buf.Len())
-		newResponse.Body = ioutil.NopCloser(buf)
-
-		newResponse.StatusCode = payload.Response.Status
+		response := c.reconstructResponse()
 
 		log.WithFields(log.Fields{
 			"key":        key,
 			"status":     payload.Response.Status,
-			"bodyLength": newResponse.ContentLength,
+			"bodyLength": response.ContentLength,
+			"mode":       AppConfig.mode,
 		}).Info("Response found, returning")
 
-		return newResponse
+		return response
 
 	} else {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
+			"mode":  AppConfig.mode,
 		}).Error("Failed to retrieve response from cache")
 		// return error? if we return nil - proxy forwards request to original destination
 		return goproxy.NewResponse(req,
