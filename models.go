@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -136,11 +137,18 @@ func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte)
 			"hashKey":       key,
 		}).Info("Recording")
 
+		b := bufio.NewScanner(req.Body)
+
+		bodyStr := b.Text()
+
 		requestObj := requestDetails{
 			Path:        req.URL.Path,
 			Method:      req.Method,
 			Destination: req.Host,
 			Query:       req.URL.RawQuery,
+			Body:        bodyStr,
+			RemoteAddr:  req.RemoteAddr,
+			Headers:     req.Header,
 		}
 
 		payload := Payload{
