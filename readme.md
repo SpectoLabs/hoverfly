@@ -42,8 +42,6 @@ service can be found in _this_repo/examples/middleware/synthetic_service/synthet
     
     ./hoverfly --synthesize --middleware "./examples/middleware/synthetic_service/synthetic.py"
 
-
-
 ### HTTPS record
 
 Add ca.pem to your trusted certificates or turn off verification, with curl you can make insecure requests with -k: 
@@ -142,6 +140,9 @@ Save this file with python extension, _chmod +x_ it and run hoverfly:
 
     ./hoverfly --middleware "./this_file.py"
 
+## Debugging
+
+You can supply "-v" flag to enable verbose logging.
 
  
 ## License

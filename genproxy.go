@@ -48,6 +48,11 @@ func main() {
 	middleware := flag.String("middleware", "", "should proxy use middleware")
 	flag.Parse()
 
+	if *verbose {
+		// Only log the warning severity or above.
+		log.SetLevel(log.DebugLevel)
+	}
+
 	// getting settings
 	initSettings()
 
@@ -75,6 +80,9 @@ func main() {
 		}
 	} else if *modify {
 		mode = ModifyMode
+
+		// not implemented
+		log.Fatal("Not yet implemented!")
 
 		if AppConfig.middleware == "" {
 			log.Fatal("Modify mode chosen although middleware not supplied")
@@ -153,7 +161,6 @@ func main() {
 	go d.startAdminInterface()
 
 	proxy.Verbose = *verbose
-
 	// proxy starting message
 	log.WithFields(log.Fields{
 		"RedisAddress": AppConfig.redisAddress,
