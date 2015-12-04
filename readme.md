@@ -4,16 +4,27 @@ Hoverfly is an experiment in lightweight, open source [service virtualization](h
 
 Hoverfly is a transparent proxy written in Go. It can capture HTTP(s) traffic between an application under test and external services, and then replace the external services. Hoverfly uses Redis for persistence.
 
+## Installation
 
-## Configuration
+You can just grab a binary from releases or you can build it yourself. Use [glide](https://github.com/Masterminds/glide) to
+fetch dependencies with:
+* glide up
+
+Then, build it:
+* go build
+Run it:
+* ./hoverfly
+
+
+## Configuration (capture/virtualize)
 
 Specifying which site to record/virtualize with regular expression (by default it records everything):
 
     ./hoverfly --destination="."
 
-By default proxy is always in virtualize mode. To switch to record mode, add "--record" flag during startup:
+By default proxy is always in virtualize mode. To switch to record mode, add "--capture" flag during startup:
 
-    ./hoverfly --record
+    ./hoverfly --capture
 
 Or you can use API call to change proxy state while running.
 
@@ -21,6 +32,15 @@ Or you can use API call to change proxy state while running.
 Do a curl request with proxy details: 
 
     curl http://mirage.readthedocs.org --proxy http://localhost:8500/
+    
+###  Synthesize
+
+Hoverfly can create responses to requests on the fly. Synthesize mode intercepts requests (also respects --destination flag)
+and applies supplied middleware (user is required to supply --middleware flag, you can read more about it below). Middleware
+is expected to populate response payload, so Hoverfly can the reconstruct it and return it to client. Example of synthetic 
+service can be found in _this_repo/examples/middleware/synthetic_service/synthetic.py_. You can test it out by running:
+    
+    ./hoverfly --synthesize --middleware "./examples/middleware/synthetic_service/synthetic.py"
 
 ### HTTPS record
 
@@ -77,7 +97,8 @@ Middleware is executed only when request is matched so for fully dynamic respons
 generating response on the fly - just add dummy request through import functionality. 
 
 In order to use your middleware, just add path to executable: 
-* ./hoverfly --middleware "./examples/middleware/modify_response/modify_response.py" 
+
+    ./hoverfly --middleware "./examples/middleware/modify_response/modify_response.py" 
 
 Basic example of a Python module to change response body and add 2 second delay:
 
@@ -116,8 +137,12 @@ if __name__ == "__main__":
 ```
 
 Save this file with python extension, _chmod +x_ it and run hoverfly:
-*./hoverfly --middleware "./this_file.py"
 
+    ./hoverfly --middleware "./this_file.py"
+
+## Debugging
+
+You can supply "-v" flag to enable verbose logging.
 
  
 ## License
