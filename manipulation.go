@@ -42,6 +42,7 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 	}
 }
 
+// reconstructResponse changes original response with details provided in Constructor Payload.Response
 func (c *Constructor) reconstructResponse() *http.Response {
 	response := &http.Response{}
 	response.Request = c.request
@@ -68,6 +69,7 @@ func (c *Constructor) reconstructResponse() *http.Response {
 	return response
 }
 
+// reconstructRequest changes original request with details provided in Constructor Payload.Request
 func (c *Constructor) reconstructRequest() *http.Request {
 	request := c.request
 
