@@ -33,7 +33,6 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 
 		log.WithFields(log.Fields{
 			"middleware": AppConfig.middleware,
-			"newPayload": newPayload,
 		}).Info("Middleware transformation complete!")
 		// override payload with transformed new payload
 		c.payload = newPayload
@@ -42,6 +41,7 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 	}
 }
 
+// reconstructResponse changes original response with details provided in Constructor Payload.Response
 func (c *Constructor) reconstructResponse() *http.Response {
 	response := &http.Response{}
 	response.Request = c.request
@@ -66,4 +66,20 @@ func (c *Constructor) reconstructResponse() *http.Response {
 	response.StatusCode = c.payload.Response.Status
 
 	return response
+}
+
+// reconstructRequest changes original request with details provided in Constructor Payload.Request
+func (c *Constructor) reconstructRequest() *http.Request {
+	request := c.request
+
+	request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(c.payload.Request.Body)))
+	request.RequestURI = ""
+	request.Host = c.payload.Request.Destination
+	request.Method = c.payload.Request.Method
+	request.URL.Path = c.payload.Request.Path
+	request.URL.RawQuery = c.payload.Request.Query
+	request.RemoteAddr = c.payload.Request.RemoteAddr
+	request.Header = c.payload.Request.Headers
+
+	return request
 }

@@ -12,6 +12,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/goproxy"
 	"github.com/garyburd/redigo/redis"
+	"io/ioutil"
 )
 
 type DBClient struct {
@@ -92,6 +93,16 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
 
+	if AppConfig.middleware != "" {
+		var payload Payload
+
+		c := NewConstructor(request, payload)
+		c.ApplyMiddleware(AppConfig.middleware)
+
+		request = c.reconstructRequest()
+
+	}
+
 	resp, err := d.http.Do(request)
 
 	if err != nil {
@@ -110,7 +121,7 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 		"path":   request.URL.Path,
 	}).Info("Response got successfuly!")
 
-	resp.Header.Set("Gen-proxy", "Was-Here")
+	resp.Header.Set("hoverfly", "Was-Here")
 	return resp, nil
 
 }
@@ -296,5 +307,54 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 			goproxy.ContentTypeText, http.StatusPreconditionFailed,
 			"Coudldn't find recorded request, please record it first!")
 	}
+
+}
+
+// modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response
+// is saved to cache.
+func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (*http.Response, error) {
+
+	// modifying request
+	resp, err := d.doRequest(req)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// preparing payload
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":      err.Error(),
+			"middleware": middleware,
+		}).Error("Failed to read response body after sending modified request")
+		return nil, err
+	}
+
+	r := response{
+		Status:  resp.StatusCode,
+		Body:    string(bodyBytes),
+		Headers: resp.Header,
+	}
+	payload := Payload{Response: r}
+
+	c := NewConstructor(req, payload)
+	// applying middleware to modify response
+	err = c.ApplyMiddleware(middleware)
+
+	if err != nil {
+		return nil, err
+	}
+
+	newResponse := c.reconstructResponse()
+
+	log.WithFields(log.Fields{
+		"status":     newResponse.StatusCode,
+		"middleware": middleware,
+		"mode":       AppConfig.mode,
+	}).Info("Response modified, returning")
+
+	return newResponse, nil
 
 }
