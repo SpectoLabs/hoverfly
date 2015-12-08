@@ -92,6 +92,16 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
 
+	if AppConfig.middleware != "" {
+		var payload Payload
+
+		c := NewConstructor(request, payload)
+		c.ApplyMiddleware(AppConfig.middleware)
+
+		request = c.reconstructRequest()
+
+	}
+
 	resp, err := d.http.Do(request)
 
 	if err != nil {
