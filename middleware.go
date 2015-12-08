@@ -58,7 +58,7 @@ func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
 	log.WithFields(log.Fields{
 		"commands": commands,
 		"no":       len(commands),
-	}).Info("Found commands")
+	}).Debug("Found commands")
 
 	cmds := exec.Command(commands[0], commands[1:]...)
 

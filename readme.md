@@ -23,7 +23,7 @@ Specifying which site to record/virtualize with regular expression (by default i
 
     ./hoverfly --destination="."
 
-## Modes (Capture / Virtualize / Synthesize)
+## Modes (Virtualize / Capture / Synthesize / Modify)
 
 Hoverfly has different operating modes. Each mode changes proxy behavior. Based on current mode Hoverfly selects
 whether it should capture requests/response, look for them in the cache or send them directly into middleware and respond with a payload that middleware generated (more on middleware below).
@@ -58,7 +58,14 @@ service can be found in _this_repo/examples/middleware/synthetic_service/synthet
 
 ### Modify
 
-This mode is not yet implemented, it will be able to modify outgoing requests and incoming responses.
+Modify mode applies selected middleware (user is required to supply --middleware flag, you can read more about it below)
+to outgoing requests and also to incoming responses (before returning them to clients). It 
+enables users to use Hoverfly without storing any data about requests. It can be used when it's difficult or there ir just little point
+in describing a service yourself and you only need to change parts of the requests/responses (i.e. add authentication headers through the
+middleware).
+Example below changes destination host to "mirage.readthedocs.org" and sets method to "GET":
+
+    ./hoverfly --modify --middleware "./examples/middleware/modify_request/modify_request.py
 
 ## HTTPS record
 
@@ -151,9 +158,18 @@ if __name__ == "__main__":
 Save this file with python extension, _chmod +x_ it and run hoverfly:
 
     ./hoverfly --middleware "./this_file.py"
+    
 
-For now middleware is supported during _virtualize_ and _synthesize_ modes. Additional support will be
-coming to _capture_ and _modify_ modes.
+### How middleware interacts with different modes?
+
+Each mode is affected by middleware in different ways. Since JSON payload has request and response structures - some middleware
+ will not change anything, some information about middleware behaviour:
+  * __Capture Mode__: middleware affects only outgoing requests. 
+  * __Virtualize Mode__: middleware affects only responses (cache contents remain untouched).
+  * __Synthesize Mode__: middleware creates responses.
+  * __Modify Mode__: middleware affects requests and responses.
+  
+
 
 ## Debugging
 

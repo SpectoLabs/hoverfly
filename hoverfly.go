@@ -81,9 +81,6 @@ func main() {
 	} else if *modify {
 		mode = ModifyMode
 
-		// not implemented
-		log.Fatal("Not yet implemented!")
-
 		if AppConfig.middleware == "" {
 			log.Fatal("Modify mode chosen although middleware not supplied")
 		}
@@ -194,8 +191,18 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 
 	} else if AppConfig.mode == ModifyMode {
 		log.Info("*** Modify ***")
-		// do stuff
-		return req, nil
+		response, err := d.modifyRequestResponse(req, AppConfig.middleware)
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":      err.Error(),
+				"middleware": AppConfig.middleware,
+			}).Error("Got error when performing request modification")
+			return req, nil
+		}
+
+		// returning modified response
+		return req, response
 
 	} else {
 		log.Info("*** Virtualize ***")
