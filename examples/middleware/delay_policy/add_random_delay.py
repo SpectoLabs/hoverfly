@@ -4,7 +4,7 @@ import logging
 import random
 from time import sleep
 
-logging.basicConfig(filename='random_delay_middleware.log', level=logging.DEBUG)
+logging.basicConfig(filename='random_delay_middleware_python.log', level=logging.DEBUG)
 logging.debug('Random delay middleware is called')
 
 # set delay to random value less than one second
