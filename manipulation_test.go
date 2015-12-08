@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"testing"
 )
@@ -30,8 +31,17 @@ func TestReconstructRequestEmptyPayload(t *testing.T) {
 
 	payload := Payload{}
 	c := NewConstructor(req, payload)
-	newRequest := c.reconstructRequest()
-	expect(t, newRequest.Method, "")
-	expect(t, newRequest.Host, "")
+	c.payload.Request.Method = "OPTIONS"
+	c.payload.Request.Destination = "newdestination"
+	c.payload.Request.Body = "new request body here"
 
+	newRequest := c.reconstructRequest()
+
+	expect(t, newRequest.Method, "OPTIONS")
+	expect(t, newRequest.Host, "newdestination")
+
+	body, err := ioutil.ReadAll(newRequest.Body)
+
+	expect(t, err, nil)
+	expect(t, string(body), "new request body here")
 }
