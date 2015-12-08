@@ -18,7 +18,6 @@ def main():
     payload_dict['request']['destination'] = "mirage.readthedocs.org"
     payload_dict['request']['method'] = "GET"
 
-
     payload_dict['response']['status'] = 201
     # returning new payload
     print(json.dumps(payload_dict))
