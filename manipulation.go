@@ -33,7 +33,6 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 
 		log.WithFields(log.Fields{
 			"middleware": AppConfig.middleware,
-			"newPayload": newPayload,
 		}).Info("Middleware transformation complete!")
 		// override payload with transformed new payload
 		c.payload = newPayload
