@@ -28,3 +28,6 @@ _testmain.go
 # Created by .ignore support plugin (hsz.mobi)
 hoverfly
 *.log
+
+# examples/clients/readthedocs_query/test.py pickle file
+links.p

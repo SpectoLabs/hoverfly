@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 import sys
 import logging
+import random
 from time import sleep
 
-logging.basicConfig(filename='delay_middleware.log', level=logging.DEBUG)
-logging.debug('Delay middleware is called')
+logging.basicConfig(filename='random_delay_middleware.log', level=logging.DEBUG)
+logging.debug('Random delay middleware is called')
 
-SLEEP_SECS = 5
+# set delay to random value less than one second
+
+SLEEP_SECS = random.random()
 
 def main():
 
@@ -22,5 +25,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
