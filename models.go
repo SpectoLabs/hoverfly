@@ -120,7 +120,7 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 		"path":   request.URL.Path,
 	}).Info("Response got successfuly!")
 
-	resp.Header.Set("Gen-proxy", "Was-Here")
+	resp.Header.Set("hoverfly", "Was-Here")
 	return resp, nil
 
 }
