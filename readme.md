@@ -151,9 +151,18 @@ if __name__ == "__main__":
 Save this file with python extension, _chmod +x_ it and run hoverfly:
 
     ./hoverfly --middleware "./this_file.py"
+    
 
-For now middleware is supported during _virtualize_ and _synthesize_ modes. Additional support will be
-coming to _capture_ and _modify_ modes.
+### How middleware interacts with different modes?
+
+Each mode is affected by middleware in different ways. Since JSON payload has request and response structures - some middleware
+ will not change anything, some information about middleware behaviour:
+  * __Capture Mode__: middleware affects only outgoing requests. 
+  * __Virtualize Mode__: middleware affects only responses (cache contents remain untouched).
+  * __Synthesize Mode__: middleware creates responses.
+  * __Modify Mode__: middleware affects requests and responses.
+  
+
 
 ## Debugging
 
