@@ -26,7 +26,7 @@ func TestReconstructRequest(t *testing.T) {
 	expect(t, newRequest.URL.RawQuery, "?foo=bar")
 }
 
-func TestReconstructRequestEmptyPayload(t *testing.T) {
+func TestReconstructRequestBodyPayload(t *testing.T) {
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	payload := Payload{}
