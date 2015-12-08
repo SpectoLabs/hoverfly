@@ -313,7 +313,8 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 // modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response
 // is saved to cache.
 func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (*http.Response, error) {
-	// modifying response
+
+	// modifying request
 	resp, err := d.doRequest(req)
 
 	if err != nil {
