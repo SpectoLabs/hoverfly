@@ -26,6 +26,22 @@ let StateChangeButton = React.createClass({
     componentWillMount() {
         console.log("getting current state");
         this.setState({state: "virtualize"});
+    changeMode(e){
+      console.log(e.target.value);
+        var url = '/state';
+        var that = this;
+        request
+            .post(url)
+            .send({ mode: e.target.value })
+            .end(function (err, res) {
+                if (err) throw err;
+                if (that.isMounted()) {
+                    console.log(res.body);
+                    that.setState({
+                        'mode': res.body.mode
+                    });
+                }
+            });
     },
 
     render() {
