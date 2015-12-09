@@ -60,26 +60,92 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var StateChangeButton = _react2.default.createClass({
+	var StateChangeComponent = _react2.default.createClass({
 	    displayName: "StateChangeButton",
 
 	    getInitialState: function getInitialState() {
-	        return { "state": null };
+	        return { "mode": null };
+	    },
+	    getCurrentMode: function getCurrentMode() {
+	        var url = '/state';
+	        var that = this;
+	        _superagent2.default.get(url).end(function (err, res) {
+	            if (err) throw err;
+	            if (that.isMounted()) {
+	                console.log(res.body);
+	                that.setState({
+	                    'mode': res.body.mode
+	                });
+	            }
+	        });
 	    },
 	    componentWillMount: function componentWillMount() {
-	        console.log("getting current state");
-	        this.setState({ state: "virtualize" });
+	        this.getCurrentMode();
+	    },
+	    changeMode: function changeMode(e) {
+	        console.log(e.target.value);
+	        var url = '/state';
+	        var that = this;
+	        _superagent2.default.post(url).send({ mode: e.target.value }).end(function (err, res) {
+	            if (err) throw err;
+	            if (that.isMounted()) {
+	                console.log(res.body);
+	                that.setState({
+	                    'mode': res.body.mode
+	                });
+	            }
+	        });
 	    },
 	    render: function render() {
+	        var defaultBtn = "button";
+	        var primaryBtn = "button-primary";
+	        // deciding states
+	        var virtualizeClass = defaultBtn;
+	        var modifyClass = defaultBtn;
+	        var captureClass = defaultBtn;
+	        var synthesizeClass = defaultBtn;
+
+	        if (this.state.mode == "virtualize") {
+	            virtualizeClass = primaryBtn;
+	        } else if (this.state.mode == "modify") {
+	            modifyClass = primaryBtn;
+	        } else if (this.state.mode == "capture") {
+	            captureClass = primaryBtn;
+	        } else if (this.state.mode == "synthesize") {
+	            synthesizeClass = primaryBtn;
+	        }
+
 	        return _react2.default.createElement(
-	            'button',
-	            { className: 'button-primary' },
-	            'Virtualize'
+	            'div',
+	            null,
+	            _react2.default.createElement(
+	                'button',
+	                { className: virtualizeClass, onClick: this.changeMode, value: 'virtualize' },
+	                'Virtualize'
+	            ),
+	            ' ',
+	            _react2.default.createElement(
+	                'button',
+	                { className: modifyClass, onClick: this.changeMode, value: 'modify' },
+	                'Modify'
+	            ),
+	            ' ',
+	            _react2.default.createElement(
+	                'button',
+	                { className: captureClass, onClick: this.changeMode, value: 'capture' },
+	                'Capture'
+	            ),
+	            ' ',
+	            _react2.default.createElement(
+	                'button',
+	                { className: synthesizeClass, onClick: this.changeMode, value: 'synthesize' },
+	                'Synthesize'
+	            )
 	        );
 	    }
 	});
 
-	_reactDom2.default.render(_react2.default.createElement(StateChangeButton, null), document.getElementById("app"));
+	_reactDom2.default.render(_react2.default.createElement(StateChangeComponent, null), document.getElementById("app"));
 
 /***/ },
 /* 1 */
