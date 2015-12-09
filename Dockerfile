@@ -12,7 +12,6 @@ ENV GO15VENDOREXPERIMENT 1
 
 RUN go install github.com/spectolabs/hoverfly
 
-ENTRYPOINT /go/bin/genproxy
+ENTRYPOINT /go/bin/hoverfly
 
 EXPOSE 8500 8888
-
