@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -53,5 +54,30 @@ func TestGetAllRecords(t *testing.T) {
 		expect(t, payload.Request.Method, "GET")
 		expect(t, payload.Response.Status, 201)
 	}
+
+}
+
+func TestSetGetCacheKey(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.pool.Close()
+	key := "keySetGetCache"
+	resp := response{
+		Status: 200,
+		Body:   "body here",
+	}
+
+	payload := Payload{Response: resp}
+	bts, err := json.Marshal(payload)
+	expect(t, err, nil)
+
+	err = dbClient.cache.set(key, bts)
+	expect(t, err, nil)
+
+	var p Payload
+	payloadBts, err := redis.Bytes(dbClient.cache.get(key))
+	err = json.Unmarshal(payloadBts, &p)
+	expect(t, err, nil)
+	expect(t, payload.Response.Body, p.Response.Body)
 
 }
