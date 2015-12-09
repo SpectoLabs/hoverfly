@@ -14,3 +14,13 @@ func TestSynthesizeResponse(t *testing.T) {
 
 	expect(t, sr.StatusCode, 200)
 }
+
+func TestSynthesizeResponseWOMiddleware(t *testing.T) {
+
+	req, err := http.NewRequest("GET", "http://example.com", nil)
+	expect(t, err, nil)
+
+	sr := synthesizeResponse(req, "")
+
+	expect(t, sr.StatusCode, 428)
+}

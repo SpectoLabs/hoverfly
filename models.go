@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	"bytes"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -64,13 +64,31 @@ type Payload struct {
 // recordRequest saves request for later playback
 func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 
+	// this is mainly for testing, since when you create
+	if req.Body == nil {
+		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	}
+
+	reqBody, err := ioutil.ReadAll(req.Body)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+			"mode":  AppConfig.mode,
+		}).Error("Got error when reading request body")
+	}
+	log.WithFields(log.Fields{
+		"body": string(reqBody),
+	}).Info("got request body")
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
+
 	// forwarding request
 	resp, err := d.doRequest(req)
 
 	if err == nil {
 
 		// getting response body
-		body, err := httputil.DumpResponse(resp, true)
+		respBody, err := httputil.DumpResponse(resp, true)
 		if err != nil {
 			// copying the response body did not work
 			if err != nil {
@@ -81,7 +99,7 @@ func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 		}
 
 		// saving response body with request/response meta to cache
-		go d.save(req, resp, body)
+		go d.save(req, resp, respBody, reqBody)
 	}
 
 	// return new response or error here
@@ -127,7 +145,7 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte) {
+func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte, reqBody []byte) {
 	// record request here
 	key := getRequestFingerprint(req)
 
@@ -144,20 +162,17 @@ func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte)
 			"path":          req.URL.Path,
 			"rawQuery":      req.URL.RawQuery,
 			"requestMethod": req.Method,
+			"bodyLen":       len(reqBody),
 			"destination":   req.Host,
 			"hashKey":       key,
-		}).Info("Recording")
-
-		b := bufio.NewScanner(req.Body)
-
-		bodyStr := b.Text()
+		}).Info("Capturing")
 
 		requestObj := requestDetails{
 			Path:        req.URL.Path,
 			Method:      req.Method,
 			Destination: req.Host,
 			Query:       req.URL.RawQuery,
-			Body:        bodyStr,
+			Body:        string(reqBody),
 			RemoteAddr:  req.RemoteAddr,
 			Headers:     req.Header,
 		}
