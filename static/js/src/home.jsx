@@ -7,6 +7,20 @@ let StateChangeButton = React.createClass({
 
     getInitialState() {
         return {"state": null}
+    getCurrentMode() {
+        var url = '/state';
+        var that = this;
+        request
+            .get(url)
+            .end(function (err, res) {
+                if (err) throw err;
+                if (that.isMounted()) {
+                    console.log(res.body);
+                    that.setState({
+                        'mode': res.body.mode
+                    });
+                }
+            });
     },
 
     componentWillMount() {
