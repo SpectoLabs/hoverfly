@@ -53,6 +53,8 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
 	mux.Post("/state", http.HandlerFunc(d.stateHandler))
 
+	mux.Handle("/*", http.FileServer(http.Dir("static")))
+
 	return mux
 }
 
