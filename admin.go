@@ -7,7 +7,9 @@ import (
 
 	"encoding/json"
 	log "github.com/Sirupsen/logrus"
+	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
+	"github.com/meatballhat/negroni-logrus"
 )
 
 // jsonResponse struct encapsulates payload data
@@ -22,6 +24,22 @@ type StateRequest struct {
 
 type messageResponse struct {
 	Message string `json:"message"`
+}
+
+func (d *DBClient) startAdminInterface() {
+	// starting admin interface
+	mux := getBoneRouter(*d)
+	n := negroni.Classic()
+	n.Use(negronilogrus.NewMiddleware())
+	n.UseHandler(mux)
+
+	// admin interface starting message
+	log.WithFields(log.Fields{
+		"RedisAddress": AppConfig.redisAddress,
+		"AdminPort":    AppConfig.adminInterface,
+	}).Info("Admin interface is starting...")
+
+	n.Run(AppConfig.adminInterface)
 }
 
 // getBoneRouter returns mux for admin interface
