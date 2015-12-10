@@ -1,0 +1,18 @@
+[submodule "redigo"]
+	path = vendor/github.com/garyburd/redigo
+	url = https://github.com/garyburd/redigo
+[submodule "logrus"]
+	path = vendor/github.com/Sirupsen/logrus
+	url = https://github.com/Sirupsen/logrus
+[submodule "goproxy"]
+	path = vendor/github.com/elazarl/goproxy
+	url = https://github.com/elazarl/goproxy
+[submodule "negroni-logrus"]
+	path = vendor/github.com/meatballhat/negroni-logrus
+	url = https://github.com/meatballhat/negroni-logrus
+[submodule "negroni"]
+    path = vendor/github.com/codegangsta/negroni
+    url = https://github.com/codegangsta/negroni
+[submodule "bone"]
+    path = vendor/github.com/go-zoo/bone
+    url = https://github.com/go-zoo/bone
