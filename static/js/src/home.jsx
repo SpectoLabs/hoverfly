@@ -2,6 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import request from 'superagent';
 
+const VirtualizeMode = "virtualize";
+const CaptureMode = "capture";
+const SynthesizeMode = "synthesize";
+const ModifyMode = "modify";
+
 let StateChangeComponent = React.createClass({
     displayName: "StateChangeButton",
 
