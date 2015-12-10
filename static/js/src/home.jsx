@@ -7,6 +7,27 @@ const CaptureMode = "capture";
 const SynthesizeMode = "synthesize";
 const ModifyMode = "modify";
 
+let ModeInfoComponent = React.createClass({
+    displayName: "ModeInfoComponent",
+
+    getInitialState() {
+        return {
+            "mode": this.props.data
+        }
+    },
+
+    render() {
+        let mode = this.props.data.mode;
+
+        if (mode == VirtualizeMode) {
+            return (
+                <div>
+                    <p>This mode enables service virtualization. Hoverfly uses captured requests and their unique
+                        identifiers (such as query, method, etc.) to find best response. If used with middleware - it
+                        will
+                        be applied to matched responses</p>
+                </div>
+            )
 let StateChangeComponent = React.createClass({
     displayName: "StateChangeButton",
 
