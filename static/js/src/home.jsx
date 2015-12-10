@@ -32,7 +32,7 @@ let ModeInfoComponent = React.createClass({
             return (
                 <div>
                     <p>
-                        When capture mode is active - Hoverfly intercepts requests and makes them on behalf of client.
+                        When capture mode is active - Hoverfly intercepts requests and makes them on behalf of the client.
                         This enables Hoverfly to also apply middleware (if user supplied middleware setting) on outgoing
                         traffic. Requests and responses are stored in Redis as a JSON structures.
                     </p>
@@ -69,6 +69,25 @@ let ModeInfoComponent = React.createClass({
 
 });
 
+let WipeRecordsComponent = React.createClass({
+    displayName: "WipeRecordsComponent",
+
+    handleClick(){
+        let that = this;
+        request
+            .del('/records')
+            .end(function (err, res) {
+                that.props.parent.fetchData()
+            });
+    },
+
+    render() {
+        return (
+            <button className="button" onClick={this.handleClick}>Wipe Records</button>
+        )
+    }
+});
+
 let StatsComponent = React.createClass({
     displayName: "StatsComponent",
 
@@ -88,11 +107,11 @@ let StatsComponent = React.createClass({
                 if (err) throw err;
                 if (that.isMounted()) {
                     // checking whether there are any records
-                    if(res.body.data == null) {
+                    if (res.body.data == null) {
                         that.setState({
                             'records': 0
                         });
-                    } else{
+                    } else {
                         that.setState({
                             'records': res.body.data.length
                         });
@@ -111,13 +130,20 @@ let StatsComponent = React.createClass({
             msg = "No records available.";
         } else if (this.state.records == 1) {
             msg = "Currently there is 1 record."
-        } else if (this.state.records >1) {
+        } else if (this.state.records > 1) {
             msg = "Currently there are " + this.state.records + " records."
         }
 
         return (
             <div>
-                {msg}
+                <div className="two-thirds column">
+                    <WipeRecordsComponent parent={this}/>
+                </div>
+                <div className="one-third column">
+                    {msg}
+                </div>
+
+
             </div>
         )
     }
@@ -191,9 +217,6 @@ let StateChangeComponent = React.createClass({
 
         return (
             <div>
-                <div className="row">
-                    <StatsComponent />
-                </div>
                 <hr/>
                 <div className="row">
                     <div className="two-thirds column">
@@ -211,6 +234,11 @@ let StateChangeComponent = React.createClass({
                         <ModeInfoComponent data={data}/>
                     </div>
                 </div>
+                    <hr/>
+                    <div className="row">
+                        <StatsComponent />
+                    </div>
+
             </div>
         )
     }

@@ -93,7 +93,7 @@
 	                _react2.default.createElement(
 	                    'p',
 	                    null,
-	                    'When capture mode is active - Hoverfly intercepts requests and makes them on behalf of client. This enables Hoverfly to also apply middleware (if user supplied middleware setting) on outgoing traffic. Requests and responses are stored in Redis as a JSON structures.'
+	                    'When capture mode is active - Hoverfly intercepts requests and makes them on behalf of the client. This enables Hoverfly to also apply middleware (if user supplied middleware setting) on outgoing traffic. Requests and responses are stored in Redis as a JSON structures.'
 	                )
 	            );
 	        } else if (mode == SynthesizeMode) {
@@ -122,30 +122,60 @@
 	    }
 	});
 
+	var WipeRecordsComponent = _react2.default.createClass({
+	    displayName: "WipeRecordsComponent",
+
+	    handleClick: function handleClick() {
+	        var that = this;
+	        _superagent2.default.del('/records').end(function (err, res) {
+	            that.props.parent.fetchData();
+	        });
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'button',
+	            { className: 'button', onClick: this.handleClick },
+	            'Wipe Records'
+	        );
+	    }
+	});
+
 	var StatsComponent = _react2.default.createClass({
 	    displayName: "StatsComponent",
 
 	    getInitialState: function getInitialState() {
 	        return {
-	            "records": null
+	            "records": null,
+	            "interval": 1000
 	        };
 	    },
-	    componentDidMount: function componentDidMount() {
+	    fetchData: function fetchData() {
 	        var url = '/records';
 	        var that = this;
 	        _superagent2.default.get(url).end(function (err, res) {
 	            if (err) throw err;
 	            if (that.isMounted()) {
-	                console.log(res.body.data.length);
-	                that.setState({
-	                    'records': res.body.data.length
-	                });
+	                // checking whether there are any records
+	                if (res.body.data == null) {
+	                    that.setState({
+	                        'records': 0
+	                    });
+	                } else {
+	                    that.setState({
+	                        'records': res.body.data.length
+	                    });
+	                }
 	            }
 	        });
 	    },
+	    componentDidMount: function componentDidMount() {
+	        setInterval(this.fetchData, parseInt(this.state.interval));
+	    },
 	    render: function render() {
-	        var msg = "No records available.";
-	        if (this.state.records == 1) {
+	        var msg = "Fetching data...";
+	        if (this.state.records == 0) {
+	            msg = "No records available.";
+	        } else if (this.state.records == 1) {
 	            msg = "Currently there is 1 record.";
 	        } else if (this.state.records > 1) {
 	            msg = "Currently there are " + this.state.records + " records.";
@@ -154,7 +184,16 @@
 	        return _react2.default.createElement(
 	            'div',
 	            null,
-	            msg
+	            _react2.default.createElement(
+	                'div',
+	                { className: 'two-thirds column' },
+	                _react2.default.createElement(WipeRecordsComponent, { parent: this })
+	            ),
+	            _react2.default.createElement(
+	                'div',
+	                { className: 'one-third column' },
+	                msg
+	            )
 	        );
 	    }
 	});
@@ -181,7 +220,6 @@
 	        this.getCurrentMode();
 	    },
 	    changeMode: function changeMode(e) {
-	        //console.log(e.target.value);
 	        var url = '/state';
 	        var that = this;
 	        _superagent2.default.post(url).send({ mode: e.target.value }).end(function (err, res) {
@@ -219,11 +257,6 @@
 	        return _react2.default.createElement(
 	            'div',
 	            null,
-	            _react2.default.createElement(
-	                'div',
-	                { className: 'row' },
-	                _react2.default.createElement(StatsComponent, null)
-	            ),
 	            _react2.default.createElement('hr', null),
 	            _react2.default.createElement(
 	                'div',
@@ -260,6 +293,12 @@
 	                    { className: 'one-third column' },
 	                    _react2.default.createElement(ModeInfoComponent, { data: data })
 	                )
+	            ),
+	            _react2.default.createElement('hr', null),
+	            _react2.default.createElement(
+	                'div',
+	                { className: 'row' },
+	                _react2.default.createElement(StatsComponent, null)
 	            )
 	        );
 	    }
