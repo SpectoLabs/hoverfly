@@ -65,8 +65,9 @@ let ModeInfoComponent = React.createClass({
     }
 
 });
+
 let StateChangeComponent = React.createClass({
-    displayName: "StateChangeButton",
+    displayName: "StateChangeComponent",
 
     getInitialState() {
         return {"mode": null}
@@ -80,7 +81,6 @@ let StateChangeComponent = React.createClass({
             .end(function (err, res) {
                 if (err) throw err;
                 if (that.isMounted()) {
-                    console.log(res.body);
                     that.setState({
                         'mode': res.body.mode
                     });
@@ -93,16 +93,15 @@ let StateChangeComponent = React.createClass({
     },
 
     changeMode(e){
-      console.log(e.target.value);
+        //console.log(e.target.value);
         var url = '/state';
         var that = this;
         request
             .post(url)
-            .send({ mode: e.target.value })
+            .send({mode: e.target.value})
             .end(function (err, res) {
                 if (err) throw err;
                 if (that.isMounted()) {
-                    console.log(res.body);
                     that.setState({
                         'mode': res.body.mode
                     });
@@ -120,25 +119,34 @@ let StateChangeComponent = React.createClass({
         let synthesizeClass = defaultBtn;
 
 
-        if (this.state.mode == "virtualize") {
+        if (this.state.mode == VirtualizeMode) {
             virtualizeClass = primaryBtn;
-        } else if (this.state.mode == "modify") {
+        } else if (this.state.mode == ModifyMode) {
             modifyClass = primaryBtn;
-        } else if (this.state.mode == "capture") {
+        } else if (this.state.mode == CaptureMode) {
             captureClass = primaryBtn;
-        } else if (this.state.mode == "synthesize") {
+        } else if (this.state.mode == SynthesizeMode) {
             synthesizeClass = primaryBtn;
         }
 
+        let data = {
+            "mode": this.state.mode
+        };
+
         return (
-            <div>
-                <button className={virtualizeClass} onClick={this.changeMode} value="virtualize">Virtualize</button>
-                {' '}
-                <button className={modifyClass} onClick={this.changeMode} value="modify">Modify</button>
-                {' '}
-                <button className={captureClass} onClick={this.changeMode} value="capture">Capture</button>
-                {' '}
-                <button className={synthesizeClass} onClick={this.changeMode} value="synthesize">Synthesize</button>
+            <div className="row">
+                <div className="two-thirds column">
+                    <button className={virtualizeClass} onClick={this.changeMode} value="virtualize">Virtualize</button>
+                    {' '}
+                    <button className={modifyClass} onClick={this.changeMode} value="modify">Modify</button>
+                    {' '}
+                    <button className={captureClass} onClick={this.changeMode} value="capture">Capture</button>
+                    {' '}
+                    <button className={synthesizeClass} onClick={this.changeMode} value="synthesize">Synthesize</button>
+                </div>
+                <div className="one-third column">
+                    <ModeInfoComponent data={data} />
+                </div>
             </div>
         )
     }
