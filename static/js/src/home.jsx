@@ -48,6 +48,23 @@ let ModeInfoComponent = React.createClass({
                     </p>
                 </div>
             )
+        } else if (mode == ModifyMode) {
+            return (
+                <div>
+                    <p>
+                        Modify mode applies middleware to both outbound and inbound HTTP traffic. Hoverfly doesn't record
+                        anything when modify mode is enabled.
+                    </p>
+                </div>
+            )
+        } else {
+            return (
+                <div></div>
+            )
+        }
+    }
+
+});
 let StateChangeComponent = React.createClass({
     displayName: "StateChangeButton",
 
