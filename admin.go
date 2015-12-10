@@ -1,13 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
-	"encoding/json"
 	log "github.com/Sirupsen/logrus"
+	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
+	"github.com/meatballhat/negroni-logrus"
 )
 
 // jsonResponse struct encapsulates payload data
@@ -24,6 +26,22 @@ type messageResponse struct {
 	Message string `json:"message"`
 }
 
+func (d *DBClient) startAdminInterface() {
+	// starting admin interface
+	mux := getBoneRouter(*d)
+	n := negroni.Classic()
+	n.Use(negronilogrus.NewMiddleware())
+	n.UseHandler(mux)
+
+	// admin interface starting message
+	log.WithFields(log.Fields{
+		"RedisAddress": AppConfig.redisAddress,
+		"AdminPort":    AppConfig.adminInterface,
+	}).Info("Admin interface is starting...")
+
+	n.Run(AppConfig.adminInterface)
+}
+
 // getBoneRouter returns mux for admin interface
 func getBoneRouter(d DBClient) *bone.Mux {
 	mux := bone.New()
@@ -34,6 +52,8 @@ func getBoneRouter(d DBClient) *bone.Mux {
 
 	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
 	mux.Post("/state", http.HandlerFunc(d.stateHandler))
+
+	mux.Handle("/*", http.FileServer(http.Dir("static")))
 
 	return mux
 }

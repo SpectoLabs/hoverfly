@@ -30,3 +30,4 @@ hoverfly
 
 # examples/clients/readthedocs_query/test.py pickle file
 links.p
+static/js/node_modules
