@@ -74,11 +74,12 @@ let StatsComponent = React.createClass({
 
     getInitialState() {
         return {
-            "records": null
+            "records": null,
+            "interval": 1000
         }
     },
 
-    componentDidMount() {
+    fetchData() {
         var url = '/records';
         var that = this;
         request
@@ -86,17 +87,29 @@ let StatsComponent = React.createClass({
             .end(function (err, res) {
                 if (err) throw err;
                 if (that.isMounted()) {
-                    console.log(res.body.data.length);
-                    that.setState({
-                        'records': res.body.data.length
-                    });
+                    // checking whether there are any records
+                    if(res.body.data == null) {
+                        that.setState({
+                            'records': 0
+                        });
+                    } else{
+                        that.setState({
+                            'records': res.body.data.length
+                        });
+                    }
                 }
             });
     },
 
+    componentDidMount() {
+        setInterval(this.fetchData, parseInt(this.state.interval));
+    },
+
     render() {
-        let msg = "No records available.";
-        if (this.state.records == 1) {
+        let msg = "Fetching data...";
+        if (this.state.records == 0) {
+            msg = "No records available.";
+        } else if (this.state.records == 1) {
             msg = "Currently there is 1 record."
         } else if (this.state.records >1) {
             msg = "Currently there are " + this.state.records + " records."
@@ -137,7 +150,6 @@ let StateChangeComponent = React.createClass({
     },
 
     changeMode(e){
-        //console.log(e.target.value);
         var url = '/state';
         var that = this;
         request
