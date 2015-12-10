@@ -65,8 +65,65 @@
 	var SynthesizeMode = "synthesize";
 	var ModifyMode = "modify";
 
+	var ModeInfoComponent = _react2.default.createClass({
+	    displayName: "ModeInfoComponent",
+
+	    getInitialState: function getInitialState() {
+	        return {
+	            "mode": this.props.data
+	        };
+	    },
+	    render: function render() {
+	        var mode = this.props.data.mode;
+
+	        if (mode == VirtualizeMode) {
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'p',
+	                    null,
+	                    'This mode enables service virtualization. Hoverfly uses captured requests and their unique identifiers (such as query, method, etc.) to find best response. If used with middleware - it will be applied to matched responses'
+	                )
+	            );
+	        } else if (mode == CaptureMode) {
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'p',
+	                    null,
+	                    'When capture mode is active - Hoverfly intercepts requests and makes them on behalf of client. This enables Hoverfly to also apply middleware (if user supplied middleware setting) on outgoing traffic. Requests and responses are stored in Redis as a JSON structures.'
+	                )
+	            );
+	        } else if (mode == SynthesizeMode) {
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'p',
+	                    null,
+	                    'Synthesize mode enforces completely synthetic, virtual services. Middleware is required for this mode work. JSON payload with incoming request information is supplied to middleware and it is expected to provide data that will be used to create response. More about this in project readme.'
+	                )
+	            );
+	        } else if (mode == ModifyMode) {
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'p',
+	                    null,
+	                    'Modify mode applies middleware to both outbound and inbound HTTP traffic. Hoverfly doesn\'t record anything when modify mode is enabled.'
+	                )
+	            );
+	        } else {
+	            return _react2.default.createElement('div', null);
+	        }
+	    }
+	});
+
 	var StateChangeComponent = _react2.default.createClass({
-	    displayName: "StateChangeButton",
+	    displayName: "StateChangeComponent",
 
 	    getInitialState: function getInitialState() {
 	        return { "mode": null };
@@ -77,7 +134,6 @@
 	        _superagent2.default.get(url).end(function (err, res) {
 	            if (err) throw err;
 	            if (that.isMounted()) {
-	                console.log(res.body);
 	                that.setState({
 	                    'mode': res.body.mode
 	                });
@@ -88,13 +144,12 @@
 	        this.getCurrentMode();
 	    },
 	    changeMode: function changeMode(e) {
-	        console.log(e.target.value);
+	        //console.log(e.target.value);
 	        var url = '/state';
 	        var that = this;
 	        _superagent2.default.post(url).send({ mode: e.target.value }).end(function (err, res) {
 	            if (err) throw err;
 	            if (that.isMounted()) {
-	                console.log(res.body);
 	                that.setState({
 	                    'mode': res.body.mode
 	                });
@@ -110,41 +165,54 @@
 	        var captureClass = defaultBtn;
 	        var synthesizeClass = defaultBtn;
 
-	        if (this.state.mode == "virtualize") {
+	        if (this.state.mode == VirtualizeMode) {
 	            virtualizeClass = primaryBtn;
-	        } else if (this.state.mode == "modify") {
+	        } else if (this.state.mode == ModifyMode) {
 	            modifyClass = primaryBtn;
-	        } else if (this.state.mode == "capture") {
+	        } else if (this.state.mode == CaptureMode) {
 	            captureClass = primaryBtn;
-	        } else if (this.state.mode == "synthesize") {
+	        } else if (this.state.mode == SynthesizeMode) {
 	            synthesizeClass = primaryBtn;
 	        }
 
+	        var data = {
+	            "mode": this.state.mode
+	        };
+
 	        return _react2.default.createElement(
 	            'div',
-	            null,
+	            { className: 'row' },
 	            _react2.default.createElement(
-	                'button',
-	                { className: virtualizeClass, onClick: this.changeMode, value: 'virtualize' },
-	                'Virtualize'
+	                'div',
+	                { className: 'two-thirds column' },
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: virtualizeClass, onClick: this.changeMode, value: 'virtualize' },
+	                    'Virtualize'
+	                ),
+	                ' ',
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: modifyClass, onClick: this.changeMode, value: 'modify' },
+	                    'Modify'
+	                ),
+	                ' ',
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: captureClass, onClick: this.changeMode, value: 'capture' },
+	                    'Capture'
+	                ),
+	                ' ',
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: synthesizeClass, onClick: this.changeMode, value: 'synthesize' },
+	                    'Synthesize'
+	                )
 	            ),
-	            ' ',
 	            _react2.default.createElement(
-	                'button',
-	                { className: modifyClass, onClick: this.changeMode, value: 'modify' },
-	                'Modify'
-	            ),
-	            ' ',
-	            _react2.default.createElement(
-	                'button',
-	                { className: captureClass, onClick: this.changeMode, value: 'capture' },
-	                'Capture'
-	            ),
-	            ' ',
-	            _react2.default.createElement(
-	                'button',
-	                { className: synthesizeClass, onClick: this.changeMode, value: 'synthesize' },
-	                'Synthesize'
+	                'div',
+	                { className: 'one-third column' },
+	                _react2.default.createElement(ModeInfoComponent, { data: data })
 	            )
 	        );
 	    }
