@@ -38,6 +38,16 @@ let ModeInfoComponent = React.createClass({
                     </p>
                 </div>
             )
+        } else if (mode == SynthesizeMode) {
+            return (
+                <div>
+                    <p>
+                        Synthesize mode enforces completely synthetic, virtual services. Middleware is required for this mode
+                        work. JSON payload with incoming request information is supplied to middleware and it is expected to
+                        provide data that will be used to create response. More about this in project readme.
+                    </p>
+                </div>
+            )
 let StateChangeComponent = React.createClass({
     displayName: "StateChangeButton",
 
