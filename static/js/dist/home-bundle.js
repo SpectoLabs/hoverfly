@@ -122,6 +122,43 @@
 	    }
 	});
 
+	var StatsComponent = _react2.default.createClass({
+	    displayName: "StatsComponent",
+
+	    getInitialState: function getInitialState() {
+	        return {
+	            "records": null
+	        };
+	    },
+	    componentDidMount: function componentDidMount() {
+	        var url = '/records';
+	        var that = this;
+	        _superagent2.default.get(url).end(function (err, res) {
+	            if (err) throw err;
+	            if (that.isMounted()) {
+	                console.log(res.body.data.length);
+	                that.setState({
+	                    'records': res.body.data.length
+	                });
+	            }
+	        });
+	    },
+	    render: function render() {
+	        var msg = "No records available.";
+	        if (this.state.records == 1) {
+	            msg = "Currently there is 1 record.";
+	        } else if (this.state.records > 1) {
+	            msg = "Currently there are " + this.state.records + " records.";
+	        }
+
+	        return _react2.default.createElement(
+	            'div',
+	            null,
+	            msg
+	        );
+	    }
+	});
+
 	var StateChangeComponent = _react2.default.createClass({
 	    displayName: "StateChangeComponent",
 
@@ -181,38 +218,48 @@
 
 	        return _react2.default.createElement(
 	            'div',
-	            { className: 'row' },
+	            null,
 	            _react2.default.createElement(
 	                'div',
-	                { className: 'two-thirds column' },
-	                _react2.default.createElement(
-	                    'button',
-	                    { className: virtualizeClass, onClick: this.changeMode, value: 'virtualize' },
-	                    'Virtualize'
-	                ),
-	                ' ',
-	                _react2.default.createElement(
-	                    'button',
-	                    { className: modifyClass, onClick: this.changeMode, value: 'modify' },
-	                    'Modify'
-	                ),
-	                ' ',
-	                _react2.default.createElement(
-	                    'button',
-	                    { className: captureClass, onClick: this.changeMode, value: 'capture' },
-	                    'Capture'
-	                ),
-	                ' ',
-	                _react2.default.createElement(
-	                    'button',
-	                    { className: synthesizeClass, onClick: this.changeMode, value: 'synthesize' },
-	                    'Synthesize'
-	                )
+	                { className: 'row' },
+	                _react2.default.createElement(StatsComponent, null)
 	            ),
+	            _react2.default.createElement('hr', null),
 	            _react2.default.createElement(
 	                'div',
-	                { className: 'one-third column' },
-	                _react2.default.createElement(ModeInfoComponent, { data: data })
+	                { className: 'row' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'two-thirds column' },
+	                    _react2.default.createElement(
+	                        'button',
+	                        { className: virtualizeClass, onClick: this.changeMode, value: 'virtualize' },
+	                        'Virtualize'
+	                    ),
+	                    ' ',
+	                    _react2.default.createElement(
+	                        'button',
+	                        { className: modifyClass, onClick: this.changeMode, value: 'modify' },
+	                        'Modify'
+	                    ),
+	                    ' ',
+	                    _react2.default.createElement(
+	                        'button',
+	                        { className: captureClass, onClick: this.changeMode, value: 'capture' },
+	                        'Capture'
+	                    ),
+	                    ' ',
+	                    _react2.default.createElement(
+	                        'button',
+	                        { className: synthesizeClass, onClick: this.changeMode, value: 'synthesize' },
+	                        'Synthesize'
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'one-third column' },
+	                    _react2.default.createElement(ModeInfoComponent, { data: data })
+	                )
 	            )
 	        );
 	    }
