@@ -6,15 +6,22 @@ Hoverfly is a proxy written in Go. It can capture HTTP(s) traffic between an app
 
 ## Installation
 
-You can just grab a binary from releases or you can build it yourself. Use [glide](https://github.com/Masterminds/glide) to
+If you have [Vagrant](https://www.vagrantup.com/), its as simple as
+
+    vagrant up
+
+Alternatively, you can just [grab a binary from releases](https://github.com/SpectoLabs/hoverfly/releases/) or you can build it yourself. Use [glide](https://github.com/Masterminds/glide) to
 fetch dependencies with:
-* glide up
+
+    glide up
 
 Then, build it:
-* go build
+
+    go build
 
 Run it:
-* ./hoverfly
+
+    ./hoverfly
 
 ## Destination configuration
 
