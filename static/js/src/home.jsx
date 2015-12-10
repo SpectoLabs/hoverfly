@@ -42,8 +42,10 @@ let ModeInfoComponent = React.createClass({
             return (
                 <div>
                     <p>
-                        Synthesize mode enforces completely synthetic, virtual services. Middleware is required for this mode
-                        work. JSON payload with incoming request information is supplied to middleware and it is expected to
+                        Synthesize mode enforces completely synthetic, virtual services. Middleware is required for this
+                        mode
+                        work. JSON payload with incoming request information is supplied to middleware and it is
+                        expected to
                         provide data that will be used to create response. More about this in project readme.
                     </p>
                 </div>
@@ -52,7 +54,8 @@ let ModeInfoComponent = React.createClass({
             return (
                 <div>
                     <p>
-                        Modify mode applies middleware to both outbound and inbound HTTP traffic. Hoverfly doesn't record
+                        Modify mode applies middleware to both outbound and inbound HTTP traffic. Hoverfly doesn't
+                        record
                         anything when modify mode is enabled.
                     </p>
                 </div>
@@ -175,18 +178,26 @@ let StateChangeComponent = React.createClass({
         };
 
         return (
-            <div className="row">
-                <div className="two-thirds column">
-                    <button className={virtualizeClass} onClick={this.changeMode} value="virtualize">Virtualize</button>
-                    {' '}
-                    <button className={modifyClass} onClick={this.changeMode} value="modify">Modify</button>
-                    {' '}
-                    <button className={captureClass} onClick={this.changeMode} value="capture">Capture</button>
-                    {' '}
-                    <button className={synthesizeClass} onClick={this.changeMode} value="synthesize">Synthesize</button>
+            <div>
+                <div className="row">
+                    <StatsComponent />
                 </div>
-                <div className="one-third column">
-                    <ModeInfoComponent data={data} />
+                <hr/>
+                <div className="row">
+                    <div className="two-thirds column">
+                        <button className={virtualizeClass} onClick={this.changeMode} value="virtualize">Virtualize
+                        </button>
+                        {' '}
+                        <button className={modifyClass} onClick={this.changeMode} value="modify">Modify</button>
+                        {' '}
+                        <button className={captureClass} onClick={this.changeMode} value="capture">Capture</button>
+                        {' '}
+                        <button className={synthesizeClass} onClick={this.changeMode} value="synthesize">Synthesize
+                        </button>
+                    </div>
+                    <div className="one-third column">
+                        <ModeInfoComponent data={data}/>
+                    </div>
                 </div>
             </div>
         )
