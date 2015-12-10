@@ -60,6 +60,11 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	var VirtualizeMode = "virtualize";
+	var CaptureMode = "capture";
+	var SynthesizeMode = "synthesize";
+	var ModifyMode = "modify";
+
 	var StateChangeComponent = _react2.default.createClass({
 	    displayName: "StateChangeButton",
 
