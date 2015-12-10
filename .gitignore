@@ -31,4 +31,4 @@ hoverfly
 # examples/clients/readthedocs_query/test.py pickle file
 links.p
 
-.vagrant
+.vagrant/
