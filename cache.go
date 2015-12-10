@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"strconv"
@@ -29,14 +30,21 @@ func (c *Cache) set(key string, value interface{}) error {
 	_, err := client.Do("SET", fmt.Sprintf(c.prefix+key), value)
 
 	if err != nil {
+		// getting payload for debugging
+		var payload string
+		switch v := value.(type) {
+		case bytes.Buffer: // return as is
+			payload = v.String() // Here v is of type bytes.Buffer
+		}
 		log.WithFields(log.Fields{
-			"error": err.Error(),
-			"key":   fmt.Sprintf(c.prefix + key),
+			"error":   err.Error(),
+			"key":     fmt.Sprintf(c.prefix + key),
+			"payload": payload,
 		}).Error("Failed to SET key...")
 	} else {
 		log.WithFields(log.Fields{
 			"key": fmt.Sprintf(c.prefix + key),
-		}).Debug("Key/value SET successfuly!")
+		}).Info("Key/value SET successfuly!")
 	}
 
 	return err

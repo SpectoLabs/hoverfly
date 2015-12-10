@@ -26,13 +26,17 @@ func synthesizeResponse(req *http.Request, middleware string) *http.Response {
 
 	c := NewConstructor(req, payload)
 
-	err := c.ApplyMiddleware(middleware)
-
-	if err != nil {
-		var errorPayload Payload
-		errorPayload.Response.Status = 503
-		errorPayload.Response.Body = fmt.Sprintf("Middleware error: %s", err.Error())
-		c.payload = errorPayload
+	if middleware != "" {
+		err := c.ApplyMiddleware(middleware)
+		if err != nil {
+			var errorPayload Payload
+			errorPayload.Response.Status = 503
+			errorPayload.Response.Body = fmt.Sprintf("Middleware error: %s", err.Error())
+			c.payload = errorPayload
+		}
+	} else {
+		c.payload.Response.Body = "Precondition failed: middleware not provided."
+		c.payload.Response.Status = 428
 	}
 
 	response := c.reconstructResponse()
