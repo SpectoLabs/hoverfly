@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# This script downloads a pre-build hoverfly binary because building hoverfly
+# This script downloads a pre-built hoverfly binary because building hoverfly
 # in a vagrant guest means dealing with Go dependencies. Life is too short.
 
 $bootstrapScript = <<SCRIPT
@@ -11,9 +11,10 @@ sudo mv /etc/redis/redis.conf /etc/redis/redis.conf.old
 echo "bind 0.0.0.0" | sudo tee /etc/redis/redis.conf
 cat /etc/redis/redis.conf.old | grep -v bind | sudo tee -a /etc/redis/redis.conf
 sudo service redis-server restart
-wget –quiet https://storage.googleapis.com/hoverfly-binaries/hoverfly_v0.3_linux_amd64
-chmod +x hoverfly_v0.3_linux_amd64
-ln -s hoverfly_v0.3_linux_amd64 hoverfly
+wget https://storage.googleapis.com/hoverfly-binaries/hoverfly_v0.4_linux_amd64
+mv hoverfly_v0.4_linux_amd64 hoverfly && chmod +x hoverfly
+ln -s /vagrant/static /home/vagrant/static
+nohup ./hoverfly > hoverfly.log 2>&1 & echo $! > hoverfly_pid &
 SCRIPT
 
 VAGRANTFILE_API_VERSION = "2"
