@@ -32,3 +32,5 @@ hoverfly
 links.p
 
 .vagrant/
+
+static/js/node_modules
