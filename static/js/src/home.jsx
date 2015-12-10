@@ -28,6 +28,16 @@ let ModeInfoComponent = React.createClass({
                         be applied to matched responses</p>
                 </div>
             )
+        } else if (mode == CaptureMode) {
+            return (
+                <div>
+                    <p>
+                        When capture mode is active - Hoverfly intercepts requests and makes them on behalf of client.
+                        This enables Hoverfly to also apply middleware (if user supplied middleware setting) on outgoing
+                        traffic. Requests and responses are stored in Redis as a JSON structures.
+                    </p>
+                </div>
+            )
 let StateChangeComponent = React.createClass({
     displayName: "StateChangeButton",
 
