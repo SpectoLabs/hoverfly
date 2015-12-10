@@ -66,6 +66,47 @@ let ModeInfoComponent = React.createClass({
 
 });
 
+let StatsComponent = React.createClass({
+    displayName: "StatsComponent",
+
+    getInitialState() {
+        return {
+            "records": null
+        }
+    },
+
+    componentDidMount() {
+        var url = '/records';
+        var that = this;
+        request
+            .get(url)
+            .end(function (err, res) {
+                if (err) throw err;
+                if (that.isMounted()) {
+                    console.log(res.body.data.length);
+                    that.setState({
+                        'records': res.body.data.length
+                    });
+                }
+            });
+    },
+
+    render() {
+        let msg = "No records available.";
+        if (this.state.records == 1) {
+            msg = "Currently there is 1 record."
+        } else if (this.state.records >1) {
+            msg = "Currently there are " + this.state.records + " records."
+        }
+
+        return (
+            <div>
+                {msg}
+            </div>
+        )
+    }
+});
+
 let StateChangeComponent = React.createClass({
     displayName: "StateChangeComponent",
 
