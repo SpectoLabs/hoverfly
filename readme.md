@@ -1,4 +1,5 @@
-# Hoverfly: dependencies without the sting
+![Hoverfly](static/images/hf_logo_side_crop.png)
+## _Dependencies without the sting_
 
 Hoverfly is an experiment in lightweight, open source [service virtualization](https://en.wikipedia.org/wiki/Service_virtualization). Using Hoverfly, you can virtualize your application dependencies to create a self-contained development/test environment.
 
@@ -65,7 +66,7 @@ service can be found in _this_repo/examples/middleware/synthetic_service/synthet
 ### Modify
 
 Modify mode applies selected middleware (user is required to supply --middleware flag, you can read more about it below)
-to outgoing requests and also to incoming responses (before returning them to clients). It 
+to outgoing requests and also to incoming responses (before returning them to clients). It
 enables users to use Hoverfly without storing any data about requests. It can be used when it's difficult or there ir just little point
 in describing a service yourself and you only need to change parts of the requests/responses (i.e. add authentication headers through the
 middleware).
@@ -170,17 +171,17 @@ if __name__ == "__main__":
 Save this file with python extension, _chmod +x_ it and run hoverfly:
 
     ./hoverfly --middleware "./this_file.py"
-    
+
 
 ### How middleware interacts with different modes?
 
 Each mode is affected by middleware in different ways. Since JSON payload has request and response structures - some middleware
  will not change anything, some information about middleware behaviour:
-  * __Capture Mode__: middleware affects only outgoing requests. 
+  * __Capture Mode__: middleware affects only outgoing requests.
   * __Virtualize Mode__: middleware affects only responses (cache contents remain untouched).
   * __Synthesize Mode__: middleware creates responses.
   * __Modify Mode__: middleware affects requests and responses.
-  
+
 
 
 ## Debugging
