@@ -16,7 +16,6 @@ Then, build it:
 Run it:
 * ./hoverfly
 
-
 ## Destination configuration
 
 Specifying which site to record/virtualize with regular expression (by default it processes everything):
@@ -72,6 +71,12 @@ Example below changes destination host to "mirage.readthedocs.org" and sets meth
 Add ca.pem to your trusted certificates or turn off verification, with curl you can make insecure requests with -k:
 
     curl https://www.bbc.co.uk --proxy http://localhost:8500 -k
+
+## Administrator web UI
+
+By default proxy launches admin API and UI on port 8888. Access admin interface for basic operations on http://proxy_hostname:8888/.
+It uses same API as described below to change state, also allows to wipe captured requests/responses and show current count of records.
+For other functions such as export/import - use API directly.
 
 ## API
 

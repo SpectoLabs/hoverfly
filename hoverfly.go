@@ -2,9 +2,7 @@ package main
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/codegangsta/negroni"
 	"github.com/elazarl/goproxy"
-	"github.com/meatballhat/negroni-logrus"
 
 	"bufio"
 	"flag"
@@ -210,20 +208,4 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 		return req, newResponse
 
 	}
-}
-
-func (d *DBClient) startAdminInterface() {
-	// starting admin interface
-	mux := getBoneRouter(*d)
-	n := negroni.Classic()
-	n.Use(negronilogrus.NewMiddleware())
-	n.UseHandler(mux)
-
-	// admin interface starting message
-	log.WithFields(log.Fields{
-		"RedisAddress": AppConfig.redisAddress,
-		"AdminPort":    AppConfig.adminInterface,
-	}).Info("Admin interface is starting...")
-
-	n.Run(AppConfig.adminInterface)
 }
