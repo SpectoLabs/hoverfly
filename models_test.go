@@ -94,7 +94,7 @@ func TestDeleteAllRecords(t *testing.T) {
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
-		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
+		req, err := http.NewRequest("GET", fmt.Sprintf("http://delete_all_records.com/q=%d", i), nil)
 		expect(t, err, nil)
 		dbClient.captureRequest(req)
 	}
