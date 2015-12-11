@@ -15,7 +15,7 @@ func TestChangeBodyMiddleware(t *testing.T) {
 	newPayload, err := ExecuteMiddleware(command, payload)
 
 	expect(t, err, nil)
-	expect(t, newPayload.Response.Body, "body was replaced by middleware")
+	expect(t, newPayload.Response.Body, "body was replaced by middleware\n")
 }
 
 func TestMalformedPayloadMiddleware(t *testing.T) {
