@@ -17,7 +17,7 @@ def main():
     payload_dict = json.loads(payload)
 
     payload_dict['response']['status'] = 201
-    payload_dict['response']['body'] = "body was replaced by middleware"
+    payload_dict['response']['body'] = "body was replaced by middleware\n"
 
     # returning new payload
     print(json.dumps(payload_dict))
