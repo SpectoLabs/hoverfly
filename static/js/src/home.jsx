@@ -23,18 +23,17 @@ let ModeInfoComponent = React.createClass({
             return (
                 <div>
                     <p>This mode enables service virtualization. Hoverfly uses captured requests and their unique
-                        identifiers (such as query, method, etc.) to find best response. If used with middleware - it
-                        will
-                        be applied to matched responses</p>
+                       identifiers (such as a query, a method, etc.) to find the best response. In this mode, middleware
+                       will be applied to matched responses.
+                    </p>
                 </div>
             )
         } else if (mode == CaptureMode) {
             return (
                 <div>
                     <p>
-                        When capture mode is active - Hoverfly intercepts requests and makes them on behalf of the client.
-                        This enables Hoverfly to also apply middleware (if user supplied middleware setting) on outgoing
-                        traffic. Requests and responses are stored in Redis as a JSON structures.
+                        When capture mode is active, Hoverfly intercepts requests and then makes them on behalf of the client.
+                        In this mode, middleware is applied to outgoing traffic. Requests and responses are stored in Redis as JSON structures.
                     </p>
                 </div>
             )
@@ -42,11 +41,9 @@ let ModeInfoComponent = React.createClass({
             return (
                 <div>
                     <p>
-                        Synthesize mode enforces completely synthetic, virtual services. Middleware is required for this
-                        mode
-                        work. JSON payload with incoming request information is supplied to middleware and it is
-                        expected to
-                        provide data that will be used to create response. More about this in project readme.
+                        Synthesize mode enables completely synthetic, virtual services. Middleware is required for this
+                        mode to work. The JSON payload with the incoming request information is supplied to the middleware.
+                        The middleware must then supply data to be returned in the response. More about this in project readme.
                     </p>
                 </div>
             )
@@ -54,9 +51,8 @@ let ModeInfoComponent = React.createClass({
             return (
                 <div>
                     <p>
-                        Modify mode applies middleware to both outbound and inbound HTTP traffic. Hoverfly doesn't
-                        record
-                        anything when modify mode is enabled.
+                        Modify mode applies middleware to both outbound and inbound HTTP/HTTPS traffic, allowing you to modify requests
+                        and responses on the fly. Hoverfly doesn't record anything when modify mode is enabled.
                     </p>
                 </div>
             )

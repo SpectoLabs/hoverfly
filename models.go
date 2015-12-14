@@ -266,7 +266,13 @@ func (d *DBClient) deleteAllRecords() error {
 		return err
 	} else {
 		for _, v := range keys {
-			d.cache.delete(v)
+			err := d.cache.delete(v)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error": err.Error(),
+					"key":   v,
+				}).Warning("Failed to delete key...")
+			}
 		}
 		return nil
 	}

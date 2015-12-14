@@ -30,4 +30,7 @@ hoverfly
 
 # examples/clients/readthedocs_query/test.py pickle file
 links.p
+
+.vagrant/
+
 static/js/node_modules
