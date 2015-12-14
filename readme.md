@@ -138,6 +138,8 @@ generating response on the fly you can use ""--synthesize" flag.
 In order to use your middleware, just add path to executable:
 
     ./hoverfly --middleware "./examples/middleware/modify_response/modify_response.py"
+    
+#### Python middleware example
 
 Basic example of a Python module to change response body and add 2 second delay:
 
@@ -178,6 +180,33 @@ if __name__ == "__main__":
 Save this file with python extension, _chmod +x_ it and run hoverfly:
 
     ./hoverfly --middleware "./this_file.py"
+
+#### JavaScript middleware example
+
+You can also execute JavaScript middleware using Node. Make sure that you can execute Node, you can brew install it on OSX. 
+
+Below is an example how to take data in, parse JSON, modify it and then encode it back to string and return:
+
+```javascript
+#!/usr/bin/env node
+
+process.stdin.resume();  
+process.stdin.setEncoding('utf8');  
+process.stdin.on('data', function(data) {
+  var parsed_json = JSON.parse(data);
+  // changing response
+  parsed_json.response.status = 201;
+  parsed_json.response.body = "body was replaced by JavaScript middleware\n";
+
+  // stringifying JSON response
+  var newJsonString = JSON.stringify(parsed_json);
+
+  process.stdout.write(newJsonString);
+});
+
+```
+
+You see, it's really easy to use it to create a synthetic service to simulate backend when you are working on the frontend side :)
 
 
 ### How middleware interacts with different modes
