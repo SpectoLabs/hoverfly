@@ -17,7 +17,7 @@ const DefaultPort = ":8500"
 
 // modes
 const VirtualizeMode = "virtualize"
-const SynthesizeMode = "sinthesize"
+const SynthesizeMode = "synthesize"
 const ModifyMode = "modify"
 const CaptureMode = "capture"
 
