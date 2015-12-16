@@ -1,4 +1,4 @@
-![Hoverfly](static/images/hf_logo_side_crop.png)
+![Hoverfly](static/images/hf-logo-std-r-transparent-medium.png)
 ## Dependencies without the sting
 
 Hoverfly is a lightweight, open source [service virtualization](https://en.wikipedia.org/wiki/Service_virtualization) tool. Using Hoverfly, you can virtualize your application dependencies to create a self-contained development or test environment.
@@ -22,7 +22,7 @@ Then build Hoverfly:
 And run it:
 
     ./hoverfly
-    
+
 The Hoverfly admin UI is available at [http://localhost:8888/](http://localhost:8888/).    
 
 ## Hoverfly is a proxy
@@ -138,7 +138,7 @@ generating response on the fly you can use ""--synthesize" flag.
 In order to use your middleware, just add path to executable:
 
     ./hoverfly --middleware "./examples/middleware/modify_response/modify_response.py"
-    
+
 #### Python middleware example
 
 Basic example of a Python module to change response body and add 2 second delay:
@@ -183,7 +183,7 @@ Save this file with python extension, _chmod +x_ it and run hoverfly:
 
 #### JavaScript middleware example
 
-You can also execute JavaScript middleware using Node. Make sure that you can execute Node, you can brew install it on OSX. 
+You can also execute JavaScript middleware using Node. Make sure that you can execute Node, you can brew install it on OSX.
 
 Below is an example how to take data in, parse JSON, modify it and then encode it back to string and return:
 
