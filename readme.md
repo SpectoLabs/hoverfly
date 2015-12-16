@@ -1,7 +1,7 @@
 ![Hoverfly](static/images/hf-logo-std-r-transparent-medium.png)
 ## Dependencies without the sting
 
-Hoverfly is a lightweight, open source [service virtualization](https://en.wikipedia.org/wiki/Service_virtualization) tool. Using Hoverfly, you can virtualize your application dependencies to create a self-contained development or test environment.
+[Hoverfly](http://hoverfly.io) is a lightweight, open source [service virtualization](https://en.wikipedia.org/wiki/Service_virtualization) tool. Using Hoverfly, you can virtualize your application dependencies to create a self-contained development or test environment.
 
 Hoverfly is a proxy written in [Go](https://github.com/golang/go). It can capture HTTP(s) traffic between an application under test and external services, and then replace the external services. Another powerful feature: middleware modules, where users can introduce their own custom logic. **Middleware modules can be written in any language**. Hoverfly uses [Redis](http://redis.io/) for persistence.
 
