@@ -106,6 +106,16 @@ func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 	return resp, err
 }
 
+func copyBody(body io.ReadCloser) (resp1, resp2 io.ReadCloser, err error) {
+	var buf bytes.Buffer
+	if _, err = buf.ReadFrom(body); err != nil {
+		return nil, nil, err
+	}
+	if err = body.Close(); err != nil {
+		return nil, nil, err
+	}
+	return ioutil.NopCloser(&buf), ioutil.NopCloser(bytes.NewReader(buf.Bytes())), nil
+}
 // doRequest performs original request and returns response that should be returned to client and error (if there is one)
 func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
