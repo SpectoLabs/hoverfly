@@ -14,7 +14,7 @@ sudo service redis-server restart
 
 # Download a pre-built hoverfly binary to avoid dealing with Go dependencies
 
-wget https://storage.googleapis.com/hoverfly-binaries/latest/hoverfly_*_linux_amd64
+wget https://storage.googleapis.com/hoverfly-binaries/latest/hoverfly_v0.4_linux_amd64
 mv hoverfly_*_linux_amd64 hoverfly && chmod +x hoverfly
 
 # Symlink the webUI static files
@@ -37,3 +37,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network "forwarded_port", guest: 8500, host: 8500
   config.vm.provision "shell", privileged: false, inline: $bootstrapScript
 end
+
+https://storage.googleapis.com/hoverfly-binaries/latest/hoverfly_v0.4_linux_amd64
