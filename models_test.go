@@ -105,8 +105,4 @@ func TestDeleteAllRecords(t *testing.T) {
 	// deleting
 	err := dbClient.deleteAllRecords()
 	expect(t, err, nil)
-
-	// checking whether all records were deleted
-	keys, _ = dbClient.cache.getAllKeys()
-	expect(t, len(keys), 0)
 }
