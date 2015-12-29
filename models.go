@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httputil"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/goproxy"
@@ -86,9 +85,7 @@ func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 	resp, err := d.doRequest(req)
 
 	if err == nil {
-
-		// getting response body
-		respBody, err := httputil.DumpResponse(resp, true)
+		respBody, err := extractBody(resp)
 		if err != nil {
 			// copying the response body did not work
 			if err != nil {
