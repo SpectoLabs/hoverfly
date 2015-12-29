@@ -5,6 +5,10 @@
 
 Hoverfly is a proxy written in [Go](https://github.com/golang/go). It can capture HTTP(s) traffic between an application under test and external services, and then replace the external services. Another powerful feature: middleware modules, where users can introduce their own custom logic. **Middleware modules can be written in any language**. Hoverfly uses [Redis](http://redis.io/) for persistence.
 
+More information about Hoverfly and how to use it:
+* https://www.specto.io/speeding-up-your-slow-dependencies/
+* https://www.specto.io/service-virtualization-modifying-traffiic/
+
 ## Installation
 
 If you have [Vagrant](https://www.vagrantup.com/), it's as simple as
