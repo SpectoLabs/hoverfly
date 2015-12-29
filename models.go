@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httputil"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/goproxy"
@@ -86,9 +85,7 @@ func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 	resp, err := d.doRequest(req)
 
 	if err == nil {
-
-		// getting response body
-		respBody, err := httputil.DumpResponse(resp, true)
+		respBody, err := extractBody(resp)
 		if err != nil {
 			// copying the response body did not work
 			if err != nil {
@@ -104,6 +101,37 @@ func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 
 	// return new response or error here
 	return resp, err
+}
+
+func copyBody(body io.ReadCloser) (resp1, resp2 io.ReadCloser, err error) {
+	var buf bytes.Buffer
+	if _, err = buf.ReadFrom(body); err != nil {
+		return nil, nil, err
+	}
+	if err = body.Close(); err != nil {
+		return nil, nil, err
+	}
+	return ioutil.NopCloser(&buf), ioutil.NopCloser(bytes.NewReader(buf.Bytes())), nil
+}
+
+func extractBody(resp *http.Response) (extract []byte, err error) {
+	save := resp.Body
+	savecl := resp.ContentLength
+
+	save, resp.Body, err = copyBody(resp.Body)
+
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	extract, err = ioutil.ReadAll(resp.Body)
+
+	resp.Body = save
+	resp.ContentLength = savecl
+	if err != nil {
+		return nil, err
+	}
+	return extract, nil
 }
 
 // doRequest performs original request and returns response that should be returned to client and error (if there is one)
