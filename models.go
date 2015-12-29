@@ -116,6 +116,27 @@ func copyBody(body io.ReadCloser) (resp1, resp2 io.ReadCloser, err error) {
 	}
 	return ioutil.NopCloser(&buf), ioutil.NopCloser(bytes.NewReader(buf.Bytes())), nil
 }
+
+func extractBody(resp *http.Response) (extract []byte, err error) {
+	save := resp.Body
+	savecl := resp.ContentLength
+
+	save, resp.Body, err = copyBody(resp.Body)
+
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	extract, err = ioutil.ReadAll(resp.Body)
+
+	resp.Body = save
+	resp.ContentLength = savecl
+	if err != nil {
+		return nil, err
+	}
+	return extract, nil
+}
+
 // doRequest performs original request and returns response that should be returned to client and error (if there is one)
 func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
