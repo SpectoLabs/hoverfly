@@ -41,7 +41,7 @@ Pre-built Hoverfly binaries are available [here](https://github.com/SpectoLabs/h
     
 ## Admin UI
 
-The Hoverfly admin UI is available at [http://localhost:8888/](http://localhost:8888/).    
+The Hoverfly admin UI is available at [http://localhost:8888/](http://localhost:8888/). It uses the [API](api) (as described below) to change state. It also allows you to wipe the captured requests/responses and shows the number of captured records. For other functions, such as export/import, you can use the API directly.
 
 ## Hoverfly is a proxy
 
@@ -104,12 +104,7 @@ The example below changes the destination host to "mirage.readthedocs.org" and s
 Add ca.pem to your trusted certificates or turn off verification. With curl you can make insecure requests with -k:
 
     curl https://www.bbc.co.uk --proxy http://localhost:8500 -k
-
-## Administrator web UI
-
-By default, the proxy launches the admin API and UI on port 8888. You can access the admin interface for basic operations on [http://localhost:8888/](http://localhost:8888/).
-It uses the same API as described below to change state. It also allows you to wipe the captured requests/responses and shows the number of captured records.
-For other functions, such as export/import, you can use the API directly.
+    
 
 ## API
 
