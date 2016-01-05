@@ -22,7 +22,7 @@ func initSettings() {
 	// getting redis connection
 	redisAddress := os.Getenv("RedisAddress")
 	if redisAddress == "" {
-		redisAddress = ":6379"
+		redisAddress = "127.0.0.1:6379"
 	}
 	AppConfig.redisAddress = redisAddress
 	// getting redis password
