@@ -31,6 +31,7 @@ type requestDetails struct {
 	Path        string              `json:"path"`
 	Method      string              `json:"method"`
 	Destination string              `json:"destination"`
+	Scheme      string              `json:"scheme"`
 	Query       string              `json:"query"`
 	Body        string              `json:"body"`
 	RemoteAddr  string              `json:"remoteAddr"`
@@ -199,6 +200,7 @@ func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte,
 			Path:        req.URL.Path,
 			Method:      req.Method,
 			Destination: req.Host,
+			Scheme:      req.URL.Scheme,
 			Query:       req.URL.RawQuery,
 			Body:        string(reqBody),
 			RemoteAddr:  req.RemoteAddr,
