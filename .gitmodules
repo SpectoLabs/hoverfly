@@ -1,6 +1,6 @@
-[submodule "redigo"]
-	path = vendor/github.com/garyburd/redigo
-	url = https://github.com/garyburd/redigo
+[submodule "boltdb"]
+	path = vendor/github.com/boltdb/bolt
+	url = https://github.com/boltdb/bolt
 [submodule "logrus"]
 	path = vendor/github.com/Sirupsen/logrus
 	url = https://github.com/Sirupsen/logrus

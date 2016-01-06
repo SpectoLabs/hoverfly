@@ -12,9 +12,13 @@ import (
 	"github.com/meatballhat/negroni-logrus"
 )
 
-// jsonResponse struct encapsulates payload data
+// recordedRequests struct encapsulates payload data
 type recordedRequests struct {
 	Data []Payload `json:"data"`
+}
+
+type recordsCount struct {
+	Count int `json:"count"`
 }
 
 type StateRequest struct {
@@ -49,6 +53,8 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	mux.Delete("/records", http.HandlerFunc(d.DeleteAllRecordsHandler))
 	mux.Post("/records", http.HandlerFunc(d.ImportRecordsHandler))
 
+	mux.Get("/count", http.HandlerFunc(d.RecordsCount))
+
 	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
 	mux.Post("/state", http.HandlerFunc(d.stateHandler))
 
@@ -67,6 +73,35 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 
 		var response recordedRequests
 		response.Data = records
+		b, err := json.Marshal(response)
+
+		if err != nil {
+			log.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else {
+			w.Write(b)
+			return
+		}
+	} else {
+		log.WithFields(log.Fields{
+			"Error": err.Error(),
+		}).Error("Failed to get data from cache!")
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(500) // can't process this entity
+		return
+	}
+}
+
+func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
+	records, err := d.cache.GetAllRequests()
+
+	if err == nil {
+
+		w.Header().Set("Content-Type", "application/json")
+
+		var response recordsCount
+		response.Count = len(records)
 		b, err := json.Marshal(response)
 
 		if err != nil {
