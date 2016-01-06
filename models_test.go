@@ -13,6 +13,8 @@ import (
 
 func TestMain(m *testing.M) {
 
+	setup()
+
 	retCode := m.Run()
 
 	// your func
@@ -27,7 +29,6 @@ func TestCaptureHeader(t *testing.T) {
 
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.pool.Close()
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	expect(t, err, nil)
@@ -42,7 +43,6 @@ func TestRequestBodyCaptured(t *testing.T) {
 
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.pool.Close()
 
 	body := ioutil.NopCloser(bytes.NewBuffer([]byte("fizz=buzz")))
 
@@ -57,7 +57,7 @@ func TestRequestBodyCaptured(t *testing.T) {
 
 	fp := getRequestFingerprint(req)
 
-	payloadBts, err := dbClient.cache.get(fp)
+	payloadBts, err := dbClient.cache.Get([]byte(fp))
 
 	var payload Payload
 
@@ -88,7 +88,6 @@ func TestDeleteAllRecords(t *testing.T) {
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.pool.Close()
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -96,11 +95,6 @@ func TestDeleteAllRecords(t *testing.T) {
 		expect(t, err, nil)
 		dbClient.captureRequest(req)
 	}
-	// checking that keys are there
-	keys, _ := dbClient.cache.getAllKeys()
-	expect(t, len(keys) > 0, true)
-
-	// deleting
-	err := dbClient.deleteAllRecords()
+	err := dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 	expect(t, err, nil)
 }
