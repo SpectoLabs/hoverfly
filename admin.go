@@ -143,7 +143,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 }
 
 func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request) {
-	err := d.deleteAllRecords()
+	err := d.cache.DeleteBucket(d.cache.requestsBucket)
 
 	w.Header().Set("Content-Type", "application/json")
 
