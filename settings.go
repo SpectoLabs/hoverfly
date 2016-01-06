@@ -4,7 +4,7 @@ import (
 	"os"
 )
 
-// Initial structure of configuration
+// Configuration - initial structure of configuration
 type Configuration struct {
 	adminInterface string
 	mode           string
@@ -13,7 +13,7 @@ type Configuration struct {
 	databaseName   string
 }
 
-// AppCondig stores application configuration
+// AppConfig stores application configuration
 var AppConfig Configuration
 
 func initSettings() {
@@ -24,14 +24,8 @@ func initSettings() {
 	if databaseName == "" {
 		databaseName = "requests.db"
 	}
-
-	// getting destination information
-	//	AppConfig.destination = "get this from cache"
-
-	// proxy state
-	// should be taken from cache if we want to make it horizontally scalable (currently not needed)
+	AppConfig.databaseName = databaseName
 
 	// middleware configuration
 	AppConfig.middleware = os.Getenv("HoverflyMiddleware")
-
 }
