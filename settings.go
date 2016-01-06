@@ -4,7 +4,7 @@ import (
 	"os"
 )
 
-// Initial structure of configuration
+// Configuration - initial structure of configuration
 type Configuration struct {
 	adminInterface string
 	mode           string
@@ -13,7 +13,7 @@ type Configuration struct {
 	databaseName   string
 }
 
-// AppCondig stores application configuration
+// AppConfig stores application configuration
 var AppConfig Configuration
 
 func initSettings() {
@@ -28,5 +28,4 @@ func initSettings() {
 
 	// middleware configuration
 	AppConfig.middleware = os.Getenv("HoverflyMiddleware")
-
 }
