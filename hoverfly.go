@@ -2,6 +2,7 @@ package main
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/boltdb/bolt"
 	"github.com/elazarl/goproxy"
 
 	"bufio"
@@ -105,8 +106,16 @@ func main() {
 	redisPool := getRedisPool()
 	defer redisPool.Close()
 
-	cache := Cache{pool: redisPool,
-		prefix: AppConfig.cachePrefix}
+	// getting boltDB
+	db := getDB()
+	defer db.Close()
+
+	cache := Cache{
+		pool:           redisPool,
+		prefix:         AppConfig.cachePrefix,
+		db:             db,
+		requestsBucket: []byte(requestsBucketName),
+	}
 
 	// getting connections
 	d := DBClient{
