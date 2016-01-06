@@ -14,7 +14,7 @@ sudo service redis-server restart
 
 # Download a pre-built hoverfly binary to avoid dealing with Go dependencies
 
-wget https://storage.googleapis.com/hoverfly-binaries/latest/hoverfly_v0.4.2_linux_amd64
+wget https://github.com/SpectoLabs/hoverfly/releases/download/v0.4.2/hoverfly_v0.4.2_linux_amd64
 mv hoverfly_v0.4.2_linux_amd64 hoverfly && chmod +x hoverfly
 
 # Symlink the webUI static files
