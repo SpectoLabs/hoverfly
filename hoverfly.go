@@ -167,6 +167,15 @@ func main() {
 	log.Warn(http.ListenAndServe(port, proxy))
 }
 
+func getDB() *bolt.DB {
+	db, err := bolt.Open("my.db", 0600, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db
+}
+
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
 func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Response) {
