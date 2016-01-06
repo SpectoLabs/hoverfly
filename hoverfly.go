@@ -102,11 +102,14 @@ func main() {
 		port = fmt.Sprintf(":%s", port)
 	}
 
-	redisPool := getRedisPool()
-	defer redisPool.Close()
+	// getting boltDB
+	db := getDB(AppConfig.databaseName)
+	defer db.Close()
 
-	cache := Cache{pool: redisPool,
-		prefix: AppConfig.cachePrefix}
+	cache := Cache{
+		db:             db,
+		requestsBucket: []byte(requestsBucketName),
+	}
 
 	// getting connections
 	d := DBClient{
@@ -158,10 +161,9 @@ func main() {
 	proxy.Verbose = *verbose
 	// proxy starting message
 	log.WithFields(log.Fields{
-		"RedisAddress": AppConfig.redisAddress,
-		"Destination":  *destination,
-		"ProxyPort":    port,
-		"Mode":         AppConfig.mode,
+		"Destination": *destination,
+		"ProxyPort":   port,
+		"Mode":        AppConfig.mode,
 	}).Info("Proxy is starting...")
 
 	log.Warn(http.ListenAndServe(port, proxy))

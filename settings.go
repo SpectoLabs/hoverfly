@@ -6,33 +6,24 @@ import (
 
 // Initial structure of configuration
 type Configuration struct {
-	redisAddress   string
-	redisPassword  string
 	adminInterface string
-	cachePrefix    string
 	mode           string
 	destination    string
 	middleware     string
+	databaseName   string
 }
 
 // AppCondig stores application configuration
 var AppConfig Configuration
 
 func initSettings() {
-	// getting redis connection
-	redisAddress := os.Getenv("RedisAddress")
-	if redisAddress == "" {
-		redisAddress = ":6379"
-	}
-	AppConfig.redisAddress = redisAddress
-	// getting redis password
-	AppConfig.redisPassword = os.Getenv("RedisPassword")
-
 	// admin interface port
 	AppConfig.adminInterface = ":8888"
 
-	// cache prefix
-	AppConfig.cachePrefix = "genproxy:"
+	databaseName := os.Getenv("HOVERFLY_DB")
+	if databaseName == "" {
+		databaseName = "requests.db"
+	}
 
 	// getting destination information
 	//	AppConfig.destination = "get this from cache"

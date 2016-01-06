@@ -11,11 +11,19 @@ More information about Hoverfly and how to use it:
 
 ## Installation
 
+### Vagrant
+
 If you have [Vagrant](https://www.vagrantup.com/), it's as simple as
 
     vagrant up
 
-Alternatively, you can just [grab a binary](https://github.com/SpectoLabs/hoverfly/releases/) or you can build it yourself. Use [glide](https://github.com/Masterminds/glide) to fetch the dependencies with:
+The Vagrant provisioning script will start hoverfly in the background in ["virtualize" mode](#virtualize), pass the logging output to "hoverfly.log" and save the Hoverfly PID into a file ("hoverfly_pid"). So if you ssh into the Vagrant box, you can examine the "hoverfly.log" file, and you kill the Hoverfly process easily with:
+
+    kill -SIGTERM $(cat hoverfly_pid)
+    
+### Build it yourself    
+
+Ensure you have [Redis](http://redis.io), then use [Glide](https://github.com/Masterminds/glide) to fetch the dependencies with:
 
     glide up
 
@@ -26,8 +34,14 @@ Then build Hoverfly:
 And run it:
 
     ./hoverfly
+    
+### Pre-built binary
 
-The Hoverfly admin UI is available at [http://localhost:8888/](http://localhost:8888/).    
+Pre-built Hoverfly binaries are available [here](https://github.com/SpectoLabs/hoverfly/releases/). You may find it easier to download a binary - however since the Hoverfly admin UI requires static files you will need to clone the Hoverfly repo first, and then copy the binary to the Hoverfly directory before executing it. You will also need [Redis](http://redis.io/).
+    
+## Admin UI
+
+The Hoverfly admin UI is available at [http://localhost:8888/](http://localhost:8888/). It uses the [API](api) (as described below) to change state. It also allows you to wipe the captured requests/responses and shows the number of captured records. For other functions, such as export/import, you can use the API directly.
 
 ## Hoverfly is a proxy
 
@@ -90,12 +104,7 @@ The example below changes the destination host to "mirage.readthedocs.org" and s
 Add ca.pem to your trusted certificates or turn off verification. With curl you can make insecure requests with -k:
 
     curl https://www.bbc.co.uk --proxy http://localhost:8500 -k
-
-## Administrator web UI
-
-By default, the proxy launches the admin API and UI on port 8888. You can access the admin interface for basic operations on [http://localhost:8888/](http://localhost:8888/).
-It uses the same API as described below to change state. It also allows you to wipe the captured requests/responses and shows the number of captured records.
-For other functions, such as export/import, you can use the API directly.
+    
 
 ## API
 
