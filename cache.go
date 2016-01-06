@@ -72,6 +72,20 @@ func (c *Cache) Set(key, value []byte) error {
 
 	return err
 }
+
+func (c *Cache) Get(key []byte) (value []byte, err error) {
+	err = c.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(c.requestsBucket)
+		if bucket == nil {
+			return fmt.Errorf("Bucket %q not found!", c.requestsBucket)
+		}
+		value = bucket.Get(key)
+		return nil
+	})
+
+	return
+}
+
 // getAllKeys returns all keys for specified (or default) prefix
 func (c *Cache) getAllKeys() ([]string, error) {
 
