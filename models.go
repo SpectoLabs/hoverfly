@@ -10,7 +10,6 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/goproxy"
-	"github.com/garyburd/redigo/redis"
 	"io/ioutil"
 )
 
@@ -321,7 +320,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	key := getRequestFingerprint(req)
 	var payload Payload
 
-	payloadBts, err := redis.Bytes(d.cache.get(key))
+	payloadBts, err := d.cache.get(key)
 
 	if err == nil {
 		// getting cache response
