@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"os"
 	"reflect"
 	"testing"
+	"time"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/boltdb/bolt"
 )
 
 // Client structure to be injected into functions to perform HTTP calls
@@ -29,6 +30,8 @@ func refute(t *testing.T, a interface{}, b interface{}) {
 	}
 }
 
+var TestDB *bolt.DB
+
 func testTools(code int, body string) (*httptest.Server, *DBClient) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -42,17 +45,9 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 			return url.Parse(server.URL)
 		},
 	}
-
-	// getting redis configuration
-	redisAddress := os.Getenv("RedisAddress")
-	if redisAddress == "" {
-		redisAddress = ":6379"
-	}
-	AppConfig.redisAddress = redisAddress
-
-	redisPool := getRedisPool()
-
-	cache := Cache{pool: redisPool, prefix: "genproxy_test:"}
+	// creating random buckets for everyone!
+	bucket := GetRandomName(10)
+	cache := Cache{db: TestDB, requestsBucket: bucket}
 
 	// preparing client
 	dbClient := &DBClient{
@@ -62,20 +57,38 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	return server, dbClient
 }
 
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const (
+	letterIdxBits = 6                    // 6 bits to represent a letter index
+	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
+	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
+)
+
+var src = rand.NewSource(time.Now().UnixNano())
+
+func GetRandomName(n int) []byte {
+	b := make([]byte, n)
+	for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
+		if remain == 0 {
+			cache, remain = src.Int63(), letterIdxMax
+		}
+		if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
+			b[i] = letterBytes[idx]
+			i--
+		}
+		cache >>= letterIdxBits
+		remain--
+	}
+
+	return b
+}
+
+func setup() {
+	db := getDB("test.db")
+	TestDB = db
+}
+
 // teardown does some cleanup after tests
 func teardown() {
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.cache.pool.Close()
-
-	// deleting cache
-
-	client := dbClient.cache.pool.Get()
-	defer client.Close()
-
-	values, _ := redis.Strings(client.Do("KEYS", "genproxy_test:*"))
-
-	for _, v := range values {
-		client.Do("DEL", v)
-	}
+	// TODO: delete test.db file here
 }
