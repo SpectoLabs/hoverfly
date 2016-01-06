@@ -128,7 +128,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 			} else {
 				// recalculating request hash and storing it in database
 				r := request{details: pl.Request}
-				d.cache.set(r.hash(), bts)
+				d.cache.Set([]byte(r.hash()), bts)
 			}
 		}
 		response.Message = fmt.Sprintf("%d requests imported successfully", len(payloads))
