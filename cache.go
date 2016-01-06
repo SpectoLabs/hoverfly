@@ -9,14 +9,19 @@ import (
 	"strconv"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/boltdb/bolt"
 	"github.com/garyburd/redigo/redis"
 )
 
 const prefix = "genproxy:"
+const requestsBucketName = "rqbucket"
 
 type Cache struct {
 	pool   *redis.Pool
 	prefix string
+
+	db             *bolt.DB
+	requestsBucket []byte
 }
 
 // set records a key in cache (redis)
