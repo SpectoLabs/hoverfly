@@ -10,7 +10,6 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/goproxy"
-	"github.com/garyburd/redigo/redis"
 	"io/ioutil"
 )
 
@@ -220,92 +219,10 @@ func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte,
 				"error": err.Error(),
 			}).Error("Failed to marshal json")
 		} else {
-			d.cache.set(key, bts)
+			d.cache.Set([]byte(key), bts)
 		}
 	}
 
-}
-
-// getAllRecordsRaw returns raw (json string) for all records
-func (d *DBClient) getAllRecordsRaw() ([]string, error) {
-	keys, err := d.cache.getAllKeys()
-
-	if err == nil {
-
-		// checking if there are any records
-		if len(keys) == 0 {
-			return nil, nil
-		}
-
-		jsonStrs, err := d.cache.getAllValues(keys)
-
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-			}).Error("Failed to get all values (raw)")
-			return nil, err
-		} else {
-			return jsonStrs, nil
-		}
-
-	} else {
-		return nil, err
-	}
-}
-
-// getAllRecords returns all stored
-func (d *DBClient) getAllRecords() ([]Payload, error) {
-	var payloads []Payload
-
-	jsonStrs, err := d.getAllRecordsRaw()
-
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Failed to get all values")
-	} else {
-
-		if jsonStrs != nil {
-			for _, v := range jsonStrs {
-				var pl Payload
-				err = json.Unmarshal([]byte(v), &pl)
-				if err != nil {
-					log.WithFields(log.Fields{
-						"error": err.Error(),
-						"json":  v,
-					}).Warning("Failed to deserialize json")
-				} else {
-					payloads = append(payloads, pl)
-				}
-			}
-		}
-	}
-
-	return payloads, err
-
-}
-
-// deleteAllRecords deletes all recorded requests
-func (d *DBClient) deleteAllRecords() error {
-	keys, err := d.cache.getAllKeys()
-
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Warning("Failed to get keys, cannot delete all records")
-		return err
-	} else {
-		for _, v := range keys {
-			err := d.cache.delete(v)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"error": err.Error(),
-					"key":   v,
-				}).Warning("Failed to delete key...")
-			}
-		}
-		return nil
-	}
 }
 
 // getRequestFingerprint returns request hash
@@ -321,7 +238,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	key := getRequestFingerprint(req)
 	var payload Payload
 
-	payloadBts, err := redis.Bytes(d.cache.get(key))
+	payloadBts, err := d.cache.Get([]byte(key))
 
 	if err == nil {
 		// getting cache response

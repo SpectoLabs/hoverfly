@@ -35,8 +35,7 @@ func (d *DBClient) startAdminInterface() {
 
 	// admin interface starting message
 	log.WithFields(log.Fields{
-		"RedisAddress": AppConfig.redisAddress,
-		"AdminPort":    AppConfig.adminInterface,
+		"AdminPort": AppConfig.adminInterface,
 	}).Info("Admin interface is starting...")
 
 	n.Run(AppConfig.adminInterface)
@@ -60,7 +59,7 @@ func getBoneRouter(d DBClient) *bone.Mux {
 
 // AllRecordsHandler returns JSON content type http response
 func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
-	records, err := d.getAllRecords()
+	records, err := d.cache.GetAllRequests()
 
 	if err == nil {
 
@@ -79,8 +78,7 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	} else {
 		log.WithFields(log.Fields{
-			"Error":        err.Error(),
-			"PasswordUsed": AppConfig.redisPassword,
+			"Error": err.Error(),
 		}).Error("Failed to get data from cache!")
 
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -128,7 +126,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 			} else {
 				// recalculating request hash and storing it in database
 				r := request{details: pl.Request}
-				d.cache.set(r.hash(), bts)
+				d.cache.Set([]byte(r.hash()), bts)
 			}
 		}
 		response.Message = fmt.Sprintf("%d requests imported successfully", len(payloads))
@@ -143,7 +141,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 }
 
 func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request) {
-	err := d.deleteAllRecords()
+	err := d.cache.DeleteBucket(d.cache.requestsBucket)
 
 	w.Header().Set("Content-Type", "application/json")
 
