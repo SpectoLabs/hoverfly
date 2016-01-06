@@ -6,12 +6,22 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/boltdb/bolt"
 )
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const (
+	letterIdxBits = 6                    // 6 bits to represent a letter index
+	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
+	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
+)
+
+const testingDatabaseName = "test.db" // very original
 
 // Client structure to be injected into functions to perform HTTP calls
 type Client struct {
@@ -57,13 +67,6 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	return server, dbClient
 }
 
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-const (
-	letterIdxBits = 6                    // 6 bits to represent a letter index
-	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
-	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
-)
-
 var src = rand.NewSource(time.Now().UnixNano())
 
 func GetRandomName(n int) []byte {
@@ -84,11 +87,11 @@ func GetRandomName(n int) []byte {
 }
 
 func setup() {
-	db := getDB("test.db")
+	db := getDB(testingDatabaseName)
 	TestDB = db
 }
 
 // teardown does some cleanup after tests
 func teardown() {
-	// TODO: delete test.db file here
+	os.Remove(testingDatabaseName)
 }
