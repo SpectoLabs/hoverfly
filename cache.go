@@ -57,6 +57,21 @@ func (c *Cache) set(key string, value interface{}) error {
 	return err
 }
 
+func (c *Cache) Set(key, value []byte) error {
+	err := c.db.Update(func(tx *bolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists(c.requestsBucket)
+		if err != nil {
+			return err
+		}
+		err = bucket.Put(key, value)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
+}
 // getAllKeys returns all keys for specified (or default) prefix
 func (c *Cache) getAllKeys() ([]string, error) {
 
