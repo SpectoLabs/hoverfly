@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
-
-	"github.com/garyburd/redigo/redis"
 )
 
 // TestRecordingToCache tests cache wrapper get/set/delete operations
@@ -16,9 +14,9 @@ func TestRecordingToCache(t *testing.T) {
 	defer server.Close()
 	defer dbClient.cache.pool.Close()
 
-	dbClient.cache.set("some_key", "value")
+	dbClient.cache.set("some_key", []byte("value"))
 
-	value, err := redis.String(dbClient.cache.get("some_key"))
+	value, err := dbClient.cache.get("some_key")
 
 	expect(t, err, nil)
 
@@ -75,7 +73,7 @@ func TestSetGetCacheKey(t *testing.T) {
 	expect(t, err, nil)
 
 	var p Payload
-	payloadBts, err := redis.Bytes(dbClient.cache.get(key))
+	payloadBts, err := dbClient.cache.get(key)
 	err = json.Unmarshal(payloadBts, &p)
 	expect(t, err, nil)
 	expect(t, payload.Response.Body, p.Response.Body)

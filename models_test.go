@@ -9,8 +9,6 @@ import (
 	"os"
 	"testing"
 	"time"
-
-	"github.com/garyburd/redigo/redis"
 )
 
 func TestMain(m *testing.M) {
@@ -59,7 +57,7 @@ func TestRequestBodyCaptured(t *testing.T) {
 
 	fp := getRequestFingerprint(req)
 
-	payloadBts, err := redis.Bytes(dbClient.cache.get(fp))
+	payloadBts, err := dbClient.cache.get(fp)
 
 	var payload Payload
 
