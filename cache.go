@@ -25,6 +25,15 @@ type Cache struct {
 	requestsBucket []byte
 }
 
+func getDB() *bolt.DB {
+	db, err := bolt.Open("my.db", 0600, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db
+}
+
 // set records a key in cache (redis)
 func (c *Cache) set(key string, value interface{}) error {
 

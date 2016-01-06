@@ -2,7 +2,6 @@ package main
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/boltdb/bolt"
 	"github.com/elazarl/goproxy"
 
 	"bufio"
@@ -174,15 +173,6 @@ func main() {
 	}).Info("Proxy is starting...")
 
 	log.Warn(http.ListenAndServe(port, proxy))
-}
-
-func getDB() *bolt.DB {
-	db, err := bolt.Open("my.db", 0600, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return db
 }
 
 // processRequest - processes incoming requests and based on proxy state (record/playback)
