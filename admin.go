@@ -60,7 +60,7 @@ func getBoneRouter(d DBClient) *bone.Mux {
 
 // AllRecordsHandler returns JSON content type http response
 func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
-	records, err := d.getAllRecords()
+	records, err := d.cache.GetAllRequests()
 
 	if err == nil {
 
