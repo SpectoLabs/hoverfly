@@ -1,3 +1,5 @@
+// redis cache backend implementation for persistent storage
+
 package main
 
 import (
@@ -88,12 +90,12 @@ func (c *Cache) getAllValues(keys []string) ([]string, error) {
 }
 
 // get returns key from cache
-func (c *Cache) get(key string) (interface{}, error) {
+func (c *Cache) get(key string) ([]byte, error) {
 
 	client := c.pool.Get()
 	defer client.Close()
 
-	value, err := client.Do("GET", fmt.Sprintf(c.prefix+key))
+	value, err := redis.Bytes(client.Do("GET", fmt.Sprintf(c.prefix+key)))
 
 	if err != nil {
 		log.WithFields(log.Fields{
