@@ -109,8 +109,23 @@ func (c *Cache) GetAllRequests() (payloads []Payload, err error) {
 				payloads = append(payloads, pl)
 			}
 		}
-
 		return nil
+	})
+	return
+}
+
+func (c *Cache) DeleteBucket(name []byte) (err error) {
+	err = c.db.Update(func(tx *bolt.Tx) error {
+		err = tx.DeleteBucket(name)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+				"name":  string(name),
+			}).Warning("Failed to delete bucket")
+			return err
+		} else {
+			return nil
+		}
 	})
 	return
 }
