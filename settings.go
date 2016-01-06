@@ -24,12 +24,7 @@ func initSettings() {
 	if databaseName == "" {
 		databaseName = "requests.db"
 	}
-
-	// getting destination information
-	//	AppConfig.destination = "get this from cache"
-
-	// proxy state
-	// should be taken from cache if we want to make it horizontally scalable (currently not needed)
+	AppConfig.databaseName = databaseName
 
 	// middleware configuration
 	AppConfig.middleware = os.Getenv("HoverflyMiddleware")
