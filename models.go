@@ -219,7 +219,7 @@ func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte,
 				"error": err.Error(),
 			}).Error("Failed to marshal json")
 		} else {
-			d.cache.set(key, bts)
+			d.cache.Set([]byte(key), bts)
 		}
 	}
 
@@ -320,7 +320,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	key := getRequestFingerprint(req)
 	var payload Payload
 
-	payloadBts, err := d.cache.get(key)
+	payloadBts, err := d.cache.Get([]byte(key))
 
 	if err == nil {
 		// getting cache response
