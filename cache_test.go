@@ -11,7 +11,7 @@ func TestSetKey(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	k := []byte("randomKey_here")
+	k := []byte("randomkeyhere")
 	v := []byte("value")
 
 	err := dbClient.cache.Set(k, v)
@@ -20,7 +20,6 @@ func TestSetKey(t *testing.T) {
 	value, err := dbClient.cache.Get(k)
 	expect(t, err, nil)
 	refute(t, value, nil)
-	//	expect(t, value, v)
 	dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 }
 
