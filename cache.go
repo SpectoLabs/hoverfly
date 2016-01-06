@@ -4,6 +4,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -83,6 +84,30 @@ func (c *Cache) Get(key []byte) (value []byte, err error) {
 		return nil
 	})
 
+	return
+}
+
+func (c *Cache) GetAllRequests() (payloads []Payload, err error) {
+	err = c.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(c.requestsBucket)
+		c := b.Cursor()
+
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			var pl Payload
+			err = json.Unmarshal(v, &pl)
+
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error": err.Error(),
+					"json":  v,
+				}).Warning("Failed to deserialize json")
+			} else {
+				payloads = append(payloads, pl)
+			}
+		}
+
+		return nil
+	})
 	return
 }
 
