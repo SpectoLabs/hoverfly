@@ -35,8 +35,7 @@ func (d *DBClient) startAdminInterface() {
 
 	// admin interface starting message
 	log.WithFields(log.Fields{
-		"RedisAddress": AppConfig.redisAddress,
-		"AdminPort":    AppConfig.adminInterface,
+		"AdminPort": AppConfig.adminInterface,
 	}).Info("Admin interface is starting...")
 
 	n.Run(AppConfig.adminInterface)
@@ -79,8 +78,7 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	} else {
 		log.WithFields(log.Fields{
-			"Error":        err.Error(),
-			"PasswordUsed": AppConfig.redisPassword,
+			"Error": err.Error(),
 		}).Error("Failed to get data from cache!")
 
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
