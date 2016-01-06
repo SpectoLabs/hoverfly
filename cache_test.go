@@ -7,32 +7,52 @@ import (
 	"testing"
 )
 
-// TestRecordingToCache tests cache wrapper get/set/delete operations
-func TestRecordingToCache(t *testing.T) {
-
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.cache.pool.Close()
-
-	dbClient.cache.set("some_key", []byte("value"))
-
-	value, err := dbClient.cache.get("some_key")
-
-	expect(t, err, nil)
-
-	expect(t, string(value), "value")
-
-	err = dbClient.cache.delete("some_key")
-
-	expect(t, err, nil)
-}
-
-// TestGetAllRecords - tests recording and then getting responses
-func TestGetAllRecords(t *testing.T) {
-
+func TestSetKey(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.pool.Close()
+
+	k := []byte("randomKey_here")
+	v := []byte("value")
+
+	err := dbClient.cache.Set(k, v)
+	expect(t, err, nil)
+
+	value, err := dbClient.cache.Get(k)
+	expect(t, err, nil)
+	refute(t, value, nil)
+	//	expect(t, value, v)
+	dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+}
+
+func TestPayloadSetGet(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	key := []byte("keySetGetCache")
+	resp := response{
+		Status: 200,
+		Body:   "body here",
+	}
+
+	payload := Payload{Response: resp}
+	bts, err := json.Marshal(payload)
+	expect(t, err, nil)
+
+	err = dbClient.cache.Set(key, bts)
+	expect(t, err, nil)
+
+	var p Payload
+	payloadBts, err := dbClient.cache.Get(key)
+	err = json.Unmarshal(payloadBts, &p)
+	expect(t, err, nil)
+	expect(t, payload.Response.Body, p.Response.Body)
+
+	dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+}
+
+func TestGetMultipleRecords(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -41,11 +61,8 @@ func TestGetAllRecords(t *testing.T) {
 		dbClient.captureRequest(req)
 	}
 
-	// getting all keys
-	keys, _ := dbClient.cache.getAllKeys()
-	expect(t, len(keys) > 0, true)
 	// getting requests
-	payloads, err := dbClient.getAllRecords()
+	payloads, err := dbClient.cache.GetAllRequests()
 	expect(t, err, nil)
 
 	for _, payload := range payloads {
