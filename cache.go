@@ -90,6 +90,10 @@ func (c *Cache) Get(key []byte) (value []byte, err error) {
 func (c *Cache) GetAllRequests() (payloads []Payload, err error) {
 	err = c.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(c.requestsBucket)
+		if b == nil {
+			// bucket doesn't exist
+			return nil
+		}
 		c := b.Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
