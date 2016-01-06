@@ -33,7 +33,8 @@ let ModeInfoComponent = React.createClass({
                 <div>
                     <p>
                         When capture mode is active, Hoverfly intercepts requests and then makes them on behalf of the client.
-                        In this mode, middleware is applied to outgoing traffic. Requests and responses are stored in Redis as JSON structures.
+                        In this mode, middleware is applied to outgoing traffic. Requests and responses are stored in
+                        embedded database as JSON structures.
                     </p>
                 </div>
             )
@@ -95,7 +96,7 @@ let StatsComponent = React.createClass({
     },
 
     fetchData() {
-        var url = '/records';
+        var url = '/count';
         var that = this;
         request
             .get(url)
@@ -103,15 +104,9 @@ let StatsComponent = React.createClass({
                 if (err) throw err;
                 if (that.isMounted()) {
                     // checking whether there are any records
-                    if (res.body.data == null) {
-                        that.setState({
-                            'records': 0
-                        });
-                    } else {
-                        that.setState({
-                            'records': res.body.data.length
-                        });
-                    }
+                    that.setState({
+                        'records': res.body.count
+                    });
                 }
             });
     },
