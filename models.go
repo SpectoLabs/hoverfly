@@ -235,18 +235,16 @@ func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte,
 			Request:  requestObj,
 			ID:       key,
 		}
-		// converting it to json bytes
-		bts, err := json.Marshal(payload)
 
+		bts, err := payload.encode()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
-			}).Error("Failed to marshal json")
+			}).Error("Failed to serialize payload")
 		} else {
 			d.cache.Set([]byte(key), bts)
 		}
 	}
-
 }
 
 // getRequestFingerprint returns request hash
@@ -260,19 +258,20 @@ func getRequestFingerprint(req *http.Request) string {
 func (d *DBClient) getResponse(req *http.Request) *http.Response {
 
 	key := getRequestFingerprint(req)
-	var payload Payload
+	//	var payload Payload
 
 	payloadBts, err := d.cache.Get([]byte(key))
 
 	if err == nil {
 		// getting cache response
-		err = json.Unmarshal(payloadBts, &payload)
+		payload, err := decodePayload(payloadBts)
 		if err != nil {
-			log.Error(err)
-			// what now?
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Failed to decode payload")
 		}
 
-		c := NewConstructor(req, payload)
+		c := NewConstructor(req, *payload)
 
 		if d.cfg.middleware != "" {
 			_ = c.ApplyMiddleware(d.cfg.middleware)
