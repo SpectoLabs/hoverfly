@@ -116,3 +116,14 @@ func TestPayloadEncodeDecode(t *testing.T) {
 	expect(t, pl.Response.Status, resp.Status)
 
 }
+
+func TestPayloadEncodeEmpty(t *testing.T) {
+	payload := Payload{}
+
+	bts, err := payload.encode()
+	expect(t, err, nil)
+
+	_, err = decodePayload(bts)
+	expect(t, err, nil)
+}
+
