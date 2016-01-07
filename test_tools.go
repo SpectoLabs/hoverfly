@@ -59,10 +59,12 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	bucket := GetRandomName(10)
 	cache := Cache{db: TestDB, requestsBucket: bucket}
 
+	cfg := InitSettings()
 	// preparing client
 	dbClient := &DBClient{
 		http:  &http.Client{Transport: tr},
 		cache: cache,
+		cfg:   &cfg,
 	}
 	return server, dbClient
 }
