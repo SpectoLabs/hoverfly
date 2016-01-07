@@ -98,3 +98,21 @@ func TestDeleteAllRecords(t *testing.T) {
 	err := dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 	expect(t, err, nil)
 }
+
+func TestPayloadEncodeDecode(t *testing.T) {
+	resp := response{
+		Status: 200,
+		Body:   "body here",
+	}
+
+	payload := Payload{Response: resp}
+
+	bts, err := payload.encode()
+	expect(t, err, nil)
+
+	pl, err := decodePayload(bts)
+	expect(t, err, nil)
+	expect(t, pl.Response.Body, resp.Body)
+	expect(t, pl.Response.Status, resp.Status)
+
+}
