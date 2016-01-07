@@ -92,7 +92,7 @@ func main() {
 	// overriding destination
 	cfg.destination = *destination
 
-	proxy, dbClient := getNewHoverfly(&cfg)
+	proxy, dbClient := getNewHoverfly(cfg)
 	defer dbClient.cache.db.Close()
 
 	log.Warn(http.ListenAndServe(cfg.proxyPort, proxy))

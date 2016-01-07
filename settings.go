@@ -37,7 +37,7 @@ const DefaultAdminPort = ":8888" // default admin interface port
 
 // initSettings gets and returns initial configuration from env
 // variables or sets defaults
-func InitSettings() (AppConfig Configuration) {
+func InitSettings() (AppConfig *Configuration) {
 
 	// getting default admin interface port
 	adminPort := os.Getenv("AdminPort")

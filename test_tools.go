@@ -64,7 +64,7 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	dbClient := &DBClient{
 		http:  &http.Client{Transport: tr},
 		cache: cache,
-		cfg:   &cfg,
+		cfg:   cfg,
 	}
 	return server, dbClient
 }
