@@ -1,26 +1,48 @@
 package main
 
 import (
+	"fmt"
 	"os"
 )
 
 // Configuration - initial structure of configuration
 type Configuration struct {
 	adminInterface string
+	proxyPort      string
 	mode           string
 	destination    string
 	middleware     string
 	databaseName   string
+	verbose        bool
 }
 
-// AppConfig stores application configuration
-var AppConfig Configuration
+const DefaultPort = ":8500"      // default proxy port
+const DefaultAdminPort = ":8888" // default admin interface port
 
-func initSettings() {
-	// admin interface port
-	AppConfig.adminInterface = ":8888"
+// initSettings gets and returns initial configuration from env
+// variables or sets defaults
+func InitSettings() (AppConfig Configuration) {
 
-	databaseName := os.Getenv("HOVERFLY_DB")
+	// getting default admin interface port
+	adminPort := os.Getenv("AdminPort")
+	if adminPort == "" {
+		adminPort = DefaultAdminPort
+	} else {
+		adminPort = fmt.Sprintf(":%s", adminPort)
+	}
+	AppConfig.adminInterface = adminPort
+
+	// getting default database
+	port := os.Getenv("ProxyPort")
+	if port == "" {
+		port = DefaultPort
+	} else {
+		port = fmt.Sprintf(":%s", port)
+	}
+
+	AppConfig.proxyPort = port
+
+	databaseName := os.Getenv("HoverflyDB")
 	if databaseName == "" {
 		databaseName = "requests.db"
 	}
@@ -28,4 +50,6 @@ func initSettings() {
 
 	// middleware configuration
 	AppConfig.middleware = os.Getenv("HoverflyMiddleware")
+
+	return AppConfig
 }
