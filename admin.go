@@ -228,6 +228,22 @@ func (d *DBClient) stateHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(422) // can't process this entity
 		return
 	}
+
+	availableModes := map[string]bool{
+		"virtualize": true,
+		"capture":    true,
+		"modify":     true,
+		"synthesize": true,
+	}
+
+	if !availableModes[stateRequest.Mode] {
+		log.WithFields(log.Fields{
+			"suppliedMode": stateRequest.Mode,
+		}).Error("Wrong mode found, can't change state")
+		http.Error(w, "Bad mode supplied, available modes: virtualize, capture, modify, synthesize.", 400)
+		return
+	}
+
 	log.WithFields(log.Fields{
 		"newState": stateRequest.Mode,
 		"body":     string(body),
