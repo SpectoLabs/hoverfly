@@ -120,3 +120,8 @@ func TestPayloadEncodeEmpty(t *testing.T) {
 	expect(t, err, nil)
 }
 
+func TestDecodeRandomBytes(t *testing.T) {
+	bts := []byte("some random stuff here")
+	_, err := decodePayload(bts)
+	refute(t, err, nil)
+}
