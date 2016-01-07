@@ -6,14 +6,11 @@ import (
 
 	"bufio"
 	"flag"
-	"fmt"
 	"net"
 	"net/http"
 	"os"
 	"regexp"
 )
-
-const DefaultPort = ":8500"
 
 // modes
 const VirtualizeMode = "virtualize"
