@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -58,16 +57,10 @@ func TestRequestBodyCaptured(t *testing.T) {
 	fp := getRequestFingerprint(req)
 
 	payloadBts, err := dbClient.cache.Get([]byte(fp))
-
-	var payload Payload
-
 	expect(t, err, nil)
 
-	// getting cache response
-	err = json.Unmarshal(payloadBts, &payload)
-
+	payload, err := decodePayload(payloadBts)
 	expect(t, err, nil)
-
 	expect(t, payload.Request.Body, "fizz=buzz")
 
 }
