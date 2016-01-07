@@ -197,7 +197,7 @@ func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 // CurrentStateHandler returns current state
 func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request) {
 	var resp StateRequest
-	resp.Mode = d.cfg.mode
+	resp.Mode = d.cfg.GetMode()
 	resp.Destination = d.cfg.destination
 
 	b, _ := json.Marshal(resp)
@@ -234,10 +234,10 @@ func (d *DBClient) stateHandler(w http.ResponseWriter, r *http.Request) {
 	}).Info("Handling state change request!")
 
 	// setting new state
-	d.cfg.mode = stateRequest.Mode
+	d.cfg.SetMode(stateRequest.Mode)
 
 	var resp StateRequest
-	resp.Mode = stateRequest.Mode
+	resp.Mode = d.cfg.GetMode()
 	resp.Destination = d.cfg.destination
 	b, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
