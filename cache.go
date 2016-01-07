@@ -1,5 +1,3 @@
-// redis cache backend implementation for persistent storage
-
 package main
 
 import (
@@ -20,7 +18,6 @@ type Cache struct {
 func getDB(name string) *bolt.DB {
 	log.WithFields(log.Fields{
 		"databaseName": name,
-		"Mode":         AppConfig.mode,
 	}).Info("Initiating database")
 	db, err := bolt.Open(name, 0600, nil)
 	if err != nil {
