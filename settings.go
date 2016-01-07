@@ -37,8 +37,9 @@ const DefaultAdminPort = ":8888" // default admin interface port
 
 // initSettings gets and returns initial configuration from env
 // variables or sets defaults
-func InitSettings() (AppConfig *Configuration) {
+func InitSettings() *Configuration {
 
+	var appConfig Configuration
 	// getting default admin interface port
 	adminPort := os.Getenv("AdminPort")
 	if adminPort == "" {
@@ -46,7 +47,7 @@ func InitSettings() (AppConfig *Configuration) {
 	} else {
 		adminPort = fmt.Sprintf(":%s", adminPort)
 	}
-	AppConfig.adminInterface = adminPort
+	appConfig.adminInterface = adminPort
 
 	// getting default database
 	port := os.Getenv("ProxyPort")
@@ -56,16 +57,16 @@ func InitSettings() (AppConfig *Configuration) {
 		port = fmt.Sprintf(":%s", port)
 	}
 
-	AppConfig.proxyPort = port
+	appConfig.proxyPort = port
 
 	databaseName := os.Getenv("HoverflyDB")
 	if databaseName == "" {
 		databaseName = "requests.db"
 	}
-	AppConfig.databaseName = databaseName
+	appConfig.databaseName = databaseName
 
 	// middleware configuration
-	AppConfig.middleware = os.Getenv("HoverflyMiddleware")
+	appConfig.middleware = os.Getenv("HoverflyMiddleware")
 
-	return AppConfig
+	return &appConfig
 }
