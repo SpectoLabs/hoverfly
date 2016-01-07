@@ -13,9 +13,11 @@ import (
 	"io/ioutil"
 )
 
+// DBClient provides access to cache, http client and configuration
 type DBClient struct {
 	cache Cache
 	http  *http.Client
+	cfg   *Configuration
 }
 
 // request holds structure for request
