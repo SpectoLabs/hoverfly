@@ -62,6 +62,16 @@ type Payload struct {
 	ID       string         `json:"id"`
 }
 
+// encode method encodes all exported Payload fields to bytes
+func (p *Payload) encode() ([]byte, error) {
+	buf := new(bytes.Buffer)
+	enc := gob.NewEncoder(buf)
+	err := enc.Encode(p)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
 // recordRequest saves request for later playback
 func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 
