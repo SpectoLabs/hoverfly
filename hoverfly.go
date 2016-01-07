@@ -6,14 +6,11 @@ import (
 
 	"bufio"
 	"flag"
-	"fmt"
 	"net"
 	"net/http"
 	"os"
 	"regexp"
 )
-
-const DefaultPort = ":8500"
 
 // modes
 const VirtualizeMode = "virtualize"
@@ -46,16 +43,17 @@ func main() {
 	middleware := flag.String("middleware", "", "should proxy use middleware")
 	flag.Parse()
 
+	// getting settings
+	cfg := InitSettings()
+
 	if *verbose {
 		// Only log the warning severity or above.
 		log.SetLevel(log.DebugLevel)
 	}
-
-	// getting settings
-	initSettings()
+	cfg.verbose = *verbose
 
 	// overriding default middleware setting
-	AppConfig.middleware = *middleware
+	cfg.middleware = *middleware
 
 	// setting default mode
 	mode := VirtualizeMode
@@ -69,7 +67,7 @@ func main() {
 	} else if *synthesize {
 		mode = SynthesizeMode
 
-		if AppConfig.middleware == "" {
+		if cfg.middleware == "" {
 			log.Fatal("Synthesize mode chosen although middleware not supplied")
 		}
 
@@ -79,7 +77,7 @@ func main() {
 	} else if *modify {
 		mode = ModifyMode
 
-		if AppConfig.middleware == "" {
+		if cfg.middleware == "" {
 			log.Fatal("Modify mode chosen although middleware not supplied")
 		}
 
@@ -89,22 +87,22 @@ func main() {
 	}
 
 	// overriding default settings
-	AppConfig.mode = mode
+	cfg.mode = mode
 
 	// overriding destination
-	AppConfig.destination = *destination
+	cfg.destination = *destination
 
-	// getting default database
-	port := os.Getenv("ProxyPort")
-	if port == "" {
-		port = DefaultPort
-	} else {
-		port = fmt.Sprintf(":%s", port)
-	}
+	proxy, dbClient := getNewHoverfly(&cfg)
+	defer dbClient.cache.db.Close()
+
+	log.Warn(http.ListenAndServe(cfg.proxyPort, proxy))
+}
+
+// getNewHoverfly returns a configured ProxyHttpServer and DBClient, also starts admin interface on configured port
+func getNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 
 	// getting boltDB
-	db := getDB(AppConfig.databaseName)
-	defer db.Close()
+	db := getDB(cfg.databaseName)
 
 	cache := Cache{
 		db:             db,
@@ -115,16 +113,17 @@ func main() {
 	d := DBClient{
 		cache: cache,
 		http:  &http.Client{},
+		cfg:   cfg,
 	}
 
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile("^.*$"))).
+	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(d.cfg.destination))).
 		HandleConnect(goproxy.AlwaysMitm)
 
 	// enable curl -p for all hosts on port 80
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(*destination))).
+	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(d.cfg.destination))).
 		HijackConnect(func(req *http.Request, client net.Conn, ctx *goproxy.ProxyCtx) {
 		defer func() {
 			if e := recover(); e != nil {
@@ -151,29 +150,30 @@ func main() {
 	})
 
 	// processing connections
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(*destination))).DoFunc(
+	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(cfg.destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			return d.processRequest(r)
 		})
 
 	go d.startAdminInterface()
 
-	proxy.Verbose = *verbose
+	proxy.Verbose = d.cfg.verbose
 	// proxy starting message
 	log.WithFields(log.Fields{
-		"Destination": *destination,
-		"ProxyPort":   port,
-		"Mode":        AppConfig.mode,
-	}).Info("Proxy is starting...")
+		"Destination": d.cfg.destination,
+		"ProxyPort":   d.cfg.proxyPort,
+		"Mode":        d.cfg.GetMode(),
+	}).Info("Proxy prepared...")
 
-	log.Warn(http.ListenAndServe(port, proxy))
+	return proxy, d
 }
 
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
 func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Response) {
 
-	if AppConfig.mode == CaptureMode {
+	mode := d.cfg.GetMode()
+	if mode == CaptureMode {
 		log.Info("*** Capture ***")
 		newResponse, err := d.captureRequest(req)
 		if err != nil {
@@ -184,19 +184,19 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 			return req, newResponse
 		}
 
-	} else if AppConfig.mode == SynthesizeMode {
+	} else if mode == SynthesizeMode {
 		log.Info("*** Sinthesize ***")
-		response := synthesizeResponse(req, AppConfig.middleware)
+		response := synthesizeResponse(req, d.cfg.middleware)
 		return req, response
 
-	} else if AppConfig.mode == ModifyMode {
+	} else if mode == ModifyMode {
 		log.Info("*** Modify ***")
-		response, err := d.modifyRequestResponse(req, AppConfig.middleware)
+		response, err := d.modifyRequestResponse(req, d.cfg.middleware)
 
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error":      err.Error(),
-				"middleware": AppConfig.middleware,
+				"middleware": d.cfg.middleware,
 			}).Error("Got error when performing request modification")
 			return req, nil
 		}

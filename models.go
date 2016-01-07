@@ -13,9 +13,11 @@ import (
 	"io/ioutil"
 )
 
+// DBClient provides access to cache, http client and configuration
 type DBClient struct {
 	cache Cache
 	http  *http.Client
+	cfg   *Configuration
 }
 
 // request holds structure for request
@@ -73,7 +75,6 @@ func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-			"mode":  AppConfig.mode,
 		}).Error("Got error when reading request body")
 	}
 	log.WithFields(log.Fields{
@@ -139,11 +140,11 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
 
-	if AppConfig.middleware != "" {
+	if d.cfg.middleware != "" {
 		var payload Payload
 
 		c := NewConstructor(request, payload)
-		c.ApplyMiddleware(AppConfig.middleware)
+		c.ApplyMiddleware(d.cfg.middleware)
 
 		request = c.reconstructRequest()
 
@@ -250,8 +251,8 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 
 		c := NewConstructor(req, payload)
 
-		if AppConfig.middleware != "" {
-			_ = c.ApplyMiddleware(AppConfig.middleware)
+		if d.cfg.middleware != "" {
+			_ = c.ApplyMiddleware(d.cfg.middleware)
 		}
 
 		response := c.reconstructResponse()
@@ -260,7 +261,6 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 			"key":        key,
 			"status":     payload.Response.Status,
 			"bodyLength": response.ContentLength,
-			"mode":       AppConfig.mode,
 		}).Info("Response found, returning")
 
 		return response
@@ -268,7 +268,6 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	} else {
 		log.WithFields(log.Fields{
 			"error":       err.Error(),
-			"mode":        AppConfig.mode,
 			"query":       req.URL.RawQuery,
 			"path":        req.URL.RawPath,
 			"destination": req.Host,
@@ -324,7 +323,6 @@ func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (
 	log.WithFields(log.Fields{
 		"status":     newResponse.StatusCode,
 		"middleware": middleware,
-		"mode":       AppConfig.mode,
 	}).Info("Response modified, returning")
 
 	return newResponse, nil

@@ -25,14 +25,14 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":      err.Error(),
-			"middleware": AppConfig.middleware,
+			"middleware": middleware,
 		}).Error("Error during middleware transformation, not modifying payload!")
 
 		return err
 	} else {
 
 		log.WithFields(log.Fields{
-			"middleware": AppConfig.middleware,
+			"middleware": middleware,
 		}).Info("Middleware transformation complete!")
 		// override payload with transformed new payload
 		c.payload = newPayload
