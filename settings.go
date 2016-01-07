@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sync"
 )
 
 // Configuration - initial structure of configuration
@@ -14,6 +15,21 @@ type Configuration struct {
 	middleware     string
 	databaseName   string
 	verbose        bool
+
+	mu sync.Mutex
+}
+
+func (c *Configuration) SetMode(mode string) {
+	c.mu.Lock()
+	c.mode = mode
+	c.mu.Unlock()
+}
+
+func (c *Configuration) GetMode() (mode string) {
+	c.mu.Lock()
+	mode = c.mode
+	c.mu.Unlock()
+	return
 }
 
 const DefaultPort = ":8500"      // default proxy port
