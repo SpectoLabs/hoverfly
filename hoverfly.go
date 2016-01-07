@@ -43,16 +43,17 @@ func main() {
 	middleware := flag.String("middleware", "", "should proxy use middleware")
 	flag.Parse()
 
+	// getting settings
+	cfg := InitSettings()
+
 	if *verbose {
 		// Only log the warning severity or above.
 		log.SetLevel(log.DebugLevel)
 	}
-
-	// getting settings
-	initSettings()
+	cfg.verbose = *verbose
 
 	// overriding default middleware setting
-	AppConfig.middleware = *middleware
+	cfg.middleware = *middleware
 
 	// setting default mode
 	mode := VirtualizeMode
