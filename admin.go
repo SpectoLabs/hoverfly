@@ -39,10 +39,10 @@ func (d *DBClient) startAdminInterface() {
 
 	// admin interface starting message
 	log.WithFields(log.Fields{
-		"AdminPort": AppConfig.adminInterface,
+		"AdminPort": d.cfg.adminInterface,
 	}).Info("Admin interface is starting...")
 
-	n.Run(AppConfig.adminInterface)
+	n.Run(d.cfg.adminInterface)
 }
 
 // getBoneRouter returns mux for admin interface
@@ -197,8 +197,8 @@ func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 // CurrentStateHandler returns current state
 func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request) {
 	var resp StateRequest
-	resp.Mode = AppConfig.mode
-	resp.Destination = AppConfig.destination
+	resp.Mode = d.cfg.mode
+	resp.Destination = d.cfg.destination
 
 	b, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -234,11 +234,11 @@ func (d *DBClient) stateHandler(w http.ResponseWriter, r *http.Request) {
 	}).Info("Handling state change request!")
 
 	// setting new state
-	AppConfig.mode = stateRequest.Mode
+	d.cfg.mode = stateRequest.Mode
 
 	var resp StateRequest
 	resp.Mode = stateRequest.Mode
-	resp.Destination = AppConfig.destination
+	resp.Destination = d.cfg.destination
 	b, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(b)
