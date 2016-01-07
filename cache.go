@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 
 	log "github.com/Sirupsen/logrus"
@@ -66,16 +65,14 @@ func (c *Cache) GetAllRequests() (payloads []Payload, err error) {
 		c := b.Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			var pl Payload
-			err = json.Unmarshal(v, &pl)
-
+			pl, err := decodePayload(v)
 			if err != nil {
 				log.WithFields(log.Fields{
 					"error": err.Error(),
 					"json":  v,
-				}).Warning("Failed to deserialize json")
+				}).Warning("Failed to deserialize bytes to payload.")
 			} else {
-				payloads = append(payloads, pl)
+				payloads = append(payloads, *pl)
 			}
 		}
 		return nil
