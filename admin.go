@@ -152,12 +152,11 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 	payloads := requests.Data
 	if len(payloads) > 0 {
 		for _, pl := range payloads {
-			bts, err := json.Marshal(pl)
-
+			bts, err := pl.encode()
 			if err != nil {
 				log.WithFields(log.Fields{
 					"error": err.Error(),
-				}).Error("Failed to marshal json")
+				}).Error("Failed to encode payload")
 			} else {
 				// recalculating request hash and storing it in database
 				r := request{details: pl.Request}
