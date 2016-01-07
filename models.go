@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/md5"
-	"encoding/json"
+	"encoding/gob"
 	"fmt"
 	"io"
 	"net/http"
@@ -72,6 +72,19 @@ func (p *Payload) encode() ([]byte, error) {
 	}
 	return buf.Bytes(), nil
 }
+
+// decodePayload decodes supplied bytes into Payload structure
+func decodePayload(data []byte) (*Payload, error) {
+	var p *Payload
+	buf := bytes.NewBuffer(data)
+	dec := gob.NewDecoder(buf)
+	err := dec.Decode(&p)
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
 // recordRequest saves request for later playback
 func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 
