@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -58,16 +57,10 @@ func TestRequestBodyCaptured(t *testing.T) {
 	fp := getRequestFingerprint(req)
 
 	payloadBts, err := dbClient.cache.Get([]byte(fp))
-
-	var payload Payload
-
 	expect(t, err, nil)
 
-	// getting cache response
-	err = json.Unmarshal(payloadBts, &payload)
-
+	payload, err := decodePayload(payloadBts)
 	expect(t, err, nil)
-
 	expect(t, payload.Request.Body, "fizz=buzz")
 
 }
@@ -97,4 +90,38 @@ func TestDeleteAllRecords(t *testing.T) {
 	}
 	err := dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 	expect(t, err, nil)
+}
+
+func TestPayloadEncodeDecode(t *testing.T) {
+	resp := response{
+		Status: 200,
+		Body:   "body here",
+	}
+
+	payload := Payload{Response: resp}
+
+	bts, err := payload.encode()
+	expect(t, err, nil)
+
+	pl, err := decodePayload(bts)
+	expect(t, err, nil)
+	expect(t, pl.Response.Body, resp.Body)
+	expect(t, pl.Response.Status, resp.Status)
+
+}
+
+func TestPayloadEncodeEmpty(t *testing.T) {
+	payload := Payload{}
+
+	bts, err := payload.encode()
+	expect(t, err, nil)
+
+	_, err = decodePayload(bts)
+	expect(t, err, nil)
+}
+
+func TestDecodeRandomBytes(t *testing.T) {
+	bts := []byte("some random stuff here")
+	_, err := decodePayload(bts)
+	refute(t, err, nil)
 }
