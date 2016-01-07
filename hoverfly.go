@@ -162,7 +162,7 @@ func getNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 	log.WithFields(log.Fields{
 		"Destination": d.cfg.destination,
 		"ProxyPort":   d.cfg.proxyPort,
-		"Mode":        d.cfg.mode,
+		"Mode":        d.cfg.GetMode(),
 	}).Info("Proxy prepared...")
 
 	return proxy, d
@@ -172,11 +172,8 @@ func getNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 // returns HTTP response.
 func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Response) {
 
-	log.WithFields(log.Fields{
-		"mode": d.cfg.mode,
-	}).Info("current mode")
-
-	if d.cfg.mode == CaptureMode {
+	mode := d.cfg.GetMode()
+	if mode == CaptureMode {
 		log.Info("*** Capture ***")
 		newResponse, err := d.captureRequest(req)
 		if err != nil {
@@ -187,12 +184,12 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 			return req, newResponse
 		}
 
-	} else if d.cfg.mode == SynthesizeMode {
+	} else if mode == SynthesizeMode {
 		log.Info("*** Sinthesize ***")
 		response := synthesizeResponse(req, d.cfg.middleware)
 		return req, response
 
-	} else if d.cfg.mode == ModifyMode {
+	} else if mode == ModifyMode {
 		log.Info("*** Modify ***")
 		response, err := d.modifyRequestResponse(req, d.cfg.middleware)
 

@@ -75,7 +75,6 @@ func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-			"mode":  d.cfg.mode,
 		}).Error("Got error when reading request body")
 	}
 	log.WithFields(log.Fields{
@@ -262,7 +261,6 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 			"key":        key,
 			"status":     payload.Response.Status,
 			"bodyLength": response.ContentLength,
-			"mode":       d.cfg.mode,
 		}).Info("Response found, returning")
 
 		return response
@@ -270,7 +268,6 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	} else {
 		log.WithFields(log.Fields{
 			"error":       err.Error(),
-			"mode":        d.cfg.mode,
 			"query":       req.URL.RawQuery,
 			"path":        req.URL.RawPath,
 			"destination": req.Host,
@@ -326,7 +323,6 @@ func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (
 	log.WithFields(log.Fields{
 		"status":     newResponse.StatusCode,
 		"middleware": middleware,
-		"mode":       d.cfg.mode,
 	}).Info("Response modified, returning")
 
 	return newResponse, nil
