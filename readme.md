@@ -1,3 +1,5 @@
+[![Circle CI](https://circleci.com/gh/SpectoLabs/hoverfly.svg?style=shield)](https://circleci.com/gh/SpectoLabs/hoverfly)
+
 ![Hoverfly](static/images/hf-logo-std-r-transparent-medium.png)
 ## Dependencies without the sting
 
@@ -15,6 +17,18 @@ More information about Hoverfly and how to use it:
 
 ## Installation
 
+### Pre-built binary
+
+Pre-built Hoverfly binaries are available [here](https://github.com/SpectoLabs/hoverfly/releases/).  
+
+Download a binary, set the correct permissions:
+
+    chmod +x hoverfly*
+
+And run it:
+
+    ./hoverfly*
+
 ### Build it yourself  
 This project uses the [Glide](https://github.com/Masterminds/glide) project to manage dependencies in combination with Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), and therefore you must have Go > 1.5 installed, and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled:
 
@@ -30,15 +44,14 @@ Then build Hoverfly:
 
     go build
 
+Set the correct permissions:
+
+    chmod +x hoverfly
+
 And run it:
 
     ./hoverfly
 
-### Pre-built binary
-
-Pre-built Hoverfly binaries are available [here](https://github.com/SpectoLabs/hoverfly/releases/).
-You may find it easier to download a binary - however since the Hoverfly admin UI requires static files you will need
-to clone the Hoverfly repo first, and then copy the binary to the Hoverfly directory before executing it.
 
 ## Admin UI
 
@@ -242,6 +255,14 @@ Each mode is affected by middleware in a different way. Since the JSON payload h
 
 You can supply "-v" flag to enable verbose logging.
 
+## Contributing
+
+Contributions are welcome!
+
+To submit a pull request you should fork the Hoverfly repository, and make your change on a feature branch of your fork. 
+Then generate a pull request from your branch against master of the Hoverfly repository. Include in your pull request 
+details of your change (why and how, as well as the testing you have performed). To read more about forking model, check out
+this link: [forking workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow). Hoverfly is a new project, we will soon provide detailed roadmap. 
 
 ## License
 
