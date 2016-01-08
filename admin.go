@@ -43,10 +43,10 @@ func (d *DBClient) startAdminInterface() {
 
 	// admin interface starting message
 	log.WithFields(log.Fields{
-		"AdminPort": d.cfg.adminInterface,
+		"AdminPort": d.cfg.adminPort,
 	}).Info("Admin interface is starting...")
 
-	n.Run(d.cfg.adminInterface)
+	n.Run(fmt.Sprintf(":%s", d.cfg.adminPort))
 }
 
 // getBoneRouter returns mux for admin interface
