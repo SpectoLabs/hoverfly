@@ -37,9 +37,8 @@ Note that you must also clone the Hoverfly repository within your $GOPATH (you c
 
     export GO15VENDOREXPERIMENT=1
     mkdir -p "$GOPATH/src/github.com/"
-    cd $GOPATH/src/github.com
-    git clone https://github.com/SpectoLabs/hoverfly.git
-    cd hoverfly
+    git clone https://github.com/SpectoLabs/hoverfly.git "$GOPATH/src/github.com/hoverfly"
+    cd "$GOPATH/src/github.com/hoverfly"
 
 We can then fetch the dependencies (or you can also use _git submodule init_) with:
 
