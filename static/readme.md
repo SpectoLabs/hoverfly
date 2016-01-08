@@ -22,4 +22,8 @@ Hoverfly uses [statik](https://github.com/rakyll/statik) to embed whole UI into 
     go get github.com/rakyll/statik
     $GOPATH/bin/statik -src=./static/dist
     
+    
+Then _/statik/statik.go_ should then be updated. Rebuild Hoverfly so it is then included into binary.
+Commit it in order to see changes. 
+    
 
