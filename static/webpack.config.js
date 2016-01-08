@@ -1,16 +1,24 @@
 var path = require("path");
 var webpack = require('webpack');
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 
 module.exports = {
     context: __dirname,
     entry: {
-        home: "./src/home.jsx"
+        home: "./js/src/home.jsx"
     },
     output: {
         path: path.resolve("./dist"),
-        filename: "[name]-bundle.js"
+        filename: "js/[name]-bundle.js"
     },
+    plugins: [
+        new CopyWebpackPlugin([
+            { from: 'index.html' },
+            { from: 'css', to: 'css' },
+            { from: 'images', to: 'images' }
+        ])
+    ],
 
     module: {
         loaders: [
