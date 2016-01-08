@@ -6,6 +6,10 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	// static assets
+	_ "github.com/SpectoLabs/hoverfly/statik"
+	"github.com/rakyll/statik/fs"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
@@ -49,6 +53,14 @@ func (d *DBClient) startAdminInterface() {
 func getBoneRouter(d DBClient) *bone.Mux {
 	mux := bone.New()
 
+	// preparing static assets for embedded admin
+	statikFS, err := fs.New()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"Error": err.Error(),
+		}).Error("Failed to load statikFS, admin UI might not work :(")
+	}
+
 	mux.Get("/records", http.HandlerFunc(d.AllRecordsHandler))
 	mux.Delete("/records", http.HandlerFunc(d.DeleteAllRecordsHandler))
 	mux.Post("/records", http.HandlerFunc(d.ImportRecordsHandler))
@@ -58,7 +70,7 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
 	mux.Post("/state", http.HandlerFunc(d.stateHandler))
 
-	mux.Handle("/*", http.FileServer(http.Dir("static")))
+	mux.Handle("/*", http.FileServer(statikFS))
 
 	return mux
 }
