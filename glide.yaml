@@ -6,3 +6,4 @@ import:
   - package: github.com/codegangsta/negroni
   - package: github.com/go-zoo/bone
   - package: github.com/boltdb/bolt
+  - package: github.com/rakyll/statik
