@@ -34,3 +34,4 @@ links.p
 .vagrant/
 
 static/node_modules
+static/dist
