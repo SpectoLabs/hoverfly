@@ -16,3 +16,9 @@
 [submodule "bone"]
     path = vendor/github.com/go-zoo/bone
     url = https://github.com/go-zoo/bone
+[submodule "statik"]
+    path = vendor/github.com/rakyll/statik
+    url = https://github.com/rakyll/statik
+
+
+
