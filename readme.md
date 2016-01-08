@@ -15,11 +15,16 @@ More information about Hoverfly and how to use it:
 
 ## Installation
 
-### Build it yourself    
+### Build it yourself  
+This project uses the [Glide](https://github.com/Masterminds/glide) project to manage dependencies in combination with Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), and therefore you must have Go > 1.5 installed, and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled:
+
+    export GO15VENDOREXPERIMENT=1
 
 Use [Glide](https://github.com/Masterminds/glide) to fetch the dependencies (or you can also use _git submodule init_) with:
 
     glide up
+
+As this project uses Glide to manage dependencies please note that you must clone the Hoverfly repository within your $GOPATH (you can read more about on how [Glide works](https://github.com/Masterminds/glide#user-content-how-it-works)), or else you may see strange errors like "_cannot find package "github.com/Sirupsen/logrus" in any of: XXX_"
 
 Then build Hoverfly:
 
