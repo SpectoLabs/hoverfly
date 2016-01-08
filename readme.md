@@ -15,6 +15,18 @@ More information about Hoverfly and how to use it:
 
 ## Installation
 
+### Pre-built binary
+
+Pre-built Hoverfly binaries are available [here](https://github.com/SpectoLabs/hoverfly/releases/).  
+
+Download a binary, set the correct permissions:
+
+    chmod +x hoverfly*
+
+And run it:
+
+    ./hoverfly*
+
 ### Build it yourself  
 This project uses the [Glide](https://github.com/Masterminds/glide) project to manage dependencies in combination with Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), and therefore you must have Go > 1.5 installed, and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled:
 
@@ -30,15 +42,14 @@ Then build Hoverfly:
 
     go build
 
+Set the correct permissions:
+
+    chmod +x hoverfly
+
 And run it:
 
     ./hoverfly
 
-### Pre-built binary
-
-Pre-built Hoverfly binaries are available [here](https://github.com/SpectoLabs/hoverfly/releases/).
-You may find it easier to download a binary - however since the Hoverfly admin UI requires static files you will need
-to clone the Hoverfly repo first, and then copy the binary to the Hoverfly directory before executing it.
 
 ## Admin UI
 
