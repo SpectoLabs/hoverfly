@@ -1,20 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"sync"
 )
 
 // Configuration - initial structure of configuration
 type Configuration struct {
-	adminInterface string
-	proxyPort      string
-	mode           string
-	destination    string
-	middleware     string
-	databaseName   string
-	verbose        bool
+	adminPort    string
+	proxyPort    string
+	mode         string
+	destination  string
+	middleware   string
+	databaseName string
+	verbose      bool
 
 	mu sync.Mutex
 }
@@ -32,8 +31,8 @@ func (c *Configuration) GetMode() (mode string) {
 	return
 }
 
-const DefaultPort = ":8500"      // default proxy port
-const DefaultAdminPort = ":8888" // default admin interface port
+const DefaultPort = "8500"      // default proxy port
+const DefaultAdminPort = "8888" // default admin interface port
 
 // initSettings gets and returns initial configuration from env
 // variables or sets defaults
@@ -41,23 +40,18 @@ func InitSettings() *Configuration {
 
 	var appConfig Configuration
 	// getting default admin interface port
-	adminPort := os.Getenv("AdminPort")
-	if adminPort == "" {
-		adminPort = DefaultAdminPort
+	if os.Getenv("AdminPort") != "" {
+		appConfig.adminPort = os.Getenv("AdminPort")
 	} else {
-		adminPort = fmt.Sprintf(":%s", adminPort)
-	}
-	appConfig.adminInterface = adminPort
-
-	// getting default database
-	port := os.Getenv("ProxyPort")
-	if port == "" {
-		port = DefaultPort
-	} else {
-		port = fmt.Sprintf(":%s", port)
+		appConfig.adminPort = DefaultAdminPort
 	}
 
-	appConfig.proxyPort = port
+	// getting proxy port
+	if os.Getenv("ProxyPort") != "" {
+		appConfig.proxyPort = os.Getenv("ProxyPort")
+	} else {
+		appConfig.proxyPort = DefaultPort
+	}
 
 	databaseName := os.Getenv("HoverflyDB")
 	if databaseName == "" {
