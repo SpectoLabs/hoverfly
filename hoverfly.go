@@ -6,6 +6,7 @@ import (
 
 	"bufio"
 	"flag"
+	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -41,6 +42,12 @@ func main() {
 
 	destination := flag.String("destination", ".", "destination URI to catch")
 	middleware := flag.String("middleware", "", "should proxy use middleware")
+
+	// proxy port
+	proxyPort := flag.String("pp", "", "proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
+	// admin port
+	adminPort := flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
+
 	flag.Parse()
 
 	// getting settings
@@ -51,6 +58,14 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 	}
 	cfg.verbose = *verbose
+
+	// overriding environment variables (proxy and admin ports)
+	if *proxyPort != "" {
+		cfg.proxyPort = *proxyPort
+	}
+	if *adminPort != "" {
+		cfg.adminPort = *adminPort
+	}
 
 	// overriding default middleware setting
 	cfg.middleware = *middleware
@@ -95,7 +110,7 @@ func main() {
 	proxy, dbClient := getNewHoverfly(cfg)
 	defer dbClient.cache.db.Close()
 
-	log.Warn(http.ListenAndServe(cfg.proxyPort, proxy))
+	log.Warn(http.ListenAndServe(fmt.Sprintf(":%s", cfg.proxyPort), proxy))
 }
 
 // getNewHoverfly returns a configured ProxyHttpServer and DBClient, also starts admin interface on configured port
