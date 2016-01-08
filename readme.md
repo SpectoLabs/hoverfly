@@ -253,6 +253,14 @@ Each mode is affected by middleware in a different way. Since the JSON payload h
 
 You can supply "-v" flag to enable verbose logging.
 
+## Contributing
+
+Contributions are welcome!
+
+To submit a pull request you should fork the Hoverfly repository, and make your change on a feature branch of your fork. 
+Then generate a pull request from your branch against master of the Hoverfly repository. Include in your pull request 
+details of your change (why and how, as well as the testing you have performed). To read more about forking model, check out
+this link: [forking workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow). Hoverfly is a new project, we will soon provide detailed roadmap. 
 
 ## License
 
