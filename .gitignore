@@ -33,4 +33,4 @@ links.p
 
 .vagrant/
 
-static/js/node_modules
+static/node_modules
