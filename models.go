@@ -39,6 +39,17 @@ type requestDetails struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
+func (r *request) concatenate() string {
+	var buffer bytes.Buffer
+
+	buffer.WriteString(r.details.Destination)
+	buffer.WriteString(r.details.Path)
+	buffer.WriteString(r.details.Method)
+	buffer.WriteString(r.details.Query)
+	buffer.WriteString(r.details.Body)
+
+	return buffer.String()
+}
 // hash returns unique hash key for request
 func (r *request) hash() string {
 	h := md5.New()
