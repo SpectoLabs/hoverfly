@@ -53,9 +53,6 @@ func TestRequestBodyCaptured(t *testing.T) {
 	_, err = dbClient.captureRequest(req)
 	expect(t, err, nil)
 
-	// since capture
-	time.Sleep(10 * time.Millisecond)
-
 	fp := getRequestFingerprint(req, requestBody)
 
 	payloadBts, err := dbClient.cache.Get([]byte(fp))
