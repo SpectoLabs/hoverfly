@@ -43,7 +43,9 @@ func TestRequestBodyCaptured(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 
-	body := ioutil.NopCloser(bytes.NewBuffer([]byte("fizz=buzz")))
+	requestBody := []byte("fizz=buzz")
+
+	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
 	expect(t, err, nil)
@@ -54,7 +56,7 @@ func TestRequestBodyCaptured(t *testing.T) {
 	// since capture
 	time.Sleep(10 * time.Millisecond)
 
-	fp := getRequestFingerprint(req)
+	fp := getRequestFingerprint(req, requestBody)
 
 	payloadBts, err := dbClient.cache.Get([]byte(fp))
 	expect(t, err, nil)
@@ -62,6 +64,50 @@ func TestRequestBodyCaptured(t *testing.T) {
 	payload, err := decodePayload(payloadBts)
 	expect(t, err, nil)
 	expect(t, payload.Request.Body, "fizz=buzz")
+}
+
+func TestMatchOnRequestBody(t *testing.T) {
+
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	// preparing and saving requests/responses with unique bodies
+	for i := 0; i < 5; i++ {
+		requestBody := []byte(fmt.Sprintf("fizz=buzz, number=%d", i))
+		body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+		request, err := http.NewRequest("POST", "http://capture_body.com", body)
+		expect(t, err, nil)
+
+		resp := response{
+			Status: 200,
+			Body:   fmt.Sprintf("body here, number=%d", i),
+		}
+		payload := Payload{Response: resp}
+
+		// creating response
+		c := NewConstructor(request, payload)
+		response := c.reconstructResponse()
+
+		dbClient.save(request, requestBody, response, []byte(resp.Body))
+	}
+
+	// now getting responses
+	for i := 0; i < 5; i++ {
+		requestBody := []byte(fmt.Sprintf("fizz=buzz, number=%d", i))
+		body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+		request, _ := http.NewRequest("POST", "http://capture_body.com", body)
+
+		response := dbClient.getResponse(request)
+
+		responseBody, err := ioutil.ReadAll(response.Body)
+		response.Body.Close()
+
+		expect(t, err, nil)
+		expect(t, string(responseBody), fmt.Sprintf("body here, number=%d", i))
+
+	}
 
 }
 
@@ -71,7 +117,7 @@ func TestRequestFingerprint(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	expect(t, err, nil)
 
-	fp := getRequestFingerprint(req)
+	fp := getRequestFingerprint(req, []byte(""))
 
 	expect(t, fp, "92a65ed4ca2b7100037a4cba9afd15ea")
 
