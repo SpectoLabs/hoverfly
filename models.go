@@ -132,7 +132,7 @@ func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 		}
 
 		// saving response body with request/response meta to cache
-		go d.save(req, reqBody, resp, respBody)
+		d.save(req, reqBody, resp, respBody)
 	}
 
 	// return new response or error here
