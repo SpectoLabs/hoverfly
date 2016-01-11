@@ -1,17 +1,33 @@
 package main
 
 import (
-	"bufio"
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // synthesizeResponse calls middleware to populate response data, nothing gets pass proxy
 func synthesizeResponse(req *http.Request, middleware string) *http.Response {
 
-	b := bufio.NewScanner(req.Body)
+	// this is mainly for testing, since when you create
+	if req.Body == nil {
+		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	}
+	responseBody, err := ioutil.ReadAll(req.Body)
+	req.Body.Close()
 
-	bodyStr := b.Text()
+	var bodyStr string
+	if err != nil {
+		log.WithFields(log.Fields{
+			"middleware": middleware,
+			"error":      err.Error(),
+		}).Error("Failed to read request body when synthesizing response")
+	} else {
+		bodyStr = string(responseBody)
+	}
 
 	request := requestDetails{
 		Path:        req.URL.Path,
@@ -23,6 +39,12 @@ func synthesizeResponse(req *http.Request, middleware string) *http.Response {
 		Headers:     req.Header,
 	}
 	payload := Payload{Request: request}
+
+	log.WithFields(log.Fields{
+		"middleware":  middleware,
+		"body":        bodyStr,
+		"destination": request.Destination,
+	}).Debug("Synthesizing new response")
 
 	c := NewConstructor(req, payload)
 
