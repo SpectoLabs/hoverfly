@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"testing"
-	"time"
 )
 
 func TestMain(m *testing.M) {
