@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 
 	log "github.com/Sirupsen/logrus"
@@ -48,7 +49,12 @@ func (c *Cache) Get(key []byte) (value []byte, err error) {
 		if bucket == nil {
 			return fmt.Errorf("Bucket %q not found!", c.requestsBucket)
 		}
-		value = bucket.Get(key)
+
+		// "Byte slices returned from Bolt are only valid during a transaction."
+		var buffer bytes.Buffer
+		buffer.Write(bucket.Get(key))
+
+		value = buffer.Bytes()
 		return nil
 	})
 
