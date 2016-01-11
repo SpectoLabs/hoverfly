@@ -98,6 +98,7 @@ func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
 		if err != nil {
 			log.WithFields(log.Fields{
 				"mwOutput": string(mwOutput),
+				"error":    err.Error(),
 			}).Error("Failed to unmarshal JSON from middleware")
 		} else {
 			// payload unmarshalled into Payload struct, returning it

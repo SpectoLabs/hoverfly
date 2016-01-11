@@ -47,3 +47,18 @@ func TestMakeCustom404(t *testing.T) {
 	expect(t, newPayload.Response.Status, 404)
 	expect(t, newPayload.Response.Headers["middleware"][0], "changed response")
 }
+
+func TestReflectBody(t *testing.T) {
+	command := "./examples/middleware/reflect_body/reflect_body.py"
+
+	req := requestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: "", Body: "request_body_here"}
+
+	payload := Payload{Request: req}
+
+	newPayload, err := ExecuteMiddleware(command, payload)
+
+	expect(t, err, nil)
+	expect(t, newPayload.Response.Body, req.Body)
+	expect(t, newPayload.Request.Method, req.Method)
+	expect(t, newPayload.Request.Destination, req.Destination)
+}

@@ -39,10 +39,22 @@ type requestDetails struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
+func (r *request) concatenate() string {
+	var buffer bytes.Buffer
+
+	buffer.WriteString(r.details.Destination)
+	buffer.WriteString(r.details.Path)
+	buffer.WriteString(r.details.Method)
+	buffer.WriteString(r.details.Query)
+	buffer.WriteString(r.details.Body)
+
+	return buffer.String()
+}
+
 // hash returns unique hash key for request
 func (r *request) hash() string {
 	h := md5.New()
-	io.WriteString(h, fmt.Sprintf("%s%s%s%s", r.details.Destination, r.details.Path, r.details.Method, r.details.Query))
+	io.WriteString(h, r.concatenate())
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
@@ -120,7 +132,7 @@ func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 		}
 
 		// saving response body with request/response meta to cache
-		go d.save(req, resp, respBody, reqBody)
+		d.save(req, reqBody, resp, respBody)
 	}
 
 	// return new response or error here
@@ -197,9 +209,9 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte, reqBody []byte) {
+func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, respBody []byte) {
 	// record request here
-	key := getRequestFingerprint(req)
+	key := getRequestFingerprint(req, reqBody)
 
 	if resp == nil {
 		resp = emptyResp
@@ -248,8 +260,15 @@ func (d *DBClient) save(req *http.Request, resp *http.Response, respBody []byte,
 }
 
 // getRequestFingerprint returns request hash
-func getRequestFingerprint(req *http.Request) string {
-	details := requestDetails{Path: req.URL.Path, Method: req.Method, Destination: req.Host, Query: req.URL.RawQuery}
+func getRequestFingerprint(req *http.Request, requestBody []byte) string {
+	details := requestDetails{
+		Path:        req.URL.Path,
+		Method:      req.Method,
+		Destination: req.Host,
+		Query:       req.URL.RawQuery,
+		Body:        string(requestBody),
+	}
+
 	r := request{details: details}
 	return r.hash()
 }
@@ -257,8 +276,15 @@ func getRequestFingerprint(req *http.Request) string {
 // getResponse returns stored response from cache
 func (d *DBClient) getResponse(req *http.Request) *http.Response {
 
-	key := getRequestFingerprint(req)
-	//	var payload Payload
+	reqBody, err := ioutil.ReadAll(req.Body)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Got error when reading request body")
+	}
+
+	key := getRequestFingerprint(req, reqBody)
 
 	payloadBts, err := d.cache.Get([]byte(key))
 
