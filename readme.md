@@ -21,6 +21,8 @@ More information about Hoverfly and how to use it:
 
 Pre-built Hoverfly binaries are available [here](https://github.com/SpectoLabs/hoverfly/releases/).  
 
+#### OSX, Linux & *BSD
+
 Download a binary, set the correct permissions:
 
     chmod +x hoverfly*
@@ -28,6 +30,10 @@ Download a binary, set the correct permissions:
 And run it:
 
     ./hoverfly*
+    
+#### Windows
+
+Simply download a .exe file and run it.
 
 ### Build it yourself  
 This project uses the [Glide](https://github.com/Masterminds/glide) project to manage dependencies in combination with Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), and therefore you must have Go > 1.5 installed, and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled:
