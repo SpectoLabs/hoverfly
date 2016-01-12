@@ -21,6 +21,8 @@ More information about Hoverfly and how to use it:
 
 Pre-built Hoverfly binaries are available [here](https://github.com/SpectoLabs/hoverfly/releases/).  
 
+#### OSX, Linux & *BSD
+
 Download a binary, set the correct permissions:
 
     chmod +x hoverfly*
@@ -28,6 +30,10 @@ Download a binary, set the correct permissions:
 And run it:
 
     ./hoverfly*
+    
+#### Windows
+
+Simply download a .exe file and run it.
 
 ### Build it yourself  
 
