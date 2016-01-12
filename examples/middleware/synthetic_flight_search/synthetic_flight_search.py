@@ -318,7 +318,7 @@ def main():
         date=trip_date))
 
     # adding json header
-    payload_dict['response']['headers '] = {"Content-Type":["application/json"]}
+    payload_dict['response']['headers '] = {"Content-Type": ["application/json"]}
 
     # returning new payload
     print(json.dumps(payload_dict))
