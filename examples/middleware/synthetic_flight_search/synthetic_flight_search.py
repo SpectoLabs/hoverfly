@@ -307,8 +307,19 @@ def main():
     trip_origin = get_origin(request_body)
     trip_destination = get_destination(request_body)
     trip_date = get_date(request_body)
+
     # some debugging info
     logging.debug("Getting trip! Origin: %s, destination: %s. Date: %s" % (trip_origin, trip_destination, trip_date))
+
+    # adding json header
+    payload_dict['response']['headers '] = {"Content-Type": ["application/json"]}
+
+    if len(trip_origin) > 3 or len(trip_destination) > 3:
+        # checking whether origin and destination doesn't exceed 3 symbols
+        payload_dict['response']['status'] = 400
+        payload_dict['response']['body'] = '{"error": "origin and destination cannot exceed 3 symbols limit"}'
+        print(json.dumps(payload_dict))
+        return
 
     # preparing response
     payload_dict['response']['status'] = 200
@@ -316,9 +327,6 @@ def main():
         origin=trip_origin,
         destination=trip_destination,
         date=trip_date))
-
-    # adding json header
-    payload_dict['response']['headers '] = {"Content-Type": ["application/json"]}
 
     # returning new payload
     print(json.dumps(payload_dict))
