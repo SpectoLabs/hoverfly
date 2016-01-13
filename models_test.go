@@ -128,6 +128,19 @@ func TestRequestFingerprintBody(t *testing.T) {
 	expect(t, fp, "b3918a54eb6e42652e29e14c21ba8f81")
 }
 
+func TestScheme(t *testing.T) {
+	req, err := http.NewRequest("GET", "http://example.com", nil)
+	expect(t, err, nil)
+
+	original_fp := getRequestFingerprint(req, []byte(""))
+
+	httpsReq, err := http.NewRequest("GET", "https://example.com", nil)
+	expect(t, err, nil)
+
+	new_fp := getRequestFingerprint(httpsReq, []byte(""))
+
+	// fingerprint should be the same
+	expect(t, original_fp, new_fp)
 }
 
 func TestDeleteAllRecords(t *testing.T) {
