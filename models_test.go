@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// TestMain prepares database for testing and then performs a cleanup
 func TestMain(m *testing.M) {
 
 	setup()
@@ -116,7 +117,31 @@ func TestRequestFingerprint(t *testing.T) {
 	fp := getRequestFingerprint(req, []byte(""))
 
 	expect(t, fp, "92a65ed4ca2b7100037a4cba9afd15ea")
+}
 
+// TestRequestFingerprintBody tests where request body is also used to create unique request ID
+func TestRequestFingerprintBody(t *testing.T) {
+	req, err := http.NewRequest("GET", "http://example.com", nil)
+	expect(t, err, nil)
+
+	fp := getRequestFingerprint(req, []byte("some huge XML or JSON here"))
+
+	expect(t, fp, "b3918a54eb6e42652e29e14c21ba8f81")
+}
+
+func TestScheme(t *testing.T) {
+	req, err := http.NewRequest("GET", "http://example.com", nil)
+	expect(t, err, nil)
+
+	original_fp := getRequestFingerprint(req, []byte(""))
+
+	httpsReq, err := http.NewRequest("GET", "https://example.com", nil)
+	expect(t, err, nil)
+
+	new_fp := getRequestFingerprint(httpsReq, []byte(""))
+
+	// fingerprint should be the same
+	expect(t, original_fp, new_fp)
 }
 
 func TestDeleteAllRecords(t *testing.T) {
