@@ -95,5 +95,6 @@ func setup() {
 
 // teardown does some cleanup after tests
 func teardown() {
+	TestDB.Close()
 	os.Remove(testingDatabaseName)
 }
