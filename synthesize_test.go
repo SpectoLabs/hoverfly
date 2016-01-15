@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"testing"
 )
@@ -22,5 +23,10 @@ func TestSynthesizeResponseWOMiddleware(t *testing.T) {
 
 	sr := synthesizeResponse(req, "")
 
+	body, err := ioutil.ReadAll(sr.Body)
+	bodys := string(body)
+	expect(t, err, nil)
+
 	expect(t, sr.StatusCode, 428)
+	expect(t, len(bodys) > 0, true)
 }

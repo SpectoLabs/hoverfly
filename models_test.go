@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// TestMain prepares database for testing and then performs a cleanup
 func TestMain(m *testing.M) {
 
 	setup()
