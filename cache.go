@@ -10,6 +10,7 @@ import (
 
 const requestsBucketName = "rqbucket"
 
+// Cache - provides access to BoltDB and holds current bucket name
 type Cache struct {
 	db             *bolt.DB
 	requestsBucket []byte
@@ -27,6 +28,7 @@ func getDB(name string) *bolt.DB {
 	return db
 }
 
+// Set - saves given key and value pair to cache
 func (c *Cache) Set(key, value []byte) error {
 	err := c.db.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(c.requestsBucket)
@@ -43,6 +45,7 @@ func (c *Cache) Set(key, value []byte) error {
 	return err
 }
 
+// Get - searches for given key in the cache and returns value if found
 func (c *Cache) Get(key []byte) (value []byte, err error) {
 	err = c.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(c.requestsBucket)
@@ -61,6 +64,7 @@ func (c *Cache) Get(key []byte) (value []byte, err error) {
 	return
 }
 
+// GetAllRequests - returns all captured requests/responses
 func (c *Cache) GetAllRequests() (payloads []Payload, err error) {
 	err = c.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(c.requestsBucket)
@@ -86,6 +90,7 @@ func (c *Cache) GetAllRequests() (payloads []Payload, err error) {
 	return
 }
 
+// DeleteBucket - deletes bucket with all saved data
 func (c *Cache) DeleteBucket(name []byte) (err error) {
 	err = c.db.Update(func(tx *bolt.Tx) error {
 		err = tx.DeleteBucket(name)
@@ -94,10 +99,9 @@ func (c *Cache) DeleteBucket(name []byte) (err error) {
 				"error": err.Error(),
 				"name":  string(name),
 			}).Warning("Failed to delete bucket")
-			return err
-		} else {
-			return nil
+
 		}
+		return err
 	})
 	return
 }

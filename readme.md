@@ -1,4 +1,4 @@
-[![Circle CI](https://circleci.com/gh/SpectoLabs/hoverfly.svg?style=shield)](https://circleci.com/gh/SpectoLabs/hoverfly)
+[![Circle CI](https://circleci.com/gh/SpectoLabs/hoverfly.svg?style=shield)](https://circleci.com/gh/SpectoLabs/hoverfly) [![Go Report Card](http://goreportcard.com/badge/SpectoLabs/hoverfly)]
 
 ![Hoverfly](static/images/hf-logo-std-r-transparent-medium.png)
 ## Dependencies without the sting
