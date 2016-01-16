@@ -1,4 +1,5 @@
-[![Circle CI](https://circleci.com/gh/SpectoLabs/hoverfly.svg?style=shield)](https://circleci.com/gh/SpectoLabs/hoverfly) [![Go Report Card](http://goreportcard.com/badge/SpectoLabs/hoverfly)]
+[![Circle CI][CircleCI-Image]][CircleCI-Url]
+[![ReportCard][ReportCard-Image]][ReportCard-Url]
 
 ![Hoverfly](static/images/hf-logo-std-r-transparent-medium.png)
 ## Dependencies without the sting
@@ -279,3 +280,8 @@ this link: [forking workflow](https://www.atlassian.com/git/tutorials/comparing-
 Apache License version 2.0 [See LICENSE for details](https://github.com/SpectoLabs/hoverfly/blob/master/LICENSE).
 
 (c) [SpectoLabs](https://specto.io) 2015.
+
+[CircleCI-Image]: https://circleci.com/gh/SpectoLabs/hoverfly.svg?style=shield
+[CircleCI-Url]: https://circleci.com/gh/SpectoLabs/hoverfly
+[ReportCard-Url]: http://goreportcard.com/report/spectolabs/hoverfly
+[ReportCard-Image]: http://goreportcard.com/badge/spectolabs/hoverfly
