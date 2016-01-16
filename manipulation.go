@@ -8,16 +8,21 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// Constructor - holds information about original request (which is needed to create response
+// and also holds payload
 type Constructor struct {
 	request *http.Request
 	payload Payload
 }
 
+// NewConstructor - returns constructor instance
 func NewConstructor(req *http.Request, payload Payload) Constructor {
 	c := Constructor{request: req, payload: payload}
 	return c
 }
 
+// ApplyMiddleware - activates given middleware, middleware should be passed as string to executable, can be
+// full path.
 func (c *Constructor) ApplyMiddleware(middleware string) error {
 
 	newPayload, err := ExecuteMiddleware(middleware, c.payload)
@@ -29,16 +34,16 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 		}).Error("Error during middleware transformation, not modifying payload!")
 
 		return err
-	} else {
-
-		log.WithFields(log.Fields{
-			"middleware": middleware,
-		}).Info("Middleware transformation complete!")
-		// override payload with transformed new payload
-		c.payload = newPayload
-
-		return nil
 	}
+
+	log.WithFields(log.Fields{
+		"middleware": middleware,
+	}).Info("Middleware transformation complete!")
+	// override payload with transformed new payload
+	c.payload = newPayload
+
+	return nil
+
 }
 
 // reconstructResponse changes original response with details provided in Constructor Payload.Response

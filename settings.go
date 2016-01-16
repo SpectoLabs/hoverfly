@@ -18,12 +18,14 @@ type Configuration struct {
 	mu sync.Mutex
 }
 
+// SetMode - provides safe way to set new mode
 func (c *Configuration) SetMode(mode string) {
 	c.mu.Lock()
 	c.mode = mode
 	c.mu.Unlock()
 }
 
+// GetMode - provides safe way to get current mode
 func (c *Configuration) GetMode() (mode string) {
 	c.mu.Lock()
 	mode = c.mode
@@ -31,10 +33,13 @@ func (c *Configuration) GetMode() (mode string) {
 	return
 }
 
-const DefaultPort = "8500"      // default proxy port
-const DefaultAdminPort = "8888" // default admin interface port
+// DefaultPort - default proxy port
+const DefaultPort = "8500"
 
-// initSettings gets and returns initial configuration from env
+// DefaultAdminPort - default admin interface port
+const DefaultAdminPort = "8888"
+
+// InitSettings gets and returns initial configuration from env
 // variables or sets defaults
 func InitSettings() *Configuration {
 

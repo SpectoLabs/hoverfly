@@ -25,7 +25,7 @@ type recordsCount struct {
 	Count int `json:"count"`
 }
 
-type StateRequest struct {
+type stateRequest struct {
 	Mode        string `json:"mode"`
 	Destination string `json:"destination"`
 }
@@ -68,7 +68,7 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	mux.Get("/count", http.HandlerFunc(d.RecordsCount))
 
 	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
-	mux.Post("/state", http.HandlerFunc(d.stateHandler))
+	mux.Post("/state", http.HandlerFunc(d.StateHandler))
 
 	mux.Handle("/*", http.FileServer(statikFS))
 
@@ -105,6 +105,7 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// RecordsCount returns number of captured requests as a JSON payload
 func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
 	records, err := d.cache.GetAllRequests()
 
@@ -134,6 +135,7 @@ func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// ImportRecordsHandler - accepts JSON payload and saves it to cache
 func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request) {
 
 	var requests recordedRequests
@@ -186,6 +188,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 
 }
 
+// DeleteAllRecordsHandler - deletes all captured requests
 func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 	err := d.cache.DeleteBucket(d.cache.requestsBucket)
 
@@ -207,7 +210,7 @@ func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 
 // CurrentStateHandler returns current state
 func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request) {
-	var resp StateRequest
+	var resp stateRequest
 	resp.Mode = d.cfg.GetMode()
 	resp.Destination = d.cfg.destination
 
@@ -216,9 +219,9 @@ func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request)
 	w.Write(b)
 }
 
-// stateHandler handles current proxy state
-func (d *DBClient) stateHandler(w http.ResponseWriter, r *http.Request) {
-	var stateRequest StateRequest
+// StateHandler handles current proxy state
+func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request) {
+	var sr stateRequest
 
 	defer r.Body.Close()
 	body, err := ioutil.ReadAll(r.Body)
@@ -232,7 +235,7 @@ func (d *DBClient) stateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.Unmarshal(body, &stateRequest)
+	err = json.Unmarshal(body, &sr)
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -247,23 +250,23 @@ func (d *DBClient) stateHandler(w http.ResponseWriter, r *http.Request) {
 		"synthesize": true,
 	}
 
-	if !availableModes[stateRequest.Mode] {
+	if !availableModes[sr.Mode] {
 		log.WithFields(log.Fields{
-			"suppliedMode": stateRequest.Mode,
+			"suppliedMode": sr.Mode,
 		}).Error("Wrong mode found, can't change state")
 		http.Error(w, "Bad mode supplied, available modes: virtualize, capture, modify, synthesize.", 400)
 		return
 	}
 
 	log.WithFields(log.Fields{
-		"newState": stateRequest.Mode,
+		"newState": sr.Mode,
 		"body":     string(body),
 	}).Info("Handling state change request!")
 
 	// setting new state
-	d.cfg.SetMode(stateRequest.Mode)
+	d.cfg.SetMode(sr.Mode)
 
-	var resp StateRequest
+	var resp stateRequest
 	resp.Mode = d.cfg.GetMode()
 	resp.Destination = d.cfg.destination
 	b, _ := json.Marshal(resp)

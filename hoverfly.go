@@ -13,10 +13,16 @@ import (
 	"regexp"
 )
 
-// modes
+// VirtualizeMode - default mode when Hoverfly looks for captured requests to respond
 const VirtualizeMode = "virtualize"
+
+// SynthesizeMode - all requests are sent to middleware to create response
 const SynthesizeMode = "synthesize"
+
+// ModifyMode - middleware is applied to outgoing and incoming traffic
 const ModifyMode = "modify"
+
+// CaptureMode - requests are captured and stored in cache
 const CaptureMode = "capture"
 
 // orPanic - wrapper for logging errors
@@ -194,10 +200,9 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 		if err != nil {
 			// something bad happened, passing through
 			return req, nil
-		} else {
-			// discarding original requests and returns supplied response
-			return req, newResponse
 		}
+		// discarding original requests and returns supplied response
+		return req, newResponse
 
 	} else if mode == SynthesizeMode {
 		log.Info("*** Sinthesize ***")
@@ -219,10 +224,10 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 		// returning modified response
 		return req, response
 
-	} else {
-		log.Info("*** Virtualize ***")
-		newResponse := d.getResponse(req)
-		return req, newResponse
-
 	}
+
+	log.Info("*** Virtualize ***")
+	newResponse := d.getResponse(req)
+	return req, newResponse
+
 }
