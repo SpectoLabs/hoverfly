@@ -40,6 +40,7 @@ func refute(t *testing.T, a interface{}, b interface{}) {
 	}
 }
 
+// TestDB - holds connection to database during tests
 var TestDB *bolt.DB
 
 func testTools(code int, body string) (*httptest.Server, *DBClient) {
@@ -71,6 +72,7 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 
 var src = rand.NewSource(time.Now().UnixNano())
 
+// GetRandomName - provides random name for buckets. Each test case gets it's own bucket
 func GetRandomName(n int) []byte {
 	b := make([]byte, n)
 	for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
