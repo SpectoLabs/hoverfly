@@ -9,7 +9,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-// To provide input to the pipeline, assign an io.Reader to the first's Stdin.
+// Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.
 func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte, pipeLineError error) {
 	// Require at least one command
 	if len(cmds) < 1 {
@@ -52,6 +52,7 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 	return output.Bytes(), stderr.Bytes(), nil
 }
 
+// ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
 func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
 	commands := strings.Split(command, " ")
 
