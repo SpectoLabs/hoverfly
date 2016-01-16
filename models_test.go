@@ -133,15 +133,15 @@ func TestScheme(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	expect(t, err, nil)
 
-	original_fp := getRequestFingerprint(req, []byte(""))
+	originalFp := getRequestFingerprint(req, []byte(""))
 
 	httpsReq, err := http.NewRequest("GET", "https://example.com", nil)
 	expect(t, err, nil)
 
-	new_fp := getRequestFingerprint(httpsReq, []byte(""))
+	newFp := getRequestFingerprint(httpsReq, []byte(""))
 
 	// fingerprint should be the same
-	expect(t, original_fp, new_fp)
+	expect(t, originalFp, newFp)
 }
 
 func TestDeleteAllRecords(t *testing.T) {
