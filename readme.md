@@ -1,4 +1,5 @@
-[![Circle CI](https://circleci.com/gh/SpectoLabs/hoverfly.svg?style=shield)](https://circleci.com/gh/SpectoLabs/hoverfly) [![Go Report Card](http://goreportcard.com/badge/SpectoLabs/hoverfly)]
+[![Circle CI][CircleCI-Image]][CircleCI-Url]
+[![ReportCard][ReportCard-Image]][ReportCard-Url]
 
 ![Hoverfly](static/images/hf-logo-std-r-transparent-medium.png)
 ## Dependencies without the sting
@@ -36,17 +37,21 @@ And run it:
 Simply download a .exe file and run it.
 
 ### Build it yourself  
-This project uses the [Glide](https://github.com/Masterminds/glide) project to manage dependencies in combination with Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), and therefore you must have Go > 1.5 installed, and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled:
+
+This project uses the [Glide](https://github.com/Masterminds/glide) project to manage dependencies in combination with Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), and therefore you must have Go > 1.5 installed, and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled. 
+
+Note that you must also clone the Hoverfly repository within your $GOPATH (you can read more about on how [Glide works](https://github.com/Masterminds/glide#user-content-how-it-works)), or else you may see strange errors like "_cannot find package "github.com/Sirupsen/logrus" in any of: XXX_":
 
     export GO15VENDOREXPERIMENT=1
+    mkdir -p "$GOPATH/src/github.com/"
+    git clone https://github.com/SpectoLabs/hoverfly.git "$GOPATH/src/github.com/hoverfly"
+    cd "$GOPATH/src/github.com/hoverfly"
 
-Use [Glide](https://github.com/Masterminds/glide) to fetch the dependencies (or you can also use _git submodule init_) with:
+We can then fetch the dependencies (or you can also use _git submodule init_) with:
 
     glide up
 
-As this project uses Glide to manage dependencies please note that you must clone the Hoverfly repository within your $GOPATH (you can read more about on how [Glide works](https://github.com/Masterminds/glide#user-content-how-it-works)), or else you may see strange errors like "_cannot find package "github.com/Sirupsen/logrus" in any of: XXX_"
-
-Then build Hoverfly:
+Build Hoverfly:
 
     go build
 
@@ -275,3 +280,8 @@ this link: [forking workflow](https://www.atlassian.com/git/tutorials/comparing-
 Apache License version 2.0 [See LICENSE for details](https://github.com/SpectoLabs/hoverfly/blob/master/LICENSE).
 
 (c) [SpectoLabs](https://specto.io) 2015.
+
+[CircleCI-Image]: https://circleci.com/gh/SpectoLabs/hoverfly.svg?style=shield
+[CircleCI-Url]: https://circleci.com/gh/SpectoLabs/hoverfly
+[ReportCard-Url]: http://goreportcard.com/report/spectolabs/hoverfly
+[ReportCard-Image]: http://goreportcard.com/badge/spectolabs/hoverfly
