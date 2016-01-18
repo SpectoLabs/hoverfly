@@ -36,8 +36,9 @@ func orPanic(err error) {
 
 func main() {
 	// Output to stderr instead of stdout, could also be a file.
-	log.SetOutput(os.Stderr)
-	log.SetFormatter(&log.TextFormatter{})
+	//	log.SetOutput(os.Stderr)
+	//	log.SetFormatter(&log.TextFormatter{})
+	log.SetFormatter(&log.JSONFormatter{})
 
 	// getting proxy configuration
 	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
