@@ -38,7 +38,14 @@ func (d *DBClient) startAdminInterface() {
 	// starting admin interface
 	mux := getBoneRouter(*d)
 	n := negroni.Classic()
-	n.Use(negronilogrus.NewMiddleware())
+
+	loglevel := log.InfoLevel
+
+	if d.cfg.verbose {
+		loglevel = log.DebugLevel
+	}
+
+	n.Use(negronilogrus.NewCustomMiddleware(loglevel, &log.JSONFormatter{}, "admin"))
 	n.UseHandler(mux)
 
 	// admin interface starting message
