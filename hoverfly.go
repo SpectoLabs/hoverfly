@@ -189,6 +189,12 @@ func getNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 	return proxy, d
 }
 
+func hoverflyError(req *http.Request, err error, msg string) *http.Response {
+	return goproxy.NewResponse(req,
+		goproxy.ContentTypeText, http.StatusServiceUnavailable,
+		fmt.Sprintf("Hoverfly Error! %s. Got error: %s \n", msg, err.Error()))
+}
+
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
 func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Response) {
@@ -199,11 +205,8 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 		newResponse, err := d.captureRequest(req)
 
 		if err != nil {
-			return req, goproxy.NewResponse(req,
-				goproxy.ContentTypeText, http.StatusServiceUnavailable,
-				fmt.Sprintf("Hoverfly Error! Could not capture request, got error: %s \n", err.Error()))
+			return req, hoverflyError(req, err, "Could not capture request")
 		}
-
 		log.WithFields(log.Fields{
 			"mode":        mode,
 			"middleware":  d.cfg.middleware,
@@ -216,7 +219,21 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 		return req, newResponse
 
 	} else if mode == SynthesizeMode {
-		response := synthesizeResponse(req, d.cfg.middleware)
+		response, err := synthesizeResponse(req, d.cfg.middleware)
+
+		if err != nil {
+			return req, hoverflyError(req, err, "Could not create synthetic response!")
+		}
+
+		log.WithFields(log.Fields{
+			"mode":        mode,
+			"middleware":  d.cfg.middleware,
+			"path":        req.URL.Path,
+			"rawQuery":    req.URL.RawQuery,
+			"method":      req.Method,
+			"destination": req.Host,
+		}).Info("synthetic response created successfuly")
+
 		return req, response
 
 	} else if mode == ModifyMode {
