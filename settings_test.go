@@ -61,3 +61,11 @@ func TestSetMode(t *testing.T) {
 	cfg.SetMode("virtualize")
 	expect(t, cfg.mode, "virtualize")
 }
+
+// TestGetMode - tests GetMode function, however it doesn't test
+// whether mutex works correctly or not
+func TestGetMode(t *testing.T) {
+	cfg := Configuration{mode: "capture"}
+
+	expect(t, cfg.GetMode(), "capture")
+}
