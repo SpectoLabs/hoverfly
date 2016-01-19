@@ -59,6 +59,28 @@ func TestGetNonExistingBucket(t *testing.T) {
 	expect(t, err.Error(), "Bucket \"some_random_bucket\" not found!")
 }
 
+func TestDeleteBucket(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	k := []byte("randomkeyhere")
+	v := []byte("value")
+	// checking whether bucket is okay
+	err := dbClient.cache.Set(k, v)
+	expect(t, err, nil)
+
+	value, err := dbClient.cache.Get(k)
+	expect(t, err, nil)
+	expect(t, string(value), string(v))
+
+	// deleting bucket
+	err = dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	expect(t, err, nil)
+
+	// deleting it again
+	err = dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	refute(t, err, nil)
+}
 func TestGetMultipleRecords(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
