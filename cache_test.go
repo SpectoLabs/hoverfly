@@ -92,6 +92,23 @@ func TestGetAllRequestNoBucket(t *testing.T) {
 	expect(t, err, nil)
 }
 
+func TestCorruptedPayloads(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	k := []byte("randomkeyhere")
+	v := []byte("value")
+
+	err := dbClient.cache.Set(k, v)
+	expect(t, err, nil)
+
+	// corrupted payloads should be just skipped
+	payloads, err := dbClient.cache.GetAllRequests()
+	expect(t, err, nil)
+	expect(t, len(payloads), 0)
+
+}
+
 func TestGetMultipleRecords(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
