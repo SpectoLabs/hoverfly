@@ -62,3 +62,26 @@ func TestGetAllRecordsWRecords(t *testing.T) {
 
 	expect(t, len(rr.Data), 5)
 }
+
+func TestGetRecordsCount(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	m := getBoneRouter(*dbClient)
+
+	req, err := http.NewRequest("GET", "/count", nil)
+	expect(t, err, nil)
+
+	//The response recorder used to record HTTP responses
+	respRec := httptest.NewRecorder()
+
+	m.ServeHTTP(respRec, req)
+
+	expect(t, respRec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(respRec.Body)
+
+	rc := recordsCount{}
+	err = json.Unmarshal(body, &rc)
+
+	expect(t, rc.Count, 0)
+}
