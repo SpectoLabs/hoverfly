@@ -1,4 +1,3 @@
-package hoverfly
 package main
 
 import (
@@ -15,3 +14,8 @@ func TestSettingsAdminPortEnv(t *testing.T) {
 	expect(t, cfg.adminPort, "5555")
 }
 
+func TestSettingsDefaultAdminPort(t *testing.T) {
+	os.Setenv("AdminPort", "")
+	cfg := InitSettings()
+	expect(t, cfg.adminPort, DefaultAdminPort)
+}
