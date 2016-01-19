@@ -19,7 +19,7 @@ func TestSetKey(t *testing.T) {
 
 	value, err := dbClient.cache.Get(k)
 	expect(t, err, nil)
-	refute(t, value, nil)
+	expect(t, string(value), string(v))
 	dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 }
 
@@ -81,6 +81,17 @@ func TestDeleteBucket(t *testing.T) {
 	err = dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 	refute(t, err, nil)
 }
+
+func TestGetAllRequestNoBucket(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	dbClient.cache.requestsBucket = []byte("no_bucket_for_TestGetAllRequestNoBucket")
+	_, err := dbClient.cache.GetAllRequests()
+	// expecting nil since this would mean that records were wiped
+	expect(t, err, nil)
+}
+
 func TestGetMultipleRecords(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
