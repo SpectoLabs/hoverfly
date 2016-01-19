@@ -52,3 +52,12 @@ func TestSettingsMiddlewareEnv(t *testing.T) {
 
 	expect(t, cfg.middleware, "./examples/middleware/x.go")
 }
+
+// TestSetMode - tests SetMode function, however it doesn't test
+// whether mutex works correctly or not
+func TestSetMode(t *testing.T) {
+
+	cfg := Configuration{}
+	cfg.SetMode("virtualize")
+	expect(t, cfg.mode, "virtualize")
+}
