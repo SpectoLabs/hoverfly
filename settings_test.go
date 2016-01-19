@@ -43,3 +43,12 @@ func TestSettingsDatabaseEnv(t *testing.T) {
 
 	expect(t, cfg.databaseName, "testingX.db")
 }
+
+func TestSettingsMiddlewareEnv(t *testing.T) {
+	defer os.Setenv("HoverflyMiddleware", "")
+
+	os.Setenv("HoverflyMiddleware", "./examples/middleware/x.go")
+	cfg := InitSettings()
+
+	expect(t, cfg.middleware, "./examples/middleware/x.go")
+}
