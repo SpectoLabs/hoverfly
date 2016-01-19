@@ -28,3 +28,10 @@ func TestSettingsProxyPortEnv(t *testing.T) {
 
 	expect(t, cfg.proxyPort, "6666")
 }
+
+func TestSettingsDefaultProxyPort(t *testing.T) {
+	os.Setenv("ProxyPort", "")
+	cfg := InitSettings()
+	expect(t, cfg.proxyPort, DefaultPort)
+}
+
