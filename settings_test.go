@@ -35,3 +35,11 @@ func TestSettingsDefaultProxyPort(t *testing.T) {
 	expect(t, cfg.proxyPort, DefaultPort)
 }
 
+func TestSettingsDatabaseEnv(t *testing.T) {
+	defer os.Setenv("HoverflyDB", "")
+
+	os.Setenv("HoverflyDB", "testingX.db")
+	cfg := InitSettings()
+
+	expect(t, cfg.databaseName, "testingX.db")
+}
