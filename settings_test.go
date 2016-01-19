@@ -19,3 +19,12 @@ func TestSettingsDefaultAdminPort(t *testing.T) {
 	cfg := InitSettings()
 	expect(t, cfg.adminPort, DefaultAdminPort)
 }
+
+func TestSettingsProxyPortEnv(t *testing.T) {
+	defer os.Setenv("ProxyPort", "")
+
+	os.Setenv("ProxyPort", "6666")
+	cfg := InitSettings()
+
+	expect(t, cfg.proxyPort, "6666")
+}
