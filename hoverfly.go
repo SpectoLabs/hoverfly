@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"os"
 	"regexp"
 )
 
@@ -195,23 +194,32 @@ func getNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Response) {
 
 	mode := d.cfg.GetMode()
+
 	if mode == CaptureMode {
-		log.Info("*** Capture ***")
 		newResponse, err := d.captureRequest(req)
+
 		if err != nil {
-			// something bad happened, passing through
-			return req, nil
+			return req, goproxy.NewResponse(req,
+				goproxy.ContentTypeText, http.StatusServiceUnavailable,
+				fmt.Sprintf("Hoverfly Error! Could not capture request, got error: %s \n", err.Error()))
 		}
-		// discarding original requests and returns supplied response
+
+		log.WithFields(log.Fields{
+			"mode":        mode,
+			"middleware":  d.cfg.middleware,
+			"path":        req.URL.Path,
+			"rawQuery":    req.URL.RawQuery,
+			"method":      req.Method,
+			"destination": req.Host,
+		}).Info("request and response captured")
+
 		return req, newResponse
 
 	} else if mode == SynthesizeMode {
-		log.Info("*** Sinthesize ***")
 		response := synthesizeResponse(req, d.cfg.middleware)
 		return req, response
 
 	} else if mode == ModifyMode {
-		log.Info("*** Modify ***")
 		response, err := d.modifyRequestResponse(req, d.cfg.middleware)
 
 		if err != nil {
@@ -227,7 +235,6 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 
 	}
 
-	log.Info("*** Virtualize ***")
 	newResponse := d.getResponse(req)
 	return req, newResponse
 

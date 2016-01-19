@@ -221,7 +221,7 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 		"host":   request.Host,
 		"method": request.Method,
 		"path":   request.URL.Path,
-	}).Info("response from external service got successfuly!")
+	}).Debug("response from external service got successfuly!")
 
 	resp.Header.Set("hoverfly", "Was-Here")
 	return resp, nil
@@ -249,7 +249,7 @@ func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, 
 			"bodyLen":       len(reqBody),
 			"destination":   req.Host,
 			"hashKey":       key,
-		}).Info("Capturing")
+		}).Debug("Capturing")
 
 		requestObj := requestDetails{
 			Path:        req.URL.Path,
