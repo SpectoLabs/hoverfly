@@ -203,8 +203,13 @@ func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 
 	var response messageResponse
 	if err != nil {
-		response.Message = fmt.Sprintf("Something went wrong: %s", err.Error())
-		w.WriteHeader(500)
+		if err.Error() == "bucket not found" {
+			response.Message = fmt.Sprintf("No records found")
+			w.WriteHeader(200)
+		} else {
+			response.Message = fmt.Sprintf("Something went wrong: %s", err.Error())
+			w.WriteHeader(500)
+		}
 	} else {
 		response.Message = "Proxy cache deleted successfuly"
 		w.WriteHeader(200)
