@@ -39,6 +39,10 @@ const DefaultPort = "8500"
 // DefaultAdminPort - default admin interface port
 const DefaultAdminPort = "8888"
 
+// DefaultDatabaseName - default database name that will be created
+// or used by Hoverfly
+const DefaultDatabaseName = "requests.db"
+
 // InitSettings gets and returns initial configuration from env
 // variables or sets defaults
 func InitSettings() *Configuration {
@@ -60,7 +64,7 @@ func InitSettings() *Configuration {
 
 	databaseName := os.Getenv("HoverflyDB")
 	if databaseName == "" {
-		databaseName = "requests.db"
+		databaseName = DefaultDatabaseName
 	}
 	appConfig.databaseName = databaseName
 

@@ -45,3 +45,38 @@ func TestReconstructRequestBodyPayload(t *testing.T) {
 	expect(t, err, nil)
 	expect(t, string(body), "new request body here")
 }
+
+func TestReconstructRequestHeadersPayload(t *testing.T) {
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	req.Header.Set("Header", "ValueX")
+
+	payload := Payload{}
+	c := NewConstructor(req, payload)
+	c.payload.Request.Headers = req.Header
+
+	newRequest := c.reconstructRequest()
+
+	expect(t, newRequest.Header.Get("Header"), "ValueX")
+}
+
+func TestReconstructResponseHeadersPayload(t *testing.T) {
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	payload := Payload{}
+
+	payload.Response.Status = 201
+	payload.Response.Body = "body here"
+
+	headers := make(map[string][]string)
+	headers["Header"] = []string{"one"}
+
+	payload.Response.Headers = headers
+
+	c := NewConstructor(req, payload)
+
+	response := c.reconstructResponse()
+
+	expect(t, response.Header.Get("Header"), headers["Header"][0])
+
+}

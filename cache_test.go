@@ -19,7 +19,7 @@ func TestSetKey(t *testing.T) {
 
 	value, err := dbClient.cache.Get(k)
 	expect(t, err, nil)
-	refute(t, value, nil)
+	expect(t, string(value), string(v))
 	dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 }
 
@@ -49,9 +49,70 @@ func TestPayloadSetGet(t *testing.T) {
 	dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 }
 
+func TestGetNonExistingBucket(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	dbClient.cache.requestsBucket = []byte("some_random_bucket")
+
+	_, err := dbClient.cache.Get([]byte("whatever"))
+	expect(t, err.Error(), "Bucket \"some_random_bucket\" not found!")
+}
+
+func TestDeleteBucket(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	k := []byte("randomkeyhere")
+	v := []byte("value")
+	// checking whether bucket is okay
+	err := dbClient.cache.Set(k, v)
+	expect(t, err, nil)
+
+	value, err := dbClient.cache.Get(k)
+	expect(t, err, nil)
+	expect(t, string(value), string(v))
+
+	// deleting bucket
+	err = dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	expect(t, err, nil)
+
+	// deleting it again
+	err = dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	refute(t, err, nil)
+}
+
+func TestGetAllRequestNoBucket(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	dbClient.cache.requestsBucket = []byte("no_bucket_for_TestGetAllRequestNoBucket")
+	_, err := dbClient.cache.GetAllRequests()
+	// expecting nil since this would mean that records were wiped
+	expect(t, err, nil)
+}
+
+func TestCorruptedPayloads(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	k := []byte("randomkeyhere")
+	v := []byte("value")
+
+	err := dbClient.cache.Set(k, v)
+	expect(t, err, nil)
+
+	// corrupted payloads should be just skipped
+	payloads, err := dbClient.cache.GetAllRequests()
+	expect(t, err, nil)
+	expect(t, len(payloads), 0)
+
+}
+
 func TestGetMultipleRecords(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -68,6 +129,26 @@ func TestGetMultipleRecords(t *testing.T) {
 		expect(t, payload.Request.Method, "GET")
 		expect(t, payload.Response.Status, 201)
 	}
+}
 
-	dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+func TestGetNonExistingKey(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+
+	// getting key
+	_, err := dbClient.cache.Get([]byte("should not be here"))
+	refute(t, err, nil)
+}
+
+func TestSetGetEmptyValue(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+
+	err := dbClient.cache.Set([]byte("shouldbe"), []byte(""))
+	expect(t, err, nil)
+	// getting key
+	_, err = dbClient.cache.Get([]byte("shouldbe"))
+	expect(t, err, nil)
 }

@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"os"
 	"regexp"
 )
 
@@ -36,8 +35,9 @@ func orPanic(err error) {
 
 func main() {
 	// Output to stderr instead of stdout, could also be a file.
-	log.SetOutput(os.Stderr)
-	log.SetFormatter(&log.TextFormatter{})
+	//	log.SetOutput(os.Stderr)
+	//	log.SetFormatter(&log.TextFormatter{})
+	log.SetFormatter(&log.JSONFormatter{})
 
 	// getting proxy configuration
 	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
@@ -189,28 +189,54 @@ func getNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 	return proxy, d
 }
 
+func hoverflyError(req *http.Request, err error, msg string, statusCode int) *http.Response {
+	return goproxy.NewResponse(req,
+		goproxy.ContentTypeText, statusCode,
+		fmt.Sprintf("Hoverfly Error! %s. Got error: %s \n", msg, err.Error()))
+}
+
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
 func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Response) {
 
 	mode := d.cfg.GetMode()
+
 	if mode == CaptureMode {
-		log.Info("*** Capture ***")
 		newResponse, err := d.captureRequest(req)
+
 		if err != nil {
-			// something bad happened, passing through
-			return req, nil
+			return req, hoverflyError(req, err, "Could not capture request", http.StatusServiceUnavailable)
 		}
-		// discarding original requests and returns supplied response
+		log.WithFields(log.Fields{
+			"mode":        mode,
+			"middleware":  d.cfg.middleware,
+			"path":        req.URL.Path,
+			"rawQuery":    req.URL.RawQuery,
+			"method":      req.Method,
+			"destination": req.Host,
+		}).Info("request and response captured")
+
 		return req, newResponse
 
 	} else if mode == SynthesizeMode {
-		log.Info("*** Sinthesize ***")
-		response := synthesizeResponse(req, d.cfg.middleware)
+		response, err := synthesizeResponse(req, d.cfg.middleware)
+
+		if err != nil {
+			return req, hoverflyError(req, err, "Could not create synthetic response!", http.StatusServiceUnavailable)
+		}
+
+		log.WithFields(log.Fields{
+			"mode":        mode,
+			"middleware":  d.cfg.middleware,
+			"path":        req.URL.Path,
+			"rawQuery":    req.URL.RawQuery,
+			"method":      req.Method,
+			"destination": req.Host,
+		}).Info("synthetic response created successfuly")
+
 		return req, response
 
 	} else if mode == ModifyMode {
-		log.Info("*** Modify ***")
 		response, err := d.modifyRequestResponse(req, d.cfg.middleware)
 
 		if err != nil {
@@ -226,7 +252,6 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 
 	}
 
-	log.Info("*** Virtualize ***")
 	newResponse := d.getResponse(req)
 	return req, newResponse
 

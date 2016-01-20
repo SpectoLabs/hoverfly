@@ -9,7 +9,6 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/elazarl/goproxy"
 	"io/ioutil"
 )
 
@@ -97,7 +96,7 @@ func decodePayload(data []byte) (*Payload, error) {
 	return p, nil
 }
 
-// recordRequest saves request for later playback
+// captureRequest saves request for later playback
 func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 
 	// this is mainly for testing, since when you create
@@ -110,11 +109,16 @@ func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
+			"mode":  "capture",
 		}).Error("Got error when reading request body")
 	}
+
+	// outputting request body if verbose logging is set
 	log.WithFields(log.Fields{
 		"body": string(reqBody),
-	}).Info("got request body")
+		"mode": "capture",
+	}).Debug("got request body")
+
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
 
 	// forwarding request
@@ -122,13 +126,15 @@ func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
 
 	if err == nil {
 		respBody, err := extractBody(resp)
+
 		if err != nil {
-			// copying the response body did not work
-			if err != nil {
-				log.WithFields(log.Fields{
-					"error": err.Error(),
-				}).Error("Failed to copy response body.")
-			}
+
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+				"mode":  "capture",
+			}).Error("Failed to copy response body.")
+
+			return resp, err
 		}
 
 		// saving response body with request/response meta to cache
@@ -172,6 +178,7 @@ func extractBody(resp *http.Response) (extract []byte, err error) {
 
 // doRequest performs original request and returns response that should be returned to client and error (if there is one)
 func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
+
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
 
@@ -179,29 +186,41 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 		var payload Payload
 
 		c := NewConstructor(request, payload)
-		c.ApplyMiddleware(d.cfg.middleware)
+		err := c.ApplyMiddleware(d.cfg.middleware)
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"mode":   d.cfg.mode,
+				"error":  err.Error(),
+				"host":   request.Host,
+				"method": request.Method,
+				"path":   request.URL.Path,
+			}).Error("could not forward request, middleware failed to modify request.")
+			return nil, err
+		}
 
 		request = c.reconstructRequest()
-
 	}
 
 	resp, err := d.http.Do(request)
 
 	if err != nil {
 		log.WithFields(log.Fields{
+			"mode":   d.cfg.mode,
 			"error":  err.Error(),
 			"host":   request.Host,
 			"method": request.Method,
 			"path":   request.URL.Path,
-		}).Error("Could not forward request.")
+		}).Error("could not forward request, failed to do an HTTP request.")
 		return nil, err
 	}
 
 	log.WithFields(log.Fields{
+		"mode":   d.cfg.mode,
 		"host":   request.Host,
 		"method": request.Method,
 		"path":   request.URL.Path,
-	}).Info("Response got successfuly!")
+	}).Debug("response from external service got successfuly!")
 
 	resp.Header.Set("hoverfly", "Was-Here")
 	return resp, nil
@@ -229,7 +248,7 @@ func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, 
 			"bodyLen":       len(reqBody),
 			"destination":   req.Host,
 			"hashKey":       key,
-		}).Info("Capturing")
+		}).Debug("Capturing")
 
 		requestObj := requestDetails{
 			Path:        req.URL.Path,
@@ -294,7 +313,10 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
+				"value": string(payloadBts),
+				"key":   key,
 			}).Error("Failed to decode payload")
+			return hoverflyError(req, err, "Failed to virtualize", http.StatusInternalServerError)
 		}
 
 		c := NewConstructor(req, *payload)
@@ -306,9 +328,15 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 		response := c.reconstructResponse()
 
 		log.WithFields(log.Fields{
-			"key":        key,
-			"status":     payload.Response.Status,
-			"bodyLength": response.ContentLength,
+			"key":         key,
+			"mode":        "virtualize",
+			"middleware":  d.cfg.middleware,
+			"path":        req.URL.Path,
+			"rawQuery":    req.URL.RawQuery,
+			"method":      req.Method,
+			"destination": req.Host,
+			"status":      payload.Response.Status,
+			"bodyLength":  response.ContentLength,
 		}).Info("Response found, returning")
 
 		return response
@@ -316,6 +344,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	}
 
 	log.WithFields(log.Fields{
+		"key":         key,
 		"error":       err.Error(),
 		"query":       req.URL.RawQuery,
 		"path":        req.URL.RawPath,
@@ -323,10 +352,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 		"method":      req.Method,
 	}).Warn("Failed to retrieve response from cache")
 	// return error? if we return nil - proxy forwards request to original destination
-	return goproxy.NewResponse(req,
-		goproxy.ContentTypeText, http.StatusPreconditionFailed,
-		"Coudldn't find recorded request, please record it first!")
-
+	return hoverflyError(req, err, "Could not find recorded request, please record it first!", http.StatusPreconditionFailed)
 }
 
 // modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response
