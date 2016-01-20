@@ -112,6 +112,7 @@ func TestCorruptedPayloads(t *testing.T) {
 func TestGetMultipleRecords(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
