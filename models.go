@@ -314,7 +314,12 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
+				"value": string(payloadBts),
+				"key":   key,
 			}).Error("Failed to decode payload")
+			return goproxy.NewResponse(req,
+				goproxy.ContentTypeText, http.StatusInternalServerError,
+				fmt.Sprintf("Failed to virtualize, got error: %s \n", err.Error()))
 		}
 
 		c := NewConstructor(req, *payload)
@@ -326,9 +331,15 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 		response := c.reconstructResponse()
 
 		log.WithFields(log.Fields{
-			"key":        key,
-			"status":     payload.Response.Status,
-			"bodyLength": response.ContentLength,
+			"key":         key,
+			"mode":        "virtualize",
+			"middleware":  d.cfg.middleware,
+			"path":        req.URL.Path,
+			"rawQuery":    req.URL.RawQuery,
+			"method":      req.Method,
+			"destination": req.Host,
+			"status":      payload.Response.Status,
+			"bodyLength":  response.ContentLength,
 		}).Info("Response found, returning")
 
 		return response
@@ -336,6 +347,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	}
 
 	log.WithFields(log.Fields{
+		"key":         key,
 		"error":       err.Error(),
 		"query":       req.URL.RawQuery,
 		"path":        req.URL.RawPath,
@@ -345,7 +357,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 	// return error? if we return nil - proxy forwards request to original destination
 	return goproxy.NewResponse(req,
 		goproxy.ContentTypeText, http.StatusPreconditionFailed,
-		"Coudldn't find recorded request, please record it first!")
+		"Could not find recorded request, please record it first!\n")
 
 }
 
