@@ -159,9 +159,36 @@ func TestExportImportRecords(t *testing.T) {
 	m.ServeHTTP(importRec, importReq)
 	expect(t, importRec.Code, http.StatusOK)
 
-	// records should be overwritten
+	// records should be there
 	payloads, err := dbClient.cache.GetAllRequests()
 	expect(t, err, nil)
 	expect(t, len(payloads), 5)
 
+}
+
+func TestDeleteHandler(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	m := getBoneRouter(*dbClient)
+
+	// inserting some payloads
+	for i := 0; i < 5; i++ {
+		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
+		expect(t, err, nil)
+		dbClient.captureRequest(req)
+	}
+
+	// checking whether we have records
+	payloads, err := dbClient.cache.GetAllRequests()
+	expect(t, err, nil)
+	expect(t, len(payloads), 5)
+
+	// deleting through handler
+	deleteReq, err := http.NewRequest("DELETE", "/records", nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, deleteReq)
+	expect(t, rec.Code, http.StatusOK)
 }
