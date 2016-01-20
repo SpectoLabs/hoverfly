@@ -192,3 +192,20 @@ func TestDecodeRandomBytes(t *testing.T) {
 	_, err := decodePayload(bts)
 	refute(t, err, nil)
 }
+
+func TestModifyRequest(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	dbClient.cfg.middleware = "./examples/middleware/modify_request/modify_request.py"
+
+	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
+	expect(t, err, nil)
+
+	response, err := dbClient.modifyRequestResponse(req, dbClient.cfg.middleware)
+	expect(t, err, nil)
+
+	// response should be changed to 202
+	expect(t, response.StatusCode, 202)
+
+}
