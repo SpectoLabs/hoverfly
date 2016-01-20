@@ -244,12 +244,14 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 				"error":      err.Error(),
 				"middleware": d.cfg.middleware,
 			}).Error("Got error when performing request modification")
-			return req, nil
+			return req, hoverflyError(
+				req,
+				err,
+				fmt.Sprintf("Middleware (%s) failed or something else happened!", d.cfg.middleware),
+				http.StatusServiceUnavailable)
 		}
-
 		// returning modified response
 		return req, response
-
 	}
 
 	newResponse := d.getResponse(req)
