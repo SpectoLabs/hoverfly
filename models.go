@@ -9,7 +9,6 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/elazarl/goproxy"
 	"io/ioutil"
 )
 
@@ -317,9 +316,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 				"value": string(payloadBts),
 				"key":   key,
 			}).Error("Failed to decode payload")
-			return goproxy.NewResponse(req,
-				goproxy.ContentTypeText, http.StatusInternalServerError,
-				fmt.Sprintf("Failed to virtualize, got error: %s \n", err.Error()))
+			return hoverflyError(req, err, "Failed to virtualize", http.StatusInternalServerError)
 		}
 
 		c := NewConstructor(req, *payload)
@@ -355,10 +352,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 		"method":      req.Method,
 	}).Warn("Failed to retrieve response from cache")
 	// return error? if we return nil - proxy forwards request to original destination
-	return goproxy.NewResponse(req,
-		goproxy.ContentTypeText, http.StatusPreconditionFailed,
-		"Could not find recorded request, please record it first!\n")
-
+	return hoverflyError(req, err, "Could not find recorded request, please record it first!", http.StatusPreconditionFailed)
 }
 
 // modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response

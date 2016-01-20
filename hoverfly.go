@@ -189,9 +189,9 @@ func getNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 	return proxy, d
 }
 
-func hoverflyError(req *http.Request, err error, msg string) *http.Response {
+func hoverflyError(req *http.Request, err error, msg string, statusCode int) *http.Response {
 	return goproxy.NewResponse(req,
-		goproxy.ContentTypeText, http.StatusServiceUnavailable,
+		goproxy.ContentTypeText, statusCode,
 		fmt.Sprintf("Hoverfly Error! %s. Got error: %s \n", msg, err.Error()))
 }
 
@@ -205,7 +205,7 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 		newResponse, err := d.captureRequest(req)
 
 		if err != nil {
-			return req, hoverflyError(req, err, "Could not capture request")
+			return req, hoverflyError(req, err, "Could not capture request", http.StatusServiceUnavailable)
 		}
 		log.WithFields(log.Fields{
 			"mode":        mode,
@@ -222,7 +222,7 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 		response, err := synthesizeResponse(req, d.cfg.middleware)
 
 		if err != nil {
-			return req, hoverflyError(req, err, "Could not create synthetic response!")
+			return req, hoverflyError(req, err, "Could not create synthetic response!", http.StatusServiceUnavailable)
 		}
 
 		log.WithFields(log.Fields{
