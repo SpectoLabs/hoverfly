@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -235,6 +236,11 @@ func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request)
 func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request) {
 	var sr stateRequest
 
+	// this is mainly for testing, since when you create
+	if r.Body == nil {
+		r.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	}
+
 	defer r.Body.Close()
 	body, err := ioutil.ReadAll(r.Body)
 
@@ -251,7 +257,7 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(422) // can't process this entity
+		w.WriteHeader(400) // can't process this entity
 		return
 	}
 
