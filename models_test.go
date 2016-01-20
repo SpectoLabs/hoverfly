@@ -209,3 +209,17 @@ func TestModifyRequest(t *testing.T) {
 	expect(t, response.StatusCode, 202)
 
 }
+
+func TestModifyRequestNoMiddleware(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	dbClient.cfg.middleware = ""
+
+	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
+	expect(t, err, nil)
+
+	_, err = dbClient.modifyRequestResponse(req, dbClient.cfg.middleware)
+	refute(t, err, nil)
+
+}
