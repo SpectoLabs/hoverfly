@@ -141,4 +141,14 @@ func TestGetNonExistingKey(t *testing.T) {
 	refute(t, err, nil)
 }
 
+func TestSetGetEmptyValue(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+
+	err := dbClient.cache.Set([]byte("shouldbe"), []byte(""))
+	expect(t, err, nil)
+	// getting key
+	_, err = dbClient.cache.Get([]byte("shouldbe"))
+	expect(t, err, nil)
 }
