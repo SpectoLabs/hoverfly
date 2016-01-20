@@ -13,6 +13,7 @@ import (
 func TestGetAllRecords(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	req, err := http.NewRequest("GET", "/records", nil)
@@ -36,6 +37,7 @@ func TestGetAllRecords(t *testing.T) {
 func TestGetAllRecordsWRecords(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -67,6 +69,7 @@ func TestGetAllRecordsWRecords(t *testing.T) {
 func TestGetRecordsCount(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	req, err := http.NewRequest("GET", "/count", nil)
@@ -90,6 +93,7 @@ func TestGetRecordsCount(t *testing.T) {
 func TestGetRecordsCountWRecords(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -121,6 +125,7 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 func TestExportImportRecords(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// inserting some payloads
