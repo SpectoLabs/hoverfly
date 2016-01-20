@@ -192,3 +192,20 @@ func TestDeleteHandler(t *testing.T) {
 	m.ServeHTTP(rec, deleteReq)
 	expect(t, rec.Code, http.StatusOK)
 }
+
+func TestDeleteHandlerNoBucket(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	m := getBoneRouter(*dbClient)
+
+	// deleting through handler
+	importReq, err := http.NewRequest("DELETE", "/records", nil)
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	importRec := httptest.NewRecorder()
+
+	m.ServeHTTP(importRec, importReq)
+	expect(t, importRec.Code, http.StatusOK)
+}
+
