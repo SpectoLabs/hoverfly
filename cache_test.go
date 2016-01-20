@@ -129,6 +129,16 @@ func TestGetMultipleRecords(t *testing.T) {
 		expect(t, payload.Request.Method, "GET")
 		expect(t, payload.Response.Status, 201)
 	}
+}
 
-	dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+func TestGetNonExistingKey(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+
+	// getting key
+	_, err := dbClient.cache.Get([]byte("should not be here"))
+	refute(t, err, nil)
+}
+
 }
