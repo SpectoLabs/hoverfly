@@ -293,4 +293,33 @@ func TestSetCaptureState(t *testing.T) {
 	expect(t, dbClient.cfg.GetMode(), "capture")
 }
 
+func TestSetModifyState(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	m := getBoneRouter(*dbClient)
+
+	// setting mode to virtualize
+	dbClient.cfg.SetMode("virtualize")
+
+	// preparing to set mode through rest api
+	var resp stateRequest
+	resp.Mode = "modify"
+
+	bts, err := json.Marshal(&resp)
+	expect(t, err, nil)
+
+	// deleting through handler
+	req, err := http.NewRequest("POST", "/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	// checking mode
+	expect(t, dbClient.cfg.GetMode(), "modify")
+}
+
 }
