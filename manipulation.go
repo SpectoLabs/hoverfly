@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -75,11 +76,21 @@ func (c *Constructor) reconstructResponse() *http.Response {
 
 // reconstructRequest changes original request with details provided in Constructor Payload.Request
 func (c *Constructor) reconstructRequest() *http.Request {
-	request := c.request
+	// let's default to http
+	if c.payload.Request.Scheme == "" {
+		c.payload.Request.Scheme = "http"
+	}
 
-	request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(c.payload.Request.Body)))
-	request.RequestURI = ""
-	request.Host = c.payload.Request.Destination
+	request, err := http.NewRequest(
+		c.payload.Request.Method,
+		fmt.Sprintf("%s://%s", c.payload.Request.Scheme, c.payload.Request.Destination),
+		ioutil.NopCloser(bytes.NewBuffer([]byte(c.payload.Request.Body))))
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Request reconstruction failed...")
+	}
 	request.Method = c.payload.Request.Method
 	request.URL.Path = c.payload.Request.Path
 	request.URL.RawQuery = c.payload.Request.Query
