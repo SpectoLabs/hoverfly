@@ -221,5 +221,34 @@ func TestModifyRequestNoMiddleware(t *testing.T) {
 
 	_, err = dbClient.modifyRequestResponse(req, dbClient.cfg.middleware)
 	refute(t, err, nil)
+}
+
+func TestGetResponseCorruptedPayload(t *testing.T) {
+
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	requestBody := []byte("fizz=buzz")
+
+	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	req, err := http.NewRequest("POST", "http://capture_body.com", body)
+	expect(t, err, nil)
+
+	_, err = dbClient.captureRequest(req)
+	expect(t, err, nil)
+
+	fp := getRequestFingerprint(req, requestBody)
+
+	dbClient.cache.Set([]byte(fp), []byte("you shall not decode me!"))
+
+	// repeating process
+	bodyNew := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	reqNew, err := http.NewRequest("POST", "http://capture_body.com", bodyNew)
+	expect(t, err, nil)
+	response := dbClient.getResponse(reqNew)
+
+	expect(t, response.StatusCode, http.StatusInternalServerError)
 
 }
