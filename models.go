@@ -199,7 +199,10 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 			return nil, err
 		}
 
-		request = c.reconstructRequest()
+		request, err = c.reconstructRequest()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	resp, err := d.http.Do(request)
