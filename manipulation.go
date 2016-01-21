@@ -17,8 +17,8 @@ type Constructor struct {
 }
 
 // NewConstructor - returns constructor instance
-func NewConstructor(req *http.Request, payload Payload) Constructor {
-	c := Constructor{request: req, payload: payload}
+func NewConstructor(req *http.Request, payload Payload) *Constructor {
+	c := &Constructor{request: req, payload: payload}
 	return c
 }
 
@@ -39,7 +39,7 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 
 	log.WithFields(log.Fields{
 		"middleware": middleware,
-	}).Info("Middleware transformation complete!")
+	}).Debug("Middleware transformation complete!")
 	// override payload with transformed new payload
 	c.payload = newPayload
 
@@ -85,7 +85,7 @@ func (c *Constructor) reconstructRequest() (*http.Request, error) {
 		return nil, fmt.Errorf("failed to reconstruct request, destination not specified")
 	}
 
-	request, err := http.NewRequest(
+	newRequest, err := http.NewRequest(
 		c.payload.Request.Method,
 		fmt.Sprintf("%s://%s", c.payload.Request.Scheme, c.payload.Request.Destination),
 		ioutil.NopCloser(bytes.NewBuffer([]byte(c.payload.Request.Body))))
@@ -96,11 +96,15 @@ func (c *Constructor) reconstructRequest() (*http.Request, error) {
 		}).Error("Request reconstruction failed...")
 		return nil, err
 	}
-	request.Method = c.payload.Request.Method
-	request.URL.Path = c.payload.Request.Path
-	request.URL.RawQuery = c.payload.Request.Query
-	request.RemoteAddr = c.payload.Request.RemoteAddr
-	request.Header = c.payload.Request.Headers
 
-	return request, nil
+	newRequest.Method = c.payload.Request.Method
+	newRequest.URL.Path = c.payload.Request.Path
+	newRequest.URL.RawQuery = c.payload.Request.Query
+	newRequest.RemoteAddr = c.payload.Request.RemoteAddr
+	newRequest.Header = c.payload.Request.Headers
+
+	// overriding original request
+	c.request = newRequest
+
+	return newRequest, nil
 }
