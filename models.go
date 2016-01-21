@@ -405,10 +405,15 @@ func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (
 		"status":      newResponse.StatusCode,
 		"middleware":  middleware,
 		"mode":        "modify",
-		"path":        c.request.URL.Path,
-		"rawQuery":    c.request.URL.RawQuery,
-		"method":      c.request.Method,
-		"destination": c.request.Host,
+		"path":        c.payload.Request.Path,
+		"rawQuery":    c.payload.Request.Query,
+		"method":      c.payload.Request.Method,
+		"destination": c.payload.Request.Destination,
+		// original here
+		"originalPath":        req.URL.Path,
+		"originalRawQuery":    req.URL.RawQuery,
+		"originalMethod":      req.Method,
+		"originalDestination": req.Host,
 	}).Info("request and response modified, returning")
 
 	return newResponse, nil
