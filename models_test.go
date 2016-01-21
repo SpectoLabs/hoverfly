@@ -108,6 +108,17 @@ func TestMatchOnRequestBody(t *testing.T) {
 
 }
 
+func TestGetNotRecordedRequest(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	request, _ := http.NewRequest("POST", "http://capture_body.com", nil)
+
+	response := dbClient.getResponse(request)
+
+	expect(t, response.StatusCode, http.StatusPreconditionFailed)
+}
+
 // TestRequestFingerprint tests whether we get correct request ID
 func TestRequestFingerprint(t *testing.T) {
 
@@ -191,4 +202,100 @@ func TestDecodeRandomBytes(t *testing.T) {
 	bts := []byte("some random stuff here")
 	_, err := decodePayload(bts)
 	refute(t, err, nil)
+}
+
+func TestModifyRequest(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	dbClient.cfg.middleware = "./examples/middleware/modify_request/modify_request.py"
+
+	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
+	expect(t, err, nil)
+
+	response, err := dbClient.modifyRequestResponse(req, dbClient.cfg.middleware)
+	expect(t, err, nil)
+
+	// response should be changed to 202
+	expect(t, response.StatusCode, 202)
+
+}
+
+func TestModifyRequestNoMiddleware(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	dbClient.cfg.middleware = ""
+
+	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
+	expect(t, err, nil)
+
+	_, err = dbClient.modifyRequestResponse(req, dbClient.cfg.middleware)
+	refute(t, err, nil)
+}
+
+func TestGetResponseCorruptedPayload(t *testing.T) {
+
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	requestBody := []byte("fizz=buzz")
+
+	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	req, err := http.NewRequest("POST", "http://capture_body.com", body)
+	expect(t, err, nil)
+
+	_, err = dbClient.captureRequest(req)
+	expect(t, err, nil)
+
+	fp := getRequestFingerprint(req, requestBody)
+
+	dbClient.cache.Set([]byte(fp), []byte("you shall not decode me!"))
+
+	// repeating process
+	bodyNew := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	reqNew, err := http.NewRequest("POST", "http://capture_body.com", bodyNew)
+	expect(t, err, nil)
+	response := dbClient.getResponse(reqNew)
+
+	expect(t, response.StatusCode, http.StatusInternalServerError)
+
+}
+
+func TestDoRequestWFailedMiddleware(t *testing.T) {
+
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	// adding middleware which doesn't exist, doRequest should return error
+	dbClient.cfg.middleware = "./should/not/exist.go"
+
+	requestBody := []byte("fizz=buzz")
+
+	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	req, err := http.NewRequest("POST", "http://capture_body.com", body)
+	expect(t, err, nil)
+
+	_, err = dbClient.doRequest(req)
+	refute(t, err, nil)
+}
+
+func TestDoRequestFailedHTTP(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	// stopping server
+	server.Close()
+
+	requestBody := []byte("fizz=buzz")
+
+	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	req, err := http.NewRequest("POST", "http://capture_body.com", body)
+	expect(t, err, nil)
+
+	_, err = dbClient.doRequest(req)
+	refute(t, err, nil)
+
 }

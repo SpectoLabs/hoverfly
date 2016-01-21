@@ -10,14 +10,15 @@ import (
 )
 
 // synthesizeResponse calls middleware to populate response data, nothing gets pass proxy
-func synthesizeResponse(req *http.Request, middleware string) *http.Response {
+func synthesizeResponse(req *http.Request, middleware string) (*http.Response, error) {
 
-	// this is mainly for testing, since when you create
+	// this is mainly for testing, since when you create a request during tests
+	// its body will be nil, that results in bad things during read
 	if req.Body == nil {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 	}
-	responseBody, err := ioutil.ReadAll(req.Body)
-	req.Body.Close()
+	defer req.Body.Close()
+	requestBody, err := ioutil.ReadAll(req.Body)
 
 	var bodyStr string
 	if err != nil {
@@ -25,9 +26,12 @@ func synthesizeResponse(req *http.Request, middleware string) *http.Response {
 			"middleware": middleware,
 			"error":      err.Error(),
 		}).Error("Failed to read request body when synthesizing response")
-	} else {
-		bodyStr = string(responseBody)
+
+		// creating new error with more info
+		return nil, fmt.Errorf("Synthesize failed, could not read request body - %s", err.Error())
 	}
+
+	bodyStr = string(requestBody)
 
 	request := requestDetails{
 		Path:        req.URL.Path,
@@ -51,17 +55,14 @@ func synthesizeResponse(req *http.Request, middleware string) *http.Response {
 	if middleware != "" {
 		err := c.ApplyMiddleware(middleware)
 		if err != nil {
-			var errorPayload Payload
-			errorPayload.Response.Status = 503
-			errorPayload.Response.Body = fmt.Sprintf("Middleware error: %s", err.Error())
-			c.payload = errorPayload
+			return nil, fmt.Errorf("Synthesize failed, middleware error - %s", err.Error())
 		}
 	} else {
-		c.payload.Response.Body = "Precondition failed: middleware not provided."
-		c.payload.Response.Status = 428
+		return nil, fmt.Errorf("Synthesize failed, middleware not provided")
+
 	}
 
 	response := c.reconstructResponse()
-	return response
+	return response, nil
 
 }

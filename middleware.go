@@ -70,6 +70,7 @@ func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Failed to marshal json")
+		return payload, err
 	}
 	cmds.Stdin = bytes.NewReader(bts)
 
@@ -80,6 +81,7 @@ func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Failed to process pipeline")
+		return payload, err
 	}
 
 	// log stderr

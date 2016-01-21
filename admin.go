@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -38,7 +39,14 @@ func (d *DBClient) startAdminInterface() {
 	// starting admin interface
 	mux := getBoneRouter(*d)
 	n := negroni.Classic()
-	n.Use(negronilogrus.NewMiddleware())
+
+	loglevel := log.WarnLevel
+
+	if d.cfg.verbose {
+		loglevel = log.DebugLevel
+	}
+
+	n.Use(negronilogrus.NewCustomMiddleware(loglevel, &log.JSONFormatter{}, "admin"))
 	n.UseHandler(mux)
 
 	// admin interface starting message
@@ -196,8 +204,13 @@ func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 
 	var response messageResponse
 	if err != nil {
-		response.Message = fmt.Sprintf("Something went wrong: %s", err.Error())
-		w.WriteHeader(500)
+		if err.Error() == "bucket not found" {
+			response.Message = fmt.Sprintf("No records found")
+			w.WriteHeader(200)
+		} else {
+			response.Message = fmt.Sprintf("Something went wrong: %s", err.Error())
+			w.WriteHeader(500)
+		}
 	} else {
 		response.Message = "Proxy cache deleted successfuly"
 		w.WriteHeader(200)
@@ -223,6 +236,11 @@ func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request)
 func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request) {
 	var sr stateRequest
 
+	// this is mainly for testing, since when you create
+	if r.Body == nil {
+		r.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	}
+
 	defer r.Body.Close()
 	body, err := ioutil.ReadAll(r.Body)
 
@@ -239,7 +257,7 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(422) // can't process this entity
+		w.WriteHeader(400) // can't process this entity
 		return
 	}
 
