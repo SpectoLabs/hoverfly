@@ -74,11 +74,15 @@ func (c *Constructor) reconstructResponse() *http.Response {
 	return response
 }
 
-// reconstructRequest changes original request with details provided in Constructor Payload.Request
-func (c *Constructor) reconstructRequest() *http.Request {
-	// let's default to http
+// reconstructRequest replaces original request with details provided in Constructor Payload.Request
+func (c *Constructor) reconstructRequest() (*http.Request, error) {
+	// let's default to what was given
 	if c.payload.Request.Scheme == "" {
-		c.payload.Request.Scheme = "http"
+		c.payload.Request.Scheme = c.request.URL.Scheme
+	}
+
+	if c.payload.Request.Destination == "" {
+		return nil, fmt.Errorf("failed to reconstruct request, destination not specified")
 	}
 
 	request, err := http.NewRequest(
@@ -90,6 +94,7 @@ func (c *Constructor) reconstructRequest() *http.Request {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Request reconstruction failed...")
+		return nil, err
 	}
 	request.Method = c.payload.Request.Method
 	request.URL.Path = c.payload.Request.Path
@@ -97,5 +102,5 @@ func (c *Constructor) reconstructRequest() *http.Request {
 	request.RemoteAddr = c.payload.Request.RemoteAddr
 	request.Header = c.payload.Request.Headers
 
-	return request
+	return request, nil
 }

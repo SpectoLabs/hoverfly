@@ -19,7 +19,8 @@ func TestReconstructRequest(t *testing.T) {
 	payload := Payload{Request: request}
 
 	c := NewConstructor(req, payload)
-	newRequest := c.reconstructRequest()
+	newRequest, err := c.reconstructRequest()
+	expect(t, err, nil)
 	expect(t, newRequest.Method, "POST")
 	expect(t, newRequest.URL.Path, "/random-path")
 	expect(t, newRequest.Host, "changed.destination.com")
@@ -35,8 +36,9 @@ func TestReconstructRequestBodyPayload(t *testing.T) {
 	c.payload.Request.Destination = "newdestination"
 	c.payload.Request.Body = "new request body here"
 
-	newRequest := c.reconstructRequest()
+	newRequest, err := c.reconstructRequest()
 
+	expect(t, err, nil)
 	expect(t, newRequest.Method, "OPTIONS")
 	expect(t, newRequest.Host, "newdestination")
 
@@ -54,9 +56,10 @@ func TestReconstructRequestHeadersPayload(t *testing.T) {
 	payload := Payload{}
 	c := NewConstructor(req, payload)
 	c.payload.Request.Headers = req.Header
+	c.payload.Request.Destination = "destination.com"
 
-	newRequest := c.reconstructRequest()
-
+	newRequest, err := c.reconstructRequest()
+	expect(t, err, nil)
 	expect(t, newRequest.Header.Get("Header"), "ValueX")
 }
 
@@ -79,4 +82,16 @@ func TestReconstructResponseHeadersPayload(t *testing.T) {
 
 	expect(t, response.Header.Get("Header"), headers["Header"][0])
 
+}
+
+func TestReconstructionFailure(t *testing.T) {
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	payload := Payload{}
+	c := NewConstructor(req, payload)
+	c.payload.Request.Method = "GET"
+	c.payload.Request.Body = "new request body here"
+
+	_, err := c.reconstructRequest()
+	refute(t, err, nil)
 }
