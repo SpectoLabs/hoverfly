@@ -402,9 +402,14 @@ func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (
 	newResponse := c.reconstructResponse()
 
 	log.WithFields(log.Fields{
-		"status":     newResponse.StatusCode,
-		"middleware": middleware,
-	}).Info("Response modified, returning")
+		"status":      newResponse.StatusCode,
+		"middleware":  middleware,
+		"mode":        "modify",
+		"path":        c.request.URL.Path,
+		"rawQuery":    c.request.URL.RawQuery,
+		"method":      c.request.Method,
+		"destination": c.request.Host,
+	}).Info("request and response modified, returning")
 
 	return newResponse, nil
 
