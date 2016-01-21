@@ -298,6 +298,10 @@ func getRequestFingerprint(req *http.Request, requestBody []byte) string {
 // getResponse returns stored response from cache
 func (d *DBClient) getResponse(req *http.Request) *http.Response {
 
+	if req.Body == nil {
+		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	}
+
 	reqBody, err := ioutil.ReadAll(req.Body)
 
 	if err != nil {
