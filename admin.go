@@ -40,7 +40,7 @@ func (d *DBClient) startAdminInterface() {
 	mux := getBoneRouter(*d)
 	n := negroni.Classic()
 
-	loglevel := log.InfoLevel
+	loglevel := log.WarnLevel
 
 	if d.cfg.verbose {
 		loglevel = log.DebugLevel

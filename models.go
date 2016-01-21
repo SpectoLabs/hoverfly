@@ -199,7 +199,10 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 			return nil, err
 		}
 
-		request = c.reconstructRequest()
+		request, err = c.reconstructRequest()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	resp, err := d.http.Do(request)
@@ -294,6 +297,10 @@ func getRequestFingerprint(req *http.Request, requestBody []byte) string {
 
 // getResponse returns stored response from cache
 func (d *DBClient) getResponse(req *http.Request) *http.Response {
+
+	if req.Body == nil {
+		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	}
 
 	reqBody, err := ioutil.ReadAll(req.Body)
 
@@ -395,9 +402,19 @@ func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (
 	newResponse := c.reconstructResponse()
 
 	log.WithFields(log.Fields{
-		"status":     newResponse.StatusCode,
-		"middleware": middleware,
-	}).Info("Response modified, returning")
+		"status":      newResponse.StatusCode,
+		"middleware":  middleware,
+		"mode":        "modify",
+		"path":        c.payload.Request.Path,
+		"rawQuery":    c.payload.Request.Query,
+		"method":      c.payload.Request.Method,
+		"destination": c.payload.Request.Destination,
+		// original here
+		"originalPath":        req.URL.Path,
+		"originalRawQuery":    req.URL.RawQuery,
+		"originalMethod":      req.Method,
+		"originalDestination": req.Host,
+	}).Info("request and response modified, returning")
 
 	return newResponse, nil
 

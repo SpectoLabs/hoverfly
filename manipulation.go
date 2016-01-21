@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -16,8 +17,8 @@ type Constructor struct {
 }
 
 // NewConstructor - returns constructor instance
-func NewConstructor(req *http.Request, payload Payload) Constructor {
-	c := Constructor{request: req, payload: payload}
+func NewConstructor(req *http.Request, payload Payload) *Constructor {
+	c := &Constructor{request: req, payload: payload}
 	return c
 }
 
@@ -38,7 +39,7 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 
 	log.WithFields(log.Fields{
 		"middleware": middleware,
-	}).Info("Middleware transformation complete!")
+	}).Debug("Middleware transformation complete!")
 	// override payload with transformed new payload
 	c.payload = newPayload
 
@@ -73,18 +74,37 @@ func (c *Constructor) reconstructResponse() *http.Response {
 	return response
 }
 
-// reconstructRequest changes original request with details provided in Constructor Payload.Request
-func (c *Constructor) reconstructRequest() *http.Request {
-	request := c.request
+// reconstructRequest replaces original request with details provided in Constructor Payload.Request
+func (c *Constructor) reconstructRequest() (*http.Request, error) {
+	// let's default to what was given
+	if c.payload.Request.Scheme == "" {
+		c.payload.Request.Scheme = c.request.URL.Scheme
+	}
 
-	request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(c.payload.Request.Body)))
-	request.RequestURI = ""
-	request.Host = c.payload.Request.Destination
-	request.Method = c.payload.Request.Method
-	request.URL.Path = c.payload.Request.Path
-	request.URL.RawQuery = c.payload.Request.Query
-	request.RemoteAddr = c.payload.Request.RemoteAddr
-	request.Header = c.payload.Request.Headers
+	if c.payload.Request.Destination == "" {
+		return nil, fmt.Errorf("failed to reconstruct request, destination not specified")
+	}
 
-	return request
+	newRequest, err := http.NewRequest(
+		c.payload.Request.Method,
+		fmt.Sprintf("%s://%s", c.payload.Request.Scheme, c.payload.Request.Destination),
+		ioutil.NopCloser(bytes.NewBuffer([]byte(c.payload.Request.Body))))
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Request reconstruction failed...")
+		return nil, err
+	}
+
+	newRequest.Method = c.payload.Request.Method
+	newRequest.URL.Path = c.payload.Request.Path
+	newRequest.URL.RawQuery = c.payload.Request.Query
+	newRequest.RemoteAddr = c.payload.Request.RemoteAddr
+	newRequest.Header = c.payload.Request.Headers
+
+	// overriding original request
+	c.request = newRequest
+
+	return newRequest, nil
 }
