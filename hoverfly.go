@@ -116,6 +116,9 @@ func main() {
 	proxy, dbClient := getNewHoverfly(cfg)
 	defer dbClient.cache.db.Close()
 
+	// starting admin interface
+	go dbClient.startAdminInterface()
+
 	log.Warn(http.ListenAndServe(fmt.Sprintf(":%s", cfg.proxyPort), proxy))
 }
 
@@ -175,8 +178,6 @@ func getNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			return d.processRequest(r)
 		})
-
-	go d.startAdminInterface()
 
 	proxy.Verbose = d.cfg.verbose
 	// proxy starting message
