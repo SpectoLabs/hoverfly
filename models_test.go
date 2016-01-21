@@ -282,3 +282,20 @@ func TestDoRequestWFailedMiddleware(t *testing.T) {
 	_, err = dbClient.doRequest(req)
 	refute(t, err, nil)
 }
+
+func TestDoRequestFailedHTTP(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	// stopping server
+	server.Close()
+
+	requestBody := []byte("fizz=buzz")
+
+	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	req, err := http.NewRequest("POST", "http://capture_body.com", body)
+	expect(t, err, nil)
+
+	_, err = dbClient.doRequest(req)
+	refute(t, err, nil)
+
+}
