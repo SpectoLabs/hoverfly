@@ -108,6 +108,17 @@ func TestMatchOnRequestBody(t *testing.T) {
 
 }
 
+func TestGetNotRecordedRequest(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	request, _ := http.NewRequest("POST", "http://capture_body.com", nil)
+
+	response := dbClient.getResponse(request)
+
+	expect(t, response.StatusCode, http.StatusPreconditionFailed)
+}
+
 // TestRequestFingerprint tests whether we get correct request ID
 func TestRequestFingerprint(t *testing.T) {
 
