@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/boltdb/bolt"
 )
 
@@ -91,6 +92,8 @@ func GetRandomName(n int) []byte {
 }
 
 func setup() {
+	// we don't really want to see what's happening
+	log.SetLevel(log.FatalLevel)
 	db := getDB(testingDatabaseName)
 	TestDB = db
 }
