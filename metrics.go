@@ -14,3 +14,28 @@ type CounterByMode struct {
 	registry                                                            metrics.Registry
 	flushInterval                                                       time.Duration
 }
+
+// NewModeCounter - returns new counter instance
+func NewModeCounter() *CounterByMode {
+
+	registry := metrics.DefaultRegistry
+
+	c := &CounterByMode{
+		counterVirtualize: metrics.NewCounter(),
+		counterCapture:    metrics.NewCounter(),
+		counterModify:     metrics.NewCounter(),
+		counterSynthesize: metrics.NewCounter(),
+		registry:          registry,
+		flushInterval:     5 * time.Second,
+	}
+
+	orPanic(c.registry.Register(fmt.Sprintf(VirtualizeMode), c.counterVirtualize))
+	orPanic(c.registry.Register(fmt.Sprintf(CaptureMode), c.counterCapture))
+	orPanic(c.registry.Register(fmt.Sprintf(ModifyMode), c.counterModify))
+	orPanic(c.registry.Register(fmt.Sprintf(SynthesizeMode), c.counterSynthesize))
+
+	log.Info("new counter created, registration successful")
+
+	return c
+}
+
