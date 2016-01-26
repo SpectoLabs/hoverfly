@@ -96,6 +96,22 @@ func (c *Cache) GetAllRequests() (payloads []Payload, err error) {
 	return
 }
 
+// RecordsCount - returns records count
+func (c *Cache) RecordsCount() (count int, err error) {
+	err = c.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(c.requestsBucket)
+		if b == nil {
+			// bucket doesn't exist
+			return nil
+		}
+
+		count = b.Stats().KeyN
+
+		return nil
+	})
+	return
+}
+
 // DeleteBucket - deletes bucket with all saved data
 func (c *Cache) DeleteBucket(name []byte) (err error) {
 	err = c.db.Update(func(tx *bolt.Tx) error {
