@@ -143,6 +143,34 @@ func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func (d *DBClient) StatsHandler(w http.ResponseWriter, req *http.Request) {
+	stats := d.counter.Flush()
+
+	var sr statsResponse
+	sr.Stats = stats
+
+	w.Header().Set("Content-Type", "application/json")
+
+	b, err := json.Marshal(sr)
+
+	if err != nil {
+		log.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.Write(b)
+		return
+	}
+
+}
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
 // categoryWSFilterHandler is used for searching categories based on names and keywords through the websocket
 func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
