@@ -22,6 +22,19 @@ let WipeRecordsComponent = React.createClass({
     }
 });
 
+let RowWrapper = React.createClass({
+    render() {
+        var name = this.props.name;
+        var val = this.props.val;
+        return (
+            <tr>
+                <td>{name}</td>
+                <td>{val}</td>
+            </tr>
+        )
+    }
+});
+
 let MetricsComponent = React.createClass({
     displayName: "MetricsComponent",
 
