@@ -54,6 +54,8 @@ func main() {
 	// admin port
 	adminPort := flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
 
+	// development
+	dev := flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
 	flag.Parse()
 
 	// getting settings
@@ -72,6 +74,9 @@ func main() {
 	if *adminPort != "" {
 		cfg.adminPort = *adminPort
 	}
+
+	// development settings
+	cfg.development = *dev
 
 	// overriding default middleware setting
 	cfg.middleware = *middleware
