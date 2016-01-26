@@ -29,7 +29,8 @@ type recordsCount struct {
 }
 
 type statsResponse struct {
-	Stats HoverflyStats `json:"stats"`
+	Stats        HoverflyStats `json:"stats"`
+	RecordsCount int           `json:"recordsCount"`
 }
 
 type stateRequest struct {
@@ -127,14 +128,14 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 
 // RecordsCount returns number of captured requests as a JSON payload
 func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
-	records, err := d.cache.GetAllRequests()
+	count, err := d.cache.RecordsCount()
 
 	if err == nil {
 
 		w.Header().Set("Content-Type", "application/json")
 
 		var response recordsCount
-		response.Count = len(records)
+		response.Count = count
 		b, err := json.Marshal(response)
 
 		if err != nil {
@@ -155,11 +156,20 @@ func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// StatsHandler - returns current stats about Hoverfly (request counts, record count)
 func (d *DBClient) StatsHandler(w http.ResponseWriter, req *http.Request) {
 	stats := d.counter.Flush()
 
+	count, err := d.cache.RecordsCount()
+
+	if err != nil {
+		log.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
 	var sr statsResponse
 	sr.Stats = stats
+	sr.RecordsCount = count
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -183,7 +193,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-// categoryWSFilterHandler is used for searching categories based on names and keywords through the websocket
+// StatsWSHandler - returns current stats about Hoverfly (request counts, record count) through the websocket
 func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -202,9 +212,21 @@ func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 
 		for _ = range time.Tick(1 * time.Second) {
 
+			count, err := d.cache.RecordsCount()
+
+			if err != nil {
+				log.WithFields(log.Fields{
+					"message": p,
+					"error":   err.Error(),
+				}).Error("got error while trying to get records count")
+				return
+			}
+
 			stats := d.counter.Flush()
+
 			var sr statsResponse
 			sr.Stats = stats
+			sr.RecordsCount = count
 
 			b, err := json.Marshal(sr)
 
