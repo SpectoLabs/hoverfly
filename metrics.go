@@ -39,3 +39,14 @@ func NewModeCounter() *CounterByMode {
 	return c
 }
 
+func (c *CounterByMode) count(mode string) {
+	if mode == VirtualizeMode {
+		c.counterVirtualize.Inc(1)
+	} else if mode == CaptureMode {
+		c.counterCapture.Inc(1)
+	} else if mode == ModifyMode {
+		c.counterModify.Inc(1)
+	} else if mode == SynthesizeMode {
+		c.counterModify.Inc(1)
+	}
+}
