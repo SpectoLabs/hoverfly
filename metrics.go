@@ -65,3 +65,29 @@ type HoverflyStats struct {
 	Gauges      map[string]int64   `json:"gauges,omitempty"`
 	GaugesFloat map[string]float64 `json:"gautesFloat,omitempty"`
 }
+
+// Flush gets current metrics from stats registry
+func (c *CounterByMode) Flush() (h HoverflyStats) {
+
+	counters := make(map[string]int64)
+	gauges := make(map[string]int64)
+	gaugesFloat := make(map[string]float64)
+
+	c.registry.Each(func(name string, i interface{}) {
+		switch metric := i.(type) {
+		case metrics.Counter:
+			//log.Info(fmt.Sprintf("%s.count %d", name, metric.Count()))
+			counters[name] = metric.Count()
+		case metrics.Gauge:
+			gauges[name] = metric.Value()
+			//fmt.Fprintf(w, "%s.%s.value %d %d\n", c.Prefix, name, metric.Value(), now)
+		case metrics.GaugeFloat64:
+			gaugesFloat[name] = metric.Value()
+		}
+	})
+
+	h.Counters = counters
+	h.Gauges = gauges
+	h.GaugesFloat = gaugesFloat
+	return
+}
