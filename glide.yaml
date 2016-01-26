@@ -7,3 +7,5 @@ import:
   - package: github.com/go-zoo/bone
   - package: github.com/boltdb/bolt
   - package: github.com/rakyll/statik
+  - package: github.com/rcrowley/go-metrics
+  - package: github.com/gorilla/websocket
