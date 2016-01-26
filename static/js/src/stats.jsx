@@ -102,6 +102,23 @@ let StatsComponent = React.createClass({
             this.state.ws.send("hi");
         }
     },
+
+    // Make the function wait until the connection is made...
+    waitForSocketConnection(socket, callback){
+        setTimeout(
+            function () {
+                if (socket.readyState === 1) {
+                    if (callback != null) {
+                        callback();
+                    }
+                } else {
+                    this.waitForSocketConnection(socket, callback);
+
+                }
+
+            }.bind(this), 5); // wait 5 ms for the connection...
+    },
+
     componentDidMount() {
         setInterval(this.fetchData, parseInt(this.state.interval));
     },
