@@ -59,3 +59,9 @@ func (c *CounterByMode) Init() {
 	}
 }
 
+// HoverflyStats - holds information about various system metrics like requests counts
+type HoverflyStats struct {
+	Counters    map[string]int64   `json:"counters"`
+	Gauges      map[string]int64   `json:"gauges,omitempty"`
+	GaugesFloat map[string]float64 `json:"gautesFloat,omitempty"`
+}
