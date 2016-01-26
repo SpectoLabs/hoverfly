@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	// static assets
 	_ "github.com/SpectoLabs/hoverfly/statik"
@@ -14,6 +15,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
+	"github.com/gorilla/websocket"
 	"github.com/meatballhat/negroni-logrus"
 )
 
@@ -24,6 +26,10 @@ type recordedRequests struct {
 
 type recordsCount struct {
 	Count int `json:"count"`
+}
+
+type statsResponse struct {
+	Stats HoverflyStats `json:"stats"`
 }
 
 type stateRequest struct {
@@ -74,6 +80,8 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	mux.Post("/records", http.HandlerFunc(d.ImportRecordsHandler))
 
 	mux.Get("/count", http.HandlerFunc(d.RecordsCount))
+	mux.Get("/stats", http.HandlerFunc(d.StatsHandler))
+	mux.Get("/statsws", http.HandlerFunc(d.StatsWSHandler))
 
 	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
 	mux.Post("/state", http.HandlerFunc(d.StateHandler))
