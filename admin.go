@@ -143,6 +143,44 @@ func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// categoryWSFilterHandler is used for searching categories based on names and keywords through the websocket
+func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for {
+		messageType, p, err := conn.ReadMessage()
+		if err != nil {
+			return
+		}
+		log.WithFields(log.Fields{
+			"message": string(p),
+		}).Info("Got message...")
+
+		for _ = range time.Tick(1 * time.Second) {
+
+			stats := d.counter.Flush()
+			var sr statsResponse
+			sr.Stats = stats
+
+			b, err := json.Marshal(sr)
+
+			if err = conn.WriteMessage(messageType, b); err != nil {
+				log.WithFields(log.Fields{
+					"message": p,
+					"error":   err.Error(),
+				}).Error("Got error when writing message...")
+				return
+			}
+		}
+
+	}
+
+}
+
 // ImportRecordsHandler - accepts JSON payload and saves it to cache
 func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request) {
 
