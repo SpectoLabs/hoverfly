@@ -50,3 +50,12 @@ func (c *CounterByMode) count(mode string) {
 		c.counterModify.Inc(1)
 	}
 }
+
+// Init initializes logging
+func (c *CounterByMode) Init() {
+	for _ = range time.Tick(c.flushInterval) {
+		m := c.Flush()
+		log.WithFields(log.Fields{"counters": m.Counters}).Info("hoverfly metrics")
+	}
+}
+
