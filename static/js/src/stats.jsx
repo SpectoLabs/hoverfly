@@ -71,14 +71,32 @@ let MetricsComponent = React.createClass({
     }
 
 });
+
 let StatsComponent = React.createClass({
     displayName: "StatsComponent",
 
     getInitialState() {
         return {
+            "ws": null,
             "records": null,
+            "counters": null,
             "interval": 1000
         }
+    },
+
+    componentWillMount() {
+        if ("WebSocket" in window) {
+            this.state.ws = new WebSocket("ws:/" + window.location.host + "/statsws");
+
+            this.state.ws.onclose = function () {
+                console.log("Connection is closed ...");
+                this.state.ws = null;
+            }.bind(this);
+
+        } else {
+            console.log("WebSocket not supported by your browser.");
+        }
+
     },
 
     fetchData() {
@@ -144,18 +162,21 @@ let StatsComponent = React.createClass({
         if (this.state.records == 0) {
             msg = "No records available.";
         } else if (this.state.records == 1) {
-            msg = "Currently there is 1 record."
+            msg = "Currently there is 1 captured request."
         } else if (this.state.records > 1) {
-            msg = "Currently there are " + this.state.records + " records."
+            msg = "Currently there are " + this.state.records + " captured requests."
         }
 
         return (
             <div>
-                <div className="two-thirds column">
+                <div className="one-third column">
                     <WipeRecordsComponent parent={this}/>
                 </div>
                 <div className="one-third column">
                     {msg}
+                </div>
+                <div className="one-third column">
+                    <MetricsComponent counters={this.state.counters} />
                 </div>
 
 
@@ -163,5 +184,6 @@ let StatsComponent = React.createClass({
         )
     }
 });
+
 
 module.exports = StatsComponent;
