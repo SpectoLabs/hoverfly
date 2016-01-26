@@ -120,7 +120,23 @@ let StatsComponent = React.createClass({
     },
 
     componentDidMount() {
-        setInterval(this.fetchData, parseInt(this.state.interval));
+        if (this.state.ws != null) {
+            this.waitForSocketConnection(this.state.ws, this.greetWebsocket);
+
+            // getting response with data
+            this.state.ws.onmessage = function (response) {
+                let parsedData = JSON.parse(response.data);
+                this.setState({
+                    "records": parsedData.recordsCount,
+                    "counters": parsedData.stats.counters
+                });
+            }.bind(this);
+
+        } else {
+            console.log("fetching data manually:(");
+            // setInterval(this.fetchData, parseInt(this.state.interval));
+        }
+
     },
 
     render() {
