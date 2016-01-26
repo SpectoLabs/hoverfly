@@ -97,6 +97,11 @@ let StatsComponent = React.createClass({
             });
     },
 
+    greetWebsocket() {
+        if (this.state.ws.readyState != this.state.ws.open) {
+            this.state.ws.send("hi");
+        }
+    },
     componentDidMount() {
         setInterval(this.fetchData, parseInt(this.state.interval));
     },
