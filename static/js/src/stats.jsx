@@ -1,5 +1,7 @@
 import React from 'react';
 import request from 'superagent';
+var $ = require('jquery');
+
 
 let WipeRecordsComponent = React.createClass({
     displayName: "WipeRecordsComponent",
@@ -20,6 +22,42 @@ let WipeRecordsComponent = React.createClass({
     }
 });
 
+let MetricsComponent = React.createClass({
+    displayName: "MetricsComponent",
+
+    getRows() {
+        let rows = [];
+        let metrics = this.props.counters;
+
+        $.each(metrics, function (key, value) {
+            rows.push(
+                <RowWrapper key={key} name={key} val={value} />)
+        });
+
+        return rows
+    },
+
+    render() {
+
+        let rows = this.getRows();
+
+        return (
+            <table className="u-full-width">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                {rows}
+                </tbody>
+            </table>
+        )
+
+    }
+
+});
 let StatsComponent = React.createClass({
     displayName: "StatsComponent",
 
