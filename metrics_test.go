@@ -11,3 +11,11 @@ func TestVirtualizeInc(t *testing.T) {
 
 	expect(t, int(counter.counterVirtualize.Count()), 1)
 }
+
+func TestCaptureInc(t *testing.T) {
+	counter := NewModeCounter()
+
+	counter.Count(CaptureMode)
+
+	expect(t, int(counter.counterCapture.Count()), 1)
+}
