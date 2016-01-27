@@ -33,11 +33,12 @@ func NewModeCounter() *CounterByMode {
 	c.registry.GetOrRegister(ModifyMode, c.counterModify)
 	c.registry.GetOrRegister(SynthesizeMode, c.counterSynthesize)
 
-	log.Info("new counter created, registration successful")
+	log.Debug("new counter created, registration successful")
 
 	return c
 }
 
+// Count - counts requests based on mode
 func (c *CounterByMode) Count(mode string) {
 	if mode == VirtualizeMode {
 		c.counterVirtualize.Inc(1)
@@ -75,11 +76,9 @@ func (c *CounterByMode) Flush() (h HoverflyStats) {
 	c.registry.Each(func(name string, i interface{}) {
 		switch metric := i.(type) {
 		case metrics.Counter:
-			//log.Info(fmt.Sprintf("%s.count %d", name, metric.Count()))
 			counters[name] = metric.Count()
 		case metrics.Gauge:
 			gauges[name] = metric.Value()
-			//fmt.Fprintf(w, "%s.%s.value %d %d\n", c.Prefix, name, metric.Value(), now)
 		case metrics.GaugeFloat64:
 			gaugesFloat[name] = metric.Value()
 		}
