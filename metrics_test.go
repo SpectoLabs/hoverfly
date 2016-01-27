@@ -35,3 +35,13 @@ func TestSynthesizeInc(t *testing.T) {
 
 	expect(t, int(counter.counterSynthesize.Count()), 1)
 }
+
+func TestFlush(t *testing.T) {
+	counter := NewModeCounter()
+
+	counter.counterVirtualize.Inc(1)
+
+	fl := counter.Flush()
+
+	expect(t, int(fl.Counters[VirtualizeMode]), 1)
+}
