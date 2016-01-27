@@ -19,6 +19,10 @@
 [submodule "statik"]
     path = vendor/github.com/rakyll/statik
     url = https://github.com/rakyll/statik
-
-
+[submodule "websocket"]
+    path = vendor/github.com/gorilla/websocket
+    url = https://github.com/gorilla/websocket
+[submodule "go-metrics"]
+    path = vendor/github.com/rcrowley/go-metrics
+    url = https://github.com/rcrowley/go-metrics
 
