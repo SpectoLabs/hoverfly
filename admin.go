@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	// static assets
 	_ "github.com/SpectoLabs/hoverfly/statik"
@@ -14,6 +15,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
+	"github.com/gorilla/websocket"
 	"github.com/meatballhat/negroni-logrus"
 )
 
@@ -24,6 +26,11 @@ type recordedRequests struct {
 
 type recordsCount struct {
 	Count int `json:"count"`
+}
+
+type statsResponse struct {
+	Stats        HoverflyStats `json:"stats"`
+	RecordsCount int           `json:"recordsCount"`
 }
 
 type stateRequest struct {
@@ -74,11 +81,17 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	mux.Post("/records", http.HandlerFunc(d.ImportRecordsHandler))
 
 	mux.Get("/count", http.HandlerFunc(d.RecordsCount))
+	mux.Get("/stats", http.HandlerFunc(d.StatsHandler))
+	mux.Get("/statsws", http.HandlerFunc(d.StatsWSHandler))
 
 	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
 	mux.Post("/state", http.HandlerFunc(d.StateHandler))
 
-	mux.Handle("/*", http.FileServer(statikFS))
+	if d.cfg.development {
+		mux.Handle("/*", http.FileServer(http.Dir("static/dist")))
+	} else {
+		mux.Handle("/*", http.FileServer(statikFS))
+	}
 
 	return mux
 }
@@ -115,14 +128,14 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 
 // RecordsCount returns number of captured requests as a JSON payload
 func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
-	records, err := d.cache.GetAllRequests()
+	count, err := d.cache.RecordsCount()
 
 	if err == nil {
 
 		w.Header().Set("Content-Type", "application/json")
 
 		var response recordsCount
-		response.Count = len(records)
+		response.Count = count
 		b, err := json.Marshal(response)
 
 		if err != nil {
@@ -141,6 +154,93 @@ func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(500) // can't process this entity
 		return
 	}
+}
+
+// StatsHandler - returns current stats about Hoverfly (request counts, record count)
+func (d *DBClient) StatsHandler(w http.ResponseWriter, req *http.Request) {
+	stats := d.counter.Flush()
+
+	count, err := d.cache.RecordsCount()
+
+	if err != nil {
+		log.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	var sr statsResponse
+	sr.Stats = stats
+	sr.RecordsCount = count
+
+	w.Header().Set("Content-Type", "application/json")
+
+	b, err := json.Marshal(sr)
+
+	if err != nil {
+		log.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.Write(b)
+		return
+	}
+
+}
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+// StatsWSHandler - returns current stats about Hoverfly (request counts, record count) through the websocket
+func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for {
+		messageType, p, err := conn.ReadMessage()
+		if err != nil {
+			return
+		}
+		log.WithFields(log.Fields{
+			"message": string(p),
+		}).Info("Got message...")
+
+		for _ = range time.Tick(1 * time.Second) {
+
+			count, err := d.cache.RecordsCount()
+
+			if err != nil {
+				log.WithFields(log.Fields{
+					"message": p,
+					"error":   err.Error(),
+				}).Error("got error while trying to get records count")
+				return
+			}
+
+			stats := d.counter.Flush()
+
+			var sr statsResponse
+			sr.Stats = stats
+			sr.RecordsCount = count
+
+			b, err := json.Marshal(sr)
+
+			if err = conn.WriteMessage(messageType, b); err != nil {
+				log.WithFields(log.Fields{
+					"message": p,
+					"error":   err.Error(),
+				}).Error("Got error when writing message...")
+				return
+			}
+		}
+
+	}
+
 }
 
 // ImportRecordsHandler - accepts JSON payload and saves it to cache

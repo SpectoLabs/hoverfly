@@ -34,9 +34,6 @@ func orPanic(err error) {
 }
 
 func main() {
-	// Output to stderr instead of stdout, could also be a file.
-	//	log.SetOutput(os.Stderr)
-	//	log.SetFormatter(&log.TextFormatter{})
 	log.SetFormatter(&log.JSONFormatter{})
 
 	// getting proxy configuration
@@ -54,6 +51,12 @@ func main() {
 	// admin port
 	adminPort := flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
 
+	// metrics
+	metrics := flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
+
+	// development
+	dev := flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
+
 	flag.Parse()
 
 	// getting settings
@@ -65,6 +68,11 @@ func main() {
 	}
 	cfg.verbose = *verbose
 
+	if *dev {
+		// making text pretty
+		log.SetFormatter(&log.TextFormatter{})
+	}
+
 	// overriding environment variables (proxy and admin ports)
 	if *proxyPort != "" {
 		cfg.proxyPort = *proxyPort
@@ -72,6 +80,9 @@ func main() {
 	if *adminPort != "" {
 		cfg.adminPort = *adminPort
 	}
+
+	// development settings
+	cfg.development = *dev
 
 	// overriding default middleware setting
 	cfg.middleware = *middleware
@@ -119,6 +130,11 @@ func main() {
 	// starting admin interface
 	go dbClient.startAdminInterface()
 
+	// start metrics registry flush
+	if *metrics {
+		go dbClient.counter.Init()
+	}
+
 	log.Warn(http.ListenAndServe(fmt.Sprintf(":%s", cfg.proxyPort), proxy))
 }
 
@@ -133,11 +149,14 @@ func getNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 		requestsBucket: []byte(requestsBucketName),
 	}
 
+	counter := NewModeCounter()
+
 	// getting connections
 	d := DBClient{
-		cache: cache,
-		http:  &http.Client{},
-		cfg:   cfg,
+		cache:   cache,
+		http:    &http.Client{},
+		cfg:     cfg,
+		counter: counter,
 	}
 
 	// creating proxy
@@ -177,6 +196,13 @@ func getNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(cfg.destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			return d.processRequest(r)
+		})
+
+	// intercepts response
+	proxy.OnResponse(goproxy.ReqHostMatches(regexp.MustCompile(cfg.destination))).DoFunc(
+		func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
+			d.counter.Count(d.cfg.GetMode())
+			return resp
 		})
 
 	proxy.Verbose = d.cfg.verbose

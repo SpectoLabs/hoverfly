@@ -389,7 +389,7 @@ func TestSetNoBody(t *testing.T) {
 	// setting mode to virtualize
 	dbClient.cfg.SetMode("virtualize")
 
-	// deleting through handler
+	// setting state
 	req, err := http.NewRequest("POST", "/state", nil)
 	expect(t, err, nil)
 	//The response recorder used to record HTTP responses
@@ -400,4 +400,161 @@ func TestSetNoBody(t *testing.T) {
 
 	// checking mode, should not have changed
 	expect(t, dbClient.cfg.GetMode(), "virtualize")
+}
+
+func TestStatsHandler(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	m := getBoneRouter(*dbClient)
+
+	// deleting through handler
+	req, err := http.NewRequest("GET", "/stats", nil)
+
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+}
+
+func TestStatsHandlerVirtualizeMetrics(t *testing.T) {
+	// test metrics, increases virtualize count by 1 and then checks through stats
+	// handler whether it is visible through /stats handler
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	m := getBoneRouter(*dbClient)
+
+	dbClient.counter.counterVirtualize.Inc(1)
+
+	req, err := http.NewRequest("GET", "/stats", nil)
+
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(rec.Body)
+
+	sr := statsResponse{}
+	err = json.Unmarshal(body, &sr)
+
+	expect(t, int(sr.Stats.Counters[VirtualizeMode]), 1)
+}
+
+func TestStatsHandlerCaptureMetrics(t *testing.T) {
+	// test metrics, increases capture count by 1 and then checks through stats
+	// handler whether it is visible through /stats handler
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	m := getBoneRouter(*dbClient)
+
+	dbClient.counter.counterCapture.Inc(1)
+
+	req, err := http.NewRequest("GET", "/stats", nil)
+
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(rec.Body)
+
+	sr := statsResponse{}
+	err = json.Unmarshal(body, &sr)
+
+	expect(t, int(sr.Stats.Counters[CaptureMode]), 1)
+}
+
+func TestStatsHandlerModifyMetrics(t *testing.T) {
+	// test metrics, increases modify count by 1 and then checks through stats
+	// handler whether it is visible through /stats handler
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	m := getBoneRouter(*dbClient)
+
+	dbClient.counter.counterModify.Inc(1)
+
+	req, err := http.NewRequest("GET", "/stats", nil)
+
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(rec.Body)
+
+	sr := statsResponse{}
+	err = json.Unmarshal(body, &sr)
+
+	expect(t, int(sr.Stats.Counters[ModifyMode]), 1)
+}
+
+func TestStatsHandlerSynthesizeMetrics(t *testing.T) {
+	// test metrics, increases synthesize count by 1 and then checks through stats
+	// handler whether it is visible through /stats handler
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	m := getBoneRouter(*dbClient)
+
+	dbClient.counter.counterSynthesize.Inc(1)
+
+	req, err := http.NewRequest("GET", "/stats", nil)
+
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(rec.Body)
+
+	sr := statsResponse{}
+	err = json.Unmarshal(body, &sr)
+
+	expect(t, int(sr.Stats.Counters[SynthesizeMode]), 1)
+}
+
+func TestStatsHandlerRecordCountMetrics(t *testing.T) {
+	// test metrics, adds 5 new requests and then checks through stats
+	// handler whether it is visible through /stats handler
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	m := getBoneRouter(*dbClient)
+
+	// inserting some payloads
+	for i := 0; i < 5; i++ {
+		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
+		expect(t, err, nil)
+		dbClient.captureRequest(req)
+	}
+
+	req, err := http.NewRequest("GET", "/stats", nil)
+
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(rec.Body)
+
+	sr := statsResponse{}
+	err = json.Unmarshal(body, &sr)
+
+	expect(t, int(sr.RecordsCount), 5)
 }

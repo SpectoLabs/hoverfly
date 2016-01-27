@@ -14,9 +14,10 @@ import (
 
 // DBClient provides access to cache, http client and configuration
 type DBClient struct {
-	cache Cache
-	http  *http.Client
-	cfg   *Configuration
+	cache   Cache
+	http    *http.Client
+	cfg     *Configuration
+	counter *CounterByMode
 }
 
 // request holds structure for request
