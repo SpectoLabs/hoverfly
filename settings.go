@@ -14,6 +14,7 @@ type Configuration struct {
 	middleware   string
 	databaseName string
 	verbose      bool
+	development  bool
 
 	mu sync.Mutex
 }

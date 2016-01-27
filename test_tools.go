@@ -62,11 +62,13 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	cache := Cache{db: TestDB, requestsBucket: bucket}
 
 	cfg := InitSettings()
+	counter := NewModeCounter()
 	// preparing client
 	dbClient := &DBClient{
-		http:  &http.Client{Transport: tr},
-		cache: cache,
-		cfg:   cfg,
+		http:    &http.Client{Transport: tr},
+		cache:   cache,
+		cfg:     cfg,
+		counter: counter,
 	}
 	return server, dbClient
 }
