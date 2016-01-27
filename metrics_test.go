@@ -19,3 +19,11 @@ func TestCaptureInc(t *testing.T) {
 
 	expect(t, int(counter.counterCapture.Count()), 1)
 }
+
+func TestModifyInc(t *testing.T) {
+	counter := NewModeCounter()
+
+	counter.Count(ModifyMode)
+
+	expect(t, int(counter.counterModify.Count()), 1)
+}
