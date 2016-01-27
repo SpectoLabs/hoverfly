@@ -401,3 +401,21 @@ func TestSetNoBody(t *testing.T) {
 	// checking mode, should not have changed
 	expect(t, dbClient.cfg.GetMode(), "virtualize")
 }
+
+func TestStatsHandler(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	m := getBoneRouter(*dbClient)
+
+	// deleting through handler
+	req, err := http.NewRequest("GET", "/stats", nil)
+
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+}
+
