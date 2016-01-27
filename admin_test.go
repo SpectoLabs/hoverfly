@@ -389,7 +389,7 @@ func TestSetNoBody(t *testing.T) {
 	// setting mode to virtualize
 	dbClient.cfg.SetMode("virtualize")
 
-	// deleting through handler
+	// setting state
 	req, err := http.NewRequest("POST", "/state", nil)
 	expect(t, err, nil)
 	//The response recorder used to record HTTP responses
@@ -525,4 +525,36 @@ func TestStatsHandlerSynthesizeMetrics(t *testing.T) {
 	err = json.Unmarshal(body, &sr)
 
 	expect(t, int(sr.Stats.Counters[SynthesizeMode]), 1)
+}
+
+func TestStatsHandlerRecordCountMetrics(t *testing.T) {
+	// test metrics, increases synthesize count by 1 and then checks through stats
+	// handler whether it is visible through /stats handler
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	m := getBoneRouter(*dbClient)
+
+	// inserting some payloads
+	for i := 0; i < 5; i++ {
+		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
+		expect(t, err, nil)
+		dbClient.captureRequest(req)
+	}
+
+	req, err := http.NewRequest("GET", "/stats", nil)
+
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(rec.Body)
+
+	sr := statsResponse{}
+	err = json.Unmarshal(body, &sr)
+
+	expect(t, int(sr.RecordsCount), 5)
 }
