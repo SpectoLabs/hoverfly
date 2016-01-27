@@ -17,7 +17,7 @@ type CounterByMode struct {
 // NewModeCounter - returns new counter instance
 func NewModeCounter() *CounterByMode {
 
-	registry := metrics.DefaultRegistry
+	registry := metrics.NewRegistry()
 
 	c := &CounterByMode{
 		counterVirtualize: metrics.NewCounter(),
@@ -63,7 +63,7 @@ func (c *CounterByMode) Init() {
 type HoverflyStats struct {
 	Counters    map[string]int64   `json:"counters"`
 	Gauges      map[string]int64   `json:"gauges,omitempty"`
-	GaugesFloat map[string]float64 `json:"gautesFloat,omitempty"`
+	GaugesFloat map[string]float64 `json:"gaugesFloat,omitempty"`
 }
 
 // Flush gets current metrics from stats registry
