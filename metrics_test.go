@@ -27,3 +27,11 @@ func TestModifyInc(t *testing.T) {
 
 	expect(t, int(counter.counterModify.Count()), 1)
 }
+
+func TestSynthesizeInc(t *testing.T) {
+	counter := NewModeCounter()
+
+	counter.Count(SynthesizeMode)
+
+	expect(t, int(counter.counterSynthesize.Count()), 1)
+}
