@@ -528,7 +528,7 @@ func TestStatsHandlerSynthesizeMetrics(t *testing.T) {
 }
 
 func TestStatsHandlerRecordCountMetrics(t *testing.T) {
-	// test metrics, increases synthesize count by 1 and then checks through stats
+	// test metrics, adds 5 new requests and then checks through stats
 	// handler whether it is visible through /stats handler
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
