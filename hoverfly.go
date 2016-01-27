@@ -34,9 +34,6 @@ func orPanic(err error) {
 }
 
 func main() {
-	// Output to stderr instead of stdout, could also be a file.
-	//	log.SetOutput(os.Stderr)
-	//	log.SetFormatter(&log.TextFormatter{})
 	log.SetFormatter(&log.JSONFormatter{})
 
 	// getting proxy configuration
@@ -70,6 +67,11 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 	}
 	cfg.verbose = *verbose
+
+	if *dev {
+		// making text pretty
+		log.SetFormatter(&log.TextFormatter{})
+	}
 
 	// overriding environment variables (proxy and admin ports)
 	if *proxyPort != "" {
