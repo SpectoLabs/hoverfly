@@ -23,6 +23,8 @@ let WipeRecordsComponent = React.createClass({
 });
 
 let RowWrapper = React.createClass({
+    displayName: "RowWrapper",
+
     render() {
         var name = this.props.name;
         var val = this.props.val;
@@ -89,12 +91,16 @@ let StatsComponent = React.createClass({
             this.state.ws = new WebSocket("ws:/" + window.location.host + "/statsws");
 
             this.state.ws.onclose = function () {
-                console.log("Connection is closed ...");
+                console.log("Connection is closed, fetching manually");
                 this.state.ws = null;
+                // starting to fetch manually
+                setInterval(this.fetchFromHTTP, parseInt(this.state.interval));
             }.bind(this);
 
         } else {
             console.log("WebSocket not supported by your browser.");
+            // starting to fetch manually
+            setInterval(this.fetchFromHTTP, parseInt(this.state.interval));
         }
 
     },
@@ -131,10 +137,24 @@ let StatsComponent = React.createClass({
                     }
                 } else {
                     this.waitForSocketConnection(socket, callback);
-
                 }
-
             }.bind(this), 5); // wait 5 ms for the connection...
+    },
+
+    // fetch counter stats, captured request count through HTTP API
+    fetchFromHTTP() {
+        var url = '/stats';
+        request
+            .get(url)
+            .end(function (err, res) {
+                if (err) throw err;
+                if (this.isMounted()) {
+                    this.setState({
+                        "records": res.body.recordsCount,
+                        "counters": res.body.stats.counters
+                    });
+                }
+            }.bind(this));
     },
 
     componentDidMount() {
@@ -152,9 +172,8 @@ let StatsComponent = React.createClass({
 
         } else {
             console.log("fetching data manually:(");
-            // setInterval(this.fetchData, parseInt(this.state.interval));
+             setInterval(this.fetchFromHTTP, parseInt(this.state.interval));
         }
-
     },
 
     render() {
