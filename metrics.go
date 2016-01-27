@@ -46,7 +46,7 @@ func (c *CounterByMode) Count(mode string) {
 	} else if mode == ModifyMode {
 		c.counterModify.Inc(1)
 	} else if mode == SynthesizeMode {
-		c.counterModify.Inc(1)
+		c.counterSynthesize.Inc(1)
 	}
 }
 
