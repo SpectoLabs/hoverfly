@@ -199,7 +199,7 @@ func getNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 	// intercepts response
 	proxy.OnResponse(goproxy.ReqHostMatches(regexp.MustCompile(cfg.destination))).DoFunc(
 		func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
-			d.counter.count(d.cfg.GetMode())
+			d.counter.Count(d.cfg.GetMode())
 			return resp
 		})
 
