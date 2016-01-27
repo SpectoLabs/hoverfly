@@ -4,7 +4,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/rcrowley/go-metrics"
 
-	"fmt"
 	"time"
 )
 
@@ -29,17 +28,17 @@ func NewModeCounter() *CounterByMode {
 		flushInterval:     5 * time.Second,
 	}
 
-	orPanic(c.registry.Register(fmt.Sprintf(VirtualizeMode), c.counterVirtualize))
-	orPanic(c.registry.Register(fmt.Sprintf(CaptureMode), c.counterCapture))
-	orPanic(c.registry.Register(fmt.Sprintf(ModifyMode), c.counterModify))
-	orPanic(c.registry.Register(fmt.Sprintf(SynthesizeMode), c.counterSynthesize))
+	c.registry.GetOrRegister(VirtualizeMode, c.counterVirtualize)
+	c.registry.GetOrRegister(CaptureMode, c.counterCapture)
+	c.registry.GetOrRegister(ModifyMode, c.counterModify)
+	c.registry.GetOrRegister(SynthesizeMode, c.counterSynthesize)
 
 	log.Info("new counter created, registration successful")
 
 	return c
 }
 
-func (c *CounterByMode) count(mode string) {
+func (c *CounterByMode) Count(mode string) {
 	if mode == VirtualizeMode {
 		c.counterVirtualize.Inc(1)
 	} else if mode == CaptureMode {
