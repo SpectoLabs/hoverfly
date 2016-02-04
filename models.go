@@ -177,6 +177,35 @@ func extractBody(resp *http.Response) (extract []byte, err error) {
 	return extract, nil
 }
 
+// getRequestDetails - extracts request details, reads request body so it will be empty.
+func getRequestDetails(req *http.Request) (requestObj requestDetails, err error) {
+	if req.Body == nil {
+		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	}
+
+	reqBody, err := ioutil.ReadAll(req.Body)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+			"mode":  "capture",
+		}).Error("Got error while reading request body")
+		return
+	}
+
+	requestObj = requestDetails{
+		Path:        req.URL.Path,
+		Method:      req.Method,
+		Destination: req.Host,
+		Scheme:      req.URL.Scheme,
+		Query:       req.URL.RawQuery,
+		Body:        string(reqBody),
+		RemoteAddr:  req.RemoteAddr,
+		Headers:     req.Header,
+	}
+	return
+}
+
 // doRequest performs original request and returns response that should be returned to client and error (if there is one)
 func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 
@@ -184,10 +213,17 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 	request.RequestURI = ""
 
 	if d.cfg.middleware != "" {
+		// middleware is provided, modifying request
 		var payload Payload
 
+		rd, err := getRequestDetails(request)
+		if err != nil {
+			return nil, err
+		}
+		payload.Request = rd
+
 		c := NewConstructor(request, payload)
-		err := c.ApplyMiddleware(d.cfg.middleware)
+		err = c.ApplyMiddleware(d.cfg.middleware)
 
 		if err != nil {
 			log.WithFields(log.Fields{
