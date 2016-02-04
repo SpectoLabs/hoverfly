@@ -221,6 +221,24 @@ func TestModifyRequest(t *testing.T) {
 
 }
 
+func TestModifyRequestWODestination(t *testing.T) {
+	// tests modify mode but uses different middleware to not supply destination
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	dbClient.cfg.middleware = "./examples/middleware/modify_response/modify_response.py"
+
+	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
+	expect(t, err, nil)
+
+	response, err := dbClient.modifyRequestResponse(req, dbClient.cfg.middleware)
+	expect(t, err, nil)
+
+	// response should be changed to 201
+	expect(t, response.StatusCode, 201)
+
+}
+
 func TestModifyRequestNoMiddleware(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
