@@ -284,7 +284,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 				}).Error("Failed to encode payload")
 			} else {
 				// recalculating request hash and storing it in database
-				r := RequestContainer{details: pl.Request}
+				r := RequestContainer{Details: pl.Request}
 				d.Cache.Set([]byte(r.Hash()), bts)
 			}
 		}

@@ -22,7 +22,7 @@ type DBClient struct {
 
 // RequestContainer holds structure for request
 type RequestContainer struct {
-	details RequestDetails
+	Details RequestDetails
 }
 
 var emptyResp = &http.Response{}
@@ -42,11 +42,11 @@ type RequestDetails struct {
 func (r *RequestContainer) concatenate() string {
 	var buffer bytes.Buffer
 
-	buffer.WriteString(r.details.Destination)
-	buffer.WriteString(r.details.Path)
-	buffer.WriteString(r.details.Method)
-	buffer.WriteString(r.details.Query)
-	buffer.WriteString(r.details.Body)
+	buffer.WriteString(r.Details.Destination)
+	buffer.WriteString(r.Details.Path)
+	buffer.WriteString(r.Details.Method)
+	buffer.WriteString(r.Details.Query)
+	buffer.WriteString(r.Details.Body)
 
 	return buffer.String()
 }
@@ -236,7 +236,7 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 			return nil, err
 		}
 
-		request, err = c.reconstructRequest()
+		request, err = c.ReconstructRequest()
 		if err != nil {
 			return nil, err
 		}
@@ -328,7 +328,7 @@ func getRequestFingerprint(req *http.Request, requestBody []byte) string {
 		Body:        string(requestBody),
 	}
 
-	r := RequestContainer{details: details}
+	r := RequestContainer{Details: details}
 	return r.Hash()
 }
 
@@ -369,7 +369,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 			_ = c.ApplyMiddleware(d.Cfg.Middleware)
 		}
 
-		response := c.reconstructResponse()
+		response := c.ReconstructResponse()
 
 		log.WithFields(log.Fields{
 			"key":         key,
@@ -436,7 +436,7 @@ func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (
 		return nil, err
 	}
 
-	newResponse := c.reconstructResponse()
+	newResponse := c.ReconstructResponse()
 
 	log.WithFields(log.Fields{
 		"status":      newResponse.StatusCode,

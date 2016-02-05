@@ -84,7 +84,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 
 		// creating response
 		c := NewConstructor(request, payload)
-		response := c.reconstructResponse()
+		response := c.ReconstructResponse()
 
 		dbClient.save(request, requestBody, response, []byte(resp.Body))
 	}
