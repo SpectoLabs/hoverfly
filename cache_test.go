@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -170,4 +171,14 @@ func TestGetAllKeys(t *testing.T) {
 	for _, v := range keys {
 		expect(t, strings.HasPrefix(v, "key"), true)
 	}
+}
+
+func TestGetAllKeysEmpty(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+
+	keys, err := dbClient.Cache.GetAllKeys()
+	expect(t, err, nil)
+	expect(t, len(keys), 0)
 }
