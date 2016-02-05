@@ -120,7 +120,7 @@ and applies the supplied middleware (the user is required to supply --middleware
 is expected to populate response payload, so Hoverfly can then reconstruct it and return it to the client. An example of a synthetic
 service can be found in _this_repo/examples/middleware/synthetic_service/synthetic.py_. You can test it by running:
 
-    ./hoverfly --synthesize --middleware "./examples/middleware/synthetic_service/synthetic.py"
+    ./hoverfly --synthesize --middleware "../../examples/middleware/synthetic_service/synthetic.py"
 
 ### Modify
 
@@ -130,7 +130,7 @@ allows users to use Hoverfly without storing any data about requests. It can be 
 in - describing a service, and you only need to change certain parts of the requests or responses (eg: adding authentication headers through with middleware).
 The example below changes the destination host to "mirage.readthedocs.org" and sets the method to "GET":
 
-    ./hoverfly --modify --middleware "./examples/middleware/modify_request/modify_request.py
+    ./hoverfly --modify --middleware "../../examples/middleware/modify_request/modify_request.py
 
 ## HTTPS capture
 
@@ -183,11 +183,11 @@ generating response on the fly you can use ""--synthesize" flag.
 
 In order to use your middleware, just add path to executable:
 
-    ./hoverfly --middleware "./examples/middleware/modify_response/modify_response.py"
+    ./hoverfly --middleware "../../examples/middleware/modify_response/modify_response.py"
 
 #### Python middleware example
 
-Basic example of a Python module to change response body and add 2 second delay:
+Basic example of a Python module to change response body, set different status code and add 2 second delay:
 
 ```python
 #!/usr/bin/env python
