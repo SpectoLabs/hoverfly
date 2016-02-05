@@ -1,4 +1,4 @@
-package main
+package hoverfly
 
 import (
 	"io/ioutil"
@@ -10,7 +10,7 @@ func TestReconstructRequest(t *testing.T) {
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	// changing payload so we don't have to call middleware
-	request := requestDetails{
+	request := RequestDetails{
 		Path:        "/random-path",
 		Method:      "POST",
 		Query:       "?foo=bar",
