@@ -1,4 +1,4 @@
-package main
+package hoverfly
 
 import (
 	"testing"
@@ -7,8 +7,8 @@ import (
 func TestChangeBodyMiddleware(t *testing.T) {
 	command := "./examples/middleware/modify_response/modify_response.py"
 
-	resp := response{Status: 201, Body: "original body"}
-	req := requestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
+	resp := ResponseDetails{Status: 201, Body: "original body"}
+	req := RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
 	payload := Payload{Response: resp, Request: req}
 
@@ -21,8 +21,8 @@ func TestChangeBodyMiddleware(t *testing.T) {
 func TestMalformedPayloadMiddleware(t *testing.T) {
 	command := "./examples/middleware/ruby_echo/echo.rb"
 
-	resp := response{Status: 201, Body: "original body"}
-	req := requestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
+	resp := ResponseDetails{Status: 201, Body: "original body"}
+	req := RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
 	payload := Payload{Response: resp, Request: req}
 
@@ -35,8 +35,8 @@ func TestMalformedPayloadMiddleware(t *testing.T) {
 func TestMakeCustom404(t *testing.T) {
 	command := "go run ./examples/middleware/go_example/change_to_custom_404.go"
 
-	resp := response{Status: 201, Body: "original body"}
-	req := requestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
+	resp := ResponseDetails{Status: 201, Body: "original body"}
+	req := RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
 	payload := Payload{Response: resp, Request: req}
 
@@ -51,7 +51,7 @@ func TestMakeCustom404(t *testing.T) {
 func TestReflectBody(t *testing.T) {
 	command := "./examples/middleware/reflect_body/reflect_body.py"
 
-	req := requestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: "", Body: "request_body_here"}
+	req := RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: "", Body: "request_body_here"}
 
 	payload := Payload{Request: req}
 
