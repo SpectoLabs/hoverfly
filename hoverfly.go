@@ -36,11 +36,11 @@ func orPanic(err error) {
 func GetNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 
 	// getting boltDB
-	db := getDB(cfg.DatabaseName)
+	db := GetDB(cfg.DatabaseName)
 
 	cache := Cache{
 		DS:             db,
-		RequestsBucket: []byte(requestsBucketName),
+		RequestsBucket: []byte(RequestsBucketName),
 	}
 
 	counter := NewModeCounter()
@@ -140,7 +140,7 @@ func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Respo
 		return req, newResponse
 
 	} else if mode == SynthesizeMode {
-		response, err := synthesizeResponse(req, d.Cfg.Middleware)
+		response, err := SynthesizeResponse(req, d.Cfg.Middleware)
 
 		if err != nil {
 			return req, hoverflyError(req, err, "Could not create synthetic response!", http.StatusServiceUnavailable)

@@ -47,8 +47,8 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 
 }
 
-// reconstructResponse changes original response with details provided in Constructor Payload.Response
-func (c *Constructor) reconstructResponse() *http.Response {
+// ReconstructResponse changes original response with details provided in Constructor Payload.Response
+func (c *Constructor) ReconstructResponse() *http.Response {
 	response := &http.Response{}
 	response.Request = c.request
 
@@ -74,8 +74,8 @@ func (c *Constructor) reconstructResponse() *http.Response {
 	return response
 }
 
-// reconstructRequest replaces original request with details provided in Constructor Payload.Request
-func (c *Constructor) reconstructRequest() (*http.Request, error) {
+// ReconstructRequest replaces original request with details provided in Constructor Payload.Request
+func (c *Constructor) ReconstructRequest() (*http.Request, error) {
 	// let's default to what was given
 	if c.payload.Request.Scheme == "" {
 		c.payload.Request.Scheme = c.request.URL.Scheme
