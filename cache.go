@@ -127,3 +127,21 @@ func (c *Cache) DeleteBucket(name []byte) (err error) {
 	})
 	return
 }
+
+// GetAllKeys - gets all current keys
+func (c *Cache) GetAllKeys() (keys []string, err error) {
+	err = c.DS.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(c.RequestsBucket)
+		if b == nil {
+			// bucket doesn't exist
+			return nil
+		}
+		c := b.Cursor()
+
+		for k, _ := c.First(); k != nil; k, _ = c.Next() {
+			keys = append(keys, string(k))
+		}
+		return nil
+	})
+	return
+}
