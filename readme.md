@@ -38,20 +38,24 @@ Simply download a .exe file and run it.
 
 ### Build it yourself  
 
-This project uses the [Glide](https://github.com/Masterminds/glide) project to manage dependencies in combination with Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), and therefore you must have Go > 1.5 installed, and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled. 
+This project uses the [Glide](https://github.com/Masterminds/glide) project to manage dependencies in combination with
+Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), and therefore you must have Go > 1.5 installed, 
+and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled. 
 
-Note that you must also clone the Hoverfly repository within your $GOPATH (you can read more about on how [Glide works](https://github.com/Masterminds/glide#user-content-how-it-works)), or else you may see strange errors like "_cannot find package "github.com/Sirupsen/logrus" in any of: XXX_":
+Note that you must also clone the Hoverfly repository within your $GOPATH (you can read more about on 
+how [Glide works](https://github.com/Masterminds/glide#user-content-how-it-works)), or else you may see strange errors
+like "_cannot find package "github.com/Sirupsen/logrus" in any of: XXX_":
 
     export GO15VENDOREXPERIMENT=1
-    mkdir -p "$GOPATH/src/github.com/"
-    git clone https://github.com/SpectoLabs/hoverfly.git "$GOPATH/src/github.com/hoverfly"
-    cd "$GOPATH/src/github.com/hoverfly"
+    mkdir -p "$GOPATH/src/github.com/SpectoLabs/"
+    git clone https://github.com/SpectoLabs/hoverfly.git "$GOPATH/src/SpectoLabs/github.com/hoverfly"
+    cd "$GOPATH/src/github.com/SpectoLabs/hoverfly/cmd/hoverfly/"
 
 We can then fetch the dependencies (or you can also use _git submodule init_) with:
 
     glide up
 
-Build Hoverfly:
+Build Hoverfly (main application file is in /cmd/hoverfly/ directory):
 
     go build
 
@@ -273,7 +277,8 @@ Contributions are welcome!
 To submit a pull request you should fork the Hoverfly repository, and make your change on a feature branch of your fork. 
 Then generate a pull request from your branch against master of the Hoverfly repository. Include in your pull request 
 details of your change (why and how, as well as the testing you have performed). To read more about forking model, check out
-this link: [forking workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow). Hoverfly is a new project, we will soon provide detailed roadmap. 
+this link: [forking workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow).
+Hoverfly is a new project, we will soon provide detailed roadmap. 
 
 ## License
 
