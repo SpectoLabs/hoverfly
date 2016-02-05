@@ -8,7 +8,8 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-const requestsBucketName = "rqbucket"
+// RequestsBucketName - default name for BoltDB bucket
+const RequestsBucketName = "rqbucket"
 
 // Cache - provides access to BoltDB and holds current bucket name
 type Cache struct {
@@ -16,7 +17,9 @@ type Cache struct {
 	RequestsBucket []byte
 }
 
-func getDB(name string) *bolt.DB {
+// GetDB - returns open BoltDB database with read/write permissions or goes down in flames if
+// something bad happends
+func GetDB(name string) *bolt.DB {
 	log.WithFields(log.Fields{
 		"databaseName": name,
 	}).Info("Initiating database")
