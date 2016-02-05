@@ -1,4 +1,4 @@
-package main
+package hoverfly
 
 import (
 	"bytes"
@@ -29,8 +29,8 @@ type recordsCount struct {
 }
 
 type statsResponse struct {
-	Stats        HoverflyStats `json:"stats"`
-	RecordsCount int           `json:"recordsCount"`
+	Stats        Stats `json:"stats"`
+	RecordsCount int   `json:"recordsCount"`
 }
 
 type stateRequest struct {
@@ -42,26 +42,27 @@ type messageResponse struct {
 	Message string `json:"message"`
 }
 
-func (d *DBClient) startAdminInterface() {
+// StartAdminInterface - starts admin interface web server
+func (d *DBClient) StartAdminInterface() {
 	// starting admin interface
 	mux := getBoneRouter(*d)
 	n := negroni.Classic()
 
-	loglevel := log.WarnLevel
+	logLevel := log.WarnLevel
 
-	if d.cfg.verbose {
-		loglevel = log.DebugLevel
+	if d.Cfg.Verbose {
+		logLevel = log.DebugLevel
 	}
 
-	n.Use(negronilogrus.NewCustomMiddleware(loglevel, &log.JSONFormatter{}, "admin"))
+	n.Use(negronilogrus.NewCustomMiddleware(logLevel, &log.JSONFormatter{}, "admin"))
 	n.UseHandler(mux)
 
 	// admin interface starting message
 	log.WithFields(log.Fields{
-		"AdminPort": d.cfg.adminPort,
+		"AdminPort": d.Cfg.AdminPort,
 	}).Info("Admin interface is starting...")
 
-	n.Run(fmt.Sprintf(":%s", d.cfg.adminPort))
+	n.Run(fmt.Sprintf(":%s", d.Cfg.AdminPort))
 }
 
 // getBoneRouter returns mux for admin interface
@@ -87,7 +88,7 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
 	mux.Post("/state", http.HandlerFunc(d.StateHandler))
 
-	if d.cfg.development {
+	if d.Cfg.Development {
 		mux.Handle("/*", http.FileServer(http.Dir("static/dist")))
 	} else {
 		mux.Handle("/*", http.FileServer(statikFS))
@@ -98,7 +99,7 @@ func getBoneRouter(d DBClient) *bone.Mux {
 
 // AllRecordsHandler returns JSON content type http response
 func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
-	records, err := d.cache.GetAllRequests()
+	records, err := d.Cache.GetAllRequests()
 
 	if err == nil {
 
@@ -128,7 +129,7 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 
 // RecordsCount returns number of captured requests as a JSON payload
 func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
-	count, err := d.cache.RecordsCount()
+	count, err := d.Cache.RecordsCount()
 
 	if err == nil {
 
@@ -158,9 +159,9 @@ func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
 
 // StatsHandler - returns current stats about Hoverfly (request counts, record count)
 func (d *DBClient) StatsHandler(w http.ResponseWriter, req *http.Request) {
-	stats := d.counter.Flush()
+	stats := d.Counter.Flush()
 
-	count, err := d.cache.RecordsCount()
+	count, err := d.Cache.RecordsCount()
 
 	if err != nil {
 		log.Error(err)
@@ -212,7 +213,7 @@ func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 
 		for _ = range time.Tick(1 * time.Second) {
 
-			count, err := d.cache.RecordsCount()
+			count, err := d.Cache.RecordsCount()
 
 			if err != nil {
 				log.WithFields(log.Fields{
@@ -222,7 +223,7 @@ func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			stats := d.counter.Flush()
+			stats := d.Counter.Flush()
 
 			var sr statsResponse
 			sr.Stats = stats
@@ -281,8 +282,8 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 				}).Error("Failed to encode payload")
 			} else {
 				// recalculating request hash and storing it in database
-				r := request{details: pl.Request}
-				d.cache.Set([]byte(r.hash()), bts)
+				r := RequestContainer{details: pl.Request}
+				d.Cache.Set([]byte(r.Hash()), bts)
 			}
 		}
 		response.Message = fmt.Sprintf("%d requests imported successfully", len(payloads))
@@ -298,7 +299,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 
 // DeleteAllRecordsHandler - deletes all captured requests
 func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request) {
-	err := d.cache.DeleteBucket(d.cache.requestsBucket)
+	err := d.Cache.DeleteBucket(d.Cache.RequestsBucket)
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -324,8 +325,8 @@ func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 // CurrentStateHandler returns current state
 func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request) {
 	var resp stateRequest
-	resp.Mode = d.cfg.GetMode()
-	resp.Destination = d.cfg.destination
+	resp.Mode = d.Cfg.GetMode()
+	resp.Destination = d.Cfg.Destination
 
 	b, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -382,11 +383,11 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request) {
 	}).Info("Handling state change request!")
 
 	// setting new state
-	d.cfg.SetMode(sr.Mode)
+	d.Cfg.SetMode(sr.Mode)
 
 	var resp stateRequest
-	resp.Mode = d.cfg.GetMode()
-	resp.Destination = d.cfg.destination
+	resp.Mode = d.Cfg.GetMode()
+	resp.Destination = d.Cfg.Destination
 	b, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(b)
