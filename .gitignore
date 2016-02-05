@@ -15,17 +15,18 @@ _test
 *.cgo1.go
 *.cgo2.c
 _cgo_defun.c
+/cmd/hoverfly/hoverfly
 _cgo_gotypes.go
 _cgo_export.*
 
 _testmain.go
 
+/cmd/hoverfly/requests.db
 *.exe
 *.test
 *.prof
 
 # Created by .ignore support plugin (hsz.mobi)
-hoverfly
 *.log
 
 # examples/clients/readthedocs_query/test.py pickle file
