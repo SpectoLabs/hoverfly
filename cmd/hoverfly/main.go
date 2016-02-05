@@ -123,7 +123,7 @@ func main() {
 	defer dbClient.Cache.DS.Close()
 
 	// starting admin interface
-	go dbClient.StartAdminInterface()
+	dbClient.StartAdminInterface()
 
 	// start metrics registry flush
 	if *metrics {
