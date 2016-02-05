@@ -9,8 +9,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-// synthesizeResponse calls middleware to populate response data, nothing gets pass proxy
-func synthesizeResponse(req *http.Request, middleware string) (*http.Response, error) {
+// SynthesizeResponse calls middleware to populate response data, nothing gets pass proxy
+func SynthesizeResponse(req *http.Request, middleware string) (*http.Response, error) {
 
 	// this is mainly for testing, since when you create a request during tests
 	// its body will be nil, that results in bad things during read
@@ -62,7 +62,7 @@ func synthesizeResponse(req *http.Request, middleware string) (*http.Response, e
 
 	}
 
-	response := c.reconstructResponse()
+	response := c.ReconstructResponse()
 	return response, nil
 
 }

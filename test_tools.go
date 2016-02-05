@@ -96,7 +96,7 @@ func GetRandomName(n int) []byte {
 func setup() {
 	// we don't really want to see what's happening
 	log.SetLevel(log.FatalLevel)
-	db := getDB(testingDatabaseName)
+	db := GetDB(testingDatabaseName)
 	TestDB = db
 }
 
