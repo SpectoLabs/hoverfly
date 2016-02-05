@@ -152,3 +152,22 @@ func TestSetGetEmptyValue(t *testing.T) {
 	_, err = dbClient.Cache.Get([]byte("shouldbe"))
 	expect(t, err, nil)
 }
+
+func TestGetAllKeys(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+
+	// inserting some payloads
+	for i := 0; i < 5; i++ {
+		dbClient.Cache.Set([]byte(fmt.Sprintf("key%d", i)), []byte("value"))
+	}
+
+	keys, err := dbClient.Cache.GetAllKeys()
+	expect(t, err, nil)
+	expect(t, len(keys), 5)
+
+	for _, v := range keys {
+		expect(t, strings.HasPrefix(v, "key"), true)
+	}
+}
