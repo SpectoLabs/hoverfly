@@ -1,4 +1,4 @@
-package main
+package hoverfly
 
 import (
 	"bytes"
@@ -33,7 +33,7 @@ func synthesizeResponse(req *http.Request, middleware string) (*http.Response, e
 
 	bodyStr = string(requestBody)
 
-	request := requestDetails{
+	request := RequestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
 		Destination: req.Host,
