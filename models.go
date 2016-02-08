@@ -18,6 +18,7 @@ type DBClient struct {
 	HTTP    *http.Client
 	Cfg     *Configuration
 	Counter *CounterByMode
+	Hooks   ActionTypeHooks
 }
 
 // RequestContainer holds structure for request
