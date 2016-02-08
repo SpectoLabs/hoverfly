@@ -63,6 +63,31 @@ func TestRequestBodyCaptured(t *testing.T) {
 	expect(t, payload.Request.Body, "fizz=buzz")
 }
 
+func TestRequestBodySentToMiddleware(t *testing.T) {
+	// sends a request with fizz=buzz body, server responds with {'message': 'here'}
+	// then, since it's modify mode - middleware is applied again, this time
+	// middleware takes original request body and replaces response body with it.
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	requestBody := []byte("fizz=buzz")
+
+	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	req, err := http.NewRequest("POST", "http://capture_body.com", body)
+	expect(t, err, nil)
+
+	resp, err := dbClient.modifyRequestResponse(req, "./examples/middleware/reflect_body/reflect_body.py")
+
+	// body from the request should be in response body, instead of server's response
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+
+	expect(t, err, nil)
+	expect(t, string(responseBody), string(requestBody))
+
+}
+
 func TestMatchOnRequestBody(t *testing.T) {
 
 	server, dbClient := testTools(200, `{'message': 'here'}`)
