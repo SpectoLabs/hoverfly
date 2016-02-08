@@ -51,6 +51,7 @@ func GetNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
 		HTTP:    &http.Client{},
 		Cfg:     cfg,
 		Counter: counter,
+		Hooks:   make(ActionTypeHooks),
 	}
 
 	// creating proxy
