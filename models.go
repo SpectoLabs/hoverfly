@@ -1,4 +1,4 @@
-package main
+package hoverfly
 
 import (
 	"bytes"
@@ -14,21 +14,21 @@ import (
 
 // DBClient provides access to cache, http client and configuration
 type DBClient struct {
-	cache   Cache
-	http    *http.Client
-	cfg     *Configuration
-	counter *CounterByMode
+	Cache   Cache
+	HTTP    *http.Client
+	Cfg     *Configuration
+	Counter *CounterByMode
 }
 
-// request holds structure for request
-type request struct {
-	details requestDetails
+// RequestContainer holds structure for request
+type RequestContainer struct {
+	Details RequestDetails
 }
 
 var emptyResp = &http.Response{}
 
-// requestDetails stores information about request, it's used for creating unique hash and also as a payload structure
-type requestDetails struct {
+// RequestDetails stores information about request, it's used for creating unique hash and also as a payload structure
+type RequestDetails struct {
 	Path        string              `json:"path"`
 	Method      string              `json:"method"`
 	Destination string              `json:"destination"`
@@ -39,29 +39,29 @@ type requestDetails struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
-func (r *request) concatenate() string {
+func (r *RequestContainer) concatenate() string {
 	var buffer bytes.Buffer
 
-	buffer.WriteString(r.details.Destination)
-	buffer.WriteString(r.details.Path)
-	buffer.WriteString(r.details.Method)
-	buffer.WriteString(r.details.Query)
-	buffer.WriteString(r.details.Body)
+	buffer.WriteString(r.Details.Destination)
+	buffer.WriteString(r.Details.Path)
+	buffer.WriteString(r.Details.Method)
+	buffer.WriteString(r.Details.Query)
+	buffer.WriteString(r.Details.Body)
 
 	return buffer.String()
 }
 
-// hash returns unique hash key for request
-func (r *request) hash() string {
+// Hash returns unique hash key for request
+func (r *RequestContainer) Hash() string {
 	h := md5.New()
 	io.WriteString(h, r.concatenate())
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-// res structure hold response body from external service, body is not decoded and is supposed
+// ResponseDetails structure hold response body from external service, body is not decoded and is supposed
 // to be bytes, however headers should provide all required information for later decoding
 // by the client.
-type response struct {
+type ResponseDetails struct {
 	Status  int                 `json:"status"`
 	Body    string              `json:"body"`
 	Headers map[string][]string `json:"headers"`
@@ -69,13 +69,13 @@ type response struct {
 
 // Payload structure holds request and response structure
 type Payload struct {
-	Response response       `json:"response"`
-	Request  requestDetails `json:"request"`
-	ID       string         `json:"id"`
+	Response ResponseDetails `json:"response"`
+	Request  RequestDetails  `json:"request"`
+	ID       string          `json:"id"`
 }
 
-// encode method encodes all exported Payload fields to bytes
-func (p *Payload) encode() ([]byte, error) {
+// Encode method encodes all exported Payload fields to bytes
+func (p *Payload) Encode() ([]byte, error) {
 	buf := new(bytes.Buffer)
 	enc := gob.NewEncoder(buf)
 	err := enc.Encode(p)
@@ -177,13 +177,33 @@ func extractBody(resp *http.Response) (extract []byte, err error) {
 	return extract, nil
 }
 
-// getRequestDetails - extracts request details, reads request body so it will be empty.
-func getRequestDetails(req *http.Request) (requestObj requestDetails, err error) {
+func extractRequestBody(req *http.Request) (extract []byte, err error) {
+	save := req.Body
+	savecl := req.ContentLength
+
+	save, req.Body, err = copyBody(req.Body)
+
+	if err != nil {
+		return
+	}
+	defer req.Body.Close()
+	extract, err = ioutil.ReadAll(req.Body)
+
+	req.Body = save
+	req.ContentLength = savecl
+	if err != nil {
+		return nil, err
+	}
+	return extract, nil
+}
+
+// getRequestDetails - extracts request details
+func getRequestDetails(req *http.Request) (requestObj RequestDetails, err error) {
 	if req.Body == nil {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 	}
 
-	reqBody, err := ioutil.ReadAll(req.Body)
+	reqBody, err := extractRequestBody(req)
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -193,7 +213,7 @@ func getRequestDetails(req *http.Request) (requestObj requestDetails, err error)
 		return
 	}
 
-	requestObj = requestDetails{
+	requestObj = RequestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
 		Destination: req.Host,
@@ -212,7 +232,7 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
 
-	if d.cfg.middleware != "" {
+	if d.Cfg.Middleware != "" {
 		// middleware is provided, modifying request
 		var payload Payload
 
@@ -223,11 +243,11 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 		payload.Request = rd
 
 		c := NewConstructor(request, payload)
-		err = c.ApplyMiddleware(d.cfg.middleware)
+		err = c.ApplyMiddleware(d.Cfg.Middleware)
 
 		if err != nil {
 			log.WithFields(log.Fields{
-				"mode":   d.cfg.mode,
+				"mode":   d.Cfg.Mode,
 				"error":  err.Error(),
 				"host":   request.Host,
 				"method": request.Method,
@@ -236,17 +256,17 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 			return nil, err
 		}
 
-		request, err = c.reconstructRequest()
+		request, err = c.ReconstructRequest()
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	resp, err := d.http.Do(request)
+	resp, err := d.HTTP.Do(request)
 
 	if err != nil {
 		log.WithFields(log.Fields{
-			"mode":   d.cfg.mode,
+			"mode":   d.Cfg.Mode,
 			"error":  err.Error(),
 			"host":   request.Host,
 			"method": request.Method,
@@ -256,7 +276,7 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 	}
 
 	log.WithFields(log.Fields{
-		"mode":   d.cfg.mode,
+		"mode":   d.Cfg.Mode,
 		"host":   request.Host,
 		"method": request.Method,
 		"path":   request.URL.Path,
@@ -275,7 +295,7 @@ func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, 
 	if resp == nil {
 		resp = emptyResp
 	} else {
-		responseObj := response{
+		responseObj := ResponseDetails{
 			Status:  resp.StatusCode,
 			Body:    string(respBody),
 			Headers: resp.Header,
@@ -290,7 +310,7 @@ func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, 
 			"hashKey":       key,
 		}).Debug("Capturing")
 
-		requestObj := requestDetails{
+		requestObj := RequestDetails{
 			Path:        req.URL.Path,
 			Method:      req.Method,
 			Destination: req.Host,
@@ -307,20 +327,20 @@ func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, 
 			ID:       key,
 		}
 
-		bts, err := payload.encode()
+		bts, err := payload.Encode()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
 			}).Error("Failed to serialize payload")
 		} else {
-			d.cache.Set([]byte(key), bts)
+			d.Cache.Set([]byte(key), bts)
 		}
 	}
 }
 
 // getRequestFingerprint returns request hash
 func getRequestFingerprint(req *http.Request, requestBody []byte) string {
-	details := requestDetails{
+	details := RequestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
 		Destination: req.Host,
@@ -328,8 +348,8 @@ func getRequestFingerprint(req *http.Request, requestBody []byte) string {
 		Body:        string(requestBody),
 	}
 
-	r := request{details: details}
-	return r.hash()
+	r := RequestContainer{Details: details}
+	return r.Hash()
 }
 
 // getResponse returns stored response from cache
@@ -349,7 +369,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 
 	key := getRequestFingerprint(req, reqBody)
 
-	payloadBts, err := d.cache.Get([]byte(key))
+	payloadBts, err := d.Cache.Get([]byte(key))
 
 	if err == nil {
 		// getting cache response
@@ -365,16 +385,16 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 
 		c := NewConstructor(req, *payload)
 
-		if d.cfg.middleware != "" {
-			_ = c.ApplyMiddleware(d.cfg.middleware)
+		if d.Cfg.Middleware != "" {
+			_ = c.ApplyMiddleware(d.Cfg.Middleware)
 		}
 
-		response := c.reconstructResponse()
+		response := c.ReconstructResponse()
 
 		log.WithFields(log.Fields{
 			"key":         key,
 			"mode":        "virtualize",
-			"middleware":  d.cfg.middleware,
+			"middleware":  d.Cfg.Middleware,
 			"path":        req.URL.Path,
 			"rawQuery":    req.URL.RawQuery,
 			"method":      req.Method,
@@ -403,6 +423,16 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 // is saved to cache.
 func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (*http.Response, error) {
 
+	// getting request details
+	rd, err := getRequestDetails(req)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":      err.Error(),
+			"middleware": middleware,
+		}).Error("Failed to get request details")
+		return nil, err
+	}
+
 	// modifying request
 	resp, err := d.doRequest(req)
 
@@ -421,12 +451,13 @@ func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (
 		return nil, err
 	}
 
-	r := response{
+	r := ResponseDetails{
 		Status:  resp.StatusCode,
 		Body:    string(bodyBytes),
 		Headers: resp.Header,
 	}
-	payload := Payload{Response: r}
+
+	payload := Payload{Response: r, Request: rd}
 
 	c := NewConstructor(req, payload)
 	// applying middleware to modify response
@@ -436,7 +467,7 @@ func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (
 		return nil, err
 	}
 
-	newResponse := c.reconstructResponse()
+	newResponse := c.ReconstructResponse()
 
 	log.WithFields(log.Fields{
 		"status":      newResponse.StatusCode,

@@ -1,4 +1,4 @@
-package main
+package hoverfly
 
 import (
 	"bytes"
@@ -8,15 +8,18 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-const requestsBucketName = "rqbucket"
+// RequestsBucketName - default name for BoltDB bucket
+const RequestsBucketName = "rqbucket"
 
 // Cache - provides access to BoltDB and holds current bucket name
 type Cache struct {
-	db             *bolt.DB
-	requestsBucket []byte
+	DS             *bolt.DB
+	RequestsBucket []byte
 }
 
-func getDB(name string) *bolt.DB {
+// GetDB - returns open BoltDB database with read/write permissions or goes down in flames if
+// something bad happends
+func GetDB(name string) *bolt.DB {
 	log.WithFields(log.Fields{
 		"databaseName": name,
 	}).Info("Initiating database")
@@ -30,8 +33,8 @@ func getDB(name string) *bolt.DB {
 
 // Set - saves given key and value pair to cache
 func (c *Cache) Set(key, value []byte) error {
-	err := c.db.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists(c.requestsBucket)
+	err := c.DS.Update(func(tx *bolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists(c.RequestsBucket)
 		if err != nil {
 			return err
 		}
@@ -48,10 +51,10 @@ func (c *Cache) Set(key, value []byte) error {
 // Get - searches for given key in the cache and returns value if found
 func (c *Cache) Get(key []byte) (value []byte, err error) {
 
-	err = c.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket(c.requestsBucket)
+	err = c.DS.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(c.RequestsBucket)
 		if bucket == nil {
-			return fmt.Errorf("Bucket %q not found!", c.requestsBucket)
+			return fmt.Errorf("Bucket %q not found!", c.RequestsBucket)
 		}
 		// "Byte slices returned from Bolt are only valid during a transaction."
 		var buffer bytes.Buffer
@@ -72,8 +75,8 @@ func (c *Cache) Get(key []byte) (value []byte, err error) {
 
 // GetAllRequests - returns all captured requests/responses
 func (c *Cache) GetAllRequests() (payloads []Payload, err error) {
-	err = c.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(c.requestsBucket)
+	err = c.DS.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(c.RequestsBucket)
 		if b == nil {
 			// bucket doesn't exist
 			return nil
@@ -98,8 +101,8 @@ func (c *Cache) GetAllRequests() (payloads []Payload, err error) {
 
 // RecordsCount - returns records count
 func (c *Cache) RecordsCount() (count int, err error) {
-	err = c.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(c.requestsBucket)
+	err = c.DS.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(c.RequestsBucket)
 		if b == nil {
 			// bucket doesn't exist
 			return nil
@@ -114,7 +117,7 @@ func (c *Cache) RecordsCount() (count int, err error) {
 
 // DeleteBucket - deletes bucket with all saved data
 func (c *Cache) DeleteBucket(name []byte) (err error) {
-	err = c.db.Update(func(tx *bolt.Tx) error {
+	err = c.DS.Update(func(tx *bolt.Tx) error {
 		err = tx.DeleteBucket(name)
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -124,6 +127,24 @@ func (c *Cache) DeleteBucket(name []byte) (err error) {
 
 		}
 		return err
+	})
+	return
+}
+
+// GetAllKeys - gets all current keys
+func (c *Cache) GetAllKeys() (keys []string, err error) {
+	err = c.DS.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(c.RequestsBucket)
+		if b == nil {
+			// bucket doesn't exist
+			return nil
+		}
+		c := b.Cursor()
+
+		for k, _ := c.First(); k != nil; k, _ = c.Next() {
+			keys = append(keys, string(k))
+		}
+		return nil
 	})
 	return
 }

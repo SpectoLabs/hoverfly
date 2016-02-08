@@ -1,4 +1,4 @@
-package main
+package hoverfly
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 func TestGetAllRecords(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	req, err := http.NewRequest("GET", "/records", nil)
@@ -37,7 +37,7 @@ func TestGetAllRecords(t *testing.T) {
 func TestGetAllRecordsWRecords(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -69,7 +69,7 @@ func TestGetAllRecordsWRecords(t *testing.T) {
 func TestGetRecordsCount(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	req, err := http.NewRequest("GET", "/count", nil)
@@ -93,7 +93,7 @@ func TestGetRecordsCount(t *testing.T) {
 func TestGetRecordsCountWRecords(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -125,7 +125,7 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 func TestExportImportRecords(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// inserting some payloads
@@ -148,7 +148,7 @@ func TestExportImportRecords(t *testing.T) {
 	body, err := ioutil.ReadAll(respRec.Body)
 
 	// deleting records
-	err = dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	err = dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	expect(t, err, nil)
 
 	// using body to import records again
@@ -160,7 +160,7 @@ func TestExportImportRecords(t *testing.T) {
 	expect(t, importRec.Code, http.StatusOK)
 
 	// records should be there
-	payloads, err := dbClient.cache.GetAllRequests()
+	payloads, err := dbClient.Cache.GetAllRequests()
 	expect(t, err, nil)
 	expect(t, len(payloads), 5)
 
@@ -169,7 +169,7 @@ func TestExportImportRecords(t *testing.T) {
 func TestDeleteHandler(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// inserting some payloads
@@ -180,7 +180,7 @@ func TestDeleteHandler(t *testing.T) {
 	}
 
 	// checking whether we have records
-	payloads, err := dbClient.cache.GetAllRequests()
+	payloads, err := dbClient.Cache.GetAllRequests()
 	expect(t, err, nil)
 	expect(t, len(payloads), 5)
 
@@ -196,7 +196,7 @@ func TestDeleteHandler(t *testing.T) {
 func TestDeleteHandlerNoBucket(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// deleting through handler
@@ -212,11 +212,11 @@ func TestDeleteHandlerNoBucket(t *testing.T) {
 func TestGetState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// setting initial mode
-	dbClient.cfg.SetMode("virtualize")
+	dbClient.Cfg.SetMode("virtualize")
 
 	// deleting through handler
 	req, err := http.NewRequest("GET", "/state", nil)
@@ -238,11 +238,11 @@ func TestGetState(t *testing.T) {
 func TestSetVirtualizeState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// setting mode to capture
-	dbClient.cfg.SetMode("capture")
+	dbClient.Cfg.SetMode("capture")
 
 	// preparing to set mode through rest api
 	var resp stateRequest
@@ -261,17 +261,17 @@ func TestSetVirtualizeState(t *testing.T) {
 	expect(t, rec.Code, http.StatusOK)
 
 	// checking mode
-	expect(t, dbClient.cfg.GetMode(), "virtualize")
+	expect(t, dbClient.Cfg.GetMode(), "virtualize")
 }
 
 func TestSetCaptureState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// setting mode to virtualize
-	dbClient.cfg.SetMode("virtualize")
+	dbClient.Cfg.SetMode("virtualize")
 
 	// preparing to set mode through rest api
 	var resp stateRequest
@@ -290,17 +290,17 @@ func TestSetCaptureState(t *testing.T) {
 	expect(t, rec.Code, http.StatusOK)
 
 	// checking mode
-	expect(t, dbClient.cfg.GetMode(), "capture")
+	expect(t, dbClient.Cfg.GetMode(), "capture")
 }
 
 func TestSetModifyState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// setting mode to virtualize
-	dbClient.cfg.SetMode("virtualize")
+	dbClient.Cfg.SetMode("virtualize")
 
 	// preparing to set mode through rest api
 	var resp stateRequest
@@ -319,17 +319,17 @@ func TestSetModifyState(t *testing.T) {
 	expect(t, rec.Code, http.StatusOK)
 
 	// checking mode
-	expect(t, dbClient.cfg.GetMode(), "modify")
+	expect(t, dbClient.Cfg.GetMode(), "modify")
 }
 
 func TestSetSynthesizeState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// setting mode to virtualize
-	dbClient.cfg.SetMode("virtualize")
+	dbClient.Cfg.SetMode("virtualize")
 
 	// preparing to set mode through rest api
 	var resp stateRequest
@@ -348,17 +348,17 @@ func TestSetSynthesizeState(t *testing.T) {
 	expect(t, rec.Code, http.StatusOK)
 
 	// checking mode
-	expect(t, dbClient.cfg.GetMode(), "synthesize")
+	expect(t, dbClient.Cfg.GetMode(), "synthesize")
 }
 
 func TestSetRandomState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// setting mode to virtualize
-	dbClient.cfg.SetMode("virtualize")
+	dbClient.Cfg.SetMode("virtualize")
 
 	// preparing to set mode through rest api
 	var resp stateRequest
@@ -377,17 +377,17 @@ func TestSetRandomState(t *testing.T) {
 	expect(t, rec.Code, http.StatusBadRequest)
 
 	// checking mode, should not have changed
-	expect(t, dbClient.cfg.GetMode(), "virtualize")
+	expect(t, dbClient.Cfg.GetMode(), "virtualize")
 }
 
 func TestSetNoBody(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// setting mode to virtualize
-	dbClient.cfg.SetMode("virtualize")
+	dbClient.Cfg.SetMode("virtualize")
 
 	// setting state
 	req, err := http.NewRequest("POST", "/state", nil)
@@ -399,13 +399,13 @@ func TestSetNoBody(t *testing.T) {
 	expect(t, rec.Code, http.StatusBadRequest)
 
 	// checking mode, should not have changed
-	expect(t, dbClient.cfg.GetMode(), "virtualize")
+	expect(t, dbClient.Cfg.GetMode(), "virtualize")
 }
 
 func TestStatsHandler(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// deleting through handler
@@ -424,10 +424,10 @@ func TestStatsHandlerVirtualizeMetrics(t *testing.T) {
 	// handler whether it is visible through /stats handler
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
-	dbClient.counter.counterVirtualize.Inc(1)
+	dbClient.Counter.counterVirtualize.Inc(1)
 
 	req, err := http.NewRequest("GET", "/stats", nil)
 
@@ -451,10 +451,10 @@ func TestStatsHandlerCaptureMetrics(t *testing.T) {
 	// handler whether it is visible through /stats handler
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
-	dbClient.counter.counterCapture.Inc(1)
+	dbClient.Counter.counterCapture.Inc(1)
 
 	req, err := http.NewRequest("GET", "/stats", nil)
 
@@ -478,10 +478,10 @@ func TestStatsHandlerModifyMetrics(t *testing.T) {
 	// handler whether it is visible through /stats handler
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
-	dbClient.counter.counterModify.Inc(1)
+	dbClient.Counter.counterModify.Inc(1)
 
 	req, err := http.NewRequest("GET", "/stats", nil)
 
@@ -505,10 +505,10 @@ func TestStatsHandlerSynthesizeMetrics(t *testing.T) {
 	// handler whether it is visible through /stats handler
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
-	dbClient.counter.counterSynthesize.Inc(1)
+	dbClient.Counter.counterSynthesize.Inc(1)
 
 	req, err := http.NewRequest("GET", "/stats", nil)
 
@@ -532,7 +532,7 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 	// handler whether it is visible through /stats handler
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	m := getBoneRouter(*dbClient)
 
 	// inserting some payloads

@@ -38,20 +38,24 @@ Simply download a .exe file and run it.
 
 ### Build it yourself  
 
-This project uses the [Glide](https://github.com/Masterminds/glide) project to manage dependencies in combination with Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), and therefore you must have Go > 1.5 installed, and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled. 
+This project uses the [Glide](https://github.com/Masterminds/glide) project to manage dependencies in combination with
+Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), and therefore you must have Go > 1.5 installed, 
+and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled. 
 
-Note that you must also clone the Hoverfly repository within your $GOPATH (you can read more about on how [Glide works](https://github.com/Masterminds/glide#user-content-how-it-works)), or else you may see strange errors like "_cannot find package "github.com/Sirupsen/logrus" in any of: XXX_":
+Note that you must also clone the Hoverfly repository within your $GOPATH (you can read more about on 
+how [Glide works](https://github.com/Masterminds/glide#user-content-how-it-works)), or else you may see strange errors
+like "_cannot find package "github.com/Sirupsen/logrus" in any of: XXX_":
 
     export GO15VENDOREXPERIMENT=1
-    mkdir -p "$GOPATH/src/github.com/"
-    git clone https://github.com/SpectoLabs/hoverfly.git "$GOPATH/src/github.com/hoverfly"
-    cd "$GOPATH/src/github.com/hoverfly"
+    mkdir -p "$GOPATH/src/github.com/SpectoLabs/"
+    git clone https://github.com/SpectoLabs/hoverfly.git "$GOPATH/src/SpectoLabs/github.com/hoverfly"
+    cd "$GOPATH/src/github.com/SpectoLabs/hoverfly/cmd/hoverfly/"
 
 We can then fetch the dependencies (or you can also use _git submodule init_) with:
 
     glide up
 
-Build Hoverfly:
+Build Hoverfly (main application file is in /cmd/hoverfly/ directory):
 
     go build
 
@@ -116,7 +120,7 @@ and applies the supplied middleware (the user is required to supply --middleware
 is expected to populate response payload, so Hoverfly can then reconstruct it and return it to the client. An example of a synthetic
 service can be found in _this_repo/examples/middleware/synthetic_service/synthetic.py_. You can test it by running:
 
-    ./hoverfly --synthesize --middleware "./examples/middleware/synthetic_service/synthetic.py"
+    ./hoverfly --synthesize --middleware "../../examples/middleware/synthetic_service/synthetic.py"
 
 ### Modify
 
@@ -126,7 +130,7 @@ allows users to use Hoverfly without storing any data about requests. It can be 
 in - describing a service, and you only need to change certain parts of the requests or responses (eg: adding authentication headers through with middleware).
 The example below changes the destination host to "mirage.readthedocs.org" and sets the method to "GET":
 
-    ./hoverfly --modify --middleware "./examples/middleware/modify_request/modify_request.py
+    ./hoverfly --modify --middleware "../../examples/middleware/modify_request/modify_request.py
 
 ## HTTPS capture
 
@@ -179,11 +183,11 @@ generating response on the fly you can use ""--synthesize" flag.
 
 In order to use your middleware, just add path to executable:
 
-    ./hoverfly --middleware "./examples/middleware/modify_response/modify_response.py"
+    ./hoverfly --middleware "../../examples/middleware/modify_response/modify_response.py"
 
 #### Python middleware example
 
-Basic example of a Python module to change response body and add 2 second delay:
+Basic example of a Python module to change response body, set different status code and add 2 second delay:
 
 ```python
 #!/usr/bin/env python
@@ -273,7 +277,8 @@ Contributions are welcome!
 To submit a pull request you should fork the Hoverfly repository, and make your change on a feature branch of your fork. 
 Then generate a pull request from your branch against master of the Hoverfly repository. Include in your pull request 
 details of your change (why and how, as well as the testing you have performed). To read more about forking model, check out
-this link: [forking workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow). Hoverfly is a new project, we will soon provide detailed roadmap. 
+this link: [forking workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow).
+Hoverfly is a new project, we will soon provide detailed roadmap. 
 
 ## License
 

@@ -1,30 +1,35 @@
-package main
+package hoverfly
 
 import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"testing"
 )
 
 func TestGetNewHoverflyCheckConfig(t *testing.T) {
 
 	cfg := InitSettings()
-	_, dbClient := getNewHoverfly(cfg)
-	defer dbClient.cache.db.Close()
+	cfg.DatabaseName = "testing2.db"
+	_, dbClient := GetNewHoverfly(cfg)
+	defer dbClient.Cache.DS.Close()
 
-	expect(t, dbClient.cfg, cfg)
+	expect(t, dbClient.Cfg, cfg)
+
+	// deleting this database
+	os.Remove(cfg.DatabaseName)
 }
 
 func TestProcessCaptureRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	expect(t, err, nil)
 
-	dbClient.cfg.SetMode("capture")
+	dbClient.Cfg.SetMode("capture")
 
 	req, resp := dbClient.processRequest(r)
 
@@ -36,13 +41,13 @@ func TestProcessCaptureRequest(t *testing.T) {
 func TestProcessVirtualizeRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	expect(t, err, nil)
 
 	// capturing
-	dbClient.cfg.SetMode("capture")
+	dbClient.Cfg.SetMode("capture")
 	req, resp := dbClient.processRequest(r)
 
 	refute(t, req, nil)
@@ -50,7 +55,7 @@ func TestProcessVirtualizeRequest(t *testing.T) {
 	expect(t, resp.StatusCode, 201)
 
 	// virtualizing
-	dbClient.cfg.SetMode("virtualize")
+	dbClient.Cfg.SetMode("virtualize")
 	newReq, newResp := dbClient.processRequest(r)
 
 	refute(t, newReq, nil)
@@ -61,17 +66,17 @@ func TestProcessVirtualizeRequest(t *testing.T) {
 func TestProcessSynthesizeRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 
 	// getting reflect middleware
-	dbClient.cfg.middleware = "./examples/middleware/reflect_body/reflect_body.py"
+	dbClient.Cfg.Middleware = "./examples/middleware/reflect_body/reflect_body.py"
 
 	bodyBytes := []byte("request_body_here")
 
 	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
 	expect(t, err, nil)
 
-	dbClient.cfg.SetMode("synthesize")
+	dbClient.Cfg.SetMode("synthesize")
 	newReq, newResp := dbClient.processRequest(r)
 
 	refute(t, newReq, nil)
@@ -87,12 +92,12 @@ func TestProcessModifyRequest(t *testing.T) {
 	defer server.Close()
 
 	// getting reflect middleware
-	dbClient.cfg.middleware = "./examples/middleware/modify_request/modify_request.py"
+	dbClient.Cfg.Middleware = "./examples/middleware/modify_request/modify_request.py"
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	expect(t, err, nil)
 
-	dbClient.cfg.SetMode("modify")
+	dbClient.Cfg.SetMode("modify")
 	newReq, newResp := dbClient.processRequest(r)
 
 	refute(t, newReq, nil)

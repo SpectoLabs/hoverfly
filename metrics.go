@@ -1,4 +1,4 @@
-package main
+package hoverfly
 
 import (
 	log "github.com/Sirupsen/logrus"
@@ -53,21 +53,23 @@ func (c *CounterByMode) Count(mode string) {
 
 // Init initializes logging
 func (c *CounterByMode) Init() {
-	for _ = range time.Tick(c.flushInterval) {
-		m := c.Flush()
-		log.WithFields(log.Fields{"counters": m.Counters}).Info("hoverfly metrics")
-	}
+	go func() {
+		for _ = range time.Tick(c.flushInterval) {
+			m := c.Flush()
+			log.WithFields(log.Fields{"counters": m.Counters}).Info("hoverfly metrics")
+		}
+	}()
 }
 
-// HoverflyStats - holds information about various system metrics like requests counts
-type HoverflyStats struct {
+// Stats - holds information about various system metrics like requests counts
+type Stats struct {
 	Counters    map[string]int64   `json:"counters"`
 	Gauges      map[string]int64   `json:"gauges,omitempty"`
 	GaugesFloat map[string]float64 `json:"gaugesFloat,omitempty"`
 }
 
 // Flush gets current metrics from stats registry
-func (c *CounterByMode) Flush() (h HoverflyStats) {
+func (c *CounterByMode) Flush() (h Stats) {
 
 	counters := make(map[string]int64)
 	gauges := make(map[string]int64)
