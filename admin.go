@@ -287,6 +287,21 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 					"error": err.Error(),
 				}).Error("Failed to encode payload")
 			} else {
+				// hook
+				var en Entry
+				en.ActionType = ActionTypeRequestCaptured
+				en.Message = "imported"
+				en.Time = time.Now()
+				en.Data = bts
+
+				if err := d.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
+					log.WithFields(log.Fields{
+						"error":      err.Error(),
+						"message":    en.Message,
+						"actionType": ActionTypeRequestCaptured,
+					}).Error("failed to fire hook")
+				}
+
 				// recalculating request hash and storing it in database
 				r := RequestContainer{Details: pl.Request}
 				d.Cache.Set([]byte(r.Hash()), bts)

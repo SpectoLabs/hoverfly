@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"io/ioutil"
@@ -19,6 +20,11 @@ type DBClient struct {
 	Cfg     *Configuration
 	Counter *CounterByMode
 	Hooks   ActionTypeHooks
+}
+
+// AddHook - adds a hook to DBClient
+func (d *DBClient) AddHook(hook Hook) {
+	d.Hooks.Add(hook)
 }
 
 // RequestContainer holds structure for request
@@ -329,6 +335,22 @@ func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, 
 		}
 
 		bts, err := payload.Encode()
+
+		// hook
+		var en Entry
+		en.ActionType = ActionTypeRequestCaptured
+		en.Message = "captured"
+		en.Time = time.Now()
+		en.Data = bts
+
+		if err := d.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
+			log.WithFields(log.Fields{
+				"error":      err.Error(),
+				"message":    en.Message,
+				"actionType": ActionTypeRequestCaptured,
+			}).Error("failed to fire hook")
+		}
+
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
@@ -487,4 +509,52 @@ func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (
 
 	return newResponse, nil
 
+}
+
+// ActionType - action type can be things such as "RequestCaptured", "GotResponse" - anything
+type ActionType string
+
+// ActionTypeRequestCaptured - default action type name for identifying
+const ActionTypeRequestCaptured = "requestCaptured"
+
+// Entry - holds information about action, based on action type - other clients will be able to decode
+// the data field.
+type Entry struct {
+	// Contains encoded data
+	Data []byte
+
+	// Time at which the action entry was fired
+	Time time.Time
+
+	ActionType ActionType
+
+	// Message, can carry additional information
+	Message string
+}
+
+// Hook - an interface to add dynamic hooks to extend functionality
+type Hook interface {
+	ActionTypes() []ActionType
+	Fire(*Entry) error
+}
+
+// ActionTypeHooks type for storing the hooks
+type ActionTypeHooks map[ActionType][]Hook
+
+// Add a hook
+func (hooks ActionTypeHooks) Add(hook Hook) {
+	for _, ac := range hook.ActionTypes() {
+		hooks[ac] = append(hooks[ac], hook)
+	}
+}
+
+// Fire all the hooks for the passed ActionType
+func (hooks ActionTypeHooks) Fire(ac ActionType, entry *Entry) error {
+	for _, hook := range hooks[ac] {
+		if err := hook.Fire(entry); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
