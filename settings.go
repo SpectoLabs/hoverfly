@@ -1,4 +1,4 @@
-package main
+package hoverfly
 
 import (
 	"os"
@@ -7,14 +7,14 @@ import (
 
 // Configuration - initial structure of configuration
 type Configuration struct {
-	adminPort    string
-	proxyPort    string
-	mode         string
-	destination  string
-	middleware   string
-	databaseName string
-	verbose      bool
-	development  bool
+	AdminPort    string
+	ProxyPort    string
+	Mode         string
+	Destination  string
+	Middleware   string
+	DatabaseName string
+	Verbose      bool
+	Development  bool
 
 	mu sync.Mutex
 }
@@ -22,14 +22,14 @@ type Configuration struct {
 // SetMode - provides safe way to set new mode
 func (c *Configuration) SetMode(mode string) {
 	c.mu.Lock()
-	c.mode = mode
+	c.Mode = mode
 	c.mu.Unlock()
 }
 
 // GetMode - provides safe way to get current mode
 func (c *Configuration) GetMode() (mode string) {
 	c.mu.Lock()
-	mode = c.mode
+	mode = c.Mode
 	c.mu.Unlock()
 	return
 }
@@ -51,26 +51,26 @@ func InitSettings() *Configuration {
 	var appConfig Configuration
 	// getting default admin interface port
 	if os.Getenv("AdminPort") != "" {
-		appConfig.adminPort = os.Getenv("AdminPort")
+		appConfig.AdminPort = os.Getenv("AdminPort")
 	} else {
-		appConfig.adminPort = DefaultAdminPort
+		appConfig.AdminPort = DefaultAdminPort
 	}
 
 	// getting proxy port
 	if os.Getenv("ProxyPort") != "" {
-		appConfig.proxyPort = os.Getenv("ProxyPort")
+		appConfig.ProxyPort = os.Getenv("ProxyPort")
 	} else {
-		appConfig.proxyPort = DefaultPort
+		appConfig.ProxyPort = DefaultPort
 	}
 
 	databaseName := os.Getenv("HoverflyDB")
 	if databaseName == "" {
 		databaseName = DefaultDatabaseName
 	}
-	appConfig.databaseName = databaseName
+	appConfig.DatabaseName = databaseName
 
 	// middleware configuration
-	appConfig.middleware = os.Getenv("HoverflyMiddleware")
+	appConfig.Middleware = os.Getenv("HoverflyMiddleware")
 
 	return &appConfig
 }

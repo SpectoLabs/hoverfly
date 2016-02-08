@@ -1,4 +1,4 @@
-package main
+package hoverfly
 
 import (
 	"fmt"
@@ -59,16 +59,16 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	}
 	// creating random buckets for everyone!
 	bucket := GetRandomName(10)
-	cache := Cache{db: TestDB, requestsBucket: bucket}
+	cache := Cache{DS: TestDB, RequestsBucket: bucket}
 
 	cfg := InitSettings()
 	counter := NewModeCounter()
 	// preparing client
 	dbClient := &DBClient{
-		http:    &http.Client{Transport: tr},
-		cache:   cache,
-		cfg:     cfg,
-		counter: counter,
+		HTTP:    &http.Client{Transport: tr},
+		Cache:   cache,
+		Cfg:     cfg,
+		Counter: counter,
 	}
 	return server, dbClient
 }
@@ -96,7 +96,7 @@ func GetRandomName(n int) []byte {
 func setup() {
 	// we don't really want to see what's happening
 	log.SetLevel(log.FatalLevel)
-	db := getDB(testingDatabaseName)
+	db := GetDB(testingDatabaseName)
 	TestDB = db
 }
 

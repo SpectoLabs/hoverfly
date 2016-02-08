@@ -1,4 +1,4 @@
-package main
+package hoverfly
 
 import (
 	"bytes"
@@ -16,7 +16,7 @@ func TestMain(m *testing.M) {
 
 	retCode := m.Run()
 
-	// your func
+	// delete test database
 	teardown()
 
 	// call with result of m.Run()
@@ -55,7 +55,7 @@ func TestRequestBodyCaptured(t *testing.T) {
 
 	fp := getRequestFingerprint(req, requestBody)
 
-	payloadBts, err := dbClient.cache.Get([]byte(fp))
+	payloadBts, err := dbClient.Cache.Get([]byte(fp))
 	expect(t, err, nil)
 
 	payload, err := decodePayload(payloadBts)
@@ -76,7 +76,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 		request, err := http.NewRequest("POST", "http://capture_body.com", body)
 		expect(t, err, nil)
 
-		resp := response{
+		resp := ResponseDetails{
 			Status: 200,
 			Body:   fmt.Sprintf("body here, number=%d", i),
 		}
@@ -84,7 +84,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 
 		// creating response
 		c := NewConstructor(request, payload)
-		response := c.reconstructResponse()
+		response := c.ReconstructResponse()
 
 		dbClient.save(request, requestBody, response, []byte(resp.Body))
 	}
@@ -166,19 +166,19 @@ func TestDeleteAllRecords(t *testing.T) {
 		expect(t, err, nil)
 		dbClient.captureRequest(req)
 	}
-	err := dbClient.cache.DeleteBucket(dbClient.cache.requestsBucket)
+	err := dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 	expect(t, err, nil)
 }
 
 func TestPayloadEncodeDecode(t *testing.T) {
-	resp := response{
+	resp := ResponseDetails{
 		Status: 200,
 		Body:   "body here",
 	}
 
 	payload := Payload{Response: resp}
 
-	bts, err := payload.encode()
+	bts, err := payload.Encode()
 	expect(t, err, nil)
 
 	pl, err := decodePayload(bts)
@@ -191,7 +191,7 @@ func TestPayloadEncodeDecode(t *testing.T) {
 func TestPayloadEncodeEmpty(t *testing.T) {
 	payload := Payload{}
 
-	bts, err := payload.encode()
+	bts, err := payload.Encode()
 	expect(t, err, nil)
 
 	_, err = decodePayload(bts)
@@ -208,12 +208,12 @@ func TestModifyRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	dbClient.cfg.middleware = "./examples/middleware/modify_request/modify_request.py"
+	dbClient.Cfg.Middleware = "./examples/middleware/modify_request/modify_request.py"
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	expect(t, err, nil)
 
-	response, err := dbClient.modifyRequestResponse(req, dbClient.cfg.middleware)
+	response, err := dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
 	expect(t, err, nil)
 
 	// response should be changed to 202
@@ -226,12 +226,12 @@ func TestModifyRequestWODestination(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	dbClient.cfg.middleware = "./examples/middleware/modify_response/modify_response.py"
+	dbClient.Cfg.Middleware = "./examples/middleware/modify_response/modify_response.py"
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	expect(t, err, nil)
 
-	response, err := dbClient.modifyRequestResponse(req, dbClient.cfg.middleware)
+	response, err := dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
 	expect(t, err, nil)
 
 	// response should be changed to 201
@@ -243,12 +243,12 @@ func TestModifyRequestNoMiddleware(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	dbClient.cfg.middleware = ""
+	dbClient.Cfg.Middleware = ""
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	expect(t, err, nil)
 
-	_, err = dbClient.modifyRequestResponse(req, dbClient.cfg.middleware)
+	_, err = dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
 	refute(t, err, nil)
 }
 
@@ -269,7 +269,7 @@ func TestGetResponseCorruptedPayload(t *testing.T) {
 
 	fp := getRequestFingerprint(req, requestBody)
 
-	dbClient.cache.Set([]byte(fp), []byte("you shall not decode me!"))
+	dbClient.Cache.Set([]byte(fp), []byte("you shall not decode me!"))
 
 	// repeating process
 	bodyNew := ioutil.NopCloser(bytes.NewBuffer(requestBody))
@@ -288,7 +288,7 @@ func TestDoRequestWFailedMiddleware(t *testing.T) {
 	defer server.Close()
 
 	// adding middleware which doesn't exist, doRequest should return error
-	dbClient.cfg.middleware = "./should/not/exist.go"
+	dbClient.Cfg.Middleware = "./should/not/exist.go"
 
 	requestBody := []byte("fizz=buzz")
 
