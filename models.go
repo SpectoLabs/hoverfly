@@ -178,13 +178,33 @@ func extractBody(resp *http.Response) (extract []byte, err error) {
 	return extract, nil
 }
 
-// getRequestDetails - extracts request details, reads request body so it will be empty.
+func extractRequestBody(req *http.Request) (extract []byte, err error) {
+	save := req.Body
+	savecl := req.ContentLength
+
+	save, req.Body, err = copyBody(req.Body)
+
+	if err != nil {
+		return
+	}
+	defer req.Body.Close()
+	extract, err = ioutil.ReadAll(req.Body)
+
+	req.Body = save
+	req.ContentLength = savecl
+	if err != nil {
+		return nil, err
+	}
+	return extract, nil
+}
+
+// getRequestDetails - extracts request details
 func getRequestDetails(req *http.Request) (requestObj RequestDetails, err error) {
 	if req.Body == nil {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 	}
 
-	reqBody, err := ioutil.ReadAll(req.Body)
+	reqBody, err := extractRequestBody(req)
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -404,6 +424,16 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 // is saved to cache.
 func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (*http.Response, error) {
 
+	// getting request details
+	rd, err := getRequestDetails(req)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":      err.Error(),
+			"middleware": middleware,
+		}).Error("Failed to get request details")
+		return nil, err
+	}
+
 	// modifying request
 	resp, err := d.doRequest(req)
 
@@ -427,7 +457,8 @@ func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (
 		Body:    string(bodyBytes),
 		Headers: resp.Header,
 	}
-	payload := Payload{Response: r}
+
+	payload := Payload{Response: r, Request: rd}
 
 	c := NewConstructor(req, payload)
 	// applying middleware to modify response

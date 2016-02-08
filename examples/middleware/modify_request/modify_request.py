@@ -3,7 +3,7 @@ import sys
 import json
 import logging
 
-logging.basicConfig(filename='middleware.log', level=logging.DEBUG)
+logging.basicConfig(filename='middleware_request.log', level=logging.DEBUG)
 logging.debug('Middleware "modify_request" called')
 
 
