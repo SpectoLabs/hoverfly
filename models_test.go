@@ -178,7 +178,7 @@ func TestPayloadEncodeDecode(t *testing.T) {
 
 	payload := Payload{Response: resp}
 
-	bts, err := payload.encode()
+	bts, err := payload.Encode()
 	expect(t, err, nil)
 
 	pl, err := decodePayload(bts)
@@ -191,7 +191,7 @@ func TestPayloadEncodeDecode(t *testing.T) {
 func TestPayloadEncodeEmpty(t *testing.T) {
 	payload := Payload{}
 
-	bts, err := payload.encode()
+	bts, err := payload.Encode()
 	expect(t, err, nil)
 
 	_, err = decodePayload(bts)

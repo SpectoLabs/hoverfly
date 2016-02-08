@@ -74,8 +74,8 @@ type Payload struct {
 	ID       string          `json:"id"`
 }
 
-// encode method encodes all exported Payload fields to bytes
-func (p *Payload) encode() ([]byte, error) {
+// Encode method encodes all exported Payload fields to bytes
+func (p *Payload) Encode() ([]byte, error) {
 	buf := new(bytes.Buffer)
 	enc := gob.NewEncoder(buf)
 	err := enc.Encode(p)
@@ -307,7 +307,7 @@ func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, 
 			ID:       key,
 		}
 
-		bts, err := payload.encode()
+		bts, err := payload.Encode()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),

@@ -277,7 +277,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 	payloads := requests.Data
 	if len(payloads) > 0 {
 		for _, pl := range payloads {
-			bts, err := pl.encode()
+			bts, err := pl.Encode()
 			if err != nil {
 				log.WithFields(log.Fields{
 					"error": err.Error(),
