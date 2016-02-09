@@ -517,6 +517,12 @@ type ActionType string
 // ActionTypeRequestCaptured - default action type name for identifying
 const ActionTypeRequestCaptured = "requestCaptured"
 
+// ActionTypeWipeDB - default action type for wiping database
+const ActionTypeWipeDB = "wipeDatabase"
+
+// ActionTypeConfigurationChanged - default action name for identifying configuration changes
+const ActionTypeConfigurationChanged = "configurationChanged"
+
 // Entry - holds information about action, based on action type - other clients will be able to decode
 // the data field.
 type Entry struct {
