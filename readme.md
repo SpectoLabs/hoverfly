@@ -141,15 +141,15 @@ Add ca.pem to your trusted certificates or turn off verification. With curl you 
 
 ## API
 
-You can access the administrator API under default port 8888:
+You can access the administrator API under the default hostname of 'localhost' and port '8888':
 
-* Recorded requests: GET http://proxy_hostname:8888/records ( __curl http://proxy_hostname:8888/records__ )
-* Wipe cache: DELETE http://proxy_hostname:8888/records ( __curl -X DELETE http://proxy_hostname:8888/records__ )
-* Get current proxy state: GET http://proxy_hostname:8888/state ( __curl http://proxy_hostname:8888/state__ )
-* Set proxy state: POST http://proxy_hostname:8888/state, where
+* Recorded requests: GET [http://localhost:8888/records](http://localhost:8888/records) ( __curl http://localhost:8888/records __ )
+* Wipe cache: DELETE http://localhost:8888/records ( __curl -X DELETE http://localhost:8888/records__ )
+* Get current proxy state: GET [http://localhost:8888/state](http://localhost:8888/state) ( __curl http://localhost:8888/state__ )
+* Set proxy state: POST http://localhost:8888/state, where
    + body to start virtualizing: {"mode":"virtualize"}
    + body to start capturing: {"mode":"capture"}
-* Exporting recorded requests to a file: __curl http://proxy_hostname:8888/records > requests.json__
+* Exporting recorded requests to a file: __curl http://localhost:8888/records > requests.json__
 * Importing requests from file: __curl --data "@/path/to/requests.json" http://localhost:8888/records__
 
 
