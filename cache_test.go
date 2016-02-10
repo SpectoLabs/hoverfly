@@ -168,8 +168,9 @@ func TestGetAllKeys(t *testing.T) {
 	expect(t, err, nil)
 	expect(t, len(keys), 5)
 
-	for _, v := range keys {
-		expect(t, strings.HasPrefix(v, "key"), true)
+	for k, v := range keys {
+		expect(t, strings.HasPrefix(k, "key"), true)
+		expect(t, v, true)
 	}
 }
 

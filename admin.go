@@ -241,7 +241,7 @@ func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 				log.WithFields(log.Fields{
 					"message": p,
 					"error":   err.Error(),
-				}).Error("Got error when writing message...")
+				}).Debug("Got error when writing message...")
 				return
 			}
 		}
@@ -287,6 +287,21 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 					"error": err.Error(),
 				}).Error("Failed to encode payload")
 			} else {
+				// hook
+				var en Entry
+				en.ActionType = ActionTypeRequestCaptured
+				en.Message = "imported"
+				en.Time = time.Now()
+				en.Data = bts
+
+				if err := d.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
+					log.WithFields(log.Fields{
+						"error":      err.Error(),
+						"message":    en.Message,
+						"actionType": ActionTypeRequestCaptured,
+					}).Error("failed to fire hook")
+				}
+
 				// recalculating request hash and storing it in database
 				r := RequestContainer{Details: pl.Request}
 				d.Cache.Set([]byte(r.Hash()), bts)
@@ -306,6 +321,19 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 // DeleteAllRecordsHandler - deletes all captured requests
 func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 	err := d.Cache.DeleteBucket(d.Cache.RequestsBucket)
+
+	var en Entry
+	en.ActionType = ActionTypeWipeDB
+	en.Message = "wipe"
+	en.Time = time.Now()
+
+	if err := d.Hooks.Fire(ActionTypeWipeDB, &en); err != nil {
+		log.WithFields(log.Fields{
+			"error":      err.Error(),
+			"message":    en.Message,
+			"actionType": ActionTypeWipeDB,
+		}).Error("failed to fire hook")
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -390,6 +418,20 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// setting new state
 	d.Cfg.SetMode(sr.Mode)
+
+	var en Entry
+	en.ActionType = ActionTypeConfigurationChanged
+	en.Message = "changed"
+	en.Time = time.Now()
+	en.Data = []byte("sr.Mode")
+
+	if err := d.Hooks.Fire(ActionTypeConfigurationChanged, &en); err != nil {
+		log.WithFields(log.Fields{
+			"error":      err.Error(),
+			"message":    en.Message,
+			"actionType": ActionTypeConfigurationChanged,
+		}).Error("failed to fire hook")
+	}
 
 	var resp stateRequest
 	resp.Mode = d.Cfg.GetMode()
