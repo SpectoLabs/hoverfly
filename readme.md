@@ -143,7 +143,7 @@ Add ca.pem to your trusted certificates or turn off verification. With curl you 
 
 You can access the administrator API under the default hostname of 'localhost' and port '8888':
 
-* Recorded requests: GET [http://localhost:8888/records](http://localhost:8888/records) ( __curl http://localhost:8888/records __ )
+* Recorded requests: GET [http://localhost:8888/records](http://localhost:8888/records) ( __curl http://localhost:8888/records__ )
 * Wipe cache: DELETE http://localhost:8888/records ( __curl -X DELETE http://localhost:8888/records__ )
 * Get current proxy state: GET [http://localhost:8888/state](http://localhost:8888/state) ( __curl http://localhost:8888/state__ )
 * Set proxy state: POST http://localhost:8888/state, where
