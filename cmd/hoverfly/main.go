@@ -119,8 +119,12 @@ func main() {
 	// overriding destination
 	cfg.Destination = *destination
 
-	proxy, dbClient := hv.GetNewHoverfly(cfg)
-	defer dbClient.Cache.DS.Close()
+	// getting boltDB
+	db := hv.GetDB(cfg.DatabaseName)
+	cache := hv.NewBoltDBCache(db, []byte(hv.RequestsBucketName))
+	defer cache.CloseDB()
+
+	proxy, dbClient := hv.GetNewHoverfly(cfg, cache)
 
 	// starting admin interface
 	dbClient.StartAdminInterface()
