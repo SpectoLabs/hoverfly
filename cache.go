@@ -18,6 +18,16 @@ type Cache interface {
 	GetAllKeys() (map[string]bool, error)
 	CloseDB()
 }
+
+// NewBoltDBCache - returns new BoltCache instance
+func NewBoltDBCache(db *bolt.DB, bucket []byte) BoltCache {
+	cache := BoltCache{
+		DS:             db,
+		RequestsBucket: []byte(bucket),
+	}
+	return cache
+}
+
 // RequestsBucketName - default name for BoltDB bucket
 const RequestsBucketName = "rqbucket"
 
