@@ -120,7 +120,7 @@ func main() {
 	cfg.Destination = *destination
 
 	proxy, dbClient := hv.GetNewHoverfly(cfg)
-	defer dbClient.Cache.DS.Close()
+	defer dbClient.Cache.CloseDB()
 
 	// starting admin interface
 	dbClient.StartAdminInterface()

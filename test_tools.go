@@ -59,14 +59,15 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	}
 	// creating random buckets for everyone!
 	bucket := GetRandomName(10)
-	cache := Cache{DS: TestDB, RequestsBucket: bucket}
+
+	cache := NewBoltDBCache(TestDB, bucket)
 
 	cfg := InitSettings()
 	counter := NewModeCounter()
 	// preparing client
 	dbClient := &DBClient{
 		HTTP:    &http.Client{Transport: tr},
-		Cache:   cache,
+		Cache:   &cache,
 		Cfg:     cfg,
 		Counter: counter,
 	}

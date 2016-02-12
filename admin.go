@@ -320,7 +320,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 
 // DeleteAllRecordsHandler - deletes all captured requests
 func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request) {
-	err := d.Cache.DeleteBucket(d.Cache.RequestsBucket)
+	err := d.Cache.DeleteData()
 
 	var en Entry
 	en.ActionType = ActionTypeWipeDB
