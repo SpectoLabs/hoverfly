@@ -12,8 +12,12 @@ func TestGetNewHoverflyCheckConfig(t *testing.T) {
 
 	cfg := InitSettings()
 	cfg.DatabaseName = "testing2.db"
-	_, dbClient := GetNewHoverfly(cfg)
-	defer dbClient.Cache.DS.Close()
+	// getting boltDB
+	db := GetDB(cfg.DatabaseName)
+	cache := NewBoltDBCache(db, []byte(RequestsBucketName))
+	defer cache.CloseDB()
+
+	_, dbClient := GetNewHoverfly(cfg, cache)
 
 	expect(t, dbClient.Cfg, cfg)
 
@@ -24,7 +28,7 @@ func TestGetNewHoverflyCheckConfig(t *testing.T) {
 func TestProcessCaptureRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+	defer dbClient.Cache.DeleteData()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	expect(t, err, nil)
@@ -41,7 +45,7 @@ func TestProcessCaptureRequest(t *testing.T) {
 func TestProcessVirtualizeRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+	defer dbClient.Cache.DeleteData()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	expect(t, err, nil)
@@ -66,7 +70,7 @@ func TestProcessVirtualizeRequest(t *testing.T) {
 func TestProcessSynthesizeRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+	defer dbClient.Cache.DeleteData()
 
 	// getting reflect middleware
 	dbClient.Cfg.Middleware = "./examples/middleware/reflect_body/reflect_body.py"
