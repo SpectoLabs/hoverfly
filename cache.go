@@ -8,7 +8,7 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-// Cache - cache interface used to store and retrieve request/response payloads
+// Cache - cache interface used to store and retrieve request/response payloads or anything else
 type Cache interface {
 	Set(key, value []byte) error
 	Get(key []byte) ([]byte, error)
@@ -30,7 +30,7 @@ func NewBoltDBCache(db *bolt.DB, bucket []byte) *BoltCache {
 // RequestsBucketName - default name for BoltDB bucket
 const RequestsBucketName = "rqbucket"
 
-// Cache - provides access to BoltDB and holds current bucket name
+// BoltCache - container to implement Cache instance with BoltDB backend for storage
 type BoltCache struct {
 	DS             *bolt.DB
 	RequestsBucket []byte
