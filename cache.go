@@ -8,6 +8,16 @@ import (
 	"github.com/boltdb/bolt"
 )
 
+// Cache - cache interface used to store and retrieve request/response payloads
+type Cache interface {
+	Set(key, value []byte) error
+	Get(key []byte) ([]byte, error)
+	GetAllRequests() ([]Payload, error)
+	RecordsCount() (int, error)
+	DeleteData() error
+	GetAllKeys() (map[string]bool, error)
+	CloseDB()
+}
 // RequestsBucketName - default name for BoltDB bucket
 const RequestsBucketName = "rqbucket"
 
