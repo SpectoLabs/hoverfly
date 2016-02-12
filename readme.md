@@ -42,21 +42,26 @@ This project uses the [Glide](https://github.com/Masterminds/glide) project to m
 Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), and therefore you must have Go > 1.5 installed, 
 and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled. 
 
+To set up your Go environment - look [here](https://golang.org/doc/code.html).
+
 Note that you must also clone the Hoverfly repository within your $GOPATH (you can read more about on 
 how [Glide works](https://github.com/Masterminds/glide#user-content-how-it-works)), or else you may see strange errors
 like "_cannot find package "github.com/Sirupsen/logrus" in any of: XXX_":
 
     export GO15VENDOREXPERIMENT=1
     mkdir -p "$GOPATH/src/github.com/SpectoLabs/"
-    git clone https://github.com/SpectoLabs/hoverfly.git "$GOPATH/src/SpectoLabs/github.com/hoverfly"
-    cd "$GOPATH/src/github.com/SpectoLabs/hoverfly/cmd/hoverfly/"
+    git clone https://github.com/SpectoLabs/hoverfly.git "$GOPATH/src/github.com/SpectoLabs/hoverfly"
+    cd "$GOPATH/src/github.com/SpectoLabs/hoverfly"
 
 We can then fetch the dependencies (or you can also use _git submodule init_) with:
-
+    
+    brew install glide
     glide up
 
+Check that you can see "vendor" folder created in Hoverfly directory - this indicates that dependencies were downloaded.
 Build Hoverfly (main application file is in /cmd/hoverfly/ directory):
 
+    cd cmd/hoverfly/
     go build
 
 Set the correct permissions:
@@ -184,6 +189,14 @@ generating response on the fly you can use ""--synthesize" flag.
 In order to use your middleware, just add path to executable:
 
     ./hoverfly --middleware "../../examples/middleware/modify_response/modify_response.py"
+    
+You should be treating Hoverfly middleware as commands, this enables a bit more complex execution:
+
+    .hoverfly --middleware "go run ../../examples/middleware/go_example/change_to_custom_404.go"
+    
+In this example Hoverfly is also compiling Go middleware on the fly. However this increases time taken to execute middleware
+(and therefore to respond) so it's better to precompile middleware binaries before using them. 
+
 
 #### Python middleware example
 
