@@ -191,7 +191,7 @@ func TestDeleteAllRecords(t *testing.T) {
 		expect(t, err, nil)
 		dbClient.captureRequest(req)
 	}
-	err := dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+	err := dbClient.Cache.DeleteData()
 	expect(t, err, nil)
 }
 

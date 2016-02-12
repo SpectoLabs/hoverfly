@@ -11,6 +11,7 @@ import (
 func TestSetKey(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
+	defer dbClient.Cache.DeleteData()
 
 	k := []byte("randomkeyhere")
 	v := []byte("value")
@@ -21,7 +22,6 @@ func TestSetKey(t *testing.T) {
 	value, err := dbClient.Cache.Get(k)
 	expect(t, err, nil)
 	expect(t, string(value), string(v))
-	dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
 }
 
 func TestPayloadSetGet(t *testing.T) {
@@ -47,17 +47,14 @@ func TestPayloadSetGet(t *testing.T) {
 	expect(t, err, nil)
 	expect(t, payload.Response.Body, p.Response.Body)
 
-	dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+	defer dbClient.Cache.DeleteData()
 }
 
 func TestGetNonExistingBucket(t *testing.T) {
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	cache := NewBoltDBCache(TestDB, []byte("somebucket"))
 
-	dbClient.Cache.RequestsBucket = []byte("some_random_bucket")
-
-	_, err := dbClient.Cache.Get([]byte("whatever"))
-	expect(t, err.Error(), "Bucket \"some_random_bucket\" not found!")
+	_, err := cache.Get([]byte("whatever"))
+	expect(t, err.Error(), "Bucket \"somebucket\" not found!")
 }
 
 func TestDeleteBucket(t *testing.T) {
@@ -75,20 +72,19 @@ func TestDeleteBucket(t *testing.T) {
 	expect(t, string(value), string(v))
 
 	// deleting bucket
-	err = dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+	err = dbClient.Cache.DeleteData()
 	expect(t, err, nil)
 
 	// deleting it again
-	err = dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+	err = dbClient.Cache.DeleteData()
 	refute(t, err, nil)
 }
 
 func TestGetAllRequestNoBucket(t *testing.T) {
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	cache := NewBoltDBCache(TestDB, []byte("somebucket"))
 
-	dbClient.Cache.RequestsBucket = []byte("no_bucket_for_TestGetAllRequestNoBucket")
-	_, err := dbClient.Cache.GetAllRequests()
+	cache.RequestsBucket = []byte("no_bucket_for_TestGetAllRequestNoBucket")
+	_, err := cache.GetAllRequests()
 	// expecting nil since this would mean that records were wiped
 	expect(t, err, nil)
 }
@@ -113,7 +109,7 @@ func TestCorruptedPayloads(t *testing.T) {
 func TestGetMultipleRecords(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+	defer dbClient.Cache.DeleteData()
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -135,7 +131,7 @@ func TestGetMultipleRecords(t *testing.T) {
 func TestGetNonExistingKey(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+	defer dbClient.Cache.DeleteData()
 
 	// getting key
 	_, err := dbClient.Cache.Get([]byte("should not be here"))
@@ -145,7 +141,7 @@ func TestGetNonExistingKey(t *testing.T) {
 func TestSetGetEmptyValue(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+	defer dbClient.Cache.DeleteData()
 
 	err := dbClient.Cache.Set([]byte("shouldbe"), []byte(""))
 	expect(t, err, nil)
@@ -157,7 +153,7 @@ func TestSetGetEmptyValue(t *testing.T) {
 func TestGetAllKeys(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+	defer dbClient.Cache.DeleteData()
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -177,7 +173,7 @@ func TestGetAllKeys(t *testing.T) {
 func TestGetAllKeysEmpty(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.Cache.DeleteBucket(dbClient.Cache.RequestsBucket)
+	defer dbClient.Cache.DeleteData()
 
 	keys, err := dbClient.Cache.GetAllKeys()
 	expect(t, err, nil)

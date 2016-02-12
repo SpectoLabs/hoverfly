@@ -8,11 +8,30 @@ import (
 	"github.com/boltdb/bolt"
 )
 
+// Cache - cache interface used to store and retrieve request/response payloads
+type Cache interface {
+	Set(key, value []byte) error
+	Get(key []byte) ([]byte, error)
+	GetAllRequests() ([]Payload, error)
+	RecordsCount() (int, error)
+	DeleteData() error
+	GetAllKeys() (map[string]bool, error)
+	CloseDB()
+}
+
+// NewBoltDBCache - returns new BoltCache instance
+func NewBoltDBCache(db *bolt.DB, bucket []byte) *BoltCache {
+	return &BoltCache{
+		DS:             db,
+		RequestsBucket: []byte(bucket),
+	}
+}
+
 // RequestsBucketName - default name for BoltDB bucket
 const RequestsBucketName = "rqbucket"
 
 // Cache - provides access to BoltDB and holds current bucket name
-type Cache struct {
+type BoltCache struct {
 	DS             *bolt.DB
 	RequestsBucket []byte
 }
@@ -31,8 +50,13 @@ func GetDB(name string) *bolt.DB {
 	return db
 }
 
+// CloseDB - closes database
+func (c *BoltCache) CloseDB() {
+	c.DS.Close()
+}
+
 // Set - saves given key and value pair to cache
-func (c *Cache) Set(key, value []byte) error {
+func (c *BoltCache) Set(key, value []byte) error {
 	err := c.DS.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(c.RequestsBucket)
 		if err != nil {
@@ -49,7 +73,7 @@ func (c *Cache) Set(key, value []byte) error {
 }
 
 // Get - searches for given key in the cache and returns value if found
-func (c *Cache) Get(key []byte) (value []byte, err error) {
+func (c *BoltCache) Get(key []byte) (value []byte, err error) {
 
 	err = c.DS.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(c.RequestsBucket)
@@ -74,7 +98,7 @@ func (c *Cache) Get(key []byte) (value []byte, err error) {
 }
 
 // GetAllRequests - returns all captured requests/responses
-func (c *Cache) GetAllRequests() (payloads []Payload, err error) {
+func (c *BoltCache) GetAllRequests() (payloads []Payload, err error) {
 	err = c.DS.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(c.RequestsBucket)
 		if b == nil {
@@ -100,7 +124,7 @@ func (c *Cache) GetAllRequests() (payloads []Payload, err error) {
 }
 
 // RecordsCount - returns records count
-func (c *Cache) RecordsCount() (count int, err error) {
+func (c *BoltCache) RecordsCount() (count int, err error) {
 	err = c.DS.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(c.RequestsBucket)
 		if b == nil {
@@ -115,8 +139,14 @@ func (c *Cache) RecordsCount() (count int, err error) {
 	return
 }
 
+// DeleteData - deletes bucket with all saved data
+func (c *BoltCache) DeleteData() error {
+	err := c.DeleteBucket(c.RequestsBucket)
+	return err
+}
+
 // DeleteBucket - deletes bucket with all saved data
-func (c *Cache) DeleteBucket(name []byte) (err error) {
+func (c *BoltCache) DeleteBucket(name []byte) (err error) {
 	err = c.DS.Update(func(tx *bolt.Tx) error {
 		err = tx.DeleteBucket(name)
 		if err != nil {
@@ -132,7 +162,7 @@ func (c *Cache) DeleteBucket(name []byte) (err error) {
 }
 
 // GetAllKeys - gets all current keys
-func (c *Cache) GetAllKeys() (keys map[string]bool, err error) {
+func (c *BoltCache) GetAllKeys() (keys map[string]bool, err error) {
 	err = c.DS.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(c.RequestsBucket)
 
