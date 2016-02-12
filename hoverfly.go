@@ -33,17 +33,13 @@ func orPanic(err error) {
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
-func GetNewHoverfly(cfg *Configuration) (*goproxy.ProxyHttpServer, DBClient) {
+func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, DBClient) {
 
 	counter := NewModeCounter()
 
-	// getting boltDB
-	db := GetDB(cfg.DatabaseName)
-	cache := NewBoltDBCache(db, []byte(RequestsBucketName))
-
 	// getting connections
 	d := DBClient{
-		Cache:   &cache,
+		Cache:   cache,
 		HTTP:    &http.Client{},
 		Cfg:     cfg,
 		Counter: counter,
