@@ -281,6 +281,13 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 	payloads := requests.Data
 	if len(payloads) > 0 {
 		for _, pl := range payloads {
+			// recalculating request hash and storing it in database
+			r := RequestContainer{Details: pl.Request}
+			key := r.Hash()
+
+			// regenerating key
+			pl.ID = key
+
 			bts, err := pl.Encode()
 			if err != nil {
 				log.WithFields(log.Fields{
@@ -302,9 +309,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 					}).Error("failed to fire hook")
 				}
 
-				// recalculating request hash and storing it in database
-				r := RequestContainer{Details: pl.Request}
-				d.Cache.Set([]byte(r.Hash()), bts)
+				d.Cache.Set([]byte(key), bts)
 			}
 		}
 		response.Message = fmt.Sprintf("%d requests imported successfully", len(payloads))
