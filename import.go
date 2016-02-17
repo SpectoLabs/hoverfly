@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"net/url"
@@ -14,9 +15,9 @@ import (
 func (d *DBClient) Import(uri string) error {
 
 	// assuming file URI is URL:
-	if IsURL(uri) {
+	if isURL(uri) {
 		log.WithFields(log.Fields{
-			"isURL":      IsURL(uri),
+			"isURL":      isURL(uri),
 			"importFrom": uri,
 		}).Info("URL")
 		return d.ImportFromUrl(uri)
@@ -44,7 +45,7 @@ const URL string = `^((ftp|https?):\/\/)(\S+(:\S*)?@)?((([1-9]\d?|1\d\d|2[01]\d|
 
 var rxURL = regexp.MustCompile(URL)
 
-func IsURL(str string) bool {
+func isURL(str string) bool {
 	if str == "" || len(str) >= 2083 || len(str) <= 3 || strings.HasPrefix(str, ".") {
 		return false
 	}
@@ -76,7 +77,20 @@ func exists(path string) (bool, error) {
 
 func (d *DBClient) ImportFromDisk(path string) error {
 	log.Warn("importing from disk")
-	return nil
+
+	payloadsFile, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
+	}
+
+	var requests recordedRequests
+
+	jsonParser := json.NewDecoder(payloadsFile)
+	if err = jsonParser.Decode(&requests); err != nil {
+		return fmt.Errorf("Got error while parsing payloads file, error %s", err.Error())
+	}
+
+	return d.ImportPayloads(requests.Data)
 }
 
 func (d *DBClient) ImportFromUrl(url string) error {
