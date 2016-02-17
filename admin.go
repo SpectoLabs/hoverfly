@@ -278,44 +278,13 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	payloads := requests.Data
-	if len(payloads) > 0 {
-		for _, pl := range payloads {
-			// recalculating request hash and storing it in database
-			r := RequestContainer{Details: pl.Request}
-			key := r.Hash()
+	err = d.ImportPayloads(requests.Data)
 
-			// regenerating key
-			pl.ID = key
-
-			bts, err := pl.Encode()
-			if err != nil {
-				log.WithFields(log.Fields{
-					"error": err.Error(),
-				}).Error("Failed to encode payload")
-			} else {
-				// hook
-				var en Entry
-				en.ActionType = ActionTypeRequestCaptured
-				en.Message = "imported"
-				en.Time = time.Now()
-				en.Data = bts
-
-				if err := d.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
-					log.WithFields(log.Fields{
-						"error":      err.Error(),
-						"message":    en.Message,
-						"actionType": ActionTypeRequestCaptured,
-					}).Error("failed to fire hook")
-				}
-
-				d.Cache.Set([]byte(key), bts)
-			}
-		}
-		response.Message = fmt.Sprintf("%d requests imported successfully", len(payloads))
-	} else {
-		response.Message = "Bad request. Nothing to import!"
+	if err != nil {
+		response.Message = err.Error()
 		w.WriteHeader(400)
+	} else {
+		response.Message = fmt.Sprintf("%d payloads import complete.", len(requests.Data))
 	}
 
 	b, err := json.Marshal(response)
