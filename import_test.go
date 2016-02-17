@@ -74,3 +74,13 @@ func TestImportFromDiskBlankPath(t *testing.T) {
 	err := dbClient.ImportFromDisk("")
 	refute(t, err, nil)
 }
+
+func TestImportFromDiskWrongJson(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+
+	err := dbClient.ImportFromDisk("examples/exports/README.md")
+	refute(t, err, nil)
+}
+
