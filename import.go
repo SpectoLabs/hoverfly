@@ -1,4 +1,16 @@
 package hoverfly
+
+import (
+	"fmt"
+	log "github.com/Sirupsen/logrus"
+	"net/url"
+	"os"
+	"path"
+	"regexp"
+	"strings"
+	"time"
+)
+
 func (d *DBClient) ImportPayloads(payloads []Payload) error {
 	if len(payloads) > 0 {
 		success := 0
