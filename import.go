@@ -3,7 +3,6 @@ package hoverfly
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 	"os"
 	"path"
@@ -95,7 +94,7 @@ func (d *DBClient) ImportFromDisk(path string) error {
 
 func (d *DBClient) ImportFromUrl(url string) error {
 
-	resp, err := http.Get(url)
+	resp, err := d.HTTP.Get(url)
 	if err != nil {
 		return fmt.Errorf("Failed to fetch given URL, error %s", err.Error())
 	}
