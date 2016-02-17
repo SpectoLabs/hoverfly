@@ -114,7 +114,7 @@ func TestImportFromURLHTTPFail(t *testing.T) {
 	server.Close()
 	defer dbClient.Cache.DeleteData()
 
-	err := dbClient.ImportFromUrl("somepath")
+	err := dbClient.ImportFromURL("somepath")
 	refute(t, err, nil)
 }
 

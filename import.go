@@ -24,25 +24,23 @@ func (d *DBClient) Import(uri string) error {
 			"isURL":      isURL(uri),
 			"importFrom": uri,
 		}).Info("URL")
-		return d.ImportFromUrl(uri)
+		return d.ImportFromURL(uri)
 	}
 	// assuming file URI is disk location
 	ext := path.Ext(uri)
 	if ext != ".json" {
 		return fmt.Errorf("Failed to import payloads, only JSON files are acceppted. Given file: %s", uri)
-	} else {
-		// checking whether it exists
-		exists, err := exists(uri)
-		if err != nil {
-			return fmt.Errorf("Failed to import payloads from %s. Got error: %s", uri, err.Error())
-		}
-		if exists {
-			// file is JSON and it exist
-			return d.ImportFromDisk(uri)
-		} else {
-			return fmt.Errorf("Failed to import payloads, given file '%s' does not exist", uri)
-		}
 	}
+	// checking whether it exists
+	exists, err := exists(uri)
+	if err != nil {
+		return fmt.Errorf("Failed to import payloads from %s. Got error: %s", uri, err.Error())
+	}
+	if exists {
+		// file is JSON and it exist
+		return d.ImportFromDisk(uri)
+	}
+	return fmt.Errorf("Failed to import payloads, given file '%s' does not exist", uri)
 }
 
 // URL is regexp to match http urls
@@ -98,10 +96,10 @@ func (d *DBClient) ImportFromDisk(path string) error {
 	return d.ImportPayloads(requests.Data)
 }
 
-// ImportFromUrl - takes one string value and tries connect to a remote server, then parse response body into
+// ImportFromURL - takes one string value and tries connect to a remote server, then parse response body into
 // recordedRequests structure (which is default format in which Hoverfly exports captured requests) and
 // imports those requests into the database
-func (d *DBClient) ImportFromUrl(url string) error {
+func (d *DBClient) ImportFromURL(url string) error {
 
 	resp, err := d.HTTP.Get(url)
 	if err != nil {
@@ -136,7 +134,7 @@ func (d *DBClient) ImportPayloads(payloads []Payload) error {
 				log.WithFields(log.Fields{
 					"error": err.Error(),
 				}).Error("Failed to encode payload")
-				failed += 1
+				failed++
 			} else {
 				// hook
 				var en Entry
@@ -155,9 +153,9 @@ func (d *DBClient) ImportPayloads(payloads []Payload) error {
 
 				d.Cache.Set([]byte(key), bts)
 				if err == nil {
-					success += 1
+					success++
 				} else {
-					failed += 1
+					failed++
 				}
 			}
 		}
@@ -167,8 +165,6 @@ func (d *DBClient) ImportPayloads(payloads []Payload) error {
 			"failed":     failed,
 		}).Info("payloads imported")
 		return nil
-	} else {
-		return fmt.Errorf("Bad request. Nothing to import!")
 	}
-
+	return fmt.Errorf("Bad request. Nothing to import!")
 }
