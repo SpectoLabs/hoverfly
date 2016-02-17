@@ -1,6 +1,8 @@
 package hoverfly
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -53,7 +55,7 @@ func TestFileDoesNotExist(t *testing.T) {
 	expect(t, err, nil)
 }
 
-func TestImportFromFile(t *testing.T) {
+func TestImportFromDisk(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.Cache.DeleteData()
