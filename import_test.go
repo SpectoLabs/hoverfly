@@ -115,3 +115,15 @@ func TestImportFromURLHTTPFail(t *testing.T) {
 	err := dbClient.ImportFromUrl("somepath")
 	refute(t, err, nil)
 }
+
+func TestImportFromURLMalformedJSON(t *testing.T) {
+	// testing behaviour when there is no json on the other end
+	server, dbClient := testTools(200, `i am not json :(`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+
+	// importing payloads
+	err := dbClient.Import("http://thiswillbeintercepted.json")
+	// we should get error
+	refute(t, err, nil)
+}
