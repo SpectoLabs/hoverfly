@@ -3,13 +3,15 @@ package hoverfly
 import (
 	"encoding/json"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
+	"net/http"
 	"net/url"
 	"os"
 	"path"
 	"regexp"
 	"strings"
 	"time"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 func (d *DBClient) Import(uri string) error {
@@ -76,8 +78,6 @@ func exists(path string) (bool, error) {
 }
 
 func (d *DBClient) ImportFromDisk(path string) error {
-	log.Warn("importing from disk")
-
 	payloadsFile, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
@@ -94,8 +94,20 @@ func (d *DBClient) ImportFromDisk(path string) error {
 }
 
 func (d *DBClient) ImportFromUrl(url string) error {
-	log.Warn("importing from url")
-	return nil
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("Failed to fetch given URL, error %s", err.Error())
+	}
+
+	var requests recordedRequests
+
+	jsonParser := json.NewDecoder(resp.Body)
+	if err = jsonParser.Decode(&requests); err != nil {
+		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
+	}
+
+	return d.ImportPayloads(requests.Data)
 }
 
 func (d *DBClient) ImportPayloads(payloads []Payload) error {
