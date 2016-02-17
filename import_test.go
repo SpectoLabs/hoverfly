@@ -84,3 +84,24 @@ func TestImportFromDiskWrongJson(t *testing.T) {
 	refute(t, err, nil)
 }
 
+func TestImportFromURL(t *testing.T) {
+	// reading file and preparing json payload
+	payloadsFile, err := os.Open("examples/exports/readthedocs.json")
+	expect(t, err, nil)
+	bts, err := ioutil.ReadAll(payloadsFile)
+	expect(t, err, nil)
+
+	// pretending this is the endpoint with given json
+	server, dbClient := testTools(200, string(bts))
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+
+	// importing payloads
+	err = dbClient.Import("http://thiswillbeintercepted.json")
+	expect(t, err, nil)
+
+	recordsCount, err := dbClient.Cache.RecordsCount()
+	expect(t, err, nil)
+	expect(t, recordsCount, 5)
+}
+
