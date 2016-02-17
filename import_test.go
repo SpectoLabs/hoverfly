@@ -39,3 +39,11 @@ func TestFileExists(t *testing.T) {
 	expect(t, ex, true)
 	expect(t, err, nil)
 }
+
+func TestFileDoesNotExist(t *testing.T) {
+	fp := "shouldnotbehere.yaml"
+
+	ex, err := exists(fp)
+	expect(t, ex, false)
+	expect(t, err, nil)
+}
