@@ -105,3 +105,13 @@ func TestImportFromURL(t *testing.T) {
 	expect(t, recordsCount, 5)
 }
 
+func TestImportFromURLHTTPFail(t *testing.T) {
+	// this tests simulates unreachable server
+	server, dbClient := testTools(200, `this shouldn't matter anyway`)
+	// closing it immediately
+	server.Close()
+	defer dbClient.Cache.DeleteData()
+
+	err := dbClient.ImportFromUrl("somepath")
+	refute(t, err, nil)
+}
