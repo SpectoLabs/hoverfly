@@ -11,6 +11,34 @@ import (
 	"time"
 )
 
+func (d *DBClient) Import(uri string) error {
+
+	// assuming file URI is URL:
+	if IsURL(uri) {
+		log.WithFields(log.Fields{
+			"isURL":      IsURL(uri),
+			"importFrom": uri,
+		}).Info("URL")
+		return d.ImportFromUrl(uri)
+	}
+	// assuming file URI is disk location
+	ext := path.Ext(uri)
+	if ext != ".json" {
+		return fmt.Errorf("Failed to import payloads, only JSON files are acceppted. Given file: %s", uri)
+	} else {
+		// checking whether it exists
+		exists, err := exists(uri)
+		if err != nil {
+			return fmt.Errorf("Failed to import payloads from %s. Got error: %s", uri, err.Error())
+		}
+		if exists {
+			// file is JSON and it exist
+			return d.ImportFromDisk(uri)
+		} else {
+			return fmt.Errorf("Failed to import payloads, given file '%s' does not exist", uri)
+		}
+	}
+}
 func (d *DBClient) ImportPayloads(payloads []Payload) error {
 	if len(payloads) > 0 {
 		success := 0
