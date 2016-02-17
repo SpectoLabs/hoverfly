@@ -62,6 +62,28 @@ func IsURL(str string) bool {
 	return rxURL.MatchString(str)
 
 }
+
+func exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return true, err
+}
+
+func (d *DBClient) ImportFromDisk(path string) error {
+	log.Warn("importing from disk")
+	return nil
+}
+
+func (d *DBClient) ImportFromUrl(url string) error {
+	log.Warn("importing from url")
+	return nil
+}
+
 func (d *DBClient) ImportPayloads(payloads []Payload) error {
 	if len(payloads) > 0 {
 		success := 0
