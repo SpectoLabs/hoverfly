@@ -47,3 +47,16 @@ func TestFileDoesNotExist(t *testing.T) {
 	expect(t, ex, false)
 	expect(t, err, nil)
 }
+
+func TestImportFromFile(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+
+	err := dbClient.Import("examples/exports/readthedocs.json")
+	expect(t, err, nil)
+
+	recordsCount, err := dbClient.Cache.RecordsCount()
+	expect(t, err, nil)
+	expect(t, recordsCount, 5)
+}
