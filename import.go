@@ -13,6 +13,9 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// Import is a function that based on input decides whether it is a local resource or whether
+// it should fetch it from remote server. It then imports given payload into the database
+// or returns an error
 func (d *DBClient) Import(uri string) error {
 
 	// assuming file URI is URL:
@@ -42,6 +45,7 @@ func (d *DBClient) Import(uri string) error {
 	}
 }
 
+// URL is regexp to match http urls
 const URL string = `^((ftp|https?):\/\/)(\S+(:\S*)?@)?((([1-9]\d?|1\d\d|2[01]\d|22[0-3])(\.(1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.([0-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(([a-zA-Z0-9]+([-\.][a-zA-Z0-9]+)*)|((www\.)?))?(([a-z\x{00a1}-\x{ffff}0-9]+-?-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.([a-z\x{00a1}-\x{ffff}]{2,}))?))(:(\d{1,5}))?((\/|\?|#)[^\s]*)?$`
 
 var rxURL = regexp.MustCompile(URL)
@@ -76,6 +80,8 @@ func exists(path string) (bool, error) {
 	return true, err
 }
 
+// ImportFromDisk - takes one string value and tries to open a file, then parse it into recordedRequests structure
+// (which is default format in which Hoverfly exports captured requests) and imports those requests into the database
 func (d *DBClient) ImportFromDisk(path string) error {
 	payloadsFile, err := os.Open(path)
 	if err != nil {
@@ -92,6 +98,9 @@ func (d *DBClient) ImportFromDisk(path string) error {
 	return d.ImportPayloads(requests.Data)
 }
 
+// ImportFromUrl - takes one string value and tries connect to a remote server, then parse response body into
+// recordedRequests structure (which is default format in which Hoverfly exports captured requests) and
+// imports those requests into the database
 func (d *DBClient) ImportFromUrl(url string) error {
 
 	resp, err := d.HTTP.Get(url)
@@ -109,6 +118,7 @@ func (d *DBClient) ImportFromUrl(url string) error {
 	return d.ImportPayloads(requests.Data)
 }
 
+// ImportPayloads - a function to save given payloads into the database.
 func (d *DBClient) ImportPayloads(payloads []Payload) error {
 	if len(payloads) > 0 {
 		success := 0
