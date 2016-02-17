@@ -65,3 +65,12 @@ func TestImportFromFile(t *testing.T) {
 	expect(t, err, nil)
 	expect(t, recordsCount, 5)
 }
+
+func TestImportFromDiskBlankPath(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+
+	err := dbClient.ImportFromDisk("")
+	refute(t, err, nil)
+}
