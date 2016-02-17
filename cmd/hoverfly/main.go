@@ -52,6 +52,9 @@ func main() {
 	// development
 	dev := flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
 
+	// import flag
+	imp := flag.String("import", "", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
+
 	flag.Parse()
 
 	// getting settings
@@ -125,6 +128,17 @@ func main() {
 	defer cache.CloseDB()
 
 	proxy, dbClient := hv.GetNewHoverfly(cfg, cache)
+
+	// importing stuff
+	if *imp != "" {
+		err := dbClient.Import(*imp)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":  err.Error(),
+				"import": *imp,
+			}).Fatal("Failed to import given resource")
+		}
+	}
 
 	// starting admin interface
 	dbClient.StartAdminInterface()
