@@ -11,6 +11,11 @@ func TestIsURLHTTP(t *testing.T) {
 	expect(t, b, true)
 }
 
+func TestIsURLEmpty(t *testing.T) {
+	b := isURL("")
+	expect(t, b, false)
+}
+
 func TestIsURLHTTPS(t *testing.T) {
 	url := "https://somehost.com"
 
