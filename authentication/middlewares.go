@@ -1,5 +1,12 @@
 package authentication
 
+import (
+	"fmt"
+	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	jwt "github.com/dgrijalva/jwt-go"
+	"net/http"
+)
+
 type AuthMiddleware struct {
 	AB backends.AuthBackend
 }
