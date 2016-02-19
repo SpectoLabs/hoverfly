@@ -83,12 +83,13 @@ func (backend *JWTAuthenticationBackend) GenerateToken(userUUID string) (string,
 }
 
 func (backend *JWTAuthenticationBackend) Authenticate(user *backends.User) bool {
-	dbUser, err := backend.AuthBackend.GetUser(user.Username)
+	dbUser, err := backend.AuthBackend.GetUser([]byte(user.Username))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":    err.Error(),
 			"username": user.Username,
 		}).Error("error while getting user")
+		return false
 	}
 
 	return user.Username == dbUser.Username && bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password)) == nil
