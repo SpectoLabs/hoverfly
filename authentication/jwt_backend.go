@@ -1,5 +1,22 @@
 package authentication
 
+import (
+	"bufio"
+	"bytes"
+	"code.google.com/p/go-uuid/uuid"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/gob"
+	"encoding/pem"
+	log "github.com/Sirupsen/logrus"
+	jwt "github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
+	"os"
+	"time"
+
+	"github.com/SpectoLabs/hoverfly/authentication/backends"
+)
+
 type JWTAuthenticationBackend struct {
 	privateKey  *rsa.PrivateKey
 	PublicKey   *rsa.PublicKey
