@@ -66,3 +66,16 @@ func (backend *JWTAuthenticationBackend) GenerateToken(userUUID string) (string,
 	return tokenString, nil
 }
 
+func (backend *JWTAuthenticationBackend) Authenticate(user *User) bool {
+	// TODO: get user info
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("testing"), 10)
+
+	testUser := User{
+		UUID:     uuid.New(),
+		Username: "hoverfly",
+		Password: string(hashedPassword),
+	}
+
+	return user.Username == testUser.Username && bcrypt.CompareHashAndPassword([]byte(testUser.Password), []byte(user.Password)) == nil
+}
+
