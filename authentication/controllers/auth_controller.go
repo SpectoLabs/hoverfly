@@ -16,7 +16,7 @@ func GetNewAuthenticationController(authBackend backends.AuthBackend) *AuthContr
 }
 
 func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
-	requestUser := new(authentication.User)
+	requestUser := new(backends.User)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
@@ -27,7 +27,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *AuthController) RefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	requestUser := new(authentication.User)
+	requestUser := new(backends.User)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
