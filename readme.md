@@ -12,9 +12,11 @@ and external services, and then replace the external services. Another powerful 
 can introduce their own custom logic. **Middleware modules can be written in any language**.
 
 More information about Hoverfly and how to use it:
-* https://www.specto.io/speeding-up-your-slow-dependencies/
-* https://www.specto.io/service-virtualization-modifying-traffiic/
-* https://www.specto.io/api-mocking-for-dev-and-e2e-testing-from-zero-to-hero/
+* [Using Hoverfly to create fast versions of slow dependencies](http://www.specto.io/blog/speeding-up-your-slow-dependencies.html)
+* [Using Hoverfly to modify traffic on the fly](http://www.specto.io/blog/service-virtualization-is-so-last-year.html)
+* [Using Hoverfly to mock APIs for development and testing](http://www.specto.io/blog/api-mocking-for-dev-and-test-part-1.html)
+* [Using Hoverfly to virtualize the Meetup API](http://www.specto.io/blog/hoverfly-meetup-api.html)
+* [Using Hoverfly to build Spring Boot microservices alongside a Java monolith](http://www.specto.io/blog/using-api-simulation-to-build-microservices.html)
 
 ## Installation
 
@@ -31,7 +33,7 @@ Download a binary, set the correct permissions:
 And run it:
 
     ./hoverfly*
-    
+
 #### Windows
 
 Simply download a .exe file and run it.
@@ -40,7 +42,7 @@ Simply download a .exe file and run it.
 
 To set up your Go environment - look [here](https://golang.org/doc/code.html).
 
-This project uses Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to handle Go dependencies. You must have Go > 1.5 installed, and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled. 
+This project uses Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to handle Go dependencies. You must have Go > 1.5 installed, and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled.
 
     export GO15VENDOREXPERIMENT=1
     mkdir -p "$GOPATH/src/github.com/SpectoLabs/"
@@ -178,13 +180,13 @@ generating response on the fly you can use ""--synthesize" flag.
 In order to use your middleware, just add path to executable:
 
     ./hoverfly --middleware "../../examples/middleware/modify_response/modify_response.py"
-    
+
 You should be treating Hoverfly middleware as commands, this enables a bit more complex execution:
 
     .hoverfly --middleware "go run ../../examples/middleware/go_example/change_to_custom_404.go"
-    
+
 In this example Hoverfly is also compiling Go middleware on the fly. However this increases time taken to execute middleware
-(and therefore to respond) so it's better to precompile middleware binaries before using them. 
+(and therefore to respond) so it's better to precompile middleware binaries before using them.
 
 
 #### Python middleware example
@@ -276,11 +278,11 @@ You can supply "-v" flag to enable verbose logging.
 
 Contributions are welcome!
 
-To submit a pull request you should fork the Hoverfly repository, and make your change on a feature branch of your fork. 
-Then generate a pull request from your branch against master of the Hoverfly repository. Include in your pull request 
+To submit a pull request you should fork the Hoverfly repository, and make your change on a feature branch of your fork.
+Then generate a pull request from your branch against master of the Hoverfly repository. Include in your pull request
 details of your change (why and how, as well as the testing you have performed). To read more about forking model, check out
 this link: [forking workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow).
-Hoverfly is a new project, we will soon provide detailed roadmap. 
+Hoverfly is a new project, we will soon provide detailed roadmap.
 
 ## License
 
