@@ -89,7 +89,10 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(ac.Logout),
 	))
 
-	mux.Get("/records", http.HandlerFunc(d.AllRecordsHandler))
+	mux.Get("/records", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.AllRecordsHandler),
+	))
 	mux.Delete("/records", http.HandlerFunc(d.DeleteAllRecordsHandler))
 	mux.Post("/records", http.HandlerFunc(d.ImportRecordsHandler))
 
@@ -122,7 +125,7 @@ func getBoneRouter(d DBClient) *bone.Mux {
 }
 
 // AllRecordsHandler returns JSON content type http response
-func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	records, err := d.Cache.GetAllRequests()
 
 	if err == nil {
