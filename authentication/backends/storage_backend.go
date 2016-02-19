@@ -2,8 +2,13 @@ package backends
 
 import (
 	"bytes"
+	"code.google.com/p/go-uuid/uuid"
+	"encoding/json"
 	"fmt"
 	"github.com/boltdb/bolt"
+	"golang.org/x/crypto/bcrypt"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type User struct {
@@ -36,6 +41,8 @@ func DecodeUser(user []bytes) (*User, error) {
 type AuthBackend interface {
 	SetValue(key, value []byte) error
 	GetValue(key []byte) ([]byte, error)
+
+	AddUser(username, password []byte) error
 	Delete(key []byte) error
 }
 
@@ -106,7 +113,19 @@ func (b *BoltAuth) SetValue(key, value []byte) error {
 }
 
 func (b *BoltAuth) Delete(key []byte) error {
-	return b.Delete(key)
+	err := b.DS.Update(func(tx *bolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists(b.TokenBucket)
+		if err != nil {
+			return err
+		}
+		err = bucket.Delete(key)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
 }
 
 func (b *BoltAuth) GetValue(key []byte) (value []byte, err error) {
