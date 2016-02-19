@@ -80,6 +80,10 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	am := authentication.GetNewAuthenticationMiddleware(d.AB)
 
 	mux.Post("/token-auth", http.HandlerFunc(ac.Login))
+	mux.Get("/refresh-token-auth", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(ac.RefreshToken),
+	))
 	mux.Get("/logout", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(ac.Logout),
