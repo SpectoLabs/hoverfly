@@ -16,3 +16,20 @@ type User struct {
 	Username string `json:"username" form:"username"`
 	Password string `json:"password" form:"password"`
 }
+
+func Login(requestUser *User, ab backends.AuthBackend) (int, []byte) {
+	authBackend := InitJWTAuthenticationBackend(ab)
+
+	if authBackend.Authenticate(requestUser) {
+		token, err := authBackend.GenerateToken(requestUser.UUID)
+		if err != nil {
+			return http.StatusInternalServerError, []byte("")
+		} else {
+			response, _ := json.Marshal(TokenAuthentication{token})
+			return http.StatusOK, response
+		}
+	}
+
+	return http.StatusUnauthorized, []byte("")
+}
+
