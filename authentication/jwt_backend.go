@@ -89,3 +89,7 @@ func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp int
 	}
 	return expireOffset
 }
+
+func (backend *JWTAuthenticationBackend) Logout(tokenString string, token *jwt.Token) error {
+	return backend.AuthBackend.Delete([]byte(tokenString))
+}
