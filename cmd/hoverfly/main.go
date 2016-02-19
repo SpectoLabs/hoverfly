@@ -144,12 +144,16 @@ func main() {
 
 	// if add new user supplied - adding it to database
 	if *addNew {
-		err := ab.AddUser(*addUser, *addPassword)
+		err := ab.AddUser([]byte(*addUser), []byte(*addPassword))
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error":    err.Error(),
 				"username": *addUser,
-			}).Fatal("Failed to add new user")
+			}).Fatal("failed to add new user")
+		} else {
+			log.WithFields(log.Fields{
+				"username": *addUser,
+			}).Info("user added successfuly")
 		}
 		return
 	}
