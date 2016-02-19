@@ -11,13 +11,7 @@ type TokenAuthentication struct {
 	Token string `json:"token" form:"token"`
 }
 
-type User struct {
-	UUID     string `json:"uuid" form:"-"`
-	Username string `json:"username" form:"username"`
-	Password string `json:"password" form:"password"`
-}
-
-func Login(requestUser *User, ab backends.AuthBackend) (int, []byte) {
+func Login(requestUser *backends.User, ab backends.AuthBackend) (int, []byte) {
 	authBackend := InitJWTAuthenticationBackend(ab)
 
 	if authBackend.Authenticate(requestUser) {
@@ -33,7 +27,7 @@ func Login(requestUser *User, ab backends.AuthBackend) (int, []byte) {
 	return http.StatusUnauthorized, []byte("")
 }
 
-func RefreshToken(requestUser *User, ab backends.AuthBackend) []byte {
+func RefreshToken(requestUser *backends.User, ab backends.AuthBackend) []byte {
 	authBackend := InitJWTAuthenticationBackend(ab)
 	token, err := authBackend.GenerateToken(requestUser.UUID)
 	if err != nil {
