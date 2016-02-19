@@ -41,9 +41,10 @@ func DecodeUser(user []bytes) (*User, error) {
 type AuthBackend interface {
 	SetValue(key, value []byte) error
 	GetValue(key []byte) ([]byte, error)
+	Delete(key []byte) error
 
 	AddUser(username, password []byte) error
-	Delete(key []byte) error
+	GetUser(username []byte) (*User, error)
 }
 
 func NewBoltDBAuthBackend(db *bolt.DB, tokenBucket, userBucket []byte) *BoltAuth {
