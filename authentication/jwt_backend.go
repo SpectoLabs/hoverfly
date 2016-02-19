@@ -134,3 +134,34 @@ func getPrivateKey() *rsa.PrivateKey {
 	return privateKeyImported
 }
 
+func getPublicKey() *rsa.PublicKey {
+	publicKeyFile, err := os.Open(Get().PublicKeyPath)
+	if err != nil {
+		panic(err)
+	}
+
+	pemfileinfo, _ := publicKeyFile.Stat()
+	var size int64 = pemfileinfo.Size()
+	pembytes := make([]byte, size)
+
+	buffer := bufio.NewReader(publicKeyFile)
+	_, err = buffer.Read(pembytes)
+
+	data, _ := pem.Decode([]byte(pembytes))
+
+	publicKeyFile.Close()
+
+	publicKeyImported, err := x509.ParsePKIXPublicKey(data.Bytes)
+
+	if err != nil {
+		panic(err)
+	}
+
+	rsaPub, ok := publicKeyImported.(*rsa.PublicKey)
+
+	if !ok {
+		panic(err)
+	}
+
+	return rsaPub
+}
