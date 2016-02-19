@@ -33,3 +33,15 @@ func Login(requestUser *User, ab backends.AuthBackend) (int, []byte) {
 	return http.StatusUnauthorized, []byte("")
 }
 
+func RefreshToken(requestUser *User, ab backends.AuthBackend) []byte {
+	authBackend := InitJWTAuthenticationBackend(ab)
+	token, err := authBackend.GenerateToken(requestUser.UUID)
+	if err != nil {
+		panic(err)
+	}
+	response, err := json.Marshal(TokenAuthentication{token})
+	if err != nil {
+		panic(err)
+	}
+	return response
+}
