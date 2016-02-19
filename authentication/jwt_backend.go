@@ -93,3 +93,13 @@ func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp int
 func (backend *JWTAuthenticationBackend) Logout(tokenString string, token *jwt.Token) error {
 	return backend.AuthBackend.Delete([]byte(tokenString))
 }
+
+func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
+
+	redisToken, _ := backend.AuthBackend.GetValue([]byte(token))
+
+	if redisToken == nil {
+		return false
+	}
+	return true
+}
