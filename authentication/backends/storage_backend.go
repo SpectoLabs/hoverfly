@@ -60,6 +60,35 @@ type BoltAuth struct {
 	UserBucket  []byte
 }
 
+func (b *BoltAuth) AddUser(username, password []byte) error {
+	err := b.DS.Update(func(tx *bolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists(b.UserBucket)
+		if err != nil {
+			return err
+		}
+		hashedPassword, _ := bcrypt.GenerateFromPassword(password, 10)
+		u := User{
+			UUID:     uuid.New(),
+			Username: username,
+			Password: string(hashedPassword),
+		}
+		bts, err := u.Encode()
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":    err.Error(),
+				"username": username,
+			})
+			return err
+		}
+		err = bucket.Put(username, bts)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	return err
+}
+
 func (b *BoltAuth) SetValue(key, value []byte) error {
 	err := b.DS.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(b.TokenBucket)
