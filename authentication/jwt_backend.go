@@ -39,3 +39,15 @@ func decodeToken(data []byte) (*Token, error) {
 	return t, nil
 }
 
+func InitJWTAuthenticationBackend(ab backends.AuthBackend) *JWTAuthenticationBackend {
+	if authBackendInstance == nil {
+		authBackendInstance = &JWTAuthenticationBackend{
+			privateKey:  getPrivateKey(),
+			PublicKey:   getPublicKey(),
+			AuthBackend: ab,
+		}
+	}
+
+	return authBackendInstance
+}
+
