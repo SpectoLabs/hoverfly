@@ -1,5 +1,12 @@
 package controllers
 
+import (
+	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/authentication"
+	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	"net/http"
+)
+
 type AuthController struct {
 	AB backends.AuthBackend
 }
@@ -28,3 +35,12 @@ func (a *AuthController) RefreshToken(w http.ResponseWriter, r *http.Request, ne
 	w.Write(authentication.RefreshToken(requestUser, a.AB))
 }
 
+func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	err := authentication.Logout(r, a.AB)
+	w.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
