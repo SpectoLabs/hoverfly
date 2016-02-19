@@ -17,6 +17,10 @@ import (
 	"github.com/go-zoo/bone"
 	"github.com/gorilla/websocket"
 	"github.com/meatballhat/negroni-logrus"
+
+	// auth
+	"github.com/SpectoLabs/hoverfly/authentication"
+	"github.com/SpectoLabs/hoverfly/authentication/controllers"
 )
 
 // recordedRequests struct encapsulates payload data
@@ -70,6 +74,16 @@ func (d *DBClient) StartAdminInterface() {
 // getBoneRouter returns mux for admin interface
 func getBoneRouter(d DBClient) *bone.Mux {
 	mux := bone.New()
+
+	// getting auth controllers and middleware
+	ac := controllers.GetNewAuthenticationController(d.AB)
+	am := authentication.GetNewAuthenticationMiddleware(d.AB)
+
+	mux.Post("/token-auth", http.HandlerFunc(ac.Login))
+	mux.Get("/logout", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(ac.Logout),
+	))
 
 	mux.Get("/records", http.HandlerFunc(d.AllRecordsHandler))
 	mux.Delete("/records", http.HandlerFunc(d.DeleteAllRecordsHandler))
