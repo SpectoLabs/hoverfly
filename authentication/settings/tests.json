@@ -1,0 +1,5 @@
+{
+  "PrivateKeyPath": "/Users/karolisrusenas/Projects/src/github.com/SpectoLabs/hoverfly/authentication/keys/private_key",
+  "PublicKeyPath": "/Users/karolisrusenas/Projects/src/github.com/SpectoLabs/hoverfly/authentication/keys/public_key.pub",
+  "JWTExpirationDelta": 72
+}
