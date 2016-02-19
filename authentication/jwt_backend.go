@@ -51,3 +51,18 @@ func InitJWTAuthenticationBackend(ab backends.AuthBackend) *JWTAuthenticationBac
 	return authBackendInstance
 }
 
+func (backend *JWTAuthenticationBackend) GenerateToken(userUUID string) (string, error) {
+	token := jwt.New(jwt.SigningMethodRS512)
+	token.Claims["exp"] = time.Now().Add(time.Hour * time.Duration(Get().JWTExpirationDelta)).Unix()
+	token.Claims["iat"] = time.Now().Unix()
+	token.Claims["sub"] = userUUID
+	tokenString, err := token.SignedString(backend.privateKey)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("got error while generating JWT token")
+		return "", err
+	}
+	return tokenString, nil
+}
+
