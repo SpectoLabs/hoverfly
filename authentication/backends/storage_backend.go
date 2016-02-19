@@ -96,6 +96,36 @@ func (b *BoltAuth) AddUser(username, password []byte) error {
 	return err
 }
 
+func (b *BoltAuth) GetUser(username []byte) (*User, error) {
+
+	err := b.DS.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(b.TokenBucket)
+		if bucket == nil {
+			return fmt.Errorf("Bucket %q not found!", b.UserBucket)
+		}
+
+		val := bucket.Get(username)
+
+		// If it doesn't exist then it will return nil
+		if val == nil {
+			return fmt.Errorf("user %q not found \n", username)
+		}
+
+		user, err := DecodeUser(val)
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":    err.Error(),
+				"username": username,
+			}).Error("Failed to decode user")
+			return fmt.Errorf("error while getting user %q \n", username)
+		}
+
+		return user
+	})
+	return err
+}
+
 func (b *BoltAuth) SetValue(key, value []byte) error {
 	err := b.DS.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(b.TokenBucket)
