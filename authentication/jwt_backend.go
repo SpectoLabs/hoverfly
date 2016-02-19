@@ -79,3 +79,13 @@ func (backend *JWTAuthenticationBackend) Authenticate(user *User) bool {
 	return user.Username == testUser.Username && bcrypt.CompareHashAndPassword([]byte(testUser.Password), []byte(user.Password)) == nil
 }
 
+func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp interface{}) int {
+	if validity, ok := timestamp.(float64); ok {
+		tm := time.Unix(int64(validity), 0)
+		remainer := tm.Sub(time.Now())
+		if remainer > 0 {
+			return int(remainer.Seconds() + expireOffset)
+		}
+	}
+	return expireOffset
+}
