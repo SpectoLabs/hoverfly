@@ -22,6 +22,8 @@ package main
 import (
 	log "github.com/Sirupsen/logrus"
 	hv "github.com/SpectoLabs/hoverfly"
+	"github.com/SpectoLabs/hoverfly/authentication"
+	"github.com/SpectoLabs/hoverfly/authentication/backends"
 
 	"flag"
 	"fmt"
@@ -129,6 +131,11 @@ func main() {
 
 	proxy, dbClient := hv.GetNewHoverfly(cfg, cache)
 
+	ab := backends.NewBoltDBAuthBackend(db, []byte(backends.TokenBucketName), []byte(backends.UserBucketName))
+	// loading auth settings
+	authentication.Init()
+
+	dbClient.AB = ab
 	// importing stuff
 	if *imp != "" {
 		err := dbClient.Import(*imp)
