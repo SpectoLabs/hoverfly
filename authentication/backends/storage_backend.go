@@ -53,3 +53,26 @@ func (b *BoltAuth) Delete(key []byte) error {
 	return b.Delete(key)
 }
 
+func (b *BoltAuth) GetValue(key []byte) (value []byte, err error) {
+
+	err = b.DS.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(b.TokenBucket)
+		if bucket == nil {
+			return fmt.Errorf("Bucket %q not found!", b.TokenBucket)
+		}
+		// "Byte slices returned from Bolt are only valid during a transaction."
+		var buffer bytes.Buffer
+		val := bucket.Get(key)
+
+		// If it doesn't exist then it will return nil
+		if val == nil {
+			return fmt.Errorf("key %q not found \n", key)
+		}
+
+		buffer.Write(val)
+		value = buffer.Bytes()
+		return nil
+	})
+
+	return
+}
