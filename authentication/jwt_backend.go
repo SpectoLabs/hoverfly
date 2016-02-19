@@ -103,3 +103,34 @@ func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
 	}
 	return true
 }
+
+func getPrivateKey() *rsa.PrivateKey {
+	privateKeyFile, err := os.Open(Get().PrivateKeyPath)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":          err.Error(),
+			"privateKeyFile": Get().PrivateKeyPath,
+		}).Panic("Failed to get private key file")
+
+	}
+
+	pemfileinfo, _ := privateKeyFile.Stat()
+	var size int64 = pemfileinfo.Size()
+	pembytes := make([]byte, size)
+
+	buffer := bufio.NewReader(privateKeyFile)
+	_, err = buffer.Read(pembytes)
+
+	data, _ := pem.Decode([]byte(pembytes))
+
+	privateKeyFile.Close()
+
+	privateKeyImported, err := x509.ParsePKCS1PrivateKey(data.Bytes)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return privateKeyImported
+}
+
