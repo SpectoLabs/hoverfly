@@ -3,7 +3,6 @@ package authentication
 import (
 	"bufio"
 	"bytes"
-	"code.google.com/p/go-uuid/uuid"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/gob"
@@ -83,17 +82,16 @@ func (backend *JWTAuthenticationBackend) GenerateToken(userUUID string) (string,
 	return tokenString, nil
 }
 
-func (backend *JWTAuthenticationBackend) Authenticate(user *User) bool {
-	// TODO: get user info
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("testing"), 10)
-
-	testUser := User{
-		UUID:     uuid.New(),
-		Username: "hoverfly",
-		Password: string(hashedPassword),
+func (backend *JWTAuthenticationBackend) Authenticate(user *backends.User) bool {
+	dbUser, err := backend.AuthBackend.GetUser(user.Username)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":    err.Error(),
+			"username": user.Username,
+		}).Error("error while getting user")
 	}
 
-	return user.Username == testUser.Username && bcrypt.CompareHashAndPassword([]byte(testUser.Password), []byte(user.Password)) == nil
+	return user.Username == dbUser.Username && bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password)) == nil
 }
 
 func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp interface{}) int {
