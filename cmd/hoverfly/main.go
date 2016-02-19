@@ -57,6 +57,11 @@ func main() {
 	// import flag
 	imp := flag.String("import", "", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
 
+	// adding new user
+	addNew := flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
+	addUser := flag.String("username", "", "username for new user")
+	addPassword := flag.String("password", "", "password for new user")
+
 	flag.Parse()
 
 	// getting settings
@@ -136,6 +141,19 @@ func main() {
 	authentication.Init()
 
 	dbClient.AB = ab
+
+	// if add new user supplied - adding it to database
+	if *addNew {
+		err := ab.AddUser(*addUser, *addPassword)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":    err.Error(),
+				"username": *addUser,
+			}).Fatal("Failed to add new user")
+		}
+		return
+	}
+
 	// importing stuff
 	if *imp != "" {
 		err := dbClient.Import(*imp)
