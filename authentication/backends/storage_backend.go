@@ -27,7 +27,7 @@ func (u *User) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func DecodeUser(user []bytes) (*User, error) {
+func DecodeUser(user []byte) (*User, error) {
 	var u *User
 	buf := bytes.NewBuffer(user)
 	dec := json.NewDecoder(buf)
@@ -77,7 +77,7 @@ func (b *BoltAuth) AddUser(username, password []byte) error {
 		hashedPassword, _ := bcrypt.GenerateFromPassword(password, 10)
 		u := User{
 			UUID:     uuid.New(),
-			Username: username,
+			Username: string(username),
 			Password: string(hashedPassword),
 		}
 		bts, err := u.Encode()
@@ -97,10 +97,10 @@ func (b *BoltAuth) AddUser(username, password []byte) error {
 	return err
 }
 
-func (b *BoltAuth) GetUser(username []byte) (*User, error) {
+func (b *BoltAuth) GetUser(username []byte) (user *User, err error) {
 
-	err := b.DS.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket(b.TokenBucket)
+	err = b.DS.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(b.UserBucket)
 		if bucket == nil {
 			return fmt.Errorf("Bucket %q not found!", b.UserBucket)
 		}
@@ -112,7 +112,7 @@ func (b *BoltAuth) GetUser(username []byte) (*User, error) {
 			return fmt.Errorf("user %q not found \n", username)
 		}
 
-		user, err := DecodeUser(val)
+		user, err = DecodeUser(val)
 
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -122,9 +122,9 @@ func (b *BoltAuth) GetUser(username []byte) (*User, error) {
 			return fmt.Errorf("error while getting user %q \n", username)
 		}
 
-		return user
+		return nil
 	})
-	return err
+	return
 }
 
 func (b *BoltAuth) SetValue(key, value []byte) error {
