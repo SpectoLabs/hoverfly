@@ -33,3 +33,19 @@ type BoltAuth struct {
 	UserBucket  []byte
 }
 
+func (b *BoltAuth) SetValue(key, value []byte) error {
+	err := b.DS.Update(func(tx *bolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists(b.TokenBucket)
+		if err != nil {
+			return err
+		}
+		err = bucket.Put(key, value)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
+}
+
