@@ -49,3 +49,7 @@ func (b *BoltAuth) SetValue(key, value []byte) error {
 	return err
 }
 
+func (b *BoltAuth) Delete(key []byte) error {
+	return b.Delete(key)
+}
+
