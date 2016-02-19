@@ -6,6 +6,33 @@ import (
 	"github.com/boltdb/bolt"
 )
 
+type User struct {
+	UUID     string `json:"uuid" form:"-"`
+	Username string `json:"username" form:"username"`
+	Password string `json:"password" form:"password"`
+}
+
+func (u *User) Encode() ([]byte, error) {
+	buf := new(bytes.Buffer)
+	enc := json.NewEncoder(buf)
+	err := enc.Encode(u)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func DecodeUser(user []bytes) (*User, error) {
+	var u *User
+	buf := bytes.NewBuffer(user)
+	dec := json.NewDecoder(buf)
+	err := dec.Decode(&u)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
 type AuthBackend interface {
 	SetValue(key, value []byte) error
 	GetValue(key []byte) ([]byte, error)
