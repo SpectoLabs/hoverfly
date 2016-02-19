@@ -19,6 +19,17 @@ type Settings struct {
 	JWTExpirationDelta int
 }
 
+var settings Settings = Settings{}
+var env = "preproduction"
+
+func Init() {
+	env = os.Getenv("GO_ENV")
+	if env == "" {
+		fmt.Println("Warning: Setting preproduction environment due to lack of GO_ENV value")
+		env = "preproduction"
+	}
+	LoadSettingsByEnv(env)
+}
 
 func LoadSettingsByEnv(env string) {
 	content, err := ioutil.ReadFile(environments[env])
