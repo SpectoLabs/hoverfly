@@ -135,6 +135,30 @@ Add ca.pem to your trusted certificates or turn off verification. With curl you 
 
 ## API
 
+### Authentication
+
+export Hoverfly secret:
+
+    export HoverflySecret=VeryVerySecret
+
+If you skip this step - a new random secret will be generated every single time when you launch Hoverfly. This can be useful
+if you are deploying it in cloud but it can also be annoying if you are working with Hoverfly where it is constantly restarted.
+
+Add new user:
+
+    ./hoverfly -v -add -username hfadmin -password hfadminpass 
+
+Getting token:
+
+    curl -H "Content-Type application/json" -X POST -d '{"Username": "hoverfly", "Password": "testing"}' http://localhost:8888/token-auth
+
+Using token:
+
+    curl -H "Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NTYxNTY3ODMsImlhdCI6MTQ1NTg5NzU4Mywic3ViIjoiIn0.Iu_xBKzBWlrO70kDAo5hE4lXydu3bQxDZKriYJ4exg3FfZXCqgYH9zm7SVKailIib9ESn_T4zU-2UtFT5iYhw_fzhnXtQoBn5HIhGfUb7mkx0tZh1TJBkLCv6y5ViPw5waAnFBRcygh9OdeiEqnJgzHKrxsR87EellXSdMn2M8wVIhjIhS3KiDjUwuqQl-ClBDaQGlsLZ7eC9OHrJIQXJLqW7LSwrkV3rstCZkTKrEZCdq6F4uAK0mgagTFmuyaBHDEccaivkgYDcaBb7n-Vmyh-jUnDOnwtFnrOv_myXlqqkvtezfm06MBl4PzZE6ZtEA5XADdobLfVarbvB9tFbA" http://localhost:8888/records
+
+
+### Usage
+
 You can access the administrator API under the default hostname of 'localhost' and port '8888':
 
 * Recorded requests: GET [http://localhost:8888/records](http://localhost:8888/records) ( __curl http://localhost:8888/records__ )

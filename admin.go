@@ -90,6 +90,7 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	))
 
 	mux.Get("/users", http.HandlerFunc(ac.GetAllUsersHandler))
+	// TODO: add users delete/add functionality
 
 	mux.Get("/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
