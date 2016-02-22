@@ -18,8 +18,8 @@ type AuthController struct {
 	SecretKey []byte
 }
 
-func GetNewAuthenticationController(authBackend backends.AuthBackend) *AuthController {
-	return &AuthController{AB: authBackend}
+func GetNewAuthenticationController(authBackend backends.AuthBackend, secretKey []byte) *AuthController {
+	return &AuthController{AB: authBackend, SecretKey: secretKey}
 }
 
 func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
