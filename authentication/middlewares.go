@@ -1,6 +1,8 @@
 package authentication
 
 import (
+	log "github.com/Sirupsen/logrus"
+
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -25,6 +27,10 @@ func (a *AuthMiddleware) RequireTokenAuthentication(rw http.ResponseWriter, req 
 			return authBackend.PublicKey, nil
 		}
 	})
+	log.WithFields(log.Fields{
+		"valid":  token.Valid,
+		"string": token.Raw,
+	}).Warn("token information")
 
 	if err == nil && token.Valid && !authBackend.IsInBlacklist(req.Header.Get("Authorization")) {
 		next(rw, req)

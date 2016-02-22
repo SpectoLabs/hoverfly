@@ -29,7 +29,7 @@ const (
 
 var authBackendInstance *JWTAuthenticationBackend = nil
 
-// Token - container for jwt.Token for encoding
+//Token - container for jwt.Token for encoding
 type Token struct {
 	Token *jwt.Token
 }
@@ -94,6 +94,9 @@ func (backend *JWTAuthenticationBackend) Authenticate(user *backends.User) bool 
 
 	// user does not exist
 	if dbUser == nil {
+		log.WithFields(log.Fields{
+			"username": user.Username,
+		}).Warn("user does not exist")
 		return false
 	}
 
