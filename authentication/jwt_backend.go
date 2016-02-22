@@ -112,7 +112,8 @@ func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp int
 }
 
 func (backend *JWTAuthenticationBackend) Logout(tokenString string, token *jwt.Token) error {
-	return backend.AuthBackend.Delete([]byte(tokenString))
+	// TODO: add value as a timestamp when to delete it for cleanup
+	return backend.AuthBackend.SetValue([]byte(tokenString), []byte("whentoexpire"))
 }
 
 func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
