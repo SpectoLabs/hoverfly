@@ -27,7 +27,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
-	responseStatus, token := authentication.Login(requestUser, a.AB)
+	responseStatus, token := authentication.Login(requestUser, a.AB, a.SecretKey)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(token)
@@ -39,11 +39,11 @@ func (a *AuthController) RefreshToken(w http.ResponseWriter, r *http.Request, ne
 	decoder.Decode(&requestUser)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(authentication.RefreshToken(requestUser, a.AB))
+	w.Write(authentication.RefreshToken(requestUser, a.AB, a.SecretKey))
 }
 
 func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	err := authentication.Logout(r, a.AB)
+	err := authentication.Logout(r, a.AB, a.SecretKey)
 	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
