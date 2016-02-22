@@ -15,6 +15,7 @@ type User struct {
 	UUID     string `json:"uuid" form:"-"`
 	Username string `json:"username" form:"username"`
 	Password string `json:"password" form:"password"`
+	IsAdmin  bool   `json:"is_admin" form:"is_admin"`
 }
 
 func (u *User) Encode() ([]byte, error) {
