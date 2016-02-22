@@ -10,8 +10,9 @@ import (
 )
 
 type AuthMiddleware struct {
-	AB        backends.AuthBackend
-	SecretKey []byte
+	AB                 backends.AuthBackend
+	SecretKey          []byte
+	JWTExpirationDelta int
 }
 
 func GetNewAuthenticationMiddleware(authBackend backends.AuthBackend, secretKey []byte) *AuthMiddleware {
