@@ -19,8 +19,8 @@ type AuthController struct {
 	JWTExpirationDelta int
 }
 
-func GetNewAuthenticationController(authBackend backends.AuthBackend, secretKey []byte) *AuthController {
-	return &AuthController{AB: authBackend, SecretKey: secretKey}
+func GetNewAuthenticationController(authBackend backends.AuthBackend, secretKey []byte, exp int) *AuthController {
+	return &AuthController{AB: authBackend, SecretKey: secretKey, JWTExpirationDelta: exp}
 }
 
 func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +28,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
-	responseStatus, token := authentication.Login(requestUser, a.AB, a.SecretKey)
+	responseStatus, token := authentication.Login(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseStatus)
 	w.Write(token)
@@ -40,11 +40,11 @@ func (a *AuthController) RefreshToken(w http.ResponseWriter, r *http.Request, ne
 	decoder.Decode(&requestUser)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(authentication.RefreshToken(requestUser, a.AB, a.SecretKey))
+	w.Write(authentication.RefreshToken(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta))
 }
 
 func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	err := authentication.Logout(r, a.AB, a.SecretKey)
+	err := authentication.Logout(r, a.AB, a.SecretKey, a.JWTExpirationDelta)
 	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -53,6 +53,8 @@ func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request, next htt
 	}
 }
 
+// GetAllUsersHandler - returns a list of all users
+// TODO: put under auth required handler
 func (a *AuthController) GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	users, err := a.AB.GetAllUsers()
 
