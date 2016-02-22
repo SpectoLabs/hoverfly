@@ -92,6 +92,11 @@ func (backend *JWTAuthenticationBackend) Authenticate(user *backends.User) bool 
 		return false
 	}
 
+	// user does not exist
+	if dbUser == nil {
+		return false
+	}
+
 	return user.Username == dbUser.Username && bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password)) == nil
 }
 

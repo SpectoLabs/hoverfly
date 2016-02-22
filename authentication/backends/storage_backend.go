@@ -110,7 +110,7 @@ func (b *BoltAuth) GetUser(username []byte) (user *User, err error) {
 
 		// If it doesn't exist then it will return nil
 		if val == nil {
-			return fmt.Errorf("user %q not found \n", username)
+			return fmt.Errorf("user not found")
 		}
 
 		user, err = DecodeUser(val)
