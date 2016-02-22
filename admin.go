@@ -89,6 +89,8 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(ac.Logout),
 	))
 
+	mux.Get("/users", http.HandlerFunc(ac.GetAllUsersHandler))
+
 	mux.Get("/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.AllRecordsHandler),
