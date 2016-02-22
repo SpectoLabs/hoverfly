@@ -76,8 +76,8 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	mux := bone.New()
 
 	// getting auth controllers and middleware
-	ac := controllers.GetNewAuthenticationController(d.AB, d.Cfg.SecretKey)
-	am := authentication.GetNewAuthenticationMiddleware(d.AB, d.Cfg.SecretKey)
+	ac := controllers.GetNewAuthenticationController(d.AB, d.Cfg.SecretKey, d.Cfg.JWTExpirationDelta)
+	am := authentication.GetNewAuthenticationMiddleware(d.AB, d.Cfg.SecretKey, d.Cfg.JWTExpirationDelta)
 
 	mux.Post("/token-auth", http.HandlerFunc(ac.Login))
 	mux.Get("/refresh-token-auth", negroni.New(
