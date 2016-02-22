@@ -1,11 +1,17 @@
 package controllers
 
 import (
+	log "github.com/Sirupsen/logrus"
+
 	"encoding/json"
 	"github.com/SpectoLabs/hoverfly/authentication"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
 	"net/http"
 )
+
+type AllUsersResponse struct {
+	Users []backends.User `json:"users"`
+}
 
 type AuthController struct {
 	AB backends.AuthBackend
@@ -42,5 +48,34 @@ func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request, next htt
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
 		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func (a *AuthController) GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+	users, err := a.AB.GetAllUsers()
+
+	if err == nil {
+
+		w.Header().Set("Content-Type", "application/json")
+
+		var response AllUsersResponse
+		response.Users = users
+		b, err := json.Marshal(response)
+
+		if err != nil {
+			log.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else {
+			w.Write(b)
+			return
+		}
+	} else {
+		log.WithFields(log.Fields{
+			"Error": err.Error(),
+		}).Error("Failed to get data from authentication backend!")
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(500)
+		return
 	}
 }
