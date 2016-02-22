@@ -60,6 +60,7 @@ func main() {
 	addNew := flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
 	addUser := flag.String("username", "", "username for new user")
 	addPassword := flag.String("password", "", "password for new user")
+	isAdmin := flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
 
 	flag.Parse()
 
@@ -142,7 +143,7 @@ func main() {
 
 	// if add new user supplied - adding it to database
 	if *addNew {
-		err := ab.AddUser([]byte(*addUser), []byte(*addPassword))
+		err := ab.AddUser([]byte(*addUser), []byte(*addPassword), *isAdmin)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error":    err.Error(),

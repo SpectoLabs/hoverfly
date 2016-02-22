@@ -42,9 +42,10 @@ func DecodeUser(user []byte) (*User, error) {
 type AuthBackend interface {
 	SetValue(key, value []byte) error
 	GetValue(key []byte) ([]byte, error)
+
 	Delete(key []byte) error
 
-	AddUser(username, password []byte) error
+	AddUser(username, password []byte, admin bool) error
 	GetUser(username []byte) (*User, error)
 	GetAllUsers() ([]User, error)
 }
@@ -70,7 +71,7 @@ type BoltAuth struct {
 	UserBucket  []byte
 }
 
-func (b *BoltAuth) AddUser(username, password []byte) error {
+func (b *BoltAuth) AddUser(username, password []byte, admin bool) error {
 	err := b.DS.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(b.UserBucket)
 		if err != nil {
