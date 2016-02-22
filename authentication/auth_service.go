@@ -11,8 +11,8 @@ type TokenAuthentication struct {
 	Token string `json:"token" form:"token"`
 }
 
-func Login(requestUser *backends.User, ab backends.AuthBackend) (int, []byte) {
-	authBackend := InitJWTAuthenticationBackend(ab)
+func Login(requestUser *backends.User, ab backends.AuthBackend, secret []byte) (int, []byte) {
+	authBackend := InitJWTAuthenticationBackend(ab, secret)
 
 	if authBackend.Authenticate(requestUser) {
 		token, err := authBackend.GenerateToken(requestUser.UUID, requestUser.Username)
@@ -27,8 +27,8 @@ func Login(requestUser *backends.User, ab backends.AuthBackend) (int, []byte) {
 	return http.StatusUnauthorized, []byte("")
 }
 
-func RefreshToken(requestUser *backends.User, ab backends.AuthBackend) []byte {
-	authBackend := InitJWTAuthenticationBackend(ab)
+func RefreshToken(requestUser *backends.User, ab backends.AuthBackend, secret []byte) []byte {
+	authBackend := InitJWTAuthenticationBackend(ab, secret)
 	token, err := authBackend.GenerateToken(requestUser.UUID, requestUser.Username)
 	if err != nil {
 		panic(err)
@@ -40,8 +40,8 @@ func RefreshToken(requestUser *backends.User, ab backends.AuthBackend) []byte {
 	return response
 }
 
-func Logout(req *http.Request, ab backends.AuthBackend) error {
-	authBackend := InitJWTAuthenticationBackend(ab)
+func Logout(req *http.Request, ab backends.AuthBackend, secret []byte) error {
+	authBackend := InitJWTAuthenticationBackend(ab, secret)
 	tokenRequest, err := jwt.ParseFromRequest(req, func(token *jwt.Token) (interface{}, error) {
 		return authBackend.SecretKey, nil
 	})
