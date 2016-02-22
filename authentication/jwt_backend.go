@@ -1,24 +1,19 @@
 package authentication
 
 import (
-	"bufio"
-	"bytes"
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/gob"
-	"encoding/pem"
 	log "github.com/Sirupsen/logrus"
 	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
-	"os"
+
+	"bytes"
+	"encoding/gob"
 	"time"
 
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
 )
 
 type JWTAuthenticationBackend struct {
-	privateKey  *rsa.PrivateKey
-	PublicKey   *rsa.PublicKey
+	SecretKey   []byte
 	AuthBackend backends.AuthBackend
 }
 
@@ -58,8 +53,7 @@ func decodeToken(data []byte) (*Token, error) {
 func InitJWTAuthenticationBackend(ab backends.AuthBackend) *JWTAuthenticationBackend {
 	if authBackendInstance == nil {
 		authBackendInstance = &JWTAuthenticationBackend{
-			privateKey:  getPrivateKey(),
-			PublicKey:   getPublicKey(),
+			SecretKey:   SecretKey,
 			AuthBackend: ab,
 		}
 	}
@@ -73,8 +67,7 @@ func (backend *JWTAuthenticationBackend) GenerateToken(userUUID, username string
 	token.Claims["iat"] = time.Now().Unix()
 	token.Claims["username"] = username
 	token.Claims["sub"] = userUUID
-	//tokenString, err := token.SignedString(backend.privateKey)
-	tokenString, err := token.SignedString(SecretKey)
+	tokenString, err := token.SignedString(backend.SecretKey)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
@@ -128,66 +121,4 @@ func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
 		return false
 	}
 	return true
-}
-
-func getPrivateKey() *rsa.PrivateKey {
-	privateKeyFile, err := os.Open(Get().PrivateKeyPath)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error":          err.Error(),
-			"privateKeyFile": Get().PrivateKeyPath,
-		}).Panic("Failed to get private key file")
-
-	}
-
-	pemfileinfo, _ := privateKeyFile.Stat()
-	var size int64 = pemfileinfo.Size()
-	pembytes := make([]byte, size)
-
-	buffer := bufio.NewReader(privateKeyFile)
-	_, err = buffer.Read(pembytes)
-
-	data, _ := pem.Decode([]byte(pembytes))
-
-	privateKeyFile.Close()
-
-	privateKeyImported, err := x509.ParsePKCS1PrivateKey(data.Bytes)
-
-	if err != nil {
-		panic(err)
-	}
-
-	return privateKeyImported
-}
-
-func getPublicKey() *rsa.PublicKey {
-	publicKeyFile, err := os.Open(Get().PublicKeyPath)
-	if err != nil {
-		panic(err)
-	}
-
-	pemfileinfo, _ := publicKeyFile.Stat()
-	var size int64 = pemfileinfo.Size()
-	pembytes := make([]byte, size)
-
-	buffer := bufio.NewReader(publicKeyFile)
-	_, err = buffer.Read(pembytes)
-
-	data, _ := pem.Decode([]byte(pembytes))
-
-	publicKeyFile.Close()
-
-	publicKeyImported, err := x509.ParsePKIXPublicKey(data.Bytes)
-
-	if err != nil {
-		panic(err)
-	}
-
-	rsaPub, ok := publicKeyImported.(*rsa.PublicKey)
-
-	if !ok {
-		panic(err)
-	}
-
-	return rsaPub
 }

@@ -24,9 +24,7 @@ func (a *AuthMiddleware) RequireTokenAuthentication(rw http.ResponseWriter, req 
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		} else {
-			// checking token info
-
-			return authBackend.PublicKey, nil
+			return authBackend.SecretKey, nil
 		}
 	})
 	log.WithFields(log.Fields{

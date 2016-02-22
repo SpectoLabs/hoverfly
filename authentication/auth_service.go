@@ -43,7 +43,7 @@ func RefreshToken(requestUser *backends.User, ab backends.AuthBackend) []byte {
 func Logout(req *http.Request, ab backends.AuthBackend) error {
 	authBackend := InitJWTAuthenticationBackend(ab)
 	tokenRequest, err := jwt.ParseFromRequest(req, func(token *jwt.Token) (interface{}, error) {
-		return authBackend.PublicKey, nil
+		return authBackend.SecretKey, nil
 	})
 	if err != nil {
 		return err
