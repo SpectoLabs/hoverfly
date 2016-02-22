@@ -50,10 +50,10 @@ func decodeToken(data []byte) (*Token, error) {
 	return t, nil
 }
 
-func InitJWTAuthenticationBackend(ab backends.AuthBackend) *JWTAuthenticationBackend {
+func InitJWTAuthenticationBackend(ab backends.AuthBackend, secret []byte) *JWTAuthenticationBackend {
 	if authBackendInstance == nil {
 		authBackendInstance = &JWTAuthenticationBackend{
-			SecretKey:   SecretKey,
+			SecretKey:   secret,
 			AuthBackend: ab,
 		}
 	}
