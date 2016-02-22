@@ -15,12 +15,12 @@ type AuthMiddleware struct {
 	JWTExpirationDelta int
 }
 
-func GetNewAuthenticationMiddleware(authBackend backends.AuthBackend, secretKey []byte) *AuthMiddleware {
-	return &AuthMiddleware{AB: authBackend, SecretKey: secretKey}
+func GetNewAuthenticationMiddleware(authBackend backends.AuthBackend, secretKey []byte, exp int) *AuthMiddleware {
+	return &AuthMiddleware{AB: authBackend, SecretKey: secretKey, JWTExpirationDelta: exp}
 }
 
 func (a *AuthMiddleware) RequireTokenAuthentication(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	authBackend := InitJWTAuthenticationBackend(a.AB, a.SecretKey)
+	authBackend := InitJWTAuthenticationBackend(a.AB, a.SecretKey, a.JWTExpirationDelta)
 
 	token, err := jwt.ParseFromRequest(req, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
