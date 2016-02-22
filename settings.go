@@ -2,19 +2,24 @@ package hoverfly
 
 import (
 	"os"
+	"strconv"
 	"sync"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // Configuration - initial structure of configuration
 type Configuration struct {
-	AdminPort    string
-	ProxyPort    string
-	Mode         string
-	Destination  string
-	Middleware   string
-	DatabaseName string
-	Verbose      bool
-	Development  bool
+	AdminPort          string
+	ProxyPort          string
+	Mode               string
+	Destination        string
+	Middleware         string
+	DatabaseName       string
+	Verbose            bool
+	Development        bool
+	SecretKey          []byte
+	JWTExpirationDelta int
 
 	mu sync.Mutex
 }
@@ -44,6 +49,8 @@ const DefaultAdminPort = "8888"
 // or used by Hoverfly
 const DefaultDatabaseName = "requests.db"
 
+const DefaultJWTExpirationDelta = 72
+
 // InitSettings gets and returns initial configuration from env
 // variables or sets defaults
 func InitSettings() *Configuration {
@@ -68,6 +75,28 @@ func InitSettings() *Configuration {
 		databaseName = DefaultDatabaseName
 	}
 	appConfig.DatabaseName = databaseName
+
+	if os.Getenv("HoverflySecret") != "" {
+		appConfig.SecretKey = []byte(os.Getenv("HoverflySecret"))
+	} else {
+		appConfig.SecretKey = GetRandomName(10)
+	}
+
+	if os.Getenv("HoverflyTokenExpiration") != "" {
+
+		exp, err := strconv.Atoi(os.Getenv("HoverflyTokenExpiration"))
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":                   err.Error(),
+				"HoverflyTokenExpiration": os.Getenv("HoverflyTokenExpiration"),
+			}).Error("failed to get token exipration delta, using default value")
+			exp = DefaultJWTExpirationDelta
+		}
+		appConfig.JWTExpirationDelta = exp
+
+	} else {
+		appConfig.JWTExpirationDelta = DefaultJWTExpirationDelta
+	}
 
 	// middleware configuration
 	appConfig.Middleware = os.Getenv("HoverflyMiddleware")
