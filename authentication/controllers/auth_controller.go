@@ -14,7 +14,8 @@ type AllUsersResponse struct {
 }
 
 type AuthController struct {
-	AB backends.AuthBackend
+	AB        backends.AuthBackend
+	SecretKey []byte
 }
 
 func GetNewAuthenticationController(authBackend backends.AuthBackend) *AuthController {
