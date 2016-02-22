@@ -13,8 +13,9 @@ import (
 )
 
 type JWTAuthenticationBackend struct {
-	SecretKey   []byte
-	AuthBackend backends.AuthBackend
+	SecretKey          []byte
+	JWTExpirationDelta int
+	AuthBackend        backends.AuthBackend
 }
 
 const (
@@ -50,11 +51,12 @@ func decodeToken(data []byte) (*Token, error) {
 	return t, nil
 }
 
-func InitJWTAuthenticationBackend(ab backends.AuthBackend, secret []byte) *JWTAuthenticationBackend {
+func InitJWTAuthenticationBackend(ab backends.AuthBackend, secret []byte, exp int) *JWTAuthenticationBackend {
 	if authBackendInstance == nil {
 		authBackendInstance = &JWTAuthenticationBackend{
-			SecretKey:   secret,
-			AuthBackend: ab,
+			SecretKey:          secret,
+			AuthBackend:        ab,
+			JWTExpirationDelta: exp,
 		}
 	}
 
@@ -63,7 +65,7 @@ func InitJWTAuthenticationBackend(ab backends.AuthBackend, secret []byte) *JWTAu
 
 func (backend *JWTAuthenticationBackend) GenerateToken(userUUID, username string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS512)
-	token.Claims["exp"] = time.Now().Add(time.Hour * time.Duration(Get().JWTExpirationDelta)).Unix()
+	token.Claims["exp"] = time.Now().Add(time.Hour * time.Duration(backend.JWTExpirationDelta)).Unix()
 	token.Claims["iat"] = time.Now().Unix()
 	token.Claims["username"] = username
 	token.Claims["sub"] = userUUID
