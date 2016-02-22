@@ -100,6 +100,26 @@ func (b *BoltAuth) AddUser(username, password []byte, admin bool) error {
 	return err
 }
 
+func (b *BoltAuth) DeleteUser(username []byte) error {
+	return b.delete(username, b.UserBucket)
+}
+
+func (b *BoltAuth) delete(key, bucket []byte) error {
+	err := b.DS.Update(func(tx *bolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists(bucket)
+		if err != nil {
+			return err
+		}
+		err = bucket.Delete(key)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
+}
+
 func (b *BoltAuth) GetUser(username []byte) (user *User, err error) {
 
 	err = b.DS.View(func(tx *bolt.Tx) error {
@@ -163,22 +183,6 @@ func (b *BoltAuth) SetValue(key, value []byte) error {
 			return err
 		}
 		err = bucket.Put(key, value)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	return err
-}
-
-func (b *BoltAuth) Delete(key []byte) error {
-	err := b.DS.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists(b.TokenBucket)
-		if err != nil {
-			return err
-		}
-		err = bucket.Delete(key)
 		if err != nil {
 			return err
 		}
