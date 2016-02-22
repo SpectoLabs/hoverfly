@@ -45,6 +45,7 @@ type AuthBackend interface {
 
 	AddUser(username, password []byte) error
 	GetUser(username []byte) (*User, error)
+	GetAllUsers() ([]User, error)
 }
 
 func NewBoltDBAuthBackend(db *bolt.DB, tokenBucket, userBucket []byte) *BoltAuth {
@@ -122,6 +123,32 @@ func (b *BoltAuth) GetUser(username []byte) (user *User, err error) {
 			return fmt.Errorf("error while getting user %q \n", username)
 		}
 
+		return nil
+	})
+	return
+}
+
+// GetAllUsers return all users
+func (b *BoltAuth) GetAllUsers() (users []User, err error) {
+	err = b.DS.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(b.UserBucket)
+		if b == nil {
+			// bucket doesn't exist
+			return nil
+		}
+		c := b.Cursor()
+
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			usr, err := DecodeUser(v)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error": err.Error(),
+					"json":  v,
+				}).Warning("Failed to deserialize bytes to user.")
+			} else {
+				users = append(users, *usr)
+			}
+		}
 		return nil
 	})
 	return
