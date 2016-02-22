@@ -15,7 +15,7 @@ func Login(requestUser *backends.User, ab backends.AuthBackend) (int, []byte) {
 	authBackend := InitJWTAuthenticationBackend(ab)
 
 	if authBackend.Authenticate(requestUser) {
-		token, err := authBackend.GenerateToken(requestUser.UUID)
+		token, err := authBackend.GenerateToken(requestUser.UUID, requestUser.Username)
 		if err != nil {
 			return http.StatusInternalServerError, []byte("")
 		} else {
@@ -29,7 +29,7 @@ func Login(requestUser *backends.User, ab backends.AuthBackend) (int, []byte) {
 
 func RefreshToken(requestUser *backends.User, ab backends.AuthBackend) []byte {
 	authBackend := InitJWTAuthenticationBackend(ab)
-	token, err := authBackend.GenerateToken(requestUser.UUID)
+	token, err := authBackend.GenerateToken(requestUser.UUID, requestUser.Username)
 	if err != nil {
 		panic(err)
 	}

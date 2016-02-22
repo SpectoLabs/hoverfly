@@ -67,12 +67,14 @@ func InitJWTAuthenticationBackend(ab backends.AuthBackend) *JWTAuthenticationBac
 	return authBackendInstance
 }
 
-func (backend *JWTAuthenticationBackend) GenerateToken(userUUID string) (string, error) {
-	token := jwt.New(jwt.SigningMethodRS512)
+func (backend *JWTAuthenticationBackend) GenerateToken(userUUID, username string) (string, error) {
+	token := jwt.New(jwt.SigningMethodHS512)
 	token.Claims["exp"] = time.Now().Add(time.Hour * time.Duration(Get().JWTExpirationDelta)).Unix()
 	token.Claims["iat"] = time.Now().Unix()
+	token.Claims["username"] = username
 	token.Claims["sub"] = userUUID
-	tokenString, err := token.SignedString(backend.privateKey)
+	//tokenString, err := token.SignedString(backend.privateKey)
+	tokenString, err := token.SignedString(SecretKey)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
