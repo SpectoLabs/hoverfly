@@ -115,7 +115,10 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.RecordsCount),
 	))
-	mux.Get("/stats", http.HandlerFunc(d.StatsHandler))
+	mux.Get("/stats", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.StatsHandler),
+	))
 	mux.Get("/statsws", http.HandlerFunc(d.StatsWSHandler))
 
 	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
@@ -202,7 +205,7 @@ func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request, next h
 }
 
 // StatsHandler - returns current stats about Hoverfly (request counts, record count)
-func (d *DBClient) StatsHandler(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) StatsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	stats := d.Counter.Flush()
 
 	count, err := d.Cache.RecordsCount()
