@@ -106,7 +106,10 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.DeleteAllRecordsHandler),
 	))
-	mux.Post("/records", http.HandlerFunc(d.ImportRecordsHandler))
+	mux.Post("/records", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.ImportRecordsHandler),
+	))
 
 	mux.Get("/count", http.HandlerFunc(d.RecordsCount))
 	mux.Get("/stats", http.HandlerFunc(d.StatsHandler))
@@ -283,7 +286,7 @@ func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ImportRecordsHandler - accepts JSON payload and saves it to cache
-func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
 	var requests recordedRequests
 
