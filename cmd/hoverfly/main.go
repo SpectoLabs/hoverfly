@@ -27,6 +27,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -129,8 +130,10 @@ func main() {
 	// overriding default settings
 	cfg.Mode = mode
 
-	// disabling/enabling authentication middleware
-	cfg.AuthEnabled = *authEnabled
+	// enabling authentication if flag or env variable is set to 'true'
+	if cfg.AuthEnabled || *authEnabled {
+		cfg.AuthEnabled = true
+	}
 
 	// overriding destination
 	cfg.Destination = *destination
