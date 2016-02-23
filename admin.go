@@ -119,9 +119,14 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.StatsHandler),
 	))
+
+	// TODO: check auth for websocket connection
 	mux.Get("/statsws", http.HandlerFunc(d.StatsWSHandler))
 
-	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
+	mux.Get("/state", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.CurrentStateHandler),
+	))
 	mux.Post("/state", http.HandlerFunc(d.StateHandler))
 
 	if d.Cfg.Development {
@@ -372,7 +377,7 @@ func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 }
 
 // CurrentStateHandler returns current state
-func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	var resp stateRequest
 	resp.Mode = d.Cfg.GetMode()
 	resp.Destination = d.Cfg.Destination
