@@ -20,6 +20,7 @@ type Configuration struct {
 	Development        bool
 	SecretKey          []byte
 	JWTExpirationDelta int
+	AuthEnabled        bool
 
 	mu sync.Mutex
 }
@@ -49,6 +50,7 @@ const DefaultAdminPort = "8888"
 // or used by Hoverfly
 const DefaultDatabaseName = "requests.db"
 
+// DefaultJWTExpirationDelta - default token expiration if environment variable is no provided
 const DefaultJWTExpirationDelta = 72
 
 // InitSettings gets and returns initial configuration from env
