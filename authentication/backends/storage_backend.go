@@ -2,10 +2,10 @@ package backends
 
 import (
 	"bytes"
-	"code.google.com/p/go-uuid/uuid"
 	"encoding/json"
 	"fmt"
 	"github.com/boltdb/bolt"
+	"github.com/pborman/uuid"
 	"golang.org/x/crypto/bcrypt"
 
 	log "github.com/Sirupsen/logrus"
