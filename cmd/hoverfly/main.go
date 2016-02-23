@@ -27,7 +27,6 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"os"
 )
 
 func main() {
