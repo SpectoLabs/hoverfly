@@ -127,7 +127,10 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.CurrentStateHandler),
 	))
-	mux.Post("/state", http.HandlerFunc(d.StateHandler))
+	mux.Post("/state", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.StateHandler),
+	))
 
 	if d.Cfg.Development {
 		// since hoverfly is not started from cmd/hoverfly/hoverfly
@@ -388,7 +391,7 @@ func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request,
 }
 
 // StateHandler handles current proxy state
-func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request) {
+func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	var sr stateRequest
 
 	// this is mainly for testing, since when you create
