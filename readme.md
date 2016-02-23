@@ -135,11 +135,23 @@ Add ca.pem to your trusted certificates or turn off verification. With curl you 
 
 ## API
 
-### Authentication
+### Authentication (setting up)
 
-export Hoverfly secret:
+To enable admin interface authentication you can pass '-auth' flag during startup:
+
+    ./hoverfly -auth
+    
+or supply environment variable:
+
+    export HoverflyAuthEnabled=true
+    
+If environment variable __or__ flag is given to enable authentication - it will be enabled (if you set flag to 'false' 
+but leave environment variable set to 'true', or vice versa - auth will be enabled). 
+
+Export Hoverfly secret:
 
     export HoverflySecret=VeryVerySecret
+    
 
 If you skip this step - a new random secret will be generated every single time when you launch Hoverfly. This can be useful
 if you are deploying it in cloud but it can also be annoying if you are working with Hoverfly where it is constantly restarted.
@@ -147,6 +159,8 @@ if you are deploying it in cloud but it can also be annoying if you are working 
 You can also specify token expiration time (defaults to 72):
 
     export HoverflyTokenExpiration=200
+
+### Adding users
 
 Then, add your first admin user:
 
@@ -172,7 +186,7 @@ You can access the administrator API under the default hostname of 'localhost' a
 * Recorded requests: GET [http://localhost:8888/records](http://localhost:8888/records) ( __curl http://localhost:8888/records__ )
 * Wipe cache: DELETE http://localhost:8888/records ( __curl -X DELETE http://localhost:8888/records__ )
 * Get current proxy state: GET [http://localhost:8888/state](http://localhost:8888/state) ( __curl http://localhost:8888/state__ )
-* Set proxy state: POST http://localhost:8888/state, where
+* Set proxy state: POST http://localhost:8888/state ( __curl -H "Content-Type application/json" -X POST -d '{"mode":"capture"}' http://localhost:8888/state__ )
    + body to start virtualizing: {"mode":"virtualize"}
    + body to start capturing: {"mode":"capture"}
 * Exporting recorded requests to a file: __curl http://localhost:8888/records > requests.json__
