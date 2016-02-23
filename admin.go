@@ -111,7 +111,10 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(d.ImportRecordsHandler),
 	))
 
-	mux.Get("/count", http.HandlerFunc(d.RecordsCount))
+	mux.Get("/count", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.RecordsCount),
+	))
 	mux.Get("/stats", http.HandlerFunc(d.StatsHandler))
 	mux.Get("/statsws", http.HandlerFunc(d.StatsWSHandler))
 
@@ -169,7 +172,7 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 }
 
 // RecordsCount returns number of captured requests as a JSON payload
-func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request, next http.Handler) {
 	count, err := d.Cache.RecordsCount()
 
 	if err == nil {
