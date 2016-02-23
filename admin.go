@@ -172,7 +172,7 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 }
 
 // RecordsCount returns number of captured requests as a JSON payload
-func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request, next http.Handler) {
+func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	count, err := d.Cache.RecordsCount()
 
 	if err == nil {
