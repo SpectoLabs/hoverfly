@@ -144,7 +144,11 @@ export Hoverfly secret:
 If you skip this step - a new random secret will be generated every single time when you launch Hoverfly. This can be useful
 if you are deploying it in cloud but it can also be annoying if you are working with Hoverfly where it is constantly restarted.
 
-Add new user:
+You can also specify token expiration time (defaults to 72):
+
+    export HoverflyTokenExpiration=200
+
+Then, add your first user:
 
     ./hoverfly -v -add -username hfadmin -password hfadminpass 
 

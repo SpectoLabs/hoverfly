@@ -43,7 +43,7 @@ type AuthBackend interface {
 	SetValue(key, value []byte) error
 	GetValue(key []byte) ([]byte, error)
 
-	Delete(key []byte) error
+	DeleteUser(username []byte) error
 
 	AddUser(username, password []byte, admin bool) error
 	GetUser(username []byte) (*User, error)
