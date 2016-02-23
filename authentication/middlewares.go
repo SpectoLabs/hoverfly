@@ -12,13 +12,19 @@ type AuthMiddleware struct {
 	AB                 backends.AuthBackend
 	SecretKey          []byte
 	JWTExpirationDelta int
+	Enabled            bool
 }
 
-func GetNewAuthenticationMiddleware(authBackend backends.AuthBackend, secretKey []byte, exp int) *AuthMiddleware {
-	return &AuthMiddleware{AB: authBackend, SecretKey: secretKey, JWTExpirationDelta: exp}
+func GetNewAuthenticationMiddleware(authBackend backends.AuthBackend, secretKey []byte, exp int, enabled bool) *AuthMiddleware {
+	return &AuthMiddleware{AB: authBackend, SecretKey: secretKey, JWTExpirationDelta: exp, Enabled: enabled}
 }
 
-func (a *AuthMiddleware) RequireTokenAuthentication(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (a *AuthMiddleware) RequireTokenAuthentication(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	// if auth is disabled - do not check token
+	if !a.Enabled {
+		next(w, req)
+	}
+
 	authBackend := InitJWTAuthenticationBackend(a.AB, a.SecretKey, a.JWTExpirationDelta)
 
 	token, err := jwt.ParseFromRequest(req, func(token *jwt.Token) (interface{}, error) {
@@ -30,8 +36,8 @@ func (a *AuthMiddleware) RequireTokenAuthentication(rw http.ResponseWriter, req 
 	})
 
 	if err == nil && token.Valid && !authBackend.IsInBlacklist(req.Header.Get("Authorization")) {
-		next(rw, req)
+		next(w, req)
 	} else {
-		rw.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
 	}
 }
