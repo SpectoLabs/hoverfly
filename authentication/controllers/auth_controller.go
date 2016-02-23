@@ -54,8 +54,7 @@ func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request, next htt
 }
 
 // GetAllUsersHandler - returns a list of all users
-// TODO: put under auth required handler
-func (a *AuthController) GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+func (a *AuthController) GetAllUsersHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	users, err := a.AB.GetAllUsers()
 
 	if err == nil {
