@@ -9,3 +9,4 @@ import:
   - package: github.com/rakyll/statik
   - package: github.com/rcrowley/go-metrics
   - package: github.com/gorilla/websocket
+  - package: github.com/dgrijalva/jwt-go
