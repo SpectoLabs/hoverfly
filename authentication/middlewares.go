@@ -1,12 +1,11 @@
 package authentication
 
 import (
-	log "github.com/Sirupsen/logrus"
-
 	"fmt"
+	"net/http"
+
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
 	jwt "github.com/dgrijalva/jwt-go"
-	"net/http"
 )
 
 type AuthMiddleware struct {
@@ -29,10 +28,6 @@ func (a *AuthMiddleware) RequireTokenAuthentication(rw http.ResponseWriter, req 
 			return authBackend.SecretKey, nil
 		}
 	})
-	log.WithFields(log.Fields{
-		"valid":  token.Valid,
-		"string": token.Raw,
-	}).Warn("token information")
 
 	if err == nil && token.Valid && !authBackend.IsInBlacklist(req.Header.Get("Authorization")) {
 		next(rw, req)
