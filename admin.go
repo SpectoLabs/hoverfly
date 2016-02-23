@@ -101,7 +101,11 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.AllRecordsHandler),
 	))
-	mux.Delete("/records", http.HandlerFunc(d.DeleteAllRecordsHandler))
+
+	mux.Delete("/records", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.DeleteAllRecordsHandler),
+	))
 	mux.Post("/records", http.HandlerFunc(d.ImportRecordsHandler))
 
 	mux.Get("/count", http.HandlerFunc(d.RecordsCount))
@@ -321,7 +325,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 }
 
 // DeleteAllRecordsHandler - deletes all captured requests
-func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	err := d.Cache.DeleteData()
 
 	var en Entry
