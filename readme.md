@@ -148,9 +148,13 @@ You can also specify token expiration time (defaults to 72):
 
     export HoverflyTokenExpiration=200
 
-Then, add your first user:
+Then, add your first admin user:
 
-    ./hoverfly -v -add -username hfadmin -password hfadminpass 
+    ./hoverfly -v -add -username hfadmin -password hfadminpass
+     
+You can also create non-admin users by supplying 'admin' flag as follows:
+
+    ./hoverfly -v -add -username hfadmin -password hfadminpass -admin false
 
 Getting token:
 
