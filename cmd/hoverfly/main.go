@@ -62,6 +62,9 @@ func main() {
 	addPassword := flag.String("password", "", "password for new user")
 	isAdmin := flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
 
+	// TODO: this should be enabled by default when UI and documentation is ready
+	authEnabled := flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
+
 	flag.Parse()
 
 	// getting settings
@@ -125,6 +128,9 @@ func main() {
 
 	// overriding default settings
 	cfg.Mode = mode
+
+	// disabling/enabling authentication middleware
+	cfg.AuthEnabled = *authEnabled
 
 	// overriding destination
 	cfg.Destination = *destination

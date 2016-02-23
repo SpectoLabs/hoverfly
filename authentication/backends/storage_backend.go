@@ -82,6 +82,7 @@ func (b *BoltAuth) AddUser(username, password []byte, admin bool) error {
 			UUID:     uuid.New(),
 			Username: string(username),
 			Password: string(hashedPassword),
+			IsAdmin:  admin,
 		}
 		bts, err := u.Encode()
 		if err != nil {
