@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 
 	// static assets
@@ -119,7 +120,6 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.StatsHandler),
 	))
-
 	// TODO: check auth for websocket connection
 	mux.Get("/statsws", http.HandlerFunc(d.StatsWSHandler))
 
@@ -131,6 +131,13 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.StateHandler),
 	))
+
+	mux.Post("/add", http.HandlerFunc(d.ManualAddHandler))
+
+	// manual add
+	mux.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "../../static/dist/manual_add.html")
+	})
 
 	if d.Cfg.Development {
 		// since hoverfly is not started from cmd/hoverfly/hoverfly
