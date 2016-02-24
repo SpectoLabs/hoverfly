@@ -26,5 +26,5 @@
     path = vendor/github.com/rcrowley/go-metrics
     url = https://github.com/rcrowley/go-metrics
 [submodule "jwt-go"]
-    path = vendor/github.com/dgrijalva/jwt-gw
+    path = vendor/github.com/dgrijalva/jwt-go
     url = https://github.com/dgrijalva/jwt-go
