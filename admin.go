@@ -341,6 +341,83 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 
 }
 
+// ManualAddHandler - manually add new request/responses, using a form
+func (d *DBClient) ManualAddHandler(w http.ResponseWriter, req *http.Request) {
+	err := req.ParseForm()
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Got error while parsing form")
+	}
+
+	// request details
+	destination := req.PostFormValue("inputDestination")
+	method := req.PostFormValue("inputMethod")
+	path := req.PostFormValue("inputPath")
+	query := req.PostFormValue("inputQuery")
+	reqBody := req.PostFormValue("inputRequestBody")
+
+	preq := RequestDetails{
+		Destination: destination,
+		Method:      method,
+		Path:        path,
+		Query:       query,
+		Body:        reqBody}
+
+	// response
+	respStatusCode := req.PostFormValue("inputResponseStatusCode")
+	respBody := req.PostFormValue("inputResponseBody")
+	contentType := req.PostFormValue("inputContentType")
+
+	headers := make(map[string][]string)
+
+	// getting content type
+	if contentType == "xml" {
+		headers["Content-Type"] = []string{"application/xml;charset=UTF-8"}
+	} else if contentType == "json" {
+		headers["Content-Type"] = []string{"application/json"}
+	} else {
+		headers["Content-Type"] = []string{"text/html"}
+	}
+
+	sc, _ := strconv.Atoi(respStatusCode)
+
+	presp := ResponseDetails{
+		Status:  sc,
+		Headers: headers,
+		Body:    respBody,
+	}
+
+	log.WithFields(log.Fields{
+		"respBody":    respBody,
+		"contentType": contentType,
+	}).Info("manually adding request/response")
+
+	p := Payload{Request: preq, Response: presp}
+
+	var pls []Payload
+
+	pls = append(pls, p)
+
+	err = d.ImportPayloads(pls)
+
+	w.Header().Set("Content-Type", "application/json")
+	var response messageResponse
+
+	if err != nil {
+		response.Message = fmt.Sprintf("Got error: %s", err.Error())
+		w.WriteHeader(400)
+	} else {
+		response.Message = "all good"
+		w.WriteHeader(200)
+	}
+	b, err := json.Marshal(response)
+	w.Write(b)
+	return
+
+}
+
 // DeleteAllRecordsHandler - deletes all captured requests
 func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	err := d.Cache.DeleteData()
