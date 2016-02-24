@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Basic Page Needs
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>Hoverfly Admin</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Mobile Specific Metas
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FONT
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <!-- CSS
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/skeleton.css">
+
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="six columns">
+            <form class="form-signin" role="form" method="post" action="/add">
+                <!-- defining request-->
+                <h4 class="form-signin-heading">Request info</h4>
+                <label for="inputDestination" class="sr-only">Destination</label>
+                <input id="inputDestination" name="inputDestination" class="form-control" placeholder="www.google.com"
+                       required autofocus>
+
+
+                <label for="inputMethod" class="sr-only">Method</label>
+                <input id="inputMethod" name="inputMethod" class="form-control" placeholder="GET"
+                       required>
+
+                <label for="inputPath" class="sr-only">Path</label>
+                <input id="inputPath" name="inputPath" class="form-control" placeholder="/api/something">
+
+                <label for="inputQuery" class="sr-only">Query</label>
+                <input id="inputQuery" name="inputQuery" class="form-control" placeholder="?search=forthis">
+
+
+                <label for="inputRequestBody">Request body</label>
+                <textarea class="u-full-width" placeholder="<Request> value here </Request"
+                          id="inputRequestBody"></textarea>
+
+                <!-- response info -->
+                <h4 class="form-signin-heading">Response info</h4>
+
+                <label for="inputContentType">Content Type</label>
+                <select class="u-full-width" id="inputContentType" name="inputContentType">
+                    <option value="xml">application/xml</option>
+                    <option value="json">application/json</option>
+                    <option value="text">text/html</option>
+                </select>
+
+
+                <label for="inputResponseStatusCode" class="sr-only">Status Code</label>
+                <input type="number" id="inputResponseStatusCode" name="inputResponseStatusCode" class="form-control" placeholder="200"
+                       required>
+
+                <label for="inputResponseBody">Response body</label>
+                <textarea class="u-full-width" placeholder="<Response> value here </Response"
+                          name="inputResponseBody"
+                          id="inputResponseBody"></textarea>
+
+
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Add</button>
+            </form>
+        </div>
+    </div>
+</div> <!-- /container -->
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+</body>
+</html>
