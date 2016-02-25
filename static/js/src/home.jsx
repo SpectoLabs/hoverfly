@@ -1,7 +1,9 @@
+import StatsComponent from './stats.jsx'
+import AddRecordComponent from './addrecord.jsx'
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import request from 'superagent';
-import StatsComponent from './stats.jsx'
 
 const VirtualizeMode = "virtualize";
 const CaptureMode = "capture";
@@ -25,8 +27,9 @@ let ModeInfoComponent = React.createClass({
             return (
                 <div>
                     <p>This mode enables service virtualization. Hoverfly uses captured requests and their unique
-                       identifiers (such as a query, a method, etc.) to find the best response. In this mode, middleware
-                       will be applied to matched responses.
+                        identifiers (such as a query, a method, etc.) to find the best response. In this mode,
+                        middleware
+                        will be applied to matched responses.
                     </p>
                 </div>
             )
@@ -34,7 +37,8 @@ let ModeInfoComponent = React.createClass({
             return (
                 <div>
                     <p>
-                        When capture mode is active, Hoverfly intercepts requests and then makes them on behalf of the client.
+                        When capture mode is active, Hoverfly intercepts requests and then makes them on behalf of the
+                        client.
                         In this mode, middleware is applied to outgoing traffic. Requests and responses are stored in
                         embedded database as JSON structures.
                     </p>
@@ -45,8 +49,10 @@ let ModeInfoComponent = React.createClass({
                 <div>
                     <p>
                         Synthesize mode enables completely synthetic, virtual services. Middleware is required for this
-                        mode to work. The JSON payload with the incoming request information is supplied to the middleware.
-                        The middleware must then supply data to be returned in the response. More about this in project readme.
+                        mode to work. The JSON payload with the incoming request information is supplied to the
+                        middleware.
+                        The middleware must then supply data to be returned in the response. More about this in project
+                        readme.
                     </p>
                 </div>
             )
@@ -54,7 +60,8 @@ let ModeInfoComponent = React.createClass({
             return (
                 <div>
                     <p>
-                        Modify mode applies middleware to both outbound and inbound HTTP/HTTPS traffic, allowing you to modify requests
+                        Modify mode applies middleware to both outbound and inbound HTTP/HTTPS traffic, allowing you to
+                        modify requests
                         and responses on the fly. Hoverfly doesn't record anything when modify mode is enabled.
                     </p>
                 </div>
@@ -154,10 +161,16 @@ let StateChangeComponent = React.createClass({
                         <ModeInfoComponent data={data}/>
                     </div>
                 </div>
-                    <hr/>
-                    <div className="row">
-                        <StatsComponent />
-                    </div>
+
+                <hr/>
+                <div className="row">
+                    <AddRecordComponent />
+                </div>
+
+                <hr/>
+                <div className="row">
+                    <StatsComponent />
+                </div>
 
             </div>
         )

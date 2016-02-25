@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 
 	// static assets
@@ -119,7 +120,6 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.StatsHandler),
 	))
-
 	// TODO: check auth for websocket connection
 	mux.Get("/statsws", http.HandlerFunc(d.StatsWSHandler))
 
@@ -130,6 +130,11 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	mux.Post("/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.StateHandler),
+	))
+
+	mux.Post("/add", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.ManualAddHandler),
 	))
 
 	if d.Cfg.Development {
@@ -337,6 +342,90 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 	}
 
 	b, err := json.Marshal(response)
+	w.Write(b)
+
+}
+
+// ManualAddHandler - manually add new request/responses, using a form
+func (d *DBClient) ManualAddHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	err := req.ParseForm()
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Got error while parsing form")
+	}
+
+	// request details
+	destination := req.PostFormValue("inputDestination")
+	method := req.PostFormValue("inputMethod")
+	path := req.PostFormValue("inputPath")
+	query := req.PostFormValue("inputQuery")
+	reqBody := req.PostFormValue("inputRequestBody")
+
+	preq := RequestDetails{
+		Destination: destination,
+		Method:      method,
+		Path:        path,
+		Query:       query,
+		Body:        reqBody}
+
+	// response
+	respStatusCode := req.PostFormValue("inputResponseStatusCode")
+	respBody := req.PostFormValue("inputResponseBody")
+	contentType := req.PostFormValue("inputContentType")
+
+	headers := make(map[string][]string)
+
+	// getting content type
+	if contentType == "xml" {
+		headers["Content-Type"] = []string{"application/xml"}
+	} else if contentType == "json" {
+		headers["Content-Type"] = []string{"application/json"}
+	} else {
+		headers["Content-Type"] = []string{"text/html"}
+	}
+
+	sc, _ := strconv.Atoi(respStatusCode)
+
+	presp := ResponseDetails{
+		Status:  sc,
+		Headers: headers,
+		Body:    respBody,
+	}
+
+	log.WithFields(log.Fields{
+		"respBody":    respBody,
+		"contentType": contentType,
+	}).Info("manually adding request/response")
+
+	p := Payload{Request: preq, Response: presp}
+
+	var pls []Payload
+
+	pls = append(pls, p)
+
+	err = d.ImportPayloads(pls)
+
+	w.Header().Set("Content-Type", "application/json")
+	var response messageResponse
+
+	if err != nil {
+		response.Message = fmt.Sprintf("Got error: %s", err.Error())
+		w.WriteHeader(400)
+
+	} else {
+		// redirecting to home
+		response.Message = "Record added successfuly"
+		w.WriteHeader(201)
+	}
+	b, err := json.Marshal(response)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":           err.Error(),
+			"originalMessage": response.Message,
+		}).Error("failed to send back message after trying to add new record ")
+	}
 	w.Write(b)
 
 }
