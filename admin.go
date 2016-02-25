@@ -132,7 +132,10 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(d.StateHandler),
 	))
 
-	mux.Post("/add", http.HandlerFunc(d.ManualAddHandler))
+	mux.Post("/add", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.ManualAddHandler),
+	))
 
 	if d.Cfg.Development {
 		// since hoverfly is not started from cmd/hoverfly/hoverfly
@@ -344,7 +347,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 }
 
 // ManualAddHandler - manually add new request/responses, using a form
-func (d *DBClient) ManualAddHandler(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) ManualAddHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	err := req.ParseForm()
 
 	if err != nil {
