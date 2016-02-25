@@ -23,6 +23,7 @@ func (a *AuthMiddleware) RequireTokenAuthentication(w http.ResponseWriter, req *
 	// if auth is disabled - do not check token
 	if !a.Enabled {
 		next(w, req)
+		return
 	}
 
 	authBackend := InitJWTAuthenticationBackend(a.AB, a.SecretKey, a.JWTExpirationDelta)
