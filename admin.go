@@ -376,7 +376,7 @@ func (d *DBClient) ManualAddHandler(w http.ResponseWriter, req *http.Request) {
 
 	// getting content type
 	if contentType == "xml" {
-		headers["Content-Type"] = []string{"application/xml;charset=UTF-8"}
+		headers["Content-Type"] = []string{"application/xml"}
 	} else if contentType == "json" {
 		headers["Content-Type"] = []string{"application/json"}
 	} else {
