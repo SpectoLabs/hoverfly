@@ -15,7 +15,6 @@ module.exports = {
     plugins: [
         new CopyWebpackPlugin([
             { from: 'index.html' },
-            { from: 'manual_add.html' },
             { from: 'css', to: 'css' },
             { from: 'images', to: 'images' }
         ])
