@@ -134,11 +134,6 @@ func getBoneRouter(d DBClient) *bone.Mux {
 
 	mux.Post("/add", http.HandlerFunc(d.ManualAddHandler))
 
-	// manual add
-	mux.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "../../static/dist/manual_add.html")
-	})
-
 	if d.Cfg.Development {
 		// since hoverfly is not started from cmd/hoverfly/hoverfly
 		// we have to target to that directory
@@ -415,13 +410,20 @@ func (d *DBClient) ManualAddHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		response.Message = fmt.Sprintf("Got error: %s", err.Error())
 		w.WriteHeader(400)
+
 	} else {
-		response.Message = "all good"
-		w.WriteHeader(200)
+		// redirecting to home
+		response.Message = "Record added successfuly"
+		w.WriteHeader(201)
 	}
 	b, err := json.Marshal(response)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":           err.Error(),
+			"originalMessage": response.Message,
+		}).Error("failed to send back message after trying to add new record ")
+	}
 	w.Write(b)
-	return
 
 }
 
