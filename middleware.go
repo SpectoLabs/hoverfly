@@ -77,20 +77,26 @@ func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
 	// Run the pipeline
 	mwOutput, stderr, err := Pipeline(cmds)
 
+	// middleware failed to execute
 	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Failed to process pipeline")
+		if len(stderr) > 0 {
+			log.WithFields(log.Fields{
+				"sdtderr": string(stderr),
+				"error":   err.Error(),
+			}).Error("Middleware error")
+		} else {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Middleware error")
+		}
 		return payload, err
 	}
 
-	// log stderr
+	// log stderr, middleware executed successfully
 	if len(stderr) > 0 {
-
 		log.WithFields(log.Fields{
 			"sdtderr": string(stderr),
 		}).Info("Information from middleware")
-
 	}
 
 	if len(mwOutput) > 0 {
