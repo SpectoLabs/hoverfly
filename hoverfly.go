@@ -2,7 +2,7 @@ package hoverfly
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/elazarl/goproxy"
+	"github.com/rusenask/goproxy"
 
 	"bufio"
 	"fmt"
