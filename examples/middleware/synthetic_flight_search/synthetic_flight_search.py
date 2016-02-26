@@ -310,6 +310,7 @@ def main():
 
     # some debugging info
     logging.debug("Getting trip! Origin: %s, destination: %s. Date: %s" % (trip_origin, trip_destination, trip_date))
+    logging.debug(payload)
 
     # adding json header
     payload_dict['response']['headers '] = {"Content-Type": ["application/json"]}
