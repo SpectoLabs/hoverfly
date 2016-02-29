@@ -62,3 +62,18 @@ func TestReflectBody(t *testing.T) {
 	expect(t, newPayload.Request.Method, req.Method)
 	expect(t, newPayload.Request.Destination, req.Destination)
 }
+
+func TestPipe(t *testing.T) {
+	middlewares := "./examples/middleware/modify_response/modify_response.py | ./examples/middleware/modify_status_code/modify_status_code.py "
+
+	req := RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: "", Body: "request_body_here"}
+
+	payload := Payload{Request: req}
+
+	newPayload, err := ExecuteMiddleware(middlewares, payload)
+
+	expect(t, err, nil)
+	expect(t, newPayload.Response.Body, "body was replaced by middleware\n")
+	expect(t, newPayload.Response.Status, 301)
+	expect(t, newPayload.Request.Method, req.Method)
+}
