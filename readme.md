@@ -190,6 +190,13 @@ You should be treating Hoverfly middleware as commands, this enables a bit more 
 In this example Hoverfly is also compiling Go middleware on the fly. However this increases time taken to execute middleware
 (and therefore to respond) so it's better to precompile middleware binaries before using them.
 
+### Using multiple middlewares at once
+
+Yes, you can do it. Here is an example of one middleware changing body/status code and then the second middleware changes
+status code again:
+
+    ./hoverfly --middleware "../../examples/middleware/modify_response/modify_response.py | ../../examples/middleware/modify_status_code/modify_status_code.py "
+
 
 #### Python middleware example
 
