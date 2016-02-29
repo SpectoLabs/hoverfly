@@ -10,9 +10,14 @@ deps:
 	go get github.com/gorilla/websocket
 	go get github.com/dgrijalva/jwt-go
 	go get github.com/rusenask/goproxy
+	go get github.com/SpectoLabs/hoverfly
 
 test: deps
 	go test
 
 build: deps
 	cd cmd/hoverfly/ && go build
+
+build_ci: deps
+	go get bitbucket.org/tebeka/go2xunit
+	go get github.com/mitchellh/gox
