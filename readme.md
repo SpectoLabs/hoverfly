@@ -42,9 +42,9 @@ Simply download a .exe file and run it.
 
 To set up your Go environment - look [here](https://golang.org/doc/code.html).
 
-This project uses Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to handle Go dependencies. You must have Go > 1.5 installed, and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled.
+This project uses Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to handle Go dependencies.
+You must have Go > 1.6 installed.
 
-    export GO15VENDOREXPERIMENT=1
     mkdir -p "$GOPATH/src/github.com/SpectoLabs/"
     git clone https://github.com/SpectoLabs/hoverfly.git "$GOPATH/src/github.com/SpectoLabs/hoverfly"
     cd "$GOPATH/src/github.com/SpectoLabs/hoverfly"
