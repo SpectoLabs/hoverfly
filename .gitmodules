@@ -4,9 +4,6 @@
 [submodule "logrus"]
 	path = vendor/github.com/Sirupsen/logrus
 	url = https://github.com/Sirupsen/logrus
-[submodule "goproxy"]
-	path = vendor/github.com/rusenask/goproxy
-	url = https://github.com/rusenask/goproxy
 [submodule "negroni-logrus"]
 	path = vendor/github.com/meatballhat/negroni-logrus
 	url = https://github.com/meatballhat/negroni-logrus
