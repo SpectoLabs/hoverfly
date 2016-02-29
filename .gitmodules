@@ -5,8 +5,8 @@
 	path = vendor/github.com/Sirupsen/logrus
 	url = https://github.com/Sirupsen/logrus
 [submodule "goproxy"]
-	path = vendor/github.com/elazarl/goproxy
-	url = https://github.com/elazarl/goproxy
+	path = vendor/github.com/rusenask/goproxy
+	url = https://github.com/rusenask/goproxy
 [submodule "negroni-logrus"]
 	path = vendor/github.com/meatballhat/negroni-logrus
 	url = https://github.com/meatballhat/negroni-logrus
@@ -25,4 +25,6 @@
 [submodule "go-metrics"]
     path = vendor/github.com/rcrowley/go-metrics
     url = https://github.com/rcrowley/go-metrics
-
+[submodule "jwt-go"]
+    path = vendor/github.com/dgrijalva/jwt-go
+    url = https://github.com/dgrijalva/jwt-go

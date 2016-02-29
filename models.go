@@ -10,6 +10,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/authentication/backends"
 	"io/ioutil"
 )
 
@@ -20,6 +21,7 @@ type DBClient struct {
 	Cfg     *Configuration
 	Counter *CounterByMode
 	Hooks   ActionTypeHooks
+	AB      backends.AuthBackend
 }
 
 // AddHook - adds a hook to DBClient

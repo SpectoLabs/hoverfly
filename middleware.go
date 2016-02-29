@@ -56,15 +56,18 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
 	commands := strings.Split(command, " ")
 
-	log.WithFields(log.Fields{
-		"commands": commands,
-		"no":       len(commands),
-	}).Debug("Found commands")
-
 	cmds := exec.Command(commands[0], commands[1:]...)
 
 	// getting payload
 	bts, err := json.Marshal(payload)
+
+	if log.GetLevel() == log.DebugLevel {
+		log.WithFields(log.Fields{
+			"commands":   commands,
+			"noCommands": len(commands),
+			"payload":    string(bts),
+		}).Debug("preparing to modify payload")
+	}
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -77,20 +80,26 @@ func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
 	// Run the pipeline
 	mwOutput, stderr, err := Pipeline(cmds)
 
+	// middleware failed to execute
 	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Failed to process pipeline")
+		if len(stderr) > 0 {
+			log.WithFields(log.Fields{
+				"sdtderr": string(stderr),
+				"error":   err.Error(),
+			}).Error("Middleware error")
+		} else {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Middleware error")
+		}
 		return payload, err
 	}
 
-	// log stderr
+	// log stderr, middleware executed successfully
 	if len(stderr) > 0 {
-
 		log.WithFields(log.Fields{
 			"sdtderr": string(stderr),
 		}).Info("Information from middleware")
-
 	}
 
 	if len(mwOutput) > 0 {
@@ -104,6 +113,13 @@ func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
 				"error":    err.Error(),
 			}).Error("Failed to unmarshal JSON from middleware")
 		} else {
+			if log.GetLevel() == log.DebugLevel {
+				log.WithFields(log.Fields{
+					"commands":   commands,
+					"noCommands": len(commands),
+					"payload":    string(mwOutput),
+				}).Debug("payload after modifications")
+			}
 			// payload unmarshalled into Payload struct, returning it
 			return newPayload, nil
 		}

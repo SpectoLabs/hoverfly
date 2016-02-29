@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 
 	// static assets
@@ -17,6 +18,10 @@ import (
 	"github.com/go-zoo/bone"
 	"github.com/gorilla/websocket"
 	"github.com/meatballhat/negroni-logrus"
+
+	// auth
+	"github.com/SpectoLabs/hoverfly/authentication"
+	"github.com/SpectoLabs/hoverfly/authentication/controllers"
 )
 
 // recordedRequests struct encapsulates payload data
@@ -71,16 +76,66 @@ func (d *DBClient) StartAdminInterface() {
 func getBoneRouter(d DBClient) *bone.Mux {
 	mux := bone.New()
 
-	mux.Get("/records", http.HandlerFunc(d.AllRecordsHandler))
-	mux.Delete("/records", http.HandlerFunc(d.DeleteAllRecordsHandler))
-	mux.Post("/records", http.HandlerFunc(d.ImportRecordsHandler))
+	// getting auth controllers and middleware
+	ac := controllers.GetNewAuthenticationController(d.AB, d.Cfg.SecretKey, d.Cfg.JWTExpirationDelta)
+	am := authentication.GetNewAuthenticationMiddleware(d.AB,
+		d.Cfg.SecretKey,
+		d.Cfg.JWTExpirationDelta,
+		d.Cfg.AuthEnabled)
 
-	mux.Get("/count", http.HandlerFunc(d.RecordsCount))
-	mux.Get("/stats", http.HandlerFunc(d.StatsHandler))
+	mux.Post("/token-auth", http.HandlerFunc(ac.Login))
+	mux.Get("/refresh-token-auth", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(ac.RefreshToken),
+	))
+	mux.Get("/logout", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(ac.Logout),
+	))
+
+	mux.Get("/users", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(ac.GetAllUsersHandler),
+	))
+
+	mux.Get("/records", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.AllRecordsHandler),
+	))
+
+	mux.Delete("/records", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.DeleteAllRecordsHandler),
+	))
+	mux.Post("/records", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.ImportRecordsHandler),
+	))
+
+	mux.Get("/count", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.RecordsCount),
+	))
+	mux.Get("/stats", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.StatsHandler),
+	))
+	// TODO: check auth for websocket connection
 	mux.Get("/statsws", http.HandlerFunc(d.StatsWSHandler))
 
-	mux.Get("/state", http.HandlerFunc(d.CurrentStateHandler))
-	mux.Post("/state", http.HandlerFunc(d.StateHandler))
+	mux.Get("/state", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.CurrentStateHandler),
+	))
+	mux.Post("/state", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.StateHandler),
+	))
+
+	mux.Post("/add", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.ManualAddHandler),
+	))
 
 	if d.Cfg.Development {
 		// since hoverfly is not started from cmd/hoverfly/hoverfly
@@ -99,12 +154,11 @@ func getBoneRouter(d DBClient) *bone.Mux {
 
 		mux.Handle("/*", http.FileServer(statikFS))
 	}
-
 	return mux
 }
 
 // AllRecordsHandler returns JSON content type http response
-func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	records, err := d.Cache.GetAllRequests()
 
 	if err == nil {
@@ -134,7 +188,7 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 // RecordsCount returns number of captured requests as a JSON payload
-func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	count, err := d.Cache.RecordsCount()
 
 	if err == nil {
@@ -164,7 +218,7 @@ func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request) {
 }
 
 // StatsHandler - returns current stats about Hoverfly (request counts, record count)
-func (d *DBClient) StatsHandler(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) StatsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	stats := d.Counter.Flush()
 
 	count, err := d.Cache.RecordsCount()
@@ -251,7 +305,7 @@ func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ImportRecordsHandler - accepts JSON payload and saves it to cache
-func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
 	var requests recordedRequests
 
@@ -292,8 +346,92 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 
 }
 
+// ManualAddHandler - manually add new request/responses, using a form
+func (d *DBClient) ManualAddHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	err := req.ParseForm()
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Got error while parsing form")
+	}
+
+	// request details
+	destination := req.PostFormValue("inputDestination")
+	method := req.PostFormValue("inputMethod")
+	path := req.PostFormValue("inputPath")
+	query := req.PostFormValue("inputQuery")
+	reqBody := req.PostFormValue("inputRequestBody")
+
+	preq := RequestDetails{
+		Destination: destination,
+		Method:      method,
+		Path:        path,
+		Query:       query,
+		Body:        reqBody}
+
+	// response
+	respStatusCode := req.PostFormValue("inputResponseStatusCode")
+	respBody := req.PostFormValue("inputResponseBody")
+	contentType := req.PostFormValue("inputContentType")
+
+	headers := make(map[string][]string)
+
+	// getting content type
+	if contentType == "xml" {
+		headers["Content-Type"] = []string{"application/xml"}
+	} else if contentType == "json" {
+		headers["Content-Type"] = []string{"application/json"}
+	} else {
+		headers["Content-Type"] = []string{"text/html"}
+	}
+
+	sc, _ := strconv.Atoi(respStatusCode)
+
+	presp := ResponseDetails{
+		Status:  sc,
+		Headers: headers,
+		Body:    respBody,
+	}
+
+	log.WithFields(log.Fields{
+		"respBody":    respBody,
+		"contentType": contentType,
+	}).Info("manually adding request/response")
+
+	p := Payload{Request: preq, Response: presp}
+
+	var pls []Payload
+
+	pls = append(pls, p)
+
+	err = d.ImportPayloads(pls)
+
+	w.Header().Set("Content-Type", "application/json")
+	var response messageResponse
+
+	if err != nil {
+		response.Message = fmt.Sprintf("Got error: %s", err.Error())
+		w.WriteHeader(400)
+
+	} else {
+		// redirecting to home
+		response.Message = "Record added successfuly"
+		w.WriteHeader(201)
+	}
+	b, err := json.Marshal(response)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":           err.Error(),
+			"originalMessage": response.Message,
+		}).Error("failed to send back message after trying to add new record ")
+	}
+	w.Write(b)
+
+}
+
 // DeleteAllRecordsHandler - deletes all captured requests
-func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	err := d.Cache.DeleteData()
 
 	var en Entry
@@ -331,7 +469,7 @@ func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 }
 
 // CurrentStateHandler returns current state
-func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request) {
+func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	var resp stateRequest
 	resp.Mode = d.Cfg.GetMode()
 	resp.Destination = d.Cfg.Destination
@@ -342,7 +480,7 @@ func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request)
 }
 
 // StateHandler handles current proxy state
-func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request) {
+func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	var sr stateRequest
 
 	// this is mainly for testing, since when you create

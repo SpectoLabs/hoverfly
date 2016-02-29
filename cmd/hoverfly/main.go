@@ -22,6 +22,7 @@ package main
 import (
 	log "github.com/Sirupsen/logrus"
 	hv "github.com/SpectoLabs/hoverfly"
+	"github.com/SpectoLabs/hoverfly/authentication/backends"
 
 	"flag"
 	"fmt"
@@ -54,6 +55,15 @@ func main() {
 
 	// import flag
 	imp := flag.String("import", "", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
+
+	// adding new user
+	addNew := flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
+	addUser := flag.String("username", "", "username for new user")
+	addPassword := flag.String("password", "", "password for new user")
+	isAdmin := flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
+
+	// TODO: this should be enabled by default when UI and documentation is ready
+	authEnabled := flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
 
 	flag.Parse()
 
@@ -119,6 +129,11 @@ func main() {
 	// overriding default settings
 	cfg.Mode = mode
 
+	// enabling authentication if flag or env variable is set to 'true'
+	if cfg.AuthEnabled || *authEnabled {
+		cfg.AuthEnabled = true
+	}
+
 	// overriding destination
 	cfg.Destination = *destination
 
@@ -128,6 +143,27 @@ func main() {
 	defer cache.CloseDB()
 
 	proxy, dbClient := hv.GetNewHoverfly(cfg, cache)
+
+	ab := backends.NewBoltDBAuthBackend(db, []byte(backends.TokenBucketName), []byte(backends.UserBucketName))
+
+	// assigning auth backend
+	dbClient.AB = ab
+
+	// if add new user supplied - adding it to database
+	if *addNew {
+		err := ab.AddUser([]byte(*addUser), []byte(*addPassword), *isAdmin)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":    err.Error(),
+				"username": *addUser,
+			}).Fatal("failed to add new user")
+		} else {
+			log.WithFields(log.Fields{
+				"username": *addUser,
+			}).Info("user added successfuly")
+		}
+		return
+	}
 
 	// importing stuff
 	if *imp != "" {

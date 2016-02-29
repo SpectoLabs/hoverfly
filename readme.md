@@ -42,9 +42,9 @@ Simply download a .exe file and run it.
 
 To set up your Go environment - look [here](https://golang.org/doc/code.html).
 
-This project uses Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to handle Go dependencies. You must have Go > 1.5 installed, and the ['Go 1.5 Vendor Experiment'](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit) flag enabled.
+This project uses Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to handle Go dependencies.
+You must have Go > 1.6 installed.
 
-    export GO15VENDOREXPERIMENT=1
     mkdir -p "$GOPATH/src/github.com/SpectoLabs/"
     git clone https://github.com/SpectoLabs/hoverfly.git "$GOPATH/src/github.com/SpectoLabs/hoverfly"
     cd "$GOPATH/src/github.com/SpectoLabs/hoverfly"
@@ -137,16 +137,28 @@ Add ca.pem to your trusted certificates or turn off verification. With curl you 
 
 ## API
 
+### Usage
+
 You can access the administrator API under the default hostname of 'localhost' and port '8888':
 
 * Recorded requests: GET [http://localhost:8888/records](http://localhost:8888/records) ( __curl http://localhost:8888/records__ )
 * Wipe cache: DELETE http://localhost:8888/records ( __curl -X DELETE http://localhost:8888/records__ )
 * Get current proxy state: GET [http://localhost:8888/state](http://localhost:8888/state) ( __curl http://localhost:8888/state__ )
-* Set proxy state: POST http://localhost:8888/state, where
+* Set proxy state: POST http://localhost:8888/state ( __curl -H "Content-Type application/json" -X POST -d '{"mode":"capture"}' http://localhost:8888/state__ )
    + body to start virtualizing: {"mode":"virtualize"}
    + body to start capturing: {"mode":"capture"}
 * Exporting recorded requests to a file: __curl http://localhost:8888/records > requests.json__
 * Importing requests from file: __curl --data "@/path/to/requests.json" http://localhost:8888/records__
+
+## Importing data on startup:
+
+Hoverfly can import data on startup from given file or url:
+
+    ./hoverfly -import my_service.json
+    
+or: 
+    
+    ./hoverfly -import http://mypage.com/service_x.json
 
 
 ## Middleware
