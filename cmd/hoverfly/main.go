@@ -35,9 +35,9 @@ func main() {
 	// getting proxy configuration
 	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
 	// modes
-	capture := flag.Bool("capture", false, "should proxy capture requests")
-	synthesize := flag.Bool("synthesize", false, "should proxy capture requests")
-	modify := flag.Bool("modify", false, "should proxy only modify requests")
+	capture := flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
+	synthesize := flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
+	modify := flag.Bool("modify", false, "start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic")
 
 	destination := flag.String("destination", ".", "destination URI to catch")
 	middleware := flag.String("middleware", "", "should proxy use middleware")
