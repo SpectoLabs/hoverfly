@@ -47,6 +47,9 @@ func main() {
 	// admin port
 	adminPort := flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
 
+	// database location
+	database := flag.String("db", "", "database location - supply it if you want to provide specific to database (will be created there if it doesn't exist)")
+
 	// metrics
 	metrics := flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
 
@@ -92,6 +95,10 @@ func main() {
 	// development settings
 	cfg.Development = *dev
 
+	// overriding database location
+	if *database != "" {
+		cfg.DatabaseName = *database
+	}
 	// overriding default middleware setting
 	cfg.Middleware = *middleware
 
