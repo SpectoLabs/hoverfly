@@ -2,11 +2,40 @@
 
 Hoverfly uses a combination of basic auth and JWT (JSON Web Tokens) to authenticate users
 
-## Usage
+### Authentication (currently disabled by default)
 
-Add new user:
+To enable admin interface authentication you can pass '-auth' flag during startup:
 
-    ./hoverfly -v -add -username hfadmin -password hfadminpass 
+    ./hoverfly -auth
+    
+or supply environment variable:
+
+    export HoverflyAuthEnabled=true
+    
+If environment variable __or__ flag is given to enable authentication - it will be enabled (if you set flag to 'false' 
+but leave environment variable set to 'true', or vice versa - auth will be enabled). 
+
+Export Hoverfly secret:
+
+    export HoverflySecret=VeryVerySecret
+    
+
+If you skip this step - a new random secret will be generated every single time when you launch Hoverfly. This can be useful
+if you are deploying it in cloud but it can also be annoying if you are working with Hoverfly where it is constantly restarted.
+
+You can also specify token expiration time (defaults to 72):
+
+    export HoverflyTokenExpiration=200
+
+### Adding users
+
+Then, add your first admin user:
+
+    ./hoverfly -v -add -username hfadmin -password hfadminpass
+     
+You can also create non-admin users by supplying 'admin' flag as follows:
+
+    ./hoverfly -v -add -username hfadmin -password hfadminpass -admin false
 
 Getting token:
 
