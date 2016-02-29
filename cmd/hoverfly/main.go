@@ -50,6 +50,9 @@ func main() {
 	// database location
 	database := flag.String("db", "", "database location - supply it if you want to provide specific to database (will be created there if it doesn't exist)")
 
+	// delete current database on startup
+	wipeDb := flag.Bool("wipedb", false, "supply -wipedb flag to delete all records from given database on startup")
+
 	// metrics
 	metrics := flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
 
@@ -99,6 +102,11 @@ func main() {
 	if *database != "" {
 		cfg.DatabaseName = *database
 	}
+
+	if *wipeDb {
+		os.Remove(cfg.DatabaseName)
+	}
+
 	// overriding default middleware setting
 	cfg.Middleware = *middleware
 
