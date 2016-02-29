@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -90,5 +91,25 @@ func TestPipeOrder(t *testing.T) {
 	expect(t, err, nil)
 	expect(t, newPayload.Response.Body, "body was replaced by middleware\n")
 	expect(t, newPayload.Response.Status, 201)
+	expect(t, newPayload.Request.Method, req.Method)
+}
+
+func TestPipeMixed(t *testing.T) {
+
+	m1 := "./examples/middleware/modify_status_code/modify_status_code.py"
+	m2 := "./examples/middleware/modify_response/modify_response.py"
+	m3 := "go run ./examples/middleware/go_example/change_to_custom_404.go"
+
+	middlewares := fmt.Sprintf("%s | %s | %s", m1, m2, m3)
+
+	req := RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: "", Body: "request_body_here"}
+
+	payload := Payload{Request: req}
+
+	newPayload, err := ExecuteMiddleware(middlewares, payload)
+
+	expect(t, err, nil)
+	expect(t, newPayload.Response.Body, "Custom body here")
+	expect(t, newPayload.Response.Status, 404)
 	expect(t, newPayload.Request.Method, req.Method)
 }
