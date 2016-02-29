@@ -42,26 +42,16 @@ Simply download a .exe file and run it.
 
 To set up your Go environment - look [here](https://golang.org/doc/code.html).
 
-This project uses Git [submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to handle Go dependencies.
 You must have Go > 1.6 installed.
 
     mkdir -p "$GOPATH/src/github.com/SpectoLabs/"
     git clone https://github.com/SpectoLabs/hoverfly.git "$GOPATH/src/github.com/SpectoLabs/hoverfly"
     cd "$GOPATH/src/github.com/SpectoLabs/hoverfly"
-    git submodule update --init --recursive
+    make build
 
-Build Hoverfly (main application file is in /cmd/hoverfly/ directory):
+And to run hoverfly:
 
-    cd cmd/hoverfly/
-    go build
-
-Set the correct permissions:
-
-    chmod +x hoverfly
-
-And run it:
-
-    ./hoverfly
+    ./cmd/hoverfly/hoverfly
 
 
 ## Admin UI
@@ -155,9 +145,9 @@ You can access the administrator API under the default hostname of 'localhost' a
 Hoverfly can import data on startup from given file or url:
 
     ./hoverfly -import my_service.json
-    
-or: 
-    
+
+or:
+
     ./hoverfly -import http://mypage.com/service_x.json
 
 
@@ -199,6 +189,13 @@ You should be treating Hoverfly middleware as commands, this enables a bit more 
 
 In this example Hoverfly is also compiling Go middleware on the fly. However this increases time taken to execute middleware
 (and therefore to respond) so it's better to precompile middleware binaries before using them.
+
+### Using multiple middlewares at once
+
+Yes, you can do it. Here is an example of one middleware changing body/status code and then the second middleware changes
+status code again:
+
+    ./hoverfly --middleware "../../examples/middleware/modify_response/modify_response.py | ../../examples/middleware/modify_status_code/modify_status_code.py "
 
 
 #### Python middleware example
