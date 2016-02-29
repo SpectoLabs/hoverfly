@@ -76,7 +76,7 @@ let AddRecordComponent = React.createClass({
                             <label htmlFor="inputRequestBody">Request body</label>
                             <textarea className="u-full-width"
                                       name="inputRequestBody"
-                                      id="inputRequestBody"> </textarea>
+                                      id="inputRequestBody"></textarea>
 
                             <h4 className="form-signin-heading">Define Response</h4>
 
@@ -97,7 +97,7 @@ let AddRecordComponent = React.createClass({
                             <label htmlFor="inputResponseBody">Response body</label>
                             <textarea className="u-full-width"
                                       name="inputResponseBody"
-                                      id="inputResponseBody"> </textarea>
+                                      id="inputResponseBody"></textarea>
 
                             <div className="row">
                                 <button className="button-primary" type="submit">Add</button>
