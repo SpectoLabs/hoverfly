@@ -1,7 +1,6 @@
 package hoverfly
 
 import (
-	"fmt"
 	"testing"
 )
 
