@@ -27,6 +27,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -35,9 +36,9 @@ func main() {
 	// getting proxy configuration
 	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
 	// modes
-	capture := flag.Bool("capture", false, "should proxy capture requests")
-	synthesize := flag.Bool("synthesize", false, "should proxy capture requests")
-	modify := flag.Bool("modify", false, "should proxy only modify requests")
+	capture := flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
+	synthesize := flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
+	modify := flag.Bool("modify", false, "start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic")
 
 	destination := flag.String("destination", ".", "destination URI to catch")
 	middleware := flag.String("middleware", "", "should proxy use middleware")
@@ -46,6 +47,12 @@ func main() {
 	proxyPort := flag.String("pp", "", "proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
 	// admin port
 	adminPort := flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
+
+	// database location
+	database := flag.String("db", "", "database location - supply it if you want to provide specific to database (will be created there if it doesn't exist)")
+
+	// delete current database on startup
+	wipeDb := flag.Bool("wipedb", false, "supply -wipedb flag to delete all records from given database on startup")
 
 	// metrics
 	metrics := flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
@@ -92,6 +99,15 @@ func main() {
 	// development settings
 	cfg.Development = *dev
 
+	// overriding database location
+	if *database != "" {
+		cfg.DatabaseName = *database
+	}
+
+	if *wipeDb {
+		os.Remove(cfg.DatabaseName)
+	}
+
 	// overriding default middleware setting
 	cfg.Middleware = *middleware
 
@@ -126,8 +142,8 @@ func main() {
 		}
 	}
 
-	// overriding default settings
-	cfg.Mode = mode
+	// setting mode
+	cfg.SetMode(mode)
 
 	// enabling authentication if flag or env variable is set to 'true'
 	if cfg.AuthEnabled || *authEnabled {

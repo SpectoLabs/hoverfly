@@ -53,19 +53,26 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 }
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
-func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
-	commands := strings.Split(command, " ")
+func ExecuteMiddleware(middlewares string, payload Payload) (Payload, error) {
 
-	cmds := exec.Command(commands[0], commands[1:]...)
+	mws := strings.Split(middlewares, "|")
+	var cmdList []*exec.Cmd
+
+	for _, v := range mws {
+		commands := strings.Split(strings.TrimSpace(v), " ")
+
+		cmd := exec.Command(commands[0], commands[1:]...)
+		cmdList = append(cmdList, cmd)
+	}
 
 	// getting payload
 	bts, err := json.Marshal(payload)
 
 	if log.GetLevel() == log.DebugLevel {
 		log.WithFields(log.Fields{
-			"commands":   commands,
-			"noCommands": len(commands),
-			"payload":    string(bts),
+			"middlewares": mws,
+			"count":       len(mws),
+			"payload":     string(bts),
 		}).Debug("preparing to modify payload")
 	}
 
@@ -75,10 +82,12 @@ func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
 		}).Error("Failed to marshal json")
 		return payload, err
 	}
-	cmds.Stdin = bytes.NewReader(bts)
+
+	//
+	cmdList[0].Stdin = bytes.NewReader(bts)
 
 	// Run the pipeline
-	mwOutput, stderr, err := Pipeline(cmds)
+	mwOutput, stderr, err := Pipeline(cmdList...)
 
 	// middleware failed to execute
 	if err != nil {
@@ -115,9 +124,9 @@ func ExecuteMiddleware(command string, payload Payload) (Payload, error) {
 		} else {
 			if log.GetLevel() == log.DebugLevel {
 				log.WithFields(log.Fields{
-					"commands":   commands,
-					"noCommands": len(commands),
-					"payload":    string(mwOutput),
+					"middlewares": middlewares,
+					"count":       len(middlewares),
+					"payload":     string(mwOutput),
 				}).Debug("payload after modifications")
 			}
 			// payload unmarshalled into Payload struct, returning it
