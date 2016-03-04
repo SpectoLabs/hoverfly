@@ -5,6 +5,7 @@ import (
     "os"
     
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	"github.com/dgrijalva/jwt-go"
 )
 
 
@@ -56,4 +57,32 @@ func TestAuthenticateFail(t *testing.T) {
         
      success := jwtBackend.Authenticate(user)
      expect(t, success, false)
+}
+
+func TestLogout(t *testing.T) {
+    ab := backends.NewBoltDBAuthBackend(TestDB, GetRandomName(10), GetRandomName(10))
+    
+    jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
+    
+    tokenString := "exampletokenstring"
+    token := jwt.New(jwt.SigningMethodHS512)
+    
+    err := jwtBackend.Logout(tokenString, token)
+    expect(t, err, nil)
+    
+    // checking whether token is in blacklist
+    
+    blacklisted := jwtBackend.IsInBlacklist(tokenString)
+    expect(t, blacklisted, true)
+}
+
+func TestNotBlacklisted(t *testing.T) {
+    ab := backends.NewBoltDBAuthBackend(TestDB, GetRandomName(10), GetRandomName(10))
+    
+    jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
+    
+    tokenString := "exampleTokenStringThatIsNotBlacklisted"
+    
+    blacklisted := jwtBackend.IsInBlacklist(tokenString)
+    expect(t, blacklisted, false)
 }
