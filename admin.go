@@ -29,6 +29,10 @@ type recordedRequests struct {
 	Data []Payload `json:"data"`
 }
 
+type storedMetadata struct {
+	Data []MetaObject `json:"data"`
+}
+
 type recordsCount struct {
 	Count int `json:"count"`
 }
@@ -110,6 +114,11 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	mux.Post("/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.ImportRecordsHandler),
+	))
+
+	mux.Get("/metadata", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.AllMetadataHandler),
 	))
 
 	mux.Get("/count", negroni.New(
