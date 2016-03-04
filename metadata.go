@@ -81,3 +81,22 @@ type MetaObject struct {
 	Key   []byte
 	Value []byte
 }
+
+// GetAll - returns all key/value pairs
+func (m *BoltMeta) GetAll() (objects []MetaObject, err error) {
+	err = m.DS.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(m.MetadataBucket)
+		if b == nil {
+			// bucket doesn't exist
+			return nil
+		}
+		c := b.Cursor()
+
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			obj := &MetaObject{Key: k, Value: v}
+			objects = append(objects, obj)
+		}
+		return nil
+	})
+	return
+}
