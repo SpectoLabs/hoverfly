@@ -75,3 +75,9 @@ func (m *BoltMeta) Get(key []byte) (value []byte, err error) {
 
 	return
 }
+
+// MetaObject - container to store both keys and values of captured objects
+type MetaObject struct {
+	Key   []byte
+	Value []byte
+}
