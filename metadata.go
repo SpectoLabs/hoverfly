@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/boltdb/bolt"
 )
 
@@ -13,6 +14,7 @@ type Metadata interface {
 	Get(key []byte) ([]byte, error)
 	Delete(key []byte) error
 	GetAll() ([]MetaObject, error)
+	DeleteData() error
 	CloseDB()
 }
 
@@ -78,8 +80,8 @@ func (m *BoltMeta) Get(key []byte) (value []byte, err error) {
 
 // MetaObject - container to store both keys and values of captured objects
 type MetaObject struct {
-	Key   []byte
-	Value []byte
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 // GetAll - returns all key/value pairs
@@ -93,7 +95,7 @@ func (m *BoltMeta) GetAll() (objects []MetaObject, err error) {
 		c := b.Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			obj := &MetaObject{Key: k, Value: v}
+			obj := &MetaObject{Key: string(k), Value: string(v)}
 			objects = append(objects, *obj)
 		}
 		return nil
@@ -116,4 +118,26 @@ func (m *BoltMeta) Delete(key []byte) error {
 	})
 
 	return err
+}
+
+// DeleteData - deletes bucket with all saved data
+func (m *BoltMeta) DeleteData() error {
+	err := m.deleteBucket(m.MetadataBucket)
+	return err
+}
+
+// DeleteBucket - deletes bucket with all saved data
+func (m *BoltMeta) deleteBucket(name []byte) (err error) {
+	err = m.DS.Update(func(tx *bolt.Tx) error {
+		err = tx.DeleteBucket(name)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+				"name":  string(name),
+			}).Warning("Failed to delete bucket")
+
+		}
+		return err
+	})
+	return
 }
