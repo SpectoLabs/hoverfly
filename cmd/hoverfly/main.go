@@ -30,6 +30,19 @@ import (
 	"os"
 )
 
+type arrayFlags []string
+
+func (i *arrayFlags) String() string {
+	return "my string representation"
+}
+
+func (i *arrayFlags) Set(value string) error {
+	*i = append(*i, value)
+	return nil
+}
+
+var importFlags arrayFlags
+
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 
@@ -61,7 +74,7 @@ func main() {
 	dev := flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
 
 	// import flag
-	imp := flag.String("import", "", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
+	flag.Var(&importFlags, "import", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
 
 	// adding new user
 	addNew := flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
@@ -182,13 +195,20 @@ func main() {
 	}
 
 	// importing stuff
-	if *imp != "" {
-		err := dbClient.Import(*imp)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error":  err.Error(),
-				"import": *imp,
-			}).Fatal("Failed to import given resource")
+	if len(importFlags) > 0 {
+		for _, v := range importFlags {
+			if v != "" {
+				log.WithFields(log.Fields{
+					"import": v,
+				}).Debug("Importing given resource")
+				err := dbClient.Import(v)
+				if err != nil {
+					log.WithFields(log.Fields{
+						"error":  err.Error(),
+						"import": v,
+					}).Fatal("Failed to import given resource")
+				}
+			}
 		}
 	}
 
