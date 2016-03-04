@@ -17,14 +17,14 @@ type Metadata interface {
 }
 
 // NewBoltDBMetadata - default metadata store
-func NewBoltDBMetadata(db *bolt.DB, bucket []byte) *BoltCache {
-	return &BoltCache{
+func NewBoltDBMetadata(db *bolt.DB, bucket []byte) *BoltMeta {
+	return &BoltMeta{
 		DS:             db,
-		RequestsBucket: []byte(bucket),
+		MetadataBucket: []byte(bucket),
 	}
 }
 
-const MetadataBucketName = []byte("metadataBucket")
+const MetadataBucketName = "metadataBucket"
 
 type BoltMeta struct {
 	DS             *bolt.DB
@@ -94,7 +94,7 @@ func (m *BoltMeta) GetAll() (objects []MetaObject, err error) {
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			obj := &MetaObject{Key: k, Value: v}
-			objects = append(objects, obj)
+			objects = append(objects, *obj)
 		}
 		return nil
 	})
