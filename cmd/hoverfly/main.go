@@ -178,6 +178,11 @@ func main() {
 	// assigning auth backend
 	dbClient.AB = ab
 
+	// metadata backend
+	md := hv.NewBoltDBMetadata(db, []byte(hv.MetadataBucketName))
+
+	dbClient.MD = md
+
 	// if add new user supplied - adding it to database
 	if *addNew {
 		err := ab.AddUser([]byte(*addUser), []byte(*addPassword), *isAdmin)
