@@ -100,3 +100,20 @@ func (m *BoltMeta) GetAll() (objects []MetaObject, err error) {
 	})
 	return
 }
+
+// Delete - deletes given metadata key
+func (m *BoltMeta) Delete(key []byte) error {
+	err := m.DS.Update(func(tx *bolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists(m.MetadataBucket)
+		if err != nil {
+			return err
+		}
+		err = bucket.Delete(key)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
+}
