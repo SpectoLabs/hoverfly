@@ -35,3 +35,20 @@ type BoltMeta struct {
 func (m *BoltMeta) CloseDB() {
 	m.DS.Close()
 }
+
+// Set - saves given key and value pair to BoltDB
+func (m *BoltMeta) Set(key, value []byte) error {
+	err := m.DS.Update(func(tx *bolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists(m.MetadataBucket)
+		if err != nil {
+			return err
+		}
+		err = bucket.Put(key, value)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err
+}
