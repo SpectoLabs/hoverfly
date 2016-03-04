@@ -52,3 +52,26 @@ func (m *BoltMeta) Set(key, value []byte) error {
 
 	return err
 }
+
+// Get - gets value for given key
+func (m *BoltMeta) Get(key []byte) (value []byte, err error) {
+	err = m.DS.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(m.MetadataBucket)
+		if bucket == nil {
+			return fmt.Errorf("Bucket %q not found!", m.MetadataBucket)
+		}
+		var buffer bytes.Buffer
+		val := bucket.Get(key)
+
+		// If it doesn't exist then it will return nil
+		if val == nil {
+			return fmt.Errorf("key %q not found \n", key)
+		}
+
+		buffer.Write(val)
+		value = buffer.Bytes()
+		return nil
+	})
+
+	return
+}
