@@ -43,3 +43,17 @@ func TestAuthenticate(t *testing.T) {
      success := jwtBackend.Authenticate(user)
      expect(t, success, true)
 }
+
+func TestAuthenticateFail(t *testing.T) {
+    ab := backends.NewBoltDBAuthBackend(TestDB, []byte(backends.TokenBucketName), GetRandomName(10))
+    
+    jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
+    user := &backends.User{
+        Username: "shouldntbehere", 
+        Password: "secret",
+         UUID: "uuid_here",
+        IsAdmin: true}
+        
+     success := jwtBackend.Authenticate(user)
+     expect(t, success, false)
+}
