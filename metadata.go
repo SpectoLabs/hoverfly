@@ -16,3 +16,18 @@ type Metadata interface {
 	CloseDB()
 }
 
+// NewBoltDBMetadata - default metadata store
+func NewBoltDBMetadata(db *bolt.DB, bucket []byte) *BoltCache {
+	return &BoltCache{
+		DS:             db,
+		RequestsBucket: []byte(bucket),
+	}
+}
+
+const MetadataBucketName = []byte("metadataBucket")
+
+type BoltMeta struct {
+	DS             *bolt.DB
+	MetadataBucket []byte
+}
+
