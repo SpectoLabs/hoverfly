@@ -562,3 +562,33 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 	w.Write(b)
 
 }
+
+// AllMetadataHandler returns JSON content type http response
+func (d *DBClient) AllMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	metadata, err := d.MD.GetAll()
+
+	if err == nil {
+
+		w.Header().Set("Content-Type", "application/json")
+
+		var response storedMetadata
+		response.Data = metadata
+		b, err := json.Marshal(response)
+
+		if err != nil {
+			log.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else {
+			w.Write(b)
+			return
+		}
+	} else {
+		log.WithFields(log.Fields{
+			"Error": err.Error(),
+		}).Error("Failed to get metadata!")
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(500)
+		return
+	}
+}
