@@ -31,3 +31,7 @@ type BoltMeta struct {
 	MetadataBucket []byte
 }
 
+// CloseDB - closes database
+func (m *BoltMeta) CloseDB() {
+	m.DS.Close()
+}
