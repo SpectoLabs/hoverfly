@@ -348,8 +348,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 		// failed to read response body
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-		}).Error("Could not read response body!")
-		response.Message = "Bad request. Nothing to import!"
+		}).Error("Could not read request body!")
 		http.Error(w, "Failed to read request body.", 400)
 		return
 	}
@@ -370,7 +369,16 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 		response.Message = fmt.Sprintf("%d payloads import complete.", len(requests.Data))
 	}
 
-	b, err := json.Marshal(response)
+	b, err := response.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+
 	w.Write(b)
 
 }
