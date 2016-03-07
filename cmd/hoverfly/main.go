@@ -201,7 +201,7 @@ func main() {
 
 	// importing stuff
 	if len(importFlags) > 0 {
-		for _, v := range importFlags {
+		for i, v := range importFlags {
 			if v != "" {
 				log.WithFields(log.Fields{
 					"import": v,
@@ -212,7 +212,10 @@ func main() {
 						"error":  err.Error(),
 						"import": v,
 					}).Fatal("Failed to import given resource")
+				} else {
+					err = dbClient.MD.Set([]byte(fmt.Sprintf("import_%d", i+1)), []byte(v))
 				}
+
 			}
 		}
 	}
