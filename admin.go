@@ -136,6 +136,11 @@ func getBoneRouter(d DBClient) *bone.Mux {
 		negroni.HandlerFunc(d.AllMetadataHandler),
 	))
 
+	mux.Put("/metadata", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.SetMetadataHandler),
+	))
+
 	mux.Get("/count", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.RecordsCount),
