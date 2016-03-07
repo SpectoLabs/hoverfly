@@ -558,3 +558,32 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 
 	expect(t, int(sr.RecordsCount), 5)
 }
+
+func TestSetMetadata(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	// preparing to set mode through rest api
+	var reqBody setMetadata
+	reqBody.Key = "some_key"
+	reqBody.Value = "some_val"
+
+	bts, err := json.Marshal(&reqBody)
+	expect(t, err, nil)
+
+	// deleting through handler
+	req, err := http.NewRequest("PUT", "/metadata", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusCreated)
+
+	// checking mode
+	meta_value, err := dbClient.MD.Get([]byte("some_key"))
+	expect(t, err, nil)
+	expect(t, string(meta_value), "some_val")
+}
