@@ -30,7 +30,7 @@ type recordedRequests struct {
 }
 
 type storedMetadata struct {
-	Data []MetaObject `json:"data"`
+	Data map[string]string `json:"data"`
 }
 
 type setMetadata struct {
@@ -615,7 +615,11 @@ func (d *DBClient) AllMetadataHandler(w http.ResponseWriter, req *http.Request, 
 		w.Header().Set("Content-Type", "application/json")
 
 		var response storedMetadata
-		response.Data = metadata
+		respMap := make(map[string]string)
+		for _, v := range metadata {
+			respMap[v.Key] = v.Value
+		}
+		response.Data = respMap
 		b, err := json.Marshal(response)
 
 		if err != nil {
@@ -636,6 +640,7 @@ func (d *DBClient) AllMetadataHandler(w http.ResponseWriter, req *http.Request, 
 	}
 }
 
+// SetMetadataHandler - sets new metadata
 func (d *DBClient) SetMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	var sm setMetadata
 	var mr messageResponse
