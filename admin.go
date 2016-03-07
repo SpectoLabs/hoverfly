@@ -699,3 +699,36 @@ func (d *DBClient) SetMetadataHandler(w http.ResponseWriter, req *http.Request, 
 	}
 	w.Write(b)
 }
+
+// DeleteMetadataHandler - deletes all metadata
+func (d *DBClient) DeleteMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	err := d.MD.DeleteData()
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var response messageResponse
+	if err != nil {
+		if err.Error() == "bucket not found" {
+			response.Message = fmt.Sprintf("No metadata found.")
+			w.WriteHeader(200)
+		} else {
+			response.Message = fmt.Sprintf("Something went wrong: %s", err.Error())
+			w.WriteHeader(500)
+		}
+	} else {
+		response.Message = "Metadata deleted successfuly"
+		w.WriteHeader(200)
+	}
+
+	b, err := response.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+	w.Write(b)
+	return
+}
