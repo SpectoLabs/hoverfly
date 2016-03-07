@@ -667,3 +667,36 @@ func TestGetMetadata(t *testing.T) {
 		expect(t, strings.HasPrefix(val.Value, "val"), true)
 	}
 }
+
+func TestDeleteMetadata(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+	m := getBoneRouter(*dbClient)
+	// adding some metadata
+	for i := 0; i < 3; i++ {
+		k := []byte(fmt.Sprintf("key_%d", i))
+		v := []byte(fmt.Sprintf("val_%d", i))
+		err := dbClient.MD.Set(k, v)
+		expect(t, err, nil)
+	}
+
+	// checking that metadata is there
+	allMeta, err := dbClient.MD.GetAll()
+	expect(t, err, nil)
+	expect(t, len(allMeta), 3)
+
+	// deleting it
+	req, err := http.NewRequest("DELETE", "/metadata", nil)
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	// checking metadata again, should be zero
+	allMeta, err = dbClient.MD.GetAll()
+	expect(t, err, nil)
+	expect(t, len(allMeta), 0)
+}
