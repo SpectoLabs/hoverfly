@@ -587,3 +587,19 @@ func TestSetMetadata(t *testing.T) {
 	expect(t, err, nil)
 	expect(t, string(meta_value), "some_val")
 }
+
+func TestSetMetadataBadBody(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	// deleting through handler
+	req, err := http.NewRequest("PUT", "/metadata", ioutil.NopCloser(bytes.NewBuffer([]byte("you shall not decode me!!"))))
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusBadRequest)
+}
