@@ -59,8 +59,10 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	}
 	// creating random buckets for everyone!
 	bucket := GetRandomName(10)
+	meta_bucket := GetRandomName(10)
 
 	cache := NewBoltDBCache(TestDB, bucket)
+	md := NewBoltDBMetadata(TestDB, meta_bucket)
 
 	cfg := InitSettings()
 	counter := NewModeCounter()
@@ -70,6 +72,7 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 		Cache:   cache,
 		Cfg:     cfg,
 		Counter: counter,
+		MD:      md,
 	}
 	return server, dbClient
 }
