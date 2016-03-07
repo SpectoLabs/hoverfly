@@ -603,3 +603,34 @@ func TestSetMetadataBadBody(t *testing.T) {
 	m.ServeHTTP(rec, req)
 	expect(t, rec.Code, http.StatusBadRequest)
 }
+
+func TestSetMetadataMissingKey(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	// preparing to set mode through rest api
+	var reqBody setMetadata
+	// missing key
+	reqBody.Value = "some_val"
+
+	bts, err := json.Marshal(&reqBody)
+	expect(t, err, nil)
+
+	// deleting through handler
+	req, err := http.NewRequest("PUT", "/metadata", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusBadRequest)
+
+	// checking response body
+	body, err := ioutil.ReadAll(rec.Body)
+	mr := messageResponse{}
+	err = json.Unmarshal(body, &mr)
+
+	expect(t, mr.Message, "Key not provided.")
+}
