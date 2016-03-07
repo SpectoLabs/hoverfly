@@ -644,7 +644,8 @@ func TestGetMetadata(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		k := []byte(fmt.Sprintf("key_%d", i))
 		v := []byte(fmt.Sprintf("val_%d", i))
-		dbClient.MD.Set(k, v)
+		err := dbClient.MD.Set(k, v)
+		expect(t, err, nil)
 	}
 
 	req, err := http.NewRequest("GET", "/metadata", nil)
