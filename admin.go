@@ -33,6 +33,11 @@ type storedMetadata struct {
 	Data []MetaObject `json:"data"`
 }
 
+type setMetadata struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 type recordsCount struct {
 	Count int `json:"count"`
 }
