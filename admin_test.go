@@ -700,3 +700,24 @@ func TestDeleteMetadata(t *testing.T) {
 	expect(t, err, nil)
 	expect(t, len(allMeta), 0)
 }
+
+func TestDeleteMetadataEmpty(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	// deleting it
+	req, err := http.NewRequest("DELETE", "/metadata", nil)
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	// checking metadata again, should be zero
+	allMeta, err := dbClient.MD.GetAll()
+	expect(t, err, nil)
+	expect(t, len(allMeta), 0)
+}
