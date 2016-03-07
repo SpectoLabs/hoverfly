@@ -456,12 +456,14 @@ func (d *DBClient) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 		response.Message = "Record added successfuly"
 		w.WriteHeader(201)
 	}
-	b, err := json.Marshal(response)
+	b, err := response.Encode()
 	if err != nil {
+		// failed to read response body
 		log.WithFields(log.Fields{
-			"error":           err.Error(),
-			"originalMessage": response.Message,
-		}).Error("failed to send back message after trying to add new record ")
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
 	}
 	w.Write(b)
 
@@ -499,8 +501,16 @@ func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 		response.Message = "Proxy cache deleted successfuly"
 		w.WriteHeader(200)
 	}
-	b, err := json.Marshal(response)
 
+	b, err := response.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
 	w.Write(b)
 	return
 }
