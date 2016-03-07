@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 )
 
@@ -583,9 +582,9 @@ func TestSetMetadata(t *testing.T) {
 	expect(t, rec.Code, http.StatusCreated)
 
 	// checking mode
-	meta_value, err := dbClient.MD.Get([]byte("some_key"))
+	metaValue, err := dbClient.MD.Get([]byte("some_key"))
 	expect(t, err, nil)
-	expect(t, string(meta_value), "some_val")
+	expect(t, string(metaValue), "some_val")
 }
 
 func TestSetMetadataBadBody(t *testing.T) {
@@ -662,9 +661,11 @@ func TestGetMetadata(t *testing.T) {
 	err = json.Unmarshal(body, &sm)
 
 	expect(t, len(sm.Data), 3)
-	for _, val := range sm.Data {
-		expect(t, strings.HasPrefix(val.Key, "key"), true)
-		expect(t, strings.HasPrefix(val.Value, "val"), true)
+
+	for i := 0; i < 3; i++ {
+		k := fmt.Sprintf("key_%d", i)
+		v := fmt.Sprintf("val_%d", i)
+		expect(t, sm.Data[k], v)
 	}
 }
 

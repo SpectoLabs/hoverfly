@@ -26,8 +26,10 @@ func NewBoltDBMetadata(db *bolt.DB, bucket []byte) *BoltMeta {
 	}
 }
 
+// MetadataBucketName - default bucket name for storing metadata in boltdb
 const MetadataBucketName = "metadataBucket"
 
+// BoltMeta - metadata backend that uses BoltDB
 type BoltMeta struct {
 	DS             *bolt.DB
 	MetadataBucket []byte
