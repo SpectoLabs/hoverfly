@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -218,7 +219,6 @@ func TestGetState(t *testing.T) {
 	// setting initial mode
 	dbClient.Cfg.SetMode("virtualize")
 
-	// deleting through handler
 	req, err := http.NewRequest("GET", "/state", nil)
 	expect(t, err, nil)
 	//The response recorder used to record HTTP responses
@@ -633,4 +633,36 @@ func TestSetMetadataMissingKey(t *testing.T) {
 	err = json.Unmarshal(body, &mr)
 
 	expect(t, mr.Message, "Key not provided.")
+}
+
+func TestGetMetadata(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+	m := getBoneRouter(*dbClient)
+	// adding some metadata
+	for i := 0; i < 3; i++ {
+		k := []byte(fmt.Sprintf("key_%d", i))
+		v := []byte(fmt.Sprintf("val_%d", i))
+		dbClient.MD.Set(k, v)
+	}
+
+	req, err := http.NewRequest("GET", "/metadata", nil)
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(rec.Body)
+
+	sm := storedMetadata{}
+	err = json.Unmarshal(body, &sm)
+
+	expect(t, len(sm.Data), 3)
+	for _, val := range sm.Data {
+		expect(t, strings.HasPrefix(val.Key, "key"), true)
+		expect(t, strings.HasPrefix(val.Value, "val"), true)
+	}
 }
