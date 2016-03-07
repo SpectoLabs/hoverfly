@@ -29,6 +29,15 @@ type recordedRequests struct {
 	Data []Payload `json:"data"`
 }
 
+type storedMetadata struct {
+	Data map[string]string `json:"data"`
+}
+
+type setMetadata struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 type recordsCount struct {
 	Count int `json:"count"`
 }
@@ -45,6 +54,16 @@ type stateRequest struct {
 
 type messageResponse struct {
 	Message string `json:"message"`
+}
+
+func (m *messageResponse) Encode() ([]byte, error) {
+	buf := new(bytes.Buffer)
+	enc := json.NewEncoder(buf)
+	err := enc.Encode(m)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 // StartAdminInterface - starts admin interface web server
@@ -110,6 +129,21 @@ func getBoneRouter(d DBClient) *bone.Mux {
 	mux.Post("/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.ImportRecordsHandler),
+	))
+
+	mux.Get("/metadata", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.AllMetadataHandler),
+	))
+
+	mux.Put("/metadata", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.SetMetadataHandler),
+	))
+
+	mux.Delete("/metadata", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.DeleteMetadataHandler),
 	))
 
 	mux.Get("/count", negroni.New(
@@ -319,8 +353,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 		// failed to read response body
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-		}).Error("Could not read response body!")
-		response.Message = "Bad request. Nothing to import!"
+		}).Error("Could not read request body!")
 		http.Error(w, "Failed to read request body.", 400)
 		return
 	}
@@ -341,7 +374,16 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 		response.Message = fmt.Sprintf("%d payloads import complete.", len(requests.Data))
 	}
 
-	b, err := json.Marshal(response)
+	b, err := response.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+
 	w.Write(b)
 
 }
@@ -419,12 +461,14 @@ func (d *DBClient) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 		response.Message = "Record added successfuly"
 		w.WriteHeader(201)
 	}
-	b, err := json.Marshal(response)
+	b, err := response.Encode()
 	if err != nil {
+		// failed to read response body
 		log.WithFields(log.Fields{
-			"error":           err.Error(),
-			"originalMessage": response.Message,
-		}).Error("failed to send back message after trying to add new record ")
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
 	}
 	w.Write(b)
 
@@ -462,8 +506,16 @@ func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 		response.Message = "Proxy cache deleted successfuly"
 		w.WriteHeader(200)
 	}
-	b, err := json.Marshal(response)
 
+	b, err := response.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
 	w.Write(b)
 	return
 }
@@ -552,4 +604,141 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(b)
 
+}
+
+// AllMetadataHandler returns JSON content type http response
+func (d *DBClient) AllMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	metadata, err := d.MD.GetAll()
+
+	if err == nil {
+
+		w.Header().Set("Content-Type", "application/json")
+
+		var response storedMetadata
+		respMap := make(map[string]string)
+		for _, v := range metadata {
+			respMap[v.Key] = v.Value
+		}
+		response.Data = respMap
+		b, err := json.Marshal(response)
+
+		if err != nil {
+			log.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else {
+			w.Write(b)
+			return
+		}
+	} else {
+		log.WithFields(log.Fields{
+			"Error": err.Error(),
+		}).Error("Failed to get metadata!")
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(500)
+		return
+	}
+}
+
+// SetMetadataHandler - sets new metadata
+func (d *DBClient) SetMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	var sm setMetadata
+	var mr messageResponse
+
+	if req.Body == nil {
+		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	defer req.Body.Close()
+	body, err := ioutil.ReadAll(req.Body)
+
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not read response body!")
+		mr.Message = fmt.Sprintf("Failed to read request body. Error: %s", err.Error())
+		w.WriteHeader(400)
+
+		b, err := mr.Encode()
+		if err != nil {
+			// failed to read response body
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Could not encode response body!")
+			http.Error(w, "Failed to encode response", 500)
+			return
+		}
+		w.Write(b)
+		return
+	}
+
+	err = json.Unmarshal(body, &sm)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to unmarshal request body!")
+		mr.Message = fmt.Sprintf("Failed to decode request body. Error: %s", err.Error())
+		w.WriteHeader(400)
+
+	} else if sm.Key == "" {
+		mr.Message = "Key not provided."
+		w.WriteHeader(400)
+
+	} else {
+		err = d.MD.Set([]byte(sm.Key), []byte(sm.Value))
+		if err != nil {
+			mr.Message = fmt.Sprintf("Failed to set metadata. Error: %s", err.Error())
+			w.WriteHeader(500)
+		} else {
+			mr.Message = "Metadata set."
+			w.WriteHeader(201)
+		}
+	}
+	b, err := mr.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+	w.Write(b)
+}
+
+// DeleteMetadataHandler - deletes all metadata
+func (d *DBClient) DeleteMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	err := d.MD.DeleteData()
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var response messageResponse
+	if err != nil {
+		if err.Error() == "bucket not found" {
+			response.Message = fmt.Sprintf("No metadata found.")
+			w.WriteHeader(200)
+		} else {
+			response.Message = fmt.Sprintf("Something went wrong: %s", err.Error())
+			w.WriteHeader(500)
+		}
+	} else {
+		response.Message = "Metadata deleted successfuly"
+		w.WriteHeader(200)
+	}
+
+	b, err := response.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+	w.Write(b)
+	return
 }

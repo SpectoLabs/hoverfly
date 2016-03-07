@@ -140,6 +140,56 @@ You can access the administrator API under the default hostname of 'localhost' a
 * Exporting recorded requests to a file: __curl http://localhost:8888/records > requests.json__
 * Importing requests from file: __curl --data "@/path/to/requests.json" http://localhost:8888/records__
 
+#### Metadata
+
+Hoverfly metadata API provides easy to use key/value storage to make management of multiple Hoverflies easier. Currently it automatically adds metadata with imported sources
+if it was done using launching flags ("-import http://mystorehostname/service.json").
+
+You can also set any key/values yourself. Let's give our Hoverfly a name! It would look something like this:
+
+    curl -H "Content-Type application/json" -X PUT -d '{"key":"name", "value": "Mad Max"}' http://localhost:8888/metadata
+
+and then add some description to it:
+
+    curl -H "Content-Type application/json" -X PUT -d '{"key":"description", "value": "Simulates keystone service, use user XXXX and password YYYYY to login"}' http://localhost:8888/metadata
+
+then, to get your Hoverfly's info - use GET request:
+
+    curl http://localhost:8888/metadata
+    
+result should be something like this:
+```javascript
+{
+	"data": {
+		"description": "Simulates keystone service, use user XXXX and password YYYYY to login",
+		"name": "Peters Hoverfly"
+	}
+}
+```
+
+if you import some resources during launch:
+
+    ./hoverfly -import ../../resources/keystone_service.json -import ../../resources/nova_service.json 
+
+our metadata will look like: 
+
+```javascript
+{
+	"data": {
+		"description": "Simulates keystone service, use user XXXX and password YYYYY to login",
+		"import_1": "../../resources/keystone_service.json",
+		"import_2": "../../resources/nova_service.json",
+		"name": "Peters Hoverfly"
+	}
+}
+```
+
+
+Currently available commands:
+* Set metadata: PUT http://localhost:8888/metadata ( __curl -H "Content-Type application/json" -X PUT -d '{"key":"my_key", "value": "my_value"}' http://localhost:8888/metadata__ )
+* Get all metadata: GET [http://localhost:8888/metadata](http://localhost:8888/metadata) ( __curl http://localhost:8888/metadata )
+* Delete all metadata: DELETE http://localhost:8888/metadata ( __curl -X DELETE http://localhost:8888/metadata )
+
 ## Importing data on startup:
 
 Hoverfly can import data on startup from given file or url:

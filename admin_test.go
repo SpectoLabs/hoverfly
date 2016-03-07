@@ -218,7 +218,6 @@ func TestGetState(t *testing.T) {
 	// setting initial mode
 	dbClient.Cfg.SetMode("virtualize")
 
-	// deleting through handler
 	req, err := http.NewRequest("GET", "/state", nil)
 	expect(t, err, nil)
 	//The response recorder used to record HTTP responses
@@ -557,4 +556,169 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 	err = json.Unmarshal(body, &sr)
 
 	expect(t, int(sr.RecordsCount), 5)
+}
+
+func TestSetMetadata(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	// preparing to set mode through rest api
+	var reqBody setMetadata
+	reqBody.Key = "some_key"
+	reqBody.Value = "some_val"
+
+	bts, err := json.Marshal(&reqBody)
+	expect(t, err, nil)
+
+	// deleting through handler
+	req, err := http.NewRequest("PUT", "/metadata", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusCreated)
+
+	// checking mode
+	metaValue, err := dbClient.MD.Get([]byte("some_key"))
+	expect(t, err, nil)
+	expect(t, string(metaValue), "some_val")
+}
+
+func TestSetMetadataBadBody(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	// deleting through handler
+	req, err := http.NewRequest("PUT", "/metadata", ioutil.NopCloser(bytes.NewBuffer([]byte("you shall not decode me!!"))))
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusBadRequest)
+}
+
+func TestSetMetadataMissingKey(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	// preparing to set mode through rest api
+	var reqBody setMetadata
+	// missing key
+	reqBody.Value = "some_val"
+
+	bts, err := json.Marshal(&reqBody)
+	expect(t, err, nil)
+
+	// deleting through handler
+	req, err := http.NewRequest("PUT", "/metadata", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusBadRequest)
+
+	// checking response body
+	body, err := ioutil.ReadAll(rec.Body)
+	mr := messageResponse{}
+	err = json.Unmarshal(body, &mr)
+
+	expect(t, mr.Message, "Key not provided.")
+}
+
+func TestGetMetadata(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+	m := getBoneRouter(*dbClient)
+	// adding some metadata
+	for i := 0; i < 3; i++ {
+		k := []byte(fmt.Sprintf("key_%d", i))
+		v := []byte(fmt.Sprintf("val_%d", i))
+		err := dbClient.MD.Set(k, v)
+		expect(t, err, nil)
+	}
+
+	req, err := http.NewRequest("GET", "/metadata", nil)
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(rec.Body)
+
+	sm := storedMetadata{}
+	err = json.Unmarshal(body, &sm)
+
+	expect(t, len(sm.Data), 3)
+
+	for i := 0; i < 3; i++ {
+		k := fmt.Sprintf("key_%d", i)
+		v := fmt.Sprintf("val_%d", i)
+		expect(t, sm.Data[k], v)
+	}
+}
+
+func TestDeleteMetadata(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+	m := getBoneRouter(*dbClient)
+	// adding some metadata
+	for i := 0; i < 3; i++ {
+		k := []byte(fmt.Sprintf("key_%d", i))
+		v := []byte(fmt.Sprintf("val_%d", i))
+		err := dbClient.MD.Set(k, v)
+		expect(t, err, nil)
+	}
+
+	// checking that metadata is there
+	allMeta, err := dbClient.MD.GetAll()
+	expect(t, err, nil)
+	expect(t, len(allMeta), 3)
+
+	// deleting it
+	req, err := http.NewRequest("DELETE", "/metadata", nil)
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	// checking metadata again, should be zero
+	allMeta, err = dbClient.MD.GetAll()
+	expect(t, err, nil)
+	expect(t, len(allMeta), 0)
+}
+
+func TestDeleteMetadataEmpty(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.Cache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	// deleting it
+	req, err := http.NewRequest("DELETE", "/metadata", nil)
+	expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	expect(t, rec.Code, http.StatusOK)
+
+	// checking metadata again, should be zero
+	allMeta, err := dbClient.MD.GetAll()
+	expect(t, err, nil)
+	expect(t, len(allMeta), 0)
 }

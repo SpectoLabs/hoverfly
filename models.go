@@ -22,6 +22,7 @@ type DBClient struct {
 	Counter *CounterByMode
 	Hooks   ActionTypeHooks
 	AB      backends.AuthBackend
+	MD      Metadata
 }
 
 // AddHook - adds a hook to DBClient
