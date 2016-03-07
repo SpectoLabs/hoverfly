@@ -592,3 +592,72 @@ func (d *DBClient) AllMetadataHandler(w http.ResponseWriter, req *http.Request, 
 		return
 	}
 }
+
+func (d *DBClient) SetMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	var sm setMetadata
+	var mr messageResponse
+
+	if req.Body == nil {
+		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	defer req.Body.Close()
+	body, err := ioutil.ReadAll(req.Body)
+
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not read response body!")
+		mr.Message = fmt.Sprintf("Failed to read request body. Error: %s", err.Error())
+		w.WriteHeader(400)
+
+		b, err := mr.Encode()
+		if err != nil {
+			// failed to read response body
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Could not encode response body!")
+			http.Error(w, "Failed to encode response", 500)
+			return
+		}
+		w.Write(b)
+		return
+	}
+
+	err = json.Unmarshal(body, &sm)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to unmarshal request body!")
+		mr.Message = fmt.Sprintf("Failed to decode request body. Error: %s", err.Error())
+		w.WriteHeader(400)
+
+	} else if sm.Key == "" {
+		mr.Message = "Key not provided."
+		w.WriteHeader(400)
+
+	} else {
+		err = d.MD.Set([]byte(sm.Key), []byte(sm.Value))
+		if err != nil {
+			mr.Message = fmt.Sprintf("Failed to set metadata. Error: %s", err.Error())
+			w.WriteHeader(500)
+		} else {
+			mr.Message = "Metadata set."
+			w.WriteHeader(201)
+		}
+	}
+	b, err := mr.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+	w.Write(b)
+}
