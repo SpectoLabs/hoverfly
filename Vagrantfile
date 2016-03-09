@@ -5,6 +5,7 @@ Vagrant.configure(2) do |config|
   config.vm.synced_folder '.', '/tmp/hoverfly-app'
 
   config.vm.network "forwarded_port", guest: 8888, host: 8888
+  config.vm.network "forwarded_port", guest: 8500, host: 8500
 
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "provision.yml"
