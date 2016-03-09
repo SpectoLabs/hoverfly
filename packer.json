@@ -11,7 +11,7 @@
     "source_ami": "ami-175d6f7d",
     "instance_type": "m3.medium",
     "ssh_username": "ubuntu",
-    "ami_name": "hoverfly-app {{timestamp}}"
+    "ami_name": "Hoverfly {{timestamp}}"
   }],
   "provisioners": [
     {
