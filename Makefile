@@ -1,22 +1,18 @@
 deps:
-	go get -u github.com/Sirupsen/logrus
-	go get -u github.com/elazarl/goproxy
-	go get -u github.com/meatballhat/negroni-logrus
-	go get -u github.com/codegangsta/negroni
-	go get -u github.com/go-zoo/bone
-	go get -u github.com/boltdb/bolt
-	go get -u github.com/rakyll/statik
-	go get -u github.com/rcrowley/go-metrics
-	go get -u github.com/gorilla/websocket
-	go get -u github.com/dgrijalva/jwt-go
-	go get -u github.com/rusenask/goproxy
-	go get -u github.com/SpectoLabs/hoverfly
+	go get
 
 test: deps
 	go test
 
-build: deps
+build-jenkins: deps
+	go get -u all
 	cd cmd/hoverfly/ && go build
+
+build: deps
+	cd cmd/hoverfly/ && go build -o ${GOPATH}/bin/hoverflyb
+
+build-ami:
+	packer build -var 'aws_access_key=${AWS_ACCESS_KEY}' -var 'aws_secret_key=${AWS_SECRET_KEY}' packer.json
 
 build_ci: deps
 	go get -u bitbucket.org/tebeka/go2xunit
