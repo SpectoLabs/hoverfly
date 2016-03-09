@@ -5,6 +5,7 @@ test: deps
 	go test
 
 build-jenkins: deps
+	go get -u all
 	cd cmd/hoverfly/ && go build
 
 build: deps
