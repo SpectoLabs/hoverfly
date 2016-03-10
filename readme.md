@@ -70,7 +70,14 @@ Configuring your application to use Hoverfly is simple. All you have to do is se
 
 You can specify which site to capture or virtualize with a regular expression (by default, Hoverfly processes everything):
 
-    ./hoverfly --destination="."
+    ./hoverfly -destination="."
+
+Or you can also provide '-dest' flags to identify regexp patterns of multiple hosts that should be virtualized like this:
+
+    ./hoverfly -dest www.myservice.org -dest authentication.service.org -dest some-other-host.com
+    
+Hoverfly will process only those requests that have matching destination, other requests will be passed through. This enables
+easy Hoverfly integration in your environments where you can start virtualizing only few services and then expanding.  
 
 ## Modes (Virtualize / Capture / Synthesize / Modify)
 
