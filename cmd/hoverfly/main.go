@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type arrayFlags []string
@@ -42,6 +43,7 @@ func (i *arrayFlags) Set(value string) error {
 }
 
 var importFlags arrayFlags
+var destinationFlags arrayFlags
 
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
@@ -53,7 +55,6 @@ func main() {
 	synthesize := flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
 	modify := flag.Bool("modify", false, "start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic")
 
-	destination := flag.String("destination", ".", "destination URI to catch")
 	middleware := flag.String("middleware", "", "should proxy use middleware")
 
 	// proxy port
@@ -75,6 +76,10 @@ func main() {
 
 	// import flag
 	flag.Var(&importFlags, "import", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
+
+	// destination configuration
+	destination := flag.String("destination", ".", "destination URI to catch")
+	flag.Var(&destinationFlags, "dest", "specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
 
 	// adding new user
 	addNew := flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
@@ -163,8 +168,13 @@ func main() {
 		cfg.AuthEnabled = true
 	}
 
-	// overriding destination
-	cfg.Destination = *destination
+	if len(destinationFlags) > 0 {
+		cfg.Destination = strings.Join(destinationFlags[:], "|")
+
+	} else {
+		//  setting destination regexp
+		cfg.Destination = *destination
+	}
 
 	// getting boltDB
 	db := hv.GetDB(cfg.DatabaseName)
