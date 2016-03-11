@@ -21,6 +21,7 @@ type Configuration struct {
 	SecretKey          []byte
 	JWTExpirationDelta int
 	AuthEnabled        bool
+	ProxyControlChan   chan bool
 
 	mu sync.Mutex
 }
@@ -121,6 +122,8 @@ func InitSettings() *Configuration {
 
 	// middleware configuration
 	appConfig.Middleware = os.Getenv(HoverflyMiddlewareEV)
+
+	appConfig.ProxyControlChan = make(chan bool)
 
 	return &appConfig
 }
