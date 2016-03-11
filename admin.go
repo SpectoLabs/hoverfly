@@ -68,27 +68,26 @@ func (m *messageResponse) Encode() ([]byte, error) {
 
 // StartAdminInterface - starts admin interface web server
 func (d *DBClient) StartAdminInterface() {
-	go func() {
-		// starting admin interface
-		mux := getBoneRouter(*d)
-		n := negroni.Classic()
 
-		logLevel := log.ErrorLevel
+	// starting admin interface
+	mux := getBoneRouter(*d)
+	n := negroni.Classic()
 
-		if d.Cfg.Verbose {
-			logLevel = log.DebugLevel
-		}
+	logLevel := log.ErrorLevel
 
-		n.Use(negronilogrus.NewCustomMiddleware(logLevel, &log.JSONFormatter{}, "admin"))
-		n.UseHandler(mux)
+	if d.Cfg.Verbose {
+		logLevel = log.DebugLevel
+	}
 
-		// admin interface starting message
-		log.WithFields(log.Fields{
-			"AdminPort": d.Cfg.AdminPort,
-		}).Info("Admin interface is starting...")
+	n.Use(negronilogrus.NewCustomMiddleware(logLevel, &log.JSONFormatter{}, "admin"))
+	n.UseHandler(mux)
 
-		n.Run(fmt.Sprintf(":%s", d.Cfg.AdminPort))
-	}()
+	// admin interface starting message
+	log.WithFields(log.Fields{
+		"AdminPort": d.Cfg.AdminPort,
+	}).Info("Admin interface is starting...")
+
+	n.Run(fmt.Sprintf(":%s", d.Cfg.AdminPort))
 }
 
 // getBoneRouter returns mux for admin interface
