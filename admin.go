@@ -575,12 +575,22 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 	}
 
 	log.WithFields(log.Fields{
-		"newState": sr.Mode,
-		"body":     string(body),
+		"newState":    sr.Mode,
+		"body":        string(body),
+		"destination": sr.Destination,
 	}).Info("Handling state change request!")
 
 	// setting new state
 	d.Cfg.SetMode(sr.Mode)
+
+	// checking whether we should restart proxy
+	if sr.Destination != "" {
+		d.Cfg.ProxyControlChan <- true
+		d.Cfg.ProxyControlWG.Wait()
+		d.Cfg.Destination = sr.Destination
+		proxy, _ := GetNewHoverfly(d.Cfg, d.Cache)
+		StartHoverflyProxy(d.Cfg, proxy)
+	}
 
 	var en Entry
 	en.ActionType = ActionTypeConfigurationChanged
