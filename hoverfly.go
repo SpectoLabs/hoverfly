@@ -85,6 +85,21 @@ func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, 
 			return d.processRequest(r)
 		})
 
+	if cfg.Verbose {
+		proxy.OnRequest().DoFunc(
+			func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+				log.WithFields(log.Fields{
+					"destination": r.Host,
+					"path":        r.URL.Path,
+					"query":       r.URL.RawQuery,
+					"method":      r.Method,
+					"remoteAddr":  r.RemoteAddr,
+					"mode":        cfg.GetMode(),
+				}).Debug("got request..")
+				return r, nil
+			})
+	}
+
 	// intercepts response
 	proxy.OnResponse(goproxy.ReqHostMatches(regexp.MustCompile(cfg.Destination))).DoFunc(
 		func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
