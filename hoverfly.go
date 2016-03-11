@@ -32,6 +32,20 @@ func orPanic(err error) {
 	}
 }
 
+// StartHoverflyProxy - starts given proxy
+func StartHoverflyProxy(cfg *Configuration, proxy *goproxy.ProxyHttpServer) {
+	go func() {
+		for {
+			select {
+			case <-cfg.ProxyControlChan:
+				return
+			default:
+				log.Warn(http.ListenAndServe(fmt.Sprintf(":%s", cfg.ProxyPort), proxy))
+			}
+		}
+	}()
+}
+
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
 func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, DBClient) {
 
