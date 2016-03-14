@@ -583,13 +583,9 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 	// setting new state
 	d.Cfg.SetMode(sr.Mode)
 
-	// checking whether we should restart proxy
+	// checking whether we should update destination
 	if sr.Destination != "" {
-		d.Cfg.SL.Stop()
-		d.Cfg.ProxyControlWG.Wait()
-		d.Cfg.Destination = sr.Destination
-		proxy, _ := GetNewHoverfly(d.Cfg, d.Cache)
-		StartHoverflyProxy(d.Cfg, proxy)
+		d.UpdateDestination(sr.Destination)
 	}
 
 	var en Entry
