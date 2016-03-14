@@ -585,7 +585,7 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 
 	// checking whether we should restart proxy
 	if sr.Destination != "" {
-		d.Cfg.ProxyControlChan <- true
+		d.Cfg.SL.Stop()
 		d.Cfg.ProxyControlWG.Wait()
 		d.Cfg.Destination = sr.Destination
 		proxy, _ := GetNewHoverfly(d.Cfg, d.Cache)

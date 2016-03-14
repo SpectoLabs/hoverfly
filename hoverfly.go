@@ -32,20 +32,6 @@ func orPanic(err error) {
 	}
 }
 
-// ListenForStop - listens for stop signal in ProxyControlChan
-func ListenForStop(sl *StoppableListener, cfg *Configuration) {
-	for {
-		select {
-		case <-cfg.ProxyControlChan:
-			log.Info("quiting proxy..")
-			sl.Stop()
-			return
-		default:
-			// continue as normal
-		}
-	}
-}
-
 // StartHoverflyProxy - starts given proxy
 func StartHoverflyProxy(cfg *Configuration, proxy *goproxy.ProxyHttpServer) {
 	log.WithFields(log.Fields{
@@ -64,6 +50,7 @@ func StartHoverflyProxy(cfg *Configuration, proxy *goproxy.ProxyHttpServer) {
 	if err != nil {
 		panic(err)
 	}
+	cfg.SL = sl
 	server := http.Server{}
 
 	cfg.ProxyControlWG.Add(1)
@@ -74,15 +61,12 @@ func StartHoverflyProxy(cfg *Configuration, proxy *goproxy.ProxyHttpServer) {
 		server.Handler = proxy
 		log.Warn(server.Serve(sl))
 	}()
-	// start listening for stop
-	go ListenForStop(sl, cfg)
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
 func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, DBClient) {
 
 	counter := NewModeCounter()
-
 	// getting connections
 	d := DBClient{
 		Cache:   cache,
