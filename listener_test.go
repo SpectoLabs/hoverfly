@@ -29,3 +29,23 @@ func TestHoverflyListener(t *testing.T) {
 	expect(t, err, nil)
 	expect(t, strings.Contains(string(body), "is a proxy server"), true)
 }
+
+func TestStopHoverflyListener(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	proxyPort := "9778"
+
+	dbClient.Cfg.ProxyPort = proxyPort
+	// starting hoverfly
+	proxy, _ := GetNewHoverfly(dbClient.Cfg, dbClient.Cache)
+	StartHoverflyProxy(dbClient.Cfg, proxy)
+
+	dbClient.Cfg.SL.Stop()
+	dbClient.Cfg.ProxyControlWG.Wait()
+
+	// checking whether it's stopped
+	_, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
+	// should get error
+	refute(t, err, nil)
+}
