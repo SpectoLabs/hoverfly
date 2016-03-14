@@ -45,6 +45,14 @@ func (c *Configuration) GetMode() (mode string) {
 	return
 }
 
+// StopProxy - stops proxy
+func (c *Configuration) StopProxy() {
+	c.mu.Lock()
+	c.SL.Stop()
+	c.ProxyControlWG.Wait()
+	c.mu.Unlock()
+}
+
 // DefaultPort - default proxy port
 const DefaultPort = "8500"
 
