@@ -41,8 +41,7 @@ func TestStopHoverflyListener(t *testing.T) {
 	proxy, _ := GetNewHoverfly(dbClient.Cfg, dbClient.Cache)
 	StartHoverflyProxy(dbClient.Cfg, proxy)
 
-	dbClient.Cfg.SL.Stop()
-	dbClient.Cfg.ProxyControlWG.Wait()
+	dbClient.Cfg.StopProxy()
 
 	// checking whether it's stopped
 	_, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
@@ -68,8 +67,7 @@ func TestRestartHoverflyListener(t *testing.T) {
 	expect(t, response.StatusCode, 500)
 
 	// stopping proxy
-	dbClient.Cfg.SL.Stop()
-	dbClient.Cfg.ProxyControlWG.Wait()
+	dbClient.Cfg.StopProxy()
 
 	// starting again
 	StartHoverflyProxy(dbClient.Cfg, proxy)
