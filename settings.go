@@ -24,8 +24,8 @@ type Configuration struct {
 	JWTExpirationDelta int
 	AuthEnabled        bool
 
-	ProxyControlChan chan bool
-	ProxyControlWG   sync.WaitGroup
+	SL             *StoppableListener
+	ProxyControlWG sync.WaitGroup
 
 	mu sync.Mutex
 }
@@ -126,8 +126,6 @@ func InitSettings() *Configuration {
 
 	// middleware configuration
 	appConfig.Middleware = os.Getenv(HoverflyMiddlewareEV)
-
-	appConfig.ProxyControlChan = make(chan bool)
 
 	return &appConfig
 }
