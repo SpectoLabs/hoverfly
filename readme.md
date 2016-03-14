@@ -138,14 +138,39 @@ Add ca.pem to your trusted certificates or turn off verification. With curl you 
 
 You can access the administrator API under the default hostname of 'localhost' and port '8888':
 
-* Recorded requests: GET [http://localhost:8888/records](http://localhost:8888/records) ( __curl http://localhost:8888/records__ )
-* Wipe cache: DELETE http://localhost:8888/records ( __curl -X DELETE http://localhost:8888/records__ )
-* Get current proxy state: GET [http://localhost:8888/state](http://localhost:8888/state) ( __curl http://localhost:8888/state__ )
-* Set proxy state: POST http://localhost:8888/state ( __curl -H "Content-Type application/json" -X POST -d '{"mode":"capture"}' http://localhost:8888/state__ )
+* Recorded requests: GET [http://localhost:8888/records](http://localhost:8888/records):
+
+
+    curl http://localhost:8888/records
+
+* Wipe cache: DELETE http://localhost:8888/records:
+
+
+    curl -X DELETE http://localhost:8888/records
+
+* Get current proxy state: GET [http://localhost:8888/state](http://localhost:8888/state) 
+* Set proxy state: POST http://localhost:8888/state
    + body to start virtualizing: {"mode":"virtualize"}
    + body to start capturing: {"mode":"capture"}
-* Exporting recorded requests to a file: __curl http://localhost:8888/records > requests.json__
-* Importing requests from file: __curl --data "@/path/to/requests.json" http://localhost:8888/records__
+
+
+    curl -H "Content-Type application/json" -X POST -d '{"mode":"capture"}' http://localhost:8888/state
+
+
+* Update proxy destination: POST http://localhost:8888/state
+
+
+    curl -H "Content-Type application/json" -X POST -d '{"destination": "service-hostname-here"}' http://localhost:8888/state 
+
+* Exporting recorded requests to a file:
+
+
+    curl http://localhost:8888/records > requests.json
+
+* Importing requests from file:
+
+
+    curl --data "@/path/to/requests.json" http://localhost:8888/records
 
 #### Metadata
 

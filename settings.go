@@ -10,17 +10,22 @@ import (
 
 // Configuration - initial structure of configuration
 type Configuration struct {
-	AdminPort          string
-	ProxyPort          string
-	Mode               string
-	Destination        string
-	Middleware         string
-	DatabaseName       string
-	Verbose            bool
-	Development        bool
+	AdminPort    string
+	ProxyPort    string
+	Mode         string
+	Destination  string
+	Middleware   string
+	DatabaseName string
+
+	Verbose     bool
+	Development bool
+
 	SecretKey          []byte
 	JWTExpirationDelta int
 	AuthEnabled        bool
+
+	SL             *StoppableListener
+	ProxyControlWG sync.WaitGroup
 
 	mu sync.Mutex
 }
@@ -38,6 +43,14 @@ func (c *Configuration) GetMode() (mode string) {
 	mode = c.Mode
 	c.mu.Unlock()
 	return
+}
+
+// StopProxy - stops proxy
+func (c *Configuration) StopProxy() {
+	c.mu.Lock()
+	c.SL.Stop()
+	c.ProxyControlWG.Wait()
+	c.mu.Unlock()
 }
 
 // DefaultPort - default proxy port

@@ -26,7 +26,6 @@ import (
 
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
 	"strings"
 )
@@ -230,13 +229,14 @@ func main() {
 		}
 	}
 
-	// starting admin interface
-	dbClient.StartAdminInterface()
-
 	// start metrics registry flush
 	if *metrics {
 		dbClient.Counter.Init()
 	}
 
-	log.Warn(http.ListenAndServe(fmt.Sprintf(":%s", cfg.ProxyPort), proxy))
+	//log.Warn(http.ListenAndServe(fmt.Sprintf(":%s", cfg.ProxyPort), proxy))
+	hv.StartHoverflyProxy(dbClient.Cfg, proxy)
+
+	// starting admin interface
+	dbClient.StartAdminInterface()
 }

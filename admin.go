@@ -68,27 +68,26 @@ func (m *messageResponse) Encode() ([]byte, error) {
 
 // StartAdminInterface - starts admin interface web server
 func (d *DBClient) StartAdminInterface() {
-	go func() {
-		// starting admin interface
-		mux := getBoneRouter(*d)
-		n := negroni.Classic()
 
-		logLevel := log.ErrorLevel
+	// starting admin interface
+	mux := getBoneRouter(*d)
+	n := negroni.Classic()
 
-		if d.Cfg.Verbose {
-			logLevel = log.DebugLevel
-		}
+	logLevel := log.ErrorLevel
 
-		n.Use(negronilogrus.NewCustomMiddleware(logLevel, &log.JSONFormatter{}, "admin"))
-		n.UseHandler(mux)
+	if d.Cfg.Verbose {
+		logLevel = log.DebugLevel
+	}
 
-		// admin interface starting message
-		log.WithFields(log.Fields{
-			"AdminPort": d.Cfg.AdminPort,
-		}).Info("Admin interface is starting...")
+	n.Use(negronilogrus.NewCustomMiddleware(logLevel, &log.JSONFormatter{}, "admin"))
+	n.UseHandler(mux)
 
-		n.Run(fmt.Sprintf(":%s", d.Cfg.AdminPort))
-	}()
+	// admin interface starting message
+	log.WithFields(log.Fields{
+		"AdminPort": d.Cfg.AdminPort,
+	}).Info("Admin interface is starting...")
+
+	n.Run(fmt.Sprintf(":%s", d.Cfg.AdminPort))
 }
 
 // getBoneRouter returns mux for admin interface
@@ -567,27 +566,35 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 		"synthesize": true,
 	}
 
-	if !availableModes[sr.Mode] {
-		log.WithFields(log.Fields{
-			"suppliedMode": sr.Mode,
-		}).Error("Wrong mode found, can't change state")
-		http.Error(w, "Bad mode supplied, available modes: virtualize, capture, modify, synthesize.", 400)
-		return
+	if sr.Mode != "" {
+		if !availableModes[sr.Mode] {
+			log.WithFields(log.Fields{
+				"suppliedMode": sr.Mode,
+			}).Error("Wrong mode found, can't change state")
+			http.Error(w, "Bad mode supplied, available modes: virtualize, capture, modify, synthesize.", 400)
+			return
+		} else {
+			log.WithFields(log.Fields{
+				"newState":    sr.Mode,
+				"body":        string(body),
+				"destination": sr.Destination,
+			}).Info("Handling state change request!")
+
+			// setting new state
+			d.Cfg.SetMode(sr.Mode)
+		}
 	}
 
-	log.WithFields(log.Fields{
-		"newState": sr.Mode,
-		"body":     string(body),
-	}).Info("Handling state change request!")
-
-	// setting new state
-	d.Cfg.SetMode(sr.Mode)
+	// checking whether we should update destination
+	if sr.Destination != "" {
+		d.UpdateDestination(sr.Destination)
+	}
 
 	var en Entry
 	en.ActionType = ActionTypeConfigurationChanged
 	en.Message = "changed"
 	en.Time = time.Now()
-	en.Data = []byte("sr.Mode")
+	en.Data = body
 
 	if err := d.Hooks.Fire(ActionTypeConfigurationChanged, &en); err != nil {
 		log.WithFields(log.Fields{

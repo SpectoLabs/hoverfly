@@ -32,11 +32,41 @@ func orPanic(err error) {
 	}
 }
 
+// StartHoverflyProxy - starts given proxy
+func StartHoverflyProxy(cfg *Configuration, proxy *goproxy.ProxyHttpServer) {
+	log.WithFields(log.Fields{
+		"destination": cfg.Destination,
+		"port":        cfg.ProxyPort,
+		"mode":        cfg.GetMode(),
+	}).Info("current proxy configuration")
+
+	// creating TCP listener
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.ProxyPort))
+	if err != nil {
+		panic(err)
+	}
+
+	sl, err := NewStoppableListener(listener)
+	if err != nil {
+		panic(err)
+	}
+	cfg.SL = sl
+	server := http.Server{}
+
+	cfg.ProxyControlWG.Add(1)
+
+	go func() {
+		defer cfg.ProxyControlWG.Done()
+		log.Info("serving proxy")
+		server.Handler = proxy
+		log.Warn(server.Serve(sl))
+	}()
+}
+
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
 func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, DBClient) {
 
 	counter := NewModeCounter()
-
 	// getting connections
 	d := DBClient{
 		Cache:   cache,

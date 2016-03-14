@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sync"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
@@ -23,6 +24,18 @@ type DBClient struct {
 	Hooks   ActionTypeHooks
 	AB      backends.AuthBackend
 	MD      Metadata
+
+	mu sync.Mutex
+}
+
+// UpdateDestination - updates proxy with new destination regexp
+func (d *DBClient) UpdateDestination(destination string) {
+	d.mu.Lock()
+	d.Cfg.StopProxy()
+	d.Cfg.Destination = destination
+	proxy, _ := GetNewHoverfly(d.Cfg, d.Cache)
+	StartHoverflyProxy(d.Cfg, proxy)
+	d.mu.Unlock()
 }
 
 // AddHook - adds a hook to DBClient
