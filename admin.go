@@ -594,7 +594,7 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 	en.ActionType = ActionTypeConfigurationChanged
 	en.Message = "changed"
 	en.Time = time.Now()
-	en.Data = []byte("sr.Mode")
+	en.Data = body
 
 	if err := d.Hooks.Fire(ActionTypeConfigurationChanged, &en); err != nil {
 		log.WithFields(log.Fields{
