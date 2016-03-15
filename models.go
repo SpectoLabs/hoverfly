@@ -31,10 +31,14 @@ type DBClient struct {
 // UpdateDestination - updates proxy with new destination regexp
 func (d *DBClient) UpdateDestination(destination string) {
 	d.mu.Lock()
-	d.Cfg.StopProxy()
+	d.StopProxy()
 	d.Cfg.Destination = destination
-	proxy, _ := GetNewHoverfly(d.Cfg, d.Cache)
-	StartHoverflyProxy(d.Cfg, proxy)
+
+	d.UpdateProxy()
+	d.StartProxy()
+	d.mu.Unlock()
+}
+
 // StartProxy - starts proxy with current configuration, this method is non blocking.
 func (d *DBClient) StartProxy() {
 	log.WithFields(log.Fields{
