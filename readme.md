@@ -5,18 +5,25 @@
 ## Dependencies without the sting
 
 [Hoverfly](http://hoverfly.io) is a lightweight, open source [service virtualization](https://en.wikipedia.org/wiki/Service_virtualization) tool.
-Using Hoverfly, you can virtualize your application dependencies to create a self-contained development or test environment.
+Using Hoverfly, you can virtualize your application dependencies to create a portable, self-contained development or test sandbox.
 
-Hoverfly is a proxy written in [Go](https://github.com/golang/go). It can capture HTTP(s) traffic between an application under test
-and external services, and then replace the external services. Another powerful feature: middleware modules, where users
+Hoverfly is a proxy written in [Go](https://github.com/golang/go). It allows you to create "simulated" dependencies by:
+
+* Capturing HTTP(s) traffic between your application and external services
+* Building your own "synthetic" services from scratch
+
+Another powerful feature: middleware modules, where users
 can introduce their own custom logic. **Middleware modules can be written in any language**.
 
+You can use middleware to simulate network latency, failure, rate limits or malformed responses, or generate responses on the fly.
+
 More information about Hoverfly and how to use it:
-* [Using Hoverfly to create fast versions of slow dependencies](http://www.specto.io/blog/speeding-up-your-slow-dependencies.html)
-* [Using Hoverfly to modify traffic on the fly](http://www.specto.io/blog/service-virtualization-is-so-last-year.html)
-* [Using Hoverfly to mock APIs for development and testing](http://www.specto.io/blog/api-mocking-for-dev-and-test-part-1.html)
-* [Using Hoverfly to virtualize the Meetup API](http://www.specto.io/blog/hoverfly-meetup-api.html)
+* [Creating fast versions of slow dependencies](http://www.specto.io/blog/speeding-up-your-slow-dependencies.html)
+* [Modifying traffic on the fly](http://www.specto.io/blog/service-virtualization-is-so-last-year.html)
+* [Mocking APIs for development and testing](http://www.specto.io/blog/api-mocking-for-dev-and-test-part-1.html)
+* [Virtualizing the Meetup API](http://www.specto.io/blog/hoverfly-meetup-api.html)
 * [Using Hoverfly to build Spring Boot microservices alongside a Java monolith](http://www.specto.io/blog/using-api-simulation-to-build-microservices.html)
+* [Easy API simulation with the Hoverfly JUnit rule](https://specto.io/blog/hoverfly-junit-api-simulation.html)
 
 ## Installation
 
@@ -72,12 +79,12 @@ You can specify which site to capture or virtualize with a regular expression (b
 
     ./hoverfly -destination="."
 
-Or you can also provide '-dest' flags to identify regexp patterns of multiple hosts that should be virtualized like this:
+Or you can also provide '-dest' flags to identify regexp patterns of multiple hosts that should be virtualized:
 
     ./hoverfly -dest www.myservice.org -dest authentication.service.org -dest some-other-host.com
-    
-Hoverfly will process only those requests that have matching destination, other requests will be passed through. This enables
-easy Hoverfly integration in your environments where you can start virtualizing only few services and then expanding.  
+
+Hoverfly will process only those requests that have a matching destination. Other requests will be passed through. This allows you
+to start by virtualizing just a view services, adding more later.  
 
 ## Modes (Virtualize / Capture / Synthesize / Modify)
 
@@ -148,7 +155,7 @@ You can access the administrator API under the default hostname of 'localhost' a
 
     curl -X DELETE http://localhost:8888/records
 
-* Get current proxy state: GET [http://localhost:8888/state](http://localhost:8888/state) 
+* Get current proxy state: GET [http://localhost:8888/state](http://localhost:8888/state)
 * Set proxy state: POST http://localhost:8888/state
    + body to start virtualizing: {"mode":"virtualize"}
    + body to start capturing: {"mode":"capture"}
@@ -160,7 +167,7 @@ You can access the administrator API under the default hostname of 'localhost' a
 * Update proxy destination: POST http://localhost:8888/state
 
 
-    curl -H "Content-Type application/json" -X POST -d '{"destination": "service-hostname-here"}' http://localhost:8888/state 
+    curl -H "Content-Type application/json" -X POST -d '{"destination": "service-hostname-here"}' http://localhost:8888/state
 
 * Exporting recorded requests to a file:
 
@@ -188,7 +195,7 @@ and then add some description to it:
 then, to get your Hoverfly's info - use GET request:
 
     curl http://localhost:8888/metadata
-    
+
 result should be something like this:
 ```javascript
 {
@@ -201,9 +208,9 @@ result should be something like this:
 
 if you import some resources during launch:
 
-    ./hoverfly -import ../../resources/keystone_service.json -import ../../resources/nova_service.json 
+    ./hoverfly -import ../../resources/keystone_service.json -import ../../resources/nova_service.json
 
-our metadata will look like: 
+our metadata will look like:
 
 ```javascript
 {
