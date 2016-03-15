@@ -46,7 +46,16 @@ func (d *DBClient) UpdateDestination(destination string) {
 }
 
 // StartProxy - starts proxy with current configuration, this method is non blocking.
-func (d *DBClient) StartProxy() {
+func (d *DBClient) StartProxy() error {
+
+	if d.Cfg.ProxyPort == "" {
+		return fmt.Errorf("Proxy port is not set!")
+	}
+
+	if d.Proxy == nil {
+		d.UpdateProxy()
+	}
+
 	log.WithFields(log.Fields{
 		"destination": d.Cfg.Destination,
 		"port":        d.Cfg.ProxyPort,
@@ -56,12 +65,12 @@ func (d *DBClient) StartProxy() {
 	// creating TCP listener
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", d.Cfg.ProxyPort))
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	sl, err := NewStoppableListener(listener)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	d.SL = sl
 	server := http.Server{}
@@ -74,6 +83,8 @@ func (d *DBClient) StartProxy() {
 		server.Handler = d.Proxy
 		log.Warn(server.Serve(sl))
 	}()
+
+	return nil
 }
 
 // StopProxy - stops proxy
