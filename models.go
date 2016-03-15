@@ -65,6 +65,12 @@ func (d *DBClient) StartProxy() {
 		log.Warn(server.Serve(sl))
 	}()
 }
+
+// StopProxy - stops proxy
+func (d *DBClient) StopProxy() {
+	d.mu.Lock()
+	d.SL.Stop()
+	d.ProxyControlWG.Wait()
 	d.mu.Unlock()
 }
 
