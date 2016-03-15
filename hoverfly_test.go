@@ -17,7 +17,7 @@ func TestGetNewHoverflyCheckConfig(t *testing.T) {
 	cache := NewBoltDBCache(db, []byte(RequestsBucketName))
 	defer cache.CloseDB()
 
-	_, dbClient := GetNewHoverfly(cfg, cache)
+	dbClient := GetNewHoverfly(cfg, cache)
 
 	expect(t, dbClient.Cfg, cfg)
 
