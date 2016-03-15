@@ -24,9 +24,6 @@ type Configuration struct {
 	JWTExpirationDelta int
 	AuthEnabled        bool
 
-	SL             *StoppableListener
-	ProxyControlWG sync.WaitGroup
-
 	mu sync.Mutex
 }
 
@@ -43,14 +40,6 @@ func (c *Configuration) GetMode() (mode string) {
 	mode = c.Mode
 	c.mu.Unlock()
 	return
-}
-
-// StopProxy - stops proxy
-func (c *Configuration) StopProxy() {
-	c.mu.Lock()
-	c.SL.Stop()
-	c.ProxyControlWG.Wait()
-	c.mu.Unlock()
 }
 
 // DefaultPort - default proxy port

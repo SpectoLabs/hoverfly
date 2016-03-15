@@ -180,7 +180,7 @@ func main() {
 	cache := hv.NewBoltDBCache(db, []byte(hv.RequestsBucketName))
 	defer cache.CloseDB()
 
-	proxy, dbClient := hv.GetNewHoverfly(cfg, cache)
+	dbClient := hv.GetNewHoverfly(cfg, cache)
 
 	ab := backends.NewBoltDBAuthBackend(db, []byte(backends.TokenBucketName), []byte(backends.UserBucketName))
 
@@ -235,8 +235,10 @@ func main() {
 	}
 
 	//log.Warn(http.ListenAndServe(fmt.Sprintf(":%s", cfg.ProxyPort), proxy))
-	hv.StartHoverflyProxy(dbClient.Cfg, proxy)
+	//hv.StartHoverflyProxy(dbClient.Cfg, proxy)
 
-	// starting admin interface
+	dbClient.StartProxy()
+
+	// starting admin interface, this is blocking
 	dbClient.StartAdminInterface()
 }
