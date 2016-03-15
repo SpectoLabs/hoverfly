@@ -16,8 +16,8 @@ func TestHoverflyListener(t *testing.T) {
 
 	dbClient.Cfg.ProxyPort = proxyPort
 	// starting hoverfly
-	proxy, _ := GetNewHoverfly(dbClient.Cfg, dbClient.Cache)
-	StartHoverflyProxy(dbClient.Cfg, proxy)
+	dbClient.UpdateProxy()
+	dbClient.StartProxy()
 
 	// checking whether it's running
 	response, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
@@ -38,10 +38,10 @@ func TestStopHoverflyListener(t *testing.T) {
 
 	dbClient.Cfg.ProxyPort = proxyPort
 	// starting hoverfly
-	proxy, _ := GetNewHoverfly(dbClient.Cfg, dbClient.Cache)
-	StartHoverflyProxy(dbClient.Cfg, proxy)
+	dbClient.UpdateProxy()
+	dbClient.StartProxy()
 
-	dbClient.Cfg.StopProxy()
+	dbClient.StopProxy()
 
 	// checking whether it's stopped
 	_, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
@@ -57,8 +57,8 @@ func TestRestartHoverflyListener(t *testing.T) {
 
 	dbClient.Cfg.ProxyPort = proxyPort
 	// starting hoverfly
-	proxy, _ := GetNewHoverfly(dbClient.Cfg, dbClient.Cache)
-	StartHoverflyProxy(dbClient.Cfg, proxy)
+	dbClient.UpdateProxy()
+	dbClient.StartProxy()
 
 	// checking whether it's running
 	response, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
@@ -67,10 +67,10 @@ func TestRestartHoverflyListener(t *testing.T) {
 	expect(t, response.StatusCode, 500)
 
 	// stopping proxy
-	dbClient.Cfg.StopProxy()
+	dbClient.StopProxy()
 
 	// starting again
-	StartHoverflyProxy(dbClient.Cfg, proxy)
+	dbClient.StartProxy()
 
 	newResponse, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
 	expect(t, err, nil)
