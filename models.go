@@ -6,13 +6,15 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"net"
 	"net/http"
 	"sync"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
-	"io/ioutil"
+	"github.com/rusenask/goproxy"
 )
 
 // DBClient provides access to cache, http client and configuration
@@ -24,6 +26,10 @@ type DBClient struct {
 	Hooks   ActionTypeHooks
 	AB      backends.AuthBackend
 	MD      Metadata
+
+	Proxy          *goproxy.ProxyHttpServer
+	SL             *StoppableListener
+	ProxyControlWG sync.WaitGroup
 
 	mu sync.Mutex
 }
