@@ -32,40 +32,8 @@ func orPanic(err error) {
 	}
 }
 
-// StartHoverflyProxy - starts given proxy
-func StartHoverflyProxy(cfg *Configuration, proxy *goproxy.ProxyHttpServer) {
-	log.WithFields(log.Fields{
-		"destination": cfg.Destination,
-		"port":        cfg.ProxyPort,
-		"mode":        cfg.GetMode(),
-	}).Info("current proxy configuration")
-
-	// creating TCP listener
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.ProxyPort))
-	if err != nil {
-		panic(err)
-	}
-
-	sl, err := NewStoppableListener(listener)
-	if err != nil {
-		panic(err)
-	}
-	cfg.SL = sl
-	server := http.Server{}
-
-	cfg.ProxyControlWG.Add(1)
-
-	go func() {
-		defer cfg.ProxyControlWG.Done()
-		log.Info("serving proxy")
-		server.Handler = proxy
-		log.Warn(server.Serve(sl))
-	}()
-}
-
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
-func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, DBClient) {
-
+func GetNewHoverfly(cfg *Configuration, cache Cache) DBClient {
 	counter := NewModeCounter()
 	// getting connections
 	d := DBClient{
@@ -76,6 +44,13 @@ func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, 
 		Hooks:   make(ActionTypeHooks),
 	}
 
+	d.UpdateProxy()
+
+	return d
+}
+
+// UpdateProxy - applies hooks
+func (d *DBClient) UpdateProxy() {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 
@@ -110,12 +85,12 @@ func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, 
 		})
 
 	// processing connections
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(cfg.Destination))).DoFunc(
+	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(d.Cfg.Destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			return d.processRequest(r)
 		})
 
-	if cfg.Verbose {
+	if d.Cfg.Verbose {
 		proxy.OnRequest().DoFunc(
 			func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 				log.WithFields(log.Fields{
@@ -124,14 +99,14 @@ func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, 
 					"query":       r.URL.RawQuery,
 					"method":      r.Method,
 					"remoteAddr":  r.RemoteAddr,
-					"mode":        cfg.GetMode(),
+					"mode":        d.Cfg.GetMode(),
 				}).Debug("got request..")
 				return r, nil
 			})
 	}
 
 	// intercepts response
-	proxy.OnResponse(goproxy.ReqHostMatches(regexp.MustCompile(cfg.Destination))).DoFunc(
+	proxy.OnResponse(goproxy.ReqHostMatches(regexp.MustCompile(d.Cfg.Destination))).DoFunc(
 		func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
 			d.Counter.Count(d.Cfg.GetMode())
 			return resp
@@ -145,7 +120,8 @@ func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, 
 		"Mode":        d.Cfg.GetMode(),
 	}).Info("Proxy prepared...")
 
-	return proxy, d
+	d.Proxy = proxy
+	return
 }
 
 func hoverflyError(req *http.Request, err error, msg string, statusCode int) *http.Response {
