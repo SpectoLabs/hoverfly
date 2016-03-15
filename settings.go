@@ -24,6 +24,8 @@ type Configuration struct {
 	JWTExpirationDelta int
 	AuthEnabled        bool
 
+	ProxyControlWG sync.WaitGroup
+
 	mu sync.Mutex
 }
 

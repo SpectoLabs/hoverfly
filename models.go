@@ -27,22 +27,21 @@ type DBClient struct {
 	AB      backends.AuthBackend
 	MD      Metadata
 
-	Proxy          *goproxy.ProxyHttpServer
-	SL             *StoppableListener
-	ProxyControlWG sync.WaitGroup
+	Proxy *goproxy.ProxyHttpServer
+	SL    *StoppableListener
 
 	mu sync.Mutex
 }
 
 // UpdateDestination - updates proxy with new destination regexp
-func (d *DBClient) UpdateDestination(destination string) {
+func (d *DBClient) UpdateDestination(destination string) (err error) {
 	d.mu.Lock()
 	d.StopProxy()
 	d.Cfg.Destination = destination
-
 	d.UpdateProxy()
-	d.StartProxy()
+	err = d.StartProxy()
 	d.mu.Unlock()
+	return
 }
 
 // StartProxy - starts proxy with current configuration, this method is non blocking.
@@ -75,10 +74,13 @@ func (d *DBClient) StartProxy() error {
 	d.SL = sl
 	server := http.Server{}
 
-	d.ProxyControlWG.Add(1)
+	d.Cfg.ProxyControlWG.Add(1)
 
 	go func() {
-		defer d.ProxyControlWG.Done()
+		defer func() {
+			log.Info("sending done signal")
+			d.Cfg.ProxyControlWG.Done()
+		}()
 		log.Info("serving proxy")
 		server.Handler = d.Proxy
 		log.Warn(server.Serve(sl))
@@ -89,10 +91,8 @@ func (d *DBClient) StartProxy() error {
 
 // StopProxy - stops proxy
 func (d *DBClient) StopProxy() {
-	d.mu.Lock()
 	d.SL.Stop()
-	d.ProxyControlWG.Wait()
-	d.mu.Unlock()
+	d.Cfg.ProxyControlWG.Wait()
 }
 
 // AddHook - adds a hook to DBClient
