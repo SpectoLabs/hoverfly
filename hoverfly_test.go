@@ -2,6 +2,7 @@ package hoverfly
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -23,6 +24,21 @@ func TestGetNewHoverflyCheckConfig(t *testing.T) {
 
 	// deleting this database
 	os.Remove(cfg.DatabaseName)
+}
+
+func TestGetNewHoverfly(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	dbClient.Cfg.ProxyPort = "6666"
+
+	err := dbClient.StartProxy()
+	expect(t, err, nil)
+
+	newResponse, err := http.Get(fmt.Sprintf("http://localhost:%s/", dbClient.Cfg.ProxyPort))
+	expect(t, err, nil)
+	expect(t, newResponse.StatusCode, 500)
+
 }
 
 func TestProcessCaptureRequest(t *testing.T) {
