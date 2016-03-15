@@ -35,6 +35,36 @@ func (d *DBClient) UpdateDestination(destination string) {
 	d.Cfg.Destination = destination
 	proxy, _ := GetNewHoverfly(d.Cfg, d.Cache)
 	StartHoverflyProxy(d.Cfg, proxy)
+// StartProxy - starts proxy with current configuration, this method is non blocking.
+func (d *DBClient) StartProxy() {
+	log.WithFields(log.Fields{
+		"destination": d.Cfg.Destination,
+		"port":        d.Cfg.ProxyPort,
+		"mode":        d.Cfg.GetMode(),
+	}).Info("current proxy configuration")
+
+	// creating TCP listener
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", d.Cfg.ProxyPort))
+	if err != nil {
+		panic(err)
+	}
+
+	sl, err := NewStoppableListener(listener)
+	if err != nil {
+		panic(err)
+	}
+	d.SL = sl
+	server := http.Server{}
+
+	d.ProxyControlWG.Add(1)
+
+	go func() {
+		defer d.ProxyControlWG.Done()
+		log.Info("serving proxy")
+		server.Handler = d.Proxy
+		log.Warn(server.Serve(sl))
+	}()
+}
 	d.mu.Unlock()
 }
 
