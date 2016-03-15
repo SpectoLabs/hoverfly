@@ -587,7 +587,11 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 
 	// checking whether we should update destination
 	if sr.Destination != "" {
-		d.UpdateDestination(sr.Destination)
+		err := d.UpdateDestination(sr.Destination)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error while updating destination: %s", err.Error()), 500)
+			return
+		}
 	}
 
 	var en Entry
