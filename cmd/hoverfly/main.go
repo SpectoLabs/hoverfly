@@ -234,10 +234,12 @@ func main() {
 		dbClient.Counter.Init()
 	}
 
-	//log.Warn(http.ListenAndServe(fmt.Sprintf(":%s", cfg.ProxyPort), proxy))
-	//hv.StartHoverflyProxy(dbClient.Cfg, proxy)
-
-	dbClient.StartProxy()
+	err := dbClient.StartProxy()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Fatal("failed to start proxy...")
+	}
 
 	// starting admin interface, this is blocking
 	dbClient.StartAdminInterface()
