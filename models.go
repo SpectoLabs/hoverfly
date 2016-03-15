@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"regexp"
 	"sync"
 	"time"
 
@@ -35,6 +36,11 @@ type DBClient struct {
 
 // UpdateDestination - updates proxy with new destination regexp
 func (d *DBClient) UpdateDestination(destination string) (err error) {
+	_, err = regexp.Compile(destination)
+	if err != nil {
+		return fmt.Errorf("destination is not a valid regular expression string")
+	}
+
 	d.mu.Lock()
 	d.StopProxy()
 	d.Cfg.Destination = destination

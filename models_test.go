@@ -365,3 +365,13 @@ func TestUpdateDestination(t *testing.T) {
 
 	expect(t, dbClient.Cfg.Destination, "newdest")
 }
+
+func TestUpdateDestinationEmpty(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	// stopping server
+	server.Close()
+	dbClient.Cfg.ProxyPort = "5557"
+	dbClient.StartProxy()
+	err := dbClient.UpdateDestination("e^^**#")
+	refute(t, err, nil)
+}
