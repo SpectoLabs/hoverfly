@@ -342,3 +342,36 @@ func TestDoRequestFailedHTTP(t *testing.T) {
 	refute(t, err, nil)
 
 }
+
+func TestStartProxyWOPort(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	// stopping server
+	server.Close()
+
+	dbClient.Cfg.ProxyPort = ""
+
+	err := dbClient.StartProxy()
+	refute(t, err, nil)
+}
+
+func TestUpdateDestination(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	// stopping server
+	server.Close()
+	dbClient.Cfg.ProxyPort = "5556"
+	err := dbClient.StartProxy()
+	expect(t, err, nil)
+	dbClient.UpdateDestination("newdest")
+
+	expect(t, dbClient.Cfg.Destination, "newdest")
+}
+
+func TestUpdateDestinationEmpty(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	// stopping server
+	server.Close()
+	dbClient.Cfg.ProxyPort = "5557"
+	dbClient.StartProxy()
+	err := dbClient.UpdateDestination("e^^**#")
+	refute(t, err, nil)
+}

@@ -6,13 +6,16 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"net"
 	"net/http"
+	"regexp"
 	"sync"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
-	"io/ioutil"
+	"github.com/rusenask/goproxy"
 )
 
 // DBClient provides access to cache, http client and configuration
@@ -25,17 +28,77 @@ type DBClient struct {
 	AB      backends.AuthBackend
 	MD      Metadata
 
+	Proxy *goproxy.ProxyHttpServer
+	SL    *StoppableListener
+
 	mu sync.Mutex
 }
 
 // UpdateDestination - updates proxy with new destination regexp
-func (d *DBClient) UpdateDestination(destination string) {
+func (d *DBClient) UpdateDestination(destination string) (err error) {
+	_, err = regexp.Compile(destination)
+	if err != nil {
+		return fmt.Errorf("destination is not a valid regular expression string")
+	}
+
 	d.mu.Lock()
-	d.Cfg.StopProxy()
+	d.StopProxy()
 	d.Cfg.Destination = destination
-	proxy, _ := GetNewHoverfly(d.Cfg, d.Cache)
-	StartHoverflyProxy(d.Cfg, proxy)
+	d.UpdateProxy()
+	err = d.StartProxy()
 	d.mu.Unlock()
+	return
+}
+
+// StartProxy - starts proxy with current configuration, this method is non blocking.
+func (d *DBClient) StartProxy() error {
+
+	if d.Cfg.ProxyPort == "" {
+		return fmt.Errorf("Proxy port is not set!")
+	}
+
+	if d.Proxy == nil {
+		d.UpdateProxy()
+	}
+
+	log.WithFields(log.Fields{
+		"destination": d.Cfg.Destination,
+		"port":        d.Cfg.ProxyPort,
+		"mode":        d.Cfg.GetMode(),
+	}).Info("current proxy configuration")
+
+	// creating TCP listener
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", d.Cfg.ProxyPort))
+	if err != nil {
+		return err
+	}
+
+	sl, err := NewStoppableListener(listener)
+	if err != nil {
+		return err
+	}
+	d.SL = sl
+	server := http.Server{}
+
+	d.Cfg.ProxyControlWG.Add(1)
+
+	go func() {
+		defer func() {
+			log.Info("sending done signal")
+			d.Cfg.ProxyControlWG.Done()
+		}()
+		log.Info("serving proxy")
+		server.Handler = d.Proxy
+		log.Warn(server.Serve(sl))
+	}()
+
+	return nil
+}
+
+// StopProxy - stops proxy
+func (d *DBClient) StopProxy() {
+	d.SL.Stop()
+	d.Cfg.ProxyControlWG.Wait()
 }
 
 // AddHook - adds a hook to DBClient

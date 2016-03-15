@@ -573,21 +573,25 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 			}).Error("Wrong mode found, can't change state")
 			http.Error(w, "Bad mode supplied, available modes: virtualize, capture, modify, synthesize.", 400)
 			return
-		} else {
-			log.WithFields(log.Fields{
-				"newState":    sr.Mode,
-				"body":        string(body),
-				"destination": sr.Destination,
-			}).Info("Handling state change request!")
-
-			// setting new state
-			d.Cfg.SetMode(sr.Mode)
 		}
+		log.WithFields(log.Fields{
+			"newState":    sr.Mode,
+			"body":        string(body),
+			"destination": sr.Destination,
+		}).Info("Handling state change request!")
+
+		// setting new state
+		d.Cfg.SetMode(sr.Mode)
+
 	}
 
 	// checking whether we should update destination
 	if sr.Destination != "" {
-		d.UpdateDestination(sr.Destination)
+		err := d.UpdateDestination(sr.Destination)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error while updating destination: %s", err.Error()), 500)
+			return
+		}
 	}
 
 	var en Entry
