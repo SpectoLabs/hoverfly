@@ -10,10 +10,10 @@ import (
 
 // Metadata - interface to store and retrieve any metadata that is related to Hoverfly
 type Metadata interface {
-	Set(key, value []byte) error
-	Get(key []byte) ([]byte, error)
-	Delete(key []byte) error
-	GetAll() ([]MetaObject, error)
+	Set(key, value string) error
+	Get(key string) (string, error)
+	Delete(key string) error
+	GetAll() (map[string]string, error)
 	DeleteData() error
 	CloseDB()
 }
@@ -41,13 +41,13 @@ func (m *BoltMeta) CloseDB() {
 }
 
 // Set - saves given key and value pair to BoltDB
-func (m *BoltMeta) Set(key, value []byte) error {
+func (m *BoltMeta) Set(key, value string) error {
 	err := m.DS.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(m.MetadataBucket)
 		if err != nil {
 			return err
 		}
-		err = bucket.Put(key, value)
+		err = bucket.Put([]byte(key), []byte(value))
 		if err != nil {
 			return err
 		}
@@ -58,22 +58,22 @@ func (m *BoltMeta) Set(key, value []byte) error {
 }
 
 // Get - gets value for given key
-func (m *BoltMeta) Get(key []byte) (value []byte, err error) {
+func (m *BoltMeta) Get(key string) (value string, err error) {
 	err = m.DS.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(m.MetadataBucket)
 		if bucket == nil {
 			return fmt.Errorf("Bucket %q not found!", m.MetadataBucket)
 		}
 		var buffer bytes.Buffer
-		val := bucket.Get(key)
+		val := bucket.Get([]byte(key))
 
 		// If it doesn't exist then it will return nil
 		if val == nil {
-			return fmt.Errorf("key %q not found \n", key)
+			return fmt.Errorf("key %s not found \n", key)
 		}
 
 		buffer.Write(val)
-		value = buffer.Bytes()
+		value = buffer.String()
 		return nil
 	})
 
@@ -87,18 +87,18 @@ type MetaObject struct {
 }
 
 // GetAll - returns all key/value pairs
-func (m *BoltMeta) GetAll() (objects []MetaObject, err error) {
+func (m *BoltMeta) GetAll() (objects map[string]string, err error) {
 	err = m.DS.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(m.MetadataBucket)
 		if b == nil {
 			// bucket doesn't exist
 			return nil
 		}
+		objects = make(map[string]string)
 		c := b.Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			obj := &MetaObject{Key: string(k), Value: string(v)}
-			objects = append(objects, *obj)
+			objects[string(k)] = string(v)
 		}
 		return nil
 	})
@@ -106,13 +106,13 @@ func (m *BoltMeta) GetAll() (objects []MetaObject, err error) {
 }
 
 // Delete - deletes given metadata key
-func (m *BoltMeta) Delete(key []byte) error {
+func (m *BoltMeta) Delete(key string) error {
 	err := m.DS.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(m.MetadataBucket)
 		if err != nil {
 			return err
 		}
-		err = bucket.Delete(key)
+		err = bucket.Delete([]byte(key))
 		if err != nil {
 			return err
 		}

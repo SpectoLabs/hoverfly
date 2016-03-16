@@ -638,11 +638,7 @@ func (d *DBClient) AllMetadataHandler(w http.ResponseWriter, req *http.Request, 
 		w.Header().Set("Content-Type", "application/json")
 
 		var response storedMetadata
-		respMap := make(map[string]string)
-		for _, v := range metadata {
-			respMap[v.Key] = v.Value
-		}
-		response.Data = respMap
+		response.Data = metadata
 		b, err := json.Marshal(response)
 
 		if err != nil {
@@ -712,7 +708,7 @@ func (d *DBClient) SetMetadataHandler(w http.ResponseWriter, req *http.Request, 
 		w.WriteHeader(400)
 
 	} else {
-		err = d.MD.Set([]byte(sm.Key), []byte(sm.Value))
+		err = d.MD.Set(sm.Key, sm.Value)
 		if err != nil {
 			mr.Message = fmt.Sprintf("Failed to set metadata. Error: %s", err.Error())
 			w.WriteHeader(500)
