@@ -12,7 +12,7 @@ import (
 type Cache interface {
 	Set(key, value []byte) error
 	Get(key []byte) ([]byte, error)
-	GetAllRequests() ([]Payload, error)
+	GetAllValues() ([][]byte, error)
 	RecordsCount() (int, error)
 	DeleteData() error
 	GetAllKeys() (map[string]bool, error)
@@ -98,7 +98,7 @@ func (c *BoltCache) Get(key []byte) (value []byte, err error) {
 }
 
 // GetAllRequests - returns all captured requests/responses
-func (c *BoltCache) GetAllRequests() (payloads []Payload, err error) {
+func (c *BoltCache) GetAllValues() (values [][]byte, err error) {
 	err = c.DS.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(c.RequestsBucket)
 		if b == nil {
@@ -108,15 +108,9 @@ func (c *BoltCache) GetAllRequests() (payloads []Payload, err error) {
 		c := b.Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			pl, err := decodePayload(v)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"error": err.Error(),
-					"json":  v,
-				}).Warning("Failed to deserialize bytes to payload.")
-			} else {
-				payloads = append(payloads, *pl)
-			}
+			var buffer bytes.Buffer
+			buffer.Write(v)
+			values = append(values, buffer.Bytes())
 		}
 		return nil
 	})

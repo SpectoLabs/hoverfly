@@ -84,7 +84,7 @@ func TestGetAllRequestNoBucket(t *testing.T) {
 	cache := NewBoltDBCache(TestDB, []byte("somebucket"))
 
 	cache.RequestsBucket = []byte("no_bucket_for_TestGetAllRequestNoBucket")
-	_, err := cache.GetAllRequests()
+	_, err := cache.GetAllValues()
 	// expecting nil since this would mean that records were wiped
 	expect(t, err, nil)
 }
@@ -100,9 +100,9 @@ func TestCorruptedPayloads(t *testing.T) {
 	expect(t, err, nil)
 
 	// corrupted payloads should be just skipped
-	payloads, err := dbClient.Cache.GetAllRequests()
+	payloads, err := dbClient.Cache.GetAllValues()
 	expect(t, err, nil)
-	expect(t, len(payloads), 0)
+	expect(t, len(payloads), 1)
 
 }
 
@@ -119,12 +119,16 @@ func TestGetMultipleRecords(t *testing.T) {
 	}
 
 	// getting requests
-	payloads, err := dbClient.Cache.GetAllRequests()
+	values, err := dbClient.Cache.GetAllValues()
 	expect(t, err, nil)
 
-	for _, payload := range payloads {
-		expect(t, payload.Request.Method, "GET")
-		expect(t, payload.Response.Status, 201)
+	for _, value := range values {
+		if payload, err := decodePayload(value); err == nil {
+			expect(t, payload.Request.Method, "GET")
+			expect(t, payload.Response.Status, 201)
+		} else {
+			t.Error(err)
+		}
 	}
 }
 

@@ -192,14 +192,26 @@ func getBoneRouter(d DBClient) *bone.Mux {
 
 // AllRecordsHandler returns JSON content type http response
 func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	records, err := d.Cache.GetAllRequests()
+	records, err := d.Cache.GetAllValues()
 
 	if err == nil {
+
+		var payloads []Payload
+
+		for _, v := range records {
+			if payload, err := decodePayload(v); err == nil {
+				payloads = append(payloads, *payload)
+			} else {
+				log.Error(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 
 		var response recordedRequests
-		response.Data = records
+		response.Data = payloads
 		b, err := json.Marshal(response)
 
 		if err != nil {
