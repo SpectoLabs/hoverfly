@@ -33,6 +33,40 @@ func TestRecordsCountZero(t *testing.T) {
 
 }
 
+func TestGetAllValues(t *testing.T) {
+	db := NewBoltDBCache(TestDB, []byte("bucketTestGetAllValues"))
+
+	err := db.Set([]byte("foo"), []byte("bar"))
+	expect(t, err, nil)
+
+	err = db.Set([]byte("foo2"), []byte("bar"))
+	expect(t, err, nil)
+
+	vals, err := db.GetAllValues()
+	expect(t, err, nil)
+
+	for i := 0; i < 2; i++ {
+		expect(t, string(vals[i]), "bar")
+	}
+}
+
+func TestGetAllEntries(t *testing.T) {
+	db := NewBoltDBCache(TestDB, []byte("bucketTestGetAllValues"))
+
+	err := db.Set([]byte("foo"), []byte("bar"))
+	expect(t, err, nil)
+
+	err = db.Set([]byte("foo2"), []byte("bar"))
+	expect(t, err, nil)
+
+	vals, err := db.GetAllValues()
+	expect(t, err, nil)
+
+	for _, v := range vals {
+		expect(t, string(v), "bar")
+	}
+}
+
 func TestDeleteRecords(t *testing.T) {
 	db := NewBoltDBCache(TestDB, []byte("bucketTestDeleteRecords"))
 
