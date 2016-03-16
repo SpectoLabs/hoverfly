@@ -160,7 +160,7 @@ func TestExportImportRecords(t *testing.T) {
 	expect(t, importRec.Code, http.StatusOK)
 
 	// records should be there
-	payloads, err := dbClient.Cache.GetAllRequests()
+	payloads, err := dbClient.Cache.GetAllValues()
 	expect(t, err, nil)
 	expect(t, len(payloads), 5)
 
@@ -180,7 +180,7 @@ func TestDeleteHandler(t *testing.T) {
 	}
 
 	// checking whether we have records
-	payloads, err := dbClient.Cache.GetAllRequests()
+	payloads, err := dbClient.Cache.GetAllValues()
 	expect(t, err, nil)
 	expect(t, len(payloads), 5)
 
