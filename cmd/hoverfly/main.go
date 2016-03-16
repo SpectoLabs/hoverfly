@@ -222,7 +222,7 @@ func main() {
 						"import": v,
 					}).Fatal("Failed to import given resource")
 				} else {
-					err = dbClient.MD.Set([]byte(fmt.Sprintf("import_%d", i+1)), []byte(v))
+					err = dbClient.MD.Set(fmt.Sprintf("import_%d", i+1), v)
 				}
 
 			}

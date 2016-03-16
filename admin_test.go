@@ -641,8 +641,8 @@ func TestGetMetadata(t *testing.T) {
 	m := getBoneRouter(*dbClient)
 	// adding some metadata
 	for i := 0; i < 3; i++ {
-		k := []byte(fmt.Sprintf("key_%d", i))
-		v := []byte(fmt.Sprintf("val_%d", i))
+		k := fmt.Sprintf("key_%d", i)
+		v := fmt.Sprintf("val_%d", i)
 		err := dbClient.MD.Set(k, v)
 		expect(t, err, nil)
 	}
@@ -676,8 +676,8 @@ func TestDeleteMetadata(t *testing.T) {
 	m := getBoneRouter(*dbClient)
 	// adding some metadata
 	for i := 0; i < 3; i++ {
-		k := []byte(fmt.Sprintf("key_%d", i))
-		v := []byte(fmt.Sprintf("val_%d", i))
+		k := fmt.Sprintf("key_%d", i)
+		v := fmt.Sprintf("val_%d", i)
 		err := dbClient.MD.Set(k, v)
 		expect(t, err, nil)
 	}

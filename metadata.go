@@ -10,7 +10,7 @@ import (
 
 // Metadata - interface to store and retrieve any metadata that is related to Hoverfly
 type Metadata interface {
-	Set(key, value []byte) error
+	Set(key, value string) error
 	Get(key []byte) ([]byte, error)
 	Delete(key []byte) error
 	GetAll() (map[string]string, error)
@@ -41,13 +41,13 @@ func (m *BoltMeta) CloseDB() {
 }
 
 // Set - saves given key and value pair to BoltDB
-func (m *BoltMeta) Set(key, value []byte) error {
+func (m *BoltMeta) Set(key, value string) error {
 	err := m.DS.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(m.MetadataBucket)
 		if err != nil {
 			return err
 		}
-		err = bucket.Put(key, value)
+		err = bucket.Put([]byte(key), []byte(value))
 		if err != nil {
 			return err
 		}

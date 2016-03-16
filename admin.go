@@ -696,7 +696,7 @@ func (d *DBClient) SetMetadataHandler(w http.ResponseWriter, req *http.Request, 
 		w.WriteHeader(400)
 
 	} else {
-		err = d.MD.Set([]byte(sm.Key), []byte(sm.Value))
+		err = d.MD.Set(sm.Key, sm.Value)
 		if err != nil {
 			mr.Message = fmt.Sprintf("Failed to set metadata. Error: %s", err.Error())
 			w.WriteHeader(500)
