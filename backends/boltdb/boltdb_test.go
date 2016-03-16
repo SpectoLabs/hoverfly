@@ -24,6 +24,40 @@ func TestSetGetValue(t *testing.T) {
 	expect(t, string(val), "bar")
 }
 
+func TestRecordsCountZero(t *testing.T) {
+	db := NewBoltDBCache(TestDB, []byte("bucketRecordsCountZero"))
+
+	ct, err := db.RecordsCount()
+	expect(t, err, nil)
+	expect(t, ct, 0)
+
+}
+
+func TestDeleteRecords(t *testing.T) {
+	db := NewBoltDBCache(TestDB, []byte("bucketTestDeleteRecords"))
+
+	err := db.Set([]byte("foo"), []byte("bar"))
+	expect(t, err, nil)
+
+	err = db.Set([]byte("foo2"), []byte("bar"))
+	expect(t, err, nil)
+
+	err = db.Set([]byte("foo3"), []byte("bar"))
+	expect(t, err, nil)
+
+	ct, err := db.RecordsCount()
+	expect(t, err, nil)
+	expect(t, ct, 3)
+
+	err = db.DeleteData()
+	expect(t, err, nil)
+
+	ctNew, err := db.RecordsCount()
+	expect(t, err, nil)
+	expect(t, ctNew, 0)
+
+}
+
 func setup() {
 	// we don't really want to see what's happening
 	log.SetLevel(log.FatalLevel)
