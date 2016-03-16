@@ -51,7 +51,7 @@ func TestGetAllValues(t *testing.T) {
 }
 
 func TestGetAllEntries(t *testing.T) {
-	db := NewBoltDBCache(TestDB, []byte("bucketTestGetAllValues"))
+	db := NewBoltDBCache(TestDB, []byte("bucketTestGetAllEntries"))
 
 	err := db.Set([]byte("foo"), []byte("bar"))
 	expect(t, err, nil)
@@ -59,12 +59,29 @@ func TestGetAllEntries(t *testing.T) {
 	err = db.Set([]byte("foo2"), []byte("bar"))
 	expect(t, err, nil)
 
-	vals, err := db.GetAllValues()
+	vals, err := db.GetAllEntries()
 	expect(t, err, nil)
 
 	for _, v := range vals {
 		expect(t, string(v), "bar")
 	}
+}
+
+func TestGetAllKeys(t *testing.T) {
+	db := NewBoltDBCache(TestDB, []byte("bucketTestGetAllKeys"))
+
+	err := db.Set([]byte("foo"), []byte("bar"))
+	expect(t, err, nil)
+
+	err = db.Set([]byte("foo2"), []byte("bar"))
+	expect(t, err, nil)
+
+	keys, err := db.GetAllKeys()
+	expect(t, err, nil)
+
+	expect(t, keys["foo"], true)
+	expect(t, keys["foo2"], true)
+	expect(t, keys["foo10"], false)
 }
 
 func TestDeleteRecords(t *testing.T) {
