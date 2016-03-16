@@ -13,7 +13,7 @@ type Metadata interface {
 	Set(key, value []byte) error
 	Get(key []byte) ([]byte, error)
 	Delete(key []byte) error
-	GetAll() ([]MetaObject, error)
+	GetAll() (map[string]string, error)
 	DeleteData() error
 	CloseDB()
 }
@@ -87,18 +87,18 @@ type MetaObject struct {
 }
 
 // GetAll - returns all key/value pairs
-func (m *BoltMeta) GetAll() (objects []MetaObject, err error) {
+func (m *BoltMeta) GetAll() (objects map[string]string, err error) {
 	err = m.DS.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(m.MetadataBucket)
 		if b == nil {
 			// bucket doesn't exist
 			return nil
 		}
+		objects = make(map[string]string)
 		c := b.Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			obj := &MetaObject{Key: string(k), Value: string(v)}
-			objects = append(objects, *obj)
+			objects[string(k)] = string(v)
 		}
 		return nil
 	})

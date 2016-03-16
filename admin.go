@@ -626,11 +626,7 @@ func (d *DBClient) AllMetadataHandler(w http.ResponseWriter, req *http.Request, 
 		w.Header().Set("Content-Type", "application/json")
 
 		var response storedMetadata
-		respMap := make(map[string]string)
-		for _, v := range metadata {
-			respMap[v.Key] = v.Value
-		}
-		response.Data = respMap
+		response.Data = metadata
 		b, err := json.Marshal(response)
 
 		if err != nil {
