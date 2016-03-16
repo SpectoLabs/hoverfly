@@ -86,7 +86,7 @@ func (c *BoltCache) Get(key []byte) (value []byte, err error) {
 	return
 }
 
-// GetAllRequests - returns all captured requests/responses
+// GetAllValues - returns all values
 func (c *BoltCache) GetAllValues() (values [][]byte, err error) {
 	err = c.DS.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(c.RequestsBucket)
@@ -100,6 +100,28 @@ func (c *BoltCache) GetAllValues() (values [][]byte, err error) {
 			var buffer bytes.Buffer
 			buffer.Write(v)
 			values = append(values, buffer.Bytes())
+		}
+		return nil
+	})
+	return
+}
+
+// GetAllEntries - returns all keys/values
+func (c *BoltCache) GetAllEntries() (values map[string][]byte, err error) {
+	err = c.DS.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(c.RequestsBucket)
+		if b == nil {
+			// bucket doesn't exist
+			return nil
+		}
+		c := b.Cursor()
+
+		values = make(map[string][]byte)
+
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			var buffer bytes.Buffer
+			buffer.Write(v)
+			values[string(k)] = buffer.Bytes()
 		}
 		return nil
 	})
