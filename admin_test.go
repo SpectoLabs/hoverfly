@@ -582,9 +582,9 @@ func TestSetMetadata(t *testing.T) {
 	expect(t, rec.Code, http.StatusCreated)
 
 	// checking mode
-	metaValue, err := dbClient.MD.Get([]byte("some_key"))
+	metaValue, err := dbClient.MD.Get("some_key")
 	expect(t, err, nil)
-	expect(t, string(metaValue), "some_val")
+	expect(t, metaValue, "some_val")
 }
 
 func TestSetMetadataBadBody(t *testing.T) {
