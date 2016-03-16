@@ -13,6 +13,7 @@ type Metadata interface {
 	Set(key, value string) error
 	Get(key []byte) ([]byte, error)
 	Delete(key []byte) error
+	Delete(key string) error
 	GetAll() (map[string]string, error)
 	DeleteData() error
 	CloseDB()
@@ -106,13 +107,13 @@ func (m *BoltMeta) GetAll() (objects map[string]string, err error) {
 }
 
 // Delete - deletes given metadata key
-func (m *BoltMeta) Delete(key []byte) error {
+func (m *BoltMeta) Delete(key string) error {
 	err := m.DS.Update(func(tx *bolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(m.MetadataBucket)
 		if err != nil {
 			return err
 		}
-		err = bucket.Delete(key)
+		err = bucket.Delete([]byte(key))
 		if err != nil {
 			return err
 		}
