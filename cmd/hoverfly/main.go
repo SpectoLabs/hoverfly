@@ -23,6 +23,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	hv "github.com/SpectoLabs/hoverfly"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/backends/boltdb"
 
 	"flag"
 	"fmt"
@@ -176,8 +177,9 @@ func main() {
 	}
 
 	// getting boltDB
-	db := hv.GetDB(cfg.DatabaseName)
-	cache := hv.NewBoltDBCache(db, []byte(hv.RequestsBucketName))
+	db := boltdb.GetDB(cfg.DatabaseName)
+
+	cache := boltdb.NewBoltDBCache(db, []byte(boltdb.RequestsBucketName))
 	defer cache.CloseDB()
 
 	dbClient := hv.GetNewHoverfly(cfg, cache)

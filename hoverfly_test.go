@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/backends/boltdb"
 )
 
 func TestGetNewHoverflyCheckConfig(t *testing.T) {
@@ -14,8 +16,8 @@ func TestGetNewHoverflyCheckConfig(t *testing.T) {
 	cfg := InitSettings()
 	cfg.DatabaseName = "testing2.db"
 	// getting boltDB
-	db := GetDB(cfg.DatabaseName)
-	cache := NewBoltDBCache(db, []byte(RequestsBucketName))
+	db := boltdb.GetDB(cfg.DatabaseName)
+	cache := boltdb.NewBoltDBCache(db, []byte(boltdb.RequestsBucketName))
 	defer cache.CloseDB()
 
 	dbClient := GetNewHoverfly(cfg, cache)

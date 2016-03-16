@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/backends/boltdb"
 )
 
 func TestSetKey(t *testing.T) {
@@ -51,7 +53,7 @@ func TestPayloadSetGet(t *testing.T) {
 }
 
 func TestGetNonExistingBucket(t *testing.T) {
-	cache := NewBoltDBCache(TestDB, []byte("somebucket"))
+	cache := boltdb.NewBoltDBCache(TestDB, []byte("somebucket"))
 
 	_, err := cache.Get([]byte("whatever"))
 	expect(t, err.Error(), "Bucket \"somebucket\" not found!")
@@ -81,7 +83,7 @@ func TestDeleteBucket(t *testing.T) {
 }
 
 func TestGetAllRequestNoBucket(t *testing.T) {
-	cache := NewBoltDBCache(TestDB, []byte("somebucket"))
+	cache := boltdb.NewBoltDBCache(TestDB, []byte("somebucket"))
 
 	cache.RequestsBucket = []byte("no_bucket_for_TestGetAllRequestNoBucket")
 	_, err := cache.GetAllValues()

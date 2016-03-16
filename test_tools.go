@@ -12,6 +12,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/backends/boltdb"
 	"github.com/boltdb/bolt"
 )
 
@@ -61,7 +62,7 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	bucket := GetRandomName(10)
 	metaBucket := GetRandomName(10)
 
-	cache := NewBoltDBCache(TestDB, bucket)
+	cache := boltdb.NewBoltDBCache(TestDB, bucket)
 	md := NewBoltDBMetadata(TestDB, metaBucket)
 
 	cfg := InitSettings()
@@ -100,7 +101,7 @@ func GetRandomName(n int) []byte {
 func setup() {
 	// we don't really want to see what's happening
 	log.SetLevel(log.FatalLevel)
-	db := GetDB(testingDatabaseName)
+	db := boltdb.GetDB(testingDatabaseName)
 	TestDB = db
 }
 
