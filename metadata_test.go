@@ -9,7 +9,7 @@ func TestSetMetadataKey(t *testing.T) {
 
 	metaBucket := GetRandomName(10)
 	c := boltdb.NewBoltDBCache(TestDB, metaBucket)
-	md := NewBoltDBMetadata(c)
+	md := NewMetadata(c)
 
 	md.Set("foo", "bar")
 	val, err := md.Get("foo")
@@ -20,7 +20,7 @@ func TestSetMetadataKey(t *testing.T) {
 func TestDeleteMetadataKey(t *testing.T) {
 	metaBucket := GetRandomName(10)
 	c := boltdb.NewBoltDBCache(TestDB, metaBucket)
-	md := NewBoltDBMetadata(c)
+	md := NewMetadata(c)
 
 	md.Set("foo", "bar")
 	md.Delete("foo")
@@ -32,7 +32,7 @@ func TestDeleteMetadataKey(t *testing.T) {
 func TestGetAllValues(t *testing.T) {
 	metaBucket := GetRandomName(10)
 	c := boltdb.NewBoltDBCache(TestDB, metaBucket)
-	md := NewBoltDBMetadata(c)
+	md := NewMetadata(c)
 
 	md.Set("foo", "bar")
 	md.Set("foo2", "bar2")
@@ -47,7 +47,7 @@ func TestGetAllValues(t *testing.T) {
 func TestDeleteAllData(t *testing.T) {
 	metaBucket := GetRandomName(10)
 	c := boltdb.NewBoltDBCache(TestDB, metaBucket)
-	md := NewBoltDBMetadata(c)
+	md := NewMetadata(c)
 
 	md.Set("foo", "bar")
 	md.Set("foo2", "bar2")

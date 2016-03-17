@@ -10,31 +10,30 @@ type Metadata interface {
 	CloseDB()
 }
 
-// NewBoltDBMetadata - default metadata store
-func NewBoltDBMetadata(cache Cache) *BoltMeta {
-	return &BoltMeta{
+// NewMetadata - default metadata store
+func NewMetadata(cache Cache) *Meta {
+	return &Meta{
 		DS: cache,
 	}
 }
 
-// BoltMeta - metadata backend that uses BoltDB
-type BoltMeta struct {
-	DS             Cache
-	MetadataBucket []byte
+// Meta - metadata backend that uses Cache interface
+type Meta struct {
+	DS Cache
 }
 
 // CloseDB - closes database
-func (m *BoltMeta) CloseDB() {
+func (m *Meta) CloseDB() {
 	m.DS.CloseDB()
 }
 
 // Set - saves given key and value pair to BoltDB
-func (m *BoltMeta) Set(key, value string) error {
+func (m *Meta) Set(key, value string) error {
 	return m.DS.Set([]byte(key), []byte(value))
 }
 
 // Get - gets value for given key
-func (m *BoltMeta) Get(key string) (value string, err error) {
+func (m *Meta) Get(key string) (value string, err error) {
 	val, err := m.DS.Get([]byte(key))
 	if err != nil {
 		return "", nil
@@ -43,7 +42,7 @@ func (m *BoltMeta) Get(key string) (value string, err error) {
 }
 
 // GetAll - returns all key/value pairs
-func (m *BoltMeta) GetAll() (map[string]string, error) {
+func (m *Meta) GetAll() (map[string]string, error) {
 	entries, err := m.DS.GetAllEntries()
 	newEntries := make(map[string]string)
 	if err != nil {
@@ -56,11 +55,11 @@ func (m *BoltMeta) GetAll() (map[string]string, error) {
 }
 
 // Delete - deletes given metadata key
-func (m *BoltMeta) Delete(key string) error {
+func (m *Meta) Delete(key string) error {
 	return m.DS.Delete([]byte(key))
 }
 
 // DeleteData - deletes bucket with all saved data
-func (m *BoltMeta) DeleteData() error {
+func (m *Meta) DeleteData() error {
 	return m.DS.DeleteData()
 }

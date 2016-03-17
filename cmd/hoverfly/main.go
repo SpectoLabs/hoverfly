@@ -191,7 +191,7 @@ func main() {
 
 	// metadata backend
 	metaCache := boltdb.NewBoltDBCache(db, []byte("metadataBucket"))
-	md := hv.NewBoltDBMetadata(metaCache)
+	md := hv.NewMetadata(metaCache)
 
 	dbClient.MD = md
 

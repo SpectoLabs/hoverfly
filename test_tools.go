@@ -65,7 +65,7 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	cache := boltdb.NewBoltDBCache(TestDB, bucket)
 	metaCache := boltdb.NewBoltDBCache(TestDB, metaBucket)
 
-	md := NewBoltDBMetadata(metaCache)
+	md := NewMetadata(metaCache)
 
 	cfg := InitSettings()
 	counter := NewModeCounter()
