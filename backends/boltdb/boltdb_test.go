@@ -109,6 +109,26 @@ func TestDeleteRecords(t *testing.T) {
 
 }
 
+func TestDeleteRecord(t *testing.T) {
+	db := NewBoltDBCache(TestDB, []byte("bucketTestDeleteRecord"))
+
+	err := db.Set([]byte("foo"), []byte("bar"))
+	expect(t, err, nil)
+
+	err = db.Delete([]byte("foo"))
+	expect(t, err, nil)
+
+	_, err = db.Get([]byte("foo"))
+	refute(t, err, nil)
+}
+
+func TestDeleteNotExisting(t *testing.T) {
+	db := NewBoltDBCache(TestDB, []byte("bucketTestDeleteNotExisting"))
+
+	err := db.Delete([]byte("foo"))
+	expect(t, err, nil)
+}
+
 func setup() {
 	// we don't really want to see what's happening
 	log.SetLevel(log.FatalLevel)
