@@ -85,7 +85,7 @@ func TestDeleteBucket(t *testing.T) {
 func TestGetAllRequestNoBucket(t *testing.T) {
 	cache := boltdb.NewBoltDBCache(TestDB, []byte("somebucket"))
 
-	cache.RequestsBucket = []byte("no_bucket_for_TestGetAllRequestNoBucket")
+	cache.CurrentBucket = []byte("no_bucket_for_TestGetAllRequestNoBucket")
 	_, err := cache.GetAllValues()
 	// expecting nil since this would mean that records were wiped
 	expect(t, err, nil)

@@ -11,8 +11,8 @@ import (
 // NewBoltDBCache - returns new BoltCache instance
 func NewBoltDBCache(db *bolt.DB, bucket []byte) *BoltCache {
 	return &BoltCache{
-		DS:             db,
-		RequestsBucket: []byte(bucket),
+		DS:            db,
+		CurrentBucket: []byte(bucket),
 	}
 }
 
@@ -21,8 +21,8 @@ const RequestsBucketName = "rqbucket"
 
 // BoltCache - container to implement Cache instance with BoltDB backend for storage
 type BoltCache struct {
-	DS             *bolt.DB
-	RequestsBucket []byte
+	DS            *bolt.DB
+	CurrentBucket []byte
 }
 
 // GetDB - returns open BoltDB database with read/write permissions or goes down in flames if
@@ -47,7 +47,7 @@ func (c *BoltCache) CloseDB() {
 // Set - saves given key and value pair to cache
 func (c *BoltCache) Set(key, value []byte) error {
 	err := c.DS.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists(c.RequestsBucket)
+		bucket, err := tx.CreateBucketIfNotExists(c.CurrentBucket)
 		if err != nil {
 			return err
 		}
@@ -65,9 +65,9 @@ func (c *BoltCache) Set(key, value []byte) error {
 func (c *BoltCache) Get(key []byte) (value []byte, err error) {
 
 	err = c.DS.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket(c.RequestsBucket)
+		bucket := tx.Bucket(c.CurrentBucket)
 		if bucket == nil {
-			return fmt.Errorf("Bucket %q not found!", c.RequestsBucket)
+			return fmt.Errorf("Bucket %q not found!", c.CurrentBucket)
 		}
 		// "Byte slices returned from Bolt are only valid during a transaction."
 		var buffer bytes.Buffer
@@ -89,7 +89,7 @@ func (c *BoltCache) Get(key []byte) (value []byte, err error) {
 // GetAllValues - returns all values
 func (c *BoltCache) GetAllValues() (values [][]byte, err error) {
 	err = c.DS.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(c.RequestsBucket)
+		b := tx.Bucket(c.CurrentBucket)
 		if b == nil {
 			// bucket doesn't exist
 			return nil
@@ -109,7 +109,7 @@ func (c *BoltCache) GetAllValues() (values [][]byte, err error) {
 // GetAllEntries - returns all keys/values
 func (c *BoltCache) GetAllEntries() (values map[string][]byte, err error) {
 	err = c.DS.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(c.RequestsBucket)
+		b := tx.Bucket(c.CurrentBucket)
 		if b == nil {
 			// bucket doesn't exist
 			return nil
@@ -131,7 +131,7 @@ func (c *BoltCache) GetAllEntries() (values map[string][]byte, err error) {
 // RecordsCount - returns records count
 func (c *BoltCache) RecordsCount() (count int, err error) {
 	err = c.DS.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(c.RequestsBucket)
+		b := tx.Bucket(c.CurrentBucket)
 		if b == nil {
 			// bucket doesn't exist
 			return nil
@@ -147,7 +147,7 @@ func (c *BoltCache) RecordsCount() (count int, err error) {
 // Delete - deletes specified key
 func (c *BoltCache) Delete(key []byte) error {
 	err := c.DS.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists(c.RequestsBucket)
+		bucket, err := tx.CreateBucketIfNotExists(c.CurrentBucket)
 		if err != nil {
 			return err
 		}
@@ -162,7 +162,7 @@ func (c *BoltCache) Delete(key []byte) error {
 
 // DeleteData - deletes bucket with all saved data
 func (c *BoltCache) DeleteData() error {
-	err := c.DeleteBucket(c.RequestsBucket)
+	err := c.DeleteBucket(c.CurrentBucket)
 	return err
 }
 
@@ -185,7 +185,7 @@ func (c *BoltCache) DeleteBucket(name []byte) (err error) {
 // GetAllKeys - gets all current keys
 func (c *BoltCache) GetAllKeys() (keys map[string]bool, err error) {
 	err = c.DS.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(c.RequestsBucket)
+		b := tx.Bucket(c.CurrentBucket)
 
 		keys = make(map[string]bool)
 
