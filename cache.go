@@ -7,6 +7,7 @@ type Cache interface {
 	GetAllValues() ([][]byte, error)
 	GetAllEntries() (map[string][]byte, error)
 	RecordsCount() (int, error)
+	Delete(key []byte) error
 	DeleteData() error
 	GetAllKeys() (map[string]bool, error)
 	CloseDB()
