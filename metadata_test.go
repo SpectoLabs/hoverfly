@@ -1,13 +1,15 @@
 package hoverfly
 
 import (
+	"github.com/SpectoLabs/hoverfly/backends/boltdb"
 	"testing"
 )
 
 func TestSetMetadataKey(t *testing.T) {
 
 	metaBucket := GetRandomName(10)
-	md := NewBoltDBMetadata(TestDB, metaBucket)
+	c := boltdb.NewBoltDBCache(TestDB, metaBucket)
+	md := NewBoltDBMetadata(c)
 
 	md.Set("foo", "bar")
 	val, err := md.Get("foo")
@@ -17,18 +19,20 @@ func TestSetMetadataKey(t *testing.T) {
 
 func TestDeleteMetadataKey(t *testing.T) {
 	metaBucket := GetRandomName(10)
-	md := NewBoltDBMetadata(TestDB, metaBucket)
+	c := boltdb.NewBoltDBCache(TestDB, metaBucket)
+	md := NewBoltDBMetadata(c)
 
 	md.Set("foo", "bar")
 	md.Delete("foo")
 
 	_, err := md.Get("foo")
-	refute(t, err, nil)
+	expect(t, err, nil)
 }
 
 func TestGetAllValues(t *testing.T) {
 	metaBucket := GetRandomName(10)
-	md := NewBoltDBMetadata(TestDB, metaBucket)
+	c := boltdb.NewBoltDBCache(TestDB, metaBucket)
+	md := NewBoltDBMetadata(c)
 
 	md.Set("foo", "bar")
 	md.Set("foo2", "bar2")
@@ -42,7 +46,8 @@ func TestGetAllValues(t *testing.T) {
 
 func TestDeleteAllData(t *testing.T) {
 	metaBucket := GetRandomName(10)
-	md := NewBoltDBMetadata(TestDB, metaBucket)
+	c := boltdb.NewBoltDBCache(TestDB, metaBucket)
+	md := NewBoltDBMetadata(c)
 
 	md.Set("foo", "bar")
 	md.Set("foo2", "bar2")
