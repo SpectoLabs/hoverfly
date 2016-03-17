@@ -144,6 +144,22 @@ func (c *BoltCache) RecordsCount() (count int, err error) {
 	return
 }
 
+// Delete - deletes specified key
+func (c *BoltCache) Delete(key []byte) error {
+	err := c.DS.Update(func(tx *bolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists(c.RequestsBucket)
+		if err != nil {
+			return err
+		}
+		err = bucket.Delete(key)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	return err
+}
+
 // DeleteData - deletes bucket with all saved data
 func (c *BoltCache) DeleteData() error {
 	err := c.DeleteBucket(c.RequestsBucket)
