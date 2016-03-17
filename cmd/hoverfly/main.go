@@ -178,9 +178,9 @@ func main() {
 
 	// getting boltDB
 	db := boltdb.GetDB(cfg.DatabaseName)
+	defer db.Close()
 
-	cache := boltdb.NewBoltDBCache(db, []byte(boltdb.RequestsBucketName))
-	defer cache.CloseDB()
+	cache := boltdb.NewBoltDBCache(db, []byte("requestsBucket"))
 
 	dbClient := hv.GetNewHoverfly(cfg, cache)
 
@@ -190,7 +190,8 @@ func main() {
 	dbClient.AB = ab
 
 	// metadata backend
-	md := hv.NewBoltDBMetadata(db, []byte(hv.MetadataBucketName))
+	metaCache := boltdb.NewBoltDBCache(db, []byte("metadataBucket"))
+	md := hv.NewBoltDBMetadata(metaCache)
 
 	dbClient.MD = md
 
