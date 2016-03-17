@@ -122,6 +122,13 @@ func TestDeleteRecord(t *testing.T) {
 	refute(t, err, nil)
 }
 
+func TestDeleteNotExisting(t *testing.T) {
+	db := NewBoltDBCache(TestDB, []byte("bucketTestDeleteNotExisting"))
+
+	err := db.Delete([]byte("foo"))
+	expect(t, err, nil)
+}
+
 func setup() {
 	// we don't really want to see what's happening
 	log.SetLevel(log.FatalLevel)
