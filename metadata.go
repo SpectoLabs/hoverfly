@@ -1,13 +1,5 @@
 package hoverfly
 
-import (
-	"bytes"
-	"fmt"
-
-	log "github.com/Sirupsen/logrus"
-	"github.com/boltdb/bolt"
-)
-
 // Metadata - interface to store and retrieve any metadata that is related to Hoverfly
 type Metadata interface {
 	Set(key, value string) error
@@ -19,127 +11,56 @@ type Metadata interface {
 }
 
 // NewBoltDBMetadata - default metadata store
-func NewBoltDBMetadata(db *bolt.DB, bucket []byte) *BoltMeta {
+func NewBoltDBMetadata(cache Cache) *BoltMeta {
 	return &BoltMeta{
-		DS:             db,
-		MetadataBucket: []byte(bucket),
+		DS: cache,
 	}
 }
 
-// MetadataBucketName - default bucket name for storing metadata in boltdb
-const MetadataBucketName = "metadataBucket"
-
 // BoltMeta - metadata backend that uses BoltDB
 type BoltMeta struct {
-	DS             *bolt.DB
+	DS             Cache
 	MetadataBucket []byte
 }
 
 // CloseDB - closes database
 func (m *BoltMeta) CloseDB() {
-	m.DS.Close()
+	m.DS.CloseDB()
 }
 
 // Set - saves given key and value pair to BoltDB
 func (m *BoltMeta) Set(key, value string) error {
-	err := m.DS.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists(m.MetadataBucket)
-		if err != nil {
-			return err
-		}
-		err = bucket.Put([]byte(key), []byte(value))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	return err
+	return m.DS.Set([]byte(key), []byte(value))
 }
 
 // Get - gets value for given key
 func (m *BoltMeta) Get(key string) (value string, err error) {
-	err = m.DS.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket(m.MetadataBucket)
-		if bucket == nil {
-			return fmt.Errorf("Bucket %q not found!", m.MetadataBucket)
-		}
-		var buffer bytes.Buffer
-		val := bucket.Get([]byte(key))
-
-		// If it doesn't exist then it will return nil
-		if val == nil {
-			return fmt.Errorf("key %s not found \n", key)
-		}
-
-		buffer.Write(val)
-		value = buffer.String()
-		return nil
-	})
-
-	return
-}
-
-// MetaObject - container to store both keys and values of captured objects
-type MetaObject struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
+	val, err := m.DS.Get([]byte(key))
+	if err != nil {
+		return "", nil
+	}
+	return string(val), err
 }
 
 // GetAll - returns all key/value pairs
-func (m *BoltMeta) GetAll() (objects map[string]string, err error) {
-	err = m.DS.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(m.MetadataBucket)
-		if b == nil {
-			// bucket doesn't exist
-			return nil
-		}
-		objects = make(map[string]string)
-		c := b.Cursor()
-
-		for k, v := c.First(); k != nil; k, v = c.Next() {
-			objects[string(k)] = string(v)
-		}
-		return nil
-	})
-	return
+func (m *BoltMeta) GetAll() (map[string]string, error) {
+	entries, err := m.DS.GetAllEntries()
+	newEntries := make(map[string]string)
+	if err != nil {
+		return newEntries, err
+	}
+	for k, v := range entries {
+		newEntries[k] = string(v)
+	}
+	return newEntries, nil
 }
 
 // Delete - deletes given metadata key
 func (m *BoltMeta) Delete(key string) error {
-	err := m.DS.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists(m.MetadataBucket)
-		if err != nil {
-			return err
-		}
-		err = bucket.Delete([]byte(key))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	return err
+	return m.DS.Delete([]byte(key))
 }
 
 // DeleteData - deletes bucket with all saved data
 func (m *BoltMeta) DeleteData() error {
-	err := m.deleteBucket(m.MetadataBucket)
-	return err
-}
-
-// DeleteBucket - deletes bucket with all saved data
-func (m *BoltMeta) deleteBucket(name []byte) (err error) {
-	err = m.DS.Update(func(tx *bolt.Tx) error {
-		err = tx.DeleteBucket(name)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-				"name":  string(name),
-			}).Warning("Failed to delete bucket")
-
-		}
-		return err
-	})
-	return
+	return m.DS.DeleteData()
 }
