@@ -1,13 +1,5 @@
 package hoverfly
 
-import (
-	"bytes"
-	"fmt"
-
-	log "github.com/Sirupsen/logrus"
-	"github.com/boltdb/bolt"
-)
-
 // Metadata - interface to store and retrieve any metadata that is related to Hoverfly
 type Metadata interface {
 	Set(key, value string) error
@@ -18,128 +10,56 @@ type Metadata interface {
 	CloseDB()
 }
 
-// NewBoltDBMetadata - default metadata store
-func NewBoltDBMetadata(db *bolt.DB, bucket []byte) *BoltMeta {
-	return &BoltMeta{
-		DS:             db,
-		MetadataBucket: []byte(bucket),
+// NewMetadata - default metadata store
+func NewMetadata(cache Cache) *Meta {
+	return &Meta{
+		DS: cache,
 	}
 }
 
-// MetadataBucketName - default bucket name for storing metadata in boltdb
-const MetadataBucketName = "metadataBucket"
-
-// BoltMeta - metadata backend that uses BoltDB
-type BoltMeta struct {
-	DS             *bolt.DB
-	MetadataBucket []byte
+// Meta - metadata backend that uses Cache interface
+type Meta struct {
+	DS Cache
 }
 
 // CloseDB - closes database
-func (m *BoltMeta) CloseDB() {
-	m.DS.Close()
+func (m *Meta) CloseDB() {
+	m.DS.CloseDB()
 }
 
 // Set - saves given key and value pair to BoltDB
-func (m *BoltMeta) Set(key, value string) error {
-	err := m.DS.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists(m.MetadataBucket)
-		if err != nil {
-			return err
-		}
-		err = bucket.Put([]byte(key), []byte(value))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	return err
+func (m *Meta) Set(key, value string) error {
+	return m.DS.Set([]byte(key), []byte(value))
 }
 
 // Get - gets value for given key
-func (m *BoltMeta) Get(key string) (value string, err error) {
-	err = m.DS.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket(m.MetadataBucket)
-		if bucket == nil {
-			return fmt.Errorf("Bucket %q not found!", m.MetadataBucket)
-		}
-		var buffer bytes.Buffer
-		val := bucket.Get([]byte(key))
-
-		// If it doesn't exist then it will return nil
-		if val == nil {
-			return fmt.Errorf("key %s not found \n", key)
-		}
-
-		buffer.Write(val)
-		value = buffer.String()
-		return nil
-	})
-
-	return
-}
-
-// MetaObject - container to store both keys and values of captured objects
-type MetaObject struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
+func (m *Meta) Get(key string) (value string, err error) {
+	val, err := m.DS.Get([]byte(key))
+	if err != nil {
+		return "", nil
+	}
+	return string(val), err
 }
 
 // GetAll - returns all key/value pairs
-func (m *BoltMeta) GetAll() (objects map[string]string, err error) {
-	err = m.DS.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(m.MetadataBucket)
-		if b == nil {
-			// bucket doesn't exist
-			return nil
-		}
-		objects = make(map[string]string)
-		c := b.Cursor()
-
-		for k, v := c.First(); k != nil; k, v = c.Next() {
-			objects[string(k)] = string(v)
-		}
-		return nil
-	})
-	return
+func (m *Meta) GetAll() (map[string]string, error) {
+	entries, err := m.DS.GetAllEntries()
+	newEntries := make(map[string]string)
+	if err != nil {
+		return newEntries, err
+	}
+	for k, v := range entries {
+		newEntries[k] = string(v)
+	}
+	return newEntries, nil
 }
 
 // Delete - deletes given metadata key
-func (m *BoltMeta) Delete(key string) error {
-	err := m.DS.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists(m.MetadataBucket)
-		if err != nil {
-			return err
-		}
-		err = bucket.Delete([]byte(key))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	return err
+func (m *Meta) Delete(key string) error {
+	return m.DS.Delete([]byte(key))
 }
 
 // DeleteData - deletes bucket with all saved data
-func (m *BoltMeta) DeleteData() error {
-	err := m.deleteBucket(m.MetadataBucket)
-	return err
-}
-
-// DeleteBucket - deletes bucket with all saved data
-func (m *BoltMeta) deleteBucket(name []byte) (err error) {
-	err = m.DS.Update(func(tx *bolt.Tx) error {
-		err = tx.DeleteBucket(name)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-				"name":  string(name),
-			}).Warning("Failed to delete bucket")
-
-		}
-		return err
-	})
-	return
+func (m *Meta) DeleteData() error {
+	return m.DS.DeleteData()
 }
