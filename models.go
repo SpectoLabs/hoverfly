@@ -137,6 +137,20 @@ func (r *RequestContainer) concatenate() string {
 	return buffer.String()
 }
 
+func (r *RequestContainer) getContentType() string {
+
+	for _, v := range r.Details.Headers["Content-Type"] {
+		if strings.Contains(v, "application/json") {
+			return JSONType
+		}
+		if strings.Contains(v, "application/xml") {
+			return XMLType
+		}
+
+	}
+	return UnknownType
+}
+
 // Hash returns unique hash key for request
 func (r *RequestContainer) Hash() string {
 	h := md5.New()
