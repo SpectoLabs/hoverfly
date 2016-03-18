@@ -414,4 +414,49 @@ func TestJSONMinifierWOHeader(t *testing.T) {
 	refute(t, fpOne, fpTwo)
 }
 
+var xmlBody = `<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+		  <modelVersion>4.0.0</modelVersion>
+		  <groupId>some ID here</groupId>
+	       </project>`
+
+var xmlBodyTwo = `<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+
+		  <modelVersion>4.0.0</modelVersion>
+
+
+		  <groupId>some ID here</groupId>
+		  
+	       </project>`
+
+func TestXMLMinifier(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	// body can be nil here, it's not reading it from request anyway
+	req, err := http.NewRequest("GET", "http://example.com", nil)
+	expect(t, err, nil)
+
+	req.Header.Add("Content-Type", "application/xml")
+
+	fpOne := dbClient.getRequestFingerprint(req, []byte(xmlBody))
+	fpTwo := dbClient.getRequestFingerprint(req, []byte(xmlBodyTwo))
+	expect(t, fpOne, fpTwo)
+}
+
+func TestXMLMinifierWOHeader(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	// body can be nil here, it's not reading it from request anyway
+	req, err := http.NewRequest("GET", "http://example.com", nil)
+	expect(t, err, nil)
+
+	// application/xml header is not set, shouldn't be equal
+	fpOne := dbClient.getRequestFingerprint(req, []byte(xmlBody))
+	fpTwo := dbClient.getRequestFingerprint(req, []byte(xmlBodyTwo))
+	refute(t, fpOne, fpTwo)
+}
 }
