@@ -171,16 +171,16 @@ func (r *RequestContainer) minifyBody(mediaType string) (minified string) {
 	return minified
 }
 
+func (r *RequestContainer) getContentType() string {
 	for _, v := range r.Details.Headers["Content-Type"] {
-		if strings.Contains(v, "application/json") {
-			return JSONType
+		if rxJSON.MatchString(v) {
+			return contentTypeJSON
 		}
-		if strings.Contains(v, "application/xml") {
-			return XMLType
+		if rxXML.MatchString(v) {
+			return contentTypeXML
 		}
-
 	}
-	return UnknownType
+	return otherType
 }
 
 // Hash returns unique hash key for request
