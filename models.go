@@ -110,7 +110,8 @@ func (d *DBClient) AddHook(hook Hook) {
 
 // RequestContainer holds structure for request
 type RequestContainer struct {
-	Details RequestDetails
+	Details  RequestDetails
+	Minifier *minify.M
 }
 
 var emptyResp = &http.Response{}
