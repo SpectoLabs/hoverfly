@@ -39,13 +39,18 @@ func orPanic(err error) {
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
 func GetNewHoverfly(cfg *Configuration, cache Cache) DBClient {
 	counter := NewModeCounter()
-	// getting connections
+
+	m := minify.New()
+	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
+	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
+
 	d := DBClient{
 		Cache:   cache,
 		HTTP:    &http.Client{},
 		Cfg:     cfg,
 		Counter: counter,
 		Hooks:   make(ActionTypeHooks),
+		MIN:     m,
 	}
 
 	d.UpdateProxy()
