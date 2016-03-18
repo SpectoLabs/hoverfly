@@ -138,27 +138,18 @@ func (r *RequestContainer) concatenate() string {
 	buffer.WriteString(r.Details.Path)
 	buffer.WriteString(r.Details.Method)
 	buffer.WriteString(r.Details.Query)
+	if len(r.Details.Body) > 0 {
+		ct := r.getContentType()
 
-	ct := r.getContentType()
-	if ct == JSONType {
-		bodyBuffer := new(bytes.Buffer)
-		if err := json.Compact(bodyBuffer, []byte(r.Details.Body)); err != nil {
+		if ct == contentTypeJSON || ct == contentTypeXML {
+			buffer.WriteString(r.minifyBody(ct))
+		} else {
 			log.WithFields(log.Fields{
-				"error":       err.Error(),
-				"destination": r.Details.Destination,
-				"path":        r.Details.Path,
-				"method":      r.Details.Method,
-			}).Error("failed to compact json body, matching may fail.")
+				"content-type": r.Details.Headers["Content-Type"],
+			}).Debug("unknown content type")
+
+			buffer.WriteString(r.Details.Body)
 		}
-		log.Info("json type detected, compacting!")
-		buffer.WriteString(bodyBuffer.String())
-	} else if ct == XMLType {
-		// TODO
-	} else {
-		log.WithFields(log.Fields{
-			"content-type": r.Details.Headers["Content-Type"],
-		}).Info("unknown content type")
-		buffer.WriteString(r.Details.Body)
 	}
 
 	return buffer.String()
