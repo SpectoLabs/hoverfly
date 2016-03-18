@@ -11,6 +11,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"net/http"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
