@@ -423,7 +423,7 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, respBody []byte) {
 	// record request here
-	key := getRequestFingerprint(req, reqBody)
+	key := d.getRequestFingerprint(req, reqBody)
 
 	if resp == nil {
 		resp = emptyResp
@@ -488,7 +488,7 @@ func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, 
 }
 
 // getRequestFingerprint returns request hash
-func getRequestFingerprint(req *http.Request, requestBody []byte) string {
+func (d *DBClient) getRequestFingerprint(req *http.Request, requestBody []byte) string {
 	details := RequestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
@@ -498,7 +498,7 @@ func getRequestFingerprint(req *http.Request, requestBody []byte) string {
 		Headers:     req.Header,
 	}
 
-	r := RequestContainer{Details: details}
+	r := RequestContainer{Details: details, Minifier: d.MIN}
 	return r.Hash()
 }
 
@@ -517,7 +517,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 		}).Error("Got error when reading request body")
 	}
 
-	key := getRequestFingerprint(req, reqBody)
+	key := d.getRequestFingerprint(req, reqBody)
 
 	payloadBts, err := d.Cache.Get([]byte(key))
 
