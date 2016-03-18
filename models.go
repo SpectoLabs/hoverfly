@@ -164,7 +164,21 @@ func (r *RequestContainer) concatenate() string {
 	return buffer.String()
 }
 
-func (r *RequestContainer) getContentType() string {
+func (r *RequestContainer) minifyBody(mediaType string) (minified string) {
+	var err error
+	minified, err = r.Minifier.String(mediaType, r.Details.Body)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":       err.Error(),
+			"destination": r.Details.Destination,
+			"path":        r.Details.Path,
+			"method":      r.Details.Method,
+		}).Errorf("failed to minify request body, media type given: %s. Request matching might fail", mediaType)
+		return r.Details.Body
+	}
+	log.Debugf("body minified, mediatype: %s", mediaType)
+	return minified
+}
 
 	for _, v := range r.Details.Headers["Content-Type"] {
 		if strings.Contains(v, "application/json") {
