@@ -139,7 +139,7 @@ func (d *DBClient) ImportPayloads(payloads []Payload) error {
 			}
 
 			// recalculating request hash and storing it in database
-			r := RequestContainer{Details: pl.Request}
+			r := RequestContainer{Details: pl.Request, Minifier: d.MIN}
 			key := r.Hash()
 
 			// regenerating key
