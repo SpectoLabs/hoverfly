@@ -116,12 +116,27 @@ func (d *DBClient) ImportFromURL(url string) error {
 	return d.ImportPayloads(requests.Data)
 }
 
+func isJSON(s string) bool {
+	var js map[string]interface{}
+	return json.Unmarshal([]byte(s), &js) == nil
+
+}
+
 // ImportPayloads - a function to save given payloads into the database.
 func (d *DBClient) ImportPayloads(payloads []Payload) error {
 	if len(payloads) > 0 {
 		success := 0
 		failed := 0
 		for _, pl := range payloads {
+			pl.Request.Headers = make(map[string][]string)
+			// sniffing content types
+			if isJSON(pl.Request.Body) {
+				pl.Request.Headers["Content-Type"] = []string{"application/json"}
+			} else {
+				ct := http.DetectContentType([]byte(pl.Request.Body))
+				pl.Request.Headers["Content-Type"] = []string{ct}
+			}
+
 			// recalculating request hash and storing it in database
 			r := RequestContainer{Details: pl.Request}
 			key := r.Hash()
