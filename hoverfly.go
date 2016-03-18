@@ -4,6 +4,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/rusenask/goproxy"
 
+	"github.com/tdewolff/minify"
+	"github.com/tdewolff/minify/json"
+	"github.com/tdewolff/minify/xml"
+
 	"bufio"
 	"fmt"
 	"net"
