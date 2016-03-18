@@ -40,9 +40,7 @@ func orPanic(err error) {
 func GetNewHoverfly(cfg *Configuration, cache Cache) DBClient {
 	counter := NewModeCounter()
 
-	m := minify.New()
-	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
-	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
+	m := GetNewMinifiers()
 
 	d := DBClient{
 		Cache:   cache,
@@ -56,6 +54,14 @@ func GetNewHoverfly(cfg *Configuration, cache Cache) DBClient {
 	d.UpdateProxy()
 
 	return d
+}
+
+// GetNewMinifiers - returns minify.M with prepared xml/json minifiers
+func GetNewMinifiers() *minify.M {
+	m := minify.New()
+	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
+	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
+	return m
 }
 
 // UpdateProxy - applies hooks
