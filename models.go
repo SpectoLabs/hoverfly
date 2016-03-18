@@ -462,6 +462,7 @@ func getRequestFingerprint(req *http.Request, requestBody []byte) string {
 		Destination: req.Host,
 		Query:       req.URL.RawQuery,
 		Body:        string(requestBody),
+		Headers:     req.Header,
 	}
 
 	r := RequestContainer{Details: details}
