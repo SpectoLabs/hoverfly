@@ -53,7 +53,7 @@ func TestRequestBodyCaptured(t *testing.T) {
 	_, err = dbClient.captureRequest(req)
 	expect(t, err, nil)
 
-	fp := getRequestFingerprint(req, requestBody)
+	fp := dbClient.getRequestFingerprint(req, requestBody)
 
 	payloadBts, err := dbClient.Cache.Get([]byte(fp))
 	expect(t, err, nil)
@@ -146,35 +146,43 @@ func TestGetNotRecordedRequest(t *testing.T) {
 
 // TestRequestFingerprint tests whether we get correct request ID
 func TestRequestFingerprint(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	expect(t, err, nil)
 
-	fp := getRequestFingerprint(req, []byte(""))
+	fp := dbClient.getRequestFingerprint(req, []byte(""))
 
 	expect(t, fp, "92a65ed4ca2b7100037a4cba9afd15ea")
 }
 
 // TestRequestFingerprintBody tests where request body is also used to create unique request ID
 func TestRequestFingerprintBody(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	expect(t, err, nil)
 
-	fp := getRequestFingerprint(req, []byte("some huge XML or JSON here"))
+	fp := dbClient.getRequestFingerprint(req, []byte("some huge XML or JSON here"))
 
 	expect(t, fp, "b3918a54eb6e42652e29e14c21ba8f81")
 }
 
 func TestScheme(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	expect(t, err, nil)
 
-	originalFp := getRequestFingerprint(req, []byte(""))
+	originalFp := dbClient.getRequestFingerprint(req, []byte(""))
 
 	httpsReq, err := http.NewRequest("GET", "https://example.com", nil)
 	expect(t, err, nil)
 
-	newFp := getRequestFingerprint(httpsReq, []byte(""))
+	newFp := dbClient.getRequestFingerprint(httpsReq, []byte(""))
 
 	// fingerprint should be the same
 	expect(t, originalFp, newFp)
@@ -292,7 +300,7 @@ func TestGetResponseCorruptedPayload(t *testing.T) {
 	_, err = dbClient.captureRequest(req)
 	expect(t, err, nil)
 
-	fp := getRequestFingerprint(req, requestBody)
+	fp := dbClient.getRequestFingerprint(req, requestBody)
 
 	dbClient.Cache.Set([]byte(fp), []byte("you shall not decode me!"))
 
@@ -374,4 +382,20 @@ func TestUpdateDestinationEmpty(t *testing.T) {
 	dbClient.StartProxy()
 	err := dbClient.UpdateDestination("e^^**#")
 	refute(t, err, nil)
+}
+
+func TestJSONMinifier(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	// body can be nil here, it's not reading it from request anyway
+	req, err := http.NewRequest("GET", "http://example.com", nil)
+	expect(t, err, nil)
+	req.Header.Add("Content-Type", "application/json")
+
+	fpOne := dbClient.getRequestFingerprint(req, []byte(`{"foo": "bar"}`))
+	fpTwo := dbClient.getRequestFingerprint(req, []byte(`{     "foo":           "bar"}`))
+
+	expect(t, fpOne, fpTwo)
+
 }

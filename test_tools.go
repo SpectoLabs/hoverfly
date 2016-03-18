@@ -69,6 +69,9 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 
 	cfg := InitSettings()
 	counter := NewModeCounter()
+
+	m := GetNewMinifiers()
+
 	// preparing client
 	dbClient := &DBClient{
 		HTTP:    &http.Client{Transport: tr},
@@ -76,6 +79,7 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 		Cfg:     cfg,
 		Counter: counter,
 		MD:      md,
+		MIN:     m,
 	}
 	return server, dbClient
 }
