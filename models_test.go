@@ -397,5 +397,21 @@ func TestJSONMinifier(t *testing.T) {
 	fpTwo := dbClient.getRequestFingerprint(req, []byte(`{     "foo":           "bar"}`))
 
 	expect(t, fpOne, fpTwo)
+}
+
+func TestJSONMinifierWOHeader(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	// body can be nil here, it's not reading it from request anyway
+	req, err := http.NewRequest("GET", "http://example.com", nil)
+	expect(t, err, nil)
+
+	// application/json header is not set, shouldn't be equal
+	fpOne := dbClient.getRequestFingerprint(req, []byte(`{"foo": "bar"}`))
+	fpTwo := dbClient.getRequestFingerprint(req, []byte(`{     "foo":           "bar"}`))
+
+	refute(t, fpOne, fpTwo)
+}
 
 }
