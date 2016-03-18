@@ -459,4 +459,3 @@ func TestXMLMinifierWOHeader(t *testing.T) {
 	fpTwo := dbClient.getRequestFingerprint(req, []byte(xmlBodyTwo))
 	refute(t, fpOne, fpTwo)
 }
-}
