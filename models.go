@@ -125,6 +125,10 @@ type RequestDetails struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
+const JSONType = "jsonType"
+const XMLType = "xmlType"
+const UnknownType = "unknownType"
+
 func (r *RequestContainer) concatenate() string {
 	var buffer bytes.Buffer
 
