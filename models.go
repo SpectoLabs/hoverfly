@@ -4,20 +4,19 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/gob"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"regexp"
-	"strings"
 	"sync"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
 	"github.com/rusenask/goproxy"
+	"github.com/tdewolff/minify"
 )
 
 // DBClient provides access to cache, http client and configuration
@@ -32,6 +31,8 @@ type DBClient struct {
 
 	Proxy *goproxy.ProxyHttpServer
 	SL    *StoppableListener
+
+	MIN *minify.M
 
 	mu sync.Mutex
 }
@@ -128,9 +129,12 @@ type RequestDetails struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
-const JSONType = "jsonType"
-const XMLType = "xmlType"
-const UnknownType = "unknownType"
+const contentTypeJSON = "application/json"
+const contentTypeXML = "application/xml"
+const otherType = "otherType"
+
+var rxJSON = regexp.MustCompile("[/+]json$")
+var rxXML = regexp.MustCompile("[/+]xml$")
 
 func (r *RequestContainer) concatenate() string {
 	var buffer bytes.Buffer
