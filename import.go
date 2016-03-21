@@ -129,13 +129,18 @@ func (d *DBClient) ImportPayloads(payloads []Payload) error {
 		success := 0
 		failed := 0
 		for _, pl := range payloads {
-			pl.Request.Headers = make(map[string][]string)
-			// sniffing content types
-			if isJSON(pl.Request.Body) {
-				pl.Request.Headers["Content-Type"] = []string{"application/json"}
-			} else {
-				ct := http.DetectContentType([]byte(pl.Request.Body))
-				pl.Request.Headers["Content-Type"] = []string{ct}
+			if len(pl.Request.Headers) == 0 {
+				pl.Request.Headers = make(map[string][]string)
+			}
+
+			if _, present := pl.Request.Headers["Content-Type"]; !present {
+				// sniffing content types
+				if isJSON(pl.Request.Body) {
+					pl.Request.Headers["Content-Type"] = []string{"application/json"}
+				} else {
+					ct := http.DetectContentType([]byte(pl.Request.Body))
+					pl.Request.Headers["Content-Type"] = []string{ct}
+				}
 			}
 
 			// recalculating request hash and storing it in database
