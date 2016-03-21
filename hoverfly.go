@@ -4,6 +4,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/rusenask/goproxy"
 
+	"github.com/tdewolff/minify"
+	"github.com/tdewolff/minify/json"
+	"github.com/tdewolff/minify/xml"
+
 	"bufio"
 	"fmt"
 	"net"
@@ -35,18 +39,29 @@ func orPanic(err error) {
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
 func GetNewHoverfly(cfg *Configuration, cache Cache) DBClient {
 	counter := NewModeCounter()
-	// getting connections
+
+	m := GetNewMinifiers()
+
 	d := DBClient{
 		Cache:   cache,
 		HTTP:    &http.Client{},
 		Cfg:     cfg,
 		Counter: counter,
 		Hooks:   make(ActionTypeHooks),
+		MIN:     m,
 	}
 
 	d.UpdateProxy()
 
 	return d
+}
+
+// GetNewMinifiers - returns minify.M with prepared xml/json minifiers
+func GetNewMinifiers() *minify.M {
+	m := minify.New()
+	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
+	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
+	return m
 }
 
 // UpdateProxy - applies hooks
