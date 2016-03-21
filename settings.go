@@ -10,17 +10,21 @@ import (
 
 // Configuration - initial structure of configuration
 type Configuration struct {
-	AdminPort          string
-	ProxyPort          string
-	Mode               string
-	Destination        string
-	Middleware         string
-	DatabaseName       string
-	Verbose            bool
-	Development        bool
+	AdminPort    string
+	ProxyPort    string
+	Mode         string
+	Destination  string
+	Middleware   string
+	DatabaseName string
+
+	Verbose     bool
+	Development bool
+
 	SecretKey          []byte
 	JWTExpirationDelta int
 	AuthEnabled        bool
+
+	ProxyControlWG sync.WaitGroup
 
 	mu sync.Mutex
 }

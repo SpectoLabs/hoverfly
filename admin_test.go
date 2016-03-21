@@ -160,7 +160,7 @@ func TestExportImportRecords(t *testing.T) {
 	expect(t, importRec.Code, http.StatusOK)
 
 	// records should be there
-	payloads, err := dbClient.Cache.GetAllRequests()
+	payloads, err := dbClient.Cache.GetAllValues()
 	expect(t, err, nil)
 	expect(t, len(payloads), 5)
 
@@ -180,7 +180,7 @@ func TestDeleteHandler(t *testing.T) {
 	}
 
 	// checking whether we have records
-	payloads, err := dbClient.Cache.GetAllRequests()
+	payloads, err := dbClient.Cache.GetAllValues()
 	expect(t, err, nil)
 	expect(t, len(payloads), 5)
 
@@ -582,9 +582,9 @@ func TestSetMetadata(t *testing.T) {
 	expect(t, rec.Code, http.StatusCreated)
 
 	// checking mode
-	metaValue, err := dbClient.MD.Get([]byte("some_key"))
+	metaValue, err := dbClient.MD.Get("some_key")
 	expect(t, err, nil)
-	expect(t, string(metaValue), "some_val")
+	expect(t, metaValue, "some_val")
 }
 
 func TestSetMetadataBadBody(t *testing.T) {
@@ -641,8 +641,8 @@ func TestGetMetadata(t *testing.T) {
 	m := getBoneRouter(*dbClient)
 	// adding some metadata
 	for i := 0; i < 3; i++ {
-		k := []byte(fmt.Sprintf("key_%d", i))
-		v := []byte(fmt.Sprintf("val_%d", i))
+		k := fmt.Sprintf("key_%d", i)
+		v := fmt.Sprintf("val_%d", i)
 		err := dbClient.MD.Set(k, v)
 		expect(t, err, nil)
 	}
@@ -676,8 +676,8 @@ func TestDeleteMetadata(t *testing.T) {
 	m := getBoneRouter(*dbClient)
 	// adding some metadata
 	for i := 0; i < 3; i++ {
-		k := []byte(fmt.Sprintf("key_%d", i))
-		v := []byte(fmt.Sprintf("val_%d", i))
+		k := fmt.Sprintf("key_%d", i)
+		v := fmt.Sprintf("val_%d", i)
 		err := dbClient.MD.Set(k, v)
 		expect(t, err, nil)
 	}

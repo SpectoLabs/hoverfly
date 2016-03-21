@@ -68,27 +68,26 @@ func (m *messageResponse) Encode() ([]byte, error) {
 
 // StartAdminInterface - starts admin interface web server
 func (d *DBClient) StartAdminInterface() {
-	go func() {
-		// starting admin interface
-		mux := getBoneRouter(*d)
-		n := negroni.Classic()
 
-		logLevel := log.ErrorLevel
+	// starting admin interface
+	mux := getBoneRouter(*d)
+	n := negroni.Classic()
 
-		if d.Cfg.Verbose {
-			logLevel = log.DebugLevel
-		}
+	logLevel := log.ErrorLevel
 
-		n.Use(negronilogrus.NewCustomMiddleware(logLevel, &log.JSONFormatter{}, "admin"))
-		n.UseHandler(mux)
+	if d.Cfg.Verbose {
+		logLevel = log.DebugLevel
+	}
 
-		// admin interface starting message
-		log.WithFields(log.Fields{
-			"AdminPort": d.Cfg.AdminPort,
-		}).Info("Admin interface is starting...")
+	n.Use(negronilogrus.NewCustomMiddleware(logLevel, &log.JSONFormatter{}, "admin"))
+	n.UseHandler(mux)
 
-		n.Run(fmt.Sprintf(":%s", d.Cfg.AdminPort))
-	}()
+	// admin interface starting message
+	log.WithFields(log.Fields{
+		"AdminPort": d.Cfg.AdminPort,
+	}).Info("Admin interface is starting...")
+
+	n.Run(fmt.Sprintf(":%s", d.Cfg.AdminPort))
 }
 
 // getBoneRouter returns mux for admin interface
@@ -193,14 +192,26 @@ func getBoneRouter(d DBClient) *bone.Mux {
 
 // AllRecordsHandler returns JSON content type http response
 func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	records, err := d.Cache.GetAllRequests()
+	records, err := d.Cache.GetAllValues()
 
 	if err == nil {
+
+		var payloads []Payload
+
+		for _, v := range records {
+			if payload, err := decodePayload(v); err == nil {
+				payloads = append(payloads, *payload)
+			} else {
+				log.Error(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 
 		var response recordedRequests
-		response.Data = records
+		response.Data = payloads
 		b, err := json.Marshal(response)
 
 		if err != nil {
@@ -567,27 +578,39 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 		"synthesize": true,
 	}
 
-	if !availableModes[sr.Mode] {
+	if sr.Mode != "" {
+		if !availableModes[sr.Mode] {
+			log.WithFields(log.Fields{
+				"suppliedMode": sr.Mode,
+			}).Error("Wrong mode found, can't change state")
+			http.Error(w, "Bad mode supplied, available modes: virtualize, capture, modify, synthesize.", 400)
+			return
+		}
 		log.WithFields(log.Fields{
-			"suppliedMode": sr.Mode,
-		}).Error("Wrong mode found, can't change state")
-		http.Error(w, "Bad mode supplied, available modes: virtualize, capture, modify, synthesize.", 400)
-		return
+			"newState":    sr.Mode,
+			"body":        string(body),
+			"destination": sr.Destination,
+		}).Info("Handling state change request!")
+
+		// setting new state
+		d.Cfg.SetMode(sr.Mode)
+
 	}
 
-	log.WithFields(log.Fields{
-		"newState": sr.Mode,
-		"body":     string(body),
-	}).Info("Handling state change request!")
-
-	// setting new state
-	d.Cfg.SetMode(sr.Mode)
+	// checking whether we should update destination
+	if sr.Destination != "" {
+		err := d.UpdateDestination(sr.Destination)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error while updating destination: %s", err.Error()), 500)
+			return
+		}
+	}
 
 	var en Entry
 	en.ActionType = ActionTypeConfigurationChanged
 	en.Message = "changed"
 	en.Time = time.Now()
-	en.Data = []byte("sr.Mode")
+	en.Data = body
 
 	if err := d.Hooks.Fire(ActionTypeConfigurationChanged, &en); err != nil {
 		log.WithFields(log.Fields{
@@ -615,11 +638,7 @@ func (d *DBClient) AllMetadataHandler(w http.ResponseWriter, req *http.Request, 
 		w.Header().Set("Content-Type", "application/json")
 
 		var response storedMetadata
-		respMap := make(map[string]string)
-		for _, v := range metadata {
-			respMap[v.Key] = v.Value
-		}
-		response.Data = respMap
+		response.Data = metadata
 		b, err := json.Marshal(response)
 
 		if err != nil {
@@ -689,7 +708,7 @@ func (d *DBClient) SetMetadataHandler(w http.ResponseWriter, req *http.Request, 
 		w.WriteHeader(400)
 
 	} else {
-		err = d.MD.Set([]byte(sm.Key), []byte(sm.Value))
+		err = d.MD.Set(sm.Key, sm.Value)
 		if err != nil {
 			mr.Message = fmt.Sprintf("Failed to set metadata. Error: %s", err.Error())
 			w.WriteHeader(500)

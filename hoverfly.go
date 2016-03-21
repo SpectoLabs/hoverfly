@@ -4,6 +4,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/rusenask/goproxy"
 
+	"github.com/tdewolff/minify"
+	"github.com/tdewolff/minify/json"
+	"github.com/tdewolff/minify/xml"
+
 	"bufio"
 	"fmt"
 	"net"
@@ -33,19 +37,35 @@ func orPanic(err error) {
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
-func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, DBClient) {
-
+func GetNewHoverfly(cfg *Configuration, cache Cache) DBClient {
 	counter := NewModeCounter()
 
-	// getting connections
+	m := GetNewMinifiers()
+
 	d := DBClient{
 		Cache:   cache,
 		HTTP:    &http.Client{},
 		Cfg:     cfg,
 		Counter: counter,
 		Hooks:   make(ActionTypeHooks),
+		MIN:     m,
 	}
 
+	d.UpdateProxy()
+
+	return d
+}
+
+// GetNewMinifiers - returns minify.M with prepared xml/json minifiers
+func GetNewMinifiers() *minify.M {
+	m := minify.New()
+	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
+	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
+	return m
+}
+
+// UpdateProxy - applies hooks
+func (d *DBClient) UpdateProxy() {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 
@@ -80,12 +100,12 @@ func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, 
 		})
 
 	// processing connections
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(cfg.Destination))).DoFunc(
+	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(d.Cfg.Destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			return d.processRequest(r)
 		})
 
-	if cfg.Verbose {
+	if d.Cfg.Verbose {
 		proxy.OnRequest().DoFunc(
 			func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 				log.WithFields(log.Fields{
@@ -94,14 +114,14 @@ func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, 
 					"query":       r.URL.RawQuery,
 					"method":      r.Method,
 					"remoteAddr":  r.RemoteAddr,
-					"mode":        cfg.GetMode(),
+					"mode":        d.Cfg.GetMode(),
 				}).Debug("got request..")
 				return r, nil
 			})
 	}
 
 	// intercepts response
-	proxy.OnResponse(goproxy.ReqHostMatches(regexp.MustCompile(cfg.Destination))).DoFunc(
+	proxy.OnResponse(goproxy.ReqHostMatches(regexp.MustCompile(d.Cfg.Destination))).DoFunc(
 		func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
 			d.Counter.Count(d.Cfg.GetMode())
 			return resp
@@ -115,7 +135,8 @@ func GetNewHoverfly(cfg *Configuration, cache Cache) (*goproxy.ProxyHttpServer, 
 		"Mode":        d.Cfg.GetMode(),
 	}).Info("Proxy prepared...")
 
-	return proxy, d
+	d.Proxy = proxy
+	return
 }
 
 func hoverflyError(req *http.Request, err error, msg string, statusCode int) *http.Response {

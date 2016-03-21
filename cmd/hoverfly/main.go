@@ -23,10 +23,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 	hv "github.com/SpectoLabs/hoverfly"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/backends/boltdb"
 
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
 	"strings"
 )
@@ -177,11 +177,12 @@ func main() {
 	}
 
 	// getting boltDB
-	db := hv.GetDB(cfg.DatabaseName)
-	cache := hv.NewBoltDBCache(db, []byte(hv.RequestsBucketName))
-	defer cache.CloseDB()
+	db := boltdb.GetDB(cfg.DatabaseName)
+	defer db.Close()
 
-	proxy, dbClient := hv.GetNewHoverfly(cfg, cache)
+	cache := boltdb.NewBoltDBCache(db, []byte("requestsBucket"))
+
+	dbClient := hv.GetNewHoverfly(cfg, cache)
 
 	ab := backends.NewBoltDBAuthBackend(db, []byte(backends.TokenBucketName), []byte(backends.UserBucketName))
 
@@ -189,7 +190,8 @@ func main() {
 	dbClient.AB = ab
 
 	// metadata backend
-	md := hv.NewBoltDBMetadata(db, []byte(hv.MetadataBucketName))
+	metaCache := boltdb.NewBoltDBCache(db, []byte("metadataBucket"))
+	md := hv.NewMetadata(metaCache)
 
 	dbClient.MD = md
 
@@ -223,20 +225,25 @@ func main() {
 						"import": v,
 					}).Fatal("Failed to import given resource")
 				} else {
-					err = dbClient.MD.Set([]byte(fmt.Sprintf("import_%d", i+1)), []byte(v))
+					err = dbClient.MD.Set(fmt.Sprintf("import_%d", i+1), v)
 				}
 
 			}
 		}
 	}
 
-	// starting admin interface
-	dbClient.StartAdminInterface()
-
 	// start metrics registry flush
 	if *metrics {
 		dbClient.Counter.Init()
 	}
 
-	log.Warn(http.ListenAndServe(fmt.Sprintf(":%s", cfg.ProxyPort), proxy))
+	err := dbClient.StartProxy()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Fatal("failed to start proxy...")
+	}
+
+	// starting admin interface, this is blocking
+	dbClient.StartAdminInterface()
 }

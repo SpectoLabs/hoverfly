@@ -6,12 +6,17 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"net"
 	"net/http"
+	"regexp"
+	"sync"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
-	"io/ioutil"
+	"github.com/rusenask/goproxy"
+	"github.com/tdewolff/minify"
 )
 
 // DBClient provides access to cache, http client and configuration
@@ -23,6 +28,80 @@ type DBClient struct {
 	Hooks   ActionTypeHooks
 	AB      backends.AuthBackend
 	MD      Metadata
+
+	Proxy *goproxy.ProxyHttpServer
+	SL    *StoppableListener
+
+	MIN *minify.M
+
+	mu sync.Mutex
+}
+
+// UpdateDestination - updates proxy with new destination regexp
+func (d *DBClient) UpdateDestination(destination string) (err error) {
+	_, err = regexp.Compile(destination)
+	if err != nil {
+		return fmt.Errorf("destination is not a valid regular expression string")
+	}
+
+	d.mu.Lock()
+	d.StopProxy()
+	d.Cfg.Destination = destination
+	d.UpdateProxy()
+	err = d.StartProxy()
+	d.mu.Unlock()
+	return
+}
+
+// StartProxy - starts proxy with current configuration, this method is non blocking.
+func (d *DBClient) StartProxy() error {
+
+	if d.Cfg.ProxyPort == "" {
+		return fmt.Errorf("Proxy port is not set!")
+	}
+
+	if d.Proxy == nil {
+		d.UpdateProxy()
+	}
+
+	log.WithFields(log.Fields{
+		"destination": d.Cfg.Destination,
+		"port":        d.Cfg.ProxyPort,
+		"mode":        d.Cfg.GetMode(),
+	}).Info("current proxy configuration")
+
+	// creating TCP listener
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", d.Cfg.ProxyPort))
+	if err != nil {
+		return err
+	}
+
+	sl, err := NewStoppableListener(listener)
+	if err != nil {
+		return err
+	}
+	d.SL = sl
+	server := http.Server{}
+
+	d.Cfg.ProxyControlWG.Add(1)
+
+	go func() {
+		defer func() {
+			log.Info("sending done signal")
+			d.Cfg.ProxyControlWG.Done()
+		}()
+		log.Info("serving proxy")
+		server.Handler = d.Proxy
+		log.Warn(server.Serve(sl))
+	}()
+
+	return nil
+}
+
+// StopProxy - stops proxy
+func (d *DBClient) StopProxy() {
+	d.SL.Stop()
+	d.Cfg.ProxyControlWG.Wait()
 }
 
 // AddHook - adds a hook to DBClient
@@ -32,7 +111,8 @@ func (d *DBClient) AddHook(hook Hook) {
 
 // RequestContainer holds structure for request
 type RequestContainer struct {
-	Details RequestDetails
+	Details  RequestDetails
+	Minifier *minify.M
 }
 
 var emptyResp = &http.Response{}
@@ -49,6 +129,13 @@ type RequestDetails struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
+const contentTypeJSON = "application/json"
+const contentTypeXML = "application/xml"
+const otherType = "otherType"
+
+var rxJSON = regexp.MustCompile("[/+]json$")
+var rxXML = regexp.MustCompile("[/+]xml$")
+
 func (r *RequestContainer) concatenate() string {
 	var buffer bytes.Buffer
 
@@ -56,9 +143,49 @@ func (r *RequestContainer) concatenate() string {
 	buffer.WriteString(r.Details.Path)
 	buffer.WriteString(r.Details.Method)
 	buffer.WriteString(r.Details.Query)
-	buffer.WriteString(r.Details.Body)
+	if len(r.Details.Body) > 0 {
+		ct := r.getContentType()
+
+		if ct == contentTypeJSON || ct == contentTypeXML {
+			buffer.WriteString(r.minifyBody(ct))
+		} else {
+			log.WithFields(log.Fields{
+				"content-type": r.Details.Headers["Content-Type"],
+			}).Debug("unknown content type")
+
+			buffer.WriteString(r.Details.Body)
+		}
+	}
 
 	return buffer.String()
+}
+
+func (r *RequestContainer) minifyBody(mediaType string) (minified string) {
+	var err error
+	minified, err = r.Minifier.String(mediaType, r.Details.Body)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":       err.Error(),
+			"destination": r.Details.Destination,
+			"path":        r.Details.Path,
+			"method":      r.Details.Method,
+		}).Errorf("failed to minify request body, media type given: %s. Request matching might fail", mediaType)
+		return r.Details.Body
+	}
+	log.Debugf("body minified, mediatype: %s", mediaType)
+	return minified
+}
+
+func (r *RequestContainer) getContentType() string {
+	for _, v := range r.Details.Headers["Content-Type"] {
+		if rxJSON.MatchString(v) {
+			return contentTypeJSON
+		}
+		if rxXML.MatchString(v) {
+			return contentTypeXML
+		}
+	}
+	return otherType
 }
 
 // Hash returns unique hash key for request
@@ -300,7 +427,7 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, respBody []byte) {
 	// record request here
-	key := getRequestFingerprint(req, reqBody)
+	key := d.getRequestFingerprint(req, reqBody)
 
 	if resp == nil {
 		resp = emptyResp
@@ -365,16 +492,17 @@ func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, 
 }
 
 // getRequestFingerprint returns request hash
-func getRequestFingerprint(req *http.Request, requestBody []byte) string {
+func (d *DBClient) getRequestFingerprint(req *http.Request, requestBody []byte) string {
 	details := RequestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
 		Destination: req.Host,
 		Query:       req.URL.RawQuery,
 		Body:        string(requestBody),
+		Headers:     req.Header,
 	}
 
-	r := RequestContainer{Details: details}
+	r := RequestContainer{Details: details, Minifier: d.MIN}
 	return r.Hash()
 }
 
@@ -393,7 +521,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 		}).Error("Got error when reading request body")
 	}
 
-	key := getRequestFingerprint(req, reqBody)
+	key := d.getRequestFingerprint(req, reqBody)
 
 	payloadBts, err := d.Cache.Get([]byte(key))
 

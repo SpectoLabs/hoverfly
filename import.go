@@ -11,6 +11,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"net/http"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -116,14 +117,34 @@ func (d *DBClient) ImportFromURL(url string) error {
 	return d.ImportPayloads(requests.Data)
 }
 
+func isJSON(s string) bool {
+	var js map[string]interface{}
+	return json.Unmarshal([]byte(s), &js) == nil
+
+}
+
 // ImportPayloads - a function to save given payloads into the database.
 func (d *DBClient) ImportPayloads(payloads []Payload) error {
 	if len(payloads) > 0 {
 		success := 0
 		failed := 0
 		for _, pl := range payloads {
+			if len(pl.Request.Headers) == 0 {
+				pl.Request.Headers = make(map[string][]string)
+			}
+
+			if _, present := pl.Request.Headers["Content-Type"]; !present {
+				// sniffing content types
+				if isJSON(pl.Request.Body) {
+					pl.Request.Headers["Content-Type"] = []string{"application/json"}
+				} else {
+					ct := http.DetectContentType([]byte(pl.Request.Body))
+					pl.Request.Headers["Content-Type"] = []string{ct}
+				}
+			}
+
 			// recalculating request hash and storing it in database
-			r := RequestContainer{Details: pl.Request}
+			r := RequestContainer{Details: pl.Request, Minifier: d.MIN}
 			key := r.Hash()
 
 			// regenerating key

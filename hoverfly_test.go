@@ -2,10 +2,13 @@ package hoverfly
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/backends/boltdb"
 )
 
 func TestGetNewHoverflyCheckConfig(t *testing.T) {
@@ -13,16 +16,31 @@ func TestGetNewHoverflyCheckConfig(t *testing.T) {
 	cfg := InitSettings()
 	cfg.DatabaseName = "testing2.db"
 	// getting boltDB
-	db := GetDB(cfg.DatabaseName)
-	cache := NewBoltDBCache(db, []byte(RequestsBucketName))
+	db := boltdb.GetDB(cfg.DatabaseName)
+	cache := boltdb.NewBoltDBCache(db, []byte(boltdb.RequestsBucketName))
 	defer cache.CloseDB()
 
-	_, dbClient := GetNewHoverfly(cfg, cache)
+	dbClient := GetNewHoverfly(cfg, cache)
 
 	expect(t, dbClient.Cfg, cfg)
 
 	// deleting this database
 	os.Remove(cfg.DatabaseName)
+}
+
+func TestGetNewHoverfly(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	dbClient.Cfg.ProxyPort = "6666"
+
+	err := dbClient.StartProxy()
+	expect(t, err, nil)
+
+	newResponse, err := http.Get(fmt.Sprintf("http://localhost:%s/", dbClient.Cfg.ProxyPort))
+	expect(t, err, nil)
+	expect(t, newResponse.StatusCode, 500)
+
 }
 
 func TestProcessCaptureRequest(t *testing.T) {
