@@ -28,3 +28,6 @@
 [submodule "goproxy"]
     path = vendor/github.com/rusenask/goproxy
     url = https://github.com/rusenask/goproxy
+[submodule "minify"]
+    path = vendor/github.com/tdewolff/minify
+    url = https://github.com/tdewolff/minify
