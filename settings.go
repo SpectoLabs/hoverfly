@@ -10,12 +10,11 @@ import (
 
 // Configuration - initial structure of configuration
 type Configuration struct {
-	AdminPort    string
-	ProxyPort    string
-	Mode         string
-	Destination  string
-	Middleware   string
-	DatabaseName string
+	AdminPort   string
+	ProxyPort   string
+	Mode        string
+	Destination string
+	Middleware  string
 
 	TlsVerification bool
 
@@ -97,7 +96,6 @@ func InitSettings() *Configuration {
 	if databaseName == "" {
 		databaseName = DefaultDatabaseName
 	}
-	appConfig.DatabaseName = databaseName
 
 	if os.Getenv(HoverflySecretEV) != "" {
 		appConfig.SecretKey = []byte(os.Getenv(HoverflySecretEV))

@@ -80,7 +80,7 @@ func (backend *JWTAuthenticationBackend) GenerateToken(userUUID, username string
 }
 
 func (backend *JWTAuthenticationBackend) Authenticate(user *backends.User) bool {
-	dbUser, err := backend.AuthBackend.GetUser([]byte(user.Username))
+	dbUser, err := backend.AuthBackend.GetUser(user.Username)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":    err.Error(),
@@ -113,12 +113,12 @@ func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp int
 
 func (backend *JWTAuthenticationBackend) Logout(tokenString string, token *jwt.Token) error {
 	// TODO: add value as a timestamp when to delete it for cleanup
-	return backend.AuthBackend.SetValue([]byte(tokenString), []byte("whentoexpire"))
+	return backend.AuthBackend.TokenCache.Set([]byte(tokenString), []byte("whentoexpire"))
 }
 
 func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
 
-	redisToken, _ := backend.AuthBackend.GetValue([]byte(token))
+	redisToken, _ := backend.AuthBackend.TokenCache.Get([]byte(token))
 
 	if redisToken == nil {
 		return false
