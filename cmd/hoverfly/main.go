@@ -24,11 +24,16 @@ import (
 	hv "github.com/SpectoLabs/hoverfly"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/backends/boltdb"
+	hvc "github.com/SpectoLabs/hoverfly/certs"
+	"github.com/rusenask/goproxy"
 
 	"flag"
 	"fmt"
 	"os"
 	"strings"
+	"crypto/tls"
+	"time"
+	"encoding/pem"
 )
 
 type arrayFlags []string
@@ -90,6 +95,13 @@ func main() {
 	// TODO: this should be enabled by default when UI and documentation is ready
 	authEnabled := flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
 
+	generateCA := flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
+	certName := flag.String("cert-name", "hoverfly.proxy", "cert name")
+	certOrg := flag.String("cert-org", "Hoverfly Authority", "organisation name for new cert")
+
+	cert := flag.String("cert", "", "CA certificate used to sign MITM certificates")
+	key := flag.String("key", "", "private key of the CA used to sign MITM certificates")
+
 	flag.Parse()
 
 	// getting settings
@@ -104,6 +116,45 @@ func main() {
 	if *dev {
 		// making text pretty
 		log.SetFormatter(&log.TextFormatter{})
+	}
+
+	if *generateCA {
+		validity := 365 * 24 * time.Hour
+		x509c, priv, err := hvc.NewCertificatePair(*certName, *certOrg, validity)
+		if err != nil {
+			log.Fatalf("Failed to generate certificate and key pair, got error: %s", err.Error())
+		}
+
+		certOut, err := os.Create("cert.pem")
+		if err != nil {
+			log.Fatalf("failed to open cert.pem for writing: %s", err.Error())
+		}
+		pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: x509c.Raw})
+		certOut.Close()
+		log.Print("cert.pem created\n")
+
+
+		keyOut, err := os.OpenFile("key.pem", os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0600)
+		if err != nil {
+			log.Fatalf("failed to open key.pem for writing: %s", err.Error())
+		}
+		pem.Encode(keyOut, hvc.PemBlockForKey(priv))
+		keyOut.Close()
+		log.Print("key.pem created.\n")
+
+		tlsc, err := hvc.GetTlsCertificate(x509c, priv, "hoverfly.proxy", validity); if err != nil {
+			log.Fatalf("failed to get tls certificate: %s", err.Error())
+		}
+		goproxy.GoproxyCa = *tlsc
+
+	} else if *cert != "" && *key != "" {
+		tlsc, err := tls.LoadX509KeyPair(*cert, *key)
+		if err != nil {
+			log.Fatalf("Failed to load certifiate and key pair, got error: %s", err.Error())
+		}
+
+		goproxy.GoproxyCa = tlsc
+
 	}
 
 	// overriding environment variables (proxy and admin ports)
@@ -225,7 +276,7 @@ func main() {
 						"import": v,
 					}).Fatal("Failed to import given resource")
 				} else {
-					err = dbClient.MD.Set(fmt.Sprintf("import_%d", i+1), v)
+					err = dbClient.MD.Set(fmt.Sprintf("import_%d", i + 1), v)
 				}
 
 			}
