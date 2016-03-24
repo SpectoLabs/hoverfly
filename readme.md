@@ -148,6 +148,18 @@ turn off verification. With curl you can make insecure requests with -k:
 
     curl https://www.bbc.co.uk --proxy http://localhost:8500 -k
 
+
+### Turning off certificate verification (Hoverfly will be happy with untrusted certificates)
+
+You can specify Hoverfly to ignore untrusted certificates when it's capturing or modifying traffic through command line flag:
+
+    ./hoverfly -tls-verification=false
+    
+Or you can also do it through environment variable 'HoverflyTlsVerification' like this:
+
+    export HoverflyTlsVerification=false
+
+
 ## API
 
 ### Usage
