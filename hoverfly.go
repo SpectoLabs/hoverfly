@@ -13,6 +13,7 @@ import (
 	"net"
 	"net/http"
 	"regexp"
+	"crypto/tls"
 )
 
 // VirtualizeMode - default mode when Hoverfly looks for captured requests to respond
@@ -42,9 +43,14 @@ func GetNewHoverfly(cfg *Configuration, cache Cache) DBClient {
 
 	m := GetNewMinifiers()
 
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.TlsVerification},
+	}
+	client := &http.Client{Transport: tr}
+
 	d := DBClient{
 		Cache:   cache,
-		HTTP:    &http.Client{},
+		HTTP:    client,
 		Cfg:     cfg,
 		Counter: counter,
 		Hooks:   make(ActionTypeHooks),
