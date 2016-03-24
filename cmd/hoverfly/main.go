@@ -33,7 +33,6 @@ import (
 	"strings"
 	"crypto/tls"
 	"time"
-	//"encoding/pem"
 )
 
 type arrayFlags []string
@@ -73,6 +72,7 @@ var (
 	certOrg = flag.String("cert-org", "Hoverfly Authority", "organisation name for new cert")
 	cert = flag.String("cert", "", "CA certificate used to sign MITM certificates")
 	key = flag.String("key", "", "private key of the CA used to sign MITM certificates")
+	tlsVerification = flag.Bool("tls-verification", true, "turn on/off tls verification for outgoing requests (will not try to verify certificates) - defaults to true")
 )
 
 func main() {
@@ -173,6 +173,12 @@ func main() {
 	// enabling authentication if flag or env variable is set to 'true'
 	if cfg.AuthEnabled || *authEnabled {
 		cfg.AuthEnabled = true
+	}
+
+	// disabling tls verification if flag or env variable is set to 'false' (defaults to true)
+	if !cfg.TlsVerification || !*tlsVerification {
+		cfg.TlsVerification = false
+		log.Info("tls certificate verification is now turned off!")
 	}
 
 	if len(destinationFlags) > 0 {
