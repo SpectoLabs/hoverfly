@@ -33,7 +33,7 @@ import (
 	"strings"
 	"crypto/tls"
 	"time"
-	"encoding/pem"
+	//"encoding/pem"
 )
 
 type arrayFlags []string
@@ -96,31 +96,10 @@ func main() {
 	}
 
 	if *generateCA {
-		validity := 365 * 24 * time.Hour
-		x509c, priv, err := hvc.NewCertificatePair(*certName, *certOrg, validity)
-		if err != nil {
-			log.Fatalf("Failed to generate certificate and key pair, got error: %s", err.Error())
-		}
-
-		certOut, err := os.Create("cert.pem")
-		if err != nil {
-			log.Fatalf("failed to open cert.pem for writing: %s", err.Error())
-		}
-		pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: x509c.Raw})
-		certOut.Close()
-		log.Print("cert.pem created\n")
-
-
-		keyOut, err := os.OpenFile("key.pem", os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0600)
-		if err != nil {
-			log.Fatalf("failed to open key.pem for writing: %s", err.Error())
-		}
-		pem.Encode(keyOut, hvc.PemBlockForKey(priv))
-		keyOut.Close()
-		log.Print("key.pem created.\n")
-
-		tlsc, err := hvc.GetTlsCertificate(x509c, priv, "hoverfly.proxy", validity); if err != nil {
-			log.Fatalf("failed to get tls certificate: %s", err.Error())
+		tlsc, err := hvc.GenerateAndSave(*certName, *certOrg, 365 * 24 * time.Hour); if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Fatal("failed to generate certificate.")
 		}
 		goproxy.GoproxyCa = *tlsc
 
