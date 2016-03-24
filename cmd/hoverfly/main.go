@@ -50,58 +50,35 @@ func (i *arrayFlags) Set(value string) error {
 var importFlags arrayFlags
 var destinationFlags arrayFlags
 
+var (
+	verbose = flag.Bool("v", false, "should every proxy request be logged to stdout")
+	capture = flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
+	synthesize = flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
+	modify = flag.Bool("modify", false, "start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic")
+	middleware = flag.String("middleware", "", "should proxy use middleware")
+	proxyPort = flag.String("pp", "", "proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
+	adminPort = flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
+	database = flag.String("db", "", "database location - supply it if you want to provide specific to database (will be created there if it doesn't exist)")
+	wipeDb = flag.Bool("wipedb", false, "supply -wipedb flag to delete all records from given database on startup")
+	metrics = flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
+	dev = flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
+	destination = flag.String("destination", ".", "destination URI to catch")
+	addNew = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
+	addUser = flag.String("username", "", "username for new user")
+	addPassword = flag.String("password", "", "password for new user")
+	isAdmin = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
+	authEnabled = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
+	generateCA = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
+	certName = flag.String("cert-name", "hoverfly.proxy", "cert name")
+	certOrg = flag.String("cert-org", "Hoverfly Authority", "organisation name for new cert")
+	cert = flag.String("cert", "", "CA certificate used to sign MITM certificates")
+	key = flag.String("key", "", "private key of the CA used to sign MITM certificates")
+)
+
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
-
-	// getting proxy configuration
-	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
-	// modes
-	capture := flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
-	synthesize := flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
-	modify := flag.Bool("modify", false, "start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic")
-
-	middleware := flag.String("middleware", "", "should proxy use middleware")
-
-	// proxy port
-	proxyPort := flag.String("pp", "", "proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
-	// admin port
-	adminPort := flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
-
-	// database location
-	database := flag.String("db", "", "database location - supply it if you want to provide specific to database (will be created there if it doesn't exist)")
-
-	// delete current database on startup
-	wipeDb := flag.Bool("wipedb", false, "supply -wipedb flag to delete all records from given database on startup")
-
-	// metrics
-	metrics := flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
-
-	// development
-	dev := flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
-
-	// import flag
 	flag.Var(&importFlags, "import", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
-
-	// destination configuration
-	destination := flag.String("destination", ".", "destination URI to catch")
 	flag.Var(&destinationFlags, "dest", "specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
-
-	// adding new user
-	addNew := flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
-	addUser := flag.String("username", "", "username for new user")
-	addPassword := flag.String("password", "", "password for new user")
-	isAdmin := flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
-
-	// TODO: this should be enabled by default when UI and documentation is ready
-	authEnabled := flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
-
-	generateCA := flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
-	certName := flag.String("cert-name", "hoverfly.proxy", "cert name")
-	certOrg := flag.String("cert-org", "Hoverfly Authority", "organisation name for new cert")
-
-	cert := flag.String("cert", "", "CA certificate used to sign MITM certificates")
-	key := flag.String("key", "", "private key of the CA used to sign MITM certificates")
-
 	flag.Parse()
 
 	// getting settings
