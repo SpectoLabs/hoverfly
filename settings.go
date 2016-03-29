@@ -17,6 +17,8 @@ type Configuration struct {
 	Middleware   string
 	DatabaseName string
 
+	TlsVerification bool
+
 	Verbose     bool
 	Development bool
 
@@ -68,6 +70,8 @@ const (
 
 	HoverflyDBEV         = "HoverflyDB"
 	HoverflyMiddlewareEV = "HoverflyMiddleware"
+
+	HoverflyTLSVerification = "HoverflyTlsVerification"
 )
 
 // InitSettings gets and returns initial configuration from env
@@ -125,6 +129,12 @@ func InitSettings() *Configuration {
 
 	// middleware configuration
 	appConfig.Middleware = os.Getenv(HoverflyMiddlewareEV)
+
+	if os.Getenv(HoverflyTLSVerification) == "false" {
+		appConfig.TlsVerification = false
+	} else {
+		appConfig.TlsVerification = true
+	}
 
 	return &appConfig
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 	"reflect"
 	"crypto/x509"
+	"os"
 )
 
 func TestNewCert(t *testing.T) {
@@ -79,6 +80,31 @@ func TestTlsCert(t *testing.T) {
 	}
 	if err := x509c.VerifyHostname("hoverfly.proxy"); err != nil {
 		t.Errorf("x509c.VerifyHostname(%q): got %v, want no error", "certy.com", err)
+	}
+
+}
+
+func TestGenerateAndSave(t *testing.T) {
+	tlsc, err := GenerateAndSave("certy", "cert authority", 1 * 24 * time.Hour)
+	if err != nil {
+		t.Errorf("Failed to generate tls certificate, got error: %s", err.Error())
+	}
+	x509c := tlsc.Leaf
+	if x509c == nil {
+		t.Errorf("x509c: got nil, want *x509.Certificate")
+	}
+
+	if _, err := os.Stat("cert.pem"); os.IsNotExist(err) {
+		t.Errorf("expected to find it but cert.pem was not created!")
+	} else {
+		os.Remove("cert.pem")
+	}
+
+
+	if _, err := os.Stat("key.pem"); os.IsNotExist(err) {
+		t.Errorf("expected to find it but key.pem was not created!")
+	} else {
+		os.Remove("key.pem")
 	}
 
 }
