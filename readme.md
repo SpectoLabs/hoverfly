@@ -132,11 +132,32 @@ The example below changes the destination host to "mirage.readthedocs.org" and s
 
     ./hoverfly --modify --middleware "../../examples/middleware/modify_request/modify_request.py
 
-## HTTPS capture
+## HTTPS capture 
 
-Add ca.pem to your trusted certificates or turn off verification. With curl you can make insecure requests with -k:
+Hoverfly can generate public and private keys:
+
+    ./hoverfly -generate-ca-cert
+
+'cert.pem' and 'key.pem' should appear in your current directory. Add cert.pem to your trusted certificates. Next time when you run Hoverfly -
+specify this key and certificate:
+
+    ./hoverfly -cert cert.pem -key key.pem
+
+You can also use default certificate that is inside Hoverfly. Add cert.pem from project root to your trusted certificates or 
+turn off verification. With curl you can make insecure requests with -k:
 
     curl https://www.bbc.co.uk --proxy http://localhost:8500 -k
+
+
+### Turning off certificate verification (Hoverfly will be happy with untrusted certificates)
+
+You can specify Hoverfly to ignore untrusted certificates when it's capturing or modifying traffic through command line flag:
+
+    ./hoverfly -tls-verification=false
+    
+Or you can also do it through environment variable 'HoverflyTlsVerification' like this:
+
+    export HoverflyTlsVerification=false
 
 
 ## API
