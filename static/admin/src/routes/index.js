@@ -13,6 +13,6 @@ import ModeView from 'views/ModeView/ModeView'
 export default (store) => (
   <Route path='/' component={CoreLayout}>
     <IndexRoute component={HomeView} />
-    <Route path='modes' component={ModeView} />
+    <Route path='/modes' component={ModeView} />
   </Route>
 )

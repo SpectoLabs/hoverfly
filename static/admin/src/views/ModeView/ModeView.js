@@ -1,7 +1,7 @@
 /* @flow */
 import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {increment, doubleAsync} from '../../redux/modules/counter'
+import {setMode} from '../../redux/modules/modes'
 import classes from './ModeView.scss'
 
 // We can use Flow (http://flowtype.org/) to type our component's props
@@ -12,36 +12,51 @@ import classes from './ModeView.scss'
 // code, or `npm i -g flow-bin` to have access to the binary globally.
 // Sorry Windows users :(.
 type Props = {
-  counter: number,
-  doubleAsync: Function,
-  increment: Function
+  mode: string,
+  setMode: Function
 };
 
 // We avoid using the `@connect` decorator on the class definition so
 // that we can export the undecorated component for testing.
 // See: http://rackt.github.io/redux/docs/recipes/WritingTests.html
-export class HomeView extends React.Component<void, Props, void> {
+export class ModeView extends React.Component<void, Props, void> {
   static propTypes = {
-    counter: PropTypes.number.isRequired,
-    doubleAsync: PropTypes.func.isRequired,
-    increment: PropTypes.func.isRequired
+    mode: PropTypes.string.isRequired,
+    setMode: PropTypes.func.isRequired
   };
 
+  constructor (props) {
+    super(props)
+    this.virtualize = this.virtualize.bind(this)
+    this.capture = this.capture.bind(this)
+  }
+
+  virtualize () {
+    console.log('virtualize clicked')
+    this.props.setMode('virtualize')
+  }
+
+  capture () {
+    console.log('capture clicked')
+    this.props.setMode('capture')
+  }
+
   render () {
+    console.log(this.props)
     return (
       <div className='container text-center'>
         <h1>Modes</h1>
         <h2>
-          Sample Counter:
+          Current:
           {' '}
-          <span className={classes['counter--green']}>{this.props.counter}</span>
+          <span className={classes['counter--green']}>{this.props.mode}</span>
         </h2>
-        <button className='btn btn-default' onClick={this.props.increment}>
-          Increment
+        <button className='btn btn-default' onClick={this.virtualize}>
+          Virtualize
         </button>
         {' '}
-        <button className='btn btn-default' onClick={this.props.doubleAsync}>
-          Double (Async)
+        <button className='btn btn-default' onClick={this.capture}>
+          Capture
         </button>
       </div>
     )
@@ -49,9 +64,9 @@ export class HomeView extends React.Component<void, Props, void> {
 }
 
 const mapStateToProps = (state) => ({
-  counter: state.counter
+  mode: state.modes
 })
+
 export default connect((mapStateToProps), {
-  increment: () => increment(1),
-  doubleAsync
-})(HomeView)
+  setMode
+})(ModeView)
