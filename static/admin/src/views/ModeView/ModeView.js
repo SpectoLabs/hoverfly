@@ -2,7 +2,7 @@
 import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {increment, doubleAsync} from '../../redux/modules/counter'
-import classes from './HomeView.scss'
+import classes from './ModeView.scss'
 
 // We can use Flow (http://flowtype.org/) to type our component's props
 // and state. For convenience we've included both regular propTypes and
@@ -30,7 +30,7 @@ export class HomeView extends React.Component<void, Props, void> {
   render () {
     return (
       <div className='container text-center'>
-        <h1>Hoverfly Admin</h1>
+        <h1>Modes</h1>
         <h2>
           Sample Counter:
           {' '}
