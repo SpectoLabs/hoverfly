@@ -49,7 +49,7 @@ func (d *Hoverfly) UpdateDestination(destination string) (err error) {
 	d.mu.Lock()
 	d.StopProxy()
 	d.Cfg.Destination = destination
-	d.RestartProxy()
+	d.UpdateProxy()
 	err = d.StartProxy()
 	d.mu.Unlock()
 	return
@@ -63,7 +63,7 @@ func (d *Hoverfly) StartProxy() error {
 	}
 
 	if d.Proxy == nil {
-		d.RestartProxy()
+		d.UpdateProxy()
 	}
 
 	log.WithFields(log.Fields{
