@@ -15,19 +15,21 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/cache"
+	"github.com/SpectoLabs/hoverfly/metrics"
 	"github.com/rusenask/goproxy"
 	"github.com/tdewolff/minify"
 )
 
-// DBClient provides access to cache, http client and configuration
-type DBClient struct {
-	Cache   Cache
-	HTTP    *http.Client
-	Cfg     *Configuration
-	Counter *CounterByMode
-	Hooks   ActionTypeHooks
-	AB      backends.AuthBackend
-	MD      Metadata
+// Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
+type Hoverfly struct {
+	RequestCache   cache.Cache
+	MetadataCache  cache.Cache
+	Authentication backends.AuthBackend
+	HTTP           *http.Client
+	Cfg            *Configuration
+	Counter        *metrics.CounterByMode
+	Hooks          ActionTypeHooks
 
 	Proxy *goproxy.ProxyHttpServer
 	SL    *StoppableListener
@@ -38,7 +40,7 @@ type DBClient struct {
 }
 
 // UpdateDestination - updates proxy with new destination regexp
-func (d *DBClient) UpdateDestination(destination string) (err error) {
+func (d *Hoverfly) UpdateDestination(destination string) (err error) {
 	_, err = regexp.Compile(destination)
 	if err != nil {
 		return fmt.Errorf("destination is not a valid regular expression string")
@@ -54,7 +56,7 @@ func (d *DBClient) UpdateDestination(destination string) (err error) {
 }
 
 // StartProxy - starts proxy with current configuration, this method is non blocking.
-func (d *DBClient) StartProxy() error {
+func (d *Hoverfly) StartProxy() error {
 
 	if d.Cfg.ProxyPort == "" {
 		return fmt.Errorf("Proxy port is not set!")
@@ -99,13 +101,13 @@ func (d *DBClient) StartProxy() error {
 }
 
 // StopProxy - stops proxy
-func (d *DBClient) StopProxy() {
+func (d *Hoverfly) StopProxy() {
 	d.SL.Stop()
 	d.Cfg.ProxyControlWG.Wait()
 }
 
 // AddHook - adds a hook to DBClient
-func (d *DBClient) AddHook(hook Hook) {
+func (d *Hoverfly) AddHook(hook Hook) {
 	d.Hooks.Add(hook)
 }
 
@@ -235,7 +237,7 @@ func decodePayload(data []byte) (*Payload, error) {
 }
 
 // captureRequest saves request for later playback
-func (d *DBClient) captureRequest(req *http.Request) (*http.Response, error) {
+func (d *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 
 	// this is mainly for testing, since when you create
 	if req.Body == nil {
@@ -364,7 +366,7 @@ func getRequestDetails(req *http.Request) (requestObj RequestDetails, err error)
 }
 
 // doRequest performs original request and returns response that should be returned to client and error (if there is one)
-func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
+func (d *Hoverfly) doRequest(request *http.Request) (*http.Response, error) {
 
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
@@ -425,7 +427,7 @@ func (d *DBClient) doRequest(request *http.Request) (*http.Response, error) {
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, respBody []byte) {
+func (d *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, respBody []byte) {
 	// record request here
 	key := d.getRequestFingerprint(req, reqBody)
 
@@ -486,13 +488,13 @@ func (d *DBClient) save(req *http.Request, reqBody []byte, resp *http.Response, 
 				"error": err.Error(),
 			}).Error("Failed to serialize payload")
 		} else {
-			d.Cache.Set([]byte(key), bts)
+			d.RequestCache.Set([]byte(key), bts)
 		}
 	}
 }
 
 // getRequestFingerprint returns request hash
-func (d *DBClient) getRequestFingerprint(req *http.Request, requestBody []byte) string {
+func (d *Hoverfly) getRequestFingerprint(req *http.Request, requestBody []byte) string {
 	details := RequestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
@@ -507,7 +509,7 @@ func (d *DBClient) getRequestFingerprint(req *http.Request, requestBody []byte) 
 }
 
 // getResponse returns stored response from cache
-func (d *DBClient) getResponse(req *http.Request) *http.Response {
+func (d *Hoverfly) getResponse(req *http.Request) *http.Response {
 
 	if req.Body == nil {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
@@ -523,7 +525,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 
 	key := d.getRequestFingerprint(req, reqBody)
 
-	payloadBts, err := d.Cache.Get([]byte(key))
+	payloadBts, err := d.RequestCache.Get([]byte(key))
 
 	if err == nil {
 		// getting cache response
@@ -547,7 +549,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 
 		log.WithFields(log.Fields{
 			"key":         key,
-			"mode":        "virtualize",
+			"mode":        VirtualizeMode,
 			"middleware":  d.Cfg.Middleware,
 			"path":        req.URL.Path,
 			"rawQuery":    req.URL.RawQuery,
@@ -575,7 +577,7 @@ func (d *DBClient) getResponse(req *http.Request) *http.Response {
 
 // modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response
 // is saved to cache.
-func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (*http.Response, error) {
+func (d *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) (*http.Response, error) {
 
 	// getting request details
 	rd, err := getRequestDetails(req)
@@ -626,7 +628,7 @@ func (d *DBClient) modifyRequestResponse(req *http.Request, middleware string) (
 	log.WithFields(log.Fields{
 		"status":      newResponse.StatusCode,
 		"middleware":  middleware,
-		"mode":        "modify",
+		"mode":        ModifyMode,
 		"path":        c.payload.Request.Path,
 		"rawQuery":    c.payload.Request.Query,
 		"method":      c.payload.Request.Method,

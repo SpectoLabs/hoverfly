@@ -1,4 +1,4 @@
-package boltdb
+package cache
 
 import (
 	"bytes"
@@ -23,25 +23,6 @@ const RequestsBucketName = "rqbucket"
 type BoltCache struct {
 	DS            *bolt.DB
 	CurrentBucket []byte
-}
-
-// GetDB - returns open BoltDB database with read/write permissions or goes down in flames if
-// something bad happends
-func GetDB(name string) *bolt.DB {
-	log.WithFields(log.Fields{
-		"databaseName": name,
-	}).Info("Initiating database")
-	db, err := bolt.Open(name, 0600, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return db
-}
-
-// CloseDB - closes database
-func (c *BoltCache) CloseDB() {
-	c.DS.Close()
 }
 
 // Set - saves given key and value pair to cache
@@ -201,4 +182,18 @@ func (c *BoltCache) GetAllKeys() (keys map[string]bool, err error) {
 		return nil
 	})
 	return
+}
+
+// GetDB - returns open BoltDB database with read/write permissions or goes down in flames if
+// something bad happends
+func GetDB(name string) *bolt.DB {
+	log.WithFields(log.Fields{
+		"databaseName": name,
+	}).Info("Initiating database")
+	db, err := bolt.Open(name, 0600, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db
 }

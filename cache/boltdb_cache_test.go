@@ -1,4 +1,4 @@
-package boltdb
+package cache
 
 import (
 	"os"

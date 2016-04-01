@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"github.com/SpectoLabs/hoverfly/testutil"
 	"net/http"
 	"testing"
 )
@@ -8,30 +9,30 @@ import (
 func TestSynthesizeResponse(t *testing.T) {
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	sr, err := SynthesizeResponse(req, "./examples/middleware/synthetic_service/synthetic.py")
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
-	expect(t, sr.StatusCode, 200)
+	testutil.Expect(t, sr.StatusCode, 200)
 }
 
 func TestSynthesizeResponseWOMiddleware(t *testing.T) {
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	_, err = SynthesizeResponse(req, "")
-	refute(t, err, nil)
+	testutil.Refute(t, err, nil)
 
-	expect(t, err.Error(), "Synthesize failed, middleware not provided")
+	testutil.Expect(t, err.Error(), "Synthesize failed, middleware not provided")
 }
 
 func TestSynthesizeMiddlewareFailure(t *testing.T) {
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	_, err = SynthesizeResponse(req, "./examples/middleware/this_is_not_there.py")
-	refute(t, err, nil)
+	testutil.Refute(t, err, nil)
 }

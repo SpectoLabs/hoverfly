@@ -2,6 +2,7 @@ package hoverfly
 
 import (
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/testutil"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -21,13 +22,13 @@ func TestHoverflyListener(t *testing.T) {
 
 	// checking whether it's running
 	response, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
-	expect(t, response.StatusCode, 500)
+	testutil.Expect(t, response.StatusCode, 500)
 
 	body, err := ioutil.ReadAll(response.Body)
-	expect(t, err, nil)
-	expect(t, strings.Contains(string(body), "is a proxy server"), true)
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, strings.Contains(string(body), "is a proxy server"), true)
 }
 
 func TestStopHoverflyListener(t *testing.T) {
@@ -46,7 +47,7 @@ func TestStopHoverflyListener(t *testing.T) {
 	// checking whether it's stopped
 	_, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
 	// should get error
-	refute(t, err, nil)
+	testutil.Refute(t, err, nil)
 }
 
 func TestRestartHoverflyListener(t *testing.T) {
@@ -62,9 +63,9 @@ func TestRestartHoverflyListener(t *testing.T) {
 
 	// checking whether it's running
 	response, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
-	expect(t, response.StatusCode, 500)
+	testutil.Expect(t, response.StatusCode, 500)
 
 	// stopping proxy
 	dbClient.StopProxy()
@@ -73,6 +74,6 @@ func TestRestartHoverflyListener(t *testing.T) {
 	dbClient.StartProxy()
 
 	newResponse, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
-	expect(t, err, nil)
-	expect(t, newResponse.StatusCode, 500)
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, newResponse.StatusCode, 500)
 }

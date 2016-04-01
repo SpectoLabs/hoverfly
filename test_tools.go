@@ -7,12 +7,11 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"reflect"
-	"testing"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/backends/boltdb"
+	"github.com/SpectoLabs/hoverfly/cache"
+	"github.com/SpectoLabs/hoverfly/metrics"
 	"github.com/boltdb/bolt"
 )
 
@@ -30,22 +29,10 @@ type Client struct {
 	HTTPClient *http.Client
 }
 
-func expect(t *testing.T, a interface{}, b interface{}) {
-	if a != b {
-		t.Errorf("Expected %v (type %v) - Got %v (type %v)", b, reflect.TypeOf(b), a, reflect.TypeOf(a))
-	}
-}
-
-func refute(t *testing.T, a interface{}, b interface{}) {
-	if a == b {
-		t.Errorf("Did not expect %v (type %v) - Got %v (type %v)", b, reflect.TypeOf(b), a, reflect.TypeOf(a))
-	}
-}
-
 // TestDB - holds connection to database during tests
 var TestDB *bolt.DB
 
-func testTools(code int, body string) (*httptest.Server, *DBClient) {
+func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(code)
@@ -62,24 +49,19 @@ func testTools(code int, body string) (*httptest.Server, *DBClient) {
 	bucket := GetRandomName(10)
 	metaBucket := GetRandomName(10)
 
-	cache := boltdb.NewBoltDBCache(TestDB, bucket)
-	metaCache := boltdb.NewBoltDBCache(TestDB, metaBucket)
-
-	md := NewMetadata(metaCache)
+	requestCache := cache.NewBoltDBCache(TestDB, bucket)
+	metaCache := cache.NewBoltDBCache(TestDB, metaBucket)
 
 	cfg := InitSettings()
-	counter := NewModeCounter()
-
-	m := GetNewMinifiers()
 
 	// preparing client
-	dbClient := &DBClient{
-		HTTP:    &http.Client{Transport: tr},
-		Cache:   cache,
-		Cfg:     cfg,
-		Counter: counter,
-		MD:      md,
-		MIN:     m,
+	dbClient := &Hoverfly{
+		HTTP:          &http.Client{Transport: tr},
+		RequestCache:  requestCache,
+		Cfg:           cfg,
+		Counter:       metrics.NewModeCounter([]string{VirtualizeMode, SynthesizeMode, ModifyMode, CaptureMode}),
+		MetadataCache: metaCache,
+		MIN:           GetNewMinifiers(),
 	}
 	return server, dbClient
 }
@@ -107,7 +89,7 @@ func GetRandomName(n int) []byte {
 func setup() {
 	// we don't really want to see what's happening
 	log.SetLevel(log.FatalLevel)
-	db := boltdb.GetDB(testingDatabaseName)
+	db := cache.GetDB(testingDatabaseName)
 	TestDB = db
 }
 

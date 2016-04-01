@@ -1,4 +1,4 @@
-package hoverfly
+package metrics
 
 import (
 	log "github.com/Sirupsen/logrus"
@@ -9,29 +9,28 @@ import (
 
 // CounterByMode - container for mode counters, registry and flush interval
 type CounterByMode struct {
-	counterVirtualize, counterCapture, counterModify, counterSynthesize metrics.Counter
-	registry                                                            metrics.Registry
-	flushInterval                                                       time.Duration
+	Counters      map[string]metrics.Counter
+	registry      metrics.Registry
+	flushInterval time.Duration
 }
 
 // NewModeCounter - returns new counter instance
-func NewModeCounter() *CounterByMode {
+func NewModeCounter(modes []string) *CounterByMode {
 
 	registry := metrics.NewRegistry()
+	counters := make(map[string]metrics.Counter)
 
-	c := &CounterByMode{
-		counterVirtualize: metrics.NewCounter(),
-		counterCapture:    metrics.NewCounter(),
-		counterModify:     metrics.NewCounter(),
-		counterSynthesize: metrics.NewCounter(),
-		registry:          registry,
-		flushInterval:     5 * time.Second,
+	for _, v := range modes {
+		counter := metrics.NewCounter()
+		counters[v] = counter
+		registry.GetOrRegister(v, counter)
 	}
 
-	c.registry.GetOrRegister(VirtualizeMode, c.counterVirtualize)
-	c.registry.GetOrRegister(CaptureMode, c.counterCapture)
-	c.registry.GetOrRegister(ModifyMode, c.counterModify)
-	c.registry.GetOrRegister(SynthesizeMode, c.counterSynthesize)
+	c := &CounterByMode{
+		Counters:      counters,
+		registry:      registry,
+		flushInterval: 5 * time.Second,
+	}
 
 	log.Debug("new counter created, registration successful")
 
@@ -40,15 +39,7 @@ func NewModeCounter() *CounterByMode {
 
 // Count - counts requests based on mode
 func (c *CounterByMode) Count(mode string) {
-	if mode == VirtualizeMode {
-		c.counterVirtualize.Inc(1)
-	} else if mode == CaptureMode {
-		c.counterCapture.Inc(1)
-	} else if mode == ModifyMode {
-		c.counterModify.Inc(1)
-	} else if mode == SynthesizeMode {
-		c.counterSynthesize.Inc(1)
-	}
+	c.Counters[mode].Inc(1)
 }
 
 // Init initializes logging

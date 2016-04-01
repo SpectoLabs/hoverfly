@@ -3,6 +3,7 @@ package hoverfly
 import (
 	"bytes"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/testutil"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -30,11 +31,11 @@ func TestCaptureHeader(t *testing.T) {
 	defer server.Close()
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	response, err := dbClient.captureRequest(req)
 
-	expect(t, response.Header.Get("hoverfly"), "Was-Here")
+	testutil.Expect(t, response.Header.Get("hoverfly"), "Was-Here")
 }
 
 // TestRequestBodyCaptured tests whether request body is recorded
@@ -48,19 +49,19 @@ func TestRequestBodyCaptured(t *testing.T) {
 	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	_, err = dbClient.captureRequest(req)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	fp := dbClient.getRequestFingerprint(req, requestBody)
 
-	payloadBts, err := dbClient.Cache.Get([]byte(fp))
-	expect(t, err, nil)
+	payloadBts, err := dbClient.RequestCache.Get([]byte(fp))
+	testutil.Expect(t, err, nil)
 
 	payload, err := decodePayload(payloadBts)
-	expect(t, err, nil)
-	expect(t, payload.Request.Body, "fizz=buzz")
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, payload.Request.Body, "fizz=buzz")
 }
 
 func TestRequestBodySentToMiddleware(t *testing.T) {
@@ -75,7 +76,7 @@ func TestRequestBodySentToMiddleware(t *testing.T) {
 	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	resp, err := dbClient.modifyRequestResponse(req, "./examples/middleware/reflect_body/reflect_body.py")
 
@@ -83,8 +84,8 @@ func TestRequestBodySentToMiddleware(t *testing.T) {
 	responseBody, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 
-	expect(t, err, nil)
-	expect(t, string(responseBody), string(requestBody))
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, string(responseBody), string(requestBody))
 
 }
 
@@ -99,7 +100,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 		body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 		request, err := http.NewRequest("POST", "http://capture_body.com", body)
-		expect(t, err, nil)
+		testutil.Expect(t, err, nil)
 
 		resp := ResponseDetails{
 			Status: 200,
@@ -126,8 +127,8 @@ func TestMatchOnRequestBody(t *testing.T) {
 		responseBody, err := ioutil.ReadAll(response.Body)
 		response.Body.Close()
 
-		expect(t, err, nil)
-		expect(t, string(responseBody), fmt.Sprintf("body here, number=%d", i))
+		testutil.Expect(t, err, nil)
+		testutil.Expect(t, string(responseBody), fmt.Sprintf("body here, number=%d", i))
 
 	}
 
@@ -141,7 +142,7 @@ func TestGetNotRecordedRequest(t *testing.T) {
 
 	response := dbClient.getResponse(request)
 
-	expect(t, response.StatusCode, http.StatusPreconditionFailed)
+	testutil.Expect(t, response.StatusCode, http.StatusPreconditionFailed)
 }
 
 // TestRequestFingerprint tests whether we get correct request ID
@@ -150,11 +151,11 @@ func TestRequestFingerprint(t *testing.T) {
 	defer server.Close()
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	fp := dbClient.getRequestFingerprint(req, []byte(""))
 
-	expect(t, fp, "92a65ed4ca2b7100037a4cba9afd15ea")
+	testutil.Expect(t, fp, "92a65ed4ca2b7100037a4cba9afd15ea")
 }
 
 // TestRequestFingerprintBody tests where request body is also used to create unique request ID
@@ -163,11 +164,11 @@ func TestRequestFingerprintBody(t *testing.T) {
 	defer server.Close()
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	fp := dbClient.getRequestFingerprint(req, []byte("some huge XML or JSON here"))
 
-	expect(t, fp, "b3918a54eb6e42652e29e14c21ba8f81")
+	testutil.Expect(t, fp, "b3918a54eb6e42652e29e14c21ba8f81")
 }
 
 func TestScheme(t *testing.T) {
@@ -175,17 +176,17 @@ func TestScheme(t *testing.T) {
 	defer server.Close()
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	originalFp := dbClient.getRequestFingerprint(req, []byte(""))
 
 	httpsReq, err := http.NewRequest("GET", "https://example.com", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	newFp := dbClient.getRequestFingerprint(httpsReq, []byte(""))
 
 	// fingerprint should be the same
-	expect(t, originalFp, newFp)
+	testutil.Expect(t, originalFp, newFp)
 }
 
 func TestDeleteAllRecords(t *testing.T) {
@@ -196,11 +197,11 @@ func TestDeleteAllRecords(t *testing.T) {
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
 		req, err := http.NewRequest("GET", fmt.Sprintf("http://delete_all_records.com/q=%d", i), nil)
-		expect(t, err, nil)
+		testutil.Expect(t, err, nil)
 		dbClient.captureRequest(req)
 	}
-	err := dbClient.Cache.DeleteData()
-	expect(t, err, nil)
+	err := dbClient.RequestCache.DeleteData()
+	testutil.Expect(t, err, nil)
 }
 
 func TestPayloadEncodeDecode(t *testing.T) {
@@ -212,12 +213,12 @@ func TestPayloadEncodeDecode(t *testing.T) {
 	payload := Payload{Response: resp}
 
 	bts, err := payload.Encode()
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	pl, err := decodePayload(bts)
-	expect(t, err, nil)
-	expect(t, pl.Response.Body, resp.Body)
-	expect(t, pl.Response.Status, resp.Status)
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, pl.Response.Body, resp.Body)
+	testutil.Expect(t, pl.Response.Status, resp.Status)
 
 }
 
@@ -225,16 +226,16 @@ func TestPayloadEncodeEmpty(t *testing.T) {
 	payload := Payload{}
 
 	bts, err := payload.Encode()
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	_, err = decodePayload(bts)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 }
 
 func TestDecodeRandomBytes(t *testing.T) {
 	bts := []byte("some random stuff here")
 	_, err := decodePayload(bts)
-	refute(t, err, nil)
+	testutil.Refute(t, err, nil)
 }
 
 func TestModifyRequest(t *testing.T) {
@@ -244,13 +245,13 @@ func TestModifyRequest(t *testing.T) {
 	dbClient.Cfg.Middleware = "./examples/middleware/modify_request/modify_request.py"
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	response, err := dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	// response should be changed to 202
-	expect(t, response.StatusCode, 202)
+	testutil.Expect(t, response.StatusCode, 202)
 
 }
 
@@ -262,13 +263,13 @@ func TestModifyRequestWODestination(t *testing.T) {
 	dbClient.Cfg.Middleware = "./examples/middleware/modify_response/modify_response.py"
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	response, err := dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	// response should be changed to 201
-	expect(t, response.StatusCode, 201)
+	testutil.Expect(t, response.StatusCode, 201)
 
 }
 
@@ -279,10 +280,10 @@ func TestModifyRequestNoMiddleware(t *testing.T) {
 	dbClient.Cfg.Middleware = ""
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	_, err = dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
-	refute(t, err, nil)
+	testutil.Refute(t, err, nil)
 }
 
 func TestGetResponseCorruptedPayload(t *testing.T) {
@@ -295,23 +296,23 @@ func TestGetResponseCorruptedPayload(t *testing.T) {
 	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	_, err = dbClient.captureRequest(req)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	fp := dbClient.getRequestFingerprint(req, requestBody)
 
-	dbClient.Cache.Set([]byte(fp), []byte("you shall not decode me!"))
+	dbClient.RequestCache.Set([]byte(fp), []byte("you shall not decode me!"))
 
 	// repeating process
 	bodyNew := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	reqNew, err := http.NewRequest("POST", "http://capture_body.com", bodyNew)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 	response := dbClient.getResponse(reqNew)
 
-	expect(t, response.StatusCode, http.StatusInternalServerError)
+	testutil.Expect(t, response.StatusCode, http.StatusInternalServerError)
 
 }
 
@@ -328,10 +329,10 @@ func TestDoRequestWFailedMiddleware(t *testing.T) {
 	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	_, err = dbClient.doRequest(req)
-	refute(t, err, nil)
+	testutil.Refute(t, err, nil)
 }
 
 func TestDoRequestFailedHTTP(t *testing.T) {
@@ -344,10 +345,10 @@ func TestDoRequestFailedHTTP(t *testing.T) {
 	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	_, err = dbClient.doRequest(req)
-	refute(t, err, nil)
+	testutil.Refute(t, err, nil)
 
 }
 
@@ -359,7 +360,7 @@ func TestStartProxyWOPort(t *testing.T) {
 	dbClient.Cfg.ProxyPort = ""
 
 	err := dbClient.StartProxy()
-	refute(t, err, nil)
+	testutil.Refute(t, err, nil)
 }
 
 func TestUpdateDestination(t *testing.T) {
@@ -368,10 +369,10 @@ func TestUpdateDestination(t *testing.T) {
 	server.Close()
 	dbClient.Cfg.ProxyPort = "5556"
 	err := dbClient.StartProxy()
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 	dbClient.UpdateDestination("newdest")
 
-	expect(t, dbClient.Cfg.Destination, "newdest")
+	testutil.Expect(t, dbClient.Cfg.Destination, "newdest")
 }
 
 func TestUpdateDestinationEmpty(t *testing.T) {
@@ -381,7 +382,7 @@ func TestUpdateDestinationEmpty(t *testing.T) {
 	dbClient.Cfg.ProxyPort = "5557"
 	dbClient.StartProxy()
 	err := dbClient.UpdateDestination("e^^**#")
-	refute(t, err, nil)
+	testutil.Refute(t, err, nil)
 }
 
 func TestJSONMinifier(t *testing.T) {
@@ -390,13 +391,13 @@ func TestJSONMinifier(t *testing.T) {
 
 	// body can be nil here, it's not reading it from request anyway
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 	req.Header.Add("Content-Type", "application/json")
 
 	fpOne := dbClient.getRequestFingerprint(req, []byte(`{"foo": "bar"}`))
 	fpTwo := dbClient.getRequestFingerprint(req, []byte(`{     "foo":           "bar"}`))
 
-	expect(t, fpOne, fpTwo)
+	testutil.Expect(t, fpOne, fpTwo)
 }
 
 func TestJSONMinifierWOHeader(t *testing.T) {
@@ -405,13 +406,13 @@ func TestJSONMinifierWOHeader(t *testing.T) {
 
 	// body can be nil here, it's not reading it from request anyway
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	// application/json header is not set, shouldn't be equal
 	fpOne := dbClient.getRequestFingerprint(req, []byte(`{"foo": "bar"}`))
 	fpTwo := dbClient.getRequestFingerprint(req, []byte(`{     "foo":           "bar"}`))
 
-	refute(t, fpOne, fpTwo)
+	testutil.Refute(t, fpOne, fpTwo)
 }
 
 var xmlBody = `<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -437,13 +438,13 @@ func TestXMLMinifier(t *testing.T) {
 
 	// body can be nil here, it's not reading it from request anyway
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	req.Header.Add("Content-Type", "application/xml")
 
 	fpOne := dbClient.getRequestFingerprint(req, []byte(xmlBody))
 	fpTwo := dbClient.getRequestFingerprint(req, []byte(xmlBodyTwo))
-	expect(t, fpOne, fpTwo)
+	testutil.Expect(t, fpOne, fpTwo)
 }
 
 func TestXMLMinifierWOHeader(t *testing.T) {
@@ -452,10 +453,10 @@ func TestXMLMinifierWOHeader(t *testing.T) {
 
 	// body can be nil here, it's not reading it from request anyway
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	expect(t, err, nil)
+	testutil.Expect(t, err, nil)
 
 	// application/xml header is not set, shouldn't be equal
 	fpOne := dbClient.getRequestFingerprint(req, []byte(xmlBody))
 	fpTwo := dbClient.getRequestFingerprint(req, []byte(xmlBodyTwo))
-	refute(t, fpOne, fpTwo)
+	testutil.Refute(t, fpOne, fpTwo)
 }
