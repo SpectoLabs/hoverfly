@@ -27,13 +27,13 @@ import (
 	hvc "github.com/SpectoLabs/hoverfly/certs"
 	"github.com/rusenask/goproxy"
 
+	"crypto/tls"
+	"encoding/pem"
 	"flag"
 	"fmt"
 	"os"
 	"strings"
-	"crypto/tls"
 	"time"
-	"encoding/pem"
 )
 
 type arrayFlags []string
@@ -133,8 +133,7 @@ func main() {
 		certOut.Close()
 		log.Print("cert.pem created\n")
 
-
-		keyOut, err := os.OpenFile("key.pem", os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0600)
+		keyOut, err := os.OpenFile("key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if err != nil {
 			log.Fatalf("failed to open key.pem for writing: %s", err.Error())
 		}
@@ -142,7 +141,8 @@ func main() {
 		keyOut.Close()
 		log.Print("key.pem created.\n")
 
-		tlsc, err := hvc.GetTlsCertificate(x509c, priv, "hoverfly.proxy", validity); if err != nil {
+		tlsc, err := hvc.GetTlsCertificate(x509c, priv, "hoverfly.proxy", validity)
+		if err != nil {
 			log.Fatalf("failed to get tls certificate: %s", err.Error())
 		}
 		goproxy.GoproxyCa = *tlsc
@@ -276,7 +276,7 @@ func main() {
 						"import": v,
 					}).Fatal("Failed to import given resource")
 				} else {
-					err = dbClient.MD.Set(fmt.Sprintf("import_%d", i + 1), v)
+					err = dbClient.MD.Set(fmt.Sprintf("import_%d", i+1), v)
 				}
 
 			}

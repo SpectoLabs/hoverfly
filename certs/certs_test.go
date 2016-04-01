@@ -1,14 +1,14 @@
 package certs
 
 import (
+	"crypto/x509"
+	"reflect"
 	"testing"
 	"time"
-	"reflect"
-	"crypto/x509"
 )
 
 func TestNewCert(t *testing.T) {
-	x509c, _, err := NewCertificatePair("certy.com", "cert authority", 365 * 24 * time.Hour)
+	x509c, _, err := NewCertificatePair("certy.com", "cert authority", 365*24*time.Hour)
 	if err != nil {
 		t.Errorf("Failed to generate certificate and key pair, got error: %s", err.Error())
 	}
@@ -46,7 +46,7 @@ func TestNewCert(t *testing.T) {
 }
 
 func TestNewPriv(t *testing.T) {
-	_, priv, err := NewCertificatePair("certy.com", "cert authority", 365 * 24 * time.Hour)
+	_, priv, err := NewCertificatePair("certy.com", "cert authority", 365*24*time.Hour)
 	if err != nil {
 		t.Errorf("Failed to generate certificate and key pair, got error: %s", err.Error())
 	}
@@ -58,11 +58,11 @@ func TestNewPriv(t *testing.T) {
 }
 
 func TestTlsCert(t *testing.T) {
-	pub, priv, err := NewCertificatePair("certy.com", "cert authority", 365 * 24 * time.Hour)
+	pub, priv, err := NewCertificatePair("certy.com", "cert authority", 365*24*time.Hour)
 	if err != nil {
 		t.Errorf("Failed to generate certificate and key pair, got error: %s", err.Error())
 	}
-	tlsc, err := GetTlsCertificate(pub, priv, "hoverfly.proxy", 365 * 24 * time.Hour)
+	tlsc, err := GetTlsCertificate(pub, priv, "hoverfly.proxy", 365*24*time.Hour)
 	if err != nil {
 		t.Errorf("Failed to get tls cert, got error: %s", err.Error())
 	}

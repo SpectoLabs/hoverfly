@@ -1,18 +1,18 @@
 package certs
 
 import (
+	"bytes"
+	"crypto/ecdsa"
+	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha1"
+	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"crypto/rand"
+	"encoding/pem"
+	"math/big"
 	"net"
 	"time"
-	"bytes"
-	"math/big"
-	"encoding/pem"
-	"crypto/ecdsa"
-	"crypto/tls"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -89,7 +89,7 @@ func NewCertificatePair(name, organization string, validity time.Duration) (*x50
 }
 
 // GetTlsCertificate - takes x509 cert and private key, returns tls.Certificate that is ready for proxy use
-func GetTlsCertificate(cert *x509.Certificate, priv *rsa.PrivateKey, hostname string,  validity time.Duration) (*tls.Certificate, error) {
+func GetTlsCertificate(cert *x509.Certificate, priv *rsa.PrivateKey, hostname string, validity time.Duration) (*tls.Certificate, error) {
 	host, _, err := net.SplitHostPort(hostname)
 	if err == nil {
 		hostname = host
