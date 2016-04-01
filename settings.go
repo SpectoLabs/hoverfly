@@ -16,7 +16,7 @@ type Configuration struct {
 	Destination string
 	Middleware  string
 
-	TlsVerification bool
+	TLSVerification bool
 
 	Verbose     bool
 	Development bool

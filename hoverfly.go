@@ -47,7 +47,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		MetadataCache:  metadataCache,
 		Authentication: authentication,
 		HTTP: &http.Client{Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.TlsVerification},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.TLSVerification},
 		}},
 		Cfg:     cfg,
 		Counter: metrics.NewModeCounter([]string{VirtualizeMode, SynthesizeMode, ModifyMode, CaptureMode}),
