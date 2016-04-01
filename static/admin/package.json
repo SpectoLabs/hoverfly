@@ -65,7 +65,9 @@
   "license": "MIT",
   "dependencies": {
     "debug": "^2.2.0",
+    "es6-promise": "^3.1.2",
     "history": "^2.0.0",
+    "isomorphic-fetch": "^2.2.1",
     "koa": "^2.0.0-alpha.3",
     "koa-connect-history-api-fallback": "^0.3.0",
     "koa-convert": "^1.2.0",
