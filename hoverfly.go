@@ -41,25 +41,25 @@ func orPanic(err error) {
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
-func NewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication backends.AuthBackend) Hoverfly {
+func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication backends.AuthBackend) Hoverfly {
 	h := Hoverfly{
 		RequestCache:   requestCache,
 		MetadataCache:  metadataCache,
 		Authentication: authentication,
 		HTTP: &http.Client{Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.TlsVerification},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.TLSVerification},
 		}},
 		Cfg:     cfg,
 		Counter: metrics.NewModeCounter([]string{VirtualizeMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		Hooks:   make(ActionTypeHooks),
-		MIN:     getNewMinifiers(),
+		MIN:     GetNewMinifiers(),
 	}
-	h.RestartProxy()
+	h.UpdateProxy()
 	return h
 }
 
 // GetNewMinifiers - returns minify.M with prepared xml/json minifiers
-func getNewMinifiers() *minify.M {
+func GetNewMinifiers() *minify.M {
 	m := minify.New()
 	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
 	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
@@ -67,7 +67,7 @@ func getNewMinifiers() *minify.M {
 }
 
 // UpdateProxy - applies hooks
-func (d *Hoverfly) RestartProxy() {
+func (d *Hoverfly) UpdateProxy() {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 

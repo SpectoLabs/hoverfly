@@ -61,7 +61,7 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 		Cfg:           cfg,
 		Counter:       metrics.NewModeCounter([]string{VirtualizeMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		MetadataCache: metaCache,
-		MIN:           getNewMinifiers(),
+		MIN:           GetNewMinifiers(),
 	}
 	return server, dbClient
 }
