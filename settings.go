@@ -52,7 +52,7 @@ const DefaultPort = "8500"
 // DefaultAdminPort - default admin interface port
 const DefaultAdminPort = "8888"
 
-// DefaultDatabaseName - default database name that will be created
+// DefaultDatabasePath - default database name that will be created
 // or used by Hoverfly
 const DefaultDatabasePath = "requests.db"
 
