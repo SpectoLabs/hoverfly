@@ -21,7 +21,7 @@ import (
 	"github.com/tdewolff/minify"
 )
 
-// DBClient provides access to cache, http client and configuration
+// Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
 type Hoverfly struct {
 	RequestCache   cache.Cache
 	MetadataCache  cache.Cache
