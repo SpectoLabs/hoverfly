@@ -23,14 +23,15 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"strings"
+	"time"
+
 	log "github.com/Sirupsen/logrus"
 	hv "github.com/SpectoLabs/hoverfly"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/cache"
 	hvc "github.com/SpectoLabs/hoverfly/certs"
 	"github.com/rusenask/goproxy"
-	"strings"
-	"time"
 )
 
 type arrayFlags []string
