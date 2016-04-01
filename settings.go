@@ -10,12 +10,13 @@ import (
 
 // Configuration - initial structure of configuration
 type Configuration struct {
-	AdminPort    string
-	ProxyPort    string
-	Mode         string
-	Destination  string
-	Middleware   string
-	DatabaseName string
+	AdminPort   string
+	ProxyPort   string
+	Mode        string
+	Destination string
+	Middleware  string
+
+	TlsVerification bool
 
 	Verbose     bool
 	Development bool
@@ -68,6 +69,8 @@ const (
 
 	HoverflyDBEV         = "HoverflyDB"
 	HoverflyMiddlewareEV = "HoverflyMiddleware"
+
+	HoverflyTLSVerification = "HoverflyTlsVerification"
 )
 
 // InitSettings gets and returns initial configuration from env
@@ -93,7 +96,6 @@ func InitSettings() *Configuration {
 	if databaseName == "" {
 		databaseName = DefaultDatabaseName
 	}
-	appConfig.DatabaseName = databaseName
 
 	if os.Getenv(HoverflySecretEV) != "" {
 		appConfig.SecretKey = []byte(os.Getenv(HoverflySecretEV))
@@ -125,6 +127,12 @@ func InitSettings() *Configuration {
 
 	// middleware configuration
 	appConfig.Middleware = os.Getenv(HoverflyMiddlewareEV)
+
+	if os.Getenv(HoverflyTLSVerification) == "false" {
+		appConfig.TlsVerification = false
+	} else {
+		appConfig.TlsVerification = true
+	}
 
 	return &appConfig
 }

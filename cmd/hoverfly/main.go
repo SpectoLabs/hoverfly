@@ -20,18 +20,15 @@
 package main
 
 import (
+	"crypto/tls"
+	"flag"
+	"fmt"
 	log "github.com/Sirupsen/logrus"
 	hv "github.com/SpectoLabs/hoverfly"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
-	"github.com/SpectoLabs/hoverfly/backends/boltdb"
+	"github.com/SpectoLabs/hoverfly/cache"
 	hvc "github.com/SpectoLabs/hoverfly/certs"
 	"github.com/rusenask/goproxy"
-
-	"crypto/tls"
-	"encoding/pem"
-	"flag"
-	"fmt"
-	"os"
 	"strings"
 	"time"
 )
@@ -50,58 +47,36 @@ func (i *arrayFlags) Set(value string) error {
 var importFlags arrayFlags
 var destinationFlags arrayFlags
 
+var (
+	verbose         = flag.Bool("v", false, "should every proxy request be logged to stdout")
+	capture         = flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
+	synthesize      = flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
+	modify          = flag.Bool("modify", false, "start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic")
+	middleware      = flag.String("middleware", "", "should proxy use middleware")
+	proxyPort       = flag.String("pp", "", "proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
+	adminPort       = flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
+	metrics         = flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
+	dev             = flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
+	destination     = flag.String("destination", ".", "destination URI to catch")
+	addNew          = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
+	addUser         = flag.String("username", "", "username for new user")
+	addPassword     = flag.String("password", "", "password for new user")
+	isAdmin         = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
+	authEnabled     = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
+	generateCA      = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
+	certName        = flag.String("cert-name", "hoverfly.proxy", "cert name")
+	certOrg         = flag.String("cert-org", "Hoverfly Authority", "organisation name for new cert")
+	cert            = flag.String("cert", "", "CA certificate used to sign MITM certificates")
+	key             = flag.String("key", "", "private key of the CA used to sign MITM certificates")
+	tlsVerification = flag.Bool("tls-verification", true, "turn on/off tls verification for outgoing requests (will not try to verify certificates) - defaults to true")
+	databasePath    = flag.String("db-dir", "", "database location - supply it if you want to provide specific to database (will be created there if it doesn't exist)")
+	database        = flag.String("db", "boltdb", "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
+)
+
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
-
-	// getting proxy configuration
-	verbose := flag.Bool("v", false, "should every proxy request be logged to stdout")
-	// modes
-	capture := flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
-	synthesize := flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
-	modify := flag.Bool("modify", false, "start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic")
-
-	middleware := flag.String("middleware", "", "should proxy use middleware")
-
-	// proxy port
-	proxyPort := flag.String("pp", "", "proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
-	// admin port
-	adminPort := flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
-
-	// database location
-	database := flag.String("db", "", "database location - supply it if you want to provide specific to database (will be created there if it doesn't exist)")
-
-	// delete current database on startup
-	wipeDb := flag.Bool("wipedb", false, "supply -wipedb flag to delete all records from given database on startup")
-
-	// metrics
-	metrics := flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
-
-	// development
-	dev := flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
-
-	// import flag
 	flag.Var(&importFlags, "import", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
-
-	// destination configuration
-	destination := flag.String("destination", ".", "destination URI to catch")
 	flag.Var(&destinationFlags, "dest", "specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
-
-	// adding new user
-	addNew := flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
-	addUser := flag.String("username", "", "username for new user")
-	addPassword := flag.String("password", "", "password for new user")
-	isAdmin := flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
-
-	// TODO: this should be enabled by default when UI and documentation is ready
-	authEnabled := flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
-
-	generateCA := flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
-	certName := flag.String("cert-name", "hoverfly.proxy", "cert name")
-	certOrg := flag.String("cert-org", "Hoverfly Authority", "organisation name for new cert")
-
-	cert := flag.String("cert", "", "CA certificate used to sign MITM certificates")
-	key := flag.String("key", "", "private key of the CA used to sign MITM certificates")
-
 	flag.Parse()
 
 	// getting settings
@@ -119,31 +94,11 @@ func main() {
 	}
 
 	if *generateCA {
-		validity := 365 * 24 * time.Hour
-		x509c, priv, err := hvc.NewCertificatePair(*certName, *certOrg, validity)
+		tlsc, err := hvc.GenerateAndSave(*certName, *certOrg, 365*24*time.Hour)
 		if err != nil {
-			log.Fatalf("Failed to generate certificate and key pair, got error: %s", err.Error())
-		}
-
-		certOut, err := os.Create("cert.pem")
-		if err != nil {
-			log.Fatalf("failed to open cert.pem for writing: %s", err.Error())
-		}
-		pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: x509c.Raw})
-		certOut.Close()
-		log.Print("cert.pem created\n")
-
-		keyOut, err := os.OpenFile("key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-		if err != nil {
-			log.Fatalf("failed to open key.pem for writing: %s", err.Error())
-		}
-		pem.Encode(keyOut, hvc.PemBlockForKey(priv))
-		keyOut.Close()
-		log.Print("key.pem created.\n")
-
-		tlsc, err := hvc.GetTlsCertificate(x509c, priv, "hoverfly.proxy", validity)
-		if err != nil {
-			log.Fatalf("failed to get tls certificate: %s", err.Error())
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Fatal("failed to generate certificate.")
 		}
 		goproxy.GoproxyCa = *tlsc
 
@@ -167,15 +122,6 @@ func main() {
 
 	// development settings
 	cfg.Development = *dev
-
-	// overriding database location
-	if *database != "" {
-		cfg.DatabaseName = *database
-	}
-
-	if *wipeDb {
-		os.Remove(cfg.DatabaseName)
-	}
 
 	// overriding default middleware setting
 	cfg.Middleware = *middleware
@@ -219,6 +165,12 @@ func main() {
 		cfg.AuthEnabled = true
 	}
 
+	// disabling tls verification if flag or env variable is set to 'false' (defaults to true)
+	if !cfg.TlsVerification || !*tlsVerification {
+		cfg.TlsVerification = false
+		log.Info("tls certificate verification is now turned off!")
+	}
+
 	if len(destinationFlags) > 0 {
 		cfg.Destination = strings.Join(destinationFlags[:], "|")
 
@@ -227,28 +179,32 @@ func main() {
 		cfg.Destination = *destination
 	}
 
-	// getting boltDB
-	db := boltdb.GetDB(cfg.DatabaseName)
-	defer db.Close()
+	var requestCache cache.Cache
+	var metadataCache cache.Cache
+	var tokenCache cache.Cache
+	var userCache cache.Cache
 
-	cache := boltdb.NewBoltDBCache(db, []byte("requestsBucket"))
+	if *database == "boltdb" {
+		log.Info("Creating bolt db backend...")
+		db := cache.GetDB(*databasePath)
+		defer db.Close()
+		requestCache = cache.NewBoltDBCache(db, []byte("requestsBucket"))
+		metadataCache = cache.NewBoltDBCache(db, []byte("metadataBucket"))
+		tokenCache = cache.NewBoltDBCache(db, []byte(backends.TokenBucketName))
+		userCache = cache.NewBoltDBCache(db, []byte(backends.UserBucketName))
+	} else {
+		log.Info("Creating in memory map backend...")
+		requestCache = cache.NewInMemoryCache()
+		metadataCache = cache.NewInMemoryCache()
+		tokenCache = cache.NewInMemoryCache()
+		userCache = cache.NewInMemoryCache()
+	}
 
-	dbClient := hv.GetNewHoverfly(cfg, cache)
-
-	ab := backends.NewBoltDBAuthBackend(db, []byte(backends.TokenBucketName), []byte(backends.UserBucketName))
-
-	// assigning auth backend
-	dbClient.AB = ab
-
-	// metadata backend
-	metaCache := boltdb.NewBoltDBCache(db, []byte("metadataBucket"))
-	md := hv.NewMetadata(metaCache)
-
-	dbClient.MD = md
+	hoverfly := hv.NewHoverfly(cfg, requestCache, metadataCache, backends.NewAuthBackend(tokenCache, userCache))
 
 	// if add new user supplied - adding it to database
 	if *addNew {
-		err := ab.AddUser([]byte(*addUser), []byte(*addPassword), *isAdmin)
+		err := hoverfly.Authentication.AddUser(*addUser, *addPassword, *isAdmin)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error":    err.Error(),
@@ -269,14 +225,14 @@ func main() {
 				log.WithFields(log.Fields{
 					"import": v,
 				}).Debug("Importing given resource")
-				err := dbClient.Import(v)
+				err := hoverfly.Import(v)
 				if err != nil {
 					log.WithFields(log.Fields{
 						"error":  err.Error(),
 						"import": v,
 					}).Fatal("Failed to import given resource")
 				} else {
-					err = dbClient.MD.Set(fmt.Sprintf("import_%d", i+1), v)
+					err = hoverfly.MetadataCache.Set([]byte(fmt.Sprintf("import_%d", i+1)), []byte(v))
 				}
 
 			}
@@ -285,10 +241,10 @@ func main() {
 
 	// start metrics registry flush
 	if *metrics {
-		dbClient.Counter.Init()
+		hoverfly.Counter.Init()
 	}
 
-	err := dbClient.StartProxy()
+	err := hoverfly.StartProxy()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
@@ -296,5 +252,5 @@ func main() {
 	}
 
 	// starting admin interface, this is blocking
-	dbClient.StartAdminInterface()
+	hoverfly.StartAdminInterface()
 }

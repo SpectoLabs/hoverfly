@@ -9,7 +9,11 @@ import (
 	"github.com/tdewolff/minify/xml"
 
 	"bufio"
+	"crypto/tls"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/cache"
+	"github.com/SpectoLabs/hoverfly/metrics"
 	"net"
 	"net/http"
 	"regexp"
@@ -37,27 +41,25 @@ func orPanic(err error) {
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
-func GetNewHoverfly(cfg *Configuration, cache Cache) DBClient {
-	counter := NewModeCounter()
-
-	m := GetNewMinifiers()
-
-	d := DBClient{
-		Cache:   cache,
-		HTTP:    &http.Client{},
+func NewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication backends.AuthBackend) Hoverfly {
+	h := Hoverfly{
+		RequestCache:   requestCache,
+		MetadataCache:  metadataCache,
+		Authentication: authentication,
+		HTTP: &http.Client{Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.TlsVerification},
+		}},
 		Cfg:     cfg,
-		Counter: counter,
+		Counter: metrics.NewModeCounter([]string{VirtualizeMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		Hooks:   make(ActionTypeHooks),
-		MIN:     m,
+		MIN:     getNewMinifiers(),
 	}
-
-	d.UpdateProxy()
-
-	return d
+	h.RestartProxy()
+	return h
 }
 
 // GetNewMinifiers - returns minify.M with prepared xml/json minifiers
-func GetNewMinifiers() *minify.M {
+func getNewMinifiers() *minify.M {
 	m := minify.New()
 	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
 	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
@@ -65,7 +67,7 @@ func GetNewMinifiers() *minify.M {
 }
 
 // UpdateProxy - applies hooks
-func (d *DBClient) UpdateProxy() {
+func (d *Hoverfly) RestartProxy() {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 
@@ -147,7 +149,7 @@ func hoverflyError(req *http.Request, err error, msg string, statusCode int) *ht
 
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
-func (d *DBClient) processRequest(req *http.Request) (*http.Request, *http.Response) {
+func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Response) {
 
 	mode := d.Cfg.GetMode()
 

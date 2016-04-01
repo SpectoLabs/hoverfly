@@ -15,10 +15,42 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"os"
 )
 
 // MaxSerialNumber - nothing very original, big number
 var MaxSerialNumber = big.NewInt(0).SetBytes(bytes.Repeat([]byte{255}, 20))
+
+func GenerateAndSave(name, organization string, validity time.Duration) (tlsc *tls.Certificate, err error) {
+	x509c, priv, err := NewCertificatePair(name, organization, validity)
+	if err != nil {
+		log.Fatalf("Failed to generate certificate and key pair, got error: %s", err.Error())
+	}
+
+	certOut, err := os.Create("cert.pem")
+	if err != nil {
+		log.Errorf("failed to open cert.pem for writing: %s", err.Error())
+		return
+	}
+	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: x509c.Raw})
+	certOut.Close()
+	log.Print("cert.pem created\n")
+
+	keyOut, err := os.OpenFile("key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		log.Errorf("failed to open key.pem for writing: %s", err.Error())
+		return
+	}
+	pem.Encode(keyOut, PemBlockForKey(priv))
+	keyOut.Close()
+	log.Print("key.pem created.\n")
+
+	tlsc, err = GetTlsCertificate(x509c, priv, "hoverfly.proxy", validity)
+	if err != nil {
+		log.Errorf("failed to get tls certificate: %s", err.Error())
+	}
+	return
+}
 
 // PemBlockForKey - based on key returns a block
 func PemBlockForKey(priv interface{}) *pem.Block {
