@@ -175,7 +175,12 @@ func getBoneRouter(d Hoverfly) *bone.Mux {
 		// since hoverfly is not started from cmd/hoverfly/hoverfly
 		// we have to target to that directory
 		log.Warn("Hoverfly is serving files from /static/admin/dist instead of statik binary!")
-		mux.Handle("/*", http.FileServer(http.Dir("../../static/admin/dist")))
+		mux.Handle("/js/*", http.StripPrefix("/js/", http.FileServer(http.Dir("../../static/admin/dist/js"))))
+
+		mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, "../../static/admin/dist/index.html")
+		})
+
 	} else {
 		// preparing static assets for embedded admin
 		statikFS, err := fs.New()
