@@ -1,4 +1,4 @@
-package hoverfly
+package cache
 
 // Cache - cache interface used to store and retrieve request/response payloads or anything else
 type Cache interface {
@@ -10,5 +10,4 @@ type Cache interface {
 	Delete(key []byte) error
 	DeleteData() error
 	GetAllKeys() (map[string]bool, error)
-	CloseDB()
 }

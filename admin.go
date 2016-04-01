@@ -22,6 +22,7 @@ import (
 	// auth
 	"github.com/SpectoLabs/hoverfly/authentication"
 	"github.com/SpectoLabs/hoverfly/authentication/controllers"
+	"github.com/SpectoLabs/hoverfly/metrics"
 )
 
 // recordedRequests struct encapsulates payload data
@@ -43,8 +44,8 @@ type recordsCount struct {
 }
 
 type statsResponse struct {
-	Stats        Stats `json:"stats"`
-	RecordsCount int   `json:"recordsCount"`
+	Stats        metrics.Stats `json:"stats"`
+	RecordsCount int           `json:"recordsCount"`
 }
 
 type stateRequest struct {
@@ -67,7 +68,7 @@ func (m *messageResponse) Encode() ([]byte, error) {
 }
 
 // StartAdminInterface - starts admin interface web server
-func (d *DBClient) StartAdminInterface() {
+func (d *Hoverfly) StartAdminInterface() {
 
 	// starting admin interface
 	mux := getBoneRouter(*d)
@@ -91,12 +92,12 @@ func (d *DBClient) StartAdminInterface() {
 }
 
 // getBoneRouter returns mux for admin interface
-func getBoneRouter(d DBClient) *bone.Mux {
+func getBoneRouter(d Hoverfly) *bone.Mux {
 	mux := bone.New()
 
 	// getting auth controllers and middleware
-	ac := controllers.GetNewAuthenticationController(d.AB, d.Cfg.SecretKey, d.Cfg.JWTExpirationDelta)
-	am := authentication.GetNewAuthenticationMiddleware(d.AB,
+	ac := controllers.GetNewAuthenticationController(d.Authentication, d.Cfg.SecretKey, d.Cfg.JWTExpirationDelta)
+	am := authentication.GetNewAuthenticationMiddleware(d.Authentication,
 		d.Cfg.SecretKey,
 		d.Cfg.JWTExpirationDelta,
 		d.Cfg.AuthEnabled)
@@ -191,8 +192,8 @@ func getBoneRouter(d DBClient) *bone.Mux {
 }
 
 // AllRecordsHandler returns JSON content type http response
-func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	records, err := d.Cache.GetAllValues()
+func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	records, err := d.RequestCache.GetAllValues()
 
 	if err == nil {
 
@@ -233,8 +234,8 @@ func (d *DBClient) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 }
 
 // RecordsCount returns number of captured requests as a JSON payload
-func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	count, err := d.Cache.RecordsCount()
+func (d *Hoverfly) RecordsCount(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	count, err := d.RequestCache.RecordsCount()
 
 	if err == nil {
 
@@ -263,10 +264,10 @@ func (d *DBClient) RecordsCount(w http.ResponseWriter, req *http.Request, next h
 }
 
 // StatsHandler - returns current stats about Hoverfly (request counts, record count)
-func (d *DBClient) StatsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (d *Hoverfly) StatsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	stats := d.Counter.Flush()
 
-	count, err := d.Cache.RecordsCount()
+	count, err := d.RequestCache.RecordsCount()
 
 	if err != nil {
 		log.Error(err)
@@ -300,7 +301,7 @@ var upgrader = websocket.Upgrader{
 }
 
 // StatsWSHandler - returns current stats about Hoverfly (request counts, record count) through the websocket
-func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
+func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -318,7 +319,7 @@ func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 
 		for _ = range time.Tick(1 * time.Second) {
 
-			count, err := d.Cache.RecordsCount()
+			count, err := d.RequestCache.RecordsCount()
 
 			if err != nil {
 				log.WithFields(log.Fields{
@@ -350,7 +351,7 @@ func (d *DBClient) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ImportRecordsHandler - accepts JSON payload and saves it to cache
-func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (d *Hoverfly) ImportRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
 	var requests recordedRequests
 
@@ -400,7 +401,7 @@ func (d *DBClient) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 }
 
 // ManualAddHandler - manually add new request/responses, using a form
-func (d *DBClient) ManualAddHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	err := req.ParseForm()
 
 	if err != nil {
@@ -486,8 +487,8 @@ func (d *DBClient) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 }
 
 // DeleteAllRecordsHandler - deletes all captured requests
-func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	err := d.Cache.DeleteData()
+func (d *Hoverfly) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	err := d.RequestCache.DeleteData()
 
 	var en Entry
 	en.ActionType = ActionTypeWipeDB
@@ -532,7 +533,7 @@ func (d *DBClient) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 }
 
 // CurrentStateHandler returns current state
-func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (d *Hoverfly) CurrentStateHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	var resp stateRequest
 	resp.Mode = d.Cfg.GetMode()
 	resp.Destination = d.Cfg.Destination
@@ -543,7 +544,7 @@ func (d *DBClient) CurrentStateHandler(w http.ResponseWriter, req *http.Request,
 }
 
 // StateHandler handles current proxy state
-func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	var sr stateRequest
 
 	// this is mainly for testing, since when you create
@@ -630,15 +631,21 @@ func (d *DBClient) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 }
 
 // AllMetadataHandler returns JSON content type http response
-func (d *DBClient) AllMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	metadata, err := d.MD.GetAll()
+func (d *Hoverfly) AllMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	entries, err := d.MetadataCache.GetAllEntries()
+
+	metaData := make(map[string]string)
+
+	for k, v := range entries {
+		metaData[k] = string(v)
+	}
 
 	if err == nil {
 
 		w.Header().Set("Content-Type", "application/json")
 
 		var response storedMetadata
-		response.Data = metadata
+		response.Data = metaData
 		b, err := json.Marshal(response)
 
 		if err != nil {
@@ -660,7 +667,7 @@ func (d *DBClient) AllMetadataHandler(w http.ResponseWriter, req *http.Request, 
 }
 
 // SetMetadataHandler - sets new metadata
-func (d *DBClient) SetMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (d *Hoverfly) SetMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	var sm setMetadata
 	var mr messageResponse
 
@@ -708,7 +715,7 @@ func (d *DBClient) SetMetadataHandler(w http.ResponseWriter, req *http.Request, 
 		w.WriteHeader(400)
 
 	} else {
-		err = d.MD.Set(sm.Key, sm.Value)
+		err = d.MetadataCache.Set([]byte(sm.Key), []byte(sm.Value))
 		if err != nil {
 			mr.Message = fmt.Sprintf("Failed to set metadata. Error: %s", err.Error())
 			w.WriteHeader(500)
@@ -730,8 +737,8 @@ func (d *DBClient) SetMetadataHandler(w http.ResponseWriter, req *http.Request, 
 }
 
 // DeleteMetadataHandler - deletes all metadata
-func (d *DBClient) DeleteMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	err := d.MD.DeleteData()
+func (d *Hoverfly) DeleteMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	err := d.MetadataCache.DeleteData()
 
 	w.Header().Set("Content-Type", "application/json")
 

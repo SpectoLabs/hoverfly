@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"github.com/SpectoLabs/hoverfly/testutil"
 	"testing"
 )
 
@@ -14,8 +15,8 @@ func TestChangeBodyMiddleware(t *testing.T) {
 
 	newPayload, err := ExecuteMiddleware(command, payload)
 
-	expect(t, err, nil)
-	expect(t, newPayload.Response.Body, "body was replaced by middleware\n")
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, newPayload.Response.Body, "body was replaced by middleware\n")
 }
 
 func TestMalformedPayloadMiddleware(t *testing.T) {
@@ -28,8 +29,8 @@ func TestMalformedPayloadMiddleware(t *testing.T) {
 
 	newPayload, err := ExecuteMiddleware(command, payload)
 
-	expect(t, err, nil)
-	expect(t, newPayload.Response.Body, "original body")
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, newPayload.Response.Body, "original body")
 }
 
 func TestMakeCustom404(t *testing.T) {
@@ -42,10 +43,10 @@ func TestMakeCustom404(t *testing.T) {
 
 	newPayload, err := ExecuteMiddleware(command, payload)
 
-	expect(t, err, nil)
-	expect(t, newPayload.Response.Body, "Custom body here")
-	expect(t, newPayload.Response.Status, 404)
-	expect(t, newPayload.Response.Headers["middleware"][0], "changed response")
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, newPayload.Response.Body, "Custom body here")
+	testutil.Expect(t, newPayload.Response.Status, 404)
+	testutil.Expect(t, newPayload.Response.Headers["middleware"][0], "changed response")
 }
 
 func TestReflectBody(t *testing.T) {
@@ -57,8 +58,8 @@ func TestReflectBody(t *testing.T) {
 
 	newPayload, err := ExecuteMiddleware(command, payload)
 
-	expect(t, err, nil)
-	expect(t, newPayload.Response.Body, req.Body)
-	expect(t, newPayload.Request.Method, req.Method)
-	expect(t, newPayload.Request.Destination, req.Destination)
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, newPayload.Response.Body, req.Body)
+	testutil.Expect(t, newPayload.Request.Method, req.Method)
+	testutil.Expect(t, newPayload.Request.Destination, req.Destination)
 }
