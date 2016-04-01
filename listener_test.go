@@ -17,7 +17,7 @@ func TestHoverflyListener(t *testing.T) {
 
 	dbClient.Cfg.ProxyPort = proxyPort
 	// starting hoverfly
-	dbClient.RestartProxy()
+	dbClient.UpdateProxy()
 	dbClient.StartProxy()
 
 	// checking whether it's running
@@ -39,7 +39,7 @@ func TestStopHoverflyListener(t *testing.T) {
 
 	dbClient.Cfg.ProxyPort = proxyPort
 	// starting hoverfly
-	dbClient.RestartProxy()
+	dbClient.UpdateProxy()
 	dbClient.StartProxy()
 
 	dbClient.StopProxy()
@@ -58,7 +58,7 @@ func TestRestartHoverflyListener(t *testing.T) {
 
 	dbClient.Cfg.ProxyPort = proxyPort
 	// starting hoverfly
-	dbClient.RestartProxy()
+	dbClient.UpdateProxy()
 	dbClient.StartProxy()
 
 	// checking whether it's running

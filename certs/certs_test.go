@@ -63,7 +63,7 @@ func TestTlsCert(t *testing.T) {
 	if err != nil {
 		t.Errorf("Failed to generate certificate and key pair, got error: %s", err.Error())
 	}
-	tlsc, err := GetTlsCertificate(pub, priv, "hoverfly.proxy", 365*24*time.Hour)
+	tlsc, err := GetTLSCertificate(pub, priv, "hoverfly.proxy", 365*24*time.Hour)
 	if err != nil {
 		t.Errorf("Failed to get tls cert, got error: %s", err.Error())
 	}

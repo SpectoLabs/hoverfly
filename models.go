@@ -21,7 +21,7 @@ import (
 	"github.com/tdewolff/minify"
 )
 
-// DBClient provides access to cache, http client and configuration
+// Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
 type Hoverfly struct {
 	RequestCache   cache.Cache
 	MetadataCache  cache.Cache
@@ -49,7 +49,7 @@ func (d *Hoverfly) UpdateDestination(destination string) (err error) {
 	d.mu.Lock()
 	d.StopProxy()
 	d.Cfg.Destination = destination
-	d.RestartProxy()
+	d.UpdateProxy()
 	err = d.StartProxy()
 	d.mu.Unlock()
 	return
@@ -63,7 +63,7 @@ func (d *Hoverfly) StartProxy() error {
 	}
 
 	if d.Proxy == nil {
-		d.RestartProxy()
+		d.UpdateProxy()
 	}
 
 	log.WithFields(log.Fields{

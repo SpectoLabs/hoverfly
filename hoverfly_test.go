@@ -23,7 +23,7 @@ func TestGetNewHoverflyCheckConfig(t *testing.T) {
 	userCache := cache.NewBoltDBCache(db, []byte("userBucket"))
 	backend := backends.NewAuthBackend(tokenCache, userCache)
 
-	dbClient := NewHoverfly(cfg, requestCache, metaCache, backend)
+	dbClient := GetNewHoverfly(cfg, requestCache, metaCache, backend)
 
 	testutil.Expect(t, dbClient.Cfg, cfg)
 
