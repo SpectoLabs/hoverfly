@@ -1,7 +1,7 @@
 /* @flow */
 import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {setMode} from '../../redux/modules/modes'
+import {setMode, fetchState} from '../../redux/modules/modes'
 import classes from './ModeView.scss'
 
 // We can use Flow (http://flowtype.org/) to type our component's props
@@ -22,7 +22,8 @@ type Props = {
 export class ModeView extends React.Component<void, Props, void> {
   static propTypes = {
     mode: PropTypes.string.isRequired,
-    setMode: PropTypes.func.isRequired
+    setMode: PropTypes.func.isRequired,
+    fetchState: PropTypes.func.isRequired
   };
 
   constructor (props) {
@@ -39,6 +40,11 @@ export class ModeView extends React.Component<void, Props, void> {
   capture () {
     console.log('capture clicked')
     this.props.setMode('capture')
+  }
+
+  componentWillMount () {
+    console.log('mounted')
+    this.props.fetchState('localhost:8888')
   }
 
   render () {
@@ -68,5 +74,6 @@ const mapStateToProps = (state) => ({
 })
 
 export default connect((mapStateToProps), {
-  setMode
+  setMode,
+  fetchState
 })(ModeView)
