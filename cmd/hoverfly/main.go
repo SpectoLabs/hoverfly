@@ -166,8 +166,8 @@ func main() {
 	}
 
 	// disabling tls verification if flag or env variable is set to 'false' (defaults to true)
-	if !cfg.TlsVerification || !*tlsVerification {
-		cfg.TlsVerification = false
+	if !cfg.TLSVerification || !*tlsVerification {
+		cfg.TLSVerification = false
 		log.Info("tls certificate verification is now turned off!")
 	}
 
@@ -184,9 +184,13 @@ func main() {
 	var tokenCache cache.Cache
 	var userCache cache.Cache
 
+	if *databasePath != "" {
+		cfg.DatabasePath = *databasePath
+	}
+
 	if *database == "boltdb" {
 		log.Info("Creating bolt db backend...")
-		db := cache.GetDB(*databasePath)
+		db := cache.GetDB(cfg.DatabasePath)
 		defer db.Close()
 		requestCache = cache.NewBoltDBCache(db, []byte("requestsBucket"))
 		metadataCache = cache.NewBoltDBCache(db, []byte("metadataBucket"))
