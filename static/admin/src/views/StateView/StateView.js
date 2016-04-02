@@ -3,7 +3,7 @@ import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {setMode, fetchState} from '../../redux/modules/modes'
 import classes from './ModeView.scss'
-
+import {Tabs, Tab, Button} from 'react-bootstrap'
 // We can use Flow (http://flowtype.org/) to type our component's props
 // and state. For convenience we've included both regular propTypes and
 // Flow types, but if you want to try just using Flow you'll want to
@@ -30,40 +30,52 @@ export class ModeView extends React.Component<void, Props, void> {
     super(props)
     this.virtualize = this.virtualize.bind(this)
     this.capture = this.capture.bind(this)
+    this.modify = this.modify.bind(this)
+    this.synthesize = this.synthesize.bind(this)
   }
 
   virtualize () {
-    console.log('virtualize clicked')
     this.props.setMode('virtualize')
   }
 
   capture () {
-    console.log('capture clicked')
     this.props.setMode('capture')
   }
 
+  modify () {
+    this.props.setMode('modify')
+  }
+
+  synthesize () {
+    this.props.setMode('synthesize')
+  }
+
   componentWillMount () {
-    console.log('mounted')
     this.props.fetchState()
   }
 
   render () {
-    console.log(this.props)
     return (
-      <div className='container text-center'>
+      <div>
         <h1>Modes</h1>
-        <h2>
-          Current:
-          {' '}
-          <span className={classes['counter--green']}>{this.props.mode}</span>
-        </h2>
-        <button className='btn btn-default' onClick={this.virtualize}>
-          Virtualize
-        </button>
-        {' '}
-        <button className='btn btn-default' onClick={this.capture}>
-          Capture
-        </button>
+        <div className='row'>
+          <Tabs defaultActiveKey={1}>
+            <Tab eventKey={1} title='Modes'>
+              <h2>
+                Current:
+                {' '}
+                <span className={classes['counter--green']}>{this.props.mode}</span>
+              </h2>
+              <Button onClick={this.virtualize}>Virtualize</Button>
+              {' '}
+              <Button onClick={this.capture}>Capture</Button>
+              {' '}
+              <Button onClick={this.modify}>Modify</Button>
+              {' '}
+              <Button onClick={this.synthesize}>Synthesize</Button>
+            </Tab>
+          </Tabs>
+        </div>
       </div>
     )
   }
