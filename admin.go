@@ -102,71 +102,71 @@ func getBoneRouter(d Hoverfly) *bone.Mux {
 		d.Cfg.JWTExpirationDelta,
 		d.Cfg.AuthEnabled)
 
-	mux.Post("/token-auth", http.HandlerFunc(ac.Login))
-	mux.Get("/refresh-token-auth", negroni.New(
+	mux.Post("/api/token-auth", http.HandlerFunc(ac.Login))
+	mux.Get("/api/refresh-token-auth", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(ac.RefreshToken),
 	))
-	mux.Get("/logout", negroni.New(
+	mux.Get("/api/logout", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(ac.Logout),
 	))
 
-	mux.Get("/users", negroni.New(
+	mux.Get("/api/users", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(ac.GetAllUsersHandler),
 	))
 
-	mux.Get("/records", negroni.New(
+	mux.Get("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.AllRecordsHandler),
 	))
 
-	mux.Delete("/records", negroni.New(
+	mux.Delete("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.DeleteAllRecordsHandler),
 	))
-	mux.Post("/records", negroni.New(
+	mux.Post("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.ImportRecordsHandler),
 	))
 
-	mux.Get("/metadata", negroni.New(
+	mux.Get("/api/metadata", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.AllMetadataHandler),
 	))
 
-	mux.Put("/metadata", negroni.New(
+	mux.Put("/api/metadata", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.SetMetadataHandler),
 	))
 
-	mux.Delete("/metadata", negroni.New(
+	mux.Delete("/api/metadata", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.DeleteMetadataHandler),
 	))
 
-	mux.Get("/count", negroni.New(
+	mux.Get("/api/count", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.RecordsCount),
 	))
-	mux.Get("/stats", negroni.New(
+	mux.Get("/api/stats", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.StatsHandler),
 	))
 	// TODO: check auth for websocket connection
-	mux.Get("/statsws", http.HandlerFunc(d.StatsWSHandler))
+	mux.Get("/api/statsws", http.HandlerFunc(d.StatsWSHandler))
 
-	mux.Get("/state", negroni.New(
+	mux.Get("/api/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.CurrentStateHandler),
 	))
-	mux.Post("/state", negroni.New(
+	mux.Post("/api/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.StateHandler),
 	))
 
-	mux.Post("/add", negroni.New(
+	mux.Post("/api/add", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.ManualAddHandler),
 	))
