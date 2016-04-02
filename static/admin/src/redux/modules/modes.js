@@ -21,7 +21,7 @@ export function setMode (mode):Action {
   return function (dispatch) {
     dispatch(requestState())
     console.log('setting mode')
-    return fetch('/state', {
+    return fetch('/api/state', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -62,7 +62,7 @@ export function fetchState () {
   return function (dispatch) {
     dispatch(requestState())
     console.log('fetching state')
-    return fetch('/state')
+    return fetch('/api/state')
       .then((response) => response.json())
       .then((json) => dispatch(receiveState(json))
       )

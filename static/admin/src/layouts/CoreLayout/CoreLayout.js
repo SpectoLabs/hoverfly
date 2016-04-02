@@ -22,7 +22,7 @@ function CoreLayout ({children}) {
       </Navbar.Header>
       <Navbar.Collapse>
         <Nav>
-          <NavItem eventKey={1} href='/modes'>Modes</NavItem>
+          <NavItem eventKey={1} href='/state'>State</NavItem>
           <NavItem eventKey={2} href='/records'>Records</NavItem>
           <NavDropdown eventKey={3} title='Dropdown' id='basic-nav-dropdown'>
             <MenuItem eventKey={3.1}>Action</MenuItem>

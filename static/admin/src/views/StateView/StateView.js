@@ -57,7 +57,7 @@ export class ModeView extends React.Component<void, Props, void> {
   render () {
     return (
       <div>
-        <h1>Modes</h1>
+        <h1>State</h1>
         <div className='row'>
           <Tabs defaultActiveKey={1}>
             <Tab eventKey={1} title='Modes'>

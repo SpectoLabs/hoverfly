@@ -1,2 +1,2 @@
-import ModeView from './ModeView'
-export default ModeView
+import StateView from './StateView'
+export default StateView
