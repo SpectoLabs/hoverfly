@@ -18,9 +18,21 @@ export const RECEIVE_STATE = 'RECEIVE_STATE'
 // DOUBLE NOTE: there is currently a bug with babel-eslint where a `space-infix-ops` error is
 // incorrectly thrown when using arrow functions, hence the oddity.
 export function setMode (mode):Action {
-  return {
-    type: SET_MODE,
-    payload: mode
+  return function (dispatch) {
+    dispatch(requestState())
+    console.log('setting mode')
+    return fetch('/state', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        mode: mode
+      })
+    }).then((response) => response.json())
+      .then((json) => dispatch(receiveState(json))
+      )
   }
 }
 
@@ -31,53 +43,30 @@ export function getMode (mode):Action {
   }
 }
 
-export function requestState (hoverfly) {
+export function requestState () {
   return {
-    type: REQUEST_STATE,
-    hoverfly
+    type: REQUEST_STATE
   }
 }
 
-export function receiveState (hoverfly, json) {
+export function receiveState (json) {
   console.log(json)
   return {
     type: RECEIVE_STATE,
-    hoverfly,
-    // mode: json.data.children.map((child) => child.data),
     payload: json.mode,
     receivedAt: Date.now()
   }
 }
 
-export function fetchState (hoverfly) {
-  // Thunk middleware knows how to handle functions.
-  // It passes the dispatch method as an argument to the function,
-  // thus making it able to dispatch actions itself.
-
+export function fetchState () {
   return function (dispatch) {
-    // First dispatch: the app state is updated to inform
-    // that the API call is starting.
-
-    dispatch(requestState(hoverfly))
-
-    // The function called by the thunk middleware can return a value,
-    // that is passed on as the return value of the dispatch method.
-
-    // In this case, we return a promise to wait for.
-    // This is not required by thunk middleware, but it is convenient for us.
-    console.log(hoverfly)
-    return fetch(`http://${hoverfly}/state`)
+    dispatch(requestState())
+    console.log('fetching state')
+    return fetch('/state')
       .then((response) => response.json())
-      .then((json) =>
-
-        // We can dispatch many times!
-        // Here, we update the app state with the results of the API call.
-
-        dispatch(receiveState(hoverfly, json))
+      .then((json) => dispatch(receiveState(json))
       )
-
-    // In a real world app, you also want to
-    // catch any error in the network call.
+    // TODO: should also catch any error in the network call.
   }
 }
 
@@ -99,8 +88,7 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-// const initialState = 'initial'
-let initialState = 'init'
+let initialState = 'fetching data..'
 export default function modeReducer (state:mode = initialState, action:Action):mode {
   const handler = ACTION_HANDLERS[action.type]
 

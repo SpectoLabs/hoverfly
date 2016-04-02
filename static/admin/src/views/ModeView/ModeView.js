@@ -44,7 +44,7 @@ export class ModeView extends React.Component<void, Props, void> {
 
   componentWillMount () {
     console.log('mounted')
-    this.props.fetchState('localhost:8888')
+    this.props.fetchState()
   }
 
   render () {
