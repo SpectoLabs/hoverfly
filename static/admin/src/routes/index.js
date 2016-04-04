@@ -14,5 +14,7 @@ export default (store) => (
   <Route path='/' component={CoreLayout}>
     <IndexRoute component={HomeView} />
     <Route path='/state' component={StateView} />
+    <Route path='/records' component={StateView} />
+    <Route path='/middleware' component={StateView} />
   </Route>
 )

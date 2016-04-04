@@ -61,7 +61,6 @@ export function receiveState (json) {
 export function fetchState () {
   return function (dispatch) {
     dispatch(requestState())
-    console.log('fetching state')
     return fetch('/api/state')
       .then((response) => response.json())
       .then((json) => dispatch(receiveState(json))

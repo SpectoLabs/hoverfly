@@ -5,9 +5,6 @@ import '../../styles/core.scss'
 // import {deepOrange500} from 'material-ui/lib/styles/colors'
 import getMuiTheme from 'material-ui/lib/styles/getMuiTheme'
 import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
-
-import {AppBar, Tabs, Tab} from 'material-ui'
-
 // Note: Stateless/function components *will not* hot reload!
 // react-transform *only* works on component classes.
 //
@@ -33,16 +30,9 @@ const muiTheme = getMuiTheme({
 })
 
 function CoreLayout ({children}) {
-  var myTabs = (
-    <Tabs>
-      <Tab label='Logout' route='/logout'/>
-    </Tabs>
-  )
-
   return (
     <MuiThemeProvider muiTheme={muiTheme}>
       <div>
-        <AppBar title='Hoverfly' iconElementRight={myTabs}/>
         <div style={styles.container}>
           <Grid>
             <Row>
