@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react'
-// import {Navbar, Nav, NavItem, NavDropdown, MenuItem, Grid, Row} from 'react-bootstrap'
+import {Grid, Row, Col} from 'react-bootstrap'
 import '../../styles/core.scss'
 
 // import {deepOrange500} from 'material-ui/lib/styles/colors'
@@ -20,12 +20,13 @@ import {AppBar, Tabs, Tab} from 'material-ui'
 
 const styles = {
   container: {
-    textAlign: 'center'
-    // paddingTop: 200
+    textAlign: 'center',
+    paddingTop: 20
   }
 }
 
 const muiTheme = getMuiTheme({
+  // keeping defaults, although everything can be overridden here
   // palette: {
   //   accent1Color: deepOrange500
   // }
@@ -40,9 +41,17 @@ function CoreLayout ({children}) {
 
   return (
     <MuiThemeProvider muiTheme={muiTheme}>
-      <div style={styles.container}>
+      <div>
         <AppBar title='Hoverfly' iconElementRight={myTabs}/>
-        {children}
+        <div style={styles.container}>
+          <Grid>
+            <Row>
+              <Col md={12}>
+                {children}
+              </Col>
+            </Row>
+          </Grid>
+        </div>
       </div>
     </MuiThemeProvider>
   )

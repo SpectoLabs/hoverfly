@@ -127,7 +127,7 @@ export class ModeView extends React.Component<void, Props, void> {
 
   render () {
     let currentMode = this.props.mode
-    let currentModeInfo = 'current mode: ' + currentMode
+    let currentModeInfo = 'Current mode: ' + currentMode
 
     let virtualizeButton
     let captureButton
