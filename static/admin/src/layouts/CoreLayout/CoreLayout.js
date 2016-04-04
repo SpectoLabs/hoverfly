@@ -1,6 +1,12 @@
 import React, {PropTypes} from 'react'
-import {Navbar, Nav, NavItem, NavDropdown, MenuItem, Grid, Row} from 'react-bootstrap'
+// import {Navbar, Nav, NavItem, NavDropdown, MenuItem, Grid, Row} from 'react-bootstrap'
 import '../../styles/core.scss'
+
+// import {deepOrange500} from 'material-ui/lib/styles/colors'
+import getMuiTheme from 'material-ui/lib/styles/getMuiTheme'
+import MuiThemeProvider from 'material-ui/lib/MuiThemeProvider'
+
+import {AppBar, Tabs, Tab} from 'material-ui'
 
 // Note: Stateless/function components *will not* hot reload!
 // react-transform *only* works on component classes.
@@ -11,47 +17,34 @@ import '../../styles/core.scss'
 //
 // CoreLayout is a pure function of its props, so we can
 // define it with a plain javascript function...
-function CoreLayout ({children}) {
-  const navbarInstance = (
-    <Navbar inverse>
-      <Navbar.Header>
-        <Navbar.Brand>
-          <a href='/'>Hoverfly</a>
-        </Navbar.Brand>
-        <Navbar.Toggle />
-      </Navbar.Header>
-      <Navbar.Collapse>
-        <Nav>
-          <NavItem eventKey={1} href='/state'>State</NavItem>
-          <NavItem eventKey={2} href='/records'>Records</NavItem>
-          <NavDropdown eventKey={3} title='Dropdown' id='basic-nav-dropdown'>
-            <MenuItem eventKey={3.1}>Action</MenuItem>
-            <MenuItem eventKey={3.2}>Another action</MenuItem>
-            <MenuItem eventKey={3.3}>Something else here</MenuItem>
-            <MenuItem divider/>
-            <MenuItem eventKey={3.3}>Separated link</MenuItem>
-          </NavDropdown>
-        </Nav>
-        <Nav pullRight>
-          <NavItem eventKey={2} href='/logout'>Logout</NavItem>
-        </Nav>
-      </Navbar.Collapse>
-    </Navbar>
-  )
 
-  const gridInstance = (
-    <Grid>
-      <Row>
-        {children}
-      </Row>
-    </Grid>
+const styles = {
+  container: {
+    textAlign: 'center'
+    // paddingTop: 200
+  }
+}
+
+const muiTheme = getMuiTheme({
+  // palette: {
+  //   accent1Color: deepOrange500
+  // }
+})
+
+function CoreLayout ({children}) {
+  var myTabs = (
+    <Tabs>
+      <Tab label='Logout' route='/logout'/>
+    </Tabs>
   )
 
   return (
-    <div className='page-container'>
-      {navbarInstance}
-      {gridInstance}
-    </div>
+    <MuiThemeProvider muiTheme={muiTheme}>
+      <div style={styles.container}>
+        <AppBar title='Hoverfly' iconElementRight={myTabs}/>
+        {children}
+      </div>
+    </MuiThemeProvider>
   )
 }
 
