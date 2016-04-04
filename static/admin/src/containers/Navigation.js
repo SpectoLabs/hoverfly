@@ -8,7 +8,6 @@ import LeftNav from 'material-ui/lib/left-nav'
 import Menu from 'material-ui/lib/menus/menu'
 import MenuItem from 'material-ui/lib/menus/menu-item'
 import {Tabs, Tab} from 'material-ui'
-import Link from 'react-router'
 
 export default class Navigation extends React.Component<void, Props, void> {
   static propTypes = {
@@ -24,6 +23,8 @@ export default class Navigation extends React.Component<void, Props, void> {
 
   handleClose = () => this.setState({open: false});
 
+  onRequestChange = (open) => this.setState({open})
+
   render () {
     let myTabs = (
       <Tabs>
@@ -38,6 +39,7 @@ export default class Navigation extends React.Component<void, Props, void> {
           ref='leftNav'
           docked={false}
           open={this.state.open}
+          onRequestChange={this.onRequestChange}
         >
           <Menu>
             <MenuItem primaryText='State'/>
