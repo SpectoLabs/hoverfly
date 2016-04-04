@@ -57,15 +57,15 @@ export class ModeView extends React.Component<void, Props, void> {
   render () {
     return (
       <div>
-        <h1>State</h1>
+        <h1>System State</h1>
         <div className='row'>
           <Tabs defaultActiveKey={1}>
             <Tab eventKey={1} title='Modes'>
-              <h2>
+              <h3>
                 Current:
                 {' '}
                 <span className={classes['counter--green']}>{this.props.mode}</span>
-              </h2>
+              </h3>
               <Button onClick={this.virtualize}>Virtualize</Button>
               {' '}
               <Button onClick={this.capture}>Capture</Button>
