@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react'
 import { Provider } from 'react-redux'
 import { Router } from 'react-router'
-import Navigation from './Navigation'
 
 export default class Root extends React.Component {
   static propTypes = {
@@ -33,17 +32,10 @@ export default class Root extends React.Component {
     }
   }
 
-  get navigation () {
-    return (
-      <Navigation store={this.props.store}/>
-    )
-  }
-
   render () {
     return (
       <Provider store={this.props.store}>
         <div style={{ height: '100%' }}>
-          {this.navigation}
           {this.content}
           {this.devTools}
         </div>
