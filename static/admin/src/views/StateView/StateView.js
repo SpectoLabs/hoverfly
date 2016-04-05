@@ -2,7 +2,6 @@
 import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {setMode, fetchState} from '../../redux/modules/modes'
-// import classes from './ModeView.scss'
 
 import Card from 'material-ui/lib/card/card'
 import CardActions from 'material-ui/lib/card/card-actions'
