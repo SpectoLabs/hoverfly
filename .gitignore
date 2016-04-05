@@ -36,3 +36,7 @@ links.p
 
 static/node_modules
 static/dist
+
+# IntelliJ
+.idea
+*.iml

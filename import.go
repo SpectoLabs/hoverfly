@@ -17,7 +17,7 @@ import (
 // Import is a function that based on input decides whether it is a local resource or whether
 // it should fetch it from remote server. It then imports given payload into the database
 // or returns an error
-func (d *DBClient) Import(uri string) error {
+func (d *Hoverfly) Import(uri string) error {
 
 	// assuming file URI is URL:
 	if isURL(uri) {
@@ -81,7 +81,7 @@ func exists(path string) (bool, error) {
 
 // ImportFromDisk - takes one string value and tries to open a file, then parse it into recordedRequests structure
 // (which is default format in which Hoverfly exports captured requests) and imports those requests into the database
-func (d *DBClient) ImportFromDisk(path string) error {
+func (d *Hoverfly) ImportFromDisk(path string) error {
 	payloadsFile, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
@@ -100,7 +100,7 @@ func (d *DBClient) ImportFromDisk(path string) error {
 // ImportFromURL - takes one string value and tries connect to a remote server, then parse response body into
 // recordedRequests structure (which is default format in which Hoverfly exports captured requests) and
 // imports those requests into the database
-func (d *DBClient) ImportFromURL(url string) error {
+func (d *Hoverfly) ImportFromURL(url string) error {
 
 	resp, err := d.HTTP.Get(url)
 	if err != nil {
@@ -124,7 +124,7 @@ func isJSON(s string) bool {
 }
 
 // ImportPayloads - a function to save given payloads into the database.
-func (d *DBClient) ImportPayloads(payloads []Payload) error {
+func (d *Hoverfly) ImportPayloads(payloads []Payload) error {
 	if len(payloads) > 0 {
 		success := 0
 		failed := 0
@@ -172,7 +172,7 @@ func (d *DBClient) ImportPayloads(payloads []Payload) error {
 					}).Error("failed to fire hook")
 				}
 
-				d.Cache.Set([]byte(key), bts)
+				d.RequestCache.Set([]byte(key), bts)
 				if err == nil {
 					success++
 				} else {

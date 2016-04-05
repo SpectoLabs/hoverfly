@@ -15,9 +15,9 @@ type Configuration struct {
 	Mode         string
 	Destination  string
 	Middleware   string
-	DatabaseName string
+	DatabasePath string
 
-	TlsVerification bool
+	TLSVerification bool
 
 	Verbose     bool
 	Development bool
@@ -52,9 +52,9 @@ const DefaultPort = "8500"
 // DefaultAdminPort - default admin interface port
 const DefaultAdminPort = "8888"
 
-// DefaultDatabaseName - default database name that will be created
+// DefaultDatabasePath - default database name that will be created
 // or used by Hoverfly
-const DefaultDatabaseName = "requests.db"
+const DefaultDatabasePath = "requests.db"
 
 // DefaultJWTExpirationDelta - default token expiration if environment variable is no provided
 const DefaultJWTExpirationDelta = 72
@@ -93,11 +93,11 @@ func InitSettings() *Configuration {
 		appConfig.ProxyPort = DefaultPort
 	}
 
-	databaseName := os.Getenv(HoverflyDBEV)
-	if databaseName == "" {
-		databaseName = DefaultDatabaseName
+	databasePath := os.Getenv(HoverflyDBEV)
+	if databasePath == "" {
+		appConfig.DatabasePath = DefaultDatabasePath
+
 	}
-	appConfig.DatabaseName = databaseName
 
 	if os.Getenv(HoverflySecretEV) != "" {
 		appConfig.SecretKey = []byte(os.Getenv(HoverflySecretEV))
@@ -131,9 +131,9 @@ func InitSettings() *Configuration {
 	appConfig.Middleware = os.Getenv(HoverflyMiddlewareEV)
 
 	if os.Getenv(HoverflyTLSVerification) == "false" {
-		appConfig.TlsVerification = false
+		appConfig.TLSVerification = false
 	} else {
-		appConfig.TlsVerification = true
+		appConfig.TLSVerification = true
 	}
 
 	return &appConfig

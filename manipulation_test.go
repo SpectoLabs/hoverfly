@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"github.com/SpectoLabs/hoverfly/testutil"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -20,11 +21,11 @@ func TestReconstructRequest(t *testing.T) {
 
 	c := NewConstructor(req, payload)
 	newRequest, err := c.ReconstructRequest()
-	expect(t, err, nil)
-	expect(t, newRequest.Method, "POST")
-	expect(t, newRequest.URL.Path, "/random-path")
-	expect(t, newRequest.Host, "changed.destination.com")
-	expect(t, newRequest.URL.RawQuery, "?foo=bar")
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, newRequest.Method, "POST")
+	testutil.Expect(t, newRequest.URL.Path, "/random-path")
+	testutil.Expect(t, newRequest.Host, "changed.destination.com")
+	testutil.Expect(t, newRequest.URL.RawQuery, "?foo=bar")
 }
 
 func TestReconstructRequestBodyPayload(t *testing.T) {
@@ -38,14 +39,14 @@ func TestReconstructRequestBodyPayload(t *testing.T) {
 
 	newRequest, err := c.ReconstructRequest()
 
-	expect(t, err, nil)
-	expect(t, newRequest.Method, "OPTIONS")
-	expect(t, newRequest.Host, "newdestination")
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, newRequest.Method, "OPTIONS")
+	testutil.Expect(t, newRequest.Host, "newdestination")
 
 	body, err := ioutil.ReadAll(newRequest.Body)
 
-	expect(t, err, nil)
-	expect(t, string(body), "new request body here")
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, string(body), "new request body here")
 }
 
 func TestReconstructRequestHeadersPayload(t *testing.T) {
@@ -59,8 +60,8 @@ func TestReconstructRequestHeadersPayload(t *testing.T) {
 	c.payload.Request.Destination = "destination.com"
 
 	newRequest, err := c.ReconstructRequest()
-	expect(t, err, nil)
-	expect(t, newRequest.Header.Get("Header"), "ValueX")
+	testutil.Expect(t, err, nil)
+	testutil.Expect(t, newRequest.Header.Get("Header"), "ValueX")
 }
 
 func TestReconstructResponseHeadersPayload(t *testing.T) {
@@ -80,7 +81,7 @@ func TestReconstructResponseHeadersPayload(t *testing.T) {
 
 	response := c.ReconstructResponse()
 
-	expect(t, response.Header.Get("Header"), headers["Header"][0])
+	testutil.Expect(t, response.Header.Get("Header"), headers["Header"][0])
 
 }
 
@@ -93,5 +94,5 @@ func TestReconstructionFailure(t *testing.T) {
 	c.payload.Request.Body = "new request body here"
 
 	_, err := c.ReconstructRequest()
-	refute(t, err, nil)
+	testutil.Refute(t, err, nil)
 }

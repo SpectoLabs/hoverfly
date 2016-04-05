@@ -1,18 +1,18 @@
 package certs
 
 import (
+	"bytes"
+	"crypto/ecdsa"
+	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha1"
+	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"crypto/rand"
+	"encoding/pem"
+	"math/big"
 	"net"
 	"time"
-	"bytes"
-	"math/big"
-	"encoding/pem"
-	"crypto/ecdsa"
-	"crypto/tls"
 
 	log "github.com/Sirupsen/logrus"
 	"os"
@@ -21,6 +21,7 @@ import (
 // MaxSerialNumber - nothing very original, big number
 var MaxSerialNumber = big.NewInt(0).SetBytes(bytes.Repeat([]byte{255}, 20))
 
+// GenerateAndSave - generates cert and key and saves them on your disk
 func GenerateAndSave(name, organization string, validity time.Duration) (tlsc *tls.Certificate, err error) {
 	x509c, priv, err := NewCertificatePair(name, organization, validity)
 	if err != nil {
@@ -36,7 +37,7 @@ func GenerateAndSave(name, organization string, validity time.Duration) (tlsc *t
 	certOut.Close()
 	log.Print("cert.pem created\n")
 
-	keyOut, err := os.OpenFile("key.pem", os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0600)
+	keyOut, err := os.OpenFile("key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		log.Errorf("failed to open key.pem for writing: %s", err.Error())
 		return
@@ -45,7 +46,8 @@ func GenerateAndSave(name, organization string, validity time.Duration) (tlsc *t
 	keyOut.Close()
 	log.Print("key.pem created.\n")
 
-	tlsc, err = GetTlsCertificate(x509c, priv, "hoverfly.proxy", validity); if err != nil {
+	tlsc, err = GetTLSCertificate(x509c, priv, "hoverfly.proxy", validity)
+	if err != nil {
 		log.Errorf("failed to get tls certificate: %s", err.Error())
 	}
 	return
@@ -119,8 +121,8 @@ func NewCertificatePair(name, organization string, validity time.Duration) (*x50
 	return x509c, priv, nil
 }
 
-// GetTlsCertificate - takes x509 cert and private key, returns tls.Certificate that is ready for proxy use
-func GetTlsCertificate(cert *x509.Certificate, priv *rsa.PrivateKey, hostname string,  validity time.Duration) (*tls.Certificate, error) {
+// GetTLSCertificate - takes x509 cert and private key, returns tls.Certificate that is ready for proxy use
+func GetTLSCertificate(cert *x509.Certificate, priv *rsa.PrivateKey, hostname string, validity time.Duration) (*tls.Certificate, error) {
 	host, _, err := net.SplitHostPort(hostname)
 	if err == nil {
 		hostname = host
