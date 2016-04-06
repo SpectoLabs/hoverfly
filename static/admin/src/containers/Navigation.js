@@ -15,7 +15,6 @@ type Props = {
 
 export default class Navigation extends React.Component<void, Props, void> {
   static propTypes = {
-    // path: PropTypes.string.isRequired,
     pushPath: PropTypes.func.isRequired
   };
 
@@ -23,7 +22,6 @@ export default class Navigation extends React.Component<void, Props, void> {
     super(props)
     this.state = {open: false}
     this.handleActive = this.handleActive.bind(this)
-    // this.goToPage = this.goToPage.bind(this)
   }
 
   handleToggle = () => this.setState({open: !this.state.open});
@@ -38,16 +36,16 @@ export default class Navigation extends React.Component<void, Props, void> {
 
   render () {
     let myLeftTabs = (
-      <Tabs>
-        <Tab label='State' route='state' onActive={this.handleActive}/>
-        <Tab label='Records' route='records' onActive={this.handleActive}/>
-        <Tab label='Middleware' route='middleware' onActive={this.handleActive}/>
+      <Tabs value={window.location.pathname}>
+        <Tab label='State' route='state' value='/state' onActive={this.handleActive}/>
+        <Tab label='Records' route='records' value='/records' onActive={this.handleActive}/>
+        <Tab label='Middleware' route='middleware' value='/middleware' onActive={this.handleActive}/>
       </Tabs>
     )
 
     let myRightTabs = (
       <Tabs>
-        <Tab label='Logout' route='/logout'/>
+        <Tab label='Logout' selected={false} route='/logout'/>
       </Tabs>
     )
 
