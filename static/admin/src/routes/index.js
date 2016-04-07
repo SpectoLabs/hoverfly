@@ -17,7 +17,7 @@ export default (store) => (
     <IndexRoute component={HomeView} />
     <Route path='login' component={LoginView}/>
     <Route path='state' component={requireAuthentication(StateView)} />
-    <Route path='records' component={StateView} />
-    <Route path='middleware' component={StateView} />
+    <Route path='records' component={requireAuthentication(StateView)} />
+    <Route path='middleware' component={requireAuthentication(StateView)} />
   </Route>
 )
