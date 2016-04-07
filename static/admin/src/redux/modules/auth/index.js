@@ -13,9 +13,7 @@ import {
   LOGIN_USER_REQUEST,
   LOGIN_USER_SUCCESS,
   LOGIN_USER_FAILURE,
-  LOGOUT_USER,
-  RECEIVE_PROTECTED_DATA,
-  FETCH_PROTECTED_DATA_REQUEST
+  LOGOUT_USER
 } from '../../../constants'
 
 export function loginUserSuccess (token) {
@@ -53,6 +51,7 @@ export function logout () {
 }
 
 export function logoutAndRedirect () {
+  console.log('logoutAndRedirect action fired')
   return (dispatch, state) => {
     dispatch(logout())
     dispatch(push('/login'))
@@ -91,45 +90,6 @@ export function loginUser (email, password, redirect = '/') {
       })
       .catch((error) => {
         dispatch(loginUserFailure(error))
-      })
-  }
-}
-
-export function receiveProtectedData (data) {
-  return {
-    type: RECEIVE_PROTECTED_DATA,
-    payload: {
-      data: data
-    }
-  }
-}
-
-export function fetchProtectedDataRequest () {
-  return {
-    type: FETCH_PROTECTED_DATA_REQUEST
-  }
-}
-
-export function fetchProtectedData (token) {
-  return (dispatch, state) => {
-    dispatch(fetchProtectedDataRequest())
-    // return fetch('http://localhost:3000/getData/', {
-    return fetch('/state/', {
-      credentials: 'include',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then(checkHttpStatus)
-      .then(parseJSON)
-      .then((response) => {
-        dispatch(receiveProtectedData(response.data))
-      })
-      .catch((error) => {
-        if (error.response.status === 401) {
-          dispatch(loginUserFailure(error))
-          dispatch(push('/login'))
-        }
       })
   }
 }
