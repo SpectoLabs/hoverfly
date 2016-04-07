@@ -2,18 +2,21 @@
  * Created by karolisrusenas on 06/04/2016.
  */
 
-import {checkHttpStatus, parseJSON} from '../../utils'
+import {checkHttpStatus, parseJSON} from '../../../utils'
+import {push} from 'react-router-redux'
+import fetch from 'isomorphic-fetch'
+
+// ------------------------------------
+// Constants
+// ------------------------------------
 import {
   LOGIN_USER_REQUEST,
-  LOGIN_USER_FAILURE,
   LOGIN_USER_SUCCESS,
+  LOGIN_USER_FAILURE,
   LOGOUT_USER,
-  FETCH_PROTECTED_DATA_REQUEST,
-  RECEIVE_PROTECTED_DATA
-} from '../../constants'
-import {push} from 'react-router-redux'
-import jwtDecode from 'jwt-decode'
-import fetch from 'isomorphic-fetch'
+  RECEIVE_PROTECTED_DATA,
+  FETCH_PROTECTED_DATA_REQUEST
+} from '../../../constants'
 
 export function loginUserSuccess (token) {
   localStorage.setItem('token', token)
@@ -58,7 +61,7 @@ export function logoutAndRedirect () {
 
 export function loginUser (email, password, redirect = '/') {
   return function (dispatch) {
-    dispatch(loginUserRequest());
+    dispatch(loginUserRequest())
     return fetch('/api/token-auth', {
       method: 'post',
       credentials: 'include',
@@ -72,10 +75,12 @@ export function loginUser (email, password, redirect = '/') {
       .then(parseJSON)
       .then((response) => {
         try {
-          let decoded = jwtDecode(response.token)
           dispatch(loginUserSuccess(response.token))
+          console.log(`loginUserSucess dispatched, redirecting to ${redirect}`)
           dispatch(push(redirect))
+          console.log('login success')
         } catch (e) {
+          console.log('login failed')
           dispatch(loginUserFailure({
             response: {
               status: 403,
@@ -120,7 +125,7 @@ export function fetchProtectedData (token) {
       .then((response) => {
         dispatch(receiveProtectedData(response.data))
       })
-      .catch(error => {
+      .catch((error) => {
         if (error.response.status === 401) {
           dispatch(loginUserFailure(error))
           dispatch(push('/login'))
