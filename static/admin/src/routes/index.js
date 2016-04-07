@@ -1,5 +1,6 @@
 import React from 'react'
 import { Route, IndexRoute } from 'react-router'
+import { requireAuthentication } from '../utils'
 
 // NOTE: here we're making use of the `resolve.root` configuration
 // option in webpack, which allows us to specify import paths as if
@@ -9,11 +10,13 @@ import { Route, IndexRoute } from 'react-router'
 import CoreLayout from 'layouts/CoreLayout/CoreLayout'
 import HomeView from 'views/HomeView/HomeView'
 import StateView from 'views/StateView/StateView'
+import LoginView from 'views/Auth/LoginView'
 
 export default (store) => (
   <Route path='/' component={CoreLayout}>
     <IndexRoute component={HomeView} />
-    <Route path='state' component={StateView} />
+    <Route path='login' component={LoginView}/>
+    <Route path='state' component={requireAuthentication(StateView)} />
     <Route path='records' component={StateView} />
     <Route path='middleware' component={StateView} />
   </Route>
