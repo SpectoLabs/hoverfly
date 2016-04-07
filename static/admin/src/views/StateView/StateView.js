@@ -5,13 +5,9 @@ import {setMode, fetchState} from '../../redux/modules/modes'
 
 import Card from 'material-ui/lib/card/card'
 import CardActions from 'material-ui/lib/card/card-actions'
-// import CardHeader from 'material-ui/lib/card/card-header'
 import CardTitle from 'material-ui/lib/card/card-title'
 import RaisedButton from 'material-ui/lib/raised-button'
 import CardText from 'material-ui/lib/card/card-text'
-
-import {bindActionCreators} from 'redux'
-import * as actionCreators from '../../redux/modules/auth'
 
 // import {Tabs, Tab, Button} from 'react-bootstrap'
 // We can use Flow (http://flowtype.org/) to type our component's props
