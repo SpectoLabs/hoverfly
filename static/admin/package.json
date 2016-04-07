@@ -68,6 +68,7 @@
     "es6-promise": "^3.1.2",
     "history": "^2.0.0",
     "isomorphic-fetch": "^2.2.1",
+    "jwt-decode": "^2.0.1",
     "koa": "^2.0.0-alpha.3",
     "koa-connect-history-api-fallback": "^0.3.0",
     "koa-convert": "^1.2.0",
@@ -77,11 +78,13 @@
     "react": "^0.14.0",
     "react-bootstrap": "^0.28.4",
     "react-dom": "^0.14.0",
+    "react-mixin": "^3.0.4",
     "react-redux": "^4.0.0",
     "react-router": "^2.0.0",
     "react-router-redux": "^4.0.0",
     "react-tap-event-plugin": "^0.2.2",
     "redux": "^3.0.0",
+    "redux-auth-wrapper": "^0.3.0",
     "redux-thunk": "^2.0.0"
   },
   "devDependencies": {
