@@ -7,6 +7,14 @@ import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 import reactMixin from 'react-mixin'
 import * as actionCreators from '../../redux/modules/auth'
+import {Col} from 'react-bootstrap'
+
+import Card from 'material-ui/lib/card/card'
+// import CardActions from 'material-ui/lib/card/card-actions'
+// import CardHeader from 'material-ui/lib/card/card-header'
+import CardTitle from 'material-ui/lib/card/card-title'
+import RaisedButton from 'material-ui/lib/raised-button'
+import CardText from 'material-ui/lib/card/card-text'
 
 export class LoginView extends React.Component {
   static propTypes = {
@@ -33,32 +41,38 @@ export class LoginView extends React.Component {
 
   render () {
     return (
-      <div className='col-xs-12 col-md-6 col-md-offset-3'>
-        <h3>Log in to view protected content!</h3>
-        <p>Hint: hf / hf</p>
-        {this.props.statusText ? <div className='alert alert-info'>{this.props.statusText}</div> : ''}
-        <form role='form'>
-          <div className='form-group'>
-            <input
-              type='text'
-              className='form-control input-lg'
-              valueLink={this.linkState('email')}
-              placeholder='Username'/>
-          </div>
-          <div className='form-group'>
-            <input
-              type='password'
-              className='form-control input-lg'
-              valueLink={this.linkState('password')}
-              placeholder='Password'/>
-          </div>
-          <button
-            type='submit'
-            className='btn btn-lg'
-            disabled={this.props.isAuthenticating}
-            onClick={this.login.bind(this)}>Submit
-          </button>
-        </form>
+      <div>
+        <Col md={3}/>
+        <Col md={6}>
+          <Card>
+            <CardTitle title='Login required!' subtitle='Hint: hf/hf'/>
+            <CardText>
+              {this.props.statusText ? <div className='alert alert-info'>{this.props.statusText}</div> : ''}
+              <form role='form'>
+                <div className='form-group'>
+                  <input
+                    type='text'
+                    className='form-control input-lg'
+                    valueLink={this.linkState('email')}
+                    placeholder='Username'/>
+                </div>
+                <div className='form-group'>
+                  <input
+                    type='password'
+                    className='form-control input-lg'
+                    valueLink={this.linkState('password')}
+                    placeholder='Password'/>
+                </div>
+                <RaisedButton
+                  type='submit'
+                  label='Submit'
+                  onClick={this.login.bind(this)}
+                  disabled={this.props.isAuthenticating}
+                  primary/>
+              </form>
+            </CardText>
+          </Card>
+        </Col>
       </div>
     )
   }

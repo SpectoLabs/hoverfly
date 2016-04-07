@@ -201,10 +201,6 @@ const mapStateToProps = (state) => ({
   mode: state.modes
 })
 
-// const mapDispatchToProps = (dispatch) => ({
-//   actions: bindActionCreators(actionCreators, dispatch)
-// })
-
 export default connect(mapStateToProps, {
   setMode,
   fetchState
