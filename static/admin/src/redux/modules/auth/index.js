@@ -59,6 +59,9 @@ export function logoutAndRedirect () {
 }
 
 export function loginUser (email, password, redirect = '/') {
+  if (redirect === '/logout') {
+    redirect = '/'
+  }
   return function (dispatch) {
     dispatch(loginUserRequest())
     return fetch('/api/token-auth', {
