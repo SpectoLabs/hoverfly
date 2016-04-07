@@ -10,6 +10,9 @@ import CardTitle from 'material-ui/lib/card/card-title'
 import RaisedButton from 'material-ui/lib/raised-button'
 import CardText from 'material-ui/lib/card/card-text'
 
+import {bindActionCreators} from 'redux'
+import * as actionCreators from '../../redux/modules/auth'
+
 // import {Tabs, Tab, Button} from 'react-bootstrap'
 // We can use Flow (http://flowtype.org/) to type our component's props
 // and state. For convenience we've included both regular propTypes and
@@ -30,7 +33,8 @@ const synthesizeMode = 'synthesize'
 
 export class ModeInfoComponent extends React.Component<void, Props, void> {
   static propTypes = {
-    mode: PropTypes.string.isRequired
+    mode: PropTypes.string.isRequired,
+    actions: PropTypes.object.isRequired
   };
 
   render () {
@@ -93,7 +97,8 @@ export class ModeView extends React.Component<void, Props, void> {
   static propTypes = {
     mode: PropTypes.string.isRequired,
     setMode: PropTypes.func.isRequired,
-    fetchState: PropTypes.func.isRequired
+    fetchState: PropTypes.func.isRequired,
+    authData: PropTypes.object.isRequired
   };
 
   constructor (props) {
@@ -102,26 +107,38 @@ export class ModeView extends React.Component<void, Props, void> {
     this.capture = this.capture.bind(this)
     this.modify = this.modify.bind(this)
     this.synthesize = this.synthesize.bind(this)
+    this.changeMode = this.changeMode.bind(this)
   }
 
   virtualize () {
-    this.props.setMode('virtualize')
+    let token = this.props.authData.token
+    this.props.setMode('virtualize', token)
   }
 
   capture () {
-    this.props.setMode('capture')
+    let token = this.props.authData.token
+    this.props.setMode('capture', token)
   }
 
   modify () {
-    this.props.setMode('modify')
+    this.props.setMode('modify', this.props.authData.token)
   }
 
   synthesize () {
-    this.props.setMode('synthesize')
+    this.props.setMode('synthesize', this.props.authData.token)
+  }
+
+  changeMode (mode) {
+    let token = this.props.authData.token
+    console.log(`changing mode to ${mode}, token ${token}`)
+    // this.props.setMode(mode, token)
   }
 
   componentWillMount () {
-    this.props.fetchState()
+    console.log('mounting component')
+    let token = this.props.authData.token
+    console.log(token)
+    this.props.fetchState(token)
   }
 
   render () {
@@ -133,6 +150,7 @@ export class ModeView extends React.Component<void, Props, void> {
     let modifyButton
     let synthesizeButton
 
+    // TODO: refactor buttons so it's a separate component that takes current mode and button mode
     if (currentMode === virtualizeMode) {
       virtualizeButton = <RaisedButton label='Virtualize' onClick={this.virtualize} primary/>
     } else {
@@ -183,7 +201,11 @@ const mapStateToProps = (state) => ({
   mode: state.modes
 })
 
-export default connect((mapStateToProps), {
+// const mapDispatchToProps = (dispatch) => ({
+//   actions: bindActionCreators(actionCreators, dispatch)
+// })
+
+export default connect(mapStateToProps, {
   setMode,
   fetchState
 })(ModeView)
