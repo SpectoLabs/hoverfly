@@ -17,15 +17,18 @@ export const RECEIVE_STATE = 'RECEIVE_STATE'
 // if you'd like to learn more you can check out: flowtype.org.
 // DOUBLE NOTE: there is currently a bug with babel-eslint where a `space-infix-ops` error is
 // incorrectly thrown when using arrow functions, hence the oddity.
-export function setMode (mode):Action {
+export function setMode (mode, token):Action {
   return function (dispatch) {
     dispatch(requestState())
+    console.log(`setting mode, token: ${token}`)
     console.log('setting mode')
     return fetch('/api/state', {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
         mode: mode
@@ -58,10 +61,19 @@ export function receiveState (json) {
   }
 }
 
-export function fetchState () {
+export function fetchState (token) {
+  if (typeof token === 'undefined') {
+    token = ''
+  }
+  console.log(`fetching state, token: ${token}`)
   return function (dispatch) {
     dispatch(requestState())
-    return fetch('/api/state')
+    return fetch('/api/state', {
+      credentials: 'include',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
       .then((response) => response.json())
       .then((json) => dispatch(receiveState(json))
       )
