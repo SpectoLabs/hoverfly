@@ -45,7 +45,7 @@ export default class Navigation extends React.Component<void, Props, void> {
 
     let myRightTabs = (
       <Tabs>
-        <Tab label='Logout' selected={false} route='/logout'/>
+        <Tab label='Logout' route='/logout' value='/logout' onActive={this.handleActive}/>
       </Tabs>
     )
 
