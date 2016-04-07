@@ -10,8 +10,6 @@ import * as actionCreators from '../../redux/modules/auth'
 import {Col} from 'react-bootstrap'
 
 import Card from 'material-ui/lib/card/card'
-// import CardActions from 'material-ui/lib/card/card-actions'
-// import CardHeader from 'material-ui/lib/card/card-header'
 import CardTitle from 'material-ui/lib/card/card-title'
 import RaisedButton from 'material-ui/lib/raised-button'
 import CardText from 'material-ui/lib/card/card-text'
@@ -20,7 +18,7 @@ export class LoginView extends React.Component {
   static propTypes = {
     location: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
-    statusText: PropTypes.string.isRequired,
+    statusText: PropTypes.string,
     isAuthenticating: PropTypes.bool.isRequired
   };
 
