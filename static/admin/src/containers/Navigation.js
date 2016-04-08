@@ -15,7 +15,8 @@ type Props = {
 
 export default class Navigation extends React.Component<void, Props, void> {
   static propTypes = {
-    pushPath: PropTypes.func.isRequired
+    pushPath: PropTypes.func.isRequired,
+    isAuthenticated: PropTypes.bool.isRequired
   };
 
   constructor (props) {
@@ -48,14 +49,21 @@ export default class Navigation extends React.Component<void, Props, void> {
         <Tab label='Logout' route='/logout' value='/logout' onActive={this.handleActive}/>
       </Tabs>
     )
-
-    return (
-      <div>
-        <AppBar
-          onLeftIconButtonTouchTap={this.handleToggle}
-          iconElementLeft={myLeftTabs} iconElementRight={myRightTabs}/>
-      </div>
-    )
+    if (this.props.isAuthenticated === true) {
+      return (
+        <div>
+          <AppBar
+            onLeftIconButtonTouchTap={this.handleToggle}
+            iconElementLeft={myLeftTabs} iconElementRight={myRightTabs}/>
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          <AppBar showMenuIconButton={false} />
+        </div>
+      )
+    }
   }
 }
 
@@ -64,7 +72,7 @@ Navigation.contextTypes = {
   history: React.PropTypes.object
 }
 
-const mapStateToProps = (state) => ({})
+const mapStateToProps = (state) => ({isAuthenticated: state.auth.isAuthenticated})
 
 export default connect((mapStateToProps), {
   pushPath
