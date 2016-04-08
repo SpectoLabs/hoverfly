@@ -54,6 +54,7 @@ export class LoginView extends React.Component {
                     ref='username'
                     type='text'
                   />
+                  <br />
                   <TextField
                     hintText='Password'
                     type='password'
