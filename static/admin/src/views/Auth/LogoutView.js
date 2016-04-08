@@ -1,16 +1,16 @@
 /**
  * Created by karolisrusenas on 07/04/2016.
  */
-import React, {PropTypes} from 'react/addons'
+import React, {PropTypes} from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
-import reactMixin from 'react-mixin'
 import * as actionCreators from '../../redux/modules/auth'
 import {Col} from 'react-bootstrap'
 
 import Card from 'material-ui/lib/card/card'
 import CardTitle from 'material-ui/lib/card/card-title'
 import CardText from 'material-ui/lib/card/card-text'
+import CircularProgress from 'material-ui/lib/circular-progress'
 
 export class LogoutView extends React.Component {
   static propTypes = {
@@ -31,7 +31,9 @@ export class LogoutView extends React.Component {
             <CardTitle title='Logged out!'/>
             <CardText>
               {this.props.statusText ? <div className='alert alert-info'>{this.props.statusText}</div> : ''}
-              You will shortly be redirected to login page.
+              <div>
+                <CircularProgress size={1.5}/>
+              </div>
             </CardText>
           </Card>
         </Col>
@@ -39,8 +41,6 @@ export class LogoutView extends React.Component {
     )
   }
 }
-
-reactMixin(LogoutView.prototype, React.addons.LinkedStateMixin)
 
 const mapStateToProps = (state) => ({
   isAuthenticating: state.auth.isAuthenticating,
