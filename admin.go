@@ -445,7 +445,7 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 	presp := ResponseDetails {
 		Status: sc,
 		Headers: headers,
-		Body: respBody
+		Body: respBody,
 	}
 
 	log.WithFields(log.Fields{
