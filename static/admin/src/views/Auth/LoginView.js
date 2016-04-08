@@ -2,10 +2,9 @@
  * Created by karolisrusenas on 06/04/2016.
  */
 
-import React, {PropTypes} from 'react/addons'
+import React, {PropTypes} from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
-import reactMixin from 'react-mixin'
 import * as actionCreators from '../../redux/modules/auth'
 import {Col} from 'react-bootstrap'
 
@@ -13,6 +12,7 @@ import Card from 'material-ui/lib/card/card'
 import CardTitle from 'material-ui/lib/card/card-title'
 import RaisedButton from 'material-ui/lib/raised-button'
 import CardText from 'material-ui/lib/card/card-text'
+import TextField from 'material-ui/lib/text-field'
 
 export class LoginView extends React.Component {
   static propTypes = {
@@ -30,11 +30,12 @@ export class LoginView extends React.Component {
       password: '',
       redirectTo: redirectRoute
     }
+    this.login = this.login.bind(this)
   }
 
   login (e) {
     e.preventDefault()
-    this.props.actions.loginUser(this.state.email, this.state.password, this.state.redirectTo)
+    this.props.actions.loginUser(this.refs.username.getValue(), this.refs.password.getValue(), this.state.redirectTo)
   }
 
   render () {
@@ -48,23 +49,21 @@ export class LoginView extends React.Component {
               {this.props.statusText ? <div className='alert alert-info'>{this.props.statusText}</div> : ''}
               <form role='form'>
                 <div className='form-group'>
-                  <input
+                  <TextField
+                    hintText='Username'
+                    ref='username'
                     type='text'
-                    className='form-control input-lg'
-                    valueLink={this.linkState('email')}
-                    placeholder='Username'/>
-                </div>
-                <div className='form-group'>
-                  <input
+                  />
+                  <TextField
+                    hintText='Password'
                     type='password'
-                    className='form-control input-lg'
-                    valueLink={this.linkState('password')}
-                    placeholder='Password'/>
+                    ref='password'
+                  />
                 </div>
                 <RaisedButton
                   type='submit'
                   label='Submit'
-                  onClick={this.login.bind(this)}
+                  onClick={this.login}
                   disabled={this.props.isAuthenticating}
                   primary/>
               </form>
@@ -75,8 +74,6 @@ export class LoginView extends React.Component {
     )
   }
 }
-
-reactMixin(LoginView.prototype, React.addons.LinkedStateMixin)
 
 const mapStateToProps = (state) => ({
   isAuthenticating: state.auth.isAuthenticating,
