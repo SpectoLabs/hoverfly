@@ -1,7 +1,7 @@
 /* @flow */
 import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {setMode, fetchState} from '../../redux/modules/modes'
+import {setMode, fetchState} from '../../redux/modules/state'
 
 import Card from 'material-ui/lib/card/card'
 import CardActions from 'material-ui/lib/card/card-actions'
@@ -9,6 +9,7 @@ import CardTitle from 'material-ui/lib/card/card-title'
 import RaisedButton from 'material-ui/lib/raised-button'
 import CardText from 'material-ui/lib/card/card-text'
 
+import StatsComponent from './Stats'
 // import {Tabs, Tab, Button} from 'react-bootstrap'
 // We can use Flow (http://flowtype.org/) to type our component's props
 // and state. For convenience we've included both regular propTypes and
@@ -29,7 +30,7 @@ const synthesizeMode = 'synthesize'
 
 export class ModeInfoComponent extends React.Component<void, Props, void> {
   static propTypes = {
-    mode: PropTypes.string.isRequired,
+    mode: PropTypes.string,
     actions: PropTypes.object
   };
 
@@ -91,7 +92,7 @@ export class ModeInfoComponent extends React.Component<void, Props, void> {
 // See: http://rackt.github.io/redux/docs/recipes/WritingTests.html
 export class StateView extends React.Component<void, Props, void> {
   static propTypes = {
-    mode: PropTypes.string.isRequired,
+    info: PropTypes.object.isRequired,
     setMode: PropTypes.func.isRequired,
     fetchState: PropTypes.func.isRequired,
     authData: PropTypes.object.isRequired
@@ -129,7 +130,7 @@ export class StateView extends React.Component<void, Props, void> {
   }
 
   render () {
-    let currentMode = this.props.mode
+    let currentMode = this.props.info.mode
     let currentModeInfo = 'Current mode: ' + currentMode
 
     let virtualizeButton
@@ -166,7 +167,7 @@ export class StateView extends React.Component<void, Props, void> {
       <Card>
         <CardTitle title={currentModeInfo} subtitle='You can change proxy behaviour here'/>
         <CardText>
-          <ModeInfoComponent mode={this.props.mode}/>
+          <ModeInfoComponent mode={this.props.info.mode}/>
         </CardText>
         <CardActions>
           {virtualizeButton}
@@ -179,13 +180,15 @@ export class StateView extends React.Component<void, Props, void> {
     return (
       <div>
         {modeInfo}
+        <hr/>
+        <StatsComponent token={this.props.authData.token}/>
       </div>
     )
   }
 }
 
 const mapStateToProps = (state) => ({
-  mode: state.modes
+  info: state.info
 })
 
 export default connect(mapStateToProps, {
