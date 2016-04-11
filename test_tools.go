@@ -53,7 +53,8 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 	metaCache := cache.NewBoltDBCache(TestDB, metaBucket)
 
 	cfg := InitSettings()
-
+	// disabling auth for testing
+	cfg.AuthEnabled = false
 	// preparing client
 	dbClient := &Hoverfly{
 		HTTP:          &http.Client{Transport: tr},
