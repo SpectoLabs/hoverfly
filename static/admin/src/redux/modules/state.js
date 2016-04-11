@@ -139,21 +139,6 @@ export const actions = {
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
-// const ACTION_HANDLERS = {
-//   [SET_MODE]: (state:mode, action:{payload: mode}):mode => action.payload,
-//   [RECEIVE_STATE]: (state:mode, action:{payload: mode}):mode => action.payload,
-//   [RECEIVE_RECORDS_COUNT]: (state:count, action:{payload: count}):count => action.payload
-// }
-//
-// // ------------------------------------
-// // Reducer
-// // ------------------------------------
-// let initialState = 'fetching data..'
-// export default function modeReducer (state:string = initialState, action:Action):string {
-//   const handler = ACTION_HANDLERS[action.type]
-//
-//   return handler ? handler(state, action) : state
-// }
 
 const initialState = {
   recordsCount: null,
@@ -163,20 +148,20 @@ const initialState = {
 export default createReducer(initialState, {
   [SET_MODE]: (state, payload) => {
     return Object.assign({}, state, {
-      'mode': payload.mode,
-      'count': state.count
+      'mode': payload,
+      'recordsCount': state.recordsCount
     })
   },
   [RECEIVE_STATE]: (state, payload) => {
     return Object.assign({}, state, {
-      'mode': payload.mode,
-      'count': state.count
+      'mode': payload,
+      'recordsCount': state.recordsCount
     })
   },
   [RECEIVE_RECORDS_COUNT]: (state, payload) => {
     return Object.assign({}, state, {
       'mode': state.mode,
-      'count': payload.count
+      'recordsCount': payload
     })
   }
 })
