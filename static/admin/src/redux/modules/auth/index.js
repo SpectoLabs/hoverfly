@@ -62,8 +62,29 @@ export function logout () {
 
 export function logoutAndRedirect () {
   return (dispatch, state) => {
+    dispatch(invalidateToken())
     dispatch(logout())
     dispatch(push('/login'))
+  }
+}
+
+export function invalidateToken () {
+  return function (dispatch) {
+    let token = localStorage.getItem('token')
+    dispatch(loginUserRequest())
+    return fetch('/api/logout', {
+      method: 'get',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(checkHttpStatus)
+      .catch((error) => {
+        console.log(error)
+      })
   }
 }
 
