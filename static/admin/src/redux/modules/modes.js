@@ -2,6 +2,7 @@
 import fetch from 'isomorphic-fetch'
 import {push} from 'react-router-redux'
 import loginUserFailure from './auth'
+import {checkHttpStatus, parseJSON} from '../../utils'
 // ------------------------------------
 // Constants
 // ------------------------------------
@@ -72,7 +73,8 @@ export function fetchState (token) {
         'Authorization': `Bearer ${token}`
       }
     })
-      .then((response) => response.json())
+      .then(checkHttpStatus)
+      .then(parseJSON)
       .then((json) => dispatch(receiveState(json))
       ).catch((error) => {
         if (error.response.status === 401) {
