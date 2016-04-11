@@ -2,7 +2,7 @@
 import fetch from 'isomorphic-fetch'
 import {push} from 'react-router-redux'
 import {loginUserFailure} from './auth'
-import {checkHttpStatus, parseJSON} from '../../utils'
+import {checkHttpStatus, parseJSON, createReducer} from '../../utils'
 // ------------------------------------
 // Constants
 // ------------------------------------
@@ -11,6 +11,9 @@ export const GET_MODE = 'GET_MODE'
 
 export const REQUEST_STATE = 'REQUEST_STATE'
 export const RECEIVE_STATE = 'RECEIVE_STATE'
+
+export const REQUEST_RECORDS_COUNT = 'REQUEST_RECORDS_COUNT'
+export const RECEIVE_RECORDS_COUNT = 'RECEIVE_RECORDS_COUNT'
 
 // ------------------------------------
 // Actions
@@ -53,6 +56,20 @@ export function requestState () {
   }
 }
 
+export function requestRecordsCount () {
+  return {
+    type: REQUEST_RECORDS_COUNT
+  }
+}
+
+export function receiveRecordsCount (json) {
+  return {
+    type: RECEIVE_RECORDS_COUNT,
+    payload: json.count,
+    receivedAt: Date.now()
+  }
+}
+
 export function receiveState (json) {
   return {
     type: RECEIVE_STATE,
@@ -85,27 +102,81 @@ export function fetchState (token) {
   }
 }
 
+export function fetchRecordsCount (token) {
+  if (typeof token === 'undefined') {
+    token = ''
+  }
+  return function (dispatch) {
+    dispatch(requestRecordsCount())
+    return fetch('/api/count', {
+      credentials: 'include',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(checkHttpStatus)
+      .then(parseJSON)
+      .then((response) => {
+        dispatch(receiveRecordsCount(response))
+      })
+      .catch((error) => {
+        dispatch(loginUserFailure(error))
+        dispatch(push('/login'))
+      })
+  }
+}
+
 export const actions = {
   setMode,
   getMode,
   requestState,
   receiveState,
-  fetchState
+  fetchState,
+  requestRecordsCount,
+  receiveRecordsCount,
+  fetchRecordsCount
 }
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
-const ACTION_HANDLERS = {
-  [SET_MODE]: (state:mode, action:{payload: mode}):mode => action.payload,
-  [RECEIVE_STATE]: (state:mode, action:{payload: mode}):mode => action.payload
+// const ACTION_HANDLERS = {
+//   [SET_MODE]: (state:mode, action:{payload: mode}):mode => action.payload,
+//   [RECEIVE_STATE]: (state:mode, action:{payload: mode}):mode => action.payload,
+//   [RECEIVE_RECORDS_COUNT]: (state:count, action:{payload: count}):count => action.payload
+// }
+//
+// // ------------------------------------
+// // Reducer
+// // ------------------------------------
+// let initialState = 'fetching data..'
+// export default function modeReducer (state:string = initialState, action:Action):string {
+//   const handler = ACTION_HANDLERS[action.type]
+//
+//   return handler ? handler(state, action) : state
+// }
+
+const initialState = {
+  recordsCount: null,
+  mode: null
 }
 
-// ------------------------------------
-// Reducer
-// ------------------------------------
-let initialState = 'fetching data..'
-export default function modeReducer (state:mode = initialState, action:Action):mode {
-  const handler = ACTION_HANDLERS[action.type]
-
-  return handler ? handler(state, action) : state
-}
+export default createReducer(initialState, {
+  [SET_MODE]: (state, payload) => {
+    return Object.assign({}, state, {
+      'mode': payload.mode,
+      'count': state.count
+    })
+  },
+  [RECEIVE_STATE]: (state, payload) => {
+    return Object.assign({}, state, {
+      'mode': payload.mode,
+      'count': state.count
+    })
+  },
+  [RECEIVE_RECORDS_COUNT]: (state, payload) => {
+    return Object.assign({}, state, {
+      'mode': state.mode,
+      'count': payload.count
+    })
+  }
+})
