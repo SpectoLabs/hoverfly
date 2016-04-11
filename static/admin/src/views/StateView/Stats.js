@@ -26,7 +26,7 @@ export class StatsComponent extends React.Component<void, Props, void> {
           <p> Stats here</p>
         </CardText>
         <CardActions>
-          <RaisedButton label='Wipe Records' primary/>
+          <RaisedButton label='Wipe Records' secondary/>
         </CardActions>
       </Card>
     )
