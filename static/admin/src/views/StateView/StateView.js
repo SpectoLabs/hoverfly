@@ -30,7 +30,7 @@ const synthesizeMode = 'synthesize'
 export class ModeInfoComponent extends React.Component<void, Props, void> {
   static propTypes = {
     mode: PropTypes.string.isRequired,
-    actions: PropTypes.object.isRequired
+    actions: PropTypes.object
   };
 
   render () {
@@ -89,7 +89,7 @@ export class ModeInfoComponent extends React.Component<void, Props, void> {
 // We avoid using the `@connect` decorator on the class definition so
 // that we can export the undecorated component for testing.
 // See: http://rackt.github.io/redux/docs/recipes/WritingTests.html
-export class ModeView extends React.Component<void, Props, void> {
+export class StateView extends React.Component<void, Props, void> {
   static propTypes = {
     mode: PropTypes.string.isRequired,
     setMode: PropTypes.func.isRequired,
@@ -103,7 +103,6 @@ export class ModeView extends React.Component<void, Props, void> {
     this.capture = this.capture.bind(this)
     this.modify = this.modify.bind(this)
     this.synthesize = this.synthesize.bind(this)
-    this.changeMode = this.changeMode.bind(this)
   }
 
   virtualize () {
@@ -124,16 +123,8 @@ export class ModeView extends React.Component<void, Props, void> {
     this.props.setMode('synthesize', this.props.authData.token)
   }
 
-  changeMode (mode) {
-    let token = this.props.authData.token
-    console.log(`changing mode to ${mode}, token ${token}`)
-    // this.props.setMode(mode, token)
-  }
-
   componentWillMount () {
-    console.log('mounting component')
     let token = this.props.authData.token
-    console.log(token)
     this.props.fetchState(token)
   }
 
@@ -200,4 +191,4 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
   setMode,
   fetchState
-})(ModeView)
+})(StateView)

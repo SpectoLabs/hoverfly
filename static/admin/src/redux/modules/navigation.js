@@ -21,7 +21,6 @@ export function navigateTo (path:string = '/'):Action {
 }
 
 export function pushPath (path) {
-  console.log('redux push pash action fired')
   return function (dispatch) {
     dispatch(navigateTo(path))
     dispatch(push(path))
