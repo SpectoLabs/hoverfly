@@ -1,5 +1,7 @@
 /* @flow */
 import fetch from 'isomorphic-fetch'
+import {push} from 'react-router-redux'
+import loginUserFailure from './auth'
 // ------------------------------------
 // Constants
 // ------------------------------------
@@ -20,8 +22,6 @@ export const RECEIVE_STATE = 'RECEIVE_STATE'
 export function setMode (mode, token):Action {
   return function (dispatch) {
     dispatch(requestState())
-    console.log(`setting mode, token: ${token}`)
-    console.log('setting mode')
     return fetch('/api/state', {
       method: 'POST',
       credentials: 'include',
@@ -53,7 +53,6 @@ export function requestState () {
 }
 
 export function receiveState (json) {
-  console.log(json)
   return {
     type: RECEIVE_STATE,
     payload: json.mode,
@@ -65,7 +64,6 @@ export function fetchState (token) {
   if (typeof token === 'undefined') {
     token = ''
   }
-  console.log(`fetching state, token: ${token}`)
   return function (dispatch) {
     dispatch(requestState())
     return fetch('/api/state', {
@@ -76,8 +74,12 @@ export function fetchState (token) {
     })
       .then((response) => response.json())
       .then((json) => dispatch(receiveState(json))
-      )
-    // TODO: should also catch any error in the network call.
+      ).catch((error) => {
+        if (error.response.status === 401) {
+          dispatch(loginUserFailure(error))
+          dispatch(push('/login'))
+        }
+      })
   }
 }
 
