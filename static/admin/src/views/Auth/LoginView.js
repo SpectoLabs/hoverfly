@@ -33,6 +33,13 @@ export class LoginView extends React.Component {
     this.login = this.login.bind(this)
   }
 
+  componentDidMount () {
+    let token = localStorage.getItem('token')
+    if (token !== null) {
+      this.props.actions.loginWithTokenAndRedirect(token, this.state.redirectTo)
+    }
+  }
+
   login (e) {
     e.preventDefault()
     this.props.actions.loginUser(this.refs.username.getValue(), this.refs.password.getValue(), this.state.redirectTo)

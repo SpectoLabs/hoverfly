@@ -26,6 +26,16 @@ export function loginUserSuccess (token) {
   }
 }
 
+export function loginWithTokenAndRedirect (token, redirect = '/') {
+  if (redirect === '/logout') {
+    redirect = '/'
+  }
+  return function (dispatch) {
+    dispatch(loginUserSuccess(token))
+    dispatch(push(redirect))
+  }
+}
+
 export function loginUserFailure (error) {
   localStorage.removeItem('token')
   return {
@@ -51,7 +61,6 @@ export function logout () {
 }
 
 export function logoutAndRedirect () {
-  console.log('logoutAndRedirect action fired')
   return (dispatch, state) => {
     dispatch(logout())
     dispatch(push('/login'))
@@ -78,11 +87,8 @@ export function loginUser (email, password, redirect = '/') {
       .then((response) => {
         try {
           dispatch(loginUserSuccess(response.token))
-          console.log(`loginUserSucess dispatched, redirecting to ${redirect}`)
           dispatch(push(redirect))
-          console.log('login success')
         } catch (e) {
-          console.log('login failed')
           dispatch(loginUserFailure({
             response: {
               status: 403,
