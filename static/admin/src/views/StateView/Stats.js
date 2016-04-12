@@ -39,7 +39,15 @@ RowWrapper.propTypes = {
 
 export class StatsComponent extends React.Component<void, Props, void> {
   componentDidMount () {
+    this._fetchRecordsCount()
+    this._fetchStats()
+  }
+
+  _fetchRecordsCount () {
     this.props.fetchRecordsCount(this.props.token)
+  }
+
+  _fetchStats () {
     this.props.fetchStats(this.props.token)
   }
 
@@ -66,13 +74,15 @@ export class StatsComponent extends React.Component<void, Props, void> {
     const counterTable = (
       <Col md={4}>
         <Table>
-          <TableHeaderColumn
-            colSpan='2'
-            tooltip='Basic statistics for requests that are passing through proxy'
-            style={{textAlign: 'center'}}>
-            Counters
-          </TableHeaderColumn>
           <TableHeader displaySelectAll={false} adjustForCheckbox={false} enableSelectAll={false}>
+            <TableRow>
+              <TableHeaderColumn
+                colSpan='2'
+                tooltip='Basic statistics for requests that are passing through proxy'
+                style={{textAlign: 'center'}}>
+                Counters
+              </TableHeaderColumn>
+            </TableRow>
             <TableRow>
               <TableHeaderColumn tooltip='Name'>Name</TableHeaderColumn>
               <TableHeaderColumn tooltip='Value of this parameter'>Value</TableHeaderColumn>
