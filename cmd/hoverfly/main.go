@@ -205,7 +205,9 @@ func main() {
 		userCache = cache.NewInMemoryCache()
 	}
 
-	hoverfly := hv.GetNewHoverfly(cfg, requestCache, metadataCache, backends.NewAuthBackend(tokenCache, userCache))
+	authBackend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
+
+	hoverfly := hv.GetNewHoverfly(cfg, requestCache, metadataCache, authBackend)
 
 	// if add new user supplied - adding it to database
 	if *addNew {
