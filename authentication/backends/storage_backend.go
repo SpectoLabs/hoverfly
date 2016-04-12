@@ -61,13 +61,14 @@ const UserBucketName = "authbucket"
 // TokenBucketName
 const TokenBucketName = "tokenbucket"
 
-// BoltCache - container to implement Cache instance with BoltDB backend for storage
-type AuthBackend struct {
+// CacheAuthBackend - container to implement Cache instance with i.e. BoltDB backend for storage
+type CacheAuthBackend struct {
 	TokenCache cache.Cache
 	userCache  cache.Cache
 }
 
-func (b *AuthBackend) AddUser(username, password string, admin bool) error {
+// AddUser - adds user with provided username, password and admin parameters
+func (b *CacheAuthBackend) AddUser(username, password string, admin bool) error {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), 10)
 	u := User{
 		UUID:     uuid.New(),
@@ -84,7 +85,7 @@ func (b *AuthBackend) AddUser(username, password string, admin bool) error {
 	return err
 }
 
-func (b *AuthBackend) GetUser(username string) (user *User, err error) {
+func (b *CacheAuthBackend) GetUser(username string) (user *User, err error) {
 	userBytes, err := b.userCache.Get([]byte(username))
 
 	if err != nil {
