@@ -38,8 +38,18 @@ func DecodeUser(user []byte) (*User, error) {
 	return u, nil
 }
 
-func NewAuthBackend(tokenCache, userCache cache.Cache) AuthBackend {
-	return AuthBackend{
+// Authentication - generic interface for authentication backend
+type Authentication interface {
+	AddUser(username, password string, admin bool) (err error)
+	GetUser(username string) (user *User, err error)
+	GetAllUsers() (users []User, err error)
+	InvalidateToken(token string) (err error)
+	IsTokenBlacklisted(token string) (blacklisted bool, err error)
+}
+
+// NewCacheBasedAuthBackend - takes two caches - one for token and one for users
+func NewCacheBasedAuthBackend(tokenCache, userCache cache.Cache) *CacheAuthBackend {
+	return &CacheAuthBackend{
 		TokenCache: tokenCache,
 		userCache:  userCache,
 	}
