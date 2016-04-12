@@ -15,7 +15,7 @@ import (
 type JWTAuthenticationBackend struct {
 	SecretKey          []byte
 	JWTExpirationDelta int
-	AuthBackend        backends.AuthBackend
+	AuthBackend        backends.Authentication
 }
 
 const (
@@ -51,7 +51,7 @@ func decodeToken(data []byte) (*Token, error) {
 	return t, nil
 }
 
-func InitJWTAuthenticationBackend(ab backends.AuthBackend, secret []byte, exp int) *JWTAuthenticationBackend {
+func InitJWTAuthenticationBackend(ab backends.Authentication, secret []byte, exp int) *JWTAuthenticationBackend {
 	if authBackendInstance == nil {
 		authBackendInstance = &JWTAuthenticationBackend{
 			SecretKey:          secret,
@@ -112,16 +112,10 @@ func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp int
 }
 
 func (backend *JWTAuthenticationBackend) Logout(tokenString string, token *jwt.Token) error {
-	// TODO: add value as a timestamp when to delete it for cleanup
-	return backend.AuthBackend.TokenCache.Set([]byte(tokenString), []byte("whentoexpire"))
+	return backend.AuthBackend.InvalidateToken(tokenString)
 }
 
 func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
-
-	redisToken, _ := backend.AuthBackend.TokenCache.Get([]byte(token))
-
-	if redisToken == nil {
-		return false
-	}
-	return true
+	blacklisted, _ := backend.AuthBackend.IsTokenBlacklisted(token)
+	return blacklisted
 }

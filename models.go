@@ -14,7 +14,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	authBackend "github.com/SpectoLabs/hoverfly/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/cache"
 	"github.com/SpectoLabs/hoverfly/metrics"
 	"github.com/rusenask/goproxy"
@@ -25,7 +25,7 @@ import (
 type Hoverfly struct {
 	RequestCache   cache.Cache
 	MetadataCache  cache.Cache
-	Authentication backends.AuthBackend
+	Authentication authBackend.Authentication
 	HTTP           *http.Client
 	Cfg            *Configuration
 	Counter        *metrics.CounterByMode

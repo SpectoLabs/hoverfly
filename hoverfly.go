@@ -41,7 +41,7 @@ func orPanic(err error) {
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
-func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication backends.AuthBackend) Hoverfly {
+func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication backends.Authentication) Hoverfly {
 	h := Hoverfly{
 		RequestCache:   requestCache,
 		MetadataCache:  metadataCache,

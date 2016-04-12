@@ -14,12 +14,12 @@ type AllUsersResponse struct {
 }
 
 type AuthController struct {
-	AB                 backends.AuthBackend
+	AB                 backends.Authentication
 	SecretKey          []byte
 	JWTExpirationDelta int
 }
 
-func GetNewAuthenticationController(authBackend backends.AuthBackend, secretKey []byte, exp int) *AuthController {
+func GetNewAuthenticationController(authBackend backends.Authentication, secretKey []byte, exp int) *AuthController {
 	return &AuthController{AB: authBackend, SecretKey: secretKey, JWTExpirationDelta: exp}
 }
 

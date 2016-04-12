@@ -11,7 +11,7 @@ type TokenAuthentication struct {
 	Token string `json:"token" form:"token"`
 }
 
-func Login(requestUser *backends.User, ab backends.AuthBackend, secret []byte, exp int) (int, []byte) {
+func Login(requestUser *backends.User, ab backends.Authentication, secret []byte, exp int) (int, []byte) {
 	authBackend := InitJWTAuthenticationBackend(ab, secret, exp)
 
 	if authBackend.Authenticate(requestUser) {
@@ -27,7 +27,7 @@ func Login(requestUser *backends.User, ab backends.AuthBackend, secret []byte, e
 	return http.StatusUnauthorized, []byte("")
 }
 
-func RefreshToken(requestUser *backends.User, ab backends.AuthBackend, secret []byte, exp int) []byte {
+func RefreshToken(requestUser *backends.User, ab backends.Authentication, secret []byte, exp int) []byte {
 	authBackend := InitJWTAuthenticationBackend(ab, secret, exp)
 	token, err := authBackend.GenerateToken(requestUser.UUID, requestUser.Username)
 	if err != nil {
@@ -40,7 +40,7 @@ func RefreshToken(requestUser *backends.User, ab backends.AuthBackend, secret []
 	return response
 }
 
-func Logout(req *http.Request, ab backends.AuthBackend, secret []byte, exp int) error {
+func Logout(req *http.Request, ab backends.Authentication, secret []byte, exp int) error {
 	authBackend := InitJWTAuthenticationBackend(ab, secret, exp)
 	tokenRequest, err := jwt.ParseFromRequest(req, func(token *jwt.Token) (interface{}, error) {
 		return authBackend.SecretKey, nil
