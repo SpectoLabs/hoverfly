@@ -106,6 +106,28 @@ func (b *CacheAuthBackend) GetUser(username string) (user *User, err error) {
 func (b *CacheAuthBackend) InvalidateToken(token string) error {
 	return b.TokenCache.Set([]byte(token), []byte("whentoexpire"))
 }
+
+// IsTokenBlacklisted - checks if token is blacklisted.
+func (b *CacheAuthBackend) IsTokenBlacklisted(token string) (bool, error) {
+	blacklistedToken, err := b.TokenCache.Get([]byte(token))
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+			"token": token,
+		}).Debug("got error while looking for blacklisted token")
+		if blacklistedToken != nil {
+			return true, err
+		}
+		return false, err
+	}
+	if blacklistedToken == nil {
+		return false, nil
+	}
+	return true, nil
+
+}
+
+func (b *CacheAuthBackend) GetAllUsers() (users []User, err error) {
 	values, _ := b.userCache.GetAllValues()
 	users = make([]User, len(values), len(values))
 	for i, user := range values {
