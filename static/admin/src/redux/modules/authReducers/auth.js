@@ -40,9 +40,9 @@ export default createReducer(initialState, {
     })
   },
   [LOGOUT_USER]: (state, payload) => {
-    console.log('logging out user, wiping data')
     return Object.assign({}, state, {
       'isAuthenticated': false,
+      'isAuthenticating': false,
       'token': null,
       'userName': null,
       'statusText': 'You have been successfully logged out.'
