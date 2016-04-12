@@ -15,6 +15,9 @@ export const RECEIVE_STATE = 'RECEIVE_STATE'
 export const REQUEST_RECORDS_COUNT = 'REQUEST_RECORDS_COUNT'
 export const RECEIVE_RECORDS_COUNT = 'RECEIVE_RECORDS_COUNT'
 
+export const REQUEST_STATS = 'REQUEST_STATS'
+export const RECEIVE_STATS = 'RECEIVE_STATS'
+
 // ------------------------------------
 // Actions
 // ------------------------------------
@@ -53,6 +56,19 @@ export function getMode (mode):Action {
 export function requestState () {
   return {
     type: REQUEST_STATE
+  }
+}
+
+export function requestStats () {
+  return {
+    type: REQUEST_STATS
+  }
+}
+
+export function receiveStats (json) {
+  return {
+    type: RECEIVE_STATS,
+    payload: json
   }
 }
 
@@ -102,6 +118,30 @@ export function fetchState (token) {
   }
 }
 
+export function fetchStats (token) {
+  if (typeof token === 'undefined') {
+    token = ''
+  }
+  return function (dispatch) {
+    dispatch(requestStats())
+    return fetch('/api/stats', {
+      credentials: 'include',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(checkHttpStatus)
+      .then(parseJSON)
+      .then((response) => {
+        dispatch(receiveStats(response))
+      })
+      .catch((error) => {
+        dispatch(loginUserFailure(error))
+        dispatch(push('/login'))
+      })
+  }
+}
+
 export function fetchRecordsCount (token) {
   if (typeof token === 'undefined') {
     token = ''
@@ -134,7 +174,10 @@ export const actions = {
   fetchState,
   requestRecordsCount,
   receiveRecordsCount,
-  fetchRecordsCount
+  fetchRecordsCount,
+  requestStats,
+  receiveStats,
+  fetchStats
 }
 // ------------------------------------
 // Action Handlers
@@ -142,7 +185,8 @@ export const actions = {
 
 const initialState = {
   recordsCount: null,
-  mode: null
+  mode: null,
+  stats: null
 }
 
 export default createReducer(initialState, {
@@ -162,6 +206,12 @@ export default createReducer(initialState, {
     return Object.assign({}, state, {
       'mode': state.mode,
       'recordsCount': payload
+    })
+  },
+  [RECEIVE_STATS]: (state, payload) => {
+    return Object.assign({}, state, {
+      'recordsCount': payload.recordsCount,
+      'stats': payload.stats
     })
   }
 })
