@@ -103,7 +103,9 @@ func (b *CacheAuthBackend) GetUser(username string) (user *User, err error) {
 	return
 }
 
-func (b *AuthBackend) GetAllUsers() (users []User, err error) {
+func (b *CacheAuthBackend) InvalidateToken(token string) error {
+	return b.TokenCache.Set([]byte(token), []byte("whentoexpire"))
+}
 	values, _ := b.userCache.GetAllValues()
 	users = make([]User, len(values), len(values))
 	for i, user := range values {
