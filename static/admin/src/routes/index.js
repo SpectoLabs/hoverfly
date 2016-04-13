@@ -8,18 +8,15 @@ import { requireAuthentication } from '../utils'
 // very easy to navigate to files regardless of how deeply nested
 // your current file is.
 import CoreLayout from 'layouts/CoreLayout/CoreLayout'
-import HomeView from 'views/HomeView/HomeView'
 import StateView from 'views/StateView/StateView'
 import LoginView from 'views/Auth/LoginView'
 import LogoutView from 'views/Auth/LogoutView'
 
 export default (store) => (
   <Route path='/' component={CoreLayout}>
-    <IndexRoute component={HomeView} />
+    <IndexRoute component={requireAuthentication(StateView)} />
     <Route path='login' component={LoginView}/>
     <Route path='logout' component={requireAuthentication(LogoutView)} />
     <Route path='state' component={requireAuthentication(StateView)} />
-    <Route path='records' component={requireAuthentication(StateView)} />
-    <Route path='middleware' component={requireAuthentication(StateView)} />
   </Route>
 )

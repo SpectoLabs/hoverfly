@@ -39,8 +39,6 @@ export default class Navigation extends React.Component<void, Props, void> {
     let myLeftTabs = (
       <Tabs value={window.location.pathname}>
         <Tab label='State' route='state' value='/state' onActive={this.handleActive}/>
-        <Tab label='Records' route='records' value='/records' onActive={this.handleActive}/>
-        <Tab label='Middleware' route='middleware' value='/middleware' onActive={this.handleActive}/>
       </Tabs>
     )
 
