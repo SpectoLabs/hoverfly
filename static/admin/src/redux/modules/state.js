@@ -166,6 +166,27 @@ export function fetchRecordsCount (token) {
   }
 }
 
+export function wipeRecords (token) {
+  if (typeof token === 'undefined') {
+    token = ''
+  }
+  return function (dispatch) {
+    dispatch(requestRecordsCount())
+    return fetch('/api/records', {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(checkHttpStatus)
+      .catch((error) => {
+        dispatch(loginUserFailure(error))
+        dispatch(push('/login'))
+      })
+  }
+}
+
 export const actions = {
   setMode,
   getMode,
@@ -177,7 +198,8 @@ export const actions = {
   fetchRecordsCount,
   requestStats,
   receiveStats,
-  fetchStats
+  fetchStats,
+  wipeRecords
 }
 // ------------------------------------
 // Action Handlers
