@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -309,9 +310,15 @@ var upgrader = websocket.Upgrader{
 func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Error("failed to upgrade websocket")
 		return
 	}
+
+	// defining counters for delta check
+	var recordsCount int
+	var statsCounters map[string]int64
 
 	for {
 		messageType, p, err := conn.ReadMessage()
@@ -323,36 +330,36 @@ func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 		}).Info("Got message...")
 
 		for _ = range time.Tick(1 * time.Second) {
-
 			count, err := d.RequestCache.RecordsCount()
-
 			if err != nil {
 				log.WithFields(log.Fields{
 					"message": p,
 					"error":   err.Error(),
 				}).Error("got error while trying to get records count")
-				return
+				continue
 			}
-
 			stats := d.Counter.Flush()
 
-			var sr statsResponse
-			sr.Stats = stats
-			sr.RecordsCount = count
+			// checking whether we should send an update
+			if !reflect.DeepEqual(stats.Counters, statsCounters) || count != recordsCount {
+				var sr statsResponse
+				sr.Stats = stats
+				sr.RecordsCount = count
 
-			b, err := json.Marshal(sr)
+				b, err := json.Marshal(sr)
 
-			if err = conn.WriteMessage(messageType, b); err != nil {
-				log.WithFields(log.Fields{
-					"message": p,
-					"error":   err.Error(),
-				}).Debug("Got error when writing message...")
-				return
+				if err = conn.WriteMessage(messageType, b); err != nil {
+					log.WithFields(log.Fields{
+						"message": p,
+						"error":   err.Error(),
+					}).Debug("Got error when writing message...")
+					continue
+				}
+				recordsCount = count
+				statsCounters = stats.Counters
 			}
 		}
-
 	}
-
 }
 
 // ImportRecordsHandler - accepts JSON payload and saves it to cache
