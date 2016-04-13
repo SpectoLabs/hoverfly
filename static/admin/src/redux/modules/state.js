@@ -68,7 +68,8 @@ export function requestStats () {
 export function receiveStats (json) {
   return {
     type: RECEIVE_STATS,
-    payload: json
+    payload: json,
+    receivedAt: Date.now()
   }
 }
 
