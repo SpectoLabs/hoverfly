@@ -19,6 +19,8 @@ import TableBody from 'material-ui/lib/table/table-body'
 
 import {Row, Col} from 'react-bootstrap'
 
+import CountersPie from '../../containers/StatsCharts'
+
 import {fetchRecordsCount, fetchStats, wipeRecords, receiveStats} from '../../redux/modules/state'
 
 export class RowWrapper extends React.Component<void, Props, void> {
@@ -145,8 +147,16 @@ export class StatsComponent extends React.Component<void, Props, void> {
   render () {
     let recordsCountInfo = 'Captured request count: ' + this.props.info.recordsCount
     let rows = null
+    let statsChart = <div> </div>
+
     if (this.props.info.stats !== 'undefined' && this.props.info.stats !== null) {
       rows = this.getCounterRows()
+      console.log('updating chart')
+      statsChart = (
+        <Col md={4}>
+          <CountersPie />
+        </Col>
+      )
     }
 
     const counterTable = (
@@ -179,6 +189,7 @@ export class StatsComponent extends React.Component<void, Props, void> {
         <CardText>
           <Row>
             {counterTable}
+            {statsChart}
           </Row>
         </CardText>
         <CardActions>
@@ -186,6 +197,7 @@ export class StatsComponent extends React.Component<void, Props, void> {
         </CardActions>
       </Card>
     )
+
     return (
       <div>
         {statsInfo}
