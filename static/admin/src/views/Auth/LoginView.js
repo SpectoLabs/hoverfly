@@ -24,7 +24,7 @@ export class LoginView extends React.Component {
 
   constructor (props) {
     super(props)
-    const redirectRoute = this.props.location.query.redirect || '/login'
+    const redirectRoute = this.props.location.query.redirect || '/'
     this.state = {
       email: '',
       password: '',

@@ -113,8 +113,10 @@ export function fetchState (token) {
         dispatch(receiveState(response))
       })
       .catch((error) => {
-        dispatch(loginUserFailure(error))
-        dispatch(push('/login'))
+        if (error.response.status === 401) {
+          dispatch(loginUserFailure(error))
+          dispatch(push('/login'))
+        }
       })
   }
 }
@@ -137,8 +139,10 @@ export function fetchStats (token) {
         dispatch(receiveStats(response))
       })
       .catch((error) => {
-        dispatch(loginUserFailure(error))
-        dispatch(push('/login'))
+        if (error.response.status === 401) {
+          dispatch(loginUserFailure(error))
+          dispatch(push('/login'))
+        }
       })
   }
 }
@@ -161,8 +165,10 @@ export function fetchRecordsCount (token) {
         dispatch(receiveRecordsCount(response))
       })
       .catch((error) => {
-        dispatch(loginUserFailure(error))
-        dispatch(push('/login'))
+        if (error.response.status === 401) {
+          dispatch(loginUserFailure(error))
+          dispatch(push('/login'))
+        }
       })
   }
 }
@@ -182,8 +188,10 @@ export function wipeRecords (token) {
     })
       .then(checkHttpStatus)
       .catch((error) => {
-        dispatch(loginUserFailure(error))
-        dispatch(push('/login'))
+        if (error.response.status === 401) {
+          dispatch(loginUserFailure(error))
+          dispatch(push('/login'))
+        }
       })
   }
 }
