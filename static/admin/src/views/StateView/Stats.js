@@ -19,7 +19,7 @@ import TableBody from 'material-ui/lib/table/table-body'
 
 import {Row, Col} from 'react-bootstrap'
 
-import {fetchRecordsCount, fetchStats, wipeRecords} from '../../redux/modules/state'
+import {fetchRecordsCount, fetchStats, wipeRecords, receiveStats} from '../../redux/modules/state'
 
 export class RowWrapper extends React.Component<void, Props, void> {
   render () {
@@ -43,11 +43,77 @@ export class StatsComponent extends React.Component<void, Props, void> {
     this._fetchRecordsCount = this._fetchRecordsCount.bind(this)
     this._fetchStats = this._fetchStats.bind(this)
     this.handleWipeRecordsClick = this.handleWipeRecordsClick.bind(this)
+
+    this.greetWebsocket = this.greetWebsocket.bind(this)
+    this.waitForSocketConnection = this.waitForSocketConnection.bind(this)
+    this._cleanup = this._cleanup.bind(this)
+
+    this.state = {
+      ws: null,
+      interval: 2000,
+      refreshId: null
+    }
+  }
+
+  greetWebsocket () {
+    if (this.state.ws.readyState !== this.state.ws.open) {
+      this.state.ws.send('hi')
+    }
+  }
+
+  // Make the function wait until the connection is made...
+  waitForSocketConnection (socket, callback) {
+    setTimeout(
+      function () {
+        if (socket.readyState === 1) {
+          if (callback != null) {
+            callback()
+          }
+        } else {
+          this.waitForSocketConnection(socket, callback)
+        }
+      }.bind(this), 5) // wait 5 ms for the connection...
+  }
+
+  componentWillMount () {
+    if ('WebSocket' in window) {
+      this.state.ws = new WebSocket('ws:/' + window.location.host + '/api/statsws')
+
+      this.state.ws.onclose = function () {
+        console.log('Connection is closed, fetching manually')
+        this.state.ws = null
+        this.state.refreshId = setInterval(this._fetchStats, parseInt(this.state.interval))
+      }.bind(this)
+    } else {
+      console.log('WebSocket not supported by your browser.')
+      this.state.refreshId = setInterval(this._fetchStats, parseInt(this.state.interval))
+    }
+  }
+
+  _cleanup () {
+    if (this.state.refreshId !== null) {
+      clearInterval(this.state.refreshId)
+    }
+    if (this.state.ws !== null) {
+      this.state.ws.close()
+    }
+  }
+
+  componentWillUnmount () {
+    this._cleanup()
   }
 
   componentDidMount () {
     this._fetchRecordsCount()
-    this._fetchStats()
+
+    if (this.state.ws != null) {
+      this.waitForSocketConnection(this.state.ws, this.greetWebsocket)
+      // getting response with data
+      this.state.ws.onmessage = function (response) {
+        let parsedData = JSON.parse(response.data)
+        this.props.receiveStats(parsedData)
+      }.bind(this)
+    }
   }
 
   _fetchRecordsCount () {
@@ -131,6 +197,7 @@ export class StatsComponent extends React.Component<void, Props, void> {
 StatsComponent.propTypes = {
   fetchRecordsCount: PropTypes.func.isRequired,
   fetchStats: PropTypes.func.isRequired,
+  receiveStats: PropTypes.func.isRequired,
   wipeRecords: PropTypes.func.isRequired,
   token: PropTypes.string,
   info: PropTypes.object.isRequired
@@ -145,5 +212,6 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
   fetchRecordsCount,
   fetchStats,
-  wipeRecords
+  wipeRecords,
+  receiveStats
 })(StatsComponent)
