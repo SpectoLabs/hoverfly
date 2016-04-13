@@ -19,7 +19,7 @@ import TableBody from 'material-ui/lib/table/table-body'
 
 import {Row, Col} from 'react-bootstrap'
 
-import {fetchRecordsCount, fetchStats} from '../../redux/modules/state'
+import {fetchRecordsCount, fetchStats, wipeRecords} from '../../redux/modules/state'
 
 export class RowWrapper extends React.Component<void, Props, void> {
   render () {
@@ -38,6 +38,13 @@ RowWrapper.propTypes = {
 }
 
 export class StatsComponent extends React.Component<void, Props, void> {
+  constructor (props) {
+    super(props)
+    this._fetchRecordsCount = this._fetchRecordsCount.bind(this)
+    this._fetchStats = this._fetchStats.bind(this)
+    this.handleWipeRecordsClick = this.handleWipeRecordsClick.bind(this)
+  }
+
   componentDidMount () {
     this._fetchRecordsCount()
     this._fetchStats()
@@ -49,6 +56,11 @@ export class StatsComponent extends React.Component<void, Props, void> {
 
   _fetchStats () {
     this.props.fetchStats(this.props.token)
+  }
+
+  handleWipeRecordsClick () {
+    this.props.wipeRecords(this.props.token)
+    this._fetchRecordsCount()
   }
 
   getCounterRows () {
@@ -104,7 +116,7 @@ export class StatsComponent extends React.Component<void, Props, void> {
           </Row>
         </CardText>
         <CardActions>
-          <RaisedButton label='Wipe Records' secondary/>
+          <RaisedButton label='Wipe Records' onClick={this.handleWipeRecordsClick} secondary/>
         </CardActions>
       </Card>
     )
@@ -119,6 +131,7 @@ export class StatsComponent extends React.Component<void, Props, void> {
 StatsComponent.propTypes = {
   fetchRecordsCount: PropTypes.func.isRequired,
   fetchStats: PropTypes.func.isRequired,
+  wipeRecords: PropTypes.func.isRequired,
   token: PropTypes.string,
   info: PropTypes.object.isRequired
 }
@@ -131,5 +144,6 @@ const mapStateToProps = (state) => ({
 
 export default connect(mapStateToProps, {
   fetchRecordsCount,
-  fetchStats
+  fetchStats,
+  wipeRecords
 })(StatsComponent)
