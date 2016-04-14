@@ -38,9 +38,17 @@ export function setMode (mode, token):Action {
       body: JSON.stringify({
         mode: mode
       })
-    }).then((response) => response.json())
-      .then((json) => dispatch(receiveState(json))
+    })
+      .then(checkHttpStatus)
+      .then(parseJSON)
+      .then((response) => dispatch(receiveState(response))
       )
+      .catch((error) => {
+        if (error.response.status === 401) {
+          dispatch(loginUserFailure(error))
+          dispatch(push('/login'))
+        }
+      })
   }
 }
 

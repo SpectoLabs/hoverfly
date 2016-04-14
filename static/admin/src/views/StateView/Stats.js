@@ -88,12 +88,12 @@ export class StatsComponent extends React.Component<void, Props, void> {
     if ('WebSocket' in window) {
       this.state.ws = new WebSocket('ws:/' + window.location.host + '/api/statsws')
 
-      this.state.ws.onclose = function () {
-        console.log('Connection is closed, fetching manually')
-        this.state.ws = null
-        this.state.refreshId = setInterval(this._fetchStats, parseInt(this.state.interval))
-        this.props.setRefreshID(this.state.refreshId)
-      }.bind(this)
+      // this.state.ws.onclose = function () {
+      //   console.log('Connection is closed, fetching manually')
+      //   this.state.ws = null
+      //   this.state.refreshId = setInterval(this._fetchStats, parseInt(this.state.interval))
+      //   this.props.setRefreshID(this.state.refreshId)
+      // }.bind(this)
     } else {
       console.log('WebSocket not supported by your browser.')
       this.state.refreshId = setInterval(this._fetchStats, parseInt(this.state.interval))
