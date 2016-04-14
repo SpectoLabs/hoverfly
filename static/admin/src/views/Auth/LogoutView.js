@@ -4,7 +4,7 @@
 import React, {PropTypes} from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
-import * as actionCreators from '../../redux/modules/auth'
+import * as actionCreators from '../../redux/modules/actions/auth'
 import {Col} from 'react-bootstrap'
 
 import Card from 'material-ui/lib/card/card'
