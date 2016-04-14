@@ -99,6 +99,7 @@ export function receiveState (json) {
 }
 
 export function setRefreshID (id) {
+  localStorage.setItem('refreshID', id)
   return {
     type: SET_REFRESH_ID,
     payload: id,
@@ -106,8 +107,10 @@ export function setRefreshID (id) {
   }
 }
 
-export function clearRefreshID (id) {
+export function clearRefreshID () {
+  let id = localStorage.getItem('refreshID')
   clearInterval(id)
+  localStorage.removeItem('refreshID')
   return {
     type: CLEAR_REFRESH_ID,
     receivedAt: Date.now()

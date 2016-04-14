@@ -103,7 +103,7 @@ export class StatsComponent extends React.Component<void, Props, void> {
 
   _cleanup () {
     if (this.state.refreshId !== null) {
-      this.props.clearRefreshID(this.props.info.refreshID)
+      this.props.clearRefreshID()
       // clearInterval(this.state.refreshId)
     }
     if (this.state.ws !== null) {
