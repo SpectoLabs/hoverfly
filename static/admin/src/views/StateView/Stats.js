@@ -21,7 +21,14 @@ import {Row, Col} from 'react-bootstrap'
 
 import CountersPie from '../../containers/StatsCharts'
 
-import {fetchRecordsCount, fetchStats, wipeRecords, receiveStats} from '../../redux/modules/state'
+import {
+  fetchRecordsCount,
+  fetchStats,
+  wipeRecords,
+  receiveStats,
+  setRefreshID,
+  clearRefreshID
+} from '../../redux/modules/state'
 
 export class RowWrapper extends React.Component<void, Props, void> {
   render () {
@@ -85,16 +92,19 @@ export class StatsComponent extends React.Component<void, Props, void> {
         console.log('Connection is closed, fetching manually')
         this.state.ws = null
         this.state.refreshId = setInterval(this._fetchStats, parseInt(this.state.interval))
+        this.props.setRefreshID(this.state.refreshId)
       }.bind(this)
     } else {
       console.log('WebSocket not supported by your browser.')
       this.state.refreshId = setInterval(this._fetchStats, parseInt(this.state.interval))
+      this.props.setRefreshID(this.state.refreshId)
     }
   }
 
   _cleanup () {
     if (this.state.refreshId !== null) {
-      clearInterval(this.state.refreshId)
+      this.props.clearRefreshID(this.props.info.refreshID)
+      // clearInterval(this.state.refreshId)
     }
     if (this.state.ws !== null) {
       this.state.ws.close()
@@ -147,11 +157,10 @@ export class StatsComponent extends React.Component<void, Props, void> {
   render () {
     let recordsCountInfo = 'Captured request count: ' + this.props.info.recordsCount
     let rows = null
-    let statsChart = <div> </div>
+    let statsChart = <div></div>
 
     if (this.props.info.stats !== 'undefined' && this.props.info.stats !== null) {
       rows = this.getCounterRows()
-      console.log('updating chart')
       statsChart = (
         <Col md={4}>
           <CountersPie />
@@ -210,6 +219,8 @@ StatsComponent.propTypes = {
   fetchRecordsCount: PropTypes.func.isRequired,
   fetchStats: PropTypes.func.isRequired,
   receiveStats: PropTypes.func.isRequired,
+  setRefreshID: PropTypes.func.isRequired,
+  clearRefreshID: PropTypes.func.isRequired,
   wipeRecords: PropTypes.func.isRequired,
   token: PropTypes.string,
   info: PropTypes.object.isRequired
@@ -224,6 +235,8 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
   fetchRecordsCount,
   fetchStats,
+  setRefreshID,
+  clearRefreshID,
   wipeRecords,
   receiveStats
 })(StatsComponent)

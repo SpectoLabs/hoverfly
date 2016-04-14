@@ -1,7 +1,7 @@
 /* @flow */
 import fetch from 'isomorphic-fetch'
 import {push} from 'react-router-redux'
-import {loginUserFailure} from './auth'
+import {loginUserFailure} from './actions/auth'
 import {checkHttpStatus, parseJSON, createReducer} from '../../utils'
 // ------------------------------------
 // Constants
@@ -17,6 +17,9 @@ export const RECEIVE_RECORDS_COUNT = 'RECEIVE_RECORDS_COUNT'
 
 export const REQUEST_STATS = 'REQUEST_STATS'
 export const RECEIVE_STATS = 'RECEIVE_STATS'
+
+export const SET_REFRESH_ID = 'SET_REFRESH_ID'
+export const CLEAR_REFRESH_ID = 'CLEAR_REFRESH_ID'
 
 // ------------------------------------
 // Actions
@@ -91,6 +94,22 @@ export function receiveState (json) {
   return {
     type: RECEIVE_STATE,
     payload: json.mode,
+    receivedAt: Date.now()
+  }
+}
+
+export function setRefreshID (id) {
+  return {
+    type: SET_REFRESH_ID,
+    payload: id,
+    receivedAt: Date.now()
+  }
+}
+
+export function clearRefreshID (id) {
+  clearInterval(id)
+  return {
+    type: CLEAR_REFRESH_ID,
     receivedAt: Date.now()
   }
 }
@@ -208,7 +227,9 @@ export const actions = {
   requestStats,
   receiveStats,
   fetchStats,
-  wipeRecords
+  wipeRecords,
+  setRefreshID,
+  clearRefreshID
 }
 // ------------------------------------
 // Action Handlers
@@ -217,7 +238,8 @@ export const actions = {
 const initialState = {
   recordsCount: null,
   mode: null,
-  stats: null
+  stats: null,
+  refreshID: null
 }
 
 export default createReducer(initialState, {
@@ -243,6 +265,16 @@ export default createReducer(initialState, {
     return Object.assign({}, state, {
       'recordsCount': payload.recordsCount,
       'stats': payload.stats
+    })
+  },
+  [SET_REFRESH_ID]: (state, payload) => {
+    return Object.assign({}, state, {
+      'refreshID': payload
+    })
+  },
+  [CLEAR_REFRESH_ID]: (state, payload) => {
+    return Object.assign({}, state, {
+      'refreshID': null
     })
   }
 })
