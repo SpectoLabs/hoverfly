@@ -161,6 +161,7 @@ export function fetchStats (token) {
         dispatch(receiveStats(response))
       })
       .catch((error) => {
+        dispatch(clearRefreshID)
         if (error.response.status === 401) {
           dispatch(loginUserFailure(error))
           dispatch(push('/login'))
