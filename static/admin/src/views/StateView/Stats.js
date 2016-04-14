@@ -28,7 +28,7 @@ import {
   receiveStats,
   setRefreshID,
   clearRefreshID
-} from '../../redux/modules/state'
+} from '../../redux/modules/actions/state'
 
 export class RowWrapper extends React.Component<void, Props, void> {
   render () {

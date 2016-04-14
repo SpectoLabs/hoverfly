@@ -1,25 +1,20 @@
 /* @flow */
 import fetch from 'isomorphic-fetch'
 import {push} from 'react-router-redux'
-import {loginUserFailure} from './actions/auth'
-import {checkHttpStatus, parseJSON, createReducer} from '../../utils'
-// ------------------------------------
-// Constants
-// ------------------------------------
-export const SET_MODE = 'SET_MODE'
-export const GET_MODE = 'GET_MODE'
+import {loginUserFailure} from './auth'
+import {checkHttpStatus, parseJSON} from '../../../utils'
 
-export const REQUEST_STATE = 'REQUEST_STATE'
-export const RECEIVE_STATE = 'RECEIVE_STATE'
-
-export const REQUEST_RECORDS_COUNT = 'REQUEST_RECORDS_COUNT'
-export const RECEIVE_RECORDS_COUNT = 'RECEIVE_RECORDS_COUNT'
-
-export const REQUEST_STATS = 'REQUEST_STATS'
-export const RECEIVE_STATS = 'RECEIVE_STATS'
-
-export const SET_REFRESH_ID = 'SET_REFRESH_ID'
-export const CLEAR_REFRESH_ID = 'CLEAR_REFRESH_ID'
+import {
+  GET_MODE,
+  REQUEST_STATE,
+  RECEIVE_STATE,
+  REQUEST_RECORDS_COUNT,
+  RECEIVE_RECORDS_COUNT,
+  REQUEST_STATS,
+  RECEIVE_STATS,
+  SET_REFRESH_ID,
+  CLEAR_REFRESH_ID
+} from '../../../constants'
 
 // ------------------------------------
 // Actions
@@ -235,50 +230,3 @@ export const actions = {
   setRefreshID,
   clearRefreshID
 }
-// ------------------------------------
-// Action Handlers
-// ------------------------------------
-
-const initialState = {
-  recordsCount: null,
-  mode: null,
-  stats: null,
-  refreshID: null
-}
-
-export default createReducer(initialState, {
-  [SET_MODE]: (state, payload) => {
-    return Object.assign({}, state, {
-      'mode': payload,
-      'recordsCount': state.recordsCount
-    })
-  },
-  [RECEIVE_STATE]: (state, payload) => {
-    return Object.assign({}, state, {
-      'mode': payload,
-      'recordsCount': state.recordsCount
-    })
-  },
-  [RECEIVE_RECORDS_COUNT]: (state, payload) => {
-    return Object.assign({}, state, {
-      'mode': state.mode,
-      'recordsCount': payload
-    })
-  },
-  [RECEIVE_STATS]: (state, payload) => {
-    return Object.assign({}, state, {
-      'recordsCount': payload.recordsCount,
-      'stats': payload.stats
-    })
-  },
-  [SET_REFRESH_ID]: (state, payload) => {
-    return Object.assign({}, state, {
-      'refreshID': payload
-    })
-  },
-  [CLEAR_REFRESH_ID]: (state, payload) => {
-    return Object.assign({}, state, {
-      'refreshID': null
-    })
-  }
-})

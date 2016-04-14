@@ -1,7 +1,7 @@
 /* @flow */
 import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {setMode, fetchState} from '../../redux/modules/state'
+import {setMode, fetchState} from '../../redux/modules/actions/state'
 
 import Card from 'material-ui/lib/card/card'
 import CardActions from 'material-ui/lib/card/card-actions'
