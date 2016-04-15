@@ -65,11 +65,11 @@ var (
 	dev         = flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
 	destination = flag.String("destination", ".", "destination URI to catch")
 
-	addNew      = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
-	addUser     = flag.String("username", "", "username for new user")
-	addPassword = flag.String("password", "", "password for new user")
-	isAdmin     = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
-	authEnabled = flag.Bool("auth", true, "enable authentication, currently it is disabled by default")
+	addNew       = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
+	addUser      = flag.String("username", "", "username for new user")
+	addPassword  = flag.String("password", "", "password for new user")
+	isAdmin      = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
+	authDisabled = flag.Bool("no-auth", false, "disabled authentication, currently it is enabled by default")
 
 	generateCA = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
 	certName   = flag.String("cert-name", "hoverfly.proxy", "cert name")
@@ -170,9 +170,9 @@ func main() {
 	// setting mode
 	cfg.SetMode(mode)
 
-	// enabling authentication if flag or env variable is set to 'true'
-	if cfg.AuthEnabled || *authEnabled {
-		cfg.AuthEnabled = true
+	// disabling authentication if no-auth for auth disabled env variable
+	if !cfg.AuthEnabled || *authDisabled {
+		cfg.AuthEnabled = false
 	}
 
 	// disabling tls verification if flag or env variable is set to 'false' (defaults to true)
