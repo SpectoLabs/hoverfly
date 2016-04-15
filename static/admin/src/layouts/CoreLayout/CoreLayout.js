@@ -33,20 +33,22 @@ const muiTheme = getMuiTheme({
 
 function CoreLayout ({children}) {
   return (
-    <MuiThemeProvider muiTheme={muiTheme}>
-      <div>
-        <Navigation />
-        <div style={styles.container}>
-          <Grid>
-            <Row>
-              <Col md={12}>
-                {children}
-              </Col>
-            </Row>
-          </Grid>
+    <div>
+      <MuiThemeProvider muiTheme={muiTheme}>
+        <div>
+          <Navigation />
+          <div style={styles.container}>
+            <Grid>
+              <Row>
+                <Col md={12}>
+                  {children}
+                </Col>
+              </Row>
+            </Grid>
+          </div>
         </div>
-      </div>
-    </MuiThemeProvider>
+      </MuiThemeProvider>
+    </div>
   )
 }
 
