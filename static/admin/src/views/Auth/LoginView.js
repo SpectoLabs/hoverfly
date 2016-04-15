@@ -51,7 +51,9 @@ export class LoginView extends React.Component {
         <Col md={3}/>
         <Col md={6}>
           <Card>
-            <CardTitle title='Login required!' subtitle='Hint: hf/hf'/>
+            <CardTitle
+              title='Login required!'
+              subtitle='Hint: if auth is disabled - use any username/password combination'/>
             <CardText>
               {this.props.statusText ? <div className='alert alert-info'>{this.props.statusText}</div> : ''}
               <form role='form'>
