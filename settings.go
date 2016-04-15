@@ -61,7 +61,7 @@ const DefaultJWTExpirationDelta = 1 * 24 * 60 * 60
 
 // Environment variables
 const (
-	HoverflyAuthEnabledEV     = "HoverflyAuthEnabled"
+	HoverflyAuthDisabledEV    = "HoverflyAuthDisabled"
 	HoverflySecretEV          = "HoverflySecret"
 	HoverflyTokenExpirationEV = "HoverflyTokenExpiration"
 
@@ -121,10 +121,10 @@ func InitSettings() *Configuration {
 		appConfig.JWTExpirationDelta = DefaultJWTExpirationDelta
 	}
 
-	if os.Getenv(HoverflyAuthEnabledEV) == "true" {
-		appConfig.AuthEnabled = true
-	} else {
+	if os.Getenv(HoverflyAuthDisabledEV) == "true" {
 		appConfig.AuthEnabled = false
+	} else {
+		appConfig.AuthEnabled = true
 	}
 
 	// middleware configuration
