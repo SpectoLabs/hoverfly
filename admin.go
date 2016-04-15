@@ -97,8 +97,14 @@ func getBoneRouter(d Hoverfly) *bone.Mux {
 	mux := bone.New()
 
 	// getting auth controllers and middleware
-	ac := controllers.GetNewAuthenticationController(d.Authentication, d.Cfg.SecretKey, d.Cfg.JWTExpirationDelta)
-	am := authentication.GetNewAuthenticationMiddleware(d.Authentication,
+	ac := controllers.GetNewAuthenticationController(
+		d.Authentication,
+		d.Cfg.SecretKey,
+		d.Cfg.JWTExpirationDelta,
+		d.Cfg.AuthEnabled)
+
+	am := authentication.GetNewAuthenticationMiddleware(
+		d.Authentication,
 		d.Cfg.SecretKey,
 		d.Cfg.JWTExpirationDelta,
 		d.Cfg.AuthEnabled)
