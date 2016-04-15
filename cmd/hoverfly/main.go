@@ -48,30 +48,37 @@ func (i *arrayFlags) Set(value string) error {
 var importFlags arrayFlags
 var destinationFlags arrayFlags
 
+const boltBackend = "boltdb"
+const inmemoryBackend = "memory"
+
 var (
-	verbose         = flag.Bool("v", false, "should every proxy request be logged to stdout")
-	capture         = flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
-	synthesize      = flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
-	modify          = flag.Bool("modify", false, "start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic")
-	middleware      = flag.String("middleware", "", "should proxy use middleware")
-	proxyPort       = flag.String("pp", "", "proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
-	adminPort       = flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
-	metrics         = flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
-	dev             = flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
-	destination     = flag.String("destination", ".", "destination URI to catch")
-	addNew          = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
-	addUser         = flag.String("username", "", "username for new user")
-	addPassword     = flag.String("password", "", "password for new user")
-	isAdmin         = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
-	authEnabled     = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
-	generateCA      = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
-	certName        = flag.String("cert-name", "hoverfly.proxy", "cert name")
-	certOrg         = flag.String("cert-org", "Hoverfly Authority", "organisation name for new cert")
-	cert            = flag.String("cert", "", "CA certificate used to sign MITM certificates")
-	key             = flag.String("key", "", "private key of the CA used to sign MITM certificates")
+	verbose     = flag.Bool("v", false, "should every proxy request be logged to stdout")
+	capture     = flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
+	synthesize  = flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
+	modify      = flag.Bool("modify", false, "start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic")
+	middleware  = flag.String("middleware", "", "should proxy use middleware")
+	proxyPort   = flag.String("pp", "", "proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
+	adminPort   = flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
+	metrics     = flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
+	dev         = flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
+	destination = flag.String("destination", ".", "destination URI to catch")
+
+	addNew      = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
+	addUser     = flag.String("username", "", "username for new user")
+	addPassword = flag.String("password", "", "password for new user")
+	isAdmin     = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
+	authEnabled = flag.Bool("auth", true, "enable authentication, currently it is disabled by default")
+
+	generateCA = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
+	certName   = flag.String("cert-name", "hoverfly.proxy", "cert name")
+	certOrg    = flag.String("cert-org", "Hoverfly Authority", "organisation name for new cert")
+	cert       = flag.String("cert", "", "CA certificate used to sign MITM certificates")
+	key        = flag.String("key", "", "private key of the CA used to sign MITM certificates")
+
 	tlsVerification = flag.Bool("tls-verification", true, "turn on/off tls verification for outgoing requests (will not try to verify certificates) - defaults to true")
-	databasePath    = flag.String("db-dir", "", "database location - supply it if you want to provide specific to database (will be created there if it doesn't exist)")
-	database        = flag.String("db", "boltdb", "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
+
+	databasePath = flag.String("db-dir", "", "database location - supply it if you want to provide specific to database (will be created there if it doesn't exist)")
+	database     = flag.String("db", "boltdb", "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
 )
 
 func main() {
@@ -189,7 +196,7 @@ func main() {
 		cfg.DatabasePath = *databasePath
 	}
 
-	if *database == "boltdb" {
+	if *database == boltBackend {
 		log.Info("Creating bolt db backend...")
 		db := cache.GetDB(cfg.DatabasePath)
 		defer db.Close()
@@ -197,12 +204,17 @@ func main() {
 		metadataCache = cache.NewBoltDBCache(db, []byte("metadataBucket"))
 		tokenCache = cache.NewBoltDBCache(db, []byte(backends.TokenBucketName))
 		userCache = cache.NewBoltDBCache(db, []byte(backends.UserBucketName))
-	} else {
+	} else if *database == inmemoryBackend {
 		log.Info("Creating in memory map backend...")
+		log.Warn("Turning off authentication...")
+		cfg.AuthEnabled = false
+
 		requestCache = cache.NewInMemoryCache()
 		metadataCache = cache.NewInMemoryCache()
 		tokenCache = cache.NewInMemoryCache()
 		userCache = cache.NewInMemoryCache()
+	} else {
+		log.Fatalf("unknown database type chosen: %s", *database)
 	}
 
 	authBackend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
