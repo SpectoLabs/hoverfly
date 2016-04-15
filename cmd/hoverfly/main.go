@@ -20,9 +20,11 @@
 package main
 
 import (
+	"bufio"
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -236,6 +238,19 @@ func main() {
 		}
 		return
 	}
+	if cfg.AuthEnabled {
+		// checking if there are any users
+		users, err := hoverfly.Authentication.GetAllUsers()
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err,
+			}).Fatal("got error while trying to get all users")
+		}
+		if len(users) < 1 {
+			createSuperUser(hoverfly)
+		}
+
+	}
 
 	// importing stuff
 	if len(importFlags) > 0 {
@@ -253,7 +268,6 @@ func main() {
 				} else {
 					err = hoverfly.MetadataCache.Set([]byte(fmt.Sprintf("import_%d", i+1)), []byte(v))
 				}
-
 			}
 		}
 	}
@@ -272,4 +286,41 @@ func main() {
 
 	// starting admin interface, this is blocking
 	hoverfly.StartAdminInterface()
+}
+
+func createSuperUser(h *hv.Hoverfly) {
+	reader := bufio.NewReader(os.Stdin)
+	// Prompt and read
+	fmt.Println("No users found in the database, please create initial user.")
+	fmt.Print("Enter username (default hf): ")
+	username, err := reader.ReadString('\n')
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Fatal("error while getting username input")
+	}
+	fmt.Print("Enter password (default hf): ")
+	password, err := reader.ReadString('\n')
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Fatal("error while getting password input")
+	}
+	// Trim whitespace and use defaults if nothing entered
+	username = strings.TrimSpace(username)
+	if username == "" {
+		username = "hf"
+	}
+	password = strings.TrimSpace(password)
+	if password == "" {
+		password = "hf"
+	}
+	err = h.Authentication.AddUser(username, password, true)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Fatal("failed to create user.")
+	} else {
+		log.Infof("User: '%s' created.\n", username)
+	}
 }
