@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -197,8 +198,19 @@ func getBoneRouter(d Hoverfly) *bone.Mux {
 				"Error": err.Error(),
 			}).Error("Failed to load statikFS, admin UI might not work :(")
 		}
-
-		mux.Handle("/*", http.FileServer(statikFS))
+		mux.Handle("/js/*", http.FileServer(statikFS))
+		mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
+			file, err := statikFS.Open("/index.html")
+			if err != nil {
+				w.WriteHeader(500)
+				log.WithFields(log.Fields{
+					"error": err,
+				}).Error("got error while opening index file")
+				return
+			}
+			io.Copy(w, file)
+			w.WriteHeader(200)
+		})
 	}
 	return mux
 }
