@@ -239,6 +239,13 @@ func main() {
 		return
 	}
 	if cfg.AuthEnabled {
+		if os.Getenv(hv.HoverflyAdminUsernameEV) != "" && os.Getenv(hv.HoverflyAdminPasswordEV) != "" {
+			hoverfly.Authentication.AddUser(
+				os.Getenv(hv.HoverflyAdminUsernameEV),
+				os.Getenv(hv.HoverflyAdminPasswordEV),
+				true)
+		}
+
 		// checking if there are any users
 		users, err := hoverfly.Authentication.GetAllUsers()
 		if err != nil {
@@ -249,7 +256,6 @@ func main() {
 		if len(users) < 1 {
 			createSuperUser(hoverfly)
 		}
-
 	}
 
 	// importing stuff
