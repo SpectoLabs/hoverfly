@@ -38,8 +38,18 @@ func DecodeUser(user []byte) (*User, error) {
 	return u, nil
 }
 
-func NewAuthBackend(tokenCache, userCache cache.Cache) AuthBackend {
-	return AuthBackend{
+// Authentication - generic interface for authentication backend
+type Authentication interface {
+	AddUser(username, password string, admin bool) (err error)
+	GetUser(username string) (user *User, err error)
+	GetAllUsers() (users []User, err error)
+	InvalidateToken(token string) (err error)
+	IsTokenBlacklisted(token string) (blacklisted bool, err error)
+}
+
+// NewCacheBasedAuthBackend - takes two caches - one for token and one for users
+func NewCacheBasedAuthBackend(tokenCache, userCache cache.Cache) *CacheAuthBackend {
+	return &CacheAuthBackend{
 		TokenCache: tokenCache,
 		userCache:  userCache,
 	}
@@ -51,13 +61,14 @@ const UserBucketName = "authbucket"
 // TokenBucketName
 const TokenBucketName = "tokenbucket"
 
-// BoltCache - container to implement Cache instance with BoltDB backend for storage
-type AuthBackend struct {
+// CacheAuthBackend - container to implement Cache instance with i.e. BoltDB backend for storage
+type CacheAuthBackend struct {
 	TokenCache cache.Cache
 	userCache  cache.Cache
 }
 
-func (b *AuthBackend) AddUser(username, password string, admin bool) error {
+// AddUser - adds user with provided username, password and admin parameters
+func (b *CacheAuthBackend) AddUser(username, password string, admin bool) error {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), 10)
 	u := User{
 		UUID:     uuid.New(),
@@ -74,7 +85,7 @@ func (b *AuthBackend) AddUser(username, password string, admin bool) error {
 	return err
 }
 
-func (b *AuthBackend) GetUser(username string) (user *User, err error) {
+func (b *CacheAuthBackend) GetUser(username string) (user *User, err error) {
 	userBytes, err := b.userCache.Get([]byte(username))
 
 	if err != nil {
@@ -92,7 +103,31 @@ func (b *AuthBackend) GetUser(username string) (user *User, err error) {
 	return
 }
 
-func (b *AuthBackend) GetAllUsers() (users []User, err error) {
+func (b *CacheAuthBackend) InvalidateToken(token string) error {
+	return b.TokenCache.Set([]byte(token), []byte("whentoexpire"))
+}
+
+// IsTokenBlacklisted - checks if token is blacklisted.
+func (b *CacheAuthBackend) IsTokenBlacklisted(token string) (bool, error) {
+	blacklistedToken, err := b.TokenCache.Get([]byte(token))
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+			"token": token,
+		}).Debug("got error while looking for blacklisted token")
+		if blacklistedToken != nil {
+			return true, err
+		}
+		return false, err
+	}
+	if blacklistedToken == nil {
+		return false, nil
+	}
+	return true, nil
+
+}
+
+func (b *CacheAuthBackend) GetAllUsers() (users []User, err error) {
 	values, _ := b.userCache.GetAllValues()
 	users = make([]User, len(values), len(values))
 	for i, user := range values {

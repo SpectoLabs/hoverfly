@@ -14,38 +14,54 @@ type AllUsersResponse struct {
 }
 
 type AuthController struct {
-	AB                 backends.AuthBackend
+	AB                 backends.Authentication
 	SecretKey          []byte
 	JWTExpirationDelta int
+	Enabled            bool
 }
 
-func GetNewAuthenticationController(authBackend backends.AuthBackend, secretKey []byte, exp int) *AuthController {
-	return &AuthController{AB: authBackend, SecretKey: secretKey, JWTExpirationDelta: exp}
+// GetNewAuthenticationController - returns a pointer to initialised AuthController
+func GetNewAuthenticationController(authBackend backends.Authentication, secretKey []byte, exp int, enabled bool) *AuthController {
+	return &AuthController{AB: authBackend, SecretKey: secretKey, JWTExpirationDelta: exp, Enabled: enabled}
 }
 
 func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if !a.Enabled {
+		w.WriteHeader(http.StatusOK)
+		// returning dummy token
+		token := `{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkR1bW15IHRva2VuIiwiYWRtaW4iOnRydWV9.sKfJparPo3LUmkYoGboBjVfOV3K1qWKUzqx9XFDEsAs"}`
+		w.Write([]byte(token))
+		return
+	}
 	requestUser := new(backends.User)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
 	responseStatus, token := authentication.Login(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta)
-	w.Header().Set("Content-Type", "application/json")
+
 	w.WriteHeader(responseStatus)
 	w.Write(token)
 }
 
 func (a *AuthController) RefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	w.Header().Set("Content-Type", "application/json")
+
 	requestUser := new(backends.User)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
-	w.Header().Set("Content-Type", "application/json")
 	w.Write(authentication.RefreshToken(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta))
 }
 
 func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	err := authentication.Logout(r, a.AB, a.SecretKey, a.JWTExpirationDelta)
 	w.Header().Set("Content-Type", "application/json")
+	if !a.Enabled {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	err := authentication.Logout(r, a.AB, a.SecretKey, a.JWTExpirationDelta)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {

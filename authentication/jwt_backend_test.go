@@ -20,7 +20,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestGenerateToken(t *testing.T) {
-	ab := backends.NewAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
+	ab := backends.NewCacheBasedAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
 	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 
 	token, err := jwtBackend.GenerateToken("userUUIDhereVeryLong", "userx")
@@ -29,7 +29,7 @@ func TestGenerateToken(t *testing.T) {
 }
 
 func TestAuthenticate(t *testing.T) {
-	ab := backends.NewAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
+	ab := backends.NewCacheBasedAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
 	username := "beloveduser"
 	passw := "12345"
 	ab.AddUser(username, passw, true)
@@ -46,7 +46,7 @@ func TestAuthenticate(t *testing.T) {
 }
 
 func TestAuthenticateFail(t *testing.T) {
-	ab := backends.NewAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
+	ab := backends.NewCacheBasedAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
 
 	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 	user := &backends.User{
@@ -60,7 +60,7 @@ func TestAuthenticateFail(t *testing.T) {
 }
 
 func TestLogout(t *testing.T) {
-	ab := backends.NewAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
+	ab := backends.NewCacheBasedAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
 
 	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 
@@ -77,7 +77,7 @@ func TestLogout(t *testing.T) {
 }
 
 func TestNotBlacklisted(t *testing.T) {
-	ab := backends.NewAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
+	ab := backends.NewCacheBasedAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
 
 	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 

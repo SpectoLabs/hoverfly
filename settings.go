@@ -57,11 +57,11 @@ const DefaultAdminPort = "8888"
 const DefaultDatabasePath = "requests.db"
 
 // DefaultJWTExpirationDelta - default token expiration if environment variable is no provided
-const DefaultJWTExpirationDelta = 72
+const DefaultJWTExpirationDelta = 1 * 24 * 60 * 60
 
 // Environment variables
 const (
-	HoverflyAuthEnabledEV     = "HoverflyAuthEnabled"
+	HoverflyAuthDisabledEV    = "HoverflyAuthDisabled"
 	HoverflySecretEV          = "HoverflySecret"
 	HoverflyTokenExpirationEV = "HoverflyTokenExpiration"
 
@@ -112,7 +112,7 @@ func InitSettings() *Configuration {
 			log.WithFields(log.Fields{
 				"error":                   err.Error(),
 				"HoverflyTokenExpiration": os.Getenv(HoverflyTokenExpirationEV),
-			}).Error("failed to get token exipration delta, using default value")
+			}).Fatal("failed to get token exipration delta, using default value")
 			exp = DefaultJWTExpirationDelta
 		}
 		appConfig.JWTExpirationDelta = exp
@@ -121,10 +121,10 @@ func InitSettings() *Configuration {
 		appConfig.JWTExpirationDelta = DefaultJWTExpirationDelta
 	}
 
-	if os.Getenv(HoverflyAuthEnabledEV) == "true" {
-		appConfig.AuthEnabled = true
-	} else {
+	if os.Getenv(HoverflyAuthDisabledEV) == "true" {
 		appConfig.AuthEnabled = false
+	} else {
+		appConfig.AuthEnabled = true
 	}
 
 	// middleware configuration

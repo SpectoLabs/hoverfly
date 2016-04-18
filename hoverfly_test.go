@@ -21,7 +21,7 @@ func TestGetNewHoverflyCheckConfig(t *testing.T) {
 	metaCache := cache.NewBoltDBCache(db, []byte("metaBucket"))
 	tokenCache := cache.NewBoltDBCache(db, []byte("tokenBucket"))
 	userCache := cache.NewBoltDBCache(db, []byte("userBucket"))
-	backend := backends.NewAuthBackend(tokenCache, userCache)
+	backend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
 
 	dbClient := GetNewHoverfly(cfg, requestCache, metaCache, backend)
 

@@ -20,9 +20,11 @@
 package main
 
 import (
+	"bufio"
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -48,30 +50,37 @@ func (i *arrayFlags) Set(value string) error {
 var importFlags arrayFlags
 var destinationFlags arrayFlags
 
+const boltBackend = "boltdb"
+const inmemoryBackend = "memory"
+
 var (
-	verbose         = flag.Bool("v", false, "should every proxy request be logged to stdout")
-	capture         = flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
-	synthesize      = flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
-	modify          = flag.Bool("modify", false, "start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic")
-	middleware      = flag.String("middleware", "", "should proxy use middleware")
-	proxyPort       = flag.String("pp", "", "proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
-	adminPort       = flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
-	metrics         = flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
-	dev             = flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
-	destination     = flag.String("destination", ".", "destination URI to catch")
-	addNew          = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
-	addUser         = flag.String("username", "", "username for new user")
-	addPassword     = flag.String("password", "", "password for new user")
-	isAdmin         = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
-	authEnabled     = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
-	generateCA      = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
-	certName        = flag.String("cert-name", "hoverfly.proxy", "cert name")
-	certOrg         = flag.String("cert-org", "Hoverfly Authority", "organisation name for new cert")
-	cert            = flag.String("cert", "", "CA certificate used to sign MITM certificates")
-	key             = flag.String("key", "", "private key of the CA used to sign MITM certificates")
+	verbose     = flag.Bool("v", false, "should every proxy request be logged to stdout")
+	capture     = flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
+	synthesize  = flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
+	modify      = flag.Bool("modify", false, "start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic")
+	middleware  = flag.String("middleware", "", "should proxy use middleware")
+	proxyPort   = flag.String("pp", "", "proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
+	adminPort   = flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
+	metrics     = flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
+	dev         = flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
+	destination = flag.String("destination", ".", "destination URI to catch")
+
+	addNew       = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
+	addUser      = flag.String("username", "", "username for new user")
+	addPassword  = flag.String("password", "", "password for new user")
+	isAdmin      = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
+	authDisabled = flag.Bool("no-auth", false, "disabled authentication, currently it is enabled by default")
+
+	generateCA = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
+	certName   = flag.String("cert-name", "hoverfly.proxy", "cert name")
+	certOrg    = flag.String("cert-org", "Hoverfly Authority", "organisation name for new cert")
+	cert       = flag.String("cert", "", "CA certificate used to sign MITM certificates")
+	key        = flag.String("key", "", "private key of the CA used to sign MITM certificates")
+
 	tlsVerification = flag.Bool("tls-verification", true, "turn on/off tls verification for outgoing requests (will not try to verify certificates) - defaults to true")
-	databasePath    = flag.String("db-dir", "", "database location - supply it if you want to provide specific to database (will be created there if it doesn't exist)")
-	database        = flag.String("db", "boltdb", "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
+
+	databasePath = flag.String("db-dir", "", "database location - supply it if you want to provide specific to database (will be created there if it doesn't exist)")
+	database     = flag.String("db", "boltdb", "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
 )
 
 func main() {
@@ -161,9 +170,9 @@ func main() {
 	// setting mode
 	cfg.SetMode(mode)
 
-	// enabling authentication if flag or env variable is set to 'true'
-	if cfg.AuthEnabled || *authEnabled {
-		cfg.AuthEnabled = true
+	// disabling authentication if no-auth for auth disabled env variable
+	if !cfg.AuthEnabled || *authDisabled {
+		cfg.AuthEnabled = false
 	}
 
 	// disabling tls verification if flag or env variable is set to 'false' (defaults to true)
@@ -189,7 +198,7 @@ func main() {
 		cfg.DatabasePath = *databasePath
 	}
 
-	if *database == "boltdb" {
+	if *database == boltBackend {
 		log.Info("Creating bolt db backend...")
 		db := cache.GetDB(cfg.DatabasePath)
 		defer db.Close()
@@ -197,15 +206,22 @@ func main() {
 		metadataCache = cache.NewBoltDBCache(db, []byte("metadataBucket"))
 		tokenCache = cache.NewBoltDBCache(db, []byte(backends.TokenBucketName))
 		userCache = cache.NewBoltDBCache(db, []byte(backends.UserBucketName))
-	} else {
+	} else if *database == inmemoryBackend {
 		log.Info("Creating in memory map backend...")
+		log.Warn("Turning off authentication...")
+		cfg.AuthEnabled = false
+
 		requestCache = cache.NewInMemoryCache()
 		metadataCache = cache.NewInMemoryCache()
 		tokenCache = cache.NewInMemoryCache()
 		userCache = cache.NewInMemoryCache()
+	} else {
+		log.Fatalf("unknown database type chosen: %s", *database)
 	}
 
-	hoverfly := hv.GetNewHoverfly(cfg, requestCache, metadataCache, backends.NewAuthBackend(tokenCache, userCache))
+	authBackend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
+
+	hoverfly := hv.GetNewHoverfly(cfg, requestCache, metadataCache, authBackend)
 
 	// if add new user supplied - adding it to database
 	if *addNew {
@@ -221,6 +237,19 @@ func main() {
 			}).Info("user added successfuly")
 		}
 		return
+	}
+	if cfg.AuthEnabled {
+		// checking if there are any users
+		users, err := hoverfly.Authentication.GetAllUsers()
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err,
+			}).Fatal("got error while trying to get all users")
+		}
+		if len(users) < 1 {
+			createSuperUser(hoverfly)
+		}
+
 	}
 
 	// importing stuff
@@ -239,7 +268,6 @@ func main() {
 				} else {
 					err = hoverfly.MetadataCache.Set([]byte(fmt.Sprintf("import_%d", i+1)), []byte(v))
 				}
-
 			}
 		}
 	}
@@ -258,4 +286,41 @@ func main() {
 
 	// starting admin interface, this is blocking
 	hoverfly.StartAdminInterface()
+}
+
+func createSuperUser(h *hv.Hoverfly) {
+	reader := bufio.NewReader(os.Stdin)
+	// Prompt and read
+	fmt.Println("No users found in the database, please create initial user.")
+	fmt.Print("Enter username (default hf): ")
+	username, err := reader.ReadString('\n')
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Fatal("error while getting username input")
+	}
+	fmt.Print("Enter password (default hf): ")
+	password, err := reader.ReadString('\n')
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Fatal("error while getting password input")
+	}
+	// Trim whitespace and use defaults if nothing entered
+	username = strings.TrimSpace(username)
+	if username == "" {
+		username = "hf"
+	}
+	password = strings.TrimSpace(password)
+	if password == "" {
+		password = "hf"
+	}
+	err = h.Authentication.AddUser(username, password, true)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Fatal("failed to create user.")
+	} else {
+		log.Infof("User: '%s' created.\n", username)
+	}
 }
