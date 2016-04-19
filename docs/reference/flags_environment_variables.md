@@ -1,4 +1,4 @@
-# Reference
+# Flags and environment variables
 
 Hoverfly can be configured using flags on startup, or using environment variables.
 

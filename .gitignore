@@ -37,6 +37,8 @@ links.p
 static/node_modules
 static/dist
 
+glide.lock
+
 # IntelliJ
 .idea
 *.iml
