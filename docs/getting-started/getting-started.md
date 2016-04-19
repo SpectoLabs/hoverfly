@@ -6,7 +6,7 @@
 
 Hoverfly binaries for all major OSes are [available here.](https://github.com/SpectoLabs/hoverfly/releases)
 
-To run the binary, ensure that the correct permissions are set, then execute the binary file.
+To start Hoverfly, ensure that the correct permissions are set, then execute the binary file. Unless you have [disabled AdminUI authentication or created a user using flags and/or environment variables](#), you will be prompted to create a new user. 
 
 ### Docker image
 
@@ -16,8 +16,15 @@ To get the Hoverfly Docker image:
 
 To run the image:
 
-    docker run -d -p 8888:8888 -p 8500:8500 spectolabs/hoverfly:latest
+    docker run -d \
+               -p 8888:8888 \
+               -p 8500:8500 \
+               spectolabs/hoverfly:latest \
+               -add -username <username> -password <password>
 
+The port mapping corresponds to the Hoverfly AdminUI port and the Hoverfly Proxy port, respectively.
+
+The Docker image supports the use of [Hoverfly flags](#). In the example above, the `-add`, `-username`, and `-password` flags are used to create a new Hoverfly user. 
 
 ### Maven and JUnit integration
 
@@ -47,7 +54,7 @@ To run the binary:
 
 ### Package management?
 
-Homebrew formula and .deb packages are on the roadmap.
+Homebrew formula and deb/rpm packages are on the roadmap.
 
 
 ## Hoverfly is an HTTP(s) proxy
@@ -63,9 +70,9 @@ Set the HTTP_PROXY or HTTPS_PROXY environment variable to point to Hoverfly:
 
 Hoverfly uses port 8500 for the proxy by default, although this is configurable.
 
-If you just want to experiment with Hoverfly, you can tell cURL to use Hoverfly as a proxy when you execute cURL command:
+If you just want to experiment with Hoverfly, you can tell cURL to use Hoverfly as a proxy:
 
-    curl blah TODO
+    curl http://mirage.readthedocs.org --proxy http://localhost:8500/
 
 ### Windows
 
@@ -79,4 +86,4 @@ The Hoverfly Admin UI is available on
     
 by default. This is configurable.
 
-The Admin UI can be used to change the Hoverfly mode, and to view basic analytic information. uses the Hoverfly API (link TODO).
+The Admin UI can be used to change the Hoverfly mode, and to view basic analytic information. It uses the [Hoverfly API](#).

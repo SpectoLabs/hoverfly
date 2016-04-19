@@ -36,16 +36,52 @@ More information on this use-case is available here:
 * [Using Hoverfly to build Spring Boot microservices alongside a Java monolith](http://www.specto.io/blog/using-api-simulation-to-build-microservices.html)
 * [Easy API simulation with the Hoverfly JUnit rule](https://specto.io/blog/hoverfly-junit-api-simulation.html)
 
-### Hoverfly modes
+## Hoverfly modes
 
-### Virtualize mode
 
 ### Capture mode
 
+In this mode, Hoverfly sits between a client application and a server application and transparently intercepts incoming requests and returned responses. These request/response pairs are stored in memory and can be persisted on disk.
+
+This is how you capture a real service or API so you can virtualize it for use in development or test. You could capture real traffic, export it as JSON, modify it to your requirements, then import it back into Hoverfly.
+
+[Read more about capture mode](#)
+
+### Virtualize mode
+
+Once Hoverfly has either captured real traffic or has been populated with pre-made (or pre-captured) virtual services, it can be put into "virtualize" mode. In this mode, Hoverfly will return a response for each request it receives.
+   
+This will be useful if you have "captured" a real service that you don't have reliable access to, and you want to build a client application that uses it. Or if a team-mate is working on a different service that your application needs to use, and they have shared a Hoverfly virtual service with you.   
+
+[Read more about virtualize mode](#)
+
+
 ### Synthesize mode
+
+In this mode, Hoverfly applies "middleware" (see below) to each incoming request to generate a response on the fly.
+
+This will be useful if you want fine-grained control over what responses Hoverfly returns, and/or if you don't want to mess around capturing traffic and editing JSON files.
+
+[Read more about synthesize mode](#)
 
 ### Modify mode
 
-### Bypass
+In this mode, Hoverfly sits between the client and the server application, and applies middleware to each request and response.
+
+This could be used for all kinds of things. For example, adding authentication headers to requests from a client application to an external service.
+
+[Read more about modify mode](#)
 
 ## Middleware
+
+Hoverfly supports middleware scripts that can be applied to the outgoing requests and/or the incoming responses, depending on the mode. Middleware can be written in any language - as long as it is supported by the machine Hoverfly is running on. You could write middleware scripts in Python, Ruby or Javascript (if you have NodeJS installed).
+ 
+Middleware works in the following ways, depending on the mode:  
+ 
+* Capture mode: middleware affects only outgoing requests.
+* Virtualize mode: middleware affects only responses (cache contents remain untouched).
+* Synthesize mode: middleware creates responses.
+* Modify mode: middleware affects requests and responses. 
+
+[Read more about middleware](#)
+
