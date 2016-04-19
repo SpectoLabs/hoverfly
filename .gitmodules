@@ -31,3 +31,6 @@
 [submodule "minify"]
     path = vendor/github.com/tdewolff/minify
     url = https://github.com/tdewolff/minify
+[submodule "strconv"]
+    path = vendor/github.com/tdewolff/strconv
+    url = https://github.com/tdewolff/strconv
