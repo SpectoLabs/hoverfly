@@ -18,7 +18,9 @@ This can be useful if you want to create, say, a portable, self-contained versio
 
 More information on these use-cases is available here:
 
-TODO
+* [Creating fast versions of slow dependencies](http://www.specto.io/blog/speeding-up-your-slow-dependencies.html)
+* [Virtualizing the Meetup API](http://www.specto.io/blog/hoverfly-meetup-api.html)
+
 
 ### Manually creating simulated services for use in a testing or development.
 
@@ -30,7 +32,9 @@ Alternatively, instead of writing a JSON file, you can write a script that will 
 
 More information on this use-case is available here:
 
-TODO  
+* [Mocking APIs for development and testing](http://www.specto.io/blog/api-mocking-for-dev-and-test-part-1.html)
+* [Using Hoverfly to build Spring Boot microservices alongside a Java monolith](http://www.specto.io/blog/using-api-simulation-to-build-microservices.html)
+* [Easy API simulation with the Hoverfly JUnit rule](https://specto.io/blog/hoverfly-junit-api-simulation.html)
 
 ### Hoverfly modes
 
