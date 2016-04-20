@@ -18,4 +18,4 @@ Or you can make an API call (again, you will need to have started Hoverfly with 
 
     curl -H "Content-Type application/json" -X POST -d '{"mode":"synthesize"}' http://localhost:8888/api/state
   
-      
+An [example of a synthetic service is available here](https://github.com/SpectoLabs/hoverfly/tree/master/examples/middleware/synthetic_flight_search).      
