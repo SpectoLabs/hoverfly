@@ -185,7 +185,21 @@ Note: if you leave this value unset - you will have to authenticate in the admin
     HoverflyTokenExpiration
     
 Token expiration time in seconds. Defaults to one day (24 * 60 * 60).
- 
+
+### Setting admin user through env variables
+
+You can provide credentials for initial user by setting these variables:
+
+    HoverflyAdmin
+    
+Admin user name.
+
+    HoverflyAdminPass
+    
+Admin password.
+Note: if you do not set initial user through environment variables with authentication enabled - Hoverfly will ask you to input
+username and password for the first user during startup. This could result in a 'stuck' container.
+
 ## Port selection 
 
     AdminPort
@@ -202,3 +216,16 @@ Proxy port, defaults to 8888.
 
 Path to BoltDB data file. By default, a "requests.db" file will be created in the directory from which Hoverfly is executed. 
 Supply a custom path with filename to use a different file or location. The file will be created if it doesn't exist.
+
+## TLS
+
+    HoverflyTlsVerification
+    
+TLS verification. Since Hoverfly is making requests on behalf of it's users - it has to either trust remote servers or not.
+This setting defaults to 'true' which means that untrusted hosts won't be accepted if request is done via HTTPs. You can turn it
+off by providing "false" value to this environment variable, for example:
+
+    export HoverflyTlsVerification="false"
+    
+    
+    
