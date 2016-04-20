@@ -1,4 +1,4 @@
 # Summary
 
-* Motivation
+* [Motivation](docs/introduction/motivation.md)
 
