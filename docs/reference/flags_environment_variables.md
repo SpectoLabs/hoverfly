@@ -151,15 +151,16 @@ Turn on/off TLS verification for outgoing requests (Hoverfly will not try to ver
 
     -v
 
-Verbose mode. Logs every proxy request to stdout.
+Verbose mode. Logs every proxy and admin UI/API request to stdout.
 
     -metrics
 
-Logs metrics to stdout.
+Logs metrics to stdout every 5 seconds.
 
 
 ## Misc
 
     -dev
 
-Supply -dev flag to serve Admin UI static files directly from ./static/dist instead from statik binary.
+Supply -dev flag to serve Admin UI static files directly from ./static/admin/dist instead from statik binary. Useful when 
+developing UI.
