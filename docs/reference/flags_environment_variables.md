@@ -107,7 +107,7 @@ bad things can happen.
 
     -db-path <string>
 
-Path to BoltDB data file. By default, a "requests.db" file will be created in the Hoverfly directory. 
+Path to BoltDB data file. By default, a "requests.db" file will be created in the directory from which Hoverfly is executed. 
 Supply a custom path with filename to use a different file or location. The file will be created if it doesn't exist.
 
 For example:
@@ -196,4 +196,9 @@ Admin UI port, defaults to 8500.
     
 Proxy port, defaults to 8888.
     
-    
+## Persistence
+ 
+    HoverflyDB
+
+Path to BoltDB data file. By default, a "requests.db" file will be created in the directory from which Hoverfly is executed. 
+Supply a custom path with filename to use a different file or location. The file will be created if it doesn't exist.
