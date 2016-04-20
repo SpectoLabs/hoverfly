@@ -45,7 +45,7 @@ Sets the proxy port. For example:
 
     ./hoverfly -ap 1234 -pp 4567         
 
-This starts Hoverfly with the Admin UI on port 1234 and the proxy on 5678.    	
+This starts Hoverfly with the Admin UI on port 1234 and the proxy on 4567.    	
 
 ## Mode selection, import & middleware
 
