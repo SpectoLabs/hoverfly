@@ -2,9 +2,6 @@
 
 Hoverfly can be configured using flags on startup, or using environment variables.
 
-TODO: add environment variables
-
-
 ## Admin UI Authentication
 
     -no-auth
@@ -23,7 +20,7 @@ Username for new user.
 
 Password for new user.
 
-    -admin <string>
+    -admin <bool>
 
 Supply '-admin false' to make this a non-admin user (defaults to 'true').
 
@@ -45,7 +42,7 @@ Sets the proxy port. For example:
 
     ./hoverfly -ap 1234 -pp 4567         
 
-This starts Hoverfly with the Admin UI on port 1234 and the proxy on 5678.    	
+This starts Hoverfly with the Admin UI on port 1234 and the proxy on 4567.    	
 
 ## Mode selection, import & middleware
 
@@ -103,11 +100,19 @@ Specify which URI to catch using regluar expression. (Defaults to ".").
 
     -db <string>
 
-Persistent storage to use. By default, Hoverfly uses BoltDB to store data in a file on disk. Specify 'memory' to disable this and use in-memory persistence only.
+Persistent storage to use. By default, Hoverfly uses BoltDB to store data in a file on disk. Specify 'memory'
+to disable this and use in-memory cache only. 
+Note: 'memory' should only be used for small test cases, if your machine runs out of RAM while Hoverfly is in 'memory' mode - 
+bad things can happen.
 
-    -db-dir <string>
+    -db-path <string>
 
-Path to BoltDB data file. By default, a "requests.db" file will be created in the Hoverfly directory. Supply a custom path and/or filename to use a different file or location. The file will be created if it doesn't exist.	    	
+Path to BoltDB data file. By default, a "requests.db" file will be created in the directory from which Hoverfly is executed. 
+Supply a custom path with filename to use a different file or location. The file will be created if it doesn't exist.
+
+For example:
+
+	 ./hoverfly -db-path new_name.db
 
 ## TLS & Certificate management
 
@@ -143,15 +148,84 @@ Turn on/off TLS verification for outgoing requests (Hoverfly will not try to ver
 
     -v
 
-Verbose mode. Logs every proxy request to stdout.
+Verbose mode. Logs every proxy and admin UI/API request to stdout.
 
     -metrics
 
-Logs metrics to stdout.
+Logs metrics to stdout every 5 seconds.
 
 
 ## Misc
 
     -dev
 
-Supply -dev flag to serve Admin UI static files directly from ./static/dist instead from statik binary.
+Supply -dev flag to serve Admin UI static files directly from ./static/admin/dist instead from statik binary. Useful when 
+developing UI.
+
+# Environment variables
+
+You can configure Hoverfly through environment variables, this is a standard approach when application is running in a 
+Docker container or hosted via platform. 
+
+## Admin UI authentication
+
+    HoverflyAuthDisabled  
+    
+Hoverfly authentication setting. Defaults to false. Set it to 'true' to disable authentication.
+    
+For example:
+    
+    export HoverflyAuthDisabled="true"
+    
+    HoverflySecret
+    
+Secret used to generate authentication tokens. If this variable is not set - Hoverfly generates one during startup.
+Note: if you leave this value unset - you will have to authenticate in the admin UI after each Hoverfly restart.
+
+    HoverflyTokenExpiration
+    
+Token expiration time in seconds. Defaults to one day (24 * 60 * 60).
+
+### Setting admin user through env variables
+
+You can provide credentials for initial user by setting these variables:
+
+    HoverflyAdmin
+    
+Admin user name.
+
+    HoverflyAdminPass
+    
+Admin password.
+Note: if you do not set initial user through environment variables with authentication enabled - Hoverfly will ask you to input
+username and password for the first user during startup. This could result in a 'stuck' container.
+
+## Port selection 
+
+    AdminPort
+    
+Admin UI port, defaults to 8500.
+    
+    ProxyPort
+    
+Proxy port, defaults to 8888.
+    
+## Persistence
+ 
+    HoverflyDB
+
+Path to BoltDB data file. By default, a "requests.db" file will be created in the directory from which Hoverfly is executed. 
+Supply a custom path with filename to use a different file or location. The file will be created if it doesn't exist.
+
+## TLS
+
+    HoverflyTlsVerification
+    
+TLS verification. Since Hoverfly is making requests on behalf of it's users - it has to either trust remote servers or not.
+This setting defaults to 'true' which means that untrusted hosts won't be accepted if request is done via HTTPs. You can turn it
+off by providing "false" value to this environment variable, for example:
+
+    export HoverflyTlsVerification="false"
+    
+    
+    
