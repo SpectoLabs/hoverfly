@@ -162,43 +162,101 @@ Or you can also do it through environment variable 'HoverflyTlsVerification' lik
 
 ## API
 
+### Authentication
+
+Hoverfly uses a combination of basic auth and JWT (JSON Web Tokens) to authenticate users.
+
+### Authentication (enabled by default)
+
+To disable authentication for you can pass '-no-auth' flag during startup:
+
+    ./hoverfly -no-auth
+    
+or supply environment variable:
+
+    export HoverflyAuthDisabled=true
+    
+If environment variable __or__ flag is given to disabled authentication - it will be disabled. If you disable authentication -
+you can use any username/password pair to authenticate to admin user interface.
+
+Export Hoverfly secret:
+
+    export HoverflySecret=VeryVerySecret
+    
+
+If you skip this step - a new random secret will be generated every single time when you launch Hoverfly. This can be useful
+if you are deploying it in the cloud but it can also be annoying if you are working with Hoverfly where it is constantly restarted.
+
+You can also specify token expiration time (defaults to 1 day) in seconds:
+
+    export HoverflyTokenExpiration=3600
+
+### Initial super user
+You can define initial super user through environment variables (useful if you are using Docker or AMI) by exporting these
+environment variables:
+
+    export HoverflyAdmin="hf" 
+    export HoverflyAdminPass="hf"
+    
+Another option is to manually add user during startup. If no user is present in Hoverfly database and authentication 
+is enabled - you will be asked to enter username and password for the initial admin level user so you can use the API. 
+
+### Adding users
+
+Then, add your first admin user:
+
+    ./hoverfly -v -add -username hfadmin -password hfadminpass
+     
+You can also create non-admin users by supplying 'admin' flag as follows:
+
+    ./hoverfly -v -add -username hfadmin -password hfadminpass -admin false
+
+Getting token:
+
+    curl -H "Content-Type application/json" -X POST -d '{"Username": "hoverfly", "Password": "testing"}' http://localhost:8888/api/token-auth
+
+Using token:
+
+    curl -H "Authorization: Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NTYxNTY3ODMsImlhdCI6MTQ1NTg5NzU4Mywic3ViIjoiIn0.Iu_xBKzBWlrO70kDAo5hE4lXydu3bQxDZKriYJ4exg3FfZXCqgYH9zm7SVKailIib9ESn_T4zU-2UtFT5iYhw_fzhnXtQoBn5HIhGfUb7mkx0tZh1TJBkLCv6y5ViPw5waAnFBRcygh9OdeiEqnJgzHKrxsR87EellXSdMn2M8wVIhjIhS3KiDjUwuqQl-ClBDaQGlsLZ7eC9OHrJIQXJLqW7LSwrkV3rstCZkTKrEZCdq6F4uAK0mgagTFmuyaBHDEccaivkgYDcaBb7n-Vmyh-jUnDOnwtFnrOv_myXlqqkvtezfm06MBl4PzZE6ZtEA5XADdobLfVarbvB9tFbA" http://localhost:8888/api/records
+
+
 ### Usage
 
 You can access the administrator API under the default hostname of 'localhost' and port '8888':
 
-* Recorded requests: GET [http://localhost:8888/records](http://localhost:8888/records):
+* Recorded requests: GET [http://localhost:8888/api/records](http://localhost:8888/api/records):
 
 
-    curl http://localhost:8888/records
+    curl http://localhost:8888/api/records
 
-* Wipe cache: DELETE http://localhost:8888/records:
+* Wipe cache: DELETE http://localhost:8888/api/records:
 
 
-    curl -X DELETE http://localhost:8888/records
+    curl -X DELETE http://localhost:8888/api/records
 
-* Get current proxy state: GET [http://localhost:8888/state](http://localhost:8888/state)
-* Set proxy state: POST http://localhost:8888/state
+* Get current proxy state: GET [http://localhost:8888/api/state](http://localhost:8888/api/state)
+* Set proxy state: POST http://localhost:8888/api/state
    + body to start virtualizing: {"mode":"virtualize"}
    + body to start capturing: {"mode":"capture"}
 
 
-    curl -H "Content-Type application/json" -X POST -d '{"mode":"capture"}' http://localhost:8888/state
+    curl -H "Content-Type application/json" -X POST -d '{"mode":"capture"}' http://localhost:8888/api/state
 
 
-* Update proxy destination: POST http://localhost:8888/state
+* Update proxy destination: POST http://localhost:8888/api/state
 
 
-    curl -H "Content-Type application/json" -X POST -d '{"destination": "service-hostname-here"}' http://localhost:8888/state
+    curl -H "Content-Type application/json" -X POST -d '{"destination": "service-hostname-here"}' http://localhost:8888/api/state
 
 * Exporting recorded requests to a file:
 
 
-    curl http://localhost:8888/records > requests.json
+    curl http://localhost:8888/api/records > requests.json
 
 * Importing requests from file:
 
 
-    curl --data "@/path/to/requests.json" http://localhost:8888/records
+    curl --data "@/path/to/requests.json" http://localhost:8888/api/records
 
 #### Metadata
 
@@ -207,15 +265,15 @@ if it was done using launching flags ("-import http://mystorehostname/service.js
 
 You can also set any key/values yourself. Let's give our Hoverfly a name! It would look something like this:
 
-    curl -H "Content-Type application/json" -X PUT -d '{"key":"name", "value": "Mad Max"}' http://localhost:8888/metadata
+    curl -H "Content-Type application/json" -X PUT -d '{"key":"name", "value": "Mad Max"}' http://localhost:8888/api/metadata
 
 and then add some description to it:
 
-    curl -H "Content-Type application/json" -X PUT -d '{"key":"description", "value": "Simulates keystone service, use user XXXX and password YYYYY to login"}' http://localhost:8888/metadata
+    curl -H "Content-Type application/json" -X PUT -d '{"key":"description", "value": "Simulates keystone service, use user XXXX and password YYYYY to login"}' http://localhost:8888/api/metadata
 
 then, to get your Hoverfly's info - use GET request:
 
-    curl http://localhost:8888/metadata
+    curl http://localhost:8888/api/metadata
 
 result should be something like this:
 ```javascript
@@ -246,9 +304,9 @@ our metadata will look like:
 
 
 Currently available commands:
-* Set metadata: PUT http://localhost:8888/metadata ( __curl -H "Content-Type application/json" -X PUT -d '{"key":"my_key", "value": "my_value"}' http://localhost:8888/metadata__ )
-* Get all metadata: GET [http://localhost:8888/metadata](http://localhost:8888/metadata) ( __curl http://localhost:8888/metadata )
-* Delete all metadata: DELETE http://localhost:8888/metadata ( __curl -X DELETE http://localhost:8888/metadata )
+* Set metadata: PUT http://localhost:8888/api/metadata ( __curl -H "Content-Type application/json" -X PUT -d '{"key":"my_key", "value": "my_value"}' http://localhost:8888/api/metadata__ )
+* Get all metadata: GET [http://localhost:8888/api/metadata](http://localhost:8888/api/metadata) ( __curl http://localhost:8888/api/metadata )
+* Delete all metadata: DELETE http://localhost:8888/api/metadata ( __curl -X DELETE http://localhost:8888/api/metadata )
 
 ## Importing data on startup:
 

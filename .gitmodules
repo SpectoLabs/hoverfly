@@ -26,8 +26,11 @@
     path = vendor/github.com/dgrijalva/jwt-go
     url = https://github.com/dgrijalva/jwt-go
 [submodule "goproxy"]
-    path = vendor/github.com/rusenask/goproxy
-    url = https://github.com/rusenask/goproxy
+    path = vendor/github.com/elazarl/goproxy
+    url = https://github.com/elazarl/goproxy
 [submodule "minify"]
     path = vendor/github.com/tdewolff/minify
     url = https://github.com/tdewolff/minify
+[submodule "strconv"]
+    path = vendor/github.com/tdewolff/strconv
+    url = https://github.com/tdewolff/strconv

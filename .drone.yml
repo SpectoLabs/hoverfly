@@ -1,8 +1,4 @@
-clone:
-  path: github.com/tjcunliffe/hoverfly
-
 build:
-  image: golang:1.6
+  image: golang:1.5
   commands:
-    - make test
-    - make build-drone  
+    - make build-drone

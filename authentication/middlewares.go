@@ -9,13 +9,13 @@ import (
 )
 
 type AuthMiddleware struct {
-	AB                 backends.AuthBackend
+	AB                 backends.Authentication
 	SecretKey          []byte
 	JWTExpirationDelta int
 	Enabled            bool
 }
 
-func GetNewAuthenticationMiddleware(authBackend backends.AuthBackend, secretKey []byte, exp int, enabled bool) *AuthMiddleware {
+func GetNewAuthenticationMiddleware(authBackend backends.Authentication, secretKey []byte, exp int, enabled bool) *AuthMiddleware {
 	return &AuthMiddleware{AB: authBackend, SecretKey: secretKey, JWTExpirationDelta: exp, Enabled: enabled}
 }
 

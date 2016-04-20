@@ -17,7 +17,7 @@ func TestGetAllRecords(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := getBoneRouter(*dbClient)
 
-	req, err := http.NewRequest("GET", "/records", nil)
+	req, err := http.NewRequest("GET", "/api/records", nil)
 	testutil.Expect(t, err, nil)
 
 	//The response recorder used to record HTTP responses
@@ -49,7 +49,7 @@ func TestGetAllRecordsWRecords(t *testing.T) {
 	// performing query
 	m := getBoneRouter(*dbClient)
 
-	req, err := http.NewRequest("GET", "/records", nil)
+	req, err := http.NewRequest("GET", "/api/records", nil)
 	testutil.Expect(t, err, nil)
 
 	//The response recorder used to record HTTP responses
@@ -73,7 +73,7 @@ func TestGetRecordsCount(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := getBoneRouter(*dbClient)
 
-	req, err := http.NewRequest("GET", "/count", nil)
+	req, err := http.NewRequest("GET", "/api/count", nil)
 	testutil.Expect(t, err, nil)
 
 	//The response recorder used to record HTTP responses
@@ -105,7 +105,7 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 	// performing query
 	m := getBoneRouter(*dbClient)
 
-	req, err := http.NewRequest("GET", "/count", nil)
+	req, err := http.NewRequest("GET", "/api/count", nil)
 	testutil.Expect(t, err, nil)
 
 	//The response recorder used to record HTTP responses
@@ -136,7 +136,7 @@ func TestExportImportRecords(t *testing.T) {
 		dbClient.captureRequest(req)
 	}
 
-	req, err := http.NewRequest("GET", "/records", nil)
+	req, err := http.NewRequest("GET", "/api/records", nil)
 	testutil.Expect(t, err, nil)
 
 	//The response recorder used to record HTTP responses
@@ -153,7 +153,7 @@ func TestExportImportRecords(t *testing.T) {
 	testutil.Expect(t, err, nil)
 
 	// using body to import records again
-	importReq, err := http.NewRequest("POST", "/records", ioutil.NopCloser(bytes.NewBuffer(body)))
+	importReq, err := http.NewRequest("POST", "/api/records", ioutil.NopCloser(bytes.NewBuffer(body)))
 	//The response recorder used to record HTTP responses
 	importRec := httptest.NewRecorder()
 
@@ -186,7 +186,7 @@ func TestDeleteHandler(t *testing.T) {
 	testutil.Expect(t, len(payloads), 5)
 
 	// deleting through handler
-	deleteReq, err := http.NewRequest("DELETE", "/records", nil)
+	deleteReq, err := http.NewRequest("DELETE", "/api/records", nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
 
@@ -201,7 +201,7 @@ func TestDeleteHandlerNoBucket(t *testing.T) {
 	m := getBoneRouter(*dbClient)
 
 	// deleting through handler
-	importReq, err := http.NewRequest("DELETE", "/records", nil)
+	importReq, err := http.NewRequest("DELETE", "/api/records", nil)
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	importRec := httptest.NewRecorder()
@@ -219,7 +219,7 @@ func TestGetState(t *testing.T) {
 	// setting initial mode
 	dbClient.Cfg.SetMode(VirtualizeMode)
 
-	req, err := http.NewRequest("GET", "/state", nil)
+	req, err := http.NewRequest("GET", "/api/state", nil)
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
@@ -252,7 +252,7 @@ func TestSetVirtualizeState(t *testing.T) {
 	testutil.Expect(t, err, nil)
 
 	// deleting through handler
-	req, err := http.NewRequest("POST", "/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
@@ -281,7 +281,7 @@ func TestSetCaptureState(t *testing.T) {
 	testutil.Expect(t, err, nil)
 
 	// deleting through handler
-	req, err := http.NewRequest("POST", "/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
@@ -310,7 +310,7 @@ func TestSetModifyState(t *testing.T) {
 	testutil.Expect(t, err, nil)
 
 	// deleting through handler
-	req, err := http.NewRequest("POST", "/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
@@ -339,7 +339,7 @@ func TestSetSynthesizeState(t *testing.T) {
 	testutil.Expect(t, err, nil)
 
 	// deleting through handler
-	req, err := http.NewRequest("POST", "/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
@@ -368,7 +368,7 @@ func TestSetRandomState(t *testing.T) {
 	testutil.Expect(t, err, nil)
 
 	// deleting through handler
-	req, err := http.NewRequest("POST", "/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
@@ -390,7 +390,7 @@ func TestSetNoBody(t *testing.T) {
 	dbClient.Cfg.SetMode(VirtualizeMode)
 
 	// setting state
-	req, err := http.NewRequest("POST", "/state", nil)
+	req, err := http.NewRequest("POST", "/api/state", nil)
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
@@ -409,7 +409,7 @@ func TestStatsHandler(t *testing.T) {
 	m := getBoneRouter(*dbClient)
 
 	// deleting through handler
-	req, err := http.NewRequest("GET", "/stats", nil)
+	req, err := http.NewRequest("GET", "/api/stats", nil)
 
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
@@ -429,7 +429,7 @@ func TestStatsHandlerVirtualizeMetrics(t *testing.T) {
 
 	dbClient.Counter.Counters[VirtualizeMode].Inc(1)
 
-	req, err := http.NewRequest("GET", "/stats", nil)
+	req, err := http.NewRequest("GET", "/api/stats", nil)
 
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
@@ -456,7 +456,7 @@ func TestStatsHandlerCaptureMetrics(t *testing.T) {
 
 	dbClient.Counter.Counters[CaptureMode].Inc(1)
 
-	req, err := http.NewRequest("GET", "/stats", nil)
+	req, err := http.NewRequest("GET", "/api/stats", nil)
 
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
@@ -483,7 +483,7 @@ func TestStatsHandlerModifyMetrics(t *testing.T) {
 
 	dbClient.Counter.Counters[ModifyMode].Inc(1)
 
-	req, err := http.NewRequest("GET", "/stats", nil)
+	req, err := http.NewRequest("GET", "/api/stats", nil)
 
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
@@ -510,7 +510,7 @@ func TestStatsHandlerSynthesizeMetrics(t *testing.T) {
 
 	dbClient.Counter.Counters[SynthesizeMode].Inc(1)
 
-	req, err := http.NewRequest("GET", "/stats", nil)
+	req, err := http.NewRequest("GET", "/api/stats", nil)
 
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
@@ -542,7 +542,7 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 		dbClient.captureRequest(req)
 	}
 
-	req, err := http.NewRequest("GET", "/stats", nil)
+	req, err := http.NewRequest("GET", "/api/stats", nil)
 
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
@@ -574,7 +574,7 @@ func TestSetMetadata(t *testing.T) {
 	testutil.Expect(t, err, nil)
 
 	// deleting through handler
-	req, err := http.NewRequest("PUT", "/metadata", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("PUT", "/api/metadata", ioutil.NopCloser(bytes.NewBuffer(bts)))
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
@@ -595,7 +595,7 @@ func TestSetMetadataBadBody(t *testing.T) {
 	m := getBoneRouter(*dbClient)
 
 	// deleting through handler
-	req, err := http.NewRequest("PUT", "/metadata", ioutil.NopCloser(bytes.NewBuffer([]byte("you shall not decode me!!"))))
+	req, err := http.NewRequest("PUT", "/api/metadata", ioutil.NopCloser(bytes.NewBuffer([]byte("you shall not decode me!!"))))
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
@@ -619,7 +619,7 @@ func TestSetMetadataMissingKey(t *testing.T) {
 	testutil.Expect(t, err, nil)
 
 	// deleting through handler
-	req, err := http.NewRequest("PUT", "/metadata", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("PUT", "/api/metadata", ioutil.NopCloser(bytes.NewBuffer(bts)))
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
@@ -648,7 +648,7 @@ func TestGetMetadata(t *testing.T) {
 		testutil.Expect(t, err, nil)
 	}
 
-	req, err := http.NewRequest("GET", "/metadata", nil)
+	req, err := http.NewRequest("GET", "/api/metadata", nil)
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
@@ -689,7 +689,7 @@ func TestDeleteMetadata(t *testing.T) {
 	testutil.Expect(t, len(allMeta), 3)
 
 	// deleting it
-	req, err := http.NewRequest("DELETE", "/metadata", nil)
+	req, err := http.NewRequest("DELETE", "/api/metadata", nil)
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()
@@ -710,7 +710,7 @@ func TestDeleteMetadataEmpty(t *testing.T) {
 	m := getBoneRouter(*dbClient)
 
 	// deleting it
-	req, err := http.NewRequest("DELETE", "/metadata", nil)
+	req, err := http.NewRequest("DELETE", "/api/metadata", nil)
 	testutil.Expect(t, err, nil)
 	//The response recorder used to record HTTP responses
 	rec := httptest.NewRecorder()

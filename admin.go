@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -96,77 +98,83 @@ func getBoneRouter(d Hoverfly) *bone.Mux {
 	mux := bone.New()
 
 	// getting auth controllers and middleware
-	ac := controllers.GetNewAuthenticationController(d.Authentication, d.Cfg.SecretKey, d.Cfg.JWTExpirationDelta)
-	am := authentication.GetNewAuthenticationMiddleware(d.Authentication,
+	ac := controllers.GetNewAuthenticationController(
+		d.Authentication,
 		d.Cfg.SecretKey,
 		d.Cfg.JWTExpirationDelta,
 		d.Cfg.AuthEnabled)
 
-	mux.Post("/token-auth", http.HandlerFunc(ac.Login))
-	mux.Get("/refresh-token-auth", negroni.New(
+	am := authentication.GetNewAuthenticationMiddleware(
+		d.Authentication,
+		d.Cfg.SecretKey,
+		d.Cfg.JWTExpirationDelta,
+		d.Cfg.AuthEnabled)
+
+	mux.Post("/api/token-auth", http.HandlerFunc(ac.Login))
+	mux.Get("/api/refresh-token-auth", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(ac.RefreshToken),
 	))
-	mux.Get("/logout", negroni.New(
+	mux.Get("/api/logout", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(ac.Logout),
 	))
 
-	mux.Get("/users", negroni.New(
+	mux.Get("/api/users", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(ac.GetAllUsersHandler),
 	))
 
-	mux.Get("/records", negroni.New(
+	mux.Get("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.AllRecordsHandler),
 	))
 
-	mux.Delete("/records", negroni.New(
+	mux.Delete("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.DeleteAllRecordsHandler),
 	))
-	mux.Post("/records", negroni.New(
+	mux.Post("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.ImportRecordsHandler),
 	))
 
-	mux.Get("/metadata", negroni.New(
+	mux.Get("/api/metadata", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.AllMetadataHandler),
 	))
 
-	mux.Put("/metadata", negroni.New(
+	mux.Put("/api/metadata", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.SetMetadataHandler),
 	))
 
-	mux.Delete("/metadata", negroni.New(
+	mux.Delete("/api/metadata", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.DeleteMetadataHandler),
 	))
 
-	mux.Get("/count", negroni.New(
+	mux.Get("/api/count", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.RecordsCount),
 	))
-	mux.Get("/stats", negroni.New(
+	mux.Get("/api/stats", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.StatsHandler),
 	))
 	// TODO: check auth for websocket connection
-	mux.Get("/statsws", http.HandlerFunc(d.StatsWSHandler))
+	mux.Get("/api/statsws", http.HandlerFunc(d.StatsWSHandler))
 
-	mux.Get("/state", negroni.New(
+	mux.Get("/api/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.CurrentStateHandler),
 	))
-	mux.Post("/state", negroni.New(
+	mux.Post("/api/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.StateHandler),
 	))
 
-	mux.Post("/add", negroni.New(
+	mux.Post("/api/add", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.ManualAddHandler),
 	))
@@ -174,8 +182,13 @@ func getBoneRouter(d Hoverfly) *bone.Mux {
 	if d.Cfg.Development {
 		// since hoverfly is not started from cmd/hoverfly/hoverfly
 		// we have to target to that directory
-		log.Warn("Hoverfly is serving files from /static/dist instead of statik binary!")
-		mux.Handle("/*", http.FileServer(http.Dir("../../static/dist")))
+		log.Warn("Hoverfly is serving files from /static/admin/dist instead of statik binary!")
+		mux.Handle("/js/*", http.StripPrefix("/js/", http.FileServer(http.Dir("../../static/admin/dist/js"))))
+
+		mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, "../../static/admin/dist/index.html")
+		})
+
 	} else {
 		// preparing static assets for embedded admin
 		statikFS, err := fs.New()
@@ -185,8 +198,19 @@ func getBoneRouter(d Hoverfly) *bone.Mux {
 				"Error": err.Error(),
 			}).Error("Failed to load statikFS, admin UI might not work :(")
 		}
-
-		mux.Handle("/*", http.FileServer(statikFS))
+		mux.Handle("/js/*", http.FileServer(statikFS))
+		mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
+			file, err := statikFS.Open("/index.html")
+			if err != nil {
+				w.WriteHeader(500)
+				log.WithFields(log.Fields{
+					"error": err,
+				}).Error("got error while opening index file")
+				return
+			}
+			io.Copy(w, file)
+			w.WriteHeader(200)
+		})
 	}
 	return mux
 }
@@ -304,9 +328,15 @@ var upgrader = websocket.Upgrader{
 func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Error("failed to upgrade websocket")
 		return
 	}
+
+	// defining counters for delta check
+	var recordsCount int
+	var statsCounters map[string]int64
 
 	for {
 		messageType, p, err := conn.ReadMessage()
@@ -318,36 +348,36 @@ func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 		}).Info("Got message...")
 
 		for _ = range time.Tick(1 * time.Second) {
-
 			count, err := d.RequestCache.RecordsCount()
-
 			if err != nil {
 				log.WithFields(log.Fields{
 					"message": p,
 					"error":   err.Error(),
 				}).Error("got error while trying to get records count")
-				return
+				continue
 			}
-
 			stats := d.Counter.Flush()
 
-			var sr statsResponse
-			sr.Stats = stats
-			sr.RecordsCount = count
+			// checking whether we should send an update
+			if !reflect.DeepEqual(stats.Counters, statsCounters) || count != recordsCount {
+				var sr statsResponse
+				sr.Stats = stats
+				sr.RecordsCount = count
 
-			b, err := json.Marshal(sr)
+				b, err := json.Marshal(sr)
 
-			if err = conn.WriteMessage(messageType, b); err != nil {
-				log.WithFields(log.Fields{
-					"message": p,
-					"error":   err.Error(),
-				}).Debug("Got error when writing message...")
-				return
+				if err = conn.WriteMessage(messageType, b); err != nil {
+					log.WithFields(log.Fields{
+						"message": p,
+						"error":   err.Error(),
+					}).Debug("Got error when writing message...")
+					continue
+				}
+				recordsCount = count
+				statsCounters = stats.Counters
 			}
 		}
-
 	}
-
 }
 
 // ImportRecordsHandler - accepts JSON payload and saves it to cache
@@ -442,10 +472,10 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 
 	sc, _ := strconv.Atoi(respStatusCode)
 
-	presp := ResponseDetails {
-		Status: sc,
+	presp := ResponseDetails{
+		Status:  sc,
 		Headers: headers,
-		Body: respBody,
+		Body:    respBody,
 	}
 
 	log.WithFields(log.Fields{
