@@ -164,7 +164,7 @@ Or you can also do it through environment variable 'HoverflyTlsVerification' lik
 
 ### Authentication
 
-Hoverfly uses a combination of basic auth and JWT (JSON Web Tokens) to authenticate users
+Hoverfly uses a combination of basic auth and JWT (JSON Web Tokens) to authenticate users.
 
 ### Authentication (enabled by default)
 
@@ -192,9 +192,14 @@ You can also specify token expiration time (defaults to 1 day) in seconds:
     export HoverflyTokenExpiration=3600
 
 ### Initial super user
+You can define initial super user through environment variables (useful if you are using Docker or AMI) by exporting these
+environment variables:
 
-If no user is present in Hoverfly database and authentication is enabled - you will be asked to enter username and 
-password for the initial admin level user so you can use the API. 
+    export HoverflyAdmin="hf" 
+    export HoverflyAdminPass="hf"
+    
+Another option is to manually add user during startup. If no user is present in Hoverfly database and authentication 
+is enabled - you will be asked to enter username and password for the initial admin level user so you can use the API. 
 
 ### Adding users
 

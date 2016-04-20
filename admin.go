@@ -472,10 +472,10 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 
 	sc, _ := strconv.Atoi(respStatusCode)
 
-	presp := ResponseDetails {
-		Status: sc,
+	presp := ResponseDetails{
+		Status:  sc,
 		Headers: headers,
-		Body: respBody,
+		Body:    respBody,
 	}
 
 	log.WithFields(log.Fields{

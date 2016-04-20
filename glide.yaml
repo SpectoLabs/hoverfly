@@ -10,5 +10,5 @@ import:
   - package: github.com/rcrowley/go-metrics
   - package: github.com/gorilla/websocket
   - package: github.com/dgrijalva/jwt-go
-  - package: github.com/rusenask/goproxy
   - package: github.com/tdewolff/minify
+  - package: github.com/tdewolff/strconv

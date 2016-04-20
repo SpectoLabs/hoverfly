@@ -72,6 +72,9 @@ const (
 	HoverflyMiddlewareEV = "HoverflyMiddleware"
 
 	HoverflyTLSVerification = "HoverflyTlsVerification"
+
+	HoverflyAdminUsernameEV = "HoverflyAdmin"
+	HoverflyAdminPasswordEV = "HoverflyAdminPass"
 )
 
 // InitSettings gets and returns initial configuration from env
