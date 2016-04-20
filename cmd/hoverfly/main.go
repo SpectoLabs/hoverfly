@@ -83,6 +83,67 @@ var (
 	database     = flag.String("db", "boltdb", "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
 )
 
+var CA_CERT = []byte(`-----BEGIN CERTIFICATE-----
+MIIDkDCCAnigAwIBAgIVAPVhYkM0BEM/yrYlqXluHt7cc6l1MA0GCSqGSIb3DQEB
+CwUAMDYxGzAZBgNVBAoTEkhvdmVyZmx5IEF1dGhvcml0eTEXMBUGA1UEAxMOaG92
+ZXJmbHkucHJveHkwHhcNMTUwMzI1MTM1NjA4WhcNMTcwMzI0MTM1NjA4WjA2MRsw
+GQYDVQQKExJIb3ZlcmZseSBBdXRob3JpdHkxFzAVBgNVBAMTDmhvdmVyZmx5LnBy
+b3h5MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyVHPS3AoW7GSExp4
+F4b6rofOpCFCk9oyALOqifcLgMqfa+xjzHa9HH7yraT5EPKieTBm+XrJUnWUih+g
+klKKvQYUWSx+W/+5LvFI/ZeOzBnBx9ZRlZNGSu613G430GZp3ydbY18wyhDlH3Xc
+EmhDEHxBX+OmSj1cLMPFqYhbsA5I79evpSafHQ6vIUcy8tZqIj7vGgpssULLq3K9
+Fnbexf8AFkaaRwx/iz3XBXfubrAzjYhr+B57/davpJGu3qkiRBhgWkMO0OHJmFIt
+iIuE8Mg6yEyYd1gJdS0zQFa7FRBOAtJbiEnZfR/MFS3DdptIgyOH9f3iFn/Ad9Lv
+JzWg3wIDAQABo4GUMIGRMA4GA1UdDwEB/wQEAwICpDATBgNVHSUEDDAKBggrBgEF
+BQcDATAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBRMLsxq3r2ownouli5b4BAD
+vjFC9DAfBgNVHSMEGDAWgBRMLsxq3r2ownouli5b4BADvjFC9DAZBgNVHREEEjAQ
+gg5ob3ZlcmZseS5wcm94eTANBgkqhkiG9w0BAQsFAAOCAQEAYPu97vNZekWN80yA
+zxTrakcp0ymcPraZT9mv2+tpicZ9rEa5QVIA4npACFaYmynhO/lyYgHjmBOpy+tX
+KhhO7R6tYJaodVY55/B6/yj/bnAUa67kdMjtcb/lZCZX+cSBaUyuQ3xMHq1JF4sk
+q09xF61TphpHdjTApQsjocJpNCxw2Ou3ctCUnSsuq6oC597CsnzKZTFJsqs4LO03
+lZ7F4bw8LyZl52zzwVwbKnNszAq6ClUyfjVonO85DpBQhq+gFWlSVz4CCC62mig9
+nnOsZC8mHNQrE0gHgTmKQlNwUQE7c+cUpfa9sjdlCG6eDkF4OaLPrG975WFuVXTM
+V6/wDA==
+-----END CERTIFICATE-----`)
+
+var CA_KEY = []byte(`-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAyVHPS3AoW7GSExp4F4b6rofOpCFCk9oyALOqifcLgMqfa+xj
+zHa9HH7yraT5EPKieTBm+XrJUnWUih+gklKKvQYUWSx+W/+5LvFI/ZeOzBnBx9ZR
+lZNGSu613G430GZp3ydbY18wyhDlH3XcEmhDEHxBX+OmSj1cLMPFqYhbsA5I79ev
+pSafHQ6vIUcy8tZqIj7vGgpssULLq3K9Fnbexf8AFkaaRwx/iz3XBXfubrAzjYhr
++B57/davpJGu3qkiRBhgWkMO0OHJmFItiIuE8Mg6yEyYd1gJdS0zQFa7FRBOAtJb
+iEnZfR/MFS3DdptIgyOH9f3iFn/Ad9LvJzWg3wIDAQABAoIBAASQlFCzlFav6g4A
+1aRC7UAz2B2km2va0LNvX3iNX3dmIMNDsueZ8aPJxRrm2LbnqYNx84PIovP5soqH
+OQ7YTEkI8EEtXxga7koAMpV9cEF0fA5Z77OiiT99tiXvYdiZ2eCzdcEFEYgjZe6W
+r4zDTHH9P0Y7VTPtvD9PmRXE/784KWLfREf6pwuICtBf2cLXPrq7mIZaV5Tf2od1
+k6PHEDSaVZ5rLWgUGzmPyFiyC7phcFpck8JEGM4mp5YEdVwL3j/F8n8pcgDYQd1R
+jf2CKtzeGNeQ3mTca8cAlqHmmbB6fUXz6SGK91x1O60tXWMJHv2A6n6wK6k/oOFn
+q54ZzOECgYEA8R+JfS1/0lAlxJR8nl/kE0YNmuTpc5ZmHI0jm1Tfz3WipWSWCktI
+BzgpygcHdjk9YzGO7d5lO5XqBccP9ntI9+6/ULwpTgusYR+O+OEHuDo50DZACgUP
+wqOnsfx37cXd9z6Dp6+xR9c82pqcxEIjBRgZ7gdRRPRndR1lmXTn7JkCgYEA1b2W
+WpCkjmfFBgrIJSpf+t6MavTksDILTQpOmRTZj4svhlJ0/EzSBwZqNDCtCYj5D8pq
+I67wMeRmVa3zh2AQLdc1hqP3yVWHohWh50rN0FMpKztFwizjNrlXDcHDTwS+RMYr
+t2K+UEhpS1XdY76L5fAMs9d5j3OH5/HvDbmjrDcCgYEAiR+cOtnjNSFrOQ4QiKiT
+tfpCxnGj6Z4AWABT3YQ4+2w0oMZBJX2GasSfz0qMDcmjhYOres7c1zP8MGjyRQP7
+jTPzDODUxJOS5nDiB9tBXp2OP0B6zrfuLIyRU4D2WvwJrQ+aI4Sg1vAqpU8EFABg
+lgcMx/bVWtd69nlPTCPVuRECgYADFdN/xyq464KKjclJ0AzGoEPCn3pVmMNU/1sX
+Fpf1XHr5I2OQ6ML3Wv5ZdoJo6tM9iRxzG2lYLwXTIsmrIJXbM4oQQXmoLFXi3xER
+N6E06p5jg12EagV1msNI7Y0WLOlaMMocwY4htonejoS9ldiLHyXvyqJ0kaRaksFy
+n0VfjQKBgQDe8rz2fM4F4ZeaCi75LCik8XCpA//8DquYrtwz+ojM9fK7Z28N8Vir
+G/COvEx6J0CycRYFzUUxNWOpFIONCgLQkNEaGppBPkZ/aLqZzeOsakv9dGxVsm2W
+gYLP4o2Hv9odPkRDyOasEJ5wIjnk8Aj2fmD34TAVKiSFkwguW9QbHg==
+-----END RSA PRIVATE KEY-----
+`)
+
+func init() {
+	// overriding default goproxy certificate
+	tlsc, err := tls.X509KeyPair(CA_CERT, CA_KEY)
+	if err != nil {
+		log.Fatalf("Failed to load certifiate and key pair, got error: %s", err.Error())
+	}
+	goproxy.GoproxyCa = tlsc
+}
+
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 	flag.Var(&importFlags, "import", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
