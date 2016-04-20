@@ -103,11 +103,19 @@ Specify which URI to catch using regluar expression. (Defaults to ".").
 
     -db <string>
 
-Persistent storage to use. By default, Hoverfly uses BoltDB to store data in a file on disk. Specify 'memory' to disable this and use in-memory persistence only.
+Persistent storage to use. By default, Hoverfly uses BoltDB to store data in a file on disk. Specify 'memory'
+to disable this and use in-memory cache only. 
+Note: 'memory' should only be used for small test cases, if your machine runs out of RAM while Hoverfly is in 'memory' mode - 
+bad things can happen.
 
-    -db-dir <string>
+    -db-path <string>
 
-Path to BoltDB data file. By default, a "requests.db" file will be created in the Hoverfly directory. Supply a custom path and/or filename to use a different file or location. The file will be created if it doesn't exist.	    	
+Path to BoltDB data file. By default, a "requests.db" file will be created in the Hoverfly directory. 
+Supply a custom path with filename to use a different file or location. The file will be created if it doesn't exist.
+
+For example:
+
+	 ./hoverfly -db-path new_name.db
 
 ## TLS & Certificate management
 
