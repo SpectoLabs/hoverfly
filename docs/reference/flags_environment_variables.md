@@ -2,9 +2,6 @@
 
 Hoverfly can be configured using flags on startup, or using environment variables.
 
-TODO: add environment variables
-
-
 ## Admin UI Authentication
 
     -no-auth
@@ -164,3 +161,39 @@ Logs metrics to stdout every 5 seconds.
 
 Supply -dev flag to serve Admin UI static files directly from ./static/admin/dist instead from statik binary. Useful when 
 developing UI.
+
+# Environment variables
+
+You can configure Hoverfly through environment variables, this is a standard approach when application is running in a 
+Docker container or hosted via platform. 
+
+## Admin UI authentication
+
+    HoverflyAuthDisabled  
+    
+Hoverfly authentication setting. Defaults to false. Set it to 'true' to disable authentication.
+    
+For example:
+    
+    export HoverflyAuthDisabled="true"
+    
+    HoverflySecret
+    
+Secret used to generate authentication tokens. If this variable is not set - Hoverfly generates one during startup.
+Note: if you leave this value unset - you will have to authenticate in the admin UI after each Hoverfly restart.
+
+    HoverflyTokenExpiration
+    
+Token expiration time in seconds. Defaults to one day (24 * 60 * 60).
+ 
+## Port selection 
+
+    AdminPort
+    
+Admin UI port, defaults to 8500.
+    
+    ProxyPort
+    
+Proxy port, defaults to 8888.
+    
+    
