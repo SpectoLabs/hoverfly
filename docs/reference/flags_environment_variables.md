@@ -23,7 +23,7 @@ Username for new user.
 
 Password for new user.
 
-    -admin <string>
+    -admin <bool>
 
 Supply '-admin false' to make this a non-admin user (defaults to 'true').
 
