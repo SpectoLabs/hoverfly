@@ -75,6 +75,8 @@ const (
 
 	HoverflyAdminUsernameEV = "HoverflyAdmin"
 	HoverflyAdminPasswordEV = "HoverflyAdminPass"
+
+	HoverflyImportRecordsEV = "HoverflyImport"
 )
 
 // InitSettings gets and returns initial configuration from env
