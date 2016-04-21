@@ -438,6 +438,92 @@ Each mode is affected by middleware in a different way. Since the JSON payload h
   * __Modify Mode__: middleware affects requests and responses.
 
 
+# Configuring Hoverfly via environment variables
+
+You can configure Hoverfly through environment variables, this is a standard approach when application is running in a 
+Docker container or hosted via platform. 
+
+## Admin UI authentication
+
+    HoverflyAuthDisabled  
+    
+Hoverfly authentication setting. Defaults to false. Set it to 'true' to disable authentication.
+    
+For example:
+    
+    export HoverflyAuthDisabled="true"
+    
+    HoverflySecret
+    
+Secret used to generate authentication tokens. If this variable is not set - Hoverfly generates one during startup.
+Note: if you leave this value unset - you will have to authenticate in the admin UI after each Hoverfly restart.
+
+    HoverflyTokenExpiration
+    
+Token expiration time in seconds. Defaults to one day (24 * 60 * 60).
+
+### Setting admin user through env variables
+
+You can provide credentials for initial user by setting these variables:
+
+    HoverflyAdmin
+    
+Admin user name.
+
+    HoverflyAdminPass
+    
+Admin password.
+Note: if you do not set initial user through environment variables with authentication enabled - Hoverfly will ask you to input
+username and password for the first user during startup. This could result in a 'stuck' container.
+
+## Importing records into Hoverfly on startup
+
+    HoverflyImport
+    
+Hoverfly looks for this variable on startup, if it's set - it will try to import it. It can be a URL or a path to file, Hoverfly
+will try to import it.
+For example:
+
+    export HoverflyImport="https://domain_where_you_store_stuff.net/filename.json"
+
+If it fails to fetch it - it won't start. You can check whether records were imported by visiting `/api/records` endpoint.
+For more information about origin of records you can also visit `/api/metadata`, it should show something like this:
+
+```javascript
+{
+	"data": {
+		"import_from_env_variable": "https://domain_where_you_store_stuff.net/filename.json"
+	}
+}
+```
+
+## Port selection 
+
+    AdminPort
+    
+Admin UI port, defaults to 8500.
+    
+    ProxyPort
+    
+Proxy port, defaults to 8888.
+    
+## Persistence
+ 
+    HoverflyDB
+
+Path to BoltDB data file. By default, a "requests.db" file will be created in the directory from which Hoverfly is executed. 
+Supply a custom path with filename to use a different file or location. The file will be created if it doesn't exist.
+
+## TLS
+
+    HoverflyTlsVerification
+    
+TLS verification. Since Hoverfly is making requests on behalf of it's users - it has to either trust remote servers or not.
+This setting defaults to 'true' which means that untrusted hosts won't be accepted if request is done via HTTPs. You can turn it
+off by providing "false" value to this environment variable, for example:
+
+    export HoverflyTlsVerification="false"
+    
 
 ## Debugging
 
