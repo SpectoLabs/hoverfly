@@ -319,6 +319,20 @@ func main() {
 		}
 	}
 
+	// importing records if environment variable is set
+	ev := os.Getenv(hv.HoverflyImportRecordsEV)
+	if ev != "" {
+		err := hoverfly.Import(ev)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":  err.Error(),
+				"import": ev,
+			}).Fatal("Environment variable for importing was set but failed to import this resource")
+		} else {
+			err = hoverfly.MetadataCache.Set([]byte("import_from_env_variable"), []byte(ev))
+		}
+	}
+
 	// importing stuff
 	if len(importFlags) > 0 {
 		for i, v := range importFlags {
