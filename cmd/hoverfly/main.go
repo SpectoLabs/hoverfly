@@ -69,7 +69,7 @@ var (
 	addUser      = flag.String("username", "", "username for new user")
 	addPassword  = flag.String("password", "", "password for new user")
 	isAdmin      = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
-	authDisabled = flag.Bool("no-auth", false, "disabled authentication, currently it is enabled by default")
+	authEnabled = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
 
 	generateCA = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
 	certName   = flag.String("cert-name", "hoverfly.proxy", "cert name")
@@ -232,7 +232,7 @@ func main() {
 	cfg.SetMode(mode)
 
 	// disabling authentication if no-auth for auth disabled env variable
-	if !cfg.AuthEnabled || *authDisabled {
+	if !cfg.AuthEnabled || !*authEnabled {
 		cfg.AuthEnabled = false
 	}
 
