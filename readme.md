@@ -57,8 +57,7 @@ You must have Go > 1.6 installed.
     make build
 
 And to run hoverfly:
-
-    ./cmd/hoverfly/hoverfly
+    $GOPATH/bin/hoverflyb
 
 
 ## Admin UI
