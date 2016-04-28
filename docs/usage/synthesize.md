@@ -1,3 +1,0 @@
-# Synthesizing responses
-
-TODO
