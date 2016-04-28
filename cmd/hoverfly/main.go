@@ -232,8 +232,8 @@ func main() {
 	cfg.SetMode(mode)
 
 	// disabling authentication if no-auth for auth disabled env variable
-	if !cfg.AuthEnabled || !*authEnabled {
-		cfg.AuthEnabled = false
+	if (*authEnabled) {
+		cfg.AuthEnabled = true
 	}
 
 	// disabling tls verification if flag or env variable is set to 'false' (defaults to true)
