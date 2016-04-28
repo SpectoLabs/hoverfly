@@ -11,30 +11,31 @@ Hoverfly was designed to provide you with the means to create your own "dependen
 
 ## Documentation
 
-The Hoverfly documentation is available here.
+The Hoverfly documentation is [available here](https://www.gitbook.com/book/spectolabs/hoverfly/details).
 
 For convenience:
 
 ### Getting started
-* Basic concepts
-* Installation and setup
+* [Use cases](https://www.gitbook.com/book/spectolabs/hoverfly/edit#/edit/master/getting_started/use_cases.md)
+* ["Modes" and middleware](https://spectolabs.gitbooks.io/hoverfly/content/getting_started/modes_and_middleware.html)
+* [Installation and setup](https://spectolabs.gitbooks.io/hoverfly/content/getting_started/installation_and_setup.html)
 
 ### Usage
-* Capturing traffic
-* Simulating services
-* Exporting and importing
-* Using middleware
-* Creating synthetic services
-* Modifying traffic
-* Filtering destination URLs and hosts
-* Using the metadata API
-* Admin UI
-* Certificate management
-* Authentication
+* [Capturing traffic](https://spectolabs.gitbooks.io/hoverfly/content/usage/capturing_traffic.html)
+* [Simulating services](https://spectolabs.gitbooks.io/hoverfly/content/usage/simulating_services.html)
+* [Exporting and importing](https://spectolabs.gitbooks.io/hoverfly/content/usage/exporting_and_importing.html)
+* [Using middleware](https://spectolabs.gitbooks.io/hoverfly/content/usage/using_middleware.html)
+* [Creating synthetic services](https://spectolabs.gitbooks.io/hoverfly/content/usage/creating_synthetic_services.html)
+* [Modifying traffic](https://spectolabs.gitbooks.io/hoverfly/content/usage/modifying_traffic.html)
+* [Filtering destination URLs and hosts](https://spectolabs.gitbooks.io/hoverfly/content/usage/filtering_destination_urls_and_hosts.html)
+* [Using the metadata API](https://spectolabs.gitbooks.io/hoverfly/content/usage/using_the_metadata_api.html)
+* [Admin UI](https://spectolabs.gitbooks.io/hoverfly/content/usage/admin_ui.html)
+* [HTTPS & certificate management](https://spectolabs.gitbooks.io/hoverfly/content/usage/certificate_management.html)
+* [Authentication](https://spectolabs.gitbooks.io/hoverfly/content/usage/authentication.html)
 
 ### Reference
-* API
-* Flags and environment variables
+* [API](https://spectolabs.gitbooks.io/hoverfly/content/reference/api.html)
+* [Flags and environment variables](https://spectolabs.gitbooks.io/hoverfly/content/reference/flags_and_environment_variables.html)
 
 
 ## Further reading
