@@ -1,3 +1,0 @@
-# Filtering destination URLs
-
-TODO
