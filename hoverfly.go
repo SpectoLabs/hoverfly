@@ -19,8 +19,8 @@ import (
 	"regexp"
 )
 
-// VirtualizeMode - default mode when Hoverfly looks for captured requests to respond
-const VirtualizeMode = "virtualize"
+// SimulateMode - default mode when Hoverfly looks for captured requests to respond
+const SimulateMode = "simulate"
 
 // SynthesizeMode - all requests are sent to middleware to create response
 const SynthesizeMode = "synthesize"
@@ -50,7 +50,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.TLSVerification},
 		}},
 		Cfg:     cfg,
-		Counter: metrics.NewModeCounter([]string{VirtualizeMode, SynthesizeMode, ModifyMode, CaptureMode}),
+		Counter: metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		Hooks:   make(ActionTypeHooks),
 		MIN:     GetNewMinifiers(),
 	}

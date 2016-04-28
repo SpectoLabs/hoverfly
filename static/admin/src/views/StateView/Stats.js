@@ -4,18 +4,20 @@
 import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
 
-import Card from 'material-ui/lib/card/card'
-import CardActions from 'material-ui/lib/card/card-actions'
-import CardTitle from 'material-ui/lib/card/card-title'
-import RaisedButton from 'material-ui/lib/raised-button'
-import CardText from 'material-ui/lib/card/card-text'
+import Card from 'material-ui/Card/Card'
+import CardActions from 'material-ui/Card/CardActions'
+import CardTitle from 'material-ui/Card/CardTitle'
+import RaisedButton from 'material-ui/RaisedButton'
+import CardText from 'material-ui/Card/CardText'
 
-import Table from 'material-ui/lib/table/table'
-import TableHeaderColumn from 'material-ui/lib/table/table-header-column'
-import TableRow from 'material-ui/lib/table/table-row'
-import TableHeader from 'material-ui/lib/table/table-header'
-import TableRowColumn from 'material-ui/lib/table/table-row-column'
-import TableBody from 'material-ui/lib/table/table-body'
+import {
+  Table,
+  TableHeaderColumn,
+  TableRow,
+  TableHeader,
+  TableRowColumn,
+  TableBody
+} from 'material-ui/Table'
 
 import {Row, Col} from 'react-bootstrap'
 
@@ -147,7 +149,7 @@ export class StatsComponent extends React.Component<void, Props, void> {
       let rows = []
       for (var key in counters) {
         if (counters.hasOwnProperty(key)) {
-          rows.push(<RowWrapper key={key} name={key} val={counters[key]}/>)
+          rows.push(<RowWrapper key={key} name={key} val={counters[key]} />)
         }
       }
       return rows
@@ -194,7 +196,7 @@ export class StatsComponent extends React.Component<void, Props, void> {
 
     const statsInfo = (
       <Card>
-        <CardTitle title={recordsCountInfo} subtitle='This section provides real-time Hoverfly metrics'/>
+        <CardTitle title={recordsCountInfo} subtitle='This section provides real-time Hoverfly metrics' />
         <CardText>
           <Row>
             {counterTable}
@@ -202,7 +204,7 @@ export class StatsComponent extends React.Component<void, Props, void> {
           </Row>
         </CardText>
         <CardActions>
-          <RaisedButton label='Wipe Records' onClick={this.handleWipeRecordsClick} secondary/>
+          <RaisedButton label='Wipe Records' onClick={this.handleWipeRecordsClick} secondary />
         </CardActions>
       </Card>
     )

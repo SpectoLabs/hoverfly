@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestVirtualizeInc(t *testing.T) {
+func TestSimulateInc(t *testing.T) {
 	counter := NewModeCounter([]string{"name"})
 
 	counter.Count("name")

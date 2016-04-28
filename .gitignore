@@ -40,3 +40,4 @@ static/dist
 # IntelliJ
 .idea
 *.iml
+requests.db

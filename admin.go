@@ -603,7 +603,7 @@ func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 	}
 
 	availableModes := map[string]bool{
-		"virtualize": true,
+		"simulate": true,
 		"capture":    true,
 		"modify":     true,
 		"synthesize": true,
@@ -614,7 +614,7 @@ func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 			log.WithFields(log.Fields{
 				"suppliedMode": sr.Mode,
 			}).Error("Wrong mode found, can't change state")
-			http.Error(w, "Bad mode supplied, available modes: virtualize, capture, modify, synthesize.", 400)
+			http.Error(w, "Bad mode supplied, available modes: simulate, capture, modify, synthesize.", 400)
 			return
 		}
 		log.WithFields(log.Fields{

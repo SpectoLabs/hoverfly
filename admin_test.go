@@ -217,7 +217,7 @@ func TestGetState(t *testing.T) {
 	m := getBoneRouter(*dbClient)
 
 	// setting initial mode
-	dbClient.Cfg.SetMode(VirtualizeMode)
+	dbClient.Cfg.SetMode(SimulateMode)
 
 	req, err := http.NewRequest("GET", "/api/state", nil)
 	testutil.Expect(t, err, nil)
@@ -232,10 +232,10 @@ func TestGetState(t *testing.T) {
 	sr := stateRequest{}
 	err = json.Unmarshal(body, &sr)
 
-	testutil.Expect(t, sr.Mode, VirtualizeMode)
+	testutil.Expect(t, sr.Mode, SimulateMode)
 }
 
-func TestSetVirtualizeState(t *testing.T) {
+func TestSetSimulateState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
@@ -246,7 +246,7 @@ func TestSetVirtualizeState(t *testing.T) {
 
 	// preparing to set mode through rest api
 	var resp stateRequest
-	resp.Mode = VirtualizeMode
+	resp.Mode = SimulateMode
 
 	bts, err := json.Marshal(&resp)
 	testutil.Expect(t, err, nil)
@@ -261,7 +261,7 @@ func TestSetVirtualizeState(t *testing.T) {
 	testutil.Expect(t, rec.Code, http.StatusOK)
 
 	// checking mode
-	testutil.Expect(t, dbClient.Cfg.GetMode(), VirtualizeMode)
+	testutil.Expect(t, dbClient.Cfg.GetMode(), SimulateMode)
 }
 
 func TestSetCaptureState(t *testing.T) {
@@ -270,8 +270,8 @@ func TestSetCaptureState(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := getBoneRouter(*dbClient)
 
-	// setting mode to virtualize
-	dbClient.Cfg.SetMode(VirtualizeMode)
+	// setting mode to simulate
+	dbClient.Cfg.SetMode(SimulateMode)
 
 	// preparing to set mode through rest api
 	var resp stateRequest
@@ -299,8 +299,8 @@ func TestSetModifyState(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := getBoneRouter(*dbClient)
 
-	// setting mode to virtualize
-	dbClient.Cfg.SetMode(VirtualizeMode)
+	// setting mode to simulate
+	dbClient.Cfg.SetMode(SimulateMode)
 
 	// preparing to set mode through rest api
 	var resp stateRequest
@@ -328,8 +328,8 @@ func TestSetSynthesizeState(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := getBoneRouter(*dbClient)
 
-	// setting mode to virtualize
-	dbClient.Cfg.SetMode(VirtualizeMode)
+	// setting mode to simulate
+	dbClient.Cfg.SetMode(SimulateMode)
 
 	// preparing to set mode through rest api
 	var resp stateRequest
@@ -357,8 +357,8 @@ func TestSetRandomState(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := getBoneRouter(*dbClient)
 
-	// setting mode to virtualize
-	dbClient.Cfg.SetMode(VirtualizeMode)
+	// setting mode to simulate
+	dbClient.Cfg.SetMode(SimulateMode)
 
 	// preparing to set mode through rest api
 	var resp stateRequest
@@ -377,7 +377,7 @@ func TestSetRandomState(t *testing.T) {
 	testutil.Expect(t, rec.Code, http.StatusBadRequest)
 
 	// checking mode, should not have changed
-	testutil.Expect(t, dbClient.Cfg.GetMode(), VirtualizeMode)
+	testutil.Expect(t, dbClient.Cfg.GetMode(), SimulateMode)
 }
 
 func TestSetNoBody(t *testing.T) {
@@ -386,8 +386,8 @@ func TestSetNoBody(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := getBoneRouter(*dbClient)
 
-	// setting mode to virtualize
-	dbClient.Cfg.SetMode(VirtualizeMode)
+	// setting mode to simulate
+	dbClient.Cfg.SetMode(SimulateMode)
 
 	// setting state
 	req, err := http.NewRequest("POST", "/api/state", nil)
@@ -399,7 +399,7 @@ func TestSetNoBody(t *testing.T) {
 	testutil.Expect(t, rec.Code, http.StatusBadRequest)
 
 	// checking mode, should not have changed
-	testutil.Expect(t, dbClient.Cfg.GetMode(), VirtualizeMode)
+	testutil.Expect(t, dbClient.Cfg.GetMode(), SimulateMode)
 }
 
 func TestStatsHandler(t *testing.T) {
@@ -419,15 +419,15 @@ func TestStatsHandler(t *testing.T) {
 	testutil.Expect(t, rec.Code, http.StatusOK)
 }
 
-func TestStatsHandlerVirtualizeMetrics(t *testing.T) {
-	// test metrics, increases virtualize count by 1 and then checks through stats
+func TestStatsHandlerSimulateMetrics(t *testing.T) {
+	// test metrics, increases simulate count by 1 and then checks through stats
 	// handler whether it is visible through /stats handler
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 	m := getBoneRouter(*dbClient)
 
-	dbClient.Counter.Counters[VirtualizeMode].Inc(1)
+	dbClient.Counter.Counters[SimulateMode].Inc(1)
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)
 
@@ -443,7 +443,7 @@ func TestStatsHandlerVirtualizeMetrics(t *testing.T) {
 	sr := statsResponse{}
 	err = json.Unmarshal(body, &sr)
 
-	testutil.Expect(t, int(sr.Stats.Counters[VirtualizeMode]), 1)
+	testutil.Expect(t, int(sr.Stats.Counters[SimulateMode]), 1)
 }
 
 func TestStatsHandlerCaptureMetrics(t *testing.T) {

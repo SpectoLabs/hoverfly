@@ -198,7 +198,7 @@ func main() {
 	cfg.Middleware = *middleware
 
 	// setting default mode
-	mode := hv.VirtualizeMode
+	mode := hv.SimulateMode
 
 	if *capture {
 		mode = hv.CaptureMode

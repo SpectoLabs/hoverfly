@@ -2,7 +2,7 @@
  * Created by karolisrusenas on 04/04/2016.
  */
 import React, {PropTypes} from 'react'
-import AppBar from 'material-ui/lib/app-bar'
+import AppBar from 'material-ui/AppBar'
 import {Tabs, Tab} from 'material-ui'
 
 import {connect} from 'react-redux'
@@ -38,13 +38,13 @@ export default class Navigation extends React.Component<void, Props, void> {
   render () {
     let myLeftTabs = (
       <Tabs value={window.location.pathname}>
-        <Tab label='State' route='state' value='/state' onActive={this.handleActive}/>
+        <Tab label='State' route='state' value='/state' onActive={this.handleActive} />
       </Tabs>
     )
 
     let myRightTabs = (
       <Tabs>
-        <Tab label='Logout' route='/logout' value='/logout' onActive={this.handleActive}/>
+        <Tab label='Logout' route='/logout' value='/logout' onActive={this.handleActive} />
       </Tabs>
     )
     if (this.props.isAuthenticated === true) {
@@ -52,7 +52,7 @@ export default class Navigation extends React.Component<void, Props, void> {
         <div>
           <AppBar
             onLeftIconButtonTouchTap={this.handleToggle}
-            iconElementLeft={myLeftTabs} iconElementRight={myRightTabs}/>
+            iconElementLeft={myLeftTabs} iconElementRight={myRightTabs} />
         </div>
       )
     } else {

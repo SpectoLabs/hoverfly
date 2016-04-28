@@ -3,11 +3,11 @@ import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {setMode, fetchState} from '../../redux/modules/actions/state'
 
-import Card from 'material-ui/lib/card/card'
-import CardActions from 'material-ui/lib/card/card-actions'
-import CardTitle from 'material-ui/lib/card/card-title'
-import RaisedButton from 'material-ui/lib/raised-button'
-import CardText from 'material-ui/lib/card/card-text'
+import Card from 'material-ui/Card/Card'
+import CardActions from 'material-ui/Card/CardActions'
+import CardTitle from 'material-ui/Card/CardTitle'
+import RaisedButton from 'material-ui/RaisedButton'
+import CardText from 'material-ui/Card/CardText'
 
 import StatsComponent from './Stats'
 // import {Tabs, Tab, Button} from 'react-bootstrap'
@@ -23,7 +23,7 @@ type Props = {
   setMode: Function
 };
 
-const virtualizeMode = 'virtualize'
+const simulateMode = 'simulate'
 const captureMode = 'capture'
 const modifyMode = 'modify'
 const synthesizeMode = 'synthesize'
@@ -36,7 +36,7 @@ export class ModeInfoComponent extends React.Component<void, Props, void> {
 
   render () {
     let mode = this.props.mode
-    if (mode === virtualizeMode) {
+    if (mode === simulateMode) {
       return (
         <div>
           <p>This mode enables service virtualization. Hoverfly uses captured requests and their unique
@@ -100,15 +100,15 @@ export class StateView extends React.Component<void, Props, void> {
 
   constructor (props) {
     super(props)
-    this.virtualize = this.virtualize.bind(this)
+    this.simulate = this.simulate.bind(this)
     this.capture = this.capture.bind(this)
     this.modify = this.modify.bind(this)
     this.synthesize = this.synthesize.bind(this)
   }
 
-  virtualize () {
+  simulate () {
     let token = this.props.authData.token
-    this.props.setMode('virtualize', token)
+    this.props.setMode('simulate', token)
   }
 
   capture () {
@@ -133,44 +133,44 @@ export class StateView extends React.Component<void, Props, void> {
     let currentMode = this.props.info.mode
     let currentModeInfo = 'Current mode: ' + currentMode
 
-    let virtualizeButton
+    let simulateButton
     let captureButton
     let modifyButton
     let synthesizeButton
 
     // TODO: refactor buttons so it's a separate component that takes current mode and button mode
-    if (currentMode === virtualizeMode) {
-      virtualizeButton = <RaisedButton label='Virtualize' onClick={this.virtualize} primary/>
+    if (currentMode === simulateMode) {
+      simulateButton = <RaisedButton label='Simulate' onClick={this.simulate} primary />
     } else {
-      virtualizeButton = <RaisedButton label='Virtualize' onClick={this.virtualize}/>
+      simulateButton = <RaisedButton label='Simulate' onClick={this.simulate} />
     }
 
     if (currentMode === captureMode) {
-      captureButton = <RaisedButton label='Capture' onClick={this.capture} primary/>
+      captureButton = <RaisedButton label='Capture' onClick={this.capture} primary />
     } else {
-      captureButton = <RaisedButton label='Capture' onClick={this.capture}/>
+      captureButton = <RaisedButton label='Capture' onClick={this.capture} />
     }
 
     if (currentMode === modifyMode) {
-      modifyButton = <RaisedButton label='Modify' onClick={this.modify} primary/>
+      modifyButton = <RaisedButton label='Modify' onClick={this.modify} primary />
     } else {
-      modifyButton = <RaisedButton label='Modify' onClick={this.modify}/>
+      modifyButton = <RaisedButton label='Modify' onClick={this.modify} />
     }
 
     if (currentMode === synthesizeMode) {
-      synthesizeButton = <RaisedButton label='Synthesize' onClick={this.synthesize} primary/>
+      synthesizeButton = <RaisedButton label='Synthesize' onClick={this.synthesize} primary />
     } else {
-      synthesizeButton = <RaisedButton label='Synthesize' onClick={this.synthesize}/>
+      synthesizeButton = <RaisedButton label='Synthesize' onClick={this.synthesize} />
     }
 
     const modeInfo = (
       <Card>
-        <CardTitle title={currentModeInfo} subtitle='You can change proxy behaviour here'/>
+        <CardTitle title={currentModeInfo} subtitle='You can change proxy behaviour here' />
         <CardText>
-          <ModeInfoComponent mode={this.props.info.mode}/>
+          <ModeInfoComponent mode={this.props.info.mode} />
         </CardText>
         <CardActions>
-          {virtualizeButton}
+          {simulateButton}
           {captureButton}
           {modifyButton}
           {synthesizeButton}
@@ -180,8 +180,8 @@ export class StateView extends React.Component<void, Props, void> {
     return (
       <div>
         {modeInfo}
-        <hr/>
-        <StatsComponent token={this.props.authData.token}/>
+        <hr />
+        <StatsComponent token={this.props.authData.token} />
       </div>
     )
   }

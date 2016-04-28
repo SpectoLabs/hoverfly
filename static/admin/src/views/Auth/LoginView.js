@@ -8,11 +8,11 @@ import {connect} from 'react-redux'
 import * as actionCreators from '../../redux/modules/actions/auth'
 import {Col} from 'react-bootstrap'
 
-import Card from 'material-ui/lib/card/card'
-import CardTitle from 'material-ui/lib/card/card-title'
-import RaisedButton from 'material-ui/lib/raised-button'
-import CardText from 'material-ui/lib/card/card-text'
-import TextField from 'material-ui/lib/text-field'
+import Card from 'material-ui/Card/Card'
+import CardTitle from 'material-ui/Card/CardTitle'
+import RaisedButton from 'material-ui/RaisedButton'
+import CardText from 'material-ui/Card/CardText'
+import TextField from 'material-ui/TextField'
 
 export class LoginView extends React.Component {
   static propTypes = {
@@ -48,12 +48,12 @@ export class LoginView extends React.Component {
   render () {
     return (
       <div>
-        <Col md={3}/>
+        <Col md={3} />
         <Col md={6}>
           <Card>
             <CardTitle
               title='Login required!'
-              subtitle='Hint: if auth is disabled - use any username/password combination'/>
+              subtitle='Hint: if auth is disabled - use any username/password combination' />
             <CardText>
               {this.props.statusText ? <div className='alert alert-info'>{this.props.statusText}</div> : ''}
               <form role='form'>
@@ -75,7 +75,7 @@ export class LoginView extends React.Component {
                   label='Submit'
                   onClick={this.login}
                   disabled={this.props.isAuthenticating}
-                  primary/>
+                  primary />
               </form>
             </CardText>
           </Card>
