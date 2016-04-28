@@ -16,7 +16,7 @@ The Hoverfly documentation is [available here](https://www.gitbook.com/book/spec
 For convenience:
 
 ### Getting started
-* [Use cases](https://www.gitbook.com/book/spectolabs/hoverfly/edit#/edit/master/getting_started/use_cases.md)
+* [Use cases](https://spectolabs.gitbooks.io/hoverfly/content/getting_started/use_cases.html)
 * ["Modes" and middleware](https://spectolabs.gitbooks.io/hoverfly/content/getting_started/modes_and_middleware.html)
 * [Installation and setup](https://spectolabs.gitbooks.io/hoverfly/content/getting_started/installation_and_setup.html)
 
