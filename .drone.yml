@@ -1,4 +1,0 @@
-build:
-  image: golang:1.5
-  commands:
-    - make build-drone
