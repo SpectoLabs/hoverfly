@@ -536,7 +536,7 @@ func (d *Hoverfly) getResponse(req *http.Request) *http.Response {
 				"value": string(payloadBts),
 				"key":   key,
 			}).Error("Failed to decode payload")
-			return hoverflyError(req, err, "Failed to virtualize", http.StatusInternalServerError)
+			return hoverflyError(req, err, "Failed to simulate", http.StatusInternalServerError)
 		}
 
 		c := NewConstructor(req, *payload)
@@ -549,7 +549,7 @@ func (d *Hoverfly) getResponse(req *http.Request) *http.Response {
 
 		log.WithFields(log.Fields{
 			"key":         key,
-			"mode":        VirtualizeMode,
+			"mode":        SimulateMode,
 			"middleware":  d.Cfg.Middleware,
 			"path":        req.URL.Path,
 			"rawQuery":    req.URL.RawQuery,

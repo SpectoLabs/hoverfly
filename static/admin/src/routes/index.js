@@ -15,7 +15,7 @@ import LogoutView from 'views/Auth/LogoutView'
 export default (store) => (
   <Route path='/' component={CoreLayout}>
     <IndexRoute component={requireAuthentication(StateView)} />
-    <Route path='login' component={LoginView}/>
+    <Route path='login' component={LoginView} />
     <Route path='logout' component={requireAuthentication(LogoutView)} />
     <Route path='state' component={requireAuthentication(StateView)} />
   </Route>

@@ -60,7 +60,7 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 		HTTP:          &http.Client{Transport: tr},
 		RequestCache:  requestCache,
 		Cfg:           cfg,
-		Counter:       metrics.NewModeCounter([]string{VirtualizeMode, SynthesizeMode, ModifyMode, CaptureMode}),
+		Counter:       metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		MetadataCache: metaCache,
 		MIN:           GetNewMinifiers(),
 	}

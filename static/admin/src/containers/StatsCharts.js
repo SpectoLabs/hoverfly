@@ -65,7 +65,7 @@ export default class CountersPie extends React.Component<void, Props, void> {
   render () {
     let options = this.getOptions()
     return (
-      <ReactHighcharts config={options}/>
+      <ReactHighcharts config={options} />
     )
   }
 }

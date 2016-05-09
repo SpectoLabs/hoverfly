@@ -69,7 +69,7 @@ var (
 	addUser      = flag.String("username", "", "username for new user")
 	addPassword  = flag.String("password", "", "password for new user")
 	isAdmin      = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
-	authDisabled = flag.Bool("no-auth", false, "disabled authentication, currently it is enabled by default")
+	authEnabled = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
 
 	generateCA = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
 	certName   = flag.String("cert-name", "hoverfly.proxy", "cert name")
@@ -79,7 +79,7 @@ var (
 
 	tlsVerification = flag.Bool("tls-verification", true, "turn on/off tls verification for outgoing requests (will not try to verify certificates) - defaults to true")
 
-	databasePath = flag.String("db-dir", "", "database location - supply it if you want to provide specific to database (will be created there if it doesn't exist)")
+	databasePath = flag.String("db-path", "", "database location - supply it to provide specific database location (will be created there if it doesn't exist)")
 	database     = flag.String("db", "boltdb", "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
 )
 
@@ -198,7 +198,7 @@ func main() {
 	cfg.Middleware = *middleware
 
 	// setting default mode
-	mode := hv.VirtualizeMode
+	mode := hv.SimulateMode
 
 	if *capture {
 		mode = hv.CaptureMode
@@ -232,8 +232,8 @@ func main() {
 	cfg.SetMode(mode)
 
 	// disabling authentication if no-auth for auth disabled env variable
-	if !cfg.AuthEnabled || *authDisabled {
-		cfg.AuthEnabled = false
+	if (*authEnabled) {
+		cfg.AuthEnabled = true
 	}
 
 	// disabling tls verification if flag or env variable is set to 'false' (defaults to true)
@@ -316,6 +316,20 @@ func main() {
 		}
 		if len(users) < 1 {
 			createSuperUser(hoverfly)
+		}
+	}
+
+	// importing records if environment variable is set
+	ev := os.Getenv(hv.HoverflyImportRecordsEV)
+	if ev != "" {
+		err := hoverfly.Import(ev)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":  err.Error(),
+				"import": ev,
+			}).Fatal("Environment variable for importing was set but failed to import this resource")
+		} else {
+			err = hoverfly.MetadataCache.Set([]byte("import_from_env_variable"), []byte(ev))
 		}
 	}
 

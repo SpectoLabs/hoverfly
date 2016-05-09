@@ -50,8 +50,8 @@ func TestSettingsMiddlewareEnv(t *testing.T) {
 func TestSetMode(t *testing.T) {
 
 	cfg := Configuration{}
-	cfg.SetMode(VirtualizeMode)
-	testutil.Expect(t, cfg.Mode, VirtualizeMode)
+	cfg.SetMode(SimulateMode)
+	testutil.Expect(t, cfg.Mode, SimulateMode)
 }
 
 // TestGetMode - tests GetMode function, however it doesn't test

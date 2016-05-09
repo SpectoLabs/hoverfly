@@ -63,7 +63,7 @@ func TestProcessCaptureRequest(t *testing.T) {
 	testutil.Expect(t, resp.StatusCode, 201)
 }
 
-func TestProcessVirtualizeRequest(t *testing.T) {
+func TestProcessSimulateRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
@@ -80,7 +80,7 @@ func TestProcessVirtualizeRequest(t *testing.T) {
 	testutil.Expect(t, resp.StatusCode, 201)
 
 	// virtualizing
-	dbClient.Cfg.SetMode(VirtualizeMode)
+	dbClient.Cfg.SetMode(SimulateMode)
 	newReq, newResp := dbClient.processRequest(r)
 
 	testutil.Refute(t, newReq, nil)

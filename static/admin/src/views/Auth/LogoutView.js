@@ -7,10 +7,10 @@ import {connect} from 'react-redux'
 import * as actionCreators from '../../redux/modules/actions/auth'
 import {Col} from 'react-bootstrap'
 
-import Card from 'material-ui/lib/card/card'
-import CardTitle from 'material-ui/lib/card/card-title'
-import CardText from 'material-ui/lib/card/card-text'
-import CircularProgress from 'material-ui/lib/circular-progress'
+import Card from 'material-ui/Card/Card'
+import CardTitle from 'material-ui/Card/CardTitle'
+import CardText from 'material-ui/Card/CardText'
+import CircularProgress from 'material-ui/CircularProgress'
 
 export class LogoutView extends React.Component {
   static propTypes = {
@@ -25,14 +25,14 @@ export class LogoutView extends React.Component {
   render () {
     return (
       <div>
-        <Col md={3}/>
+        <Col md={3} />
         <Col md={6}>
           <Card>
-            <CardTitle title='Logged out!'/>
+            <CardTitle title='Logged out!' />
             <CardText>
               {this.props.statusText ? <div className='alert alert-info'>{this.props.statusText}</div> : ''}
               <div>
-                <CircularProgress size={1.5}/>
+                <CircularProgress size={1.5} />
               </div>
             </CardText>
           </Card>
