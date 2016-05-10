@@ -7,19 +7,27 @@ import (
 	"testing"
 	"github.com/phayes/freeport"
 	"fmt"
-	"github.com/SpectoLabs/hub/application"
 	"net/http"
-	"go/build"
-	"strings"
-	"time"
+	//"go/build"
+	//"strings"
 	"github.com/SpectoLabs/hoverfly"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/cache"
 	"github.com/dghubble/sling"
+	"strconv"
+	"os"
+
+	"github.com/Sirupsen/logrus"
+	"time"
+	"github.com/boltdb/bolt"
+	"net/url"
 )
 
 var (
-	baseUrl string
+	hoverflyAdminUrl string
+	hoverflyProxyUrl string
+	cfg *hoverfly.Configuration
+	db * bolt.DB
 )
 
 
@@ -29,26 +37,43 @@ func TestHoverfly(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	port := freeport.GetPort()
-	baseUrl = fmt.Sprintf("http://localhost:%v", port)
-	go func() {
-		cfg := hoverfly.InitSettings()
-		db := cache.GetDB(cfg.DatabasePath)
-		defer db.Close()
-		requestCache := cache.NewBoltDBCache(db, []byte("requestsBucket"))
-		metadataCache := cache.NewBoltDBCache(db, []byte("metadataBucket"))
-		tokenCache := cache.NewBoltDBCache(db, []byte(backends.TokenBucketName))
-		userCache := cache.NewBoltDBCache(db, []byte(backends.UserBucketName))
-		authBackend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
-		hoverfly := hoverfly.GetNewHoverfly(cfg, requestCache, metadataCache, authBackend)
-		err := hoverfly.StartProxy()
-		if err != nil {
-			panic(err)
-		}
-		go hoverfly.StartAdminInterface()
-	}();
+
+	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetFormatter(&logrus.TextFormatter{})
+
+	adminPort := strconv.Itoa(freeport.GetPort())
+	proxyPort := strconv.Itoa(freeport.GetPort())
+	hoverflyAdminUrl = fmt.Sprintf("http://localhost:%v", adminPort)
+	hoverflyProxyUrl = fmt.Sprintf("http://localhost:%v", proxyPort)
+
+	cfg = hoverfly.InitSettings()
+	cfg.AdminPort = adminPort
+	cfg.ProxyPort = proxyPort
+	cfg.SetMode(hoverfly.SimulateMode)
+	cfg.Verbose = true
+	db = cache.GetDB(cfg.DatabasePath)
+
+
+	requestCache := cache.NewBoltDBCache(db, []byte("requestsBucket"))
+	metadataCache := cache.NewBoltDBCache(db, []byte("metadataBucket"))
+	tokenCache := cache.NewBoltDBCache(db, []byte(backends.TokenBucketName))
+	userCache := cache.NewBoltDBCache(db, []byte(backends.UserBucketName))
+	authBackend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
+	hoverfly := hoverfly.GetNewHoverfly(cfg, requestCache, metadataCache, authBackend)
+
+	err := hoverfly.StartProxy()
+
+	if err != nil {
+		panic(err)
+	}
+
+	go hoverfly.StartAdminInterface()
+
+	os.Setenv("HTTP_PROXY", hoverflyProxyUrl)
+	os.Setenv("HTTPS_PROXY", hoverflyProxyUrl)
+
 	Eventually(func() int {
-		resp, err := http.Get(baseUrl + "/state")
+		resp, err := http.Get(hoverflyAdminUrl + "/api/state")
 		if err == nil {
 			return resp.StatusCode
 		} else {
@@ -57,10 +82,30 @@ var _ = BeforeSuite(func() {
 	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
 })
 
-func DoRequest(r *sling.Sling) (*http.Response, error) {
+var _ = AfterSuite(func() {
+	os.Setenv("HTTP_PROXY", "")
+	os.Setenv("HTTPS_PROXY", "")
+	db.Close()
+})
+
+func DoRequest(r *sling.Sling) (*http.Response) {
 	req, err := r.Request()
-	if err != nil {
-		return nil, err
-	}
-	return http.DefaultClient.Do(req)
+	Expect(err).To(BeNil())
+	response, err := http.DefaultClient.Do(req)
+
+	Expect(err).To(BeNil())
+	return response
+}
+
+func DoRequestThroughProxy(r *sling.Sling) (*http.Response) {
+	req, err := r.Request()
+	Expect(err).To(BeNil())
+
+	proxy, err := url.Parse(hoverflyProxyUrl)
+	proxyHttpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxy)}}
+	response, err := proxyHttpClient.Do(req)
+
+	Expect(err).To(BeNil())
+
+	return response
 }
