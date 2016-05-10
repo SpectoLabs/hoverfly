@@ -21,6 +21,8 @@ import (
 	"time"
 	"github.com/boltdb/bolt"
 	"net/url"
+	"strings"
+	"io"
 )
 
 var (
@@ -108,4 +110,29 @@ func DoRequestThroughProxy(r *sling.Sling) (*http.Response) {
 	Expect(err).To(BeNil())
 
 	return response
+}
+
+func SetHoverflyMode(mode string) {
+	req := sling.New().Post(hoverflyAdminUrl + "/api/state").Body(strings.NewReader(`{"mode":"` + mode +`"}`))
+	res := DoRequest(req)
+	Expect(res.StatusCode).To(Equal(200))
+}
+
+func EraseHoverflyRecords() {
+	req := sling.New().Delete(hoverflyAdminUrl + "/api/records")
+	res := DoRequest(req)
+	Expect(res.StatusCode).To(Equal(200))
+}
+
+func ExportHoverflyRecords() (io.Reader) {
+	res := sling.New().Get(hoverflyAdminUrl + "/api/records")
+	req := DoRequest(res)
+	Expect(req.StatusCode).To(Equal(200))
+	return req.Body
+}
+
+func ImportHoverflyRecords(payload io.Reader) {
+	req := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(payload)
+	res := DoRequest(req)
+	Expect(res.StatusCode).To(Equal(200))
 }

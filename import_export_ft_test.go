@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	//"compress/gzip"
-	"strings"
 	"fmt"
 	"io/ioutil"
+	"github.com/SpectoLabs/hoverfly"
 )
 
 var _ = Describe("Capturing, exporting, importing and simulating", func() {
@@ -33,9 +33,7 @@ var _ = Describe("Capturing, exporting, importing and simulating", func() {
 				}))
 
 				// Switch Hoverfly to capture mode
-				hoverflyCaptureModeRequest := sling.New().Post(hoverflyAdminUrl + "/api/state").Body(strings.NewReader(`{"mode":"capture"}`))
-				hoverflyCaptureModeResponse := DoRequest(hoverflyCaptureModeRequest)
-				Expect(hoverflyCaptureModeResponse.StatusCode).To(Equal(200))
+				SetHoverflyMode(hoverfly.CaptureMode)
 
 				// Make a request to the fake server and proxy through Hoverfly
 				fakeServerUrl := fakeGzipServer.URL
@@ -46,29 +44,16 @@ var _ = Describe("Capturing, exporting, importing and simulating", func() {
 				Expect(response.StatusCode).To(Equal(200))
 
 				// Export the data out of Hoverfly
-				hoverflyRecordsRequest := sling.New().Get(hoverflyAdminUrl + "/api/records")
-
-				hoverflyRecordsResponse := DoRequest(hoverflyRecordsRequest)
-				Expect(hoverflyRecordsResponse.StatusCode).To(Equal(200))
+				exportedRecords := ExportHoverflyRecords()
 
 				// Wipe the records in Hoverfly
-				hoverflyDeleteRequest := sling.New().Delete(hoverflyAdminUrl + "/api/records")
-
-				hoverflyDeleteResponse := DoRequest(hoverflyDeleteRequest)
-				Expect(hoverflyDeleteResponse.StatusCode).To(Equal(200))
+				EraseHoverflyRecords()
 
 				// Import the same data into Hoverfly
-				hoverflyImportRequest := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(hoverflyRecordsResponse.Body)
-
-				hoverflyImportResponse := DoRequest(hoverflyImportRequest)
-				Expect(hoverflyImportResponse.StatusCode).To(Equal(200))
+				ImportHoverflyRecords(exportedRecords)
 
 				// Switch Hoverfly to simulate mode
-
-				hoverflySimulateModeRequest := sling.New().Post(hoverflyAdminUrl + "/api/state").Body(strings.NewReader(`{"mode":"simulate"}`))
-
-				hoverflySimulateModeResponse := DoRequest(hoverflySimulateModeRequest)
-				Expect(hoverflySimulateModeResponse.StatusCode).To(Equal(200))
+				SetHoverflyMode(hoverfly.SimulateMode)
 
 				// Make the request to Hoverfly simulate
 				afterImportFakeServerRequest := sling.New().Get(fakeServerUrl)
