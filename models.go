@@ -19,6 +19,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/metrics"
 	"github.com/rusenask/goproxy"
 	"github.com/tdewolff/minify"
+	"encoding/base64"
 )
 
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
@@ -206,6 +207,27 @@ type ResponseDetails struct {
 	Headers map[string][]string `json:"headers"`
 }
 
+func (r *ResponseDetails) ConvertToSerializableResponseDetails() (SerializableResponseDetails) {
+	needsEncoding  := false
+
+	// Check headers for gzip
+	contentEncodingValues := r.Headers["Content-Encoding"]
+	for _, a := range contentEncodingValues {
+		if a == "gzip" {
+			needsEncoding = true
+		}
+	}
+
+	// If contains gzip, base64 encode
+	body := r.Body
+	if(needsEncoding) {
+		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
+	}
+
+	return SerializableResponseDetails{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
+}
+
+
 // Payload structure holds request and response structure
 type Payload struct {
 	Response ResponseDetails `json:"response"`
@@ -224,9 +246,63 @@ func (p *Payload) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+func (p *Payload) ConvertToSerializablePayload() (*SerializablePayload) {
+	return &SerializablePayload{p.Response.ConvertToSerializableResponseDetails(), p.Request, p.ID}
+}
+
 // decodePayload decodes supplied bytes into Payload structure
 func decodePayload(data []byte) (*Payload, error) {
 	var p *Payload
+	buf := bytes.NewBuffer(data)
+	dec := gob.NewDecoder(buf)
+	err := dec.Decode(&p)
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+// SerializableResponseDetails is used when marshalling and
+// unmarshalling requests. This struct's Body may be Base64
+// encoded based on the EncodedBody field.
+
+type SerializableResponseDetails struct {
+	Status      int                 `json: "status"`
+	Body        string              `json: "body"`
+	EncodedBody bool                `json: "encodedBody"`
+	Headers     map[string][]string `json: "headers"`
+}
+
+func (s *SerializableResponseDetails) ConvertToResponseDetails() (ResponseDetails) {
+	return ResponseDetails{Status: s.Status, Body: s.Body, Headers: s.Headers}
+}
+
+// SerializablePayload is used when marshalling and
+// unmarshalling payloads.
+type SerializablePayload struct {
+	Response SerializableResponseDetails `json: "response"`
+	Request  RequestDetails              `json: "request"`
+	ID       string                      `json: "id"`
+}
+
+func (s *SerializablePayload) ConvertToPayload() (Payload) {
+	return Payload{Response: s.Response.ConvertToResponseDetails(), Request: s.Request, ID: s.ID}
+}
+
+// Encode method encodes all exported Payload fields to bytes
+func (p *SerializablePayload) Encode() ([]byte, error) {
+	buf := new(bytes.Buffer)
+	enc := gob.NewEncoder(buf)
+	err := enc.Encode(p)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+// decodePayload decodes supplied bytes into Payload structure
+func decodeSerializablePayload(data []byte) (*SerializablePayload, error) {
+	var p *SerializablePayload
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
 	err := dec.Decode(&p)

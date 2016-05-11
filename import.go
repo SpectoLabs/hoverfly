@@ -12,6 +12,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"net/http"
+	"encoding/base64"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -124,11 +125,28 @@ func isJSON(s string) bool {
 }
 
 // ImportPayloads - a function to save given payloads into the database.
-func (d *Hoverfly) ImportPayloads(payloads []Payload) error {
+func (d *Hoverfly) ImportPayloads(payloads []SerializablePayload) error {
 	if len(payloads) > 0 {
 		success := 0
 		failed := 0
-		for _, pl := range payloads {
+		for _, serializablePayload := range payloads {
+
+			// Decode base64 if body is encoded
+
+			if serializablePayload.Response.EncodedBody {
+				//decodedBody := make([]byte, base64.StdEncoding.DecodedLen(len(serializablePayload.Response.Body)))
+				//base64.StdEncoding.Decode(decodedBody, []byte(serializablePayload.Response.Body))
+				decodedBody, err := base64.StdEncoding.DecodeString(serializablePayload.Response.Body)
+				if err != nil {
+					log.Fatal("error:", err)
+				}
+
+				serializablePayload.Response.Body = string(decodedBody)
+			}
+
+			// Convert SerializablePayload back to Payload for internal storage
+			pl := serializablePayload.ConvertToPayload()
+
 			if len(pl.Request.Headers) == 0 {
 				pl.Request.Headers = make(map[string][]string)
 			}

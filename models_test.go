@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	. "github.com/onsi/gomega"
+	"compress/gzip"
 )
 
 // TestMain prepares database for testing and then performs a cleanup
@@ -460,3 +462,114 @@ func TestXMLMinifierWOHeader(t *testing.T) {
 	fpTwo := dbClient.getRequestFingerprint(req, []byte(xmlBodyTwo))
 	testutil.Refute(t, fpOne, fpTwo)
 }
+
+// Helper function for gzipping strings
+func GzipString(s string) (string) {
+	var b bytes.Buffer
+	gz := gzip.NewWriter(&b)
+	gz.Write([]byte(s))
+	return b.String()
+}
+
+func TestConvertToSerializableResponseDetails_WithPlainTextResponseDetails(t *testing.T) {
+	RegisterTestingT(t)
+
+	statusCode := 200
+	body := "hello_world"
+	headers := map[string][]string{"test_header": []string{"true"}}
+
+	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers: headers}
+
+	serializableResp := originalResp.ConvertToSerializableResponseDetails()
+
+	Expect(serializableResp.Status).To(Equal(statusCode))
+	Expect(serializableResp.Headers).To(Equal(headers))
+
+	Expect(serializableResp.EncodedBody).To(Equal(false))
+	Expect(serializableResp.Body).To(Equal(body))
+}
+
+func TestNewSerializableResponseDetails_WithGzippedResonseResponseDetails(t *testing.T) {
+	RegisterTestingT(t)
+
+	originalBody := "hello_world"
+
+	statusCode := 200
+	body := GzipString(originalBody)
+	headers := map[string][]string{"Content-Encoding": []string{"gzip"}}
+
+	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers:headers}
+
+	serializableResp := originalResp.ConvertToSerializableResponseDetails()
+
+	Expect(serializableResp.Status).To(Equal(statusCode))
+	Expect(serializableResp.Headers).To(Equal(headers))
+
+	Expect(serializableResp.EncodedBody).To(Equal(true))
+	Expect(serializableResp.Body).NotTo(Equal(body))
+	Expect(serializableResp.Body).NotTo(Equal(originalBody))
+
+	base64EncodedBody := "H4sIAAAJbogA/w=="
+
+	Expect(serializableResp.Body).To(Equal(base64EncodedBody))
+}
+
+func TestNewSerializablePayload_WithPlainTextResponse(t *testing.T) {
+	RegisterTestingT(t)
+
+	respStatusCode := 200
+	respBody := "hello_world"
+	headers := map[string][]string{"test_header": []string{"true"}}
+
+	originalResp := ResponseDetails{Status: respStatusCode, Body: respBody, Headers: headers}
+	originalReq := RequestDetails{Path: "/", Method: "GET", Destination: "/", Scheme: "scheme",
+		Query: "", Body: "", RemoteAddr: "localhost", Headers: headers}
+	payloadId := "1"
+
+	originalPayload := Payload{Response: originalResp, Request: originalReq, ID: payloadId}
+
+	serializablePayload := originalPayload.ConvertToSerializablePayload()
+
+	Expect(serializablePayload.Response.Status).To(Equal(respStatusCode))
+	Expect(serializablePayload.Response.Body).To(Equal(respBody))
+	Expect(serializablePayload.Response.Headers).To(Equal(headers))
+	Expect(serializablePayload.Response.EncodedBody).To(Equal(false))
+
+	Expect(serializablePayload.Request).To(Equal(originalReq))
+
+	Expect(serializablePayload.ID).To(Equal(payloadId))
+}
+
+func TestNewSerializablePayload_WithGzippedResponse(t *testing.T) {
+	RegisterTestingT(t)
+
+	originalBody := "hello_world"
+
+	respStatusCode := 200
+	respBody := GzipString(originalBody)
+	headers := map[string][]string{"Content-Encoding": []string{"gzip"}}
+
+	originalResp := ResponseDetails{Status: respStatusCode, Body: respBody, Headers: headers}
+	originalReq := RequestDetails{Path: "/", Method: "GET", Destination: "/", Scheme: "scheme",
+		Query: "", Body: "", RemoteAddr: "localhost", Headers: headers}
+	payloadId := "1"
+
+	originalPayload := Payload{Response: originalResp, Request: originalReq, ID: payloadId}
+
+	serializablePayload := originalPayload.ConvertToSerializablePayload()
+
+	Expect(serializablePayload.Response.Status).To(Equal(respStatusCode))
+	Expect(serializablePayload.Response.Headers).To(Equal(headers))
+	Expect(serializablePayload.Response.EncodedBody).To(Equal(true))
+
+	Expect(serializablePayload.Request).To(Equal(originalReq))
+
+	Expect(serializablePayload.ID).To(Equal(payloadId))
+
+	base64EncodedBody := "H4sIAAAJbogA/w=="
+
+	Expect(serializablePayload.Response.Body).NotTo(Equal(respBody))
+	Expect(serializablePayload.Response.Body).NotTo(Equal(originalBody))
+	Expect(serializablePayload.Response.Body).To(Equal(base64EncodedBody))
+}
+

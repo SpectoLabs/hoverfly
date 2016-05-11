@@ -5,6 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"github.com/SpectoLabs/hoverfly/cache"
+	. "github.com/onsi/gomega"
+	"encoding/base64"
 )
 
 func TestIsURLHTTP(t *testing.T) {
@@ -129,4 +132,128 @@ func TestImportFromURLMalformedJSON(t *testing.T) {
 	err := dbClient.Import("http://thiswillbeintercepted.json")
 	// we should get error
 	testutil.Refute(t, err, nil)
+}
+
+func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
+	cache := cache.NewInMemoryCache()
+	hv := Hoverfly{RequestCache: cache, MIN: GetNewMinifiers()}
+
+	RegisterTestingT(t)
+
+	originalPayload := SerializablePayload{
+		Response: SerializableResponseDetails{
+			Status: 200,
+			Body: "hello_world",
+			EncodedBody: false,
+			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
+		Request:  RequestDetails{
+			Path: "/",
+			Method: "GET",
+			Destination: "/",
+			Scheme: "scheme",
+			Query: "", Body: "",
+			RemoteAddr: "localhost",
+			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
+		ID: "9b114df98da7f7e2afdc975883dab4f2"}
+
+	hv.ImportPayloads([]SerializablePayload{originalPayload})
+
+	value, err := cache.Get([]byte(originalPayload.ID))
+	Expect(err).To(BeNil())
+	decodedPayload, err := decodePayload(value)
+	Expect(err).To(BeNil())
+	Expect(*decodedPayload).To(Equal(originalPayload.ConvertToPayload()))
+}
+
+func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
+	cache := cache.NewInMemoryCache()
+	hv := Hoverfly{RequestCache: cache, MIN: GetNewMinifiers()}
+
+	RegisterTestingT(t)
+
+	originalPayload1 := SerializablePayload{
+		Response: SerializableResponseDetails{
+			Status: 200,
+			Body: "hello_world",
+			EncodedBody: false,
+			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
+		Request:  RequestDetails{
+			Path: "/",
+			Method: "GET",
+			Destination: "/",
+			Scheme: "scheme",
+			Query: "", Body: "",
+			RemoteAddr: "localhost",
+			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
+		ID: "9b114df98da7f7e2afdc975883dab4f2"}
+
+	originalPayload2 := originalPayload1
+
+	originalPayload2.ID = "9c03e4af1f30542ff079a712bddad602"
+	originalPayload2.Request.Path = "/new/path"
+
+	originalPayload3 := originalPayload1
+
+	originalPayload3.ID = "fd099332afee48101edb7441b098cd4a"
+	originalPayload3.Request.Path = "/newer/path"
+
+	hv.ImportPayloads([]SerializablePayload{originalPayload1, originalPayload2, originalPayload3})
+
+	value, err := cache.Get([]byte(originalPayload1.ID))
+	Expect(err).To(BeNil())
+	decodedPayload1, err := decodePayload(value)
+	Expect(err).To(BeNil())
+	Expect(*decodedPayload1).To(Equal(originalPayload1.ConvertToPayload()))
+
+	value, err = cache.Get([]byte(originalPayload2.ID))
+	Expect(err).To(BeNil())
+	decodedPayload2, err := decodePayload(value)
+	Expect(err).To(BeNil())
+	Expect(*decodedPayload2).To(Equal(originalPayload2.ConvertToPayload()))
+
+	value, err = cache.Get([]byte(originalPayload3.ID))
+	Expect(err).To(BeNil())
+	decodedPayload3, err := decodePayload(value)
+	Expect(err).To(BeNil())
+	Expect(*decodedPayload3).To(Equal(originalPayload3.ConvertToPayload()))
+}
+
+// Helper function for base64 encoding
+func base64String(s string) (string) {
+	return base64.StdEncoding.EncodeToString([]byte(s))
+}
+
+func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
+	cache := cache.NewInMemoryCache()
+	hv := Hoverfly{RequestCache: cache, MIN: GetNewMinifiers()}
+
+	RegisterTestingT(t)
+
+	encodedPayload := SerializablePayload{
+		Response: SerializableResponseDetails{
+			Status: 200,
+			Body: base64String("hello_world"),
+			EncodedBody: true,
+			Headers: map[string][]string{"Content-Encoding": []string {"gzip"}}},
+		Request:  RequestDetails{
+			Path: "/",
+			Method: "GET",
+			Destination: "/",
+			Scheme: "scheme",
+			Query: "", Body: "",
+			RemoteAddr: "localhost",
+			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
+		ID: "9b114df98da7f7e2afdc975883dab4f2"}
+
+	originalPayload := encodedPayload
+	originalPayload.Response.Body = "hello_world"
+
+	hv.ImportPayloads([]SerializablePayload{encodedPayload})
+
+	value, err := cache.Get([]byte(encodedPayload.ID))
+	Expect(err).To(BeNil())
+	decodedPayload, err := decodePayload(value)
+	Expect(err).To(BeNil())
+	Expect(*decodedPayload).ToNot(Equal(encodedPayload))
+	Expect(*decodedPayload).To(Equal(originalPayload.ConvertToPayload()))
 }

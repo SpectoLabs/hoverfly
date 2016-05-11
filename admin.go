@@ -29,7 +29,11 @@ import (
 
 // recordedRequests struct encapsulates payload data
 type recordedRequests struct {
-	Data []Payload `json:"data"`
+	Data []SerializablePayload `json:"data"`
+}
+
+type serializableRecordRequests struct {
+	Data []SerializablePayload `json: "data"`
 }
 
 type storedMetadata struct {
@@ -221,11 +225,12 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 
 	if err == nil {
 
-		var payloads []Payload
+		var payloads []SerializablePayload
 
 		for _, v := range records {
 			if payload, err := decodePayload(v); err == nil {
-				payloads = append(payloads, *payload)
+				serializablePayload := payload.ConvertToSerializablePayload()
+				payloads = append(payloads, *serializablePayload)
 			} else {
 				log.Error(err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -235,7 +240,7 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 
 		w.Header().Set("Content-Type", "application/json")
 
-		var response recordedRequests
+		var response serializableRecordRequests
 		response.Data = payloads
 		b, err := json.Marshal(response)
 
@@ -485,9 +490,9 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 
 	p := Payload{Request: preq, Response: presp}
 
-	var pls []Payload
+	var pls []SerializablePayload
 
-	pls = append(pls, p)
+	pls = append(pls, *p.ConvertToSerializablePayload())
 
 	err = d.ImportPayloads(pls)
 
