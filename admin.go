@@ -32,7 +32,7 @@ type recordedRequests struct {
 	Data []PayloadView `json:"data"`
 }
 
-type serializableRecordRequests struct {
+type RecordRequestsView struct {
 	Data []PayloadView `json: "data"`
 }
 
@@ -240,7 +240,7 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 
 		w.Header().Set("Content-Type", "application/json")
 
-		var response serializableRecordRequests
+		var response RecordRequestsView
 		response.Data = payloads
 		b, err := json.Marshal(response)
 
