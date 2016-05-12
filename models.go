@@ -207,7 +207,7 @@ type ResponseDetails struct {
 	Headers map[string][]string `json:"headers"`
 }
 
-func (r *ResponseDetails) ConvertToSerializableResponseDetails() (SerializableResponseDetails) {
+func (r *ResponseDetails) ConvertToResponseDetailsView() (ResponseDetailsView) {
 	needsEncoding  := false
 
 	// Check headers for gzip
@@ -224,7 +224,7 @@ func (r *ResponseDetails) ConvertToSerializableResponseDetails() (SerializableRe
 		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
 	}
 
-	return SerializableResponseDetails{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
+	return ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
 }
 
 
@@ -247,7 +247,7 @@ func (p *Payload) Encode() ([]byte, error) {
 }
 
 func (p *Payload) ConvertToPayloadView() (*PayloadView) {
-	return &PayloadView{p.Response.ConvertToSerializableResponseDetails(), p.Request, p.ID}
+	return &PayloadView{p.Response.ConvertToResponseDetailsView(), p.Request, p.ID}
 }
 
 // decodePayload decodes supplied bytes into Payload structure
@@ -262,24 +262,24 @@ func decodePayload(data []byte) (*Payload, error) {
 	return p, nil
 }
 
-// SerializableResponseDetails is used when marshalling and
+// ResponseDetailsView is used when marshalling and
 // unmarshalling requests. This struct's Body may be Base64
 // encoded based on the EncodedBody field.
 
-type SerializableResponseDetails struct {
+type ResponseDetailsView struct {
 	Status      int                 `json: "status"`
 	Body        string              `json: "body"`
 	EncodedBody bool                `json: "encodedBody"`
 	Headers     map[string][]string `json: "headers"`
 }
 
-func (s *SerializableResponseDetails) ConvertToResponseDetails() (ResponseDetails) {
+func (s *ResponseDetailsView) ConvertToResponseDetails() (ResponseDetails) {
 	return ResponseDetails{Status: s.Status, Body: s.Body, Headers: s.Headers}
 }
 
 // PayloadView is used when marshalling and unmarshalling payloads.
 type PayloadView struct {
-	Response SerializableResponseDetails `json: "response"`
+	Response ResponseDetailsView `json: "response"`
 	Request  RequestDetails              `json: "request"`
 	ID       string                      `json: "id"`
 }

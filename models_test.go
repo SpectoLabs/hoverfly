@@ -471,7 +471,7 @@ func GzipString(s string) (string) {
 	return b.String()
 }
 
-func TestConvertToSerializableResponseDetails_WithPlainTextResponseDetails(t *testing.T) {
+func TestConvertToResponseDetailsView_WithPlainTextResponseDetails(t *testing.T) {
 	RegisterTestingT(t)
 
 	statusCode := 200
@@ -480,16 +480,16 @@ func TestConvertToSerializableResponseDetails_WithPlainTextResponseDetails(t *te
 
 	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers: headers}
 
-	serializableResp := originalResp.ConvertToSerializableResponseDetails()
+	respView := originalResp.ConvertToResponseDetailsView()
 
-	Expect(serializableResp.Status).To(Equal(statusCode))
-	Expect(serializableResp.Headers).To(Equal(headers))
+	Expect(respView.Status).To(Equal(statusCode))
+	Expect(respView.Headers).To(Equal(headers))
 
-	Expect(serializableResp.EncodedBody).To(Equal(false))
-	Expect(serializableResp.Body).To(Equal(body))
+	Expect(respView.EncodedBody).To(Equal(false))
+	Expect(respView.Body).To(Equal(body))
 }
 
-func TestNewSerializableResponseDetails_WithGzippedResonseResponseDetails(t *testing.T) {
+func TestConvertToResponseDetailsView_WithGzippedResonseResponseDetails(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalBody := "hello_world"
@@ -500,21 +500,21 @@ func TestNewSerializableResponseDetails_WithGzippedResonseResponseDetails(t *tes
 
 	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers:headers}
 
-	serializableResp := originalResp.ConvertToSerializableResponseDetails()
+	respView := originalResp.ConvertToResponseDetailsView()
 
-	Expect(serializableResp.Status).To(Equal(statusCode))
-	Expect(serializableResp.Headers).To(Equal(headers))
+	Expect(respView.Status).To(Equal(statusCode))
+	Expect(respView.Headers).To(Equal(headers))
 
-	Expect(serializableResp.EncodedBody).To(Equal(true))
-	Expect(serializableResp.Body).NotTo(Equal(body))
-	Expect(serializableResp.Body).NotTo(Equal(originalBody))
+	Expect(respView.EncodedBody).To(Equal(true))
+	Expect(respView.Body).NotTo(Equal(body))
+	Expect(respView.Body).NotTo(Equal(originalBody))
 
 	base64EncodedBody := "H4sIAAAJbogA/w=="
 
-	Expect(serializableResp.Body).To(Equal(base64EncodedBody))
+	Expect(respView.Body).To(Equal(base64EncodedBody))
 }
 
-func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
+func TestConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	respStatusCode := 200
@@ -540,7 +540,7 @@ func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 	Expect(payloadView.ID).To(Equal(payloadId))
 }
 
-func TestPayload_ConvertToPayloadView_WithGzippedResponse(t *testing.T) {
+func TestConvertToPayloadView_WithGzippedResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalBody := "hello_world"

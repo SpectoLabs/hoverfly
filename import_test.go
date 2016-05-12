@@ -141,7 +141,7 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalPayload := PayloadView{
-		Response: SerializableResponseDetails{
+		Response: ResponseDetailsView{
 			Status: 200,
 			Body: "hello_world",
 			EncodedBody: false,
@@ -172,7 +172,7 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalPayload1 := PayloadView{
-		Response: SerializableResponseDetails{
+		Response: ResponseDetailsView{
 			Status: 200,
 			Body: "hello_world",
 			EncodedBody: false,
@@ -230,7 +230,7 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 	RegisterTestingT(t)
 
 	encodedPayload := PayloadView{
-		Response: SerializableResponseDetails{
+		Response: ResponseDetailsView{
 			Status: 200,
 			Body: base64String("hello_world"),
 			EncodedBody: true,
