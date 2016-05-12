@@ -29,11 +29,11 @@ import (
 
 // recordedRequests struct encapsulates payload data
 type recordedRequests struct {
-	Data []SerializablePayload `json:"data"`
+	Data []PayloadView `json:"data"`
 }
 
 type serializableRecordRequests struct {
-	Data []SerializablePayload `json: "data"`
+	Data []PayloadView `json: "data"`
 }
 
 type storedMetadata struct {
@@ -225,12 +225,12 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 
 	if err == nil {
 
-		var payloads []SerializablePayload
+		var payloads []PayloadView
 
 		for _, v := range records {
 			if payload, err := decodePayload(v); err == nil {
-				serializablePayload := payload.ConvertToSerializablePayload()
-				payloads = append(payloads, *serializablePayload)
+				payloadView := payload.ConvertToPayloadView()
+				payloads = append(payloads, *payloadView)
 			} else {
 				log.Error(err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -490,9 +490,9 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 
 	p := Payload{Request: preq, Response: presp}
 
-	var pls []SerializablePayload
+	var pls []PayloadView
 
-	pls = append(pls, *p.ConvertToSerializablePayload())
+	pls = append(pls, *p.ConvertToPayloadView())
 
 	err = d.ImportPayloads(pls)
 

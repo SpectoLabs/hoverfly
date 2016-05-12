@@ -140,7 +140,7 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPayload := SerializablePayload{
+	originalPayload := PayloadView{
 		Response: SerializableResponseDetails{
 			Status: 200,
 			Body: "hello_world",
@@ -156,7 +156,7 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
 		ID: "9b114df98da7f7e2afdc975883dab4f2"}
 
-	hv.ImportPayloads([]SerializablePayload{originalPayload})
+	hv.ImportPayloads([]PayloadView{originalPayload})
 
 	value, err := cache.Get([]byte(originalPayload.ID))
 	Expect(err).To(BeNil())
@@ -171,7 +171,7 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPayload1 := SerializablePayload{
+	originalPayload1 := PayloadView{
 		Response: SerializableResponseDetails{
 			Status: 200,
 			Body: "hello_world",
@@ -197,7 +197,7 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 	originalPayload3.ID = "fd099332afee48101edb7441b098cd4a"
 	originalPayload3.Request.Path = "/newer/path"
 
-	hv.ImportPayloads([]SerializablePayload{originalPayload1, originalPayload2, originalPayload3})
+	hv.ImportPayloads([]PayloadView{originalPayload1, originalPayload2, originalPayload3})
 
 	value, err := cache.Get([]byte(originalPayload1.ID))
 	Expect(err).To(BeNil())
@@ -229,7 +229,7 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	encodedPayload := SerializablePayload{
+	encodedPayload := PayloadView{
 		Response: SerializableResponseDetails{
 			Status: 200,
 			Body: base64String("hello_world"),
@@ -248,7 +248,7 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 	originalPayload := encodedPayload
 	originalPayload.Response.Body = "hello_world"
 
-	hv.ImportPayloads([]SerializablePayload{encodedPayload})
+	hv.ImportPayloads([]PayloadView{encodedPayload})
 
 	value, err := cache.Get([]byte(encodedPayload.ID))
 	Expect(err).To(BeNil())

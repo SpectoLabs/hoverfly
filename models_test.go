@@ -514,7 +514,7 @@ func TestNewSerializableResponseDetails_WithGzippedResonseResponseDetails(t *tes
 	Expect(serializableResp.Body).To(Equal(base64EncodedBody))
 }
 
-func TestNewSerializablePayload_WithPlainTextResponse(t *testing.T) {
+func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	respStatusCode := 200
@@ -528,19 +528,19 @@ func TestNewSerializablePayload_WithPlainTextResponse(t *testing.T) {
 
 	originalPayload := Payload{Response: originalResp, Request: originalReq, ID: payloadId}
 
-	serializablePayload := originalPayload.ConvertToSerializablePayload()
+	payloadView := originalPayload.ConvertToPayloadView()
 
-	Expect(serializablePayload.Response.Status).To(Equal(respStatusCode))
-	Expect(serializablePayload.Response.Body).To(Equal(respBody))
-	Expect(serializablePayload.Response.Headers).To(Equal(headers))
-	Expect(serializablePayload.Response.EncodedBody).To(Equal(false))
+	Expect(payloadView.Response.Status).To(Equal(respStatusCode))
+	Expect(payloadView.Response.Body).To(Equal(respBody))
+	Expect(payloadView.Response.Headers).To(Equal(headers))
+	Expect(payloadView.Response.EncodedBody).To(Equal(false))
 
-	Expect(serializablePayload.Request).To(Equal(originalReq))
+	Expect(payloadView.Request).To(Equal(originalReq))
 
-	Expect(serializablePayload.ID).To(Equal(payloadId))
+	Expect(payloadView.ID).To(Equal(payloadId))
 }
 
-func TestNewSerializablePayload_WithGzippedResponse(t *testing.T) {
+func TestPayload_ConvertToPayloadView_WithGzippedResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalBody := "hello_world"
@@ -556,20 +556,20 @@ func TestNewSerializablePayload_WithGzippedResponse(t *testing.T) {
 
 	originalPayload := Payload{Response: originalResp, Request: originalReq, ID: payloadId}
 
-	serializablePayload := originalPayload.ConvertToSerializablePayload()
+	payloadView := originalPayload.ConvertToPayloadView()
 
-	Expect(serializablePayload.Response.Status).To(Equal(respStatusCode))
-	Expect(serializablePayload.Response.Headers).To(Equal(headers))
-	Expect(serializablePayload.Response.EncodedBody).To(Equal(true))
+	Expect(payloadView.Response.Status).To(Equal(respStatusCode))
+	Expect(payloadView.Response.Headers).To(Equal(headers))
+	Expect(payloadView.Response.EncodedBody).To(Equal(true))
 
-	Expect(serializablePayload.Request).To(Equal(originalReq))
+	Expect(payloadView.Request).To(Equal(originalReq))
 
-	Expect(serializablePayload.ID).To(Equal(payloadId))
+	Expect(payloadView.ID).To(Equal(payloadId))
 
 	base64EncodedBody := "H4sIAAAJbogA/w=="
 
-	Expect(serializablePayload.Response.Body).NotTo(Equal(respBody))
-	Expect(serializablePayload.Response.Body).NotTo(Equal(originalBody))
-	Expect(serializablePayload.Response.Body).To(Equal(base64EncodedBody))
+	Expect(payloadView.Response.Body).NotTo(Equal(respBody))
+	Expect(payloadView.Response.Body).NotTo(Equal(originalBody))
+	Expect(payloadView.Response.Body).To(Equal(base64EncodedBody))
 }
 

@@ -246,8 +246,8 @@ func (p *Payload) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (p *Payload) ConvertToSerializablePayload() (*SerializablePayload) {
-	return &SerializablePayload{p.Response.ConvertToSerializableResponseDetails(), p.Request, p.ID}
+func (p *Payload) ConvertToPayloadView() (*PayloadView) {
+	return &PayloadView{p.Response.ConvertToSerializableResponseDetails(), p.Request, p.ID}
 }
 
 // decodePayload decodes supplied bytes into Payload structure
@@ -277,20 +277,19 @@ func (s *SerializableResponseDetails) ConvertToResponseDetails() (ResponseDetail
 	return ResponseDetails{Status: s.Status, Body: s.Body, Headers: s.Headers}
 }
 
-// SerializablePayload is used when marshalling and
-// unmarshalling payloads.
-type SerializablePayload struct {
+// PayloadView is used when marshalling and unmarshalling payloads.
+type PayloadView struct {
 	Response SerializableResponseDetails `json: "response"`
 	Request  RequestDetails              `json: "request"`
 	ID       string                      `json: "id"`
 }
 
-func (s *SerializablePayload) ConvertToPayload() (Payload) {
+func (s *PayloadView) ConvertToPayload() (Payload) {
 	return Payload{Response: s.Response.ConvertToResponseDetails(), Request: s.Request, ID: s.ID}
 }
 
 // Encode method encodes all exported Payload fields to bytes
-func (p *SerializablePayload) Encode() ([]byte, error) {
+func (p *PayloadView) Encode() ([]byte, error) {
 	buf := new(bytes.Buffer)
 	enc := gob.NewEncoder(buf)
 	err := enc.Encode(p)
@@ -301,8 +300,8 @@ func (p *SerializablePayload) Encode() ([]byte, error) {
 }
 
 // decodePayload decodes supplied bytes into Payload structure
-func decodeSerializablePayload(data []byte) (*SerializablePayload, error) {
-	var p *SerializablePayload
+func decodePayloadView(data []byte) (*PayloadView, error) {
+	var p *PayloadView
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
 	err := dec.Decode(&p)
