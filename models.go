@@ -12,7 +12,6 @@ import (
 	"regexp"
 	"sync"
 	"time"
-
 	log "github.com/Sirupsen/logrus"
 	authBackend "github.com/SpectoLabs/hoverfly/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/cache"
@@ -20,7 +19,10 @@ import (
 	"github.com/rusenask/goproxy"
 	"github.com/tdewolff/minify"
 	"encoding/base64"
+	"strings"
 )
+
+var supportedMimeTypes = [...]string {"text", "plain", "css", "html", "json", "xml", "js", "javascript"}
 
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
 type Hoverfly struct {
@@ -212,9 +214,16 @@ func (r *ResponseDetails) ConvertToResponseDetailsView() (ResponseDetailsView) {
 
 	// Check headers for gzip
 	contentEncodingValues := r.Headers["Content-Encoding"]
-	for _, a := range contentEncodingValues {
-		if a == "gzip" {
+	if len(contentEncodingValues) > 0 {
+		needsEncoding = true
+	} else {
+		mimeType := http.DetectContentType([]byte(r.Body))
+		for _, v := range supportedMimeTypes {
 			needsEncoding = true
+			if strings.Contains(mimeType, v) {
+				needsEncoding = false
+				break
+			}
 		}
 	}
 
@@ -280,8 +289,8 @@ func (s *ResponseDetailsView) ConvertToResponseDetails() (ResponseDetails) {
 // PayloadView is used when marshalling and unmarshalling payloads.
 type PayloadView struct {
 	Response ResponseDetailsView `json: "response"`
-	Request  RequestDetails              `json: "request"`
-	ID       string                      `json: "id"`
+	Request  RequestDetails      `json: "request"`
+	ID       string              `json: "id"`
 }
 
 func (s *PayloadView) ConvertToPayload() (Payload) {

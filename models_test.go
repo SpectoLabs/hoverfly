@@ -489,7 +489,7 @@ func TestConvertToResponseDetailsView_WithPlainTextResponseDetails(t *testing.T)
 	Expect(respView.Body).To(Equal(body))
 }
 
-func TestConvertToResponseDetailsView_WithGzippedResonseResponseDetails(t *testing.T) {
+func TestConvertToResponseDetailsView_WithGzipContentEncodedHeader(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalBody := "hello_world"
@@ -510,6 +510,57 @@ func TestConvertToResponseDetailsView_WithGzippedResonseResponseDetails(t *testi
 	Expect(respView.Body).NotTo(Equal(originalBody))
 
 	base64EncodedBody := "H4sIAAAJbogA/w=="
+
+	Expect(respView.Body).To(Equal(base64EncodedBody))
+}
+
+func TestConvertToResponseDetailsView_WithDeflateContentEncodedHeader(t *testing.T) {
+	RegisterTestingT(t)
+
+	originalBody := "this_should_be_encoded_but_its_not_important"
+
+	statusCode := 200
+	headers := map[string][]string{"Content-Encoding": []string{"deflate"}}
+
+	originalResp := ResponseDetails{Status: statusCode, Body: originalBody, Headers:headers}
+
+	respView := originalResp.ConvertToResponseDetailsView()
+
+	Expect(respView.Status).To(Equal(statusCode))
+	Expect(respView.Headers).To(Equal(headers))
+
+	Expect(respView.EncodedBody).To(Equal(true))
+	Expect(respView.Body).NotTo(Equal(originalBody))
+
+	base64EncodedBody := "dGhpc19zaG91bGRfYmVfZW5jb2RlZF9idXRfaXRzX25vdF9pbXBvcnRhbnQ="
+
+	Expect(respView.Body).To(Equal(base64EncodedBody))
+}
+
+func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
+	RegisterTestingT(t)
+
+	pwd, _ := os.Getwd()
+	imageUri := "/testdata/1x1.png"
+
+	file, _ := os.Open(pwd + imageUri)
+	defer file.Close()
+
+	originalImageBytes, _ := ioutil.ReadAll(file)
+	statusCode := 200
+	headers := map[string][]string{}
+
+	originalResp := ResponseDetails{Status: statusCode, Body: string(originalImageBytes), Headers:headers}
+
+	respView := originalResp.ConvertToResponseDetailsView()
+
+	Expect(respView.Status).To(Equal(statusCode))
+	Expect(respView.Headers).To(Equal(headers))
+
+	Expect(respView.EncodedBody).To(Equal(true))
+	Expect(respView.Body).NotTo(Equal(originalImageBytes))
+
+	base64EncodedBody := "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg=="
 
 	Expect(respView.Body).To(Equal(base64EncodedBody))
 }

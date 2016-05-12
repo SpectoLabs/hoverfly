@@ -6,13 +6,12 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
-	//"compress/gzip"
 	"fmt"
 	"io/ioutil"
 	"github.com/SpectoLabs/hoverfly"
-	//"compress/gzip"
 	"compress/gzip"
 	"bytes"
+	"os"
 )
 
 // Helper function for gzipping strings
@@ -26,27 +25,26 @@ func GzipString(s string) (string) {
 var _ = Describe("Capture > export > importing > simulate flow", func() {
 
 
-	Describe("Import, Export", func() {
-		Context("The captured response should be returned after exporting and importing", func() {
+	Describe("When I import and export", func() {
+		Context("A plain text response", func() {
 
 			var afterImportFakeServerResponse *http.Response
 
 			BeforeEach(func() {
 				// Spin up a fake server which returns hello world
-				fakeGzipServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 					w.Header().Set("Content-Type", "text/plain")
 					w.WriteHeader(200)
 					fmt.Fprintf(w, "hello_world")
 				}))
+				defer fakeServer.Close()
 
 				// Switch Hoverfly to capture mode
 				SetHoverflyMode(hoverfly.CaptureMode)
 
 				// Make a request to the fake server and proxy through Hoverfly
-				fakeServerUrl := fakeGzipServer.URL
-
-				fakeServerRequest := sling.New().Get(fakeServerUrl)
+				fakeServerRequest := sling.New().Get(fakeServer.URL)
 
 				response := DoRequestThroughProxy(fakeServerRequest)
 				Expect(response.StatusCode).To(Equal(200))
@@ -64,7 +62,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				SetHoverflyMode(hoverfly.SimulateMode)
 
 				// Make the request to Hoverfly simulate
-				afterImportFakeServerRequest := sling.New().Get(fakeServerUrl)
+				afterImportFakeServerRequest := sling.New().Get(fakeServer.URL)
 				afterImportFakeServerResponse = DoRequestThroughProxy(afterImportFakeServerRequest)
 			})
 
@@ -91,27 +89,26 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 			})
 		})
 
-		Context("The captured response should be returned after exporting and importing when gzipped", func() {
+		Context("A gzipped response", func() {
 
 			var afterImportFakeServerResponse *http.Response
 
 			BeforeEach(func() {
 				// Spin up a fake server which returns hello world gzipped
-				fakeGzipServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 					w.Header().Set("Content-Encoding", "gzip")
 					w.Header().Set("Content-Type", "text/plain")
 					gzipWriter := gzip.NewWriter(w)
 					gzipWriter.Write([]byte(`hello_world`))
 				}))
+				defer fakeServer.Close()
 
 				// Switch Hoverfly to capture mode
 				SetHoverflyMode(hoverfly.CaptureMode)
 
 				// Make a request to the fake server and proxy through Hoverfly
-				fakeServerUrl := fakeGzipServer.URL
-
-				fakeServerRequest := sling.New().Get(fakeServerUrl).Set("Accept-Encoding", "gzip")
+				fakeServerRequest := sling.New().Get(fakeServer.URL).Set("Accept-Encoding", "gzip")
 
 				response := DoRequestThroughProxy(fakeServerRequest)
 				Expect(response.StatusCode).To(Equal(200))
@@ -129,7 +126,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				SetHoverflyMode(hoverfly.SimulateMode)
 
 				// Make the request to Hoverfly simulate
-				afterImportFakeServerRequest := sling.New().Get(fakeServerUrl).Set("Accept-Encoding", "gzip")
+				afterImportFakeServerRequest := sling.New().Get(fakeServer.URL).Set("Accept-Encoding", "gzip")
 				afterImportFakeServerResponse = DoRequestThroughProxy(afterImportFakeServerRequest)
 			})
 
@@ -153,6 +150,77 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 
 			It("Returns with text/plain Content-Type header", func() {
 				Expect(afterImportFakeServerResponse.Header).To(HaveKeyWithValue("Content-Type", []string{"text/plain"}))
+			})
+
+			It("Returns with a Hoverfly header", func() {
+				Expect(afterImportFakeServerResponse.Header).To(HaveKeyWithValue("Hoverfly", []string{"Was-Here"}))
+			})
+		})
+
+		Context("An image response", func() {
+
+			var afterImportFakeServerResponse *http.Response
+
+
+			pwd, _ := os.Getwd()
+			imageUri := "/testdata/1x1.png"
+
+			BeforeEach(func() {
+				// Spin up a fake server which returns hello world gzipped
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "image/jpeg")
+					w.WriteHeader(200)
+					http.ServeFile(w, r, pwd + imageUri)
+				}))
+
+				defer fakeServer.Close()
+				fmt.Println(fakeServer.URL)
+				//time.Sleep(time.Second * 3)
+
+				// Switch Hoverfly to capture mode
+				SetHoverflyMode(hoverfly.CaptureMode)
+
+				// Make a request to the fake server and proxy through Hoverfly
+				fakeServerRequest := sling.New().Get(fakeServer.URL)
+				response := DoRequestThroughProxy(fakeServerRequest)
+				Expect(response.StatusCode).To(Equal(200))
+
+				// Export the data out of Hoverfly
+				exportedRecords := ExportHoverflyRecords()
+
+				// Wipe the records in Hoverfly
+				EraseHoverflyRecords()
+
+				// Import the same data into Hoverfly
+				ImportHoverflyRecords(exportedRecords)
+
+				// Switch Hoverfly to simulate mode
+				SetHoverflyMode(hoverfly.SimulateMode)
+
+				// Make the request to Hoverfly simulate
+				afterImportFakeServerRequest := sling.New().Get(fakeServer.URL)
+				afterImportFakeServerResponse = DoRequestThroughProxy(afterImportFakeServerRequest)
+			})
+
+
+			It("Returns a status code of 200", func() {
+				Expect(afterImportFakeServerResponse.StatusCode).To(Equal(200))
+			})
+
+			It("Returns image", func() {
+				file, _ := os.Open(pwd + imageUri)
+				defer file.Close()
+				returnedImageBytes, _ := ioutil.ReadAll(afterImportFakeServerResponse.Body)
+				originalImageBytes, _ := ioutil.ReadAll(file)
+				Expect(returnedImageBytes).To(Equal(originalImageBytes))
+			})
+
+			It("Returns with Hoverfly header", func() {
+				Expect(afterImportFakeServerResponse.Header).To(HaveKeyWithValue("Hoverfly", []string{"Was-Here"}))
+			})
+
+			It("Returns with image/jpeg Content-Type header", func() {
+				Expect(afterImportFakeServerResponse.Header).To(HaveKeyWithValue("Content-Type", []string{"image/jpeg"}))
 			})
 
 			It("Returns with a Hoverfly header", func() {

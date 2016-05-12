@@ -45,6 +45,9 @@ var _ = BeforeSuite(func() {
 
 	adminPort := strconv.Itoa(freeport.GetPort())
 	proxyPort := strconv.Itoa(freeport.GetPort())
+
+	fmt.Println("Admin: " + adminPort)
+	fmt.Println("Proxy: " + proxyPort)
 	hoverflyAdminUrl = fmt.Sprintf("http://localhost:%v", adminPort)
 	hoverflyProxyUrl = fmt.Sprintf("http://localhost:%v", proxyPort)
 
