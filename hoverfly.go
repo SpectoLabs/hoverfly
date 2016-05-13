@@ -3,11 +3,6 @@ package hoverfly
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/rusenask/goproxy"
-
-	"github.com/tdewolff/minify"
-	"github.com/tdewolff/minify/json"
-	"github.com/tdewolff/minify/xml"
-
 	"bufio"
 	"crypto/tls"
 	"fmt"
@@ -52,18 +47,9 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		Cfg:     cfg,
 		Counter: metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		Hooks:   make(ActionTypeHooks),
-		MIN:     GetNewMinifiers(),
 	}
 	h.UpdateProxy()
 	return h
-}
-
-// GetNewMinifiers - returns minify.M with prepared xml/json minifiers
-func GetNewMinifiers() *minify.M {
-	m := minify.New()
-	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
-	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
-	return m
 }
 
 // UpdateProxy - applies hooks

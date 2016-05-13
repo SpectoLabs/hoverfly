@@ -2,8 +2,6 @@ package hoverfly
 
 import (
 	"bytes"
-	"crypto/md5"
-	"encoding/gob"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,15 +10,14 @@ import (
 	"regexp"
 	"sync"
 	"time"
-
 	log "github.com/Sirupsen/logrus"
 	authBackend "github.com/SpectoLabs/hoverfly/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/cache"
 	"github.com/SpectoLabs/hoverfly/metrics"
 	"github.com/rusenask/goproxy"
-	"github.com/tdewolff/minify"
-	"encoding/base64"
+	"github.com/SpectoLabs/hoverfly/models"
 )
+
 
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
 type Hoverfly struct {
@@ -34,9 +31,6 @@ type Hoverfly struct {
 
 	Proxy *goproxy.ProxyHttpServer
 	SL    *StoppableListener
-
-	MIN *minify.M
-
 	mu sync.Mutex
 }
 
@@ -112,205 +106,12 @@ func (d *Hoverfly) AddHook(hook Hook) {
 	d.Hooks.Add(hook)
 }
 
-// RequestContainer holds structure for request
-type RequestContainer struct {
-	Details  RequestDetails
-	Minifier *minify.M
-}
 
 var emptyResp = &http.Response{}
 
-// RequestDetails stores information about request, it's used for creating unique hash and also as a payload structure
-type RequestDetails struct {
-	Path        string              `json:"path"`
-	Method      string              `json:"method"`
-	Destination string              `json:"destination"`
-	Scheme      string              `json:"scheme"`
-	Query       string              `json:"query"`
-	Body        string              `json:"body"`
-	RemoteAddr  string              `json:"remoteAddr"`
-	Headers     map[string][]string `json:"headers"`
-}
-
-const contentTypeJSON = "application/json"
-const contentTypeXML = "application/xml"
-const otherType = "otherType"
-
-var rxJSON = regexp.MustCompile("[/+]json$")
-var rxXML = regexp.MustCompile("[/+]xml$")
-
-func (r *RequestContainer) concatenate() string {
-	var buffer bytes.Buffer
-
-	buffer.WriteString(r.Details.Destination)
-	buffer.WriteString(r.Details.Path)
-	buffer.WriteString(r.Details.Method)
-	buffer.WriteString(r.Details.Query)
-	if len(r.Details.Body) > 0 {
-		ct := r.getContentType()
-
-		if ct == contentTypeJSON || ct == contentTypeXML {
-			buffer.WriteString(r.minifyBody(ct))
-		} else {
-			log.WithFields(log.Fields{
-				"content-type": r.Details.Headers["Content-Type"],
-			}).Debug("unknown content type")
-
-			buffer.WriteString(r.Details.Body)
-		}
-	}
-
-	return buffer.String()
-}
-
-func (r *RequestContainer) minifyBody(mediaType string) (minified string) {
-	var err error
-	minified, err = r.Minifier.String(mediaType, r.Details.Body)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error":       err.Error(),
-			"destination": r.Details.Destination,
-			"path":        r.Details.Path,
-			"method":      r.Details.Method,
-		}).Errorf("failed to minify request body, media type given: %s. Request matching might fail", mediaType)
-		return r.Details.Body
-	}
-	log.Debugf("body minified, mediatype: %s", mediaType)
-	return minified
-}
-
-func (r *RequestContainer) getContentType() string {
-	for _, v := range r.Details.Headers["Content-Type"] {
-		if rxJSON.MatchString(v) {
-			return contentTypeJSON
-		}
-		if rxXML.MatchString(v) {
-			return contentTypeXML
-		}
-	}
-	return otherType
-}
-
-// Hash returns unique hash key for request
-func (r *RequestContainer) Hash() string {
-	h := md5.New()
-	io.WriteString(h, r.concatenate())
-	return fmt.Sprintf("%x", h.Sum(nil))
-}
-
-// ResponseDetails structure hold response body from external service, body is not decoded and is supposed
-// to be bytes, however headers should provide all required information for later decoding
-// by the client.
-type ResponseDetails struct {
-	Status  int                 `json:"status"`
-	Body    string              `json:"body"`
-	Headers map[string][]string `json:"headers"`
-}
-
-func (r *ResponseDetails) ConvertToSerializableResponseDetails() (SerializableResponseDetails) {
-	needsEncoding  := false
-
-	// Check headers for gzip
-	contentEncodingValues := r.Headers["Content-Encoding"]
-	for _, a := range contentEncodingValues {
-		if a == "gzip" {
-			needsEncoding = true
-		}
-	}
-
-	// If contains gzip, base64 encode
-	body := r.Body
-	if(needsEncoding) {
-		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
-	}
-
-	return SerializableResponseDetails{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
-}
 
 
-// Payload structure holds request and response structure
-type Payload struct {
-	Response ResponseDetails `json:"response"`
-	Request  RequestDetails  `json:"request"`
-	ID       string          `json:"id"`
-}
 
-// Encode method encodes all exported Payload fields to bytes
-func (p *Payload) Encode() ([]byte, error) {
-	buf := new(bytes.Buffer)
-	enc := gob.NewEncoder(buf)
-	err := enc.Encode(p)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-func (p *Payload) ConvertToSerializablePayload() (*SerializablePayload) {
-	return &SerializablePayload{p.Response.ConvertToSerializableResponseDetails(), p.Request, p.ID}
-}
-
-// decodePayload decodes supplied bytes into Payload structure
-func decodePayload(data []byte) (*Payload, error) {
-	var p *Payload
-	buf := bytes.NewBuffer(data)
-	dec := gob.NewDecoder(buf)
-	err := dec.Decode(&p)
-	if err != nil {
-		return nil, err
-	}
-	return p, nil
-}
-
-// SerializableResponseDetails is used when marshalling and
-// unmarshalling requests. This struct's Body may be Base64
-// encoded based on the EncodedBody field.
-
-type SerializableResponseDetails struct {
-	Status      int                 `json: "status"`
-	Body        string              `json: "body"`
-	EncodedBody bool                `json: "encodedBody"`
-	Headers     map[string][]string `json: "headers"`
-}
-
-func (s *SerializableResponseDetails) ConvertToResponseDetails() (ResponseDetails) {
-	return ResponseDetails{Status: s.Status, Body: s.Body, Headers: s.Headers}
-}
-
-// SerializablePayload is used when marshalling and
-// unmarshalling payloads.
-type SerializablePayload struct {
-	Response SerializableResponseDetails `json: "response"`
-	Request  RequestDetails              `json: "request"`
-	ID       string                      `json: "id"`
-}
-
-func (s *SerializablePayload) ConvertToPayload() (Payload) {
-	return Payload{Response: s.Response.ConvertToResponseDetails(), Request: s.Request, ID: s.ID}
-}
-
-// Encode method encodes all exported Payload fields to bytes
-func (p *SerializablePayload) Encode() ([]byte, error) {
-	buf := new(bytes.Buffer)
-	enc := gob.NewEncoder(buf)
-	err := enc.Encode(p)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-// decodePayload decodes supplied bytes into Payload structure
-func decodeSerializablePayload(data []byte) (*SerializablePayload, error) {
-	var p *SerializablePayload
-	buf := bytes.NewBuffer(data)
-	dec := gob.NewDecoder(buf)
-	err := dec.Decode(&p)
-	if err != nil {
-		return nil, err
-	}
-	return p, nil
-}
 
 // captureRequest saves request for later playback
 func (d *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
@@ -413,7 +214,7 @@ func extractRequestBody(req *http.Request) (extract []byte, err error) {
 }
 
 // getRequestDetails - extracts request details
-func getRequestDetails(req *http.Request) (requestObj RequestDetails, err error) {
+func getRequestDetails(req *http.Request) (requestObj models.RequestDetails, err error) {
 	if req.Body == nil {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 	}
@@ -428,7 +229,7 @@ func getRequestDetails(req *http.Request) (requestObj RequestDetails, err error)
 		return
 	}
 
-	requestObj = RequestDetails{
+	requestObj = models.RequestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
 		Destination: req.Host,
@@ -449,7 +250,7 @@ func (d *Hoverfly) doRequest(request *http.Request) (*http.Response, error) {
 
 	if d.Cfg.Middleware != "" {
 		// middleware is provided, modifying request
-		var payload Payload
+		var payload models.Payload
 
 		rd, err := getRequestDetails(request)
 		if err != nil {
@@ -510,7 +311,7 @@ func (d *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, 
 	if resp == nil {
 		resp = emptyResp
 	} else {
-		responseObj := ResponseDetails{
+		responseObj := models.ResponseDetails{
 			Status:  resp.StatusCode,
 			Body:    string(respBody),
 			Headers: resp.Header,
@@ -525,7 +326,7 @@ func (d *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, 
 			"hashKey":       key,
 		}).Debug("Capturing")
 
-		requestObj := RequestDetails{
+		requestObj := models.RequestDetails{
 			Path:        req.URL.Path,
 			Method:      req.Method,
 			Destination: req.Host,
@@ -536,10 +337,9 @@ func (d *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, 
 			Headers:     req.Header,
 		}
 
-		payload := Payload{
+		payload := models.Payload{
 			Response: responseObj,
 			Request:  requestObj,
-			ID:       key,
 		}
 
 		bts, err := payload.Encode()
@@ -571,7 +371,7 @@ func (d *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, 
 
 // getRequestFingerprint returns request hash
 func (d *Hoverfly) getRequestFingerprint(req *http.Request, requestBody []byte) string {
-	details := RequestDetails{
+	r := models.RequestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
 		Destination: req.Host,
@@ -580,7 +380,6 @@ func (d *Hoverfly) getRequestFingerprint(req *http.Request, requestBody []byte) 
 		Headers:     req.Header,
 	}
 
-	r := RequestContainer{Details: details, Minifier: d.MIN}
 	return r.Hash()
 }
 
@@ -605,7 +404,7 @@ func (d *Hoverfly) getResponse(req *http.Request) *http.Response {
 
 	if err == nil {
 		// getting cache response
-		payload, err := decodePayload(payloadBts)
+		payload, err := models.NewPayloadFromBytes(payloadBts)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
@@ -683,13 +482,13 @@ func (d *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) (
 		return nil, err
 	}
 
-	r := ResponseDetails{
+	r := models.ResponseDetails{
 		Status:  resp.StatusCode,
 		Body:    string(bodyBytes),
 		Headers: resp.Header,
 	}
 
-	payload := Payload{Response: r, Request: rd}
+	payload := models.Payload{Response: r, Request: rd}
 
 	c := NewConstructor(req, payload)
 	// applying middleware to modify response

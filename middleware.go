@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/models"
 )
 
 // Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.
@@ -53,7 +54,7 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 }
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
-func ExecuteMiddleware(middlewares string, payload Payload) (Payload, error) {
+func ExecuteMiddleware(middlewares string, payload models.Payload) (models.Payload, error) {
 
 	mws := strings.Split(middlewares, "|")
 	var cmdList []*exec.Cmd
@@ -112,7 +113,7 @@ func ExecuteMiddleware(middlewares string, payload Payload) (Payload, error) {
 	}
 
 	if len(mwOutput) > 0 {
-		var newPayload Payload
+		var newPayload models.Payload
 
 		err = json.Unmarshal(mwOutput, &newPayload)
 

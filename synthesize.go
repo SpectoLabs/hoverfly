@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/models"
 )
 
 // SynthesizeResponse calls middleware to populate response data, nothing gets pass proxy
@@ -33,7 +34,7 @@ func SynthesizeResponse(req *http.Request, middleware string) (*http.Response, e
 
 	bodyStr = string(requestBody)
 
-	request := RequestDetails{
+	request := models.RequestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
 		Destination: req.Host,
@@ -42,7 +43,7 @@ func SynthesizeResponse(req *http.Request, middleware string) (*http.Response, e
 		RemoteAddr:  req.RemoteAddr,
 		Headers:     req.Header,
 	}
-	payload := Payload{Request: request}
+	payload := models.Payload{Request: request}
 
 	log.WithFields(log.Fields{
 		"middleware":  middleware,

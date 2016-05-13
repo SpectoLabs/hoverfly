@@ -8,6 +8,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/cache"
 	. "github.com/onsi/gomega"
 	"encoding/base64"
+	"github.com/SpectoLabs/hoverfly/models"
 )
 
 func TestIsURLHTTP(t *testing.T) {
@@ -136,84 +137,95 @@ func TestImportFromURLMalformedJSON(t *testing.T) {
 
 func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 	cache := cache.NewInMemoryCache()
-	hv := Hoverfly{RequestCache: cache, MIN: GetNewMinifiers()}
+	hv := Hoverfly{RequestCache: cache}
 
 	RegisterTestingT(t)
 
-	originalPayload := SerializablePayload{
-		Response: SerializableResponseDetails{
+	originalPayload := models.PayloadView{
+		Response: models.ResponseDetailsView{
 			Status: 200,
 			Body: "hello_world",
 			EncodedBody: false,
-			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
-		Request:  RequestDetails{
+			Headers: map[string][]string{"Content-Type": []string {"text/plain"}}},
+		Request:  models.RequestDetailsView{
 			Path: "/",
 			Method: "GET",
 			Destination: "/",
 			Scheme: "scheme",
 			Query: "", Body: "",
 			RemoteAddr: "localhost",
-			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
-		ID: "9b114df98da7f7e2afdc975883dab4f2"}
+			Headers: map[string][]string{"Content-Type": []string {"text/plain"}}}}
 
-	hv.ImportPayloads([]SerializablePayload{originalPayload})
+	hv.ImportPayloads([]models.PayloadView{originalPayload})
 
-	value, err := cache.Get([]byte(originalPayload.ID))
-	Expect(err).To(BeNil())
-	decodedPayload, err := decodePayload(value)
-	Expect(err).To(BeNil())
-	Expect(*decodedPayload).To(Equal(originalPayload.ConvertToPayload()))
+	value, _ := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
+	decodedPayload, _ := models.NewPayloadFromBytes(value)
+	Expect(*decodedPayload).To(Equal(models.Payload{
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body: "hello_world",
+			Headers: map[string][]string{"Content-Type": []string {"text/plain"}},
+		},
+		Request:  models.RequestDetails{
+			Path: "/",
+			Method: "GET",
+			Destination: "/",
+			Scheme: "scheme",
+			Query: "", Body: "",
+			RemoteAddr: "localhost",
+			Headers: map[string][]string{"Content-Type": []string {"text/plain"}},
+		},
+	}))
 }
 
 func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 	cache := cache.NewInMemoryCache()
-	hv := Hoverfly{RequestCache: cache, MIN: GetNewMinifiers()}
+	hv := Hoverfly{RequestCache: cache}
 
 	RegisterTestingT(t)
 
-	originalPayload1 := SerializablePayload{
-		Response: SerializableResponseDetails{
+	originalPayload1 := models.PayloadView{
+		Response: models.ResponseDetailsView{
 			Status: 200,
 			Body: "hello_world",
 			EncodedBody: false,
-			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
-		Request:  RequestDetails{
+			Headers: map[string][]string{"Hoverfly": []string {"testing"}},
+		},
+		Request:  models.RequestDetailsView{
 			Path: "/",
 			Method: "GET",
 			Destination: "/",
 			Scheme: "scheme",
 			Query: "", Body: "",
 			RemoteAddr: "localhost",
-			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
-		ID: "9b114df98da7f7e2afdc975883dab4f2"}
+			Headers: map[string][]string{"Hoverfly": []string {"testing"}},
+		},
+	}
 
 	originalPayload2 := originalPayload1
 
-	originalPayload2.ID = "9c03e4af1f30542ff079a712bddad602"
 	originalPayload2.Request.Path = "/new/path"
 
 	originalPayload3 := originalPayload1
 
-	originalPayload3.ID = "fd099332afee48101edb7441b098cd4a"
 	originalPayload3.Request.Path = "/newer/path"
 
-	hv.ImportPayloads([]SerializablePayload{originalPayload1, originalPayload2, originalPayload3})
-
-	value, err := cache.Get([]byte(originalPayload1.ID))
+	hv.ImportPayloads([]models.PayloadView{originalPayload1, originalPayload2, originalPayload3})
+	value, err := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	Expect(err).To(BeNil())
-	decodedPayload1, err := decodePayload(value)
+	decodedPayload1, err := models.NewPayloadFromBytes(value)
 	Expect(err).To(BeNil())
 	Expect(*decodedPayload1).To(Equal(originalPayload1.ConvertToPayload()))
 
-	value, err = cache.Get([]byte(originalPayload2.ID))
+	value, err = cache.Get([]byte("9c03e4af1f30542ff079a712bddad602"))
 	Expect(err).To(BeNil())
-	decodedPayload2, err := decodePayload(value)
+	decodedPayload2, err := models.NewPayloadFromBytes(value)
 	Expect(err).To(BeNil())
 	Expect(*decodedPayload2).To(Equal(originalPayload2.ConvertToPayload()))
 
-	value, err = cache.Get([]byte(originalPayload3.ID))
+	value, err = cache.Get([]byte("fd099332afee48101edb7441b098cd4a"))
 	Expect(err).To(BeNil())
-	decodedPayload3, err := decodePayload(value)
+	decodedPayload3, err := models.NewPayloadFromBytes(value)
 	Expect(err).To(BeNil())
 	Expect(*decodedPayload3).To(Equal(originalPayload3.ConvertToPayload()))
 }
@@ -225,34 +237,33 @@ func base64String(s string) (string) {
 
 func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 	cache := cache.NewInMemoryCache()
-	hv := Hoverfly{RequestCache: cache, MIN: GetNewMinifiers()}
+	hv := Hoverfly{RequestCache: cache}
 
 	RegisterTestingT(t)
 
-	encodedPayload := SerializablePayload{
-		Response: SerializableResponseDetails{
+	encodedPayload := models.PayloadView{
+		Response: models.ResponseDetailsView{
 			Status: 200,
 			Body: base64String("hello_world"),
 			EncodedBody: true,
 			Headers: map[string][]string{"Content-Encoding": []string {"gzip"}}},
-		Request:  RequestDetails{
+		Request:  models.RequestDetailsView{
 			Path: "/",
 			Method: "GET",
 			Destination: "/",
 			Scheme: "scheme",
 			Query: "", Body: "",
 			RemoteAddr: "localhost",
-			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
-		ID: "9b114df98da7f7e2afdc975883dab4f2"}
+			Headers: map[string][]string{"Hoverfly": []string {"testing"}}}}
 
 	originalPayload := encodedPayload
 	originalPayload.Response.Body = "hello_world"
 
-	hv.ImportPayloads([]SerializablePayload{encodedPayload})
+	hv.ImportPayloads([]models.PayloadView{encodedPayload})
 
-	value, err := cache.Get([]byte(encodedPayload.ID))
+	value, err := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	Expect(err).To(BeNil())
-	decodedPayload, err := decodePayload(value)
+	decodedPayload, err := models.NewPayloadFromBytes(value)
 	Expect(err).To(BeNil())
 	Expect(*decodedPayload).ToNot(Equal(encodedPayload))
 	Expect(*decodedPayload).To(Equal(originalPayload.ConvertToPayload()))
