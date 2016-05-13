@@ -134,6 +134,19 @@ type RequestDetails struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
+func (r *RequestDetails) ConvertToRequestDetailsView() (RequestDetailsView) {
+	return RequestDetailsView{
+		Path: r.Path,
+		Method: r.Method,
+		Destination: r.Destination,
+		Scheme: r.Scheme,
+		Query: r.Query,
+		Body: r.Body,
+		RemoteAddr: r.RemoteAddr,
+		Headers: r.Headers,
+	}
+}
+
 const contentTypeJSON = "application/json"
 const contentTypeXML = "application/xml"
 const otherType = "otherType"
@@ -270,11 +283,34 @@ func decodePayload(data []byte) (*Payload, error) {
 	}
 	return p, nil
 }
+// RequestDetailsView is used when marshalling and unmarshalling RequestDetails
+type RequestDetailsView struct {
+	Path        string              `json:"path"`
+	Method      string              `json:"method"`
+	Destination string              `json:"destination"`
+	Scheme      string              `json:"scheme"`
+	Query       string              `json:"query"`
+	Body        string              `json:"body"`
+	RemoteAddr  string              `json:"remoteAddr"`
+	Headers     map[string][]string `json:"headers"`
+}
+
+func (r *RequestDetailsView) ConvertToRequestDetails() (RequestDetails) {
+	return RequestDetails{
+		Path: r.Path,
+		Method: r.Method,
+		Destination: r.Destination,
+		Scheme: r.Scheme,
+		Query: r.Query,
+		Body: r.Body,
+		RemoteAddr: r.RemoteAddr,
+		Headers: r.Headers,
+	}
+}
 
 // ResponseDetailsView is used when marshalling and
 // unmarshalling requests. This struct's Body may be Base64
 // encoded based on the EncodedBody field.
-
 type ResponseDetailsView struct {
 	Status      int                 `json: "status"`
 	Body        string              `json: "body"`
@@ -282,8 +318,8 @@ type ResponseDetailsView struct {
 	Headers     map[string][]string `json: "headers"`
 }
 
-func (s *ResponseDetailsView) ConvertToResponseDetails() (ResponseDetails) {
-	return ResponseDetails{Status: s.Status, Body: s.Body, Headers: s.Headers}
+func (r *ResponseDetailsView) ConvertToResponseDetails() (ResponseDetails) {
+	return ResponseDetails{Status: r.Status, Body: r.Body, Headers: r.Headers}
 }
 
 // PayloadView is used when marshalling and unmarshalling payloads.
@@ -293,8 +329,8 @@ type PayloadView struct {
 	ID       string              `json: "id"`
 }
 
-func (s *PayloadView) ConvertToPayload() (Payload) {
-	return Payload{Response: s.Response.ConvertToResponseDetails(), Request: s.Request, ID: s.ID}
+func (r *PayloadView) ConvertToPayload() (Payload) {
+	return Payload{Response: r.Response.ConvertToResponseDetails(), Request: r.Request, ID: r.ID}
 }
 
 // Encode method encodes all exported Payload fields to bytes
