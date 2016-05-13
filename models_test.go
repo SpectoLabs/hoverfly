@@ -564,8 +564,7 @@ func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
 
 	Expect(respView.Body).To(Equal(base64EncodedBody))
 }
-
-func TestConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
+func TestPayloadView_ConvertToPayload_WithPlainTextResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	respStatusCode := 200
@@ -586,12 +585,13 @@ func TestConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 	Expect(payloadView.Response.Headers).To(Equal(headers))
 	Expect(payloadView.Response.EncodedBody).To(Equal(false))
 
-	Expect(payloadView.Request).To(Equal(originalReq))
+	Expect(payloadView.Request).ToNot(Equal(originalReq))
+	Expect(payloadView.Request).To(Equal(originalReq.ConvertToRequestDetailsView()))
 
 	Expect(payloadView.ID).To(Equal(payloadId))
 }
 
-func TestConvertToPayloadView_WithGzippedResponse(t *testing.T) {
+func TestPayloadView_ConvertToPayload_WithGzippedResonse(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalBody := "hello_world"
@@ -613,7 +613,8 @@ func TestConvertToPayloadView_WithGzippedResponse(t *testing.T) {
 	Expect(payloadView.Response.Headers).To(Equal(headers))
 	Expect(payloadView.Response.EncodedBody).To(Equal(true))
 
-	Expect(payloadView.Request).To(Equal(originalReq))
+	Expect(payloadView.Request).ToNot(Equal(originalReq))
+	Expect(payloadView.Request).To(Equal(originalReq.ConvertToRequestDetailsView()))
 
 	Expect(payloadView.ID).To(Equal(payloadId))
 

@@ -146,7 +146,7 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 			Body: "hello_world",
 			EncodedBody: false,
 			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
-		Request:  RequestDetails{
+		Request:  RequestDetailsView{
 			Path: "/",
 			Method: "GET",
 			Destination: "/",
@@ -177,7 +177,7 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 			Body: "hello_world",
 			EncodedBody: false,
 			Headers: map[string][]string{"Hoverfly": []string {"testing"}}},
-		Request:  RequestDetails{
+		Request:  RequestDetailsView{
 			Path: "/",
 			Method: "GET",
 			Destination: "/",
@@ -235,7 +235,7 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 			Body: base64String("hello_world"),
 			EncodedBody: true,
 			Headers: map[string][]string{"Content-Encoding": []string {"gzip"}}},
-		Request:  RequestDetails{
+		Request:  RequestDetailsView{
 			Path: "/",
 			Method: "GET",
 			Destination: "/",

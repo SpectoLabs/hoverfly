@@ -269,7 +269,7 @@ func (p *Payload) Encode() ([]byte, error) {
 }
 
 func (p *Payload) ConvertToPayloadView() (*PayloadView) {
-	return &PayloadView{p.Response.ConvertToResponseDetailsView(), p.Request, p.ID}
+	return &PayloadView{p.Response.ConvertToResponseDetailsView(), p.Request.ConvertToRequestDetailsView(), p.ID}
 }
 
 // decodePayload decodes supplied bytes into Payload structure
@@ -325,12 +325,12 @@ func (r *ResponseDetailsView) ConvertToResponseDetails() (ResponseDetails) {
 // PayloadView is used when marshalling and unmarshalling payloads.
 type PayloadView struct {
 	Response ResponseDetailsView `json: "response"`
-	Request  RequestDetails      `json: "request"`
+	Request  RequestDetailsView  `json: "request"`
 	ID       string              `json: "id"`
 }
 
 func (r *PayloadView) ConvertToPayload() (Payload) {
-	return Payload{Response: r.Response.ConvertToResponseDetails(), Request: r.Request, ID: r.ID}
+	return Payload{Response: r.Response.ConvertToResponseDetails(), Request: r.Request.ConvertToRequestDetails(), ID: r.ID}
 }
 
 // Encode method encodes all exported Payload fields to bytes
