@@ -5,19 +5,20 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"github.com/SpectoLabs/hoverfly/models"
 )
 
 func TestReconstructRequest(t *testing.T) {
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	// changing payload so we don't have to call middleware
-	request := RequestDetails{
+	request := models.RequestDetails{
 		Path:        "/random-path",
 		Method:      "POST",
 		Query:       "?foo=bar",
 		Destination: "changed.destination.com",
 	}
-	payload := Payload{Request: request}
+	payload := models.Payload{Request: request}
 
 	c := NewConstructor(req, payload)
 	newRequest, err := c.ReconstructRequest()
@@ -31,7 +32,7 @@ func TestReconstructRequest(t *testing.T) {
 func TestReconstructRequestBodyPayload(t *testing.T) {
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
-	payload := Payload{}
+	payload := models.Payload{}
 	c := NewConstructor(req, payload)
 	c.payload.Request.Method = "OPTIONS"
 	c.payload.Request.Destination = "newdestination"
@@ -54,7 +55,7 @@ func TestReconstructRequestHeadersPayload(t *testing.T) {
 
 	req.Header.Set("Header", "ValueX")
 
-	payload := Payload{}
+	payload := models.Payload{}
 	c := NewConstructor(req, payload)
 	c.payload.Request.Headers = req.Header
 	c.payload.Request.Destination = "destination.com"
@@ -67,7 +68,7 @@ func TestReconstructRequestHeadersPayload(t *testing.T) {
 func TestReconstructResponseHeadersPayload(t *testing.T) {
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
-	payload := Payload{}
+	payload := models.Payload{}
 
 	payload.Response.Status = 201
 	payload.Response.Body = "body here"
@@ -88,7 +89,7 @@ func TestReconstructResponseHeadersPayload(t *testing.T) {
 func TestReconstructionFailure(t *testing.T) {
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
-	payload := Payload{}
+	payload := models.Payload{}
 	c := NewConstructor(req, payload)
 	c.payload.Request.Method = "GET"
 	c.payload.Request.Body = "new request body here"

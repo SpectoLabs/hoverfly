@@ -3,15 +3,16 @@ package hoverfly
 import (
 	"github.com/SpectoLabs/hoverfly/testutil"
 	"testing"
+	"github.com/SpectoLabs/hoverfly/models"
 )
 
 func TestChangeBodyMiddleware(t *testing.T) {
 	command := "./examples/middleware/modify_response/modify_response.py"
 
-	resp := ResponseDetails{Status: 201, Body: "original body"}
-	req := RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
+	resp := models.ResponseDetails{Status: 201, Body: "original body"}
+	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
-	payload := Payload{Response: resp, Request: req}
+	payload := models.Payload{Response: resp, Request: req}
 
 	newPayload, err := ExecuteMiddleware(command, payload)
 
@@ -22,10 +23,10 @@ func TestChangeBodyMiddleware(t *testing.T) {
 func TestMalformedPayloadMiddleware(t *testing.T) {
 	command := "./examples/middleware/ruby_echo/echo.rb"
 
-	resp := ResponseDetails{Status: 201, Body: "original body"}
-	req := RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
+	resp := models.ResponseDetails{Status: 201, Body: "original body"}
+	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
-	payload := Payload{Response: resp, Request: req}
+	payload := models.Payload{Response: resp, Request: req}
 
 	newPayload, err := ExecuteMiddleware(command, payload)
 
@@ -36,10 +37,10 @@ func TestMalformedPayloadMiddleware(t *testing.T) {
 func TestMakeCustom404(t *testing.T) {
 	command := "go run ./examples/middleware/go_example/change_to_custom_404.go"
 
-	resp := ResponseDetails{Status: 201, Body: "original body"}
-	req := RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
+	resp := models.ResponseDetails{Status: 201, Body: "original body"}
+	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
-	payload := Payload{Response: resp, Request: req}
+	payload := models.Payload{Response: resp, Request: req}
 
 	newPayload, err := ExecuteMiddleware(command, payload)
 
@@ -52,9 +53,9 @@ func TestMakeCustom404(t *testing.T) {
 func TestReflectBody(t *testing.T) {
 	command := "./examples/middleware/reflect_body/reflect_body.py"
 
-	req := RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: "", Body: "request_body_here"}
+	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: "", Body: "request_body_here"}
 
-	payload := Payload{Request: req}
+	payload := models.Payload{Request: req}
 
 	newPayload, err := ExecuteMiddleware(command, payload)
 

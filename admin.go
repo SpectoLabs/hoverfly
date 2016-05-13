@@ -25,15 +25,16 @@ import (
 	"github.com/SpectoLabs/hoverfly/authentication"
 	"github.com/SpectoLabs/hoverfly/authentication/controllers"
 	"github.com/SpectoLabs/hoverfly/metrics"
+	"github.com/SpectoLabs/hoverfly/models"
 )
 
 // recordedRequests struct encapsulates payload data
 type recordedRequests struct {
-	Data []PayloadView `json:"data"`
+	Data []models.PayloadView `json:"data"`
 }
 
 type RecordRequestsView struct {
-	Data []PayloadView `json: "data"`
+	Data []models.PayloadView `json:"data"`
 }
 
 type storedMetadata struct {
@@ -225,10 +226,10 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 
 	if err == nil {
 
-		var payloads []PayloadView
+		var payloads []models.PayloadView
 
 		for _, v := range records {
-			if payload, err := decodePayload(v); err == nil {
+			if payload, err := models.NewPayloadFromBytes(v); err == nil {
 				payloadView := payload.ConvertToPayloadView()
 				payloads = append(payloads, *payloadView)
 			} else {
@@ -452,7 +453,7 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 	query := req.PostFormValue("inputQuery")
 	reqBody := req.PostFormValue("inputRequestBody")
 
-	preq := RequestDetails{
+	preq := models.RequestDetails{
 		Destination: destination,
 		Method:      method,
 		Path:        path,
@@ -477,7 +478,7 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 
 	sc, _ := strconv.Atoi(respStatusCode)
 
-	presp := ResponseDetails{
+	presp := models.ResponseDetails{
 		Status:  sc,
 		Headers: headers,
 		Body:    respBody,
@@ -488,9 +489,9 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 		"contentType": contentType,
 	}).Info("manually adding request/response")
 
-	p := Payload{Request: preq, Response: presp}
+	p := models.Payload{Request: preq, Response: presp}
 
-	var pls []PayloadView
+	var pls []models.PayloadView
 
 	pls = append(pls, *p.ConvertToPayloadView())
 

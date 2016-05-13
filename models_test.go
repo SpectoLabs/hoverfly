@@ -8,8 +8,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
-	. "github.com/onsi/gomega"
-	"compress/gzip"
+	"github.com/SpectoLabs/hoverfly/models"
 )
 
 // TestMain prepares database for testing and then performs a cleanup
@@ -61,7 +60,7 @@ func TestRequestBodyCaptured(t *testing.T) {
 	payloadBts, err := dbClient.RequestCache.Get([]byte(fp))
 	testutil.Expect(t, err, nil)
 
-	payload, err := decodePayload(payloadBts)
+	payload, err := models.NewPayloadFromBytes(payloadBts)
 	testutil.Expect(t, err, nil)
 	testutil.Expect(t, payload.Request.Body, "fizz=buzz")
 }
@@ -104,11 +103,11 @@ func TestMatchOnRequestBody(t *testing.T) {
 		request, err := http.NewRequest("POST", "http://capture_body.com", body)
 		testutil.Expect(t, err, nil)
 
-		resp := ResponseDetails{
+		resp := models.ResponseDetails{
 			Status: 200,
 			Body:   fmt.Sprintf("body here, number=%d", i),
 		}
-		payload := Payload{Response: resp}
+		payload := models.Payload{Response: resp}
 
 		// creating response
 		c := NewConstructor(request, payload)
@@ -207,17 +206,17 @@ func TestDeleteAllRecords(t *testing.T) {
 }
 
 func TestPayloadEncodeDecode(t *testing.T) {
-	resp := ResponseDetails{
+	resp := models.ResponseDetails{
 		Status: 200,
 		Body:   "body here",
 	}
 
-	payload := Payload{Response: resp}
+	payload := models.Payload{Response: resp}
 
 	bts, err := payload.Encode()
 	testutil.Expect(t, err, nil)
 
-	pl, err := decodePayload(bts)
+	pl, err := models.NewPayloadFromBytes(bts)
 	testutil.Expect(t, err, nil)
 	testutil.Expect(t, pl.Response.Body, resp.Body)
 	testutil.Expect(t, pl.Response.Status, resp.Status)
@@ -225,18 +224,18 @@ func TestPayloadEncodeDecode(t *testing.T) {
 }
 
 func TestPayloadEncodeEmpty(t *testing.T) {
-	payload := Payload{}
+	payload := models.Payload{}
 
 	bts, err := payload.Encode()
 	testutil.Expect(t, err, nil)
 
-	_, err = decodePayload(bts)
+	_, err = models.NewPayloadFromBytes(bts)
 	testutil.Expect(t, err, nil)
 }
 
 func TestDecodeRandomBytes(t *testing.T) {
 	bts := []byte("some random stuff here")
-	_, err := decodePayload(bts)
+	_, err := models.NewPayloadFromBytes(bts)
 	testutil.Refute(t, err, nil)
 }
 
@@ -463,212 +462,5 @@ func TestXMLMinifierWOHeader(t *testing.T) {
 	testutil.Refute(t, fpOne, fpTwo)
 }
 
-// Helper function for gzipping strings
-func GzipString(s string) (string) {
-	var b bytes.Buffer
-	gz := gzip.NewWriter(&b)
-	gz.Write([]byte(s))
-	return b.String()
-}
-
-func TestConvertToResponseDetailsView_WithPlainTextResponseDetails(t *testing.T) {
-	RegisterTestingT(t)
-
-	statusCode := 200
-	body := "hello_world"
-	headers := map[string][]string{"test_header": []string{"true"}}
-
-	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers: headers}
-
-	respView := originalResp.ConvertToResponseDetailsView()
-
-	Expect(respView.Status).To(Equal(statusCode))
-	Expect(respView.Headers).To(Equal(headers))
-
-	Expect(respView.EncodedBody).To(Equal(false))
-	Expect(respView.Body).To(Equal(body))
-}
-
-func TestConvertToResponseDetailsView_WithGzipContentEncodedHeader(t *testing.T) {
-	RegisterTestingT(t)
-
-	originalBody := "hello_world"
-
-	statusCode := 200
-	body := GzipString(originalBody)
-	headers := map[string][]string{"Content-Encoding": []string{"gzip"}}
-
-	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers:headers}
-
-	respView := originalResp.ConvertToResponseDetailsView()
-
-	Expect(respView.Status).To(Equal(statusCode))
-	Expect(respView.Headers).To(Equal(headers))
-
-	Expect(respView.EncodedBody).To(Equal(true))
-	Expect(respView.Body).NotTo(Equal(body))
-	Expect(respView.Body).NotTo(Equal(originalBody))
-
-	base64EncodedBody := "H4sIAAAJbogA/w=="
-
-	Expect(respView.Body).To(Equal(base64EncodedBody))
-}
-
-func TestConvertToResponseDetailsView_WithDeflateContentEncodedHeader(t *testing.T) {
-	RegisterTestingT(t)
-
-	originalBody := "this_should_be_encoded_but_its_not_important"
-
-	statusCode := 200
-	headers := map[string][]string{"Content-Encoding": []string{"deflate"}}
-
-	originalResp := ResponseDetails{Status: statusCode, Body: originalBody, Headers:headers}
-
-	respView := originalResp.ConvertToResponseDetailsView()
-
-	Expect(respView.Status).To(Equal(statusCode))
-	Expect(respView.Headers).To(Equal(headers))
-
-	Expect(respView.EncodedBody).To(Equal(true))
-	Expect(respView.Body).NotTo(Equal(originalBody))
-
-	base64EncodedBody := "dGhpc19zaG91bGRfYmVfZW5jb2RlZF9idXRfaXRzX25vdF9pbXBvcnRhbnQ="
-
-	Expect(respView.Body).To(Equal(base64EncodedBody))
-}
-
-func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
-	RegisterTestingT(t)
-
-	pwd, _ := os.Getwd()
-	imageUri := "/testdata/1x1.png"
-
-	file, _ := os.Open(pwd + imageUri)
-	defer file.Close()
-
-	originalImageBytes, _ := ioutil.ReadAll(file)
-	statusCode := 200
-	headers := map[string][]string{}
-
-	originalResp := ResponseDetails{Status: statusCode, Body: string(originalImageBytes), Headers:headers}
-
-	respView := originalResp.ConvertToResponseDetailsView()
-
-	Expect(respView.Status).To(Equal(statusCode))
-	Expect(respView.Headers).To(Equal(headers))
-
-	Expect(respView.EncodedBody).To(Equal(true))
-	Expect(respView.Body).NotTo(Equal(originalImageBytes))
-
-	base64EncodedBody := "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg=="
-
-	Expect(respView.Body).To(Equal(base64EncodedBody))
-}
-func TestPayloadView_ConvertToPayload_WithPlainTextResponse(t *testing.T) {
-	RegisterTestingT(t)
-
-	respStatusCode := 200
-	respBody := "hello_world"
-	headers := map[string][]string{"test_header": []string{"true"}}
-
-	originalResp := ResponseDetails{Status: respStatusCode, Body: respBody, Headers: headers}
-	originalReq := RequestDetails{Path: "/", Method: "GET", Destination: "/", Scheme: "scheme",
-		Query: "", Body: "", RemoteAddr: "localhost", Headers: headers}
-	payloadId := "1"
-
-	originalPayload := Payload{Response: originalResp, Request: originalReq, ID: payloadId}
-
-	payloadView := originalPayload.ConvertToPayloadView()
-
-	Expect(payloadView.Response.Status).To(Equal(respStatusCode))
-	Expect(payloadView.Response.Body).To(Equal(respBody))
-	Expect(payloadView.Response.Headers).To(Equal(headers))
-	Expect(payloadView.Response.EncodedBody).To(Equal(false))
-
-	Expect(payloadView.Request).ToNot(Equal(originalReq))
-	Expect(payloadView.Request).To(Equal(originalReq.ConvertToRequestDetailsView()))
-
-	Expect(payloadView.ID).To(Equal(payloadId))
-}
-
-func TestPayloadView_ConvertToPayload_WithGzippedResonse(t *testing.T) {
-	RegisterTestingT(t)
-
-	originalBody := "hello_world"
-
-	respStatusCode := 200
-	respBody := GzipString(originalBody)
-	headers := map[string][]string{"Content-Encoding": []string{"gzip"}}
-
-	originalResp := ResponseDetails{Status: respStatusCode, Body: respBody, Headers: headers}
-	originalReq := RequestDetails{Path: "/", Method: "GET", Destination: "/", Scheme: "scheme",
-		Query: "", Body: "", RemoteAddr: "localhost", Headers: headers}
-	payloadId := "1"
-
-	originalPayload := Payload{Response: originalResp, Request: originalReq, ID: payloadId}
-
-	payloadView := originalPayload.ConvertToPayloadView()
-
-	Expect(payloadView.Response.Status).To(Equal(respStatusCode))
-	Expect(payloadView.Response.Headers).To(Equal(headers))
-	Expect(payloadView.Response.EncodedBody).To(Equal(true))
-
-	Expect(payloadView.Request).ToNot(Equal(originalReq))
-	Expect(payloadView.Request).To(Equal(originalReq.ConvertToRequestDetailsView()))
-
-	Expect(payloadView.ID).To(Equal(payloadId))
-
-	base64EncodedBody := "H4sIAAAJbogA/w=="
-
-	Expect(payloadView.Response.Body).NotTo(Equal(respBody))
-	Expect(payloadView.Response.Body).NotTo(Equal(originalBody))
-	Expect(payloadView.Response.Body).To(Equal(base64EncodedBody))
-}
-
-func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
-	RegisterTestingT(t)
-
-	requestDetailsView := RequestDetailsView{
-		Path: "/",
-		Method: "GET",
-		Destination: "/",
-		Scheme: "scheme",
-		Query: "", Body: "",
-		RemoteAddr: "localhost",
-		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}}
-
-	requestDetails := requestDetailsView.ConvertToRequestDetails()
-
-	Expect(requestDetails.Path).To(Equal(requestDetailsView.Path))
-	Expect(requestDetails.Method).To(Equal(requestDetailsView.Method))
-	Expect(requestDetails.Destination).To(Equal(requestDetailsView.Destination))
-	Expect(requestDetails.Scheme).To(Equal(requestDetailsView.Scheme))
-	Expect(requestDetails.Query).To(Equal(requestDetailsView.Query))
-	Expect(requestDetails.RemoteAddr).To(Equal(requestDetailsView.RemoteAddr))
-	Expect(requestDetails.Headers).To(Equal(requestDetailsView.Headers))
-}
-
-func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
-	RegisterTestingT(t)
-
-	requestDetails := RequestDetails{
-		Path: "/",
-		Method: "GET",
-		Destination: "/",
-		Scheme: "scheme",
-		Query: "", Body: "",
-		RemoteAddr: "localhost",
-		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}}
-
-	requestDetailsView := requestDetails.ConvertToRequestDetailsView()
-
-	Expect(requestDetailsView.Path).To(Equal(requestDetails.Path))
-	Expect(requestDetailsView.Method).To(Equal(requestDetails.Method))
-	Expect(requestDetailsView.Destination).To(Equal(requestDetails.Destination))
-	Expect(requestDetailsView.Scheme).To(Equal(requestDetails.Scheme))
-	Expect(requestDetailsView.Query).To(Equal(requestDetails.Query))
-	Expect(requestDetailsView.RemoteAddr).To(Equal(requestDetails.RemoteAddr))
-	Expect(requestDetailsView.Headers).To(Equal(requestDetails.Headers))
-}
 
 

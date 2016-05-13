@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"github.com/SpectoLabs/hoverfly/models"
 )
 
 func TestSetKey(t *testing.T) {
@@ -31,19 +32,19 @@ func TestPayloadSetGet(t *testing.T) {
 	defer server.Close()
 
 	key := []byte("keySetGetCache")
-	resp := ResponseDetails{
+	resp := models.ResponseDetails{
 		Status: 200,
 		Body:   "body here",
 	}
 
-	payload := Payload{Response: resp}
+	payload := models.Payload{Response: resp}
 	bts, err := json.Marshal(payload)
 	testutil.Expect(t, err, nil)
 
 	err = dbClient.RequestCache.Set(key, bts)
 	testutil.Expect(t, err, nil)
 
-	var p Payload
+	var p models.Payload
 	payloadBts, err := dbClient.RequestCache.Get(key)
 	err = json.Unmarshal(payloadBts, &p)
 	testutil.Expect(t, err, nil)
@@ -125,7 +126,7 @@ func TestGetMultipleRecords(t *testing.T) {
 	testutil.Expect(t, err, nil)
 
 	for _, value := range values {
-		if payload, err := decodePayload(value); err == nil {
+		if payload, err := models.NewPayloadFromBytes(value); err == nil {
 			testutil.Expect(t, payload.Request.Method, "GET")
 			testutil.Expect(t, payload.Response.Status, 201)
 		} else {
