@@ -11,11 +11,12 @@ import (
 )
 
 var (
-	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
-	simulateCommand = kingpin.Command("simulate", "Set Hoverfly to simulate mode")
-	captureCommand = kingpin.Command("capture", "Set Hoverfly to capture mode")
-	modifyCommand = kingpin.Command("modify", "Set Hoverfly to modify mode")
-	synthesizeCommand = kingpin.Command("synthesize", "Set Hoverfly to synthesize mode")
+	modeCategory = kingpin.Command("mode", "Get Hoverfly's current mode")
+	modeCommand = modeCategory.Command("status", "Get Hoverfly's current mode").Default()
+	simulateCommand = modeCategory.Command("simulate", "Set Hoverfly to simulate mode")
+	captureCommand = modeCategory.Command("capture", "Set Hoverfly to capture mode")
+	modifyCommand = modeCategory.Command("modify", "Set Hoverfly to modify mode")
+	synthesizeCommand = modeCategory.Command("synthesize", "Set Hoverfly to synthesize mode")
 )
 
 type ApiStateResponse struct {
@@ -24,6 +25,7 @@ type ApiStateResponse struct {
 }
 
 func main() {
+	fmt.Println(modeCommand.FullCommand())
 	switch kingpin.Parse() {
 		case modeCommand.FullCommand():
 			modeHandler()
