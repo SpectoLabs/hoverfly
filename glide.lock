@@ -1,0 +1,14 @@
+hash: 7128f2b8efd712d045e171726b1ed3533913ecfb0892ca819404be068320a471
+updated: 2016-05-14T12:05:57.213754484+01:00
+imports:
+- name: github.com/alecthomas/template
+  version: a0175ee3bccc567396460bf5acd36800cb10c49c
+  subpackages:
+  - parse
+- name: github.com/alecthomas/units
+  version: 2efee857e7cfd4f3d0138cc3cbb1b4966962b93a
+- name: github.com/dghubble/sling
+  version: 5765fe1bdc176ae984b074c8a89980d1f16e6dd8
+- name: gopkg.in/alecthomas/kingpin.v2
+  version: 8cccfa8eb2e3183254457fb1749b2667fbc364c7
+devImports: []
