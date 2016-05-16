@@ -116,7 +116,6 @@ func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 			Scheme: "scheme",
 			Query: "",
 			Body: "",
-			RemoteAddr: "localhost",
 			Headers: map[string][]string{"test_header": []string{"true"}}},
 	}
 
@@ -135,7 +134,6 @@ func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 			Scheme: "scheme",
 			Query: "",
 			Body: "",
-			RemoteAddr: "localhost",
 			Headers: map[string][]string{"test_header": []string{"true"}}},
 	}))
 }
@@ -155,7 +153,6 @@ func TestPayload_ConvertToPayloadView_WithGzippedResponse(t *testing.T) {
 			Scheme: "scheme",
 			Query: "",
 			Body: "",
-			RemoteAddr: "localhost",
 			Headers: map[string][]string{"Content-Encoding": []string{"gzip"}},
 		},
 	}
@@ -175,7 +172,6 @@ func TestPayload_ConvertToPayloadView_WithGzippedResponse(t *testing.T) {
 			Scheme: "scheme",
 			Query: "",
 			Body: "",
-			RemoteAddr: "localhost",
 			Headers: map[string][]string{"Content-Encoding": []string{"gzip"}},
 		},
 	}))
@@ -190,7 +186,6 @@ func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 		Destination: "/",
 		Scheme: "scheme",
 		Query: "", Body: "",
-		RemoteAddr: "localhost",
 		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}}
 
 	requestDetails := requestDetailsView.ConvertToRequestDetails()
@@ -200,7 +195,6 @@ func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 	Expect(requestDetails.Destination).To(Equal(requestDetailsView.Destination))
 	Expect(requestDetails.Scheme).To(Equal(requestDetailsView.Scheme))
 	Expect(requestDetails.Query).To(Equal(requestDetailsView.Query))
-	Expect(requestDetails.RemoteAddr).To(Equal(requestDetailsView.RemoteAddr))
 	Expect(requestDetails.Headers).To(Equal(requestDetailsView.Headers))
 }
 
@@ -213,7 +207,6 @@ func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
 		Destination: "/",
 		Scheme: "scheme",
 		Query: "", Body: "",
-		RemoteAddr: "localhost",
 		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}}
 
 	requestDetailsView := requestDetails.ConvertToRequestDetailsView()
@@ -223,7 +216,6 @@ func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
 	Expect(requestDetailsView.Destination).To(Equal(requestDetails.Destination))
 	Expect(requestDetailsView.Scheme).To(Equal(requestDetails.Scheme))
 	Expect(requestDetailsView.Query).To(Equal(requestDetails.Query))
-	Expect(requestDetailsView.RemoteAddr).To(Equal(requestDetails.RemoteAddr))
 	Expect(requestDetailsView.Headers).To(Equal(requestDetails.Headers))
 }
 

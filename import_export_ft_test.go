@@ -45,9 +45,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				SetHoverflyMode(hoverfly.CaptureMode)
 
 				// Make a request to the fake server and proxy through Hoverfly
-				fakeServerRequest := sling.New().Get(fakeServer.URL)
-
-				response := DoRequestThroughProxy(fakeServerRequest)
+				response := CallFakeServerThroughProxy(fakeServer)
 				Expect(response.StatusCode).To(Equal(200))
 
 				// Export the data out of Hoverfly
@@ -63,8 +61,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				SetHoverflyMode(hoverfly.SimulateMode)
 
 				// Make the request to Hoverfly simulate
-				afterImportFakeServerRequest := sling.New().Get(fakeServer.URL)
-				afterImportFakeServerResponse = DoRequestThroughProxy(afterImportFakeServerRequest)
+				afterImportFakeServerResponse = CallFakeServerThroughProxy(fakeServer)
 			})
 
 

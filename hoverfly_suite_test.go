@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"strings"
 	"io"
+	"net/http/httptest"
 )
 
 var (
@@ -30,6 +31,7 @@ var (
 	hoverflyProxyUrl string
 	cfg *hoverfly.Configuration
 	db * bolt.DB
+	requestCache cache.Cache
 )
 
 
@@ -59,7 +61,7 @@ var _ = BeforeSuite(func() {
 	db = cache.GetDB(cfg.DatabasePath)
 
 
-	requestCache := cache.NewBoltDBCache(db, []byte("requestsBucket"))
+	requestCache = cache.NewBoltDBCache(db, []byte("requestsBucket"))
 	metadataCache := cache.NewBoltDBCache(db, []byte("metadataBucket"))
 	tokenCache := cache.NewBoltDBCache(db, []byte(backends.TokenBucketName))
 	userCache := cache.NewBoltDBCache(db, []byte(backends.UserBucketName))
@@ -138,4 +140,8 @@ func ImportHoverflyRecords(payload io.Reader) {
 	req := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(payload)
 	res := DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
+}
+
+func CallFakeServerThroughProxy(server * httptest.Server) *http.Response {
+	return DoRequestThroughProxy(sling.New().Get(server.URL))
 }

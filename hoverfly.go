@@ -101,7 +101,6 @@ func (d *Hoverfly) UpdateProxy() {
 					"path":        r.URL.Path,
 					"query":       r.URL.RawQuery,
 					"method":      r.Method,
-					"remoteAddr":  r.RemoteAddr,
 					"mode":        d.Cfg.GetMode(),
 				}).Debug("got request..")
 				return r, nil

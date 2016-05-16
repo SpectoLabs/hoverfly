@@ -44,7 +44,6 @@
         "scheme": "http",
         "query": "",
         "body": "",
-        "remoteAddr": "[::1]:59730",
         "headers": {
           "Accept": [
             "*/*"
@@ -106,7 +105,6 @@
         "scheme": "http",
         "query": "",
         "body": "",
-        "remoteAddr": "[::1]:59728",
         "headers": {
           "Accept": [
             "*/*"
@@ -168,7 +166,6 @@
         "scheme": "http",
         "query": "",
         "body": "",
-        "remoteAddr": "[::1]:59736",
         "headers": {
           "Accept": [
             "*/*"
@@ -226,7 +223,6 @@
         "scheme": "http",
         "query": "",
         "body": "",
-        "remoteAddr": "[::1]:59732",
         "headers": {
           "Accept": [
             "*/*"
@@ -284,7 +280,6 @@
         "scheme": "http",
         "query": "",
         "body": "",
-        "remoteAddr": "[::1]:59734",
         "headers": {
           "Accept": [
             "*/*"
