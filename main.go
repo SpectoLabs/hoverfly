@@ -115,12 +115,12 @@ func stopHandler(hoverflyDirectory string) {
 	pid, _ := strconv.Atoi(string(pidFileData))
 	hoverflyProcess := os.Process{Pid: pid}
 	err := hoverflyProcess.Kill()
-	if err != nil {
+	if err == nil {
 		fmt.Println("Hoverfly has been killed")
 		os.Remove(hoverflyPidFile)
 	} else {
-		fmt.Println(err.Error())
 		fmt.Println("Failed to kill Hoverfly")
+		fmt.Println(err.Error())
 		fmt.Printf("Pid: %#v", pid)
 	}
 }
