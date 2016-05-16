@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os/exec"
 	"encoding/json"
 	"io/ioutil"
 	"strings"
@@ -17,6 +18,8 @@ var (
 	captureCommand = modeCategory.Command("capture", "Set Hoverfly to capture mode")
 	modifyCommand = modeCategory.Command("modify", "Set Hoverfly to modify mode")
 	synthesizeCommand = modeCategory.Command("synthesize", "Set Hoverfly to synthesize mode")
+
+	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
 )
 
 type ApiStateResponse struct {
@@ -25,7 +28,6 @@ type ApiStateResponse struct {
 }
 
 func main() {
-	fmt.Println(modeCommand.FullCommand())
 	switch kingpin.Parse() {
 		case modeCommand.FullCommand():
 			modeHandler()
@@ -37,6 +39,8 @@ func main() {
 			modifyHandler()
 		case synthesizeCommand.FullCommand():
 			synthesizeHandler()
+		case startCommand.FullCommand():
+			startHandler()
 		
 	}
 }
@@ -68,6 +72,12 @@ func synthesizeHandler() {
 	response := setHoverflyMode("synthesize")
 	defer response.Body.Close()
 	fmt.Println("Hoverfly set to synthesize mode")
+}
+
+func startHandler() {
+	//os.Open("/Users/benjih/Downloads/hoverfly/hoverfly_v0.5.17_OSX_amd64")
+	cmd := exec.Command("/Users/benjih/Downloads/hoverfly/hoverfly_v0.5.17_OSX_amd64")
+	cmd.Start()
 }
 
 func getHoverflyMode() (ApiStateResponse) {
