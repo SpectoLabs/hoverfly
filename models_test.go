@@ -332,7 +332,7 @@ func TestDoRequestWFailedMiddleware(t *testing.T) {
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
 	testutil.Expect(t, err, nil)
 
-	_, err = dbClient.doRequest(req)
+	_, _, err = dbClient.doRequest(req)
 	testutil.Refute(t, err, nil)
 }
 
@@ -348,7 +348,7 @@ func TestDoRequestFailedHTTP(t *testing.T) {
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
 	testutil.Expect(t, err, nil)
 
-	_, err = dbClient.doRequest(req)
+	_, _, err = dbClient.doRequest(req)
 	testutil.Refute(t, err, nil)
 
 }

@@ -12,78 +12,154 @@ import (
 	"fmt"
 	"strings"
 	"net/url"
+	"os"
 )
 
-var _ = Describe("Running Hoverfly in capture mode", func() {
+var _ = Describe("Running Hoverfly in various modes", func() {
 
-	Context("When capturing http traffic", func() {
+	Context("When running in capture mode", func() {
 
+		var fakeServer * httptest.Server
 		var fakeServerUrl * url.URL
 
-		BeforeEach(func() {
-			requestCache.DeleteData()
+		Context("without middleware", func() {
 
-			fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Content-Type", "text/plain")
-				w.Header().Set("Date", "date")
-				w.Write([]byte("Hello world"))
-			}))
+			BeforeEach(func() {
+				requestCache.DeleteData()
+				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "text/plain")
+					w.Header().Set("Date", "date")
+					w.Write([]byte("Hello world"))
+				}))
 
-			fakeServerUrl, _ = url.Parse(fakeServer.URL)
-			SetHoverflyMode(hoverfly.CaptureMode)
-			resp := CallFakeServerThroughProxy(fakeServer)
-			Expect(resp.StatusCode).To(Equal(200))
+				defer fakeServer.Close()
+
+				fakeServerUrl, _ = url.Parse(fakeServer.URL)
+				SetHoverflyMode(hoverfly.CaptureMode)
+				resp := CallFakeServerThroughProxy(fakeServer)
+				Expect(resp.StatusCode).To(Equal(200))
+			})
+
+			It("Should capture the request and response", func() {
+				expectedDestination := strings.Replace(fakeServerUrl.String(), "http://", "", 1)
+
+				recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+				Expect(err).To(BeNil())
+				Expect(recordsJson).To(MatchJSON(fmt.Sprintf(
+					`{
+					  "data": [
+					    {
+					      "response": {
+						"status": 200,
+						"body": "Hello world",
+						"encodedBody": false,
+						"headers": {
+						  "Content-Length": [
+						    "11"
+						  ],
+						  "Content-Type": [
+						    "text/plain"
+						  ],
+						  "Date": [
+						    "date"
+						  ],
+						  "Hoverfly": [
+						    "Was-Here"
+						  ]
+						}
+					      },
+					      "request": {
+						"path": "/",
+						"method": "GET",
+						"destination": "%v",
+						"scheme": "http",
+						"query": "",
+						"body": "",
+						"headers": {
+						  "Accept-Encoding": [
+						    "gzip"
+						  ],
+						  "User-Agent": [
+						    "Go-http-client/1.1"
+						  ]
+						}
+					      }
+					    }
+					  ]
+					}`, expectedDestination)))
+			})
 		})
 
-		It("Should capture the request and response", func() {
-			expectedDestination := strings.Replace(fakeServerUrl.String(), "http://", "", 1)
+		Context("with middleware", func() {
+			BeforeEach(func() {
+				requestCache.DeleteData()
+				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "text/plain")
+					w.Header().Set("Date", "date")
+					w.Write([]byte("Hello world"))
+				}))
 
-			recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
-			Expect(err).To(BeNil())
-			Expect(recordsJson).To(MatchJSON(fmt.Sprintf(
-				`{
-				  "data": [
-				    {
-				      "response": {
-					"status": 200,
-					"body": "Hello world",
-					"encodedBody": false,
-					"headers": {
-					  "Content-Length": [
-					    "11"
-					  ],
-					  "Content-Type": [
-					    "text/plain"
-					  ],
-					  "Date": [
-					    "date"
-					  ],
-					  "Hoverfly": [
-					    "Was-Here"
+				fakeServerUrl, _ = url.Parse(fakeServer.URL)
+				SetHoverflyMode(hoverfly.CaptureMode)
+
+				wd, err := os.Getwd()
+				Expect(err).To(BeNil())
+				hf.Cfg.Middleware = wd + "/testdata/middleware.py"
+			})
+
+			It("Should modify the request but not the response", func() {
+				CallFakeServerThroughProxy(fakeServer)
+				expectedDestination := strings.Replace(fakeServerUrl.String(), "http://", "", 1)
+				recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+				Expect(err).To(BeNil())
+				Expect(recordsJson).To(MatchJSON(fmt.Sprintf(
+					`{
+					  "data": [
+					    {
+					      "response": {
+						"status": 200,
+						"body": "Hello world",
+						"encodedBody": false,
+						"headers": {
+						  "Content-Length": [
+						    "11"
+						  ],
+						  "Content-Type": [
+						    "text/plain"
+						  ],
+						  "Date": [
+						    "date"
+						  ],
+						  "Hoverfly": [
+						    "Was-Here"
+						  ]
+						}
+					      },
+					      "request": {
+						"path": "/",
+						"method": "GET",
+						"destination": "%v",
+						"scheme": "http",
+						"query": "",
+						"body": "CHANGED",
+						"headers": {
+						  "Accept-Encoding": [
+						    "gzip"
+						  ],
+						  "User-Agent": [
+						    "Go-http-client/1.1"
+						  ]
+						}
+					      }
+					    }
 					  ]
-					}
-				      },
-				      "request": {
-					"path": "/",
-					"method": "GET",
-					"destination": "%v",
-					"scheme": "http",
-					"query": "",
-					"body": "",
-					"headers": {
-					  "Accept-Encoding": [
-					    "gzip"
-					  ],
-					  "User-Agent": [
-					    "Go-http-client/1.1"
-					  ]
-					}
-				      }
-				    }
-				  ]
-				}`, expectedDestination)))
+					}`, expectedDestination)))
+			})
+
+			AfterEach(func() {
+				hf.Cfg.Middleware = ""
+				fakeServer.Close()
+			})
 		})
-
-
 	})
 })
