@@ -13,6 +13,8 @@ import (
 	"strings"
 	"net/url"
 	"os"
+	"github.com/SpectoLabs/hoverfly/models"
+	"github.com/dghubble/sling"
 )
 
 var _ = Describe("Running Hoverfly in various modes", func() {
@@ -159,6 +161,81 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			AfterEach(func() {
 				hf.Cfg.Middleware = ""
 				fakeServer.Close()
+			})
+		})
+	})
+
+	Context("When running in simulate mode", func() {
+
+		BeforeEach(func(){
+			SetHoverflyMode(hoverfly.SimulateMode)
+			requestCache.DeleteData()
+			pl1 := models.Payload{
+				Request: models.RequestDetails{
+					Path:"/path1",
+					Method:"GET",
+					Destination:"www.virtual.com",
+					Scheme:"http",
+					Query:"",
+					Body:"",
+					Headers:map[string][]string{"Header": []string{"value1"}},
+				},
+				Response: models.ResponseDetails{
+					Status: 201,
+					Body: "body1",
+					Headers:map[string][]string{"Header": []string{"value1"}},
+				},
+			}
+			encoded, _ := pl1.Encode()
+			requestCache.Set([]byte(pl1.Id()), encoded)
+			pl2 := models.Payload{
+				Request: models.RequestDetails{
+					Path:"/path2",
+					Method:"GET",
+					Destination:"www.virtual.com",
+					Scheme:"http",
+					Query:"",
+					Body:"",
+					Headers:map[string][]string{"Header": []string{"value2"}},
+				},
+				Response: models.ResponseDetails{
+					Status: 202,
+					Body: "body2",
+					Headers:map[string][]string{"Header": []string{"value2"}},
+				},
+			}
+			encoded, _ = pl2.Encode()
+			requestCache.Set([]byte(pl2.Id()), encoded)
+		})
+
+		Context("without middleware", func() {
+			It("should return the cached response", func() {
+				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path1"))
+				Expect(resp.StatusCode).To(Equal(201))
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(string(body)).To(Equal("body1"))
+				Expect(resp.Header).To(HaveKeyWithValue("Header", []string{"value1"}))
+			})
+		})
+
+		Context("with middleware", func() {
+
+			BeforeEach(func() {
+				wd, err := os.Getwd()
+				Expect(err).To(BeNil())
+				hf.Cfg.Middleware = wd + "/testdata/middleware.py"
+			})
+
+			It("should apply middleware to the cached response", func() {
+				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2"))
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(string(body)).To(Equal("CHANGED"))
+			})
+
+			AfterEach(func() {
+				hf.Cfg.Middleware = ""
 			})
 		})
 	})
