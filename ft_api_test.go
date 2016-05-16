@@ -3,9 +3,7 @@ package hoverfly_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	//"compress/gzip"
 	"io/ioutil"
-	//"compress/gzip"
 	"github.com/SpectoLabs/hoverfly/models"
 	"github.com/dghubble/sling"
 )
@@ -54,7 +52,7 @@ var _ = Describe("Interacting with the API", func() {
 
 	Context("GET /api/records", func() {
 
-		It("Should capture the request and response", func() {
+		It("Should retrieve the records", func() {
 			req := sling.New().Get(hoverflyAdminUrl + "/api/records")
 			res := DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
@@ -115,6 +113,16 @@ var _ = Describe("Interacting with the API", func() {
 				    }
 				  ]
 				}`))
+		})
+	})
+
+	Context("DELETE /api/records", func() {
+
+		It("Should delete the records", func() {
+			req := sling.New().Delete(hoverflyAdminUrl + "/api/records")
+			res := DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			Expect(requestCache.RecordsCount()).To(Equal(0))
 		})
 	})
 })
