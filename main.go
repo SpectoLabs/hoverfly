@@ -2,13 +2,17 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"encoding/json"
 	"io/ioutil"
 	"strings"
+	"strconv"
 	"net/http"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/dghubble/sling"
+	"github.com/mitchellh/go-homedir"
 )
 
 var (
@@ -28,6 +32,8 @@ type ApiStateResponse struct {
 }
 
 func main() {
+	hoverflyDirectory := createHomeDirectory()
+
 	switch kingpin.Parse() {
 		case modeCommand.FullCommand():
 			modeHandler()
@@ -40,9 +46,22 @@ func main() {
 		case synthesizeCommand.FullCommand():
 			synthesizeHandler()
 		case startCommand.FullCommand():
-			startHandler()
+			startHandler(hoverflyDirectory)
 		
 	}
+}
+
+func createHomeDirectory() string {
+	homeDirectory, _ := homedir.Dir()
+	hoverflyDirectory := filepath.Join(homeDirectory, "/.hoverfly")
+
+	if _, err := os.Stat(hoverflyDirectory); err != nil {
+    		if os.IsNotExist(err) {
+        		os.Mkdir(hoverflyDirectory, 0777)
+    		}
+	}
+	
+	return hoverflyDirectory
 }
 
 func modeHandler() {
@@ -74,10 +93,17 @@ func synthesizeHandler() {
 	fmt.Println("Hoverfly set to synthesize mode")
 }
 
-func startHandler() {
-	//os.Open("/Users/benjih/Downloads/hoverfly/hoverfly_v0.5.17_OSX_amd64")
-	cmd := exec.Command("/Users/benjih/Downloads/hoverfly/hoverfly_v0.5.17_OSX_amd64")
-	cmd.Start()
+func startHandler(hoverflyDirectory string) {
+	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
+
+	if _, err := os.Stat(hoverflyPidFile); err != nil {
+                if os.IsNotExist(err) {
+			cmd := exec.Command("/Users/benjih/Downloads/hoverfly/hoverfly_v0.5.17_OSX_amd64")
+			cmd.Start()
+			ioutil.WriteFile(hoverflyPidFile, []byte(strconv.Itoa(cmd.Process.Pid)), 0644)
+			fmt.Println("Hoverfly is now running")
+                }
+        }
 }
 
 func getHoverflyMode() (ApiStateResponse) {
