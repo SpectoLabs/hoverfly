@@ -24,6 +24,7 @@ var (
 	synthesizeCommand = modeCategory.Command("synthesize", "Set Hoverfly to synthesize mode")
 
 	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
+	stopCommand = kingpin.Command("stop", "Stop a local instance of Hoverfly")
 )
 
 type ApiStateResponse struct {
@@ -47,6 +48,8 @@ func main() {
 			synthesizeHandler()
 		case startCommand.FullCommand():
 			startHandler(hoverflyDirectory)
+		case stopCommand.FullCommand():
+			stopHandler(hoverflyDirectory)
 		
 	}
 }
@@ -104,6 +107,22 @@ func startHandler(hoverflyDirectory string) {
 			fmt.Println("Hoverfly is now running")
                 }
         }
+}
+
+func stopHandler(hoverflyDirectory string) {
+	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
+	pidFileData, _ := ioutil.ReadFile(hoverflyPidFile)
+	pid, _ := strconv.Atoi(string(pidFileData))
+	hoverflyProcess := os.Process{Pid: pid}
+	err := hoverflyProcess.Kill()
+	if err != nil {
+		fmt.Println("Hoverfly has been killed")
+		os.Remove(hoverflyPidFile)
+	} else {
+		fmt.Println(err.Error())
+		fmt.Println("Failed to kill Hoverfly")
+		fmt.Printf("Pid: %#v", pid)
+	}
 }
 
 func getHoverflyMode() (ApiStateResponse) {
