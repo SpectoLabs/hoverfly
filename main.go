@@ -105,8 +105,10 @@ func startHandler(hoverflyDirectory string) {
 			cmd.Start()
 			ioutil.WriteFile(hoverflyPidFile, []byte(strconv.Itoa(cmd.Process.Pid)), 0644)
 			fmt.Println("Hoverfly is now running")
-                }
-        }
+		}
+        } else {
+		fmt.Println("Hoverfly is already running")
+	}
 }
 
 func stopHandler(hoverflyDirectory string) {
