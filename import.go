@@ -133,7 +133,6 @@ func (d *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
 		for _, payloadView := range payloads {
 
 			// Decode base64 if body is encoded
-
 			if payloadView.Response.EncodedBody {
 				decodedBody, err := base64.StdEncoding.DecodeString(payloadView.Response.Body)
 				if err != nil {
@@ -159,6 +158,7 @@ func (d *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
 					pl.Request.Headers["Content-Type"] = []string{ct}
 				}
 			}
+
 
 			bts, err := pl.Encode()
 			if err != nil {

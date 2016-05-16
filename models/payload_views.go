@@ -34,7 +34,6 @@ type RequestDetailsView struct {
 	Scheme      string              `json:"scheme"`
 	Query       string              `json:"query"`
 	Body        string              `json:"body"`
-	RemoteAddr  string              `json:"remoteAddr"`
 	Headers     map[string][]string `json:"headers"`
 }
 
@@ -46,7 +45,6 @@ func (r *RequestDetailsView) ConvertToRequestDetails() (RequestDetails) {
 		Scheme: r.Scheme,
 		Query: r.Query,
 		Body: r.Body,
-		RemoteAddr: r.RemoteAddr,
 		Headers: r.Headers,
 	}
 }

@@ -101,7 +101,6 @@ func (c *Constructor) ReconstructRequest() (*http.Request, error) {
 	newRequest.Method = c.payload.Request.Method
 	newRequest.URL.Path = c.payload.Request.Path
 	newRequest.URL.RawQuery = c.payload.Request.Query
-	newRequest.RemoteAddr = c.payload.Request.RemoteAddr
 	newRequest.Header = c.payload.Request.Headers
 
 	// overriding original request

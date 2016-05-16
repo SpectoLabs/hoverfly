@@ -153,8 +153,7 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 			Destination: "/",
 			Scheme: "scheme",
 			Query: "", Body: "",
-			RemoteAddr: "localhost",
-			Headers: map[string][]string{"Content-Type": []string {"text/plain"}}}}
+			Headers: map[string][]string{"Hoverfly": []string {"testing"}}}}
 
 	hv.ImportPayloads([]models.PayloadView{originalPayload})
 
@@ -172,8 +171,10 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 			Destination: "/",
 			Scheme: "scheme",
 			Query: "", Body: "",
-			RemoteAddr: "localhost",
-			Headers: map[string][]string{"Content-Type": []string {"text/plain"}},
+			Headers: map[string][]string{
+				"Content-Type": []string {"text/plain; charset=utf-8"},
+				"Hoverfly": []string {"testing"},
+			},
 		},
 	}))
 }
@@ -197,10 +198,7 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 			Destination: "/",
 			Scheme: "scheme",
 			Query: "", Body: "",
-			RemoteAddr: "localhost",
-			Headers: map[string][]string{"Hoverfly": []string {"testing"}},
-		},
-	}
+			Headers: map[string][]string{"Hoverfly": []string {"testing"}}}}
 
 	originalPayload2 := originalPayload1
 
@@ -253,7 +251,6 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 			Destination: "/",
 			Scheme: "scheme",
 			Query: "", Body: "",
-			RemoteAddr: "localhost",
 			Headers: map[string][]string{"Hoverfly": []string {"testing"}}}}
 
 	originalPayload := encodedPayload

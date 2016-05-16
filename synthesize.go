@@ -40,7 +40,6 @@ func SynthesizeResponse(req *http.Request, middleware string) (*http.Response, e
 		Destination: req.Host,
 		Query:       req.URL.RawQuery,
 		Body:        bodyStr,
-		RemoteAddr:  req.RemoteAddr,
 		Headers:     req.Header,
 	}
 	payload := models.Payload{Request: request}

@@ -236,7 +236,6 @@ func getRequestDetails(req *http.Request) (requestObj models.RequestDetails, err
 		Scheme:      req.URL.Scheme,
 		Query:       req.URL.RawQuery,
 		Body:        string(reqBody),
-		RemoteAddr:  req.RemoteAddr,
 		Headers:     req.Header,
 	}
 	return
@@ -333,7 +332,6 @@ func (d *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, 
 			Scheme:      req.URL.Scheme,
 			Query:       req.URL.RawQuery,
 			Body:        string(reqBody),
-			RemoteAddr:  req.RemoteAddr,
 			Headers:     req.Header,
 		}
 
