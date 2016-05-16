@@ -13,6 +13,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/dghubble/sling"
 	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -34,6 +35,14 @@ type ApiStateResponse struct {
 
 func main() {
 	hoverflyDirectory := createHomeDirectory()
+
+	setConfigurationDefaults()
+	viper.SetConfigName("config")
+	viper.AddConfigPath(hoverflyDirectory)
+	err := viper.ReadInConfig()
+	if err != nil {
+		// Not sure what to do here
+	}
 
 	switch kingpin.Parse() {
 		case modeCommand.FullCommand():
@@ -65,6 +74,12 @@ func createHomeDirectory() string {
 	}
 	
 	return hoverflyDirectory
+}
+
+func setConfigurationDefaults() {
+	viper.SetDefault("hoverfly.host", "localhost")
+	viper.SetDefault("hoverfly.admin.port", "8888")
+	viper.SetDefault("hoverfly.proxy.port", "8500")
 }
 
 func modeHandler() {
@@ -134,7 +149,8 @@ func stopHandler(hoverflyDirectory string) {
 }
 
 func getHoverflyMode() (ApiStateResponse) {
-	request, _ := sling.New().Get("http://localhost:8888/api/state").Request()
+	url := fmt.Sprintf("http://%v:%v/api/state", viper.Get("hoverfly.host"), viper.Get("hoverfly.admin.port"))
+	request, _ := sling.New().Get(url).Request()
 	response, _ := http.DefaultClient.Do(request)
 	defer response.Body.Close()
 
@@ -145,7 +161,8 @@ func getHoverflyMode() (ApiStateResponse) {
 }
 
 func setHoverflyMode(mode string) (*http.Response) {
-	request, _ := sling.New().Post("http://localhost:8888/api/state").Body(strings.NewReader(`{"mode":"` + mode + `"}`)).Request()
+	url := fmt.Sprintf("http://%v:%v/api/state", viper.Get("hoverfly.host"), viper.Get("hoverfly.admin.port"))
+	request, _ := sling.New().Post(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`)).Request()
 	response, _ := http.DefaultClient.Do(request)
 	return response
 }
