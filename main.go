@@ -60,6 +60,12 @@ func main() {
 	if err != nil {
 		// Not sure what to do here
 	}
+	hoverfly := Hoverfly{
+		Host: viper.Get("hoverfly.host").(string),
+		AdminPort: viper.Get("hoverfly.admin.port").(string),
+		ProxyPort: viper.Get("hoverfly.proxy.port").(string),
+		httpClient: http.DefaultClient,
+	}
 
 	switch kingpin.Parse() {
 		case modeCommand.FullCommand():
@@ -82,7 +88,7 @@ func main() {
 		case pushCommand.FullCommand():
 			pushHandler(*pushNameArg, cacheDirectory)
 		case wipeCommand.FullCommand():
-			statusCode := wipeHandler()
+			statusCode := hoverfly.WipeDatabase()
 			if statusCode == 200 {
 				fmt.Println("Hoverfly has been wiped")
 			} else {
@@ -287,14 +293,6 @@ func exportHandler(vendor string, name string, cacheDirectory string) {
 
 	ioutil.WriteFile(hoverfileUri, []byte(body), 0644)
 	fmt.Printf("%v/%v exported successfully", vendor, name)
-}
-
-func wipeHandler() int {
-	url := fmt.Sprintf("http://%v:%v/api/records", viper.Get("hoverfly.host"), viper.Get("hoverfly.admin.port"))
-	request, _ := sling.New().Delete(url).Request()
-	response, _ := http.DefaultClient.Do(request)
-	defer response.Body.Close()
-	return response.StatusCode
 }
 
 func buildHoverfileName(vendor string, api string) string {
