@@ -26,6 +26,9 @@ var (
 
 	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
 	stopCommand = kingpin.Command("stop", "Stop a local instance of Hoverfly")
+
+	exportCommand = kingpin.Command("export", "Exports data out of Hoverfly")
+	exportNameArg = exportCommand.Arg("name", "Name of exported simulation").Required().String()
 )
 
 type ApiStateResponse struct {
@@ -59,8 +62,24 @@ func main() {
 			startHandler(hoverflyDirectory)
 		case stopCommand.FullCommand():
 			stopHandler(hoverflyDirectory)
+		case exportCommand.FullCommand():
+			fmt.Println(*exportNameArg)
+
+			vendor, api, version := splitHoverfileName(*exportNameArg)
+			exportHandler(vendor, api, version, hoverflyDirectory)
 		
 	}
+}
+
+func splitHoverfileName(name string) (string, string, string) {
+	s := strings.Split(*exportNameArg, "/", )
+	vendor := s[0]
+	s = strings.Split(s[1], ":")
+	api := s[0]
+	version := s[1]
+
+	return vendor, api, version
+
 }
 
 func createHomeDirectory() string {
@@ -146,6 +165,22 @@ func stopHandler(hoverflyDirectory string) {
 			fmt.Printf("Pid: %#v", pid)
 		}
 	}
+}
+
+func exportHandler(vendor string, api string, version string, hoverflyDirectory string) {
+	url := fmt.Sprintf("http://%v:%v/api/records", viper.Get("hoverfly.host"), viper.Get("hoverfly.admin.port"))
+	request, _ := sling.New().Get(url).Request()
+	response, _ := http.DefaultClient.Do(request)
+	defer response.Body.Close()
+
+	body, _ := ioutil.ReadAll(response.Body)
+
+	exportedFileName := fmt.Sprintf("%v.%v.%v.hfile", vendor, api, version)
+
+	exportedFile := filepath.Join(hoverflyDirectory, exportedFileName)
+
+	ioutil.WriteFile(exportedFile, []byte(body), 0644)
+	fmt.Printf("%v/%v:%v exported successfully")
 }
 
 func getHoverflyMode() (ApiStateResponse) {
