@@ -1,17 +1,17 @@
 package hoverfly_test
 
 import (
-	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
-	"fmt"
-	"io/ioutil"
-	"github.com/SpectoLabs/hoverfly"
 	"compress/gzip"
 	"bytes"
+	"net/http/httptest"
+	"fmt"
+	"github.com/SpectoLabs/hoverfly"
+	"github.com/dghubble/sling"
 	"os"
+	"net/http"
+	"io/ioutil"
 )
 
 // Helper function for gzipping strings

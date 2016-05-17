@@ -5,19 +5,22 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
-	//"compress/gzip"
 	"io/ioutil"
 	"github.com/SpectoLabs/hoverfly"
-	//"compress/gzip"
-	"fmt"
-	"strings"
-	"net/url"
 	"os"
-	"github.com/SpectoLabs/hoverfly/models"
 	"github.com/dghubble/sling"
+	"fmt"
+	"net/url"
+	"github.com/SpectoLabs/hoverfly/models"
+	"strings"
 )
 
 var _ = Describe("Running Hoverfly in various modes", func() {
+
+
+	BeforeEach(func() {
+		requestCache.DeleteData()
+	})
 
 	Context("When running in capture mode", func() {
 
@@ -27,7 +30,6 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 		Context("without middleware", func() {
 
 			BeforeEach(func() {
-				requestCache.DeleteData()
 				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "text/plain")
 					w.Header().Set("Date", "date")
@@ -94,7 +96,6 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 		Context("with middleware", func() {
 			BeforeEach(func() {
-				requestCache.DeleteData()
 				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "text/plain")
 					w.Header().Set("Date", "date")
@@ -143,7 +144,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 						"destination": "%v",
 						"scheme": "http",
 						"query": "",
-						"body": "CHANGED",
+						"body": "CHANGED_REQUEST_BODY",
 						"headers": {
 						  "Accept-Encoding": [
 						    "gzip"
@@ -169,7 +170,6 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 		BeforeEach(func(){
 			SetHoverflyMode(hoverfly.SimulateMode)
-			requestCache.DeleteData()
 			pl1 := models.Payload{
 				Request: models.RequestDetails{
 					Path:"/path1",
@@ -231,7 +231,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2"))
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).To(BeNil())
-				Expect(string(body)).To(Equal("CHANGED"))
+				Expect(string(body)).To(Equal("CHANGED_RESPONSE_BODY"))
 			})
 
 			AfterEach(func() {
@@ -251,14 +251,14 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			BeforeEach(func() {
 				wd, err := os.Getwd()
 				Expect(err).To(BeNil())
-				hf.Cfg.Middleware = wd + "/testdata/middleware_synthesise.py"
+				hf.Cfg.Middleware = wd + "/testdata/middleware.py"
 			})
 
 			It("Should generate responses using middleware", func() {
 				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2"))
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).To(BeNil())
-				Expect(string(body)).To(Equal("GENERATED"))
+				Expect(string(body)).To(Equal("CHANGED_RESPONSE_BODY"))
 			})
 
 			AfterEach(func() {
@@ -273,5 +273,58 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			})
 		})
 
+	})
+
+	Context("When running in modify mode", func() {
+
+		BeforeEach(func() {
+			SetHoverflyMode(hoverfly.ModifyMode)
+		})
+
+		var fakeServer * httptest.Server
+		var requestBody string
+
+		Context("With middleware", func() {
+
+			BeforeEach(func() {
+				wd, err := os.Getwd()
+				Expect(err).To(BeNil())
+				hf.Cfg.Middleware = wd + "/testdata/middleware.py"
+
+				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					body, _ := ioutil.ReadAll(r.Body);
+					requestBody = string(body)
+					fmt.Println(requestBody)
+					w.Header().Set("Content-Type", "text/plain")
+					w.Header().Set("Date", "date")
+					w.Write([]byte("Hello world"))
+				}))
+			})
+
+			It("Should modify the request using middleware", func() {
+				fmt.Println(fakeServer.URL)
+				DoRequestThroughProxy(sling.New().Get(fakeServer.URL))
+				Expect(requestBody).To(Equal("CHANGED_REQUEST_BODY"))
+			})
+
+			It("Should modify the response using middleware", func() {
+				resp := DoRequestThroughProxy(sling.New().Get(fakeServer.URL))
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(string(body)).To(Equal("CHANGED_RESPONSE_BODY"))
+			})
+
+			AfterEach(func() {
+				hf.Cfg.Middleware = ""
+				fakeServer.Close()
+			})
+		})
+
+		Context("Without middleware", func() {
+			It("Should fail to generate responses using middleware", func() {
+				resp := DoRequestThroughProxy(sling.New().Get(fakeServer.URL))
+				Expect(resp.StatusCode).To(Equal(503))
+			})
+		})
 	})
 })

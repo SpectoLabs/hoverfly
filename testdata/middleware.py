@@ -15,8 +15,10 @@ def main():
 
     payload_dict = json.loads(payload)
 
-    payload_dict['request']['body'] = "CHANGED"
-    payload_dict['response']['body'] = "CHANGED"
+    payload_dict['response']['body'] = "CHANGED_RESPONSE_BODY"
+    payload_dict['request']['body'] = "CHANGED_REQUEST_BODY"
+    payload_dict['response']['status'] = 200
+    payload_dict['response']['headers'] = {'Content-Length': ["21"]}
 
     # returning new payload
     print(json.dumps(payload_dict))

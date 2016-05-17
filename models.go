@@ -291,9 +291,13 @@ func (d *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respon
 
 	requestBody, _ := ioutil.ReadAll(request.Body)
 
+	fmt.Println("New request is " + string(requestBody))
+	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
+
 	resp, err := d.HTTP.Do(request)
 
 	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
+
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -531,7 +535,6 @@ func (d *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) (
 	}).Info("request and response modified, returning")
 
 	return newResponse, nil
-
 }
 
 // ActionType - action type can be things such as "RequestCaptured", "GotResponse" - anything
