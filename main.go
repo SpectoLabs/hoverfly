@@ -36,6 +36,9 @@ var (
 	pushCommand = kingpin.Command("push", "Pushes the data to Specto Hub")
 	pushNameArg = pushCommand.Arg("name", "Name of exported simulation").Required().String()
 
+	pullCommand = kingpin.Command("pull", "Pushes the data to Specto Hub")
+	pullNameArg = pullCommand.Arg("name", "Name of imported simulation").Required().String()
+
 	wipeCommand = kingpin.Command("wipe", "Wipe Hoverfly database")
 )
 
@@ -137,6 +140,9 @@ func main() {
 		case pushCommand.FullCommand():
 			pushHandler(*pushNameArg, cacheDirectory, spectoHub)
 
+		case pullCommand.FullCommand():
+			pullHandler(*pullNameArg, cacheDirectory, spectoHub)
+
 		case wipeCommand.FullCommand():
 			err := hoverfly.WipeDatabase()
 			if err == nil {
@@ -206,6 +212,18 @@ func pushHandler(name string, cacheDirectory string, spectoHub SpectoHub) {
 			fmt.Println("Failed to create a new simulation on the Specto Hub")
 		}
 	}
+}
+
+func pullHandler(name string, cacheDirectory string, spectoHub SpectoHub) {
+	vendor, name := splitHoverfileName(name)
+	hoverfileName := buildHoverfileName(vendor, name)
+	hoverfileUri := buildHoverfileUri(hoverfileName, cacheDirectory)
+
+	spectoHubSimulation := SpectoHubSimulation{Vendor: vendor, Api: "build-pipeline", Version: "none", Name: name, Description: "test"}
+
+	simulation := spectoHub.GetSimulation(spectoHubSimulation)
+
+	ioutil.WriteFile(hoverfileUri, []byte(simulation), 0644)
 }
 
 func splitHoverfileName(hoverfileKey string) (string, string) {

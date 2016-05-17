@@ -6,6 +6,7 @@ import (
 	"github.com/dghubble/sling"
 	"net/http"
 	"strings"
+	"io/ioutil"
 )
 
 type SpectoHubSimulation struct {
@@ -50,6 +51,18 @@ func (s *SpectoHub) UploadSimulation(simulation SpectoHubSimulation, body string
 	defer response.Body.Close()
 
 	return response.StatusCode
+}
+
+func (s *SpectoHub) GetSimulation(simulation SpectoHubSimulation) string {
+	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", simulation.Vendor, simulation.Vendor, simulation.Api, simulation.Version, simulation.Name))
+
+	request, _ := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Request()
+	response, _ := http.DefaultClient.Do(request)
+	defer response.Body.Close()
+
+	body, _ := ioutil.ReadAll(response.Body)
+
+	return string(body)
 }
 
 func (s *SpectoHub) buildUrl(endpoint string) string {
