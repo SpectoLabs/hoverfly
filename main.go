@@ -63,17 +63,43 @@ func main() {
 
 	switch kingpin.Parse() {
 		case modeCommand.FullCommand():
-			mode, _ := hoverfly.GetMode()
-			fmt.Println("Hoverfly is set to", mode, "mode")
+			mode, err := hoverfly.GetMode()
+			if err == nil {
+				fmt.Println("Hoverfly is set to", mode, "mode")
+			} else {
+				fmt.Println(err.Error())
+			}
+
 
 		case simulateCommand.FullCommand():
-			simulateHandler()
+			mode, err := hoverfly.SetMode("simulate")
+			if err == nil {
+				fmt.Println("Hoverfly has been set to", mode, "mode")
+			} else {
+				fmt.Println(err.Error())
+			}
+
 		case captureCommand.FullCommand():
-			captureHandler()
+			mode, err := hoverfly.SetMode("capture")
+			if err == nil {
+				fmt.Println("Hoverfly has been set to", mode, "mode")
+			} else {
+				fmt.Println(err.Error())
+			}
 		case modifyCommand.FullCommand():
-			modifyHandler()
+			mode, err := hoverfly.SetMode("modify")
+			if err == nil {
+				fmt.Println("Hoverfly has been set to", mode, "mode")
+			} else {
+				fmt.Println(err.Error())
+			}
 		case synthesizeCommand.FullCommand():
-			synthesizeHandler()
+			mode, err := hoverfly.SetMode("synthesize")
+			if err == nil {
+				fmt.Println("Hoverfly has been set to", mode, "mode")
+			} else {
+				fmt.Println(err.Error())
+			}
 		case startCommand.FullCommand():
 			startHandler(hoverflyDirectory)
 		case stopCommand.FullCommand():
@@ -88,7 +114,7 @@ func main() {
 			if err == nil {
 				fmt.Println("Hoverfly has been wiped")
 			} else {
-				fmt.Println("There was an error wiping Hoverfly")
+				fmt.Println(err.Error())
 			}
 
 
@@ -209,30 +235,6 @@ func setConfigurationDefaults() {
 	viper.SetDefault("hoverfly.proxy.port", "8500")
 }
 
-func simulateHandler() {
-	response := setHoverflyMode("simulate")
-	defer response.Body.Close()
-	fmt.Println("Hoverfly set to simulate mode")
-}
-
-func captureHandler() {
-	response := setHoverflyMode("capture")
-	defer response.Body.Close()
-	fmt.Println("Hoverfly set to capture mode")
-}
-
-func modifyHandler() {
-	response := setHoverflyMode("modify")
-	defer response.Body.Close()
-	fmt.Println("Hoverfly set to modify mode")
-}
-
-func synthesizeHandler() {
-	response := setHoverflyMode("synthesize")
-	defer response.Body.Close()
-	fmt.Println("Hoverfly set to synthesize mode")
-}
-
 func startHandler(hoverflyDirectory string) {
 	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
 
@@ -296,9 +298,3 @@ func buildHoverfileUri(fileName string, baseUri string) string {
 
 
 
-func setHoverflyMode(mode string) (*http.Response) {
-	url := fmt.Sprintf("http://%v:%v/api/state", viper.Get("hoverfly.host"), viper.Get("hoverfly.admin.port"))
-	request, _ := sling.New().Post(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`)).Request()
-	response, _ := http.DefaultClient.Do(request)
-	return response
-}

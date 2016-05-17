@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"errors"
+	"strings"
 )
 
 type ApiStateResponse struct {
@@ -54,6 +55,31 @@ func (h *Hoverfly) GetMode() (string, error) {
 	apiResponse := h.createApiStateResponse(response)
 
 	return apiResponse.Mode, nil
+}
+
+func (h *Hoverfly) SetMode(mode string) (string, error) {
+	fmt.Println(mode)
+	if mode != "simulate" && mode != "capture" && mode != "modify" && mode != "synthesize" {
+		return "", errors.New(mode + " is not a valid mode")
+	}
+
+	url := h.buildUrl("/api/state")
+	request, err := sling.New().Post(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`)).Request()
+
+	if err != nil {
+		return "", err
+	}
+
+	response, err := h.httpClient.Do(request)
+
+	if err != nil {
+		return "", err
+	}
+
+	apiResponse := h.createApiStateResponse(response)
+
+	return apiResponse.Mode, nil
+
 }
 
 func (h *Hoverfly) createApiStateResponse(response *http.Response) ApiStateResponse {
