@@ -47,13 +47,11 @@ func main() {
 	hoverflyDirectory := createHomeDirectory()
 	cacheDirectory := createCacheDirectory(hoverflyDirectory)
 
-	setConfigurationDefaults()
-	viper.SetConfigName("config")
-	viper.AddConfigPath(hoverflyDirectory)
 	err := viper.ReadInConfig()
 	if err != nil {
 		// Not sure what to do here
 	}
+
 	hoverfly := Hoverfly{
 		Host: viper.Get("hoverfly.host").(string),
 		AdminPort: viper.Get("hoverfly.admin.port").(string),
@@ -86,6 +84,7 @@ func main() {
 			} else {
 				fmt.Println(err.Error())
 			}
+
 		case modifyCommand.FullCommand():
 			mode, err := hoverfly.SetMode("modify")
 			if err == nil {
@@ -93,6 +92,7 @@ func main() {
 			} else {
 				fmt.Println(err.Error())
 			}
+
 		case synthesizeCommand.FullCommand():
 			mode, err := hoverfly.SetMode("synthesize")
 			if err == nil {
@@ -100,15 +100,20 @@ func main() {
 			} else {
 				fmt.Println(err.Error())
 			}
+
 		case startCommand.FullCommand():
 			startHandler(hoverflyDirectory)
+
 		case stopCommand.FullCommand():
 			stopHandler(hoverflyDirectory)
+
 		case exportCommand.FullCommand():
 			vendor, name := splitHoverfileName(*exportNameArg)
 			exportHandler(vendor, name, cacheDirectory)
+
 		case pushCommand.FullCommand():
 			pushHandler(*pushNameArg, cacheDirectory)
+		
 		case wipeCommand.FullCommand():
 			err := hoverfly.WipeDatabase()
 			if err == nil {
@@ -121,6 +126,14 @@ func main() {
 
 
 	}
+}
+
+
+func setConfigurationDefaults(hoverflyDirectory string) {
+	viper.AddConfigPath(hoverflyDirectory)
+	viper.SetDefault("hoverfly.host", "localhost")
+	viper.SetDefault("hoverfly.admin.port", "8888")
+	viper.SetDefault("hoverfly.proxy.port", "8500")
 }
 
 func pushHandler(name string, cacheDirectory string) {
@@ -229,11 +242,6 @@ func createCacheDirectory(baseUri string) string {
 	return cacheDirectory
 }
 
-func setConfigurationDefaults() {
-	viper.SetDefault("hoverfly.host", "localhost")
-	viper.SetDefault("hoverfly.admin.port", "8888")
-	viper.SetDefault("hoverfly.proxy.port", "8500")
-}
 
 func startHandler(hoverflyDirectory string) {
 	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
