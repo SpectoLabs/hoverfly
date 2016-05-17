@@ -58,7 +58,6 @@ func (h *Hoverfly) GetMode() (string, error) {
 }
 
 func (h *Hoverfly) SetMode(mode string) (string, error) {
-	fmt.Println(mode)
 	if mode != "simulate" && mode != "capture" && mode != "modify" && mode != "synthesize" {
 		return "", errors.New(mode + " is not a valid mode")
 	}
