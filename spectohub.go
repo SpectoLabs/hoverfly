@@ -44,7 +44,7 @@ func (s *SpectoHub) CreateSimulation(simulation SpectoHubSimulation) int {
 
 func (s *SpectoHub) UploadSimulation(simulation SpectoHubSimulation, body string) int {
 	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", simulation.Vendor, simulation.Vendor, simulation.Api, simulation.Version, simulation.Name))
-	
+
 	request, _ := sling.New().Put(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Body(strings.NewReader(body)).Request()
 	response, _ := http.DefaultClient.Do(request)
 	defer response.Body.Close()

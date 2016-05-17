@@ -29,6 +29,10 @@ var (
 	exportCommand = kingpin.Command("export", "Exports data out of Hoverfly")
 	exportNameArg = exportCommand.Arg("name", "Name of exported simulation").Required().String()
 
+	importCommand = kingpin.Command("import", "Imports data into Hoverfly")
+	importNameArg = importCommand.Arg("name", "Name of imported simulation").Required().String()
+
+
 	pushCommand = kingpin.Command("push", "Pushes the data to Specto Hub")
 	pushNameArg = pushCommand.Arg("name", "Name of exported simulation").Required().String()
 
@@ -111,6 +115,25 @@ func main() {
 			vendor, name := splitHoverfileName(*exportNameArg)
 			exportHandler(vendor, name, cacheDirectory)
 
+		case importCommand.FullCommand():
+			vendor, name := splitHoverfileName(*importNameArg)
+
+			hoverfileName := buildHoverfileName(vendor, name)
+			hoverfileUri := buildHoverfileUri(hoverfileName, cacheDirectory)
+
+			if !fileIsPresent(hoverfileUri) {
+				return
+			}
+
+			hoverfileData, _ := ioutil.ReadFile(hoverfileUri)
+
+			err := hoverfly.ImportSimulation(string(hoverfileData))
+			if err == nil {
+				fmt.Println(vendor + "/" + name + " imported successfully")
+			} else {
+				fmt.Println(err.Error())
+			}
+
 		case pushCommand.FullCommand():
 			pushHandler(*pushNameArg, cacheDirectory, spectoHub)
 
@@ -126,6 +149,14 @@ func main() {
 
 
 	}
+}
+
+func fileIsPresent(fileUri string) bool {
+	if _, err := os.Stat(fileUri); err != nil {
+		return os.IsExist(err)
+	}
+
+	return true
 }
 
 
@@ -272,6 +303,3 @@ func buildHoverfileName(vendor string, api string) string {
 func buildHoverfileUri(fileName string, baseUri string) string {
 	return filepath.Join(baseUri, fileName)
 }
-
-
-

@@ -78,7 +78,23 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 	apiResponse := h.createApiStateResponse(response)
 
 	return apiResponse.Mode, nil
+}
 
+func (h *Hoverfly) ImportSimulation(payload string) error {
+	url := h.buildUrl("/api/records")
+	request, err := sling.New().Post(url).Body(strings.NewReader(payload)).Request()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = h.httpClient.Do(request)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (h *Hoverfly) createApiStateResponse(response *http.Response) ApiStateResponse {
