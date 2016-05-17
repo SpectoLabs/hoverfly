@@ -239,4 +239,39 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			})
 		})
 	})
+
+	Context("When running in synthesise mode", func() {
+
+		BeforeEach(func() {
+			SetHoverflyMode(hoverfly.SynthesizeMode)
+		})
+
+		Context("With middleware", func() {
+
+			BeforeEach(func() {
+				wd, err := os.Getwd()
+				Expect(err).To(BeNil())
+				hf.Cfg.Middleware = wd + "/testdata/middleware_synthesise.py"
+			})
+
+			It("Should generate responses using middleware", func() {
+				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2"))
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(string(body)).To(Equal("GENERATED"))
+			})
+
+			AfterEach(func() {
+				hf.Cfg.Middleware = ""
+			})
+		})
+
+		Context("Without middleware", func() {
+			It("Should fail to generate responses using middleware", func() {
+				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2"))
+				Expect(resp.StatusCode).To(Equal(503))
+			})
+		})
+
+	})
 })
