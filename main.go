@@ -32,6 +32,8 @@ var (
 
 	pushCommand = kingpin.Command("push", "Pushes the data to Specto Hub")
 	pushNameArg = pushCommand.Arg("name", "Name of exported simulation").Required().String()
+
+	wipeCommand = kingpin.Command("wipe", "Wipe Hoverfly database")
 )
 
 type ApiStateResponse struct {
@@ -78,8 +80,14 @@ func main() {
 			vendor, name := splitHoverfileName(*exportNameArg)
 			exportHandler(vendor, name, cacheDirectory)
 		case pushCommand.FullCommand():
-
 			pushHandler(*pushNameArg, cacheDirectory)
+		case wipeCommand.FullCommand():
+			statusCode := wipeHandler()
+			if statusCode == 200 {
+				fmt.Println("Hoverfly has been wiped")
+			} else {
+				fmt.Println("There was an error wiping Hoverfly")
+			}
 
 
 
@@ -279,6 +287,14 @@ func exportHandler(vendor string, name string, cacheDirectory string) {
 
 	ioutil.WriteFile(hoverfileUri, []byte(body), 0644)
 	fmt.Printf("%v/%v:%v exported successfully", vendor, name)
+}
+
+func wipeHandler() int {
+	url := fmt.Sprintf("http://%v:%v/api/records", viper.Get("hoverfly.host"), viper.Get("hoverfly.admin.port"))
+	request, _ := sling.New().Delete(url).Request()
+	response, _ := http.DefaultClient.Do(request)
+	defer response.Body.Close()
+	return response.StatusCode
 }
 
 func buildHoverfileName(vendor string, api string) string {
