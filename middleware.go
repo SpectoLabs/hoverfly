@@ -67,7 +67,7 @@ func ExecuteMiddleware(middlewares string, payload models.Payload) (models.Paylo
 	}
 
 	// getting payload
-	bts, err := json.Marshal(payload)
+	bts, err := json.Marshal(payload.ConvertToPayloadView())
 
 	if log.GetLevel() == log.DebugLevel {
 		log.WithFields(log.Fields{

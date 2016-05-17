@@ -32,6 +32,7 @@ var (
 	cfg *hoverfly.Configuration
 	db * bolt.DB
 	requestCache cache.Cache
+	hf * hoverfly.Hoverfly
 )
 
 
@@ -66,15 +67,15 @@ var _ = BeforeSuite(func() {
 	tokenCache := cache.NewBoltDBCache(db, []byte(backends.TokenBucketName))
 	userCache := cache.NewBoltDBCache(db, []byte(backends.UserBucketName))
 	authBackend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
-	hoverfly := hoverfly.GetNewHoverfly(cfg, requestCache, metadataCache, authBackend)
+	hf = hoverfly.GetNewHoverfly(cfg, requestCache, metadataCache, authBackend)
 
-	err := hoverfly.StartProxy()
+	err := hf.StartProxy()
 
 	if err != nil {
 		panic(err)
 	}
 
-	go hoverfly.StartAdminInterface()
+	go hf.StartAdminInterface()
 
 	os.Setenv("HTTP_PROXY", hoverflyProxyUrl)
 	os.Setenv("HTTPS_PROXY", hoverflyProxyUrl)

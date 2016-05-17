@@ -90,7 +90,8 @@ func (d *Hoverfly) UpdateProxy() {
 	// processing connections
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(d.Cfg.Destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-			return d.processRequest(r)
+			req, resp := d.processRequest(r)
+			return req, resp
 		})
 
 	if d.Cfg.Verbose {
@@ -174,6 +175,7 @@ func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Respo
 		return req, response
 
 	} else if mode == ModifyMode {
+
 		response, err := d.modifyRequestResponse(req, d.Cfg.Middleware)
 
 		if err != nil {

@@ -136,10 +136,21 @@ func (d *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		"mode": "capture",
 	}).Debug("got request body")
 
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
 
 	// forwarding request
-	resp, err := d.doRequest(req)
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
+
+	req, resp, err := d.doRequest(req)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+			"mode":  "capture",
+		}).Error("Got error when reading body after being modified by middleware")
+	}
+
+	reqBody, err = ioutil.ReadAll(req.Body)
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
 
 	if err == nil {
 		respBody, err := extractBody(resp)
@@ -242,7 +253,7 @@ func getRequestDetails(req *http.Request) (requestObj models.RequestDetails, err
 }
 
 // doRequest performs original request and returns response that should be returned to client and error (if there is one)
-func (d *Hoverfly) doRequest(request *http.Request) (*http.Response, error) {
+func (d *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Response, error) {
 
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
@@ -253,7 +264,7 @@ func (d *Hoverfly) doRequest(request *http.Request) (*http.Response, error) {
 
 		rd, err := getRequestDetails(request)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		payload.Request = rd
 
@@ -268,16 +279,25 @@ func (d *Hoverfly) doRequest(request *http.Request) (*http.Response, error) {
 				"method": request.Method,
 				"path":   request.URL.Path,
 			}).Error("could not forward request, middleware failed to modify request.")
-			return nil, err
+			return nil, nil, err
 		}
 
 		request, err = c.ReconstructRequest()
+
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
+	requestBody, _ := ioutil.ReadAll(request.Body)
+
+	fmt.Println("New request is " + string(requestBody))
+	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
+
 	resp, err := d.HTTP.Do(request)
+
+	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
+
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -287,7 +307,7 @@ func (d *Hoverfly) doRequest(request *http.Request) (*http.Response, error) {
 			"method": request.Method,
 			"path":   request.URL.Path,
 		}).Error("could not forward request, failed to do an HTTP request.")
-		return nil, err
+		return nil, nil, err
 	}
 
 	log.WithFields(log.Fields{
@@ -298,7 +318,8 @@ func (d *Hoverfly) doRequest(request *http.Request) (*http.Response, error) {
 	}).Debug("response from external service got successfuly!")
 
 	resp.Header.Set("hoverfly", "Was-Here")
-	return resp, nil
+
+	return request, resp, nil
 
 }
 
@@ -463,7 +484,7 @@ func (d *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) (
 	}
 
 	// modifying request
-	resp, err := d.doRequest(req)
+	req, resp, err := d.doRequest(req)
 
 	if err != nil {
 		return nil, err
@@ -514,7 +535,6 @@ func (d *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) (
 	}).Info("request and response modified, returning")
 
 	return newResponse, nil
-
 }
 
 // ActionType - action type can be things such as "RequestCaptured", "GotResponse" - anything
