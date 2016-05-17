@@ -286,7 +286,7 @@ func exportHandler(vendor string, name string, cacheDirectory string) {
 	hoverfileUri := buildHoverfileUri(hoverfileName, cacheDirectory)
 
 	ioutil.WriteFile(hoverfileUri, []byte(body), 0644)
-	fmt.Printf("%v/%v:%v exported successfully", vendor, name)
+	fmt.Printf("%v/%v exported successfully", vendor, name)
 }
 
 func wipeHandler() int {
