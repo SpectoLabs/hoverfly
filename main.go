@@ -29,15 +29,27 @@ var (
 
 	exportCommand = kingpin.Command("export", "Exports data out of Hoverfly")
 	exportNameArg = exportCommand.Arg("name", "Name of exported simulation").Required().String()
+
+	pushCommand = kingpin.Command("push", "Pushes the data to Specto Hub")
+	pushNameArg = pushCommand.Arg("name", "Name of exported simulation").Required().String()
 )
 
 type ApiStateResponse struct {
-	Mode string        `json:"mode"`
+	Mode        string `json:"mode"`
 	Destination string `json"destination"`
+}
+
+type SpectoHubSimulation struct {
+	Vendor      string `json:"vendor"`
+	Api         string `json:"api"`
+	Version     string `json:"version"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func main() {
 	hoverflyDirectory := createHomeDirectory()
+	cacheDirectory := createCacheDirectory(hoverflyDirectory)
 
 	setConfigurationDefaults()
 	viper.SetConfigName("config")
@@ -63,22 +75,96 @@ func main() {
 		case stopCommand.FullCommand():
 			stopHandler(hoverflyDirectory)
 		case exportCommand.FullCommand():
-			fmt.Println(*exportNameArg)
+			vendor, name := splitHoverfileName(*exportNameArg)
+			exportHandler(vendor, name, cacheDirectory)
+		case pushCommand.FullCommand():
 
-			vendor, api, version := splitHoverfileName(*exportNameArg)
-			exportHandler(vendor, api, version, hoverflyDirectory)
-		
+			pushHandler(*pushNameArg, cacheDirectory)
+
+
+
+
 	}
 }
 
-func splitHoverfileName(name string) (string, string, string) {
-	s := strings.Split(*exportNameArg, "/", )
-	vendor := s[0]
-	s = strings.Split(s[1], ":")
-	api := s[0]
-	version := s[1]
+func pushHandler(name string, cacheDirectory string) {
+	vendor, name := splitHoverfileName(name)
+	hoverfileName := buildHoverfileName(vendor, name)
+	hoverfileUri := buildHoverfileUri(hoverfileName, cacheDirectory)
 
-	return vendor, api, version
+	if _, err := os.Stat(hoverfileUri); err != nil {
+		if os.IsNotExist(err) {
+			fmt.Println("Simulation not found")
+			return
+		}
+	}
+
+	hoverfileData, _ := ioutil.ReadFile(hoverfileUri)
+
+	spectoHubSimulation := SpectoHubSimulation{Vendor: vendor, Api: "build-pipeline", Version: "none", Name: name, Description: "test"}
+	getStatusCode := checkIfSimulationExists(spectoHubSimulation)
+	if getStatusCode == 200 {
+		fmt.Println("Updating Specto Hub")
+
+		putStatusCode := uploadSimulation(spectoHubSimulation, string(hoverfileData))
+		if putStatusCode == 200 {
+			fmt.Println(name, "has been pushed to the Specto Hub")
+		}
+
+	} else {
+		fmt.Println("Creating a new simulation on the Specto Hub")
+
+		postStatusCode := createSimulation(spectoHubSimulation)
+		if postStatusCode == 201 {
+			putStatusCode := uploadSimulation(spectoHubSimulation, string(hoverfileData))
+			if putStatusCode == 200 {
+				fmt.Println(name, "has been pushed to the Specto Hub")
+			}
+		} else {
+			fmt.Println("Failed to create a new simulation on the Specto Hub")
+		}
+	}
+}
+
+func checkIfSimulationExists(simulation SpectoHubSimulation) int {
+	url := fmt.Sprintf("http://%v:%v/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v", viper.Get("specto.hub.host"), viper.Get("specto.hub.port"), simulation.Vendor, simulation.Vendor, simulation.Api, simulation.Version, simulation.Name)
+	authHeaderValue := fmt.Sprintf("Bearer %v", viper.Get("specto.hub.api.key"))
+
+	request, _ := sling.New().Get(url).Add("Authorization", authHeaderValue).Request()
+	response, _ := http.DefaultClient.Do(request)
+	defer response.Body.Close()
+
+	return response.StatusCode
+}
+
+func createSimulation(simulation SpectoHubSimulation) int {
+	postUrl := fmt.Sprintf("http://%v:%v/api/v1/simulations", viper.Get("specto.hub.host"), viper.Get("specto.hub.port"))
+	authHeaderValue := fmt.Sprintf("Bearer %v", viper.Get("specto.hub.api.key"))
+
+	request, _ := sling.New().Post(postUrl).Add("Authorization", authHeaderValue).BodyJSON(simulation).Request()
+	response, _ := http.DefaultClient.Do(request)
+	defer response.Body.Close()
+	return response.StatusCode
+}
+
+func uploadSimulation(simulation SpectoHubSimulation, body string) int {
+	url := fmt.Sprintf("http://%v:%v/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", viper.Get("specto.hub.host"), viper.Get("specto.hub.port"), simulation.Vendor, simulation.Vendor, simulation.Api, simulation.Version, simulation.Name)
+	authHeaderValue := fmt.Sprintf("Bearer %v", viper.Get("specto.hub.api.key"))
+	request, _ := sling.New().Put(url).Add("Authorization", authHeaderValue).Add("Content-Type", "application/json").Body(strings.NewReader(body)).Request()
+	response, _ := http.DefaultClient.Do(request)
+	defer response.Body.Close()
+
+	return response.StatusCode
+}
+
+
+
+func splitHoverfileName(hoverfileKey string) (string, string) {
+	s := strings.Split(hoverfileKey, "/", )
+	vendor := s[0]
+	name := s[1]
+
+	return vendor, name
 
 }
 
@@ -93,6 +179,18 @@ func createHomeDirectory() string {
 	}
 	
 	return hoverflyDirectory
+}
+
+func createCacheDirectory(baseUri string) string {
+	cacheDirectory := filepath.Join(baseUri, "cache/")
+
+	if _, err := os.Stat(cacheDirectory); err != nil {
+		if os.IsNotExist(err) {
+			os.Mkdir(cacheDirectory, 0777)
+		}
+	}
+
+	return cacheDirectory
 }
 
 func setConfigurationDefaults() {
@@ -167,7 +265,7 @@ func stopHandler(hoverflyDirectory string) {
 	}
 }
 
-func exportHandler(vendor string, api string, version string, hoverflyDirectory string) {
+func exportHandler(vendor string, name string, cacheDirectory string) {
 	url := fmt.Sprintf("http://%v:%v/api/records", viper.Get("hoverfly.host"), viper.Get("hoverfly.admin.port"))
 	request, _ := sling.New().Get(url).Request()
 	response, _ := http.DefaultClient.Do(request)
@@ -175,12 +273,20 @@ func exportHandler(vendor string, api string, version string, hoverflyDirectory 
 
 	body, _ := ioutil.ReadAll(response.Body)
 
-	exportedFileName := fmt.Sprintf("%v.%v.%v.hfile", vendor, api, version)
+	hoverfileName := buildHoverfileName(vendor, name)
 
-	exportedFile := filepath.Join(hoverflyDirectory, exportedFileName)
+	hoverfileUri := buildHoverfileUri(hoverfileName, cacheDirectory)
 
-	ioutil.WriteFile(exportedFile, []byte(body), 0644)
-	fmt.Printf("%v/%v:%v exported successfully")
+	ioutil.WriteFile(hoverfileUri, []byte(body), 0644)
+	fmt.Printf("%v/%v:%v exported successfully", vendor, name)
+}
+
+func buildHoverfileName(vendor string, api string) string {
+	return fmt.Sprintf("%v.%v.hfile", vendor, api)
+}
+
+func buildHoverfileUri(fileName string, baseUri string) string {
+	return filepath.Join(baseUri, fileName)
 }
 
 func getHoverflyMode() (ApiStateResponse) {
