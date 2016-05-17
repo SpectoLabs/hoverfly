@@ -35,17 +35,11 @@ var (
 	wipeCommand = kingpin.Command("wipe", "Wipe Hoverfly database")
 )
 
-type SpectoHubSimulation struct {
-	Vendor      string `json:"vendor"`
-	Api         string `json:"api"`
-	Version     string `json:"version"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
 func main() {
 	hoverflyDirectory := createHomeDirectory()
 	cacheDirectory := createCacheDirectory(hoverflyDirectory)
+
+	setConfigurationDefaults(hoverflyDirectory)
 
 	err := viper.ReadInConfig()
 	if err != nil {
@@ -53,10 +47,16 @@ func main() {
 	}
 
 	hoverfly := Hoverfly{
-		Host: viper.Get("hoverfly.host").(string),
-		AdminPort: viper.Get("hoverfly.admin.port").(string),
-		ProxyPort: viper.Get("hoverfly.proxy.port").(string),
+		Host: viper.GetString("hoverfly.host"),
+		AdminPort: viper.GetString("hoverfly.admin.port"),
+		ProxyPort: viper.GetString("hoverfly.proxy.port"),
 		httpClient: http.DefaultClient,
+	}
+
+	spectoHub := SpectoHub{
+		Host: viper.GetString("specto.hub.host"),
+		Port: viper.GetString("specto.hub.port"),
+		ApiKey: viper.GetString("specto.hub.api.key"),
 	}
 
 	switch kingpin.Parse() {
@@ -112,8 +112,8 @@ func main() {
 			exportHandler(vendor, name, cacheDirectory)
 
 		case pushCommand.FullCommand():
-			pushHandler(*pushNameArg, cacheDirectory)
-		
+			pushHandler(*pushNameArg, cacheDirectory, spectoHub)
+
 		case wipeCommand.FullCommand():
 			err := hoverfly.WipeDatabase()
 			if err == nil {
@@ -134,9 +134,11 @@ func setConfigurationDefaults(hoverflyDirectory string) {
 	viper.SetDefault("hoverfly.host", "localhost")
 	viper.SetDefault("hoverfly.admin.port", "8888")
 	viper.SetDefault("hoverfly.proxy.port", "8500")
+	viper.SetDefault("specto.hub.host", "localhost")
+	viper.SetDefault("specto.hub.port", "81")
 }
 
-func pushHandler(name string, cacheDirectory string) {
+func pushHandler(name string, cacheDirectory string, spectoHub SpectoHub) {
 	vendor, name := splitHoverfileName(name)
 	hoverfileName := buildHoverfileName(vendor, name)
 	hoverfileUri := buildHoverfileUri(hoverfileName, cacheDirectory)
@@ -151,11 +153,11 @@ func pushHandler(name string, cacheDirectory string) {
 	hoverfileData, _ := ioutil.ReadFile(hoverfileUri)
 
 	spectoHubSimulation := SpectoHubSimulation{Vendor: vendor, Api: "build-pipeline", Version: "none", Name: name, Description: "test"}
-	getStatusCode := checkIfSimulationExists(spectoHubSimulation)
+	getStatusCode := spectoHub.CheckSimulation(spectoHubSimulation)
 	if getStatusCode == 200 {
 		fmt.Println("Updating Specto Hub")
 
-		putStatusCode := uploadSimulation(spectoHubSimulation, string(hoverfileData))
+		putStatusCode := spectoHub.UploadSimulation(spectoHubSimulation, string(hoverfileData))
 		if putStatusCode == 200 {
 			fmt.Println(name, "has been pushed to the Specto Hub")
 		}
@@ -163,9 +165,9 @@ func pushHandler(name string, cacheDirectory string) {
 	} else {
 		fmt.Println("Creating a new simulation on the Specto Hub")
 
-		postStatusCode := createSimulation(spectoHubSimulation)
+		postStatusCode := spectoHub.CreateSimulation(spectoHubSimulation)
 		if postStatusCode == 201 {
-			putStatusCode := uploadSimulation(spectoHubSimulation, string(hoverfileData))
+			putStatusCode := spectoHub.UploadSimulation(spectoHubSimulation, string(hoverfileData))
 			if putStatusCode == 200 {
 				fmt.Println(name, "has been pushed to the Specto Hub")
 			}
@@ -174,39 +176,6 @@ func pushHandler(name string, cacheDirectory string) {
 		}
 	}
 }
-
-func checkIfSimulationExists(simulation SpectoHubSimulation) int {
-	url := fmt.Sprintf("http://%v:%v/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v", viper.Get("specto.hub.host"), viper.Get("specto.hub.port"), simulation.Vendor, simulation.Vendor, simulation.Api, simulation.Version, simulation.Name)
-	authHeaderValue := fmt.Sprintf("Bearer %v", viper.Get("specto.hub.api.key"))
-
-	request, _ := sling.New().Get(url).Add("Authorization", authHeaderValue).Request()
-	response, _ := http.DefaultClient.Do(request)
-	defer response.Body.Close()
-
-	return response.StatusCode
-}
-
-func createSimulation(simulation SpectoHubSimulation) int {
-	postUrl := fmt.Sprintf("http://%v:%v/api/v1/simulations", viper.Get("specto.hub.host"), viper.Get("specto.hub.port"))
-	authHeaderValue := fmt.Sprintf("Bearer %v", viper.Get("specto.hub.api.key"))
-
-	request, _ := sling.New().Post(postUrl).Add("Authorization", authHeaderValue).BodyJSON(simulation).Request()
-	response, _ := http.DefaultClient.Do(request)
-	defer response.Body.Close()
-	return response.StatusCode
-}
-
-func uploadSimulation(simulation SpectoHubSimulation, body string) int {
-	url := fmt.Sprintf("http://%v:%v/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", viper.Get("specto.hub.host"), viper.Get("specto.hub.port"), simulation.Vendor, simulation.Vendor, simulation.Api, simulation.Version, simulation.Name)
-	authHeaderValue := fmt.Sprintf("Bearer %v", viper.Get("specto.hub.api.key"))
-	request, _ := sling.New().Put(url).Add("Authorization", authHeaderValue).Add("Content-Type", "application/json").Body(strings.NewReader(body)).Request()
-	response, _ := http.DefaultClient.Do(request)
-	defer response.Body.Close()
-
-	return response.StatusCode
-}
-
-
 
 func splitHoverfileName(hoverfileKey string) (string, string) {
 	s := strings.Split(hoverfileKey, "/", )
