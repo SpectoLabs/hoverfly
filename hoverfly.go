@@ -4,7 +4,16 @@ import (
 	"fmt"
 	"github.com/dghubble/sling"
 	"net/http"
+	"io/ioutil"
+	"encoding/json"
+	"errors"
 )
+
+type ApiStateResponse struct {
+	Mode        string `json:"mode"`
+	Destination string `json"destination"`
+}
+
 
 type Hoverfly struct {
 	Host       string
@@ -13,10 +22,51 @@ type Hoverfly struct {
 	httpClient *http.Client
 }
 
-func (h *Hoverfly) WipeDatabase() int {
-	url := fmt.Sprintf("http://%v:%v/api/records", h.Host, h.AdminPort)
+func (h *Hoverfly) WipeDatabase() error {
+	url := h.buildUrl("/api/records")
 	request, _ := sling.New().Delete(url).Request()
 	response, _ := h.httpClient.Do(request)
 	defer response.Body.Close()
-	return response.StatusCode
+
+	if response.StatusCode != 200 {
+		return errors.New("Hoverfly did not wipe the database")
+	}
+
+	return nil
+}
+
+func (h *Hoverfly) GetMode() (string, error) {
+	url := h.buildUrl("/api/state")
+	request, err := sling.New().Get(url).Request()
+
+	if err != nil {
+		return "", err
+	}
+
+	response, err := h.httpClient.Do(request)
+
+	if err != nil {
+		return "", err
+	}
+
+	defer response.Body.Close()
+
+	apiResponse := h.createApiStateResponse(response)
+
+	return apiResponse.Mode, nil
+}
+
+func (h *Hoverfly) createApiStateResponse(response *http.Response) ApiStateResponse {
+	body, _ := ioutil.ReadAll(response.Body)
+	var apiResponse ApiStateResponse
+	json.Unmarshal(body, &apiResponse)
+	return apiResponse
+}
+
+func (h * Hoverfly) buildUrl(endpoint string) string {
+	return fmt.Sprintf("%v%v", h.buildBaseUrl(), endpoint)
+}
+
+func (h * Hoverfly) buildBaseUrl() string {
+	return fmt.Sprintf("http://%v:%v", h.Host, h.AdminPort)
 }

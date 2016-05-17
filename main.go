@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"encoding/json"
 	"io/ioutil"
 	"strings"
 	"strconv"
@@ -36,11 +35,6 @@ var (
 	wipeCommand = kingpin.Command("wipe", "Wipe Hoverfly database")
 )
 
-type ApiStateResponse struct {
-	Mode        string `json:"mode"`
-	Destination string `json"destination"`
-}
-
 type SpectoHubSimulation struct {
 	Vendor      string `json:"vendor"`
 	Api         string `json:"api"`
@@ -69,7 +63,9 @@ func main() {
 
 	switch kingpin.Parse() {
 		case modeCommand.FullCommand():
-			modeHandler()
+			mode, _ := hoverfly.GetMode()
+			fmt.Println("Hoverfly is set to", mode, "mode")
+
 		case simulateCommand.FullCommand():
 			simulateHandler()
 		case captureCommand.FullCommand():
@@ -88,8 +84,8 @@ func main() {
 		case pushCommand.FullCommand():
 			pushHandler(*pushNameArg, cacheDirectory)
 		case wipeCommand.FullCommand():
-			statusCode := hoverfly.WipeDatabase()
-			if statusCode == 200 {
+			err := hoverfly.WipeDatabase()
+			if err == nil {
 				fmt.Println("Hoverfly has been wiped")
 			} else {
 				fmt.Println("There was an error wiping Hoverfly")
@@ -213,11 +209,6 @@ func setConfigurationDefaults() {
 	viper.SetDefault("hoverfly.proxy.port", "8500")
 }
 
-func modeHandler() {
-	response := getHoverflyMode()
-	fmt.Println("Hoverfly is currently set to " + response.Mode + " mode")
-}
-
 func simulateHandler() {
 	response := setHoverflyMode("simulate")
 	defer response.Body.Close()
@@ -303,17 +294,7 @@ func buildHoverfileUri(fileName string, baseUri string) string {
 	return filepath.Join(baseUri, fileName)
 }
 
-func getHoverflyMode() (ApiStateResponse) {
-	url := fmt.Sprintf("http://%v:%v/api/state", viper.Get("hoverfly.host"), viper.Get("hoverfly.admin.port"))
-	request, _ := sling.New().Get(url).Request()
-	response, _ := http.DefaultClient.Do(request)
-	defer response.Body.Close()
 
-	body, _ := ioutil.ReadAll(response.Body)
-	var jsonResponse ApiStateResponse 
-	json.Unmarshal(body, &jsonResponse)
-	return jsonResponse
-}
 
 func setHoverflyMode(mode string) (*http.Response) {
 	url := fmt.Sprintf("http://%v:%v/api/state", viper.Get("hoverfly.host"), viper.Get("hoverfly.admin.port"))
