@@ -74,7 +74,7 @@ func main() {
 				if err == nil {
 					fmt.Println("Hoverfly is set to", mode, "mode")
 				} else {
-					fmt.Println(err.Error())
+					failAndExit(err)
 				}
 
 			} else {
@@ -83,7 +83,7 @@ func main() {
 				if err == nil {
 					fmt.Println("Hoverfly has been set to", mode, "mode")
 				} else {
-					fmt.Println(err.Error())
+					failAndExit(err)
 				}
 
 			}
