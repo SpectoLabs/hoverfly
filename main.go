@@ -124,10 +124,46 @@ func main() {
 			}
 
 		case pushCommand.FullCommand():
-			pushHandler(*pushNameArg, cacheDirectory, spectoHub)
+			data, err := localCache.ReadSimulation(*pushNameArg)
+			if err != nil {
+				failAndExit(err)
+			}
+
+			vendor, name := splitHoverfileName(*pushNameArg)
+			spectoHubSimulation := SpectoHubSimulation{Vendor: vendor, Api: "build-pipeline", Version: "none", Name: name, Description: "test"}
+			getStatusCode := spectoHub.CheckSimulation(spectoHubSimulation)
+			if getStatusCode == 200 {
+				fmt.Println("Updating Specto Hub")
+
+				putStatusCode := spectoHub.UploadSimulation(spectoHubSimulation, string(data))
+				if putStatusCode == 200 {
+					fmt.Println(name, "has been pushed to the Specto Hub")
+				}
+
+			} else {
+				fmt.Println("Creating a new simulation on the Specto Hub")
+
+				postStatusCode := spectoHub.CreateSimulation(spectoHubSimulation)
+				if postStatusCode == 201 {
+					putStatusCode := spectoHub.UploadSimulation(spectoHubSimulation, string(data))
+					if putStatusCode == 200 {
+						fmt.Println(name, "has been pushed to the Specto Hub")
+					}
+				} else {
+					fmt.Println("Failed to create a new simulation on the Specto Hub")
+				}
+			}
 
 		case pullCommand.FullCommand():
-			pullHandler(*pullNameArg, cacheDirectory, spectoHub)
+			vendor, name := splitHoverfileName(*pullNameArg)
+			hoverfileName := buildHoverfileName(vendor, name)
+			hoverfileUri := buildHoverfileUri(cacheDirectory, hoverfileName)
+
+			spectoHubSimulation := SpectoHubSimulation{Vendor: vendor, Api: "build-pipeline", Version: "none", Name: name, Description: "test"}
+
+			simulation := spectoHub.GetSimulation(spectoHubSimulation)
+
+			ioutil.WriteFile(hoverfileUri, []byte(simulation), 0644)
 
 		case wipeCommand.FullCommand():
 			err := hoverfly.WipeDatabase()
@@ -152,55 +188,4 @@ func setConfigurationDefaults(hoverflyDirectory string) {
 	viper.SetDefault("hoverfly.proxy.port", "8500")
 	viper.SetDefault("specto.hub.host", "localhost")
 	viper.SetDefault("specto.hub.port", "81")
-}
-
-func pushHandler(name string, cacheDirectory string, spectoHub SpectoHub) {
-	vendor, name := splitHoverfileName(name)
-	hoverfileName := buildHoverfileName(vendor, name)
-	hoverfileUri := buildHoverfileUri(cacheDirectory, hoverfileName)
-
-	if _, err := os.Stat(hoverfileUri); err != nil {
-		if os.IsNotExist(err) {
-			fmt.Println("Simulation not found")
-			return
-		}
-	}
-
-	hoverfileData, _ := ioutil.ReadFile(hoverfileUri)
-
-	spectoHubSimulation := SpectoHubSimulation{Vendor: vendor, Api: "build-pipeline", Version: "none", Name: name, Description: "test"}
-	getStatusCode := spectoHub.CheckSimulation(spectoHubSimulation)
-	if getStatusCode == 200 {
-		fmt.Println("Updating Specto Hub")
-
-		putStatusCode := spectoHub.UploadSimulation(spectoHubSimulation, string(hoverfileData))
-		if putStatusCode == 200 {
-			fmt.Println(name, "has been pushed to the Specto Hub")
-		}
-
-	} else {
-		fmt.Println("Creating a new simulation on the Specto Hub")
-
-		postStatusCode := spectoHub.CreateSimulation(spectoHubSimulation)
-		if postStatusCode == 201 {
-			putStatusCode := spectoHub.UploadSimulation(spectoHubSimulation, string(hoverfileData))
-			if putStatusCode == 200 {
-				fmt.Println(name, "has been pushed to the Specto Hub")
-			}
-		} else {
-			fmt.Println("Failed to create a new simulation on the Specto Hub")
-		}
-	}
-}
-
-func pullHandler(name string, cacheDirectory string, spectoHub SpectoHub) {
-	vendor, name := splitHoverfileName(name)
-	hoverfileName := buildHoverfileName(vendor, name)
-	hoverfileUri := buildHoverfileUri(cacheDirectory, hoverfileName)
-
-	spectoHubSimulation := SpectoHubSimulation{Vendor: vendor, Api: "build-pipeline", Version: "none", Name: name, Description: "test"}
-
-	simulation := spectoHub.GetSimulation(spectoHubSimulation)
-
-	ioutil.WriteFile(hoverfileUri, []byte(simulation), 0644)
 }
