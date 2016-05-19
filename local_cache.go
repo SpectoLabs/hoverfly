@@ -4,7 +4,22 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"path/filepath"
 	"os"
+	"io/ioutil"
 )
+
+type LocalCache struct {
+	uri string
+}
+
+func (l *LocalCache) PersistSimulation(key string, data []byte) error {
+	vendor, name := splitHoverfileName(key)
+
+	hoverfileName := buildHoverfileName(vendor, name)
+
+	hoverfileUri := buildHoverfileUri(hoverfileName, l.uri)
+
+	return ioutil.WriteFile(hoverfileUri, data, 0644)
+}
 
 func createHomeDirectory() (string, error) {
 	homeDirectory, _ := homedir.Dir()

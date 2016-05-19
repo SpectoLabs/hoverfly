@@ -97,6 +97,29 @@ func (h *Hoverfly) ImportSimulation(payload string) error {
 	return nil
 }
 
+func (h *Hoverfly) ExportSimulation() ([]byte, error) {
+	url := h.buildUrl("/api/records")
+
+	request, err := sling.New().Get(url).Request()
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := h.httpClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
+}
+
 func (h *Hoverfly) createApiStateResponse(response *http.Response) ApiStateResponse {
 	body, _ := ioutil.ReadAll(response.Body)
 	var apiResponse ApiStateResponse

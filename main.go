@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"net/http"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"github.com/dghubble/sling"
 	"github.com/spf13/viper"
 )
 
@@ -47,6 +46,11 @@ func main() {
 	if err != nil {
 		failAndExit(err)
 	}
+
+	localCache := LocalCache{
+		uri: cacheDirectory,
+	}
+
 
 	setConfigurationDefaults(hoverflyDirectory)
 
@@ -96,8 +100,18 @@ func main() {
 			stopHandler(hoverflyDirectory)
 
 		case exportCommand.FullCommand():
-			vendor, name := splitHoverfileName(*exportNameArg)
-			exportHandler(vendor, name, cacheDirectory)
+
+			exportedData, err := hoverfly.ExportSimulation()
+
+			if err != nil {
+				failAndExit(err)
+			}
+
+			if localCache.PersistSimulation(*exportNameArg, exportedData) == nil {
+				fmt.Println(*exportNameArg, "exported successfully")
+			} else {
+				failAndExit(err)
+			}
 
 		case importCommand.FullCommand():
 			vendor, name := splitHoverfileName(*importNameArg)
@@ -131,10 +145,6 @@ func main() {
 			} else {
 				fmt.Println(err.Error())
 			}
-
-
-
-
 	}
 }
 
@@ -256,22 +266,6 @@ func stopHandler(hoverflyDirectory string) {
 			fmt.Printf("Pid: %#v", pid)
 		}
 	}
-}
-
-func exportHandler(vendor string, name string, cacheDirectory string) {
-	url := fmt.Sprintf("http://%v:%v/api/records", viper.Get("hoverfly.host"), viper.Get("hoverfly.admin.port"))
-	request, _ := sling.New().Get(url).Request()
-	response, _ := http.DefaultClient.Do(request)
-	defer response.Body.Close()
-
-	body, _ := ioutil.ReadAll(response.Body)
-
-	hoverfileName := buildHoverfileName(vendor, name)
-
-	hoverfileUri := buildHoverfileUri(hoverfileName, cacheDirectory)
-
-	ioutil.WriteFile(hoverfileUri, []byte(body), 0644)
-	fmt.Printf("%v/%v exported successfully", vendor, name)
 }
 
 func buildHoverfileName(vendor string, api string) string {
