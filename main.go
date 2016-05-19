@@ -55,6 +55,7 @@ func main() {
 
 	err = viper.ReadInConfig()
 	if err != nil {
+		fmt.Println("You are missing a config file")
 	}
 
 	hoverfly := Hoverfly {
@@ -63,7 +64,7 @@ func main() {
 		ProxyPort: viper.GetString("hoverfly.proxy.port"),
 		httpClient: http.DefaultClient,
 	}
-
+	
 	spectoHub := SpectoHub {
 		Host: viper.GetString("specto.hub.host"),
 		Port: viper.GetString("specto.hub.port"),
