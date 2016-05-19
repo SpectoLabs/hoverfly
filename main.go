@@ -21,7 +21,6 @@ var (
 	importCommand = kingpin.Command("import", "Imports data into Hoverfly")
 	importNameArg = importCommand.Arg("name", "Name of imported simulation").Required().String()
 
-
 	pushCommand = kingpin.Command("push", "Pushes the data to Specto Hub")
 	pushNameArg = pushCommand.Arg("name", "Name of exported simulation").Required().String()
 
@@ -128,28 +127,14 @@ func main() {
 				failAndExit(err)
 			}
 
-			_, name := splitHoverfileName(*pushNameArg)
-			getStatusCode := spectoHub.CheckSimulation(*pushNameArg)
-			if getStatusCode == 200 {
-				fmt.Println("Updating Specto Hub")
 
-				putStatusCode := spectoHub.UploadSimulation(*pushNameArg, data)
-				if putStatusCode == 200 {
-					fmt.Println(name, "has been pushed to the Specto Hub")
-				}
+			statusCode, err := spectoHub.UploadSimulation(*pushNameArg, data)
+			if err != nil {
+				failAndExit(err)
+			}
 
-			} else {
-				fmt.Println("Creating a new simulation on the Specto Hub")
-
-				postStatusCode := spectoHub.CreateSimulation(*pushNameArg)
-				if postStatusCode == 201 {
-					putStatusCode := spectoHub.UploadSimulation(*pushNameArg, data)
-					if putStatusCode == 200 {
-						fmt.Println(name, "has been pushed to the Specto Hub")
-					}
-				} else {
-					fmt.Println("Failed to create a new simulation on the Specto Hub")
-				}
+			if statusCode == 200 {
+				fmt.Println(*pushNameArg, "has been pushed to the Specto Hub")
 			}
 
 		case pullCommand.FullCommand():
