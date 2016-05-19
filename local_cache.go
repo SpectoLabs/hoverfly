@@ -14,7 +14,7 @@ type LocalCache struct {
 	uri string
 }
 
-func (l *LocalCache) PersistSimulation(key string, data []byte) error {
+func (l *LocalCache) WriteSimulation(key string, data []byte) error {
 	vendor, name := splitHoverfileName(key)
 
 	hoverfileName := buildHoverfileName(vendor, name)

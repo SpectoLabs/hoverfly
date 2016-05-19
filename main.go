@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"io/ioutil"
 	"net/http"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/spf13/viper"
@@ -104,7 +103,7 @@ func main() {
 				failAndExit(err)
 			}
 
-			if err = localCache.PersistSimulation(*exportNameArg, exportedData); err == nil {
+			if err = localCache.WriteSimulation(*exportNameArg, exportedData); err == nil {
 				fmt.Println(*exportNameArg, "exported successfully")
 			} else {
 				failAndExit(err)
@@ -155,22 +154,20 @@ func main() {
 			}
 
 		case pullCommand.FullCommand():
-			vendor, name := splitHoverfileName(*pullNameArg)
-			hoverfileName := buildHoverfileName(vendor, name)
-			hoverfileUri := buildHoverfileUri(cacheDirectory, hoverfileName)
 
-			spectoHubSimulation := SpectoHubSimulation{Vendor: vendor, Api: "build-pipeline", Version: "none", Name: name, Description: "test"}
+			simulation := spectoHub.GetSimulation(*pullNameArg)
 
-			simulation := spectoHub.GetSimulation(spectoHubSimulation)
-
-			ioutil.WriteFile(hoverfileUri, []byte(simulation), 0644)
+			if err := localCache.WriteSimulation(*pullNameArg, simulation); err == nil {
+				fmt.Println(*pullNameArg, "has been pulled from the Specto Hub")
+			} else {
+				failAndExit(err)
+			}
 
 		case wipeCommand.FullCommand():
-			err := hoverfly.WipeDatabase()
-			if err == nil {
+			if err := hoverfly.WipeDatabase(); err == nil {
 				fmt.Println("Hoverfly has been wiped")
 			} else {
-				fmt.Println(err.Error())
+				failAndExit(err)
 			}
 	}
 }

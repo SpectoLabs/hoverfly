@@ -16,7 +16,7 @@ import (
 
 type ApiStateResponse struct {
 	Mode        string `json:"mode"`
-	Destination string `json"destination"`
+	Destination string `json:"destination"`
 }
 
 
