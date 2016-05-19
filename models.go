@@ -291,7 +291,6 @@ func (d *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respon
 
 	requestBody, _ := ioutil.ReadAll(request.Body)
 
-	fmt.Println("New request is " + string(requestBody))
 	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
 
 	resp, err := d.HTTP.Do(request)
