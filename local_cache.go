@@ -19,7 +19,7 @@ func (l *LocalCache) PersistSimulation(key string, data []byte) error {
 
 	hoverfileName := buildHoverfileName(vendor, name)
 
-	hoverfileUri := buildHoverfileUri(hoverfileName, l.uri)
+	hoverfileUri := buildHoverfileUri(l.uri, hoverfileName)
 
 	return ioutil.WriteFile(hoverfileUri, data, 0644)
 }
@@ -29,7 +29,7 @@ func (l *LocalCache) ReadSimulation(key string) ([]byte, error) {
 	vendor, name := splitHoverfileName(key)
 
 	hoverfileName := buildHoverfileName(vendor, name)
-	hoverfileUri := buildHoverfileUri(hoverfileName, l.uri)
+	hoverfileUri := buildHoverfileUri(l.uri, hoverfileName)
 
 	if !fileIsPresent(hoverfileUri) {
 		return nil, errors.New("Simulation not found")
@@ -80,6 +80,12 @@ func fileIsPresent(fileUri string) bool {
 func buildHoverfileName(vendor string, api string) string {
 	return fmt.Sprintf("%v.%v.hfile", vendor, api)
 }
+
+func buildHoverfileUri(baseUri string, fileName string) string {
+	return filepath.Join(baseUri, fileName)
+}
+
+
 
 func splitHoverfileName(hoverfileKey string) (string, string) {
 	s := strings.Split(hoverfileKey, "/", )

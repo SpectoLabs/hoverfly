@@ -3,10 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
-	"path/filepath"
 	"io/ioutil"
-	"strconv"
 	"net/http"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/spf13/viper"
@@ -64,7 +61,7 @@ func main() {
 		ProxyPort: viper.GetString("hoverfly.proxy.port"),
 		httpClient: http.DefaultClient,
 	}
-	
+
 	spectoHub := SpectoHub {
 		Host: viper.GetString("specto.hub.host"),
 		Port: viper.GetString("specto.hub.port"),
@@ -160,7 +157,7 @@ func setConfigurationDefaults(hoverflyDirectory string) {
 func pushHandler(name string, cacheDirectory string, spectoHub SpectoHub) {
 	vendor, name := splitHoverfileName(name)
 	hoverfileName := buildHoverfileName(vendor, name)
-	hoverfileUri := buildHoverfileUri(hoverfileName, cacheDirectory)
+	hoverfileUri := buildHoverfileUri(cacheDirectory, hoverfileName)
 
 	if _, err := os.Stat(hoverfileUri); err != nil {
 		if os.IsNotExist(err) {
@@ -199,54 +196,11 @@ func pushHandler(name string, cacheDirectory string, spectoHub SpectoHub) {
 func pullHandler(name string, cacheDirectory string, spectoHub SpectoHub) {
 	vendor, name := splitHoverfileName(name)
 	hoverfileName := buildHoverfileName(vendor, name)
-	hoverfileUri := buildHoverfileUri(hoverfileName, cacheDirectory)
+	hoverfileUri := buildHoverfileUri(cacheDirectory, hoverfileName)
 
 	spectoHubSimulation := SpectoHubSimulation{Vendor: vendor, Api: "build-pipeline", Version: "none", Name: name, Description: "test"}
 
 	simulation := spectoHub.GetSimulation(spectoHubSimulation)
 
 	ioutil.WriteFile(hoverfileUri, []byte(simulation), 0644)
-}
-
-
-
-func startHandler(hoverflyDirectory string) {
-	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
-
-	if _, err := os.Stat(hoverflyPidFile); err != nil {
-                if os.IsNotExist(err) {
-			cmd := exec.Command("/Users/benjih/Downloads/hoverfly/hoverfly_v0.5.17_OSX_amd64")
-			cmd.Start()
-			ioutil.WriteFile(hoverflyPidFile, []byte(strconv.Itoa(cmd.Process.Pid)), 0644)
-			fmt.Println("Hoverfly is now running")
-		}
-        } else {
-		fmt.Println("Hoverfly is already running")
-	}
-}
-
-func stopHandler(hoverflyDirectory string) {
-	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
-	if _, err := os.Stat(hoverflyPidFile); err != nil {
-                if os.IsNotExist(err) {
-			fmt.Println("Hoverfly is not running")
-		}
-	} else {
-		pidFileData, _ := ioutil.ReadFile(hoverflyPidFile)
-		pid, _ := strconv.Atoi(string(pidFileData))
-		hoverflyProcess := os.Process{Pid: pid}
-		err := hoverflyProcess.Kill()
-		if err == nil {
-			fmt.Println("Hoverfly has been killed")
-			os.Remove(hoverflyPidFile)
-		} else {
-			fmt.Println("Failed to kill Hoverfly")
-			fmt.Println(err.Error())
-			fmt.Printf("Pid: %#v", pid)
-		}
-	}
-}
-
-func buildHoverfileUri(fileName string, baseUri string) string {
-	return filepath.Join(baseUri, fileName)
 }

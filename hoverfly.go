@@ -8,6 +8,10 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
+	"strconv"
+	"path/filepath"
+	"os"
+	"os/exec"
 )
 
 type ApiStateResponse struct {
@@ -133,4 +137,41 @@ func (h * Hoverfly) buildUrl(endpoint string) string {
 
 func (h * Hoverfly) buildBaseUrl() string {
 	return fmt.Sprintf("http://%v:%v", h.Host, h.AdminPort)
+}
+
+func startHandler(hoverflyDirectory string) {
+	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
+
+	if _, err := os.Stat(hoverflyPidFile); err != nil {
+		if os.IsNotExist(err) {
+			cmd := exec.Command("/Users/benjih/Downloads/hoverfly/hoverfly_v0.5.17_OSX_amd64")
+			cmd.Start()
+			ioutil.WriteFile(hoverflyPidFile, []byte(strconv.Itoa(cmd.Process.Pid)), 0644)
+			fmt.Println("Hoverfly is now running")
+		}
+	} else {
+		fmt.Println("Hoverfly is already running")
+	}
+}
+
+func stopHandler(hoverflyDirectory string) {
+	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
+	if _, err := os.Stat(hoverflyPidFile); err != nil {
+		if os.IsNotExist(err) {
+			fmt.Println("Hoverfly is not running")
+		}
+	} else {
+		pidFileData, _ := ioutil.ReadFile(hoverflyPidFile)
+		pid, _ := strconv.Atoi(string(pidFileData))
+		hoverflyProcess := os.Process{Pid: pid}
+		err := hoverflyProcess.Kill()
+		if err == nil {
+			fmt.Println("Hoverfly has been killed")
+			os.Remove(hoverflyPidFile)
+		} else {
+			fmt.Println("Failed to kill Hoverfly")
+			fmt.Println(err.Error())
+			fmt.Printf("Pid: %#v", pid)
+		}
+	}
 }
