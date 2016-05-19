@@ -164,7 +164,7 @@ func main() {
 			}
 
 		case wipeCommand.FullCommand():
-			if err := hoverfly.WipeDatabase(); err == nil {
+			if err := hoverfly.Wipe(); err == nil {
 				fmt.Println("Hoverfly has been wiped")
 			} else {
 				failAndExit(err)

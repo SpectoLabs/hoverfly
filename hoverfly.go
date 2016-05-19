@@ -27,7 +27,7 @@ type Hoverfly struct {
 	httpClient *http.Client
 }
 
-func (h *Hoverfly) WipeDatabase() error {
+func (h *Hoverfly) Wipe() error {
 	url := h.buildUrl("/api/records")
 	request, _ := sling.New().Delete(url).Request()
 	response, _ := h.httpClient.Do(request)
