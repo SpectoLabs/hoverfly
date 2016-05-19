@@ -6,7 +6,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"io/ioutil"
-	"strings"
 	"strconv"
 	"net/http"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -107,29 +106,23 @@ func main() {
 				failAndExit(err)
 			}
 
-			if localCache.PersistSimulation(*exportNameArg, exportedData) == nil {
+			if err = localCache.PersistSimulation(*exportNameArg, exportedData); err == nil {
 				fmt.Println(*exportNameArg, "exported successfully")
 			} else {
 				failAndExit(err)
 			}
 
 		case importCommand.FullCommand():
-			vendor, name := splitHoverfileName(*importNameArg)
 
-			hoverfileName := buildHoverfileName(vendor, name)
-			hoverfileUri := buildHoverfileUri(hoverfileName, cacheDirectory)
-
-			if !fileIsPresent(hoverfileUri) {
-				return
+			data, err := localCache.ReadSimulation(*importNameArg)
+			if err != nil {
+				failAndExit(err)
 			}
 
-			hoverfileData, _ := ioutil.ReadFile(hoverfileUri)
-
-			err := hoverfly.ImportSimulation(string(hoverfileData))
-			if err == nil {
-				fmt.Println(vendor + "/" + name + " imported successfully")
+			if err = hoverfly.ImportSimulation(string(data)); err == nil {
+				fmt.Println(*importNameArg, "imported successfully")
 			} else {
-				fmt.Println(err.Error())
+				failAndExit(err)
 			}
 
 		case pushCommand.FullCommand():
@@ -151,14 +144,6 @@ func main() {
 func failAndExit(err error) {
 	fmt.Println(err.Error())
 	os.Exit(1)
-}
-
-func fileIsPresent(fileUri string) bool {
-	if _, err := os.Stat(fileUri); err != nil {
-		return os.IsExist(err)
-	}
-
-	return true
 }
 
 
@@ -222,14 +207,7 @@ func pullHandler(name string, cacheDirectory string, spectoHub SpectoHub) {
 	ioutil.WriteFile(hoverfileUri, []byte(simulation), 0644)
 }
 
-func splitHoverfileName(hoverfileKey string) (string, string) {
-	s := strings.Split(hoverfileKey, "/", )
-	vendor := s[0]
-	name := s[1]
 
-	return vendor, name
-
-}
 
 func startHandler(hoverflyDirectory string) {
 	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
@@ -266,10 +244,6 @@ func stopHandler(hoverflyDirectory string) {
 			fmt.Printf("Pid: %#v", pid)
 		}
 	}
-}
-
-func buildHoverfileName(vendor string, api string) string {
-	return fmt.Sprintf("%v.%v.hfile", vendor, api)
 }
 
 func buildHoverfileUri(fileName string, baseUri string) string {
