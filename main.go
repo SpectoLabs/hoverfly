@@ -16,12 +16,8 @@ import (
 )
 
 var (
-	modeCategory = kingpin.Command("mode", "Get Hoverfly's current mode")
-	modeCommand = modeCategory.Command("status", "Get Hoverfly's current mode").Default()
-	simulateCommand = modeCategory.Command("simulate", "Set Hoverfly to simulate mode")
-	captureCommand = modeCategory.Command("capture", "Set Hoverfly to capture mode")
-	modifyCommand = modeCategory.Command("modify", "Set Hoverfly to modify mode")
-	synthesizeCommand = modeCategory.Command("synthesize", "Set Hoverfly to synthesize mode")
+	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
+	modeNameArg = modeCommand.Arg("name", "Set Hoverfly's mode").String()
 
 	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
 	stopCommand = kingpin.Command("stop", "Stop a local instance of Hoverfly")
@@ -51,6 +47,7 @@ func main() {
 	err := viper.ReadInConfig()
 	if err != nil {
 		// Not sure what to do here
+		fmt.Println("Issue with config")
 	}
 
 	hoverfly := Hoverfly{
@@ -68,44 +65,24 @@ func main() {
 
 	switch kingpin.Parse() {
 		case modeCommand.FullCommand():
-			mode, err := hoverfly.GetMode()
-			if err == nil {
-				fmt.Println("Hoverfly is set to", mode, "mode")
-			} else {
-				fmt.Println(err.Error())
-			}
+			if *modeNameArg == "" || *modeNameArg == "status"{
 
+				mode, err := hoverfly.GetMode()
+				if err == nil {
+					fmt.Println("Hoverfly is set to", mode, "mode")
+				} else {
+					fmt.Println(err.Error())
+				}
 
-		case simulateCommand.FullCommand():
-			mode, err := hoverfly.SetMode("simulate")
-			if err == nil {
-				fmt.Println("Hoverfly has been set to", mode, "mode")
 			} else {
-				fmt.Println(err.Error())
-			}
 
-		case captureCommand.FullCommand():
-			mode, err := hoverfly.SetMode("capture")
-			if err == nil {
-				fmt.Println("Hoverfly has been set to", mode, "mode")
-			} else {
-				fmt.Println(err.Error())
-			}
+				mode, err := hoverfly.SetMode(*modeNameArg)
+				if err == nil {
+					fmt.Println("Hoverfly has been set to", mode, "mode")
+				} else {
+					fmt.Println(err.Error())
+				}
 
-		case modifyCommand.FullCommand():
-			mode, err := hoverfly.SetMode("modify")
-			if err == nil {
-				fmt.Println("Hoverfly has been set to", mode, "mode")
-			} else {
-				fmt.Println(err.Error())
-			}
-
-		case synthesizeCommand.FullCommand():
-			mode, err := hoverfly.SetMode("synthesize")
-			if err == nil {
-				fmt.Println("Hoverfly has been set to", mode, "mode")
-			} else {
-				fmt.Println(err.Error())
 			}
 
 		case startCommand.FullCommand():
