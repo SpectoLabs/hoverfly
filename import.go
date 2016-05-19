@@ -12,7 +12,6 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"net/http"
-	"encoding/base64"
 	"github.com/SpectoLabs/hoverfly/models"
 )
 
@@ -131,16 +130,6 @@ func (d *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
 		success := 0
 		failed := 0
 		for _, payloadView := range payloads {
-
-			// Decode base64 if body is encoded
-			if payloadView.Response.EncodedBody {
-				decodedBody, err := base64.StdEncoding.DecodeString(payloadView.Response.Body)
-				if err != nil {
-					log.Fatal("error:", err)
-				}
-
-				payloadView.Response.Body = string(decodedBody)
-			}
 
 			// Convert PayloadView back to Payload for internal storage
 			pl := payloadView.ConvertToPayload()

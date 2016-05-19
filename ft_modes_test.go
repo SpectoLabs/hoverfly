@@ -3,15 +3,15 @@ package hoverfly_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
 	"io/ioutil"
 	"github.com/SpectoLabs/hoverfly"
 	"os"
 	"github.com/dghubble/sling"
-	"fmt"
+	"net/http/httptest"
 	"net/url"
+	"fmt"
 	"github.com/SpectoLabs/hoverfly/models"
+	"net/http"
 	"strings"
 )
 
@@ -294,7 +294,6 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					body, _ := ioutil.ReadAll(r.Body);
 					requestBody = string(body)
-					fmt.Println(requestBody)
 					w.Header().Set("Content-Type", "text/plain")
 					w.Header().Set("Date", "date")
 					w.Write([]byte("Hello world"))
@@ -325,6 +324,35 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				resp := DoRequestThroughProxy(sling.New().Get(fakeServer.URL))
 				Expect(resp.StatusCode).To(Equal(503))
 			})
+
+			AfterEach(func() {
+				hf.Cfg.Middleware = ""
+				fakeServer.Close()
+			})
+		})
+	})
+
+	Context("Using middleware with binary data", func() {
+
+		var expectedImage []byte
+
+		BeforeEach(func() {
+			SetHoverflyMode(hoverfly.SynthesizeMode)
+			pwd, _ := os.Getwd()
+			expectedFile := "/testdata/1x1.png"
+			expectedImage, _  = ioutil.ReadFile(pwd + expectedFile)
+			hf.Cfg.Middleware = pwd + "/testdata/binary_middleware.py"
+		})
+
+		It("Should render an image correctly after base64 encoding it using middleware", func() {
+			resp := DoRequestThroughProxy(sling.New().Get("http://www.foo.com"))
+			responseBytes, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+			Expect(responseBytes).To(Equal(expectedImage))
+		})
+
+		AfterEach(func() {
+			hf.Cfg.Middleware = ""
 		})
 	})
 })

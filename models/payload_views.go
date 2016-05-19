@@ -3,6 +3,7 @@ package models
 import (
 	"bytes"
 	"encoding/gob"
+	"encoding/base64"
 )
 
 type PayloadViewData struct {
@@ -64,5 +65,12 @@ type ResponseDetailsView struct {
 }
 
 func (r *ResponseDetailsView) ConvertToResponseDetails() (ResponseDetails) {
-	return ResponseDetails{Status: r.Status, Body: r.Body, Headers: r.Headers}
+	body := r.Body
+
+	if r.EncodedBody == true {
+		decoded, _ := base64.StdEncoding.DecodeString(r.Body)
+		body = string(decoded)
+	}
+
+	return ResponseDetails{Status: r.Status, Body: body, Headers: r.Headers}
 }
