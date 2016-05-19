@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/dghubble/sling"
-	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
@@ -39,25 +38,30 @@ var (
 )
 
 func main() {
-	hoverflyDirectory := createHomeDirectory()
-	cacheDirectory := createCacheDirectory(hoverflyDirectory)
+	hoverflyDirectory, err := createHomeDirectory()
+	if err != nil {
+		failAndExit(err)
+	}
+
+	cacheDirectory, err := createCacheDirectory(hoverflyDirectory)
+	if err != nil {
+		failAndExit(err)
+	}
 
 	setConfigurationDefaults(hoverflyDirectory)
 
-	err := viper.ReadInConfig()
+	err = viper.ReadInConfig()
 	if err != nil {
-		// Not sure what to do here
-		fmt.Println("Issue with config")
 	}
 
-	hoverfly := Hoverfly{
+	hoverfly := Hoverfly {
 		Host: viper.GetString("hoverfly.host"),
 		AdminPort: viper.GetString("hoverfly.admin.port"),
 		ProxyPort: viper.GetString("hoverfly.proxy.port"),
 		httpClient: http.DefaultClient,
 	}
 
-	spectoHub := SpectoHub{
+	spectoHub := SpectoHub {
 		Host: viper.GetString("specto.hub.host"),
 		Port: viper.GetString("specto.hub.port"),
 		ApiKey: viper.GetString("specto.hub.api.key"),
@@ -132,6 +136,11 @@ func main() {
 
 
 	}
+}
+
+func failAndExit(err error) {
+	fmt.Println(err.Error())
+	os.Exit(1)
 }
 
 func fileIsPresent(fileUri string) bool {
@@ -211,32 +220,6 @@ func splitHoverfileName(hoverfileKey string) (string, string) {
 	return vendor, name
 
 }
-
-func createHomeDirectory() string {
-	homeDirectory, _ := homedir.Dir()
-	hoverflyDirectory := filepath.Join(homeDirectory, "/.hoverfly")
-
-	if _, err := os.Stat(hoverflyDirectory); err != nil {
-    		if os.IsNotExist(err) {
-        		os.Mkdir(hoverflyDirectory, 0777)
-    		}
-	}
-	
-	return hoverflyDirectory
-}
-
-func createCacheDirectory(baseUri string) string {
-	cacheDirectory := filepath.Join(baseUri, "cache/")
-
-	if _, err := os.Stat(cacheDirectory); err != nil {
-		if os.IsNotExist(err) {
-			os.Mkdir(cacheDirectory, 0777)
-		}
-	}
-
-	return cacheDirectory
-}
-
 
 func startHandler(hoverflyDirectory string) {
 	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
