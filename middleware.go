@@ -113,9 +113,9 @@ func ExecuteMiddleware(middlewares string, payload models.Payload) (models.Paylo
 	}
 
 	if len(mwOutput) > 0 {
-		var newPayload models.Payload
+		var newPayloadView models.PayloadView
 
-		err = json.Unmarshal(mwOutput, &newPayload)
+		err = json.Unmarshal(mwOutput, &newPayloadView)
 
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -131,7 +131,7 @@ func ExecuteMiddleware(middlewares string, payload models.Payload) (models.Paylo
 				}).Debug("payload after modifications")
 			}
 			// payload unmarshalled into Payload struct, returning it
-			return newPayload, nil
+			return newPayloadView.ConvertToPayload(), nil
 		}
 	} else {
 

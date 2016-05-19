@@ -3,11 +3,10 @@ package hoverfly_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	//"io/ioutil"
+	"io/ioutil"
 	"github.com/SpectoLabs/hoverfly/models"
 	"github.com/dghubble/sling"
 	"strings"
-	"io/ioutil"
 )
 
 var _ = Describe("Interacting with the API", func() {

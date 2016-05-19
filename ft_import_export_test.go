@@ -159,7 +159,6 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 
 			var afterImportFakeServerResponse *http.Response
 
-
 			pwd, _ := os.Getwd()
 			imageUri := "/testdata/1x1.png"
 
