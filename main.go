@@ -128,13 +128,12 @@ func main() {
 				failAndExit(err)
 			}
 
-			vendor, name := splitHoverfileName(*pushNameArg)
-			spectoHubSimulation := SpectoHubSimulation{Vendor: vendor, Api: "build-pipeline", Version: "none", Name: name, Description: "test"}
-			getStatusCode := spectoHub.CheckSimulation(spectoHubSimulation)
+			_, name := splitHoverfileName(*pushNameArg)
+			getStatusCode := spectoHub.CheckSimulation(*pushNameArg)
 			if getStatusCode == 200 {
 				fmt.Println("Updating Specto Hub")
 
-				putStatusCode := spectoHub.UploadSimulation(spectoHubSimulation, string(data))
+				putStatusCode := spectoHub.UploadSimulation(*pushNameArg, data)
 				if putStatusCode == 200 {
 					fmt.Println(name, "has been pushed to the Specto Hub")
 				}
@@ -142,9 +141,9 @@ func main() {
 			} else {
 				fmt.Println("Creating a new simulation on the Specto Hub")
 
-				postStatusCode := spectoHub.CreateSimulation(spectoHubSimulation)
+				postStatusCode := spectoHub.CreateSimulation(*pushNameArg)
 				if postStatusCode == 201 {
-					putStatusCode := spectoHub.UploadSimulation(spectoHubSimulation, string(data))
+					putStatusCode := spectoHub.UploadSimulation(*pushNameArg, data)
 					if putStatusCode == 200 {
 						fmt.Println(name, "has been pushed to the Specto Hub")
 					}
@@ -154,10 +153,9 @@ func main() {
 			}
 
 		case pullCommand.FullCommand():
+			data := spectoHub.GetSimulation(*pullNameArg)
 
-			simulation := spectoHub.GetSimulation(*pullNameArg)
-
-			if err := localCache.WriteSimulation(*pullNameArg, simulation); err == nil {
+			if err := localCache.WriteSimulation(*pullNameArg, data); err == nil {
 				fmt.Println(*pullNameArg, "has been pulled from the Specto Hub")
 			} else {
 				failAndExit(err)

@@ -139,6 +139,10 @@ func (h * Hoverfly) buildBaseUrl() string {
 	return fmt.Sprintf("http://%v:%v", h.Host, h.AdminPort)
 }
 
+/*
+This isn't working as intended, its working, just not how I imagined it.
+ */
+
 func startHandler(hoverflyDirectory string) {
 	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
 
@@ -153,6 +157,10 @@ func startHandler(hoverflyDirectory string) {
 		fmt.Println("Hoverfly is already running")
 	}
 }
+
+/*
+This isn't working as intended, its working, just not how I imagined it.
+ */
 
 func stopHandler(hoverflyDirectory string) {
 	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")

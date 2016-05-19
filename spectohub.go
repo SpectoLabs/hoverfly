@@ -22,8 +22,9 @@ type SpectoHub struct {
 	ApiKey string
 }
 
-func (s *SpectoHub) CheckSimulation(simulation SpectoHubSimulation) int {
-	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v", simulation.Vendor, simulation.Vendor, simulation.Api, simulation.Version, simulation.Name))
+func (s *SpectoHub) CheckSimulation(key string) int {
+	vendor, name := splitHoverfileName(key)
+	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v", vendor, vendor, "build-pipeline", "none", name))
 
 	request, _ := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Request()
 	response, _ := http.DefaultClient.Do(request)
@@ -32,7 +33,11 @@ func (s *SpectoHub) CheckSimulation(simulation SpectoHubSimulation) int {
 	return response.StatusCode
 }
 
-func (s *SpectoHub) CreateSimulation(simulation SpectoHubSimulation) int {
+func (s *SpectoHub) CreateSimulation(key string) int {
+	vendor, name := splitHoverfileName(key)
+
+	simulation := SpectoHubSimulation{Vendor: vendor, Api: "build-pipeline", Version: "none", Name: name, Description: "test"}
+
 	url := s.buildUrl("/api/v1/simulations")
 
 	request, _ := sling.New().Post(url).Add("Authorization", s.buildAuthorizationHeaderValue()).BodyJSON(simulation).Request()
@@ -41,10 +46,11 @@ func (s *SpectoHub) CreateSimulation(simulation SpectoHubSimulation) int {
 	return response.StatusCode
 }
 
-func (s *SpectoHub) UploadSimulation(simulation SpectoHubSimulation, body string) int {
-	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", simulation.Vendor, simulation.Vendor, simulation.Api, simulation.Version, simulation.Name))
+func (s *SpectoHub) UploadSimulation(key string, data []byte) int {
+	vendor, name := splitHoverfileName(key)
+	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", vendor, vendor, "build-pipeline", "none", name))
 
-	request, _ := sling.New().Put(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Body(strings.NewReader(body)).Request()
+	request, _ := sling.New().Put(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Body(strings.NewReader(string(data))).Request()
 	response, _ := http.DefaultClient.Do(request)
 	defer response.Body.Close()
 
