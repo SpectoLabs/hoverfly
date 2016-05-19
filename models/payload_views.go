@@ -5,6 +5,10 @@ import (
 	"encoding/gob"
 )
 
+type PayloadViewData struct {
+	Data []PayloadView `json:"data"`
+}
+
 // PayloadView is used when marshalling and unmarshalling payloads.
 type PayloadView struct {
 	Response ResponseDetailsView `json:"response"`

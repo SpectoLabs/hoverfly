@@ -159,7 +159,6 @@ func (d *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
 				}
 			}
 
-
 			bts, err := pl.Encode()
 			if err != nil {
 				log.WithFields(log.Fields{

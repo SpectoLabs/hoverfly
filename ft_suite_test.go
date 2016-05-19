@@ -8,8 +8,6 @@ import (
 	"github.com/phayes/freeport"
 	"fmt"
 	"net/http"
-	//"go/build"
-	//"strings"
 	"github.com/SpectoLabs/hoverfly"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/cache"

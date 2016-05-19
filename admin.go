@@ -33,10 +33,6 @@ type recordedRequests struct {
 	Data []models.PayloadView `json:"data"`
 }
 
-type RecordRequestsView struct {
-	Data []models.PayloadView `json:"data"`
-}
-
 type storedMetadata struct {
 	Data map[string]string `json:"data"`
 }
@@ -241,7 +237,7 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 
 		w.Header().Set("Content-Type", "application/json")
 
-		var response RecordRequestsView
+		var response models.PayloadViewData
 		response.Data = payloads
 		b, err := json.Marshal(response)
 
