@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestNewHoverfile_CanCreateAHoverfileFromCompleteKey(t *testing.T) {
+func Test_NewHoverfile_CanCreateAHoverfileFromCompleteKey(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfile, err := NewHoverfile("testvendor/testname:v1")
@@ -17,7 +17,7 @@ func TestNewHoverfile_CanCreateAHoverfileFromCompleteKey(t *testing.T) {
 	Expect(hoverfile.Version).To(Equal("v1"))
 }
 
-func TestNewHoverfile_CanCreateAHoverfileFromDifferentCompleteKey(t *testing.T) {
+func Test_NewHoverfile_CanCreateAHoverfileFromDifferentCompleteKey(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfile, err := NewHoverfile("another-vendor/test_simulation:v7")
@@ -29,7 +29,7 @@ func TestNewHoverfile_CanCreateAHoverfileFromDifferentCompleteKey(t *testing.T) 
 	Expect(hoverfile.Version).To(Equal("v7"))
 }
 
-func TestNewHoverfile_CanCreateAHoverfileFromKey_WithNoVersion(t *testing.T) {
+func Test_NewHoverfile_CanCreateAHoverfileFromKey_WithNoVersion(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfile, err := NewHoverfile("tester/tested")
@@ -41,7 +41,7 @@ func TestNewHoverfile_CanCreateAHoverfileFromKey_WithNoVersion(t *testing.T) {
 	Expect(hoverfile.Version).To(Equal("v1"))
 }
 
-func TestNewHoverfile_CanCreateAHoverfileFromKey_WithNoVendor(t *testing.T) {
+func Test_NewHoverfile_CanCreateAHoverfileFromKey_WithNoVendor(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfile, err := NewHoverfile("just_a-name")
@@ -52,7 +52,7 @@ func TestNewHoverfile_CanCreateAHoverfileFromKey_WithNoVendor(t *testing.T) {
 	Expect(hoverfile.Version).To(Equal("v1"))
 }
 
-func TestNewHoverfile_WontCreateAHoverfileFromKey_WithSpecialCharacters(t *testing.T) {
+func Test_NewHoverfile_WontCreateAHoverfileFromKey_WithSpecialCharacters(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfile, err := NewHoverfile("just_@-name")
@@ -74,4 +74,31 @@ func TestNewHoverfile_WontCreateAHoverfileFromKey_WithSpecialCharacters(t *testi
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Invalid characters used in hoverfile name"))
 	Expect(hoverfile).To(Equal(Hoverfile{}))
+}
+
+func Test_Hoverfile_GetFileName(t *testing.T) {
+	RegisterTestingT(t)
+
+	hoverfile := Hoverfile{
+		Vendor: "vendor",
+		Name: "name",
+		Version: "version",
+	}
+
+	resultFileName := hoverfile.GetFileName()
+	Expect(resultFileName).To(Equal("vendor.name.version.hfile"))
+}
+
+func Test_Hoverfile_String(t *testing.T) {
+	RegisterTestingT(t)
+
+	hoverfile := Hoverfile{
+		Vendor: "vendor",
+		Name: "name",
+		Version: "version",
+	}
+
+	resultString := hoverfile.String()
+	Expect(resultString).To(Equal("vendor/name:version"))
+
 }

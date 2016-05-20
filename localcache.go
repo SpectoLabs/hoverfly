@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"os"
 	"io/ioutil"
-	"fmt"
 	"errors"
 )
 
@@ -14,17 +13,14 @@ type LocalCache struct {
 }
 
 func (l *LocalCache) WriteSimulation(hoverfile Hoverfile, data []byte) error {
-	hoverfileName := buildHoverfileName(hoverfile.Vendor, hoverfile.Name)
-
-	hoverfileUri := buildHoverfileUri(l.uri, hoverfileName)
+	hoverfileUri := buildHoverfileUri(l.uri, hoverfile.GetFileName())
 
 	return ioutil.WriteFile(hoverfileUri, data, 0644)
 }
 
 
 func (l *LocalCache) ReadSimulation(hoverfile Hoverfile) ([]byte, error) {
-	hoverfileName := buildHoverfileName(hoverfile.Vendor, hoverfile.Name)
-	hoverfileUri := buildHoverfileUri(l.uri, hoverfileName)
+	hoverfileUri := buildHoverfileUri(l.uri, hoverfile.GetFileName())
 
 	if !fileIsPresent(hoverfileUri) {
 		return nil, errors.New("Simulation not found")
@@ -70,10 +66,6 @@ func fileIsPresent(fileUri string) bool {
 	}
 
 	return true
-}
-
-func buildHoverfileName(vendor string, api string) string {
-	return fmt.Sprintf("%v.%v.hfile", vendor, api)
 }
 
 func buildHoverfileUri(baseUri string, fileName string) string {

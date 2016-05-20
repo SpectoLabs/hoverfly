@@ -3,12 +3,17 @@ package main
 import (
 	"strings"
 	"errors"
+	"fmt"
 )
 
 type Hoverfile struct {
 	Vendor  string
 	Name    string
 	Version string
+}
+
+func (h *Hoverfile) GetFileName() string {
+	return fmt.Sprintf("%v.%v.%v.hfile", h.Vendor, h.Name, h.Version)
 }
 
 func (h *Hoverfile) String() string {

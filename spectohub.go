@@ -62,7 +62,7 @@ func (s *SpectoHub) UploadSimulation(hoverfile Hoverfile, data []byte) (int, err
 	request, _ := sling.New().Put(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Body(strings.NewReader(string(data))).Request()
 	response, _ := http.DefaultClient.Do(request)
 	defer response.Body.Close()
-	
+
 	return response.StatusCode, nil
 }
 
