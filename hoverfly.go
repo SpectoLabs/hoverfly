@@ -3,11 +3,6 @@ package hoverfly
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/rusenask/goproxy"
-
-	"github.com/tdewolff/minify"
-	"github.com/tdewolff/minify/json"
-	"github.com/tdewolff/minify/xml"
-
 	"bufio"
 	"crypto/tls"
 	"fmt"
@@ -52,18 +47,9 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		Cfg:     cfg,
 		Counter: metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		Hooks:   make(ActionTypeHooks),
-		MIN:     GetNewMinifiers(),
 	}
 	h.UpdateProxy()
 	return h
-}
-
-// GetNewMinifiers - returns minify.M with prepared xml/json minifiers
-func GetNewMinifiers() *minify.M {
-	m := minify.New()
-	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
-	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
-	return m
 }
 
 // UpdateProxy - applies hooks
@@ -104,7 +90,8 @@ func (d *Hoverfly) UpdateProxy() {
 	// processing connections
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(d.Cfg.Destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-			return d.processRequest(r)
+			req, resp := d.processRequest(r)
+			return req, resp
 		})
 
 	if d.Cfg.Verbose {
@@ -115,7 +102,6 @@ func (d *Hoverfly) UpdateProxy() {
 					"path":        r.URL.Path,
 					"query":       r.URL.RawQuery,
 					"method":      r.Method,
-					"remoteAddr":  r.RemoteAddr,
 					"mode":        d.Cfg.GetMode(),
 				}).Debug("got request..")
 				return r, nil
@@ -189,6 +175,7 @@ func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Respo
 		return req, response
 
 	} else if mode == ModifyMode {
+
 		response, err := d.modifyRequestResponse(req, d.Cfg.Middleware)
 
 		if err != nil {

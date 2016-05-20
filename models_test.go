@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"github.com/SpectoLabs/hoverfly/models"
 )
 
 // TestMain prepares database for testing and then performs a cleanup
@@ -59,7 +60,7 @@ func TestRequestBodyCaptured(t *testing.T) {
 	payloadBts, err := dbClient.RequestCache.Get([]byte(fp))
 	testutil.Expect(t, err, nil)
 
-	payload, err := decodePayload(payloadBts)
+	payload, err := models.NewPayloadFromBytes(payloadBts)
 	testutil.Expect(t, err, nil)
 	testutil.Expect(t, payload.Request.Body, "fizz=buzz")
 }
@@ -102,11 +103,11 @@ func TestMatchOnRequestBody(t *testing.T) {
 		request, err := http.NewRequest("POST", "http://capture_body.com", body)
 		testutil.Expect(t, err, nil)
 
-		resp := ResponseDetails{
+		resp := models.ResponseDetails{
 			Status: 200,
 			Body:   fmt.Sprintf("body here, number=%d", i),
 		}
-		payload := Payload{Response: resp}
+		payload := models.Payload{Response: resp}
 
 		// creating response
 		c := NewConstructor(request, payload)
@@ -205,17 +206,17 @@ func TestDeleteAllRecords(t *testing.T) {
 }
 
 func TestPayloadEncodeDecode(t *testing.T) {
-	resp := ResponseDetails{
+	resp := models.ResponseDetails{
 		Status: 200,
 		Body:   "body here",
 	}
 
-	payload := Payload{Response: resp}
+	payload := models.Payload{Response: resp}
 
 	bts, err := payload.Encode()
 	testutil.Expect(t, err, nil)
 
-	pl, err := decodePayload(bts)
+	pl, err := models.NewPayloadFromBytes(bts)
 	testutil.Expect(t, err, nil)
 	testutil.Expect(t, pl.Response.Body, resp.Body)
 	testutil.Expect(t, pl.Response.Status, resp.Status)
@@ -223,18 +224,18 @@ func TestPayloadEncodeDecode(t *testing.T) {
 }
 
 func TestPayloadEncodeEmpty(t *testing.T) {
-	payload := Payload{}
+	payload := models.Payload{}
 
 	bts, err := payload.Encode()
 	testutil.Expect(t, err, nil)
 
-	_, err = decodePayload(bts)
+	_, err = models.NewPayloadFromBytes(bts)
 	testutil.Expect(t, err, nil)
 }
 
 func TestDecodeRandomBytes(t *testing.T) {
 	bts := []byte("some random stuff here")
-	_, err := decodePayload(bts)
+	_, err := models.NewPayloadFromBytes(bts)
 	testutil.Refute(t, err, nil)
 }
 
@@ -331,7 +332,7 @@ func TestDoRequestWFailedMiddleware(t *testing.T) {
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
 	testutil.Expect(t, err, nil)
 
-	_, err = dbClient.doRequest(req)
+	_, _, err = dbClient.doRequest(req)
 	testutil.Refute(t, err, nil)
 }
 
@@ -347,7 +348,7 @@ func TestDoRequestFailedHTTP(t *testing.T) {
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
 	testutil.Expect(t, err, nil)
 
-	_, err = dbClient.doRequest(req)
+	_, _, err = dbClient.doRequest(req)
 	testutil.Refute(t, err, nil)
 
 }
@@ -460,3 +461,6 @@ func TestXMLMinifierWOHeader(t *testing.T) {
 	fpTwo := dbClient.getRequestFingerprint(req, []byte(xmlBodyTwo))
 	testutil.Refute(t, fpOne, fpTwo)
 }
+
+
+

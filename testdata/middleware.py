@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 import sys
-import logging
 import json
-from time import gmtime, strftime
+import logging
 
-
-logging.basicConfig(filename='middleware_synthetic.log', level=logging.DEBUG)
-logging.debug('Middleware "synthetic service" called')
+logging.basicConfig(filename='middleware_request.log', level=logging.DEBUG)
+logging.debug('Middleware "modify_request" called')
 
 
 def main():
@@ -17,16 +15,14 @@ def main():
 
     payload_dict = json.loads(payload)
 
-    dest = payload_dict['request']['destination']
-
+    payload_dict['response']['body'] = "CHANGED_RESPONSE_BODY"
+    payload_dict['request']['body'] = "CHANGED_REQUEST_BODY"
     payload_dict['response']['status'] = 200
-    payload_dict['response']['body'] = "You called (%s). I am synthethic service, maybe I could do more?\n" \
-                                       "Current time: %s"
+    payload_dict['response']['headers'] = {'Content-Length': ["21"]}
 
     # returning new payload
     print(json.dumps(payload_dict))
 
 if __name__ == "__main__":
     main()
-
 

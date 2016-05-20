@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/models"
 )
 
 // Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.
@@ -53,7 +54,7 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 }
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
-func ExecuteMiddleware(middlewares string, payload Payload) (Payload, error) {
+func ExecuteMiddleware(middlewares string, payload models.Payload) (models.Payload, error) {
 
 	mws := strings.Split(middlewares, "|")
 	var cmdList []*exec.Cmd
@@ -66,7 +67,7 @@ func ExecuteMiddleware(middlewares string, payload Payload) (Payload, error) {
 	}
 
 	// getting payload
-	bts, err := json.Marshal(payload)
+	bts, err := json.Marshal(payload.ConvertToPayloadView())
 
 	if log.GetLevel() == log.DebugLevel {
 		log.WithFields(log.Fields{
@@ -112,9 +113,9 @@ func ExecuteMiddleware(middlewares string, payload Payload) (Payload, error) {
 	}
 
 	if len(mwOutput) > 0 {
-		var newPayload Payload
+		var newPayloadView models.PayloadView
 
-		err = json.Unmarshal(mwOutput, &newPayload)
+		err = json.Unmarshal(mwOutput, &newPayloadView)
 
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -130,7 +131,7 @@ func ExecuteMiddleware(middlewares string, payload Payload) (Payload, error) {
 				}).Debug("payload after modifications")
 			}
 			// payload unmarshalled into Payload struct, returning it
-			return newPayload, nil
+			return newPayloadView.ConvertToPayload(), nil
 		}
 	} else {
 

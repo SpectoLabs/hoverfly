@@ -7,17 +7,18 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/models"
 )
 
 // Constructor - holds information about original request (which is needed to create response
 // and also holds payload
 type Constructor struct {
 	request *http.Request
-	payload Payload
+	payload models.Payload
 }
 
 // NewConstructor - returns constructor instance
-func NewConstructor(req *http.Request, payload Payload) *Constructor {
+func NewConstructor(req *http.Request, payload models.Payload) *Constructor {
 	c := &Constructor{request: req, payload: payload}
 	return c
 }
@@ -100,7 +101,6 @@ func (c *Constructor) ReconstructRequest() (*http.Request, error) {
 	newRequest.Method = c.payload.Request.Method
 	newRequest.URL.Path = c.payload.Request.Path
 	newRequest.URL.RawQuery = c.payload.Request.Query
-	newRequest.RemoteAddr = c.payload.Request.RemoteAddr
 	newRequest.Header = c.payload.Request.Headers
 
 	// overriding original request

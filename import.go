@@ -12,6 +12,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"net/http"
+	"github.com/SpectoLabs/hoverfly/models"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -124,11 +125,15 @@ func isJSON(s string) bool {
 }
 
 // ImportPayloads - a function to save given payloads into the database.
-func (d *Hoverfly) ImportPayloads(payloads []Payload) error {
+func (d *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
 	if len(payloads) > 0 {
 		success := 0
 		failed := 0
-		for _, pl := range payloads {
+		for _, payloadView := range payloads {
+
+			// Convert PayloadView back to Payload for internal storage
+			pl := payloadView.ConvertToPayload()
+
 			if len(pl.Request.Headers) == 0 {
 				pl.Request.Headers = make(map[string][]string)
 			}
@@ -142,13 +147,6 @@ func (d *Hoverfly) ImportPayloads(payloads []Payload) error {
 					pl.Request.Headers["Content-Type"] = []string{ct}
 				}
 			}
-
-			// recalculating request hash and storing it in database
-			r := RequestContainer{Details: pl.Request, Minifier: d.MIN}
-			key := r.Hash()
-
-			// regenerating key
-			pl.ID = key
 
 			bts, err := pl.Encode()
 			if err != nil {
@@ -172,7 +170,7 @@ func (d *Hoverfly) ImportPayloads(payloads []Payload) error {
 					}).Error("failed to fire hook")
 				}
 
-				d.RequestCache.Set([]byte(key), bts)
+				d.RequestCache.Set([]byte(pl.Id()), bts)
 				if err == nil {
 					success++
 				} else {
