@@ -13,14 +13,14 @@ type LocalCache struct {
 }
 
 func (l *LocalCache) WriteSimulation(hoverfile Hoverfile, data []byte) error {
-	hoverfileUri := buildHoverfileUri(l.uri, hoverfile.GetFileName())
+	hoverfileUri := buildAbsoluteFilePath(l.uri, hoverfile.GetFileName())
 
 	return ioutil.WriteFile(hoverfileUri, data, 0644)
 }
 
 
 func (l *LocalCache) ReadSimulation(hoverfile Hoverfile) ([]byte, error) {
-	hoverfileUri := buildHoverfileUri(l.uri, hoverfile.GetFileName())
+	hoverfileUri := buildAbsoluteFilePath(l.uri, hoverfile.GetFileName())
 
 	if !fileIsPresent(hoverfileUri) {
 		return nil, errors.New("Simulation not found")
@@ -68,6 +68,6 @@ func fileIsPresent(fileUri string) bool {
 	return true
 }
 
-func buildHoverfileUri(baseUri string, fileName string) string {
+func buildAbsoluteFilePath(baseUri string, fileName string) string {
 	return filepath.Join(baseUri, fileName)
 }
