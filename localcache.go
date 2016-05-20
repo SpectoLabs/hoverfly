@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"os"
 	"io/ioutil"
-	"strings"
 	"fmt"
 	"errors"
 )
@@ -14,10 +13,8 @@ type LocalCache struct {
 	uri string
 }
 
-func (l *LocalCache) WriteSimulation(key string, data []byte) error {
-	vendor, name := splitHoverfileName(key)
-
-	hoverfileName := buildHoverfileName(vendor, name)
+func (l *LocalCache) WriteSimulation(hoverfile Hoverfile, data []byte) error {
+	hoverfileName := buildHoverfileName(hoverfile.Vendor, hoverfile.Name)
 
 	hoverfileUri := buildHoverfileUri(l.uri, hoverfileName)
 
@@ -25,10 +22,8 @@ func (l *LocalCache) WriteSimulation(key string, data []byte) error {
 }
 
 
-func (l *LocalCache) ReadSimulation(key string) ([]byte, error) {
-	vendor, name := splitHoverfileName(key)
-
-	hoverfileName := buildHoverfileName(vendor, name)
+func (l *LocalCache) ReadSimulation(hoverfile Hoverfile) ([]byte, error) {
+	hoverfileName := buildHoverfileName(hoverfile.Vendor, hoverfile.Name)
 	hoverfileUri := buildHoverfileUri(l.uri, hoverfileName)
 
 	if !fileIsPresent(hoverfileUri) {
@@ -83,14 +78,4 @@ func buildHoverfileName(vendor string, api string) string {
 
 func buildHoverfileUri(baseUri string, fileName string) string {
 	return filepath.Join(baseUri, fileName)
-}
-
-
-
-func splitHoverfileName(hoverfileKey string) (string, string) {
-	s := strings.Split(hoverfileKey, "/", )
-	vendor := s[0]
-	name := s[1]
-
-	return vendor, name
 }

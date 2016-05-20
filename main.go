@@ -95,6 +95,10 @@ func main() {
 			stopHandler(hoverflyDirectory)
 
 		case exportCommand.FullCommand():
+			hoverfile, err := NewHoverfile(*exportNameArg)
+			if err != nil {
+				failAndExit(err)
+			}
 
 			exportedData, err := hoverfly.ExportSimulation()
 
@@ -102,46 +106,60 @@ func main() {
 				failAndExit(err)
 			}
 
-			if err = localCache.WriteSimulation(*exportNameArg, exportedData); err == nil {
+			if err = localCache.WriteSimulation(hoverfile, exportedData); err == nil {
 				fmt.Println(*exportNameArg, "exported successfully")
 			} else {
 				failAndExit(err)
 			}
 
 		case importCommand.FullCommand():
+			hoverfile, err := NewHoverfile(*importNameArg)
+			if err != nil {
+				failAndExit(err)
+			}
 
-			data, err := localCache.ReadSimulation(*importNameArg)
+			data, err := localCache.ReadSimulation(hoverfile)
 			if err != nil {
 				failAndExit(err)
 			}
 
 			if err = hoverfly.ImportSimulation(string(data)); err == nil {
-				fmt.Println(*importNameArg, "imported successfully")
+				fmt.Println(hoverfile.String(), "imported successfully")
 			} else {
 				failAndExit(err)
 			}
 
 		case pushCommand.FullCommand():
-			data, err := localCache.ReadSimulation(*pushNameArg)
+			hoverfile, err := NewHoverfile(*pushNameArg)
+			if err != nil {
+				failAndExit(err)
+			}
+
+			data, err := localCache.ReadSimulation(hoverfile)
 			if err != nil {
 				failAndExit(err)
 			}
 
 
-			statusCode, err := spectoHub.UploadSimulation(*pushNameArg, data)
+			statusCode, err := spectoHub.UploadSimulation(hoverfile, data)
 			if err != nil {
 				failAndExit(err)
 			}
 
 			if statusCode == 200 {
-				fmt.Println(*pushNameArg, "has been pushed to the Specto Hub")
+				fmt.Println(hoverfile.String(), "has been pushed to the Specto Hub")
 			}
 
 		case pullCommand.FullCommand():
-			data := spectoHub.GetSimulation(*pullNameArg)
+			hoverfile, err := NewHoverfile(*pullNameArg)
+			if err != nil {
+				failAndExit(err)
+			}
 
-			if err := localCache.WriteSimulation(*pullNameArg, data); err == nil {
-				fmt.Println(*pullNameArg, "has been pulled from the Specto Hub")
+			data := spectoHub.GetSimulation(hoverfile)
+
+			if err := localCache.WriteSimulation(hoverfile, data); err == nil {
+				fmt.Println(hoverfile.String(), "has been pulled from the Specto Hub")
 			} else {
 				failAndExit(err)
 			}
