@@ -253,15 +253,24 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 			Query: "", Body: "",
 			Headers: map[string][]string{"Hoverfly": []string {"testing"}}}}
 
-	originalPayload := encodedPayload
-	originalPayload.Response.Body = "hello_world"
-
 	hv.ImportPayloads([]models.PayloadView{encodedPayload})
 
 	value, err := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	Expect(err).To(BeNil())
+
 	decodedPayload, err := models.NewPayloadFromBytes(value)
 	Expect(err).To(BeNil())
-	Expect(*decodedPayload).ToNot(Equal(encodedPayload))
-	Expect(*decodedPayload).To(Equal(originalPayload.ConvertToPayload()))
+
+	Expect(decodedPayload).ToNot(Equal(models.Payload{
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body: "hello_world",
+			Headers: map[string][]string{"Content-Encoding": []string {"gzip"}}},
+		Request:  models.RequestDetails{
+			Path: "/",
+			Method: "GET",
+			Destination: "/",
+			Scheme: "scheme",
+			Query: "", Body: "",
+			Headers: map[string][]string{"Hoverfly": []string {"testing"}}}}))
 }
