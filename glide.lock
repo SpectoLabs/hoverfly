@@ -1,5 +1,5 @@
-hash: 61ff7a18a884cc68aa3d4b52723e31bcb702d0f8a36448479017e86808b5367e
-updated: 2016-05-16T17:10:29.817123841+01:00
+hash: b16c480569715798d7968911654ce7fed8070f1fb6ff79e9ff6007ec3f976542
+updated: 2016-05-20T12:43:01.099492102+01:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -34,6 +34,8 @@ imports:
   version: 981ab348d865cf048eb7d17e78ac7192632d8415
 - name: github.com/mitchellh/mapstructure
   version: d2dd0262208475919e1a362f675cfc0e7c10e905
+- name: github.com/onsi/gomega
+  version: c73e51675ad2455a4515b6213eb7145eaade4824
 - name: github.com/spf13/cast
   version: 27b586b42e29bec072fe7379259cc719e1289da6
 - name: github.com/spf13/jwalterweatherman

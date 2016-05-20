@@ -4,3 +4,4 @@ import:
 - package: github.com/dghubble/sling
 - package: github.com/mitchellh/go-homedir
 - package: github.com/spf13/viper
+- package: github.com/onsi/gomega
