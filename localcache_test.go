@@ -17,15 +17,13 @@ func teardown() {
 	os.RemoveAll(testDirectory)
 }
 
-
 func Test_LocalCache_ReadSimulation(t *testing.T) {
 	RegisterTestingT(t)
 	setup()
 
+	ioutil.WriteFile(testDirectory + "/vendor.name.v1.hfile", []byte("this is a test file"), 0644)
 
-	ioutil.WriteFile("/tmp/vendor.name.v1.hfile", []byte("this is a test file"), 0644)
-
-	localCache := LocalCache{Uri: "/tmp"}
+	localCache := LocalCache{Uri: testDirectory}
 
 	data, err := localCache.ReadSimulation(Hoverfile{Vendor: "vendor", Name: "name", Version: "v1"})
 
@@ -39,7 +37,7 @@ func Test_LocalCache_ReadSimulation_ErrorsWhenFileIsMissing(t *testing.T) {
 	RegisterTestingT(t)
 	setup()
 
-	localCache := LocalCache{Uri: "/tmp"}
+	localCache := LocalCache{Uri: testDirectory}
 
 	data, err := localCache.ReadSimulation(Hoverfile{Vendor: "vendor", Name: "name", Version: "v1"})
 
