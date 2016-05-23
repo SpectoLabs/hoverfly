@@ -9,18 +9,18 @@ import (
 )
 
 type LocalCache struct {
-	uri string
+	Uri string
 }
 
 func (l *LocalCache) WriteSimulation(hoverfile Hoverfile, data []byte) error {
-	hoverfileUri := buildAbsoluteFilePath(l.uri, hoverfile.GetFileName())
+	hoverfileUri := buildAbsoluteFilePath(l.Uri, hoverfile.GetFileName())
 
 	return ioutil.WriteFile(hoverfileUri, data, 0644)
 }
 
 
 func (l *LocalCache) ReadSimulation(hoverfile Hoverfile) ([]byte, error) {
-	hoverfileUri := buildAbsoluteFilePath(l.uri, hoverfile.GetFileName())
+	hoverfileUri := buildAbsoluteFilePath(l.Uri, hoverfile.GetFileName())
 
 	if !fileIsPresent(hoverfileUri) {
 		return nil, errors.New("Simulation not found")

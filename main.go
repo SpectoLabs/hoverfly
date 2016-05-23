@@ -42,7 +42,7 @@ func main() {
 	}
 
 	localCache := LocalCache{
-		uri: cacheDirectory,
+		Uri: cacheDirectory,
 	}
 
 
