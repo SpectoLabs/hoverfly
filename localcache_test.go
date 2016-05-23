@@ -17,6 +17,44 @@ func teardown() {
 	os.RemoveAll(testDirectory)
 }
 
+func Test_LocalCache_WriteSimulation(t *testing.T) {
+	RegisterTestingT(t)
+	setup()
+
+	localCache := LocalCache{Uri: testDirectory}
+	hoverfile := Hoverfile{Vendor: "vendor", Name: "name", Version: "v1"}
+
+	err := localCache.WriteSimulation(hoverfile, []byte("hello"))
+
+	Expect(err).To(BeNil())
+
+	data, err := ioutil.ReadFile(testDirectory + "/vendor.name.v1.hfile")
+
+	Expect(err).To(BeNil())
+	Expect(string(data)).To(Equal("hello"))
+
+	teardown()
+}
+
+func Test_LocalCache_WriteSimulation_WithJson(t *testing.T) {
+	RegisterTestingT(t)
+	setup()
+
+	localCache := LocalCache{Uri: testDirectory}
+	hoverfile := Hoverfile{Vendor: "vendor", Name: "test", Version: "v1"}
+
+	err := localCache.WriteSimulation(hoverfile, []byte(`{"key":"value"}`))
+
+	Expect(err).To(BeNil())
+
+	data, err := ioutil.ReadFile(testDirectory + "/vendor.test.v1.hfile")
+
+	Expect(err).To(BeNil())
+	Expect(string(data)).To(Equal(`{"key":"value"}`))
+
+	teardown()
+}
+
 func Test_LocalCache_ReadSimulation(t *testing.T) {
 	RegisterTestingT(t)
 	setup()
@@ -24,8 +62,9 @@ func Test_LocalCache_ReadSimulation(t *testing.T) {
 	ioutil.WriteFile(testDirectory + "/vendor.name.v1.hfile", []byte("this is a test file"), 0644)
 
 	localCache := LocalCache{Uri: testDirectory}
+	hoverfile := Hoverfile{Vendor: "vendor", Name: "name", Version: "v1"}
 
-	data, err := localCache.ReadSimulation(Hoverfile{Vendor: "vendor", Name: "name", Version: "v1"})
+	data, err := localCache.ReadSimulation(hoverfile)
 
 	Expect(err).To(BeNil())
 	Expect(data).To(Equal([]byte("this is a test file")))
@@ -38,8 +77,9 @@ func Test_LocalCache_ReadSimulation_ErrorsWhenFileIsMissing(t *testing.T) {
 	setup()
 
 	localCache := LocalCache{Uri: testDirectory}
+	hoverfile := Hoverfile{Vendor: "vendor", Name: "name", Version: "v1"}
 
-	data, err := localCache.ReadSimulation(Hoverfile{Vendor: "vendor", Name: "name", Version: "v1"})
+	data, err := localCache.ReadSimulation(hoverfile)
 
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Simulation not found"))
