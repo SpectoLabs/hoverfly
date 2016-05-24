@@ -102,7 +102,10 @@ func main() {
 			}
 
 		case startCommand.FullCommand():
-			startHandler(hoverflyDirectory)
+			err := startHandler(hoverflyDirectory)
+			if err != nil {
+				failAndExit(err)
+			}
 
 		case stopCommand.FullCommand():
 			stopHandler(hoverflyDirectory)

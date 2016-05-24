@@ -147,19 +147,26 @@ func (h * Hoverfly) buildBaseUrl() string {
 This isn't working as intended, its working, just not how I imagined it.
  */
 
-func startHandler(hoverflyDirectory string) {
+func startHandler(hoverflyDirectory string) error {
 	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
 
 	if _, err := os.Stat(hoverflyPidFile); err != nil {
 		if os.IsNotExist(err) {
-			cmd := exec.Command("/Users/benjih/Downloads/hoverfly/hoverfly_v0.5.17_OSX_amd64")
-			cmd.Start()
+			cmd := exec.Command(filepath.Join(hoverflyDirectory, "/hoverfly"))
+			err := cmd.Start()
+
+			if err != nil {
+				return errors.New("Hoverfly did not start")
+			}
+
 			ioutil.WriteFile(hoverflyPidFile, []byte(strconv.Itoa(cmd.Process.Pid)), 0644)
 			fmt.Println("Hoverfly is now running")
 		}
 	} else {
 		fmt.Println("Hoverfly is already running")
 	}
+
+	return nil
 }
 
 /*
