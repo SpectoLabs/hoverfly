@@ -9,6 +9,9 @@ import (
 )
 
 var (
+	hostFlag = kingpin.Flag("host", "Set the host of Hoverfly").Short('h').String()
+	adminPortFlag = kingpin.Flag("port", "Set the admin port of Hoverfly").Short('p').String()
+
 	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
 	modeNameArg = modeCommand.Arg("name", "Set Hoverfly's mode").String()
 
@@ -58,6 +61,16 @@ func main() {
 		AdminPort: viper.GetString("hoverfly.admin.port"),
 		ProxyPort: viper.GetString("hoverfly.proxy.port"),
 		httpClient: http.DefaultClient,
+	}
+
+	kingpin.Parse()
+
+	if len(*hostFlag) > 0 {
+		hoverfly.Host = *hostFlag
+	}
+
+	if len(*adminPortFlag) > 0 {
+		hoverfly.AdminPort = *adminPortFlag
 	}
 
 	spectoHub := SpectoHub {
