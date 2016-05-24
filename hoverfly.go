@@ -92,10 +92,14 @@ func (h *Hoverfly) ImportSimulation(payload string) error {
 		return err
 	}
 
-	_, err = h.httpClient.Do(request)
+	response, err := h.httpClient.Do(request)
 
 	if err != nil {
 		return err
+	}
+
+	if response.StatusCode != 200 {
+		return errors.New("Import to Hoverfly failed")
 	}
 
 	return nil
