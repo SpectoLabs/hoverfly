@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	hostFlag = kingpin.Flag("host", "Set the host of Hoverfly").Short('h').String()
-	adminPortFlag = kingpin.Flag("port", "Set the admin port of Hoverfly").Short('p').String()
+	hostFlag = kingpin.Flag("host", "Set the host of Hoverfly").String()
+	adminPortFlag = kingpin.Flag("admin-port", "Set the admin port of Hoverfly").String()
+	proxyPortFlag = kingpin.Flag("proxy-port", "Set the admin port of Hoverfly").String()
 
 	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
 	modeNameArg = modeCommand.Arg("name", "Set Hoverfly's mode").String()
@@ -73,6 +74,10 @@ func main() {
 		hoverfly.AdminPort = *adminPortFlag
 	}
 
+	if len(*proxyPortFlag) > 0 {
+		hoverfly.ProxyPort = *proxyPortFlag
+	}
+
 	spectoHub := SpectoHub {
 		Host: viper.GetString("specto.hub.host"),
 		Port: viper.GetString("specto.hub.port"),
@@ -102,13 +107,13 @@ func main() {
 			}
 
 		case startCommand.FullCommand():
-			err := startHandler(hoverflyDirectory)
+			err := startHandler(hoverflyDirectory, hoverfly)
 			if err != nil {
 				failAndExit(err)
 			}
 
 		case stopCommand.FullCommand():
-			stopHandler(hoverflyDirectory)
+			stopHandler(hoverflyDirectory, hoverfly)
 
 		case exportCommand.FullCommand():
 			hoverfile, err := NewHoverfile(*exportNameArg)

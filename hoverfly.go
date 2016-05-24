@@ -147,13 +147,15 @@ func (h * Hoverfly) buildBaseUrl() string {
 This isn't working as intended, its working, just not how I imagined it.
  */
 
-func startHandler(hoverflyDirectory string) error {
-	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
+func startHandler(hoverflyDirectory string, hoverfly Hoverfly) error {
+	pidName := fmt.Sprintf("hoverfly.%v.%v.pid", hoverfly.AdminPort, hoverfly.ProxyPort)
+	hoverflyPidFile := filepath.Join(hoverflyDirectory, pidName)
 
 	if _, err := os.Stat(hoverflyPidFile); err != nil {
 		if os.IsNotExist(err) {
-			cmd := exec.Command(filepath.Join(hoverflyDirectory, "/hoverfly"))
-			err := cmd.Start()
+			binaryUri := filepath.Join(hoverflyDirectory, "/hoverfly")
+			cmd := exec.Command(binaryUri, "-db", "memory", "-ap", hoverfly.AdminPort, "-pp", hoverfly.ProxyPort)
+			err = cmd.Start()
 
 			if err != nil {
 				return errors.New("Hoverfly did not start")
@@ -173,8 +175,10 @@ func startHandler(hoverflyDirectory string) error {
 This isn't working as intended, its working, just not how I imagined it.
  */
 
-func stopHandler(hoverflyDirectory string) {
-	hoverflyPidFile := filepath.Join(hoverflyDirectory, "hoverfly.pid")
+func stopHandler(hoverflyDirectory string, hoverfly Hoverfly) {
+	pidName := fmt.Sprintf("hoverfly.%v.%v.pid", hoverfly.AdminPort, hoverfly.ProxyPort)
+	hoverflyPidFile := filepath.Join(hoverflyDirectory, pidName)
+
 	if _, err := os.Stat(hoverflyPidFile); err != nil {
 		if os.IsNotExist(err) {
 			fmt.Println("Hoverfly is not running")
