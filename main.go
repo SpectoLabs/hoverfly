@@ -30,6 +30,7 @@ var (
 
 	pullCommand = kingpin.Command("pull", "Pushes the data to Specto Hub")
 	pullNameArg = pullCommand.Arg("name", "Name of imported simulation").Required().String()
+	pullOverrideHostFlag = pullCommand.Flag("override-host", "Name of the host you want to virtualise").String()
 
 	wipeCommand = kingpin.Command("wipe", "Wipe Hoverfly database")
 )
@@ -177,7 +178,7 @@ func main() {
 				failAndExit(err)
 			}
 
-			data := spectoHub.GetSimulation(hoverfile)
+			data := spectoHub.GetSimulation(hoverfile, *pullOverrideHostFlag)
 
 			if err := localCache.WriteSimulation(hoverfile, data); err == nil {
 				fmt.Println(hoverfile.String(), "has been pulled from the Specto Hub")

@@ -66,8 +66,14 @@ func (s *SpectoHub) UploadSimulation(hoverfile Hoverfile, data []byte) (int, err
 	return response.StatusCode, nil
 }
 
-func (s *SpectoHub) GetSimulation(hoverfile Hoverfile) []byte {
-	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", hoverfile.Vendor, hoverfile.Vendor, "build-pipeline", hoverfile.Version, hoverfile.Name))
+func (s *SpectoHub) GetSimulation(hoverfile Hoverfile, overrideHost string) []byte {
+	var url string
+
+	if len(overrideHost) > 0 {
+		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data?override-host=%v", hoverfile.Vendor, hoverfile.Vendor, "build-pipeline", hoverfile.Version, hoverfile.Name, overrideHost))
+	} else {
+		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", hoverfile.Vendor, hoverfile.Vendor, "build-pipeline", hoverfile.Version, hoverfile.Name))
+	}
 
 	request, _ := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Request()
 	response, _ := http.DefaultClient.Do(request)
