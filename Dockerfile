@@ -1,6 +1,6 @@
 FROM golang:1.5
 
-MAINTAINER karolis.rusenas@opencredo.com
+MAINTAINER benji.hooper@specto.io
 
 ADD . /go/src/github.com/SpectoLabs/hoverfly
 
