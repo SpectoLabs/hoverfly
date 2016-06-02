@@ -168,6 +168,8 @@ func startHandler(hoverflyDirectory string, hoverfly Hoverfly) error {
 		fmt.Println("Hoverfly is already running")
 	}
 
+	//WRITE A LOOP TO CHECK IF ITS RUNNING
+
 	return nil
 }
 
