@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/spf13/viper"
+	"path"
+	"github.com/mitchellh/go-homedir"
 )
 
 var (
@@ -36,10 +38,16 @@ var (
 )
 
 func main() {
-	hoverflyDirectory, err := createHomeDirectory()
-	if err != nil {
-		failAndExit(err)
+	setConfigurationDefaults()
+
+	viper.ReadInConfig()
+	configUri := viper.ConfigFileUsed()
+
+	if len(configUri) == 0 {
+		fmt.Println("You are missing a config file, defaults being used instead")
 	}
+
+	hoverflyDirectory := getHoverflyDirectory(configUri)
 
 	cacheDirectory, err := createCacheDirectory(hoverflyDirectory)
 	if err != nil {
@@ -51,12 +59,6 @@ func main() {
 	}
 
 
-	setConfigurationDefaults(hoverflyDirectory)
-
-	err = viper.ReadInConfig()
-	if err != nil {
-		fmt.Println("You are missing a config file")
-	}
 
 	hoverfly := Hoverfly {
 		Host: viper.GetString("hoverfly.host"),
@@ -201,11 +203,26 @@ func failAndExit(err error) {
 }
 
 
-func setConfigurationDefaults(hoverflyDirectory string) {
-	viper.AddConfigPath(hoverflyDirectory)
+func setConfigurationDefaults() {
+	viper.AddConfigPath("./.hoverfly")
+	viper.AddConfigPath("$HOME/.hoverfly")
 	viper.SetDefault("hoverfly.host", "localhost")
 	viper.SetDefault("hoverfly.admin.port", "8888")
 	viper.SetDefault("hoverfly.proxy.port", "8500")
 	viper.SetDefault("specto.hub.host", "localhost")
 	viper.SetDefault("specto.hub.port", "81")
+}
+
+func getHoverflyDirectory(configUri string) string {
+	if len(configUri) == 0 {
+		homeDir, err := homedir.Dir()
+
+		if err != nil {
+			failAndExit(err)
+		}
+
+		return homeDir
+	}
+
+	return path.Dir(configUri)
 }
