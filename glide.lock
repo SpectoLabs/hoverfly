@@ -1,5 +1,5 @@
-hash: b16c480569715798d7968911654ce7fed8070f1fb6ff79e9ff6007ec3f976542
-updated: 2016-05-20T12:43:01.099492102+01:00
+hash: fcdbacf39246ac50f8338ebdad162a1f2f23bb06eb38792c14b98c4760396284
+updated: 2016-06-07T16:56:26.268560039+01:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -18,7 +18,7 @@ imports:
   subpackages:
   - query
 - name: github.com/hashicorp/hcl
-  version: 9a905a34e6280ce905da1a32344b25e81011197a
+  version: d7400db7143f8e869812e50a53acd6c8d92af3b8
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -31,7 +31,7 @@ imports:
 - name: github.com/magiconair/properties
   version: c265cfa48dda6474e208715ca93e987829f572f8
 - name: github.com/mitchellh/go-homedir
-  version: 981ab348d865cf048eb7d17e78ac7192632d8415
+  version: 1111e456ffea841564ac0fa5f69c26ef44dafec9
 - name: github.com/mitchellh/mapstructure
   version: d2dd0262208475919e1a362f675cfc0e7c10e905
 - name: github.com/onsi/gomega
@@ -43,9 +43,9 @@ imports:
 - name: github.com/spf13/pflag
   version: cb88ea77998c3f024757528e3305022ab50b43be
 - name: github.com/spf13/viper
-  version: d8a428b8a30606e1d0b355d91edf282609ade1a6
+  version: c1ccc378a054ea8d4e38d8c67f6938d4760b53dd
 - name: golang.org/x/sys
-  version: d4feaf1a7e61e1d9e79e6c4e76c6349e9cab0a03
+  version: 076b546753157f758b316e59bcb51e6807c04057
   subpackages:
   - unix
 - name: gopkg.in/alecthomas/kingpin.v2
