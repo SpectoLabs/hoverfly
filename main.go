@@ -7,7 +7,6 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/spf13/viper"
 	"path"
-	"github.com/mitchellh/go-homedir"
 )
 
 var (
@@ -43,10 +42,6 @@ func main() {
 	viper.ReadInConfig()
 	configUri := viper.ConfigFileUsed()
 
-	if len(configUri) == 0 {
-		fmt.Println("You are missing a config file, defaults being used instead")
-	}
-
 	hoverflyDirectory := getHoverflyDirectory(configUri)
 
 	cacheDirectory, err := createCacheDirectory(hoverflyDirectory)
@@ -57,8 +52,6 @@ func main() {
 	localCache := LocalCache{
 		Uri: cacheDirectory,
 	}
-
-
 
 	hoverfly := Hoverfly {
 		Host: viper.GetString("hoverfly.host"),
@@ -215,13 +208,16 @@ func setConfigurationDefaults() {
 
 func getHoverflyDirectory(configUri string) string {
 	if len(configUri) == 0 {
-		homeDir, err := homedir.Dir()
+		fmt.Println("Missing a config file")
+		fmt.Println("Creating a new  a config file")
+
+		hoverflyDir, err := createHomeDirectory()
 
 		if err != nil {
 			failAndExit(err)
 		}
 
-		return homeDir
+		return hoverflyDir
 	}
 
 	return path.Dir(configUri)
