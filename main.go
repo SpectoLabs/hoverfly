@@ -53,26 +53,9 @@ func main() {
 		Uri: cacheDirectory,
 	}
 
-	hoverfly := Hoverfly {
-		Host: viper.GetString("hoverfly.host"),
-		AdminPort: viper.GetString("hoverfly.admin.port"),
-		ProxyPort: viper.GetString("hoverfly.proxy.port"),
-		httpClient: http.DefaultClient,
-	}
-
 	kingpin.Parse()
 
-	if len(*hostFlag) > 0 {
-		hoverfly.Host = *hostFlag
-	}
-
-	if len(*adminPortFlag) > 0 {
-		hoverfly.AdminPort = *adminPortFlag
-	}
-
-	if len(*proxyPortFlag) > 0 {
-		hoverfly.ProxyPort = *proxyPortFlag
-	}
+	hoverfly := createHoverfly(*hostFlag, *adminPortFlag, *proxyPortFlag)
 
 	spectoLab := SpectoLab{
 		Host: viper.GetString("specto.lab.host"),
@@ -193,6 +176,29 @@ func main() {
 func failAndExit(err error) {
 	fmt.Println(err.Error())
 	os.Exit(1)
+}
+
+func createHoverfly(hostOverride, adminPortOverride, proxyPortOverride string) Hoverfly {
+	hoverfly := Hoverfly {
+		Host: viper.GetString("hoverfly.host"),
+		AdminPort: viper.GetString("hoverfly.admin.port"),
+		ProxyPort: viper.GetString("hoverfly.proxy.port"),
+		httpClient: http.DefaultClient,
+	}
+
+	if len(*hostFlag) > 0 {
+		hoverfly.Host = *hostFlag
+	}
+
+	if len(*adminPortFlag) > 0 {
+		hoverfly.AdminPort = *adminPortFlag
+	}
+
+	if len(*proxyPortFlag) > 0 {
+		hoverfly.ProxyPort = *proxyPortFlag
+	}
+
+	return hoverfly
 }
 
 
