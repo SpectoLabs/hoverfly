@@ -9,7 +9,7 @@ import (
 	"errors"
 )
 
-type SpectoHubSimulation struct {
+type SpectoLabSimulation struct {
 	Vendor      string `json:"vendor"`
 	Api         string `json:"api"`
 	Version     string `json:"version"`
@@ -17,13 +17,13 @@ type SpectoHubSimulation struct {
 	Description string `json:"description"`
 }
 
-type SpectoHub struct {
+type SpectoLab struct {
 	Host   string
 	Port   string
 	ApiKey string
 }
 
-func (s *SpectoHub) SimulationIsPresent(hoverfile Hoverfile) (bool, error) {
+func (s *SpectoLab) SimulationIsPresent(hoverfile Hoverfile) (bool, error) {
 	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v", hoverfile.Vendor, hoverfile.Vendor, "build-pipeline", hoverfile.Version, hoverfile.Name))
 
 	request, err := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Request()
@@ -37,8 +37,8 @@ func (s *SpectoHub) SimulationIsPresent(hoverfile Hoverfile) (bool, error) {
 	return response.StatusCode == 200, nil
 }
 
-func (s *SpectoHub) CreateSimulation(hoverfile Hoverfile) int {
-	simulation := SpectoHubSimulation{Vendor: hoverfile.Vendor, Api: "build-pipeline", Version: hoverfile.Version, Name: hoverfile.Name, Description: "test"}
+func (s *SpectoLab) CreateSimulation(hoverfile Hoverfile) int {
+	simulation := SpectoLabSimulation{Vendor: hoverfile.Vendor, Api: "build-pipeline", Version: hoverfile.Version, Name: hoverfile.Name, Description: "test"}
 
 	url := s.buildUrl("/api/v1/simulations")
 
@@ -48,12 +48,12 @@ func (s *SpectoHub) CreateSimulation(hoverfile Hoverfile) int {
 	return response.StatusCode
 }
 
-func (s *SpectoHub) UploadSimulation(hoverfile Hoverfile, data []byte) (int, error) {
+func (s *SpectoLab) UploadSimulation(hoverfile Hoverfile, data []byte) (int, error) {
 	simulationExists, _ := s.SimulationIsPresent(hoverfile)
 	if !simulationExists {
 		postStatusCode := s.CreateSimulation(hoverfile)
 		if postStatusCode != 201 {
-			return 0, errors.New("Failed to create a new simulation on the Specto Hub")
+			return 0, errors.New("Failed to create a new simulation on the Specto Lab")
 		}
 	}
 
@@ -66,7 +66,7 @@ func (s *SpectoHub) UploadSimulation(hoverfile Hoverfile, data []byte) (int, err
 	return response.StatusCode, nil
 }
 
-func (s *SpectoHub) GetSimulation(hoverfile Hoverfile, overrideHost string) []byte {
+func (s *SpectoLab) GetSimulation(hoverfile Hoverfile, overrideHost string) []byte {
 	var url string
 
 	if len(overrideHost) > 0 {
@@ -84,15 +84,15 @@ func (s *SpectoHub) GetSimulation(hoverfile Hoverfile, overrideHost string) []by
 	return body
 }
 
-func (s *SpectoHub) buildUrl(endpoint string) string {
+func (s *SpectoLab) buildUrl(endpoint string) string {
 	return fmt.Sprintf("%v%v", s.buildBaseUrl(), endpoint)
 }
 
-func (s *SpectoHub) buildBaseUrl() string {
+func (s *SpectoLab) buildBaseUrl() string {
 	return fmt.Sprintf("http://%v:%v", s.Host, s.Port)
 }
 
-func (s *SpectoHub) buildAuthorizationHeaderValue() string {
+func (s *SpectoLab) buildAuthorizationHeaderValue() string {
 	return fmt.Sprintf("Bearer %v", s.ApiKey)
 }
 

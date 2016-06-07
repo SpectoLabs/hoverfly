@@ -74,10 +74,10 @@ func main() {
 		hoverfly.ProxyPort = *proxyPortFlag
 	}
 
-	spectoHub := SpectoHub {
-		Host: viper.GetString("specto.hub.host"),
-		Port: viper.GetString("specto.hub.port"),
-		ApiKey: viper.GetString("specto.hub.api.key"),
+	spectoLab := SpectoLab{
+		Host: viper.GetString("specto.lab.host"),
+		Port: viper.GetString("specto.lab.port"),
+		ApiKey: viper.GetString("specto.lab.api.key"),
 	}
 
 	switch kingpin.Parse() {
@@ -158,13 +158,13 @@ func main() {
 			}
 
 
-			statusCode, err := spectoHub.UploadSimulation(hoverfile, data)
+			statusCode, err := spectoLab.UploadSimulation(hoverfile, data)
 			if err != nil {
 				failAndExit(err)
 			}
 
 			if statusCode == 200 {
-				fmt.Println(hoverfile.String(), "has been pushed to the Specto Hub")
+				fmt.Println(hoverfile.String(), "has been pushed to the Specto Lab")
 			}
 
 		case pullCommand.FullCommand():
@@ -173,10 +173,10 @@ func main() {
 				failAndExit(err)
 			}
 
-			data := spectoHub.GetSimulation(hoverfile, *pullOverrideHostFlag)
+			data := spectoLab.GetSimulation(hoverfile, *pullOverrideHostFlag)
 
 			if err := localCache.WriteSimulation(hoverfile, data); err == nil {
-				fmt.Println(hoverfile.String(), "has been pulled from the Specto Hub")
+				fmt.Println(hoverfile.String(), "has been pulled from the Specto Lab")
 			} else {
 				failAndExit(err)
 			}
@@ -202,8 +202,8 @@ func setConfigurationDefaults() {
 	viper.SetDefault("hoverfly.host", "localhost")
 	viper.SetDefault("hoverfly.admin.port", "8888")
 	viper.SetDefault("hoverfly.proxy.port", "8500")
-	viper.SetDefault("specto.hub.host", "localhost")
-	viper.SetDefault("specto.hub.port", "81")
+	viper.SetDefault("specto.lab.host", "localhost")
+	viper.SetDefault("specto.lab.port", "81")
 }
 
 func getHoverflyDirectory(configUri string) string {
