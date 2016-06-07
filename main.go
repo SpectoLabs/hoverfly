@@ -7,6 +7,9 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/spf13/viper"
 	"path"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"path/filepath"
 )
 
 var (
@@ -40,6 +43,7 @@ func main() {
 	setConfigurationDefaults()
 
 	viper.ReadInConfig()
+
 	configUri := viper.ConfigFileUsed()
 
 	hoverflyDirectory := getHoverflyDirectory(configUri)
@@ -219,6 +223,8 @@ func getHoverflyDirectory(configUri string) string {
 
 		hoverflyDir, err := createHomeDirectory()
 
+		createConfigFile(hoverflyDir)
+
 		if err != nil {
 			failAndExit(err)
 		}
@@ -227,4 +233,36 @@ func getHoverflyDirectory(configUri string) string {
 	}
 
 	return path.Dir(configUri)
+}
+
+
+type Config struct {
+	HoverflyHost      string `yaml:"hoverfly.host"`
+	HoverflyAdminPort string `yaml:"hoverfly.admin.port"`
+	HoverflyProxyPort string `yaml:"hoverfly.proxy.port"`
+	SpectoLabHost     string `yaml:"specto.lab.host"`
+	SpectoLabPort     string `yaml:"specto.lab.port"`
+}
+
+func createConfigFile(hoverflyDir string) {
+	config := Config{
+		HoverflyHost: viper.GetString("hoverfly.host"),
+		HoverflyAdminPort: viper.GetString("hoverfly.admin.port"),
+		HoverflyProxyPort: viper.GetString("hoverfly.proxy.port"),
+		SpectoLabHost: viper.GetString("specto.lab.host"),
+		SpectoLabPort: viper.GetString("specto.lab.port"),
+	}
+	configData, err := yaml.Marshal(config)
+
+	if err != nil {
+		failAndExit(err)
+	}
+
+	filename := filepath.Join(hoverflyDir, "config.yaml")
+
+	err = ioutil.WriteFile(filename, configData, 0644)
+
+	if err != nil {
+		failAndExit(err)
+	}
 }
