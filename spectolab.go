@@ -81,8 +81,18 @@ func (s *SpectoLab) UploadSimulation(simulation Simulation, data []byte) (int, e
 
 	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data", simulation.Vendor,  simulation.Name, simulation.Version))
 
-	request, _ := sling.New().Put(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Body(strings.NewReader(string(data))).Request()
-	response, _ := http.DefaultClient.Do(request)
+	request, err := sling.New().Put(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Body(strings.NewReader(string(data))).Request()
+
+	if err != nil {
+		return 0, err
+	}
+
+	response, err := http.DefaultClient.Do(request)
+
+	if err != nil {
+		return 0, err
+	}
+
 	defer response.Body.Close()
 
 	return response.StatusCode, nil
