@@ -5,7 +5,6 @@ import (
 	"os"
 	"net/http"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"github.com/spf13/viper"
 	"path"
 )
 
@@ -37,13 +36,11 @@ var (
 )
 
 func main() {
-	setConfigurationDefaults()
+	kingpin.Parse()
 
-	viper.ReadInConfig()
+	config := GetConfig(*hostFlag, *adminPortFlag, *proxyPortFlag)
 
-	configUri := viper.ConfigFileUsed()
-
-	hoverflyDirectory := getHoverflyDirectory(configUri)
+	hoverflyDirectory := getHoverflyDirectory(config)
 
 	cacheDirectory, err := createCacheDirectory(hoverflyDirectory)
 	if err != nil {
@@ -54,14 +51,18 @@ func main() {
 		Uri: cacheDirectory,
 	}
 
-	kingpin.Parse()
 
-	hoverfly := createHoverfly(*hostFlag, *adminPortFlag, *proxyPortFlag)
+	hoverfly := Hoverfly {
+		Host: config.HoverflyHost,
+		AdminPort: config.HoverflyAdminPort,
+		ProxyPort: config.HoverflyProxyPort,
+		httpClient: http.DefaultClient,
+	}
 
 	spectoLab := SpectoLab{
-		Host: viper.GetString("specto.lab.host"),
-		Port: viper.GetString("specto.lab.port"),
-		ApiKey: viper.GetString("specto.lab.api.key"),
+		Host: config.SpectoLabHost,
+		Port: config.SpectoLabPort,
+		ApiKey: config.SpectoLabApiKey,
 	}
 
 	switch kingpin.Parse() {
@@ -179,48 +180,13 @@ func failAndExit(err error) {
 	os.Exit(1)
 }
 
-func createHoverfly(hostOverride, adminPortOverride, proxyPortOverride string) Hoverfly {
-	hoverfly := Hoverfly {
-		Host: viper.GetString("hoverfly.host"),
-		AdminPort: viper.GetString("hoverfly.admin.port"),
-		ProxyPort: viper.GetString("hoverfly.proxy.port"),
-		httpClient: http.DefaultClient,
-	}
-
-	if len(*hostFlag) > 0 {
-		hoverfly.Host = *hostFlag
-	}
-
-	if len(*adminPortFlag) > 0 {
-		hoverfly.AdminPort = *adminPortFlag
-	}
-
-	if len(*proxyPortFlag) > 0 {
-		hoverfly.ProxyPort = *proxyPortFlag
-	}
-
-	return hoverfly
-}
-
-
-func setConfigurationDefaults() {
-	viper.AddConfigPath("./.hoverfly")
-	viper.AddConfigPath("$HOME/.hoverfly")
-	viper.SetDefault("hoverfly.host", "localhost")
-	viper.SetDefault("hoverfly.admin.port", "8888")
-	viper.SetDefault("hoverfly.proxy.port", "8500")
-	viper.SetDefault("specto.lab.host", "localhost")
-	viper.SetDefault("specto.lab.port", "81")
-}
-
-func getHoverflyDirectory(configUri string) string {
-	if len(configUri) == 0 {
+func getHoverflyDirectory(config Config) string {
+	if len(config.GetFilepath()) == 0 {
 		fmt.Println("Missing a config file")
 		fmt.Println("Creating a new  a config file")
 
 		hoverflyDir, err := createHomeDirectory()
 
-		config := NewConfig()
 		config.WriteToFile(hoverflyDir)
 
 		if err != nil {
@@ -230,5 +196,5 @@ func getHoverflyDirectory(configUri string) string {
 		return hoverflyDir
 	}
 
-	return path.Dir(configUri)
+	return path.Dir(config.GetFilepath())
 }
