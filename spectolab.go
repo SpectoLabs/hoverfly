@@ -110,7 +110,11 @@ func (s *SpectoLab) buildUrl(endpoint string) string {
 }
 
 func (s *SpectoLab) buildBaseUrl() string {
-	return fmt.Sprintf("http://%v:%v", s.Host, s.Port)
+	if len(s.Port) > 0 {
+		return fmt.Sprintf("http://%v:%v", s.Host, s.Port)
+	} else {
+		return fmt.Sprintf("http://%v", s.Host)
+	}
 }
 
 func (s *SpectoLab) buildAuthorizationHeaderValue() string {
