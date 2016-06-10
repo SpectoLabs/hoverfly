@@ -153,12 +153,11 @@ func startHandler(hoverflyDirectory string, hoverfly Hoverfly) error {
 
 	if _, err := os.Stat(hoverflyPidFile); err != nil {
 		if os.IsNotExist(err) {
-			binaryUri := filepath.Join(hoverflyDirectory, "/hoverfly")
-			cmd := exec.Command(binaryUri, "-db", "memory", "-ap", hoverfly.AdminPort, "-pp", hoverfly.ProxyPort)
+			cmd := exec.Command("hoverfly", "-db", "memory", "-ap", hoverfly.AdminPort, "-pp", hoverfly.ProxyPort)
 			err = cmd.Start()
 
 			if err != nil {
-				return errors.New("Hoverfly did not start")
+				return err
 			}
 
 			ioutil.WriteFile(hoverflyPidFile, []byte(strconv.Itoa(cmd.Process.Pid)), 0644)

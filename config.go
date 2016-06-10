@@ -48,11 +48,11 @@ func (c *Config) GetFilepath() (string) {
 	return viper.ConfigFileUsed()
 }
 
-func (c *Config) WriteToFile(path string) {
+func (c *Config) WriteToFile(path string) (error) {
 	data, err := yaml.Marshal(c)
 
 	if err != nil {
-		failAndExit(err)
+		return err
 	}
 
 	filepath := filepath.Join(path, "config.yaml")
@@ -60,8 +60,10 @@ func (c *Config) WriteToFile(path string) {
 	err = ioutil.WriteFile(filepath, data, 0644)
 
 	if err != nil {
-		failAndExit(err)
+		return err
 	}
+
+	return nil
 }
 
 func SetConfigurationDefaults() {

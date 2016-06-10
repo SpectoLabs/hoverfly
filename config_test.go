@@ -93,7 +93,9 @@ func Test_ConfigWriteToFileWritesTheConfigObjectToAFileInAYamlFormat(t *testing.
 	config := GetConfig("", "", "")
 
 	workingDir, _ := os.Getwd()
-	config.WriteToFile(workingDir)
+	err := config.WriteToFile(workingDir)
+
+	Expect(err).To(BeNil())
 
 	data, _ := ioutil.ReadFile(workingDir + "/config.yaml")
 	os.Remove(workingDir + "/config.yaml")
