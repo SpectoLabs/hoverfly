@@ -10,12 +10,11 @@ import (
 )
 
 type SpectoLabSimulation struct {
-	Vendor      string `json:"vendor"`
-	Api         string `json:"api"`
 	Version     string `json:"version"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }
+
 
 type SpectoLab struct {
 	Host   string
@@ -24,40 +23,63 @@ type SpectoLab struct {
 }
 
 func (s *SpectoLab) SimulationIsPresent(simulation Simulation) (bool, error) {
-	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v", simulation.Vendor, simulation.Vendor, "build-pipeline", simulation.Version, simulation.Name))
+	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v", simulation.Vendor, simulation.Name, simulation.Version))
 
 	request, err := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Request()
+
 	if err != nil {
 		return false, err
 	}
 
-	response, _ := http.DefaultClient.Do(request)
-	defer response.Body.Close()
+	response, err := http.DefaultClient.Do(request)
 
+	if err != nil {
+		return false, err
+	}
+
+	defer response.Body.Close()
 	return response.StatusCode == 200, nil
 }
 
-func (s *SpectoLab) CreateSimulation(simulationName Simulation) int {
-	simulation := SpectoLabSimulation{Vendor: simulationName.Vendor, Api: "build-pipeline", Version: simulationName.Version, Name: simulationName.Name, Description: "test"}
+func (s *SpectoLab) CreateSimulation(simulationName Simulation) (int, error) {
+	simulation := SpectoLabSimulation{Version: simulationName.Version, Name: simulationName.Name, Description: "A description could go here"}
 
 	url := s.buildUrl("/api/v1/simulations")
+	request, err := sling.New().Post(url).BodyJSON(simulation).Add("Authorization", s.buildAuthorizationHeaderValue()).Request()
 
-	request, _ := sling.New().Post(url).Add("Authorization", s.buildAuthorizationHeaderValue()).BodyJSON(simulation).Request()
-	response, _ := http.DefaultClient.Do(request)
+	if err != nil {
+		return 0, err
+	}
+
+	response, err := http.DefaultClient.Do(request)
 	defer response.Body.Close()
-	return response.StatusCode
+
+	if err != nil {
+		return 0, err
+	}
+
+	return response.StatusCode, nil
 }
 
 func (s *SpectoLab) UploadSimulation(simulation Simulation, data []byte) (int, error) {
-	simulationExists, _ := s.SimulationIsPresent(simulation)
+	simulationExists, err := s.SimulationIsPresent(simulation)
+
+	if err != nil {
+		return 0, err
+	}
+
 	if !simulationExists {
-		postStatusCode := s.CreateSimulation(simulation)
+		postStatusCode, err := s.CreateSimulation(simulation)
+
+		if err != nil {
+			return 0, err
+		}
 		if postStatusCode != 201 {
 			return 0, errors.New("Failed to create a new simulation on the Specto Lab")
 		}
 	}
 
-	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", simulation.Vendor, simulation.Vendor, "build-pipeline", simulation.Version, simulation.Name))
+	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data", simulation.Vendor,  simulation.Name, simulation.Version))
 
 	request, _ := sling.New().Put(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Body(strings.NewReader(string(data))).Request()
 	response, _ := http.DefaultClient.Do(request)
@@ -68,11 +90,10 @@ func (s *SpectoLab) UploadSimulation(simulation Simulation, data []byte) (int, e
 
 func (s *SpectoLab) GetSimulation(simulation Simulation, overrideHost string) []byte {
 	var url string
-
 	if len(overrideHost) > 0 {
-		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data?override-host=%v", simulation.Vendor, simulation.Vendor, "build-pipeline", simulation.Version, simulation.Name, overrideHost))
+		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data?override-host=%v", simulation.Vendor, simulation.Name, simulation.Version, overrideHost))
 	} else {
-		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", simulation.Vendor, simulation.Vendor, "build-pipeline", simulation.Version, simulation.Name))
+		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data", simulation.Vendor, simulation.Name, simulation.Version))
 	}
 
 	request, _ := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Request()
