@@ -26,7 +26,7 @@ func GetConfig(hoverflyHostOverride, hoverflyAdminPortOverride, hoverflyProxyPor
 		HoverflyProxyPort: viper.GetString("hoverfly.proxy.port"),
 		SpectoLabHost: viper.GetString("specto.lab.host"),
 		SpectoLabPort: viper.GetString("specto.lab.port"),
-		SpectoLabApiKey: "[API-KEY]",
+		SpectoLabApiKey: "",
 	}
 
 	if len(hoverflyHostOverride) > 0 {
