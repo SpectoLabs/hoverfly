@@ -176,11 +176,6 @@ func main() {
 	}
 }
 
-//func failAndExit(err error) {
-//	fmt.Println(err.Error())
-//	os.Exit(1)
-//}
-
 func failAndExitWithVerboseLevel(message string, err error, verbose bool) {
 	fmt.Println(message)
 	if verbose {
