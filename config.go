@@ -17,7 +17,6 @@ type Config struct {
 }
 
 func GetConfig(hoverflyHostOverride, hoverflyAdminPortOverride, hoverflyProxyPortOverride string) Config {
-	SetConfigurationDefaults()
 	viper.ReadInConfig()
 
 	config := Config{
@@ -66,9 +65,12 @@ func (c *Config) WriteToFile(path string) (error) {
 	return nil
 }
 
-func SetConfigurationDefaults() {
+func SetConfigurationPaths() {
 	viper.AddConfigPath("./.hoverfly")
 	viper.AddConfigPath("$HOME/.hoverfly")
+}
+
+func SetConfigurationDefaults() {
 	viper.SetDefault("hoverfly.host", "localhost")
 	viper.SetDefault("hoverfly.admin.port", "8888")
 	viper.SetDefault("hoverfly.proxy.port", "8500")
