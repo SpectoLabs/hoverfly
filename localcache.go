@@ -12,21 +12,21 @@ type LocalCache struct {
 	Uri string
 }
 
-func (l *LocalCache) WriteSimulation(hoverfile Hoverfile, data []byte) error {
-	hoverfileUri := buildAbsoluteFilePath(l.Uri, hoverfile.GetFileName())
+func (l *LocalCache) WriteSimulation(simulation Simulation, data []byte) error {
+	simulationUri := buildAbsoluteFilePath(l.Uri, simulation.GetFileName())
 
-	return ioutil.WriteFile(hoverfileUri, data, 0644)
+	return ioutil.WriteFile(simulationUri, data, 0644)
 }
 
 
-func (l *LocalCache) ReadSimulation(hoverfile Hoverfile) ([]byte, error) {
-	hoverfileUri := buildAbsoluteFilePath(l.Uri, hoverfile.GetFileName())
+func (l *LocalCache) ReadSimulation(simulation Simulation) ([]byte, error) {
+	simulationUri := buildAbsoluteFilePath(l.Uri, simulation.GetFileName())
 
-	if !fileIsPresent(hoverfileUri) {
+	if !fileIsPresent(simulationUri) {
 		return nil, errors.New("Simulation not found")
 	}
 
-	return ioutil.ReadFile(hoverfileUri)
+	return ioutil.ReadFile(simulationUri)
 }
 
 func createHomeDirectory() (string, error) {

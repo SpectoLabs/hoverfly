@@ -98,71 +98,71 @@ func main() {
 			stopHandler(hoverflyDirectory, hoverfly)
 
 		case exportCommand.FullCommand():
-			hoverfile, err := NewHoverfile(*exportNameArg)
+			simulation, err := NewSimulation(*exportNameArg)
 			if err != nil {
 				failAndExit("Could not export from Hoverfly", err, *verboseFlag)
 			}
 
-			exportedData, err := hoverfly.ExportSimulation()
+			simulationData, err := hoverfly.ExportSimulation()
 
 			if err != nil {
 				failAndExit("Could not export from Hoverfly", err, *verboseFlag)
 			}
 
-			if err = localCache.WriteSimulation(hoverfile, exportedData); err == nil {
+			if err = localCache.WriteSimulation(simulation, simulationData); err == nil {
 				fmt.Println(*exportNameArg, "exported successfully")
 			} else {
 				failAndExit("Could not write simulation to local cache", err, *verboseFlag)
 			}
 
 		case importCommand.FullCommand():
-			hoverfile, err := NewHoverfile(*importNameArg)
+			simulation, err := NewSimulation(*importNameArg)
 			if err != nil {
 				failAndExit("Could not import into Hoverfly", err, *verboseFlag)
 			}
 
-			data, err := localCache.ReadSimulation(hoverfile)
+			simulationData, err := localCache.ReadSimulation(simulation)
 			if err != nil {
 				failAndExit("Could not read simulation from local cache", err, *verboseFlag)
 			}
 
-			if err = hoverfly.ImportSimulation(string(data)); err == nil {
-				fmt.Println(hoverfile.String(), "imported successfully")
+			if err = hoverfly.ImportSimulation(string(simulationData)); err == nil {
+				fmt.Println(simulation.String(), "imported successfully")
 			} else {
 				failAndExit("Could not import into Hoverfly", err, *verboseFlag)
 			}
 
 		case pushCommand.FullCommand():
-			hoverfile, err := NewHoverfile(*pushNameArg)
+			simulation, err := NewSimulation(*pushNameArg)
 			if err != nil {
 				failAndExit("Could not push to Specto Labs", err, *verboseFlag)
 			}
 
-			data, err := localCache.ReadSimulation(hoverfile)
+			simulationData, err := localCache.ReadSimulation(simulation)
 			if err != nil {
 				failAndExit("Could not read simulation from local cache", err, *verboseFlag)
 			}
 
 
-			statusCode, err := spectoLab.UploadSimulation(hoverfile, data)
+			statusCode, err := spectoLab.UploadSimulation(simulation, simulationData)
 			if err != nil {
 				failAndExit("Could not upload simulation to Specto Labs", err, *verboseFlag)
 			}
 
 			if statusCode == 200 {
-				fmt.Println(hoverfile.String(), "has been pushed to the Specto Lab")
+				fmt.Println(simulation.String(), "has been pushed to the Specto Lab")
 			}
 
 		case pullCommand.FullCommand():
-			hoverfile, err := NewHoverfile(*pullNameArg)
+			simulation, err := NewSimulation(*pullNameArg)
 			if err != nil {
 				failAndExit("Could not pull from Specto Labs", err, *verboseFlag)
 			}
 
-			data := spectoLab.GetSimulation(hoverfile, *pullOverrideHostFlag)
+			simulationData := spectoLab.GetSimulation(simulation, *pullOverrideHostFlag)
 
-			if err := localCache.WriteSimulation(hoverfile, data); err == nil {
-				fmt.Println(hoverfile.String(), "has been pulled from the Specto Lab")
+			if err := localCache.WriteSimulation(simulation, simulationData); err == nil {
+				fmt.Println(simulation.String(), "has been pulled from the Specto Lab")
 			} else {
 				failAndExit("Could not write simulation to local cache", err, *verboseFlag)
 			}

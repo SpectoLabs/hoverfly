@@ -22,9 +22,9 @@ func Test_LocalCache_WriteSimulation(t *testing.T) {
 	setup()
 
 	localCache := LocalCache{Uri: testDirectory}
-	hoverfile := Hoverfile{Vendor: "vendor", Name: "name", Version: "v1"}
+	simulation := Simulation{Vendor: "vendor", Name: "name", Version: "v1"}
 
-	err := localCache.WriteSimulation(hoverfile, []byte("hello"))
+	err := localCache.WriteSimulation(simulation, []byte("hello"))
 
 	Expect(err).To(BeNil())
 
@@ -41,9 +41,9 @@ func Test_LocalCache_WriteSimulation_WithJson(t *testing.T) {
 	setup()
 
 	localCache := LocalCache{Uri: testDirectory}
-	hoverfile := Hoverfile{Vendor: "vendor", Name: "test", Version: "v1"}
+	simulation := Simulation{Vendor: "vendor", Name: "test", Version: "v1"}
 
-	err := localCache.WriteSimulation(hoverfile, []byte(`{"key":"value"}`))
+	err := localCache.WriteSimulation(simulation, []byte(`{"key":"value"}`))
 
 	Expect(err).To(BeNil())
 
@@ -62,9 +62,9 @@ func Test_LocalCache_ReadSimulation(t *testing.T) {
 	ioutil.WriteFile(testDirectory + "/vendor.name.v1.hfile", []byte("this is a test file"), 0644)
 
 	localCache := LocalCache{Uri: testDirectory}
-	hoverfile := Hoverfile{Vendor: "vendor", Name: "name", Version: "v1"}
+	simulation := Simulation{Vendor: "vendor", Name: "name", Version: "v1"}
 
-	data, err := localCache.ReadSimulation(hoverfile)
+	data, err := localCache.ReadSimulation(simulation)
 
 	Expect(err).To(BeNil())
 	Expect(data).To(Equal([]byte("this is a test file")))
@@ -77,9 +77,9 @@ func Test_LocalCache_ReadSimulation_ErrorsWhenFileIsMissing(t *testing.T) {
 	setup()
 
 	localCache := LocalCache{Uri: testDirectory}
-	hoverfile := Hoverfile{Vendor: "vendor", Name: "name", Version: "v1"}
+	simulation := Simulation{Vendor: "vendor", Name: "name", Version: "v1"}
 
-	data, err := localCache.ReadSimulation(hoverfile)
+	data, err := localCache.ReadSimulation(simulation)
 
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Simulation not found"))

@@ -6,26 +6,26 @@ import (
 	"fmt"
 )
 
-type Hoverfile struct {
+type Simulation struct {
 	Vendor  string
 	Name    string
 	Version string
 }
 
-func (h *Hoverfile) GetFileName() string {
-	return fmt.Sprintf("%v.%v.%v.hfile", h.Vendor, h.Name, h.Version)
+func (s *Simulation) GetFileName() string {
+	return fmt.Sprintf("%v.%v.%v.hfile", s.Vendor, s.Name, s.Version)
 }
 
-func (h *Hoverfile) String() string {
-	return h.Vendor + "/" + h.Name + ":" + h.Version
+func (s *Simulation) String() string {
+	return s.Vendor + "/" + s.Name + ":" + s.Version
 }
 
-func NewHoverfile(key string) (Hoverfile, error) {
+func NewSimulation(key string) (Simulation, error) {
 
 	var vendor, name, version string
 
 	if strings.ContainsAny(key, "@\\~`|[]{}!@€£$%^&*()+=?\"';§±") {
-		return Hoverfile{}, errors.New("Invalid characters used in hoverfile name")
+		return Simulation{}, errors.New("Invalid characters used in simulation name")
 	}
 
 	if strings.Contains(key, "/") && strings.Contains(key, ":") {
@@ -46,7 +46,7 @@ func NewHoverfile(key string) (Hoverfile, error) {
 		version = "v1"
 	}
 
-	return Hoverfile {
+	return Simulation{
 		Vendor: vendor,
 		Name: name,
 		Version: version,

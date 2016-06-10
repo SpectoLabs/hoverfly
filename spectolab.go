@@ -23,8 +23,8 @@ type SpectoLab struct {
 	ApiKey string
 }
 
-func (s *SpectoLab) SimulationIsPresent(hoverfile Hoverfile) (bool, error) {
-	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v", hoverfile.Vendor, hoverfile.Vendor, "build-pipeline", hoverfile.Version, hoverfile.Name))
+func (s *SpectoLab) SimulationIsPresent(simulation Simulation) (bool, error) {
+	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v", simulation.Vendor, simulation.Vendor, "build-pipeline", simulation.Version, simulation.Name))
 
 	request, err := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Request()
 	if err != nil {
@@ -37,8 +37,8 @@ func (s *SpectoLab) SimulationIsPresent(hoverfile Hoverfile) (bool, error) {
 	return response.StatusCode == 200, nil
 }
 
-func (s *SpectoLab) CreateSimulation(hoverfile Hoverfile) int {
-	simulation := SpectoLabSimulation{Vendor: hoverfile.Vendor, Api: "build-pipeline", Version: hoverfile.Version, Name: hoverfile.Name, Description: "test"}
+func (s *SpectoLab) CreateSimulation(simulationName Simulation) int {
+	simulation := SpectoLabSimulation{Vendor: simulationName.Vendor, Api: "build-pipeline", Version: simulationName.Version, Name: simulationName.Name, Description: "test"}
 
 	url := s.buildUrl("/api/v1/simulations")
 
@@ -48,16 +48,16 @@ func (s *SpectoLab) CreateSimulation(hoverfile Hoverfile) int {
 	return response.StatusCode
 }
 
-func (s *SpectoLab) UploadSimulation(hoverfile Hoverfile, data []byte) (int, error) {
-	simulationExists, _ := s.SimulationIsPresent(hoverfile)
+func (s *SpectoLab) UploadSimulation(simulation Simulation, data []byte) (int, error) {
+	simulationExists, _ := s.SimulationIsPresent(simulation)
 	if !simulationExists {
-		postStatusCode := s.CreateSimulation(hoverfile)
+		postStatusCode := s.CreateSimulation(simulation)
 		if postStatusCode != 201 {
 			return 0, errors.New("Failed to create a new simulation on the Specto Lab")
 		}
 	}
 
-	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", hoverfile.Vendor, hoverfile.Vendor, "build-pipeline", hoverfile.Version, hoverfile.Name))
+	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", simulation.Vendor, simulation.Vendor, "build-pipeline", simulation.Version, simulation.Name))
 
 	request, _ := sling.New().Put(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Body(strings.NewReader(string(data))).Request()
 	response, _ := http.DefaultClient.Do(request)
@@ -66,13 +66,13 @@ func (s *SpectoLab) UploadSimulation(hoverfile Hoverfile, data []byte) (int, err
 	return response.StatusCode, nil
 }
 
-func (s *SpectoLab) GetSimulation(hoverfile Hoverfile, overrideHost string) []byte {
+func (s *SpectoLab) GetSimulation(simulation Simulation, overrideHost string) []byte {
 	var url string
 
 	if len(overrideHost) > 0 {
-		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data?override-host=%v", hoverfile.Vendor, hoverfile.Vendor, "build-pipeline", hoverfile.Version, hoverfile.Name, overrideHost))
+		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data?override-host=%v", simulation.Vendor, simulation.Vendor, "build-pipeline", simulation.Version, simulation.Name, overrideHost))
 	} else {
-		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", hoverfile.Vendor, hoverfile.Vendor, "build-pipeline", hoverfile.Version, hoverfile.Name))
+		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/vendors/%v/apis/%v/versions/%v/%v/data", simulation.Vendor, simulation.Vendor, "build-pipeline", simulation.Version, simulation.Name))
 	}
 
 	request, _ := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Request()
