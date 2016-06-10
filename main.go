@@ -45,7 +45,7 @@ func main() {
 
 	cacheDirectory, err := createCacheDirectory(hoverflyDirectory)
 	if err != nil {
-		failAndExitWithVerboseLevel("Could not create local cache", err, *verboseFlag)
+		failAndExit("Could not create local cache", err, *verboseFlag)
 	}
 
 	localCache := LocalCache{
@@ -74,7 +74,7 @@ func main() {
 				if err == nil {
 					fmt.Println("Hoverfly is set to", mode, "mode")
 				} else {
-					failAndExitWithVerboseLevel("Could not get Hoverfly's mode", err, *verboseFlag)
+					failAndExit("Could not get Hoverfly's mode", err, *verboseFlag)
 				}
 
 			} else {
@@ -83,7 +83,7 @@ func main() {
 				if err == nil {
 					fmt.Println("Hoverfly has been set to", mode, "mode")
 				} else {
-					failAndExitWithVerboseLevel("Could not set Hoverfly's mode", err, *verboseFlag)
+					failAndExit("Could not set Hoverfly's mode", err, *verboseFlag)
 				}
 
 			}
@@ -91,7 +91,7 @@ func main() {
 		case startCommand.FullCommand():
 			err := startHandler(hoverflyDirectory, hoverfly)
 			if err != nil {
-				failAndExitWithVerboseLevel("Could not start Hoverfly", err, *verboseFlag)
+				failAndExit("Could not start Hoverfly", err, *verboseFlag)
 			}
 
 		case stopCommand.FullCommand():
@@ -100,53 +100,53 @@ func main() {
 		case exportCommand.FullCommand():
 			hoverfile, err := NewHoverfile(*exportNameArg)
 			if err != nil {
-				failAndExitWithVerboseLevel("Could not export from Hoverfly", err, *verboseFlag)
+				failAndExit("Could not export from Hoverfly", err, *verboseFlag)
 			}
 
 			exportedData, err := hoverfly.ExportSimulation()
 
 			if err != nil {
-				failAndExitWithVerboseLevel("Could not export from Hoverfly", err, *verboseFlag)
+				failAndExit("Could not export from Hoverfly", err, *verboseFlag)
 			}
 
 			if err = localCache.WriteSimulation(hoverfile, exportedData); err == nil {
 				fmt.Println(*exportNameArg, "exported successfully")
 			} else {
-				failAndExitWithVerboseLevel("Could not write simulation to local cache", err, *verboseFlag)
+				failAndExit("Could not write simulation to local cache", err, *verboseFlag)
 			}
 
 		case importCommand.FullCommand():
 			hoverfile, err := NewHoverfile(*importNameArg)
 			if err != nil {
-				failAndExitWithVerboseLevel("Could not import into Hoverfly", err, *verboseFlag)
+				failAndExit("Could not import into Hoverfly", err, *verboseFlag)
 			}
 
 			data, err := localCache.ReadSimulation(hoverfile)
 			if err != nil {
-				failAndExitWithVerboseLevel("Could not read simulation from local cache", err, *verboseFlag)
+				failAndExit("Could not read simulation from local cache", err, *verboseFlag)
 			}
 
 			if err = hoverfly.ImportSimulation(string(data)); err == nil {
 				fmt.Println(hoverfile.String(), "imported successfully")
 			} else {
-				failAndExitWithVerboseLevel("Could not import into Hoverfly", err, *verboseFlag)
+				failAndExit("Could not import into Hoverfly", err, *verboseFlag)
 			}
 
 		case pushCommand.FullCommand():
 			hoverfile, err := NewHoverfile(*pushNameArg)
 			if err != nil {
-				failAndExitWithVerboseLevel("Could not push to Specto Labs", err, *verboseFlag)
+				failAndExit("Could not push to Specto Labs", err, *verboseFlag)
 			}
 
 			data, err := localCache.ReadSimulation(hoverfile)
 			if err != nil {
-				failAndExitWithVerboseLevel("Could not read simulation from local cache", err, *verboseFlag)
+				failAndExit("Could not read simulation from local cache", err, *verboseFlag)
 			}
 
 
 			statusCode, err := spectoLab.UploadSimulation(hoverfile, data)
 			if err != nil {
-				failAndExitWithVerboseLevel("Could not upload simulation to Specto Labs", err, *verboseFlag)
+				failAndExit("Could not upload simulation to Specto Labs", err, *verboseFlag)
 			}
 
 			if statusCode == 200 {
@@ -156,7 +156,7 @@ func main() {
 		case pullCommand.FullCommand():
 			hoverfile, err := NewHoverfile(*pullNameArg)
 			if err != nil {
-				failAndExitWithVerboseLevel("Could not pull from Specto Labs", err, *verboseFlag)
+				failAndExit("Could not pull from Specto Labs", err, *verboseFlag)
 			}
 
 			data := spectoLab.GetSimulation(hoverfile, *pullOverrideHostFlag)
@@ -164,19 +164,19 @@ func main() {
 			if err := localCache.WriteSimulation(hoverfile, data); err == nil {
 				fmt.Println(hoverfile.String(), "has been pulled from the Specto Lab")
 			} else {
-				failAndExitWithVerboseLevel("Could not write simulation to local cache", err, *verboseFlag)
+				failAndExit("Could not write simulation to local cache", err, *verboseFlag)
 			}
 
 		case wipeCommand.FullCommand():
 			if err := hoverfly.Wipe(); err == nil {
 				fmt.Println("Hoverfly has been wiped")
 			} else {
-				failAndExitWithVerboseLevel("Could not wipe Hoverfly", err, *verboseFlag)
+				failAndExit("Could not wipe Hoverfly", err, *verboseFlag)
 			}
 	}
 }
 
-func failAndExitWithVerboseLevel(message string, err error, verbose bool) {
+func failAndExit(message string, err error, verbose bool) {
 	fmt.Println(message)
 	if verbose {
 		fmt.Println(err.Error())
@@ -192,13 +192,13 @@ func getHoverflyDirectory(config Config) string {
 		hoverflyDir, err := createHomeDirectory()
 
 		if err != nil {
-			failAndExitWithVerboseLevel("Could not get .hoverfly directory", err, *verboseFlag)
+			failAndExit("Could not get .hoverfly directory", err, *verboseFlag)
 		}
 
 		err = config.WriteToFile(hoverflyDir)
 
 		if err != nil {
-			failAndExitWithVerboseLevel("Could not write new config to disk", err, *verboseFlag)
+			failAndExit("Could not write new config to disk", err, *verboseFlag)
 		}
 
 		return hoverflyDir
