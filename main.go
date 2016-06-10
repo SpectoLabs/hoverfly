@@ -112,7 +112,7 @@ func main() {
 			if err = localCache.WriteSimulation(hoverfile, exportedData); err == nil {
 				fmt.Println(*exportNameArg, "exported successfully")
 			} else {
-				failAndExitWithVerboseLevel("Could not write Hoverfile to local cache", err, *verboseFlag)
+				failAndExitWithVerboseLevel("Could not write simulation to local cache", err, *verboseFlag)
 			}
 
 		case importCommand.FullCommand():
@@ -123,7 +123,7 @@ func main() {
 
 			data, err := localCache.ReadSimulation(hoverfile)
 			if err != nil {
-				failAndExitWithVerboseLevel("Could not read Hoverfile from local cache", err, *verboseFlag)
+				failAndExitWithVerboseLevel("Could not read simulation from local cache", err, *verboseFlag)
 			}
 
 			if err = hoverfly.ImportSimulation(string(data)); err == nil {
@@ -164,7 +164,7 @@ func main() {
 			if err := localCache.WriteSimulation(hoverfile, data); err == nil {
 				fmt.Println(hoverfile.String(), "has been pulled from the Specto Lab")
 			} else {
-				failAndExitWithVerboseLevel("Could not write Hoverfile to local cache", err, *verboseFlag)
+				failAndExitWithVerboseLevel("Could not write simulation to local cache", err, *verboseFlag)
 			}
 
 		case wipeCommand.FullCommand():
