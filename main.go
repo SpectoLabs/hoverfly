@@ -39,8 +39,9 @@ var (
 func main() {
 	kingpin.Parse()
 
-	SetConfigurationPaths()
 	SetConfigurationDefaults()
+	SetConfigurationPaths()
+
 	config := GetConfig(*hostFlag, *adminPortFlag, *proxyPortFlag)
 
 	hoverflyDirectory := getHoverflyDirectory(config)
