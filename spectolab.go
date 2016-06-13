@@ -25,17 +25,16 @@ func (s *SpectoLab) CreateSimulation(simulationName Simulation) (error) {
 
 	url := s.buildUrl("/api/v1/simulations")
 	request, err := sling.New().Post(url).BodyJSON(simulation).Add("Authorization", s.buildAuthorizationHeaderValue()).Request()
-
 	if err != nil {
 		return err
 	}
 
 	response, err := http.DefaultClient.Do(request)
-	defer response.Body.Close()
-
 	if err != nil {
 		return err
 	}
+
+	defer response.Body.Close()
 
 	return nil
 }
