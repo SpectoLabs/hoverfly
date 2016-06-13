@@ -8,17 +8,16 @@ import (
 	"io/ioutil"
 )
 
-type SpectoLabSimulation struct {
-	Version     string `json:"version"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
-
 type SpectoLab struct {
 	Host   string
 	Port   string
 	ApiKey string
+}
+
+type SpectoLabSimulation struct {
+	Version     string `json:"version"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func (s *SpectoLab) CreateSimulation(simulationName Simulation) (error) {
