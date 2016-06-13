@@ -151,7 +151,7 @@ func main() {
 				failAndExit("Could not upload simulation to Specto Labs", err, *verboseFlag)
 			}
 
-			if statusCode == 200 {
+			if statusCode {
 				fmt.Println(simulation.String(), "has been pushed to the Specto Lab")
 			}
 

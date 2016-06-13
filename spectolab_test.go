@@ -3,7 +3,13 @@ package main
 import (
 	"testing"
 	. "github.com/onsi/gomega"
+	"os"
 )
+
+func TestMain(m *testing.M) {
+	returnCode := m.Run()
+	os.Exit(returnCode)
+}
 
 func Test_SpectoLab_buildBaseUrl_UsesHostAndPort(t *testing.T) {
 	RegisterTestingT(t)
