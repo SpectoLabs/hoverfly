@@ -5,4 +5,4 @@ test:
 	go test -v $(go list ./... | grep -v -E 'vendor')
 
 build:
-	go build -o target/hoverfly-cli
+	go build -o target/hoverctl
