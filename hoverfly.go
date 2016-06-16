@@ -185,8 +185,8 @@ func (h *Hoverfly) buildBaseUrl() string {
 This isn't working as intended, its working, just not how I imagined it.
  */
 
-func (h *Hoverfly) start(hoverflyDir string) (error) {
-	hoverflyPidFile := h.buildPidFilePath(hoverflyDir)
+func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) (error) {
+	hoverflyPidFile := h.buildPidFilePath(hoverflyDirectory.Path)
 
 	if _, err := os.Stat(hoverflyPidFile); err != nil {
 		if os.IsNotExist(err) {
@@ -214,8 +214,8 @@ func (h *Hoverfly) start(hoverflyDir string) (error) {
 This isn't working as intended, its working, just not how I imagined it.
  */
 
-func (h *Hoverfly) stop(hoverflyDir string) {
-	hoverflyPidFile := h.buildPidFilePath(hoverflyDir)
+func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) {
+	hoverflyPidFile := h.buildPidFilePath(hoverflyDirectory.Path)
 
 	if _, err := os.Stat(hoverflyPidFile); err != nil {
 		if os.IsNotExist(err) {

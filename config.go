@@ -48,7 +48,7 @@ func (c *Config) GetFilepath() (string) {
 	return viper.ConfigFileUsed()
 }
 
-func (c *Config) WriteToFile(path string) (error) {
+func (c *Config) WriteToFile(hoverflyDirectory HoverflyDirectory) (error) {
 	data, err := yaml.Marshal(c)
 
 	if err != nil {
@@ -56,7 +56,7 @@ func (c *Config) WriteToFile(path string) (error) {
 		return err
 	}
 
-	filepath := filepath.Join(path, "config.yaml")
+	filepath := filepath.Join(hoverflyDirectory.Path, "config.yaml")
 
 	err = ioutil.WriteFile(filepath, data, 0644)
 

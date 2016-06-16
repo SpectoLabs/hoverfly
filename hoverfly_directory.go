@@ -5,14 +5,30 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"path/filepath"
 	"os"
+	"path"
 )
 
 type HoverflyDirectory struct {
 	Path string
 }
 
-func NewHoverflyDirectory() (HoverflyDirectory) {
-	return HoverflyDirectory{Path: "/"}
+func NewHoverflyDirectory(config Config) (HoverflyDirectory) {
+	if len(config.GetFilepath()) == 0 {
+		log.Info("Missing a config file")
+		log.Info("Creating a new  a config file")
+		hoverflyDirectory := HoverflyDirectory{Path: createHoverflyDirectory(getHomeDirectory())}
+
+		err := config.WriteToFile(hoverflyDirectory)
+
+		if err != nil {
+			log.Fatal("Could not write new config to disk")
+		}
+
+		return hoverflyDirectory
+	}
+	return HoverflyDirectory{
+		Path: path.Dir(config.GetFilepath()),
+	}
 }
 
 func getHomeDirectory() (string) {

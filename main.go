@@ -3,7 +3,6 @@ package main
 import (
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"path"
 )
 
 var (
@@ -46,7 +45,7 @@ func main() {
 
 	config := GetConfig(*hostFlag, *adminPortFlag, *proxyPortFlag)
 
-	hoverflyDirectory := getHoverflyDirectory(config)
+	hoverflyDirectory := NewHoverflyDirectory(config)
 
 	cacheDirectory, err := createCacheDirectory(hoverflyDirectory)
 	if err != nil {
@@ -177,23 +176,4 @@ func main() {
 				log.Fatal("Could not wipe Hoverfly")
 			}
 	}
-}
-
-func getHoverflyDirectory(config Config) string {
-	if len(config.GetFilepath()) == 0 {
-		log.Info("Missing a config file")
-		log.Info("Creating a new  a config file")
-
-		hoverflyDir := createHoverflyDirectory(getHomeDirectory())
-
-		err := config.WriteToFile(hoverflyDir)
-
-		if err != nil {
-			log.Fatal("Could not write new config to disk")
-		}
-
-		return hoverflyDir
-	}
-
-	return path.Dir(config.GetFilepath())
 }

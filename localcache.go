@@ -29,8 +29,8 @@ func (l *LocalCache) ReadSimulation(simulation Simulation) ([]byte, error) {
 	return ioutil.ReadFile(simulationUri)
 }
 
-func createCacheDirectory(baseUri string) (string, error) {
-	cacheDirectory := filepath.Join(baseUri, "cache/")
+func createCacheDirectory(hoverflyDirectory HoverflyDirectory) (string, error) {
+	cacheDirectory := filepath.Join(hoverflyDirectory.Path, "cache/")
 
 	if _, err := os.Stat(cacheDirectory); err != nil {
 		if os.IsNotExist(err) {

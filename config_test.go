@@ -92,13 +92,17 @@ func Test_ConfigWriteToFileWritesTheConfigObjectToAFileInAYamlFormat(t *testing.
 	SetConfigurationDefaults()
 	config := GetConfig("", "", "")
 
-	workingDir, _ := os.Getwd()
-	err := config.WriteToFile(workingDir)
+	wd, _ := os.Getwd()
+	hoverflyDirectory := HoverflyDirectory{
+		Path: wd,
+	}
+
+	err := config.WriteToFile(hoverflyDirectory)
 
 	Expect(err).To(BeNil())
 
-	data, _ := ioutil.ReadFile(workingDir + "/config.yaml")
-	os.Remove(workingDir + "/config.yaml")
+	data, _ := ioutil.ReadFile(hoverflyDirectory.Path + "/config.yaml")
+	os.Remove(hoverflyDirectory.Path + "/config.yaml")
 
 	var result Config
 	yaml.Unmarshal(data, &result)
