@@ -9,17 +9,17 @@ import (
 
 var testDirectory = "/tmp/hoverctl-tests"
 
-func setup() {
+func localCache_setup() {
 	os.Mkdir(testDirectory, 0777)
 }
 
-func teardown() {
+func localCache_teardown() {
 	os.RemoveAll(testDirectory)
 }
 
 func Test_LocalCache_WriteSimulation(t *testing.T) {
 	RegisterTestingT(t)
-	setup()
+	localCache_setup()
 
 	localCache := LocalCache{Uri: testDirectory}
 	simulation := Simulation{Vendor: "vendor", Name: "name", Version: "v1"}
@@ -33,12 +33,12 @@ func Test_LocalCache_WriteSimulation(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(string(data)).To(Equal("hello"))
 
-	teardown()
+	localCache_teardown()
 }
 
 func Test_LocalCache_WriteSimulation_WithJson(t *testing.T) {
 	RegisterTestingT(t)
-	setup()
+	localCache_setup()
 
 	localCache := LocalCache{Uri: testDirectory}
 	simulation := Simulation{Vendor: "vendor", Name: "test", Version: "v1"}
@@ -52,12 +52,12 @@ func Test_LocalCache_WriteSimulation_WithJson(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(string(data)).To(Equal(`{"key":"value"}`))
 
-	teardown()
+	localCache_teardown()
 }
 
 func Test_LocalCache_ReadSimulation(t *testing.T) {
 	RegisterTestingT(t)
-	setup()
+	localCache_setup()
 
 	ioutil.WriteFile(testDirectory + "/vendor.name.v1.hfile", []byte("this is a test file"), 0644)
 
@@ -69,12 +69,12 @@ func Test_LocalCache_ReadSimulation(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(data).To(Equal([]byte("this is a test file")))
 
-	teardown()
+	localCache_teardown()
 }
 
 func Test_LocalCache_ReadSimulation_ErrorsWhenFileIsMissing(t *testing.T) {
 	RegisterTestingT(t)
-	setup()
+	localCache_setup()
 
 	localCache := LocalCache{Uri: testDirectory}
 	simulation := Simulation{Vendor: "vendor", Name: "name", Version: "v1"}
@@ -85,5 +85,5 @@ func Test_LocalCache_ReadSimulation_ErrorsWhenFileIsMissing(t *testing.T) {
 	Expect(err.Error()).To(Equal("Simulation not found"))
 	Expect(data).To(BeNil())
 
-	teardown()
+	localCache_teardown()
 }
