@@ -189,21 +189,24 @@ func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) (error) {
 		return err
 	}
 
-	if pid == 0 {
-		cmd := exec.Command("hoverfly", "-db", "memory", "-ap", h.AdminPort, "-pp", h.ProxyPort)
-
-		err := cmd.Start()
-		if err != nil {
-			return err
+	if pid != 0 {
+		_, err := h.GetMode()
+		if err == nil {
+			return errors.New("Hoverfly is already running")
 		}
+		hoverflyDirectory.DeletePid(h.AdminPort, h.ProxyPort)
+	}
 
-		err = hoverflyDirectory.WritePid(h.AdminPort, h.ProxyPort, cmd.Process.Pid)
-		if err != nil {
-			return err
-		}
+	cmd := exec.Command("hoverfly", "-db", "memory", "-ap", h.AdminPort, "-pp", h.ProxyPort)
 
-	} else {
-		return errors.New("Hoverfly is already running")
+	err = cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	err = hoverflyDirectory.WritePid(h.AdminPort, h.ProxyPort, cmd.Process.Pid)
+	if err != nil {
+		return err
 	}
 
 	return nil
