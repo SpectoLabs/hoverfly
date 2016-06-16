@@ -2,7 +2,6 @@ package main
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"net/http"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"path"
 )
@@ -59,12 +58,7 @@ func main() {
 	}
 
 
-	hoverfly := Hoverfly {
-		Host: config.HoverflyHost,
-		AdminPort: config.HoverflyAdminPort,
-		ProxyPort: config.HoverflyProxyPort,
-		httpClient: http.DefaultClient,
-	}
+	hoverfly := NewHoverfly(config)
 
 	spectoLab := SpectoLab{
 		Host: config.SpectoLabHost,

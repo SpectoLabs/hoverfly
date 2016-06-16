@@ -28,6 +28,15 @@ type Hoverfly struct {
 	httpClient *http.Client
 }
 
+func NewHoverfly(config Config) (Hoverfly) {
+	return Hoverfly {
+		Host: config.HoverflyHost,
+		AdminPort: config.HoverflyAdminPort,
+		ProxyPort: config.HoverflyProxyPort,
+		httpClient: http.DefaultClient,
+	}
+}
+
 func (h *Hoverfly) Wipe() error {
 	url := h.buildUrl("/api/records")
 
