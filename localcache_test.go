@@ -21,7 +21,7 @@ func Test_LocalCache_WriteSimulation(t *testing.T) {
 	RegisterTestingT(t)
 	localCache_setup()
 
-	localCache := LocalCache{Uri: localCache_testDirectory}
+	localCache := LocalCache{URI: localCache_testDirectory}
 	simulation := Simulation{Vendor: "vendor", Name: "name", Version: "v1"}
 
 	err := localCache.WriteSimulation(simulation, []byte("hello"))
@@ -40,7 +40,7 @@ func Test_LocalCache_WriteSimulation_WithJson(t *testing.T) {
 	RegisterTestingT(t)
 	localCache_setup()
 
-	localCache := LocalCache{Uri: localCache_testDirectory}
+	localCache := LocalCache{URI: localCache_testDirectory}
 	simulation := Simulation{Vendor: "vendor", Name: "test", Version: "v1"}
 
 	err := localCache.WriteSimulation(simulation, []byte(`{"key":"value"}`))
@@ -61,7 +61,7 @@ func Test_LocalCache_ReadSimulation(t *testing.T) {
 
 	ioutil.WriteFile(localCache_testDirectory + "/vendor.name.v1.hfile", []byte("this is a test file"), 0644)
 
-	localCache := LocalCache{Uri: localCache_testDirectory}
+	localCache := LocalCache{URI: localCache_testDirectory}
 	simulation := Simulation{Vendor: "vendor", Name: "name", Version: "v1"}
 
 	data, err := localCache.ReadSimulation(simulation)
@@ -76,7 +76,7 @@ func Test_LocalCache_ReadSimulation_ErrorsWhenFileIsMissing(t *testing.T) {
 	RegisterTestingT(t)
 	localCache_setup()
 
-	localCache := LocalCache{Uri: localCache_testDirectory}
+	localCache := LocalCache{URI: localCache_testDirectory}
 	simulation := Simulation{Vendor: "vendor", Name: "name", Version: "v1"}
 
 	data, err := localCache.ReadSimulation(simulation)

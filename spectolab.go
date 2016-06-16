@@ -12,7 +12,7 @@ import (
 type SpectoLab struct {
 	Host   string
 	Port   string
-	ApiKey string
+	APIKey string
 }
 
 type SpectoLabSimulation struct {
@@ -24,7 +24,7 @@ type SpectoLabSimulation struct {
 func (s *SpectoLab) CreateSimulation(simulationName Simulation) (error) {
 	simulation := SpectoLabSimulation{Version: simulationName.Version, Name: simulationName.Name, Description: "A description could go here"}
 
-	url := s.buildUrl("/api/v1/simulations")
+	url := s.buildURL("/api/v1/simulations")
 	request, err := sling.New().Post(url).BodyJSON(simulation).Add("Authorization", s.buildAuthorizationHeaderValue()).Request()
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func (s *SpectoLab) UploadSimulation(simulation Simulation, data []byte) (bool, 
 		return false, err
 	}
 
-	url := s.buildUrl(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data", simulation.Vendor,  simulation.Name, simulation.Version))
+	url := s.buildURL(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data", simulation.Vendor,  simulation.Name, simulation.Version))
 
 	request, err := sling.New().Put(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Body(strings.NewReader(string(data))).Request()
 
@@ -69,9 +69,9 @@ func (s *SpectoLab) UploadSimulation(simulation Simulation, data []byte) (bool, 
 func (s *SpectoLab) GetSimulation(simulation Simulation, overrideHost string) ([]byte, error) {
 	var url string
 	if len(overrideHost) > 0 {
-		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data?override-host=%v", simulation.Vendor, simulation.Name, simulation.Version, overrideHost))
+		url = s.buildURL(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data?override-host=%v", simulation.Vendor, simulation.Name, simulation.Version, overrideHost))
 	} else {
-		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data", simulation.Vendor, simulation.Name, simulation.Version))
+		url = s.buildURL(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data", simulation.Vendor, simulation.Name, simulation.Version))
 	}
 
 	request, err := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Request()
@@ -97,18 +97,18 @@ func (s *SpectoLab) GetSimulation(simulation Simulation, overrideHost string) ([
 	return body, nil
 }
 
-func (s *SpectoLab) buildUrl(endpoint string) string {
-	return fmt.Sprintf("%v%v", s.buildBaseUrl(), endpoint)
+func (s *SpectoLab) buildURL(endpoint string) string {
+	return fmt.Sprintf("%v%v", s.buildBaseURL(), endpoint)
 }
 
-func (s *SpectoLab) buildBaseUrl() string {
+func (s *SpectoLab) buildBaseURL() string {
 	if len(s.Port) > 0 {
 		return fmt.Sprintf("http://%v:%v", s.Host, s.Port)
-	} else {
-		return fmt.Sprintf("http://%v", s.Host)
 	}
+
+	return fmt.Sprintf("http://%v", s.Host)
 }
 
 func (s *SpectoLab) buildAuthorizationHeaderValue() string {
-	return fmt.Sprintf("Bearer %v", s.ApiKey)
+	return fmt.Sprintf("Bearer %v", s.APIKey)
 }

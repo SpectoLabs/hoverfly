@@ -53,7 +53,7 @@ func main() {
 	}
 
 	localCache := LocalCache{
-		Uri: cacheDirectory,
+		URI: cacheDirectory,
 	}
 
 
@@ -62,7 +62,7 @@ func main() {
 	spectoLab := SpectoLab{
 		Host: config.SpectoLabHost,
 		Port: config.SpectoLabPort,
-		ApiKey: config.SpectoLabApiKey,
+		APIKey: config.SpectoLabAPIKey,
 	}
 
 	switch kingpin.Parse() {

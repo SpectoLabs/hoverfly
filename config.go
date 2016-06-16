@@ -14,7 +14,7 @@ type Config struct {
 	HoverflyProxyPort string `yaml:"hoverfly.proxy.port"`
 	SpectoLabHost     string `yaml:"specto.lab.host"`
 	SpectoLabPort     string `yaml:"specto.lab.port"`
-	SpectoLabApiKey   string `yaml:"specto.lab.api.key"`
+	SpectoLabAPIKey   string `yaml:"specto.lab.api.key"`
 }
 
 func GetConfig(hoverflyHostOverride, hoverflyAdminPortOverride, hoverflyProxyPortOverride string) Config {
@@ -26,7 +26,7 @@ func GetConfig(hoverflyHostOverride, hoverflyAdminPortOverride, hoverflyProxyPor
 		HoverflyProxyPort: viper.GetString("hoverfly.proxy.port"),
 		SpectoLabHost: viper.GetString("specto.lab.host"),
 		SpectoLabPort: viper.GetString("specto.lab.port"),
-		SpectoLabApiKey: viper.GetString("specto.lab.api.key"),
+		SpectoLabAPIKey: viper.GetString("specto.lab.api.key"),
 	}
 
 	if len(hoverflyHostOverride) > 0 {

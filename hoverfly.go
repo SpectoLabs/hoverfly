@@ -13,7 +13,7 @@ import (
 	"os/exec"
 )
 
-type ApiStateResponse struct {
+type APIStateResponse struct {
 	Mode        string `json:"mode"`
 	Destination string `json:"destination"`
 }
@@ -36,7 +36,7 @@ func NewHoverfly(config Config) (Hoverfly) {
 }
 
 func (h *Hoverfly) Wipe() (error) {
-	url := h.buildUrl("/api/records")
+	url := h.buildURL("/api/records")
 
 	request, err := sling.New().Delete(url).Request()
 	if err != nil {
@@ -59,7 +59,7 @@ func (h *Hoverfly) Wipe() (error) {
 }
 
 func (h *Hoverfly) GetMode() (string, error) {
-	url := h.buildUrl("/api/state")
+	url := h.buildURL("/api/state")
 	request, err := sling.New().Get(url).Request()
 
 	if err != nil {
@@ -76,7 +76,7 @@ func (h *Hoverfly) GetMode() (string, error) {
 
 	defer response.Body.Close()
 
-	apiResponse := h.createApiStateResponse(response)
+	apiResponse := h.createAPIStateResponse(response)
 
 	return apiResponse.Mode, nil
 }
@@ -86,7 +86,7 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 		return "", errors.New(mode + " is not a valid mode")
 	}
 
-	url := h.buildUrl("/api/state")
+	url := h.buildURL("/api/state")
 	request, err := sling.New().Post(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`)).Request()
 
 	if err != nil {
@@ -101,13 +101,13 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 		return "", err
 	}
 
-	apiResponse := h.createApiStateResponse(response)
+	apiResponse := h.createAPIStateResponse(response)
 
 	return apiResponse.Mode, nil
 }
 
 func (h *Hoverfly) ImportSimulation(payload string) (error) {
-	url := h.buildUrl("/api/records")
+	url := h.buildURL("/api/records")
 	request, err := sling.New().Post(url).Body(strings.NewReader(payload)).Request()
 
 	if err != nil {
@@ -130,7 +130,7 @@ func (h *Hoverfly) ImportSimulation(payload string) (error) {
 }
 
 func (h *Hoverfly) ExportSimulation() ([]byte, error) {
-	url := h.buildUrl("/api/records")
+	url := h.buildURL("/api/records")
 
 	request, err := sling.New().Get(url).Request()
 	if err != nil {
@@ -155,13 +155,13 @@ func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 	return body, nil
 }
 
-func (h *Hoverfly) createApiStateResponse(response *http.Response) (ApiStateResponse) {
+func (h *Hoverfly) createAPIStateResponse(response *http.Response) (APIStateResponse) {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())
 	}
 
-	var apiResponse ApiStateResponse
+	var apiResponse APIStateResponse
 
 	err = json.Unmarshal(body, &apiResponse)
 	if err != nil {
@@ -171,11 +171,11 @@ func (h *Hoverfly) createApiStateResponse(response *http.Response) (ApiStateResp
 	return apiResponse
 }
 
-func (h *Hoverfly) buildUrl(endpoint string) (string) {
-	return fmt.Sprintf("%v%v", h.buildBaseUrl(), endpoint)
+func (h *Hoverfly) buildURL(endpoint string) (string) {
+	return fmt.Sprintf("%v%v", h.buildBaseURL(), endpoint)
 }
 
-func (h *Hoverfly) buildBaseUrl() string {
+func (h *Hoverfly) buildBaseURL() string {
 	return fmt.Sprintf("http://%v:%v", h.Host, h.AdminPort)
 }
 
@@ -229,17 +229,17 @@ func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) (error) {
 	if pid == 0 {
 		return errors.New("Hoverfly is not running")
 
-	} else {
-		hoverflyProcess := os.Process{Pid: pid}
-		err := hoverflyProcess.Kill()
-		if err != nil {
-			return err
-		}
+	}
 
-		err = hoverflyDirectory.DeletePid(h.AdminPort, h.ProxyPort)
-		if err != nil {
-			return err
-		}
+	hoverflyProcess := os.Process{Pid: pid}
+	err = hoverflyProcess.Kill()
+	if err != nil {
+		return err
+	}
+
+	err = hoverflyDirectory.DeletePid(h.AdminPort, h.ProxyPort)
+	if err != nil {
+		return err
 	}
 
 	return nil
