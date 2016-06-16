@@ -7,28 +7,28 @@ import (
 	"os"
 )
 
-var testDirectory = "/tmp/hoverctl-tests"
+var localCache_testDirectory = "/tmp/hoverctl-tests"
 
 func localCache_setup() {
-	os.Mkdir(testDirectory, 0777)
+	os.Mkdir(localCache_testDirectory, 0777)
 }
 
 func localCache_teardown() {
-	os.RemoveAll(testDirectory)
+	os.RemoveAll(localCache_testDirectory)
 }
 
 func Test_LocalCache_WriteSimulation(t *testing.T) {
 	RegisterTestingT(t)
 	localCache_setup()
 
-	localCache := LocalCache{Uri: testDirectory}
+	localCache := LocalCache{Uri: localCache_testDirectory}
 	simulation := Simulation{Vendor: "vendor", Name: "name", Version: "v1"}
 
 	err := localCache.WriteSimulation(simulation, []byte("hello"))
 
 	Expect(err).To(BeNil())
 
-	data, err := ioutil.ReadFile(testDirectory + "/vendor.name.v1.hfile")
+	data, err := ioutil.ReadFile(localCache_testDirectory + "/vendor.name.v1.hfile")
 
 	Expect(err).To(BeNil())
 	Expect(string(data)).To(Equal("hello"))
@@ -40,14 +40,14 @@ func Test_LocalCache_WriteSimulation_WithJson(t *testing.T) {
 	RegisterTestingT(t)
 	localCache_setup()
 
-	localCache := LocalCache{Uri: testDirectory}
+	localCache := LocalCache{Uri: localCache_testDirectory}
 	simulation := Simulation{Vendor: "vendor", Name: "test", Version: "v1"}
 
 	err := localCache.WriteSimulation(simulation, []byte(`{"key":"value"}`))
 
 	Expect(err).To(BeNil())
 
-	data, err := ioutil.ReadFile(testDirectory + "/vendor.test.v1.hfile")
+	data, err := ioutil.ReadFile(localCache_testDirectory + "/vendor.test.v1.hfile")
 
 	Expect(err).To(BeNil())
 	Expect(string(data)).To(Equal(`{"key":"value"}`))
@@ -59,9 +59,9 @@ func Test_LocalCache_ReadSimulation(t *testing.T) {
 	RegisterTestingT(t)
 	localCache_setup()
 
-	ioutil.WriteFile(testDirectory + "/vendor.name.v1.hfile", []byte("this is a test file"), 0644)
+	ioutil.WriteFile(localCache_testDirectory + "/vendor.name.v1.hfile", []byte("this is a test file"), 0644)
 
-	localCache := LocalCache{Uri: testDirectory}
+	localCache := LocalCache{Uri: localCache_testDirectory}
 	simulation := Simulation{Vendor: "vendor", Name: "name", Version: "v1"}
 
 	data, err := localCache.ReadSimulation(simulation)
@@ -76,7 +76,7 @@ func Test_LocalCache_ReadSimulation_ErrorsWhenFileIsMissing(t *testing.T) {
 	RegisterTestingT(t)
 	localCache_setup()
 
-	localCache := LocalCache{Uri: testDirectory}
+	localCache := LocalCache{Uri: localCache_testDirectory}
 	simulation := Simulation{Vendor: "vendor", Name: "name", Version: "v1"}
 
 	data, err := localCache.ReadSimulation(simulation)

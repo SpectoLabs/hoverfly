@@ -184,13 +184,9 @@ func getHoverflyDirectory(config Config) string {
 		log.Info("Missing a config file")
 		log.Info("Creating a new  a config file")
 
-		hoverflyDir, err := createHomeDirectory()
+		hoverflyDir := createHoverflyDirectory(getHomeDirectory())
 
-		if err != nil {
-			log.Fatal("Could not get .hoverfly directory")
-		}
-
-		err = config.WriteToFile(hoverflyDir)
+		err := config.WriteToFile(hoverflyDir)
 
 		if err != nil {
 			log.Fatal("Could not write new config to disk")

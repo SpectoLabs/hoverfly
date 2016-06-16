@@ -2,7 +2,6 @@ package main
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/mitchellh/go-homedir"
 	"path/filepath"
 	"os"
 	"io/ioutil"
@@ -28,29 +27,6 @@ func (l *LocalCache) ReadSimulation(simulation Simulation) ([]byte, error) {
 	}
 
 	return ioutil.ReadFile(simulationUri)
-}
-
-func createHomeDirectory() (string, error) {
-	homeDirectory, err := homedir.Dir()
-	if err != nil {
-		log.Debug(err.Error())
-		return "", err
-	}
-
-	hoverflyDirectory := filepath.Join(homeDirectory, "/.hoverfly")
-
-
-	if !fileIsPresent(hoverflyDirectory) {
-		err := os.Mkdir(hoverflyDirectory, 0777)
-		if err == nil {
-			return hoverflyDirectory, nil
-		} else {
-			log.Debug(err.Error())
-			return "", err
-		}
-	}
-
-	return hoverflyDirectory, nil
 }
 
 func createCacheDirectory(baseUri string) (string, error) {
