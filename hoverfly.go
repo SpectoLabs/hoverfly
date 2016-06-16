@@ -9,8 +9,6 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
-	"strconv"
-	"path/filepath"
 	"os"
 	"os/exec"
 )
@@ -186,58 +184,49 @@ This isn't working as intended, its working, just not how I imagined it.
  */
 
 func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) (error) {
-	hoverflyPidFile := h.buildPidFilePath(hoverflyDirectory.Path)
+	pid := hoverflyDirectory.GetPid(h.AdminPort, h.ProxyPort)
 
-	if _, err := os.Stat(hoverflyPidFile); err != nil {
-		if os.IsNotExist(err) {
-			cmd := exec.Command("hoverfly", "-db", "memory", "-ap", h.AdminPort, "-pp", h.ProxyPort)
-			err = cmd.Start()
+	if pid == 0 {
+		cmd := exec.Command("hoverfly", "-db", "memory", "-ap", h.AdminPort, "-pp", h.ProxyPort)
+		err := cmd.Start()
 
-			if err != nil {
-				log.Debug(err.Error())
-				return err
-			}
-
-			ioutil.WriteFile(hoverflyPidFile, []byte(strconv.Itoa(cmd.Process.Pid)), 0644)
-			log.Info("Hoverfly is now running")
+		if err != nil {
+			log.Debug(err.Error())
+			return err
 		}
-	} else {
-		log.Info("Hoverfly is already running")
-	}
+		err = hoverflyDirectory.WritePid(h.AdminPort, h.ProxyPort, cmd.Process.Pid)
+		if err != nil {
+			log.Debug(err.Error())
+			return err
+		}
 
-	//WRITE A LOOP TO CHECK IF ITS RUNNING
+		log.Info("Hoverfly is now running")
+	} else {
+		log.Fatal("Hoverfly is already running")
+	}
 
 	return nil
 }
 
-/*
-This isn't working as intended, its working, just not how I imagined it.
- */
-
 func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) {
-	hoverflyPidFile := h.buildPidFilePath(hoverflyDirectory.Path)
+	pid := hoverflyDirectory.GetPid(h.AdminPort, h.ProxyPort)
 
-	if _, err := os.Stat(hoverflyPidFile); err != nil {
-		if os.IsNotExist(err) {
-			log.Fatal("Hoverfly is not running")
-		}
+	if pid == 0 {
+		log.Fatal("Hoverfly is not running")
 	} else {
-		pidFileData, _ := ioutil.ReadFile(hoverflyPidFile)
-		pid, _ := strconv.Atoi(string(pidFileData))
 		hoverflyProcess := os.Process{Pid: pid}
 		err := hoverflyProcess.Kill()
-		if err == nil {
-			log.Info("Hoverfly has been killed")
-			os.Remove(hoverflyPidFile)
-		} else {
+		if err != nil {
 			log.Debug(err.Error())
 			log.Debug("Pid: %#v", pid)
 			log.Fatal("Failed to kill Hoverfly")
 		}
-	}
-}
 
-func (h *Hoverfly) buildPidFilePath(hoverflyDir string) (string) {
-	pidName := fmt.Sprintf("hoverfly.%v.%v.pid", h.AdminPort, h.ProxyPort)
-	return filepath.Join(hoverflyDir, pidName)
+		log.Info("Hoverfly has been killed")
+		err = hoverflyDirectory.DeletePid(h.AdminPort, h.ProxyPort)
+		if err != nil {
+			log.Debug(err.Error())
+			log.Fatal("Failed to remove hoverfly pid from .hover")
+		}
+	}
 }

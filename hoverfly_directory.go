@@ -6,6 +6,10 @@ import (
 	"path/filepath"
 	"os"
 	"path"
+	"fmt"
+	"io/ioutil"
+	"strconv"
+	"errors"
 )
 
 type HoverflyDirectory struct {
@@ -29,6 +33,44 @@ func NewHoverflyDirectory(config Config) (HoverflyDirectory) {
 	return HoverflyDirectory{
 		Path: path.Dir(config.GetFilepath()),
 	}
+}
+
+func (h *HoverflyDirectory) GetPid(adminPort, proxyPort string) (int) {
+	hoverflyPidFile := h.buildPidFilePath(adminPort, proxyPort)
+	if fileIsPresent(hoverflyPidFile) {
+		pidFileData, err := ioutil.ReadFile(hoverflyPidFile)
+		if err != nil {
+			log.Debug(err.Error())
+			log.Fatal("Could not get pid from .hoverfly directory")
+		}
+
+		pid, err := strconv.Atoi(string(pidFileData))
+		if err != nil {
+			log.Debug(err.Error())
+			log.Fatal("Could not read pid from .hoverfly directory")
+		}
+
+		return pid
+	}
+
+	return 0
+}
+
+func (h *HoverflyDirectory) WritePid(adminPort, proxyPort string, pid int) (error) {
+	pidFilePath := h.buildPidFilePath(adminPort, proxyPort)
+	if fileIsPresent(pidFilePath) {
+		return errors.New("Hoverfly pid already exists")
+	}
+	return ioutil.WriteFile(pidFilePath, []byte(strconv.Itoa(pid)), 0644)
+}
+
+func (h *HoverflyDirectory) DeletePid(adminPort, proxyPort string) (error) {
+	return os.Remove(h.buildPidFilePath(adminPort, proxyPort))
+}
+
+func (h *HoverflyDirectory) buildPidFilePath(adminPort, proxyPort string) (string) {
+	pidName := fmt.Sprintf("hoverfly.%v.%v.pid", adminPort, proxyPort)
+	return filepath.Join(h.Path, pidName)
 }
 
 func getHomeDirectory() (string) {
