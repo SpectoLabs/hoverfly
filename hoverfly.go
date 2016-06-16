@@ -184,49 +184,52 @@ This isn't working as intended, its working, just not how I imagined it.
  */
 
 func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) (error) {
-	pid := hoverflyDirectory.GetPid(h.AdminPort, h.ProxyPort)
+	pid, err := hoverflyDirectory.GetPid(h.AdminPort, h.ProxyPort)
+	if err != nil {
+		return err
+	}
 
 	if pid == 0 {
 		cmd := exec.Command("hoverfly", "-db", "memory", "-ap", h.AdminPort, "-pp", h.ProxyPort)
-		err := cmd.Start()
 
+		err := cmd.Start()
 		if err != nil {
-			log.Debug(err.Error())
 			return err
 		}
+
 		err = hoverflyDirectory.WritePid(h.AdminPort, h.ProxyPort, cmd.Process.Pid)
 		if err != nil {
-			log.Debug(err.Error())
 			return err
 		}
 
-		log.Info("Hoverfly is now running")
 	} else {
-		log.Fatal("Hoverfly is already running")
+		return errors.New("Hoverfly is already running")
 	}
 
 	return nil
 }
 
-func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) {
-	pid := hoverflyDirectory.GetPid(h.AdminPort, h.ProxyPort)
+func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) (error) {
+	pid, err := hoverflyDirectory.GetPid(h.AdminPort, h.ProxyPort)
+	if err != nil {
+		return err
+	}
 
 	if pid == 0 {
-		log.Fatal("Hoverfly is not running")
+		return errors.New("Hoverfly is not running")
+
 	} else {
 		hoverflyProcess := os.Process{Pid: pid}
 		err := hoverflyProcess.Kill()
 		if err != nil {
-			log.Debug(err.Error())
-			log.Debug("Pid: %#v", pid)
-			log.Fatal("Failed to kill Hoverfly")
+			return err
 		}
 
-		log.Info("Hoverfly has been killed")
 		err = hoverflyDirectory.DeletePid(h.AdminPort, h.ProxyPort)
 		if err != nil {
-			log.Debug(err.Error())
-			log.Fatal("Failed to remove hoverfly pid from .hover")
+			return err
 		}
 	}
+
+	return nil
 }

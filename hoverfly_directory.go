@@ -35,25 +35,23 @@ func NewHoverflyDirectory(config Config) (HoverflyDirectory) {
 	}
 }
 
-func (h *HoverflyDirectory) GetPid(adminPort, proxyPort string) (int) {
+func (h *HoverflyDirectory) GetPid(adminPort, proxyPort string) (int, error) {
 	hoverflyPidFile := h.buildPidFilePath(adminPort, proxyPort)
 	if fileIsPresent(hoverflyPidFile) {
 		pidFileData, err := ioutil.ReadFile(hoverflyPidFile)
 		if err != nil {
-			log.Debug(err.Error())
-			log.Fatal("Could not get pid from .hoverfly directory")
+			return 0, err
 		}
 
 		pid, err := strconv.Atoi(string(pidFileData))
 		if err != nil {
-			log.Debug(err.Error())
-			log.Fatal("Could not read pid from .hoverfly directory")
+			return 0, err
 		}
 
-		return pid
+		return pid, nil
 	}
 
-	return 0
+	return 0, nil
 }
 
 func (h *HoverflyDirectory) WritePid(adminPort, proxyPort string, pid int) (error) {

@@ -55,9 +55,10 @@ func Test_GetPid_ReturnsAnIntOfTheFileContents(t *testing.T) {
 		Path: hoverflyDirectory_testDirectory,
 	}
 
-	result := hoverflyDirectory.GetPid("9654", "4332")
+	result, err := hoverflyDirectory.GetPid("9654", "4332")
 
 	Expect(result).To(Equal(5555))
+	Expect(err).To(BeNil())
 
 	hoverflyDirectory_teardown()
 }
@@ -70,9 +71,10 @@ func Test_GetPid_ReturnsZeroIfFileIsNotFound(t *testing.T) {
 		Path: hoverflyDirectory_testDirectory,
 	}
 
-	result := hoverflyDirectory.GetPid("8321", "3342")
+	result, err := hoverflyDirectory.GetPid("8321", "3342")
 
 	Expect(result).To(Equal(0))
+	Expect(err).To(BeNil())
 
 	hoverflyDirectory_teardown()
 }
