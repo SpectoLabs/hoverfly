@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-var testDirectory = "/tmp/hoverfly-cli-tests"
+var testDirectory = "/tmp/hoverctl-tests"
 
 func setup() {
 	os.Mkdir(testDirectory, 0777)
