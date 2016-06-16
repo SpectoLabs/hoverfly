@@ -37,7 +37,7 @@ func NewHoverfly(config Config) (Hoverfly) {
 	}
 }
 
-func (h *Hoverfly) Wipe() error {
+func (h *Hoverfly) Wipe() (error) {
 	url := h.buildUrl("/api/records")
 
 	request, err := sling.New().Delete(url).Request()
@@ -108,7 +108,7 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 	return apiResponse.Mode, nil
 }
 
-func (h *Hoverfly) ImportSimulation(payload string) error {
+func (h *Hoverfly) ImportSimulation(payload string) (error) {
 	url := h.buildUrl("/api/records")
 	request, err := sling.New().Post(url).Body(strings.NewReader(payload)).Request()
 
@@ -157,7 +157,7 @@ func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 	return body, nil
 }
 
-func (h *Hoverfly) createApiStateResponse(response *http.Response) ApiStateResponse {
+func (h *Hoverfly) createApiStateResponse(response *http.Response) (ApiStateResponse) {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())
@@ -173,11 +173,11 @@ func (h *Hoverfly) createApiStateResponse(response *http.Response) ApiStateRespo
 	return apiResponse
 }
 
-func (h * Hoverfly) buildUrl(endpoint string) string {
+func (h *Hoverfly) buildUrl(endpoint string) (string) {
 	return fmt.Sprintf("%v%v", h.buildBaseUrl(), endpoint)
 }
 
-func (h * Hoverfly) buildBaseUrl() string {
+func (h *Hoverfly) buildBaseUrl() string {
 	return fmt.Sprintf("http://%v:%v", h.Host, h.AdminPort)
 }
 
