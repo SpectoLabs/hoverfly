@@ -23,10 +23,10 @@ var (
 	importCommand = kingpin.Command("import", "Imports data into Hoverfly")
 	importNameArg = importCommand.Arg("name", "Name of imported simulation").Required().String()
 
-	pushCommand = kingpin.Command("push", "Pushes the data to Specto Hub")
+	pushCommand = kingpin.Command("push", "Pushes the data to SpectoLab")
 	pushNameArg = pushCommand.Arg("name", "Name of exported simulation").Required().String()
 
-	pullCommand = kingpin.Command("pull", "Pushes the data to Specto Hub")
+	pullCommand = kingpin.Command("pull", "Pushes the data to SpectoLab")
 	pullNameArg = pullCommand.Arg("name", "Name of imported simulation").Required().String()
 	pullOverrideHostFlag = pullCommand.Flag("override-host", "Name of the host you want to virtualise").String()
 
@@ -143,7 +143,7 @@ func main() {
 		case pushCommand.FullCommand():
 			simulation, err := NewSimulation(*pushNameArg)
 			if err != nil {
-				log.Fatal("Could not push to Specto Labs")
+				log.Fatal("Could not push to SpectoLab")
 			}
 
 			simulationData, err := localCache.ReadSimulation(simulation)
@@ -154,26 +154,26 @@ func main() {
 
 			statusCode, err := spectoLab.UploadSimulation(simulation, simulationData)
 			if err != nil {
-				log.Fatal("Could not upload simulation to Specto Labs")
+				log.Fatal("Could not upload simulation to SpectoLab")
 			}
 
 			if statusCode {
-				log.Info(simulation.String(), " has been pushed to the Specto Lab")
+				log.Info(simulation.String(), " has been pushed to the SpectoLab")
 			}
 
 		case pullCommand.FullCommand():
 			simulation, err := NewSimulation(*pullNameArg)
 			if err != nil {
-				log.Fatal("Could not pull from Specto Labs")
+				log.Fatal("Could not pull from SpectoLab")
 			}
 
 			simulationData, err := spectoLab.GetSimulation(simulation, *pullOverrideHostFlag)
 			if err != nil {
-				log.Fatal("Could not pull simulation from Specto Labs")
+				log.Fatal("Could not pull simulation from SpectoLab")
 			}
 
 			if err := localCache.WriteSimulation(simulation, simulationData); err == nil {
-				log.Info(simulation.String(), " has been pulled from the Specto Lab")
+				log.Info(simulation.String(), " has been pulled from the SpectoLab")
 			} else {
 				log.Fatal("Could not write simulation to local cache")
 			}
