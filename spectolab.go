@@ -1,6 +1,7 @@
 package main
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"fmt"
 	"github.com/dghubble/sling"
 	"net/http"
@@ -65,7 +66,7 @@ func (s *SpectoLab) UploadSimulation(simulation Simulation, data []byte) (bool, 
 	return response.StatusCode >= 200 && response.StatusCode <= 299, nil
 }
 
-func (s *SpectoLab) GetSimulation(simulation Simulation, overrideHost string) []byte {
+func (s *SpectoLab) GetSimulation(simulation Simulation, overrideHost string) ([]byte, error) {
 	var url string
 	if len(overrideHost) > 0 {
 		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data?override-host=%v", simulation.Vendor, simulation.Name, simulation.Version, overrideHost))
@@ -73,13 +74,27 @@ func (s *SpectoLab) GetSimulation(simulation Simulation, overrideHost string) []
 		url = s.buildUrl(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data", simulation.Vendor, simulation.Name, simulation.Version))
 	}
 
-	request, _ := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Request()
-	response, _ := http.DefaultClient.Do(request)
+	request, err := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Request()
+	if err != nil {
+		log.Debug(err.Error())
+		return nil, err
+	}
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		log.Debug(err.Error())
+		return nil, err
+	}
+
 	defer response.Body.Close()
 
-	body, _ := ioutil.ReadAll(response.Body)
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Debug(err.Error())
+		return nil, err
+	}
 
-	return body
+	return body, nil
 }
 
 func (s *SpectoLab) buildUrl(endpoint string) string {

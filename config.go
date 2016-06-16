@@ -1,6 +1,7 @@
 package main
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 	"path/filepath"
@@ -51,6 +52,7 @@ func (c *Config) WriteToFile(path string) (error) {
 	data, err := yaml.Marshal(c)
 
 	if err != nil {
+		log.Debug(err.Error())
 		return err
 	}
 
@@ -59,6 +61,7 @@ func (c *Config) WriteToFile(path string) (error) {
 	err = ioutil.WriteFile(filepath, data, 0644)
 
 	if err != nil {
+		log.Debug(err.Error())
 		return err
 	}
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"fmt"
 	"github.com/dghubble/sling"
 	"net/http"
@@ -29,8 +30,18 @@ type Hoverfly struct {
 
 func (h *Hoverfly) Wipe() error {
 	url := h.buildUrl("/api/records")
-	request, _ := sling.New().Delete(url).Request()
-	response, _ := h.httpClient.Do(request)
+
+	request, err := sling.New().Delete(url).Request()
+	if err != nil {
+		log.Debug(err.Error())
+		return err
+	}
+
+	response, err := h.httpClient.Do(request)
+	if err != nil {
+		log.Debug(err.Error())
+		return err
+	}
 	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
@@ -45,12 +56,14 @@ func (h *Hoverfly) GetMode() (string, error) {
 	request, err := sling.New().Get(url).Request()
 
 	if err != nil {
+		log.Debug(err.Error())
 		return "", err
 	}
 
 	response, err := h.httpClient.Do(request)
 
 	if err != nil {
+		log.Debug(err.Error())
 		return "", err
 	}
 
@@ -70,12 +83,14 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 	request, err := sling.New().Post(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`)).Request()
 
 	if err != nil {
+		log.Debug(err.Error())
 		return "", err
 	}
 
 	response, err := h.httpClient.Do(request)
 
 	if err != nil {
+		log.Debug(err.Error())
 		return "", err
 	}
 
@@ -89,12 +104,14 @@ func (h *Hoverfly) ImportSimulation(payload string) error {
 	request, err := sling.New().Post(url).Body(strings.NewReader(payload)).Request()
 
 	if err != nil {
+		log.Debug(err.Error())
 		return err
 	}
 
 	response, err := h.httpClient.Do(request)
 
 	if err != nil {
+		log.Debug(err.Error())
 		return err
 	}
 
@@ -110,11 +127,13 @@ func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 
 	request, err := sling.New().Get(url).Request()
 	if err != nil {
+		log.Debug(err.Error())
 		return nil, err
 	}
 
 	response, err := h.httpClient.Do(request)
 	if err != nil {
+		log.Debug(err.Error())
 		return nil, err
 	}
 
@@ -122,6 +141,7 @@ func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		log.Debug(err.Error())
 		return nil, err
 	}
 
@@ -129,9 +149,18 @@ func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 }
 
 func (h *Hoverfly) createApiStateResponse(response *http.Response) ApiStateResponse {
-	body, _ := ioutil.ReadAll(response.Body)
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Debug(err.Error())
+	}
+
 	var apiResponse ApiStateResponse
-	json.Unmarshal(body, &apiResponse)
+
+	err = json.Unmarshal(body, &apiResponse)
+	if err != nil {
+		log.Debug(err.Error())
+	}
+
 	return apiResponse
 }
 
@@ -157,14 +186,15 @@ func startHandler(hoverflyDirectory string, hoverfly Hoverfly) error {
 			err = cmd.Start()
 
 			if err != nil {
+				log.Debug(err.Error())
 				return err
 			}
 
 			ioutil.WriteFile(hoverflyPidFile, []byte(strconv.Itoa(cmd.Process.Pid)), 0644)
-			fmt.Println("Hoverfly is now running")
+			log.Info("Hoverfly is now running")
 		}
 	} else {
-		fmt.Println("Hoverfly is already running")
+		log.Info("Hoverfly is already running")
 	}
 
 	//WRITE A LOOP TO CHECK IF ITS RUNNING
@@ -182,7 +212,7 @@ func stopHandler(hoverflyDirectory string, hoverfly Hoverfly) {
 
 	if _, err := os.Stat(hoverflyPidFile); err != nil {
 		if os.IsNotExist(err) {
-			fmt.Println("Hoverfly is not running")
+			log.Fatal("Hoverfly is not running")
 		}
 	} else {
 		pidFileData, _ := ioutil.ReadFile(hoverflyPidFile)
@@ -190,12 +220,12 @@ func stopHandler(hoverflyDirectory string, hoverfly Hoverfly) {
 		hoverflyProcess := os.Process{Pid: pid}
 		err := hoverflyProcess.Kill()
 		if err == nil {
-			fmt.Println("Hoverfly has been killed")
+			log.Info("Hoverfly has been killed")
 			os.Remove(hoverflyPidFile)
 		} else {
-			fmt.Println("Failed to kill Hoverfly")
-			fmt.Println(err.Error())
-			fmt.Printf("Pid: %#v", pid)
+			log.Debug(err.Error())
+			log.Debug("Pid: %#v", pid)
+			log.Fatal("Failed to kill Hoverfly")
 		}
 	}
 }
