@@ -89,13 +89,13 @@ func main() {
 			}
 
 		case startCommand.FullCommand():
-			err := startHandler(hoverflyDirectory, hoverfly)
+			err := hoverfly.start(hoverflyDirectory)
 			if err != nil {
 				log.Fatal("Could not start Hoverfly")
 			}
 
 		case stopCommand.FullCommand():
-			stopHandler(hoverflyDirectory, hoverfly)
+			hoverfly.stop(hoverflyDirectory)
 
 		case exportCommand.FullCommand():
 			simulation, err := NewSimulation(*exportNameArg)
