@@ -1,6 +1,7 @@
 package main
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"fmt"
 	"github.com/dghubble/sling"
 	"net/http"
@@ -19,6 +20,27 @@ type SpectoLabSimulation struct {
 	Version     string `json:"version"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+}
+
+func (s *SpectoLab) CheckAPIKey() (error) {
+	url := s.buildURL("/api/v1/simulations")
+	request, err := sling.New().Post(url).BodyJSON("{}").Add("Authorization", s.buildAuthorizationHeaderValue()).Request()
+	if err != nil {
+		return err
+	}
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return err
+	}
+	log.Info(response.StatusCode)
+	log.Info(s.buildAuthorizationHeaderValue())
+	log.Info(url)
+	if response.StatusCode == 401 {
+		return errors.New("You don't have a valid API key, please sign in at https://lab.specto.io to generate a new API key")
+	}
+
+	return nil
 }
 
 func (s *SpectoLab) CreateSimulation(simulationName Simulation) (error) {
@@ -104,10 +126,10 @@ func (s *SpectoLab) buildURL(endpoint string) string {
 
 func (s *SpectoLab) buildBaseURL() string {
 	if len(s.Port) > 0 {
-		return fmt.Sprintf("http://%v:%v", s.Host, s.Port)
+		return fmt.Sprintf("https://%v:%v", s.Host, s.Port)
 	}
 
-	return fmt.Sprintf("http://%v", s.Host)
+	return fmt.Sprintf("https://%v", s.Host)
 }
 
 func (s *SpectoLab) buildAuthorizationHeaderValue() string {
