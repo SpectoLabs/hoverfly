@@ -121,6 +121,9 @@ func main() {
 			log.Info(simulation.String(), " imported successfully")
 
 		case pushCommand.FullCommand():
+			err := spectoLab.CheckAPIKey()
+			handleIfError(err, "API key not valid")
+
 			simulation, err := NewSimulation(*pushNameArg)
 			handleIfError(err, "Could not push to SpectoLab")
 
@@ -135,6 +138,9 @@ func main() {
 			}
 
 		case pullCommand.FullCommand():
+			err := spectoLab.CheckAPIKey()
+			handleIfError(err, "API key not valid")
+
 			simulation, err := NewSimulation(*pullNameArg)
 			handleIfError(err, "Could not pull from SpectoLab")
 
