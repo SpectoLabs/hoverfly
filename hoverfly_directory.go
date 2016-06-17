@@ -16,23 +16,26 @@ type HoverflyDirectory struct {
 	Path string
 }
 
-func NewHoverflyDirectory(config Config) (HoverflyDirectory) {
+func NewHoverflyDirectory(config Config) (HoverflyDirectory, error) {
+	var hoverflyDirectory HoverflyDirectory
+
 	if len(config.GetFilepath()) == 0 {
-		log.Info("Missing a config file")
-		log.Info("Creating a new  a config file")
-		hoverflyDirectory := HoverflyDirectory{Path: createHoverflyDirectory(getHomeDirectory())}
+		log.Debug("Missing a config file")
+		log.Debug("Creating a new  a config file")
+		hoverflyDirectory = HoverflyDirectory{Path: createHoverflyDirectory(getHomeDirectory())}
 
 		err := config.WriteToFile(hoverflyDirectory)
-
 		if err != nil {
-			log.Fatal("Could not write new config to disk")
+			return HoverflyDirectory{}, err
 		}
 
-		return hoverflyDirectory
+	} else {
+		hoverflyDirectory = HoverflyDirectory{
+			Path: path.Dir(config.GetFilepath()),
+		}
 	}
-	return HoverflyDirectory{
-		Path: path.Dir(config.GetFilepath()),
-	}
+
+	return hoverflyDirectory, nil
 }
 
 func (h *HoverflyDirectory) GetPid(adminPort, proxyPort string) (int, error) {

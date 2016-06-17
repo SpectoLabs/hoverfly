@@ -17,8 +17,11 @@ type Config struct {
 	SpectoLabAPIKey   string `yaml:"specto.lab.api.key"`
 }
 
-func GetConfig(hoverflyHostOverride, hoverflyAdminPortOverride, hoverflyProxyPortOverride string) Config {
-	viper.ReadInConfig()
+func GetConfig(hoverflyHostOverride, hoverflyAdminPortOverride, hoverflyProxyPortOverride string) (Config) {
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Debug(err.Error())
+	}
 
 	config := Config{
 		HoverflyHost: viper.GetString("hoverfly.host"),

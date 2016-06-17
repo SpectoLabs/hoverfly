@@ -30,7 +30,6 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyHost(t *testing.T) {
 	hoverflyHost := "testhost"
 	result := GetConfig(hoverflyHost, "", "")
 
-
 	Expect(result.HoverflyHost).To(Equal(hoverflyHost))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
@@ -91,6 +90,7 @@ func Test_ConfigWriteToFileWritesTheConfigObjectToAFileInAYamlFormat(t *testing.
 
 	SetConfigurationDefaults()
 	config := GetConfig("", "", "")
+
 
 	wd, _ := os.Getwd()
 	hoverflyDirectory := HoverflyDirectory{
