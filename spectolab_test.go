@@ -17,7 +17,7 @@ func Test_SpectoLab_buildBaseUrl_UsesHostAndPort(t *testing.T) {
 	spectoLab := SpectoLab{Host: "test-host", Port: "12432"}
 
 	result := spectoLab.buildBaseURL()
-	Expect(result).To(Equal("https://test-host:12432"))
+	Expect(result).To(Equal("test-host:12432"))
 }
 
 func Test_SpectoLab_buildBaseUrl_JustHostDoesNotIncludeSemicolon(t *testing.T) {
@@ -26,7 +26,7 @@ func Test_SpectoLab_buildBaseUrl_JustHostDoesNotIncludeSemicolon(t *testing.T) {
 	spectoLab := SpectoLab{Host: "test-host.com", Port: ""}
 
 	result := spectoLab.buildBaseURL()
-	Expect(result).To(Equal("https://test-host.com"))
+	Expect(result).To(Equal("test-host.com"))
 }
 
 func Test_SpectoLab_buildAuthorizationHeaderValue_UsesApiKey(t *testing.T) {
