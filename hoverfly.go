@@ -35,20 +35,22 @@ func NewHoverfly(config Config) (Hoverfly) {
 	}
 }
 
+// Wipe will call the records endpoint in Hoverfly with a DELETE request, triggering Hoverfly to wipe the database
 func (h *Hoverfly) Wipe() (error) {
 	url := h.buildURL("/api/records")
 
 	request, err := sling.New().Delete(url).Request()
 	if err != nil {
 		log.Debug(err.Error())
-		return err
+		return errors.New("Could not communicate with Hoverfly")
 	}
 
 	response, err := h.httpClient.Do(request)
 	if err != nil {
 		log.Debug(err.Error())
-		return err
+		return errors.New("Could not communicate with Hoverfly")
 	}
+
 	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
@@ -58,20 +60,20 @@ func (h *Hoverfly) Wipe() (error) {
 	return nil
 }
 
+// GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
 func (h *Hoverfly) GetMode() (string, error) {
 	url := h.buildURL("/api/state")
-	request, err := sling.New().Get(url).Request()
 
+	request, err := sling.New().Get(url).Request()
 	if err != nil {
 		log.Debug(err.Error())
-		return "", err
+		return "", errors.New("Could not communicate with Hoverfly")
 	}
 
 	response, err := h.httpClient.Do(request)
-
 	if err != nil {
 		log.Debug(err.Error())
-		return "", err
+		return "", errors.New("Could not communicate with Hoverfly")
 	}
 
 	defer response.Body.Close()
@@ -81,6 +83,7 @@ func (h *Hoverfly) GetMode() (string, error) {
 	return apiResponse.Mode, nil
 }
 
+// Set will go the state endpoint in Hoverfly, sending JSON that will set the mode of Hoverfly
 func (h *Hoverfly) SetMode(mode string) (string, error) {
 	if mode != "simulate" && mode != "capture" && mode != "modify" && mode != "synthesize" {
 		return "", errors.New(mode + " is not a valid mode")
@@ -88,17 +91,15 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 
 	url := h.buildURL("/api/state")
 	request, err := sling.New().Post(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`)).Request()
-
 	if err != nil {
 		log.Debug(err.Error())
-		return "", err
+		return "", errors.New("Could not communicate with Hoverfly")
 	}
 
 	response, err := h.httpClient.Do(request)
-
 	if err != nil {
 		log.Debug(err.Error())
-		return "", err
+		return "", errors.New("Could not communicate with Hoverfly")
 	}
 
 	apiResponse := h.createAPIStateResponse(response)

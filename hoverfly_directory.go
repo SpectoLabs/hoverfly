@@ -26,7 +26,8 @@ func NewHoverflyDirectory(config Config) (HoverflyDirectory, error) {
 
 		err := config.WriteToFile(hoverflyDirectory)
 		if err != nil {
-			return HoverflyDirectory{}, err
+			log.Debug(err.Error())
+			return HoverflyDirectory{}, errors.New("Could not write new config to disk")
 		}
 
 	} else {

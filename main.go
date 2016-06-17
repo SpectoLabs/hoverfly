@@ -46,10 +46,10 @@ func main() {
 	config := GetConfig(*hostFlag, *adminPortFlag, *proxyPortFlag)
 
 	hoverflyDirectory, err := NewHoverflyDirectory(config)
-	handleIfError(err, "Could not write new config to disk")
+	handleIfError(err)
 
 	cacheDirectory, err := createCacheDirectory(hoverflyDirectory)
-	handleIfError(err, "Could not create local cache")
+	handleIfError(err)
 
 	localCache := LocalCache{
 		URI: cacheDirectory,
@@ -65,73 +65,65 @@ func main() {
 	switch kingpin.Parse() {
 		case modeCommand.FullCommand():
 			if *modeNameArg == "" || *modeNameArg == "status"{
-
 				mode, err := hoverfly.GetMode()
-				if err == nil {
-					log.Info("Hoverfly is set to ", mode, " mode")
-				} else {
-					log.Fatal("Could not get Hoverfly's mode")
-				}
+				handleIfError(err)
 
+				log.Info("Hoverfly is set to ", mode, " mode")
 			} else {
-
 				mode, err := hoverfly.SetMode(*modeNameArg)
-				if err == nil {
-					log.Info("Hoverfly has been set to ", mode, " mode")
-				} else {
-					log.Fatal("Could not set Hoverfly's mode")
-				}
+				handleIfError(err)
 
+				log.Info("Hoverfly has been set to ", mode, " mode")
 			}
 
 		case startCommand.FullCommand():
 			err := hoverfly.start(hoverflyDirectory)
-			handleIfError(err, "Could not start Hoverfly")
+			handleIfError_old(err, "Could not start Hoverfly")
 
 			log.Info("Hoverfly is now running")
 
 		case stopCommand.FullCommand():
 			err := hoverfly.stop(hoverflyDirectory)
-			handleIfError(err, "Could not stop Hoverfly")
+			handleIfError_old(err, "Could not stop Hoverfly")
 
 			log.Info("Hoverfly has been stopped")
 
 		case exportCommand.FullCommand():
 			simulation, err := NewSimulation(*exportNameArg)
-			handleIfError(err, "Could not export from Hoverfly with that name")
+			handleIfError_old(err, "Could not export from Hoverfly with that name")
 
 			simulationData, err := hoverfly.ExportSimulation()
-			handleIfError(err, "Could not export from Hoverfly")
+			handleIfError_old(err, "Could not export from Hoverfly")
 
 			err = localCache.WriteSimulation(simulation, simulationData)
-			handleIfError(err, "Could not write simulation to local cache")
+			handleIfError_old(err, "Could not write simulation to local cache")
 
 			log.Info(simulation.String(), " exported successfully")
 
 		case importCommand.FullCommand():
 			simulation, err := NewSimulation(*importNameArg)
-			handleIfError(err, "Could not import into Hoverfly")
+			handleIfError_old(err, "Could not import into Hoverfly")
 
 			simulationData, err := localCache.ReadSimulation(simulation)
-			handleIfError(err, "Could not read simulation from local cache")
+			handleIfError_old(err, "Could not read simulation from local cache")
 
 			err = hoverfly.ImportSimulation(string(simulationData))
-			handleIfError(err, "Could not import into Hoverfly")
+			handleIfError_old(err, "Could not import into Hoverfly")
 
 			log.Info(simulation.String(), " imported successfully")
 
 		case pushCommand.FullCommand():
 			err := spectoLab.CheckAPIKey()
-			handleIfError(err, "API key not valid")
+			handleIfError_old(err, "API key not valid")
 
 			simulation, err := NewSimulation(*pushNameArg)
-			handleIfError(err, "Could not push to SpectoLab")
+			handleIfError_old(err, "Could not push to SpectoLab")
 
 			simulationData, err := localCache.ReadSimulation(simulation)
-			handleIfError(err, "Could not read simulation from local cache")
+			handleIfError_old(err, "Could not read simulation from local cache")
 
 			statusCode, err := spectoLab.UploadSimulation(simulation, simulationData)
-			handleIfError(err, "Could not upload simulation to SpectoLab")
+			handleIfError_old(err, "Could not upload simulation to SpectoLab")
 
 			if statusCode {
 				log.Info(simulation.String(), " has been pushed to the SpectoLab")
@@ -139,30 +131,36 @@ func main() {
 
 		case pullCommand.FullCommand():
 			err := spectoLab.CheckAPIKey()
-			handleIfError(err, "API key not valid")
+			handleIfError_old(err, "API key not valid")
 
 			simulation, err := NewSimulation(*pullNameArg)
-			handleIfError(err, "Could not pull from SpectoLab")
+			handleIfError_old(err, "Could not pull from SpectoLab")
 
 			simulationData, err := spectoLab.GetSimulation(simulation, *pullOverrideHostFlag)
-			handleIfError(err, "Could not pull simulation from SpectoLab")
+			handleIfError_old(err, "Could not pull simulation from SpectoLab")
 
 			err = localCache.WriteSimulation(simulation, simulationData)
-			handleIfError(err, "Could not write simulation to local cache")
+			handleIfError_old(err, "Could not write simulation to local cache")
 
 			log.Info(simulation.String(), " has been pulled from the SpectoLab")
 
 		case wipeCommand.FullCommand():
 			err := hoverfly.Wipe()
-			handleIfError(err, "Could not wipe Hoverfly")
+			handleIfError(err)
 
 			log.Info("Hoverfly has been wiped")
 	}
 }
 
-func handleIfError(err error, message string) {
+func handleIfError_old(err error, message string) {
 	if err != nil {
 		log.Debug(err.Error())
 		log.Fatal(message)
+	}
+}
+
+func handleIfError(err error) {
+	if err != nil {
+		log.Fatal(err.Error())
 	}
 }
