@@ -38,7 +38,7 @@ func Test_NewSimulation_CanCreateASimulationFromKey_WithNoVersion(t *testing.T) 
 
 	Expect(simulation.Vendor).To(Equal("tester"))
 	Expect(simulation.Name).To(Equal("tested"))
-	Expect(simulation.Version).To(Equal("v1"))
+	Expect(simulation.Version).To(Equal("latest"))
 }
 
 func Test_NewSimulation_CanCreateASimulationFromKey_WithNoVendor(t *testing.T) {
@@ -49,7 +49,7 @@ func Test_NewSimulation_CanCreateASimulationFromKey_WithNoVendor(t *testing.T) {
 
 	Expect(simulation.Vendor).To(Equal(""))
 	Expect(simulation.Name).To(Equal("just_a-name"))
-	Expect(simulation.Version).To(Equal("v1"))
+	Expect(simulation.Version).To(Equal("latest"))
 }
 
 func Test_NewSimulation_WontCreateASimulationFromKey_WithSpecialCharacters(t *testing.T) {

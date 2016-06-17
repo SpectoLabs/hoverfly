@@ -39,11 +39,11 @@ func NewSimulation(key string) (Simulation, error) {
 		vendorAndEnd := strings.Split(key, "/", )
 		vendor = vendorAndEnd[0]
 		name = vendorAndEnd[1]
-		version = "v1"
+		version = "latest"
 	} else if !strings.Contains(key, "/") && ! strings.Contains(key, ":") {
 		vendor = ""
 		name = key
-		version = "v1"
+		version = "latest"
 	}
 
 	return Simulation{
