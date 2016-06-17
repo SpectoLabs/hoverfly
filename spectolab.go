@@ -1,12 +1,12 @@
 package main
 
 import (
-	log "github.com/Sirupsen/logrus"
 	"fmt"
 	"github.com/dghubble/sling"
 	"net/http"
 	"strings"
 	"io/ioutil"
+	"errors"
 )
 
 type SpectoLab struct {
@@ -76,21 +76,22 @@ func (s *SpectoLab) GetSimulation(simulation Simulation, overrideHost string) ([
 
 	request, err := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Request()
 	if err != nil {
-		log.Debug(err.Error())
 		return nil, err
 	}
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		log.Debug(err.Error())
 		return nil, err
 	}
 
 	defer response.Body.Close()
 
+	if response.StatusCode != 200 {
+		return nil, errors.New("Simulation not found in the SpectoLab")
+	}
+
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		log.Debug(err.Error())
 		return nil, err
 	}
 
