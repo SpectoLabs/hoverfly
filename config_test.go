@@ -18,8 +18,6 @@ func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
 	Expect(result.HoverflyHost).To(Equal("localhost"))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
-	Expect(result.SpectoLabHost).To(Equal("localhost"))
-	Expect(result.SpectoLabPort).To(Equal("81"))
 	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
@@ -33,8 +31,6 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyHost(t *testing.T) {
 	Expect(result.HoverflyHost).To(Equal(hoverflyHost))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
-	Expect(result.SpectoLabHost).To(Equal("localhost"))
-	Expect(result.SpectoLabPort).To(Equal("81"))
 	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
@@ -48,8 +44,6 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyAdminPort(t *testing.T) {
 	Expect(result.HoverflyHost).To(Equal("localhost"))
 	Expect(result.HoverflyAdminPort).To(Equal(hoverflyAdminPort))
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
-	Expect(result.SpectoLabHost).To(Equal("localhost"))
-	Expect(result.SpectoLabPort).To(Equal("81"))
 	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
@@ -63,8 +57,6 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyProxyPort(t *testing.T) {
 	Expect(result.HoverflyHost).To(Equal("localhost"))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
 	Expect(result.HoverflyProxyPort).To(Equal(hoverflyProxyPort))
-	Expect(result.SpectoLabHost).To(Equal("localhost"))
-	Expect(result.SpectoLabPort).To(Equal("81"))
 	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
@@ -80,8 +72,6 @@ func Test_GetConfigOverridesDefaultValueWithAllOverrides(t *testing.T) {
 	Expect(result.HoverflyHost).To(Equal(hoverflyHost))
 	Expect(result.HoverflyAdminPort).To(Equal(hoverflyAdminPort))
 	Expect(result.HoverflyProxyPort).To(Equal(hoverflyProxyPort))
-	Expect(result.SpectoLabHost).To(Equal("localhost"))
-	Expect(result.SpectoLabPort).To(Equal("81"))
 	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
@@ -110,7 +100,5 @@ func Test_ConfigWriteToFileWritesTheConfigObjectToAFileInAYamlFormat(t *testing.
 	Expect(result.HoverflyHost).To(Equal("localhost"))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
-	Expect(result.SpectoLabHost).To(Equal("localhost"))
-	Expect(result.SpectoLabPort).To(Equal("81"))
 	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }

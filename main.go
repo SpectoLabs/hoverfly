@@ -58,8 +58,7 @@ func main() {
 	hoverfly := NewHoverfly(config)
 
 	spectoLab := SpectoLab{
-		Host: config.SpectoLabHost,
-		Port: config.SpectoLabPort,
+		Host: "lab.specto.io",
 		APIKey: config.SpectoLabAPIKey,
 	}
 
