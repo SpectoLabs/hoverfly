@@ -11,22 +11,13 @@ func TestMain(m *testing.M) {
 	os.Exit(returnCode)
 }
 
-func Test_SpectoLab_buildBaseUrl_UsesHostAndPort(t *testing.T) {
+func Test_SpectoLab_buildUrl_JoinsAPathToTheHost(t *testing.T) {
 	RegisterTestingT(t)
 
-	spectoLab := SpectoLab{Host: "test-host", Port: "12432"}
+	spectoLab := SpectoLab{Host: "test-host.com"}
 
-	result := spectoLab.buildBaseURL()
-	Expect(result).To(Equal("test-host:12432"))
-}
-
-func Test_SpectoLab_buildBaseUrl_JustHostDoesNotIncludeSemicolon(t *testing.T) {
-	RegisterTestingT(t)
-
-	spectoLab := SpectoLab{Host: "test-host.com", Port: ""}
-
-	result := spectoLab.buildBaseURL()
-	Expect(result).To(Equal("test-host.com"))
+	result := spectoLab.buildURL("/cats")
+	Expect(result).To(Equal("test-host.com/cats"))
 }
 
 func Test_SpectoLab_buildAuthorizationHeaderValue_UsesApiKey(t *testing.T) {

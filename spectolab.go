@@ -12,7 +12,6 @@ import (
 
 type SpectoLab struct {
 	Host   string
-	Port   string
 	APIKey string
 }
 
@@ -121,15 +120,7 @@ func (s *SpectoLab) GetSimulation(simulation Simulation, overrideHost string) ([
 }
 
 func (s *SpectoLab) buildURL(endpoint string) string {
-	return fmt.Sprintf("%v%v", s.buildBaseURL(), endpoint)
-}
-
-func (s *SpectoLab) buildBaseURL() string {
-	if len(s.Port) > 0 {
-		return fmt.Sprintf("%v:%v", s.Host, s.Port)
-	}
-
-	return fmt.Sprintf("%v", s.Host)
+	return fmt.Sprintf("%v%v", s.Host, endpoint)
 }
 
 func (s *SpectoLab) buildAuthorizationHeaderValue() string {
