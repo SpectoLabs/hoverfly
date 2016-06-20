@@ -25,13 +25,17 @@ func (s *SpectoLab) CheckAPIKey() (error) {
 	url := s.buildURL("/api/v1/simulations")
 	request, err := sling.New().Post(url).BodyJSON("{}").Add("Authorization", s.buildAuthorizationHeaderValue()).Request()
 	if err != nil {
-		return err
+		log.Debug(err.Error())
+		return errors.New("Could not create a request to check API key against SpectoLab")
 	}
+
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		return err
+		log.Debug(err.Error())
+		return errors.New("Could not communicate with SpectoLab")
 	}
+
 	log.Info(response.StatusCode)
 	log.Info(s.buildAuthorizationHeaderValue())
 	log.Info(url)
@@ -97,12 +101,14 @@ func (s *SpectoLab) GetSimulation(simulation Simulation, overrideHost string) ([
 
 	request, err := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Request()
 	if err != nil {
-		return nil, err
+		log.Debug(err.Error())
+		return nil, errors.New("Could not create a request to the SpectoLab")
 	}
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		return nil, err
+		log.Debug(err.Error())
+		return nil, errors.New("Could not communicate with the SpectoLab")
 	}
 
 	defer response.Body.Close()
@@ -113,7 +119,8 @@ func (s *SpectoLab) GetSimulation(simulation Simulation, overrideHost string) ([
 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		log.Debug(err.Error())
+		return nil, errors.New("Could not pull simulation from the SpectoLab")
 	}
 
 	return body, nil

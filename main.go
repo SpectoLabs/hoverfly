@@ -114,7 +114,7 @@ func main() {
 
 		case pushCommand.FullCommand():
 			err := spectoLab.CheckAPIKey()
-			handleIfError_old(err, "API key not valid")
+			handleIfError(err)
 
 			simulation, err := NewSimulation(*pushNameArg)
 			handleIfError(err)
@@ -131,16 +131,16 @@ func main() {
 
 		case pullCommand.FullCommand():
 			err := spectoLab.CheckAPIKey()
-			handleIfError_old(err, "API key not valid")
+			handleIfError(err)
 
 			simulation, err := NewSimulation(*pullNameArg)
 			handleIfError(err)
 
 			simulationData, err := spectoLab.GetSimulation(simulation, *pullOverrideHostFlag)
-			handleIfError_old(err, "Could not pull simulation from SpectoLab")
+			handleIfError(err)
 
 			err = localCache.WriteSimulation(simulation, simulationData)
-			handleIfError_old(err, "Could not write simulation to local cache")
+			handleIfError(err)
 
 			log.Info(simulation.String(), " has been pulled from the SpectoLab")
 
