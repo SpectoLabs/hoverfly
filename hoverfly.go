@@ -195,7 +195,8 @@ func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) (error) {
 
 	pid, err := hoverflyDirectory.GetPid(h.AdminPort, h.ProxyPort)
 	if err != nil {
-		return err
+		log.Debug(err.Error())
+		return errors.New("Could not read Hoverfly pid file")
 	}
 
 	if pid != 0 {
@@ -210,12 +211,14 @@ func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) (error) {
 
 	err = cmd.Start()
 	if err != nil {
-		return err
+		log.Debug(err)
+		return errors.New("Could not start Hoverfly")
 	}
 
 	err = hoverflyDirectory.WritePid(h.AdminPort, h.ProxyPort, cmd.Process.Pid)
 	if err != nil {
-		return err
+		log.Debug(err.Error())
+		return errors.New("Could not write a pid for Hoverfly")
 	}
 
 	return nil

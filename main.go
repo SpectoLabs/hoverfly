@@ -78,7 +78,7 @@ func main() {
 
 		case startCommand.FullCommand():
 			err := hoverfly.start(hoverflyDirectory)
-			handleIfError_old(err, "Could not start Hoverfly")
+			handleIfError(err)
 
 			log.Info("Hoverfly is now running")
 
