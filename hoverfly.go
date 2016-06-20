@@ -136,13 +136,13 @@ func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 	request, err := sling.New().Get(url).Request()
 	if err != nil {
 		log.Debug(err.Error())
-		return nil, err
+		return nil, errors.New("Could not create a request to Hoverfly")
 	}
 
 	response, err := h.httpClient.Do(request)
 	if err != nil {
 		log.Debug(err.Error())
-		return nil, err
+		return nil, errors.New("Could not communicate with Hoverfly")
 	}
 
 	defer response.Body.Close()
@@ -150,7 +150,7 @@ func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())
-		return nil, err
+		return nil, errors.New("Could not export from Hoverfly")
 	}
 
 	return body, nil

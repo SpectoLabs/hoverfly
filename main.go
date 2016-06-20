@@ -93,7 +93,7 @@ func main() {
 			handleIfError(err)
 
 			simulationData, err := hoverfly.ExportSimulation()
-			handleIfError_old(err, "Could not export from Hoverfly")
+			handleIfError(err)
 
 			err = localCache.WriteSimulation(simulation, simulationData)
 			handleIfError_old(err, "Could not write simulation to local cache")
