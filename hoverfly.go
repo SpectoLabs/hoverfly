@@ -227,24 +227,27 @@ func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) (error) {
 	}
 
 	pid, err := hoverflyDirectory.GetPid(h.AdminPort, h.ProxyPort)
+
 	if err != nil {
-		return err
+		log.Debug(err.Error())
+		return errors.New("Could not read Hoverfly pid file")
 	}
 
 	if pid == 0 {
 		return errors.New("Hoverfly is not running")
-
 	}
 
 	hoverflyProcess := os.Process{Pid: pid}
 	err = hoverflyProcess.Kill()
 	if err != nil {
-		return err
+		log.Info(err.Error())
+		return errors.New("Could not kill Hoverfly")
 	}
 
 	err = hoverflyDirectory.DeletePid(h.AdminPort, h.ProxyPort)
 	if err != nil {
-		return err
+		log.Debug(err.Error())
+		return errors.New("Could not delete Hoverfly pid")
 	}
 
 	return nil

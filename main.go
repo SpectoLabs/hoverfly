@@ -84,7 +84,7 @@ func main() {
 
 		case stopCommand.FullCommand():
 			err := hoverfly.stop(hoverflyDirectory)
-			handleIfError_old(err, "Could not stop Hoverfly")
+			handleIfError(err)
 
 			log.Info("Hoverfly has been stopped")
 
