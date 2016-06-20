@@ -1,3 +1,0 @@
-hoverfly.host: localhost
-hoverfly.proxy.port: 8500
-hoverfly.admin.port: 8888
