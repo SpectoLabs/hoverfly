@@ -105,10 +105,10 @@ func main() {
 			handleIfError(err)
 
 			simulationData, err := localCache.ReadSimulation(simulation)
-			handleIfError_old(err, "Could not read simulation from local cache")
+			handleIfError(err)
 
 			err = hoverfly.ImportSimulation(string(simulationData))
-			handleIfError_old(err, "Could not import into Hoverfly")
+			handleIfError(err)
 
 			log.Info(simulation.String(), " imported successfully")
 
@@ -120,10 +120,10 @@ func main() {
 			handleIfError(err)
 
 			simulationData, err := localCache.ReadSimulation(simulation)
-			handleIfError_old(err, "Could not read simulation from local cache")
+			handleIfError(err)
 
 			statusCode, err := spectoLab.UploadSimulation(simulation, simulationData)
-			handleIfError_old(err, "Could not upload simulation to SpectoLab")
+			handleIfError(err)
 
 			if statusCode {
 				log.Info(simulation.String(), " has been pushed to the SpectoLab")
@@ -149,13 +149,6 @@ func main() {
 			handleIfError(err)
 
 			log.Info("Hoverfly has been wiped")
-	}
-}
-
-func handleIfError_old(err error, message string) {
-	if err != nil {
-		log.Debug(err.Error())
-		log.Fatal(message)
 	}
 }
 

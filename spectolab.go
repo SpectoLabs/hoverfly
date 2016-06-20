@@ -69,7 +69,8 @@ func (s *SpectoLab) UploadSimulation(simulation Simulation, data []byte) (bool, 
 	err := s.CreateSimulation(simulation)
 
 	if err != nil {
-		return false, err
+		log.Debug(err)
+		return false, errors.New("Unable to create a simulation on SpectoLab")
 	}
 
 	url := s.buildURL(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data", simulation.Vendor,  simulation.Name, simulation.Version))
@@ -77,13 +78,15 @@ func (s *SpectoLab) UploadSimulation(simulation Simulation, data []byte) (bool, 
 	request, err := sling.New().Put(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Body(strings.NewReader(string(data))).Request()
 
 	if err != nil {
-		return false, err
+		log.Debug(err)
+		return false, errors.New("Could not create a request to check API key against SpectoLab")
 	}
 
 	response, err := http.DefaultClient.Do(request)
 
 	if err != nil {
-		return false, err
+		log.Debug(err)
+		return false, errors.New("Could not communicate with SpectoLab")
 	}
 
 	defer response.Body.Close()
@@ -102,25 +105,25 @@ func (s *SpectoLab) GetSimulation(simulation Simulation, overrideHost string) ([
 	request, err := sling.New().Get(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Request()
 	if err != nil {
 		log.Debug(err.Error())
-		return nil, errors.New("Could not create a request to the SpectoLab")
+		return nil, errors.New("Could not create a request to SpectoLab")
 	}
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		log.Debug(err.Error())
-		return nil, errors.New("Could not communicate with the SpectoLab")
+		return nil, errors.New("Could not communicate with SpectoLab")
 	}
 
 	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
-		return nil, errors.New("Simulation not found in the SpectoLab")
+		return nil, errors.New("Simulation not found in SpectoLab")
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())
-		return nil, errors.New("Could not pull simulation from the SpectoLab")
+		return nil, errors.New("Could not pull simulation from SpectoLab")
 	}
 
 	return body, nil

@@ -113,14 +113,14 @@ func (h *Hoverfly) ImportSimulation(payload string) (error) {
 
 	if err != nil {
 		log.Debug(err.Error())
-		return err
+		return errors.New("Could not communicate with Hoverfly")
 	}
 
 	response, err := h.httpClient.Do(request)
 
 	if err != nil {
 		log.Debug(err.Error())
-		return err
+		return errors.New("Could not communicate with Hoverfly")
 	}
 
 	if response.StatusCode != 200 {
