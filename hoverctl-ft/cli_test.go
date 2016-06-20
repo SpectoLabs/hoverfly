@@ -19,35 +19,37 @@ var _ = Describe("When I use hoverfly-cli", func() {
 		workingDir, _ = os.Getwd()
 		adminPort = "8888"
 	)
-	BeforeEach(func() {
-		hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
-		hoverflyCmd = exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", adminPort, "-pp", "8500")
-
-		err := hoverflyCmd.Start()
-
-		if err != nil {
-			fmt.Println("Unable to start Hoverfly")
-			fmt.Println(hoverflyBinaryUri)
-			fmt.Println("Is the binary there?")
-			os.Exit(1)
-		}
-
-		Eventually(func() int {
-			resp, err := http.Get("http://localhost:8888/api/state")
-			if err == nil {
-				return resp.StatusCode
-			} else {
-				fmt.Println(err.Error())
-				return 0
-			}
-		}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
-	})
-
-	AfterEach(func() {
-		hoverflyCmd.Process.Kill()
-	})
 
 	Describe("with a running hoverfly", func() {
+
+		BeforeEach(func() {
+			hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
+			hoverflyCmd = exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", adminPort, "-pp", "8500")
+
+			err := hoverflyCmd.Start()
+
+			if err != nil {
+				fmt.Println("Unable to start Hoverfly")
+				fmt.Println(hoverflyBinaryUri)
+				fmt.Println("Is the binary there?")
+				os.Exit(1)
+			}
+
+			Eventually(func() int {
+				resp, err := http.Get("http://localhost:8888/api/state")
+				if err == nil {
+					return resp.StatusCode
+				} else {
+					fmt.Println(err.Error())
+					return 0
+				}
+			}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+		})
+
+		AfterEach(func() {
+			hoverflyCmd.Process.Kill()
+		})
+
 
 		Context("I can get the hoverfly's mode", func() {
 			cliBinaryUri := filepath.Join(workingDir, "bin/hoverctl")
