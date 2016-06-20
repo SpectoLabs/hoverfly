@@ -15,7 +15,14 @@ type LocalCache struct {
 func (l *LocalCache) WriteSimulation(simulation Simulation, data []byte) error {
 	simulationURI := buildAbsoluteFilePath(l.URI, simulation.GetFileName())
 
-	return ioutil.WriteFile(simulationURI, data, 0644)
+	err := ioutil.WriteFile(simulationURI, data, 0644)
+
+	if err != nil {
+		log.Debug(err)
+		return errors.New("Could not write simulation to local cache")
+	}
+
+	return nil
 }
 
 
@@ -23,10 +30,17 @@ func (l *LocalCache) ReadSimulation(simulation Simulation) ([]byte, error) {
 	simulationURI := buildAbsoluteFilePath(l.URI, simulation.GetFileName())
 
 	if !fileIsPresent(simulationURI) {
-		return nil, errors.New("Simulation not found")
+		return nil, errors.New("Simulation not found in local cache")
 	}
 
-	return ioutil.ReadFile(simulationURI)
+	data, err := ioutil.ReadFile(simulationURI)
+
+	if err != nil {
+		log.Debug(err.Error())
+		return nil, errors.New("Unable to read simulation in local cache")
+	}
+
+	return data, nil
 }
 
 func createCacheDirectory(hoverflyDirectory HoverflyDirectory) (string, error) {

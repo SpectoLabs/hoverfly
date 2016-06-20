@@ -96,7 +96,7 @@ func main() {
 			handleIfError(err)
 
 			err = localCache.WriteSimulation(simulation, simulationData)
-			handleIfError_old(err, "Could not write simulation to local cache")
+			handleIfError(err)
 
 			log.Info(simulation.String(), " exported successfully")
 

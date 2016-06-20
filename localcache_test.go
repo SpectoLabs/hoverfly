@@ -82,7 +82,7 @@ func Test_LocalCache_ReadSimulation_ErrorsWhenFileIsMissing(t *testing.T) {
 	data, err := localCache.ReadSimulation(simulation)
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Simulation not found"))
+	Expect(err.Error()).To(Equal("Simulation not found in local cache"))
 	Expect(data).To(BeNil())
 
 	localCache_teardown()
