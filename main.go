@@ -90,7 +90,7 @@ func main() {
 
 		case exportCommand.FullCommand():
 			simulation, err := NewSimulation(*exportNameArg)
-			handleIfError_old(err, "Could not export from Hoverfly with that name")
+			handleIfError(err)
 
 			simulationData, err := hoverfly.ExportSimulation()
 			handleIfError_old(err, "Could not export from Hoverfly")
@@ -102,7 +102,7 @@ func main() {
 
 		case importCommand.FullCommand():
 			simulation, err := NewSimulation(*importNameArg)
-			handleIfError_old(err, "Could not import into Hoverfly")
+			handleIfError(err)
 
 			simulationData, err := localCache.ReadSimulation(simulation)
 			handleIfError_old(err, "Could not read simulation from local cache")
@@ -117,7 +117,7 @@ func main() {
 			handleIfError_old(err, "API key not valid")
 
 			simulation, err := NewSimulation(*pushNameArg)
-			handleIfError_old(err, "Could not push to SpectoLab")
+			handleIfError(err)
 
 			simulationData, err := localCache.ReadSimulation(simulation)
 			handleIfError_old(err, "Could not read simulation from local cache")
@@ -134,7 +134,7 @@ func main() {
 			handleIfError_old(err, "API key not valid")
 
 			simulation, err := NewSimulation(*pullNameArg)
-			handleIfError_old(err, "Could not pull from SpectoLab")
+			handleIfError(err)
 
 			simulationData, err := spectoLab.GetSimulation(simulation, *pullOverrideHostFlag)
 			handleIfError_old(err, "Could not pull simulation from SpectoLab")
