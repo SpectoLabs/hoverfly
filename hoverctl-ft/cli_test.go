@@ -50,7 +50,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 	Describe("with a running hoverfly", func() {
 
 		Context("I can get the hoverfly's mode", func() {
-			cliBinaryUri := filepath.Join(workingDir, "bin/hoverfly-cli")
+			cliBinaryUri := filepath.Join(workingDir, "bin/hoverctl")
 
 			It("when hoverfly is in simulate mode", func() {
 				SetHoverflyMode("simulate", adminPort)
@@ -90,7 +90,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 		})
 
 		Context("I can set hoverfly's mode", func() {
-			cliBinaryUri := filepath.Join(workingDir, "bin/hoverfly-cli")
+			cliBinaryUri := filepath.Join(workingDir, "bin/hoverctl")
 
 			It("to simulate mode", func() {
 				setOutput, _ := exec.Command(cliBinaryUri, "mode", "simulate").Output()
