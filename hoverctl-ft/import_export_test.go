@@ -71,17 +71,9 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				Expect(string(bytes)).ToNot(Equal(`{"data":null}`))
 			})
 
-			It("it can wipe data", func() {
-				output, err := exec.Command(hoverctlBinary, "wipe", "--admin-port=" + adminPortAsString).Output()
-				Expect(err).To(BeNil())
-				Expect(output).To(ContainSubstring("Hoverfly has been wiped"))
+			It("can export, wipe and then re-import the data", func() {
 
-				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
-				bytes, _ := ioutil.ReadAll(resp.Body)
-				Expect(string(bytes)).To(Equal(`{"data":null}`))
-			})
-
-			It("can export the data", func() {
+				// Export the data
 				output, err := exec.Command(hoverctlBinary, "export", "mogronalol/twitter", "--admin-port=" + adminPortAsString).Output()
 				Expect(err).To(BeNil())
 				Expect(output).To(ContainSubstring("mogronalol/twitter:latest exported successfully"))
@@ -114,7 +106,53 @@ var _ = Describe("When I use hoverfly-cli", func() {
 						}]
 					}`),
 				)
+
+				// Wipe it
+				output, err = exec.Command(hoverctlBinary, "wipe", "--admin-port=" + adminPortAsString).Output()
+				Expect(err).To(BeNil())
+				Expect(output).To(ContainSubstring("Hoverfly has been wiped"))
+
+				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				bytes, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(Equal(`{"data":null}`))
+
+				// Re-import it
+				output, err = exec.Command(hoverctlBinary, "import", "mogronalol/twitter", "--admin-port=" + adminPortAsString).Output()
+				Expect(err).To(BeNil())
+				Expect(output).To(ContainSubstring("mogronalol/twitter:latest imported successfully"))
+
+				resp = DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				bytes, _ = ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(MatchJSON(`
+					{
+						"data": [{
+							"request": {
+								"path": "/api/bookings",
+								"method": "POST",
+								"destination": "www.my-test.com",
+								"scheme": "http",
+								"query": "",
+								"body": "{\"flightId\": \"1\"}",
+								"headers": {
+									"Content-Type": [
+										"application/json"
+									]
+								}
+							},
+							"response": {
+								"status": 201,
+								"body": "",
+								"encodedBody": false,
+								"headers": {
+									"Location": [
+										"http://localhost/api/bookings/1"
+									]
+								}
+							}
+						}]
+					}`))
 			})
+
 		})
 	})
 })
