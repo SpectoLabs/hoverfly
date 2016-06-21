@@ -44,7 +44,8 @@ var _ = Describe("When I use hoverfly-cli", func() {
 								"path": "/api/bookings",
 								"method": "POST",
 								"destination": "www.my-test.com",
-								"query": null,
+								"scheme": "http",
+								"query": "",
 								"body": "{\"flightId\": \"1\"}",
 								"headers": {
 									"Content-Type": [
@@ -78,6 +79,41 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(Equal(`{"data":null}`))
+			})
+
+			It("can export the data", func() {
+				output, err := exec.Command(hoverctlBinary, "export", "mogronalol/twitter", "--admin-port=" + adminPortAsString).Output()
+				Expect(err).To(BeNil())
+				Expect(output).To(ContainSubstring("mogronalol/twitter:latest exported successfully"))
+				Expect(ioutil.ReadFile(hoverctlCacheDir + "/mogronalol.twitter.latest.hfile")).To(MatchJSON(`
+					{
+						"data": [{
+							"request": {
+								"path": "/api/bookings",
+								"method": "POST",
+								"destination": "www.my-test.com",
+								"scheme": "http",
+								"query": "",
+								"body": "{\"flightId\": \"1\"}",
+								"headers": {
+									"Content-Type": [
+										"application/json"
+									]
+								}
+							},
+							"response": {
+								"status": 201,
+								"body": "",
+								"encodedBody": false,
+								"headers": {
+									"Location": [
+										"http://localhost/api/bookings/1"
+									]
+								}
+							}
+						}]
+					}`),
+				)
 			})
 		})
 	})

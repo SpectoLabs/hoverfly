@@ -19,6 +19,7 @@ import (
 
 var (
 	hoverctlBinary string
+	hoverctlCacheDir string
 )
 
 func TestHoverflyEndToEnd(t *testing.T) {
@@ -28,6 +29,9 @@ func TestHoverflyEndToEnd(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	workingDirectory, _ := os.Getwd()
+
+	hoverctlCacheDir = filepath.Join(workingDirectory, ".hoverfly/cache")
+
 	hoverctlBinary = filepath.Join(workingDirectory, "bin/hoverctl")
 
 	binDirectory := filepath.Join(workingDirectory, "bin")
