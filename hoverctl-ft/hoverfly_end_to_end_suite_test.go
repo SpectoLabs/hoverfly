@@ -15,11 +15,13 @@ import (
 	"os/exec"
 	"strconv"
 	"time"
+	"gopkg.in/yaml.v2"
 )
 
 var (
 	hoverctlBinary string
 	hoverctlCacheDir string
+	workingDirectory string
 )
 
 func TestHoverflyEndToEnd(t *testing.T) {
@@ -96,4 +98,41 @@ func startHoverfly(adminPort, proxyPort int, workingDir string) * exec.Cmd {
 	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
 
 	return hoverflyCmd
+}
+
+type testConfig struct {
+	HoverflyHost      string `yaml:"hoverfly.host"`
+	HoverflyAdminPort string `yaml:"hoverfly.admin.port"`
+	HoverflyProxyPort string `yaml:"hoverfly.proxy.port"`
+}
+
+func WriteConfiguration(host, adminPort, proxyPort string) {
+	configHost := "localhost"
+	configAdminPort := "8888"
+	configProxyPort := "8500"
+
+	if len(adminPort) > 0 {
+		configHost = host
+	}
+
+	if len(adminPort) > 0 {
+		configAdminPort = adminPort
+	}
+
+	if len(proxyPort) > 0 {
+		configProxyPort = proxyPort
+	}
+
+	testConfig := testConfig{
+		HoverflyHost:configHost,
+		HoverflyAdminPort: configAdminPort,
+		HoverflyProxyPort: configProxyPort,
+	}
+
+	data, _ := yaml.Marshal(testConfig)
+
+	filepath := filepath.Join(workingDirectory, ".hoverfly", "config.yaml")
+
+	ioutil.WriteFile(filepath, data, 0644)
+
 }

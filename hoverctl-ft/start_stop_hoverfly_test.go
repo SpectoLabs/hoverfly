@@ -7,14 +7,25 @@ import (
 	"strings"
 	"io/ioutil"
 	"strconv"
+	"github.com/phayes/freeport"
 )
+
 
 var _ = Describe("When I use hoverctl", func() {
 
 	Describe("without a running hoverfly", func() {
 
+		var (
+			adminPort = freeport.GetPort()
+			adminPortAsString = strconv.Itoa(adminPort)
+
+			proxyPort = freeport.GetPort()
+			proxyPortAsString = strconv.Itoa(proxyPort)
+		)
+
 		BeforeEach(func() {
 			exec.Command(hoverctlBinary, "stop", "-v").Run()
+			WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
 		})
 
 		AfterEach(func() {
@@ -29,7 +40,7 @@ var _ = Describe("When I use hoverctl", func() {
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
-				data, err := ioutil.ReadFile("./.hoverfly/hoverfly.8888.8500.pid")
+				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
 
 				if err != nil {
 					Fail("Could not find pid file")
@@ -51,7 +62,7 @@ var _ = Describe("When I use hoverctl", func() {
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
 
-				_, err := ioutil.ReadFile("./.hoverfly/hoverfly.8888.8500.pid")
+				_, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
 
 				if err == nil {
 					Fail("Could not find pid file")
