@@ -7,7 +7,6 @@ import (
 	"strings"
 	"io/ioutil"
 	"strconv"
-	"fmt"
 )
 
 var _ = Describe("When I use hoverctl", func() {
@@ -70,9 +69,6 @@ var _ = Describe("When I use hoverctl", func() {
 					output = strings.TrimSpace(string(setOutput))
 					Expect(output).To(ContainSubstring("Hoverfly is already running"))
 				})
-				fmt.Println("end")
-				setOutput, _ := exec.Command(hoverctlBinary, "stop", "-v").CombinedOutput()
-				fmt.Println(string(setOutput))
 
 			})
 		})
