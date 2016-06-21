@@ -28,13 +28,16 @@ var _ = Describe("When I use hoverfly-cli", func() {
 		workingDir, _ = os.Getwd()
 		adminPort = freeport.GetPort()
 		adminPortAsString = strconv.Itoa(adminPort)
+
+		proxyPort = freeport.GetPort()
+		proxyPortAsString = strconv.Itoa(proxyPort)
 	)
 
 	Describe("with a running hoverfly", func() {
 
 		BeforeEach(func() {
 			hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
-			hoverflyCmd = exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", adminPortAsString, "-pp", "8500")
+			hoverflyCmd = exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", adminPortAsString, "-pp", proxyPortAsString)
 
 
 			err := hoverflyCmd.Start()
