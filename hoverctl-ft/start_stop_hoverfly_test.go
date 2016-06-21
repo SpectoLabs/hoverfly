@@ -7,14 +7,25 @@ import (
 	"strings"
 	"io/ioutil"
 	"strconv"
+	"fmt"
 )
 
 var _ = Describe("When I use hoverctl", func() {
+
 		Describe("without a running hoverfly", func() {
 
-			Context("I can control hoverfly by starting it", func() {
+			BeforeEach(func() {
+				exec.Command(hoverctlBinary, "stop", "-v").Run()
+			})
 
-				It("and hoverfly starts", func() {
+			AfterEach(func() {
+
+				exec.Command(hoverctlBinary, "stop", "-v").Run()
+			})
+
+			Context("I can control a process of hoverfly", func() {
+
+				It("by starting hoverfly", func() {
 					setOutput, _ := exec.Command(hoverctlBinary, "start").CombinedOutput()
 
 					output := strings.TrimSpace(string(setOutput))
@@ -34,7 +45,9 @@ var _ = Describe("When I use hoverctl", func() {
 
 				})
 
-				It("by stopping a hoverfly", func() {
+				It("by stopping  hoverfly", func() {
+					exec.Command(hoverctlBinary, "start").Run()
+
 					setOutput, _ := exec.Command(hoverctlBinary, "stop").CombinedOutput()
 
 					output := strings.TrimSpace(string(setOutput))
@@ -47,6 +60,20 @@ var _ = Describe("When I use hoverctl", func() {
 					}
  				})
 
+				It("but you cannot start hoverfly if already running", func() {
+					setOutput, _ := exec.Command(hoverctlBinary, "start").CombinedOutput()
+
+					output := strings.TrimSpace(string(setOutput))
+					Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+					setOutput, _ = exec.Command(hoverctlBinary, "start").CombinedOutput()
+
+					output = strings.TrimSpace(string(setOutput))
+					Expect(output).To(ContainSubstring("Hoverfly is already running"))
+				})
+				fmt.Println("end")
+				setOutput, _ := exec.Command(hoverctlBinary, "stop", "-v").CombinedOutput()
+				fmt.Println(string(setOutput))
 
 			})
 		})
