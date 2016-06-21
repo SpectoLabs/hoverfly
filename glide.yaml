@@ -7,4 +7,3 @@ import:
 - package: github.com/onsi/gomega
 - package: gopkg.in/yaml.v2
 - package: github.com/Sirupsen/logrus
-- package: github.com/phayes/freeport

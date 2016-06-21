@@ -36,8 +36,6 @@ imports:
   version: d2dd0262208475919e1a362f675cfc0e7c10e905
 - name: github.com/onsi/gomega
   version: 3e93f011213c200aadafcb19ed56eb718381cfbd
-- name: github.com/phayes/freeport
-  version: e7681b37614941bf73b404e0caa37f19e33b5fed
 - name: github.com/Sirupsen/logrus
   version: f3cfb454f4c209e6668c95216c4744b8fddb2356
 - name: github.com/spf13/cast

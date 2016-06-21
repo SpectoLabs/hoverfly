@@ -3,3 +3,4 @@ import:
 - package: github.com/onsi/gomega
 - package: github.com/onsi/ginkgo
 - package: github.com/dghubble/sling
+- package: github.com/phayes/freeport
