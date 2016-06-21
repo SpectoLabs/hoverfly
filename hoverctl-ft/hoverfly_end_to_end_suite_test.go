@@ -21,8 +21,6 @@ var (
 func TestHoverflyEndToEnd(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Hoverfly End To End Suite")
-
-
 }
 
 var _ = BeforeSuite(func() {
