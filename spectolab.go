@@ -36,9 +36,6 @@ func (s *SpectoLab) CheckAPIKey() (error) {
 		return errors.New("Could not communicate with SpectoLab")
 	}
 
-	log.Info(response.StatusCode)
-	log.Info(s.buildAuthorizationHeaderValue())
-	log.Info(url)
 	if response.StatusCode == 401 {
 		return errors.New("You don't have a valid API key, please sign in at https://lab.specto.io to generate a new API key")
 	}
