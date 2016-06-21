@@ -8,6 +8,9 @@ import (
 	"github.com/dghubble/sling"
 	"strings"
 	"net/http"
+	"fmt"
+	"encoding/json"
+	"io/ioutil"
 )
 
 func TestHoverflyEndToEnd(t *testing.T) {
@@ -15,8 +18,8 @@ func TestHoverflyEndToEnd(t *testing.T) {
 	RunSpecs(t, "Hoverfly End To End Suite")
 }
 
-func SetHoverflyMode(mode, port string) {
-	req := sling.New().Post("http://localhost:" + port + "/api/state").Body(strings.NewReader(`{"mode":"` + mode +`"}`))
+func SetHoverflyMode(mode string, port int) {
+	req := sling.New().Post(fmt.Sprintf("http://localhost:%v/api/state", port)).Body(strings.NewReader(`{"mode":"` + mode +`"}`))
 	res := DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
 }
@@ -28,4 +31,22 @@ func DoRequest(r *sling.Sling) (*http.Response) {
 
 	Expect(err).To(BeNil())
 	return response
+}
+
+func GetHoverflyMode(port int) string {
+	currentState := &stateRequest{}
+	resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/state", port)))
+
+	body, err := ioutil.ReadAll(resp.Body)
+	Expect(err).ToNot(BeNil())
+
+	err = json.Unmarshal(body, currentState)
+	Expect(err).ToNot(BeNil())
+
+	return currentState.Mode
+}
+
+type stateRequest struct {
+	Mode        string `json:"mode"`
+	Destination string `json:"destination"`
 }

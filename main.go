@@ -36,6 +36,8 @@ var (
 func main() {
 	kingpin.Parse()
 
+	panic(*adminPortFlag)
+
 	if *verboseFlag {
 		log.SetLevel(log.DebugLevel)
 	}
