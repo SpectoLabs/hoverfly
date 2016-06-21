@@ -46,7 +46,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("when hoverfly is in simulate mode", func() {
 				SetHoverflyMode("simulate", adminPort)
 
-				out, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).CombinedOutput()
+				out, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).Output()
 
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
@@ -55,7 +55,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("when hoverfly is in capture mode", func() {
 				SetHoverflyMode("capture", adminPort)
 
-				out, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).CombinedOutput()
+				out, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).Output()
 
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Hoverfly is set to capture mode"))
@@ -64,7 +64,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("when hoverfly is in synthesize mode", func() {
 				SetHoverflyMode("synthesize", adminPort)
 
-				out, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).CombinedOutput()
+				out, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).Output()
 
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Hoverfly is set to synthesize mode"))
@@ -73,7 +73,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("when hoverfly is in modify mode", func() {
 				SetHoverflyMode("modify", adminPort)
 
-				out, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).CombinedOutput()
+				out, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).Output()
 
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Hoverfly is set to modify mode"))
@@ -84,12 +84,12 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			cliBinaryUri := filepath.Join(workingDir, "bin/hoverctl")
 
 			It("to simulate mode", func() {
-				setOutput, _ := exec.Command(cliBinaryUri, "mode", "simulate", "--admin-port=" + adminPortAsString).CombinedOutput()
+				setOutput, _ := exec.Command(cliBinaryUri, "mode", "simulate", "--admin-port=" + adminPortAsString).Output()
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly has been set to simulate mode"))
 
-				getOutput, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).CombinedOutput()
+				getOutput, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).Output()
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
@@ -97,12 +97,12 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			})
 
 			It("to capture mode", func() {
-				setOutput, _ := exec.Command(cliBinaryUri, "mode", "capture", "--admin-port=" + adminPortAsString).CombinedOutput()
+				setOutput, _ := exec.Command(cliBinaryUri, "mode", "capture", "--admin-port=" + adminPortAsString).Output()
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly has been set to capture mode"))
 
-				getOutput, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).CombinedOutput()
+				getOutput, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).Output()
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to capture mode"))
@@ -110,12 +110,12 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			})
 
 			It("to synthesize mode", func() {
-				setOutput, _ := exec.Command(cliBinaryUri, "mode", "synthesize", "--admin-port=" + adminPortAsString).CombinedOutput()
+				setOutput, _ := exec.Command(cliBinaryUri, "mode", "synthesize", "--admin-port=" + adminPortAsString).Output()
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly has been set to synthesize mode"))
 
-				getOutput, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).CombinedOutput()
+				getOutput, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).Output()
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to synthesize mode"))
@@ -123,12 +123,12 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			})
 
 			It("to modify mode", func() {
-				setOutput, _ := exec.Command(cliBinaryUri, "mode", "modify", "--admin-port=" + adminPortAsString).CombinedOutput()
+				setOutput, _ := exec.Command(cliBinaryUri, "mode", "modify", "--admin-port=" + adminPortAsString).Output()
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly has been set to modify mode"))
 
-				getOutput, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).CombinedOutput()
+				getOutput, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).Output()
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to modify mode"))

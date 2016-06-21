@@ -3,6 +3,7 @@ package main
 import (
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"os"
 )
 
 var (
@@ -36,6 +37,7 @@ var (
 func main() {
 	kingpin.Parse()
 
+	log.SetOutput(os.Stdout)
 	if *verboseFlag {
 		log.SetLevel(log.DebugLevel)
 	}
