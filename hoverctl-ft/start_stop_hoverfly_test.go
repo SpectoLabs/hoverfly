@@ -101,6 +101,39 @@ var _ = Describe("When I use hoverctl", func() {
 
 			})
 
+			It("by starting and stopping hoverfly on a different proxy port using a flag", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "start", "--proxy-port=22113").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + ".22113.pid")
+
+				if err != nil {
+					Fail("Could not find pid file")
+				}
+
+				Expect(data).ToNot(BeEmpty())
+
+				if _, err := strconv.Atoi(string(data)); err != nil {
+					Fail("Pid file not have an integer in it")
+				}
+
+				GetHoverflyMode(adminPort)
+
+				setOutput, _ = exec.Command(hoverctlBinary, "stop", "--proxy-port=22113").Output()
+
+				output = strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
+
+				_, err = ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + ".22113.pid")
+
+				if err == nil {
+					Fail("Found the pid file that should have been deleted")
+				}
+
+			})
+
 			It("but you cannot start hoverfly if already running", func() {
 				exec.Command(hoverctlBinary, "start").Run()
 
