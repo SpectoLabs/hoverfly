@@ -2,3 +2,5 @@
 vendor
 *.iml
 hoverctl-ft/.hoverfly/cache/*
+hoverctl-ft/.hoverfly/config.yaml
+hoverctl-ft/.hoverfly/*.pid
