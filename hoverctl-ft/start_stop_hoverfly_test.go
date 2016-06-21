@@ -1,0 +1,53 @@
+package hoverfly_end_to_end_test
+
+import (
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"os/exec"
+	"strings"
+	"io/ioutil"
+	"strconv"
+)
+
+var _ = Describe("When I use hoverctl", func() {
+		Describe("without a running hoverfly", func() {
+
+			Context("I can control hoverfly by starting it", func() {
+
+				It("and hoverfly starts", func() {
+					setOutput, _ := exec.Command(hoverctlBinary, "start").CombinedOutput()
+
+					output := strings.TrimSpace(string(setOutput))
+					Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+					data, err := ioutil.ReadFile("./.hoverfly/hoverfly.8888.8500.pid")
+
+					if err != nil {
+						Fail("Could not find pid file")
+					}
+
+					Expect(data).ToNot(BeEmpty())
+
+					if _, err := strconv.Atoi(string(data)); err != nil {
+						Fail("Pid file not have an integer in it")
+					}
+
+				})
+
+				It("by stopping a hoverfly", func() {
+					setOutput, _ := exec.Command(hoverctlBinary, "stop").CombinedOutput()
+
+					output := strings.TrimSpace(string(setOutput))
+					Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
+
+					_, err := ioutil.ReadFile("./.hoverfly/hoverfly.8888.8500.pid")
+
+					if err == nil {
+						Fail("Could not find pid file")
+					}
+ 				})
+
+
+			})
+		})
+	})

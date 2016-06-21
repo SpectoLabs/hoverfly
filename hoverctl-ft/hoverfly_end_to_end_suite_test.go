@@ -3,7 +3,6 @@ package hoverfly_end_to_end_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
 	"testing"
 	"github.com/dghubble/sling"
 	"strings"
@@ -11,12 +10,25 @@ import (
 	"fmt"
 	"encoding/json"
 	"io/ioutil"
+	"path/filepath"
+	"os"
+)
+
+var (
+	hoverctlBinary string
 )
 
 func TestHoverflyEndToEnd(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Hoverfly End To End Suite")
+
+
 }
+
+var _ = BeforeSuite(func() {
+	workingDirectory, _ := os.Getwd()
+	hoverctlBinary = filepath.Join(workingDirectory, "bin/hoverctl")
+})
 
 func SetHoverflyMode(mode string, port int) {
 	req := sling.New().Post(fmt.Sprintf("http://localhost:%v/api/state", port)).Body(strings.NewReader(`{"mode":"` + mode +`"}`))
