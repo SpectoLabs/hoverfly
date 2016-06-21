@@ -2,12 +2,15 @@ package hoverfly_end_to_end_test
 
 import (
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"os/exec"
 	"os"
 	"strings"
 	"github.com/phayes/freeport"
 	"fmt"
 	"github.com/dghubble/sling"
+	"strconv"
+	"io/ioutil"
 )
 
 var _ = Describe("When I use hoverfly-cli", func() {
@@ -16,7 +19,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 		workingDir, _ = os.Getwd()
 		adminPort = freeport.GetPort()
-		//adminPortAsString = strconv.Itoa(adminPort)
+		adminPortAsString = strconv.Itoa(adminPort)
 
 		proxyPort = freeport.GetPort()
 	)
@@ -31,10 +34,10 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			hoverflyCmd.Process.Kill()
 		})
 
-		Describe("which contains some data", func() {
+		Describe("Managing Hoverflies data using the CLI", func() {
 
 			BeforeEach(func() {
-				sling.New().Post(fmt.Sprintf("http://localhost:%v/api/state", adminPort)).Body(strings.NewReader(`
+				DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/records", adminPort)).Body(strings.NewReader(`
 					{
 						"data": [{
 							"request": {
@@ -60,13 +63,22 @@ var _ = Describe("When I use hoverfly-cli", func() {
 								}
 							}
 						}]
-					}`))
+					}`)))
+
+				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				bytes, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).ToNot(Equal(`{"data":null}`))
 			})
 
-			//Context("and the data is wiped", func() {
-			//	output, _ := exec.Command(hoverctlBinary, "wipe").CombinedOutput()
-			//	panic(string(output))
-			//})
+			It("it can wipe data", func() {
+				output, err := exec.Command(hoverctlBinary, "wipe", "--admin-port=" + adminPortAsString).Output()
+				Expect(err).To(BeNil())
+				Expect(output).To(ContainSubstring("Hoverfly has been wiped"))
+
+				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				bytes, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(Equal(`{"data":null}`))
+			})
 		})
 	})
 })

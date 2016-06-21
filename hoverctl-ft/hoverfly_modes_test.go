@@ -39,14 +39,12 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			hoverflyCmd.Process.Kill()
 		})
 
-
 		Context("I can get the hoverfly's mode", func() {
-			cliBinaryUri := filepath.Join(workingDir, "bin/hoverctl")
 
 			It("when hoverfly is in simulate mode", func() {
 				SetHoverflyMode("simulate", adminPort)
 
-				out, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).Output()
+				out, _ := exec.Command(hoverctlBinary, "mode", "--admin-port=" + adminPortAsString).Output()
 
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
@@ -55,7 +53,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("when hoverfly is in capture mode", func() {
 				SetHoverflyMode("capture", adminPort)
 
-				out, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).Output()
+				out, _ := exec.Command(hoverctlBinary, "mode", "--admin-port=" + adminPortAsString).Output()
 
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Hoverfly is set to capture mode"))
@@ -64,7 +62,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("when hoverfly is in synthesize mode", func() {
 				SetHoverflyMode("synthesize", adminPort)
 
-				out, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).Output()
+				out, _ := exec.Command(hoverctlBinary, "mode", "--admin-port=" + adminPortAsString).Output()
 
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Hoverfly is set to synthesize mode"))
@@ -73,7 +71,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("when hoverfly is in modify mode", func() {
 				SetHoverflyMode("modify", adminPort)
 
-				out, _ := exec.Command(cliBinaryUri, "mode", "--admin-port=" + adminPortAsString).Output()
+				out, _ := exec.Command(hoverctlBinary, "mode", "--admin-port=" + adminPortAsString).Output()
 
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Hoverfly is set to modify mode"))
