@@ -13,7 +13,7 @@ type Simulation struct {
 }
 
 func (s *Simulation) GetFileName() string {
-	return fmt.Sprintf("%v.%v.%v.hfile", s.Vendor, s.Name, s.Version)
+	return fmt.Sprintf("%v.%v.%v.json", s.Vendor, s.Name, s.Version)
 }
 
 func (s *Simulation) String() string {
