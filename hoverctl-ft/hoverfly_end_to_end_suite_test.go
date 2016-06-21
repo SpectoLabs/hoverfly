@@ -26,6 +26,10 @@ func TestHoverflyEndToEnd(t *testing.T) {
 var _ = BeforeSuite(func() {
 	workingDirectory, _ := os.Getwd()
 	hoverctlBinary = filepath.Join(workingDirectory, "bin/hoverctl")
+
+	binDirectory := filepath.Join(workingDirectory, "bin")
+
+	os.Setenv("PATH", fmt.Sprintf("%v:%v", binDirectory, os.Getenv("PATH")))
 })
 
 func SetHoverflyMode(mode string, port int) {
