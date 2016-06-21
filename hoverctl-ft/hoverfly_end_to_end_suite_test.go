@@ -38,10 +38,10 @@ func GetHoverflyMode(port int) string {
 	resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/state", port)))
 
 	body, err := ioutil.ReadAll(resp.Body)
-	Expect(err).ToNot(BeNil())
+	Expect(err).To(BeNil())
 
 	err = json.Unmarshal(body, currentState)
-	Expect(err).ToNot(BeNil())
+	Expect(err).To(BeNil())
 
 	return currentState.Mode
 }

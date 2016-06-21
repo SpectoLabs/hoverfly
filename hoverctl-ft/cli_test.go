@@ -115,6 +115,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
+				Expect(GetHoverflyMode(adminPort)).To(Equal(simulate))
 			})
 
 			It("to capture mode", func() {
@@ -127,6 +128,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to capture mode"))
+				Expect(GetHoverflyMode(adminPort)).To(Equal(capture))
 			})
 
 			It("to synthesize mode", func() {
@@ -139,6 +141,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to synthesize mode"))
+				Expect(GetHoverflyMode(adminPort)).To(Equal(synthesize))
 			})
 
 			It("to modify mode", func() {
@@ -151,6 +154,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to modify mode"))
+				Expect(GetHoverflyMode(adminPort)).To(Equal(modify))
 			})
 		})
 	})
