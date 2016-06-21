@@ -64,7 +64,7 @@ var _ = Describe("When I use hoverctl", func() {
 				_, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
 
 				if err == nil {
-					Fail("Could not find pid file")
+					Fail("Found the pid file that should have been deleted")
 				}
 			})
 
