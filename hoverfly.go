@@ -11,13 +11,14 @@ import (
 	"strings"
 	"os"
 	"os/exec"
+	"time"
+	"strconv"
 )
 
 type APIStateResponse struct {
 	Mode        string `json:"mode"`
 	Destination string `json:"destination"`
 }
-
 
 type Hoverfly struct {
 	Host       string
@@ -27,7 +28,7 @@ type Hoverfly struct {
 }
 
 func NewHoverfly(config Config) (Hoverfly) {
-	return Hoverfly {
+	return Hoverfly{
 		Host: config.HoverflyHost,
 		AdminPort: config.HoverflyAdminPort,
 		ProxyPort: config.HoverflyProxyPort,
@@ -180,7 +181,6 @@ func (h *Hoverfly) buildBaseURL() string {
 	return fmt.Sprintf("http://%v:%v", h.Host, h.AdminPort)
 }
 
-
 func (h *Hoverfly) isLocal() (bool) {
 	return h.Host == "localhost" || h.Host == "127.0.0.1"
 }
@@ -210,9 +210,35 @@ func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) (error) {
 	cmd := exec.Command("hoverfly", "-db", "memory", "-ap", h.AdminPort, "-pp", h.ProxyPort)
 
 	err = cmd.Start()
+
 	if err != nil {
 		log.Debug(err)
 		return errors.New("Could not start Hoverfly")
+	}
+
+	timeout := time.After(10 * time.Second)
+	tick := time.Tick(500 * time.Millisecond)
+	statusCode := 0
+
+	for {
+		select {
+			case <-timeout:
+				if err != nil {
+					log.Debug(err)
+				}
+				return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: " + strconv.Itoa(statusCode)))
+			case <-tick:
+				resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", h.AdminPort))
+				if err == nil {
+					statusCode = resp.StatusCode
+				} else {
+					statusCode = 0
+				}
+			}
+
+		if statusCode == 200 {
+			break;
+		}
 	}
 
 	err = hoverflyDirectory.WritePid(h.AdminPort, h.ProxyPort, cmd.Process.Pid)
