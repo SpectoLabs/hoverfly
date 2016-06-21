@@ -85,7 +85,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				output, err := exec.Command(hoverctlBinary, "export", "mogronalol/twitter", "--admin-port=" + adminPortAsString).Output()
 				Expect(err).To(BeNil())
 				Expect(output).To(ContainSubstring("mogronalol/twitter:latest exported successfully"))
-				Expect(ioutil.ReadFile(hoverctlCacheDir + "/mogronalol.twitter.latest.hfile")).To(MatchJSON(`
+				Expect(ioutil.ReadFile(hoverctlCacheDir + "/mogronalol.twitter.latest.json")).To(MatchJSON(`
 					{
 						"data": [{
 							"request": {
