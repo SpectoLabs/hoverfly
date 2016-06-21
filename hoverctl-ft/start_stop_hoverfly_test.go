@@ -59,16 +59,21 @@ var _ = Describe("When I use hoverctl", func() {
  				})
 
 				It("but you cannot start hoverfly if already running", func() {
+					exec.Command(hoverctlBinary, "start").Run()
+
 					setOutput, _ := exec.Command(hoverctlBinary, "start").CombinedOutput()
 
 					output := strings.TrimSpace(string(setOutput))
-					Expect(output).To(ContainSubstring("Hoverfly is now running"))
-
-					setOutput, _ = exec.Command(hoverctlBinary, "start").CombinedOutput()
-
-					output = strings.TrimSpace(string(setOutput))
 					Expect(output).To(ContainSubstring("Hoverfly is already running"))
 				})
+
+				It("but you cannot stop hoverfly if is not running", func() {
+					setOutput, _ := exec.Command(hoverctlBinary, "stop").CombinedOutput()
+
+					output := strings.TrimSpace(string(setOutput))
+					Expect(output).To(ContainSubstring("Hoverfly is not running"))
+				})
+
 
 			})
 		})
