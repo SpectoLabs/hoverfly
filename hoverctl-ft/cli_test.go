@@ -3,9 +3,6 @@ package hoverfly_end_to_end_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"fmt"
-	"net/http"
-	"time"
 	"path/filepath"
 	"os/exec"
 	"os"
@@ -30,34 +27,12 @@ var _ = Describe("When I use hoverfly-cli", func() {
 		adminPortAsString = strconv.Itoa(adminPort)
 
 		proxyPort = freeport.GetPort()
-		proxyPortAsString = strconv.Itoa(proxyPort)
 	)
 
 	Describe("with a running hoverfly", func() {
 
 		BeforeEach(func() {
-			hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
-			hoverflyCmd = exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", adminPortAsString, "-pp", proxyPortAsString)
-
-
-			err := hoverflyCmd.Start()
-
-			if err != nil {
-				fmt.Println("Unable to start Hoverfly")
-				fmt.Println(hoverflyBinaryUri)
-				fmt.Println("Is the binary there?")
-				os.Exit(1)
-			}
-
-			Eventually(func() int {
-				resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", adminPort))
-				if err == nil {
-					return resp.StatusCode
-				} else {
-					fmt.Println(err.Error())
-					return 0
-				}
-			}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+			hoverflyCmd = startHoverfly(adminPort, proxyPort, workingDir)
 		})
 
 		AfterEach(func() {

@@ -12,6 +12,9 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"os"
+	"os/exec"
+	"strconv"
+	"time"
 )
 
 var (
@@ -63,4 +66,30 @@ func GetHoverflyMode(port int) string {
 type stateRequest struct {
 	Mode        string `json:"mode"`
 	Destination string `json:"destination"`
+}
+
+func startHoverfly(adminPort, proxyPort int, workingDir string) * exec.Cmd {
+	hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
+
+	err := hoverflyCmd.Start()
+
+	if err != nil {
+		fmt.Println("Unable to start Hoverfly")
+		fmt.Println(hoverflyBinaryUri)
+		fmt.Println("Is the binary there?")
+		os.Exit(1)
+	}
+
+	Eventually(func() int {
+		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", adminPort))
+		if err == nil {
+			return resp.StatusCode
+		} else {
+			fmt.Println(err.Error())
+			return 0
+		}
+	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+
+	return hoverflyCmd
 }

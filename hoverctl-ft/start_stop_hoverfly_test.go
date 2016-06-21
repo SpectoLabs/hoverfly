@@ -19,14 +19,13 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 			AfterEach(func() {
-
 				exec.Command(hoverctlBinary, "stop", "-v").Run()
 			})
 
 			Context("I can control a process of hoverfly", func() {
 
 				It("by starting hoverfly", func() {
-					setOutput, _ := exec.Command(hoverctlBinary, "start").CombinedOutput()
+					setOutput, _ := exec.Command(hoverctlBinary, "start", "-v").CombinedOutput()
 
 					output := strings.TrimSpace(string(setOutput))
 					Expect(output).To(ContainSubstring("Hoverfly is now running"))
