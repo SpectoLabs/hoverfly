@@ -5,22 +5,17 @@ import (
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"github.com/SpectoLabs/hoverfly"
-	"os"
+	"bytes"
 	"github.com/dghubble/sling"
 	"net/http/httptest"
 	"net/url"
-	"fmt"
-	"github.com/SpectoLabs/hoverfly/models"
-	"net/http"
 	"strings"
+	"fmt"
+	"net/http"
+	"os"
 )
 
 var _ = Describe("Running Hoverfly in various modes", func() {
-
-
-	BeforeEach(func() {
-		requestCache.DeleteData()
-	})
 
 	Context("When running in capture mode", func() {
 
@@ -30,6 +25,8 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 		Context("without middleware", func() {
 
 			BeforeEach(func() {
+				hoverflyCmd = startHoverfly(adminPort, proxyPort)
+
 				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "text/plain")
 					w.Header().Set("Date", "date")
@@ -42,6 +39,10 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				SetHoverflyMode(hoverfly.CaptureMode)
 				resp := CallFakeServerThroughProxy(fakeServer)
 				Expect(resp.StatusCode).To(Equal(200))
+			})
+
+			AfterEach(func() {
+				stopHoverfly()
 			})
 
 			It("Should capture the request and response", func() {
@@ -96,6 +97,8 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 		Context("with middleware", func() {
 			BeforeEach(func() {
+				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/middleware.py")
+
 				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "text/plain")
 					w.Header().Set("Date", "date")
@@ -103,11 +106,12 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				}))
 
 				fakeServerUrl, _ = url.Parse(fakeServer.URL)
-				SetHoverflyMode(hoverfly.CaptureMode)
+				SetHoverflyMode("capture")
+			})
 
-				wd, err := os.Getwd()
-				Expect(err).To(BeNil())
-				hf.Cfg.Middleware = wd + "/testdata/middleware.py"
+			AfterEach(func() {
+				stopHoverfly()
+				fakeServer.Close()
 			})
 
 			It("Should modify the request but not the response", func() {
@@ -158,57 +162,31 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 					  ]
 					}`, expectedDestination)))
 			})
-
-			AfterEach(func() {
-				hf.Cfg.Middleware = ""
-				fakeServer.Close()
-			})
 		})
 	})
 
 	Context("When running in simulate mode", func() {
 
+		var (
+			jsonPayload *bytes.Buffer
+		)
+
 		BeforeEach(func(){
-			SetHoverflyMode(hoverfly.SimulateMode)
-			pl1 := models.Payload{
-				Request: models.RequestDetails{
-					Path:"/path1",
-					Method:"GET",
-					Destination:"www.virtual.com",
-					Scheme:"http",
-					Query:"",
-					Body:"",
-					Headers:map[string][]string{"Header": []string{"value1"}},
-				},
-				Response: models.ResponseDetails{
-					Status: 201,
-					Body: "body1",
-					Headers:map[string][]string{"Header": []string{"value1"}},
-				},
-			}
-			encoded, _ := pl1.Encode()
-			requestCache.Set([]byte(pl1.Id()), encoded)
-			pl2 := models.Payload{
-				Request: models.RequestDetails{
-					Path:"/path2",
-					Method:"GET",
-					Destination:"www.virtual.com",
-					Scheme:"http",
-					Query:"",
-					Body:"",
-					Headers:map[string][]string{"Header": []string{"value2"}},
-				},
-				Response: models.ResponseDetails{
-					Status: 202,
-					Body: "body2",
-					Headers:map[string][]string{"Header": []string{"value2"}},
-				},
-			}
-			encoded, _ = pl2.Encode()
-			requestCache.Set([]byte(pl2.Id()), encoded)
+			jsonPayload = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}, {"request": {"path": "/path2", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
 		})
 
 		Context("without middleware", func() {
+
+			BeforeEach(func() {
+				hoverflyCmd = startHoverfly(adminPort, proxyPort)
+				SetHoverflyMode(hoverfly.SimulateMode)
+				ImportHoverflyRecords(jsonPayload)
+			})
+
+			AfterEach(func() {
+				stopHoverfly()
+			})
+
 			It("should return the cached response", func() {
 				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path1"))
 				Expect(resp.StatusCode).To(Equal(201))
@@ -222,9 +200,9 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 		Context("with middleware", func() {
 
 			BeforeEach(func() {
-				wd, err := os.Getwd()
-				Expect(err).To(BeNil())
-				hf.Cfg.Middleware = wd + "/testdata/middleware.py"
+				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/middleware.py")
+				SetHoverflyMode(hoverfly.SimulateMode)
+				ImportHoverflyRecords(jsonPayload)
 			})
 
 			It("should apply middleware to the cached response", func() {
@@ -235,23 +213,18 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			})
 
 			AfterEach(func() {
-				hf.Cfg.Middleware = ""
+				stopHoverfly()
 			})
 		})
 	})
 
 	Context("When running in synthesise mode", func() {
 
-		BeforeEach(func() {
-			SetHoverflyMode(hoverfly.SynthesizeMode)
-		})
-
 		Context("With middleware", func() {
 
 			BeforeEach(func() {
-				wd, err := os.Getwd()
-				Expect(err).To(BeNil())
-				hf.Cfg.Middleware = wd + "/testdata/middleware.py"
+				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/middleware.py")
+				SetHoverflyMode(hoverfly.SynthesizeMode)
 			})
 
 			It("Should generate responses using middleware", func() {
@@ -262,14 +235,26 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			})
 
 			AfterEach(func() {
-				hf.Cfg.Middleware = ""
+				stopHoverfly()
 			})
+
+
 		})
 
 		Context("Without middleware", func() {
+
+			BeforeEach(func() {
+				hoverflyCmd = startHoverfly(adminPort, proxyPort)
+				SetHoverflyMode(hoverfly.SynthesizeMode)
+			})
+
 			It("Should fail to generate responses using middleware", func() {
 				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2"))
 				Expect(resp.StatusCode).To(Equal(503))
+			})
+
+			AfterEach(func() {
+				stopHoverfly()
 			})
 		})
 
@@ -277,20 +262,14 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 	Context("When running in modify mode", func() {
 
-		BeforeEach(func() {
-			SetHoverflyMode(hoverfly.ModifyMode)
-		})
-
-		var fakeServer * httptest.Server
+		var fakeServer *httptest.Server
 		var requestBody string
 
 		Context("With middleware", func() {
 
 			BeforeEach(func() {
-				wd, err := os.Getwd()
-				Expect(err).To(BeNil())
-				hf.Cfg.Middleware = wd + "/testdata/middleware.py"
-
+				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/middleware.py")
+				SetHoverflyMode(hoverfly.ModifyMode)
 				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					body, _ := ioutil.ReadAll(r.Body);
 					requestBody = string(body)
@@ -314,22 +293,29 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			})
 
 			AfterEach(func() {
-				hf.Cfg.Middleware = ""
+				stopHoverfly()
 				fakeServer.Close()
 			})
 		})
 
 		Context("Without middleware", func() {
+
+			BeforeEach(func() {
+				hoverflyCmd = startHoverfly(adminPort, proxyPort)
+				SetHoverflyMode(hoverfly.ModifyMode)
+			})
+
 			It("Should fail to generate responses using middleware", func() {
 				resp := DoRequestThroughProxy(sling.New().Get(fakeServer.URL))
 				Expect(resp.StatusCode).To(Equal(503))
 			})
 
 			AfterEach(func() {
-				hf.Cfg.Middleware = ""
+				stopHoverfly()
 				fakeServer.Close()
 			})
 		})
+
 	})
 
 	Context("Using middleware with binary data", func() {
@@ -337,11 +323,11 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 		var expectedImage []byte
 
 		BeforeEach(func() {
+			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/binary_middleware.py")
 			SetHoverflyMode(hoverfly.SynthesizeMode)
 			pwd, _ := os.Getwd()
 			expectedFile := "/testdata/1x1.png"
 			expectedImage, _  = ioutil.ReadFile(pwd + expectedFile)
-			hf.Cfg.Middleware = pwd + "/testdata/binary_middleware.py"
 		})
 
 		It("Should render an image correctly after base64 encoding it using middleware", func() {
@@ -352,7 +338,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 		})
 
 		AfterEach(func() {
-			hf.Cfg.Middleware = ""
+			stopHoverfly()
 		})
 	})
 })

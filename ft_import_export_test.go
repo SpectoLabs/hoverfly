@@ -32,6 +32,9 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 			var afterImportFakeServerResponse *http.Response
 
 			BeforeEach(func() {
+				// Start hoverfly
+				hoverflyCmd = startHoverfly(adminPort, proxyPort)
+
 				// Spin up a fake server which returns hello world
 				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -64,6 +67,11 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				afterImportFakeServerResponse = CallFakeServerThroughProxy(fakeServer)
 			})
 
+			AfterEach(func() {
+				// Stop hoverfly
+				stopHoverfly()
+			})
+
 
 			It("Returns a status code of 200", func() {
 				Expect(afterImportFakeServerResponse.StatusCode).To(Equal(200))
@@ -92,6 +100,9 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 			var afterImportFakeServerResponse *http.Response
 
 			BeforeEach(func() {
+				// Start hoverfly
+				hoverflyCmd = startHoverfly(adminPort, proxyPort)
+
 				// Spin up a fake server which returns hello world gzipped
 				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -126,6 +137,11 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				// Make the request to Hoverfly simulate
 				afterImportFakeServerRequest := sling.New().Get(fakeServer.URL).Set("Accept-Encoding", "gzip")
 				afterImportFakeServerResponse = DoRequestThroughProxy(afterImportFakeServerRequest)
+			})
+
+			AfterEach(func() {
+				// Stop hoverfly
+				stopHoverfly()
 			})
 
 
@@ -163,6 +179,9 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 			imageUri := "/testdata/1x1.png"
 
 			BeforeEach(func() {
+				// Start hoverfly
+				hoverflyCmd = startHoverfly(adminPort, proxyPort)
+
 				// Spin up a fake server which returns hello world gzipped
 				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "image/jpeg")
@@ -197,6 +216,11 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				// Make the request to Hoverfly simulate
 				afterImportFakeServerRequest := sling.New().Get(fakeServer.URL)
 				afterImportFakeServerResponse = DoRequestThroughProxy(afterImportFakeServerRequest)
+			})
+
+			AfterEach(func() {
+				// Stop hoverfly
+				stopHoverfly()
 			})
 
 

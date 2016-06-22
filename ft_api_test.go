@@ -4,54 +4,33 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
-	"github.com/SpectoLabs/hoverfly/models"
 	"github.com/dghubble/sling"
-	"strings"
+	"bytes"
 )
 
 var _ = Describe("Interacting with the API", func() {
 
+	var (
+		jsonPayload1 *bytes.Buffer
+		jsonPayload2 *bytes.Buffer
+	)
+
 	BeforeEach(func() {
-		requestCache.DeleteData()
-		pl1 := models.Payload{
-			Request: models.RequestDetails{
-				Path:"path1",
-				Method:"method1",
-				Destination:"destination1",
-				Scheme:"scheme1",
-				Query:"query1",
-				Body:"body1",
-				Headers:map[string][]string{"header": []string{"value1"}},
-			},
-			Response: models.ResponseDetails{
-				Status: 201,
-				Body: "body1",
-				Headers:map[string][]string{"header": []string{"value1"}},
-			},
-		}
-		encoded, _ := pl1.Encode()
-		requestCache.Set([]byte(pl1.Id()), encoded)
-		pl2 := models.Payload{
-			Request: models.RequestDetails{
-				Path:"path2",
-				Method:"method2",
-				Destination:"destination2",
-				Scheme:"scheme2",
-				Query:"query2",
-				Body:"body2",
-				Headers:map[string][]string{"header": []string{"value2"}},
-			},
-			Response: models.ResponseDetails{
-				Status: 202,
-				Body: "body2",
-				Headers:map[string][]string{"header": []string{"value2"}},
-			},
-		}
-		encoded, _ = pl2.Encode()
-		requestCache.Set([]byte(pl2.Id()), encoded)
+		jsonPayload1 = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "method1", "destination": "destination1", "scheme": "scheme1", "query": "query1", "body": "body1", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
+		jsonPayload2 = bytes.NewBufferString(`{"data":[{"request": {"path": "/path2", "method": "method2", "destination": "destination2", "scheme": "scheme2", "query": "query2", "body": "body2", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "encodedBody": false, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
 	})
 
 	Context("GET /api/records", func() {
+
+		BeforeEach(func() {
+			hoverflyCmd = startHoverfly(adminPort, proxyPort)
+			ImportHoverflyRecords(jsonPayload1)
+			ImportHoverflyRecords(jsonPayload2)
+		})
+
+		AfterEach(func() {
+			stopHoverfly()
+		})
 
 		It("Should retrieve the records", func() {
 			req := sling.New().Get(hoverflyAdminUrl + "/api/records")
@@ -68,20 +47,23 @@ var _ = Describe("Interacting with the API", func() {
 					"body": "body1",
 					"encodedBody": false,
 					"headers": {
-					  "header": [
+					  "Header": [
 					    "value1"
 					  ]
 					}
 				      },
 				      "request": {
-					"path": "path1",
+					"path": "/path1",
 					"method": "method1",
 					"destination": "destination1",
 					"scheme": "scheme1",
 					"query": "query1",
 					"body": "body1",
 					"headers": {
-					  "header": [
+					  "Content-Type": [
+                                            "text/plain; charset=utf-8"
+                                          ],
+					  "Header": [
 					    "value1"
 					  ]
 					}
@@ -93,20 +75,23 @@ var _ = Describe("Interacting with the API", func() {
 					"body": "body2",
 					"encodedBody": false,
 					"headers": {
-					  "header": [
+					  "Header": [
 					    "value2"
 					  ]
 					}
 				      },
 				      "request": {
-					"path": "path2",
+					"path": "/path2",
 					"method": "method2",
 					"destination": "destination2",
 					"scheme": "scheme2",
 					"query": "query2",
 					"body": "body2",
 					"headers": {
-					  "header": [
+					  "Content-Type": [
+                                            "text/plain; charset=utf-8"
+                                          ],
+					  "Header": [
 					    "value2"
 					  ]
 					}
@@ -119,194 +104,174 @@ var _ = Describe("Interacting with the API", func() {
 
 	Context("DELETE /api/records", func() {
 
+		BeforeEach(func() {
+			hoverflyCmd = startHoverfly(adminPort, proxyPort)
+			ImportHoverflyRecords(jsonPayload1)
+			ImportHoverflyRecords(jsonPayload2)
+		})
+
+		AfterEach(func() {
+			stopHoverfly()
+		})
+
 		It("Should delete the records", func() {
-			req := sling.New().Delete(hoverflyAdminUrl + "/api/records")
-			res := DoRequest(req)
-			Expect(res.StatusCode).To(Equal(200))
-			Expect(requestCache.RecordsCount()).To(Equal(0))
+			reqPost := sling.New().Delete(hoverflyAdminUrl + "/api/records")
+			resPost := DoRequest(reqPost)
+			Expect(resPost.StatusCode).To(Equal(200))
+			responseMessage, err := ioutil.ReadAll(resPost.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(responseMessage)).To(ContainSubstring("Proxy cache deleted successfuly"))
+
+			reqGet := sling.New().Get(hoverflyAdminUrl + "/api/records")
+			resGet := DoRequest(reqGet)
+			Expect(resGet.StatusCode).To(Equal(200))
+			recordsJson, err := ioutil.ReadAll(resGet.Body)
+			Expect(err).To(BeNil())
+			Expect(recordsJson).To(MatchJSON(
+				`{
+				  "data": null
+				}`))
 		})
 	})
 
 	Context("POST /api/records", func() {
 
+		BeforeEach(func() {
+			hoverflyCmd = startHoverfly(adminPort, proxyPort)
+		})
+
+		AfterEach(func() {
+			stopHoverfly()
+		})
+
 		Context("When no records exist", func() {
 			It("Should create the records", func() {
-				res := DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/records").Set("Content-Type", "application/json").Body(
-					strings.NewReader(`
-					{
-						"data": [{
-							"response": {
-								"status": 201,
-								"body": "body1",
-								"encodedBody": false,
-								"headers": {
-									"header": [
-										"value1"
-									]
-								}
-							},
-							"request": {
-								"path": "path1",
-								"method": "method1",
-								"destination": "destination1",
-								"scheme": "scheme1",
-								"query": "query1",
-								"body": "body1",
-								"headers": {
-									"header": [
-										"value1"
-									],
-									"Content-Type": [
-										"application/json"
-									]
-								}
-							}
-						}]
-					}
-					`)))
+				res := DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonPayload1))
 				Expect(res.StatusCode).To(Equal(200))
 
-				data := models.PayloadViewData{
-					Data: []models.PayloadView{models.PayloadView{
-						Request: models.RequestDetailsView{
-							Path:"path1",
-							Method:"method1",
-							Destination:"destination1",
-							Scheme:"scheme1",
-							Query:"query1",
-							Body:"body1",
-							Headers:map[string][]string{
-								"header": []string{"value1"},
-								"Content-Type": []string{"application/json"},
-							},
-						},
-						Response: models.ResponseDetailsView{
-							Status: 201,
-							Body: "body1",
-							EncodedBody: false,
-							Headers:map[string][]string{"header": []string{"value1"}},
-						},
-					}},
-				}
+				reqGet := sling.New().Get(hoverflyAdminUrl + "/api/records")
+				resGet := DoRequest(reqGet)
 
-				expectedPayload := data.Data[0].ConvertToPayload()
-				outputBytes, err := requestCache.Get([]byte(expectedPayload.Id()))
+				Expect(resGet.StatusCode).To(Equal(200))
+
+				recordsJson, err := ioutil.ReadAll(resGet.Body)
 				Expect(err).To(BeNil())
-				payload, err := models.NewPayloadFromBytes(outputBytes)
-				Expect(*payload).To(Equal(expectedPayload))
+				Expect(recordsJson).To(MatchJSON(
+					`{
+					  "data": [
+					    {
+					      "response": {
+						"status": 201,
+						"body": "body1",
+						"encodedBody": false,
+						"headers": {
+						  "Header": [
+						    "value1"
+						  ]
+						}
+					      },
+					      "request": {
+						"path": "/path1",
+						"method": "method1",
+						"destination": "destination1",
+						"scheme": "scheme1",
+						"query": "query1",
+						"body": "body1",
+						"headers": {
+						  "Content-Type": [
+						    "text/plain; charset=utf-8"
+						  ],
+						  "Header": [
+						    "value1"
+						  ]
+						}
+					      }
+					    }
+					  ]
+					}`))
 			})
 		})
 
 		Context("When a record already exists", func() {
 
 			BeforeEach(func() {
-				p := models.Payload{
-					Request: models.RequestDetails{
-						Path:"path2",
-						Method:"method2",
-						Destination:"destination2",
-						Scheme:"scheme2",
-						Query:"query2",
-						Body:"body2",
-						Headers:map[string][]string{"header": []string{"value1"}},
-					},
-					Response: models.ResponseDetails{
-						Status: 201,
-						Body: "body2",
-						Headers:map[string][]string{"header": []string{"value1"}},
-					},
-				}
-				bytes, err := p.Encode()
-				Expect(err).To(BeNil())
-				requestCache.Set([]byte(p.Id()), bytes)
+				ImportHoverflyRecords(jsonPayload1)
 			})
 
 			It("Should append the records to the existing ones", func() {
-				res := DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/records").Set("Content-Type", "application/json").Body(
-					strings.NewReader(`
-					{
-						"data": [{
-							"response": {
-								"status": 201,
-								"body": "body1",
-								"encodedBody": false,
-								"headers": {
-									"header": [
-										"value1"
-									]
-								}
-							},
-							"request": {
-								"path": "path1",
-								"method": "method1",
-								"destination": "destination1",
-								"scheme": "scheme1",
-								"query": "query1",
-								"body": "body1",
-								"headers": {
-									"header": [
-										"value1"
-									],
-									"Content-Type": [
-										"application/json"
-									]
-								}
-							}
-						}]
-					}
-					`)))
+				res := DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/records").Set("Content-Type", "application/json").Body(jsonPayload2))
 				Expect(res.StatusCode).To(Equal(200))
 
-				data := models.PayloadViewData{
-					Data: []models.PayloadView{models.PayloadView{
-						Request: models.RequestDetailsView{
-							Path:"path1",
-							Method:"method1",
-							Destination:"destination1",
-							Scheme:"scheme1",
-							Query:"query1",
-							Body:"body1",
-							Headers:map[string][]string{
-								"header": []string{"value1"},
-								"Content-Type": []string{"application/json"},
-							},
-						},
-						Response: models.ResponseDetailsView{
-							Status: 201,
-							Body: "body1",
-							EncodedBody: false,
-							Headers:map[string][]string{"header": []string{"value1"}},
-						},
-					}},
-				}
+				reqGet := sling.New().Get(hoverflyAdminUrl + "/api/records")
+				resGet := DoRequest(reqGet)
 
-				expectedPayload := data.Data[0].ConvertToPayload()
-				outputBytes, err := requestCache.Get([]byte(expectedPayload.Id()))
+				Expect(resGet.StatusCode).To(Equal(200))
+
+				recordsJson, err := ioutil.ReadAll(resGet.Body)
 				Expect(err).To(BeNil())
-				payload, err := models.NewPayloadFromBytes(outputBytes)
-				Expect(*payload).To(Equal(expectedPayload))
 
-				other := models.Payload{
-					Request: models.RequestDetails{
-						Path:"path2",
-						Method:"method2",
-						Destination:"destination2",
-						Scheme:"scheme2",
-						Query:"query2",
-						Body:"body2",
-						Headers:map[string][]string{"header": []string{"value1"}},
-					},
-					Response: models.ResponseDetails{
-						Status: 201,
-						Body: "body2",
-						Headers:map[string][]string{"header": []string{"value1"}},
-					},
-				}
-
-				outputBytes, err = requestCache.Get([]byte(other.Id()))
-				Expect(err).To(BeNil())
-				payload, err = models.NewPayloadFromBytes(outputBytes)
-				Expect(*payload).To(Equal(other))
+				Expect(recordsJson).To(MatchJSON(
+					`{
+					  "data": [
+					    {
+					      "response": {
+						"status": 201,
+						"body": "body1",
+						"encodedBody": false,
+						"headers": {
+						  "Header": [
+						    "value1"
+						  ]
+						}
+					      },
+					      "request": {
+						"path": "/path1",
+						"method": "method1",
+						"destination": "destination1",
+						"scheme": "scheme1",
+						"query": "query1",
+						"body": "body1",
+						"headers": {
+						  "Content-Type": [
+						    "text/plain; charset=utf-8"
+						  ],
+						  "Header": [
+						    "value1"
+						  ]
+						}
+					      }
+					    },
+					    {
+					      "response": {
+						"status": 202,
+						"body": "body2",
+						"encodedBody": false,
+						"headers": {
+						  "Header": [
+						    "value2"
+						  ]
+						}
+					      },
+					      "request": {
+						"path": "/path2",
+						"method": "method2",
+						"destination": "destination2",
+						"scheme": "scheme2",
+						"query": "query2",
+						"body": "body2",
+						"headers": {
+						  "Content-Type": [
+						    "text/plain; charset=utf-8"
+						  ],
+						  "Header": [
+						    "value2"
+						  ]
+						}
+					      }
+					    }
+					  ]
+					}`))
 			})
 		})
 	})
