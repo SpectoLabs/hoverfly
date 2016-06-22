@@ -6,6 +6,8 @@ hoverctl-functional-test-dependencies:
 	cd functional-tests/hoverctl && \
 	glide install
 
+dependencies: hoverctl-dependencies hoverctl-functional-test-dependencies
+
 hoverctl-test: hoverctl-dependencies
 	cd hoverctl && \
 	go test -v $(go list ./... | grep -v -E 'vendor')
