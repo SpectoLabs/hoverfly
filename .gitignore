@@ -1,6 +1,6 @@
 .idea
 vendor
 *.iml
-hoverctl-ft/.hoverfly/cache/*.json
-hoverctl-ft/.hoverfly/config.yaml
-hoverctl-ft/.hoverfly/*.pid
+functional-tests/hoverctl/.hoverfly/cache/*.json
+functional-tests/hoverctl/.hoverfly/config.yaml
+functional-tests/hoverctl/.hoverfly/*.pid
