@@ -86,7 +86,7 @@ func Test_Simulation_GetFileName(t *testing.T) {
 	}
 
 	resultFileName := simulation.GetFileName()
-	Expect(resultFileName).To(Equal("vendor.name.version.hfile"))
+	Expect(resultFileName).To(Equal("vendor.name.version.json"))
 }
 
 func Test_Simulation_String(t *testing.T) {
