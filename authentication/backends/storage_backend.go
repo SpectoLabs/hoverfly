@@ -7,7 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/cache"
+	"github.com/SpectoLabs/hoverfly/core/cache"
 )
 
 type User struct {

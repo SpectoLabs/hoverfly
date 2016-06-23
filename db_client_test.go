@@ -3,7 +3,7 @@ package hoverfly
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/cache"
+	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"net/http"
 	"strings"

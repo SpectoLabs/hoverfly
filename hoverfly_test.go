@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
-	"github.com/SpectoLabs/hoverfly/cache"
+	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"

@@ -12,12 +12,11 @@ import (
 	"time"
 	log "github.com/Sirupsen/logrus"
 	authBackend "github.com/SpectoLabs/hoverfly/authentication/backends"
-	"github.com/SpectoLabs/hoverfly/cache"
+	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/metrics"
 	"github.com/rusenask/goproxy"
 	"github.com/SpectoLabs/hoverfly/models"
 )
-
 
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
 type Hoverfly struct {

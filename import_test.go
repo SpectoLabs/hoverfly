@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/cache"
+	"github.com/SpectoLabs/hoverfly/core/cache"
 	. "github.com/onsi/gomega"
 	"encoding/base64"
 	"github.com/SpectoLabs/hoverfly/models"
