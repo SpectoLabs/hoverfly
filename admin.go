@@ -24,7 +24,7 @@ import (
 	// auth
 	"github.com/SpectoLabs/hoverfly/authentication"
 	"github.com/SpectoLabs/hoverfly/authentication/controllers"
-	"github.com/SpectoLabs/hoverfly/metrics"
+	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/models"
 )
 

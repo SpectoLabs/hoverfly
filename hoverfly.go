@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
-	"github.com/SpectoLabs/hoverfly/metrics"
+	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"net"
 	"net/http"
 	"regexp"
