@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/cache"
-	"github.com/SpectoLabs/hoverfly/testutil"
+	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"
 	"os"

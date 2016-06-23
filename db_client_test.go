@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/cache"
-	"github.com/SpectoLabs/hoverfly/testutil"
+	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"net/http"
 	"strings"
 	"testing"

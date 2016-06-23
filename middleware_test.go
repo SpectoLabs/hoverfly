@@ -1,7 +1,7 @@
 package hoverfly
 
 import (
-	"github.com/SpectoLabs/hoverfly/testutil"
+	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"testing"
 	"github.com/SpectoLabs/hoverfly/models"
 )
