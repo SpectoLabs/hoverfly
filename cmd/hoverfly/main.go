@@ -30,9 +30,9 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	hv "github.com/SpectoLabs/hoverfly"
-	"github.com/SpectoLabs/hoverfly/authentication/backends"
-	"github.com/SpectoLabs/hoverfly/cache"
-	hvc "github.com/SpectoLabs/hoverfly/certs"
+	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/core/cache"
+	hvc "github.com/SpectoLabs/hoverfly/core/certs"
 	"github.com/rusenask/goproxy"
 )
 
