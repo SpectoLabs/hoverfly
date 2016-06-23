@@ -38,67 +38,8 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			recordsJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(recordsJson).To(MatchJSON(
-				`{
-				  "data": [
-				    {
-				      "response": {
-					"status": 201,
-					"body": "body1",
-					"encodedBody": false,
-					"headers": {
-					  "Header": [
-					    "value1"
-					  ]
-					}
-				      },
-				      "request": {
-					"path": "/path1",
-					"method": "method1",
-					"destination": "destination1",
-					"scheme": "scheme1",
-					"query": "query1",
-					"body": "body1",
-					"headers": {
-					  "Content-Type": [
-                                            "text/plain; charset=utf-8"
-                                          ],
-					  "Header": [
-					    "value1"
-					  ]
-					}
-				      }
-				    },
-				    {
-				      "response": {
-					"status": 202,
-					"body": "body2",
-					"encodedBody": false,
-					"headers": {
-					  "Header": [
-					    "value2"
-					  ]
-					}
-				      },
-				      "request": {
-					"path": "/path2",
-					"method": "method2",
-					"destination": "destination2",
-					"scheme": "scheme2",
-					"query": "query2",
-					"body": "body2",
-					"headers": {
-					  "Content-Type": [
-                                            "text/plain; charset=utf-8"
-                                          ],
-					  "Header": [
-					    "value2"
-					  ]
-					}
-				      }
-				    }
-				  ]
-				}`))
+			Expect(recordsJson).To(ContainSubstring(jsonPayload1.String()))
+			Expect(recordsJson).To(ContainSubstring(jsonPayload2.String()))
 		})
 	})
 
@@ -210,68 +151,8 @@ var _ = Describe("Interacting with the API", func() {
 
 				recordsJson, err := ioutil.ReadAll(resGet.Body)
 				Expect(err).To(BeNil())
-
-				Expect(recordsJson).To(MatchJSON(
-					`{
-					  "data": [
-					    {
-					      "response": {
-						"status": 201,
-						"body": "body1",
-						"encodedBody": false,
-						"headers": {
-						  "Header": [
-						    "value1"
-						  ]
-						}
-					      },
-					      "request": {
-						"path": "/path1",
-						"method": "method1",
-						"destination": "destination1",
-						"scheme": "scheme1",
-						"query": "query1",
-						"body": "body1",
-						"headers": {
-						  "Content-Type": [
-						    "text/plain; charset=utf-8"
-						  ],
-						  "Header": [
-						    "value1"
-						  ]
-						}
-					      }
-					    },
-					    {
-					      "response": {
-						"status": 202,
-						"body": "body2",
-						"encodedBody": false,
-						"headers": {
-						  "Header": [
-						    "value2"
-						  ]
-						}
-					      },
-					      "request": {
-						"path": "/path2",
-						"method": "method2",
-						"destination": "destination2",
-						"scheme": "scheme2",
-						"query": "query2",
-						"body": "body2",
-						"headers": {
-						  "Content-Type": [
-						    "text/plain; charset=utf-8"
-						  ],
-						  "Header": [
-						    "value2"
-						  ]
-						}
-					      }
-					    }
-					  ]
-					}`))
+				Expect(recordsJson).To(ContainSubstring(jsonPayload1.String()))
+				Expect(recordsJson).To(ContainSubstring(jsonPayload2.String()))
 			})
 		})
 	})
