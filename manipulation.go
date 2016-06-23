@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/models"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 // Constructor - holds information about original request (which is needed to create response

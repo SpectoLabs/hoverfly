@@ -3,7 +3,7 @@ package hoverfly
 import (
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/models"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 func TestChangeBodyMiddleware(t *testing.T) {

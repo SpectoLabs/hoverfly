@@ -15,7 +15,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/rusenask/goproxy"
-	"github.com/SpectoLabs/hoverfly/models"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access

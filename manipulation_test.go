@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/models"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 func TestReconstructRequest(t *testing.T) {

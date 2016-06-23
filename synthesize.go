@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/models"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 // SynthesizeResponse calls middleware to populate response data, nothing gets pass proxy

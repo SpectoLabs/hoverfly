@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/models"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 // TestMain prepares database for testing and then performs a cleanup

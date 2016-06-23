@@ -25,7 +25,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/authentication"
 	"github.com/SpectoLabs/hoverfly/authentication/controllers"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
-	"github.com/SpectoLabs/hoverfly/models"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 // recordedRequests struct encapsulates payload data

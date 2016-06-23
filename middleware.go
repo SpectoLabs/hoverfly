@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/models"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 // Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.

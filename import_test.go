@@ -8,7 +8,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	. "github.com/onsi/gomega"
 	"encoding/base64"
-	"github.com/SpectoLabs/hoverfly/models"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 func TestIsURLHTTP(t *testing.T) {

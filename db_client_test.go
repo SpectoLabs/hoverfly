@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/models"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 func TestSetKey(t *testing.T) {
