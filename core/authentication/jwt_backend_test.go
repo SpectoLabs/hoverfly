@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/authentication/backends"
-	"github.com/SpectoLabs/hoverfly/cache"
+	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/dgrijalva/jwt-go"
 )
 

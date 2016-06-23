@@ -6,7 +6,7 @@ import (
 	"bufio"
 	"crypto/tls"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"net"

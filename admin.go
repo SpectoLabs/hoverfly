@@ -22,8 +22,8 @@ import (
 	"github.com/meatballhat/negroni-logrus"
 
 	// auth
-	"github.com/SpectoLabs/hoverfly/authentication"
-	"github.com/SpectoLabs/hoverfly/authentication/controllers"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
+	"github.com/SpectoLabs/hoverfly/core/authentication/controllers"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )

@@ -4,8 +4,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/authentication"
-	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
+	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"net/http"
 )
 

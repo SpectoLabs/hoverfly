@@ -9,7 +9,7 @@ import (
 	"encoding/gob"
 	"time"
 
-	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 )
 
 type JWTAuthenticationBackend struct {

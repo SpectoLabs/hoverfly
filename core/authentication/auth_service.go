@@ -2,7 +2,7 @@ package authentication
 
 import (
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	jwt "github.com/dgrijalva/jwt-go"
 	"net/http"
 )

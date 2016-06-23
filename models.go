@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 	log "github.com/Sirupsen/logrus"
-	authBackend "github.com/SpectoLabs/hoverfly/authentication/backends"
+	authBackend "github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/rusenask/goproxy"

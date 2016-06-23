@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/SpectoLabs/hoverfly/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
