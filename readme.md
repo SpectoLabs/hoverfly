@@ -1,7 +1,7 @@
 [![Circle CI][CircleCI-Image]][CircleCI-Url]
 [![ReportCard][ReportCard-Image]][ReportCard-Url]
 
-![Hoverfly](static/img/hoverfly_logo.png)
+![Hoverfly](core/static/img/hoverfly_logo.png)
 ## Dependencies without the sting
 
 Hoverfly is a light-weight open source tool for creating simulations of external services for use in development and testing. 
