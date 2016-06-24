@@ -1,9 +1,6 @@
 deps:
 	go get
 
-test: deps
-	go test
-
 build-drone: deps
 	go get -u all
 	cd cmd/hoverfly/ && go build
@@ -58,4 +55,4 @@ hoverctl-functional-test: hoverctl-functional-test-dependencies hoverctl-build
 	cd functional-tests/hoverctl && \
 	go test -v $(go list ./... | grep -v -E 'vendor')
 
-build: hoverfly-functional-test hoverctl-functional-test
+test: hoverfly-functional-test hoverctl-functional-test
