@@ -24,6 +24,10 @@ hoverctl-dependencies:
 	cd hoverctl && \
 	glide install
 
+hoverfly-functional-test-dependencies:
+	cd functional-tests/core && \
+	glide install
+
 hoverctl-functional-test-dependencies:
 	cd functional-tests/hoverctl && \
 	glide install
