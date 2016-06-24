@@ -7,7 +7,6 @@ import (
 	"bytes"
 	"net/http/httptest"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly"
 	"github.com/dghubble/sling"
 	"os"
 	"net/http"
@@ -45,7 +44,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				defer fakeServer.Close()
 
 				// Switch Hoverfly to capture mode
-				SetHoverflyMode(hoverfly.CaptureMode)
+				SetHoverflyMode("capture")
 
 				// Make a request to the fake server and proxy through Hoverfly
 				response := CallFakeServerThroughProxy(fakeServer)
@@ -61,7 +60,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				ImportHoverflyRecords(exportedRecords)
 
 				// Switch Hoverfly to simulate mode
-				SetHoverflyMode(hoverfly.SimulateMode)
+				SetHoverflyMode("simulate")
 
 				// Make the request to Hoverfly simulate
 				afterImportFakeServerResponse = CallFakeServerThroughProxy(fakeServer)
@@ -114,7 +113,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				defer fakeServer.Close()
 
 				// Switch Hoverfly to capture mode
-				SetHoverflyMode(hoverfly.CaptureMode)
+				SetHoverflyMode("capture")
 
 				// Make a request to the fake server and proxy through Hoverfly
 				fakeServerRequest := sling.New().Get(fakeServer.URL).Set("Accept-Encoding", "gzip")
@@ -132,7 +131,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				ImportHoverflyRecords(exportedRecords)
 
 				// Switch Hoverfly to simulate mode
-				SetHoverflyMode(hoverfly.SimulateMode)
+				SetHoverflyMode("simulate")
 
 				// Make the request to Hoverfly simulate
 				afterImportFakeServerRequest := sling.New().Get(fakeServer.URL).Set("Accept-Encoding", "gzip")
@@ -194,7 +193,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				//time.Sleep(time.Second * 3)
 
 				// Switch Hoverfly to capture mode
-				SetHoverflyMode(hoverfly.CaptureMode)
+				SetHoverflyMode("capture")
 
 				// Make a request to the fake server and proxy through Hoverfly
 				fakeServerRequest := sling.New().Get(fakeServer.URL)
@@ -211,7 +210,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				ImportHoverflyRecords(exportedRecords)
 
 				// Switch Hoverfly to simulate mode
-				SetHoverflyMode(hoverfly.SimulateMode)
+				SetHoverflyMode("simulate")
 
 				// Make the request to Hoverfly simulate
 				afterImportFakeServerRequest := sling.New().Get(fakeServer.URL)
