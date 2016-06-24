@@ -40,7 +40,6 @@ static/dist
 # IntelliJ
 requests.db
 .idea
-vendor
 *.iml
 target
 functional-tests/hoverctl/.hoverfly/cache/*.json
