@@ -58,4 +58,4 @@ hoverctl-functional-test: hoverctl-functional-test-dependencies hoverctl-build
 	cd functional-tests/hoverctl && \
 	go test -v $(go list ./... | grep -v -E 'vendor')
 
-build: hoverctl-functional-test
+build: hoverfly-functional-test hoverctl-functional-test
