@@ -12,7 +12,7 @@ import (
 	"time"
 
 	// static assets
-	_ "github.com/SpectoLabs/hoverfly/statik"
+	_ "github.com/SpectoLabs/hoverfly/core/statik"
 	"github.com/rakyll/statik/fs"
 
 	log "github.com/Sirupsen/logrus"
