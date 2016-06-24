@@ -5,7 +5,7 @@ machine:
 checkout:
   post:
     - mkdir -p $GOPATH/src/github.com/SpectoLabs/hoverfly || echo "project dir already exists"
-    - "rsync -azC --delete ./ $GOPATH/src/github.com/SpectoLabs/hoverfly" 
+    - "rsync -az --delete ./ $GOPATH/src/github.com/SpectoLabs/hoverfly" 
 
 dependencies:
   pre:
