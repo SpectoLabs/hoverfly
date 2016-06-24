@@ -38,6 +38,12 @@ static/node_modules
 static/dist
 
 # IntelliJ
-.idea
-*.iml
 requests.db
+.idea
+vendor
+*.iml
+target
+functional-tests/hoverctl/.hoverfly/cache/*.json
+functional-tests/hoverctl/.hoverfly/config.yaml
+functional-tests/hoverctl/.hoverfly/*.pid
+functional-tests/hoverctl/bin/hoverctl

@@ -13,3 +13,26 @@ build: deps
 
 build-ami:
 	packer build -var 'aws_access_key=${AWS_ACCESS_KEY}' -var 'aws_secret_key=${AWS_SECRET_KEY}' packer.json
+
+dependencies: hoverctl-dependencies hoverctl-functional-test-dependencies
+
+hoverctl-dependencies:
+	cd hoverctl && \
+	glide install
+
+hoverctl-functional-test-dependencies:
+	cd functional-tests/hoverctl && \
+	glide install
+
+hoverctl-test: hoverctl-dependencies
+	cd hoverctl && \
+	go test -v $(go list ./... | grep -v -E 'vendor')
+
+hoverctl-build: hoverctl-test
+	cd hoverctl && \
+	go build -o ../target/hoverctl
+
+hoverctl-functional-test: hoverctl-functional-test-dependencies hoverctl-build
+	cp target/hoverctl functional-tests/hoverctl/bin/hoverctl
+	cd functional-tests/hoverctl && \
+	go test -v $(go list ./... | grep -v -E 'vendor')
