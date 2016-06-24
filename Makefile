@@ -40,6 +40,10 @@ hoverctl-test: hoverctl-dependencies
 	cd hoverctl && \
 	go test -v $(go list ./... | grep -v -E 'vendor')
 
+hoverfly-build: hoverfly-test
+	cd core/cmd/hoverfly && \
+	go build -o ../../../target/hoverfly
+
 hoverctl-build: hoverctl-test
 	cd hoverctl && \
 	go build -o ../target/hoverctl
