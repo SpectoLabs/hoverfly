@@ -45,3 +45,12 @@ hoverctl-functional-test: hoverctl-functional-test-dependencies hoverctl-build
 test: hoverfly-functional-test hoverctl-functional-test
 
 build: test
+
+gox-build: test
+	rm -rf target/*
+	cd core/cmd/hoverfly && \
+	$(GOPATH)/bin/gox
+	mv core/cmd/hoverfly/hoverfly_* target/
+	cd hoverctl && \
+	$(GOPATH)/bin/gox
+	mv hoverctl/hoverctl_* target/
