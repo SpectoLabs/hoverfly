@@ -4,8 +4,8 @@ machine:
 
 checkout:
   post:
-    - mkdir -p $GOPATH/src/github.com/SpectoLabs/${CIRCLE_PROJECT_REPONAME} || echo "project dir already exists"
-    - "rsync -azC --delete ./ $GOPATH/src/github.com/SpectoLabs/${CIRCLE_PROJECT_REPONAME}" 
+    - mkdir -p $GOPATH/src/github.com/SpectoLabs/hoverfly || echo "project dir already exists"
+    - "rsync -azC --delete ./ $GOPATH/src/github.com/SpectoLabs/hoverfly" 
 
 dependencies:
   pre:
@@ -13,14 +13,11 @@ dependencies:
     - sudo apt-get update
     - sudo apt-get install -y glide
     - go get github.com/aktau/github-release
-
-  override:
-    - "cd $GOPATH/src/github.com/SpectoLabs/${CIRCLE_PROJECT_REPONAME} && rm -rf vendor/ && glide up"
-    - "cd $GOPATH/src/github.com/SpectoLabs/${CIRCLE_PROJECT_REPONAME} && go get -t -d -v ./... || echo 'go get failed'"
+    - go get github.com/mitchellh/gox
           
 test:
   override:
-    - "cd $GOPATH/src/github.com/SpectoLabs/${CIRCLE_PROJECT_REPONAME} go test -race -v"
+    - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly && make gox-build"
  
 deployment:
   production:
