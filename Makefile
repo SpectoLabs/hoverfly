@@ -2,19 +2,19 @@ dependencies: hoverctl-dependencies hoverctl-functional-test-dependencies
 
 hoverfly-dependencies:
 	cd core && \
-	glide install
+	glide install --strip-vcs
 
 hoverctl-dependencies:
 	cd hoverctl && \
-	glide install
+	glide install --strip-vcs
 
 hoverfly-functional-test-dependencies:
 	cd functional-tests/core && \
-	glide install
+	glide install --strip-vcs
 
 hoverctl-functional-test-dependencies:
 	cd functional-tests/hoverctl && \
-	glide install
+	glide install --strip-vcs
 
 hoverfly-test: hoverfly-dependencies
 	cd core && \
