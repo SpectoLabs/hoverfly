@@ -1,0 +1,29 @@
+machine:
+  environment:
+    GOPATH: /home/ubuntu/.go_workspace
+
+checkout:
+  post:
+    - mkdir -p $GOPATH/src/github.com/SpectoLabs/${CIRCLE_PROJECT_REPONAME} || echo "project dir already exists"
+    - "rsync -azC --delete ./ $GOPATH/src/github.com/SpectoLabs/${CIRCLE_PROJECT_REPONAME}" 
+
+dependencies:
+  pre:
+    - sudo add-apt-repository -y ppa:masterminds/glide
+    - sudo apt-get update
+    - sudo apt-get install -y glide
+    - go get github.com/aktau/github-release
+
+  override:
+    - "cd $GOPATH/src/github.com/SpectoLabs/${CIRCLE_PROJECT_REPONAME} && rm -rf vendor/ && glide up"
+    - "cd $GOPATH/src/github.com/SpectoLabs/${CIRCLE_PROJECT_REPONAME} && go get -t -d -v ./... || echo 'go get failed'"
+          
+test:
+  override:
+    - "cd $GOPATH/src/github.com/SpectoLabs/${CIRCLE_PROJECT_REPONAME} go test -race -v"
+ 
+deployment:
+  production:
+    branch: master
+    commands:
+      - github-release --help
