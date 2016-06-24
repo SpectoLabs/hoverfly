@@ -29,7 +29,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	hv "github.com/SpectoLabs/hoverfly"
+	hv "github.com/SpectoLabs/hoverfly/core"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	hvc "github.com/SpectoLabs/hoverfly/core/certs"
