@@ -45,3 +45,4 @@ import:
 - package: github.com/gorilla/pat
 - package: github.com/cheekybits/is
 - package: github.com/ursiform/bear
+- package: github.com/onsi/gomega
