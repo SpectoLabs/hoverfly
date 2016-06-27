@@ -3,6 +3,8 @@ updated: 2016-06-07T12:14:42.556864965+01:00
 imports:
 - name: github.com/dghubble/sling
   version: 5765fe1bdc176ae984b074c8a89980d1f16e6dd8
+- name: github.com/google/go-querystring
+  version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
 - name: github.com/onsi/ginkgo
   version: 5437a97bf824dec14e58d68c56ee36e772670c2e
 - name: github.com/onsi/gomega
