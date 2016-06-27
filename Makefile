@@ -55,3 +55,12 @@ gox-build: test
 	cd hoverctl && \
 	$(GOPATH)/bin/gox
 	mv hoverctl/hoverctl_* target/
+
+build-release:
+	rm -rf target/*
+	cd core/cmd/hoverfly && \
+	$(GOPATH)/bin/gox
+	mv core/cmd/hoverfly/hoverfly_* target/
+	cd hoverctl && \
+	$(GOPATH)/bin/gox
+	mv hoverctl/hoverctl_* target/
