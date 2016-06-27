@@ -21,6 +21,6 @@ test:
  
 deployment:
   production:
-    branch: master
+    branch: hoverctl-merge-in
     commands:
       - "for f in hoverfly_\"$GIT_TAG_NAME\"_*;do;github-release upload  --user SpectoLabs --repo hoverfly-fork --tag \"$GIT_TAG_NAME\" --name \"$f\" --file \"$f\";done" 
