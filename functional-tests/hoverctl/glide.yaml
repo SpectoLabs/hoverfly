@@ -4,3 +4,4 @@ import:
 - package: github.com/onsi/ginkgo
 - package: github.com/dghubble/sling
 - package: github.com/phayes/freeport
+- package: gopkg.in/yaml.v2
