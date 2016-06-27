@@ -1,4 +1,4 @@
-dependencies: hoverctl-dependencies hoverctl-functional-test-dependencies
+dependencies: hoverfly-dependencies hoverfly-functional-test-dependencies hoverctl-dependencies hoverctl-functional-test-dependencies
 
 hoverfly-dependencies:
 	cd core && \
