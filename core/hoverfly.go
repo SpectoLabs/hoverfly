@@ -12,6 +12,7 @@ import (
 	"net"
 	"net/http"
 	"regexp"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond
@@ -125,6 +126,11 @@ func (d *Hoverfly) UpdateProxy() {
 
 	d.Proxy = proxy
 	return
+}
+
+func (d *Hoverfly) UpdateResponseDelays(responseDelays []models.ResponseDelay) {
+	// d.Cfg.ResponseDelays = responseDelays
+	log.Info("Response delay config updated on hoverfly")
 }
 
 func hoverflyError(req *http.Request, err error, msg string, statusCode int) *http.Response {

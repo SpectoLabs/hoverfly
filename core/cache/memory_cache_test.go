@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"github.com/SpectoLabs/hoverfly/testutil"
+	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"reflect"
 	"testing"
 )

@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 // Configuration - initial structure of configuration
@@ -18,6 +19,8 @@ type Configuration struct {
 	DatabasePath string
 
 	TLSVerification bool
+
+	ResponseDelays []models.ResponseDelay
 
 	Verbose     bool
 	Development bool
@@ -140,6 +143,9 @@ func InitSettings() *Configuration {
 	} else {
 		appConfig.TLSVerification = true
 	}
+
+	//initialize slice
+	appConfig.ResponseDelays = make([]models.ResponseDelay, 0)
 
 	return &appConfig
 }

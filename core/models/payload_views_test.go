@@ -1,15 +1,14 @@
-package models_test
+package models
 
 import (
 	"testing"
 	. "github.com/onsi/gomega"
-	"github.com/SpectoLabs/hoverfly/models"
 )
 
 func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestDetailsView := models.RequestDetailsView{
+	requestDetailsView := RequestDetailsView{
 		Path: "/",
 		Method: "GET",
 		Destination: "/",
@@ -30,8 +29,8 @@ func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
-	view := models.PayloadView{
-		Request: models.RequestDetailsView{
+	view := PayloadView{
+		Request: RequestDetailsView{
 			Path: "A",
 			Method: "A",
 			Destination: "A",
@@ -43,7 +42,7 @@ func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 				"C" : []string{"D"},
 			},
 		},
-		Response: models.ResponseDetailsView{
+		Response: ResponseDetailsView{
 			Status: 1,
 			Body: "1",
 			EncodedBody: false,
@@ -56,8 +55,8 @@ func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 
 	payload := view.ConvertToPayload()
 
-	Expect(payload).To(Equal(models.Payload{
-		Request: models.RequestDetails{
+	Expect(payload).To(Equal(Payload{
+		Request: RequestDetails{
 			Path: "A",
 			Method: "A",
 			Destination: "A",
@@ -69,7 +68,7 @@ func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 				"C" : []string{"D"},
 			},
 		},
-		Response: models.ResponseDetails{
+		Response: ResponseDetails{
 			Status: 1,
 			Body: "1",
 			Headers: map[string][]string{
@@ -83,8 +82,8 @@ func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 func TestPayloadViewData_ConvertToPayloadDataWithEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
-	view := models.PayloadView{
-		Response: models.ResponseDetailsView{
+	view := PayloadView{
+		Response: ResponseDetailsView{
 			Body: "ZW5jb2RlZA==",
 			EncodedBody: true,
 		},

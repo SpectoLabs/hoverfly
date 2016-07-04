@@ -80,7 +80,7 @@ func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
 
 	imageUri := "/testdata/1x1.png"
 
-	file, _ := os.Open(".." + imageUri)
+	file, _ := os.Open("../../functional-tests/core" + imageUri)
 	defer file.Close()
 
 	originalImageBytes, _ := ioutil.ReadAll(file)
