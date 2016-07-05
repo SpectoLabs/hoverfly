@@ -3,7 +3,7 @@ package models
 import (
 	json "encoding/json"
 	"regexp"
-	"github.com/Sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 )
 
 type ResponseDelay struct {
@@ -27,10 +27,10 @@ func ParseResponseDelayJson(j []byte) []ResponseDelay {
 			if _, err := regexp.Compile(delay.HostPattern); err == nil {
 				result = append(result, delay)
 			} else {
-				logrus.Warn("Response delay entry skipped due to invalid pattern : %s", delay.HostPattern)
+				log.Warn("Response delay entry skipped due to invalid pattern : %s", delay.HostPattern)
 			}
 		} else {
-			logrus.Warn("Response delay entry skipped due to missing values: %v", delay)
+			log.Warn("Response delay entry skipped due to missing values: %v", delay)
 		}
 	}
 	return result
@@ -38,5 +38,5 @@ func ParseResponseDelayJson(j []byte) []ResponseDelay {
 
 func (this *ResponseDelay) Execute() {
 	// apply the delay
-	panic("execute delay not implemented")
+	log.Warn("execute delay not implemented")
 }
