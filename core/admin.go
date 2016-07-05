@@ -605,7 +605,7 @@ func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 	}
 
 	availableModes := map[string]bool{
-		"simulate": true,
+		"simulate":   true,
 		"capture":    true,
 		"modify":     true,
 		"synthesize": true,

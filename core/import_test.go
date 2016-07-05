@@ -1,14 +1,14 @@
 package hoverfly
 
 import (
+	"encoding/base64"
+	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
+	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/cache"
-	. "github.com/onsi/gomega"
-	"encoding/base64"
-	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 func TestIsURLHTTP(t *testing.T) {
@@ -143,17 +143,17 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 
 	originalPayload := models.PayloadView{
 		Response: models.ResponseDetailsView{
-			Status: 200,
-			Body: "hello_world",
+			Status:      200,
+			Body:        "hello_world",
 			EncodedBody: false,
-			Headers: map[string][]string{"Content-Type": []string {"text/plain"}}},
-		Request:  models.RequestDetailsView{
-			Path: "/",
-			Method: "GET",
+			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}}},
+		Request: models.RequestDetailsView{
+			Path:        "/",
+			Method:      "GET",
 			Destination: "/",
-			Scheme: "scheme",
-			Query: "", Body: "",
-			Headers: map[string][]string{"Hoverfly": []string {"testing"}}}}
+			Scheme:      "scheme",
+			Query:       "", Body: "",
+			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	hv.ImportPayloads([]models.PayloadView{originalPayload})
 
@@ -161,19 +161,19 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 	decodedPayload, _ := models.NewPayloadFromBytes(value)
 	Expect(*decodedPayload).To(Equal(models.Payload{
 		Response: models.ResponseDetails{
-			Status: 200,
-			Body: "hello_world",
-			Headers: map[string][]string{"Content-Type": []string {"text/plain"}},
+			Status:  200,
+			Body:    "hello_world",
+			Headers: map[string][]string{"Content-Type": []string{"text/plain"}},
 		},
-		Request:  models.RequestDetails{
-			Path: "/",
-			Method: "GET",
+		Request: models.RequestDetails{
+			Path:        "/",
+			Method:      "GET",
 			Destination: "/",
-			Scheme: "scheme",
-			Query: "", Body: "",
+			Scheme:      "scheme",
+			Query:       "", Body: "",
 			Headers: map[string][]string{
-				"Content-Type": []string {"text/plain; charset=utf-8"},
-				"Hoverfly": []string {"testing"},
+				"Content-Type": []string{"text/plain; charset=utf-8"},
+				"Hoverfly":     []string{"testing"},
 			},
 		},
 	}))
@@ -187,18 +187,18 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 
 	originalPayload1 := models.PayloadView{
 		Response: models.ResponseDetailsView{
-			Status: 200,
-			Body: "hello_world",
+			Status:      200,
+			Body:        "hello_world",
 			EncodedBody: false,
-			Headers: map[string][]string{"Hoverfly": []string {"testing"}},
+			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 		},
-		Request:  models.RequestDetailsView{
-			Path: "/",
-			Method: "GET",
+		Request: models.RequestDetailsView{
+			Path:        "/",
+			Method:      "GET",
 			Destination: "/",
-			Scheme: "scheme",
-			Query: "", Body: "",
-			Headers: map[string][]string{"Hoverfly": []string {"testing"}}}}
+			Scheme:      "scheme",
+			Query:       "", Body: "",
+			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	originalPayload2 := originalPayload1
 
@@ -229,7 +229,7 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 }
 
 // Helper function for base64 encoding
-func base64String(s string) (string) {
+func base64String(s string) string {
 	return base64.StdEncoding.EncodeToString([]byte(s))
 }
 
@@ -241,17 +241,17 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 
 	encodedPayload := models.PayloadView{
 		Response: models.ResponseDetailsView{
-			Status: 200,
-			Body: base64String("hello_world"),
+			Status:      200,
+			Body:        base64String("hello_world"),
 			EncodedBody: true,
-			Headers: map[string][]string{"Content-Encoding": []string {"gzip"}}},
-		Request:  models.RequestDetailsView{
-			Path: "/",
-			Method: "GET",
+			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
+		Request: models.RequestDetailsView{
+			Path:        "/",
+			Method:      "GET",
 			Destination: "/",
-			Scheme: "scheme",
-			Query: "", Body: "",
-			Headers: map[string][]string{"Hoverfly": []string {"testing"}}}}
+			Scheme:      "scheme",
+			Query:       "", Body: "",
+			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	hv.ImportPayloads([]models.PayloadView{encodedPayload})
 
@@ -263,14 +263,14 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 
 	Expect(decodedPayload).ToNot(Equal(models.Payload{
 		Response: models.ResponseDetails{
-			Status: 200,
-			Body: "hello_world",
-			Headers: map[string][]string{"Content-Encoding": []string {"gzip"}}},
-		Request:  models.RequestDetails{
-			Path: "/",
-			Method: "GET",
+			Status:  200,
+			Body:    "hello_world",
+			Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}},
+		Request: models.RequestDetails{
+			Path:        "/",
+			Method:      "GET",
 			Destination: "/",
-			Scheme: "scheme",
-			Query: "", Body: "",
-			Headers: map[string][]string{"Hoverfly": []string {"testing"}}}}))
+			Scheme:      "scheme",
+			Query:       "", Body: "",
+			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}))
 }

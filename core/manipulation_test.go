@@ -1,11 +1,11 @@
 package hoverfly
 
 import (
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 func TestReconstructRequest(t *testing.T) {

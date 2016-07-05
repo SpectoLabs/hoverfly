@@ -1,18 +1,18 @@
 package hoverfly
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"github.com/rusenask/goproxy"
 	"bufio"
 	"crypto/tls"
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
+	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/rusenask/goproxy"
 	"net"
 	"net/http"
 	"regexp"
-	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond
@@ -129,7 +129,7 @@ func (d *Hoverfly) UpdateProxy() {
 }
 
 func (d *Hoverfly) UpdateResponseDelays(responseDelays []models.ResponseDelay) {
-	// d.Cfg.ResponseDelays = responseDelays
+	d.Cfg.ResponseDelays = responseDelays
 	log.Info("Response delay config updated on hoverfly")
 }
 
@@ -200,6 +200,10 @@ func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Respo
 	}
 
 	newResponse := d.getResponse(req)
+
+	respDelay := d.Cfg.GetDelay(req.Host)
+	respDelay.Execute()
+
 	return req, newResponse
 
 }

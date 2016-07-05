@@ -7,6 +7,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"regexp"
 )
 
 // Configuration - initial structure of configuration
@@ -49,6 +50,17 @@ func (c *Configuration) GetMode() (mode string) {
 	return
 }
 
+func (c *Configuration) GetDelay(host string) (delay *models.ResponseDelay) {
+	for _, val := range c.ResponseDelays {
+		match := regexp.MustCompile(val.HostPattern).MatchString(host)
+		if match {
+			log.Info("Found response delay setting for this request host: ", delay)
+			return &val
+		}
+	}
+	return delay
+}
+
 // DefaultPort - default proxy port
 const DefaultPort = "8500"
 
@@ -64,7 +76,7 @@ const DefaultJWTExpirationDelta = 1 * 24 * 60 * 60
 
 // Environment variables
 const (
-	HoverflyAuthEnabledEV = "HoverflyAuthEnabled"
+	HoverflyAuthEnabledEV     = "HoverflyAuthEnabled"
 	HoverflySecretEV          = "HoverflySecret"
 	HoverflyTokenExpirationEV = "HoverflyTokenExpiration"
 
@@ -143,9 +155,6 @@ func InitSettings() *Configuration {
 	} else {
 		appConfig.TLSVerification = true
 	}
-
-	//initialize slice
-	appConfig.ResponseDelays = make([]models.ResponseDelay, 0)
 
 	return &appConfig
 }

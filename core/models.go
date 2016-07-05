@@ -3,6 +3,12 @@ package hoverfly
 import (
 	"bytes"
 	"fmt"
+	log "github.com/Sirupsen/logrus"
+	authBackend "github.com/SpectoLabs/hoverfly/core/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/metrics"
+	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/rusenask/goproxy"
 	"io"
 	"io/ioutil"
 	"net"
@@ -10,12 +16,6 @@ import (
 	"regexp"
 	"sync"
 	"time"
-	log "github.com/Sirupsen/logrus"
-	authBackend "github.com/SpectoLabs/hoverfly/core/authentication/backends"
-	"github.com/SpectoLabs/hoverfly/core/cache"
-	"github.com/SpectoLabs/hoverfly/core/metrics"
-	"github.com/rusenask/goproxy"
-	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
@@ -30,7 +30,7 @@ type Hoverfly struct {
 
 	Proxy *goproxy.ProxyHttpServer
 	SL    *StoppableListener
-	mu sync.Mutex
+	mu    sync.Mutex
 }
 
 // UpdateDestination - updates proxy with new destination regexp
@@ -105,12 +105,7 @@ func (d *Hoverfly) AddHook(hook Hook) {
 	d.Hooks.Add(hook)
 }
 
-
 var emptyResp = &http.Response{}
-
-
-
-
 
 // captureRequest saves request for later playback
 func (d *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
@@ -134,7 +129,6 @@ func (d *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		"body": string(reqBody),
 		"mode": "capture",
 	}).Debug("got request body")
-
 
 	// forwarding request
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
@@ -295,7 +289,6 @@ func (d *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respon
 	resp, err := d.HTTP.Do(request)
 
 	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
-
 
 	if err != nil {
 		log.WithFields(log.Fields{

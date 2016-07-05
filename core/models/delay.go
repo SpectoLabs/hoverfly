@@ -35,3 +35,8 @@ func ParseResponseDelayJson(j []byte) []ResponseDelay {
 	}
 	return result
 }
+
+func (this *ResponseDelay) Execute() {
+	// apply the delay
+	panic("execute delay not implemented")
+}

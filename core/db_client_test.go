@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"net/http"
 	"strings"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 func TestSetKey(t *testing.T) {
