@@ -202,7 +202,9 @@ func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Respo
 	newResponse := d.getResponse(req)
 
 	respDelay := d.Cfg.GetDelay(req.Host)
-	respDelay.Execute()
+	if (respDelay != nil) {
+		respDelay.Execute()
+	}
 
 	return req, newResponse
 

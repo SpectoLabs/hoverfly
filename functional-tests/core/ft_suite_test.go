@@ -109,6 +109,35 @@ func startHoverflyWithMiddleware(adminPort, proxyPort int, middlewarePath string
 	return hoverflyCmd
 }
 
+func startHoverflyWithResponseDelays(adminPort, proxyPort int, delayConfigPath string) * exec.Cmd {
+	workingDirectory, _ := os.Getwd()
+	hoverflyBinaryUri := filepath.Join(workingDirectory, "bin/hoverfly")
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-host-delay-config", delayConfigPath)
+	hoverflyCmd.Stdout = os.Stdout
+	hoverflyCmd.Stderr = os.Stderr
+
+	err := hoverflyCmd.Start()
+
+	if err != nil {
+		fmt.Println("Unable to start Hoverfly")
+		fmt.Println(hoverflyBinaryUri)
+		fmt.Println("Is the binary there?")
+		os.Exit(1)
+	}
+
+	Eventually(func() int {
+		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", adminPort))
+		if err == nil {
+			return resp.StatusCode
+		} else {
+			fmt.Println(err.Error())
+			return 0
+		}
+	}, time.Second * 1).Should(BeNumerically("==", http.StatusOK))
+
+	return hoverflyCmd
+}
+
 func stopHoverfly() {
 	hoverflyCmd.Process.Kill()
 }

@@ -4,12 +4,12 @@ import (
 	json "encoding/json"
 	"regexp"
 	log "github.com/Sirupsen/logrus"
+	"time"
 )
 
 type ResponseDelay struct {
 	HostPattern string
 	Delay int
-	DelayStdDev int
 }
 
 type ResponseDelayJson struct {
@@ -37,6 +37,9 @@ func ParseResponseDelayJson(j []byte) []ResponseDelay {
 }
 
 func (this *ResponseDelay) Execute() {
-	// apply the delay
-	log.Warn("execute delay not implemented")
+	// apply the delay - must be called from goroutine handling the request
+	log.Info("Pausing before sending the response to simulate delays")
+	time.Sleep(time.Duration(this.Delay) * time.Millisecond)
+	log.Info("Response delay completed")
 }
+

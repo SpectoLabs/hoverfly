@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 )
 
 var _ = Describe("Running Hoverfly in various modes", func() {
@@ -209,6 +210,31 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).To(BeNil())
 				Expect(string(body)).To(Equal("CHANGED_RESPONSE_BODY"))
+			})
+
+			AfterEach(func() {
+				stopHoverfly()
+			})
+		})
+
+		Context("with response delays", func() {
+
+			BeforeEach(func() {
+				hoverflyCmd = startHoverflyWithResponseDelays(adminPort, proxyPort, "testdata/delays.json")
+				SetHoverflyMode("simulate")
+				ImportHoverflyRecords(jsonPayload)
+			})
+
+			It("should delay returning the cached response", func() {
+				start := time.Now()
+				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2"))
+				end := time.Now()
+				reqDuration := end.Sub(start)
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(string(body)).To(Equal("body2"))
+				Expect(reqDuration > (100 * time.Millisecond)).To(BeTrue())
+				Expect(reqDuration < (110 * time.Millisecond)).To(BeTrue())
 			})
 
 			AfterEach(func() {

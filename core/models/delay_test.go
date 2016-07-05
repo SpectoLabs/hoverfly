@@ -12,15 +12,13 @@ func TestConvertJsonStringToResponseDelayConfig(t *testing.T) {
 	{
 		"data": [{
 				"hostPattern": ".",
-				"delay": 100,
-				"delayStdDev": 10
+				"delay": 1
 			}]
 	}`
 	byteArr := []byte(jsonConf)
 	responseDelayConf := ParseResponseDelayJson(byteArr)
 	Expect(responseDelayConf[0].HostPattern).To(Equal("."))
-	Expect(responseDelayConf[0].Delay).To((Equal(100)))
-	Expect(responseDelayConf[0].DelayStdDev).To(Equal(10))
+	Expect(responseDelayConf[0].Delay).To((Equal(1)))
 }
 
 func TestDefaultResponseStdDevIsZero(t *testing.T) {
@@ -30,14 +28,13 @@ func TestDefaultResponseStdDevIsZero(t *testing.T) {
 	{
 		"data": [{
 				"hostPattern": ".",
-				"delay": 100
+				"delay": 1
 			}]
 	}`
 	byteArr := []byte(jsonConf)
 	responseDelayConf := ParseResponseDelayJson(byteArr)
 	Expect(responseDelayConf[0].HostPattern).To(Equal("."))
-	Expect(responseDelayConf[0].Delay).To((Equal(100)))
-	Expect(responseDelayConf[0].DelayStdDev).To(Equal(0))
+	Expect(responseDelayConf[0].Delay).To((Equal(1)))
 }
 
 func TestDelayIsIgnoredIfHostPatternNotSet(t *testing.T) {
@@ -46,7 +43,7 @@ func TestDelayIsIgnoredIfHostPatternNotSet(t *testing.T) {
 	jsonConf := `
 	{
 		"data": [{
-				"delay": 100
+				"delay": 2
 			}]
 	}`
 	byteArr := []byte(jsonConf)
@@ -75,7 +72,7 @@ func TestHostPatternMustBeAValidRegexPattern(t *testing.T) {
 	{
 		"data": [{
 				"hostPattern": "*",
-				"delay": 100
+				"delay": 1
 			}]
 	}`
 	byteArr := []byte(jsonConf)
