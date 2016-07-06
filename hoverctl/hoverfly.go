@@ -227,7 +227,7 @@ func (h *Hoverfly) createAPIStateResponse(response *http.Response) (APIStateResp
 	return apiResponse
 }
 func (h *Hoverfly) addAuthIfNeeded(sling *sling.Sling) (*sling.Sling, error) {
-	if len(h.Username) > 0 || len(h.Password) > 0 {
+	if len(h.Username) > 0 || len(h.Password) > 0  && len(h.authToken) == 0 {
 		credentials := HoverflyAuth{
 			Username: h.Username,
 			Password: h.Password,
