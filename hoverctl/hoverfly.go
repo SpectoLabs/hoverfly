@@ -26,7 +26,17 @@ type Hoverfly struct {
 	ProxyPort  string
 	Username   string
 	Password   string
+	authToken  string
 	httpClient *http.Client
+}
+
+type HoverflyAuth struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type HoverflyAuthToken struct {
+	Token string `json:"token"`
 }
 
 func NewHoverfly(config Config) (Hoverfly) {
@@ -34,6 +44,8 @@ func NewHoverfly(config Config) (Hoverfly) {
 		Host: config.HoverflyHost,
 		AdminPort: config.HoverflyAdminPort,
 		ProxyPort: config.HoverflyProxyPort,
+		Username: config.HoverflyUsername,
+		Password: config.HoverflyPassword,
 		httpClient: http.DefaultClient,
 	}
 }
@@ -42,7 +54,15 @@ func NewHoverfly(config Config) (Hoverfly) {
 func (h *Hoverfly) Wipe() (error) {
 	url := h.buildURL("/api/records")
 
-	request, err := sling.New().Delete(url).Request()
+	slingRequest := sling.New().Delete(url)
+	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return errors.New("Could not authenticate  with Hoverfly")
+	}
+
+	request, err := slingRequest.Request()
+
 	if err != nil {
 		log.Debug(err.Error())
 		return errors.New("Could not communicate with Hoverfly")
@@ -67,7 +87,16 @@ func (h *Hoverfly) Wipe() (error) {
 func (h *Hoverfly) GetMode() (string, error) {
 	url := h.buildURL("/api/state")
 
-	request, err := sling.New().Get(url).Request()
+	slingRequest:= sling.New().Get(url)
+
+	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not authenticate  with Hoverfly")
+	}
+
+	request, err := slingRequest.Request()
+
 	if err != nil {
 		log.Debug(err.Error())
 		return "", errors.New("Could not communicate with Hoverfly")
@@ -93,7 +122,16 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 	}
 
 	url := h.buildURL("/api/state")
-	request, err := sling.New().Post(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`)).Request()
+
+	slingRequest := sling.New().Post(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`))
+
+	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not authenticate  with Hoverfly")
+	}
+
+	request, err := slingRequest.Request()
 	if err != nil {
 		log.Debug(err.Error())
 		return "", errors.New("Could not communicate with Hoverfly")
@@ -112,8 +150,15 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 
 func (h *Hoverfly) ImportSimulation(payload string) (error) {
 	url := h.buildURL("/api/records")
-	request, err := sling.New().Post(url).Body(strings.NewReader(payload)).Request()
 
+	slingRequest := sling.New().Post(url).Body(strings.NewReader(payload))
+	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return errors.New("Could not authenticate  with Hoverfly")
+	}
+
+	request, err := slingRequest.Request()
 	if err != nil {
 		log.Debug(err.Error())
 		return errors.New("Could not communicate with Hoverfly")
@@ -136,7 +181,14 @@ func (h *Hoverfly) ImportSimulation(payload string) (error) {
 func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 	url := h.buildURL("/api/records")
 
-	request, err := sling.New().Get(url).Request()
+	slingRequest := sling.New().Get(url)
+	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return nil, errors.New("Could not authenticate  with Hoverfly")
+	}
+
+	request, err := slingRequest.Request()
 	if err != nil {
 		log.Debug(err.Error())
 		return nil, errors.New("Could not create a request to Hoverfly")
@@ -174,6 +226,48 @@ func (h *Hoverfly) createAPIStateResponse(response *http.Response) (APIStateResp
 
 	return apiResponse
 }
+func (h *Hoverfly) addAuthIfNeeded(sling *sling.Sling) (*sling.Sling, error) {
+	if len(h.Username) > 0 || len(h.Password) > 0 {
+		credentials := HoverflyAuth{
+			Username: h.Username,
+			Password: h.Password,
+		}
+
+		jsonCredentials, err := json.Marshal(credentials)
+		if err != nil {
+			return nil, err
+		}
+
+		request, err := sling.New().Post(h.buildURL("/api/token-auth")).Body(strings.NewReader(string(jsonCredentials))).Request()
+		if err != nil {
+			return nil, err
+		}
+
+		response, err := h.httpClient.Do(request)
+		if err != nil {
+			return nil, err
+		}
+
+		body, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		var authToken HoverflyAuthToken
+		err = json.Unmarshal(body, &authToken)
+		if err != nil {
+			return nil, err
+		}
+
+		h.authToken = authToken.Token
+	}
+
+	if len(h.authToken) > 0 {
+		sling.Add("Authorization", h.buildAuthorizationHeaderValue())
+	}
+
+	return sling, nil
+}
 
 func (h *Hoverfly) buildURL(endpoint string) (string) {
 	return fmt.Sprintf("%v%v", h.buildBaseURL(), endpoint)
@@ -186,6 +280,11 @@ func (h *Hoverfly) buildBaseURL() string {
 func (h *Hoverfly) isLocal() (bool) {
 	return h.Host == "localhost" || h.Host == "127.0.0.1"
 }
+
+func (h *Hoverfly) buildAuthorizationHeaderValue() string {
+	return fmt.Sprintf("Bearer %v", h.authToken)
+}
+
 /*
 This isn't working as intended, its working, just not how I imagined it.
  */
