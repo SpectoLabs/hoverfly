@@ -228,38 +228,12 @@ func (h *Hoverfly) createAPIStateResponse(response *http.Response) (APIStateResp
 }
 func (h *Hoverfly) addAuthIfNeeded(sling *sling.Sling) (*sling.Sling, error) {
 	if len(h.Username) > 0 || len(h.Password) > 0  && len(h.authToken) == 0 {
-		credentials := HoverflyAuth{
-			Username: h.Username,
-			Password: h.Password,
-		}
+		var err error
 
-		jsonCredentials, err := json.Marshal(credentials)
+		h.authToken, err = h.generateAuthToken()
 		if err != nil {
 			return nil, err
 		}
-
-		request, err := sling.New().Post(h.buildURL("/api/token-auth")).Body(strings.NewReader(string(jsonCredentials))).Request()
-		if err != nil {
-			return nil, err
-		}
-
-		response, err := h.httpClient.Do(request)
-		if err != nil {
-			return nil, err
-		}
-
-		body, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		var authToken HoverflyAuthToken
-		err = json.Unmarshal(body, &authToken)
-		if err != nil {
-			return nil, err
-		}
-
-		h.authToken = authToken.Token
 	}
 
 	if len(h.authToken) > 0 {
@@ -267,6 +241,41 @@ func (h *Hoverfly) addAuthIfNeeded(sling *sling.Sling) (*sling.Sling, error) {
 	}
 
 	return sling, nil
+}
+
+func (h *Hoverfly) generateAuthToken() (string, error) {
+	credentials := HoverflyAuth{
+		Username: h.Username,
+		Password: h.Password,
+	}
+
+	jsonCredentials, err := json.Marshal(credentials)
+	if err != nil {
+		return "", err
+	}
+
+	request, err := sling.New().Post(h.buildURL("/api/token-auth")).Body(strings.NewReader(string(jsonCredentials))).Request()
+	if err != nil {
+		return "", err
+	}
+
+	response, err := h.httpClient.Do(request)
+	if err != nil {
+		return "", err
+	}
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var authToken HoverflyAuthToken
+	err = json.Unmarshal(body, &authToken)
+	if err != nil {
+		return "", err
+	}
+
+	return authToken.Token, nil
 }
 
 func (h *Hoverfly) buildURL(endpoint string) (string) {
