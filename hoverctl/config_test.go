@@ -13,11 +13,13 @@ func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
-	result := GetConfig("", "", "")
+	result := GetConfig("", "", "", "", "")
 
 	Expect(result.HoverflyHost).To(Equal("localhost"))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
+	Expect(result.HoverflyUsername).To(Equal(""))
+	Expect(result.HoverflyPassword).To(Equal(""))
 	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
@@ -26,11 +28,13 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyHost(t *testing.T) {
 
 	SetConfigurationDefaults()
 	hoverflyHost := "testhost"
-	result := GetConfig(hoverflyHost, "", "")
+	result := GetConfig(hoverflyHost, "", "", "", "")
 
 	Expect(result.HoverflyHost).To(Equal(hoverflyHost))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
+	Expect(result.HoverflyUsername).To(Equal(""))
+	Expect(result.HoverflyPassword).To(Equal(""))
 	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
@@ -39,11 +43,13 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyAdminPort(t *testing.T) {
 
 	SetConfigurationDefaults()
 	hoverflyAdminPort := "5"
-	result := GetConfig("", hoverflyAdminPort, "")
+	result := GetConfig("", hoverflyAdminPort, "", "", "")
 
 	Expect(result.HoverflyHost).To(Equal("localhost"))
 	Expect(result.HoverflyAdminPort).To(Equal(hoverflyAdminPort))
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
+	Expect(result.HoverflyUsername).To(Equal(""))
+	Expect(result.HoverflyPassword).To(Equal(""))
 	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
@@ -52,11 +58,43 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyProxyPort(t *testing.T) {
 
 	SetConfigurationDefaults()
 	hoverflyProxyPort := "7"
-	result := GetConfig("", "", hoverflyProxyPort)
+	result := GetConfig("", "", hoverflyProxyPort, "", "")
 
 	Expect(result.HoverflyHost).To(Equal("localhost"))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
 	Expect(result.HoverflyProxyPort).To(Equal(hoverflyProxyPort))
+	Expect(result.HoverflyUsername).To(Equal(""))
+	Expect(result.HoverflyPassword).To(Equal(""))
+	Expect(result.SpectoLabAPIKey).To(Equal(""))
+}
+
+func Test_GetConfigOverridesDefaultValueWithAHoverflyUsername(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	hoverflyUsername := "benjih"
+	result := GetConfig("", "", "", hoverflyUsername, "")
+
+	Expect(result.HoverflyHost).To(Equal("localhost"))
+	Expect(result.HoverflyAdminPort).To(Equal("8888"))
+	Expect(result.HoverflyProxyPort).To(Equal("8500"))
+	Expect(result.HoverflyUsername).To(Equal(hoverflyUsername))
+	Expect(result.HoverflyPassword).To(Equal(""))
+	Expect(result.SpectoLabAPIKey).To(Equal(""))
+}
+
+func Test_GetConfigOverridesDefaultValueWithAHoverflyPassword(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	hoverflyPassword := "mypassword123"
+	result := GetConfig("", "", "", "", hoverflyPassword)
+
+	Expect(result.HoverflyHost).To(Equal("localhost"))
+	Expect(result.HoverflyAdminPort).To(Equal("8888"))
+	Expect(result.HoverflyProxyPort).To(Equal("8500"))
+	Expect(result.HoverflyUsername).To(Equal(""))
+	Expect(result.HoverflyPassword).To(Equal(hoverflyPassword))
 	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
@@ -67,11 +105,15 @@ func Test_GetConfigOverridesDefaultValueWithAllOverrides(t *testing.T) {
 	hoverflyHost := "specto.io"
 	hoverflyAdminPort := "7654"
 	hoverflyProxyPort := "1523"
-	result := GetConfig(hoverflyHost, hoverflyAdminPort, hoverflyProxyPort)
+	hoverflyUsername := "hfuser"
+	hoverflyPassword := "hfpassword"
+	result := GetConfig(hoverflyHost, hoverflyAdminPort, hoverflyProxyPort, hoverflyUsername, hoverflyPassword)
 
 	Expect(result.HoverflyHost).To(Equal(hoverflyHost))
 	Expect(result.HoverflyAdminPort).To(Equal(hoverflyAdminPort))
 	Expect(result.HoverflyProxyPort).To(Equal(hoverflyProxyPort))
+	Expect(result.HoverflyUsername).To(Equal(hoverflyUsername))
+	Expect(result.HoverflyPassword).To(Equal(hoverflyPassword))
 	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
@@ -79,7 +121,7 @@ func Test_ConfigWriteToFileWritesTheConfigObjectToAFileInAYamlFormat(t *testing.
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
-	config := GetConfig("", "", "")
+	config := GetConfig("testhost", "1234", "4567", "username", "password")
 
 
 	wd, _ := os.Getwd()
@@ -97,8 +139,10 @@ func Test_ConfigWriteToFileWritesTheConfigObjectToAFileInAYamlFormat(t *testing.
 	var result Config
 	yaml.Unmarshal(data, &result)
 
-	Expect(result.HoverflyHost).To(Equal("localhost"))
-	Expect(result.HoverflyAdminPort).To(Equal("8888"))
-	Expect(result.HoverflyProxyPort).To(Equal("8500"))
+	Expect(result.HoverflyHost).To(Equal("testhost"))
+	Expect(result.HoverflyAdminPort).To(Equal("1234"))
+	Expect(result.HoverflyProxyPort).To(Equal("4567"))
+	Expect(result.HoverflyUsername).To(Equal("username"))
+	Expect(result.HoverflyPassword).To(Equal("password"))
 	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }

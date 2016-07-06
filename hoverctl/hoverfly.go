@@ -24,6 +24,8 @@ type Hoverfly struct {
 	Host       string
 	AdminPort  string
 	ProxyPort  string
+	Username   string
+	Password   string
 	httpClient *http.Client
 }
 

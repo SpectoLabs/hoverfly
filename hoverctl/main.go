@@ -45,7 +45,7 @@ func main() {
 	SetConfigurationDefaults()
 	SetConfigurationPaths()
 
-	config := GetConfig(*hostFlag, *adminPortFlag, *proxyPortFlag)
+	config := GetConfig(*hostFlag, *adminPortFlag, *proxyPortFlag, "", "")
 
 	hoverflyDirectory, err := NewHoverflyDirectory(config)
 	handleIfError(err)
