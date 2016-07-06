@@ -9,13 +9,6 @@ import (
 	"github.com/phayes/freeport"
 )
 
-const (
-	simulate = "simulate"
-	capture = "capture"
-	synthesize = "synthesize"
-	modify = "modify"
-)
-
 var _ = Describe("When I use hoverfly-cli", func() {
 	var (
 		hoverflyCmd *exec.Cmd

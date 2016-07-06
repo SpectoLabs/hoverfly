@@ -18,6 +18,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const (
+	simulate = "simulate"
+	capture = "capture"
+	synthesize = "synthesize"
+	modify = "modify"
+)
+
 var (
 	hoverctlBinary string
 	hoverctlCacheDir string
@@ -100,18 +107,63 @@ func startHoverfly(adminPort, proxyPort int, workingDir string) * exec.Cmd {
 	return hoverflyCmd
 }
 
+func startHoverflyWithAuth(adminPort, proxyPort int, workingDir, username, password string) (*exec.Cmd) {
+	hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
+
+	hoverflyAddUserCmd := exec.Command(hoverflyBinaryUri, "-add", "-username", username, "-password", password)
+	err := hoverflyAddUserCmd.Start()
+
+	if err != nil {
+		fmt.Println("Unable to start Hoverfly to add user")
+		fmt.Println(hoverflyBinaryUri)
+		fmt.Println("Is the binary there?")
+		os.Exit(1)
+	}
+
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-auth", "true", "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
+
+	err = hoverflyCmd.Start()
+
+	if err != nil {
+		fmt.Println("Unable to start Hoverfly")
+		fmt.Println(hoverflyBinaryUri)
+		fmt.Println("Is the binary there?")
+		os.Exit(1)
+	}
+
+	Eventually(func() int {
+		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", adminPort))
+		if err == nil {
+			return resp.StatusCode
+		} else {
+			fmt.Println(err.Error())
+			return 0
+		}
+	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+
+	return hoverflyCmd
+}
+
 type testConfig struct {
 	HoverflyHost      string `yaml:"hoverfly.host"`
 	HoverflyAdminPort string `yaml:"hoverfly.admin.port"`
 	HoverflyProxyPort string `yaml:"hoverfly.proxy.port"`
+	HoverflyUsername  string `yaml:"hoverfly.username"`
+	HoverflyPassword  string `yaml:"hoverfly.password"`
 }
 
 func WriteConfiguration(host, adminPort, proxyPort string) {
+	WriteConfigurationWithAuth(host, adminPort, proxyPort, "", "")
+}
+
+func WriteConfigurationWithAuth(host, adminPort, proxyPort, username, password string) {
 	configHost := "localhost"
 	configAdminPort := "8888"
 	configProxyPort := "8500"
+	configUsername := ""
+	configPassword := ""
 
-	if len(adminPort) > 0 {
+	if len(host) > 0 {
 		configHost = host
 	}
 
@@ -123,10 +175,20 @@ func WriteConfiguration(host, adminPort, proxyPort string) {
 		configProxyPort = proxyPort
 	}
 
+	if len(username) > 0 {
+		configUsername = username
+	}
+
+	if len(password) > 0 {
+		configPassword = password
+	}
+
 	testConfig := testConfig{
 		HoverflyHost:configHost,
 		HoverflyAdminPort: configAdminPort,
 		HoverflyProxyPort: configProxyPort,
+		HoverflyUsername: configUsername,
+		HoverflyPassword: configPassword,
 	}
 
 	data, _ := yaml.Marshal(testConfig)
