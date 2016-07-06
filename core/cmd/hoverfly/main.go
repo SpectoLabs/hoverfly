@@ -201,36 +201,7 @@ func main() {
 	// overriding default middleware setting
 	cfg.Middleware = *middleware
 
-	// setting default mode
-	mode := hv.SimulateMode
-
-	if *capture {
-		mode = hv.CaptureMode
-		// checking whether user supplied other modes
-		if *synthesize == true || *modify == true {
-			log.Fatal("Two or more modes supplied, check your flags")
-		}
-	} else if *synthesize {
-		mode = hv.SynthesizeMode
-
-		if cfg.Middleware == "" {
-			log.Fatal("Synthesize mode chosen although middleware not supplied")
-		}
-
-		if *capture == true || *modify == true {
-			log.Fatal("Two or more modes supplied, check your flags")
-		}
-	} else if *modify {
-		mode = hv.ModifyMode
-
-		if cfg.Middleware == "" {
-			log.Fatal("Modify mode chosen although middleware not supplied")
-		}
-
-		if *capture == true || *synthesize == true {
-			log.Fatal("Two or more modes supplied, check your flags")
-		}
-	}
+	mode := getInitialMode(cfg)
 
 	// setting mode
 	cfg.SetMode(mode)
@@ -419,4 +390,41 @@ func createSuperUser(h *hv.Hoverfly) {
 	} else {
 		log.Infof("User: '%s' created.\n", username)
 	}
+}
+
+func getInitialMode(cfg *hv.Configuration) (string) {
+	if *capture {
+		// checking whether user supplied other modes
+		if *synthesize == true || *modify == true {
+			log.Fatal("Two or more modes supplied, check your flags")
+		}
+
+		return hv.CaptureMode
+
+	} else if *synthesize {
+
+
+		if cfg.Middleware == "" {
+			log.Fatal("Synthesize mode chosen although middleware not supplied")
+		}
+
+		if *capture == true || *modify == true {
+			log.Fatal("Two or more modes supplied, check your flags")
+		}
+
+		return hv.SynthesizeMode
+
+	} else if *modify {
+		if cfg.Middleware == "" {
+			log.Fatal("Modify mode chosen although middleware not supplied")
+		}
+
+		if *capture == true || *synthesize == true {
+			log.Fatal("Two or more modes supplied, check your flags")
+		}
+
+		return hv.ModifyMode
+	}
+
+	return hv.SimulateMode
 }
