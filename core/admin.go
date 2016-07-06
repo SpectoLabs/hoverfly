@@ -70,6 +70,22 @@ func (m *messageResponse) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+type HoverflyAdmin interface {
+	StartAdminInterface()
+	AllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
+	RecordsCount(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
+	StatsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
+	StatsWSHandler(w http.ResponseWriter, r *http.Request)
+	ImportRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
+	ManualAddHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
+	DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
+	CurrentStateHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
+	StateHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
+	AllMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
+	SetMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
+	DeleteMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
+}
+
 // StartAdminInterface - starts admin interface web server
 func (d *Hoverfly) StartAdminInterface() {
 
@@ -182,6 +198,16 @@ func getBoneRouter(d Hoverfly) *bone.Mux {
 
 	mux.Get("/api/health", negroni.New(
 		negroni.HandlerFunc(d.HealthHandler),
+	))
+
+	mux.Get("/api/delays", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.GetResponseDelaysHandler),
+	))
+
+	mux.Put("/api/delays", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.UpdateResponseDelaysHandler),
 	))
 
 	if d.Cfg.Development {
@@ -805,6 +831,78 @@ func (d *Hoverfly) DeleteMetadataHandler(w http.ResponseWriter, req *http.Reques
 	return
 }
 
+func (d *Hoverfly) GetResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	var resp models.ResponseDelayJson
+	resp.Data = d.Cfg.ResponseDelays
+	b, _ := json.Marshal(resp)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Write(b)
+
+}
+
+func (d *Hoverfly) UpdateResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	var rd models.ResponseDelayJson
+	var mr messageResponse
+
+	if req.Body == nil {
+		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	defer req.Body.Close()
+	body, err := ioutil.ReadAll(req.Body)
+
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not read response body!")
+		mr.Message = fmt.Sprintf("Failed to read request body. Error: %s", err.Error())
+		w.WriteHeader(400)
+
+		b, err := mr.Encode()
+		if err != nil {
+			// failed to read response body
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Could not encode response body!")
+			http.Error(w, "Failed to encode response", 500)
+			return
+		}
+		w.Write(b)
+		return
+	}
+
+	err = json.Unmarshal(body, &rd)
+	//TODO: validate that all delays in the data have non-zero values for host and delay
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to unmarshal request body!")
+		mr.Message = fmt.Sprintf("Failed to decode request body. Error: %s", err.Error())
+		w.WriteHeader(400)
+
+	}  else {
+		d.Cfg.ResponseDelays = rd.Data
+		mr.Message = "Response delays updated."
+		w.WriteHeader(201)
+	}
+	b, err := mr.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+	w.Write(b)
+	return
+
+}
+
 func (d *Hoverfly) HealthHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -824,5 +922,4 @@ func (d *Hoverfly) HealthHandler(w http.ResponseWriter, req *http.Request, next 
 	}
 	w.Write(b)
 	return
-
 }

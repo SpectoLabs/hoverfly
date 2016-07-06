@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"github.com/SpectoLabs/hoverfly/core/models"
+	"reflect"
 )
 
 func TestGetAllRecords(t *testing.T) {
@@ -722,4 +724,91 @@ func TestDeleteMetadataEmpty(t *testing.T) {
 	allMeta, err := dbClient.MetadataCache.GetAllEntries()
 	testutil.Expect(t, err, nil)
 	testutil.Expect(t, len(allMeta), 0)
+}
+
+func TestGetResponseDelays(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	delay :=models.ResponseDelay{
+		HostPattern: ".",
+		Delay: 100,
+	}
+	delays := []models.ResponseDelay{delay}
+	dbClient.Cfg.ResponseDelays = delays
+
+	req, err := http.NewRequest("GET", "/api/delays", nil)
+	testutil.Expect(t, err, nil)
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	testutil.Expect(t, rec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(rec.Body)
+
+	sr := models.ResponseDelayJson{}
+	err = json.Unmarshal(body, &sr)
+
+	// normal equality checking doesn't work on slices (!!)
+	testutil.Expect(t, reflect.DeepEqual(sr.Data, delays), true)
+}
+
+func TestUpdateResponseDelays(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	delayOne :=models.ResponseDelay{
+		HostPattern: ".",
+		Delay: 100,
+	}
+	delayTwo := models.ResponseDelay{
+		HostPattern: "example",
+		Delay:       100,
+	}
+	delays := []models.ResponseDelay{delayOne, delayTwo}
+	delayJson := models.ResponseDelayJson{ Data: delays }
+	bts, err := json.Marshal(&delayJson)
+	testutil.Expect(t, err, nil)
+
+	req, err := http.NewRequest("PUT", "/api/delays", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	testutil.Expect(t, err, nil)
+
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	testutil.Expect(t, rec.Code, http.StatusCreated)
+
+	// normal equality checking doesn't work on slices (!!)
+	testutil.Expect(t, reflect.DeepEqual(dbClient.Cfg.ResponseDelays, delays), true)
+}
+
+func TestInvalidUpdateResponseDelays(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	delayJson := "{aseuifhksejfc}"
+	bts, err := json.Marshal(&delayJson)
+	testutil.Expect(t, err, nil)
+
+	req, err := http.NewRequest("PUT", "/api/delays", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	testutil.Expect(t, err, nil)
+
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	testutil.Expect(t, rec.Code, http.StatusBadRequest)
+	fmt.Println(dbClient.Cfg.ResponseDelays)
+
+	// normal equality checking doesn't work on slices (!!)
+	var expd []models.ResponseDelay
+	testutil.Expect(t, reflect.DeepEqual(dbClient.Cfg.ResponseDelays, expd), true)
 }
