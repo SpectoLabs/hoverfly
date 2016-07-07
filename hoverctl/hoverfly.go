@@ -76,6 +76,10 @@ func (h *Hoverfly) Wipe() (error) {
 
 	defer response.Body.Close()
 
+	if response.StatusCode == 401 {
+		return errors.New("Hoverfly requires authentication")
+	}
+
 	if response.StatusCode != 200 {
 		return errors.New("Hoverfly did not wipe the database")
 	}
@@ -180,6 +184,10 @@ func (h *Hoverfly) ImportSimulation(payload string) (error) {
 		return errors.New("Could not communicate with Hoverfly")
 	}
 
+	if response.StatusCode == 401 {
+		return errors.New("Hoverfly requires authentication")
+	}
+
 	if response.StatusCode != 200 {
 		return errors.New("Import to Hoverfly failed")
 	}
@@ -207,6 +215,10 @@ func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 	if err != nil {
 		log.Debug(err.Error())
 		return nil, errors.New("Could not communicate with Hoverfly")
+	}
+
+	if response.StatusCode == 401 {
+		return nil, errors.New("Hoverfly requires authentication")
 	}
 
 	defer response.Body.Close()

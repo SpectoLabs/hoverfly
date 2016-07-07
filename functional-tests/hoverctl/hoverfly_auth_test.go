@@ -130,40 +130,28 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 			})
 		})
 
-	//	Context("you can manage simulations", func() {
-	//
-	//		It("by importing data", func() {
-	//			setOutput, _ := exec.Command(hoverctlBinary, "import", "mogronalol/twitter:latest").Output()
-	//
-	//			output := strings.TrimSpace(string(setOutput))
-	//			Expect(output).To(ContainSubstring("mogronalol/twitter:latest imported successfully"))
-	//		})
-	//
-	//		It("and then exporting the data", func() {
-	//			setOutput, _ := exec.Command(hoverctlBinary, "export", "benjih/twitter:latest").Output()
-	//
-	//			output := strings.TrimSpace(string(setOutput))
-	//			Expect(output).To(ContainSubstring("benjih/twitter:latest exported successfully"))
-	//
-	//			importFile, err1 := ioutil.ReadFile(workingDirectory + "/.hoverfly/cache/mogronalol.twitter.latest.json")
-	//			if err1 != nil {
-	//				Fail("Failed reading test data")
-	//			}
-	//
-	//			exportFile, err2 := ioutil.ReadFile(workingDirectory + "/.hoverfly/cache/benjih.twitter.latest.json")
-	//			if err2 != nil {
-	//				Fail("Failed reading test data")
-	//			}
-	//
-	//			Expect(bytes.Equal(importFile, exportFile)).To(BeTrue())
-	//		})
-	//
-	//		It("and then wiping hoverfly", func() {
-	//			setOutput, _ := exec.Command(hoverctlBinary, "wipe").Output()
-	//
-	//			output := strings.TrimSpace(string(setOutput))
-	//			Expect(output).To(ContainSubstring("Hoverfly has been wiped"))
-	//		})
-	//	})
+		Context("you cannot manage simulations", func() {
+
+			It("by importing data", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "import", "mogronalol/twitter:latest").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
+			})
+
+			It("and then exporting the data", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "export", "benjih/twitter:latest").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
+			})
+
+			It("and then wiping hoverfly", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "wipe").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
+			})
+		})
 	})
 })
