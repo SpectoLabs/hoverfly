@@ -3,6 +3,7 @@ package models
 import (
 	"testing"
 	. "github.com/onsi/gomega"
+	"encoding/json"
 )
 
 func TestConvertJsonStringToResponseDelayConfig(t *testing.T) {
@@ -15,27 +16,12 @@ func TestConvertJsonStringToResponseDelayConfig(t *testing.T) {
 				"delay": 1
 			}]
 	}`
-	byteArr := []byte(jsonConf)
-	responseDelayConf := ParseResponseDelayJson(byteArr)
-	Expect(responseDelayConf[0].HostPattern).To(Equal("."))
-	Expect(responseDelayConf[0].Delay).To((Equal(1)))
+	var responseDelayJson ResponseDelayJson
+	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
+	err := ValidateResponseDelayJson(responseDelayJson)
+	Expect(err).To(BeNil())
 }
 
-func TestDefaultResponseStdDevIsZero(t *testing.T) {
-	RegisterTestingT(t)
-
-	jsonConf := `
-	{
-		"data": [{
-				"hostPattern": ".",
-				"delay": 1
-			}]
-	}`
-	byteArr := []byte(jsonConf)
-	responseDelayConf := ParseResponseDelayJson(byteArr)
-	Expect(responseDelayConf[0].HostPattern).To(Equal("."))
-	Expect(responseDelayConf[0].Delay).To((Equal(1)))
-}
 
 func TestDelayIsIgnoredIfHostPatternNotSet(t *testing.T) {
 	RegisterTestingT(t)
@@ -46,9 +32,10 @@ func TestDelayIsIgnoredIfHostPatternNotSet(t *testing.T) {
 				"delay": 2
 			}]
 	}`
-	byteArr := []byte(jsonConf)
-	responseDelayConf := ParseResponseDelayJson(byteArr)
-	Expect(len(responseDelayConf)).To(Equal(0))
+	var responseDelayJson ResponseDelayJson
+	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
+	err := ValidateResponseDelayJson(responseDelayJson)
+	Expect(err).To(Not(BeNil()))
 }
 
 func TestDelayIsIgnoredIfDelayNotSet(t *testing.T) {
@@ -60,9 +47,10 @@ func TestDelayIsIgnoredIfDelayNotSet(t *testing.T) {
 				"hostPattern": "."
 			}]
 	}`
-	byteArr := []byte(jsonConf)
-	responseDelayConf := ParseResponseDelayJson(byteArr)
-	Expect(len(responseDelayConf)).To(Equal(0))
+	var responseDelayJson ResponseDelayJson
+	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
+	err := ValidateResponseDelayJson(responseDelayJson)
+	Expect(err).To(Not(BeNil()))
 }
 
 func TestHostPatternMustBeAValidRegexPattern(t *testing.T) {
@@ -75,7 +63,8 @@ func TestHostPatternMustBeAValidRegexPattern(t *testing.T) {
 				"delay": 1
 			}]
 	}`
-	byteArr := []byte(jsonConf)
-	responseDelayConf := ParseResponseDelayJson(byteArr)
-	Expect(len(responseDelayConf)).To(Equal(0))
+	var responseDelayJson ResponseDelayJson
+	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
+	err := ValidateResponseDelayJson(responseDelayJson)
+	Expect(err).To(Not(BeNil()))
 }

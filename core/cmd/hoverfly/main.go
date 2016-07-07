@@ -36,6 +36,7 @@ import (
 	"github.com/rusenask/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"io/ioutil"
+	"encoding/json"
 )
 
 type arrayFlags []string
@@ -331,11 +332,24 @@ func main() {
 	// if delay config file set - configure hoverfly with contents of the config file
 	if (*delayConfigPath != "") {
 		conf, err := ioutil.ReadFile(*delayConfigPath)
-		if err == nil {
-			responseDelays := models.ParseResponseDelayJson(conf)
-			hoverfly.UpdateResponseDelays(responseDelays)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":  err.Error(),
+				"path": *delayConfigPath,
+			}).Fatal("Unable to read delay config file: ", err)
 		} else {
-			log.Warn("Unable to read delay config file: ", err)
+			var responseDelayJson models.ResponseDelayJson
+			json.Unmarshal(conf, &responseDelayJson)
+			fmt.Printf("%v", responseDelayJson)
+			err = models.ValidateResponseDelayJson(responseDelayJson)
+			if (err != nil) {
+				log.WithFields(log.Fields{
+					"error":  err.Error(),
+					"import": conf,
+				}).Fatal("Error validating response delay config file")
+			} else {
+				hoverfly.UpdateResponseDelays(responseDelayJson.Data)
+			}
 		}
 	}
 

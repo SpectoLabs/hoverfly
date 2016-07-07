@@ -1,10 +1,11 @@
 package models
 
 import (
-	json "encoding/json"
 	"regexp"
 	log "github.com/Sirupsen/logrus"
 	"time"
+	"errors"
+	"fmt"
 )
 
 type ResponseDelay struct {
@@ -16,24 +17,18 @@ type ResponseDelayJson struct {
 	Data []ResponseDelay
 }
 
-func ParseResponseDelayJson(j []byte) []ResponseDelay {
-	var responseDelayJson ResponseDelayJson
-	result := make([]ResponseDelay,0)
-	json.Unmarshal(j, &responseDelayJson)
-
+func ValidateResponseDelayJson(j ResponseDelayJson) (err error) {
 	// filter any entries that don't meet the invariants
-	for _, delay := range responseDelayJson.Data {
+	for _, delay := range j.Data {
 		if delay.HostPattern != "" && delay.Delay != 0 {
-			if _, err := regexp.Compile(delay.HostPattern); err == nil {
-				result = append(result, delay)
-			} else {
-				log.Warn("Response delay entry skipped due to invalid pattern : %s", delay.HostPattern)
+			if _, err := regexp.Compile(delay.HostPattern); err != nil {
+				return errors.New(fmt.Sprintf("Response delay entry skipped due to invalid pattern : %s", delay.HostPattern))
 			}
 		} else {
-			log.Warn("Response delay entry skipped due to missing values: %v", delay)
+			return errors.New(fmt.Sprintf("Config error - Missing values found in: %v", delay))
 		}
 	}
-	return result
+	return nil
 }
 
 func (this *ResponseDelay) Execute() {
