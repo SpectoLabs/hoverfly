@@ -92,7 +92,7 @@ func (h *Hoverfly) GetMode() (string, error) {
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
 		log.Debug(err.Error())
-		return "", errors.New("Could not authenticate  with Hoverfly")
+		return "", errors.New("Could not authenticate with Hoverfly")
 	}
 
 	request, err := slingRequest.Request()
@@ -106,6 +106,10 @@ func (h *Hoverfly) GetMode() (string, error) {
 	if err != nil {
 		log.Debug(err.Error())
 		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	if response.StatusCode == 401 {
+		return "", errors.New("Hoverfly requires authentication")
 	}
 
 	defer response.Body.Close()
@@ -142,6 +146,11 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 		log.Debug(err.Error())
 		return "", errors.New("Could not communicate with Hoverfly")
 	}
+
+	if response.StatusCode == 401 {
+		return "", errors.New("Hoverfly requires authentication")
+	}
+
 
 	apiResponse := h.createAPIStateResponse(response)
 

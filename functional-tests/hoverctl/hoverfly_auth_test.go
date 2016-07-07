@@ -98,4 +98,72 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 			})
 		})
 	})
+
+	Describe("and the credentials are not the hoverctl config", func() {
+
+		BeforeEach(func() {
+			hoverflyCmd = startHoverflyWithAuth(adminPort, proxyPort, workingDirectory, username, password)
+			WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
+		})
+
+		AfterEach(func() {
+			hoverflyCmd.Process.Kill()
+		})
+
+		Context("you cannot get the mode", func() {
+
+			It("and it returns an error", func() {
+				out, _ := exec.Command(hoverctlBinary, "mode").Output()
+
+				output := strings.TrimSpace(string(out))
+				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
+			})
+		})
+
+		Context("you cannot set the mode", func() {
+
+			It("and it returns an error", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "mode", "capture").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
+			})
+		})
+
+	//	Context("you can manage simulations", func() {
+	//
+	//		It("by importing data", func() {
+	//			setOutput, _ := exec.Command(hoverctlBinary, "import", "mogronalol/twitter:latest").Output()
+	//
+	//			output := strings.TrimSpace(string(setOutput))
+	//			Expect(output).To(ContainSubstring("mogronalol/twitter:latest imported successfully"))
+	//		})
+	//
+	//		It("and then exporting the data", func() {
+	//			setOutput, _ := exec.Command(hoverctlBinary, "export", "benjih/twitter:latest").Output()
+	//
+	//			output := strings.TrimSpace(string(setOutput))
+	//			Expect(output).To(ContainSubstring("benjih/twitter:latest exported successfully"))
+	//
+	//			importFile, err1 := ioutil.ReadFile(workingDirectory + "/.hoverfly/cache/mogronalol.twitter.latest.json")
+	//			if err1 != nil {
+	//				Fail("Failed reading test data")
+	//			}
+	//
+	//			exportFile, err2 := ioutil.ReadFile(workingDirectory + "/.hoverfly/cache/benjih.twitter.latest.json")
+	//			if err2 != nil {
+	//				Fail("Failed reading test data")
+	//			}
+	//
+	//			Expect(bytes.Equal(importFile, exportFile)).To(BeTrue())
+	//		})
+	//
+	//		It("and then wiping hoverfly", func() {
+	//			setOutput, _ := exec.Command(hoverctlBinary, "wipe").Output()
+	//
+	//			output := strings.TrimSpace(string(setOutput))
+	//			Expect(output).To(ContainSubstring("Hoverfly has been wiped"))
+	//		})
+	//	})
+	})
 })
