@@ -8,8 +8,9 @@ import (
 	"strconv"
 	"github.com/phayes/freeport"
 	"io/ioutil"
-	"bytes"
 	"fmt"
+	"path/filepath"
+	"os"
 )
 
 var _ = Describe("When I use hoverctl with a running an authenticated hoverfly", func() {
@@ -64,30 +65,58 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 		})
 
 		Context("you can manage simulations", func() {
+			workingDirectory, _ := os.Getwd()
+			fileToWrite := filepath.Join(workingDirectory, "/.hoverfly/cache/benjih.test.latest.json")
+			fmt.Println(fileToWrite)
+			ioutil.WriteFile(fileToWrite,
+				[]byte(`
+					{
+						"data": [{
+							"request": {
+								"path": "/api/bookings",
+								"method": "POST",
+								"destination": "www.my-test.com",
+								"scheme": "http",
+								"query": "",
+								"body": "{\"flightId\": \"1\"}",
+								"headers": {
+									"Content-Type": [
+										"application/json"
+									]
+								}
+							},
+							"response": {
+								"status": 201,
+								"body": "",
+								"encodedBody": false,
+								"headers": {
+									"Location": [
+										"http://localhost/api/bookings/1"
+									]
+								}
+							}
+						}]
+					}`), 0644)
 
 			It("by importing and exporting data", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "import", "mogronalol/twitter:latest").Output()
+				setOutput, _ := exec.Command(hoverctlBinary, "import", "benjih/test:latest").Output()
 
 				output := strings.TrimSpace(string(setOutput))
-				Expect(output).To(ContainSubstring("mogronalol/twitter:latest imported successfully"))
+				Expect(output).To(ContainSubstring("benjih/test:latest imported successfully"))
 
-				setOutput, _ = exec.Command(hoverctlBinary, "export", "benjih/twitter:latest").Output()
+				setOutput, _ = exec.Command(hoverctlBinary, "export", "benjih/test-copy:latest").Output()
 
 				output = strings.TrimSpace(string(setOutput))
-				Expect(output).To(ContainSubstring("benjih/twitter:latest exported successfully"))
+				Expect(output).To(ContainSubstring("benjih/test-copy:latest exported successfully"))
 
-				importFile, err1 := ioutil.ReadFile(workingDirectory + "/.hoverfly/cache/mogronalol.twitter.latest.json")
-				if err1 != nil {
+
+				exportFile, err := ioutil.ReadFile(workingDirectory + "/.hoverfly/cache/benjih.test-copy.latest.json")
+				if err != nil {
 					Fail("Failed reading test data")
 				}
 
-				exportFile, err2 := ioutil.ReadFile(workingDirectory + "/.hoverfly/cache/benjih.twitter.latest.json")
-				if err2 != nil {
-					Fail("Failed reading test data")
-				}
-				fmt.Println(string(importFile))
-				fmt.Println(string(exportFile))
-				Expect(bytes.Equal(importFile, exportFile)).To(BeTrue())
+				Expect(string(exportFile)).To(ContainSubstring(`"path":"/api/bookings"`))
+				Expect(string(exportFile)).To(ContainSubstring(`"body":"{\"flightId\": \"1\"}"`))
 			})
 
 			It("and then wiping hoverfly", func() {
