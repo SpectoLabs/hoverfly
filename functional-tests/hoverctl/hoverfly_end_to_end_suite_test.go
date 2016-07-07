@@ -120,8 +120,7 @@ func startHoverflyWithAuth(adminPort, proxyPort int, workingDir, username, passw
 		os.Exit(1)
 	}
 
-	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-db", "memory", "-auth", "true")
-
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-auth", "true", "-db", "memory")
 	err = hoverflyCmd.Start()
 
 	if err != nil {
