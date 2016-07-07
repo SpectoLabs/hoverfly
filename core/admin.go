@@ -180,6 +180,10 @@ func getBoneRouter(d Hoverfly) *bone.Mux {
 		negroni.HandlerFunc(d.ManualAddHandler),
 	))
 
+	mux.Get("/api/health", negroni.New(
+		negroni.HandlerFunc(d.HealthHandler),
+	))
+
 	if d.Cfg.Development {
 		// since hoverfly is not started from cmd/hoverfly/hoverfly
 		// we have to target to that directory
@@ -799,4 +803,26 @@ func (d *Hoverfly) DeleteMetadataHandler(w http.ResponseWriter, req *http.Reques
 	}
 	w.Write(b)
 	return
+}
+
+func (d *Hoverfly) HealthHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var response messageResponse
+	response.Message = "Hoverfly is healthy"
+
+	response.Encode()
+
+	b, err := response.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+	w.Write(b)
+	return
+
 }
