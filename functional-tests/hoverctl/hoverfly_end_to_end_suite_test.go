@@ -83,7 +83,7 @@ type stateRequest struct {
 
 func startHoverfly(adminPort, proxyPort int, workingDir string) * exec.Cmd {
 	hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
-	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-db", "memory")
 
 	err := hoverflyCmd.Start()
 
@@ -120,7 +120,7 @@ func startHoverflyWithAuth(adminPort, proxyPort int, workingDir, username, passw
 		os.Exit(1)
 	}
 
-	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-auth", "true", "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-db", "memory", "-auth", "true")
 
 	err = hoverflyCmd.Start()
 
