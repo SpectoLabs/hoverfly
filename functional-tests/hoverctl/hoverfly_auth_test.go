@@ -9,9 +9,10 @@ import (
 	"github.com/phayes/freeport"
 	"io/ioutil"
 	"bytes"
+	"fmt"
 )
 
-var _ = Describe("When I use hoverfly-cli", func() {
+var _ = Describe("When I use hoverctl with a running an authenticated hoverfly", func() {
 	var (
 		hoverflyCmd *exec.Cmd
 
@@ -26,12 +27,11 @@ var _ = Describe("When I use hoverfly-cli", func() {
 		password = "ft_password"
 	)
 
-	Describe("with a running an authenticated hoverfly", func() {
+	Describe("and the credentials are in the hoverctl config", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverflyWithAuth(adminPort, proxyPort, workingDirectory, username, password)
 			WriteConfigurationWithAuth("localhost", adminPortAsString, proxyPortAsString, username, password)
-			//WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
 		})
 
 		AfterEach(func() {
@@ -65,19 +65,17 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 		Context("you can manage simulations", func() {
 
-			It("by importing data", func() {
+			It("by importing and exporting data", func() {
 				setOutput, _ := exec.Command(hoverctlBinary, "import", "mogronalol/twitter:latest").Output()
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("mogronalol/twitter:latest imported successfully"))
-			})
 
-			It("and then exporting the data", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "export", "benjih/twitter:latest").Output()
+				setOutput, _ = exec.Command(hoverctlBinary, "export", "benjih/twitter:latest").Output()
 
-				output := strings.TrimSpace(string(setOutput))
+				output = strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("benjih/twitter:latest exported successfully"))
-				
+
 				importFile, err1 := ioutil.ReadFile(workingDirectory + "/.hoverfly/cache/mogronalol.twitter.latest.json")
 				if err1 != nil {
 					Fail("Failed reading test data")
@@ -87,7 +85,8 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				if err2 != nil {
 					Fail("Failed reading test data")
 				}
-
+				fmt.Println(string(importFile))
+				fmt.Println(string(exportFile))
 				Expect(bytes.Equal(importFile, exportFile)).To(BeTrue())
 			})
 
