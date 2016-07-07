@@ -37,7 +37,7 @@ func TestHoverflyEndToEnd(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	workingDirectory, _ := os.Getwd()
+	workingDirectory, _ = os.Getwd()
 
 	hoverctlCacheDir = filepath.Join(workingDirectory, ".hoverfly/cache")
 
