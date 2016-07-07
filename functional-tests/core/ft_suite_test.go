@@ -68,7 +68,7 @@ func startHoverfly(adminPort, proxyPort int) * exec.Cmd {
 	}
 
 	Eventually(func() int {
-		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", adminPort))
+		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
 		if err == nil {
 			return resp.StatusCode
 		} else {
