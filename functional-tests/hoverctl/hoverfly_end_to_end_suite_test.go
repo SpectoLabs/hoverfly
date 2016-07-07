@@ -108,16 +108,12 @@ func startHoverfly(adminPort, proxyPort int, workingDir string) * exec.Cmd {
 }
 
 func startHoverflyWithAuth(adminPort, proxyPort int, workingDir, username, password string) (*exec.Cmd) {
-	err := os.Remove(filepath.Join(workingDir, "requests.db"))
-	if err != nil {
-		fmt.Println("Unable to delete requests.db")
-		os.Exit(1)
-	}
+	os.Remove(filepath.Join(workingDir, "requests.db"))
 
 	hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
 
 	hoverflyAddUserCmd := exec.Command(hoverflyBinaryUri, "-add", "-username", username, "-password", password, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
-	err = hoverflyAddUserCmd.Run()
+	err := hoverflyAddUserCmd.Run()
 
 	if err != nil {
 		fmt.Println("Unable to start Hoverfly to add user")
