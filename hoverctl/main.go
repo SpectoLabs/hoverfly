@@ -4,6 +4,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
+	"fmt"
 )
 
 var (
@@ -32,6 +33,9 @@ var (
 	pullOverrideHostFlag = pullCommand.Flag("override-host", "Name of the host you want to virtualise").String()
 
 	wipeCommand = kingpin.Command("wipe", "Wipe Hoverfly database")
+
+	delaysCommand = kingpin.Command("delays", "Get per-host response delay config currently loaded into Hoverfly")
+	delaysPathArg = delaysCommand.Arg("path", "Set per-host response delay config from JSON file").String()
 )
 
 func main() {
@@ -151,6 +155,22 @@ func main() {
 			handleIfError(err)
 
 			log.Info("Hoverfly has been wiped")
+
+		case delaysCommand.FullCommand():
+			if *delaysPathArg == "" || *delaysPathArg == "status"{
+				delays, err := hoverfly.GetDelays()
+				handleIfError(err)
+				for _, delay := range delays {
+					fmt.Printf("%+v\n", delay)
+				}
+			} else {
+				delays, err := hoverfly.SetDelays(*delaysPathArg)
+				handleIfError(err)
+				log.Info("Response delays set in Hoverfly: ")
+				for _, delay := range delays {
+					fmt.Printf("%+v\n", delay)
+				}
+			}
 	}
 }
 

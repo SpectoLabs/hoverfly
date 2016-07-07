@@ -234,7 +234,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				Expect(err).To(BeNil())
 				Expect(string(body)).To(Equal("body2"))
 				Expect(reqDuration > (100 * time.Millisecond)).To(BeTrue())
-				// Can't ensure
+				// Can't guarantee the maximum time taken
 				// Expect(reqDuration < (110 * time.Millisecond)).To(BeTrue())
 			})
 
