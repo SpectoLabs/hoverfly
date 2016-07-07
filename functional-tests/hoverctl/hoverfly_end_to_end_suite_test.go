@@ -110,8 +110,8 @@ func startHoverfly(adminPort, proxyPort int, workingDir string) * exec.Cmd {
 func startHoverflyWithAuth(adminPort, proxyPort int, workingDir, username, password string) (*exec.Cmd) {
 	hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
 
-	hoverflyAddUserCmd := exec.Command(hoverflyBinaryUri, "-add", "-username", username, "-password", password)
-	err := hoverflyAddUserCmd.Start()
+	hoverflyAddUserCmd := exec.Command(hoverflyBinaryUri, "-add", "-username", username, "-password", password, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
+	err := hoverflyAddUserCmd.Run()
 
 	if err != nil {
 		fmt.Println("Unable to start Hoverfly to add user")
@@ -132,7 +132,7 @@ func startHoverflyWithAuth(adminPort, proxyPort int, workingDir, username, passw
 	}
 
 	Eventually(func() int {
-		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", adminPort))
+		resp, err := http.Get(fmt.Sprintf("http://localhost:%v", adminPort))
 		if err == nil {
 			return resp.StatusCode
 		} else {
