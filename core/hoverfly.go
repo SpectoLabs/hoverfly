@@ -67,7 +67,6 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		Counter: metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		Hooks:   make(ActionTypeHooks),
 	}
-	h.Proxy = NewProxy(h)
 	return h
 }
 
@@ -78,9 +77,7 @@ func (d *Hoverfly) StartProxy() error {
 		return fmt.Errorf("Proxy port is not set!")
 	}
 
-	if d.Proxy == nil {
-		d.Proxy = NewProxy(d)
-	}
+	d.Proxy = NewProxy(d)
 
 	log.WithFields(log.Fields{
 		"destination": d.Cfg.Destination,
@@ -132,7 +129,6 @@ func (d *Hoverfly) UpdateDestination(destination string) (err error) {
 	d.mu.Lock()
 	d.StopProxy()
 	d.Cfg.Destination = destination
-	d.Proxy = NewProxy(d)
 	err = d.StartProxy()
 	d.mu.Unlock()
 	return
