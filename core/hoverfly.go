@@ -77,8 +77,12 @@ func (d *Hoverfly) StartProxy() error {
 		return fmt.Errorf("Proxy port is not set!")
 	}
 
-	d.Proxy = NewProxy(d)
-
+	if d.Cfg.Webserver {
+		d.Proxy = NewWebserverProxy(d)
+	} else {
+		d.Proxy = NewProxy(d)
+	}
+	
 	log.WithFields(log.Fields{
 		"destination": d.Cfg.Destination,
 		"port":        d.Cfg.ProxyPort,
