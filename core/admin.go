@@ -70,22 +70,6 @@ func (m *messageResponse) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-type HoverflyAdmin interface {
-	StartAdminInterface()
-	AllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
-	RecordsCount(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
-	StatsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
-	StatsWSHandler(w http.ResponseWriter, r *http.Request)
-	ImportRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
-	ManualAddHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
-	DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
-	CurrentStateHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
-	StateHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
-	AllMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
-	SetMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
-	DeleteMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc)
-}
-
 // StartAdminInterface - starts admin interface web server
 func (d *Hoverfly) StartAdminInterface() {
 
