@@ -188,7 +188,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 			"destination": req.Host,
 		}).Info("synthetic response created successfuly")
 
-		respDelay := d.Cfg.GetDelay(req.Host)
+		respDelay := hf.Cfg.GetDelay(req.Host)
 		if (respDelay != nil) {
 			respDelay.Execute()
 		}
@@ -211,7 +211,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 				http.StatusServiceUnavailable)
 		}
 
-		respDelay := d.Cfg.GetDelay(req.Host)
+		respDelay := hf.Cfg.GetDelay(req.Host)
 		if (respDelay != nil) {
 			respDelay.Execute()
 		}
