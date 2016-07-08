@@ -10,7 +10,7 @@ import (
 )
 
 // Creates goproxy.ProxyHttpServer and configures it to be used as a proxy for Hoverfly
-//
+// goproxy is given handlers that use the Hoverfly request processing code
 func NewProxy(hoverfly *Hoverfly) (*goproxy.ProxyHttpServer){
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
