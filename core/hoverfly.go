@@ -71,26 +71,26 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 }
 
 // StartProxy - starts proxy with current configuration, this method is non blocking.
-func (d *Hoverfly) StartProxy() error {
+func (hf *Hoverfly) StartProxy() error {
 
-	if d.Cfg.ProxyPort == "" {
+	if hf.Cfg.ProxyPort == "" {
 		return fmt.Errorf("Proxy port is not set!")
 	}
 
-	if d.Cfg.Webserver {
-		d.Proxy = NewWebserverProxy(d)
+	if hf.Cfg.Webserver {
+		hf.Proxy = NewWebserverProxy(hf)
 	} else {
-		d.Proxy = NewProxy(d)
+		hf.Proxy = NewProxy(hf)
 	}
-	
+
 	log.WithFields(log.Fields{
-		"destination": d.Cfg.Destination,
-		"port":        d.Cfg.ProxyPort,
-		"mode":        d.Cfg.GetMode(),
+		"destination": hf.Cfg.Destination,
+		"port":        hf.Cfg.ProxyPort,
+		"mode":        hf.Cfg.GetMode(),
 	}).Info("current proxy configuration")
 
 	// creating TCP listener
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", d.Cfg.ProxyPort))
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", hf.Cfg.ProxyPort))
 	if err != nil {
 		return err
 	}
@@ -99,18 +99,18 @@ func (d *Hoverfly) StartProxy() error {
 	if err != nil {
 		return err
 	}
-	d.SL = sl
+	hf.SL = sl
 	server := http.Server{}
 
-	d.Cfg.ProxyControlWG.Add(1)
+	hf.Cfg.ProxyControlWG.Add(1)
 
 	go func() {
 		defer func() {
 			log.Info("sending done signal")
-			d.Cfg.ProxyControlWG.Done()
+			hf.Cfg.ProxyControlWG.Done()
 		}()
 		log.Info("serving proxy")
-		server.Handler = d.Proxy
+		server.Handler = hf.Proxy
 		log.Warn(server.Serve(sl))
 	}()
 
@@ -118,28 +118,28 @@ func (d *Hoverfly) StartProxy() error {
 }
 
 // StopProxy - stops proxy
-func (d *Hoverfly) StopProxy() {
-	d.SL.Stop()
-	d.Cfg.ProxyControlWG.Wait()
+func (hf *Hoverfly) StopProxy() {
+	hf.SL.Stop()
+	hf.Cfg.ProxyControlWG.Wait()
 }
 
 // UpdateDestination - updates proxy with new destination regexp
-func (d *Hoverfly) UpdateDestination(destination string) (err error) {
+func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
 	_, err = regexp.Compile(destination)
 	if err != nil {
 		return fmt.Errorf("destination is not a valid regular expression string")
 	}
 
-	d.mu.Lock()
-	d.StopProxy()
-	d.Cfg.Destination = destination
-	err = d.StartProxy()
-	d.mu.Unlock()
+	hf.mu.Lock()
+	hf.StopProxy()
+	hf.Cfg.Destination = destination
+	err = hf.StartProxy()
+	hf.mu.Unlock()
 	return
 }
 
-func (d *Hoverfly) UpdateResponseDelays(responseDelays []models.ResponseDelay) {
-	d.Cfg.ResponseDelays = responseDelays
+func (hf *Hoverfly) UpdateResponseDelays(responseDelays []models.ResponseDelay) {
+	hf.Cfg.ResponseDelays = responseDelays
 	log.Info("Response delay config updated on hoverfly")
 }
 
@@ -151,19 +151,19 @@ func hoverflyError(req *http.Request, err error, msg string, statusCode int) *ht
 
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
-func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Response) {
+func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Response) {
 
-	mode := d.Cfg.GetMode()
+	mode := hf.Cfg.GetMode()
 
 	if mode == CaptureMode {
-		newResponse, err := d.captureRequest(req)
+		newResponse, err := hf.captureRequest(req)
 
 		if err != nil {
 			return req, hoverflyError(req, err, "Could not capture request", http.StatusServiceUnavailable)
 		}
 		log.WithFields(log.Fields{
 			"mode":        mode,
-			"middleware":  d.Cfg.Middleware,
+			"middleware":  hf.Cfg.Middleware,
 			"path":        req.URL.Path,
 			"rawQuery":    req.URL.RawQuery,
 			"method":      req.Method,
@@ -173,7 +173,7 @@ func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Respo
 		return req, newResponse
 
 	} else if mode == SynthesizeMode {
-		response, err := SynthesizeResponse(req, d.Cfg.Middleware)
+		response, err := SynthesizeResponse(req, hf.Cfg.Middleware)
 
 		if err != nil {
 			return req, hoverflyError(req, err, "Could not create synthetic response!", http.StatusServiceUnavailable)
@@ -181,7 +181,7 @@ func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Respo
 
 		log.WithFields(log.Fields{
 			"mode":        mode,
-			"middleware":  d.Cfg.Middleware,
+			"middleware":  hf.Cfg.Middleware,
 			"path":        req.URL.Path,
 			"rawQuery":    req.URL.RawQuery,
 			"method":      req.Method,
@@ -197,17 +197,17 @@ func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Respo
 
 	} else if mode == ModifyMode {
 
-		response, err := d.modifyRequestResponse(req, d.Cfg.Middleware)
+		response, err := hf.modifyRequestResponse(req, hf.Cfg.Middleware)
 
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error":      err.Error(),
-				"middleware": d.Cfg.Middleware,
+				"middleware": hf.Cfg.Middleware,
 			}).Error("Got error when performing request modification")
 			return req, hoverflyError(
 				req,
 				err,
-				fmt.Sprintf("Middleware (%s) failed or something else happened!", d.Cfg.Middleware),
+				fmt.Sprintf("Middleware (%s) failed or something else happened!", hf.Cfg.Middleware),
 				http.StatusServiceUnavailable)
 		}
 
@@ -220,9 +220,9 @@ func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Respo
 		return req, response
 	}
 
-	newResponse := d.getResponse(req)
+	newResponse := hf.getResponse(req)
 
-	respDelay := d.Cfg.GetDelay(req.Host)
+	respDelay := hf.Cfg.GetDelay(req.Host)
 	if (respDelay != nil) {
 		respDelay.Execute()
 	}
@@ -232,12 +232,12 @@ func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Respo
 }
 
 // AddHook - adds a hook to DBClient
-func (d *Hoverfly) AddHook(hook Hook) {
-	d.Hooks.Add(hook)
+func (hf *Hoverfly) AddHook(hook Hook) {
+	hf.Hooks.Add(hook)
 }
 
 // captureRequest saves request for later playback
-func (d *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
+func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 
 	// this is mainly for testing, since when you create
 	if req.Body == nil {
@@ -262,7 +262,7 @@ func (d *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 	// forwarding request
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
 
-	req, resp, err := d.doRequest(req)
+	req, resp, err := hf.doRequest(req)
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -288,7 +288,7 @@ func (d *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		}
 
 		// saving response body with request/response meta to cache
-		d.save(req, reqBody, resp, respBody)
+		hf.save(req, reqBody, resp, respBody)
 	}
 
 	// return new response or error here
@@ -296,12 +296,12 @@ func (d *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 }
 
 // doRequest performs original request and returns response that should be returned to client and error (if there is one)
-func (d *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Response, error) {
+func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Response, error) {
 
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
 
-	if d.Cfg.Middleware != "" {
+	if hf.Cfg.Middleware != "" {
 		// middleware is provided, modifying request
 		var payload models.Payload
 
@@ -312,11 +312,11 @@ func (d *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respon
 		payload.Request = rd
 
 		c := NewConstructor(request, payload)
-		err = c.ApplyMiddleware(d.Cfg.Middleware)
+		err = c.ApplyMiddleware(hf.Cfg.Middleware)
 
 		if err != nil {
 			log.WithFields(log.Fields{
-				"mode":   d.Cfg.Mode,
+				"mode":   hf.Cfg.Mode,
 				"error":  err.Error(),
 				"host":   request.Host,
 				"method": request.Method,
@@ -336,13 +336,13 @@ func (d *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respon
 
 	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
 
-	resp, err := d.HTTP.Do(request)
+	resp, err := hf.HTTP.Do(request)
 
 	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
 
 	if err != nil {
 		log.WithFields(log.Fields{
-			"mode":   d.Cfg.Mode,
+			"mode":   hf.Cfg.Mode,
 			"error":  err.Error(),
 			"host":   request.Host,
 			"method": request.Method,
@@ -352,7 +352,7 @@ func (d *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respon
 	}
 
 	log.WithFields(log.Fields{
-		"mode":   d.Cfg.Mode,
+		"mode":   hf.Cfg.Mode,
 		"host":   request.Host,
 		"method": request.Method,
 		"path":   request.URL.Path,
@@ -365,7 +365,7 @@ func (d *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respon
 }
 
 // getResponse returns stored response from cache
-func (d *Hoverfly) getResponse(req *http.Request) *http.Response {
+func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 
 	if req.Body == nil {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
@@ -379,9 +379,9 @@ func (d *Hoverfly) getResponse(req *http.Request) *http.Response {
 		}).Error("Got error when reading request body")
 	}
 
-	key := d.getRequestFingerprint(req, reqBody)
+	key := hf.getRequestFingerprint(req, reqBody)
 
-	payloadBts, err := d.RequestCache.Get([]byte(key))
+	payloadBts, err := hf.RequestCache.Get([]byte(key))
 
 	if err == nil {
 		// getting cache response
@@ -397,8 +397,8 @@ func (d *Hoverfly) getResponse(req *http.Request) *http.Response {
 
 		c := NewConstructor(req, *payload)
 
-		if d.Cfg.Middleware != "" {
-			_ = c.ApplyMiddleware(d.Cfg.Middleware)
+		if hf.Cfg.Middleware != "" {
+			_ = c.ApplyMiddleware(hf.Cfg.Middleware)
 		}
 
 		response := c.ReconstructResponse()
@@ -406,7 +406,7 @@ func (d *Hoverfly) getResponse(req *http.Request) *http.Response {
 		log.WithFields(log.Fields{
 			"key":         key,
 			"mode":        SimulateMode,
-			"middleware":  d.Cfg.Middleware,
+			"middleware":  hf.Cfg.Middleware,
 			"path":        req.URL.Path,
 			"rawQuery":    req.URL.RawQuery,
 			"method":      req.Method,
@@ -433,7 +433,7 @@ func (d *Hoverfly) getResponse(req *http.Request) *http.Response {
 
 // modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response
 // is saved to cache.
-func (d *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) (*http.Response, error) {
+func (hf *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) (*http.Response, error) {
 
 	// getting request details
 	rd, err := getRequestDetails(req)
@@ -446,7 +446,7 @@ func (d *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) (
 	}
 
 	// modifying request
-	req, resp, err := d.doRequest(req)
+	req, resp, err := hf.doRequest(req)
 
 	if err != nil {
 		return nil, err
@@ -500,7 +500,7 @@ func (d *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) (
 }
 
 // getRequestFingerprint returns request hash
-func (d *Hoverfly) getRequestFingerprint(req *http.Request, requestBody []byte) string {
+func (hf *Hoverfly) getRequestFingerprint(req *http.Request, requestBody []byte) string {
 	r := models.RequestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
@@ -514,9 +514,9 @@ func (d *Hoverfly) getRequestFingerprint(req *http.Request, requestBody []byte) 
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (d *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, respBody []byte) {
+func (hf *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, respBody []byte) {
 	// record request here
-	key := d.getRequestFingerprint(req, reqBody)
+	key := hf.getRequestFingerprint(req, reqBody)
 
 	if resp == nil {
 		resp = emptyResp
@@ -560,7 +560,7 @@ func (d *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, 
 		en.Time = time.Now()
 		en.Data = bts
 
-		if err := d.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
+		if err := hf.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
 			log.WithFields(log.Fields{
 				"error":      err.Error(),
 				"message":    en.Message,
@@ -573,7 +573,7 @@ func (d *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, 
 				"error": err.Error(),
 			}).Error("Failed to serialize payload")
 		} else {
-			d.RequestCache.Set([]byte(key), bts)
+			hf.RequestCache.Set([]byte(key), bts)
 		}
 	}
 }

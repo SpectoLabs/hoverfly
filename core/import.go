@@ -18,7 +18,7 @@ import (
 // Import is a function that based on input decides whether it is a local resource or whether
 // it should fetch it from remote server. It then imports given payload into the database
 // or returns an error
-func (d *Hoverfly) Import(uri string) error {
+func (hf *Hoverfly) Import(uri string) error {
 
 	// assuming file URI is URL:
 	if isURL(uri) {
@@ -26,7 +26,7 @@ func (d *Hoverfly) Import(uri string) error {
 			"isURL":      isURL(uri),
 			"importFrom": uri,
 		}).Info("URL")
-		return d.ImportFromURL(uri)
+		return hf.ImportFromURL(uri)
 	}
 	// assuming file URI is disk location
 	ext := path.Ext(uri)
@@ -40,7 +40,7 @@ func (d *Hoverfly) Import(uri string) error {
 	}
 	if exists {
 		// file is JSON and it exist
-		return d.ImportFromDisk(uri)
+		return hf.ImportFromDisk(uri)
 	}
 	return fmt.Errorf("Failed to import payloads, given file '%s' does not exist", uri)
 }
@@ -82,7 +82,7 @@ func exists(path string) (bool, error) {
 
 // ImportFromDisk - takes one string value and tries to open a file, then parse it into recordedRequests structure
 // (which is default format in which Hoverfly exports captured requests) and imports those requests into the database
-func (d *Hoverfly) ImportFromDisk(path string) error {
+func (hf *Hoverfly) ImportFromDisk(path string) error {
 	payloadsFile, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
@@ -95,15 +95,15 @@ func (d *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while parsing payloads file, error %s", err.Error())
 	}
 
-	return d.ImportPayloads(requests.Data)
+	return hf.ImportPayloads(requests.Data)
 }
 
 // ImportFromURL - takes one string value and tries connect to a remote server, then parse response body into
 // recordedRequests structure (which is default format in which Hoverfly exports captured requests) and
 // imports those requests into the database
-func (d *Hoverfly) ImportFromURL(url string) error {
+func (hf *Hoverfly) ImportFromURL(url string) error {
 
-	resp, err := d.HTTP.Get(url)
+	resp, err := hf.HTTP.Get(url)
 	if err != nil {
 		return fmt.Errorf("Failed to fetch given URL, error %s", err.Error())
 	}
@@ -115,7 +115,7 @@ func (d *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return d.ImportPayloads(requests.Data)
+	return hf.ImportPayloads(requests.Data)
 }
 
 func isJSON(s string) bool {
@@ -125,7 +125,7 @@ func isJSON(s string) bool {
 }
 
 // ImportPayloads - a function to save given payloads into the database.
-func (d *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
+func (hf *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
 	if len(payloads) > 0 {
 		success := 0
 		failed := 0
@@ -162,7 +162,7 @@ func (d *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
 				en.Time = time.Now()
 				en.Data = bts
 
-				if err := d.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
+				if err := hf.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
 					log.WithFields(log.Fields{
 						"error":      err.Error(),
 						"message":    en.Message,
@@ -170,7 +170,7 @@ func (d *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
 					}).Error("failed to fire hook")
 				}
 
-				d.RequestCache.Set([]byte(pl.Id()), bts)
+				hf.RequestCache.Set([]byte(pl.Id()), bts)
 				if err == nil {
 					success++
 				} else {
