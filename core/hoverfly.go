@@ -188,6 +188,11 @@ func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Respo
 			"destination": req.Host,
 		}).Info("synthetic response created successfuly")
 
+		respDelay := d.Cfg.GetDelay(req.Host)
+		if (respDelay != nil) {
+			respDelay.Execute()
+		}
+
 		return req, response
 
 	} else if mode == ModifyMode {
@@ -205,6 +210,12 @@ func (d *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Respo
 				fmt.Sprintf("Middleware (%s) failed or something else happened!", d.Cfg.Middleware),
 				http.StatusServiceUnavailable)
 		}
+
+		respDelay := d.Cfg.GetDelay(req.Host)
+		if (respDelay != nil) {
+			respDelay.Execute()
+		}
+
 		// returning modified response
 		return req, response
 	}
