@@ -348,7 +348,7 @@ func main() {
 					"import": conf,
 				}).Fatal("Error validating response delay config file")
 			} else {
-				hoverfly.UpdateResponseDelays(responseDelayJson.Data)
+				hoverfly.UpdateResponseDelays(*responseDelayJson.Data)
 			}
 		}
 	}

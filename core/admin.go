@@ -832,8 +832,9 @@ func (d *Hoverfly) DeleteMetadataHandler(w http.ResponseWriter, req *http.Reques
 }
 
 func (d *Hoverfly) GetResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var resp models.ResponseDelayJson
-	resp.Data = d.Cfg.ResponseDelays
+	resp := models.ResponseDelayJson{
+		Data: &d.Cfg.ResponseDelays,
+	}
 	b, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(b)
@@ -875,20 +876,31 @@ func (d *Hoverfly) UpdateResponseDelaysHandler(w http.ResponseWriter, req *http.
 	}
 
 	err = json.Unmarshal(body, &rd)
-	//TODO: validate that all delays in the data have non-zero values for host and delay
-
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Failed to unmarshal request body!")
 		mr.Message = fmt.Sprintf("Failed to decode request body. Error: %s", err.Error())
 		w.WriteHeader(400)
-
-	}  else {
-		d.Cfg.ResponseDelays = rd.Data
-		mr.Message = "Response delays updated."
-		w.WriteHeader(201)
+	}  else if rd.Data == nil {
+		log.Error("No delay data in the request body!")
+		mr.Message = fmt.Sprintf("Failed to get data from the request body.")
+		w.WriteHeader(422)
+	} else {
+		err = models.ValidateResponseDelayJson(rd)
+		if (err != nil) {
+			log.WithFields(log.Fields{
+				"error":  err.Error(),
+			}).Error("Error validating response delays config supplied")
+			mr.Message = fmt.Sprintf("Failed to validate response delays config. Error: %s", err.Error())
+			w.WriteHeader(422)
+		} else {
+			d.UpdateResponseDelays(*rd.Data)
+			mr.Message = "Response delays updated."
+			w.WriteHeader(201)
+		}
 	}
+
 	b, err := mr.Encode()
 	if err != nil {
 		// failed to read response body

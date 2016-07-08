@@ -753,7 +753,7 @@ func TestGetResponseDelays(t *testing.T) {
 	err = json.Unmarshal(body, &sr)
 
 	// normal equality checking doesn't work on slices (!!)
-	testutil.Expect(t, reflect.DeepEqual(sr.Data, delays), true)
+	testutil.Expect(t, reflect.DeepEqual(*sr.Data, delays), true)
 }
 
 func TestUpdateResponseDelays(t *testing.T) {
@@ -771,7 +771,7 @@ func TestUpdateResponseDelays(t *testing.T) {
 		Delay:       100,
 	}
 	delays := []models.ResponseDelay{delayOne, delayTwo}
-	delayJson := models.ResponseDelayJson{ Data: delays }
+	delayJson := models.ResponseDelayJson{ Data: &delays }
 	bts, err := json.Marshal(&delayJson)
 	testutil.Expect(t, err, nil)
 
@@ -788,17 +788,15 @@ func TestUpdateResponseDelays(t *testing.T) {
 	testutil.Expect(t, reflect.DeepEqual(dbClient.Cfg.ResponseDelays, delays), true)
 }
 
-func TestInvalidUpdateResponseDelays(t *testing.T) {
+func TestInvalidJSONSyntaxUpdateResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 	m := getBoneRouter(*dbClient)
 
 	delayJson := "{aseuifhksejfc}"
-	bts, err := json.Marshal(&delayJson)
-	testutil.Expect(t, err, nil)
 
-	req, err := http.NewRequest("PUT", "/api/delays", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("PUT", "/api/delays", ioutil.NopCloser(bytes.NewBuffer([]byte(delayJson))))
 	testutil.Expect(t, err, nil)
 
 	//The response recorder used to record HTTP responses
@@ -806,6 +804,77 @@ func TestInvalidUpdateResponseDelays(t *testing.T) {
 
 	m.ServeHTTP(rec, req)
 	testutil.Expect(t, rec.Code, http.StatusBadRequest)
+	fmt.Println(dbClient.Cfg.ResponseDelays)
+
+	// normal equality checking doesn't work on slices (!!)
+	var expd []models.ResponseDelay
+	testutil.Expect(t, reflect.DeepEqual(dbClient.Cfg.ResponseDelays, expd), true)
+}
+
+func TestInvalidJSONSemanticsUpdateResponseDelays(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	delayJson := "{ \"madeupfield\" : \"somevalue\" }"
+
+	req, err := http.NewRequest("PUT", "/api/delays", ioutil.NopCloser(bytes.NewBuffer([]byte(delayJson))))
+	testutil.Expect(t, err, nil)
+
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	testutil.Expect(t, rec.Code, 422)
+	fmt.Println(dbClient.Cfg.ResponseDelays)
+
+	// normal equality checking doesn't work on slices (!!)
+	var expd []models.ResponseDelay
+	testutil.Expect(t, reflect.DeepEqual(dbClient.Cfg.ResponseDelays, expd), true)
+}
+
+func TestJSONWithInvalidHostPatternUpdateResponseDelays(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	delayJson := "{ \"data\": [{\"hostPattern\": \"*\", \"delay\": 100}] }"
+
+	req, err := http.NewRequest("PUT", "/api/delays", ioutil.NopCloser(bytes.NewBuffer([]byte(delayJson))))
+	testutil.Expect(t, err, nil)
+
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	fmt.Println(req.Body)
+	testutil.Expect(t, rec.Code, 422)
+	fmt.Println(dbClient.Cfg.ResponseDelays)
+
+	// normal equality checking doesn't work on slices (!!)
+	var expd []models.ResponseDelay
+	testutil.Expect(t, reflect.DeepEqual(dbClient.Cfg.ResponseDelays, expd), true)
+}
+
+func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	delayJson := "{ \"data\" : [{\"hostPattern\": \".\"}] }"
+
+	req, err := http.NewRequest("PUT", "/api/delays", ioutil.NopCloser(bytes.NewBuffer([]byte(delayJson))))
+	testutil.Expect(t, err, nil)
+
+	//The response recorder used to record HTTP responses
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	fmt.Println(req.Body)
+	testutil.Expect(t, rec.Code, 422)
 	fmt.Println(dbClient.Cfg.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)

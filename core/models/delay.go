@@ -14,18 +14,20 @@ type ResponseDelay struct {
 }
 
 type ResponseDelayJson struct {
-	Data []ResponseDelay
+	Data *[]ResponseDelay
 }
 
 func ValidateResponseDelayJson(j ResponseDelayJson) (err error) {
 	// filter any entries that don't meet the invariants
-	for _, delay := range j.Data {
-		if delay.HostPattern != "" && delay.Delay != 0 {
-			if _, err := regexp.Compile(delay.HostPattern); err != nil {
-				return errors.New(fmt.Sprintf("Response delay entry skipped due to invalid pattern : %s", delay.HostPattern))
+	if j.Data != nil {
+		for _, delay := range *j.Data {
+			if delay.HostPattern != "" && delay.Delay != 0 {
+				if _, err := regexp.Compile(delay.HostPattern); err != nil {
+					return errors.New(fmt.Sprintf("Response delay entry skipped due to invalid pattern : %s", delay.HostPattern))
+				}
+			} else {
+				return errors.New(fmt.Sprintf("Config error - Missing values found in: %v", delay))
 			}
-		} else {
-			return errors.New(fmt.Sprintf("Config error - Missing values found in: %v", delay))
 		}
 	}
 	return nil
