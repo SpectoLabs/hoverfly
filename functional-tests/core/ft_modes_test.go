@@ -220,7 +220,8 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 		Context("with response delays", func() {
 
 			BeforeEach(func() {
-				hoverflyCmd = startHoverflyWithResponseDelays(adminPort, proxyPort, "testdata/delays.json")
+				hoverflyCmd = startHoverfly(adminPort, proxyPort)
+				SetHoverflyResponseDelays("testdata/delays.json")
 				SetHoverflyMode("simulate")
 				ImportHoverflyRecords(jsonPayload)
 			})

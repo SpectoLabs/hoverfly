@@ -34,9 +34,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	hvc "github.com/SpectoLabs/hoverfly/core/certs"
 	"github.com/rusenask/goproxy"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"io/ioutil"
-	"encoding/json"
 )
 
 type arrayFlags []string
@@ -85,7 +82,6 @@ var (
 	databasePath = flag.String("db-path", "", "database location - supply it to provide specific database location (will be created there if it doesn't exist)")
 	database     = flag.String("db", "boltdb", "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
 
-	delayConfigPath = flag.String("host-delay-config", "", "Path to config file defining delays on requests made to particular hosts")
 )
 
 var CA_CERT = []byte(`-----BEGIN CERTIFICATE-----
@@ -325,30 +321,6 @@ func main() {
 				} else {
 					err = hoverfly.MetadataCache.Set([]byte(fmt.Sprintf("import_%d", i+1)), []byte(v))
 				}
-			}
-		}
-	}
-
-	// if delay config file set - configure hoverfly with contents of the config file
-	if (*delayConfigPath != "") {
-		conf, err := ioutil.ReadFile(*delayConfigPath)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error":  err.Error(),
-				"path": *delayConfigPath,
-			}).Fatal("Unable to read delay config file: ", err)
-		} else {
-			var responseDelayJson models.ResponseDelayJson
-			json.Unmarshal(conf, &responseDelayJson)
-			fmt.Printf("%v", responseDelayJson)
-			err = models.ValidateResponseDelayJson(responseDelayJson)
-			if (err != nil) {
-				log.WithFields(log.Fields{
-					"error":  err.Error(),
-					"import": conf,
-				}).Fatal("Error validating response delay config file")
-			} else {
-				hoverfly.UpdateResponseDelays(*responseDelayJson.Data)
 			}
 		}
 	}
