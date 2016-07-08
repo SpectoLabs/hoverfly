@@ -10,7 +10,7 @@ import (
 )
 
 // Creates goproxy.ProxyHttpServer and configures it to be used as a proxy for Hoverfly
-// goproxy is given handlers that use the Hoverfly request processing code
+// goproxy is given handlers that use the Hoverfly request processing
 func NewProxy(hoverfly *Hoverfly) (*goproxy.ProxyHttpServer){
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
@@ -80,6 +80,50 @@ func NewProxy(hoverfly *Hoverfly) (*goproxy.ProxyHttpServer){
 		"ProxyPort":   hoverfly.Cfg.ProxyPort,
 		"Mode":        hoverfly.Cfg.GetMode(),
 	}).Info("Proxy prepared...")
+
+	return proxy
+}
+
+// Creates goproxy.ProxyHttpServer and configures it to be used as a webserver for Hoverfly
+// goproxy is given a non proxy handler that uses the Hoverfly request processing
+func NewWebserverProxy(hoverfly *Hoverfly) (*goproxy.ProxyHttpServer) {
+	// creating proxy
+	proxy := goproxy.NewProxyHttpServer()
+	proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Warn("NonproxyHandler")
+		req, resp := hoverfly.processRequest(r)
+		body, err := extractBody(resp)
+
+		if err != nil {
+			log.Error("Error reading response body")
+			w.WriteHeader(500)
+			return
+		}
+		w.Header().Set("Req", req.RequestURI)
+		w.Header().Set("Resp", resp.Header.Get("Content-Length"))
+		w.Write(body)
+		})
+
+	if hoverfly.Cfg.Verbose {
+		proxy.OnRequest().DoFunc(
+			func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+				log.WithFields(log.Fields{
+					"destination": r.Host,
+					"path":        r.URL.Path,
+					"query":       r.URL.RawQuery,
+					"method":      r.Method,
+					"mode":        hoverfly.Cfg.GetMode(),
+				}).Debug("got request..")
+				return r, nil
+			})
+	}
+
+
+	log.WithFields(log.Fields{
+		"Destination":   hoverfly.Cfg.Destination,
+		"WebserverPort": hoverfly.Cfg.ProxyPort,
+		"Mode":          hoverfly.Cfg.GetMode(),
+	}).Info("Webserver prepared...")
 
 	return proxy
 }
