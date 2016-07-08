@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-
-
 var emptyResp = &http.Response{}
 
 func copyBody(body io.ReadCloser) (resp1, resp2 io.ReadCloser, err error) {

@@ -1,7 +1,6 @@
 package hoverfly
 
 import (
-	"bufio"
 	"crypto/tls"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
@@ -68,7 +67,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		Counter: metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		Hooks:   make(ActionTypeHooks),
 	}
-	h.UpdateProxy()
+	h.Proxy = NewProxy(h)
 	return h
 }
 
@@ -80,7 +79,7 @@ func (d *Hoverfly) StartProxy() error {
 	}
 
 	if d.Proxy == nil {
-		d.UpdateProxy()
+		d.Proxy = NewProxy(d)
 	}
 
 	log.WithFields(log.Fields{
@@ -123,81 +122,6 @@ func (d *Hoverfly) StopProxy() {
 	d.Cfg.ProxyControlWG.Wait()
 }
 
-// UpdateProxy - applies hooks
-func (d *Hoverfly) UpdateProxy() {
-	// creating proxy
-	proxy := goproxy.NewProxyHttpServer()
-
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(d.Cfg.Destination))).
-		HandleConnect(goproxy.AlwaysMitm)
-
-	// enable curl -p for all hosts on port 80
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(d.Cfg.Destination))).
-		HijackConnect(func(req *http.Request, client net.Conn, ctx *goproxy.ProxyCtx) {
-			defer func() {
-				if e := recover(); e != nil {
-					ctx.Logf("error connecting to remote: %v", e)
-					client.Write([]byte("HTTP/1.1 500 Cannot reach destination\r\n\r\n"))
-				}
-				client.Close()
-			}()
-			clientBuf := bufio.NewReadWriter(bufio.NewReader(client), bufio.NewWriter(client))
-			remote, err := net.Dial("tcp", req.URL.Host)
-			orPanic(err)
-			remoteBuf := bufio.NewReadWriter(bufio.NewReader(remote), bufio.NewWriter(remote))
-			for {
-				req, err := http.ReadRequest(clientBuf.Reader)
-				orPanic(err)
-				orPanic(req.Write(remoteBuf))
-				orPanic(remoteBuf.Flush())
-				resp, err := http.ReadResponse(remoteBuf.Reader, req)
-
-				orPanic(err)
-				orPanic(resp.Write(clientBuf.Writer))
-				orPanic(clientBuf.Flush())
-			}
-		})
-
-	// processing connections
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(d.Cfg.Destination))).DoFunc(
-		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-			req, resp := d.processRequest(r)
-			return req, resp
-		})
-
-	if d.Cfg.Verbose {
-		proxy.OnRequest().DoFunc(
-			func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-				log.WithFields(log.Fields{
-					"destination": r.Host,
-					"path":        r.URL.Path,
-					"query":       r.URL.RawQuery,
-					"method":      r.Method,
-					"mode":        d.Cfg.GetMode(),
-				}).Debug("got request..")
-				return r, nil
-			})
-	}
-
-	// intercepts response
-	proxy.OnResponse(goproxy.ReqHostMatches(regexp.MustCompile(d.Cfg.Destination))).DoFunc(
-		func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
-			d.Counter.Count(d.Cfg.GetMode())
-			return resp
-		})
-
-	proxy.Verbose = d.Cfg.Verbose
-	// proxy starting message
-	log.WithFields(log.Fields{
-		"Destination": d.Cfg.Destination,
-		"ProxyPort":   d.Cfg.ProxyPort,
-		"Mode":        d.Cfg.GetMode(),
-	}).Info("Proxy prepared...")
-
-	d.Proxy = proxy
-	return
-}
-
 // UpdateDestination - updates proxy with new destination regexp
 func (d *Hoverfly) UpdateDestination(destination string) (err error) {
 	_, err = regexp.Compile(destination)
@@ -208,7 +132,7 @@ func (d *Hoverfly) UpdateDestination(destination string) (err error) {
 	d.mu.Lock()
 	d.StopProxy()
 	d.Cfg.Destination = destination
-	d.UpdateProxy()
+	d.Proxy = NewProxy(d)
 	err = d.StartProxy()
 	d.mu.Unlock()
 	return
