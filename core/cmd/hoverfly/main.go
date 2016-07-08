@@ -64,6 +64,7 @@ var (
 	metrics     = flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
 	dev         = flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
 	destination = flag.String("destination", ".", "destination URI to catch")
+	webserver   = flag.Bool("webserver", false, "start Hoverfly in webserver mode (simulate mode)")
 
 	addNew       = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
 	addUser      = flag.String("username", "", "username for new user")
@@ -330,6 +331,8 @@ func main() {
 		hoverfly.Counter.Init()
 	}
 
+	cfg.Webserver = *webserver
+
 	err := hoverfly.StartProxy()
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -379,6 +382,10 @@ func createSuperUser(h *hv.Hoverfly) {
 }
 
 func getInitialMode(cfg *hv.Configuration) (string) {
+	if *webserver {
+		return hv.SimulateMode
+	}
+
 	if *capture {
 		// checking whether user supplied other modes
 		if *synthesize == true || *modify == true {

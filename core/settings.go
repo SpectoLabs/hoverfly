@@ -18,6 +18,7 @@ type Configuration struct {
 	Destination  string
 	Middleware   string
 	DatabasePath string
+	Webserver    bool
 
 	TLSVerification bool
 
@@ -43,11 +44,11 @@ func (c *Configuration) SetMode(mode string) {
 }
 
 // GetMode - provides safe way to get current mode
-func (c *Configuration) GetMode() (mode string) {
+func (c *Configuration) GetMode() (string) {
 	c.mu.Lock()
-	mode = c.Mode
+	mode := c.Mode
 	c.mu.Unlock()
-	return
+	return mode
 }
 
 func (c *Configuration) GetDelay(host string) (delay *models.ResponseDelay) {
@@ -116,8 +117,9 @@ func InitSettings() *Configuration {
 	databasePath := os.Getenv(HoverflyDBEV)
 	if databasePath == "" {
 		appConfig.DatabasePath = DefaultDatabasePath
-
 	}
+
+	appConfig.Webserver = false
 
 	if os.Getenv(HoverflySecretEV) != "" {
 		appConfig.SecretKey = []byte(os.Getenv(HoverflySecretEV))

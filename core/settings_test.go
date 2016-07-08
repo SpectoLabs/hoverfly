@@ -94,3 +94,8 @@ func TestMultipleMatchingDelaysReturnsTheFirst(t *testing.T) {
 	delayMatch := cfg.GetDelay("delayexample.com")
 	testutil.Expect(t, *delayMatch, delayOne)
 }
+
+func Test_InitSettings_SetsTheWebserverFieldToFalse(t *testing.T) {
+	unit := InitSettings()
+	testutil.Expect(t, unit.Webserver, false)
+}
