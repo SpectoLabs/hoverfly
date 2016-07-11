@@ -501,13 +501,19 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) 
 
 // getRequestFingerprint returns request hash
 func (hf *Hoverfly) getRequestFingerprint(req *http.Request, requestBody []byte) string {
-	r := models.RequestDetails{
+	var r models.RequestDetails
+
+	r = models.RequestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
 		Destination: req.Host,
 		Query:       req.URL.RawQuery,
 		Body:        string(requestBody),
 		Headers:     req.Header,
+	}
+
+	if hf.Cfg.Webserver {
+		return r.HashWithoutHost()
 	}
 
 	return r.Hash()

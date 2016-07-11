@@ -137,7 +137,8 @@ func TestImportFromURLMalformedJSON(t *testing.T) {
 
 func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 	cache := cache.NewInMemoryCache()
-	hv := Hoverfly{RequestCache: cache}
+	cfg := Configuration{Webserver: false}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg}
 
 	RegisterTestingT(t)
 
@@ -181,7 +182,8 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 
 func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 	cache := cache.NewInMemoryCache()
-	hv := Hoverfly{RequestCache: cache}
+	cfg := Configuration{Webserver: false}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg}
 
 	RegisterTestingT(t)
 
@@ -235,7 +237,9 @@ func base64String(s string) string {
 
 func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 	cache := cache.NewInMemoryCache()
-	hv := Hoverfly{RequestCache: cache}
+	cfg := Configuration{Webserver: false}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg}
+
 
 	RegisterTestingT(t)
 

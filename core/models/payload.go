@@ -47,6 +47,10 @@ func (p Payload) Id() string {
 	return p.Request.Hash()
 }
 
+func (p Payload) IdWithoutHost() string {
+	return p.Request.HashWithoutHost()
+}
+
 // Encode method encodes all exported Payload fields to bytes
 func (p *Payload) Encode() ([]byte, error) {
 	buf := new(bytes.Buffer)
@@ -97,10 +101,13 @@ func (r *RequestDetails) ConvertToRequestDetailsView() (RequestDetailsView) {
 	}
 }
 
-func (r *RequestDetails) concatenate() string {
+func (r *RequestDetails) concatenate(withHost bool) string {
 	var buffer bytes.Buffer
 
-	buffer.WriteString(r.Destination)
+	if withHost {
+		buffer.WriteString(r.Destination)
+	}
+
 	buffer.WriteString(r.Path)
 	buffer.WriteString(r.Method)
 	buffer.WriteString(r.Query)
@@ -139,7 +146,12 @@ func (r *RequestDetails) minifyBody(mediaType string) (minified string) {
 
 func (r *RequestDetails) Hash() string {
 	h := md5.New()
-	io.WriteString(h, r.concatenate())
+	io.WriteString(h, r.concatenate(true))
+	return fmt.Sprintf("%x", h.Sum(nil))
+}
+func (r *RequestDetails) HashWithoutHost() string {
+	h := md5.New()
+	io.WriteString(h, r.concatenate(false))
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
