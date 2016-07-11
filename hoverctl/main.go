@@ -33,13 +33,15 @@ var (
 	pullNameArg = pullCommand.Arg("name", "Name of imported simulation").Required().String()
 	pullOverrideHostFlag = pullCommand.Flag("override-host", "Name of the host you want to virtualise").String()
 
-	wipeCommand = kingpin.Command("wipe", "Wipe Hoverfly database")
+	deleteCommand = kingpin.Command("delete", "Delete test data from Hoverfly")
 
 	delaysCommand = kingpin.Command("delays", "Get per-host response delay config currently loaded into Hoverfly")
 	delaysPathArg = delaysCommand.Arg("path", "Set per-host response delay config from JSON file").String()
 )
 
 func main() {
+	deleteCommand.Alias("wipe")
+
 	kingpin.Parse()
 
 	log.SetOutput(os.Stdout)
@@ -158,7 +160,7 @@ func main() {
 
 			log.Info(simulation.String(), " has been pulled from the SpectoLab")
 
-		case wipeCommand.FullCommand():
+		case deleteCommand.FullCommand():
 			err := hoverfly.Wipe()
 			handleIfError(err)
 
