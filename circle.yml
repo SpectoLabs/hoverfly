@@ -6,6 +6,10 @@ checkout:
   post:
     - mkdir -p $GOPATH/src/github.com/SpectoLabs/hoverfly || echo "project dir already exists"
     - "rsync -az --delete ./ $GOPATH/src/github.com/SpectoLabs/hoverfly" 
+    - "echo $GCLOUD_SERVICE_KEY | base64 --decode > ${HOME}/gcloud-service-key.json"
+    - "sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update"
+    - "sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json"
+    - "sudo /opt/google-cloud-sdk/bin/gcloud config set project $GCLOUD_PROJECT"
 
 dependencies:
   pre:
@@ -19,6 +23,9 @@ test:
   override:
     - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly && make build"
  
+  post:
+    - "gcloud docker push eu.gcr.io/specto-sandbox/hoverfly:$CIRCLE_BUILD_NUM"
+
 deployment:
   production:
     tag: /v[0-9]+(\.[0-9]+)*/
