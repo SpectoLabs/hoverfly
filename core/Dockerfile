@@ -1,12 +1,9 @@
-FROM golang:1.5
+FROM alpine
 
 MAINTAINER karolis.rusenas@opencredo.com
 
-ADD . /go/src/github.com/SpectoLabs/hoverfly
-
-ENV GO15VENDOREXPERIMENT 1
-
-RUN go install github.com/SpectoLabs/hoverfly/cmd/hoverfly/
+# you already built the binaries on linux, right?
+COPY target/hoverfly /go/bin/hoverfly
 
 ENTRYPOINT /go/bin/hoverfly
 
