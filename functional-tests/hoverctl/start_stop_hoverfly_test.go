@@ -8,8 +8,8 @@ import (
 	"io/ioutil"
 	"strconv"
 	"github.com/phayes/freeport"
+	"github.com/dghubble/sling"
 )
-
 
 var _ = Describe("When I use hoverctl", func() {
 
@@ -183,6 +183,51 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 
+		})
+
+		Context("I can control a process of hoverfly running as a webserver", func() {
+
+			It("by starting hoverfly as a webserver", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "start", "webserver", "-v").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Hoverfly is now running as a webserver"))
+
+				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
+
+				if err != nil {
+					Fail("Could not find pid file")
+				}
+
+				Expect(data).ToNot(BeEmpty())
+
+				if _, err := strconv.Atoi(string(data)); err != nil {
+					Fail("Pid file not have an integer in it")
+				}
+
+				request := sling.New().Get("http://localhost:" + proxyPortAsString)
+				response := DoRequest(request)
+
+				responseBody, err := ioutil.ReadAll(response.Body)
+				Expect(err).To(BeNil())
+
+				Expect(string(responseBody)).ToNot(ContainSubstring("This is a proxy server"))
+			})
+
+			//It("by stopping hoverfly as a webserver", func() {
+			//	exec.Command(hoverctlBinary, "start webserver").Run()
+			//
+			//	setOutput, _ := exec.Command(hoverctlBinary, "stop").Output()
+			//
+			//	output := strings.TrimSpace(string(setOutput))
+			//	Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
+			//
+			//	_, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
+			//
+			//	if err == nil {
+			//		Fail("Found the pid file that should have been deleted")
+			//	}
+			//})
 		})
 	})
 })

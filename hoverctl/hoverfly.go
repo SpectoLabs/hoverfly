@@ -329,6 +329,11 @@ This isn't working as intended, its working, just not how I imagined it.
  */
 
 func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) (error) {
+	return h.startWithFlags(hoverflyDirectory, "")
+}
+
+func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags string) (error) {
+
 	if !h.isLocal() {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
 	}
@@ -347,7 +352,7 @@ func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) (error) {
 		hoverflyDirectory.DeletePid(h.AdminPort, h.ProxyPort)
 	}
 
-	cmd := exec.Command("hoverfly", "-db", "memory", "-ap", h.AdminPort, "-pp", h.ProxyPort)
+	cmd := exec.Command("hoverfly", "-db", "memory", "-ap", h.AdminPort, "-pp", h.ProxyPort, flags)
 
 	err = cmd.Start()
 

@@ -17,6 +17,7 @@ var (
 	modeNameArg = modeCommand.Arg("name", "Set Hoverfly's mode").String()
 
 	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
+	startArg = startCommand.Arg("configuration", "Choose the configuration of Hoverfly (proxy/webserver)").String()
 	stopCommand = kingpin.Command("stop", "Stop a local instance of Hoverfly")
 
 	exportCommand = kingpin.Command("export", "Exports data out of Hoverfly")
@@ -83,10 +84,17 @@ func main() {
 			}
 
 		case startCommand.FullCommand():
-			err := hoverfly.start(hoverflyDirectory)
-			handleIfError(err)
+			if *startArg == "webserver" {
+				err := hoverfly.startWithFlags(hoverflyDirectory, "-webserver")
+				handleIfError(err)
 
-			log.Info("Hoverfly is now running")
+				log.Info("Hoverfly is now running as a webserver")
+			} else {
+				err := hoverfly.start(hoverflyDirectory)
+				handleIfError(err)
+
+				log.Info("Hoverfly is now running")
+			}
 
 		case stopCommand.FullCommand():
 			err := hoverfly.stop(hoverflyDirectory)
