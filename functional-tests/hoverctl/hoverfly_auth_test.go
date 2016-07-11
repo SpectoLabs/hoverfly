@@ -117,11 +117,11 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 				Expect(string(exportFile)).To(ContainSubstring(`"body":"{\"flightId\": \"1\"}"`))
 			})
 
-			It("and then wiping hoverfly", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "wipe").Output()
+			It("and then delete simulations from hoverfly", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "delete", "simulations").Output()
 
 				output := strings.TrimSpace(string(setOutput))
-				Expect(output).To(ContainSubstring("Hoverfly has been wiped"))
+				Expect(output).To(ContainSubstring("Simulations have been deleted from Hoverfly"))
 			})
 		})
 	})
@@ -206,7 +206,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 			})
 
 			It("and then wiping hoverfly", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "wipe").Output()
+				setOutput, _ := exec.Command(hoverctlBinary, "delete", "simulations").Output()
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))

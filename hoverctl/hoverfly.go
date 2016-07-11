@@ -60,7 +60,7 @@ func NewHoverfly(config Config) (Hoverfly) {
 }
 
 // Wipe will call the records endpoint in Hoverfly with a DELETE request, triggering Hoverfly to wipe the database
-func (h *Hoverfly) Wipe() (error) {
+func (h *Hoverfly) DeleteSimulations() (error) {
 	url := h.buildURL("/api/records")
 
 	slingRequest := sling.New().Delete(url)

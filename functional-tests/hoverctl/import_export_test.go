@@ -71,7 +71,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				Expect(string(bytes)).ToNot(Equal(`{"data":null}`))
 			})
 
-			It("can export, wipe and then re-import the data", func() {
+			It("can export, delete and then re-import the data", func() {
 
 				// Export the data
 				output, err := exec.Command(hoverctlBinary, "export", "mogronalol/twitter", "--admin-port=" + adminPortAsString).Output()
@@ -108,9 +108,9 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				)
 
 				// Wipe it
-				output, err = exec.Command(hoverctlBinary, "wipe", "--admin-port=" + adminPortAsString).Output()
+				output, err = exec.Command(hoverctlBinary, "delete", "simulations", "--admin-port=" + adminPortAsString).Output()
 				Expect(err).To(BeNil())
-				Expect(output).To(ContainSubstring("Hoverfly has been wiped"))
+				Expect(output).To(ContainSubstring("Simulations have been deleted from Hoverfly"))
 
 				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
 				bytes, _ := ioutil.ReadAll(resp.Body)

@@ -34,6 +34,7 @@ var (
 	pullOverrideHostFlag = pullCommand.Flag("override-host", "Name of the host you want to virtualise").String()
 
 	deleteCommand = kingpin.Command("delete", "Delete test data from Hoverfly")
+	deleteArg = deleteCommand.Arg("resource", "A collection of data that can be deleted").String()
 
 	delaysCommand = kingpin.Command("delays", "Get per-host response delay config currently loaded into Hoverfly")
 	delaysPathArg = delaysCommand.Arg("path", "Set per-host response delay config from JSON file").String()
@@ -161,12 +162,20 @@ func main() {
 			log.Info(simulation.String(), " has been pulled from the SpectoLab")
 
 		case deleteCommand.FullCommand():
-			err := hoverfly.Wipe()
-			handleIfError(err)
+			if *deleteArg == "all" {
+				err := hoverfly.DeleteSimulations()
+				handleIfError(err)
 
-			log.Info("Hoverfly has been wiped")
+				log.Info("All data has been deleted from Hoverfly")
+			}
+			if *deleteArg == "simulations" {
+				err := hoverfly.DeleteSimulations()
+				handleIfError(err)
 
-		case delaysCommand.FullCommand():
+				log.Info("Simulations have been deleted from Hoverfly")
+			}
+
+	case delaysCommand.FullCommand():
 			if *delaysPathArg == "" || *delaysPathArg == "status"{
 				delays, err := hoverfly.GetDelays()
 				handleIfError(err)
