@@ -90,7 +90,43 @@ func (h *Hoverfly) DeleteSimulations() (error) {
 	}
 
 	if response.StatusCode != 200 {
-		return errors.New("Hoverfly did not wipe the database")
+		return errors.New("Simulations were not deleted from Hoverfly")
+	}
+
+	return nil
+}
+
+func (h *Hoverfly) DeleteDelays() (error) {
+	url := h.buildURL("/api/delays")
+
+	slingRequest := sling.New().Delete(url)
+	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return errors.New("Could not authenticate  with Hoverfly")
+	}
+
+	request, err := slingRequest.Request()
+
+	if err != nil {
+		log.Debug(err.Error())
+		return errors.New("Could not communicate with Hoverfly")
+	}
+
+	response, err := h.httpClient.Do(request)
+	if err != nil {
+		log.Debug(err.Error())
+		return errors.New("Could not communicate with Hoverfly")
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode == 401 {
+		return errors.New("Hoverfly requires authentication")
+	}
+
+	if response.StatusCode != 200 {
+		return errors.New("Delays were not deleted from Hoverfly")
 	}
 
 	return nil

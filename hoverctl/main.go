@@ -165,14 +165,22 @@ func main() {
 			if *deleteArg == "all" {
 				err := hoverfly.DeleteSimulations()
 				handleIfError(err)
+				err = hoverfly.DeleteDelays()
+				handleIfError(err)
 
-				log.Info("All data has been deleted from Hoverfly")
+				log.Info("Delays and simulations have been deleted from Hoverfly")
 			}
 			if *deleteArg == "simulations" {
 				err := hoverfly.DeleteSimulations()
 				handleIfError(err)
 
 				log.Info("Simulations have been deleted from Hoverfly")
+			}
+			if *deleteArg == "delays" {
+				err := hoverfly.DeleteDelays()
+				handleIfError(err)
+
+				log.Info("Delays have been deleted from Hoverfly")
 			}
 
 	case delaysCommand.FullCommand():
