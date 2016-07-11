@@ -125,4 +125,81 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			})
 		})
 	})
+
+	Describe("with a running hoverfly set to run as a webserver", func() {
+
+		BeforeEach(func() {
+			hoverflyCmd = startHoverflyWebserver(adminPort, proxyPort, workingDirectory)
+			WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
+		})
+
+		AfterEach(func() {
+			hoverflyCmd.Process.Kill()
+		})
+
+		Context("I can get the hoverfly's mode", func() {
+
+			It("when hoverfly is in simulate mode", func() {
+				out, _ := exec.Command(hoverctlBinary, "mode").Output()
+
+				output := strings.TrimSpace(string(out))
+				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
+			})
+		})
+
+		Context("I cannot set hoverfly's mode", func() {
+
+			It("to simulate mode", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "mode", "simulate").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Cannot change the mode of Hoverfly when running as a webserver"))
+
+				getOutput, _ := exec.Command(hoverctlBinary, "mode").Output()
+
+				output = strings.TrimSpace(string(getOutput))
+				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
+				Expect(GetHoverflyMode(adminPort)).To(Equal(simulate))
+			})
+
+			It("to capture mode", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "mode", "capture").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Cannot change the mode of Hoverfly when running as a webserver"))
+
+				getOutput, _ := exec.Command(hoverctlBinary, "mode").Output()
+
+				output = strings.TrimSpace(string(getOutput))
+				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
+				Expect(GetHoverflyMode(adminPort)).To(Equal(simulate))
+			})
+
+			It("to synthesize mode", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "mode", "synthesize").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Cannot change the mode of Hoverfly when running as a webserver"))
+
+				getOutput, _ := exec.Command(hoverctlBinary, "mode").Output()
+
+				output = strings.TrimSpace(string(getOutput))
+				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
+				Expect(GetHoverflyMode(adminPort)).To(Equal(simulate))
+			})
+
+			It("to modify mode", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "mode", "modify").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Cannot change the mode of Hoverfly when running as a webserver"))
+
+				getOutput, _ := exec.Command(hoverctlBinary, "mode").Output()
+
+				output = strings.TrimSpace(string(getOutput))
+				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
+				Expect(GetHoverflyMode(adminPort)).To(Equal(simulate))
+			})
+		})
+	})
 })

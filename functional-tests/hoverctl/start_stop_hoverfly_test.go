@@ -213,21 +213,6 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(string(responseBody)).ToNot(ContainSubstring("This is a proxy server"))
 			})
-
-			//It("by stopping hoverfly as a webserver", func() {
-			//	exec.Command(hoverctlBinary, "start webserver").Run()
-			//
-			//	setOutput, _ := exec.Command(hoverctlBinary, "stop").Output()
-			//
-			//	output := strings.TrimSpace(string(setOutput))
-			//	Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
-			//
-			//	_, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
-			//
-			//	if err == nil {
-			//		Fail("Found the pid file that should have been deleted")
-			//	}
-			//})
 		})
 	})
 })

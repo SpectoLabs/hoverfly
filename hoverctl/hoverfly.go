@@ -164,6 +164,10 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 		return "", errors.New("Hoverfly requires authentication")
 	}
 
+	if response.StatusCode == 403 {
+		return "", errors.New("Cannot change the mode of Hoverfly when running as a webserver")
+	}
+
 
 	apiResponse := h.createAPIStateResponse(response)
 
