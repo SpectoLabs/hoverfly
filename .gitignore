@@ -44,6 +44,7 @@ requests.db
 target
 
 core/cmd/hoverfly/hoverfly
+hoverctl/hoverctl
 functional-tests/core/bin/hoverfly
 functional-tests/hoverctl/bin/hoverfly
 functional-tests/hoverctl/bin/hoverctl
