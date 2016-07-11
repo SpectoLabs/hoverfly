@@ -16,6 +16,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"github.com/dghubble/sling"
+	"strings"
 )
 
 var _ = Describe("When running Hoverfly as a webserver", func() {
@@ -92,6 +93,31 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 
 					Expect(string(responseBody)).To(Equal("another-host.com body2"))
 				})
+			})
+		})
+
+		Context("I cannot change the mode", func() {
+
+			It("it should start in simulate mode", func() {
+				request := sling.New().Get(hoverflyAdminUrl + "/api/state")
+				response := DoRequest(request)
+
+				responseBody, err := ioutil.ReadAll(response.Body)
+				Expect(err).To(BeNil())
+
+				Expect(string(responseBody)).To(ContainSubstring("simulate"))
+			})
+
+			It("it should not be switchable", func() {
+				request := sling.New().Post(hoverflyAdminUrl + "/api/state").Body(strings.NewReader(`{"mode":"capture"}`))
+				response := DoRequest(request)
+
+				Expect(response.StatusCode).To(Equal(403))
+
+				responseBody, err := ioutil.ReadAll(response.Body)
+				Expect(err).To(BeNil())
+
+				Expect(string(responseBody)).To(ContainSubstring("Hoverfly is currently configured to act as webserver, which can only operate in simulate mode"))
 			})
 		})
 	})

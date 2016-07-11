@@ -591,7 +591,7 @@ func (d *Hoverfly) CurrentStateHandler(w http.ResponseWriter, req *http.Request,
 
 // StateHandler handles current proxy state
 func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	var sr stateRequest
+		var sr stateRequest
 
 	// this is mainly for testing, since when you create
 	if r.Body == nil {
@@ -615,6 +615,12 @@ func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(400) // can't process this entity
+		return
+	}
+
+	if d.Cfg.Webserver {
+		log.Error("Can't change state when configured as a webserver ")
+		http.Error(w, "Hoverfly is currently configured to act as webserver, which can only operate in simulate mode", 403)
 		return
 	}
 
