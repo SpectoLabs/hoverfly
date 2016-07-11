@@ -1,4 +1,4 @@
-FROM alpine
+FROM debian:jessie
 
 MAINTAINER karolis.rusenas@opencredo.com
 
