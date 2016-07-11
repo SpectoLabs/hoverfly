@@ -194,6 +194,11 @@ func getBoneRouter(d Hoverfly) *bone.Mux {
 		negroni.HandlerFunc(d.UpdateResponseDelaysHandler),
 	))
 
+	mux.Delete("/api/delays", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.DeleteAllResponseDelaysHandler),
+	))
+
 	if d.Cfg.Development {
 		// since hoverfly is not started from cmd/hoverfly/hoverfly
 		// we have to target to that directory
@@ -828,7 +833,26 @@ func (d *Hoverfly) GetResponseDelaysHandler(w http.ResponseWriter, req *http.Req
 	b, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(b)
+}
 
+func (d *Hoverfly) DeleteAllResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	d.Cfg.ResponseDelays = []models.ResponseDelay{}
+
+	var response messageResponse
+	response.Message = "Delays deleted successfuly"
+	w.WriteHeader(200)
+
+	b, err := response.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+	w.Write(b)
+	return
 }
 
 func (d *Hoverfly) UpdateResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {

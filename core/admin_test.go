@@ -756,6 +756,30 @@ func TestGetResponseDelays(t *testing.T) {
 	testutil.Expect(t, reflect.DeepEqual(*sr.Data, delays), true)
 }
 
+func TestDeleteAllResponseDelaysHandler(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+	m := getBoneRouter(*dbClient)
+
+	delay :=models.ResponseDelay{
+		HostPattern: ".",
+		Delay: 100,
+	}
+	delays := []models.ResponseDelay{delay}
+	dbClient.Cfg.ResponseDelays = delays
+
+	req, err := http.NewRequest("DELETE", "/api/delays", nil)
+	testutil.Expect(t, err, nil)
+
+	rec := httptest.NewRecorder()
+
+	m.ServeHTTP(rec, req)
+	testutil.Expect(t, rec.Code, http.StatusOK)
+
+	testutil.Expect(t, len(dbClient.Cfg.ResponseDelays), 0)
+}
+
 func TestUpdateResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
