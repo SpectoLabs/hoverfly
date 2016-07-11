@@ -27,7 +27,7 @@ test:
     - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly && make build"
  
   post:
-    - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly/core && docker build -t eu.gcr.io/specto-sandbox/hoverfly:$CIRCLE_BUILD_NUM ."
+    - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly && docker build -t eu.gcr.io/specto-sandbox/hoverfly:$CIRCLE_BUILD_NUM  -f core/Dockerfile ."
     - "sudo /opt/google-cloud-sdk/bin/gcloud docker push eu.gcr.io/specto-sandbox/hoverfly:$CIRCLE_BUILD_NUM"
 
 deployment:
