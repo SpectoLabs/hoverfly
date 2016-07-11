@@ -5,6 +5,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
 	"fmt"
+	"errors"
 )
 
 var (
@@ -183,7 +184,12 @@ func main() {
 				log.Info("Delays have been deleted from Hoverfly")
 			}
 
-	case delaysCommand.FullCommand():
+			if *deleteArg == "" {
+				err := errors.New("You have not specified what to delete from Hoverfly")
+				handleIfError(err)
+			}
+
+		case delaysCommand.FullCommand():
 			if *delaysPathArg == "" || *delaysPathArg == "status"{
 				delays, err := hoverfly.GetDelays()
 				handleIfError(err)

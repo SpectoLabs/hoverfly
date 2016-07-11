@@ -170,5 +170,13 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 		})
 
+		Context("I won't delete if I have not specified what to delete", func() {
+			It("when I call hoverctl delete", func() {
+				out, _ := exec.Command(hoverctlBinary, "delete").Output()
+				output := strings.TrimSpace(string(out))
+				Expect(output).To(ContainSubstring("You have not specified what to delete from Hoverfly"))
+			})
+		})
+
 	})
 })
