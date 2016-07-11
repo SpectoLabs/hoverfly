@@ -17,7 +17,7 @@ var (
 	modeNameArg = modeCommand.Arg("name", "Set Hoverfly's mode").String()
 
 	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
-	startArg = startCommand.Arg("configuration", "Choose the configuration of Hoverfly (proxy/webserver)").String()
+	startArg = startCommand.Arg("server type", "Choose the configuration of Hoverfly (proxy/webserver)").String()
 	stopCommand = kingpin.Command("stop", "Stop a local instance of Hoverfly")
 
 	exportCommand = kingpin.Command("export", "Exports data out of Hoverfly")
