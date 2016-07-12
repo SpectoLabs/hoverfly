@@ -1,15 +1,66 @@
-deps:
-	go get
+dependencies: hoverfly-dependencies hoverfly-functional-test-dependencies hoverctl-dependencies hoverctl-functional-test-dependencies
 
-test: deps
-	go test
+hoverfly-dependencies:
+	cd core && \
+	glide install --strip-vcs
 
-build-drone: deps
-	go get -u all
-	cd cmd/hoverfly/ && go build
+hoverctl-dependencies:
+	cd hoverctl && \
+	glide install --strip-vcs
 
-build: deps
-	cd cmd/hoverfly/ && go build -o ${GOPATH}/bin/hoverflyb
+hoverfly-functional-test-dependencies:
+	cd functional-tests/core && \
+	glide install --strip-vcs
 
-build-ami:
-	packer build -var 'aws_access_key=${AWS_ACCESS_KEY}' -var 'aws_secret_key=${AWS_SECRET_KEY}' packer.json
+hoverctl-functional-test-dependencies:
+	cd functional-tests/hoverctl && \
+	glide install --strip-vcs
+
+hoverfly-test: hoverfly-dependencies
+	cd core && \
+	go test -v $(go list ./.. | grep -v -E 'vendor')
+
+hoverctl-test: hoverctl-dependencies
+	cd hoverctl && \
+	go test -v $(go list ./... | grep -v -E 'vendor')
+
+hoverfly-build: hoverfly-test
+	cd core/cmd/hoverfly && \
+	go build -o ../../../target/hoverfly
+
+hoverctl-build: hoverctl-test
+	cd hoverctl && \
+	go build -o ../target/hoverctl
+
+hoverfly-functional-test: hoverfly-functional-test-dependencies hoverfly-build
+	cp target/hoverfly functional-tests/core/bin/hoverfly
+	cd functional-tests/core && \
+	go test -v $(go list ./.. | grep -v -E 'vendor')
+
+hoverctl-functional-test: hoverctl-functional-test-dependencies hoverctl-build
+	cp target/hoverctl functional-tests/hoverctl/bin/hoverctl
+	cp target/hoverfly functional-tests/hoverctl/bin/hoverfly
+	cd functional-tests/hoverctl && \
+	go test -v $(go list ./... | grep -v -E 'vendor')
+
+test: hoverfly-functional-test hoverctl-functional-test
+
+build: test
+
+gox-build: test
+	rm -rf target/*
+	cd core/cmd/hoverfly && \
+	$(GOPATH)/bin/gox
+	mv core/cmd/hoverfly/hoverfly_* target/
+	cd hoverctl && \
+	$(GOPATH)/bin/gox
+	mv hoverctl/hoverctl_* target/
+
+build-release:
+	rm -rf target/*
+	cd core/cmd/hoverfly && \
+	$(GOPATH)/bin/gox
+	mv core/cmd/hoverfly/hoverfly_* target/
+	cd hoverctl && \
+	$(GOPATH)/bin/gox
+	mv hoverctl/hoverctl_* target/
