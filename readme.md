@@ -1,5 +1,4 @@
 [![Circle CI][CircleCI-Image]][CircleCI-Url]
-[![ReportCard][ReportCard-Image]][ReportCard-Url]
 
 ![Hoverfly](core/static/img/hoverfly_logo.png)
 ## Dependencies without the sting
@@ -8,6 +7,23 @@ Hoverfly is a light-weight open source tool for creating simulations of external
 This technique is sometimes referred to as [service virtualization](https://en.wikipedia.org/wiki/Service_virtualization).
 
 Hoverfly was designed to provide you with the means to create your own "dependency sandbox": a simulated development and test environment that you control.
+
+## Hoverfly + hoverctl
+
+Hoverctl is a command line interface for Hoverfly. It uses the Hoverfly REST API to control local and remote Hoverfly instances and manage Hoverfly data.
+
+## Quickstart
+
+Run the install script to install Hoverfly and hoverctl:
+
+    curl -o install.sh https://storage.googleapis.com/specto-binaries/install.sh && bash install.sh
+
+Or [download the Hoverfly and hoverctl binaries](https://github.com/SpectoLabs/hoverfly/releases), set the correct permissions and copy them to a directory on your path.
+
+Or get the docker image (Hoverfly only):
+
+    docker pull spectolabs/hoverfly
+    docker run -d -p 8888:8888 -p 8500:8500 spectolabs/hoverfly
 
 ## Documentation
 
@@ -36,6 +52,7 @@ For convenience:
 ### Reference
 * [API](https://spectolabs.gitbooks.io/hoverfly/content/reference/api.html)
 * [Flags and environment variables](https://spectolabs.gitbooks.io/hoverfly/content/reference/flags_and_environment_variables.html)
+* [Hoverctl](https://spectolabs.gitbooks.io/hoverfly/content/reference/hoverctl.html)
 
 
 ## Further reading
