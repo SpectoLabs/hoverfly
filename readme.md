@@ -10,7 +10,7 @@ Hoverfly was designed to provide you with the means to create your own "dependen
 
 ## Hoverfly + hoverctl
 
-Hoverctl is a command line interface for Hoverfly. It uses the Hoverfly REST API to control local and remote Hoverfly instances and manage Hoverfly data.
+Hoverctl is a command line interface for Hoverfly. It uses the Hoverfly REST API to control local or remote Hoverfly instances and manage Hoverfly data.
 
 ## Quickstart
 
@@ -85,5 +85,3 @@ Apache License version 2.0 [See LICENSE for details](https://github.com/SpectoLa
 
 [CircleCI-Image]: https://circleci.com/gh/SpectoLabs/hoverfly.svg?style=shield
 [CircleCI-Url]: https://circleci.com/gh/SpectoLabs/hoverfly
-[ReportCard-Url]: http://goreportcard.com/report/spectolabs/hoverfly
-[ReportCard-Image]: http://goreportcard.com/badge/spectolabs/hoverfly
