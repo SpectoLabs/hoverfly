@@ -66,6 +66,18 @@ func startHoverfly(adminPort, proxyPort int) * exec.Cmd {
 	return hoverflyCmd
 }
 
+func startHoverflyWithDatabase(adminPort, proxyPort int) * exec.Cmd {
+	hoverflyBinaryUri := buildBinaryPath()
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
+
+	err := hoverflyCmd.Start()
+
+	binaryErrorCheck(err, hoverflyBinaryUri)
+	healthcheck(adminPort)
+
+	return hoverflyCmd
+}
+
 func startHoverflyWebServer(adminPort, proxyPort int) * exec.Cmd {
 	hoverflyBinaryUri := buildBinaryPath()
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-webserver")
