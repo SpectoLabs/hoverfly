@@ -34,7 +34,7 @@ test:
   post:
     - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly && docker build -t eu.gcr.io/specto-sandbox/hoverfly:$CIRCLE_BUILD_NUM  -f core/Dockerfile ."
     - "sudo /opt/google-cloud-sdk/bin/gcloud docker push eu.gcr.io/specto-sandbox/hoverfly:$CIRCLE_BUILD_NUM"
-    - "git clone https://${GITHUB_TOKEN}@github.com/SpectoLabs/hoverfly-load-testing && cd hoverfly-load-testing && sudo load-test.sh"
+    - "git clone https://${GITHUB_TOKEN}@github.com/SpectoLabs/hoverfly-load-testing && cd hoverfly-load-testing && sudo \"PATH=$PATH\" ./load-test.sh"
 
 deployment:
   production:
