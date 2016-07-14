@@ -56,7 +56,7 @@ gox-build: test
 	$(GOPATH)/bin/gox
 	mv hoverctl/hoverctl_* target/
 
-build-release:
+rename-darwin-binaries:
 	mv target/hoverfly_darwin_386 target/hoverfly_OSX_386
 	mv target/hoverfly_darwin_amd64 target/hoverfly_OSX_amd64
 	mv target/hoverctl_darwin_386 target/hoverctl_OSX_386
