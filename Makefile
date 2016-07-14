@@ -56,6 +56,12 @@ gox-build: test
 	$(GOPATH)/bin/gox
 	mv hoverctl/hoverctl_* target/
 
+version-binaries:
+	for f in target/*; \
+	do \
+ 		mv $$f $${f:0:15}_$(GIT_TAG_NAME)$${f:15}; \
+	done;
+
 rename-darwin-binaries:
 	mv target/hoverfly_darwin_386 target/hoverfly_OSX_386
 	mv target/hoverfly_darwin_amd64 target/hoverfly_OSX_amd64
