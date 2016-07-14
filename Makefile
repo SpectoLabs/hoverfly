@@ -67,3 +67,5 @@ rename-darwin-binaries:
 	mv target/hoverfly_darwin_amd64 target/hoverfly_OSX_amd64
 	mv target/hoverctl_darwin_386 target/hoverctl_OSX_386
 	mv target/hoverctl_darwin_amd64 target/hoverctl_OSX_amd64
+
+build-release: gox-build rename-darwin-binaries version-binaries
