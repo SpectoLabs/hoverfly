@@ -278,7 +278,6 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			})
 
 			It("Should modify the request using middleware", func() {
-				fmt.Println(fakeServer.URL)
 				DoRequestThroughProxy(sling.New().Get(fakeServer.URL))
 				Expect(requestBody).To(Equal("CHANGED_REQUEST_BODY"))
 			})

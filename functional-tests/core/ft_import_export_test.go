@@ -189,7 +189,6 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				}))
 
 				defer fakeServer.Close()
-				fmt.Println(fakeServer.URL)
 				//time.Sleep(time.Second * 3)
 
 				// Switch Hoverfly to capture mode

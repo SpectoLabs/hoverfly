@@ -107,15 +107,21 @@ func binaryErrorCheck(err error, binaryPath string) {
 }
 
 func healthcheck(adminPort int) {
-	Eventually(func() int {
-		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
+	var err error
+	var resp *http.Response
+
+	hasPassed := Eventually(func() int {
+		resp, err = http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
 		if err == nil {
 			return resp.StatusCode
 		} else {
-			fmt.Println(err.Error())
 			return 0
 		}
 	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+
+	if !hasPassed {
+		fmt.Println(err.Error())
+	}
 }
 
 func stopHoverfly() {
@@ -166,7 +172,6 @@ func ExportHoverflyRecords() (io.Reader) {
 func ImportHoverflyRecords(payload io.Reader) {
 	req := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(payload)
 	res := DoRequest(req)
-	fmt.Println(hoverflyAdminUrl)
 	Expect(res.StatusCode).To(Equal(200))
 }
 
