@@ -121,4 +121,35 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 			})
 		})
 	})
+
+	Context("using a request.db from the disk", func() {
+
+		Context("and the requests.db was created by Hoverfly proxy", func() {
+			BeforeEach(func() {
+				hoverflyCmd = startHoverflyWithDatabase(adminPort, proxyPort)
+				getPayload1 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "destination1", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 200, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
+				ImportHoverflyRecords(getPayload1)
+
+				hoverflyCmd.Process.Kill()
+
+				hoverflyCmd = startHoverflyWebServerWithDatabase(adminPort, proxyPort)
+			})
+
+			AfterEach(func() {
+				hoverflyCmd.Process.Kill()
+			})
+
+			It("should recache the requests so that the destination is not included in the cache", func() {
+				request := sling.New().Get("http://localhost:" + proxyPortAsString + "/path1")
+
+				response := DoRequest(request)
+
+				responseBody, err := ioutil.ReadAll(response.Body)
+				Expect(err).To(BeNil())
+
+				Expect(string(responseBody)).To(Equal("body1"))
+			})
+
+		})
+	})
 })

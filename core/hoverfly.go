@@ -73,6 +73,8 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 // StartProxy - starts proxy with current configuration, this method is non blocking.
 func (hf *Hoverfly) StartProxy() error {
 
+	rebuildHashes(hf.RequestCache, hf.Cfg.Webserver)
+
 	if hf.Cfg.ProxyPort == "" {
 		return fmt.Errorf("Proxy port is not set!")
 	}
