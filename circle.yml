@@ -10,9 +10,6 @@ checkout:
     - mkdir -p $GOPATH/src/github.com/SpectoLabs/hoverfly || echo "project dir already exists"
     - "rsync -az --delete ./ $GOPATH/src/github.com/SpectoLabs/hoverfly" 
     - "echo $GCLOUD_SERVICE_KEY | base64 --decode > ${HOME}/gcloud-service-key.json"
-    - "sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update"
-    - "sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json"
-    - "sudo /opt/google-cloud-sdk/bin/gcloud config set project $GCLOUD_PROJECT"
 
 dependencies:
   pre:
@@ -21,6 +18,13 @@ dependencies:
     - sudo apt-get install -y glide
     - go get github.com/aktau/github-release
     - go get github.com/mitchellh/gox
+    - "sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update"
+    - "sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update kubectl"
+    - "sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json"
+    - "sudo /opt/google-cloud-sdk/bin/gcloud config set project $GCLOUD_PROJECT"
+    - "sudo /opt/google-cloud-sdk/bin/gcloud --quiet config set container/cluster $CLUSTER_NAME"
+    - "sudo /opt/google-cloud-sdk/bin/gcloud config set compute/zone ${CLOUDSDK_COMPUTE_ZONE}"
+    - "sudo /opt/google-cloud-sdk/bin/gcloud --quiet container clusters get-credentials $CLUSTER_NAME"
           
 test:
   override:
@@ -29,6 +33,7 @@ test:
   post:
     - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly && docker build -t eu.gcr.io/specto-sandbox/hoverfly:$CIRCLE_BUILD_NUM  -f core/Dockerfile ."
     - "sudo /opt/google-cloud-sdk/bin/gcloud docker push eu.gcr.io/specto-sandbox/hoverfly:$CIRCLE_BUILD_NUM"
+    - "git clone https://github.com/SpectoLabs/hoverfly-load-testing && cd hoverfly-load-testing && ./load-test.sh
 
 deployment:
   production:
