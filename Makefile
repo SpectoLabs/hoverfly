@@ -47,7 +47,7 @@ test: hoverfly-functional-test hoverctl-functional-test
 
 build: test
 
-gox-build: test
+gox-build: 
 	rm -rf target/*
 	cd core/cmd/hoverfly && \
 	$(GOPATH)/bin/gox
