@@ -74,7 +74,7 @@ func (m *messageResponse) Encode() ([]byte, error) {
 func (d *Hoverfly) StartAdminInterface() {
 
 	// starting admin interface
-	mux := getBoneRouter(*d)
+	mux := getBoneRouter(d)
 	n := negroni.Classic()
 
 	logLevel := log.ErrorLevel
@@ -95,7 +95,7 @@ func (d *Hoverfly) StartAdminInterface() {
 }
 
 // getBoneRouter returns mux for admin interface
-func getBoneRouter(d Hoverfly) *bone.Mux {
+func getBoneRouter(d *Hoverfly) *bone.Mux {
 	mux := bone.New()
 
 	// getting auth controllers and middleware
@@ -828,7 +828,7 @@ func (d *Hoverfly) DeleteMetadataHandler(w http.ResponseWriter, req *http.Reques
 
 func (d *Hoverfly) GetResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	resp := models.ResponseDelayJson{
-		Data: &d.Cfg.ResponseDelays,
+		Data: &d.ResponseDelays,
 	}
 	b, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -836,7 +836,7 @@ func (d *Hoverfly) GetResponseDelaysHandler(w http.ResponseWriter, req *http.Req
 }
 
 func (d *Hoverfly) DeleteAllResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	d.Cfg.ResponseDelays = []models.ResponseDelay{}
+	d.ResponseDelays = models.ResponseDelayList{}
 
 	var response messageResponse
 	response.Message = "Delays deleted successfuly"

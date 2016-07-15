@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"net/url"
 )
 
 func TestGetNewHoverflyCheckConfig(t *testing.T) {
@@ -129,4 +130,14 @@ func TestProcessModifyRequest(t *testing.T) {
 	testutil.Refute(t, newResp, nil)
 
 	testutil.Expect(t, newResp.StatusCode, 202)
+}
+
+func TestURLToStringWorksAsExpected(t *testing.T) {
+	testUrl := url.URL {
+		Scheme: "http",
+		Host: "test.com",
+		Path: "/args/1",
+		RawQuery: "query=val",
+	}
+	testutil.Expect(t, testUrl.String(), "http://test.com/args/1?query=val")
 }

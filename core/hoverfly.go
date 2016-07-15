@@ -49,6 +49,8 @@ type Hoverfly struct {
 	Counter        *metrics.CounterByMode
 	Hooks          ActionTypeHooks
 
+	ResponseDelays models.ResponseDelayList
+
 	Proxy *goproxy.ProxyHttpServer
 	SL    *StoppableListener
 	mu    sync.Mutex
@@ -140,8 +142,8 @@ func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
 	return
 }
 
-func (hf *Hoverfly) UpdateResponseDelays(responseDelays []models.ResponseDelay) {
-	hf.Cfg.ResponseDelays = responseDelays
+func (hf *Hoverfly) UpdateResponseDelays(responseDelays models.ResponseDelayList) {
+	hf.ResponseDelays = responseDelays
 	log.Info("Response delay config updated on hoverfly")
 }
 
@@ -190,7 +192,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 			"destination": req.Host,
 		}).Info("synthetic response created successfuly")
 
-		respDelay := hf.Cfg.GetDelay(req.Host)
+		respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
 		if (respDelay != nil) {
 			respDelay.Execute()
 		}
@@ -213,7 +215,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 				http.StatusServiceUnavailable)
 		}
 
-		respDelay := hf.Cfg.GetDelay(req.Host)
+		respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
 		if (respDelay != nil) {
 			respDelay.Execute()
 		}
@@ -224,7 +226,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 
 	newResponse := hf.getResponse(req)
 
-	respDelay := hf.Cfg.GetDelay(req.Host)
+	respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
 	if (respDelay != nil) {
 		respDelay.Execute()
 	}

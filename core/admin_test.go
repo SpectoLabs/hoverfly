@@ -17,7 +17,7 @@ func TestGetAllRecords(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/records", nil)
 	testutil.Expect(t, err, nil)
@@ -49,7 +49,7 @@ func TestGetAllRecordsWRecords(t *testing.T) {
 		dbClient.captureRequest(req)
 	}
 	// performing query
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/records", nil)
 	testutil.Expect(t, err, nil)
@@ -73,7 +73,7 @@ func TestGetRecordsCount(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/count", nil)
 	testutil.Expect(t, err, nil)
@@ -105,7 +105,7 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 		dbClient.captureRequest(req)
 	}
 	// performing query
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/count", nil)
 	testutil.Expect(t, err, nil)
@@ -129,7 +129,7 @@ func TestExportImportRecords(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -173,7 +173,7 @@ func TestDeleteHandler(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -200,7 +200,7 @@ func TestDeleteHandlerNoBucket(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// deleting through handler
 	importReq, err := http.NewRequest("DELETE", "/api/records", nil)
@@ -216,7 +216,7 @@ func TestGetState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// setting initial mode
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -241,7 +241,7 @@ func TestSetSimulateState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// setting mode to capture
 	dbClient.Cfg.SetMode("capture")
@@ -270,7 +270,7 @@ func TestSetCaptureState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// setting mode to simulate
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -299,7 +299,7 @@ func TestSetModifyState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// setting mode to simulate
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -328,7 +328,7 @@ func TestSetSynthesizeState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// setting mode to simulate
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -357,7 +357,7 @@ func TestSetRandomState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// setting mode to simulate
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -386,7 +386,7 @@ func TestSetNoBody(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// setting mode to simulate
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -408,7 +408,7 @@ func TestStatsHandler(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// deleting through handler
 	req, err := http.NewRequest("GET", "/api/stats", nil)
@@ -427,7 +427,7 @@ func TestStatsHandlerSimulateMetrics(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	dbClient.Counter.Counters[SimulateMode].Inc(1)
 
@@ -454,7 +454,7 @@ func TestStatsHandlerCaptureMetrics(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	dbClient.Counter.Counters[CaptureMode].Inc(1)
 
@@ -481,7 +481,7 @@ func TestStatsHandlerModifyMetrics(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	dbClient.Counter.Counters[ModifyMode].Inc(1)
 
@@ -508,7 +508,7 @@ func TestStatsHandlerSynthesizeMetrics(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	dbClient.Counter.Counters[SynthesizeMode].Inc(1)
 
@@ -535,7 +535,7 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -565,7 +565,7 @@ func TestSetMetadata(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// preparing to set mode through rest api
 	var reqBody setMetadata
@@ -594,7 +594,7 @@ func TestSetMetadataBadBody(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// deleting through handler
 	req, err := http.NewRequest("PUT", "/api/metadata", ioutil.NopCloser(bytes.NewBuffer([]byte("you shall not decode me!!"))))
@@ -610,7 +610,7 @@ func TestSetMetadataMissingKey(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// preparing to set mode through rest api
 	var reqBody setMetadata
@@ -641,7 +641,7 @@ func TestGetMetadata(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 	// adding some metadata
 	for i := 0; i < 3; i++ {
 		k := fmt.Sprintf("key_%d", i)
@@ -676,7 +676,7 @@ func TestDeleteMetadata(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 	// adding some metadata
 	for i := 0; i < 3; i++ {
 		k := fmt.Sprintf("key_%d", i)
@@ -709,7 +709,7 @@ func TestDeleteMetadataEmpty(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	// deleting it
 	req, err := http.NewRequest("DELETE", "/api/metadata", nil)
@@ -730,14 +730,16 @@ func TestGetResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
 
-	delay :=models.ResponseDelay{
-		HostPattern: ".",
+
+	delay := models.ResponseDelay{
+		UrlPattern: ".",
 		Delay: 100,
 	}
-	delays := []models.ResponseDelay{delay}
-	dbClient.Cfg.ResponseDelays = delays
+	delays := models.ResponseDelayList{delay}
+	dbClient.UpdateResponseDelays(delays)
+
+	m := getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/delays", nil)
 	testutil.Expect(t, err, nil)
@@ -760,14 +762,14 @@ func TestDeleteAllResponseDelaysHandler(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
-
 	delay :=models.ResponseDelay{
-		HostPattern: ".",
+		UrlPattern: ".",
 		Delay: 100,
 	}
-	delays := []models.ResponseDelay{delay}
-	dbClient.Cfg.ResponseDelays = delays
+	delays := models.ResponseDelayList{delay}
+	dbClient.ResponseDelays = delays
+	m := getBoneRouter(dbClient)
+
 
 	req, err := http.NewRequest("DELETE", "/api/delays", nil)
 	testutil.Expect(t, err, nil)
@@ -777,24 +779,24 @@ func TestDeleteAllResponseDelaysHandler(t *testing.T) {
 	m.ServeHTTP(rec, req)
 	testutil.Expect(t, rec.Code, http.StatusOK)
 
-	testutil.Expect(t, len(dbClient.Cfg.ResponseDelays), 0)
+	testutil.Expect(t, len(dbClient.ResponseDelays), 0)
 }
 
 func TestUpdateResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	delayOne :=models.ResponseDelay{
-		HostPattern: ".",
+		UrlPattern: ".",
 		Delay: 100,
 	}
 	delayTwo := models.ResponseDelay{
-		HostPattern: "example",
+		UrlPattern: "example",
 		Delay:       100,
 	}
-	delays := []models.ResponseDelay{delayOne, delayTwo}
+	delays := models.ResponseDelayList{delayOne, delayTwo}
 	delayJson := models.ResponseDelayJson{ Data: &delays }
 	bts, err := json.Marshal(&delayJson)
 	testutil.Expect(t, err, nil)
@@ -809,14 +811,14 @@ func TestUpdateResponseDelays(t *testing.T) {
 	testutil.Expect(t, rec.Code, http.StatusCreated)
 
 	// normal equality checking doesn't work on slices (!!)
-	testutil.Expect(t, reflect.DeepEqual(dbClient.Cfg.ResponseDelays, delays), true)
+	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, delays), true)
 }
 
 func TestInvalidJSONSyntaxUpdateResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	delayJson := "{aseuifhksejfc}"
 
@@ -828,18 +830,18 @@ func TestInvalidJSONSyntaxUpdateResponseDelays(t *testing.T) {
 
 	m.ServeHTTP(rec, req)
 	testutil.Expect(t, rec.Code, http.StatusBadRequest)
-	fmt.Println(dbClient.Cfg.ResponseDelays)
+	fmt.Println(dbClient.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)
-	var expd []models.ResponseDelay
-	testutil.Expect(t, reflect.DeepEqual(dbClient.Cfg.ResponseDelays, expd), true)
+	var expd models.ResponseDelayList
+	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, expd), true)
 }
 
 func TestInvalidJSONSemanticsUpdateResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	delayJson := "{ \"madeupfield\" : \"somevalue\" }"
 
@@ -851,18 +853,18 @@ func TestInvalidJSONSemanticsUpdateResponseDelays(t *testing.T) {
 
 	m.ServeHTTP(rec, req)
 	testutil.Expect(t, rec.Code, 422)
-	fmt.Println(dbClient.Cfg.ResponseDelays)
+	fmt.Println(dbClient.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)
-	var expd []models.ResponseDelay
-	testutil.Expect(t, reflect.DeepEqual(dbClient.Cfg.ResponseDelays, expd), true)
+	var expd models.ResponseDelayList
+	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, expd), true)
 }
 
 func TestJSONWithInvalidHostPatternUpdateResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	delayJson := "{ \"data\": [{\"hostPattern\": \"*\", \"delay\": 100}] }"
 
@@ -875,18 +877,18 @@ func TestJSONWithInvalidHostPatternUpdateResponseDelays(t *testing.T) {
 	m.ServeHTTP(rec, req)
 	fmt.Println(req.Body)
 	testutil.Expect(t, rec.Code, 422)
-	fmt.Println(dbClient.Cfg.ResponseDelays)
+	fmt.Println(dbClient.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)
-	var expd []models.ResponseDelay
-	testutil.Expect(t, reflect.DeepEqual(dbClient.Cfg.ResponseDelays, expd), true)
+	var expd models.ResponseDelayList
+	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, expd), true)
 }
 
 func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(*dbClient)
+	m := getBoneRouter(dbClient)
 
 	delayJson := "{ \"data\" : [{\"hostPattern\": \".\"}] }"
 
@@ -899,9 +901,10 @@ func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
 	m.ServeHTTP(rec, req)
 	fmt.Println(req.Body)
 	testutil.Expect(t, rec.Code, 422)
-	fmt.Println(dbClient.Cfg.ResponseDelays)
+	fmt.Println(dbClient.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)
-	var expd []models.ResponseDelay
-	testutil.Expect(t, reflect.DeepEqual(dbClient.Cfg.ResponseDelays, expd), true)
+	var expd models.ResponseDelayList
+	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, expd), true)
 }
+
