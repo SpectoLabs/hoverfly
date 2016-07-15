@@ -34,5 +34,5 @@ deployment:
   production:
     tag: /v[0-9]+(\.[0-9]+)*/
     commands:
-      - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly && make build-release"
+      - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly && make build-release GIT_TAG_NAME=$CIRCLE_TAG"
       - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly/target && for f in hover*;do github-release upload  --user SpectoLabs --repo hoverfly --tag \"$CIRCLE_TAG\" --name \"$f\" --file \"$f\"; done" 
