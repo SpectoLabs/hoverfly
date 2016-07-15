@@ -47,7 +47,7 @@ test: hoverfly-functional-test hoverctl-functional-test
 
 build: test
 
-gox-build: test
+gox-build: 
 	rm -rf target/*
 	cd core/cmd/hoverfly && \
 	$(GOPATH)/bin/gox
@@ -56,11 +56,16 @@ gox-build: test
 	$(GOPATH)/bin/gox
 	mv hoverctl/hoverctl_* target/
 
-build-release:
-	rm -rf target/*
-	cd core/cmd/hoverfly && \
-	$(GOPATH)/bin/gox
-	mv core/cmd/hoverfly/hoverfly_* target/
-	cd hoverctl && \
-	$(GOPATH)/bin/gox
-	mv hoverctl/hoverctl_* target/
+version-binaries:
+	for f in target/*; \
+	do \
+ 		mv $$f $${f:0:15}_$(GIT_TAG_NAME)$${f:15}; \
+	done;
+
+rename-darwin-binaries:
+	mv target/hoverfly_darwin_386 target/hoverfly_OSX_386
+	mv target/hoverfly_darwin_amd64 target/hoverfly_OSX_amd64
+	mv target/hoverctl_darwin_386 target/hoverctl_OSX_386
+	mv target/hoverctl_darwin_amd64 target/hoverctl_OSX_amd64
+
+build-release: gox-build rename-darwin-binaries version-binaries
