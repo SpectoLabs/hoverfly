@@ -10,13 +10,13 @@ import (
 )
 
 type ResponseDelay struct {
-	UrlPattern string
-	HttpMethod string
-	Delay      int
+	UrlPattern string `json:"urlpattern"`
+	HttpMethod string `json:"httpmethod"`
+	Delay      int `json:"delay"`
 }
 
 type ResponseDelayJson struct {
-	Data *ResponseDelayList
+	Data *ResponseDelayList `json:"data"`
 }
 
 type ResponseDelayList []ResponseDelay

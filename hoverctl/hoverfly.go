@@ -21,12 +21,13 @@ type APIStateResponse struct {
 }
 
 type APIDelaysResponse struct {
-	Data []ResponseDelay
+	Data []ResponseDelay `json:"data"`
 }
 
 type ResponseDelay struct {
-	HostPattern string
-	Delay int
+	UrlPattern string `json:"urlpattern"`
+	Delay      int `json:"delay"`
+	HttpMethod string `json:"httpmethod"`
 }
 
 type Hoverfly struct {
