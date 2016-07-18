@@ -72,5 +72,5 @@ func (this *ResponseDelayList) Json() []byte {
 }
 
 func (this *ResponseDelayList) Len() int {
-	return this.Len()
+	return len(this)
 }
