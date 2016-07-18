@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"testing"
-	"net/url"
-	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 func TestGetNewHoverflyCheckConfig(t *testing.T) {
@@ -134,17 +134,17 @@ func TestProcessModifyRequest(t *testing.T) {
 }
 
 func TestURLToStringWorksAsExpected(t *testing.T) {
-	testUrl := url.URL {
-		Scheme: "http",
-		Host: "test.com",
-		Path: "/args/1",
+	testUrl := url.URL{
+		Scheme:   "http",
+		Host:     "test.com",
+		Path:     "/args/1",
 		RawQuery: "query=val",
 	}
 	testutil.Expect(t, testUrl.String(), "http://test.com/args/1?query=val")
 }
 
 type ResponseDelayListStub struct {
-	gotDelays int;
+	gotDelays int
 }
 
 func (this *ResponseDelayListStub) Json() []byte {
@@ -155,9 +155,9 @@ func (this *ResponseDelayListStub) Len() int {
 	return this.Len()
 }
 
-func (this *ResponseDelayListStub) GetDelay(urlPattern, httpMethod string) (*models.ResponseDelay){
-	this.gotDelays++;
-	return nil;
+func (this *ResponseDelayListStub) GetDelay(urlPattern, httpMethod string) *models.ResponseDelay {
+	this.gotDelays++
+	return nil
 }
 
 func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {

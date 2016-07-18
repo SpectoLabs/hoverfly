@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"testing"
-	"github.com/SpectoLabs/hoverfly/core/models"
 	"reflect"
+	"testing"
 )
 
 func TestGetAllRecords(t *testing.T) {
@@ -731,10 +731,9 @@ func TestGetResponseDelays(t *testing.T) {
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
-
 	delay := models.ResponseDelay{
 		UrlPattern: ".",
-		Delay: 100,
+		Delay:      100,
 	}
 	delays := models.ResponseDelayList{delay}
 	dbClient.UpdateResponseDelays(delays)
@@ -762,14 +761,13 @@ func TestDeleteAllResponseDelaysHandler(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	delay :=models.ResponseDelay{
+	delay := models.ResponseDelay{
 		UrlPattern: ".",
-		Delay: 100,
+		Delay:      100,
 	}
 	delays := models.ResponseDelayList{delay}
 	dbClient.ResponseDelays = &delays
 	m := getBoneRouter(dbClient)
-
 
 	req, err := http.NewRequest("DELETE", "/api/delays", nil)
 	testutil.Expect(t, err, nil)
@@ -788,16 +786,16 @@ func TestUpdateResponseDelays(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := getBoneRouter(dbClient)
 
-	delayOne :=models.ResponseDelay{
+	delayOne := models.ResponseDelay{
 		UrlPattern: ".",
-		Delay: 100,
+		Delay:      100,
 	}
 	delayTwo := models.ResponseDelay{
 		UrlPattern: "example",
-		Delay:       100,
+		Delay:      100,
 	}
 	delays := models.ResponseDelayList{delayOne, delayTwo}
-	delayJson := models.ResponseDelayJson{ Data: &delays }
+	delayJson := models.ResponseDelayJson{Data: &delays}
 	bts, err := json.Marshal(&delayJson)
 	testutil.Expect(t, err, nil)
 
@@ -903,4 +901,3 @@ func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
 	// normal equality checking doesn't work on slices (!!)
 	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, &models.ResponseDelayList{}), true)
 }
-

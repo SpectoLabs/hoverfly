@@ -1,49 +1,49 @@
 package hoverfly
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"net"
 	"bufio"
+	log "github.com/Sirupsen/logrus"
 	"github.com/rusenask/goproxy"
-	"regexp"
+	"net"
 	"net/http"
+	"regexp"
 )
 
 // Creates goproxy.ProxyHttpServer and configures it to be used as a proxy for Hoverfly
 // goproxy is given handlers that use the Hoverfly request processing
-func NewProxy(hoverfly *Hoverfly) (*goproxy.ProxyHttpServer){
+func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).
-	HandleConnect(goproxy.AlwaysMitm)
+		HandleConnect(goproxy.AlwaysMitm)
 
 	// enable curl -p for all hosts on port 80
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).
-	HijackConnect(func(req *http.Request, client net.Conn, ctx *goproxy.ProxyCtx) {
-		defer func() {
-			if e := recover(); e != nil {
-				ctx.Logf("error connecting to remote: %v", e)
-				client.Write([]byte("HTTP/1.1 500 Cannot reach destination\r\n\r\n"))
-			}
-			client.Close()
-		}()
-		clientBuf := bufio.NewReadWriter(bufio.NewReader(client), bufio.NewWriter(client))
-		remote, err := net.Dial("tcp", req.URL.Host)
-		orPanic(err)
-		remoteBuf := bufio.NewReadWriter(bufio.NewReader(remote), bufio.NewWriter(remote))
-		for {
-			req, err := http.ReadRequest(clientBuf.Reader)
+		HijackConnect(func(req *http.Request, client net.Conn, ctx *goproxy.ProxyCtx) {
+			defer func() {
+				if e := recover(); e != nil {
+					ctx.Logf("error connecting to remote: %v", e)
+					client.Write([]byte("HTTP/1.1 500 Cannot reach destination\r\n\r\n"))
+				}
+				client.Close()
+			}()
+			clientBuf := bufio.NewReadWriter(bufio.NewReader(client), bufio.NewWriter(client))
+			remote, err := net.Dial("tcp", req.URL.Host)
 			orPanic(err)
-			orPanic(req.Write(remoteBuf))
-			orPanic(remoteBuf.Flush())
-			resp, err := http.ReadResponse(remoteBuf.Reader, req)
+			remoteBuf := bufio.NewReadWriter(bufio.NewReader(remote), bufio.NewWriter(remote))
+			for {
+				req, err := http.ReadRequest(clientBuf.Reader)
+				orPanic(err)
+				orPanic(req.Write(remoteBuf))
+				orPanic(remoteBuf.Flush())
+				resp, err := http.ReadResponse(remoteBuf.Reader, req)
 
-			orPanic(err)
-			orPanic(resp.Write(clientBuf.Writer))
-			orPanic(clientBuf.Flush())
-		}
-	})
+				orPanic(err)
+				orPanic(resp.Write(clientBuf.Writer))
+				orPanic(clientBuf.Flush())
+			}
+		})
 
 	// processing connections
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).DoFunc(
@@ -86,7 +86,7 @@ func NewProxy(hoverfly *Hoverfly) (*goproxy.ProxyHttpServer){
 
 // Creates goproxy.ProxyHttpServer and configures it to be used as a webserver for Hoverfly
 // goproxy is given a non proxy handler that uses the Hoverfly request processing
-func NewWebserverProxy(hoverfly *Hoverfly) (*goproxy.ProxyHttpServer) {
+func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +102,7 @@ func NewWebserverProxy(hoverfly *Hoverfly) (*goproxy.ProxyHttpServer) {
 		w.Header().Set("Req", req.RequestURI)
 		w.Header().Set("Resp", resp.Header.Get("Content-Length"))
 		w.Write(body)
-		})
+	})
 
 	if hoverfly.Cfg.Verbose {
 		proxy.OnRequest().DoFunc(
@@ -117,7 +117,6 @@ func NewWebserverProxy(hoverfly *Hoverfly) (*goproxy.ProxyHttpServer) {
 				return r, nil
 			})
 	}
-
 
 	log.WithFields(log.Fields{
 		"Destination":   hoverfly.Cfg.Destination,

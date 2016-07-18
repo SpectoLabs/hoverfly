@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
@@ -9,12 +10,11 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/rusenask/goproxy"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"regexp"
 	"sync"
-	"io/ioutil"
-	"bytes"
 	"time"
 )
 
@@ -65,9 +65,9 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		HTTP: &http.Client{Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.TLSVerification},
 		}},
-		Cfg:     cfg,
-		Counter: metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
-		Hooks:   make(ActionTypeHooks),
+		Cfg:            cfg,
+		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
+		Hooks:          make(ActionTypeHooks),
 		ResponseDelays: &models.ResponseDelayList{},
 	}
 	return h
@@ -194,7 +194,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 		}).Info("synthetic response created successfuly")
 
 		respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
-		if (respDelay != nil) {
+		if respDelay != nil {
 			respDelay.Execute()
 		}
 
@@ -217,7 +217,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 		}
 
 		respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
-		if (respDelay != nil) {
+		if respDelay != nil {
 			respDelay.Execute()
 		}
 
@@ -416,7 +416,7 @@ func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 		}).Info("Response found, returning")
 
 		respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
-		if (respDelay != nil) {
+		if respDelay != nil {
 			respDelay.Execute()
 		}
 

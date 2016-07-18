@@ -40,7 +40,7 @@ func (c *Configuration) SetMode(mode string) {
 }
 
 // GetMode - provides safe way to get current mode
-func (c *Configuration) GetMode() (string) {
+func (c *Configuration) GetMode() string {
 	c.mu.Lock()
 	mode := c.Mode
 	c.mu.Unlock()

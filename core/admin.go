@@ -596,7 +596,7 @@ func (d *Hoverfly) CurrentStateHandler(w http.ResponseWriter, req *http.Request,
 
 // StateHandler handles current proxy state
 func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-		var sr stateRequest
+	var sr stateRequest
 
 	// this is mainly for testing, since when you create
 	if r.Body == nil {
@@ -893,15 +893,15 @@ func (d *Hoverfly) UpdateResponseDelaysHandler(w http.ResponseWriter, req *http.
 		}).Error("Failed to unmarshal request body!")
 		mr.Message = fmt.Sprintf("Failed to decode request body. Error: %s", err.Error())
 		w.WriteHeader(400)
-	}  else if rd.Data == nil {
+	} else if rd.Data == nil {
 		log.Error("No delay data in the request body!")
 		mr.Message = fmt.Sprintf("Failed to get data from the request body.")
 		w.WriteHeader(422)
 	} else {
 		err = models.ValidateResponseDelayJson(rd)
-		if (err != nil) {
+		if err != nil {
 			log.WithFields(log.Fields{
-				"error":  err.Error(),
+				"error": err.Error(),
 			}).Error("Error validating response delays config supplied")
 			mr.Message = fmt.Sprintf("Failed to validate response delays config. Error: %s", err.Error())
 			w.WriteHeader(422)
