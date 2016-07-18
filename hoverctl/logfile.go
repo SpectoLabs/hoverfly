@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"errors"
+	"github.com/hpcloud/tail"
 )
 
 type LogFile struct {
@@ -24,7 +25,7 @@ func NewLogFile(directory HoverflyDirectory, adminPort, proxyPort string) (LogFi
 	}
 }
 
-func (l *LogFile) GetLogs() (string, error) {
+func (l *LogFile) getLogs() (string, error) {
 	content, err := ioutil.ReadFile(l.Path)
 	if err != nil {
 		log.Debug(err.Error())
@@ -32,4 +33,30 @@ func (l *LogFile) GetLogs() (string, error) {
 	}
 
 	return string(content), nil
+}
+
+func (l * LogFile) Print() (error) {
+	logs, err := l.getLogs()
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Print(logs)
+
+	return nil
+}
+
+func (l* LogFile) Tail() (error) {
+	tail, err := tail.TailFile(l.Path, tail.Config{Follow: true})
+	if err != nil {
+		log.Debug(err.Error())
+		return errors.New("Could not follow Hoverfly log file")
+	}
+
+	for line := range tail.Lines {
+		fmt.Println(line.Text)
+	}
+
+	return nil
 }

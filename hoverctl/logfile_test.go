@@ -45,7 +45,7 @@ func Test_Logfile_GetLogs(t *testing.T) {
 
 	ioutil.WriteFile(logfile.Path, []byte("testing rocks"), 0644)
 
-	logs, err := logfile.GetLogs()
+	logs, err := logfile.getLogs()
 	Expect(err).To(BeNil())
 
 	Expect(logs).To(Equal("testing rocks"))
@@ -62,7 +62,7 @@ func Test_Logfile_GetLogs_ReturnsErrorIfLogDoesNotExist(t *testing.T) {
 
 	logfile := NewLogFile(hoverflyDirectory, "9856", "6589")
 
-	_, err := logfile.GetLogs()
+	_, err := logfile.getLogs()
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Could not open Hoverfly log file"))
 }
