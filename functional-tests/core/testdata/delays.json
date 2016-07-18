@@ -1,11 +1,11 @@
 {
   "data": [
     {
-      "hostPattern": "virtual\\.com",
+      "urlPattern": "virtual\\.com",
       "delay": 100
     },
     {
-      "hostPattern": "virtual\\.com",
+      "urlPattern": "virtual\\.com",
       "delay": 110
     }
   ]

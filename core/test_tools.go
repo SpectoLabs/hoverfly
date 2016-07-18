@@ -12,6 +12,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/boltdb/bolt"
 )
 
@@ -57,11 +58,12 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 	cfg.AuthEnabled = false
 	// preparing client
 	dbClient := &Hoverfly{
-		HTTP:          &http.Client{Transport: tr},
-		RequestCache:  requestCache,
-		Cfg:           cfg,
-		Counter:       metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
-		MetadataCache: metaCache,
+		HTTP:           &http.Client{Transport: tr},
+		RequestCache:   requestCache,
+		Cfg:            cfg,
+		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
+		MetadataCache:  metaCache,
+		ResponseDelays: &models.ResponseDelayList{},
 	}
 	return server, dbClient
 }

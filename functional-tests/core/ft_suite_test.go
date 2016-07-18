@@ -55,86 +55,97 @@ var _ = AfterSuite(func() {
 })
 
 func startHoverfly(adminPort, proxyPort int) * exec.Cmd {
-	workingDirectory, _ := os.Getwd()
-	hoverflyBinaryUri := filepath.Join(workingDirectory, "bin/hoverfly")
+	hoverflyBinaryUri := buildBinaryPath()
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
 
 	err := hoverflyCmd.Start()
 
-	if err != nil {
-		fmt.Println("Unable to start Hoverfly")
-		fmt.Println(hoverflyBinaryUri)
-		fmt.Println("Is the binary there?")
-		os.Exit(1)
-	}
+	binaryErrorCheck(err, hoverflyBinaryUri)
+	healthcheck(adminPort)
 
-	Eventually(func() int {
-		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
-		if err == nil {
-			return resp.StatusCode
-		} else {
-			fmt.Println(err.Error())
-			return 0
-		}
-	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+	return hoverflyCmd
+}
+
+func startHoverflyWithDatabase(adminPort, proxyPort int) * exec.Cmd {
+	hoverflyBinaryUri := buildBinaryPath()
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
+
+	err := hoverflyCmd.Start()
+
+	binaryErrorCheck(err, hoverflyBinaryUri)
+	healthcheck(adminPort)
+
+	return hoverflyCmd
+}
+
+func startHoverflyWebServerWithDatabase(adminPort, proxyPort int) * exec.Cmd {
+	hoverflyBinaryUri := buildBinaryPath()
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-webserver")
+
+	err := hoverflyCmd.Start()
+
+	binaryErrorCheck(err, hoverflyBinaryUri)
+	healthcheck(adminPort)
 
 	return hoverflyCmd
 }
 
 func startHoverflyWebServer(adminPort, proxyPort int) * exec.Cmd {
-	workingDirectory, _ := os.Getwd()
-	hoverflyBinaryUri := filepath.Join(workingDirectory, "bin/hoverfly")
+	hoverflyBinaryUri := buildBinaryPath()
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-webserver")
 
 	err := hoverflyCmd.Start()
 
-	if err != nil {
-		fmt.Println("Unable to start Hoverfly")
-		fmt.Println(hoverflyBinaryUri)
-		fmt.Println("Is the binary there?")
-		os.Exit(1)
-	}
-
-	Eventually(func() int {
-		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
-		if err == nil {
-			return resp.StatusCode
-		} else {
-			fmt.Println(err.Error())
-			return 0
-		}
-	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+	binaryErrorCheck(err, hoverflyBinaryUri)
+	healthcheck(adminPort)
 
 	return hoverflyCmd
 }
 
 func startHoverflyWithMiddleware(adminPort, proxyPort int, middlewarePath string) * exec.Cmd {
-	workingDirectory, _ := os.Getwd()
-	hoverflyBinaryUri := filepath.Join(workingDirectory, "bin/hoverfly")
+	hoverflyBinaryUri := buildBinaryPath()
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-middleware", middlewarePath)
 	hoverflyCmd.Stdout = os.Stdout
 	hoverflyCmd.Stderr = os.Stderr
 
 	err := hoverflyCmd.Start()
 
+	binaryErrorCheck(err, hoverflyBinaryUri)
+	healthcheck(adminPort)
+
+	return hoverflyCmd
+}
+
+func buildBinaryPath() (string) {
+	workingDirectory, _ := os.Getwd()
+	return filepath.Join(workingDirectory, "bin/hoverfly")
+}
+
+func binaryErrorCheck(err error, binaryPath string) {
 	if err != nil {
 		fmt.Println("Unable to start Hoverfly")
-		fmt.Println(hoverflyBinaryUri)
+		fmt.Println(binaryPath)
 		fmt.Println("Is the binary there?")
 		os.Exit(1)
 	}
+}
 
-	Eventually(func() int {
-		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", adminPort))
+func healthcheck(adminPort int) {
+	var err error
+	var resp *http.Response
+
+	hasPassed := Eventually(func() int {
+		resp, err = http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
 		if err == nil {
 			return resp.StatusCode
 		} else {
-			fmt.Println(err.Error())
 			return 0
 		}
-	}, time.Second * 1).Should(BeNumerically("==", http.StatusOK))
+	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
 
-	return hoverflyCmd
+	if !hasPassed {
+		fmt.Println(err.Error())
+	}
 }
 
 func stopHoverfly() {
@@ -185,7 +196,6 @@ func ExportHoverflyRecords() (io.Reader) {
 func ImportHoverflyRecords(payload io.Reader) {
 	req := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(payload)
 	res := DoRequest(req)
-	fmt.Println(hoverflyAdminUrl)
 	Expect(res.StatusCode).To(Equal(200))
 }
 

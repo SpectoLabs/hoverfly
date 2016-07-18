@@ -6,24 +6,34 @@ import (
 	"time"
 	"errors"
 	"fmt"
+	"strings"
+	"encoding/json"
 )
 
 type ResponseDelay struct {
-	HostPattern string
-	Delay int
+	UrlPattern string `json:"urlpattern"`
+	HttpMethod string `json:"httpmethod"`
+	Delay      int `json:"delay"`
 }
 
 type ResponseDelayJson struct {
-	Data *[]ResponseDelay
+	Data *ResponseDelayList `json:"data"`
+}
+
+type ResponseDelayList []ResponseDelay
+
+type ResponseDelays interface {
+	Json() []byte
+	GetDelay(url, httpMethod string) (*ResponseDelay)
+	Len() int
 }
 
 func ValidateResponseDelayJson(j ResponseDelayJson) (err error) {
-	// filter any entries that don't meet the invariants
 	if j.Data != nil {
 		for _, delay := range *j.Data {
-			if delay.HostPattern != "" && delay.Delay != 0 {
-				if _, err := regexp.Compile(delay.HostPattern); err != nil {
-					return errors.New(fmt.Sprintf("Response delay entry skipped due to invalid pattern : %s", delay.HostPattern))
+			if delay.UrlPattern != "" && delay.Delay != 0 {
+				if _, err := regexp.Compile(delay.UrlPattern); err != nil {
+					return errors.New(fmt.Sprintf("Response delay entry skipped due to invalid pattern : %s", delay.UrlPattern))
 				}
 			} else {
 				return errors.New(fmt.Sprintf("Config error - Missing values found in: %v", delay))
@@ -40,3 +50,31 @@ func (this *ResponseDelay) Execute() {
 	log.Info("Response delay completed")
 }
 
+func (this *ResponseDelayList) GetDelay(url, httpMethod string) (*ResponseDelay) {
+	for _, val := range *this {
+		match := regexp.MustCompile(val.UrlPattern).MatchString(url)
+		if match {
+			if val.HttpMethod == "" || strings.EqualFold(val.HttpMethod, httpMethod) {
+				log.Info("Found response delay setting for this request host: ", val)
+				return &val
+			}
+		}
+	}
+	return nil
+}
+
+func (this *ResponseDelayList) Json() []byte {
+	resp := ResponseDelayJson{
+		Data: this,
+	}
+	b, _ := json.Marshal(resp)
+	return b
+}
+
+func (this *ResponseDelayList) Len() int {
+	list := []ResponseDelay{}
+	if this != nil {
+		list = append(list, *this...)
+	}
+	return len(list)
+}

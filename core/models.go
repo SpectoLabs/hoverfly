@@ -91,7 +91,6 @@ func getRequestDetails(req *http.Request) (requestObj models.RequestDetails, err
 	return
 }
 
-
 // ActionType - action type can be things such as "RequestCaptured", "GotResponse" - anything
 type ActionType string
 

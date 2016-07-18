@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
@@ -9,12 +10,11 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/rusenask/goproxy"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"regexp"
 	"sync"
-	"io/ioutil"
-	"bytes"
 	"time"
 )
 
@@ -49,6 +49,8 @@ type Hoverfly struct {
 	Counter        *metrics.CounterByMode
 	Hooks          ActionTypeHooks
 
+	ResponseDelays models.ResponseDelays
+
 	Proxy *goproxy.ProxyHttpServer
 	SL    *StoppableListener
 	mu    sync.Mutex
@@ -63,15 +65,18 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		HTTP: &http.Client{Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.TLSVerification},
 		}},
-		Cfg:     cfg,
-		Counter: metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
-		Hooks:   make(ActionTypeHooks),
+		Cfg:            cfg,
+		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
+		Hooks:          make(ActionTypeHooks),
+		ResponseDelays: &models.ResponseDelayList{},
 	}
 	return h
 }
 
 // StartProxy - starts proxy with current configuration, this method is non blocking.
 func (hf *Hoverfly) StartProxy() error {
+
+	rebuildHashes(hf.RequestCache, hf.Cfg.Webserver)
 
 	if hf.Cfg.ProxyPort == "" {
 		return fmt.Errorf("Proxy port is not set!")
@@ -138,8 +143,8 @@ func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
 	return
 }
 
-func (hf *Hoverfly) UpdateResponseDelays(responseDelays []models.ResponseDelay) {
-	hf.Cfg.ResponseDelays = responseDelays
+func (hf *Hoverfly) UpdateResponseDelays(responseDelays models.ResponseDelayList) {
+	hf.ResponseDelays = &responseDelays
 	log.Info("Response delay config updated on hoverfly")
 }
 
@@ -188,8 +193,8 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 			"destination": req.Host,
 		}).Info("synthetic response created successfuly")
 
-		respDelay := hf.Cfg.GetDelay(req.Host)
-		if (respDelay != nil) {
+		respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
+		if respDelay != nil {
 			respDelay.Execute()
 		}
 
@@ -211,8 +216,8 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 				http.StatusServiceUnavailable)
 		}
 
-		respDelay := hf.Cfg.GetDelay(req.Host)
-		if (respDelay != nil) {
+		respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
+		if respDelay != nil {
 			respDelay.Execute()
 		}
 
@@ -221,11 +226,6 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 	}
 
 	newResponse := hf.getResponse(req)
-
-	respDelay := hf.Cfg.GetDelay(req.Host)
-	if (respDelay != nil) {
-		respDelay.Execute()
-	}
 
 	return req, newResponse
 
@@ -414,6 +414,11 @@ func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 			"status":      payload.Response.Status,
 			"bodyLength":  response.ContentLength,
 		}).Info("Response found, returning")
+
+		respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
+		if respDelay != nil {
+			respDelay.Execute()
+		}
 
 		return response
 

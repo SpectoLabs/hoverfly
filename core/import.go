@@ -172,7 +172,7 @@ func (hf *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
 				if hf.Cfg.Webserver {
 					err = hf.RequestCache.Set([]byte(pl.IdWithoutHost()), bts)
 				} else {
-  					err = hf.RequestCache.Set([]byte(pl.Id()), bts)
+					err = hf.RequestCache.Set([]byte(pl.Id()), bts)
 				}
 
 				if err == nil {

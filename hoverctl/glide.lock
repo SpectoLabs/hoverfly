@@ -1,24 +1,24 @@
-hash: 1476f3808348ffd45cf085c6a7a525fcf9aec8d97076201e82be0c1432228137
-updated: 2016-06-21T09:21:51.240569507+01:00
+hash: 805a3ceac6b5771b7d087b7492cb9b91c01cc448cb5b682da97263bd79113588
+updated: 2016-07-18T13:24:27.878374648+01:00
 imports:
 - name: github.com/alecthomas/template
-  version: a0175ee3bccc567396460bf5acd36800cb10c49c
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
   subpackages:
   - parse
 - name: github.com/alecthomas/units
-  version: 2efee857e7cfd4f3d0138cc3cbb1b4966962b93a
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: github.com/BurntSushi/toml
-  version: f0aeabca5a127c4078abb8c8d64298b147264b55
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: github.com/dghubble/sling
-  version: 4af638d6d3265b9f740bf6d2665ef20d7abd0103
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: github.com/fsnotify/fsnotify
-  version: 30411dbcefb7a1da7e84f75530ad3abe4011b4f8
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: github.com/google/go-querystring
-  version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
   subpackages:
   - query
 - name: github.com/hashicorp/hcl
-  version: d7400db7143f8e869812e50a53acd6c8d92af3b8
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -28,30 +28,32 @@ imports:
   - hcl/strconv
   - json/scanner
   - json/token
+- name: github.com/hpcloud/tail
+  version: a30252cb686a21eb2d0b98132633053ec2f7f1e5
 - name: github.com/magiconair/properties
-  version: c265cfa48dda6474e208715ca93e987829f572f8
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: github.com/mitchellh/go-homedir
-  version: 1111e456ffea841564ac0fa5f69c26ef44dafec9
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: github.com/mitchellh/mapstructure
-  version: d2dd0262208475919e1a362f675cfc0e7c10e905
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: github.com/onsi/gomega
-  version: 3e93f011213c200aadafcb19ed56eb718381cfbd
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: github.com/Sirupsen/logrus
-  version: f3cfb454f4c209e6668c95216c4744b8fddb2356
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: github.com/spf13/cast
-  version: 27b586b42e29bec072fe7379259cc719e1289da6
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: github.com/spf13/jwalterweatherman
-  version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: github.com/spf13/pflag
-  version: 367864438f1b1a3c7db4da06a2f55b144e6784e0
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: github.com/spf13/viper
-  version: c1ccc378a054ea8d4e38d8c67f6938d4760b53dd
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: golang.org/x/sys
-  version: 62bee037599929a6e9146f29d10dd5208c43507d
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
   subpackages:
   - unix
 - name: gopkg.in/alecthomas/kingpin.v2
-  version: 8cccfa8eb2e3183254457fb1749b2667fbc364c7
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 - name: gopkg.in/yaml.v2
-  version: a83829b6f1293c91addabc89d0571c246397bbf4
+  version: 64e3b546cafcb35819eabce29c65721e297c1897
 devImports: []

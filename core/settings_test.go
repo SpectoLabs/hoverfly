@@ -1,7 +1,6 @@
 package hoverfly
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"os"
 	"testing"
@@ -61,38 +60,6 @@ func TestGetMode(t *testing.T) {
 	cfg := Configuration{Mode: "capture"}
 
 	testutil.Expect(t, cfg.GetMode(), "capture")
-}
-
-func TestGetDelayWithRegexMatch(t *testing.T) {
-	delay := models.ResponseDelay{
-		HostPattern: "example",
-		Delay:       100,
-	}
-	delays := []models.ResponseDelay{delay}
-	cfg := Configuration{ResponseDelays: delays}
-
-	delayMatch := cfg.GetDelay("delayexample.com")
-	testutil.Expect(t, *delayMatch, delay)
-
-	delayMatch = cfg.GetDelay("nodelay.com")
-	var nilDelay *models.ResponseDelay
-	testutil.Expect(t, delayMatch, nilDelay)
-}
-
-func TestMultipleMatchingDelaysReturnsTheFirst(t *testing.T) {
-	delayOne := models.ResponseDelay{
-		HostPattern: "example.com",
-		Delay:       100,
-	}
-	delayTwo := models.ResponseDelay{
-		HostPattern: "example",
-		Delay:       100,
-	}
-	delays := []models.ResponseDelay{delayOne, delayTwo}
-	cfg := Configuration{ResponseDelays: delays}
-
-	delayMatch := cfg.GetDelay("delayexample.com")
-	testutil.Expect(t, *delayMatch, delayOne)
 }
 
 func Test_InitSettings_SetsTheWebserverFieldToFalse(t *testing.T) {
