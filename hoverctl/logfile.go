@@ -28,7 +28,7 @@ func (l *LogFile) GetLogs() (string, error) {
 	content, err := ioutil.ReadFile(l.Path)
 	if err != nil {
 		log.Debug(err.Error())
-		return "", errors.New("Unable to open Hoverfly log file")
+		return "", errors.New("Could not open Hoverfly log file")
 	}
 
 	return string(content), nil

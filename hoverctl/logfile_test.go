@@ -64,5 +64,5 @@ func Test_Logfile_GetLogs_ReturnsErrorIfLogDoesNotExist(t *testing.T) {
 
 	_, err := logfile.GetLogs()
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Unable to open Hoverfly log file"))
+	Expect(err.Error()).To(Equal("Could not open Hoverfly log file"))
 }
