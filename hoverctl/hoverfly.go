@@ -394,6 +394,16 @@ func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags str
 
 	cmd := exec.Command("hoverfly", "-db", "memory", "-ap", h.AdminPort, "-pp", h.ProxyPort, flags)
 
+	file, err := os.Create(hoverflyDirectory.Path + "/hoverfly." + h.AdminPort + "." + h.ProxyPort + ".log")
+	if err != nil {
+		log.Debug(err)
+		return errors.New("Could not create log file")
+	}
+
+	cmd.Stdout = file
+	cmd.Stderr = file
+	defer file.Close()
+
 	err = cmd.Start()
 
 	if err != nil {
