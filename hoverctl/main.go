@@ -6,6 +6,7 @@ import (
 	"os"
 	"fmt"
 	"errors"
+	"github.com/hpcloud/tail"
 )
 
 var (
@@ -214,6 +215,18 @@ func main() {
 			handleIfError(err)
 
 			fmt.Print(logs)
+
+			if *followLogsFlag {
+				tail, err := tail.TailFile(logfile.Path, tail.Config{Follow: true})
+				if err != nil {
+					log.Debug(err.Error())
+					handleIfError(errors.New("Could not follow Hoverfly log file"))
+				}
+
+				for line := range tail.Lines {
+					fmt.Println(line.Text)
+				}
+			}
 	}
 }
 
