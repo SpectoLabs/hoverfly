@@ -227,11 +227,6 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 
 	newResponse := hf.getResponse(req)
 
-	respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
-	if (respDelay != nil) {
-		respDelay.Execute()
-	}
-
 	return req, newResponse
 
 }
@@ -419,6 +414,11 @@ func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 			"status":      payload.Response.Status,
 			"bodyLength":  response.ContentLength,
 		}).Info("Response found, returning")
+
+		respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
+		if (respDelay != nil) {
+			respDelay.Execute()
+		}
 
 		return response
 
