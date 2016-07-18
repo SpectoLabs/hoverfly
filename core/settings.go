@@ -6,8 +6,6 @@ import (
 	"sync"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"regexp"
 )
 
 // Configuration - initial structure of configuration
@@ -21,8 +19,6 @@ type Configuration struct {
 	Webserver    bool
 
 	TLSVerification bool
-
-	ResponseDelays []models.ResponseDelay
 
 	Verbose     bool
 	Development bool
@@ -44,22 +40,11 @@ func (c *Configuration) SetMode(mode string) {
 }
 
 // GetMode - provides safe way to get current mode
-func (c *Configuration) GetMode() (string) {
+func (c *Configuration) GetMode() string {
 	c.mu.Lock()
 	mode := c.Mode
 	c.mu.Unlock()
 	return mode
-}
-
-func (c *Configuration) GetDelay(host string) (delay *models.ResponseDelay) {
-	for _, val := range c.ResponseDelays {
-		match := regexp.MustCompile(val.HostPattern).MatchString(host)
-		if match {
-			log.Info("Found response delay setting for this request host: ", delay)
-			return &val
-		}
-	}
-	return delay
 }
 
 // DefaultPort - default proxy port

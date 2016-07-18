@@ -1,11 +1,11 @@
 {
   "data": [
     {
-      "hostPattern": "host1",
+      "urlPattern": "host1",
       "delay": 100
     },
     {
-      "hostPattern": "host2",
+      "urlPattern": "host2",
       "delay": 110
     }
   ]

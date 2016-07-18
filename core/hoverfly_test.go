@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"testing"
 )
@@ -129,4 +131,188 @@ func TestProcessModifyRequest(t *testing.T) {
 	testutil.Refute(t, newResp, nil)
 
 	testutil.Expect(t, newResp.StatusCode, 202)
+}
+
+func TestURLToStringWorksAsExpected(t *testing.T) {
+	testUrl := url.URL{
+		Scheme:   "http",
+		Host:     "test.com",
+		Path:     "/args/1",
+		RawQuery: "query=val",
+	}
+	testutil.Expect(t, testUrl.String(), "http://test.com/args/1?query=val")
+}
+
+type ResponseDelayListStub struct {
+	gotDelays int
+}
+
+func (this *ResponseDelayListStub) Json() []byte {
+	return nil
+}
+
+func (this *ResponseDelayListStub) Len() int {
+	return this.Len()
+}
+
+func (this *ResponseDelayListStub) GetDelay(urlPattern, httpMethod string) *models.ResponseDelay {
+	this.gotDelays++
+	return nil
+}
+
+func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+
+	r, err := http.NewRequest("GET", "http://somehost.com", nil)
+	testutil.Expect(t, err, nil)
+
+	// capturing
+	dbClient.Cfg.SetMode("capture")
+	_, resp := dbClient.processRequest(r)
+
+	testutil.Expect(t, resp.StatusCode, 201)
+
+	// virtualizing
+	dbClient.Cfg.SetMode(SimulateMode)
+
+	stub := ResponseDelayListStub{}
+	dbClient.ResponseDelays = &stub
+
+	_, newResp := dbClient.processRequest(r)
+
+	testutil.Expect(t, newResp.StatusCode, 201)
+
+	testutil.Expect(t, stub.gotDelays, 1)
+}
+
+func TestDelayNotAppliedToFailedSimulateRequest(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	r, err := http.NewRequest("GET", "http://somehost.com", nil)
+	testutil.Expect(t, err, nil)
+
+	// virtualizing
+	dbClient.Cfg.SetMode(SimulateMode)
+
+	stub := ResponseDelayListStub{}
+	dbClient.ResponseDelays = &stub
+
+	_, newResp := dbClient.processRequest(r)
+
+	testutil.Expect(t, newResp.StatusCode, 412)
+
+	testutil.Expect(t, stub.gotDelays, 0)
+}
+
+func TestDelayNotAppliedToCaptureRequest(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+
+	r, err := http.NewRequest("GET", "http://somehost.com", nil)
+	testutil.Expect(t, err, nil)
+
+	dbClient.Cfg.SetMode("capture")
+
+	stub := ResponseDelayListStub{}
+	dbClient.ResponseDelays = &stub
+
+	_, resp := dbClient.processRequest(r)
+
+	testutil.Expect(t, resp.StatusCode, 201)
+
+	testutil.Expect(t, stub.gotDelays, 0)
+}
+
+func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+
+	// getting reflect middleware
+	dbClient.Cfg.Middleware = "./examples/middleware/reflect_body/reflect_body.py"
+
+	bodyBytes := []byte("request_body_here")
+
+	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	testutil.Expect(t, err, nil)
+
+	dbClient.Cfg.SetMode(SynthesizeMode)
+
+	stub := ResponseDelayListStub{}
+	dbClient.ResponseDelays = &stub
+	_, newResp := dbClient.processRequest(r)
+
+	testutil.Expect(t, newResp.StatusCode, 200)
+
+	testutil.Expect(t, stub.gotDelays, 1)
+}
+
+func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+
+	// getting reflect middleware
+	dbClient.Cfg.Middleware = "./examples/middleware/reflect_body/no_exist.py"
+
+	bodyBytes := []byte("request_body_here")
+
+	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	testutil.Expect(t, err, nil)
+
+	dbClient.Cfg.SetMode(SynthesizeMode)
+
+	stub := ResponseDelayListStub{}
+	dbClient.ResponseDelays = &stub
+	_, newResp := dbClient.processRequest(r)
+
+	testutil.Expect(t, newResp.StatusCode, 503)
+
+	testutil.Expect(t, stub.gotDelays, 0)
+}
+
+func TestDelayAppliedToModifyRequest(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	// getting reflect middleware
+	dbClient.Cfg.Middleware = "./examples/middleware/modify_request/modify_request.py"
+
+	r, err := http.NewRequest("POST", "http://somehost.com", nil)
+	testutil.Expect(t, err, nil)
+
+	dbClient.Cfg.SetMode(ModifyMode)
+
+	stub := ResponseDelayListStub{}
+	dbClient.ResponseDelays = &stub
+	_, newResp := dbClient.processRequest(r)
+
+	testutil.Expect(t, newResp.StatusCode, 202)
+
+	testutil.Expect(t, stub.gotDelays, 1)
+}
+
+func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	// getting reflect middleware
+	dbClient.Cfg.Middleware = "./examples/middleware/modify_request/no_exist.py"
+
+	r, err := http.NewRequest("POST", "http://somehost.com", nil)
+	testutil.Expect(t, err, nil)
+
+	dbClient.Cfg.SetMode(ModifyMode)
+
+	stub := ResponseDelayListStub{}
+	dbClient.ResponseDelays = &stub
+	_, newResp := dbClient.processRequest(r)
+
+	testutil.Expect(t, newResp.StatusCode, 503)
+
+	testutil.Expect(t, stub.gotDelays, 0)
 }

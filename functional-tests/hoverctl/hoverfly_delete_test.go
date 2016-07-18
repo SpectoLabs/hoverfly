@@ -102,7 +102,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/delays", adminPort)))
 				bytes, _ := ioutil.ReadAll(resp.Body)
-				Expect(string(bytes)).To(Equal(`{"Data":[]}`))
+				Expect(string(bytes)).To(Equal(`{"data":[]}`))
 			})
 		})
 
@@ -161,7 +161,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 					resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/delays", adminPort)))
 					bytes, _ := ioutil.ReadAll(resp.Body)
-					Expect(string(bytes)).To(Equal(`{"Data":[]}`))
+					Expect(string(bytes)).To(Equal(`{"data":[]}`))
 
 					resp = DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
 					bytes, _ = ioutil.ReadAll(resp.Body)

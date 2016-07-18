@@ -74,7 +74,7 @@ func (m *messageResponse) Encode() ([]byte, error) {
 func (d *Hoverfly) StartAdminInterface() {
 
 	// starting admin interface
-	mux := getBoneRouter(*d)
+	mux := getBoneRouter(d)
 	n := negroni.Classic()
 
 	logLevel := log.ErrorLevel
@@ -95,7 +95,7 @@ func (d *Hoverfly) StartAdminInterface() {
 }
 
 // getBoneRouter returns mux for admin interface
-func getBoneRouter(d Hoverfly) *bone.Mux {
+func getBoneRouter(d *Hoverfly) *bone.Mux {
 	mux := bone.New()
 
 	// getting auth controllers and middleware
@@ -596,7 +596,7 @@ func (d *Hoverfly) CurrentStateHandler(w http.ResponseWriter, req *http.Request,
 
 // StateHandler handles current proxy state
 func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-		var sr stateRequest
+	var sr stateRequest
 
 	// this is mainly for testing, since when you create
 	if r.Body == nil {
@@ -827,16 +827,13 @@ func (d *Hoverfly) DeleteMetadataHandler(w http.ResponseWriter, req *http.Reques
 }
 
 func (d *Hoverfly) GetResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	resp := models.ResponseDelayJson{
-		Data: &d.Cfg.ResponseDelays,
-	}
-	b, _ := json.Marshal(resp)
+	b := d.ResponseDelays.Json()
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(b)
 }
 
 func (d *Hoverfly) DeleteAllResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	d.Cfg.ResponseDelays = []models.ResponseDelay{}
+	d.ResponseDelays = &models.ResponseDelayList{}
 
 	var response messageResponse
 	response.Message = "Delays deleted successfuly"
@@ -896,15 +893,15 @@ func (d *Hoverfly) UpdateResponseDelaysHandler(w http.ResponseWriter, req *http.
 		}).Error("Failed to unmarshal request body!")
 		mr.Message = fmt.Sprintf("Failed to decode request body. Error: %s", err.Error())
 		w.WriteHeader(400)
-	}  else if rd.Data == nil {
+	} else if rd.Data == nil {
 		log.Error("No delay data in the request body!")
 		mr.Message = fmt.Sprintf("Failed to get data from the request body.")
 		w.WriteHeader(422)
 	} else {
 		err = models.ValidateResponseDelayJson(rd)
-		if (err != nil) {
+		if err != nil {
 			log.WithFields(log.Fields{
-				"error":  err.Error(),
+				"error": err.Error(),
 			}).Error("Error validating response delays config supplied")
 			mr.Message = fmt.Sprintf("Failed to validate response delays config. Error: %s", err.Error())
 			w.WriteHeader(422)

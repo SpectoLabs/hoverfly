@@ -240,7 +240,6 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 	cfg := Configuration{Webserver: false}
 	hv := Hoverfly{RequestCache: cache, Cfg: &cfg}
 
-
 	RegisterTestingT(t)
 
 	encodedPayload := models.PayloadView{
