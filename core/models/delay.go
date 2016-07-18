@@ -72,5 +72,9 @@ func (this *ResponseDelayList) Json() []byte {
 }
 
 func (this *ResponseDelayList) Len() int {
-	return len(this)
+	list := []ResponseDelay{}
+	if this != nil {
+		list = append(list, *this...)
+	}
+	return len(list)
 }

@@ -811,7 +811,7 @@ func TestUpdateResponseDelays(t *testing.T) {
 	testutil.Expect(t, rec.Code, http.StatusCreated)
 
 	// normal equality checking doesn't work on slices (!!)
-	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, delays), true)
+	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, &delays), true)
 }
 
 func TestInvalidJSONSyntaxUpdateResponseDelays(t *testing.T) {
@@ -833,8 +833,7 @@ func TestInvalidJSONSyntaxUpdateResponseDelays(t *testing.T) {
 	fmt.Println(dbClient.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)
-	var expd models.ResponseDelayList
-	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, expd), true)
+	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, &models.ResponseDelayList{}), true)
 }
 
 func TestInvalidJSONSemanticsUpdateResponseDelays(t *testing.T) {
@@ -856,8 +855,7 @@ func TestInvalidJSONSemanticsUpdateResponseDelays(t *testing.T) {
 	fmt.Println(dbClient.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)
-	var expd models.ResponseDelayList
-	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, expd), true)
+	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, &models.ResponseDelayList{}), true)
 }
 
 func TestJSONWithInvalidHostPatternUpdateResponseDelays(t *testing.T) {
@@ -880,8 +878,7 @@ func TestJSONWithInvalidHostPatternUpdateResponseDelays(t *testing.T) {
 	fmt.Println(dbClient.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)
-	var expd models.ResponseDelayList
-	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, expd), true)
+	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, &models.ResponseDelayList{}), true)
 }
 
 func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
@@ -904,7 +901,6 @@ func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
 	fmt.Println(dbClient.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)
-	var expd models.ResponseDelayList
-	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, expd), true)
+	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, &models.ResponseDelayList{}), true)
 }
 

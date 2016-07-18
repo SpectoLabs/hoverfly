@@ -13,6 +13,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/boltdb/bolt"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -62,6 +63,7 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 		Cfg:           cfg,
 		Counter:       metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		MetadataCache: metaCache,
+		ResponseDelays: &models.ResponseDelayList{},
 	}
 	return server, dbClient
 }

@@ -68,6 +68,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		Cfg:     cfg,
 		Counter: metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		Hooks:   make(ActionTypeHooks),
+		ResponseDelays: &models.ResponseDelayList{},
 	}
 	return h
 }
