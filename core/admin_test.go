@@ -767,7 +767,7 @@ func TestDeleteAllResponseDelaysHandler(t *testing.T) {
 		Delay: 100,
 	}
 	delays := models.ResponseDelayList{delay}
-	dbClient.ResponseDelays = delays
+	dbClient.ResponseDelays = &delays
 	m := getBoneRouter(dbClient)
 
 
@@ -779,7 +779,7 @@ func TestDeleteAllResponseDelaysHandler(t *testing.T) {
 	m.ServeHTTP(rec, req)
 	testutil.Expect(t, rec.Code, http.StatusOK)
 
-	testutil.Expect(t, len(dbClient.ResponseDelays), 0)
+	testutil.Expect(t, dbClient.ResponseDelays.Len(), 0)
 }
 
 func TestUpdateResponseDelays(t *testing.T) {

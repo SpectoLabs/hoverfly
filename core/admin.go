@@ -827,16 +827,13 @@ func (d *Hoverfly) DeleteMetadataHandler(w http.ResponseWriter, req *http.Reques
 }
 
 func (d *Hoverfly) GetResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	resp := models.ResponseDelayJson{
-		Data: &d.ResponseDelays,
-	}
-	b, _ := json.Marshal(resp)
+	b := d.ResponseDelays.Json()
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(b)
 }
 
 func (d *Hoverfly) DeleteAllResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	d.ResponseDelays = models.ResponseDelayList{}
+	d.ResponseDelays = &models.ResponseDelayList{}
 
 	var response messageResponse
 	response.Message = "Delays deleted successfuly"

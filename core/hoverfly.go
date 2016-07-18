@@ -49,7 +49,7 @@ type Hoverfly struct {
 	Counter        *metrics.CounterByMode
 	Hooks          ActionTypeHooks
 
-	ResponseDelays models.ResponseDelayList
+	ResponseDelays models.ResponseDelays
 
 	Proxy *goproxy.ProxyHttpServer
 	SL    *StoppableListener
@@ -143,7 +143,7 @@ func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
 }
 
 func (hf *Hoverfly) UpdateResponseDelays(responseDelays models.ResponseDelayList) {
-	hf.ResponseDelays = responseDelays
+	hf.ResponseDelays = &responseDelays
 	log.Info("Response delay config updated on hoverfly")
 }
 

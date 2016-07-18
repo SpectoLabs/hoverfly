@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"encoding/json"
 )
 
 type ResponseDelay struct {
@@ -21,6 +22,11 @@ type ResponseDelayJson struct {
 
 type ResponseDelayList []ResponseDelay
 
+type ResponseDelays interface {
+	Json() []byte
+	GetDelay(url, httpMethod string) (*ResponseDelay)
+	Len() int
+}
 
 func ValidateResponseDelayJson(j ResponseDelayJson) (err error) {
 	if j.Data != nil {
@@ -55,4 +61,16 @@ func (this *ResponseDelayList) GetDelay(url, httpMethod string) (*ResponseDelay)
 		}
 	}
 	return nil
+}
+
+func (this *ResponseDelayList) Json() []byte {
+	resp := ResponseDelayJson{
+		Data: this,
+	}
+	b, _ := json.Marshal(resp)
+	return b
+}
+
+func (this *ResponseDelayList) Len() int {
+	return this.Len()
 }

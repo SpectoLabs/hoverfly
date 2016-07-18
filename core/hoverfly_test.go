@@ -11,6 +11,7 @@ import (
 	"os"
 	"testing"
 	"net/url"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 func TestGetNewHoverflyCheckConfig(t *testing.T) {
@@ -140,4 +141,52 @@ func TestURLToStringWorksAsExpected(t *testing.T) {
 		RawQuery: "query=val",
 	}
 	testutil.Expect(t, testUrl.String(), "http://test.com/args/1?query=val")
+}
+
+type ResponseDelayListStub struct {
+	gotDelays int;
+}
+
+func (this *ResponseDelayListStub) Json() []byte {
+	return nil
+}
+
+func (this *ResponseDelayListStub) Len() int {
+	return this.Len()
+}
+
+func (this *ResponseDelayListStub) GetDelay(urlPattern, httpMethod string) (*models.ResponseDelay){
+	this.gotDelays++;
+	return nil;
+}
+
+func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+
+	r, err := http.NewRequest("GET", "http://somehost.com", nil)
+	testutil.Expect(t, err, nil)
+
+	// capturing
+	dbClient.Cfg.SetMode("capture")
+	req, resp := dbClient.processRequest(r)
+
+	testutil.Refute(t, req, nil)
+	testutil.Refute(t, resp, nil)
+	testutil.Expect(t, resp.StatusCode, 201)
+
+	// virtualizing
+	dbClient.Cfg.SetMode(SimulateMode)
+
+	stub := ResponseDelayListStub{}
+	dbClient.ResponseDelays = &stub
+
+	newReq, newResp := dbClient.processRequest(r)
+
+	testutil.Refute(t, newReq, nil)
+	testutil.Refute(t, newResp, nil)
+	testutil.Expect(t, newResp.StatusCode, 201)
+
+	testutil.Expect(t, stub.gotDelays, 1)
 }
