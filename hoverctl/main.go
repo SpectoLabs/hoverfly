@@ -39,6 +39,9 @@ var (
 
 	delaysCommand = kingpin.Command("delays", "Get per-host response delay config currently loaded into Hoverfly")
 	delaysPathArg = delaysCommand.Arg("path", "Set per-host response delay config from JSON file").String()
+
+	logsCommand = kingpin.Command("logs", "Get the logs from Hoverfly")
+	followLogsFlag = logsCommand.Flag("follow", "Follow the logs from Hoverfly").Bool()
 )
 
 func main() {
@@ -204,6 +207,13 @@ func main() {
 					fmt.Printf("%+v\n", delay)
 				}
 			}
+		case logsCommand.FullCommand():
+			logfile := NewLogFile(hoverflyDirectory, hoverfly.AdminPort, hoverfly.ProxyPort)
+
+			logs, err := logfile.GetLogs()
+			handleIfError(err)
+
+			fmt.Print(logs)
 	}
 }
 

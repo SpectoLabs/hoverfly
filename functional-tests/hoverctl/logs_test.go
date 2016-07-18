@@ -20,6 +20,33 @@ var _ = Describe("When I use hoverctl", func() {
 		proxyPort = strconv.Itoa(freeport.GetPort())
 	)
 
+	Context("I can get the logs using the log command", func() {
+
+		BeforeEach(func() {
+			_, err := exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
+			Expect(err).To(BeNil())
+		})
+
+		AfterEach(func() {
+			_, err := exec.Command(hoverctlBinary, "stop", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
+			Expect(err).To(BeNil())
+		})
+
+		It("should return the logs", func() {
+			out, _ := exec.Command(hoverctlBinary, "logs", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
+
+			output := strings.TrimSpace(string(out))
+			Expect(output).To(ContainSubstring("listening on :" + adminPort))
+		})
+
+		It("should return an error if the logs don't exist", func() {
+			out, _ := exec.Command(hoverctlBinary, "logs", "--admin-port=hotdogs", "--proxy-port=burgers").Output()
+
+			output := strings.TrimSpace(string(out))
+			Expect(output).To(ContainSubstring("Could not open Hoverfly log file"))
+		})
+	})
+
 	Describe("and start Hoverfly using hoverctl", func() {
 
 		Context("the logs get captured in a .log file", func() {
