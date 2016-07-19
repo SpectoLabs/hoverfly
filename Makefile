@@ -50,10 +50,10 @@ build: test
 gox-build: 
 	rm -rf target/*
 	cd core/cmd/hoverfly && \
-	$(GOPATH)/bin/gox
+	$(GOPATH)/bin/gox -ldflags "-X main.hoverflyVersion=$$(git describe --tags)"
 	mv core/cmd/hoverfly/hoverfly_* target/
 	cd hoverctl && \
-	$(GOPATH)/bin/gox
+	$(GOPATH)/bin/gox -ldflags "-X main.hoverctlVersion=$$(git describe --tags)"
 	mv hoverctl/hoverctl_* target/
 
 version-binaries:
