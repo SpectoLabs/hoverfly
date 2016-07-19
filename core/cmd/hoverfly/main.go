@@ -54,6 +54,9 @@ const boltBackend = "boltdb"
 const inmemoryBackend = "memory"
 
 var (
+	hoverflyVersion string
+
+	version     = flag.Bool("version", false, "get the version of hoverfly")
 	verbose     = flag.Bool("v", false, "should every proxy request be logged to stdout")
 	capture     = flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
 	synthesize  = flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
@@ -151,6 +154,11 @@ func main() {
 	flag.Var(&importFlags, "import", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
 	flag.Var(&destinationFlags, "dest", "specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
 	flag.Parse()
+
+	if *version {
+		fmt.Println(hoverflyVersion)
+		os.Exit(0)
+	}
 
 	// getting settings
 	cfg := hv.InitSettings()

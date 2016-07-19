@@ -26,7 +26,7 @@ hoverctl-test: hoverctl-dependencies
 
 hoverfly-build: hoverfly-test
 	cd core/cmd/hoverfly && \
-	go build -o ../../../target/hoverfly
+	go build -ldflags "-X main.hoverflyVersion=$$(git describe --tags)" -o ../../../target/hoverfly
 
 hoverctl-build: hoverctl-test
 	cd hoverctl && \
