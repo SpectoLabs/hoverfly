@@ -828,7 +828,6 @@ func TestInvalidJSONSyntaxUpdateResponseDelays(t *testing.T) {
 
 	m.ServeHTTP(rec, req)
 	testutil.Expect(t, rec.Code, http.StatusBadRequest)
-	fmt.Println(dbClient.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)
 	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, &models.ResponseDelayList{}), true)
@@ -850,7 +849,6 @@ func TestInvalidJSONSemanticsUpdateResponseDelays(t *testing.T) {
 
 	m.ServeHTTP(rec, req)
 	testutil.Expect(t, rec.Code, 422)
-	fmt.Println(dbClient.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)
 	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, &models.ResponseDelayList{}), true)
@@ -871,9 +869,7 @@ func TestJSONWithInvalidHostPatternUpdateResponseDelays(t *testing.T) {
 	rec := httptest.NewRecorder()
 
 	m.ServeHTTP(rec, req)
-	fmt.Println(req.Body)
 	testutil.Expect(t, rec.Code, 422)
-	fmt.Println(dbClient.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)
 	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, &models.ResponseDelayList{}), true)
@@ -894,9 +890,7 @@ func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
 	rec := httptest.NewRecorder()
 
 	m.ServeHTTP(rec, req)
-	fmt.Println(req.Body)
 	testutil.Expect(t, rec.Code, 422)
-	fmt.Println(dbClient.ResponseDelays)
 
 	// normal equality checking doesn't work on slices (!!)
 	testutil.Expect(t, reflect.DeepEqual(dbClient.ResponseDelays, &models.ResponseDelayList{}), true)
