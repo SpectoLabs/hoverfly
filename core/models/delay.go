@@ -11,8 +11,8 @@ import (
 )
 
 type ResponseDelay struct {
-	UrlPattern string `json:"urlpattern"`
-	HttpMethod string `json:"httpmethod"`
+	UrlPattern string `json:"urlPattern"`
+	HttpMethod string `json:"httpMethod"`
 	Delay      int `json:"delay"`
 }
 
