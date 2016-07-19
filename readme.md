@@ -3,6 +3,8 @@
 ![Hoverfly](core/static/img/hoverfly_logo.png)
 ## Dependencies without the sting
 
+[![Join the chat at https://gitter.im/SpectoLabs/hoverfly](https://badges.gitter.im/SpectoLabs/hoverfly.svg)](https://gitter.im/SpectoLabs/hoverfly?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Hoverfly is a light-weight open source tool for creating simulations of external services for use in development and testing. 
 This technique is sometimes referred to as [service virtualization](https://en.wikipedia.org/wiki/Service_virtualization).
 
