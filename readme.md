@@ -14,9 +14,17 @@ Hoverctl is a command line interface for Hoverfly. It uses the Hoverfly REST API
 
 ## Quickstart
 
+### Homebrew (OS X)
+
+    brew install SpectoLabs/tap/hoverfly
+
+### Installation script (Linux and OS X)
+
 Run the install script to install Hoverfly and hoverctl:
 
     curl -o install.sh https://storage.googleapis.com/specto-binaries/install.sh && bash install.sh
+
+### Binaries
 
 Or [download the Hoverfly and hoverctl binaries](https://github.com/SpectoLabs/hoverfly/releases), set the correct permissions and copy them to a directory on your path.
 
