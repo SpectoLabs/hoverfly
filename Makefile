@@ -30,7 +30,7 @@ hoverfly-build: hoverfly-test
 
 hoverctl-build: hoverctl-test
 	cd hoverctl && \
-	go build -o ../target/hoverctl
+	go build -ldflags "-X main.hoverctlVersion=$$(git describe --tags)" -o ../target/hoverctl
 
 hoverfly-functional-test: hoverfly-functional-test-dependencies hoverfly-build
 	cp target/hoverfly functional-tests/core/bin/hoverfly
