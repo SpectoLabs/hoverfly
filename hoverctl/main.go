@@ -9,6 +9,8 @@ import (
 )
 
 var (
+
+	hoverctlVersion string
 	hostFlag = kingpin.Flag("host", "Set the host of Hoverfly").String()
 	adminPortFlag = kingpin.Flag("admin-port", "Set the admin port of Hoverfly").String()
 	proxyPortFlag = kingpin.Flag("proxy-port", "Set the admin port of Hoverfly").String()
@@ -46,6 +48,7 @@ var (
 
 func main() {
 	deleteCommand.Alias("wipe")
+	kingpin.Version(hoverctlVersion)
 
 	kingpin.Parse()
 
