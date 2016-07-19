@@ -1,4 +1,4 @@
-[![Circle CI][CircleCI-Image]][CircleCI-Url]
+[![Circle CI][CircleCI-Image]][CircleCI-Url] [![Join the chat at https://gitter.im/SpectoLabs/hoverfly](https://badges.gitter.im/SpectoLabs/hoverfly.svg)](https://gitter.im/SpectoLabs/hoverfly?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ![Hoverfly](core/static/img/hoverfly_logo.png)
 ## Dependencies without the sting
