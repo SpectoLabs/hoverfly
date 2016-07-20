@@ -20,18 +20,19 @@ var _ = Describe("When I use hoverctl", func() {
 		proxyPort = strconv.Itoa(freeport.GetPort())
 	)
 
+	BeforeEach(func() {
+		WriteConfiguration("localhost", adminPort, proxyPort)
+	})
+
+	AfterEach(func() {
+		exec.Command(hoverctlBinary, "stop", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
+	})
+
 	Context("I can get the logs using the log command", func() {
 
-		BeforeEach(func() {
-			exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
-			WriteConfiguration("localhost", adminPort, proxyPort)
-		})
-
-		AfterEach(func() {
-			exec.Command(hoverctlBinary, "stop", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
-		})
-
 		It("should return the logs", func() {
+			exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
+
 			out, _ := exec.Command(hoverctlBinary, "logs", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
 
 			output := strings.TrimSpace(string(out))
@@ -39,6 +40,8 @@ var _ = Describe("When I use hoverctl", func() {
 		})
 
 		It("should return an error if the logs don't exist", func() {
+			exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
+			
 			out, _ := exec.Command(hoverctlBinary, "logs", "--admin-port=hotdogs", "--proxy-port=burgers").Output()
 
 			output := strings.TrimSpace(string(out))
@@ -46,19 +49,12 @@ var _ = Describe("When I use hoverctl", func() {
 		})
 	})
 
-	Describe("and start Hoverfly using hoverctl", func() {
+	Context("and start Hoverfly using hoverctl", func() {
 
 		Context("the logs get captured in a .log file", func() {
-			BeforeEach(func() {
-				exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
-				WriteConfiguration("localhost", adminPort, proxyPort)
-			})
-
-			AfterEach(func() {
-				exec.Command(hoverctlBinary, "stop", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
-			})
-
 			It("and I can see it has started", func() {
+				exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
+
 				workingDir, _ := os.Getwd()
 				filePath := filepath.Join(workingDir, ".hoverfly/", "hoverfly." + adminPort + "." + proxyPort +".log")
 
@@ -69,6 +65,7 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 			It("and they get updated when you use hoverfly", func() {
+				exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
 
 				adminPortAsString, _ := strconv.Atoi(adminPort)
 
@@ -85,6 +82,8 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 			It("and the stderr is captured in the log file", func() {
+				exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
+
 				req := sling.New().Post(fmt.Sprintf("http://localhost:%v/api/state", adminPort)).Body(strings.NewReader(`{"mode":"not-a-mode"}`))
 				DoRequest(req)
 
