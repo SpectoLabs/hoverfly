@@ -23,14 +23,12 @@ var _ = Describe("When I use hoverctl", func() {
 	Context("I can get the logs using the log command", func() {
 
 		BeforeEach(func() {
-			_, err := exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
+			exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
 			WriteConfiguration("localhost", adminPort, proxyPort)
-			Expect(err).To(BeNil())
 		})
 
 		AfterEach(func() {
-			_, err := exec.Command(hoverctlBinary, "stop", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
-			Expect(err).To(BeNil())
+			exec.Command(hoverctlBinary, "stop", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
 		})
 
 		It("should return the logs", func() {
@@ -52,14 +50,12 @@ var _ = Describe("When I use hoverctl", func() {
 
 		Context("the logs get captured in a .log file", func() {
 			BeforeEach(func() {
-				_, err := exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
+				exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
 				WriteConfiguration("localhost", adminPort, proxyPort)
-				Expect(err).To(BeNil())
 			})
 
 			AfterEach(func() {
-				_, err := exec.Command(hoverctlBinary, "stop", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
-				Expect(err).To(BeNil())
+				exec.Command(hoverctlBinary, "stop", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
 			})
 
 			It("and I can see it has started", func() {
