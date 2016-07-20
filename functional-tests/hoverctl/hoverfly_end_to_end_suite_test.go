@@ -45,7 +45,7 @@ var _ = BeforeSuite(func() {
 
 	binDirectory := filepath.Join(workingDirectory, "bin")
 
-	os.Setenv("PATH", fmt.Sprintf("%v:%v", binDirectory, os.Getenv("PATH")))
+	os.Setenv("PATH", fmt.Sprintf("%v", binDirectory))
 })
 
 func SetHoverflyMode(mode string, port int) {
