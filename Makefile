@@ -26,11 +26,11 @@ hoverctl-test: hoverctl-dependencies
 
 hoverfly-build: hoverfly-test
 	cd core/cmd/hoverfly && \
-	go build -ldflags "-X main.hoverflyVersion=$$(git describe --tags)" -o ../../../target/hoverfly
+	go build -ldflags "-X main.hoverflyVersion=$(GIT_TAG_NAME)" -o ../../../target/hoverfly
 
 hoverctl-build: hoverctl-test
 	cd hoverctl && \
-	go build -ldflags "-X main.hoverctlVersion=$$(git describe --tags)" -o ../target/hoverctl
+	go build -ldflags "-X main.hoverctlVersion=$(GIT_TAG_NAME)" -o ../target/hoverctl
 
 hoverfly-functional-test: hoverfly-functional-test-dependencies hoverfly-build
 	cp target/hoverfly functional-tests/core/bin/hoverfly
@@ -50,10 +50,10 @@ build: test
 gox-build: 
 	rm -rf target/*
 	cd core/cmd/hoverfly && \
-	$(GOPATH)/bin/gox -ldflags "-X main.hoverflyVersion=$$(git describe --tags)"
+	$(GOPATH)/bin/gox -ldflags "-X main.hoverflyVersion=$(GIT_TAG_NAME)"
 	mv core/cmd/hoverfly/hoverfly_* target/
 	cd hoverctl && \
-	$(GOPATH)/bin/gox -ldflags "-X main.hoverctlVersion=$$(git describe --tags)"
+	$(GOPATH)/bin/gox -ldflags "-X main.hoverctlVersion=$(GIT_TAG_NAME)"
 	mv hoverctl/hoverctl_* target/
 
 version-binaries:
