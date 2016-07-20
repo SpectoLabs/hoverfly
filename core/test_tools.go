@@ -14,6 +14,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/boltdb/bolt"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -56,6 +57,13 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 	cfg := InitSettings()
 	// disabling auth for testing
 	cfg.AuthEnabled = false
+
+	requestMatcher := matching.RequestMatcher{
+		RequestCache: requestCache,
+		TemplateStore: matching.RequestTemplateStore{},
+		Webserver: &cfg.Webserver,
+	}
+
 	// preparing client
 	dbClient := &Hoverfly{
 		HTTP:           &http.Client{Transport: tr},
@@ -64,6 +72,7 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		MetadataCache:  metaCache,
 		ResponseDelays: &models.ResponseDelayList{},
+		RequestMatcher: requestMatcher,
 	}
 	return server, dbClient
 }

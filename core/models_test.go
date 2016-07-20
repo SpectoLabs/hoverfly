@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 )
 
 // TestMain prepares database for testing and then performs a cleanup
@@ -55,7 +56,7 @@ func TestRequestBodyCaptured(t *testing.T) {
 	_, err = dbClient.captureRequest(req)
 	testutil.Expect(t, err, nil)
 
-	fp := dbClient.getRequestFingerprint(req, requestBody)
+	fp := matching.GetRequestFingerprint(req, requestBody, false)
 
 	payloadBts, err := dbClient.RequestCache.Get([]byte(fp))
 	testutil.Expect(t, err, nil)
@@ -148,43 +149,37 @@ func TestGetNotRecordedRequest(t *testing.T) {
 
 // TestRequestFingerprint tests whether we get correct request ID
 func TestRequestFingerprint(t *testing.T) {
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	testutil.Expect(t, err, nil)
 
-	fp := dbClient.getRequestFingerprint(req, []byte(""))
+	fp := matching.GetRequestFingerprint(req, []byte(""), false)
 
 	testutil.Expect(t, fp, "92a65ed4ca2b7100037a4cba9afd15ea")
 }
 
 // TestRequestFingerprintBody tests where request body is also used to create unique request ID
 func TestRequestFingerprintBody(t *testing.T) {
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	testutil.Expect(t, err, nil)
 
-	fp := dbClient.getRequestFingerprint(req, []byte("some huge XML or JSON here"))
+	fp := matching.GetRequestFingerprint(req, []byte("some huge XML or JSON here"), false)
 
 	testutil.Expect(t, fp, "b3918a54eb6e42652e29e14c21ba8f81")
 }
 
 func TestScheme(t *testing.T) {
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	testutil.Expect(t, err, nil)
 
-	originalFp := dbClient.getRequestFingerprint(req, []byte(""))
+	originalFp := matching.GetRequestFingerprint(req, []byte(""), false)
 
 	httpsReq, err := http.NewRequest("GET", "https://example.com", nil)
 	testutil.Expect(t, err, nil)
 
-	newFp := dbClient.getRequestFingerprint(httpsReq, []byte(""))
+	newFp := matching.GetRequestFingerprint(httpsReq, []byte(""), false)
 
 	// fingerprint should be the same
 	testutil.Expect(t, originalFp, newFp)
@@ -302,7 +297,7 @@ func TestGetResponseCorruptedPayload(t *testing.T) {
 	_, err = dbClient.captureRequest(req)
 	testutil.Expect(t, err, nil)
 
-	fp := dbClient.getRequestFingerprint(req, requestBody)
+	fp := matching.GetRequestFingerprint(req, requestBody, false)
 
 	dbClient.RequestCache.Set([]byte(fp), []byte("you shall not decode me!"))
 
@@ -387,31 +382,27 @@ func TestUpdateDestinationEmpty(t *testing.T) {
 }
 
 func TestJSONMinifier(t *testing.T) {
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
 
 	// body can be nil here, it's not reading it from request anyway
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	testutil.Expect(t, err, nil)
 	req.Header.Add("Content-Type", "application/json")
 
-	fpOne := dbClient.getRequestFingerprint(req, []byte(`{"foo": "bar"}`))
-	fpTwo := dbClient.getRequestFingerprint(req, []byte(`{     "foo":           "bar"}`))
+	fpOne := matching.GetRequestFingerprint(req, []byte(`{"foo": "bar"}`), false)
+	fpTwo := matching.GetRequestFingerprint(req, []byte(`{     "foo":           "bar"}`), false)
 
 	testutil.Expect(t, fpOne, fpTwo)
 }
 
 func TestJSONMinifierWOHeader(t *testing.T) {
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
 
 	// body can be nil here, it's not reading it from request anyway
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	testutil.Expect(t, err, nil)
 
 	// application/json header is not set, shouldn't be equal
-	fpOne := dbClient.getRequestFingerprint(req, []byte(`{"foo": "bar"}`))
-	fpTwo := dbClient.getRequestFingerprint(req, []byte(`{     "foo":           "bar"}`))
+	fpOne := matching.GetRequestFingerprint(req, []byte(`{"foo": "bar"}`), false)
+	fpTwo := matching.GetRequestFingerprint(req, []byte(`{     "foo":           "bar"}`), false)
 
 	testutil.Refute(t, fpOne, fpTwo)
 }
@@ -434,8 +425,6 @@ var xmlBodyTwo = `<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="
 	       </project>`
 
 func TestXMLMinifier(t *testing.T) {
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
 
 	// body can be nil here, it's not reading it from request anyway
 	req, err := http.NewRequest("GET", "http://example.com", nil)
@@ -443,21 +432,19 @@ func TestXMLMinifier(t *testing.T) {
 
 	req.Header.Add("Content-Type", "application/xml")
 
-	fpOne := dbClient.getRequestFingerprint(req, []byte(xmlBody))
-	fpTwo := dbClient.getRequestFingerprint(req, []byte(xmlBodyTwo))
+	fpOne := matching.GetRequestFingerprint(req, []byte(xmlBody), false)
+	fpTwo := matching.GetRequestFingerprint(req, []byte(xmlBodyTwo), false)
 	testutil.Expect(t, fpOne, fpTwo)
 }
 
 func TestXMLMinifierWOHeader(t *testing.T) {
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
 
 	// body can be nil here, it's not reading it from request anyway
 	req, err := http.NewRequest("GET", "http://example.com", nil)
 	testutil.Expect(t, err, nil)
 
 	// application/xml header is not set, shouldn't be equal
-	fpOne := dbClient.getRequestFingerprint(req, []byte(xmlBody))
-	fpTwo := dbClient.getRequestFingerprint(req, []byte(xmlBodyTwo))
+	fpOne := matching.GetRequestFingerprint(req, []byte(xmlBody), false)
+	fpTwo := matching.GetRequestFingerprint(req, []byte(xmlBodyTwo), false)
 	testutil.Refute(t, fpOne, fpTwo)
 }

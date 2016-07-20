@@ -16,6 +16,7 @@ import (
 	"regexp"
 	"sync"
 	"time"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond
@@ -42,6 +43,7 @@ func orPanic(err error) {
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
 type Hoverfly struct {
 	RequestCache   cache.Cache
+	RequestMatcher matching.RequestMatcher
 	MetadataCache  cache.Cache
 	Authentication authBackend.Authentication
 	HTTP           *http.Client
@@ -58,6 +60,11 @@ type Hoverfly struct {
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
 func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication authBackend.Authentication) *Hoverfly {
+	requestMatcher := matching.RequestMatcher{
+		RequestCache: requestCache,
+		TemplateStore: matching.RequestTemplateStore{},
+		Webserver: &cfg.Webserver,
+	}
 	h := &Hoverfly{
 		RequestCache:   requestCache,
 		MetadataCache:  metadataCache,
@@ -69,6 +76,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		Hooks:          make(ActionTypeHooks),
 		ResponseDelays: &models.ResponseDelayList{},
+		RequestMatcher: requestMatcher,
 	}
 	return h
 }
@@ -398,73 +406,23 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 // getResponse returns stored response from cache
 func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 
-	if req.Body == nil {
-		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+
+	payload, matchErr := hf.RequestMatcher.GetPayload(req)
+	if matchErr != nil {
+		return hoverflyError(req, matchErr, matchErr.Error(), matchErr.StatusCode)
 	}
 
-	reqBody, err := ioutil.ReadAll(req.Body)
-
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Got error when reading request body")
+	c := NewConstructor(req, *payload)
+	if hf.Cfg.Middleware != "" {
+		_ = c.ApplyMiddleware(hf.Cfg.Middleware)
 	}
 
-	key := hf.getRequestFingerprint(req, reqBody)
-
-	payloadBts, err := hf.RequestCache.Get([]byte(key))
-
-	if err == nil {
-		// getting cache response
-		payload, err := models.NewPayloadFromBytes(payloadBts)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-				"value": string(payloadBts),
-				"key":   key,
-			}).Error("Failed to decode payload")
-			return hoverflyError(req, err, "Failed to simulate", http.StatusInternalServerError)
-		}
-
-		c := NewConstructor(req, *payload)
-
-		if hf.Cfg.Middleware != "" {
-			_ = c.ApplyMiddleware(hf.Cfg.Middleware)
-		}
-
-		response := c.ReconstructResponse()
-
-		log.WithFields(log.Fields{
-			"key":         key,
-			"mode":        SimulateMode,
-			"middleware":  hf.Cfg.Middleware,
-			"path":        req.URL.Path,
-			"rawQuery":    req.URL.RawQuery,
-			"method":      req.Method,
-			"destination": req.Host,
-			"status":      payload.Response.Status,
-			"bodyLength":  response.ContentLength,
-		}).Info("Response found, returning")
-
-		respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
-		if respDelay != nil {
-			respDelay.Execute()
-		}
-
-		return response
-
+	respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
+	if respDelay != nil {
+		respDelay.Execute()
 	}
 
-	log.WithFields(log.Fields{
-		"key":         key,
-		"error":       err.Error(),
-		"query":       req.URL.RawQuery,
-		"path":        req.URL.RawPath,
-		"destination": req.Host,
-		"method":      req.Method,
-	}).Warn("Failed to retrieve response from cache")
-	// return error? if we return nil - proxy forwards request to original destination
-	return hoverflyError(req, err, "Could not find recorded request, please record it first!", http.StatusPreconditionFailed)
+	return c.ReconstructResponse()
 }
 
 // modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response
@@ -535,30 +493,11 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) 
 	return newResponse, nil
 }
 
-// getRequestFingerprint returns request hash
-func (hf *Hoverfly) getRequestFingerprint(req *http.Request, requestBody []byte) string {
-	var r models.RequestDetails
-
-	r = models.RequestDetails{
-		Path:        req.URL.Path,
-		Method:      req.Method,
-		Destination: req.Host,
-		Query:       req.URL.RawQuery,
-		Body:        string(requestBody),
-		Headers:     req.Header,
-	}
-
-	if hf.Cfg.Webserver {
-		return r.HashWithoutHost()
-	}
-
-	return r.Hash()
-}
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (hf *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, respBody []byte) {
 	// record request here
-	key := hf.getRequestFingerprint(req, reqBody)
+	key := matching.GetRequestFingerprint(req, reqBody, hf.Cfg.Webserver)
 
 	if resp == nil {
 		resp = emptyResp
