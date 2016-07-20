@@ -24,6 +24,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 		BeforeEach(func() {
 			_, err := exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
+			WriteConfiguration("localhost", adminPort, proxyPort)
 			Expect(err).To(BeNil())
 		})
 
@@ -52,6 +53,7 @@ var _ = Describe("When I use hoverctl", func() {
 		Context("the logs get captured in a .log file", func() {
 			BeforeEach(func() {
 				_, err := exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
+				WriteConfiguration("localhost", adminPort, proxyPort)
 				Expect(err).To(BeNil())
 			})
 
