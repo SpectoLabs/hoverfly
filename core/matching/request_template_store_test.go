@@ -23,7 +23,7 @@ func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 	r.Header = http.Header{
 		"sdv": []string{"ascd"},
 	}
-	result, _ := store.GetPayload(r)
+	result, _ := store.GetPayload(r, []byte("test-body"))
 
 	//var rd models.RequestDetails
 	Expect(result.Response.Body).To(Equal("test-body"))
@@ -53,7 +53,7 @@ func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		"header1": []string{"val1"},
 		"header2": []string{"val2"},
 	}
-	result, _ := store.GetPayload(r)
+	result, _ := store.GetPayload(r, []byte("test-body"))
 
 	Expect(result.Response.Body).To(Equal("test-body"))
 }
@@ -80,7 +80,7 @@ func TestReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 	r.Header = http.Header{
 		"header1": []string{"val1"},
 	}
-	result, _ := store.GetPayload(r)
+	result, _ := store.GetPayload(r, []byte("test-body"))
 
 	Expect(result).To(BeNil())
 }
@@ -108,7 +108,7 @@ func TestReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 		"header1": []string{"val1"},
 		"header2": []string{"different"},
 	}
-	result, _ := store.GetPayload(r)
+	result, _ := store.GetPayload(r, []byte("test-body"))
 
 	Expect(result).To(BeNil())
 }
@@ -136,7 +136,7 @@ func TestReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
-	result, _ := store.GetPayload(r)
+	result, _ := store.GetPayload(r, []byte("test-body"))
 
 	Expect(result.Response.Body).To(Equal("test-body"))
 }
@@ -157,6 +157,7 @@ func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 		},
 		Response: response,
 	}
+
 	store := RequestTemplateStore{templateEntry}
 
 	r, _ := http.NewRequest("GET", "http://somehost.com", nil)
@@ -164,7 +165,7 @@ func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 		"header1": []string{"val1-a", "val1-differnet"},
 		"header2": []string{"val2"},
 	}
-	result, _ := store.GetPayload(r)
+	result, _ := store.GetPayload(r, []byte("test-body"))
 
 	Expect(result).To(BeNil())
 }

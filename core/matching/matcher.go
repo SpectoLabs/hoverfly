@@ -45,7 +45,7 @@ func (this *RequestMatcher) GetPayload(req *http.Request) (*models.Payload, *Mat
 			"method":      req.Method,
 		}).Warn("Failed to retrieve response from cache")
 
-		payload, err := this.TemplateStore.GetPayload(req)
+		payload, err := this.TemplateStore.GetPayload(req, reqBody)
 		if err != nil {
 			return nil, &MatchingError{
 				StatusCode: 412,
