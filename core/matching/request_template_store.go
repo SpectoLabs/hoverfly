@@ -35,9 +35,9 @@ func(this *RequestTemplateStore) GetPayload(req *http.Request) (*models.Payload,
 	for _, entry := range this.RequestTemplates {
 		//TODO: not matching by default on URL and body - need to enable this
 		// TODO: need to enable regex matches
-		if headerMatch(entry, req.Header) {
+		if headerMatch(entry.RequestTemplate.Headers, req.Header) {
 			// return the first template to match
-			return models.Payload{Response: *entry.Response}, nil
+			return &models.Payload{Response: entry.Response}, nil
 		}
 	}
 	return nil, errors.New("No match found")
