@@ -4,6 +4,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"errors"
 	"net/http"
+	"reflect"
 )
 
 type RequestTemplateStore []RequestTemplatePayload
@@ -48,9 +49,9 @@ func headerMatch(tmplHeaders map[string][]string, reqHeaders http.Header) (bool)
 
 	for headerName, headerVal := range tmplHeaders {
 		// TODO: case insensitive lookup
-		// TODO: whole slice equality check
+		// TODO: is order of values in slice really important?
 		reqHeaderVal, ok := reqHeaders[headerName]
-		if (ok && headerVal[0] == reqHeaderVal[0]) {
+		if (ok && reflect.DeepEqual(headerVal, reqHeaderVal)) {
 			continue;
 		} else {
 			return false;

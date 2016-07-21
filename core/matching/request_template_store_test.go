@@ -141,7 +141,7 @@ func TestReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 	Expect(result.Response.Body).To(Equal("test-body"))
 }
 
-func IgnoreTestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
+func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
 	response := models.ResponseDetails{
