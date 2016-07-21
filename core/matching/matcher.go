@@ -81,6 +81,37 @@ func (this *RequestMatcher) GetPayload(req *http.Request) (*models.Payload, *Mat
 	return payload, nil
 }
 
+func (this *RequestMatcher) SavePayload(payload *models.Payload) () {
+	var key string
+
+	if *this.Webserver {
+		key = payload.IdWithoutHost()
+	} else {
+		key = payload.Id()
+	}
+
+	log.WithFields(log.Fields{
+		"path":          payload.Request.Path,
+		"rawQuery":      payload.Request.Query,
+		"requestMethod": payload.Request.Method,
+		"bodyLen":       len(payload.Request.Body),
+		"destination":   payload.Request.Destination,
+		"hashKey":       key,
+	}).Debug("Capturing")
+
+	payloadBytes, err := payload.Encode()
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to serialize payload")
+	} else {
+		this.RequestCache.Set([]byte(key), payloadBytes)
+	}
+
+
+}
+
 type MatchingError struct {
 	StatusCode int
 	Description string

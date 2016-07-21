@@ -497,7 +497,7 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (hf *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, respBody []byte) {
 	// record request here
-	key := matching.GetRequestFingerprint(req, reqBody, hf.Cfg.Webserver)
+	//key := matching.GetRequestFingerprint(req, reqBody, hf.Cfg.Webserver)
 
 	if resp == nil {
 		resp = emptyResp
@@ -507,15 +507,6 @@ func (hf *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response,
 			Body:    string(respBody),
 			Headers: resp.Header,
 		}
-
-		log.WithFields(log.Fields{
-			"path":          req.URL.Path,
-			"rawQuery":      req.URL.RawQuery,
-			"requestMethod": req.Method,
-			"bodyLen":       len(reqBody),
-			"destination":   req.Host,
-			"hashKey":       key,
-		}).Debug("Capturing")
 
 		requestObj := models.RequestDetails{
 			Path:        req.URL.Path,
@@ -532,29 +523,29 @@ func (hf *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response,
 			Request:  requestObj,
 		}
 
+		hf.RequestMatcher.SavePayload(&payload)
+
 		bts, err := payload.Encode()
-
-		// hook
-		var en Entry
-		en.ActionType = ActionTypeRequestCaptured
-		en.Message = "captured"
-		en.Time = time.Now()
-		en.Data = bts
-
-		if err := hf.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
-			log.WithFields(log.Fields{
-				"error":      err.Error(),
-				"message":    en.Message,
-				"actionType": ActionTypeRequestCaptured,
-			}).Error("failed to fire hook")
-		}
-
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
 			}).Error("Failed to serialize payload")
 		} else {
-			hf.RequestCache.Set([]byte(key), bts)
+			// hook
+			var en Entry
+			en.ActionType = ActionTypeRequestCaptured
+			en.Message = "captured"
+			en.Time = time.Now()
+			en.Data = bts
+
+			if err := hf.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
+				log.WithFields(log.Fields{
+					"error":      err.Error(),
+					"message":    en.Message,
+					"actionType": ActionTypeRequestCaptured,
+				}).Error("failed to fire hook")
+			}
 		}
+
 	}
 }
