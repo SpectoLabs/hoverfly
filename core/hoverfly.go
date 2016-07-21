@@ -523,7 +523,12 @@ func (hf *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response,
 			Request:  requestObj,
 		}
 
-		hf.RequestMatcher.SavePayload(&payload)
+		err := hf.RequestMatcher.SavePayload(&payload)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Failed to save payload")
+		}
 
 		bts, err := payload.Encode()
 		if err != nil {

@@ -81,7 +81,7 @@ func (this *RequestMatcher) GetPayload(req *http.Request) (*models.Payload, *Mat
 	return payload, nil
 }
 
-func (this *RequestMatcher) SavePayload(payload *models.Payload) () {
+func (this *RequestMatcher) SavePayload(payload *models.Payload) (error) {
 	var key string
 
 	if *this.Webserver {
@@ -102,11 +102,9 @@ func (this *RequestMatcher) SavePayload(payload *models.Payload) () {
 	payloadBytes, err := payload.Encode()
 
 	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Failed to serialize payload")
+		return err
 	} else {
-		this.RequestCache.Set([]byte(key), payloadBytes)
+		return this.RequestCache.Set([]byte(key), payloadBytes)
 	}
 
 
