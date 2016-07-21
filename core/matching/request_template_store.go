@@ -4,12 +4,10 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"errors"
 	"net/http"
-	"strings"
 )
 
-type RequestTemplateStore struct {
-	RequestTemplates []RequestTemplatePayload
-}
+type RequestTemplateStore []RequestTemplatePayload
+
 
 type RequestTemplatePayload struct {
 	RequestTemplate RequestTemplate        `json: "requestTemplate"`
@@ -32,8 +30,8 @@ type RequestTemplate struct {
 
 func(this *RequestTemplateStore) GetPayload(req *http.Request) (*models.Payload, error) {
 	// iterate through the request templates, looking for template to match request
-	for _, entry := range this.RequestTemplates {
-		//TODO: not matching by default on URL and body - need to enable this
+	for _, entry := range *this {
+		// TODO: not matching by default on URL and body - need to enable this
 		// TODO: need to enable regex matches
 		if headerMatch(entry.RequestTemplate.Headers, req.Header) {
 			// return the first template to match
@@ -46,10 +44,13 @@ func(this *RequestTemplateStore) GetPayload(req *http.Request) (*models.Payload,
 /**
 Check keys and corresponding values in template headers are also present in request headers
  */
-func headerMatch(templHeaders map[string][]string, reqHeaders http.Header) (bool) {
-	for headerName, headerVal := range templHeaders {
-		// TODO: why is payload storing a list of strings but http has a single string??
-		if (strings.Join(headerVal[:],",") == reqHeaders.Get(headerName)) {
+func headerMatch(tmplHeaders map[string][]string, reqHeaders http.Header) (bool) {
+
+	for headerName, headerVal := range tmplHeaders {
+		// TODO: case insensitive lookup
+		// TODO: whole slice equality check
+		reqHeaderVal, ok := reqHeaders[headerName]
+		if (ok && headerVal[0] == reqHeaderVal[0]) {
 			continue;
 		} else {
 			return false;
