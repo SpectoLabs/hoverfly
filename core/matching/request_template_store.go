@@ -14,13 +14,13 @@ type RequestTemplateStore []RequestTemplatePayload
 
 
 type RequestTemplatePayload struct {
-	RequestTemplate RequestTemplate        `json: "requestTemplate"`
-	Response        models.ResponseDetails `json: "response"`
+	RequestTemplate RequestTemplate        `json:"requestTemplate"`
+	Response        models.ResponseDetails `json:"response"`
 }
 
 type RequestTemplatePayloadView struct {
-	RequestTemplate RequestTemplate        `json: "requestTemplate"`
-	Response        models.ResponseDetailsView `json: "response"`
+	RequestTemplate RequestTemplate        `json:"requestTemplate"`
+	Response        models.ResponseDetailsView `json:"response"`
 }
 
 type RequestTemplatePayloadJson struct {
