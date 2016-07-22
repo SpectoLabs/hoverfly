@@ -8,6 +8,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"strings"
 )
 
 // Constructor - holds information about original request (which is needed to create response
@@ -46,6 +47,10 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 
 	return nil
 
+}
+
+func isMiddlewareLocal(middleware string) (bool) {
+	return !strings.HasPrefix(middleware, "http")
 }
 
 // ReconstructResponse changes original response with details provided in Constructor Payload.Response

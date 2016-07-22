@@ -97,3 +97,15 @@ func TestReconstructionFailure(t *testing.T) {
 	_, err := c.ReconstructRequest()
 	testutil.Refute(t, err, nil)
 }
+
+func TestIsMiddlewareLocal_WithNonHttpString(t *testing.T) {
+	testutil.Expect(t, isMiddlewareLocal("python middleware.py"), true)
+}
+
+func TestIsMiddlewareLocal_WithHttpString(t *testing.T) {
+	testutil.Expect(t, isMiddlewareLocal("http://remotemiddleware.com/process"), false)
+}
+
+func TestIsMiddlewareLocal_WithHttpsString(t *testing.T) {
+	testutil.Expect(t, isMiddlewareLocal("http://remotemiddleware.com/process"), false)
+}
