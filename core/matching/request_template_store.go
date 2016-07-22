@@ -34,6 +34,8 @@ func(this *RequestTemplateStore) GetPayload(req *http.Request, reqBody []byte) (
 	for _, entry := range *this {
 		// TODO: not matching by default on URL and body - need to enable this
 		// TODO: need to enable regex matches
+		//TODO: enable matching on scheme
+
 		if entry.RequestTemplate.Body != "" && entry.RequestTemplate.Body == string(reqBody) {
 			continue
 		}

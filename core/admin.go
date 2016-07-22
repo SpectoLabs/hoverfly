@@ -139,9 +139,25 @@ func getBoneRouter(d *Hoverfly) *bone.Mux {
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.DeleteAllRecordsHandler),
 	))
+
 	mux.Post("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.ImportRecordsHandler),
+	))
+
+	mux.Get("/api/templates", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.GetAllTemplatesHandler),
+	))
+
+	mux.Delete("/api/templates", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.DeleteAllTemplatesHandler),
+	))
+
+	mux.Post("/api/templates", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.ImportTemplatesHandler),
 	))
 
 	mux.Get("/api/metadata", negroni.New(
@@ -595,6 +611,49 @@ func (d *Hoverfly) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 	}
 	w.Write(b)
 	return
+}
+
+// AllRecordsHandler returns JSON content type http response
+func (d *Hoverfly) GetAllTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	records, err := d.RequestMatcher.TemplateStore.GetAllValues()
+
+	if err == nil {
+
+		var payloads []models.PayloadView
+
+		for _, v := range records {
+			if payload, err := models.NewPayloadFromBytes(v); err == nil {
+				payloadView := payload.ConvertToPayloadView()
+				payloads = append(payloads, *payloadView)
+			} else {
+				log.Error(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+
+		var response models.PayloadViewData
+		response.Data = payloads
+		b, err := json.Marshal(response)
+
+		if err != nil {
+			log.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else {
+			w.Write(b)
+			return
+		}
+	} else {
+		log.WithFields(log.Fields{
+			"Error": err.Error(),
+		}).Error("Failed to get data from cache!")
+
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(500) // can't process this entity
+		return
+	}
 }
 
 // CurrentStateHandler returns current state

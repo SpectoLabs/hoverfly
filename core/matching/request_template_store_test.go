@@ -23,7 +23,7 @@ func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 	r.Header = http.Header{
 		"sdv": []string{"ascd"},
 	}
-	result, _ := store.GetPayload(r, []byte("test-body"))
+	result, _ := store.GetPayload(r, nil)
 
 	//var rd models.RequestDetails
 	Expect(result.Response.Body).To(Equal("test-body"))
@@ -53,7 +53,7 @@ func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		"header1": []string{"val1"},
 		"header2": []string{"val2"},
 	}
-	result, _ := store.GetPayload(r, []byte("test-body"))
+	result, _ := store.GetPayload(r, nil)
 
 	Expect(result.Response.Body).To(Equal("test-body"))
 }
@@ -80,7 +80,7 @@ func TestReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 	r.Header = http.Header{
 		"header1": []string{"val1"},
 	}
-	result, _ := store.GetPayload(r, []byte("test-body"))
+	result, _ := store.GetPayload(r, nil)
 
 	Expect(result).To(BeNil())
 }
@@ -108,7 +108,7 @@ func TestReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 		"header1": []string{"val1"},
 		"header2": []string{"different"},
 	}
-	result, _ := store.GetPayload(r, []byte("test-body"))
+	result, _ := store.GetPayload(r, nil)
 
 	Expect(result).To(BeNil())
 }
@@ -165,7 +165,7 @@ func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 		"header1": []string{"val1-a", "val1-differnet"},
 		"header2": []string{"val2"},
 	}
-	result, _ := store.GetPayload(r, []byte("test-body"))
+	result, _ := store.GetPayload(r, nil)
 
 	Expect(result).To(BeNil())
 }
@@ -198,4 +198,69 @@ func IgnoreTestCaseInsensitiveHeaderMatch(t *testing.T) {
 	}
 	res := headerMatch(tmplHeaders, reqHeaders)
 	Expect(res).To(BeTrue())
+}
+
+func TestEndpointMatchWithHeaders(t *testing.T) {
+	RegisterTestingT(t)
+
+	response := models.ResponseDetails{
+		Body: "test-body",
+	}
+	headers := map[string][]string{
+		"header1": []string{"val1-a", "val1-b"},
+		"header2": []string{"val2"},
+	}
+	templateEntry := RequestTemplatePayload{
+		RequestTemplate: RequestTemplate{
+			Headers: headers,
+			Destination: "testhost.com",
+			Path: "/a/1",
+			Method: "GET",
+			Query: "q=test",
+		},
+		Response: response,
+	}
+	store := RequestTemplateStore{templateEntry}
+
+	r, _ := http.NewRequest("GET", "http://testhost.com/a/1?q=test", nil)
+	r.Header = http.Header{
+		"header1": []string{"val1-a", "val1-b"},
+		"header2": []string{"val2"},
+	}
+	result, _ := store.GetPayload(r, nil)
+
+	Expect(result.Response.Body).To(Equal("test-body"))
+}
+
+
+func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
+	RegisterTestingT(t)
+
+	response := models.ResponseDetails{
+		Body: "test-body",
+	}
+	headers := map[string][]string{
+		"header1": []string{"val1-a", "val1-b"},
+		"header2": []string{"val2"},
+	}
+	templateEntry := RequestTemplatePayload{
+		RequestTemplate: RequestTemplate{
+			Headers: headers,
+			Destination: "testhost.com",
+			Path: "/a/1",
+			Method: "GET",
+			Query: "q=test",
+		},
+		Response: response,
+	}
+	store := RequestTemplateStore{templateEntry}
+
+	r, _ := http.NewRequest("GET", "http://testhost.com/a/1?q=different", nil)
+	r.Header = http.Header{
+		"header1": []string{"val1-a", "val1-b"},
+		"header2": []string{"val2"},
+	}
+	result, _ := store.GetPayload(r, nil)
+
+	Expect(result).To(BeNil())
 }
