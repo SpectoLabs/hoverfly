@@ -26,6 +26,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/authentication/controllers"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 )
 
 // recordedRequests struct encapsulates payload data
@@ -615,45 +616,94 @@ func (d *Hoverfly) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 
 // AllRecordsHandler returns JSON content type http response
 func (d *Hoverfly) GetAllTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	records, err := d.RequestMatcher.TemplateStore.GetAllValues()
+	payloadJson := d.RequestMatcher.TemplateStore.ConvertToPayloadJson()
 
-	if err == nil {
+	w.Header().Set("Content-Type", "application/json")
 
-		var payloads []models.PayloadView
+	b, err := json.Marshal(payloadJson)
 
-		for _, v := range records {
-			if payload, err := models.NewPayloadFromBytes(v); err == nil {
-				payloadView := payload.ConvertToPayloadView()
-				payloads = append(payloads, *payloadView)
-			} else {
-				log.Error(err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-
-		var response models.PayloadViewData
-		response.Data = payloads
-		b, err := json.Marshal(response)
-
-		if err != nil {
-			log.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		} else {
-			w.Write(b)
-			return
-		}
+	if err != nil {
+		log.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		log.WithFields(log.Fields{
-			"Error": err.Error(),
-		}).Error("Failed to get data from cache!")
-
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(500) // can't process this entity
+		w.Write(b)
 		return
 	}
+}
+
+func (d *Hoverfly) ImportTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+
+	var payload matching.RequestTemplatePayloadJson
+
+	defer req.Body.Close()
+	body, err := ioutil.ReadAll(req.Body)
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	var response messageResponse
+
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not read request body!")
+		http.Error(w, "Failed to read request body.", 400)
+		return
+	}
+
+	err = json.Unmarshal(body, &payload)
+
+	if err != nil {
+		w.WriteHeader(422) // can't process this entity
+		return
+	}
+
+	err = d.RequestMatcher.TemplateStore.ImportPayloads(payload)
+
+	if err != nil {
+		response.Message = err.Error()
+		w.WriteHeader(400)
+	} else {
+		response.Message = fmt.Sprintf("%d payloads import complete.", len(*payload.Data))
+	}
+
+	b, err := response.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+
+	w.Write(b)
+
+}
+
+
+// DeleteAllRecordsHandler - deletes all captured requests
+func (d *Hoverfly) DeleteAllTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	d.RequestMatcher.TemplateStore.Wipe()
+
+	// TODO: add hooks for consistency with records
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var response messageResponse
+	response.Message = "Template store wiped successfuly"
+	w.WriteHeader(200)
+
+	b, err := response.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+	w.Write(b)
+	return
 }
 
 // CurrentStateHandler returns current state
