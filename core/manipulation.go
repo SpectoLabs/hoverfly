@@ -33,7 +33,7 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 	if isMiddlewareLocal(middleware) {
 		newPayload, err = ExecuteMiddlewareLocally(middleware, c.payload)
 	} else {
-		err = fmt.Errorf("Not implemented")
+		newPayload, err = ExecuteMiddlewareRemotely(middleware, c.payload)
 	}
 
 	if err != nil {

@@ -8,6 +8,9 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"io/ioutil"
+	"net/http"
+	"errors"
 )
 
 // Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.
@@ -142,4 +145,47 @@ func ExecuteMiddlewareLocally(middlewares string, payload models.Payload) (model
 
 	return payload, nil
 
+}
+
+func ExecuteMiddlewareRemotely(middleware string, payload models.Payload) (models.Payload, error) {
+	bts, err := json.Marshal(payload.ConvertToPayloadView())
+
+	req, err := http.NewRequest("POST", middleware, bytes.NewBuffer(bts))
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Middleware error")
+		return payload, err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Middleware error")
+		return payload, err
+	}
+
+	if resp.StatusCode != 200 {
+		log.Error("Middleware error")
+		return payload, errors.New("Remote middleware did not process payload")
+	}
+
+	newPayloadBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Middleware error")
+		return payload, err
+	}
+
+	var newPayloadView models.PayloadView
+
+	err = json.Unmarshal(newPayloadBytes, &newPayloadView)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Middleware error")
+	}
+	return newPayloadView.ConvertToPayload(), nil
 }
