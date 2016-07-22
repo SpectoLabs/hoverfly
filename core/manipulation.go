@@ -27,8 +27,14 @@ func NewConstructor(req *http.Request, payload models.Payload) *Constructor {
 // ApplyMiddleware - activates given middleware, middleware should be passed as string to executable, can be
 // full path.
 func (c *Constructor) ApplyMiddleware(middleware string) error {
+	var newPayload models.Payload
+	var err error
 
-	newPayload, err := ExecuteMiddleware(middleware, c.payload)
+	if isMiddlewareLocal(middleware) {
+		newPayload, err = ExecuteMiddlewareLocally(middleware, c.payload)
+	} else {
+		err = fmt.Errorf("Not implemented")
+	}
 
 	if err != nil {
 		log.WithFields(log.Fields{

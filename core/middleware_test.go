@@ -14,7 +14,7 @@ func TestChangeBodyMiddleware(t *testing.T) {
 
 	payload := models.Payload{Response: resp, Request: req}
 
-	newPayload, err := ExecuteMiddleware(command, payload)
+	newPayload, err := ExecuteMiddlewareLocally(command, payload)
 
 	testutil.Expect(t, err, nil)
 	testutil.Expect(t, newPayload.Response.Body, "body was replaced by middleware\n")
@@ -28,7 +28,7 @@ func TestMalformedPayloadMiddleware(t *testing.T) {
 
 	payload := models.Payload{Response: resp, Request: req}
 
-	newPayload, err := ExecuteMiddleware(command, payload)
+	newPayload, err := ExecuteMiddlewareLocally(command, payload)
 
 	testutil.Expect(t, err, nil)
 	testutil.Expect(t, newPayload.Response.Body, "original body")
@@ -42,7 +42,7 @@ func TestMakeCustom404(t *testing.T) {
 
 	payload := models.Payload{Response: resp, Request: req}
 
-	newPayload, err := ExecuteMiddleware(command, payload)
+	newPayload, err := ExecuteMiddlewareLocally(command, payload)
 
 	testutil.Expect(t, err, nil)
 	testutil.Expect(t, newPayload.Response.Body, "Custom body here")
@@ -57,7 +57,7 @@ func TestReflectBody(t *testing.T) {
 
 	payload := models.Payload{Request: req}
 
-	newPayload, err := ExecuteMiddleware(command, payload)
+	newPayload, err := ExecuteMiddlewareLocally(command, payload)
 
 	testutil.Expect(t, err, nil)
 	testutil.Expect(t, newPayload.Response.Body, req.Body)
