@@ -30,6 +30,15 @@ type ResponseDelaySchema struct {
 	HttpMethod string `json:"httpmethod"`
 }
 
+type HoverflyAuthSchema struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type HoverflyAuthTokenSchema struct {
+	Token string `json:"token"`
+}
+
 type MiddlewareSchema struct {
 	Middleware string `json:"middleware"`
 }
@@ -44,14 +53,6 @@ type Hoverfly struct {
 	httpClient *http.Client
 }
 
-type HoverflyAuth struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type HoverflyAuthToken struct {
-	Token string `json:"token"`
-}
 
 func NewHoverfly(config Config) (Hoverfly) {
 	return Hoverfly{
@@ -319,7 +320,7 @@ func (h *Hoverfly) addAuthIfNeeded(sling *sling.Sling) (*sling.Sling, error) {
 }
 
 func (h *Hoverfly) generateAuthToken() (string, error) {
-	credentials := HoverflyAuth{
+	credentials := HoverflyAuthSchema{
 		Username: h.Username,
 		Password: h.Password,
 	}
@@ -344,7 +345,7 @@ func (h *Hoverfly) generateAuthToken() (string, error) {
 		return "", err
 	}
 
-	var authToken HoverflyAuthToken
+	var authToken HoverflyAuthTokenSchema
 	err = json.Unmarshal(body, &authToken)
 	if err != nil {
 		return "", err
