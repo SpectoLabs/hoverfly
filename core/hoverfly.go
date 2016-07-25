@@ -143,6 +143,10 @@ func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
 	return
 }
 
+func (hf *Hoverfly) SetMiddleware(middleware string) {
+	hf.Cfg.Middleware = middleware
+}
+
 func (hf *Hoverfly) UpdateResponseDelays(responseDelays models.ResponseDelayList) {
 	hf.ResponseDelays = &responseDelays
 	log.Info("Response delay config updated on hoverfly")

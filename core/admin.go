@@ -731,8 +731,7 @@ func(d *Hoverfly) MiddlewareHandler(w http.ResponseWriter, req *http.Request, ne
 		w.WriteHeader(400) // can't process this entity
 		return
 	}
-
-	d.Cfg.Middleware = middlewareReq.Middleware
+	d.SetMiddleware(middlewareReq.Middleware)
 
 	d.CurrentMiddlewareHandler(w, req, next)
 
