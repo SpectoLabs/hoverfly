@@ -84,11 +84,15 @@ func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
 	w.Write(bts)
 }
 
+func processHandlerOkayButNoResponse(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
+}
+
 func processHandlerNotOkay(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(404)
 }
 
-func TestExecuteMiddlewareLocally(t *testing.T) {
+func TestExecuteMiddlewareRemotely(t *testing.T) {
 	RegisterTestingT(t)
 
 	muxRouter := mux.NewRouter()
@@ -109,7 +113,7 @@ func TestExecuteMiddlewareLocally(t *testing.T) {
 	Expect(processedPayload.Response.Body).To(Equal("You got straight up messed with"))
 }
 
-func TestExecuteMiddlewareLocally_ReturnsErrorIfDoesntGetA200_AndSamePayload(t *testing.T) {
+func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSamePayload(t *testing.T) {
 	RegisterTestingT(t)
 	muxRouter := mux.NewRouter()
 	muxRouter.HandleFunc("/process", processHandlerNotOkay).Methods("POST")
@@ -125,6 +129,26 @@ func TestExecuteMiddlewareLocally_ReturnsErrorIfDoesntGetA200_AndSamePayload(t *
 	processedPayload, err := ExecuteMiddlewareRemotely(server.URL + "/process", testPayload)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Remote middleware did not process payload"))
+
+	Expect(processedPayload).To(Equal(testPayload))
+}
+
+func TestExecuteMiddlewareRemotely_ReturnsErrorIfNoPayloadOnResponse_AnOriginalPayloadIsReturned(t *testing.T) {
+	RegisterTestingT(t)
+	muxRouter := mux.NewRouter()
+	muxRouter.HandleFunc("/process", processHandlerOkayButNoResponse).Methods("POST")
+	server := httptest.NewServer(muxRouter)
+	defer server.Close()
+
+	testPayload := models.Payload{
+		Response: models.ResponseDetails{
+			Body: "Normal body",
+		},
+	}
+
+	processedPayload, err := ExecuteMiddlewareRemotely(server.URL + "/process", testPayload)
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("unexpected end of JSON input"))
 
 	Expect(processedPayload).To(Equal(testPayload))
 }

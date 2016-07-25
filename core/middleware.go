@@ -186,6 +186,7 @@ func ExecuteMiddlewareRemotely(middleware string, payload models.Payload) (model
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Middleware error")
+		return payload, err
 	}
 	return newPayloadView.ConvertToPayload(), nil
 }
