@@ -154,7 +154,7 @@ func ExecuteMiddlewareRemotely(middleware string, payload models.Payload) (model
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-		}).Error("Middleware error")
+		}).Error("Error when building request to remote middleware")
 		return payload, err
 	}
 
@@ -162,20 +162,20 @@ func ExecuteMiddlewareRemotely(middleware string, payload models.Payload) (model
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-		}).Error("Middleware error")
+		}).Error("Error when communicating with remote middleware")
 		return payload, err
 	}
 
 	if resp.StatusCode != 200 {
-		log.Error("Middleware error")
-		return payload, errors.New("Remote middleware did not process payload")
+		log.Error("Remote middleware did not process payload")
+		return payload, errors.New("Error when communicating with remote middleware")
 	}
 
 	newPayloadBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-		}).Error("Middleware error")
+		}).Error("Error when process response from remote middleware")
 		return payload, err
 	}
 
@@ -185,7 +185,7 @@ func ExecuteMiddlewareRemotely(middleware string, payload models.Payload) (model
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-		}).Error("Middleware error")
+		}).Error("Error when trying to serialize response from remote middleware")
 		return payload, err
 	}
 	return newPayloadView.ConvertToPayload(), nil

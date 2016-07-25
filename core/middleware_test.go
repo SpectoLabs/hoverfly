@@ -128,7 +128,7 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSamePayload(t 
 
 	processedPayload, err := ExecuteMiddlewareRemotely(server.URL + "/process", testPayload)
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Remote middleware did not process payload"))
+	Expect(err.Error()).To(Equal("Error when communicating with remote middleware"))
 
 	Expect(processedPayload).To(Equal(testPayload))
 }
