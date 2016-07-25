@@ -653,6 +653,9 @@ func (d *Hoverfly) ImportTemplatesHandler(w http.ResponseWriter, req *http.Reque
 	err = json.Unmarshal(body, &payload)
 
 	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not read request body as request template JSON!")
 		w.WriteHeader(422) // can't process this entity
 		return
 	}

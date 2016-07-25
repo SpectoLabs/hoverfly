@@ -47,11 +47,27 @@ func (this *RequestMatcher) GetPayload(req *http.Request) (*models.Payload, *Mat
 
 		payload, err := this.TemplateStore.GetPayload(req, reqBody)
 		if err != nil {
+			log.WithFields(log.Fields{
+				"key":         key,
+				"error":       err.Error(),
+				"query":       req.URL.RawQuery,
+				"path":        req.URL.RawPath,
+				"destination": req.Host,
+				"method":      req.Method,
+			}).Warn("Failed to find matching request template from template store")
+
 			return nil, &MatchingError{
 				StatusCode: 412,
 				Description: "Could not find recorded request, please record it first!",
 			}
 		}
+		log.WithFields(log.Fields{
+			"key":         key,
+			"query":       req.URL.RawQuery,
+			"path":        req.URL.RawPath,
+			"destination": req.Host,
+			"method":      req.Method,
+		}).Info("Found template matching request from template store")
 		return payload, nil
 	}
 
