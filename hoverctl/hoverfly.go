@@ -216,6 +216,42 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 	return apiResponse.Mode, nil
 }
 
+// GetMiddle will go the middleware endpoint in Hoverfly, parse the JSON response and return the middleware of Hoverfly
+func (h *Hoverfly) GetMiddleware() (string, error) {
+	url := h.buildURL("/api/middleware")
+
+	slingRequest:= sling.New().Get(url)
+
+	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not authenticate with Hoverfly")
+	}
+
+	request, err := slingRequest.Request()
+
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	response, err := h.httpClient.Do(request)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	if response.StatusCode == 401 {
+		return "", errors.New("Hoverfly requires authentication")
+	}
+
+	defer response.Body.Close()
+
+	middlewareResponse := h.createMiddlewareSchema(response)
+
+	return middlewareResponse.Middleware, nil
+}
+
 func (h *Hoverfly) ImportSimulation(payload string) (error) {
 	url := h.buildURL("/api/records")
 
@@ -302,6 +338,24 @@ func (h *Hoverfly) createAPIStateResponse(response *http.Response) (APIStateSche
 
 	return apiResponse
 }
+
+func (h *Hoverfly) createMiddlewareSchema(response *http.Response) (MiddlewareSchema) {
+	body, err := ioutil.ReadAll(response.Body)
+	fmt.Println(string(body))
+	if err != nil {
+		log.Debug(err.Error())
+	}
+
+	var middleware MiddlewareSchema
+
+	err = json.Unmarshal(body, &middleware)
+	if err != nil {
+		log.Debug(err.Error())
+	}
+
+	return middleware
+}
+
 func (h *Hoverfly) addAuthIfNeeded(sling *sling.Sling) (*sling.Sling, error) {
 	if len(h.Username) > 0 || len(h.Password) > 0  && len(h.authToken) == 0 {
 		var err error

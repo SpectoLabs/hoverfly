@@ -19,6 +19,8 @@ var (
 	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
 	modeNameArg = modeCommand.Arg("name", "Set Hoverfly's mode").String()
 
+	middlewareCommand = kingpin.Command("middleware", "Get Hoverfly's middleware config")
+
 	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
 	startArg = startCommand.Arg("server type", "Choose the configuration of Hoverfly (proxy/webserver)").String()
 	stopCommand = kingpin.Command("stop", "Stop a local instance of Hoverfly")
@@ -93,7 +95,14 @@ func main() {
 				log.Info("Hoverfly has been set to ", mode, " mode")
 			}
 
-		case startCommand.FullCommand():
+		case middlewareCommand.FullCommand():
+			middleware, err := hoverfly.GetMiddleware()
+			handleIfError(err)
+
+			log.Info("Hoverfly is currently set to run the following as middleware")
+			log.Info(middleware)
+
+	case startCommand.FullCommand():
 			if *startArg == "webserver" {
 				err := hoverfly.startWithFlags(hoverflyDirectory, "-webserver")
 				handleIfError(err)

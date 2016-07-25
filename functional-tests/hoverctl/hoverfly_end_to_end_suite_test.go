@@ -107,6 +107,33 @@ func startHoverfly(adminPort, proxyPort int, workingDir string) * exec.Cmd {
 	return hoverflyCmd
 }
 
+func startHoverflyWithMiddleware(adminPort, proxyPort int, workingDir, middleware string) * exec.Cmd {
+	hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-db", "memory", "-middleware", middleware)
+
+	err := hoverflyCmd.Start()
+
+	if err != nil {
+		fmt.Println("Unable to start Hoverfly")
+		fmt.Println(hoverflyBinaryUri)
+		fmt.Println("Is the binary there?")
+		os.Exit(1)
+	}
+
+	Eventually(func() int {
+		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
+		if err == nil {
+			return resp.StatusCode
+		} else {
+			fmt.Println(err.Error())
+			return 0
+		}
+	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+
+	return hoverflyCmd
+}
+
+
 func startHoverflyWithAuth(adminPort, proxyPort int, workingDir, username, password string) (*exec.Cmd) {
 	os.Remove(filepath.Join(workingDir, "requests.db"))
 
