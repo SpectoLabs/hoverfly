@@ -42,7 +42,31 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 			})
 		})
 
+
+		Context("When running in webserver mode", func() {
+
+			BeforeEach(func() {
+				hoverflyCmd = startHoverflyWebServer(adminPort, proxyPort)
+				ImportHoverflyTemplates(jsonPayload)
+			})
+
+			It("Should find a match", func() {
+				request := sling.New().Get("http://localhost:" + proxyPortAsString + "/path2").Add("Header", "value2")
+
+				resp := DoRequest(request)
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(202))
+				Expect(string(body)).To(Equal("body2"))
+			})
+
+			AfterEach(func() {
+				stopHoverfly()
+			})
+		})
+
 	})
+
 
 })
 

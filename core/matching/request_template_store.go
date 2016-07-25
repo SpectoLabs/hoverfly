@@ -37,18 +37,20 @@ type RequestTemplate struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
-func(this *RequestTemplateStore) GetPayload(req *http.Request, reqBody []byte) (*models.Payload, error) {
+func(this *RequestTemplateStore) GetPayload(req *http.Request, reqBody []byte, webserver bool) (*models.Payload, error) {
 	// iterate through the request templates, looking for template to match request
 	for _, entry := range *this {
 		// TODO: not matching by default on URL and body - need to enable this
 		// TODO: need to enable regex matches
-		//TODO: enable matching on scheme
+		// TODO: enable matching on scheme
 
 		if entry.RequestTemplate.Body != nil && *entry.RequestTemplate.Body == string(reqBody) {
 			continue
 		}
-		if entry.RequestTemplate.Destination != nil && *entry.RequestTemplate.Destination != req.Host {
-			continue
+		if (!webserver) {
+			if entry.RequestTemplate.Destination != nil && *entry.RequestTemplate.Destination != req.Host {
+				continue
+			}
 		}
 		if entry.RequestTemplate.Path != nil && *entry.RequestTemplate.Path != req.URL.Path {
 			continue
