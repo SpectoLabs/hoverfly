@@ -56,7 +56,7 @@ type stateRequest struct {
 	Destination string `json:"destination"`
 }
 
-type middlewareRequest struct {
+type middlewareSchema struct {
 	Middleware string `json:"middleware"`
 }
 
@@ -702,7 +702,7 @@ func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 }
 
 func(d *Hoverfly) CurrentMiddlewareHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var resp middlewareRequest
+	var resp middlewareSchema
 
 	resp.Middleware = d.Cfg.Middleware
 
@@ -723,7 +723,7 @@ func(d *Hoverfly) MiddlewareHandler(w http.ResponseWriter, req *http.Request, ne
 		return
 	}
 
-	var middlewareReq middlewareRequest
+	var middlewareReq middlewareSchema
 
 	err = json.Unmarshal(body, &middlewareReq)
 	if err != nil {

@@ -421,7 +421,7 @@ func TestGetMiddleware(t *testing.T) {
 	body, err := ioutil.ReadAll(rec.Body)
 	testutil.Expect(t, err, nil)
 
-	middlewareResponse := middlewareRequest{}
+	middlewareResponse := middlewareSchema{}
 	err = json.Unmarshal(body, &middlewareResponse)
 	testutil.Expect(t, err, nil)
 
@@ -436,7 +436,7 @@ func TestSetMiddleware(t *testing.T) {
 
 	dbClient.Cfg.Middleware = "python middleware_test.py"
 
-	var middlewareReq middlewareRequest
+	var middlewareReq middlewareSchema
 	middlewareReq.Middleware = "go run middleware_test.go"
 
 	bts, err := json.Marshal(&middlewareReq)
@@ -452,7 +452,7 @@ func TestSetMiddleware(t *testing.T) {
 	body, err := ioutil.ReadAll(rec.Body)
 	testutil.Expect(t, err, nil)
 
-	middlewareResponse := middlewareRequest{}
+	middlewareResponse := middlewareSchema{}
 	err = json.Unmarshal(body, &middlewareResponse)
 	testutil.Expect(t, err, nil)
 
