@@ -404,6 +404,61 @@ func TestSetNoBody(t *testing.T) {
 	testutil.Expect(t, dbClient.Cfg.GetMode(), SimulateMode)
 }
 
+func TestGetMiddleware(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+	m := getBoneRouter(dbClient)
+
+	dbClient.Cfg.Middleware = "python middleware_test.py"
+	req, err := http.NewRequest("GET", "/api/middleware", nil)
+	testutil.Expect(t, err, nil)
+
+	rec := httptest.NewRecorder()
+	m.ServeHTTP(rec, req)
+	testutil.Expect(t, rec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(rec.Body)
+	testutil.Expect(t, err, nil)
+
+	middlewareResponse := middlewareRequest{}
+	err = json.Unmarshal(body, &middlewareResponse)
+	testutil.Expect(t, err, nil)
+
+	testutil.Expect(t, middlewareResponse.Middleware, "python middleware_test.py")
+}
+
+func TestSetMiddleware(t *testing.T) {
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+	m := getBoneRouter(dbClient)
+
+	dbClient.Cfg.Middleware = "python middleware_test.py"
+
+	var middlewareReq middlewareRequest
+	middlewareReq.Middleware = "go run middleware_test.go"
+
+	bts, err := json.Marshal(&middlewareReq)
+	testutil.Expect(t, err, nil)
+
+	req, err := http.NewRequest("GET", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	testutil.Expect(t, err, nil)
+
+	rec := httptest.NewRecorder()
+	m.ServeHTTP(rec, req)
+	testutil.Expect(t, rec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(rec.Body)
+	testutil.Expect(t, err, nil)
+
+	middlewareResponse := middlewareRequest{}
+	err = json.Unmarshal(body, &middlewareResponse)
+	testutil.Expect(t, err, nil)
+
+	testutil.Expect(t, middlewareResponse.Middleware, "python middleware_test.py")
+}
+
 func TestStatsHandler(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
