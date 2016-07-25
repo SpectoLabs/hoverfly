@@ -8,6 +8,9 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"io/ioutil"
+	"net/http"
+	"errors"
 )
 
 // Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.
@@ -54,7 +57,7 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 }
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
-func ExecuteMiddleware(middlewares string, payload models.Payload) (models.Payload, error) {
+func ExecuteMiddlewareLocally(middlewares string, payload models.Payload) (models.Payload, error) {
 
 	mws := strings.Split(middlewares, "|")
 	var cmdList []*exec.Cmd
@@ -142,4 +145,48 @@ func ExecuteMiddleware(middlewares string, payload models.Payload) (models.Paylo
 
 	return payload, nil
 
+}
+
+func ExecuteMiddlewareRemotely(middleware string, payload models.Payload) (models.Payload, error) {
+	bts, err := json.Marshal(payload.ConvertToPayloadView())
+
+	req, err := http.NewRequest("POST", middleware, bytes.NewBuffer(bts))
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Error when building request to remote middleware")
+		return payload, err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Error when communicating with remote middleware")
+		return payload, err
+	}
+
+	if resp.StatusCode != 200 {
+		log.Error("Remote middleware did not process payload")
+		return payload, errors.New("Error when communicating with remote middleware")
+	}
+
+	newPayloadBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Error when process response from remote middleware")
+		return payload, err
+	}
+
+	var newPayloadView models.PayloadView
+
+	err = json.Unmarshal(newPayloadBytes, &newPayloadView)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Error when trying to serialize response from remote middleware")
+		return payload, err
+	}
+	return newPayloadView.ConvertToPayload(), nil
 }
