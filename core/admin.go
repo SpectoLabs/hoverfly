@@ -727,11 +727,21 @@ func(d *Hoverfly) MiddlewareHandler(w http.ResponseWriter, req *http.Request, ne
 
 	err = json.Unmarshal(body, &middlewareReq)
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(400) // can't process this entity
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not deserialize middleware")
+		http.Error(w, "Unable to deserialize request body.", 400)
 		return
 	}
-	d.SetMiddleware(middlewareReq.Middleware)
+
+	err = d.SetMiddleware(middlewareReq.Middleware)
+	if  err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not execute middleware")
+		http.Error(w, "Invalid middleware", 400)
+		return
+	}
 
 	d.CurrentMiddlewareHandler(w, req, next)
 

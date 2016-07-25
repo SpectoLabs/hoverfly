@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	. "github.com/onsi/gomega"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -428,21 +429,21 @@ func TestGetMiddleware(t *testing.T) {
 	testutil.Expect(t, middlewareResponse.Middleware, "python middleware_test.py")
 }
 
-func TestSetMiddleware(t *testing.T) {
+func TestSetMiddleware_WithValidMiddleware(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 	m := getBoneRouter(dbClient)
 
-	dbClient.Cfg.Middleware = "python middleware_test.py"
+	dbClient.Cfg.Middleware = "python examples/middleware/modify_request/modify_request.py"
 
 	var middlewareReq middlewareSchema
-	middlewareReq.Middleware = "go run middleware_test.go"
+	middlewareReq.Middleware = "python examples/middleware/delay_policy/add_random_delay.py"
 
 	bts, err := json.Marshal(&middlewareReq)
 	testutil.Expect(t, err, nil)
 
-	req, err := http.NewRequest("GET", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(bts)))
 	testutil.Expect(t, err, nil)
 
 	rec := httptest.NewRecorder()
@@ -451,12 +452,46 @@ func TestSetMiddleware(t *testing.T) {
 
 	body, err := ioutil.ReadAll(rec.Body)
 	testutil.Expect(t, err, nil)
-
-	middlewareResponse := middlewareSchema{}
-	err = json.Unmarshal(body, &middlewareResponse)
+	middlewareResp := middlewareSchema{}
+	err = json.Unmarshal(body, &middlewareResp)
 	testutil.Expect(t, err, nil)
 
-	testutil.Expect(t, middlewareResponse.Middleware, "python middleware_test.py")
+	testutil.Expect(t, middlewareResp.Middleware, "python examples/middleware/delay_policy/add_random_delay.py")
+	testutil.Expect(t, dbClient.Cfg.Middleware, "python examples/middleware/delay_policy/add_random_delay.py")
+}
+
+func TestSetMiddleware_WithInvalidMiddleware(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+	m := getBoneRouter(dbClient)
+
+	dbClient.Cfg.Middleware = "python examples/middleware/modify_request/modify_request.py"
+
+	var middlewareReq middlewareSchema
+	middlewareReq.Middleware = "definitely won't execute"
+
+	bts, err := json.Marshal(&middlewareReq)
+	testutil.Expect(t, err, nil)
+
+	req, err := http.NewRequest("POST", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	testutil.Expect(t, err, nil)
+
+	rec := httptest.NewRecorder()
+	m.ServeHTTP(rec, req)
+	testutil.Expect(t, rec.Code, http.StatusBadRequest)
+
+	body, err := ioutil.ReadAll(rec.Body)
+	testutil.Expect(t, err, nil)
+	middlewareResp := middlewareSchema{}
+	err = json.Unmarshal(body, &middlewareResp)
+
+	Expect(err).ToNot(BeNil())
+	Expect(string(body)).To(ContainSubstring("Invalid middleware"))
+
+	testutil.Expect(t, dbClient.Cfg.Middleware, "python examples/middleware/modify_request/modify_request.py")
 }
 
 func TestStatsHandler(t *testing.T) {

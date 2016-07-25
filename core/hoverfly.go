@@ -143,8 +143,31 @@ func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
 	return
 }
 
-func (hf *Hoverfly) SetMiddleware(middleware string) {
+func (hf *Hoverfly) SetMiddleware(middleware string) (error) {
+	testPayload := models.Payload{
+		Request: models.RequestDetails{
+			Path: "/",
+			Method: "GET",
+			Destination: "www.test.com",
+			Scheme: "",
+			Query: "",
+			Body: "",
+			Headers: map[string][]string{"test_header": []string{"true"}},
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body: "ok",
+			Headers: map[string][]string{"test_header": []string{"true"}},
+		},
+	}
+	c := NewConstructor(nil, testPayload)
+	err := c.ApplyMiddleware(middleware)
+	if err != nil {
+		return err
+	}
+
 	hf.Cfg.Middleware = middleware
+	return nil
 }
 
 func (hf *Hoverfly) UpdateResponseDelays(responseDelays models.ResponseDelayList) {
