@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"bytes"
 	"github.com/dghubble/sling"
-	"fmt"
 )
 
 var _ = Describe("Using Hoverfly to return responses by request templates", func() {
@@ -43,25 +42,6 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 			})
 		})
 
-		Context("When running in webserver mode", func() {
-
-			BeforeEach(func() {
-				hoverflyCmd = startHoverflyWebServer(adminPort, proxyPort)
-				ImportHoverflyTemplates(jsonPayload)
-			})
-
-			It("Should find a match", func() {
-				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2").Add("Header", "value2"))
-				body, err := ioutil.ReadAll(resp.Body)
-				Expect(err).To(BeNil())
-				Expect(resp.StatusCode).To(Equal(202))
-				Expect(string(body)).To(Equal("body2"))
-			})
-
-			AfterEach(func() {
-				stopHoverfly()
-			})
-		})
 	})
 
 })

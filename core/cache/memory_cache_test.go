@@ -11,9 +11,7 @@ func TestEmptyByDefault(t *testing.T) {
 
 	expectedKey := []byte{'k'}
 
-	if actualValue, err := cache.Get(expectedKey); err != nil {
-		t.Fatalf("err: %v", err)
-	} else if len(actualValue) != 0 {
+	if actualValue, err := cache.Get(expectedKey); err == nil || len(actualValue) != 0 {
 		t.Fatal("Cache should be empty by default")
 	}
 
@@ -186,11 +184,19 @@ func TestDeleteKey(t *testing.T) {
 
 	cache.Delete([]byte(expectedKey1))
 
-	if value, err := cache.Get(expectedKey1); err != nil {
+	if value, err := cache.Get(expectedKey1); err == nil {
 		t.Fatalf("Error %v", err)
 	} else if len(value) != 0 {
 		t.Fatalf("Expected nil value but got %v", value)
 	} else if value, _ := cache.RecordsCount(); value != 1 {
 		t.Fatalf("Expected %v records but got %v", 1, cache.RecordsCount)
+	}
+}
+
+func TestThrowErrorIfGettingANotExistingKey(t *testing.T) {
+	cache := NewInMemoryCache()
+	_, err := cache.Get([]byte("key"))
+	if (err == nil) {
+		t.Fatal("Expected cache to throw an error when getting a non-existing key")
 	}
 }
