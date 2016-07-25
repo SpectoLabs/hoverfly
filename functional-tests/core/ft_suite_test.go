@@ -4,21 +4,21 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"testing"
-	"github.com/phayes/freeport"
 	"fmt"
-	"net/http"
 	"github.com/dghubble/sling"
-	"strconv"
-	"os"
-	"time"
-	"net/url"
-	"strings"
+	"github.com/phayes/freeport"
 	"io"
+	"io/ioutil"
+	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"os"
 	"os/exec"
 	"path/filepath"
-	"io/ioutil"
+	"strconv"
+	"strings"
+	"testing"
+	"time"
 )
 
 var (
@@ -27,10 +27,10 @@ var (
 
 	hoverflyCmd *exec.Cmd
 
-	adminPort = freeport.GetPort()
+	adminPort         = freeport.GetPort()
 	adminPortAsString = strconv.Itoa(adminPort)
 
-	proxyPort = freeport.GetPort()
+	proxyPort         = freeport.GetPort()
 	proxyPortAsString = strconv.Itoa(proxyPort)
 )
 
@@ -54,7 +54,7 @@ var _ = AfterSuite(func() {
 	stopHoverfly()
 })
 
-func startHoverfly(adminPort, proxyPort int) * exec.Cmd {
+func startHoverfly(adminPort, proxyPort int) *exec.Cmd {
 	hoverflyBinaryUri := buildBinaryPath()
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
 
@@ -66,7 +66,7 @@ func startHoverfly(adminPort, proxyPort int) * exec.Cmd {
 	return hoverflyCmd
 }
 
-func startHoverflyWithDatabase(adminPort, proxyPort int) * exec.Cmd {
+func startHoverflyWithDatabase(adminPort, proxyPort int) *exec.Cmd {
 	hoverflyBinaryUri := buildBinaryPath()
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
 
@@ -78,7 +78,7 @@ func startHoverflyWithDatabase(adminPort, proxyPort int) * exec.Cmd {
 	return hoverflyCmd
 }
 
-func startHoverflyWebServerWithDatabase(adminPort, proxyPort int) * exec.Cmd {
+func startHoverflyWebServerWithDatabase(adminPort, proxyPort int) *exec.Cmd {
 	hoverflyBinaryUri := buildBinaryPath()
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-webserver")
 
@@ -90,7 +90,7 @@ func startHoverflyWebServerWithDatabase(adminPort, proxyPort int) * exec.Cmd {
 	return hoverflyCmd
 }
 
-func startHoverflyWebServer(adminPort, proxyPort int) * exec.Cmd {
+func startHoverflyWebServer(adminPort, proxyPort int) *exec.Cmd {
 	hoverflyBinaryUri := buildBinaryPath()
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-webserver")
 
@@ -102,7 +102,7 @@ func startHoverflyWebServer(adminPort, proxyPort int) * exec.Cmd {
 	return hoverflyCmd
 }
 
-func startHoverflyWithMiddleware(adminPort, proxyPort int, middlewarePath string) * exec.Cmd {
+func startHoverflyWithMiddleware(adminPort, proxyPort int, middlewarePath string) *exec.Cmd {
 	hoverflyBinaryUri := buildBinaryPath()
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-middleware", middlewarePath)
 	hoverflyCmd.Stdout = os.Stdout
@@ -116,7 +116,7 @@ func startHoverflyWithMiddleware(adminPort, proxyPort int, middlewarePath string
 	return hoverflyCmd
 }
 
-func buildBinaryPath() (string) {
+func buildBinaryPath() string {
 	workingDirectory, _ := os.Getwd()
 	return filepath.Join(workingDirectory, "bin/hoverfly")
 }
@@ -141,7 +141,7 @@ func healthcheck(adminPort int) {
 		} else {
 			return 0
 		}
-	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+	}, time.Second*3).Should(BeNumerically("==", http.StatusOK))
 
 	if !hasPassed {
 		fmt.Println(err.Error())
@@ -152,7 +152,7 @@ func stopHoverfly() {
 	hoverflyCmd.Process.Kill()
 }
 
-func DoRequest(r *sling.Sling) (*http.Response) {
+func DoRequest(r *sling.Sling) *http.Response {
 	req, err := r.Request()
 	Expect(err).To(BeNil())
 	response, err := http.DefaultClient.Do(req)
@@ -161,7 +161,7 @@ func DoRequest(r *sling.Sling) (*http.Response) {
 	return response
 }
 
-func DoRequestThroughProxy(r *sling.Sling) (*http.Response) {
+func DoRequestThroughProxy(r *sling.Sling) *http.Response {
 	req, err := r.Request()
 	Expect(err).To(BeNil())
 
@@ -175,7 +175,7 @@ func DoRequestThroughProxy(r *sling.Sling) (*http.Response) {
 }
 
 func SetHoverflyMode(mode string) {
-	req := sling.New().Post(hoverflyAdminUrl + "/api/state").Body(strings.NewReader(`{"mode":"` + mode +`"}`))
+	req := sling.New().Post(hoverflyAdminUrl + "/api/state").Body(strings.NewReader(`{"mode":"` + mode + `"}`))
 	res := DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
 }
@@ -186,7 +186,7 @@ func EraseHoverflyRecords() {
 	Expect(res.StatusCode).To(Equal(200))
 }
 
-func ExportHoverflyRecords() (io.Reader) {
+func ExportHoverflyRecords() io.Reader {
 	res := sling.New().Get(hoverflyAdminUrl + "/api/records")
 	req := DoRequest(res)
 	Expect(req.StatusCode).To(Equal(200))
@@ -205,7 +205,7 @@ func ImportHoverflyTemplates(payload io.Reader) {
 	Expect(res.StatusCode).To(Equal(200))
 }
 
-func CallFakeServerThroughProxy(server * httptest.Server) *http.Response {
+func CallFakeServerThroughProxy(server *httptest.Server) *http.Response {
 	return DoRequestThroughProxy(sling.New().Get(server.URL))
 }
 

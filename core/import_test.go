@@ -3,13 +3,13 @@ package hoverfly
 import (
 	"encoding/base64"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 )
 
 func TestIsURLHTTP(t *testing.T) {

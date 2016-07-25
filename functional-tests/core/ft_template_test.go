@@ -1,16 +1,16 @@
 package hoverfly_test
 
 import (
+	"bytes"
+	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
-	"bytes"
-	"github.com/dghubble/sling"
 )
 
 var _ = Describe("Using Hoverfly to return responses by request templates", func() {
 
-	Context("With a request template loaded for matching on URL + headers", func () {
+	Context("With a request template loaded for matching on URL + headers", func() {
 
 		var (
 			jsonPayload *bytes.Buffer
@@ -42,7 +42,6 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 			})
 		})
 
-
 		Context("When running in webserver mode", func() {
 
 			BeforeEach(func() {
@@ -51,7 +50,7 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 			})
 
 			It("Should find a match", func() {
-				request := sling.New().Get("http://localhost:" + proxyPortAsString + "/path2").Add("Header", "value2")
+				request := sling.New().Get("http://localhost:"+proxyPortAsString+"/path2").Add("Header", "value2")
 
 				resp := DoRequest(request)
 				body, err := ioutil.ReadAll(resp.Body)
@@ -67,6 +66,4 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 
 	})
 
-
 })
-

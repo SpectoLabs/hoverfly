@@ -24,9 +24,9 @@ import (
 	// auth
 	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/authentication/controllers"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 )
 
 // recordedRequests struct encapsulates payload data
@@ -682,7 +682,6 @@ func (d *Hoverfly) ImportTemplatesHandler(w http.ResponseWriter, req *http.Reque
 	w.Write(b)
 
 }
-
 
 // DeleteAllRecordsHandler - deletes all captured requests
 func (d *Hoverfly) DeleteAllTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {

@@ -1,11 +1,11 @@
 package hoverfly_test
 
 import (
+	"bytes"
+	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
-	"github.com/dghubble/sling"
-	"bytes"
 )
 
 var _ = Describe("Interacting with the API", func() {
@@ -141,7 +141,7 @@ var _ = Describe("Interacting with the API", func() {
 			})
 
 			It("Should append the records to the existing ones", func() {
-				res := DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/records").Set("Content-Type", "application/json").Body(jsonPayload2))
+				res := DoRequest(sling.New().Post(hoverflyAdminUrl+"/api/records").Set("Content-Type", "application/json").Body(jsonPayload2))
 				Expect(res.StatusCode).To(Equal(200))
 
 				reqGet := sling.New().Get(hoverflyAdminUrl + "/api/records")

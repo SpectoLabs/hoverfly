@@ -7,6 +7,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	authBackend "github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/rusenask/goproxy"
@@ -16,7 +17,6 @@ import (
 	"regexp"
 	"sync"
 	"time"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond
@@ -61,9 +61,9 @@ type Hoverfly struct {
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
 func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication authBackend.Authentication) *Hoverfly {
 	requestMatcher := matching.RequestMatcher{
-		RequestCache: requestCache,
+		RequestCache:  requestCache,
 		TemplateStore: matching.RequestTemplateStore{},
-		Webserver: &cfg.Webserver,
+		Webserver:     &cfg.Webserver,
 	}
 	h := &Hoverfly{
 		RequestCache:   requestCache,
@@ -406,7 +406,6 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 // getResponse returns stored response from cache
 func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 
-
 	payload, matchErr := hf.RequestMatcher.GetPayload(req)
 	if matchErr != nil {
 		return hoverflyError(req, matchErr, matchErr.Error(), matchErr.StatusCode)
@@ -492,7 +491,6 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) 
 
 	return newResponse, nil
 }
-
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (hf *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, respBody []byte) {

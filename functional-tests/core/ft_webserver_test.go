@@ -14,8 +14,8 @@ import (
 	//"os"
 	//"time"
 	"bytes"
-	"io/ioutil"
 	"github.com/dghubble/sling"
+	"io/ioutil"
 	"strings"
 )
 

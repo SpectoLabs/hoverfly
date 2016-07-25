@@ -1,15 +1,15 @@
 package hoverfly
 
 import (
+	"bytes"
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/matching"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"bytes"
 )
 
 func TestGetAllTemplates(t *testing.T) {
@@ -54,11 +54,11 @@ func TestGetAllTemplatesWTemplates(t *testing.T) {
 	query := "q=test"
 	templateEntry := matching.RequestTemplatePayload{
 		RequestTemplate: matching.RequestTemplate{
-			Headers: headers,
+			Headers:     headers,
 			Destination: &destination,
-			Path: &path,
-			Method: &method,
-			Query: &query,
+			Path:        &path,
+			Method:      &method,
+			Query:       &query,
 		},
 		Response: response,
 	}
@@ -108,16 +108,15 @@ func TestExportImportTemplates(t *testing.T) {
 	query := "q=test"
 	templateEntry := matching.RequestTemplatePayload{
 		RequestTemplate: matching.RequestTemplate{
-			Headers: headers,
+			Headers:     headers,
 			Destination: &destination,
-			Path: &path,
-			Method: &method,
-			Query: &query,
+			Path:        &path,
+			Method:      &method,
+			Query:       &query,
 		},
 		Response: response,
 	}
 	dbClient.RequestMatcher.TemplateStore = matching.RequestTemplateStore{templateEntry, templateEntry}
-
 
 	req, err := http.NewRequest("GET", "/api/templates", nil)
 	testutil.Expect(t, err, nil)
@@ -167,16 +166,15 @@ func TestDeleteTemplates(t *testing.T) {
 	query := "q=test"
 	templateEntry := matching.RequestTemplatePayload{
 		RequestTemplate: matching.RequestTemplate{
-			Headers: headers,
+			Headers:     headers,
 			Destination: &destination,
-			Path: &path,
-			Method: &method,
-			Query: &query,
+			Path:        &path,
+			Method:      &method,
+			Query:       &query,
 		},
 		Response: response,
 	}
 	dbClient.RequestMatcher.TemplateStore = matching.RequestTemplateStore{templateEntry, templateEntry}
-
 
 	// checking whether we have records
 	testutil.Expect(t, len(dbClient.RequestMatcher.TemplateStore), 2)

@@ -11,10 +11,10 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/boltdb/bolt"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -59,9 +59,9 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 	cfg.AuthEnabled = false
 
 	requestMatcher := matching.RequestMatcher{
-		RequestCache: requestCache,
+		RequestCache:  requestCache,
 		TemplateStore: matching.RequestTemplateStore{},
-		Webserver: &cfg.Webserver,
+		Webserver:     &cfg.Webserver,
 	}
 
 	// preparing client

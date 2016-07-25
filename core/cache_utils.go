@@ -36,4 +36,3 @@ func rebuildHashes(db cache.Cache, webserver bool) {
 		}
 	}
 }
-

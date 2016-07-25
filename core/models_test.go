@@ -3,13 +3,13 @@ package hoverfly
 import (
 	"bytes"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 )
 
 // TestMain prepares database for testing and then performs a cleanup

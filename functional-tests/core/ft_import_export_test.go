@@ -1,20 +1,20 @@
 package hoverfly_test
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"compress/gzip"
 	"bytes"
-	"net/http/httptest"
+	"compress/gzip"
 	"fmt"
 	"github.com/dghubble/sling"
-	"os"
-	"net/http"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"os"
 )
 
 // Helper function for gzipping strings
-func GzipString(s string) (string) {
+func GzipString(s string) string {
 	var b bytes.Buffer
 	gz := gzip.NewWriter(&b)
 	gz.Write([]byte(s))
@@ -22,7 +22,6 @@ func GzipString(s string) (string) {
 }
 
 var _ = Describe("Capture > export > importing > simulate flow", func() {
-
 
 	Describe("When I import and export", func() {
 
@@ -70,7 +69,6 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				// Stop hoverfly
 				stopHoverfly()
 			})
-
 
 			It("Returns a status code of 200", func() {
 				Expect(afterImportFakeServerResponse.StatusCode).To(Equal(200))
@@ -143,7 +141,6 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				stopHoverfly()
 			})
 
-
 			It("Returns a status code of 200", func() {
 				Expect(afterImportFakeServerResponse.StatusCode).To(Equal(200))
 			})
@@ -185,7 +182,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "image/jpeg")
 					w.WriteHeader(200)
-					http.ServeFile(w, r, pwd + imageUri)
+					http.ServeFile(w, r, pwd+imageUri)
 				}))
 
 				defer fakeServer.Close()
@@ -220,7 +217,6 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				// Stop hoverfly
 				stopHoverfly()
 			})
-
 
 			It("Returns a status code of 200", func() {
 				Expect(afterImportFakeServerResponse.StatusCode).To(Equal(200))
