@@ -76,20 +76,6 @@ func (this *RequestTemplateStore) ImportPayloads(payloadsView RequestTemplatePay
 		payloads := payloadsView.ConvertToRequestTemplateStore()
 		for _, pl := range payloads {
 
-			if len(pl.RequestTemplate.Headers) == 0 {
-				pl.RequestTemplate.Headers = make(map[string][]string)
-			}
-
-			if _, present := pl.RequestTemplate.Headers["Content-Type"]; !present {
-				// sniffing content types
-				if isJSON(pl.RequestTemplate.Body) {
-					pl.RequestTemplate.Headers["Content-Type"] = []string{"application/json"}
-				} else {
-					ct := http.DetectContentType([]byte(pl.RequestTemplate.Body))
-					pl.RequestTemplate.Headers["Content-Type"] = []string{ct}
-				}
-			}
-
 			//TODO: add hooks for concsistency with request import
 			// note that importing hoverfly is a disallowed circular import
 

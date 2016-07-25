@@ -121,9 +121,6 @@ var _ = Describe("Interacting with the API", func() {
 						"query": "query1",
 						"body": "body1",
 						"headers": {
-						  "Content-Type": [
-						    "text/plain; charset=utf-8"
-						  ],
 						  "Header": [
 						    "value1"
 						  ]
