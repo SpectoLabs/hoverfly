@@ -48,13 +48,17 @@ func TestGetAllTemplatesWTemplates(t *testing.T) {
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
+	destination := "testhost.com"
+	method := "GET"
+	path := "/a/1"
+	query := "q=test"
 	templateEntry := matching.RequestTemplatePayload{
 		RequestTemplate: matching.RequestTemplate{
 			Headers: headers,
-			Destination: "testhost.com",
-			Path: "/a/1",
-			Method: "GET",
-			Query: "q=test",
+			Destination: &destination,
+			Path: &path,
+			Method: &method,
+			Query: &query,
 		},
 		Response: response,
 	}
@@ -98,13 +102,17 @@ func TestExportImportTemplates(t *testing.T) {
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
+	destination := "testhost.com"
+	method := "GET"
+	path := "/a/1"
+	query := "q=test"
 	templateEntry := matching.RequestTemplatePayload{
 		RequestTemplate: matching.RequestTemplate{
 			Headers: headers,
-			Destination: "testhost.com",
-			Path: "/a/1",
-			Method: "GET",
-			Query: "q=test",
+			Destination: &destination,
+			Path: &path,
+			Method: &method,
+			Query: &query,
 		},
 		Response: response,
 	}
@@ -153,13 +161,17 @@ func TestDeleteTemplates(t *testing.T) {
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
+	destination := "testhost.com"
+	method := "GET"
+	path := "/a/1"
+	query := "q=test"
 	templateEntry := matching.RequestTemplatePayload{
 		RequestTemplate: matching.RequestTemplate{
 			Headers: headers,
-			Destination: "testhost.com",
-			Path: "/a/1",
-			Method: "GET",
-			Query: "q=test",
+			Destination: &destination,
+			Path: &path,
+			Method: &method,
+			Query: &query,
 		},
 		Response: response,
 	}

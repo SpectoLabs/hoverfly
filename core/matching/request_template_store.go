@@ -28,12 +28,12 @@ type RequestTemplatePayloadJson struct {
 }
 
 type RequestTemplate struct {
-	Path        string              `json:"path"`
-	Method      string              `json:"method"`
-	Destination string              `json:"destination"`
-	Scheme      string              `json:"scheme"`
-	Query       string              `json:"query"`
-	Body        string              `json:"body"`
+	Path        *string              `json:"path"`
+	Method      *string              `json:"method"`
+	Destination *string              `json:"destination"`
+	Scheme      *string              `json:"scheme"`
+	Query       *string              `json:"query"`
+	Body        *string              `json:"body"`
 	Headers     map[string][]string `json:"headers"`
 }
 
@@ -44,22 +44,22 @@ func(this *RequestTemplateStore) GetPayload(req *http.Request, reqBody []byte) (
 		// TODO: need to enable regex matches
 		//TODO: enable matching on scheme
 
-		if entry.RequestTemplate.Body != "" && entry.RequestTemplate.Body == string(reqBody) {
+		if entry.RequestTemplate.Body != nil && *entry.RequestTemplate.Body == string(reqBody) {
 			continue
 		}
-		if entry.RequestTemplate.Destination != "" && entry.RequestTemplate.Destination != req.Host {
+		if entry.RequestTemplate.Destination != nil && *entry.RequestTemplate.Destination != req.Host {
 			continue
 		}
-		if entry.RequestTemplate.Path != "" && entry.RequestTemplate.Path != req.URL.Path {
+		if entry.RequestTemplate.Path != nil && *entry.RequestTemplate.Path != req.URL.Path {
 			continue
 		}
-		if entry.RequestTemplate.Query != "" && entry.RequestTemplate.Query != req.URL.RawQuery {
+		if entry.RequestTemplate.Query != nil && *entry.RequestTemplate.Query != req.URL.RawQuery {
 			continue
 		}
 		if !headerMatch(entry.RequestTemplate.Headers, req.Header) {
 			continue
 		}
-		if entry.RequestTemplate.Method != "" && entry.RequestTemplate.Method != req.Method {
+		if entry.RequestTemplate.Method != nil && *entry.RequestTemplate.Method != req.Method {
 			continue
 		}
 

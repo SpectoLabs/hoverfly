@@ -210,13 +210,17 @@ func TestEndpointMatchWithHeaders(t *testing.T) {
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
+	destination := "testhost.com"
+	method := "GET"
+	path := "/a/1"
+	query := "q=test"
 	templateEntry := RequestTemplatePayload{
 		RequestTemplate: RequestTemplate{
 			Headers: headers,
-			Destination: "testhost.com",
-			Path: "/a/1",
-			Method: "GET",
-			Query: "q=test",
+			Destination: &destination,
+			Path: &path,
+			Method: &method,
+			Query: &query,
 		},
 		Response: response,
 	}
@@ -243,13 +247,17 @@ func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
+	destination := "testhost.com"
+	method := "GET"
+	path := "/a/1"
+	query := "q=test"
 	templateEntry := RequestTemplatePayload{
 		RequestTemplate: RequestTemplate{
 			Headers: headers,
-			Destination: "testhost.com",
-			Path: "/a/1",
-			Method: "GET",
-			Query: "q=test",
+			Destination: &destination,
+			Path: &path,
+			Method: &method,
+			Query: &query,
 		},
 		Response: response,
 	}
@@ -261,6 +269,38 @@ func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 		"header2": []string{"val2"},
 	}
 	result, _ := store.GetPayload(r, nil)
+
+	Expect(result).To(BeNil())
+}
+
+func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
+	RegisterTestingT(t)
+
+	response := models.ResponseDetails{
+		Body: "test-body",
+	}
+	destination := "testhost.com"
+	method := "GET"
+	path := ""
+	query := "q=test"
+	templateEntry := RequestTemplatePayload{
+		RequestTemplate: RequestTemplate{
+			Destination: &destination,
+			Path: &path,
+			Method: &method,
+			Query: &query,
+		},
+		Response: response,
+	}
+	store := RequestTemplateStore{templateEntry}
+
+	r, _ := http.NewRequest("GET", "http://testhost.com?q=test", nil)
+	result, _ := store.GetPayload(r, nil)
+
+	Expect(result.Response.Body).To(Equal("test-body"))
+
+	r, _ = http.NewRequest("GET", "http://testhost.com/a/1?q=test", nil)
+	result, _ = store.GetPayload(r, nil)
 
 	Expect(result).To(BeNil())
 }
