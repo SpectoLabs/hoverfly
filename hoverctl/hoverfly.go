@@ -30,6 +30,10 @@ type ResponseDelaySchema struct {
 	HttpMethod string `json:"httpmethod"`
 }
 
+type MiddlewareSchema struct {
+	Middleware string `json:"middleware"`
+}
+
 type Hoverfly struct {
 	Host       string
 	AdminPort  string
