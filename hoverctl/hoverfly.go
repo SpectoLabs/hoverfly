@@ -15,16 +15,16 @@ import (
 	"strconv"
 )
 
-type APIStateResponse struct {
+type APIStateSchema struct {
 	Mode        string `json:"mode"`
 	Destination string `json:"destination"`
 }
 
-type APIDelaysResponse struct {
-	Data []ResponseDelay `json:"data"`
+type APIDelaySchema struct {
+	Data []ResponseDelaySchema `json:"data"`
 }
 
-type ResponseDelay struct {
+type ResponseDelaySchema struct {
 	UrlPattern string `json:"urlpattern"`
 	Delay      int `json:"delay"`
 	HttpMethod string `json:"httpmethod"`
@@ -282,13 +282,13 @@ func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 	return body, nil
 }
 
-func (h *Hoverfly) createAPIStateResponse(response *http.Response) (APIStateResponse) {
+func (h *Hoverfly) createAPIStateResponse(response *http.Response) (APIStateSchema) {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())
 	}
 
-	var apiResponse APIStateResponse
+	var apiResponse APIStateSchema
 
 	err = json.Unmarshal(body, &apiResponse)
 	if err != nil {
@@ -479,7 +479,7 @@ func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) (error) {
 }
 
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
-func (h *Hoverfly) GetDelays() (rd []ResponseDelay, err error) {
+func (h *Hoverfly) GetDelays() (rd []ResponseDelaySchema, err error) {
 	url := h.buildURL("/api/delays")
 
 	slingRequest:= sling.New().Get(url)
@@ -512,7 +512,7 @@ func (h *Hoverfly) GetDelays() (rd []ResponseDelay, err error) {
 
 
 // Set will go the state endpoint in Hoverfly, sending JSON that will set the mode of Hoverfly
-func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelay, err error) {
+func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelaySchema, err error) {
 
 	conf, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -565,13 +565,13 @@ func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelay, err error) {
 	return apiResponse.Data, nil
 }
 
-func createAPIDelaysResponse(response *http.Response) (APIDelaysResponse) {
+func createAPIDelaysResponse(response *http.Response) (APIDelaySchema) {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())
 	}
 
-	var apiResponse APIDelaysResponse
+	var apiResponse APIDelaySchema
 
 	err = json.Unmarshal(body, &apiResponse)
 	if err != nil {
