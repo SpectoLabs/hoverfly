@@ -739,7 +739,7 @@ func(d *Hoverfly) MiddlewareHandler(w http.ResponseWriter, req *http.Request, ne
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Could not execute middleware")
-		http.Error(w, "Invalid middleware", 400)
+		http.Error(w, "Invalid middleware: " + err.Error(), 400)
 		return
 	}
 
