@@ -1,12 +1,11 @@
 package hoverfly
 
 import (
+	. "github.com/onsi/gomega"
 	"encoding/base64"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/testutil"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -16,49 +15,49 @@ func TestIsURLHTTP(t *testing.T) {
 	url := "http://somehost.com"
 
 	b := isURL(url)
-	testutil.Expect(t, b, true)
+	Expect(b).To(BeTrue())
 }
 
 func TestIsURLEmpty(t *testing.T) {
 	b := isURL("")
-	testutil.Expect(t, b, false)
+	Expect(b).To(BeFalse())
 }
 
 func TestIsURLHTTPS(t *testing.T) {
 	url := "https://somehost.com"
 
 	b := isURL(url)
-	testutil.Expect(t, b, true)
+	Expect(b).To(BeTrue())
 }
 
 func TestIsURLWrong(t *testing.T) {
 	url := "somehost.com"
 
 	b := isURL(url)
-	testutil.Expect(t, b, false)
+	Expect(b).To(BeFalse())
 }
 
 func TestIsURLWrongTLD(t *testing.T) {
 	url := "http://somehost."
 
 	b := isURL(url)
-	testutil.Expect(t, b, false)
+	Expect(b).To(BeFalse())
 }
 
 func TestFileExists(t *testing.T) {
 	fp := "examples/exports/readthedocs.json"
 
 	ex, err := exists(fp)
-	testutil.Expect(t, ex, true)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
+	Expect(ex).To(BeTrue())
 }
 
 func TestFileDoesNotExist(t *testing.T) {
 	fp := "shouldnotbehere.yaml"
 
 	ex, err := exists(fp)
-	testutil.Expect(t, ex, false)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
+	Expect(ex).To(BeFalse())
 }
 
 func TestImportFromDisk(t *testing.T) {
@@ -67,11 +66,12 @@ func TestImportFromDisk(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 
 	err := dbClient.Import("examples/exports/readthedocs.json")
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	recordsCount, err := dbClient.RequestCache.RecordsCount()
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, recordsCount, 5)
+	Expect(err).To(BeNil())
+
+	Expect(recordsCount).To(Equal(5))
 }
 
 func TestImportFromDiskBlankPath(t *testing.T) {
@@ -80,7 +80,7 @@ func TestImportFromDiskBlankPath(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 
 	err := dbClient.ImportFromDisk("")
-	testutil.Refute(t, err, nil)
+	Expect(err).ToNot(BeNil())
 }
 
 func TestImportFromDiskWrongJson(t *testing.T) {
@@ -89,15 +89,15 @@ func TestImportFromDiskWrongJson(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 
 	err := dbClient.ImportFromDisk("examples/exports/README.md")
-	testutil.Refute(t, err, nil)
+	Expect(err).ToNot(BeNil())
 }
 
 func TestImportFromURL(t *testing.T) {
 	// reading file and preparing json payload
 	payloadsFile, err := os.Open("examples/exports/readthedocs.json")
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 	bts, err := ioutil.ReadAll(payloadsFile)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	// pretending this is the endpoint with given json
 	server, dbClient := testTools(200, string(bts))
@@ -106,11 +106,11 @@ func TestImportFromURL(t *testing.T) {
 
 	// importing payloads
 	err = dbClient.Import("http://thiswillbeintercepted.json")
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	recordsCount, err := dbClient.RequestCache.RecordsCount()
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, recordsCount, 5)
+	Expect(err).To(BeNil())
+	Expect(recordsCount).To(Equal(5))
 }
 
 func TestImportFromURLHTTPFail(t *testing.T) {
@@ -121,7 +121,7 @@ func TestImportFromURLHTTPFail(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 
 	err := dbClient.ImportFromURL("somepath")
-	testutil.Refute(t, err, nil)
+	Expect(err).ToNot(BeNil())
 }
 
 func TestImportFromURLMalformedJSON(t *testing.T) {
@@ -133,7 +133,7 @@ func TestImportFromURLMalformedJSON(t *testing.T) {
 	// importing payloads
 	err := dbClient.Import("http://thiswillbeintercepted.json")
 	// we should get error
-	testutil.Refute(t, err, nil)
+	Expect(err).ToNot(BeNil())
 }
 
 func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
