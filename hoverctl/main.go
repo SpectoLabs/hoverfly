@@ -260,7 +260,6 @@ func main() {
 			}
 		case templatesCommand.FullCommand():
 			if *templatesPathArg == "" || *templatesPathArg == "status" {
-				fmt.Println("test")
 				requestTemplatesData, err := hoverfly.GetRequestTemplates()
 				handleIfError(err)
 				requestTemplatesJson, err := json.MarshalIndent(requestTemplatesData, "", "    ")
