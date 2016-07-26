@@ -198,8 +198,10 @@ func main() {
 				handleIfError(err)
 				err = hoverfly.DeleteRequestTemplates()
 				handleIfError(err)
+				_, err = hoverfly.SetMiddleware("")
+				handleIfError(err)
 
-				log.Info("Delays, request templates and simulations have been deleted from Hoverfly")
+				log.Info("Delays, middleware, request templates and simulations have all been deleted from Hoverfly")
 			}
 			if *deleteArg == "simulations" {
 				err := hoverfly.DeleteSimulations()

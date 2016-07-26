@@ -201,27 +201,30 @@ var _ = Describe("When I use hoverctl", func() {
 				resp := DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/templates", adminPort)).Body(fileReader))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(ContainSubstring(`{"message":"2 payloads import complete."}`))
+
+				exec.Command(hoverctlBinary, "middleware", "python testdata/add_random_delay.py").Output()
 			})
 
-			Context("I can delete all data in Hoverfly", func() {
+			It("by calling delete all", func() {
+				out, _ := exec.Command(hoverctlBinary, "delete", "all").Output()
+				output := strings.TrimSpace(string(out))
+				Expect(output).To(ContainSubstring("Delays, middleware, request templates and simulations have all been deleted from Hoverfly"))
 
-				It("by calling delete all", func() {
-					out, _ := exec.Command(hoverctlBinary, "delete", "all").Output()
-					output := strings.TrimSpace(string(out))
-					Expect(output).To(ContainSubstring("Delays, request templates and simulations have been deleted from Hoverfly"))
+				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/delays", adminPort)))
+				bytes, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(Equal(`{"data":[]}`))
 
-					resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/delays", adminPort)))
-					bytes, _ := ioutil.ReadAll(resp.Body)
-					Expect(string(bytes)).To(Equal(`{"data":[]}`))
+				resp = DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				bytes, _ = ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(Equal(`{"data":null}`))
 
-					resp = DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
-					bytes, _ = ioutil.ReadAll(resp.Body)
-					Expect(string(bytes)).To(Equal(`{"data":null}`))
+				resp = DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/templates", adminPort)))
+				bytes, _ = ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(ContainSubstring(`{"data":null}`))
 
-					resp = DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/templates", adminPort)))
-					bytes, _ = ioutil.ReadAll(resp.Body)
-					Expect(string(bytes)).To(ContainSubstring(`{"data":null}`))
-				})
+				resp = DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/middleware", adminPort)))
+				bytes, _ = ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(Equal(`{"middleware":""}`))
 			})
 		})
 
