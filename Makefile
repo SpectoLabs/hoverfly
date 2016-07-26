@@ -18,7 +18,7 @@ hoverctl-functional-test-dependencies:
 
 hoverfly-test: hoverfly-dependencies
 	cd core && \
-	go test -v $(go list ./.. | grep -v -E 'vendor')
+	go test -v $(go list ./... | grep -v -E 'vendor')
 
 hoverctl-test: hoverctl-dependencies
 	cd hoverctl && \
@@ -35,7 +35,7 @@ hoverctl-build: hoverctl-test
 hoverfly-functional-test: hoverfly-functional-test-dependencies hoverfly-build
 	cp target/hoverfly functional-tests/core/bin/hoverfly
 	cd functional-tests/core && \
-	go test -v $(go list ./.. | grep -v -E 'vendor')
+	go test -v $(go list ./... | grep -v -E 'vendor')
 
 hoverctl-functional-test: hoverctl-functional-test-dependencies hoverctl-build
 	cp target/hoverctl functional-tests/hoverctl/bin/hoverctl
