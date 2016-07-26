@@ -55,7 +55,7 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(ContainSubstring("Hoverfly could not execute this middleware"))
 		})
 
-		It("I cannae set the hoverfly's middleware when specifying non-existing file -v", func() {
+		It("When I use the verbose flag, I see that python exited with status 2", func() {
 			out, _ := exec.Command(hoverctlBinary, "-v", "middleware", `python testdata/not_a_real_file.fake`).Output()
 
 			output := strings.TrimSpace(string(out))
@@ -63,7 +63,7 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(ContainSubstring("Invalid middleware: exit status 2"))
 		})
 
-		It("I cannae set the hoverfly's middleware when specifying non-existing binary -v", func() {
+		It("When I use the verbose flag, I see that notpython is not an executable", func() {
 			out, _ := exec.Command(hoverctlBinary, "-v", "middleware", `notpython testdata/add_random_delay.py`).Output()
 
 			output := strings.TrimSpace(string(out))
