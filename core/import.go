@@ -169,10 +169,12 @@ func (hf *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
 						"actionType": ActionTypeRequestCaptured,
 					}).Error("failed to fire hook")
 				}
-				if hf.Cfg.Webserver {
-					err = hf.RequestCache.Set([]byte(pl.IdWithoutHost()), bts)
-				} else {
-					err = hf.RequestCache.Set([]byte(pl.Id()), bts)
+
+				err := hf.RequestMatcher.SavePayload(&pl)
+				if err != nil {
+					log.WithFields(log.Fields{
+						"error": err.Error(),
+					}).Error("Failed to save payload")
 				}
 
 				if err == nil {

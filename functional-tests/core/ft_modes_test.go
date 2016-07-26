@@ -1,25 +1,25 @@
 package hoverfly_test
 
 import (
+	"bytes"
+	"fmt"
+	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
-	"bytes"
-	"github.com/dghubble/sling"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"strings"
-	"fmt"
-	"net/http"
 	"os"
+	"strings"
 )
 
 var _ = Describe("Running Hoverfly in various modes", func() {
 
 	Context("When running in capture mode", func() {
 
-		var fakeServer * httptest.Server
-		var fakeServerUrl * url.URL
+		var fakeServer *httptest.Server
+		var fakeServerUrl *url.URL
 
 		Context("without middleware", func() {
 
@@ -170,7 +170,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			jsonPayload *bytes.Buffer
 		)
 
-		BeforeEach(func(){
+		BeforeEach(func() {
 			jsonPayload = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}, {"request": {"path": "/path2", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
 		})
 
@@ -237,7 +237,6 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				stopHoverfly()
 			})
 
-
 		})
 
 		Context("Without middleware", func() {
@@ -269,7 +268,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/middleware.py")
 				SetHoverflyMode("modify")
 				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					body, _ := ioutil.ReadAll(r.Body);
+					body, _ := ioutil.ReadAll(r.Body)
 					requestBody = string(body)
 					w.Header().Set("Content-Type", "text/plain")
 					w.Header().Set("Date", "date")
@@ -324,7 +323,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			SetHoverflyMode("synthesize")
 			pwd, _ := os.Getwd()
 			expectedFile := "/testdata/1x1.png"
-			expectedImage, _  = ioutil.ReadFile(pwd + expectedFile)
+			expectedImage, _ = ioutil.ReadFile(pwd + expectedFile)
 		})
 
 		It("Should render an image correctly after base64 encoding it using middleware", func() {

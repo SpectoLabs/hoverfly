@@ -2,6 +2,7 @@ package cache
 
 import (
 	"sync"
+	"fmt"
 )
 
 // Cache used for storing requests and responses in memory
@@ -28,8 +29,11 @@ func (c *InMemoryCache) Get(key []byte) (value []byte, err error) {
 	bytes := c.elements[string(key)]
 	value = make([]byte, len(bytes), len(bytes))
 	copy(value, bytes)
+	if (len(value) == 0) {
+		return nil, fmt.Errorf("key %q not found \n", key)
+	}
 	c.RUnlock()
-	return
+	return value, nil
 }
 
 func (c *InMemoryCache) GetAllValues() (values [][]byte, err error) {

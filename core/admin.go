@@ -24,6 +24,7 @@ import (
 	// auth
 	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/authentication/controllers"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
@@ -139,9 +140,25 @@ func getBoneRouter(d *Hoverfly) *bone.Mux {
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.DeleteAllRecordsHandler),
 	))
+
 	mux.Post("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.ImportRecordsHandler),
+	))
+
+	mux.Get("/api/templates", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.GetAllTemplatesHandler),
+	))
+
+	mux.Delete("/api/templates", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.DeleteAllTemplatesHandler),
+	))
+
+	mux.Post("/api/templates", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.ImportTemplatesHandler),
 	))
 
 	mux.Get("/api/metadata", negroni.New(
@@ -583,6 +600,100 @@ func (d *Hoverfly) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 		response.Message = "Proxy cache deleted successfuly"
 		w.WriteHeader(200)
 	}
+
+	b, err := response.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+	w.Write(b)
+	return
+}
+
+// AllRecordsHandler returns JSON content type http response
+func (d *Hoverfly) GetAllTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	payloadJson := d.RequestMatcher.TemplateStore.ConvertToPayloadJson()
+
+	w.Header().Set("Content-Type", "application/json")
+
+	b, err := json.Marshal(payloadJson)
+
+	if err != nil {
+		log.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		w.Write(b)
+		return
+	}
+}
+
+func (d *Hoverfly) ImportTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+
+	var payload matching.RequestTemplatePayloadJson
+
+	defer req.Body.Close()
+	body, err := ioutil.ReadAll(req.Body)
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	var response messageResponse
+
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not read request body!")
+		http.Error(w, "Failed to read request body.", 400)
+		return
+	}
+
+	err = json.Unmarshal(body, &payload)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not read request body as request template JSON!")
+		w.WriteHeader(422) // can't process this entity
+		return
+	}
+
+	err = d.RequestMatcher.TemplateStore.ImportPayloads(payload)
+
+	if err != nil {
+		response.Message = err.Error()
+		w.WriteHeader(400)
+	} else {
+		response.Message = fmt.Sprintf("%d payloads import complete.", len(*payload.Data))
+	}
+
+	b, err := response.Encode()
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not encode response body!")
+		http.Error(w, "Failed to encode response", 500)
+		return
+	}
+
+	w.Write(b)
+
+}
+
+// DeleteAllRecordsHandler - deletes all captured requests
+func (d *Hoverfly) DeleteAllTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	d.RequestMatcher.TemplateStore.Wipe()
+
+	// TODO: add hooks for consistency with records
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var response messageResponse
+	response.Message = "Template store wiped successfuly"
+	w.WriteHeader(200)
 
 	b, err := response.Encode()
 	if err != nil {

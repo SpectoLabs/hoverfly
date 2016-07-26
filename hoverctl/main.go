@@ -6,6 +6,7 @@ import (
 	"os"
 	"fmt"
 	"errors"
+	"encoding/json"
 )
 
 var (
@@ -42,11 +43,15 @@ var (
 	deleteCommand = kingpin.Command("delete", "Delete test data from Hoverfly")
 	deleteArg = deleteCommand.Arg("resource", "A collection of data that can be deleted").String()
 
-	delaysCommand = kingpin.Command("delays", "Get per-host response delay config currently loaded into Hoverfly")
+	delaysCommand = kingpin.Command("delays", "Get per-host response delay config currently loaded in Hoverfly")
 	delaysPathArg = delaysCommand.Arg("path", "Set per-host response delay config from JSON file").String()
 
 	logsCommand = kingpin.Command("logs", "Get the logs from Hoverfly")
 	followLogsFlag = logsCommand.Flag("follow", "Follow the logs from Hoverfly").Bool()
+
+	templatesCommand = kingpin.Command("templates", "Get set of request templates currently loaded in Hoverfly")
+	templatesPathArg = templatesCommand.Arg("path", "Add JSON config to set of request templates in Hoverfly").String()
+
 )
 
 func main() {
@@ -84,7 +89,7 @@ func main() {
 
 	switch kingpin.Parse() {
 		case modeCommand.FullCommand():
-			if *modeNameArg == "" || *modeNameArg == "status"{
+			if *modeNameArg == "" || *modeNameArg == "status" {
 				mode, err := hoverfly.GetMode()
 				handleIfError(err)
 
@@ -191,8 +196,10 @@ func main() {
 				handleIfError(err)
 				err = hoverfly.DeleteDelays()
 				handleIfError(err)
+				err = hoverfly.DeleteRequestTemplates()
+				handleIfError(err)
 
-				log.Info("Delays and simulations have been deleted from Hoverfly")
+				log.Info("Delays, request templates and simulations have been deleted from Hoverfly")
 			}
 			if *deleteArg == "simulations" {
 				err := hoverfly.DeleteSimulations()
@@ -205,6 +212,12 @@ func main() {
 				handleIfError(err)
 
 				log.Info("Delays have been deleted from Hoverfly")
+			}
+			if *deleteArg == "templates" {
+				err := hoverfly.DeleteRequestTemplates()
+				handleIfError(err)
+
+				log.Info("Request templates have been deleted from Hoverfly")
 			}
 
 			if *deleteArg == "middleware" {
@@ -221,7 +234,7 @@ func main() {
 			}
 
 		case delaysCommand.FullCommand():
-			if *delaysPathArg == "" || *delaysPathArg == "status"{
+			if *delaysPathArg == "" || *delaysPathArg == "status" {
 				delays, err := hoverfly.GetDelays()
 				handleIfError(err)
 				for _, delay := range delays {
@@ -238,7 +251,6 @@ func main() {
 		case logsCommand.FullCommand():
 			logfile := NewLogFile(hoverflyDirectory, hoverfly.AdminPort, hoverfly.ProxyPort)
 
-
 			if *followLogsFlag {
 				err := logfile.Tail()
 				handleIfError(err)
@@ -246,7 +258,26 @@ func main() {
 				err := logfile.Print()
 				handleIfError(err)
 			}
-	}
+		case templatesCommand.FullCommand():
+			if *templatesPathArg == "" || *templatesPathArg == "status" {
+				requestTemplatesData, err := hoverfly.GetRequestTemplates()
+				handleIfError(err)
+				requestTemplatesJson, err := json.MarshalIndent(requestTemplatesData, "", "    ")
+				if err != nil {
+					log.Error("Error marshalling JSON for printing request templates: " + err.Error())
+				}
+				fmt.Println(string(requestTemplatesJson))
+			} else {
+				requestTemplatesData, err := hoverfly.SetRequestTemplates(*templatesPathArg)
+				handleIfError(err)
+				fmt.Println("Request template data set in Hoverfly: ")
+				requestTemplatesJson, err := json.MarshalIndent(requestTemplatesData, "", "    ")
+				if err != nil {
+					log.Error("Error marshalling JSON for printing request templates: " + err.Error())
+				}
+				fmt.Println(string(requestTemplatesJson))
+			}
+		}
 }
 
 func handleIfError(err error) {

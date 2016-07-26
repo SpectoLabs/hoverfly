@@ -52,6 +52,7 @@ var _ = Describe("When I use hoverctl", func() {
 	Context("and start Hoverfly using hoverctl", func() {
 
 		Context("the logs get captured in a .log file", func() {
+
 			It("and I can see it has started", func() {
 				exec.Command(hoverctlBinary, "start", "--admin-port=" + adminPort, "--proxy-port=" + proxyPort).Output()
 

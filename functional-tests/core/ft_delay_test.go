@@ -1,14 +1,14 @@
 package hoverfly_test
 
 import (
+	"bytes"
+	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
-	"bytes"
-	"github.com/dghubble/sling"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"net/http"
 	"time"
 )
 
@@ -16,8 +16,8 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 	Context("When running in capture mode", func() {
 
-		var fakeServer * httptest.Server
-		var fakeServerUrl * url.URL
+		var fakeServer *httptest.Server
+		var fakeServerUrl *url.URL
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
@@ -55,7 +55,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 			jsonPayload *bytes.Buffer
 		)
 
-		BeforeEach(func(){
+		BeforeEach(func() {
 			jsonPayload = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}, {"request": {"path": "/path2", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
 			SetHoverflyResponseDelays("testdata/delays.json")

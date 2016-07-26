@@ -3,6 +3,7 @@ package hoverfly
 import (
 	"encoding/base64"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/testutil"
 	. "github.com/onsi/gomega"
@@ -138,7 +139,8 @@ func TestImportFromURLMalformedJSON(t *testing.T) {
 func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg}
+	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher}
 
 	RegisterTestingT(t)
 
@@ -157,7 +159,6 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	hv.ImportPayloads([]models.PayloadView{originalPayload})
-
 	value, _ := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	decodedPayload, _ := models.NewPayloadFromBytes(value)
 	Expect(*decodedPayload).To(Equal(models.Payload{
@@ -183,7 +184,8 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg}
+	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher}
 
 	RegisterTestingT(t)
 
@@ -238,7 +240,8 @@ func base64String(s string) string {
 func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg}
+	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher}
 
 	RegisterTestingT(t)
 

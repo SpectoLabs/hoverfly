@@ -1,10 +1,10 @@
 package hoverfly
 
 import (
-	"testing"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
+	"testing"
 )
 
 func Test_rebuildHashes_whenDataIsHashedForAProxy_andStillAProxy_keysAreNotChanged(t *testing.T) {
@@ -15,7 +15,7 @@ func Test_rebuildHashes_whenDataIsHashedForAProxy_andStillAProxy_keysAreNotChang
 
 	testPayload := models.Payload{
 		Request: models.RequestDetails{
-			Path: "/hello",
+			Path:        "/hello",
 			Destination: "a-host.com",
 		},
 		Response: models.ResponseDetails{
@@ -43,7 +43,7 @@ func Test_rebuildHashes_whenDataIsHashedForAWebserver_andStillAWebserver_keysAre
 
 	testPayload := models.Payload{
 		Request: models.RequestDetails{
-			Path: "/hello",
+			Path:        "/hello",
 			Destination: "a-host.com",
 		},
 		Response: models.ResponseDetails{
@@ -71,7 +71,7 @@ func Test_rebuildHashes_whenDataIsHashedForAProxy_andIsNowAWebserver_keysAreChan
 
 	testPayload := models.Payload{
 		Request: models.RequestDetails{
-			Path: "/hello",
+			Path:        "/hello",
 			Destination: "a-host.com",
 		},
 		Response: models.ResponseDetails{

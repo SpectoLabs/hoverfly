@@ -74,3 +74,4 @@ func (r *ResponseDetailsView) ConvertToResponseDetails() (ResponseDetails) {
 
 	return ResponseDetails{Status: r.Status, Body: body, Headers: r.Headers}
 }
+
