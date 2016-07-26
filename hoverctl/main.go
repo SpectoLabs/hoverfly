@@ -211,6 +211,12 @@ func main() {
 
 				log.Info("Delays have been deleted from Hoverfly")
 			}
+			if *deleteArg == "templates" {
+				err := hoverfly.DeleteRequestTemplates()
+				handleIfError(err)
+
+				log.Info("Request templates have been deleted from Hoverfly")
+			}
 
 			if *deleteArg == "middleware" {
 				_, err := hoverfly.SetMiddleware("")

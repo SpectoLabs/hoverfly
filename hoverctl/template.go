@@ -98,28 +98,14 @@ func unmarshalRequestTemplates(response *http.Response) (*matching.RequestTempla
 
 	return &requestTemplates, nil
 }
-/**
-func (h *Hoverfly) DeleteDelays() (error) {
-	url := h.buildURL("/api/delays")
+
+func (h *Hoverfly) DeleteRequestTemplates() (error) {
+	url := h.buildURL("/api/templates")
 
 	slingRequest := sling.New().Delete(url)
-	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	response, err := h.performAPIRequest(slingRequest)
 	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not authenticate  with Hoverfly")
-	}
-
-	request, err := slingRequest.Request()
-
-	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not communicate with Hoverfly")
-	}
-
-	response, err := h.httpClient.Do(request)
-	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not communicate with Hoverfly")
+		return err
 	}
 
 	defer response.Body.Close()
@@ -129,8 +115,8 @@ func (h *Hoverfly) DeleteDelays() (error) {
 	}
 
 	if response.StatusCode != 200 {
-		return errors.New("Delays were not deleted from Hoverfly")
+		return errors.New("Templates were not deleted from Hoverfly")
 	}
 
 	return nil
-}**/
+}

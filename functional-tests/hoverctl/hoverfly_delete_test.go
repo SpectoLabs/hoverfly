@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"github.com/dghubble/sling"
+	"os"
 )
 
 var _ = Describe("When I use hoverctl", func() {
@@ -123,6 +124,30 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 		})
 
+
+		Context("I can delete the request templates in Hoverfly", func() {
+			BeforeEach(func() {
+				fileReader, err := os.Open("testdata/request-template.json")
+				defer fileReader.Close()
+				if err != nil {
+					Fail("Failed to read request template test data")
+				}
+				resp := DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/templates", adminPort)).Body(fileReader))
+				bytes, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(ContainSubstring(`{"message":"2 payloads import complete."}`))
+			})
+
+			It("and they should be removed", func() {
+				out, _ := exec.Command(hoverctlBinary, "delete", "templates").Output()
+
+				output := strings.TrimSpace(string(out))
+				Expect(output).To(ContainSubstring("Request templates have been deleted from Hoverfly"))
+
+				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/templates", adminPort)))
+				bytes, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(ContainSubstring(`"data":null`))
+			})
+		})
 
 		Context("I can delete everything in hoverfly", func() {
 
