@@ -15,19 +15,32 @@ import (
 	"strconv"
 )
 
-type APIStateResponse struct {
+type APIStateSchema struct {
 	Mode        string `json:"mode"`
 	Destination string `json:"destination"`
 }
 
-type APIDelaysResponse struct {
-	Data []ResponseDelay `json:"data"`
+type APIDelaySchema struct {
+	Data []ResponseDelaySchema `json:"data"`
 }
 
-type ResponseDelay struct {
+type ResponseDelaySchema struct {
 	UrlPattern string `json:"urlpattern"`
 	Delay      int `json:"delay"`
 	HttpMethod string `json:"httpmethod"`
+}
+
+type HoverflyAuthSchema struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type HoverflyAuthTokenSchema struct {
+	Token string `json:"token"`
+}
+
+type MiddlewareSchema struct {
+	Middleware string `json:"middleware"`
 }
 
 type Hoverfly struct {
@@ -40,14 +53,6 @@ type Hoverfly struct {
 	httpClient *http.Client
 }
 
-type HoverflyAuth struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type HoverflyAuthToken struct {
-	Token string `json:"token"`
-}
 
 func NewHoverfly(config Config) (Hoverfly) {
 	return Hoverfly{
@@ -211,6 +216,86 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 	return apiResponse.Mode, nil
 }
 
+// GetMiddle will go the middleware endpoint in Hoverfly, parse the JSON response and return the middleware of Hoverfly
+func (h *Hoverfly) GetMiddleware() (string, error) {
+	url := h.buildURL("/api/middleware")
+
+	slingRequest:= sling.New().Get(url)
+
+	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not authenticate with Hoverfly")
+	}
+
+	request, err := slingRequest.Request()
+
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	response, err := h.httpClient.Do(request)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	if response.StatusCode == 401 {
+		return "", errors.New("Hoverfly requires authentication")
+	}
+
+	defer response.Body.Close()
+
+	middlewareResponse := h.createMiddlewareSchema(response)
+
+	return middlewareResponse.Middleware, nil
+}
+
+func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
+	url := h.buildURL("/api/middleware")
+
+	slingRequest := sling.New().Post(url).Body(strings.NewReader(`{"middleware":"` + middleware + `"}`))
+
+	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not authenticate  with Hoverfly")
+	}
+
+	request, err := slingRequest.Request()
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	response, err := h.httpClient.Do(request)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	if response.StatusCode == 401 {
+		return "", errors.New("Hoverfly requires authentication")
+	}
+
+	if response.StatusCode == 403 {
+		return "", errors.New("Cannot change the mode of Hoverfly when running as a webserver")
+	}
+
+	if response.StatusCode != 200 {
+		defer response.Body.Close()
+		errorMessage, _ := ioutil.ReadAll(response.Body)
+		trimmedError := strings.TrimSpace(string(errorMessage))
+		log.Debug(trimmedError)
+		return "", errors.New("Hoverfly could not execute this middleware")
+	}
+
+	apiResponse := h.createMiddlewareSchema(response)
+
+	return apiResponse.Middleware, nil
+}
+
 func (h *Hoverfly) ImportSimulation(payload string) (error) {
 	url := h.buildURL("/api/records")
 
@@ -282,13 +367,13 @@ func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 	return body, nil
 }
 
-func (h *Hoverfly) createAPIStateResponse(response *http.Response) (APIStateResponse) {
+func (h *Hoverfly) createAPIStateResponse(response *http.Response) (APIStateSchema) {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())
 	}
 
-	var apiResponse APIStateResponse
+	var apiResponse APIStateSchema
 
 	err = json.Unmarshal(body, &apiResponse)
 	if err != nil {
@@ -297,6 +382,24 @@ func (h *Hoverfly) createAPIStateResponse(response *http.Response) (APIStateResp
 
 	return apiResponse
 }
+
+func (h *Hoverfly) createMiddlewareSchema(response *http.Response) (MiddlewareSchema) {
+	body, err := ioutil.ReadAll(response.Body)
+	fmt.Println(string(body))
+	if err != nil {
+		log.Debug(err.Error())
+	}
+
+	var middleware MiddlewareSchema
+
+	err = json.Unmarshal(body, &middleware)
+	if err != nil {
+		log.Debug(err.Error())
+	}
+
+	return middleware
+}
+
 func (h *Hoverfly) addAuthIfNeeded(sling *sling.Sling) (*sling.Sling, error) {
 	if len(h.Username) > 0 || len(h.Password) > 0  && len(h.authToken) == 0 {
 		var err error
@@ -315,7 +418,7 @@ func (h *Hoverfly) addAuthIfNeeded(sling *sling.Sling) (*sling.Sling, error) {
 }
 
 func (h *Hoverfly) generateAuthToken() (string, error) {
-	credentials := HoverflyAuth{
+	credentials := HoverflyAuthSchema{
 		Username: h.Username,
 		Password: h.Password,
 	}
@@ -340,7 +443,7 @@ func (h *Hoverfly) generateAuthToken() (string, error) {
 		return "", err
 	}
 
-	var authToken HoverflyAuthToken
+	var authToken HoverflyAuthTokenSchema
 	err = json.Unmarshal(body, &authToken)
 	if err != nil {
 		return "", err
@@ -479,7 +582,7 @@ func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) (error) {
 }
 
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
-func (h *Hoverfly) GetDelays() (rd []ResponseDelay, err error) {
+func (h *Hoverfly) GetDelays() (rd []ResponseDelaySchema, err error) {
 	url := h.buildURL("/api/delays")
 
 	slingRequest:= sling.New().Get(url)
@@ -512,7 +615,7 @@ func (h *Hoverfly) GetDelays() (rd []ResponseDelay, err error) {
 
 
 // Set will go the state endpoint in Hoverfly, sending JSON that will set the mode of Hoverfly
-func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelay, err error) {
+func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelaySchema, err error) {
 
 	conf, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -565,13 +668,13 @@ func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelay, err error) {
 	return apiResponse.Data, nil
 }
 
-func createAPIDelaysResponse(response *http.Response) (APIDelaysResponse) {
+func createAPIDelaysResponse(response *http.Response) (APIDelaySchema) {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())
 	}
 
-	var apiResponse APIDelaysResponse
+	var apiResponse APIDelaySchema
 
 	err = json.Unmarshal(body, &apiResponse)
 	if err != nil {

@@ -106,6 +106,24 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 		})
 
+		Context("I can delete the middleware in Hoverfly", func() {
+			BeforeEach(func() {
+				exec.Command(hoverctlBinary, "middleware", "python testdata/add_random_delay.py").Output()
+			})
+
+			It("and they should be removed", func() {
+				out, _ := exec.Command(hoverctlBinary, "delete", "middleware").Output()
+
+				output := strings.TrimSpace(string(out))
+				Expect(output).To(ContainSubstring("Middleware has been deleted from Hoverfly"))
+
+				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/middleware", adminPort)))
+				bytes, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(Equal(`{"middleware":""}`))
+			})
+		})
+
+
 		Context("I can delete everything in hoverfly", func() {
 
 			BeforeEach(func() {

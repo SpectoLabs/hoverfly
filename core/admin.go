@@ -56,6 +56,10 @@ type stateRequest struct {
 	Destination string `json:"destination"`
 }
 
+type middlewareSchema struct {
+	Middleware string `json:"middleware"`
+}
+
 type messageResponse struct {
 	Message string `json:"message"`
 }
@@ -173,6 +177,16 @@ func getBoneRouter(d *Hoverfly) *bone.Mux {
 	mux.Post("/api/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(d.StateHandler),
+	))
+
+	mux.Get("/api/middleware", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.CurrentMiddlewareHandler),
+	))
+
+	mux.Post("/api/middleware", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(d.MiddlewareHandler),
 	))
 
 	mux.Post("/api/add", negroni.New(
@@ -684,6 +698,52 @@ func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 	b, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(b)
+
+}
+
+func(d *Hoverfly) CurrentMiddlewareHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	var resp middlewareSchema
+
+	resp.Middleware = d.Cfg.Middleware
+
+	jsonResp, _ := json.Marshal(resp)
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Write(jsonResp)
+}
+
+func(d *Hoverfly) MiddlewareHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		// failed to read response body
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not read response body!")
+		http.Error(w, "Failed to read request body.", 400)
+		return
+	}
+
+	var middlewareReq middlewareSchema
+
+	err = json.Unmarshal(body, &middlewareReq)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not deserialize middleware")
+		http.Error(w, "Unable to deserialize request body.", 400)
+		return
+	}
+
+	err = d.SetMiddleware(middlewareReq.Middleware)
+	if  err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Could not execute middleware")
+		http.Error(w, "Invalid middleware: " + err.Error(), 400)
+		return
+	}
+
+	d.CurrentMiddlewareHandler(w, req, next)
 
 }
 

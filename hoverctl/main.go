@@ -19,6 +19,9 @@ var (
 	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
 	modeNameArg = modeCommand.Arg("name", "Set Hoverfly's mode").String()
 
+	middlewareCommand = kingpin.Command("middleware", "Get Hoverfly's middleware")
+	middlewarePathArg = middlewareCommand.Arg("path", "Set Hoverfly's middleware").String()
+
 	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
 	startArg = startCommand.Arg("server type", "Choose the configuration of Hoverfly (proxy/webserver)").String()
 	stopCommand = kingpin.Command("stop", "Stop a local instance of Hoverfly")
@@ -92,6 +95,20 @@ func main() {
 
 				log.Info("Hoverfly has been set to ", mode, " mode")
 			}
+
+		case middlewareCommand.FullCommand():
+			var middleware string
+			if *middlewarePathArg == "" || *modeNameArg == "status" {
+				middleware, err = hoverfly.GetMiddleware()
+				handleIfError(err)
+				log.Info("Hoverfly is currently set to run the following as middleware")
+			} else {
+				middleware, err = hoverfly.SetMiddleware(*middlewarePathArg)
+				handleIfError(err)
+				log.Info("Hoverfly is now set to run the following as middleware")
+			}
+
+			log.Info(middleware)
 
 		case startCommand.FullCommand():
 			if *startArg == "webserver" {
@@ -189,6 +206,14 @@ func main() {
 
 				log.Info("Delays have been deleted from Hoverfly")
 			}
+
+			if *deleteArg == "middleware" {
+				_, err := hoverfly.SetMiddleware("")
+				handleIfError(err)
+
+				log.Info("Middleware has been deleted from Hoverfly")
+			}
+
 
 			if *deleteArg == "" {
 				err := errors.New("You have not specified what to delete from Hoverfly")
