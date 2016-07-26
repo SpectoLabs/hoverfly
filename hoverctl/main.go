@@ -207,6 +207,14 @@ func main() {
 				log.Info("Delays have been deleted from Hoverfly")
 			}
 
+			if *deleteArg == "middleware" {
+				_, err := hoverfly.SetMiddleware("")
+				handleIfError(err)
+
+				log.Info("Middleware has been deleted from Hoverfly")
+			}
+
+
 			if *deleteArg == "" {
 				err := errors.New("You have not specified what to delete from Hoverfly")
 				handleIfError(err)

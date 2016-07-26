@@ -144,6 +144,10 @@ func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
 }
 
 func (hf *Hoverfly) SetMiddleware(middleware string) (error) {
+	if middleware == "" {
+		hf.Cfg.Middleware = middleware
+		return nil
+	}
 	testPayload := models.Payload{
 		Request: models.RequestDetails{
 			Path: "/",

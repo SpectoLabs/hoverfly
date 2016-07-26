@@ -494,6 +494,41 @@ func TestSetMiddleware_WithInvalidMiddleware(t *testing.T) {
 	testutil.Expect(t, dbClient.Cfg.Middleware, "python examples/middleware/modify_request/modify_request.py")
 }
 
+func TestSetMiddleware_WithEmptyMiddleware(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+	m := getBoneRouter(dbClient)
+
+	dbClient.Cfg.Middleware = "python examples/middleware/modify_request/modify_request.py"
+
+	var middlewareReq middlewareSchema
+	middlewareReq.Middleware = ""
+
+	bts, err := json.Marshal(&middlewareReq)
+	testutil.Expect(t, err, nil)
+
+	req, err := http.NewRequest("POST", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	testutil.Expect(t, err, nil)
+
+	rec := httptest.NewRecorder()
+	m.ServeHTTP(rec, req)
+	testutil.Expect(t, rec.Code, http.StatusOK)
+
+	body, err := ioutil.ReadAll(rec.Body)
+	testutil.Expect(t, err, nil)
+	middlewareResp := middlewareSchema{}
+	err = json.Unmarshal(body, &middlewareResp)
+
+	Expect(err).To(BeNil())
+
+	testutil.Expect(t, middlewareResp.Middleware, "")
+	testutil.Expect(t, dbClient.Cfg.Middleware, "")
+}
+
+
 func TestStatsHandler(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
