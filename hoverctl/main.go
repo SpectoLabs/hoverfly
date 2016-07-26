@@ -196,8 +196,10 @@ func main() {
 				handleIfError(err)
 				err = hoverfly.DeleteDelays()
 				handleIfError(err)
+				err = hoverfly.DeleteRequestTemplates()
+				handleIfError(err)
 
-				log.Info("Delays and simulations have been deleted from Hoverfly")
+				log.Info("Delays, request templates and simulations have been deleted from Hoverfly")
 			}
 			if *deleteArg == "simulations" {
 				err := hoverfly.DeleteSimulations()

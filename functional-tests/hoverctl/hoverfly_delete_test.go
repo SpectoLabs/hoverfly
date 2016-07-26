@@ -145,7 +145,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/templates", adminPort)))
 				bytes, _ := ioutil.ReadAll(resp.Body)
-				Expect(string(bytes)).To(ContainSubstring(`"data":null`))
+				Expect(string(bytes)).To(ContainSubstring(`{"data":null}`))
 			})
 		})
 
@@ -193,6 +193,14 @@ var _ = Describe("When I use hoverctl", func() {
 							}
 						}]
 					}`)))
+				fileReader, err := os.Open("testdata/request-template.json")
+				defer fileReader.Close()
+				if err != nil {
+					Fail("Failed to read request template test data")
+				}
+				resp := DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/templates", adminPort)).Body(fileReader))
+				bytes, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(ContainSubstring(`{"message":"2 payloads import complete."}`))
 			})
 
 			Context("I can delete all data in Hoverfly", func() {
@@ -200,7 +208,7 @@ var _ = Describe("When I use hoverctl", func() {
 				It("by calling delete all", func() {
 					out, _ := exec.Command(hoverctlBinary, "delete", "all").Output()
 					output := strings.TrimSpace(string(out))
-					Expect(output).To(ContainSubstring("Delays and simulations have been deleted from Hoverfly"))
+					Expect(output).To(ContainSubstring("Delays, request templates and simulations have been deleted from Hoverfly"))
 
 					resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/delays", adminPort)))
 					bytes, _ := ioutil.ReadAll(resp.Body)
@@ -209,6 +217,10 @@ var _ = Describe("When I use hoverctl", func() {
 					resp = DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
 					bytes, _ = ioutil.ReadAll(resp.Body)
 					Expect(string(bytes)).To(Equal(`{"data":null}`))
+
+					resp = DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/templates", adminPort)))
+					bytes, _ = ioutil.ReadAll(resp.Body)
+					Expect(string(bytes)).To(ContainSubstring(`{"data":null}`))
 				})
 			})
 		})
