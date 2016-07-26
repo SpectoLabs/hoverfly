@@ -5,38 +5,42 @@ import (
 	"encoding/json"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	. "github.com/onsi/gomega"
 )
 
 func TestGetAllTemplates(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestMatcher.TemplateStore.Wipe()
 	m := getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/templates", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	//The response recorder used to record HTTP responses
 	respRec := httptest.NewRecorder()
 
 	m.ServeHTTP(respRec, req)
 
-	testutil.Expect(t, respRec.Code, http.StatusOK)
+	Expect(respRec.Code).To(Equal(http.StatusOK))
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
 	rr := recordedRequests{}
 	err = json.Unmarshal(body, &rr)
 
-	testutil.Expect(t, len(rr.Data), 0)
+	Expect(rr.Data).To(HaveLen(0))
 }
 
 func TestGetAllTemplatesWTemplates(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestMatcher.TemplateStore.Wipe()
@@ -68,14 +72,14 @@ func TestGetAllTemplatesWTemplates(t *testing.T) {
 	m := getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/templates", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	//The response recorder used to record HTTP responses
 	respRec := httptest.NewRecorder()
 
 	m.ServeHTTP(respRec, req)
 
-	testutil.Expect(t, respRec.Code, http.StatusOK)
+	Expect(respRec.Code).To(Equal(http.StatusOK))
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
@@ -85,10 +89,12 @@ func TestGetAllTemplatesWTemplates(t *testing.T) {
 	// check the json given is correct to construct the request template store
 	result := rr.ConvertToRequestTemplateStore()
 
-	testutil.Expect(t, len(result), 2)
+	Expect(result).To(HaveLen(2))
 }
 
 func TestExportImportTemplates(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestMatcher.TemplateStore.Wipe()
@@ -119,20 +125,20 @@ func TestExportImportTemplates(t *testing.T) {
 	dbClient.RequestMatcher.TemplateStore = matching.RequestTemplateStore{templateEntry, templateEntry}
 
 	req, err := http.NewRequest("GET", "/api/templates", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	//The response recorder used to record HTTP responses
 	respRec := httptest.NewRecorder()
 
 	m.ServeHTTP(respRec, req)
 
-	testutil.Expect(t, respRec.Code, http.StatusOK)
+	Expect(respRec.Code).To(Equal(http.StatusOK))
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
 	// deleting records
 	dbClient.RequestMatcher.TemplateStore.Wipe()
-	testutil.Expect(t, len(dbClient.RequestMatcher.TemplateStore), 0)
+	Expect(dbClient.RequestMatcher.TemplateStore).To(HaveLen(0))
 
 	// using body to import records again
 	importReq, err := http.NewRequest("POST", "/api/templates", ioutil.NopCloser(bytes.NewBuffer(body)))
@@ -140,13 +146,15 @@ func TestExportImportTemplates(t *testing.T) {
 	importRec := httptest.NewRecorder()
 
 	m.ServeHTTP(importRec, importReq)
-	testutil.Expect(t, importRec.Code, http.StatusOK)
+	Expect(importRec.Code).To(Equal(http.StatusOK))
 
 	// records should be there
-	testutil.Expect(t, len(dbClient.RequestMatcher.TemplateStore), 2)
+	Expect(dbClient.RequestMatcher.TemplateStore).To(HaveLen(2))
 }
 
 func TestDeleteTemplates(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestMatcher.TemplateStore.Wipe()
@@ -177,7 +185,7 @@ func TestDeleteTemplates(t *testing.T) {
 	dbClient.RequestMatcher.TemplateStore = matching.RequestTemplateStore{templateEntry, templateEntry}
 
 	// checking whether we have records
-	testutil.Expect(t, len(dbClient.RequestMatcher.TemplateStore), 2)
+	Expect(dbClient.RequestMatcher.TemplateStore).To(HaveLen(2))
 
 	// deleting through handler
 	deleteReq, _ := http.NewRequest("DELETE", "/api/templates", nil)
@@ -185,7 +193,7 @@ func TestDeleteTemplates(t *testing.T) {
 	rec := httptest.NewRecorder()
 
 	m.ServeHTTP(rec, deleteReq)
-	testutil.Expect(t, rec.Code, http.StatusOK)
-	testutil.Expect(t, len(dbClient.RequestMatcher.TemplateStore), 0)
+	Expect(rec.Code).To(Equal(http.StatusOK))
+	Expect(dbClient.RequestMatcher.TemplateStore).To(HaveLen(0))
 
 }
