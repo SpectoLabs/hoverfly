@@ -20,7 +20,7 @@ var _ = Describe("When I use hoverctl", func() {
 		proxyPortAsString = strconv.Itoa(proxyPort)
 	)
 
-	Describe("with a running hoverfly which as middleware configured", func() {
+	Describe("with a running hoverfly which has middleware configured", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, workingDirectory, "python middleware.py")
