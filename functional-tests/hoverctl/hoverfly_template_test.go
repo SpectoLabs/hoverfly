@@ -49,6 +49,11 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				Expect(output).To(ContainSubstring("\"path\": \"/path1\""))
 				Expect(output).To(ContainSubstring("\"path\": \"/path2\""))
 			})
+
+			It("does nothing when deleting request templates", func() {
+				out, _ := exec.Command(hoverctlBinary, "delete", "templates").Output()
+
+			})
 		})
 
 		Context("With some templates already imported", func() {
