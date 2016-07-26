@@ -3,7 +3,6 @@ package hoverfly
 import (
 	. "github.com/onsi/gomega"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"testing"
 	"net/http"
 	"github.com/gorilla/mux"
@@ -13,6 +12,8 @@ import (
 )
 
 func TestChangeBodyMiddleware(t *testing.T) {
+	RegisterTestingT(t)
+
 	command := "./examples/middleware/modify_response/modify_response.py"
 
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
@@ -22,11 +23,13 @@ func TestChangeBodyMiddleware(t *testing.T) {
 
 	newPayload, err := ExecuteMiddlewareLocally(command, payload)
 
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, newPayload.Response.Body, "body was replaced by middleware\n")
+	Expect(err).To(BeNil())
+	Expect(newPayload.Response.Body).To(Equal("body was replaced by middleware\n"))
 }
 
 func TestMalformedPayloadMiddleware(t *testing.T) {
+	RegisterTestingT(t)
+
 	command := "./examples/middleware/ruby_echo/echo.rb"
 
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
@@ -36,11 +39,13 @@ func TestMalformedPayloadMiddleware(t *testing.T) {
 
 	newPayload, err := ExecuteMiddlewareLocally(command, payload)
 
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, newPayload.Response.Body, "original body")
+	Expect(err).To(BeNil())
+	Expect(newPayload.Response.Body).To(Equal("original body"))
 }
 
 func TestMakeCustom404(t *testing.T) {
+	RegisterTestingT(t)
+
 	command := "go run ./examples/middleware/go_example/change_to_custom_404.go"
 
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
@@ -50,13 +55,15 @@ func TestMakeCustom404(t *testing.T) {
 
 	newPayload, err := ExecuteMiddlewareLocally(command, payload)
 
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, newPayload.Response.Body, "Custom body here")
-	testutil.Expect(t, newPayload.Response.Status, 404)
-	testutil.Expect(t, newPayload.Response.Headers["middleware"][0], "changed response")
+	Expect(err).To(BeNil())
+	Expect(newPayload.Response.Body).To(Equal("Custom body here"))
+	Expect(newPayload.Response.Status).To(Equal(http.StatusNotFound))
+	Expect(newPayload.Response.Headers["middleware"][0]).To(Equal("changed response"))
 }
 
 func TestReflectBody(t *testing.T) {
+	RegisterTestingT(t)
+
 	command := "./examples/middleware/reflect_body/reflect_body.py"
 
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: "", Body: "request_body_here"}
@@ -65,10 +72,10 @@ func TestReflectBody(t *testing.T) {
 
 	newPayload, err := ExecuteMiddlewareLocally(command, payload)
 
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, newPayload.Response.Body, req.Body)
-	testutil.Expect(t, newPayload.Request.Method, req.Method)
-	testutil.Expect(t, newPayload.Request.Destination, req.Destination)
+	Expect(err).To(BeNil())
+	Expect(newPayload.Response.Body).To(Equal(req.Body))
+	Expect(newPayload.Request.Method).To(Equal(req.Method))
+	Expect(newPayload.Request.Destination).To(Equal(req.Destination))
 }
 
 func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
@@ -115,6 +122,7 @@ func TestExecuteMiddlewareRemotely(t *testing.T) {
 
 func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSamePayload(t *testing.T) {
 	RegisterTestingT(t)
+
 	muxRouter := mux.NewRouter()
 	muxRouter.HandleFunc("/process", processHandlerNotOkay).Methods("POST")
 	server := httptest.NewServer(muxRouter)
@@ -135,6 +143,7 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSamePayload(t 
 
 func TestExecuteMiddlewareRemotely_ReturnsErrorIfNoPayloadOnResponse_AnOriginalPayloadIsReturned(t *testing.T) {
 	RegisterTestingT(t)
+
 	muxRouter := mux.NewRouter()
 	muxRouter.HandleFunc("/process", processHandlerOkayButNoResponse).Methods("POST")
 	server := httptest.NewServer(muxRouter)
