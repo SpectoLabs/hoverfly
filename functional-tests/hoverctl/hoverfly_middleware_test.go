@@ -32,12 +32,19 @@ var _ = Describe("When I use hoverctl", func() {
 		})
 
 		It("I can get the hoverfly's middleware", func() {
-
 			out, _ := exec.Command(hoverctlBinary, "middleware").Output()
 
 			output := strings.TrimSpace(string(out))
 			Expect(output).To(ContainSubstring("Hoverfly is currently set to run the following as middleware"))
 			Expect(output).To(ContainSubstring("python middleware.py"))
+		})
+
+		It("I can set the hoverfly's middleware", func() {
+			out, _ := exec.Command(hoverctlBinary, "middleware", `python testdata/add_random_delay.py`).Output()
+
+			output := strings.TrimSpace(string(out))
+			Expect(output).To(ContainSubstring("Hoverfly is now set to run the following as middleware"))
+			Expect(output).To(ContainSubstring("python testdata/add_random_delay.py"))
 		})
 	})
 })

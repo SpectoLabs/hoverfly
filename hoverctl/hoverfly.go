@@ -252,6 +252,42 @@ func (h *Hoverfly) GetMiddleware() (string, error) {
 	return middlewareResponse.Middleware, nil
 }
 
+func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
+	url := h.buildURL("/api/middleware")
+
+	slingRequest := sling.New().Post(url).Body(strings.NewReader(`{"middleware":"` + middleware + `"}`))
+
+	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not authenticate  with Hoverfly")
+	}
+
+	request, err := slingRequest.Request()
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	response, err := h.httpClient.Do(request)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	if response.StatusCode == 401 {
+		return "", errors.New("Hoverfly requires authentication")
+	}
+
+	if response.StatusCode == 403 {
+		return "", errors.New("Cannot change the mode of Hoverfly when running as a webserver")
+	}
+
+	apiResponse := h.createMiddlewareSchema(response)
+
+	return apiResponse.Middleware, nil
+}
+
 func (h *Hoverfly) ImportSimulation(payload string) (error) {
 	url := h.buildURL("/api/records")
 
