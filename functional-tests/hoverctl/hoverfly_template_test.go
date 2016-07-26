@@ -65,7 +65,6 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				out, _ := exec.Command(hoverctlBinary, "templates").Output()
 				output := strings.TrimSpace(string(out))
-				Expect(output).To(ContainSubstring("test"))
 				Expect(output).To(ContainSubstring("\"path\": \"/path1\""))
 				Expect(output).To(ContainSubstring("\"path\": \"/path2\""))
 			})
