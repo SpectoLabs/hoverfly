@@ -1,14 +1,16 @@
 package hoverfly
 
 import (
+	. "github.com/onsi/gomega"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"
 	"testing"
 )
 
 func TestReconstructRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	// changing payload so we don't have to call middleware
@@ -22,14 +24,16 @@ func TestReconstructRequest(t *testing.T) {
 
 	c := NewConstructor(req, payload)
 	newRequest, err := c.ReconstructRequest()
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, newRequest.Method, "POST")
-	testutil.Expect(t, newRequest.URL.Path, "/random-path")
-	testutil.Expect(t, newRequest.Host, "changed.destination.com")
-	testutil.Expect(t, newRequest.URL.RawQuery, "?foo=bar")
+	Expect(err).To(BeNil())
+	Expect(newRequest.Method).To(Equal("POST"))
+	Expect(newRequest.URL.Path).To(Equal("/random-path"))
+	Expect(newRequest.Host).To(Equal("changed.destination.com"))
+	Expect(newRequest.URL.RawQuery).To(Equal("?foo=bar"))
 }
 
 func TestReconstructRequestBodyPayload(t *testing.T) {
+	RegisterTestingT(t)
+
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	payload := models.Payload{}
@@ -40,17 +44,19 @@ func TestReconstructRequestBodyPayload(t *testing.T) {
 
 	newRequest, err := c.ReconstructRequest()
 
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, newRequest.Method, "OPTIONS")
-	testutil.Expect(t, newRequest.Host, "newdestination")
+	Expect(err).To(BeNil())
+	Expect(newRequest.Method).To(Equal("OPTIONS"))
+	Expect(newRequest.Host).To(Equal("newdestination"))
 
 	body, err := ioutil.ReadAll(newRequest.Body)
 
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, string(body), "new request body here")
+	Expect(err).To(BeNil())
+	Expect(string(body)).To(Equal("new request body here"))
 }
 
 func TestReconstructRequestHeadersPayload(t *testing.T) {
+	RegisterTestingT(t)
+
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	req.Header.Set("Header", "ValueX")
@@ -61,11 +67,13 @@ func TestReconstructRequestHeadersPayload(t *testing.T) {
 	c.payload.Request.Destination = "destination.com"
 
 	newRequest, err := c.ReconstructRequest()
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, newRequest.Header.Get("Header"), "ValueX")
+	Expect(err).To(BeNil())
+	Expect(newRequest.Header.Get("Header")).To(Equal("ValueX"))
 }
 
 func TestReconstructResponseHeadersPayload(t *testing.T) {
+	RegisterTestingT(t)
+
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	payload := models.Payload{}
@@ -82,11 +90,13 @@ func TestReconstructResponseHeadersPayload(t *testing.T) {
 
 	response := c.ReconstructResponse()
 
-	testutil.Expect(t, response.Header.Get("Header"), headers["Header"][0])
+	Expect(response.Header.Get("Header")).To(Equal(headers["Header"][0]))
 
 }
 
 func TestReconstructionFailure(t *testing.T) {
+	RegisterTestingT(t)
+
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	payload := models.Payload{}
@@ -95,17 +105,23 @@ func TestReconstructionFailure(t *testing.T) {
 	c.payload.Request.Body = "new request body here"
 
 	_, err := c.ReconstructRequest()
-	testutil.Refute(t, err, nil)
+	Expect(err).ToNot(BeNil())
 }
 
 func TestIsMiddlewareLocal_WithNonHttpString(t *testing.T) {
-	testutil.Expect(t, isMiddlewareLocal("python middleware.py"), true)
+	RegisterTestingT(t)
+
+	Expect(isMiddlewareLocal("python middleware.py")).To(BeTrue())
 }
 
 func TestIsMiddlewareLocal_WithHttpString(t *testing.T) {
-	testutil.Expect(t, isMiddlewareLocal("http://remotemiddleware.com/process"), false)
+	RegisterTestingT(t)
+
+	Expect(isMiddlewareLocal("http://remotemiddleware.com/process")).To(BeFalse())
 }
 
 func TestIsMiddlewareLocal_WithHttpsString(t *testing.T) {
-	testutil.Expect(t, isMiddlewareLocal("http://remotemiddleware.com/process"), false)
+	RegisterTestingT(t)
+
+	Expect(isMiddlewareLocal("http://remotemiddleware.com/process")).To(BeFalse())
 }
