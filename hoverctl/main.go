@@ -42,11 +42,18 @@ var (
 	deleteCommand = kingpin.Command("delete", "Delete test data from Hoverfly")
 	deleteArg = deleteCommand.Arg("resource", "A collection of data that can be deleted").String()
 
-	delaysCommand = kingpin.Command("delays", "Get per-host response delay config currently loaded into Hoverfly")
+	delaysCommand = kingpin.Command("delays", "Get per-host response delay config currently loaded in Hoverfly")
 	delaysPathArg = delaysCommand.Arg("path", "Set per-host response delay config from JSON file").String()
 
 	logsCommand = kingpin.Command("logs", "Get the logs from Hoverfly")
 	followLogsFlag = logsCommand.Flag("follow", "Follow the logs from Hoverfly").Bool()
+
+	templatesCommand = kingpin.Command("templates", "Get set of request templates currently loaded in Hoverfly")
+	templatesExportCommand = templatesCommand.Command("export", "Exports all request templates from Hoverfly")
+	templateExportNameArg = templatesExportCommand.Arg("path", "Name for set of exported request templates").Required().String()
+	templatesImportCommand = templatesCommand.Command("import", "Imports request templates to Hoverfly")
+	templateImportNameArg = templatesImportCommand.Arg("name", "Name for set of request templates to import").Required().String()
+
 )
 
 func main() {
@@ -246,7 +253,19 @@ func main() {
 				err := logfile.Print()
 				handleIfError(err)
 			}
-	}
+		case templatesCommand.FullCommand():
+			requestTemplatesData, err := hoverfly.GetRequestTemplates()
+			handleIfError(err)
+			for _, requestTemplate := range requestTemplatesData.Data {
+				fmt.Printf("%+v\n", requestTemplate)
+			}
+		case templatesImportCommand.FullCommand():
+			requestTemplatesData, err := hoverfly.SetRequestTemplates()
+			handleIfError(err)
+			for _, requestTemplate := range requestTemplatesData.Data {
+				fmt.Printf("%+v\n", requestTemplate)
+			}
+		}
 }
 
 func handleIfError(err error) {
