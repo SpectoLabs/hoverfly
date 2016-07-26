@@ -34,23 +34,50 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 		Context("With no templates imported", func() {
 
-			It("(running export) will print out an empty string", func() {
+			It("getting templates will print out null data", func() {
 
-				out, _ := exec.Command(hoverctlBinary, "templates").Output()
-
+				out, _ := exec.Command(hoverctlBinary, "templates", "export").Output()
 				output := strings.TrimSpace(string(out))
-				// TODO: when no delays are set we should really have a nice message
-				Expect(len(output)).To(Equal(0))
+				Expect(output).To(ContainSubstring("\"data\": null"))
 			})
 
 			It("is possible to set request templates by import", func() {
 
 				out, _ := exec.Command(hoverctlBinary, "templates", "import", "testdata/request-template.json").Output()
-
 				output := strings.TrimSpace(string(out))
-				Expect(output).To(ContainSubstring("Response templates set in Hoverfly"))
-				Expect(output).To(ContainSubstring("Path:/path1"))
-				Expect(output).To(ContainSubstring("Path:/path2"))
+				Expect(output).To(ContainSubstring("Request template data set in Hoverfly"))
+				Expect(output).To(ContainSubstring("\"path\": \"/path1\""))
+				Expect(output).To(ContainSubstring("\"path\": \"/path2\""))
+			})
+		})
+
+		Context("With some templates already imported", func() {
+
+			BeforeEach(func() {
+				_, err := exec.Command(hoverctlBinary, "templates", "import", "testdata/request-template.json").Output()
+				if err != nil {
+					Fail("Template import failed: "+err.Error())
+				}
+			})
+
+			It("will print out the existing request template data when getting templates", func() {
+
+				out, _ := exec.Command(hoverctlBinary, "templates", "export").Output()
+				output := strings.TrimSpace(string(out))
+				Expect(output).To(ContainSubstring("test"))
+				Expect(output).To(ContainSubstring("\"path\": \"/path1\""))
+				Expect(output).To(ContainSubstring("\"path\": \"/path2\""))
+			})
+
+			It("adds the extra request templates when calling import", func() {
+
+				out, _ := exec.Command(hoverctlBinary, "templates", "import", "testdata/request-template.json").Output()
+				output := strings.TrimSpace(string(out))
+				Expect(output).To(ContainSubstring("Request template data set in Hoverfly"))
+				Expect(output).To(ContainSubstring("\"path\": \"/path1\""))
+				Expect(output).To(ContainSubstring("\"path\": \"/path2\""))
+				Expect(strings.Count(output, "\"path\": \"/path1\"")).To(Equal(2))
+				Expect(strings.Count(output, "\"path\": \"/path2\"")).To(Equal(2))
 			})
 		})
 	})

@@ -6,6 +6,7 @@ import (
 	"os"
 	"fmt"
 	"errors"
+	"encoding/json"
 )
 
 var (
@@ -50,9 +51,8 @@ var (
 
 	templatesCommand = kingpin.Command("templates", "Get set of request templates currently loaded in Hoverfly")
 	templatesExportCommand = templatesCommand.Command("export", "Exports all request templates from Hoverfly")
-	templateExportNameArg = templatesExportCommand.Arg("path", "Name for set of exported request templates").Required().String()
 	templatesImportCommand = templatesCommand.Command("import", "Imports request templates to Hoverfly")
-	templateImportNameArg = templatesImportCommand.Arg("name", "Name for set of request templates to import").Required().String()
+	templatesImportNameArg = templatesImportCommand.Arg("name", "Name for set of request templates to import").Required().String()
 
 )
 
@@ -253,17 +253,25 @@ func main() {
 				err := logfile.Print()
 				handleIfError(err)
 			}
-		case templatesCommand.FullCommand():
+		case templatesExportCommand.FullCommand():
+			fmt.Println("test")
 			requestTemplatesData, err := hoverfly.GetRequestTemplates()
 			handleIfError(err)
-			for _, requestTemplate := range requestTemplatesData.Data {
-				fmt.Printf("%+v\n", requestTemplate)
+			requestTemplatesJson, err := json.MarshalIndent(requestTemplatesData, "", "    ")
+			if err != nil {
+				log.Error("Error marshalling JSON for printing request templates: " + err.Error())
 			}
+			fmt.Println(string(requestTemplatesJson))
 		case templatesImportCommand.FullCommand():
-			requestTemplatesData, err := hoverfly.SetRequestTemplates()
-			handleIfError(err)
-			for _, requestTemplate := range requestTemplatesData.Data {
-				fmt.Printf("%+v\n", requestTemplate)
+			if *templatesImportNameArg != "" {
+				requestTemplatesData, err := hoverfly.SetRequestTemplates(*templatesImportNameArg)
+				handleIfError(err)
+				fmt.Println("Request template data set in Hoverfly: ")
+				requestTemplatesJson, err := json.MarshalIndent(requestTemplatesData, "", "    ")
+				if err != nil {
+					log.Error("Error marshalling JSON for printing request templates: " + err.Error())
+				}
+				fmt.Println(string(requestTemplatesJson))
 			}
 		}
 }
