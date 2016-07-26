@@ -283,6 +283,14 @@ func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
 		return "", errors.New("Cannot change the mode of Hoverfly when running as a webserver")
 	}
 
+	if response.StatusCode != 200 {
+		defer response.Body.Close()
+		errorMessage, _ := ioutil.ReadAll(response.Body)
+		trimmedError := strings.TrimSpace(string(errorMessage))
+		log.Debug(trimmedError)
+		return "", errors.New("Hoverfly could not execute this middleware")
+	}
+
 	apiResponse := h.createMiddlewareSchema(response)
 
 	return apiResponse.Middleware, nil
