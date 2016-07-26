@@ -1,15 +1,16 @@
 package hoverfly
 
 import (
+	. "github.com/onsi/gomega"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"testing"
 )
 
 func TestHoverflyListener(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
@@ -22,16 +23,18 @@ func TestHoverflyListener(t *testing.T) {
 
 	// checking whether it's running
 	response, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
-	testutil.Expect(t, response.StatusCode, 500)
+	Expect(response.StatusCode).To(Equal(http.StatusInternalServerError))
 
 	body, err := ioutil.ReadAll(response.Body)
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, strings.Contains(string(body), "is a proxy server"), true)
+	Expect(err).To(BeNil())
+	Expect(string(body)).To(ContainSubstring("is a proxy server"))
 }
 
 func TestStopHoverflyListener(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
@@ -47,10 +50,12 @@ func TestStopHoverflyListener(t *testing.T) {
 	// checking whether it's stopped
 	_, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
 	// should get error
-	testutil.Refute(t, err, nil)
+	Expect(err).ToNot(BeNil())
 }
 
 func TestRestartHoverflyListener(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
@@ -63,9 +68,9 @@ func TestRestartHoverflyListener(t *testing.T) {
 
 	// checking whether it's running
 	response, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
-	testutil.Expect(t, response.StatusCode, 500)
+	Expect(response.StatusCode).To(Equal(http.StatusInternalServerError))
 
 	// stopping proxy
 	dbClient.StopProxy()
@@ -74,6 +79,6 @@ func TestRestartHoverflyListener(t *testing.T) {
 	dbClient.StartProxy()
 
 	newResponse, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, newResponse.StatusCode, 500)
+	Expect(err).To(BeNil())
+	Expect(newResponse.StatusCode).To(Equal(http.StatusInternalServerError))
 }

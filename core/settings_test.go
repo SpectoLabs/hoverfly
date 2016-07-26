@@ -1,57 +1,68 @@
 package hoverfly
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/testutil"
+	. "github.com/onsi/gomega"
 	"os"
 	"testing"
 )
 
 func TestSettingsAdminPortEnv(t *testing.T) {
+	RegisterTestingT(t)
+
 	defer os.Setenv("AdminPort", "")
 
 	os.Setenv("AdminPort", "5555")
 
 	cfg := InitSettings()
-	testutil.Expect(t, cfg.AdminPort, "5555")
+	Expect(cfg.AdminPort).To(Equal("5555"))
 }
 
 func TestSettingsDefaultAdminPort(t *testing.T) {
+	RegisterTestingT(t)
+
 	os.Setenv("AdminPort", "")
 	cfg := InitSettings()
-	testutil.Expect(t, cfg.AdminPort, DefaultAdminPort)
+	Expect(cfg.AdminPort).To(Equal(DefaultAdminPort))
 }
 
 func TestSettingsProxyPortEnv(t *testing.T) {
+	RegisterTestingT(t)
+
 	defer os.Setenv("ProxyPort", "")
 
 	os.Setenv("ProxyPort", "6666")
 	cfg := InitSettings()
 
-	testutil.Expect(t, cfg.ProxyPort, "6666")
+	Expect(cfg.ProxyPort).To(Equal("6666"))
 }
 
 func TestSettingsDefaultProxyPort(t *testing.T) {
+	RegisterTestingT(t)
+
 	os.Setenv("ProxyPort", "")
 	cfg := InitSettings()
-	testutil.Expect(t, cfg.ProxyPort, DefaultPort)
+	Expect(cfg.ProxyPort).To(Equal(DefaultPort))
 }
 
 func TestSettingsMiddlewareEnv(t *testing.T) {
+	RegisterTestingT(t)
+
 	defer os.Setenv("HoverflyMiddleware", "")
 
 	os.Setenv("HoverflyMiddleware", "./examples/middleware/x.go")
 	cfg := InitSettings()
 
-	testutil.Expect(t, cfg.Middleware, "./examples/middleware/x.go")
+	Expect(cfg.Middleware).To(Equal("./examples/middleware/x.go"))
 }
 
 // TestSetMode - tests SetMode function, however it doesn't test
 // whether mutex works correctly or not
 func TestSetMode(t *testing.T) {
+	RegisterTestingT(t)
 
 	cfg := Configuration{}
 	cfg.SetMode(SimulateMode)
-	testutil.Expect(t, cfg.Mode, SimulateMode)
+	Expect(cfg.Mode).To(Equal(SimulateMode))
 }
 
 // TestGetMode - tests GetMode function, however it doesn't test
@@ -59,10 +70,10 @@ func TestSetMode(t *testing.T) {
 func TestGetMode(t *testing.T) {
 	cfg := Configuration{Mode: "capture"}
 
-	testutil.Expect(t, cfg.GetMode(), "capture")
+	Expect(cfg.GetMode()).To(Equal("capture"))
 }
 
 func Test_InitSettings_SetsTheWebserverFieldToFalse(t *testing.T) {
 	unit := InitSettings()
-	testutil.Expect(t, unit.Webserver, false)
+	Expect(unit.Webserver).To(BeFalse())
 }
