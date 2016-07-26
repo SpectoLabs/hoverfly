@@ -50,9 +50,7 @@ var (
 	followLogsFlag = logsCommand.Flag("follow", "Follow the logs from Hoverfly").Bool()
 
 	templatesCommand = kingpin.Command("templates", "Get set of request templates currently loaded in Hoverfly")
-	templatesExportCommand = templatesCommand.Command("export", "Exports all request templates from Hoverfly")
-	templatesImportCommand = templatesCommand.Command("import", "Imports request templates to Hoverfly")
-	templatesImportNameArg = templatesImportCommand.Arg("name", "Name for set of request templates to import").Required().String()
+	templatesPathArg = templatesCommand.Arg("path", "Add JSON config to set of request templates in Hoverfly").String()
 
 )
 
@@ -91,7 +89,7 @@ func main() {
 
 	switch kingpin.Parse() {
 		case modeCommand.FullCommand():
-			if *modeNameArg == "" || *modeNameArg == "status"{
+			if *modeNameArg == "" || *modeNameArg == "status" {
 				mode, err := hoverfly.GetMode()
 				handleIfError(err)
 
@@ -228,7 +226,7 @@ func main() {
 			}
 
 		case delaysCommand.FullCommand():
-			if *delaysPathArg == "" || *delaysPathArg == "status"{
+			if *delaysPathArg == "" || *delaysPathArg == "status" {
 				delays, err := hoverfly.GetDelays()
 				handleIfError(err)
 				for _, delay := range delays {
@@ -245,7 +243,6 @@ func main() {
 		case logsCommand.FullCommand():
 			logfile := NewLogFile(hoverflyDirectory, hoverfly.AdminPort, hoverfly.ProxyPort)
 
-
 			if *followLogsFlag {
 				err := logfile.Tail()
 				handleIfError(err)
@@ -253,18 +250,18 @@ func main() {
 				err := logfile.Print()
 				handleIfError(err)
 			}
-		case templatesExportCommand.FullCommand():
-			fmt.Println("test")
-			requestTemplatesData, err := hoverfly.GetRequestTemplates()
-			handleIfError(err)
-			requestTemplatesJson, err := json.MarshalIndent(requestTemplatesData, "", "    ")
-			if err != nil {
-				log.Error("Error marshalling JSON for printing request templates: " + err.Error())
-			}
-			fmt.Println(string(requestTemplatesJson))
-		case templatesImportCommand.FullCommand():
-			if *templatesImportNameArg != "" {
-				requestTemplatesData, err := hoverfly.SetRequestTemplates(*templatesImportNameArg)
+		case templatesCommand.FullCommand():
+			if *templatesPathArg == "" || *templatesPathArg == "status" {
+				fmt.Println("test")
+				requestTemplatesData, err := hoverfly.GetRequestTemplates()
+				handleIfError(err)
+				requestTemplatesJson, err := json.MarshalIndent(requestTemplatesData, "", "    ")
+				if err != nil {
+					log.Error("Error marshalling JSON for printing request templates: " + err.Error())
+				}
+				fmt.Println(string(requestTemplatesJson))
+			} else {
+				requestTemplatesData, err := hoverfly.SetRequestTemplates(*templatesPathArg)
 				handleIfError(err)
 				fmt.Println("Request template data set in Hoverfly: ")
 				requestTemplatesJson, err := json.MarshalIndent(requestTemplatesData, "", "    ")
