@@ -1,11 +1,11 @@
 package hoverfly
 
 import (
+	. "github.com/onsi/gomega"
 	"bytes"
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -28,20 +28,22 @@ func TestMain(m *testing.M) {
 
 // TestCaptureHeader tests whether request gets new header assigned
 func TestCaptureHeader(t *testing.T) {
+	RegisterTestingT(t)
 
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	response, err := dbClient.captureRequest(req)
 
-	testutil.Expect(t, response.Header.Get("hoverfly"), "Was-Here")
+	Expect(response.Header.Get("hoverfly")).To(Equal("Was-Here"))
 }
 
 // TestRequestBodyCaptured tests whether request body is recorded
 func TestRequestBodyCaptured(t *testing.T) {
+	RegisterTestingT(t)
 
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
@@ -51,22 +53,24 @@ func TestRequestBodyCaptured(t *testing.T) {
 	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	_, err = dbClient.captureRequest(req)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	fp := matching.GetRequestFingerprint(req, requestBody, false)
 
 	payloadBts, err := dbClient.RequestCache.Get([]byte(fp))
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	payload, err := models.NewPayloadFromBytes(payloadBts)
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, payload.Request.Body, "fizz=buzz")
+	Expect(err).To(BeNil())
+	Expect(payload.Request.Body).To(Equal("fizz=buzz"))
 }
 
 func TestRequestBodySentToMiddleware(t *testing.T) {
+	RegisterTestingT(t)
+
 	// sends a request with fizz=buzz body, server responds with {'message': 'here'}
 	// then, since it's modify mode - middleware is applied again, this time
 	// middleware takes original request body and replaces response body with it.
@@ -78,7 +82,7 @@ func TestRequestBodySentToMiddleware(t *testing.T) {
 	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	resp, err := dbClient.modifyRequestResponse(req, "./examples/middleware/reflect_body/reflect_body.py")
 
@@ -86,12 +90,13 @@ func TestRequestBodySentToMiddleware(t *testing.T) {
 	responseBody, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, string(responseBody), string(requestBody))
+	Expect(err).To(BeNil())
+	Expect(string(responseBody)).To(Equal(string(requestBody)))
 
 }
 
 func TestMatchOnRequestBody(t *testing.T) {
+	RegisterTestingT(t)
 
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
@@ -102,7 +107,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 		body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 		request, err := http.NewRequest("POST", "http://capture_body.com", body)
-		testutil.Expect(t, err, nil)
+		Expect(err).To(BeNil())
 
 		resp := models.ResponseDetails{
 			Status: 200,
@@ -129,14 +134,16 @@ func TestMatchOnRequestBody(t *testing.T) {
 		responseBody, err := ioutil.ReadAll(response.Body)
 		response.Body.Close()
 
-		testutil.Expect(t, err, nil)
-		testutil.Expect(t, string(responseBody), fmt.Sprintf("body here, number=%d", i))
+		Expect(err).To(BeNil())
+		Expect(string(responseBody)).To(Equal(fmt.Sprintf("body here, number=%d", i)))
 
 	}
 
 }
 
 func TestGetNotRecordedRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 
@@ -144,48 +151,52 @@ func TestGetNotRecordedRequest(t *testing.T) {
 
 	response := dbClient.getResponse(request)
 
-	testutil.Expect(t, response.StatusCode, http.StatusPreconditionFailed)
+	Expect(response.StatusCode).To(Equal(http.StatusPreconditionFailed))
 }
 
 // TestRequestFingerprint tests whether we get correct request ID
 func TestRequestFingerprint(t *testing.T) {
+	RegisterTestingT(t)
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	fp := matching.GetRequestFingerprint(req, []byte(""), false)
 
-	testutil.Expect(t, fp, "92a65ed4ca2b7100037a4cba9afd15ea")
+	Expect(fp).To(Equal("92a65ed4ca2b7100037a4cba9afd15ea"))
 }
 
 // TestRequestFingerprintBody tests where request body is also used to create unique request ID
 func TestRequestFingerprintBody(t *testing.T) {
+	RegisterTestingT(t)
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	fp := matching.GetRequestFingerprint(req, []byte("some huge XML or JSON here"), false)
 
-	testutil.Expect(t, fp, "b3918a54eb6e42652e29e14c21ba8f81")
+	Expect(fp).To(Equal("b3918a54eb6e42652e29e14c21ba8f81"))
 }
 
 func TestScheme(t *testing.T) {
+	RegisterTestingT(t)
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	originalFp := matching.GetRequestFingerprint(req, []byte(""), false)
 
 	httpsReq, err := http.NewRequest("GET", "https://example.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	newFp := matching.GetRequestFingerprint(httpsReq, []byte(""), false)
 
 	// fingerprint should be the same
-	testutil.Expect(t, originalFp, newFp)
+	Expect(originalFp).To(Equal(newFp))
 }
 
 func TestDeleteAllRecords(t *testing.T) {
+	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
@@ -193,14 +204,16 @@ func TestDeleteAllRecords(t *testing.T) {
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
 		req, err := http.NewRequest("GET", fmt.Sprintf("http://delete_all_records.com/q=%d", i), nil)
-		testutil.Expect(t, err, nil)
+		Expect(err).To(BeNil())
 		dbClient.captureRequest(req)
 	}
 	err := dbClient.RequestCache.DeleteData()
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 }
 
 func TestPayloadEncodeDecode(t *testing.T) {
+	RegisterTestingT(t)
+
 	resp := models.ResponseDetails{
 		Status: 200,
 		Body:   "body here",
@@ -209,49 +222,56 @@ func TestPayloadEncodeDecode(t *testing.T) {
 	payload := models.Payload{Response: resp}
 
 	bts, err := payload.Encode()
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	pl, err := models.NewPayloadFromBytes(bts)
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, pl.Response.Body, resp.Body)
-	testutil.Expect(t, pl.Response.Status, resp.Status)
-
+	Expect(err).To(BeNil())
+	Expect(pl.Response.Body).To(Equal(resp.Body))
+	Expect(pl.Response.Status).To(Equal(resp.Status))
 }
 
 func TestPayloadEncodeEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
 	payload := models.Payload{}
 
 	bts, err := payload.Encode()
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	_, err = models.NewPayloadFromBytes(bts)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 }
 
 func TestDecodeRandomBytes(t *testing.T) {
+	RegisterTestingT(t)
+
 	bts := []byte("some random stuff here")
 	_, err := models.NewPayloadFromBytes(bts)
-	testutil.Refute(t, err, nil)
+	Expect(err).ToNot(BeNil())
 }
 
 func TestModifyRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
 	dbClient.Cfg.Middleware = "./examples/middleware/modify_request/modify_request.py"
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	response, err := dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	// response should be changed to 202
-	testutil.Expect(t, response.StatusCode, 202)
+	Expect(response.StatusCode).To(Equal(http.StatusAccepted))
 
 }
 
 func TestModifyRequestWODestination(t *testing.T) {
+	RegisterTestingT(t)
+
 	// tests modify mode but uses different middleware to not supply destination
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
@@ -259,30 +279,33 @@ func TestModifyRequestWODestination(t *testing.T) {
 	dbClient.Cfg.Middleware = "./examples/middleware/modify_response/modify_response.py"
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	response, err := dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	// response should be changed to 201
-	testutil.Expect(t, response.StatusCode, 201)
+	Expect(response.StatusCode).To(Equal(http.StatusCreated))
 
 }
 
 func TestModifyRequestNoMiddleware(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
 	dbClient.Cfg.Middleware = ""
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	_, err = dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
-	testutil.Refute(t, err, nil)
+	Expect(err).ToNot(BeNil())
 }
 
 func TestGetResponseCorruptedPayload(t *testing.T) {
+	RegisterTestingT(t)
 
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
@@ -292,10 +315,10 @@ func TestGetResponseCorruptedPayload(t *testing.T) {
 	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	_, err = dbClient.captureRequest(req)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	fp := matching.GetRequestFingerprint(req, requestBody, false)
 
@@ -305,14 +328,14 @@ func TestGetResponseCorruptedPayload(t *testing.T) {
 	bodyNew := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	reqNew, err := http.NewRequest("POST", "http://capture_body.com", bodyNew)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 	response := dbClient.getResponse(reqNew)
 
-	testutil.Expect(t, response.StatusCode, http.StatusInternalServerError)
-
+	Expect(response.StatusCode).To(Equal(http.StatusInternalServerError))
 }
 
 func TestDoRequestWFailedMiddleware(t *testing.T) {
+	RegisterTestingT(t)
 
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
@@ -325,13 +348,15 @@ func TestDoRequestWFailedMiddleware(t *testing.T) {
 	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	_, _, err = dbClient.doRequest(req)
-	testutil.Refute(t, err, nil)
+	Expect(err).ToNot(BeNil())
 }
 
 func TestDoRequestFailedHTTP(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	// stopping server
 	server.Close()
@@ -341,14 +366,16 @@ func TestDoRequestFailedHTTP(t *testing.T) {
 	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	_, _, err = dbClient.doRequest(req)
-	testutil.Refute(t, err, nil)
+	Expect(err).ToNot(BeNil())
 
 }
 
 func TestStartProxyWOPort(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	// stopping server
 	server.Close()
@@ -356,55 +383,61 @@ func TestStartProxyWOPort(t *testing.T) {
 	dbClient.Cfg.ProxyPort = ""
 
 	err := dbClient.StartProxy()
-	testutil.Refute(t, err, nil)
+	Expect(err).ToNot(BeNil())
 }
 
 func TestUpdateDestination(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	// stopping server
 	server.Close()
 	dbClient.Cfg.ProxyPort = "5556"
 	err := dbClient.StartProxy()
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 	dbClient.UpdateDestination("newdest")
 
-	testutil.Expect(t, dbClient.Cfg.Destination, "newdest")
+	Expect(dbClient.Cfg.Destination).To(Equal("newdest"))
 }
 
 func TestUpdateDestinationEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	// stopping server
 	server.Close()
 	dbClient.Cfg.ProxyPort = "5557"
 	dbClient.StartProxy()
 	err := dbClient.UpdateDestination("e^^**#")
-	testutil.Refute(t, err, nil)
+	Expect(err).ToNot(BeNil())
 }
 
 func TestJSONMinifier(t *testing.T) {
+	RegisterTestingT(t)
 
 	// body can be nil here, it's not reading it from request anyway
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 	req.Header.Add("Content-Type", "application/json")
 
 	fpOne := matching.GetRequestFingerprint(req, []byte(`{"foo": "bar"}`), false)
 	fpTwo := matching.GetRequestFingerprint(req, []byte(`{     "foo":           "bar"}`), false)
 
-	testutil.Expect(t, fpOne, fpTwo)
+	Expect(fpOne).To(Equal(fpTwo))
 }
 
 func TestJSONMinifierWOHeader(t *testing.T) {
+	RegisterTestingT(t)
 
 	// body can be nil here, it's not reading it from request anyway
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	// application/json header is not set, shouldn't be equal
 	fpOne := matching.GetRequestFingerprint(req, []byte(`{"foo": "bar"}`), false)
 	fpTwo := matching.GetRequestFingerprint(req, []byte(`{     "foo":           "bar"}`), false)
 
-	testutil.Refute(t, fpOne, fpTwo)
+	Expect(fpOne).ToNot(Equal(fpTwo))
 }
 
 var xmlBody = `<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -425,26 +458,28 @@ var xmlBodyTwo = `<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="
 	       </project>`
 
 func TestXMLMinifier(t *testing.T) {
+	RegisterTestingT(t)
 
 	// body can be nil here, it's not reading it from request anyway
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	req.Header.Add("Content-Type", "application/xml")
 
 	fpOne := matching.GetRequestFingerprint(req, []byte(xmlBody), false)
 	fpTwo := matching.GetRequestFingerprint(req, []byte(xmlBodyTwo), false)
-	testutil.Expect(t, fpOne, fpTwo)
+	Expect(fpOne).To(Equal(fpTwo))
 }
 
 func TestXMLMinifierWOHeader(t *testing.T) {
+	RegisterTestingT(t)
 
 	// body can be nil here, it's not reading it from request anyway
 	req, err := http.NewRequest("GET", "http://example.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	// application/xml header is not set, shouldn't be equal
 	fpOne := matching.GetRequestFingerprint(req, []byte(xmlBody), false)
 	fpTwo := matching.GetRequestFingerprint(req, []byte(xmlBodyTwo), false)
-	testutil.Refute(t, fpOne, fpTwo)
+	Expect(fpOne).ToNot(Equal(fpTwo))
 }
