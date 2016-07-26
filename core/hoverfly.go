@@ -494,8 +494,6 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) 
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (hf *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response, respBody []byte) {
-	// record request here
-	//key := matching.GetRequestFingerprint(req, reqBody, hf.Cfg.Webserver)
 
 	if resp == nil {
 		resp = emptyResp
