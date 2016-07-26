@@ -1,12 +1,12 @@
 package hoverfly
 
 import (
+	. "github.com/onsi/gomega"
 	"bytes"
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/testutil"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -15,6 +15,7 @@ import (
 )
 
 func TestGetNewHoverflyCheckConfig(t *testing.T) {
+	RegisterTestingT(t)
 
 	cfg := InitSettings()
 
@@ -27,70 +28,78 @@ func TestGetNewHoverflyCheckConfig(t *testing.T) {
 
 	dbClient := GetNewHoverfly(cfg, requestCache, metaCache, backend)
 
-	testutil.Expect(t, dbClient.Cfg, cfg)
+	Expect(dbClient.Cfg).To(Equal(cfg))
 
 	// deleting this database
 	os.Remove("testing2.db")
 }
 
 func TestGetNewHoverfly(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
 	dbClient.Cfg.ProxyPort = "6666"
 
 	err := dbClient.StartProxy()
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	newResponse, err := http.Get(fmt.Sprintf("http://localhost:%s/", dbClient.Cfg.ProxyPort))
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, newResponse.StatusCode, 500)
+	Expect(err).To(BeNil())
+	Expect(newResponse.StatusCode).To(Equal(http.StatusInternalServerError))
 
 }
 
 func TestProcessCaptureRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	dbClient.Cfg.SetMode("capture")
 
 	req, resp := dbClient.processRequest(r)
 
-	testutil.Refute(t, req, nil)
-	testutil.Refute(t, resp, nil)
-	testutil.Expect(t, resp.StatusCode, 201)
+	Expect(req).ToNot(BeNil())
+	Expect(resp).ToNot(BeNil())
+	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 }
 
 func TestProcessSimulateRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	// capturing
 	dbClient.Cfg.SetMode("capture")
 	req, resp := dbClient.processRequest(r)
 
-	testutil.Refute(t, req, nil)
-	testutil.Refute(t, resp, nil)
-	testutil.Expect(t, resp.StatusCode, 201)
+	Expect(req).ToNot(BeNil())
+	Expect(resp).ToNot(BeNil())
+	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
 	// virtualizing
 	dbClient.Cfg.SetMode(SimulateMode)
 	newReq, newResp := dbClient.processRequest(r)
 
-	testutil.Refute(t, newReq, nil)
-	testutil.Refute(t, newResp, nil)
-	testutil.Expect(t, newResp.StatusCode, 201)
+	Expect(newReq).ToNot(BeNil())
+	Expect(newResp).ToNot(BeNil())
+	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 }
 
 func TestProcessSynthesizeRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
@@ -101,20 +110,22 @@ func TestProcessSynthesizeRequest(t *testing.T) {
 	bodyBytes := []byte("request_body_here")
 
 	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	dbClient.Cfg.SetMode(SynthesizeMode)
 	newReq, newResp := dbClient.processRequest(r)
 
-	testutil.Refute(t, newReq, nil)
-	testutil.Refute(t, newResp, nil)
-	testutil.Expect(t, newResp.StatusCode, 200)
+	Expect(newReq).ToNot(BeNil())
+	Expect(newResp).ToNot(BeNil())
+	Expect(newResp.StatusCode).To(Equal(http.StatusOK))
 	b, err := ioutil.ReadAll(newResp.Body)
-	testutil.Expect(t, err, nil)
-	testutil.Expect(t, string(b), string(bodyBytes))
+	Expect(err).To(BeNil())
+	Expect(string(b)).To(Equal(string(bodyBytes)))
 }
 
 func TestProcessModifyRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
@@ -122,25 +133,27 @@ func TestProcessModifyRequest(t *testing.T) {
 	dbClient.Cfg.Middleware = "./examples/middleware/modify_request/modify_request.py"
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	dbClient.Cfg.SetMode(ModifyMode)
 	newReq, newResp := dbClient.processRequest(r)
 
-	testutil.Refute(t, newReq, nil)
-	testutil.Refute(t, newResp, nil)
+	Expect(newReq).ToNot(BeNil())
+	Expect(newResp).ToNot(BeNil())
 
-	testutil.Expect(t, newResp.StatusCode, 202)
+	Expect(newResp.StatusCode).To(Equal(http.StatusAccepted))
 }
 
 func TestURLToStringWorksAsExpected(t *testing.T) {
+	RegisterTestingT(t)
+
 	testUrl := url.URL{
 		Scheme:   "http",
 		Host:     "test.com",
 		Path:     "/args/1",
 		RawQuery: "query=val",
 	}
-	testutil.Expect(t, testUrl.String(), "http://test.com/args/1?query=val")
+	Expect(testUrl.String()).To(Equal("http://test.com/args/1?query=val"))
 }
 
 type ResponseDelayListStub struct {
@@ -161,18 +174,20 @@ func (this *ResponseDelayListStub) GetDelay(urlPattern, httpMethod string) *mode
 }
 
 func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	// capturing
 	dbClient.Cfg.SetMode("capture")
 	_, resp := dbClient.processRequest(r)
 
-	testutil.Expect(t, resp.StatusCode, 201)
+	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
 	// virtualizing
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -182,17 +197,19 @@ func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {
 
 	_, newResp := dbClient.processRequest(r)
 
-	testutil.Expect(t, newResp.StatusCode, 201)
+	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
-	testutil.Expect(t, stub.gotDelays, 1)
+	Expect(stub.gotDelays, Equal(1))
 }
 
 func TestDelayNotAppliedToFailedSimulateRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	// virtualizing
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -202,18 +219,20 @@ func TestDelayNotAppliedToFailedSimulateRequest(t *testing.T) {
 
 	_, newResp := dbClient.processRequest(r)
 
-	testutil.Expect(t, newResp.StatusCode, 412)
+	Expect(newResp.StatusCode).To(Equal(http.StatusPreconditionFailed))
 
-	testutil.Expect(t, stub.gotDelays, 0)
+	Expect(stub.gotDelays).To(Equal(0))
 }
 
 func TestDelayNotAppliedToCaptureRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	dbClient.Cfg.SetMode("capture")
 
@@ -222,12 +241,14 @@ func TestDelayNotAppliedToCaptureRequest(t *testing.T) {
 
 	_, resp := dbClient.processRequest(r)
 
-	testutil.Expect(t, resp.StatusCode, 201)
+	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
-	testutil.Expect(t, stub.gotDelays, 0)
+	Expect(stub.gotDelays).To(Equal(0))
 }
 
 func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
@@ -238,7 +259,7 @@ func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
 	bodyBytes := []byte("request_body_here")
 
 	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	dbClient.Cfg.SetMode(SynthesizeMode)
 
@@ -246,12 +267,14 @@ func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	_, newResp := dbClient.processRequest(r)
 
-	testutil.Expect(t, newResp.StatusCode, 200)
+	Expect(newResp.StatusCode).To(Equal(http.StatusOK))
 
-	testutil.Expect(t, stub.gotDelays, 1)
+	Expect(stub.gotDelays).To(Equal(1))
 }
 
 func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
@@ -262,7 +285,7 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 	bodyBytes := []byte("request_body_here")
 
 	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	dbClient.Cfg.SetMode(SynthesizeMode)
 
@@ -270,12 +293,14 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	_, newResp := dbClient.processRequest(r)
 
-	testutil.Expect(t, newResp.StatusCode, 503)
+	Expect(newResp.StatusCode).To(Equal(http.StatusServiceUnavailable))
 
-	testutil.Expect(t, stub.gotDelays, 0)
+	Expect(stub.gotDelays).To(Equal(0))
 }
 
 func TestDelayAppliedToModifyRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
@@ -283,7 +308,7 @@ func TestDelayAppliedToModifyRequest(t *testing.T) {
 	dbClient.Cfg.Middleware = "./examples/middleware/modify_request/modify_request.py"
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	dbClient.Cfg.SetMode(ModifyMode)
 
@@ -291,12 +316,14 @@ func TestDelayAppliedToModifyRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	_, newResp := dbClient.processRequest(r)
 
-	testutil.Expect(t, newResp.StatusCode, 202)
+	Expect(newResp.StatusCode).To(Equal(http.StatusAccepted))
 
-	testutil.Expect(t, stub.gotDelays, 1)
+	Expect(stub.gotDelays).To(Equal(1))
 }
 
 func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
@@ -304,7 +331,7 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 	dbClient.Cfg.Middleware = "./examples/middleware/modify_request/no_exist.py"
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
-	testutil.Expect(t, err, nil)
+	Expect(err).To(BeNil())
 
 	dbClient.Cfg.SetMode(ModifyMode)
 
@@ -312,7 +339,7 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	_, newResp := dbClient.processRequest(r)
 
-	testutil.Expect(t, newResp.StatusCode, 503)
+	Expect(newResp.StatusCode).To(Equal(503))
 
-	testutil.Expect(t, stub.gotDelays, 0)
+	Expect(stub.gotDelays).To(Equal(0))
 }
