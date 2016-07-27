@@ -97,9 +97,8 @@ func TestGetDelayWithRegexMatch(t *testing.T) {
 	delayMatch := delays.GetDelay("delayexample.com", "method-dummy")
 	Expect(*delayMatch).To(Equal(delay))
 
-	var nilDelay *ResponseDelay
 	delayMatch = delays.GetDelay("nodelay.com", "method-dummy")
-	Expect(delayMatch).To(Equal(nilDelay))
+	Expect(delayMatch).To(BeNil())
 }
 
 func TestMultipleMatchingDelaysReturnsTheFirst(t *testing.T) {
@@ -129,9 +128,7 @@ func TestNoMatchIfMethodsDontMatch(t *testing.T) {
 	}
 	delays := ResponseDelayList{delay}
 
-	var nilDelay *ResponseDelay
 	delayMatch := delays.GetDelay("delayexample.com", "GET")
-	Expect(delayMatch).To(Equal(nilDelay))
 	Expect(delayMatch).To(BeNil())
 }
 
