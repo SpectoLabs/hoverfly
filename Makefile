@@ -18,11 +18,11 @@ hoverctl-functional-test-dependencies:
 
 hoverfly-test: hoverfly-dependencies
 	cd core && \
-	go test -v $(go list ./... | grep -v -E 'vendor')
+	go test -v $$(go list ./... | grep -v -E 'vendor')
 
 hoverctl-test: hoverctl-dependencies
 	cd hoverctl && \
-	go test -v $(go list ./... | grep -v -E 'vendor')
+	go test -v $$(go list ./... | grep -v -E 'vendor')
 
 hoverfly-build: hoverfly-test
 	cd core/cmd/hoverfly && \
