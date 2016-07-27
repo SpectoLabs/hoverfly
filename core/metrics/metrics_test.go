@@ -1,22 +1,23 @@
 package metrics
 
 import (
+	. "github.com/onsi/gomega"
 	"testing"
 )
 
 func TestSimulateInc(t *testing.T) {
+	RegisterTestingT(t)
 	counter := NewModeCounter([]string{"name"})
 
 	counter.Count("name")
 
 	count := counter.Counters["name"].Count()
 
-	if count != 1 {
-		t.Fatalf("Expected counter to have size %v but was %v", 1, counter)
-	}
+	Expect(count).To(Equal(int64(1)))
 }
 
 func TestFlush(t *testing.T) {
+	RegisterTestingT(t)
 	counter := NewModeCounter([]string{"name"})
 
 	counter.Counters["name"].Inc(1)
@@ -25,7 +26,5 @@ func TestFlush(t *testing.T) {
 
 	count := fl.Counters["name"]
 
-	if count != 1 {
-		t.Fatalf("Expected counter to have size %v but was %v", 1, counter)
-	}
+	Expect(count).To(Equal(int64(1)))
 }
