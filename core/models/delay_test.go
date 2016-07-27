@@ -1,11 +1,9 @@
 package models
 
 import (
-	"testing"
 	. "github.com/onsi/gomega"
+	"testing"
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/testutil"
-	"fmt"
 )
 
 func TestConvertJsonStringToResponseDelayConfig(t *testing.T) {
@@ -88,6 +86,8 @@ func TestErrorIfHostPatternUsed(t *testing.T) {
 }
 
 func TestGetDelayWithRegexMatch(t *testing.T) {
+	RegisterTestingT(t)
+
 	delay := ResponseDelay{
 		UrlPattern: "example(.+)",
 		Delay:       100,
@@ -95,14 +95,16 @@ func TestGetDelayWithRegexMatch(t *testing.T) {
 	delays := ResponseDelayList{delay}
 
 	delayMatch := delays.GetDelay("delayexample.com", "method-dummy")
-	testutil.Expect(t, *delayMatch, delay)
+	Expect(*delayMatch).To(Equal(delay))
 
 	var nilDelay *ResponseDelay
 	delayMatch = delays.GetDelay("nodelay.com", "method-dummy")
-	testutil.Expect(t, delayMatch, nilDelay)
+	Expect(delayMatch).To(Equal(nilDelay))
 }
 
 func TestMultipleMatchingDelaysReturnsTheFirst(t *testing.T) {
+	RegisterTestingT(t)
+
 	delayOne := ResponseDelay{
 		UrlPattern: "example.com",
 		Delay:       100,
@@ -114,10 +116,12 @@ func TestMultipleMatchingDelaysReturnsTheFirst(t *testing.T) {
 	delays := ResponseDelayList{delayOne, delayTwo}
 
 	delayMatch := delays.GetDelay("delayexample.com", "method-dummy")
-	testutil.Expect(t, *delayMatch, delayOne)
+	Expect(*delayMatch).To(Equal(delayOne))
 }
 
 func TestNoMatchIfMethodsDontMatch(t *testing.T) {
+	RegisterTestingT(t)
+
 	delay := ResponseDelay{
 		UrlPattern: "example.com",
 		Delay:       100,
@@ -127,13 +131,13 @@ func TestNoMatchIfMethodsDontMatch(t *testing.T) {
 
 	var nilDelay *ResponseDelay
 	delayMatch := delays.GetDelay("delayexample.com", "GET")
-	testutil.Expect(t, delayMatch, nilDelay)
-	if (delayMatch!=nil) {
-		t.Fail()
-	}
+	Expect(delayMatch).To(Equal(nilDelay))
+	Expect(delayMatch).To(BeNil())
 }
 
 func TestReturnMatchIfMethodsMatch(t *testing.T) {
+	RegisterTestingT(t)
+
 	delay := ResponseDelay{
 		UrlPattern: "example.com",
 		Delay:       100,
@@ -142,10 +146,12 @@ func TestReturnMatchIfMethodsMatch(t *testing.T) {
 	delays := ResponseDelayList{delay}
 
 	delayMatch := delays.GetDelay("delayexample.com", "GET")
-	testutil.Expect(t, *delayMatch, delay)
+	Expect(*delayMatch).To(Equal(delay))
 }
 
 func TestIfDelayMethodBlankThenMatchesAnyMethod(t *testing.T) {
+	RegisterTestingT(t)
+
 	delay := ResponseDelay{
 		UrlPattern: "example(.+)",
 		Delay:       100,
@@ -153,19 +159,5 @@ func TestIfDelayMethodBlankThenMatchesAnyMethod(t *testing.T) {
 	delays := ResponseDelayList{delay}
 
 	delayMatch := delays.GetDelay("delayexample.com", "method-dummy")
-	testutil.Expect(t, *delayMatch, delay)
-}
-
-func TestMarshalToJSONWorks(t *testing.T) {
-	delay := ResponseDelay{
-		UrlPattern: "example(.+)",
-		Delay:       100,
-	}
-	delays := ResponseDelayList{delay}
-
-	resp := ResponseDelayJson{
-		Data: &delays,
-	}
-	b, _ := json.Marshal(resp)
-	fmt.Print(string(b))
+	Expect(*delayMatch).To(Equal(delay))
 }
