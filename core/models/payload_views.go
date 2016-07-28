@@ -25,18 +25,6 @@ type RequestDetailsView struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
-func (r *RequestDetailsView) ConvertToRequestDetails() (RequestDetails) {
-	return RequestDetails{
-		Path: r.Path,
-		Method: r.Method,
-		Destination: r.Destination,
-		Scheme: r.Scheme,
-		Query: r.Query,
-		Body: r.Body,
-		Headers: r.Headers,
-	}
-}
-
 // ResponseDetailsView is used when marshalling and
 // unmarshalling requests. This struct's Body may be Base64
 // encoded based on the EncodedBody field.

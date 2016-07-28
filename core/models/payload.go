@@ -79,7 +79,7 @@ func NewPayloadFromBytes(data []byte) (*Payload, error) {
 }
 
 func NewPayloadFromPayloadView(data PayloadView) (Payload) {
-	return Payload{Response: data.Response.ConvertToResponseDetails(), Request: data.Request.ConvertToRequestDetails()}
+	return Payload{Response: data.Response.ConvertToResponseDetails(), Request: NewRequestDetailsFromRequestDetailsView(data.Request)}
 }
 
 // RequestDetails stores information about request, it's used for creating unique hash and also as a payload structure
@@ -91,6 +91,18 @@ type RequestDetails struct {
 	Query       string              `json:"query"`
 	Body        string              `json:"body"`
 	Headers     map[string][]string `json:"headers"`
+}
+
+func NewRequestDetailsFromRequestDetailsView(data RequestDetailsView) (RequestDetails) {
+	return RequestDetails{
+		Path: data.Path,
+		Method: data.Method,
+		Destination: data.Destination,
+		Scheme: data.Scheme,
+		Query: data.Query,
+		Body: data.Body,
+		Headers: data.Headers,
+	}
 }
 
 func (r *RequestDetails) ConvertToRequestDetailsView() (RequestDetailsView) {
