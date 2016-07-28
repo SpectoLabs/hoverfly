@@ -143,7 +143,7 @@ func(this *RequestTemplatePayloadJson) ConvertToRequestTemplateStore() (RequestT
 func(this *RequestTemplatePayloadView) ConvertToPayload() (RequestTemplatePayload) {
 	return RequestTemplatePayload{
 		RequestTemplate: this.RequestTemplate,
-		Response: this.Response.ConvertToResponseDetails(),
+		Response: models.NewResponseDetialsFromResponseDetailsView(this.Response),
 	}
 }
 

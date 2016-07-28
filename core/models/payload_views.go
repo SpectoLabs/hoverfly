@@ -1,9 +1,5 @@
 package models
 
-import (
-	"encoding/base64"
-)
-
 type PayloadViewData struct {
 	Data []PayloadView `json:"data"`
 }
@@ -34,15 +30,3 @@ type ResponseDetailsView struct {
 	EncodedBody bool                `json:"encodedBody"`
 	Headers     map[string][]string `json:"headers"`
 }
-
-func (r *ResponseDetailsView) ConvertToResponseDetails() (ResponseDetails) {
-	body := r.Body
-
-	if r.EncodedBody == true {
-		decoded, _ := base64.StdEncoding.DecodeString(r.Body)
-		body = string(decoded)
-	}
-
-	return ResponseDetails{Status: r.Status, Body: body, Headers: r.Headers}
-}
-

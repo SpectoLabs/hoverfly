@@ -79,7 +79,10 @@ func NewPayloadFromBytes(data []byte) (*Payload, error) {
 }
 
 func NewPayloadFromPayloadView(data PayloadView) (Payload) {
-	return Payload{Response: data.Response.ConvertToResponseDetails(), Request: NewRequestDetailsFromRequestDetailsView(data.Request)}
+	return Payload{
+		Response: NewResponseDetialsFromResponseDetailsView(data.Response),
+		Request: NewRequestDetailsFromRequestDetailsView(data.Request),
+	}
 }
 
 // RequestDetails stores information about request, it's used for creating unique hash and also as a payload structure
@@ -191,6 +194,19 @@ type ResponseDetails struct {
 	Body    string              `json:"body"`
 	Headers map[string][]string `json:"headers"`
 }
+
+func NewResponseDetialsFromResponseDetailsView(data ResponseDetailsView) (ResponseDetails) {
+	body := data.Body
+
+	if data.EncodedBody == true {
+		decoded, _ := base64.StdEncoding.DecodeString(data.Body)
+		body = string(decoded)
+	}
+
+	return ResponseDetails{Status: data.Status, Body: body, Headers: data.Headers}
+}
+
+
 
 func (r *ResponseDetails) ConvertToResponseDetailsView() (ResponseDetailsView) {
 	needsEncoding := false
