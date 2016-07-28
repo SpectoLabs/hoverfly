@@ -31,10 +31,6 @@ import (
 )
 
 // recordedRequests struct encapsulates payload data
-type recordedRequests struct {
-	Data []views.PayloadView `json:"data"`
-}
-
 type storedMetadata struct {
 	Data map[string]string `json:"data"`
 }
@@ -436,7 +432,7 @@ func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 // ImportRecordsHandler - accepts JSON payload and saves it to cache
 func (d *Hoverfly) ImportRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var requests recordedRequests
+	var requests views.PayloadViewData
 
 	defer req.Body.Close()
 	body, err := ioutil.ReadAll(req.Body)

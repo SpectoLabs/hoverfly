@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 func TestGetAllRecords(t *testing.T) {
@@ -32,7 +33,7 @@ func TestGetAllRecords(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rr := recordedRequests{}
+	rr := views.PayloadViewData{}
 	err = json.Unmarshal(body, &rr)
 
 	Expect(len(rr.Data)).To(Equal(0))
@@ -66,7 +67,7 @@ func TestGetAllRecordsWRecords(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rr := recordedRequests{}
+	rr := views.PayloadViewData{}
 	err = json.Unmarshal(body, &rr)
 
 	Expect(len(rr.Data)).To(Equal(5))
