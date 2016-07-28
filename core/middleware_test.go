@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http/httptest"
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 func TestChangeBodyMiddleware(t *testing.T) {
@@ -81,7 +82,7 @@ func TestReflectBody(t *testing.T) {
 func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 
-	var newPayloadView models.PayloadView
+	var newPayloadView views.PayloadView
 
 	json.Unmarshal(body, &newPayloadView)
 

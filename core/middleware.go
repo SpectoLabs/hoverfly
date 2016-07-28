@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"errors"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 // Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.
@@ -116,7 +117,7 @@ func ExecuteMiddlewareLocally(middlewares string, payload models.Payload) (model
 	}
 
 	if len(mwOutput) > 0 {
-		var newPayloadView models.PayloadView
+		var newPayloadView views.PayloadView
 
 		err = json.Unmarshal(mwOutput, &newPayloadView)
 
@@ -134,7 +135,7 @@ func ExecuteMiddlewareLocally(middlewares string, payload models.Payload) (model
 				}).Debug("payload after modifications")
 			}
 			// payload unmarshalled into Payload struct, returning it
-			return newPayloadView.ConvertToPayload(), nil
+			return models.NewPayloadFromPayloadView(newPayloadView), nil
 		}
 	} else {
 
@@ -179,7 +180,7 @@ func ExecuteMiddlewareRemotely(middleware string, payload models.Payload) (model
 		return payload, err
 	}
 
-	var newPayloadView models.PayloadView
+	var newPayloadView views.PayloadView
 
 	err = json.Unmarshal(newPayloadBytes, &newPayloadView)
 	if err != nil {
@@ -188,5 +189,5 @@ func ExecuteMiddlewareRemotely(middleware string, payload models.Payload) (model
 		}).Error("Error when trying to serialize response from remote middleware")
 		return payload, err
 	}
-	return newPayloadView.ConvertToPayload(), nil
+	return models.NewPayloadFromPayloadView(newPayloadView), nil
 }

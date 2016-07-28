@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"testing"
 	. "github.com/onsi/gomega"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 func TestGetAllTemplates(t *testing.T) {
@@ -32,7 +33,7 @@ func TestGetAllTemplates(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rr := recordedRequests{}
+	rr := views.PayloadViewData{}
 	err = json.Unmarshal(body, &rr)
 
 	Expect(rr.Data).To(HaveLen(0))

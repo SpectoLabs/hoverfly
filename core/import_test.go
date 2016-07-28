@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 func TestIsURLHTTP(t *testing.T) {
@@ -144,13 +145,13 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPayload := models.PayloadView{
-		Response: models.ResponseDetailsView{
+	originalPayload := views.PayloadView{
+		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}}},
-		Request: models.RequestDetailsView{
+		Request: views.RequestDetailsView{
 			Path:        "/",
 			Method:      "GET",
 			Destination: "/",
@@ -158,7 +159,7 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 			Query:       "", Body: "",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	hv.ImportPayloads([]models.PayloadView{originalPayload})
+	hv.ImportPayloads([]views.PayloadView{originalPayload})
 	value, _ := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	decodedPayload, _ := models.NewPayloadFromBytes(value)
 	Expect(*decodedPayload).To(Equal(models.Payload{
@@ -189,14 +190,14 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPayload1 := models.PayloadView{
-		Response: models.ResponseDetailsView{
+	originalPayload1 := views.PayloadView{
+		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 		},
-		Request: models.RequestDetailsView{
+		Request: views.RequestDetailsView{
 			Path:        "/",
 			Method:      "GET",
 			Destination: "/",
@@ -212,24 +213,24 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 
 	originalPayload3.Request.Path = "/newer/path"
 
-	hv.ImportPayloads([]models.PayloadView{originalPayload1, originalPayload2, originalPayload3})
+	hv.ImportPayloads([]views.PayloadView{originalPayload1, originalPayload2, originalPayload3})
 	value, err := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	Expect(err).To(BeNil())
 	decodedPayload1, err := models.NewPayloadFromBytes(value)
 	Expect(err).To(BeNil())
-	Expect(*decodedPayload1).To(Equal(originalPayload1.ConvertToPayload()))
+	Expect(*decodedPayload1).To(Equal(models.NewPayloadFromPayloadView(originalPayload1)))
 
 	value, err = cache.Get([]byte("9c03e4af1f30542ff079a712bddad602"))
 	Expect(err).To(BeNil())
 	decodedPayload2, err := models.NewPayloadFromBytes(value)
 	Expect(err).To(BeNil())
-	Expect(*decodedPayload2).To(Equal(originalPayload2.ConvertToPayload()))
+	Expect(*decodedPayload2).To(Equal(models.NewPayloadFromPayloadView(originalPayload2)))
 
 	value, err = cache.Get([]byte("fd099332afee48101edb7441b098cd4a"))
 	Expect(err).To(BeNil())
 	decodedPayload3, err := models.NewPayloadFromBytes(value)
 	Expect(err).To(BeNil())
-	Expect(*decodedPayload3).To(Equal(originalPayload3.ConvertToPayload()))
+	Expect(*decodedPayload3).To(Equal(models.NewPayloadFromPayloadView(originalPayload3)))
 }
 
 // Helper function for base64 encoding
@@ -245,13 +246,13 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	encodedPayload := models.PayloadView{
-		Response: models.ResponseDetailsView{
+	encodedPayload := views.PayloadView{
+		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
-		Request: models.RequestDetailsView{
+		Request: views.RequestDetailsView{
 			Path:        "/",
 			Method:      "GET",
 			Destination: "/",
@@ -259,7 +260,7 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 			Query:       "", Body: "",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	hv.ImportPayloads([]models.PayloadView{encodedPayload})
+	hv.ImportPayloads([]views.PayloadView{encodedPayload})
 
 	value, err := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	Expect(err).To(BeNil())

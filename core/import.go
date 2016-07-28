@@ -13,6 +13,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"net/http"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -88,7 +89,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
 	}
 
-	var requests recordedRequests
+	var requests views.PayloadViewData
 
 	jsonParser := json.NewDecoder(payloadsFile)
 	if err = jsonParser.Decode(&requests); err != nil {
@@ -108,7 +109,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Failed to fetch given URL, error %s", err.Error())
 	}
 
-	var requests recordedRequests
+	var requests views.PayloadViewData
 
 	jsonParser := json.NewDecoder(resp.Body)
 	if err = jsonParser.Decode(&requests); err != nil {
@@ -125,14 +126,14 @@ func isJSON(s string) bool {
 }
 
 // ImportPayloads - a function to save given payloads into the database.
-func (hf *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
+func (hf *Hoverfly) ImportPayloads(payloads []views.PayloadView) error {
 	if len(payloads) > 0 {
 		success := 0
 		failed := 0
 		for _, payloadView := range payloads {
 
 			// Convert PayloadView back to Payload for internal storage
-			pl := payloadView.ConvertToPayload()
+			pl := models.NewPayloadFromPayloadView(payloadView)
 
 			if len(pl.Request.Headers) == 0 {
 				pl.Request.Headers = make(map[string][]string)

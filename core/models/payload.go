@@ -14,6 +14,7 @@ import (
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 const (
@@ -62,8 +63,8 @@ func (p *Payload) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (p *Payload) ConvertToPayloadView() (*PayloadView) {
-	return &PayloadView{Response: p.Response.ConvertToResponseDetailsView(), Request: p.Request.ConvertToRequestDetailsView()}
+func (p *Payload) ConvertToPayloadView() (*views.PayloadView) {
+	return &views.PayloadView{Response: p.Response.ConvertToResponseDetailsView(), Request: p.Request.ConvertToRequestDetailsView()}
 }
 
 // NewPayloadFromBytes decodes supplied bytes into Payload structure
@@ -78,6 +79,13 @@ func NewPayloadFromBytes(data []byte) (*Payload, error) {
 	return p, nil
 }
 
+func NewPayloadFromPayloadView(data views.PayloadView) (Payload) {
+	return Payload{
+		Response: NewResponseDetialsFromResponseDetailsView(data.Response),
+		Request: NewRequestDetailsFromRequestDetailsView(data.Request),
+	}
+}
+
 // RequestDetails stores information about request, it's used for creating unique hash and also as a payload structure
 type RequestDetails struct {
 	Path        string              `json:"path"`
@@ -89,8 +97,20 @@ type RequestDetails struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
-func (r *RequestDetails) ConvertToRequestDetailsView() (RequestDetailsView) {
-	return RequestDetailsView{
+func NewRequestDetailsFromRequestDetailsView(data views.RequestDetailsView) (RequestDetails) {
+	return RequestDetails{
+		Path: data.Path,
+		Method: data.Method,
+		Destination: data.Destination,
+		Scheme: data.Scheme,
+		Query: data.Query,
+		Body: data.Body,
+		Headers: data.Headers,
+	}
+}
+
+func (r *RequestDetails) ConvertToRequestDetailsView() (views.RequestDetailsView) {
+	return views.RequestDetailsView{
 		Path: r.Path,
 		Method: r.Method,
 		Destination: r.Destination,
@@ -176,7 +196,20 @@ type ResponseDetails struct {
 	Headers map[string][]string `json:"headers"`
 }
 
-func (r *ResponseDetails) ConvertToResponseDetailsView() (ResponseDetailsView) {
+func NewResponseDetialsFromResponseDetailsView(data views.ResponseDetailsView) (ResponseDetails) {
+	body := data.Body
+
+	if data.EncodedBody == true {
+		decoded, _ := base64.StdEncoding.DecodeString(data.Body)
+		body = string(decoded)
+	}
+
+	return ResponseDetails{Status: data.Status, Body: body, Headers: data.Headers}
+}
+
+
+
+func (r *ResponseDetails) ConvertToResponseDetailsView() (views.ResponseDetailsView) {
 	needsEncoding := false
 
 	// Check headers for gzip
@@ -200,5 +233,5 @@ func (r *ResponseDetails) ConvertToResponseDetailsView() (ResponseDetailsView) {
 		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
 	}
 
-	return ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
+	return views.ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
 }

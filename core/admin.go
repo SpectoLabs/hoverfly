@@ -27,13 +27,10 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 // recordedRequests struct encapsulates payload data
-type recordedRequests struct {
-	Data []models.PayloadView `json:"data"`
-}
-
 type storedMetadata struct {
 	Data map[string]string `json:"data"`
 }
@@ -272,7 +269,7 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 
 	if err == nil {
 
-		var payloads []models.PayloadView
+		var payloads []views.PayloadView
 
 		for _, v := range records {
 			if payload, err := models.NewPayloadFromBytes(v); err == nil {
@@ -287,7 +284,7 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 
 		w.Header().Set("Content-Type", "application/json")
 
-		var response models.PayloadViewData
+		var response views.PayloadViewData
 		response.Data = payloads
 		b, err := json.Marshal(response)
 
@@ -435,7 +432,7 @@ func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 // ImportRecordsHandler - accepts JSON payload and saves it to cache
 func (d *Hoverfly) ImportRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var requests recordedRequests
+	var requests views.PayloadViewData
 
 	defer req.Body.Close()
 	body, err := ioutil.ReadAll(req.Body)
@@ -537,7 +534,7 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 
 	p := models.Payload{Request: preq, Response: presp}
 
-	var pls []models.PayloadView
+	var pls []views.PayloadView
 
 	pls = append(pls, *p.ConvertToPayloadView())
 
