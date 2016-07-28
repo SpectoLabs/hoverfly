@@ -8,6 +8,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"fmt"
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 type RequestTemplateStore []RequestTemplatePayload
@@ -20,7 +21,7 @@ type RequestTemplatePayload struct {
 
 type RequestTemplatePayloadView struct {
 	RequestTemplate RequestTemplate        `json:"requestTemplate"`
-	Response        models.ResponseDetailsView `json:"response"`
+	Response        views.ResponseDetailsView `json:"response"`
 }
 
 type RequestTemplatePayloadJson struct {

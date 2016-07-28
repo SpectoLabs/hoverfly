@@ -13,6 +13,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"net/http"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -125,7 +126,7 @@ func isJSON(s string) bool {
 }
 
 // ImportPayloads - a function to save given payloads into the database.
-func (hf *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
+func (hf *Hoverfly) ImportPayloads(payloads []views.PayloadView) error {
 	if len(payloads) > 0 {
 		success := 0
 		failed := 0

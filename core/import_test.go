@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 func TestIsURLHTTP(t *testing.T) {
@@ -144,13 +145,13 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPayload := models.PayloadView{
-		Response: models.ResponseDetailsView{
+	originalPayload := views.PayloadView{
+		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}}},
-		Request: models.RequestDetailsView{
+		Request: views.RequestDetailsView{
 			Path:        "/",
 			Method:      "GET",
 			Destination: "/",
@@ -158,7 +159,7 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 			Query:       "", Body: "",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	hv.ImportPayloads([]models.PayloadView{originalPayload})
+	hv.ImportPayloads([]views.PayloadView{originalPayload})
 	value, _ := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	decodedPayload, _ := models.NewPayloadFromBytes(value)
 	Expect(*decodedPayload).To(Equal(models.Payload{
@@ -189,14 +190,14 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPayload1 := models.PayloadView{
-		Response: models.ResponseDetailsView{
+	originalPayload1 := views.PayloadView{
+		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 		},
-		Request: models.RequestDetailsView{
+		Request: views.RequestDetailsView{
 			Path:        "/",
 			Method:      "GET",
 			Destination: "/",
@@ -212,7 +213,7 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 
 	originalPayload3.Request.Path = "/newer/path"
 
-	hv.ImportPayloads([]models.PayloadView{originalPayload1, originalPayload2, originalPayload3})
+	hv.ImportPayloads([]views.PayloadView{originalPayload1, originalPayload2, originalPayload3})
 	value, err := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	Expect(err).To(BeNil())
 	decodedPayload1, err := models.NewPayloadFromBytes(value)
@@ -245,13 +246,13 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	encodedPayload := models.PayloadView{
-		Response: models.ResponseDetailsView{
+	encodedPayload := views.PayloadView{
+		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
-		Request: models.RequestDetailsView{
+		Request: views.RequestDetailsView{
 			Path:        "/",
 			Method:      "GET",
 			Destination: "/",
@@ -259,7 +260,7 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 			Query:       "", Body: "",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	hv.ImportPayloads([]models.PayloadView{encodedPayload})
+	hv.ImportPayloads([]views.PayloadView{encodedPayload})
 
 	value, err := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	Expect(err).To(BeNil())

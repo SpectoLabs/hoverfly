@@ -1,4 +1,4 @@
-package models
+package views
 
 type PayloadViewData struct {
 	Data []PayloadView `json:"data"`

@@ -7,6 +7,7 @@ import (
 	"compress/gzip"
 	"bytes"
 	"io/ioutil"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 func TestConvertToResponseDetailsView_WithPlainTextResponseDetails(t *testing.T) {
@@ -93,7 +94,7 @@ func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
 	respView := originalResp.ConvertToResponseDetailsView()
 
 	base64EncodedBody := "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg=="
-	Expect(respView).To(Equal(ResponseDetailsView{
+	Expect(respView).To(Equal(views.ResponseDetailsView{
 		Status: 200,
 		Body: base64EncodedBody,
 		EncodedBody: true,
@@ -121,13 +122,13 @@ func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 
 	payloadView := originalPayload.ConvertToPayloadView()
 
-	Expect(*payloadView).To(Equal(PayloadView{
-		Response: ResponseDetailsView{
+	Expect(*payloadView).To(Equal(views.PayloadView{
+		Response: views.ResponseDetailsView{
 			Status: 200,
 			Body: respBody,
 			Headers: map[string][]string{"test_header": []string{"true"}},
 			EncodedBody: false},
-		Request: RequestDetailsView{
+		Request: views.RequestDetailsView{
 			Path: "/",
 			Method: "GET",
 			Destination: "/",
@@ -159,13 +160,13 @@ func TestPayload_ConvertToPayloadView_WithGzippedResponse(t *testing.T) {
 
 	payloadView := originalPayload.ConvertToPayloadView()
 
-	Expect(*payloadView).To(Equal(PayloadView{
-		Response: ResponseDetailsView{
+	Expect(*payloadView).To(Equal(views.PayloadView{
+		Response: views.ResponseDetailsView{
 			Status: 200,
 			Body: "H4sIAAAJbogA/w==",
 			Headers: map[string][]string{"Content-Encoding": []string{"gzip"}},
 			EncodedBody: true},
-		Request: RequestDetailsView{
+		Request: views.RequestDetailsView{
 			Path: "/",
 			Method: "GET",
 			Destination: "/",
@@ -209,8 +210,8 @@ func GzipString(s string) (string) {
 func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
-	view := PayloadView{
-		Request: RequestDetailsView{
+	view := views.PayloadView{
+		Request: views.RequestDetailsView{
 			Path: "A",
 			Method: "A",
 			Destination: "A",
@@ -222,7 +223,7 @@ func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 				"C" : []string{"D"},
 			},
 		},
-		Response: ResponseDetailsView{
+		Response: views.ResponseDetailsView{
 			Status: 1,
 			Body: "1",
 			EncodedBody: false,
@@ -262,8 +263,8 @@ func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 func TestPayloadViewData_ConvertToPayloadDataWithEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
-	view := PayloadView{
-		Response: ResponseDetailsView{
+	view := views.PayloadView{
+		Response: views.ResponseDetailsView{
 			Body: "ZW5jb2RlZA==",
 			EncodedBody: true,
 		},
@@ -277,7 +278,7 @@ func TestPayloadViewData_ConvertToPayloadDataWithEncoding(t *testing.T) {
 func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestDetailsView := RequestDetailsView{
+	requestDetailsView := views.RequestDetailsView{
 		Path: "/",
 		Method: "GET",
 		Destination: "/",
