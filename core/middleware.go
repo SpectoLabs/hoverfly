@@ -134,7 +134,7 @@ func ExecuteMiddlewareLocally(middlewares string, payload models.Payload) (model
 				}).Debug("payload after modifications")
 			}
 			// payload unmarshalled into Payload struct, returning it
-			return newPayloadView.ConvertToPayload(), nil
+			return models.NewPayloadFromPayloadView(newPayloadView), nil
 		}
 	} else {
 
@@ -188,5 +188,5 @@ func ExecuteMiddlewareRemotely(middleware string, payload models.Payload) (model
 		}).Error("Error when trying to serialize response from remote middleware")
 		return payload, err
 	}
-	return newPayloadView.ConvertToPayload(), nil
+	return models.NewPayloadFromPayloadView(newPayloadView), nil
 }

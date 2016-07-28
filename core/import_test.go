@@ -217,19 +217,19 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 	Expect(err).To(BeNil())
 	decodedPayload1, err := models.NewPayloadFromBytes(value)
 	Expect(err).To(BeNil())
-	Expect(*decodedPayload1).To(Equal(originalPayload1.ConvertToPayload()))
+	Expect(*decodedPayload1).To(Equal(models.NewPayloadFromPayloadView(originalPayload1)))
 
 	value, err = cache.Get([]byte("9c03e4af1f30542ff079a712bddad602"))
 	Expect(err).To(BeNil())
 	decodedPayload2, err := models.NewPayloadFromBytes(value)
 	Expect(err).To(BeNil())
-	Expect(*decodedPayload2).To(Equal(originalPayload2.ConvertToPayload()))
+	Expect(*decodedPayload2).To(Equal(models.NewPayloadFromPayloadView(originalPayload2)))
 
 	value, err = cache.Get([]byte("fd099332afee48101edb7441b098cd4a"))
 	Expect(err).To(BeNil())
 	decodedPayload3, err := models.NewPayloadFromBytes(value)
 	Expect(err).To(BeNil())
-	Expect(*decodedPayload3).To(Equal(originalPayload3.ConvertToPayload()))
+	Expect(*decodedPayload3).To(Equal(models.NewPayloadFromPayloadView(originalPayload3)))
 }
 
 // Helper function for base64 encoding

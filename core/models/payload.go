@@ -78,6 +78,10 @@ func NewPayloadFromBytes(data []byte) (*Payload, error) {
 	return p, nil
 }
 
+func NewPayloadFromPayloadView(data PayloadView) (Payload) {
+	return Payload{Response: data.Response.ConvertToResponseDetails(), Request: data.Request.ConvertToRequestDetails()}
+}
+
 // RequestDetails stores information about request, it's used for creating unique hash and also as a payload structure
 type RequestDetails struct {
 	Path        string              `json:"path"`

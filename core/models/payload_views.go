@@ -1,8 +1,6 @@
 package models
 
 import (
-	"bytes"
-	"encoding/gob"
 	"encoding/base64"
 )
 
@@ -14,21 +12,6 @@ type PayloadViewData struct {
 type PayloadView struct {
 	Response ResponseDetailsView `json:"response"`
 	Request  RequestDetailsView  `json:"request"`
-}
-
-func (r *PayloadView) ConvertToPayload() (Payload) {
-	return Payload{Response: r.Response.ConvertToResponseDetails(), Request: r.Request.ConvertToRequestDetails()}
-}
-
-// Encode method encodes all exported Payload fields to bytes
-func (p *PayloadView) Encode() ([]byte, error) {
-	buf := new(bytes.Buffer)
-	enc := gob.NewEncoder(buf)
-	err := enc.Encode(p)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
 }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails

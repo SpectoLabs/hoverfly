@@ -132,7 +132,7 @@ func (hf *Hoverfly) ImportPayloads(payloads []models.PayloadView) error {
 		for _, payloadView := range payloads {
 
 			// Convert PayloadView back to Payload for internal storage
-			pl := payloadView.ConvertToPayload()
+			pl := models.NewPayloadFromPayloadView(payloadView)
 
 			if len(pl.Request.Headers) == 0 {
 				pl.Request.Headers = make(map[string][]string)

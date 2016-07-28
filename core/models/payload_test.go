@@ -205,3 +205,71 @@ func GzipString(s string) (string) {
 	gz.Write([]byte(s))
 	return b.String()
 }
+
+func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
+	RegisterTestingT(t)
+
+	view := PayloadView{
+		Request: RequestDetailsView{
+			Path: "A",
+			Method: "A",
+			Destination: "A",
+			Scheme: "A",
+			Query: "A",
+			Body: "A",
+			Headers: map[string][]string{
+				"A" : []string{"B"},
+				"C" : []string{"D"},
+			},
+		},
+		Response: ResponseDetailsView{
+			Status: 1,
+			Body: "1",
+			EncodedBody: false,
+			Headers: map[string][]string{
+				"1" : []string{"2"},
+				"3" : []string{"4"},
+			},
+		},
+	}
+
+	payload := NewPayloadFromPayloadView(view)
+
+	Expect(payload).To(Equal(Payload{
+		Request: RequestDetails{
+			Path: "A",
+			Method: "A",
+			Destination: "A",
+			Scheme: "A",
+			Query: "A",
+			Body: "A",
+			Headers: map[string][]string{
+				"A" : []string{"B"},
+				"C" : []string{"D"},
+			},
+		},
+		Response: ResponseDetails{
+			Status: 1,
+			Body: "1",
+			Headers: map[string][]string{
+				"1" : []string{"2"},
+				"3" : []string{"4"},
+			},
+		},
+	}))
+}
+
+func TestPayloadViewData_ConvertToPayloadDataWithEncoding(t *testing.T) {
+	RegisterTestingT(t)
+
+	view := PayloadView{
+		Response: ResponseDetailsView{
+			Body: "ZW5jb2RlZA==",
+			EncodedBody: true,
+		},
+	}
+
+	payload := NewPayloadFromPayloadView(view)
+
+	Expect(payload.Response.Body).To(Equal("encoded"))
+}
