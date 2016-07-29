@@ -25,7 +25,7 @@ func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 			"sdv": []string{"ascd"},
 		},
 	}
-	result, _ := store.GetPayload(r, nil, false)
+	result, _ := store.GetPayload(r, false)
 
 	Expect(result.Response.Body).To(Equal("test-body"))
 }
@@ -57,7 +57,7 @@ func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		},
 	}
 
-	result, _ := store.GetPayload(r, nil, false)
+	result, _ := store.GetPayload(r, false)
 
 	Expect(result.Response.Body).To(Equal("test-body"))
 }
@@ -88,7 +88,7 @@ func TestReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 		},
 	}
 
-	result, _ := store.GetPayload(r, nil, false)
+	result, _ := store.GetPayload(r, false)
 
 	Expect(result).To(BeNil())
 }
@@ -119,7 +119,7 @@ func TestReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 			"header2": []string{"different"},
 		},
 	}
-	result, _ := store.GetPayload(r, nil, false)
+	result, _ := store.GetPayload(r, false)
 
 	Expect(result).To(BeNil())
 }
@@ -145,12 +145,13 @@ func TestReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 	r := models.RequestDetails{
 		Method:"GET",
 		Destination: "http://somehost.com",
+		Body: "test-body",
 		Headers: map[string][]string {
 			"header1": []string{"val1-a", "val1-b"},
 			"header2": []string{"val2"},
 		},
 	}
-	result, _ := store.GetPayload(r, []byte("test-body"), false)
+	result, _ := store.GetPayload(r, false)
 
 	Expect(result.Response.Body).To(Equal("test-body"))
 }
@@ -183,7 +184,7 @@ func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 		},
 	}
 
-	result, _ := store.GetPayload(r, nil, false)
+	result, _ := store.GetPayload(r, false)
 
 	Expect(result).To(BeNil())
 }
@@ -251,7 +252,7 @@ func TestEndpointMatchWithHeaders(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result, _ := store.GetPayload(r, nil, false)
+	result, _ := store.GetPayload(r, false)
 
 	Expect(result.Response.Body).To(Equal("test-body"))
 }
@@ -293,7 +294,7 @@ func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 		},
 	}
 
-	result, _ := store.GetPayload(r, nil, false)
+	result, _ := store.GetPayload(r, false)
 
 	Expect(result).To(BeNil())
 }
@@ -324,7 +325,7 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 		Destination: "testhost.com",
 		Query: "q=test",
 	}
-	result, _ := store.GetPayload(r, nil, false)
+	result, _ := store.GetPayload(r, false)
 
 	Expect(result.Response.Body).To(Equal("test-body"))
 
@@ -335,7 +336,7 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 		Query: "q=test",
 	}
 
-	result, _ = store.GetPayload(r, nil, false)
+	result, _ = store.GetPayload(r, false)
 
 	Expect(result).To(BeNil())
 }
