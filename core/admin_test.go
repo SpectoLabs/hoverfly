@@ -1101,3 +1101,22 @@ func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
 	// normal equality checking doesn't work on slices (!!)
 	Expect(dbClient.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
 }
+
+func TestGetMissingURL(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+	m := getBoneRouter(dbClient)
+
+	req, err := http.NewRequest("GET", "/api/sdiughvksjv", nil)
+	Expect(err).To(BeNil())
+
+	//The response recorder used to record HTTP responses
+	respRec := httptest.NewRecorder()
+
+	m.ServeHTTP(respRec, req)
+
+	Expect(respRec.Code, http.StatusNotFound)
+}
