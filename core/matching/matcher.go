@@ -15,7 +15,7 @@ type RequestMatcher struct {
 }
 
 // getResponse returns stored response from cache
-func (this *RequestMatcher) GetPayload(req *models.RequestDetails) (*models.ResponseDetails, *MatchingError) {
+func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.ResponseDetails, *MatchingError) {
 
 	var key string
 

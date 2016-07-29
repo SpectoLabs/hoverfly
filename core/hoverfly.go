@@ -428,7 +428,7 @@ func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 		Headers: req.Header,
 	}
 
-	responseDetails, matchErr := hf.RequestMatcher.GetPayload(&requestDetails)
+	responseDetails, matchErr := hf.RequestMatcher.GetResponse(&requestDetails)
 	if matchErr != nil {
 		return hoverflyError(req, matchErr, matchErr.Error(), matchErr.StatusCode)
 	}
