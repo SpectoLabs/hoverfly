@@ -45,7 +45,16 @@ func (this *RequestMatcher) GetPayload(req *http.Request) (*models.Payload, *Mat
 			"method":      req.Method,
 		}).Warn("Failed to retrieve response from cache")
 
-		payload, err := this.TemplateStore.GetPayload(req, reqBody, *this.Webserver)
+		r := models.RequestDetails{
+			Path:        req.URL.Path,
+			Method:      req.Method,
+			Destination: req.Host,
+			Query:       req.URL.RawQuery,
+			Body:        string(reqBody),
+			Headers:     req.Header,
+		}
+
+		payload, err := this.TemplateStore.GetPayload(r, reqBody, *this.Webserver)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"key":         key,
