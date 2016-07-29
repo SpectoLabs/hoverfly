@@ -3,7 +3,6 @@ package matching
 import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"errors"
-	"net/http"
 	"reflect"
 	log "github.com/Sirupsen/logrus"
 	"fmt"
@@ -38,28 +37,28 @@ type RequestTemplate struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
-func(this *RequestTemplateStore) GetPayload(req *http.Request, reqBody []byte, webserver bool) (*models.Payload, error) {
+func(this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserver bool) (*models.ResponseDetails, error) {
 	// iterate through the request templates, looking for template to match request
 	for _, entry := range *this {
 		// TODO: not matching by default on URL and body - need to enable this
 		// TODO: need to enable regex matches
 		// TODO: enable matching on scheme
 
-		if entry.RequestTemplate.Body != nil && *entry.RequestTemplate.Body == string(reqBody) {
+		if entry.RequestTemplate.Body != nil && *entry.RequestTemplate.Body == req.Body {
 			continue
 		}
 		if (!webserver) {
-			if entry.RequestTemplate.Destination != nil && *entry.RequestTemplate.Destination != req.Host {
+			if entry.RequestTemplate.Destination != nil && *entry.RequestTemplate.Destination != req.Destination {
 				continue
 			}
 		}
-		if entry.RequestTemplate.Path != nil && *entry.RequestTemplate.Path != req.URL.Path {
+		if entry.RequestTemplate.Path != nil && *entry.RequestTemplate.Path != req.Path {
 			continue
 		}
-		if entry.RequestTemplate.Query != nil && *entry.RequestTemplate.Query != req.URL.RawQuery {
+		if entry.RequestTemplate.Query != nil && *entry.RequestTemplate.Query != req.Query {
 			continue
 		}
-		if !headerMatch(entry.RequestTemplate.Headers, req.Header) {
+		if !headerMatch(entry.RequestTemplate.Headers, req.Headers) {
 			continue
 		}
 		if entry.RequestTemplate.Method != nil && *entry.RequestTemplate.Method != req.Method {
@@ -67,7 +66,7 @@ func(this *RequestTemplateStore) GetPayload(req *http.Request, reqBody []byte, w
 		}
 
 		// return the first template to match
-		return &models.Payload{Response: entry.Response}, nil
+		return &entry.Response, nil
 	}
 	return nil, errors.New("No match found")
 }
@@ -100,7 +99,7 @@ func (this *RequestTemplateStore) Wipe() {
 /**
 Check keys and corresponding values in template headers are also present in request headers
  */
-func headerMatch(tmplHeaders map[string][]string, reqHeaders http.Header) (bool) {
+func headerMatch(tmplHeaders, reqHeaders map[string][]string) (bool) {
 
 	for headerName, headerVal := range tmplHeaders {
 		// TODO: case insensitive lookup
