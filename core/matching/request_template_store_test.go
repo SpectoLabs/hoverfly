@@ -27,7 +27,7 @@ func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 	}
 	result, _ := store.GetResponse(r, false)
 
-	Expect(result.Response.Body).To(Equal("test-body"))
+	Expect(result.Body).To(Equal("test-body"))
 }
 
 func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
@@ -59,7 +59,7 @@ func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 
 	result, _ := store.GetResponse(r, false)
 
-	Expect(result.Response.Body).To(Equal("test-body"))
+	Expect(result.Body).To(Equal("test-body"))
 }
 
 func TestReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
@@ -153,7 +153,7 @@ func TestReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 	}
 	result, _ := store.GetResponse(r, false)
 
-	Expect(result.Response.Body).To(Equal("test-body"))
+	Expect(result.Body).To(Equal("test-body"))
 }
 
 func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
@@ -254,7 +254,7 @@ func TestEndpointMatchWithHeaders(t *testing.T) {
 	}
 	result, _ := store.GetResponse(r, false)
 
-	Expect(result.Response.Body).To(Equal("test-body"))
+	Expect(result.Body).To(Equal("test-body"))
 }
 
 func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
@@ -327,7 +327,7 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 	}
 	result, _ := store.GetResponse(r, false)
 
-	Expect(result.Response.Body).To(Equal("test-body"))
+	Expect(result.Body).To(Equal("test-body"))
 
 	r = models.RequestDetails{
 		Method:"GET",

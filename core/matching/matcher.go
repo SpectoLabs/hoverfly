@@ -54,7 +54,7 @@ func (this *RequestMatcher) GetPayload(req *http.Request) (*models.Payload, *Mat
 			Headers:     req.Header,
 		}
 
-		payload, err := this.TemplateStore.GetResponse(r, *this.Webserver)
+		response, err := this.TemplateStore.GetResponse(r, *this.Webserver)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"key":         key,
@@ -77,7 +77,7 @@ func (this *RequestMatcher) GetPayload(req *http.Request) (*models.Payload, *Mat
 			"destination": req.Host,
 			"method":      req.Method,
 		}).Info("Found template matching request from template store")
-		return payload, nil
+		return &models.Payload{Response: *response}, nil
 	}
 
 	// getting cache response
