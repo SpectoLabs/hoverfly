@@ -8,14 +8,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"github.com/gorilla/mux"
-	"github.com/SpectoLabs/hoverfly/core/models"
 	"encoding/json"
 	"bytes"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 func checkHeadersHttpMiddleware(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
-	var newPayloadView models.PayloadView
+	var newPayloadView views.PayloadView
 
 	json.Unmarshal(body, &newPayloadView)
 
