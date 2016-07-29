@@ -406,7 +406,30 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 // getResponse returns stored response from cache
 func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 
-	payload, matchErr := hf.RequestMatcher.GetPayload(req)
+	if req.Body == nil {
+		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	}
+
+	reqBody, err := ioutil.ReadAll(req.Body)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Got error when reading request body")
+	}
+
+	requestDetails := models.RequestDetails{
+		Path: req.URL.Path,
+		Method: req.Method,
+		Destination: req.Host,
+		Scheme: req.URL.Scheme,
+		Query: req.URL.RawQuery,
+		Body: string(reqBody),
+		Headers: req.Header,
+	}
+
+	payload, matchErr := hf.RequestMatcher.GetPayload(&requestDetails)
+
 	if matchErr != nil {
 		return hoverflyError(req, matchErr, matchErr.Error(), matchErr.StatusCode)
 	}

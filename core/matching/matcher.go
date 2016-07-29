@@ -5,8 +5,6 @@ import (
 	"net/http"
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"io/ioutil"
-	"bytes"
 )
 
 type RequestMatcher struct {
@@ -17,21 +15,15 @@ type RequestMatcher struct {
 }
 
 // getResponse returns stored response from cache
-func (this *RequestMatcher) GetPayload(req *http.Request) (*models.Payload, *MatchingError) {
+func (this *RequestMatcher) GetPayload(req *models.RequestDetails) (*models.Payload, *MatchingError) {
 
-	if req.Body == nil {
-		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	var key string
+
+	if *this.Webserver {
+		key = req.HashWithoutHost()
+	} else {
+		key = req.Hash()
 	}
-
-	reqBody, err := ioutil.ReadAll(req.Body)
-
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Got error when reading request body")
-	}
-
-	key := GetRequestFingerprint(req, reqBody, *this.Webserver)
 
 	payloadBts, err := this.RequestCache.Get([]byte(key))
 
@@ -39,29 +31,20 @@ func (this *RequestMatcher) GetPayload(req *http.Request) (*models.Payload, *Mat
 		log.WithFields(log.Fields{
 			"key":         key,
 			"error":       err.Error(),
-			"query":       req.URL.RawQuery,
-			"path":        req.URL.RawPath,
-			"destination": req.Host,
+			"query":       req.Query,
+			"path":        req.Path,
+			"destination": req.Destination,
 			"method":      req.Method,
 		}).Warn("Failed to retrieve response from cache")
 
-		r := models.RequestDetails{
-			Path:        req.URL.Path,
-			Method:      req.Method,
-			Destination: req.Host,
-			Query:       req.URL.RawQuery,
-			Body:        string(reqBody),
-			Headers:     req.Header,
-		}
-
-		response, err := this.TemplateStore.GetResponse(r, *this.Webserver)
+		response, err := this.TemplateStore.GetResponse(*req, *this.Webserver)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"key":         key,
 				"error":       err.Error(),
-				"query":       req.URL.RawQuery,
-				"path":        req.URL.RawPath,
-				"destination": req.Host,
+				"query":       req.Query,
+				"path":        req.Path,
+				"destination": req.Destination,
 				"method":      req.Method,
 			}).Warn("Failed to find matching request template from template store")
 
@@ -72,9 +55,9 @@ func (this *RequestMatcher) GetPayload(req *http.Request) (*models.Payload, *Mat
 		}
 		log.WithFields(log.Fields{
 			"key":         key,
-			"query":       req.URL.RawQuery,
-			"path":        req.URL.RawPath,
-			"destination": req.Host,
+			"query":       req.Query,
+			"path":        req.Path,
+			"destination": req.Destination,
 			"method":      req.Method,
 		}).Info("Found template matching request from template store")
 		return &models.Payload{Response: *response}, nil
@@ -96,10 +79,10 @@ func (this *RequestMatcher) GetPayload(req *http.Request) (*models.Payload, *Mat
 
 	log.WithFields(log.Fields{
 		"key":         key,
-		"path":        req.URL.Path,
-		"rawQuery":    req.URL.RawQuery,
+		"path":        req.Path,
+		"rawQuery":    req.Query,
 		"method":      req.Method,
-		"destination": req.Host,
+		"destination": req.Destination,
 		"status":      payload.Response.Status,
 	}).Info("Payload found from cache")
 
@@ -128,11 +111,9 @@ func (this *RequestMatcher) SavePayload(payload *models.Payload) (error) {
 
 	if err != nil {
 		return err
-	} else {
-		return this.RequestCache.Set([]byte(key), payloadBytes)
 	}
 
-
+	return this.RequestCache.Set([]byte(key), payloadBytes)
 }
 
 type MatchingError struct {
