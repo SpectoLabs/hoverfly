@@ -428,10 +428,14 @@ func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 		Headers: req.Header,
 	}
 
-	payload, matchErr := hf.RequestMatcher.GetPayload(&requestDetails)
-
+	responseDetails, matchErr := hf.RequestMatcher.GetPayload(&requestDetails)
 	if matchErr != nil {
 		return hoverflyError(req, matchErr, matchErr.Error(), matchErr.StatusCode)
+	}
+
+	payload := &models.Payload{
+		Request: requestDetails,
+		Response: *responseDetails,
 	}
 
 	c := NewConstructor(req, *payload)

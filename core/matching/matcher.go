@@ -15,7 +15,7 @@ type RequestMatcher struct {
 }
 
 // getResponse returns stored response from cache
-func (this *RequestMatcher) GetPayload(req *models.RequestDetails) (*models.Payload, *MatchingError) {
+func (this *RequestMatcher) GetPayload(req *models.RequestDetails) (*models.ResponseDetails, *MatchingError) {
 
 	var key string
 
@@ -60,7 +60,7 @@ func (this *RequestMatcher) GetPayload(req *models.RequestDetails) (*models.Payl
 			"destination": req.Destination,
 			"method":      req.Method,
 		}).Info("Found template matching request from template store")
-		return &models.Payload{Response: *response}, nil
+		return response, nil
 	}
 
 	// getting cache response
@@ -86,7 +86,7 @@ func (this *RequestMatcher) GetPayload(req *models.RequestDetails) (*models.Payl
 		"status":      payload.Response.Status,
 	}).Info("Payload found from cache")
 
-	return payload, nil
+	return &payload.Response, nil
 }
 
 func (this *RequestMatcher) SavePayload(payload *models.Payload) (error) {
