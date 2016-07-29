@@ -6,6 +6,7 @@ import:
 - package: github.com/phayes/freeport
 - package: gopkg.in/yaml.v2
 - package: github.com/gorilla/mux
+- package: github.com/gorilla/context
 - package: github.com/google/go-querystring
   subpackages:
   - query

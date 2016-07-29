@@ -15,4 +15,6 @@ imports:
   version: a83829b6f1293c91addabc89d0571c246397bbf4
 - name: github.com/gorilla/mux
   version: a49d62f618e6dc4a7a7d1f0ad69744a158c21f23
+- name: github.com/gorilla/context
+  version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
 devImports: []
