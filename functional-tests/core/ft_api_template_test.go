@@ -24,22 +24,76 @@ var _ = Describe("Interacting with the API", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
-			ImportHoverflyRecords(jsonPayload1)
-			ImportHoverflyRecords(jsonPayload2)
+			ImportHoverflyTemplates(jsonPayload1)
+			ImportHoverflyTemplates(jsonPayload2)
 		})
 
 		AfterEach(func() {
 			stopHoverfly()
 		})
 
-		It("Should retrieve the records", func() {
-			req := sling.New().Get(hoverflyAdminUrl + "/api/records")
+		It("Should retrieve the templates", func() {
+			req := sling.New().Get(hoverflyAdminUrl + "/api/templates")
 			res := DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
-			recordsJson, err := ioutil.ReadAll(res.Body)
+			templatesJsonBytes, err := ioutil.ReadAll(res.Body)
+
 			Expect(err).To(BeNil())
-			Expect(recordsJson).To(ContainSubstring(jsonPayload1.String()))
-			Expect(recordsJson).To(ContainSubstring(jsonPayload2.String()))
+			Expect(templatesJsonBytes).To(MatchJSON(
+				`{
+				  "data": [
+				    {
+				      "response": {
+					"status": 201,
+					"body": "body1",
+					"encodedBody": false,
+					"headers": {
+					  "Header": [
+					    "value1"
+					  ]
+					}
+				      },
+				      "requestTemplate": {
+					"path": "/path1",
+					"method": "method1",
+					"destination": "destination1",
+					"scheme": "scheme1",
+					"query": "query1",
+					"body": "body1",
+					"headers": {
+					  "Header": [
+					    "value1"
+					  ]
+					}
+				      }
+				    },
+				    {
+				      "response": {
+					"status": 202,
+					"body": "body2",
+					"encodedBody": false,
+					"headers": {
+					  "Header": [
+					    "value2"
+					  ]
+					}
+				      },
+				      "requestTemplate": {
+					"path": "/path2",
+					"method": "method2",
+					"destination": "destination2",
+					"scheme": "scheme2",
+					"query": "query2",
+					"body": "body2",
+					"headers": {
+					  "Header": [
+					    "value2"
+					  ]
+					}
+				      }
+				    }
+				  ]
+				}`))
 		})
 	})
 
@@ -47,15 +101,15 @@ var _ = Describe("Interacting with the API", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
-			ImportHoverflyRecords(jsonPayload1)
-			ImportHoverflyRecords(jsonPayload2)
+			ImportHoverflyTemplates(jsonPayload1)
+			ImportHoverflyTemplates(jsonPayload2)
 		})
 
 		AfterEach(func() {
 			stopHoverfly()
 		})
 
-		It("Should delete the records", func() {
+		It("Should delete the templates", func() {
 			reqPost := sling.New().Delete(hoverflyAdminUrl + "/api/templates")
 			resPost := DoRequest(reqPost)
 			Expect(resPost.StatusCode).To(Equal(200))
@@ -67,16 +121,16 @@ var _ = Describe("Interacting with the API", func() {
 			reqGet := sling.New().Get(hoverflyAdminUrl + "/api/templates")
 			resGet := DoRequest(reqGet)
 			Expect(resGet.StatusCode).To(Equal(200))
-			recordsJson, err := ioutil.ReadAll(resGet.Body)
+			templatesJson, err := ioutil.ReadAll(resGet.Body)
 			Expect(err).To(BeNil())
-			Expect(recordsJson).To(MatchJSON(
+			Expect(templatesJson).To(MatchJSON(
 				`{
 				  "data": null
 				}`))
 		})
 	})
 
-	Context("POST /api/records", func() {
+	Context("POST /api/templates", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
@@ -86,8 +140,8 @@ var _ = Describe("Interacting with the API", func() {
 			stopHoverfly()
 		})
 
-		Context("When no records exist", func() {
-			It("Should create the records", func() {
+		Context("When no templates exist", func() {
+			It("Should create the templates", func() {
 				res := DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/templates").Body(jsonPayload1))
 				Expect(res.StatusCode).To(Equal(200))
 
@@ -96,9 +150,9 @@ var _ = Describe("Interacting with the API", func() {
 
 				Expect(resGet.StatusCode).To(Equal(200))
 
-				recordsJson, err := ioutil.ReadAll(resGet.Body)
+				templatesJson, err := ioutil.ReadAll(resGet.Body)
 				Expect(err).To(BeNil())
-				Expect(recordsJson).To(MatchJSON(
+				Expect(templatesJson).To(MatchJSON(
 					`{
 					  "data": [
 					    {
@@ -134,10 +188,10 @@ var _ = Describe("Interacting with the API", func() {
 		Context("When a record already exists", func() {
 
 			BeforeEach(func() {
-				ImportHoverflyRecords(jsonPayload1)
+				ImportHoverflyTemplates(jsonPayload1)
 			})
 
-			It("Should append the records to the existing ones", func() {
+			It("Should append the templates to the existing ones", func() {
 				res := DoRequest(sling.New().Post(hoverflyAdminUrl+"/api/templates").Set("Content-Type", "application/json").Body(jsonPayload2))
 				Expect(res.StatusCode).To(Equal(200))
 
@@ -145,11 +199,63 @@ var _ = Describe("Interacting with the API", func() {
 				resGet := DoRequest(reqGet)
 
 				Expect(resGet.StatusCode).To(Equal(200))
-
-				recordsJson, err := ioutil.ReadAll(resGet.Body)
+				templatesJsonBytes, err := ioutil.ReadAll(resGet.Body)
 				Expect(err).To(BeNil())
-				Expect(recordsJson).To(ContainSubstring(jsonPayload1.String()))
-				Expect(recordsJson).To(ContainSubstring(jsonPayload2.String()))
+				Expect(templatesJsonBytes).To(MatchJSON(
+					`{
+					  "data": [
+					    {
+					      "response": {
+						"status": 201,
+						"body": "body1",
+						"encodedBody": false,
+						"headers": {
+						  "Header": [
+						    "value1"
+						  ]
+						}
+					      },
+					      "requestTemplate": {
+						"path": "/path1",
+						"method": "method1",
+						"destination": "destination1",
+						"scheme": "scheme1",
+						"query": "query1",
+						"body": "body1",
+						"headers": {
+						  "Header": [
+						    "value1"
+						  ]
+						}
+					      }
+					    },
+					    {
+					      "response": {
+						"status": 202,
+						"body": "body2",
+						"encodedBody": false,
+						"headers": {
+						  "Header": [
+						    "value2"
+						  ]
+						}
+					      },
+					      "requestTemplate": {
+						"path": "/path2",
+						"method": "method2",
+						"destination": "destination2",
+						"scheme": "scheme2",
+						"query": "query2",
+						"body": "body2",
+						"headers": {
+						  "Header": [
+						    "value2"
+						  ]
+						}
+					      }
+					    }
+					  ]
+					}`))
 			})
 		})
 	})
