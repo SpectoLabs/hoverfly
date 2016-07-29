@@ -1,4 +1,4 @@
-package: github.com/SpectoLabs/hoverfly/functional-tests/hoverfly
+package: github.com/SpectoLabs/hoverfly/functional-tests/core
 import:
 - package: github.com/dghubble/sling
 - package: github.com/onsi/ginkgo
