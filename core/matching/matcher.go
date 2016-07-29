@@ -54,7 +54,7 @@ func (this *RequestMatcher) GetPayload(req *http.Request) (*models.Payload, *Mat
 			Headers:     req.Header,
 		}
 
-		payload, err := this.TemplateStore.GetPayload(r, *this.Webserver)
+		payload, err := this.TemplateStore.GetResponse(r, *this.Webserver)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"key":         key,

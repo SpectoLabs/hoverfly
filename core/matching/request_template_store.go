@@ -36,7 +36,7 @@ type RequestTemplate struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
-func(this *RequestTemplateStore) GetPayload(req models.RequestDetails, webserver bool) (*models.Payload, error) {
+func(this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserver bool) (*models.Payload, error) {
 	// iterate through the request templates, looking for template to match request
 	for _, entry := range *this {
 		// TODO: not matching by default on URL and body - need to enable this
