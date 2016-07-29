@@ -1,16 +1,20 @@
-hash: 1c0bf60b94de2c9de96cafd07c2439faedf710a2c2c5fa2d0acec24ad563afcf
-updated: 2016-06-23T14:00:35.3461637+01:00
+hash: 407e842170118e07a0d834c69864cecb1d22fdf4be9cf3f3435ff3e44b465cd0
+updated: 2016-07-29T16:12:40.351817993+01:00
 imports:
 - name: github.com/dghubble/sling
-  version: 4af638d6d3265b9f740bf6d2665ef20d7abd0103
+  version: 72b819847fd6c08fc926da5ba098412795fbfcd6
 - name: github.com/google/go-querystring
-  version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
+  version: 72b819847fd6c08fc926da5ba098412795fbfcd6
+  subpackages:
+  - query
+- name: github.com/gorilla/mux
+  version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc
 - name: github.com/onsi/ginkgo
-  version: 059cec02d342bab423425a99b191186a03255e9e
+  version: 72b819847fd6c08fc926da5ba098412795fbfcd6
 - name: github.com/onsi/gomega
-  version: 3e93f011213c200aadafcb19ed56eb718381cfbd
+  version: 72b819847fd6c08fc926da5ba098412795fbfcd6
 - name: github.com/phayes/freeport
-  version: e7681b37614941bf73b404e0caa37f19e33b5fed
+  version: 72b819847fd6c08fc926da5ba098412795fbfcd6
 - name: gopkg.in/yaml.v2
-  version: a83829b6f1293c91addabc89d0571c246397bbf4
-devImports: []
+  version: 72b819847fd6c08fc926da5ba098412795fbfcd6
+testImports: []

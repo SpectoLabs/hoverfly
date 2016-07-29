@@ -8,3 +8,5 @@ import:
 - package: github.com/google/go-querystring
   subpackages:
   - query
+- package: github.com/gorilla/mux
+  version: v1.1
