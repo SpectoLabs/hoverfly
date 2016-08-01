@@ -191,7 +191,8 @@ func main() {
 			log.Info(simulation.String(), " has been pulled from the SpectoLab")
 
 		case deleteCommand.FullCommand():
-			if *deleteArg == "all" {
+			switch *deleteArg {
+			case "all":
 				err := hoverfly.DeleteSimulations()
 				handleIfError(err)
 				err = hoverfly.DeleteDelays()
@@ -202,36 +203,30 @@ func main() {
 				handleIfError(err)
 
 				log.Info("Delays, middleware, request templates and simulations have all been deleted from Hoverfly")
-			}
-			if *deleteArg == "simulations" {
+			case "simulations":
 				err := hoverfly.DeleteSimulations()
 				handleIfError(err)
 
 				log.Info("Simulations have been deleted from Hoverfly")
-			}
-			if *deleteArg == "delays" {
+
+			case "delays":
 				err := hoverfly.DeleteDelays()
 				handleIfError(err)
 
 				log.Info("Delays have been deleted from Hoverfly")
-			}
-			if *deleteArg == "templates" {
+			case "templates":
 				err := hoverfly.DeleteRequestTemplates()
 				handleIfError(err)
 
 				log.Info("Request templates have been deleted from Hoverfly")
-			}
 
-			if *deleteArg == "middleware" {
+			case "middleware":
 				_, err := hoverfly.SetMiddleware("")
 				handleIfError(err)
 
 				log.Info("Middleware has been deleted from Hoverfly")
-			}
-
-
-			if *deleteArg == "" {
-				err := errors.New("You have not specified what to delete from Hoverfly")
+			default:
+				err := errors.New("You have not specified a valid resource to delete from Hoverfly")
 				handleIfError(err)
 			}
 

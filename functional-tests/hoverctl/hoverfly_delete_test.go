@@ -229,10 +229,16 @@ var _ = Describe("When I use hoverctl", func() {
 		})
 
 		Context("I won't delete if I have not specified what to delete", func() {
-			It("when I call hoverctl delete", func() {
+			It("when I call hoverctl delete with no resource", func() {
 				out, _ := exec.Command(hoverctlBinary, "delete").Output()
 				output := strings.TrimSpace(string(out))
-				Expect(output).To(ContainSubstring("You have not specified what to delete from Hoverfly"))
+				Expect(output).To(ContainSubstring("You have not specified a valid resource to delete from Hoverfly"))
+			})
+
+			It("when I call hoverctl delete with an invalid resource", func() {
+				out, _ := exec.Command(hoverctlBinary, "delete", "test").Output()
+				output := strings.TrimSpace(string(out))
+				Expect(output).To(ContainSubstring("You have not specified a valid resource to delete from Hoverfly"))
 			})
 		})
 
