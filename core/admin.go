@@ -810,7 +810,7 @@ func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 
 }
 
-func(d *Hoverfly) CurrentMiddlewareHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (d *Hoverfly) CurrentMiddlewareHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	var resp middlewareSchema
 
 	resp.Middleware = d.Cfg.Middleware
@@ -821,7 +821,7 @@ func(d *Hoverfly) CurrentMiddlewareHandler(w http.ResponseWriter, req *http.Requ
 	w.Write(jsonResp)
 }
 
-func(d *Hoverfly) MiddlewareHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (d *Hoverfly) MiddlewareHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		// failed to read response body
@@ -844,11 +844,11 @@ func(d *Hoverfly) MiddlewareHandler(w http.ResponseWriter, req *http.Request, ne
 	}
 
 	err = d.SetMiddleware(middlewareReq.Middleware)
-	if  err != nil {
+	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Could not execute middleware")
-		http.Error(w, "Invalid middleware: " + err.Error(), 400)
+		http.Error(w, "Invalid middleware: "+err.Error(), 400)
 		return
 	}
 

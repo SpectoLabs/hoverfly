@@ -1,13 +1,13 @@
 package models
 
 import (
+	"bytes"
+	"compress/gzip"
+	"github.com/SpectoLabs/hoverfly/core/views"
+	. "github.com/onsi/gomega"
+	"io/ioutil"
 	"os"
 	"testing"
-	. "github.com/onsi/gomega"
-	"compress/gzip"
-	"bytes"
-	"io/ioutil"
-	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 func TestConvertToResponseDetailsView_WithPlainTextResponseDetails(t *testing.T) {
@@ -37,7 +37,7 @@ func TestConvertToResponseDetailsView_WithGzipContentEncodedHeader(t *testing.T)
 	body := GzipString(originalBody)
 	headers := map[string][]string{"Content-Encoding": []string{"gzip"}}
 
-	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers:headers}
+	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers: headers}
 
 	respView := originalResp.ConvertToResponseDetailsView()
 
@@ -61,7 +61,7 @@ func TestConvertToResponseDetailsView_WithDeflateContentEncodedHeader(t *testing
 	statusCode := 200
 	headers := map[string][]string{"Content-Encoding": []string{"deflate"}}
 
-	originalResp := ResponseDetails{Status: statusCode, Body: originalBody, Headers:headers}
+	originalResp := ResponseDetails{Status: statusCode, Body: originalBody, Headers: headers}
 
 	respView := originalResp.ConvertToResponseDetailsView()
 
@@ -88,15 +88,15 @@ func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
 
 	originalResp := ResponseDetails{
 		Status: 200,
-		Body: string(originalImageBytes),
+		Body:   string(originalImageBytes),
 	}
 
 	respView := originalResp.ConvertToResponseDetailsView()
 
 	base64EncodedBody := "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg=="
 	Expect(respView).To(Equal(views.ResponseDetailsView{
-		Status: 200,
-		Body: base64EncodedBody,
+		Status:      200,
+		Body:        base64EncodedBody,
 		EncodedBody: true,
 	}))
 }
@@ -107,35 +107,35 @@ func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 
 	originalPayload := Payload{
 		Response: ResponseDetails{
-			Status: 200,
-			Body: respBody,
+			Status:  200,
+			Body:    respBody,
 			Headers: map[string][]string{"test_header": []string{"true"}}},
 		Request: RequestDetails{
-			Path: "/",
-			Method: "GET",
+			Path:        "/",
+			Method:      "GET",
 			Destination: "/",
-			Scheme: "scheme",
-			Query: "",
-			Body: "",
-			Headers: map[string][]string{"test_header": []string{"true"}}},
+			Scheme:      "scheme",
+			Query:       "",
+			Body:        "",
+			Headers:     map[string][]string{"test_header": []string{"true"}}},
 	}
 
 	payloadView := originalPayload.ConvertToPayloadView()
 
 	Expect(*payloadView).To(Equal(views.PayloadView{
 		Response: views.ResponseDetailsView{
-			Status: 200,
-			Body: respBody,
-			Headers: map[string][]string{"test_header": []string{"true"}},
+			Status:      200,
+			Body:        respBody,
+			Headers:     map[string][]string{"test_header": []string{"true"}},
 			EncodedBody: false},
 		Request: views.RequestDetailsView{
-			Path: "/",
-			Method: "GET",
+			Path:        "/",
+			Method:      "GET",
 			Destination: "/",
-			Scheme: "scheme",
-			Query: "",
-			Body: "",
-			Headers: map[string][]string{"test_header": []string{"true"}}},
+			Scheme:      "scheme",
+			Query:       "",
+			Body:        "",
+			Headers:     map[string][]string{"test_header": []string{"true"}}},
 	}))
 }
 
@@ -144,17 +144,17 @@ func TestPayload_ConvertToPayloadView_WithGzippedResponse(t *testing.T) {
 
 	originalPayload := Payload{
 		Response: ResponseDetails{
-			Status: 200,
-			Body: GzipString("hello_world"),
+			Status:  200,
+			Body:    GzipString("hello_world"),
 			Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}},
 		Request: RequestDetails{
-			Path: "/",
-			Method: "GET",
+			Path:        "/",
+			Method:      "GET",
 			Destination: "/",
-			Scheme: "scheme",
-			Query: "",
-			Body: "",
-			Headers: map[string][]string{"Content-Encoding": []string{"gzip"}},
+			Scheme:      "scheme",
+			Query:       "",
+			Body:        "",
+			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 		},
 	}
 
@@ -162,18 +162,18 @@ func TestPayload_ConvertToPayloadView_WithGzippedResponse(t *testing.T) {
 
 	Expect(*payloadView).To(Equal(views.PayloadView{
 		Response: views.ResponseDetailsView{
-			Status: 200,
-			Body: "H4sIAAAJbogA/w==",
-			Headers: map[string][]string{"Content-Encoding": []string{"gzip"}},
+			Status:      200,
+			Body:        "H4sIAAAJbogA/w==",
+			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 			EncodedBody: true},
 		Request: views.RequestDetailsView{
-			Path: "/",
-			Method: "GET",
+			Path:        "/",
+			Method:      "GET",
 			Destination: "/",
-			Scheme: "scheme",
-			Query: "",
-			Body: "",
-			Headers: map[string][]string{"Content-Encoding": []string{"gzip"}},
+			Scheme:      "scheme",
+			Query:       "",
+			Body:        "",
+			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 		},
 	}))
 }
@@ -182,11 +182,11 @@ func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
 	RegisterTestingT(t)
 
 	requestDetails := RequestDetails{
-		Path: "/",
-		Method: "GET",
+		Path:        "/",
+		Method:      "GET",
 		Destination: "/",
-		Scheme: "scheme",
-		Query: "", Body: "",
+		Scheme:      "scheme",
+		Query:       "", Body: "",
 		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}}
 
 	requestDetailsView := requestDetails.ConvertToRequestDetailsView()
@@ -200,7 +200,7 @@ func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
 }
 
 // Helper function for gzipping strings
-func GzipString(s string) (string) {
+func GzipString(s string) string {
 	var b bytes.Buffer
 	gz := gzip.NewWriter(&b)
 	gz.Write([]byte(s))
@@ -212,24 +212,24 @@ func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 
 	view := views.PayloadView{
 		Request: views.RequestDetailsView{
-			Path: "A",
-			Method: "A",
+			Path:        "A",
+			Method:      "A",
 			Destination: "A",
-			Scheme: "A",
-			Query: "A",
-			Body: "A",
+			Scheme:      "A",
+			Query:       "A",
+			Body:        "A",
 			Headers: map[string][]string{
-				"A" : []string{"B"},
-				"C" : []string{"D"},
+				"A": []string{"B"},
+				"C": []string{"D"},
 			},
 		},
 		Response: views.ResponseDetailsView{
-			Status: 1,
-			Body: "1",
+			Status:      1,
+			Body:        "1",
 			EncodedBody: false,
 			Headers: map[string][]string{
-				"1" : []string{"2"},
-				"3" : []string{"4"},
+				"1": []string{"2"},
+				"3": []string{"4"},
 			},
 		},
 	}
@@ -238,23 +238,23 @@ func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 
 	Expect(payload).To(Equal(Payload{
 		Request: RequestDetails{
-			Path: "A",
-			Method: "A",
+			Path:        "A",
+			Method:      "A",
 			Destination: "A",
-			Scheme: "A",
-			Query: "A",
-			Body: "A",
+			Scheme:      "A",
+			Query:       "A",
+			Body:        "A",
 			Headers: map[string][]string{
-				"A" : []string{"B"},
-				"C" : []string{"D"},
+				"A": []string{"B"},
+				"C": []string{"D"},
 			},
 		},
 		Response: ResponseDetails{
 			Status: 1,
-			Body: "1",
+			Body:   "1",
 			Headers: map[string][]string{
-				"1" : []string{"2"},
-				"3" : []string{"4"},
+				"1": []string{"2"},
+				"3": []string{"4"},
 			},
 		},
 	}))
@@ -265,7 +265,7 @@ func TestPayloadViewData_ConvertToPayloadDataWithEncoding(t *testing.T) {
 
 	view := views.PayloadView{
 		Response: views.ResponseDetailsView{
-			Body: "ZW5jb2RlZA==",
+			Body:        "ZW5jb2RlZA==",
 			EncodedBody: true,
 		},
 	}
@@ -279,11 +279,11 @@ func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 	RegisterTestingT(t)
 
 	requestDetailsView := views.RequestDetailsView{
-		Path: "/",
-		Method: "GET",
+		Path:        "/",
+		Method:      "GET",
 		Destination: "/",
-		Scheme: "scheme",
-		Query: "", Body: "",
+		Scheme:      "scheme",
+		Query:       "", Body: "",
 		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}}
 
 	requestDetails := NewRequestDetailsFromRequestDetailsView(requestDetailsView)

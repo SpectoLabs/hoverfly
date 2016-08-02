@@ -1,13 +1,13 @@
 package main
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"github.com/dghubble/sling"
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
 	"errors"
+	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/dghubble/sling"
+	"io/ioutil"
+	"net/http"
 	"strings"
 )
 
@@ -99,7 +99,7 @@ func unmarshalRequestTemplates(response *http.Response) (*matching.RequestTempla
 	return &requestTemplates, nil
 }
 
-func (h *Hoverfly) DeleteRequestTemplates() (error) {
+func (h *Hoverfly) DeleteRequestTemplates() error {
 	url := h.buildURL("/api/templates")
 
 	slingRequest := sling.New().Delete(url)

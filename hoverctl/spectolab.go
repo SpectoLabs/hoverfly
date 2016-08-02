@@ -1,13 +1,13 @@
 package main
 
 import (
-	log "github.com/Sirupsen/logrus"
+	"errors"
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/dghubble/sling"
+	"io/ioutil"
 	"net/http"
 	"strings"
-	"io/ioutil"
-	"errors"
 )
 
 type SpectoLab struct {
@@ -21,14 +21,13 @@ type SpectoLabSimulation struct {
 	Description string `json:"description"`
 }
 
-func (s *SpectoLab) CheckAPIKey() (error) {
+func (s *SpectoLab) CheckAPIKey() error {
 	url := s.buildURL("/api/v1/simulations")
 	request, err := sling.New().Post(url).BodyJSON("{}").Add("Authorization", s.buildAuthorizationHeaderValue()).Request()
 	if err != nil {
 		log.Debug(err.Error())
 		return errors.New("Could not create a request to check API key against SpectoLab")
 	}
-
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
@@ -43,7 +42,7 @@ func (s *SpectoLab) CheckAPIKey() (error) {
 	return nil
 }
 
-func (s *SpectoLab) CreateSimulation(simulationName Simulation) (error) {
+func (s *SpectoLab) CreateSimulation(simulationName Simulation) error {
 	simulation := SpectoLabSimulation{Version: simulationName.Version, Name: simulationName.Name, Description: "A description could go here"}
 
 	url := s.buildURL("/api/v1/simulations")
@@ -70,7 +69,7 @@ func (s *SpectoLab) UploadSimulation(simulation Simulation, data []byte) (bool, 
 		return false, errors.New("Unable to create a simulation on SpectoLab")
 	}
 
-	url := s.buildURL(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data", simulation.Vendor,  simulation.Name, simulation.Version))
+	url := s.buildURL(fmt.Sprintf("/api/v1/users/%v/simulations/%v/versions/%v/data", simulation.Vendor, simulation.Name, simulation.Version))
 
 	request, err := sling.New().Put(url).Add("Authorization", s.buildAuthorizationHeaderValue()).Add("Content-Type", "application/json").Body(strings.NewReader(string(data))).Request()
 

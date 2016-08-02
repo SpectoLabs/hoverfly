@@ -3,20 +3,20 @@ package hoverfly_end_to_end_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os/exec"
-	"strings"
-	"strconv"
 	"github.com/phayes/freeport"
+	"os/exec"
+	"strconv"
+	"strings"
 )
 
 var _ = Describe("When I use hoverfly-cli", func() {
 	var (
 		hoverflyCmd *exec.Cmd
 
-		adminPort = freeport.GetPort()
+		adminPort         = freeport.GetPort()
 		adminPortAsString = strconv.Itoa(adminPort)
 
-		proxyPort = freeport.GetPort()
+		proxyPort         = freeport.GetPort()
 		proxyPortAsString = strconv.Itoa(proxyPort)
 	)
 

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"strings"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type Simulation struct {
@@ -29,26 +29,26 @@ func NewSimulation(key string) (Simulation, error) {
 	}
 
 	if strings.Contains(key, "/") && strings.Contains(key, ":") {
-		vendorAndEnd := strings.Split(key, "/", )
+		vendorAndEnd := strings.Split(key, "/")
 		nameAndVersion := strings.Split(vendorAndEnd[1], ":")
 
 		vendor = vendorAndEnd[0]
 		name = nameAndVersion[0]
 		version = nameAndVersion[1]
-	} else if strings.Contains(key,"/") {
-		vendorAndEnd := strings.Split(key, "/", )
+	} else if strings.Contains(key, "/") {
+		vendorAndEnd := strings.Split(key, "/")
 		vendor = vendorAndEnd[0]
 		name = vendorAndEnd[1]
 		version = "latest"
-	} else if !strings.Contains(key, "/") && ! strings.Contains(key, ":") {
+	} else if !strings.Contains(key, "/") && !strings.Contains(key, ":") {
 		vendor = ""
 		name = key
 		version = "latest"
 	}
 
 	return Simulation{
-		Vendor: vendor,
-		Name: name,
+		Vendor:  vendor,
+		Name:    name,
 		Version: version,
 	}, nil
 }

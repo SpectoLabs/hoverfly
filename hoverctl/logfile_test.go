@@ -2,9 +2,9 @@ package main
 
 import (
 	. "github.com/onsi/gomega"
-	"testing"
-	"os"
 	"io/ioutil"
+	"os"
+	"testing"
 )
 
 var logFile_testDirectory = "/tmp/hoverctl-tests-logfile"

@@ -1,16 +1,16 @@
 package hoverfly
 
 import (
-	. "github.com/onsi/gomega"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/views"
+	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 func TestGetAllRecords(t *testing.T) {
@@ -566,7 +566,6 @@ func TestSetMiddleware_WithEmptyMiddleware(t *testing.T) {
 	Expect(middlewareResp.Middleware).To(Equal(""))
 	Expect(dbClient.Cfg.Middleware).To(Equal(""))
 }
-
 
 func TestStatsHandler(t *testing.T) {
 	RegisterTestingT(t)

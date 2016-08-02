@@ -1,9 +1,9 @@
 package matching
 
 import (
-	"testing"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
+	"testing"
 )
 
 func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
@@ -14,14 +14,14 @@ func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 	}
 	templateEntry := RequestTemplatePayload{
 		RequestTemplate: RequestTemplate{},
-		Response: response,
+		Response:        response,
 	}
 	store := RequestTemplateStore{templateEntry}
 
 	r := models.RequestDetails{
-		Method:"GET",
+		Method:      "GET",
 		Destination: "somehost.com",
-		Headers: map[string][]string {
+		Headers: map[string][]string{
 			"sdv": []string{"ascd"},
 		},
 	}
@@ -49,9 +49,9 @@ func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 	store := RequestTemplateStore{templateEntry}
 
 	r := models.RequestDetails{
-		Method:"GET",
+		Method:      "GET",
 		Destination: "http://somehost.com",
-		Headers: map[string][]string {
+		Headers: map[string][]string{
 			"header1": []string{"val1"},
 			"header2": []string{"val2"},
 		},
@@ -81,9 +81,9 @@ func TestReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 	store := RequestTemplateStore{templateEntry}
 
 	r := models.RequestDetails{
-		Method:"GET",
+		Method:      "GET",
 		Destination: "http://somehost.com",
-		Headers: map[string][]string {
+		Headers: map[string][]string{
 			"header1": []string{"val1"},
 		},
 	}
@@ -112,9 +112,9 @@ func TestReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 	store := RequestTemplateStore{templateEntry}
 
 	r := models.RequestDetails{
-		Method:"GET",
+		Method:      "GET",
 		Destination: "somehost.com",
-		Headers: map[string][]string {
+		Headers: map[string][]string{
 			"header1": []string{"val1"},
 			"header2": []string{"different"},
 		},
@@ -143,10 +143,10 @@ func TestReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 	store := RequestTemplateStore{templateEntry}
 
 	r := models.RequestDetails{
-		Method:"GET",
+		Method:      "GET",
 		Destination: "http://somehost.com",
-		Body: "test-body",
-		Headers: map[string][]string {
+		Body:        "test-body",
+		Headers: map[string][]string{
 			"header1": []string{"val1-a", "val1-b"},
 			"header2": []string{"val2"},
 		},
@@ -176,9 +176,9 @@ func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 	store := RequestTemplateStore{templateEntry}
 
 	r := models.RequestDetails{
-		Method:"GET",
+		Method:      "GET",
 		Destination: "http://somehost.com",
-		Headers: map[string][]string {
+		Headers: map[string][]string{
 			"header1": []string{"val1-a", "val1-differnet"},
 			"header2": []string{"val2"},
 		},
@@ -232,22 +232,22 @@ func TestEndpointMatchWithHeaders(t *testing.T) {
 	query := "q=test"
 	templateEntry := RequestTemplatePayload{
 		RequestTemplate: RequestTemplate{
-			Headers: headers,
+			Headers:     headers,
 			Destination: &destination,
-			Path: &path,
-			Method: &method,
-			Query: &query,
+			Path:        &path,
+			Method:      &method,
+			Query:       &query,
 		},
 		Response: response,
 	}
 	store := RequestTemplateStore{templateEntry}
 
 	r := models.RequestDetails{
-		Method:"GET",
+		Method:      "GET",
 		Destination: "testhost.com",
-		Path: "/a/1",
-		Query: "q=test",
-		Headers: map[string][]string {
+		Path:        "/a/1",
+		Query:       "q=test",
+		Headers: map[string][]string{
 			"header1": []string{"val1-a", "val1-b"},
 			"header2": []string{"val2"},
 		},
@@ -273,22 +273,22 @@ func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 	query := "q=test"
 	templateEntry := RequestTemplatePayload{
 		RequestTemplate: RequestTemplate{
-			Headers: headers,
+			Headers:     headers,
 			Destination: &destination,
-			Path: &path,
-			Method: &method,
-			Query: &query,
+			Path:        &path,
+			Method:      &method,
+			Query:       &query,
 		},
 		Response: response,
 	}
 	store := RequestTemplateStore{templateEntry}
 
 	r := models.RequestDetails{
-		Method:"GET",
+		Method:      "GET",
 		Destination: "http://testhost.com",
-		Path: "/a/1",
-		Query: "q=different",
-		Headers: map[string][]string {
+		Path:        "/a/1",
+		Query:       "q=different",
+		Headers: map[string][]string{
 			"header1": []string{"val1-a", "val1-b"},
 			"header2": []string{"val2"},
 		},
@@ -312,28 +312,28 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 	templateEntry := RequestTemplatePayload{
 		RequestTemplate: RequestTemplate{
 			Destination: &destination,
-			Path: &path,
-			Method: &method,
-			Query: &query,
+			Path:        &path,
+			Method:      &method,
+			Query:       &query,
 		},
 		Response: response,
 	}
 	store := RequestTemplateStore{templateEntry}
 
 	r := models.RequestDetails{
-		Method:"GET",
+		Method:      "GET",
 		Destination: "testhost.com",
-		Query: "q=test",
+		Query:       "q=test",
 	}
 	result, _ := store.GetResponse(r, false)
 
 	Expect(result.Body).To(Equal("test-body"))
 
 	r = models.RequestDetails{
-		Method:"GET",
+		Method:      "GET",
 		Destination: "testhost.com",
-		Path: "/a/1",
-		Query: "q=test",
+		Path:        "/a/1",
+		Query:       "q=test",
 	}
 
 	result, _ = store.GetResponse(r, false)

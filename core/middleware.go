@@ -6,12 +6,12 @@ import (
 	"os/exec"
 	"strings"
 
+	"errors"
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/views"
 	"io/ioutil"
 	"net/http"
-	"errors"
-	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 // Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.

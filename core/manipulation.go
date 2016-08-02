@@ -55,7 +55,7 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 
 }
 
-func isMiddlewareLocal(middleware string) (bool) {
+func isMiddlewareLocal(middleware string) bool {
 	return !strings.HasPrefix(middleware, "http")
 }
 

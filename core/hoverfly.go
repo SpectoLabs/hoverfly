@@ -151,24 +151,24 @@ func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
 	return
 }
 
-func (hf *Hoverfly) SetMiddleware(middleware string) (error) {
+func (hf *Hoverfly) SetMiddleware(middleware string) error {
 	if middleware == "" {
 		hf.Cfg.Middleware = middleware
 		return nil
 	}
 	testPayload := models.Payload{
 		Request: models.RequestDetails{
-			Path: "/",
-			Method: "GET",
+			Path:        "/",
+			Method:      "GET",
 			Destination: "www.test.com",
-			Scheme: "",
-			Query: "",
-			Body: "",
-			Headers: map[string][]string{"test_header": []string{"true"}},
+			Scheme:      "",
+			Query:       "",
+			Body:        "",
+			Headers:     map[string][]string{"test_header": []string{"true"}},
 		},
 		Response: models.ResponseDetails{
-			Status: 200,
-			Body: "ok",
+			Status:  200,
+			Body:    "ok",
 			Headers: map[string][]string{"test_header": []string{"true"}},
 		},
 	}
@@ -419,13 +419,13 @@ func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 	}
 
 	requestDetails := models.RequestDetails{
-		Path: req.URL.Path,
-		Method: req.Method,
+		Path:        req.URL.Path,
+		Method:      req.Method,
 		Destination: req.Host,
-		Scheme: req.URL.Scheme,
-		Query: req.URL.RawQuery,
-		Body: string(reqBody),
-		Headers: req.Header,
+		Scheme:      req.URL.Scheme,
+		Query:       req.URL.RawQuery,
+		Body:        string(reqBody),
+		Headers:     req.Header,
 	}
 
 	responseDetails, matchErr := hf.RequestMatcher.GetResponse(&requestDetails)
@@ -434,7 +434,7 @@ func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 	}
 
 	payload := &models.Payload{
-		Request: requestDetails,
+		Request:  requestDetails,
 		Response: *responseDetails,
 	}
 

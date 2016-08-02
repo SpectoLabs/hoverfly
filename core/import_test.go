@@ -1,15 +1,15 @@
 package hoverfly
 
 import (
-	. "github.com/onsi/gomega"
 	"encoding/base64"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/views"
+	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 func TestIsURLHTTP(t *testing.T) {

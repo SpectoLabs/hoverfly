@@ -1,11 +1,11 @@
 package main
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"path/filepath"
-	"os"
-	"io/ioutil"
 	"errors"
+	log "github.com/Sirupsen/logrus"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 type LocalCache struct {
@@ -24,7 +24,6 @@ func (l *LocalCache) WriteSimulation(simulation Simulation, data []byte) error {
 
 	return nil
 }
-
 
 func (l *LocalCache) ReadSimulation(simulation Simulation) ([]byte, error) {
 	simulationURI := buildAbsoluteFilePath(l.URI, simulation.GetFileName())

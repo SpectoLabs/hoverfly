@@ -1,8 +1,8 @@
 package main
 
 import (
-	"testing"
 	. "github.com/onsi/gomega"
+	"testing"
 )
 
 func Test_Hoverfly_isLocal_WhenLocalhost(t *testing.T) {

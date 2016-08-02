@@ -1,17 +1,16 @@
 package matching
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"errors"
-	"reflect"
-	log "github.com/Sirupsen/logrus"
-	"fmt"
 	"encoding/json"
+	"errors"
+	"fmt"
+	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
+	"reflect"
 )
 
 type RequestTemplateStore []RequestTemplatePayload
-
 
 type RequestTemplatePayload struct {
 	RequestTemplate RequestTemplate        `json:"requestTemplate"`
@@ -19,7 +18,7 @@ type RequestTemplatePayload struct {
 }
 
 type RequestTemplatePayloadView struct {
-	RequestTemplate RequestTemplate        `json:"requestTemplate"`
+	RequestTemplate RequestTemplate           `json:"requestTemplate"`
 	Response        views.ResponseDetailsView `json:"response"`
 }
 
@@ -28,16 +27,16 @@ type RequestTemplatePayloadJson struct {
 }
 
 type RequestTemplate struct {
-	Path        *string              `json:"path"`
-	Method      *string              `json:"method"`
-	Destination *string              `json:"destination"`
-	Scheme      *string              `json:"scheme"`
-	Query       *string              `json:"query"`
-	Body        *string              `json:"body"`
+	Path        *string             `json:"path"`
+	Method      *string             `json:"method"`
+	Destination *string             `json:"destination"`
+	Scheme      *string             `json:"scheme"`
+	Query       *string             `json:"query"`
+	Body        *string             `json:"body"`
 	Headers     map[string][]string `json:"headers"`
 }
 
-func(this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserver bool) (*models.ResponseDetails, error) {
+func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserver bool) (*models.ResponseDetails, error) {
 	// iterate through the request templates, looking for template to match request
 	for _, entry := range *this {
 		// TODO: not matching by default on URL and body - need to enable this
@@ -47,7 +46,7 @@ func(this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserve
 		if entry.RequestTemplate.Body != nil && *entry.RequestTemplate.Body == req.Body {
 			continue
 		}
-		if (!webserver) {
+		if !webserver {
 			if entry.RequestTemplate.Destination != nil && *entry.RequestTemplate.Destination != req.Destination {
 				continue
 			}
@@ -84,7 +83,7 @@ func (this *RequestTemplateStore) ImportPayloads(payloadsView RequestTemplatePay
 			*this = append(*this, pl)
 		}
 		log.WithFields(log.Fields{
-			"total":      len(*this),
+			"total": len(*this),
 		}).Info("payloads imported")
 		return nil
 	}
@@ -98,24 +97,24 @@ func (this *RequestTemplateStore) Wipe() {
 
 /**
 Check keys and corresponding values in template headers are also present in request headers
- */
-func headerMatch(tmplHeaders, reqHeaders map[string][]string) (bool) {
+*/
+func headerMatch(tmplHeaders, reqHeaders map[string][]string) bool {
 
 	for headerName, headerVal := range tmplHeaders {
 		// TODO: case insensitive lookup
 		// TODO: is order of values in slice really important?
 
 		reqHeaderVal, ok := reqHeaders[headerName]
-		if (ok && reflect.DeepEqual(headerVal, reqHeaderVal)) {
-			continue;
+		if ok && reflect.DeepEqual(headerVal, reqHeaderVal) {
+			continue
 		} else {
-			return false;
+			return false
 		}
 	}
-	return true;
+	return true
 }
 
-func(this *RequestTemplateStore) ConvertToPayloadJson() (RequestTemplatePayloadJson) {
+func (this *RequestTemplateStore) ConvertToPayloadJson() RequestTemplatePayloadJson {
 	var payloadViewList []RequestTemplatePayloadView
 	for _, v := range *this {
 		payloadViewList = append(payloadViewList, v.ConvertToRequestTemplatePayloadView())
@@ -125,14 +124,14 @@ func(this *RequestTemplateStore) ConvertToPayloadJson() (RequestTemplatePayloadJ
 	}
 }
 
-func(this *RequestTemplatePayload) ConvertToRequestTemplatePayloadView() (RequestTemplatePayloadView) {
+func (this *RequestTemplatePayload) ConvertToRequestTemplatePayloadView() RequestTemplatePayloadView {
 	return RequestTemplatePayloadView{
 		RequestTemplate: this.RequestTemplate,
-		Response: this.Response.ConvertToResponseDetailsView(),
+		Response:        this.Response.ConvertToResponseDetailsView(),
 	}
 }
 
-func(this *RequestTemplatePayloadJson) ConvertToRequestTemplateStore() (RequestTemplateStore) {
+func (this *RequestTemplatePayloadJson) ConvertToRequestTemplateStore() RequestTemplateStore {
 	var requestTemplateStore RequestTemplateStore
 	for _, v := range *this.Data {
 		requestTemplateStore = append(requestTemplateStore, v.ConvertToPayload())
@@ -140,10 +139,10 @@ func(this *RequestTemplatePayloadJson) ConvertToRequestTemplateStore() (RequestT
 	return requestTemplateStore
 }
 
-func(this *RequestTemplatePayloadView) ConvertToPayload() (RequestTemplatePayload) {
+func (this *RequestTemplatePayloadView) ConvertToPayload() RequestTemplatePayload {
 	return RequestTemplatePayload{
 		RequestTemplate: this.RequestTemplate,
-		Response: models.NewResponseDetialsFromResponseDetailsView(this.Response),
+		Response:        models.NewResponseDetialsFromResponseDetailsView(this.Response),
 	}
 }
 

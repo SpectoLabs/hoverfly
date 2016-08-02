@@ -69,10 +69,10 @@ var (
 	destination = flag.String("destination", ".", "destination URI to catch")
 	webserver   = flag.Bool("webserver", false, "start Hoverfly in webserver mode (simulate mode)")
 
-	addNew       = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
-	addUser      = flag.String("username", "", "username for new user")
-	addPassword  = flag.String("password", "", "password for new user")
-	isAdmin      = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
+	addNew      = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
+	addUser     = flag.String("username", "", "username for new user")
+	addPassword = flag.String("password", "", "password for new user")
+	isAdmin     = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
 	authEnabled = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
 
 	generateCA = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
@@ -85,7 +85,6 @@ var (
 
 	databasePath = flag.String("db-path", "", "database location - supply it to provide specific database location (will be created there if it doesn't exist)")
 	database     = flag.String("db", "boltdb", "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
-
 )
 
 var CA_CERT = []byte(`-----BEGIN CERTIFICATE-----
@@ -213,7 +212,7 @@ func main() {
 	cfg.SetMode(mode)
 
 	// disabling authentication if no-auth for auth disabled env variable
-	if (*authEnabled) {
+	if *authEnabled {
 		cfg.AuthEnabled = true
 	}
 
@@ -389,7 +388,7 @@ func createSuperUser(h *hv.Hoverfly) {
 	}
 }
 
-func getInitialMode(cfg *hv.Configuration) (string) {
+func getInitialMode(cfg *hv.Configuration) string {
 	if *webserver {
 		return hv.SimulateMode
 	}
@@ -403,7 +402,6 @@ func getInitialMode(cfg *hv.Configuration) (string) {
 		return hv.CaptureMode
 
 	} else if *synthesize {
-
 
 		if cfg.Middleware == "" {
 			log.Fatal("Synthesize mode chosen although middleware not supplied")

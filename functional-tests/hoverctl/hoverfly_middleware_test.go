@@ -3,20 +3,20 @@ package hoverfly_end_to_end_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os/exec"
-	"strings"
-	"strconv"
 	"github.com/phayes/freeport"
+	"os/exec"
+	"strconv"
+	"strings"
 )
 
 var _ = Describe("When I use hoverctl", func() {
 	var (
 		hoverflyCmd *exec.Cmd
 
-		adminPort = freeport.GetPort()
+		adminPort         = freeport.GetPort()
 		adminPortAsString = strconv.Itoa(adminPort)
 
-		proxyPort = freeport.GetPort()
+		proxyPort         = freeport.GetPort()
 		proxyPortAsString = strconv.Itoa(proxyPort)
 	)
 
@@ -46,7 +46,6 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(ContainSubstring("Hoverfly is now set to run the following as middleware"))
 			Expect(output).To(ContainSubstring("python testdata/add_random_delay.py"))
 		})
-
 
 		It("I cannae set the hoverfly's middleware when specifying non-existing file", func() {
 			out, _ := exec.Command(hoverctlBinary, "middleware", `python testdata/not_a_real_file.fake`).Output()

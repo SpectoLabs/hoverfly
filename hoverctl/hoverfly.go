@@ -1,18 +1,18 @@
 package main
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"fmt"
-	"github.com/dghubble/sling"
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
 	"errors"
-	"strings"
+	"fmt"
+	log "github.com/Sirupsen/logrus"
+	"github.com/dghubble/sling"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
-	"time"
 	"strconv"
+	"strings"
+	"time"
 )
 
 type APIStateSchema struct {
@@ -26,7 +26,7 @@ type APIDelaySchema struct {
 
 type ResponseDelaySchema struct {
 	UrlPattern string `json:"urlpattern"`
-	Delay      int `json:"delay"`
+	Delay      int    `json:"delay"`
 	HttpMethod string `json:"httpmethod"`
 }
 
@@ -53,20 +53,19 @@ type Hoverfly struct {
 	httpClient *http.Client
 }
 
-
-func NewHoverfly(config Config) (Hoverfly) {
+func NewHoverfly(config Config) Hoverfly {
 	return Hoverfly{
-		Host: config.HoverflyHost,
-		AdminPort: config.HoverflyAdminPort,
-		ProxyPort: config.HoverflyProxyPort,
-		Username: config.HoverflyUsername,
-		Password: config.HoverflyPassword,
+		Host:       config.HoverflyHost,
+		AdminPort:  config.HoverflyAdminPort,
+		ProxyPort:  config.HoverflyProxyPort,
+		Username:   config.HoverflyUsername,
+		Password:   config.HoverflyPassword,
 		httpClient: http.DefaultClient,
 	}
 }
 
 // Wipe will call the records endpoint in Hoverfly with a DELETE request, triggering Hoverfly to wipe the database
-func (h *Hoverfly) DeleteSimulations() (error) {
+func (h *Hoverfly) DeleteSimulations() error {
 	url := h.buildURL("/api/records")
 
 	slingRequest := sling.New().Delete(url)
@@ -102,7 +101,7 @@ func (h *Hoverfly) DeleteSimulations() (error) {
 	return nil
 }
 
-func (h *Hoverfly) DeleteDelays() (error) {
+func (h *Hoverfly) DeleteDelays() error {
 	url := h.buildURL("/api/delays")
 
 	slingRequest := sling.New().Delete(url)
@@ -142,7 +141,7 @@ func (h *Hoverfly) DeleteDelays() (error) {
 func (h *Hoverfly) GetMode() (string, error) {
 	url := h.buildURL("/api/state")
 
-	slingRequest:= sling.New().Get(url)
+	slingRequest := sling.New().Get(url)
 
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
@@ -210,7 +209,6 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 		return "", errors.New("Cannot change the mode of Hoverfly when running as a webserver")
 	}
 
-
 	apiResponse := h.createAPIStateResponse(response)
 
 	return apiResponse.Mode, nil
@@ -220,7 +218,7 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 func (h *Hoverfly) GetMiddleware() (string, error) {
 	url := h.buildURL("/api/middleware")
 
-	slingRequest:= sling.New().Get(url)
+	slingRequest := sling.New().Get(url)
 
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
@@ -296,7 +294,7 @@ func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
 	return apiResponse.Middleware, nil
 }
 
-func (h *Hoverfly) ImportSimulation(payload string) (error) {
+func (h *Hoverfly) ImportSimulation(payload string) error {
 	url := h.buildURL("/api/records")
 
 	slingRequest := sling.New().Post(url).Body(strings.NewReader(payload))
@@ -367,7 +365,7 @@ func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 	return body, nil
 }
 
-func (h *Hoverfly) createAPIStateResponse(response *http.Response) (APIStateSchema) {
+func (h *Hoverfly) createAPIStateResponse(response *http.Response) APIStateSchema {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())
@@ -383,7 +381,7 @@ func (h *Hoverfly) createAPIStateResponse(response *http.Response) (APIStateSche
 	return apiResponse
 }
 
-func (h *Hoverfly) createMiddlewareSchema(response *http.Response) (MiddlewareSchema) {
+func (h *Hoverfly) createMiddlewareSchema(response *http.Response) MiddlewareSchema {
 	body, err := ioutil.ReadAll(response.Body)
 	fmt.Println(string(body))
 	if err != nil {
@@ -401,7 +399,7 @@ func (h *Hoverfly) createMiddlewareSchema(response *http.Response) (MiddlewareSc
 }
 
 func (h *Hoverfly) addAuthIfNeeded(sling *sling.Sling) (*sling.Sling, error) {
-	if len(h.Username) > 0 || len(h.Password) > 0  && len(h.authToken) == 0 {
+	if len(h.Username) > 0 || len(h.Password) > 0 && len(h.authToken) == 0 {
 		var err error
 
 		h.authToken, err = h.generateAuthToken()
@@ -452,7 +450,7 @@ func (h *Hoverfly) generateAuthToken() (string, error) {
 	return authToken.Token, nil
 }
 
-func (h *Hoverfly) buildURL(endpoint string) (string) {
+func (h *Hoverfly) buildURL(endpoint string) string {
 	return fmt.Sprintf("%v%v", h.buildBaseURL(), endpoint)
 }
 
@@ -460,7 +458,7 @@ func (h *Hoverfly) buildBaseURL() string {
 	return fmt.Sprintf("http://%v:%v", h.Host, h.AdminPort)
 }
 
-func (h *Hoverfly) isLocal() (bool) {
+func (h *Hoverfly) isLocal() bool {
 	return h.Host == "localhost" || h.Host == "127.0.0.1"
 }
 
@@ -470,13 +468,13 @@ func (h *Hoverfly) buildAuthorizationHeaderValue() string {
 
 /*
 This isn't working as intended, its working, just not how I imagined it.
- */
+*/
 
-func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) (error) {
+func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) error {
 	return h.startWithFlags(hoverflyDirectory, "")
 }
 
-func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags string) (error) {
+func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags string) error {
 
 	if !h.isLocal() {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
@@ -521,22 +519,22 @@ func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags str
 
 	for {
 		select {
-			case <-timeout:
-				if err != nil {
-					log.Debug(err)
-				}
-				return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: " + strconv.Itoa(statusCode)))
-			case <-tick:
-				resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", h.AdminPort))
-				if err == nil {
-					statusCode = resp.StatusCode
-				} else {
-					statusCode = 0
-				}
+		case <-timeout:
+			if err != nil {
+				log.Debug(err)
 			}
+			return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: " + strconv.Itoa(statusCode)))
+		case <-tick:
+			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", h.AdminPort))
+			if err == nil {
+				statusCode = resp.StatusCode
+			} else {
+				statusCode = 0
+			}
+		}
 
 		if statusCode == 200 {
-			break;
+			break
 		}
 	}
 
@@ -549,7 +547,7 @@ func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags str
 	return nil
 }
 
-func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) (error) {
+func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) error {
 	if !h.isLocal() {
 		return errors.New("hoverctl can not stop an instance of Hoverfly on a remote host")
 	}
@@ -585,7 +583,7 @@ func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) (error) {
 func (h *Hoverfly) GetDelays() (rd []ResponseDelaySchema, err error) {
 	url := h.buildURL("/api/delays")
 
-	slingRequest:= sling.New().Get(url)
+	slingRequest := sling.New().Get(url)
 
 	slingRequest, err = h.addAuthIfNeeded(slingRequest)
 	if err != nil {
@@ -612,7 +610,6 @@ func (h *Hoverfly) GetDelays() (rd []ResponseDelaySchema, err error) {
 
 	return apiResponse.Data, nil
 }
-
 
 // Set will go the state endpoint in Hoverfly, sending JSON that will set the mode of Hoverfly
 func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelaySchema, err error) {
@@ -668,7 +665,7 @@ func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelaySchema, err error) 
 	return apiResponse.Data, nil
 }
 
-func createAPIDelaysResponse(response *http.Response) (APIDelaySchema) {
+func createAPIDelaysResponse(response *http.Response) APIDelaySchema {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())
