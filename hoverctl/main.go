@@ -225,6 +225,9 @@ func main() {
 				handleIfError(err)
 
 				log.Info("Middleware has been deleted from Hoverfly")
+			case "":
+				err := errors.New("You have not specified a resource to delete from Hoverfly")
+				handleIfError(err)
 			default:
 				err := errors.New("You have not specified a valid resource to delete from Hoverfly")
 				handleIfError(err)
