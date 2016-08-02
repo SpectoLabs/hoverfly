@@ -69,3 +69,6 @@ rename-darwin-binaries:
 	mv target/hoverctl_darwin_amd64 target/hoverctl_OSX_amd64
 
 build-release: gox-build rename-darwin-binaries version-binaries
+
+fmt:
+	go fmt $$(go list ./... | grep -v -E 'vendor')
