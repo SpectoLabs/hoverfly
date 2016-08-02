@@ -4,8 +4,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
-	"path/filepath"
 	"io/ioutil"
+	"path/filepath"
 )
 
 type Config struct {
@@ -17,19 +17,19 @@ type Config struct {
 	SpectoLabAPIKey   string `yaml:"specto.lab.api.key"`
 }
 
-func GetConfig(hoverflyHostOverride, hoverflyAdminPortOverride, hoverflyProxyPortOverride, hoverflyUsername, hoverflyPassword string) (Config) {
+func GetConfig(hoverflyHostOverride, hoverflyAdminPortOverride, hoverflyProxyPortOverride, hoverflyUsername, hoverflyPassword string) Config {
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Debug(err.Error())
 	}
 
 	config := Config{
-		HoverflyHost: viper.GetString("hoverfly.host"),
+		HoverflyHost:      viper.GetString("hoverfly.host"),
 		HoverflyAdminPort: viper.GetString("hoverfly.admin.port"),
 		HoverflyProxyPort: viper.GetString("hoverfly.proxy.port"),
-		HoverflyUsername: viper.GetString("hoverfly.username"),
-		HoverflyPassword: viper.GetString("hoverfly.password"),
-		SpectoLabAPIKey: viper.GetString("specto.lab.api.key"),
+		HoverflyUsername:  viper.GetString("hoverfly.username"),
+		HoverflyPassword:  viper.GetString("hoverfly.password"),
+		SpectoLabAPIKey:   viper.GetString("specto.lab.api.key"),
 	}
 
 	if len(hoverflyHostOverride) > 0 {
@@ -55,11 +55,11 @@ func GetConfig(hoverflyHostOverride, hoverflyAdminPortOverride, hoverflyProxyPor
 	return config
 }
 
-func (c *Config) GetFilepath() (string) {
+func (c *Config) GetFilepath() string {
 	return viper.ConfigFileUsed()
 }
 
-func (c *Config) WriteToFile(hoverflyDirectory HoverflyDirectory) (error) {
+func (c *Config) WriteToFile(hoverflyDirectory HoverflyDirectory) error {
 	data, err := yaml.Marshal(c)
 
 	if err != nil {

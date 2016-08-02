@@ -1,16 +1,16 @@
 package hoverfly_test
 
 import (
+	"bytes"
+	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/dghubble/sling"
+	"github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"github.com/gorilla/mux"
-	"encoding/json"
-	"bytes"
-	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 func checkHeadersHttpMiddleware(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +33,6 @@ var server *httptest.Server
 
 var _ = Describe("Running Hoverfly with middleware", func() {
 
-
 	Context("in simulate mode", func() {
 
 		BeforeEach(func() {
@@ -41,7 +40,7 @@ var _ = Describe("Running Hoverfly with middleware", func() {
 			muxRouter.HandleFunc("/process", checkHeadersHttpMiddleware).Methods("POST")
 			server = httptest.NewServer(muxRouter)
 
-			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, server.URL + "/process")
+			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, server.URL+"/process")
 
 			jsonPayload := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "destination1", "scheme": "http", "query": "", "body": "", "headers": {}}, "response": {"status": 200, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
 			ImportHoverflyRecords(jsonPayload)

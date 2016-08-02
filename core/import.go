@@ -12,8 +12,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"net/http"
 	"github.com/SpectoLabs/hoverfly/core/views"
+	"net/http"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether

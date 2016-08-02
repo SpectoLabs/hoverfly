@@ -1,26 +1,26 @@
 package hoverfly_end_to_end_test
 
 import (
+	"fmt"
+	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os/exec"
-	"strings"
-	"strconv"
 	"github.com/phayes/freeport"
-	"fmt"
 	"io/ioutil"
-	"github.com/dghubble/sling"
 	"os"
+	"os/exec"
+	"strconv"
+	"strings"
 )
 
 var _ = Describe("When I use hoverctl", func() {
 	var (
 		hoverflyCmd *exec.Cmd
 
-		adminPort = freeport.GetPort()
+		adminPort         = freeport.GetPort()
 		adminPortAsString = strconv.Itoa(adminPort)
 
-		proxyPort = freeport.GetPort()
+		proxyPort         = freeport.GetPort()
 		proxyPortAsString = strconv.Itoa(proxyPort)
 	)
 
@@ -123,7 +123,6 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(string(bytes)).To(Equal(`{"middleware":""}`))
 			})
 		})
-
 
 		Context("I can delete the request templates in Hoverfly", func() {
 			BeforeEach(func() {

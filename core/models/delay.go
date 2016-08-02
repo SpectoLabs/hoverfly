@@ -1,19 +1,19 @@
 package models
 
 import (
-	"regexp"
-	log "github.com/Sirupsen/logrus"
-	"time"
+	"encoding/json"
 	"errors"
 	"fmt"
+	log "github.com/Sirupsen/logrus"
+	"regexp"
 	"strings"
-	"encoding/json"
+	"time"
 )
 
 type ResponseDelay struct {
 	UrlPattern string `json:"urlPattern"`
 	HttpMethod string `json:"httpMethod"`
-	Delay      int `json:"delay"`
+	Delay      int    `json:"delay"`
 }
 
 type ResponseDelayJson struct {
@@ -24,7 +24,7 @@ type ResponseDelayList []ResponseDelay
 
 type ResponseDelays interface {
 	Json() []byte
-	GetDelay(url, httpMethod string) (*ResponseDelay)
+	GetDelay(url, httpMethod string) *ResponseDelay
 	Len() int
 }
 
@@ -50,7 +50,7 @@ func (this *ResponseDelay) Execute() {
 	log.Info("Response delay completed")
 }
 
-func (this *ResponseDelayList) GetDelay(url, httpMethod string) (*ResponseDelay) {
+func (this *ResponseDelayList) GetDelay(url, httpMethod string) *ResponseDelay {
 	for _, val := range *this {
 		match := regexp.MustCompile(val.UrlPattern).MatchString(url)
 		if match {

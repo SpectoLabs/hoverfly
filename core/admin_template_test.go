@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/views"
+	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	. "github.com/onsi/gomega"
-	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 func TestGetAllTemplates(t *testing.T) {

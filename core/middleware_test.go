@@ -1,15 +1,15 @@
 package hoverfly
 
 import (
-	. "github.com/onsi/gomega"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"testing"
-	"net/http"
-	"github.com/gorilla/mux"
-	"io/ioutil"
-	"net/http/httptest"
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
+	"github.com/gorilla/mux"
+	. "github.com/onsi/gomega"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 func TestChangeBodyMiddleware(t *testing.T) {
@@ -114,7 +114,7 @@ func TestExecuteMiddlewareRemotely(t *testing.T) {
 		},
 	}
 
-	processedPayload, err := ExecuteMiddlewareRemotely(server.URL + "/process", testPayload)
+	processedPayload, err := ExecuteMiddlewareRemotely(server.URL+"/process", testPayload)
 	Expect(err).To(BeNil())
 
 	Expect(processedPayload).ToNot(Equal(testPayload))
@@ -135,7 +135,7 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSamePayload(t 
 		},
 	}
 
-	processedPayload, err := ExecuteMiddlewareRemotely(server.URL + "/process", testPayload)
+	processedPayload, err := ExecuteMiddlewareRemotely(server.URL+"/process", testPayload)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Error when communicating with remote middleware"))
 
@@ -156,7 +156,7 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfNoPayloadOnResponse_AnOriginalP
 		},
 	}
 
-	processedPayload, err := ExecuteMiddlewareRemotely(server.URL + "/process", testPayload)
+	processedPayload, err := ExecuteMiddlewareRemotely(server.URL+"/process", testPayload)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("unexpected end of JSON input"))
 

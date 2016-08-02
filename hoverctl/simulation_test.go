@@ -80,8 +80,8 @@ func Test_Simulation_GetFileName(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := Simulation{
-		Vendor: "vendor",
-		Name: "name",
+		Vendor:  "vendor",
+		Name:    "name",
 		Version: "version",
 	}
 
@@ -93,8 +93,8 @@ func Test_Simulation_String(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := Simulation{
-		Vendor: "vendor",
-		Name: "name",
+		Vendor:  "vendor",
+		Name:    "name",
 		Version: "version",
 	}
 

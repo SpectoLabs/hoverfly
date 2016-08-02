@@ -1,11 +1,11 @@
 package main
 
 import (
-	"testing"
-	. "github.com/onsi/gomega"
-	"os"
 	"github.com/mitchellh/go-homedir"
+	. "github.com/onsi/gomega"
 	"io/ioutil"
+	"os"
+	"testing"
 )
 
 var hoverflyDirectory_testDirectory = "/tmp/hoverctl-hoverfly-directory-test"
@@ -49,7 +49,7 @@ func Test_GetPid_ReturnsAnIntOfTheFileContents(t *testing.T) {
 	RegisterTestingT(t)
 	hoverflyDirectory_setup()
 
-	ioutil.WriteFile(hoverflyDirectory_testDirectory + "/hoverfly.9654.4332.pid", []byte("5555"), 0644)
+	ioutil.WriteFile(hoverflyDirectory_testDirectory+"/hoverfly.9654.4332.pid", []byte("5555"), 0644)
 
 	hoverflyDirectory := HoverflyDirectory{
 		Path: hoverflyDirectory_testDirectory,
@@ -102,7 +102,7 @@ func Test_WritePid_WhenPidExists_WontOverwrite(t *testing.T) {
 	RegisterTestingT(t)
 	hoverflyDirectory_setup()
 
-	ioutil.WriteFile(hoverflyDirectory_testDirectory + "/hoverfly.4321.6654.pid", []byte("untouched"), 0644)
+	ioutil.WriteFile(hoverflyDirectory_testDirectory+"/hoverfly.4321.6654.pid", []byte("untouched"), 0644)
 
 	hoverflyDirectory := HoverflyDirectory{
 		Path: hoverflyDirectory_testDirectory,
@@ -123,7 +123,7 @@ func Test_DeletePid_WhenPidExists(t *testing.T) {
 	RegisterTestingT(t)
 	hoverflyDirectory_setup()
 
-	ioutil.WriteFile(hoverflyDirectory_testDirectory + "/hoverfly.4332.3342.pid", []byte("1234"), 0644)
+	ioutil.WriteFile(hoverflyDirectory_testDirectory+"/hoverfly.4332.3342.pid", []byte("1234"), 0644)
 
 	hoverflyDirectory := HoverflyDirectory{
 		Path: hoverflyDirectory_testDirectory,

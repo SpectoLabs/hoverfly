@@ -3,32 +3,32 @@ package models
 import (
 	"bytes"
 	"crypto/md5"
-	"fmt"
 	"encoding/base64"
 	"encoding/gob"
-	"io"
-	"regexp"
+	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"net/http"
-	"strings"
+	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
-	"github.com/SpectoLabs/hoverfly/core/views"
+	"io"
+	"net/http"
+	"regexp"
+	"strings"
 )
 
 const (
 	contentTypeJSON = "application/json"
-	contentTypeXML = "application/xml"
-	otherType = "otherType"
+	contentTypeXML  = "application/xml"
+	otherType       = "otherType"
 )
 
 var (
 	rxJSON = regexp.MustCompile("[/+]json$")
-	rxXML = regexp.MustCompile("[/+]xml$")
+	rxXML  = regexp.MustCompile("[/+]xml$")
 	// mime types which will not be base 64 encoded when exporting as JSON
 	supportedMimeTypes = [...]string{"text", "plain", "css", "html", "json", "xml", "js", "javascript"}
-	minifiers * minify.M
+	minifiers          *minify.M
 )
 
 func init() {
@@ -63,7 +63,7 @@ func (p *Payload) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (p *Payload) ConvertToPayloadView() (*views.PayloadView) {
+func (p *Payload) ConvertToPayloadView() *views.PayloadView {
 	return &views.PayloadView{Response: p.Response.ConvertToResponseDetailsView(), Request: p.Request.ConvertToRequestDetailsView()}
 }
 
@@ -79,10 +79,10 @@ func NewPayloadFromBytes(data []byte) (*Payload, error) {
 	return p, nil
 }
 
-func NewPayloadFromPayloadView(data views.PayloadView) (Payload) {
+func NewPayloadFromPayloadView(data views.PayloadView) Payload {
 	return Payload{
 		Response: NewResponseDetialsFromResponseDetailsView(data.Response),
-		Request: NewRequestDetailsFromRequestDetailsView(data.Request),
+		Request:  NewRequestDetailsFromRequestDetailsView(data.Request),
 	}
 }
 
@@ -97,27 +97,27 @@ type RequestDetails struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
-func NewRequestDetailsFromRequestDetailsView(data views.RequestDetailsView) (RequestDetails) {
+func NewRequestDetailsFromRequestDetailsView(data views.RequestDetailsView) RequestDetails {
 	return RequestDetails{
-		Path: data.Path,
-		Method: data.Method,
+		Path:        data.Path,
+		Method:      data.Method,
 		Destination: data.Destination,
-		Scheme: data.Scheme,
-		Query: data.Query,
-		Body: data.Body,
-		Headers: data.Headers,
+		Scheme:      data.Scheme,
+		Query:       data.Query,
+		Body:        data.Body,
+		Headers:     data.Headers,
 	}
 }
 
-func (r *RequestDetails) ConvertToRequestDetailsView() (views.RequestDetailsView) {
+func (r *RequestDetails) ConvertToRequestDetailsView() views.RequestDetailsView {
 	return views.RequestDetailsView{
-		Path: r.Path,
-		Method: r.Method,
+		Path:        r.Path,
+		Method:      r.Method,
 		Destination: r.Destination,
-		Scheme: r.Scheme,
-		Query: r.Query,
-		Body: r.Body,
-		Headers: r.Headers,
+		Scheme:      r.Scheme,
+		Query:       r.Query,
+		Body:        r.Body,
+		Headers:     r.Headers,
 	}
 }
 
@@ -196,7 +196,7 @@ type ResponseDetails struct {
 	Headers map[string][]string `json:"headers"`
 }
 
-func NewResponseDetialsFromResponseDetailsView(data views.ResponseDetailsView) (ResponseDetails) {
+func NewResponseDetialsFromResponseDetailsView(data views.ResponseDetailsView) ResponseDetails {
 	body := data.Body
 
 	if data.EncodedBody == true {
@@ -207,9 +207,7 @@ func NewResponseDetialsFromResponseDetailsView(data views.ResponseDetailsView) (
 	return ResponseDetails{Status: data.Status, Body: body, Headers: data.Headers}
 }
 
-
-
-func (r *ResponseDetails) ConvertToResponseDetailsView() (views.ResponseDetailsView) {
+func (r *ResponseDetails) ConvertToResponseDetailsView() views.ResponseDetailsView {
 	needsEncoding := false
 
 	// Check headers for gzip
@@ -229,7 +227,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsView() (views.ResponseDetailsV
 
 	// If contains gzip, base64 encode
 	body := r.Body
-	if (needsEncoding) {
+	if needsEncoding {
 		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
 	}
 

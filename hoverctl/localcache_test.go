@@ -1,10 +1,10 @@
 package main
 
 import (
-	"testing"
-	"io/ioutil"
 	. "github.com/onsi/gomega"
+	"io/ioutil"
 	"os"
+	"testing"
 )
 
 var localCache_testDirectory = "/tmp/hoverctl-tests"
@@ -59,7 +59,7 @@ func Test_LocalCache_ReadSimulation(t *testing.T) {
 	RegisterTestingT(t)
 	localCache_setup()
 
-	ioutil.WriteFile(localCache_testDirectory + "/vendor.name.v1.json", []byte("this is a test file"), 0644)
+	ioutil.WriteFile(localCache_testDirectory+"/vendor.name.v1.json", []byte("this is a test file"), 0644)
 
 	localCache := LocalCache{URI: localCache_testDirectory}
 	simulation := Simulation{Vendor: "vendor", Name: "name", Version: "v1"}

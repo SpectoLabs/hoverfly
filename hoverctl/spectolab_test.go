@@ -1,9 +1,9 @@
 package main
 
 import (
-	"testing"
 	. "github.com/onsi/gomega"
 	"os"
+	"testing"
 )
 
 func TestMain(m *testing.M) {

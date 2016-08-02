@@ -1,17 +1,16 @@
 package matching
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/cache"
-	"net/http"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"net/http"
 )
 
 type RequestMatcher struct {
-	RequestCache	cache.Cache
-	TemplateStore	RequestTemplateStore
-	Webserver	*bool
-
+	RequestCache  cache.Cache
+	TemplateStore RequestTemplateStore
+	Webserver     *bool
 }
 
 // getResponse returns stored response from cache
@@ -49,7 +48,7 @@ func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.Res
 			}).Warn("Failed to find matching request template from template store")
 
 			return nil, &MatchingError{
-				StatusCode: 412,
+				StatusCode:  412,
 				Description: "Could not find recorded request, please record it first!",
 			}
 		}
@@ -72,7 +71,7 @@ func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.Res
 			"key":   key,
 		}).Error("Failed to decode payload")
 		return nil, &MatchingError{
-			StatusCode: 500,
+			StatusCode:  500,
 			Description: "Failed to decode payload",
 		}
 	}
@@ -89,7 +88,7 @@ func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.Res
 	return &payload.Response, nil
 }
 
-func (this *RequestMatcher) SavePayload(payload *models.Payload) (error) {
+func (this *RequestMatcher) SavePayload(payload *models.Payload) error {
 	var key string
 
 	if *this.Webserver {
@@ -117,11 +116,11 @@ func (this *RequestMatcher) SavePayload(payload *models.Payload) (error) {
 }
 
 type MatchingError struct {
-	StatusCode int
+	StatusCode  int
 	Description string
 }
 
-func (this MatchingError) Error() (string) {
+func (this MatchingError) Error() string {
 	return this.Description
 }
 

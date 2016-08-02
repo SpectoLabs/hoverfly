@@ -1,8 +1,8 @@
 package hoverfly
 
 import (
-	. "github.com/onsi/gomega"
 	"fmt"
+	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"testing"

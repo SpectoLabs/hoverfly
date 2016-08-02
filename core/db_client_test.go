@@ -1,11 +1,11 @@
 package hoverfly
 
 import (
-	. "github.com/onsi/gomega"
 	"encoding/json"
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	. "github.com/onsi/gomega"
 	"net/http"
 	"testing"
 )

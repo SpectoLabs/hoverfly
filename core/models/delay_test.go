@@ -1,9 +1,9 @@
 package models
 
 import (
+	"encoding/json"
 	. "github.com/onsi/gomega"
 	"testing"
-	"encoding/json"
 )
 
 func TestConvertJsonStringToResponseDelayConfig(t *testing.T) {
@@ -21,7 +21,6 @@ func TestConvertJsonStringToResponseDelayConfig(t *testing.T) {
 	err := ValidateResponseDelayJson(responseDelayJson)
 	Expect(err).To(BeNil())
 }
-
 
 func TestErrorIfHostPatternNotSet(t *testing.T) {
 	RegisterTestingT(t)
@@ -90,7 +89,7 @@ func TestGetDelayWithRegexMatch(t *testing.T) {
 
 	delay := ResponseDelay{
 		UrlPattern: "example(.+)",
-		Delay:       100,
+		Delay:      100,
 	}
 	delays := ResponseDelayList{delay}
 
@@ -106,11 +105,11 @@ func TestMultipleMatchingDelaysReturnsTheFirst(t *testing.T) {
 
 	delayOne := ResponseDelay{
 		UrlPattern: "example.com",
-		Delay:       100,
+		Delay:      100,
 	}
 	delayTwo := ResponseDelay{
 		UrlPattern: "example",
-		Delay:       100,
+		Delay:      100,
 	}
 	delays := ResponseDelayList{delayOne, delayTwo}
 
@@ -123,7 +122,7 @@ func TestNoMatchIfMethodsDontMatch(t *testing.T) {
 
 	delay := ResponseDelay{
 		UrlPattern: "example.com",
-		Delay:       100,
+		Delay:      100,
 		HttpMethod: "PURPLE",
 	}
 	delays := ResponseDelayList{delay}
@@ -137,7 +136,7 @@ func TestReturnMatchIfMethodsMatch(t *testing.T) {
 
 	delay := ResponseDelay{
 		UrlPattern: "example.com",
-		Delay:       100,
+		Delay:      100,
 		HttpMethod: "GET",
 	}
 	delays := ResponseDelayList{delay}
@@ -151,7 +150,7 @@ func TestIfDelayMethodBlankThenMatchesAnyMethod(t *testing.T) {
 
 	delay := ResponseDelay{
 		UrlPattern: "example(.+)",
-		Delay:       100,
+		Delay:      100,
 	}
 	delays := ResponseDelayList{delay}
 

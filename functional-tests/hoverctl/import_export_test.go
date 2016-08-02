@@ -1,24 +1,24 @@
 package hoverfly_end_to_end_test
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"os/exec"
-	"os"
-	"strings"
-	"github.com/phayes/freeport"
 	"fmt"
 	"github.com/dghubble/sling"
-	"strconv"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/phayes/freeport"
 	"io/ioutil"
+	"os"
+	"os/exec"
+	"strconv"
+	"strings"
 )
 
 var _ = Describe("When I use hoverctl", func() {
 	var (
 		hoverflyCmd *exec.Cmd
 
-		workingDir, _ = os.Getwd()
-		adminPort = freeport.GetPort()
+		workingDir, _     = os.Getwd()
+		adminPort         = freeport.GetPort()
 		adminPortAsString = strconv.Itoa(adminPort)
 
 		proxyPort = freeport.GetPort()
@@ -76,7 +76,7 @@ var _ = Describe("When I use hoverctl", func() {
 			It("can export", func() {
 
 				// Export the data
-				output, _ := exec.Command(hoverctlBinary, "export", "testuser1/simulation1", "--admin-port=" + adminPortAsString).Output()
+				output, _ := exec.Command(hoverctlBinary, "export", "testuser1/simulation1", "--admin-port="+adminPortAsString).Output()
 
 				Expect(output).To(ContainSubstring("testuser1/simulation1:latest exported successfully"))
 				Expect(ioutil.ReadFile(hoverctlCacheDir + "/testuser1.simulation1.latest.json")).To(MatchJSON(hoverflyData))
@@ -85,11 +85,11 @@ var _ = Describe("When I use hoverctl", func() {
 
 			It("can import", func() {
 
-				err := ioutil.WriteFile(hoverctlCacheDir + "/testuser2.simulation2.latest.json", []byte(hoverflyData), 0644)
+				err := ioutil.WriteFile(hoverctlCacheDir+"/testuser2.simulation2.latest.json", []byte(hoverflyData), 0644)
 				Expect(err).To(BeNil())
 
-				output, _ := exec.Command(hoverctlBinary, "import", "testuser2/simulation2", "--admin-port=" + adminPortAsString).Output()
-				
+				output, _ := exec.Command(hoverctlBinary, "import", "testuser2/simulation2", "--admin-port="+adminPortAsString).Output()
+
 				Expect(output).To(ContainSubstring("testuser2/simulation2:latest imported successfully"))
 
 				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))

@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	expectedKey1 = []byte{'1'}
-	expectedKey2 = []byte{'2'}
+	expectedKey1   = []byte{'1'}
+	expectedKey2   = []byte{'2'}
 	expectedValue1 = []byte{'A'}
 	expectedValue2 = []byte{'B'}
 )
@@ -19,7 +19,7 @@ func TestCacheGetIsEmptyByDefault(t *testing.T) {
 
 	expectedKey := []byte{'k'}
 
-	actualValue, err := cache.Get(expectedKey);
+	actualValue, err := cache.Get(expectedKey)
 	Expect(err).ToNot(BeNil())
 	Expect(actualValue).To(HaveLen(0))
 }
@@ -39,7 +39,7 @@ func TestCacheGetAllKeysIsEmptyByDefault(t *testing.T) {
 
 	cache := &InMemoryCache{}
 
-	actualValue, err := cache.GetAllKeys();
+	actualValue, err := cache.GetAllKeys()
 	Expect(err).To(BeNil())
 	Expect(actualValue).To(HaveLen(0))
 }
@@ -49,7 +49,7 @@ func TestCacheGetAllValuesIsEmptyByDefault(t *testing.T) {
 
 	cache := &InMemoryCache{}
 
-	actualValue, err := cache.GetAllValues();
+	actualValue, err := cache.GetAllValues()
 	Expect(err).To(BeNil())
 	Expect(actualValue).To(HaveLen(0))
 }
@@ -59,10 +59,10 @@ func TestSetAndGet(t *testing.T) {
 
 	cache := NewInMemoryCache()
 
-	err := cache.Set(expectedKey1, expectedValue1);
+	err := cache.Set(expectedKey1, expectedValue1)
 	Expect(err).To(BeNil())
 
-	err = cache.Set(expectedKey2, expectedValue2);
+	err = cache.Set(expectedKey2, expectedValue2)
 	Expect(err).To(BeNil())
 
 	actualValue, err := cache.Get(expectedKey1)
@@ -167,7 +167,7 @@ func TestDeleteKey(t *testing.T) {
 
 	Expect(value).To(HaveLen(0))
 
-	count, err := cache.RecordsCount();
+	count, err := cache.RecordsCount()
 	Expect(err).To(BeNil())
 
 	Expect(count).To(Equal(1))

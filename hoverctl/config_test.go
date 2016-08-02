@@ -1,13 +1,12 @@
 package main
 
 import (
-	"testing"
 	. "github.com/onsi/gomega"
-	"os"
-	"io/ioutil"
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"os"
+	"testing"
 )
-
 
 func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
 	RegisterTestingT(t)
@@ -122,7 +121,6 @@ func Test_ConfigWriteToFileWritesTheConfigObjectToAFileInAYamlFormat(t *testing.
 
 	SetConfigurationDefaults()
 	config := GetConfig("testhost", "1234", "4567", "username", "password")
-
 
 	wd, _ := os.Getwd()
 	hoverflyDirectory := HoverflyDirectory{

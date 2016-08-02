@@ -1,14 +1,14 @@
 package hoverfly_end_to_end_test
 
 import (
+	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os/exec"
-	"strings"
-	"io/ioutil"
-	"strconv"
 	"github.com/phayes/freeport"
-	"github.com/dghubble/sling"
+	"io/ioutil"
+	"os/exec"
+	"strconv"
+	"strings"
 )
 
 var _ = Describe("When I use hoverctl", func() {
@@ -16,10 +16,10 @@ var _ = Describe("When I use hoverctl", func() {
 	Describe("without a running hoverfly", func() {
 
 		var (
-			adminPort = freeport.GetPort()
+			adminPort         = freeport.GetPort()
 			adminPortAsString = strconv.Itoa(adminPort)
 
-			proxyPort = freeport.GetPort()
+			proxyPort         = freeport.GetPort()
 			proxyPortAsString = strconv.Itoa(proxyPort)
 		)
 
@@ -133,7 +133,6 @@ var _ = Describe("When I use hoverctl", func() {
 				}
 			})
 
-
 			It("by starting and stopping hoverfly on a different admin and proxy port using both flag", func() {
 				setOutput, _ := exec.Command(hoverctlBinary, "start", "--admin-port=11223", "--proxy-port=22113").Output()
 
@@ -181,7 +180,6 @@ var _ = Describe("When I use hoverctl", func() {
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is not running"))
 			})
-
 
 		})
 

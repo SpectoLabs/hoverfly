@@ -1,12 +1,12 @@
 package main
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"path/filepath"
-	"fmt"
-	"io/ioutil"
 	"errors"
+	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/hpcloud/tail"
+	"io/ioutil"
+	"path/filepath"
 )
 
 type LogFile struct {
@@ -14,7 +14,7 @@ type LogFile struct {
 	Name string
 }
 
-func NewLogFile(directory HoverflyDirectory, adminPort, proxyPort string) (LogFile) {
+func NewLogFile(directory HoverflyDirectory, adminPort, proxyPort string) LogFile {
 	fileName := fmt.Sprintf("hoverfly.%v.%v.log", adminPort, proxyPort)
 
 	filePath := filepath.Join(directory.Path, fileName)
@@ -35,7 +35,7 @@ func (l *LogFile) getLogs() (string, error) {
 	return string(content), nil
 }
 
-func (l * LogFile) Print() (error) {
+func (l *LogFile) Print() error {
 	logs, err := l.getLogs()
 
 	if err != nil {
@@ -47,7 +47,7 @@ func (l * LogFile) Print() (error) {
 	return nil
 }
 
-func (l* LogFile) Tail() (error) {
+func (l *LogFile) Tail() error {
 	tail, err := tail.TailFile(l.Path, tail.Config{Follow: true})
 	if err != nil {
 		log.Debug(err.Error())
