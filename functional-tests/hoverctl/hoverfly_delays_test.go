@@ -7,7 +7,6 @@ import (
 	"strings"
 	"strconv"
 	"github.com/phayes/freeport"
-	"fmt"
 )
 
 var _ = Describe("When I use hoverfly-cli", func() {
@@ -40,7 +39,6 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				out, _ := exec.Command(hoverctlBinary, "delays").Output()
 
 				output := strings.TrimSpace(string(out))
-				fmt.Println(output)
 				// TODO: when no delays are set we should really have a nice message
 				Expect(len(output)).To(Equal(0))
 			})
@@ -55,7 +53,6 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				out, _ := exec.Command(hoverctlBinary, "delays", "testdata/delays.json").Output()
 
 				output := strings.TrimSpace(string(out))
-				fmt.Println(output)
 				Expect(output).To(ContainSubstring("Response delays set in Hoverfly"))
 				Expect(output).To(ContainSubstring("UrlPattern:host1"))
 				Expect(output).To(ContainSubstring("Delay:110"))

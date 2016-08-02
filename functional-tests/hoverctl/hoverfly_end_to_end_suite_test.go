@@ -87,22 +87,8 @@ func startHoverfly(adminPort, proxyPort int, workingDir string) * exec.Cmd {
 
 	err := hoverflyCmd.Start()
 
-	if err != nil {
-		fmt.Println("Unable to start Hoverfly")
-		fmt.Println(hoverflyBinaryUri)
-		fmt.Println("Is the binary there?")
-		os.Exit(1)
-	}
-
-	Eventually(func() int {
-		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
-		if err == nil {
-			return resp.StatusCode
-		} else {
-			fmt.Println(err.Error())
-			return 0
-		}
-	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+	binaryErrorCheck(err, hoverflyBinaryUri)
+	healthcheck(adminPort)
 
 	return hoverflyCmd
 }
@@ -113,22 +99,8 @@ func startHoverflyWithMiddleware(adminPort, proxyPort int, workingDir, middlewar
 
 	err := hoverflyCmd.Start()
 
-	if err != nil {
-		fmt.Println("Unable to start Hoverfly")
-		fmt.Println(hoverflyBinaryUri)
-		fmt.Println("Is the binary there?")
-		os.Exit(1)
-	}
-
-	Eventually(func() int {
-		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
-		if err == nil {
-			return resp.StatusCode
-		} else {
-			fmt.Println(err.Error())
-			return 0
-		}
-	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+	binaryErrorCheck(err, hoverflyBinaryUri)
+	healthcheck(adminPort)
 
 	return hoverflyCmd
 }
@@ -152,22 +124,8 @@ func startHoverflyWithAuth(adminPort, proxyPort int, workingDir, username, passw
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-auth", "true")
 	err = hoverflyCmd.Start()
 
-	if err != nil {
-		fmt.Println("Unable to start Hoverfly")
-		fmt.Println(hoverflyBinaryUri)
-		fmt.Println("Is the binary there?")
-		os.Exit(1)
-	}
-
-	Eventually(func() int {
-		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
-		if err == nil {
-			return resp.StatusCode
-		} else {
-			fmt.Println(err.Error())
-			return 0
-		}
-	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+	binaryErrorCheck(err, hoverflyBinaryUri)
+	healthcheck(adminPort)
 
 	return hoverflyCmd
 }
@@ -178,25 +136,39 @@ func startHoverflyWebserver(adminPort, proxyPort int, workingDir string) * exec.
 
 	err := hoverflyCmd.Start()
 
-	if err != nil {
-		fmt.Println("Unable to start Hoverfly")
-		fmt.Println(hoverflyBinaryUri)
-		fmt.Println("Is the binary there?")
-		os.Exit(1)
-	}
-
-	Eventually(func() int {
-		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
-		if err == nil {
-			return resp.StatusCode
-		} else {
-			fmt.Println(err.Error())
-			return 0
-		}
-	}, time.Second * 3).Should(BeNumerically("==", http.StatusOK))
+	binaryErrorCheck(err, hoverflyBinaryUri)
+	healthcheck(adminPort)
 
 	return hoverflyCmd
 }
+
+func binaryErrorCheck(err error, binaryPath string) {
+	if err != nil {
+		fmt.Println("Unable to start Hoverfly")
+		fmt.Println(binaryPath)
+		fmt.Println("Is the binary there?")
+		os.Exit(1)
+	}
+}
+
+func healthcheck(adminPort int) {
+	var err error
+	var resp *http.Response
+
+	hasPassed := Eventually(func() int {
+		resp, err = http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
+		if err == nil {
+			return resp.StatusCode
+		} else {
+			return 0
+		}
+	}, time.Second*3).Should(BeNumerically("==", http.StatusOK))
+
+	if !hasPassed {
+		fmt.Println(err.Error())
+	}
+}
+
 
 type testConfig struct {
 	HoverflyHost      string `yaml:"hoverfly.host"`
