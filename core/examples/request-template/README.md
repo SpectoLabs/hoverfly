@@ -11,3 +11,4 @@ To see all request templates configured in Hoverfly, use the following command:
 ```
 hoverctl templates
 ```
+To find out more, please check the documentation regarding [partial matching](https://spectolabs.gitbooks.io/hoverfly/content/usage/matching_requests.html)
