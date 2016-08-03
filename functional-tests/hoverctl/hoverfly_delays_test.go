@@ -54,7 +54,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Response delays set in Hoverfly"))
 				Expect(output).To(ContainSubstring("host1 - 100ms"))
-				Expect(output).To(ContainSubstring("host2 - 110ms"))
+				Expect(output).To(ContainSubstring("POST | host2 - 110ms"))
 			})
 
 		})
