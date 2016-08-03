@@ -1,6 +1,6 @@
 # Delays
 
-This is an example of a file to apply delays within Hoverfly. This example will add a 2 second delay to responses from all hosts.
+This is an example of a file to apply delays within Hoverfly. This example will add a 2 second delay to responses to github.com using any HTTP method. It will also apply a 2 second delay to any response to a POST request.
 
 To import this file into Hoverfly, you can run the following command:
 ```
