@@ -1,7 +1,7 @@
 {
   "data": [
     {
-      "urlPattern": "host1",
+      "urlPattern": "github.com",
       "delay": 2000
     },
     {
