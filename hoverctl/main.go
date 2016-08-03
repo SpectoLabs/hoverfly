@@ -235,16 +235,18 @@ func main() {
 		if *delaysPathArg == "" || *delaysPathArg == "status" {
 			delays, err := hoverfly.GetDelays()
 			handleIfError(err)
-			for _, delay := range delays {
-				fmt.Printf("%+v\n", delay)
+			if len(delays) == 0 {
+				log.Info("Hoverfly has no delays configured")
+			} else {
+				log.Info("Hoverfly has been configured with these delays")
+				printResponseDelays(delays)
 			}
+
 		} else {
 			delays, err := hoverfly.SetDelays(*delaysPathArg)
 			handleIfError(err)
 			log.Info("Response delays set in Hoverfly: ")
-			for _, delay := range delays {
-				fmt.Printf("%+v\n", delay)
-			}
+			printResponseDelays(delays)
 		}
 	case logsCommand.FullCommand():
 		logfile := NewLogFile(hoverflyDirectory, hoverfly.AdminPort, hoverfly.ProxyPort)
@@ -275,6 +277,18 @@ func main() {
 			}
 			fmt.Println(string(requestTemplatesJson))
 		}
+	}
+}
+
+func printResponseDelays(delays []ResponseDelaySchema) {
+	for _, delay := range delays {
+		var delayString string
+		if delay.HttpMethod != "" {
+			delayString = fmt.Sprintf("%v | %v - %vms", delay.HttpMethod, delay.UrlPattern, delay.Delay)
+		} else {
+			delayString = fmt.Sprintf("%v - %vms", delay.UrlPattern, delay.Delay)
+		}
+		log.Info(delayString)
 	}
 }
 
