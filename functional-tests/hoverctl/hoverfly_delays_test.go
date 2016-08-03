@@ -39,8 +39,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				out, _ := exec.Command(hoverctlBinary, "delays").Output()
 
 				output := strings.TrimSpace(string(out))
-				// TODO: when no delays are set we should really have a nice message
-				Expect(len(output)).To(Equal(0))
+				Expect(output).To(ContainSubstring("Hoverfly has no delays configured"))
 			})
 
 		})
@@ -54,10 +53,8 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Response delays set in Hoverfly"))
-				Expect(output).To(ContainSubstring("UrlPattern:host1"))
-				Expect(output).To(ContainSubstring("Delay:110"))
-				Expect(output).To(ContainSubstring("UrlPattern:host2"))
-				Expect(output).To(ContainSubstring("Delay:100"))
+				Expect(output).To(ContainSubstring("host1 - 100ms"))
+				Expect(output).To(ContainSubstring("host2 - 110ms"))
 			})
 
 		})
