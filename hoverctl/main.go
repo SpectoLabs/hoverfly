@@ -239,9 +239,9 @@ func main() {
 				log.Info("Hoverfly has no delays configured")
 			} else {
 				log.Info("Hoverfly has been configured with these delays")
+				printResponseDelays(delays)
 			}
 
-			printResponseDelays(delays)
 		} else {
 			delays, err := hoverfly.SetDelays(*delaysPathArg)
 			handleIfError(err)
