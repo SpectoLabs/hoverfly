@@ -2,7 +2,7 @@ from time import sleep
 from random import randint
 
 def lambda_handler(event, context):
-    sleep(randint(0,9))
+    sleep(randint(0,2))
  
     event['response'] = {}
     event['response']['status'] = 503
