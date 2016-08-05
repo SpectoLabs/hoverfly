@@ -3,7 +3,7 @@
 ![Hoverfly](core/static/img/hoverfly_logo.png)
 ## Dependencies without the sting
 
-Hoverfly is a light-weight open source tool for creating simulations of external services for use in development and testing. 
+Hoverfly is a light-weight open source tool for creating simulations of external services for use in development and testing.
 This technique is sometimes referred to as [service virtualization](https://en.wikipedia.org/wiki/Service_virtualization).
 
 Hoverfly was designed to provide you with the means to create your own "dependency sandbox": a simulated development and test environment that you control.
@@ -22,7 +22,7 @@ Hoverctl is a command line interface for Hoverfly. It uses the Hoverfly REST API
 
 Run the install script to install Hoverfly and hoverctl:
 
-    curl -o install.sh https://storage.googleapis.com/specto-binaries/install.sh && bash install.sh
+    curl -o install.sh https://raw.githubusercontent.com/SpectoLabs/hoverfly/master/install.sh && bash install.sh
 
 ### Binaries
 
