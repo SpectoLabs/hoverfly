@@ -1,4 +1,4 @@
-package hoverfly_end_to_end_test
+package hoverctl_end_to_end
 
 import (
 	. "github.com/onsi/ginkgo"
