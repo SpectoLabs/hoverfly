@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 // Creates goproxy.ProxyHttpServer and configures it to be used as a proxy for Hoverfly
@@ -99,8 +100,18 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 			w.WriteHeader(500)
 			return
 		}
+
+		for name, values := range resp.Header {
+			name = strings.ToLower(name)
+
+			for _, value := range values {
+				w.Header().Add(name, value)
+			}
+		}
+
 		w.Header().Set("Req", req.RequestURI)
 		w.Header().Set("Resp", resp.Header.Get("Content-Length"))
+
 		w.WriteHeader(resp.StatusCode)
 		w.Write(body)
 	})
