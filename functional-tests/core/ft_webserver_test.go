@@ -25,7 +25,7 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverflyWebServer(adminPort, proxyPort)
-			getPayload1 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "destination1", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
+			getPayload1 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "destination1", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1", "value2"]}}}]}`)
 			getPayload2 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1/resource", "method": "GET", "destination": "another-destination.com", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "another-host.com body1", "headers": {"Header": ["value1"]}}}]}`)
 			postPayload1 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path2", "method": "POST", "destination": "destination1", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body2", "headers": {"Header": ["value1"]}}}]}`)
 			postPayload2 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path2/resource", "method": "POST", "destination": "another-destination.com", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "another-host.com body2", "headers": {"Header": ["value1"]}}}]}`)
@@ -51,6 +51,14 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 					Expect(err).To(BeNil())
 
 					Expect(string(responseBody)).To(Equal("body1"))
+				})
+
+				It("and it should return the correct headers on the response", func() {
+					request := sling.New().Get("http://localhost:" + proxyPortAsString + "/path1")
+
+					response := DoRequest(request)
+
+					Expect(response.Header).To(HaveKeyWithValue("Header", []string{"value1", "value2"}))
 				})
 			})
 
