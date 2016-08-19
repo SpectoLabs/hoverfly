@@ -15,7 +15,7 @@ func rebuildHashes(db cache.Cache, webserver bool) {
 	}
 
 	for key, bytes := range entries {
-		payload, err := models.NewPayloadFromBytes(bytes)
+		pair, err := models.NewRequestResponsePairFromBytes(bytes)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
@@ -25,9 +25,9 @@ func rebuildHashes(db cache.Cache, webserver bool) {
 		}
 		var newKey string
 		if webserver {
-			newKey = payload.IdWithoutHost()
+			newKey = pair.IdWithoutHost()
 		} else {
-			newKey = payload.Id()
+			newKey = pair.Id()
 		}
 
 		if key != newKey {

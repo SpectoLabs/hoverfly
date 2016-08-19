@@ -60,12 +60,12 @@ func TestRequestBodyCaptured(t *testing.T) {
 
 	fp := matching.GetRequestFingerprint(req, requestBody, false)
 
-	payloadBts, err := dbClient.RequestCache.Get([]byte(fp))
+	pairBts, err := dbClient.RequestCache.Get([]byte(fp))
 	Expect(err).To(BeNil())
 
-	payload, err := models.NewPayloadFromBytes(payloadBts)
+	pair, err := models.NewRequestResponsePairFromBytes(pairBts)
 	Expect(err).To(BeNil())
-	Expect(payload.Request.Body).To(Equal("fizz=buzz"))
+	Expect(pair.Request.Body).To(Equal("fizz=buzz"))
 }
 
 func TestRequestBodySentToMiddleware(t *testing.T) {
@@ -113,10 +113,10 @@ func TestMatchOnRequestBody(t *testing.T) {
 			Status: 200,
 			Body:   fmt.Sprintf("body here, number=%d", i),
 		}
-		payload := models.RequestResponsePair{Response: resp}
+		pair := models.RequestResponsePair{Response: resp}
 
 		// creating response
-		c := NewConstructor(request, payload)
+		c := NewConstructor(request, pair)
 		response := c.ReconstructResponse()
 
 		dbClient.save(request, requestBody, response, []byte(resp.Body))
@@ -211,7 +211,7 @@ func TestDeleteAllRecords(t *testing.T) {
 	Expect(err).To(BeNil())
 }
 
-func TestPayloadEncodeDecode(t *testing.T) {
+func TestRequestResponsePairEncodeDecode(t *testing.T) {
 	RegisterTestingT(t)
 
 	resp := models.ResponseDetails{
@@ -219,26 +219,26 @@ func TestPayloadEncodeDecode(t *testing.T) {
 		Body:   "body here",
 	}
 
-	payload := models.RequestResponsePair{Response: resp}
+	pair := models.RequestResponsePair{Response: resp}
 
-	bts, err := payload.Encode()
+	bts, err := pair.Encode()
 	Expect(err).To(BeNil())
 
-	pl, err := models.NewPayloadFromBytes(bts)
+	pairFromBytes, err := models.NewRequestResponsePairFromBytes(bts)
 	Expect(err).To(BeNil())
-	Expect(pl.Response.Body).To(Equal(resp.Body))
-	Expect(pl.Response.Status).To(Equal(resp.Status))
+	Expect(pairFromBytes.Response.Body).To(Equal(resp.Body))
+	Expect(pairFromBytes.Response.Status).To(Equal(resp.Status))
 }
 
-func TestPayloadEncodeEmpty(t *testing.T) {
+func TestRequestResponsePairEncodeEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
-	payload := models.RequestResponsePair{}
+	pair := models.RequestResponsePair{}
 
-	bts, err := payload.Encode()
+	bts, err := pair.Encode()
 	Expect(err).To(BeNil())
 
-	_, err = models.NewPayloadFromBytes(bts)
+	_, err = models.NewRequestResponsePairFromBytes(bts)
 	Expect(err).To(BeNil())
 }
 
@@ -246,7 +246,7 @@ func TestDecodeRandomBytes(t *testing.T) {
 	RegisterTestingT(t)
 
 	bts := []byte("some random stuff here")
-	_, err := models.NewPayloadFromBytes(bts)
+	_, err := models.NewRequestResponsePairFromBytes(bts)
 	Expect(err).ToNot(BeNil())
 }
 
@@ -304,7 +304,7 @@ func TestModifyRequestNoMiddleware(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 }
 
-func TestGetResponseCorruptedPayload(t *testing.T) {
+func TestGetResponseCorruptedRequestResponsePair(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(200, `{'message': 'here'}`)

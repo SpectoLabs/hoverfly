@@ -278,12 +278,12 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 		return
 	}
 
-	var payloads []views.RequestResponsePairView
+	var pairViews []views.RequestResponsePairView
 
 	for _, v := range records {
-		if payload, err := models.NewPayloadFromBytes(v); err == nil {
-			payloadView := payload.ConvertToPayloadView()
-			payloads = append(payloads, *payloadView)
+		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
+			pairView := pair.ConvertToRequestResponsePairView()
+			pairViews = append(pairViews, *pairView)
 		} else {
 			log.Error(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -294,7 +294,7 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 	w.Header().Set("Content-Type", "application/json")
 
 	var response views.RequestResponsePairPayload
-	response.Data = payloads
+	response.Data = pairViews
 	b, err := json.Marshal(response)
 
 	if err != nil {
@@ -456,7 +456,7 @@ func (d *Hoverfly) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	err = d.ImportPayloads(requests.Data)
+	err = d.ImportRequestResponsePairViews(requests.Data)
 
 	if err != nil {
 		response.Message = err.Error()
@@ -536,9 +536,9 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 
 	var pls []views.RequestResponsePairView
 
-	pls = append(pls, *p.ConvertToPayloadView())
+	pls = append(pls, *p.ConvertToRequestResponsePairView())
 
-	err = d.ImportPayloads(pls)
+	err = d.ImportRequestResponsePairViews(pls)
 
 	w.Header().Set("Content-Type", "application/json")
 	var response messageResponse
@@ -613,24 +613,24 @@ func (d *Hoverfly) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 
 // AllRecordsHandler returns JSON content type http response
 func (d *Hoverfly) GetAllTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	payloadJson := d.RequestMatcher.TemplateStore.GetPayload()
+	requestTemplatePayload := d.RequestMatcher.TemplateStore.GetPayload()
 
 	w.Header().Set("Content-Type", "application/json")
 
-	b, err := json.Marshal(payloadJson)
+	requestTemplateJson, err := json.Marshal(requestTemplatePayload)
 
 	if err != nil {
 		log.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		w.Write(b)
+		w.Write(requestTemplateJson)
 		return
 	}
 }
 
 func (d *Hoverfly) ImportTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var payload matching.RequestTemplateResponsePairPayload
+	var requestTemplatePayload matching.RequestTemplateResponsePairPayload
 
 	defer req.Body.Close()
 	body, err := ioutil.ReadAll(req.Body)
@@ -647,7 +647,7 @@ func (d *Hoverfly) ImportTemplatesHandler(w http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = json.Unmarshal(body, &payload)
+	err = json.Unmarshal(body, &requestTemplatePayload)
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -657,13 +657,13 @@ func (d *Hoverfly) ImportTemplatesHandler(w http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = d.RequestMatcher.TemplateStore.ImportPayloads(payload)
+	err = d.RequestMatcher.TemplateStore.ImportPayloads(requestTemplatePayload)
 
 	if err != nil {
 		response.Message = err.Error()
 		w.WriteHeader(400)
 	} else {
-		response.Message = fmt.Sprintf("%d payloads import complete.", len(*payload.Data))
+		response.Message = fmt.Sprintf("%d payloads import complete.", len(*requestTemplatePayload.Data))
 	}
 
 	b, err := response.Encode()

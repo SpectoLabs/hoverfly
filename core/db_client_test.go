@@ -28,7 +28,7 @@ func TestSetKey(t *testing.T) {
 	Expect(value).To(Equal(v))
 }
 
-func TestPayloadSetGet(t *testing.T) {
+func TestCacheSetGetWithRequestResponsePair(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -40,18 +40,18 @@ func TestPayloadSetGet(t *testing.T) {
 		Body:   "body here",
 	}
 
-	payload := models.RequestResponsePair{Response: resp}
-	bts, err := json.Marshal(payload)
+	pair := models.RequestResponsePair{Response: resp}
+	bts, err := json.Marshal(pair)
 	Expect(err).To(BeNil())
 
 	err = dbClient.RequestCache.Set(key, bts)
 	Expect(err).To(BeNil())
 
 	var p models.RequestResponsePair
-	payloadBts, err := dbClient.RequestCache.Get(key)
-	err = json.Unmarshal(payloadBts, &p)
+	pairBytes, err := dbClient.RequestCache.Get(key)
+	err = json.Unmarshal(pairBytes, &p)
 	Expect(err).To(BeNil())
-	Expect(payload.Response.Body).To(Equal(p.Response.Body))
+	Expect(pair.Response.Body).To(Equal(p.Response.Body))
 
 	defer dbClient.RequestCache.DeleteData()
 }
@@ -102,7 +102,7 @@ func TestGetAllRequestNoBucket(t *testing.T) {
 	Expect(err).To(BeNil())
 }
 
-func TestCorruptedPayloads(t *testing.T) {
+func TestCorruptedPairs(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -115,9 +115,9 @@ func TestCorruptedPayloads(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	// corrupted payloads should be just skipped
-	payloads, err := dbClient.RequestCache.GetAllValues()
+	pairBytes, err := dbClient.RequestCache.GetAllValues()
 	Expect(err).To(BeNil())
-	Expect(payloads).To(HaveLen(1))
+	Expect(pairBytes).To(HaveLen(1))
 }
 
 func TestGetMultipleRecords(t *testing.T) {
@@ -139,9 +139,9 @@ func TestGetMultipleRecords(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	for _, value := range values {
-		if payload, err := models.NewPayloadFromBytes(value); err == nil {
-			Expect(payload.Request.Method).To(Equal("GET"))
-			Expect(payload.Response.Status).To(Equal(201))
+		if pair, err := models.NewRequestResponsePairFromBytes(value); err == nil {
+			Expect(pair.Request.Method).To(Equal("GET"))
+			Expect(pair.Response.Status).To(Equal(201))
 		} else {
 			t.Error(err)
 		}

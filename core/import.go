@@ -84,19 +84,19 @@ func exists(path string) (bool, error) {
 // ImportFromDisk - takes one string value and tries to open a file, then parse it into recordedRequests structure
 // (which is default format in which Hoverfly exports captured requests) and imports those requests into the database
 func (hf *Hoverfly) ImportFromDisk(path string) error {
-	payloadsFile, err := os.Open(path)
+	pairsFile, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
 	}
 
 	var requests views.RequestResponsePairPayload
 
-	jsonParser := json.NewDecoder(payloadsFile)
+	jsonParser := json.NewDecoder(pairsFile)
 	if err = jsonParser.Decode(&requests); err != nil {
 		return fmt.Errorf("Got error while parsing payloads file, error %s", err.Error())
 	}
 
-	return hf.ImportPayloads(requests.Data)
+	return hf.ImportRequestResponsePairViews(requests.Data)
 }
 
 // ImportFromURL - takes one string value and tries connect to a remote server, then parse response body into
@@ -116,7 +116,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.ImportPayloads(requests.Data)
+	return hf.ImportRequestResponsePairViews(requests.Data)
 }
 
 func isJSON(s string) bool {
@@ -125,31 +125,31 @@ func isJSON(s string) bool {
 
 }
 
-// ImportPayloads - a function to save given payloads into the database.
-func (hf *Hoverfly) ImportPayloads(payloads []views.RequestResponsePairView) error {
-	if len(payloads) > 0 {
+// ImportRequestResponsePairViews - a function to save given pairs into the database.
+func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []views.RequestResponsePairView) error {
+	if len(pairViews) > 0 {
 		success := 0
 		failed := 0
-		for _, payloadView := range payloads {
+		for _, pairView := range pairViews {
 
 			// Convert PayloadView back to Payload for internal storage
-			pl := models.NewPayloadFromPayloadView(payloadView)
+			pair := models.NewRequestResponsePairFromRequestResponsePairView(pairView)
 
-			if len(pl.Request.Headers) == 0 {
-				pl.Request.Headers = make(map[string][]string)
+			if len(pair.Request.Headers) == 0 {
+				pair.Request.Headers = make(map[string][]string)
 			}
 
-			if _, present := pl.Request.Headers["Content-Type"]; !present {
+			if _, present := pair.Request.Headers["Content-Type"]; !present {
 				// sniffing content types
-				if isJSON(pl.Request.Body) {
-					pl.Request.Headers["Content-Type"] = []string{"application/json"}
+				if isJSON(pair.Request.Body) {
+					pair.Request.Headers["Content-Type"] = []string{"application/json"}
 				} else {
-					ct := http.DetectContentType([]byte(pl.Request.Body))
-					pl.Request.Headers["Content-Type"] = []string{ct}
+					ct := http.DetectContentType([]byte(pair.Request.Body))
+					pair.Request.Headers["Content-Type"] = []string{ct}
 				}
 			}
 
-			bts, err := pl.Encode()
+			bts, err := pair.Encode()
 			if err != nil {
 				log.WithFields(log.Fields{
 					"error": err.Error(),
@@ -171,7 +171,7 @@ func (hf *Hoverfly) ImportPayloads(payloads []views.RequestResponsePairView) err
 					}).Error("failed to fire hook")
 				}
 
-				err := hf.RequestMatcher.SavePayload(&pl)
+				err := hf.RequestMatcher.SaveRequestResponsePair(&pair)
 				if err != nil {
 					log.WithFields(log.Fields{
 						"error": err.Error(),
@@ -186,7 +186,7 @@ func (hf *Hoverfly) ImportPayloads(payloads []views.RequestResponsePairView) err
 			}
 		}
 		log.WithFields(log.Fields{
-			"total":      len(payloads),
+			"total":      len(pairViews),
 			"successful": success,
 			"failed":     failed,
 		}).Info("payloads imported")

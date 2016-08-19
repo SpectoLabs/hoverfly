@@ -70,11 +70,11 @@ func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserv
 }
 
 // ImportPayloads - a function to save given payloads into the database.
-func (this *RequestTemplateStore) ImportPayloads(payloadsView RequestTemplateResponsePairPayload) error {
-	if len(*payloadsView.Data) > 0 {
+func (this *RequestTemplateStore) ImportPayloads(pairPayload RequestTemplateResponsePairPayload) error {
+	if len(*pairPayload.Data) > 0 {
 		// Convert PayloadView back to Payload for internal storage
-		payloads := payloadsView.ConvertToRequestTemplateStore()
-		for _, pl := range payloads {
+		templateStore := pairPayload.ConvertToRequestTemplateStore()
+		for _, pl := range templateStore {
 
 			//TODO: add hooks for concsistency with request import
 			// note that importing hoverfly is a disallowed circular import

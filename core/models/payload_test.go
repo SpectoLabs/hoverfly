@@ -100,12 +100,12 @@ func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
 		EncodedBody: true,
 	}))
 }
-func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
+func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	respBody := "hello_world"
 
-	originalPayload := RequestResponsePair{
+	requestResponsePair := RequestResponsePair{
 		Response: ResponseDetails{
 			Status:  200,
 			Body:    respBody,
@@ -120,9 +120,9 @@ func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 			Headers:     map[string][]string{"test_header": []string{"true"}}},
 	}
 
-	payloadView := originalPayload.ConvertToPayloadView()
+	pairView := requestResponsePair.ConvertToRequestResponsePairView()
 
-	Expect(*payloadView).To(Equal(views.RequestResponsePairView{
+	Expect(*pairView).To(Equal(views.RequestResponsePairView{
 		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        respBody,
@@ -140,10 +140,10 @@ func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 	}))
 }
 
-func TestPayload_ConvertToPayloadView_WithGzippedResponse(t *testing.T) {
+func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedResponse(t *testing.T) {
 	RegisterTestingT(t)
 
-	originalPayload := RequestResponsePair{
+	requestResponsePair := RequestResponsePair{
 		Response: ResponseDetails{
 			Status:  200,
 			Body:    GzipString("hello_world"),
@@ -159,9 +159,9 @@ func TestPayload_ConvertToPayloadView_WithGzippedResponse(t *testing.T) {
 		},
 	}
 
-	payloadView := originalPayload.ConvertToPayloadView()
+	pairView := requestResponsePair.ConvertToRequestResponsePairView()
 
-	Expect(*payloadView).To(Equal(views.RequestResponsePairView{
+	Expect(*pairView).To(Equal(views.RequestResponsePairView{
 		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        "H4sIAAAJbogA/w==",
@@ -209,7 +209,7 @@ func GzipString(s string) string {
 	return b.String()
 }
 
-func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
+func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
 	view := views.RequestResponsePairView{
@@ -236,9 +236,9 @@ func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 		},
 	}
 
-	payload := NewPayloadFromPayloadView(view)
+	requestResponsePair := NewRequestResponsePairFromRequestResponsePairView(view)
 
-	Expect(payload).To(Equal(RequestResponsePair{
+	Expect(requestResponsePair).To(Equal(RequestResponsePair{
 		Request: RequestDetails{
 			Path:        "A",
 			Method:      "A",
@@ -262,7 +262,7 @@ func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 	}))
 }
 
-func TestPayloadViewData_ConvertToPayloadDataWithEncoding(t *testing.T) {
+func TestRequestResponsePairView_ConvertToRequestResponsePairWithEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
 	view := views.RequestResponsePairView{
@@ -272,9 +272,9 @@ func TestPayloadViewData_ConvertToPayloadDataWithEncoding(t *testing.T) {
 		},
 	}
 
-	payload := NewPayloadFromPayloadView(view)
+	pair := NewRequestResponsePairFromRequestResponsePairView(view)
 
-	Expect(payload.Response.Body).To(Equal("encoded"))
+	Expect(pair.Response.Body).To(Equal("encoded"))
 }
 
 func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {

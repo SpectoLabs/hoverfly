@@ -14,26 +14,26 @@ import (
 // Constructor - holds information about original request (which is needed to create response
 // and also holds payload
 type Constructor struct {
-	request *http.Request
-	payload models.RequestResponsePair
+	request             *http.Request
+	requestResponsePair models.RequestResponsePair
 }
 
 // NewConstructor - returns constructor instance
-func NewConstructor(req *http.Request, payload models.RequestResponsePair) *Constructor {
-	c := &Constructor{request: req, payload: payload}
+func NewConstructor(req *http.Request, pair models.RequestResponsePair) *Constructor {
+	c := &Constructor{request: req, requestResponsePair: pair}
 	return c
 }
 
 // ApplyMiddleware - activates given middleware, middleware should be passed as string to executable, can be
 // full path.
 func (c *Constructor) ApplyMiddleware(middleware string) error {
-	var newPayload models.RequestResponsePair
+	var newPair models.RequestResponsePair
 	var err error
 
 	if isMiddlewareLocal(middleware) {
-		newPayload, err = ExecuteMiddlewareLocally(middleware, c.payload)
+		newPair, err = ExecuteMiddlewareLocally(middleware, c.requestResponsePair)
 	} else {
-		newPayload, err = ExecuteMiddlewareRemotely(middleware, c.payload)
+		newPair, err = ExecuteMiddlewareRemotely(middleware, c.requestResponsePair)
 	}
 
 	if err != nil {
@@ -49,7 +49,7 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 		"middleware": middleware,
 	}).Debug("Middleware transformation complete!")
 	// override payload with transformed new payload
-	c.payload = newPayload
+	c.requestResponsePair = newPair
 
 	return nil
 
@@ -68,8 +68,8 @@ func (c *Constructor) ReconstructResponse() *http.Response {
 	response.Header = make(http.Header)
 
 	// applying payload
-	if len(c.payload.Response.Headers) > 0 {
-		for k, values := range c.payload.Response.Headers {
+	if len(c.requestResponsePair.Response.Headers) > 0 {
+		for k, values := range c.requestResponsePair.Response.Headers {
 			// headers is a map, appending each value
 			for _, v := range values {
 				response.Header.Add(k, v)
@@ -78,10 +78,10 @@ func (c *Constructor) ReconstructResponse() *http.Response {
 		}
 	}
 	// adding body, length, status code
-	buf := bytes.NewBufferString(c.payload.Response.Body)
+	buf := bytes.NewBufferString(c.requestResponsePair.Response.Body)
 	response.ContentLength = int64(buf.Len())
 	response.Body = ioutil.NopCloser(buf)
-	response.StatusCode = c.payload.Response.Status
+	response.StatusCode = c.requestResponsePair.Response.Status
 
 	return response
 }
@@ -89,18 +89,18 @@ func (c *Constructor) ReconstructResponse() *http.Response {
 // ReconstructRequest replaces original request with details provided in Constructor Payload.Request
 func (c *Constructor) ReconstructRequest() (*http.Request, error) {
 	// let's default to what was given
-	if c.payload.Request.Scheme == "" {
-		c.payload.Request.Scheme = c.request.URL.Scheme
+	if c.requestResponsePair.Request.Scheme == "" {
+		c.requestResponsePair.Request.Scheme = c.request.URL.Scheme
 	}
 
-	if c.payload.Request.Destination == "" {
+	if c.requestResponsePair.Request.Destination == "" {
 		return nil, fmt.Errorf("failed to reconstruct request, destination not specified")
 	}
 
 	newRequest, err := http.NewRequest(
-		c.payload.Request.Method,
-		fmt.Sprintf("%s://%s", c.payload.Request.Scheme, c.payload.Request.Destination),
-		ioutil.NopCloser(bytes.NewBuffer([]byte(c.payload.Request.Body))))
+		c.requestResponsePair.Request.Method,
+		fmt.Sprintf("%s://%s", c.requestResponsePair.Request.Scheme, c.requestResponsePair.Request.Destination),
+		ioutil.NopCloser(bytes.NewBuffer([]byte(c.requestResponsePair.Request.Body))))
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -109,10 +109,10 @@ func (c *Constructor) ReconstructRequest() (*http.Request, error) {
 		return nil, err
 	}
 
-	newRequest.Method = c.payload.Request.Method
-	newRequest.URL.Path = c.payload.Request.Path
-	newRequest.URL.RawQuery = c.payload.Request.Query
-	newRequest.Header = c.payload.Request.Headers
+	newRequest.Method = c.requestResponsePair.Request.Method
+	newRequest.URL.Path = c.requestResponsePair.Request.Path
+	newRequest.URL.RawQuery = c.requestResponsePair.Request.Query
+	newRequest.Header = c.requestResponsePair.Request.Headers
 
 	// overriding original request
 	c.request = newRequest

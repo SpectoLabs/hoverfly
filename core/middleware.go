@@ -58,7 +58,7 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 }
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
-func ExecuteMiddlewareLocally(middlewares string, payload models.RequestResponsePair) (models.RequestResponsePair, error) {
+func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 
 	mws := strings.Split(middlewares, "|")
 	var cmdList []*exec.Cmd
@@ -71,13 +71,13 @@ func ExecuteMiddlewareLocally(middlewares string, payload models.RequestResponse
 	}
 
 	// getting payload
-	bts, err := json.Marshal(payload.ConvertToPayloadView())
+	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
 	if log.GetLevel() == log.DebugLevel {
 		log.WithFields(log.Fields{
 			"middlewares": mws,
 			"count":       len(mws),
-			"payload":     string(bts),
+			"payload":     string(pairViewBytes),
 		}).Debug("preparing to modify payload")
 	}
 
@@ -85,11 +85,11 @@ func ExecuteMiddlewareLocally(middlewares string, payload models.RequestResponse
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Failed to marshal json")
-		return payload, err
+		return pair, err
 	}
 
 	//
-	cmdList[0].Stdin = bytes.NewReader(bts)
+	cmdList[0].Stdin = bytes.NewReader(pairViewBytes)
 
 	// Run the pipeline
 	mwOutput, stderr, err := Pipeline(cmdList...)
@@ -106,7 +106,7 @@ func ExecuteMiddlewareLocally(middlewares string, payload models.RequestResponse
 				"error": err.Error(),
 			}).Error("Middleware error")
 		}
-		return payload, err
+		return pair, err
 	}
 
 	// log stderr, middleware executed successfully
@@ -117,9 +117,9 @@ func ExecuteMiddlewareLocally(middlewares string, payload models.RequestResponse
 	}
 
 	if len(mwOutput) > 0 {
-		var newPayloadView views.RequestResponsePairView
+		var newPairView views.RequestResponsePairView
 
-		err = json.Unmarshal(mwOutput, &newPayloadView)
+		err = json.Unmarshal(mwOutput, &newPairView)
 
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -134,8 +134,8 @@ func ExecuteMiddlewareLocally(middlewares string, payload models.RequestResponse
 					"payload":     string(mwOutput),
 				}).Debug("payload after modifications")
 			}
-			// payload unmarshalled into Payload struct, returning it
-			return models.NewPayloadFromPayloadView(newPayloadView), nil
+			// payload unmarshalled into RequestResponsePair struct, returning it
+			return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
 		}
 	} else {
 
@@ -144,19 +144,19 @@ func ExecuteMiddlewareLocally(middlewares string, payload models.RequestResponse
 		}).Warn("No response from middleware.")
 	}
 
-	return payload, nil
+	return pair, nil
 
 }
 
-func ExecuteMiddlewareRemotely(middleware string, payload models.RequestResponsePair) (models.RequestResponsePair, error) {
-	bts, err := json.Marshal(payload.ConvertToPayloadView())
+func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+	bts, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
 	req, err := http.NewRequest("POST", middleware, bytes.NewBuffer(bts))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Error when building request to remote middleware")
-		return payload, err
+		return pair, err
 	}
 
 	resp, err := http.DefaultClient.Do(req)
@@ -164,30 +164,30 @@ func ExecuteMiddlewareRemotely(middleware string, payload models.RequestResponse
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Error when communicating with remote middleware")
-		return payload, err
+		return pair, err
 	}
 
 	if resp.StatusCode != 200 {
 		log.Error("Remote middleware did not process payload")
-		return payload, errors.New("Error when communicating with remote middleware")
+		return pair, errors.New("Error when communicating with remote middleware")
 	}
 
-	newPayloadBytes, err := ioutil.ReadAll(resp.Body)
+	pairViewBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Error when process response from remote middleware")
-		return payload, err
+		return pair, err
 	}
 
-	var newPayloadView views.RequestResponsePairView
+	var newPairView views.RequestResponsePairView
 
-	err = json.Unmarshal(newPayloadBytes, &newPayloadView)
+	err = json.Unmarshal(pairViewBytes, &newPairView)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Error when trying to serialize response from remote middleware")
-		return payload, err
+		return pair, err
 	}
-	return models.NewPayloadFromPayloadView(newPayloadView), nil
+	return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
 }

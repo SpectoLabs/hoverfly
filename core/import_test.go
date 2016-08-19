@@ -95,13 +95,13 @@ func TestImportFromDiskWrongJson(t *testing.T) {
 
 func TestImportFromURL(t *testing.T) {
 	// reading file and preparing json payload
-	payloadsFile, err := os.Open("examples/exports/readthedocs.json")
+	pairFile, err := os.Open("examples/exports/readthedocs.json")
 	Expect(err).To(BeNil())
-	bts, err := ioutil.ReadAll(payloadsFile)
+	pairFileBytes, err := ioutil.ReadAll(pairFile)
 	Expect(err).To(BeNil())
 
 	// pretending this is the endpoint with given json
-	server, dbClient := testTools(200, string(bts))
+	server, dbClient := testTools(200, string(pairFileBytes))
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
@@ -137,7 +137,7 @@ func TestImportFromURLMalformedJSON(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 }
 
-func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
+func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
@@ -145,7 +145,7 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPayload := views.RequestResponsePairView{
+	originalPair := views.RequestResponsePairView{
 		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
@@ -159,10 +159,10 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 			Query:       "", Body: "",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	hv.ImportPayloads([]views.RequestResponsePairView{originalPayload})
+	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{originalPair})
 	value, _ := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
-	decodedPayload, _ := models.NewPayloadFromBytes(value)
-	Expect(*decodedPayload).To(Equal(models.RequestResponsePair{
+	decodedPair, _ := models.NewRequestResponsePairFromBytes(value)
+	Expect(*decodedPair).To(Equal(models.RequestResponsePair{
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "hello_world",
@@ -182,7 +182,7 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 	}))
 }
 
-func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
+func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) {
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
@@ -190,7 +190,7 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPayload1 := views.RequestResponsePairView{
+	originalPair1 := views.RequestResponsePairView{
 		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
@@ -205,32 +205,31 @@ func TestImportPayloads_CanImportAMultiplePayload(t *testing.T) {
 			Query:       "", Body: "",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	originalPayload2 := originalPayload1
+	originalPair2 := originalPair1
+	originalPair2.Request.Path = "/new/path"
 
-	originalPayload2.Request.Path = "/new/path"
+	originalPair3 := originalPair1
+	originalPair3.Request.Path = "/newer/path"
 
-	originalPayload3 := originalPayload1
+	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{originalPair1, originalPair2, originalPair3})
 
-	originalPayload3.Request.Path = "/newer/path"
+	pairBytes, err := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
+	Expect(err).To(BeNil())
+	decodedPair1, err := models.NewRequestResponsePairFromBytes(pairBytes)
+	Expect(err).To(BeNil())
+	Expect(*decodedPair1).To(Equal(models.NewRequestResponsePairFromRequestResponsePairView(originalPair1)))
 
-	hv.ImportPayloads([]views.RequestResponsePairView{originalPayload1, originalPayload2, originalPayload3})
-	value, err := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
+	pairBytes, err = cache.Get([]byte("9c03e4af1f30542ff079a712bddad602"))
 	Expect(err).To(BeNil())
-	decodedPayload1, err := models.NewPayloadFromBytes(value)
+	decodedPair2, err := models.NewRequestResponsePairFromBytes(pairBytes)
 	Expect(err).To(BeNil())
-	Expect(*decodedPayload1).To(Equal(models.NewPayloadFromPayloadView(originalPayload1)))
+	Expect(*decodedPair2).To(Equal(models.NewRequestResponsePairFromRequestResponsePairView(originalPair2)))
 
-	value, err = cache.Get([]byte("9c03e4af1f30542ff079a712bddad602"))
+	pairBytes, err = cache.Get([]byte("fd099332afee48101edb7441b098cd4a"))
 	Expect(err).To(BeNil())
-	decodedPayload2, err := models.NewPayloadFromBytes(value)
+	decodedPair3, err := models.NewRequestResponsePairFromBytes(pairBytes)
 	Expect(err).To(BeNil())
-	Expect(*decodedPayload2).To(Equal(models.NewPayloadFromPayloadView(originalPayload2)))
-
-	value, err = cache.Get([]byte("fd099332afee48101edb7441b098cd4a"))
-	Expect(err).To(BeNil())
-	decodedPayload3, err := models.NewPayloadFromBytes(value)
-	Expect(err).To(BeNil())
-	Expect(*decodedPayload3).To(Equal(models.NewPayloadFromPayloadView(originalPayload3)))
+	Expect(*decodedPair3).To(Equal(models.NewRequestResponsePairFromRequestResponsePairView(originalPair3)))
 }
 
 // Helper function for base64 encoding
@@ -238,7 +237,7 @@ func base64String(s string) string {
 	return base64.StdEncoding.EncodeToString([]byte(s))
 }
 
-func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
+func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *testing.T) {
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
@@ -246,7 +245,7 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	encodedPayload := views.RequestResponsePairView{
+	encodedPair := views.RequestResponsePairView{
 		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        base64String("hello_world"),
@@ -260,15 +259,15 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 			Query:       "", Body: "",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	hv.ImportPayloads([]views.RequestResponsePairView{encodedPayload})
+	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{encodedPair})
 
 	value, err := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	Expect(err).To(BeNil())
 
-	decodedPayload, err := models.NewPayloadFromBytes(value)
+	decodedPair, err := models.NewRequestResponsePairFromBytes(value)
 	Expect(err).To(BeNil())
 
-	Expect(decodedPayload).ToNot(Equal(models.RequestResponsePair{
+	Expect(decodedPair).ToNot(Equal(models.RequestResponsePair{
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "hello_world",

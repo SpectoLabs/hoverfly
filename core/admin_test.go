@@ -33,10 +33,10 @@ func TestGetAllRecords(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rr := views.RequestResponsePairPayload{}
-	err = json.Unmarshal(body, &rr)
+	pair := views.RequestResponsePairPayload{}
+	err = json.Unmarshal(body, &pair)
 
-	Expect(len(rr.Data)).To(Equal(0))
+	Expect(len(pair.Data)).To(Equal(0))
 }
 
 func TestGetAllRecordsWRecords(t *testing.T) {
@@ -67,10 +67,10 @@ func TestGetAllRecordsWRecords(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rr := views.RequestResponsePairPayload{}
-	err = json.Unmarshal(body, &rr)
+	pair := views.RequestResponsePairPayload{}
+	err = json.Unmarshal(body, &pair)
 
-	Expect(len(rr.Data)).To(Equal(5))
+	Expect(len(pair.Data)).To(Equal(5))
 }
 
 func TestGetRecordsCount(t *testing.T) {
@@ -173,9 +173,9 @@ func TestExportImportRecords(t *testing.T) {
 	Expect(respRec.Code, http.StatusOK)
 
 	// records should be there
-	payloads, err := dbClient.RequestCache.GetAllValues()
+	pairBytes, err := dbClient.RequestCache.GetAllValues()
 	Expect(err).To(BeNil())
-	Expect(len(payloads)).To(Equal(5))
+	Expect(len(pairBytes)).To(Equal(5))
 }
 
 func TestDeleteHandler(t *testing.T) {
@@ -194,9 +194,9 @@ func TestDeleteHandler(t *testing.T) {
 	}
 
 	// checking whether we have records
-	payloads, err := dbClient.RequestCache.GetAllValues()
+	pairBytes, err := dbClient.RequestCache.GetAllValues()
 	Expect(err).To(BeNil())
-	Expect(len(payloads)).To(Equal(5))
+	Expect(len(pairBytes)).To(Equal(5))
 
 	// deleting through handler
 	deleteReq, err := http.NewRequest("DELETE", "/api/records", nil)
