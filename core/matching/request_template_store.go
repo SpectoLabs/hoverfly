@@ -1,7 +1,6 @@
 package matching
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
@@ -10,20 +9,20 @@ import (
 	"reflect"
 )
 
-type RequestTemplateStore []RequestTemplatePayload
+type RequestTemplateStore []RequestTemplateResponsePair
 
-type RequestTemplatePayload struct {
+type RequestTemplateResponsePair struct {
 	RequestTemplate RequestTemplate        `json:"requestTemplate"`
 	Response        models.ResponseDetails `json:"response"`
 }
 
-type RequestTemplatePayloadView struct {
+type RequestTemplateResponsePairView struct {
 	RequestTemplate RequestTemplate           `json:"requestTemplate"`
 	Response        views.ResponseDetailsView `json:"response"`
 }
 
-type RequestTemplatePayloadJson struct {
-	Data *[]RequestTemplatePayloadView `json:"data"`
+type RequestTemplateResponsePairPayload struct {
+	Data *[]RequestTemplateResponsePairView `json:"data"`
 }
 
 type RequestTemplate struct {
@@ -71,7 +70,7 @@ func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserv
 }
 
 // ImportPayloads - a function to save given payloads into the database.
-func (this *RequestTemplateStore) ImportPayloads(payloadsView RequestTemplatePayloadJson) error {
+func (this *RequestTemplateStore) ImportPayloads(payloadsView RequestTemplateResponsePairPayload) error {
 	if len(*payloadsView.Data) > 0 {
 		// Convert PayloadView back to Payload for internal storage
 		payloads := payloadsView.ConvertToRequestTemplateStore()
@@ -114,40 +113,34 @@ func headerMatch(tmplHeaders, reqHeaders map[string][]string) bool {
 	return true
 }
 
-func (this *RequestTemplateStore) ConvertToPayloadJson() RequestTemplatePayloadJson {
-	var payloadViewList []RequestTemplatePayloadView
-	for _, v := range *this {
-		payloadViewList = append(payloadViewList, v.ConvertToRequestTemplatePayloadView())
+func (this *RequestTemplateStore) GetPayload() RequestTemplateResponsePairPayload {
+	var pairsPayload []RequestTemplateResponsePairView
+	for _, pair := range *this {
+		pairsPayload = append(pairsPayload, pair.ConvertToRequestTemplateResponsePairView())
 	}
-	return RequestTemplatePayloadJson{
-		Data: &payloadViewList,
+	return RequestTemplateResponsePairPayload{
+		Data: &pairsPayload,
 	}
 }
 
-func (this *RequestTemplatePayload) ConvertToRequestTemplatePayloadView() RequestTemplatePayloadView {
-	return RequestTemplatePayloadView{
+func (this *RequestTemplateResponsePair) ConvertToRequestTemplateResponsePairView() RequestTemplateResponsePairView {
+	return RequestTemplateResponsePairView{
 		RequestTemplate: this.RequestTemplate,
 		Response:        this.Response.ConvertToResponseDetailsView(),
 	}
 }
 
-func (this *RequestTemplatePayloadJson) ConvertToRequestTemplateStore() RequestTemplateStore {
+func (this *RequestTemplateResponsePairPayload) ConvertToRequestTemplateStore() RequestTemplateStore {
 	var requestTemplateStore RequestTemplateStore
-	for _, v := range *this.Data {
-		requestTemplateStore = append(requestTemplateStore, v.ConvertToPayload())
+	for _, pair := range *this.Data {
+		requestTemplateStore = append(requestTemplateStore, pair.ConvertToRequestTemplateResponsePair())
 	}
 	return requestTemplateStore
 }
 
-func (this *RequestTemplatePayloadView) ConvertToPayload() RequestTemplatePayload {
-	return RequestTemplatePayload{
+func (this *RequestTemplateResponsePairView) ConvertToRequestTemplateResponsePair() RequestTemplateResponsePair {
+	return RequestTemplateResponsePair{
 		RequestTemplate: this.RequestTemplate,
 		Response:        models.NewResponseDetialsFromResponseDetailsView(this.Response),
 	}
-}
-
-func isJSON(s string) bool {
-	var js map[string]interface{}
-	return json.Unmarshal([]byte(s), &js) == nil
-
 }

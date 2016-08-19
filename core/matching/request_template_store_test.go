@@ -12,7 +12,7 @@ func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 	response := models.ResponseDetails{
 		Body: "test-body",
 	}
-	templateEntry := RequestTemplatePayload{
+	templateEntry := RequestTemplateResponsePair{
 		RequestTemplate: RequestTemplate{},
 		Response:        response,
 	}
@@ -40,7 +40,7 @@ func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		"header1": []string{"val1"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := RequestTemplatePayload{
+	templateEntry := RequestTemplateResponsePair{
 		RequestTemplate: RequestTemplate{
 			Headers: headers,
 		},
@@ -72,7 +72,7 @@ func TestReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 		"header1": []string{"val1"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := RequestTemplatePayload{
+	templateEntry := RequestTemplateResponsePair{
 		RequestTemplate: RequestTemplate{
 			Headers: headers,
 		},
@@ -103,7 +103,7 @@ func TestReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 		"header1": []string{"val1"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := RequestTemplatePayload{
+	templateEntry := RequestTemplateResponsePair{
 		RequestTemplate: RequestTemplate{
 			Headers: headers,
 		},
@@ -134,7 +134,7 @@ func TestReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := RequestTemplatePayload{
+	templateEntry := RequestTemplateResponsePair{
 		RequestTemplate: RequestTemplate{
 			Headers: headers,
 		},
@@ -166,7 +166,7 @@ func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := RequestTemplatePayload{
+	templateEntry := RequestTemplateResponsePair{
 		RequestTemplate: RequestTemplate{
 			Headers: headers,
 		},
@@ -230,7 +230,7 @@ func TestEndpointMatchWithHeaders(t *testing.T) {
 	method := "GET"
 	path := "/a/1"
 	query := "q=test"
-	templateEntry := RequestTemplatePayload{
+	templateEntry := RequestTemplateResponsePair{
 		RequestTemplate: RequestTemplate{
 			Headers:     headers,
 			Destination: &destination,
@@ -271,7 +271,7 @@ func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 	method := "GET"
 	path := "/a/1"
 	query := "q=test"
-	templateEntry := RequestTemplatePayload{
+	templateEntry := RequestTemplateResponsePair{
 		RequestTemplate: RequestTemplate{
 			Headers:     headers,
 			Destination: &destination,
@@ -309,7 +309,7 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 	method := "GET"
 	path := ""
 	query := "q=test"
-	templateEntry := RequestTemplatePayload{
+	templateEntry := RequestTemplateResponsePair{
 		RequestTemplate: RequestTemplate{
 			Destination: &destination,
 			Path:        &path,

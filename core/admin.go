@@ -613,7 +613,7 @@ func (d *Hoverfly) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 
 // AllRecordsHandler returns JSON content type http response
 func (d *Hoverfly) GetAllTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	payloadJson := d.RequestMatcher.TemplateStore.ConvertToPayloadJson()
+	payloadJson := d.RequestMatcher.TemplateStore.GetPayload()
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -630,7 +630,7 @@ func (d *Hoverfly) GetAllTemplatesHandler(w http.ResponseWriter, req *http.Reque
 
 func (d *Hoverfly) ImportTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var payload matching.RequestTemplatePayloadJson
+	var payload matching.RequestTemplateResponsePairPayload
 
 	defer req.Body.Close()
 	body, err := ioutil.ReadAll(req.Body)

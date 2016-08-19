@@ -57,7 +57,7 @@ func TestGetAllTemplatesWTemplates(t *testing.T) {
 	method := "GET"
 	path := "/a/1"
 	query := "q=test"
-	templateEntry := matching.RequestTemplatePayload{
+	templateEntry := matching.RequestTemplateResponsePair{
 		RequestTemplate: matching.RequestTemplate{
 			Headers:     headers,
 			Destination: &destination,
@@ -84,7 +84,7 @@ func TestGetAllTemplatesWTemplates(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rr := matching.RequestTemplatePayloadJson{}
+	rr := matching.RequestTemplateResponsePairPayload{}
 	err = json.Unmarshal(body, &rr)
 
 	// check the json given is correct to construct the request template store
@@ -113,7 +113,7 @@ func TestExportImportTemplates(t *testing.T) {
 	method := "GET"
 	path := "/a/1"
 	query := "q=test"
-	templateEntry := matching.RequestTemplatePayload{
+	templateEntry := matching.RequestTemplateResponsePair{
 		RequestTemplate: matching.RequestTemplate{
 			Headers:     headers,
 			Destination: &destination,
@@ -173,7 +173,7 @@ func TestDeleteTemplates(t *testing.T) {
 	method := "GET"
 	path := "/a/1"
 	query := "q=test"
-	templateEntry := matching.RequestTemplatePayload{
+	templateEntry := matching.RequestTemplateResponsePair{
 		RequestTemplate: matching.RequestTemplate{
 			Headers:     headers,
 			Destination: &destination,
