@@ -117,7 +117,7 @@ func ExecuteMiddlewareLocally(middlewares string, payload models.Payload) (model
 	}
 
 	if len(mwOutput) > 0 {
-		var newPayloadView views.PayloadView
+		var newPayloadView views.RequestResponsePairView
 
 		err = json.Unmarshal(mwOutput, &newPayloadView)
 
@@ -180,7 +180,7 @@ func ExecuteMiddlewareRemotely(middleware string, payload models.Payload) (model
 		return payload, err
 	}
 
-	var newPayloadView views.PayloadView
+	var newPayloadView views.RequestResponsePairView
 
 	err = json.Unmarshal(newPayloadBytes, &newPayloadView)
 	if err != nil {

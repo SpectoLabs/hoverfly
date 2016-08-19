@@ -33,7 +33,7 @@ func TestGetAllTemplates(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rr := views.PayloadViewData{}
+	rr := views.RequestResponsePairPayload{}
 	err = json.Unmarshal(body, &rr)
 
 	Expect(rr.Data).To(HaveLen(0))

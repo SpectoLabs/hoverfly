@@ -63,8 +63,8 @@ func (p *Payload) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (p *Payload) ConvertToPayloadView() *views.PayloadView {
-	return &views.PayloadView{Response: p.Response.ConvertToResponseDetailsView(), Request: p.Request.ConvertToRequestDetailsView()}
+func (p *Payload) ConvertToPayloadView() *views.RequestResponsePairView {
+	return &views.RequestResponsePairView{Response: p.Response.ConvertToResponseDetailsView(), Request: p.Request.ConvertToRequestDetailsView()}
 }
 
 // NewPayloadFromBytes decodes supplied bytes into Payload structure
@@ -79,7 +79,7 @@ func NewPayloadFromBytes(data []byte) (*Payload, error) {
 	return p, nil
 }
 
-func NewPayloadFromPayloadView(data views.PayloadView) Payload {
+func NewPayloadFromPayloadView(data views.RequestResponsePairView) Payload {
 	return Payload{
 		Response: NewResponseDetialsFromResponseDetailsView(data.Response),
 		Request:  NewRequestDetailsFromRequestDetailsView(data.Request),

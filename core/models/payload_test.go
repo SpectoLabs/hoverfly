@@ -122,7 +122,7 @@ func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 
 	payloadView := originalPayload.ConvertToPayloadView()
 
-	Expect(*payloadView).To(Equal(views.PayloadView{
+	Expect(*payloadView).To(Equal(views.RequestResponsePairView{
 		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        respBody,
@@ -161,7 +161,7 @@ func TestPayload_ConvertToPayloadView_WithGzippedResponse(t *testing.T) {
 
 	payloadView := originalPayload.ConvertToPayloadView()
 
-	Expect(*payloadView).To(Equal(views.PayloadView{
+	Expect(*payloadView).To(Equal(views.RequestResponsePairView{
 		Response: views.ResponseDetailsView{
 			Status:      200,
 			Body:        "H4sIAAAJbogA/w==",
@@ -212,7 +212,7 @@ func GzipString(s string) string {
 func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
-	view := views.PayloadView{
+	view := views.RequestResponsePairView{
 		Request: views.RequestDetailsView{
 			Path:        "A",
 			Method:      "A",
@@ -265,7 +265,7 @@ func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 func TestPayloadViewData_ConvertToPayloadDataWithEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
-	view := views.PayloadView{
+	view := views.RequestResponsePairView{
 		Response: views.ResponseDetailsView{
 			Body:        "ZW5jb2RlZA==",
 			EncodedBody: true,

@@ -89,7 +89,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
 	}
 
-	var requests views.PayloadViewData
+	var requests views.RequestResponsePairPayload
 
 	jsonParser := json.NewDecoder(payloadsFile)
 	if err = jsonParser.Decode(&requests); err != nil {
@@ -109,7 +109,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Failed to fetch given URL, error %s", err.Error())
 	}
 
-	var requests views.PayloadViewData
+	var requests views.RequestResponsePairPayload
 
 	jsonParser := json.NewDecoder(resp.Body)
 	if err = jsonParser.Decode(&requests); err != nil {
@@ -126,7 +126,7 @@ func isJSON(s string) bool {
 }
 
 // ImportPayloads - a function to save given payloads into the database.
-func (hf *Hoverfly) ImportPayloads(payloads []views.PayloadView) error {
+func (hf *Hoverfly) ImportPayloads(payloads []views.RequestResponsePairView) error {
 	if len(payloads) > 0 {
 		success := 0
 		failed := 0

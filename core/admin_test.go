@@ -33,7 +33,7 @@ func TestGetAllRecords(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rr := views.PayloadViewData{}
+	rr := views.RequestResponsePairPayload{}
 	err = json.Unmarshal(body, &rr)
 
 	Expect(len(rr.Data)).To(Equal(0))
@@ -67,7 +67,7 @@ func TestGetAllRecordsWRecords(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rr := views.PayloadViewData{}
+	rr := views.RequestResponsePairPayload{}
 	err = json.Unmarshal(body, &rr)
 
 	Expect(len(rr.Data)).To(Equal(5))

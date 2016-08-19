@@ -278,7 +278,7 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 		return
 	}
 
-	var payloads []views.PayloadView
+	var payloads []views.RequestResponsePairView
 
 	for _, v := range records {
 		if payload, err := models.NewPayloadFromBytes(v); err == nil {
@@ -293,7 +293,7 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var response views.PayloadViewData
+	var response views.RequestResponsePairPayload
 	response.Data = payloads
 	b, err := json.Marshal(response)
 
@@ -432,7 +432,7 @@ func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 // ImportRecordsHandler - accepts JSON payload and saves it to cache
 func (d *Hoverfly) ImportRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var requests views.PayloadViewData
+	var requests views.RequestResponsePairPayload
 
 	defer req.Body.Close()
 	body, err := ioutil.ReadAll(req.Body)
@@ -534,7 +534,7 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 
 	p := models.Payload{Request: preq, Response: presp}
 
-	var pls []views.PayloadView
+	var pls []views.RequestResponsePairView
 
 	pls = append(pls, *p.ConvertToPayloadView())
 

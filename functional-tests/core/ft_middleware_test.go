@@ -15,7 +15,7 @@ import (
 
 func checkHeadersHttpMiddleware(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
-	var newPayloadView views.PayloadView
+	var newPayloadView views.RequestResponsePairView
 
 	json.Unmarshal(body, &newPayloadView)
 
