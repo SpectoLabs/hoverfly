@@ -40,14 +40,14 @@ func TestPayloadSetGet(t *testing.T) {
 		Body:   "body here",
 	}
 
-	payload := models.Payload{Response: resp}
+	payload := models.RequestResponsePair{Response: resp}
 	bts, err := json.Marshal(payload)
 	Expect(err).To(BeNil())
 
 	err = dbClient.RequestCache.Set(key, bts)
 	Expect(err).To(BeNil())
 
-	var p models.Payload
+	var p models.RequestResponsePair
 	payloadBts, err := dbClient.RequestCache.Get(key)
 	err = json.Unmarshal(payloadBts, &p)
 	Expect(err).To(BeNil())

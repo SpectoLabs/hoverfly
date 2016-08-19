@@ -162,7 +162,7 @@ func TestImportPayloads_CanImportASinglePayload(t *testing.T) {
 	hv.ImportPayloads([]views.RequestResponsePairView{originalPayload})
 	value, _ := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	decodedPayload, _ := models.NewPayloadFromBytes(value)
-	Expect(*decodedPayload).To(Equal(models.Payload{
+	Expect(*decodedPayload).To(Equal(models.RequestResponsePair{
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "hello_world",
@@ -268,7 +268,7 @@ func TestImportPayloads_CanImportASingleBase64EncodedPayload(t *testing.T) {
 	decodedPayload, err := models.NewPayloadFromBytes(value)
 	Expect(err).To(BeNil())
 
-	Expect(decodedPayload).ToNot(Equal(models.Payload{
+	Expect(decodedPayload).ToNot(Equal(models.RequestResponsePair{
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "hello_world",

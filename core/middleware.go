@@ -58,7 +58,7 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 }
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
-func ExecuteMiddlewareLocally(middlewares string, payload models.Payload) (models.Payload, error) {
+func ExecuteMiddlewareLocally(middlewares string, payload models.RequestResponsePair) (models.RequestResponsePair, error) {
 
 	mws := strings.Split(middlewares, "|")
 	var cmdList []*exec.Cmd
@@ -148,7 +148,7 @@ func ExecuteMiddlewareLocally(middlewares string, payload models.Payload) (model
 
 }
 
-func ExecuteMiddlewareRemotely(middleware string, payload models.Payload) (models.Payload, error) {
+func ExecuteMiddlewareRemotely(middleware string, payload models.RequestResponsePair) (models.RequestResponsePair, error) {
 	bts, err := json.Marshal(payload.ConvertToPayloadView())
 
 	req, err := http.NewRequest("POST", middleware, bytes.NewBuffer(bts))

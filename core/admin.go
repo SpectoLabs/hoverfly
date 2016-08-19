@@ -532,7 +532,7 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 		"contentType": contentType,
 	}).Info("manually adding request/response")
 
-	p := models.Payload{Request: preq, Response: presp}
+	p := models.RequestResponsePair{Request: preq, Response: presp}
 
 	var pls []views.RequestResponsePairView
 

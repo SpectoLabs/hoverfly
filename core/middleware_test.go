@@ -20,7 +20,7 @@ func TestChangeBodyMiddleware(t *testing.T) {
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
-	payload := models.Payload{Response: resp, Request: req}
+	payload := models.RequestResponsePair{Response: resp, Request: req}
 
 	newPayload, err := ExecuteMiddlewareLocally(command, payload)
 
@@ -36,7 +36,7 @@ func TestMalformedPayloadMiddleware(t *testing.T) {
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
-	payload := models.Payload{Response: resp, Request: req}
+	payload := models.RequestResponsePair{Response: resp, Request: req}
 
 	newPayload, err := ExecuteMiddlewareLocally(command, payload)
 
@@ -52,7 +52,7 @@ func TestMakeCustom404(t *testing.T) {
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
-	payload := models.Payload{Response: resp, Request: req}
+	payload := models.RequestResponsePair{Response: resp, Request: req}
 
 	newPayload, err := ExecuteMiddlewareLocally(command, payload)
 
@@ -69,7 +69,7 @@ func TestReflectBody(t *testing.T) {
 
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: "", Body: "request_body_here"}
 
-	payload := models.Payload{Request: req}
+	payload := models.RequestResponsePair{Request: req}
 
 	newPayload, err := ExecuteMiddlewareLocally(command, payload)
 
@@ -108,7 +108,7 @@ func TestExecuteMiddlewareRemotely(t *testing.T) {
 	server := httptest.NewServer(muxRouter)
 	defer server.Close()
 
-	testPayload := models.Payload{
+	testPayload := models.RequestResponsePair{
 		Response: models.ResponseDetails{
 			Body: "Normal body",
 		},
@@ -129,7 +129,7 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSamePayload(t 
 	server := httptest.NewServer(muxRouter)
 	defer server.Close()
 
-	testPayload := models.Payload{
+	testPayload := models.RequestResponsePair{
 		Response: models.ResponseDetails{
 			Body: "Normal body",
 		},
@@ -150,7 +150,7 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfNoPayloadOnResponse_AnOriginalP
 	server := httptest.NewServer(muxRouter)
 	defer server.Close()
 
-	testPayload := models.Payload{
+	testPayload := models.RequestResponsePair{
 		Response: models.ResponseDetails{
 			Body: "Normal body",
 		},

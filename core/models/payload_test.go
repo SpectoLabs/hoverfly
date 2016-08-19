@@ -105,7 +105,7 @@ func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 
 	respBody := "hello_world"
 
-	originalPayload := Payload{
+	originalPayload := RequestResponsePair{
 		Response: ResponseDetails{
 			Status:  200,
 			Body:    respBody,
@@ -143,7 +143,7 @@ func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 func TestPayload_ConvertToPayloadView_WithGzippedResponse(t *testing.T) {
 	RegisterTestingT(t)
 
-	originalPayload := Payload{
+	originalPayload := RequestResponsePair{
 		Response: ResponseDetails{
 			Status:  200,
 			Body:    GzipString("hello_world"),
@@ -238,7 +238,7 @@ func TestPayloadViewData_ConvertToPayloadDataWithoutEncoding(t *testing.T) {
 
 	payload := NewPayloadFromPayloadView(view)
 
-	Expect(payload).To(Equal(Payload{
+	Expect(payload).To(Equal(RequestResponsePair{
 		Request: RequestDetails{
 			Path:        "A",
 			Method:      "A",

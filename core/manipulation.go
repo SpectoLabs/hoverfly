@@ -15,11 +15,11 @@ import (
 // and also holds payload
 type Constructor struct {
 	request *http.Request
-	payload models.Payload
+	payload models.RequestResponsePair
 }
 
 // NewConstructor - returns constructor instance
-func NewConstructor(req *http.Request, payload models.Payload) *Constructor {
+func NewConstructor(req *http.Request, payload models.RequestResponsePair) *Constructor {
 	c := &Constructor{request: req, payload: payload}
 	return c
 }
@@ -27,7 +27,7 @@ func NewConstructor(req *http.Request, payload models.Payload) *Constructor {
 // ApplyMiddleware - activates given middleware, middleware should be passed as string to executable, can be
 // full path.
 func (c *Constructor) ApplyMiddleware(middleware string) error {
-	var newPayload models.Payload
+	var newPayload models.RequestResponsePair
 	var err error
 
 	if isMiddlewareLocal(middleware) {

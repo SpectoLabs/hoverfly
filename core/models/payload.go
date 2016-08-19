@@ -39,50 +39,50 @@ func init() {
 }
 
 // Payload structure holds request and response structure
-type Payload struct {
+type RequestResponsePair struct {
 	Response ResponseDetails `json:"response"`
 	Request  RequestDetails  `json:"request"`
 }
 
-func (p Payload) Id() string {
-	return p.Request.Hash()
+func (this RequestResponsePair) Id() string {
+	return this.Request.Hash()
 }
 
-func (p Payload) IdWithoutHost() string {
-	return p.Request.HashWithoutHost()
+func (this RequestResponsePair) IdWithoutHost() string {
+	return this.Request.HashWithoutHost()
 }
 
 // Encode method encodes all exported Payload fields to bytes
-func (p *Payload) Encode() ([]byte, error) {
+func (this *RequestResponsePair) Encode() ([]byte, error) {
 	buf := new(bytes.Buffer)
 	enc := gob.NewEncoder(buf)
-	err := enc.Encode(p)
+	err := enc.Encode(this)
 	if err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
 }
 
-func (p *Payload) ConvertToPayloadView() *views.RequestResponsePairView {
-	return &views.RequestResponsePairView{Response: p.Response.ConvertToResponseDetailsView(), Request: p.Request.ConvertToRequestDetailsView()}
+func (this *RequestResponsePair) ConvertToPayloadView() *views.RequestResponsePairView {
+	return &views.RequestResponsePairView{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
 }
 
 // NewPayloadFromBytes decodes supplied bytes into Payload structure
-func NewPayloadFromBytes(data []byte) (*Payload, error) {
-	var p *Payload
+func NewPayloadFromBytes(data []byte) (*RequestResponsePair, error) {
+	var pair *RequestResponsePair
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
-	err := dec.Decode(&p)
+	err := dec.Decode(&pair)
 	if err != nil {
 		return nil, err
 	}
-	return p, nil
+	return pair, nil
 }
 
-func NewPayloadFromPayloadView(data views.RequestResponsePairView) Payload {
-	return Payload{
-		Response: NewResponseDetialsFromResponseDetailsView(data.Response),
-		Request:  NewRequestDetailsFromRequestDetailsView(data.Request),
+func NewPayloadFromPayloadView(pairView views.RequestResponsePairView) RequestResponsePair {
+	return RequestResponsePair{
+		Response: NewResponseDetialsFromResponseDetailsView(pairView.Response),
+		Request:  NewRequestDetailsFromRequestDetailsView(pairView.Request),
 	}
 }
 
@@ -109,16 +109,16 @@ func NewRequestDetailsFromRequestDetailsView(data views.RequestDetailsView) Requ
 	}
 }
 
-func (r *RequestDetails) ConvertToRequestDetailsView() views.RequestDetailsView {
+func (this *RequestDetails) ConvertToRequestDetailsView() views.RequestDetailsView {
 	return views.RequestDetailsView{
 		RequestType: "snapshot",
-		Path:        r.Path,
-		Method:      r.Method,
-		Destination: r.Destination,
-		Scheme:      r.Scheme,
-		Query:       r.Query,
-		Body:        r.Body,
-		Headers:     r.Headers,
+		Path:        this.Path,
+		Method:      this.Method,
+		Destination: this.Destination,
+		Scheme:      this.Scheme,
+		Query:       this.Query,
+		Body:        this.Body,
+		Headers:     this.Headers,
 	}
 }
 

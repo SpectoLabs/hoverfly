@@ -88,7 +88,7 @@ func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.Res
 	return &payload.Response, nil
 }
 
-func (this *RequestMatcher) SavePayload(payload *models.Payload) error {
+func (this *RequestMatcher) SavePayload(payload *models.RequestResponsePair) error {
 	var key string
 
 	if *this.Webserver {

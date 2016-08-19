@@ -13,7 +13,7 @@ func Test_rebuildHashes_whenDataIsHashedForAProxy_andStillAProxy_keysAreNotChang
 
 	db := cache.NewInMemoryCache()
 
-	testPayload := models.Payload{
+	testPayload := models.RequestResponsePair{
 		Request: models.RequestDetails{
 			Path:        "/hello",
 			Destination: "a-host.com",
@@ -41,7 +41,7 @@ func Test_rebuildHashes_whenDataIsHashedForAWebserver_andStillAWebserver_keysAre
 
 	db := cache.NewInMemoryCache()
 
-	testPayload := models.Payload{
+	testPayload := models.RequestResponsePair{
 		Request: models.RequestDetails{
 			Path:        "/hello",
 			Destination: "a-host.com",
@@ -69,7 +69,7 @@ func Test_rebuildHashes_whenDataIsHashedForAProxy_andIsNowAWebserver_keysAreChan
 
 	db := cache.NewInMemoryCache()
 
-	testPayload := models.Payload{
+	testPayload := models.RequestResponsePair{
 		Request: models.RequestDetails{
 			Path:        "/hello",
 			Destination: "a-host.com",

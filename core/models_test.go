@@ -113,7 +113,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 			Status: 200,
 			Body:   fmt.Sprintf("body here, number=%d", i),
 		}
-		payload := models.Payload{Response: resp}
+		payload := models.RequestResponsePair{Response: resp}
 
 		// creating response
 		c := NewConstructor(request, payload)
@@ -219,7 +219,7 @@ func TestPayloadEncodeDecode(t *testing.T) {
 		Body:   "body here",
 	}
 
-	payload := models.Payload{Response: resp}
+	payload := models.RequestResponsePair{Response: resp}
 
 	bts, err := payload.Encode()
 	Expect(err).To(BeNil())
@@ -233,7 +233,7 @@ func TestPayloadEncodeDecode(t *testing.T) {
 func TestPayloadEncodeEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
-	payload := models.Payload{}
+	payload := models.RequestResponsePair{}
 
 	bts, err := payload.Encode()
 	Expect(err).To(BeNil())

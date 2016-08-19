@@ -156,7 +156,7 @@ func (hf *Hoverfly) SetMiddleware(middleware string) error {
 		hf.Cfg.Middleware = middleware
 		return nil
 	}
-	testPayload := models.Payload{
+	testPayload := models.RequestResponsePair{
 		Request: models.RequestDetails{
 			Path:        "/",
 			Method:      "GET",
@@ -342,7 +342,7 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 
 	if hf.Cfg.Middleware != "" {
 		// middleware is provided, modifying request
-		var payload models.Payload
+		var payload models.RequestResponsePair
 
 		rd, err := getRequestDetails(request)
 		if err != nil {
@@ -433,7 +433,7 @@ func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 		return hoverflyError(req, matchErr, matchErr.Error(), matchErr.StatusCode)
 	}
 
-	payload := &models.Payload{
+	payload := &models.RequestResponsePair{
 		Request:  requestDetails,
 		Response: *responseDetails,
 	}
@@ -489,7 +489,7 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) 
 		Headers: resp.Header,
 	}
 
-	payload := models.Payload{Response: r, Request: rd}
+	payload := models.RequestResponsePair{Response: r, Request: rd}
 
 	c := NewConstructor(req, payload)
 	// applying middleware to modify response
@@ -541,7 +541,7 @@ func (hf *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response,
 			Headers:     req.Header,
 		}
 
-		payload := models.Payload{
+		payload := models.RequestResponsePair{
 			Response: responseObj,
 			Request:  requestObj,
 		}
