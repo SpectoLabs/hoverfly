@@ -268,35 +268,7 @@ func getBoneRouter(d *Hoverfly) *bone.Mux {
 func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	records, err := d.RequestCache.GetAllValues()
 
-	if err == nil {
-
-		var payloads []views.PayloadView
-
-		for _, v := range records {
-			if payload, err := models.NewPayloadFromBytes(v); err == nil {
-				payloadView := payload.ConvertToPayloadView()
-				payloads = append(payloads, *payloadView)
-			} else {
-				log.Error(err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-
-		var response views.PayloadViewData
-		response.Data = payloads
-		b, err := json.Marshal(response)
-
-		if err != nil {
-			log.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		} else {
-			w.Write(b)
-			return
-		}
-	} else {
+	if err != nil {
 		log.WithFields(log.Fields{
 			"Error": err.Error(),
 		}).Error("Failed to get data from cache!")
@@ -305,6 +277,33 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 		w.WriteHeader(500) // can't process this entity
 		return
 	}
+
+	var payloads []views.PayloadView
+
+	for _, v := range records {
+		if payload, err := models.NewPayloadFromBytes(v); err == nil {
+			payloadView := payload.ConvertToPayloadView()
+			payloads = append(payloads, *payloadView)
+		} else {
+			log.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var response views.PayloadViewData
+	response.Data = payloads
+	b, err := json.Marshal(response)
+
+	if err != nil {
+		log.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	w.Write(b)
+	return
 }
 
 // RecordsCount returns number of captured requests as a JSON payload
