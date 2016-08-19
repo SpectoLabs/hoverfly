@@ -12,6 +12,7 @@ type PayloadView struct {
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsView struct {
+	RequestType string              `json:"requestType"`
 	Path        string              `json:"path"`
 	Method      string              `json:"method"`
 	Destination string              `json:"destination"`

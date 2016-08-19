@@ -27,6 +27,7 @@ var _ = Describe("When I use hoverctl", func() {
 					{
 						"data": [{
 							"request": {
+								"requestType": "snapshot",
 								"path": "/api/bookings",
 								"method": "POST",
 								"destination": "www.my-test.com",

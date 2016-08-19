@@ -129,6 +129,7 @@ func TestPayload_ConvertToPayloadView_WithPlainTextResponse(t *testing.T) {
 			Headers:     map[string][]string{"test_header": []string{"true"}},
 			EncodedBody: false},
 		Request: views.RequestDetailsView{
+			RequestType: "snapshot",
 			Path:        "/",
 			Method:      "GET",
 			Destination: "/",
@@ -167,6 +168,7 @@ func TestPayload_ConvertToPayloadView_WithGzippedResponse(t *testing.T) {
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 			EncodedBody: true},
 		Request: views.RequestDetailsView{
+			RequestType: "snapshot",
 			Path:        "/",
 			Method:      "GET",
 			Destination: "/",

@@ -111,6 +111,7 @@ func NewRequestDetailsFromRequestDetailsView(data views.RequestDetailsView) Requ
 
 func (r *RequestDetails) ConvertToRequestDetailsView() views.RequestDetailsView {
 	return views.RequestDetailsView{
+		RequestType: "snapshot",
 		Path:        r.Path,
 		Method:      r.Method,
 		Destination: r.Destination,

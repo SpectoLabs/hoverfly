@@ -73,6 +73,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 						}
 					      },
 					      "request": {
+					      	"requestType": "snapshot",
 						"path": "/",
 						"method": "GET",
 						"destination": "%v",
@@ -142,6 +143,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 						}
 					      },
 					      "request": {
+					      	"requestType": "snapshot",
 						"path": "/",
 						"method": "GET",
 						"destination": "%v",
