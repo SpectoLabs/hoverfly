@@ -13,11 +13,11 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 	Context("With a request template loaded for matching on URL + headers", func() {
 
 		var (
-			jsonPayload *bytes.Buffer
+			jsonRequestResponsePair *bytes.Buffer
 		)
 
 		BeforeEach(func() {
-			jsonPayload = bytes.NewBufferString(`{"data":[{"requestTemplate": {"path": "/path1", "method": "GET", "destination": "www.virtual.com"}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}, {"requestTemplate": {"path": "/path2", "method": "GET", "destination": "www.virtual.com", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
+			jsonRequestResponsePair = bytes.NewBufferString(`{"data":[{"requestTemplate": {"path": "/path1", "method": "GET", "destination": "www.virtual.com"}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}, {"requestTemplate": {"path": "/path2", "method": "GET", "destination": "www.virtual.com", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
 
 		})
 
@@ -26,7 +26,7 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 			BeforeEach(func() {
 				hoverflyCmd = startHoverfly(adminPort, proxyPort)
 				SetHoverflyMode("simulate")
-				ImportHoverflyTemplates(jsonPayload)
+				ImportHoverflyTemplates(jsonRequestResponsePair)
 			})
 
 			AfterEach(func() {
@@ -46,7 +46,7 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 
 			BeforeEach(func() {
 				hoverflyCmd = startHoverflyWebServer(adminPort, proxyPort)
-				ImportHoverflyTemplates(jsonPayload)
+				ImportHoverflyTemplates(jsonRequestResponsePair)
 			})
 
 			It("Should find a match", func() {

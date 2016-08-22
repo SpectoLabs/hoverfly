@@ -169,11 +169,11 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 	Context("When running in simulate mode", func() {
 
 		var (
-			jsonPayload *bytes.Buffer
+			jsonRequestResponsePair *bytes.Buffer
 		)
 
 		BeforeEach(func() {
-			jsonPayload = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1", "value2"]}}}, {"request": {"path": "/path2", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
+			jsonRequestResponsePair = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1", "value2"]}}}, {"request": {"path": "/path2", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
 		})
 
 		Context("without middleware", func() {
@@ -181,7 +181,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			BeforeEach(func() {
 				hoverflyCmd = startHoverfly(adminPort, proxyPort)
 				SetHoverflyMode("simulate")
-				ImportHoverflyRecords(jsonPayload)
+				ImportHoverflyRecords(jsonRequestResponsePair)
 			})
 
 			AfterEach(func() {
@@ -203,7 +203,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			BeforeEach(func() {
 				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/middleware.py")
 				SetHoverflyMode("simulate")
-				ImportHoverflyRecords(jsonPayload)
+				ImportHoverflyRecords(jsonRequestResponsePair)
 			})
 
 			It("should apply middleware to the cached response", func() {

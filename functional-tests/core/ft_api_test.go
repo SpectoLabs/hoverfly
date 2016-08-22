@@ -11,21 +11,21 @@ import (
 var _ = Describe("Interacting with the API", func() {
 
 	var (
-		jsonPayload1 *bytes.Buffer
-		jsonPayload2 *bytes.Buffer
+		jsonRequestResponsePair1 *bytes.Buffer
+		jsonRequestResponsePair2 *bytes.Buffer
 	)
 
 	BeforeEach(func() {
-		jsonPayload1 = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "method1", "destination": "destination1", "scheme": "scheme1", "query": "query1", "body": "body1", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
-		jsonPayload2 = bytes.NewBufferString(`{"data":[{"request": {"path": "/path2", "method": "method2", "destination": "destination2", "scheme": "scheme2", "query": "query2", "body": "body2", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "encodedBody": false, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
+		jsonRequestResponsePair1 = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "method1", "destination": "destination1", "scheme": "scheme1", "query": "query1", "body": "body1", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
+		jsonRequestResponsePair2 = bytes.NewBufferString(`{"data":[{"request": {"path": "/path2", "method": "method2", "destination": "destination2", "scheme": "scheme2", "query": "query2", "body": "body2", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "encodedBody": false, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
 	})
 
 	Context("GET /api/records", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
-			ImportHoverflyRecords(jsonPayload1)
-			ImportHoverflyRecords(jsonPayload2)
+			ImportHoverflyRecords(jsonRequestResponsePair1)
+			ImportHoverflyRecords(jsonRequestResponsePair2)
 		})
 
 		AfterEach(func() {
@@ -38,8 +38,8 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			recordsJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(recordsJson).To(ContainSubstring(jsonPayload1.String()))
-			Expect(recordsJson).To(ContainSubstring(jsonPayload2.String()))
+			Expect(recordsJson).To(ContainSubstring(jsonRequestResponsePair1.String()))
+			Expect(recordsJson).To(ContainSubstring(jsonRequestResponsePair2.String()))
 		})
 	})
 
@@ -47,8 +47,8 @@ var _ = Describe("Interacting with the API", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
-			ImportHoverflyRecords(jsonPayload1)
-			ImportHoverflyRecords(jsonPayload2)
+			ImportHoverflyRecords(jsonRequestResponsePair1)
+			ImportHoverflyRecords(jsonRequestResponsePair2)
 		})
 
 		AfterEach(func() {
@@ -88,7 +88,7 @@ var _ = Describe("Interacting with the API", func() {
 
 		Context("When no records exist", func() {
 			It("Should create the records", func() {
-				res := DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonPayload1))
+				res := DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonRequestResponsePair1))
 				Expect(res.StatusCode).To(Equal(200))
 
 				reqGet := sling.New().Get(hoverflyAdminUrl + "/api/records")
@@ -138,11 +138,11 @@ var _ = Describe("Interacting with the API", func() {
 		Context("When a record already exists", func() {
 
 			BeforeEach(func() {
-				ImportHoverflyRecords(jsonPayload1)
+				ImportHoverflyRecords(jsonRequestResponsePair1)
 			})
 
 			It("Should append the records to the existing ones", func() {
-				res := DoRequest(sling.New().Post(hoverflyAdminUrl+"/api/records").Set("Content-Type", "application/json").Body(jsonPayload2))
+				res := DoRequest(sling.New().Post(hoverflyAdminUrl+"/api/records").Set("Content-Type", "application/json").Body(jsonRequestResponsePair2))
 				Expect(res.StatusCode).To(Equal(200))
 
 				reqGet := sling.New().Get(hoverflyAdminUrl + "/api/records")
@@ -152,8 +152,8 @@ var _ = Describe("Interacting with the API", func() {
 
 				recordsJson, err := ioutil.ReadAll(resGet.Body)
 				Expect(err).To(BeNil())
-				Expect(recordsJson).To(ContainSubstring(jsonPayload1.String()))
-				Expect(recordsJson).To(ContainSubstring(jsonPayload2.String()))
+				Expect(recordsJson).To(ContainSubstring(jsonRequestResponsePair1.String()))
+				Expect(recordsJson).To(ContainSubstring(jsonRequestResponsePair2.String()))
 			})
 		})
 	})

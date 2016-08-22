@@ -11,21 +11,21 @@ import (
 var _ = Describe("Interacting with the API", func() {
 
 	var (
-		jsonPayload1 *bytes.Buffer
-		jsonPayload2 *bytes.Buffer
+		jsonRequestResponsePair1 *bytes.Buffer
+		jsonRequestResponsePair2 *bytes.Buffer
 	)
 
 	BeforeEach(func() {
-		jsonPayload1 = bytes.NewBufferString(`{"data":[{"requestTemplate": {"path": "/path1", "method": "method1", "destination": "destination1", "scheme": "scheme1", "query": "query1", "body": "body1", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
-		jsonPayload2 = bytes.NewBufferString(`{"data":[{"requestTemplate": {"path": "/path2", "method": "method2", "destination": "destination2", "scheme": "scheme2", "query": "query2", "body": "body2", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "encodedBody": false, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
+		jsonRequestResponsePair1 = bytes.NewBufferString(`{"data":[{"requestTemplate": {"path": "/path1", "method": "method1", "destination": "destination1", "scheme": "scheme1", "query": "query1", "body": "body1", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
+		jsonRequestResponsePair2 = bytes.NewBufferString(`{"data":[{"requestTemplate": {"path": "/path2", "method": "method2", "destination": "destination2", "scheme": "scheme2", "query": "query2", "body": "body2", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "encodedBody": false, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
 	})
 
 	Context("GET /api/templates", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
-			ImportHoverflyTemplates(jsonPayload1)
-			ImportHoverflyTemplates(jsonPayload2)
+			ImportHoverflyTemplates(jsonRequestResponsePair1)
+			ImportHoverflyTemplates(jsonRequestResponsePair2)
 		})
 
 		AfterEach(func() {
@@ -101,8 +101,8 @@ var _ = Describe("Interacting with the API", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
-			ImportHoverflyTemplates(jsonPayload1)
-			ImportHoverflyTemplates(jsonPayload2)
+			ImportHoverflyTemplates(jsonRequestResponsePair1)
+			ImportHoverflyTemplates(jsonRequestResponsePair2)
 		})
 
 		AfterEach(func() {
@@ -142,7 +142,7 @@ var _ = Describe("Interacting with the API", func() {
 
 		Context("When no templates exist", func() {
 			It("Should create the templates", func() {
-				res := DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/templates").Body(jsonPayload1))
+				res := DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/templates").Body(jsonRequestResponsePair1))
 				Expect(res.StatusCode).To(Equal(200))
 
 				reqGet := sling.New().Get(hoverflyAdminUrl + "/api/templates")
@@ -188,11 +188,11 @@ var _ = Describe("Interacting with the API", func() {
 		Context("When a record already exists", func() {
 
 			BeforeEach(func() {
-				ImportHoverflyTemplates(jsonPayload1)
+				ImportHoverflyTemplates(jsonRequestResponsePair1)
 			})
 
 			It("Should append the templates to the existing ones", func() {
-				res := DoRequest(sling.New().Post(hoverflyAdminUrl+"/api/templates").Set("Content-Type", "application/json").Body(jsonPayload2))
+				res := DoRequest(sling.New().Post(hoverflyAdminUrl+"/api/templates").Set("Content-Type", "application/json").Body(jsonRequestResponsePair2))
 				Expect(res.StatusCode).To(Equal(200))
 
 				reqGet := sling.New().Get(hoverflyAdminUrl + "/api/templates")

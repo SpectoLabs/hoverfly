@@ -52,15 +52,15 @@ var _ = Describe("Running Hoverfly with delays", func() {
 	Context("When running in simulate mode", func() {
 
 		var (
-			jsonPayload *bytes.Buffer
+			jsonRequestResponsePair *bytes.Buffer
 		)
 
 		BeforeEach(func() {
-			jsonPayload = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}, {"request": {"path": "/path2", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
+			jsonRequestResponsePair = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}, {"request": {"path": "/path2", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
 			SetHoverflyResponseDelays("testdata/delays.json")
 			SetHoverflyMode("simulate")
-			ImportHoverflyRecords(jsonPayload)
+			ImportHoverflyRecords(jsonRequestResponsePair)
 		})
 
 		It("should delay returning the cached response", func() {
