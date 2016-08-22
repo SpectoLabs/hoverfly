@@ -45,6 +45,7 @@ func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserv
 		if entry.RequestTemplate.Body != nil && *entry.RequestTemplate.Body != req.Body {
 			continue
 		}
+
 		if !webserver {
 			if entry.RequestTemplate.Destination != nil && *entry.RequestTemplate.Destination != req.Destination {
 				continue
@@ -87,6 +88,10 @@ func (this *RequestTemplateStore) ImportPayloads(pairPayload RequestTemplateResp
 		return nil
 	}
 	return fmt.Errorf("Bad request. Nothing to import!")
+}
+
+func (this *RequestTemplateStore) ImportRequestTemplateResponsePair(pair RequestTemplateResponsePair) {
+	*this = append(*this, pair)
 }
 
 func (this *RequestTemplateStore) Wipe() {

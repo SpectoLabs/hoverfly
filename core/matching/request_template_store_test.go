@@ -361,3 +361,37 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 
 	Expect(result).To(BeNil())
 }
+
+func TestImportRequestTemplateResponsePair_ShouldInsertAPairIntoTheArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	store := RequestTemplateStore{}
+
+	body := "Request"
+
+	requestTemplate := RequestTemplate{
+		Body: &body,
+	}
+
+	response :=  models.ResponseDetails{
+		Body: "Response",
+	}
+
+	pair := RequestTemplateResponsePair{
+		RequestTemplate: requestTemplate,
+		Response: response,
+	}
+
+	store.ImportRequestTemplateResponsePair(pair)
+
+	Expect(len(store)).To(Equal(1))
+
+	request := models.RequestDetails{
+		Body: body,
+	}
+
+	returnedResponse, err := store.GetResponse(request, false)
+	Expect(err).To(BeNil())
+
+	Expect(*returnedResponse).To(Equal(response))
+}
