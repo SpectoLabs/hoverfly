@@ -134,9 +134,29 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []views.RequestResp
 		for _, pairView := range pairViews {
 			if pairView.Request.RequestType == "template" {
 				responseDetails := models.NewResponseDetialsFromResponseDetailsView(pairView.Response)
+
+				getValue := func (value string) *string {
+					if value == "" {
+						return nil
+					}
+					return &value
+				}
+
+				requestTemplate := matching.RequestTemplate{
+					Path: getValue(pairView.Request.Path),
+					Method: getValue(pairView.Request.Method),
+					Destination: getValue(pairView.Request.Destination),
+					Scheme: getValue(pairView.Request.Scheme),
+					Query: getValue(pairView.Request.Query),
+					Body: getValue(pairView.Request.Body),
+					Headers: pairView.Request.Headers,
+				}
+
 				requestTemplateResponsePair := matching.RequestTemplateResponsePair{
+					RequestTemplate: requestTemplate,
 					Response: responseDetails,
 				}
+
 				hf.RequestMatcher.TemplateStore = append(hf.RequestMatcher.TemplateStore, requestTemplateResponsePair)
 				continue
 			}
