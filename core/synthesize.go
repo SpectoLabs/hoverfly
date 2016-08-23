@@ -42,7 +42,7 @@ func SynthesizeResponse(req *http.Request, middleware string) (*http.Response, e
 		Body:        bodyStr,
 		Headers:     req.Header,
 	}
-	payload := models.Payload{Request: request}
+	pair := models.RequestResponsePair{Request: request}
 
 	log.WithFields(log.Fields{
 		"middleware":  middleware,
@@ -50,7 +50,7 @@ func SynthesizeResponse(req *http.Request, middleware string) (*http.Response, e
 		"destination": request.Destination,
 	}).Debug("Synthesizing new response")
 
-	c := NewConstructor(req, payload)
+	c := NewConstructor(req, pair)
 
 	if middleware != "" {
 		err := c.ApplyMiddleware(middleware)

@@ -20,9 +20,9 @@ func TestReconstructRequest(t *testing.T) {
 		Query:       "?foo=bar",
 		Destination: "changed.destination.com",
 	}
-	payload := models.Payload{Request: request}
+	pair := models.RequestResponsePair{Request: request}
 
-	c := NewConstructor(req, payload)
+	c := NewConstructor(req, pair)
 	newRequest, err := c.ReconstructRequest()
 	Expect(err).To(BeNil())
 	Expect(newRequest.Method).To(Equal("POST"))
@@ -31,16 +31,16 @@ func TestReconstructRequest(t *testing.T) {
 	Expect(newRequest.URL.RawQuery).To(Equal("?foo=bar"))
 }
 
-func TestReconstructRequestBodyPayload(t *testing.T) {
+func TestReconstructRequestBodyRequestResponsePair(t *testing.T) {
 	RegisterTestingT(t)
 
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
-	payload := models.Payload{}
-	c := NewConstructor(req, payload)
-	c.payload.Request.Method = "OPTIONS"
-	c.payload.Request.Destination = "newdestination"
-	c.payload.Request.Body = "new request body here"
+	emptyPair := models.RequestResponsePair{}
+	c := NewConstructor(req, emptyPair)
+	c.requestResponsePair.Request.Method = "OPTIONS"
+	c.requestResponsePair.Request.Destination = "newdestination"
+	c.requestResponsePair.Request.Body = "new request body here"
 
 	newRequest, err := c.ReconstructRequest()
 
@@ -54,39 +54,39 @@ func TestReconstructRequestBodyPayload(t *testing.T) {
 	Expect(string(body)).To(Equal("new request body here"))
 }
 
-func TestReconstructRequestHeadersPayload(t *testing.T) {
+func TestReconstructRequestHeadersInPair(t *testing.T) {
 	RegisterTestingT(t)
 
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
 	req.Header.Set("Header", "ValueX")
 
-	payload := models.Payload{}
-	c := NewConstructor(req, payload)
-	c.payload.Request.Headers = req.Header
-	c.payload.Request.Destination = "destination.com"
+	emptyPair := models.RequestResponsePair{}
+	c := NewConstructor(req, emptyPair)
+	c.requestResponsePair.Request.Headers = req.Header
+	c.requestResponsePair.Request.Destination = "destination.com"
 
 	newRequest, err := c.ReconstructRequest()
 	Expect(err).To(BeNil())
 	Expect(newRequest.Header.Get("Header")).To(Equal("ValueX"))
 }
 
-func TestReconstructResponseHeadersPayload(t *testing.T) {
+func TestReconstructResponseHeadersInPair(t *testing.T) {
 	RegisterTestingT(t)
 
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
-	payload := models.Payload{}
+	pair := models.RequestResponsePair{}
 
-	payload.Response.Status = 201
-	payload.Response.Body = "body here"
+	pair.Response.Status = 201
+	pair.Response.Body = "body here"
 
 	headers := make(map[string][]string)
 	headers["Header"] = []string{"one"}
 
-	payload.Response.Headers = headers
+	pair.Response.Headers = headers
 
-	c := NewConstructor(req, payload)
+	c := NewConstructor(req, pair)
 
 	response := c.ReconstructResponse()
 
@@ -99,10 +99,10 @@ func TestReconstructionFailure(t *testing.T) {
 
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 
-	payload := models.Payload{}
-	c := NewConstructor(req, payload)
-	c.payload.Request.Method = "GET"
-	c.payload.Request.Body = "new request body here"
+	emptyPair := models.RequestResponsePair{}
+	c := NewConstructor(req, emptyPair)
+	c.requestResponsePair.Request.Method = "GET"
+	c.requestResponsePair.Request.Body = "new request body here"
 
 	_, err := c.ReconstructRequest()
 	Expect(err).ToNot(BeNil())

@@ -15,17 +15,17 @@ import (
 
 func checkHeadersHttpMiddleware(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
-	var newPayloadView views.PayloadView
+	var newPairView views.RequestResponsePairView
 
-	json.Unmarshal(body, &newPayloadView)
+	json.Unmarshal(body, &newPairView)
 
-	if _, present := newPayloadView.Request.Headers["New-Header"]; present {
-		newPayloadView.Response.Body = "New-Header present"
+	if _, present := newPairView.Request.Headers["New-Header"]; present {
+		newPairView.Response.Body = "New-Header present"
 	} else {
-		newPayloadView.Response.Body = "New-Header not present"
+		newPairView.Response.Body = "New-Header not present"
 	}
 
-	bts, _ := json.Marshal(newPayloadView)
+	bts, _ := json.Marshal(newPairView)
 	w.Write(bts)
 }
 
@@ -42,8 +42,8 @@ var _ = Describe("Running Hoverfly with middleware", func() {
 
 			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, server.URL+"/process")
 
-			jsonPayload := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "destination1", "scheme": "http", "query": "", "body": "", "headers": {}}, "response": {"status": 200, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
-			ImportHoverflyRecords(jsonPayload)
+			jsonRequestResponsePair := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "destination1", "scheme": "http", "query": "", "body": "", "headers": {}}, "response": {"status": 200, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
+			ImportHoverflyRecords(jsonRequestResponsePair)
 
 			SetHoverflyMode("simulate")
 		})

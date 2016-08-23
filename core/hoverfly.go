@@ -156,7 +156,7 @@ func (hf *Hoverfly) SetMiddleware(middleware string) error {
 		hf.Cfg.Middleware = middleware
 		return nil
 	}
-	testPayload := models.Payload{
+	originalPair := models.RequestResponsePair{
 		Request: models.RequestDetails{
 			Path:        "/",
 			Method:      "GET",
@@ -172,7 +172,7 @@ func (hf *Hoverfly) SetMiddleware(middleware string) error {
 			Headers: map[string][]string{"test_header": []string{"true"}},
 		},
 	}
-	c := NewConstructor(nil, testPayload)
+	c := NewConstructor(nil, originalPair)
 	err := c.ApplyMiddleware(middleware)
 	if err != nil {
 		return err
@@ -342,15 +342,15 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 
 	if hf.Cfg.Middleware != "" {
 		// middleware is provided, modifying request
-		var payload models.Payload
+		var requestResponsePair models.RequestResponsePair
 
 		rd, err := getRequestDetails(request)
 		if err != nil {
 			return nil, nil, err
 		}
-		payload.Request = rd
+		requestResponsePair.Request = rd
 
-		c := NewConstructor(request, payload)
+		c := NewConstructor(request, requestResponsePair)
 		err = c.ApplyMiddleware(hf.Cfg.Middleware)
 
 		if err != nil {
@@ -433,12 +433,12 @@ func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 		return hoverflyError(req, matchErr, matchErr.Error(), matchErr.StatusCode)
 	}
 
-	payload := &models.Payload{
+	pair := &models.RequestResponsePair{
 		Request:  requestDetails,
 		Response: *responseDetails,
 	}
 
-	c := NewConstructor(req, *payload)
+	c := NewConstructor(req, *pair)
 	if hf.Cfg.Middleware != "" {
 		_ = c.ApplyMiddleware(hf.Cfg.Middleware)
 	}
@@ -489,9 +489,9 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) 
 		Headers: resp.Header,
 	}
 
-	payload := models.Payload{Response: r, Request: rd}
+	requestResponsePair := models.RequestResponsePair{Response: r, Request: rd}
 
-	c := NewConstructor(req, payload)
+	c := NewConstructor(req, requestResponsePair)
 	// applying middleware to modify response
 	err = c.ApplyMiddleware(middleware)
 
@@ -505,10 +505,10 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) 
 		"status":      newResponse.StatusCode,
 		"middleware":  middleware,
 		"mode":        ModifyMode,
-		"path":        c.payload.Request.Path,
-		"rawQuery":    c.payload.Request.Query,
-		"method":      c.payload.Request.Method,
-		"destination": c.payload.Request.Destination,
+		"path":        c.requestResponsePair.Request.Path,
+		"rawQuery":    c.requestResponsePair.Request.Query,
+		"method":      c.requestResponsePair.Request.Method,
+		"destination": c.requestResponsePair.Request.Destination,
 		// original here
 		"originalPath":        req.URL.Path,
 		"originalRawQuery":    req.URL.RawQuery,
@@ -541,19 +541,19 @@ func (hf *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response,
 			Headers:     req.Header,
 		}
 
-		payload := models.Payload{
+		pair := models.RequestResponsePair{
 			Response: responseObj,
 			Request:  requestObj,
 		}
 
-		err := hf.RequestMatcher.SavePayload(&payload)
+		err := hf.RequestMatcher.SaveRequestResponsePair(&pair)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
 			}).Error("Failed to save payload")
 		}
 
-		bts, err := payload.Encode()
+		bts, err := pair.Encode()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),

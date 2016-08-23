@@ -25,15 +25,15 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverflyWebServer(adminPort, proxyPort)
-			getPayload1 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "destination1", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1", "value2"]}}}]}`)
-			getPayload2 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1/resource", "method": "GET", "destination": "another-destination.com", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "another-host.com body1", "headers": {"Header": ["value1"]}}}]}`)
-			postPayload1 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path2", "method": "POST", "destination": "destination1", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body2", "headers": {"Header": ["value1"]}}}]}`)
-			postPayload2 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path2/resource", "method": "POST", "destination": "another-destination.com", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "another-host.com body2", "headers": {"Header": ["value1"]}}}]}`)
+			getPair1 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "destination1", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1", "value2"]}}}]}`)
+			getPair2 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1/resource", "method": "GET", "destination": "another-destination.com", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "another-host.com body1", "headers": {"Header": ["value1"]}}}]}`)
+			postPair1 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path2", "method": "POST", "destination": "destination1", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body2", "headers": {"Header": ["value1"]}}}]}`)
+			postPair2 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path2/resource", "method": "POST", "destination": "another-destination.com", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "another-host.com body2", "headers": {"Header": ["value1"]}}}]}`)
 
-			ImportHoverflyRecords(getPayload1)
-			ImportHoverflyRecords(postPayload1)
-			ImportHoverflyRecords(getPayload2)
-			ImportHoverflyRecords(postPayload2)
+			ImportHoverflyRecords(getPair1)
+			ImportHoverflyRecords(postPair1)
+			ImportHoverflyRecords(getPair2)
+			ImportHoverflyRecords(postPair2)
 		})
 
 		AfterEach(func() {
@@ -135,8 +135,8 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 		Context("and the requests.db was created by Hoverfly proxy", func() {
 			BeforeEach(func() {
 				hoverflyCmd = startHoverflyWithDatabase(adminPort, proxyPort)
-				getPayload1 := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "destination1", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 200, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
-				ImportHoverflyRecords(getPayload1)
+				getPair := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "destination1", "scheme": "", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 200, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
+				ImportHoverflyRecords(getPair)
 
 				hoverflyCmd.Process.Kill()
 

@@ -20,15 +20,15 @@ func TestChangeBodyMiddleware(t *testing.T) {
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
-	payload := models.Payload{Response: resp, Request: req}
+	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
-	newPayload, err := ExecuteMiddlewareLocally(command, payload)
+	newPair, err := ExecuteMiddlewareLocally(command, originalPair)
 
 	Expect(err).To(BeNil())
-	Expect(newPayload.Response.Body).To(Equal("body was replaced by middleware\n"))
+	Expect(newPair.Response.Body).To(Equal("body was replaced by middleware\n"))
 }
 
-func TestMalformedPayloadMiddleware(t *testing.T) {
+func TestMalformedRequestResponsePairWithMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
 	command := "./examples/middleware/ruby_echo/echo.rb"
@@ -36,12 +36,12 @@ func TestMalformedPayloadMiddleware(t *testing.T) {
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
-	payload := models.Payload{Response: resp, Request: req}
+	malformedPair := models.RequestResponsePair{Response: resp, Request: req}
 
-	newPayload, err := ExecuteMiddlewareLocally(command, payload)
+	newPair, err := ExecuteMiddlewareLocally(command, malformedPair)
 
 	Expect(err).To(BeNil())
-	Expect(newPayload.Response.Body).To(Equal("original body"))
+	Expect(newPair.Response.Body).To(Equal("original body"))
 }
 
 func TestMakeCustom404(t *testing.T) {
@@ -52,14 +52,14 @@ func TestMakeCustom404(t *testing.T) {
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
-	payload := models.Payload{Response: resp, Request: req}
+	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
-	newPayload, err := ExecuteMiddlewareLocally(command, payload)
+	newPair, err := ExecuteMiddlewareLocally(command, originalPair)
 
 	Expect(err).To(BeNil())
-	Expect(newPayload.Response.Body).To(Equal("Custom body here"))
-	Expect(newPayload.Response.Status).To(Equal(http.StatusNotFound))
-	Expect(newPayload.Response.Headers["middleware"][0]).To(Equal("changed response"))
+	Expect(newPair.Response.Body).To(Equal("Custom body here"))
+	Expect(newPair.Response.Status).To(Equal(http.StatusNotFound))
+	Expect(newPair.Response.Headers["middleware"][0]).To(Equal("changed response"))
 }
 
 func TestReflectBody(t *testing.T) {
@@ -69,26 +69,26 @@ func TestReflectBody(t *testing.T) {
 
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: "", Body: "request_body_here"}
 
-	payload := models.Payload{Request: req}
+	originalPair := models.RequestResponsePair{Request: req}
 
-	newPayload, err := ExecuteMiddlewareLocally(command, payload)
+	newPair, err := ExecuteMiddlewareLocally(command, originalPair)
 
 	Expect(err).To(BeNil())
-	Expect(newPayload.Response.Body).To(Equal(req.Body))
-	Expect(newPayload.Request.Method).To(Equal(req.Method))
-	Expect(newPayload.Request.Destination).To(Equal(req.Destination))
+	Expect(newPair.Response.Body).To(Equal(req.Body))
+	Expect(newPair.Request.Method).To(Equal(req.Method))
+	Expect(newPair.Request.Destination).To(Equal(req.Destination))
 }
 
 func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 
-	var newPayloadView views.PayloadView
+	var newPairView views.RequestResponsePairView
 
-	json.Unmarshal(body, &newPayloadView)
+	json.Unmarshal(body, &newPairView)
 
-	newPayloadView.Response.Body = "You got straight up messed with"
+	newPairView.Response.Body = "You got straight up messed with"
 
-	bts, _ := json.Marshal(newPayloadView)
+	bts, _ := json.Marshal(newPairView)
 	w.Write(bts)
 }
 
@@ -108,20 +108,20 @@ func TestExecuteMiddlewareRemotely(t *testing.T) {
 	server := httptest.NewServer(muxRouter)
 	defer server.Close()
 
-	testPayload := models.Payload{
+	originalPair := models.RequestResponsePair{
 		Response: models.ResponseDetails{
 			Body: "Normal body",
 		},
 	}
 
-	processedPayload, err := ExecuteMiddlewareRemotely(server.URL+"/process", testPayload)
+	newPair, err := ExecuteMiddlewareRemotely(server.URL+"/process", originalPair)
 	Expect(err).To(BeNil())
 
-	Expect(processedPayload).ToNot(Equal(testPayload))
-	Expect(processedPayload.Response.Body).To(Equal("You got straight up messed with"))
+	Expect(newPair).ToNot(Equal(originalPair))
+	Expect(newPair.Response.Body).To(Equal("You got straight up messed with"))
 }
 
-func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSamePayload(t *testing.T) {
+func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSameRequestResponsePairs(t *testing.T) {
 	RegisterTestingT(t)
 
 	muxRouter := mux.NewRouter()
@@ -129,20 +129,20 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSamePayload(t 
 	server := httptest.NewServer(muxRouter)
 	defer server.Close()
 
-	testPayload := models.Payload{
+	originalPair := models.RequestResponsePair{
 		Response: models.ResponseDetails{
 			Body: "Normal body",
 		},
 	}
 
-	processedPayload, err := ExecuteMiddlewareRemotely(server.URL+"/process", testPayload)
+	newPair, err := ExecuteMiddlewareRemotely(server.URL+"/process", originalPair)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Error when communicating with remote middleware"))
 
-	Expect(processedPayload).To(Equal(testPayload))
+	Expect(newPair).To(Equal(originalPair))
 }
 
-func TestExecuteMiddlewareRemotely_ReturnsErrorIfNoPayloadOnResponse_AnOriginalPayloadIsReturned(t *testing.T) {
+func TestExecuteMiddlewareRemotely_ReturnsErrorIfNoRequestResponsePairOnResponse_TheUntouchedPairIsReturned(t *testing.T) {
 	RegisterTestingT(t)
 
 	muxRouter := mux.NewRouter()
@@ -150,15 +150,15 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfNoPayloadOnResponse_AnOriginalP
 	server := httptest.NewServer(muxRouter)
 	defer server.Close()
 
-	testPayload := models.Payload{
+	originalPair := models.RequestResponsePair{
 		Response: models.ResponseDetails{
 			Body: "Normal body",
 		},
 	}
 
-	processedPayload, err := ExecuteMiddlewareRemotely(server.URL+"/process", testPayload)
+	untouchedPair, err := ExecuteMiddlewareRemotely(server.URL+"/process", originalPair)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("unexpected end of JSON input"))
 
-	Expect(processedPayload).To(Equal(testPayload))
+	Expect(untouchedPair).To(Equal(originalPair))
 }

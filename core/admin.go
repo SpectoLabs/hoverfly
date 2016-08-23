@@ -268,35 +268,7 @@ func getBoneRouter(d *Hoverfly) *bone.Mux {
 func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	records, err := d.RequestCache.GetAllValues()
 
-	if err == nil {
-
-		var payloads []views.PayloadView
-
-		for _, v := range records {
-			if payload, err := models.NewPayloadFromBytes(v); err == nil {
-				payloadView := payload.ConvertToPayloadView()
-				payloads = append(payloads, *payloadView)
-			} else {
-				log.Error(err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-
-		var response views.PayloadViewData
-		response.Data = payloads
-		b, err := json.Marshal(response)
-
-		if err != nil {
-			log.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		} else {
-			w.Write(b)
-			return
-		}
-	} else {
+	if err != nil {
 		log.WithFields(log.Fields{
 			"Error": err.Error(),
 		}).Error("Failed to get data from cache!")
@@ -305,6 +277,33 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 		w.WriteHeader(500) // can't process this entity
 		return
 	}
+
+	var pairViews []views.RequestResponsePairView
+
+	for _, v := range records {
+		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
+			pairView := pair.ConvertToRequestResponsePairView()
+			pairViews = append(pairViews, *pairView)
+		} else {
+			log.Error(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var response views.RequestResponsePairPayload
+	response.Data = pairViews
+	b, err := json.Marshal(response)
+
+	if err != nil {
+		log.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	w.Write(b)
+	return
 }
 
 // RecordsCount returns number of captured requests as a JSON payload
@@ -433,7 +432,7 @@ func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 // ImportRecordsHandler - accepts JSON payload and saves it to cache
 func (d *Hoverfly) ImportRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var requests views.PayloadViewData
+	var requests views.RequestResponsePairPayload
 
 	defer req.Body.Close()
 	body, err := ioutil.ReadAll(req.Body)
@@ -457,7 +456,7 @@ func (d *Hoverfly) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	err = d.ImportPayloads(requests.Data)
+	err = d.ImportRequestResponsePairViews(requests.Data)
 
 	if err != nil {
 		response.Message = err.Error()
@@ -533,13 +532,13 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 		"contentType": contentType,
 	}).Info("manually adding request/response")
 
-	p := models.Payload{Request: preq, Response: presp}
+	p := models.RequestResponsePair{Request: preq, Response: presp}
 
-	var pls []views.PayloadView
+	var pls []views.RequestResponsePairView
 
-	pls = append(pls, *p.ConvertToPayloadView())
+	pls = append(pls, *p.ConvertToRequestResponsePairView())
 
-	err = d.ImportPayloads(pls)
+	err = d.ImportRequestResponsePairViews(pls)
 
 	w.Header().Set("Content-Type", "application/json")
 	var response messageResponse
@@ -614,24 +613,24 @@ func (d *Hoverfly) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 
 // AllRecordsHandler returns JSON content type http response
 func (d *Hoverfly) GetAllTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	payloadJson := d.RequestMatcher.TemplateStore.ConvertToPayloadJson()
+	requestTemplatePayload := d.RequestMatcher.TemplateStore.GetPayload()
 
 	w.Header().Set("Content-Type", "application/json")
 
-	b, err := json.Marshal(payloadJson)
+	requestTemplateJson, err := json.Marshal(requestTemplatePayload)
 
 	if err != nil {
 		log.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		w.Write(b)
+		w.Write(requestTemplateJson)
 		return
 	}
 }
 
 func (d *Hoverfly) ImportTemplatesHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var payload matching.RequestTemplatePayloadJson
+	var requestTemplatePayload matching.RequestTemplateResponsePairPayload
 
 	defer req.Body.Close()
 	body, err := ioutil.ReadAll(req.Body)
@@ -648,7 +647,7 @@ func (d *Hoverfly) ImportTemplatesHandler(w http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = json.Unmarshal(body, &payload)
+	err = json.Unmarshal(body, &requestTemplatePayload)
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -658,13 +657,13 @@ func (d *Hoverfly) ImportTemplatesHandler(w http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = d.RequestMatcher.TemplateStore.ImportPayloads(payload)
+	err = d.RequestMatcher.TemplateStore.ImportPayloads(requestTemplatePayload)
 
 	if err != nil {
 		response.Message = err.Error()
 		w.WriteHeader(400)
 	} else {
-		response.Message = fmt.Sprintf("%d payloads import complete.", len(*payload.Data))
+		response.Message = fmt.Sprintf("%d payloads import complete.", len(*requestTemplatePayload.Data))
 	}
 
 	b, err := response.Encode()

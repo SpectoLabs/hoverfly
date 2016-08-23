@@ -24,7 +24,7 @@ func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.Res
 		key = req.Hash()
 	}
 
-	payloadBts, err := this.RequestCache.Get([]byte(key))
+	pairBytes, err := this.RequestCache.Get([]byte(key))
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -63,11 +63,11 @@ func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.Res
 	}
 
 	// getting cache response
-	payload, err := models.NewPayloadFromBytes(payloadBts)
+	pair, err := models.NewRequestResponsePairFromBytes(pairBytes)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-			"value": string(payloadBts),
+			"value": string(pairBytes),
 			"key":   key,
 		}).Error("Failed to decode payload")
 		return nil, &MatchingError{
@@ -82,37 +82,37 @@ func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.Res
 		"rawQuery":    req.Query,
 		"method":      req.Method,
 		"destination": req.Destination,
-		"status":      payload.Response.Status,
+		"status":      pair.Response.Status,
 	}).Info("Payload found from cache")
 
-	return &payload.Response, nil
+	return &pair.Response, nil
 }
 
-func (this *RequestMatcher) SavePayload(payload *models.Payload) error {
+func (this *RequestMatcher) SaveRequestResponsePair(pair *models.RequestResponsePair) error {
 	var key string
 
 	if *this.Webserver {
-		key = payload.IdWithoutHost()
+		key = pair.IdWithoutHost()
 	} else {
-		key = payload.Id()
+		key = pair.Id()
 	}
 
 	log.WithFields(log.Fields{
-		"path":          payload.Request.Path,
-		"rawQuery":      payload.Request.Query,
-		"requestMethod": payload.Request.Method,
-		"bodyLen":       len(payload.Request.Body),
-		"destination":   payload.Request.Destination,
+		"path":          pair.Request.Path,
+		"rawQuery":      pair.Request.Query,
+		"requestMethod": pair.Request.Method,
+		"bodyLen":       len(pair.Request.Body),
+		"destination":   pair.Request.Destination,
 		"hashKey":       key,
 	}).Debug("Capturing")
 
-	payloadBytes, err := payload.Encode()
+	pairBytes, err := pair.Encode()
 
 	if err != nil {
 		return err
 	}
 
-	return this.RequestCache.Set([]byte(key), payloadBytes)
+	return this.RequestCache.Set([]byte(key), pairBytes)
 }
 
 type MatchingError struct {

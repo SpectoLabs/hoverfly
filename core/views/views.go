@@ -1,17 +1,18 @@
 package views
 
-type PayloadViewData struct {
-	Data []PayloadView `json:"data"`
+type RequestResponsePairPayload struct {
+	Data []RequestResponsePairView `json:"data"`
 }
 
 // PayloadView is used when marshalling and unmarshalling payloads.
-type PayloadView struct {
+type RequestResponsePairView struct {
 	Response ResponseDetailsView `json:"response"`
 	Request  RequestDetailsView  `json:"request"`
 }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsView struct {
+	RequestType string              `json:"requestType"`
 	Path        string              `json:"path"`
 	Method      string              `json:"method"`
 	Destination string              `json:"destination"`

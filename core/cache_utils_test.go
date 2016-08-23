@@ -13,7 +13,7 @@ func Test_rebuildHashes_whenDataIsHashedForAProxy_andStillAProxy_keysAreNotChang
 
 	db := cache.NewInMemoryCache()
 
-	testPayload := models.Payload{
+	pair := models.RequestResponsePair{
 		Request: models.RequestDetails{
 			Path:        "/hello",
 			Destination: "a-host.com",
@@ -23,16 +23,16 @@ func Test_rebuildHashes_whenDataIsHashedForAProxy_andStillAProxy_keysAreNotChang
 		},
 	}
 
-	testPayloadBytes, _ := testPayload.Encode()
+	pairBytes, _ := pair.Encode()
 
-	db.Set([]byte(testPayload.Id()), testPayloadBytes)
+	db.Set([]byte(pair.Id()), pairBytes)
 
 	rebuildHashes(db, webserver)
 
-	result, err := db.Get([]byte(testPayload.Id()))
+	result, err := db.Get([]byte(pair.Id()))
 
 	Expect(err).To(BeNil())
-	Expect(result).To(Equal(testPayloadBytes))
+	Expect(result).To(Equal(pairBytes))
 }
 
 func Test_rebuildHashes_whenDataIsHashedForAWebserver_andStillAWebserver_keysAreNotChanged(t *testing.T) {
@@ -41,7 +41,7 @@ func Test_rebuildHashes_whenDataIsHashedForAWebserver_andStillAWebserver_keysAre
 
 	db := cache.NewInMemoryCache()
 
-	testPayload := models.Payload{
+	pair := models.RequestResponsePair{
 		Request: models.RequestDetails{
 			Path:        "/hello",
 			Destination: "a-host.com",
@@ -51,16 +51,16 @@ func Test_rebuildHashes_whenDataIsHashedForAWebserver_andStillAWebserver_keysAre
 		},
 	}
 
-	testPayloadBytes, _ := testPayload.Encode()
+	pairBytes, _ := pair.Encode()
 
-	db.Set([]byte(testPayload.IdWithoutHost()), testPayloadBytes)
+	db.Set([]byte(pair.IdWithoutHost()), pairBytes)
 
 	rebuildHashes(db, webserver)
 
-	result, err := db.Get([]byte(testPayload.IdWithoutHost()))
+	result, err := db.Get([]byte(pair.IdWithoutHost()))
 
 	Expect(err).To(BeNil())
-	Expect(result).To(Equal(testPayloadBytes))
+	Expect(result).To(Equal(pairBytes))
 }
 
 func Test_rebuildHashes_whenDataIsHashedForAProxy_andIsNowAWebserver_keysAreChanged(t *testing.T) {
@@ -69,7 +69,7 @@ func Test_rebuildHashes_whenDataIsHashedForAProxy_andIsNowAWebserver_keysAreChan
 
 	db := cache.NewInMemoryCache()
 
-	testPayload := models.Payload{
+	pair := models.RequestResponsePair{
 		Request: models.RequestDetails{
 			Path:        "/hello",
 			Destination: "a-host.com",
@@ -79,14 +79,14 @@ func Test_rebuildHashes_whenDataIsHashedForAProxy_andIsNowAWebserver_keysAreChan
 		},
 	}
 
-	testPayloadBytes, _ := testPayload.Encode()
+	pairBytes, _ := pair.Encode()
 
-	db.Set([]byte(testPayload.Id()), testPayloadBytes)
+	db.Set([]byte(pair.Id()), pairBytes)
 
 	rebuildHashes(db, webserver)
 
-	result, err := db.Get([]byte(testPayload.IdWithoutHost()))
+	result, err := db.Get([]byte(pair.IdWithoutHost()))
 
 	Expect(err).To(BeNil())
-	Expect(result).To(Equal(testPayloadBytes))
+	Expect(result).To(Equal(pairBytes))
 }
