@@ -100,6 +100,25 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 
 		})
 
+		Context("When I export", func() {
+
+			BeforeEach(func() {
+				slingRequest := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonPayload)
+				DoRequest(slingRequest)
+			})
+
+			It("It should contain both templates and snapshots", func() {
+				records := ExportHoverflyRecords()
+
+				recordsBytes, err := ioutil.ReadAll(records)
+				Expect(err).To(BeNil())
+
+				Expect(string(recordsBytes)).To(ContainSubstring("template"))
+				Expect(string(recordsBytes)).To(ContainSubstring("snapshot"))
+			})
+
+		})
+
 	})
 
 	Describe("When I import and export", func() {
