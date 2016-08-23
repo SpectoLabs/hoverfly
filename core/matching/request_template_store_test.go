@@ -30,6 +30,27 @@ func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 	Expect(result.Body).To(Equal("test-body"))
 }
 
+func TestTemplateShouldMatchOnBody(t *testing.T) {
+	RegisterTestingT(t)
+
+	response := models.ResponseDetails{
+		Body: "body",
+	}
+	templateEntry := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{Body: &response.Body},
+		Response:        response,
+	}
+	store := RequestTemplateStore{templateEntry}
+
+	r := models.RequestDetails{
+		Body: "body",
+	}
+	result, err := store.GetResponse(r, false)
+	Expect(err).To(BeNil())
+
+	Expect(result.Body).To(Equal("body"))
+}
+
 func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 	RegisterTestingT(t)
 

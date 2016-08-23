@@ -42,7 +42,7 @@ func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserv
 		// TODO: need to enable regex matches
 		// TODO: enable matching on scheme
 
-		if entry.RequestTemplate.Body != nil && *entry.RequestTemplate.Body == req.Body {
+		if entry.RequestTemplate.Body != nil && *entry.RequestTemplate.Body != req.Body {
 			continue
 		}
 		if !webserver {
