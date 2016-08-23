@@ -534,11 +534,11 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 
 	p := models.RequestResponsePair{Request: preq, Response: presp}
 
-	var pls []views.RequestResponsePairView
+	var pairViews []views.RequestResponsePairView
 
-	pls = append(pls, *p.ConvertToRequestResponsePairView())
+	pairViews = append(pairViews, *p.ConvertToRequestResponsePairView())
 
-	err = d.ImportRequestResponsePairViews(pls)
+	err = d.ImportRequestResponsePairViews(pairViews)
 
 	w.Header().Set("Content-Type", "application/json")
 	var response messageResponse

@@ -41,14 +41,14 @@ func TestCacheSetGetWithRequestResponsePair(t *testing.T) {
 	}
 
 	pair := models.RequestResponsePair{Response: resp}
-	bts, err := json.Marshal(pair)
+	pairBytes, err := json.Marshal(pair)
 	Expect(err).To(BeNil())
 
-	err = dbClient.RequestCache.Set(key, bts)
+	err = dbClient.RequestCache.Set(key, pairBytes)
 	Expect(err).To(BeNil())
 
 	var p models.RequestResponsePair
-	pairBytes, err := dbClient.RequestCache.Get(key)
+	pairBytes, err = dbClient.RequestCache.Get(key)
 	err = json.Unmarshal(pairBytes, &p)
 	Expect(err).To(BeNil())
 	Expect(pair.Response.Body).To(Equal(p.Response.Body))

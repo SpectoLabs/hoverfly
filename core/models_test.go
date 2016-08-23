@@ -60,10 +60,10 @@ func TestRequestBodyCaptured(t *testing.T) {
 
 	fp := matching.GetRequestFingerprint(req, requestBody, false)
 
-	pairBts, err := dbClient.RequestCache.Get([]byte(fp))
+	pairBytes, err := dbClient.RequestCache.Get([]byte(fp))
 	Expect(err).To(BeNil())
 
-	pair, err := models.NewRequestResponsePairFromBytes(pairBts)
+	pair, err := models.NewRequestResponsePairFromBytes(pairBytes)
 	Expect(err).To(BeNil())
 	Expect(pair.Request.Body).To(Equal("fizz=buzz"))
 }
@@ -221,10 +221,10 @@ func TestRequestResponsePairEncodeDecode(t *testing.T) {
 
 	pair := models.RequestResponsePair{Response: resp}
 
-	bts, err := pair.Encode()
+	pairBytes, err := pair.Encode()
 	Expect(err).To(BeNil())
 
-	pairFromBytes, err := models.NewRequestResponsePairFromBytes(bts)
+	pairFromBytes, err := models.NewRequestResponsePairFromBytes(pairBytes)
 	Expect(err).To(BeNil())
 	Expect(pairFromBytes.Response.Body).To(Equal(resp.Body))
 	Expect(pairFromBytes.Response.Status).To(Equal(resp.Status))
@@ -235,18 +235,18 @@ func TestRequestResponsePairEncodeEmpty(t *testing.T) {
 
 	pair := models.RequestResponsePair{}
 
-	bts, err := pair.Encode()
+	pairBytes, err := pair.Encode()
 	Expect(err).To(BeNil())
 
-	_, err = models.NewRequestResponsePairFromBytes(bts)
+	_, err = models.NewRequestResponsePairFromBytes(pairBytes)
 	Expect(err).To(BeNil())
 }
 
 func TestDecodeRandomBytes(t *testing.T) {
 	RegisterTestingT(t)
 
-	bts := []byte("some random stuff here")
-	_, err := models.NewRequestResponsePairFromBytes(bts)
+	bytes := []byte("some random stuff here")
+	_, err := models.NewRequestResponsePairFromBytes(bytes)
 	Expect(err).ToNot(BeNil())
 }
 

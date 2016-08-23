@@ -70,18 +70,18 @@ type CacheAuthBackend struct {
 // AddUser - adds user with provided username, password and admin parameters
 func (b *CacheAuthBackend) AddUser(username, password string, admin bool) error {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), 10)
-	u := User{
+	user := User{
 		UUID:     uuid.New(),
 		Username: username,
 		Password: string(hashedPassword),
 		IsAdmin:  admin,
 	}
-	bts, err := u.Encode()
+	userBytes, err := user.Encode()
 	if err != nil {
 		logUserError(err, username)
 		return err
 	}
-	err = b.userCache.Set([]byte(username), bts)
+	err = b.userCache.Set([]byte(username), userBytes)
 	return err
 }
 

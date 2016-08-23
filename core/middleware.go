@@ -149,9 +149,9 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 }
 
 func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	bts, err := json.Marshal(pair.ConvertToRequestResponsePairView())
+	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
-	req, err := http.NewRequest("POST", middleware, bytes.NewBuffer(bts))
+	req, err := http.NewRequest("POST", middleware, bytes.NewBuffer(pairViewBytes))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
@@ -172,7 +172,7 @@ func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePai
 		return pair, errors.New("Error when communicating with remote middleware")
 	}
 
-	pairViewBytes, err := ioutil.ReadAll(resp.Body)
+	returnedPairViewBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
@@ -182,7 +182,7 @@ func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePai
 
 	var newPairView views.RequestResponsePairView
 
-	err = json.Unmarshal(pairViewBytes, &newPairView)
+	err = json.Unmarshal(returnedPairViewBytes, &newPairView)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),

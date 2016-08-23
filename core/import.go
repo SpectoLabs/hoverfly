@@ -149,7 +149,7 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []views.RequestResp
 				}
 			}
 
-			bts, err := pair.Encode()
+			pairBytes, err := pair.Encode()
 			if err != nil {
 				log.WithFields(log.Fields{
 					"error": err.Error(),
@@ -161,7 +161,7 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []views.RequestResp
 				en.ActionType = ActionTypeRequestCaptured
 				en.Message = "imported"
 				en.Time = time.Now()
-				en.Data = bts
+				en.Data = pairBytes
 
 				if err := hf.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
 					log.WithFields(log.Fields{
