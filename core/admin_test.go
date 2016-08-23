@@ -267,11 +267,11 @@ func TestSetSimulateState(t *testing.T) {
 	var resp stateRequest
 	resp.Mode = SimulateMode
 
-	bts, err := json.Marshal(&resp)
+	requestBytes, err := json.Marshal(&resp)
 	Expect(err).To(BeNil())
 
 	// deleting through handler
-	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(requestBytes)))
 	Expect(err).To(BeNil())
 
 	//The response recorder used to record HTTP responses
@@ -299,11 +299,11 @@ func TestSetCaptureState(t *testing.T) {
 	var resp stateRequest
 	resp.Mode = "capture"
 
-	bts, err := json.Marshal(&resp)
+	requestBytes, err := json.Marshal(&resp)
 	Expect(err).To(BeNil())
 
 	// deleting through handler
-	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(requestBytes)))
 	Expect(err).To(BeNil())
 
 	//The response recorder used to record HTTP responses
@@ -331,11 +331,11 @@ func TestSetModifyState(t *testing.T) {
 	var resp stateRequest
 	resp.Mode = ModifyMode
 
-	bts, err := json.Marshal(&resp)
+	requestBytes, err := json.Marshal(&resp)
 	Expect(err).To(BeNil())
 
 	// deleting through handler
-	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(requestBytes)))
 	Expect(err).To(BeNil())
 
 	//The response recorder used to record HTTP responses
@@ -363,11 +363,11 @@ func TestSetSynthesizeState(t *testing.T) {
 	var resp stateRequest
 	resp.Mode = SynthesizeMode
 
-	bts, err := json.Marshal(&resp)
+	requestBytes, err := json.Marshal(&resp)
 	Expect(err).To(BeNil())
 
 	// deleting through handler
-	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(requestBytes)))
 	Expect(err).To(BeNil())
 
 	//The response recorder used to record HTTP responses
@@ -395,11 +395,11 @@ func TestSetRandomState(t *testing.T) {
 	var resp stateRequest
 	resp.Mode = "shouldnotwork"
 
-	bts, err := json.Marshal(&resp)
+	requestBytes, err := json.Marshal(&resp)
 	Expect(err).To(BeNil())
 
 	// deleting through handler
-	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/state", ioutil.NopCloser(bytes.NewBuffer(requestBytes)))
 	Expect(err).To(BeNil())
 
 	//The response recorder used to record HTTP responses
@@ -476,10 +476,10 @@ func TestSetMiddleware_WithValidMiddleware(t *testing.T) {
 	var middlewareReq middlewareSchema
 	middlewareReq.Middleware = "python examples/middleware/delay_policy/add_random_delay.py"
 
-	bts, err := json.Marshal(&middlewareReq)
+	middlewareReqBytes, err := json.Marshal(&middlewareReq)
 	Expect(err).To(BeNil())
 
-	req, err := http.NewRequest("POST", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(middlewareReqBytes)))
 	Expect(err).To(BeNil())
 
 	rec := httptest.NewRecorder()
@@ -510,10 +510,10 @@ func TestSetMiddleware_WithInvalidMiddleware(t *testing.T) {
 	var middlewareReq middlewareSchema
 	middlewareReq.Middleware = "definitely won't execute"
 
-	bts, err := json.Marshal(&middlewareReq)
+	middlewareReqBytes, err := json.Marshal(&middlewareReq)
 	Expect(err).To(BeNil())
 
-	req, err := http.NewRequest("POST", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(middlewareReqBytes)))
 	Expect(err).To(BeNil())
 
 	rec := httptest.NewRecorder()
@@ -545,10 +545,10 @@ func TestSetMiddleware_WithEmptyMiddleware(t *testing.T) {
 	var middlewareReq middlewareSchema
 	middlewareReq.Middleware = ""
 
-	bts, err := json.Marshal(&middlewareReq)
+	middlewareReqBytes, err := json.Marshal(&middlewareReq)
 	Expect(err).To(BeNil())
 
-	req, err := http.NewRequest("POST", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("POST", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(middlewareReqBytes)))
 	Expect(err).To(BeNil())
 
 	rec := httptest.NewRecorder()
@@ -749,11 +749,11 @@ func TestSetMetadata(t *testing.T) {
 	reqBody.Key = "some_key"
 	reqBody.Value = "some_val"
 
-	bts, err := json.Marshal(&reqBody)
+	reqBodyBytes, err := json.Marshal(&reqBody)
 	Expect(err).To(BeNil())
 
 	// deleting through handler
-	req, err := http.NewRequest("PUT", "/api/metadata", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("PUT", "/api/metadata", ioutil.NopCloser(bytes.NewBuffer(reqBodyBytes)))
 	Expect(err).To(BeNil())
 
 	//The response recorder used to record HTTP responses
@@ -800,11 +800,11 @@ func TestSetMetadataMissingKey(t *testing.T) {
 	// missing key
 	reqBody.Value = "some_val"
 
-	bts, err := json.Marshal(&reqBody)
+	reqBodyBytes, err := json.Marshal(&reqBody)
 	Expect(err).To(BeNil())
 
 	// deleting through handler
-	req, err := http.NewRequest("PUT", "/api/metadata", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("PUT", "/api/metadata", ioutil.NopCloser(bytes.NewBuffer(reqBodyBytes)))
 	Expect(err).To(BeNil())
 
 	//The response recorder used to record HTTP responses
@@ -993,10 +993,10 @@ func TestUpdateResponseDelays(t *testing.T) {
 	}
 	delays := models.ResponseDelayList{delayOne, delayTwo}
 	delayJson := models.ResponseDelayJson{Data: &delays}
-	bts, err := json.Marshal(&delayJson)
+	delayJsonBytes, err := json.Marshal(&delayJson)
 	Expect(err).To(BeNil())
 
-	req, err := http.NewRequest("PUT", "/api/delays", ioutil.NopCloser(bytes.NewBuffer(bts)))
+	req, err := http.NewRequest("PUT", "/api/delays", ioutil.NopCloser(bytes.NewBuffer(delayJsonBytes)))
 	Expect(err).To(BeNil())
 
 	//The response recorder used to record HTTP responses

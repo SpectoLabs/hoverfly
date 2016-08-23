@@ -553,7 +553,7 @@ func (hf *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response,
 			}).Error("Failed to save payload")
 		}
 
-		bts, err := pair.Encode()
+		pairBytes, err := pair.Encode()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
@@ -564,7 +564,7 @@ func (hf *Hoverfly) save(req *http.Request, reqBody []byte, resp *http.Response,
 			en.ActionType = ActionTypeRequestCaptured
 			en.Message = "captured"
 			en.Time = time.Now()
-			en.Data = bts
+			en.Data = pairBytes
 
 			if err := hf.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
 				log.WithFields(log.Fields{

@@ -88,8 +88,8 @@ func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
 
 	newPairView.Response.Body = "You got straight up messed with"
 
-	bts, _ := json.Marshal(newPairView)
-	w.Write(bts)
+	pairViewBytes, _ := json.Marshal(newPairView)
+	w.Write(pairViewBytes)
 }
 
 func processHandlerOkayButNoResponse(w http.ResponseWriter, r *http.Request) {

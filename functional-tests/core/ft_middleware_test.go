@@ -25,8 +25,8 @@ func checkHeadersHttpMiddleware(w http.ResponseWriter, r *http.Request) {
 		newPairView.Response.Body = "New-Header not present"
 	}
 
-	bts, _ := json.Marshal(newPairView)
-	w.Write(bts)
+	pairViewBytes, _ := json.Marshal(newPairView)
+	w.Write(pairViewBytes)
 }
 
 var server *httptest.Server
