@@ -232,6 +232,106 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 	Expect(*decodedPair3).To(Equal(models.NewRequestResponsePairFromRequestResponsePairView(originalPair3)))
 }
 
+func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(t *testing.T) {
+	cache := cache.NewInMemoryCache()
+	cfg := Configuration{Webserver: false}
+	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher}
+
+	RegisterTestingT(t)
+
+	requestTemplate := views.RequestDetailsView{
+		RequestType: "template",
+		Method:      "GET",
+	}
+
+	responseView := views.ResponseDetailsView{
+		Status:      200,
+		Body:        "hello_world",
+		EncodedBody: false,
+		Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
+	}
+
+	templatePair := views.RequestResponsePairView{
+		Response: responseView,
+		Request:  requestTemplate,
+	}
+
+	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{templatePair})
+
+	Expect(len(hv.RequestMatcher.TemplateStore)).To(Equal(1))
+
+	request := models.NewRequestDetailsFromRequestDetailsView(requestTemplate)
+	responseFromCache, err := hv.RequestMatcher.TemplateStore.GetResponse(request, false)
+	Expect(err).To(BeNil())
+
+	response := models.NewResponseDetialsFromResponseDetailsView(responseView)
+
+	Expect(*responseFromCache).To(Equal(response))
+}
+
+func TestImportImportRequestResponsePairs_CanImportARequestResponsePair_AndRequestTemplateResponsePair(t *testing.T) {
+	cache := cache.NewInMemoryCache()
+	cfg := Configuration{Webserver: false}
+	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher}
+
+	RegisterTestingT(t)
+
+	requestTemplate := views.RequestDetailsView{
+		RequestType: "template",
+		Method:      "GET",
+	}
+
+	requestView := views.RequestDetailsView{
+		Method:      "GET",
+		Path:        "/",
+		Destination: "test.com",
+		Scheme:      "http",
+	}
+
+	responseView := views.ResponseDetailsView{
+		Status:      200,
+		Body:        "hello_world",
+		EncodedBody: false,
+		Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
+	}
+
+	templatePair := views.RequestResponsePairView{
+		Request:  requestTemplate,
+		Response: responseView,
+	}
+
+	ordinaryPair := views.RequestResponsePairView{
+		Request:  requestView,
+		Response: responseView,
+	}
+
+	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{templatePair, ordinaryPair})
+
+	cacheCount, err := hv.RequestCache.RecordsCount()
+	Expect(cacheCount).To(Equal(1))
+	Expect(err).To(BeNil())
+
+	Expect(len(hv.RequestMatcher.TemplateStore)).To(Equal(1))
+
+	request := models.NewRequestDetailsFromRequestDetailsView(requestTemplate)
+	response := models.NewResponseDetialsFromResponseDetailsView(responseView)
+
+	pairBytes, err := hv.RequestCache.Get([]byte("76cf08e38439f083de2658b0971df9bf"))
+	Expect(err).To(BeNil())
+
+	savedPair, err := models.NewRequestResponsePairFromBytes(pairBytes)
+	Expect(err).To(BeNil())
+
+	Expect(savedPair.Response).To(Equal(response))
+
+	responseFromCache, err := hv.RequestMatcher.TemplateStore.GetResponse(request, false)
+	Expect(err).To(BeNil())
+	Expect(*responseFromCache).To(Equal(response))
+
+}
+
 // Helper function for base64 encoding
 func base64String(s string) string {
 	return base64.StdEncoding.EncodeToString([]byte(s))

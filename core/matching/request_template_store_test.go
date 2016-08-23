@@ -373,13 +373,13 @@ func TestImportRequestTemplateResponsePair_ShouldInsertAPairIntoTheArray(t *test
 		Body: &body,
 	}
 
-	response :=  models.ResponseDetails{
+	response := models.ResponseDetails{
 		Body: "Response",
 	}
 
 	pair := RequestTemplateResponsePair{
 		RequestTemplate: requestTemplate,
-		Response: response,
+		Response:        response,
 	}
 
 	store.ImportRequestTemplateResponsePair(pair)
