@@ -131,6 +131,30 @@ func (this *RequestTemplateResponsePair) ConvertToRequestTemplateResponsePairVie
 	}
 }
 
+func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() views.RequestResponsePairView {
+
+	getValue := func (value *string) string {
+		if value == nil {
+			return ""
+		}
+		return *value
+	}
+
+	return views.RequestResponsePairView{
+		Request: views.RequestDetailsView{
+			RequestType: "template",
+			Path:        getValue(this.RequestTemplate.Path),
+			Method:      getValue(this.RequestTemplate.Method),
+			Destination: getValue(this.RequestTemplate.Destination),
+			Scheme:      getValue(this.RequestTemplate.Scheme),
+			Query:       getValue(this.RequestTemplate.Query),
+			Body:        getValue(this.RequestTemplate.Body),
+			Headers:     this.RequestTemplate.Headers,
+		},
+		Response: this.Response.ConvertToResponseDetailsView(),
+	}
+}
+
 func (this *RequestTemplateResponsePairPayload) ConvertToRequestTemplateStore() RequestTemplateStore {
 	var requestTemplateStore RequestTemplateStore
 	for _, pair := range *this.Data {

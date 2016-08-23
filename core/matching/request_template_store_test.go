@@ -361,3 +361,29 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 
 	Expect(result).To(BeNil())
 }
+
+func TestRequestTemplateResponsePairCanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
+	RegisterTestingT(t)
+
+	method := "POST"
+
+	requestTemplateResponsePair := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Method: &method,
+		},
+		Response: models.ResponseDetails{
+			Body: "Yo",
+		},
+	}
+
+	pairView := requestTemplateResponsePair.ConvertToRequestResponsePairView()
+
+	Expect(pairView.Request.RequestType).To(Equal("template"))
+	Expect(pairView.Request.Method).To(Equal("POST"))
+	Expect(pairView.Request.Destination).To(Equal(""))
+	Expect(pairView.Request.Path).To(Equal(""))
+	Expect(pairView.Request.Scheme).To(Equal(""))
+	Expect(pairView.Request.Query).To(Equal(""))
+
+	Expect(pairView.Response.Body).To(Equal("Yo"))
+}
