@@ -33,10 +33,10 @@ func TestGetAllTemplates(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rr := views.RequestResponsePairPayload{}
-	err = json.Unmarshal(body, &rr)
+	pair := views.RequestResponsePairPayload{}
+	err = json.Unmarshal(body, &pair)
 
-	Expect(rr.Data).To(HaveLen(0))
+	Expect(pair.Data).To(HaveLen(0))
 }
 
 func TestGetAllTemplatesWTemplates(t *testing.T) {
@@ -84,11 +84,11 @@ func TestGetAllTemplatesWTemplates(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rr := matching.RequestTemplateResponsePairPayload{}
-	err = json.Unmarshal(body, &rr)
+	pair := matching.RequestTemplateResponsePairPayload{}
+	err = json.Unmarshal(body, &pair)
 
 	// check the json given is correct to construct the request template store
-	result := rr.ConvertToRequestTemplateStore()
+	result := pair.ConvertToRequestTemplateStore()
 
 	Expect(result).To(HaveLen(2))
 }
