@@ -90,10 +90,6 @@ func (this *RequestTemplateStore) ImportPayloads(pairPayload RequestTemplateResp
 	return fmt.Errorf("Bad request. Nothing to import!")
 }
 
-func (this *RequestTemplateStore) ImportRequestTemplateResponsePair(pair RequestTemplateResponsePair) {
-	*this = append(*this, pair)
-}
-
 func (this *RequestTemplateStore) Wipe() {
 	// don't change the pointer here!
 	*this = RequestTemplateStore{}
