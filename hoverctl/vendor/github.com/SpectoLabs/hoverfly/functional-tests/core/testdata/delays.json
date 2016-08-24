@@ -1,0 +1,12 @@
+{
+  "data": [
+    {
+      "urlPattern": "virtual\\.com",
+      "delay": 100
+    },
+    {
+      "urlPattern": "virtual\\.com",
+      "delay": 110
+    }
+  ]
+}

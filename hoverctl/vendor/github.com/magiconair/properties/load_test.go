@@ -62,8 +62,9 @@ func (s *LoadSuite) TestLoadFiles(c *C) {
 }
 
 func (s *LoadSuite) TestLoadExpandedFile(c *C) {
-	filename := s.makeFilePrefix(c, os.Getenv("USER"), "key=value")
-	filename = strings.Replace(filename, os.Getenv("USER"), "${USER}", -1)
+	os.Setenv("_VARX", "some-value")
+	filename := s.makeFilePrefix(c, os.Getenv("_VARX"), "key=value")
+	filename = strings.Replace(filename, os.Getenv("_VARX"), "${_VARX}", -1)
 	p := MustLoadFile(filename, ISO_8859_1)
 	assertKeyValues(c, "", p, "key", "value")
 }
@@ -122,6 +123,16 @@ func (s *LoadSuite) TestLoadURLFailInvalidEncoding(c *C) {
 	p, err := LoadURL(srv.URL + "/json")
 	c.Assert(p, IsNil)
 	c.Assert(err, ErrorMatches, ".*invalid content type.*")
+}
+
+func (s *LoadSuite) TestLoadAll(c *C) {
+	filename := s.makeFile(c, "key=value")
+	filename2 := s.makeFile(c, "key2=value3")
+	filename3 := s.makeFile(c, "key=value4")
+	srv := testServer()
+	defer srv.Close()
+	p := MustLoadAll([]string{filename, filename2, srv.URL + "/a", srv.URL + "/b", filename3}, UTF8, false)
+	assertKeyValues(c, "", p, "key", "value4", "key2", "value2")
 }
 
 func (s *LoadSuite) SetUpSuite(c *C) {

@@ -1,0 +1,13 @@
+{
+  "data": [
+    {
+      "urlPattern": "host1",
+      "delay": 100
+    },
+    {
+      "httpMethod": "POST",
+      "urlPattern": "host2",
+      "delay": 110
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-# Kingpin - A Go (golang) command line and flag parser [![](https://godoc.org/github.com/alecthomas/kingpin?status.svg)](http://godoc.org/github.com/alecthomas/kingpin) [![Build Status](https://travis-ci.org/alecthomas/kingpin.png)](https://travis-ci.org/alecthomas/kingpin)
+# Kingpin - A Go (golang) command line and flag parser [![](https://godoc.org/github.com/alecthomas/kingpin?status.svg)](http://godoc.org/github.com/alecthomas/kingpin) [![Build Status](https://travis-ci.org/alecthomas/kingpin.svg?branch=master)](https://travis-ci.org/alecthomas/kingpin)
 
 <!-- MarkdownTOC -->
 
@@ -54,7 +54,7 @@ func main() {
 }
 ```
 
-More [examples](https://github.com/alecthomas/kingpin/tree/master/examples) are available.
+More [examples](https://github.com/alecthomas/kingpin/tree/master/_examples) are available.
 
 Second to parsing, providing the user with useful help is probably the most
 important thing a command-line parser does. Kingpin tries to provide detailed
@@ -138,7 +138,7 @@ $ go get gopkg.in/alecthomas/kingpin.v1
 - *2015-09-19* -- Stable v2.1.0 release.
     - Added `command.Default()` to specify a default command to use if no other
       command matches. This allows for convenient user shortcuts.
-    - Exposed `HelpFlag` and `VersionFlag` for further cusomisation.
+    - Exposed `HelpFlag` and `VersionFlag` for further customisation.
     - `Action()` and `PreAction()` added and both now support an arbitrary
       number of callbacks.
     - `kingpin.SeparateOptionalFlagsUsageTemplate`.
