@@ -1,5 +1,5 @@
-hash: 0cc9472c04bed080f1c8faebe4bb8337b8a7af04a2c6d71c43e03d4059e4b4f8
-updated: 2016-05-13T14:17:58.547720462+01:00
+hash: 5fc845a0dd35871d2ee3b116521deebc45aede203dae3a7c20f3129a63b8e6f8
+updated: 2016-08-24T16:22:05.681330373+01:00
 imports:
 - name: github.com/boltdb/bolt
   version: c1c3bd7e847a231b2b1f9592fa86182a121ad734
@@ -39,13 +39,25 @@ imports:
   version: 45c278ab3607870051a2ea9040bb85fcb8557481
 - name: github.com/onsi/gomega
   version: 0df7b7fdb38123c12a1f569f0affb2c2a7bd72cf
+  subpackages:
+  - format
+  - internal/assertion
+  - internal/asyncassertion
+  - internal/oraclematcher
+  - internal/testingtsupport
+  - matchers
+  - matchers/support/goraph/bipartitegraph
+  - matchers/support/goraph/edge
+  - matchers/support/goraph/node
+  - matchers/support/goraph/util
+  - types
 - name: github.com/pborman/uuid
   version: c55201b036063326c5b1b89ccfe45a184973d073
 - name: github.com/rakyll/statik
   version: 2940084503a48359b41de178874e862c5bc3efe8
   subpackages:
-  - fs
   - example/statik
+  - fs
 - name: github.com/rcrowley/go-metrics
   version: eeba7bd0dd01ace6e690fa833b3f22aaec29af43
 - name: github.com/rogpeppe/go-charset
@@ -96,4 +108,4 @@ imports:
   version: 31e6fd4bd5a98d8ee7673d24bc54ec73c31810dd
 - name: gopkg.in/yaml.v2
   version: a83829b6f1293c91addabc89d0571c246397bbf4
-devImports: []
+testImports: []

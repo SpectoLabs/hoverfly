@@ -1,0 +1,163 @@
+{
+"8bit": {
+	"Desc": "raw 8-bit data",
+	"Class": "8bit",
+	"Comment": "special class for raw 8bit data that has been converted to utf-8"
+},
+"big5": {
+	"Desc": "Big 5 (HKU)",
+	"Class": "big5",
+	"Comment": "Traditional Chinese"
+},
+"euc-jp": {
+	"Aliases":["x-euc-jp"],
+	"Desc": "Japanese Extended UNIX Code",
+	"Class": "euc-jp"
+},
+"gb2312": {
+	"Aliases":["iso-ir-58", "chinese", "gb_2312-80"],
+	"Desc": "Chinese mixed one byte",
+	"Class": "gb2312"
+},
+"ibm437": {
+	"Aliases":["437", "cp437"],
+	"Desc": "IBM PC: CP 437",
+	"Class": "cp",
+	"Arg": "ibm437.cp",
+	"Comment": "originally from jhelling@cs.ruu.nl (Jeroen Hellingman)"
+},
+"ibm850": {
+	"Aliases":["850", "cp850"],
+	"Desc": "IBM PS/2: CP 850",
+	"Class": "cp",
+	"Arg": "ibm850.cp",
+	"Comment": "originally from jhelling@cs.ruu.nl (Jeroen Hellingman)"
+},
+"ibm866": {
+	"Aliases":["cp866", "866"],
+	"Desc": "Russian MS-DOS CP 866",
+	"Class": "cp",
+	"Arg": "ibm866.cp"
+},
+"iso-8859-1": {
+	"Aliases":["iso-ir-100", "ibm819", "l1", "iso8859-1", "iso-latin-1", "iso_8859-1:1987", "cp819", "iso_8859-1", "iso8859_1", "latin1"],
+	"Desc": "Latin-1",
+	"Class": "cp",
+	"Arg": "iso-8859-1.cp"
+},
+"iso-8859-10": {
+	"Aliases":["iso_8859-10:1992", "l6", "iso-ir-157", "latin6"],
+	"Desc": "Latin-6",
+	"Class": "cp",
+	"Arg": "iso-8859-10.cp",
+	"Comment": "originally from dkuug.dk:i18n/charmaps/ISO_8859-10:1993"
+},
+"iso-8859-15": {
+	"Aliases":["l9-iso-8859-15", "latin9"],
+	"Desc": "Latin-9",
+	"Class": "cp",
+	"Arg": "iso-8859-15.cp"
+},
+"iso-8859-2": {
+	"Aliases":["iso-ir-101", "iso_8859-2:1987", "l2", "iso_8859-2", "latin2"],
+	"Desc": "Latin-2",
+	"Class": "cp",
+	"Arg": "iso-8859-2.cp"
+},
+"iso-8859-3": {
+	"Aliases":["iso-ir-109", "l3", "iso_8859-3:1988", "iso_8859-3", "latin3"],
+	"Desc": "Latin-3",
+	"Class": "cp",
+	"Arg": "iso-8859-3.cp"
+},
+"iso-8859-4": {
+	"Aliases":["iso-ir-110", "iso_8859-4:1988", "l4", "iso_8859-4", "latin4"],
+	"Desc": "Latin-4",
+	"Class": "cp",
+	"Arg": "iso-8859-4.cp"
+},
+"iso-8859-5": {
+	"Aliases":["cyrillic", "iso_8859-5", "iso-ir-144", "iso_8859-5:1988"],
+	"Desc": "Part 5 (Cyrillic)",
+	"Class": "cp",
+	"Arg": "iso-8859-5.cp"
+},
+"iso-8859-6": {
+	"Aliases":["ecma-114", "iso_8859-6:1987", "arabic", "iso_8859-6", "asmo-708", "iso-ir-127"],
+	"Desc": "Part 6 (Arabic)",
+	"Class": "cp",
+	"Arg": "iso-8859-6.cp"
+},
+"iso-8859-7": {
+	"Aliases":["greek8", "elot_928", "ecma-118", "greek", "iso_8859-7", "iso_8859-7:1987", "iso-ir-126"],
+	"Desc": "Part 7 (Greek)",
+	"Class": "cp",
+	"Arg": "iso-8859-7.cp"
+},
+"iso-8859-8": {
+	"Aliases":["iso_8859-8:1988", "hebrew", "iso_8859-8", "iso-ir-138"],
+	"Desc": "Part 8 (Hebrew)",
+	"Class": "cp",
+	"Arg": "iso-8859-8.cp"
+},
+"iso-8859-9": {
+	"Aliases":["l5", "iso_8859-9:1989", "iso_8859-9", "iso-ir-148", "latin5"],
+	"Desc": "Latin-5",
+	"Class": "cp",
+	"Arg": "iso-8859-9.cp"
+},
+"koi8-r": {
+	"Desc": "KOI8-R (RFC1489)",
+	"Class": "cp",
+	"Arg": "koi8-r.cp"
+},
+"shift_jis": {
+	"Aliases":["sjis", "ms_kanji", "x-sjis"],
+	"Desc": "Shift-JIS Japanese",
+	"Class": "cp932",
+	"Arg": "shiftjis"
+},
+"utf-16": {
+	"Aliases":["utf16"],
+	"Desc": "Unicode UTF-16",
+	"Class": "utf16"
+},
+"utf-16be": {
+	"Aliases":["utf16be"],
+	"Desc": "Unicode UTF-16 big endian",
+	"Class": "utf16",
+	"Arg": "be"
+},
+"utf-16le": {
+	"Aliases":["utf16le"],
+	"Desc": "Unicode UTF-16 little endian",
+	"Class": "utf16",
+	"Arg": "le"
+},
+"utf-8": {
+	"Aliases":["utf8", "ascii", "us-ascii"],
+	"Desc": "Unicode UTF-8",
+	"Class": "utf8"
+},
+"windows-1250": {
+	"Desc": "MS Windows CP 1250 (Central Europe)",
+	"Class": "cp",
+	"Arg": "windows-1250.cp"
+},
+"windows-1251": {
+	"Desc": "MS Windows CP 1251 (Cyrillic)",
+	"Class": "cp",
+	"Arg": "windows-1251.cp"
+},
+"windows-1252": {
+	"Desc": "MS Windows CP 1252 (Latin 1)",
+	"Class": "cp",
+	"Arg": "windows-1252.cp"
+},
+"windows-31j": {
+	"Aliases":["cp932"],
+	"Desc": "MS-Windows Japanese (cp932)",
+	"Class": "cp932",
+	"Arg": "cp932"
+}
+}
