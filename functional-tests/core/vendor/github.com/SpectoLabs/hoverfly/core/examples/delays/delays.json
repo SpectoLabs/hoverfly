@@ -1,0 +1,13 @@
+{
+  "data": [
+    {
+      "urlPattern": "github.com",
+      "delay": 2000
+    },
+    {
+      "httpMethod": "POST",
+      "urlPattern": ".",
+      "delay": 2000
+    }
+  ]
+}

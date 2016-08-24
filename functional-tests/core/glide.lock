@@ -1,20 +1,53 @@
-hash: 1c0bf60b94de2c9de96cafd07c2439faedf710a2c2c5fa2d0acec24ad563afcf
-updated: 2016-06-23T14:00:35.3461637+01:00
+hash: e7725f96bdf3ff68224772d7aadf6c1c21b12f69be61e89a7912f344da49c0bc
+updated: 2016-08-24T16:25:25.283477349+01:00
 imports:
 - name: github.com/dghubble/sling
   version: 4af638d6d3265b9f740bf6d2665ef20d7abd0103
 - name: github.com/google/go-querystring
   version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
+  subpackages:
+  - query
+- name: github.com/gorilla/context
+  version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
+- name: github.com/gorilla/mux
+  version: a49d62f618e6dc4a7a7d1f0ad69744a158c21f23
 - name: github.com/onsi/ginkgo
   version: 059cec02d342bab423425a99b191186a03255e9e
+  subpackages:
+  - config
+  - internal/codelocation
+  - internal/containernode
+  - internal/failer
+  - internal/leafnodes
+  - internal/remote
+  - internal/spec
+  - internal/specrunner
+  - internal/suite
+  - internal/testingtproxy
+  - internal/writer
+  - reporters
+  - reporters/stenographer
+  - types
 - name: github.com/onsi/gomega
   version: 3e93f011213c200aadafcb19ed56eb718381cfbd
+  subpackages:
+  - format
+  - internal/assertion
+  - internal/asyncassertion
+  - internal/oraclematcher
+  - internal/testingtsupport
+  - matchers
+  - matchers/support/goraph/bipartitegraph
+  - matchers/support/goraph/edge
+  - matchers/support/goraph/node
+  - matchers/support/goraph/util
+  - types
 - name: github.com/phayes/freeport
   version: e7681b37614941bf73b404e0caa37f19e33b5fed
 - name: gopkg.in/yaml.v2
   version: a83829b6f1293c91addabc89d0571c246397bbf4
-- name: github.com/gorilla/mux
-  version: a49d62f618e6dc4a7a7d1f0ad69744a158c21f23
-- name: github.com/gorilla/context
-  version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
-devImports: []
+testImports:
+- name: github.com/SpectoLabs/hoverfly
+  version: fbcaf354502ada1873ac419b526b5a07bc855085
+  subpackages:
+  - core/views
