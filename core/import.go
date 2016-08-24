@@ -158,6 +158,7 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []views.RequestResp
 				}
 
 				hf.RequestMatcher.TemplateStore = append(hf.RequestMatcher.TemplateStore, requestTemplateResponsePair)
+				success++
 				continue
 			}
 
