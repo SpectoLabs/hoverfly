@@ -1,4 +1,4 @@
-package: github.com/SpectoLabs/hoverfly
+package: github.com/SpectoLabs/hoverfly/core
 import:
 - package: github.com/Sirupsen/logrus
 - package: github.com/boltdb/bolt

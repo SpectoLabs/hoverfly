@@ -1,4 +1,4 @@
-package: github.com/SpectoLabs/hoverfly-end-to-end
+package: github.com/SpectoLabs/functional-tests/hoverctl
 import:
 - package: github.com/onsi/gomega
 - package: github.com/onsi/ginkgo
