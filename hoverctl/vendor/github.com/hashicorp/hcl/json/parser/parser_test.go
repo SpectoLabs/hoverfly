@@ -311,6 +311,10 @@ func TestParse(t *testing.T) {
 			"types.json",
 			false,
 		},
+		{
+			"bad_input_128.json",
+			true,
+		},
 	}
 
 	const fixtureDir = "./test-fixtures"
@@ -324,6 +328,22 @@ func TestParse(t *testing.T) {
 		_, err = Parse(d)
 		if (err != nil) != tc.Err {
 			t.Fatalf("Input: %s\n\nError: %s", tc.Name, err)
+		}
+	}
+}
+
+func TestParse_inline(t *testing.T) {
+	cases := []struct {
+		Value string
+		Err   bool
+	}{
+		{"{:{", true},
+	}
+
+	for _, tc := range cases {
+		_, err := Parse([]byte(tc.Value))
+		if (err != nil) != tc.Err {
+			t.Fatalf("Input: %q\n\nError: %s", tc.Value, err)
 		}
 	}
 }
