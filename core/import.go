@@ -14,6 +14,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
+	. "github.com/SpectoLabs/hoverfly/core/util"
 	"net/http"
 )
 
@@ -132,23 +133,17 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []views.RequestResp
 		success := 0
 		failed := 0
 		for _, pairView := range pairViews {
-			if pairView.Request.RequestType == "template" {
+
+			if pairView.Request.RequestType != nil && *pairView.Request.RequestType == *StringToPointer("template") {
 				responseDetails := models.NewResponseDetialsFromResponseDetailsView(pairView.Response)
 
-				getValue := func (value string) *string {
-					if value == "" {
-						return nil
-					}
-					return &value
-				}
-
 				requestTemplate := matching.RequestTemplate{
-					Path: getValue(pairView.Request.Path),
-					Method: getValue(pairView.Request.Method),
-					Destination: getValue(pairView.Request.Destination),
-					Scheme: getValue(pairView.Request.Scheme),
-					Query: getValue(pairView.Request.Query),
-					Body: getValue(pairView.Request.Body),
+					Path: pairView.Request.Path,
+					Method: pairView.Request.Method,
+					Destination: pairView.Request.Destination,
+					Scheme: pairView.Request.Scheme,
+					Query: pairView.Request.Query,
+					Body: pairView.Request.Body,
 					Headers: pairView.Request.Headers,
 				}
 

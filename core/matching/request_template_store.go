@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
 	"reflect"
@@ -133,22 +134,15 @@ func (this *RequestTemplateResponsePair) ConvertToRequestTemplateResponsePairVie
 
 func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() views.RequestResponsePairView {
 
-	getValue := func (value *string) string {
-		if value == nil {
-			return ""
-		}
-		return *value
-	}
-
 	return views.RequestResponsePairView{
 		Request: views.RequestDetailsView{
-			RequestType: "template",
-			Path:        getValue(this.RequestTemplate.Path),
-			Method:      getValue(this.RequestTemplate.Method),
-			Destination: getValue(this.RequestTemplate.Destination),
-			Scheme:      getValue(this.RequestTemplate.Scheme),
-			Query:       getValue(this.RequestTemplate.Query),
-			Body:        getValue(this.RequestTemplate.Body),
+			RequestType: StringToPointer("template"),
+			Path:        this.RequestTemplate.Path,
+			Method:      this.RequestTemplate.Method,
+			Destination: this.RequestTemplate.Destination,
+			Scheme:      this.RequestTemplate.Scheme,
+			Query:       this.RequestTemplate.Query,
+			Body:        this.RequestTemplate.Body,
 			Headers:     this.RequestTemplate.Headers,
 		},
 		Response: this.Response.ConvertToResponseDetailsView(),

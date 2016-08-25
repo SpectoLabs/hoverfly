@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	. "github.com/SpectoLabs/hoverfly/core/util"
 )
 
 func TestIsURLHTTP(t *testing.T) {
@@ -152,11 +153,12 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			EncodedBody: false,
 			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}}},
 		Request: views.RequestDetailsView{
-			Path:        "/",
-			Method:      "GET",
-			Destination: "/",
-			Scheme:      "scheme",
-			Query:       "", Body: "",
+			Path:        StringToPointer("/"),
+			Method:      StringToPointer("GET"),
+			Destination: StringToPointer("/"),
+			Scheme:      StringToPointer("scheme"),
+			Query:       StringToPointer(""),
+			Body: StringToPointer(""),
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{originalPair})
@@ -198,18 +200,19 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 		},
 		Request: views.RequestDetailsView{
-			Path:        "/",
-			Method:      "GET",
-			Destination: "/",
-			Scheme:      "scheme",
-			Query:       "", Body: "",
+			Path:        StringToPointer("/"),
+			Method:      StringToPointer("GET"),
+			Destination: StringToPointer("/"),
+			Scheme:      StringToPointer("scheme"),
+			Query:       StringToPointer(""),
+			Body: StringToPointer(""),
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	originalPair2 := originalPair1
-	originalPair2.Request.Path = "/new/path"
+	originalPair2.Request.Path = StringToPointer("/new/path")
 
 	originalPair3 := originalPair1
-	originalPair3.Request.Path = "/newer/path"
+	originalPair3.Request.Path = StringToPointer("/newer/path")
 
 	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{originalPair1, originalPair2, originalPair3})
 
@@ -241,8 +244,8 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 	RegisterTestingT(t)
 
 	requestTemplate := views.RequestDetailsView{
-		RequestType: "template",
-		Method:      "GET",
+		RequestType: StringToPointer("template"),
+		Method:      StringToPointer("GET"),
 	}
 
 	responseView := views.ResponseDetailsView{
@@ -279,15 +282,15 @@ func TestImportImportRequestResponsePairs_CanImportARequestResponsePair_AndReque
 	RegisterTestingT(t)
 
 	requestTemplate := views.RequestDetailsView{
-		RequestType: "template",
-		Method:      "GET",
+		RequestType: StringToPointer("template"),
+		Method:      StringToPointer("GET"),
 	}
 
 	requestView := views.RequestDetailsView{
-		Method:      "GET",
-		Path:        "/",
-		Destination: "test.com",
-		Scheme:      "http",
+		Method:      StringToPointer("GET"),
+		Path:        StringToPointer("/"),
+		Destination: StringToPointer("test.com"),
+		Scheme:      StringToPointer("http"),
 	}
 
 	responseView := views.ResponseDetailsView{
@@ -352,11 +355,12 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 			EncodedBody: true,
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
 		Request: views.RequestDetailsView{
-			Path:        "/",
-			Method:      "GET",
-			Destination: "/",
-			Scheme:      "scheme",
-			Query:       "", Body: "",
+			Path:        StringToPointer("/"),
+			Method:      StringToPointer("GET"),
+			Destination: StringToPointer("/"),
+			Scheme:      StringToPointer("scheme"),
+			Query:       StringToPointer(""),
+			Body: StringToPointer(""),
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{encodedPair})

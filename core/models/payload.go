@@ -8,6 +8,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/views"
+	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
@@ -99,25 +100,26 @@ type RequestDetails struct {
 
 func NewRequestDetailsFromRequestDetailsView(data views.RequestDetailsView) RequestDetails {
 	return RequestDetails{
-		Path:        data.Path,
-		Method:      data.Method,
-		Destination: data.Destination,
-		Scheme:      data.Scheme,
-		Query:       data.Query,
-		Body:        data.Body,
+		Path:        PointerToString(data.Path),
+		Method:      PointerToString(data.Method),
+		Destination: PointerToString(data.Destination),
+		Scheme:      PointerToString(data.Scheme),
+		Query:       PointerToString(data.Query),
+		Body:        PointerToString(data.Body),
 		Headers:     data.Headers,
 	}
 }
 
 func (this *RequestDetails) ConvertToRequestDetailsView() views.RequestDetailsView {
+	s := "snapshot"
 	return views.RequestDetailsView{
-		RequestType: "snapshot",
-		Path:        this.Path,
-		Method:      this.Method,
-		Destination: this.Destination,
-		Scheme:      this.Scheme,
-		Query:       this.Query,
-		Body:        this.Body,
+		RequestType: &s,
+		Path:        &this.Path,
+		Method:      &this.Method,
+		Destination: &this.Destination,
+		Scheme:      &this.Scheme,
+		Query:       &this.Query,
+		Body:        &this.Body,
 		Headers:     this.Headers,
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 	"testing"
+	. "github.com/SpectoLabs/hoverfly/core/util"
 )
 
 func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
@@ -378,12 +379,12 @@ func TestRequestTemplateResponsePairCanBeConvertedToARequestResponsePairView_Whi
 
 	pairView := requestTemplateResponsePair.ConvertToRequestResponsePairView()
 
-	Expect(pairView.Request.RequestType).To(Equal("template"))
-	Expect(pairView.Request.Method).To(Equal("POST"))
-	Expect(pairView.Request.Destination).To(Equal(""))
-	Expect(pairView.Request.Path).To(Equal(""))
-	Expect(pairView.Request.Scheme).To(Equal(""))
-	Expect(pairView.Request.Query).To(Equal(""))
+	Expect(pairView.Request.RequestType).To(Equal(StringToPointer("template")))
+	Expect(pairView.Request.Method).To(Equal(StringToPointer("POST")))
+	Expect(pairView.Request.Destination).To(BeNil())
+	Expect(pairView.Request.Path).To(BeNil())
+	Expect(pairView.Request.Scheme).To(BeNil())
+	Expect(pairView.Request.Query).To(BeNil())
 
 	Expect(pairView.Response.Body).To(Equal("Yo"))
 }
