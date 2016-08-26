@@ -23,6 +23,104 @@ func GzipString(s string) string {
 
 var _ = Describe("Capture > export > importing > simulate flow", func() {
 
+	Describe("When working with a mixed data set of recorded and templated requests", func() {
+
+		var jsonPayload *bytes.Buffer
+
+		BeforeEach(func() {
+			hoverflyCmd = startHoverfly(adminPort, proxyPort)
+			SetHoverflyMode("simulate")
+
+			jsonPayload = bytes.NewBufferString(`
+				{
+					"data": [{
+						"request": {
+							"path": "/path1",
+							"method": "GET",
+							"destination": "destination1",
+							"scheme": "http",
+							"query": "",
+							"body": "",
+							"headers": {}
+						},
+						"response": {
+							"status": 201,
+							"encodedBody": false,
+							"body": "exact match",
+							"headers": {}
+						}
+					}, {
+						"request": {
+							"requestType": "template",
+							"destination": "destination2"
+						},
+						"response": {
+							"status": 200,
+							"encodedBody": false,
+							"body": "template match",
+							"headers": {}
+						}
+					}]
+				}
+			`)
+
+		})
+
+		AfterEach(func() {
+			stopHoverfly()
+		})
+
+		Context("When I import", func() {
+
+
+			It("It should accept and store both", func() {
+				slingRequest := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonPayload)
+				response := DoRequest(slingRequest)
+				Expect(response.Status).To(Equal("200 OK"))
+			})
+
+			It("It should match on the exact request and on template", func() {
+				slingRequest := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonPayload)
+				DoRequest(slingRequest)
+
+				slingRequest = sling.New().Get("http://destination1/path1")
+				response := DoRequestThroughProxy(slingRequest)
+
+				body, err := ioutil.ReadAll(response.Body)
+				Expect(err).To(BeNil())
+				Expect(string(body)).To(Equal("exact match"))
+
+				slingRequest = sling.New().Get("http://destination2/should-match-regardless")
+				response = DoRequestThroughProxy(slingRequest)
+
+				body, err = ioutil.ReadAll(response.Body)
+				Expect(err).To(BeNil())
+				Expect(string(body)).To(Equal("template match"))
+			})
+
+		})
+
+		Context("When I export", func() {
+
+			BeforeEach(func() {
+				slingRequest := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonPayload)
+				DoRequest(slingRequest)
+			})
+
+			It("It should contain both templates and snapshots", func() {
+				records := ExportHoverflyRecords()
+
+				recordsBytes, err := ioutil.ReadAll(records)
+				Expect(err).To(BeNil())
+
+				Expect(string(recordsBytes)).To(ContainSubstring("template"))
+				Expect(string(recordsBytes)).To(ContainSubstring("recording"))
+			})
+
+		})
+
+	})
+
 	Describe("When I import and export", func() {
 
 		Context("A plain text response", func() {

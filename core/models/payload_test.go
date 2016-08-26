@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"github.com/SpectoLabs/hoverfly/core/views"
+	. "github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
@@ -129,13 +130,13 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 			Headers:     map[string][]string{"test_header": []string{"true"}},
 			EncodedBody: false},
 		Request: views.RequestDetailsView{
-			RequestType: "snapshot",
-			Path:        "/",
-			Method:      "GET",
-			Destination: "/",
-			Scheme:      "scheme",
-			Query:       "",
-			Body:        "",
+			RequestType: StringToPointer("recording"),
+			Path:        StringToPointer("/"),
+			Method:      StringToPointer("GET"),
+			Destination: StringToPointer("/"),
+			Scheme:      StringToPointer("scheme"),
+			Query:       StringToPointer(""),
+			Body:        StringToPointer(""),
 			Headers:     map[string][]string{"test_header": []string{"true"}}},
 	}))
 }
@@ -168,13 +169,13 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 			EncodedBody: true},
 		Request: views.RequestDetailsView{
-			RequestType: "snapshot",
-			Path:        "/",
-			Method:      "GET",
-			Destination: "/",
-			Scheme:      "scheme",
-			Query:       "",
-			Body:        "",
+			RequestType: StringToPointer("recording"),
+			Path:        StringToPointer("/"),
+			Method:      StringToPointer("GET"),
+			Destination: StringToPointer("/"),
+			Scheme:      StringToPointer("scheme"),
+			Query:       StringToPointer(""),
+			Body:        StringToPointer(""),
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 		},
 	}))
@@ -193,11 +194,11 @@ func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
 
 	requestDetailsView := requestDetails.ConvertToRequestDetailsView()
 
-	Expect(requestDetailsView.Path).To(Equal(requestDetails.Path))
-	Expect(requestDetailsView.Method).To(Equal(requestDetails.Method))
-	Expect(requestDetailsView.Destination).To(Equal(requestDetails.Destination))
-	Expect(requestDetailsView.Scheme).To(Equal(requestDetails.Scheme))
-	Expect(requestDetailsView.Query).To(Equal(requestDetails.Query))
+	Expect(requestDetailsView.Path).To(Equal(StringToPointer(requestDetails.Path)))
+	Expect(requestDetailsView.Method).To(Equal(StringToPointer(requestDetails.Method)))
+	Expect(requestDetailsView.Destination).To(Equal(StringToPointer(requestDetails.Destination)))
+	Expect(requestDetailsView.Scheme).To(Equal(StringToPointer(requestDetails.Scheme)))
+	Expect(requestDetailsView.Query).To(Equal(StringToPointer(requestDetails.Query)))
 	Expect(requestDetailsView.Headers).To(Equal(requestDetails.Headers))
 }
 
@@ -214,12 +215,12 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *
 
 	view := views.RequestResponsePairView{
 		Request: views.RequestDetailsView{
-			Path:        "A",
-			Method:      "A",
-			Destination: "A",
-			Scheme:      "A",
-			Query:       "A",
-			Body:        "A",
+			Path:        StringToPointer("A"),
+			Method:      StringToPointer("A"),
+			Destination: StringToPointer("A"),
+			Scheme:      StringToPointer("A"),
+			Query:       StringToPointer("A"),
+			Body:        StringToPointer("A"),
 			Headers: map[string][]string{
 				"A": []string{"B"},
 				"C": []string{"D"},
@@ -281,19 +282,20 @@ func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 	RegisterTestingT(t)
 
 	requestDetailsView := views.RequestDetailsView{
-		Path:        "/",
-		Method:      "GET",
-		Destination: "/",
-		Scheme:      "scheme",
-		Query:       "", Body: "",
+		Path:        StringToPointer("/"),
+		Method:      StringToPointer("GET"),
+		Destination: StringToPointer("/"),
+		Scheme:      StringToPointer("scheme"),
+		Query:       StringToPointer(""),
+		Body: StringToPointer(""),
 		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}}
 
 	requestDetails := NewRequestDetailsFromRequestDetailsView(requestDetailsView)
 
-	Expect(requestDetails.Path).To(Equal(requestDetailsView.Path))
-	Expect(requestDetails.Method).To(Equal(requestDetailsView.Method))
-	Expect(requestDetails.Destination).To(Equal(requestDetailsView.Destination))
-	Expect(requestDetails.Scheme).To(Equal(requestDetailsView.Scheme))
-	Expect(requestDetails.Query).To(Equal(requestDetailsView.Query))
+	Expect(requestDetails.Path).To(Equal(*requestDetailsView.Path))
+	Expect(requestDetails.Method).To(Equal(*requestDetailsView.Method))
+	Expect(requestDetails.Destination).To(Equal(*requestDetailsView.Destination))
+	Expect(requestDetails.Scheme).To(Equal(*requestDetailsView.Scheme))
+	Expect(requestDetails.Query).To(Equal(*requestDetailsView.Query))
 	Expect(requestDetails.Headers).To(Equal(requestDetailsView.Headers))
 }

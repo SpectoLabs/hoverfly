@@ -291,6 +291,11 @@ func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, n
 		}
 	}
 
+	for _, v := range d.RequestMatcher.TemplateStore {
+		pairView := v.ConvertToRequestResponsePairView()
+		pairViews = append(pairViews, pairView)
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 
 	var response views.RequestResponsePairPayload

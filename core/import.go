@@ -11,8 +11,10 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
+	. "github.com/SpectoLabs/hoverfly/core/util"
 	"net/http"
 )
 
@@ -131,6 +133,29 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []views.RequestResp
 		success := 0
 		failed := 0
 		for _, pairView := range pairViews {
+
+			if pairView.Request.RequestType != nil && *pairView.Request.RequestType == *StringToPointer("template") {
+				responseDetails := models.NewResponseDetailsFromResponseDetailsView(pairView.Response)
+
+				requestTemplate := matching.RequestTemplate{
+					Path: pairView.Request.Path,
+					Method: pairView.Request.Method,
+					Destination: pairView.Request.Destination,
+					Scheme: pairView.Request.Scheme,
+					Query: pairView.Request.Query,
+					Body: pairView.Request.Body,
+					Headers: pairView.Request.Headers,
+				}
+
+				requestTemplateResponsePair := matching.RequestTemplateResponsePair{
+					RequestTemplate: requestTemplate,
+					Response: responseDetails,
+				}
+
+				hf.RequestMatcher.TemplateStore = append(hf.RequestMatcher.TemplateStore, requestTemplateResponsePair)
+				success++
+				continue
+			}
 
 			// Convert PayloadView back to Payload for internal storage
 			pair := models.NewRequestResponsePairFromRequestResponsePairView(pairView)

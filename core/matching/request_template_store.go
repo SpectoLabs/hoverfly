@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
 	"reflect"
@@ -45,6 +46,7 @@ func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserv
 		if entry.RequestTemplate.Body != nil && *entry.RequestTemplate.Body != req.Body {
 			continue
 		}
+
 		if !webserver {
 			if entry.RequestTemplate.Destination != nil && *entry.RequestTemplate.Destination != req.Destination {
 				continue
@@ -130,6 +132,23 @@ func (this *RequestTemplateResponsePair) ConvertToRequestTemplateResponsePairVie
 	}
 }
 
+func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() views.RequestResponsePairView {
+
+	return views.RequestResponsePairView{
+		Request: views.RequestDetailsView{
+			RequestType: StringToPointer("template"),
+			Path:        this.RequestTemplate.Path,
+			Method:      this.RequestTemplate.Method,
+			Destination: this.RequestTemplate.Destination,
+			Scheme:      this.RequestTemplate.Scheme,
+			Query:       this.RequestTemplate.Query,
+			Body:        this.RequestTemplate.Body,
+			Headers:     this.RequestTemplate.Headers,
+		},
+		Response: this.Response.ConvertToResponseDetailsView(),
+	}
+}
+
 func (this *RequestTemplateResponsePairPayload) ConvertToRequestTemplateStore() RequestTemplateStore {
 	var requestTemplateStore RequestTemplateStore
 	for _, pair := range *this.Data {
@@ -141,6 +160,6 @@ func (this *RequestTemplateResponsePairPayload) ConvertToRequestTemplateStore() 
 func (this *RequestTemplateResponsePairView) ConvertToRequestTemplateResponsePair() RequestTemplateResponsePair {
 	return RequestTemplateResponsePair{
 		RequestTemplate: this.RequestTemplate,
-		Response:        models.NewResponseDetialsFromResponseDetailsView(this.Response),
+		Response:        models.NewResponseDetailsFromResponseDetailsView(this.Response),
 	}
 }

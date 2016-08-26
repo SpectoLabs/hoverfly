@@ -4,6 +4,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 	"testing"
+	. "github.com/SpectoLabs/hoverfly/core/util"
 )
 
 func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
@@ -360,4 +361,30 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 	result, _ = store.GetResponse(r, false)
 
 	Expect(result).To(BeNil())
+}
+
+func TestRequestTemplateResponsePairCanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
+	RegisterTestingT(t)
+
+	method := "POST"
+
+	requestTemplateResponsePair := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Method: &method,
+		},
+		Response: models.ResponseDetails{
+			Body: "Yo",
+		},
+	}
+
+	pairView := requestTemplateResponsePair.ConvertToRequestResponsePairView()
+
+	Expect(pairView.Request.RequestType).To(Equal(StringToPointer("template")))
+	Expect(pairView.Request.Method).To(Equal(StringToPointer("POST")))
+	Expect(pairView.Request.Destination).To(BeNil())
+	Expect(pairView.Request.Path).To(BeNil())
+	Expect(pairView.Request.Scheme).To(BeNil())
+	Expect(pairView.Request.Query).To(BeNil())
+
+	Expect(pairView.Response.Body).To(Equal("Yo"))
 }
