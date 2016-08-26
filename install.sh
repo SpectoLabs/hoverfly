@@ -82,38 +82,22 @@ ln -s ${HFCTL_BINARY} hoverctl
 
 mkdir ${HF_DIR}
 
-# Get API key
-
-echo
-echo "*****************************************************"
-echo "************** SpectoLab PRIVATE BETA ***************"
-echo "*****************************************************"
-echo "To use the SpectoLab with hoverctl, sign in at"
-echo "https://lab.specto.io/settings to access your API Key."
-echo
-echo "If you don't have an API key, just press RETURN below."
-echo
-read -rsp "Enter your SpectoLab API key here : " API_KEY
-
 # Create config file
 
 cat >${HF_DIR}/config.yaml <<EOL
 hoverfly.host: ${HF_HOST}
 hoverfly.admin.port: ${HF_ADMIN_PORT}
 hoverfly.proxy.port: ${HF_PROXY_PORT}
-specto.lab.api.key: ${API_KEY}
+specto.lab.api.key:
 EOL
 
 echo
 echo
-echo "Hoverctl config file created: ${HF_DIR}/config.yaml. Edit this file to change hoverfly host, ports and SpectoLab API key."
+echo "Hoverctl config file created: ${HF_DIR}/config.yaml. Edit this file to change hoverfly host and ports."
 echo
 echo "Installation complete."
 echo
-echo "To get started:"
-echo "1. Run 'hoverctl pull benjvi/hello-world:latest'"
-echo "2. Set your http_proxy environment variable: 'export http_proxy=http://${HF_HOST}:${HF_PROXY_PORT}/'"
-echo "3. Run 'hoverctl start'"
-echo "3. Run 'hoverctl import benjvi/hello-world:latest'"
-echo "4. Run 'curl -L http://lab.specto.io/static/hello-world.html', or open in the browser on linux"
+echo "Run 'hoverctl help' to get started"
+echo
+echo "Hoverfly documentation is available here: https://spectolabs.gitbooks.io/hoverfly/content"
 echo
