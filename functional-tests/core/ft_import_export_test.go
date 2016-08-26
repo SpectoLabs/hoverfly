@@ -114,7 +114,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				Expect(err).To(BeNil())
 
 				Expect(string(recordsBytes)).To(ContainSubstring("template"))
-				Expect(string(recordsBytes)).To(ContainSubstring("snapshot"))
+				Expect(string(recordsBytes)).To(ContainSubstring("recording"))
 			})
 
 		})

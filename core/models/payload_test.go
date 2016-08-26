@@ -130,7 +130,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 			Headers:     map[string][]string{"test_header": []string{"true"}},
 			EncodedBody: false},
 		Request: views.RequestDetailsView{
-			RequestType: StringToPointer("snapshot"),
+			RequestType: StringToPointer("recording"),
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
@@ -169,7 +169,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 			EncodedBody: true},
 		Request: views.RequestDetailsView{
-			RequestType: StringToPointer("snapshot"),
+			RequestType: StringToPointer("recording"),
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),

@@ -113,7 +113,7 @@ var _ = Describe("Interacting with the API", func() {
 						}
 					      },
 					      "request": {
-					      	"requestType": "snapshot",
+					      	"requestType": "recording",
 						"path": "/path1",
 						"method": "method1",
 						"destination": "destination1",
