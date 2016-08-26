@@ -135,7 +135,7 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []views.RequestResp
 		for _, pairView := range pairViews {
 
 			if pairView.Request.RequestType != nil && *pairView.Request.RequestType == *StringToPointer("template") {
-				responseDetails := models.NewResponseDetialsFromResponseDetailsView(pairView.Response)
+				responseDetails := models.NewResponseDetailsFromResponseDetailsView(pairView.Response)
 
 				requestTemplate := matching.RequestTemplate{
 					Path: pairView.Request.Path,

@@ -82,7 +82,7 @@ func NewRequestResponsePairFromBytes(data []byte) (*RequestResponsePair, error) 
 
 func NewRequestResponsePairFromRequestResponsePairView(pairView views.RequestResponsePairView) RequestResponsePair {
 	return RequestResponsePair{
-		Response: NewResponseDetialsFromResponseDetailsView(pairView.Response),
+		Response: NewResponseDetailsFromResponseDetailsView(pairView.Response),
 		Request:  NewRequestDetailsFromRequestDetailsView(pairView.Request),
 	}
 }
@@ -199,7 +199,7 @@ type ResponseDetails struct {
 	Headers map[string][]string `json:"headers"`
 }
 
-func NewResponseDetialsFromResponseDetailsView(data views.ResponseDetailsView) ResponseDetails {
+func NewResponseDetailsFromResponseDetailsView(data views.ResponseDetailsView) ResponseDetails {
 	body := data.Body
 
 	if data.EncodedBody == true {

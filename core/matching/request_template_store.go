@@ -160,6 +160,6 @@ func (this *RequestTemplateResponsePairPayload) ConvertToRequestTemplateStore() 
 func (this *RequestTemplateResponsePairView) ConvertToRequestTemplateResponsePair() RequestTemplateResponsePair {
 	return RequestTemplateResponsePair{
 		RequestTemplate: this.RequestTemplate,
-		Response:        models.NewResponseDetialsFromResponseDetailsView(this.Response),
+		Response:        models.NewResponseDetailsFromResponseDetailsView(this.Response),
 	}
 }
