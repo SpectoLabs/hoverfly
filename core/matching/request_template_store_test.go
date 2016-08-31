@@ -572,3 +572,34 @@ func TestTemplatesCanUseGlobsOnBodyAndNotMatchWhenTheBodyIsWrong(t *testing.T) {
 	_, err :=store.GetResponse(request, false)
 	Expect(err).ToNot(BeNil())
 }
+
+func TestTemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestTemplateResponsePair := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Headers: map[string][]string {
+				"unique-header": []string {"*"},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "template matched",
+		},
+	}
+
+	store := RequestTemplateStore{requestTemplateResponsePair}
+
+	request := models.RequestDetails{
+		Method:      "GET",
+		Destination: "testhost.com",
+		Path:        "/api/1",
+		Headers:  map[string][]string {
+			"unique-header": []string {"totally-unique"},
+		},
+	}
+
+	response, err :=store.GetResponse(request, false)
+	Expect(err).To(BeNil())
+
+	Expect(response.Body).To(Equal("template matched"))
+}

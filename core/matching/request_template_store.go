@@ -7,7 +7,6 @@ import (
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
-	"reflect"
 	"github.com/ryanuber/go-glob"
 )
 
@@ -100,17 +99,25 @@ func (this *RequestTemplateStore) Wipe() {
 /**
 Check keys and corresponding values in template headers are also present in request headers
 */
-func headerMatch(tmplHeaders, reqHeaders map[string][]string) bool {
+func headerMatch(templateHeaders, requestHeaders map[string][]string) bool {
 
-	for headerName, headerVal := range tmplHeaders {
-		// TODO: case insensitive lookup
-		// TODO: is order of values in slice really important?
-
-		reqHeaderVal, ok := reqHeaders[headerName]
-		if ok && reflect.DeepEqual(headerVal, reqHeaderVal) {
-			continue
-		} else {
+	for templateHeaderKey, templateHeaderValues := range templateHeaders {
+		requestTemplateValues, ok := requestHeaders[templateHeaderKey]
+		if !ok {
 			return false
+		}
+
+		for _, templateHeaderValue := range templateHeaderValues {
+			found := 0
+			for _, requestHeaderValue := range requestTemplateValues {
+				if glob.Glob(templateHeaderValue, requestHeaderValue) {
+					found++
+				}
+			}
+
+			if found == 0 {
+				return false
+			}
 		}
 	}
 	return true
