@@ -17,8 +17,43 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 		)
 
 		BeforeEach(func() {
-			jsonRequestResponsePair = bytes.NewBufferString(`{"data":[{"requestTemplate": {"path": "/path1", "method": "GET", "destination": "www.virtual.com"}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}, {"requestTemplate": {"path": "/path2", "method": "GET", "destination": "www.virtual.com", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
-
+			jsonRequestResponsePair = bytes.NewBufferString(`
+			{
+				"data": [{
+					"request": {
+						"requestType": "template",
+						"path": "/path1",
+						"method": "GET",
+						"destination": "www.virtual.com"
+					},
+					"response": {
+						"status": 201,
+						"encodedBody": false,
+						"body": "body1",
+						"headers": {
+							"Header": ["value1"]
+						}
+					}
+				}, {
+					"request": {
+						"requestType": "template",
+						"path": "/path2",
+						"method": "GET",
+						"destination": "www.virtual.com",
+						"headers": {
+							"Header": ["value2"]
+						}
+					},
+					"response": {
+						"status": 202,
+						"body": "body2",
+						"headers": {
+							"Header": ["value2"]
+						}
+					}
+				}]
+			}
+			`)
 		})
 
 		Context("When running in proxy mode", func() {
@@ -26,7 +61,7 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 			BeforeEach(func() {
 				hoverflyCmd = startHoverfly(adminPort, proxyPort)
 				SetHoverflyMode("simulate")
-				ImportHoverflyTemplates(jsonRequestResponsePair)
+				ImportHoverflyRecords(jsonRequestResponsePair)
 			})
 
 			AfterEach(func() {
@@ -46,7 +81,7 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 
 			BeforeEach(func() {
 				hoverflyCmd = startHoverflyWebServer(adminPort, proxyPort)
-				ImportHoverflyTemplates(jsonRequestResponsePair)
+				ImportHoverflyRecords(jsonRequestResponsePair)
 			})
 
 			It("Should find a match", func() {
