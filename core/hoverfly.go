@@ -269,7 +269,6 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	}
 
 	return response
-
 }
 
 // AddHook - adds a hook to DBClient
