@@ -196,11 +196,15 @@ func hoverflyError(req *http.Request, err error, msg string, statusCode int) *ht
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
 func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Response) {
+	var request = req
+	var response *http.Response
 
 	mode := hf.Cfg.GetMode()
 
+
 	if mode == CaptureMode {
-		newResponse, err := hf.captureRequest(req)
+		var err error
+		response, err = hf.captureRequest(req)
 
 		if err != nil {
 			return req, hoverflyError(req, err, "Could not capture request", http.StatusServiceUnavailable)
@@ -214,10 +218,11 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 			"destination": req.Host,
 		}).Info("request and response captured")
 
-		return req, newResponse
+		return request, response
 
 	} else if mode == SynthesizeMode {
-		response, err := SynthesizeResponse(req, hf.Cfg.Middleware)
+		var err error
+		response, err = SynthesizeResponse(req, hf.Cfg.Middleware)
 
 		if err != nil {
 			return req, hoverflyError(req, err, "Could not create synthetic response!", http.StatusServiceUnavailable)
@@ -232,16 +237,9 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 			"destination": req.Host,
 		}).Info("synthetic response created successfuly")
 
-		respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
-		if respDelay != nil {
-			respDelay.Execute()
-		}
-
-		return req, response
-
 	} else if mode == ModifyMode {
-
-		response, err := hf.modifyRequestResponse(req, hf.Cfg.Middleware)
+		var err error
+		response, err = hf.modifyRequestResponse(req, hf.Cfg.Middleware)
 
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -255,18 +253,20 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 				http.StatusServiceUnavailable)
 		}
 
-		respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
-		if respDelay != nil {
-			respDelay.Execute()
+	} else {
+		var err *matching.MatchingError
+		response, err = hf.getResponse(req)
+		if err != nil {
+			return req, hoverflyError(req, err, err.Error(), err.StatusCode)
 		}
-
-		// returning modified response
-		return req, response
 	}
 
-	newResponse := hf.getResponse(req)
+	respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
+	if respDelay != nil {
+		respDelay.Execute()
+	}
 
-	return req, newResponse
+	return request, response
 
 }
 
@@ -404,7 +404,7 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 }
 
 // getResponse returns stored response from cache
-func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
+func (hf *Hoverfly) getResponse(req *http.Request) (*http.Response, *matching.MatchingError) {
 
 	if req.Body == nil {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
@@ -430,7 +430,7 @@ func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 
 	responseDetails, matchErr := hf.RequestMatcher.GetResponse(&requestDetails)
 	if matchErr != nil {
-		return hoverflyError(req, matchErr, matchErr.Error(), matchErr.StatusCode)
+		return nil, matchErr
 	}
 
 	pair := &models.RequestResponsePair{
@@ -443,12 +443,7 @@ func (hf *Hoverfly) getResponse(req *http.Request) *http.Response {
 		_ = c.ApplyMiddleware(hf.Cfg.Middleware)
 	}
 
-	respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
-	if respDelay != nil {
-		respDelay.Execute()
-	}
-
-	return c.ReconstructResponse()
+	return c.ReconstructResponse(), nil
 }
 
 // modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response

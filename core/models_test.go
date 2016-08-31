@@ -127,9 +127,11 @@ func TestMatchOnRequestBody(t *testing.T) {
 		requestBody := []byte(fmt.Sprintf("fizz=buzz, number=%d", i))
 		body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
-		request, _ := http.NewRequest("POST", "http://capture_body.com", body)
+		request, err := http.NewRequest("POST", "http://capture_body.com", body)
+		Expect(err).To(BeNil())
 
-		response := dbClient.getResponse(request)
+		response, err := dbClient.getResponse(request)
+		Expect(err).To(BeNil())
 
 		responseBody, err := ioutil.ReadAll(response.Body)
 		response.Body.Close()
@@ -149,9 +151,10 @@ func TestGetNotRecordedRequest(t *testing.T) {
 
 	request, _ := http.NewRequest("POST", "http://capture_body.com", nil)
 
-	response := dbClient.getResponse(request)
+	response, err := dbClient.getResponse(request)
+	Expect(err).ToNot(BeNil())
 
-	Expect(response.StatusCode).To(Equal(http.StatusPreconditionFailed))
+	Expect(response).To(BeNil())
 }
 
 // TestRequestFingerprint tests whether we get correct request ID
@@ -329,9 +332,10 @@ func TestGetResponseCorruptedRequestResponsePair(t *testing.T) {
 
 	reqNew, err := http.NewRequest("POST", "http://capture_body.com", bodyNew)
 	Expect(err).To(BeNil())
-	response := dbClient.getResponse(reqNew)
+	response, err := dbClient.getResponse(reqNew)
+	Expect(err).ToNot(BeNil())
 
-	Expect(response.StatusCode).To(Equal(http.StatusInternalServerError))
+	Expect(response).To(BeNil())
 }
 
 func TestDoRequestWFailedMiddleware(t *testing.T) {
