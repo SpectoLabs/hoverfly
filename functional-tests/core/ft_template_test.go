@@ -51,6 +51,20 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 							"Header": ["value2"]
 						}
 					}
+				}, {
+					"request": {
+						"requestType": "template",
+						"method": "GET",
+						"destination": "www.randomheader.com",
+						"headers": {
+							"Random": ["*"]
+						}
+					},
+					"response": {
+						"status": 203,
+						"body": "body3",
+						"headers": {}
+					}
 				}]
 			}
 			`)
@@ -75,6 +89,14 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 				Expect(resp.StatusCode).To(Equal(202))
 				Expect(string(body)).To(Equal("body2"))
 			})
+
+			It("Should find a match using wildcards", func() {
+				resp := DoRequestThroughProxy(sling.New().Get("http://www.randomheader.com/unmatched_path").Add("Random", "value2"))
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(203))
+				Expect(string(body)).To(Equal("body3"))
+			})
 		})
 
 		Context("When running in webserver mode", func() {
@@ -83,6 +105,11 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 				hoverflyCmd = startHoverflyWebServer(adminPort, proxyPort)
 				ImportHoverflyRecords(jsonRequestResponsePair)
 			})
+
+			AfterEach(func() {
+				stopHoverfly()
+			})
+
 
 			It("Should find a match", func() {
 				request := sling.New().Get("http://localhost:"+proxyPortAsString+"/path2").Add("Header", "value2")
@@ -94,9 +121,16 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 				Expect(string(body)).To(Equal("body2"))
 			})
 
-			AfterEach(func() {
-				stopHoverfly()
+			It("Should find a match using wildcards", func() {
+				request := sling.New().Get("http://localhost:"+proxyPortAsString+"/unmatched_path").Add("Random", "whatever-you-like")
+
+				resp := DoRequest(request)
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(203))
+				Expect(string(body)).To(Equal("body3"))
 			})
+
 		})
 
 	})
