@@ -8,6 +8,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
 	"reflect"
+	"github.com/ryanuber/go-glob"
 )
 
 type RequestTemplateStore []RequestTemplateResponsePair
@@ -43,25 +44,25 @@ func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserv
 		// TODO: need to enable regex matches
 		// TODO: enable matching on scheme
 
-		if entry.RequestTemplate.Body != nil && *entry.RequestTemplate.Body != req.Body {
+		if entry.RequestTemplate.Body != nil && !glob.Glob(*entry.RequestTemplate.Body, req.Body) {
 			continue
 		}
 
 		if !webserver {
-			if entry.RequestTemplate.Destination != nil && *entry.RequestTemplate.Destination != req.Destination {
+			if entry.RequestTemplate.Destination != nil && !glob.Glob(*entry.RequestTemplate.Destination, req.Destination) {
 				continue
 			}
 		}
-		if entry.RequestTemplate.Path != nil && *entry.RequestTemplate.Path != req.Path {
+		if entry.RequestTemplate.Path != nil && !glob.Glob(*entry.RequestTemplate.Path, req.Path) {
 			continue
 		}
-		if entry.RequestTemplate.Query != nil && *entry.RequestTemplate.Query != req.Query {
+		if entry.RequestTemplate.Query != nil && !glob.Glob(*entry.RequestTemplate.Query, req.Query) {
 			continue
 		}
 		if !headerMatch(entry.RequestTemplate.Headers, req.Headers) {
 			continue
 		}
-		if entry.RequestTemplate.Method != nil && *entry.RequestTemplate.Method != req.Method {
+		if entry.RequestTemplate.Method != nil && !glob.Glob(*entry.RequestTemplate.Method, req.Method) {
 			continue
 		}
 
