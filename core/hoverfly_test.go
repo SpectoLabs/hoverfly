@@ -63,9 +63,8 @@ func TestProcessCaptureRequest(t *testing.T) {
 
 	dbClient.Cfg.SetMode("capture")
 
-	req, resp := dbClient.processRequest(r)
+	resp := dbClient.processRequest(r)
 
-	Expect(req).ToNot(BeNil())
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 }
@@ -82,17 +81,15 @@ func TestProcessSimulateRequest(t *testing.T) {
 
 	// capturing
 	dbClient.Cfg.SetMode("capture")
-	req, resp := dbClient.processRequest(r)
+	resp := dbClient.processRequest(r)
 
-	Expect(req).ToNot(BeNil())
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
 	// virtualizing
 	dbClient.Cfg.SetMode(SimulateMode)
-	newReq, newResp := dbClient.processRequest(r)
+	newResp := dbClient.processRequest(r)
 
-	Expect(newReq).ToNot(BeNil())
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 }
@@ -113,9 +110,8 @@ func TestProcessSynthesizeRequest(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	dbClient.Cfg.SetMode(SynthesizeMode)
-	newReq, newResp := dbClient.processRequest(r)
+	newResp := dbClient.processRequest(r)
 
-	Expect(newReq).ToNot(BeNil())
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusOK))
 	b, err := ioutil.ReadAll(newResp.Body)
@@ -136,9 +132,8 @@ func TestProcessModifyRequest(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	dbClient.Cfg.SetMode(ModifyMode)
-	newReq, newResp := dbClient.processRequest(r)
+	newResp := dbClient.processRequest(r)
 
-	Expect(newReq).ToNot(BeNil())
 	Expect(newResp).ToNot(BeNil())
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusAccepted))
@@ -185,7 +180,7 @@ func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {
 
 	// capturing
 	dbClient.Cfg.SetMode("capture")
-	_, resp := dbClient.processRequest(r)
+	resp := dbClient.processRequest(r)
 
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
@@ -195,7 +190,7 @@ func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub
 
-	_, newResp := dbClient.processRequest(r)
+	newResp := dbClient.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
@@ -217,7 +212,7 @@ func TestDelayNotAppliedToFailedSimulateRequest(t *testing.T) {
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub
 
-	_, newResp := dbClient.processRequest(r)
+	newResp := dbClient.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusPreconditionFailed))
 
@@ -239,7 +234,7 @@ func TestDelayNotAppliedToCaptureRequest(t *testing.T) {
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub
 
-	_, resp := dbClient.processRequest(r)
+	resp := dbClient.processRequest(r)
 
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
@@ -265,7 +260,7 @@ func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
 
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub
-	_, newResp := dbClient.processRequest(r)
+	newResp := dbClient.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusOK))
 
@@ -291,7 +286,7 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub
-	_, newResp := dbClient.processRequest(r)
+	newResp := dbClient.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusServiceUnavailable))
 
@@ -314,7 +309,7 @@ func TestDelayAppliedToModifyRequest(t *testing.T) {
 
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub
-	_, newResp := dbClient.processRequest(r)
+	newResp := dbClient.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusAccepted))
 
@@ -337,7 +332,7 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub
-	_, newResp := dbClient.processRequest(r)
+	newResp := dbClient.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(503))
 

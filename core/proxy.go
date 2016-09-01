@@ -49,8 +49,8 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	// processing connections
 	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-			req, resp := hoverfly.processRequest(r)
-			return req, resp
+			resp := hoverfly.processRequest(r)
+			return r, resp
 		})
 
 	if hoverfly.Cfg.Verbose {
@@ -92,7 +92,7 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Warn("NonproxyHandler")
-		req, resp := hoverfly.processRequest(r)
+		resp := hoverfly.processRequest(r)
 		body, err := extractBody(resp)
 
 		if err != nil {
@@ -109,7 +109,7 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 			}
 		}
 
-		w.Header().Set("Req", req.RequestURI)
+		w.Header().Set("Req", r.RequestURI)
 		w.Header().Set("Resp", resp.Header.Get("Content-Length"))
 
 		w.WriteHeader(resp.StatusCode)

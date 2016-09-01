@@ -195,8 +195,7 @@ func hoverflyError(req *http.Request, err error, msg string, statusCode int) *ht
 
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
-func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Response) {
-	var request = req
+func (hf *Hoverfly) processRequest(req *http.Request) (*http.Response) {
 	var response *http.Response
 
 	mode := hf.Cfg.GetMode()
@@ -207,7 +206,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 		response, err = hf.captureRequest(req)
 
 		if err != nil {
-			return req, hoverflyError(req, err, "Could not capture request", http.StatusServiceUnavailable)
+			return hoverflyError(req, err, "Could not capture request", http.StatusServiceUnavailable)
 		}
 		log.WithFields(log.Fields{
 			"mode":        mode,
@@ -218,14 +217,14 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 			"destination": req.Host,
 		}).Info("request and response captured")
 
-		return request, response
+		return response
 
 	} else if mode == SynthesizeMode {
 		var err error
 		response, err = SynthesizeResponse(req, hf.Cfg.Middleware)
 
 		if err != nil {
-			return req, hoverflyError(req, err, "Could not create synthetic response!", http.StatusServiceUnavailable)
+			return hoverflyError(req, err, "Could not create synthetic response!", http.StatusServiceUnavailable)
 		}
 
 		log.WithFields(log.Fields{
@@ -246,18 +245,14 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 				"error":      err.Error(),
 				"middleware": hf.Cfg.Middleware,
 			}).Error("Got error when performing request modification")
-			return req, hoverflyError(
-				req,
-				err,
-				fmt.Sprintf("Middleware (%s) failed or something else happened!", hf.Cfg.Middleware),
-				http.StatusServiceUnavailable)
+			return hoverflyError(req, err, fmt.Sprintf("Middleware (%s) failed or something else happened!", hf.Cfg.Middleware), http.StatusServiceUnavailable)
 		}
 
 	} else {
 		var err *matching.MatchingError
 		response, err = hf.getResponse(req)
 		if err != nil {
-			return req, hoverflyError(req, err, err.Error(), err.StatusCode)
+			return hoverflyError(req, err, err.Error(), err.StatusCode)
 		}
 	}
 
@@ -266,7 +261,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Request, *http.Resp
 		respDelay.Execute()
 	}
 
-	return request, response
+	return response
 
 }
 
