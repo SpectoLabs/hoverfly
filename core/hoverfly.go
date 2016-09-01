@@ -200,6 +200,10 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Response) {
 
 	mode := hf.Cfg.GetMode()
 
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
+	if err != nil {
+		return hoverflyError(req, err, "Could not interpret HTTP request", http.StatusServiceUnavailable)
+	}
 
 	if mode == CaptureMode {
 		var err error
@@ -256,7 +260,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Response) {
 		}
 	}
 
-	respDelay := hf.ResponseDelays.GetDelay(req.URL.String(), req.Method)
+	respDelay := hf.ResponseDelays.GetDelay(requestDetails)
 	if respDelay != nil {
 		respDelay.Execute()
 	}

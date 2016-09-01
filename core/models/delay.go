@@ -24,7 +24,7 @@ type ResponseDelayList []ResponseDelay
 
 type ResponseDelays interface {
 	Json() []byte
-	GetDelay(url, httpMethod string) *ResponseDelay
+	GetDelay(request RequestDetails) *ResponseDelay
 	Len() int
 }
 
@@ -50,11 +50,11 @@ func (this *ResponseDelay) Execute() {
 	log.Info("Response delay completed")
 }
 
-func (this *ResponseDelayList) GetDelay(url, httpMethod string) *ResponseDelay {
+func (this *ResponseDelayList) GetDelay(request RequestDetails) *ResponseDelay {
 	for _, val := range *this {
-		match := regexp.MustCompile(val.UrlPattern).MatchString(url)
+		match := regexp.MustCompile(val.UrlPattern).MatchString(request.Destination + request.Path)
 		if match {
-			if val.HttpMethod == "" || strings.EqualFold(val.HttpMethod, httpMethod) {
+			if val.HttpMethod == "" || strings.EqualFold(val.HttpMethod, request.Method) {
 				log.Info("Found response delay setting for this request host: ", val)
 				return &val
 			}
