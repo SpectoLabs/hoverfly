@@ -130,7 +130,10 @@ func TestMatchOnRequestBody(t *testing.T) {
 		request, err := http.NewRequest("POST", "http://capture_body.com", body)
 		Expect(err).To(BeNil())
 
-		response, err := dbClient.getResponse(request)
+		requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
+		Expect(err).To(BeNil())
+
+		response, err := dbClient.getResponse(request, requestDetails)
 		Expect(err).To(BeNil())
 
 		responseBody, err := ioutil.ReadAll(response.Body)
@@ -149,9 +152,13 @@ func TestGetNotRecordedRequest(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 
-	request, _ := http.NewRequest("POST", "http://capture_body.com", nil)
+	request, err := http.NewRequest("POST", "http://capture_body.com", nil)
+	Expect(err).To(BeNil())
 
-	response, err := dbClient.getResponse(request)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
+	Expect(err).To(BeNil())
+
+	response, err := dbClient.getResponse(request, requestDetails)
 	Expect(err).ToNot(BeNil())
 
 	Expect(response).To(BeNil())
@@ -332,7 +339,11 @@ func TestGetResponseCorruptedRequestResponsePair(t *testing.T) {
 
 	reqNew, err := http.NewRequest("POST", "http://capture_body.com", bodyNew)
 	Expect(err).To(BeNil())
-	response, err := dbClient.getResponse(reqNew)
+
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(reqNew)
+	Expect(err).To(BeNil())
+
+	response, err := dbClient.getResponse(reqNew, requestDetails)
 	Expect(err).ToNot(BeNil())
 
 	Expect(response).To(BeNil())

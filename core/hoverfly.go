@@ -225,7 +225,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Response) {
 
 	} else if mode == SynthesizeMode {
 		var err error
-		response, err = SynthesizeResponse(req, hf.Cfg.Middleware)
+		response, err = SynthesizeResponse(req, requestDetails, hf.Cfg.Middleware)
 
 		if err != nil {
 			return hoverflyError(req, err, "Could not create synthetic response!", http.StatusServiceUnavailable)
@@ -254,7 +254,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Response) {
 
 	} else {
 		var err *matching.MatchingError
-		response, err = hf.getResponse(req)
+		response, err = hf.getResponse(req, requestDetails)
 		if err != nil {
 			return hoverflyError(req, err, err.Error(), err.StatusCode)
 		}
@@ -403,29 +403,7 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 }
 
 // getResponse returns stored response from cache
-func (hf *Hoverfly) getResponse(req *http.Request) (*http.Response, *matching.MatchingError) {
-
-	if req.Body == nil {
-		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
-	}
-
-	reqBody, err := ioutil.ReadAll(req.Body)
-
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Got error when reading request body")
-	}
-
-	requestDetails := models.RequestDetails{
-		Path:        req.URL.Path,
-		Method:      req.Method,
-		Destination: req.Host,
-		Scheme:      req.URL.Scheme,
-		Query:       req.URL.RawQuery,
-		Body:        string(reqBody),
-		Headers:     req.Header,
-	}
+func (hf *Hoverfly) getResponse(req *http.Request, requestDetails models.RequestDetails) (*http.Response, *matching.MatchingError) {
 
 	responseDetails, matchErr := hf.RequestMatcher.GetResponse(&requestDetails)
 	if matchErr != nil {
