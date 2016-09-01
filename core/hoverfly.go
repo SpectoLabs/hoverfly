@@ -242,7 +242,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Response) {
 
 	} else if mode == ModifyMode {
 		var err error
-		response, err = hf.modifyRequestResponse(req, hf.Cfg.Middleware)
+		response, err = hf.modifyRequestResponse(req, requestDetails, hf.Cfg.Middleware)
 
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -425,17 +425,7 @@ func (hf *Hoverfly) getResponse(req *http.Request, requestDetails models.Request
 
 // modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response
 // is saved to cache.
-func (hf *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) (*http.Response, error) {
-
-	// getting request details
-	rd, err := models.NewRequestDetailsFromHttpRequest(req)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error":      err.Error(),
-			"middleware": middleware,
-		}).Error("Failed to get request details")
-		return nil, err
-	}
+func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails models.RequestDetails, middleware string) (*http.Response, error) {
 
 	// modifying request
 	req, resp, err := hf.doRequest(req)
@@ -461,7 +451,7 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) 
 		Headers: resp.Header,
 	}
 
-	requestResponsePair := models.RequestResponsePair{Response: r, Request: rd}
+	requestResponsePair := models.RequestResponsePair{Response: r, Request: requestDetails}
 
 	c := NewConstructor(req, requestResponsePair)
 	// applying middleware to modify response

@@ -84,7 +84,10 @@ func TestRequestBodySentToMiddleware(t *testing.T) {
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
 	Expect(err).To(BeNil())
 
-	resp, err := dbClient.modifyRequestResponse(req, "./examples/middleware/reflect_body/reflect_body.py")
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
+	Expect(err).To(BeNil())
+
+	resp, err := dbClient.modifyRequestResponse(req, requestDetails, "./examples/middleware/reflect_body/reflect_body.py")
 
 	// body from the request should be in response body, instead of server's response
 	responseBody, err := ioutil.ReadAll(resp.Body)
@@ -271,7 +274,10 @@ func TestModifyRequest(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
+	Expect(err).To(BeNil())
+
+	response, err := dbClient.modifyRequestResponse(req, requestDetails, dbClient.Cfg.Middleware)
 	Expect(err).To(BeNil())
 
 	// response should be changed to 202
@@ -291,7 +297,10 @@ func TestModifyRequestWODestination(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
+	Expect(err).To(BeNil())
+
+	response, err := dbClient.modifyRequestResponse(req, requestDetails, dbClient.Cfg.Middleware)
 	Expect(err).To(BeNil())
 
 	// response should be changed to 201
@@ -310,7 +319,10 @@ func TestModifyRequestNoMiddleware(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
 
-	_, err = dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
+	Expect(err).To(BeNil())
+
+	_, err = dbClient.modifyRequestResponse(req, requestDetails, dbClient.Cfg.Middleware)
 	Expect(err).ToNot(BeNil())
 }
 
