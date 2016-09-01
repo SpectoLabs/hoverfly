@@ -269,10 +269,6 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	}
 
 	return response
-<<<<<<< 99237bc17a6478da8a9ac0eb598e683e08e56688
-=======
-
->>>>>>> Refactored the hoverfly.processRequest to not return the request as the modified request is never returned
 }
 
 // AddHook - adds a hook to DBClient
