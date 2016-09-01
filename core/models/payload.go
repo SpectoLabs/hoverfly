@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"io/ioutil"
 )
 
 const (
@@ -96,6 +97,64 @@ type RequestDetails struct {
 	Query       string              `json:"query"`
 	Body        string              `json:"body"`
 	Headers     map[string][]string `json:"headers"`
+}
+
+func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error) {
+	if req.Body == nil {
+		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	}
+
+	reqBody, err := extractRequestBody(req)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+			"mode":  "capture",
+		}).Error("Got error while reading request body")
+		return RequestDetails{}, err
+	}
+
+	requestDetails := RequestDetails{
+		Path:        req.URL.Path,
+		Method:      req.Method,
+		Destination: req.Host,
+		Scheme:      req.URL.Scheme,
+		Query:       req.URL.RawQuery,
+		Body:        string(reqBody),
+		Headers:     req.Header,
+	}
+	return requestDetails, nil
+}
+
+func extractRequestBody(req *http.Request) (extract []byte, err error) {
+	save := req.Body
+	savecl := req.ContentLength
+
+	save, req.Body, err = CopyBody(req.Body)
+	if err != nil {
+		return
+	}
+
+	defer req.Body.Close()
+	extract, err = ioutil.ReadAll(req.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Body = save
+	req.ContentLength = savecl
+	return extract, nil
+}
+
+func CopyBody(body io.ReadCloser) (resp1, resp2 io.ReadCloser, err error) {
+	var buf bytes.Buffer
+	if _, err = buf.ReadFrom(body); err != nil {
+		return nil, nil, err
+	}
+	if err = body.Close(); err != nil {
+		return nil, nil, err
+	}
+	return ioutil.NopCloser(&buf), ioutil.NopCloser(bytes.NewReader(buf.Bytes())), nil
 }
 
 func NewRequestDetailsFromRequestDetailsView(data views.RequestDetailsView) RequestDetails {

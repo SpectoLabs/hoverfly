@@ -339,7 +339,7 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 		// middleware is provided, modifying request
 		var requestResponsePair models.RequestResponsePair
 
-		rd, err := getRequestDetails(request)
+		rd, err := models.NewRequestDetailsFromHttpRequest(request)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -446,7 +446,7 @@ func (hf *Hoverfly) getResponse(req *http.Request) (*http.Response, *matching.Ma
 func (hf *Hoverfly) modifyRequestResponse(req *http.Request, middleware string) (*http.Response, error) {
 
 	// getting request details
-	rd, err := getRequestDetails(req)
+	rd, err := models.NewRequestDetailsFromHttpRequest(req)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":      err.Error(),
