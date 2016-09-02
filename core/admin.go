@@ -1026,7 +1026,7 @@ func (d *Hoverfly) DeleteAllResponseDelaysHandler(w http.ResponseWriter, req *ht
 }
 
 func (d *Hoverfly) UpdateResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var rd models.ResponseDelayJson
+	var rd models.ResponseDelayPayload
 	var mr messageResponse
 
 	if req.Body == nil {

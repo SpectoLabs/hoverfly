@@ -943,7 +943,7 @@ func TestGetResponseDelays(t *testing.T) {
 
 	body, err := ioutil.ReadAll(rec.Body)
 
-	sr := models.ResponseDelayJson{}
+	sr := models.ResponseDelayPayload{}
 	err = json.Unmarshal(body, &sr)
 
 	// normal equality checking doesn't work on slices (!!)
@@ -992,7 +992,7 @@ func TestUpdateResponseDelays(t *testing.T) {
 		Delay:      100,
 	}
 	delays := models.ResponseDelayList{delayOne, delayTwo}
-	delayJson := models.ResponseDelayJson{Data: &delays}
+	delayJson := models.ResponseDelayPayload{Data: &delays}
 	delayJsonBytes, err := json.Marshal(&delayJson)
 	Expect(err).To(BeNil())
 

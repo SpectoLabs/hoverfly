@@ -16,7 +16,7 @@ type ResponseDelay struct {
 	Delay      int    `json:"delay"`
 }
 
-type ResponseDelayJson struct {
+type ResponseDelayPayload struct {
 	Data *ResponseDelayList `json:"data"`
 }
 
@@ -28,7 +28,7 @@ type ResponseDelays interface {
 	Len() int
 }
 
-func ValidateResponseDelayJson(j ResponseDelayJson) (err error) {
+func ValidateResponseDelayJson(j ResponseDelayPayload) (err error) {
 	if j.Data != nil {
 		for _, delay := range *j.Data {
 			if delay.UrlPattern != "" && delay.Delay != 0 {
@@ -64,7 +64,7 @@ func (this *ResponseDelayList) GetDelay(request RequestDetails) *ResponseDelay {
 }
 
 func (this *ResponseDelayList) Json() []byte {
-	resp := ResponseDelayJson{
+	resp := ResponseDelayPayload{
 		Data: this,
 	}
 	b, _ := json.Marshal(resp)

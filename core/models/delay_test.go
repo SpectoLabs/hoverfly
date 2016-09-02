@@ -16,7 +16,7 @@ func TestConvertJsonStringToResponseDelayConfig(t *testing.T) {
 				"delay": 1
 			}]
 	}`
-	var responseDelayJson ResponseDelayJson
+	var responseDelayJson ResponseDelayPayload
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
 	err := ValidateResponseDelayJson(responseDelayJson)
 	Expect(err).To(BeNil())
@@ -31,7 +31,7 @@ func TestErrorIfHostPatternNotSet(t *testing.T) {
 				"delay": 2
 			}]
 	}`
-	var responseDelayJson ResponseDelayJson
+	var responseDelayJson ResponseDelayPayload
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
 	err := ValidateResponseDelayJson(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
@@ -46,7 +46,7 @@ func TestErrprIfDelayNotSet(t *testing.T) {
 				"urlPattern": "."
 			}]
 	}`
-	var responseDelayJson ResponseDelayJson
+	var responseDelayJson ResponseDelayPayload
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
 	err := ValidateResponseDelayJson(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
@@ -62,7 +62,7 @@ func TestHostPatternMustBeAValidRegexPattern(t *testing.T) {
 				"delay": 1
 			}]
 	}`
-	var responseDelayJson ResponseDelayJson
+	var responseDelayJson ResponseDelayPayload
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
 	err := ValidateResponseDelayJson(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
@@ -78,7 +78,7 @@ func TestErrorIfHostPatternUsed(t *testing.T) {
 				"delay": 1
 			}]
 	}`
-	var responseDelayJson ResponseDelayJson
+	var responseDelayJson ResponseDelayPayload
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
 	err := ValidateResponseDelayJson(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
