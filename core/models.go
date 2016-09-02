@@ -28,6 +28,7 @@ func extractBody(resp *http.Response) (extract []byte, err error) {
 	}
 	return extract, nil
 }
+
 // ActionType - action type can be things such as "RequestCaptured", "GotResponse" - anything
 type ActionType string
 

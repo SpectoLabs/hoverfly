@@ -72,7 +72,6 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 
 		Context("When I import", func() {
 
-
 			It("It should accept and store both", func() {
 				slingRequest := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonPayload)
 				response := DoRequest(slingRequest)

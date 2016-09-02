@@ -110,7 +110,6 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 				stopHoverfly()
 			})
 
-
 			It("Should find a match", func() {
 				request := sling.New().Get("http://localhost:"+proxyPortAsString+"/path2").Add("Header", "value2")
 

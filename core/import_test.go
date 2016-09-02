@@ -5,12 +5,12 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/core/views"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"testing"
-	. "github.com/SpectoLabs/hoverfly/core/util"
 )
 
 func TestIsURLHTTP(t *testing.T) {
@@ -158,8 +158,8 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			Destination: StringToPointer("/"),
 			Scheme:      StringToPointer("scheme"),
 			Query:       StringToPointer(""),
-			Body: StringToPointer(""),
-			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
+			Body:        StringToPointer(""),
+			Headers:     map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{originalPair})
 	value, _ := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
@@ -205,8 +205,8 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Destination: StringToPointer("/"),
 			Scheme:      StringToPointer("scheme"),
 			Query:       StringToPointer(""),
-			Body: StringToPointer(""),
-			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
+			Body:        StringToPointer(""),
+			Headers:     map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	originalPair2 := originalPair1
 	originalPair2.Request.Path = StringToPointer("/new/path")
@@ -360,8 +360,8 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 			Destination: StringToPointer("/"),
 			Scheme:      StringToPointer("scheme"),
 			Query:       StringToPointer(""),
-			Body: StringToPointer(""),
-			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
+			Body:        StringToPointer(""),
+			Headers:     map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{encodedPair})
 

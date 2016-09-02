@@ -2,9 +2,9 @@ package matching
 
 import (
 	"github.com/SpectoLabs/hoverfly/core/models"
+	. "github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 	"testing"
-	. "github.com/SpectoLabs/hoverfly/core/util"
 )
 
 func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
@@ -463,7 +463,7 @@ func TestTemplatesCanUseGlobsOnDestinationAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err :=store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -489,7 +489,7 @@ func TestTemplatesCanUseGlobsOnPathAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err :=store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -515,7 +515,7 @@ func TestTemplatesCanUseGlobsOnMethodAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err :=store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -542,7 +542,7 @@ func TestTemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err :=store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -566,10 +566,10 @@ func TestTemplatesCanUseGlobsOnQueryAndBeMatched(t *testing.T) {
 		Method:      "GET",
 		Destination: "testhost.com",
 		Path:        "/api/1",
-		Query: 	     "q=anything-i-want",
+		Query:       "q=anything-i-want",
 	}
 
-	response, err :=store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -593,10 +593,10 @@ func TestTemplatesCanUseGlobsOnBodyndBeMatched(t *testing.T) {
 		Method:      "GET",
 		Destination: "testhost.com",
 		Path:        "/api/1",
-		Body: 	     `{"json": "object", "key": "value"}`,
+		Body:        `{"json": "object", "key": "value"}`,
 	}
 
-	response, err :=store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -620,10 +620,10 @@ func TestTemplatesCanUseGlobsOnBodyAndNotMatchWhenTheBodyIsWrong(t *testing.T) {
 		Method:      "GET",
 		Destination: "testhost.com",
 		Path:        "/api/1",
-		Body: 	     `[{"json": "objects", "key": "value"}]`,
+		Body:        `[{"json": "objects", "key": "value"}]`,
 	}
 
-	_, err :=store.GetResponse(request, false)
+	_, err := store.GetResponse(request, false)
 	Expect(err).ToNot(BeNil())
 }
 
@@ -632,8 +632,8 @@ func TestTemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 
 	requestTemplateResponsePair := RequestTemplateResponsePair{
 		RequestTemplate: RequestTemplate{
-			Headers: map[string][]string {
-				"unique-header": []string {"*"},
+			Headers: map[string][]string{
+				"unique-header": []string{"*"},
 			},
 		},
 		Response: models.ResponseDetails{
@@ -647,12 +647,12 @@ func TestTemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 		Method:      "GET",
 		Destination: "testhost.com",
 		Path:        "/api/1",
-		Headers:  map[string][]string {
-			"unique-header": []string {"totally-unique"},
+		Headers: map[string][]string{
+			"unique-header": []string{"totally-unique"},
 		},
 	}
 
-	response, err :=store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))

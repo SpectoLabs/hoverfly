@@ -93,17 +93,17 @@ func TestGetDelayWithRegexMatch(t *testing.T) {
 	}
 	delays := ResponseDelayList{delay}
 
-	request1 := RequestDetails {
+	request1 := RequestDetails{
 		Destination: "delayexample.com",
-		Method: "method-dummy",
+		Method:      "method-dummy",
 	}
 
 	delayMatch := delays.GetDelay(request1)
 	Expect(*delayMatch).To(Equal(delay))
 
-	request2 := RequestDetails {
+	request2 := RequestDetails{
 		Destination: "nodelay.com",
-		Method: "method-dummy",
+		Method:      "method-dummy",
 	}
 
 	delayMatch = delays.GetDelay(request2)
@@ -123,9 +123,9 @@ func TestMultipleMatchingDelaysReturnsTheFirst(t *testing.T) {
 	}
 	delays := ResponseDelayList{delayOne, delayTwo}
 
-	request1 := RequestDetails {
+	request1 := RequestDetails{
 		Destination: "delayexample.com",
-		Method: "method-dummy",
+		Method:      "method-dummy",
 	}
 
 	delayMatch := delays.GetDelay(request1)
@@ -142,9 +142,9 @@ func TestNoMatchIfMethodsDontMatch(t *testing.T) {
 	}
 	delays := ResponseDelayList{delay}
 
-	request := RequestDetails {
+	request := RequestDetails{
 		Destination: "delayexample.com",
-		Method: "GET",
+		Method:      "GET",
 	}
 
 	delayMatch := delays.GetDelay(request)
@@ -161,9 +161,9 @@ func TestReturnMatchIfMethodsMatch(t *testing.T) {
 	}
 	delays := ResponseDelayList{delay}
 
-	request := RequestDetails {
+	request := RequestDetails{
 		Destination: "delayexample.com",
-		Method: "GET",
+		Method:      "GET",
 	}
 
 	delayMatch := delays.GetDelay(request)
@@ -179,9 +179,9 @@ func TestIfDelayMethodBlankThenMatchesAnyMethod(t *testing.T) {
 	}
 	delays := ResponseDelayList{delay}
 
-	request := RequestDetails {
+	request := RequestDetails{
 		Destination: "delayexample.com",
-		Method: "method-dummy",
+		Method:      "method-dummy",
 	}
 
 	delayMatch := delays.GetDelay(request)

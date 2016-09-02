@@ -1,10 +1,10 @@
 package hoverfly
 
 import (
+	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 	"net/http"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 func TestSynthesizeResponse(t *testing.T) {

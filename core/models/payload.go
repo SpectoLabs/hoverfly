@@ -7,16 +7,16 @@ import (
 	"encoding/gob"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	. "github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strings"
-	"io/ioutil"
 )
 
 const (

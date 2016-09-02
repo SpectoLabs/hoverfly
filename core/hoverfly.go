@@ -195,7 +195,7 @@ func hoverflyError(req *http.Request, err error, msg string, statusCode int) *ht
 
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
-func (hf *Hoverfly) processRequest(req *http.Request) (*http.Response) {
+func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	var response *http.Response
 
 	mode := hf.Cfg.GetMode()
