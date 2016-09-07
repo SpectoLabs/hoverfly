@@ -108,6 +108,7 @@ func headerMatch(templateHeaders, requestHeaders map[string][]string) bool {
 			requestHeaders[strings.ToLower(requestHeaderKey)] = requestHeaderValues
 
 		}
+
 		requestTemplateValues, templateHeaderMatched := requestHeaders[strings.ToLower(templateHeaderKey)]
 		if !templateHeaderMatched {
 			return false
