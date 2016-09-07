@@ -24,6 +24,7 @@ import (
 	// auth
 	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/authentication/controllers"
+	handlers "github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -210,7 +211,7 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		negroni.HandlerFunc(d.ManualAddHandler),
 	))
 
-	healthHandler := HealthHandler{}
+	healthHandler := handlers.HealthHandler{}
 	mux.Get("/api/health", negroni.New(
 		negroni.HandlerFunc(healthHandler.Get),
 	))
