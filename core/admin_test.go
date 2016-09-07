@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	handlers "github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
 	. "github.com/onsi/gomega"
@@ -95,7 +96,7 @@ func TestGetRecordsCount(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rc := recordsCount{}
+	rc := handlers.RecordsCount{}
 	err = json.Unmarshal(body, &rc)
 
 	Expect(rc.Count).To(Equal(0))
@@ -129,7 +130,7 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	rc := recordsCount{}
+	rc := handlers.RecordsCount{}
 	err = json.Unmarshal(body, &rc)
 
 	Expect(rc.Count).To(Equal(5))
@@ -248,7 +249,7 @@ func TestGetState(t *testing.T) {
 
 	body, err := ioutil.ReadAll(rec.Body)
 
-	sr := stateRequest{}
+	sr := handlers.StateRequest{}
 	err = json.Unmarshal(body, &sr)
 
 	Expect(sr.Mode).To(Equal(SimulateMode))
@@ -266,7 +267,7 @@ func TestSetSimulateState(t *testing.T) {
 	dbClient.Cfg.SetMode("capture")
 
 	// preparing to set mode through rest api
-	var resp stateRequest
+	var resp handlers.StateRequest
 	resp.Mode = SimulateMode
 
 	requestBytes, err := json.Marshal(&resp)
@@ -298,7 +299,7 @@ func TestSetCaptureState(t *testing.T) {
 	dbClient.Cfg.SetMode(SimulateMode)
 
 	// preparing to set mode through rest api
-	var resp stateRequest
+	var resp handlers.StateRequest
 	resp.Mode = "capture"
 
 	requestBytes, err := json.Marshal(&resp)
@@ -330,7 +331,7 @@ func TestSetModifyState(t *testing.T) {
 	dbClient.Cfg.SetMode(SimulateMode)
 
 	// preparing to set mode through rest api
-	var resp stateRequest
+	var resp handlers.StateRequest
 	resp.Mode = ModifyMode
 
 	requestBytes, err := json.Marshal(&resp)
@@ -362,7 +363,7 @@ func TestSetSynthesizeState(t *testing.T) {
 	dbClient.Cfg.SetMode(SimulateMode)
 
 	// preparing to set mode through rest api
-	var resp stateRequest
+	var resp handlers.StateRequest
 	resp.Mode = SynthesizeMode
 
 	requestBytes, err := json.Marshal(&resp)
@@ -394,7 +395,7 @@ func TestSetRandomState(t *testing.T) {
 	dbClient.Cfg.SetMode(SimulateMode)
 
 	// preparing to set mode through rest api
-	var resp stateRequest
+	var resp handlers.StateRequest
 	resp.Mode = "shouldnotwork"
 
 	requestBytes, err := json.Marshal(&resp)
@@ -458,7 +459,7 @@ func TestGetMiddleware(t *testing.T) {
 	body, err := ioutil.ReadAll(rec.Body)
 	Expect(err).To(BeNil())
 
-	middlewareResponse := middlewareSchema{}
+	middlewareResponse := handlers.MiddlewareSchema{}
 	err = json.Unmarshal(body, &middlewareResponse)
 	Expect(err).To(BeNil())
 
@@ -475,7 +476,7 @@ func TestSetMiddleware_WithValidMiddleware(t *testing.T) {
 
 	dbClient.Cfg.Middleware = "python examples/middleware/modify_request/modify_request.py"
 
-	var middlewareReq middlewareSchema
+	var middlewareReq handlers.MiddlewareSchema
 	middlewareReq.Middleware = "python examples/middleware/delay_policy/add_random_delay.py"
 
 	middlewareReqBytes, err := json.Marshal(&middlewareReq)
@@ -491,7 +492,7 @@ func TestSetMiddleware_WithValidMiddleware(t *testing.T) {
 	body, err := ioutil.ReadAll(rec.Body)
 	Expect(err).To(BeNil())
 
-	middlewareResp := middlewareSchema{}
+	middlewareResp := handlers.MiddlewareSchema{}
 	err = json.Unmarshal(body, &middlewareResp)
 	Expect(err).To(BeNil())
 
@@ -509,7 +510,7 @@ func TestSetMiddleware_WithInvalidMiddleware(t *testing.T) {
 
 	dbClient.Cfg.Middleware = "python examples/middleware/modify_request/modify_request.py"
 
-	var middlewareReq middlewareSchema
+	var middlewareReq handlers.MiddlewareSchema
 	middlewareReq.Middleware = "definitely won't execute"
 
 	middlewareReqBytes, err := json.Marshal(&middlewareReq)
@@ -525,7 +526,7 @@ func TestSetMiddleware_WithInvalidMiddleware(t *testing.T) {
 	body, err := ioutil.ReadAll(rec.Body)
 	Expect(err).To(BeNil())
 
-	middlewareResp := middlewareSchema{}
+	middlewareResp := handlers.MiddlewareSchema{}
 	err = json.Unmarshal(body, &middlewareResp)
 
 	Expect(err).ToNot(BeNil())
@@ -544,7 +545,7 @@ func TestSetMiddleware_WithEmptyMiddleware(t *testing.T) {
 
 	dbClient.Cfg.Middleware = "python examples/middleware/modify_request/modify_request.py"
 
-	var middlewareReq middlewareSchema
+	var middlewareReq handlers.MiddlewareSchema
 	middlewareReq.Middleware = ""
 
 	middlewareReqBytes, err := json.Marshal(&middlewareReq)
@@ -560,7 +561,7 @@ func TestSetMiddleware_WithEmptyMiddleware(t *testing.T) {
 	body, err := ioutil.ReadAll(rec.Body)
 	Expect(err).To(BeNil())
 
-	middlewareResp := middlewareSchema{}
+	middlewareResp := handlers.MiddlewareSchema{}
 	err = json.Unmarshal(body, &middlewareResp)
 
 	Expect(err).To(BeNil())
@@ -611,7 +612,7 @@ func TestStatsHandlerSimulateMetrics(t *testing.T) {
 
 	body, err := ioutil.ReadAll(rec.Body)
 
-	sr := statsResponse{}
+	sr := handlers.StatsResponse{}
 	err = json.Unmarshal(body, &sr)
 
 	Expect(int(sr.Stats.Counters[SimulateMode])).To(Equal(1))
@@ -640,7 +641,7 @@ func TestStatsHandlerCaptureMetrics(t *testing.T) {
 
 	body, err := ioutil.ReadAll(rec.Body)
 
-	sr := statsResponse{}
+	sr := handlers.StatsResponse{}
 	err = json.Unmarshal(body, &sr)
 
 	Expect(int(sr.Stats.Counters[CaptureMode])).To(Equal(1))
@@ -669,7 +670,7 @@ func TestStatsHandlerModifyMetrics(t *testing.T) {
 
 	body, err := ioutil.ReadAll(rec.Body)
 
-	sr := statsResponse{}
+	sr := handlers.StatsResponse{}
 	err = json.Unmarshal(body, &sr)
 
 	Expect(int(sr.Stats.Counters[ModifyMode])).To(Equal(1))
@@ -698,7 +699,7 @@ func TestStatsHandlerSynthesizeMetrics(t *testing.T) {
 
 	body, err := ioutil.ReadAll(rec.Body)
 
-	sr := statsResponse{}
+	sr := handlers.StatsResponse{}
 	err = json.Unmarshal(body, &sr)
 
 	Expect(int(sr.Stats.Counters[SynthesizeMode])).To(Equal(1))
@@ -732,7 +733,7 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 
 	body, err := ioutil.ReadAll(rec.Body)
 
-	sr := statsResponse{}
+	sr := handlers.StatsResponse{}
 	err = json.Unmarshal(body, &sr)
 
 	Expect(int(sr.RecordsCount)).To(Equal(5))
@@ -747,7 +748,7 @@ func TestSetMetadata(t *testing.T) {
 	m := adminApi.getBoneRouter(dbClient)
 
 	// preparing to set mode through rest api
-	var reqBody setMetadata
+	var reqBody handlers.SetMetadata
 	reqBody.Key = "some_key"
 	reqBody.Value = "some_val"
 
@@ -798,7 +799,7 @@ func TestSetMetadataMissingKey(t *testing.T) {
 	m := adminApi.getBoneRouter(dbClient)
 
 	// preparing to set mode through rest api
-	var reqBody setMetadata
+	var reqBody handlers.SetMetadata
 	// missing key
 	reqBody.Value = "some_val"
 
@@ -817,7 +818,7 @@ func TestSetMetadataMissingKey(t *testing.T) {
 
 	// checking response body
 	body, err := ioutil.ReadAll(rec.Body)
-	mr := messageResponse{}
+	mr := handlers.MessageResponse{}
 	err = json.Unmarshal(body, &mr)
 
 	Expect(mr.Message).To(Equal("Key not provided."))
@@ -849,7 +850,7 @@ func TestGetMetadata(t *testing.T) {
 
 	body, err := ioutil.ReadAll(rec.Body)
 
-	sm := storedMetadata{}
+	sm := handlers.StoredMetadata{}
 	err = json.Unmarshal(body, &sm)
 
 	Expect(len(sm.Data)).To(Equal(3))

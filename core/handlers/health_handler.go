@@ -10,7 +10,7 @@ type HealthHandler struct{}
 func (this *HealthHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var response messageResponse
+	var response MessageResponse
 	response.Message = "Hoverfly is healthy"
 
 	response.Encode()

@@ -26,54 +26,11 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/authentication/controllers"
 	handlers "github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/matching"
-	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
-// recordedRequests struct encapsulates payload data
-type storedMetadata struct {
-	Data map[string]string `json:"data"`
-}
-
-type setMetadata struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
-type recordsCount struct {
-	Count int `json:"count"`
-}
-
-type statsResponse struct {
-	Stats        metrics.Stats `json:"stats"`
-	RecordsCount int           `json:"recordsCount"`
-}
-
-type stateRequest struct {
-	Mode        string `json:"mode"`
-	Destination string `json:"destination"`
-}
-
-type middlewareSchema struct {
-	Middleware string `json:"middleware"`
-}
-
-type messageResponse struct {
-	Message string `json:"message"`
-}
-
 type AdminApi struct{}
-
-func (m *messageResponse) Encode() ([]byte, error) {
-	buf := new(bytes.Buffer)
-	enc := json.NewEncoder(buf)
-	err := enc.Encode(m)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
 
 // StartAdminInterface - starts admin interface web server
 func (this *AdminApi) StartAdminInterface(hoverfly *Hoverfly) {
@@ -323,7 +280,7 @@ func (d *Hoverfly) RecordsCount(w http.ResponseWriter, req *http.Request, next h
 
 		w.Header().Set("Content-Type", "application/json")
 
-		var response recordsCount
+		var response handlers.RecordsCount
 		response.Count = count
 		b, err := json.Marshal(response)
 
@@ -356,7 +313,7 @@ func (d *Hoverfly) StatsHandler(w http.ResponseWriter, req *http.Request, next h
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	var sr statsResponse
+	var sr handlers.StatsResponse
 	sr.Stats = stats
 	sr.RecordsCount = count
 
@@ -418,7 +375,7 @@ func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 
 			// checking whether we should send an update
 			if !reflect.DeepEqual(stats.Counters, statsCounters) || count != recordsCount {
-				var sr statsResponse
+				var sr handlers.StatsResponse
 				sr.Stats = stats
 				sr.RecordsCount = count
 
@@ -447,7 +404,7 @@ func (d *Hoverfly) ImportRecordsHandler(w http.ResponseWriter, req *http.Request
 	body, err := ioutil.ReadAll(req.Body)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	var response messageResponse
+	var response handlers.MessageResponse
 
 	if err != nil {
 		// failed to read response body
@@ -550,7 +507,7 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 	err = d.ImportRequestResponsePairViews(pairViews)
 
 	w.Header().Set("Content-Type", "application/json")
-	var response messageResponse
+	var response handlers.MessageResponse
 
 	if err != nil {
 		response.Message = fmt.Sprintf("Got error: %s", err.Error())
@@ -593,7 +550,7 @@ func (d *Hoverfly) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Requ
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var response messageResponse
+	var response handlers.MessageResponse
 	if err != nil {
 		if err.Error() == "bucket not found" {
 			response.Message = fmt.Sprintf("No records found")
@@ -645,7 +602,7 @@ func (d *Hoverfly) ImportTemplatesHandler(w http.ResponseWriter, req *http.Reque
 	body, err := ioutil.ReadAll(req.Body)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	var response messageResponse
+	var response handlers.MessageResponse
 
 	if err != nil {
 		// failed to read response body
@@ -697,7 +654,7 @@ func (d *Hoverfly) DeleteAllTemplatesHandler(w http.ResponseWriter, req *http.Re
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var response messageResponse
+	var response handlers.MessageResponse
 	response.Message = "Template store wiped successfuly"
 	w.WriteHeader(200)
 
@@ -716,7 +673,7 @@ func (d *Hoverfly) DeleteAllTemplatesHandler(w http.ResponseWriter, req *http.Re
 
 // CurrentStateHandler returns current state
 func (d *Hoverfly) CurrentStateHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var resp stateRequest
+	var resp handlers.StateRequest
 	resp.Mode = d.Cfg.GetMode()
 	resp.Destination = d.Cfg.Destination
 
@@ -727,7 +684,7 @@ func (d *Hoverfly) CurrentStateHandler(w http.ResponseWriter, req *http.Request,
 
 // StateHandler handles current proxy state
 func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	var sr stateRequest
+	var sr handlers.StateRequest
 
 	// this is mainly for testing, since when you create
 	if r.Body == nil {
@@ -809,7 +766,7 @@ func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 		}).Error("failed to fire hook")
 	}
 
-	var resp stateRequest
+	var resp handlers.StateRequest
 	resp.Mode = d.Cfg.GetMode()
 	resp.Destination = d.Cfg.Destination
 	b, _ := json.Marshal(resp)
@@ -819,7 +776,7 @@ func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 }
 
 func (d *Hoverfly) CurrentMiddlewareHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var resp middlewareSchema
+	var resp handlers.MiddlewareSchema
 
 	resp.Middleware = d.Cfg.Middleware
 
@@ -840,7 +797,7 @@ func (d *Hoverfly) MiddlewareHandler(w http.ResponseWriter, req *http.Request, n
 		return
 	}
 
-	var middlewareReq middlewareSchema
+	var middlewareReq handlers.MiddlewareSchema
 
 	err = json.Unmarshal(body, &middlewareReq)
 	if err != nil {
@@ -878,7 +835,7 @@ func (d *Hoverfly) AllMetadataHandler(w http.ResponseWriter, req *http.Request, 
 
 		w.Header().Set("Content-Type", "application/json")
 
-		var response storedMetadata
+		var response handlers.StoredMetadata
 		response.Data = metaData
 		b, err := json.Marshal(response)
 
@@ -902,8 +859,8 @@ func (d *Hoverfly) AllMetadataHandler(w http.ResponseWriter, req *http.Request, 
 
 // SetMetadataHandler - sets new metadata
 func (d *Hoverfly) SetMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var sm setMetadata
-	var mr messageResponse
+	var sm handlers.SetMetadata
+	var mr handlers.MessageResponse
 
 	if req.Body == nil {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
@@ -976,7 +933,7 @@ func (d *Hoverfly) DeleteMetadataHandler(w http.ResponseWriter, req *http.Reques
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var response messageResponse
+	var response handlers.MessageResponse
 	if err != nil {
 		if err.Error() == "bucket not found" {
 			response.Message = fmt.Sprintf("No metadata found.")
@@ -1012,7 +969,7 @@ func (d *Hoverfly) GetResponseDelaysHandler(w http.ResponseWriter, req *http.Req
 func (d *Hoverfly) DeleteAllResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	d.ResponseDelays = &models.ResponseDelayList{}
 
-	var response messageResponse
+	var response handlers.MessageResponse
 	response.Message = "Delays deleted successfuly"
 	w.WriteHeader(200)
 
@@ -1031,7 +988,7 @@ func (d *Hoverfly) DeleteAllResponseDelaysHandler(w http.ResponseWriter, req *ht
 
 func (d *Hoverfly) UpdateResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	var rd models.ResponseDelayPayload
-	var mr messageResponse
+	var mr handlers.MessageResponse
 
 	if req.Body == nil {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
