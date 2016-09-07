@@ -2,7 +2,9 @@ package hoverfly_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,6 +28,15 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			BeforeEach(func() {
 				hoverflyCmd = startHoverfly(adminPort, proxyPort)
 
+				SetHoverflyMode("capture")
+			})
+
+			AfterEach(func() {
+				stopHoverfly()
+			})
+
+			It("Should capture the request and response", func() {
+
 				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "text/plain")
 					w.Header().Set("Date", "date")
@@ -35,16 +46,9 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				defer fakeServer.Close()
 
 				fakeServerUrl, _ = url.Parse(fakeServer.URL)
-				SetHoverflyMode("capture")
 				resp := CallFakeServerThroughProxy(fakeServer)
 				Expect(resp.StatusCode).To(Equal(200))
-			})
 
-			AfterEach(func() {
-				stopHoverfly()
-			})
-
-			It("Should capture the request and response", func() {
 				expectedDestination := strings.Replace(fakeServerUrl.String(), "http://", "", 1)
 
 				recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
@@ -92,6 +96,43 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 					    }
 					  ]
 					}`, expectedDestination)))
+			})
+
+			It("Should capture a redirect response", func() {
+
+				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "text/plain")
+					w.Header().Set("Date", "date")
+					w.Write([]byte("redirection got you here"))
+				}))
+				fakeServerUrl, _ := url.Parse(fakeServer.URL)
+				fakeServerRedirect := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Location", fakeServer.URL)
+					w.Header().Set("Content-Type", "text/plain")
+					w.WriteHeader(301)
+				}))
+				fakeServerRedirectUrl, _ := url.Parse(fakeServerRedirect.URL)
+
+				defer fakeServer.Close()
+				defer fakeServerRedirect.Close()
+
+				resp := CallFakeServerThroughProxy(fakeServerRedirect)
+				Expect(resp.StatusCode).To(Equal(301))
+
+				expectedRedirectDestination := strings.Replace(fakeServerRedirectUrl.String(), "http://", "", 1)
+
+				recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+				Expect(err).To(BeNil())
+
+				payload := views.RequestResponsePairPayload{}
+
+				json.Unmarshal(recordsJson, &payload)
+				Expect(payload.Data).To(HaveLen(1))
+
+				Expect(payload.Data[0].Request.Destination).To(Equal(expectedRedirectDestination))
+
+				Expect(payload.Data[0].Response.Status).To(Equal(301))
+				Expect(payload.Data[0].Response.Headers["Location"][0]).To(Equal(fakeServerUrl.String()))
 			})
 		})
 
@@ -279,7 +320,8 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			})
 
 			It("Should modify the request using middleware", func() {
-				DoRequestThroughProxy(sling.New().Get(fakeServer.URL))
+				resp := DoRequestThroughProxy(sling.New().Get(fakeServer.URL))
+				Expect(resp.StatusCode).To(Equal(200))
 				Expect(requestBody).To(Equal("CHANGED_REQUEST_BODY"))
 			})
 

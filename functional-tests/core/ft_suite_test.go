@@ -166,7 +166,7 @@ func DoRequestThroughProxy(r *sling.Sling) *http.Response {
 	Expect(err).To(BeNil())
 
 	proxy, err := url.Parse(hoverflyProxyUrl)
-	proxyHttpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxy)}}
+	proxyHttpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxy)}, CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }}
 	response, err := proxyHttpClient.Do(req)
 
 	Expect(err).To(BeNil())

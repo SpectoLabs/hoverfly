@@ -65,11 +65,14 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		TemplateStore: matching.RequestTemplateStore{},
 		Webserver:     &cfg.Webserver,
 	}
+
 	h := &Hoverfly{
 		RequestCache:   requestCache,
 		MetadataCache:  metadataCache,
 		Authentication: authentication,
-		HTTP: &http.Client{Transport: &http.Transport{
+		HTTP: &http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		}, Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.TLSVerification},
 		}},
 		Cfg:            cfg,
