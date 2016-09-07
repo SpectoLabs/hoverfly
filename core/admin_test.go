@@ -13,13 +13,15 @@ import (
 	"testing"
 )
 
+var adminApi = AdminApi{}
+
 func TestGetAllRecords(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/records", nil)
 	Expect(err).To(BeNil())
@@ -53,7 +55,7 @@ func TestGetAllRecordsWRecords(t *testing.T) {
 		dbClient.captureRequest(req)
 	}
 	// performing query
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/records", nil)
 	Expect(err).To(BeNil())
@@ -79,7 +81,7 @@ func TestGetRecordsCount(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/count", nil)
 	Expect(err).To(BeNil())
@@ -113,7 +115,7 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 		dbClient.captureRequest(req)
 	}
 	// performing query
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/count", nil)
 	Expect(err).To(BeNil())
@@ -139,7 +141,7 @@ func TestExportImportRecords(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -184,7 +186,7 @@ func TestDeleteHandler(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -213,7 +215,7 @@ func TestDeleteHandlerNoBucket(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// deleting through handler
 	importReq, err := http.NewRequest("DELETE", "/api/records", nil)
@@ -231,7 +233,7 @@ func TestGetState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// setting initial mode
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -258,7 +260,7 @@ func TestSetSimulateState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// setting mode to capture
 	dbClient.Cfg.SetMode("capture")
@@ -290,7 +292,7 @@ func TestSetCaptureState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// setting mode to simulate
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -322,7 +324,7 @@ func TestSetModifyState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// setting mode to simulate
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -354,7 +356,7 @@ func TestSetSynthesizeState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// setting mode to simulate
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -386,7 +388,7 @@ func TestSetRandomState(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// setting mode to simulate
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -418,7 +420,7 @@ func TestSetNoBody(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// setting mode to simulate
 	dbClient.Cfg.SetMode(SimulateMode)
@@ -443,7 +445,7 @@ func TestGetMiddleware(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	dbClient.Cfg.Middleware = "python middleware_test.py"
 	req, err := http.NewRequest("GET", "/api/middleware", nil)
@@ -469,7 +471,7 @@ func TestSetMiddleware_WithValidMiddleware(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	dbClient.Cfg.Middleware = "python examples/middleware/modify_request/modify_request.py"
 
@@ -503,7 +505,7 @@ func TestSetMiddleware_WithInvalidMiddleware(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	dbClient.Cfg.Middleware = "python examples/middleware/modify_request/modify_request.py"
 
@@ -538,7 +540,7 @@ func TestSetMiddleware_WithEmptyMiddleware(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	dbClient.Cfg.Middleware = "python examples/middleware/modify_request/modify_request.py"
 
@@ -573,7 +575,7 @@ func TestStatsHandler(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// deleting through handler
 	req, err := http.NewRequest("GET", "/api/stats", nil)
@@ -594,7 +596,7 @@ func TestStatsHandlerSimulateMetrics(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	dbClient.Counter.Counters[SimulateMode].Inc(1)
 
@@ -623,7 +625,7 @@ func TestStatsHandlerCaptureMetrics(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	dbClient.Counter.Counters[CaptureMode].Inc(1)
 
@@ -652,7 +654,7 @@ func TestStatsHandlerModifyMetrics(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	dbClient.Counter.Counters[ModifyMode].Inc(1)
 
@@ -681,7 +683,7 @@ func TestStatsHandlerSynthesizeMetrics(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	dbClient.Counter.Counters[SynthesizeMode].Inc(1)
 
@@ -710,7 +712,7 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -742,7 +744,7 @@ func TestSetMetadata(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// preparing to set mode through rest api
 	var reqBody setMetadata
@@ -774,7 +776,7 @@ func TestSetMetadataBadBody(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// deleting through handler
 	req, err := http.NewRequest("PUT", "/api/metadata", ioutil.NopCloser(bytes.NewBuffer([]byte("you shall not decode me!!"))))
@@ -793,7 +795,7 @@ func TestSetMetadataMissingKey(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// preparing to set mode through rest api
 	var reqBody setMetadata
@@ -827,7 +829,7 @@ func TestGetMetadata(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 	// adding some metadata
 	for i := 0; i < 3; i++ {
 		k := fmt.Sprintf("key_%d", i)
@@ -865,7 +867,7 @@ func TestDeleteMetadata(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 	// adding some metadata
 	for i := 0; i < 3; i++ {
 		k := fmt.Sprintf("key_%d", i)
@@ -900,7 +902,7 @@ func TestDeleteMetadataEmpty(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// deleting it
 	req, err := http.NewRequest("DELETE", "/api/metadata", nil)
@@ -931,7 +933,7 @@ func TestGetResponseDelays(t *testing.T) {
 	delays := models.ResponseDelayList{delay}
 	dbClient.UpdateResponseDelays(delays)
 
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/delays", nil)
 	Expect(err).To(BeNil())
@@ -962,7 +964,7 @@ func TestDeleteAllResponseDelaysHandler(t *testing.T) {
 	}
 	delays := models.ResponseDelayList{delay}
 	dbClient.ResponseDelays = &delays
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("DELETE", "/api/delays", nil)
 	Expect(err).To(BeNil())
@@ -981,7 +983,7 @@ func TestUpdateResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	delayOne := models.ResponseDelay{
 		UrlPattern: ".",
@@ -1015,7 +1017,7 @@ func TestInvalidJSONSyntaxUpdateResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	delayJson := "{aseuifhksejfc}"
 
@@ -1038,7 +1040,7 @@ func TestInvalidJSONSemanticsUpdateResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	delayJson := "{ \"madeupfield\" : \"somevalue\" }"
 
@@ -1061,7 +1063,7 @@ func TestJSONWithInvalidHostPatternUpdateResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	delayJson := "{ \"data\": [{\"hostPattern\": \"*\", \"delay\": 100}] }"
 
@@ -1084,7 +1086,7 @@ func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	delayJson := "{ \"data\" : [{\"hostPattern\": \".\"}] }"
 
@@ -1107,7 +1109,7 @@ func TestGetMissingURL(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/sdiughvksjv", nil)
 	Expect(err).To(BeNil())

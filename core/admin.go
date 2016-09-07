@@ -62,6 +62,8 @@ type messageResponse struct {
 	Message string `json:"message"`
 }
 
+type AdminApi struct{}
+
 func (m *messageResponse) Encode() ([]byte, error) {
 	buf := new(bytes.Buffer)
 	enc := json.NewEncoder(buf)
@@ -73,15 +75,15 @@ func (m *messageResponse) Encode() ([]byte, error) {
 }
 
 // StartAdminInterface - starts admin interface web server
-func (d *Hoverfly) StartAdminInterface() {
+func (this *AdminApi) StartAdminInterface(hoverfly *Hoverfly) {
 
 	// starting admin interface
-	mux := getBoneRouter(d)
+	mux := this.getBoneRouter(hoverfly)
 	n := negroni.Classic()
 
 	logLevel := log.ErrorLevel
 
-	if d.Cfg.Verbose {
+	if hoverfly.Cfg.Verbose {
 		logLevel = log.DebugLevel
 	}
 
@@ -90,14 +92,14 @@ func (d *Hoverfly) StartAdminInterface() {
 
 	// admin interface starting message
 	log.WithFields(log.Fields{
-		"AdminPort": d.Cfg.AdminPort,
+		"AdminPort": hoverfly.Cfg.AdminPort,
 	}).Info("Admin interface is starting...")
 
-	n.Run(fmt.Sprintf(":%s", d.Cfg.AdminPort))
+	n.Run(fmt.Sprintf(":%s", hoverfly.Cfg.AdminPort))
 }
 
 // getBoneRouter returns mux for admin interface
-func getBoneRouter(d *Hoverfly) *bone.Mux {
+func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 	mux := bone.New()
 
 	// getting auth controllers and middleware
