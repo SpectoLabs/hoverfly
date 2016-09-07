@@ -8,6 +8,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/ryanuber/go-glob"
+	"strings"
 )
 
 type RequestTemplateStore []RequestTemplateResponsePair
@@ -102,7 +103,12 @@ Check keys and corresponding values in template headers are also present in requ
 func headerMatch(templateHeaders, requestHeaders map[string][]string) bool {
 
 	for templateHeaderKey, templateHeaderValues := range templateHeaders {
-		requestTemplateValues, ok := requestHeaders[templateHeaderKey]
+		for requestHeaderKey, requestHeaderValues := range requestHeaders {
+			delete(requestHeaders, requestHeaderKey)
+			requestHeaders[strings.ToLower(requestHeaderKey)] = requestHeaderValues
+
+		}
+		requestTemplateValues, ok := requestHeaders[strings.ToLower(templateHeaderKey)]
 		if !ok {
 			return false
 		}
@@ -110,7 +116,7 @@ func headerMatch(templateHeaders, requestHeaders map[string][]string) bool {
 		for _, templateHeaderValue := range templateHeaderValues {
 			found := 0
 			for _, requestHeaderValue := range requestTemplateValues {
-				if glob.Glob(templateHeaderValue, requestHeaderValue) {
+				if glob.Glob(strings.ToLower(templateHeaderValue), strings.ToLower(requestHeaderValue)) {
 					found++
 				}
 			}

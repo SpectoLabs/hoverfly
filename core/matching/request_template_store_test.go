@@ -223,7 +223,7 @@ func TestHeaderMatch(t *testing.T) {
 	Expect(res).To(BeTrue())
 }
 
-func IgnoreTestCaseInsensitiveHeaderMatch(t *testing.T) {
+func TestIgnoreTestCaseInsensitiveHeaderMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	tmplHeaders := map[string][]string{
@@ -232,7 +232,7 @@ func IgnoreTestCaseInsensitiveHeaderMatch(t *testing.T) {
 	}
 	reqHeaders := map[string][]string{
 		"HEADER1": []string{"val1"},
-		"Header2": []string{"val2"},
+		"Header2": []string{"VAL2"},
 	}
 	res := headerMatch(tmplHeaders, reqHeaders)
 	Expect(res).To(BeTrue())
