@@ -158,7 +158,11 @@ func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
 	return
 }
 
-func (hf *Hoverfly) SetMiddleware(middleware string) error {
+func (hf Hoverfly) GetMiddleware() string {
+	return hf.Cfg.Middleware
+}
+
+func (hf Hoverfly) SetMiddleware(middleware string) error {
 	if middleware == "" {
 		hf.Cfg.Middleware = middleware
 		return nil
