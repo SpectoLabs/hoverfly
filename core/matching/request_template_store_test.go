@@ -238,6 +238,60 @@ func TestIgnoreTestCaseInsensitiveHeaderMatch(t *testing.T) {
 	Expect(res).To(BeTrue())
 }
 
+func TestHeaderMatchingTemplateHasMoreHeaderKeysThanRequestMatchesFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	tmplHeaders := map[string][]string{
+		"header1": []string{"val1"},
+		"header2": []string{"val2"},
+	}
+	reqHeaders := map[string][]string{
+		"header1": []string{"val1"},
+	}
+	res := headerMatch(tmplHeaders, reqHeaders)
+	Expect(res).To(BeFalse())
+}
+
+func TestHeaderMatchingTemplateHasMoreHeaderValuesThanRequestMatchesFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	tmplHeaders := map[string][]string{
+		"header2": []string{"val1", "val2"},
+	}
+	reqHeaders := map[string][]string{
+		"header2": []string{"val1"},
+	}
+	res := headerMatch(tmplHeaders, reqHeaders)
+	Expect(res).To(BeFalse())
+}
+
+func TestHeaderMatchingRequestHasMoreHeaderKeysThanTemplateMatchesFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	tmplHeaders := map[string][]string{
+		"header2": []string{"val2"},
+	}
+	reqHeaders := map[string][]string{
+		"HEADER1": []string{"val1"},
+		"header2": []string{"val2"},
+	}
+	res := headerMatch(tmplHeaders, reqHeaders)
+	Expect(res).To(BeTrue())
+}
+
+func TestHeaderMatchingRequestHasMoreHeaderValuesThanTemplateMatchesFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	tmplHeaders := map[string][]string{
+		"header2": []string{"val2"},
+	}
+	reqHeaders := map[string][]string{
+		"header2": []string{"val1", "val2"},
+	}
+	res := headerMatch(tmplHeaders, reqHeaders)
+	Expect(res).To(BeTrue())
+}
+
 func TestEndpointMatchWithHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
