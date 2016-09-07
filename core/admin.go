@@ -210,8 +210,9 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		negroni.HandlerFunc(d.ManualAddHandler),
 	))
 
+	healthHandler := HealthHandler{}
 	mux.Get("/api/health", negroni.New(
-		negroni.HandlerFunc(d.HealthHandler),
+		negroni.HandlerFunc(healthHandler.Get),
 	))
 
 	mux.Get("/api/delays", negroni.New(
@@ -1099,25 +1100,4 @@ func (d *Hoverfly) UpdateResponseDelaysHandler(w http.ResponseWriter, req *http.
 	w.Write(b)
 	return
 
-}
-
-func (d *Hoverfly) HealthHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	w.Header().Set("Content-Type", "application/json")
-
-	var response messageResponse
-	response.Message = "Hoverfly is healthy"
-
-	response.Encode()
-
-	b, err := response.Encode()
-	if err != nil {
-		// failed to read response body
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Could not encode response body!")
-		http.Error(w, "Failed to encode response", 500)
-		return
-	}
-	w.Write(b)
-	return
 }
