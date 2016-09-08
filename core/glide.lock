@@ -1,5 +1,5 @@
-hash: 5fc845a0dd35871d2ee3b116521deebc45aede203dae3a7c20f3129a63b8e6f8
-updated: 2016-08-24T16:22:05.681330373+01:00
+hash: 725df96c0cb0634243ad60225da702e3fec65530ca168d9b4ac65bb745a8379a
+updated: 2016-08-31T09:43:31.064886454+01:00
 imports:
 - name: github.com/boltdb/bolt
   version: c1c3bd7e847a231b2b1f9592fa86182a121ad734
@@ -20,9 +20,9 @@ imports:
 - name: github.com/go-zoo/bone
   version: 2b727a8601bc7a74fac33a9583ebba67779c502d
 - name: github.com/gorilla/context
-  version: a8d44e7d8e4d532b6a27a02dd82abb31cc1b01bd
+  version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
 - name: github.com/gorilla/mux
-  version: 9c19ed558d5df4da88e2ade9c8940d742aef0e7e
+  version: a49d62f618e6dc4a7a7d1f0ad69744a158c21f23
 - name: github.com/gorilla/pat
   version: cf955c3d1f2c27ee96f93e9738085c762ff5f49d
 - name: github.com/gorilla/websocket
@@ -38,7 +38,7 @@ imports:
 - name: github.com/ogier/pflag
   version: 45c278ab3607870051a2ea9040bb85fcb8557481
 - name: github.com/onsi/gomega
-  version: 0df7b7fdb38123c12a1f569f0affb2c2a7bd72cf
+  version: 3e93f011213c200aadafcb19ed56eb718381cfbd
   subpackages:
   - format
   - internal/assertion
@@ -67,6 +67,8 @@ imports:
   - data
 - name: github.com/rusenask/goproxy
   version: d502efea2f393722d4b0f6180e12bb1e968d2525
+- name: github.com/ryanuber/go-glob
+  version: 572520ed46dbddaed19ea3d9541bdd0494163693
 - name: github.com/Sirupsen/logrus
   version: cd7d1bbe41066b6c1f19780f895901052150a575
 - name: github.com/stathat/go

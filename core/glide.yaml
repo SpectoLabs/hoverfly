@@ -47,3 +47,5 @@ import:
 - package: github.com/ursiform/bear
 - package: github.com/onsi/gomega
 - package: gopkg.in/yaml.v2
+- package: github.com/ryanuber/go-glob
+  version: ^0.1.0

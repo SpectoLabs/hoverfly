@@ -223,7 +223,7 @@ func TestHeaderMatch(t *testing.T) {
 	Expect(res).To(BeTrue())
 }
 
-func IgnoreTestCaseInsensitiveHeaderMatch(t *testing.T) {
+func TestIgnoreTestCaseInsensitiveHeaderMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	tmplHeaders := map[string][]string{
@@ -232,7 +232,61 @@ func IgnoreTestCaseInsensitiveHeaderMatch(t *testing.T) {
 	}
 	reqHeaders := map[string][]string{
 		"HEADER1": []string{"val1"},
-		"Header2": []string{"val2"},
+		"Header2": []string{"VAL2"},
+	}
+	res := headerMatch(tmplHeaders, reqHeaders)
+	Expect(res).To(BeTrue())
+}
+
+func TestHeaderMatchingTemplateHasMoreHeaderKeysThanRequestMatchesFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	tmplHeaders := map[string][]string{
+		"header1": []string{"val1"},
+		"header2": []string{"val2"},
+	}
+	reqHeaders := map[string][]string{
+		"header1": []string{"val1"},
+	}
+	res := headerMatch(tmplHeaders, reqHeaders)
+	Expect(res).To(BeFalse())
+}
+
+func TestHeaderMatchingTemplateHasMoreHeaderValuesThanRequestMatchesFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	tmplHeaders := map[string][]string{
+		"header2": []string{"val1", "val2"},
+	}
+	reqHeaders := map[string][]string{
+		"header2": []string{"val1"},
+	}
+	res := headerMatch(tmplHeaders, reqHeaders)
+	Expect(res).To(BeFalse())
+}
+
+func TestHeaderMatchingRequestHasMoreHeaderKeysThanTemplateMatchesFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	tmplHeaders := map[string][]string{
+		"header2": []string{"val2"},
+	}
+	reqHeaders := map[string][]string{
+		"HEADER1": []string{"val1"},
+		"header2": []string{"val2"},
+	}
+	res := headerMatch(tmplHeaders, reqHeaders)
+	Expect(res).To(BeTrue())
+}
+
+func TestHeaderMatchingRequestHasMoreHeaderValuesThanTemplateMatchesFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	tmplHeaders := map[string][]string{
+		"header2": []string{"val2"},
+	}
+	reqHeaders := map[string][]string{
+		"header2": []string{"val1", "val2"},
 	}
 	res := headerMatch(tmplHeaders, reqHeaders)
 	Expect(res).To(BeTrue())
@@ -373,7 +427,7 @@ func TestRequestTemplateResponsePairCanBeConvertedToARequestResponsePairView_Whi
 			Method: &method,
 		},
 		Response: models.ResponseDetails{
-			Body: "Yo",
+			Body: "template matched",
 		},
 	}
 
@@ -386,5 +440,220 @@ func TestRequestTemplateResponsePairCanBeConvertedToARequestResponsePairView_Whi
 	Expect(pairView.Request.Scheme).To(BeNil())
 	Expect(pairView.Request.Query).To(BeNil())
 
-	Expect(pairView.Response.Body).To(Equal("Yo"))
+	Expect(pairView.Response.Body).To(Equal("template matched"))
+}
+
+func TestTemplatesCanUseGlobsOnDestinationAndBeMatched(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestTemplateResponsePair := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Destination: StringToPointer("*.com"),
+		},
+		Response: models.ResponseDetails{
+			Body: "template matched",
+		},
+	}
+
+	store := RequestTemplateStore{requestTemplateResponsePair}
+
+	request := models.RequestDetails{
+		Method:      "GET",
+		Destination: "testhost.com",
+		Path:        "/api/1",
+	}
+
+	response, err :=store.GetResponse(request, false)
+	Expect(err).To(BeNil())
+
+	Expect(response.Body).To(Equal("template matched"))
+}
+
+func TestTemplatesCanUseGlobsOnPathAndBeMatched(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestTemplateResponsePair := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Path: StringToPointer("/api/*"),
+		},
+		Response: models.ResponseDetails{
+			Body: "template matched",
+		},
+	}
+
+	store := RequestTemplateStore{requestTemplateResponsePair}
+
+	request := models.RequestDetails{
+		Method:      "GET",
+		Destination: "testhost.com",
+		Path:        "/api/1",
+	}
+
+	response, err :=store.GetResponse(request, false)
+	Expect(err).To(BeNil())
+
+	Expect(response.Body).To(Equal("template matched"))
+}
+
+func TestTemplatesCanUseGlobsOnMethodAndBeMatched(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestTemplateResponsePair := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Method: StringToPointer("*T"),
+		},
+		Response: models.ResponseDetails{
+			Body: "template matched",
+		},
+	}
+
+	store := RequestTemplateStore{requestTemplateResponsePair}
+
+	request := models.RequestDetails{
+		Method:      "GET",
+		Destination: "testhost.com",
+		Path:        "/api/1",
+	}
+
+	response, err :=store.GetResponse(request, false)
+	Expect(err).To(BeNil())
+
+	Expect(response.Body).To(Equal("template matched"))
+}
+
+func TestTemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestTemplateResponsePair := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Scheme: StringToPointer("H*"),
+		},
+		Response: models.ResponseDetails{
+			Body: "template matched",
+		},
+	}
+
+	store := RequestTemplateStore{requestTemplateResponsePair}
+
+	request := models.RequestDetails{
+		Method:      "GET",
+		Destination: "testhost.com",
+		Scheme:      "http",
+		Path:        "/api/1",
+	}
+
+	response, err :=store.GetResponse(request, false)
+	Expect(err).To(BeNil())
+
+	Expect(response.Body).To(Equal("template matched"))
+}
+
+func TestTemplatesCanUseGlobsOnQueryAndBeMatched(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestTemplateResponsePair := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Query: StringToPointer("q=*"),
+		},
+		Response: models.ResponseDetails{
+			Body: "template matched",
+		},
+	}
+
+	store := RequestTemplateStore{requestTemplateResponsePair}
+
+	request := models.RequestDetails{
+		Method:      "GET",
+		Destination: "testhost.com",
+		Path:        "/api/1",
+		Query: 	     "q=anything-i-want",
+	}
+
+	response, err :=store.GetResponse(request, false)
+	Expect(err).To(BeNil())
+
+	Expect(response.Body).To(Equal("template matched"))
+}
+
+func TestTemplatesCanUseGlobsOnBodyndBeMatched(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestTemplateResponsePair := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Body: StringToPointer(`{"json": "object", "key": *}`),
+		},
+		Response: models.ResponseDetails{
+			Body: "template matched",
+		},
+	}
+
+	store := RequestTemplateStore{requestTemplateResponsePair}
+
+	request := models.RequestDetails{
+		Method:      "GET",
+		Destination: "testhost.com",
+		Path:        "/api/1",
+		Body: 	     `{"json": "object", "key": "value"}`,
+	}
+
+	response, err :=store.GetResponse(request, false)
+	Expect(err).To(BeNil())
+
+	Expect(response.Body).To(Equal("template matched"))
+}
+
+func TestTemplatesCanUseGlobsOnBodyAndNotMatchWhenTheBodyIsWrong(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestTemplateResponsePair := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Body: StringToPointer(`{"json": "object", "key": *}`),
+		},
+		Response: models.ResponseDetails{
+			Body: "template matched",
+		},
+	}
+
+	store := RequestTemplateStore{requestTemplateResponsePair}
+
+	request := models.RequestDetails{
+		Method:      "GET",
+		Destination: "testhost.com",
+		Path:        "/api/1",
+		Body: 	     `[{"json": "objects", "key": "value"}]`,
+	}
+
+	_, err :=store.GetResponse(request, false)
+	Expect(err).ToNot(BeNil())
+}
+
+func TestTemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestTemplateResponsePair := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Headers: map[string][]string {
+				"unique-header": []string {"*"},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "template matched",
+		},
+	}
+
+	store := RequestTemplateStore{requestTemplateResponsePair}
+
+	request := models.RequestDetails{
+		Method:      "GET",
+		Destination: "testhost.com",
+		Path:        "/api/1",
+		Headers:  map[string][]string {
+			"unique-header": []string {"totally-unique"},
+		},
+	}
+
+	response, err :=store.GetResponse(request, false)
+	Expect(err).To(BeNil())
+
+	Expect(response.Body).To(Equal("template matched"))
 }

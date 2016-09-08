@@ -5,12 +5,11 @@
 package mux
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 	"testing"
-
-	"github.com/gorilla/context"
 )
 
 func (r *Route) GoString() string {
@@ -1197,6 +1196,42 @@ func TestWalkNested(t *testing.T) {
 	}
 }
 
+func TestWalkErrorRoute(t *testing.T) {
+	router := NewRouter()
+	router.Path("/g")
+	expectedError := errors.New("error")
+	err := router.Walk(func(route *Route, router *Router, ancestors []*Route) error {
+		return expectedError
+	})
+	if err != expectedError {
+		t.Errorf("Expected %v routes, found %v", expectedError, err)
+	}
+}
+
+func TestWalkErrorMatcher(t *testing.T) {
+	router := NewRouter()
+	expectedError := router.Path("/g").Subrouter().Path("").GetError()
+	err := router.Walk(func(route *Route, router *Router, ancestors []*Route) error {
+		return route.GetError()
+	})
+	if err != expectedError {
+		t.Errorf("Expected %v routes, found %v", expectedError, err)
+	}
+}
+
+func TestWalkErrorHandler(t *testing.T) {
+	handler := NewRouter()
+	expectedError := handler.Path("/path").Subrouter().Path("").GetError()
+	router := NewRouter()
+	router.Path("/g").Handler(handler)
+	err := router.Walk(func(route *Route, router *Router, ancestors []*Route) error {
+		return route.GetError()
+	})
+	if err != expectedError {
+		t.Errorf("Expected %v routes, found %v", expectedError, err)
+	}
+}
+
 func TestSubrouterErrorHandling(t *testing.T) {
 	superRouterCalled := false
 	subRouterCalled := false
@@ -1314,36 +1349,6 @@ func testTemplate(t *testing.T, test routeTest) {
 	if host_err == nil && host_tmpl != host_template {
 		t.Errorf("(%v) GetHostTemplate not equal: expected %v, got %v", test.title, host_template, host_tmpl)
 	}
-}
-
-// Tests that the context is cleared or not cleared properly depending on
-// the configuration of the router
-func TestKeepContext(t *testing.T) {
-	func1 := func(w http.ResponseWriter, r *http.Request) {}
-
-	r := NewRouter()
-	r.HandleFunc("/", func1).Name("func1")
-
-	req, _ := http.NewRequest("GET", "http://localhost/", nil)
-	context.Set(req, "t", 1)
-
-	res := new(http.ResponseWriter)
-	r.ServeHTTP(*res, req)
-
-	if _, ok := context.GetOk(req, "t"); ok {
-		t.Error("Context should have been cleared at end of request")
-	}
-
-	r.KeepContext = true
-
-	req, _ = http.NewRequest("GET", "http://localhost/", nil)
-	context.Set(req, "t", 1)
-
-	r.ServeHTTP(*res, req)
-	if _, ok := context.GetOk(req, "t"); !ok {
-		t.Error("Context should NOT have been cleared at end of request")
-	}
-
 }
 
 type TestA301ResponseWriter struct {

@@ -7,7 +7,8 @@ import (
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
-	"reflect"
+	"github.com/ryanuber/go-glob"
+	"strings"
 )
 
 type RequestTemplateStore []RequestTemplateResponsePair
@@ -43,25 +44,25 @@ func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserv
 		// TODO: need to enable regex matches
 		// TODO: enable matching on scheme
 
-		if entry.RequestTemplate.Body != nil && *entry.RequestTemplate.Body != req.Body {
+		if entry.RequestTemplate.Body != nil && !glob.Glob(*entry.RequestTemplate.Body, req.Body) {
 			continue
 		}
 
 		if !webserver {
-			if entry.RequestTemplate.Destination != nil && *entry.RequestTemplate.Destination != req.Destination {
+			if entry.RequestTemplate.Destination != nil && !glob.Glob(*entry.RequestTemplate.Destination, req.Destination) {
 				continue
 			}
 		}
-		if entry.RequestTemplate.Path != nil && *entry.RequestTemplate.Path != req.Path {
+		if entry.RequestTemplate.Path != nil && !glob.Glob(*entry.RequestTemplate.Path, req.Path) {
 			continue
 		}
-		if entry.RequestTemplate.Query != nil && *entry.RequestTemplate.Query != req.Query {
+		if entry.RequestTemplate.Query != nil && !glob.Glob(*entry.RequestTemplate.Query, req.Query) {
 			continue
 		}
 		if !headerMatch(entry.RequestTemplate.Headers, req.Headers) {
 			continue
 		}
-		if entry.RequestTemplate.Method != nil && *entry.RequestTemplate.Method != req.Method {
+		if entry.RequestTemplate.Method != nil && !glob.Glob(*entry.RequestTemplate.Method, req.Method) {
 			continue
 		}
 
@@ -99,17 +100,30 @@ func (this *RequestTemplateStore) Wipe() {
 /**
 Check keys and corresponding values in template headers are also present in request headers
 */
-func headerMatch(tmplHeaders, reqHeaders map[string][]string) bool {
+func headerMatch(templateHeaders, requestHeaders map[string][]string) bool {
 
-	for headerName, headerVal := range tmplHeaders {
-		// TODO: case insensitive lookup
-		// TODO: is order of values in slice really important?
+	for templateHeaderKey, templateHeaderValues := range templateHeaders {
+		for requestHeaderKey, requestHeaderValues := range requestHeaders {
+			delete(requestHeaders, requestHeaderKey)
+			requestHeaders[strings.ToLower(requestHeaderKey)] = requestHeaderValues
 
-		reqHeaderVal, ok := reqHeaders[headerName]
-		if ok && reflect.DeepEqual(headerVal, reqHeaderVal) {
-			continue
-		} else {
+		}
+		requestTemplateValues, templateHeaderMatched := requestHeaders[strings.ToLower(templateHeaderKey)]
+		if !templateHeaderMatched {
 			return false
+		}
+
+		for _, templateHeaderValue := range templateHeaderValues {
+			templateValueMatched := false
+			for _, requestHeaderValue := range requestTemplateValues {
+				if glob.Glob(strings.ToLower(templateHeaderValue), strings.ToLower(requestHeaderValue)) {
+					templateValueMatched = true
+				}
+			}
+
+			if !templateValueMatched {
+				return false
+			}
 		}
 	}
 	return true
