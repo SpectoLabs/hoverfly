@@ -84,7 +84,10 @@ func TestRequestBodySentToMiddleware(t *testing.T) {
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
 	Expect(err).To(BeNil())
 
-	resp, err := dbClient.modifyRequestResponse(req, "./examples/middleware/reflect_body/reflect_body.py")
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
+	Expect(err).To(BeNil())
+
+	resp, err := dbClient.modifyRequestResponse(req, requestDetails, "./examples/middleware/reflect_body/reflect_body.py")
 
 	// body from the request should be in response body, instead of server's response
 	responseBody, err := ioutil.ReadAll(resp.Body)
@@ -127,9 +130,14 @@ func TestMatchOnRequestBody(t *testing.T) {
 		requestBody := []byte(fmt.Sprintf("fizz=buzz, number=%d", i))
 		body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
 
-		request, _ := http.NewRequest("POST", "http://capture_body.com", body)
+		request, err := http.NewRequest("POST", "http://capture_body.com", body)
+		Expect(err).To(BeNil())
 
-		response := dbClient.getResponse(request)
+		requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
+		Expect(err).To(BeNil())
+
+		response, err := dbClient.getResponse(request, requestDetails)
+		Expect(err).To(BeNil())
 
 		responseBody, err := ioutil.ReadAll(response.Body)
 		response.Body.Close()
@@ -147,11 +155,16 @@ func TestGetNotRecordedRequest(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 
-	request, _ := http.NewRequest("POST", "http://capture_body.com", nil)
+	request, err := http.NewRequest("POST", "http://capture_body.com", nil)
+	Expect(err).To(BeNil())
 
-	response := dbClient.getResponse(request)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
+	Expect(err).To(BeNil())
 
-	Expect(response.StatusCode).To(Equal(http.StatusPreconditionFailed))
+	response, err := dbClient.getResponse(request, requestDetails)
+	Expect(err).ToNot(BeNil())
+
+	Expect(response).To(BeNil())
 }
 
 // TestRequestFingerprint tests whether we get correct request ID
@@ -261,7 +274,10 @@ func TestModifyRequest(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
+	Expect(err).To(BeNil())
+
+	response, err := dbClient.modifyRequestResponse(req, requestDetails, dbClient.Cfg.Middleware)
 	Expect(err).To(BeNil())
 
 	// response should be changed to 202
@@ -281,7 +297,10 @@ func TestModifyRequestWODestination(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
+	Expect(err).To(BeNil())
+
+	response, err := dbClient.modifyRequestResponse(req, requestDetails, dbClient.Cfg.Middleware)
 	Expect(err).To(BeNil())
 
 	// response should be changed to 201
@@ -300,7 +319,10 @@ func TestModifyRequestNoMiddleware(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
 
-	_, err = dbClient.modifyRequestResponse(req, dbClient.Cfg.Middleware)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
+	Expect(err).To(BeNil())
+
+	_, err = dbClient.modifyRequestResponse(req, requestDetails, dbClient.Cfg.Middleware)
 	Expect(err).ToNot(BeNil())
 }
 
@@ -329,9 +351,14 @@ func TestGetResponseCorruptedRequestResponsePair(t *testing.T) {
 
 	reqNew, err := http.NewRequest("POST", "http://capture_body.com", bodyNew)
 	Expect(err).To(BeNil())
-	response := dbClient.getResponse(reqNew)
 
-	Expect(response.StatusCode).To(Equal(http.StatusInternalServerError))
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(reqNew)
+	Expect(err).To(BeNil())
+
+	response, err := dbClient.getResponse(reqNew, requestDetails)
+	Expect(err).ToNot(BeNil())
+
+	Expect(response).To(BeNil())
 }
 
 func TestDoRequestWFailedMiddleware(t *testing.T) {

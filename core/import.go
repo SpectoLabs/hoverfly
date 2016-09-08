@@ -13,8 +13,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	. "github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/core/views"
 	"net/http"
 )
 
@@ -138,18 +138,18 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []views.RequestResp
 				responseDetails := models.NewResponseDetailsFromResponseDetailsView(pairView.Response)
 
 				requestTemplate := matching.RequestTemplate{
-					Path: pairView.Request.Path,
-					Method: pairView.Request.Method,
+					Path:        pairView.Request.Path,
+					Method:      pairView.Request.Method,
 					Destination: pairView.Request.Destination,
-					Scheme: pairView.Request.Scheme,
-					Query: pairView.Request.Query,
-					Body: pairView.Request.Body,
-					Headers: pairView.Request.Headers,
+					Scheme:      pairView.Request.Scheme,
+					Query:       pairView.Request.Query,
+					Body:        pairView.Request.Body,
+					Headers:     pairView.Request.Headers,
 				}
 
 				requestTemplateResponsePair := matching.RequestTemplateResponsePair{
 					RequestTemplate: requestTemplate,
-					Response: responseDetails,
+					Response:        responseDetails,
 				}
 
 				hf.RequestMatcher.TemplateStore = append(hf.RequestMatcher.TemplateStore, requestTemplateResponsePair)

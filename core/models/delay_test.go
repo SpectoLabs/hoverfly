@@ -16,7 +16,7 @@ func TestConvertJsonStringToResponseDelayConfig(t *testing.T) {
 				"delay": 1
 			}]
 	}`
-	var responseDelayJson ResponseDelayJson
+	var responseDelayJson ResponseDelayPayload
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
 	err := ValidateResponseDelayJson(responseDelayJson)
 	Expect(err).To(BeNil())
@@ -31,7 +31,7 @@ func TestErrorIfHostPatternNotSet(t *testing.T) {
 				"delay": 2
 			}]
 	}`
-	var responseDelayJson ResponseDelayJson
+	var responseDelayJson ResponseDelayPayload
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
 	err := ValidateResponseDelayJson(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
@@ -46,7 +46,7 @@ func TestErrprIfDelayNotSet(t *testing.T) {
 				"urlPattern": "."
 			}]
 	}`
-	var responseDelayJson ResponseDelayJson
+	var responseDelayJson ResponseDelayPayload
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
 	err := ValidateResponseDelayJson(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
@@ -62,7 +62,7 @@ func TestHostPatternMustBeAValidRegexPattern(t *testing.T) {
 				"delay": 1
 			}]
 	}`
-	var responseDelayJson ResponseDelayJson
+	var responseDelayJson ResponseDelayPayload
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
 	err := ValidateResponseDelayJson(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
@@ -78,7 +78,7 @@ func TestErrorIfHostPatternUsed(t *testing.T) {
 				"delay": 1
 			}]
 	}`
-	var responseDelayJson ResponseDelayJson
+	var responseDelayJson ResponseDelayPayload
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
 	err := ValidateResponseDelayJson(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
@@ -93,10 +93,20 @@ func TestGetDelayWithRegexMatch(t *testing.T) {
 	}
 	delays := ResponseDelayList{delay}
 
-	delayMatch := delays.GetDelay("delayexample.com", "method-dummy")
+	request1 := RequestDetails{
+		Destination: "delayexample.com",
+		Method:      "method-dummy",
+	}
+
+	delayMatch := delays.GetDelay(request1)
 	Expect(*delayMatch).To(Equal(delay))
 
-	delayMatch = delays.GetDelay("nodelay.com", "method-dummy")
+	request2 := RequestDetails{
+		Destination: "nodelay.com",
+		Method:      "method-dummy",
+	}
+
+	delayMatch = delays.GetDelay(request2)
 	Expect(delayMatch).To(BeNil())
 }
 
@@ -113,7 +123,12 @@ func TestMultipleMatchingDelaysReturnsTheFirst(t *testing.T) {
 	}
 	delays := ResponseDelayList{delayOne, delayTwo}
 
-	delayMatch := delays.GetDelay("delayexample.com", "method-dummy")
+	request1 := RequestDetails{
+		Destination: "delayexample.com",
+		Method:      "method-dummy",
+	}
+
+	delayMatch := delays.GetDelay(request1)
 	Expect(*delayMatch).To(Equal(delayOne))
 }
 
@@ -127,7 +142,12 @@ func TestNoMatchIfMethodsDontMatch(t *testing.T) {
 	}
 	delays := ResponseDelayList{delay}
 
-	delayMatch := delays.GetDelay("delayexample.com", "GET")
+	request := RequestDetails{
+		Destination: "delayexample.com",
+		Method:      "GET",
+	}
+
+	delayMatch := delays.GetDelay(request)
 	Expect(delayMatch).To(BeNil())
 }
 
@@ -141,7 +161,12 @@ func TestReturnMatchIfMethodsMatch(t *testing.T) {
 	}
 	delays := ResponseDelayList{delay}
 
-	delayMatch := delays.GetDelay("delayexample.com", "GET")
+	request := RequestDetails{
+		Destination: "delayexample.com",
+		Method:      "GET",
+	}
+
+	delayMatch := delays.GetDelay(request)
 	Expect(*delayMatch).To(Equal(delay))
 }
 
@@ -154,6 +179,11 @@ func TestIfDelayMethodBlankThenMatchesAnyMethod(t *testing.T) {
 	}
 	delays := ResponseDelayList{delay}
 
-	delayMatch := delays.GetDelay("delayexample.com", "method-dummy")
+	request := RequestDetails{
+		Destination: "delayexample.com",
+		Method:      "method-dummy",
+	}
+
+	delayMatch := delays.GetDelay(request)
 	Expect(*delayMatch).To(Equal(delay))
 }

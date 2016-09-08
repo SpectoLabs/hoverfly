@@ -3,8 +3,8 @@ package models
 import (
 	"bytes"
 	"compress/gzip"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	. "github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/core/views"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
@@ -287,8 +287,8 @@ func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 		Destination: StringToPointer("/"),
 		Scheme:      StringToPointer("scheme"),
 		Query:       StringToPointer(""),
-		Body: StringToPointer(""),
-		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}}
+		Body:        StringToPointer(""),
+		Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}}
 
 	requestDetails := NewRequestDetailsFromRequestDetailsView(requestDetailsView)
 

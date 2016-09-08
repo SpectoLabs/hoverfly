@@ -12,13 +12,13 @@ type RequestResponsePairView struct {
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsView struct {
-	RequestType *string              `json:"requestType"`
-	Path        *string              `json:"path"`
-	Method      *string              `json:"method"`
-	Destination *string              `json:"destination"`
-	Scheme      *string              `json:"scheme"`
-	Query       *string              `json:"query"`
-	Body        *string              `json:"body"`
+	RequestType *string             `json:"requestType"`
+	Path        *string             `json:"path"`
+	Method      *string             `json:"method"`
+	Destination *string             `json:"destination"`
+	Scheme      *string             `json:"scheme"`
+	Query       *string             `json:"query"`
+	Body        *string             `json:"body"`
 	Headers     map[string][]string `json:"headers"`
 }
 

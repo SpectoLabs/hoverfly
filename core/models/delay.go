@@ -16,7 +16,7 @@ type ResponseDelay struct {
 	Delay      int    `json:"delay"`
 }
 
-type ResponseDelayJson struct {
+type ResponseDelayPayload struct {
 	Data *ResponseDelayList `json:"data"`
 }
 
@@ -24,11 +24,11 @@ type ResponseDelayList []ResponseDelay
 
 type ResponseDelays interface {
 	Json() []byte
-	GetDelay(url, httpMethod string) *ResponseDelay
+	GetDelay(request RequestDetails) *ResponseDelay
 	Len() int
 }
 
-func ValidateResponseDelayJson(j ResponseDelayJson) (err error) {
+func ValidateResponseDelayJson(j ResponseDelayPayload) (err error) {
 	if j.Data != nil {
 		for _, delay := range *j.Data {
 			if delay.UrlPattern != "" && delay.Delay != 0 {
@@ -50,11 +50,11 @@ func (this *ResponseDelay) Execute() {
 	log.Info("Response delay completed")
 }
 
-func (this *ResponseDelayList) GetDelay(url, httpMethod string) *ResponseDelay {
+func (this *ResponseDelayList) GetDelay(request RequestDetails) *ResponseDelay {
 	for _, val := range *this {
-		match := regexp.MustCompile(val.UrlPattern).MatchString(url)
+		match := regexp.MustCompile(val.UrlPattern).MatchString(request.Destination + request.Path)
 		if match {
-			if val.HttpMethod == "" || strings.EqualFold(val.HttpMethod, httpMethod) {
+			if val.HttpMethod == "" || strings.EqualFold(val.HttpMethod, request.Method) {
 				log.Info("Found response delay setting for this request host: ", val)
 				return &val
 			}
@@ -64,7 +64,7 @@ func (this *ResponseDelayList) GetDelay(url, httpMethod string) *ResponseDelay {
 }
 
 func (this *ResponseDelayList) Json() []byte {
-	resp := ResponseDelayJson{
+	resp := ResponseDelayPayload{
 		Data: this,
 	}
 	b, _ := json.Marshal(resp)

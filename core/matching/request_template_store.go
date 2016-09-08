@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/ryanuber/go-glob"
 	"strings"
@@ -108,6 +108,7 @@ func headerMatch(templateHeaders, requestHeaders map[string][]string) bool {
 			requestHeaders[strings.ToLower(requestHeaderKey)] = requestHeaderValues
 
 		}
+
 		requestTemplateValues, templateHeaderMatched := requestHeaders[strings.ToLower(templateHeaderKey)]
 		if !templateHeaderMatched {
 			return false
