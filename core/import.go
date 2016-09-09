@@ -111,7 +111,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 // recordedRequests structure (which is default format in which Hoverfly exports captured requests) and
 // imports those requests into the database
 func (hf *Hoverfly) ImportFromURL(url string) error {
-	resp, err := hf.HTTP.Get(url)
+	resp, err := http.DefaultClient.Get(url)
 
 	if err != nil {
 		return fmt.Errorf("Failed to fetch given URL, error %s", err.Error())

@@ -11,6 +11,8 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"net/http/httptest"
+	"net/http"
 )
 
 func TestIsURLHTTP(t *testing.T) {
@@ -130,6 +132,38 @@ func TestImportFromURL(t *testing.T) {
 
 	// importing payloads
 	err = dbClient.Import(server.URL)
+	Expect(err).To(BeNil())
+
+	recordsCount, err := dbClient.RequestCache.RecordsCount()
+	Expect(err).To(BeNil())
+	Expect(recordsCount).To(Equal(5))
+}
+
+func TestImportFromURLRedirect(t *testing.T) {
+	RegisterTestingT(t)
+
+	// reading file and preparing json payload
+	pairFile, err := os.Open("examples/exports/readthedocs.json")
+	Expect(err).To(BeNil())
+	pairFileBytes, err := ioutil.ReadAll(pairFile)
+	Expect(err).To(BeNil())
+
+
+	// pretending this is the endpoint with given json
+	server, dbClient := testTools(200, string(pairFileBytes))
+	defer server.Close()
+	defer dbClient.RequestCache.DeleteData()
+
+	dbClient.HTTP = GetDefaultHoverflyHTTPClient(false)
+
+	redirectServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Location", server.URL)
+		w.WriteHeader(301)
+	}))
+	defer redirectServer.Close()
+
+	// importing payloads
+	err = dbClient.Import(redirectServer.URL)
 	Expect(err).To(BeNil())
 
 	recordsCount, err := dbClient.RequestCache.RecordsCount()
