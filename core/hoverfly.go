@@ -70,11 +70,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		RequestCache:   requestCache,
 		MetadataCache:  metadataCache,
 		Authentication: authentication,
-		HTTP: &http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		}, Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.TLSVerification},
-		}},
+		HTTP: 		GetDefaultHoverflyHTTPClient(cfg.TLSVerification),
 		Cfg:            cfg,
 		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		Hooks:          make(ActionTypeHooks),
@@ -82,6 +78,14 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		RequestMatcher: requestMatcher,
 	}
 	return h
+}
+
+func GetDefaultHoverflyHTTPClient(tlsVerification bool) *http.Client {
+	return &http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error {
+		return http.ErrUseLastResponse
+	}, Transport: &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: tlsVerification},
+	}}
 }
 
 // StartProxy - starts proxy with current configuration, this method is non blocking.
