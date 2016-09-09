@@ -14,6 +14,8 @@ import (
 )
 
 func TestIsURLHTTP(t *testing.T) {
+	RegisterTestingT(t)
+
 	url := "http://somehost.com"
 
 	b := isURL(url)
@@ -21,11 +23,15 @@ func TestIsURLHTTP(t *testing.T) {
 }
 
 func TestIsURLEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
 	b := isURL("")
 	Expect(b).To(BeFalse())
 }
 
 func TestIsURLHTTPS(t *testing.T) {
+	RegisterTestingT(t)
+
 	url := "https://somehost.com"
 
 	b := isURL(url)
@@ -33,6 +39,8 @@ func TestIsURLHTTPS(t *testing.T) {
 }
 
 func TestIsURLWrong(t *testing.T) {
+	RegisterTestingT(t)
+
 	url := "somehost.com"
 
 	b := isURL(url)
@@ -40,6 +48,8 @@ func TestIsURLWrong(t *testing.T) {
 }
 
 func TestIsURLWrongTLD(t *testing.T) {
+	RegisterTestingT(t)
+
 	url := "http://somehost."
 
 	b := isURL(url)
@@ -47,6 +57,8 @@ func TestIsURLWrongTLD(t *testing.T) {
 }
 
 func TestFileExists(t *testing.T) {
+	RegisterTestingT(t)
+
 	fp := "examples/exports/readthedocs.json"
 
 	ex, err := exists(fp)
@@ -55,6 +67,8 @@ func TestFileExists(t *testing.T) {
 }
 
 func TestFileDoesNotExist(t *testing.T) {
+	RegisterTestingT(t)
+
 	fp := "shouldnotbehere.yaml"
 
 	ex, err := exists(fp)
@@ -63,6 +77,8 @@ func TestFileDoesNotExist(t *testing.T) {
 }
 
 func TestImportFromDisk(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
@@ -77,6 +93,8 @@ func TestImportFromDisk(t *testing.T) {
 }
 
 func TestImportFromDiskBlankPath(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
@@ -86,6 +104,8 @@ func TestImportFromDiskBlankPath(t *testing.T) {
 }
 
 func TestImportFromDiskWrongJson(t *testing.T) {
+	RegisterTestingT(t)
+
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
@@ -95,6 +115,8 @@ func TestImportFromDiskWrongJson(t *testing.T) {
 }
 
 func TestImportFromURL(t *testing.T) {
+	RegisterTestingT(t)
+
 	// reading file and preparing json payload
 	pairFile, err := os.Open("examples/exports/readthedocs.json")
 	Expect(err).To(BeNil())
@@ -107,7 +129,7 @@ func TestImportFromURL(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 
 	// importing payloads
-	err = dbClient.Import("http://thiswillbeintercepted.json")
+	err = dbClient.Import(server.URL)
 	Expect(err).To(BeNil())
 
 	recordsCount, err := dbClient.RequestCache.RecordsCount()
@@ -116,6 +138,8 @@ func TestImportFromURL(t *testing.T) {
 }
 
 func TestImportFromURLHTTPFail(t *testing.T) {
+	RegisterTestingT(t)
+
 	// this tests simulates unreachable server
 	server, dbClient := testTools(200, `this shouldn't matter anyway`)
 	// closing it immediately
@@ -127,6 +151,8 @@ func TestImportFromURLHTTPFail(t *testing.T) {
 }
 
 func TestImportFromURLMalformedJSON(t *testing.T) {
+	RegisterTestingT(t)
+
 	// testing behaviour when there is no json on the other end
 	server, dbClient := testTools(200, `i am not json :(`)
 	defer server.Close()
@@ -139,6 +165,8 @@ func TestImportFromURLMalformedJSON(t *testing.T) {
 }
 
 func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
+	RegisterTestingT(t)
+
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
@@ -185,6 +213,8 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 }
 
 func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) {
+	RegisterTestingT(t)
+
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
@@ -236,6 +266,8 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 }
 
 func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(t *testing.T) {
+	RegisterTestingT(t)
+
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
@@ -274,6 +306,8 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 }
 
 func TestImportImportRequestResponsePairs_CanImportARequestResponsePair_AndRequestTemplateResponsePair(t *testing.T) {
+	RegisterTestingT(t)
+
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
@@ -341,6 +375,8 @@ func base64String(s string) string {
 }
 
 func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *testing.T) {
+	RegisterTestingT(t)
+
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
