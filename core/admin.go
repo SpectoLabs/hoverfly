@@ -74,7 +74,7 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		d.Cfg.AuthEnabled)
 
 	healthHandler := handlers.HealthHandler{}
-	middlewareHandler := handlers.MiddlewareHandler{Hoverfly: *d}
+	middlewareHandler := handlers.MiddlewareHandler{Hoverfly: d}
 	recordsHandler := handlers.RecordsHandler{Hoverfly: d}
 
 	mux.Post("/api/token-auth", http.HandlerFunc(ac.Login))
