@@ -5,16 +5,13 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"os"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
-	"github.com/SpectoLabs/hoverfly/core/matching"
-	"github.com/SpectoLabs/hoverfly/core/metrics"
-	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/boltdb/bolt"
+	"net/url"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -42,11 +39,7 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 		fmt.Fprintln(w, body)
 	}))
 
-	tr := &http.Transport{
-		Proxy: func(req *http.Request) (*url.URL, error) {
-			return url.Parse(server.URL)
-		},
-	}
+
 	// creating random buckets for everyone!
 	bucket := GetRandomName(10)
 	metaBucket := GetRandomName(10)
@@ -58,22 +51,15 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 	// disabling auth for testing
 	cfg.AuthEnabled = false
 
-	requestMatcher := matching.RequestMatcher{
-		RequestCache:  requestCache,
-		TemplateStore: matching.RequestTemplateStore{},
-		Webserver:     &cfg.Webserver,
-	}
+	dbClient := GetNewHoverfly(cfg, requestCache, metaCache, nil)
 
-	// preparing client
-	dbClient := &Hoverfly{
-		HTTP:           &http.Client{Transport: tr},
-		RequestCache:   requestCache,
-		Cfg:            cfg,
-		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
-		MetadataCache:  metaCache,
-		ResponseDelays: &models.ResponseDelayList{},
-		RequestMatcher: requestMatcher,
+	tr := &http.Transport{
+		Proxy: func(req *http.Request) (*url.URL, error) {
+			return url.Parse(server.URL)
+		},
 	}
+	dbClient.HTTP = &http.Client{Transport: tr}
+
 	return server, dbClient
 }
 

@@ -16,6 +16,7 @@ import (
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/core/views"
 	"net/http"
+	"io/ioutil"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -93,9 +94,14 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 
 	var requests views.RequestResponsePairPayload
 
-	jsonParser := json.NewDecoder(pairsFile)
-	if err = jsonParser.Decode(&requests); err != nil {
-		return fmt.Errorf("Got error while parsing payloads file, error %s", err.Error())
+	body, err := ioutil.ReadAll(pairsFile)
+	if err != nil {
+		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
+	}
+
+	err = json.Unmarshal(body, &requests)
+	if err != nil {
+		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
 	return hf.ImportRequestResponsePairViews(requests.Data)
@@ -105,16 +111,21 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 // recordedRequests structure (which is default format in which Hoverfly exports captured requests) and
 // imports those requests into the database
 func (hf *Hoverfly) ImportFromURL(url string) error {
+	resp, err := http.DefaultClient.Get(url)
 
-	resp, err := hf.HTTP.Get(url)
 	if err != nil {
 		return fmt.Errorf("Failed to fetch given URL, error %s", err.Error())
 	}
 
 	var requests views.RequestResponsePairPayload
 
-	jsonParser := json.NewDecoder(resp.Body)
-	if err = jsonParser.Decode(&requests); err != nil {
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
+	}
+
+	err = json.Unmarshal(body, &requests)
+	if err != nil {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
