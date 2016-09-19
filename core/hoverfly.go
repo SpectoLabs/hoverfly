@@ -166,6 +166,14 @@ func (this Hoverfly) GetTemplateCache() matching.RequestTemplateStore {
 	return this.RequestMatcher.TemplateStore
 }
 
+func (this *Hoverfly) DeleteTemplateCache() {
+	this.RequestMatcher.TemplateStore.Wipe()
+}
+
+func (this *Hoverfly) ImportTemplates(pairPayload matching.RequestTemplateResponsePairPayload) error {
+	return this.RequestMatcher.TemplateStore.ImportPayloads(pairPayload)
+}
+
 func (hf Hoverfly) GetMiddleware() string {
 	return hf.Cfg.Middleware
 }
