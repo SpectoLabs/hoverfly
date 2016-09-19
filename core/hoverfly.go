@@ -213,6 +213,23 @@ func (hf Hoverfly) SetMiddleware(middleware string) error {
 	return nil
 }
 
+func (this Hoverfly) GetMode() string {
+	return this.Cfg.Mode
+}
+
+func (this *Hoverfly) SetMode(mode string) error {
+	if this.Cfg.Webserver {
+		log.Error("Can't change state when configured as a webserver ")
+		return fmt.Errorf("Can't change state when configured as a webserver")
+	}
+	this.Cfg.SetMode(mode)
+	return nil
+}
+
+func (this Hoverfly) GetDestination() string {
+	return this.Cfg.Destination
+}
+
 func (hf *Hoverfly) UpdateResponseDelays(responseDelays models.ResponseDelayList) {
 	hf.ResponseDelays = &responseDelays
 	log.Info("Response delay config updated on hoverfly")
