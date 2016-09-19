@@ -162,6 +162,10 @@ func (hf Hoverfly) GetRequestCache() cache.Cache {
 	return hf.RequestCache
 }
 
+func (this Hoverfly) GetMetadataCache() cache.Cache {
+	return this.MetadataCache
+}
+
 func (this Hoverfly) GetTemplateCache() matching.RequestTemplateStore {
 	return this.RequestMatcher.TemplateStore
 }

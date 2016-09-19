@@ -76,6 +76,7 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 	middlewareHandler := handlers.MiddlewareHandler{Hoverfly: d}
 	recordsHandler := handlers.RecordsHandler{Hoverfly: d}
 	templatesHandler := handlers.TemplatesHandler{Hoverfly: d}
+	metadataHandler := handlers.MetadataHandler{Hoverfly: d}
 
 	mux.Post("/api/token-auth", http.HandlerFunc(ac.Login))
 
@@ -125,17 +126,17 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 
 	mux.Get("/api/metadata", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(d.AllMetadataHandler),
+		negroni.HandlerFunc(metadataHandler.Get),
 	))
 
 	mux.Put("/api/metadata", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(d.SetMetadataHandler),
+		negroni.HandlerFunc(metadataHandler.Put),
 	))
 
 	mux.Delete("/api/metadata", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(d.DeleteMetadataHandler),
+		negroni.HandlerFunc(metadataHandler.Delete),
 	))
 
 	mux.Get("/api/count", negroni.New(
@@ -586,145 +587,6 @@ func (d *Hoverfly) StateHandler(w http.ResponseWriter, r *http.Request, next htt
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(b)
 
-}
-
-// AllMetadataHandler returns JSON content type http response
-func (d *Hoverfly) AllMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	entries, err := d.MetadataCache.GetAllEntries()
-
-	metaData := make(map[string]string)
-
-	for k, v := range entries {
-		metaData[k] = string(v)
-	}
-
-	if err == nil {
-
-		w.Header().Set("Content-Type", "application/json")
-
-		var response handlers.StoredMetadata
-		response.Data = metaData
-		b, err := json.Marshal(response)
-
-		if err != nil {
-			log.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		} else {
-			w.Write(b)
-			return
-		}
-	} else {
-		log.WithFields(log.Fields{
-			"Error": err.Error(),
-		}).Error("Failed to get metadata!")
-
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(500)
-		return
-	}
-}
-
-// SetMetadataHandler - sets new metadata
-func (d *Hoverfly) SetMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var sm handlers.SetMetadata
-	var mr handlers.MessageResponse
-
-	if req.Body == nil {
-		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-
-	defer req.Body.Close()
-	body, err := ioutil.ReadAll(req.Body)
-
-	if err != nil {
-		// failed to read response body
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Could not read response body!")
-		mr.Message = fmt.Sprintf("Failed to read request body. Error: %s", err.Error())
-		w.WriteHeader(400)
-
-		b, err := mr.Encode()
-		if err != nil {
-			// failed to read response body
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-			}).Error("Could not encode response body!")
-			http.Error(w, "Failed to encode response", 500)
-			return
-		}
-		w.Write(b)
-		return
-	}
-
-	err = json.Unmarshal(body, &sm)
-
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Failed to unmarshal request body!")
-		mr.Message = fmt.Sprintf("Failed to decode request body. Error: %s", err.Error())
-		w.WriteHeader(400)
-
-	} else if sm.Key == "" {
-		mr.Message = "Key not provided."
-		w.WriteHeader(400)
-
-	} else {
-		err = d.MetadataCache.Set([]byte(sm.Key), []byte(sm.Value))
-		if err != nil {
-			mr.Message = fmt.Sprintf("Failed to set metadata. Error: %s", err.Error())
-			w.WriteHeader(500)
-		} else {
-			mr.Message = "Metadata set."
-			w.WriteHeader(201)
-		}
-	}
-	b, err := mr.Encode()
-	if err != nil {
-		// failed to read response body
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Could not encode response body!")
-		http.Error(w, "Failed to encode response", 500)
-		return
-	}
-	w.Write(b)
-}
-
-// DeleteMetadataHandler - deletes all metadata
-func (d *Hoverfly) DeleteMetadataHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	err := d.MetadataCache.DeleteData()
-
-	w.Header().Set("Content-Type", "application/json")
-
-	var response handlers.MessageResponse
-	if err != nil {
-		if err.Error() == "bucket not found" {
-			response.Message = fmt.Sprintf("No metadata found.")
-			w.WriteHeader(200)
-		} else {
-			response.Message = fmt.Sprintf("Something went wrong: %s", err.Error())
-			w.WriteHeader(500)
-		}
-	} else {
-		response.Message = "Metadata deleted successfuly"
-		w.WriteHeader(200)
-	}
-
-	b, err := response.Encode()
-	if err != nil {
-		// failed to read response body
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Could not encode response body!")
-		http.Error(w, "Failed to encode response", 500)
-		return
-	}
-	w.Write(b)
-	return
 }
 
 func (d *Hoverfly) GetResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
