@@ -439,52 +439,6 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 
 }
 
-// DeleteAllRecordsHandler - deletes all captured requests
-func (d *Hoverfly) DeleteAllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	err := d.RequestCache.DeleteData()
-
-	var en Entry
-	en.ActionType = ActionTypeWipeDB
-	en.Message = "wipe"
-	en.Time = time.Now()
-
-	if err := d.Hooks.Fire(ActionTypeWipeDB, &en); err != nil {
-		log.WithFields(log.Fields{
-			"error":      err.Error(),
-			"message":    en.Message,
-			"actionType": ActionTypeWipeDB,
-		}).Error("failed to fire hook")
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	var response handlers.MessageResponse
-	if err != nil {
-		if err.Error() == "bucket not found" {
-			response.Message = fmt.Sprintf("No records found")
-			w.WriteHeader(200)
-		} else {
-			response.Message = fmt.Sprintf("Something went wrong: %s", err.Error())
-			w.WriteHeader(500)
-		}
-	} else {
-		response.Message = "Proxy cache deleted successfuly"
-		w.WriteHeader(200)
-	}
-
-	b, err := response.Encode()
-	if err != nil {
-		// failed to read response body
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Could not encode response body!")
-		http.Error(w, "Failed to encode response", 500)
-		return
-	}
-	w.Write(b)
-	return
-}
-
 // CurrentStateHandler returns current state
 func (d *Hoverfly) CurrentStateHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	var resp handlers.StateRequest
