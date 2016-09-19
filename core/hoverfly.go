@@ -158,6 +158,14 @@ func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
 	return
 }
 
+func (hf Hoverfly) GetRequestCache() cache.Cache {
+	return hf.RequestCache
+}
+
+func (this Hoverfly) GetTemplateCache() matching.RequestTemplateStore {
+	return this.RequestMatcher.TemplateStore
+}
+
 func (hf Hoverfly) GetMiddleware() string {
 	return hf.Cfg.Middleware
 }

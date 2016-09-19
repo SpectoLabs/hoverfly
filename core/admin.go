@@ -73,7 +73,12 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		d.Cfg.JWTExpirationDelta,
 		d.Cfg.AuthEnabled)
 
+	healthHandler := handlers.HealthHandler{}
+	middlewareHandler := handlers.MiddlewareHandler{Hoverfly: *d}
+	recordsHandler := handlers.RecordsHandler{Hoverfly: d}
+
 	mux.Post("/api/token-auth", http.HandlerFunc(ac.Login))
+
 	mux.Get("/api/refresh-token-auth", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(ac.RefreshToken),
@@ -90,17 +95,17 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 
 	mux.Get("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(d.AllRecordsHandler),
+		negroni.HandlerFunc(recordsHandler.Get),
 	))
 
 	mux.Delete("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(d.DeleteAllRecordsHandler),
+		negroni.HandlerFunc(recordsHandler.Delete),
 	))
 
 	mux.Post("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(d.ImportRecordsHandler),
+		negroni.HandlerFunc(recordsHandler.Post),
 	))
 
 	mux.Get("/api/templates", negroni.New(
@@ -153,7 +158,6 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		negroni.HandlerFunc(d.StateHandler),
 	))
 
-	middlewareHandler := handlers.MiddlewareHandler{Hoverfly: *d}
 	mux.Get("/api/middleware", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(middlewareHandler.Get),
@@ -169,7 +173,6 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		negroni.HandlerFunc(d.ManualAddHandler),
 	))
 
-	healthHandler := handlers.HealthHandler{}
 	mux.Get("/api/health", negroni.New(
 		negroni.HandlerFunc(healthHandler.Get),
 	))
@@ -224,53 +227,6 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		})
 	}
 	return mux
-}
-
-// AllRecordsHandler returns JSON content type http response
-func (d *Hoverfly) AllRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	records, err := d.RequestCache.GetAllValues()
-
-	if err != nil {
-		log.WithFields(log.Fields{
-			"Error": err.Error(),
-		}).Error("Failed to get data from cache!")
-
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(500) // can't process this entity
-		return
-	}
-
-	var pairViews []views.RequestResponsePairView
-
-	for _, v := range records {
-		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
-			pairView := pair.ConvertToRequestResponsePairView()
-			pairViews = append(pairViews, *pairView)
-		} else {
-			log.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
-
-	for _, v := range d.RequestMatcher.TemplateStore {
-		pairView := v.ConvertToRequestResponsePairView()
-		pairViews = append(pairViews, pairView)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	var response views.RequestResponsePairPayload
-	response.Data = pairViews
-	b, err := json.Marshal(response)
-
-	if err != nil {
-		log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	w.Write(b)
-	return
 }
 
 // RecordsCount returns number of captured requests as a JSON payload
@@ -394,56 +350,6 @@ func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-}
-
-// ImportRecordsHandler - accepts JSON payload and saves it to cache
-func (d *Hoverfly) ImportRecordsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-
-	var requests views.RequestResponsePairPayload
-
-	defer req.Body.Close()
-	body, err := ioutil.ReadAll(req.Body)
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	var response handlers.MessageResponse
-
-	if err != nil {
-		// failed to read response body
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Could not read request body!")
-		http.Error(w, "Failed to read request body.", 400)
-		return
-	}
-
-	err = json.Unmarshal(body, &requests)
-
-	if err != nil {
-		w.WriteHeader(422) // can't process this entity
-		return
-	}
-
-	err = d.ImportRequestResponsePairViews(requests.Data)
-
-	if err != nil {
-		response.Message = err.Error()
-		w.WriteHeader(400)
-	} else {
-		response.Message = fmt.Sprintf("%d payloads import complete.", len(requests.Data))
-	}
-
-	b, err := response.Encode()
-	if err != nil {
-		// failed to read response body
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Could not encode response body!")
-		http.Error(w, "Failed to encode response", 500)
-		return
-	}
-
-	w.Write(b)
-
 }
 
 // ManualAddHandler - manually add new request/responses, using a form
