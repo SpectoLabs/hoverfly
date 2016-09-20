@@ -34,7 +34,6 @@ type MiddlewareSchema struct {
 	Middleware string `json:"middleware"`
 }
 
-
 type MessageResponse struct {
 	Message string `json:"message"`
 }

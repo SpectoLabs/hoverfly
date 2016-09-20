@@ -1,13 +1,16 @@
 package hoverfly
 
 import (
-	"net/http"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"io/ioutil"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
+	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/codegangsta/negroni"
+	"github.com/go-zoo/bone"
+	"io/ioutil"
+	"net/http"
 )
 
 type HoverflyDelays interface {
@@ -16,9 +19,25 @@ type HoverflyDelays interface {
 	DeleteResponseDelays()
 }
 
-
 type DelaysHandler struct {
 	Hoverfly HoverflyDelays
+}
+
+func (this *DelaysHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+	mux.Get("/api/delays", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Get),
+	))
+
+	mux.Put("/api/delays", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Put),
+	))
+
+	mux.Delete("/api/delays", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Delete),
+	))
 }
 
 func (this *DelaysHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {

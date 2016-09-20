@@ -2,10 +2,19 @@ package hoverfly
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
+	"github.com/codegangsta/negroni"
+	"github.com/go-zoo/bone"
 	"net/http"
 )
 
 type HealthHandler struct{}
+
+func (this *HealthHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+	mux.Get("/api/health", negroni.New(
+		negroni.HandlerFunc(this.Get),
+	))
+}
 
 func (this *HealthHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	w.Header().Set("Content-Type", "application/json")

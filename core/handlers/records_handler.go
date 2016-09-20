@@ -1,15 +1,18 @@
 package hoverfly
 
 import (
-	"net/http"
 	"encoding/json"
+	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/views"
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/views"
+	"github.com/codegangsta/negroni"
+	"github.com/go-zoo/bone"
 	"io/ioutil"
-	"fmt"
+	"net/http"
 )
 
 type HoverflyRecords interface {
@@ -18,9 +21,25 @@ type HoverflyRecords interface {
 	ImportRequestResponsePairViews(pairViews []views.RequestResponsePairView) error
 }
 
-
 type RecordsHandler struct {
 	Hoverfly HoverflyRecords
+}
+
+func (this *RecordsHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+	mux.Get("/api/records", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Get),
+	))
+
+	mux.Delete("/api/records", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Delete),
+	))
+
+	mux.Post("/api/records", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Post),
+	))
 }
 
 // AllRecordsHandler returns JSON content type http response

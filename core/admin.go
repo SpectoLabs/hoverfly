@@ -49,7 +49,6 @@ func (this *AdminApi) StartAdminInterface(hoverfly *Hoverfly) {
 // getBoneRouter returns mux for admin interface
 func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 	mux := bone.New()
-
 	// getting auth controllers and middleware
 	ac := controllers.GetNewAuthenticationController(
 		d.Authentication,
@@ -63,16 +62,10 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		d.Cfg.JWTExpirationDelta,
 		d.Cfg.AuthEnabled)
 
-	healthHandler := handlers.HealthHandler{}
-	middlewareHandler := handlers.MiddlewareHandler{Hoverfly: d}
-	recordsHandler := handlers.RecordsHandler{Hoverfly: d}
-	templatesHandler := handlers.TemplatesHandler{Hoverfly: d}
-	metadataHandler := handlers.MetadataHandler{Hoverfly: d}
-	stateHandler := handlers.StateHandler{Hoverfly: d}
-	delaysHandler := handlers.DelaysHandler{Hoverfly: d}
-	addHandler := handlers.AddHandler{Hoverfly: d}
-	countHandler := handlers.CountHandler{Hoverfly: d}
-	statsHandler := handlers.StatsHandler{Hoverfly: d}
+	handlers := GetAllHandlers(d)
+	for _, handler := range handlers {
+		handler.RegisterRoutes(mux, am)
+	}
 
 	mux.Post("/api/token-auth", http.HandlerFunc(ac.Login))
 
@@ -88,105 +81,6 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 	mux.Get("/api/users", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(ac.GetAllUsersHandler),
-	))
-
-	mux.Get("/api/records", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(recordsHandler.Get),
-	))
-
-	mux.Delete("/api/records", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(recordsHandler.Delete),
-	))
-
-	mux.Post("/api/records", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(recordsHandler.Post),
-	))
-
-	mux.Get("/api/templates", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(templatesHandler.Get),
-	))
-
-	mux.Delete("/api/templates", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(templatesHandler.Delete),
-	))
-
-	mux.Post("/api/templates", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(templatesHandler.Post),
-	))
-
-	mux.Get("/api/metadata", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(metadataHandler.Get),
-	))
-
-	mux.Put("/api/metadata", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(metadataHandler.Put),
-	))
-
-	mux.Delete("/api/metadata", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(metadataHandler.Delete),
-	))
-
-	mux.Get("/api/count", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(countHandler.Get),
-	))
-	mux.Get("/api/stats", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(statsHandler.Get),
-	))
-	// TODO: check auth for websocket connection
-	mux.Get("/api/statsws", http.HandlerFunc(statsHandler.GetWS))
-
-	mux.Get("/api/state", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(stateHandler.Get),
-	))
-	mux.Post("/api/state", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(stateHandler.Post),
-	))
-
-	mux.Get("/api/middleware", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(middlewareHandler.Get),
-	))
-
-	mux.Post("/api/middleware", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(middlewareHandler.Post),
-	))
-
-	mux.Post("/api/add", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(addHandler.Post),
-	))
-
-	mux.Get("/api/health", negroni.New(
-		negroni.HandlerFunc(healthHandler.Get),
-	))
-
-	mux.Get("/api/delays", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(delaysHandler.Get),
-	))
-
-	mux.Put("/api/delays", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(delaysHandler.Put),
-	))
-
-	mux.Delete("/api/delays", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(delaysHandler.Delete),
 	))
 
 	if d.Cfg.Development {
@@ -224,4 +118,21 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		})
 	}
 	return mux
+}
+
+func GetAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
+	var list []handlers.AdminHandler
+
+	list = append(list, &handlers.AddHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.CountHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.DelaysHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.HealthHandler{})
+	list = append(list, &handlers.MetadataHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.MiddlewareHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.RecordsHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.StateHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.StatsHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.TemplatesHandler{Hoverfly: hoverfly})
+
+	return list
 }
