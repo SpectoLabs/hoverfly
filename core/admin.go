@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"reflect"
-	"strconv"
 	"time"
 
 	// static assets
@@ -23,8 +22,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/authentication/controllers"
 	handlers "github.com/SpectoLabs/hoverfly/core/handlers"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 type AdminApi struct{}
@@ -77,6 +74,7 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 	metadataHandler := handlers.MetadataHandler{Hoverfly: d}
 	stateHandler := handlers.StateHandler{Hoverfly: d}
 	delaysHandler := handlers.DelaysHandler{Hoverfly: d}
+	addHandler := handlers.AddHandler{Hoverfly: d}
 
 	mux.Post("/api/token-auth", http.HandlerFunc(ac.Login))
 
@@ -171,7 +169,7 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 
 	mux.Post("/api/add", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(d.ManualAddHandler),
+		negroni.HandlerFunc(addHandler.Post),
 	))
 
 	mux.Get("/api/health", negroni.New(
@@ -351,90 +349,4 @@ func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-}
-
-// ManualAddHandler - manually add new request/responses, using a form
-func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	err := req.ParseForm()
-
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Got error while parsing form")
-	}
-
-	// request details
-	destination := req.PostFormValue("inputDestination")
-	method := req.PostFormValue("inputMethod")
-	path := req.PostFormValue("inputPath")
-	query := req.PostFormValue("inputQuery")
-	reqBody := req.PostFormValue("inputRequestBody")
-
-	preq := models.RequestDetails{
-		Destination: destination,
-		Method:      method,
-		Path:        path,
-		Query:       query,
-		Body:        reqBody}
-
-	// response
-	respStatusCode := req.PostFormValue("inputResponseStatusCode")
-	respBody := req.PostFormValue("inputResponseBody")
-	contentType := req.PostFormValue("inputContentType")
-
-	headers := make(map[string][]string)
-
-	// getting content type
-	if contentType == "xml" {
-		headers["Content-Type"] = []string{"application/xml"}
-	} else if contentType == "json" {
-		headers["Content-Type"] = []string{"application/json"}
-	} else {
-		headers["Content-Type"] = []string{"text/html"}
-	}
-
-	sc, _ := strconv.Atoi(respStatusCode)
-
-	presp := models.ResponseDetails{
-		Status:  sc,
-		Headers: headers,
-		Body:    respBody,
-	}
-
-	log.WithFields(log.Fields{
-		"respBody":    respBody,
-		"contentType": contentType,
-	}).Info("manually adding request/response")
-
-	p := models.RequestResponsePair{Request: preq, Response: presp}
-
-	var pairViews []views.RequestResponsePairView
-
-	pairViews = append(pairViews, *p.ConvertToRequestResponsePairView())
-
-	err = d.ImportRequestResponsePairViews(pairViews)
-
-	w.Header().Set("Content-Type", "application/json")
-	var response handlers.MessageResponse
-
-	if err != nil {
-		response.Message = fmt.Sprintf("Got error: %s", err.Error())
-		w.WriteHeader(400)
-
-	} else {
-		// redirecting to home
-		response.Message = "Record added successfuly"
-		w.WriteHeader(201)
-	}
-	b, err := response.Encode()
-	if err != nil {
-		// failed to read response body
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Could not encode response body!")
-		http.Error(w, "Failed to encode response", 500)
-		return
-	}
-	w.Write(b)
-
 }
