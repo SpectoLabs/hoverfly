@@ -75,6 +75,7 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 	stateHandler := handlers.StateHandler{Hoverfly: d}
 	delaysHandler := handlers.DelaysHandler{Hoverfly: d}
 	addHandler := handlers.AddHandler{Hoverfly: d}
+	countHandler := handlers.CountHandler{Hoverfly: d}
 
 	mux.Post("/api/token-auth", http.HandlerFunc(ac.Login))
 
@@ -139,7 +140,7 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 
 	mux.Get("/api/count", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(d.RecordsCount),
+		negroni.HandlerFunc(countHandler.Get),
 	))
 	mux.Get("/api/stats", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
@@ -226,36 +227,6 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		})
 	}
 	return mux
-}
-
-// RecordsCount returns number of captured requests as a JSON payload
-func (d *Hoverfly) RecordsCount(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	count, err := d.RequestCache.RecordsCount()
-
-	if err == nil {
-
-		w.Header().Set("Content-Type", "application/json")
-
-		var response handlers.RecordsCount
-		response.Count = count
-		b, err := json.Marshal(response)
-
-		if err != nil {
-			log.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		} else {
-			w.Write(b)
-			return
-		}
-	} else {
-		log.WithFields(log.Fields{
-			"Error": err.Error(),
-		}).Error("Failed to get data from cache!")
-
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(500) // can't process this entity
-		return
-	}
 }
 
 // StatsHandler - returns current stats about Hoverfly (request counts, record count)
