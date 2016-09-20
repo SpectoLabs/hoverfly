@@ -19,7 +19,7 @@ func TestGetAllTemplates(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestMatcher.TemplateStore.Wipe()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/templates", nil)
 	Expect(err).To(BeNil())
@@ -70,7 +70,7 @@ func TestGetAllTemplatesWTemplates(t *testing.T) {
 	dbClient.RequestMatcher.TemplateStore = matching.RequestTemplateStore{templateEntry, templateEntry}
 
 	// performing query
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	req, err := http.NewRequest("GET", "/api/templates", nil)
 	Expect(err).To(BeNil())
@@ -99,7 +99,7 @@ func TestExportImportTemplates(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestMatcher.TemplateStore.Wipe()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// inserting some payloads
 	response := models.ResponseDetails{
@@ -159,7 +159,7 @@ func TestDeleteTemplates(t *testing.T) {
 	server, dbClient := testTools(200, `{'message': 'here'}`)
 	defer server.Close()
 	defer dbClient.RequestMatcher.TemplateStore.Wipe()
-	m := getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(dbClient)
 
 	// inserting some payloads
 	response := models.ResponseDetails{

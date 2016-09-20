@@ -70,7 +70,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		RequestCache:   requestCache,
 		MetadataCache:  metadataCache,
 		Authentication: authentication,
-		HTTP: 		GetDefaultHoverflyHTTPClient(cfg.TLSVerification),
+		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification),
 		Cfg:            cfg,
 		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		Hooks:          make(ActionTypeHooks),
@@ -158,7 +158,31 @@ func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
 	return
 }
 
-func (hf *Hoverfly) SetMiddleware(middleware string) error {
+func (hf Hoverfly) GetRequestCache() cache.Cache {
+	return hf.RequestCache
+}
+
+func (this Hoverfly) GetMetadataCache() cache.Cache {
+	return this.MetadataCache
+}
+
+func (this Hoverfly) GetTemplateCache() matching.RequestTemplateStore {
+	return this.RequestMatcher.TemplateStore
+}
+
+func (this *Hoverfly) DeleteTemplateCache() {
+	this.RequestMatcher.TemplateStore.Wipe()
+}
+
+func (this *Hoverfly) ImportTemplates(pairPayload matching.RequestTemplateResponsePairPayload) error {
+	return this.RequestMatcher.TemplateStore.ImportPayloads(pairPayload)
+}
+
+func (hf Hoverfly) GetMiddleware() string {
+	return hf.Cfg.Middleware
+}
+
+func (hf Hoverfly) SetMiddleware(middleware string) error {
 	if middleware == "" {
 		hf.Cfg.Middleware = middleware
 		return nil
@@ -189,9 +213,38 @@ func (hf *Hoverfly) SetMiddleware(middleware string) error {
 	return nil
 }
 
+func (this Hoverfly) GetMode() string {
+	return this.Cfg.Mode
+}
+
+func (this *Hoverfly) SetMode(mode string) error {
+	if this.Cfg.Webserver {
+		log.Error("Can't change state when configured as a webserver ")
+		return fmt.Errorf("Can't change state when configured as a webserver")
+	}
+	this.Cfg.SetMode(mode)
+	return nil
+}
+
+func (this Hoverfly) GetDestination() string {
+	return this.Cfg.Destination
+}
+
 func (hf *Hoverfly) UpdateResponseDelays(responseDelays models.ResponseDelayList) {
 	hf.ResponseDelays = &responseDelays
 	log.Info("Response delay config updated on hoverfly")
+}
+
+func (hf *Hoverfly) GetResponseDelays() models.ResponseDelays {
+	return hf.ResponseDelays
+}
+
+func (hf *Hoverfly) DeleteResponseDelays() {
+	hf.ResponseDelays = &models.ResponseDelayList{}
+}
+
+func (hf Hoverfly) GetStats() metrics.Stats {
+	return hf.Counter.Flush()
 }
 
 func hoverflyError(req *http.Request, err error, msg string, statusCode int) *http.Response {

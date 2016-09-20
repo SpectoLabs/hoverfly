@@ -130,9 +130,9 @@ func headerMatch(templateHeaders, requestHeaders map[string][]string) bool {
 	return true
 }
 
-func (this *RequestTemplateStore) GetPayload() RequestTemplateResponsePairPayload {
+func (this RequestTemplateStore) GetPayload() RequestTemplateResponsePairPayload {
 	var pairsPayload []RequestTemplateResponsePairView
-	for _, pair := range *this {
+	for _, pair := range this {
 		pairsPayload = append(pairsPayload, pair.ConvertToRequestTemplateResponsePairView())
 	}
 	return RequestTemplateResponsePairPayload{

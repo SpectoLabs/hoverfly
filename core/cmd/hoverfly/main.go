@@ -348,7 +348,8 @@ func main() {
 	}
 
 	// starting admin interface, this is blocking
-	hoverfly.StartAdminInterface()
+	adminApi := hv.AdminApi{}
+	adminApi.StartAdminInterface(hoverfly)
 }
 
 func createSuperUser(h *hv.Hoverfly) {
