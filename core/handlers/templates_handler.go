@@ -1,12 +1,15 @@
 package hoverfly
 
 import (
-	"net/http"
 	"encoding/json"
-	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/matching"
-	"io/ioutil"
 	"fmt"
+	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
+	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/codegangsta/negroni"
+	"github.com/go-zoo/bone"
+	"io/ioutil"
+	"net/http"
 )
 
 type HoverflyTemplates interface {
@@ -15,9 +18,25 @@ type HoverflyTemplates interface {
 	DeleteTemplateCache()
 }
 
-
 type TemplatesHandler struct {
 	Hoverfly HoverflyTemplates
+}
+
+func (this *TemplatesHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+	mux.Get("/api/templates", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Get),
+	))
+
+	mux.Delete("/api/templates", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Delete),
+	))
+
+	mux.Post("/api/templates", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Post),
+	))
 }
 
 // AllRecordsHandler returns JSON content type http response

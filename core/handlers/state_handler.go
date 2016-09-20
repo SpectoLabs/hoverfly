@@ -1,12 +1,15 @@
 package hoverfly
 
 import (
-	"net/http"
-	"encoding/json"
-	"io/ioutil"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
+	"github.com/codegangsta/negroni"
+	"github.com/go-zoo/bone"
+	"io/ioutil"
+	"net/http"
 )
 
 type HoverflyState interface {
@@ -16,9 +19,19 @@ type HoverflyState interface {
 	UpdateDestination(string) error
 }
 
-
 type StateHandler struct {
 	Hoverfly HoverflyState
+}
+
+func (this *StateHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+	mux.Get("/api/state", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Get),
+	))
+	mux.Post("/api/state", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Post),
+	))
 }
 
 // CurrentStateHandler returns current state

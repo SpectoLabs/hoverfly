@@ -3,8 +3,11 @@ package hoverfly
 import (
 	"encoding/json"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
+	"github.com/codegangsta/negroni"
+	"github.com/go-zoo/bone"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"reflect"
@@ -18,6 +21,15 @@ type HoverflyStats interface {
 
 type StatsHandler struct {
 	Hoverfly HoverflyStats
+}
+
+func (this *StatsHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+	mux.Get("/api/stats", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Get),
+	))
+	// TODO: check auth for websocket connection
+	mux.Get("/api/statsws", http.HandlerFunc(this.GetWS))
 }
 
 // StatsHandler - returns current stats about Hoverfly (request counts, record count)

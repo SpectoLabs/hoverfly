@@ -1,22 +1,41 @@
 package hoverfly
 
 import (
-	"net/http"
-	"encoding/json"
-	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/cache"
-	"io/ioutil"
 	"bytes"
+	"encoding/json"
 	"fmt"
+	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
+	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/codegangsta/negroni"
+	"github.com/go-zoo/bone"
+	"io/ioutil"
+	"net/http"
 )
 
 type HoverflyMetadata interface {
 	GetMetadataCache() cache.Cache
 }
 
-
 type MetadataHandler struct {
 	Hoverfly HoverflyMetadata
+}
+
+func (this *MetadataHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+	mux.Get("/api/metadata", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Get),
+	))
+
+	mux.Put("/api/metadata", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Put),
+	))
+
+	mux.Delete("/api/metadata", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Delete),
+	))
 }
 
 // AllMetadataHandler returns JSON content type http response

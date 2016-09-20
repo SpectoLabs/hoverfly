@@ -1,10 +1,13 @@
 package hoverfly
 
 import (
-	"net/http"
 	"encoding/json"
-	"io/ioutil"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
+	"github.com/codegangsta/negroni"
+	"github.com/go-zoo/bone"
+	"io/ioutil"
+	"net/http"
 )
 
 type HoverflyMiddleware interface {
@@ -14,6 +17,18 @@ type HoverflyMiddleware interface {
 
 type MiddlewareHandler struct {
 	Hoverfly HoverflyMiddleware
+}
+
+func (this *MiddlewareHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+	mux.Get("/api/middleware", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Get),
+	))
+
+	mux.Post("/api/middleware", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Post),
+	))
 }
 
 func (this *MiddlewareHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {

@@ -3,14 +3,24 @@ package hoverfly
 import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
+	"github.com/codegangsta/negroni"
+	"github.com/go-zoo/bone"
 	"net/http"
 	"strconv"
 )
 
 type AddHandler struct {
 	Hoverfly HoverflyRecords
+}
+
+func (this *AddHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+	mux.Post("/api/add", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Post),
+	))
 }
 
 // ManualAddHandler - manually add new request/responses, using a form
