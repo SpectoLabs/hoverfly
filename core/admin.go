@@ -62,35 +62,10 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		d.Cfg.JWTExpirationDelta,
 		d.Cfg.AuthEnabled)
 
-	healthHandler := handlers.HealthHandler{}
-	healthHandler.RegisterRoutes(mux, am)
-
-	middlewareHandler := handlers.MiddlewareHandler{Hoverfly: d}
-	middlewareHandler.RegisterRoutes(mux, am)
-
-	recordsHandler := handlers.RecordsHandler{Hoverfly: d}
-	recordsHandler.RegisterRoutes(mux, am)
-
-	templatesHandler := handlers.TemplatesHandler{Hoverfly: d}
-	templatesHandler.RegisterRoutes(mux, am)
-
-	metadataHandler := handlers.MetadataHandler{Hoverfly: d}
-	metadataHandler.RegisterRoutes(mux, am)
-
-	stateHandler := handlers.StateHandler{Hoverfly: d}
-	stateHandler.RegisterRoutes(mux, am)
-
-	delaysHandler := handlers.DelaysHandler{Hoverfly: d}
-	delaysHandler.RegisterRoutes(mux, am)
-
-	addHandler := handlers.AddHandler{Hoverfly: d}
-	addHandler.RegisterRoutes(mux, am)
-
-	countHandler := handlers.CountHandler{Hoverfly: d}
-	countHandler.RegisterRoutes(mux, am)
-
-	statsHandler := handlers.StatsHandler{Hoverfly: d}
-	statsHandler.RegisterRoutes(mux, am)
+	handlers := GetAllHandlers(d)
+	for _, handler := range handlers {
+		handler.RegisterRoutes(mux, am)
+	}
 
 	mux.Post("/api/token-auth", http.HandlerFunc(ac.Login))
 
@@ -143,4 +118,21 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		})
 	}
 	return mux
+}
+
+func GetAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
+	var list []handlers.AdminHandler
+
+	list = append(list, &handlers.AddHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.CountHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.DelaysHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.HealthHandler{})
+	list = append(list, &handlers.MetadataHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.MiddlewareHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.RecordsHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.StateHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.StatsHandler{Hoverfly: hoverfly})
+	list = append(list, &handlers.TemplatesHandler{Hoverfly: hoverfly})
+
+	return list
 }

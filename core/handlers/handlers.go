@@ -6,5 +6,5 @@ import (
 )
 
 type AdminHandler interface {
-	RegisterRoutes(bone.Mux, *authentication.AuthMiddleware)
+	RegisterRoutes(*bone.Mux, *authentication.AuthMiddleware)
 }
