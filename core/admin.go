@@ -1,12 +1,9 @@
 package hoverfly
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"reflect"
-	"time"
 
 	// static assets
 	_ "github.com/SpectoLabs/hoverfly/core/statik"
@@ -15,7 +12,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
-	"github.com/gorilla/websocket"
 	"github.com/meatballhat/negroni-logrus"
 
 	// auth
@@ -148,7 +144,7 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		negroni.HandlerFunc(statsHandler.Get),
 	))
 	// TODO: check auth for websocket connection
-	mux.Get("/api/statsws", http.HandlerFunc(d.StatsWSHandler))
+	mux.Get("/api/statsws", http.HandlerFunc(statsHandler.GetWS))
 
 	mux.Get("/api/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
@@ -228,68 +224,4 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		})
 	}
 	return mux
-}
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
-// StatsWSHandler - returns current stats about Hoverfly (request counts, record count) through the websocket
-func (d *Hoverfly) StatsWSHandler(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err,
-		}).Error("failed to upgrade websocket")
-		return
-	}
-
-	// defining counters for delta check
-	var recordsCount int
-	var statsCounters map[string]int64
-
-	for {
-		messageType, p, err := conn.ReadMessage()
-		if err != nil {
-			return
-		}
-		log.WithFields(log.Fields{
-			"message": string(p),
-		}).Info("Got message...")
-
-		for _ = range time.Tick(1 * time.Second) {
-			count, err := d.RequestCache.RecordsCount()
-			if err != nil {
-				log.WithFields(log.Fields{
-					"message": p,
-					"error":   err.Error(),
-				}).Error("got error while trying to get records count")
-				continue
-			}
-			stats := d.Counter.Flush()
-
-			// checking whether we should send an update
-			if !reflect.DeepEqual(stats.Counters, statsCounters) || count != recordsCount {
-				var sr handlers.StatsResponse
-				sr.Stats = stats
-				sr.RecordsCount = count
-
-				b, err := json.Marshal(sr)
-
-				if err = conn.WriteMessage(messageType, b); err != nil {
-					log.WithFields(log.Fields{
-						"message": p,
-						"error":   err.Error(),
-					}).Debug("Got error when writing message...")
-					continue
-				}
-				recordsCount = count
-				statsCounters = stats.Counters
-			}
-		}
-	}
 }

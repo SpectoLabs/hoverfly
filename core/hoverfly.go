@@ -247,10 +247,6 @@ func (hf Hoverfly) GetStats() metrics.Stats {
 	return hf.Counter.Flush()
 }
 
-func (hf Hoverfly) GetCounter() metrics.CounterByMode {
-	return *hf.Counter
-}
-
 func hoverflyError(req *http.Request, err error, msg string, statusCode int) *http.Response {
 	return goproxy.NewResponse(req,
 		goproxy.ContentTypeText, statusCode,
