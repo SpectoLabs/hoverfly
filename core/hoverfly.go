@@ -235,6 +235,14 @@ func (hf *Hoverfly) UpdateResponseDelays(responseDelays models.ResponseDelayList
 	log.Info("Response delay config updated on hoverfly")
 }
 
+func (hf *Hoverfly) GetResponseDelays() models.ResponseDelays {
+	return hf.ResponseDelays
+}
+
+func (hf *Hoverfly) DeleteResponseDelays() {
+	hf.ResponseDelays = &models.ResponseDelayList{}
+}
+
 func hoverflyError(req *http.Request, err error, msg string, statusCode int) *http.Response {
 	return goproxy.NewResponse(req,
 		goproxy.ContentTypeText, statusCode,

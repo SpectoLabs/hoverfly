@@ -1,11 +1,9 @@
 package hoverfly
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -78,6 +76,7 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 	templatesHandler := handlers.TemplatesHandler{Hoverfly: d}
 	metadataHandler := handlers.MetadataHandler{Hoverfly: d}
 	stateHandler := handlers.StateHandler{Hoverfly: d}
+	delaysHandler := handlers.DelaysHandler{Hoverfly: d}
 
 	mux.Post("/api/token-auth", http.HandlerFunc(ac.Login))
 
@@ -181,17 +180,17 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 
 	mux.Get("/api/delays", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(d.GetResponseDelaysHandler),
+		negroni.HandlerFunc(delaysHandler.Get),
 	))
 
 	mux.Put("/api/delays", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(d.UpdateResponseDelaysHandler),
+		negroni.HandlerFunc(delaysHandler.Put),
 	))
 
 	mux.Delete("/api/delays", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(d.DeleteAllResponseDelaysHandler),
+		negroni.HandlerFunc(delaysHandler.Delete),
 	))
 
 	if d.Cfg.Development {
@@ -437,105 +436,5 @@ func (d *Hoverfly) ManualAddHandler(w http.ResponseWriter, req *http.Request, ne
 		return
 	}
 	w.Write(b)
-
-}
-
-func (d *Hoverfly) GetResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	b := d.ResponseDelays.Json()
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Write(b)
-}
-
-func (d *Hoverfly) DeleteAllResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	d.ResponseDelays = &models.ResponseDelayList{}
-
-	var response handlers.MessageResponse
-	response.Message = "Delays deleted successfuly"
-	w.WriteHeader(200)
-
-	b, err := response.Encode()
-	if err != nil {
-		// failed to read response body
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Could not encode response body!")
-		http.Error(w, "Failed to encode response", 500)
-		return
-	}
-	w.Write(b)
-	return
-}
-
-func (d *Hoverfly) UpdateResponseDelaysHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var rd models.ResponseDelayPayload
-	var mr handlers.MessageResponse
-
-	if req.Body == nil {
-		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-
-	defer req.Body.Close()
-	body, err := ioutil.ReadAll(req.Body)
-
-	if err != nil {
-		// failed to read response body
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Could not read response body!")
-		mr.Message = fmt.Sprintf("Failed to read request body. Error: %s", err.Error())
-		w.WriteHeader(400)
-
-		b, err := mr.Encode()
-		if err != nil {
-			// failed to read response body
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-			}).Error("Could not encode response body!")
-			http.Error(w, "Failed to encode response", 500)
-			return
-		}
-		w.Write(b)
-		return
-	}
-
-	err = json.Unmarshal(body, &rd)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Failed to unmarshal request body!")
-		mr.Message = fmt.Sprintf("Failed to decode request body. Error: %s", err.Error())
-		w.WriteHeader(400)
-	} else if rd.Data == nil {
-		log.Error("No delay data in the request body!")
-		mr.Message = fmt.Sprintf("Failed to get data from the request body.")
-		w.WriteHeader(422)
-	} else {
-		err = models.ValidateResponseDelayJson(rd)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-			}).Error("Error validating response delays config supplied")
-			mr.Message = fmt.Sprintf("Failed to validate response delays config. Error: %s", err.Error())
-			w.WriteHeader(422)
-		} else {
-			d.UpdateResponseDelays(*rd.Data)
-			mr.Message = "Response delays updated."
-			w.WriteHeader(201)
-		}
-	}
-
-	b, err := mr.Encode()
-	if err != nil {
-		// failed to read response body
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Could not encode response body!")
-		http.Error(w, "Failed to encode response", 500)
-		return
-	}
-	w.Write(b)
-	return
 
 }
