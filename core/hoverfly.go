@@ -70,7 +70,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		RequestCache:   requestCache,
 		MetadataCache:  metadataCache,
 		Authentication: authentication,
-		HTTP: 		GetDefaultHoverflyHTTPClient(cfg.TLSVerification),
+		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification),
 		Cfg:            cfg,
 		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		Hooks:          make(ActionTypeHooks),
@@ -241,6 +241,14 @@ func (hf *Hoverfly) GetResponseDelays() models.ResponseDelays {
 
 func (hf *Hoverfly) DeleteResponseDelays() {
 	hf.ResponseDelays = &models.ResponseDelayList{}
+}
+
+func (hf Hoverfly) GetStats() metrics.Stats {
+	return hf.Counter.Flush()
+}
+
+func (hf Hoverfly) GetCounter() metrics.CounterByMode {
+	return *hf.Counter
 }
 
 func hoverflyError(req *http.Request, err error, msg string, statusCode int) *http.Response {

@@ -76,6 +76,7 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 	delaysHandler := handlers.DelaysHandler{Hoverfly: d}
 	addHandler := handlers.AddHandler{Hoverfly: d}
 	countHandler := handlers.CountHandler{Hoverfly: d}
+	statsHandler := handlers.StatsHandler{Hoverfly: d}
 
 	mux.Post("/api/token-auth", http.HandlerFunc(ac.Login))
 
@@ -144,7 +145,7 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 	))
 	mux.Get("/api/stats", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(d.StatsHandler),
+		negroni.HandlerFunc(statsHandler.Get),
 	))
 	// TODO: check auth for websocket connection
 	mux.Get("/api/statsws", http.HandlerFunc(d.StatsWSHandler))
@@ -227,35 +228,6 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		})
 	}
 	return mux
-}
-
-// StatsHandler - returns current stats about Hoverfly (request counts, record count)
-func (d *Hoverfly) StatsHandler(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	stats := d.Counter.Flush()
-
-	count, err := d.RequestCache.RecordsCount()
-
-	if err != nil {
-		log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	var sr handlers.StatsResponse
-	sr.Stats = stats
-	sr.RecordsCount = count
-
-	w.Header().Set("Content-Type", "application/json")
-
-	b, err := json.Marshal(sr)
-
-	if err != nil {
-		log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		w.Write(b)
-		return
-	}
-
 }
 
 var upgrader = websocket.Upgrader{
