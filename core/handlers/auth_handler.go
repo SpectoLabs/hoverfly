@@ -1,31 +1,73 @@
-package controllers
+package handlers
 
 import (
+	"fmt"
+	"net/http"
 	log "github.com/Sirupsen/logrus"
 
+	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
+	jwt "github.com/dgrijalva/jwt-go"
 	"encoding/json"
 	"github.com/SpectoLabs/hoverfly/core/authentication"
-	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
-	"net/http"
+	"github.com/codegangsta/negroni"
+	"github.com/go-zoo/bone"
 )
 
-type AllUsersResponse struct {
-	Users []backends.User `json:"users"`
-}
-
-type AuthController struct {
+type AuthHandler struct {
 	AB                 backends.Authentication
 	SecretKey          []byte
 	JWTExpirationDelta int
 	Enabled            bool
 }
 
-// GetNewAuthenticationController - returns a pointer to initialised AuthController
-func GetNewAuthenticationController(authBackend backends.Authentication, secretKey []byte, exp int, enabled bool) *AuthController {
-	return &AuthController{AB: authBackend, SecretKey: secretKey, JWTExpirationDelta: exp, Enabled: enabled}
+func (this *AuthHandler) RegisterRoutes(mux *bone.Mux) {
+
+	mux.Post("/api/token-auth", http.HandlerFunc(this.Login))
+
+	mux.Get("/api/refresh-token-auth", negroni.New(
+		negroni.HandlerFunc(this.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.RefreshToken),
+	))
+	mux.Get("/api/logout", negroni.New(
+		negroni.HandlerFunc(this.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Logout),
+	))
+
+	mux.Get("/api/users", negroni.New(
+		negroni.HandlerFunc(this.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.GetAllUsersHandler),
+	))
 }
 
-func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
+func (a *AuthHandler) RequireTokenAuthentication(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	// if auth is disabled - do not check token
+	if !a.Enabled {
+		next(w, req)
+		return
+	}
+
+	authBackend := authentication.InitJWTAuthenticationBackend(a.AB, a.SecretKey, a.JWTExpirationDelta)
+
+	token, err := jwt.ParseFromRequest(req, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		} else {
+			return authBackend.SecretKey, nil
+		}
+	})
+
+	if err == nil && token.Valid && !authBackend.IsInBlacklist(req.Header.Get("Authorization")) {
+		next(w, req)
+	} else {
+		w.WriteHeader(http.StatusUnauthorized)
+	}
+}
+
+type AllUsersResponse struct {
+	Users []backends.User `json:"users"`
+}
+
+func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if !a.Enabled {
 		w.WriteHeader(http.StatusOK)
@@ -44,7 +86,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 	w.Write(token)
 }
 
-func (a *AuthController) RefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func (a *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Header().Set("Content-Type", "application/json")
 
 	requestUser := new(backends.User)
@@ -54,7 +96,7 @@ func (a *AuthController) RefreshToken(w http.ResponseWriter, r *http.Request, ne
 	w.Write(authentication.RefreshToken(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta))
 }
 
-func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func (a *AuthHandler) Logout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Header().Set("Content-Type", "application/json")
 	if !a.Enabled {
 		w.WriteHeader(http.StatusOK)
@@ -70,7 +112,7 @@ func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request, next htt
 }
 
 // GetAllUsersHandler - returns a list of all users
-func (a *AuthController) GetAllUsersHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func (a *AuthHandler) GetAllUsersHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	users, err := a.AB.GetAllUsers()
 
 	if err == nil {

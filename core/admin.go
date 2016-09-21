@@ -14,9 +14,6 @@ import (
 	"github.com/go-zoo/bone"
 	"github.com/meatballhat/negroni-logrus"
 
-	// auth
-	"github.com/SpectoLabs/hoverfly/core/authentication"
-	"github.com/SpectoLabs/hoverfly/core/authentication/controllers"
 	handlers "github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
@@ -49,39 +46,20 @@ func (this *AdminApi) StartAdminInterface(hoverfly *Hoverfly) {
 // getBoneRouter returns mux for admin interface
 func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 	mux := bone.New()
-	// getting auth controllers and middleware
-	ac := controllers.GetNewAuthenticationController(
-		d.Authentication,
-		d.Cfg.SecretKey,
-		d.Cfg.JWTExpirationDelta,
-		d.Cfg.AuthEnabled)
 
-	am := authentication.GetNewAuthenticationMiddleware(
+	authHandler := &handlers.AuthHandler{
 		d.Authentication,
 		d.Cfg.SecretKey,
 		d.Cfg.JWTExpirationDelta,
-		d.Cfg.AuthEnabled)
+		d.Cfg.AuthEnabled,
+	}
+
+	authHandler.RegisterRoutes(mux)
 
 	handlers := GetAllHandlers(d)
 	for _, handler := range handlers {
-		handler.RegisterRoutes(mux, am)
+		handler.RegisterRoutes(mux, authHandler)
 	}
-
-	mux.Post("/api/token-auth", http.HandlerFunc(ac.Login))
-
-	mux.Get("/api/refresh-token-auth", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(ac.RefreshToken),
-	))
-	mux.Get("/api/logout", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(ac.Logout),
-	))
-
-	mux.Get("/api/users", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(ac.GetAllUsersHandler),
-	))
 
 	if d.Cfg.Development {
 		// since hoverfly is not started from cmd/hoverfly/hoverfly

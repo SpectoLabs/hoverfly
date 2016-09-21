@@ -1,9 +1,8 @@
-package hoverfly
+package handlers
 
 import (
 	"encoding/json"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"net/http"
@@ -13,7 +12,7 @@ type CountHandler struct {
 	Hoverfly HoverflyRecords
 }
 
-func (this *CountHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+func (this *CountHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
 	mux.Get("/api/count", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

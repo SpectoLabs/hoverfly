@@ -1,10 +1,9 @@
-package hoverfly
+package handlers
 
 import (
 	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
@@ -22,7 +21,7 @@ type TemplatesHandler struct {
 	Hoverfly HoverflyTemplates
 }
 
-func (this *TemplatesHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+func (this *TemplatesHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
 	mux.Get("/api/templates", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),
