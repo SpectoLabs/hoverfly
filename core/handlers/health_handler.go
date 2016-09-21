@@ -1,4 +1,4 @@
-package hoverfly
+package handlers
 
 import (
 	log "github.com/Sirupsen/logrus"

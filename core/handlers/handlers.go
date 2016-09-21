@@ -1,4 +1,4 @@
-package hoverfly
+package handlers
 
 import (
 	"github.com/go-zoo/bone"
