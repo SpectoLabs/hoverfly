@@ -19,7 +19,7 @@ type MiddlewareHandler struct {
 	Hoverfly HoverflyMiddleware
 }
 
-func (this *MiddlewareHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+func (this *MiddlewareHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthHandler) {
 	mux.Get("/api/middleware", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

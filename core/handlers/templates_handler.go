@@ -22,7 +22,7 @@ type TemplatesHandler struct {
 	Hoverfly HoverflyTemplates
 }
 
-func (this *TemplatesHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+func (this *TemplatesHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthHandler) {
 	mux.Get("/api/templates", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

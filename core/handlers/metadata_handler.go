@@ -21,7 +21,7 @@ type MetadataHandler struct {
 	Hoverfly HoverflyMetadata
 }
 
-func (this *MetadataHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+func (this *MetadataHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthHandler) {
 	mux.Get("/api/metadata", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

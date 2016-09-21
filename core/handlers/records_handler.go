@@ -25,7 +25,7 @@ type RecordsHandler struct {
 	Hoverfly HoverflyRecords
 }
 
-func (this *RecordsHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+func (this *RecordsHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthHandler) {
 	mux.Get("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

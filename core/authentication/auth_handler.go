@@ -8,18 +8,14 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-type AuthMiddleware struct {
+type AuthHandler struct {
 	AB                 backends.Authentication
 	SecretKey          []byte
 	JWTExpirationDelta int
 	Enabled            bool
 }
 
-func GetNewAuthenticationMiddleware(authBackend backends.Authentication, secretKey []byte, exp int, enabled bool) *AuthMiddleware {
-	return &AuthMiddleware{AB: authBackend, SecretKey: secretKey, JWTExpirationDelta: exp, Enabled: enabled}
-}
-
-func (a *AuthMiddleware) RequireTokenAuthentication(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (a *AuthHandler) RequireTokenAuthentication(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	// if auth is disabled - do not check token
 	if !a.Enabled {
 		next(w, req)

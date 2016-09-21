@@ -23,7 +23,7 @@ type DelaysHandler struct {
 	Hoverfly HoverflyDelays
 }
 
-func (this *DelaysHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+func (this *DelaysHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthHandler) {
 	mux.Get("/api/delays", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

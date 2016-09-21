@@ -10,7 +10,7 @@ import (
 
 type HealthHandler struct{}
 
-func (this *HealthHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+func (this *HealthHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthHandler) {
 	mux.Get("/api/health", negroni.New(
 		negroni.HandlerFunc(this.Get),
 	))

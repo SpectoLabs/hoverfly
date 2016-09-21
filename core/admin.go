@@ -56,11 +56,12 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		d.Cfg.JWTExpirationDelta,
 		d.Cfg.AuthEnabled)
 
-	am := authentication.GetNewAuthenticationMiddleware(
+	am := &authentication.AuthHandler{
 		d.Authentication,
 		d.Cfg.SecretKey,
 		d.Cfg.JWTExpirationDelta,
-		d.Cfg.AuthEnabled)
+		d.Cfg.AuthEnabled,
+	}
 
 	handlers := GetAllHandlers(d)
 	for _, handler := range handlers {

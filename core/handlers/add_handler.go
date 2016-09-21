@@ -16,7 +16,7 @@ type AddHandler struct {
 	Hoverfly HoverflyRecords
 }
 
-func (this *AddHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthMiddleware) {
+func (this *AddHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthHandler) {
 	mux.Post("/api/add", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Post),
