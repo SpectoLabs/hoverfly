@@ -47,33 +47,19 @@ func (this *AdminApi) StartAdminInterface(hoverfly *Hoverfly) {
 func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 	mux := bone.New()
 
-	am := &handlers.AuthHandler{
+	authHandler := &handlers.AuthHandler{
 		d.Authentication,
 		d.Cfg.SecretKey,
 		d.Cfg.JWTExpirationDelta,
 		d.Cfg.AuthEnabled,
 	}
 
+	authHandler.RegisterRoutes(mux)
+
 	handlers := GetAllHandlers(d)
 	for _, handler := range handlers {
-		handler.RegisterRoutes(mux, am)
+		handler.RegisterRoutes(mux, authHandler)
 	}
-
-	mux.Post("/api/token-auth", http.HandlerFunc(am.Login))
-
-	mux.Get("/api/refresh-token-auth", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(am.RefreshToken),
-	))
-	mux.Get("/api/logout", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(am.Logout),
-	))
-
-	mux.Get("/api/users", negroni.New(
-		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(am.GetAllUsersHandler),
-	))
 
 	if d.Cfg.Development {
 		// since hoverfly is not started from cmd/hoverfly/hoverfly

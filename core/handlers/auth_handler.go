@@ -9,6 +9,8 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"encoding/json"
 	"github.com/SpectoLabs/hoverfly/core/authentication"
+	"github.com/codegangsta/negroni"
+	"github.com/go-zoo/bone"
 )
 
 type AuthHandler struct {
@@ -16,6 +18,25 @@ type AuthHandler struct {
 	SecretKey          []byte
 	JWTExpirationDelta int
 	Enabled            bool
+}
+
+func (this *AuthHandler) RegisterRoutes(mux *bone.Mux) {
+
+	mux.Post("/api/token-auth", http.HandlerFunc(this.Login))
+
+	mux.Get("/api/refresh-token-auth", negroni.New(
+		negroni.HandlerFunc(this.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.RefreshToken),
+	))
+	mux.Get("/api/logout", negroni.New(
+		negroni.HandlerFunc(this.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Logout),
+	))
+
+	mux.Get("/api/users", negroni.New(
+		negroni.HandlerFunc(this.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.GetAllUsersHandler),
+	))
 }
 
 func (a *AuthHandler) RequireTokenAuthentication(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
