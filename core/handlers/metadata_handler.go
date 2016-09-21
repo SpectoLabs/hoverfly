@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
@@ -21,7 +20,7 @@ type MetadataHandler struct {
 	Hoverfly HoverflyMetadata
 }
 
-func (this *MetadataHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthHandler) {
+func (this *MetadataHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
 	mux.Get("/api/metadata", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

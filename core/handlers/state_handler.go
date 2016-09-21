@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"io/ioutil"
@@ -23,7 +22,7 @@ type StateHandler struct {
 	Hoverfly HoverflyState
 }
 
-func (this *StateHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthHandler) {
+func (this *StateHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
 	mux.Get("/api/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

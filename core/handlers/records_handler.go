@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -25,7 +24,7 @@ type RecordsHandler struct {
 	Hoverfly HoverflyRecords
 }
 
-func (this *RecordsHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthHandler) {
+func (this *RecordsHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
 	mux.Get("/api/records", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

@@ -1,4 +1,4 @@
-package authentication
+package hoverfly
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	jwt "github.com/dgrijalva/jwt-go"
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
 )
 
 type AuthHandler struct {
@@ -24,7 +25,7 @@ func (a *AuthHandler) RequireTokenAuthentication(w http.ResponseWriter, req *htt
 		return
 	}
 
-	authBackend := InitJWTAuthenticationBackend(a.AB, a.SecretKey, a.JWTExpirationDelta)
+	authBackend := authentication.InitJWTAuthenticationBackend(a.AB, a.SecretKey, a.JWTExpirationDelta)
 
 	token, err := jwt.ParseFromRequest(req, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -58,7 +59,7 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
-	responseStatus, token := Login(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta)
+	responseStatus, token := authentication.Login(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta)
 
 	w.WriteHeader(responseStatus)
 	w.Write(token)
@@ -71,7 +72,7 @@ func (a *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request, next 
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
-	w.Write(RefreshToken(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta))
+	w.Write(authentication.RefreshToken(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta))
 }
 
 func (a *AuthHandler) Logout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
@@ -81,7 +82,7 @@ func (a *AuthHandler) Logout(w http.ResponseWriter, r *http.Request, next http.H
 		return
 	}
 
-	err := Logout(r, a.AB, a.SecretKey, a.JWTExpirationDelta)
+	err := authentication.Logout(r, a.AB, a.SecretKey, a.JWTExpirationDelta)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {

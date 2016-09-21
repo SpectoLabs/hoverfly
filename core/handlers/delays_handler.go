@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
@@ -23,7 +22,7 @@ type DelaysHandler struct {
 	Hoverfly HoverflyDelays
 }
 
-func (this *DelaysHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthHandler) {
+func (this *DelaysHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
 	mux.Get("/api/delays", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

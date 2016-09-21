@@ -3,7 +3,6 @@ package hoverfly
 import (
 	"encoding/json"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/codegangsta/negroni"
@@ -23,7 +22,7 @@ type StatsHandler struct {
 	Hoverfly HoverflyStats
 }
 
-func (this *StatsHandler) RegisterRoutes(mux *bone.Mux, am *authentication.AuthHandler) {
+func (this *StatsHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
 	mux.Get("/api/stats", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

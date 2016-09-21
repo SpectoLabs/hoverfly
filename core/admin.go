@@ -14,8 +14,6 @@ import (
 	"github.com/go-zoo/bone"
 	"github.com/meatballhat/negroni-logrus"
 
-	// auth
-	"github.com/SpectoLabs/hoverfly/core/authentication"
 	handlers "github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
@@ -49,7 +47,7 @@ func (this *AdminApi) StartAdminInterface(hoverfly *Hoverfly) {
 func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 	mux := bone.New()
 
-	am := &authentication.AuthHandler{
+	am := &handlers.AuthHandler{
 		d.Authentication,
 		d.Cfg.SecretKey,
 		d.Cfg.JWTExpirationDelta,
