@@ -5,15 +5,14 @@ from argparse import ArgumentParser
 import pickle
  
 limit = 50
- 
- 
+
 # getting urls and dumping them into file
 def get_urls():
-    sites = requests.get("http://readthedocs.org/api/v1/project/?limit=%s&amp;offset=0" % limit)
+    sites = requests.get("http://readthedocs.org/api/v1/project/?limit=%s&amp;offset=0&amp;format=json" % limit)
  
     objects = sites.json()['objects']
  
-    links = [x['subdomain'] for x in objects]
+    links = ["http://readthedocs.org" + x['resource_uri'] for x in objects]
  
     with open("links.p", "wb") as outfile:
         pickle.dump(links, outfile)
