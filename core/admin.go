@@ -15,6 +15,7 @@ import (
 	"github.com/meatballhat/negroni-logrus"
 
 	handlers "github.com/SpectoLabs/hoverfly/core/handlers"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 )
 
 type AdminApi struct{}
@@ -101,16 +102,16 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 func GetAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 	var list []handlers.AdminHandler
 
-	list = append(list, &handlers.AddHandler{Hoverfly: hoverfly})
-	list = append(list, &handlers.CountHandler{Hoverfly: hoverfly})
-	list = append(list, &handlers.DelaysHandler{Hoverfly: hoverfly})
-	list = append(list, &handlers.HealthHandler{})
-	list = append(list, &handlers.MetadataHandler{Hoverfly: hoverfly})
-	list = append(list, &handlers.MiddlewareHandler{Hoverfly: hoverfly})
-	list = append(list, &handlers.RecordsHandler{Hoverfly: hoverfly})
-	list = append(list, &handlers.StateHandler{Hoverfly: hoverfly})
-	list = append(list, &handlers.StatsHandler{Hoverfly: hoverfly})
-	list = append(list, &handlers.TemplatesHandler{Hoverfly: hoverfly})
+	list = append(list, &v1.AddHandler{Hoverfly: hoverfly})
+	list = append(list, &v1.CountHandler{Hoverfly: hoverfly})
+	list = append(list, &v1.DelaysHandler{Hoverfly: hoverfly})
+	list = append(list, &v1.HealthHandler{})
+	list = append(list, &v1.MetadataHandler{Hoverfly: hoverfly})
+	list = append(list, &v1.MiddlewareHandler{Hoverfly: hoverfly})
+	list = append(list, &v1.RecordsHandler{Hoverfly: hoverfly})
+	list = append(list, &v1.StateHandler{Hoverfly: hoverfly})
+	list = append(list, &v1.StatsHandler{Hoverfly: hoverfly})
+	list = append(list, &v1.TemplatesHandler{Hoverfly: hoverfly})
 
 	return list
 }

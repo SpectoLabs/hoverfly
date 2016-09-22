@@ -1,4 +1,4 @@
-package handlers
+package v1
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"github.com/go-zoo/bone"
 	"io/ioutil"
 	"net/http"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyState interface {
@@ -22,7 +23,7 @@ type StateHandler struct {
 	Hoverfly HoverflyState
 }
 
-func (this *StateHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
+func (this *StateHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
 	mux.Get("/api/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

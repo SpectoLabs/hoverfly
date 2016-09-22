@@ -1,4 +1,4 @@
-package handlers
+package v1
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 	"github.com/go-zoo/bone"
 	"io/ioutil"
 	"net/http"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyDelays interface {
@@ -22,7 +23,7 @@ type DelaysHandler struct {
 	Hoverfly HoverflyDelays
 }
 
-func (this *DelaysHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
+func (this *DelaysHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
 	mux.Get("/api/delays", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

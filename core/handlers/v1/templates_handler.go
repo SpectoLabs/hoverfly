@@ -1,4 +1,4 @@
-package handlers
+package v1
 
 import (
 	"encoding/json"
@@ -9,6 +9,7 @@ import (
 	"github.com/go-zoo/bone"
 	"io/ioutil"
 	"net/http"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyTemplates interface {
@@ -21,7 +22,7 @@ type TemplatesHandler struct {
 	Hoverfly HoverflyTemplates
 }
 
-func (this *TemplatesHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
+func (this *TemplatesHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
 	mux.Get("/api/templates", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

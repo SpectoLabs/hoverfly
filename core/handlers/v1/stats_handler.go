@@ -1,4 +1,4 @@
-package handlers
+package v1
 
 import (
 	"encoding/json"
@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"reflect"
 	"time"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyStats interface {
@@ -22,7 +23,7 @@ type StatsHandler struct {
 	Hoverfly HoverflyStats
 }
 
-func (this *StatsHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
+func (this *StatsHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
 	mux.Get("/api/stats", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),
