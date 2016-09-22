@@ -1,16 +1,16 @@
 package v2
 
 import (
-	"testing"
-	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
-	"github.com/codegangsta/negroni"
-	"encoding/json"
-	"io/ioutil"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
+	"github.com/codegangsta/negroni"
+	. "github.com/onsi/gomega"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 type HoverflyStub struct {

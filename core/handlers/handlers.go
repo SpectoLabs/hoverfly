@@ -1,13 +1,13 @@
 package handlers
 
 import (
+	"encoding/json"
 	"github.com/go-zoo/bone"
 	"net/http"
-	"encoding/json"
 )
 
 type ErrorView struct {
-	Error        string `json:"error"`
+	Error string `json:"error"`
 }
 
 type AdminHandler interface {
@@ -21,7 +21,11 @@ func WriteResponse(response http.ResponseWriter, bytes []byte) {
 
 func WriteErrorResponse(response http.ResponseWriter, message string, code int) {
 	errorView := &ErrorView{Error: message}
-	errorBytes, _ := json.Marshal(errorView)
+	errorBytes, err := json.Marshal(errorView)
+	if err != nil {
+		response.WriteHeader(500)
+		return
+	}
 	response.WriteHeader(code)
 	WriteResponse(response, errorBytes)
 }

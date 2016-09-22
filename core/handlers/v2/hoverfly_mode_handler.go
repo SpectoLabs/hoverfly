@@ -2,20 +2,16 @@ package v2
 
 import (
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
-	"net/http"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"io/ioutil"
+	"net/http"
 )
 
 type HoverflyState interface {
 	GetMode() string
 	SetMode(string) error
-}
-
-type ModeView struct {
-	Mode        string `json:"mode"`
 }
 
 type HoverflyModeHandler struct {
