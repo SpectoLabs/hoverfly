@@ -1,15 +1,16 @@
-package handlers
+package v1
 
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"net/http"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HealthHandler struct{}
 
-func (this *HealthHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
+func (this *HealthHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
 	mux.Get("/api/health", negroni.New(
 		negroni.HandlerFunc(this.Get),
 	))

@@ -1,4 +1,4 @@
-package handlers
+package v1
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 	"github.com/go-zoo/bone"
 	"io/ioutil"
 	"net/http"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyMetadata interface {
@@ -20,7 +21,7 @@ type MetadataHandler struct {
 	Hoverfly HoverflyMetadata
 }
 
-func (this *MetadataHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
+func (this *MetadataHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
 	mux.Get("/api/metadata", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

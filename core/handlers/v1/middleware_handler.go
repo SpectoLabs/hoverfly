@@ -1,4 +1,4 @@
-package handlers
+package v1
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"github.com/go-zoo/bone"
 	"io/ioutil"
 	"net/http"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyMiddleware interface {
@@ -18,7 +19,7 @@ type MiddlewareHandler struct {
 	Hoverfly HoverflyMiddleware
 }
 
-func (this *MiddlewareHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
+func (this *MiddlewareHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
 	mux.Get("/api/middleware", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),

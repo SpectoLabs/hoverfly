@@ -1,4 +1,4 @@
-package handlers
+package v1
 
 import (
 	"fmt"
@@ -9,13 +9,14 @@ import (
 	"github.com/go-zoo/bone"
 	"net/http"
 	"strconv"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type AddHandler struct {
 	Hoverfly HoverflyRecords
 }
 
-func (this *AddHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
+func (this *AddHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
 	mux.Post("/api/add", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Post),

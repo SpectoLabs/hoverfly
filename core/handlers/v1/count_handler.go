@@ -1,4 +1,4 @@
-package handlers
+package v1
 
 import (
 	"encoding/json"
@@ -6,13 +6,14 @@ import (
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"net/http"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type CountHandler struct {
 	Hoverfly HoverflyRecords
 }
 
-func (this *CountHandler) RegisterRoutes(mux *bone.Mux, am *AuthHandler) {
+func (this *CountHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
 	mux.Get("/api/count", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),
