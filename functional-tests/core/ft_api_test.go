@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
+	"strings"
 )
 
 var _ = Describe("Interacting with the API", func() {
@@ -18,6 +19,54 @@ var _ = Describe("Interacting with the API", func() {
 	BeforeEach(func() {
 		jsonRequestResponsePair1 = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "method1", "destination": "destination1", "scheme": "scheme1", "query": "query1", "body": "body1", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
 		jsonRequestResponsePair2 = bytes.NewBufferString(`{"data":[{"request": {"path": "/path2", "method": "method2", "destination": "destination2", "scheme": "scheme2", "query": "query2", "body": "body2", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "encodedBody": false, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
+	})
+
+	Context("GET /api/v2/hoverfly/mode", func() {
+
+		BeforeEach(func() {
+			hoverflyCmd = startHoverfly(adminPort, proxyPort)
+		})
+
+		AfterEach(func() {
+			stopHoverfly()
+		})
+
+		It("Should get the mode", func() {
+			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
+			res := DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"mode":"simulate"}`)))
+		})
+	})
+
+	Context("PUT /api/v2/hoverfly/mode", func() {
+
+		BeforeEach(func() {
+			hoverflyCmd = startHoverfly(adminPort, proxyPort)
+		})
+
+		AfterEach(func() {
+			stopHoverfly()
+		})
+
+		It("Should put the mode", func() {
+			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
+			req.Body(strings.NewReader(`{"mode":"capture"}`))
+			res := DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"mode":"capture"}`)))
+
+			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
+			res = DoRequest(req)
+			modeJson, err = ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"mode":"capture"}`)))
+		})
+
 	})
 
 	Context("GET /api/records", func() {
