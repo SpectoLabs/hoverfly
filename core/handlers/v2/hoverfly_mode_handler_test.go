@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"bytes"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyStub struct {
@@ -137,17 +138,17 @@ func unmarshalModeView(buffer *bytes.Buffer) (ModeView, error) {
 	return modeView, nil
 }
 
-func unmarshalErrorView(buffer *bytes.Buffer) (ErrorView, error) {
+func unmarshalErrorView(buffer *bytes.Buffer) (handlers.ErrorView, error) {
 	body, err := ioutil.ReadAll(buffer)
 	if err != nil {
-		return ErrorView{}, err
+		return handlers.ErrorView{}, err
 	}
 
-	var errorView ErrorView
+	var errorView handlers.ErrorView
 
 	err = json.Unmarshal(body, &errorView)
 	if err != nil {
-		return ErrorView{}, err
+		return handlers.ErrorView{}, err
 	}
 
 	return errorView, nil

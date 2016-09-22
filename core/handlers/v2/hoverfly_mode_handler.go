@@ -18,10 +18,6 @@ type ModeView struct {
 	Mode        string `json:"mode"`
 }
 
-type ErrorView struct {
-	Error        string `json:"error"`
-}
-
 type HoverflyModeHandler struct {
 	Hoverfly HoverflyState
 }
@@ -55,19 +51,13 @@ func (this *HoverflyModeHandler) Put(w http.ResponseWriter, r *http.Request, nex
 
 	err := json.Unmarshal(body, &modeView)
 	if err != nil {
-		errorView := &ErrorView{Error: "Malformed JSON"}
-		errorBytes, _ := json.Marshal(errorView)
-		w.WriteHeader(400)
-		w.Write(errorBytes)
+		handlers.WriteErrorResponse(w, "Malformed JSON", 400)
 		return
 	}
 
 	err = this.Hoverfly.SetMode(modeView.Mode)
 	if err != nil {
-		errorView := &ErrorView{Error: err.Error()}
-		errorBytes, _ := json.Marshal(errorView)
-		w.WriteHeader(422)
-		w.Write(errorBytes)
+		handlers.WriteErrorResponse(w, err.Error(), 422)
 		return
 	}
 
