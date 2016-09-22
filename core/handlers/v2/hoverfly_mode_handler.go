@@ -18,6 +18,10 @@ type ModeView struct {
 	Mode        string `json:"mode"`
 }
 
+type ErrorView struct {
+	Error        string `json:"error"`
+}
+
 type HoverflyModeHandler struct {
 	Hoverfly HoverflyState
 }
@@ -49,28 +53,22 @@ func (this *HoverflyModeHandler) Put(w http.ResponseWriter, r *http.Request, nex
 
 	body, _ := ioutil.ReadAll(r.Body)
 
-	_ = json.Unmarshal(body, &modeView)
-
-
-	availableModes := map[string]bool{
-		"simulate":   true,
-		"capture":    true,
-		"modify":     true,
-		"synthesize": true,
+	err := json.Unmarshal(body, &modeView)
+	if err != nil {
+		errorView := &ErrorView{Error: "Malformed JSON"}
+		errorBytes, _ := json.Marshal(errorView)
+		w.WriteHeader(400)
+		w.Write(errorBytes)
+		return
 	}
 
-	if modeView.Mode != "" {
-		if !availableModes[modeView.Mode] {
-			http.Error(w, "Bad mode supplied, available modes: simulate, capture, modify, synthesize.", 400)
-			return
-		}
-		// setting new state
-		err := this.Hoverfly.SetMode(modeView.Mode)
-		if err != nil {
-			http.Error(w, "Hoverfly is currently configured to act as webserver, which can only operate in simulate mode", 403)
-			return
-		}
-
+	err = this.Hoverfly.SetMode(modeView.Mode)
+	if err != nil {
+		errorView := &ErrorView{Error: err.Error()}
+		errorBytes, _ := json.Marshal(errorView)
+		w.WriteHeader(422)
+		w.Write(errorBytes)
+		return
 	}
 
 	var responseModeView ModeView
