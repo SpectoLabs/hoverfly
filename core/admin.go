@@ -16,6 +16,7 @@ import (
 
 	handlers "github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 type AdminApi struct{}
@@ -112,6 +113,7 @@ func GetAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 	list = append(list, &v1.StateHandler{Hoverfly: hoverfly})
 	list = append(list, &v1.StatsHandler{Hoverfly: hoverfly})
 	list = append(list, &v1.TemplatesHandler{Hoverfly: hoverfly})
+	list = append(list, &v2.HoverflyModeHandler{Hoverfly: hoverfly})
 
 	return list
 }

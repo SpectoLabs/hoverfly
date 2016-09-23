@@ -175,7 +175,7 @@ func DoRequestThroughProxy(r *sling.Sling) *http.Response {
 }
 
 func SetHoverflyMode(mode string) {
-	req := sling.New().Post(hoverflyAdminUrl + "/api/state").Body(strings.NewReader(`{"mode":"` + mode + `"}`))
+	req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode").Body(strings.NewReader(`{"mode":"` + mode + `"}`))
 	res := DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
 }

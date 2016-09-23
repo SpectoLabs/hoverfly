@@ -218,6 +218,18 @@ func (this Hoverfly) GetMode() string {
 }
 
 func (this *Hoverfly) SetMode(mode string) error {
+	availableModes := map[string]bool{
+		"simulate":   true,
+		"capture":    true,
+		"modify":     true,
+		"synthesize": true,
+	}
+
+	if mode == "" || !availableModes[mode] {
+		log.Error("Can't change mode to \"%d\"", mode)
+		return fmt.Errorf("Not a valid mode")
+	}
+
 	if this.Cfg.Webserver {
 		log.Error("Can't change state when configured as a webserver ")
 		return fmt.Errorf("Can't change state when configured as a webserver")
