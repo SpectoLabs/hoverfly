@@ -57,9 +57,5 @@ func (this *HoverflyModeHandler) Put(w http.ResponseWriter, r *http.Request, nex
 		return
 	}
 
-	var responseModeView ModeView
-	responseModeView.Mode = this.Hoverfly.GetMode()
-	bytes, _ := json.Marshal(responseModeView)
-
-	handlers.WriteResponse(w, bytes)
+	this.Get(w, r, next)
 }

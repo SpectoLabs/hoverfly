@@ -19,17 +19,16 @@ var _ = Describe("Interacting with the API", func() {
 	BeforeEach(func() {
 		jsonRequestResponsePair1 = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "method1", "destination": "destination1", "scheme": "scheme1", "query": "query1", "body": "body1", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
 		jsonRequestResponsePair2 = bytes.NewBufferString(`{"data":[{"request": {"path": "/path2", "method": "method2", "destination": "destination2", "scheme": "scheme2", "query": "query2", "body": "body2", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "encodedBody": false, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
+
+		hoverflyCmd = startHoverfly(adminPort, proxyPort)
 	})
 
+	AfterEach(func() {
+		stopHoverfly()
+	})
+
+
 	Context("GET /api/v2/hoverfly/mode", func() {
-
-		BeforeEach(func() {
-			hoverflyCmd = startHoverfly(adminPort, proxyPort)
-		})
-
-		AfterEach(func() {
-			stopHoverfly()
-		})
 
 		It("Should get the mode", func() {
 			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
@@ -42,14 +41,6 @@ var _ = Describe("Interacting with the API", func() {
 	})
 
 	Context("PUT /api/v2/hoverfly/mode", func() {
-
-		BeforeEach(func() {
-			hoverflyCmd = startHoverfly(adminPort, proxyPort)
-		})
-
-		AfterEach(func() {
-			stopHoverfly()
-		})
 
 		It("Should put the mode", func() {
 			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
@@ -69,16 +60,43 @@ var _ = Describe("Interacting with the API", func() {
 
 	})
 
+	Context("GET /api/v2/hoverfly/middleware", func() {
+
+		It("Should get the middleware which should be blank", func() {
+			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/middleware")
+			res := DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"middleware":""}`)))
+		})
+	})
+
+	Context("PUT /api/v2/hoverfly/middleware", func() {
+
+		It("Should put the middleware", func() {
+			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/middleware")
+			req.Body(strings.NewReader(`{"middleware":"cat"}`))
+			res := DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"middleware":"cat"}`)))
+
+			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/middleware")
+			res = DoRequest(req)
+			modeJson, err = ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"middleware":"cat"}`)))
+		})
+
+	})
+
 	Context("GET /api/records", func() {
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverfly(adminPort, proxyPort)
 			ImportHoverflyRecords(jsonRequestResponsePair1)
 			ImportHoverflyRecords(jsonRequestResponsePair2)
-		})
-
-		AfterEach(func() {
-			stopHoverfly()
 		})
 
 		It("Should retrieve the records", func() {
@@ -95,14 +113,10 @@ var _ = Describe("Interacting with the API", func() {
 	Context("DELETE /api/records", func() {
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverfly(adminPort, proxyPort)
 			ImportHoverflyRecords(jsonRequestResponsePair1)
 			ImportHoverflyRecords(jsonRequestResponsePair2)
 		})
 
-		AfterEach(func() {
-			stopHoverfly()
-		})
 
 		It("Should delete the records", func() {
 			reqPost := sling.New().Delete(hoverflyAdminUrl + "/api/records")
@@ -126,14 +140,6 @@ var _ = Describe("Interacting with the API", func() {
 	})
 
 	Context("POST /api/records", func() {
-
-		BeforeEach(func() {
-			hoverflyCmd = startHoverfly(adminPort, proxyPort)
-		})
-
-		AfterEach(func() {
-			stopHoverfly()
-		})
 
 		Context("When no records exist", func() {
 			It("Should create the records", func() {
