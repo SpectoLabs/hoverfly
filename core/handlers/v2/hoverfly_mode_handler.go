@@ -9,13 +9,13 @@ import (
 	"net/http"
 )
 
-type HoverflyState interface {
+type HoverflyMode interface {
 	GetMode() string
 	SetMode(string) error
 }
 
 type HoverflyModeHandler struct {
-	Hoverfly HoverflyState
+	Hoverfly HoverflyMode
 }
 
 func (this *HoverflyModeHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
