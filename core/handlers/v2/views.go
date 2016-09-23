@@ -1,5 +1,10 @@
 package v2
 
+type DestinationView struct {
+	Destination string `json:"destination"`
+}
+
+
 type MiddlewareView struct {
 	Middleware string `json:"middleware"`
 }
