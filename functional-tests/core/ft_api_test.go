@@ -27,6 +27,37 @@ var _ = Describe("Interacting with the API", func() {
 		stopHoverfly()
 	})
 
+	Context("GET /api/v2/hoverfly/destination", func() {
+
+		It("Should get the mode", func() {
+			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/destination")
+			res := DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"destination":"."}`)))
+		})
+	})
+
+	Context("PUT /api/v2/hoverfly/destination", func() {
+
+		It("Should put the mode", func() {
+			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/destination")
+			req.Body(strings.NewReader(`{"destination":"test.com"}`))
+			res := DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"destination":"test.com"}`)))
+
+			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/destination")
+			res = DoRequest(req)
+			modeJson, err = ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"destination":"test.com"}`)))
+		})
+
+	})
 
 	Context("GET /api/v2/hoverfly/mode", func() {
 
