@@ -60,6 +60,38 @@ var _ = Describe("Interacting with the API", func() {
 
 	})
 
+	Context("GET /api/v2/hoverfly/middleware", func() {
+
+		It("Should get the middleware which should be blank", func() {
+			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/middleware")
+			res := DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"middleware":""}`)))
+		})
+	})
+
+	Context("PUT /api/v2/hoverfly/middleware", func() {
+
+		It("Should put the middleware", func() {
+			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/middleware")
+			req.Body(strings.NewReader(`{"middleware":"cat"}`))
+			res := DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"middleware":"cat"}`)))
+
+			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/middleware")
+			res = DoRequest(req)
+			modeJson, err = ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"middleware":"cat"}`)))
+		})
+
+	})
+
 	Context("GET /api/records", func() {
 
 		BeforeEach(func() {
