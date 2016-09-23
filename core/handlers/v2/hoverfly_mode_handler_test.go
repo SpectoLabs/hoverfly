@@ -4,24 +4,21 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
-	"github.com/codegangsta/negroni"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 )
 
-type HoverflyStub struct {
+type HoverflyModeStub struct {
 	Mode string
 }
 
-func (this HoverflyStub) GetMode() string {
+func (this HoverflyModeStub) GetMode() string {
 	return this.Mode
 }
 
-func (this *HoverflyStub) SetMode(mode string) error {
+func (this *HoverflyModeStub) SetMode(mode string) error {
 	this.Mode = mode
 	if mode == "error" {
 		return fmt.Errorf("This is an error")
@@ -33,7 +30,7 @@ func (this *HoverflyStub) SetMode(mode string) error {
 func TestGetReturnsTheCorrectMode(t *testing.T) {
 	RegisterTestingT(t)
 
-	stubHoverfly := &HoverflyStub{Mode: "test-mode"}
+	stubHoverfly := &HoverflyModeStub{Mode: "test-mode"}
 	unit := HoverflyModeHandler{Hoverfly: stubHoverfly}
 
 	request, err := http.NewRequest("GET", "/api/v2/hoverfly/mode", nil)
@@ -51,7 +48,7 @@ func TestGetReturnsTheCorrectMode(t *testing.T) {
 func TestPutSetsTheNewModeAndReplacesTheTestMode(t *testing.T) {
 	RegisterTestingT(t)
 
-	stubHoverfly := &HoverflyStub{Mode: "test-mode"}
+	stubHoverfly := &HoverflyModeStub{Mode: "test-mode"}
 	unit := HoverflyModeHandler{Hoverfly: stubHoverfly}
 
 	modeView := &ModeView{Mode: "new-mode"}
@@ -75,7 +72,7 @@ func TestPutSetsTheNewModeAndReplacesTheTestMode(t *testing.T) {
 func TestPutWill422ErrorIfHoverflyErrors(t *testing.T) {
 	RegisterTestingT(t)
 
-	var stubHoverfly HoverflyStub
+	var stubHoverfly HoverflyModeStub
 	unit := HoverflyModeHandler{Hoverfly: &stubHoverfly}
 
 	modeView := &ModeView{Mode: "error"}
@@ -98,7 +95,7 @@ func TestPutWill422ErrorIfHoverflyErrors(t *testing.T) {
 func TestPutWill400ErrorIfJsonIsBad(t *testing.T) {
 	RegisterTestingT(t)
 
-	var stubHoverfly HoverflyStub
+	var stubHoverfly HoverflyModeStub
 	unit := HoverflyModeHandler{Hoverfly: &stubHoverfly}
 
 	bodyBytes := []byte("{{}{}}")
@@ -115,13 +112,6 @@ func TestPutWill400ErrorIfJsonIsBad(t *testing.T) {
 	Expect(errorViewResponse.Error).To(Equal("Malformed JSON"))
 }
 
-func makeRequestOnHandler(handlerFunc negroni.HandlerFunc, request *http.Request) *httptest.ResponseRecorder {
-	responseRecorder := httptest.NewRecorder()
-	negroni := negroni.New(handlerFunc)
-	negroni.ServeHTTP(responseRecorder, request)
-	return responseRecorder
-}
-
 func unmarshalModeView(buffer *bytes.Buffer) (ModeView, error) {
 	body, err := ioutil.ReadAll(buffer)
 	if err != nil {
@@ -136,20 +126,4 @@ func unmarshalModeView(buffer *bytes.Buffer) (ModeView, error) {
 	}
 
 	return modeView, nil
-}
-
-func unmarshalErrorView(buffer *bytes.Buffer) (handlers.ErrorView, error) {
-	body, err := ioutil.ReadAll(buffer)
-	if err != nil {
-		return handlers.ErrorView{}, err
-	}
-
-	var errorView handlers.ErrorView
-
-	err = json.Unmarshal(body, &errorView)
-	if err != nil {
-		return handlers.ErrorView{}, err
-	}
-
-	return errorView, nil
 }
