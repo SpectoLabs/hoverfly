@@ -27,6 +27,18 @@ var _ = Describe("Interacting with the API", func() {
 		stopHoverfly()
 	})
 
+	Context("GET /api/v2/hoverfly", func() {
+
+		It("Should get all the Hoverfly config available", func() {
+			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly")
+			res := DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"destination":".","middleware":"","mode":"simulate","usage":{"counters":{"capture":0,"modify":0,"simulate":0,"synthesize":0}}}`)))
+		})
+	})
+
 	Context("GET /api/v2/hoverfly/destination", func() {
 
 		It("Should get the mode", func() {
@@ -209,7 +221,6 @@ var _ = Describe("Interacting with the API", func() {
 			ImportHoverflyRecords(jsonRequestResponsePair1)
 			ImportHoverflyRecords(jsonRequestResponsePair2)
 		})
-
 
 		It("Should delete the records", func() {
 			reqPost := sling.New().Delete(hoverflyAdminUrl + "/api/records")
