@@ -17,3 +17,10 @@ type MiddlewareView struct {
 type ModeView struct {
 	Mode string `json:"mode"`
 }
+
+type HoverflyView struct {
+	DestinationView
+	MiddlewareView
+	ModeView
+	UsageView
+}
