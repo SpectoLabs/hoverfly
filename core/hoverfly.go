@@ -7,9 +7,11 @@ import (
 	log "github.com/Sirupsen/logrus"
 	authBackend "github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/rusenask/goproxy"
 	"io/ioutil"
 	"net"
@@ -170,11 +172,15 @@ func (this Hoverfly) GetTemplateCache() matching.RequestTemplateStore {
 	return this.RequestMatcher.TemplateStore
 }
 
+func (this Hoverfly) GetTemplates() v1.RequestTemplateResponsePairPayload {
+	return this.RequestMatcher.TemplateStore.GetPayload()
+}
+
 func (this *Hoverfly) DeleteTemplateCache() {
 	this.RequestMatcher.TemplateStore.Wipe()
 }
 
-func (this *Hoverfly) ImportTemplates(pairPayload matching.RequestTemplateResponsePairPayload) error {
+func (this *Hoverfly) ImportTemplates(pairPayload v1.RequestTemplateResponsePairPayload) error {
 	return this.RequestMatcher.TemplateStore.ImportPayloads(pairPayload)
 }
 
@@ -257,6 +263,33 @@ func (hf *Hoverfly) DeleteResponseDelays() {
 
 func (hf Hoverfly) GetStats() metrics.Stats {
 	return hf.Counter.Flush()
+}
+
+func (hf Hoverfly) GetRecords() ([]views.RequestResponsePairView, error) {
+	records, err := hf.RequestCache.GetAllEntries()
+	if err != nil {
+		return nil, err
+	}
+
+	var pairViews []views.RequestResponsePairView
+
+	for _, v := range records {
+		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
+			pairView := pair.ConvertToRequestResponsePairView()
+			pairViews = append(pairViews, *pairView)
+		} else {
+			log.Error(err)
+			return nil, err
+		}
+	}
+
+	for _, v := range hf.RequestMatcher.TemplateStore {
+		pairView := v.ConvertToRequestResponsePairView()
+		pairViews = append(pairViews, pairView)
+	}
+
+	return pairViews, nil
+
 }
 
 func hoverflyError(req *http.Request, err error, msg string, statusCode int) *http.Response {

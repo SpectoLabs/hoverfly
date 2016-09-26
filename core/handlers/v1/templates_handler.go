@@ -4,17 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"io/ioutil"
 	"net/http"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyTemplates interface {
-	GetTemplateCache() matching.RequestTemplateStore
-	ImportTemplates(pairPayload matching.RequestTemplateResponsePairPayload) error
+	GetTemplates() RequestTemplateResponsePairPayload
+	ImportTemplates(pairPayload RequestTemplateResponsePairPayload) error
 	DeleteTemplateCache()
 }
 
@@ -41,7 +40,7 @@ func (this *TemplatesHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHan
 
 // AllRecordsHandler returns JSON content type http response
 func (this *TemplatesHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	requestTemplatePayload := this.Hoverfly.GetTemplateCache().GetPayload()
+	requestTemplatePayload := this.Hoverfly.GetTemplates()
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -58,7 +57,7 @@ func (this *TemplatesHandler) Get(w http.ResponseWriter, req *http.Request, next
 
 func (this *TemplatesHandler) Post(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var requestTemplatePayload matching.RequestTemplateResponsePairPayload
+	var requestTemplatePayload RequestTemplateResponsePairPayload
 
 	defer req.Body.Close()
 	body, err := ioutil.ReadAll(req.Body)
