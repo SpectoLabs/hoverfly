@@ -5,13 +5,13 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
-	"net/http"
 	"io/ioutil"
+	"net/http"
 )
 
 type HoverflyDestination interface {
 	GetDestination() string
-	UpdateDestination(string) error
+	SetDestination(string) error
 }
 
 type HoverflyDestinationHandler struct {
@@ -52,7 +52,7 @@ func (this *HoverflyDestinationHandler) Put(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = this.Hoverfly.UpdateDestination(destinationView.Destination)
+	err = this.Hoverfly.SetDestination(destinationView.Destination)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), 422)
 		return

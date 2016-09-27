@@ -12,7 +12,7 @@ import (
 )
 
 // UpdateDestination - updates proxy with new destination regexp
-func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
+func (hf *Hoverfly) SetDestination(destination string) (err error) {
 	_, err = regexp.Compile(destination)
 	if err != nil {
 		return fmt.Errorf("destination is not a valid regular expression string")

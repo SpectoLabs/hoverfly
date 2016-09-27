@@ -5,18 +5,18 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"io/ioutil"
 	"net/http"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyState interface {
 	GetMode() string
 	SetMode(string) error
 	GetDestination() string
-	UpdateDestination(string) error
+	SetDestination(string) error
 }
 
 type StateHandler struct {
@@ -105,7 +105,7 @@ func (this *StateHandler) Post(w http.ResponseWriter, r *http.Request, next http
 
 	// checking whether we should update destination
 	if sr.Destination != "" {
-		err := this.Hoverfly.UpdateDestination(sr.Destination)
+		err := this.Hoverfly.SetDestination(sr.Destination)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error while updating destination: %s", err.Error()), 500)
 			return

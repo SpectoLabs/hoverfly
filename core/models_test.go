@@ -413,7 +413,7 @@ func TestStartProxyWOPort(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 }
 
-func TestUpdateDestination(t *testing.T) {
+func TestSetDestination(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(200, `{'message': 'here'}`)
@@ -422,7 +422,7 @@ func TestUpdateDestination(t *testing.T) {
 	dbClient.Cfg.ProxyPort = "5556"
 	err := dbClient.StartProxy()
 	Expect(err).To(BeNil())
-	dbClient.UpdateDestination("newdest")
+	dbClient.SetDestination("newdest")
 
 	Expect(dbClient.Cfg.Destination).To(Equal("newdest"))
 }
@@ -435,7 +435,7 @@ func TestUpdateDestinationEmpty(t *testing.T) {
 	server.Close()
 	dbClient.Cfg.ProxyPort = "5557"
 	dbClient.StartProxy()
-	err := dbClient.UpdateDestination("e^^**#")
+	err := dbClient.SetDestination("e^^**#")
 	Expect(err).ToNot(BeNil())
 }
 
