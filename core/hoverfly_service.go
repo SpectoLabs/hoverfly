@@ -114,8 +114,8 @@ func (this *Hoverfly) DeleteTemplateCache() {
 	this.RequestMatcher.TemplateStore.Wipe()
 }
 
-func (hf *Hoverfly) GetResponseDelays() models.ResponseDelays {
-	return hf.ResponseDelays
+func (hf *Hoverfly) GetResponseDelays() []byte {
+	return hf.ResponseDelays.Json()
 }
 
 func (hf *Hoverfly) SetResponseDelays(payload models.ResponseDelayPayload) error {

@@ -14,7 +14,7 @@ import (
 )
 
 type HoverflyDelays interface {
-	GetResponseDelays() models.ResponseDelays
+	GetResponseDelays() []byte
 	SetResponseDelays(models.ResponseDelayPayload) error
 	DeleteResponseDelays()
 }
@@ -41,7 +41,7 @@ func (this *DelaysHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandle
 }
 
 func (this *DelaysHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	b := this.Hoverfly.GetResponseDelays().Json()
+	b := this.Hoverfly.GetResponseDelays()
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(b)
 }
