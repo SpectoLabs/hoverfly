@@ -11,6 +11,10 @@ import (
 	"regexp"
 )
 
+func (this Hoverfly) GetDestination() string {
+	return this.Cfg.Destination
+}
+
 // UpdateDestination - updates proxy with new destination regexp
 func (hf *Hoverfly) SetDestination(destination string) (err error) {
 	_, err = regexp.Compile(destination)
@@ -26,28 +30,29 @@ func (hf *Hoverfly) SetDestination(destination string) (err error) {
 	return
 }
 
-func (hf Hoverfly) DeleteRequestCache() error {
-	return hf.RequestCache.DeleteData()
+func (this Hoverfly) GetMode() string {
+	return this.Cfg.Mode
 }
 
-func (hf Hoverfly) GetRequestCacheCount() (int, error) {
-	return hf.RequestCache.RecordsCount()
-}
+func (this *Hoverfly) SetMode(mode string) error {
+	availableModes := map[string]bool{
+		"simulate":   true,
+		"capture":    true,
+		"modify":     true,
+		"synthesize": true,
+	}
 
-func (this Hoverfly) GetMetadataCache() cache.Cache {
-	return this.MetadataCache
-}
+	if mode == "" || !availableModes[mode] {
+		log.Error("Can't change mode to \"%d\"", mode)
+		return fmt.Errorf("Not a valid mode")
+	}
 
-func (this Hoverfly) GetTemplates() v1.RequestTemplateResponsePairPayload {
-	return this.RequestMatcher.TemplateStore.GetPayload()
-}
-
-func (this *Hoverfly) DeleteTemplateCache() {
-	this.RequestMatcher.TemplateStore.Wipe()
-}
-
-func (this *Hoverfly) ImportTemplates(pairPayload v1.RequestTemplateResponsePairPayload) error {
-	return this.RequestMatcher.TemplateStore.ImportPayloads(pairPayload)
+	if this.Cfg.Webserver {
+		log.Error("Can't change state when configured as a webserver ")
+		return fmt.Errorf("Can't change state when configured as a webserver")
+	}
+	this.Cfg.SetMode(mode)
+	return nil
 }
 
 func (hf Hoverfly) GetMiddleware() string {
@@ -85,42 +90,37 @@ func (hf Hoverfly) SetMiddleware(middleware string) error {
 	return nil
 }
 
-func (this Hoverfly) GetMode() string {
-	return this.Cfg.Mode
+func (hf Hoverfly) GetRequestCacheCount() (int, error) {
+	return hf.RequestCache.RecordsCount()
 }
 
-func (this *Hoverfly) SetMode(mode string) error {
-	availableModes := map[string]bool{
-		"simulate":   true,
-		"capture":    true,
-		"modify":     true,
-		"synthesize": true,
-	}
-
-	if mode == "" || !availableModes[mode] {
-		log.Error("Can't change mode to \"%d\"", mode)
-		return fmt.Errorf("Not a valid mode")
-	}
-
-	if this.Cfg.Webserver {
-		log.Error("Can't change state when configured as a webserver ")
-		return fmt.Errorf("Can't change state when configured as a webserver")
-	}
-	this.Cfg.SetMode(mode)
-	return nil
+func (this Hoverfly) GetMetadataCache() cache.Cache {
+	return this.MetadataCache
 }
 
-func (this Hoverfly) GetDestination() string {
-	return this.Cfg.Destination
+func (hf Hoverfly) DeleteRequestCache() error {
+	return hf.RequestCache.DeleteData()
+}
+
+func (this Hoverfly) GetTemplates() v1.RequestTemplateResponsePairPayload {
+	return this.RequestMatcher.TemplateStore.GetPayload()
+}
+
+func (this *Hoverfly) ImportTemplates(pairPayload v1.RequestTemplateResponsePairPayload) error {
+	return this.RequestMatcher.TemplateStore.ImportPayloads(pairPayload)
+}
+
+func (this *Hoverfly) DeleteTemplateCache() {
+	this.RequestMatcher.TemplateStore.Wipe()
+}
+
+func (hf *Hoverfly) GetResponseDelays() models.ResponseDelays {
+	return hf.ResponseDelays
 }
 
 func (hf *Hoverfly) UpdateResponseDelays(responseDelays models.ResponseDelayList) {
 	hf.ResponseDelays = &responseDelays
 	log.Info("Response delay config updated on hoverfly")
-}
-
-func (hf *Hoverfly) GetResponseDelays() models.ResponseDelays {
-	return hf.ResponseDelays
 }
 
 func (hf *Hoverfly) DeleteResponseDelays() {
