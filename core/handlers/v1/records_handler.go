@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/codegangsta/negroni"
@@ -14,7 +13,7 @@ import (
 )
 
 type HoverflyRecords interface {
-	GetRequestCache() cache.Cache
+	DeleteRequestCache() error
 	GetRecords() ([]views.RequestResponsePairView, error)
 	ImportRequestResponsePairViews(pairViews []views.RequestResponsePairView) error
 }
@@ -121,7 +120,7 @@ func (this *RecordsHandler) Post(w http.ResponseWriter, req *http.Request, next 
 
 // DeleteAllRecordsHandler - deletes all captured requests
 func (this *RecordsHandler) Delete(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	err := this.Hoverfly.GetRequestCache().DeleteData()
+	err := this.Hoverfly.DeleteRequestCache()
 
 	w.Header().Set("Content-Type", "application/json")
 

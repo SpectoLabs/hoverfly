@@ -26,8 +26,12 @@ func (hf *Hoverfly) UpdateDestination(destination string) (err error) {
 	return
 }
 
-func (hf Hoverfly) GetRequestCache() cache.Cache {
-	return hf.RequestCache
+func (hf Hoverfly) DeleteRequestCache() error {
+	return hf.RequestCache.DeleteData()
+}
+
+func (hf Hoverfly) GetRequestCacheCount() (int, error) {
+	return hf.RequestCache.RecordsCount()
 }
 
 func (this Hoverfly) GetMetadataCache() cache.Cache {
