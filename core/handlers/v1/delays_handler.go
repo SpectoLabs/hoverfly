@@ -5,17 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"io/ioutil"
 	"net/http"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyDelays interface {
 	GetResponseDelays() models.ResponseDelays
-	UpdateResponseDelays(models.ResponseDelayList)
+	SetResponseDelays(models.ResponseDelayPayload) error
 	DeleteResponseDelays()
 }
 
@@ -47,7 +47,7 @@ func (this *DelaysHandler) Get(w http.ResponseWriter, req *http.Request, next ht
 }
 
 func (this *DelaysHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var rd models.ResponseDelayPayload
+	var responseDelaysView models.ResponseDelayPayload
 	var mr MessageResponse
 
 	if req.Body == nil {
@@ -80,19 +80,19 @@ func (this *DelaysHandler) Put(w http.ResponseWriter, req *http.Request, next ht
 		return
 	}
 
-	err = json.Unmarshal(body, &rd)
+	err = json.Unmarshal(body, &responseDelaysView)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Failed to unmarshal request body!")
 		mr.Message = fmt.Sprintf("Failed to decode request body. Error: %s", err.Error())
 		w.WriteHeader(400)
-	} else if rd.Data == nil {
+	} else if responseDelaysView.Data == nil {
 		log.Error("No delay data in the request body!")
 		mr.Message = fmt.Sprintf("Failed to get data from the request body.")
 		w.WriteHeader(422)
 	} else {
-		err = models.ValidateResponseDelayJson(rd)
+		err = this.Hoverfly.SetResponseDelays(responseDelaysView)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
@@ -100,7 +100,6 @@ func (this *DelaysHandler) Put(w http.ResponseWriter, req *http.Request, next ht
 			mr.Message = fmt.Sprintf("Failed to validate response delays config. Error: %s", err.Error())
 			w.WriteHeader(422)
 		} else {
-			this.Hoverfly.UpdateResponseDelays(*rd.Data)
 			mr.Message = "Response delays updated."
 			w.WriteHeader(201)
 		}

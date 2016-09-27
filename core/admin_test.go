@@ -932,7 +932,8 @@ func TestGetResponseDelays(t *testing.T) {
 		Delay:      100,
 	}
 	delays := models.ResponseDelayList{delay}
-	dbClient.UpdateResponseDelays(delays)
+
+	dbClient.SetResponseDelays(models.ResponseDelayPayload{Data: &delays})
 
 	m := adminApi.getBoneRouter(dbClient)
 

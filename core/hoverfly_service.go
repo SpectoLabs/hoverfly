@@ -118,9 +118,14 @@ func (hf *Hoverfly) GetResponseDelays() models.ResponseDelays {
 	return hf.ResponseDelays
 }
 
-func (hf *Hoverfly) UpdateResponseDelays(responseDelays models.ResponseDelayList) {
-	hf.ResponseDelays = &responseDelays
-	log.Info("Response delay config updated on hoverfly")
+func (hf *Hoverfly) SetResponseDelays(payload models.ResponseDelayPayload) error {
+	err := models.ValidateResponseDelayJson(payload)
+	if err != nil {
+		return err
+	}
+
+	hf.ResponseDelays = payload.Data
+	return nil
 }
 
 func (hf *Hoverfly) DeleteResponseDelays() {
