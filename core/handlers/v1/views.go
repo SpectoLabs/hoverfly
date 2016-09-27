@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
+	"github.com/SpectoLabs/hoverfly/core/views"
 )
 
 // recordedRequests struct encapsulates payload data
@@ -46,4 +47,23 @@ func (m *MessageResponse) Encode() ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
+}
+
+type RequestTemplateResponsePairView struct {
+	RequestTemplate RequestTemplateView       `json:"requestTemplate"`
+	Response        views.ResponseDetailsView `json:"response"`
+}
+
+type RequestTemplateResponsePairPayload struct {
+	Data *[]RequestTemplateResponsePairView `json:"data"`
+}
+
+type RequestTemplateView struct {
+	Path        *string             `json:"path"`
+	Method      *string             `json:"method"`
+	Destination *string             `json:"destination"`
+	Scheme      *string             `json:"scheme"`
+	Query       *string             `json:"query"`
+	Body        *string             `json:"body"`
+	Headers     map[string][]string `json:"headers"`
 }

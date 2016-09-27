@@ -5,19 +5,17 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
-	"github.com/SpectoLabs/hoverfly/core/matching"
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"io/ioutil"
 	"net/http"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyRecords interface {
 	GetRequestCache() cache.Cache
-	GetTemplateCache() matching.RequestTemplateStore
+	GetRecords() ([]views.RequestResponsePairView, error)
 	ImportRequestResponsePairViews(pairViews []views.RequestResponsePairView) error
 }
 
@@ -44,7 +42,7 @@ func (this *RecordsHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandl
 
 // AllRecordsHandler returns JSON content type http response
 func (this *RecordsHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	records, err := this.Hoverfly.GetRequestCache().GetAllEntries()
+	pairViews, err := this.Hoverfly.GetRecords()
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -54,24 +52,6 @@ func (this *RecordsHandler) Get(w http.ResponseWriter, req *http.Request, next h
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(500) // can't process this entity
 		return
-	}
-
-	var pairViews []views.RequestResponsePairView
-
-	for _, v := range records {
-		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
-			pairView := pair.ConvertToRequestResponsePairView()
-			pairViews = append(pairViews, *pairView)
-		} else {
-			log.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
-
-	for _, v := range this.Hoverfly.GetTemplateCache() {
-		pairView := v.ConvertToRequestResponsePairView()
-		pairViews = append(pairViews, pairView)
 	}
 
 	w.Header().Set("Content-Type", "application/json")

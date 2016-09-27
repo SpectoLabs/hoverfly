@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/core/views"
@@ -16,15 +17,6 @@ type RequestTemplateStore []RequestTemplateResponsePair
 type RequestTemplateResponsePair struct {
 	RequestTemplate RequestTemplate        `json:"requestTemplate"`
 	Response        models.ResponseDetails `json:"response"`
-}
-
-type RequestTemplateResponsePairView struct {
-	RequestTemplate RequestTemplate           `json:"requestTemplate"`
-	Response        views.ResponseDetailsView `json:"response"`
-}
-
-type RequestTemplateResponsePairPayload struct {
-	Data *[]RequestTemplateResponsePairView `json:"data"`
 }
 
 type RequestTemplate struct {
@@ -73,10 +65,10 @@ func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserv
 }
 
 // ImportPayloads - a function to save given payloads into the database.
-func (this *RequestTemplateStore) ImportPayloads(pairPayload RequestTemplateResponsePairPayload) error {
+func (this *RequestTemplateStore) ImportPayloads(pairPayload v1.RequestTemplateResponsePairPayload) error {
 	if len(*pairPayload.Data) > 0 {
 		// Convert PayloadView back to Payload for internal storage
-		templateStore := pairPayload.ConvertToRequestTemplateStore()
+		templateStore := ConvertPayloadToRequestTemplateStore(pairPayload)
 		for _, pl := range templateStore {
 
 			//TODO: add hooks for concsistency with request import
@@ -130,20 +122,28 @@ func headerMatch(templateHeaders, requestHeaders map[string][]string) bool {
 	return true
 }
 
-func (this RequestTemplateStore) GetPayload() RequestTemplateResponsePairPayload {
-	var pairsPayload []RequestTemplateResponsePairView
+func (this RequestTemplateStore) GetPayload() v1.RequestTemplateResponsePairPayload {
+	var pairsPayload []v1.RequestTemplateResponsePairView
 	for _, pair := range this {
 		pairsPayload = append(pairsPayload, pair.ConvertToRequestTemplateResponsePairView())
 	}
-	return RequestTemplateResponsePairPayload{
+	return v1.RequestTemplateResponsePairPayload{
 		Data: &pairsPayload,
 	}
 }
 
-func (this *RequestTemplateResponsePair) ConvertToRequestTemplateResponsePairView() RequestTemplateResponsePairView {
-	return RequestTemplateResponsePairView{
-		RequestTemplate: this.RequestTemplate,
-		Response:        this.Response.ConvertToResponseDetailsView(),
+func (this *RequestTemplateResponsePair) ConvertToRequestTemplateResponsePairView() v1.RequestTemplateResponsePairView {
+	return v1.RequestTemplateResponsePairView{
+		RequestTemplate: v1.RequestTemplateView{
+			Path:        this.RequestTemplate.Path,
+			Method:      this.RequestTemplate.Method,
+			Destination: this.RequestTemplate.Destination,
+			Scheme:      this.RequestTemplate.Scheme,
+			Query:       this.RequestTemplate.Query,
+			Body:        this.RequestTemplate.Body,
+			Headers:     this.RequestTemplate.Headers,
+		},
+		Response: this.Response.ConvertToResponseDetailsView(),
 	}
 }
 
@@ -164,17 +164,25 @@ func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() view
 	}
 }
 
-func (this *RequestTemplateResponsePairPayload) ConvertToRequestTemplateStore() RequestTemplateStore {
+func ConvertPayloadToRequestTemplateStore(payload v1.RequestTemplateResponsePairPayload) RequestTemplateStore {
 	var requestTemplateStore RequestTemplateStore
-	for _, pair := range *this.Data {
-		requestTemplateStore = append(requestTemplateStore, pair.ConvertToRequestTemplateResponsePair())
+	for _, pair := range *payload.Data {
+		requestTemplateStore = append(requestTemplateStore, ConvertToRequestTemplateResponsePair(pair))
 	}
 	return requestTemplateStore
 }
 
-func (this *RequestTemplateResponsePairView) ConvertToRequestTemplateResponsePair() RequestTemplateResponsePair {
+func ConvertToRequestTemplateResponsePair(pairView v1.RequestTemplateResponsePairView) RequestTemplateResponsePair {
 	return RequestTemplateResponsePair{
-		RequestTemplate: this.RequestTemplate,
-		Response:        models.NewResponseDetailsFromResponseDetailsView(this.Response),
+		RequestTemplate: RequestTemplate{
+			Path:        pairView.RequestTemplate.Path,
+			Method:      pairView.RequestTemplate.Method,
+			Destination: pairView.RequestTemplate.Destination,
+			Scheme:      pairView.RequestTemplate.Scheme,
+			Query:       pairView.RequestTemplate.Query,
+			Body:        pairView.RequestTemplate.Body,
+			Headers:     pairView.RequestTemplate.Headers,
+		},
+		Response: models.NewResponseDetailsFromResponseDetailsView(pairView.Response),
 	}
 }
