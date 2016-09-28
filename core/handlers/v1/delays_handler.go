@@ -6,7 +6,6 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
-	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"io/ioutil"
@@ -15,7 +14,7 @@ import (
 
 type HoverflyDelays interface {
 	GetResponseDelays() []byte
-	SetResponseDelays(models.ResponseDelayPayload) error
+	SetResponseDelays(ResponseDelayPayload) error
 	DeleteResponseDelays()
 }
 
@@ -47,7 +46,7 @@ func (this *DelaysHandler) Get(w http.ResponseWriter, req *http.Request, next ht
 }
 
 func (this *DelaysHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var responseDelaysView models.ResponseDelayPayload
+	var responseDelaysView ResponseDelayPayload
 	var mr MessageResponse
 
 	if req.Body == nil {

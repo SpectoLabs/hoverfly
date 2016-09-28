@@ -118,7 +118,21 @@ func (hf *Hoverfly) GetResponseDelays() []byte {
 	return hf.ResponseDelays.Json()
 }
 
-func (hf *Hoverfly) SetResponseDelays(payload models.ResponseDelayPayload) error {
+func (hf *Hoverfly) SetResponseDelays(payloadView v1.ResponseDelayPayload) error {
+	var responseDelays models.ResponseDelayList
+
+	for _, responseDelayView := range *payloadView.Data {
+		responseDelays = append(responseDelays, models.ResponseDelay{
+			UrlPattern: responseDelayView.UrlPattern,
+			HttpMethod: responseDelayView.HttpMethod,
+			Delay:      responseDelayView.Delay,
+		})
+	}
+
+	payload := models.ResponseDelayPayload{
+		Data: &responseDelays,
+	}
+
 	err := models.ValidateResponseDelayJson(payload)
 	if err != nil {
 		return err

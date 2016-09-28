@@ -68,12 +68,12 @@ type RequestTemplateView struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
-type ResponseDelay struct {
+type ResponseDelayView struct {
 	UrlPattern string `json:"urlPattern"`
 	HttpMethod string `json:"httpMethod"`
 	Delay      int    `json:"delay"`
 }
 
 type ResponseDelayPayload struct {
-	Data *[]RequestTemplateView `json:"data"`
+	Data *[]ResponseDelayView `json:"data"`
 }

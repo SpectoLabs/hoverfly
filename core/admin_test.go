@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
 	. "github.com/onsi/gomega"
@@ -11,7 +12,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 )
 
 var adminApi = AdminApi{}
@@ -927,13 +927,18 @@ func TestGetResponseDelays(t *testing.T) {
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
-	delay := models.ResponseDelay{
+	delay := v1.ResponseDelayView{
 		UrlPattern: ".",
+		HttpMethod: "GET",
 		Delay:      100,
 	}
-	delays := models.ResponseDelayList{delay}
+	delays := []v1.ResponseDelayView{delay}
 
-	dbClient.SetResponseDelays(models.ResponseDelayPayload{Data: &delays})
+	delaysPayload := v1.ResponseDelayPayload{
+		Data: &delays,
+	}
+
+	dbClient.SetResponseDelays(delaysPayload)
 
 	m := adminApi.getBoneRouter(dbClient)
 
@@ -951,7 +956,8 @@ func TestGetResponseDelays(t *testing.T) {
 	err = json.Unmarshal(body, &sr)
 
 	// normal equality checking doesn't work on slices (!!)
-	Expect(*sr.Data).To(Equal(delays))
+	delayList := models.ResponseDelayList{{UrlPattern: ".", HttpMethod: "GET", Delay: 100}}
+	Expect(*sr.Data).To(Equal(delayList))
 }
 
 func TestDeleteAllResponseDelaysHandler(t *testing.T) {
