@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"regexp"
 	"strings"
 	"time"
@@ -28,7 +29,7 @@ type ResponseDelays interface {
 	Len() int
 }
 
-func ValidateResponseDelayJson(j ResponseDelayPayload) (err error) {
+func ValidateResponseDelayJson(j v1.ResponseDelayPayload) (err error) {
 	if j.Data != nil {
 		for _, delay := range *j.Data {
 			if delay.UrlPattern != "" && delay.Delay != 0 {

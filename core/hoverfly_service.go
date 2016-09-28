@@ -119,6 +119,11 @@ func (hf *Hoverfly) GetResponseDelays() []byte {
 }
 
 func (hf *Hoverfly) SetResponseDelays(payloadView v1.ResponseDelayPayload) error {
+	err := models.ValidateResponseDelayJson(payloadView)
+	if err != nil {
+		return err
+	}
+
 	var responseDelays models.ResponseDelayList
 
 	for _, responseDelayView := range *payloadView.Data {
@@ -131,11 +136,6 @@ func (hf *Hoverfly) SetResponseDelays(payloadView v1.ResponseDelayPayload) error
 
 	payload := models.ResponseDelayPayload{
 		Data: &responseDelays,
-	}
-
-	err := models.ValidateResponseDelayJson(payload)
-	if err != nil {
-		return err
 	}
 
 	hf.ResponseDelays = payload.Data
