@@ -1,7 +1,6 @@
 package models
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
@@ -24,7 +23,6 @@ type ResponseDelayPayload struct {
 type ResponseDelayList []ResponseDelay
 
 type ResponseDelays interface {
-	Json() []byte
 	GetDelay(request RequestDetails) *ResponseDelay
 	Len() int
 	ConvertToResponseDelayPayloadView() v1.ResponseDelayPayloadView
@@ -81,14 +79,6 @@ func (this ResponseDelayList) ConvertToResponseDelayPayloadView() v1.ResponseDel
 	}
 
 	return payloadView
-}
-
-func (this *ResponseDelayList) Json() []byte {
-	resp := ResponseDelayPayload{
-		Data: this,
-	}
-	b, _ := json.Marshal(resp)
-	return b
 }
 
 func (this *ResponseDelayList) Len() int {
