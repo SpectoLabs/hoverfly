@@ -126,7 +126,7 @@ func (hf *Hoverfly) SetResponseDelays(payloadView v1.ResponseDelayPayloadView) e
 
 	var responseDelays models.ResponseDelayList
 
-	for _, responseDelayView := range *payloadView.Data {
+	for _, responseDelayView := range payloadView.Data {
 		responseDelays = append(responseDelays, models.ResponseDelay{
 			UrlPattern: responseDelayView.UrlPattern,
 			HttpMethod: responseDelayView.HttpMethod,

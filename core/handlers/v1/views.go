@@ -75,5 +75,5 @@ type ResponseDelayView struct {
 }
 
 type ResponseDelayPayloadView struct {
-	Data *[]ResponseDelayView `json:"data"`
+	Data []ResponseDelayView `json:"data"`
 }

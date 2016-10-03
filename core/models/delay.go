@@ -31,7 +31,7 @@ type ResponseDelays interface {
 
 func ValidateResponseDelayPayload(j v1.ResponseDelayPayloadView) (err error) {
 	if j.Data != nil {
-		for _, delay := range *j.Data {
+		for _, delay := range j.Data {
 			if delay.UrlPattern != "" && delay.Delay != 0 {
 				if _, err := regexp.Compile(delay.UrlPattern); err != nil {
 					return errors.New(fmt.Sprintf("Response delay entry skipped due to invalid pattern : %s", delay.UrlPattern))
