@@ -16,10 +16,6 @@ type ResponseDelay struct {
 	Delay      int    `json:"delay"`
 }
 
-type ResponseDelayPayload struct {
-	Data *ResponseDelayList `json:"data"`
-}
-
 type ResponseDelayList []ResponseDelay
 
 type ResponseDelays interface {

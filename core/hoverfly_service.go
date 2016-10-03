@@ -134,11 +134,7 @@ func (hf *Hoverfly) SetResponseDelays(payloadView v1.ResponseDelayPayloadView) e
 		})
 	}
 
-	payload := models.ResponseDelayPayload{
-		Data: &responseDelays,
-	}
-
-	hf.ResponseDelays = payload.Data
+	hf.ResponseDelays = &responseDelays
 	return nil
 }
 
