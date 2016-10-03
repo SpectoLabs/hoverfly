@@ -27,6 +27,7 @@ type ResponseDelays interface {
 	Json() []byte
 	GetDelay(request RequestDetails) *ResponseDelay
 	Len() int
+	ConvertToResponseDelayPayloadView() v1.ResponseDelayPayloadView
 }
 
 func ValidateResponseDelayPayload(j v1.ResponseDelayPayloadView) (err error) {
@@ -62,6 +63,24 @@ func (this *ResponseDelayList) GetDelay(request RequestDetails) *ResponseDelay {
 		}
 	}
 	return nil
+}
+
+func (this ResponseDelayList) ConvertToResponseDelayPayloadView() v1.ResponseDelayPayloadView {
+	payloadView := v1.ResponseDelayPayloadView{
+		Data: []v1.ResponseDelayView{},
+	}
+
+	for _, responseDelay := range this {
+		responseDelayView := v1.ResponseDelayView{
+			UrlPattern: responseDelay.UrlPattern,
+			HttpMethod: responseDelay.HttpMethod,
+			Delay: responseDelay.Delay,
+		}
+
+		payloadView.Data = append(payloadView.Data, responseDelayView)
+	}
+
+	return payloadView
 }
 
 func (this *ResponseDelayList) Json() []byte {

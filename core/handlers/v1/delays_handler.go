@@ -13,7 +13,7 @@ import (
 )
 
 type HoverflyDelays interface {
-	GetResponseDelays() []byte
+	GetResponseDelays() ResponseDelayPayloadView
 	SetResponseDelays(ResponseDelayPayloadView) error
 	DeleteResponseDelays()
 }
@@ -40,9 +40,14 @@ func (this *DelaysHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandle
 }
 
 func (this *DelaysHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	b := this.Hoverfly.GetResponseDelays()
+	payloadView := this.Hoverfly.GetResponseDelays()
+	bytes, err := json.Marshal(payloadView)
+	if err != nil {
+		log.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Write(b)
+	w.Write(bytes)
 }
 
 func (this *DelaysHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {

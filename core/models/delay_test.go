@@ -188,3 +188,19 @@ func TestIfDelayMethodBlankThenMatchesAnyMethod(t *testing.T) {
 	delayMatch := delays.GetDelay(request)
 	Expect(*delayMatch).To(Equal(delay))
 }
+
+func TestResponseDelayList_ConvertToPayloadView(t *testing.T) {
+	RegisterTestingT(t)
+
+	delay := ResponseDelay{
+		UrlPattern: "example(.+)",
+		Delay:      100,
+	}
+	delays := ResponseDelayList{delay}
+
+	payloadView := delays.ConvertToResponseDelayPayloadView()
+
+	Expect(payloadView.Data[0].UrlPattern).To(Equal("example(.+)"))
+	Expect(payloadView.Data[0].Delay).To(Equal(100))
+
+}
