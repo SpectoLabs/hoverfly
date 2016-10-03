@@ -74,6 +74,6 @@ type ResponseDelayView struct {
 	Delay      int    `json:"delay"`
 }
 
-type ResponseDelayPayload struct {
+type ResponseDelayPayloadView struct {
 	Data *[]ResponseDelayView `json:"data"`
 }

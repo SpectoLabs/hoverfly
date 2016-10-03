@@ -934,7 +934,7 @@ func TestGetResponseDelays(t *testing.T) {
 	}
 	delays := []v1.ResponseDelayView{delay}
 
-	delaysPayload := v1.ResponseDelayPayload{
+	delaysPayload := v1.ResponseDelayPayloadView{
 		Data: &delays,
 	}
 

@@ -29,7 +29,7 @@ type ResponseDelays interface {
 	Len() int
 }
 
-func ValidateResponseDelayPayload(j v1.ResponseDelayPayload) (err error) {
+func ValidateResponseDelayPayload(j v1.ResponseDelayPayloadView) (err error) {
 	if j.Data != nil {
 		for _, delay := range *j.Data {
 			if delay.UrlPattern != "" && delay.Delay != 0 {

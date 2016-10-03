@@ -14,7 +14,7 @@ import (
 
 type HoverflyDelays interface {
 	GetResponseDelays() []byte
-	SetResponseDelays(ResponseDelayPayload) error
+	SetResponseDelays(ResponseDelayPayloadView) error
 	DeleteResponseDelays()
 }
 
@@ -46,7 +46,7 @@ func (this *DelaysHandler) Get(w http.ResponseWriter, req *http.Request, next ht
 }
 
 func (this *DelaysHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var responseDelaysView ResponseDelayPayload
+	var responseDelaysView ResponseDelayPayloadView
 	var mr MessageResponse
 
 	if req.Body == nil {
