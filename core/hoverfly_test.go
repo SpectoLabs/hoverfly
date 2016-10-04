@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"testing"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 )
 
 func TestGetNewHoverflyCheckConfig(t *testing.T) {
@@ -166,6 +167,10 @@ func (this *ResponseDelayListStub) Len() int {
 func (this *ResponseDelayListStub) GetDelay(request models.RequestDetails) *models.ResponseDelay {
 	this.gotDelays++
 	return nil
+}
+
+func (this ResponseDelayListStub) ConvertToResponseDelayPayloadView() v1.ResponseDelayPayloadView {
+	return v1.ResponseDelayPayloadView{}
 }
 
 func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {

@@ -1,10 +1,10 @@
 package models
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"regexp"
 	"strings"
 	"time"
@@ -16,21 +16,17 @@ type ResponseDelay struct {
 	Delay      int    `json:"delay"`
 }
 
-type ResponseDelayPayload struct {
-	Data *ResponseDelayList `json:"data"`
-}
-
 type ResponseDelayList []ResponseDelay
 
 type ResponseDelays interface {
-	Json() []byte
 	GetDelay(request RequestDetails) *ResponseDelay
 	Len() int
+	ConvertToResponseDelayPayloadView() v1.ResponseDelayPayloadView
 }
 
-func ValidateResponseDelayJson(j ResponseDelayPayload) (err error) {
+func ValidateResponseDelayPayload(j v1.ResponseDelayPayloadView) (err error) {
 	if j.Data != nil {
-		for _, delay := range *j.Data {
+		for _, delay := range j.Data {
 			if delay.UrlPattern != "" && delay.Delay != 0 {
 				if _, err := regexp.Compile(delay.UrlPattern); err != nil {
 					return errors.New(fmt.Sprintf("Response delay entry skipped due to invalid pattern : %s", delay.UrlPattern))
@@ -63,12 +59,22 @@ func (this *ResponseDelayList) GetDelay(request RequestDetails) *ResponseDelay {
 	return nil
 }
 
-func (this *ResponseDelayList) Json() []byte {
-	resp := ResponseDelayPayload{
-		Data: this,
+func (this ResponseDelayList) ConvertToResponseDelayPayloadView() v1.ResponseDelayPayloadView {
+	payloadView := v1.ResponseDelayPayloadView{
+		Data: []v1.ResponseDelayView{},
 	}
-	b, _ := json.Marshal(resp)
-	return b
+
+	for _, responseDelay := range this {
+		responseDelayView := v1.ResponseDelayView{
+			UrlPattern: responseDelay.UrlPattern,
+			HttpMethod: responseDelay.HttpMethod,
+			Delay: responseDelay.Delay,
+		}
+
+		payloadView.Data = append(payloadView.Data, responseDelayView)
+	}
+
+	return payloadView
 }
 
 func (this *ResponseDelayList) Len() int {

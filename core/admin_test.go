@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/views"
 	. "github.com/onsi/gomega"
@@ -11,7 +12,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 )
 
 var adminApi = AdminApi{}
@@ -927,12 +927,18 @@ func TestGetResponseDelays(t *testing.T) {
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
-	delay := models.ResponseDelay{
+	delay := v1.ResponseDelayView{
 		UrlPattern: ".",
+		HttpMethod: "GET",
 		Delay:      100,
 	}
-	delays := models.ResponseDelayList{delay}
-	dbClient.UpdateResponseDelays(delays)
+	delays := []v1.ResponseDelayView{delay}
+
+	delaysPayload := v1.ResponseDelayPayloadView{
+		Data: delays,
+	}
+
+	dbClient.SetResponseDelays(delaysPayload)
 
 	m := adminApi.getBoneRouter(dbClient)
 
@@ -946,11 +952,12 @@ func TestGetResponseDelays(t *testing.T) {
 
 	body, err := ioutil.ReadAll(rec.Body)
 
-	sr := models.ResponseDelayPayload{}
+	sr := v1.ResponseDelayPayloadView{}
 	err = json.Unmarshal(body, &sr)
 
 	// normal equality checking doesn't work on slices (!!)
-	Expect(*sr.Data).To(Equal(delays))
+	delayList := []v1.ResponseDelayView{{UrlPattern: ".", HttpMethod: "GET", Delay: 100}}
+	Expect(sr.Data).To(Equal(delayList))
 }
 
 func TestDeleteAllResponseDelaysHandler(t *testing.T) {
@@ -986,16 +993,16 @@ func TestUpdateResponseDelays(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := adminApi.getBoneRouter(dbClient)
 
-	delayOne := models.ResponseDelay{
+	delayOne := v1.ResponseDelayView{
 		UrlPattern: ".",
 		Delay:      100,
 	}
-	delayTwo := models.ResponseDelay{
+	delayTwo := v1.ResponseDelayView{
 		UrlPattern: "example",
 		Delay:      100,
 	}
-	delays := models.ResponseDelayList{delayOne, delayTwo}
-	delayJson := models.ResponseDelayPayload{Data: &delays}
+	delays := []v1.ResponseDelayView{delayOne, delayTwo}
+	delayJson := v1.ResponseDelayPayloadView{Data: delays}
 	delayJsonBytes, err := json.Marshal(&delayJson)
 	Expect(err).To(BeNil())
 
@@ -1008,8 +1015,7 @@ func TestUpdateResponseDelays(t *testing.T) {
 	m.ServeHTTP(rec, req)
 	Expect(rec.Code).To(Equal(http.StatusCreated))
 
-	// normal equality checking doesn't work on slices (!!)
-	Expect(dbClient.ResponseDelays).To(Equal(&delays))
+	Expect(dbClient.ResponseDelays.ConvertToResponseDelayPayloadView()).To(Equal(delayJson))
 }
 
 func TestInvalidJSONSyntaxUpdateResponseDelays(t *testing.T) {

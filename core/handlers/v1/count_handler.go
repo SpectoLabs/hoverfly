@@ -9,8 +9,12 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
+type HoverflyCount interface {
+	GetRequestCacheCount() (int, error)
+}
+
 type CountHandler struct {
-	Hoverfly HoverflyRecords
+	Hoverfly HoverflyCount
 }
 
 func (this *CountHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
@@ -22,7 +26,7 @@ func (this *CountHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler
 
 // RecordsCount returns number of captured requests as a JSON payload
 func (this *CountHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	count, err := this.Hoverfly.GetRequestCache().RecordsCount()
+	count, err := this.Hoverfly.GetRequestCacheCount()
 
 	if err == nil {
 

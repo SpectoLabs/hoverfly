@@ -18,7 +18,7 @@ func (this HoverflyDestinationStub) GetDestination() string {
 	return this.Destination
 }
 
-func (this *HoverflyDestinationStub) UpdateDestination(destination string) error {
+func (this *HoverflyDestinationStub) SetDestination(destination string) error {
 	this.Destination = destination
 	if destination == "error" {
 		return fmt.Errorf("error")
