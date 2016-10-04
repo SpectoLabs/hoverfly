@@ -3,8 +3,8 @@ package models
 import (
 	"bytes"
 	"compress/gzip"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	. "github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
@@ -95,7 +95,7 @@ func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
 	respView := originalResp.ConvertToResponseDetailsView()
 
 	base64EncodedBody := "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg=="
-	Expect(respView).To(Equal(views.ResponseDetailsView{
+	Expect(respView).To(Equal(v1.ResponseDetailsView{
 		Status:      200,
 		Body:        base64EncodedBody,
 		EncodedBody: true,
@@ -123,13 +123,13 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 
 	pairView := requestResponsePair.ConvertToRequestResponsePairView()
 
-	Expect(*pairView).To(Equal(views.RequestResponsePairView{
-		Response: views.ResponseDetailsView{
+	Expect(*pairView).To(Equal(v1.RequestResponsePairView{
+		Response: v1.ResponseDetailsView{
 			Status:      200,
 			Body:        respBody,
 			Headers:     map[string][]string{"test_header": []string{"true"}},
 			EncodedBody: false},
-		Request: views.RequestDetailsView{
+		Request: v1.RequestDetailsView{
 			RequestType: StringToPointer("recording"),
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
@@ -162,13 +162,13 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 
 	pairView := requestResponsePair.ConvertToRequestResponsePairView()
 
-	Expect(*pairView).To(Equal(views.RequestResponsePairView{
-		Response: views.ResponseDetailsView{
+	Expect(*pairView).To(Equal(v1.RequestResponsePairView{
+		Response: v1.ResponseDetailsView{
 			Status:      200,
 			Body:        "H4sIAAAJbogA/w==",
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 			EncodedBody: true},
-		Request: views.RequestDetailsView{
+		Request: v1.RequestDetailsView{
 			RequestType: StringToPointer("recording"),
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
@@ -213,8 +213,8 @@ func GzipString(s string) string {
 func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
-	view := views.RequestResponsePairView{
-		Request: views.RequestDetailsView{
+	view := v1.RequestResponsePairView{
+		Request: v1.RequestDetailsView{
 			Path:        StringToPointer("A"),
 			Method:      StringToPointer("A"),
 			Destination: StringToPointer("A"),
@@ -226,7 +226,7 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *
 				"C": []string{"D"},
 			},
 		},
-		Response: views.ResponseDetailsView{
+		Response: v1.ResponseDetailsView{
 			Status:      1,
 			Body:        "1",
 			EncodedBody: false,
@@ -266,8 +266,8 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *
 func TestRequestResponsePairView_ConvertToRequestResponsePairWithEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
-	view := views.RequestResponsePairView{
-		Response: views.ResponseDetailsView{
+	view := v1.RequestResponsePairView{
+		Response: v1.ResponseDetailsView{
 			Body:        "ZW5jb2RlZA==",
 			EncodedBody: true,
 		},
@@ -281,7 +281,7 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithEncoding(t *tes
 func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestDetailsView := views.RequestDetailsView{
+	requestDetailsView := v1.RequestDetailsView{
 		Path:        StringToPointer("/"),
 		Method:      StringToPointer("GET"),
 		Destination: StringToPointer("/"),

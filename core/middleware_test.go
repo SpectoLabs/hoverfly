@@ -2,8 +2,8 @@ package hoverfly
 
 import (
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
@@ -82,7 +82,7 @@ func TestReflectBody(t *testing.T) {
 func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 
-	var newPairView views.RequestResponsePairView
+	var newPairView v1.RequestResponsePairView
 
 	json.Unmarshal(body, &newPairView)
 

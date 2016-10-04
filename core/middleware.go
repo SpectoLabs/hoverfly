@@ -8,8 +8,8 @@ import (
 
 	"errors"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	"io/ioutil"
 	"net/http"
 )
@@ -117,7 +117,7 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 	}
 
 	if len(mwOutput) > 0 {
-		var newPairView views.RequestResponsePairView
+		var newPairView v1.RequestResponsePairView
 
 		err = json.Unmarshal(mwOutput, &newPairView)
 
@@ -180,7 +180,7 @@ func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePai
 		return pair, err
 	}
 
-	var newPairView views.RequestResponsePairView
+	var newPairView v1.RequestResponsePairView
 
 	err = json.Unmarshal(returnedPairViewBytes, &newPairView)
 	if err != nil {

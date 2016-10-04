@@ -3,16 +3,16 @@ package hoverfly
 import (
 	"encoding/base64"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
-	"net/http/httptest"
-	"net/http"
 )
 
 func TestIsURLHTTP(t *testing.T) {
@@ -148,7 +148,6 @@ func TestImportFromURLRedirect(t *testing.T) {
 	pairFileBytes, err := ioutil.ReadAll(pairFile)
 	Expect(err).To(BeNil())
 
-
 	// pretending this is the endpoint with given json
 	server, dbClient := testTools(200, string(pairFileBytes))
 	defer server.Close()
@@ -208,13 +207,13 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPair := views.RequestResponsePairView{
-		Response: views.ResponseDetailsView{
+	originalPair := v1.RequestResponsePairView{
+		Response: v1.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}}},
-		Request: views.RequestDetailsView{
+		Request: v1.RequestDetailsView{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
@@ -223,7 +222,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			Body:        StringToPointer(""),
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{originalPair})
+	hv.ImportRequestResponsePairViews([]v1.RequestResponsePairView{originalPair})
 	value, _ := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	decodedPair, _ := models.NewRequestResponsePairFromBytes(value)
 	Expect(*decodedPair).To(Equal(models.RequestResponsePair{
@@ -256,14 +255,14 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 
 	RegisterTestingT(t)
 
-	originalPair1 := views.RequestResponsePairView{
-		Response: views.ResponseDetailsView{
+	originalPair1 := v1.RequestResponsePairView{
+		Response: v1.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 		},
-		Request: views.RequestDetailsView{
+		Request: v1.RequestDetailsView{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
@@ -278,7 +277,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 	originalPair3 := originalPair1
 	originalPair3.Request.Path = StringToPointer("/newer/path")
 
-	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{originalPair1, originalPair2, originalPair3})
+	hv.ImportRequestResponsePairViews([]v1.RequestResponsePairView{originalPair1, originalPair2, originalPair3})
 
 	pairBytes, err := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	Expect(err).To(BeNil())
@@ -309,24 +308,24 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 
 	RegisterTestingT(t)
 
-	requestTemplate := views.RequestDetailsView{
+	requestTemplate := v1.RequestDetailsView{
 		RequestType: StringToPointer("template"),
 		Method:      StringToPointer("GET"),
 	}
 
-	responseView := views.ResponseDetailsView{
+	responseView := v1.ResponseDetailsView{
 		Status:      200,
 		Body:        "hello_world",
 		EncodedBody: false,
 		Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 	}
 
-	templatePair := views.RequestResponsePairView{
+	templatePair := v1.RequestResponsePairView{
 		Response: responseView,
 		Request:  requestTemplate,
 	}
 
-	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{templatePair})
+	hv.ImportRequestResponsePairViews([]v1.RequestResponsePairView{templatePair})
 
 	Expect(len(hv.RequestMatcher.TemplateStore)).To(Equal(1))
 
@@ -349,36 +348,36 @@ func TestImportImportRequestResponsePairs_CanImportARequestResponsePair_AndReque
 
 	RegisterTestingT(t)
 
-	requestTemplate := views.RequestDetailsView{
+	requestTemplate := v1.RequestDetailsView{
 		RequestType: StringToPointer("template"),
 		Method:      StringToPointer("GET"),
 	}
 
-	requestView := views.RequestDetailsView{
+	requestView := v1.RequestDetailsView{
 		Method:      StringToPointer("GET"),
 		Path:        StringToPointer("/"),
 		Destination: StringToPointer("test.com"),
 		Scheme:      StringToPointer("http"),
 	}
 
-	responseView := views.ResponseDetailsView{
+	responseView := v1.ResponseDetailsView{
 		Status:      200,
 		Body:        "hello_world",
 		EncodedBody: false,
 		Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 	}
 
-	templatePair := views.RequestResponsePairView{
+	templatePair := v1.RequestResponsePairView{
 		Request:  requestTemplate,
 		Response: responseView,
 	}
 
-	ordinaryPair := views.RequestResponsePairView{
+	ordinaryPair := v1.RequestResponsePairView{
 		Request:  requestView,
 		Response: responseView,
 	}
 
-	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{templatePair, ordinaryPair})
+	hv.ImportRequestResponsePairViews([]v1.RequestResponsePairView{templatePair, ordinaryPair})
 
 	cacheCount, err := hv.RequestCache.RecordsCount()
 	Expect(cacheCount).To(Equal(1))
@@ -418,13 +417,13 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 
 	RegisterTestingT(t)
 
-	encodedPair := views.RequestResponsePairView{
-		Response: views.ResponseDetailsView{
+	encodedPair := v1.RequestResponsePairView{
+		Response: v1.ResponseDetailsView{
 			Status:      200,
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
-		Request: views.RequestDetailsView{
+		Request: v1.RequestDetailsView{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
@@ -433,7 +432,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 			Body:        StringToPointer(""),
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	hv.ImportRequestResponsePairViews([]views.RequestResponsePairView{encodedPair})
+	hv.ImportRequestResponsePairViews([]v1.RequestResponsePairView{encodedPair})
 
 	value, err := cache.Get([]byte("9b114df98da7f7e2afdc975883dab4f2"))
 	Expect(err).To(BeNil())

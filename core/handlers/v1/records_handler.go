@@ -5,7 +5,6 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"io/ioutil"
@@ -14,8 +13,8 @@ import (
 
 type HoverflyRecords interface {
 	DeleteRequestCache() error
-	GetRecords() ([]views.RequestResponsePairView, error)
-	ImportRequestResponsePairViews(pairViews []views.RequestResponsePairView) error
+	GetRecords() ([]RequestResponsePairView, error)
+	ImportRequestResponsePairViews(pairViews []RequestResponsePairView) error
 }
 
 type RecordsHandler struct {
@@ -55,7 +54,7 @@ func (this *RecordsHandler) Get(w http.ResponseWriter, req *http.Request, next h
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var response views.RequestResponsePairPayload
+	var response RequestResponsePairPayload
 	response.Data = pairViews
 	b, err := json.Marshal(response)
 
@@ -71,7 +70,7 @@ func (this *RecordsHandler) Get(w http.ResponseWriter, req *http.Request, next h
 // ImportRecordsHandler - accepts JSON payload and saves it to cache
 func (this *RecordsHandler) Post(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var requests views.RequestResponsePairPayload
+	var requests RequestResponsePairPayload
 
 	defer req.Body.Close()
 	body, err := ioutil.ReadAll(req.Body)

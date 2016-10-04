@@ -11,12 +11,12 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/SpectoLabs/hoverfly/core/views"
-	"net/http"
 	"io/ioutil"
+	"net/http"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -92,7 +92,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
 	}
 
-	var requests views.RequestResponsePairPayload
+	var requests v1.RequestResponsePairPayload
 
 	body, err := ioutil.ReadAll(pairsFile)
 	if err != nil {
@@ -117,7 +117,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Failed to fetch given URL, error %s", err.Error())
 	}
 
-	var requests views.RequestResponsePairPayload
+	var requests v1.RequestResponsePairPayload
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -139,7 +139,7 @@ func isJSON(s string) bool {
 }
 
 // ImportRequestResponsePairViews - a function to save given pairs into the database.
-func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []views.RequestResponsePairView) error {
+func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v1.RequestResponsePairView) error {
 	if len(pairViews) > 0 {
 		success := 0
 		failed := 0
