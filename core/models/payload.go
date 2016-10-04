@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 const (
@@ -67,6 +68,10 @@ func (this *RequestResponsePair) Encode() ([]byte, error) {
 
 func (this *RequestResponsePair) ConvertToRequestResponsePairView() *v1.RequestResponsePairView {
 	return &v1.RequestResponsePairView{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
+}
+
+func (this *RequestResponsePair) ConvertToV2RequestResponsePairView() v2.RequestResponsePairView {
+	return v2.RequestResponsePairView{Response: this.Response.ConvertToV2ResponseDetailsView(), Request: this.Request.ConvertToV2RequestDetailsView()}
 }
 
 // NewPayloadFromBytes decodes supplied bytes into Payload structure
@@ -172,6 +177,20 @@ func NewRequestDetailsFromRequestDetailsView(data v1.RequestDetailsView) Request
 func (this *RequestDetails) ConvertToRequestDetailsView() v1.RequestDetailsView {
 	s := "recording"
 	return v1.RequestDetailsView{
+		RequestType: &s,
+		Path:        &this.Path,
+		Method:      &this.Method,
+		Destination: &this.Destination,
+		Scheme:      &this.Scheme,
+		Query:       &this.Query,
+		Body:        &this.Body,
+		Headers:     this.Headers,
+	}
+}
+
+func (this *RequestDetails) ConvertToV2RequestDetailsView() v2.RequestDetailsView {
+	s := "recording"
+	return v2.RequestDetailsView{
 		RequestType: &s,
 		Path:        &this.Path,
 		Method:      &this.Method,
@@ -295,3 +314,31 @@ func (r *ResponseDetails) ConvertToResponseDetailsView() v1.ResponseDetailsView 
 
 	return v1.ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
 }
+
+func (r *ResponseDetails) ConvertToV2ResponseDetailsView() v2.ResponseDetailsView {
+	needsEncoding := false
+
+	// Check headers for gzip
+	contentEncodingValues := r.Headers["Content-Encoding"]
+	if len(contentEncodingValues) > 0 {
+		needsEncoding = true
+	} else {
+		mimeType := http.DetectContentType([]byte(r.Body))
+		needsEncoding = true
+		for _, v := range supportedMimeTypes {
+			if strings.Contains(mimeType, v) {
+				needsEncoding = false
+				break
+			}
+		}
+	}
+
+	// If contains gzip, base64 encode
+	body := r.Body
+	if needsEncoding {
+		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
+	}
+
+	return v2.ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
+}
+
