@@ -7,8 +7,8 @@ import (
 	"encoding/gob"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	. "github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
@@ -65,8 +65,8 @@ func (this *RequestResponsePair) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (this *RequestResponsePair) ConvertToRequestResponsePairView() *views.RequestResponsePairView {
-	return &views.RequestResponsePairView{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
+func (this *RequestResponsePair) ConvertToRequestResponsePairView() *v1.RequestResponsePairView {
+	return &v1.RequestResponsePairView{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
 }
 
 // NewPayloadFromBytes decodes supplied bytes into Payload structure
@@ -81,7 +81,7 @@ func NewRequestResponsePairFromBytes(data []byte) (*RequestResponsePair, error) 
 	return pair, nil
 }
 
-func NewRequestResponsePairFromRequestResponsePairView(pairView views.RequestResponsePairView) RequestResponsePair {
+func NewRequestResponsePairFromRequestResponsePairView(pairView v1.RequestResponsePairView) RequestResponsePair {
 	return RequestResponsePair{
 		Response: NewResponseDetailsFromResponseDetailsView(pairView.Response),
 		Request:  NewRequestDetailsFromRequestDetailsView(pairView.Request),
@@ -157,7 +157,7 @@ func CopyBody(body io.ReadCloser) (resp1, resp2 io.ReadCloser, err error) {
 	return ioutil.NopCloser(&buf), ioutil.NopCloser(bytes.NewReader(buf.Bytes())), nil
 }
 
-func NewRequestDetailsFromRequestDetailsView(data views.RequestDetailsView) RequestDetails {
+func NewRequestDetailsFromRequestDetailsView(data v1.RequestDetailsView) RequestDetails {
 	return RequestDetails{
 		Path:        PointerToString(data.Path),
 		Method:      PointerToString(data.Method),
@@ -169,9 +169,9 @@ func NewRequestDetailsFromRequestDetailsView(data views.RequestDetailsView) Requ
 	}
 }
 
-func (this *RequestDetails) ConvertToRequestDetailsView() views.RequestDetailsView {
+func (this *RequestDetails) ConvertToRequestDetailsView() v1.RequestDetailsView {
 	s := "recording"
-	return views.RequestDetailsView{
+	return v1.RequestDetailsView{
 		RequestType: &s,
 		Path:        &this.Path,
 		Method:      &this.Method,
@@ -258,7 +258,7 @@ type ResponseDetails struct {
 	Headers map[string][]string `json:"headers"`
 }
 
-func NewResponseDetailsFromResponseDetailsView(data views.ResponseDetailsView) ResponseDetails {
+func NewResponseDetailsFromResponseDetailsView(data v1.ResponseDetailsView) ResponseDetails {
 	body := data.Body
 
 	if data.EncodedBody == true {
@@ -269,7 +269,7 @@ func NewResponseDetailsFromResponseDetailsView(data views.ResponseDetailsView) R
 	return ResponseDetails{Status: data.Status, Body: body, Headers: data.Headers}
 }
 
-func (r *ResponseDetails) ConvertToResponseDetailsView() views.ResponseDetailsView {
+func (r *ResponseDetails) ConvertToResponseDetailsView() v1.ResponseDetailsView {
 	needsEncoding := false
 
 	// Check headers for gzip
@@ -293,5 +293,5 @@ func (r *ResponseDetails) ConvertToResponseDetailsView() views.ResponseDetailsVi
 		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
 	}
 
-	return views.ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
+	return v1.ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
 }

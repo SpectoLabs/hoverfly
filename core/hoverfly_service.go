@@ -7,7 +7,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	"regexp"
 )
 
@@ -146,13 +145,13 @@ func (hf Hoverfly) GetStats() metrics.Stats {
 	return hf.Counter.Flush()
 }
 
-func (hf Hoverfly) GetRecords() ([]views.RequestResponsePairView, error) {
+func (hf Hoverfly) GetRecords() ([]v1.RequestResponsePairView, error) {
 	records, err := hf.RequestCache.GetAllEntries()
 	if err != nil {
 		return nil, err
 	}
 
-	var pairViews []views.RequestResponsePairView
+	var pairViews []v1.RequestResponsePairView
 
 	for _, v := range records {
 		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {

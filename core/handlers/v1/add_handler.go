@@ -5,7 +5,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"net/http"
@@ -40,7 +39,7 @@ func (this *AddHandler) Post(w http.ResponseWriter, req *http.Request, next http
 	query := req.PostFormValue("inputQuery")
 	reqBody := req.PostFormValue("inputRequestBody")
 
-	preq := views.RequestDetailsView{
+	preq := RequestDetailsView{
 		Destination: util.StringToPointer(destination),
 		Method:      util.StringToPointer(method),
 		Path:        util.StringToPointer(path),
@@ -66,7 +65,7 @@ func (this *AddHandler) Post(w http.ResponseWriter, req *http.Request, next http
 
 	sc, _ := strconv.Atoi(respStatusCode)
 
-	presp := views.ResponseDetailsView{
+	presp := ResponseDetailsView{
 		Status:  sc,
 		Headers: headers,
 		Body:    respBody,
@@ -77,9 +76,9 @@ func (this *AddHandler) Post(w http.ResponseWriter, req *http.Request, next http
 		"contentType": contentType,
 	}).Info("manually adding request/response")
 
-	p := views.RequestResponsePairView{Request: preq, Response: presp}
+	p := RequestResponsePairView{Request: preq, Response: presp}
 
-	var pairViews []views.RequestResponsePairView
+	var pairViews []RequestResponsePairView
 
 	pairViews = append(pairViews, p)
 

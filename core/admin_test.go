@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
@@ -36,7 +35,7 @@ func TestGetAllRecords(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	pair := views.RequestResponsePairPayload{}
+	pair := v1.RequestResponsePairPayload{}
 	err = json.Unmarshal(body, &pair)
 
 	Expect(len(pair.Data)).To(Equal(0))
@@ -70,7 +69,7 @@ func TestGetAllRecordsWRecords(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	pair := views.RequestResponsePairPayload{}
+	pair := v1.RequestResponsePairPayload{}
 	err = json.Unmarshal(body, &pair)
 
 	Expect(len(pair.Data)).To(Equal(5))

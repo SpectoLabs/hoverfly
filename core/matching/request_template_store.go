@@ -7,7 +7,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/ryanuber/go-glob"
 	"strings"
 )
@@ -147,10 +146,10 @@ func (this *RequestTemplateResponsePair) ConvertToRequestTemplateResponsePairVie
 	}
 }
 
-func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() views.RequestResponsePairView {
+func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v1.RequestResponsePairView {
 
-	return views.RequestResponsePairView{
-		Request: views.RequestDetailsView{
+	return v1.RequestResponsePairView{
+		Request: v1.RequestDetailsView{
 			RequestType: StringToPointer("template"),
 			Path:        this.RequestTemplate.Path,
 			Method:      this.RequestTemplate.Method,
