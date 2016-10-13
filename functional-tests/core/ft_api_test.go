@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"strings"
+	"github.com/antonholmquist/jason"
 )
 
 var _ = Describe("Interacting with the API", func() {
@@ -27,15 +28,67 @@ var _ = Describe("Interacting with the API", func() {
 		stopHoverfly()
 	})
 
-	Context("GET /api/v2/hoverfly", func() {
+	Context("GET /api/v2/simulation", func() {
+		
+		BeforeEach(func() {
+			ImportHoverflyRecords(jsonRequestResponsePair1)
+			ImportHoverflyRecords(jsonRequestResponsePair2)
+			SetHoverflyResponseDelays("testdata/delays.json")
+		})
 
-		It("Should get all the Hoverfly config available", func() {
-			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly")
+		It("Should get all the Hoverfly simulation data in one JSON file", func() {
+			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/simulation")
 			res := DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
-			modeJson, err := ioutil.ReadAll(res.Body)
+			responseJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"destination":".","middleware":"","mode":"simulate","usage":{"counters":{"capture":0,"modify":0,"simulate":0,"synthesize":0}}}`)))
+			
+			jsonObject, err := jason.NewObjectFromBytes(responseJson)
+			Expect(err).To(BeNil())
+			
+			metaObject, err := jsonObject.GetObject("meta")
+			Expect(err).To(BeNil())
+			schemaVersion, err := metaObject.GetString("schemaVersion")
+			Expect(err).To(BeNil())
+			Expect(schemaVersion).To(Equal("v1"))
+			hoverflyVersion, err := metaObject.GetString("hoverflyVersion")
+			Expect(err).To(BeNil())
+			Expect(hoverflyVersion).ToNot(BeNil())
+			timeExported, err := metaObject.GetString("timeExported")
+			Expect(err).To(BeNil())
+			Expect(timeExported).ToNot(BeNil())
+
+			dataObject, err := jsonObject.GetObject("data")
+			Expect(err).To(BeNil())
+
+			pairsArray, err := dataObject.GetObjectArray("pairs")
+			Expect(err).To(BeNil())
+
+			Expect(pairsArray).To(HaveLen(2))
+
+			requestObject, err := pairsArray[0].GetObject("request")
+			Expect(err).To(BeNil())
+			Expect(requestObject.String()).To(Equal(`{"body":"body1","destination":"destination1","headers":{"Content-Type":["text/plain; charset=utf-8"],"Header":["value1"]},"method":"method1","path":"/path1","query":"query1","requestType":"recording","scheme":"scheme1"}`))
+			responseObject, err := pairsArray[0].GetObject("response")
+			Expect(err).To(BeNil())
+			Expect(responseObject.String()).To(Equal(`{"body":"body1","encodedBody":false,"headers":{"Header":["value1"]},"status":201}`))
+
+			requestObject, err = pairsArray[1].GetObject("request")
+			Expect(err).To(BeNil())
+			Expect(requestObject.String()).To(Equal(`{"body":"body2","destination":"destination2","headers":{"Content-Type":["text/plain; charset=utf-8"],"Header":["value2"]},"method":"method2","path":"/path2","query":"query2","requestType":"recording","scheme":"scheme2"}`))
+			responseObject, err = pairsArray[1].GetObject("response")
+			Expect(err).To(BeNil())
+			Expect(responseObject.String()).To(Equal(`{"body":"body2","encodedBody":false,"headers":{"Header":["value2"]},"status":202}`))
+
+			globalActionsObject, err := dataObject.GetObject("globalActions")
+			Expect(err).To(BeNil())
+
+			delaysArray, err := globalActionsObject.GetObjectArray("delays")
+			Expect(err).To(BeNil())
+
+			Expect(delaysArray).To(HaveLen(2))
+			Expect(delaysArray[0].String()).To(Equal(`{"delay":100,"httpMethod":"","urlPattern":"virtual\\.com"}`))
+			Expect(delaysArray[1].String()).To(Equal(`{"delay":110,"httpMethod":"","urlPattern":"virtual\\.com"}`))
 		})
 	})
 
