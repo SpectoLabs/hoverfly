@@ -8,6 +8,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/json"
@@ -17,7 +18,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 const (
@@ -288,6 +288,9 @@ func NewResponseDetailsFromResponseDetailsView(data v1.ResponseDetailsView) Resp
 	return ResponseDetails{Status: data.Status, Body: body, Headers: data.Headers}
 }
 
+// This function will create a JSON appriopriate version of ResponseDetails for the v1 API
+// If the response headers indicate that the content is encoded, or it has a non-matching
+// supported mimetype, we base64 encode it.
 func (r *ResponseDetails) ConvertToResponseDetailsView() v1.ResponseDetailsView {
 	needsEncoding := false
 
@@ -314,7 +317,9 @@ func (r *ResponseDetails) ConvertToResponseDetailsView() v1.ResponseDetailsView 
 
 	return v1.ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
 }
-
+// This function will create a JSON appriopriate version of ResponseDetails for the v2 API
+// If the response headers indicate that the content is encoded, or it has a non-matching
+// supported mimetype, we base64 encode it.
 func (r *ResponseDetails) ConvertToV2ResponseDetailsView() v2.ResponseDetailsView {
 	needsEncoding := false
 
@@ -341,4 +346,3 @@ func (r *ResponseDetails) ConvertToV2ResponseDetailsView() v2.ResponseDetailsVie
 
 	return v2.ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
 }
-
