@@ -2,14 +2,14 @@ package handlers
 
 import (
 	"fmt"
-	"net/http"
 	log "github.com/Sirupsen/logrus"
+	"net/http"
 
-	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
-	jwt "github.com/dgrijalva/jwt-go"
 	"encoding/json"
 	"github.com/SpectoLabs/hoverfly/core/authentication"
+	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/codegangsta/negroni"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-zoo/bone"
 )
 

@@ -2,11 +2,11 @@ package v2
 
 import (
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"io/ioutil"
 	"net/http"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyMiddleware interface {
@@ -58,7 +58,7 @@ func (this *HoverflyMiddlewareHandler) Put(w http.ResponseWriter, req *http.Requ
 
 	err = this.Hoverfly.SetMiddleware(middlewareReq.Middleware)
 	if err != nil {
-		handlers.WriteErrorResponse(w, "Invalid middleware: " + err.Error(), 422)
+		handlers.WriteErrorResponse(w, "Invalid middleware: "+err.Error(), 422)
 		return
 	}
 

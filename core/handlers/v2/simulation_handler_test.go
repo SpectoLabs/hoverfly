@@ -3,12 +3,12 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 )
 
 type HoverflySimulationStub struct{}
@@ -17,30 +17,29 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationView, error) {
 	pairOne := RequestResponsePairView{
 		Request: RequestDetailsView{
 			Destination: util.StringToPointer("test.com"),
-			Path: util.StringToPointer("/testing"),
+			Path:        util.StringToPointer("/testing"),
 		},
 		Response: ResponseDetailsView{
 			Body: "test-body",
 		},
-
 	}
 
-	return SimulationView {
-		DataView {
+	return SimulationView{
+		DataView{
 			RequestResponsePairs: []RequestResponsePairView{pairOne},
 			GlobalActions: GlobalActionsView{
 				Delays: []v1.ResponseDelayView{
 					{
 						HttpMethod: "GET",
-						Delay: 100,
+						Delay:      100,
 					},
 				},
 			},
 		},
-		MetaView {
-			SchemaVersion: "v1",
+		MetaView{
+			SchemaVersion:   "v1",
 			HoverflyVersion: "test",
-			TimeExported: "now",
+			TimeExported:    "now",
 		},
 	}, nil
 }

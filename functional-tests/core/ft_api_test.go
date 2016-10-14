@@ -2,12 +2,12 @@ package hoverfly_test
 
 import (
 	"bytes"
+	"github.com/antonholmquist/jason"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"strings"
-	"github.com/antonholmquist/jason"
 )
 
 var _ = Describe("Interacting with the API", func() {
@@ -29,7 +29,7 @@ var _ = Describe("Interacting with the API", func() {
 	})
 
 	Context("GET /api/v2/simulation", func() {
-		
+
 		BeforeEach(func() {
 			ImportHoverflyRecords(jsonRequestResponsePair1)
 			ImportHoverflyRecords(jsonRequestResponsePair2)
@@ -42,10 +42,10 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			responseJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			
+
 			jsonObject, err := jason.NewObjectFromBytes(responseJson)
 			Expect(err).To(BeNil())
-			
+
 			metaObject, err := jsonObject.GetObject("meta")
 			Expect(err).To(BeNil())
 			schemaVersion, err := metaObject.GetString("schemaVersion")

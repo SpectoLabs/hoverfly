@@ -5,10 +5,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"regexp"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"time"
 )
 
@@ -194,11 +194,11 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
 
 	responseDelays := hf.ResponseDelays.ConvertToResponseDelayPayloadView()
 
-	return v2.SimulationView {
-		MetaView: v2.MetaView {
+	return v2.SimulationView{
+		MetaView: v2.MetaView{
 			HoverflyVersion: "v0.9.0",
-			SchemaVersion: "v1",
-			TimeExported: time.Now().Format(time.RFC3339),
+			SchemaVersion:   "v1",
+			TimeExported:    time.Now().Format(time.RFC3339),
 		},
 		DataView: v2.DataView{
 			RequestResponsePairs: pairViews,

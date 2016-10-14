@@ -68,7 +68,7 @@ func (this ResponseDelayList) ConvertToResponseDelayPayloadView() v1.ResponseDel
 		responseDelayView := v1.ResponseDelayView{
 			UrlPattern: responseDelay.UrlPattern,
 			HttpMethod: responseDelay.HttpMethod,
-			Delay: responseDelay.Delay,
+			Delay:      responseDelay.Delay,
 		}
 
 		payloadView.Data = append(payloadView.Data, responseDelayView)
