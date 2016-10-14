@@ -8,6 +8,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"regexp"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"time"
 )
 
 func (this Hoverfly) GetDestination() string {
@@ -170,4 +172,39 @@ func (hf Hoverfly) GetRecords() ([]v1.RequestResponsePairView, error) {
 
 	return pairViews, nil
 
+}
+
+func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
+	records, err := hf.RequestCache.GetAllEntries()
+	if err != nil {
+		return v2.SimulationView{}, err
+	}
+
+	var pairViews []v2.RequestResponsePairView
+
+	for _, v := range records {
+		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
+			pairView := pair.ConvertToV2RequestResponsePairView()
+			pairViews = append(pairViews, pairView)
+		} else {
+			log.Error(err)
+			return v2.SimulationView{}, err
+		}
+	}
+
+	responseDelays := hf.ResponseDelays.ConvertToResponseDelayPayloadView()
+
+	return v2.SimulationView {
+		MetaView: v2.MetaView {
+			HoverflyVersion: "v0.9.0",
+			SchemaVersion: "v1",
+			TimeExported: time.Now().Format(time.RFC3339),
+		},
+		DataView: v2.DataView{
+			RequestResponsePairs: pairViews,
+			GlobalActions: v2.GlobalActionsView{
+				Delays: responseDelays.Data,
+			},
+		},
+	}, nil
 }
