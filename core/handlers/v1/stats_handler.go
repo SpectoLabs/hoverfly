@@ -3,6 +3,7 @@ package v1
 import (
 	"encoding/json"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
@@ -10,7 +11,6 @@ import (
 	"net/http"
 	"reflect"
 	"time"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyStats interface {

@@ -1,8 +1,8 @@
 package v2
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/metrics"
 )
 
 type DestinationView struct {
@@ -35,7 +35,7 @@ type SimulationView struct {
 
 type DataView struct {
 	RequestResponsePairs []RequestResponsePairView `json:"pairs"`
-	GlobalActions GlobalActionsView `json:"globalActions"`
+	GlobalActions        GlobalActionsView         `json:"globalActions"`
 }
 
 type RequestResponsePairView struct {
@@ -72,7 +72,7 @@ type GlobalActionsView struct {
 }
 
 type MetaView struct {
-	SchemaVersion string `json:"schemaVersion"`
+	SchemaVersion   string `json:"schemaVersion"`
 	HoverflyVersion string `json:"hoverflyVersion"`
-	TimeExported string `json:"timeExported"`
+	TimeExported    string `json:"timeExported"`
 }

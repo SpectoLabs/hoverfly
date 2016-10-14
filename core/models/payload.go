@@ -317,6 +317,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsView() v1.ResponseDetailsView 
 
 	return v1.ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
 }
+
 // This function will create a JSON appriopriate version of ResponseDetails for the v2 API
 // If the response headers indicate that the content is encoded, or it has a non-matching
 // supported mimetype, we base64 encode it.

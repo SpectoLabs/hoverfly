@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
@@ -12,7 +13,6 @@ import (
 	"net/url"
 	"os"
 	"testing"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 )
 
 func TestGetNewHoverflyCheckConfig(t *testing.T) {

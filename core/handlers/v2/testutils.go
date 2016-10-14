@@ -1,13 +1,13 @@
 package v2
 
 import (
-	"github.com/codegangsta/negroni"
-	"net/http/httptest"
 	"bytes"
-	"io/ioutil"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
+	"github.com/codegangsta/negroni"
+	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 )
 
 func makeRequestOnHandler(handlerFunc negroni.HandlerFunc, request *http.Request) *httptest.ResponseRecorder {

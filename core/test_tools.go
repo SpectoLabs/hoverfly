@@ -39,7 +39,6 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 		fmt.Fprintln(w, body)
 	}))
 
-
 	// creating random buckets for everyone!
 	bucket := GetRandomName(10)
 	metaBucket := GetRandomName(10)
