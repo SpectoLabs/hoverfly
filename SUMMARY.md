@@ -1,6 +1,6 @@
 # Summary
 
-* [Introduction](docs/README.md)
+* [Introduction](README.md)
    * [Motivation](docs/introduction/motivation.md)
    * [Principles](docs/introduction/principles.md)
    * [Feature overview](docs/introduction/feature_overview.md)

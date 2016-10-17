@@ -1,67 +1,100 @@
 # Installation and setup
-***Note:*** Although Hoverfly runs on any OS (including Windows) the examples in these docs are currently aimed Linux, Unix, *BSD and OSX users. 
 
 ## Get Hoverfly
-Hoverfly comes with a command line application called "hoverctl". Currently, Hoverfly can be used either with hoverctl or without.
+Hoverfly is a single binary file. It comes with an optional command line interface tool called hoverctl
 
-### Quick install
-#### Homebrew (OSX)
-     brew install SpectoLabs/tap/hoverfly
+### MacOS
+```
+brew install SpectoLabs/tap/hoverfly
+```
+### Linux
 
-#### Installation script (OSX & Linux) 
+    curl -o install.sh https://raw.githubusercontent.com/SpectoLabs/hoverfly/master/install.sh && sudo bash install.sh
 
-**NOTE**: *The installation script will prompt you for a **[SpectoLab](https://lab.specto.io) API key**. Since SpectoLab is currently in private beta, you will have to register for an invite to get an API key on the SpectoLab site. **If you don't have an API key, or you just want to get started without using SpectoLab, just enter a null value when prompted for the key.** Without an API key, all hoverctl functionality will work, with the exception of "pushing" and "pulling" Hoverfly simulations to and from SpectoLab.* 
+### Windows
 
-    curl -o install.sh https://raw.githubusercontent.com/SpectoLabs/hoverfly/master/install.sh && bash install.sh
+Download one of the zip files below, extract the Hoverfly and hoverctl binaries, and move them to a directory on your [PATH](https://www.java.com/en/download/help/path.xml)
 
-Once the install process is complete, use hoverctl to start an instance of Hoverfly locally:
+[Hoverfly & hoverctl (Windows 64bit)](http://hoverfly.io/downloads/hoverfly_bundle_latest_win_x64.zip)
 
-    hoverctl start
+[Hoverfly & hoverctl (Windows 32bit)](http://hoverfly.io/downloads/hoverfly_bundle_latest_win_x86.zip)
 
-To view the various hoverctl commands:
+### Pre-built binaries
 
-    hoverctl help
+Hoverfly binaries for every major OS are [available here.](https://github.com/SpectoLabs/hoverfly/releases)
 
-For more information on hoverctl, see **Hoverctl** in the **Reference** section.
+## Run Hoverfly
 
-### Pre-built binary (Hoverfly only)
+To capture traffic between your application and an external service, you will need to configure your OS, browser or application to use Hoverfly as a proxy.
 
-Hoverfly binaries for every major OS are [available here.](https://github.com/SpectoLabs/hoverfly/releases) Hoverctl binaries will be available for download once the source is released.
+### MacOS & Linux
 
-You can control Hoverfly without using the hoverctl CLI via flags and environment variables (see **Flags and environment variables** in the **Usage** section), or via the API directly.
+Run Hoverfly using hoverctl:
+```
+hoverctl start
+```
 
-To run Hoverfly, ensure that the binary is executable by setting the correct permissions, then execute the binary file:
+By default, the Hoverfly proxy runs on localhost:8500. Switch Hoverfly to "capture" mode and make a request with cURL, using Hoverfly as a proxy:
+```
+hoverctl mode capture
+curl --proxy http://localhost:8500 http://hoverfly.io/
+```
 
-    chmod +x hoverfly*
-    ./hoverfly*
+Hoverfly has captured the request and the response. View the Hoverfly logs:
 
-Hoverfly authentication is disabled by default (see the **Authentication** section). The API examples in these docs assume that authentication is disabled.
+```
+hoverctl logs
+```
 
-### Docker image
+Switch Hoverfly to "simulate" mode" and make the same request:
+```
+hoverctl mode simulate
+curl --proxy http://localhost:8500 http://hoverfly.io/
+```
+Hoverfly has returned the captured response.
 
-To get the Hoverfly Docker image:
+### Windows
 
-    docker pull spectolabs/hoverfly
+Open a command prompt and run Hoverfly using hoverctl:
+```
+hoverctl start
+```
 
-To run the image:
+Configure your application, browser or OS to use the Hoverfly proxy (http://localhost:8500). Switch Hoverfly to "capture" mode:
 
-    docker run -d \
-               -p 8888:8888 \
-               -p 8500:8500 \
-               spectolabs/hoverfly:latest
+```
+hoverctl mode capture
+```
 
-The port mapping is for the Hoverfly AdminUI/API and proxy respectively.
+Make some requests from your application, browser or OS, then view the Hoverfly logs:
 
-The Docker image supports Hoverfly flags (see **Flags and environment variables** in the **Usage** section). For example, to put Hoverfly into *capture mode* (see the **Capturing traffic** section) when the container starts:
+```
+hoverctl logs
+```
 
-    docker run -d \
-               -p 8888:8888 \
-               -p 8500:8500 \
-               spectolabs/hoverfly:latest \
-               -capture
+Switch Hoverfly to "simulate" mode:
 
+```
+hoverctl mode simulate
+```
 
-### Maven and JUnit integration
+Make the same requests from your browser, OS or application. Hoverfly is returning the captured responses.
+
+More information on proxy settings:
+
+* [Windows proxy settings explains](http://blog.raido.be/?p=426)
+* [Firefox proxy settings](https://support.mozilla.org/en-US/kb/advanced-panel-settings-in-firefox#w_connection)
+* [Java Networking and Proxies](https://docs.oracle.com/javase/6/docs/technotes/guides/net/proxies.html)
+
+## Docker image
+
+The Hoverfly docker image contains only the Hoverfly binary.
+
+    docker run -d -p 8888:8888 -p 8500:8500 spectolabs/hoverfly
+
+The port mapping is for the Hoverfly AdminUI/API and proxy respectively. The Docker image supports Hoverfly flags (see **Flags and environment variables** in the **Usage** section).
+
+## JUnit rule
 
 The Hoverfly JUnit rule is available as a Maven dependency. To get started, add the following to your pom.xml:
 
@@ -73,55 +106,19 @@ This will download the JUnit rule and the Hoverfly binary. More information on h
 
 [Easy API Simulation with the Hoverfly JUnit Rule](https://specto.io/blog/hoverfly-junit-api-simulation.html)         
 
-### Build from source
 
-You will need Go 1.7 installed. Instructions on how to set up your Go environment are [available here](https://golang.org/doc/code.html).
+## Setting the HOVERFLY_HOST environment variable
 
-    mkdir -p "$GOPATH/src/github.com/SpectoLabs/"
-    git clone https://github.com/SpectoLabs/hoverfly.git "$GOPATH/src/github.com/SpectoLabs/hoverfly"
-    cd "$GOPATH/src/github.com/SpectoLabs/hoverfly"
-    make build
-    
-
-Then, to run Hoverfly (with authentication disabled):
-
-    target/hoverfly
-    
-The source for hoverctl has not yet been released (as of 2016-07-07), although it will be available in the next Hoverfly release.
-
-### Setting the HOVERFLY_HOST environment variable
-
-Throughout the documentation, `${HOVERFLY_HOST}` is used in API examples and Admin UI guides. If you are running a binary on your local machine, the Hoverfly host will be `localhost`. However, if you are running Hoverfly on a remote machine, or using Docker on OSX for example, it will be different.
+Throughout the documentation, `${HOVERFLY_HOST}` is used in API examples and Admin UI guides. If you are running a binary on your local machine, the Hoverfly host will be `localhost`. However, if you are running Hoverfly on a remote machine, or using Docker Machine for example, it will be different.
 
 To make things easier when following the documentation, it is recommended that you set the HOVERFLY_HOST environment variable. For example:
 
     export HOVERFLY_HOST=localhost
 
-### Package management?
-
-Homebrew formula, deb and rpm packages are on the roadmap.
-
-
 ## Hoverfly as an HTTP(S) proxy
 
 Hoverfly is primarily a proxy - although it can run (with limitations) as a webserver. To use Hoverfly in your development or test environment to capture traffic, you need to ensure that your application is using it as a proxy. This can be done at the OS level, or at the application level, depending on the environment.
 
-### Linux, Unix, OSX, *BSD
-
-Set the HTTP_PROXY and/or HTTPS_PROXY environment variable to point to Hoverfly:
-
-    export HTTP_PROXY=http://${HOVERFLY_HOST}:8500/  
-    export HTTPS_PROXY=https://${HOVERFLY_HOST}:8500/
-
-Hoverfly uses port 8500 for the proxy by default, although this is configurable via flags or environment variables (see the **Flags and environment variables** section).
-
-If you just want to experiment with Hoverfly, you can make cURL use Hoverfly as a proxy with the `--proxy` flag:
-
-    curl http://mirage.readthedocs.org --proxy http://${HOVERFLY_HOST}:8500/
-
-### Windows
-
-TODO
 
 ## Admin UI
 
