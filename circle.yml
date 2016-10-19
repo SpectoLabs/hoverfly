@@ -71,5 +71,5 @@ deployment:
       - "docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS"
       - "docker push spectolabs/hoverfly:$CIRCLE_TAG"
       - "docker push spectolabs/hoverfly:latest"
-      - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly && make build-release GIT_TAG_NAME=$CIRCLE_TAG SHELL=/bin/bash"
-      - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly/target && for f in hover*;do github-release upload  --user SpectoLabs --repo hoverfly --tag \"$CIRCLE_TAG\" --name \"$f\" --file \"$f\"; done" 
+      - "$GOPATH/src/github.com/SpectoLabs/hoverfly/release.sh GIT_TAG_NAME=$CIRCLE_TAG SHELL=/bin/bash"
+      - "cd $GOPATH/src/github.com/SpectoLabs/hoverfly/target && for f in hover*;do github-release upload  --user SpectoLabs --repo hoverfly --tag \"$CIRCLE_TAG\" --name \"$f\" --file \"$f\"; done"
