@@ -18,7 +18,7 @@ for OSARCH in "${OSARCH_LIST[@]}"; do
   VERSION_FILE=${BIN_TARGET_DIR}/VERSION.txt
   ZIP_FILE=${ZIP_TARGET_DIR}/hoverfly_bundle_${SUFFIX}.zip
 
-  rm -rf ${BIN_TARGET_DIR} && mkdir -p ${BIN_TARGET_DIR}
+  mkdir -p ${BIN_TARGET_DIR}
   cd ${HF_BUILD_DIR}
   ${GOX} "-X main.hoverflyVersion=${GIT_TAG_NAME}" -osarch="${OSARCH}" -output="${HF_BIN}"
   cd ${HCTL_BUILD_DIR}
@@ -27,3 +27,5 @@ for OSARCH in "${OSARCH_LIST[@]}"; do
   cp ${LICENSE} ${BIN_TARGET_DIR}/LICENSE.txt
   zip -j ${ZIP_FILE} ${BIN_TARGET_DIR}/*
 done
+
+rm -rf ${ZIP_TARGET_DIR}/bin
