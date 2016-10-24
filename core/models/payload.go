@@ -9,6 +9,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/json"
@@ -88,7 +89,7 @@ func NewRequestResponsePairFromBytes(data []byte) (*RequestResponsePair, error) 
 
 func NewRequestResponsePairFromRequestResponsePairView(pairView v1.RequestResponsePairView) RequestResponsePair {
 	return RequestResponsePair{
-		Response: NewResponseDetailsFromResponseDetailsView(pairView.Response),
+		Response: NewResponseDetailsFromResponse(pairView.Response),
 		Request:  NewRequestDetailsFromRequestDetailsView(pairView.Request),
 	}
 }
@@ -277,15 +278,15 @@ type ResponseDetails struct {
 	Headers map[string][]string `json:"headers"`
 }
 
-func NewResponseDetailsFromResponseDetailsView(data v1.ResponseDetailsView) ResponseDetails {
-	body := data.Body
+func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
+	body := data.GetBody()
 
-	if data.EncodedBody == true {
-		decoded, _ := base64.StdEncoding.DecodeString(data.Body)
+	if data.GetEncodedBody() == true {
+		decoded, _ := base64.StdEncoding.DecodeString(data.GetBody())
 		body = string(decoded)
 	}
 
-	return ResponseDetails{Status: data.Status, Body: body, Headers: data.Headers}
+	return ResponseDetails{Status: data.GetStatus(), Body: body, Headers: data.GetHeaders()}
 }
 
 // This function will create a JSON appriopriate version of ResponseDetails for the v1 API

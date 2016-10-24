@@ -182,6 +182,6 @@ func ConvertToRequestTemplateResponsePair(pairView v1.RequestTemplateResponsePai
 			Body:        pairView.RequestTemplate.Body,
 			Headers:     pairView.RequestTemplate.Headers,
 		},
-		Response: models.NewResponseDetailsFromResponseDetailsView(pairView.Response),
+		Response: models.NewResponseDetailsFromResponse(pairView.Response),
 	}
 }
