@@ -11,7 +11,9 @@ import (
 	"testing"
 )
 
-type HoverflySimulationStub struct{}
+type HoverflySimulationStub struct {
+	Deleted bool
+}
 
 func (this HoverflySimulationStub) GetSimulation() (SimulationView, error) {
 	pairOne := RequestResponsePairView{
@@ -44,6 +46,11 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationView, error) {
 	}, nil
 }
 
+func (this *HoverflySimulationStub) DeleteSimulation() error {
+	this.Deleted = true
+	return nil
+}
+
 func TestSimulationHandlerGetReturnsSimulation(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -74,6 +81,54 @@ func TestSimulationHandlerGetReturnsSimulation(t *testing.T) {
 	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v1"))
 	Expect(simulationView.MetaView.HoverflyVersion).To(Equal("test"))
 	Expect(simulationView.MetaView.TimeExported).To(Equal("now"))
+}
+
+func TestSimulationHandlerDeleteCallsDelete(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationStub{}
+	Expect(stubHoverfly.Deleted).To(BeFalse())
+
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("DELETE", "", nil)
+	Expect(err).To(BeNil())
+
+	makeRequestOnHandler(unit.Delete, request)
+
+	Expect(stubHoverfly.Deleted).To(BeTrue())
+}
+
+func TestSimulationHandlerDeleteCallsGetAfterDelete(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationStub{}
+
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("DELETE", "", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Delete, request)
+
+	simulationView, err := unmarshalSimulationView(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(simulationView.DataView.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(simulationView.DataView.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
+	Expect(simulationView.DataView.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
+
+	Expect(simulationView.DataView.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
+
+	Expect(simulationView.DataView.GlobalActions.Delays).To(HaveLen(1))
+	Expect(simulationView.DataView.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
+	Expect(simulationView.DataView.GlobalActions.Delays[0].Delay).To(Equal(100))
+
+	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v1"))
+	Expect(simulationView.MetaView.HoverflyVersion).To(Equal("test"))
+	Expect(simulationView.MetaView.TimeExported).To(Equal("now"))
+
 }
 
 func unmarshalSimulationView(buffer *bytes.Buffer) (SimulationView, error) {

@@ -208,3 +208,9 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
 		},
 	}, nil
 }
+
+func (this *Hoverfly) DeleteSimulation() error {
+	this.DeleteTemplateCache()
+	this.DeleteResponseDelays()
+	return this.DeleteRequestCache()
+}
