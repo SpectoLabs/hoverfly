@@ -108,3 +108,15 @@ type ResponseDetailsView struct {
 	EncodedBody bool                `json:"encodedBody"`
 	Headers     map[string][]string `json:"headers"`
 }
+
+//Gets Status - required for interfaces.Response
+func (this ResponseDetailsView) GetStatus() int { return this.Status }
+
+// Gets Body - required for interfaces.Response
+func (this ResponseDetailsView) GetBody() string { return this.Body }
+
+// Gets EncodedBody - required for interfaces.Response
+func (this ResponseDetailsView) GetEncodedBody() bool { return this.EncodedBody }
+
+// Gets Headers - required for interfaces.Response
+func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.Headers }
