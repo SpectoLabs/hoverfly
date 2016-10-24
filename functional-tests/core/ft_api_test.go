@@ -90,6 +90,45 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(delaysArray[0].String()).To(Equal(`{"delay":100,"httpMethod":"","urlPattern":"virtual\\.com"}`))
 			Expect(delaysArray[1].String()).To(Equal(`{"delay":110,"httpMethod":"","urlPattern":"virtual\\.com"}`))
 		})
+
+		It("Should delete all the Hoverfly data", func() {
+			req := sling.New().Delete(hoverflyAdminUrl + "/api/v2/simulation")
+			res := DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			responseJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+
+			jsonObject, err := jason.NewObjectFromBytes(responseJson)
+			Expect(err).To(BeNil())
+
+			dataObject, err := jsonObject.GetObject("data")
+			Expect(err).To(BeNil())
+
+			pairsArray, err := dataObject.GetObjectArray("pairs")
+			Expect(err).To(BeNil())
+
+			Expect(pairsArray).To(HaveLen(0))
+
+			metaObject, err := jsonObject.GetObject("meta")
+			Expect(err).To(BeNil())
+			schemaVersion, err := metaObject.GetString("schemaVersion")
+			Expect(err).To(BeNil())
+			Expect(schemaVersion).To(Equal("v1"))
+			hoverflyVersion, err := metaObject.GetString("hoverflyVersion")
+			Expect(err).To(BeNil())
+			Expect(hoverflyVersion).ToNot(BeNil())
+			timeExported, err := metaObject.GetString("timeExported")
+			Expect(err).To(BeNil())
+			Expect(timeExported).ToNot(BeNil())
+
+			globalActionsObject, err := dataObject.GetObject("globalActions")
+			Expect(err).To(BeNil())
+
+			delaysArray, err := globalActionsObject.GetObjectArray("delays")
+			Expect(err).To(BeNil())
+
+			Expect(delaysArray).To(HaveLen(0))
+		})
 	})
 
 	Context("GET /api/v2/hoverfly/destination", func() {

@@ -180,7 +180,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
 		return v2.SimulationView{}, err
 	}
 
-	var pairViews []v2.RequestResponsePairView
+	pairViews := make([]v2.RequestResponsePairView, 0)
 
 	for _, v := range records {
 		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
