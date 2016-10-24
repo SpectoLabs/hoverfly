@@ -99,7 +99,7 @@ func TestSimulationHandlerDeleteCallsDelete(t *testing.T) {
 	Expect(stubHoverfly.Deleted).To(BeTrue())
 }
 
-func TestSimulationHandlerDeleteCallsGetAfterDelete(t *testing.T) {
+func TestSimulationHandler_Delete_CallsGetAfterDelete(t *testing.T) {
 	RegisterTestingT(t)
 
 	stubHoverfly := &HoverflySimulationStub{}
