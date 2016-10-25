@@ -3,6 +3,7 @@ package v1
 import (
 	"bytes"
 	"encoding/json"
+
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 )
 
@@ -98,6 +99,30 @@ type RequestDetailsView struct {
 	Body        *string             `json:"body"`
 	Headers     map[string][]string `json:"headers"`
 }
+
+//Gets RequestType - required for interfaces.Request
+func (this RequestDetailsView) GetRequestType() *string { return this.RequestType }
+
+//Gets Path - required for interfaces.Request
+func (this RequestDetailsView) GetPath() *string { return this.Path }
+
+//Gets Method - required for interfaces.Request
+func (this RequestDetailsView) GetMethod() *string { return this.Method }
+
+//Gets Destination - required for interfaces.Request
+func (this RequestDetailsView) GetDestination() *string { return this.Destination }
+
+//Gets Scheme - required for interfaces.Request
+func (this RequestDetailsView) GetScheme() *string { return this.Scheme }
+
+//Gets Query - required for interfaces.Request
+func (this RequestDetailsView) GetQuery() *string { return this.Query }
+
+//Gets Body - required for interfaces.Request
+func (this RequestDetailsView) GetBody() *string { return this.Body }
+
+//Gets Headers - required for interfaces.Request
+func (this RequestDetailsView) GetHeaders() map[string][]string { return this.Headers }
 
 // ResponseDetailsView is used when marshalling and
 // unmarshalling requests. This struct's Body may be Base64
