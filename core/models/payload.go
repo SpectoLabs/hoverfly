@@ -87,10 +87,10 @@ func NewRequestResponsePairFromBytes(data []byte) (*RequestResponsePair, error) 
 	return pair, nil
 }
 
-func NewRequestResponsePairFromRequestResponsePairView(pairView v1.RequestResponsePairView) RequestResponsePair {
+func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.RequestResponsePair) RequestResponsePair {
 	return RequestResponsePair{
-		Response: NewResponseDetailsFromResponse(pairView.Response),
-		Request:  NewRequestDetailsFromRequest(pairView.Request),
+		Response: NewResponseDetailsFromResponse(pairView.GetResponse()),
+		Request:  NewRequestDetailsFromRequest(pairView.GetRequest()),
 	}
 }
 

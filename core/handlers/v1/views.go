@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/SpectoLabs/hoverfly/core/metrics"
+	"github.com/SpectoLabs/hoverfly/core/interfaces"
 )
 
 // recordedRequests struct encapsulates payload data
@@ -87,6 +88,12 @@ type RequestResponsePairView struct {
 	Response ResponseDetailsView `json:"response"`
 	Request  RequestDetailsView  `json:"request"`
 }
+
+//Gets Response - required for interfaces.Request
+func (this RequestResponsePairView) GetResponse() interfaces.Response { return this.Response }
+
+//Gets Request - required for interfaces.Request
+func (this RequestResponsePairView) GetRequest() interfaces.Request { return this.Request }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsView struct {
