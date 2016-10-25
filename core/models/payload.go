@@ -9,6 +9,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/json"
@@ -86,10 +87,10 @@ func NewRequestResponsePairFromBytes(data []byte) (*RequestResponsePair, error) 
 	return pair, nil
 }
 
-func NewRequestResponsePairFromRequestResponsePairView(pairView v1.RequestResponsePairView) RequestResponsePair {
+func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.RequestResponsePair) RequestResponsePair {
 	return RequestResponsePair{
-		Response: NewResponseDetailsFromResponseDetailsView(pairView.Response),
-		Request:  NewRequestDetailsFromRequestDetailsView(pairView.Request),
+		Response: NewResponseDetailsFromResponse(pairView.GetResponse()),
+		Request:  NewRequestDetailsFromRequest(pairView.GetRequest()),
 	}
 }
 
@@ -162,15 +163,15 @@ func CopyBody(body io.ReadCloser) (resp1, resp2 io.ReadCloser, err error) {
 	return ioutil.NopCloser(&buf), ioutil.NopCloser(bytes.NewReader(buf.Bytes())), nil
 }
 
-func NewRequestDetailsFromRequestDetailsView(data v1.RequestDetailsView) RequestDetails {
+func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 	return RequestDetails{
-		Path:        PointerToString(data.Path),
-		Method:      PointerToString(data.Method),
-		Destination: PointerToString(data.Destination),
-		Scheme:      PointerToString(data.Scheme),
-		Query:       PointerToString(data.Query),
-		Body:        PointerToString(data.Body),
-		Headers:     data.Headers,
+		Path:        PointerToString(data.GetPath()),
+		Method:      PointerToString(data.GetMethod()),
+		Destination: PointerToString(data.GetDestination()),
+		Scheme:      PointerToString(data.GetScheme()),
+		Query:       PointerToString(data.GetQuery()),
+		Body:        PointerToString(data.GetBody()),
+		Headers:     data.GetHeaders(),
 	}
 }
 
@@ -277,15 +278,15 @@ type ResponseDetails struct {
 	Headers map[string][]string `json:"headers"`
 }
 
-func NewResponseDetailsFromResponseDetailsView(data v1.ResponseDetailsView) ResponseDetails {
-	body := data.Body
+func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
+	body := data.GetBody()
 
-	if data.EncodedBody == true {
-		decoded, _ := base64.StdEncoding.DecodeString(data.Body)
+	if data.GetEncodedBody() == true {
+		decoded, _ := base64.StdEncoding.DecodeString(data.GetBody())
 		body = string(decoded)
 	}
 
-	return ResponseDetails{Status: data.Status, Body: body, Headers: data.Headers}
+	return ResponseDetails{Status: data.GetStatus(), Body: body, Headers: data.GetHeaders()}
 }
 
 // This function will create a JSON appriopriate version of ResponseDetails for the v1 API

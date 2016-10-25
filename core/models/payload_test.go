@@ -290,7 +290,7 @@ func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 		Body:        StringToPointer(""),
 		Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}}
 
-	requestDetails := NewRequestDetailsFromRequestDetailsView(requestDetailsView)
+	requestDetails := NewRequestDetailsFromRequest(requestDetailsView)
 
 	Expect(requestDetails.Path).To(Equal(*requestDetailsView.Path))
 	Expect(requestDetails.Method).To(Equal(*requestDetailsView.Method))
