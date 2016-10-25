@@ -90,7 +90,7 @@ func NewRequestResponsePairFromBytes(data []byte) (*RequestResponsePair, error) 
 func NewRequestResponsePairFromRequestResponsePairView(pairView v1.RequestResponsePairView) RequestResponsePair {
 	return RequestResponsePair{
 		Response: NewResponseDetailsFromResponse(pairView.Response),
-		Request:  NewRequestDetailsFromRequestDetailsView(pairView.Request),
+		Request:  NewRequestDetailsFromRequest(pairView.Request),
 	}
 }
 
@@ -163,15 +163,15 @@ func CopyBody(body io.ReadCloser) (resp1, resp2 io.ReadCloser, err error) {
 	return ioutil.NopCloser(&buf), ioutil.NopCloser(bytes.NewReader(buf.Bytes())), nil
 }
 
-func NewRequestDetailsFromRequestDetailsView(data v1.RequestDetailsView) RequestDetails {
+func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 	return RequestDetails{
-		Path:        PointerToString(data.Path),
-		Method:      PointerToString(data.Method),
-		Destination: PointerToString(data.Destination),
-		Scheme:      PointerToString(data.Scheme),
-		Query:       PointerToString(data.Query),
-		Body:        PointerToString(data.Body),
-		Headers:     data.Headers,
+		Path:        PointerToString(data.GetPath()),
+		Method:      PointerToString(data.GetMethod()),
+		Destination: PointerToString(data.GetDestination()),
+		Scheme:      PointerToString(data.GetScheme()),
+		Query:       PointerToString(data.GetQuery()),
+		Body:        PointerToString(data.GetBody()),
+		Headers:     data.GetHeaders(),
 	}
 }
 

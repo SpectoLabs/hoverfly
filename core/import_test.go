@@ -329,7 +329,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 
 	Expect(len(hv.RequestMatcher.TemplateStore)).To(Equal(1))
 
-	request := models.NewRequestDetailsFromRequestDetailsView(requestTemplate)
+	request := models.NewRequestDetailsFromRequest(requestTemplate)
 	responseFromCache, err := hv.RequestMatcher.TemplateStore.GetResponse(request, false)
 	Expect(err).To(BeNil())
 
@@ -385,7 +385,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestResponsePair_AndReque
 
 	Expect(len(hv.RequestMatcher.TemplateStore)).To(Equal(1))
 
-	request := models.NewRequestDetailsFromRequestDetailsView(requestTemplate)
+	request := models.NewRequestDetailsFromRequest(requestTemplate)
 	response := models.NewResponseDetailsFromResponse(responseView)
 
 	pairBytes, err := hv.RequestCache.Get([]byte("76cf08e38439f083de2658b0971df9bf"))
