@@ -89,10 +89,10 @@ type RequestResponsePairView struct {
 	Request  RequestDetailsView  `json:"request"`
 }
 
-//Gets Response - required for interfaces.Request
+//Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestResponsePairView) GetResponse() interfaces.Response { return this.Response }
 
-//Gets Request - required for interfaces.Request
+//Gets Request - required for interfaces.RequestResponsePairView
 func (this RequestResponsePairView) GetRequest() interfaces.Request { return this.Request }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
