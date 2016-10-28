@@ -9,12 +9,13 @@ import (
 	"github.com/go-zoo/bone"
 	"io/ioutil"
 	"net/http"
+	"github.com/SpectoLabs/hoverfly/core/interfaces"
 )
 
 type HoverflyRecords interface {
 	DeleteRequestCache() error
 	GetRecords() ([]RequestResponsePairView, error)
-	ImportRequestResponsePairViews(pairViews []RequestResponsePairView) error
+	ImportRequestResponsePairViews(pairViews []interfaces.RequestResponsePair) error
 }
 
 type RecordsHandler struct {
@@ -94,7 +95,12 @@ func (this *RecordsHandler) Post(w http.ResponseWriter, req *http.Request, next 
 		return
 	}
 
-	err = this.Hoverfly.ImportRequestResponsePairViews(requests.Data)
+	requestResponsePairViews := make([]interfaces.RequestResponsePair, len(requests.Data))
+	for i, v := range requests.Data {
+		requestResponsePairViews[i] = v
+	}
+
+	err = this.Hoverfly.ImportRequestResponsePairViews(requestResponsePairViews)
 
 	if err != nil {
 		response.Message = err.Error()
