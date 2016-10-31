@@ -10,6 +10,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"regexp"
 	"time"
+	"github.com/SpectoLabs/hoverfly/core/interfaces"
 )
 
 func (this Hoverfly) GetDestination() string {
@@ -207,6 +208,15 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
 			},
 		},
 	}, nil
+}
+
+func (this *Hoverfly) PutSimulation(simulationView v2.SimulationView) (error) {
+	requestResponsePairViews := make([]interfaces.RequestResponsePair, len(simulationView.RequestResponsePairs))
+	for i, v := range simulationView.RequestResponsePairs {
+		requestResponsePairViews[i] = v
+	}
+
+	return this.ImportRequestResponsePairViews(requestResponsePairViews)
 }
 
 func (this *Hoverfly) DeleteSimulation() error {

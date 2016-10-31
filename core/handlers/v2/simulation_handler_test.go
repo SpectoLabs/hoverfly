@@ -13,6 +13,7 @@ import (
 
 type HoverflySimulationStub struct {
 	Deleted bool
+	Simulation SimulationView
 }
 
 func (this HoverflySimulationStub) GetSimulation() (SimulationView, error) {
@@ -48,6 +49,11 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationView, error) {
 
 func (this *HoverflySimulationStub) DeleteSimulation() error {
 	this.Deleted = true
+	return nil
+}
+
+func (this *HoverflySimulationStub) PutSimulation(simulation SimulationView) (error) {
+	this.Simulation = simulation
 	return nil
 }
 
@@ -128,7 +134,41 @@ func TestSimulationHandler_Delete_CallsGetAfterDelete(t *testing.T) {
 	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v1"))
 	Expect(simulationView.MetaView.HoverflyVersion).To(Equal("test"))
 	Expect(simulationView.MetaView.TimeExported).To(Equal("now"))
+}
 
+func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationStub{}
+
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`
+	{
+		"data": {
+			"pairs": [
+				{
+					"request": {
+						"destination": "test.org"
+					},
+					"response": {
+						"status": 200
+					}
+				}
+
+			]
+		}
+	}
+	`))))
+	Expect(err).To(BeNil())
+
+	makeRequestOnHandler(unit.Put, request)
+
+	Expect(stubHoverfly.Simulation).ToNot(BeNil())
+	Expect(stubHoverfly.Simulation.RequestResponsePairs).ToNot(BeNil())
+
+	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.org")))
+	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 }
 
 func unmarshalSimulationView(buffer *bytes.Buffer) (SimulationView, error) {

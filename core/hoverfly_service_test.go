@@ -5,6 +5,21 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+)
+
+var (
+	pairOne = v2.RequestResponsePairView{
+		Request: v2.RequestDetailsView{
+			Destination: util.StringToPointer("test.com"),
+			Path:        util.StringToPointer("/testing"),
+		},
+		Response: v2.ResponseDetailsView{
+			Body: "test-body",
+		},
+	}
 )
 
 func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.T) {
@@ -136,4 +151,28 @@ func TestHoverflyGetSimulationReturnsMultipleDelays(t *testing.T) {
 	Expect(simulation.DataView.GlobalActions.Delays[1].UrlPattern).To(Equal(""))
 	Expect(simulation.DataView.GlobalActions.Delays[1].HttpMethod).To(Equal("test"))
 	Expect(simulation.DataView.GlobalActions.Delays[1].Delay).To(Equal(200))
+}
+
+func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	simulationToImport := v2.SimulationView {
+		DataView: v2.DataView {
+			RequestResponsePairs: []v2.RequestResponsePairView{pairOne},
+			GlobalActions: v2.GlobalActionsView {
+				Delays: []v1.ResponseDelayView {},
+			},
+		},
+		MetaView: v2.MetaView {},
+	}
+
+	unit.PutSimulation(simulationToImport)
+
+	importedSimulation, err := unit.GetSimulation()
+	Expect(err).To(BeNil())
+
+	Expect(importedSimulation.RequestResponsePairs).To(HaveLen(1))
 }
