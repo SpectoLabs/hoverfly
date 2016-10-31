@@ -155,8 +155,18 @@ func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
 						"status": 200
 					}
 				}
+			],
 
-			]
+			"globalActions": {
+				"delays": [
+					{
+						"urlPattern": "test.org",
+						"httpMethod": "GET",
+						"delay": 200
+					}
+				]
+			}
+
 		}
 	}
 	`))))
@@ -169,6 +179,10 @@ func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
 
 	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.org")))
 	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
+
+	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].UrlPattern).To(Equal("test.org"))
+	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
+	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].Delay).To(Equal(200))
 }
 
 func unmarshalSimulationView(buffer *bytes.Buffer) (SimulationView, error) {
