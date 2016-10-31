@@ -3,16 +3,17 @@ package hoverfly
 import (
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/models"
-	. "github.com/onsi/gomega"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/util"
+	. "github.com/onsi/gomega"
 )
 
 var (
-	pairOne = v2.RequestResponsePairView{
+	pairOneRecording = v2.RequestResponsePairView{
 		Request: v2.RequestDetailsView{
+			RequestType: util.StringToPointer("recording"),
 			Destination: util.StringToPointer("test.com"),
 			Path:        util.StringToPointer("/testing"),
 		},
@@ -159,14 +160,14 @@ func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 	server, unit := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	simulationToImport := v2.SimulationView {
-		DataView: v2.DataView {
-			RequestResponsePairs: []v2.RequestResponsePairView{pairOne},
-			GlobalActions: v2.GlobalActionsView {
-				Delays: []v1.ResponseDelayView {},
+	simulationToImport := v2.SimulationView{
+		DataView: v2.DataView{
+			RequestResponsePairs: []v2.RequestResponsePairView{pairOneRecording},
+			GlobalActions: v2.GlobalActionsView{
+				Delays: []v1.ResponseDelayView{},
 			},
 		},
-		MetaView: v2.MetaView {},
+		MetaView: v2.MetaView{},
 	}
 
 	unit.PutSimulation(simulationToImport)
@@ -174,5 +175,14 @@ func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 	importedSimulation, err := unit.GetSimulation()
 	Expect(err).To(BeNil())
 
+	Expect(importedSimulation).ToNot(BeNil())
+
+	Expect(importedSimulation.RequestResponsePairs).ToNot(BeNil())
 	Expect(importedSimulation.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(importedSimulation.RequestResponsePairs[0].Request.RequestType).To(Equal(util.StringToPointer("recording")))
+	Expect(importedSimulation.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
+	Expect(importedSimulation.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
+
+	Expect(importedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
 }
