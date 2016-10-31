@@ -40,7 +40,7 @@ func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.
 	Expect(simulation.MetaView.TimeExported).ToNot(BeNil())
 }
 
-func TestHoverflyGetSimulationReturnsASingleRequestResponsePair(t *testing.T) {
+func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairRecording(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, unit := testTools(201, `{'message': 'here'}`)
@@ -67,6 +67,7 @@ func TestHoverflyGetSimulationReturnsASingleRequestResponsePair(t *testing.T) {
 
 	Expect(simulation.DataView.RequestResponsePairs).To(HaveLen(1))
 
+	Expect(*simulation.DataView.RequestResponsePairs[0].Request.RequestType).To(Equal("recording"))
 	Expect(*simulation.DataView.RequestResponsePairs[0].Request.Destination).To(Equal("testhost.com"))
 	Expect(*simulation.DataView.RequestResponsePairs[0].Request.Path).To(Equal("/test"))
 	Expect(*simulation.DataView.RequestResponsePairs[0].Request.RequestType).To(Equal("recording"))
