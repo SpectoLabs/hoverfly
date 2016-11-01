@@ -72,7 +72,7 @@ func (this *RequestResponsePair) ConvertToV1RequestResponsePairView() *v1.Reques
 }
 
 func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairView {
-	return v2.RequestResponsePairView{Response: this.Response.ConvertToV2ResponseDetailsView(), Request: this.Request.ConvertToV2RequestDetailsView()}
+	return v2.RequestResponsePairView{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToV2RequestDetailsView()}
 }
 
 // NewPayloadFromBytes decodes supplied bytes into Payload structure
@@ -322,7 +322,7 @@ func (r *ResponseDetails) ConvertToV1ResponseDetailsView() v1.ResponseDetailsVie
 // This function will create a JSON appriopriate version of ResponseDetails for the v2 API
 // If the response headers indicate that the content is encoded, or it has a non-matching
 // supported mimetype, we base64 encode it.
-func (r *ResponseDetails) ConvertToV2ResponseDetailsView() v2.ResponseDetailsView {
+func (r *ResponseDetails) ConvertToResponseDetailsView() v2.ResponseDetailsView {
 	needsEncoding := false
 
 	// Check headers for gzip
