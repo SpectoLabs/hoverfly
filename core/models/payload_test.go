@@ -101,7 +101,7 @@ func TestResponseDetails_ConvertToV1ResponseDetailsView_WithImageBody(t *testing
 		EncodedBody: true,
 	}))
 }
-func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextResponse(t *testing.T) {
+func TestRequestResponsePair_ConvertToV1RequestResponsePairView_WithPlainTextResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	respBody := "hello_world"
@@ -141,7 +141,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 	}))
 }
 
-func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedResponse(t *testing.T) {
+func TestRequestResponsePair_ConvertToV1RequestResponsePairView_WithGzippedResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	requestResponsePair := RequestResponsePair{
