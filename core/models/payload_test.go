@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestConvertToResponseDetailsView_WithPlainTextResponseDetails(t *testing.T) {
+func TestResponseDetails_ConvertToV1ResponseDetailsView_WithPlainTextResponseDetails(t *testing.T) {
 	RegisterTestingT(t)
 
 	statusCode := 200
@@ -29,7 +29,7 @@ func TestConvertToResponseDetailsView_WithPlainTextResponseDetails(t *testing.T)
 	Expect(respView.Body).To(Equal(body))
 }
 
-func TestConvertToResponseDetailsView_WithGzipContentEncodedHeader(t *testing.T) {
+func TestResponseDetails_ConvertToV1ResponseDetailsView_WithGzipContentEncodedHeader(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalBody := "hello_world"
@@ -54,7 +54,7 @@ func TestConvertToResponseDetailsView_WithGzipContentEncodedHeader(t *testing.T)
 	Expect(respView.Body).To(Equal(base64EncodedBody))
 }
 
-func TestConvertToResponseDetailsView_WithDeflateContentEncodedHeader(t *testing.T) {
+func TestResponseDetails_ConvertToV1ResponseDetailsView_WithDeflateContentEncodedHeader(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalBody := "this_should_be_encoded_but_its_not_important"
@@ -77,7 +77,7 @@ func TestConvertToResponseDetailsView_WithDeflateContentEncodedHeader(t *testing
 	Expect(respView.Body).To(Equal(base64EncodedBody))
 }
 
-func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
+func TestResponseDetails_ConvertToV1ResponseDetailsView_WithImageBody(t *testing.T) {
 	RegisterTestingT(t)
 
 	imageUri := "/testdata/1x1.png"
@@ -181,7 +181,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 	}))
 }
 
-func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
+func TestRequestDetails_ConvertToV1RequestDetailsView(t *testing.T) {
 	RegisterTestingT(t)
 
 	requestDetails := RequestDetails{
