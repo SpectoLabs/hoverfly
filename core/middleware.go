@@ -71,7 +71,7 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 	}
 
 	// getting payload
-	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
+	pairViewBytes, err := json.Marshal(pair.ConvertToV1RequestResponsePairView())
 
 	if log.GetLevel() == log.DebugLevel {
 		log.WithFields(log.Fields{
@@ -149,7 +149,7 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 }
 
 func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
+	pairViewBytes, err := json.Marshal(pair.ConvertToV1RequestResponsePairView())
 
 	req, err := http.NewRequest("POST", middleware, bytes.NewBuffer(pairViewBytes))
 	if err != nil {

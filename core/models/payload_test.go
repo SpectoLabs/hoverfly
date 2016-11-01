@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestConvertToResponseDetailsView_WithPlainTextResponseDetails(t *testing.T) {
+func TestResponseDetails_ConvertToV1ResponseDetailsView_WithPlainTextResponseDetails(t *testing.T) {
 	RegisterTestingT(t)
 
 	statusCode := 200
@@ -20,7 +20,7 @@ func TestConvertToResponseDetailsView_WithPlainTextResponseDetails(t *testing.T)
 
 	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers: headers}
 
-	respView := originalResp.ConvertToResponseDetailsView()
+	respView := originalResp.ConvertToV1ResponseDetailsView()
 
 	Expect(respView.Status).To(Equal(statusCode))
 	Expect(respView.Headers).To(Equal(headers))
@@ -29,7 +29,7 @@ func TestConvertToResponseDetailsView_WithPlainTextResponseDetails(t *testing.T)
 	Expect(respView.Body).To(Equal(body))
 }
 
-func TestConvertToResponseDetailsView_WithGzipContentEncodedHeader(t *testing.T) {
+func TestResponseDetails_ConvertToV1ResponseDetailsView_WithGzipContentEncodedHeader(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalBody := "hello_world"
@@ -40,7 +40,7 @@ func TestConvertToResponseDetailsView_WithGzipContentEncodedHeader(t *testing.T)
 
 	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers: headers}
 
-	respView := originalResp.ConvertToResponseDetailsView()
+	respView := originalResp.ConvertToV1ResponseDetailsView()
 
 	Expect(respView.Status).To(Equal(statusCode))
 	Expect(respView.Headers).To(Equal(headers))
@@ -54,7 +54,7 @@ func TestConvertToResponseDetailsView_WithGzipContentEncodedHeader(t *testing.T)
 	Expect(respView.Body).To(Equal(base64EncodedBody))
 }
 
-func TestConvertToResponseDetailsView_WithDeflateContentEncodedHeader(t *testing.T) {
+func TestResponseDetails_ConvertToV1ResponseDetailsView_WithDeflateContentEncodedHeader(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalBody := "this_should_be_encoded_but_its_not_important"
@@ -64,7 +64,7 @@ func TestConvertToResponseDetailsView_WithDeflateContentEncodedHeader(t *testing
 
 	originalResp := ResponseDetails{Status: statusCode, Body: originalBody, Headers: headers}
 
-	respView := originalResp.ConvertToResponseDetailsView()
+	respView := originalResp.ConvertToV1ResponseDetailsView()
 
 	Expect(respView.Status).To(Equal(statusCode))
 	Expect(respView.Headers).To(Equal(headers))
@@ -77,7 +77,7 @@ func TestConvertToResponseDetailsView_WithDeflateContentEncodedHeader(t *testing
 	Expect(respView.Body).To(Equal(base64EncodedBody))
 }
 
-func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
+func TestResponseDetails_ConvertToV1ResponseDetailsView_WithImageBody(t *testing.T) {
 	RegisterTestingT(t)
 
 	imageUri := "/testdata/1x1.png"
@@ -92,7 +92,7 @@ func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
 		Body:   string(originalImageBytes),
 	}
 
-	respView := originalResp.ConvertToResponseDetailsView()
+	respView := originalResp.ConvertToV1ResponseDetailsView()
 
 	base64EncodedBody := "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg=="
 	Expect(respView).To(Equal(v1.ResponseDetailsView{
@@ -101,7 +101,7 @@ func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
 		EncodedBody: true,
 	}))
 }
-func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextResponse(t *testing.T) {
+func TestRequestResponsePair_ConvertToV1RequestResponsePairView_WithPlainTextResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	respBody := "hello_world"
@@ -121,7 +121,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 			Headers:     map[string][]string{"test_header": []string{"true"}}},
 	}
 
-	pairView := requestResponsePair.ConvertToRequestResponsePairView()
+	pairView := requestResponsePair.ConvertToV1RequestResponsePairView()
 
 	Expect(*pairView).To(Equal(v1.RequestResponsePairView{
 		Response: v1.ResponseDetailsView{
@@ -141,7 +141,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 	}))
 }
 
-func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedResponse(t *testing.T) {
+func TestRequestResponsePair_ConvertToV1RequestResponsePairView_WithGzippedResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	requestResponsePair := RequestResponsePair{
@@ -160,7 +160,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 		},
 	}
 
-	pairView := requestResponsePair.ConvertToRequestResponsePairView()
+	pairView := requestResponsePair.ConvertToV1RequestResponsePairView()
 
 	Expect(*pairView).To(Equal(v1.RequestResponsePairView{
 		Response: v1.ResponseDetailsView{
@@ -181,7 +181,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 	}))
 }
 
-func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
+func TestRequestDetails_ConvertToV1RequestDetailsView(t *testing.T) {
 	RegisterTestingT(t)
 
 	requestDetails := RequestDetails{
@@ -192,7 +192,7 @@ func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
 		Query:       "", Body: "",
 		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}}
 
-	requestDetailsView := requestDetails.ConvertToRequestDetailsView()
+	requestDetailsView := requestDetails.ConvertToV1RequestDetailsView()
 
 	Expect(requestDetailsView.Path).To(Equal(StringToPointer(requestDetails.Path)))
 	Expect(requestDetailsView.Method).To(Equal(StringToPointer(requestDetails.Method)))

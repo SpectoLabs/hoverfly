@@ -67,12 +67,12 @@ func (this *RequestResponsePair) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (this *RequestResponsePair) ConvertToRequestResponsePairView() *v1.RequestResponsePairView {
-	return &v1.RequestResponsePairView{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
+func (this *RequestResponsePair) ConvertToV1RequestResponsePairView() *v1.RequestResponsePairView {
+	return &v1.RequestResponsePairView{Response: this.Response.ConvertToV1ResponseDetailsView(), Request: this.Request.ConvertToV1RequestDetailsView()}
 }
 
-func (this *RequestResponsePair) ConvertToV2RequestResponsePairView() v2.RequestResponsePairView {
-	return v2.RequestResponsePairView{Response: this.Response.ConvertToV2ResponseDetailsView(), Request: this.Request.ConvertToV2RequestDetailsView()}
+func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairView {
+	return v2.RequestResponsePairView{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
 }
 
 // NewPayloadFromBytes decodes supplied bytes into Payload structure
@@ -175,7 +175,7 @@ func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 	}
 }
 
-func (this *RequestDetails) ConvertToRequestDetailsView() v1.RequestDetailsView {
+func (this *RequestDetails) ConvertToV1RequestDetailsView() v1.RequestDetailsView {
 	s := "recording"
 	return v1.RequestDetailsView{
 		RequestType: &s,
@@ -189,7 +189,7 @@ func (this *RequestDetails) ConvertToRequestDetailsView() v1.RequestDetailsView 
 	}
 }
 
-func (this *RequestDetails) ConvertToV2RequestDetailsView() v2.RequestDetailsView {
+func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsView {
 	s := "recording"
 	return v2.RequestDetailsView{
 		RequestType: &s,
@@ -292,7 +292,7 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 // This function will create a JSON appriopriate version of ResponseDetails for the v1 API
 // If the response headers indicate that the content is encoded, or it has a non-matching
 // supported mimetype, we base64 encode it.
-func (r *ResponseDetails) ConvertToResponseDetailsView() v1.ResponseDetailsView {
+func (r *ResponseDetails) ConvertToV1ResponseDetailsView() v1.ResponseDetailsView {
 	needsEncoding := false
 
 	// Check headers for gzip
@@ -322,7 +322,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsView() v1.ResponseDetailsView 
 // This function will create a JSON appriopriate version of ResponseDetails for the v2 API
 // If the response headers indicate that the content is encoded, or it has a non-matching
 // supported mimetype, we base64 encode it.
-func (r *ResponseDetails) ConvertToV2ResponseDetailsView() v2.ResponseDetailsView {
+func (r *ResponseDetails) ConvertToResponseDetailsView() v2.ResponseDetailsView {
 	needsEncoding := false
 
 	// Check headers for gzip
