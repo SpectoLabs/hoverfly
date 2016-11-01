@@ -71,7 +71,7 @@ func (this *RequestResponsePair) ConvertToV1RequestResponsePairView() *v1.Reques
 	return &v1.RequestResponsePairView{Response: this.Response.ConvertToV1ResponseDetailsView(), Request: this.Request.ConvertToV1RequestDetailsView()}
 }
 
-func (this *RequestResponsePair) ConvertToV2RequestResponsePairView() v2.RequestResponsePairView {
+func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairView {
 	return v2.RequestResponsePairView{Response: this.Response.ConvertToV2ResponseDetailsView(), Request: this.Request.ConvertToV2RequestDetailsView()}
 }
 
