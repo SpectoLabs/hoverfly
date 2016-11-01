@@ -17,6 +17,7 @@ import (
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	"io/ioutil"
 	"net/http"
+	"github.com/SpectoLabs/hoverfly/core/interfaces"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -104,7 +105,12 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.ImportRequestResponsePairViews(requests.Data)
+	requestResponsePairViews := make([]interfaces.RequestResponsePair, len(requests.Data))
+	for i, v := range requests.Data {
+		requestResponsePairViews[i] = v
+	}
+
+	return hf.ImportRequestResponsePairViews(requestResponsePairViews)
 }
 
 // ImportFromURL - takes one string value and tries connect to a remote server, then parse response body into
@@ -129,7 +135,12 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.ImportRequestResponsePairViews(requests.Data)
+	requestResponsePairViews := make([]interfaces.RequestResponsePair, len(requests.Data))
+	for i, v := range requests.Data {
+		requestResponsePairViews[i] = v
+	}
+
+	return hf.ImportRequestResponsePairViews(requestResponsePairViews)
 }
 
 func isJSON(s string) bool {
@@ -139,23 +150,23 @@ func isJSON(s string) bool {
 }
 
 // ImportRequestResponsePairViews - a function to save given pairs into the database.
-func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v1.RequestResponsePairView) error {
+func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.RequestResponsePair) error {
 	if len(pairViews) > 0 {
 		success := 0
 		failed := 0
 		for _, pairView := range pairViews {
 
-			if pairView.Request.RequestType != nil && *pairView.Request.RequestType == *StringToPointer("template") {
-				responseDetails := models.NewResponseDetailsFromResponse(pairView.Response)
+			if pairView.GetRequest().GetRequestType() != nil && *pairView.GetRequest().GetRequestType() == *StringToPointer("template") {
+				responseDetails := models.NewResponseDetailsFromResponse(pairView.GetResponse())
 
 				requestTemplate := matching.RequestTemplate{
-					Path:        pairView.Request.Path,
-					Method:      pairView.Request.Method,
-					Destination: pairView.Request.Destination,
-					Scheme:      pairView.Request.Scheme,
-					Query:       pairView.Request.Query,
-					Body:        pairView.Request.Body,
-					Headers:     pairView.Request.Headers,
+					Path:        pairView.GetRequest().GetPath(),
+					Method:      pairView.GetRequest().GetMethod(),
+					Destination: pairView.GetRequest().GetDestination(),
+					Scheme:      pairView.GetRequest().GetScheme(),
+					Query:       pairView.GetRequest().GetQuery(),
+					Body:        pairView.GetRequest().GetBody(),
+					Headers:     pairView.GetRequest().GetHeaders(),
 				}
 
 				requestTemplateResponsePair := matching.RequestTemplateResponsePair{

@@ -9,6 +9,7 @@ import (
 	"github.com/go-zoo/bone"
 	"net/http"
 	"strconv"
+	"github.com/SpectoLabs/hoverfly/core/interfaces"
 )
 
 type AddHandler struct {
@@ -78,7 +79,7 @@ func (this *AddHandler) Post(w http.ResponseWriter, req *http.Request, next http
 
 	p := RequestResponsePairView{Request: preq, Response: presp}
 
-	var pairViews []RequestResponsePairView
+	pairViews := make([]interfaces.RequestResponsePair, 0)
 
 	pairViews = append(pairViews, p)
 
