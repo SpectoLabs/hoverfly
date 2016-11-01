@@ -43,7 +43,7 @@ Puts the new destination and overwrites current destination for the running inst
 
 
 ## GET /api/v2/hoverfly/middleware
-Gets the current middleware for the running instance of Hoverfly.
+Gets the current middleware value for the running instance of Hoverfly. This is likely to be an executable command and path to middleware script being used.
 ```
 {
 	"middleware": "python ~/middleware.py"
@@ -51,10 +51,11 @@ Gets the current middleware for the running instance of Hoverfly.
 ```
 
 ## PUT /api/v2/hoverfly/middleware
-Puts the new middleware and overwrites current middleware for the running instance of Hoverfly. This requires a JSON body on the request.
+Puts the new middleware value and overwrites current middleware value for the running instance of Hoverfly. This requires a JSON body on the request. The value you send should be a command that runs on the machine Hoverfly is running. You may need to specify the command to run the script as well as the path to the script.
 {
 	"middleware": "python ~/new-middleware.py"
 }
+
 ## GET /api/v2/hoverfly/mode
 Gets the current mode for the running instance of Hoverfly.
 ```
