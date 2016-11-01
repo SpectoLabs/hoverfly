@@ -167,7 +167,7 @@ func (hf Hoverfly) GetRecords() ([]v1.RequestResponsePairView, error) {
 	}
 
 	for _, v := range hf.RequestMatcher.TemplateStore {
-		pairView := v.ConvertToRequestResponsePairView()
+		pairView := v.ConvertToV1RequestResponsePairView()
 		pairViews = append(pairViews, pairView)
 	}
 
