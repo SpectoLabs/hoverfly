@@ -67,7 +67,7 @@ func (this *RequestResponsePair) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (this *RequestResponsePair) ConvertToRequestResponsePairView() *v1.RequestResponsePairView {
+func (this *RequestResponsePair) ConvertToV1RequestResponsePairView() *v1.RequestResponsePairView {
 	return &v1.RequestResponsePairView{Response: this.Response.ConvertToV1ResponseDetailsView(), Request: this.Request.ConvertToV1RequestDetailsView()}
 }
 

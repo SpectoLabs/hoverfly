@@ -121,7 +121,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 			Headers:     map[string][]string{"test_header": []string{"true"}}},
 	}
 
-	pairView := requestResponsePair.ConvertToRequestResponsePairView()
+	pairView := requestResponsePair.ConvertToV1RequestResponsePairView()
 
 	Expect(*pairView).To(Equal(v1.RequestResponsePairView{
 		Response: v1.ResponseDetailsView{
@@ -160,7 +160,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 		},
 	}
 
-	pairView := requestResponsePair.ConvertToRequestResponsePairView()
+	pairView := requestResponsePair.ConvertToV1RequestResponsePairView()
 
 	Expect(*pairView).To(Equal(v1.RequestResponsePairView{
 		Response: v1.ResponseDetailsView{
