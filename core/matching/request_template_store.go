@@ -146,7 +146,8 @@ func (this *RequestTemplateResponsePair) ConvertToRequestTemplateResponsePairVie
 	}
 }
 
-func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v1.RequestResponsePairView {
+// DEPRICATED - Once we remove the v1 API, this will also go
+func (this *RequestTemplateResponsePair) ConvertToV1RequestResponsePairView() v1.RequestResponsePairView {
 
 	return v1.RequestResponsePairView{
 		Request: v1.RequestDetailsView{
