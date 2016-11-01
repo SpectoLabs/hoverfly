@@ -72,7 +72,7 @@ func (this *RequestResponsePair) ConvertToV1RequestResponsePairView() *v1.Reques
 }
 
 func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairView {
-	return v2.RequestResponsePairView{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToV2RequestDetailsView()}
+	return v2.RequestResponsePairView{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
 }
 
 // NewPayloadFromBytes decodes supplied bytes into Payload structure
@@ -189,7 +189,7 @@ func (this *RequestDetails) ConvertToV1RequestDetailsView() v1.RequestDetailsVie
 	}
 }
 
-func (this *RequestDetails) ConvertToV2RequestDetailsView() v2.RequestDetailsView {
+func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsView {
 	s := "recording"
 	return v2.RequestDetailsView{
 		RequestType: &s,
