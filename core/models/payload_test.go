@@ -20,7 +20,7 @@ func TestConvertToResponseDetailsView_WithPlainTextResponseDetails(t *testing.T)
 
 	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers: headers}
 
-	respView := originalResp.ConvertToResponseDetailsView()
+	respView := originalResp.ConvertToV1ResponseDetailsView()
 
 	Expect(respView.Status).To(Equal(statusCode))
 	Expect(respView.Headers).To(Equal(headers))
@@ -40,7 +40,7 @@ func TestConvertToResponseDetailsView_WithGzipContentEncodedHeader(t *testing.T)
 
 	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers: headers}
 
-	respView := originalResp.ConvertToResponseDetailsView()
+	respView := originalResp.ConvertToV1ResponseDetailsView()
 
 	Expect(respView.Status).To(Equal(statusCode))
 	Expect(respView.Headers).To(Equal(headers))
@@ -64,7 +64,7 @@ func TestConvertToResponseDetailsView_WithDeflateContentEncodedHeader(t *testing
 
 	originalResp := ResponseDetails{Status: statusCode, Body: originalBody, Headers: headers}
 
-	respView := originalResp.ConvertToResponseDetailsView()
+	respView := originalResp.ConvertToV1ResponseDetailsView()
 
 	Expect(respView.Status).To(Equal(statusCode))
 	Expect(respView.Headers).To(Equal(headers))
@@ -92,7 +92,7 @@ func TestConvertToResponseDetailsView_WithImageBody(t *testing.T) {
 		Body:   string(originalImageBytes),
 	}
 
-	respView := originalResp.ConvertToResponseDetailsView()
+	respView := originalResp.ConvertToV1ResponseDetailsView()
 
 	base64EncodedBody := "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg=="
 	Expect(respView).To(Equal(v1.ResponseDetailsView{
@@ -192,7 +192,7 @@ func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
 		Query:       "", Body: "",
 		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}}
 
-	requestDetailsView := requestDetails.ConvertToRequestDetailsView()
+	requestDetailsView := requestDetails.ConvertToV1RequestDetailsView()
 
 	Expect(requestDetailsView.Path).To(Equal(StringToPointer(requestDetails.Path)))
 	Expect(requestDetailsView.Method).To(Equal(StringToPointer(requestDetails.Method)))

@@ -142,7 +142,7 @@ func (this *RequestTemplateResponsePair) ConvertToRequestTemplateResponsePairVie
 			Body:        this.RequestTemplate.Body,
 			Headers:     this.RequestTemplate.Headers,
 		},
-		Response: this.Response.ConvertToResponseDetailsView(),
+		Response: this.Response.ConvertToV1ResponseDetailsView(),
 	}
 }
 
@@ -160,7 +160,7 @@ func (this *RequestTemplateResponsePair) ConvertToV1RequestResponsePairView() v1
 			Body:        this.RequestTemplate.Body,
 			Headers:     this.RequestTemplate.Headers,
 		},
-		Response: this.Response.ConvertToResponseDetailsView(),
+		Response: this.Response.ConvertToV1ResponseDetailsView(),
 	}
 }
 
