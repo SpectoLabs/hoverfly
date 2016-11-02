@@ -32,6 +32,17 @@ var (
 			Body: "template-body",
 		},
 	}
+
+	delayOne = v1.ResponseDelayView{
+		UrlPattern: ".",
+		HttpMethod: "GET",
+		Delay: 200,
+	}
+
+	delayTwo = v1.ResponseDelayView{
+		UrlPattern: "test.com",
+		Delay: 201,
+	}
 )
 
 func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.T) {
@@ -305,4 +316,37 @@ func TestHoverfly_PutSimulation_ImportsRecordingsAndTemplates(t *testing.T) {
 	Expect(importedSimulation.RequestResponsePairs[1].Request.Path).To(Equal(util.StringToPointer("/template")))
 
 	Expect(importedSimulation.RequestResponsePairs[1].Response.Body).To(Equal("template-body"))
+}
+
+func TestHoverfly_PutSimulation_ImportsDelays(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	simulationToImport := v2.SimulationView{
+		DataView: v2.DataView{
+			RequestResponsePairs: []v2.RequestResponsePairView{},
+			GlobalActions: v2.GlobalActionsView{
+				Delays: []v1.ResponseDelayView{delayOne, delayTwo},
+			},
+		},
+		MetaView: v2.MetaView{},
+	}
+
+	err := unit.PutSimulation(simulationToImport)
+	Expect(err).To(BeNil())
+
+	delays := unit.ResponseDelays.ConvertToResponseDelayPayloadView()
+	Expect(delays).ToNot(BeNil())
+
+	Expect(delays.Data).To(HaveLen(2))
+
+	Expect(delays.Data[0].UrlPattern).To(Equal("."))
+	Expect(delays.Data[0].HttpMethod).To(Equal("GET"))
+	Expect(delays.Data[0].Delay).To(Equal(200))
+
+	Expect(delays.Data[1].UrlPattern).To(Equal("test.com"))
+	Expect(delays.Data[1].HttpMethod).To(Equal(""))
+	Expect(delays.Data[1].Delay).To(Equal(201))
 }
