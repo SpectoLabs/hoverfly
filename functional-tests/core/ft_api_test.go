@@ -13,14 +13,15 @@ import (
 var _ = Describe("Interacting with the API", func() {
 
 	var (
-		jsonRequestResponsePair1 *bytes.Buffer
-		jsonRequestResponsePair2 *bytes.Buffer
+		jsonRequestResponsePair1        *bytes.Buffer
+		jsonRequestResponsePair2        *bytes.Buffer
+		jsonRequestResponsePairTemplate *bytes.Buffer
 	)
 
 	BeforeEach(func() {
 		jsonRequestResponsePair1 = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "method1", "destination": "destination1", "scheme": "scheme1", "query": "query1", "body": "body1", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
 		jsonRequestResponsePair2 = bytes.NewBufferString(`{"data":[{"request": {"path": "/path2", "method": "method2", "destination": "destination2", "scheme": "scheme2", "query": "query2", "body": "body2", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "encodedBody": false, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
-
+		jsonRequestResponsePairTemplate = bytes.NewBufferString(`{"data":[{"request": {"requestType": "template", "path": "/template"}, "response": {"status": 202, "encodedBody": false, "body": "template-body", "headers": {"Header": ["value2"]}}}]}`)
 		hoverflyCmd = startHoverfly(adminPort, proxyPort)
 	})
 
@@ -33,6 +34,7 @@ var _ = Describe("Interacting with the API", func() {
 		BeforeEach(func() {
 			ImportHoverflyRecords(jsonRequestResponsePair1)
 			ImportHoverflyRecords(jsonRequestResponsePair2)
+			ImportHoverflyRecords(jsonRequestResponsePairTemplate)
 			SetHoverflyResponseDelays("testdata/delays.json")
 		})
 
@@ -64,7 +66,7 @@ var _ = Describe("Interacting with the API", func() {
 			pairsArray, err := dataObject.GetObjectArray("pairs")
 			Expect(err).To(BeNil())
 
-			Expect(pairsArray).To(HaveLen(2))
+			Expect(pairsArray).To(HaveLen(3))
 
 			requestObject, err := pairsArray[0].GetObject("request")
 			Expect(err).To(BeNil())
@@ -79,6 +81,13 @@ var _ = Describe("Interacting with the API", func() {
 			responseObject, err = pairsArray[1].GetObject("response")
 			Expect(err).To(BeNil())
 			Expect(responseObject.String()).To(Equal(`{"body":"body2","encodedBody":false,"headers":{"Header":["value2"]},"status":202}`))
+
+			requestObject, err = pairsArray[2].GetObject("request")
+			Expect(err).To(BeNil())
+			Expect(requestObject.String()).To(Equal(`{"body":null,"destination":null,"headers":null,"method":null,"path":"/template","query":null,"requestType":"template","scheme":null}`))
+			responseObject, err = pairsArray[2].GetObject("response")
+			Expect(err).To(BeNil())
+			Expect(responseObject.String()).To(Equal(`{"body":"template-body","encodedBody":false,"headers":{"Header":["value2"]},"status":202}`))
 
 			globalActionsObject, err := dataObject.GetObject("globalActions")
 			Expect(err).To(BeNil())
