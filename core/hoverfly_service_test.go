@@ -5,6 +5,7 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
@@ -70,10 +71,46 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairRecording(t *te
 	Expect(*simulation.DataView.RequestResponsePairs[0].Request.RequestType).To(Equal("recording"))
 	Expect(*simulation.DataView.RequestResponsePairs[0].Request.Destination).To(Equal("testhost.com"))
 	Expect(*simulation.DataView.RequestResponsePairs[0].Request.Path).To(Equal("/test"))
-	Expect(*simulation.DataView.RequestResponsePairs[0].Request.RequestType).To(Equal("recording"))
 
 	Expect(simulation.DataView.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(simulation.DataView.RequestResponsePairs[0].Response.Body).To(Equal("test"))
+
+	Expect(nil).To(BeNil())
+}
+
+func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairTemplate(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	unit.RequestMatcher.TemplateStore = append(unit.RequestMatcher.TemplateStore, matching.RequestTemplateResponsePair{
+		RequestTemplate: matching.RequestTemplate{
+			Destination: util.StringToPointer("test.com"),
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "test-template",
+		},
+	})
+
+	simulation, err := unit.GetSimulation()
+	Expect(err).To(BeNil())
+
+	Expect(simulation.DataView.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(*simulation.DataView.RequestResponsePairs[0].Request.RequestType).To(Equal("template"))
+	Expect(*simulation.DataView.RequestResponsePairs[0].Request.Destination).To(Equal("test.com"))
+	Expect(simulation.DataView.RequestResponsePairs[0].Request.Path).To(BeNil())
+	Expect(simulation.DataView.RequestResponsePairs[0].Request.Method).To(BeNil())
+	Expect(simulation.DataView.RequestResponsePairs[0].Request.Query).To(BeNil())
+	Expect(simulation.DataView.RequestResponsePairs[0].Request.Scheme).To(BeNil())
+	Expect(simulation.DataView.RequestResponsePairs[0].Request.Headers).To(HaveLen(0))
+
+	Expect(simulation.DataView.RequestResponsePairs[0].Response.Status).To(Equal(200))
+	Expect(simulation.DataView.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
+	Expect(simulation.DataView.RequestResponsePairs[0].Response.Body).To(Equal("test-template"))
+	Expect(simulation.DataView.RequestResponsePairs[0].Response.Headers).To(HaveLen(0))
 
 	Expect(nil).To(BeNil())
 }

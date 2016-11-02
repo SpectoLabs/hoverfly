@@ -193,6 +193,10 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
 		}
 	}
 
+	for _, v := range hf.RequestMatcher.TemplateStore {
+		pairViews = append(pairViews, v.ConvertToRequestResponsePairView())
+	}
+
 	responseDelays := hf.ResponseDelays.ConvertToResponseDelayPayloadView()
 
 	return v2.SimulationView{
