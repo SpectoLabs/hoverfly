@@ -12,12 +12,12 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	"io/ioutil"
 	"net/http"
-	"github.com/SpectoLabs/hoverfly/core/interfaces"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -239,5 +239,5 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.Reques
 		}).Info("payloads imported")
 		return nil
 	}
-	return fmt.Errorf("Bad request. Nothing to import!")
+	return nil
 }
