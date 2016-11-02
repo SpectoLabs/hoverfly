@@ -9,6 +9,7 @@ import (
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/ryanuber/go-glob"
 	"strings"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 type RequestTemplateStore []RequestTemplateResponsePair
@@ -161,6 +162,23 @@ func (this *RequestTemplateResponsePair) ConvertToV1RequestResponsePairView() v1
 			Headers:     this.RequestTemplate.Headers,
 		},
 		Response: this.Response.ConvertToV1ResponseDetailsView(),
+	}
+}
+
+func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairView {
+
+	return v2.RequestResponsePairView{
+		Request: v2.RequestDetailsView{
+			RequestType: StringToPointer("template"),
+			Path:        this.RequestTemplate.Path,
+			Method:      this.RequestTemplate.Method,
+			Destination: this.RequestTemplate.Destination,
+			Scheme:      this.RequestTemplate.Scheme,
+			Query:       this.RequestTemplate.Query,
+			Body:        this.RequestTemplate.Body,
+			Headers:     this.RequestTemplate.Headers,
+		},
+		Response: this.Response.ConvertToResponseDetailsView(),
 	}
 }
 
