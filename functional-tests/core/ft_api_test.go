@@ -99,6 +99,9 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(delaysArray[0].String()).To(Equal(`{"delay":100,"httpMethod":"","urlPattern":"virtual\\.com"}`))
 			Expect(delaysArray[1].String()).To(Equal(`{"delay":110,"httpMethod":"","urlPattern":"virtual\\.com"}`))
 		})
+	})
+
+	Context("DELETE /api/v2/simulation", func() {
 
 		It("Should delete all the Hoverfly data", func() {
 			req := sling.New().Delete(hoverflyAdminUrl + "/api/v2/simulation")
