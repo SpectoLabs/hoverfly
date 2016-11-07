@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"os"
 )
 
 var (
 	hoverctlVersion string
 	hostFlag        = kingpin.Flag("host", "Set the host of Hoverfly").String()
 	adminPortFlag   = kingpin.Flag("admin-port", "Set the admin port of Hoverfly").String()
-	proxyPortFlag   = kingpin.Flag("proxy-port", "Set the admin port of Hoverfly").String()
+	proxyPortFlag   = kingpin.Flag("proxy-port", "Set the proxy port of Hoverfly").String()
 	verboseFlag     = kingpin.Flag("verbose", "Verbose mode.").Short('v').Bool()
 
 	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
