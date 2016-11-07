@@ -2,12 +2,13 @@ package hoverfly_test
 
 import (
 	"bytes"
+	"io/ioutil"
+	"strings"
+
 	"github.com/antonholmquist/jason"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
-	"strings"
 )
 
 var _ = Describe("Interacting with the API", func() {
@@ -140,6 +141,79 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(err).To(BeNil())
 
 			Expect(delaysArray).To(HaveLen(0))
+		})
+	})
+
+	Context("PUT /api/v2/simulation", func() {
+		It("Should import data using a PUT and should be able to get the same data back using a GET", func() {
+			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/simulation")
+			payload := bytes.NewBufferString(`
+			{
+				"data": {
+					"pairs": [{
+						"request": {
+							"requestType": "template",
+							"destination": "templatedurl.com"
+						},
+						"response": {
+							"status": 200,
+							"body": "This is the body for the template",
+							"encodedBody": false,
+							"headers": {}
+						}
+					}]
+				},
+				"meta": {}
+			}
+			`)
+
+			req.Body(payload)
+			res := DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+
+			getReq := sling.New().Get(hoverflyAdminUrl + "/api/v2/simulation")
+
+			getRes := DoRequest(getReq)
+			Expect(getRes.StatusCode).To(Equal(200))
+
+			defer getRes.Body.Close()
+
+			schemaObject, err := jason.NewObjectFromReader(getRes.Body)
+			Expect(err).To(BeNil())
+
+			dataObject, err := schemaObject.GetObject("data")
+			Expect(err).To(BeNil())
+
+			pairsArray, err := dataObject.GetObjectArray("pairs")
+			Expect(err).To(BeNil())
+
+			Expect(pairsArray).To(HaveLen(1))
+
+			requestObject, err := pairsArray[0].GetObject("request")
+			Expect(err).To(BeNil())
+
+			requestType, err := requestObject.GetString("requestType")
+			Expect(err).To(BeNil())
+			Expect(requestType).To(Equal("template"))
+
+			destination, err := requestObject.GetString("destination")
+			Expect(err).To(BeNil())
+			Expect(destination).To(Equal("templatedurl.com"))
+
+			responseObject, err := pairsArray[0].GetObject("response")
+			Expect(err).To(BeNil())
+
+			status, err := responseObject.GetNumber("status")
+			Expect(err).To(BeNil())
+			Expect(status.String()).To(Equal("200"))
+
+			body, err := responseObject.GetString("body")
+			Expect(err).To(BeNil())
+			Expect(body).To(Equal("This is the body for the template"))
+
+			encodedBody, err := responseObject.GetBoolean("encodedBody")
+			Expect(err).To(BeNil())
+			Expect(encodedBody).To(BeFalse())
 		})
 	})
 
