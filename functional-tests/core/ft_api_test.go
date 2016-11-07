@@ -215,6 +215,62 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(err).To(BeNil())
 			Expect(encodedBody).To(BeFalse())
 		})
+
+		It("should delete previous data when putting new data in", func() {
+			originalReq := sling.New().Put(hoverflyAdminUrl + "/api/v2/simulation")
+			originalPayload := bytes.NewBufferString(`
+			{
+				"data": {
+					"pairs": [{
+						"request": {
+							"requestType": "template",
+							"destination": "templatedurl.com"
+						},
+						"response": {
+							"status": 200,
+							"body": "This is the body for the template",
+							"encodedBody": false,
+							"headers": {}
+						}
+					}]
+				},
+				"meta": {}
+			}
+			`)
+
+			originalReq.Body(originalPayload)
+			DoRequest(originalReq)
+
+			request := sling.New().Put(hoverflyAdminUrl + "/api/v2/simulation")
+			payload := bytes.NewBufferString(`
+			{
+				"data": {
+					"pairs": []
+				},
+				"meta": {}
+			}
+			`)
+
+			request.Body(payload)
+			DoRequest(request)
+			getReq := sling.New().Get(hoverflyAdminUrl + "/api/v2/simulation")
+
+			getRes := DoRequest(getReq)
+			Expect(getRes.StatusCode).To(Equal(200))
+
+			defer getRes.Body.Close()
+
+			schemaObject, err := jason.NewObjectFromReader(getRes.Body)
+			Expect(err).To(BeNil())
+
+			dataObject, err := schemaObject.GetObject("data")
+			Expect(err).To(BeNil())
+
+			pairsArray, err := dataObject.GetObjectArray("pairs")
+			Expect(err).To(BeNil())
+
+			Expect(pairsArray).To(HaveLen(0))
+		})
 	})
 
 	Context("GET /api/v2/hoverfly/destination", func() {

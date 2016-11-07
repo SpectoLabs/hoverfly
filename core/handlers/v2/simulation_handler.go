@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"io/ioutil"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
-	"io/ioutil"
 )
 
 type HoverflySimulation interface {
 	GetSimulation() (SimulationView, error)
-	PutSimulation(SimulationView) (error)
+	PutSimulation(SimulationView) error
 	DeleteSimulation() error
 }
 
@@ -57,6 +58,8 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	this.Delete(w, req, next)
 
 	err = this.Hoverfly.PutSimulation(simulationView)
 	if err != nil {
