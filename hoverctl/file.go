@@ -1,11 +1,26 @@
 package main
 
-import "io/ioutil"
+import (
+	"io/ioutil"
+	"os"
+	"path"
 
-func WriteFile(fileName string, data []byte) error {
-	return ioutil.WriteFile(fileName, data, 0644)
+	log "github.com/Sirupsen/logrus"
+)
+
+func WriteFile(filePath string, data []byte) error {
+	basePath := path.Dir(filePath)
+	fileName := path.Base(filePath)
+	log.Debug(basePath)
+
+	err := os.MkdirAll(basePath, 0777)
+	if err != nil {
+		return err
+	}
+	log.Debug("Should be writing?")
+	return ioutil.WriteFile(basePath+"/"+fileName, data, 0644)
 }
 
-func ReadFile(fileName string) ([]byte, error) {
-	return ioutil.ReadFile(fileName)
+func ReadFile(filePath string) ([]byte, error) {
+	return ioutil.ReadFile(filePath)
 }
