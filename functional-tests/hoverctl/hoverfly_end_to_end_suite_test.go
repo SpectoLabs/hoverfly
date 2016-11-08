@@ -1,6 +1,8 @@
 package hoverctl_end_to_end
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -229,5 +231,11 @@ func WriteConfigurationWithAuth(host, adminPort, proxyPort, username, password s
 }
 
 func generateFileName() string {
-	return "testdata-gen/random.json"
+
+	rb := make([]byte, 10)
+	rand.Read(rb)
+
+	rs := base64.URLEncoding.EncodeToString(rb)
+
+	return "testdata-gen/" + rs + ".json"
 }
