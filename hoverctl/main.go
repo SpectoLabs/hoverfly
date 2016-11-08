@@ -65,13 +65,6 @@ func main() {
 	hoverflyDirectory, err := NewHoverflyDirectory(config)
 	handleIfError(err)
 
-	cacheDirectory, err := createCacheDirectory(hoverflyDirectory)
-	handleIfError(err)
-
-	localCache := LocalCache{
-		URI: cacheDirectory,
-	}
-
 	hoverfly := NewHoverfly(config)
 
 	switch kingpin.Parse() {
@@ -131,16 +124,13 @@ func main() {
 		log.Info("Successfully exported to ", *exportNameArg)
 
 	case importCommand.FullCommand():
-		simulation, err := NewSimulation(*importNameArg)
-		handleIfError(err)
-
-		simulationData, err := localCache.ReadSimulation(simulation)
+		simulationData, err := ReadFile(*importNameArg)
 		handleIfError(err)
 
 		err = hoverfly.ImportSimulation(string(simulationData))
 		handleIfError(err)
 
-		log.Info(simulation.String(), " imported successfully")
+		log.Info("Successfully imported from ", *importNameArg)
 
 	case deleteCommand.FullCommand():
 		switch *deleteArg {
