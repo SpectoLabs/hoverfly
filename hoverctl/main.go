@@ -122,16 +122,13 @@ func main() {
 		log.Info("Hoverfly has been stopped")
 
 	case exportCommand.FullCommand():
-		simulation, err := NewSimulation(*exportNameArg)
-		handleIfError(err)
-
 		simulationData, err := hoverfly.ExportSimulation()
 		handleIfError(err)
 
-		err = localCache.WriteSimulation(simulation, simulationData)
+		err = WriteFile(*exportNameArg, simulationData)
 		handleIfError(err)
 
-		log.Info(simulation.String(), " exported successfully")
+		log.Info("Successfully exported to ", *exportNameArg)
 
 	case importCommand.FullCommand():
 		simulation, err := NewSimulation(*importNameArg)

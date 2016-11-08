@@ -1,15 +1,16 @@
 package hoverctl_end_to_end
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/phayes/freeport"
 )
 
 var _ = Describe("When I use hoverctl with a running an authenticated hoverfly", func() {
@@ -101,12 +102,13 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("benjih/test:latest imported successfully"))
 
-				setOutput, _ = exec.Command(hoverctlBinary, "export", "benjih/test-copy:latest").Output()
+				filePath := generateFileName()
+				setOutput, _ = exec.Command(hoverctlBinary, "export", filePath).Output()
 
 				output = strings.TrimSpace(string(setOutput))
-				Expect(output).To(ContainSubstring("benjih/test-copy:latest exported successfully"))
+				Expect(output).To(ContainSubstring("Successfully exported to " + filePath))
 
-				exportFile, err := ioutil.ReadFile(workingDirectory + "/.hoverfly/cache/benjih.test-copy.latest.json")
+				exportFile, err := ioutil.ReadFile(filePath)
 				if err != nil {
 					Fail("Failed reading test data")
 				}

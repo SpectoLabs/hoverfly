@@ -3,10 +3,6 @@ package hoverctl_end_to_end
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dghubble/sling"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -16,6 +12,11 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/dghubble/sling"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -46,6 +47,10 @@ var _ = BeforeSuite(func() {
 	binDirectory := filepath.Join(workingDirectory, "bin")
 
 	os.Setenv("PATH", fmt.Sprintf("%v:%v", binDirectory, os.Getenv("PATH")))
+})
+
+var _ = AfterSuite(func() {
+	os.RemoveAll("testdata-gen")
 })
 
 func SetHoverflyMode(mode string, port int) {
@@ -221,4 +226,8 @@ func WriteConfigurationWithAuth(host, adminPort, proxyPort, username, password s
 
 	ioutil.WriteFile(filepath, data, 0644)
 
+}
+
+func generateFileName() string {
+	return "testdata-gen/random.json"
 }

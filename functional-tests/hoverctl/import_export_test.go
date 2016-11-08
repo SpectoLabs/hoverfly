@@ -2,15 +2,16 @@ package hoverctl_end_to_end
 
 import (
 	"fmt"
-	"github.com/dghubble/sling"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/dghubble/sling"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/phayes/freeport"
 )
 
 var _ = Describe("When I use hoverctl", func() {
@@ -76,11 +77,12 @@ var _ = Describe("When I use hoverctl", func() {
 
 			It("can export", func() {
 
+				fileName := generateFileName()
 				// Export the data
-				output, _ := exec.Command(hoverctlBinary, "export", "testuser1/simulation1", "--admin-port="+adminPortAsString).Output()
+				output, _ := exec.Command(hoverctlBinary, "export", fileName, "--admin-port="+adminPortAsString).Output()
 
-				Expect(output).To(ContainSubstring("testuser1/simulation1:latest exported successfully"))
-				Expect(ioutil.ReadFile(hoverctlCacheDir + "/testuser1.simulation1.latest.json")).To(MatchJSON(hoverflyData))
+				Expect(output).To(ContainSubstring("Successfully exported to " + fileName))
+				Expect(ioutil.ReadFile(fileName)).To(MatchJSON(hoverflyData))
 
 			})
 
