@@ -33,10 +33,6 @@ var (
 	importCommand = kingpin.Command("import", "Imports data into Hoverfly")
 	importNameArg = importCommand.Arg("name", "Name of imported simulation").Required().String()
 
-	pullCommand          = kingpin.Command("pull", "Pushes the data to SpectoLab")
-	pullNameArg          = pullCommand.Arg("name", "Name of imported simulation").Required().String()
-	pullOverrideHostFlag = pullCommand.Flag("override-host", "Name of the host you want to virtualise").String()
-
 	deleteCommand = kingpin.Command("delete", "Delete test data from Hoverfly")
 	deleteArg     = deleteCommand.Arg("resource", "A collection of data that can be deleted").String()
 
@@ -77,11 +73,6 @@ func main() {
 	}
 
 	hoverfly := NewHoverfly(config)
-
-	spectoLab := SpectoLab{
-		Host:   "https://lab.specto.io",
-		APIKey: config.SpectoLabAPIKey,
-	}
 
 	switch kingpin.Parse() {
 	case modeCommand.FullCommand():
@@ -153,21 +144,6 @@ func main() {
 		handleIfError(err)
 
 		log.Info(simulation.String(), " imported successfully")
-
-	case pullCommand.FullCommand():
-		err := spectoLab.CheckAPIKey()
-		handleIfError(err)
-
-		simulation, err := NewSimulation(*pullNameArg)
-		handleIfError(err)
-
-		simulationData, err := spectoLab.GetSimulation(simulation, *pullOverrideHostFlag)
-		handleIfError(err)
-
-		err = localCache.WriteSimulation(simulation, simulationData)
-		handleIfError(err)
-
-		log.Info(simulation.String(), " has been pulled from the SpectoLab")
 
 	case deleteCommand.FullCommand():
 		switch *deleteArg {

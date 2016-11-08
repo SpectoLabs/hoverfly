@@ -1,11 +1,12 @@
 package main
 
 import (
+	"io/ioutil"
+	"path/filepath"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"path/filepath"
 )
 
 type Config struct {
@@ -14,7 +15,6 @@ type Config struct {
 	HoverflyProxyPort string `yaml:"hoverfly.proxy.port"`
 	HoverflyUsername  string `yaml:"hoverfly.username"`
 	HoverflyPassword  string `yaml:"hoverfly.password"`
-	SpectoLabAPIKey   string `yaml:"specto.lab.api.key"`
 }
 
 func GetConfig(hoverflyHostOverride, hoverflyAdminPortOverride, hoverflyProxyPortOverride, hoverflyUsername, hoverflyPassword string) Config {
@@ -29,7 +29,6 @@ func GetConfig(hoverflyHostOverride, hoverflyAdminPortOverride, hoverflyProxyPor
 		HoverflyProxyPort: viper.GetString("hoverfly.proxy.port"),
 		HoverflyUsername:  viper.GetString("hoverfly.username"),
 		HoverflyPassword:  viper.GetString("hoverfly.password"),
-		SpectoLabAPIKey:   viper.GetString("specto.lab.api.key"),
 	}
 
 	if len(hoverflyHostOverride) > 0 {
@@ -90,5 +89,4 @@ func SetConfigurationDefaults() {
 	viper.SetDefault("hoverfly.proxy.port", "8500")
 	viper.SetDefault("hoverfly.username", "")
 	viper.SetDefault("hoverfly.password", "")
-	viper.SetDefault("specto.lab.api.key", "")
 }
