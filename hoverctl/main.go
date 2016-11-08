@@ -33,9 +33,6 @@ var (
 	importCommand = kingpin.Command("import", "Imports data into Hoverfly")
 	importNameArg = importCommand.Arg("name", "Name of imported simulation").Required().String()
 
-	pushCommand = kingpin.Command("push", "Pushes the data to SpectoLab")
-	pushNameArg = pushCommand.Arg("name", "Name of exported simulation").Required().String()
-
 	pullCommand          = kingpin.Command("pull", "Pushes the data to SpectoLab")
 	pullNameArg          = pullCommand.Arg("name", "Name of imported simulation").Required().String()
 	pullOverrideHostFlag = pullCommand.Flag("override-host", "Name of the host you want to virtualise").String()
@@ -156,23 +153,6 @@ func main() {
 		handleIfError(err)
 
 		log.Info(simulation.String(), " imported successfully")
-
-	case pushCommand.FullCommand():
-		err := spectoLab.CheckAPIKey()
-		handleIfError(err)
-
-		simulation, err := NewSimulation(*pushNameArg)
-		handleIfError(err)
-
-		simulationData, err := localCache.ReadSimulation(simulation)
-		handleIfError(err)
-
-		statusCode, err := spectoLab.UploadSimulation(simulation, simulationData)
-		handleIfError(err)
-
-		if statusCode {
-			log.Info(simulation.String(), " has been pushed to the SpectoLab")
-		}
 
 	case pullCommand.FullCommand():
 		err := spectoLab.CheckAPIKey()
