@@ -125,37 +125,6 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 
 	Describe("and the credentials are not the hoverctl config", func() {
 
-		filePath := generateFileName()
-		ioutil.WriteFile(filePath,
-			[]byte(`
-					{
-						"data": [{
-							"request": {
-								"path": "/api/bookings",
-								"method": "POST",
-								"destination": "www.my-test.com",
-								"scheme": "http",
-								"query": "",
-								"body": "{\"flightId\": \"1\"}",
-								"headers": {
-									"Content-Type": [
-										"application/json"
-									]
-								}
-							},
-							"response": {
-								"status": 201,
-								"body": "",
-								"encodedBody": false,
-								"headers": {
-									"Location": [
-										"http://localhost/api/bookings/1"
-									]
-								}
-							}
-						}]
-					}`), 0644)
-
 		BeforeEach(func() {
 			hoverflyCmd = startHoverflyWithAuth(adminPort, proxyPort, workingDirectory, username, password)
 			WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
@@ -186,6 +155,41 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 		})
 
 		Context("you cannot manage simulations", func() {
+
+			var filePath string
+
+			BeforeEach(func() {
+				filePath = generateFileName()
+				ioutil.WriteFile(filePath,
+					[]byte(`
+					{
+						"data": [{
+							"request": {
+								"path": "/api/bookings",
+								"method": "POST",
+								"destination": "www.my-test.com",
+								"scheme": "http",
+								"query": "",
+								"body": "{\"flightId\": \"1\"}",
+								"headers": {
+									"Content-Type": [
+										"application/json"
+									]
+								}
+							},
+							"response": {
+								"status": 201,
+								"body": "",
+								"encodedBody": false,
+								"headers": {
+									"Location": [
+										"http://localhost/api/bookings/1"
+									]
+								}
+							}
+						}]
+					}`), 0644)
+			})
 
 			It("by importing data", func() {
 				setOutput, _ := exec.Command(hoverctlBinary, "import", filePath).Output()
