@@ -3,16 +3,17 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/util"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/util"
+	. "github.com/onsi/gomega"
 )
 
 type HoverflySimulationStub struct {
-	Deleted bool
+	Deleted    bool
 	Simulation SimulationView
 }
 
@@ -52,7 +53,7 @@ func (this *HoverflySimulationStub) DeleteSimulation() error {
 	return nil
 }
 
-func (this *HoverflySimulationStub) PutSimulation(simulation SimulationView) (error) {
+func (this *HoverflySimulationStub) PutSimulation(simulation SimulationView) error {
 	this.Simulation = simulation
 	return nil
 }
@@ -185,6 +186,46 @@ func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
 	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].Delay).To(Equal(200))
 }
 
+func TestSimulationHandler_Put_CallsDelete(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationStub{}
+
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`
+	{
+		"data": {
+			"pairs": [
+				{
+					"request": {
+						"destination": "test.org"
+					},
+					"response": {
+						"status": 200
+					}
+				}
+			],
+
+			"globalActions": {
+				"delays": [
+					{
+						"urlPattern": "test.org",
+						"httpMethod": "GET",
+						"delay": 200
+					}
+				]
+			}
+
+		}
+	}
+	`))))
+	Expect(err).To(BeNil())
+
+	makeRequestOnHandler(unit.Put, request)
+
+	Expect(stubHoverfly.Deleted).To(BeTrue())
+}
 func unmarshalSimulationView(buffer *bytes.Buffer) (SimulationView, error) {
 	body, err := ioutil.ReadAll(buffer)
 	if err != nil {

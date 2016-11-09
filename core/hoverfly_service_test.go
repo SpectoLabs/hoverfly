@@ -22,6 +22,27 @@ var (
 			Body: "test-body",
 		},
 	}
+
+	pairOneTemplate = v2.RequestResponsePairView{
+		Request: v2.RequestDetailsView{
+			RequestType: util.StringToPointer("template"),
+			Path:        util.StringToPointer("/template"),
+		},
+		Response: v2.ResponseDetailsView{
+			Body: "template-body",
+		},
+	}
+
+	delayOne = v1.ResponseDelayView{
+		UrlPattern: ".",
+		HttpMethod: "GET",
+		Delay: 200,
+	}
+
+	delayTwo = v1.ResponseDelayView{
+		UrlPattern: "test.com",
+		Delay: 201,
+	}
 )
 
 func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.T) {
@@ -223,4 +244,109 @@ func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 	Expect(importedSimulation.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
 
 	Expect(importedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
+}
+
+func TestHoverfly_PutSimulation_ImportsTemplates(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	simulationToImport := v2.SimulationView{
+		DataView: v2.DataView{
+			RequestResponsePairs: []v2.RequestResponsePairView{pairOneTemplate},
+			GlobalActions: v2.GlobalActionsView{
+				Delays: []v1.ResponseDelayView{},
+			},
+		},
+		MetaView: v2.MetaView{},
+	}
+
+	unit.PutSimulation(simulationToImport)
+
+	importedSimulation, err := unit.GetSimulation()
+	Expect(err).To(BeNil())
+
+	Expect(importedSimulation).ToNot(BeNil())
+
+	Expect(importedSimulation.RequestResponsePairs).ToNot(BeNil())
+	Expect(importedSimulation.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(importedSimulation.RequestResponsePairs[0].Request.RequestType).To(Equal(util.StringToPointer("template")))
+	Expect(importedSimulation.RequestResponsePairs[0].Request.Destination).To(BeNil())
+	Expect(importedSimulation.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/template")))
+
+	Expect(importedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("template-body"))
+}
+
+func TestHoverfly_PutSimulation_ImportsRecordingsAndTemplates(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	simulationToImport := v2.SimulationView{
+		DataView: v2.DataView{
+			RequestResponsePairs: []v2.RequestResponsePairView{pairOneRecording, pairOneTemplate},
+			GlobalActions: v2.GlobalActionsView{
+				Delays: []v1.ResponseDelayView{},
+			},
+		},
+		MetaView: v2.MetaView{},
+	}
+
+	unit.PutSimulation(simulationToImport)
+
+	importedSimulation, err := unit.GetSimulation()
+	Expect(err).To(BeNil())
+
+	Expect(importedSimulation).ToNot(BeNil())
+
+	Expect(importedSimulation.RequestResponsePairs).ToNot(BeNil())
+	Expect(importedSimulation.RequestResponsePairs).To(HaveLen(2))
+
+	Expect(importedSimulation.RequestResponsePairs[0].Request.RequestType).To(Equal(util.StringToPointer("recording")))
+	Expect(importedSimulation.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
+	Expect(importedSimulation.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
+
+	Expect(importedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
+
+	Expect(importedSimulation.RequestResponsePairs[1].Request.RequestType).To(Equal(util.StringToPointer("template")))
+	Expect(importedSimulation.RequestResponsePairs[1].Request.Destination).To(BeNil())
+	Expect(importedSimulation.RequestResponsePairs[1].Request.Path).To(Equal(util.StringToPointer("/template")))
+
+	Expect(importedSimulation.RequestResponsePairs[1].Response.Body).To(Equal("template-body"))
+}
+
+func TestHoverfly_PutSimulation_ImportsDelays(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	simulationToImport := v2.SimulationView{
+		DataView: v2.DataView{
+			RequestResponsePairs: []v2.RequestResponsePairView{},
+			GlobalActions: v2.GlobalActionsView{
+				Delays: []v1.ResponseDelayView{delayOne, delayTwo},
+			},
+		},
+		MetaView: v2.MetaView{},
+	}
+
+	err := unit.PutSimulation(simulationToImport)
+	Expect(err).To(BeNil())
+
+	delays := unit.ResponseDelays.ConvertToResponseDelayPayloadView()
+	Expect(delays).ToNot(BeNil())
+
+	Expect(delays.Data).To(HaveLen(2))
+
+	Expect(delays.Data[0].UrlPattern).To(Equal("."))
+	Expect(delays.Data[0].HttpMethod).To(Equal("GET"))
+	Expect(delays.Data[0].Delay).To(Equal(200))
+
+	Expect(delays.Data[1].UrlPattern).To(Equal("test.com"))
+	Expect(delays.Data[1].HttpMethod).To(Equal(""))
+	Expect(delays.Data[1].Delay).To(Equal(201))
 }

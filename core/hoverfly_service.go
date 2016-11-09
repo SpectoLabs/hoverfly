@@ -220,7 +220,17 @@ func (this *Hoverfly) PutSimulation(simulationView v2.SimulationView) error {
 		requestResponsePairViews[i] = v
 	}
 
-	return this.ImportRequestResponsePairViews(requestResponsePairViews)
+	err := this.ImportRequestResponsePairViews(requestResponsePairViews)
+	if err != nil {
+		return err
+	}
+
+	err = this.SetResponseDelays(v1.ResponseDelayPayloadView{Data: simulationView.GlobalActions.Delays})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (this *Hoverfly) DeleteSimulation() error {
