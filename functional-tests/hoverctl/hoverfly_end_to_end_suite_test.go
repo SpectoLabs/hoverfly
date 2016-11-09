@@ -22,10 +22,11 @@ import (
 )
 
 const (
-	simulate   = "simulate"
-	capture    = "capture"
-	synthesize = "synthesize"
-	modify     = "modify"
+	simulate          = "simulate"
+	capture           = "capture"
+	synthesize        = "synthesize"
+	modify            = "modify"
+	generatedTestData = "testdata-gen"
 )
 
 var (
@@ -35,8 +36,12 @@ var (
 )
 
 func TestHoverflyEndToEnd(t *testing.T) {
+	os.Mkdir(generatedTestData, os.ModePerm)
+
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Hoverfly End To End Suite")
+
+	os.RemoveAll(generatedTestData)
 }
 
 var _ = BeforeSuite(func() {
@@ -49,10 +54,7 @@ var _ = BeforeSuite(func() {
 	binDirectory := filepath.Join(workingDirectory, "bin")
 
 	os.Setenv("PATH", fmt.Sprintf("%v:%v", binDirectory, os.Getenv("PATH")))
-})
 
-var _ = AfterSuite(func() {
-	os.RemoveAll("testdata-gen")
 })
 
 func SetHoverflyMode(mode string, port int) {
@@ -232,7 +234,7 @@ func WriteConfigurationWithAuth(host, adminPort, proxyPort, username, password s
 
 func generateFileName() string {
 
-	rb := make([]byte, 10)
+	rb := make([]byte, 6)
 	rand.Read(rb)
 
 	rs := base64.URLEncoding.EncodeToString(rb)
