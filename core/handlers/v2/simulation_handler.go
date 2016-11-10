@@ -59,7 +59,10 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	this.Delete(w, req, next)
+	err = this.Hoverfly.DeleteSimulation()
+	if err != nil {
+		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+	}
 
 	err = this.Hoverfly.PutSimulation(simulationView)
 	if err != nil {
