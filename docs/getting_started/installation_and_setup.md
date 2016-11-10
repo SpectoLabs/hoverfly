@@ -1,27 +1,20 @@
 # Installation and setup
 
 ## Get Hoverfly
-Hoverfly is a single binary file. It comes with an optional command line interface tool called hoverctl
+Hoverfly is a single binary file. It comes with an optional command line interface tool called hoverctl.
 
-### MacOS
+Zip archives containing the Hoverfly and hoverctl binaries for Windows, MacOS and Linux are available on the GitHub releases page:
+
+[Hoverfly & hoverctl zip archives](https://github.com/SpectoLabs/hoverfly/releases/latest)
+
+Download the archive for your OS, extract the Hoverfly and hoverctl binaries and move them to a directory on your [PATH](https://www.java.com/en/download/help/path.xml).
+
+### Homebrew (MacOS)
+
 ```
 brew install SpectoLabs/tap/hoverfly
 ```
-### Linux
 
-    curl -o install.sh https://raw.githubusercontent.com/SpectoLabs/hoverfly/master/install.sh && sudo bash install.sh
-
-### Windows
-
-Download one of the zip files below, extract the Hoverfly and hoverctl binaries, and move them to a directory on your [PATH](https://www.java.com/en/download/help/path.xml)
-
-[Hoverfly & hoverctl (Windows 64bit)](http://hoverfly.io/downloads/hoverfly_bundle_latest_win_x64.zip)
-
-[Hoverfly & hoverctl (Windows 32bit)](http://hoverfly.io/downloads/hoverfly_bundle_latest_win_x86.zip)
-
-### Pre-built binaries
-
-Hoverfly binaries for every major OS are [available here.](https://github.com/SpectoLabs/hoverfly/releases)
 
 ## Run Hoverfly
 
