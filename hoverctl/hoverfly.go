@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
-	"github.com/dghubble/sling"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -13,6 +11,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/dghubble/sling"
+)
+
+const (
+	v1ApiSimulation = "/api/records"
 )
 
 type APIStateSchema struct {
@@ -295,7 +300,7 @@ func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
 }
 
 func (h *Hoverfly) ImportSimulation(simulationData string) error {
-	url := h.buildURL("/api/records")
+	url := h.buildURL(v1ApiSimulation)
 
 	slingRequest := sling.New().Post(url).Body(strings.NewReader(simulationData))
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
@@ -329,7 +334,7 @@ func (h *Hoverfly) ImportSimulation(simulationData string) error {
 }
 
 func (h *Hoverfly) ExportSimulation() ([]byte, error) {
-	url := h.buildURL("/api/records")
+	url := h.buildURL(v1ApiSimulation)
 
 	slingRequest := sling.New().Get(url)
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
