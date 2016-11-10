@@ -1,15 +1,14 @@
 package hoverctl_end_to_end
 
 import (
+	"io/ioutil"
+	"os/exec"
+	"strconv"
+	"strings"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phayes/freeport"
-	"io/ioutil"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"strconv"
-	"strings"
 )
 
 var _ = Describe("When I use hoverctl with a running an authenticated hoverfly", func() {
@@ -63,50 +62,50 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 		})
 
 		Context("you can manage simulations", func() {
-			workingDirectory, _ := os.Getwd()
-			fileToWrite := filepath.Join(workingDirectory, "/.hoverfly/cache/benjih.test.latest.json")
-			ioutil.WriteFile(fileToWrite,
-				[]byte(`
-					{
-						"data": [{
-							"request": {
-								"path": "/api/bookings",
-								"method": "POST",
-								"destination": "www.my-test.com",
-								"scheme": "http",
-								"query": "",
-								"body": "{\"flightId\": \"1\"}",
-								"headers": {
-									"Content-Type": [
-										"application/json"
-									]
-								}
-							},
-							"response": {
-								"status": 201,
-								"body": "",
-								"encodedBody": false,
-								"headers": {
-									"Location": [
-										"http://localhost/api/bookings/1"
-									]
-								}
-							}
-						}]
-					}`), 0644)
 
 			It("by importing and exporting data", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "import", "benjih/test:latest").Output()
+				filePath := generateFileName()
+				ioutil.WriteFile(filePath,
+					[]byte(`
+						{
+							"data": [{
+								"request": {
+									"path": "/api/bookings",
+									"method": "POST",
+									"destination": "www.my-test.com",
+									"scheme": "http",
+									"query": "",
+									"body": "{\"flightId\": \"1\"}",
+									"headers": {
+										"Content-Type": [
+											"application/json"
+										]
+									}
+								},
+								"response": {
+									"status": 201,
+									"body": "",
+									"encodedBody": false,
+									"headers": {
+										"Location": [
+											"http://localhost/api/bookings/1"
+										]
+									}
+								}
+							}]
+						}`), 0644)
+				setOutput, _ := exec.Command(hoverctlBinary, "import", filePath).Output()
 
 				output := strings.TrimSpace(string(setOutput))
-				Expect(output).To(ContainSubstring("benjih/test:latest imported successfully"))
+				Expect(output).To(ContainSubstring("Successfully imported from " + filePath))
 
-				setOutput, _ = exec.Command(hoverctlBinary, "export", "benjih/test-copy:latest").Output()
+				newFilePath := generateFileName()
+				setOutput, _ = exec.Command(hoverctlBinary, "export", newFilePath).Output()
 
 				output = strings.TrimSpace(string(setOutput))
-				Expect(output).To(ContainSubstring("benjih/test-copy:latest exported successfully"))
+				Expect(output).To(ContainSubstring("Successfully exported to " + newFilePath))
 
-				exportFile, err := ioutil.ReadFile(workingDirectory + "/.hoverfly/cache/benjih.test-copy.latest.json")
+				exportFile, err := ioutil.ReadFile(newFilePath)
 				if err != nil {
 					Fail("Failed reading test data")
 				}
@@ -125,38 +124,6 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 	})
 
 	Describe("and the credentials are not the hoverctl config", func() {
-
-		workingDirectory, _ := os.Getwd()
-		fileToWrite := filepath.Join(workingDirectory, "/.hoverfly/cache/benjih.test.latest.json")
-		ioutil.WriteFile(fileToWrite,
-			[]byte(`
-					{
-						"data": [{
-							"request": {
-								"path": "/api/bookings",
-								"method": "POST",
-								"destination": "www.my-test.com",
-								"scheme": "http",
-								"query": "",
-								"body": "{\"flightId\": \"1\"}",
-								"headers": {
-									"Content-Type": [
-										"application/json"
-									]
-								}
-							},
-							"response": {
-								"status": 201,
-								"body": "",
-								"encodedBody": false,
-								"headers": {
-									"Location": [
-										"http://localhost/api/bookings/1"
-									]
-								}
-							}
-						}]
-					}`), 0644)
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverflyWithAuth(adminPort, proxyPort, workingDirectory, username, password)
@@ -189,15 +156,50 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 
 		Context("you cannot manage simulations", func() {
 
+			var filePath string
+
+			BeforeEach(func() {
+				filePath = generateFileName()
+				ioutil.WriteFile(filePath,
+					[]byte(`
+					{
+						"data": [{
+							"request": {
+								"path": "/api/bookings",
+								"method": "POST",
+								"destination": "www.my-test.com",
+								"scheme": "http",
+								"query": "",
+								"body": "{\"flightId\": \"1\"}",
+								"headers": {
+									"Content-Type": [
+										"application/json"
+									]
+								}
+							},
+							"response": {
+								"status": 201,
+								"body": "",
+								"encodedBody": false,
+								"headers": {
+									"Location": [
+										"http://localhost/api/bookings/1"
+									]
+								}
+							}
+						}]
+					}`), 0644)
+			})
+
 			It("by importing data", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "import", "benjih/test:latest").Output()
+				setOutput, _ := exec.Command(hoverctlBinary, "import", filePath).Output()
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			})
 
 			It("and then exporting the data", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "export", "benjih/test:latest").Output()
+				setOutput, _ := exec.Command(hoverctlBinary, "export", filePath).Output()
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))

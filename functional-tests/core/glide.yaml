@@ -10,3 +10,5 @@ import:
 - package: github.com/google/go-querystring
   subpackages:
   - query
+- package: github.com/antonholmquist/jason
+  version: v1.0.0

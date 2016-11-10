@@ -3,9 +3,9 @@ package hoverfly
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
@@ -33,7 +33,7 @@ func TestGetAllTemplates(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	pair := views.RequestResponsePairPayload{}
+	pair := v1.RequestResponsePairPayload{}
 	err = json.Unmarshal(body, &pair)
 
 	Expect(pair.Data).To(HaveLen(0))
@@ -84,11 +84,11 @@ func TestGetAllTemplatesWTemplates(t *testing.T) {
 
 	body, err := ioutil.ReadAll(respRec.Body)
 
-	pair := matching.RequestTemplateResponsePairPayload{}
+	pair := v1.RequestTemplateResponsePairPayload{}
 	err = json.Unmarshal(body, &pair)
 
 	// check the json given is correct to construct the request template store
-	result := pair.ConvertToRequestTemplateStore()
+	result := matching.ConvertPayloadToRequestTemplateStore(pair)
 
 	Expect(result).To(HaveLen(2))
 }

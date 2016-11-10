@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"os"
 )
 
 var (
 	hoverctlVersion string
 	hostFlag        = kingpin.Flag("host", "Set the host of Hoverfly").String()
 	adminPortFlag   = kingpin.Flag("admin-port", "Set the admin port of Hoverfly").String()
-	proxyPortFlag   = kingpin.Flag("proxy-port", "Set the admin port of Hoverfly").String()
+	proxyPortFlag   = kingpin.Flag("proxy-port", "Set the proxy port of Hoverfly").String()
 	verboseFlag     = kingpin.Flag("verbose", "Verbose mode.").Short('v').Bool()
 
 	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
@@ -31,13 +32,6 @@ var (
 
 	importCommand = kingpin.Command("import", "Imports data into Hoverfly")
 	importNameArg = importCommand.Arg("name", "Name of imported simulation").Required().String()
-
-	pushCommand = kingpin.Command("push", "Pushes the data to SpectoLab")
-	pushNameArg = pushCommand.Arg("name", "Name of exported simulation").Required().String()
-
-	pullCommand          = kingpin.Command("pull", "Pushes the data to SpectoLab")
-	pullNameArg          = pullCommand.Arg("name", "Name of imported simulation").Required().String()
-	pullOverrideHostFlag = pullCommand.Flag("override-host", "Name of the host you want to virtualise").String()
 
 	deleteCommand = kingpin.Command("delete", "Delete test data from Hoverfly")
 	deleteArg     = deleteCommand.Arg("resource", "A collection of data that can be deleted").String()
@@ -71,19 +65,7 @@ func main() {
 	hoverflyDirectory, err := NewHoverflyDirectory(config)
 	handleIfError(err)
 
-	cacheDirectory, err := createCacheDirectory(hoverflyDirectory)
-	handleIfError(err)
-
-	localCache := LocalCache{
-		URI: cacheDirectory,
-	}
-
 	hoverfly := NewHoverfly(config)
-
-	spectoLab := SpectoLab{
-		Host:   "https://lab.specto.io",
-		APIKey: config.SpectoLabAPIKey,
-	}
 
 	switch kingpin.Parse() {
 	case modeCommand.FullCommand():
@@ -133,60 +115,22 @@ func main() {
 		log.Info("Hoverfly has been stopped")
 
 	case exportCommand.FullCommand():
-		simulation, err := NewSimulation(*exportNameArg)
-		handleIfError(err)
-
 		simulationData, err := hoverfly.ExportSimulation()
 		handleIfError(err)
 
-		err = localCache.WriteSimulation(simulation, simulationData)
+		err = WriteFile(*exportNameArg, simulationData)
 		handleIfError(err)
 
-		log.Info(simulation.String(), " exported successfully")
+		log.Info("Successfully exported to ", *exportNameArg)
 
 	case importCommand.FullCommand():
-		simulation, err := NewSimulation(*importNameArg)
-		handleIfError(err)
-
-		simulationData, err := localCache.ReadSimulation(simulation)
+		simulationData, err := ReadFile(*importNameArg)
 		handleIfError(err)
 
 		err = hoverfly.ImportSimulation(string(simulationData))
 		handleIfError(err)
 
-		log.Info(simulation.String(), " imported successfully")
-
-	case pushCommand.FullCommand():
-		err := spectoLab.CheckAPIKey()
-		handleIfError(err)
-
-		simulation, err := NewSimulation(*pushNameArg)
-		handleIfError(err)
-
-		simulationData, err := localCache.ReadSimulation(simulation)
-		handleIfError(err)
-
-		statusCode, err := spectoLab.UploadSimulation(simulation, simulationData)
-		handleIfError(err)
-
-		if statusCode {
-			log.Info(simulation.String(), " has been pushed to the SpectoLab")
-		}
-
-	case pullCommand.FullCommand():
-		err := spectoLab.CheckAPIKey()
-		handleIfError(err)
-
-		simulation, err := NewSimulation(*pullNameArg)
-		handleIfError(err)
-
-		simulationData, err := spectoLab.GetSimulation(simulation, *pullOverrideHostFlag)
-		handleIfError(err)
-
-		err = localCache.WriteSimulation(simulation, simulationData)
-		handleIfError(err)
-
-		log.Info(simulation.String(), " has been pulled from the SpectoLab")
+		log.Info("Successfully imported from ", *importNameArg)
 
 	case deleteCommand.FullCommand():
 		switch *deleteArg {
