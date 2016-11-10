@@ -300,9 +300,14 @@ func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
 	return apiResponse.Middleware, nil
 }
 
-func (h *Hoverfly) ImportSimulation(simulationData string) error {
-	url := h.buildURL(v1ApiSimulation)
+func (h *Hoverfly) ImportSimulation(simulationData string, v1 bool) error {
+	var url string
 
+	if v1 {
+		url = h.buildURL(v1ApiSimulation)
+	} else {
+		url = h.buildURL(v1ApiSimulation)
+	}
 	slingRequest := sling.New().Post(url).Body(strings.NewReader(simulationData))
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {

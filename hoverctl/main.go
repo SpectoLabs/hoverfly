@@ -31,6 +31,7 @@ var (
 	exportNameArg = exportCommand.Arg("name", "Name of exported simulation").Required().String()
 
 	importCommand = kingpin.Command("import", "Imports data into Hoverfly")
+	importV1Flag  = importCommand.Flag("v1", "Imports v1 formatted data into Hoverfly").Bool()
 	importNameArg = importCommand.Arg("name", "Name of imported simulation").Required().String()
 
 	deleteCommand = kingpin.Command("delete", "Delete test data from Hoverfly")
@@ -127,7 +128,7 @@ func main() {
 		simulationData, err := ReadFile(*importNameArg)
 		handleIfError(err)
 
-		err = hoverfly.ImportSimulation(string(simulationData))
+		err = hoverfly.ImportSimulation(string(simulationData), *importV1Flag)
 		handleIfError(err)
 
 		log.Info("Successfully imported from ", *importNameArg)

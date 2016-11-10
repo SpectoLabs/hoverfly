@@ -109,6 +109,20 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
 			})
 
+			It("can import v1 simulations", func() {
+
+				fileName := generateFileName()
+				err := ioutil.WriteFile(fileName, []byte(v1HoverflyData), 0644)
+				Expect(err).To(BeNil())
+
+				output, _ := exec.Command(hoverctlBinary, "import", "--v1", fileName, "--admin-port="+adminPortAsString).Output()
+
+				Expect(output).To(ContainSubstring("Successfully imported from " + fileName))
+
+				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				bytes, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
+			})
 		})
 	})
 })
