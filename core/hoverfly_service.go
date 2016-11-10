@@ -2,6 +2,9 @@ package hoverfly
 
 import (
 	"fmt"
+	"regexp"
+	"time"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
@@ -9,8 +12,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"regexp"
-	"time"
 )
 
 func (this Hoverfly) GetDestination() string {
@@ -233,8 +234,8 @@ func (this *Hoverfly) PutSimulation(simulationView v2.SimulationView) error {
 	return nil
 }
 
-func (this *Hoverfly) DeleteSimulation() error {
+func (this *Hoverfly) DeleteSimulation() {
 	this.DeleteTemplateCache()
 	this.DeleteResponseDelays()
-	return this.DeleteRequestCache()
+	this.DeleteRequestCache()
 }

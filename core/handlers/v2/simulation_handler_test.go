@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"testing"
 
+	"fmt"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
@@ -48,9 +50,8 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationView, error) {
 	}, nil
 }
 
-func (this *HoverflySimulationStub) DeleteSimulation() error {
+func (this *HoverflySimulationStub) DeleteSimulation() {
 	this.Deleted = true
-	return nil
 }
 
 func (this *HoverflySimulationStub) PutSimulation(simulation SimulationView) error {
@@ -58,7 +59,19 @@ func (this *HoverflySimulationStub) PutSimulation(simulation SimulationView) err
 	return nil
 }
 
-func TestSimulationHandlerGetReturnsSimulation(t *testing.T) {
+type HoverflySimulationErrorStub struct{}
+
+func (this HoverflySimulationErrorStub) GetSimulation() (SimulationView, error) {
+	return SimulationView{}, fmt.Errorf("error")
+}
+
+func (this *HoverflySimulationErrorStub) DeleteSimulation() {}
+
+func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationView) error {
+	return fmt.Errorf("error")
+}
+
+func TestSimulationHandler_Get_ReturnsSimulation(t *testing.T) {
 	RegisterTestingT(t)
 
 	stubHoverfly := &HoverflySimulationStub{}
@@ -90,7 +103,26 @@ func TestSimulationHandlerGetReturnsSimulation(t *testing.T) {
 	Expect(simulationView.MetaView.TimeExported).To(Equal("now"))
 }
 
-func TestSimulationHandlerDeleteCallsDelete(t *testing.T) {
+func TestSimulationHandler_Get_ReturnsErrorIfHoverflyErrors(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationErrorStub{}
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Get, request)
+
+	Expect(response.Code).To(Equal(http.StatusInternalServerError))
+
+	errorView, err := unmarshalErrorView(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(errorView.Error).To(Equal("error"))
+}
+
+func TestSimulationHandler_Delete_CallsDelete(t *testing.T) {
 	RegisterTestingT(t)
 
 	stubHoverfly := &HoverflySimulationStub{}
@@ -135,6 +167,24 @@ func TestSimulationHandler_Delete_CallsGetAfterDelete(t *testing.T) {
 	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v1"))
 	Expect(simulationView.MetaView.HoverflyVersion).To(Equal("test"))
 	Expect(simulationView.MetaView.TimeExported).To(Equal("now"))
+}
+
+func TestSimulationHandler_Delete_ErrorReturnsWithoutGet(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationErrorStub{}
+
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("DELETE", "", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Delete, request)
+
+	errorView, err := unmarshalErrorView(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(errorView.Error).To(Equal("error"))
 }
 
 func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
@@ -226,6 +276,26 @@ func TestSimulationHandler_Put_CallsDelete(t *testing.T) {
 
 	Expect(stubHoverfly.Deleted).To(BeTrue())
 }
+
+func TestSimulationHandler_Put_ReturnsErrorIfCannotParseRequestBody(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationErrorStub{}
+
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(``))))
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Put, request)
+
+	errorView, err := unmarshalErrorView(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(response.Result().StatusCode).To(Equal(500))
+	Expect(errorView.Error).To(Equal("unexpected end of JSON input"))
+}
+
 func unmarshalSimulationView(buffer *bytes.Buffer) (SimulationView, error) {
 	body, err := ioutil.ReadAll(buffer)
 	if err != nil {
