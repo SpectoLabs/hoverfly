@@ -8,6 +8,9 @@ import (
 	"strconv"
 	"strings"
 
+	"net/http"
+	"net/http/httptest"
+
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -139,6 +142,22 @@ var _ = Describe("When I use hoverctl", func() {
 				output, _ := exec.Command(hoverctlBinary, "import", fileName, "--admin-port="+adminPortAsString).Output()
 
 				Expect(output).To(ContainSubstring("Successfully imported from " + fileName))
+
+				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				bytes, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
+			})
+
+			It("can import over http", func() {
+				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					fmt.Fprintln(w, v2HoverflyData)
+				}))
+				defer ts.Close()
+
+				output, _ := exec.Command(hoverctlBinary, "import", ts.URL, "--admin-port="+adminPortAsString).Output()
+
+				Expect(output).To(ContainSubstring("Successfully imported from " + ts.URL))
 
 				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
 				bytes, _ := ioutil.ReadAll(resp.Body)

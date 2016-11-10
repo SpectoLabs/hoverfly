@@ -1,9 +1,14 @@
 package main
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"path"
+
+	"strings"
+
+	"net/http"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -17,10 +22,31 @@ func WriteFile(filePath string, data []byte) error {
 	if err != nil {
 		return err
 	}
-	log.Debug("Should be writing?")
+
 	return ioutil.WriteFile(basePath+"/"+fileName, data, 0644)
 }
 
 func ReadFile(filePath string) ([]byte, error) {
+	if strings.HasPrefix(filePath, "http://") || strings.HasPrefix(filePath, "https://") {
+		return DownloadFile(filePath)
+	}
 	return ioutil.ReadFile(filePath)
+}
+
+func DownloadFile(filePath string) ([]byte, error) {
+	response, err := http.Get(filePath)
+	if err != nil {
+		log.Info(err.Error())
+		return nil, errors.New("Could not download simulation")
+	}
+
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Info(err.Error())
+		return nil, errors.New("Could not download simulation")
+	}
+
+	return body, nil
 }
