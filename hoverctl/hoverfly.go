@@ -18,6 +18,7 @@ import (
 
 const (
 	v1ApiSimulation = "/api/records"
+	v2ApiSimulation = "/api/v2/simulation"
 )
 
 type APIStateSchema struct {
@@ -334,7 +335,7 @@ func (h *Hoverfly) ImportSimulation(simulationData string) error {
 }
 
 func (h *Hoverfly) ExportSimulation() ([]byte, error) {
-	url := h.buildURL(v1ApiSimulation)
+	url := h.buildURL(v2ApiSimulation)
 
 	slingRequest := sling.New().Get(url)
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
