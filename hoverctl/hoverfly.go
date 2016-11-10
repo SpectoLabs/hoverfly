@@ -78,7 +78,7 @@ func (h *Hoverfly) DeleteSimulations() error {
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
 		log.Debug(err.Error())
-		return errors.New("Could not authenticate  with Hoverfly")
+		return errors.New("Could not authenticate with Hoverfly")
 	}
 
 	request, err := slingRequest.Request()
@@ -300,10 +300,14 @@ func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
 	return apiResponse.Middleware, nil
 }
 
-func (h *Hoverfly) ImportSimulation(simulationData string) error {
-	url := h.buildURL(v1ApiSimulation)
+func (h *Hoverfly) ImportSimulation(simulationData string, v1 bool) error {
+	slingRequest := sling.New().Body(strings.NewReader(simulationData))
 
-	slingRequest := sling.New().Post(url).Body(strings.NewReader(simulationData))
+	if v1 {
+		slingRequest = slingRequest.Post(h.buildURL(v1ApiSimulation))
+	} else {
+		slingRequest = slingRequest.Put(h.buildURL(v2ApiSimulation))
+	}
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
 		log.Debug(err.Error())
