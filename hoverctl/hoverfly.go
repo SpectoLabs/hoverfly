@@ -78,7 +78,7 @@ func (h *Hoverfly) DeleteSimulations() error {
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
 		log.Debug(err.Error())
-		return errors.New("Could not authenticate  with Hoverfly")
+		return errors.New("Could not authenticate with Hoverfly")
 	}
 
 	request, err := slingRequest.Request()
