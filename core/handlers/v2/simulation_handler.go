@@ -42,6 +42,7 @@ func (this *SimulationHandler) Get(w http.ResponseWriter, req *http.Request, nex
 	simulationView, err := this.Hoverfly.GetSimulation()
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	bytes, _ := json.Marshal(simulationView)
@@ -57,16 +58,19 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 	err := json.Unmarshal(body, &simulationView)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	err = this.Hoverfly.DeleteSimulation()
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	err = this.Hoverfly.PutSimulation(simulationView)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	this.Get(w, req, next)
@@ -76,6 +80,7 @@ func (this *SimulationHandler) Delete(w http.ResponseWriter, req *http.Request, 
 	err := this.Hoverfly.DeleteSimulation()
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	this.Get(w, req, next)
