@@ -3,19 +3,11 @@
 ## Get Hoverfly
 Hoverfly is a single binary file. It comes with an optional command line interface tool called hoverctl.
 
-Download one of the zip archives below, extract the Hoverfly and hoverctl binaries and move them to a directory on your [PATH](https://www.java.com/en/download/help/path.xml)
+Zip archives containing the Hoverfly and hoverctl binaries for Windows, MacOS and Linux are available on the GitHub releases page:
 
+[Hoverfly & hoverctl zip archives](https://github.com/SpectoLabs/hoverfly/releases/latest)
 
-[Windows (32bit)](https://s3-eu-west-1.amazonaws.com/hoverfly-zips/hoverfly_bundle_windows_386.zip)
-
-[Windows (64bit)](https://s3-eu-west-1.amazonaws.com/hoverfly-zips/hoverfly_bundle_windows_amd64.zip)
-
-[MacOS](https://s3-eu-west-1.amazonaws.com/hoverfly-zips/hoverfly_bundle_OSX_amd64.zip)
-
-[Linux (32bit)](https://s3-eu-west-1.amazonaws.com/hoverfly-zips/hoverfly_bundle_linux_386.zip)
-
-[Linux (64bit)](https://s3-eu-west-1.amazonaws.com/hoverfly-zips/hoverfly_bundle_linux_amd64.zip)
-
+Download the archive for your OS, extract the Hoverfly and hoverctl binaries and move them to a directory on your [PATH](https://www.java.com/en/download/help/path.xml).
 
 ### Homebrew (MacOS)
 
