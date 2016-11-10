@@ -50,9 +50,8 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationView, error) {
 	}, nil
 }
 
-func (this *HoverflySimulationStub) DeleteSimulation() error {
+func (this *HoverflySimulationStub) DeleteSimulation() {
 	this.Deleted = true
-	return nil
 }
 
 func (this *HoverflySimulationStub) PutSimulation(simulation SimulationView) error {
@@ -66,9 +65,7 @@ func (this HoverflySimulationErrorStub) GetSimulation() (SimulationView, error) 
 	return SimulationView{}, fmt.Errorf("error")
 }
 
-func (this *HoverflySimulationErrorStub) DeleteSimulation() error {
-	return fmt.Errorf("error")
-}
+func (this *HoverflySimulationErrorStub) DeleteSimulation() {}
 
 func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationView) error {
 	return fmt.Errorf("error")

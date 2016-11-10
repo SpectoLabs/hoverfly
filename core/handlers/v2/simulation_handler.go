@@ -14,7 +14,7 @@ import (
 type HoverflySimulation interface {
 	GetSimulation() (SimulationView, error)
 	PutSimulation(SimulationView) error
-	DeleteSimulation() error
+	DeleteSimulation()
 }
 
 type SimulationHandler struct {
@@ -61,11 +61,7 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 		return
 	}
 
-	err = this.Hoverfly.DeleteSimulation()
-	if err != nil {
-		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	this.Hoverfly.DeleteSimulation()
 
 	err = this.Hoverfly.PutSimulation(simulationView)
 	if err != nil {
@@ -77,11 +73,7 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 }
 
 func (this *SimulationHandler) Delete(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	err := this.Hoverfly.DeleteSimulation()
-	if err != nil {
-		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	this.Hoverfly.DeleteSimulation()
 
 	this.Get(w, req, next)
 }
