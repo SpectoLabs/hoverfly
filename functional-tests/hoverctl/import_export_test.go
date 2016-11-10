@@ -54,6 +54,42 @@ var _ = Describe("When I use hoverctl", func() {
 						}]
 					}`
 
+		v2HoverflyData = `
+			{
+				"data": {
+					"pairs": [{
+						"response": {
+							"status": 201,
+							"body": "",
+							"encodedBody": false,
+							"headers": {
+								"Location": ["http://localhost/api/bookings/1"]
+							}
+						},
+						"request": {
+							"requestType": "recording",
+							"path": "/api/bookings",
+							"method": "POST",
+							"destination": "www.my-test.com",
+							"scheme": "http",
+							"query": "",
+							"body": "{\"flightId\": \"1\"}",
+							"headers": {
+								"Content-Type": ["application/json"]
+							}
+						}
+					}],
+					"globalActions": {
+						"delays": []
+					}
+				},
+				"meta": {
+					"schemaVersion": "v1",
+					"hoverflyVersion": "v0.9.0",
+					"timeExported": "2016-11-10T12:27:46Z"
+				}
+			}`
+
 		v2HoverflySimulation = `"pairs":[{"response":{"status":201,"body":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]}},"request":{"requestType":"recording","path":"/api/bookings","method":"POST","destination":"www.my-test.com","scheme":"http","query":"","body":"{\"flightId\": \"1\"}","headers":{"Content-Type":["application/json"]}}}],"globalActions":{"delays":[]}}`
 
 		v2HoverflyMeta = `"meta":{"schemaVersion":"v1","hoverflyVersion":"v0.9.0","timeExported":`
@@ -97,7 +133,7 @@ var _ = Describe("When I use hoverctl", func() {
 			It("can import", func() {
 
 				fileName := generateFileName()
-				err := ioutil.WriteFile(fileName, []byte(v1HoverflyData), 0644)
+				err := ioutil.WriteFile(fileName, []byte(v2HoverflyData), 0644)
 				Expect(err).To(BeNil())
 
 				output, _ := exec.Command(hoverctlBinary, "import", fileName, "--admin-port="+adminPortAsString).Output()

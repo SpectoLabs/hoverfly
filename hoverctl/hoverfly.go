@@ -301,14 +301,13 @@ func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
 }
 
 func (h *Hoverfly) ImportSimulation(simulationData string, v1 bool) error {
-	var url string
+	slingRequest := sling.New().Body(strings.NewReader(simulationData))
 
 	if v1 {
-		url = h.buildURL(v1ApiSimulation)
+		slingRequest = slingRequest.Post(h.buildURL(v1ApiSimulation))
 	} else {
-		url = h.buildURL(v1ApiSimulation)
+		slingRequest = slingRequest.Put(h.buildURL(v2ApiSimulation))
 	}
-	slingRequest := sling.New().Post(url).Body(strings.NewReader(simulationData))
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
 		log.Debug(err.Error())
