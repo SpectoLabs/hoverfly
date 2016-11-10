@@ -1,11 +1,12 @@
 package main
 
 import (
-	. "github.com/onsi/gomega"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"testing"
+
+	. "github.com/onsi/gomega"
+	"gopkg.in/yaml.v2"
 )
 
 func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
@@ -19,7 +20,6 @@ func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
 	Expect(result.HoverflyUsername).To(Equal(""))
 	Expect(result.HoverflyPassword).To(Equal(""))
-	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
 func Test_GetConfigOverridesDefaultValueWithAHoverflyHost(t *testing.T) {
@@ -34,7 +34,6 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyHost(t *testing.T) {
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
 	Expect(result.HoverflyUsername).To(Equal(""))
 	Expect(result.HoverflyPassword).To(Equal(""))
-	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
 func Test_GetConfigOverridesDefaultValueWithAHoverflyAdminPort(t *testing.T) {
@@ -49,7 +48,6 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyAdminPort(t *testing.T) {
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
 	Expect(result.HoverflyUsername).To(Equal(""))
 	Expect(result.HoverflyPassword).To(Equal(""))
-	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
 func Test_GetConfigOverridesDefaultValueWithAHoverflyProxyPort(t *testing.T) {
@@ -64,7 +62,6 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyProxyPort(t *testing.T) {
 	Expect(result.HoverflyProxyPort).To(Equal(hoverflyProxyPort))
 	Expect(result.HoverflyUsername).To(Equal(""))
 	Expect(result.HoverflyPassword).To(Equal(""))
-	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
 func Test_GetConfigOverridesDefaultValueWithAHoverflyUsername(t *testing.T) {
@@ -79,7 +76,6 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyUsername(t *testing.T) {
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
 	Expect(result.HoverflyUsername).To(Equal(hoverflyUsername))
 	Expect(result.HoverflyPassword).To(Equal(""))
-	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
 func Test_GetConfigOverridesDefaultValueWithAHoverflyPassword(t *testing.T) {
@@ -94,7 +90,6 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyPassword(t *testing.T) {
 	Expect(result.HoverflyProxyPort).To(Equal("8500"))
 	Expect(result.HoverflyUsername).To(Equal(""))
 	Expect(result.HoverflyPassword).To(Equal(hoverflyPassword))
-	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
 func Test_GetConfigOverridesDefaultValueWithAllOverrides(t *testing.T) {
@@ -113,7 +108,6 @@ func Test_GetConfigOverridesDefaultValueWithAllOverrides(t *testing.T) {
 	Expect(result.HoverflyProxyPort).To(Equal(hoverflyProxyPort))
 	Expect(result.HoverflyUsername).To(Equal(hoverflyUsername))
 	Expect(result.HoverflyPassword).To(Equal(hoverflyPassword))
-	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
 
 func Test_ConfigWriteToFileWritesTheConfigObjectToAFileInAYamlFormat(t *testing.T) {
@@ -142,5 +136,4 @@ func Test_ConfigWriteToFileWritesTheConfigObjectToAFileInAYamlFormat(t *testing.
 	Expect(result.HoverflyProxyPort).To(Equal("4567"))
 	Expect(result.HoverflyUsername).To(Equal("username"))
 	Expect(result.HoverflyPassword).To(Equal("password"))
-	Expect(result.SpectoLabAPIKey).To(Equal(""))
 }
