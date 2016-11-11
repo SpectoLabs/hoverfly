@@ -4,21 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/cache"
-	"github.com/SpectoLabs/hoverfly/core/matching"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/views"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"io/ioutil"
 	"net/http"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
+	"github.com/SpectoLabs/hoverfly/core/interfaces"
 )
 
 type HoverflyRecords interface {
-	GetRequestCache() cache.Cache
-	GetTemplateCache() matching.RequestTemplateStore
-	ImportRequestResponsePairViews(pairViews []views.RequestResponsePairView) error
+	DeleteRequestCache() error
+	GetRecords() ([]RequestResponsePairView, error)
+	ImportRequestResponsePairViews(pairViews []interfaces.RequestResponsePair) error
 }
 
 type RecordsHandler struct {
@@ -44,7 +41,7 @@ func (this *RecordsHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandl
 
 // AllRecordsHandler returns JSON content type http response
 func (this *RecordsHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	records, err := this.Hoverfly.GetRequestCache().GetAllEntries()
+	pairViews, err := this.Hoverfly.GetRecords()
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -56,27 +53,9 @@ func (this *RecordsHandler) Get(w http.ResponseWriter, req *http.Request, next h
 		return
 	}
 
-	var pairViews []views.RequestResponsePairView
-
-	for _, v := range records {
-		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
-			pairView := pair.ConvertToRequestResponsePairView()
-			pairViews = append(pairViews, *pairView)
-		} else {
-			log.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
-
-	for _, v := range this.Hoverfly.GetTemplateCache() {
-		pairView := v.ConvertToRequestResponsePairView()
-		pairViews = append(pairViews, pairView)
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 
-	var response views.RequestResponsePairPayload
+	var response RequestResponsePairPayload
 	response.Data = pairViews
 	b, err := json.Marshal(response)
 
@@ -92,7 +71,7 @@ func (this *RecordsHandler) Get(w http.ResponseWriter, req *http.Request, next h
 // ImportRecordsHandler - accepts JSON payload and saves it to cache
 func (this *RecordsHandler) Post(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var requests views.RequestResponsePairPayload
+	var requests RequestResponsePairPayload
 
 	defer req.Body.Close()
 	body, err := ioutil.ReadAll(req.Body)
@@ -116,7 +95,12 @@ func (this *RecordsHandler) Post(w http.ResponseWriter, req *http.Request, next 
 		return
 	}
 
-	err = this.Hoverfly.ImportRequestResponsePairViews(requests.Data)
+	requestResponsePairViews := make([]interfaces.RequestResponsePair, len(requests.Data))
+	for i, v := range requests.Data {
+		requestResponsePairViews[i] = v
+	}
+
+	err = this.Hoverfly.ImportRequestResponsePairViews(requestResponsePairViews)
 
 	if err != nil {
 		response.Message = err.Error()
@@ -141,7 +125,7 @@ func (this *RecordsHandler) Post(w http.ResponseWriter, req *http.Request, next 
 
 // DeleteAllRecordsHandler - deletes all captured requests
 func (this *RecordsHandler) Delete(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	err := this.Hoverfly.GetRequestCache().DeleteData()
+	err := this.Hoverfly.DeleteRequestCache()
 
 	w.Header().Set("Content-Type", "application/json")
 

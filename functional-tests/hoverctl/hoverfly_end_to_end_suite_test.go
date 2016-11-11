@@ -1,12 +1,10 @@
 package hoverctl_end_to_end
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/dghubble/sling"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -16,13 +14,19 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/dghubble/sling"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"gopkg.in/yaml.v2"
 )
 
 const (
-	simulate   = "simulate"
-	capture    = "capture"
-	synthesize = "synthesize"
-	modify     = "modify"
+	simulate          = "simulate"
+	capture           = "capture"
+	synthesize        = "synthesize"
+	modify            = "modify"
+	generatedTestData = "testdata-gen"
 )
 
 var (
@@ -32,8 +36,12 @@ var (
 )
 
 func TestHoverflyEndToEnd(t *testing.T) {
+	os.Mkdir(generatedTestData, os.ModePerm)
+
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Hoverfly End To End Suite")
+
+	os.RemoveAll(generatedTestData)
 }
 
 var _ = BeforeSuite(func() {
@@ -46,6 +54,7 @@ var _ = BeforeSuite(func() {
 	binDirectory := filepath.Join(workingDirectory, "bin")
 
 	os.Setenv("PATH", fmt.Sprintf("%v:%v", binDirectory, os.Getenv("PATH")))
+
 })
 
 func SetHoverflyMode(mode string, port int) {
@@ -221,4 +230,14 @@ func WriteConfigurationWithAuth(host, adminPort, proxyPort, username, password s
 
 	ioutil.WriteFile(filepath, data, 0644)
 
+}
+
+func generateFileName() string {
+
+	rb := make([]byte, 6)
+	rand.Read(rb)
+
+	rs := base64.URLEncoding.EncodeToString(rb)
+
+	return "testdata-gen/" + rs + ".json"
 }

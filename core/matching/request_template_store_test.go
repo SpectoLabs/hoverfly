@@ -431,7 +431,7 @@ func TestRequestTemplateResponsePairCanBeConvertedToARequestResponsePairView_Whi
 		},
 	}
 
-	pairView := requestTemplateResponsePair.ConvertToRequestResponsePairView()
+	pairView := requestTemplateResponsePair.ConvertToV1RequestResponsePairView()
 
 	Expect(pairView.Request.RequestType).To(Equal(StringToPointer("template")))
 	Expect(pairView.Request.Method).To(Equal(StringToPointer("POST")))
@@ -656,4 +656,30 @@ func TestTemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
+}
+
+func TestRequestTemplateResponsePair_ConvertToRequestResponsePairView_CanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
+	RegisterTestingT(t)
+
+	method := "POST"
+
+	requestTemplateResponsePair := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Method: &method,
+		},
+		Response: models.ResponseDetails{
+			Body: "template matched",
+		},
+	}
+
+	pairView := requestTemplateResponsePair.ConvertToRequestResponsePairView()
+
+	Expect(pairView.Request.RequestType).To(Equal(StringToPointer("template")))
+	Expect(pairView.Request.Method).To(Equal(StringToPointer("POST")))
+	Expect(pairView.Request.Destination).To(BeNil())
+	Expect(pairView.Request.Path).To(BeNil())
+	Expect(pairView.Request.Scheme).To(BeNil())
+	Expect(pairView.Request.Query).To(BeNil())
+
+	Expect(pairView.Response.Body).To(Equal("template matched"))
 }

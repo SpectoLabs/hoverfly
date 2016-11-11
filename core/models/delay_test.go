@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	. "github.com/onsi/gomega"
 	"testing"
 )
@@ -16,9 +17,9 @@ func TestConvertJsonStringToResponseDelayConfig(t *testing.T) {
 				"delay": 1
 			}]
 	}`
-	var responseDelayJson ResponseDelayPayload
+	var responseDelayJson v1.ResponseDelayPayloadView
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
-	err := ValidateResponseDelayJson(responseDelayJson)
+	err := ValidateResponseDelayPayload(responseDelayJson)
 	Expect(err).To(BeNil())
 }
 
@@ -31,9 +32,9 @@ func TestErrorIfHostPatternNotSet(t *testing.T) {
 				"delay": 2
 			}]
 	}`
-	var responseDelayJson ResponseDelayPayload
+	var responseDelayJson v1.ResponseDelayPayloadView
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
-	err := ValidateResponseDelayJson(responseDelayJson)
+	err := ValidateResponseDelayPayload(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
 }
 
@@ -46,9 +47,9 @@ func TestErrprIfDelayNotSet(t *testing.T) {
 				"urlPattern": "."
 			}]
 	}`
-	var responseDelayJson ResponseDelayPayload
+	var responseDelayJson v1.ResponseDelayPayloadView
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
-	err := ValidateResponseDelayJson(responseDelayJson)
+	err := ValidateResponseDelayPayload(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
 }
 
@@ -62,9 +63,9 @@ func TestHostPatternMustBeAValidRegexPattern(t *testing.T) {
 				"delay": 1
 			}]
 	}`
-	var responseDelayJson ResponseDelayPayload
+	var responseDelayJson v1.ResponseDelayPayloadView
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
-	err := ValidateResponseDelayJson(responseDelayJson)
+	err := ValidateResponseDelayPayload(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
 }
 
@@ -78,9 +79,9 @@ func TestErrorIfHostPatternUsed(t *testing.T) {
 				"delay": 1
 			}]
 	}`
-	var responseDelayJson ResponseDelayPayload
+	var responseDelayJson v1.ResponseDelayPayloadView
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
-	err := ValidateResponseDelayJson(responseDelayJson)
+	err := ValidateResponseDelayPayload(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
 }
 
@@ -186,4 +187,20 @@ func TestIfDelayMethodBlankThenMatchesAnyMethod(t *testing.T) {
 
 	delayMatch := delays.GetDelay(request)
 	Expect(*delayMatch).To(Equal(delay))
+}
+
+func TestResponseDelayList_ConvertToPayloadView(t *testing.T) {
+	RegisterTestingT(t)
+
+	delay := ResponseDelay{
+		UrlPattern: "example(.+)",
+		Delay:      100,
+	}
+	delays := ResponseDelayList{delay}
+
+	payloadView := delays.ConvertToResponseDelayPayloadView()
+
+	Expect(payloadView.Data[0].UrlPattern).To(Equal("example(.+)"))
+	Expect(payloadView.Data[0].Delay).To(Equal(100))
+
 }

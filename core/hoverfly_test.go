@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
@@ -166,6 +167,10 @@ func (this *ResponseDelayListStub) Len() int {
 func (this *ResponseDelayListStub) GetDelay(request models.RequestDetails) *models.ResponseDelay {
 	this.gotDelays++
 	return nil
+}
+
+func (this ResponseDelayListStub) ConvertToResponseDelayPayloadView() v1.ResponseDelayPayloadView {
+	return v1.ResponseDelayPayloadView{}
 }
 
 func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {

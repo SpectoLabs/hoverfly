@@ -3,13 +3,14 @@ package main
 import (
 	"errors"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
-	"github.com/mitchellh/go-homedir"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"strconv"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/mitchellh/go-homedir"
 )
 
 type HoverflyDirectory struct {
@@ -99,4 +100,12 @@ func createHoverflyDirectory(homeDirectory string) string {
 	}
 
 	return hoverflyDirectory
+}
+
+func fileIsPresent(fileURI string) bool {
+	if _, err := os.Stat(fileURI); err != nil {
+		return os.IsExist(err)
+	}
+
+	return true
 }

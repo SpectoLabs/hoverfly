@@ -7,8 +7,10 @@ import (
 	"encoding/gob"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	. "github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
@@ -65,8 +67,12 @@ func (this *RequestResponsePair) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (this *RequestResponsePair) ConvertToRequestResponsePairView() *views.RequestResponsePairView {
-	return &views.RequestResponsePairView{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
+func (this *RequestResponsePair) ConvertToV1RequestResponsePairView() *v1.RequestResponsePairView {
+	return &v1.RequestResponsePairView{Response: this.Response.ConvertToV1ResponseDetailsView(), Request: this.Request.ConvertToV1RequestDetailsView()}
+}
+
+func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairView {
+	return v2.RequestResponsePairView{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
 }
 
 // NewPayloadFromBytes decodes supplied bytes into Payload structure
@@ -81,10 +87,10 @@ func NewRequestResponsePairFromBytes(data []byte) (*RequestResponsePair, error) 
 	return pair, nil
 }
 
-func NewRequestResponsePairFromRequestResponsePairView(pairView views.RequestResponsePairView) RequestResponsePair {
+func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.RequestResponsePair) RequestResponsePair {
 	return RequestResponsePair{
-		Response: NewResponseDetailsFromResponseDetailsView(pairView.Response),
-		Request:  NewRequestDetailsFromRequestDetailsView(pairView.Request),
+		Response: NewResponseDetailsFromResponse(pairView.GetResponse()),
+		Request:  NewRequestDetailsFromRequest(pairView.GetRequest()),
 	}
 }
 
@@ -157,21 +163,35 @@ func CopyBody(body io.ReadCloser) (resp1, resp2 io.ReadCloser, err error) {
 	return ioutil.NopCloser(&buf), ioutil.NopCloser(bytes.NewReader(buf.Bytes())), nil
 }
 
-func NewRequestDetailsFromRequestDetailsView(data views.RequestDetailsView) RequestDetails {
+func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 	return RequestDetails{
-		Path:        PointerToString(data.Path),
-		Method:      PointerToString(data.Method),
-		Destination: PointerToString(data.Destination),
-		Scheme:      PointerToString(data.Scheme),
-		Query:       PointerToString(data.Query),
-		Body:        PointerToString(data.Body),
-		Headers:     data.Headers,
+		Path:        PointerToString(data.GetPath()),
+		Method:      PointerToString(data.GetMethod()),
+		Destination: PointerToString(data.GetDestination()),
+		Scheme:      PointerToString(data.GetScheme()),
+		Query:       PointerToString(data.GetQuery()),
+		Body:        PointerToString(data.GetBody()),
+		Headers:     data.GetHeaders(),
 	}
 }
 
-func (this *RequestDetails) ConvertToRequestDetailsView() views.RequestDetailsView {
+func (this *RequestDetails) ConvertToV1RequestDetailsView() v1.RequestDetailsView {
 	s := "recording"
-	return views.RequestDetailsView{
+	return v1.RequestDetailsView{
+		RequestType: &s,
+		Path:        &this.Path,
+		Method:      &this.Method,
+		Destination: &this.Destination,
+		Scheme:      &this.Scheme,
+		Query:       &this.Query,
+		Body:        &this.Body,
+		Headers:     this.Headers,
+	}
+}
+
+func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsView {
+	s := "recording"
+	return v2.RequestDetailsView{
 		RequestType: &s,
 		Path:        &this.Path,
 		Method:      &this.Method,
@@ -258,18 +278,21 @@ type ResponseDetails struct {
 	Headers map[string][]string `json:"headers"`
 }
 
-func NewResponseDetailsFromResponseDetailsView(data views.ResponseDetailsView) ResponseDetails {
-	body := data.Body
+func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
+	body := data.GetBody()
 
-	if data.EncodedBody == true {
-		decoded, _ := base64.StdEncoding.DecodeString(data.Body)
+	if data.GetEncodedBody() == true {
+		decoded, _ := base64.StdEncoding.DecodeString(data.GetBody())
 		body = string(decoded)
 	}
 
-	return ResponseDetails{Status: data.Status, Body: body, Headers: data.Headers}
+	return ResponseDetails{Status: data.GetStatus(), Body: body, Headers: data.GetHeaders()}
 }
 
-func (r *ResponseDetails) ConvertToResponseDetailsView() views.ResponseDetailsView {
+// This function will create a JSON appriopriate version of ResponseDetails for the v1 API
+// If the response headers indicate that the content is encoded, or it has a non-matching
+// supported mimetype, we base64 encode it.
+func (r *ResponseDetails) ConvertToV1ResponseDetailsView() v1.ResponseDetailsView {
 	needsEncoding := false
 
 	// Check headers for gzip
@@ -293,5 +316,35 @@ func (r *ResponseDetails) ConvertToResponseDetailsView() views.ResponseDetailsVi
 		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
 	}
 
-	return views.ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
+	return v1.ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
+}
+
+// This function will create a JSON appriopriate version of ResponseDetails for the v2 API
+// If the response headers indicate that the content is encoded, or it has a non-matching
+// supported mimetype, we base64 encode it.
+func (r *ResponseDetails) ConvertToResponseDetailsView() v2.ResponseDetailsView {
+	needsEncoding := false
+
+	// Check headers for gzip
+	contentEncodingValues := r.Headers["Content-Encoding"]
+	if len(contentEncodingValues) > 0 {
+		needsEncoding = true
+	} else {
+		mimeType := http.DetectContentType([]byte(r.Body))
+		needsEncoding = true
+		for _, v := range supportedMimeTypes {
+			if strings.Contains(mimeType, v) {
+				needsEncoding = false
+				break
+			}
+		}
+	}
+
+	// If contains gzip, base64 encode
+	body := r.Body
+	if needsEncoding {
+		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
+	}
+
+	return v2.ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
 }

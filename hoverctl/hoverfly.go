@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
-	"github.com/dghubble/sling"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -13,6 +11,14 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/dghubble/sling"
+)
+
+const (
+	v1ApiSimulation = "/api/records"
+	v2ApiSimulation = "/api/v2/simulation"
 )
 
 type APIStateSchema struct {
@@ -72,7 +78,7 @@ func (h *Hoverfly) DeleteSimulations() error {
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
 		log.Debug(err.Error())
-		return errors.New("Could not authenticate  with Hoverfly")
+		return errors.New("Could not authenticate with Hoverfly")
 	}
 
 	request, err := slingRequest.Request()
@@ -294,10 +300,14 @@ func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
 	return apiResponse.Middleware, nil
 }
 
-func (h *Hoverfly) ImportSimulation(simulationData string) error {
-	url := h.buildURL("/api/records")
+func (h *Hoverfly) ImportSimulation(simulationData string, v1 bool) error {
+	slingRequest := sling.New().Body(strings.NewReader(simulationData))
 
-	slingRequest := sling.New().Post(url).Body(strings.NewReader(simulationData))
+	if v1 {
+		slingRequest = slingRequest.Post(h.buildURL(v1ApiSimulation))
+	} else {
+		slingRequest = slingRequest.Put(h.buildURL(v2ApiSimulation))
+	}
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
 		log.Debug(err.Error())
@@ -329,7 +339,7 @@ func (h *Hoverfly) ImportSimulation(simulationData string) error {
 }
 
 func (h *Hoverfly) ExportSimulation() ([]byte, error) {
-	url := h.buildURL("/api/records")
+	url := h.buildURL(v2ApiSimulation)
 
 	slingRequest := sling.New().Get(url)
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)

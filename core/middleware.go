@@ -8,8 +8,8 @@ import (
 
 	"errors"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/views"
 	"io/ioutil"
 	"net/http"
 )
@@ -71,7 +71,7 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 	}
 
 	// getting payload
-	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
+	pairViewBytes, err := json.Marshal(pair.ConvertToV1RequestResponsePairView())
 
 	if log.GetLevel() == log.DebugLevel {
 		log.WithFields(log.Fields{
@@ -117,7 +117,7 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 	}
 
 	if len(mwOutput) > 0 {
-		var newPairView views.RequestResponsePairView
+		var newPairView v1.RequestResponsePairView
 
 		err = json.Unmarshal(mwOutput, &newPairView)
 
@@ -149,7 +149,7 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 }
 
 func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
+	pairViewBytes, err := json.Marshal(pair.ConvertToV1RequestResponsePairView())
 
 	req, err := http.NewRequest("POST", middleware, bytes.NewBuffer(pairViewBytes))
 	if err != nil {
@@ -180,7 +180,7 @@ func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePai
 		return pair, err
 	}
 
-	var newPairView views.RequestResponsePairView
+	var newPairView v1.RequestResponsePairView
 
 	err = json.Unmarshal(returnedPairViewBytes, &newPairView)
 	if err != nil {

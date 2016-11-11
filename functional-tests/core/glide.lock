@@ -1,6 +1,8 @@
-hash: e7725f96bdf3ff68224772d7aadf6c1c21b12f69be61e89a7912f344da49c0bc
-updated: 2016-08-24T16:25:25.283477349+01:00
+hash: 0019067cc638daa27a1e6f2588f4f76037ca79d2be16540ee7423c70bf37f36a
+updated: 2016-10-13T16:14:59.005808404+01:00
 imports:
+- name: github.com/antonholmquist/jason
+  version: c23cef7eaa75a6a5b8810120e167bd590d8fd2ab
 - name: github.com/dghubble/sling
   version: 4af638d6d3265b9f740bf6d2665ef20d7abd0103
 - name: github.com/google/go-querystring

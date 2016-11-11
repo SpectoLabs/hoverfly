@@ -3,7 +3,7 @@ package v1
 import (
 	"encoding/json"
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
@@ -11,12 +11,11 @@ import (
 	"net/http"
 	"reflect"
 	"time"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
 )
 
 type HoverflyStats interface {
 	GetStats() metrics.Stats
-	GetRequestCache() cache.Cache
+	GetRequestCacheCount() (int, error)
 }
 
 type StatsHandler struct {
@@ -36,7 +35,7 @@ func (this *StatsHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler
 func (this *StatsHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	stats := this.Hoverfly.GetStats()
 
-	count, err := this.Hoverfly.GetRequestCache().RecordsCount()
+	count, err := this.Hoverfly.GetRequestCacheCount()
 
 	if err != nil {
 		log.Error(err)
@@ -93,7 +92,7 @@ func (this *StatsHandler) GetWS(w http.ResponseWriter, r *http.Request) {
 		}).Info("Got message...")
 
 		for _ = range time.Tick(1 * time.Second) {
-			count, err := this.Hoverfly.GetRequestCache().RecordsCount()
+			count, err := this.Hoverfly.GetRequestCacheCount()
 			if err != nil {
 				log.WithFields(log.Fields{
 					"message": p,

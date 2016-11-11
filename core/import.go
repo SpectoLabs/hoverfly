@@ -11,12 +11,13 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/SpectoLabs/hoverfly/core/views"
-	"net/http"
 	"io/ioutil"
+	"net/http"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -92,7 +93,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
 	}
 
-	var requests views.RequestResponsePairPayload
+	var requests v1.RequestResponsePairPayload
 
 	body, err := ioutil.ReadAll(pairsFile)
 	if err != nil {
@@ -104,7 +105,12 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.ImportRequestResponsePairViews(requests.Data)
+	requestResponsePairViews := make([]interfaces.RequestResponsePair, len(requests.Data))
+	for i, v := range requests.Data {
+		requestResponsePairViews[i] = v
+	}
+
+	return hf.ImportRequestResponsePairViews(requestResponsePairViews)
 }
 
 // ImportFromURL - takes one string value and tries connect to a remote server, then parse response body into
@@ -117,7 +123,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Failed to fetch given URL, error %s", err.Error())
 	}
 
-	var requests views.RequestResponsePairPayload
+	var requests v1.RequestResponsePairPayload
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -129,7 +135,12 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.ImportRequestResponsePairViews(requests.Data)
+	requestResponsePairViews := make([]interfaces.RequestResponsePair, len(requests.Data))
+	for i, v := range requests.Data {
+		requestResponsePairViews[i] = v
+	}
+
+	return hf.ImportRequestResponsePairViews(requestResponsePairViews)
 }
 
 func isJSON(s string) bool {
@@ -139,23 +150,23 @@ func isJSON(s string) bool {
 }
 
 // ImportRequestResponsePairViews - a function to save given pairs into the database.
-func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []views.RequestResponsePairView) error {
+func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.RequestResponsePair) error {
 	if len(pairViews) > 0 {
 		success := 0
 		failed := 0
 		for _, pairView := range pairViews {
 
-			if pairView.Request.RequestType != nil && *pairView.Request.RequestType == *StringToPointer("template") {
-				responseDetails := models.NewResponseDetailsFromResponseDetailsView(pairView.Response)
+			if pairView.GetRequest().GetRequestType() != nil && *pairView.GetRequest().GetRequestType() == *StringToPointer("template") {
+				responseDetails := models.NewResponseDetailsFromResponse(pairView.GetResponse())
 
 				requestTemplate := matching.RequestTemplate{
-					Path:        pairView.Request.Path,
-					Method:      pairView.Request.Method,
-					Destination: pairView.Request.Destination,
-					Scheme:      pairView.Request.Scheme,
-					Query:       pairView.Request.Query,
-					Body:        pairView.Request.Body,
-					Headers:     pairView.Request.Headers,
+					Path:        pairView.GetRequest().GetPath(),
+					Method:      pairView.GetRequest().GetMethod(),
+					Destination: pairView.GetRequest().GetDestination(),
+					Scheme:      pairView.GetRequest().GetScheme(),
+					Query:       pairView.GetRequest().GetQuery(),
+					Body:        pairView.GetRequest().GetBody(),
+					Headers:     pairView.GetRequest().GetHeaders(),
 				}
 
 				requestTemplateResponsePair := matching.RequestTemplateResponsePair{
@@ -228,5 +239,5 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []views.RequestResp
 		}).Info("payloads imported")
 		return nil
 	}
-	return fmt.Errorf("Bad request. Nothing to import!")
+	return nil
 }
