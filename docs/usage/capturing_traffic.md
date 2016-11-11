@@ -29,7 +29,7 @@ First put Hoverfly into *capture mode*. There are four ways to do this.
 
 4. Ensure Hoverfly is running (in any mode), then make an API call:
 
-        curl -H "Content-Type application/json" -X POST -d '{"mode":"capture"}' http://${HOVERFLY_HOST}:8888/api/state
+        curl -H "Content-Type application/json" -X PUT -d '{"mode":"capture"}' http://${HOVERFLY_HOST}:8888/api/v2/hoverfly/mode
 
 The simplest way to capture some traffic is to use cURL:
 
@@ -41,7 +41,7 @@ To verify that Hoverfly is capturing traffic, you can look at the Hoverfly loggi
 
 You can also make an API call to view captured traffic:
 
-    curl http://${HOVERFLY_HOST}:8888/api/records
+    curl http://${HOVERFLY_HOST}:8888/api/v2/simulation
 
 ## What is happening?
 
@@ -59,7 +59,7 @@ This can be done in three ways.
 
 3. Make an API call:
 
-       curl -X DELETE http://${HOVERFLY_HOST}:8888/api/records
+       curl -X DELETE http://${HOVERFLY_HOST}:8888/api/v2/simulation
 
 ## Next steps
 
