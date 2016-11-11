@@ -2,7 +2,7 @@
 
 In *modify mode*, Hoverfly does not make use of its cache. Traffic is passed through Hoverfly, and middleware is executed both on out-going and in-bound traffic. In this mode, Middleware can be used to manipulate any part of a request or a response.
 
-This is a mode with potential applications outside of simulating external services for development and testing. Possible use-cases include introducing transparent redirects and injecting authentication headers. 
+This is a mode with potential applications outside of simulating external services for development and testing. Possible use-cases include introducing transparent redirects and injecting authentication headers.
 
 ## Set up
 
@@ -59,7 +59,7 @@ There are three ways of doing this:
 
 3. Ensure Hoverfly is running (in any mode), and that the middleware has been specified, then make an API call:
 
-       curl -H "Content-Type application/json" -X POST -d '{"mode":"modify"}' http://${HOVERFLY_HOST}:8888/api/state
+       curl -H "Content-Type application/json" -X POST -d '{"mode":"modify"}' http://${HOVERFLY_HOST}:8888/api/v2/hoverfly/mode
 
 Now cURL any (HTTP) URL with Hoverfly as a proxy. For example:
 

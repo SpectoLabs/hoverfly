@@ -11,7 +11,7 @@ To simulate service latency, you will need to have created a simulation by captu
 ## Simulate latency
 
 ### JSON configuration
-To simulate latency, Hoverfly can be configured to apply a delay to individual hosts or API endpoints in the simulation using a JSON configuration file. This is done using a regular expression to match against the URL, a delay value in milliseconds, and an optional HTTP method value. 
+To simulate latency, Hoverfly can be configured to apply a delay to individual hosts or API endpoints in the simulation using a JSON configuration file. This is done using a regular expression to match against the URL, a delay value in milliseconds, and an optional HTTP method value.
 
 For example, to apply a delay of 2 seconds to all hosts in the simulation:  
 
@@ -59,7 +59,7 @@ It is also possible to apply delays to specific resources and endpoints in your 
         }
       ]
     }
-    
+
 The **delays will be matched in the order that they appear in the JSON configuration file**. In the following example, `"urlPattern":"."` matches all hosts, overriding `"urlPattern": "1\\.myhost\\.com"` and all subsequent matches, applying a 3 second delay to all responses:   
 
     {
@@ -83,12 +83,12 @@ The configuration can be applied using hoverctl.
         hoverctl delays path/to/my_delays.json
 2. To view the delays which have been applied:
         hoverctl delays
-        
+
 Alternatively, the configuration can be applied using the Hoverfly API directly:
 
 1. To apply delays:
         curl -H "Content-Type application/json" -X PUT -d '{"data":[{"urlPattern":"1\\.myhost\\.com","delay":1000},{"urlPattern":"2\\.myhost\\.com","delay":2000}]}' http://${HOVERFLY_HOST}:8888/api/delays
-        
+
 2. To view the delays which have been applied
 
         curl http://${HOVERFLY_HOST}:8888/api/delays

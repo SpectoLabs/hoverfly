@@ -1,7 +1,9 @@
 # API
 
 ## GET /api/v2/simulation
-Gets all simulation data being used in the running instance of Hoverfly. This includes recordings, templates, delays and meta data.
+Gets all simulation data from the running instance of Hoverfly. This includes recordings, templates, delays and metadata.
+
+### Example response body
 ```
 {
   "data": {
@@ -73,7 +75,9 @@ Gets all simulation data being used in the running instance of Hoverfly. This in
 ```
 
 ## PUT /api/v2/simulation
-Puts the simulation into Hoverfly and replaces the previous set of data.
+Puts simulation into the running instance of Hoverfly, overwriting any existing simulation data.
+
+### Example request body
 ```
 {
   "data": {
@@ -145,7 +149,9 @@ Puts the simulation into Hoverfly and replaces the previous set of data.
 ```
 
 ## GET /api/v2/hoverfly
-Gets all configuration for the running instance of Hoverfly.
+Gets configuration information from the running instance of Hoverfly.
+
+### Example response body
 ```
 {
     destination: ".",
@@ -163,15 +169,19 @@ Gets all configuration for the running instance of Hoverfly.
 ```
 
 ## GET /api/v2/hoverfly/destination
-Gets the current destination for the running instance of Hoverfly.
+Gets the current destination setting for the running instance of Hoverfly.
+
+### Example response body
 ```
 {
     destination: "."
 }
 ```
 
-## PUT /api/v2/hoverfly/destination	
-Puts the new destination and overwrites current destination for the running instance of Hoverfly. This requires a JSON body on the request.
+## PUT /api/v2/hoverfly/destination
+Sets a new destination for the running instance of Hoverfly, overwriting the existing destination setting.
+
+### Example request body
 
 ```
 {
@@ -181,7 +191,9 @@ Puts the new destination and overwrites current destination for the running inst
 
 
 ## GET /api/v2/hoverfly/middleware
-Gets the current middleware value for the running instance of Hoverfly. This is likely to be an executable command and path to middleware script being used.
+Gets the middleware value for the running instance of Hoverfly. This will be either an executable command, or an executable command with a path to a middleware script.
+
+### Example response body
 ```
 {
 	"middleware": "python ~/middleware.py"
@@ -189,13 +201,21 @@ Gets the current middleware value for the running instance of Hoverfly. This is 
 ```
 
 ## PUT /api/v2/hoverfly/middleware
-Puts the new middleware value and overwrites current middleware value for the running instance of Hoverfly. This requires a JSON body on the request. The value you send should be a command that runs on the machine Hoverfly is running. You may need to specify the command to run the script as well as the path to the script.
+Sets a new middleware value, overwriting the existing middleware value for the running instance of Hoverfly. The middleware value should be an executable command, or an executable command with a path to a middleware script. The command and the file must be available on the Hoverfly host machine.
+
+### Example request body
+
+```
 {
 	"middleware": "python ~/new-middleware.py"
 }
+```
 
 ## GET /api/v2/hoverfly/mode
-Gets the current mode for the running instance of Hoverfly.
+Gets the mode for the running instance of Hoverfly.
+
+### Example response body
+
 ```
 {
     mode: "simulate"
@@ -203,15 +223,20 @@ Gets the current mode for the running instance of Hoverfly.
 ```
 
 ## PUT /api/v2/hoverfly/mode
-Puts the new mode and overwrites current mode of the running instace of Hoverfly. This requires a JSON body on the request.
+
+Changes the mode of the running instance of Hoverfly.
+
+### Example request body
 ```
 {
     mode: "simulate"
 }
 ```
-                                       
+
 ## GET /api/v2/hoverfly/usage
-Gets the metrics for the running instance of Hoverfly.
+Gets metrics information for the running instance of Hoverfly.
+
+### Example response body
 ```
 {
 	"metrics": {

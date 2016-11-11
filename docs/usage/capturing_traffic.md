@@ -34,7 +34,7 @@ First put Hoverfly into *capture mode*. There are four ways to do this.
 The simplest way to capture some traffic is to use cURL:
 
     curl http://<MY_EXTERNAL_SERVICE> --proxy http://${HOVERFLY_HOST}:8500/
-    
+
 Or if you are developing or testing an application that uses an external service, just run your tests.
 
 To verify that Hoverfly is capturing traffic, you can look at the Hoverfly logging output, or the Admin UI.
@@ -45,7 +45,7 @@ You can also make an API call to view captured traffic:
 
 ## What is happening?
 
-Hoverfly is transparently passing requests from the client application through to the destination service, then passing the responses back. It is storing the request/response pairs in memory, and persisting them on disk in a file named `requests.db`. 
+Hoverfly is transparently passing requests from the client application through to the destination service, then passing the responses back. It is storing the request/response pairs in memory, and persisting them on disk in a file named `requests.db`.
 
 ## Deleting all captured traffic
 
@@ -54,7 +54,7 @@ This can be done in three ways.
 1. Use hoverctl to wipe Hoverfly
 
        hoverctl wipe
-       
+
 2. Visit the Admin UI at `http://${HOVERFLY_HOST}:8888` and click "Wipe records"
 
 3. Make an API call:
