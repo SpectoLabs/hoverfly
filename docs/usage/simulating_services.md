@@ -11,19 +11,19 @@ You will need to have your application or OS configured to use Hoverfly as a pro
 Put Hoverfly into *simulate mode*. There are four ways of doing this:
 
 1. Use hoverctl to start Hoverfly and set the mode to simulate:
-       
+
        hoverctl start
        hoverctl mode simulate
-       
+
 2. Start Hoverfly without specifying the mode (Hoverfly starts in *simulate mode* by default)
 
        ./hoverfly
-       
+
 3. Ensure Hoverfly is running (in any mode), then select "simulate" in the Admin UI, which is available at `http://${HOVERFLY_HOST}:8888` by default.
 
 4. Ensure Hoverfly is running (in any mode), then make an API call:
 
-       curl -H "Content-Type application/json" -X POST -d '{"mode":"simulate"}' http://${HOVERFLY_HOST}:8888/api/state
+       curl -H "Content-Type application/json" -X POST -d '{"mode":"simulate"}' http://${HOVERFLY_HOST}:8888/api/v2/hoverfly/mode
 
 Provided you have previously captured traffic either using cURL or by running tests, you can now repeat the steps you took to capture traffic.
 
@@ -49,7 +49,7 @@ Put Hoverfly into *simulate mode* while it is running as a webserver. There are 
 
 Provided you have previously captured traffic either using cURL or by running tests with Hoverfly running as a proxy (or you have imported previously captured traffic - see the **Exporting and importing** section), Hoverfly can now be used instead of the external service you captured.
 
-Since Hoverfly is simulating the service as a *webserver* rather than a *proxy*, you will need to substitute the host name of the service you captured with the host and port that the Hoverfly webserver is running on when you make a request. 
+Since Hoverfly is simulating the service as a *webserver* rather than a *proxy*, you will need to substitute the host name of the service you captured with the host and port that the Hoverfly webserver is running on when you make a request.
 
 For example, if you created a simulation by running the following command with Hoverfly running in *capture* mode as a **proxy**:
 
@@ -62,7 +62,7 @@ You would need to run the following command with Hoverfly running in *simulate* 
 
 ## What is happening?
 
-Hoverfly is no longer passing requests through to the external service. Instead, for each request it receives, it is returning a matched response from its cache. The cache is stored in memory, and persisted on disk in the `requets.db` file. 
+Hoverfly is no longer passing requests through to the external service. Instead, for each request it receives, it is returning a matched response from its cache. The cache is stored in memory, and persisted on disk in the `requets.db` file.
 
 ## Next steps
 
@@ -79,7 +79,3 @@ A detailed step-by-step guide to capturing traffic and creating a simulated serv
 A guide on how to capture and simulate the Meetup API is available here:
 
 [Virtualizing the Meetup API](https://specto.io/blog/hoverfly-meetup-api.html)
-
-    
-
-

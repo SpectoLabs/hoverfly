@@ -41,7 +41,7 @@ To get the token for a user, make an API call:
 
 To use the token in an API call:
 
-    curl -H "Authorization: Bearer <token>" http://${HOVERFLY_HOST}:8888/api/records
+    curl -H "Authorization: Bearer <token>" http://${HOVERFLY_HOST}:8888/api/v2/simulation
 
 By default, tokens expire after one day. You can override this by setting the `HoverflyTokenExpiration` environment variable in seconds:
 

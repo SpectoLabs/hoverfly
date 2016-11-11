@@ -1,5 +1,5 @@
 # Using middleware
-Hoverfly middleware can be written in any language. Middleware modules receive a service data JSON string via the standard input (STDIN) and must return a service data JSON string to the standard output (STDOUT). 
+Hoverfly middleware can be written in any language. Middleware modules receive a service data JSON string via the standard input (STDIN) and must return a service data JSON string to the standard output (STDOUT).
 
 The way middleware is applied to the requests and/or the responses depends on the mode:
 
@@ -23,13 +23,18 @@ Middleware is set using hoverctl.
 You can also set the middleware on start up with the Hoverfly binary
 
     ./hoverfly -middleware "path/to/script"
-    
+
 This will start Hoverfly in the default mode (*simulate mode*) and import a middleware script.
 
 The string supplied as middleware can contain commands as well as a path to a file. For example, if you have written middleware in Go:
 
+<<<<<<< HEAD
     ./hoverfly -middleware "go run path/to/file.go"
-    
+
+=======
+    hoverctl middleware "go run path/to/file.go"
+
+>>>>>>> ac56250b0e22ee2691c71165487108abc6fddcdd
 (This will compile the Go file on the fly, which will introduce latency. It would be preferable to pre-compile the Go binary.)
 
 ### Python example
@@ -71,11 +76,11 @@ This example will change the response code and body in each response, and add 2 
 
 4. Retart Hoverfly in *simulate mode* with the `example.py` script specified as middleware:
 
-       ./hoverfly -middleware "./example.py"
+       hoverctl middleware "./example.py"
 
 5. Repeat the steps you took to capture the traffic       
 
-You will notice that every response will have the `201` status code, and the body will have been replaced by the string specified in the script. 
+You will notice that every response will have the `201` status code, and the body will have been replaced by the string specified in the script.
 
 There will also be a 2 second delay between each request and the response.
 
@@ -102,11 +107,11 @@ This example will change the response code and body in each response.
 
           process.stdout.write(newJsonString);
         });
-        
+
 4. Restart Hoverfly in *simulate mode* with the `example.js` script specified as middleware:
 
-          ./hoverfly -middleware "./example.js"
-          
+          hoverctl middleware "./example.js"
+
 5. Repeat the steps you took to capture the traffic
 You will notice that every response will have the `201` status code, and the body will have been replaced by the string specified in the script.
 
@@ -115,8 +120,7 @@ The examples above show how to execute middleware on the machine on which Hoverf
 
 For example, you could write a piece of middleware using [AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html) and then provide the URL to Hoverfly as middleware.
 
-    hoverctl -middleware "https://1sfefc4.execute-api.eu-west-1.amazonaws.com/remote/middleware"
-          
+    hoverctl middleware "https://1sfefc4.execute-api.eu-west-1.amazonaws.com/remote/middleware"
 
 Remote middleare execution works in a similar way to local middleware execution. Hoverfly will send the same JSON data to the middleware, but instead of sending it via `stdin`, it is sent as a POST request to the specified URL. The middleware is then expected to return the same data as it would to `stdout` to the response body.
 

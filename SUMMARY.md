@@ -7,8 +7,8 @@
 * Getting started
    * [Use cases](docs/getting_started/use_cases.md)
    * [Modes and middleware](docs/getting_started/modes_and_middleware.md)
-   * [Server type](docs/getting_started/server_type.md)
    * [Installation and setup](docs/getting_started/installation_and_setup.md)
+   * [Server type](docs/getting_started/server_type.md)
 * Usage
    * [Capturing traffic](docs/usage/capturing_traffic.md)
    * [Simulating services](docs/usage/simulating_services.md)
