@@ -1,4 +1,7 @@
 # HTTPS support & certificate management
+Hoverfly ships with a default certificate (`cert.pem` in the repository root directory). To use Hoverfly with HTTPS traffic, you will need to add this default certificate to your trust store. 
+
+Using Hoverfly, you may also generate new certificates.  
 
 ## Generating and using certificates
 
@@ -13,8 +16,6 @@ This will create `cert.pem` and a `key.pem` files in your current directory. Nex
 You will then need to add the `cert.pem` file to your trusted certificates. Alternatively, you can turn off certificate verification. For example, to make insecure requests with cURL, you can use the `-k` flag:
 
     curl https://www.bbc.co.uk --proxy http://${HOVERFLY_HOST}:8500 -k
-
-Hoverfly also ships with a default certificate (`cert.pem` in the repository root directory). You can add this certificate to your trust store if you prefer.  
 
 ## Turn off verification when capturing or modifying traffic
 
