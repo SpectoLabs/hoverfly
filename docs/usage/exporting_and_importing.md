@@ -8,52 +8,44 @@ Hoverfly can export and import service data in JSON format. This is useful if:
 * You want to share your service data someone else   
 
 ## Exporting captured data
-
-There are two ways to export data from Hoverfly.
-
-Firstly, you can use hoverctl. This will create a JSON file of the simulation in the hoverctl local cache.
+Using hoverctl, you can export all the simulation data in Hoverfly. The file written will be a JSON file and it will write this file relative to your current working directory.
 ```
-hoverctl export myname/mysimulation
+hoverctl export mysimulation.json
 ```
-For more about hoverctl and the local cache, [check here](../reference/hoverctl.md).
 
-If you are not using hoverctl, you can retrieve this data through the web API.
-```
-curl http://${HOVERFLY_HOST}:8888/api/records > data.json
-```
-This will dump the service data stored in Hoverfly to a `data.json` file.
-
+For more about hoverctl, [check here](../reference/hoverctl.md).
 
 ## Simulation data JSON format
 
 Hoverfly stores captured **Request Response Pairs** (i.e. "traffic") in the following JSON structure:
 
     {
-        "data": [{
-            "response": {
-                "status": 200,
-                "body": "body here",
-                "encodedBody": false,
-                "headers": {
-                    "Content-Type": ["text/html; charset=utf-8"]
-                }
-            },
-            "request": {
-                "requestType": "recording",
-                "path": "/",
-                "method": "GET",
-                "destination": "myhost.io",
-                "scheme": "https",
-                "query": "",
-                "body": "",
-                "headers": {
-                    "Accept": ["text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"],
-                    "User-Agent": ["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"]
-                }
-            }
-        }]
-    }    
-    
+    	"data": {
+    		"pairs": [{
+    			"response": {
+    				"status": 200,
+    				"body": "body here",
+    				"encodedBody": false,
+    				"headers": {
+    					"Content-Type": ["text/html; charset=utf-8"]
+    				}
+    			},
+    			"request": {
+    				"requestType": "recording",
+    				"path": "/",
+    				"method": "GET",
+    				"destination": "myhost.io",
+    				"scheme": "https",
+    				"query": "",
+    				"body": "",
+    				"headers": {
+    					"Accept": ["text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"],
+    					"User-Agent": ["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"]
+    				}
+    			}
+    		}]
+    	}
+    } 
 
 When you export a simulation that you have captured, the JSON file will look something like this. Notice that by default, the request `requestType` is `recording`. 
 
@@ -76,107 +68,111 @@ Request templates are defined in the JSON file by setting the `requestType` prop
 For example:
 
     {
-        "data": [{
-            "response": {
-                "status": 200,
-                "body": "<h1>Matched on template</h1>",
-                "encodedBody": false,
-                "headers": {
-                    "Content-Type": ["text/html; charset=utf-8"],
+        "data": {
+            "pairs": [{
+                "response": {
+                    "status": 200,
+                    "body": "<h1>Matched on template</h1>",
+                    "encodedBody": false,
+                    "headers": {
+                        "Content-Type": ["text/html; charset=utf-8"]
+                    }
+                },
+                "request": {
+                    "requestType": "template",
+                    "path": "/template"
                 }
-            },
-            "request": {
-                "requestType": "template",
-                "path": "/template"
-            }
-        }]
+            }]
+        }
     }
 
 Here, any request with the path `/template` will return the same response.
 
 For looser matching, it is possible to use a wildcard to substitute characters. This is achieved by using an `*` symbol. This will match any number of characters and is case sensitive.
 
-In the example below, the template will match to any HTTP request regardless of method.
-
-    {
-        "data": [{
-            "response": {
-                "status": 200,
-                "body": "<h1>Matched on template</h1>",
-                "encodedBody": false,
-                "headers": {
-                    "Content-Type": ["text/html; charset=utf-8"],
-                }
-            },
-            "request": {
-                "requestType": "template",
-                "path": "/template",
-                "method": "*"
-            }
-        }]
-    }
-    
 It is possible to combine the wildcard with characters to substitute parts of a string. In the next example, we use a wildcard the replace part of a URL path. This allows us to match on either `/api/v1/template` or `/api/v2/template`.
 
     {
-        "data": [{
-            "response": {
-                "status": 200,
-                "body": "<h1>Matched on template</h1>",
-                "encodedBody": false,
-                "headers": {
-                    "Content-Type": ["text/html; charset=utf-8"],
+        "data": {
+            "pairs": [{
+                "response": {
+                    "status": 200,
+                    "body": "<h1>Matched on template</h1>",
+                    "encodedBody": false,
+                    "headers": {
+                        "Content-Type": ["text/html; charset=utf-8"]
+                    }
+                },
+                "request": {
+                    "requestType": "template",
+                    "path": "/api/*/template"
                 }
-            },
-            "request": {
-                "requestType": "template",
-                "path": "/api/*/template"
-            }
-        }]
+            }]
+        }
     }
     
 The JSON file can contain both requests recordings and request templates:
 
     {
-        "data": [{
-            "response": {
-                "status": 200,
-                "body": "<h1>Matched on recording</h1>",
-                "encodedBody": false,
-                "headers": {
-                    "Content-Type": ["text/html; charset=utf-8"]
+        "data": {
+            "pairs": [{
+                "response": {
+                    "status": 200,
+                    "body": "<h1>Matched on recording</h1>",
+                    "encodedBody": false,
+                    "headers": {
+                        "Content-Type": [
+                            "text/html; charset=utf-8"
+                        ]
+                    }
+                },
+                "request": {
+                    "requestType": "recording",
+                    "path": "/",
+                    "method": "GET",
+                    "destination": "myhost.io",
+                    "scheme": "https",
+                    "query": "",
+                    "body": "",
+                    "headers": {
+                        "Accept": [
+                            "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+                        ],
+                        "Content-Type": [
+                            "text/plain; charset=utf-8"
+                        ],
+                        "User-Agent": [
+                            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
+                        ]
+                    }
                 }
-            },
-            "request": {
-                "requestType": "recording",
-                "path": "/",
-                "method": "GET",
-                "destination": "myhost.io",
-                "scheme": "https",
-                "query": "",
-                "body": "",
-                "headers": {
-                    "Accept": ["text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"],
-                    "User-Agent": ["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"]
+            }, {
+                "response": {
+                    "status": 200,
+                    "body": "<h1>Matched on template</h1>",
+                    "encodedBody": false,
+                    "headers": {
+                        "Content-Type": [
+                            "text/html; charset=utf-8"
+                        ]
+                    }
+                },
+                "request": {
+                    "requestType": "template",
+                    "path": "/template",
+                    "method": null,
+                    "destination": null,
+                    "scheme": null,
+                    "query": null,
+                    "body": null,
+                    "headers": null
                 }
+            }],
+            "globalActions": {
+                "delays": []
             }
-        }, {
-            "response": {
-                "status": 200,
-                "body": "<h1>Matched on template</h1>",
-                "encodedBody": false,
-                "headers": {
-                    "Content-Type": ["text/html; charset=utf-8"],
-                }
-            },
-            "request": {
-                "requestType": "template",
-                "path": "/template"
-            }
-        }]
+        }
     }
-
-
 
 A standard workflow might be: 
 
@@ -189,11 +185,11 @@ If the `requestType` property is not defined or not recognized, Hoverfly will tr
 
 ## Importing service data
 
-Service data can be imported from the local file system, or from a URL. After you have edited captured data to include some request templates, you will probably want to import it back into Hoverfly. There are four ways to do this.
+Service data can be imported from the local file system, or from a URL. After you have edited captured data to include some request templates, you will probably want to import it back into Hoverfly. There are three ways to do this.
 
-1. Use hoverctl to load a file from your local cache into Hoverfly:
+1. Use hoverctl to load a file into Hoverfly:
 
-       hoverctl import myname/mysimulation
+       hoverctl import simulation.json
        
 For more about hoverctl and the local cache, [check here](../reference/hoverctl.md).
        
@@ -217,7 +213,7 @@ For more about hoverctl and the local cache, [check here](../reference/hoverctl.
  
 3. Make an API call:
 
-       curl --data "@/path/to/data.json" http://${HOVERFLY_HOST}:8888/api/records
+       curl --data "@/path/to/data.json" http://${HOVERFLY_HOST}:8888/api/v2/simulation
 
 For each service data file that has been imported, metadata containing the imported service data source will be stored in Hoverfly (see the **Using the metadata API** section). 
 
