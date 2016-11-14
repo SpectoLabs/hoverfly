@@ -19,6 +19,7 @@ import (
 const (
 	v1ApiSimulation = "/api/records"
 	v2ApiSimulation = "/api/v2/simulation"
+	v2ApiMode       = "/api/v2/hoverfly/mode"
 )
 
 type APIStateSchema struct {
@@ -145,7 +146,7 @@ func (h *Hoverfly) DeleteDelays() error {
 
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
 func (h *Hoverfly) GetMode() (string, error) {
-	url := h.buildURL("/api/state")
+	url := h.buildURL(v2ApiMode)
 
 	slingRequest := sling.New().Get(url)
 
