@@ -17,7 +17,9 @@ import (
 )
 
 const (
+	v1ApiDelays     = "/api/delays"
 	v1ApiSimulation = "/api/records"
+
 	v2ApiSimulation = "/api/v2/simulation"
 	v2ApiMode       = "/api/v2/hoverfly/mode"
 	v2ApiMiddleware = "/api/v2/hoverfly/middleware"
@@ -114,7 +116,7 @@ func (h *Hoverfly) DeleteSimulations() error {
 }
 
 func (h *Hoverfly) DeleteDelays() error {
-	url := h.buildURL("/api/delays")
+	url := h.buildURL(v1ApiDelays)
 
 	slingRequest := sling.New().Delete(url)
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
@@ -544,7 +546,7 @@ func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags str
 			}
 			return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: " + strconv.Itoa(statusCode)))
 		case <-tick:
-			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", h.AdminPort))
+			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/mode", h.AdminPort))
 			if err == nil {
 				statusCode = resp.StatusCode
 			} else {
@@ -600,7 +602,7 @@ func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) error {
 
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
 func (h *Hoverfly) GetDelays() (rd []ResponseDelaySchema, err error) {
-	url := h.buildURL("/api/delays")
+	url := h.buildURL(v1ApiDelays)
 
 	slingRequest := sling.New().Get(url)
 
@@ -638,7 +640,7 @@ func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelaySchema, err error) 
 		return rd, err
 	}
 
-	url := h.buildURL("/api/delays")
+	url := h.buildURL(v1ApiDelays)
 
 	slingRequest := sling.New().Put(url).Body(strings.NewReader(string(conf)))
 
