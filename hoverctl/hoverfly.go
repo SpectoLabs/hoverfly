@@ -17,8 +17,12 @@ import (
 )
 
 const (
+	v1ApiDelays     = "/api/delays"
 	v1ApiSimulation = "/api/records"
+
 	v2ApiSimulation = "/api/v2/simulation"
+	v2ApiMode       = "/api/v2/hoverfly/mode"
+	v2ApiMiddleware = "/api/v2/hoverfly/middleware"
 )
 
 type APIStateSchema struct {
@@ -49,6 +53,10 @@ type MiddlewareSchema struct {
 	Middleware string `json:"middleware"`
 }
 
+type ErrorSchema struct {
+	ErrorMessage string `json:"error"`
+}
+
 type Hoverfly struct {
 	Host       string
 	AdminPort  string
@@ -72,7 +80,7 @@ func NewHoverfly(config Config) Hoverfly {
 
 // Wipe will call the records endpoint in Hoverfly with a DELETE request, triggering Hoverfly to wipe the database
 func (h *Hoverfly) DeleteSimulations() error {
-	url := h.buildURL("/api/records")
+	url := h.buildURL(v2ApiSimulation)
 
 	slingRequest := sling.New().Delete(url)
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
@@ -108,7 +116,7 @@ func (h *Hoverfly) DeleteSimulations() error {
 }
 
 func (h *Hoverfly) DeleteDelays() error {
-	url := h.buildURL("/api/delays")
+	url := h.buildURL(v1ApiDelays)
 
 	slingRequest := sling.New().Delete(url)
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
@@ -145,7 +153,7 @@ func (h *Hoverfly) DeleteDelays() error {
 
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
 func (h *Hoverfly) GetMode() (string, error) {
-	url := h.buildURL("/api/state")
+	url := h.buildURL(v2ApiMode)
 
 	slingRequest := sling.New().Get(url)
 
@@ -185,9 +193,9 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 		return "", errors.New(mode + " is not a valid mode")
 	}
 
-	url := h.buildURL("/api/state")
+	url := h.buildURL(v2ApiMode)
 
-	slingRequest := sling.New().Post(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`))
+	slingRequest := sling.New().Put(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`))
 
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
@@ -211,7 +219,7 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 		return "", errors.New("Hoverfly requires authentication")
 	}
 
-	if response.StatusCode == 403 {
+	if response.StatusCode == 422 {
 		return "", errors.New("Cannot change the mode of Hoverfly when running as a webserver")
 	}
 
@@ -222,7 +230,7 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 
 // GetMiddle will go the middleware endpoint in Hoverfly, parse the JSON response and return the middleware of Hoverfly
 func (h *Hoverfly) GetMiddleware() (string, error) {
-	url := h.buildURL("/api/middleware")
+	url := h.buildURL(v2ApiMiddleware)
 
 	slingRequest := sling.New().Get(url)
 
@@ -257,9 +265,9 @@ func (h *Hoverfly) GetMiddleware() (string, error) {
 }
 
 func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
-	url := h.buildURL("/api/middleware")
+	url := h.buildURL(v2ApiMiddleware)
 
-	slingRequest := sling.New().Post(url).Body(strings.NewReader(`{"middleware":"` + middleware + `"}`))
+	slingRequest := sling.New().Put(url).Body(strings.NewReader(`{"middleware":"` + middleware + `"}`))
 
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
@@ -290,8 +298,11 @@ func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
 	if response.StatusCode != 200 {
 		defer response.Body.Close()
 		errorMessage, _ := ioutil.ReadAll(response.Body)
-		trimmedError := strings.TrimSpace(string(errorMessage))
-		log.Debug(trimmedError)
+
+		error := &ErrorSchema{}
+
+		json.Unmarshal(errorMessage, error)
+		log.Debug(error.ErrorMessage)
 		return "", errors.New("Hoverfly could not execute this middleware")
 	}
 
@@ -535,7 +546,7 @@ func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags str
 			}
 			return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: " + strconv.Itoa(statusCode)))
 		case <-tick:
-			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", h.AdminPort))
+			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/mode", h.AdminPort))
 			if err == nil {
 				statusCode = resp.StatusCode
 			} else {
@@ -591,7 +602,7 @@ func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) error {
 
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
 func (h *Hoverfly) GetDelays() (rd []ResponseDelaySchema, err error) {
-	url := h.buildURL("/api/delays")
+	url := h.buildURL(v1ApiDelays)
 
 	slingRequest := sling.New().Get(url)
 
@@ -629,7 +640,7 @@ func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelaySchema, err error) 
 		return rd, err
 	}
 
-	url := h.buildURL("/api/delays")
+	url := h.buildURL(v1ApiDelays)
 
 	slingRequest := sling.New().Put(url).Body(strings.NewReader(string(conf)))
 
