@@ -20,6 +20,9 @@ var (
 	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
 	modeNameArg = modeCommand.Arg("name", "Set Hoverfly's mode").String()
 
+	destinationCommand = kingpin.Command("destination", "Get Hoverfly's current destination")
+	destinationNameArg = destinationCommand.Arg("name", "Set Hoverfly's destination").String()
+
 	middlewareCommand = kingpin.Command("middleware", "Get Hoverfly's middleware")
 	middlewarePathArg = middlewareCommand.Arg("path", "Set Hoverfly's middleware").String()
 
@@ -80,6 +83,18 @@ func main() {
 			handleIfError(err)
 
 			log.Info("Hoverfly has been set to ", mode, " mode")
+		}
+	case destinationCommand.FullCommand():
+		if *destinationNameArg == "" || *destinationNameArg == "status" {
+			destination, err := hoverfly.GetDestination()
+			handleIfError(err)
+
+			log.Info("The destination in Hoverfly is set to ", destination)
+		} else {
+			destination, err := hoverfly.SetDestination(*destinationNameArg)
+			handleIfError(err)
+
+			log.Info("The destination in Hoverfly has been set to ", destination)
 		}
 
 	case middlewareCommand.FullCommand():

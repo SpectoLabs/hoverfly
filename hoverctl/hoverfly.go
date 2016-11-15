@@ -20,9 +20,10 @@ const (
 	v1ApiDelays     = "/api/delays"
 	v1ApiSimulation = "/api/records"
 
-	v2ApiSimulation = "/api/v2/simulation"
-	v2ApiMode       = "/api/v2/hoverfly/mode"
-	v2ApiMiddleware = "/api/v2/hoverfly/middleware"
+	v2ApiSimulation  = "/api/v2/simulation"
+	v2ApiMode        = "/api/v2/hoverfly/mode"
+	v2ApiDestination = "/api/v2/hoverfly/destination"
+	v2ApiMiddleware  = "/api/v2/hoverfly/middleware"
 )
 
 type APIStateSchema struct {
@@ -226,6 +227,75 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 	apiResponse := h.createAPIStateResponse(response)
 
 	return apiResponse.Mode, nil
+}
+
+// GetDestination will go the destination endpoint in Hoverfly, parse the JSON response and return the destination of Hoverfly
+func (h *Hoverfly) GetDestination() (string, error) {
+	url := h.buildURL(v2ApiDestination)
+
+	slingRequest := sling.New().Get(url)
+
+	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not authenticate with Hoverfly")
+	}
+
+	request, err := slingRequest.Request()
+
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	response, err := h.httpClient.Do(request)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	if response.StatusCode == 401 {
+		return "", errors.New("Hoverfly requires authentication")
+	}
+
+	defer response.Body.Close()
+
+	apiResponse := h.createAPIStateResponse(response)
+
+	return apiResponse.Destination, nil
+}
+
+// SetDestination will go the destination endpoint in Hoverfly, sending JSON that will set the destination of Hoverfly
+func (h *Hoverfly) SetDestination(destination string) (string, error) {
+	url := h.buildURL(v2ApiDestination)
+
+	slingRequest := sling.New().Put(url).Body(strings.NewReader(`{"destination":"` + destination + `"}`))
+
+	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not authenticate  with Hoverfly")
+	}
+
+	request, err := slingRequest.Request()
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	response, err := h.httpClient.Do(request)
+	if err != nil {
+		log.Debug(err.Error())
+		return "", errors.New("Could not communicate with Hoverfly")
+	}
+
+	if response.StatusCode == 401 {
+		return "", errors.New("Hoverfly requires authentication")
+	}
+
+	apiResponse := h.createAPIStateResponse(response)
+
+	return apiResponse.Destination, nil
 }
 
 // GetMiddle will go the middleware endpoint in Hoverfly, parse the JSON response and return the middleware of Hoverfly
