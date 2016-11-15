@@ -224,7 +224,7 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 
 // GetMiddle will go the middleware endpoint in Hoverfly, parse the JSON response and return the middleware of Hoverfly
 func (h *Hoverfly) GetMiddleware() (string, error) {
-	url := h.buildURL("/api/middleware")
+	url := h.buildURL(v2ApiMiddleware)
 
 	slingRequest := sling.New().Get(url)
 
