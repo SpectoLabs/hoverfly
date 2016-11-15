@@ -20,6 +20,7 @@ const (
 	v1ApiSimulation = "/api/records"
 	v2ApiSimulation = "/api/v2/simulation"
 	v2ApiMode       = "/api/v2/hoverfly/mode"
+	v2ApiMiddleware = "/api/v2/hoverfly/middleware"
 )
 
 type APIStateSchema struct {
@@ -73,7 +74,7 @@ func NewHoverfly(config Config) Hoverfly {
 
 // Wipe will call the records endpoint in Hoverfly with a DELETE request, triggering Hoverfly to wipe the database
 func (h *Hoverfly) DeleteSimulations() error {
-	url := h.buildURL("/api/records")
+	url := h.buildURL(v2ApiSimulation)
 
 	slingRequest := sling.New().Delete(url)
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
