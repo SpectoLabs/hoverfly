@@ -51,6 +51,10 @@ type MiddlewareSchema struct {
 	Middleware string `json:"middleware"`
 }
 
+type ErrorSchema struct {
+	ErrorMessage string `json:"error"`
+}
+
 type Hoverfly struct {
 	Host       string
 	AdminPort  string
@@ -259,9 +263,9 @@ func (h *Hoverfly) GetMiddleware() (string, error) {
 }
 
 func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
-	url := h.buildURL("/api/middleware")
+	url := h.buildURL(v2ApiMiddleware)
 
-	slingRequest := sling.New().Post(url).Body(strings.NewReader(`{"middleware":"` + middleware + `"}`))
+	slingRequest := sling.New().Put(url).Body(strings.NewReader(`{"middleware":"` + middleware + `"}`))
 
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
@@ -292,8 +296,11 @@ func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
 	if response.StatusCode != 200 {
 		defer response.Body.Close()
 		errorMessage, _ := ioutil.ReadAll(response.Body)
-		trimmedError := strings.TrimSpace(string(errorMessage))
-		log.Debug(trimmedError)
+
+		error := &ErrorSchema{}
+
+		json.Unmarshal(errorMessage, error)
+		log.Debug(error.ErrorMessage)
 		return "", errors.New("Hoverfly could not execute this middleware")
 	}
 
