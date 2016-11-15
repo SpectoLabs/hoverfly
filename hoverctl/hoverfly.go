@@ -186,9 +186,9 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 		return "", errors.New(mode + " is not a valid mode")
 	}
 
-	url := h.buildURL("/api/state")
+	url := h.buildURL(v2ApiMode)
 
-	slingRequest := sling.New().Post(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`))
+	slingRequest := sling.New().Put(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`))
 
 	slingRequest, err := h.addAuthIfNeeded(slingRequest)
 	if err != nil {
@@ -212,7 +212,7 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 		return "", errors.New("Hoverfly requires authentication")
 	}
 
-	if response.StatusCode == 403 {
+	if response.StatusCode == 422 {
 		return "", errors.New("Cannot change the mode of Hoverfly when running as a webserver")
 	}
 
