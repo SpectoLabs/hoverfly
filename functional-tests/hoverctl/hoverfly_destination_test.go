@@ -72,4 +72,32 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 		})
 	})
+
+	Describe("without a running hoverfly", func() {
+
+		Context("we can test our regex with a --dry-run", func() {
+
+			It("does not attempt the --dry-run the destination if regex is invalid", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "destination", "regex[[[[", "--dry-run", "doesntmatter.io").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Regex pattern does not compile"))
+			})
+
+			It("does a dry run and tests if the regex matches the URL - which it does", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "destination", "hoverfly.io", "--dry-run", "hoverfly.io").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("The regex provided matches the dry run URL"))
+			})
+
+			It("does a dry run and tests if the regex matches the URL - which it does not", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "destination", "specto.io", "--dry-run", "hoverfly.io").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("The regex provided does not match the dry run URL"))
+			})
+
+		})
+	})
 })
