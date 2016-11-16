@@ -185,6 +185,7 @@ func (h *Hoverfly) GetDestination() (string, error) {
 
 // SetDestination will go the destination endpoint in Hoverfly, sending JSON that will set the destination of Hoverfly
 func (h *Hoverfly) SetDestination(destination string) (string, error) {
+
 	slingRequest, err := h.buildPutRequest(v2ApiDestination, `{"destination":"`+destination+`"}`)
 	if err != nil {
 		return "", err

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 
+	"regexp"
+
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -91,6 +93,12 @@ func main() {
 
 			log.Info("The destination in Hoverfly is set to ", destination)
 		} else {
+			_, err := regexp.Compile(*destinationNameArg)
+			if err != nil {
+				log.Debug(err.Error())
+				handleIfError(errors.New("Regex pattern does not compile"))
+			}
+
 			destination, err := hoverfly.SetDestination(*destinationNameArg)
 			handleIfError(err)
 

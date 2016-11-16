@@ -56,5 +56,20 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(output).To(ContainSubstring("The destination in Hoverfly is set to example.org"))
 			})
 		})
+
+		Context("I cannot set hoverfly's destination", func() {
+
+			It("does not set the destination if regex is invalid", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "destination", "regex[[[[").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Regex pattern does not compile"))
+
+				getOutput, _ := exec.Command(hoverctlBinary, "destination").Output()
+
+				output = strings.TrimSpace(string(getOutput))
+				Expect(output).To(ContainSubstring("The destination in Hoverfly is set to ."))
+			})
+		})
 	})
 })
