@@ -21,14 +21,6 @@ var _ = Describe("Running Hoverfly", func() {
 		BeforeEach(func() {
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
 			SetHoverflyMode("capture")
-		})
-
-		AfterEach(func() {
-			stopHoverfly()
-		})
-
-		It("Should not capture capture if destination does not match", func() {
-			SetHoverflyDestination("notlocalhost")
 
 			fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "text/plain")
@@ -36,7 +28,16 @@ var _ = Describe("Running Hoverfly", func() {
 				w.Write([]byte("Hello world"))
 			}))
 
-			defer fakeServer.Close()
+		})
+
+		AfterEach(func() {
+			stopHoverfly()
+
+			fakeServer.Close()
+		})
+
+		It("Should not capture capture if destination does not match", func() {
+			SetHoverflyDestination("notlocalhost")
 
 			resp := CallFakeServerThroughProxy(fakeServer)
 
@@ -52,14 +53,6 @@ var _ = Describe("Running Hoverfly", func() {
 		})
 
 		It("Should capture capture if destination is 127.0.0.1", func() {
-			fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Content-Type", "text/plain")
-				w.Header().Set("date", "date")
-				w.Write([]byte("Hello world"))
-			}))
-
-			defer fakeServer.Close()
-
 			SetHoverflyDestination("127.0.0.1")
 
 			resp := CallFakeServerThroughProxy(fakeServer)
