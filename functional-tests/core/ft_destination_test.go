@@ -62,49 +62,24 @@ var _ = Describe("Running Hoverfly", func() {
 
 			recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).To(MatchJSON(fmt.Sprintf(
-				`{
-					"data": [
-						{
-						"response": {
-							"status": 200,
-							"body": "Hello world",
-							"encodedBody": false,
-							"headers": {
-							"Content-Length": [
-								"11"
-							],
-							"Content-Type": [
-								"text/plain"
-							],
-							"Date": [
-								"date"
-							],
-							"Hoverfly": [
-								"Was-Here"
-							]
-							}
-						},
-						"request": {
-							"requestType": "recording",
-							"path": "/",
-							"method": "GET",
-							"destination": "%v",
-							"scheme": "http",
-							"query": "",
-							"body": "",
-							"headers": {
-							"Accept-Encoding": [
-								"gzip"
-							],
-							"User-Agent": [
-								"Go-http-client/1.1"
-							]
-							}
-						}
-						}
-					]
-					}`, strings.Replace(fakeServer.URL, "http://", "", 1))))
+			Expect(recordsJson).ToNot(MatchJSON(fmt.Sprintf(`{
+				"data": null
+			}`)))
+		})
+
+		It("Should capture if destination is set to port numbers", func() {
+			SetHoverflyDestination(strings.Replace(fakeServer.URL, "http://127.0.0.1", "", 1))
+
+			resp := CallFakeServerThroughProxy(fakeServer)
+
+			Expect(resp.StatusCode).To(Equal(200))
+			Expect(resp.Header.Get("date")).To(Equal("date"))
+
+			recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+			Expect(err).To(BeNil())
+			Expect(recordsJson).ToNot(MatchJSON(fmt.Sprintf(`{
+				"data": null
+			}`)))
 		})
 	})
 })
