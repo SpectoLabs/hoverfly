@@ -36,7 +36,7 @@ var _ = Describe("Running Hoverfly", func() {
 			fakeServer.Close()
 		})
 
-		It("Should not capture capture if destination does not match", func() {
+		It("Should not capture if destination does not match", func() {
 			SetHoverflyDestination("notlocalhost")
 
 			resp := CallFakeServerThroughProxy(fakeServer)
@@ -52,7 +52,7 @@ var _ = Describe("Running Hoverfly", func() {
 					}`)))
 		})
 
-		It("Should capture capture if destination is 127.0.0.1", func() {
+		It("Should capture if destination is 127.0.0.1", func() {
 			SetHoverflyDestination("127.0.0.1")
 
 			resp := CallFakeServerThroughProxy(fakeServer)
