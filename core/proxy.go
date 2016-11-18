@@ -2,12 +2,13 @@ package hoverfly
 
 import (
 	"bufio"
-	log "github.com/Sirupsen/logrus"
-	"github.com/rusenask/goproxy"
 	"net"
 	"net/http"
 	"regexp"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/rusenask/goproxy"
 )
 
 // Creates goproxy.ProxyHttpServer and configures it to be used as a proxy for Hoverfly
@@ -16,11 +17,11 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).
+	proxy.OnRequest(goproxy.UrlMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).
 		HandleConnect(goproxy.AlwaysMitm)
 
 	// enable curl -p for all hosts on port 80
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).
+	proxy.OnRequest(goproxy.UrlMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).
 		HijackConnect(func(req *http.Request, client net.Conn, ctx *goproxy.ProxyCtx) {
 			defer func() {
 				if e := recover(); e != nil {
@@ -47,7 +48,7 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 		})
 
 	// processing connections
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).DoFunc(
+	proxy.OnRequest(goproxy.UrlMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			resp := hoverfly.processRequest(r)
 			return r, resp
@@ -68,7 +69,7 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	}
 
 	// intercepts response
-	proxy.OnResponse(goproxy.ReqHostMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).DoFunc(
+	proxy.OnResponse(goproxy.UrlMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).DoFunc(
 		func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
 			hoverfly.Counter.Count(hoverfly.Cfg.GetMode())
 			return resp

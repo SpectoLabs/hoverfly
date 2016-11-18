@@ -8,6 +8,7 @@ import (
 
 	"strings"
 
+	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -78,6 +79,36 @@ var _ = Describe("Running Hoverfly", func() {
 			recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
 			Expect(err).To(BeNil())
 			Expect(recordsJson).ToNot(MatchJSON(fmt.Sprintf(`{
+				"data": null
+			}`)))
+		})
+
+		It("Should capture if destination is set to the path", func() {
+			SetHoverflyDestination("/path")
+
+			resp := DoRequestThroughProxy(sling.New().Get(fakeServer.URL + "/path"))
+
+			Expect(resp.StatusCode).To(Equal(200))
+			Expect(resp.Header.Get("date")).To(Equal("date"))
+
+			recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+			Expect(err).To(BeNil())
+			Expect(recordsJson).ToNot(MatchJSON(fmt.Sprintf(`{
+				"data": null
+			}`)))
+		})
+
+		It("Should not capture if destination is set to the wrong path", func() {
+			SetHoverflyDestination("/wrongpath")
+
+			resp := DoRequestThroughProxy(sling.New().Get(fakeServer.URL + "/path"))
+
+			Expect(resp.StatusCode).To(Equal(200))
+			Expect(resp.Header.Get("date")).To(Equal("date"))
+
+			recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+			Expect(err).To(BeNil())
+			Expect(recordsJson).To(MatchJSON(fmt.Sprintf(`{
 				"data": null
 			}`)))
 		})
