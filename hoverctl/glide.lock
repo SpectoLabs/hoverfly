@@ -1,5 +1,5 @@
-hash: 5ed7fc8647e69bc8af0045f7d4e42913951baab40ee1224027aee933877858b4
-updated: 2016-08-24T11:59:24.987815519+01:00
+hash: ea38daa990fd3fbbbbdf703c4d9ee9d07fa70192d9018ab07cbaf1f7116162ab
+updated: 2016-11-21T14:00:57.481270857Z
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -35,6 +35,8 @@ imports:
   - util
   - watch
   - winfile
+- name: github.com/kardianos/osext
+  version: c2c54e542fb797ad986b31721e1baedf214ca413
 - name: github.com/kr/fs
   version: 2788f0dbd16903de03cb8186e5c7d97b69ad387b
 - name: github.com/magiconair/properties
