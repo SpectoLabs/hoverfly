@@ -133,20 +133,13 @@ func main() {
 		log.Info(middleware)
 
 	case startCommand.FullCommand():
-		flags := []string{}
-		if *startArg == "webserver" {
-			flags = append(flags, "-webserver")
-		}
-		if *startCertificateFlag != "" {
-			flags = append(flags, "-cert")
-			flags = append(flags, *startCertificateFlag)
-		}
-		if *startKeyFlag != "" {
-			flags = append(flags, "-key")
-			flags = append(flags, *startKeyFlag)
+		flagsBuilder := FlagsBuilder{
+			Webserver:   *startArg,
+			Certificate: *startCertificateFlag,
+			Key:         *startKeyFlag,
 		}
 
-		err := hoverfly.startWithFlags(hoverflyDirectory, flags)
+		err := hoverfly.startWithFlags(hoverflyDirectory, flagsBuilder.BuildFlags())
 		handleIfError(err)
 		if *startArg == "webserver" {
 			log.Info("Hoverfly is now running as a webserver")
