@@ -7,8 +7,10 @@ type FlagsBuilder struct {
 	DisableTls  bool
 }
 
-func (this FlagsBuilder) BuildFlags() []string {
-	flags := []string{}
+type Flags []string
+
+func (this FlagsBuilder) BuildFlags() Flags {
+	flags := Flags{}
 
 	if this.Webserver == "webserver" {
 		flags = append(flags, "-webserver")
