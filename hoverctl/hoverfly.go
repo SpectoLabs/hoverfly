@@ -453,7 +453,7 @@ func (h *Hoverfly) buildAuthorizationHeaderValue() string {
 This isn't working as intended, its working, just not how I imagined it.
 */
 
-func (h *Hoverfly) runBinary(path string, flags []string, hoverflyDirectory HoverflyDirectory) (*exec.Cmd, error) {
+func (h *Hoverfly) runBinary(path string, flags Flags, hoverflyDirectory HoverflyDirectory) (*exec.Cmd, error) {
 	flags = append(flags, "-db")
 	flags = append(flags, "memory")
 	flags = append(flags, "-ap")
@@ -486,7 +486,7 @@ func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) error {
 	return h.startWithFlags(hoverflyDirectory, []string{})
 }
 
-func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags []string) error {
+func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags Flags) error {
 
 	if !h.isLocal() {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
