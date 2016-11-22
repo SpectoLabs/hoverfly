@@ -12,12 +12,10 @@ func (this FlagsBuilder) BuildFlags() []string {
 		flags = append(flags, "-webserver")
 	}
 	if this.Certificate != "" {
-		flags = append(flags, "-cert")
-		flags = append(flags, this.Certificate)
+		flags = append(flags, "-cert="+this.Certificate)
 	}
 	if this.Key != "" {
-		flags = append(flags, "-key")
-		flags = append(flags, this.Key)
+		flags = append(flags, "-key="+this.Key)
 	}
 
 	return flags
