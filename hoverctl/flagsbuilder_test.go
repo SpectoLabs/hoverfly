@@ -48,6 +48,17 @@ func Test_FlagsBuilder_BuildFlags_KeySetsKeyFlag(t *testing.T) {
 	Expect(unit.BuildFlags()[0]).To(Equal("-key=key.pem"))
 }
 
+func Test_FlagsBuilder_BuildFlags_DisableTlsSetsTlsVerificationFlagToFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := FlagsBuilder{
+		DisableTls: true,
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(1))
+	Expect(unit.BuildFlags()[0]).To(Equal("-tls-verification=false"))
+}
+
 func Test_FlagsBuilder_BuildFlags_CanBuildFlagsInCorrectOrderWithAllVariables(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -55,10 +66,12 @@ func Test_FlagsBuilder_BuildFlags_CanBuildFlagsInCorrectOrderWithAllVariables(t 
 		Webserver:   "webserver",
 		Certificate: "certificate.pem",
 		Key:         "key.pem",
+		DisableTls:  true,
 	}
 
-	Expect(unit.BuildFlags()).To(HaveLen(3))
+	Expect(unit.BuildFlags()).To(HaveLen(4))
 	Expect(unit.BuildFlags()[0]).To(Equal("-webserver"))
 	Expect(unit.BuildFlags()[1]).To(Equal("-cert=certificate.pem"))
 	Expect(unit.BuildFlags()[2]).To(Equal("-key=key.pem"))
+	Expect(unit.BuildFlags()[3]).To(Equal("-tls-verification=false"))
 }

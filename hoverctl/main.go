@@ -33,6 +33,7 @@ var (
 	startArg             = startCommand.Arg("server type", "Choose the configuration of Hoverfly (proxy/webserver)").String()
 	startCertificateFlag = startCommand.Flag("certificate", "Supply path for custom certificate").String()
 	startKeyFlag         = startCommand.Flag("key", "Supply path for custom key").String()
+	startTlsFlag         = startCommand.Flag("disable-tls", "Disable TLS verification").Bool()
 
 	stopCommand = kingpin.Command("stop", "Stop a local instance of Hoverfly")
 
@@ -137,6 +138,7 @@ func main() {
 			Webserver:   *startArg,
 			Certificate: *startCertificateFlag,
 			Key:         *startKeyFlag,
+			DisableTls:  *startTlsFlag,
 		}
 
 		err := hoverfly.startWithFlags(hoverflyDirectory, flagsBuilder.BuildFlags())

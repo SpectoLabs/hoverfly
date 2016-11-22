@@ -240,5 +240,32 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(data).To(ContainSubstring("Default keys have been overwritten"))
 			})
 		})
+
+		Context("You can disable tls for hoverfly", func() {
+
+			It("starts hoverfly with tls verification turned off", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "start", "--disable-tls", "-v").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
+
+				if err != nil {
+					Fail("Could not find pid file")
+				}
+
+				Expect(data).ToNot(BeEmpty())
+
+				data, err = ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
+
+				if err != nil {
+					Fail("Could not find log file")
+				}
+
+				Expect(data).ToNot(BeEmpty())
+				Expect(data).To(ContainSubstring("tls certificate verification is now turned off!"))
+			})
+		})
 	})
 })
