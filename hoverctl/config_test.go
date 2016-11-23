@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	. "github.com/onsi/gomega"
-	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -15,6 +14,7 @@ var (
 	defaultHoverflyProxyPort = "8500"
 	defaultHoverflyUsername  = ""
 	defaultHoverflyPassword  = ""
+	defaultHoverflyWebserver = false
 )
 
 func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
@@ -28,6 +28,7 @@ func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
 	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
 	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
 	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	Expect(result.HoverflyWebserver).To(Equal(defaultHoverflyWebserver))
 }
 
 func Test_Config_SetHost_OverridesDefaultValueWithAHoverflyHost(t *testing.T) {
@@ -160,6 +161,20 @@ func Test_Config_SetPassword_DoesNotOverrideWhenEmpty(t *testing.T) {
 	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
 }
 
+func Test_Config_SetWebserver_OverridesDefaultValueWithAHoverflyPassword(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	result := GetConfig().SetWebserver(true)
+
+	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
+	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
+	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
+	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
+	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	Expect(result.HoverflyWebserver).To(Equal(true))
+}
+
 func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -179,12 +194,10 @@ func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testin
 	data, _ := ioutil.ReadFile(hoverflyDirectory.Path + "/config.yaml")
 	os.Remove(hoverflyDirectory.Path + "/config.yaml")
 
-	var result Config
-	yaml.Unmarshal(data, &result)
-
-	Expect(result.HoverflyHost).To(Equal("testhost"))
-	Expect(result.HoverflyAdminPort).To(Equal("1234"))
-	Expect(result.HoverflyProxyPort).To(Equal("4567"))
-	Expect(result.HoverflyUsername).To(Equal("username"))
-	Expect(result.HoverflyPassword).To(Equal("password"))
+	Expect(string(data)).To(ContainSubstring(`hoverfly.host: testhost`))
+	Expect(string(data)).To(ContainSubstring("hoverfly.admin.port: \"1234\""))
+	Expect(string(data)).To(ContainSubstring("hoverfly.proxy.port: \"4567\""))
+	Expect(string(data)).To(ContainSubstring("hoverfly.username: username"))
+	Expect(string(data)).To(ContainSubstring("hoverfly.password: password"))
+	Expect(string(data)).To(ContainSubstring("hoverfly.webserver: false"))
 }

@@ -15,6 +15,7 @@ type Config struct {
 	HoverflyProxyPort string `yaml:"hoverfly.proxy.port"`
 	HoverflyUsername  string `yaml:"hoverfly.username"`
 	HoverflyPassword  string `yaml:"hoverfly.password"`
+	HoverflyWebserver bool   `yaml:"hoverfly.webserver"`
 }
 
 func GetConfig() *Config {
@@ -67,6 +68,11 @@ func (this *Config) SetPassword(password string) *Config {
 	return this
 }
 
+func (this *Config) SetWebserver(webserver bool) *Config {
+	this.HoverflyWebserver = webserver
+	return this
+}
+
 func (c *Config) GetFilepath() string {
 	return viper.ConfigFileUsed()
 }
@@ -102,4 +108,5 @@ func SetConfigurationDefaults() {
 	viper.SetDefault("hoverfly.proxy.port", "8500")
 	viper.SetDefault("hoverfly.username", "")
 	viper.SetDefault("hoverfly.password", "")
+	viper.SetDefault("hoverfly.webserver", "false")
 }
