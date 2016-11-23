@@ -58,6 +58,7 @@ var (
 )
 
 func main() {
+	log.Info(*followLogsFlag)
 	deleteCommand.Alias("wipe")
 	kingpin.Version(hoverctlVersion)
 

@@ -18,6 +18,7 @@ type Config struct {
 	HoverflyWebserver   bool   `yaml:"hoverfly.webserver"`
 	HoverflyCertificate string `yaml:"hoverfly.tls.certificate"`
 	HoverflyKey         string `yaml:"hoverfly.tls.key"`
+	HoverflyDisableTls  bool   `yaml:"hoverfly.tls.disable"`
 }
 
 func GetConfig() *Config {
@@ -91,6 +92,13 @@ func (this *Config) SetKey(key string) *Config {
 
 func (c *Config) GetFilepath() string {
 	return viper.ConfigFileUsed()
+}
+
+func (this *Config) DisableTls(disableTls bool) *Config {
+	if this.HoverflyDisableTls || disableTls {
+		this.HoverflyDisableTls = true
+	}
+	return this
 }
 
 func (c *Config) WriteToFile(hoverflyDirectory HoverflyDirectory) error {

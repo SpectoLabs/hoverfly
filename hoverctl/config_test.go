@@ -203,6 +203,37 @@ func Test_Config_SetWebserver_OverridesDefaultValueWithAHoverflyPassword(t *test
 	Expect(result.HoverflyWebserver).To(Equal(true))
 }
 
+func Test_Config_DisableTls_OverridesDefaultValueWithAHoverflyPassword(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	result := GetConfig().DisableTls(true)
+
+	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
+	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
+	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
+	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
+	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	Expect(result.HoverflyDisableTls).To(Equal(true))
+}
+
+func Test_Config_DisableTls_DoesNotOverridesDefaultValueIfDefaultIsPositive(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	result := GetConfig()
+
+	result.HoverflyDisableTls = true
+	result = result.DisableTls(false)
+
+	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
+	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
+	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
+	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
+	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	Expect(result.HoverflyDisableTls).To(Equal(true))
+}
+
 func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -216,6 +247,7 @@ func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testin
 	config = config.SetWebserver(true)
 	config = config.SetCertificate("/home/benjih/certificate.pem")
 	config = config.SetKey("/home/benjih/key.pem")
+	config = config.DisableTls(true)
 
 	wd, _ := os.Getwd()
 	hoverflyDirectory := HoverflyDirectory{
@@ -237,6 +269,7 @@ func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testin
 	Expect(string(data)).To(ContainSubstring("hoverfly.webserver: true"))
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.certificate: /home/benjih/certificate.pem"))
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.key: /home/benjih/key.pem"))
+	Expect(string(data)).To(ContainSubstring("hoverfly.tls.disable: true"))
 }
 
 func Test_Config_WriteToFile_WritesTheDefaultConfigObjectToAFileInAYamlFormat(t *testing.T) {
@@ -265,4 +298,5 @@ func Test_Config_WriteToFile_WritesTheDefaultConfigObjectToAFileInAYamlFormat(t 
 	Expect(string(data)).To(ContainSubstring("hoverfly.webserver: false"))
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.certificate: \"\""))
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.key: \"\""))
+	Expect(string(data)).To(ContainSubstring("hoverfly.tls.disable: false"))
 }
