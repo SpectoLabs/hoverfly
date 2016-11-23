@@ -9,6 +9,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type Flags []string
+
 type Config struct {
 	HoverflyHost        string `yaml:"hoverfly.host"`
 	HoverflyAdminPort   string `yaml:"hoverfly.admin.port"`
