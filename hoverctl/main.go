@@ -145,7 +145,7 @@ func main() {
 	case startCommand.FullCommand():
 		err := hoverfly.startWithFlags(hoverflyDirectory)
 		handleIfError(err)
-		if *startArg == "webserver" {
+		if config.HoverflyWebserver {
 			log.Info("Hoverfly is now running as a webserver")
 		} else {
 			log.Info("Hoverfly is now running")

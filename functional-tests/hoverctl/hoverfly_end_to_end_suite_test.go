@@ -183,7 +183,7 @@ type testConfig struct {
 	HoverflyProxyPort string `yaml:"hoverfly.proxy.port"`
 	HoverflyUsername  string `yaml:"hoverfly.username"`
 	HoverflyPassword  string `yaml:"hoverfly.password"`
-	HoverflyWebserver bool   `yaml:"hoverfly.webserver`
+	HoverflyWebserver bool   `yaml:"hoverfly.webserver"`
 }
 
 func WriteConfiguration(host, adminPort, proxyPort string) {
