@@ -458,9 +458,6 @@ This isn't working as intended, its working, just not how I imagined it.
 func (h *Hoverfly) runBinary(path string, hoverflyDirectory HoverflyDirectory) (*exec.Cmd, error) {
 	flags := h.config.BuildFlags()
 
-	flags = append(flags, "-db")
-	flags = append(flags, "memory")
-
 	cmd := exec.Command(path, flags...)
 	log.Debug(cmd.Args)
 	file, err := os.Create(hoverflyDirectory.Path + "/hoverfly." + h.AdminPort + "." + h.ProxyPort + ".log")

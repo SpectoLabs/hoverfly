@@ -15,6 +15,7 @@ type Config struct {
 	HoverflyHost        string `yaml:"hoverfly.host"`
 	HoverflyAdminPort   string `yaml:"hoverfly.admin.port"`
 	HoverflyProxyPort   string `yaml:"hoverfly.proxy.port"`
+	HoverflyDbType      string `yaml:"hoverfly.db.type"`
 	HoverflyUsername    string `yaml:"hoverfly.username"`
 	HoverflyPassword    string `yaml:"hoverfly.password"`
 	HoverflyWebserver   bool   `yaml:"hoverfly.webserver"`
@@ -33,6 +34,7 @@ func GetConfig() *Config {
 		HoverflyHost:        viper.GetString("hoverfly.host"),
 		HoverflyAdminPort:   viper.GetString("hoverfly.admin.port"),
 		HoverflyProxyPort:   viper.GetString("hoverfly.proxy.port"),
+		HoverflyDbType:      viper.GetString("hoverfly.db.type"),
 		HoverflyUsername:    viper.GetString("hoverfly.username"),
 		HoverflyPassword:    viper.GetString("hoverfly.password"),
 		HoverflyWebserver:   viper.GetBool("hoverfly.webserver"),
@@ -59,6 +61,16 @@ func (this *Config) SetAdminPort(adminPort string) *Config {
 func (this *Config) SetProxyPort(proxyPort string) *Config {
 	if len(proxyPort) > 0 {
 		this.HoverflyProxyPort = proxyPort
+	}
+	return this
+}
+
+func (this *Config) SetDbType(dbType string) *Config {
+	if dbType == "memory" {
+		this.HoverflyDbType = dbType
+	}
+	if dbType == "boltdb" {
+		this.HoverflyDbType = dbType
 	}
 	return this
 }
@@ -145,6 +157,10 @@ func (this Config) BuildFlags() Flags {
 		flags = append(flags, "-pp="+this.HoverflyProxyPort)
 	}
 
+	if this.HoverflyDbType != "" {
+		flags = append(flags, "-db="+this.HoverflyDbType)
+	}
+
 	if this.HoverflyWebserver {
 		flags = append(flags, "-webserver")
 	}
@@ -173,6 +189,7 @@ func SetConfigurationDefaults() {
 	viper.SetDefault("hoverfly.host", "localhost")
 	viper.SetDefault("hoverfly.admin.port", "8888")
 	viper.SetDefault("hoverfly.proxy.port", "8500")
+	viper.SetDefault("hoverfly.db.type", "memory")
 	viper.SetDefault("hoverfly.username", "")
 	viper.SetDefault("hoverfly.password", "")
 	viper.SetDefault("hoverfly.webserver", "false")

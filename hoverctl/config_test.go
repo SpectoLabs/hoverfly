@@ -12,6 +12,7 @@ var (
 	defaultHoverflyHost      = "localhost"
 	defaultHoverflyAdminPort = "8888"
 	defaultHoverflyProxyPort = "8500"
+	defaultHoverflyDbType    = "memory"
 	defaultHoverflyUsername  = ""
 	defaultHoverflyPassword  = ""
 	defaultHoverflyWebserver = false
@@ -26,6 +27,7 @@ func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
 	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
 	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
 	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
+	Expect(result.HoverflyDbType).To(Equal(defaultHoverflyDbType))
 	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
 	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
 	Expect(result.HoverflyWebserver).To(Equal(defaultHoverflyWebserver))
@@ -107,6 +109,24 @@ func Test_Config_SetProxyPort_DoesNotOverrideWhenEmpty(t *testing.T) {
 	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
 	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
 	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+}
+
+func Test_Config_SetDbType_OverridesDefaultValueWithAHoverflyProxyPort(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	result := GetConfig().SetDbType("boltdb")
+
+	Expect(result.HoverflyDbType).To(Equal("boltdb"))
+}
+
+func Test_Config_SetDbType_DoesNotOverrideWhenEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	result := GetConfig().SetProxyPort("")
+
+	Expect(result.HoverflyDbType).To(Equal("memory"))
 }
 
 func Test_Config_SetUsername_OverridesDefaultValueWithAHoverflyUsername(t *testing.T) {
@@ -242,6 +262,7 @@ func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testin
 	config = config.SetHost("testhost")
 	config = config.SetAdminPort("1234")
 	config = config.SetProxyPort("4567")
+	config = config.SetDbType("boltdb")
 	config = config.SetUsername("username")
 	config = config.SetPassword("password")
 	config = config.SetWebserver("webserver")
@@ -264,6 +285,7 @@ func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testin
 	Expect(string(data)).To(ContainSubstring(`hoverfly.host: testhost`))
 	Expect(string(data)).To(ContainSubstring("hoverfly.admin.port: \"1234\""))
 	Expect(string(data)).To(ContainSubstring("hoverfly.proxy.port: \"4567\""))
+	Expect(string(data)).To(ContainSubstring("hoverfly.db.type: boltdb"))
 	Expect(string(data)).To(ContainSubstring("hoverfly.username: username"))
 	Expect(string(data)).To(ContainSubstring("hoverfly.password: password"))
 	Expect(string(data)).To(ContainSubstring("hoverfly.webserver: true"))
@@ -293,6 +315,7 @@ func Test_Config_WriteToFile_WritesTheDefaultConfigObjectToAFileInAYamlFormat(t 
 	Expect(string(data)).To(ContainSubstring(`hoverfly.host: localhost`))
 	Expect(string(data)).To(ContainSubstring("hoverfly.admin.port: \"8888\""))
 	Expect(string(data)).To(ContainSubstring("hoverfly.proxy.port: \"8500\""))
+	Expect(string(data)).To(ContainSubstring("hoverfly.db.type: memory"))
 	Expect(string(data)).To(ContainSubstring("hoverfly.username: \"\""))
 	Expect(string(data)).To(ContainSubstring("hoverfly.password: \"\""))
 	Expect(string(data)).To(ContainSubstring("hoverfly.webserver: false"))
@@ -342,6 +365,17 @@ func Test_Config_BuildFlags_ProxyPortSetsThePpFlag(t *testing.T) {
 
 	Expect(unit.BuildFlags()).To(HaveLen(1))
 	Expect(unit.BuildFlags()[0]).To(Equal("-pp=3421"))
+}
+
+func Test_Config_BuildFlags_DbTypeSetsTheDbFlag(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Config{
+		HoverflyDbType: "boltdb",
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(1))
+	Expect(unit.BuildFlags()[0]).To(Equal("-db=boltdb"))
 }
 
 func Test_Config_BuildFlags_CertificateSetsCertFlag(t *testing.T) {
