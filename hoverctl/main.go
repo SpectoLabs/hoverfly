@@ -72,7 +72,16 @@ func main() {
 	SetConfigurationDefaults()
 	SetConfigurationPaths()
 
-	config := GetConfig().SetHost(*hostFlag).SetAdminPort(*adminPortFlag).SetProxyPort(*proxyPortFlag).SetUsername("").SetPassword("")
+	config := GetConfig()
+	config = config.SetHost(*hostFlag)
+	config = config.SetAdminPort(*adminPortFlag)
+	config = config.SetProxyPort(*proxyPortFlag)
+	config = config.SetUsername("")
+	config = config.SetPassword("")
+	config = config.SetWebserver(*startArg)
+	config = config.SetCertificate(*startCertificateFlag)
+	config = config.SetKey(*startKeyFlag)
+	config = config.DisableTls(*startTlsFlag)
 
 	hoverflyDirectory, err := NewHoverflyDirectory(*config)
 	handleIfError(err)
