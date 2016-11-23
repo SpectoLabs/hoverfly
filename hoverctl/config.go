@@ -71,8 +71,15 @@ func (this *Config) SetPassword(password string) *Config {
 	return this
 }
 
-func (this *Config) SetWebserver(webserver bool) *Config {
-	this.HoverflyWebserver = webserver
+func (this *Config) SetWebserver(hoverflyType string) *Config {
+	if hoverflyType == "webserver" {
+		this.HoverflyWebserver = true
+	}
+
+	if hoverflyType == "proxy" {
+		this.HoverflyWebserver = false
+	}
+
 	return this
 }
 
