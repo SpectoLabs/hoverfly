@@ -300,3 +300,64 @@ func Test_Config_WriteToFile_WritesTheDefaultConfigObjectToAFileInAYamlFormat(t 
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.key: \"\""))
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.disable: false"))
 }
+
+func Test_Config_BuildFlags_SettingWebserverToWebserverPutsTheCorrectFlag(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Config{
+		HoverflyWebserver: true,
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(1))
+	Expect(unit.BuildFlags()[0]).To(Equal("-webserver"))
+}
+
+func Test_Config_BuildFlags_CertificateSetsCertFlag(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Config{
+		HoverflyCertificate: "certificate.pem",
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(1))
+	Expect(unit.BuildFlags()[0]).To(Equal("-cert=certificate.pem"))
+}
+
+func Test_Config_BuildFlags_KeySetsKeyFlag(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Config{
+		HoverflyKey: "key.pem",
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(1))
+	Expect(unit.BuildFlags()[0]).To(Equal("-key=key.pem"))
+}
+
+func Test_Config_BuildFlags_DisableTlsSetsTlsVerificationFlagToFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Config{
+		HoverflyDisableTls: true,
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(1))
+	Expect(unit.BuildFlags()[0]).To(Equal("-tls-verification=false"))
+}
+
+func Test_Config_BuildFlags_CanBuildFlagsInCorrectOrderWithAllVariables(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Config{
+		HoverflyWebserver:   true,
+		HoverflyCertificate: "certificate.pem",
+		HoverflyKey:         "key.pem",
+		HoverflyDisableTls:  true,
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(4))
+	Expect(unit.BuildFlags()[0]).To(Equal("-webserver"))
+	Expect(unit.BuildFlags()[1]).To(Equal("-cert=certificate.pem"))
+	Expect(unit.BuildFlags()[2]).To(Equal("-key=key.pem"))
+	Expect(unit.BuildFlags()[3]).To(Equal("-tls-verification=false"))
+}

@@ -132,6 +132,28 @@ func (c *Config) WriteToFile(hoverflyDirectory HoverflyDirectory) error {
 	return nil
 }
 
+func (this Config) BuildFlags() Flags {
+	flags := Flags{}
+
+	if this.HoverflyWebserver {
+		flags = append(flags, "-webserver")
+	}
+
+	if this.HoverflyCertificate != "" {
+		flags = append(flags, "-cert="+this.HoverflyCertificate)
+	}
+
+	if this.HoverflyKey != "" {
+		flags = append(flags, "-key="+this.HoverflyKey)
+	}
+
+	if this.HoverflyDisableTls {
+		flags = append(flags, "-tls-verification=false")
+	}
+
+	return flags
+}
+
 func SetConfigurationPaths() {
 	viper.AddConfigPath("./.hoverfly")
 	viper.AddConfigPath("$HOME/.hoverfly")
