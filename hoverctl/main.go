@@ -71,12 +71,12 @@ func main() {
 	SetConfigurationDefaults()
 	SetConfigurationPaths()
 
-	config := GetConfig(*hostFlag, *adminPortFlag, *proxyPortFlag, "", "")
+	config := GetConfig().SetHost(*hostFlag).SetAdminPort(*adminPortFlag).SetProxyPort(*proxyPortFlag).SetUsername("").SetPassword("")
 
-	hoverflyDirectory, err := NewHoverflyDirectory(config)
+	hoverflyDirectory, err := NewHoverflyDirectory(*config)
 	handleIfError(err)
 
-	hoverfly := NewHoverfly(config)
+	hoverfly := NewHoverfly(*config)
 
 	switch kingpin.Parse() {
 	case modeCommand.FullCommand():

@@ -13,7 +13,7 @@ func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
-	result := GetConfig("", "", "", "", "")
+	result := GetConfig()
 
 	Expect(result.HoverflyHost).To(Equal("localhost"))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
@@ -22,12 +22,12 @@ func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
 	Expect(result.HoverflyPassword).To(Equal(""))
 }
 
-func Test_GetConfigOverridesDefaultValueWithAHoverflyHost(t *testing.T) {
+func Test_Config_SetHost_OverridesDefaultValueWithAHoverflyHost(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
 	hoverflyHost := "testhost"
-	result := GetConfig(hoverflyHost, "", "", "", "")
+	result := GetConfig().SetHost(hoverflyHost)
 
 	Expect(result.HoverflyHost).To(Equal(hoverflyHost))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
@@ -36,12 +36,12 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyHost(t *testing.T) {
 	Expect(result.HoverflyPassword).To(Equal(""))
 }
 
-func Test_GetConfigOverridesDefaultValueWithAHoverflyAdminPort(t *testing.T) {
+func Test_Config_SetAdminPort_OverridesDefaultValueWithAHoverflyAdminPort(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
 	hoverflyAdminPort := "5"
-	result := GetConfig("", hoverflyAdminPort, "", "", "")
+	result := GetConfig().SetAdminPort(hoverflyAdminPort)
 
 	Expect(result.HoverflyHost).To(Equal("localhost"))
 	Expect(result.HoverflyAdminPort).To(Equal(hoverflyAdminPort))
@@ -50,12 +50,12 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyAdminPort(t *testing.T) {
 	Expect(result.HoverflyPassword).To(Equal(""))
 }
 
-func Test_GetConfigOverridesDefaultValueWithAHoverflyProxyPort(t *testing.T) {
+func Test_Config_SetProxyPort_OverridesDefaultValueWithAHoverflyProxyPort(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
 	hoverflyProxyPort := "7"
-	result := GetConfig("", "", hoverflyProxyPort, "", "")
+	result := GetConfig().SetProxyPort(hoverflyProxyPort)
 
 	Expect(result.HoverflyHost).To(Equal("localhost"))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
@@ -64,12 +64,12 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyProxyPort(t *testing.T) {
 	Expect(result.HoverflyPassword).To(Equal(""))
 }
 
-func Test_GetConfigOverridesDefaultValueWithAHoverflyUsername(t *testing.T) {
+func Test_Config_SetUsername_OverridesDefaultValueWithAHoverflyUsername(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
 	hoverflyUsername := "benjih"
-	result := GetConfig("", "", "", hoverflyUsername, "")
+	result := GetConfig().SetUsername(hoverflyUsername)
 
 	Expect(result.HoverflyHost).To(Equal("localhost"))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
@@ -78,12 +78,12 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyUsername(t *testing.T) {
 	Expect(result.HoverflyPassword).To(Equal(""))
 }
 
-func Test_GetConfigOverridesDefaultValueWithAHoverflyPassword(t *testing.T) {
+func Test_Config_SetPassword_OverridesDefaultValueWithAHoverflyPassword(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
 	hoverflyPassword := "mypassword123"
-	result := GetConfig("", "", "", "", hoverflyPassword)
+	result := GetConfig().SetPassword(hoverflyPassword)
 
 	Expect(result.HoverflyHost).To(Equal("localhost"))
 	Expect(result.HoverflyAdminPort).To(Equal("8888"))
@@ -92,29 +92,12 @@ func Test_GetConfigOverridesDefaultValueWithAHoverflyPassword(t *testing.T) {
 	Expect(result.HoverflyPassword).To(Equal(hoverflyPassword))
 }
 
-func Test_GetConfigOverridesDefaultValueWithAllOverrides(t *testing.T) {
+func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
-	hoverflyHost := "specto.io"
-	hoverflyAdminPort := "7654"
-	hoverflyProxyPort := "1523"
-	hoverflyUsername := "hfuser"
-	hoverflyPassword := "hfpassword"
-	result := GetConfig(hoverflyHost, hoverflyAdminPort, hoverflyProxyPort, hoverflyUsername, hoverflyPassword)
-
-	Expect(result.HoverflyHost).To(Equal(hoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(hoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(hoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(hoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(hoverflyPassword))
-}
-
-func Test_ConfigWriteToFileWritesTheConfigObjectToAFileInAYamlFormat(t *testing.T) {
-	RegisterTestingT(t)
-
-	SetConfigurationDefaults()
-	config := GetConfig("testhost", "1234", "4567", "username", "password")
+	config := GetConfig()
+	config = config.SetHost("testhost").SetAdminPort("1234").SetProxyPort("4567").SetUsername("username").SetPassword("password")
 
 	wd, _ := os.Getwd()
 	hoverflyDirectory := HoverflyDirectory{

@@ -17,41 +17,54 @@ type Config struct {
 	HoverflyPassword  string `yaml:"hoverfly.password"`
 }
 
-func GetConfig(hoverflyHostOverride, hoverflyAdminPortOverride, hoverflyProxyPortOverride, hoverflyUsername, hoverflyPassword string) Config {
+func GetConfig() *Config {
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Debug(err.Error())
 	}
 
-	config := Config{
+	return &Config{
 		HoverflyHost:      viper.GetString("hoverfly.host"),
 		HoverflyAdminPort: viper.GetString("hoverfly.admin.port"),
 		HoverflyProxyPort: viper.GetString("hoverfly.proxy.port"),
 		HoverflyUsername:  viper.GetString("hoverfly.username"),
 		HoverflyPassword:  viper.GetString("hoverfly.password"),
 	}
+}
 
-	if len(hoverflyHostOverride) > 0 {
-		config.HoverflyHost = hoverflyHostOverride
+func (this *Config) SetHost(host string) *Config {
+	if len(host) > 0 {
+		this.HoverflyHost = host
 	}
+	return this
+}
 
-	if len(hoverflyAdminPortOverride) > 0 {
-		config.HoverflyAdminPort = hoverflyAdminPortOverride
+func (this *Config) SetAdminPort(adminPort string) *Config {
+	if len(adminPort) > 0 {
+		this.HoverflyAdminPort = adminPort
 	}
+	return this
+}
 
-	if len(hoverflyProxyPortOverride) > 0 {
-		config.HoverflyProxyPort = hoverflyProxyPortOverride
+func (this *Config) SetProxyPort(proxyPort string) *Config {
+	if len(proxyPort) > 0 {
+		this.HoverflyProxyPort = proxyPort
 	}
+	return this
+}
 
-	if len(hoverflyUsername) > 0 {
-		config.HoverflyUsername = hoverflyUsername
+func (this *Config) SetUsername(username string) *Config {
+	if len(username) > 0 {
+		this.HoverflyUsername = username
 	}
+	return this
+}
 
-	if len(hoverflyPassword) > 0 {
-		config.HoverflyPassword = hoverflyPassword
+func (this *Config) SetPassword(password string) *Config {
+	if len(password) > 0 {
+		this.HoverflyPassword = password
 	}
-
-	return config
+	return this
 }
 
 func (c *Config) GetFilepath() string {
