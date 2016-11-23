@@ -180,7 +180,7 @@ func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testin
 
 	SetConfigurationDefaults()
 	config := GetConfig()
-	config = config.SetHost("testhost").SetAdminPort("1234").SetProxyPort("4567").SetUsername("username").SetPassword("password")
+	config = config.SetHost("testhost").SetAdminPort("1234").SetProxyPort("4567").SetUsername("username").SetPassword("password").SetWebserver(true)
 
 	wd, _ := os.Getwd()
 	hoverflyDirectory := HoverflyDirectory{
@@ -199,5 +199,31 @@ func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testin
 	Expect(string(data)).To(ContainSubstring("hoverfly.proxy.port: \"4567\""))
 	Expect(string(data)).To(ContainSubstring("hoverfly.username: username"))
 	Expect(string(data)).To(ContainSubstring("hoverfly.password: password"))
+	Expect(string(data)).To(ContainSubstring("hoverfly.webserver: true"))
+}
+
+func Test_Config_WriteToFile_WritesTheDefaultConfigObjectToAFileInAYamlFormat(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	config := GetConfig()
+
+	wd, _ := os.Getwd()
+	hoverflyDirectory := HoverflyDirectory{
+		Path: wd,
+	}
+
+	err := config.WriteToFile(hoverflyDirectory)
+
+	Expect(err).To(BeNil())
+
+	data, _ := ioutil.ReadFile(hoverflyDirectory.Path + "/config.yaml")
+	os.Remove(hoverflyDirectory.Path + "/config.yaml")
+
+	Expect(string(data)).To(ContainSubstring(`hoverfly.host: localhost`))
+	Expect(string(data)).To(ContainSubstring("hoverfly.admin.port: \"8888\""))
+	Expect(string(data)).To(ContainSubstring("hoverfly.proxy.port: \"8500\""))
+	Expect(string(data)).To(ContainSubstring("hoverfly.username: \"\""))
+	Expect(string(data)).To(ContainSubstring("hoverfly.password: \"\""))
 	Expect(string(data)).To(ContainSubstring("hoverfly.webserver: false"))
 }
