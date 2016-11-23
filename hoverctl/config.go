@@ -28,11 +28,15 @@ func GetConfig() *Config {
 	}
 
 	return &Config{
-		HoverflyHost:      viper.GetString("hoverfly.host"),
-		HoverflyAdminPort: viper.GetString("hoverfly.admin.port"),
-		HoverflyProxyPort: viper.GetString("hoverfly.proxy.port"),
-		HoverflyUsername:  viper.GetString("hoverfly.username"),
-		HoverflyPassword:  viper.GetString("hoverfly.password"),
+		HoverflyHost:        viper.GetString("hoverfly.host"),
+		HoverflyAdminPort:   viper.GetString("hoverfly.admin.port"),
+		HoverflyProxyPort:   viper.GetString("hoverfly.proxy.port"),
+		HoverflyUsername:    viper.GetString("hoverfly.username"),
+		HoverflyPassword:    viper.GetString("hoverfly.password"),
+		HoverflyWebserver:   viper.GetBool("hoverfly.webserver"),
+		HoverflyCertificate: viper.GetString("hoverfly.tls.certificate"),
+		HoverflyKey:         viper.GetString("hoverfly.tls.key"),
+		HoverflyDisableTls:  viper.GetBool("hoverfly.tls.disable"),
 	}
 }
 
