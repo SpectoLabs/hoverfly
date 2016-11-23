@@ -137,6 +137,14 @@ func (c *Config) WriteToFile(hoverflyDirectory HoverflyDirectory) error {
 func (this Config) BuildFlags() Flags {
 	flags := Flags{}
 
+	if this.HoverflyAdminPort != "" {
+		flags = append(flags, "-ap="+this.HoverflyAdminPort)
+	}
+
+	if this.HoverflyProxyPort != "" {
+		flags = append(flags, "-pp="+this.HoverflyProxyPort)
+	}
+
 	if this.HoverflyWebserver {
 		flags = append(flags, "-webserver")
 	}

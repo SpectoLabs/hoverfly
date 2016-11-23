@@ -460,10 +460,6 @@ func (h *Hoverfly) runBinary(path string, hoverflyDirectory HoverflyDirectory) (
 
 	flags = append(flags, "-db")
 	flags = append(flags, "memory")
-	flags = append(flags, "-ap")
-	flags = append(flags, h.AdminPort)
-	flags = append(flags, "-pp")
-	flags = append(flags, h.ProxyPort)
 
 	cmd := exec.Command(path, flags...)
 	log.Debug(cmd.Args)

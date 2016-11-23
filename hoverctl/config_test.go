@@ -301,7 +301,7 @@ func Test_Config_WriteToFile_WritesTheDefaultConfigObjectToAFileInAYamlFormat(t 
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.disable: false"))
 }
 
-func Test_Config_BuildFlags_SettingWebserverToWebserverPutsTheCorrectFlag(t *testing.T) {
+func Test_Config_BuildFlags_SettingWebserverToTrueAddsTheFlag(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := Config{
@@ -310,6 +310,38 @@ func Test_Config_BuildFlags_SettingWebserverToWebserverPutsTheCorrectFlag(t *tes
 
 	Expect(unit.BuildFlags()).To(HaveLen(1))
 	Expect(unit.BuildFlags()[0]).To(Equal("-webserver"))
+}
+
+func Test_Config_BuildFlags_SettingWebserverToFalseDoesNotAddTheFlag(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Config{
+		HoverflyWebserver: false,
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(0))
+}
+
+func Test_Config_BuildFlags_AdminPortSetsTheApFlag(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Config{
+		HoverflyAdminPort: "1234",
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(1))
+	Expect(unit.BuildFlags()[0]).To(Equal("-ap=1234"))
+}
+
+func Test_Config_BuildFlags_ProxyPortSetsThePpFlag(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Config{
+		HoverflyProxyPort: "3421",
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(1))
+	Expect(unit.BuildFlags()[0]).To(Equal("-pp=3421"))
 }
 
 func Test_Config_BuildFlags_CertificateSetsCertFlag(t *testing.T) {
