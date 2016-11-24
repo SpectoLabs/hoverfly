@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"regexp"
 
@@ -55,6 +56,8 @@ var (
 
 	templatesCommand = kingpin.Command("templates", "Get set of request templates currently loaded in Hoverfly")
 	templatesPathArg = templatesCommand.Arg("path", "Add JSON config to set of request templates in Hoverfly").String()
+
+	configCommand = kingpin.Command("config", "Get the config being used by hoverctl and Hoverfly")
 )
 
 func main() {
@@ -263,6 +266,15 @@ func main() {
 				log.Error("Error marshalling JSON for printing request templates: " + err.Error())
 			}
 			fmt.Println(string(requestTemplatesJson))
+		}
+	case configCommand.FullCommand():
+		log.Info(config.GetFilepath())
+		configData, _ := ReadFile(config.GetFilepath())
+		configLines := strings.Split(string(configData), "\n")
+		for _, line := range configLines {
+			if line != "" {
+				log.Info(line)
+			}
 		}
 	}
 }
