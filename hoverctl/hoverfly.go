@@ -479,10 +479,6 @@ func (h *Hoverfly) runBinary(path string, hoverflyDirectory HoverflyDirectory) (
 	return cmd, nil
 }
 
-func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) error {
-	return h.startWithFlags(hoverflyDirectory)
-}
-
 func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory) error {
 
 	if !h.isLocal() {
