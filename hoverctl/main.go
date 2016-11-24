@@ -15,10 +15,15 @@ import (
 
 var (
 	hoverctlVersion string
+
+	verboseFlag = kingpin.Flag("verbose", "Verbose mode.").Short('v').Bool()
+
 	hostFlag        = kingpin.Flag("host", "Set the host of Hoverfly").String()
 	adminPortFlag   = kingpin.Flag("admin-port", "Set the admin port of Hoverfly").String()
 	proxyPortFlag   = kingpin.Flag("proxy-port", "Set the proxy port of Hoverfly").String()
-	verboseFlag     = kingpin.Flag("verbose", "Verbose mode.").Short('v').Bool()
+	certificateFlag = kingpin.Flag("certificate", "Supply path for custom certificate").String()
+	keyFlag         = kingpin.Flag("key", "Supply path for custom key").String()
+	disableTlsFlag  = kingpin.Flag("disable-tls", "Disable TLS verification").Bool()
 
 	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
 	modeNameArg = modeCommand.Arg("name", "Set Hoverfly's mode").String()
@@ -30,11 +35,8 @@ var (
 	middlewareCommand = kingpin.Command("middleware", "Get Hoverfly's middleware")
 	middlewarePathArg = middlewareCommand.Arg("path", "Set Hoverfly's middleware").String()
 
-	startCommand         = kingpin.Command("start", "Start a local instance of Hoverfly")
-	startArg             = startCommand.Arg("server type", "Choose the configuration of Hoverfly (proxy/webserver)").String()
-	startCertificateFlag = startCommand.Flag("certificate", "Supply path for custom certificate").String()
-	startKeyFlag         = startCommand.Flag("key", "Supply path for custom key").String()
-	startTlsFlag         = startCommand.Flag("disable-tls", "Disable TLS verification").Bool()
+	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
+	startArg     = startCommand.Arg("server type", "Choose the configuration of Hoverfly (proxy/webserver)").String()
 
 	stopCommand = kingpin.Command("stop", "Stop a local instance of Hoverfly")
 
@@ -81,9 +83,9 @@ func main() {
 	config = config.SetUsername("")
 	config = config.SetPassword("")
 	config = config.SetWebserver(*startArg)
-	config = config.SetCertificate(*startCertificateFlag)
-	config = config.SetKey(*startKeyFlag)
-	config = config.DisableTls(*startTlsFlag)
+	config = config.SetCertificate(*certificateFlag)
+	config = config.SetKey(*keyFlag)
+	config = config.DisableTls(*disableTlsFlag)
 
 	hoverflyDirectory, err := NewHoverflyDirectory(*config)
 	handleIfError(err)
@@ -91,6 +93,21 @@ func main() {
 	hoverfly := NewHoverfly(*config)
 
 	switch kingpin.Parse() {
+	case startCommand.FullCommand():
+		err := hoverfly.start(hoverflyDirectory)
+		handleIfError(err)
+		if config.HoverflyWebserver {
+			log.Info("Hoverfly is now running as a webserver")
+		} else {
+			log.Info("Hoverfly is now running")
+		}
+
+	case stopCommand.FullCommand():
+		err := hoverfly.stop(hoverflyDirectory)
+		handleIfError(err)
+
+		log.Info("Hoverfly has been stopped")
+
 	case modeCommand.FullCommand():
 		if *modeNameArg == "" || *modeNameArg == "status" {
 			mode, err := hoverfly.GetMode()
@@ -144,21 +161,6 @@ func main() {
 		}
 
 		log.Info(middleware)
-
-	case startCommand.FullCommand():
-		err := hoverfly.start(hoverflyDirectory)
-		handleIfError(err)
-		if config.HoverflyWebserver {
-			log.Info("Hoverfly is now running as a webserver")
-		} else {
-			log.Info("Hoverfly is now running")
-		}
-
-	case stopCommand.FullCommand():
-		err := hoverfly.stop(hoverflyDirectory)
-		handleIfError(err)
-
-		log.Info("Hoverfly has been stopped")
 
 	case exportCommand.FullCommand():
 		simulationData, err := hoverfly.ExportSimulation()
