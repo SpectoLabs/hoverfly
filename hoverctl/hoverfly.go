@@ -479,7 +479,7 @@ func (h *Hoverfly) runBinary(path string, hoverflyDirectory HoverflyDirectory) (
 	return cmd, nil
 }
 
-func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory) error {
+func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) error {
 
 	if !h.isLocal() {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
