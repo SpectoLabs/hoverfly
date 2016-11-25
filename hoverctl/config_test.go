@@ -21,13 +21,6 @@ var (
 		HoverflyKey:         "",
 		HoverflyDisableTls:  false,
 	}
-	defaultHoverflyHost      = "localhost"
-	defaultHoverflyAdminPort = "8888"
-	defaultHoverflyProxyPort = "8500"
-	defaultHoverflyDbType    = "memory"
-	defaultHoverflyUsername  = ""
-	defaultHoverflyPassword  = ""
-	defaultHoverflyWebserver = false
 )
 
 func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
