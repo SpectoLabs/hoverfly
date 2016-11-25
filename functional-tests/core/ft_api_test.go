@@ -69,26 +69,14 @@ var _ = Describe("Interacting with the API", func() {
 
 			Expect(pairsArray).To(HaveLen(3))
 
-			requestObject, err := pairsArray[0].GetObject("request")
-			Expect(err).To(BeNil())
-			Expect(requestObject.String()).To(Equal(`{"body":"body1","destination":"destination1","headers":{"Content-Type":["text/plain; charset=utf-8"],"Header":["value1"]},"method":"method1","path":"/path1","query":"query1","requestType":"recording","scheme":"scheme1"}`))
-			responseObject, err := pairsArray[0].GetObject("response")
-			Expect(err).To(BeNil())
-			Expect(responseObject.String()).To(Equal(`{"body":"body1","encodedBody":false,"headers":{"Header":["value1"]},"status":201}`))
+			Expect(jsonObject.String()).To(ContainSubstring(`{"body":"body1","destination":"destination1","headers":{"Content-Type":["text/plain; charset=utf-8"],"Header":["value1"]},"method":"method1","path":"/path1","query":"query1","requestType":"recording","scheme":"scheme1"}`))
+			Expect(jsonObject.String()).To(ContainSubstring(`{"body":"body1","encodedBody":false,"headers":{"Header":["value1"]},"status":201}`))
 
-			requestObject, err = pairsArray[1].GetObject("request")
-			Expect(err).To(BeNil())
-			Expect(requestObject.String()).To(Equal(`{"body":"body2","destination":"destination2","headers":{"Content-Type":["text/plain; charset=utf-8"],"Header":["value2"]},"method":"method2","path":"/path2","query":"query2","requestType":"recording","scheme":"scheme2"}`))
-			responseObject, err = pairsArray[1].GetObject("response")
-			Expect(err).To(BeNil())
-			Expect(responseObject.String()).To(Equal(`{"body":"body2","encodedBody":false,"headers":{"Header":["value2"]},"status":202}`))
+			Expect(jsonObject.String()).To(ContainSubstring(`{"body":"body2","destination":"destination2","headers":{"Content-Type":["text/plain; charset=utf-8"],"Header":["value2"]},"method":"method2","path":"/path2","query":"query2","requestType":"recording","scheme":"scheme2"}`))
+			Expect(jsonObject.String()).To(ContainSubstring(`{"body":"body2","encodedBody":false,"headers":{"Header":["value2"]},"status":202}`))
 
-			requestObject, err = pairsArray[2].GetObject("request")
-			Expect(err).To(BeNil())
-			Expect(requestObject.String()).To(Equal(`{"body":null,"destination":null,"headers":null,"method":null,"path":"/template","query":null,"requestType":"template","scheme":null}`))
-			responseObject, err = pairsArray[2].GetObject("response")
-			Expect(err).To(BeNil())
-			Expect(responseObject.String()).To(Equal(`{"body":"template-body","encodedBody":false,"headers":{"Header":["value2"]},"status":202}`))
+			Expect(jsonObject.String()).To(ContainSubstring(`{"body":null,"destination":null,"headers":null,"method":null,"path":"/template","query":null,"requestType":"template","scheme":null}`))
+			Expect(jsonObject.String()).To(ContainSubstring(`{"body":"template-body","encodedBody":false,"headers":{"Header":["value2"]},"status":202}`))
 
 			globalActionsObject, err := dataObject.GetObject("globalActions")
 			Expect(err).To(BeNil())
