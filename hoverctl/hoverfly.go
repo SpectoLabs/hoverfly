@@ -65,6 +65,7 @@ type Hoverfly struct {
 	Username   string
 	Password   string
 	authToken  string
+	config     Config
 	httpClient *http.Client
 }
 
@@ -75,6 +76,7 @@ func NewHoverfly(config Config) Hoverfly {
 		ProxyPort:  config.HoverflyProxyPort,
 		Username:   config.HoverflyUsername,
 		Password:   config.HoverflyPassword,
+		config:     config,
 		httpClient: http.DefaultClient,
 	}
 }
@@ -453,13 +455,8 @@ func (h *Hoverfly) buildAuthorizationHeaderValue() string {
 This isn't working as intended, its working, just not how I imagined it.
 */
 
-func (h *Hoverfly) runBinary(path string, flags Flags, hoverflyDirectory HoverflyDirectory) (*exec.Cmd, error) {
-	flags = append(flags, "-db")
-	flags = append(flags, "memory")
-	flags = append(flags, "-ap")
-	flags = append(flags, h.AdminPort)
-	flags = append(flags, "-pp")
-	flags = append(flags, h.ProxyPort)
+func (h *Hoverfly) runBinary(path string, hoverflyDirectory HoverflyDirectory) (*exec.Cmd, error) {
+	flags := h.config.BuildFlags()
 
 	cmd := exec.Command(path, flags...)
 	log.Debug(cmd.Args)
@@ -483,10 +480,10 @@ func (h *Hoverfly) runBinary(path string, flags Flags, hoverflyDirectory Hoverfl
 }
 
 func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) error {
-	return h.startWithFlags(hoverflyDirectory, []string{})
+	return h.startWithFlags(hoverflyDirectory)
 }
 
-func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags Flags) error {
+func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory) error {
 
 	if !h.isLocal() {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
@@ -512,9 +509,9 @@ func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags Fla
 		return errors.New("Could not start Hoverfly")
 	}
 
-	cmd, err := h.runBinary(binaryLocation+"/hoverfly", flags, hoverflyDirectory)
+	cmd, err := h.runBinary(binaryLocation+"/hoverfly", hoverflyDirectory)
 	if err != nil {
-		cmd, err = h.runBinary("hoverfly", flags, hoverflyDirectory)
+		cmd, err = h.runBinary("hoverfly", hoverflyDirectory)
 		if err != nil {
 			return errors.New("Could not read Hoverfly pid file")
 		}

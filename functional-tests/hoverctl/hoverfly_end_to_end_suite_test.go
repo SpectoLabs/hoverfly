@@ -183,13 +183,14 @@ type testConfig struct {
 	HoverflyProxyPort string `yaml:"hoverfly.proxy.port"`
 	HoverflyUsername  string `yaml:"hoverfly.username"`
 	HoverflyPassword  string `yaml:"hoverfly.password"`
+	HoverflyWebserver bool   `yaml:"hoverfly.webserver"`
 }
 
 func WriteConfiguration(host, adminPort, proxyPort string) {
-	WriteConfigurationWithAuth(host, adminPort, proxyPort, "", "")
+	WriteConfigurationWithAuth(host, adminPort, proxyPort, false, "", "")
 }
 
-func WriteConfigurationWithAuth(host, adminPort, proxyPort, username, password string) {
+func WriteConfigurationWithAuth(host, adminPort, proxyPort string, webserver bool, username, password string) {
 	configHost := "localhost"
 	configAdminPort := "8888"
 	configProxyPort := "8500"
@@ -220,6 +221,7 @@ func WriteConfigurationWithAuth(host, adminPort, proxyPort, username, password s
 		HoverflyHost:      configHost,
 		HoverflyAdminPort: configAdminPort,
 		HoverflyProxyPort: configProxyPort,
+		HoverflyWebserver: webserver,
 		HoverflyUsername:  configUsername,
 		HoverflyPassword:  configPassword,
 	}

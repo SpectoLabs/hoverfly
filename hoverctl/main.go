@@ -71,12 +71,21 @@ func main() {
 	SetConfigurationDefaults()
 	SetConfigurationPaths()
 
-	config := GetConfig(*hostFlag, *adminPortFlag, *proxyPortFlag, "", "")
+	config := GetConfig()
+	config = config.SetHost(*hostFlag)
+	config = config.SetAdminPort(*adminPortFlag)
+	config = config.SetProxyPort(*proxyPortFlag)
+	config = config.SetUsername("")
+	config = config.SetPassword("")
+	config = config.SetWebserver(*startArg)
+	config = config.SetCertificate(*startCertificateFlag)
+	config = config.SetKey(*startKeyFlag)
+	config = config.DisableTls(*startTlsFlag)
 
-	hoverflyDirectory, err := NewHoverflyDirectory(config)
+	hoverflyDirectory, err := NewHoverflyDirectory(*config)
 	handleIfError(err)
 
-	hoverfly := NewHoverfly(config)
+	hoverfly := NewHoverfly(*config)
 
 	switch kingpin.Parse() {
 	case modeCommand.FullCommand():
@@ -134,16 +143,9 @@ func main() {
 		log.Info(middleware)
 
 	case startCommand.FullCommand():
-		flagsBuilder := FlagsBuilder{
-			Webserver:   *startArg,
-			Certificate: *startCertificateFlag,
-			Key:         *startKeyFlag,
-			DisableTls:  *startTlsFlag,
-		}
-
-		err := hoverfly.startWithFlags(hoverflyDirectory, flagsBuilder.BuildFlags())
+		err := hoverfly.startWithFlags(hoverflyDirectory)
 		handleIfError(err)
-		if *startArg == "webserver" {
+		if config.HoverflyWebserver {
 			log.Info("Hoverfly is now running as a webserver")
 		} else {
 			log.Info("Hoverfly is now running")

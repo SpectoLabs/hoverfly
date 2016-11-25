@@ -267,5 +267,26 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(data).To(ContainSubstring("tls certificate verification is now turned off!"))
 			})
 		})
+
+		Context("You can start a hoverfly based on config from config.yml", func() {
+
+			It("will start on the admin and proxy ports", func() {
+				WriteConfiguration("localhost", "5543", "6478")
+				setOutput, _ := exec.Command(hoverctlBinary, "start", "-v").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("hoverfly -ap=5543 -pp=6478"))
+			})
+
+			It("will start as a webserver", func() {
+				WriteConfigurationWithAuth("localhost", "7654", "8765", true, "", "")
+				setOutput, _ := exec.Command(hoverctlBinary, "start", "-v").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("hoverfly -ap=7654 -pp=8765 -db=memory -webserver"))
+				Expect(output).To(ContainSubstring("Hoverfly is now running as a webserver"))
+			})
+
+		})
 	})
 })
