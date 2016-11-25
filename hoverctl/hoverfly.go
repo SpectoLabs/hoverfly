@@ -480,10 +480,6 @@ func (h *Hoverfly) runBinary(path string, hoverflyDirectory HoverflyDirectory) (
 }
 
 func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) error {
-	return h.startWithFlags(hoverflyDirectory)
-}
-
-func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory) error {
 
 	if !h.isLocal() {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
