@@ -29,7 +29,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverflyWithAuth(adminPort, proxyPort, workingDirectory, username, password)
-			WriteConfigurationWithAuth("localhost", adminPortAsString, proxyPortAsString, username, password)
+			WriteConfigurationWithAuth("localhost", adminPortAsString, proxyPortAsString, false, username, password)
 		})
 
 		AfterEach(func() {

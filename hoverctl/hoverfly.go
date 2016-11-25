@@ -8,17 +8,22 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/dghubble/sling"
+	"github.com/kardianos/osext"
 )
 
 const (
+	v1ApiDelays     = "/api/delays"
 	v1ApiSimulation = "/api/records"
-	v2ApiSimulation = "/api/v2/simulation"
+
+	v2ApiSimulation  = "/api/v2/simulation"
+	v2ApiMode        = "/api/v2/hoverfly/mode"
+	v2ApiDestination = "/api/v2/hoverfly/destination"
+	v2ApiMiddleware  = "/api/v2/hoverfly/middleware"
 )
 
 type APIStateSchema struct {
@@ -49,6 +54,10 @@ type MiddlewareSchema struct {
 	Middleware string `json:"middleware"`
 }
 
+type ErrorSchema struct {
+	ErrorMessage string `json:"error"`
+}
+
 type Hoverfly struct {
 	Host       string
 	AdminPort  string
@@ -56,6 +65,7 @@ type Hoverfly struct {
 	Username   string
 	Password   string
 	authToken  string
+	config     Config
 	httpClient *http.Client
 }
 
@@ -66,39 +76,24 @@ func NewHoverfly(config Config) Hoverfly {
 		ProxyPort:  config.HoverflyProxyPort,
 		Username:   config.HoverflyUsername,
 		Password:   config.HoverflyPassword,
+		config:     config,
 		httpClient: http.DefaultClient,
 	}
 }
 
 // Wipe will call the records endpoint in Hoverfly with a DELETE request, triggering Hoverfly to wipe the database
 func (h *Hoverfly) DeleteSimulations() error {
-	url := h.buildURL("/api/records")
-
-	slingRequest := sling.New().Delete(url)
-	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	slingRequest, err := h.buildDeleteRequest(v2ApiSimulation)
 	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not authenticate with Hoverfly")
+		return err
 	}
 
-	request, err := slingRequest.Request()
-
+	response, err := h.doRequest(slingRequest)
 	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not communicate with Hoverfly")
-	}
-
-	response, err := h.httpClient.Do(request)
-	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not communicate with Hoverfly")
+		return err
 	}
 
 	defer response.Body.Close()
-
-	if response.StatusCode == 401 {
-		return errors.New("Hoverfly requires authentication")
-	}
 
 	if response.StatusCode != 200 {
 		return errors.New("Simulations were not deleted from Hoverfly")
@@ -108,33 +103,17 @@ func (h *Hoverfly) DeleteSimulations() error {
 }
 
 func (h *Hoverfly) DeleteDelays() error {
-	url := h.buildURL("/api/delays")
-
-	slingRequest := sling.New().Delete(url)
-	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	slingRequest, err := h.buildDeleteRequest(v1ApiDelays)
 	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not authenticate  with Hoverfly")
+		return err
 	}
 
-	request, err := slingRequest.Request()
-
+	response, err := h.doRequest(slingRequest)
 	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not communicate with Hoverfly")
-	}
-
-	response, err := h.httpClient.Do(request)
-	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not communicate with Hoverfly")
+		return err
 	}
 
 	defer response.Body.Close()
-
-	if response.StatusCode == 401 {
-		return errors.New("Hoverfly requires authentication")
-	}
 
 	if response.StatusCode != 200 {
 		return errors.New("Delays were not deleted from Hoverfly")
@@ -145,31 +124,14 @@ func (h *Hoverfly) DeleteDelays() error {
 
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
 func (h *Hoverfly) GetMode() (string, error) {
-	url := h.buildURL("/api/state")
-
-	slingRequest := sling.New().Get(url)
-
-	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	slingRequest, err := h.buildGetRequest(v2ApiMode)
 	if err != nil {
-		log.Debug(err.Error())
-		return "", errors.New("Could not authenticate with Hoverfly")
+		return "", err
 	}
 
-	request, err := slingRequest.Request()
-
+	response, err := h.doRequest(slingRequest)
 	if err != nil {
-		log.Debug(err.Error())
-		return "", errors.New("Could not communicate with Hoverfly")
-	}
-
-	response, err := h.httpClient.Do(request)
-	if err != nil {
-		log.Debug(err.Error())
-		return "", errors.New("Could not communicate with Hoverfly")
-	}
-
-	if response.StatusCode == 401 {
-		return "", errors.New("Hoverfly requires authentication")
+		return "", err
 	}
 
 	defer response.Body.Close()
@@ -185,33 +147,17 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 		return "", errors.New(mode + " is not a valid mode")
 	}
 
-	url := h.buildURL("/api/state")
-
-	slingRequest := sling.New().Post(url).Body(strings.NewReader(`{"mode":"` + mode + `"}`))
-
-	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	slingRequest, err := h.buildPutRequest(v2ApiMode, `{"mode":"`+mode+`"}`)
 	if err != nil {
-		log.Debug(err.Error())
-		return "", errors.New("Could not authenticate  with Hoverfly")
+		return "", err
 	}
 
-	request, err := slingRequest.Request()
+	response, err := h.doRequest(slingRequest)
 	if err != nil {
-		log.Debug(err.Error())
-		return "", errors.New("Could not communicate with Hoverfly")
+		return "", err
 	}
 
-	response, err := h.httpClient.Do(request)
-	if err != nil {
-		log.Debug(err.Error())
-		return "", errors.New("Could not communicate with Hoverfly")
-	}
-
-	if response.StatusCode == 401 {
-		return "", errors.New("Hoverfly requires authentication")
-	}
-
-	if response.StatusCode == 403 {
+	if response.StatusCode == 422 {
 		return "", errors.New("Cannot change the mode of Hoverfly when running as a webserver")
 	}
 
@@ -220,33 +166,53 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 	return apiResponse.Mode, nil
 }
 
+// GetDestination will go the destination endpoint in Hoverfly, parse the JSON response and return the destination of Hoverfly
+func (h *Hoverfly) GetDestination() (string, error) {
+	slingRequest, err := h.buildGetRequest(v2ApiDestination)
+	if err != nil {
+		return "", err
+	}
+
+	response, err := h.doRequest(slingRequest)
+	if err != nil {
+		return "", err
+	}
+
+	defer response.Body.Close()
+
+	apiResponse := h.createAPIStateResponse(response)
+
+	return apiResponse.Destination, nil
+}
+
+// SetDestination will go the destination endpoint in Hoverfly, sending JSON that will set the destination of Hoverfly
+func (h *Hoverfly) SetDestination(destination string) (string, error) {
+
+	slingRequest, err := h.buildPutRequest(v2ApiDestination, `{"destination":"`+destination+`"}`)
+	if err != nil {
+		return "", err
+	}
+
+	response, err := h.doRequest(slingRequest)
+	if err != nil {
+		return "", err
+	}
+
+	apiResponse := h.createAPIStateResponse(response)
+
+	return apiResponse.Destination, nil
+}
+
 // GetMiddle will go the middleware endpoint in Hoverfly, parse the JSON response and return the middleware of Hoverfly
 func (h *Hoverfly) GetMiddleware() (string, error) {
-	url := h.buildURL("/api/middleware")
-
-	slingRequest := sling.New().Get(url)
-
-	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	slingRequest, err := h.buildGetRequest(v2ApiMiddleware)
 	if err != nil {
-		log.Debug(err.Error())
-		return "", errors.New("Could not authenticate with Hoverfly")
+		return "", err
 	}
 
-	request, err := slingRequest.Request()
-
+	response, err := h.doRequest(slingRequest)
 	if err != nil {
-		log.Debug(err.Error())
-		return "", errors.New("Could not communicate with Hoverfly")
-	}
-
-	response, err := h.httpClient.Do(request)
-	if err != nil {
-		log.Debug(err.Error())
-		return "", errors.New("Could not communicate with Hoverfly")
-	}
-
-	if response.StatusCode == 401 {
-		return "", errors.New("Hoverfly requires authentication")
+		return "", err
 	}
 
 	defer response.Body.Close()
@@ -257,30 +223,14 @@ func (h *Hoverfly) GetMiddleware() (string, error) {
 }
 
 func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
-	url := h.buildURL("/api/middleware")
-
-	slingRequest := sling.New().Post(url).Body(strings.NewReader(`{"middleware":"` + middleware + `"}`))
-
-	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	slingRequest, err := h.buildPutRequest(v2ApiMiddleware, `{"middleware":"`+middleware+`"}`)
 	if err != nil {
-		log.Debug(err.Error())
-		return "", errors.New("Could not authenticate  with Hoverfly")
+		return "", err
 	}
 
-	request, err := slingRequest.Request()
+	response, err := h.doRequest(slingRequest)
 	if err != nil {
-		log.Debug(err.Error())
-		return "", errors.New("Could not communicate with Hoverfly")
-	}
-
-	response, err := h.httpClient.Do(request)
-	if err != nil {
-		log.Debug(err.Error())
-		return "", errors.New("Could not communicate with Hoverfly")
-	}
-
-	if response.StatusCode == 401 {
-		return "", errors.New("Hoverfly requires authentication")
+		return "", err
 	}
 
 	if response.StatusCode == 403 {
@@ -290,8 +240,11 @@ func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
 	if response.StatusCode != 200 {
 		defer response.Body.Close()
 		errorMessage, _ := ioutil.ReadAll(response.Body)
-		trimmedError := strings.TrimSpace(string(errorMessage))
-		log.Debug(trimmedError)
+
+		error := &ErrorSchema{}
+
+		json.Unmarshal(errorMessage, error)
+		log.Debug(error.ErrorMessage)
 		return "", errors.New("Hoverfly could not execute this middleware")
 	}
 
@@ -314,21 +267,9 @@ func (h *Hoverfly) ImportSimulation(simulationData string, v1 bool) error {
 		return errors.New("Could not authenticate  with Hoverfly")
 	}
 
-	request, err := slingRequest.Request()
+	response, err := h.doRequest(slingRequest)
 	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not communicate with Hoverfly")
-	}
-
-	response, err := h.httpClient.Do(request)
-
-	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not communicate with Hoverfly")
-	}
-
-	if response.StatusCode == 401 {
-		return errors.New("Hoverfly requires authentication")
+		return err
 	}
 
 	if response.StatusCode != 200 {
@@ -339,29 +280,14 @@ func (h *Hoverfly) ImportSimulation(simulationData string, v1 bool) error {
 }
 
 func (h *Hoverfly) ExportSimulation() ([]byte, error) {
-	url := h.buildURL(v2ApiSimulation)
-
-	slingRequest := sling.New().Get(url)
-	slingRequest, err := h.addAuthIfNeeded(slingRequest)
+	slingRequest, err := h.buildGetRequest(v2ApiSimulation)
 	if err != nil {
-		log.Debug(err.Error())
-		return nil, errors.New("Could not authenticate  with Hoverfly")
+		return nil, err
 	}
 
-	request, err := slingRequest.Request()
+	response, err := h.doRequest(slingRequest)
 	if err != nil {
-		log.Debug(err.Error())
-		return nil, errors.New("Could not create a request to Hoverfly")
-	}
-
-	response, err := h.httpClient.Do(request)
-	if err != nil {
-		log.Debug(err.Error())
-		return nil, errors.New("Could not communicate with Hoverfly")
-	}
-
-	if response.StatusCode == 401 {
-		return nil, errors.New("Hoverfly requires authentication")
+		return nil, err
 	}
 
 	defer response.Body.Close()
@@ -460,6 +386,55 @@ func (h *Hoverfly) generateAuthToken() (string, error) {
 	return authToken.Token, nil
 }
 
+func (h *Hoverfly) buildGetRequest(endpoint string) (*sling.Sling, error) {
+	url := h.buildURL(endpoint)
+	request := sling.New().Get(url)
+	return h.buildRequest(request)
+}
+
+func (h *Hoverfly) buildPutRequest(endpoint, body string) (*sling.Sling, error) {
+	url := h.buildURL(endpoint)
+	request := sling.New().Put(url).Body(strings.NewReader(body))
+	return h.buildRequest(request)
+}
+
+func (h *Hoverfly) buildDeleteRequest(endpoint string) (*sling.Sling, error) {
+	url := h.buildURL(endpoint)
+	request := sling.New().Delete(url)
+	return h.buildRequest(request)
+}
+
+func (h *Hoverfly) buildRequest(request *sling.Sling) (*sling.Sling, error) {
+	request, err := h.addAuthIfNeeded(request)
+
+	if err != nil {
+		log.Debug(err.Error())
+		return nil, errors.New("Could not authenticate with Hoverfly")
+	}
+
+	return request, nil
+}
+
+func (h *Hoverfly) doRequest(request *sling.Sling) (*http.Response, error) {
+	httpRequest, err := request.Request()
+	if err != nil {
+		log.Debug(err.Error())
+		return nil, errors.New("Could not communicate with Hoverfly")
+	}
+
+	response, err := h.httpClient.Do(httpRequest)
+	if err != nil {
+		log.Debug(err.Error())
+		return nil, errors.New("Could not communicate with Hoverfly")
+	}
+
+	if response.StatusCode == 401 {
+		return nil, errors.New("Hoverfly requires authentication")
+	}
+
+	return response, nil
+}
+
 func (h *Hoverfly) buildURL(endpoint string) string {
 	return fmt.Sprintf("%v%v", h.buildBaseURL(), endpoint)
 }
@@ -480,11 +455,31 @@ func (h *Hoverfly) buildAuthorizationHeaderValue() string {
 This isn't working as intended, its working, just not how I imagined it.
 */
 
-func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) error {
-	return h.startWithFlags(hoverflyDirectory, "")
+func (h *Hoverfly) runBinary(path string, hoverflyDirectory HoverflyDirectory) (*exec.Cmd, error) {
+	flags := h.config.BuildFlags()
+
+	cmd := exec.Command(path, flags...)
+	log.Debug(cmd.Args)
+	file, err := os.Create(hoverflyDirectory.Path + "/hoverfly." + h.AdminPort + "." + h.ProxyPort + ".log")
+	if err != nil {
+		log.Debug(err)
+		return nil, errors.New("Could not create log file")
+	}
+
+	cmd.Stdout = file
+	cmd.Stderr = file
+	defer file.Close()
+
+	err = cmd.Start()
+	if err != nil {
+		log.Debug(err)
+		return nil, errors.New("Could not start Hoverfly")
+	}
+
+	return cmd, nil
 }
 
-func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags string) error {
+func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) error {
 
 	if !h.isLocal() {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
@@ -504,23 +499,18 @@ func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags str
 		hoverflyDirectory.DeletePid(h.AdminPort, h.ProxyPort)
 	}
 
-	cmd := exec.Command("hoverfly", "-db", "memory", "-ap", h.AdminPort, "-pp", h.ProxyPort, flags)
-
-	file, err := os.Create(hoverflyDirectory.Path + "/hoverfly." + h.AdminPort + "." + h.ProxyPort + ".log")
-	if err != nil {
-		log.Debug(err)
-		return errors.New("Could not create log file")
-	}
-
-	cmd.Stdout = file
-	cmd.Stderr = file
-	defer file.Close()
-
-	err = cmd.Start()
-
+	binaryLocation, err := osext.ExecutableFolder()
 	if err != nil {
 		log.Debug(err)
 		return errors.New("Could not start Hoverfly")
+	}
+
+	cmd, err := h.runBinary(binaryLocation+"/hoverfly", hoverflyDirectory)
+	if err != nil {
+		cmd, err = h.runBinary("hoverfly", hoverflyDirectory)
+		if err != nil {
+			return errors.New("Could not read Hoverfly pid file")
+		}
 	}
 
 	timeout := time.After(10 * time.Second)
@@ -533,9 +523,10 @@ func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags str
 			if err != nil {
 				log.Debug(err)
 			}
-			return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: " + strconv.Itoa(statusCode)))
+			return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: %v", statusCode))
 		case <-tick:
-			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/state", h.AdminPort))
+			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/mode", h.AdminPort))
+
 			if err == nil {
 				statusCode = resp.StatusCode
 			} else {
@@ -591,27 +582,14 @@ func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) error {
 
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
 func (h *Hoverfly) GetDelays() (rd []ResponseDelaySchema, err error) {
-	url := h.buildURL("/api/delays")
-
-	slingRequest := sling.New().Get(url)
-
-	slingRequest, err = h.addAuthIfNeeded(slingRequest)
+	slingRequest, err := h.buildGetRequest(v1ApiDelays)
 	if err != nil {
-		log.Debug(err.Error())
-		return rd, errors.New("Could not authenticate  with Hoverfly")
+		return rd, err
 	}
 
-	request, err := slingRequest.Request()
-
+	response, err := h.doRequest(slingRequest)
 	if err != nil {
-		log.Debug(err.Error())
-		return rd, errors.New("Could not communicate with Hoverfly")
-	}
-
-	response, err := h.httpClient.Do(request)
-	if err != nil {
-		log.Debug(err.Error())
-		return rd, errors.New("Could not communicate with Hoverfly")
+		return nil, err
 	}
 
 	defer response.Body.Close()
@@ -629,9 +607,17 @@ func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelaySchema, err error) 
 		return rd, err
 	}
 
-	url := h.buildURL("/api/delays")
+	slingRequest, err := h.buildPutRequest(v1ApiDelays, string(conf))
+	if err != nil {
+		return rd, err
+	}
 
-	slingRequest := sling.New().Put(url).Body(strings.NewReader(string(conf)))
+	response, err := h.doRequest(slingRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	slingRequest = sling.New().Get(h.buildURL(v1ApiDelays))
 
 	slingRequest, err = h.addAuthIfNeeded(slingRequest)
 	if err != nil {
@@ -640,26 +626,6 @@ func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelaySchema, err error) 
 	}
 
 	request, err := slingRequest.Request()
-	if err != nil {
-		log.Debug(err.Error())
-		return rd, errors.New("Could not communicate with Hoverfly")
-	}
-
-	response, err := h.httpClient.Do(request)
-	if err != nil {
-		log.Debug(err.Error())
-		return rd, errors.New("Could not communicate with Hoverfly")
-	}
-
-	slingRequest = sling.New().Get(url).Body(strings.NewReader(string(conf)))
-
-	slingRequest, err = h.addAuthIfNeeded(slingRequest)
-	if err != nil {
-		log.Debug(err.Error())
-		return rd, errors.New("Could not authenticate  with Hoverfly")
-	}
-
-	request, err = slingRequest.Request()
 	if err != nil {
 		log.Debug(err.Error())
 		return rd, errors.New("Could not communicate with Hoverfly")

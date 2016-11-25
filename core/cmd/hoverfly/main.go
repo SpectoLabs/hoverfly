@@ -188,6 +188,11 @@ func main() {
 			log.Fatalf("Failed to load certifiate and key pair, got error: %s", err.Error())
 		}
 
+		log.WithFields(log.Fields{
+			"certificate": *cert,
+			"key":         *key,
+		}).Info("Default keys have been overwritten")
+
 		goproxy.GoproxyCa = tlsc
 
 	}

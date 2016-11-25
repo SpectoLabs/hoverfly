@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
+
+	"regexp"
 
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -12,20 +15,30 @@ import (
 
 var (
 	hoverctlVersion string
+
+	verboseFlag = kingpin.Flag("verbose", "Verbose mode.").Short('v').Bool()
+
 	hostFlag        = kingpin.Flag("host", "Set the host of Hoverfly").String()
 	adminPortFlag   = kingpin.Flag("admin-port", "Set the admin port of Hoverfly").String()
 	proxyPortFlag   = kingpin.Flag("proxy-port", "Set the proxy port of Hoverfly").String()
-	verboseFlag     = kingpin.Flag("verbose", "Verbose mode.").Short('v').Bool()
+	certificateFlag = kingpin.Flag("certificate", "Supply path for custom certificate").String()
+	keyFlag         = kingpin.Flag("key", "Supply path for custom key").String()
+	disableTlsFlag  = kingpin.Flag("disable-tls", "Disable TLS verification").Bool()
 
 	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
 	modeNameArg = modeCommand.Arg("name", "Set Hoverfly's mode").String()
+
+	destinationCommand = kingpin.Command("destination", "Get Hoverfly's current destination")
+	destinationNameArg = destinationCommand.Arg("name", "Set Hoverfly's destination").String()
+	destinationDryRun  = destinationCommand.Flag("dry-run", "Test a url against a regex pattern").String()
 
 	middlewareCommand = kingpin.Command("middleware", "Get Hoverfly's middleware")
 	middlewarePathArg = middlewareCommand.Arg("path", "Set Hoverfly's middleware").String()
 
 	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
 	startArg     = startCommand.Arg("server type", "Choose the configuration of Hoverfly (proxy/webserver)").String()
-	stopCommand  = kingpin.Command("stop", "Stop a local instance of Hoverfly")
+
+	stopCommand = kingpin.Command("stop", "Stop a local instance of Hoverfly")
 
 	exportCommand = kingpin.Command("export", "Exports data out of Hoverfly")
 	exportNameArg = exportCommand.Arg("name", "Name of exported simulation").Required().String()
@@ -45,6 +58,8 @@ var (
 
 	templatesCommand = kingpin.Command("templates", "Get set of request templates currently loaded in Hoverfly")
 	templatesPathArg = templatesCommand.Arg("path", "Add JSON config to set of request templates in Hoverfly").String()
+
+	configCommand = kingpin.Command("config", "Get the config being used by hoverctl and Hoverfly")
 )
 
 func main() {
@@ -61,14 +76,38 @@ func main() {
 	SetConfigurationDefaults()
 	SetConfigurationPaths()
 
-	config := GetConfig(*hostFlag, *adminPortFlag, *proxyPortFlag, "", "")
+	config := GetConfig()
+	config = config.SetHost(*hostFlag)
+	config = config.SetAdminPort(*adminPortFlag)
+	config = config.SetProxyPort(*proxyPortFlag)
+	config = config.SetUsername("")
+	config = config.SetPassword("")
+	config = config.SetWebserver(*startArg)
+	config = config.SetCertificate(*certificateFlag)
+	config = config.SetKey(*keyFlag)
+	config = config.DisableTls(*disableTlsFlag)
 
-	hoverflyDirectory, err := NewHoverflyDirectory(config)
+	hoverflyDirectory, err := NewHoverflyDirectory(*config)
 	handleIfError(err)
 
-	hoverfly := NewHoverfly(config)
+	hoverfly := NewHoverfly(*config)
 
 	switch kingpin.Parse() {
+	case startCommand.FullCommand():
+		err := hoverfly.start(hoverflyDirectory)
+		handleIfError(err)
+		if config.HoverflyWebserver {
+			log.Info("Hoverfly is now running as a webserver")
+		} else {
+			log.Info("Hoverfly is now running")
+		}
+
+	case stopCommand.FullCommand():
+		err := hoverfly.stop(hoverflyDirectory)
+		handleIfError(err)
+
+		log.Info("Hoverfly has been stopped")
+
 	case modeCommand.FullCommand():
 		if *modeNameArg == "" || *modeNameArg == "status" {
 			mode, err := hoverfly.GetMode()
@@ -80,6 +119,33 @@ func main() {
 			handleIfError(err)
 
 			log.Info("Hoverfly has been set to ", mode, " mode")
+		}
+	case destinationCommand.FullCommand():
+		if *destinationNameArg == "" || *destinationNameArg == "status" {
+			destination, err := hoverfly.GetDestination()
+			handleIfError(err)
+
+			log.Info("The destination in Hoverfly is set to ", destination)
+		} else {
+			regexPattern, err := regexp.Compile(*destinationNameArg)
+			if err != nil {
+				log.Debug(err.Error())
+				handleIfError(errors.New("Regex pattern does not compile"))
+			}
+
+			if *destinationDryRun != "" {
+				if regexPattern.MatchString(*destinationDryRun) {
+					log.Info("The regex provided matches the dry run URL")
+				} else {
+					log.Fatal("The regex provided does not match the dry run URL")
+				}
+			} else {
+				destination, err := hoverfly.SetDestination(*destinationNameArg)
+				handleIfError(err)
+
+				log.Info("The destination in Hoverfly has been set to ", destination)
+			}
+
 		}
 
 	case middlewareCommand.FullCommand():
@@ -95,25 +161,6 @@ func main() {
 		}
 
 		log.Info(middleware)
-
-	case startCommand.FullCommand():
-		if *startArg == "webserver" {
-			err := hoverfly.startWithFlags(hoverflyDirectory, "-webserver")
-			handleIfError(err)
-
-			log.Info("Hoverfly is now running as a webserver")
-		} else {
-			err := hoverfly.start(hoverflyDirectory)
-			handleIfError(err)
-
-			log.Info("Hoverfly is now running")
-		}
-
-	case stopCommand.FullCommand():
-		err := hoverfly.stop(hoverflyDirectory)
-		handleIfError(err)
-
-		log.Info("Hoverfly has been stopped")
 
 	case exportCommand.FullCommand():
 		simulationData, err := hoverfly.ExportSimulation()
@@ -221,6 +268,15 @@ func main() {
 				log.Error("Error marshalling JSON for printing request templates: " + err.Error())
 			}
 			fmt.Println(string(requestTemplatesJson))
+		}
+	case configCommand.FullCommand():
+		log.Info(config.GetFilepath())
+		configData, _ := ReadFile(config.GetFilepath())
+		configLines := strings.Split(string(configData), "\n")
+		for _, line := range configLines {
+			if line != "" {
+				log.Info(line)
+			}
 		}
 	}
 }

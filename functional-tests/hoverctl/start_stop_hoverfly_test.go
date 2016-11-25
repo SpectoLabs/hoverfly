@@ -1,14 +1,15 @@
 package hoverctl_end_to_end
 
 import (
-	"github.com/dghubble/sling"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
 	"io/ioutil"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/dghubble/sling"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/phayes/freeport"
 )
 
 var _ = Describe("When I use hoverctl", func() {
@@ -211,6 +212,81 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(string(responseBody)).ToNot(ContainSubstring("This is a proxy server"))
 			})
+		})
+
+		Context("You can specify the certificate and key for hoverfly", func() {
+
+			It("starts hoverfly with different certificate and key", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "start", "--certificate", "testdata/cert.pem", "--key", "testdata/key.pem", "-v").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
+
+				if err != nil {
+					Fail("Could not find pid file")
+				}
+
+				Expect(data).ToNot(BeEmpty())
+
+				data, err = ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
+
+				if err != nil {
+					Fail("Could not find log file")
+				}
+
+				Expect(data).ToNot(BeEmpty())
+				Expect(data).To(ContainSubstring("Default keys have been overwritten"))
+			})
+		})
+
+		Context("You can disable tls for hoverfly", func() {
+
+			It("starts hoverfly with tls verification turned off", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "start", "--disable-tls", "-v").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
+
+				if err != nil {
+					Fail("Could not find pid file")
+				}
+
+				Expect(data).ToNot(BeEmpty())
+
+				data, err = ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
+
+				if err != nil {
+					Fail("Could not find log file")
+				}
+
+				Expect(data).ToNot(BeEmpty())
+				Expect(data).To(ContainSubstring("tls certificate verification is now turned off!"))
+			})
+		})
+
+		Context("You can start a hoverfly based on config from config.yml", func() {
+
+			It("will start on the admin and proxy ports", func() {
+				WriteConfiguration("localhost", "5543", "6478")
+				setOutput, _ := exec.Command(hoverctlBinary, "start", "-v").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("hoverfly -ap=5543 -pp=6478"))
+			})
+
+			It("will start as a webserver", func() {
+				WriteConfigurationWithAuth("localhost", "7654", "8765", true, "", "")
+				setOutput, _ := exec.Command(hoverctlBinary, "start", "-v").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("hoverfly -ap=7654 -pp=8765 -db=memory -webserver"))
+				Expect(output).To(ContainSubstring("Hoverfly is now running as a webserver"))
+			})
+
 		})
 	})
 })
