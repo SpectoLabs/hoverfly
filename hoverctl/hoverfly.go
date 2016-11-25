@@ -8,12 +8,12 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/dghubble/sling"
+	"github.com/kardianos/osext"
 )
 
 const (
@@ -453,11 +453,40 @@ func (h *Hoverfly) buildAuthorizationHeaderValue() string {
 This isn't working as intended, its working, just not how I imagined it.
 */
 
-func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) error {
-	return h.startWithFlags(hoverflyDirectory, "")
+func (h *Hoverfly) runBinary(path string, flags []string, hoverflyDirectory HoverflyDirectory) (*exec.Cmd, error) {
+	flags = append(flags, "-db")
+	flags = append(flags, "memory")
+	flags = append(flags, "-ap")
+	flags = append(flags, h.AdminPort)
+	flags = append(flags, "-pp")
+	flags = append(flags, h.ProxyPort)
+
+	cmd := exec.Command(path, flags...)
+	log.Debug(cmd.Args)
+	file, err := os.Create(hoverflyDirectory.Path + "/hoverfly." + h.AdminPort + "." + h.ProxyPort + ".log")
+	if err != nil {
+		log.Debug(err)
+		return nil, errors.New("Could not create log file")
+	}
+
+	cmd.Stdout = file
+	cmd.Stderr = file
+	defer file.Close()
+
+	err = cmd.Start()
+	if err != nil {
+		log.Debug(err)
+		return nil, errors.New("Could not start Hoverfly")
+	}
+
+	return cmd, nil
 }
 
-func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags string) error {
+func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) error {
+	return h.startWithFlags(hoverflyDirectory, []string{})
+}
+
+func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags []string) error {
 
 	if !h.isLocal() {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
@@ -477,23 +506,18 @@ func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags str
 		hoverflyDirectory.DeletePid(h.AdminPort, h.ProxyPort)
 	}
 
-	cmd := exec.Command("hoverfly", "-db", "memory", "-ap", h.AdminPort, "-pp", h.ProxyPort, flags)
-
-	file, err := os.Create(hoverflyDirectory.Path + "/hoverfly." + h.AdminPort + "." + h.ProxyPort + ".log")
-	if err != nil {
-		log.Debug(err)
-		return errors.New("Could not create log file")
-	}
-
-	cmd.Stdout = file
-	cmd.Stderr = file
-	defer file.Close()
-
-	err = cmd.Start()
-
+	binaryLocation, err := osext.ExecutableFolder()
 	if err != nil {
 		log.Debug(err)
 		return errors.New("Could not start Hoverfly")
+	}
+
+	cmd, err := h.runBinary(binaryLocation+"/hoverfly", flags, hoverflyDirectory)
+	if err != nil {
+		cmd, err = h.runBinary("hoverfly", flags, hoverflyDirectory)
+		if err != nil {
+			return errors.New("Could not read Hoverfly pid file")
+		}
 	}
 
 	timeout := time.After(10 * time.Second)
@@ -506,9 +530,10 @@ func (h *Hoverfly) startWithFlags(hoverflyDirectory HoverflyDirectory, flags str
 			if err != nil {
 				log.Debug(err)
 			}
-			return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: " + strconv.Itoa(statusCode)))
+			return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: %v", statusCode))
 		case <-tick:
 			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/mode", h.AdminPort))
+
 			if err == nil {
 				statusCode = resp.StatusCode
 			} else {

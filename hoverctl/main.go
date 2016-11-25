@@ -29,9 +29,12 @@ var (
 	middlewareCommand = kingpin.Command("middleware", "Get Hoverfly's middleware")
 	middlewarePathArg = middlewareCommand.Arg("path", "Set Hoverfly's middleware").String()
 
-	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
-	startArg     = startCommand.Arg("server type", "Choose the configuration of Hoverfly (proxy/webserver)").String()
-	stopCommand  = kingpin.Command("stop", "Stop a local instance of Hoverfly")
+	startCommand         = kingpin.Command("start", "Start a local instance of Hoverfly")
+	startArg             = startCommand.Arg("server type", "Choose the configuration of Hoverfly (proxy/webserver)").String()
+	startCertificateFlag = startCommand.Flag("certificate", "Supply path for custom certificate").String()
+	startKeyFlag         = startCommand.Flag("key", "Supply path for custom key").String()
+
+	stopCommand = kingpin.Command("stop", "Stop a local instance of Hoverfly")
 
 	exportCommand = kingpin.Command("export", "Exports data out of Hoverfly")
 	exportNameArg = exportCommand.Arg("name", "Name of exported simulation").Required().String()
@@ -130,15 +133,17 @@ func main() {
 		log.Info(middleware)
 
 	case startCommand.FullCommand():
-		if *startArg == "webserver" {
-			err := hoverfly.startWithFlags(hoverflyDirectory, "-webserver")
-			handleIfError(err)
+		flagsBuilder := FlagsBuilder{
+			Webserver:   *startArg,
+			Certificate: *startCertificateFlag,
+			Key:         *startKeyFlag,
+		}
 
+		err := hoverfly.startWithFlags(hoverflyDirectory, flagsBuilder.BuildFlags())
+		handleIfError(err)
+		if *startArg == "webserver" {
 			log.Info("Hoverfly is now running as a webserver")
 		} else {
-			err := hoverfly.start(hoverflyDirectory)
-			handleIfError(err)
-
 			log.Info("Hoverfly is now running")
 		}
 
