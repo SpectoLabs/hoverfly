@@ -5,8 +5,6 @@ import (
 	. "github.com/onsi/gomega"
 
 	"fmt"
-	"github.com/dghubble/sling"
-	"github.com/phayes/freeport"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -19,6 +17,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/dghubble/sling"
+	"github.com/phayes/freeport"
 )
 
 var (
@@ -176,6 +177,12 @@ func DoRequestThroughProxy(r *sling.Sling) *http.Response {
 
 func SetHoverflyMode(mode string) {
 	req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode").Body(strings.NewReader(`{"mode":"` + mode + `"}`))
+	res := DoRequest(req)
+	Expect(res.StatusCode).To(Equal(200))
+}
+
+func SetHoverflyDestination(destination string) {
+	req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/destination").Body(strings.NewReader(`{"destination":"` + destination + `"}`))
 	res := DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
 }

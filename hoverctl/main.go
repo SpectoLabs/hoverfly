@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 
+	"regexp"
+
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -19,6 +21,10 @@ var (
 
 	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
 	modeNameArg = modeCommand.Arg("name", "Set Hoverfly's mode").String()
+
+	destinationCommand = kingpin.Command("destination", "Get Hoverfly's current destination")
+	destinationNameArg = destinationCommand.Arg("name", "Set Hoverfly's destination").String()
+	destinationDryRun  = destinationCommand.Flag("dry-run", "Test a url against a regex pattern").String()
 
 	middlewareCommand = kingpin.Command("middleware", "Get Hoverfly's middleware")
 	middlewarePathArg = middlewareCommand.Arg("path", "Set Hoverfly's middleware").String()
@@ -80,6 +86,33 @@ func main() {
 			handleIfError(err)
 
 			log.Info("Hoverfly has been set to ", mode, " mode")
+		}
+	case destinationCommand.FullCommand():
+		if *destinationNameArg == "" || *destinationNameArg == "status" {
+			destination, err := hoverfly.GetDestination()
+			handleIfError(err)
+
+			log.Info("The destination in Hoverfly is set to ", destination)
+		} else {
+			regexPattern, err := regexp.Compile(*destinationNameArg)
+			if err != nil {
+				log.Debug(err.Error())
+				handleIfError(errors.New("Regex pattern does not compile"))
+			}
+
+			if *destinationDryRun != "" {
+				if regexPattern.MatchString(*destinationDryRun) {
+					log.Info("The regex provided matches the dry run URL")
+				} else {
+					log.Fatal("The regex provided does not match the dry run URL")
+				}
+			} else {
+				destination, err := hoverfly.SetDestination(*destinationNameArg)
+				handleIfError(err)
+
+				log.Info("The destination in Hoverfly has been set to ", destination)
+			}
+
 		}
 
 	case middlewareCommand.FullCommand():
