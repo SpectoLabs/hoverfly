@@ -9,6 +9,18 @@ import (
 )
 
 var (
+	defaultConfig = Config{
+		HoverflyHost:        "localhost",
+		HoverflyAdminPort:   "8888",
+		HoverflyProxyPort:   "8500",
+		HoverflyDbType:      "memory",
+		HoverflyWebserver:   false,
+		HoverflyUsername:    "",
+		HoverflyPassword:    "",
+		HoverflyCertificate: "",
+		HoverflyKey:         "",
+		HoverflyDisableTls:  false,
+	}
 	defaultHoverflyHost      = "localhost"
 	defaultHoverflyAdminPort = "8888"
 	defaultHoverflyProxyPort = "8500"
@@ -24,13 +36,7 @@ func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
 	SetConfigurationDefaults()
 	result := GetConfig()
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyDbType).To(Equal(defaultHoverflyDbType))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
-	Expect(result.HoverflyWebserver).To(Equal(defaultHoverflyWebserver))
+	Expect(*result).To(Equal(defaultConfig))
 }
 
 func Test_Config_SetHost_OverridesDefaultValueWithAHoverflyHost(t *testing.T) {
@@ -39,11 +45,10 @@ func Test_Config_SetHost_OverridesDefaultValueWithAHoverflyHost(t *testing.T) {
 	SetConfigurationDefaults()
 	result := GetConfig().SetHost("testhost")
 
-	Expect(result.HoverflyHost).To(Equal("testhost"))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	expected := defaultConfig
+	expected.HoverflyHost = "testhost"
+
+	Expect(*result).To(Equal(expected))
 }
 
 func Test_Config_SetHost_DoesNotOverrideWhenEmpty(t *testing.T) {
@@ -52,11 +57,9 @@ func Test_Config_SetHost_DoesNotOverrideWhenEmpty(t *testing.T) {
 	SetConfigurationDefaults()
 	result := GetConfig().SetHost("")
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	expected := defaultConfig
+
+	Expect(*result).To(Equal(expected))
 }
 
 func Test_Config_SetAdminPort_OverridesDefaultValueWithAHoverflyAdminPort(t *testing.T) {
@@ -65,11 +68,10 @@ func Test_Config_SetAdminPort_OverridesDefaultValueWithAHoverflyAdminPort(t *tes
 	SetConfigurationDefaults()
 	result := GetConfig().SetAdminPort("5")
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal("5"))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	expected := defaultConfig
+	expected.HoverflyAdminPort = "5"
+
+	Expect(*result).To(Equal(expected))
 }
 
 func Test_Config_SetAdminPort_DoesNotOverrideWhenEmpty(t *testing.T) {
@@ -78,11 +80,9 @@ func Test_Config_SetAdminPort_DoesNotOverrideWhenEmpty(t *testing.T) {
 	SetConfigurationDefaults()
 	result := GetConfig().SetAdminPort("")
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	expected := defaultConfig
+
+	Expect(*result).To(Equal(expected))
 }
 
 func Test_Config_SetProxyPort_OverridesDefaultValueWithAHoverflyProxyPort(t *testing.T) {
@@ -91,11 +91,10 @@ func Test_Config_SetProxyPort_OverridesDefaultValueWithAHoverflyProxyPort(t *tes
 	SetConfigurationDefaults()
 	result := GetConfig().SetProxyPort("7")
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal("7"))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	expected := defaultConfig
+	expected.HoverflyProxyPort = "7"
+
+	Expect(*result).To(Equal(expected))
 }
 
 func Test_Config_SetProxyPort_DoesNotOverrideWhenEmpty(t *testing.T) {
@@ -104,11 +103,9 @@ func Test_Config_SetProxyPort_DoesNotOverrideWhenEmpty(t *testing.T) {
 	SetConfigurationDefaults()
 	result := GetConfig().SetProxyPort("")
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	expected := defaultConfig
+
+	Expect(*result).To(Equal(expected))
 }
 
 func Test_Config_SetDbType_OverridesDefaultValueWithAHoverflyProxyPort(t *testing.T) {
@@ -117,7 +114,10 @@ func Test_Config_SetDbType_OverridesDefaultValueWithAHoverflyProxyPort(t *testin
 	SetConfigurationDefaults()
 	result := GetConfig().SetDbType("boltdb")
 
-	Expect(result.HoverflyDbType).To(Equal("boltdb"))
+	expected := defaultConfig
+	expected.HoverflyDbType = "boltdb"
+
+	Expect(*result).To(Equal(expected))
 }
 
 func Test_Config_SetDbType_DoesNotOverrideWhenEmpty(t *testing.T) {
@@ -126,20 +126,21 @@ func Test_Config_SetDbType_DoesNotOverrideWhenEmpty(t *testing.T) {
 	SetConfigurationDefaults()
 	result := GetConfig().SetProxyPort("")
 
-	Expect(result.HoverflyDbType).To(Equal("memory"))
+	expected := defaultConfig
+
+	Expect(*result).To(Equal(expected))
 }
 
-func Test_Config_SetUsername_OverridesDefaultValueWithAHoverflyUsername(t *testing.T) {
+func Test_Config_SetUsername_OverridesDefaultValue(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
 	result := GetConfig().SetUsername("benjih")
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal("benjih"))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	expected := defaultConfig
+	expected.HoverflyUsername = "benjih"
+
+	Expect(*result).To(Equal(expected))
 }
 
 func Test_Config_SetUsername_DoesNotOverrideWhenEmpty(t *testing.T) {
@@ -148,24 +149,21 @@ func Test_Config_SetUsername_DoesNotOverrideWhenEmpty(t *testing.T) {
 	SetConfigurationDefaults()
 	result := GetConfig().SetUsername("")
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	expected := defaultConfig
+
+	Expect(*result).To(Equal(expected))
 }
 
-func Test_Config_SetPassword_OverridesDefaultValueWithAHoverflyPassword(t *testing.T) {
+func Test_Config_SetPassword_OverridesDefaultValue(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
 	result := GetConfig().SetPassword("burger-toucher")
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal("burger-toucher"))
+	expected := defaultConfig
+	expected.HoverflyPassword = "burger-toucher"
+
+	Expect(*result).To(Equal(expected))
 }
 
 func Test_Config_SetPassword_DoesNotOverrideWhenEmpty(t *testing.T) {
@@ -174,25 +172,21 @@ func Test_Config_SetPassword_DoesNotOverrideWhenEmpty(t *testing.T) {
 	SetConfigurationDefaults()
 	result := GetConfig().SetPassword("")
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
+	expected := defaultConfig
+
+	Expect(*result).To(Equal(expected))
 }
 
-func Test_Config_SetCertificate_OverridesDefaultValueWithAHoverflyPassword(t *testing.T) {
+func Test_Config_SetCertificate_OverridesDefaultValue(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
 	result := GetConfig().SetCertificate("/home/benjih/test/certificate.pem")
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
-	Expect(result.HoverflyCertificate).To(Equal("/home/benjih/test/certificate.pem"))
+	expected := defaultConfig
+	expected.HoverflyCertificate = "/home/benjih/test/certificate.pem"
+
+	Expect(*result).To(Equal(expected))
 }
 
 func Test_Config_SetKey_DoesNotOverrideWhenEmpty(t *testing.T) {
@@ -201,74 +195,108 @@ func Test_Config_SetKey_DoesNotOverrideWhenEmpty(t *testing.T) {
 	SetConfigurationDefaults()
 	result := GetConfig().SetKey("/home/benjih/test/key.pem")
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
-	Expect(result.HoverflyKey).To(Equal("/home/benjih/test/key.pem"))
+	expected := defaultConfig
+	expected.HoverflyKey = "/home/benjih/test/key.pem"
+
+	Expect(*result).To(Equal(expected))
 }
 
-func Test_Config_SetWebserver_OverridesDefaultValueWithAHoverflyPassword(t *testing.T) {
+func Test_Config_SetWebserver_OverridesDefaultValue(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
 	result := GetConfig().SetWebserver("webserver")
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
-	Expect(result.HoverflyWebserver).To(Equal(true))
+	expected := defaultConfig
+	expected.HoverflyWebserver = true
+
+	Expect(*result).To(Equal(expected))
 }
 
-func Test_Config_DisableTls_OverridesDefaultValueWithAHoverflyPassword(t *testing.T) {
+func Test_Config_SetWebserver_DoesNotOverrideIfEmptyString(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	result := GetConfig().SetWebserver("")
+
+	expected := defaultConfig
+	expected.HoverflyWebserver = false
+
+	Expect(*result).To(Equal(expected))
+}
+
+func Test_Config_SetWebserver_DoesNotOverrideIfNotGivenProxyOrWebserver(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+
+	result := GetConfig()
+	result.HoverflyWebserver = true
+	result.SetWebserver("not-webserver")
+
+	expected := defaultConfig
+	expected.HoverflyWebserver = true
+
+	Expect(*result).To(Equal(expected))
+}
+
+func Test_Config_SetWebserver_OverrideIfGivenProxy(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+
+	result := GetConfig()
+	result.HoverflyWebserver = true
+	result.SetWebserver("proxy")
+
+	expected := defaultConfig
+	expected.HoverflyWebserver = false
+
+	Expect(*result).To(Equal(expected))
+}
+
+func Test_Config_DisableTls_OverridesDefaultValue(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
 	result := GetConfig().DisableTls(true)
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
-	Expect(result.HoverflyDisableTls).To(Equal(true))
+	expected := defaultConfig
+	expected.HoverflyDisableTls = true
+
+	Expect(*result).To(Equal(expected))
 }
 
 func Test_Config_DisableTls_DoesNotOverridesDefaultValueIfDefaultIsPositive(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
-	result := GetConfig()
 
+	result := GetConfig()
 	result.HoverflyDisableTls = true
 	result = result.DisableTls(false)
 
-	Expect(result.HoverflyHost).To(Equal(defaultHoverflyHost))
-	Expect(result.HoverflyAdminPort).To(Equal(defaultHoverflyAdminPort))
-	Expect(result.HoverflyProxyPort).To(Equal(defaultHoverflyProxyPort))
-	Expect(result.HoverflyUsername).To(Equal(defaultHoverflyUsername))
-	Expect(result.HoverflyPassword).To(Equal(defaultHoverflyPassword))
-	Expect(result.HoverflyDisableTls).To(Equal(true))
+	expected := defaultConfig
+	expected.HoverflyDisableTls = true
+
+	Expect(*result).To(Equal(expected))
 }
 
 func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testing.T) {
 	RegisterTestingT(t)
 
-	SetConfigurationDefaults()
-	config := GetConfig()
-	config = config.SetHost("testhost")
-	config = config.SetAdminPort("1234")
-	config = config.SetProxyPort("4567")
-	config = config.SetDbType("boltdb")
-	config = config.SetUsername("username")
-	config = config.SetPassword("password")
-	config = config.SetWebserver("webserver")
-	config = config.SetCertificate("/home/benjih/certificate.pem")
-	config = config.SetKey("/home/benjih/key.pem")
-	config = config.DisableTls(true)
+	config := Config{
+		HoverflyHost:        "testhost",
+		HoverflyAdminPort:   "1234",
+		HoverflyProxyPort:   "4567",
+		HoverflyDbType:      "boltdb",
+		HoverflyUsername:    "username",
+		HoverflyPassword:    "password",
+		HoverflyWebserver:   true,
+		HoverflyCertificate: "/home/benjih/certificate.pem",
+		HoverflyKey:         "/home/benjih/key.pem",
+		HoverflyDisableTls:  true,
+	}
 
 	wd, _ := os.Getwd()
 	hoverflyDirectory := HoverflyDirectory{
