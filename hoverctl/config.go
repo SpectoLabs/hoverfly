@@ -192,7 +192,8 @@ func SetConfigurationDefaults() {
 	viper.SetDefault("hoverfly.db.type", "memory")
 	viper.SetDefault("hoverfly.username", "")
 	viper.SetDefault("hoverfly.password", "")
-	viper.SetDefault("hoverfly.webserver", "false")
+	viper.SetDefault("hoverfly.webserver", false)
 	viper.SetDefault("hoverfly.tls.certificate", "")
 	viper.SetDefault("hoverfly.tls.key", "")
+	viper.SetDefault("hoverfly.tls.disable", false)
 }
