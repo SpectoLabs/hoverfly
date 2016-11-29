@@ -4,16 +4,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/views"
-	"github.com/dghubble/sling"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/SpectoLabs/hoverfly/core/views"
+	"github.com/dghubble/sling"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Running Hoverfly in various modes", func() {
@@ -47,6 +48,75 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 				fakeServerUrl, _ = url.Parse(fakeServer.URL)
 				resp := CallFakeServerThroughProxy(fakeServer)
+				Expect(resp.StatusCode).To(Equal(200))
+
+				expectedDestination := strings.Replace(fakeServerUrl.String(), "http://", "", 1)
+
+				recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+				Expect(err).To(BeNil())
+				Expect(recordsJson).To(MatchJSON(fmt.Sprintf(
+					`{
+					  "data": [
+					    {
+					      "response": {
+						"status": 200,
+						"body": "Hello world",
+						"encodedBody": false,
+						"headers": {
+						  "Content-Length": [
+						    "11"
+						  ],
+						  "Content-Type": [
+						    "text/plain"
+						  ],
+						  "Date": [
+						    "date"
+						  ],
+						  "Hoverfly": [
+						    "Was-Here"
+						  ]
+						}
+					      },
+					      "request": {
+					      	"requestType": "recording",
+						"path": "/",
+						"method": "GET",
+						"destination": "%v",
+						"scheme": "http",
+						"query": "",
+						"body": "",
+						"headers": {
+						  "Accept-Encoding": [
+						    "gzip"
+						  ],
+						  "User-Agent": [
+						    "Go-http-client/1.1"
+						  ]
+						}
+					      }
+					    }
+					  ]
+					}`, expectedDestination)))
+			})
+
+			It("Should capture the request and response in capture mode after the same request is made in simulate mode", func() {
+
+				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "text/plain")
+					w.Header().Set("Date", "date")
+					w.Write([]byte("Hello world"))
+				}))
+
+				defer fakeServer.Close()
+
+				fakeServerUrl, _ = url.Parse(fakeServer.URL)
+
+				SetHoverflyMode("simulate")
+				resp := CallFakeServerThroughProxy(fakeServer)
+				Expect(resp.StatusCode).To(Equal(412))
+				SetHoverflyMode("capture")
+
+				resp = CallFakeServerThroughProxy(fakeServer)
 				Expect(resp.StatusCode).To(Equal(200))
 
 				expectedDestination := strings.Replace(fakeServerUrl.String(), "http://", "", 1)
