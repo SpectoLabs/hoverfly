@@ -1,8 +1,9 @@
 package cache
 
 import (
-	. "github.com/onsi/gomega"
 	"testing"
+
+	. "github.com/onsi/gomega"
 )
 
 var (
@@ -72,6 +73,22 @@ func TestSetAndGet(t *testing.T) {
 	actualValue, err = cache.Get(expectedKey2)
 	Expect(err).To(BeNil())
 	Expect(actualValue).To(Equal(expectedValue2))
+}
+
+func TestInMemoryCache_Get_DoesntLockIfFailed(t *testing.T) {
+	RegisterTestingT(t)
+
+	cache := NewInMemoryCache()
+
+	_, err := cache.Get(expectedKey1)
+	Expect(err).ToNot(BeNil())
+
+	err = cache.Set(expectedKey1, expectedValue1)
+	Expect(err).To(BeNil())
+
+	actualValue, err := cache.Get(expectedKey1)
+	Expect(err).To(BeNil())
+	Expect(actualValue).To(Equal(expectedValue1))
 }
 
 func TestGetAllKeysMem(t *testing.T) {

@@ -29,10 +29,10 @@ func (c *InMemoryCache) Get(key []byte) (value []byte, err error) {
 	bytes := c.elements[string(key)]
 	value = make([]byte, len(bytes), len(bytes))
 	copy(value, bytes)
+	c.RUnlock()
 	if len(value) == 0 {
 		return nil, fmt.Errorf("key %q not found \n", key)
 	}
-	c.RUnlock()
 	return value, nil
 }
 
