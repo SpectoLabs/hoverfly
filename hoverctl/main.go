@@ -97,9 +97,15 @@ func main() {
 		err := hoverfly.start(hoverflyDirectory)
 		handleIfError(err)
 		if config.HoverflyWebserver {
-			log.Info("Hoverfly is now running as a webserver")
+			log.WithFields(log.Fields{
+				"admin-port":     config.HoverflyAdminPort,
+				"webserver-port": config.HoverflyProxyPort,
+			}).Info("Hoverfly is now running as a webserver")
 		} else {
-			log.Info("Hoverfly is now running")
+			log.WithFields(log.Fields{
+				"admin-port": config.HoverflyAdminPort,
+				"proxy-port": config.HoverflyProxyPort,
+			}).Info("Hoverfly is now running")
 		}
 
 	case stopCommand.FullCommand():
