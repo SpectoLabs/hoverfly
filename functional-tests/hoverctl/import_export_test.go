@@ -1,6 +1,8 @@
 package hoverctl_end_to_end
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -129,8 +131,11 @@ var _ = Describe("When I use hoverctl", func() {
 				data, err := ioutil.ReadFile(fileName)
 				Expect(err).To(BeNil())
 
-				Expect(string(data)).To(ContainSubstring(v2HoverflySimulation))
-				Expect(string(data)).To(ContainSubstring(v2HoverflyMeta))
+				buffer := new(bytes.Buffer)
+				json.Compact(buffer, data)
+
+				Expect(buffer.String()).To(ContainSubstring(v2HoverflySimulation))
+				Expect(buffer.String()).To(ContainSubstring(v2HoverflyMeta))
 			})
 
 			It("can import", func() {

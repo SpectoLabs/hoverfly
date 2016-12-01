@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -301,7 +302,14 @@ func (h *Hoverfly) ExportSimulation() ([]byte, error) {
 		return nil, errors.New("Could not export from Hoverfly")
 	}
 
-	return body, nil
+	var jsonBytes bytes.Buffer
+	err = json.Indent(&jsonBytes, body, "", "\t")
+	if err != nil {
+		log.Debug(err.Error())
+		return nil, errors.New("Could not export from Hoverfly")
+	}
+
+	return jsonBytes.Bytes(), nil
 }
 
 func (h *Hoverfly) createAPIStateResponse(response *http.Response) APIStateSchema {

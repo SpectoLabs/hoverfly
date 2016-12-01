@@ -115,8 +115,8 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 					Fail("Failed reading test data")
 				}
 
-				Expect(string(exportFile)).To(ContainSubstring(`"path":"/api/bookings"`))
-				Expect(string(exportFile)).To(ContainSubstring(`"body":"{\"flightId\": \"1\"}"`))
+				Expect(string(exportFile)).To(ContainSubstring(`"path": "/api/bookings"`))
+				Expect(string(exportFile)).To(ContainSubstring(`"body": "{\"flightId\": \"1\"}"`))
 			})
 
 			It("and then delete simulations from hoverfly", func() {
