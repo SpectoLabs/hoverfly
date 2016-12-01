@@ -293,7 +293,7 @@ func TestSimulationHandler_Put_ReturnsErrorIfCannotParseRequestBody(t *testing.T
 	Expect(err).To(BeNil())
 
 	Expect(response.Result().StatusCode).To(Equal(500))
-	Expect(errorView.Error).To(Equal("unexpected end of JSON input"))
+	Expect(errorView.Error).To(Equal("Could not import simulation, did not follow valid v2 schema"))
 }
 
 func unmarshalSimulationView(buffer *bytes.Buffer) (SimulationView, error) {

@@ -9,6 +9,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type HoverflySimulation interface {
@@ -57,7 +59,12 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 
 	err := json.Unmarshal(body, &simulationView)
 	if err != nil {
-		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		log.WithFields(log.Fields{
+			"body": string(body),
+		}).Debug(err.Error())
+
+		handlers.WriteErrorResponse(w, "Could not import simulation, did not follow valid v2 schema", http.StatusInternalServerError)
 		return
 	}
 
@@ -65,7 +72,12 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 
 	err = this.Hoverfly.PutSimulation(simulationView)
 	if err != nil {
-		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		log.WithFields(log.Fields{
+			"body": string(body),
+		}).Debug(err.Error())
+
+		handlers.WriteErrorResponse(w, "Could not import payload", http.StatusInternalServerError)
 		return
 	}
 
