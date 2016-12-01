@@ -217,7 +217,9 @@ func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
 					}
 				]
 			}
-
+		},
+		"meta": {
+			"schemaVersion": "v1"
 		}
 	}
 	`))))
@@ -266,7 +268,9 @@ func TestSimulationHandler_Put_CallsDelete(t *testing.T) {
 					}
 				]
 			}
-
+		},
+		"meta": {
+			"schemaVersion": "v1"
 		}
 	}
 	`))))

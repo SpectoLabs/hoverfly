@@ -151,7 +151,9 @@ var _ = Describe("Interacting with the API", func() {
 						}
 					}]
 				},
-				"meta": {}
+				"meta": {
+					"schemaVersion": "v1"
+				}
 			}
 			`)
 
@@ -222,7 +224,9 @@ var _ = Describe("Interacting with the API", func() {
 						}
 					}]
 				},
-				"meta": {}
+				"meta": {
+					"schemaVersion": "v1"
+				}
 			}
 			`)
 

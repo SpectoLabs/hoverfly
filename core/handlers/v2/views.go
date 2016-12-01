@@ -39,12 +39,33 @@ type SimulationView struct {
 func (this SimulationView) GetValidationSchema() valid.Validator {
 	return valid.Object(
 		valid.ObjKV("data", valid.Object(
-			valid.ObjKV("pairs", valid.Array(valid.ArrEach(valid.Object(
+			valid.ObjKV("pairs", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
 				valid.ObjKV("request", valid.Object(
-					valid.ObjKV("type", valid.Optional(valid.String())),
+					valid.ObjKV("requestType", valid.Optional(valid.String())),
+					valid.ObjKV("path", valid.Optional(valid.String())),
+					valid.ObjKV("method", valid.Optional(valid.String())),
+					valid.ObjKV("scheme", valid.Optional(valid.String())),
+					valid.ObjKV("query", valid.Optional(valid.String())),
+					valid.ObjKV("body", valid.Optional(valid.String())),
+					valid.ObjKV("headers", valid.Optional(valid.Object())),
 				)),
-				valid.ObjKV("response", valid.Object()),
-			)))),
+				valid.ObjKV("response", valid.Object(
+					valid.ObjKV("status", valid.Optional(valid.Number())),
+					valid.ObjKV("body", valid.Optional(valid.String())),
+					valid.ObjKV("encodedBody", valid.Optional(valid.Boolean())),
+					valid.ObjKV("headers", valid.Optional(valid.Object())),
+				)),
+			))))),
+			valid.ObjKV("globalActions", valid.Optional(valid.Object(
+				valid.ObjKV("delays", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
+					valid.ObjKV("urlPattern", valid.Optional(valid.String())),
+					valid.ObjKV("httpMethod", valid.Optional(valid.String())),
+					valid.ObjKV("delay", valid.Optional(valid.Number())),
+				))))),
+			))),
+		)),
+		valid.ObjKV("meta", valid.Object(
+			valid.ObjKV("schemaVersion", valid.String()),
 		)),
 	)
 }
