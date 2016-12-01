@@ -40,6 +40,8 @@ var _ = Describe("When I use hoverctl", func() {
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
+				Expect(output).To(ContainSubstring("admin-port=" + adminPortAsString))
+				Expect(output).To(ContainSubstring("proxy-port=" + proxyPortAsString))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
 
@@ -74,6 +76,8 @@ var _ = Describe("When I use hoverctl", func() {
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
+				Expect(output).To(ContainSubstring("admin-port=11223"))
+				Expect(output).To(ContainSubstring("proxy-port=" + proxyPortAsString))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly.11223." + proxyPortAsString + ".pid")
 
@@ -107,6 +111,8 @@ var _ = Describe("When I use hoverctl", func() {
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
+				Expect(output).To(ContainSubstring("admin-port=" + adminPortAsString))
+				Expect(output).To(ContainSubstring("proxy-port=22113"))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + ".22113.pid")
 
@@ -139,6 +145,8 @@ var _ = Describe("When I use hoverctl", func() {
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
+				Expect(output).To(ContainSubstring("admin-port=11223"))
+				Expect(output).To(ContainSubstring("proxy-port=22113"))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly.11223.22113.pid")
 
@@ -191,6 +199,8 @@ var _ = Describe("When I use hoverctl", func() {
 
 				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running as a webserver"))
+				Expect(output).To(ContainSubstring("admin-port=" + adminPortAsString))
+				Expect(output).To(ContainSubstring("webserver-port=" + proxyPortAsString))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
 
