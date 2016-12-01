@@ -55,18 +55,29 @@ func (this *SimulationHandler) Get(w http.ResponseWriter, req *http.Request, nex
 func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	body, _ := ioutil.ReadAll(req.Body)
 
-	var simulationView SimulationView
-
-	err := json.Unmarshal(body, &simulationView)
+	var jsonMap map[string]interface{}
+	err := json.Unmarshal(body, &jsonMap)
 	if err != nil {
-
 		log.WithFields(log.Fields{
 			"body": string(body),
 		}).Debug(err.Error())
 
-		handlers.WriteErrorResponse(w, "Could not import simulation, was not valid json", http.StatusInternalServerError)
+		handlers.WriteErrorResponse(w, "Invalid json", http.StatusInternalServerError)
 		return
 	}
+
+	var simulationView SimulationView
+
+	if path, err := simulationView.GetValidationSchema().Validate(jsonMap); err != nil {
+		log.WithFields(log.Fields{
+			"body": string(body),
+		}).Debug(err.Error())
+
+		handlers.WriteErrorResponse(w, "Json did not match schema: "+path, http.StatusInternalServerError)
+		return
+	}
+
+	json.Unmarshal(body, &simulationView)
 
 	this.Hoverfly.DeleteSimulation()
 
@@ -77,7 +88,7 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 			"body": string(body),
 		}).Debug(err.Error())
 
-		handlers.WriteErrorResponse(w, "Could not import simulation, did not follow valid v2 schema", http.StatusInternalServerError)
+		handlers.WriteErrorResponse(w, "An error occured: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 

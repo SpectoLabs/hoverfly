@@ -2,8 +2,10 @@ package v2
 
 import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
+	"github.com/SpectoLabs/hoverfly/core/metrics"
+
+	valid "github.com/gima/govalid/v1"
 )
 
 type DestinationView struct {
@@ -34,6 +36,19 @@ type SimulationView struct {
 	MetaView `json:"meta"`
 }
 
+func (this SimulationView) GetValidationSchema() valid.Validator {
+	return valid.Object(
+		valid.ObjKV("data", valid.Object(
+			valid.ObjKV("pairs", valid.Array(valid.ArrEach(valid.Object(
+				valid.ObjKV("request", valid.Object(
+					valid.ObjKV("type", valid.Optional(valid.String())),
+				)),
+				valid.ObjKV("response", valid.Object()),
+			)))),
+		)),
+	)
+}
+
 type DataView struct {
 	RequestResponsePairs []RequestResponsePairView `json:"pairs"`
 	GlobalActions        GlobalActionsView         `json:"globalActions"`
@@ -43,7 +58,6 @@ type RequestResponsePairView struct {
 	Response ResponseDetailsView `json:"response"`
 	Request  RequestDetailsView  `json:"request"`
 }
-
 
 //Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestResponsePairView) GetResponse() interfaces.Response { return this.Response }
@@ -96,7 +110,6 @@ type ResponseDetailsView struct {
 	EncodedBody bool                `json:"encodedBody"`
 	Headers     map[string][]string `json:"headers"`
 }
-
 
 //Gets Status - required for interfaces.Response
 func (this ResponseDetailsView) GetStatus() int { return this.Status }

@@ -277,7 +277,7 @@ func TestSimulationHandler_Put_CallsDelete(t *testing.T) {
 	Expect(stubHoverfly.Deleted).To(BeTrue())
 }
 
-func TestSimulationHandler_Put_ReturnsErrorIfJsonDoesntMatchSchema(t *testing.T) {
+func TestSimulationHandler_Put_ReturnsErrorIfJsonDoesntMatchSchema_MissingDataKey(t *testing.T) {
 	RegisterTestingT(t)
 
 	stubHoverfly := &HoverflySimulationErrorStub{}
@@ -293,7 +293,26 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonDoesntMatchSchema(t *testing.T)
 	Expect(err).To(BeNil())
 
 	Expect(response.Result().StatusCode).To(Equal(500))
-	Expect(errorView.Error).To(Equal("Could not import simulation, did not follow valid v2 schema"))
+	Expect(errorView.Error).To(Equal("Json did not match schema: Object->Key[data].Value->Object"))
+}
+
+func TestSimulationHandler_Put_ReturnsErrorIfJsonDoesntMatchSchema_EmptyObject(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationErrorStub{}
+
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`{}`))))
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Put, request)
+
+	errorView, err := unmarshalErrorView(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(response.Result().StatusCode).To(Equal(500))
+	Expect(errorView.Error).To(Equal("Json did not match schema: Object->Key[data].Value->Object"))
 }
 
 func TestSimulationHandler_Put_ReturnsErrorIfJsonIsNotValid(t *testing.T) {
@@ -312,7 +331,7 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonIsNotValid(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(response.Result().StatusCode).To(Equal(500))
-	Expect(errorView.Error).To(Equal("Could not import simulation, was not valid json"))
+	Expect(errorView.Error).To(Equal("Invalid json"))
 }
 
 func unmarshalSimulationView(buffer *bytes.Buffer) (SimulationView, error) {
