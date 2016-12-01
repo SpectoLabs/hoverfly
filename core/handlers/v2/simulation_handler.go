@@ -64,7 +64,7 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 			"body": string(body),
 		}).Debug(err.Error())
 
-		handlers.WriteErrorResponse(w, "Could not import simulation, did not follow valid v2 schema", http.StatusInternalServerError)
+		handlers.WriteErrorResponse(w, "Could not import simulation, was not valid json", http.StatusInternalServerError)
 		return
 	}
 
@@ -77,7 +77,7 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 			"body": string(body),
 		}).Debug(err.Error())
 
-		handlers.WriteErrorResponse(w, "Could not import payload", http.StatusInternalServerError)
+		handlers.WriteErrorResponse(w, "Could not import simulation, did not follow valid v2 schema", http.StatusInternalServerError)
 		return
 	}
 

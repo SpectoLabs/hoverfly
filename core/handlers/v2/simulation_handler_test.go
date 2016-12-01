@@ -277,14 +277,14 @@ func TestSimulationHandler_Put_CallsDelete(t *testing.T) {
 	Expect(stubHoverfly.Deleted).To(BeTrue())
 }
 
-func TestSimulationHandler_Put_ReturnsErrorIfCannotParseRequestBody(t *testing.T) {
+func TestSimulationHandler_Put_ReturnsErrorIfJsonDoesntMatchSchema(t *testing.T) {
 	RegisterTestingT(t)
 
 	stubHoverfly := &HoverflySimulationErrorStub{}
 
 	unit := SimulationHandler{Hoverfly: stubHoverfly}
 
-	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(``))))
+	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`{"notdata": "whoops"}`))))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -294,6 +294,25 @@ func TestSimulationHandler_Put_ReturnsErrorIfCannotParseRequestBody(t *testing.T
 
 	Expect(response.Result().StatusCode).To(Equal(500))
 	Expect(errorView.Error).To(Equal("Could not import simulation, did not follow valid v2 schema"))
+}
+
+func TestSimulationHandler_Put_ReturnsErrorIfJsonIsNotValid(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationErrorStub{}
+
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`{notdata: {{]]}[}]}""}`))))
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Put, request)
+
+	errorView, err := unmarshalErrorView(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(response.Result().StatusCode).To(Equal(500))
+	Expect(errorView.Error).To(Equal("Could not import simulation, was not valid json"))
 }
 
 func unmarshalSimulationView(buffer *bytes.Buffer) (SimulationView, error) {
