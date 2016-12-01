@@ -94,6 +94,9 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 										}
 									}
 								}]
+							},
+							"meta": {
+								"schemaVersion": "v1"
 							}
 						}`), 0644)
 				setOutput, _ := exec.Command(hoverctlBinary, "import", filePath).Output()
