@@ -202,7 +202,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
 
 	return v2.SimulationView{
 		MetaView: v2.MetaView{
-			HoverflyVersion: "v0.9.0",
+			HoverflyVersion: "v0.9.2",
 			SchemaVersion:   "v1",
 			TimeExported:    time.Now().Format(time.RFC3339),
 		},

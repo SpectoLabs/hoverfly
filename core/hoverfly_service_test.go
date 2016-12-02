@@ -36,12 +36,12 @@ var (
 	delayOne = v1.ResponseDelayView{
 		UrlPattern: ".",
 		HttpMethod: "GET",
-		Delay: 200,
+		Delay:      200,
 	}
 
 	delayTwo = v1.ResponseDelayView{
 		UrlPattern: "test.com",
-		Delay: 201,
+		Delay:      201,
 	}
 )
 
@@ -58,7 +58,7 @@ func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.
 	Expect(simulation.DataView.GlobalActions.Delays).To(HaveLen(0))
 
 	Expect(simulation.MetaView.SchemaVersion).To(Equal("v1"))
-	Expect(simulation.MetaView.HoverflyVersion).To(Equal("v0.9.0"))
+	Expect(simulation.MetaView.HoverflyVersion).To(Equal("v0.9.2"))
 	Expect(simulation.MetaView.TimeExported).ToNot(BeNil())
 }
 

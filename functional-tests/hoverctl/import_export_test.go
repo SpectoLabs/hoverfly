@@ -90,14 +90,14 @@ var _ = Describe("When I use hoverctl", func() {
 				},
 				"meta": {
 					"schemaVersion": "v1",
-					"hoverflyVersion": "v0.9.0",
+					"hoverflyVersion": "v0.9.2",
 					"timeExported": "2016-11-10T12:27:46Z"
 				}
 			}`
 
 		v2HoverflySimulation = `"pairs":[{"response":{"status":201,"body":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]}},"request":{"requestType":"recording","path":"/api/bookings","method":"POST","destination":"www.my-test.com","scheme":"http","query":"","body":"{\"flightId\": \"1\"}","headers":{"Content-Type":["application/json"]}}}],"globalActions":{"delays":[]}}`
 
-		v2HoverflyMeta = `"meta":{"schemaVersion":"v1","hoverflyVersion":"v0.9.0","timeExported":`
+		v2HoverflyMeta = `"meta":{"schemaVersion":"v1","hoverflyVersion":"v0.9.2","timeExported":`
 	)
 
 	Describe("with a running hoverfly", func() {
