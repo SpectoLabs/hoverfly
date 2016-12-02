@@ -62,7 +62,7 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 			"body": string(body),
 		}).Debug(err.Error())
 
-		handlers.WriteErrorResponse(w, "Invalid json", http.StatusInternalServerError)
+		handlers.WriteErrorResponse(w, "Invalid json", http.StatusBadRequest)
 		return
 	}
 
@@ -73,7 +73,7 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 			"body": string(body),
 		}).Debug(err.Error())
 
-		handlers.WriteErrorResponse(w, "Json did not match schema: "+path, http.StatusInternalServerError)
+		handlers.WriteErrorResponse(w, "Json did not match schema: "+path, http.StatusUnprocessableEntity)
 		return
 	}
 

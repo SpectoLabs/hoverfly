@@ -296,7 +296,7 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonDoesntMatchSchema_MissingDataKe
 	errorView, err := unmarshalErrorView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(response.Result().StatusCode).To(Equal(500))
+	Expect(response.Result().StatusCode).To(Equal(422))
 	Expect(errorView.Error).To(Equal("Json did not match schema: Object->Key[data].Value->Object"))
 }
 
@@ -315,7 +315,7 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonDoesntMatchSchema_EmptyObject(t
 	errorView, err := unmarshalErrorView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(response.Result().StatusCode).To(Equal(500))
+	Expect(response.Result().StatusCode).To(Equal(422))
 	Expect(errorView.Error).To(Equal("Json did not match schema: Object->Key[data].Value->Object"))
 }
 
@@ -334,7 +334,7 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonIsNotValid(t *testing.T) {
 	errorView, err := unmarshalErrorView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(response.Result().StatusCode).To(Equal(500))
+	Expect(response.Result().StatusCode).To(Equal(400))
 	Expect(errorView.Error).To(Equal("Invalid json"))
 }
 
