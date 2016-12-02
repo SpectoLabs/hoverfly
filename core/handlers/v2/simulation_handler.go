@@ -9,6 +9,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type HoverflySimulation interface {
@@ -53,19 +55,40 @@ func (this *SimulationHandler) Get(w http.ResponseWriter, req *http.Request, nex
 func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	body, _ := ioutil.ReadAll(req.Body)
 
-	var simulationView SimulationView
-
-	err := json.Unmarshal(body, &simulationView)
+	var jsonMap map[string]interface{}
+	err := json.Unmarshal(body, &jsonMap)
 	if err != nil {
-		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		log.WithFields(log.Fields{
+			"body": string(body),
+		}).Debug(err.Error())
+
+		handlers.WriteErrorResponse(w, "Invalid json", http.StatusBadRequest)
 		return
 	}
+
+	var simulationView SimulationView
+
+	if path, err := simulationView.GetValidationSchema().Validate(jsonMap); err != nil {
+		log.WithFields(log.Fields{
+			"body": string(body),
+		}).Debug(err.Error())
+
+		handlers.WriteErrorResponse(w, "Json did not match schema: "+path, http.StatusUnprocessableEntity)
+		return
+	}
+
+	json.Unmarshal(body, &simulationView)
 
 	this.Hoverfly.DeleteSimulation()
 
 	err = this.Hoverfly.PutSimulation(simulationView)
 	if err != nil {
-		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+
+		log.WithFields(log.Fields{
+			"body": string(body),
+		}).Debug(err.Error())
+
+		handlers.WriteErrorResponse(w, "An error occured: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 

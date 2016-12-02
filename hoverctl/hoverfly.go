@@ -273,7 +273,10 @@ func (h *Hoverfly) ImportSimulation(simulationData string, v1 bool) error {
 	}
 
 	if response.StatusCode != 200 {
-		return errors.New("Import to Hoverfly failed")
+		body, _ := ioutil.ReadAll(response.Body)
+		var errorView ErrorSchema
+		json.Unmarshal(body, &errorView)
+		return errors.New("Import to Hoverfly failed: " + errorView.ErrorMessage)
 	}
 
 	return nil

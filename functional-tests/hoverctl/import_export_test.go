@@ -178,6 +178,50 @@ var _ = Describe("When I use hoverctl", func() {
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
 			})
+
+			It("cannot import incorrect json / missing meta", func() {
+
+				fileName := generateFileName()
+				err := ioutil.WriteFile(fileName, []byte(`
+				{
+					"data": {
+						"pairs": [{
+							"response": {
+								"status": 201,
+								"body": "",
+								"encodedBody": false,
+								"headers": {
+									"Location": ["http://localhost/api/bookings/1"]
+								}
+							},
+							"request": {
+								"requestType": "recording",
+								"path": "/api/bookings",
+								"method": "POST",
+								"destination": "www.my-test.com",
+								"scheme": "http",
+								"query": "",
+								"body": "{\"flightId\": \"1\"}",
+								"headers": {
+									"Content-Type": ["application/json"]
+								}
+							}
+						}],
+						"globalActions": {
+							"delays": []
+						}
+					}
+				}`), 0644)
+				Expect(err).To(BeNil())
+
+				output, _ := exec.Command(hoverctlBinary, "import", fileName, "--admin-port="+adminPortAsString).Output()
+
+				Expect(output).To(ContainSubstring("Import to Hoverfly failed: Json did not match schema: Object->Key[meta].Value->Object"))
+
+				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				bytes, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
+			})
 		})
 	})
 })

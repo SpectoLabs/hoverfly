@@ -2,8 +2,10 @@ package v2
 
 import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
+	"github.com/SpectoLabs/hoverfly/core/metrics"
+
+	valid "github.com/gima/govalid/v1"
 )
 
 type DestinationView struct {
@@ -34,6 +36,40 @@ type SimulationView struct {
 	MetaView `json:"meta"`
 }
 
+func (this SimulationView) GetValidationSchema() valid.Validator {
+	return valid.Object(
+		valid.ObjKV("data", valid.Object(
+			valid.ObjKV("pairs", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
+				valid.ObjKV("request", valid.Object(
+					valid.ObjKV("requestType", valid.Optional(valid.String())),
+					valid.ObjKV("path", valid.Optional(valid.String())),
+					valid.ObjKV("method", valid.Optional(valid.String())),
+					valid.ObjKV("scheme", valid.Optional(valid.String())),
+					valid.ObjKV("query", valid.Optional(valid.String())),
+					valid.ObjKV("body", valid.Optional(valid.String())),
+					valid.ObjKV("headers", valid.Optional(valid.Object())),
+				)),
+				valid.ObjKV("response", valid.Object(
+					valid.ObjKV("status", valid.Optional(valid.Number())),
+					valid.ObjKV("body", valid.Optional(valid.String())),
+					valid.ObjKV("encodedBody", valid.Optional(valid.Boolean())),
+					valid.ObjKV("headers", valid.Optional(valid.Object())),
+				)),
+			))))),
+			valid.ObjKV("globalActions", valid.Optional(valid.Object(
+				valid.ObjKV("delays", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
+					valid.ObjKV("urlPattern", valid.Optional(valid.String())),
+					valid.ObjKV("httpMethod", valid.Optional(valid.String())),
+					valid.ObjKV("delay", valid.Optional(valid.Number())),
+				))))),
+			))),
+		)),
+		valid.ObjKV("meta", valid.Object(
+			valid.ObjKV("schemaVersion", valid.String()),
+		)),
+	)
+}
+
 type DataView struct {
 	RequestResponsePairs []RequestResponsePairView `json:"pairs"`
 	GlobalActions        GlobalActionsView         `json:"globalActions"`
@@ -43,7 +79,6 @@ type RequestResponsePairView struct {
 	Response ResponseDetailsView `json:"response"`
 	Request  RequestDetailsView  `json:"request"`
 }
-
 
 //Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestResponsePairView) GetResponse() interfaces.Response { return this.Response }
@@ -96,7 +131,6 @@ type ResponseDetailsView struct {
 	EncodedBody bool                `json:"encodedBody"`
 	Headers     map[string][]string `json:"headers"`
 }
-
 
 //Gets Status - required for interfaces.Response
 func (this ResponseDetailsView) GetStatus() int { return this.Status }

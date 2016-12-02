@@ -1,5 +1,5 @@
-hash: 725df96c0cb0634243ad60225da702e3fec65530ca168d9b4ac65bb745a8379a
-updated: 2016-08-31T09:43:31.064886454+01:00
+hash: a93503914294ee667cdc574188413a1cec8108501a7208f5ef45a8eaac7876f1
+updated: 2016-12-01T13:29:28.440604317Z
 imports:
 - name: github.com/boltdb/bolt
   version: c1c3bd7e847a231b2b1f9592fa86182a121ad734
@@ -17,6 +17,10 @@ imports:
   version: 6f97d0d3970881d3e53dd6f547a41109eb055e54
 - name: github.com/fsnotify/fsnotify
   version: 30411dbcefb7a1da7e84f75530ad3abe4011b4f8
+- name: github.com/gima/govalid
+  version: c535894061717218f2b81c7c1aad110769d79bf7
+  subpackages:
+  - v1
 - name: github.com/go-zoo/bone
   version: 2b727a8601bc7a74fac33a9583ebba67779c502d
 - name: github.com/gorilla/context
@@ -38,7 +42,7 @@ imports:
 - name: github.com/ogier/pflag
   version: 45c278ab3607870051a2ea9040bb85fcb8557481
 - name: github.com/onsi/gomega
-  version: 3e93f011213c200aadafcb19ed56eb718381cfbd
+  version: c73e51675ad2455a4515b6213eb7145eaade4824
   subpackages:
   - format
   - internal/assertion
