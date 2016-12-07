@@ -198,7 +198,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 
 	} else if mode == ModifyMode {
 		var err error
-		response, err = hf.modifyRequestResponse(req, requestDetails, hf.Cfg.Middleware)
+		response, err = hf.modifyRequestResponse(req, requestDetails)
 
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -389,7 +389,7 @@ func (hf *Hoverfly) getResponse(req *http.Request, requestDetails models.Request
 
 // modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response
 // is saved to cache.
-func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails models.RequestDetails, middleware string) (*http.Response, error) {
+func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails models.RequestDetails) (*http.Response, error) {
 
 	// modifying request
 	req, resp, err := hf.doRequest(req)
@@ -404,7 +404,7 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":      err.Error(),
-			"middleware": middleware,
+			"middleware": hf.Cfg.Middleware,
 		}).Error("Failed to read response body after sending modified request")
 		return nil, err
 	}
@@ -420,11 +420,11 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 	c := NewConstructor(req, requestResponsePair)
 	// applying middleware to modify response
 
-	middlewareObject := &Middleware{
-		Script: middleware,
+	middleware := &Middleware{
+		Script: hf.Cfg.Middleware,
 	}
 
-	err = c.ApplyMiddleware(middlewareObject)
+	err = c.ApplyMiddleware(middleware)
 
 	if err != nil {
 		return nil, err
@@ -434,7 +434,7 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 
 	log.WithFields(log.Fields{
 		"status":      newResponse.StatusCode,
-		"middleware":  middleware,
+		"middleware":  middleware.Script,
 		"mode":        ModifyMode,
 		"path":        c.requestResponsePair.Request.Path,
 		"rawQuery":    c.requestResponsePair.Request.Query,

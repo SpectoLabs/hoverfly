@@ -3,13 +3,14 @@ package hoverfly
 import (
 	"bytes"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/matching"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/models"
+	. "github.com/onsi/gomega"
 )
 
 // TestMain prepares database for testing and then performs a cleanup
@@ -87,7 +88,9 @@ func TestRequestBodySentToMiddleware(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	resp, err := dbClient.modifyRequestResponse(req, requestDetails, "./examples/middleware/reflect_body/reflect_body.py")
+	dbClient.Cfg.Middleware = "./examples/middleware/reflect_body/reflect_body.py"
+
+	resp, err := dbClient.modifyRequestResponse(req, requestDetails)
 
 	// body from the request should be in response body, instead of server's response
 	responseBody, err := ioutil.ReadAll(resp.Body)
@@ -277,7 +280,7 @@ func TestModifyRequest(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.modifyRequestResponse(req, requestDetails, dbClient.Cfg.Middleware)
+	response, err := dbClient.modifyRequestResponse(req, requestDetails)
 	Expect(err).To(BeNil())
 
 	// response should be changed to 202
@@ -300,7 +303,7 @@ func TestModifyRequestWODestination(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.modifyRequestResponse(req, requestDetails, dbClient.Cfg.Middleware)
+	response, err := dbClient.modifyRequestResponse(req, requestDetails)
 	Expect(err).To(BeNil())
 
 	// response should be changed to 201
@@ -322,7 +325,7 @@ func TestModifyRequestNoMiddleware(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	_, err = dbClient.modifyRequestResponse(req, requestDetails, dbClient.Cfg.Middleware)
+	_, err = dbClient.modifyRequestResponse(req, requestDetails)
 	Expect(err).ToNot(BeNil())
 }
 
