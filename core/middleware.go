@@ -7,11 +7,12 @@ import (
 	"strings"
 
 	"errors"
-	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/models"
 	"io/ioutil"
 	"net/http"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 // Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.
@@ -71,7 +72,7 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 	}
 
 	// getting payload
-	pairViewBytes, err := json.Marshal(pair.ConvertToV1RequestResponsePairView())
+	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
 	if log.GetLevel() == log.DebugLevel {
 		log.WithFields(log.Fields{
@@ -117,7 +118,7 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 	}
 
 	if len(mwOutput) > 0 {
-		var newPairView v1.RequestResponsePairView
+		var newPairView v2.RequestResponsePairView
 
 		err = json.Unmarshal(mwOutput, &newPairView)
 
@@ -149,7 +150,7 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 }
 
 func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	pairViewBytes, err := json.Marshal(pair.ConvertToV1RequestResponsePairView())
+	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
 	req, err := http.NewRequest("POST", middleware, bytes.NewBuffer(pairViewBytes))
 	if err != nil {
@@ -180,7 +181,7 @@ func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePai
 		return pair, err
 	}
 
-	var newPairView v1.RequestResponsePairView
+	var newPairView v2.RequestResponsePairView
 
 	err = json.Unmarshal(returnedPairViewBytes, &newPairView)
 	if err != nil {
