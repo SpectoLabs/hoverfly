@@ -27,19 +27,15 @@ func NewConstructor(req *http.Request, pair models.RequestResponsePair) *Constru
 
 // ApplyMiddleware - activates given middleware, middleware should be passed as string to executable, can be
 // full path.
-func (c *Constructor) ApplyMiddleware(middleware string) error {
+func (c *Constructor) ApplyMiddleware(middleware *Middleware) error {
 	var newPair models.RequestResponsePair
 	var err error
 
-	middlewareObject := &Middleware{
-		Script: middleware,
-	}
-
-	if isMiddlewareLocal(middleware) {
-		newPair, err = middlewareObject.ExecuteMiddlewareLocally(c.requestResponsePair)
+	if isMiddlewareLocal(middleware.Script) {
+		newPair, err = middleware.ExecuteMiddlewareLocally(c.requestResponsePair)
 	} else {
 
-		newPair, err = middlewareObject.ExecuteMiddlewareRemotely(c.requestResponsePair)
+		newPair, err = middleware.ExecuteMiddlewareRemotely(c.requestResponsePair)
 	}
 
 	if err != nil {

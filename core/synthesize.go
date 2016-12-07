@@ -21,7 +21,11 @@ func SynthesizeResponse(req *http.Request, requestDetails models.RequestDetails,
 	c := NewConstructor(req, pair)
 
 	if middleware != "" {
-		err := c.ApplyMiddleware(middleware)
+
+		middlewareObject := &Middleware{
+			Script: middleware,
+		}
+		err := c.ApplyMiddleware(middlewareObject)
 		if err != nil {
 			return nil, fmt.Errorf("Synthesize failed, middleware error - %s", err.Error())
 		}

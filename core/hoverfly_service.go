@@ -84,7 +84,12 @@ func (hf Hoverfly) SetMiddleware(middleware string) error {
 		},
 	}
 	c := NewConstructor(nil, originalPair)
-	err := c.ApplyMiddleware(middleware)
+
+	middlewareObject := &Middleware{
+		Script: middleware,
+	}
+
+	err := c.ApplyMiddleware(middlewareObject)
 	if err != nil {
 		return err
 	}

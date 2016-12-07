@@ -4,6 +4,12 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"io/ioutil"
+	"net"
+	"net/http"
+	"sync"
+	"time"
+
 	log "github.com/Sirupsen/logrus"
 	authBackend "github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
@@ -11,11 +17,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/rusenask/goproxy"
-	"io/ioutil"
-	"net"
-	"net/http"
-	"sync"
-	"time"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond
@@ -304,7 +305,12 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 		requestResponsePair.Request = rd
 
 		c := NewConstructor(request, requestResponsePair)
-		err = c.ApplyMiddleware(hf.Cfg.Middleware)
+
+		middleware := &Middleware{
+			Script: hf.Cfg.Middleware,
+		}
+
+		err = c.ApplyMiddleware(middleware)
 
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -371,7 +377,11 @@ func (hf *Hoverfly) getResponse(req *http.Request, requestDetails models.Request
 
 	c := NewConstructor(req, *pair)
 	if hf.Cfg.Middleware != "" {
-		_ = c.ApplyMiddleware(hf.Cfg.Middleware)
+
+		middleware := &Middleware{
+			Script: hf.Cfg.Middleware,
+		}
+		_ = c.ApplyMiddleware(middleware)
 	}
 
 	return c.ReconstructResponse(), nil
@@ -409,7 +419,12 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 
 	c := NewConstructor(req, requestResponsePair)
 	// applying middleware to modify response
-	err = c.ApplyMiddleware(middleware)
+
+	middlewareObject := &Middleware{
+		Script: middleware,
+	}
+
+	err = c.ApplyMiddleware(middlewareObject)
 
 	if err != nil {
 		return nil, err
