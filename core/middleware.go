@@ -64,9 +64,9 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 }
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
-func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+func (this Middleware) ExecuteMiddlewareLocally(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 
-	mws := strings.Split(middlewares, "|")
+	mws := strings.Split(this.Script, "|")
 	var cmdList []*exec.Cmd
 
 	for _, v := range mws {
@@ -135,9 +135,9 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 		} else {
 			if log.GetLevel() == log.DebugLevel {
 				log.WithFields(log.Fields{
-					"middlewares": middlewares,
-					"count":       len(middlewares),
-					"payload":     string(mwOutput),
+					"middleware": this.Script,
+					"count":      len(this.Script),
+					"payload":    string(mwOutput),
 				}).Debug("payload after modifications")
 			}
 			// payload unmarshalled into RequestResponsePair struct, returning it

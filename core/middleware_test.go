@@ -16,14 +16,16 @@ import (
 func TestChangeBodyMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
-	command := "./examples/middleware/modify_response/modify_response.py"
-
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
 	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
-	newPair, err := ExecuteMiddlewareLocally(command, originalPair)
+	unit := &Middleware{
+		Script: "./examples/middleware/modify_response/modify_response.py",
+	}
+
+	newPair, err := unit.ExecuteMiddlewareLocally(originalPair)
 
 	Expect(err).To(BeNil())
 	Expect(newPair.Response.Body).To(Equal("body was replaced by middleware\n"))
@@ -32,14 +34,16 @@ func TestChangeBodyMiddleware(t *testing.T) {
 func TestMalformedRequestResponsePairWithMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
-	command := "./examples/middleware/ruby_echo/echo.rb"
-
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
 	malformedPair := models.RequestResponsePair{Response: resp, Request: req}
 
-	newPair, err := ExecuteMiddlewareLocally(command, malformedPair)
+	unit := &Middleware{
+		Script: "./examples/middleware/ruby_echo/echo.rb",
+	}
+
+	newPair, err := unit.ExecuteMiddlewareLocally(malformedPair)
 
 	Expect(err).To(BeNil())
 	Expect(newPair.Response.Body).To(Equal("original body"))
@@ -48,14 +52,16 @@ func TestMalformedRequestResponsePairWithMiddleware(t *testing.T) {
 func TestMakeCustom404(t *testing.T) {
 	RegisterTestingT(t)
 
-	command := "go run ./examples/middleware/go_example/change_to_custom_404.go"
-
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
 	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
-	newPair, err := ExecuteMiddlewareLocally(command, originalPair)
+	unit := &Middleware{
+		Script: "go run ./examples/middleware/go_example/change_to_custom_404.go",
+	}
+
+	newPair, err := unit.ExecuteMiddlewareLocally(originalPair)
 
 	Expect(err).To(BeNil())
 	Expect(newPair.Response.Body).To(Equal("Custom body here"))
@@ -66,13 +72,15 @@ func TestMakeCustom404(t *testing.T) {
 func TestReflectBody(t *testing.T) {
 	RegisterTestingT(t)
 
-	command := "./examples/middleware/reflect_body/reflect_body.py"
-
 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: "", Body: "request_body_here"}
 
 	originalPair := models.RequestResponsePair{Request: req}
 
-	newPair, err := ExecuteMiddlewareLocally(command, originalPair)
+	unit := &Middleware{
+		Script: "./examples/middleware/reflect_body/reflect_body.py",
+	}
+
+	newPair, err := unit.ExecuteMiddlewareLocally(originalPair)
 
 	Expect(err).To(BeNil())
 	Expect(newPair.Response.Body).To(Equal(req.Body))

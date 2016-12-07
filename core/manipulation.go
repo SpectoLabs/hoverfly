@@ -31,12 +31,14 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 	var newPair models.RequestResponsePair
 	var err error
 
+	middlewareObject := &Middleware{
+		Script: middleware,
+	}
+
 	if isMiddlewareLocal(middleware) {
-		newPair, err = ExecuteMiddlewareLocally(middleware, c.requestResponsePair)
+		newPair, err = middlewareObject.ExecuteMiddlewareLocally(c.requestResponsePair)
 	} else {
-		middlewareObject := &Middleware{
-			Script: middleware,
-		}
+
 		newPair, err = middlewareObject.ExecuteMiddlewareRemotely(c.requestResponsePair)
 	}
 
