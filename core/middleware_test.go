@@ -2,14 +2,15 @@ package hoverfly
 
 import (
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/gorilla/mux"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/gorilla/mux"
+	. "github.com/onsi/gomega"
 )
 
 func TestChangeBodyMiddleware(t *testing.T) {
@@ -114,7 +115,11 @@ func TestExecuteMiddlewareRemotely(t *testing.T) {
 		},
 	}
 
-	newPair, err := ExecuteMiddlewareRemotely(server.URL+"/process", originalPair)
+	unit := &Middleware{
+		Script: server.URL + "/process",
+	}
+
+	newPair, err := unit.ExecuteMiddlewareRemotely(originalPair)
 	Expect(err).To(BeNil())
 
 	Expect(newPair).ToNot(Equal(originalPair))
@@ -135,7 +140,11 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSameRequestRes
 		},
 	}
 
-	newPair, err := ExecuteMiddlewareRemotely(server.URL+"/process", originalPair)
+	unit := &Middleware{
+		Script: server.URL + "/process",
+	}
+
+	newPair, err := unit.ExecuteMiddlewareRemotely(originalPair)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Error when communicating with remote middleware"))
 
@@ -156,7 +165,11 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfNoRequestResponsePairOnResponse
 		},
 	}
 
-	untouchedPair, err := ExecuteMiddlewareRemotely(server.URL+"/process", originalPair)
+	unit := &Middleware{
+		Script: server.URL + "/process",
+	}
+
+	untouchedPair, err := unit.ExecuteMiddlewareRemotely(originalPair)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("unexpected end of JSON input"))
 

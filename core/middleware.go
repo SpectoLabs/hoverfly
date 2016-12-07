@@ -15,6 +15,11 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
+type Middleware struct {
+	Binary string
+	Script string
+}
+
 // Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.
 func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte, pipeLineError error) {
 	// Require at least one command
@@ -149,10 +154,10 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 
 }
 
-func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+func (this Middleware) ExecuteMiddlewareRemotely(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
-	req, err := http.NewRequest("POST", middleware, bytes.NewBuffer(pairViewBytes))
+	req, err := http.NewRequest("POST", this.Script, bytes.NewBuffer(pairViewBytes))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),

@@ -6,9 +6,10 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"strings"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"strings"
 )
 
 // Constructor - holds information about original request (which is needed to create response
@@ -33,7 +34,10 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 	if isMiddlewareLocal(middleware) {
 		newPair, err = ExecuteMiddlewareLocally(middleware, c.requestResponsePair)
 	} else {
-		newPair, err = ExecuteMiddlewareRemotely(middleware, c.requestResponsePair)
+		middlewareObject := &Middleware{
+			Script: middleware,
+		}
+		newPair, err = middlewareObject.ExecuteMiddlewareRemotely(c.requestResponsePair)
 	}
 
 	if err != nil {
