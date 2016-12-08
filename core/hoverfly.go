@@ -181,7 +181,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 
 	} else if mode == SynthesizeMode {
 		var err error
-		response, err = SynthesizeResponse(req, requestDetails, hf.Cfg.Middleware)
+		response, err = SynthesizeResponse(req, requestDetails, hf.Cfg.Middleware.Script)
 
 		if err != nil {
 			return hoverflyError(req, err, "Could not create synthetic response!", http.StatusServiceUnavailable)
@@ -294,7 +294,7 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
 
-	if hf.Cfg.Middleware != "" {
+	if hf.Cfg.Middleware.Script != "" {
 		// middleware is provided, modifying request
 		var requestResponsePair models.RequestResponsePair
 
@@ -306,11 +306,7 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 
 		c := NewConstructor(request, requestResponsePair)
 
-		middleware := &Middleware{
-			Script: hf.Cfg.Middleware,
-		}
-
-		err = c.ApplyMiddleware(middleware)
+		err = c.ApplyMiddleware(&hf.Cfg.Middleware)
 
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -376,12 +372,8 @@ func (hf *Hoverfly) getResponse(req *http.Request, requestDetails models.Request
 	}
 
 	c := NewConstructor(req, *pair)
-	if hf.Cfg.Middleware != "" {
-
-		middleware := &Middleware{
-			Script: hf.Cfg.Middleware,
-		}
-		_ = c.ApplyMiddleware(middleware)
+	if hf.Cfg.Middleware.Script != "" {
+		_ = c.ApplyMiddleware(&hf.Cfg.Middleware)
 	}
 
 	return c.ReconstructResponse(), nil
@@ -418,13 +410,9 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 	requestResponsePair := models.RequestResponsePair{Response: r, Request: requestDetails}
 
 	c := NewConstructor(req, requestResponsePair)
-	// applying middleware to modify response
+	// applying middleware to modify responseObj
 
-	middleware := &Middleware{
-		Script: hf.Cfg.Middleware,
-	}
-
-	err = c.ApplyMiddleware(middleware)
+	err = c.ApplyMiddleware(&hf.Cfg.Middleware)
 
 	if err != nil {
 		return nil, err
@@ -434,7 +422,7 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 
 	log.WithFields(log.Fields{
 		"status":      newResponse.StatusCode,
-		"middleware":  middleware.Script,
+		"middleware":  hf.Cfg.Middleware.Script,
 		"mode":        ModifyMode,
 		"path":        c.requestResponsePair.Request.Path,
 		"rawQuery":    c.requestResponsePair.Request.Query,
