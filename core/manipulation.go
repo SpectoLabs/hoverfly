@@ -8,7 +8,6 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"strings"
 )
 
 // Constructor - holds information about original request (which is needed to create response
@@ -26,15 +25,11 @@ func NewConstructor(req *http.Request, pair models.RequestResponsePair) *Constru
 
 // ApplyMiddleware - activates given middleware, middleware should be passed as string to executable, can be
 // full path.
-func (c *Constructor) ApplyMiddleware(middleware string) error {
+func (c *Constructor) ApplyMiddleware(middleware *Middleware) error {
 	var newPair models.RequestResponsePair
 	var err error
 
-	if isMiddlewareLocal(middleware) {
-		newPair, err = ExecuteMiddlewareLocally(middleware, c.requestResponsePair)
-	} else {
-		newPair, err = ExecuteMiddlewareRemotely(middleware, c.requestResponsePair)
-	}
+	newPair, err = middleware.Execute(c.requestResponsePair)
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -53,10 +48,6 @@ func (c *Constructor) ApplyMiddleware(middleware string) error {
 
 	return nil
 
-}
-
-func isMiddlewareLocal(middleware string) bool {
-	return !strings.HasPrefix(middleware, "http")
 }
 
 // ReconstructResponse changes original response with details provided in Constructor Payload.Response

@@ -14,7 +14,7 @@ type Configuration struct {
 	ProxyPort    string
 	Mode         string
 	Destination  string
-	Middleware   string
+	Middleware   Middleware
 	DatabasePath string
 	Webserver    bool
 
@@ -135,7 +135,7 @@ func InitSettings() *Configuration {
 	}
 
 	// middleware configuration
-	appConfig.Middleware = os.Getenv(HoverflyMiddlewareEV)
+	appConfig.Middleware.FullCommand = os.Getenv(HoverflyMiddlewareEV)
 
 	if os.Getenv(HoverflyTLSVerification) == "false" {
 		appConfig.TLSVerification = false

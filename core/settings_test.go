@@ -1,9 +1,10 @@
 package hoverfly
 
 import (
-	. "github.com/onsi/gomega"
 	"os"
 	"testing"
+
+	. "github.com/onsi/gomega"
 )
 
 func TestSettingsAdminPortEnv(t *testing.T) {
@@ -52,7 +53,7 @@ func TestSettingsMiddlewareEnv(t *testing.T) {
 	os.Setenv("HoverflyMiddleware", "./examples/middleware/x.go")
 	cfg := InitSettings()
 
-	Expect(cfg.Middleware).To(Equal("./examples/middleware/x.go"))
+	Expect(cfg.Middleware.FullCommand).To(Equal("./examples/middleware/x.go"))
 }
 
 // TestSetMode - tests SetMode function, however it doesn't test

@@ -1,10 +1,11 @@
 package hoverfly
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/models"
-	. "github.com/onsi/gomega"
 	"net/http"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/models"
+	. "github.com/onsi/gomega"
 )
 
 func TestSynthesizeResponse(t *testing.T) {
@@ -16,7 +17,11 @@ func TestSynthesizeResponse(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	sr, err := SynthesizeResponse(req, requestDetails, "./examples/middleware/synthetic_service/synthetic.py")
+	middleware := &Middleware{
+		FullCommand: "./examples/middleware/synthetic_service/synthetic.py",
+	}
+
+	sr, err := SynthesizeResponse(req, requestDetails, middleware)
 	Expect(err).To(BeNil())
 
 	Expect(sr.StatusCode).To(Equal(http.StatusOK))
@@ -31,7 +36,9 @@ func TestSynthesizeResponseWOMiddleware(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	_, err = SynthesizeResponse(req, requestDetails, "")
+	middleware := &Middleware{}
+
+	_, err = SynthesizeResponse(req, requestDetails, middleware)
 	Expect(err).ToNot(BeNil())
 
 	Expect(err).To(MatchError("Synthesize failed, middleware not provided"))
@@ -46,6 +53,10 @@ func TestSynthesizeMiddlewareFailure(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	_, err = SynthesizeResponse(req, requestDetails, "./examples/middleware/this_is_not_there.py")
+	middleware := &Middleware{
+		FullCommand: "./examples/middleware/this_is_not_there.py",
+	}
+
+	_, err = SynthesizeResponse(req, requestDetails, middleware)
 	Expect(err).ToNot(BeNil())
 }

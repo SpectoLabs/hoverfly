@@ -4,6 +4,12 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"io/ioutil"
+	"net"
+	"net/http"
+	"sync"
+	"time"
+
 	log "github.com/Sirupsen/logrus"
 	authBackend "github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
@@ -11,11 +17,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/rusenask/goproxy"
-	"io/ioutil"
-	"net"
-	"net/http"
-	"sync"
-	"time"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond
@@ -180,7 +181,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 
 	} else if mode == SynthesizeMode {
 		var err error
-		response, err = SynthesizeResponse(req, requestDetails, hf.Cfg.Middleware)
+		response, err = SynthesizeResponse(req, requestDetails, &hf.Cfg.Middleware)
 
 		if err != nil {
 			return hoverflyError(req, err, "Could not create synthetic response!", http.StatusServiceUnavailable)
@@ -197,7 +198,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 
 	} else if mode == ModifyMode {
 		var err error
-		response, err = hf.modifyRequestResponse(req, requestDetails, hf.Cfg.Middleware)
+		response, err = hf.modifyRequestResponse(req, requestDetails)
 
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -293,7 +294,7 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
 
-	if hf.Cfg.Middleware != "" {
+	if hf.Cfg.Middleware.FullCommand != "" {
 		// middleware is provided, modifying request
 		var requestResponsePair models.RequestResponsePair
 
@@ -304,7 +305,8 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 		requestResponsePair.Request = rd
 
 		c := NewConstructor(request, requestResponsePair)
-		err = c.ApplyMiddleware(hf.Cfg.Middleware)
+
+		err = c.ApplyMiddleware(&hf.Cfg.Middleware)
 
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -370,8 +372,8 @@ func (hf *Hoverfly) getResponse(req *http.Request, requestDetails models.Request
 	}
 
 	c := NewConstructor(req, *pair)
-	if hf.Cfg.Middleware != "" {
-		_ = c.ApplyMiddleware(hf.Cfg.Middleware)
+	if hf.Cfg.Middleware.FullCommand != "" {
+		_ = c.ApplyMiddleware(&hf.Cfg.Middleware)
 	}
 
 	return c.ReconstructResponse(), nil
@@ -379,7 +381,7 @@ func (hf *Hoverfly) getResponse(req *http.Request, requestDetails models.Request
 
 // modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response
 // is saved to cache.
-func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails models.RequestDetails, middleware string) (*http.Response, error) {
+func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails models.RequestDetails) (*http.Response, error) {
 
 	// modifying request
 	req, resp, err := hf.doRequest(req)
@@ -394,7 +396,7 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":      err.Error(),
-			"middleware": middleware,
+			"middleware": hf.Cfg.Middleware,
 		}).Error("Failed to read response body after sending modified request")
 		return nil, err
 	}
@@ -408,8 +410,9 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 	requestResponsePair := models.RequestResponsePair{Response: r, Request: requestDetails}
 
 	c := NewConstructor(req, requestResponsePair)
-	// applying middleware to modify response
-	err = c.ApplyMiddleware(middleware)
+	// applying middleware to modify responseObj
+
+	err = c.ApplyMiddleware(&hf.Cfg.Middleware)
 
 	if err != nil {
 		return nil, err
@@ -419,7 +422,7 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 
 	log.WithFields(log.Fields{
 		"status":      newResponse.StatusCode,
-		"middleware":  middleware,
+		"middleware":  hf.Cfg.Middleware.FullCommand,
 		"mode":        ModifyMode,
 		"path":        c.requestResponsePair.Request.Path,
 		"rawQuery":    c.requestResponsePair.Request.Query,

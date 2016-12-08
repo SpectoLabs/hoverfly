@@ -9,18 +9,19 @@ import (
 )
 
 // SynthesizeResponse calls middleware to populate response data, nothing gets pass proxy
-func SynthesizeResponse(req *http.Request, requestDetails models.RequestDetails, middleware string) (*http.Response, error) {
+func SynthesizeResponse(req *http.Request, requestDetails models.RequestDetails, middleware *Middleware) (*http.Response, error) {
 	pair := models.RequestResponsePair{Request: requestDetails}
 
 	log.WithFields(log.Fields{
-		"middleware":  middleware,
+		"middleware":  middleware.FullCommand,
 		"body":        requestDetails.Body,
 		"destination": requestDetails.Destination,
 	}).Debug("Synthesizing new response")
 
 	c := NewConstructor(req, pair)
 
-	if middleware != "" {
+	if middleware.FullCommand != "" {
+
 		err := c.ApplyMiddleware(middleware)
 		if err != nil {
 			return nil, fmt.Errorf("Synthesize failed, middleware error - %s", err.Error())

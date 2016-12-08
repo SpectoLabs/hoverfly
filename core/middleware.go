@@ -7,12 +7,17 @@ import (
 	"strings"
 
 	"errors"
-	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/models"
 	"io/ioutil"
 	"net/http"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
+
+type Middleware struct {
+	FullCommand string
+}
 
 // Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.
 func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte, pipeLineError error) {
@@ -57,10 +62,19 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 	return output.Bytes(), stderr.Bytes(), nil
 }
 
-// ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
-func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+func (this Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+	if this.isLocal() {
+		return this.executeMiddlewareLocally(pair)
+	} else {
+		return this.executeMiddlewareRemotely(pair)
+	}
 
-	mws := strings.Split(middlewares, "|")
+}
+
+// ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
+func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+
+	mws := strings.Split(this.FullCommand, "|")
 	var cmdList []*exec.Cmd
 
 	for _, v := range mws {
@@ -71,7 +85,7 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 	}
 
 	// getting payload
-	pairViewBytes, err := json.Marshal(pair.ConvertToV1RequestResponsePairView())
+	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
 	if log.GetLevel() == log.DebugLevel {
 		log.WithFields(log.Fields{
@@ -117,7 +131,7 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 	}
 
 	if len(mwOutput) > 0 {
-		var newPairView v1.RequestResponsePairView
+		var newPairView v2.RequestResponsePairView
 
 		err = json.Unmarshal(mwOutput, &newPairView)
 
@@ -129,9 +143,9 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 		} else {
 			if log.GetLevel() == log.DebugLevel {
 				log.WithFields(log.Fields{
-					"middlewares": middlewares,
-					"count":       len(middlewares),
-					"payload":     string(mwOutput),
+					"middleware": this.FullCommand,
+					"count":      len(this.FullCommand),
+					"payload":    string(mwOutput),
 				}).Debug("payload after modifications")
 			}
 			// payload unmarshalled into RequestResponsePair struct, returning it
@@ -148,10 +162,10 @@ func ExecuteMiddlewareLocally(middlewares string, pair models.RequestResponsePai
 
 }
 
-func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	pairViewBytes, err := json.Marshal(pair.ConvertToV1RequestResponsePairView())
+func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
-	req, err := http.NewRequest("POST", middleware, bytes.NewBuffer(pairViewBytes))
+	req, err := http.NewRequest("POST", this.FullCommand, bytes.NewBuffer(pairViewBytes))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
@@ -180,7 +194,7 @@ func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePai
 		return pair, err
 	}
 
-	var newPairView v1.RequestResponsePairView
+	var newPairView v2.RequestResponsePairView
 
 	err = json.Unmarshal(returnedPairViewBytes, &newPairView)
 	if err != nil {
@@ -190,4 +204,8 @@ func ExecuteMiddlewareRemotely(middleware string, pair models.RequestResponsePai
 		return pair, err
 	}
 	return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
+}
+
+func (this Middleware) isLocal() bool {
+	return !strings.HasPrefix(this.FullCommand, "http")
 }

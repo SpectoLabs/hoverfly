@@ -3,13 +3,14 @@ package hoverfly
 import (
 	"bytes"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/matching"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/models"
+	. "github.com/onsi/gomega"
 )
 
 // TestMain prepares database for testing and then performs a cleanup
@@ -87,7 +88,9 @@ func TestRequestBodySentToMiddleware(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	resp, err := dbClient.modifyRequestResponse(req, requestDetails, "./examples/middleware/reflect_body/reflect_body.py")
+	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/reflect_body/reflect_body.py"
+
+	resp, err := dbClient.modifyRequestResponse(req, requestDetails)
 
 	// body from the request should be in response body, instead of server's response
 	responseBody, err := ioutil.ReadAll(resp.Body)
@@ -269,7 +272,7 @@ func TestModifyRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	dbClient.Cfg.Middleware = "./examples/middleware/modify_request/modify_request.py"
+	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_request/modify_request.py"
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
@@ -277,7 +280,7 @@ func TestModifyRequest(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.modifyRequestResponse(req, requestDetails, dbClient.Cfg.Middleware)
+	response, err := dbClient.modifyRequestResponse(req, requestDetails)
 	Expect(err).To(BeNil())
 
 	// response should be changed to 202
@@ -292,7 +295,7 @@ func TestModifyRequestWODestination(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	dbClient.Cfg.Middleware = "./examples/middleware/modify_response/modify_response.py"
+	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_response/modify_response.py"
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
@@ -300,7 +303,7 @@ func TestModifyRequestWODestination(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.modifyRequestResponse(req, requestDetails, dbClient.Cfg.Middleware)
+	response, err := dbClient.modifyRequestResponse(req, requestDetails)
 	Expect(err).To(BeNil())
 
 	// response should be changed to 201
@@ -314,7 +317,7 @@ func TestModifyRequestNoMiddleware(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	dbClient.Cfg.Middleware = ""
+	dbClient.Cfg.Middleware.FullCommand = ""
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
@@ -322,7 +325,7 @@ func TestModifyRequestNoMiddleware(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	_, err = dbClient.modifyRequestResponse(req, requestDetails, dbClient.Cfg.Middleware)
+	_, err = dbClient.modifyRequestResponse(req, requestDetails)
 	Expect(err).ToNot(BeNil())
 }
 
@@ -368,7 +371,7 @@ func TestDoRequestWFailedMiddleware(t *testing.T) {
 	defer server.Close()
 
 	// adding middleware which doesn't exist, doRequest should return error
-	dbClient.Cfg.Middleware = "./should/not/exist.go"
+	dbClient.Cfg.Middleware.FullCommand = "./should/not/exist.go"
 
 	requestBody := []byte("fizz=buzz")
 
