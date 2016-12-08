@@ -213,3 +213,23 @@ func Test_Middleware_IsLocal_WithHttpsString(t *testing.T) {
 
 	Expect(unit.isLocal()).To(BeFalse())
 }
+
+func Test_Middleware_SetBinary_SetsBinaryIfItCanRunIt(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetBinary("go")
+	Expect(err).To(BeNil())
+	Expect(unit.Binary).To(Equal("go"))
+}
+
+func Test_Middleware_SetBinary_DoesNotSetIfCantRun(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetBinary("|{}|")
+	Expect(err).ToNot(BeNil())
+	Expect(unit.Binary).To(Equal(""))
+}

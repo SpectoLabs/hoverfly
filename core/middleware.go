@@ -16,7 +16,20 @@ import (
 )
 
 type Middleware struct {
+	Binary      string
 	FullCommand string
+}
+
+func (this *Middleware) SetBinary(binary string) error {
+	testCommand := exec.Command(binary)
+	if err := testCommand.Start(); err != nil {
+		return err
+	}
+
+	testCommand.Process.Kill()
+
+	this.Binary = binary
+	return nil
 }
 
 func (this Middleware) isLocal() bool {
