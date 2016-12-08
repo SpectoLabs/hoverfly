@@ -181,7 +181,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 
 	} else if mode == SynthesizeMode {
 		var err error
-		response, err = SynthesizeResponse(req, requestDetails, hf.Cfg.Middleware.Script)
+		response, err = SynthesizeResponse(req, requestDetails, &hf.Cfg.Middleware)
 
 		if err != nil {
 			return hoverflyError(req, err, "Could not create synthetic response!", http.StatusServiceUnavailable)
