@@ -29,12 +29,7 @@ func (c *Constructor) ApplyMiddleware(middleware *Middleware) error {
 	var newPair models.RequestResponsePair
 	var err error
 
-	if middleware.IsLocal() {
-		newPair, err = middleware.ExecuteMiddlewareLocally(c.requestResponsePair)
-	} else {
-
-		newPair, err = middleware.ExecuteMiddlewareRemotely(c.requestResponsePair)
-	}
+	newPair, err = middleware.Execute(c.requestResponsePair)
 
 	if err != nil {
 		log.WithFields(log.Fields{

@@ -62,8 +62,17 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 	return output.Bytes(), stderr.Bytes(), nil
 }
 
+func (this Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+	if this.isLocal() {
+		return this.executeMiddlewareLocally(pair)
+	} else {
+		return this.executeMiddlewareRemotely(pair)
+	}
+
+}
+
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
-func (this Middleware) ExecuteMiddlewareLocally(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 
 	mws := strings.Split(this.FullCommand, "|")
 	var cmdList []*exec.Cmd
@@ -153,7 +162,7 @@ func (this Middleware) ExecuteMiddlewareLocally(pair models.RequestResponsePair)
 
 }
 
-func (this Middleware) ExecuteMiddlewareRemotely(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
 	req, err := http.NewRequest("POST", this.FullCommand, bytes.NewBuffer(pairViewBytes))
@@ -197,6 +206,6 @@ func (this Middleware) ExecuteMiddlewareRemotely(pair models.RequestResponsePair
 	return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
 }
 
-func (this Middleware) IsLocal() bool {
+func (this Middleware) isLocal() bool {
 	return !strings.HasPrefix(this.FullCommand, "http")
 }

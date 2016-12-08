@@ -25,7 +25,7 @@ func TestChangeBodyMiddleware(t *testing.T) {
 		FullCommand: "./examples/middleware/modify_response/modify_response.py",
 	}
 
-	newPair, err := unit.ExecuteMiddlewareLocally(originalPair)
+	newPair, err := unit.executeMiddlewareLocally(originalPair)
 
 	Expect(err).To(BeNil())
 	Expect(newPair.Response.Body).To(Equal("body was replaced by middleware\n"))
@@ -43,7 +43,7 @@ func TestMalformedRequestResponsePairWithMiddleware(t *testing.T) {
 		FullCommand: "./examples/middleware/ruby_echo/echo.rb",
 	}
 
-	newPair, err := unit.ExecuteMiddlewareLocally(malformedPair)
+	newPair, err := unit.executeMiddlewareLocally(malformedPair)
 
 	Expect(err).To(BeNil())
 	Expect(newPair.Response.Body).To(Equal("original body"))
@@ -61,7 +61,7 @@ func TestMakeCustom404(t *testing.T) {
 		FullCommand: "go run ./examples/middleware/go_example/change_to_custom_404.go",
 	}
 
-	newPair, err := unit.ExecuteMiddlewareLocally(originalPair)
+	newPair, err := unit.executeMiddlewareLocally(originalPair)
 
 	Expect(err).To(BeNil())
 	Expect(newPair.Response.Body).To(Equal("Custom body here"))
@@ -80,7 +80,7 @@ func TestReflectBody(t *testing.T) {
 		FullCommand: "./examples/middleware/reflect_body/reflect_body.py",
 	}
 
-	newPair, err := unit.ExecuteMiddlewareLocally(originalPair)
+	newPair, err := unit.executeMiddlewareLocally(originalPair)
 
 	Expect(err).To(BeNil())
 	Expect(newPair.Response.Body).To(Equal(req.Body))
@@ -127,14 +127,14 @@ func TestExecuteMiddlewareRemotely(t *testing.T) {
 		FullCommand: server.URL + "/process",
 	}
 
-	newPair, err := unit.ExecuteMiddlewareRemotely(originalPair)
+	newPair, err := unit.executeMiddlewareRemotely(originalPair)
 	Expect(err).To(BeNil())
 
 	Expect(newPair).ToNot(Equal(originalPair))
 	Expect(newPair.Response.Body).To(Equal("You got straight up messed with"))
 }
 
-func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSameRequestResponsePairs(t *testing.T) {
+func Test_Middleware_executeMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSameRequestResponsePairs(t *testing.T) {
 	RegisterTestingT(t)
 
 	muxRouter := mux.NewRouter()
@@ -152,14 +152,14 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSameRequestRes
 		FullCommand: server.URL + "/process",
 	}
 
-	newPair, err := unit.ExecuteMiddlewareRemotely(originalPair)
+	newPair, err := unit.executeMiddlewareRemotely(originalPair)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Error when communicating with remote middleware"))
 
 	Expect(newPair).To(Equal(originalPair))
 }
 
-func TestExecuteMiddlewareRemotely_ReturnsErrorIfNoRequestResponsePairOnResponse_TheUntouchedPairIsReturned(t *testing.T) {
+func Test_Middleware_executeMiddlewareRemotely_ReturnsErrorIfNoRequestResponsePairOnResponse_TheUntouchedPairIsReturned(t *testing.T) {
 	RegisterTestingT(t)
 
 	muxRouter := mux.NewRouter()
@@ -177,7 +177,7 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfNoRequestResponsePairOnResponse
 		FullCommand: server.URL + "/process",
 	}
 
-	untouchedPair, err := unit.ExecuteMiddlewareRemotely(originalPair)
+	untouchedPair, err := unit.executeMiddlewareRemotely(originalPair)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("unexpected end of JSON input"))
 
@@ -191,7 +191,7 @@ func Test_Middleware_IsLocal_WithNonHttpString(t *testing.T) {
 		FullCommand: "python middleware.py",
 	}
 
-	Expect(unit.IsLocal()).To(BeTrue())
+	Expect(unit.isLocal()).To(BeTrue())
 }
 
 func Test_Middleware_IsLocal_WithHttpString(t *testing.T) {
@@ -201,7 +201,7 @@ func Test_Middleware_IsLocal_WithHttpString(t *testing.T) {
 		FullCommand: "http://remotemiddleware.com/process",
 	}
 
-	Expect(unit.IsLocal()).To(BeFalse())
+	Expect(unit.isLocal()).To(BeFalse())
 }
 
 func Test_Middleware_IsLocal_WithHttpsString(t *testing.T) {
@@ -211,5 +211,5 @@ func Test_Middleware_IsLocal_WithHttpsString(t *testing.T) {
 		FullCommand: "http://remotemiddleware.com/process",
 	}
 
-	Expect(unit.IsLocal()).To(BeFalse())
+	Expect(unit.isLocal()).To(BeFalse())
 }
