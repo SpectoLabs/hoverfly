@@ -448,7 +448,7 @@ func TestGetMiddleware(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := adminApi.getBoneRouter(dbClient)
 
-	dbClient.Cfg.Middleware.Script = "python middleware_test.py"
+	dbClient.Cfg.Middleware.FullCommand = "python middleware_test.py"
 	req, err := http.NewRequest("GET", "/api/middleware", nil)
 	Expect(err).To(BeNil())
 
@@ -474,7 +474,7 @@ func TestSetMiddleware_WithValidMiddleware(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := adminApi.getBoneRouter(dbClient)
 
-	dbClient.Cfg.Middleware.Script = "python examples/middleware/modify_request/modify_request.py"
+	dbClient.Cfg.Middleware.FullCommand = "python examples/middleware/modify_request/modify_request.py"
 
 	var middlewareReq v1.MiddlewareSchema
 	middlewareReq.Middleware = "python examples/middleware/delay_policy/add_random_delay.py"
@@ -497,7 +497,7 @@ func TestSetMiddleware_WithValidMiddleware(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(middlewareResp.Middleware).To(Equal("python examples/middleware/delay_policy/add_random_delay.py"))
-	Expect(dbClient.Cfg.Middleware.Script).To(Equal("python examples/middleware/delay_policy/add_random_delay.py"))
+	Expect(dbClient.Cfg.Middleware.FullCommand).To(Equal("python examples/middleware/delay_policy/add_random_delay.py"))
 }
 
 func TestSetMiddleware_WithInvalidMiddleware(t *testing.T) {
@@ -508,7 +508,7 @@ func TestSetMiddleware_WithInvalidMiddleware(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := adminApi.getBoneRouter(dbClient)
 
-	dbClient.Cfg.Middleware.Script = "python examples/middleware/modify_request/modify_request.py"
+	dbClient.Cfg.Middleware.FullCommand = "python examples/middleware/modify_request/modify_request.py"
 
 	var middlewareReq v1.MiddlewareSchema
 	middlewareReq.Middleware = "definitely won't execute"
@@ -532,7 +532,7 @@ func TestSetMiddleware_WithInvalidMiddleware(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 	Expect(string(body)).To(ContainSubstring("Invalid middleware"))
 
-	Expect(dbClient.Cfg.Middleware.Script).To(Equal("python examples/middleware/modify_request/modify_request.py"))
+	Expect(dbClient.Cfg.Middleware.FullCommand).To(Equal("python examples/middleware/modify_request/modify_request.py"))
 }
 
 func TestSetMiddleware_WithEmptyMiddleware(t *testing.T) {
@@ -543,7 +543,7 @@ func TestSetMiddleware_WithEmptyMiddleware(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := adminApi.getBoneRouter(dbClient)
 
-	dbClient.Cfg.Middleware.Script = "python examples/middleware/modify_request/modify_request.py"
+	dbClient.Cfg.Middleware.FullCommand = "python examples/middleware/modify_request/modify_request.py"
 
 	var middlewareReq v1.MiddlewareSchema
 	middlewareReq.Middleware = ""
@@ -567,7 +567,7 @@ func TestSetMiddleware_WithEmptyMiddleware(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(middlewareResp.Middleware).To(Equal(""))
-	Expect(dbClient.Cfg.Middleware.Script).To(Equal(""))
+	Expect(dbClient.Cfg.Middleware.FullCommand).To(Equal(""))
 }
 
 func TestStatsHandler(t *testing.T) {

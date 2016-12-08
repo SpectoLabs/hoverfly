@@ -59,12 +59,12 @@ func (this *Hoverfly) SetMode(mode string) error {
 }
 
 func (hf Hoverfly) GetMiddleware() string {
-	return hf.Cfg.Middleware.Script
+	return hf.Cfg.Middleware.FullCommand
 }
 
 func (hf Hoverfly) SetMiddleware(middleware string) error {
 	if middleware == "" {
-		hf.Cfg.Middleware.Script = middleware
+		hf.Cfg.Middleware.FullCommand = middleware
 		return nil
 	}
 	originalPair := models.RequestResponsePair{
@@ -86,7 +86,7 @@ func (hf Hoverfly) SetMiddleware(middleware string) error {
 	c := NewConstructor(nil, originalPair)
 
 	middlewareObject := &Middleware{
-		Script: middleware,
+		FullCommand: middleware,
 	}
 
 	err := c.ApplyMiddleware(middlewareObject)
@@ -94,7 +94,7 @@ func (hf Hoverfly) SetMiddleware(middleware string) error {
 		return err
 	}
 
-	hf.Cfg.Middleware.Script = middleware
+	hf.Cfg.Middleware.FullCommand = middleware
 	return nil
 }
 

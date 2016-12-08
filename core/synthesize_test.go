@@ -18,7 +18,7 @@ func TestSynthesizeResponse(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	middleware := &Middleware{
-		Script: "./examples/middleware/synthetic_service/synthetic.py",
+		FullCommand: "./examples/middleware/synthetic_service/synthetic.py",
 	}
 
 	sr, err := SynthesizeResponse(req, requestDetails, middleware)
@@ -54,7 +54,7 @@ func TestSynthesizeMiddlewareFailure(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	middleware := &Middleware{
-		Script: "./examples/middleware/this_is_not_there.py",
+		FullCommand: "./examples/middleware/this_is_not_there.py",
 	}
 
 	_, err = SynthesizeResponse(req, requestDetails, middleware)

@@ -294,7 +294,7 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
 
-	if hf.Cfg.Middleware.Script != "" {
+	if hf.Cfg.Middleware.FullCommand != "" {
 		// middleware is provided, modifying request
 		var requestResponsePair models.RequestResponsePair
 
@@ -372,7 +372,7 @@ func (hf *Hoverfly) getResponse(req *http.Request, requestDetails models.Request
 	}
 
 	c := NewConstructor(req, *pair)
-	if hf.Cfg.Middleware.Script != "" {
+	if hf.Cfg.Middleware.FullCommand != "" {
 		_ = c.ApplyMiddleware(&hf.Cfg.Middleware)
 	}
 
@@ -422,7 +422,7 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 
 	log.WithFields(log.Fields{
 		"status":      newResponse.StatusCode,
-		"middleware":  hf.Cfg.Middleware.Script,
+		"middleware":  hf.Cfg.Middleware.FullCommand,
 		"mode":        ModifyMode,
 		"path":        c.requestResponsePair.Request.Path,
 		"rawQuery":    c.requestResponsePair.Request.Query,

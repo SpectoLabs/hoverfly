@@ -13,14 +13,14 @@ func SynthesizeResponse(req *http.Request, requestDetails models.RequestDetails,
 	pair := models.RequestResponsePair{Request: requestDetails}
 
 	log.WithFields(log.Fields{
-		"middleware":  middleware.Script,
+		"middleware":  middleware.FullCommand,
 		"body":        requestDetails.Body,
 		"destination": requestDetails.Destination,
 	}).Debug("Synthesizing new response")
 
 	c := NewConstructor(req, pair)
 
-	if middleware.Script != "" {
+	if middleware.FullCommand != "" {
 
 		err := c.ApplyMiddleware(middleware)
 		if err != nil {

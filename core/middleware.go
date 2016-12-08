@@ -16,8 +16,7 @@ import (
 )
 
 type Middleware struct {
-	Binary string
-	Script string
+	FullCommand string
 }
 
 // Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.
@@ -66,7 +65,7 @@ func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte,
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
 func (this Middleware) ExecuteMiddlewareLocally(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 
-	mws := strings.Split(this.Script, "|")
+	mws := strings.Split(this.FullCommand, "|")
 	var cmdList []*exec.Cmd
 
 	for _, v := range mws {
@@ -135,8 +134,8 @@ func (this Middleware) ExecuteMiddlewareLocally(pair models.RequestResponsePair)
 		} else {
 			if log.GetLevel() == log.DebugLevel {
 				log.WithFields(log.Fields{
-					"middleware": this.Script,
-					"count":      len(this.Script),
+					"middleware": this.FullCommand,
+					"count":      len(this.FullCommand),
 					"payload":    string(mwOutput),
 				}).Debug("payload after modifications")
 			}
@@ -157,7 +156,7 @@ func (this Middleware) ExecuteMiddlewareLocally(pair models.RequestResponsePair)
 func (this Middleware) ExecuteMiddlewareRemotely(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
-	req, err := http.NewRequest("POST", this.Script, bytes.NewBuffer(pairViewBytes))
+	req, err := http.NewRequest("POST", this.FullCommand, bytes.NewBuffer(pairViewBytes))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
@@ -199,5 +198,5 @@ func (this Middleware) ExecuteMiddlewareRemotely(pair models.RequestResponsePair
 }
 
 func (this Middleware) IsLocal() bool {
-	return !strings.HasPrefix(this.Script, "http")
+	return !strings.HasPrefix(this.FullCommand, "http")
 }

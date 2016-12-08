@@ -88,7 +88,7 @@ func TestRequestBodySentToMiddleware(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.Middleware.Script = "./examples/middleware/reflect_body/reflect_body.py"
+	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/reflect_body/reflect_body.py"
 
 	resp, err := dbClient.modifyRequestResponse(req, requestDetails)
 
@@ -272,7 +272,7 @@ func TestModifyRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	dbClient.Cfg.Middleware.Script = "./examples/middleware/modify_request/modify_request.py"
+	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_request/modify_request.py"
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
@@ -295,7 +295,7 @@ func TestModifyRequestWODestination(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	dbClient.Cfg.Middleware.Script = "./examples/middleware/modify_response/modify_response.py"
+	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_response/modify_response.py"
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
@@ -317,7 +317,7 @@ func TestModifyRequestNoMiddleware(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	dbClient.Cfg.Middleware.Script = ""
+	dbClient.Cfg.Middleware.FullCommand = ""
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
@@ -371,7 +371,7 @@ func TestDoRequestWFailedMiddleware(t *testing.T) {
 	defer server.Close()
 
 	// adding middleware which doesn't exist, doRequest should return error
-	dbClient.Cfg.Middleware.Script = "./should/not/exist.go"
+	dbClient.Cfg.Middleware.FullCommand = "./should/not/exist.go"
 
 	requestBody := []byte("fizz=buzz")
 

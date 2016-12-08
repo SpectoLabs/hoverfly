@@ -53,7 +53,7 @@ func TestSettingsMiddlewareEnv(t *testing.T) {
 	os.Setenv("HoverflyMiddleware", "./examples/middleware/x.go")
 	cfg := InitSettings()
 
-	Expect(cfg.Middleware.Script).To(Equal("./examples/middleware/x.go"))
+	Expect(cfg.Middleware.FullCommand).To(Equal("./examples/middleware/x.go"))
 }
 
 // TestSetMode - tests SetMode function, however it doesn't test

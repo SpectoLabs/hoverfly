@@ -22,7 +22,7 @@ func TestChangeBodyMiddleware(t *testing.T) {
 	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
 	unit := &Middleware{
-		Script: "./examples/middleware/modify_response/modify_response.py",
+		FullCommand: "./examples/middleware/modify_response/modify_response.py",
 	}
 
 	newPair, err := unit.ExecuteMiddlewareLocally(originalPair)
@@ -40,7 +40,7 @@ func TestMalformedRequestResponsePairWithMiddleware(t *testing.T) {
 	malformedPair := models.RequestResponsePair{Response: resp, Request: req}
 
 	unit := &Middleware{
-		Script: "./examples/middleware/ruby_echo/echo.rb",
+		FullCommand: "./examples/middleware/ruby_echo/echo.rb",
 	}
 
 	newPair, err := unit.ExecuteMiddlewareLocally(malformedPair)
@@ -58,7 +58,7 @@ func TestMakeCustom404(t *testing.T) {
 	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
 	unit := &Middleware{
-		Script: "go run ./examples/middleware/go_example/change_to_custom_404.go",
+		FullCommand: "go run ./examples/middleware/go_example/change_to_custom_404.go",
 	}
 
 	newPair, err := unit.ExecuteMiddlewareLocally(originalPair)
@@ -77,7 +77,7 @@ func TestReflectBody(t *testing.T) {
 	originalPair := models.RequestResponsePair{Request: req}
 
 	unit := &Middleware{
-		Script: "./examples/middleware/reflect_body/reflect_body.py",
+		FullCommand: "./examples/middleware/reflect_body/reflect_body.py",
 	}
 
 	newPair, err := unit.ExecuteMiddlewareLocally(originalPair)
@@ -124,7 +124,7 @@ func TestExecuteMiddlewareRemotely(t *testing.T) {
 	}
 
 	unit := &Middleware{
-		Script: server.URL + "/process",
+		FullCommand: server.URL + "/process",
 	}
 
 	newPair, err := unit.ExecuteMiddlewareRemotely(originalPair)
@@ -149,7 +149,7 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSameRequestRes
 	}
 
 	unit := &Middleware{
-		Script: server.URL + "/process",
+		FullCommand: server.URL + "/process",
 	}
 
 	newPair, err := unit.ExecuteMiddlewareRemotely(originalPair)
@@ -174,7 +174,7 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfNoRequestResponsePairOnResponse
 	}
 
 	unit := &Middleware{
-		Script: server.URL + "/process",
+		FullCommand: server.URL + "/process",
 	}
 
 	untouchedPair, err := unit.ExecuteMiddlewareRemotely(originalPair)
@@ -188,7 +188,7 @@ func Test_Middleware_IsLocal_WithNonHttpString(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := Middleware{
-		Script: "python middleware.py",
+		FullCommand: "python middleware.py",
 	}
 
 	Expect(unit.IsLocal()).To(BeTrue())
@@ -198,7 +198,7 @@ func Test_Middleware_IsLocal_WithHttpString(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := Middleware{
-		Script: "http://remotemiddleware.com/process",
+		FullCommand: "http://remotemiddleware.com/process",
 	}
 
 	Expect(unit.IsLocal()).To(BeFalse())
@@ -208,7 +208,7 @@ func Test_Middleware_IsLocal_WithHttpsString(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := Middleware{
-		Script: "http://remotemiddleware.com/process",
+		FullCommand: "http://remotemiddleware.com/process",
 	}
 
 	Expect(unit.IsLocal()).To(BeFalse())

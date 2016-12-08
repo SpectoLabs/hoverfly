@@ -104,7 +104,7 @@ func TestProcessSynthesizeRequest(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 
 	// getting reflect middleware
-	dbClient.Cfg.Middleware.Script = "./examples/middleware/reflect_body/reflect_body.py"
+	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/reflect_body/reflect_body.py"
 
 	bodyBytes := []byte("request_body_here")
 
@@ -128,7 +128,7 @@ func TestProcessModifyRequest(t *testing.T) {
 	defer server.Close()
 
 	// getting reflect middleware
-	dbClient.Cfg.Middleware.Script = "./examples/middleware/modify_request/modify_request.py"
+	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_request/modify_request.py"
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
@@ -255,7 +255,7 @@ func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 
 	// getting reflect middleware
-	dbClient.Cfg.Middleware.Script = "./examples/middleware/reflect_body/reflect_body.py"
+	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/reflect_body/reflect_body.py"
 
 	bodyBytes := []byte("request_body_here")
 
@@ -281,7 +281,7 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 
 	// getting reflect middleware
-	dbClient.Cfg.Middleware.Script = "./examples/middleware/reflect_body/no_exist.py"
+	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/reflect_body/no_exist.py"
 
 	bodyBytes := []byte("request_body_here")
 
@@ -306,7 +306,7 @@ func TestDelayAppliedToModifyRequest(t *testing.T) {
 	defer server.Close()
 
 	// getting reflect middleware
-	dbClient.Cfg.Middleware.Script = "./examples/middleware/modify_request/modify_request.py"
+	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_request/modify_request.py"
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
@@ -329,7 +329,7 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 	defer server.Close()
 
 	// getting reflect middleware
-	dbClient.Cfg.Middleware.Script = "./examples/middleware/modify_request/no_exist.py"
+	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_request/no_exist.py"
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
