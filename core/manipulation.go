@@ -6,8 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"strings"
-
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
@@ -31,7 +29,7 @@ func (c *Constructor) ApplyMiddleware(middleware *Middleware) error {
 	var newPair models.RequestResponsePair
 	var err error
 
-	if isMiddlewareLocal(middleware.Script) {
+	if middleware.IsLocal() {
 		newPair, err = middleware.ExecuteMiddlewareLocally(c.requestResponsePair)
 	} else {
 
@@ -55,10 +53,6 @@ func (c *Constructor) ApplyMiddleware(middleware *Middleware) error {
 
 	return nil
 
-}
-
-func isMiddlewareLocal(middleware string) bool {
-	return !strings.HasPrefix(middleware, "http")
 }
 
 // ReconstructResponse changes original response with details provided in Constructor Payload.Response

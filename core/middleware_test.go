@@ -183,3 +183,33 @@ func TestExecuteMiddlewareRemotely_ReturnsErrorIfNoRequestResponsePairOnResponse
 
 	Expect(untouchedPair).To(Equal(originalPair))
 }
+
+func Test_Middleware_IsLocal_WithNonHttpString(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Script: "python middleware.py",
+	}
+
+	Expect(unit.IsLocal()).To(BeTrue())
+}
+
+func Test_Middleware_IsLocal_WithHttpString(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Script: "http://remotemiddleware.com/process",
+	}
+
+	Expect(unit.IsLocal()).To(BeFalse())
+}
+
+func Test_Middleware_IsLocal_WithHttpsString(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Script: "http://remotemiddleware.com/process",
+	}
+
+	Expect(unit.IsLocal()).To(BeFalse())
+}

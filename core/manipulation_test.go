@@ -1,11 +1,12 @@
 package hoverfly
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/models"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/models"
+	. "github.com/onsi/gomega"
 )
 
 func TestReconstructRequest(t *testing.T) {
@@ -106,22 +107,4 @@ func TestReconstructionFailure(t *testing.T) {
 
 	_, err := c.ReconstructRequest()
 	Expect(err).ToNot(BeNil())
-}
-
-func TestIsMiddlewareLocal_WithNonHttpString(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(isMiddlewareLocal("python middleware.py")).To(BeTrue())
-}
-
-func TestIsMiddlewareLocal_WithHttpString(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(isMiddlewareLocal("http://remotemiddleware.com/process")).To(BeFalse())
-}
-
-func TestIsMiddlewareLocal_WithHttpsString(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(isMiddlewareLocal("http://remotemiddleware.com/process")).To(BeFalse())
 }

@@ -197,3 +197,7 @@ func (this Middleware) ExecuteMiddlewareRemotely(pair models.RequestResponsePair
 	}
 	return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
 }
+
+func (this Middleware) IsLocal() bool {
+	return !strings.HasPrefix(this.Script, "http")
+}
