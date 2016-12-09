@@ -83,13 +83,12 @@ func (hf Hoverfly) SetMiddleware(middleware string) error {
 			Headers: map[string][]string{"test_header": []string{"true"}},
 		},
 	}
-	c := NewConstructor(nil, originalPair)
 
 	middlewareObject := &Middleware{
 		FullCommand: middleware,
 	}
 
-	err := c.ApplyMiddleware(middlewareObject)
+	_, err := middlewareObject.executeMiddlewareLocally(originalPair)
 	if err != nil {
 		return err
 	}
