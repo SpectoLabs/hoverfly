@@ -3,6 +3,7 @@ package hoverfly
 import (
 	"bytes"
 	"encoding/json"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -17,7 +18,21 @@ import (
 
 type Middleware struct {
 	Binary      string
+	Script      *os.File
 	FullCommand string
+}
+
+func (this *Middleware) SetScript(scriptContent string) error {
+	script, err := ioutil.TempFile(os.TempDir(), "hoverfly_")
+	if err != nil {
+		return err
+	}
+
+	script.Write([]byte(scriptContent))
+
+	this.Script = script
+
+	return nil
 }
 
 func (this *Middleware) SetBinary(binary string) error {
@@ -36,7 +51,11 @@ func (this Middleware) isLocal() bool {
 	return !strings.HasPrefix(this.FullCommand, "http")
 }
 
-func (this Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+func (this *Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+	if this.Binary != "" && this.Script != nil {
+		this.FullCommand = this.Binary + " " + this.Script.Name()
+	}
+
 	if this.isLocal() {
 		return this.executeMiddlewareLocally(pair)
 	} else {
