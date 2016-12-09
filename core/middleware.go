@@ -29,6 +29,12 @@ func (this *Middleware) SetScript(scriptContent string) error {
 	}
 
 	script.Write([]byte(scriptContent))
+	if this.Script != nil {
+		err = os.Remove(this.Script.Name())
+		if err != nil {
+			return err
+		}
+	}
 
 	this.Script = script
 
