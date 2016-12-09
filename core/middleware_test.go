@@ -286,6 +286,15 @@ func Test_Middleware_DeleteScript_WillDeleteScriptAndSetScriptToNil(t *testing.T
 	Expect(err).ToNot(BeNil())
 }
 
+func Test_Middleware_DeleteScript_DoesNotErrorIfNoScriptWasSet(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.DeleteScript()
+	Expect(err).To(BeNil())
+}
+
 func Test_Middleware_SetScript_WritesMultiLineStringScriptToFile(t *testing.T) {
 	RegisterTestingT(t)
 
