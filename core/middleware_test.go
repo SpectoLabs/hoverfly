@@ -268,6 +268,24 @@ func Test_Middleware_SetScript_DeletesPreviousScript(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 }
 
+func Test_Middleware_DeleteScript_WillDeleteScriptAndSetScriptToNil(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetScript("just a test")
+	Expect(err).To(BeNil())
+
+	firstScript := unit.Script
+
+	err = unit.DeleteScript()
+	Expect(err).To(BeNil())
+	Expect(unit.Script).To(BeNil())
+
+	_, err = ioutil.ReadFile(firstScript.Name())
+	Expect(err).ToNot(BeNil())
+}
+
 func Test_Middleware_SetScript_WritesMultiLineStringScriptToFile(t *testing.T) {
 	RegisterTestingT(t)
 

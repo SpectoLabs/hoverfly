@@ -33,15 +33,21 @@ func (this *Middleware) SetScript(scriptContent string) error {
 		return err
 	}
 
-	if this.Script != nil {
-		err = os.Remove(this.Script.Name())
-		if err != nil {
-			return err
-		}
-	}
+	this.DeleteScript()
 
 	this.Script = script
 
+	return nil
+}
+
+func (this *Middleware) DeleteScript() error {
+	if this.Script != nil {
+		err := os.Remove(this.Script.Name())
+		if err != nil {
+			return err
+		}
+		this.Script = nil
+	}
 	return nil
 }
 
