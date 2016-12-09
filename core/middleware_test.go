@@ -280,6 +280,30 @@ func Test_Middleware_SetScript_DeletesPreviousScript(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 }
 
+func Test_Middleware_GetScript_GetsScript(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetScript("just a test")
+	Expect(err).To(BeNil())
+	Expect(unit.Script).ToNot(BeNil())
+
+	result, err := unit.GetScript()
+	Expect(err).To(BeNil())
+	Expect(result).To(Equal("just a test"))
+}
+
+func Test_Middleware_GetScript_DoesNotErrorIfScriptIsNotSet(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	result, err := unit.GetScript()
+	Expect(err).To(BeNil())
+	Expect(result).To(Equal(""))
+}
+
 func Test_Middleware_DeleteScript_WillDeleteScriptAndSetScriptToNil(t *testing.T) {
 	RegisterTestingT(t)
 

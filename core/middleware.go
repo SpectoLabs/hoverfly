@@ -40,6 +40,18 @@ func (this *Middleware) SetScript(scriptContent string) error {
 	return nil
 }
 
+func (this Middleware) GetScript() (string, error) {
+	if this.Script == nil {
+		return "", nil
+	}
+	contents, err := ioutil.ReadFile(this.Script.Name())
+	if err != nil {
+		return "", err
+	}
+
+	return string(contents), nil
+}
+
 func (this *Middleware) DeleteScript() error {
 	if this.Script != nil {
 		err := os.Remove(this.Script.Name())
