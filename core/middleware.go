@@ -52,6 +52,10 @@ func (this *Middleware) DeleteScript() error {
 }
 
 func (this *Middleware) SetBinary(binary string) error {
+	if binary == "" {
+		this.Binary = ""
+		return nil
+	}
 	testCommand := exec.Command(binary)
 	if err := testCommand.Start(); err != nil {
 		return err

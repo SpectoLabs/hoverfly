@@ -234,6 +234,18 @@ func Test_Middleware_SetBinary_DoesNotSetIfCantRun(t *testing.T) {
 	Expect(unit.Binary).To(Equal(""))
 }
 
+func Test_Middleware_SetBinary_SetsStringToEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Binary: "test",
+	}
+
+	err := unit.SetBinary("")
+	Expect(err).To(BeNil())
+	Expect(unit.Binary).To(Equal(""))
+}
+
 func Test_Middleware_SetScript_WritesScriptToFile(t *testing.T) {
 	RegisterTestingT(t)
 
