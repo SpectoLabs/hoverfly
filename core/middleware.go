@@ -19,47 +19,8 @@ type Middleware struct {
 	FullCommand string
 }
 
-// Pipeline - to provide input to the pipeline, assign an io.Reader to the first's Stdin.
-func Pipeline(cmds ...*exec.Cmd) (pipeLineOutput, collectedStandardError []byte, pipeLineError error) {
-	// Require at least one command
-	if len(cmds) < 1 {
-		return nil, nil, nil
-	}
-
-	// Collect the output from the command(s)
-	var output bytes.Buffer
-	var stderr bytes.Buffer
-
-	last := len(cmds) - 1
-	for i, cmd := range cmds[:last] {
-		// Connect each command's stdin to the previous command's stdout
-		var err error
-		if cmds[i+1].Stdin, err = cmd.StdoutPipe(); err != nil {
-			return nil, nil, err
-		}
-		// Connect each command's stderr to a buffer
-		cmd.Stderr = &stderr
-	}
-
-	// Connect the output and error for the last command
-	cmds[last].Stdout, cmds[last].Stderr = &output, &stderr
-
-	// Start each command
-	for _, cmd := range cmds {
-		if err := cmd.Start(); err != nil {
-			return output.Bytes(), stderr.Bytes(), err
-		}
-	}
-
-	// Wait for each command to complete
-	for _, cmd := range cmds {
-		if err := cmd.Wait(); err != nil {
-			return output.Bytes(), stderr.Bytes(), err
-		}
-	}
-
-	// Return the pipeline output and the collected standard error
-	return output.Bytes(), stderr.Bytes(), nil
+func (this Middleware) isLocal() bool {
+	return !strings.HasPrefix(this.FullCommand, "http")
 }
 
 func (this Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
@@ -68,32 +29,20 @@ func (this Middleware) Execute(pair models.RequestResponsePair) (models.RequestR
 	} else {
 		return this.executeMiddlewareRemotely(pair)
 	}
-
 }
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
 func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 
-	mws := strings.Split(this.FullCommand, "|")
 	var cmdList []*exec.Cmd
 
-	for _, v := range mws {
-		commands := strings.Split(strings.TrimSpace(v), " ")
+	commandAndArgs := strings.Split(strings.TrimSpace(this.FullCommand), " ")
 
-		cmd := exec.Command(commands[0], commands[1:]...)
-		cmdList = append(cmdList, cmd)
-	}
+	middlewareCommand := exec.Command(commandAndArgs[0], commandAndArgs[1:]...)
+	cmdList = append(cmdList, middlewareCommand)
 
 	// getting payload
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
-
-	if log.GetLevel() == log.DebugLevel {
-		log.WithFields(log.Fields{
-			"middlewares": mws,
-			"count":       len(mws),
-			"payload":     string(pairViewBytes),
-		}).Debug("preparing to modify payload")
-	}
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -102,59 +51,69 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 		return pair, err
 	}
 
-	//
-	cmdList[0].Stdin = bytes.NewReader(pairViewBytes)
+	if log.GetLevel() == log.DebugLevel {
+		log.WithFields(log.Fields{
+			"middleware": this.FullCommand,
+			"stdin":      string(pairViewBytes),
+		}).Debug("preparing to modify payload")
+	}
 
-	// Run the pipeline
-	mwOutput, stderr, err := Pipeline(cmdList...)
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
 
-	// middleware failed to execute
-	if err != nil {
-		if len(stderr) > 0 {
-			log.WithFields(log.Fields{
-				"sdtderr": string(stderr),
-				"error":   err.Error(),
-			}).Error("Middleware error")
-		} else {
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-			}).Error("Middleware error")
-		}
+	// Redirect standard streams
+	middlewareCommand.Stdin = bytes.NewReader(pairViewBytes)
+	middlewareCommand.Stdout = &stdout
+	middlewareCommand.Stderr = &stderr
+
+	if err := middlewareCommand.Start(); err != nil {
+		log.WithFields(log.Fields{
+			"sdtdout": string(stdout.Bytes()),
+			"sdtderr": string(stderr.Bytes()),
+			"error":   err.Error(),
+		}).Error("Middleware failed to start")
+		return pair, err
+	}
+
+	if err := middlewareCommand.Wait(); err != nil {
+		log.WithFields(log.Fields{
+			"sdtdout": string(stdout.Bytes()),
+			"sdtderr": string(stderr.Bytes()),
+			"error":   err.Error(),
+		}).Error("Middleware failed to stop successfully")
 		return pair, err
 	}
 
 	// log stderr, middleware executed successfully
-	if len(stderr) > 0 {
+	if len(stderr.Bytes()) > 0 {
 		log.WithFields(log.Fields{
-			"sdtderr": string(stderr),
+			"sdtderr": string(stderr.Bytes()),
 		}).Info("Information from middleware")
 	}
 
-	if len(mwOutput) > 0 {
+	if len(stdout.Bytes()) > 0 {
 		var newPairView v2.RequestResponsePairView
 
-		err = json.Unmarshal(mwOutput, &newPairView)
+		err = json.Unmarshal(stdout.Bytes(), &newPairView)
 
 		if err != nil {
 			log.WithFields(log.Fields{
-				"mwOutput": string(mwOutput),
-				"error":    err.Error(),
+				"stdout": string(stdout.Bytes()),
+				"error":  err.Error(),
 			}).Error("Failed to unmarshal JSON from middleware")
 		} else {
 			if log.GetLevel() == log.DebugLevel {
 				log.WithFields(log.Fields{
 					"middleware": this.FullCommand,
-					"count":      len(this.FullCommand),
-					"payload":    string(mwOutput),
+					"payload":    string(stdout.Bytes()),
 				}).Debug("payload after modifications")
 			}
 			// payload unmarshalled into RequestResponsePair struct, returning it
 			return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
 		}
 	} else {
-
 		log.WithFields(log.Fields{
-			"mwOutput": string(mwOutput),
+			"stdout": string(stdout.Bytes()),
 		}).Warn("No response from middleware.")
 	}
 
@@ -204,8 +163,4 @@ func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair
 		return pair, err
 	}
 	return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
-}
-
-func (this Middleware) isLocal() bool {
-	return !strings.HasPrefix(this.FullCommand, "http")
 }
