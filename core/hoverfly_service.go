@@ -122,26 +122,26 @@ func (hf *Hoverfly) SetMiddlewareV2(binary, script string) error {
 		return nil
 	}
 
-	// originalPair := models.RequestResponsePair{
-	// 	Request: models.RequestDetails{
-	// 		Path:        "/",
-	// 		Method:      "GET",
-	// 		Destination: "www.test.com",
-	// 		Scheme:      "",
-	// 		Query:       "",
-	// 		Body:        "",
-	// 		Headers:     map[string][]string{"test_header": []string{"true"}},
-	// 	},
-	// 	Response: models.ResponseDetails{
-	// 		Status:  200,
-	// 		Body:    "ok",
-	// 		Headers: map[string][]string{"test_header": []string{"true"}},
-	// 	},
-	// }
-	// _, err = newMiddleware.executeMiddlewareLocally(originalPair)
-	// if err != nil {
-	// 	return err
-	// }
+	testData := models.RequestResponsePair{
+		Request: models.RequestDetails{
+			Path:        "/",
+			Method:      "GET",
+			Destination: "www.test.com",
+			Scheme:      "",
+			Query:       "",
+			Body:        "",
+			Headers:     map[string][]string{"test_header": []string{"true"}},
+		},
+		Response: models.ResponseDetails{
+			Status:  200,
+			Body:    "ok",
+			Headers: map[string][]string{"test_header": []string{"true"}},
+		},
+	}
+	_, err = newMiddleware.executeMiddlewareLocally(testData)
+	if err != nil {
+		return err
+	}
 
 	hf.Cfg.Middleware = newMiddleware
 	return nil

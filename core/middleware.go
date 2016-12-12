@@ -97,13 +97,14 @@ func (this *Middleware) Execute(pair models.RequestResponsePair) (models.Request
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
 func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-
-	var cmdList []*exec.Cmd
-
-	commandAndArgs := strings.Split(strings.TrimSpace(this.FullCommand), " ")
+	var commandAndArgs []string
+	if this.Binary == "" {
+		commandAndArgs = strings.Split(strings.TrimSpace(this.FullCommand), " ")
+	} else {
+		commandAndArgs = []string{this.Binary, this.Script.Name()}
+	}
 
 	middlewareCommand := exec.Command(commandAndArgs[0], commandAndArgs[1:]...)
-	cmdList = append(cmdList, middlewareCommand)
 
 	// getting payload
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
