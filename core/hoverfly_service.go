@@ -102,6 +102,51 @@ func (hf Hoverfly) SetMiddleware(middleware string) error {
 	return nil
 }
 
+func (hf *Hoverfly) SetMiddlewareV2(binary, script string) error {
+	newMiddleware := Middleware{}
+
+	if binary == "" && script == "" {
+		hf.Cfg.Middleware = newMiddleware
+		return nil
+	} else if binary == "" {
+		return fmt.Errorf("Cannot run script with no binary")
+	}
+
+	err := newMiddleware.SetBinary(binary)
+	if err != nil {
+		return err
+	}
+
+	err = newMiddleware.SetScript(script)
+	if err != nil {
+		return nil
+	}
+
+	// originalPair := models.RequestResponsePair{
+	// 	Request: models.RequestDetails{
+	// 		Path:        "/",
+	// 		Method:      "GET",
+	// 		Destination: "www.test.com",
+	// 		Scheme:      "",
+	// 		Query:       "",
+	// 		Body:        "",
+	// 		Headers:     map[string][]string{"test_header": []string{"true"}},
+	// 	},
+	// 	Response: models.ResponseDetails{
+	// 		Status:  200,
+	// 		Body:    "ok",
+	// 		Headers: map[string][]string{"test_header": []string{"true"}},
+	// 	},
+	// }
+	// _, err = newMiddleware.executeMiddlewareLocally(originalPair)
+	// if err != nil {
+	// 	return err
+	// }
+
+	hf.Cfg.Middleware = newMiddleware
+	return nil
+}
+
 func (hf Hoverfly) GetRequestCacheCount() (int, error) {
 	return hf.RequestCache.RecordsCount()
 }
