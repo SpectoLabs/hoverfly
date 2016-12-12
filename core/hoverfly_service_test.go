@@ -460,3 +460,17 @@ func Test_Hoverfly_SetMiddleware_WontSetMiddlewareIfCannotRunScript(t *testing.T
 	script, _ := unit.Cfg.Middleware.GetScript()
 	Expect(script).To(Equal(""))
 }
+
+func Test_Hoverfly_SetMiddleware_WillSetBinaryWithNoScript(t *testing.T) {
+	RegisterTestingT(t)
+
+	_, unit := testTools(201, `{'message': 'here'}`)
+
+	err := unit.SetMiddlewareV2("cat", "")
+	Expect(err).To(BeNil())
+
+	Expect(unit.Cfg.Middleware.Binary).To(Equal("cat"))
+
+	script, _ := unit.Cfg.Middleware.GetScript()
+	Expect(script).To(Equal(""))
+}
