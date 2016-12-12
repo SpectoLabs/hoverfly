@@ -121,7 +121,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", adminPort)))
 				bytes, _ := ioutil.ReadAll(resp.Body)
-				Expect(string(bytes)).To(Equal(`{"middleware":""}`))
+				Expect(string(bytes)).To(Equal(`{"binary":"","middleware":"","script":""}`))
 			})
 		})
 
@@ -224,7 +224,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				resp = DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", adminPort)))
 				bytes, _ = ioutil.ReadAll(resp.Body)
-				Expect(string(bytes)).To(Equal(`{"middleware":""}`))
+				Expect(string(bytes)).To(Equal(`{"binary":"","middleware":"","script":""}`))
 			})
 		})
 
