@@ -62,6 +62,11 @@ func (hf Hoverfly) GetMiddleware() string {
 	return hf.Cfg.Middleware.FullCommand
 }
 
+func (hf Hoverfly) GetMiddlewareV2() (string, string) {
+	script, _ := hf.Cfg.Middleware.GetScript()
+	return hf.Cfg.Middleware.Binary, script
+}
+
 func (hf Hoverfly) SetMiddleware(middleware string) error {
 	if middleware == "" {
 		hf.Cfg.Middleware.FullCommand = middleware

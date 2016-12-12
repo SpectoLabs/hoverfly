@@ -350,3 +350,36 @@ func TestHoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 	Expect(delays.Data[1].HttpMethod).To(Equal(""))
 	Expect(delays.Data[1].Delay).To(Equal(201))
 }
+
+func Test_Hoverfly_GetMiddleware_ReturnsCorrectValuesFromMiddleware(t *testing.T) {
+	RegisterTestingT(t)
+
+	_, unit := testTools(201, `{'message': 'here'}`)
+	unit.Cfg.Middleware.SetBinary("python")
+	unit.Cfg.Middleware.SetScript("import sys\nprint(sys.stdin.readlines()[0])")
+
+	binary, script := unit.GetMiddlewareV2()
+	Expect(binary).To(Equal("python"))
+	Expect(script).To(Equal("import sys\nprint(sys.stdin.readlines()[0])"))
+}
+
+func Test_Hoverfly_GetMiddleware_ReturnsEmptyStringsWhenNeitherIsSet(t *testing.T) {
+	RegisterTestingT(t)
+
+	_, unit := testTools(201, `{'message': 'here'}`)
+
+	binary, script := unit.GetMiddlewareV2()
+	Expect(binary).To(Equal(""))
+	Expect(script).To(Equal(""))
+}
+
+func Test_Hoverfly_GetMiddleware_ReturnsBinaryIfJustBinarySet(t *testing.T) {
+	RegisterTestingT(t)
+
+	_, unit := testTools(201, `{'message': 'here'}`)
+	unit.Cfg.Middleware.SetBinary("python")
+
+	binary, script := unit.GetMiddlewareV2()
+	Expect(binary).To(Equal("python"))
+	Expect(script).To(Equal(""))
+}
