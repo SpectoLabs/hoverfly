@@ -17,7 +17,9 @@ type UsageView struct {
 }
 
 type MiddlewareView struct {
+	Binary     string `json:"binary"`
 	Middleware string `json:"middleware"`
+	Script     string `json:"script"`
 }
 
 type ModeView struct {

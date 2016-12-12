@@ -403,7 +403,7 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"middleware":""}`)))
+			Expect(modeJson).To(Equal([]byte(`{"binary":"","middleware":"","script":""}`)))
 		})
 	})
 
@@ -416,13 +416,13 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"middleware":"cat"}`)))
+			Expect(modeJson).To(Equal([]byte(`{"binary":"","middleware":"cat","script":""}`)))
 
 			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/middleware")
 			res = DoRequest(req)
 			modeJson, err = ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"middleware":"cat"}`)))
+			Expect(modeJson).To(Equal([]byte(`{"binary":"","middleware":"cat","script":""}`)))
 		})
 
 	})
