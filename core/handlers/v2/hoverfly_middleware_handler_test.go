@@ -4,18 +4,25 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	. "github.com/onsi/gomega"
 )
 
 type HoverflyMiddlewareStub struct {
+	Binary     string
+	Script     string
 	Middleware string
 }
 
 func (this HoverflyMiddlewareStub) GetMiddleware() string {
 	return this.Middleware
+}
+
+func (this HoverflyMiddlewareStub) GetMiddlewareV2() (string, string) {
+	return this.Binary, this.Script
 }
 
 func (this *HoverflyMiddlewareStub) SetMiddleware(middleware string) error {
@@ -30,7 +37,7 @@ func (this *HoverflyMiddlewareStub) SetMiddleware(middleware string) error {
 func TestHoverflyMiddlewareHandlerGetReturnsTheCorrectMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
-	stubHoverfly := &HoverflyMiddlewareStub{Middleware: "test-middleware"}
+	stubHoverfly := &HoverflyMiddlewareStub{Binary: "test", Script: "middleware"}
 	unit := HoverflyMiddlewareHandler{Hoverfly: stubHoverfly}
 
 	request, err := http.NewRequest("GET", "", nil)
@@ -42,7 +49,8 @@ func TestHoverflyMiddlewareHandlerGetReturnsTheCorrectMiddleware(t *testing.T) {
 
 	middlewareView, err := unmarshalMiddlewareView(response.Body)
 	Expect(err).To(BeNil())
-	Expect(middlewareView.Middleware).To(Equal("test-middleware"))
+	Expect(middlewareView.Binary).To(Equal("test"))
+	Expect(middlewareView.Script).To(Equal("middleware"))
 }
 
 func TestHoverflyMiddlewareHandlerPutSetsTheNewMiddlewarendReplacesTheTestMiddleware(t *testing.T) {

@@ -2,15 +2,17 @@ package v2
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
-	"io/ioutil"
-	"net/http"
 )
 
 type HoverflyMiddleware interface {
 	GetMiddleware() string
+	GetMiddlewareV2() (string, string)
 	SetMiddleware(string) error
 }
 
@@ -32,6 +34,7 @@ func (this *HoverflyMiddlewareHandler) RegisterRoutes(mux *bone.Mux, am *handler
 
 func (this *HoverflyMiddlewareHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	var middlewareView MiddlewareView
+	middlewareView.Binary, middlewareView.Script = this.Hoverfly.GetMiddlewareV2()
 	middlewareView.Middleware = this.Hoverfly.GetMiddleware()
 
 	middlewareBytes, _ := json.Marshal(middlewareView)
