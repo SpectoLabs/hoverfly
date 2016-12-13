@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 
@@ -211,9 +212,11 @@ func (r *RequestDetails) concatenate(withHost bool) string {
 		buffer.WriteString(r.Destination)
 	}
 
+	values, _ := url.ParseQuery(r.Query)
+
 	buffer.WriteString(r.Path)
 	buffer.WriteString(r.Method)
-	buffer.WriteString(r.Query)
+	buffer.WriteString(values.Encode())
 	if len(r.Body) > 0 {
 		ct := r.getContentType()
 

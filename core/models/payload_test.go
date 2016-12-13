@@ -544,3 +544,23 @@ func Test_RequestDetails_Hash_TheHashIncludesTheBody(t *testing.T) {
 
 	Expect(hashedUnit).To(Equal("51834bfe5334158be38ef5209f2b8e29"))
 }
+
+func Test_RequestDetails_Hash_QueryParametersCanBeInAnyOrder(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := RequestDetails{
+		Method:      "GET",
+		Scheme:      "http",
+		Destination: "test.com",
+		Path:        "/testing",
+		Query:       "query=true&another=true",
+	}
+
+	hashedUnit := unit.Hash()
+
+	unit.Query = "another=true&query=true"
+
+	differentOrderHash := unit.Hash()
+
+	Expect(hashedUnit).To(Equal(differentOrderHash))
+}
