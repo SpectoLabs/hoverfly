@@ -6,6 +6,12 @@ import (
 	"encoding/base64"
 	"encoding/gob"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"regexp"
+	"strings"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -14,11 +20,6 @@ import (
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"regexp"
-	"strings"
 )
 
 const (
@@ -251,6 +252,7 @@ func (r *RequestDetails) Hash() string {
 	io.WriteString(h, r.concatenate(true))
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
+
 func (r *RequestDetails) HashWithoutHost() string {
 	h := md5.New()
 	io.WriteString(h, r.concatenate(false))
