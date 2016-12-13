@@ -3,13 +3,14 @@ package models
 import (
 	"bytes"
 	"compress/gzip"
+	"io/ioutil"
+	"os"
+	"testing"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
-	"os"
-	"testing"
 )
 
 func TestResponseDetails_ConvertToV1ResponseDetailsView_WithPlainTextResponseDetails(t *testing.T) {
@@ -492,4 +493,74 @@ func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 	Expect(requestDetails.Scheme).To(Equal(*requestDetailsView.Scheme))
 	Expect(requestDetails.Query).To(Equal(*requestDetailsView.Query))
 	Expect(requestDetails.Headers).To(Equal(requestDetailsView.Headers))
+}
+
+func Test_RequestDetails_Hash_ItHashes(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := RequestDetails{
+		Method:      "GET",
+		Scheme:      "http",
+		Destination: "test.com",
+		Path:        "/testing",
+		Query:       "query=true",
+	}
+
+	hashedUnit := unit.Hash()
+
+	Expect(hashedUnit).To(Equal("70c4fd58c2db41298071ea0446af0793"))
+}
+
+func Test_RequestDetails_Hash_TheHashIgnoresHeaders(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := RequestDetails{
+		Method:      "GET",
+		Scheme:      "http",
+		Destination: "test.com",
+		Path:        "/testing",
+		Query:       "query=true",
+		Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
+	}
+
+	hashedUnit := unit.Hash()
+
+	Expect(hashedUnit).To(Equal("70c4fd58c2db41298071ea0446af0793"))
+}
+
+func Test_RequestDetails_Hash_TheHashIncludesTheBody(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := RequestDetails{
+		Method:      "GET",
+		Scheme:      "http",
+		Destination: "test.com",
+		Path:        "/testing",
+		Query:       "query=true",
+		Body:        "tidy text",
+	}
+
+	hashedUnit := unit.Hash()
+
+	Expect(hashedUnit).To(Equal("51834bfe5334158be38ef5209f2b8e29"))
+}
+
+func Test_RequestDetails_Hash_QueryParametersCanBeInAnyOrder(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := RequestDetails{
+		Method:      "GET",
+		Scheme:      "http",
+		Destination: "test.com",
+		Path:        "/testing",
+		Query:       "query=true&another=true",
+	}
+
+	hashedUnit := unit.Hash()
+
+	unit.Query = "another=true&query=true"
+
+	differentOrderHash := unit.Hash()
+
+	Expect(hashedUnit).To(Equal(differentOrderHash))
 }
