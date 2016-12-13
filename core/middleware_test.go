@@ -213,3 +213,188 @@ func Test_Middleware_IsLocal_WithHttpsString(t *testing.T) {
 
 	Expect(unit.isLocal()).To(BeFalse())
 }
+
+func Test_Middleware_SetBinary_SetsBinaryIfItCanRunIt(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetBinary("go")
+	Expect(err).To(BeNil())
+	Expect(unit.Binary).To(Equal("go"))
+}
+
+func Test_Middleware_SetBinary_DoesNotSetIfCantRun(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetBinary("|{}|")
+	Expect(err).ToNot(BeNil())
+	Expect(unit.Binary).To(Equal(""))
+}
+
+func Test_Middleware_SetBinary_SetsStringToEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Binary: "test",
+	}
+
+	err := unit.SetBinary("")
+	Expect(err).To(BeNil())
+	Expect(unit.Binary).To(Equal(""))
+}
+
+func Test_Middleware_SetScript_WritesScriptToFile(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetScript("just a test")
+	Expect(err).To(BeNil())
+	Expect(unit.Script).ToNot(BeNil())
+
+	fileContents, err := ioutil.ReadFile(unit.Script.Name())
+	Expect(err).To(BeNil())
+
+	Expect(string(fileContents)).To(Equal("just a test"))
+}
+
+func Test_Middleware_SetScript_DeletesPreviousScript(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetScript("just a test")
+	Expect(err).To(BeNil())
+	Expect(unit.Script).ToNot(BeNil())
+
+	firstScript := unit.Script
+
+	err = unit.SetScript("just a test 2")
+	Expect(err).To(BeNil())
+	Expect(unit.Script).ToNot(BeNil())
+
+	_, err = ioutil.ReadFile(firstScript.Name())
+	Expect(err).ToNot(BeNil())
+}
+
+func Test_Middleware_GetScript_GetsScript(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetScript("just a test")
+	Expect(err).To(BeNil())
+	Expect(unit.Script).ToNot(BeNil())
+
+	result, err := unit.GetScript()
+	Expect(err).To(BeNil())
+	Expect(result).To(Equal("just a test"))
+}
+
+func Test_Middleware_GetScript_DoesNotErrorIfScriptIsNotSet(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	result, err := unit.GetScript()
+	Expect(err).To(BeNil())
+	Expect(result).To(Equal(""))
+}
+
+func Test_Middleware_DeleteScript_WillDeleteScriptAndSetScriptToNil(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetScript("just a test")
+	Expect(err).To(BeNil())
+
+	firstScript := unit.Script
+
+	err = unit.DeleteScript()
+	Expect(err).To(BeNil())
+	Expect(unit.Script).To(BeNil())
+
+	_, err = ioutil.ReadFile(firstScript.Name())
+	Expect(err).ToNot(BeNil())
+}
+
+func Test_Middleware_DeleteScript_DoesNotErrorIfNoScriptWasSet(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.DeleteScript()
+	Expect(err).To(BeNil())
+}
+
+func Test_Middleware_SetScript_WritesMultiLineStringScriptToFile(t *testing.T) {
+	RegisterTestingT(t)
+
+	script := "#!/usr/bin/env ruby\n" +
+		"# encoding: utf-8\n" +
+		"while payload = STDIN.gets\n" +
+		"next unless payload\n" +
+		"\n" +
+		"STDOUT.puts payload\n" +
+		"\n" +
+		"STDERR.puts \"Payload data: #{payload}\"\n" +
+		"\n" +
+		"end"
+
+	unit := Middleware{}
+
+	err := unit.SetScript(script)
+	Expect(err).To(BeNil())
+	Expect(unit.Script).ToNot(BeNil())
+
+	fileContents, err := ioutil.ReadFile(unit.Script.Name())
+	Expect(err).To(BeNil())
+
+	Expect(string(fileContents)).To(Equal(script))
+}
+
+func Test_Middleware_Execute_RunsMiddlewareCorrectly(t *testing.T) {
+	RegisterTestingT(t)
+
+	binary := "python"
+	script := "#!/usr/bin/env python\n" +
+		"import sys\n" +
+		"import json\n" +
+		"\n" +
+		"def main():\n" +
+		"	data = sys.stdin.readlines()\n" +
+		"	payload = data[0]\n" +
+		"\n" +
+		"	payload_dict = json.loads(payload)\n" +
+		"\n" +
+		"	payload_dict['response']['status'] = 200" +
+		"\n" +
+		"	print(json.dumps(payload_dict))\n" +
+		"\n" +
+		"if __name__ == \"__main__\":\n" +
+		"	main()"
+
+	unit := Middleware{}
+
+	err := unit.SetScript(script)
+	Expect(err).To(BeNil())
+	Expect(unit.Script).ToNot(BeNil())
+
+	err = unit.SetBinary(binary)
+	Expect(err).To(BeNil())
+	Expect(unit.Binary).To(Equal(binary))
+
+	resp := models.ResponseDetails{Status: 0, Body: "original body"}
+	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
+
+	originalPair := models.RequestResponsePair{Response: resp, Request: req}
+
+	resultPair, err := unit.Execute(originalPair)
+	Expect(err).To(BeNil())
+
+	Expect(resultPair.Response.Status).To(Equal(200))
+}

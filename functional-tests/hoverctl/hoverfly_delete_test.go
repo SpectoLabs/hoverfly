@@ -2,15 +2,16 @@ package hoverctl_end_to_end
 
 import (
 	"fmt"
-	"github.com/dghubble/sling"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/dghubble/sling"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/phayes/freeport"
 )
 
 var _ = Describe("When I use hoverctl", func() {
@@ -118,7 +119,7 @@ var _ = Describe("When I use hoverctl", func() {
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Middleware has been deleted from Hoverfly"))
 
-				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/middleware", adminPort)))
+				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", adminPort)))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(Equal(`{"middleware":""}`))
 			})
@@ -221,7 +222,7 @@ var _ = Describe("When I use hoverctl", func() {
 				bytes, _ = ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(ContainSubstring(`{"data":null}`))
 
-				resp = DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/middleware", adminPort)))
+				resp = DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", adminPort)))
 				bytes, _ = ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(Equal(`{"middleware":""}`))
 			})

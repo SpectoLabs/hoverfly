@@ -3,6 +3,7 @@ package hoverfly
 import (
 	"bytes"
 	"encoding/json"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -16,14 +17,77 @@ import (
 )
 
 type Middleware struct {
+	Binary      string
+	Script      *os.File
 	FullCommand string
+}
+
+func (this *Middleware) SetScript(scriptContent string) error {
+	script, err := ioutil.TempFile(os.TempDir(), "hoverfly_")
+	if err != nil {
+		return err
+	}
+
+	_, err = script.Write([]byte(scriptContent))
+	if err != nil {
+		return err
+	}
+
+	this.DeleteScript()
+
+	this.Script = script
+
+	return nil
+}
+
+func (this Middleware) GetScript() (string, error) {
+	if this.Script == nil {
+		return "", nil
+	}
+	contents, err := ioutil.ReadFile(this.Script.Name())
+	if err != nil {
+		return "", err
+	}
+
+	return string(contents), nil
+}
+
+func (this *Middleware) DeleteScript() error {
+	if this.Script != nil {
+		err := os.Remove(this.Script.Name())
+		if err != nil {
+			return err
+		}
+		this.Script = nil
+	}
+	return nil
+}
+
+func (this *Middleware) SetBinary(binary string) error {
+	if binary == "" {
+		this.Binary = ""
+		return nil
+	}
+	testCommand := exec.Command(binary)
+	if err := testCommand.Start(); err != nil {
+		return err
+	}
+
+	testCommand.Process.Kill()
+
+	this.Binary = binary
+	return nil
 }
 
 func (this Middleware) isLocal() bool {
 	return !strings.HasPrefix(this.FullCommand, "http")
 }
 
-func (this Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+func (this *Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+	if this.Binary != "" && this.Script != nil {
+		this.FullCommand = this.Binary + " " + this.Script.Name()
+	}
+
 	if this.isLocal() {
 		return this.executeMiddlewareLocally(pair)
 	} else {
@@ -33,13 +97,14 @@ func (this Middleware) Execute(pair models.RequestResponsePair) (models.RequestR
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
 func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-
-	var cmdList []*exec.Cmd
-
-	commandAndArgs := strings.Split(strings.TrimSpace(this.FullCommand), " ")
+	var commandAndArgs []string
+	if this.Binary == "" {
+		commandAndArgs = strings.Split(strings.TrimSpace(this.FullCommand), " ")
+	} else {
+		commandAndArgs = []string{this.Binary, this.Script.Name()}
+	}
 
 	middlewareCommand := exec.Command(commandAndArgs[0], commandAndArgs[1:]...)
-	cmdList = append(cmdList, middlewareCommand)
 
 	// getting payload
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())

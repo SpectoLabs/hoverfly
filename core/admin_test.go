@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 )
@@ -449,7 +450,7 @@ func TestGetMiddleware(t *testing.T) {
 	m := adminApi.getBoneRouter(dbClient)
 
 	dbClient.Cfg.Middleware.FullCommand = "python middleware_test.py"
-	req, err := http.NewRequest("GET", "/api/middleware", nil)
+	req, err := http.NewRequest("GET", "/api/v2/hoverfly/middleware", nil)
 	Expect(err).To(BeNil())
 
 	rec := httptest.NewRecorder()
@@ -482,7 +483,7 @@ func TestSetMiddleware_WithValidMiddleware(t *testing.T) {
 	middlewareReqBytes, err := json.Marshal(&middlewareReq)
 	Expect(err).To(BeNil())
 
-	req, err := http.NewRequest("POST", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(middlewareReqBytes)))
+	req, err := http.NewRequest("PUT", "/api/v2/hoverfly/middleware", ioutil.NopCloser(bytes.NewBuffer(middlewareReqBytes)))
 	Expect(err).To(BeNil())
 
 	rec := httptest.NewRecorder()
@@ -516,20 +517,20 @@ func TestSetMiddleware_WithInvalidMiddleware(t *testing.T) {
 	middlewareReqBytes, err := json.Marshal(&middlewareReq)
 	Expect(err).To(BeNil())
 
-	req, err := http.NewRequest("POST", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(middlewareReqBytes)))
+	req, err := http.NewRequest("PUT", "/api/v2/hoverfly/middleware", ioutil.NopCloser(bytes.NewBuffer(middlewareReqBytes)))
 	Expect(err).To(BeNil())
 
 	rec := httptest.NewRecorder()
 	m.ServeHTTP(rec, req)
-	Expect(rec.Code).To(Equal(http.StatusBadRequest))
+	Expect(rec.Code).To(Equal(http.StatusUnprocessableEntity))
 
 	body, err := ioutil.ReadAll(rec.Body)
 	Expect(err).To(BeNil())
 
-	middlewareResp := v1.MiddlewareSchema{}
+	middlewareResp := v2.MiddlewareView{}
 	err = json.Unmarshal(body, &middlewareResp)
 
-	Expect(err).ToNot(BeNil())
+	Expect(err).To(BeNil())
 	Expect(string(body)).To(ContainSubstring("Invalid middleware"))
 
 	Expect(dbClient.Cfg.Middleware.FullCommand).To(Equal("python examples/middleware/modify_request/modify_request.py"))
@@ -551,7 +552,7 @@ func TestSetMiddleware_WithEmptyMiddleware(t *testing.T) {
 	middlewareReqBytes, err := json.Marshal(&middlewareReq)
 	Expect(err).To(BeNil())
 
-	req, err := http.NewRequest("POST", "/api/middleware", ioutil.NopCloser(bytes.NewBuffer(middlewareReqBytes)))
+	req, err := http.NewRequest("PUT", "/api/v2/hoverfly/middleware", ioutil.NopCloser(bytes.NewBuffer(middlewareReqBytes)))
 	Expect(err).To(BeNil())
 
 	rec := httptest.NewRecorder()

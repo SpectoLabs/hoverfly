@@ -62,6 +62,11 @@ func (hf Hoverfly) GetMiddleware() string {
 	return hf.Cfg.Middleware.FullCommand
 }
 
+func (hf Hoverfly) GetMiddlewareV2() (string, string) {
+	script, _ := hf.Cfg.Middleware.GetScript()
+	return hf.Cfg.Middleware.Binary, script
+}
+
 func (hf Hoverfly) SetMiddleware(middleware string) error {
 	if middleware == "" {
 		hf.Cfg.Middleware.FullCommand = middleware
@@ -83,18 +88,62 @@ func (hf Hoverfly) SetMiddleware(middleware string) error {
 			Headers: map[string][]string{"test_header": []string{"true"}},
 		},
 	}
-	c := NewConstructor(nil, originalPair)
 
 	middlewareObject := &Middleware{
 		FullCommand: middleware,
 	}
 
-	err := c.ApplyMiddleware(middlewareObject)
+	_, err := middlewareObject.executeMiddlewareLocally(originalPair)
 	if err != nil {
 		return err
 	}
 
 	hf.Cfg.Middleware.FullCommand = middleware
+	return nil
+}
+
+func (hf *Hoverfly) SetMiddlewareV2(binary, script string) error {
+	newMiddleware := Middleware{}
+
+	if binary == "" && script == "" {
+		hf.Cfg.Middleware = newMiddleware
+		return nil
+	} else if binary == "" {
+		return fmt.Errorf("Cannot run script with no binary")
+	}
+
+	err := newMiddleware.SetBinary(binary)
+	if err != nil {
+		return err
+	}
+
+	err = newMiddleware.SetScript(script)
+	if err != nil {
+		return nil
+	}
+
+	testData := models.RequestResponsePair{
+		Request: models.RequestDetails{
+			Path:        "/",
+			Method:      "GET",
+			Destination: "www.test.com",
+			Scheme:      "",
+			Query:       "",
+			Body:        "",
+			Headers:     map[string][]string{"test_header": []string{"true"}},
+		},
+		Response: models.ResponseDetails{
+			Status:  200,
+			Body:    "ok",
+			Headers: map[string][]string{"test_header": []string{"true"}},
+		},
+	}
+	_, err = newMiddleware.executeMiddlewareLocally(testData)
+	if err != nil {
+		return err
+	}
+
+	hf.Cfg.Middleware = newMiddleware
 	return nil
 }
 
