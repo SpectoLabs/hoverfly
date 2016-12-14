@@ -126,10 +126,9 @@ More information on proxy settings:
 -  `Java Networking and
    Proxies <https://docs.oracle.com/javase/6/docs/technotes/guides/net/proxies.html>`__
 
-Contents:
-
 .. toctree::
    :maxdepth: 2
+   :hidden:
 
    introduction/introduction
    usage/usage
