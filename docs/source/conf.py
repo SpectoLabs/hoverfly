@@ -50,8 +50,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'hoverfly'
-copyright = u'2016, Tom'
-author = u'Tom'
+copyright = u'2016, SpectoLabs Ltd'
+author = u'SpectoLabs Ltd'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
