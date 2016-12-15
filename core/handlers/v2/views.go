@@ -20,6 +20,7 @@ type MiddlewareView struct {
 	Binary     string `json:"binary"`
 	Middleware string `json:"middleware"`
 	Script     string `json:"script"`
+	Remote     string `json:"remote"`
 }
 
 type ModeView struct {

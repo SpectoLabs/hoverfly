@@ -62,9 +62,9 @@ func (hf Hoverfly) GetMiddleware() string {
 	return hf.Cfg.Middleware.FullCommand
 }
 
-func (hf Hoverfly) GetMiddlewareV2() (string, string) {
+func (hf Hoverfly) GetMiddlewareV2() (string, string, string) {
 	script, _ := hf.Cfg.Middleware.GetScript()
-	return hf.Cfg.Middleware.Binary, script
+	return hf.Cfg.Middleware.Binary, script, hf.Cfg.Middleware.Remote
 }
 
 func (hf Hoverfly) SetMiddleware(middleware string) error {
