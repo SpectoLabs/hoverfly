@@ -15,14 +15,15 @@ type HoverflyMiddlewareStub struct {
 	Binary     string
 	Script     string
 	Middleware string
+	Remote     string
 }
 
 func (this HoverflyMiddlewareStub) GetMiddleware() string {
 	return this.Middleware
 }
 
-func (this HoverflyMiddlewareStub) GetMiddlewareV2() (string, string) {
-	return this.Binary, this.Script
+func (this HoverflyMiddlewareStub) GetMiddlewareV2() (string, string, string) {
+	return this.Binary, this.Script, this.Remote
 }
 
 func (this *HoverflyMiddlewareStub) SetMiddleware(middleware string) error {
@@ -37,7 +38,12 @@ func (this *HoverflyMiddlewareStub) SetMiddleware(middleware string) error {
 func TestHoverflyMiddlewareHandlerGetReturnsTheCorrectMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
-	stubHoverfly := &HoverflyMiddlewareStub{Binary: "test", Script: "middleware"}
+	stubHoverfly := &HoverflyMiddlewareStub{
+		Binary: "test",
+		Script: "middleware",
+		Remote: "remote",
+	}
+
 	unit := HoverflyMiddlewareHandler{Hoverfly: stubHoverfly}
 
 	request, err := http.NewRequest("GET", "", nil)
@@ -51,6 +57,7 @@ func TestHoverflyMiddlewareHandlerGetReturnsTheCorrectMiddleware(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(middlewareView.Binary).To(Equal("test"))
 	Expect(middlewareView.Script).To(Equal("middleware"))
+	Expect(middlewareView.Remote).To(Equal("remote"))
 }
 
 func TestHoverflyMiddlewareHandlerPutSetsTheNewMiddlewarendReplacesTheTestMiddleware(t *testing.T) {
