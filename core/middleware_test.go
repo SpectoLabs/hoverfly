@@ -14,6 +14,55 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+var (
+	pythonModifyResponse = "#!/usr/bin/env python\n" +
+		"import sys\n" +
+		"import json\n" +
+
+		"def main():\n" +
+		"	data = sys.stdin.readlines()\n" +
+		"	payload = data[0]\n" +
+
+		"	payload_dict = json.loads(payload)\n" +
+
+		"	payload_dict['response']['status'] = 201\n" +
+		"	payload_dict['response']['body'] = \"body was replaced by middleware\"\n" +
+
+		"	print(json.dumps(payload_dict))\n" +
+
+		"if __name__ == \"__main__\":\n" +
+		"	main()\n"
+
+	pythonReflectBody = "#!/usr/bin/env python\n" +
+		"import sys\n" +
+		"import json\n" +
+
+		"def main():\n" +
+		"	data = sys.stdin.readlines()\n" +
+		"	payload = data[0]\n" +
+
+		"	payload_dict = json.loads(payload)\n" +
+
+		"	payload_dict['response']['status'] = 201\n" +
+		"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
+
+		"	print(json.dumps(payload_dict))\n" +
+
+		"if __name__ == \"__main__\":\n" +
+		"	main()\n"
+
+	rubyEcho = "#!/usr/bin/env ruby\n" +
+		"# encoding: utf-8\n" +
+		"while payload = STDIN.gets\n" +
+		"next unless payload\n" +
+		"\n" +
+		"STDOUT.puts payload\n" +
+		"\n" +
+		"STDERR.puts \"Payload data: #{payload}\"\n" +
+		"\n" +
+		"end"
+)
+
 func TestChangeBodyMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -22,14 +71,18 @@ func TestChangeBodyMiddleware(t *testing.T) {
 
 	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
-	unit := &Middleware{
-		FullCommand: "./examples/middleware/modify_response/modify_response.py",
-	}
+	unit := &Middleware{}
+
+	err := unit.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = unit.SetScript(pythonModifyResponse)
+	Expect(err).To(BeNil())
 
 	newPair, err := unit.executeMiddlewareLocally(originalPair)
 
 	Expect(err).To(BeNil())
-	Expect(newPair.Response.Body).To(Equal("body was replaced by middleware\n"))
+	Expect(newPair.Response.Body).To(Equal("body was replaced by middleware"))
 }
 
 func TestMalformedRequestResponsePairWithMiddleware(t *testing.T) {
@@ -40,34 +93,18 @@ func TestMalformedRequestResponsePairWithMiddleware(t *testing.T) {
 
 	malformedPair := models.RequestResponsePair{Response: resp, Request: req}
 
-	unit := &Middleware{
-		FullCommand: "./examples/middleware/ruby_echo/echo.rb",
-	}
+	unit := &Middleware{}
+
+	err := unit.SetBinary("ruby")
+	Expect(err).To(BeNil())
+
+	err = unit.SetScript(rubyEcho)
+	Expect(err).To(BeNil())
 
 	newPair, err := unit.executeMiddlewareLocally(malformedPair)
 
 	Expect(err).To(BeNil())
 	Expect(newPair.Response.Body).To(Equal("original body"))
-}
-
-func TestMakeCustom404(t *testing.T) {
-	RegisterTestingT(t)
-
-	resp := models.ResponseDetails{Status: 201, Body: "original body"}
-	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
-
-	originalPair := models.RequestResponsePair{Response: resp, Request: req}
-
-	unit := &Middleware{
-		FullCommand: "go run ./examples/middleware/go_example/change_to_custom_404.go",
-	}
-
-	newPair, err := unit.executeMiddlewareLocally(originalPair)
-
-	Expect(err).To(BeNil())
-	Expect(newPair.Response.Body).To(Equal("Custom body here"))
-	Expect(newPair.Response.Status).To(Equal(http.StatusNotFound))
-	Expect(newPair.Response.Headers["middleware"][0]).To(Equal("changed response"))
 }
 
 func TestReflectBody(t *testing.T) {
@@ -77,9 +114,13 @@ func TestReflectBody(t *testing.T) {
 
 	originalPair := models.RequestResponsePair{Request: req}
 
-	unit := &Middleware{
-		FullCommand: "./examples/middleware/reflect_body/reflect_body.py",
-	}
+	unit := &Middleware{}
+
+	err := unit.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = unit.SetScript(pythonReflectBody)
+	Expect(err).To(BeNil())
 
 	newPair, err := unit.executeMiddlewareLocally(originalPair)
 
@@ -124,9 +165,10 @@ func TestExecuteMiddlewareRemotely(t *testing.T) {
 		},
 	}
 
-	unit := &Middleware{
-		FullCommand: server.URL + "/process",
-	}
+	unit := &Middleware{}
+
+	err := unit.SetRemote(server.URL + "/process")
+	Expect(err).To(BeNil())
 
 	newPair, err := unit.executeMiddlewareRemotely(originalPair)
 	Expect(err).To(BeNil())
@@ -149,9 +191,10 @@ func Test_Middleware_executeMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSa
 		},
 	}
 
-	unit := &Middleware{
-		FullCommand: server.URL + "/process",
-	}
+	unit := &Middleware{}
+
+	err := unit.SetRemote(server.URL + "/process")
+	Expect(err).ToNot(BeNil())
 
 	newPair, err := unit.executeMiddlewareRemotely(originalPair)
 	Expect(err).ToNot(BeNil())
@@ -174,9 +217,10 @@ func Test_Middleware_executeMiddlewareRemotely_ReturnsErrorIfNoRequestResponsePa
 		},
 	}
 
-	unit := &Middleware{
-		FullCommand: server.URL + "/process",
-	}
+	unit := &Middleware{}
+
+	err := unit.SetRemote(server.URL + "/process")
+	Expect(err).To(BeNil())
 
 	untouchedPair, err := unit.executeMiddlewareRemotely(originalPair)
 	Expect(err).ToNot(BeNil())
@@ -335,27 +379,16 @@ func Test_Middleware_DeleteScript_DoesNotErrorIfNoScriptWasSet(t *testing.T) {
 func Test_Middleware_SetScript_WritesMultiLineStringScriptToFile(t *testing.T) {
 	RegisterTestingT(t)
 
-	script := "#!/usr/bin/env ruby\n" +
-		"# encoding: utf-8\n" +
-		"while payload = STDIN.gets\n" +
-		"next unless payload\n" +
-		"\n" +
-		"STDOUT.puts payload\n" +
-		"\n" +
-		"STDERR.puts \"Payload data: #{payload}\"\n" +
-		"\n" +
-		"end"
-
 	unit := Middleware{}
 
-	err := unit.SetScript(script)
+	err := unit.SetScript(rubyEcho)
 	Expect(err).To(BeNil())
 	Expect(unit.Script).ToNot(BeNil())
 
 	fileContents, err := ioutil.ReadFile(unit.Script.Name())
 	Expect(err).To(BeNil())
 
-	Expect(string(fileContents)).To(Equal(script))
+	Expect(string(fileContents)).To(Equal(rubyEcho))
 }
 
 func Test_Middleware_Execute_RunsMiddlewareCorrectly(t *testing.T) {
