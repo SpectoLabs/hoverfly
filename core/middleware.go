@@ -11,6 +11,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"fmt"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -19,6 +21,7 @@ import (
 type Middleware struct {
 	Binary      string
 	Script      *os.File
+	Remote      string
 	FullCommand string
 }
 
@@ -76,6 +79,15 @@ func (this *Middleware) SetBinary(binary string) error {
 	testCommand.Process.Kill()
 
 	this.Binary = binary
+	return nil
+}
+
+func (this *Middleware) SetRemote(remoteUrl string) error {
+	response, err := http.Post(remoteUrl, "", nil)
+	if err != nil || response.StatusCode != 200 {
+		return fmt.Errorf("Could not reach remote middleware")
+	}
+	this.Remote = remoteUrl
 	return nil
 }
 

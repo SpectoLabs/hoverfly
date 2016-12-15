@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/gomega"
@@ -398,3 +399,69 @@ func Test_Middleware_Execute_RunsMiddlewareCorrectly(t *testing.T) {
 
 	Expect(resultPair.Response.Status).To(Equal(200))
 }
+
+func Test_Middleware_SetRemote_CanSetRemote(t *testing.T) {
+	RegisterTestingT(t)
+
+	remoteMiddleware := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := ioutil.ReadAll(r.Body)
+		var newPairView v2.RequestResponsePairView
+
+		json.Unmarshal(body, &newPairView)
+
+		newPairView.Response.Body = "modified body"
+
+		pairViewBytes, _ := json.Marshal(newPairView)
+		w.Write(pairViewBytes)
+	}))
+	defer remoteMiddleware.Close()
+
+	unit := Middleware{}
+
+	err := unit.SetRemote(remoteMiddleware.URL)
+	Expect(err).To(BeNil())
+
+	Expect(unit.Remote).To(Equal(remoteMiddleware.URL))
+}
+
+func Test_Middleware_SetRemote_WontSetRemoteIfRemoteDoesntExist(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetRemote("http://www.specto.io/madeupmiddlewareendpoint")
+	Expect(err).ToNot(BeNil())
+
+	Expect(unit.Remote).To(Equal(""))
+}
+
+// func Test_Middleware_Execute_RunsRemoteMiddlewareCorrectly(t *testing.T) {
+// 	RegisterTestingT(t)
+
+// 	middlewareServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		body, _ := ioutil.ReadAll(r.Body)
+// 		var newPairView v2.RequestResponsePairView
+
+// 		json.Unmarshal(body, &newPairView)
+
+// 		newPairView.Response.Body = "modified body"
+
+// 		pairViewBytes, _ := json.Marshal(newPairView)
+// 		w.Write(pairViewBytes)
+// 	}))
+// 	defer middlewareServer.Close()
+
+// 	unit := Middleware{}
+// 	err := unit.SetRemote(middlewareServer.URL)
+// 	Expect(err).To(BeNil())
+
+// 	resp := models.ResponseDetails{Status: 0, Body: "original body"}
+// 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
+
+// 	originalPair := models.RequestResponsePair{Response: resp, Request: req}
+
+// 	resultPair, err := unit.Execute(originalPair)
+// 	Expect(err).To(BeNil())
+
+// 	Expect(resultPair.Response.Body).To(Equal("modified body"))
+// }
