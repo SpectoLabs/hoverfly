@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestSynthesizeResponse(t *testing.T) {
+func Test_SynthesizeResponse_WorksWhenGivenMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
@@ -17,9 +17,29 @@ func TestSynthesizeResponse(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	middleware := &Middleware{
-		FullCommand: "./examples/middleware/synthetic_service/synthetic.py",
-	}
+	middleware := &Middleware{}
+
+	err = middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = middleware.SetScript("#!/usr/bin/env python\n" +
+		"import sys\n" +
+		"import json\n" +
+		"\n" +
+		"def main():\n" +
+		"	data = sys.stdin.readlines()\n" +
+		"	payload = data[0]\n" +
+		"\n" +
+		"	payload_dict = json.loads(payload)\n" +
+		"\n" +
+		"	payload_dict['response']['status'] = 200" +
+		"\n" +
+		"	print(json.dumps(payload_dict))\n" +
+		"\n" +
+		"if __name__ == \"__main__\":\n" +
+		"	main()")
+
+	Expect(err).To(BeNil())
 
 	sr, err := SynthesizeResponse(req, requestDetails, middleware)
 	Expect(err).To(BeNil())
@@ -27,7 +47,7 @@ func TestSynthesizeResponse(t *testing.T) {
 	Expect(sr.StatusCode).To(Equal(http.StatusOK))
 }
 
-func TestSynthesizeResponseWOMiddleware(t *testing.T) {
+func Test_SynthesizeResponse_WithoutProperlyConfiguredMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
@@ -44,7 +64,7 @@ func TestSynthesizeResponseWOMiddleware(t *testing.T) {
 	Expect(err).To(MatchError("Synthesize failed, middleware not provided"))
 }
 
-func TestSynthesizeMiddlewareFailure(t *testing.T) {
+func Test_SynthesizeResponse_MiddlewareFailure(t *testing.T) {
 	RegisterTestingT(t)
 
 	req, err := http.NewRequest("GET", "http://example.com", nil)
@@ -54,7 +74,7 @@ func TestSynthesizeMiddlewareFailure(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	middleware := &Middleware{
-		FullCommand: "./examples/middleware/this_is_not_there.py",
+		Script: nil,
 	}
 
 	_, err = SynthesizeResponse(req, requestDetails, middleware)
