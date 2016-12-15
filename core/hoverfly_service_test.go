@@ -358,9 +358,10 @@ func Test_Hoverfly_GetMiddleware_ReturnsCorrectValuesFromMiddleware(t *testing.T
 	unit.Cfg.Middleware.SetBinary("python")
 	unit.Cfg.Middleware.SetScript("import sys\nprint(sys.stdin.readlines()[0])")
 
-	binary, script := unit.GetMiddlewareV2()
+	binary, script, remote := unit.GetMiddlewareV2()
 	Expect(binary).To(Equal("python"))
 	Expect(script).To(Equal("import sys\nprint(sys.stdin.readlines()[0])"))
+	Expect(remote).To(Equal(""))
 }
 
 func Test_Hoverfly_GetMiddleware_ReturnsEmptyStringsWhenNeitherIsSet(t *testing.T) {
@@ -368,9 +369,10 @@ func Test_Hoverfly_GetMiddleware_ReturnsEmptyStringsWhenNeitherIsSet(t *testing.
 
 	_, unit := testTools(201, `{'message': 'here'}`)
 
-	binary, script := unit.GetMiddlewareV2()
+	binary, script, remote := unit.GetMiddlewareV2()
 	Expect(binary).To(Equal(""))
 	Expect(script).To(Equal(""))
+	Expect(remote).To(Equal(""))
 }
 
 func Test_Hoverfly_GetMiddleware_ReturnsBinaryIfJustBinarySet(t *testing.T) {
@@ -379,9 +381,22 @@ func Test_Hoverfly_GetMiddleware_ReturnsBinaryIfJustBinarySet(t *testing.T) {
 	_, unit := testTools(201, `{'message': 'here'}`)
 	unit.Cfg.Middleware.SetBinary("python")
 
-	binary, script := unit.GetMiddlewareV2()
+	binary, script, remote := unit.GetMiddlewareV2()
 	Expect(binary).To(Equal("python"))
 	Expect(script).To(Equal(""))
+	Expect(remote).To(Equal(""))
+}
+
+func Test_Hoverfly_GetMiddleware_ReturnsRemotefJustRemoteSet(t *testing.T) {
+	RegisterTestingT(t)
+
+	_, unit := testTools(201, `{'message': 'here'}`)
+	unit.Cfg.Middleware.Remote = "test.com"
+
+	binary, script, remote := unit.GetMiddlewareV2()
+	Expect(binary).To(Equal(""))
+	Expect(script).To(Equal(""))
+	Expect(remote).To(Equal("test.com"))
 }
 
 func Test_Hoverfly_SetMiddleware_CanSetBinaryAndScript(t *testing.T) {
