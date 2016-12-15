@@ -1,5 +1,3 @@
-.. figure:: logo-large.png
-   :alt: Hoverfly logo
 
 What is Hoverfly?
 -----------------
@@ -126,11 +124,10 @@ More information on proxy settings:
 -  `Java Networking and
    Proxies <https://docs.oracle.com/javase/6/docs/technotes/guides/net/proxies.html>`__
 
-.. toctree::
-   :maxdepth: 2
-   :hidden:
+ .. toctree::
+    :maxdepth: 1
+    :hidden:
 
-   introduction/introduction
-   usage/usage
-   reference/reference
-
+    introduction
+    usage
+    reference
