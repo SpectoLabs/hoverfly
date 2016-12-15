@@ -208,7 +208,7 @@ html_static_path = ['alabaster/static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'hoverflydoc'
 
-html_sidebars = { '**': ['about.html', 'navigation.html', 'sourcelink.html', 'searchbox.html'], }
+html_sidebars = { '**': ['about.html', 'navigation.html', 'searchbox.html'], }
 
 
 # -- Options for LaTeX output ---------------------------------------------
