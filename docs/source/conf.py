@@ -49,9 +49,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'hoverfly'
+project = u'Hoverfly'
 copyright = u'2016, SpectoLabs Ltd'
-author = u'SpectoLabs Ltd'
+author = u'SpectoLabs'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -113,10 +113,8 @@ todo_include_todos = True
 # a list of builtin themes.
 # html_theme = 'alabaster'
 
-if 'READTHEDOCS' not in os.environ:
-    import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme = 'alabaster'
+html_theme_path = ['.']
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -135,7 +133,7 @@ if 'READTHEDOCS' not in os.environ:
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "logo.png"
+html_logo = "logo-large.png"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -145,7 +143,7 @@ html_favicon = "favicon-16x16.png"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ['alabaster/static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -209,6 +207,9 @@ html_static_path = ['_static']
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'hoverflydoc'
+
+html_sidebars = { '**': ['about.html', 'navigation.html', 'sourcelink.html', 'searchbox.html'], }
+
 
 # -- Options for LaTeX output ---------------------------------------------
 
