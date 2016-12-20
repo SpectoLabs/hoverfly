@@ -468,6 +468,17 @@ func Test_Middleware_SetRemote_WontSetRemoteIfRemoteDoesntExist(t *testing.T) {
 	Expect(unit.Remote).To(Equal(""))
 }
 
+func Test_Middleware_SetRemote_CanBeSetToEmptyStringWithoutError(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetRemote("")
+	Expect(err).To(BeNil())
+
+	Expect(unit.Remote).To(Equal(""))
+}
+
 // This test is relevant, but is broken for now, it shall be uncommented soon
 // func Test_Middleware_Execute_RunsRemoteMiddlewareCorrectly(t *testing.T) {
 // 	RegisterTestingT(t)

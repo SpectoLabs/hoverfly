@@ -83,6 +83,11 @@ func (this *Middleware) SetBinary(binary string) error {
 }
 
 func (this *Middleware) SetRemote(remoteUrl string) error {
+	if remoteUrl == "" {
+		this.Remote = ""
+		return nil
+	}
+
 	response, err := http.Post(remoteUrl, "", nil)
 	if err != nil || response.StatusCode != 200 {
 		return fmt.Errorf("Could not reach remote middleware")
