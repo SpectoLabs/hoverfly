@@ -102,13 +102,15 @@ func (hf Hoverfly) SetMiddleware(middleware string) error {
 	return nil
 }
 
-func (hf *Hoverfly) SetMiddlewareV2(binary, script string) error {
+func (hf *Hoverfly) SetMiddlewareV2(binary, script, remote string) error {
 	newMiddleware := Middleware{}
 
-	if binary == "" && script == "" {
+	if binary == "" && script == "" && remote == "" {
 		hf.Cfg.Middleware = newMiddleware
 		return nil
-	} else if binary == "" {
+	}
+
+	if binary == "" && script != "" {
 		return fmt.Errorf("Cannot run script with no binary")
 	}
 
@@ -120,6 +122,11 @@ func (hf *Hoverfly) SetMiddlewareV2(binary, script string) error {
 	err = newMiddleware.SetScript(script)
 	if err != nil {
 		return nil
+	}
+
+	err = newMiddleware.SetRemote(remote)
+	if err != nil {
+		return err
 	}
 
 	testData := models.RequestResponsePair{
