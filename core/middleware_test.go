@@ -468,6 +468,17 @@ func Test_Middleware_SetRemote_WontSetRemoteIfRemoteDoesntExist(t *testing.T) {
 	Expect(unit.Remote).To(Equal(""))
 }
 
+func Test_Middleware_SetRemote_WontSetRemoteIfCouldNeverExist(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.SetRemote("[]somemadeupwebsite*&*^&$%^")
+	Expect(err).ToNot(BeNil())
+
+	Expect(unit.Remote).To(Equal(""))
+}
+
 func Test_Middleware_SetRemote_CanBeSetToEmptyStringWithoutError(t *testing.T) {
 	RegisterTestingT(t)
 
