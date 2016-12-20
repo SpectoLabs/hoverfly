@@ -93,7 +93,7 @@ func (hf Hoverfly) SetMiddleware(middleware string) error {
 		FullCommand: middleware,
 	}
 
-	_, err := middlewareObject.executeMiddlewareLocally(originalPair)
+	_, err := middlewareObject.Execute(originalPair)
 	if err != nil {
 		return err
 	}
@@ -138,7 +138,7 @@ func (hf *Hoverfly) SetMiddlewareV2(binary, script string) error {
 			Headers: map[string][]string{"test_header": []string{"true"}},
 		},
 	}
-	_, err = newMiddleware.executeMiddlewareLocally(testData)
+	_, err = newMiddleware.Execute(testData)
 	if err != nil {
 		return err
 	}
