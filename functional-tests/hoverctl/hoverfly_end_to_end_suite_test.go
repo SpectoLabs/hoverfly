@@ -15,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -102,14 +103,18 @@ func startHoverfly(adminPort, proxyPort int, workingDir string) *exec.Cmd {
 	return hoverflyCmd
 }
 
-func startHoverflyWithMiddleware(adminPort, proxyPort int, workingDir, middleware string) *exec.Cmd {
+func startHoverflyWithMiddleware(adminPort, proxyPort int, workingDir, binary, script string) *exec.Cmd {
 	hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
-	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-db", "memory", "-middleware", middleware)
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-db", "memory")
 
 	err := hoverflyCmd.Start()
 
 	binaryErrorCheck(err, hoverflyBinaryUri)
 	healthcheck(adminPort)
+
+	request := sling.New().Put(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", adminPort)).BodyJSON(v2.MiddlewareView{Binary: binary, Script: script})
+
+	DoRequest(request)
 
 	return hoverflyCmd
 }
