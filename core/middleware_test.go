@@ -51,6 +51,8 @@ var (
 		"if __name__ == \"__main__\":\n" +
 		"	main()\n"
 
+	pythonMiddlewareBad = "this shouldn't work"
+
 	rubyEcho = "#!/usr/bin/env ruby\n" +
 		"# encoding: utf-8\n" +
 		"while payload = STDIN.gets\n" +
