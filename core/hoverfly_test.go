@@ -104,7 +104,11 @@ func TestProcessSynthesizeRequest(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 
 	// getting reflect middleware
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/reflect_body/reflect_body.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript(pythonReflectBody)
+	Expect(err).To(BeNil())
 
 	bodyBytes := []byte("request_body_here")
 
@@ -115,7 +119,7 @@ func TestProcessSynthesizeRequest(t *testing.T) {
 	newResp := dbClient.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
-	Expect(newResp.StatusCode).To(Equal(http.StatusOK))
+	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 	b, err := ioutil.ReadAll(newResp.Body)
 	Expect(err).To(BeNil())
 	Expect(string(b)).To(Equal(string(bodyBytes)))
@@ -127,8 +131,11 @@ func TestProcessModifyRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	// getting reflect middleware
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_request/modify_request.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript(pythonModifyResponse)
+	Expect(err).To(BeNil())
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
@@ -138,7 +145,7 @@ func TestProcessModifyRequest(t *testing.T) {
 
 	Expect(newResp).ToNot(BeNil())
 
-	Expect(newResp.StatusCode).To(Equal(http.StatusAccepted))
+	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 }
 
 func TestURLToStringWorksAsExpected(t *testing.T) {
@@ -254,8 +261,11 @@ func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
-	// getting reflect middleware
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/reflect_body/reflect_body.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript(pythonReflectBody)
+	Expect(err).To(BeNil())
 
 	bodyBytes := []byte("request_body_here")
 
@@ -268,7 +278,7 @@ func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	newResp := dbClient.processRequest(r)
 
-	Expect(newResp.StatusCode).To(Equal(http.StatusOK))
+	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
 	Expect(stub.gotDelays).To(Equal(1))
 }
@@ -280,8 +290,11 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
-	// getting reflect middleware
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/reflect_body/no_exist.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript(pythonMiddlewareBad)
+	Expect(err).To(BeNil())
 
 	bodyBytes := []byte("request_body_here")
 
@@ -299,14 +312,17 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 	Expect(stub.gotDelays).To(Equal(0))
 }
 
-func TestDelayAppliedToModifyRequest(t *testing.T) {
+func TestDelayAppliedToSuccessfulMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	// getting reflect middleware
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_request/modify_request.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript(pythonModifyResponse)
+	Expect(err).To(BeNil())
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
@@ -317,7 +333,7 @@ func TestDelayAppliedToModifyRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	newResp := dbClient.processRequest(r)
 
-	Expect(newResp.StatusCode).To(Equal(http.StatusAccepted))
+	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
 	Expect(stub.gotDelays).To(Equal(1))
 }
@@ -328,8 +344,11 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	// getting reflect middleware
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_request/no_exist.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript(pythonMiddlewareBad)
+	Expect(err).To(BeNil())
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
