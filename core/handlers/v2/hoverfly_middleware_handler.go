@@ -11,9 +11,7 @@ import (
 )
 
 type HoverflyMiddleware interface {
-	GetMiddleware() string
 	GetMiddlewareV2() (string, string, string)
-	SetMiddleware(string) error
 	SetMiddlewareV2(string, string, string) error
 }
 
