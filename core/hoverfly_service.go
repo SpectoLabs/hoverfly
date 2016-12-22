@@ -58,48 +58,9 @@ func (this *Hoverfly) SetMode(mode string) error {
 	return nil
 }
 
-func (hf Hoverfly) GetMiddleware() string {
-	return hf.Cfg.Middleware.FullCommand
-}
-
 func (hf Hoverfly) GetMiddlewareV2() (string, string, string) {
 	script, _ := hf.Cfg.Middleware.GetScript()
 	return hf.Cfg.Middleware.Binary, script, hf.Cfg.Middleware.Remote
-}
-
-func (hf Hoverfly) SetMiddleware(middleware string) error {
-	if middleware == "" {
-		hf.Cfg.Middleware.FullCommand = middleware
-		return nil
-	}
-	originalPair := models.RequestResponsePair{
-		Request: models.RequestDetails{
-			Path:        "/",
-			Method:      "GET",
-			Destination: "www.test.com",
-			Scheme:      "",
-			Query:       "",
-			Body:        "",
-			Headers:     map[string][]string{"test_header": []string{"true"}},
-		},
-		Response: models.ResponseDetails{
-			Status:  200,
-			Body:    "ok",
-			Headers: map[string][]string{"test_header": []string{"true"}},
-		},
-	}
-
-	middlewareObject := &Middleware{
-		FullCommand: middleware,
-	}
-
-	_, err := middlewareObject.Execute(originalPair)
-	if err != nil {
-		return err
-	}
-
-	hf.Cfg.Middleware.FullCommand = middleware
-	return nil
 }
 
 func (hf *Hoverfly) SetMiddlewareV2(binary, script, remote string) error {
