@@ -29,7 +29,7 @@ type ModeView struct {
 
 type HoverflyView struct {
 	DestinationView
-	MiddlewareView
+	MiddlewareView `json:"middleware"`
 	ModeView
 	UsageView
 }

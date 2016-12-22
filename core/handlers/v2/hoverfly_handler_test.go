@@ -3,11 +3,12 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/metrics"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/metrics"
+	. "github.com/onsi/gomega"
 )
 
 type HoverflyStub struct{}
@@ -20,8 +21,8 @@ func (this HoverflyStub) GetMode() string {
 	return "test-mode"
 }
 
-func (this HoverflyStub) GetMiddleware() string {
-	return "test-middleware"
+func (this HoverflyStub) GetMiddlewareV2() (string, string, string) {
+	return "test-binary", "test-script", "test-remote"
 }
 
 func (this HoverflyStub) GetStats() metrics.Stats {
@@ -52,7 +53,9 @@ func TestHoverflyHandlerGetReturnsTheCorrectMode(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(hoverflyView.Destination).To(Equal("test-destination.com"))
 	Expect(hoverflyView.Mode).To(Equal("test-mode"))
-	Expect(hoverflyView.Middleware).To(Equal("test-middleware"))
+	Expect(hoverflyView.Binary).To(Equal("test-binary"))
+	Expect(hoverflyView.Script).To(Equal("test-script"))
+	Expect(hoverflyView.Remote).To(Equal("test-remote"))
 }
 
 func unmarshalHoverflyView(buffer *bytes.Buffer) (HoverflyView, error) {
