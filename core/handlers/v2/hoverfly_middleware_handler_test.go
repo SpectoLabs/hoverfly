@@ -18,21 +18,8 @@ type HoverflyMiddlewareStub struct {
 	Remote     string
 }
 
-func (this HoverflyMiddlewareStub) GetMiddleware() string {
-	return this.Middleware
-}
-
 func (this HoverflyMiddlewareStub) GetMiddlewareV2() (string, string, string) {
 	return this.Binary, this.Script, this.Remote
-}
-
-func (this *HoverflyMiddlewareStub) SetMiddleware(middleware string) error {
-	this.Middleware = middleware
-	if middleware == "error" {
-		return fmt.Errorf("error")
-	}
-
-	return nil
 }
 
 func (this *HoverflyMiddlewareStub) SetMiddlewareV2(binary, script, remote string) error {
