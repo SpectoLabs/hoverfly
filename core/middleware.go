@@ -101,10 +101,6 @@ func (this Middleware) isLocal() bool {
 }
 
 func (this *Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	if this.Binary != "" && this.Script != nil {
-		this.FullCommand = this.Binary + " " + this.Script.Name()
-	}
-
 	if strings.HasPrefix(this.FullCommand, "http") {
 		this.Remote = this.FullCommand
 	}
