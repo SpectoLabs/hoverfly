@@ -105,6 +105,10 @@ func (this *Middleware) Execute(pair models.RequestResponsePair) (models.Request
 		this.FullCommand = this.Binary + " " + this.Script.Name()
 	}
 
+	if strings.HasPrefix(this.FullCommand, "http") {
+		this.Remote = this.FullCommand
+	}
+
 	if this.isLocal() && this.Remote == "" {
 		return this.executeMiddlewareLocally(pair)
 	} else {
@@ -206,19 +210,11 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
-	var middlewareAddress string
-
-	if this.FullCommand != "" {
-		middlewareAddress = this.FullCommand
-	} else {
-		middlewareAddress = this.Remote
-	}
-
-	if middlewareAddress == "" {
+	if this.Remote == "" {
 		return pair, fmt.Errorf("Error when communicating with remote middleware")
 	}
 
-	req, err := http.NewRequest("POST", middlewareAddress, bytes.NewBuffer(pairViewBytes))
+	req, err := http.NewRequest("POST", this.Remote, bytes.NewBuffer(pairViewBytes))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
