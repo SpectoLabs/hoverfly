@@ -88,9 +88,29 @@ func TestRequestBodySentToMiddleware(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/reflect_body/reflect_body.py"
+	err = dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript("#!/usr/bin/env python\n" +
+		"import sys\n" +
+		"import json\n" +
+		"\n" +
+		"def main():\n" +
+		"	data = sys.stdin.readlines()\n" +
+		"	payload = data[0]\n" +
+		"\n" +
+		"	payload_dict = json.loads(payload)\n" +
+		"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
+		"	payload_dict['response']['status'] = 200\n" +
+		"\n" +
+		"	print(json.dumps(payload_dict))\n" +
+		"\n" +
+		"if __name__ == \"__main__\":\n" +
+		"	main()")
+	Expect(err).To(BeNil())
 
 	resp, err := dbClient.modifyRequestResponse(req, requestDetails)
+	Expect(err).To(BeNil())
 
 	// body from the request should be in response body, instead of server's response
 	responseBody, err := ioutil.ReadAll(resp.Body)
@@ -272,7 +292,26 @@ func TestModifyRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_request/modify_request.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript("#!/usr/bin/env python\n" +
+		"import sys\n" +
+		"import json\n" +
+		"\n" +
+		"def main():\n" +
+		"	data = sys.stdin.readlines()\n" +
+		"	payload = data[0]\n" +
+		"\n" +
+		"	payload_dict = json.loads(payload)\n" +
+		"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
+		"	payload_dict['response']['status'] = 202\n" +
+		"\n" +
+		"	print(json.dumps(payload_dict))\n" +
+		"\n" +
+		"if __name__ == \"__main__\":\n" +
+		"	main()")
+	Expect(err).To(BeNil())
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
@@ -295,7 +334,26 @@ func TestModifyRequestWODestination(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_response/modify_response.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript("#!/usr/bin/env python\n" +
+		"import sys\n" +
+		"import json\n" +
+		"\n" +
+		"def main():\n" +
+		"	data = sys.stdin.readlines()\n" +
+		"	payload = data[0]\n" +
+		"\n" +
+		"	payload_dict = json.loads(payload)\n" +
+		"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
+		"	payload_dict['response']['status'] = 201\n" +
+		"\n" +
+		"	print(json.dumps(payload_dict))\n" +
+		"\n" +
+		"if __name__ == \"__main__\":\n" +
+		"	main()")
+	Expect(err).To(BeNil())
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
@@ -317,7 +375,9 @@ func TestModifyRequestNoMiddleware(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	dbClient.Cfg.Middleware.FullCommand = ""
+	dbClient.Cfg.Middleware.Binary = ""
+	dbClient.Cfg.Middleware.Script = nil
+	dbClient.Cfg.Middleware.Remote = ""
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 	Expect(err).To(BeNil())
@@ -362,26 +422,6 @@ func TestGetResponseCorruptedRequestResponsePair(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 
 	Expect(response).To(BeNil())
-}
-
-func TestDoRequestWFailedMiddleware(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-
-	// adding middleware which doesn't exist, doRequest should return error
-	dbClient.Cfg.Middleware.FullCommand = "./should/not/exist.go"
-
-	requestBody := []byte("fizz=buzz")
-
-	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
-
-	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	Expect(err).To(BeNil())
-
-	_, _, err = dbClient.doRequest(req)
-	Expect(err).ToNot(BeNil())
 }
 
 func TestDoRequestFailedHTTP(t *testing.T) {

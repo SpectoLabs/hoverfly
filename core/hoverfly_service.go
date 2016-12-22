@@ -62,9 +62,9 @@ func (hf Hoverfly) GetMiddleware() string {
 	return hf.Cfg.Middleware.FullCommand
 }
 
-func (hf Hoverfly) GetMiddlewareV2() (string, string) {
+func (hf Hoverfly) GetMiddlewareV2() (string, string, string) {
 	script, _ := hf.Cfg.Middleware.GetScript()
-	return hf.Cfg.Middleware.Binary, script
+	return hf.Cfg.Middleware.Binary, script, hf.Cfg.Middleware.Remote
 }
 
 func (hf Hoverfly) SetMiddleware(middleware string) error {
@@ -93,7 +93,7 @@ func (hf Hoverfly) SetMiddleware(middleware string) error {
 		FullCommand: middleware,
 	}
 
-	_, err := middlewareObject.executeMiddlewareLocally(originalPair)
+	_, err := middlewareObject.Execute(originalPair)
 	if err != nil {
 		return err
 	}
@@ -102,13 +102,15 @@ func (hf Hoverfly) SetMiddleware(middleware string) error {
 	return nil
 }
 
-func (hf *Hoverfly) SetMiddlewareV2(binary, script string) error {
+func (hf *Hoverfly) SetMiddlewareV2(binary, script, remote string) error {
 	newMiddleware := Middleware{}
 
-	if binary == "" && script == "" {
+	if binary == "" && script == "" && remote == "" {
 		hf.Cfg.Middleware = newMiddleware
 		return nil
-	} else if binary == "" {
+	}
+
+	if binary == "" && script != "" {
 		return fmt.Errorf("Cannot run script with no binary")
 	}
 
@@ -120,6 +122,11 @@ func (hf *Hoverfly) SetMiddlewareV2(binary, script string) error {
 	err = newMiddleware.SetScript(script)
 	if err != nil {
 		return nil
+	}
+
+	err = newMiddleware.SetRemote(remote)
+	if err != nil {
+		return err
 	}
 
 	testData := models.RequestResponsePair{
@@ -138,7 +145,7 @@ func (hf *Hoverfly) SetMiddlewareV2(binary, script string) error {
 			Headers: map[string][]string{"test_header": []string{"true"}},
 		},
 	}
-	_, err = newMiddleware.executeMiddlewareLocally(testData)
+	_, err = newMiddleware.Execute(testData)
 	if err != nil {
 		return err
 	}

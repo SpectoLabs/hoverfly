@@ -11,6 +11,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"fmt"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -19,6 +21,7 @@ import (
 type Middleware struct {
 	Binary      string
 	Script      *os.File
+	Remote      string
 	FullCommand string
 }
 
@@ -79,6 +82,20 @@ func (this *Middleware) SetBinary(binary string) error {
 	return nil
 }
 
+func (this *Middleware) SetRemote(remoteUrl string) error {
+	if remoteUrl == "" {
+		this.Remote = ""
+		return nil
+	}
+
+	response, err := http.Post(remoteUrl, "", nil)
+	if err != nil || response.StatusCode != 200 {
+		return fmt.Errorf("Could not reach remote middleware")
+	}
+	this.Remote = remoteUrl
+	return nil
+}
+
 func (this Middleware) isLocal() bool {
 	return !strings.HasPrefix(this.FullCommand, "http")
 }
@@ -88,7 +105,7 @@ func (this *Middleware) Execute(pair models.RequestResponsePair) (models.Request
 		this.FullCommand = this.Binary + " " + this.Script.Name()
 	}
 
-	if this.isLocal() {
+	if this.isLocal() && this.Remote == "" {
 		return this.executeMiddlewareLocally(pair)
 	} else {
 		return this.executeMiddlewareRemotely(pair)
@@ -189,7 +206,19 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
-	req, err := http.NewRequest("POST", this.FullCommand, bytes.NewBuffer(pairViewBytes))
+	var middlewareAddress string
+
+	if this.FullCommand != "" {
+		middlewareAddress = this.FullCommand
+	} else {
+		middlewareAddress = this.Remote
+	}
+
+	if middlewareAddress == "" {
+		return pair, fmt.Errorf("Error when communicating with remote middleware")
+	}
+
+	req, err := http.NewRequest("POST", middlewareAddress, bytes.NewBuffer(pairViewBytes))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),

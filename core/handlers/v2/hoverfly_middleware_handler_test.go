@@ -4,18 +4,26 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	. "github.com/onsi/gomega"
 )
 
 type HoverflyMiddlewareStub struct {
+	Binary     string
+	Script     string
 	Middleware string
+	Remote     string
 }
 
 func (this HoverflyMiddlewareStub) GetMiddleware() string {
 	return this.Middleware
+}
+
+func (this HoverflyMiddlewareStub) GetMiddlewareV2() (string, string, string) {
+	return this.Binary, this.Script, this.Remote
 }
 
 func (this *HoverflyMiddlewareStub) SetMiddleware(middleware string) error {
@@ -27,10 +35,26 @@ func (this *HoverflyMiddlewareStub) SetMiddleware(middleware string) error {
 	return nil
 }
 
+func (this *HoverflyMiddlewareStub) SetMiddlewareV2(binary, script, remote string) error {
+	this.Binary = binary
+	this.Script = script
+	this.Remote = remote
+	if script == "error" {
+		return fmt.Errorf("error")
+	}
+
+	return nil
+}
+
 func TestHoverflyMiddlewareHandlerGetReturnsTheCorrectMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
-	stubHoverfly := &HoverflyMiddlewareStub{Middleware: "test-middleware"}
+	stubHoverfly := &HoverflyMiddlewareStub{
+		Binary: "test",
+		Script: "middleware",
+		Remote: "remote",
+	}
+
 	unit := HoverflyMiddlewareHandler{Hoverfly: stubHoverfly}
 
 	request, err := http.NewRequest("GET", "", nil)
@@ -42,16 +66,18 @@ func TestHoverflyMiddlewareHandlerGetReturnsTheCorrectMiddleware(t *testing.T) {
 
 	middlewareView, err := unmarshalMiddlewareView(response.Body)
 	Expect(err).To(BeNil())
-	Expect(middlewareView.Middleware).To(Equal("test-middleware"))
+	Expect(middlewareView.Binary).To(Equal("test"))
+	Expect(middlewareView.Script).To(Equal("middleware"))
+	Expect(middlewareView.Remote).To(Equal("remote"))
 }
 
 func TestHoverflyMiddlewareHandlerPutSetsTheNewMiddlewarendReplacesTheTestMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
-	stubHoverfly := &HoverflyMiddlewareStub{Middleware: "test-middleware"}
+	stubHoverfly := &HoverflyMiddlewareStub{Binary: "test"}
 	unit := HoverflyMiddlewareHandler{Hoverfly: stubHoverfly}
 
-	middlewareView := &MiddlewareView{Middleware: "new-middleware"}
+	middlewareView := &MiddlewareView{Binary: "python", Script: "new-middleware"}
 
 	bodyBytes, err := json.Marshal(middlewareView)
 	Expect(err).To(BeNil())
@@ -61,12 +87,14 @@ func TestHoverflyMiddlewareHandlerPutSetsTheNewMiddlewarendReplacesTheTestMiddle
 
 	response := makeRequestOnHandler(unit.Put, request)
 	Expect(response.Code).To(Equal(http.StatusOK))
-	Expect(stubHoverfly.Middleware).To(Equal("new-middleware"))
+	Expect(stubHoverfly.Binary).To(Equal("python"))
+	Expect(stubHoverfly.Script).To(Equal("new-middleware"))
 
 	middlewareViewResponse, err := unmarshalMiddlewareView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(middlewareViewResponse.Middleware).To(Equal("new-middleware"))
+	Expect(middlewareViewResponse.Binary).To(Equal("python"))
+	Expect(middlewareViewResponse.Script).To(Equal("new-middleware"))
 }
 
 func TestHoverflyMiddlewareHandlerPutWill422ErrorIfHoverflyErrors(t *testing.T) {
@@ -75,7 +103,7 @@ func TestHoverflyMiddlewareHandlerPutWill422ErrorIfHoverflyErrors(t *testing.T) 
 	var stubHoverfly HoverflyMiddlewareStub
 	unit := HoverflyMiddlewareHandler{Hoverfly: &stubHoverfly}
 
-	middlewareView := &MiddlewareView{Middleware: "error"}
+	middlewareView := &MiddlewareView{Script: "error"}
 
 	bodyBytes, err := json.Marshal(middlewareView)
 	Expect(err).To(BeNil())

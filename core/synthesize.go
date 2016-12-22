@@ -20,7 +20,7 @@ func SynthesizeResponse(req *http.Request, requestDetails models.RequestDetails,
 
 	c := NewConstructor(req, pair)
 
-	if middleware.FullCommand != "" {
+	if middleware.FullCommand != "" || middleware.Binary != "" || middleware.Remote != "" {
 
 		err := c.ApplyMiddleware(middleware)
 		if err != nil {
