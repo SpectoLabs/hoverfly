@@ -105,7 +105,7 @@ func (this *Middleware) Execute(pair models.RequestResponsePair) (models.Request
 		this.Remote = this.FullCommand
 	}
 
-	if this.isLocal() && this.Remote == "" {
+	if this.Remote == "" {
 		return this.executeMiddlewareLocally(pair)
 	} else {
 		return this.executeMiddlewareRemotely(pair)
