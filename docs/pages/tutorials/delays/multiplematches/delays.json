@@ -1,0 +1,12 @@
+{
+  "data": [
+    {
+      "urlPattern": ".",
+      "delay": 3000
+    },
+     {
+      "urlPattern": "time\\.jsontest.com",
+      "delay": 1000
+     }
+   ]
+}

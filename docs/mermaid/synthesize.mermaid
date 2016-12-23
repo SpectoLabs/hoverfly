@@ -1,0 +1,8 @@
+sequenceDiagram
+    participant Client application
+    participant Hoverfly
+    loop http
+        Client application -->> Hoverfly: request
+        note over Hoverfly: middleware.py
+        Hoverfly -->> Client application: response
+    end

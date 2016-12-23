@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Client application
+    participant Hoverfly
+    participant External service
+    loop http
+        Client application -->> Hoverfly: request
+        note over Hoverfly: change_req.py
+        Hoverfly -->> External service: request
+        External service -->> Hoverfly: response
+        note over Hoverfly: change_req.py
+        Hoverfly -->> Client application: response
+    end
