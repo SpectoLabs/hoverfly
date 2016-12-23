@@ -12,10 +12,9 @@ import (
 )
 
 type HoverflyMiddlewareStub struct {
-	Binary     string
-	Script     string
-	Middleware string
-	Remote     string
+	Binary string
+	Script string
+	Remote string
 }
 
 func (this HoverflyMiddlewareStub) GetMiddleware() (string, string, string) {
