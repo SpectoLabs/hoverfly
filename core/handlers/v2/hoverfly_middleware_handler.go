@@ -11,8 +11,8 @@ import (
 )
 
 type HoverflyMiddleware interface {
-	GetMiddlewareV2() (string, string, string)
-	SetMiddlewareV2(string, string, string) error
+	GetMiddleware() (string, string, string)
+	SetMiddleware(string, string, string) error
 }
 
 type HoverflyMiddlewareHandler struct {
@@ -33,7 +33,7 @@ func (this *HoverflyMiddlewareHandler) RegisterRoutes(mux *bone.Mux, am *handler
 
 func (this *HoverflyMiddlewareHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	var middlewareView MiddlewareView
-	middlewareView.Binary, middlewareView.Script, middlewareView.Remote = this.Hoverfly.GetMiddlewareV2()
+	middlewareView.Binary, middlewareView.Script, middlewareView.Remote = this.Hoverfly.GetMiddleware()
 
 	middlewareBytes, _ := json.Marshal(middlewareView)
 
@@ -57,7 +57,7 @@ func (this *HoverflyMiddlewareHandler) Put(w http.ResponseWriter, req *http.Requ
 		return
 	}
 
-	err = this.Hoverfly.SetMiddlewareV2(middlewareReq.Binary, middlewareReq.Script, middlewareReq.Remote)
+	err = this.Hoverfly.SetMiddleware(middlewareReq.Binary, middlewareReq.Script, middlewareReq.Remote)
 	if err != nil {
 		handlers.WriteErrorResponse(w, "Invalid middleware: "+err.Error(), 422)
 		return
