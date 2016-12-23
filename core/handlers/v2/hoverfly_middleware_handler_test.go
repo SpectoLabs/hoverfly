@@ -18,11 +18,11 @@ type HoverflyMiddlewareStub struct {
 	Remote     string
 }
 
-func (this HoverflyMiddlewareStub) GetMiddlewareV2() (string, string, string) {
+func (this HoverflyMiddlewareStub) GetMiddleware() (string, string, string) {
 	return this.Binary, this.Script, this.Remote
 }
 
-func (this *HoverflyMiddlewareStub) SetMiddlewareV2(binary, script, remote string) error {
+func (this *HoverflyMiddlewareStub) SetMiddleware(binary, script, remote string) error {
 	this.Binary = binary
 	this.Script = script
 	this.Remote = remote

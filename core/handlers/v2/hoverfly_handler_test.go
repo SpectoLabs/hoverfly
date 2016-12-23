@@ -21,7 +21,7 @@ func (this HoverflyStub) GetMode() string {
 	return "test-mode"
 }
 
-func (this HoverflyStub) GetMiddlewareV2() (string, string, string) {
+func (this HoverflyStub) GetMiddleware() (string, string, string) {
 	return "test-binary", "test-script", "test-remote"
 }
 
