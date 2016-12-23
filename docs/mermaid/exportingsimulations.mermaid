@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Enduser
+    participant Hoverctl
+    participant Hoverfly
+    participant Endpoint
+    Enduser -->> Hoverctl: start in capture mode
+    Hoverctl -->> Hoverfly: start in capture mode
+    Enduser -->> Hoverfly: request (via proxy)
+    Hoverfly -->> Endpoint: proxied request
+    Endpoint -->> Hoverfly: response (via proxy)
+    Hoverfly -->> Enduser: proxied response
+    Enduser -->> Hoverctl: show logs
+    Hoverctl -->> Enduser: prints logs
+    Enduser -->> Hoverctl: export simulation
+    Hoverctl -->> Enduser: exports simulation
+    Enduser -->> Hoverctl: stop

@@ -1,0 +1,8 @@
+sequenceDiagram
+    participant Client application
+    participant Hoverfly
+    participant External service
+    loop http
+        Client application -->> Hoverfly: request
+        Hoverfly -->> Client application: response
+    end

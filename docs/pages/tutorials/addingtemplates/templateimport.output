@@ -1,0 +1,11 @@
+time="2016-12-22T08:56:02Z" level=info msg="Hoverfly is now running" admin-port=8888 proxy-port=8500 
+time="2016-12-22T08:56:02Z" level=info msg="Hoverfly has been set to simulate mode" 
+time="2016-12-22T08:56:02Z" level=info msg="Successfully imported from simulationimport.json" 
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    38  100    38    0     0  16330      0 --:--:-- --:--:-- --:--:-- 38000
+{
+   "foo": "baz",
+   "bar": "spam"
+}
+time="2016-12-22T08:56:02Z" level=info msg="Hoverfly has been stopped" 
