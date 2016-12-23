@@ -490,34 +490,33 @@ func Test_Middleware_IsSet_ReturnsIfBinaryIsSet(t *testing.T) {
 	Expect(unit.IsSet()).To(BeTrue())
 }
 
-// This test is relevant, but is broken for now, it shall be uncommented soon
-// func Test_Middleware_Execute_RunsRemoteMiddlewareCorrectly(t *testing.T) {
-// 	RegisterTestingT(t)
+func Test_Middleware_Execute_RunsRemoteMiddlewareCorrectly(t *testing.T) {
+	RegisterTestingT(t)
 
-// 	middlewareServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		body, _ := ioutil.ReadAll(r.Body)
-// 		var newPairView v2.RequestResponsePairView
+	middlewareServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := ioutil.ReadAll(r.Body)
+		var newPairView v2.RequestResponsePairView
 
-// 		json.Unmarshal(body, &newPairView)
+		json.Unmarshal(body, &newPairView)
 
-// 		newPairView.Response.Body = "modified body"
+		newPairView.Response.Body = "modified body"
 
-// 		pairViewBytes, _ := json.Marshal(newPairView)
-// 		w.Write(pairViewBytes)
-// 	}))
-// 	defer middlewareServer.Close()
+		pairViewBytes, _ := json.Marshal(newPairView)
+		w.Write(pairViewBytes)
+	}))
+	defer middlewareServer.Close()
 
-// 	unit := Middleware{}
-// 	err := unit.SetRemote(middlewareServer.URL)
-// 	Expect(err).To(BeNil())
+	unit := Middleware{}
+	err := unit.SetRemote(middlewareServer.URL)
+	Expect(err).To(BeNil())
 
-// 	resp := models.ResponseDetails{Status: 0, Body: "original body"}
-// 	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
+	resp := models.ResponseDetails{Status: 0, Body: "original body"}
+	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
 
-// 	originalPair := models.RequestResponsePair{Response: resp, Request: req}
+	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
-// 	resultPair, err := unit.Execute(originalPair)
-// 	Expect(err).To(BeNil())
+	resultPair, err := unit.Execute(originalPair)
+	Expect(err).To(BeNil())
 
-// 	Expect(resultPair.Response.Body).To(Equal("modified body"))
-// }
+	Expect(resultPair.Response.Body).To(Equal("modified body"))
+}
