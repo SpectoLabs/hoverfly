@@ -100,6 +100,10 @@ func (this Middleware) isLocal() bool {
 	return !strings.HasPrefix(this.FullCommand, "http")
 }
 
+func (this Middleware) IsSet() bool {
+	return this.Binary != "" || this.Remote != ""
+}
+
 func (this *Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	if strings.HasPrefix(this.FullCommand, "http") {
 		this.Remote = this.FullCommand
