@@ -492,6 +492,34 @@ func Test_Middleware_SetRemote_CanBeSetToEmptyStringWithoutError(t *testing.T) {
 	Expect(unit.Remote).To(Equal(""))
 }
 
+func Test_Middleware_IsSet_ReturnsFalseIfNotSet(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	Expect(unit.IsSet()).To(BeFalse())
+}
+
+func Test_Middleware_IsSet_ReturnsIfRemoteIsSet(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Remote: "something",
+	}
+
+	Expect(unit.IsSet()).To(BeTrue())
+}
+
+func Test_Middleware_IsSet_ReturnsIfBinaryIsSet(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Binary: "something",
+	}
+
+	Expect(unit.IsSet()).To(BeTrue())
+}
+
 // This test is relevant, but is broken for now, it shall be uncommented soon
 // func Test_Middleware_Execute_RunsRemoteMiddlewareCorrectly(t *testing.T) {
 // 	RegisterTestingT(t)
