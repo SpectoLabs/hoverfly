@@ -96,7 +96,7 @@ func (this *Middleware) SetRemote(remoteUrl string) error {
 	return nil
 }
 
-func (this Middleware) IsSet() bool {
+func (this Middleware) IsValid() bool {
 	return this.Binary != "" || this.Remote != ""
 }
 
