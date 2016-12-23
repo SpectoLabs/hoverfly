@@ -96,10 +96,6 @@ func (this *Middleware) SetRemote(remoteUrl string) error {
 	return nil
 }
 
-func (this Middleware) isLocal() bool {
-	return !strings.HasPrefix(this.FullCommand, "http")
-}
-
 func (this Middleware) IsSet() bool {
 	return this.Binary != "" || this.Remote != ""
 }
