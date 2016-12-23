@@ -58,12 +58,12 @@ func (this *Hoverfly) SetMode(mode string) error {
 	return nil
 }
 
-func (hf Hoverfly) GetMiddlewareV2() (string, string, string) {
+func (hf Hoverfly) GetMiddleware() (string, string, string) {
 	script, _ := hf.Cfg.Middleware.GetScript()
 	return hf.Cfg.Middleware.Binary, script, hf.Cfg.Middleware.Remote
 }
 
-func (hf *Hoverfly) SetMiddlewareV2(binary, script, remote string) error {
+func (hf *Hoverfly) SetMiddleware(binary, script, remote string) error {
 	newMiddleware := Middleware{}
 
 	if binary == "" && script == "" && remote == "" {
