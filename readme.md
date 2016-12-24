@@ -25,10 +25,37 @@ Hoverfly is a proxy written in [Go](https://golang.org/). It can capture HTTP(s)
 
 Contributions are welcome!
 
-To submit a pull request you should fork the Hoverfly repository, and make your change on a feature branch of your fork.
-Then generate a pull request from your branch against master of the Hoverfly repository. Include in your pull request
-details of your change (why and how, as well as the testing you have performed). To read more about forking model, check out
-this link: [forking workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow).
+To contribute, please:
+
+1. Fork the repository
+1. Create a feature branch on your fork
+1. Commit your changes, and create a pull request against Hoverfly's master branch
+1. In your pull request, include details regarding your change, i.e
+    1. why you made it
+    1. how to test it
+    1. any information about testing you have performed
+
+To read more about forking model, check out this link: [forking workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow).
+
+## Building, running & testing
+
+```bash
+cd $GOPATH/src
+mkdir -p github.com/SpectoLabs/
+cd github.com/SpectoLabs/
+git clone https://github.com/SpectoLabs/hoverfly.git
+# or: git clone https://github.com/<your_username>/hoverfly.git
+cd hoverfly
+make build
+```
+
+Notice the binaries are in the ``target`` directory.
+
+Finally to test your build:
+
+```bash
+make test
+```
 
 ## License
 
