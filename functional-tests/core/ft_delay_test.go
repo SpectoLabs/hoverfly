@@ -2,14 +2,15 @@ package hoverfly_test
 
 import (
 	"bytes"
-	"github.com/dghubble/sling"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"time"
+
+	"github.com/dghubble/sling"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Running Hoverfly with delays", func() {
@@ -82,7 +83,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 	Context("When running in synthesise mode (with middleware)", func() {
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/middleware.py")
+			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "python testdata/middleware.py")
 			SetHoverflyResponseDelays("testdata/delays.json")
 			SetHoverflyMode("synthesize")
 		})
@@ -108,7 +109,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 	Context("When running in modify mode", func() {
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/middleware.py")
+			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "python testdata/middleware.py")
 			SetHoverflyResponseDelays("testdata/delays.json")
 			SetHoverflyMode("modify")
 		})
