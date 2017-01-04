@@ -22,29 +22,14 @@ func Test_SynthesizeResponse_WorksWhenGivenMiddleware(t *testing.T) {
 	err = middleware.SetBinary("python")
 	Expect(err).To(BeNil())
 
-	err = middleware.SetScript("#!/usr/bin/env python\n" +
-		"import sys\n" +
-		"import json\n" +
-		"\n" +
-		"def main():\n" +
-		"	data = sys.stdin.readlines()\n" +
-		"	payload = data[0]\n" +
-		"\n" +
-		"	payload_dict = json.loads(payload)\n" +
-		"\n" +
-		"	payload_dict['response']['status'] = 200" +
-		"\n" +
-		"	print(json.dumps(payload_dict))\n" +
-		"\n" +
-		"if __name__ == \"__main__\":\n" +
-		"	main()")
+	err = middleware.SetScript(pythonReflectBody)
 
 	Expect(err).To(BeNil())
 
 	sr, err := SynthesizeResponse(req, requestDetails, middleware)
 	Expect(err).To(BeNil())
 
-	Expect(sr.StatusCode).To(Equal(http.StatusOK))
+	Expect(sr.StatusCode).To(Equal(http.StatusCreated))
 }
 
 func Test_SynthesizeResponse_WithoutProperlyConfiguredMiddleware(t *testing.T) {

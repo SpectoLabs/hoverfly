@@ -14,56 +14,56 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var (
-	pythonModifyResponse = "#!/usr/bin/env python\n" +
-		"import sys\n" +
-		"import json\n" +
+const pythonMiddlewareBasic = "import sys\nprint(sys.stdin.readlines()[0])"
 
-		"def main():\n" +
-		"	data = sys.stdin.readlines()\n" +
-		"	payload = data[0]\n" +
+const pythonModifyResponse = "#!/usr/bin/env python\n" +
+	"import sys\n" +
+	"import json\n" +
 
-		"	payload_dict = json.loads(payload)\n" +
+	"def main():\n" +
+	"	data = sys.stdin.readlines()\n" +
+	"	payload = data[0]\n" +
 
-		"	payload_dict['response']['status'] = 201\n" +
-		"	payload_dict['response']['body'] = \"body was replaced by middleware\"\n" +
+	"	payload_dict = json.loads(payload)\n" +
 
-		"	print(json.dumps(payload_dict))\n" +
+	"	payload_dict['response']['status'] = 201\n" +
+	"	payload_dict['response']['body'] = \"body was replaced by middleware\"\n" +
 
-		"if __name__ == \"__main__\":\n" +
-		"	main()\n"
+	"	print(json.dumps(payload_dict))\n" +
 
-	pythonReflectBody = "#!/usr/bin/env python\n" +
-		"import sys\n" +
-		"import json\n" +
+	"if __name__ == \"__main__\":\n" +
+	"	main()\n"
 
-		"def main():\n" +
-		"	data = sys.stdin.readlines()\n" +
-		"	payload = data[0]\n" +
+const pythonReflectBody = "#!/usr/bin/env python\n" +
+	"import sys\n" +
+	"import json\n" +
 
-		"	payload_dict = json.loads(payload)\n" +
+	"def main():\n" +
+	"	data = sys.stdin.readlines()\n" +
+	"	payload = data[0]\n" +
 
-		"	payload_dict['response']['status'] = 201\n" +
-		"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
+	"	payload_dict = json.loads(payload)\n" +
 
-		"	print(json.dumps(payload_dict))\n" +
+	"	payload_dict['response']['status'] = 201\n" +
+	"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
 
-		"if __name__ == \"__main__\":\n" +
-		"	main()\n"
+	"	print(json.dumps(payload_dict))\n" +
 
-	pythonMiddlewareBad = "this shouldn't work"
+	"if __name__ == \"__main__\":\n" +
+	"	main()\n"
 
-	rubyEcho = "#!/usr/bin/env ruby\n" +
-		"# encoding: utf-8\n" +
-		"while payload = STDIN.gets\n" +
-		"next unless payload\n" +
-		"\n" +
-		"STDOUT.puts payload\n" +
-		"\n" +
-		"STDERR.puts \"Payload data: #{payload}\"\n" +
-		"\n" +
-		"end"
-)
+const pythonMiddlewareBad = "this shouldn't work"
+
+const rubyEcho = "#!/usr/bin/env ruby\n" +
+	"# encoding: utf-8\n" +
+	"while payload = STDIN.gets\n" +
+	"next unless payload\n" +
+	"\n" +
+	"STDOUT.puts payload\n" +
+	"\n" +
+	"STDERR.puts \"Payload data: #{payload}\"\n" +
+	"\n" +
+	"end"
 
 func TestChangeBodyMiddleware(t *testing.T) {
 	RegisterTestingT(t)
