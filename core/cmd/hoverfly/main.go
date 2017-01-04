@@ -209,6 +209,11 @@ func main() {
 	cfg.Development = *dev
 
 	// overriding default middleware setting
+	newMiddleware, err := hv.ConvertToNewMiddleware(*middleware)
+	if err != nil {
+		log.Error(err.Error())
+	}
+	cfg.Middleware = *newMiddleware
 	cfg.Middleware.FullCommand = *middleware
 
 	mode := getInitialMode(cfg)
@@ -345,7 +350,7 @@ func main() {
 
 	cfg.Webserver = *webserver
 
-	err := hoverfly.StartProxy()
+	err = hoverfly.StartProxy()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
