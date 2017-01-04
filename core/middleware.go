@@ -25,6 +25,36 @@ type Middleware struct {
 	FullCommand string
 }
 
+func ConvertToNewMiddleware(middleware string) (*Middleware, error) {
+	newMiddleware := &Middleware{}
+	if strings.HasPrefix(middleware, "http") {
+
+		err := newMiddleware.SetRemote(middleware)
+		if err != nil {
+			return nil, err
+		}
+
+		return newMiddleware, nil
+	} else if strings.Contains(middleware, " ") {
+		splitMiddleware := strings.Split(middleware, " ")
+		fileContents, _ := ioutil.ReadFile(splitMiddleware[1])
+
+		newMiddleware.SetBinary(splitMiddleware[0])
+		newMiddleware.SetScript(string(fileContents))
+
+		return newMiddleware, nil
+
+	} else {
+		err := newMiddleware.SetBinary(middleware)
+		if err != nil {
+			return nil, err
+		}
+		return newMiddleware, nil
+	}
+
+	return nil, nil
+}
+
 func (this *Middleware) SetScript(scriptContent string) error {
 	script, err := ioutil.TempFile(os.TempDir(), "hoverfly_")
 	if err != nil {
