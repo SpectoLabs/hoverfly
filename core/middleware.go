@@ -280,3 +280,14 @@ func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair
 	}
 	return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
 }
+
+func (this Middleware) toString() string {
+	if this.Remote != "" {
+		return this.Remote
+	} else {
+		if this.Script != nil {
+			return this.Binary + " " + this.Script.Name()
+		}
+		return this.Binary
+	}
+}

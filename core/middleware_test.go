@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
@@ -581,4 +582,35 @@ func Test_Middleware_Execute_RunsRemoteMiddlewareCorrectly(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(resultPair.Response.Body).To(Equal("modified body"))
+}
+
+func Test_Middleware_toString_WillProduceAStringRepresentationOfMiddlewareThatUsesRemote(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Remote: "test-remote",
+	}
+
+	Expect(unit.toString()).To(Equal("test-remote"))
+}
+
+func Test_Middleware_toString_WillProduceAStringRepresentationOfMiddlewareThatUsesBinary(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Binary: "test-binary",
+	}
+
+	Expect(unit.toString()).To(Equal("test-binary"))
+}
+
+func Test_Middleware_toString_WillProduceAStringRepresentationOfMiddlewareThatUsesBinaryAndScript(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Binary: "test-binary",
+		Script: os.NewFile(0, "testfile.txt"),
+	}
+
+	Expect(unit.toString()).To(Equal("test-binary testfile.txt"))
 }
