@@ -65,6 +65,76 @@ const rubyEcho = "#!/usr/bin/env ruby\n" +
 	"\n" +
 	"end"
 
+func processHandlerOkayButNoResponse(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
+}
+
+func processHandlerNotOkay(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(404)
+}
+
+func Test_ConvertToNewMiddleware_WillCreateAMiddlewareObjectFromAUrlString(t *testing.T) {
+	RegisterTestingT(t)
+
+	muxRouter := mux.NewRouter()
+	muxRouter.HandleFunc("/process", processHandlerOkayButNoResponse).Methods("POST")
+	server := httptest.NewServer(muxRouter)
+	defer server.Close()
+
+	unit, err := ConvertToNewMiddleware(server.URL + "/process")
+	Expect(err).To(BeNil())
+
+	Expect(unit.Binary).To(Equal(""))
+	Expect(unit.Script).To(BeNil())
+	Expect(unit.Remote).To(Equal(server.URL + "/process"))
+}
+
+func Test_ConvertToNewMiddleware_ReturnsErrorIfUrlIsUnaccessible(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit, err := ConvertToNewMiddleware("http://specto.io/404/process")
+	Expect(err).ToNot(BeNil())
+
+	Expect(unit).To(BeNil())
+}
+
+func Test_ConvertToNewMiddleware_WillCreateAMiddlewareObjectFromASingleBinary(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit, err := ConvertToNewMiddleware("cat")
+	Expect(err).To(BeNil())
+
+	Expect(unit.Binary).To(Equal("cat"))
+	Expect(unit.Script).To(BeNil())
+	Expect(unit.Remote).To(Equal(""))
+}
+
+func Test_ConvertToNewMiddleware_ReturnsErrorIfBinaryIsUnaccessible(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit, err := ConvertToNewMiddleware("fake-binary")
+	Expect(err).ToNot(BeNil())
+
+	Expect(unit).To(BeNil())
+}
+
+func Test_ConvertToNewMiddleware_WillCreateAMiddlewareObjectFromASingleBinaryAndScript(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit, err := ConvertToNewMiddleware("python examples/middleware/reflect_body/reflect_body.py")
+	Expect(err).To(BeNil())
+
+	Expect(unit.Binary).To(Equal("python"))
+	Expect(unit.Script).ToNot(BeNil())
+
+	script, err := unit.GetScript()
+	Expect(err).To(BeNil())
+
+	Expect(script).ToNot(BeNil())
+
+	Expect(unit.Remote).To(Equal(""))
+}
+
 func TestChangeBodyMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -143,14 +213,6 @@ func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
 
 	pairViewBytes, _ := json.Marshal(newPairView)
 	w.Write(pairViewBytes)
-}
-
-func processHandlerOkayButNoResponse(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(200)
-}
-
-func processHandlerNotOkay(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(404)
 }
 
 func TestExecuteMiddlewareRemotely(t *testing.T) {
