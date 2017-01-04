@@ -91,22 +91,7 @@ func TestRequestBodySentToMiddleware(t *testing.T) {
 	err = dbClient.Cfg.Middleware.SetBinary("python")
 	Expect(err).To(BeNil())
 
-	err = dbClient.Cfg.Middleware.SetScript("#!/usr/bin/env python\n" +
-		"import sys\n" +
-		"import json\n" +
-		"\n" +
-		"def main():\n" +
-		"	data = sys.stdin.readlines()\n" +
-		"	payload = data[0]\n" +
-		"\n" +
-		"	payload_dict = json.loads(payload)\n" +
-		"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
-		"	payload_dict['response']['status'] = 200\n" +
-		"\n" +
-		"	print(json.dumps(payload_dict))\n" +
-		"\n" +
-		"if __name__ == \"__main__\":\n" +
-		"	main()")
+	err = dbClient.Cfg.Middleware.SetScript(pythonReflectBody)
 	Expect(err).To(BeNil())
 
 	resp, err := dbClient.modifyRequestResponse(req, requestDetails)
@@ -295,22 +280,7 @@ func TestModifyRequest(t *testing.T) {
 	err := dbClient.Cfg.Middleware.SetBinary("python")
 	Expect(err).To(BeNil())
 
-	err = dbClient.Cfg.Middleware.SetScript("#!/usr/bin/env python\n" +
-		"import sys\n" +
-		"import json\n" +
-		"\n" +
-		"def main():\n" +
-		"	data = sys.stdin.readlines()\n" +
-		"	payload = data[0]\n" +
-		"\n" +
-		"	payload_dict = json.loads(payload)\n" +
-		"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
-		"	payload_dict['response']['status'] = 202\n" +
-		"\n" +
-		"	print(json.dumps(payload_dict))\n" +
-		"\n" +
-		"if __name__ == \"__main__\":\n" +
-		"	main()")
+	err = dbClient.Cfg.Middleware.SetScript(pythonReflectBody)
 	Expect(err).To(BeNil())
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
@@ -322,8 +292,8 @@ func TestModifyRequest(t *testing.T) {
 	response, err := dbClient.modifyRequestResponse(req, requestDetails)
 	Expect(err).To(BeNil())
 
-	// response should be changed to 202
-	Expect(response.StatusCode).To(Equal(http.StatusAccepted))
+	// response should be changed to 201
+	Expect(response.StatusCode).To(Equal(http.StatusCreated))
 
 }
 
@@ -337,22 +307,7 @@ func TestModifyRequestWODestination(t *testing.T) {
 	err := dbClient.Cfg.Middleware.SetBinary("python")
 	Expect(err).To(BeNil())
 
-	err = dbClient.Cfg.Middleware.SetScript("#!/usr/bin/env python\n" +
-		"import sys\n" +
-		"import json\n" +
-		"\n" +
-		"def main():\n" +
-		"	data = sys.stdin.readlines()\n" +
-		"	payload = data[0]\n" +
-		"\n" +
-		"	payload_dict = json.loads(payload)\n" +
-		"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
-		"	payload_dict['response']['status'] = 201\n" +
-		"\n" +
-		"	print(json.dumps(payload_dict))\n" +
-		"\n" +
-		"if __name__ == \"__main__\":\n" +
-		"	main()")
+	err = dbClient.Cfg.Middleware.SetScript(pythonModifyResponse)
 	Expect(err).To(BeNil())
 
 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
