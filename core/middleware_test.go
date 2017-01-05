@@ -584,6 +584,36 @@ func Test_Middleware_Execute_RunsRemoteMiddlewareCorrectly(t *testing.T) {
 	Expect(resultPair.Response.Body).To(Equal("modified body"))
 }
 
+func Test_Middleware_IsSet_WillSayItsSetIfARemoteIsDefined(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Remote: "test-remote",
+	}
+
+	Expect(unit.IsSet()).To(BeTrue())
+}
+
+func Test_Middleware_IsSet_WillSayItsSetIfABinaryIsDefined(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Binary: "test-binary",
+	}
+
+	Expect(unit.IsSet()).To(BeTrue())
+}
+
+func Test_Middleware_IsSet_WillSayItsNotSetIfAOnlyAScriptIsDefined(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Script: os.NewFile(0, "testfile.txt"),
+	}
+
+	Expect(unit.IsSet()).To(BeFalse())
+}
+
 func Test_Middleware_toString_WillProduceAStringRepresentationOfMiddlewareThatUsesRemote(t *testing.T) {
 	RegisterTestingT(t)
 
