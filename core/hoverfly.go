@@ -402,7 +402,6 @@ func (hf *Hoverfly) getResponse(req *http.Request, requestDetails models.Request
 // modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response
 // is saved to cache.
 func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails models.RequestDetails) (*http.Response, error) {
-
 	// modifying request
 	req, resp, err := hf.doRequest(req)
 
