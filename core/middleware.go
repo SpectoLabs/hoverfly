@@ -281,6 +281,10 @@ func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair
 	return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
 }
 
+func (this Middleware) IsSet() bool {
+	return this.Binary != "" || this.Remote != ""
+}
+
 func (this Middleware) toString() string {
 	if this.Remote != "" {
 		return this.Remote
