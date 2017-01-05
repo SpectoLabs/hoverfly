@@ -125,10 +125,6 @@ func (this *Middleware) SetRemote(remoteUrl string) error {
 	return nil
 }
 
-func (this Middleware) IsValid() bool {
-	return this.Binary != "" || this.Remote != ""
-}
-
 func (this *Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	if !this.IsSet() {
 		log.WithFields(log.Fields{
