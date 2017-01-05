@@ -131,10 +131,6 @@ func (this Middleware) IsValid() bool {
 }
 
 func (this *Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	if strings.HasPrefix(this.FullCommand, "http") {
-		this.Remote = this.FullCommand
-	}
-
 	if this.Remote == "" {
 		return this.executeMiddlewareLocally(pair)
 	} else {
@@ -165,7 +161,7 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 
 	if log.GetLevel() == log.DebugLevel {
 		log.WithFields(log.Fields{
-			"middleware": this.FullCommand,
+			"middleware": this.toString(),
 			"stdin":      string(pairViewBytes),
 		}).Debug("preparing to modify payload")
 	}
@@ -216,7 +212,7 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 		} else {
 			if log.GetLevel() == log.DebugLevel {
 				log.WithFields(log.Fields{
-					"middleware": this.FullCommand,
+					"middleware": this.toString(),
 					"payload":    string(stdout.Bytes()),
 				}).Debug("payload after modifications")
 			}
