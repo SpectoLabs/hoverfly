@@ -1,10 +1,15 @@
 package hoverctl_end_to_end
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"os/exec"
 	"strconv"
 	"strings"
 
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phayes/freeport"
@@ -50,11 +55,40 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(ContainSubstring(`Script: #!/usr/bin/env python\nimport sys\nimport logging\nimport random\nfrom time import sleep\n\nlogging.basicConfig(filename='random_delay_middleware.log', level=logging.DEBUG)\nlogging.debug('Random delay middleware is called')\n\n# set delay to random value less than one second\n\nSLEEP_SECS = random.random()\n\ndef main():\n\n    data = sys.stdin.readlines()\n    # this is a json string in one line so we are interested in that one line\n    payload = data[0]\n    logging.debug(\"sleeping for %s seconds\" % SLEEP_SECS)\n    sleep(SLEEP_SECS)\n\n\n    # do not modifying payload, returning same one\n    print(payload)\n\nif __name__ == \"__main__\":\n    main()\n`))
 		})
 
+		It("I can set the hoverfly's middleware with a remote", func() {
+
+			middlewareServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				body, _ := ioutil.ReadAll(r.Body)
+				var newPairView v2.RequestResponsePairView
+
+				json.Unmarshal(body, &newPairView)
+
+				newPairView.Response.Body = "modified body"
+
+				pairViewBytes, _ := json.Marshal(newPairView)
+				w.Write(pairViewBytes)
+			}))
+			defer middlewareServer.Close()
+
+			out, _ := exec.Command(hoverctlBinary, "middleware", "--remote", middlewareServer.URL).Output()
+
+			output := strings.TrimSpace(string(out))
+			Expect(output).To(ContainSubstring("Hoverfly is now set to run the following as middleware"))
+			Expect(output).To(ContainSubstring("Remote: " + middlewareServer.URL))
+		})
+
 		It("I cannae set the hoverfly's middleware when specifying non-existing file", func() {
 			out, _ := exec.Command(hoverctlBinary, "middleware", "--binary", "python", "--script", "testdata/not_a_real_file.fake").Output()
 
 			output := strings.TrimSpace(string(out))
 			Expect(output).To(ContainSubstring("open testdata/not_a_real_file.fake: no such file or directory"))
+		})
+
+		It("I cannae set the hoverfly's middleware when specifying non-existing remote middleware", func() {
+			out, _ := exec.Command(hoverctlBinary, "middleware", "--remote", "http://specto.io/404/nothere").Output()
+
+			output := strings.TrimSpace(string(out))
+			Expect(output).To(ContainSubstring("Hoverfly could not execute this middleware"))
 		})
 
 		It("When I use the verbose flag, I see that notpython is not an executable", func() {

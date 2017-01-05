@@ -36,6 +36,7 @@ var (
 	middlewareCommand    = kingpin.Command("middleware", "Get Hoverfly's middleware")
 	middlewareBinaryFlag = middlewareCommand.Flag("binary", "The binary that middleware should execute").String()
 	middlewareScriptFlag = middlewareCommand.Flag("script", "The script that middleware should execute").String()
+	middlewareRemoteFlag = middlewareCommand.Flag("remote", "The remote address that middleware should execute").String()
 	middlewarePathArg    = middlewareCommand.Arg("path", "Set Hoverfly's middleware").String()
 
 	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
@@ -159,17 +160,23 @@ func main() {
 
 	case middlewareCommand.FullCommand():
 		var middleware v2.MiddlewareView
-		if *middlewareBinaryFlag == "" && *middlewareScriptFlag == "" {
+		if *middlewareBinaryFlag == "" && *middlewareScriptFlag == "" && *middlewareRemoteFlag == "" {
 			middleware, err = hoverfly.GetMiddleware()
 			handleIfError(err)
 			log.Info("Hoverfly is currently set to run the following as middleware")
 		} else {
-			script, err := ReadFile(*middlewareScriptFlag)
-			handleIfError(err)
+			if *middlewareRemoteFlag != "" {
+				middleware, err = hoverfly.SetMiddleware("", "", *middlewareRemoteFlag)
+				handleIfError(err)
+				log.Info("Hoverfly is now set to run the following as middleware")
+			} else {
+				script, err := ReadFile(*middlewareScriptFlag)
+				handleIfError(err)
 
-			middleware, err = hoverfly.SetMiddleware(*middlewareBinaryFlag, string(script), "")
-			handleIfError(err)
-			log.Info("Hoverfly is now set to run the following as middleware")
+				middleware, err = hoverfly.SetMiddleware(*middlewareBinaryFlag, string(script), "")
+				handleIfError(err)
+				log.Info("Hoverfly is now set to run the following as middleware")
+			}
 		}
 
 		if middleware.Binary != "" {
