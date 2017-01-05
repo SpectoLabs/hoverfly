@@ -214,7 +214,6 @@ func main() {
 		log.Error(err.Error())
 	}
 	cfg.Middleware = *newMiddleware
-	cfg.Middleware.FullCommand = *middleware
 
 	mode := getInitialMode(cfg)
 
@@ -414,7 +413,7 @@ func getInitialMode(cfg *hv.Configuration) string {
 
 	} else if *synthesize {
 
-		if cfg.Middleware.FullCommand == "" {
+		if !cfg.Middleware.IsSet() {
 			log.Fatal("Synthesize mode chosen although middleware not supplied")
 		}
 
@@ -425,7 +424,7 @@ func getInitialMode(cfg *hv.Configuration) string {
 		return hv.SynthesizeMode
 
 	} else if *modify {
-		if cfg.Middleware.FullCommand == "" {
+		if !cfg.Middleware.IsSet() {
 			log.Fatal("Modify mode chosen although middleware not supplied")
 		}
 
