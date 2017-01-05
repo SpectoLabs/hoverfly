@@ -19,10 +19,9 @@ import (
 )
 
 type Middleware struct {
-	Binary      string
-	Script      *os.File
-	Remote      string
-	FullCommand string
+	Binary string
+	Script *os.File
+	Remote string
 }
 
 func ConvertToNewMiddleware(middleware string) (*Middleware, error) {
