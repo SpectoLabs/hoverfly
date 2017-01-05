@@ -41,7 +41,7 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(ContainSubstring(`Script: #!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend`))
 		})
 
-		It("I can set the hoverfly's middleware", func() {
+		It("I can set the hoverfly's middleware with a binary and a script", func() {
 			out, _ := exec.Command(hoverctlBinary, "middleware", "--binary", "python", "--script", "testdata/add_random_delay.py").Output()
 
 			output := strings.TrimSpace(string(out))
