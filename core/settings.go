@@ -135,7 +135,9 @@ func InitSettings() *Configuration {
 	}
 
 	// middleware configuration
-	appConfig.Middleware.FullCommand = os.Getenv(HoverflyMiddlewareEV)
+	newMiddleware, _ := ConvertToNewMiddleware(os.Getenv(HoverflyMiddlewareEV))
+
+	appConfig.Middleware = *newMiddleware
 
 	if os.Getenv(HoverflyTLSVerification) == "false" {
 		appConfig.TLSVerification = false
