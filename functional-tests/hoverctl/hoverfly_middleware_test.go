@@ -98,5 +98,13 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(ContainSubstring("Hoverfly could not execute this middleware"))
 			Expect(output).To(ContainSubstring(`Invalid middleware: exec: \"notpython\": executable file not found in $PATH`))
 		})
+
+		It("When I use the verbose flag, I see that http://wqrwwewf.wewefwef.specto is not an executable remote middleware", func() {
+			out, _ := exec.Command(hoverctlBinary, "-v", "middleware", "--remote", "http://wqrwwewf.wewefwef.specto").Output()
+
+			output := strings.TrimSpace(string(out))
+			Expect(output).To(ContainSubstring("Hoverfly could not execute this middleware"))
+			Expect(output).To(ContainSubstring(`Invalid middleware: Could not reach remote middleware`))
+		})
 	})
 })
