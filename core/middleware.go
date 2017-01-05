@@ -131,6 +131,14 @@ func (this Middleware) IsValid() bool {
 }
 
 func (this *Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+	if !this.IsSet() {
+		log.WithFields(log.Fields{
+			"middleware": this.toString(),
+		}).Error("Error when calling middleware, middleware has not been set")
+
+		return pair, fmt.Errorf("Cannot execute middleware as middleware has not been correctly set")
+	}
+
 	if this.Remote == "" {
 		return this.executeMiddlewareLocally(pair)
 	} else {
@@ -140,12 +148,7 @@ func (this *Middleware) Execute(pair models.RequestResponsePair) (models.Request
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
 func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	var commandAndArgs []string
-	if this.Binary == "" {
-		commandAndArgs = strings.Split(strings.TrimSpace(this.FullCommand), " ")
-	} else {
-		commandAndArgs = []string{this.Binary, this.Script.Name()}
-	}
+	commandAndArgs := []string{this.Binary, this.Script.Name()}
 
 	middlewareCommand := exec.Command(commandAndArgs[0], commandAndArgs[1:]...)
 

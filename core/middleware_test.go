@@ -468,6 +468,18 @@ func Test_Middleware_Execute_RunsMiddlewareCorrectly(t *testing.T) {
 	Expect(resultPair.Response.Status).To(Equal(200))
 }
 
+func Test_Middleware_Execute_WillErrorIfMiddlewareHasNotBeenCorrectlySet(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	_, err := unit.Execute(models.RequestResponsePair{})
+	Expect(err).ToNot(BeNil())
+
+	Expect(err.Error()).To(Equal("Cannot execute middleware as middleware has not been correctly set"))
+}
+
 func Test_Middleware_SetRemote_CanSetRemote(t *testing.T) {
 	RegisterTestingT(t)
 
