@@ -30,7 +30,12 @@ func ReadFile(filePath string) ([]byte, error) {
 	if strings.HasPrefix(filePath, "http://") || strings.HasPrefix(filePath, "https://") {
 		return DownloadFile(filePath)
 	}
-	return ioutil.ReadFile(filePath)
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, errors.New("File not found: " + filePath)
+	}
+
+	return data, nil
 }
 
 func DownloadFile(filePath string) ([]byte, error) {

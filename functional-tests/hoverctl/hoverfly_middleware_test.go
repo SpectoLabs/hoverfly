@@ -81,7 +81,7 @@ var _ = Describe("When I use hoverctl", func() {
 			out, _ := exec.Command(hoverctlBinary, "middleware", "--binary", "python", "--script", "testdata/not_a_real_file.fake").Output()
 
 			output := strings.TrimSpace(string(out))
-			Expect(output).To(ContainSubstring("open testdata/not_a_real_file.fake: no such file or directory"))
+			Expect(output).To(ContainSubstring("File not found: testdata/not_a_real_file.fake"))
 		})
 
 		It("I cannae set the hoverfly's middleware when specifying non-existing remote middleware", func() {
