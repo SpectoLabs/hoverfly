@@ -58,11 +58,11 @@ const pythonMiddlewareBad = "this shouldn't work"
 const rubyEcho = "#!/usr/bin/env ruby\n" +
 	"# encoding: utf-8\n" +
 	"while payload = STDIN.gets\n" +
-	"next unless payload\n" +
+	"  next unless payload\n" +
 	"\n" +
-	"STDOUT.puts payload\n" +
+	"  STDOUT.puts payload\n" +
 	"\n" +
-	"STDERR.puts \"Payload data: #{payload}\"\n" +
+	"  STDERR.puts \"Payload data: #{payload}\"\n" +
 	"\n" +
 	"end"
 
