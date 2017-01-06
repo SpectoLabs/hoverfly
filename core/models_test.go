@@ -147,11 +147,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 		response, err := dbClient.GetResponse(request, requestDetails)
 		Expect(err).To(BeNil())
 
-		responseBody, err := ioutil.ReadAll(response.Body)
-		response.Body.Close()
-
-		Expect(err).To(BeNil())
-		Expect(string(responseBody)).To(Equal(fmt.Sprintf("body here, number=%d", i)))
+		Expect(response.Body).To(Equal(fmt.Sprintf("body here, number=%d", i)))
 
 	}
 

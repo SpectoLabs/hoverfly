@@ -323,24 +323,8 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 }
 
 // GetResponse returns stored response from cache
-func (hf *Hoverfly) GetResponse(req *http.Request, requestDetails models.RequestDetails) (*http.Response, *matching.MatchingError) {
-
-	responseDetails, matchErr := hf.RequestMatcher.GetResponse(&requestDetails)
-	if matchErr != nil {
-		return nil, matchErr
-	}
-
-	pair := &models.RequestResponsePair{
-		Request:  requestDetails,
-		Response: *responseDetails,
-	}
-
-	c := NewConstructor(req, *pair)
-	if hf.Cfg.Middleware.IsSet() {
-		_ = c.ApplyMiddleware(&hf.Cfg.Middleware)
-	}
-
-	return c.ReconstructResponse(), nil
+func (hf *Hoverfly) GetResponse(req *http.Request, requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
+	return hf.RequestMatcher.GetResponse(&requestDetails)
 }
 
 // modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response
