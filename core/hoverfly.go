@@ -210,10 +210,9 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 		}
 
 	} else {
-		var err *matching.MatchingError
-		response, err = hf.getResponse(req, requestDetails)
+		response, err = Simulate{hoverfly: hf}.Process(req, requestDetails)
 		if err != nil {
-			return hoverflyError(req, err, err.Error(), err.StatusCode)
+			return response
 		}
 	}
 
