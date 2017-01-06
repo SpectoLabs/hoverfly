@@ -16,5 +16,16 @@ func (this Simulate) Process(request *http.Request, details models.RequestDetail
 		return hoverflyError(request, err, err.Error(), err.StatusCode), err
 	}
 
-	return response, nil
+	pair := models.RequestResponsePair{
+		Request:  details,
+		Response: *response,
+	}
+
+	if this.hoverfly.Cfg.Middleware.IsSet() {
+		pair, _ = this.hoverfly.Cfg.Middleware.Execute(pair)
+	}
+
+	c := NewConstructor(request, pair)
+
+	return c.ReconstructResponse(), nil
 }
