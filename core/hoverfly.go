@@ -353,11 +353,10 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 	if err != nil {
 		log.WithFields(log.Fields{
 			"mode":   hf.Cfg.Mode,
-			"error":  err.Error(),
 			"host":   request.Host,
 			"method": request.Method,
 			"path":   request.URL.Path,
-		}).Error("could not forward request, failed to do an HTTP request.")
+		}).Error("HTTP request failed: " + err.Error())
 		return nil, nil, err
 	}
 
