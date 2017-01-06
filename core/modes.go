@@ -17,7 +17,7 @@ type Simulate struct {
 }
 
 func (this Simulate) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
-	response, err := this.hoverfly.getResponse(request, details)
+	response, err := this.hoverfly.GetResponse(request, details)
 	if err != nil {
 		return hoverflyError(request, err, err.Error(), err.StatusCode), err
 	}

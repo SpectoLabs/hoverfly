@@ -322,8 +322,8 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 
 }
 
-// getResponse returns stored response from cache
-func (hf *Hoverfly) getResponse(req *http.Request, requestDetails models.RequestDetails) (*http.Response, *matching.MatchingError) {
+// GetResponse returns stored response from cache
+func (hf *Hoverfly) GetResponse(req *http.Request, requestDetails models.RequestDetails) (*http.Response, *matching.MatchingError) {
 
 	responseDetails, matchErr := hf.RequestMatcher.GetResponse(&requestDetails)
 	if matchErr != nil {
