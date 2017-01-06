@@ -344,3 +344,17 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 
 	Expect(stub.gotDelays).To(Equal(0))
 }
+
+func Test_Hoverfly_captureRequest_DoesNotPanicWhenCannotMakeRequest(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, dbClient := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	request, err := http.NewRequest("GET", "w.specto.fake", nil)
+	Expect(err).To(BeNil())
+
+	response, err := dbClient.captureRequest(request)
+	Expect(response).To(BeNil())
+	Expect(err).ToNot(BeNil())
+}

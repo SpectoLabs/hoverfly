@@ -240,10 +240,22 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 	reqBody, err := ioutil.ReadAll(req.Body)
 
 	if err != nil {
+		reqBody = []byte("")
+
 		log.WithFields(log.Fields{
-			"error": err.Error(),
-			"mode":  "capture",
+			"error":       err.Error(),
+			"mode":        "capture",
+			"path":        req.URL.Path,
+			"method":      req.Method,
+			"destination": req.Host,
+			"scheme":      req.URL.Scheme,
+			"query":       req.URL.RawQuery,
+			"body":        string(reqBody),
+			"headers":     req.Header,
 		}).Error("Got error when reading request body")
+		if req.TLS != nil {
+			log.Debug(req.TLS)
+		}
 	}
 
 	// outputting request body if verbose logging is set
@@ -255,17 +267,26 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 	// forwarding request
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
 
-	req, resp, err := hf.doRequest(req)
+	modifiedReq, resp, err := hf.doRequest(req)
 
 	if err != nil {
 		log.WithFields(log.Fields{
-			"error": err.Error(),
-			"mode":  "capture",
-		}).Error("Got error when reading body after being modified by middleware")
+			"error":       err.Error(),
+			"mode":        "capture",
+			"Path":        req.URL.Path,
+			"Method":      req.Method,
+			"Destination": req.Host,
+			"Scheme":      req.URL.Scheme,
+			"Query":       req.URL.RawQuery,
+			"Body":        string(reqBody),
+			"Headers":     req.Header,
+		}).Error("Got error when executing request")
+
+		return nil, err
 	}
 
-	reqBody, err = ioutil.ReadAll(req.Body)
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
+	reqBody, err = ioutil.ReadAll(modifiedReq.Body)
+	modifiedReq.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
 
 	if err == nil {
 		respBody, err := extractBody(resp)
@@ -281,7 +302,7 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		}
 
 		// saving response body with request/response meta to cache
-		hf.save(req, reqBody, resp, respBody)
+		hf.save(modifiedReq, reqBody, resp, respBody)
 	}
 
 	// return new response or error here
@@ -315,7 +336,7 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 				"host":   request.Host,
 				"method": request.Method,
 				"path":   request.URL.Path,
-			}).Error("could not forward request, middleware failed to modify request.")
+			}).Error("Middleware failed to modify request")
 			return nil, nil, err
 		}
 
@@ -337,11 +358,10 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 	if err != nil {
 		log.WithFields(log.Fields{
 			"mode":   hf.Cfg.Mode,
-			"error":  err.Error(),
 			"host":   request.Host,
 			"method": request.Method,
 			"path":   request.URL.Path,
-		}).Error("could not forward request, failed to do an HTTP request.")
+		}).Error("HTTP request failed: " + err.Error())
 		return nil, nil, err
 	}
 
