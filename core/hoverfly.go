@@ -267,7 +267,7 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 	// forwarding request
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
 
-	req, resp, err := hf.doRequest(req)
+	modifiedReq, resp, err := hf.doRequest(req)
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -285,8 +285,8 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
-	reqBody, err = ioutil.ReadAll(req.Body)
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
+	reqBody, err = ioutil.ReadAll(modifiedReq.Body)
+	modifiedReq.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
 
 	if err == nil {
 		respBody, err := extractBody(resp)
@@ -302,7 +302,7 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		}
 
 		// saving response body with request/response meta to cache
-		hf.save(req, reqBody, resp, respBody)
+		hf.save(modifiedReq, reqBody, resp, respBody)
 	}
 
 	// return new response or error here
