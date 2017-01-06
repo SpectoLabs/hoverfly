@@ -57,6 +57,7 @@ func ConvertToNewMiddleware(middleware string) (*Middleware, error) {
 
 func (this *Middleware) SetScript(scriptContent string) error {
 	tempDir := path.Join(os.TempDir(), "hoverfly")
+	this.DeleteScripts(tempDir)
 
 	//We ignore the error it outputs as this directory may already exist
 	os.Mkdir(tempDir, 0777)
@@ -70,8 +71,6 @@ func (this *Middleware) SetScript(scriptContent string) error {
 	if err != nil {
 		return err
 	}
-
-	this.DeleteScript()
 
 	this.Script = script
 
@@ -90,14 +89,13 @@ func (this Middleware) GetScript() (string, error) {
 	return string(contents), nil
 }
 
-func (this *Middleware) DeleteScript() error {
-	if this.Script != nil {
-		err := os.Remove(this.Script.Name())
-		if err != nil {
-			return err
-		}
-		this.Script = nil
+func (this *Middleware) DeleteScripts(path string) error {
+	err := os.RemoveAll(path)
+	if err != nil {
+		return err
 	}
+	this.Script = nil
+
 	return nil
 }
 
