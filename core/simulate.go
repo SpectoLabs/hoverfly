@@ -1,6 +1,10 @@
-package main
+package hoverfly
 
-import ()
+import (
+	"net/http"
+
+	"github.com/SpectoLabs/hoverfly/core/models"
+)
 
 type Simulate struct {
 	hoverfly *Hoverfly
