@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 
 	"errors"
@@ -55,7 +56,12 @@ func ConvertToNewMiddleware(middleware string) (*Middleware, error) {
 }
 
 func (this *Middleware) SetScript(scriptContent string) error {
-	script, err := ioutil.TempFile(os.TempDir(), "hoverfly_")
+	tempDir := path.Join(os.TempDir(), "hoverfly")
+
+	//We ignore the error it outputs as this directory may already exist
+	os.Mkdir(tempDir, 0777)
+
+	script, err := ioutil.TempFile(tempDir, "hoverfly_")
 	if err != nil {
 		return err
 	}
