@@ -198,15 +198,9 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 		}).Info("synthetic response created successfuly")
 
 	} else if mode == ModifyMode {
-		var err error
-		response, err = hf.modifyRequestResponse(req, requestDetails)
-
+		response, err = Modify{hoverfly: hf}.Process(req, requestDetails)
 		if err != nil {
-			log.WithFields(log.Fields{
-				"error":      err.Error(),
-				"middleware": hf.Cfg.Middleware,
-			}).Error("Got error when performing request modification")
-			return hoverflyError(req, err, fmt.Sprintf("Middleware (%s) failed or something else happened!", hf.Cfg.Middleware), http.StatusServiceUnavailable)
+			return response
 		}
 
 	} else {
