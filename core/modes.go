@@ -42,3 +42,48 @@ func (this Modify) Process(request *http.Request, details models.RequestDetails)
 
 	return response, nil
 }
+
+type Synthesize struct {
+	hoverfly *Hoverfly
+}
+
+func (this Synthesize) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
+	response, err := SynthesizeResponse(request, details, &this.hoverfly.Cfg.Middleware)
+
+	if err != nil {
+		return hoverflyError(request, err, "Could not create synthetic response!", http.StatusServiceUnavailable), err
+	}
+
+	log.WithFields(log.Fields{
+		"mode":        this.hoverfly.Cfg.Mode,
+		"middleware":  this.hoverfly.Cfg.Middleware,
+		"path":        request.URL.Path,
+		"rawQuery":    request.URL.RawQuery,
+		"method":      request.Method,
+		"destination": request.Host,
+	}).Info("synthetic response created successfuly")
+
+	return response, nil
+}
+
+type Capture struct {
+	hoverfly *Hoverfly
+}
+
+func (this Capture) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
+	response, err := this.hoverfly.captureRequest(request)
+
+	if err != nil {
+		return hoverflyError(request, err, "Could not capture request", http.StatusServiceUnavailable), err
+	}
+	log.WithFields(log.Fields{
+		"mode":        this.hoverfly.Cfg.Mode,
+		"middleware":  this.hoverfly.Cfg.Middleware,
+		"path":        request.URL.Path,
+		"rawQuery":    request.URL.RawQuery,
+		"method":      request.Method,
+		"destination": request.Host,
+	}).Info("request and response captured")
+
+	return response, nil
+}

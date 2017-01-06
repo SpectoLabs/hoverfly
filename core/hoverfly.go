@@ -163,39 +163,15 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	}
 
 	if mode == CaptureMode {
-		var err error
-		response, err = hf.captureRequest(req)
-
-		if err != nil {
-			return hoverflyError(req, err, "Could not capture request", http.StatusServiceUnavailable)
-		}
-		log.WithFields(log.Fields{
-			"mode":        mode,
-			"middleware":  hf.Cfg.Middleware,
-			"path":        req.URL.Path,
-			"rawQuery":    req.URL.RawQuery,
-			"method":      req.Method,
-			"destination": req.Host,
-		}).Info("request and response captured")
+		response, err = Capture{hoverfly: hf}.Process(req, requestDetails)
 
 		return response
 
 	} else if mode == SynthesizeMode {
-		var err error
-		response, err = SynthesizeResponse(req, requestDetails, &hf.Cfg.Middleware)
-
+		response, err = Synthesize{hoverfly: hf}.Process(req, requestDetails)
 		if err != nil {
-			return hoverflyError(req, err, "Could not create synthetic response!", http.StatusServiceUnavailable)
+			return response
 		}
-
-		log.WithFields(log.Fields{
-			"mode":        mode,
-			"middleware":  hf.Cfg.Middleware,
-			"path":        req.URL.Path,
-			"rawQuery":    req.URL.RawQuery,
-			"method":      req.Method,
-			"destination": req.Host,
-		}).Info("synthetic response created successfuly")
 
 	} else if mode == ModifyMode {
 		response, err = Modify{hoverfly: hf}.Process(req, requestDetails)
