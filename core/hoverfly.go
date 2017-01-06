@@ -57,6 +57,8 @@ type Hoverfly struct {
 	Proxy *goproxy.ProxyHttpServer
 	SL    *StoppableListener
 	mu    sync.Mutex
+
+	modeMap map[string]Mode
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
@@ -78,6 +80,16 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		ResponseDelays: &models.ResponseDelayList{},
 		RequestMatcher: requestMatcher,
 	}
+
+	modeMap := make(map[string]Mode)
+
+	modeMap["capture"] = Capture{hoverfly: h}
+	modeMap["simulate"] = Simulate{hoverfly: h}
+	modeMap["modify"] = Modify{hoverfly: h}
+	modeMap["synthesize"] = Synthesize{hoverfly: h}
+
+	h.modeMap = modeMap
+
 	return h
 }
 
@@ -153,21 +165,14 @@ func hoverflyError(req *http.Request, err error, msg string, statusCode int) *ht
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
 func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
-	modeMap := make(map[string]Mode)
-
-	modeMap["capture"] = Capture{hoverfly: hf}
-	modeMap["simulate"] = Simulate{hoverfly: hf}
-	modeMap["modify"] = Modify{hoverfly: hf}
-	modeMap["synthesize"] = Synthesize{hoverfly: hf}
-
-	mode := hf.Cfg.GetMode()
-
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	if err != nil {
 		return hoverflyError(req, err, "Could not interpret HTTP request", http.StatusServiceUnavailable)
 	}
 
-	response, err := modeMap[mode].Process(req, requestDetails)
+	mode := hf.Cfg.GetMode()
+
+	response, err := hf.modeMap[mode].Process(req, requestDetails)
 
 	// Don't delete the error
 	// and definitely don't delay people in capture mode
