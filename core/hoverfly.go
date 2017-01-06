@@ -16,6 +16,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/rusenask/goproxy"
 )
 
@@ -237,10 +238,10 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 	}
 
-	reqBody, err := ioutil.ReadAll(req.Body)
+	reqBody, err := util.GetRequestBody(req)
 
 	if err != nil {
-		reqBody = []byte("")
+		reqBody = ""
 
 		log.WithFields(log.Fields{
 			"error":       err.Error(),
@@ -264,9 +265,6 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		"mode": "capture",
 	}).Debug("got request body")
 
-	// forwarding request
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
-
 	modifiedReq, resp, err := hf.doRequest(req)
 
 	if err != nil {
@@ -285,11 +283,10 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
-	reqBody, err = ioutil.ReadAll(modifiedReq.Body)
-	modifiedReq.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
+	reqBody, err = util.GetRequestBody(modifiedReq)
 
 	if err == nil {
-		respBody, err := extractBody(resp)
+		respBody, err := util.GetResponseBody(resp)
 
 		if err != nil {
 
@@ -302,7 +299,7 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		}
 
 		// saving response body with request/response meta to cache
-		hf.save(modifiedReq, reqBody, resp, respBody)
+		hf.save(modifiedReq, []byte(reqBody), resp, []byte(respBody))
 	}
 
 	// return new response or error here

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/rusenask/goproxy"
 )
 
@@ -94,7 +95,7 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Warn("NonproxyHandler")
 		resp := hoverfly.processRequest(r)
-		body, err := extractBody(resp)
+		body, err := util.GetResponseBody(resp)
 
 		if err != nil {
 			log.Error("Error reading response body")
@@ -114,7 +115,7 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 		w.Header().Set("Resp", resp.Header.Get("Content-Length"))
 
 		w.WriteHeader(resp.StatusCode)
-		w.Write(body)
+		w.Write([]byte(body))
 	})
 
 	if hoverfly.Cfg.Verbose {
