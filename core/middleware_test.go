@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
@@ -384,7 +385,7 @@ func Test_Middleware_GetScript_DoesNotErrorIfScriptIsNotSet(t *testing.T) {
 	Expect(result).To(Equal(""))
 }
 
-func Test_Middleware_DeleteScript_WillDeleteScriptAndSetScriptToNil(t *testing.T) {
+func Test_Middleware_DeleteScripts_WillDeleteScriptAndSetScriptToNil(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := Middleware{}
@@ -394,7 +395,7 @@ func Test_Middleware_DeleteScript_WillDeleteScriptAndSetScriptToNil(t *testing.T
 
 	firstScript := unit.Script
 
-	err = unit.DeleteScript()
+	err = unit.DeleteScripts(path.Join(os.TempDir(), "hoverfly"))
 	Expect(err).To(BeNil())
 	Expect(unit.Script).To(BeNil())
 
@@ -402,12 +403,37 @@ func Test_Middleware_DeleteScript_WillDeleteScriptAndSetScriptToNil(t *testing.T
 	Expect(err).ToNot(BeNil())
 }
 
-func Test_Middleware_DeleteScript_DoesNotErrorIfNoScriptWasSet(t *testing.T) {
+func Test_Middleware_DeleteScripts_WillDeletePreviousScripts(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := Middleware{}
 
-	err := unit.DeleteScript()
+	err := unit.SetScript("just a test")
+	Expect(err).To(BeNil())
+
+	firstScript := unit.Script
+
+	err = ioutil.WriteFile(path.Join(os.TempDir(), "hoverfly", "test"), []byte("test"), 0644)
+	Expect(err).To(BeNil())
+
+	err = unit.DeleteScripts(path.Join(os.TempDir(), "hoverfly"))
+	Expect(err).To(BeNil())
+	Expect(unit.Script).To(BeNil())
+
+	_, err = ioutil.ReadFile(firstScript.Name())
+	Expect(err).ToNot(BeNil())
+
+	_, err = ioutil.ReadFile(path.Join(os.TempDir(), "hoverfly", "test"))
+	Expect(err).ToNot(BeNil())
+
+}
+
+func Test_Middleware_DeleteScripts_DoesNotErrorIfNoScriptWasSet(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	err := unit.DeleteScripts(path.Join(os.TempDir(), "hoverfly"))
 	Expect(err).To(BeNil())
 }
 
