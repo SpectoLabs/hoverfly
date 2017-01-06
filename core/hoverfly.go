@@ -323,7 +323,7 @@ func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Respo
 }
 
 // GetResponse returns stored response from cache
-func (hf *Hoverfly) GetResponse(req *http.Request, requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
+func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
 	return hf.RequestMatcher.GetResponse(&requestDetails)
 }
 
