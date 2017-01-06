@@ -36,3 +36,31 @@ func Test_GetRequestBody_GettingTheRequestBodySetsTheSameBodyAgain(t *testing.T)
 
 	Expect(string(newRequestBody)).To(Equal("test-preserve"))
 }
+
+func Test_GetResponseBody_GettingTheResponseBodyGetsTheCorrectData(t *testing.T) {
+	RegisterTestingT(t)
+
+	response := &http.Response{}
+	response.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("test")))
+
+	responseBody, err := GetResponseBody(response)
+	Expect(err).To(BeNil())
+
+	Expect(responseBody).To(Equal("test"))
+
+}
+
+func Test_GetResponseBody_GettingTheResponseBodySetsTheSameBodyAgain(t *testing.T) {
+	RegisterTestingT(t)
+
+	response := &http.Response{}
+	response.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("test-preserve")))
+
+	_, err := GetResponseBody(response)
+	Expect(err).To(BeNil())
+
+	newResponseBody, err := ioutil.ReadAll(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(string(newResponseBody)).To(Equal("test-preserve"))
+}
