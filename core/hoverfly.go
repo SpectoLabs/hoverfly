@@ -153,7 +153,12 @@ func hoverflyError(req *http.Request, err error, msg string, statusCode int) *ht
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
 func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
-	var response *http.Response
+	modeMap := make(map[string]Mode)
+
+	modeMap["capture"] = Capture{hoverfly: hf}
+	modeMap["simulate"] = Simulate{hoverfly: hf}
+	modeMap["modify"] = Modify{hoverfly: hf}
+	modeMap["synthesize"] = Synthesize{hoverfly: hf}
 
 	mode := hf.Cfg.GetMode()
 
@@ -162,28 +167,12 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 		return hoverflyError(req, err, "Could not interpret HTTP request", http.StatusServiceUnavailable)
 	}
 
-	if mode == CaptureMode {
-		response, err = Capture{hoverfly: hf}.Process(req, requestDetails)
+	response, err := modeMap[mode].Process(req, requestDetails)
 
+	// Don't delete the error
+	// and definitely don't delay people in capture mode
+	if err != nil || mode == CaptureMode {
 		return response
-
-	} else if mode == SynthesizeMode {
-		response, err = Synthesize{hoverfly: hf}.Process(req, requestDetails)
-		if err != nil {
-			return response
-		}
-
-	} else if mode == ModifyMode {
-		response, err = Modify{hoverfly: hf}.Process(req, requestDetails)
-		if err != nil {
-			return response
-		}
-
-	} else {
-		response, err = Simulate{hoverfly: hf}.Process(req, requestDetails)
-		if err != nil {
-			return response
-		}
 	}
 
 	respDelay := hf.ResponseDelays.GetDelay(requestDetails)
