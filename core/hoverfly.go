@@ -283,24 +283,8 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
-	reqBody, err = util.GetRequestBody(modifiedReq)
-
-	if err == nil {
-		respBody, err := util.GetResponseBody(resp)
-
-		if err != nil {
-
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-				"mode":  "capture",
-			}).Error("Failed to copy response body.")
-
-			return resp, err
-		}
-
-		// saving response body with request/response meta to cache
-		hf.save(modifiedReq, reqBody, resp, respBody)
-	}
+	// saving response body with request/response meta to cache
+	hf.save(modifiedReq, resp)
 
 	// return new response or error here
 	return resp, err
@@ -455,16 +439,20 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (hf *Hoverfly) save(req *http.Request, reqBody string, resp *http.Response, respBody string) {
+func (hf *Hoverfly) save(req *http.Request, resp *http.Response) {
 
 	if resp == nil {
 		resp = emptyResp
 	} else {
+		respBody, _ := util.GetResponseBody(resp)
+
 		responseObj := models.ResponseDetails{
 			Status:  resp.StatusCode,
 			Body:    string(respBody),
 			Headers: resp.Header,
 		}
+
+		reqBody, _ := util.GetRequestBody(req)
 
 		requestObj := models.RequestDetails{
 			Path:        req.URL.Path,
