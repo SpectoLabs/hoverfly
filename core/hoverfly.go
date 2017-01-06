@@ -240,17 +240,22 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 	reqBody, err := ioutil.ReadAll(req.Body)
 
 	if err != nil {
+		reqBody = []byte("")
+
 		log.WithFields(log.Fields{
 			"error":       err.Error(),
 			"mode":        "capture",
-			"Path":        req.URL.Path,
-			"Method":      req.Method,
-			"Destination": req.Host,
-			"Scheme":      req.URL.Scheme,
-			"Query":       req.URL.RawQuery,
-			"Body":        string(reqBody),
-			"Headers":     req.Header,
+			"path":        req.URL.Path,
+			"method":      req.Method,
+			"destination": req.Host,
+			"scheme":      req.URL.Scheme,
+			"query":       req.URL.RawQuery,
+			"body":        string(reqBody),
+			"headers":     req.Header,
 		}).Error("Got error when reading request body")
+		if req.TLS != nil {
+			log.Debug(req.TLS)
+		}
 	}
 
 	// outputting request body if verbose logging is set
