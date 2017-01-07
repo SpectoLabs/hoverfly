@@ -1,20 +1,19 @@
-package hoverfly
+package modes
 
 import (
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/modes"
 )
 
 type Simulate struct {
-	hoverfly *Hoverfly
+	Hoverfly Hoverfly
 }
 
 func (this Simulate) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
-	response, err := this.hoverfly.GetResponse(details)
+	response, err := this.Hoverfly.GetResponse(details)
 	if err != nil {
-		return hoverflyError(request, err, err.Error(), err.StatusCode), err
+		return errorResponse(request, err, err.Error(), err.StatusCode), err
 	}
 
 	pair := models.RequestResponsePair{
@@ -22,9 +21,9 @@ func (this Simulate) Process(request *http.Request, details models.RequestDetail
 		Response: *response,
 	}
 
-	pair, _ = this.hoverfly.ApplyMiddlewareIfSet(pair)
+	pair, _ = this.Hoverfly.ApplyMiddlewareIfSet(pair)
 	// TODO: If there is an error, should Hoverfly return an error via http.Response
 	// or should it just log.Error the message and return the original pair?
 
-	return modes.ReconstructResponse(request, pair), nil
+	return ReconstructResponse(request, pair), nil
 }

@@ -6,12 +6,18 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/rusenask/goproxy"
 )
 
 type Mode interface {
 	Process(*http.Request, models.RequestDetails) (*http.Response, error)
+}
+
+type Hoverfly interface {
+	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
+	ApplyMiddlewareIfSet(models.RequestResponsePair) (models.RequestResponsePair, error)
 }
 
 // ReconstructResponse changes original response with details provided in Constructor Payload.Response
