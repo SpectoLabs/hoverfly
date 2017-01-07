@@ -6,6 +6,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 )
 
 type Modify struct {
@@ -31,7 +32,20 @@ type Synthesize struct {
 }
 
 func (this Synthesize) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
-	response, err := SynthesizeResponse(request, details, &this.hoverfly.Cfg.Middleware)
+	pair := models.RequestResponsePair{Request: details}
+
+	log.WithFields(log.Fields{
+		"middleware":  this.hoverfly.Cfg.Middleware.toString(),
+		"body":        details.Body,
+		"destination": details.Destination,
+	}).Debug("Synthesizing new response")
+
+	if !this.hoverfly.Cfg.Middleware.IsSet() {
+		err := fmt.Errorf("Middleware not set")
+		return hoverflyError(request, err, "Synthesize failed, middleware not provided", http.StatusServiceUnavailable), err
+	}
+
+	pair, err := this.hoverfly.ApplyMiddlewareIfSet(pair)
 
 	if err != nil {
 		return hoverflyError(request, err, "Could not create synthetic response!", http.StatusServiceUnavailable), err
@@ -46,7 +60,7 @@ func (this Synthesize) Process(request *http.Request, details models.RequestDeta
 		"destination": request.Host,
 	}).Info("synthetic response created successfuly")
 
-	return response, nil
+	return modes.ReconstructResponse(request, pair), nil
 }
 
 type Capture struct {
