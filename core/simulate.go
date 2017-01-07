@@ -25,7 +25,5 @@ func (this Simulate) Process(request *http.Request, details models.RequestDetail
 	// TODO: If there is an error, should Hoverfly return an error via http.Response
 	// or should it just log.Error the message and return the original pair?
 
-	c := NewConstructor(request, pair)
-
-	return c.ReconstructResponse(), nil
+	return ReconstructResponse(request, pair), nil
 }
