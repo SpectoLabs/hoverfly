@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 )
 
 type Simulate struct {
@@ -25,5 +26,5 @@ func (this Simulate) Process(request *http.Request, details models.RequestDetail
 	// TODO: If there is an error, should Hoverfly return an error via http.Response
 	// or should it just log.Error the message and return the original pair?
 
-	return ReconstructResponse(request, pair), nil
+	return modes.ReconstructResponse(request, pair), nil
 }
