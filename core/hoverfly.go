@@ -16,6 +16,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/rusenask/goproxy"
 )
@@ -58,7 +59,7 @@ type Hoverfly struct {
 	SL    *StoppableListener
 	mu    sync.Mutex
 
-	modeMap map[string]Mode
+	modeMap map[string]modes.Mode
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
@@ -81,7 +82,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		RequestMatcher: requestMatcher,
 	}
 
-	modeMap := make(map[string]Mode)
+	modeMap := make(map[string]modes.Mode)
 
 	modeMap["capture"] = Capture{hoverfly: h}
 	modeMap["simulate"] = Simulate{hoverfly: h}
