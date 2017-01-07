@@ -2,10 +2,12 @@ package modes
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/rusenask/goproxy"
 )
 
 type Mode interface {
@@ -38,4 +40,10 @@ func ReconstructResponse(request *http.Request, pair models.RequestResponsePair)
 	response.StatusCode = pair.Response.Status
 
 	return response
+}
+
+func errorResponse(req *http.Request, err error, msg string, statusCode int) *http.Response {
+	return goproxy.NewResponse(req,
+		goproxy.ContentTypeText, statusCode,
+		fmt.Sprintf("Hoverfly Error! %s. Got error: %s \n", msg, err.Error()))
 }
