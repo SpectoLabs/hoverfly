@@ -21,9 +21,9 @@ func (this Simulate) Process(request *http.Request, details models.RequestDetail
 		Response: *response,
 	}
 
-	if this.hoverfly.Cfg.Middleware.IsSet() {
-		pair, _ = this.hoverfly.Cfg.Middleware.Execute(pair)
-	}
+	pair, _ = this.hoverfly.ApplyMiddlewareIfSet(pair)
+	// TODO: If there is an error, should Hoverfly return an error via http.Response
+	// or should it just log.Error the message and return the original pair?
 
 	c := NewConstructor(request, pair)
 
