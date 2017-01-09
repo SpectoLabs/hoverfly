@@ -61,6 +61,28 @@ func Test_ReconstructResponse_AddsHeadersToResponse(t *testing.T) {
 	Expect(response.Header.Get("Header")).To(Equal(headers["Header"][0]))
 }
 
+func Test_ReconstructResponse_AddsMultipleHeaderValuesToResponse(t *testing.T) {
+	RegisterTestingT(t)
+
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	pair := models.RequestResponsePair{}
+
+	headers := make(map[string][]string)
+	headers["Header"] = []string{"one", "two", "three"}
+
+	pair.Response.Headers = headers
+
+	response := ReconstructResponse(req, pair)
+	values, ok := response.Header["Header"]
+	Expect(ok).To(BeTrue())
+
+	Expect(len(values)).To(Equal(3))
+	Expect(values[0]).To(Equal("one"))
+	Expect(values[1]).To(Equal("two"))
+	Expect(values[2]).To(Equal("three"))
+}
+
 func Test_ReconstructResponse_CanReturnACompleteHttpResponseWithAllFieldsFilled(t *testing.T) {
 	RegisterTestingT(t)
 
