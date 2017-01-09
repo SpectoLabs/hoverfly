@@ -1,6 +1,7 @@
 package modes
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -26,6 +27,9 @@ func (this hoverflyStub) GetResponse(request models.RequestDetails) (*models.Res
 }
 
 func (this hoverflyStub) ApplyMiddlewareIfSet(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+	if pair.Request.Path == "middleware-error" {
+		return pair, errors.New("error")
+	}
 	return pair, nil
 }
 
@@ -66,4 +70,27 @@ func Test_SimulateMode_WhenGivenANonMatchingRequestItReturnsAnError(t *testing.T
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("Hoverfly Error! Test error. Got error: Test error \n"))
+}
+
+func Test_SimulateMode_WhenGivenAMatchingRequesAndMiddlewareFaislItReturnsAnError(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := &SimulateMode{
+		Hoverfly: hoverflyStub{},
+	}
+
+	request := models.RequestDetails{
+		Destination: "positive-match.com",
+		Path:        "middleware-error",
+	}
+
+	response, err := unit.Process(&http.Request{}, request)
+	Expect(err).ToNot(BeNil())
+
+	Expect(response.StatusCode).To(Equal(503))
+
+	responseBody, err := ioutil.ReadAll(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(string(responseBody)).To(Equal("Hoverfly Error! Error when executing middleware. Got error: error \n"))
 }

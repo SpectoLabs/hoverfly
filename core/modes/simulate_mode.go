@@ -11,9 +11,9 @@ type SimulateMode struct {
 }
 
 func (this SimulateMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
-	response, err := this.Hoverfly.GetResponse(details)
-	if err != nil {
-		return errorResponse(request, err, err.Error(), err.StatusCode), err
+	response, matchingErr := this.Hoverfly.GetResponse(details)
+	if matchingErr != nil {
+		return errorResponse(request, matchingErr, matchingErr.Error(), matchingErr.StatusCode), matchingErr
 	}
 
 	pair := models.RequestResponsePair{
@@ -21,9 +21,10 @@ func (this SimulateMode) Process(request *http.Request, details models.RequestDe
 		Response: *response,
 	}
 
-	pair, _ = this.Hoverfly.ApplyMiddlewareIfSet(pair)
-	// TODO: If there is an error, should Hoverfly return an error via http.Response
-	// or should it just log.Error the message and return the original pair?
+	pair, err := this.Hoverfly.ApplyMiddlewareIfSet(pair)
+	if err != nil {
+		return errorResponse(request, err, "Error when executing middleware", http.StatusServiceUnavailable), err
+	}
 
 	return ReconstructResponse(request, pair), nil
 }
