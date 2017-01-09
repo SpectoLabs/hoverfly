@@ -247,8 +247,18 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
+	requestObj, _ := models.NewRequestDetailsFromHttpRequest(modifiedReq)
+
+	respBody, _ := util.GetResponseBody(resp)
+
+	responseObj := &models.ResponseDetails{
+		Status:  resp.StatusCode,
+		Body:    string(respBody),
+		Headers: resp.Header,
+	}
+
 	// saving response body with request/response meta to cache
-	hf.Save(modifiedReq, resp)
+	hf.Save(&requestObj, responseObj)
 
 	// return new response or error here
 	return resp, err
@@ -387,66 +397,42 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (hf *Hoverfly) Save(req *http.Request, resp *http.Response) {
+func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails) {
 
-	if resp == nil {
-		resp = emptyResp
-	} else {
-		respBody, _ := util.GetResponseBody(resp)
-
-		responseObj := models.ResponseDetails{
-			Status:  resp.StatusCode,
-			Body:    string(respBody),
-			Headers: resp.Header,
-		}
-
-		reqBody, _ := util.GetRequestBody(req)
-
-		requestObj := models.RequestDetails{
-			Path:        req.URL.Path,
-			Method:      req.Method,
-			Destination: req.Host,
-			Scheme:      req.URL.Scheme,
-			Query:       req.URL.RawQuery,
-			Body:        string(reqBody),
-			Headers:     req.Header,
-		}
-
-		pair := models.RequestResponsePair{
-			Response: responseObj,
-			Request:  requestObj,
-		}
-
-		err := hf.RequestMatcher.SaveRequestResponsePair(&pair)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-			}).Error("Failed to save payload")
-		}
-
-		pairBytes, err := pair.Encode()
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-			}).Error("Failed to serialize payload")
-		} else {
-			// hook
-			var en Entry
-			en.ActionType = ActionTypeRequestCaptured
-			en.Message = "captured"
-			en.Time = time.Now()
-			en.Data = pairBytes
-
-			if err := hf.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
-				log.WithFields(log.Fields{
-					"error":      err.Error(),
-					"message":    en.Message,
-					"actionType": ActionTypeRequestCaptured,
-				}).Error("failed to fire hook")
-			}
-		}
-
+	pair := models.RequestResponsePair{
+		Request:  *request,
+		Response: *response,
 	}
+
+	err := hf.RequestMatcher.SaveRequestResponsePair(&pair)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to save payload")
+	}
+
+	pairBytes, err := pair.Encode()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Failed to serialize payload")
+	} else {
+		// hook
+		var en Entry
+		en.ActionType = ActionTypeRequestCaptured
+		en.Message = "captured"
+		en.Time = time.Now()
+		en.Data = pairBytes
+
+		if err := hf.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
+			log.WithFields(log.Fields{
+				"error":      err.Error(),
+				"message":    en.Message,
+				"actionType": ActionTypeRequestCaptured,
+			}).Error("failed to fire hook")
+		}
+	}
+
 }
 
 func (this Hoverfly) ApplyMiddlewareIfSet(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
