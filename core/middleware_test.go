@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
@@ -14,56 +15,126 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var (
-	pythonModifyResponse = "#!/usr/bin/env python\n" +
-		"import sys\n" +
-		"import json\n" +
+const pythonMiddlewareBasic = "import sys\nprint(sys.stdin.readlines()[0])"
 
-		"def main():\n" +
-		"	data = sys.stdin.readlines()\n" +
-		"	payload = data[0]\n" +
+const pythonModifyResponse = "#!/usr/bin/env python\n" +
+	"import sys\n" +
+	"import json\n" +
 
-		"	payload_dict = json.loads(payload)\n" +
+	"def main():\n" +
+	"	data = sys.stdin.readlines()\n" +
+	"	payload = data[0]\n" +
 
-		"	payload_dict['response']['status'] = 201\n" +
-		"	payload_dict['response']['body'] = \"body was replaced by middleware\"\n" +
+	"	payload_dict = json.loads(payload)\n" +
 
-		"	print(json.dumps(payload_dict))\n" +
+	"	payload_dict['response']['status'] = 201\n" +
+	"	payload_dict['response']['body'] = \"body was replaced by middleware\"\n" +
 
-		"if __name__ == \"__main__\":\n" +
-		"	main()\n"
+	"	print(json.dumps(payload_dict))\n" +
 
-	pythonReflectBody = "#!/usr/bin/env python\n" +
-		"import sys\n" +
-		"import json\n" +
+	"if __name__ == \"__main__\":\n" +
+	"	main()\n"
 
-		"def main():\n" +
-		"	data = sys.stdin.readlines()\n" +
-		"	payload = data[0]\n" +
+const pythonReflectBody = "#!/usr/bin/env python\n" +
+	"import sys\n" +
+	"import json\n" +
 
-		"	payload_dict = json.loads(payload)\n" +
+	"def main():\n" +
+	"	data = sys.stdin.readlines()\n" +
+	"	payload = data[0]\n" +
 
-		"	payload_dict['response']['status'] = 201\n" +
-		"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
+	"	payload_dict = json.loads(payload)\n" +
 
-		"	print(json.dumps(payload_dict))\n" +
+	"	payload_dict['response']['status'] = 201\n" +
+	"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
 
-		"if __name__ == \"__main__\":\n" +
-		"	main()\n"
+	"	print(json.dumps(payload_dict))\n" +
 
-	pythonMiddlewareBad = "this shouldn't work"
+	"if __name__ == \"__main__\":\n" +
+	"	main()\n"
 
-	rubyEcho = "#!/usr/bin/env ruby\n" +
-		"# encoding: utf-8\n" +
-		"while payload = STDIN.gets\n" +
-		"next unless payload\n" +
-		"\n" +
-		"STDOUT.puts payload\n" +
-		"\n" +
-		"STDERR.puts \"Payload data: #{payload}\"\n" +
-		"\n" +
-		"end"
-)
+const pythonMiddlewareBad = "this shouldn't work"
+
+const rubyEcho = "#!/usr/bin/env ruby\n" +
+	"# encoding: utf-8\n" +
+	"while payload = STDIN.gets\n" +
+	"  next unless payload\n" +
+	"\n" +
+	"  STDOUT.puts payload\n" +
+	"\n" +
+	"  STDERR.puts \"Payload data: #{payload}\"\n" +
+	"\n" +
+	"end"
+
+func processHandlerOkayButNoResponse(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
+}
+
+func processHandlerNotOkay(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(404)
+}
+
+func Test_ConvertToNewMiddleware_WillCreateAMiddlewareObjectFromAUrlString(t *testing.T) {
+	RegisterTestingT(t)
+
+	muxRouter := mux.NewRouter()
+	muxRouter.HandleFunc("/process", processHandlerOkayButNoResponse).Methods("POST")
+	server := httptest.NewServer(muxRouter)
+	defer server.Close()
+
+	unit, err := ConvertToNewMiddleware(server.URL + "/process")
+	Expect(err).To(BeNil())
+
+	Expect(unit.Binary).To(Equal(""))
+	Expect(unit.Script).To(BeNil())
+	Expect(unit.Remote).To(Equal(server.URL + "/process"))
+}
+
+func Test_ConvertToNewMiddleware_ReturnsErrorIfUrlIsUnaccessible(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit, err := ConvertToNewMiddleware("http://specto.io/404/process")
+	Expect(err).ToNot(BeNil())
+
+	Expect(unit).To(BeNil())
+}
+
+func Test_ConvertToNewMiddleware_WillCreateAMiddlewareObjectFromASingleBinary(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit, err := ConvertToNewMiddleware("cat")
+	Expect(err).To(BeNil())
+
+	Expect(unit.Binary).To(Equal("cat"))
+	Expect(unit.Script).To(BeNil())
+	Expect(unit.Remote).To(Equal(""))
+}
+
+func Test_ConvertToNewMiddleware_ReturnsErrorIfBinaryIsUnaccessible(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit, err := ConvertToNewMiddleware("fake-binary")
+	Expect(err).ToNot(BeNil())
+
+	Expect(unit).To(BeNil())
+}
+
+func Test_ConvertToNewMiddleware_WillCreateAMiddlewareObjectFromASingleBinaryAndScript(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit, err := ConvertToNewMiddleware("python examples/middleware/reflect_body/reflect_body.py")
+	Expect(err).To(BeNil())
+
+	Expect(unit.Binary).To(Equal("python"))
+	Expect(unit.Script).ToNot(BeNil())
+
+	script, err := unit.GetScript()
+	Expect(err).To(BeNil())
+
+	Expect(script).ToNot(BeNil())
+
+	Expect(unit.Remote).To(Equal(""))
+}
 
 func TestChangeBodyMiddleware(t *testing.T) {
 	RegisterTestingT(t)
@@ -143,14 +214,6 @@ func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
 
 	pairViewBytes, _ := json.Marshal(newPairView)
 	w.Write(pairViewBytes)
-}
-
-func processHandlerOkayButNoResponse(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(200)
-}
-
-func processHandlerNotOkay(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(404)
 }
 
 func TestExecuteMiddlewareRemotely(t *testing.T) {
@@ -405,6 +468,18 @@ func Test_Middleware_Execute_RunsMiddlewareCorrectly(t *testing.T) {
 	Expect(resultPair.Response.Status).To(Equal(200))
 }
 
+func Test_Middleware_Execute_WillErrorIfMiddlewareHasNotBeenCorrectlySet(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	unit := Middleware{}
+
+	_, err := unit.Execute(models.RequestResponsePair{})
+	Expect(err).ToNot(BeNil())
+
+	Expect(err.Error()).To(Equal("Cannot execute middleware as middleware has not been correctly set"))
+}
+
 func Test_Middleware_SetRemote_CanSetRemote(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -462,34 +537,6 @@ func Test_Middleware_SetRemote_CanBeSetToEmptyStringWithoutError(t *testing.T) {
 	Expect(unit.Remote).To(Equal(""))
 }
 
-func Test_Middleware_IsValid_ReturnsFalseIfNotSet(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := Middleware{}
-
-	Expect(unit.IsValid()).To(BeFalse())
-}
-
-func Test_Middleware_IsValid_ReturnsTrueIfRemoteIsSet(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := Middleware{
-		Remote: "something",
-	}
-
-	Expect(unit.IsValid()).To(BeTrue())
-}
-
-func Test_Middleware_IsValid_ReturnsTrueIfBinaryIsValid(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := Middleware{
-		Binary: "something",
-	}
-
-	Expect(unit.IsValid()).To(BeTrue())
-}
-
 func Test_Middleware_Execute_RunsRemoteMiddlewareCorrectly(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -519,4 +566,65 @@ func Test_Middleware_Execute_RunsRemoteMiddlewareCorrectly(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(resultPair.Response.Body).To(Equal("modified body"))
+}
+
+func Test_Middleware_IsSet_WillSayItsSetIfARemoteIsDefined(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Remote: "test-remote",
+	}
+
+	Expect(unit.IsSet()).To(BeTrue())
+}
+
+func Test_Middleware_IsSet_WillSayItsSetIfABinaryIsDefined(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Binary: "test-binary",
+	}
+
+	Expect(unit.IsSet()).To(BeTrue())
+}
+
+func Test_Middleware_IsSet_WillSayItsNotSetIfAOnlyAScriptIsDefined(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Script: os.NewFile(0, "testfile.txt"),
+	}
+
+	Expect(unit.IsSet()).To(BeFalse())
+}
+
+func Test_Middleware_toString_WillProduceAStringRepresentationOfMiddlewareThatUsesRemote(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Remote: "test-remote",
+	}
+
+	Expect(unit.toString()).To(Equal("test-remote"))
+}
+
+func Test_Middleware_toString_WillProduceAStringRepresentationOfMiddlewareThatUsesBinary(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Binary: "test-binary",
+	}
+
+	Expect(unit.toString()).To(Equal("test-binary"))
+}
+
+func Test_Middleware_toString_WillProduceAStringRepresentationOfMiddlewareThatUsesBinaryAndScript(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Middleware{
+		Binary: "test-binary",
+		Script: os.NewFile(0, "testfile.txt"),
+	}
+
+	Expect(unit.toString()).To(Equal("test-binary testfile.txt"))
 }

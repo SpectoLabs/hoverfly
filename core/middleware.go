@@ -19,10 +19,39 @@ import (
 )
 
 type Middleware struct {
-	Binary      string
-	Script      *os.File
-	Remote      string
-	FullCommand string
+	Binary string
+	Script *os.File
+	Remote string
+}
+
+func ConvertToNewMiddleware(middleware string) (*Middleware, error) {
+	newMiddleware := &Middleware{}
+	if strings.HasPrefix(middleware, "http") {
+
+		err := newMiddleware.SetRemote(middleware)
+		if err != nil {
+			return nil, err
+		}
+
+		return newMiddleware, nil
+	} else if strings.Contains(middleware, " ") {
+		splitMiddleware := strings.Split(middleware, " ")
+		fileContents, _ := ioutil.ReadFile(splitMiddleware[1])
+
+		newMiddleware.SetBinary(splitMiddleware[0])
+		newMiddleware.SetScript(string(fileContents))
+
+		return newMiddleware, nil
+
+	} else {
+		err := newMiddleware.SetBinary(middleware)
+		if err != nil {
+			return nil, err
+		}
+		return newMiddleware, nil
+	}
+
+	return nil, nil
 }
 
 func (this *Middleware) SetScript(scriptContent string) error {
@@ -96,13 +125,13 @@ func (this *Middleware) SetRemote(remoteUrl string) error {
 	return nil
 }
 
-func (this Middleware) IsValid() bool {
-	return this.Binary != "" || this.Remote != ""
-}
-
 func (this *Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	if strings.HasPrefix(this.FullCommand, "http") {
-		this.Remote = this.FullCommand
+	if !this.IsSet() {
+		log.WithFields(log.Fields{
+			"middleware": this.toString(),
+		}).Error("Error when calling middleware, middleware has not been set")
+
+		return pair, fmt.Errorf("Cannot execute middleware as middleware has not been correctly set")
 	}
 
 	if this.Remote == "" {
@@ -114,12 +143,7 @@ func (this *Middleware) Execute(pair models.RequestResponsePair) (models.Request
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
 func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	var commandAndArgs []string
-	if this.Binary == "" {
-		commandAndArgs = strings.Split(strings.TrimSpace(this.FullCommand), " ")
-	} else {
-		commandAndArgs = []string{this.Binary, this.Script.Name()}
-	}
+	commandAndArgs := []string{this.Binary, this.Script.Name()}
 
 	middlewareCommand := exec.Command(commandAndArgs[0], commandAndArgs[1:]...)
 
@@ -135,7 +159,7 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 
 	if log.GetLevel() == log.DebugLevel {
 		log.WithFields(log.Fields{
-			"middleware": this.FullCommand,
+			"middleware": this.toString(),
 			"stdin":      string(pairViewBytes),
 		}).Debug("preparing to modify payload")
 	}
@@ -186,7 +210,7 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 		} else {
 			if log.GetLevel() == log.DebugLevel {
 				log.WithFields(log.Fields{
-					"middleware": this.FullCommand,
+					"middleware": this.toString(),
 					"payload":    string(stdout.Bytes()),
 				}).Debug("payload after modifications")
 			}
@@ -249,4 +273,19 @@ func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair
 		return pair, err
 	}
 	return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
+}
+
+func (this Middleware) IsSet() bool {
+	return this.Binary != "" || this.Remote != ""
+}
+
+func (this Middleware) toString() string {
+	if this.Remote != "" {
+		return this.Remote
+	} else {
+		if this.Script != nil {
+			return this.Binary + " " + this.Script.Name()
+		}
+		return this.Binary
+	}
 }
