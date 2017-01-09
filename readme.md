@@ -17,8 +17,8 @@ Hoverfly is a proxy written in [Go](https://golang.org/). It can capture HTTP(s)
 
 ## Quickstart
 
-* [Get Hoverfly](http://hoverfly.io/#get-hoverfly)
-* [Read the docs](http://hoverfly.io/introduction/)
+* [Download and installation](https://hoverfly.readthedocs.io/en/latest/pages/introduction/downloadinstallation.html)
+* [Read the docs](https://hoverfly.readthedocs.io)
 
 
 ## Contributing
