@@ -3,11 +3,11 @@ Download and installation
 
 Hoverfly comes with a command line interface called hoverctl. Archives containing the Hoverfly and hoverctl binaries are available for the major operating systems and architectures.
 
-- `macOS 64bit <https://github.com/SpectoLabs/hoverfly/releases/download/v0.9.2/hoverfly_bundle_OSX_amd64.zip>`_
-- `Linux 32bit <https://github.com/SpectoLabs/hoverfly/releases/download/v0.9.2/hoverfly_bundle_linux_386.zip>`_
-- `Linux 64bit <https://github.com/SpectoLabs/hoverfly/releases/download/v0.9.2/hoverfly_bundle_linux_amd64.zip>`_
-- `Windows 32bit <https://github.com/SpectoLabs/hoverfly/releases/download/v0.9.2/hoverfly_bundle_windows_386.zip>`_
-- `Windows 64bit <https://github.com/SpectoLabs/hoverfly/releases/download/v0.9.2/hoverfly_bundle_windows_amd64.zip>`_
+- :zip_bundle_os_arch:`MacOS 64bit <OSX_amd64>`
+- :zip_bundle_os_arch:`Linux 32bit <linux_386>`
+- :zip_bundle_os_arch:`Linux 64bit <linux_amd64>`
+- :zip_bundle_os_arch:`Windows 32bit <windows_386>`
+- :zip_bundle_os_arch:`Windows 64bit <windows_amd64>`
 
 Download the correct archive, extract the binaries and place them in a directory in your PATH.
 
