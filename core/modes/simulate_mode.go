@@ -6,11 +6,11 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-type Simulate struct {
+type SimulateMode struct {
 	Hoverfly Hoverfly
 }
 
-func (this Simulate) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
+func (this SimulateMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
 	response, err := this.Hoverfly.GetResponse(details)
 	if err != nil {
 		return errorResponse(request, err, err.Error(), err.StatusCode), err
