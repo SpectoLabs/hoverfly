@@ -248,7 +248,7 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 	}
 
 	// saving response body with request/response meta to cache
-	hf.save(modifiedReq, resp)
+	hf.Save(modifiedReq, resp)
 
 	// return new response or error here
 	return resp, err
@@ -387,7 +387,7 @@ func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails mode
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (hf *Hoverfly) save(req *http.Request, resp *http.Response) {
+func (hf *Hoverfly) Save(req *http.Request, resp *http.Response) {
 
 	if resp == nil {
 		resp = emptyResp

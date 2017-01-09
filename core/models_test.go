@@ -130,7 +130,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 		c := NewConstructor(request, pair)
 		response := c.ReconstructResponse()
 
-		dbClient.save(request, response)
+		dbClient.Save(request, response)
 	}
 
 	// now getting responses
