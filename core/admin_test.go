@@ -57,7 +57,7 @@ func TestGetAllRecordsWRecords(t *testing.T) {
 		resp := &http.Response{}
 		resp.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 
-		dbClient.save(req, resp)
+		dbClient.Save(req, resp)
 	}
 	// performing query
 	m := adminApi.getBoneRouter(dbClient)
@@ -121,7 +121,7 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 		resp := &http.Response{}
 		resp.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 
-		dbClient.save(req, resp)
+		dbClient.Save(req, resp)
 	}
 	// performing query
 	m := adminApi.getBoneRouter(dbClient)
@@ -160,7 +160,7 @@ func TestExportImportRecords(t *testing.T) {
 		resp := &http.Response{}
 		resp.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 
-		dbClient.save(req, resp)
+		dbClient.Save(req, resp)
 	}
 
 	req, err := http.NewRequest("GET", "/api/records", nil)
@@ -209,7 +209,7 @@ func TestDeleteHandler(t *testing.T) {
 		resp := &http.Response{}
 		resp.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 
-		dbClient.save(req, resp)
+		dbClient.Save(req, resp)
 	}
 
 	// checking whether we have records
@@ -609,7 +609,7 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 		resp := &http.Response{}
 		resp.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 
-		dbClient.save(req, resp)
+		dbClient.Save(req, resp)
 	}
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)
