@@ -114,23 +114,19 @@ func TestMatchOnRequestBody(t *testing.T) {
 
 	// preparing and saving requests/responses with unique bodies
 	for i := 0; i < 5; i++ {
-		requestBody := []byte(fmt.Sprintf("fizz=buzz, number=%d", i))
-		body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+		req := &models.RequestDetails{
+			Method:      "POST",
+			Scheme:      "http",
+			Destination: "capture_body.com",
+			Body:        fmt.Sprintf("fizz=buzz, number=%d", i),
+		}
 
-		request, err := http.NewRequest("POST", "http://capture_body.com", body)
-		Expect(err).To(BeNil())
-
-		resp := models.ResponseDetails{
+		resp := &models.ResponseDetails{
 			Status: 200,
 			Body:   fmt.Sprintf("body here, number=%d", i),
 		}
-		pair := models.RequestResponsePair{Response: resp}
 
-		// creating response
-		c := NewConstructor(request, pair)
-		response := c.ReconstructResponse()
-
-		dbClient.Save(request, response)
+		dbClient.Save(req, resp)
 	}
 
 	// now getting responses
