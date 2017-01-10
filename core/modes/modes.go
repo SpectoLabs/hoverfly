@@ -18,6 +18,8 @@ type Mode interface {
 type Hoverfly interface {
 	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
 	ApplyMiddlewareIfSet(models.RequestResponsePair) (models.RequestResponsePair, error)
+	DoRequest(*http.Request) (*http.Request, *http.Response, error)
+	Save(*models.RequestDetails, *models.ResponseDetails)
 }
 
 // ReconstructResponse changes original response with details provided in Constructor Payload.Response

@@ -33,6 +33,12 @@ func (this hoverflyStub) ApplyMiddlewareIfSet(pair models.RequestResponsePair) (
 	return pair, nil
 }
 
+func (this hoverflyStub) DoRequest(*http.Request) (*http.Request, *http.Response, error) {
+	return nil, nil, nil
+}
+
+func (this hoverflyStub) Save(*models.RequestDetails, *models.ResponseDetails) {}
+
 func Test_SimulateMode_WhenGivenAMatchingRequestItReturnsTheCorrectResponse(t *testing.T) {
 	RegisterTestingT(t)
 
