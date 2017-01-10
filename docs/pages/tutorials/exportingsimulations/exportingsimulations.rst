@@ -34,8 +34,8 @@ Stop hoverfly
 
     hoverctl stop
 
-You'll now see a requests.db file in your current working directory, which contains all your simulation data.
+You'll now see a simulation.json file in your current working directory, which contains all your simulation data.
 
 In case you are curious, the sequence diagram of this use case looks like so:
 
-.. figure:: exportsimulations.mermaid.png
+.. figure:: exportingsimulations.mermaid.png
