@@ -1,6 +1,7 @@
 package modes
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -111,4 +112,25 @@ func Test_ReconstructResponse_CanReturnACompleteHttpResponseWithAllFieldsFilled(
 
 	Expect(response.Header.Get("Header")).To(Equal(headers["Header"][0]))
 	Expect(response.Header.Get("Other")).To(Equal(headers["Other"][0]))
+}
+
+func Test_errorResponse_ShouldAlwaysBeABadGatway(t *testing.T) {
+	RegisterTestingT(t)
+
+	response := errorResponse(&http.Request{}, errors.New(""), "An error was got")
+
+	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
+}
+
+func Test_errorResponse_ShouldAlwaysIncludeBothMessageAndErrorInResponseBody(t *testing.T) {
+	RegisterTestingT(t)
+
+	response := errorResponse(&http.Request{}, errors.New("error doing something"), "This is a test error")
+
+	responseBody, err := ioutil.ReadAll(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(string(responseBody)).To(ContainSubstring("Hoverfly Error!"))
+	Expect(string(responseBody)).To(ContainSubstring("This is a test error"))
+	Expect(string(responseBody)).To(ContainSubstring("error doing something"))
 }
