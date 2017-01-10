@@ -30,7 +30,6 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 	}).Debug("got request body")
 
 	modifiedReq, response, err := this.Hoverfly.DoRequest(request)
-
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":       err.Error(),
@@ -44,7 +43,7 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 			"Headers":     request.Header,
 		}).Error("Got error when executing request")
 
-		return nil, err
+		return errorResponse(request, err, "There was an error when forwarding the request to the intended desintation"), err
 	}
 
 	requestObj, _ := models.NewRequestDetailsFromHttpRequest(modifiedReq)
@@ -60,9 +59,6 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 	// saving response body with request/response meta to cache
 	this.Hoverfly.Save(&requestObj, responseObj)
 
-	if err != nil {
-		return errorResponse(request, err, "Could not capture request"), err
-	}
 	log.WithFields(log.Fields{
 		"mode": "capture",
 		// "middleware":  this.Hoverfly.Cfg.Middleware,
