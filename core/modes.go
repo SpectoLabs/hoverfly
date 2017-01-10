@@ -40,7 +40,7 @@ func (this Synthesize) Process(request *http.Request, details models.RequestDeta
 		"destination": details.Destination,
 	}).Debug("Synthesizing new response")
 
-	if !this.hoverfly.Cfg.Middleware.IsSet() {
+	if !this.hoverfly.IsMiddlewareSet() {
 		err := fmt.Errorf("Middleware not set")
 		return hoverflyError(request, err, "Synthesize failed, middleware not provided", http.StatusServiceUnavailable), err
 	}
