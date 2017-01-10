@@ -21,7 +21,7 @@ func (this hoverflyCaptureStub) GetResponse(models.RequestDetails) (*models.Resp
 	return nil, nil
 }
 
-func (this hoverflyCaptureStub) ApplyMiddlewareIfSet(models.RequestResponsePair) (models.RequestResponsePair, error) {
+func (this hoverflyCaptureStub) ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error) {
 	return models.RequestResponsePair{}, nil
 }
 

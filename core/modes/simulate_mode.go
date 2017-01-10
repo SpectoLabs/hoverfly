@@ -21,7 +21,7 @@ func (this SimulateMode) Process(request *http.Request, details models.RequestDe
 		Response: *response,
 	}
 
-	pair, err := this.Hoverfly.ApplyMiddlewareIfSet(pair)
+	pair, err := this.Hoverfly.ApplyMiddleware(pair)
 	if err != nil {
 		return errorResponse(request, err, "There was an error when executing middleware"), err
 	}

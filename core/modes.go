@@ -45,7 +45,7 @@ func (this Synthesize) Process(request *http.Request, details models.RequestDeta
 		return hoverflyError(request, err, "Synthesize failed, middleware not provided", http.StatusServiceUnavailable), err
 	}
 
-	pair, err := this.hoverfly.ApplyMiddlewareIfSet(pair)
+	pair, err := this.hoverfly.ApplyMiddleware(pair)
 
 	if err != nil {
 		return hoverflyError(request, err, "Could not create synthetic response!", http.StatusServiceUnavailable), err

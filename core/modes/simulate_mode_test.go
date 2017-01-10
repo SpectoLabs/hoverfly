@@ -26,7 +26,7 @@ func (this hoverflyStub) GetResponse(request models.RequestDetails) (*models.Res
 	}
 }
 
-func (this hoverflyStub) ApplyMiddlewareIfSet(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+func (this hoverflyStub) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	if pair.Request.Path == "middleware-error" {
 		return pair, errors.New("middleware-error")
 	}
