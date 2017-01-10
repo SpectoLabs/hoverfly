@@ -19,6 +19,7 @@ type Hoverfly interface {
 	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
 	DoRequest(*http.Request) (*http.Request, *http.Response, error)
+	IsMiddlewareSet() bool
 	Save(*models.RequestDetails, *models.ResponseDetails)
 }
 

@@ -42,6 +42,10 @@ func (this *hoverflyCaptureStub) Save(request *models.RequestDetails, response *
 	this.SavedResponse = response
 }
 
+func (this hoverflyCaptureStub) IsMiddlewareSet() bool {
+	return true
+}
+
 func Test_CaptureMode_WhenGivenARequestItWillMakeTheRequestAndSaveIt(t *testing.T) {
 	RegisterTestingT(t)
 
