@@ -371,25 +371,6 @@ func TestGetResponseCorruptedRequestResponsePair(t *testing.T) {
 	Expect(response).To(BeNil())
 }
 
-func TestDoRequestFailedHTTP(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	// stopping server
-	server.Close()
-
-	requestBody := []byte("fizz=buzz")
-
-	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
-
-	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	Expect(err).To(BeNil())
-
-	_, _, err = dbClient.DoRequest(req)
-	Expect(err).ToNot(BeNil())
-
-}
-
 func TestStartProxyWOPort(t *testing.T) {
 	RegisterTestingT(t)
 
