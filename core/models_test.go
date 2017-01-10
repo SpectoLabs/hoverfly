@@ -385,7 +385,7 @@ func TestDoRequestFailedHTTP(t *testing.T) {
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
 	Expect(err).To(BeNil())
 
-	_, _, err = dbClient.doRequest(req)
+	_, _, err = dbClient.DoRequest(req)
 	Expect(err).ToNot(BeNil())
 
 }
