@@ -20,7 +20,7 @@ func (this hoverflyStub) GetResponse(request models.RequestDetails) (*models.Res
 		}, nil
 	} else {
 		return nil, &matching.MatchingError{
-			Description: "Test error",
+			Description: "matching-error",
 			StatusCode:  500,
 		}
 	}
@@ -28,7 +28,7 @@ func (this hoverflyStub) GetResponse(request models.RequestDetails) (*models.Res
 
 func (this hoverflyStub) ApplyMiddlewareIfSet(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	if pair.Request.Path == "middleware-error" {
-		return pair, errors.New("error")
+		return pair, errors.New("middleware-error")
 	}
 	return pair, nil
 }
@@ -64,12 +64,13 @@ func Test_SimulateMode_WhenGivenANonMatchingRequestItReturnsAnError(t *testing.T
 	response, err := unit.Process(&http.Request{}, request)
 	Expect(err).ToNot(BeNil())
 
-	Expect(response.StatusCode).To(Equal(500))
+	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(string(responseBody)).To(Equal("Hoverfly Error! Test error. Got error: Test error \n"))
+	Expect(string(responseBody)).To(ContainSubstring("There was an error when matching"))
+	Expect(string(responseBody)).To(ContainSubstring("matching-error"))
 }
 
 func Test_SimulateMode_WhenGivenAMatchingRequesAndMiddlewareFaislItReturnsAnError(t *testing.T) {
@@ -87,10 +88,11 @@ func Test_SimulateMode_WhenGivenAMatchingRequesAndMiddlewareFaislItReturnsAnErro
 	response, err := unit.Process(&http.Request{}, request)
 	Expect(err).ToNot(BeNil())
 
-	Expect(response.StatusCode).To(Equal(503))
+	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(string(responseBody)).To(Equal("Hoverfly Error! Error when executing middleware. Got error: error \n"))
+	Expect(string(responseBody)).To(ContainSubstring("There was an error when executing middleware"))
+	Expect(string(responseBody)).To(ContainSubstring("middleware-error"))
 }

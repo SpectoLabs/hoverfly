@@ -113,11 +113,11 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 				SetHoverflyMode("simulate")
 				resp := CallFakeServerThroughProxy(fakeServer)
-				Expect(resp.StatusCode).To(Equal(412))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
 				SetHoverflyMode("capture")
 
 				resp = CallFakeServerThroughProxy(fakeServer)
-				Expect(resp.StatusCode).To(Equal(200))
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
 				expectedDestination := strings.Replace(fakeServerUrl.String(), "http://", "", 1)
 
