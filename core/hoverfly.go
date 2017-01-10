@@ -229,7 +229,7 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 		"mode": "capture",
 	}).Debug("got request body")
 
-	modifiedReq, resp, err := hf.doRequest(req)
+	modifiedReq, resp, err := hf.DoRequest(req)
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -265,7 +265,7 @@ func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
 }
 
 // doRequest performs original request and returns response that should be returned to client and error (if there is one)
-func (hf *Hoverfly) doRequest(request *http.Request) (*http.Request, *http.Response, error) {
+func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Request, *http.Response, error) {
 
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
@@ -342,7 +342,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 // is saved to cache.
 func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails models.RequestDetails) (*http.Response, error) {
 	// modifying request
-	req, resp, err := hf.doRequest(req)
+	req, resp, err := hf.DoRequest(req)
 
 	if err != nil {
 		return nil, err
