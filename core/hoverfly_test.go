@@ -227,7 +227,7 @@ func TestDelayNotAppliedToFailedSimulateRequest(t *testing.T) {
 
 	newResp := dbClient.processRequest(r)
 
-	Expect(newResp.StatusCode).To(Equal(http.StatusPreconditionFailed))
+	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
 }

@@ -13,7 +13,7 @@ type SimulateMode struct {
 func (this SimulateMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
 	response, matchingErr := this.Hoverfly.GetResponse(details)
 	if matchingErr != nil {
-		return errorResponse(request, matchingErr, matchingErr.Error(), matchingErr.StatusCode), matchingErr
+		return errorResponse(request, matchingErr, "There was an error when matching"), matchingErr
 	}
 
 	pair := models.RequestResponsePair{
@@ -23,7 +23,7 @@ func (this SimulateMode) Process(request *http.Request, details models.RequestDe
 
 	pair, err := this.Hoverfly.ApplyMiddlewareIfSet(pair)
 	if err != nil {
-		return errorResponse(request, err, "Error when executing middleware", http.StatusServiceUnavailable), err
+		return errorResponse(request, err, "There was an error when executing middleware"), err
 	}
 
 	return ReconstructResponse(request, pair), nil
