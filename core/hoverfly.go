@@ -442,3 +442,7 @@ func (this Hoverfly) ApplyMiddleware(pair models.RequestResponsePair) (models.Re
 
 	return pair, nil
 }
+
+func (this Hoverfly) IsMiddlewareSet() bool {
+	return this.Cfg.Middleware.IsSet()
+}
