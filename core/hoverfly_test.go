@@ -377,3 +377,22 @@ func Test_Hoverfly_captureRequest_DoesNotPanicWhenCannotMakeRequest(t *testing.T
 	Expect(response).To(BeNil())
 	Expect(err).ToNot(BeNil())
 }
+
+func Test_Hoverfly_DoRequest_FailedHTTP(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	// stopping server
+	server.Close()
+
+	requestBody := []byte("fizz=buzz")
+
+	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	req, err := http.NewRequest("POST", "http://capture_body.com", body)
+	Expect(err).To(BeNil())
+
+	_, _, err = dbClient.DoRequest(req)
+	Expect(err).ToNot(BeNil())
+
+}
