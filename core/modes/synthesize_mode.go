@@ -1,7 +1,7 @@
 package modes
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -9,8 +9,13 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+type HoverflySynthesize interface {
+	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
+	IsMiddlewareSet() bool
+}
+
 type SynthesizeMode struct {
-	Hoverfly Hoverfly
+	Hoverfly HoverflySynthesize
 }
 
 func (this SynthesizeMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
@@ -23,14 +28,13 @@ func (this SynthesizeMode) Process(request *http.Request, details models.Request
 	}).Debug("Synthesizing new response")
 
 	if !this.Hoverfly.IsMiddlewareSet() {
-		err := fmt.Errorf("Middleware not set")
-		return errorResponse(request, err, "Synthesize failed, middleware not provided"), err
+		err := errors.New("Middleware not set")
+		return errorResponse(request, err, "There was an error when creating a synthetic response"), err
 	}
 
 	pair, err := this.Hoverfly.ApplyMiddleware(pair)
-
 	if err != nil {
-		return errorResponse(request, err, "Could not create synthetic response!"), err
+		return errorResponse(request, err, "There was an error when creating a synthetic response"), err
 	}
 
 	log.WithFields(log.Fields{
