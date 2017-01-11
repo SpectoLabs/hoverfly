@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 )
@@ -15,14 +14,6 @@ import (
 type hoverflyCaptureStub struct {
 	SavedRequest  *models.RequestDetails
 	SavedResponse *models.ResponseDetails
-}
-
-func (this hoverflyCaptureStub) GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
-	return nil, nil
-}
-
-func (this hoverflyCaptureStub) ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error) {
-	return models.RequestResponsePair{}, nil
 }
 
 func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Request, *http.Response, error) {
@@ -40,10 +31,6 @@ func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Request,
 func (this *hoverflyCaptureStub) Save(request *models.RequestDetails, response *models.ResponseDetails) {
 	this.SavedRequest = request
 	this.SavedResponse = response
-}
-
-func (this hoverflyCaptureStub) IsMiddlewareSet() bool {
-	return true
 }
 
 func Test_CaptureMode_WhenGivenARequestItWillMakeTheRequestAndSaveIt(t *testing.T) {
