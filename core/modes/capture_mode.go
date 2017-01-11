@@ -49,7 +49,10 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		return errorResponse(request, err, "There was an error when forwarding the request to the intended desintation"), err
 	}
 
-	requestObj, _ := models.NewRequestDetailsFromHttpRequest(modifiedReq)
+	requestObj, err := models.NewRequestDetailsFromHttpRequest(modifiedReq)
+	if err != nil {
+		return errorResponse(modifiedReq, err, "There was an error reading the request body"), err
+	}
 
 	respBody, _ := util.GetResponseBody(response)
 
