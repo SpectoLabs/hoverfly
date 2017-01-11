@@ -359,7 +359,7 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	newResp := dbClient.processRequest(r)
 
-	Expect(newResp.StatusCode).To(Equal(503))
+	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
 }
