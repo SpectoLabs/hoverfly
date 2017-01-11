@@ -11,8 +11,13 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+type HoverflyCapture interface {
+	DoRequest(*http.Request) (*http.Request, *http.Response, error)
+	Save(*models.RequestDetails, *models.ResponseDetails)
+}
+
 type CaptureMode struct {
-	Hoverfly Hoverfly
+	Hoverfly HoverflyCapture
 }
 
 func (this CaptureMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
