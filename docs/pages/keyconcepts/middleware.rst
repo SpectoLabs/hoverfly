@@ -1,7 +1,7 @@
 .. _middleware:
 
 Middleware
-----------
+**********
 
 When you want to modify a request, a response, or both you need *middleware*. Middleware intercepts data flowing between the client and the endpoint (whether real or virtualised), and enables you to modify it at will.
 
@@ -25,7 +25,7 @@ When middleware is called by Hoverfly, expect to receive and return JSON. This J
 
 .. figure:: middleware.mermaid.png
 
-Hoverfly will send the JSON object to middleware via the standard input stream. Hoverfly will then listen to the standard output stream and wait for the JSON object to be returned. 
+Hoverfly will send the JSON object to middleware via the standard input stream. Hoverfly will then listen to the standard output stream and wait for the JSON object to be returned.
 
 
 .. seealso::

@@ -1,15 +1,14 @@
 .. _delays:
 
 Delays
-------
+******
 
 Once you have created a simulated service by capturing traffic between
 your application and an external service, you may wish to make the
 simulation more "realistic" by applying latency to the responses
 returned by Hoverfly.
 
-This could be done using middleware (See the **Using middleware**
-section). However, if you do not want to go to the effort of writing a
+This could be done using :ref:`middleware`. However, if you do not want to go to the effort of writing a
 middleware script, you can use a JSON file to apply a set of fixed
 response delays to the Hoverfly simulation.
 
@@ -23,8 +22,7 @@ Set up
 ~~~~~~
 
 To simulate service latency, you will need to have created a simulation
-by capturing traffic (see the **Capturing traffic** and **Simulating
-services** sections).
+by capturing traffic.
 
 Simulate latency
 ~~~~~~~~~~~~~~~~

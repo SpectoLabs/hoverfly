@@ -1,7 +1,9 @@
-Modify Mode
-~~~~~~~~~~~
+.. _modify_mode:
 
-Modify mode is similar to capture mode. Hoverfly will forward requests to the intended destinations, but it will not record the requests or the responses. Instead, it will pass each request to a middleware executable before forwarding it to the destination, and will do the same with the response before returning it to the client.
+Modify mode
+***********
+
+Modify Mode is similar to :ref:`capture_mode`. Hoverfly will forward requests to the intended destinations, but it will not record the requests or the responses. Instead, it will pass each request to a :ref:`middleware` executable before forwarding it to the destination, and will do the same with the response before returning it to the client.
 
 .. figure:: modify.mermaid.png
 

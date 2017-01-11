@@ -1,9 +1,9 @@
 .. _templates:
 
 Templates
-~~~~~~~~~
+*********
 
-When it comes to matching URLs, sometimes simple matching is not enough: we want to be able to match a whole swath of URLs, e.g:
+Sometimes simple one-to-one matching of responses to requests is not enough. For example, you may want to return a single response for all these URLs:
 
 ::
 
@@ -12,7 +12,7 @@ When it comes to matching URLs, sometimes simple matching is not enough: we want
     http://example.com/api/v3/endpoint
     http://example.com/api/v4/endpoint
 
-We may want to return the same response for all these URLs. This is done using templates. Templates use globbing, i.e they enable you to replace parts of a URL with a ``*``. So in this case, if we'd want to match all versions of the endpoint, we could have a templated URL looking like so:
+This is done using templates. Templates use globbing: i.e they allow you to replace parts of a URL with a ``*``. In this case, if we want to match all versions of the endpoint, we could specify a URL like this:
 
 ::
 
@@ -20,4 +20,4 @@ We may want to return the same response for all these URLs. This is done using t
 
 .. seealso::
 
-    Templating is better understood with a practical example, so please refer to :ref:`addingtemplates` to get hands on experience with templating.
+    Templating is best understood with a practical example, so please refer to :ref:`addingtemplates` to get hands on experience with templating.
