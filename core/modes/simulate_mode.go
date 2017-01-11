@@ -3,11 +3,17 @@ package modes
 import (
 	"net/http"
 
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
+type HoverflySimulate interface {
+	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
+	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
+}
+
 type SimulateMode struct {
-	Hoverfly Hoverfly
+	Hoverfly HoverflySimulate
 }
 
 func (this SimulateMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {

@@ -16,8 +16,6 @@ type CaptureMode struct {
 }
 
 func (this CaptureMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
-	// response, err := this.hoverfly.captureRequest(request)
-
 	// this is mainly for testing, since when you create
 	if request.Body == nil {
 		request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))

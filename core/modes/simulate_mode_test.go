@@ -11,9 +11,9 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type hoverflyStub struct{}
+type hoverflySimulateStub struct{}
 
-func (this hoverflyStub) GetResponse(request models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
+func (this hoverflySimulateStub) GetResponse(request models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
 	if request.Destination == "positive-match.com" {
 		return &models.ResponseDetails{
 			Status: 200,
@@ -26,28 +26,18 @@ func (this hoverflyStub) GetResponse(request models.RequestDetails) (*models.Res
 	}
 }
 
-func (this hoverflyStub) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+func (this hoverflySimulateStub) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	if pair.Request.Path == "middleware-error" {
 		return pair, errors.New("middleware-error")
 	}
 	return pair, nil
 }
 
-func (this hoverflyStub) DoRequest(*http.Request) (*http.Request, *http.Response, error) {
-	return nil, nil, nil
-}
-
-func (this hoverflyStub) Save(*models.RequestDetails, *models.ResponseDetails) {}
-
-func (this hoverflyStub) IsMiddlewareSet() bool {
-	return true
-}
-
 func Test_SimulateMode_WhenGivenAMatchingRequestItReturnsTheCorrectResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := &SimulateMode{
-		Hoverfly: hoverflyStub{},
+		Hoverfly: hoverflySimulateStub{},
 	}
 
 	request := models.RequestDetails{
@@ -64,7 +54,7 @@ func Test_SimulateMode_WhenGivenANonMatchingRequestItReturnsAnError(t *testing.T
 	RegisterTestingT(t)
 
 	unit := &SimulateMode{
-		Hoverfly: hoverflyStub{},
+		Hoverfly: hoverflySimulateStub{},
 	}
 
 	request := models.RequestDetails{
@@ -87,7 +77,7 @@ func Test_SimulateMode_WhenGivenAMatchingRequesAndMiddlewareFaislItReturnsAnErro
 	RegisterTestingT(t)
 
 	unit := &SimulateMode{
-		Hoverfly: hoverflyStub{},
+		Hoverfly: hoverflySimulateStub{},
 	}
 
 	request := models.RequestDetails{
