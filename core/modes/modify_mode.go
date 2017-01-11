@@ -1,7 +1,6 @@
 package modes
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -28,7 +27,7 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 			"error": err.Error(),
 			// "middleware": this.hoverfly.Cfg.Middleware,
 		}).Error("Failed to read response body after sending modified request")
-		return errorResponse(request, err, fmt.Sprintf("Middleware failed or something else happened!")), err
+		return errorResponse(request, err, "Middleware failed or something else happened!"), err
 	}
 
 	r := models.ResponseDetails{
@@ -41,7 +40,7 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 
 	newPairs, err := this.Hoverfly.ApplyMiddleware(requestResponsePair)
 	if err != nil {
-		return errorResponse(request, err, fmt.Sprintf("Middleware failed or something else happened!")), err
+		return errorResponse(request, err, "Middleware failed or something else happened!"), err
 	}
 
 	log.WithFields(log.Fields{
