@@ -9,12 +9,17 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+type HoverflyModify interface {
+	DoRequest(*http.Request) (*http.Request, *http.Response, error)
+	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
+}
+
 type ModifyMode struct {
-	Hoverfly Hoverfly
+	Hoverfly HoverflyModify
 }
 
 func (this ModifyMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
-	req, resp, err := this.Hoverfly.DoRequest(request)
+	modifiedRequest, resp, err := this.Hoverfly.DoRequest(request)
 	if err != nil {
 		return errorResponse(request, err, "There was an error when forwarding the request to the intended desintation"), err
 	}
@@ -36,11 +41,16 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 		Headers: resp.Header,
 	}
 
-	requestResponsePair := models.RequestResponsePair{Response: r, Request: details}
+	modifiedRequestDetails, err := models.NewRequestDetailsFromHttpRequest(modifiedRequest)
+	if err != nil {
+		return errorResponse(request, err, "There was an error when reading modified request body"), err
+	}
+
+	requestResponsePair := models.RequestResponsePair{Response: r, Request: modifiedRequestDetails}
 
 	newPairs, err := this.Hoverfly.ApplyMiddleware(requestResponsePair)
 	if err != nil {
-		return errorResponse(request, err, "Middleware failed or something else happened!"), err
+		return errorResponse(request, err, "There was an error when executing middleware"), err
 	}
 
 	log.WithFields(log.Fields{
@@ -52,11 +62,11 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 		"method":      newPairs.Request.Method,
 		"destination": newPairs.Request.Destination,
 		// original here
-		"originalPath":        req.URL.Path,
-		"originalRawQuery":    req.URL.RawQuery,
-		"originalMethod":      req.Method,
-		"originalDestination": req.Host,
+		"originalPath":        modifiedRequest.URL.Path,
+		"originalRawQuery":    modifiedRequest.URL.RawQuery,
+		"originalMethod":      modifiedRequest.Method,
+		"originalDestination": modifiedRequest.Host,
 	}).Info("request and response modified, returning")
 
-	return ReconstructResponse(req, newPairs), nil
+	return ReconstructResponse(modifiedRequest, newPairs), nil
 }
