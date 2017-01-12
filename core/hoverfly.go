@@ -8,7 +8,6 @@ import (
 	"net"
 	"net/http"
 	"sync"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 	authBackend "github.com/SpectoLabs/hoverfly/core/authentication/backends"
@@ -50,7 +49,6 @@ type Hoverfly struct {
 	HTTP           *http.Client
 	Cfg            *Configuration
 	Counter        *metrics.CounterByMode
-	Hooks          ActionTypeHooks
 
 	ResponseDelays models.ResponseDelays
 
@@ -76,7 +74,6 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification),
 		Cfg:            cfg,
 		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
-		Hooks:          make(ActionTypeHooks),
 		ResponseDelays: &models.ResponseDelayList{},
 		RequestMatcher: requestMatcher,
 	}
@@ -182,11 +179,6 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	return response
 }
 
-// AddHook - adds a hook to DBClient
-func (hf *Hoverfly) AddHook(hook Hook) {
-	hf.Hooks.Add(hook)
-}
-
 // DoRequest - performs request and returns response that should be returned to client and error
 func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 
@@ -243,29 +235,6 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 			"error": err.Error(),
 		}).Error("Failed to save payload")
 	}
-
-	pairBytes, err := pair.Encode()
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Failed to serialize payload")
-	} else {
-		// hook
-		var en Entry
-		en.ActionType = ActionTypeRequestCaptured
-		en.Message = "captured"
-		en.Time = time.Now()
-		en.Data = pairBytes
-
-		if err := hf.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
-			log.WithFields(log.Fields{
-				"error":      err.Error(),
-				"message":    en.Message,
-				"actionType": ActionTypeRequestCaptured,
-			}).Error("failed to fire hook")
-		}
-	}
-
 }
 
 func (this Hoverfly) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {

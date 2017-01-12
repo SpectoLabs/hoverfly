@@ -8,7 +8,9 @@ import (
 	"path"
 	"regexp"
 	"strings"
-	"time"
+
+	"io/ioutil"
+	"net/http"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
@@ -16,8 +18,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
-	"io/ioutil"
-	"net/http"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -196,40 +196,17 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.Reques
 				}
 			}
 
-			pairBytes, err := pair.Encode()
+			err := hf.RequestMatcher.SaveRequestResponsePair(&pair)
 			if err != nil {
 				log.WithFields(log.Fields{
 					"error": err.Error(),
-				}).Error("Failed to encode payload")
-				failed++
+				}).Error("Failed to save payload")
+			}
+
+			if err == nil {
+				success++
 			} else {
-				// hook
-				var en Entry
-				en.ActionType = ActionTypeRequestCaptured
-				en.Message = "imported"
-				en.Time = time.Now()
-				en.Data = pairBytes
-
-				if err := hf.Hooks.Fire(ActionTypeRequestCaptured, &en); err != nil {
-					log.WithFields(log.Fields{
-						"error":      err.Error(),
-						"message":    en.Message,
-						"actionType": ActionTypeRequestCaptured,
-					}).Error("failed to fire hook")
-				}
-
-				err := hf.RequestMatcher.SaveRequestResponsePair(&pair)
-				if err != nil {
-					log.WithFields(log.Fields{
-						"error": err.Error(),
-					}).Error("Failed to save payload")
-				}
-
-				if err == nil {
-					success++
-				} else {
-					failed++
-				}
+				failed++
 			}
 		}
 		log.WithFields(log.Fields{
