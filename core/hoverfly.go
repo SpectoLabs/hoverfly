@@ -199,38 +199,6 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Request, *http.Respo
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
 
-	if hf.Cfg.Middleware.IsSet() {
-		// middleware is provided, modifying request
-		var requestResponsePair models.RequestResponsePair
-
-		rd, err := models.NewRequestDetailsFromHttpRequest(request)
-		if err != nil {
-			return nil, nil, err
-		}
-		requestResponsePair.Request = rd
-
-		c := NewConstructor(request, requestResponsePair)
-
-		err = c.ApplyMiddleware(&hf.Cfg.Middleware)
-
-		if err != nil {
-			log.WithFields(log.Fields{
-				"mode":   hf.Cfg.Mode,
-				"error":  err.Error(),
-				"host":   request.Host,
-				"method": request.Method,
-				"path":   request.URL.Path,
-			}).Error("Middleware failed to modify request")
-			return nil, nil, err
-		}
-
-		request, err = c.ReconstructRequest()
-
-		if err != nil {
-			return nil, nil, err
-		}
-	}
-
 	requestBody, _ := ioutil.ReadAll(request.Body)
 
 	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
