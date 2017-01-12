@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	log "github.com/Sirupsen/logrus"
+
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/rusenask/goproxy"
@@ -21,6 +23,32 @@ type Hoverfly interface {
 	DoRequest(*http.Request) (*http.Request, *http.Response, error)
 	IsMiddlewareSet() bool
 	Save(*models.RequestDetails, *models.ResponseDetails)
+}
+
+// ReconstructRequest replaces original request with details provided in Constructor Payload.Request
+func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) {
+	if pair.Request.Destination == "" {
+		return nil, fmt.Errorf("failed to reconstruct request, destination not specified")
+	}
+
+	newRequest, err := http.NewRequest(
+		pair.Request.Method,
+		fmt.Sprintf("%s://%s", pair.Request.Scheme, pair.Request.Destination),
+		ioutil.NopCloser(bytes.NewBuffer([]byte(pair.Request.Body))))
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Error("Request reconstruction failed...")
+		return nil, err
+	}
+
+	newRequest.Method = pair.Request.Method
+	newRequest.URL.Path = pair.Request.Path
+	newRequest.URL.RawQuery = pair.Request.Query
+	newRequest.Header = pair.Request.Headers
+
+	return newRequest, nil
 }
 
 // ReconstructResponse changes original response with details provided in Constructor Payload.Response
