@@ -46,6 +46,7 @@ func Test_ModifyMode_WhenGivenARequestItWillModifyTheRequestAndExecuteIt(t *test
 	}
 
 	requestDetails := models.RequestDetails{
+		Scheme:      "http",
 		Destination: "positive-match.com",
 	}
 
@@ -74,6 +75,7 @@ func Test_ModifyMode_WhenGivenABadRequestItWillError(t *testing.T) {
 	}
 
 	requestDetails := models.RequestDetails{
+		Scheme:      "http",
 		Destination: "error.com",
 	}
 
@@ -102,6 +104,7 @@ func Test_ModifyMode_WillErrorWhenMiddlewareFails(t *testing.T) {
 	}
 
 	requestDetails := models.RequestDetails{
+		Scheme:      "http",
 		Destination: "test.com",
 		Path:        "/middleware-error",
 	}
@@ -117,6 +120,6 @@ func Test_ModifyMode_WillErrorWhenMiddlewareFails(t *testing.T) {
 	responseBody, err := ioutil.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(string(responseBody)).To(ContainSubstring("There was an error when executing middleware"))
+	Expect(string(responseBody)).To(ContainSubstring("There was an error when applying middleware to http request"))
 	Expect(string(responseBody)).To(ContainSubstring("middleware-error"))
 }

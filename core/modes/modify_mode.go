@@ -10,8 +10,8 @@ import (
 )
 
 type HoverflyModify interface {
-	DoRequest(*http.Request) (*http.Request, *http.Response, error)
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
+	DoRequest(*http.Request) (*http.Request, *http.Response, error)
 }
 
 type ModifyMode struct {
@@ -19,7 +19,17 @@ type ModifyMode struct {
 }
 
 func (this ModifyMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
-	modifiedRequest, resp, err := this.Hoverfly.DoRequest(request)
+	pair, err := this.Hoverfly.ApplyMiddleware(models.RequestResponsePair{Request: details})
+	if err != nil {
+		return ErrorResponse(request, err, "There was an error when applying middleware to http request"), err
+	}
+
+	modifiedRequest, err := ReconstructRequest(pair)
+	if err != nil {
+		return ErrorResponse(request, err, "There was an error when rebuilding the modified http request"), err
+	}
+
+	modifiedRequest, resp, err := this.Hoverfly.DoRequest(modifiedRequest)
 	if err != nil {
 		return ErrorResponse(request, err, "There was an error when forwarding the request to the intended desintation"), err
 	}
