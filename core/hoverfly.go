@@ -156,18 +156,12 @@ func (hf *Hoverfly) StopProxy() {
 	hf.Cfg.ProxyControlWG.Wait()
 }
 
-func hoverflyError(req *http.Request, err error, msg string, statusCode int) *http.Response {
-	return goproxy.NewResponse(req,
-		goproxy.ContentTypeText, statusCode,
-		fmt.Sprintf("Hoverfly Error! %s. Got error: %s \n", msg, err.Error()))
-}
-
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
 func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	if err != nil {
-		return hoverflyError(req, err, "Could not interpret HTTP request", http.StatusServiceUnavailable)
+		return modes.ErrorResponse(req, err, "Could not interpret HTTP request")
 	}
 
 	mode := hf.Cfg.GetMode()
