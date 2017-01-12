@@ -27,21 +27,6 @@ func TestMain(m *testing.M) {
 	os.Exit(retCode)
 }
 
-// TestCaptureHeader tests whether request gets new header assigned
-func Test_DoRequest_AddsHoverflyHeaderOnSuccessfulRequest(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-
-	req, err := http.NewRequest("GET", "http://example.com", ioutil.NopCloser(bytes.NewBuffer([]byte(""))))
-	Expect(err).To(BeNil())
-
-	response, err := dbClient.DoRequest(req)
-
-	Expect(response.Header.Get("hoverfly")).To(Equal("Was-Here"))
-}
-
 func TestRequestBodySentToMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
