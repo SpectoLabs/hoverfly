@@ -1,4 +1,4 @@
-package modes
+package modes_test
 
 import (
 	"errors"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 	. "github.com/onsi/gomega"
 )
 
@@ -21,7 +22,7 @@ func Test_ReconstructResponse_ReturnsAResponseWithCorrectStatus(t *testing.T) {
 		},
 	}
 
-	response := ReconstructResponse(req, pair)
+	response := modes.ReconstructResponse(req, pair)
 
 	Expect(response.StatusCode).To(Equal(404))
 }
@@ -37,7 +38,7 @@ func Test_ReconstructResponse_ReturnsAResponseWithBody(t *testing.T) {
 		},
 	}
 
-	response := ReconstructResponse(req, pair)
+	response := modes.ReconstructResponse(req, pair)
 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	Expect(err).To(BeNil())
@@ -57,7 +58,7 @@ func Test_ReconstructResponse_AddsHeadersToResponse(t *testing.T) {
 
 	pair.Response.Headers = headers
 
-	response := ReconstructResponse(req, pair)
+	response := modes.ReconstructResponse(req, pair)
 
 	Expect(response.Header.Get("Header")).To(Equal(headers["Header"][0]))
 }
@@ -74,7 +75,7 @@ func Test_ReconstructResponse_AddsMultipleHeaderValuesToResponse(t *testing.T) {
 
 	pair.Response.Headers = headers
 
-	response := ReconstructResponse(req, pair)
+	response := modes.ReconstructResponse(req, pair)
 	values, ok := response.Header["Header"]
 	Expect(ok).To(BeTrue())
 
@@ -101,7 +102,7 @@ func Test_ReconstructResponse_CanReturnACompleteHttpResponseWithAllFieldsFilled(
 	headers["Other"] = []string{"header"}
 	pair.Response.Headers = headers
 
-	response := ReconstructResponse(req, pair)
+	response := modes.ReconstructResponse(req, pair)
 
 	Expect(response.StatusCode).To(Equal(201))
 
@@ -117,7 +118,7 @@ func Test_ReconstructResponse_CanReturnACompleteHttpResponseWithAllFieldsFilled(
 func Test_errorResponse_ShouldAlwaysBeABadGatway(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := errorResponse(&http.Request{}, errors.New(""), "An error was got")
+	response := modes.ErrorResponse(&http.Request{}, errors.New(""), "An error was got")
 
 	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
 }
@@ -125,7 +126,7 @@ func Test_errorResponse_ShouldAlwaysBeABadGatway(t *testing.T) {
 func Test_errorResponse_ShouldAlwaysIncludeBothMessageAndErrorInResponseBody(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := errorResponse(&http.Request{}, errors.New("error doing something"), "This is a test error")
+	response := modes.ErrorResponse(&http.Request{}, errors.New("error doing something"), "This is a test error")
 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	Expect(err).To(BeNil())

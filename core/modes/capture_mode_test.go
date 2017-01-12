@@ -1,4 +1,4 @@
-package modes
+package modes_test
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 	. "github.com/onsi/gomega"
 )
 
@@ -38,7 +39,7 @@ func Test_CaptureMode_WhenGivenARequestItWillMakeTheRequestAndSaveIt(t *testing.
 
 	hoverflyStub := &hoverflyCaptureStub{}
 
-	unit := &CaptureMode{
+	unit := &modes.CaptureMode{
 		Hoverfly: hoverflyStub,
 	}
 
@@ -68,7 +69,7 @@ func Test_CaptureMode_WhenGivenABadRequestItWillError(t *testing.T) {
 
 	hoverflyStub := &hoverflyCaptureStub{}
 
-	unit := &CaptureMode{
+	unit := &modes.CaptureMode{
 		Hoverfly: hoverflyStub,
 	}
 

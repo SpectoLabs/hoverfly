@@ -1,4 +1,4 @@
-package modes
+package modes_test
 
 import (
 	"errors"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 	. "github.com/onsi/gomega"
 )
 
@@ -36,7 +37,7 @@ func (this hoverflySimulateStub) ApplyMiddleware(pair models.RequestResponsePair
 func Test_SimulateMode_WhenGivenAMatchingRequestItReturnsTheCorrectResponse(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := &SimulateMode{
+	unit := &modes.SimulateMode{
 		Hoverfly: hoverflySimulateStub{},
 	}
 
@@ -53,7 +54,7 @@ func Test_SimulateMode_WhenGivenAMatchingRequestItReturnsTheCorrectResponse(t *t
 func Test_SimulateMode_WhenGivenANonMatchingRequestItReturnsAnError(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := &SimulateMode{
+	unit := &modes.SimulateMode{
 		Hoverfly: hoverflySimulateStub{},
 	}
 
@@ -76,7 +77,7 @@ func Test_SimulateMode_WhenGivenANonMatchingRequestItReturnsAnError(t *testing.T
 func Test_SimulateMode_WhenGivenAMatchingRequesAndMiddlewareFaislItReturnsAnError(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := &SimulateMode{
+	unit := &modes.SimulateMode{
 		Hoverfly: hoverflySimulateStub{},
 	}
 

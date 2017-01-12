@@ -46,12 +46,12 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 			"Headers":     request.Header,
 		}).Error("Got error when executing request")
 
-		return errorResponse(request, err, "There was an error when forwarding the request to the intended desintation"), err
+		return ErrorResponse(request, err, "There was an error when forwarding the request to the intended desintation"), err
 	}
 
 	requestObj, err := models.NewRequestDetailsFromHttpRequest(modifiedReq)
 	if err != nil {
-		return errorResponse(modifiedReq, err, "There was an error reading the request body"), err
+		return ErrorResponse(modifiedReq, err, "There was an error reading the request body"), err
 	}
 
 	respBody, _ := util.GetResponseBody(response)

@@ -21,7 +21,7 @@ type ModifyMode struct {
 func (this ModifyMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
 	modifiedRequest, resp, err := this.Hoverfly.DoRequest(request)
 	if err != nil {
-		return errorResponse(request, err, "There was an error when forwarding the request to the intended desintation"), err
+		return ErrorResponse(request, err, "There was an error when forwarding the request to the intended desintation"), err
 	}
 
 	// preparing payload
@@ -32,7 +32,7 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 			"error": err.Error(),
 			// "middleware": this.hoverfly.Cfg.Middleware,
 		}).Error("Failed to read response body after sending modified request")
-		return errorResponse(request, err, "Middleware failed or something else happened!"), err
+		return ErrorResponse(request, err, "Middleware failed or something else happened!"), err
 	}
 
 	r := models.ResponseDetails{
@@ -43,14 +43,14 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 
 	modifiedRequestDetails, err := models.NewRequestDetailsFromHttpRequest(modifiedRequest)
 	if err != nil {
-		return errorResponse(request, err, "There was an error when reading modified request body"), err
+		return ErrorResponse(request, err, "There was an error when reading modified request body"), err
 	}
 
 	requestResponsePair := models.RequestResponsePair{Response: r, Request: modifiedRequestDetails}
 
 	newPairs, err := this.Hoverfly.ApplyMiddleware(requestResponsePair)
 	if err != nil {
-		return errorResponse(request, err, "There was an error when executing middleware"), err
+		return ErrorResponse(request, err, "There was an error when executing middleware"), err
 	}
 
 	log.WithFields(log.Fields{

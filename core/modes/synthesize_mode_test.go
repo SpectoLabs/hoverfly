@@ -1,4 +1,4 @@
-package modes
+package modes_test
 
 import (
 	"errors"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 	. "github.com/onsi/gomega"
 )
 
@@ -34,7 +35,7 @@ func Test_SynthesizeMode_WhenGivenARequestItWillUseMiddlewareToGenerateAResponse
 		MiddlewareSet: true,
 	}
 
-	unit := &SynthesizeMode{
+	unit := &modes.SynthesizeMode{
 		Hoverfly: hoverflyStub,
 	}
 
@@ -63,7 +64,7 @@ func Test_SynthesizeMode_IfMiddlewareFailsThenModeReturnsNiceError(t *testing.T)
 		MiddlewareSet: true,
 	}
 
-	unit := &SynthesizeMode{
+	unit := &modes.SynthesizeMode{
 		Hoverfly: hoverflyStub,
 	}
 
@@ -93,7 +94,7 @@ func Test_SynthesizeMode_IfMiddlewareNotSetModeReturnsNiceError(t *testing.T) {
 		MiddlewareSet: false,
 	}
 
-	unit := &SynthesizeMode{
+	unit := &modes.SynthesizeMode{
 		Hoverfly: hoverflyStub,
 	}
 

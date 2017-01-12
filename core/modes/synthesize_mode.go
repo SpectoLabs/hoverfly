@@ -29,12 +29,12 @@ func (this SynthesizeMode) Process(request *http.Request, details models.Request
 
 	if !this.Hoverfly.IsMiddlewareSet() {
 		err := errors.New("Middleware not set")
-		return errorResponse(request, err, "There was an error when creating a synthetic response"), err
+		return ErrorResponse(request, err, "There was an error when creating a synthetic response"), err
 	}
 
 	pair, err := this.Hoverfly.ApplyMiddleware(pair)
 	if err != nil {
-		return errorResponse(request, err, "There was an error when creating a synthetic response"), err
+		return ErrorResponse(request, err, "There was an error when creating a synthetic response"), err
 	}
 
 	log.WithFields(log.Fields{
