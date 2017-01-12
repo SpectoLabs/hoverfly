@@ -24,16 +24,16 @@ func (this hoverflyCaptureStub) ApplyMiddleware(pair models.RequestResponsePair)
 }
 
 // DoRequest - Stub implementation of modes.HoverflyCapture interface
-func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Request, *http.Response, error) {
+func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Response, error) {
 	response := &http.Response{}
 	if request.Host == "error.com" {
-		return nil, nil, errors.New("Could not reach error.com")
+		return nil, errors.New("Could not reach error.com")
 	}
 
 	response.StatusCode = 200
 	response.Body = ioutil.NopCloser(bytes.NewBufferString("test"))
 
-	return request, response, nil
+	return response, nil
 }
 
 // Save - Stub implementation of modes.HoverflyCapture interface

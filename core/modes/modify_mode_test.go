@@ -14,10 +14,10 @@ import (
 
 type hoverflyModifyStub struct{}
 
-func (this hoverflyModifyStub) DoRequest(request *http.Request) (*http.Request, *http.Response, error) {
+func (this hoverflyModifyStub) DoRequest(request *http.Request) (*http.Response, error) {
 	response := &http.Response{}
 	if request.Host == "error.com" {
-		return nil, nil, errors.New("Could not reach error.com")
+		return nil, errors.New("Could not reach error.com")
 	}
 
 	request.Host = "modified.com"
@@ -25,7 +25,7 @@ func (this hoverflyModifyStub) DoRequest(request *http.Request) (*http.Request, 
 	response.StatusCode = 200
 	response.Body = ioutil.NopCloser(bytes.NewBufferString("test"))
 
-	return request, response, nil
+	return response, nil
 }
 
 func (this hoverflyModifyStub) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {

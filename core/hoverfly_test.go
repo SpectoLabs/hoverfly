@@ -374,7 +374,7 @@ func Test_Hoverfly_DoRequest_DoesNotPanicWhenCannotMakeRequest(t *testing.T) {
 	request, err := http.NewRequest("GET", "w.specto.fake", ioutil.NopCloser(bytes.NewBuffer([]byte(""))))
 	Expect(err).To(BeNil())
 
-	request, response, err := dbClient.DoRequest(request)
+	response, err := dbClient.DoRequest(request)
 	Expect(response).To(BeNil())
 	Expect(err).ToNot(BeNil())
 }
@@ -393,7 +393,7 @@ func Test_Hoverfly_DoRequest_FailedHTTP(t *testing.T) {
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
 	Expect(err).To(BeNil())
 
-	_, _, err = dbClient.DoRequest(req)
+	_, err = dbClient.DoRequest(req)
 	Expect(err).ToNot(BeNil())
 
 }

@@ -187,8 +187,8 @@ func (hf *Hoverfly) AddHook(hook Hook) {
 	hf.Hooks.Add(hook)
 }
 
-// doRequest performs original request and returns response that should be returned to client and error (if there is one)
-func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Request, *http.Response, error) {
+// DoRequest - performs request and returns response that should be returned to client and error
+func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
@@ -208,7 +208,7 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Request, *http.Respo
 			"method": request.Method,
 			"path":   request.URL.Path,
 		}).Error("HTTP request failed: " + err.Error())
-		return nil, nil, err
+		return nil, err
 	}
 
 	log.WithFields(log.Fields{
@@ -220,7 +220,7 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Request, *http.Respo
 
 	resp.Header.Set("hoverfly", "Was-Here")
 
-	return request, resp, nil
+	return resp, nil
 
 }
 

@@ -13,7 +13,7 @@ import (
 
 type HoverflyCapture interface {
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
-	DoRequest(*http.Request) (*http.Request, *http.Response, error)
+	DoRequest(*http.Request) (*http.Response, error)
 	Save(*models.RequestDetails, *models.ResponseDetails)
 }
 
@@ -43,7 +43,7 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		return ErrorResponse(request, err, "There was an error when rebuilding the modified http request"), err
 	}
 
-	modifiedReq, response, err := this.Hoverfly.DoRequest(modifiedRequest)
+	response, err := this.Hoverfly.DoRequest(modifiedRequest)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":       err.Error(),
@@ -60,9 +60,9 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		return ErrorResponse(request, err, "There was an error when forwarding the request to the intended desintation"), err
 	}
 
-	requestObj, err := models.NewRequestDetailsFromHttpRequest(modifiedReq)
+	requestObj, err := models.NewRequestDetailsFromHttpRequest(modifiedRequest)
 	if err != nil {
-		return ErrorResponse(modifiedReq, err, "There was an error reading the request body"), err
+		return ErrorResponse(modifiedRequest, err, "There was an error reading the request body"), err
 	}
 
 	respBody, _ := util.GetResponseBody(response)
