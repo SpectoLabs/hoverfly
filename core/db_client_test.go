@@ -3,11 +3,11 @@ package hoverfly
 import (
 	"encoding/json"
 	"fmt"
+	"testing"
+
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"testing"
 )
 
 func TestSetKey(t *testing.T) {
@@ -129,9 +129,15 @@ func TestGetMultipleRecords(t *testing.T) {
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
-		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
-		Expect(err).To(BeNil())
-		dbClient.captureRequest(req)
+		dbClient.Save(&models.RequestDetails{
+			Method:      "GET",
+			Scheme:      "http",
+			Destination: "example.com",
+			Query:       fmt.Sprintf("q=%d", i),
+		}, &models.ResponseDetails{
+			Status: 201,
+			Body:   "ok",
+		})
 	}
 
 	// getting requests

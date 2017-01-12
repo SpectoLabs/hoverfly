@@ -17,7 +17,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/rusenask/goproxy"
 )
 
@@ -192,76 +191,6 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 // AddHook - adds a hook to DBClient
 func (hf *Hoverfly) AddHook(hook Hook) {
 	hf.Hooks.Add(hook)
-}
-
-// captureRequest saves request for later playback
-func (hf *Hoverfly) captureRequest(req *http.Request) (*http.Response, error) {
-
-	// this is mainly for testing, since when you create
-	if req.Body == nil {
-		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
-	}
-
-	reqBody, err := util.GetRequestBody(req)
-
-	if err != nil {
-		reqBody = ""
-
-		log.WithFields(log.Fields{
-			"error":       err.Error(),
-			"mode":        "capture",
-			"path":        req.URL.Path,
-			"method":      req.Method,
-			"destination": req.Host,
-			"scheme":      req.URL.Scheme,
-			"query":       req.URL.RawQuery,
-			"body":        string(reqBody),
-			"headers":     req.Header,
-		}).Error("Got error when reading request body")
-		if req.TLS != nil {
-			log.Debug(req.TLS)
-		}
-	}
-
-	// outputting request body if verbose logging is set
-	log.WithFields(log.Fields{
-		"body": string(reqBody),
-		"mode": "capture",
-	}).Debug("got request body")
-
-	modifiedReq, resp, err := hf.DoRequest(req)
-
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error":       err.Error(),
-			"mode":        "capture",
-			"Path":        req.URL.Path,
-			"Method":      req.Method,
-			"Destination": req.Host,
-			"Scheme":      req.URL.Scheme,
-			"Query":       req.URL.RawQuery,
-			"Body":        string(reqBody),
-			"Headers":     req.Header,
-		}).Error("Got error when executing request")
-
-		return nil, err
-	}
-
-	requestObj, _ := models.NewRequestDetailsFromHttpRequest(modifiedReq)
-
-	respBody, _ := util.GetResponseBody(resp)
-
-	responseObj := &models.ResponseDetails{
-		Status:  resp.StatusCode,
-		Body:    string(respBody),
-		Headers: resp.Header,
-	}
-
-	// saving response body with request/response meta to cache
-	hf.Save(&requestObj, responseObj)
-
-	// return new response or error here
-	return resp, err
 }
 
 // doRequest performs original request and returns response that should be returned to client and error (if there is one)
