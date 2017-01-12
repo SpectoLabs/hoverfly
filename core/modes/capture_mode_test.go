@@ -15,8 +15,15 @@ import (
 type hoverflyCaptureStub struct {
 	SavedRequest  *models.RequestDetails
 	SavedResponse *models.ResponseDetails
+	MiddlewareSet bool
 }
 
+// ApplyMiddleware - Stub implementation of modes.HoverflyCapture interface
+func (this hoverflyCaptureStub) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+	return pair, nil
+}
+
+// DoRequest - Stub implementation of modes.HoverflyCapture interface
 func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Request, *http.Response, error) {
 	response := &http.Response{}
 	if request.Host == "error.com" {
@@ -29,6 +36,7 @@ func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Request,
 	return request, response, nil
 }
 
+// Save - Stub implementation of modes.HoverflyCapture interface
 func (this *hoverflyCaptureStub) Save(request *models.RequestDetails, response *models.ResponseDetails) {
 	this.SavedRequest = request
 	this.SavedResponse = response
@@ -44,6 +52,7 @@ func Test_CaptureMode_WhenGivenARequestItWillMakeTheRequestAndSaveIt(t *testing.
 	}
 
 	requestDetails := models.RequestDetails{
+		Scheme:      "http",
 		Destination: "positive-match.com",
 	}
 
@@ -74,6 +83,7 @@ func Test_CaptureMode_WhenGivenABadRequestItWillError(t *testing.T) {
 	}
 
 	requestDetails := models.RequestDetails{
+		Scheme:      "http",
 		Destination: "error.com",
 	}
 
