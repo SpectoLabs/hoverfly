@@ -235,64 +235,6 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	return hf.RequestMatcher.GetResponse(&requestDetails)
 }
 
-// modifyRequestResponse modifies outgoing request and then modifies incoming response, neither request nor response
-// is saved to cache.
-func (hf *Hoverfly) modifyRequestResponse(req *http.Request, requestDetails models.RequestDetails) (*http.Response, error) {
-	// modifying request
-	req, resp, err := hf.DoRequest(req)
-
-	if err != nil {
-		return nil, err
-	}
-
-	// preparing payload
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error":      err.Error(),
-			"middleware": hf.Cfg.Middleware,
-		}).Error("Failed to read response body after sending modified request")
-		return nil, err
-	}
-
-	r := models.ResponseDetails{
-		Status:  resp.StatusCode,
-		Body:    string(bodyBytes),
-		Headers: resp.Header,
-	}
-
-	requestResponsePair := models.RequestResponsePair{Response: r, Request: requestDetails}
-
-	c := NewConstructor(req, requestResponsePair)
-	// applying middleware to modify responseObj
-
-	err = c.ApplyMiddleware(&hf.Cfg.Middleware)
-
-	if err != nil {
-		return nil, err
-	}
-
-	newResponse := c.ReconstructResponse()
-
-	log.WithFields(log.Fields{
-		"status":      newResponse.StatusCode,
-		"middleware":  hf.Cfg.Middleware.toString(),
-		"mode":        ModifyMode,
-		"path":        c.requestResponsePair.Request.Path,
-		"rawQuery":    c.requestResponsePair.Request.Query,
-		"method":      c.requestResponsePair.Request.Method,
-		"destination": c.requestResponsePair.Request.Destination,
-		// original here
-		"originalPath":        req.URL.Path,
-		"originalRawQuery":    req.URL.RawQuery,
-		"originalMethod":      req.Method,
-		"originalDestination": req.Host,
-	}).Info("request and response modified, returning")
-
-	return newResponse, nil
-}
-
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails) {
 
