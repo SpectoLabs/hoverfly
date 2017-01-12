@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"os"
 	"testing"
 
@@ -53,7 +52,7 @@ func TestGetNewHoverfly(t *testing.T) {
 
 }
 
-func TestProcessCaptureRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CaptureModeReturnsResponseAndSavesIt(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -69,9 +68,14 @@ func TestProcessCaptureRequest(t *testing.T) {
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+
+	count, err := dbClient.RequestCache.RecordsCount()
+	Expect(err).To(BeNil())
+
+	Expect(count).To(Equal(1))
 }
 
-func TestProcessSimulateRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CanSimulateRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -96,7 +100,7 @@ func TestProcessSimulateRequest(t *testing.T) {
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 }
 
-func TestProcessSynthesizeRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -125,7 +129,7 @@ func TestProcessSynthesizeRequest(t *testing.T) {
 	Expect(string(b)).To(Equal(string(bodyBytes)))
 }
 
-func TestProcessModifyRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CanModifyRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -146,18 +150,6 @@ func TestProcessModifyRequest(t *testing.T) {
 	Expect(newResp).ToNot(BeNil())
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
-}
-
-func TestURLToStringWorksAsExpected(t *testing.T) {
-	RegisterTestingT(t)
-
-	testUrl := url.URL{
-		Scheme:   "http",
-		Host:     "test.com",
-		Path:     "/args/1",
-		RawQuery: "query=val",
-	}
-	Expect(testUrl.String()).To(Equal("http://test.com/args/1?query=val"))
 }
 
 type ResponseDelayListStub struct {
