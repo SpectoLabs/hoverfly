@@ -37,7 +37,7 @@ func Test_DoRequest_AddsHoverflyHeaderOnSuccessfulRequest(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://example.com", ioutil.NopCloser(bytes.NewBuffer([]byte(""))))
 	Expect(err).To(BeNil())
 
-	_, response, err := dbClient.DoRequest(req)
+	response, err := dbClient.DoRequest(req)
 
 	Expect(response.Header.Get("hoverfly")).To(Equal("Was-Here"))
 }
