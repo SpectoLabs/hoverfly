@@ -11,6 +11,76 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func TestReconstructRequest(t *testing.T) {
+	RegisterTestingT(t)
+
+	request := models.RequestDetails{
+		Scheme:      "http",
+		Path:        "/random-path",
+		Method:      "GET",
+		Query:       "?foo=bar",
+		Destination: "test-destination.com",
+	}
+	pair := models.RequestResponsePair{Request: request}
+
+	newRequest, err := modes.ReconstructRequest(pair)
+	Expect(err).To(BeNil())
+
+	Expect(newRequest.Method).To(Equal("GET"))
+	Expect(newRequest.URL.Path).To(Equal("/random-path"))
+	Expect(newRequest.Host).To(Equal("test-destination.com"))
+	Expect(newRequest.URL.RawQuery).To(Equal("?foo=bar"))
+}
+
+func Test_ReconstructRequest_BodyRequestResponsePair(t *testing.T) {
+	RegisterTestingT(t)
+
+	request := models.RequestDetails{
+		Scheme:      "http",
+		Path:        "/another-path",
+		Method:      "POST",
+		Query:       "",
+		Destination: "test-destination.com",
+		Body:        "new request body here",
+	}
+	pair := models.RequestResponsePair{Request: request}
+
+	newRequest, err := modes.ReconstructRequest(pair)
+
+	Expect(err).To(BeNil())
+	Expect(newRequest.Method).To(Equal("POST"))
+	Expect(newRequest.Host).To(Equal("test-destination.com"))
+
+	body, err := ioutil.ReadAll(newRequest.Body)
+	Expect(err).To(BeNil())
+
+	Expect(string(body)).To(Equal("new request body here"))
+}
+
+func Test_ReconstructRequest_HeadersInPair(t *testing.T) {
+	RegisterTestingT(t)
+
+	RegisterTestingT(t)
+
+	request := models.RequestDetails{
+		Scheme:      "http",
+		Path:        "/another-path",
+		Method:      "POST",
+		Query:       "",
+		Destination: "test-destination.com",
+		Body:        "new request body here",
+		Headers: map[string][]string{
+			"Header": []string{"ValueX"},
+		},
+	}
+	pair := models.RequestResponsePair{Request: request}
+
+	newRequest, err := modes.ReconstructRequest(pair)
+	Expect(err).To(BeNil())
+
+	Expect(newRequest.Header.Get("Header")).To(Equal("ValueX"))
+}
+
 func Test_ReconstructResponse_ReturnsAResponseWithCorrectStatus(t *testing.T) {
 	RegisterTestingT(t)
 
