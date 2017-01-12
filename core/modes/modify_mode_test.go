@@ -1,4 +1,4 @@
-package modes
+package modes_test
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 	. "github.com/onsi/gomega"
 )
 
@@ -40,7 +41,7 @@ func Test_ModifyMode_WhenGivenARequestItWillModifyTheRequestAndExecuteIt(t *test
 
 	hoverflyStub := &hoverflyModifyStub{}
 
-	unit := &ModifyMode{
+	unit := &modes.ModifyMode{
 		Hoverfly: hoverflyStub,
 	}
 
@@ -68,7 +69,7 @@ func Test_ModifyMode_WhenGivenABadRequestItWillError(t *testing.T) {
 
 	hoverflyStub := &hoverflyModifyStub{}
 
-	unit := &ModifyMode{
+	unit := &modes.ModifyMode{
 		Hoverfly: hoverflyStub,
 	}
 
@@ -96,7 +97,7 @@ func Test_ModifyMode_WillErrorWhenMiddlewareFails(t *testing.T) {
 
 	hoverflyStub := &hoverflyModifyStub{}
 
-	unit := &ModifyMode{
+	unit := &modes.ModifyMode{
 		Hoverfly: hoverflyStub,
 	}
 

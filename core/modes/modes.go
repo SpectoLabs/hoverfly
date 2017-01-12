@@ -51,7 +51,7 @@ func ReconstructResponse(request *http.Request, pair models.RequestResponsePair)
 	return response
 }
 
-func errorResponse(req *http.Request, err error, msg string) *http.Response {
+func ErrorResponse(req *http.Request, err error, msg string) *http.Response {
 	return goproxy.NewResponse(req,
 		goproxy.ContentTypeText, http.StatusBadGateway,
 		fmt.Sprintf("Hoverfly Error! \n\n%s\n\nGot error: %s", msg, err.Error()))
