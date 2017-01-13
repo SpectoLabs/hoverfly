@@ -192,23 +192,9 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 	resp, err := hf.HTTP.Do(request)
 
 	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
-
 	if err != nil {
-		log.WithFields(log.Fields{
-			"mode":   hf.Cfg.Mode,
-			"host":   request.Host,
-			"method": request.Method,
-			"path":   request.URL.Path,
-		}).Error("HTTP request failed: " + err.Error())
 		return nil, err
 	}
-
-	log.WithFields(log.Fields{
-		"mode":   hf.Cfg.Mode,
-		"host":   request.Host,
-		"method": request.Method,
-		"path":   request.URL.Path,
-	}).Debug("response from external service got successfuly!")
 
 	resp.Header.Set("hoverfly", "Was-Here")
 
@@ -231,9 +217,6 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 
 	err := hf.RequestMatcher.SaveRequestResponsePair(&pair)
 	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Failed to save payload")
 		return err
 	}
 

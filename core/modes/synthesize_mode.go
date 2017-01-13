@@ -29,21 +29,18 @@ func (this SynthesizeMode) Process(request *http.Request, details models.Request
 
 	if !this.Hoverfly.IsMiddlewareSet() {
 		err := errors.New("Middleware not set")
-		return ErrorResponse(request, err, "There was an error when creating a synthetic response"), err
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when creating a synthetic response", "synthesize")
 	}
 
 	pair, err := this.Hoverfly.ApplyMiddleware(pair)
 	if err != nil {
-		return ErrorResponse(request, err, "There was an error when creating a synthetic response"), err
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", "synthesize")
 	}
 
 	log.WithFields(log.Fields{
 		"mode": "synthesize",
 		// "middleware":  this.hoverfly.Cfg.Middleware,
-		"path":        request.URL.Path,
-		"rawQuery":    request.URL.RawQuery,
-		"method":      request.Method,
-		"destination": request.Host,
+		"request": GetRequestLogFields(&pair.Request),
 	}).Info("synthetic response created successfuly")
 
 	return ReconstructResponse(request, pair), nil

@@ -17,19 +17,20 @@ type SimulateMode struct {
 }
 
 func (this SimulateMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
-	response, matchingErr := this.Hoverfly.GetResponse(details)
-	if matchingErr != nil {
-		return ErrorResponse(request, matchingErr, "There was an error when matching"), matchingErr
+	pair := models.RequestResponsePair{
+		Request: details,
 	}
 
-	pair := models.RequestResponsePair{
-		Request:  details,
-		Response: *response,
+	response, matchingErr := this.Hoverfly.GetResponse(details)
+	if matchingErr != nil {
+		return ReturnErrorAndLog(request, matchingErr, &pair, "There was an error when matching", "simulate")
 	}
+
+	pair.Response = *response
 
 	pair, err := this.Hoverfly.ApplyMiddleware(pair)
 	if err != nil {
-		return ErrorResponse(request, err, "There was an error when executing middleware"), err
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", "simulate")
 	}
 
 	return ReconstructResponse(request, pair), nil

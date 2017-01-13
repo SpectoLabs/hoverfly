@@ -120,6 +120,6 @@ func Test_ModifyMode_WillErrorWhenMiddlewareFails(t *testing.T) {
 	responseBody, err := ioutil.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(string(responseBody)).To(ContainSubstring("There was an error when applying middleware to http request"))
+	Expect(string(responseBody)).To(ContainSubstring("There was an error when executing middleware"))
 	Expect(string(responseBody)).To(ContainSubstring("middleware-error"))
 }

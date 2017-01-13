@@ -83,7 +83,7 @@ func Test_SynthesizeMode_IfMiddlewareFailsThenModeReturnsNiceError(t *testing.T)
 	responseBody, err := ioutil.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(string(responseBody)).To(ContainSubstring("There was an error when creating a synthetic response"))
+	Expect(string(responseBody)).To(ContainSubstring("There was an error when executing middleware"))
 	Expect(string(responseBody)).To(ContainSubstring("Middleware failed"))
 }
 

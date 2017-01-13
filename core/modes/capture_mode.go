@@ -27,42 +27,19 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 	}
 
-	// outputting request body if verbose logging is set
-	log.WithFields(log.Fields{
-		"body": details.Body,
-		"mode": "capture",
-	}).Debug("got request body")
-
 	pair, err := this.Hoverfly.ApplyMiddleware(models.RequestResponsePair{Request: details})
 	if err != nil {
-		return ErrorResponse(request, err, "There was an error when applying middleware to http request"), err
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when applying middleware to http request", "capture")
 	}
 
 	modifiedRequest, err := ReconstructRequest(pair)
 	if err != nil {
-		return ErrorResponse(request, err, "There was an error when rebuilding the modified http request"), err
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when applying middleware to http request", "capture")
 	}
 
 	response, err := this.Hoverfly.DoRequest(modifiedRequest)
 	if err != nil {
-		log.WithFields(log.Fields{
-			"error":       err.Error(),
-			"mode":        "capture",
-			"Path":        request.URL.Path,
-			"Method":      request.Method,
-			"Destination": request.Host,
-			"Scheme":      request.URL.Scheme,
-			"Query":       request.URL.RawQuery,
-			"Body":        string(details.Body),
-			"Headers":     request.Header,
-		}).Error("Got error when executing request")
-
-		return ErrorResponse(request, err, "There was an error when forwarding the request to the intended desintation"), err
-	}
-
-	requestObj, err := models.NewRequestDetailsFromHttpRequest(modifiedRequest)
-	if err != nil {
-		return ErrorResponse(modifiedRequest, err, "There was an error reading the request body"), err
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended desintation", "capture")
 	}
 
 	respBody, _ := util.GetResponseBody(response)
@@ -74,15 +51,15 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 	}
 
 	// saving response body with request/response meta to cache
-	this.Hoverfly.Save(&requestObj, responseObj)
+	err = this.Hoverfly.Save(&pair.Request, responseObj)
+	if err != nil {
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when saving request and response", "capture")
+	}
 
 	log.WithFields(log.Fields{
-		"mode": "capture",
-		// "middleware":  this.Hoverfly.Cfg.Middleware,
-		"path":        request.URL.Path,
-		"rawQuery":    request.URL.RawQuery,
-		"method":      request.Method,
-		"destination": request.Host,
+		"mode":     "capture",
+		"request":  GetRequestLogFields(&pair.Request),
+		"response": GetResponseLogFields(&pair.Response),
 	}).Info("request and response captured")
 
 	return response, nil
