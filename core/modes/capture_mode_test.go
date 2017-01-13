@@ -37,9 +37,11 @@ func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Response
 }
 
 // Save - Stub implementation of modes.HoverflyCapture interface
-func (this *hoverflyCaptureStub) Save(request *models.RequestDetails, response *models.ResponseDetails) {
+func (this *hoverflyCaptureStub) Save(request *models.RequestDetails, response *models.ResponseDetails) error {
 	this.SavedRequest = request
 	this.SavedResponse = response
+
+	return nil
 }
 
 func Test_CaptureMode_WhenGivenARequestItWillMakeTheRequestAndSaveIt(t *testing.T) {
