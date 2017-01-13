@@ -14,7 +14,7 @@ import (
 type HoverflyCapture interface {
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
 	DoRequest(*http.Request) (*http.Response, error)
-	Save(*models.RequestDetails, *models.ResponseDetails)
+	Save(*models.RequestDetails, *models.ResponseDetails) error
 }
 
 type CaptureMode struct {

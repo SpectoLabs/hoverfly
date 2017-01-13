@@ -222,7 +222,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails) {
+func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails) error {
 
 	pair := models.RequestResponsePair{
 		Request:  *request,
@@ -234,7 +234,10 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Failed to save payload")
+		return err
 	}
+
+	return nil
 }
 
 func (this Hoverfly) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
