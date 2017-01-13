@@ -3,7 +3,7 @@
 Key Concepts
 ************
 
-Hoverfly's functionality is quite broad. You are therefore encouraged to go through these key concepts and understand them clearly before jumping into the `Tutorials`_.
+Hoverfly's functionality is quite broad. You are therefore encouraged to go through these key concepts and understand them clearly before jumping into the ref::`tutorials`.
 
 .. toctree::
    :maxdepth: 2
@@ -12,8 +12,9 @@ Hoverfly's functionality is quite broad. You are therefore encouraged to go thro
    webserver
    modes/modes
    simulations/simulations
-   capturingtraffic
+   capturedtraffic
    templates
+   destinationfiltering
    meta
    delays
    middleware

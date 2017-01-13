@@ -37,6 +37,9 @@ Alternatively, applications themselves can usually be configured to use a proxy.
 
     The proxy configuration methods described here are intended to help you use the code examples in this documentation. The method of configuring an application or operating system to use a proxy varies depending on the environment.
 
+      - `Windows Proxy Settings Explained <https://www.securelink.be/windows-proxy-settings-explained/>`_
+      - `Firefox Proxy Settings <https://support.mozilla.org/en-US/kb/advanced-panel-settings-in-firefox#w_connection>`_
+
 The difference between a proxy server and a webserver
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

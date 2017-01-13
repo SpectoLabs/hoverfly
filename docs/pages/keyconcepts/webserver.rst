@@ -11,23 +11,23 @@ Sometimes you may not be able to configure your client to use a proxy, or you ma
 
     When running as a webserver, Hoverfly cannot capture traffic (see :ref:`capture_mode`) - it can only be used to simulate APIs (see :ref:`simulate_mode`). For this reason, when you use Hoverfly as a webserver, you should have Hoverfly simulations ready to be loaded.
 
-.. When running as a webserver, Hoverfly strips the domain from the endpoint's URL. So for example, if while capturing traffic with Hoverfly running as a proxy you made requests to:
+When running as a webserver, Hoverfly strips the domain from the endpoint's URL. So for example, if while capturing traffic with Hoverfly running as a proxy you made requests to:
 
-..    .. code::
+.. code::
 
-        http://echo.jsontest.com/key/value
+      http://echo.jsontest.com/key/value
 
-..    And Hoverfly is running as a webserver on:
+And Hoverfly is running as a webserver on:
 
-..    .. code::
+.. code::
 
-        http://localhost:8888
+      http://localhost:8888
 
-..    Then the URL you would use to retrieve the data from Hoverfly would be:
+Then the URL you would use to retrieve the data from Hoverfly would be:
 
-..    .. code::
+.. code::
 
-        http://localhost:8500/key/value
+      http://localhost:8500/key/value
 
 .. seealso::
 

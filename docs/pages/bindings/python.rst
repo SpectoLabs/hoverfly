@@ -1,14 +1,16 @@
-Python
-------
+.. _hoverpy:
 
-HoverPy enables you to quickly and easily get started:
+HoverPy
+*******
+
+To get started:
 
 .. code::
 
     sudo pip install hoverpy
     python
 
-And in python you can simply get started with:
+And in Python you can simply get started with:
 
 .. code::
 
@@ -26,4 +28,4 @@ And in python you can simply get started with:
 
     assert(data["milliseconds_since_epoch"] == simData["milliseconds_since_epoch"])
 
-You can read hoverpy's full documentation at http://hoverpy.io.
+For more information, read the `HoverPy documentation <https://hoverpy.readthedocs.io/en/latest/>`_.

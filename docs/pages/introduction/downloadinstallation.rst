@@ -16,8 +16,8 @@ Download the correct archive, extract the binaries and place them in a directory
 Homebrew (MacOS)
 ~~~~~~~~~~~~~~~~
 
-If you have `homebrew <http://brew.sh/>`_ installed, you can easily install Hoverfly using the brew command.
+If you have `homebrew <http://brew.sh/>`_ installed, you can easily install Hoverfly using the ``brew`` command.
 
-::
+.. code:: bash
 
     brew install SpectoLabs/tap/hoverfly

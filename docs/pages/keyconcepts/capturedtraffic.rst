@@ -1,6 +1,6 @@
-.. _capturing_traffic:
+.. _captured_traffic:
 
-Capturing traffic
+Captured traffic
 *****************
 
 Hoverfly's core functionality is to capture requests and responses ("traffic") to create API simulations.

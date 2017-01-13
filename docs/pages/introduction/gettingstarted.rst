@@ -16,27 +16,27 @@ Hoverfly is the application that does the bulk of the work, providing the proxy 
 
 Once you have extracted both Hoverfly and hoverctl into a directory on your PATH, you can run hoverctl and Hoverfly.
 
-.. code::
+.. code:: bash
 
     hoverctl --version
     hoverfly --version
 
 If installed correctly, both of these commands should return a version number. Now you can run an instance of Hoverfly:
 
-.. code::
+.. code:: bash
 
     hoverctl start
 
-We can check whether Hoverfly is running with the following command:
+Check whether Hoverfly is running with the following command:
 
-.. code::
+.. code:: bash
 
     hoverctl logs
 
 The logs should contain the string ``serving proxy`` which indicates that Hoverfly is up and running.
 
-Finally, we can stop Hoverfly:
+Finally, stop Hoverfly with:
 
-.. code::
+.. code:: bash
 
     hoverctl stop
