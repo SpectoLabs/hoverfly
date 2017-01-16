@@ -13,6 +13,7 @@ Hoverfly is a lightweight, open source API simulation tool. Using Hoverfly, you 
 - Extend and customize with any programming language
 - Export, share, edit and import API simulations
 - CLI and native language bindings for Java and Python
+- REST API
 - Lightweight, high-performance, run anywhere
 - Apache 2 license
 
