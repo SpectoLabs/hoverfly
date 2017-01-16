@@ -56,58 +56,31 @@ var _ = AfterSuite(func() {
 })
 
 func startHoverfly(adminPort, proxyPort int) *exec.Cmd {
-	hoverflyBinaryUri := buildBinaryPath()
-	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
-
-	err := hoverflyCmd.Start()
-
-	binaryErrorCheck(err, hoverflyBinaryUri)
-	healthcheck(adminPort)
-
-	return hoverflyCmd
-}
-
-func startHoverflyWithDatabase(adminPort, proxyPort int) *exec.Cmd {
-	hoverflyBinaryUri := buildBinaryPath()
-	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "boltdb", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
-
-	err := hoverflyCmd.Start()
-
-	binaryErrorCheck(err, hoverflyBinaryUri)
-	healthcheck(adminPort)
-
-	return hoverflyCmd
-}
-
-func startHoverflyWebServerWithDatabase(adminPort, proxyPort int) *exec.Cmd {
-	hoverflyBinaryUri := buildBinaryPath()
-	hoverflyCmd := exec.Command(hoverflyBinaryUri,"-db", "boltdb", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-webserver")
-
-	err := hoverflyCmd.Start()
-
-	binaryErrorCheck(err, hoverflyBinaryUri)
-	healthcheck(adminPort)
-
-	return hoverflyCmd
+	return startHoverflyInternal("-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
 }
 
 func startHoverflyWebServer(adminPort, proxyPort int) *exec.Cmd {
-	hoverflyBinaryUri := buildBinaryPath()
-	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-webserver")
+	return startHoverflyInternal("-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-webserver")
+}
 
-	err := hoverflyCmd.Start()
+func startHoverflyWithDatabase(adminPort, proxyPort int) *exec.Cmd {
+	return startHoverflyInternal("-db", "boltdb", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
+}
 
-	binaryErrorCheck(err, hoverflyBinaryUri)
-	healthcheck(adminPort)
-
-	return hoverflyCmd
+func startHoverflyWebServerWithDatabase(adminPort, proxyPort int) *exec.Cmd {
+	return startHoverflyInternal("-db", "boltdb", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-webserver")
 }
 
 func startHoverflyWithMiddleware(adminPort, proxyPort int, middlewarePath string) *exec.Cmd {
-	hoverflyBinaryUri := buildBinaryPath()
-	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "memory", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-middleware", middlewarePath)
+	hoverflyCmd := startHoverflyInternal("-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-middleware", middlewarePath)
 	hoverflyCmd.Stdout = os.Stdout
 	hoverflyCmd.Stderr = os.Stderr
+	return hoverflyCmd
+}
+
+func startHoverflyInternal(commands... string) *exec.Cmd {
+	hoverflyBinaryUri := buildBinaryPath()
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, commands...)
 
 	err := hoverflyCmd.Start()
 
