@@ -128,7 +128,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 		})
 	})
 
-	Describe("and the credentials are not the hoverctl config", func() {
+	Describe("and the credentials are not in the hoverctl config", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverflyWithAuth(adminPort, proxyPort, workingDirectory, username, password)
