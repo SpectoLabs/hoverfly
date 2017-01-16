@@ -5,7 +5,7 @@ Tutorials
 
 In these examples, we will use the hoverctl (CLI tool for Hoverfly) to interact with Hoverfly.
 
-Hoverfly can also be controlled via its REST API, or via native language bindings (LINK).
+Hoverfly can also be controlled via its REST API, or via :ref:`bindings`.
 
 .. toctree::
     :maxdepth: 3
@@ -14,6 +14,7 @@ Hoverfly can also be controlled via its REST API, or via native language binding
     importingsimulations/importingsimulations
     delays/addingdelays
     addingtemplates/addingtemplates
+    randomlatency/randomlatency
     modifyingresponses/modifyingresponses
     https/https
     asawebserver/asawebserver
