@@ -113,11 +113,11 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 				SetHoverflyMode("simulate")
 				resp := CallFakeServerThroughProxy(fakeServer)
-				Expect(resp.StatusCode).To(Equal(412))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
 				SetHoverflyMode("capture")
 
 				resp = CallFakeServerThroughProxy(fakeServer)
-				Expect(resp.StatusCode).To(Equal(200))
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
 				expectedDestination := strings.Replace(fakeServerUrl.String(), "http://", "", 1)
 
@@ -361,7 +361,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 			It("Should fail to generate responses using middleware", func() {
 				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2"))
-				Expect(resp.StatusCode).To(Equal(503))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
 			})
 
 			AfterEach(func() {
@@ -417,7 +417,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 			It("Should fail to generate responses using middleware", func() {
 				resp := DoRequestThroughProxy(sling.New().Get(fakeServer.URL))
-				Expect(resp.StatusCode).To(Equal(503))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
 			})
 
 			AfterEach(func() {

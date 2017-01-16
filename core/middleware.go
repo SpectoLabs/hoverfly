@@ -131,10 +131,6 @@ func (this *Middleware) SetRemote(remoteUrl string) error {
 
 func (this *Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	if !this.IsSet() {
-		log.WithFields(log.Fields{
-			"middleware": this.toString(),
-		}).Error("Error when calling middleware, middleware has not been set")
-
 		return pair, fmt.Errorf("Cannot execute middleware as middleware has not been correctly set")
 	}
 
@@ -155,18 +151,13 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
 	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Failed to marshal json")
-		return pair, err
+		return pair, errors.New("Failed to marshal request to JSON")
 	}
 
-	if log.GetLevel() == log.DebugLevel {
-		log.WithFields(log.Fields{
-			"middleware": this.toString(),
-			"stdin":      string(pairViewBytes),
-		}).Debug("preparing to modify payload")
-	}
+	log.WithFields(log.Fields{
+		"middleware": this.toString(),
+		"stdin":      string(pairViewBytes),
+	}).Debug("preparing to modify payload")
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -207,10 +198,7 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 		err = json.Unmarshal(stdout.Bytes(), &newPairView)
 
 		if err != nil {
-			log.WithFields(log.Fields{
-				"stdout": string(stdout.Bytes()),
-				"error":  err.Error(),
-			}).Error("Failed to unmarshal JSON from middleware")
+			return pair, errors.New("Failed to unmarshal JSON from middleware")
 		} else {
 			if log.GetLevel() == log.DebugLevel {
 				log.WithFields(log.Fields{

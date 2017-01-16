@@ -17,7 +17,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
-	. "github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
@@ -112,7 +112,7 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 	}
 
-	reqBody, err := extractRequestBody(req)
+	reqBody, err := util.GetRequestBody(req)
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -134,26 +134,6 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 	return requestDetails, nil
 }
 
-func extractRequestBody(req *http.Request) (extract []byte, err error) {
-	save := req.Body
-	savecl := req.ContentLength
-
-	save, req.Body, err = CopyBody(req.Body)
-	if err != nil {
-		return
-	}
-
-	defer req.Body.Close()
-	extract, err = ioutil.ReadAll(req.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Body = save
-	req.ContentLength = savecl
-	return extract, nil
-}
-
 func CopyBody(body io.ReadCloser) (resp1, resp2 io.ReadCloser, err error) {
 	var buf bytes.Buffer
 	if _, err = buf.ReadFrom(body); err != nil {
@@ -167,12 +147,12 @@ func CopyBody(body io.ReadCloser) (resp1, resp2 io.ReadCloser, err error) {
 
 func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 	return RequestDetails{
-		Path:        PointerToString(data.GetPath()),
-		Method:      PointerToString(data.GetMethod()),
-		Destination: PointerToString(data.GetDestination()),
-		Scheme:      PointerToString(data.GetScheme()),
-		Query:       PointerToString(data.GetQuery()),
-		Body:        PointerToString(data.GetBody()),
+		Path:        util.PointerToString(data.GetPath()),
+		Method:      util.PointerToString(data.GetMethod()),
+		Destination: util.PointerToString(data.GetDestination()),
+		Scheme:      util.PointerToString(data.GetScheme()),
+		Query:       util.PointerToString(data.GetQuery()),
+		Body:        util.PointerToString(data.GetBody()),
 		Headers:     data.GetHeaders(),
 	}
 }

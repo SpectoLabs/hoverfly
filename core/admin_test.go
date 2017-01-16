@@ -51,10 +51,16 @@ func TestGetAllRecordsWRecords(t *testing.T) {
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
-		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
-		Expect(err).To(BeNil())
-		dbClient.captureRequest(req)
+		req := &models.RequestDetails{
+			Method:      "GET",
+			Scheme:      "http",
+			Destination: "example.com",
+			Query:       fmt.Sprintf("q=%d", i),
+		}
+
+		dbClient.Save(req, &models.ResponseDetails{})
 	}
+
 	// performing query
 	m := adminApi.getBoneRouter(dbClient)
 
@@ -111,9 +117,14 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
-		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
-		Expect(err).To(BeNil())
-		dbClient.captureRequest(req)
+		req := &models.RequestDetails{
+			Method:      "GET",
+			Scheme:      "http",
+			Destination: "example.com",
+			Query:       fmt.Sprintf("q=%d", i),
+		}
+
+		dbClient.Save(req, &models.ResponseDetails{})
 	}
 	// performing query
 	m := adminApi.getBoneRouter(dbClient)
@@ -146,9 +157,14 @@ func TestExportImportRecords(t *testing.T) {
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
-		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
-		Expect(err).To(BeNil())
-		dbClient.captureRequest(req)
+		req := &models.RequestDetails{
+			Method:      "GET",
+			Scheme:      "http",
+			Destination: "example.com",
+			Query:       fmt.Sprintf("q=%d", i),
+		}
+
+		dbClient.Save(req, &models.ResponseDetails{})
 	}
 
 	req, err := http.NewRequest("GET", "/api/records", nil)
@@ -191,9 +207,14 @@ func TestDeleteHandler(t *testing.T) {
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
-		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
-		Expect(err).To(BeNil())
-		dbClient.captureRequest(req)
+		req := &models.RequestDetails{
+			Method:      "GET",
+			Scheme:      "http",
+			Destination: "example.com",
+			Query:       fmt.Sprintf("q=%d", i),
+		}
+
+		dbClient.Save(req, &models.ResponseDetails{})
 	}
 
 	// checking whether we have records
@@ -587,9 +608,17 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
-		req, err := http.NewRequest("GET", fmt.Sprintf("http://example.com/q=%d", i), nil)
-		Expect(err).To(BeNil())
-		dbClient.captureRequest(req)
+		req := &models.RequestDetails{
+			Method:      "GET",
+			Scheme:      "http",
+			Destination: "example.com",
+			Query:       fmt.Sprintf("q=%d", i),
+		}
+
+		resp := &http.Response{}
+		resp.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+
+		dbClient.Save(req, &models.ResponseDetails{})
 	}
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)

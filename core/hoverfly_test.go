@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"os"
 	"testing"
 
@@ -53,7 +52,7 @@ func TestGetNewHoverfly(t *testing.T) {
 
 }
 
-func TestProcessCaptureRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CaptureModeReturnsResponseAndSavesIt(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -69,9 +68,14 @@ func TestProcessCaptureRequest(t *testing.T) {
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+
+	count, err := dbClient.RequestCache.RecordsCount()
+	Expect(err).To(BeNil())
+
+	Expect(count).To(Equal(1))
 }
 
-func TestProcessSimulateRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CanSimulateRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -96,7 +100,7 @@ func TestProcessSimulateRequest(t *testing.T) {
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 }
 
-func TestProcessSynthesizeRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -125,7 +129,7 @@ func TestProcessSynthesizeRequest(t *testing.T) {
 	Expect(string(b)).To(Equal(string(bodyBytes)))
 }
 
-func TestProcessModifyRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CanModifyRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -146,18 +150,6 @@ func TestProcessModifyRequest(t *testing.T) {
 	Expect(newResp).ToNot(BeNil())
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
-}
-
-func TestURLToStringWorksAsExpected(t *testing.T) {
-	RegisterTestingT(t)
-
-	testUrl := url.URL{
-		Scheme:   "http",
-		Host:     "test.com",
-		Path:     "/args/1",
-		RawQuery: "query=val",
-	}
-	Expect(testUrl.String()).To(Equal("http://test.com/args/1?query=val"))
 }
 
 type ResponseDelayListStub struct {
@@ -227,7 +219,7 @@ func TestDelayNotAppliedToFailedSimulateRequest(t *testing.T) {
 
 	newResp := dbClient.processRequest(r)
 
-	Expect(newResp.StatusCode).To(Equal(http.StatusPreconditionFailed))
+	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
 }
@@ -307,7 +299,7 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	newResp := dbClient.processRequest(r)
 
-	Expect(newResp.StatusCode).To(Equal(http.StatusServiceUnavailable))
+	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
 }
@@ -359,21 +351,55 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	newResp := dbClient.processRequest(r)
 
-	Expect(newResp.StatusCode).To(Equal(503))
+	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
 }
 
-func Test_Hoverfly_captureRequest_DoesNotPanicWhenCannotMakeRequest(t *testing.T) {
+func Test_Hoverfly_DoRequest_DoesNotPanicWhenCannotMakeRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	request, err := http.NewRequest("GET", "w.specto.fake", nil)
+	ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	request, err := http.NewRequest("GET", "w.specto.fake", ioutil.NopCloser(bytes.NewBuffer([]byte(""))))
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.captureRequest(request)
+	response, err := dbClient.DoRequest(request)
 	Expect(response).To(BeNil())
 	Expect(err).ToNot(BeNil())
+}
+
+func Test_Hoverfly_DoRequest_FailedHTTP(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	// stopping server
+	server.Close()
+
+	requestBody := []byte("fizz=buzz")
+
+	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	req, err := http.NewRequest("POST", "http://capture_body.com", body)
+	Expect(err).To(BeNil())
+
+	_, err = dbClient.DoRequest(req)
+	Expect(err).ToNot(BeNil())
+}
+
+// TestCaptureHeader tests whether request gets new header assigned
+func Test_DoRequest_AddsHoverflyHeaderOnSuccessfulRequest(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	req, err := http.NewRequest("GET", "http://example.com", ioutil.NopCloser(bytes.NewBuffer([]byte(""))))
+	Expect(err).To(BeNil())
+
+	response, err := dbClient.DoRequest(req)
+
+	Expect(response.Header.Get("hoverfly")).To(Equal("Was-Here"))
 }

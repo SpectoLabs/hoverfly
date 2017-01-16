@@ -1,33 +1,11 @@
 package hoverfly
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"io/ioutil"
 	"net/http"
 	"time"
 )
 
 var emptyResp = &http.Response{}
-
-func extractBody(resp *http.Response) (extract []byte, err error) {
-	save := resp.Body
-	savecl := resp.ContentLength
-
-	save, resp.Body, err = models.CopyBody(resp.Body)
-
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	extract, err = ioutil.ReadAll(resp.Body)
-
-	resp.Body = save
-	resp.ContentLength = savecl
-	if err != nil {
-		return nil, err
-	}
-	return extract, nil
-}
 
 // ActionType - action type can be things such as "RequestCaptured", "GotResponse" - anything
 type ActionType string
