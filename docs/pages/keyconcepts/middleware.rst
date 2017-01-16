@@ -1,7 +1,7 @@
 .. _middleware:
 
 Middleware
-**********
+==========
 
 Middleware intercepts traffic between the client and the API (whether real or simulated), and allowing you to manipulate it.
 

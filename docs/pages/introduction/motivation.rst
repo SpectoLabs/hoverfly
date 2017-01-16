@@ -1,7 +1,7 @@
 .. _motivation:
 
 Motivation
-**********
+==========
 
 Developing and testing interdependent applications is difficult. Maybe you’re working on a mobile application that needs to talk to a legacy API. Or a microservice that relies on two other services that are still in development.
 

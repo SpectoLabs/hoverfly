@@ -1,7 +1,7 @@
 .. _introduction:
 
 Introduction
-************
+============
 
 .. toctree::
     :maxdepth: 3

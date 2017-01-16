@@ -1,7 +1,7 @@
 .. _webserver:
 
 Hoverfly as a webserver
-***********************
+=======================
 
 Sometimes you may not be able to configure your client to use a proxy, or you may simply want to explicitly point your application at Hoverfly. For this reason, Hoverfly can run as a webserver.
 

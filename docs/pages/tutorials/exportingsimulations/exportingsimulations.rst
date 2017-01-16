@@ -1,7 +1,7 @@
 .. _simulations_io:
 
 Creating and exporting a simulation
------------------------------------
+===================================
 
 Start Hoverfly and set it to Capture mode
 

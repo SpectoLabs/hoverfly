@@ -1,11 +1,11 @@
 .. _tutorials:
 
 Tutorials
-*********
+=========
 
 In these examples, we will use the hoverctl (CLI tool for Hoverfly) to interact with Hoverfly.
 
-Hoverfly can also be controlled via its REST API, or via :ref:`bindings`.
+Hoverfly can also be controlled via its :ref:`rest_api`, or via :ref:`bindings`.
 
 .. toctree::
     :maxdepth: 3

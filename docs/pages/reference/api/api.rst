@@ -1,5 +1,8 @@
-API
-===
+.. _rest_api:
+
+
+REST API
+========
 
 GET /api/v2/simulation
 """"""""""""""""""""""

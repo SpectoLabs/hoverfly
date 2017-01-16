@@ -1,7 +1,7 @@
 .. _synthesize_mode:
 
 Synthesize mode
-***************
+===============
 
 This mode is similar to :ref:`simulate_mode`, but instead of looking for a response in stored simulation data, the request is passed directly to a user-supplied executable file. These files are known as :ref:`middleware`.
 

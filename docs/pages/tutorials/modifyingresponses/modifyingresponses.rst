@@ -1,7 +1,7 @@
 .. _modifyingresponses:
 
 Using middleware to modify response payload and status code
------------------------------------------------------------
+===========================================================
 
 .. seealso::
 

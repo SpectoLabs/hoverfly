@@ -1,7 +1,7 @@
 .. _templates:
 
 Templates
-*********
+=========
 
 Sometimes simple one-to-one matching of responses to requests is not enough.
 

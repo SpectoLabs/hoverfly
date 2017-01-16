@@ -2,7 +2,7 @@
 
 
 Hoverfly Java
-*************
+=============
 
 - Strict or loose HTTP request matching based on URL, method, body and header combinations
 - Fluent and expressive DSL for easy generation of simulated APIs

@@ -1,7 +1,7 @@
 .. _addingtemplates:
 
 Adding templates to a simulation
-********************************
+================================
 
 .. seealso::
 
@@ -22,14 +22,14 @@ Which gives us this output:
 If you take a look at your ``simulation.json`` you should notice these lines in your request.
 
 .. literalinclude:: simulation.json
-    :language: json
+    :language: javascript
     :lines: 33-36
     :dedent: 4
 
 Modify them to:
 
 .. literalinclude:: simulationimport.json
-    :language: json
+    :language: javascript
     :lines: 33-36
     :dedent: 4
 

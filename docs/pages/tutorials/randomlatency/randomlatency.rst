@@ -1,7 +1,7 @@
 .. _randomlatency:
 
 Using middleware to simulate network latency
---------------------------------------------
+============================================
 
 .. seealso::
 
@@ -28,4 +28,4 @@ Middleware gives you control over the behaviour of a simulation, as well as the 
   Hoverfly's performance under load.
 
   If you need to simulate latency during a load test, it is recommended that you use Hoverfly's native :ref:`delays`
-  functionality to simulate network latency (see :ref:`adding_delays`) instead of writing middleware. The delays functionality sacrifices flexibility for performance.   
+  functionality to simulate network latency (see :ref:`adding_delays`) instead of writing middleware. The delays functionality sacrifices flexibility for performance.

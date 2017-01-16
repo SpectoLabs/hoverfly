@@ -1,7 +1,7 @@
 .. _getting_started:
 
 Getting Started
-***************
+===============
 
 .. sidebar:: Note
 

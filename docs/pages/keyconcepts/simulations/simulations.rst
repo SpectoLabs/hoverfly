@@ -1,7 +1,7 @@
 .. _simulations:
 
 Simulations
-***********
+===========
 
 The core functionality of Hoverfly is to capture HTTP(S) traffic to create API simulations which can be used in testing. Hoverfly stores captured traffic as `simulations`.
 

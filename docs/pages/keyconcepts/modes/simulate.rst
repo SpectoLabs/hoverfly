@@ -1,7 +1,7 @@
 .. _simulate_mode:
 
 Simulate mode
-*************
+=============
 
 In this mode, Hoverfly uses traffic captured using :ref:`capture_mode` (which may also have been manually edited) to mimic external APIs.
 

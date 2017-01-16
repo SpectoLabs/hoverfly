@@ -1,7 +1,7 @@
 .. _proxy_server:
 
 Hoverfly as a proxy server
-**************************
+==========================
 
 A proxy server passes requests between a client and server.
 

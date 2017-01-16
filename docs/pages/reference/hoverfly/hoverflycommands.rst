@@ -1,15 +1,17 @@
-hoverfly commands
------------------
+.. _hoverfly_commands:
 
-This page contains the equivalent of running:
+Hoverfly commands
+=================
+
+This page contains the output of:
 
 .. code:: bash
-    
+
     hoverfly --help
 
-The command's help content has been placed here for convenience.    
+The command's help content has been placed here for convenience.
 
-:: 
+::
 
     Usage of hoverfly:
       -add

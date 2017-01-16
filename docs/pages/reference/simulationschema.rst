@@ -1,7 +1,7 @@
 .. _simulation_schema:
 
 Simulation schema
-******************
+=================
 
 .. code:: json
 

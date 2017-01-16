@@ -1,7 +1,7 @@
 .. _destination_filtering:
 
 Destination filtering
-*********************
+=====================
 
 By default, Hoverfly will process every request it receives. However, you may wish to control which URLs Hoverfly processes.
 

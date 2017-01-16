@@ -1,7 +1,7 @@
 .. _delays:
 
 Delays
-******
+======
 
 Once you have created a simulated service by capturing traffic between
 your application and an external service, you may wish to make the

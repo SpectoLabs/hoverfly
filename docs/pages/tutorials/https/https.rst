@@ -1,7 +1,7 @@
 .. _simulating_https:
 
 Simulating HTTPS APIs
----------------------
+=====================
 
 Simulating HTTPS traffic is similar to simulating HTTP traffic, with the addition of having to configure Hoverfly's HTTPS certificate.
 

@@ -1,7 +1,7 @@
 .. _capture_mode:
 
 Capture mode
-************
+============
 
 Capture mode is used for creating API simulations.
 

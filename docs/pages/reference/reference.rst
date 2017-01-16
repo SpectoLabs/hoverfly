@@ -1,3 +1,6 @@
+.. _reference:
+
+
 Reference
 =========
 

@@ -1,7 +1,7 @@
 .. _hoverpy:
 
 HoverPy
-*******
+=======
 
 To get started:
 

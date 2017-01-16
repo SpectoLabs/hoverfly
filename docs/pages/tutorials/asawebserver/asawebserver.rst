@@ -1,7 +1,7 @@
 .. _webservertutorial:
 
 Running Hoverfly as a webserver
--------------------------------
+===============================
 
 .. seealso::
 

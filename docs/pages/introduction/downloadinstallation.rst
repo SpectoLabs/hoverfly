@@ -1,7 +1,7 @@
 .. _download_and_installation:
 
 Download and installation
-*************************
+=========================
 
 Hoverfly comes with a command line interface called hoverctl. Archives containing the Hoverfly and hoverctl binaries are available for the major operating systems and architectures.
 

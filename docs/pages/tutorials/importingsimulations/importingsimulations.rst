@@ -1,7 +1,7 @@
 .. _importing_simulation:
 
 Importing and using a simulation
---------------------------------
+================================
 
 In this tutorial we are going to import the simulation we created in the previous tutorial.
 
