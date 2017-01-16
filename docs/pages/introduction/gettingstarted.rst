@@ -1,40 +1,42 @@
+.. _getting_started:
+
 Getting Started
----------------
+===============
 
 .. sidebar:: Note
 
-    You are strongly recommended to keep hoverfly and hoverctl in the same directory. However if they are not in the same directory, then hoverctl first looks in the current directory for hoverfly, then in other directories in the path.
+    It is recommended that you keep Hoverfly and hoverctl in the same directory. However if they are not in the same directory, hoverctl will look in the current directory for Hoverfly, then in other directories on the PATH.
 
 
-Hoverfly is composed of two binaries: hoverfly, and hoverctl.
+Hoverfly is composed of two binaries: Hoverfly, and hoverctl.
 
-hoverctl can be used to spawn, configure, control, and stop hoverfly. It enables to run Hoverfly as a daemon.
-hoverfly is the binary that does the bulk of the work, including the proxy, and api endpoints.
+hoverctl can be used to spawn, configure, control, and stop Hoverfly. It allows you to run Hoverfly as a daemon.
 
-Once you have extracted both hoverfly and hoverctl into the correct directories in your PATH, are able to run hoverctl and hoverfly.
+Hoverfly is the application that does the bulk of the work, providing the proxy server or webserver and the API endpoints.
 
-.. code::
+Once you have extracted both Hoverfly and hoverctl into a directory on your PATH, you can run hoverctl and Hoverfly.
+
+.. code:: bash
 
     hoverctl --version
     hoverfly --version
 
-If installed correctly, both of these binaries should return a version number. You are able to run an instance of Hoverfly:
+If installed correctly, both of these commands should return a version number. Now you can run an instance of Hoverfly:
 
-.. code::
+.. code:: bash
 
     hoverctl start
 
-We can check whether or not Hoverfly is running with the hoverctl logs command:
+Check whether Hoverfly is running with the following command:
 
-.. code::
+.. code:: bash
 
     hoverctl logs
 
-The logs should contain the string “serving proxy” which indicates that hoverfly is up and running successfully.
+The logs should contain the string ``serving proxy`` which indicates that Hoverfly is up and running.
 
-Finally we can stop Hoverfly:
+Finally, stop Hoverfly with:
 
-.. code::
+.. code:: bash
 
     hoverctl stop
-

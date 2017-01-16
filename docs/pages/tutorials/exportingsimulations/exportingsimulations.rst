@@ -1,9 +1,9 @@
 .. _simulations_io:
 
 Creating and exporting a simulation
------------------------------------
+===================================
 
-Start Hoverfly and set it to capture mode
+Start Hoverfly and set it to Capture mode
 
 .. code:: bash
 
@@ -14,12 +14,12 @@ Make a request with cURL, using Hoverfly as a proxy server:
 
 .. code:: bash
 
-    curl --proxy localhost:8500 http://time.jsontest.com
+    curl --proxy http://localhost:8500 http://time.jsontest.com
 
 View the Hoverfly logs
 
 .. code:: bash
-    
+
     hoverctl logs
 
 Export the simulation to a JSON file
@@ -34,8 +34,8 @@ Stop hoverfly
 
     hoverctl stop
 
-You'll now see a requests.db file in your current working directory, which contains all your simulation data.
+You'll now see a ``simulation.json`` file in your current working directory, which contains all your simulation data.
 
-In case you are curious, the sequence diagram of this use case looks like so:
+In case you are curious, the sequence diagram for this process looks like this:
 
-.. figure:: exportsimulations.mermaid.png
+.. figure:: exportingsimulations.mermaid.png

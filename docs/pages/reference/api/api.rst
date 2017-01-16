@@ -1,12 +1,15 @@
-API
-===
+.. _rest_api:
+
+
+REST API
+========
 
 GET /api/v2/simulation
 """"""""""""""""""""""
 
-Gets the entire simulation data. Please remember that the simulation contains all the information Hoverfly can hold; this includes recordings, templates, delays and metadata.
+Gets all simulation data. The simulation JSON contains all the information Hoverfly can hold; this includes recordings, templates, delays and metadata.
 
-Example response body
+Example response body:
 
 ::
 
@@ -82,9 +85,9 @@ Example response body
 PUT /api/v2/simulation
 """"""""""""""""""""""
 
-This puts the given simulation into Hoverfly, overwriting any existing simulation data.
+This puts the supplied simulation JSON into Hoverfly, overwriting any existing simulation data.
 
-Example request body
+Example request body:
 
 ::
 
@@ -164,7 +167,7 @@ GET /api/v2/hoverfly
 
 Gets configuration information from the running instance of Hoverfly.
 
-Example response body
+Example response body:
 
 ::
 
@@ -192,7 +195,7 @@ GET /api/v2/hoverfly/destination
 Gets the current destination setting for the running instance of
 Hoverfly.
 
-Example response body
+Example response body:
 
 ::
 
@@ -207,7 +210,7 @@ PUT /api/v2/hoverfly/destination
 Sets a new destination for the running instance of Hoverfly, overwriting
 the existing destination setting.
 
-Example request body
+Example request body:
 
 ::
 
@@ -226,7 +229,7 @@ Gets the middleware value for the running instance of Hoverfly. This
 will be either an executable command, or an executable command with a
 path to a middleware script.
 
-Example response body
+Example response body:
 
 ::
 
@@ -244,7 +247,7 @@ executable command, or an executable command with a path to a middleware
 script. The command and the file must be available on the Hoverfly host
 machine.
 
-Example request body
+Example request body:
 
 ::
 
@@ -261,7 +264,7 @@ GET /api/v2/hoverfly/mode
 
 Gets the mode for the running instance of Hoverfly.
 
-Example response body
+Example response body:
 
 ::
 
@@ -276,7 +279,7 @@ PUT /api/v2/hoverfly/mode
 
 Changes the mode of the running instance of Hoverfly.
 
-Example request body
+Example request body:
 
 ::
 
@@ -293,7 +296,7 @@ GET /api/v2/hoverfly/usage
 
 Gets metrics information for the running instance of Hoverfly.
 
-Example response body
+Example response body:
 
 ::
 

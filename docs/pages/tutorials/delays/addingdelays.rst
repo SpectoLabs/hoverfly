@@ -1,12 +1,13 @@
-Adding delays to a simulation
------------------------------
+.. _adding_delays:
 
-Simulating latency during development enables you to write code that'll deal with it gracefully. In Hoverfly, this is done with a json file.
+Adding delays to a simulation
+=============================
+
+Simulating API latency during development allows you to write code that will deal with it gracefully. In Hoverfly, this is done with a JSON file.
 
 .. toctree::
     :maxdepth: 3
-    
-    allhosts/allhosts
+
+    allresponses/allresponses
     multiplehosts/multiplehosts
     multiplelocations/multiplelocations
-    multiplematches/multiplematches

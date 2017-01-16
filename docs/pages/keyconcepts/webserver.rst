@@ -1,34 +1,34 @@
 .. _webserver:
 
-Hoverfly as a Webserver
------------------------
+Hoverfly as a webserver
+=======================
 
-Sometimes you may not be able to configure your client to use a proxy, or you may simply want to point to Hoverfly as a webserver.
+Sometimes you may not be able to configure your client to use a proxy, or you may simply want to explicitly point your application at Hoverfly. For this reason, Hoverfly can run as a webserver.
 
 .. figure:: webserver.mermaid.png
 
 .. note::
-    
-    In this mode, Hoverfly does not capture traffic, it can only replay it. For this reason, when you use Hoverfly as a webserver, you should have simulations ready to be loaded. 
 
-.. In webserver mode, Hoverfly strips the domain from the endpoint's URL. So for example, if during capture phase you made requests to:
+    When running as a webserver, Hoverfly cannot capture traffic (see :ref:`capture_mode`) - it can only be used to simulate APIs (see :ref:`simulate_mode`). For this reason, when you use Hoverfly as a webserver, you should have Hoverfly simulations ready to be loaded.
 
-..    .. code::
-        
-        http://echo.jsontest.com/key/value
+When running as a webserver, Hoverfly strips the domain from the endpoint's URL. So for example, if while capturing traffic with Hoverfly running as a proxy you made requests to:
 
-..    And Hoverfly is running on:
+.. code::
 
-..    .. code::
-        
-        http://localhost:8888
+      http://echo.jsontest.com/key/value
 
-..    Then the URL that would retrieve the data back would be:
+And Hoverfly is running as a webserver on:
 
-..    .. code::
-        
-        http://localhost:8500/key/value
+.. code::
+
+      http://localhost:8888
+
+Then the URL you would use to retrieve the data from Hoverfly would be:
+
+.. code::
+
+      http://localhost:8500/key/value
 
 .. seealso::
-    
-    Please refer to the :ref:`webservertutorial` tutorial, for a step by step example.
+
+    Please refer to the :ref:`webservertutorial` tutorial for a step-by-step example.

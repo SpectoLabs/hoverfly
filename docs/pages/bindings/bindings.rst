@@ -1,9 +1,11 @@
-Language bindings
-=================
+.. _bindings:
 
-Hoverfly is available in a variety of languages. This allows for easy integration into your various environments and departments.
+Native language bindings
+========================
+
+Native language bindings are available for Hoverfly to make it easy to integrate into different environments.
 
 .. toctree::
-    
+
     python
     java

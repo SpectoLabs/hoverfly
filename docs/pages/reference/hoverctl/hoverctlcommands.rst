@@ -1,15 +1,17 @@
-hoverctl commands
------------------
+.. _hoverctl_commands:
 
-This page contains the equivalent of running:
+hoverctl commands
+=================
+
+This page contains the output of:
 
 .. code:: bash
-    
+
     hoverctl --help
 
-The command's help content has been placed here for convenience.    
+The command's help content has been placed here for convenience.
 
-:: 
+::
 
     usage: hoverctl [<flags>] <command> [<args> ...]
 
@@ -64,5 +66,3 @@ The command's help content has been placed here for convenience.
 
       config
         Get the config being used by hoverctl and Hoverfly
-
-

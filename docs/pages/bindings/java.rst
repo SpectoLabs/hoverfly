@@ -1,15 +1,13 @@
-Java
-----
+.. _hoverfly_java:
 
-Simply add the following rule to your class, giving it the path to your Simulation on the ClassPath.
 
-.. code:: java
+Hoverfly Java
+=============
 
-    public HoverflyRule hoverflyRule = HoverflyRule.inSimulationMode("test-service.json");
+- Strict or loose HTTP request matching based on URL, method, body and header combinations
+- Fluent and expressive DSL for easy generation of simulated APIs
+- Automatic marshalling of objects into JSON during request/response body generation
+- HTTPS automatically supported, no extra configuration required
+- Download via Maven or Gradle
 
-As Hoverfly is a proxy, all requests (assuming they respect the JVM proxy settings) will be routed through it. Hoverfly will then respond instead of the real service.
-
-The rule will attempt to detect the operating system and architecture type of the host, and then extract and execute the correct hoverfly binary. It will import the json into it’s database and then and destroy the process at the end of the tests.
-
-To read more about Hoverfly's junit binding, please go to https://github.com/SpectoLabs/hoverfly-junit
-
+To get started, read the `Hoverfly Java documentation <https://hoverfly-java.readthedocs.io/en/latest/>`_.

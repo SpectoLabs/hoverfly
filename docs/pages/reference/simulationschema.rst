@@ -1,9 +1,7 @@
-.. _simulationschema:
+.. _simulation_schema:
 
-Simulations schema
-==================
-
-You may find the simulations schema here in its entirety.
+Simulation schema
+=================
 
 .. code:: json
 

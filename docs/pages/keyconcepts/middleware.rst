@@ -1,33 +1,31 @@
 .. _middleware:
 
 Middleware
-----------
+==========
 
-When you want to modify a request, a response, or both you need *middleware*. Middleware intercepts data flowing between the client and the endpoint (whether real or virtualised), and enables you to modify it at will.
+Middleware intercepts traffic between the client and the API (whether real or simulated), and allowing you to manipulate it.
 
-Below is a list of the modes and how they interact with middleware.
+You can use middleware to manipulate data in simulated responses, or to inject unpredictable performance characteristics into your simulation.
 
-- Capture Mode: middleware affects only **outgoing** requests
-- Simulate Mode: middleware affects only **responses** (cache contents remain untouched)
-- Synthesize Mode: middleware **creates responses**
-- Modify Mode: middleware affects **requests and responses**
+Middleware works differently depending on the Hoverfly mode.
 
-You can write middleware in any language as long as it can be executed by the shell on the Hoverfly host. This includes executing a binary file, or an interpreter executing a script. e.g:
+- Capture mode: middleware affects only **outgoing requests**
+- Simulate mode: middleware affects only **incoming responses** (cache contents remain untouched)
+- Synthesize mode: middleware **creates responses**
+- Modify mode: middleware affects **requests and responses**
 
-::
-
-    php middleware.php
+You can write middleware in any language as long as it can be executed by the shell on the Hoverfly host. Middleware could be a binary file, or a script.
 
 Middleware Interface
 ~~~~~~~~~~~~~~~~~~~~
 
-When middleware is called by Hoverfly, expect to receive and return JSON. This JSON will match the request response pair structure defined in the simulation JSON schema. It is important that middleware modifies the values of this JSON schema and not the schema itself.
+When middleware is called by Hoverfly, it expects to receive and return JSON (see :ref:`simulation_schema`). Middleware can be used to modify the values in the JSON but **must not** modify the schema itself.
 
 .. figure:: middleware.mermaid.png
 
-Hoverfly will send the JSON object to middleware via the standard input stream. Hoverfly will then listen to the standard output stream and wait for the JSON object to be returned. 
+Hoverfly will send the JSON object to middleware via the standard input stream. Hoverfly will then listen to the standard output stream and wait for the JSON object to be returned.
 
 
 .. seealso::
 
-    Middleware examples are covered in the tutorials section.
+    Middleware examples are covered in the tutorials section. See :ref:`randomlatency` and :ref:`modifyingresponses`.
