@@ -3,17 +3,18 @@
 ![Hoverfly](core/static/img/hoverfly_logo.png)
 ## Dependencies without the sting
 
-Hoverfly is a lightweight, open source [service virtualization](https://en.wikipedia.org/wiki/Service_virtualization) tool. Using Hoverfly, you can virtualize your application dependencies to create a self-contained development or test environment.
+Hoverfly is a lightweight, open source API simulation tool. Using Hoverfly, you can create realistic simulations of the APIs your application depends on.
 
-Hoverfly is a proxy written in [Go](https://golang.org/). It can capture HTTP(s) traffic between an application under test and external services, and then replace the external services. It can also generate synthetic responses on the fly.
-
-* Capture traffic between a client application and an external service
-* Use captured traffic to create a simulated service
-* Export and import captured traffic
+* Replace slow, flaky API dependencies with realistic, re-usable simulations
+* Simulate network latency, random failures or rate limits to test edge-cases
 * Extend and customize with any programming language
-* Dynamically create responses to requests on the fly
-* Manipulate data in requests and responses
-* Simulate network latency, random failures, rate limits...
+* Export, share, edit and import API simulations
+* CLI and native language bindings for Java and Python
+* REST API
+* Lightweight, high-performance, run anywhere
+* Apache 2 license
+
+Hoverfly is developed and maintained by [SpectoLabs](https://specto.io).
 
 ## Quickstart
 
