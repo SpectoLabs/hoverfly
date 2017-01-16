@@ -7,7 +7,7 @@ Sometimes simple one-to-one matching of responses to requests is not enough.
 
 Request templates are defined in the :ref:`simulation_schema` by setting the ``"requestType"`` property for a request to ``"template"`` and including only the information in the request that you want Hoverfly to use in the match.
 
-In the example below, Hoverfly will retun the same response for any request with the path ``/template``:
+In the example below, Hoverfly will return the same response for any request with the path ``/template``:
 
 
 

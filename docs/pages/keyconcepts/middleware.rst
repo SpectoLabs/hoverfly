@@ -9,8 +9,8 @@ You can use middleware to manipulate data in simulated responses, or to inject u
 
 Middleware works differently depending on the Hoverfly mode.
 
-- Capture mode: middleware affects only **outgoing** requests
-- Simulate mode: middleware affects only **responses** (cache contents remain untouched)
+- Capture mode: middleware affects only **outgoing requests**
+- Simulate mode: middleware affects only **incoming responses** (cache contents remain untouched)
 - Synthesize mode: middleware **creates responses**
 - Modify mode: middleware affects **requests and responses**
 
@@ -28,4 +28,4 @@ Hoverfly will send the JSON object to middleware via the standard input stream. 
 
 .. seealso::
 
-    Middleware examples are covered in the tutorials section. TODO
+    Middleware examples are covered in the tutorials section. See :ref:`randomlatency` and :ref:`modifyingresponses`.

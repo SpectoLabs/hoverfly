@@ -13,7 +13,7 @@ Below you'll find a complete example how to capture data with Hoverfly running a
     :language: bash
     :lines: 3-7
 
-Now let's start Hoverfly as a webserver, in Simulate mode.
+Now let's start Hoverfly as a webserver in Simulate mode.
 
 .. literalinclude:: asawebserver.sh
     :language: bash

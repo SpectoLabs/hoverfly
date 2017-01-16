@@ -5,7 +5,7 @@ Getting Started
 
 .. sidebar:: Note
 
-    It is strongly recommended that you keep Hoverfly and hoverctl in the same directory. However if they are not in the same directory, hoverctl will look in the current directory for Hoverfly, then in other directories on the PATH.
+    It is recommended that you keep Hoverfly and hoverctl in the same directory. However if they are not in the same directory, hoverctl will look in the current directory for Hoverfly, then in other directories on the PATH.
 
 
 Hoverfly is composed of two binaries: Hoverfly, and hoverctl.
