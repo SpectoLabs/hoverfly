@@ -49,3 +49,11 @@ build: test
 
 fmt:
 	go fmt $$(go list ./... | grep -v -E 'vendor')
+
+update-version:
+	awk \
+		-v line=$$(awk '/h.version/{print NR; exit}' core/hoverfly.go) \
+		-v version=$(GIT_TAG_NAME) \
+		'{ if (NR == line) print "	h.version = \"$(GIT_TAG_NAME)\""; else print $0}' core/hoverfly.go > core/hoverfly2.go
+	rm -rf core/hoverfly.go
+	mv core/hoverfly2.go core/hoverfly.go

@@ -52,9 +52,10 @@ type Hoverfly struct {
 
 	ResponseDelays models.ResponseDelays
 
-	Proxy *goproxy.ProxyHttpServer
-	SL    *StoppableListener
-	mu    sync.Mutex
+	Proxy   *goproxy.ProxyHttpServer
+	SL      *StoppableListener
+	mu      sync.Mutex
+	version string
 
 	modeMap map[string]modes.Mode
 }
@@ -86,6 +87,8 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 	modeMap["synthesize"] = modes.SynthesizeMode{Hoverfly: h}
 
 	h.modeMap = modeMap
+
+	h.version = "v0.9.2"
 
 	return h
 }
