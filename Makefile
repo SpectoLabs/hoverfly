@@ -57,3 +57,6 @@ update-version:
 		'{ if (NR == line) print "	h.version = \"$(GIT_TAG_NAME)\""; else print $0}' core/hoverfly.go > core/hoverfly2.go
 	rm -rf core/hoverfly.go
 	mv core/hoverfly2.go core/hoverfly.go
+	git add core/hoverfly.go
+	git commit -m "Updated hoverfly version to $(GIT_TAG_NAME)"
+	git push origin master
