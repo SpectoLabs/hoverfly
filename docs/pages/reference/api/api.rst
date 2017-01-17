@@ -172,15 +172,19 @@ Example response body:
 ::
 
     {
-        destination: ".",
-        middleware: "",
-        mode: "simulate",
-        usage: {
-            counters: {
-                capture: 0,
-                modify: 0,
-                simulate: 0,
-                synthesize: 0
+        "destination": ".",
+        "middleware": {
+		"binary": "python",
+		"script": "# a python script would go here",
+		"remote": ""
+	},
+        "mode": "simulate",
+        "usage": {
+            "counters": {
+                "capture": 0,
+                "modify": 0,
+                "simulate": 0,
+                "synthesize": 0
             }
         }
     }
@@ -225,34 +229,37 @@ Example request body:
 GET /api/v2/hoverfly/middleware
 """""""""""""""""""""""""""""""
 
-Gets the middleware value for the running instance of Hoverfly. This
-will be either an executable command, or an executable command with a
-path to a middleware script.
+Gets the middleware settings for the running instance of Hoverfly. This
+could be either an executable binary, a script that can be executed with 
+a binary or a URL to remote middleware.
 
 Example response body:
 
 ::
 
     {
-        "middleware": "python ./middleware.py"
+        "binary": "python",
+	"script": "#python code goes here",
+	"remote": ""
     }
 
 
 PUT /api/v2/hoverfly/middleware
 """""""""""""""""""""""""""""""
 
-Sets a new middleware value, overwriting the existing middleware value
-for the running instance of Hoverfly. The middleware value should be an
-executable command, or an executable command with a path to a middleware
-script. The command and the file must be available on the Hoverfly host
-machine.
+Sets new middleware, overwriting the existing middleware
+for the running instance of Hoverfly. The middleware being set
+can be either an executable binary located on the host, a script
+and the binary to execute it or the URL to a remote middleware.
 
 Example request body:
 
 ::
 
     {
-        "middleware": "python ./new-middleware.py"
+        "binary": "python",
+	"script": "#python code goes here",
+	"remote": ""
     }
 
 
