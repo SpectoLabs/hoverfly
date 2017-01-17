@@ -58,57 +58,20 @@ func (this *Hoverfly) SetMode(mode string) error {
 	return nil
 }
 
-func (hf Hoverfly) GetMiddleware() string {
-	return hf.Cfg.Middleware.FullCommand
-}
-
-func (hf Hoverfly) GetMiddlewareV2() (string, string) {
+func (hf Hoverfly) GetMiddleware() (string, string, string) {
 	script, _ := hf.Cfg.Middleware.GetScript()
-	return hf.Cfg.Middleware.Binary, script
+	return hf.Cfg.Middleware.Binary, script, hf.Cfg.Middleware.Remote
 }
 
-func (hf Hoverfly) SetMiddleware(middleware string) error {
-	if middleware == "" {
-		hf.Cfg.Middleware.FullCommand = middleware
-		return nil
-	}
-	originalPair := models.RequestResponsePair{
-		Request: models.RequestDetails{
-			Path:        "/",
-			Method:      "GET",
-			Destination: "www.test.com",
-			Scheme:      "",
-			Query:       "",
-			Body:        "",
-			Headers:     map[string][]string{"test_header": []string{"true"}},
-		},
-		Response: models.ResponseDetails{
-			Status:  200,
-			Body:    "ok",
-			Headers: map[string][]string{"test_header": []string{"true"}},
-		},
-	}
-
-	middlewareObject := &Middleware{
-		FullCommand: middleware,
-	}
-
-	_, err := middlewareObject.executeMiddlewareLocally(originalPair)
-	if err != nil {
-		return err
-	}
-
-	hf.Cfg.Middleware.FullCommand = middleware
-	return nil
-}
-
-func (hf *Hoverfly) SetMiddlewareV2(binary, script string) error {
+func (hf *Hoverfly) SetMiddleware(binary, script, remote string) error {
 	newMiddleware := Middleware{}
 
-	if binary == "" && script == "" {
+	if binary == "" && script == "" && remote == "" {
 		hf.Cfg.Middleware = newMiddleware
 		return nil
-	} else if binary == "" {
+	}
+
+	if binary == "" && script != "" {
 		return fmt.Errorf("Cannot run script with no binary")
 	}
 
@@ -120,6 +83,11 @@ func (hf *Hoverfly) SetMiddlewareV2(binary, script string) error {
 	err = newMiddleware.SetScript(script)
 	if err != nil {
 		return nil
+	}
+
+	err = newMiddleware.SetRemote(remote)
+	if err != nil {
+		return err
 	}
 
 	testData := models.RequestResponsePair{
@@ -138,7 +106,7 @@ func (hf *Hoverfly) SetMiddlewareV2(binary, script string) error {
 			Headers: map[string][]string{"test_header": []string{"true"}},
 		},
 	}
-	_, err = newMiddleware.executeMiddlewareLocally(testData)
+	_, err = newMiddleware.Execute(testData)
 	if err != nil {
 		return err
 	}
@@ -256,7 +224,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
 
 	return v2.SimulationView{
 		MetaView: v2.MetaView{
-			HoverflyVersion: "v0.9.2",
+			HoverflyVersion: hf.version,
 			SchemaVersion:   "v1",
 			TimeExported:    time.Now().Format(time.RFC3339),
 		},

@@ -113,11 +113,11 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 				SetHoverflyMode("simulate")
 				resp := CallFakeServerThroughProxy(fakeServer)
-				Expect(resp.StatusCode).To(Equal(412))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
 				SetHoverflyMode("capture")
 
 				resp = CallFakeServerThroughProxy(fakeServer)
-				Expect(resp.StatusCode).To(Equal(200))
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
 				expectedDestination := strings.Replace(fakeServerUrl.String(), "http://", "", 1)
 
@@ -208,7 +208,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 		Context("with middleware", func() {
 			BeforeEach(func() {
-				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/middleware.py")
+				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "python testdata/middleware.py")
 
 				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "text/plain")
@@ -312,7 +312,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 		Context("with middleware", func() {
 
 			BeforeEach(func() {
-				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/middleware.py")
+				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "python testdata/middleware.py")
 				SetHoverflyMode("simulate")
 				ImportHoverflyRecords(jsonRequestResponsePair)
 			})
@@ -335,7 +335,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 		Context("With middleware", func() {
 
 			BeforeEach(func() {
-				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/middleware.py")
+				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "python testdata/middleware.py")
 				SetHoverflyMode("synthesize")
 			})
 
@@ -361,7 +361,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 			It("Should fail to generate responses using middleware", func() {
 				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2"))
-				Expect(resp.StatusCode).To(Equal(503))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
 			})
 
 			AfterEach(func() {
@@ -378,7 +378,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 		Context("With middleware", func() {
 
 			BeforeEach(func() {
-				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/middleware.py")
+				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "python testdata/middleware.py")
 				SetHoverflyMode("modify")
 				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					body, _ := ioutil.ReadAll(r.Body)
@@ -417,7 +417,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 			It("Should fail to generate responses using middleware", func() {
 				resp := DoRequestThroughProxy(sling.New().Get(fakeServer.URL))
-				Expect(resp.StatusCode).To(Equal(503))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
 			})
 
 			AfterEach(func() {
@@ -433,7 +433,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 		var expectedImage []byte
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "testdata/binary_middleware.py")
+			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "python testdata/binary_middleware.py")
 			SetHoverflyMode("synthesize")
 			pwd, _ := os.Getwd()
 			expectedFile := "/testdata/1x1.png"

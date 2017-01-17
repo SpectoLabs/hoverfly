@@ -298,5 +298,32 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 		})
+
+		Context("You can set db options for hoverfly", func() {
+
+			It("starts hoverfly with boltdb for data persistence", func() {
+				setOutput, _ := exec.Command(hoverctlBinary, "start", "--database", "boltdb", "-v").Output()
+
+				output := strings.TrimSpace(string(setOutput))
+				Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
+
+				if err != nil {
+					Fail("Could not find pid file")
+				}
+
+				Expect(data).ToNot(BeEmpty())
+
+				data, err = ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
+
+				if err != nil {
+					Fail("Could not find log file")
+				}
+
+				Expect(data).ToNot(BeEmpty())
+				Expect(data).To(ContainSubstring("Creating bolt db backend."))
+			})
+		})
 	})
 })

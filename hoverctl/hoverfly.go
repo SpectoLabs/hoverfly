@@ -13,6 +13,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/dghubble/sling"
 	"github.com/kardianos/osext"
 )
@@ -205,37 +206,48 @@ func (h *Hoverfly) SetDestination(destination string) (string, error) {
 }
 
 // GetMiddle will go the middleware endpoint in Hoverfly, parse the JSON response and return the middleware of Hoverfly
-func (h *Hoverfly) GetMiddleware() (string, error) {
+func (h *Hoverfly) GetMiddleware() (v2.MiddlewareView, error) {
 	slingRequest, err := h.buildGetRequest(v2ApiMiddleware)
 	if err != nil {
-		return "", err
+		return v2.MiddlewareView{}, err
 	}
 
 	response, err := h.doRequest(slingRequest)
 	if err != nil {
-		return "", err
+		return v2.MiddlewareView{}, err
 	}
 
 	defer response.Body.Close()
 
 	middlewareResponse := h.createMiddlewareSchema(response)
 
-	return middlewareResponse.Middleware, nil
+	return middlewareResponse, nil
 }
 
-func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
-	slingRequest, err := h.buildPutRequest(v2ApiMiddleware, `{"middleware":"`+middleware+`"}`)
+func (h *Hoverfly) SetMiddleware(binary, script, remote string) (v2.MiddlewareView, error) {
+	middlewareRequest := &v2.MiddlewareView{
+		Binary: binary,
+		Script: script,
+		Remote: remote,
+	}
+
+	marshalledMiddleware, err := json.Marshal(middlewareRequest)
 	if err != nil {
-		return "", err
+		return v2.MiddlewareView{}, err
+	}
+
+	slingRequest, err := h.buildPutRequest(v2ApiMiddleware, string(marshalledMiddleware))
+	if err != nil {
+		return v2.MiddlewareView{}, err
 	}
 
 	response, err := h.doRequest(slingRequest)
 	if err != nil {
-		return "", err
+		return v2.MiddlewareView{}, err
 	}
 
 	if response.StatusCode == 403 {
-		return "", errors.New("Cannot change the mode of Hoverfly when running as a webserver")
+		return v2.MiddlewareView{}, errors.New("Cannot change the mode of Hoverfly when running as a webserver")
 	}
 
 	if response.StatusCode != 200 {
@@ -246,12 +258,12 @@ func (h *Hoverfly) SetMiddleware(middleware string) (string, error) {
 
 		json.Unmarshal(errorMessage, error)
 		log.Debug(error.ErrorMessage)
-		return "", errors.New("Hoverfly could not execute this middleware")
+		return v2.MiddlewareView{}, errors.New("Hoverfly could not execute this middleware")
 	}
 
 	apiResponse := h.createMiddlewareSchema(response)
 
-	return apiResponse.Middleware, nil
+	return apiResponse, nil
 }
 
 func (h *Hoverfly) ImportSimulation(simulationData string, v1 bool) error {
@@ -328,14 +340,13 @@ func (h *Hoverfly) createAPIStateResponse(response *http.Response) APIStateSchem
 	return apiResponse
 }
 
-func (h *Hoverfly) createMiddlewareSchema(response *http.Response) MiddlewareSchema {
+func (h *Hoverfly) createMiddlewareSchema(response *http.Response) v2.MiddlewareView {
 	body, err := ioutil.ReadAll(response.Body)
-	fmt.Println(string(body))
 	if err != nil {
 		log.Debug(err.Error())
 	}
 
-	var middleware MiddlewareSchema
+	var middleware v2.MiddlewareView
 
 	err = json.Unmarshal(body, &middleware)
 	if err != nil {

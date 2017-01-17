@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"os"
 	"testing"
 
@@ -53,7 +52,7 @@ func TestGetNewHoverfly(t *testing.T) {
 
 }
 
-func TestProcessCaptureRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CaptureModeReturnsResponseAndSavesIt(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -69,9 +68,14 @@ func TestProcessCaptureRequest(t *testing.T) {
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+
+	count, err := dbClient.RequestCache.RecordsCount()
+	Expect(err).To(BeNil())
+
+	Expect(count).To(Equal(1))
 }
 
-func TestProcessSimulateRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CanSimulateRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -96,7 +100,7 @@ func TestProcessSimulateRequest(t *testing.T) {
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 }
 
-func TestProcessSynthesizeRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
@@ -104,7 +108,11 @@ func TestProcessSynthesizeRequest(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 
 	// getting reflect middleware
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/reflect_body/reflect_body.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript(pythonReflectBody)
+	Expect(err).To(BeNil())
 
 	bodyBytes := []byte("request_body_here")
 
@@ -115,20 +123,23 @@ func TestProcessSynthesizeRequest(t *testing.T) {
 	newResp := dbClient.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
-	Expect(newResp.StatusCode).To(Equal(http.StatusOK))
+	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 	b, err := ioutil.ReadAll(newResp.Body)
 	Expect(err).To(BeNil())
 	Expect(string(b)).To(Equal(string(bodyBytes)))
 }
 
-func TestProcessModifyRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CanModifyRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	// getting reflect middleware
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_request/modify_request.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript(pythonModifyResponse)
+	Expect(err).To(BeNil())
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
@@ -138,19 +149,7 @@ func TestProcessModifyRequest(t *testing.T) {
 
 	Expect(newResp).ToNot(BeNil())
 
-	Expect(newResp.StatusCode).To(Equal(http.StatusAccepted))
-}
-
-func TestURLToStringWorksAsExpected(t *testing.T) {
-	RegisterTestingT(t)
-
-	testUrl := url.URL{
-		Scheme:   "http",
-		Host:     "test.com",
-		Path:     "/args/1",
-		RawQuery: "query=val",
-	}
-	Expect(testUrl.String()).To(Equal("http://test.com/args/1?query=val"))
+	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 }
 
 type ResponseDelayListStub struct {
@@ -220,7 +219,7 @@ func TestDelayNotAppliedToFailedSimulateRequest(t *testing.T) {
 
 	newResp := dbClient.processRequest(r)
 
-	Expect(newResp.StatusCode).To(Equal(http.StatusPreconditionFailed))
+	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
 }
@@ -254,8 +253,11 @@ func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
-	// getting reflect middleware
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/reflect_body/reflect_body.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript(pythonReflectBody)
+	Expect(err).To(BeNil())
 
 	bodyBytes := []byte("request_body_here")
 
@@ -268,7 +270,7 @@ func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	newResp := dbClient.processRequest(r)
 
-	Expect(newResp.StatusCode).To(Equal(http.StatusOK))
+	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
 	Expect(stub.gotDelays).To(Equal(1))
 }
@@ -280,8 +282,11 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
-	// getting reflect middleware
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/reflect_body/no_exist.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript(pythonMiddlewareBad)
+	Expect(err).To(BeNil())
 
 	bodyBytes := []byte("request_body_here")
 
@@ -294,19 +299,22 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	newResp := dbClient.processRequest(r)
 
-	Expect(newResp.StatusCode).To(Equal(http.StatusServiceUnavailable))
+	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
 }
 
-func TestDelayAppliedToModifyRequest(t *testing.T) {
+func TestDelayAppliedToSuccessfulMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	// getting reflect middleware
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_request/modify_request.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript(pythonModifyResponse)
+	Expect(err).To(BeNil())
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
@@ -317,7 +325,7 @@ func TestDelayAppliedToModifyRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	newResp := dbClient.processRequest(r)
 
-	Expect(newResp.StatusCode).To(Equal(http.StatusAccepted))
+	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
 	Expect(stub.gotDelays).To(Equal(1))
 }
@@ -328,8 +336,11 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	// getting reflect middleware
-	dbClient.Cfg.Middleware.FullCommand = "./examples/middleware/modify_request/no_exist.py"
+	err := dbClient.Cfg.Middleware.SetBinary("python")
+	Expect(err).To(BeNil())
+
+	err = dbClient.Cfg.Middleware.SetScript(pythonMiddlewareBad)
+	Expect(err).To(BeNil())
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
@@ -340,21 +351,55 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 	dbClient.ResponseDelays = &stub
 	newResp := dbClient.processRequest(r)
 
-	Expect(newResp.StatusCode).To(Equal(503))
+	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
 }
 
-func Test_Hoverfly_captureRequest_DoesNotPanicWhenCannotMakeRequest(t *testing.T) {
+func Test_Hoverfly_DoRequest_DoesNotPanicWhenCannotMakeRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	request, err := http.NewRequest("GET", "w.specto.fake", nil)
+	ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+	request, err := http.NewRequest("GET", "w.specto.fake", ioutil.NopCloser(bytes.NewBuffer([]byte(""))))
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.captureRequest(request)
+	response, err := dbClient.DoRequest(request)
 	Expect(response).To(BeNil())
 	Expect(err).ToNot(BeNil())
+}
+
+func Test_Hoverfly_DoRequest_FailedHTTP(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	// stopping server
+	server.Close()
+
+	requestBody := []byte("fizz=buzz")
+
+	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+
+	req, err := http.NewRequest("POST", "http://capture_body.com", body)
+	Expect(err).To(BeNil())
+
+	_, err = dbClient.DoRequest(req)
+	Expect(err).ToNot(BeNil())
+}
+
+// TestCaptureHeader tests whether request gets new header assigned
+func Test_DoRequest_AddsHoverflyHeaderOnSuccessfulRequest(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, dbClient := testTools(200, `{'message': 'here'}`)
+	defer server.Close()
+
+	req, err := http.NewRequest("GET", "http://example.com", ioutil.NopCloser(bytes.NewBuffer([]byte(""))))
+	Expect(err).To(BeNil())
+
+	response, err := dbClient.DoRequest(req)
+
+	Expect(response.Header.Get("hoverfly")).To(Equal("Was-Here"))
 }

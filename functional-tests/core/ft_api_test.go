@@ -403,7 +403,7 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"middleware":""}`)))
+			Expect(modeJson).To(Equal([]byte(`{"binary":"","script":"","remote":""}`)))
 		})
 	})
 
@@ -411,18 +411,18 @@ var _ = Describe("Interacting with the API", func() {
 
 		It("Should put the middleware", func() {
 			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/middleware")
-			req.Body(strings.NewReader(`{"middleware":"cat"}`))
+			req.Body(strings.NewReader(`{"binary":"ruby", "script":"#!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend"}`))
 			res := DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"middleware":"cat"}`)))
+			Expect(modeJson).To(Equal([]byte(`{"binary":"ruby","script":"#!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend","remote":""}`)))
 
 			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/middleware")
 			res = DoRequest(req)
 			modeJson, err = ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"middleware":"cat"}`)))
+			Expect(modeJson).To(Equal([]byte(`{"binary":"ruby","script":"#!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend","remote":""}`)))
 		})
 
 	})

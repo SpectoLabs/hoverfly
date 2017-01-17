@@ -5,11 +5,14 @@ import (
 	"encoding/json"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 
 	"errors"
 	"io/ioutil"
 	"net/http"
+
+	"fmt"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -17,13 +20,49 @@ import (
 )
 
 type Middleware struct {
-	Binary      string
-	Script      *os.File
-	FullCommand string
+	Binary string
+	Script *os.File
+	Remote string
+}
+
+func ConvertToNewMiddleware(middleware string) (*Middleware, error) {
+	newMiddleware := &Middleware{}
+	if strings.HasPrefix(middleware, "http") {
+
+		err := newMiddleware.SetRemote(middleware)
+		if err != nil {
+			return nil, err
+		}
+
+		return newMiddleware, nil
+	} else if strings.Contains(middleware, " ") {
+		splitMiddleware := strings.Split(middleware, " ")
+		fileContents, _ := ioutil.ReadFile(splitMiddleware[1])
+
+		newMiddleware.SetBinary(splitMiddleware[0])
+		newMiddleware.SetScript(string(fileContents))
+
+		return newMiddleware, nil
+
+	} else {
+		err := newMiddleware.SetBinary(middleware)
+		if err != nil {
+			return nil, err
+		}
+		return newMiddleware, nil
+	}
+
+	return nil, nil
 }
 
 func (this *Middleware) SetScript(scriptContent string) error {
-	script, err := ioutil.TempFile(os.TempDir(), "hoverfly_")
+	tempDir := path.Join(os.TempDir(), "hoverfly")
+	this.DeleteScripts(tempDir)
+
+	//We ignore the error it outputs as this directory may already exist
+	os.Mkdir(tempDir, 0777)
+
+	script, err := ioutil.TempFile(tempDir, "hoverfly_")
 	if err != nil {
 		return err
 	}
@@ -32,8 +71,6 @@ func (this *Middleware) SetScript(scriptContent string) error {
 	if err != nil {
 		return err
 	}
-
-	this.DeleteScript()
 
 	this.Script = script
 
@@ -52,14 +89,13 @@ func (this Middleware) GetScript() (string, error) {
 	return string(contents), nil
 }
 
-func (this *Middleware) DeleteScript() error {
-	if this.Script != nil {
-		err := os.Remove(this.Script.Name())
-		if err != nil {
-			return err
-		}
-		this.Script = nil
+func (this *Middleware) DeleteScripts(path string) error {
+	err := os.RemoveAll(path)
+	if err != nil {
+		return err
 	}
+	this.Script = nil
+
 	return nil
 }
 
@@ -79,16 +115,26 @@ func (this *Middleware) SetBinary(binary string) error {
 	return nil
 }
 
-func (this Middleware) isLocal() bool {
-	return !strings.HasPrefix(this.FullCommand, "http")
+func (this *Middleware) SetRemote(remoteUrl string) error {
+	if remoteUrl == "" {
+		this.Remote = ""
+		return nil
+	}
+
+	response, err := http.Post(remoteUrl, "", nil)
+	if err != nil || response.StatusCode != 200 {
+		return fmt.Errorf("Could not reach remote middleware")
+	}
+	this.Remote = remoteUrl
+	return nil
 }
 
 func (this *Middleware) Execute(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	if this.Binary != "" && this.Script != nil {
-		this.FullCommand = this.Binary + " " + this.Script.Name()
+	if !this.IsSet() {
+		return pair, fmt.Errorf("Cannot execute middleware as middleware has not been correctly set")
 	}
 
-	if this.isLocal() {
+	if this.Remote == "" {
 		return this.executeMiddlewareLocally(pair)
 	} else {
 		return this.executeMiddlewareRemotely(pair)
@@ -97,12 +143,7 @@ func (this *Middleware) Execute(pair models.RequestResponsePair) (models.Request
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
 func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	var commandAndArgs []string
-	if this.Binary == "" {
-		commandAndArgs = strings.Split(strings.TrimSpace(this.FullCommand), " ")
-	} else {
-		commandAndArgs = []string{this.Binary, this.Script.Name()}
-	}
+	commandAndArgs := []string{this.Binary, this.Script.Name()}
 
 	middlewareCommand := exec.Command(commandAndArgs[0], commandAndArgs[1:]...)
 
@@ -110,18 +151,13 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
 	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("Failed to marshal json")
-		return pair, err
+		return pair, errors.New("Failed to marshal request to JSON")
 	}
 
-	if log.GetLevel() == log.DebugLevel {
-		log.WithFields(log.Fields{
-			"middleware": this.FullCommand,
-			"stdin":      string(pairViewBytes),
-		}).Debug("preparing to modify payload")
-	}
+	log.WithFields(log.Fields{
+		"middleware": this.toString(),
+		"stdin":      string(pairViewBytes),
+	}).Debug("preparing to modify payload")
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -162,14 +198,11 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 		err = json.Unmarshal(stdout.Bytes(), &newPairView)
 
 		if err != nil {
-			log.WithFields(log.Fields{
-				"stdout": string(stdout.Bytes()),
-				"error":  err.Error(),
-			}).Error("Failed to unmarshal JSON from middleware")
+			return pair, errors.New("Failed to unmarshal JSON from middleware")
 		} else {
 			if log.GetLevel() == log.DebugLevel {
 				log.WithFields(log.Fields{
-					"middleware": this.FullCommand,
+					"middleware": this.toString(),
 					"payload":    string(stdout.Bytes()),
 				}).Debug("payload after modifications")
 			}
@@ -189,7 +222,11 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 
-	req, err := http.NewRequest("POST", this.FullCommand, bytes.NewBuffer(pairViewBytes))
+	if this.Remote == "" {
+		return pair, fmt.Errorf("Error when communicating with remote middleware")
+	}
+
+	req, err := http.NewRequest("POST", this.Remote, bytes.NewBuffer(pairViewBytes))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
@@ -228,4 +265,19 @@ func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair
 		return pair, err
 	}
 	return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
+}
+
+func (this Middleware) IsSet() bool {
+	return this.Binary != "" || this.Remote != ""
+}
+
+func (this Middleware) toString() string {
+	if this.Remote != "" {
+		return this.Remote
+	} else {
+		if this.Script != nil {
+			return this.Binary + " " + this.Script.Name()
+		}
+		return this.Binary
+	}
 }

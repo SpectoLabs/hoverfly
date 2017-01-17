@@ -17,7 +17,9 @@ type UsageView struct {
 }
 
 type MiddlewareView struct {
-	Middleware string `json:"middleware"`
+	Binary string `json:"binary"`
+	Script string `json:"script"`
+	Remote string `json:"remote"`
 }
 
 type ModeView struct {
@@ -26,7 +28,7 @@ type ModeView struct {
 
 type HoverflyView struct {
 	DestinationView
-	MiddlewareView
+	MiddlewareView `json:"middleware"`
 	ModeView
 	UsageView
 }

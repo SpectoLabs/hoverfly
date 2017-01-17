@@ -55,7 +55,7 @@ func (c *InMemoryCache) GetAllEntries() (map[string][]byte, error) {
 		dest[k] = v
 	}
 	c.RUnlock()
-	return c.elements, nil
+	return dest, nil
 }
 
 func (c *InMemoryCache) RecordsCount() (count int, err error) {

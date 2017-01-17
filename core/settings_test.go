@@ -50,10 +50,15 @@ func TestSettingsMiddlewareEnv(t *testing.T) {
 
 	defer os.Setenv("HoverflyMiddleware", "")
 
-	os.Setenv("HoverflyMiddleware", "./examples/middleware/x.go")
+	os.Setenv("HoverflyMiddleware", "ruby examples/middleware/ruby_echo/echo.rb")
 	cfg := InitSettings()
 
-	Expect(cfg.Middleware.FullCommand).To(Equal("./examples/middleware/x.go"))
+	Expect(cfg.Middleware.Binary).To(Equal("ruby"))
+
+	script, err := cfg.Middleware.GetScript()
+	Expect(err).To(BeNil())
+
+	Expect(script).To(Equal(rubyEcho))
 }
 
 // TestSetMode - tests SetMode function, however it doesn't test

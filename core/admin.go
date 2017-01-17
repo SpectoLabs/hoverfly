@@ -103,12 +103,10 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 func GetAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 	var list []handlers.AdminHandler
 
-	list = append(list, &v1.AddHandler{Hoverfly: hoverfly})
 	list = append(list, &v1.CountHandler{Hoverfly: hoverfly})
 	list = append(list, &v1.DelaysHandler{Hoverfly: hoverfly})
 	list = append(list, &v1.HealthHandler{})
 	list = append(list, &v1.MetadataHandler{Hoverfly: hoverfly})
-	list = append(list, &v1.MiddlewareHandler{})
 	list = append(list, &v1.RecordsHandler{Hoverfly: hoverfly})
 	list = append(list, &v1.StateHandler{Hoverfly: hoverfly})
 	list = append(list, &v1.StatsHandler{Hoverfly: hoverfly})

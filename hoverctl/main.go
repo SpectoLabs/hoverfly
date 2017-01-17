@@ -10,6 +10,7 @@ import (
 	"regexp"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -24,6 +25,7 @@ var (
 	certificateFlag = kingpin.Flag("certificate", "Supply path for custom certificate").String()
 	keyFlag         = kingpin.Flag("key", "Supply path for custom key").String()
 	disableTlsFlag  = kingpin.Flag("disable-tls", "Disable TLS verification").Bool()
+	databaseFlag    = kingpin.Flag("database", "Set persistance storage to use - default to in memory DB").String()
 
 	modeCommand = kingpin.Command("mode", "Get Hoverfly's current mode")
 	modeNameArg = modeCommand.Arg("name", "Set Hoverfly's mode").String()
@@ -32,8 +34,11 @@ var (
 	destinationNameArg = destinationCommand.Arg("name", "Set Hoverfly's destination").String()
 	destinationDryRun  = destinationCommand.Flag("dry-run", "Test a url against a regex pattern").String()
 
-	middlewareCommand = kingpin.Command("middleware", "Get Hoverfly's middleware")
-	middlewarePathArg = middlewareCommand.Arg("path", "Set Hoverfly's middleware").String()
+	middlewareCommand    = kingpin.Command("middleware", "Get Hoverfly's middleware")
+	middlewareBinaryFlag = middlewareCommand.Flag("binary", "The binary that middleware should execute").String()
+	middlewareScriptFlag = middlewareCommand.Flag("script", "The script that middleware should execute").String()
+	middlewareRemoteFlag = middlewareCommand.Flag("remote", "The remote address that middleware should execute").String()
+	middlewarePathArg    = middlewareCommand.Arg("path", "Set Hoverfly's middleware").String()
 
 	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
 	startArg     = startCommand.Arg("server type", "Choose the configuration of Hoverfly (proxy/webserver)").String()
@@ -86,6 +91,7 @@ func main() {
 	config = config.SetCertificate(*certificateFlag)
 	config = config.SetKey(*keyFlag)
 	config = config.DisableTls(*disableTlsFlag)
+	config = config.SetDbType(*databaseFlag)
 
 	hoverflyDirectory, err := NewHoverflyDirectory(*config)
 	handleIfError(err)
@@ -155,18 +161,37 @@ func main() {
 		}
 
 	case middlewareCommand.FullCommand():
-		var middleware string
-		if *middlewarePathArg == "" || *modeNameArg == "status" {
+		var middleware v2.MiddlewareView
+		if *middlewareBinaryFlag == "" && *middlewareScriptFlag == "" && *middlewareRemoteFlag == "" {
 			middleware, err = hoverfly.GetMiddleware()
 			handleIfError(err)
 			log.Info("Hoverfly is currently set to run the following as middleware")
 		} else {
-			middleware, err = hoverfly.SetMiddleware(*middlewarePathArg)
-			handleIfError(err)
-			log.Info("Hoverfly is now set to run the following as middleware")
+			if *middlewareRemoteFlag != "" {
+				middleware, err = hoverfly.SetMiddleware("", "", *middlewareRemoteFlag)
+				handleIfError(err)
+				log.Info("Hoverfly is now set to run the following as middleware")
+			} else {
+				script, err := ReadFile(*middlewareScriptFlag)
+				handleIfError(err)
+
+				middleware, err = hoverfly.SetMiddleware(*middlewareBinaryFlag, string(script), "")
+				handleIfError(err)
+				log.Info("Hoverfly is now set to run the following as middleware")
+			}
 		}
 
-		log.Info(middleware)
+		if middleware.Binary != "" {
+			log.Info("Binary: " + middleware.Binary)
+		}
+
+		if middleware.Script != "" {
+			log.Info("Script: " + middleware.Script)
+		}
+
+		if middleware.Remote != "" {
+			log.Info("Remote: " + middleware.Remote)
+		}
 
 	case exportCommand.FullCommand():
 		simulationData, err := hoverfly.ExportSimulation()
@@ -195,7 +220,7 @@ func main() {
 			handleIfError(err)
 			err = hoverfly.DeleteRequestTemplates()
 			handleIfError(err)
-			_, err = hoverfly.SetMiddleware("")
+			_, err = hoverfly.SetMiddleware("", "", "")
 			handleIfError(err)
 
 			log.Info("Delays, middleware, request templates and simulations have all been deleted from Hoverfly")
@@ -217,7 +242,7 @@ func main() {
 			log.Info("Request templates have been deleted from Hoverfly")
 
 		case "middleware":
-			_, err := hoverfly.SetMiddleware("")
+			_, err := hoverfly.SetMiddleware("", "", "")
 			handleIfError(err)
 
 			log.Info("Middleware has been deleted from Hoverfly")

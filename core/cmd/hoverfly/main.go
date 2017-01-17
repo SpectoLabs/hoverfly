@@ -84,7 +84,7 @@ var (
 	tlsVerification = flag.Bool("tls-verification", true, "turn on/off tls verification for outgoing requests (will not try to verify certificates) - defaults to true")
 
 	databasePath = flag.String("db-path", "", "database location - supply it to provide specific database location (will be created there if it doesn't exist)")
-	database     = flag.String("db", "boltdb", "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
+	database     = flag.String("db", inmemoryBackend, "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
 )
 
 var CA_CERT = []byte(`-----BEGIN CERTIFICATE-----
@@ -209,7 +209,11 @@ func main() {
 	cfg.Development = *dev
 
 	// overriding default middleware setting
-	cfg.Middleware.FullCommand = *middleware
+	newMiddleware, err := hv.ConvertToNewMiddleware(*middleware)
+	if err != nil {
+		log.Error(err.Error())
+	}
+	cfg.Middleware = *newMiddleware
 
 	mode := getInitialMode(cfg)
 
@@ -345,7 +349,7 @@ func main() {
 
 	cfg.Webserver = *webserver
 
-	err := hoverfly.StartProxy()
+	err = hoverfly.StartProxy()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
@@ -409,7 +413,7 @@ func getInitialMode(cfg *hv.Configuration) string {
 
 	} else if *synthesize {
 
-		if cfg.Middleware.FullCommand == "" {
+		if !cfg.Middleware.IsSet() {
 			log.Fatal("Synthesize mode chosen although middleware not supplied")
 		}
 
@@ -420,7 +424,7 @@ func getInitialMode(cfg *hv.Configuration) string {
 		return hv.SynthesizeMode
 
 	} else if *modify {
-		if cfg.Middleware.FullCommand == "" {
+		if !cfg.Middleware.IsSet() {
 			log.Fatal("Modify mode chosen although middleware not supplied")
 		}
 
