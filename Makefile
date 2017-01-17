@@ -45,7 +45,9 @@ hoverctl-functional-test: hoverctl-functional-test-dependencies hoverctl-build
 
 test: hoverfly-functional-test hoverctl-functional-test
 
-build: test
+build:
+	go build -ldflags "-X main.hoverflyVersion=$(GIT_TAG_NAME)" -o ../../../target/hoverfly
+	go build -ldflags "-X main.hoverctlVersion=$(GIT_TAG_NAME)" -o ../target/hoverctl
 
 fmt:
 	go fmt $$(go list ./... | grep -v -E 'vendor')
@@ -59,4 +61,4 @@ update-version:
 	mv core/hoverfly2.go core/hoverfly.go
 	git add core/hoverfly.go
 	git commit -m "Updated hoverfly version to $(GIT_TAG_NAME)"
-	git push origin master
+	git push
