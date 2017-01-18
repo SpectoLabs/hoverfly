@@ -38,7 +38,6 @@ var (
 	middlewareBinaryFlag = middlewareCommand.Flag("binary", "The binary that middleware should execute").String()
 	middlewareScriptFlag = middlewareCommand.Flag("script", "The script that middleware should execute").String()
 	middlewareRemoteFlag = middlewareCommand.Flag("remote", "The remote address that middleware should execute").String()
-	middlewarePathArg    = middlewareCommand.Arg("path", "Set Hoverfly's middleware").String()
 
 	startCommand = kingpin.Command("start", "Start a local instance of Hoverfly")
 	startArg     = startCommand.Arg("server type", "Choose the configuration of Hoverfly (proxy/webserver)").String()
@@ -61,10 +60,10 @@ var (
 	logsCommand    = kingpin.Command("logs", "Get the logs from Hoverfly")
 	followLogsFlag = logsCommand.Flag("follow", "Follow the logs from Hoverfly").Bool()
 
-	templatesCommand = kingpin.Command("templates", "Get set of request templates currently loaded in Hoverfly")
+	templatesCommand = kingpin.Command("templates", "Get request templates currently loaded in Hoverfly")
 	templatesPathArg = templatesCommand.Arg("path", "Add JSON config to set of request templates in Hoverfly").String()
 
-	configCommand = kingpin.Command("config", "Get the config being used by hoverctl and Hoverfly")
+	configCommand = kingpin.Command("config", "Get the hoverctl config location and contents")
 )
 
 func main() {
