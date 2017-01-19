@@ -58,9 +58,9 @@ author = u'SpectoLabs'
 # built documents.
 #
 # The short X.Y version.
-version = 'v0.9.2'
+version = 'v0.10.0'
 # The full version, including alpha/beta/rc tags.
-release = 'v0.9.2'
+release = 'v0.10.0'
 
 zip_base_url = 'https://github.com/SpectoLabs/hoverfly/releases/download/' + version + '/'
 
