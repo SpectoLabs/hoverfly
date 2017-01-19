@@ -97,7 +97,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 		v2HoverflySimulation = `"pairs":[{"response":{"status":201,"body":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]}},"request":{"requestType":"recording","path":"/api/bookings","method":"POST","destination":"www.my-test.com","scheme":"http","query":"","body":"{\"flightId\": \"1\"}","headers":{"Content-Type":["application/json"]}}}],"globalActions":{"delays":[]}}`
 
-		v2HoverflyMeta = `"meta":{"schemaVersion":"v1","hoverflyVersion":"v0.9.2","timeExported":`
+		v2HoverflyMeta = `"meta":{"schemaVersion":"v1","hoverflyVersion":"v\d+.\d+.\d+","timeExported":`
 	)
 
 	Describe("with a running hoverfly", func() {
@@ -135,7 +135,7 @@ var _ = Describe("When I use hoverctl", func() {
 				json.Compact(buffer, data)
 
 				Expect(buffer.String()).To(ContainSubstring(v2HoverflySimulation))
-				Expect(buffer.String()).To(ContainSubstring(v2HoverflyMeta))
+				Expect(buffer.String()).To(MatchRegexp(v2HoverflyMeta))
 			})
 
 			It("can import", func() {

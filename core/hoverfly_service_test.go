@@ -60,7 +60,7 @@ func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.
 	Expect(simulation.DataView.GlobalActions.Delays).To(HaveLen(0))
 
 	Expect(simulation.MetaView.SchemaVersion).To(Equal("v1"))
-	Expect(simulation.MetaView.HoverflyVersion).To(Equal("v0.9.2"))
+	Expect(simulation.MetaView.HoverflyVersion).To(MatchRegexp(`v\d+.\d+.\d+`))
 	Expect(simulation.MetaView.TimeExported).ToNot(BeNil())
 }
 
