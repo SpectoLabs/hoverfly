@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/antonholmquist/jason"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -41,7 +42,7 @@ var _ = Describe("Interacting with the API", func() {
 
 		It("Should get all the Hoverfly simulation data in one JSON file", func() {
 			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/simulation")
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			responseJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
@@ -94,7 +95,7 @@ var _ = Describe("Interacting with the API", func() {
 
 		It("Should delete all the Hoverfly data", func() {
 			req := sling.New().Delete(hoverflyAdminUrl + "/api/v2/simulation")
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			responseJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
@@ -158,12 +159,12 @@ var _ = Describe("Interacting with the API", func() {
 			`)
 
 			req.Body(payload)
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 
 			getReq := sling.New().Get(hoverflyAdminUrl + "/api/v2/simulation")
 
-			getRes := DoRequest(getReq)
+			getRes := functional_tests.DoRequest(getReq)
 			Expect(getRes.StatusCode).To(Equal(200))
 
 			defer getRes.Body.Close()
@@ -231,7 +232,7 @@ var _ = Describe("Interacting with the API", func() {
 			`)
 
 			req.Body(payload)
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 
 			defer res.Body.Close()
@@ -297,7 +298,7 @@ var _ = Describe("Interacting with the API", func() {
 			`)
 
 			originalReq.Body(originalPayload)
-			DoRequest(originalReq)
+			functional_tests.DoRequest(originalReq)
 
 			request := sling.New().Put(hoverflyAdminUrl + "/api/v2/simulation")
 			payload := bytes.NewBufferString(`
@@ -310,10 +311,10 @@ var _ = Describe("Interacting with the API", func() {
 			`)
 
 			request.Body(payload)
-			DoRequest(request)
+			functional_tests.DoRequest(request)
 			getReq := sling.New().Get(hoverflyAdminUrl + "/api/v2/simulation")
 
-			getRes := DoRequest(getReq)
+			getRes := functional_tests.DoRequest(getReq)
 			Expect(getRes.StatusCode).To(Equal(200))
 
 			defer getRes.Body.Close()
@@ -335,7 +336,7 @@ var _ = Describe("Interacting with the API", func() {
 
 		It("Should get the mode", func() {
 			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/destination")
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
@@ -348,14 +349,14 @@ var _ = Describe("Interacting with the API", func() {
 		It("Should put the mode", func() {
 			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/destination")
 			req.Body(strings.NewReader(`{"destination":"test.com"}`))
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 			Expect(modeJson).To(Equal([]byte(`{"destination":"test.com"}`)))
 
 			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/destination")
-			res = DoRequest(req)
+			res = functional_tests.DoRequest(req)
 			modeJson, err = ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 			Expect(modeJson).To(Equal([]byte(`{"destination":"test.com"}`)))
@@ -367,7 +368,7 @@ var _ = Describe("Interacting with the API", func() {
 
 		It("Should get the mode", func() {
 			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
@@ -380,14 +381,14 @@ var _ = Describe("Interacting with the API", func() {
 		It("Should put the mode", func() {
 			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
 			req.Body(strings.NewReader(`{"mode":"capture"}`))
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 			Expect(modeJson).To(Equal([]byte(`{"mode":"capture"}`)))
 
 			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
-			res = DoRequest(req)
+			res = functional_tests.DoRequest(req)
 			modeJson, err = ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 			Expect(modeJson).To(Equal([]byte(`{"mode":"capture"}`)))
@@ -399,7 +400,7 @@ var _ = Describe("Interacting with the API", func() {
 
 		It("Should get the middleware which should be blank", func() {
 			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/middleware")
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
@@ -412,14 +413,14 @@ var _ = Describe("Interacting with the API", func() {
 		It("Should put the middleware", func() {
 			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/middleware")
 			req.Body(strings.NewReader(`{"binary":"ruby", "script":"#!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend"}`))
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 			Expect(modeJson).To(Equal([]byte(`{"binary":"ruby","script":"#!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend","remote":""}`)))
 
 			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/middleware")
-			res = DoRequest(req)
+			res = functional_tests.DoRequest(req)
 			modeJson, err = ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 			Expect(modeJson).To(Equal([]byte(`{"binary":"ruby","script":"#!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend","remote":""}`)))
@@ -431,7 +432,7 @@ var _ = Describe("Interacting with the API", func() {
 
 		It("Should get the usage counters", func() {
 			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/usage")
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
@@ -442,7 +443,7 @@ var _ = Describe("Interacting with the API", func() {
 			proxyReq := sling.New().Get("http://www.google.com")
 			DoRequestThroughProxy(proxyReq)
 			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/usage")
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
@@ -455,7 +456,7 @@ var _ = Describe("Interacting with the API", func() {
 			proxyReq := sling.New().Get("http://www.google.com")
 			DoRequestThroughProxy(proxyReq)
 			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/usage")
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
@@ -468,7 +469,7 @@ var _ = Describe("Interacting with the API", func() {
 			proxyReq := sling.New().Get("http://www.google.com")
 			DoRequestThroughProxy(proxyReq)
 			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/usage")
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
@@ -481,7 +482,7 @@ var _ = Describe("Interacting with the API", func() {
 			proxyReq := sling.New().Get("http://www.google.com")
 			DoRequestThroughProxy(proxyReq)
 			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/usage")
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
@@ -498,7 +499,7 @@ var _ = Describe("Interacting with the API", func() {
 
 		It("Should retrieve the records", func() {
 			req := sling.New().Get(hoverflyAdminUrl + "/api/records")
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			recordsJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
@@ -516,7 +517,7 @@ var _ = Describe("Interacting with the API", func() {
 
 		It("Should delete the records", func() {
 			reqPost := sling.New().Delete(hoverflyAdminUrl + "/api/records")
-			resPost := DoRequest(reqPost)
+			resPost := functional_tests.DoRequest(reqPost)
 			Expect(resPost.StatusCode).To(Equal(200))
 			responseMessage, err := ioutil.ReadAll(resPost.Body)
 			Expect(err).To(BeNil())
@@ -524,7 +525,7 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(string(responseMessage)).To(ContainSubstring("Proxy cache deleted successfuly"))
 
 			reqGet := sling.New().Get(hoverflyAdminUrl + "/api/records")
-			resGet := DoRequest(reqGet)
+			resGet := functional_tests.DoRequest(reqGet)
 			Expect(resGet.StatusCode).To(Equal(200))
 			recordsJson, err := ioutil.ReadAll(resGet.Body)
 			Expect(err).To(BeNil())
@@ -539,11 +540,11 @@ var _ = Describe("Interacting with the API", func() {
 
 		Context("When no records exist", func() {
 			It("Should create the records", func() {
-				res := DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonRequestResponsePair1))
+				res := functional_tests.DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonRequestResponsePair1))
 				Expect(res.StatusCode).To(Equal(200))
 
 				reqGet := sling.New().Get(hoverflyAdminUrl + "/api/records")
-				resGet := DoRequest(reqGet)
+				resGet := functional_tests.DoRequest(reqGet)
 
 				Expect(resGet.StatusCode).To(Equal(200))
 
@@ -593,11 +594,11 @@ var _ = Describe("Interacting with the API", func() {
 			})
 
 			It("Should append the records to the existing ones", func() {
-				res := DoRequest(sling.New().Post(hoverflyAdminUrl+"/api/records").Set("Content-Type", "application/json").Body(jsonRequestResponsePair2))
+				res := functional_tests.DoRequest(sling.New().Post(hoverflyAdminUrl+"/api/records").Set("Content-Type", "application/json").Body(jsonRequestResponsePair2))
 				Expect(res.StatusCode).To(Equal(200))
 
 				reqGet := sling.New().Get(hoverflyAdminUrl + "/api/records")
-				resGet := DoRequest(reqGet)
+				resGet := functional_tests.DoRequest(reqGet)
 
 				Expect(resGet.StatusCode).To(Equal(200))
 

@@ -1,22 +1,15 @@
 package hoverfly_test
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	//"io/ioutil"
-	//"bytes"
-	//"github.com/dghubble/sling"
-	//"net/http/httptest"
-	//"net/url"
-	//"strings"
-	//"fmt"
-	//"net/http"
-	//"os"
-	//"time"
 	"bytes"
-	"github.com/dghubble/sling"
 	"io/ioutil"
 	"strings"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+
+	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/dghubble/sling"
 )
 
 var _ = Describe("When running Hoverfly as a webserver", func() {
@@ -45,7 +38,7 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 				It("and it should return the response", func() {
 					request := sling.New().Get("http://localhost:" + proxyPortAsString + "/path1")
 
-					response := DoRequest(request)
+					response := functional_tests.DoRequest(request)
 
 					responseBody, err := ioutil.ReadAll(response.Body)
 					Expect(err).To(BeNil())
@@ -56,7 +49,7 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 				It("and it should return the correct headers on the response", func() {
 					request := sling.New().Get("http://localhost:" + proxyPortAsString + "/path1")
 
-					response := DoRequest(request)
+					response := functional_tests.DoRequest(request)
 
 					Expect(response.Header).To(HaveKeyWithValue("Header", []string{"value1", "value2"}))
 				})
@@ -66,7 +59,7 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 				It("and it should return the response", func() {
 					request := sling.New().Post("http://localhost:" + proxyPortAsString + "/path2")
 
-					response := DoRequest(request)
+					response := functional_tests.DoRequest(request)
 
 					responseBody, err := ioutil.ReadAll(response.Body)
 					Expect(err).To(BeNil())
@@ -81,7 +74,7 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 				It("and it should still return the response", func() {
 					request := sling.New().Get("http://localhost:" + proxyPortAsString + "/path1/resource")
 
-					response := DoRequest(request)
+					response := functional_tests.DoRequest(request)
 
 					responseBody, err := ioutil.ReadAll(response.Body)
 					Expect(err).To(BeNil())
@@ -94,7 +87,7 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 				It("and it should still return the response", func() {
 					request := sling.New().Post("http://localhost:" + proxyPortAsString + "/path2/resource")
 
-					response := DoRequest(request)
+					response := functional_tests.DoRequest(request)
 
 					responseBody, err := ioutil.ReadAll(response.Body)
 					Expect(err).To(BeNil())
@@ -108,7 +101,7 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 
 			It("it should start in simulate mode", func() {
 				request := sling.New().Get(hoverflyAdminUrl + "/api/state")
-				response := DoRequest(request)
+				response := functional_tests.DoRequest(request)
 
 				responseBody, err := ioutil.ReadAll(response.Body)
 				Expect(err).To(BeNil())
@@ -118,7 +111,7 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 
 			It("it should not be switchable", func() {
 				request := sling.New().Post(hoverflyAdminUrl + "/api/state").Body(strings.NewReader(`{"mode":"capture"}`))
-				response := DoRequest(request)
+				response := functional_tests.DoRequest(request)
 
 				Expect(response.StatusCode).To(Equal(403))
 
@@ -150,7 +143,7 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 			It("should recache the requests so that the destination is not included in the cache", func() {
 				request := sling.New().Get("http://localhost:" + proxyPortAsString + "/path1")
 
-				response := DoRequest(request)
+				response := functional_tests.DoRequest(request)
 
 				responseBody, err := ioutil.ReadAll(response.Body)
 				Expect(err).To(BeNil())
