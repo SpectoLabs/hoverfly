@@ -61,7 +61,6 @@ update-version:
 	mv core/hoverfly2.go core/hoverfly.go
 	git add core/hoverfly.go
 	git commit -m "Updated hoverfly version to $(GIT_TAG_NAME)"
-
-  	git config --global user.email "benji@sixp.in"
-  	git config --global user.name "Benji Hooper"
+	git config --global user.email "benji@sixp.in"
+	git config --global user.name "Benji Hooper"
 	git push
