@@ -3,13 +3,14 @@ package matching
 import (
 	"errors"
 	"fmt"
+	"strings"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/ryanuber/go-glob"
-	"strings"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 type RequestTemplateStore []RequestTemplateResponsePair
@@ -36,25 +37,27 @@ func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserv
 		// TODO: need to enable regex matches
 		// TODO: enable matching on scheme
 
-		if entry.RequestTemplate.Body != nil && !glob.Glob(*entry.RequestTemplate.Body, req.Body) {
+		template := entry.RequestTemplate
+
+		if template.Body != nil && !glob.Glob(*template.Body, req.Body) {
 			continue
 		}
 
 		if !webserver {
-			if entry.RequestTemplate.Destination != nil && !glob.Glob(*entry.RequestTemplate.Destination, req.Destination) {
+			if template.Destination != nil && !glob.Glob(*template.Destination, req.Destination) {
 				continue
 			}
 		}
-		if entry.RequestTemplate.Path != nil && !glob.Glob(*entry.RequestTemplate.Path, req.Path) {
+		if template.Path != nil && !glob.Glob(*template.Path, req.Path) {
 			continue
 		}
-		if entry.RequestTemplate.Query != nil && !glob.Glob(*entry.RequestTemplate.Query, req.Query) {
+		if template.Query != nil && !glob.Glob(SortQueryString(*template.Query), SortQueryString(req.Query)) {
 			continue
 		}
-		if !headerMatch(entry.RequestTemplate.Headers, req.Headers) {
+		if !headerMatch(template.Headers, req.Headers) {
 			continue
 		}
-		if entry.RequestTemplate.Method != nil && !glob.Glob(*entry.RequestTemplate.Method, req.Method) {
+		if template.Method != nil && !glob.Glob(*template.Method, req.Method) {
 			continue
 		}
 
