@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"sort"
+	"strings"
 )
 
 // GetRequestBody will read the http.Request body io.ReadCloser
@@ -44,4 +47,45 @@ func PointerToString(value *string) string {
 	}
 
 	return *value
+}
+
+func SortQueryString(query string) string {
+	m := make(url.Values)
+	for query != "" {
+		key := query
+		if i := strings.IndexAny(key, "&;"); i >= 0 {
+			key, query = key[:i], key[i+1:]
+		} else {
+			query = ""
+		}
+		if key == "" {
+			continue
+		}
+		value := ""
+		if i := strings.Index(key, "="); i >= 0 {
+			key, value = key[:i], key[i+1:]
+		}
+
+		m[key] = append(m[key], value)
+	}
+
+	var buf bytes.Buffer
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		vs := m[k]
+		prefix := k + "="
+		sort.Strings(vs)
+		for _, v := range vs {
+			if buf.Len() > 0 {
+				buf.WriteByte('&')
+			}
+			buf.WriteString(prefix)
+			buf.WriteString(v)
+		}
+	}
+	return buf.String()
 }
