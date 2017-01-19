@@ -2,10 +2,12 @@ package hoverfly_test
 
 import (
 	"bytes"
+	"io/ioutil"
+
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
 )
 
 var _ = Describe("Interacting with the API", func() {
@@ -34,7 +36,7 @@ var _ = Describe("Interacting with the API", func() {
 
 		It("Should retrieve the templates", func() {
 			req := sling.New().Get(hoverflyAdminUrl + "/api/templates")
-			res := DoRequest(req)
+			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			templatesJsonBytes, err := ioutil.ReadAll(res.Body)
 
@@ -111,7 +113,7 @@ var _ = Describe("Interacting with the API", func() {
 
 		It("Should delete the templates", func() {
 			reqPost := sling.New().Delete(hoverflyAdminUrl + "/api/templates")
-			resPost := DoRequest(reqPost)
+			resPost := functional_tests.DoRequest(reqPost)
 			Expect(resPost.StatusCode).To(Equal(200))
 			responseMessage, err := ioutil.ReadAll(resPost.Body)
 			Expect(err).To(BeNil())
@@ -119,7 +121,7 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(string(responseMessage)).To(ContainSubstring("Template store wiped successfuly"))
 
 			reqGet := sling.New().Get(hoverflyAdminUrl + "/api/templates")
-			resGet := DoRequest(reqGet)
+			resGet := functional_tests.DoRequest(reqGet)
 			Expect(resGet.StatusCode).To(Equal(200))
 			templatesJson, err := ioutil.ReadAll(resGet.Body)
 			Expect(err).To(BeNil())
@@ -142,11 +144,11 @@ var _ = Describe("Interacting with the API", func() {
 
 		Context("When no templates exist", func() {
 			It("Should create the templates", func() {
-				res := DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/templates").Body(jsonRequestResponsePair1))
+				res := functional_tests.DoRequest(sling.New().Post(hoverflyAdminUrl + "/api/templates").Body(jsonRequestResponsePair1))
 				Expect(res.StatusCode).To(Equal(200))
 
 				reqGet := sling.New().Get(hoverflyAdminUrl + "/api/templates")
-				resGet := DoRequest(reqGet)
+				resGet := functional_tests.DoRequest(reqGet)
 
 				Expect(resGet.StatusCode).To(Equal(200))
 
@@ -192,11 +194,11 @@ var _ = Describe("Interacting with the API", func() {
 			})
 
 			It("Should append the templates to the existing ones", func() {
-				res := DoRequest(sling.New().Post(hoverflyAdminUrl+"/api/templates").Set("Content-Type", "application/json").Body(jsonRequestResponsePair2))
+				res := functional_tests.DoRequest(sling.New().Post(hoverflyAdminUrl+"/api/templates").Set("Content-Type", "application/json").Body(jsonRequestResponsePair2))
 				Expect(res.StatusCode).To(Equal(200))
 
 				reqGet := sling.New().Get(hoverflyAdminUrl + "/api/templates")
-				resGet := DoRequest(reqGet)
+				resGet := functional_tests.DoRequest(reqGet)
 
 				Expect(resGet.StatusCode).To(Equal(200))
 				templatesJsonBytes, err := ioutil.ReadAll(resGet.Body)

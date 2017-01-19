@@ -18,6 +18,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	"github.com/phayes/freeport"
 )
@@ -126,15 +127,6 @@ func stopHoverfly() {
 	hoverflyCmd.Process.Kill()
 }
 
-func DoRequest(r *sling.Sling) *http.Response {
-	req, err := r.Request()
-	Expect(err).To(BeNil())
-	response, err := http.DefaultClient.Do(req)
-
-	Expect(err).To(BeNil())
-	return response
-}
-
 func DoRequestThroughProxy(r *sling.Sling) *http.Response {
 	req, err := r.Request()
 	Expect(err).To(BeNil())
@@ -150,43 +142,43 @@ func DoRequestThroughProxy(r *sling.Sling) *http.Response {
 
 func SetHoverflyMode(mode string) {
 	req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode").Body(strings.NewReader(`{"mode":"` + mode + `"}`))
-	res := DoRequest(req)
+	res := functional_tests.DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
 }
 
 func SetHoverflyDestination(destination string) {
 	req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/destination").Body(strings.NewReader(`{"destination":"` + destination + `"}`))
-	res := DoRequest(req)
+	res := functional_tests.DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
 }
 
 func EraseHoverflyRecords() {
 	req := sling.New().Delete(hoverflyAdminUrl + "/api/records")
-	res := DoRequest(req)
+	res := functional_tests.DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
 }
 
 func ExportHoverflyRecords() io.Reader {
 	res := sling.New().Get(hoverflyAdminUrl + "/api/records")
-	req := DoRequest(res)
+	req := functional_tests.DoRequest(res)
 	Expect(req.StatusCode).To(Equal(200))
 	return req.Body
 }
 
 func ImportHoverflyRecords(payload io.Reader) {
 	req := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(payload)
-	res := DoRequest(req)
+	res := functional_tests.DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
 }
 
 func ImportHoverflySimulation(payload io.Reader) *http.Response {
 	req := sling.New().Put(hoverflyAdminUrl + "/api/v2/simulation").Body(payload)
-	return DoRequest(req)
+	return functional_tests.DoRequest(req)
 }
 
 func ImportHoverflyTemplates(payload io.Reader) {
 	req := sling.New().Post(hoverflyAdminUrl + "/api/templates").Body(payload)
-	res := DoRequest(req)
+	res := functional_tests.DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
 }
 
@@ -200,6 +192,6 @@ func SetHoverflyResponseDelays(path string) {
 		Fail("can't read delay config file")
 	}
 	req := sling.New().Put(hoverflyAdminUrl + "/api/delays").Body(strings.NewReader(string(delaysConf)))
-	res := DoRequest(req)
+	res := functional_tests.DoRequest(req)
 	Expect(res.StatusCode).To(Equal(201))
 }
