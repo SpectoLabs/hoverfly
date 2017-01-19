@@ -13,7 +13,7 @@ hoverfly-functional-test-dependencies:
 	glide --quiet install
 
 hoverctl-functional-test-dependencies:
-	cd functional-tests/hoverctl && \
+	cd functional-tests/ && \
 	glide --quiet install
 
 hoverfly-test: hoverfly-dependencies
