@@ -1,10 +1,11 @@
 package matching
 
 import (
+	"testing"
+
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
-	"testing"
 )
 
 func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
@@ -209,6 +210,34 @@ func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 	result, _ := store.GetResponse(r, false)
 
 	Expect(result).To(BeNil())
+}
+
+func TestMatchesWithDifferentOrderQueryParameters(t *testing.T) {
+	RegisterTestingT(t)
+
+	response := models.ResponseDetails{
+		Body: "test-body",
+	}
+
+	templateEntry := RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Query: StringToPointer("first=value&second=value"),
+		},
+		Response: response,
+	}
+
+	store := RequestTemplateStore{templateEntry}
+
+	r := models.RequestDetails{
+		Method:      "GET",
+		Destination: "http://somehost.com",
+		Query:       "second=value&first=value",
+	}
+
+	result, err := store.GetResponse(r, true)
+	Expect(err).To(BeNil())
+
+	Expect(result.Body).To(Equal("test-body"))
 }
 
 func TestHeaderMatch(t *testing.T) {

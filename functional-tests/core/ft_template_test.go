@@ -2,10 +2,11 @@ package hoverfly_test
 
 import (
 	"bytes"
+	"io/ioutil"
+
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
 )
 
 var _ = Describe("Using Hoverfly to return responses by request templates", func() {
@@ -65,6 +66,30 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 						"body": "body3",
 						"headers": {}
 					}
+				}, {
+					"request": {
+						"requestType": "template",
+						"method": "GET",
+						"destination": "www.query.com",
+						"query": "query2=two&query1=one"
+					},
+					"response": {
+						"status": 200,
+						"body": "body",
+						"headers": {}
+					}
+				}, {
+					"request": {
+						"requestType": "template",
+						"method": "GET",
+						"destination": "www.query.com",
+						"query": "query1=one&query2=two&query2=three"
+					},
+					"response": {
+						"status": 200,
+						"body": "body",
+						"headers": {}
+					}
 				}]
 			}
 			`)
@@ -96,6 +121,22 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(203))
 				Expect(string(body)).To(Equal("body3"))
+			})
+
+			It("Should find a match using a different order set of query parameters", func() {
+				resp := DoRequestThroughProxy(sling.New().Get("http://www.query.com/?query1=one&query2=two").Add("Random", "value2"))
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(200))
+				Expect(string(body)).To(Equal("body"))
+			})
+
+			It("Should find a match with two query parameter keys", func() {
+				resp := DoRequestThroughProxy(sling.New().Get("http://www.query.com/?query2=two&query1=one&query2=three").Add("Random", "value2"))
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(resp.StatusCode).To(Equal(200))
+				Expect(string(body)).To(Equal("body"))
 			})
 		})
 
