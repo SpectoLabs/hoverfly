@@ -46,7 +46,10 @@ hoverctl-functional-test: hoverctl-functional-test-dependencies hoverctl-build
 test: hoverfly-functional-test hoverctl-functional-test
 
 build:
+	cd core/cmd/hoverfly && \
 	go build -ldflags "-X main.hoverflyVersion=$(GIT_TAG_NAME)" -o ../../../target/hoverfly
+
+	cd hoverctl && \
 	go build -ldflags "-X main.hoverctlVersion=$(GIT_TAG_NAME)" -o ../target/hoverctl
 
 fmt:
