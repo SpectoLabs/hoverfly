@@ -63,3 +63,33 @@ func Test_GetResponseBody_GettingTheResponseBodySetsTheSameBodyAgain(t *testing.
 
 	Expect(string(newResponseBody)).To(Equal("test-preserve"))
 }
+
+func Test_SortQueryString_ReordersQueryStringAlphabetically(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(SortQueryString("e=e&d=d")).To(Equal("d=d&e=e"))
+}
+
+func Test_SortQueryString_ReordersQueryValuesAlphabetically(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(SortQueryString("e=e&e=d")).To(Equal("e=d&e=e"))
+}
+
+func Test_SortQueryString_ReordersQueryValuesNumerically(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(SortQueryString("e=2&e=1")).To(Equal("e=1&e=2"))
+}
+
+func Test_SortQueryString_ReordersQueryValuesAlphanumerically(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(SortQueryString("e=2&e=d&e=1&e=e")).To(Equal("e=1&e=2&e=d&e=e"))
+}
+
+func Test_SortQueryString_KeepsAsteriskInTact(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(SortQueryString("&e=*")).To(Equal("e=*"))
+}
