@@ -49,8 +49,10 @@ func PointerToString(value *string) string {
 	return *value
 }
 
+// SortQueryString will sort a http query string alphanumerically
+// by key and then by value.
 func SortQueryString(query string) string {
-	m := make(url.Values)
+	keyValues := make(url.Values)
 	for query != "" {
 		key := query
 		if i := strings.IndexAny(key, "&;"); i >= 0 {
@@ -66,26 +68,26 @@ func SortQueryString(query string) string {
 			key, value = key[:i], key[i+1:]
 		}
 
-		m[key] = append(m[key], value)
+		keyValues[key] = append(keyValues[key], value)
 	}
 
-	var buf bytes.Buffer
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
+	var queryBuffer bytes.Buffer
+	keys := make([]string, 0, len(keyValues))
+	for key := range keyValues {
+		keys = append(keys, key)
 	}
 	sort.Strings(keys)
-	for _, k := range keys {
-		vs := m[k]
-		prefix := k + "="
-		sort.Strings(vs)
-		for _, v := range vs {
-			if buf.Len() > 0 {
-				buf.WriteByte('&')
+	for _, key := range keys {
+		values := keyValues[key]
+		prefix := key + "="
+		sort.Strings(values)
+		for _, value := range values {
+			if queryBuffer.Len() > 0 {
+				queryBuffer.WriteByte('&')
 			}
-			buf.WriteString(prefix)
-			buf.WriteString(v)
+			queryBuffer.WriteString(prefix)
+			queryBuffer.WriteString(value)
 		}
 	}
-	return buf.String()
+	return queryBuffer.String()
 }
