@@ -4,13 +4,15 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
-	"github.com/dghubble/sling"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
+
+	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/dghubble/sling"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 // Helper function for gzipping strings
@@ -74,13 +76,13 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 
 			It("It should accept and store both", func() {
 				slingRequest := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonPayload)
-				response := DoRequest(slingRequest)
+				response := functional_tests.DoRequest(slingRequest)
 				Expect(response.Status).To(Equal("200 OK"))
 			})
 
 			It("It should match on the exact request and on template", func() {
 				slingRequest := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonPayload)
-				DoRequest(slingRequest)
+				functional_tests.DoRequest(slingRequest)
 
 				slingRequest = sling.New().Get("http://destination1/path1")
 				response := DoRequestThroughProxy(slingRequest)
@@ -103,7 +105,7 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 
 			BeforeEach(func() {
 				slingRequest := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(jsonPayload)
-				DoRequest(slingRequest)
+				functional_tests.DoRequest(slingRequest)
 			})
 
 			It("It should contain both templates and snapshots", func() {

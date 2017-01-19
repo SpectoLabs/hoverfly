@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -172,7 +173,7 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 			It("Should find a match", func() {
 				request := sling.New().Get("http://localhost:"+proxyPortAsString+"/path2").Add("Header", "value2")
 
-				resp := DoRequest(request)
+				resp := functional_tests.DoRequest(request)
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(202))
@@ -182,7 +183,7 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 			It("Should find a match using wildcards", func() {
 				request := sling.New().Get("http://localhost:"+proxyPortAsString+"/unmatched_path").Add("Random", "whatever-you-like")
 
-				resp := DoRequest(request)
+				resp := functional_tests.DoRequest(request)
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(203))
