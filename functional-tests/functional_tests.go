@@ -29,31 +29,35 @@ func DoRequest(r *sling.Sling) *http.Response {
 
 type Hoverfly struct {
 	adminPort int
-	ProxyPort int
+	adminUrl  string
+	proxyPort int
+	proxyUrl  string
 	process   *exec.Cmd
 }
 
 func NewHoverfly() *Hoverfly {
 	return &Hoverfly{
 		adminPort: freeport.GetPort(),
-		ProxyPort: freeport.GetPort(),
+		proxyPort: freeport.GetPort(),
 	}
 }
 
 func (this *Hoverfly) Start(commands ...string) {
-	this.process = startHoverflyInternal(this.adminPort, this.ProxyPort, commands...)
+	this.process = startHoverflyInternal(this.adminPort, this.proxyPort, commands...)
+	this.adminUrl = fmt.Sprintf("http://localhost:%v", this.adminPort)
+	this.proxyUrl = fmt.Sprintf("http://localhost:%v", this.proxyPort)
 }
 
 func (this Hoverfly) Stop() error {
 	return this.process.Process.Kill()
 }
 func (this Hoverfly) SetMode(mode string) {
-	req := sling.New().Put("http://localhost:" + strconv.Itoa(this.adminPort) + "/api/v2/hoverfly/mode").Body(strings.NewReader(`{"mode":"capture"}`))
+	req := sling.New().Put(this.adminUrl + "/api/v2/hoverfly/mode").Body(strings.NewReader(`{"mode":"capture"}`))
 	DoRequest(req)
 }
 
 func (this Hoverfly) GetSimulation() io.Reader {
-	res := sling.New().Get("http://localhost:" + strconv.Itoa(this.adminPort) + "/api/records")
+	res := sling.New().Get(this.adminUrl + "/api/records")
 	req := DoRequest(res)
 	Expect(req.StatusCode).To(Equal(200))
 	return req.Body
@@ -63,7 +67,7 @@ func (this Hoverfly) Proxy(r *sling.Sling) *http.Response {
 	req, err := r.Request()
 	Expect(err).To(BeNil())
 
-	proxy, _ := url.Parse("http://localhost:" + strconv.Itoa(this.ProxyPort))
+	proxy, _ := url.Parse(this.proxyUrl)
 	proxyHttpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxy)}, CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }}
 	response, err := proxyHttpClient.Do(req)
 
