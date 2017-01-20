@@ -126,7 +126,7 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 		Method:      req.Method,
 		Destination: req.Host,
 		Scheme:      req.URL.Scheme,
-		Query:       req.URL.RawQuery,
+		Query:       util.SortQueryString(req.URL.RawQuery),
 		Body:        string(reqBody),
 		Headers:     req.Header,
 	}
@@ -150,7 +150,7 @@ func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 		Method:      util.PointerToString(data.GetMethod()),
 		Destination: util.PointerToString(data.GetDestination()),
 		Scheme:      util.PointerToString(data.GetScheme()),
-		Query:       util.PointerToString(data.GetQuery()),
+		Query:       util.SortQueryString(util.PointerToString(data.GetQuery())),
 		Body:        util.PointerToString(data.GetBody()),
 		Headers:     data.GetHeaders(),
 	}
@@ -193,7 +193,7 @@ func (r *RequestDetails) concatenate(withHost bool) string {
 
 	buffer.WriteString(r.Path)
 	buffer.WriteString(r.Method)
-	buffer.WriteString(util.SortQueryString(r.Query))
+	buffer.WriteString(r.Query)
 	if len(r.Body) > 0 {
 		ct := r.getContentType()
 
