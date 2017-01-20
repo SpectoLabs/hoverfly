@@ -93,3 +93,21 @@ func Test_SortQueryString_KeepsAsteriskInTact(t *testing.T) {
 
 	Expect(SortQueryString("&e=*")).To(Equal("e=*"))
 }
+
+func Test_SortQueryString_PreservesEqualsAndEmptyValueQuery(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(SortQueryString("e=")).To(Equal("e="))
+}
+
+func Test_SortQueryString_PreservesNoEqualsAndEmptyValueQuery(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(SortQueryString("e")).To(Equal("e"))
+}
+
+func Test_SortQueryString_PreservesBothEqualsAndNoEqualsWithEmptyValue(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(SortQueryString("a&b&c=&d&e=&f=")).To(Equal("a&b&c=&d&e=&f="))
+}
