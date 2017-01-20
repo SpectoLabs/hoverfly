@@ -78,7 +78,7 @@ func startHoverflyWithMiddleware(adminPort, proxyPort int, middlewarePath string
 	return hoverflyCmd
 }
 
-func startHoverflyInternal(commands... string) *exec.Cmd {
+func startHoverflyInternal(commands ...string) *exec.Cmd {
 	hoverflyBinaryUri := buildBinaryPath()
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, commands...)
 
@@ -177,6 +177,11 @@ func ImportHoverflyRecords(payload io.Reader) {
 	req := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(payload)
 	res := DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
+}
+
+func ImportHoverflySimulation(payload io.Reader) *http.Response {
+	req := sling.New().Put(hoverflyAdminUrl + "/api/v2/simulation").Body(payload)
+	return DoRequest(req)
 }
 
 func ImportHoverflyTemplates(payload io.Reader) {

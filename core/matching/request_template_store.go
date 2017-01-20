@@ -51,7 +51,7 @@ func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserv
 		if template.Path != nil && !glob.Glob(*template.Path, req.Path) {
 			continue
 		}
-		if template.Query != nil && !glob.Glob(SortQueryString(*template.Query), req.Query) {
+		if template.Query != nil && !glob.Glob(*template.Query, req.Query) {
 			continue
 		}
 		if !headerMatch(template.Headers, req.Headers) {
