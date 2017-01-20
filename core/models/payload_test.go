@@ -7,6 +7,8 @@ import (
 	"os"
 	"testing"
 
+	"net/http"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	. "github.com/SpectoLabs/hoverfly/core/util"
@@ -405,6 +407,22 @@ func GzipString(s string) string {
 	return b.String()
 }
 
+func Test_NewRequestDetailsFromRequest_SortsQueryString(t *testing.T) {
+	requestDetails := NewRequestDetailsFromRequest(v2.RequestDetailsView{
+		Query: StringToPointer("b=b&a=a"),
+	})
+
+	Expect(requestDetails.Query).To(Equal("a=a&b=b"))
+}
+
+func Test_NewRequestDetailsFromHttpRequest_SortsQueryString(t *testing.T) {
+	request, _ := http.NewRequest("GET", "http://test.org/?a=b&a=a", nil)
+	requestDetails, err := NewRequestDetailsFromHttpRequest(request)
+	Expect(err).To(BeNil())
+
+	Expect(requestDetails.Query).To(Equal("a=a&a=b"))
+}
+
 func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -543,24 +561,4 @@ func Test_RequestDetails_Hash_TheHashIncludesTheBody(t *testing.T) {
 	hashedUnit := unit.Hash()
 
 	Expect(hashedUnit).To(Equal("51834bfe5334158be38ef5209f2b8e29"))
-}
-
-func Test_RequestDetails_Hash_QueryParametersCanBeInAnyOrder(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := RequestDetails{
-		Method:      "GET",
-		Scheme:      "http",
-		Destination: "test.com",
-		Path:        "/testing",
-		Query:       "query=true&another=true",
-	}
-
-	hashedUnit := unit.Hash()
-
-	unit.Query = "another=true&query=true"
-
-	differentOrderHash := unit.Hash()
-
-	Expect(hashedUnit).To(Equal(differentOrderHash))
 }
