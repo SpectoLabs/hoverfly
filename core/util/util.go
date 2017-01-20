@@ -79,7 +79,6 @@ func SortQueryString(query string) string {
 	sort.Strings(keys)
 	for _, key := range keys {
 		values := keyValues[key]
-		// prefix := key + "="
 		sort.Strings(values)
 		for _, value := range values {
 			if queryBuffer.Len() > 0 {
