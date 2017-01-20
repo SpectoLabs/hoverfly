@@ -77,7 +77,7 @@ func (this Hoverfly) Proxy(r *sling.Sling) *http.Response {
 }
 
 func startHoverflyInternal(adminPort, proxyPort int, commands ...string) *exec.Cmd {
-	hoverflyBinaryUri := buildBinaryPath()
+	hoverflyBinaryUri := BuildBinaryPath()
 
 	commands = append(commands, "-ap")
 	commands = append(commands, strconv.Itoa(adminPort))
@@ -88,18 +88,18 @@ func startHoverflyInternal(adminPort, proxyPort int, commands ...string) *exec.C
 
 	err := hoverflyCmd.Start()
 
-	binaryErrorCheck(err, hoverflyBinaryUri)
-	healthcheck(adminPort)
+	BinaryErrorCheck(err, hoverflyBinaryUri)
+	Healthcheck(adminPort)
 
 	return hoverflyCmd
 }
 
-func buildBinaryPath() string {
+func BuildBinaryPath() string {
 	workingDirectory, _ := os.Getwd()
 	return filepath.Join(workingDirectory, "bin/hoverfly")
 }
 
-func binaryErrorCheck(err error, binaryPath string) {
+func BinaryErrorCheck(err error, binaryPath string) {
 	if err != nil {
 		fmt.Println("Unable to start Hoverfly")
 		fmt.Println(binaryPath)
@@ -108,7 +108,7 @@ func binaryErrorCheck(err error, binaryPath string) {
 	}
 }
 
-func healthcheck(adminPort int) {
+func Healthcheck(adminPort int) {
 	var err error
 	var resp *http.Response
 
