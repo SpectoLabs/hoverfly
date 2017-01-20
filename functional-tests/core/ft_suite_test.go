@@ -176,12 +176,6 @@ func ImportHoverflySimulation(payload io.Reader) *http.Response {
 	return functional_tests.DoRequest(req)
 }
 
-func ImportHoverflyTemplates(payload io.Reader) {
-	req := sling.New().Post(hoverflyAdminUrl + "/api/templates").Body(payload)
-	res := functional_tests.DoRequest(req)
-	Expect(res.StatusCode).To(Equal(200))
-}
-
 func CallFakeServerThroughProxy(server *httptest.Server) *http.Response {
 	return DoRequestThroughProxy(sling.New().Get(server.URL))
 }
