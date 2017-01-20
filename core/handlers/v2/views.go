@@ -5,6 +5,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 
+	"github.com/SpectoLabs/hoverfly/core/util"
 	valid "github.com/gima/govalid/v1"
 )
 
@@ -116,7 +117,13 @@ func (this RequestDetailsView) GetDestination() *string { return this.Destinatio
 func (this RequestDetailsView) GetScheme() *string { return this.Scheme }
 
 //Gets Query - required for interfaces.Request
-func (this RequestDetailsView) GetQuery() *string { return this.Query }
+func (this RequestDetailsView) GetQuery() *string {
+	if this.Query == nil {
+		return this.Query
+	}
+	queryString := util.SortQueryString(*this.Query)
+	return &queryString
+}
 
 //Gets Body - required for interfaces.Request
 func (this RequestDetailsView) GetBody() *string { return this.Body }
