@@ -65,7 +65,7 @@ func SortQueryString(query string) string {
 		}
 		value := ""
 		if i := strings.Index(key, "="); i >= 0 {
-			key, value = key[:i], key[i+1:]
+			key, value = key[:i+1], key[i+1:]
 		}
 
 		keyValues[key] = append(keyValues[key], value)
@@ -79,13 +79,13 @@ func SortQueryString(query string) string {
 	sort.Strings(keys)
 	for _, key := range keys {
 		values := keyValues[key]
-		prefix := key + "="
+		// prefix := key + "="
 		sort.Strings(values)
 		for _, value := range values {
 			if queryBuffer.Len() > 0 {
 				queryBuffer.WriteByte('&')
 			}
-			queryBuffer.WriteString(prefix)
+			queryBuffer.WriteString(key)
 			queryBuffer.WriteString(value)
 		}
 	}
