@@ -13,9 +13,9 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -97,8 +97,8 @@ func startHoverfly(adminPort, proxyPort int, workingDir string) *exec.Cmd {
 
 	err := hoverflyCmd.Start()
 
-	binaryErrorCheck(err, hoverflyBinaryUri)
-	healthcheck(adminPort)
+	functional_tests.BinaryErrorCheck(err, hoverflyBinaryUri)
+	functional_tests.Healthcheck(adminPort)
 
 	return hoverflyCmd
 }
@@ -109,8 +109,8 @@ func startHoverflyWithMiddleware(adminPort, proxyPort int, workingDir, binary, s
 
 	err := hoverflyCmd.Start()
 
-	binaryErrorCheck(err, hoverflyBinaryUri)
-	healthcheck(adminPort)
+	functional_tests.BinaryErrorCheck(err, hoverflyBinaryUri)
+	functional_tests.Healthcheck(adminPort)
 
 	request := sling.New().Put(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", adminPort)).BodyJSON(v2.MiddlewareView{Binary: binary, Script: script})
 
@@ -124,7 +124,7 @@ func startHoverflyWithAuth(adminPort, proxyPort int, workingDir, username, passw
 
 	hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
 
-	hoverflyAddUserCmd := exec.Command(hoverflyBinaryUri,"-db", "boltdb", "-add", "-username", username, "-password", password, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
+	hoverflyAddUserCmd := exec.Command(hoverflyBinaryUri, "-db", "boltdb", "-add", "-username", username, "-password", password, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
 	err := hoverflyAddUserCmd.Run()
 
 	if err != nil {
@@ -134,11 +134,11 @@ func startHoverflyWithAuth(adminPort, proxyPort int, workingDir, username, passw
 		os.Exit(1)
 	}
 
-	hoverflyCmd := exec.Command(hoverflyBinaryUri,"-db", "boltdb", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-auth", "true")
+	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "boltdb", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-auth", "true")
 	err = hoverflyCmd.Start()
 
-	binaryErrorCheck(err, hoverflyBinaryUri)
-	healthcheck(adminPort)
+	functional_tests.BinaryErrorCheck(err, hoverflyBinaryUri)
+	functional_tests.Healthcheck(adminPort)
 
 	return hoverflyCmd
 }
@@ -149,37 +149,10 @@ func startHoverflyWebserver(adminPort, proxyPort int, workingDir string) *exec.C
 
 	err := hoverflyCmd.Start()
 
-	binaryErrorCheck(err, hoverflyBinaryUri)
-	healthcheck(adminPort)
+	functional_tests.BinaryErrorCheck(err, hoverflyBinaryUri)
+	functional_tests.Healthcheck(adminPort)
 
 	return hoverflyCmd
-}
-
-func binaryErrorCheck(err error, binaryPath string) {
-	if err != nil {
-		fmt.Println("Unable to start Hoverfly")
-		fmt.Println(binaryPath)
-		fmt.Println("Is the binary there?")
-		os.Exit(1)
-	}
-}
-
-func healthcheck(adminPort int) {
-	var err error
-	var resp *http.Response
-
-	hasPassed := Eventually(func() int {
-		resp, err = http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
-		if err == nil {
-			return resp.StatusCode
-		} else {
-			return 0
-		}
-	}, time.Second*3).Should(BeNumerically("==", http.StatusOK))
-
-	if !hasPassed {
-		fmt.Println(err.Error())
-	}
 }
 
 type testConfig struct {
