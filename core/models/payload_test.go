@@ -407,14 +407,6 @@ func GzipString(s string) string {
 	return b.String()
 }
 
-func Test_NewRequestDetailsFromRequest_SortsQueryString(t *testing.T) {
-	requestDetails := NewRequestDetailsFromRequest(v2.RequestDetailsView{
-		Query: StringToPointer("b=b&a=a"),
-	})
-
-	Expect(requestDetails.Query).To(Equal("a=a&b=b"))
-}
-
 func Test_NewRequestDetailsFromHttpRequest_SortsQueryString(t *testing.T) {
 	request, _ := http.NewRequest("GET", "http://test.org/?a=b&a=a", nil)
 	requestDetails, err := NewRequestDetailsFromHttpRequest(request)

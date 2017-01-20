@@ -150,7 +150,7 @@ func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 		Method:      util.PointerToString(data.GetMethod()),
 		Destination: util.PointerToString(data.GetDestination()),
 		Scheme:      util.PointerToString(data.GetScheme()),
-		Query:       util.SortQueryString(util.PointerToString(data.GetQuery())),
+		Query:       util.PointerToString(data.GetQuery()),
 		Body:        util.PointerToString(data.GetBody()),
 		Headers:     data.GetHeaders(),
 	}
