@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -215,7 +216,7 @@ var _ = Describe("When I use hoverctl", func() {
 				}
 
 				request := sling.New().Get("http://localhost:" + proxyPortAsString)
-				response := DoRequest(request)
+				response := functional_tests.DoRequest(request)
 
 				responseBody, err := ioutil.ReadAll(response.Body)
 				Expect(err).To(BeNil())

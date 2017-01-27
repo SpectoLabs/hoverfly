@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -113,9 +114,9 @@ var _ = Describe("When I use hoverctl", func() {
 		Describe("Managing Hoverflies data using the CLI", func() {
 
 			BeforeEach(func() {
-				DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/records", adminPort)).Body(strings.NewReader(v1HoverflyData)))
+				functional_tests.DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/records", adminPort)).Body(strings.NewReader(v1HoverflyData)))
 
-				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).ToNot(Equal(`{"data":null}`))
 			})
@@ -148,7 +149,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(output).To(ContainSubstring("Successfully imported from " + fileName))
 
-				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
 			})
@@ -164,7 +165,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(output).To(ContainSubstring("Successfully imported from " + ts.URL))
 
-				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
 			})
@@ -179,7 +180,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(output).To(ContainSubstring("Successfully imported from " + fileName))
 
-				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
 			})
@@ -223,7 +224,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(output).To(ContainSubstring("Import to Hoverfly failed: Json did not match schema: Object->Key[meta].Value->Object"))
 
-				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
 			})
