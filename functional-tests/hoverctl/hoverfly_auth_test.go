@@ -31,6 +31,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 
 		AfterEach(func() {
 			hoverfly.Stop()
+			hoverfly.DeleteBoltDb()
 		})
 
 		Context("you can get the mode", func() {
@@ -138,6 +139,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 
 		AfterEach(func() {
 			hoverfly.Stop()
+			hoverfly.DeleteBoltDb()
 		})
 
 		Context("you cannot get the mode", func() {
