@@ -97,6 +97,10 @@ func (this Hoverfly) GetAdminPort() string {
 	return strconv.Itoa(this.adminPort)
 }
 
+func (this Hoverfly) GetProxyPort() string {
+	return strconv.Itoa(this.proxyPort)
+}
+
 func startHoverflyInternal(adminPort, proxyPort int, commands ...string) *exec.Cmd {
 	hoverflyBinaryUri := BuildBinaryPath()
 
