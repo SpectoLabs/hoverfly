@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
@@ -65,9 +64,8 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 			It("and they should be removed", func() {
-				out, _ := exec.Command(hoverctlBinary, "delete", "simulations").Output()
+				output := functional_tests.Run(hoverctlBinary, "delete", "simulations")
 
-				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Simulations have been deleted from Hoverfly"))
 
 				bytes, _ := ioutil.ReadAll(hoverfly.GetSimulation())
@@ -92,9 +90,8 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 			It("and they should be removed", func() {
-				out, _ := exec.Command(hoverctlBinary, "delete", "delays").Output()
+				output := functional_tests.Run(hoverctlBinary, "delete", "delays")
 
-				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Delays have been deleted from Hoverfly"))
 
 				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/delays", hoverfly.GetAdminPort())))
@@ -105,13 +102,12 @@ var _ = Describe("When I use hoverctl", func() {
 
 		Context("I can delete the middleware in Hoverfly", func() {
 			BeforeEach(func() {
-				exec.Command(hoverctlBinary, "middleware", "python testdata/add_random_delay.py").Output()
+				functional_tests.Run(hoverctlBinary, "middleware", "python testdata/add_random_delay.py")
 			})
 
 			It("and they should be removed", func() {
-				out, _ := exec.Command(hoverctlBinary, "delete", "middleware").Output()
+				output := functional_tests.Run(hoverctlBinary, "delete", "middleware")
 
-				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Middleware has been deleted from Hoverfly"))
 
 				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", hoverfly.GetAdminPort())))
@@ -133,9 +129,8 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 			It("and they should be removed", func() {
-				out, _ := exec.Command(hoverctlBinary, "delete", "templates").Output()
+				output := functional_tests.Run(hoverctlBinary, "delete", "templates")
 
-				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Request templates have been deleted from Hoverfly"))
 
 				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/templates", hoverfly.GetAdminPort())))
@@ -197,12 +192,11 @@ var _ = Describe("When I use hoverctl", func() {
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(ContainSubstring(`{"message":"2 payloads import complete."}`))
 
-				exec.Command(hoverctlBinary, "middleware", "python testdata/add_random_delay.py").Output()
+				functional_tests.Run(hoverctlBinary, "middleware", "python testdata/add_random_delay.py")
 			})
 
 			It("by calling delete all", func() {
-				out, _ := exec.Command(hoverctlBinary, "delete", "all").Output()
-				output := strings.TrimSpace(string(out))
+				output := functional_tests.Run(hoverctlBinary, "delete", "all")
 				Expect(output).To(ContainSubstring("Delays, middleware, request templates and simulations have all been deleted from Hoverfly"))
 
 				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/delays", hoverfly.GetAdminPort())))
@@ -225,14 +219,12 @@ var _ = Describe("When I use hoverctl", func() {
 
 		Context("I won't delete if I have not specified what to delete", func() {
 			It("when I call hoverctl delete with no resource", func() {
-				out, _ := exec.Command(hoverctlBinary, "delete").Output()
-				output := strings.TrimSpace(string(out))
+				output := functional_tests.Run(hoverctlBinary, "delete")
 				Expect(output).To(ContainSubstring("You have not specified a resource to delete from Hoverfly"))
 			})
 
 			It("when I call hoverctl delete with an invalid resource", func() {
-				out, _ := exec.Command(hoverctlBinary, "delete", "test").Output()
-				output := strings.TrimSpace(string(out))
+				output := functional_tests.Run(hoverctlBinary, "delete", "test")
 				Expect(output).To(ContainSubstring("You have not specified a valid resource to delete from Hoverfly"))
 			})
 		})

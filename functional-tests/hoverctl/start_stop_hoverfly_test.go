@@ -2,9 +2,7 @@ package hoverctl_end_to_end
 
 import (
 	"io/ioutil"
-	"os/exec"
 	"strconv"
-	"strings"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
@@ -26,20 +24,19 @@ var _ = Describe("When I use hoverctl", func() {
 		)
 
 		BeforeEach(func() {
-			exec.Command(hoverctlBinary, "stop", "-v").Run()
+			functional_tests.Run(hoverctlBinary, "stop", "-v")
 			WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
 		})
 
 		AfterEach(func() {
-			exec.Command(hoverctlBinary, "stop", "-v").Run()
+			functional_tests.Run(hoverctlBinary, "stop", "-v")
 		})
 
 		Context("I can control a process of hoverfly", func() {
 
 			It("by starting hoverfly", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "start", "-v").Output()
+				output := functional_tests.Run(hoverctlBinary, "start", "-v")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 				Expect(output).To(ContainSubstring("admin-port=" + adminPortAsString))
 				Expect(output).To(ContainSubstring("proxy-port=" + proxyPortAsString))
@@ -58,11 +55,10 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 			It("by stopping  hoverfly", func() {
-				exec.Command(hoverctlBinary, "start").Run()
+				functional_tests.Run(hoverctlBinary, "start")
 
-				setOutput, _ := exec.Command(hoverctlBinary, "stop").Output()
+				output := functional_tests.Run(hoverctlBinary, "stop")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
 
 				_, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
@@ -73,9 +69,8 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 			It("by starting and stopping hoverfly on a different admin port using a flag", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "start", "--admin-port=11223").Output()
+				output := functional_tests.Run(hoverctlBinary, "start", "--admin-port=11223")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 				Expect(output).To(ContainSubstring("admin-port=11223"))
 				Expect(output).To(ContainSubstring("proxy-port=" + proxyPortAsString))
@@ -92,9 +87,8 @@ var _ = Describe("When I use hoverctl", func() {
 					Fail("Pid file not have an integer in it")
 				}
 
-				setOutput, _ = exec.Command(hoverctlBinary, "stop", "--admin-port=11223").Output()
+				output = functional_tests.Run(hoverctlBinary, "stop", "--admin-port=11223")
 
-				output = strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
 
 				_, err = ioutil.ReadFile("./.hoverfly/hoverfly.11223." + proxyPortAsString + ".pid")
@@ -106,9 +100,8 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 			It("by starting and stopping hoverfly on a different proxy port using a flag", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "start", "--proxy-port=22113").Output()
+				output := functional_tests.Run(hoverctlBinary, "start", "--proxy-port=22113")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 				Expect(output).To(ContainSubstring("admin-port=" + adminPortAsString))
 				Expect(output).To(ContainSubstring("proxy-port=22113"))
@@ -125,9 +118,8 @@ var _ = Describe("When I use hoverctl", func() {
 					Fail("Pid file not have an integer in it")
 				}
 
-				setOutput, _ = exec.Command(hoverctlBinary, "stop", "--proxy-port=22113").Output()
+				output = functional_tests.Run(hoverctlBinary, "stop", "--proxy-port=22113")
 
-				output = strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
 
 				_, err = ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + ".22113.pid")
@@ -138,9 +130,8 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 			It("by starting and stopping hoverfly on a different admin and proxy port using both flag", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "start", "--admin-port=11223", "--proxy-port=22113").Output()
+				output := functional_tests.Run(hoverctlBinary, "start", "--admin-port=11223", "--proxy-port=22113")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 				Expect(output).To(ContainSubstring("admin-port=11223"))
 				Expect(output).To(ContainSubstring("proxy-port=22113"))
@@ -157,9 +148,8 @@ var _ = Describe("When I use hoverctl", func() {
 					Fail("Pid file not have an integer in it")
 				}
 
-				setOutput, _ = exec.Command(hoverctlBinary, "stop", "--admin-port=11223", "--proxy-port=22113").Output()
+				output = functional_tests.Run(hoverctlBinary, "stop", "--admin-port=11223", "--proxy-port=22113")
 
-				output = strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
 
 				_, err = ioutil.ReadFile("./.hoverfly/hoverfly.11223.22113.pid")
@@ -170,18 +160,16 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 			It("but you cannot start hoverfly if already running", func() {
-				exec.Command(hoverctlBinary, "start").Run()
+				functional_tests.Run(hoverctlBinary, "start")
 
-				setOutput, _ := exec.Command(hoverctlBinary, "start").Output()
+				output := functional_tests.Run(hoverctlBinary, "start")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is already running"))
 			})
 
 			It("but you cannot stop hoverfly if is not running", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "stop").Output()
+				output := functional_tests.Run(hoverctlBinary, "stop")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is not running"))
 			})
 
@@ -190,9 +178,8 @@ var _ = Describe("When I use hoverctl", func() {
 		Context("I can control a process of hoverfly running as a webserver", func() {
 
 			It("by starting hoverfly as a webserver", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "start", "webserver", "-v").Output()
+				output := functional_tests.Run(hoverctlBinary, "start", "webserver", "-v")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running as a webserver"))
 				Expect(output).To(ContainSubstring("admin-port=" + adminPortAsString))
 				Expect(output).To(ContainSubstring("webserver-port=" + proxyPortAsString))
@@ -222,9 +209,8 @@ var _ = Describe("When I use hoverctl", func() {
 		Context("You can specify the certificate and key for hoverfly", func() {
 
 			It("starts hoverfly with different certificate and key", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "start", "--certificate", "testdata/cert.pem", "--key", "testdata/key.pem", "-v").Output()
+				output := functional_tests.Run(hoverctlBinary, "start", "--certificate", "testdata/cert.pem", "--key", "testdata/key.pem", "-v")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
@@ -249,9 +235,8 @@ var _ = Describe("When I use hoverctl", func() {
 		Context("You can disable tls for hoverfly", func() {
 
 			It("starts hoverfly with tls verification turned off", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "start", "--disable-tls", "-v").Output()
+				output := functional_tests.Run(hoverctlBinary, "start", "--disable-tls", "-v")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
@@ -277,17 +262,15 @@ var _ = Describe("When I use hoverctl", func() {
 
 			It("will start on the admin and proxy ports", func() {
 				WriteConfiguration("localhost", "5543", "6478")
-				setOutput, _ := exec.Command(hoverctlBinary, "start", "-v").Output()
+				output := functional_tests.Run(hoverctlBinary, "start", "-v")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("hoverfly -ap=5543 -pp=6478"))
 			})
 
 			It("will start as a webserver", func() {
 				WriteConfigurationWithAuth("localhost", "7654", "8765", true, "", "")
-				setOutput, _ := exec.Command(hoverctlBinary, "start", "-v").Output()
+				output := functional_tests.Run(hoverctlBinary, "start", "-v")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("hoverfly -ap=7654 -pp=8765 -db=memory -webserver"))
 				Expect(output).To(ContainSubstring("Hoverfly is now running as a webserver"))
 			})
@@ -297,9 +280,8 @@ var _ = Describe("When I use hoverctl", func() {
 		Context("You can set db options for hoverfly", func() {
 
 			It("starts hoverfly with boltdb for data persistence", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "start", "--database", "boltdb", "-v").Output()
+				output := functional_tests.Run(hoverctlBinary, "start", "--database", "boltdb", "-v")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")

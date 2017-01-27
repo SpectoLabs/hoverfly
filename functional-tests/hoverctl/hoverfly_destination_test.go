@@ -1,9 +1,6 @@
 package hoverctl_end_to_end
 
 import (
-	"os/exec"
-	"strings"
-
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -31,9 +28,7 @@ var _ = Describe("When I use hoverctl", func() {
 		Context("I can get the hoverfly's destination", func() {
 
 			It("should return the destination", func() {
-				out, _ := exec.Command(hoverctlBinary, "destination").Output()
-
-				output := strings.TrimSpace(string(out))
+				output := functional_tests.Run(hoverctlBinary, "destination")
 				Expect(output).To(ContainSubstring("The destination in Hoverfly is set to ."))
 			})
 		})
@@ -41,14 +36,10 @@ var _ = Describe("When I use hoverctl", func() {
 		Context("I can set hoverfly's destination", func() {
 
 			It("sets the destination", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "destination", "example.org").Output()
-
-				output := strings.TrimSpace(string(setOutput))
+				output := functional_tests.Run(hoverctlBinary, "destination", "example.org")
 				Expect(output).To(ContainSubstring("The destination in Hoverfly has been set to example.org"))
 
-				getOutput, _ := exec.Command(hoverctlBinary, "destination").Output()
-
-				output = strings.TrimSpace(string(getOutput))
+				output = functional_tests.Run(hoverctlBinary, "destination")
 				Expect(output).To(ContainSubstring("The destination in Hoverfly is set to example.org"))
 			})
 		})
@@ -56,14 +47,10 @@ var _ = Describe("When I use hoverctl", func() {
 		Context("I cannot set hoverfly's destination", func() {
 
 			It("does not set the destination if regex is invalid", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "destination", "regex[[[[").Output()
-
-				output := strings.TrimSpace(string(setOutput))
+				output := functional_tests.Run(hoverctlBinary, "destination", "regex[[[[")
 				Expect(output).To(ContainSubstring("Regex pattern does not compile"))
 
-				getOutput, _ := exec.Command(hoverctlBinary, "destination").Output()
-
-				output = strings.TrimSpace(string(getOutput))
+				output = functional_tests.Run(hoverctlBinary, "destination")
 				Expect(output).To(ContainSubstring("The destination in Hoverfly is set to ."))
 			})
 		})
@@ -74,23 +61,17 @@ var _ = Describe("When I use hoverctl", func() {
 		Context("we can test our regex with a --dry-run", func() {
 
 			It("does not attempt the --dry-run the destination if regex is invalid", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "destination", "regex[[[[", "--dry-run", "doesntmatter.io").Output()
-
-				output := strings.TrimSpace(string(setOutput))
+				output := functional_tests.Run(hoverctlBinary, "destination", "regex[[[[", "--dry-run", "doesntmatter.io")
 				Expect(output).To(ContainSubstring("Regex pattern does not compile"))
 			})
 
 			It("does a dry run and tests if the regex matches the URL - which it does", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "destination", "hoverfly.io", "--dry-run", "hoverfly.io").Output()
-
-				output := strings.TrimSpace(string(setOutput))
+				output := functional_tests.Run(hoverctlBinary, "destination", "hoverfly.io", "--dry-run", "hoverfly.io")
 				Expect(output).To(ContainSubstring("The regex provided matches the dry run URL"))
 			})
 
 			It("does a dry run and tests if the regex matches the URL - which it does not", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "destination", "specto.io", "--dry-run", "hoverfly.io").Output()
-
-				output := strings.TrimSpace(string(setOutput))
+				output := functional_tests.Run(hoverctlBinary, "destination", "specto.io", "--dry-run", "hoverfly.io")
 				Expect(output).To(ContainSubstring("The regex provided does not match the dry run URL"))
 			})
 
