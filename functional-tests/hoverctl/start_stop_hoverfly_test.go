@@ -92,8 +92,6 @@ var _ = Describe("When I use hoverctl", func() {
 					Fail("Pid file not have an integer in it")
 				}
 
-				GetHoverflyMode(11223)
-
 				setOutput, _ = exec.Command(hoverctlBinary, "stop", "--admin-port=11223").Output()
 
 				output = strings.TrimSpace(string(setOutput))
@@ -127,8 +125,6 @@ var _ = Describe("When I use hoverctl", func() {
 					Fail("Pid file not have an integer in it")
 				}
 
-				GetHoverflyMode(adminPort)
-
 				setOutput, _ = exec.Command(hoverctlBinary, "stop", "--proxy-port=22113").Output()
 
 				output = strings.TrimSpace(string(setOutput))
@@ -160,8 +156,6 @@ var _ = Describe("When I use hoverctl", func() {
 				if _, err := strconv.Atoi(string(data)); err != nil {
 					Fail("Pid file not have an integer in it")
 				}
-
-				GetHoverflyMode(11223)
 
 				setOutput, _ = exec.Command(hoverctlBinary, "stop", "--admin-port=11223", "--proxy-port=22113").Output()
 

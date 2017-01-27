@@ -3,16 +3,13 @@ package hoverctl_end_to_end
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
-	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/yaml.v2"
@@ -55,30 +52,6 @@ var _ = BeforeSuite(func() {
 	os.Setenv("PATH", fmt.Sprintf("%v:%v", binDirectory, os.Getenv("PATH")))
 
 })
-
-func SetHoverflyMode(mode string, port int) {
-	req := sling.New().Post(fmt.Sprintf("http://localhost:%v/api/state", port)).Body(strings.NewReader(`{"mode":"` + mode + `"}`))
-	res := functional_tests.DoRequest(req)
-	Expect(res.StatusCode).To(Equal(200))
-}
-
-func GetHoverflyMode(port int) string {
-	currentState := &stateRequest{}
-	resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/state", port)))
-
-	body, err := ioutil.ReadAll(resp.Body)
-	Expect(err).To(BeNil())
-
-	err = json.Unmarshal(body, currentState)
-	Expect(err).To(BeNil())
-
-	return currentState.Mode
-}
-
-type stateRequest struct {
-	Mode        string `json:"mode"`
-	Destination string `json:"destination"`
-}
 
 type testConfig struct {
 	HoverflyHost      string `yaml:"hoverfly.host"`
