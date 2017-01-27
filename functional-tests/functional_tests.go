@@ -73,6 +73,15 @@ func (this Hoverfly) SetMode(mode string) {
 	DoRequest(sling.New().Put(this.adminUrl + "/api/v2/hoverfly/mode").BodyJSON(newMode))
 }
 
+func (this Hoverfly) SetMiddleware(binary, script string) {
+	newMiddleware := v2.MiddlewareView{
+		Binary: binary,
+		Script: script,
+	}
+
+	DoRequest(sling.New().Put(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", this.adminPort)).BodyJSON(newMiddleware))
+}
+
 func (this Hoverfly) GetSimulation() io.Reader {
 	res := sling.New().Get(this.adminUrl + "/api/records")
 	req := DoRequest(res)

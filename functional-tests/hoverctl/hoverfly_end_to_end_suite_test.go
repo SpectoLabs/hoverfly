@@ -13,7 +13,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -91,22 +90,6 @@ func startHoverfly(adminPort, proxyPort int, workingDir string) *exec.Cmd {
 
 	functional_tests.BinaryErrorCheck(err, hoverflyBinaryUri)
 	functional_tests.Healthcheck(adminPort)
-
-	return hoverflyCmd
-}
-
-func startHoverflyWithMiddleware(adminPort, proxyPort int, workingDir, binary, script string) *exec.Cmd {
-	hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
-	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
-
-	err := hoverflyCmd.Start()
-
-	functional_tests.BinaryErrorCheck(err, hoverflyBinaryUri)
-	functional_tests.Healthcheck(adminPort)
-
-	request := sling.New().Put(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", adminPort)).BodyJSON(v2.MiddlewareView{Binary: binary, Script: script})
-
-	functional_tests.DoRequest(request)
 
 	return hoverflyCmd
 }
