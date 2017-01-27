@@ -2,13 +2,11 @@ package hoverctl_end_to_end
 
 import (
 	"os/exec"
-	"strconv"
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
 )
 
 var (
@@ -16,10 +14,6 @@ var (
 )
 
 var _ = Describe("When I use hoverfly-cli", func() {
-	var (
-		proxyPort         = freeport.GetPort()
-		proxyPortAsString = strconv.Itoa(proxyPort)
-	)
 
 	Describe("with a running hoverfly", func() {
 
@@ -27,7 +21,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			hoverfly = functional_tests.NewHoverfly()
 			hoverfly.Start()
 
-			WriteConfiguration("localhost", hoverfly.GetAdminPort(), proxyPortAsString)
+			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
 		})
 
 		AfterEach(func() {
@@ -135,7 +129,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			hoverfly = functional_tests.NewHoverfly()
 			hoverfly.Start("-webserver")
 
-			WriteConfiguration("localhost", hoverfly.GetAdminPort(), proxyPortAsString)
+			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
 		})
 
 		AfterEach(func() {
