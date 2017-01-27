@@ -7,9 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -80,30 +78,6 @@ func GetHoverflyMode(port int) string {
 type stateRequest struct {
 	Mode        string `json:"mode"`
 	Destination string `json:"destination"`
-}
-
-func startHoverflyWithAuth(adminPort, proxyPort int, workingDir, username, password string) *exec.Cmd {
-	os.Remove(filepath.Join(workingDir, "requests.db"))
-
-	hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
-
-	hoverflyAddUserCmd := exec.Command(hoverflyBinaryUri, "-db", "boltdb", "-add", "-username", username, "-password", password, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort))
-	err := hoverflyAddUserCmd.Run()
-
-	if err != nil {
-		fmt.Println("Unable to start Hoverfly to add user")
-		fmt.Println(hoverflyBinaryUri)
-		fmt.Println("Is the binary there?")
-		os.Exit(1)
-	}
-
-	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-db", "boltdb", "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-auth", "true")
-	err = hoverflyCmd.Start()
-
-	functional_tests.BinaryErrorCheck(err, hoverflyBinaryUri)
-	functional_tests.Healthcheck(adminPort)
-
-	return hoverflyCmd
 }
 
 type testConfig struct {
