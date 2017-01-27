@@ -18,6 +18,11 @@ import (
 )
 
 var _ = Describe("When I use hoverctl", func() {
+
+	var (
+		hoverfly *functional_tests.Hoverfly
+	)
+
 	var (
 		v1HoverflyData = `
 					{
