@@ -53,10 +53,9 @@ func (this *Hoverfly) Start(commands ...string) {
 
 func (this Hoverfly) Stop() {
 	this.process.Process.Kill()
-	this.deleteBoltDb()
 }
 
-func (this Hoverfly) deleteBoltDb() {
+func (this Hoverfly) DeleteBoltDb() {
 	workingDirectory, _ := os.Getwd()
 	os.Remove(workingDirectory + "requests.db")
 }
