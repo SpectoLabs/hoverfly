@@ -9,10 +9,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var (
-	hoverfly *functional_tests.Hoverfly
-)
-
 var _ = Describe("When I use hoverfly-cli", func() {
 
 	Describe("with a running hoverfly", func() {

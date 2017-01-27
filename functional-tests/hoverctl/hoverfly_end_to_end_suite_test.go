@@ -31,6 +31,8 @@ const (
 )
 
 var (
+	hoverfly *functional_tests.Hoverfly
+
 	hoverctlBinary   string
 	hoverctlCacheDir string
 	workingDirectory string
