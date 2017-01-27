@@ -35,6 +35,7 @@ type Hoverfly struct {
 	proxyPort int
 	proxyUrl  string
 	process   *exec.Cmd
+	commands  []string
 }
 
 func NewHoverfly() *Hoverfly {
@@ -45,7 +46,7 @@ func NewHoverfly() *Hoverfly {
 }
 
 func (this *Hoverfly) Start(commands ...string) {
-	this.process = startHoverflyInternal(this.adminPort, this.proxyPort, commands...)
+	this.process = this.startHoverflyInternal(this.adminPort, this.proxyPort, commands...)
 	this.adminUrl = fmt.Sprintf("http://localhost:%v", this.adminPort)
 	this.proxyUrl = fmt.Sprintf("http://localhost:%v", this.proxyPort)
 }
@@ -116,7 +117,7 @@ func (this Hoverfly) GetProxyPort() string {
 	return strconv.Itoa(this.proxyPort)
 }
 
-func startHoverflyInternal(adminPort, proxyPort int, additionalCommands ...string) *exec.Cmd {
+func (this Hoverfly) startHoverflyInternal(adminPort, proxyPort int, additionalCommands ...string) *exec.Cmd {
 	hoverflyBinaryUri := BuildBinaryPath()
 
 	commands := []string{
@@ -127,7 +128,7 @@ func startHoverflyInternal(adminPort, proxyPort int, additionalCommands ...strin
 	}
 
 	commands = append(commands, additionalCommands...)
-
+	this.commands = commands
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, commands...)
 
 	err := hoverflyCmd.Start()
@@ -142,7 +143,7 @@ func startHoverflyInternal(adminPort, proxyPort int, additionalCommands ...strin
 	}
 
 	if healthCheckNeeded {
-		Healthcheck(adminPort)
+		this.healthcheck()
 	}
 
 	return hoverflyCmd
@@ -162,6 +163,17 @@ func BinaryErrorCheck(err error, binaryPath string) {
 	}
 }
 
+func (this Hoverfly) healthcheck() {
+	Eventually(func() int {
+		resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/health", this.adminPort))
+		if err == nil {
+			return resp.StatusCode
+		} else {
+			return 0
+		}
+	}, time.Second*5).Should(BeNumerically("==", http.StatusOK), "Hoverfly not running on %d", this.adminPort, this.commands)
+}
+
 func Healthcheck(adminPort int) {
 	var err error
 	var resp *http.Response
@@ -173,6 +185,5 @@ func Healthcheck(adminPort int) {
 		} else {
 			return 0
 		}
-	}, time.Second*3).Should(BeNumerically("==", http.StatusOK))
-
+	}, time.Second*5).Should(BeNumerically("==", http.StatusOK), "Hoverfly not running on %d but have no extra information", adminPort)
 }
