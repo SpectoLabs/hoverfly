@@ -135,18 +135,6 @@ func startHoverflyWithAuth(adminPort, proxyPort int, workingDir, username, passw
 	return hoverflyCmd
 }
 
-func startHoverflyWebserver(adminPort, proxyPort int, workingDir string) *exec.Cmd {
-	hoverflyBinaryUri := filepath.Join(workingDir, "bin/hoverfly")
-	hoverflyCmd := exec.Command(hoverflyBinaryUri, "-ap", strconv.Itoa(adminPort), "-pp", strconv.Itoa(proxyPort), "-webserver")
-
-	err := hoverflyCmd.Start()
-
-	functional_tests.BinaryErrorCheck(err, hoverflyBinaryUri)
-	functional_tests.Healthcheck(adminPort)
-
-	return hoverflyCmd
-}
-
 type testConfig struct {
 	HoverflyHost      string `yaml:"hoverfly.host"`
 	HoverflyAdminPort string `yaml:"hoverfly.admin.port"`
