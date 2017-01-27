@@ -3,24 +3,15 @@ package hoverctl_end_to_end
 import (
 	"io/ioutil"
 	"os/exec"
-	"strconv"
 	"strings"
 
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
 )
 
 var _ = Describe("When I use hoverctl with a running an authenticated hoverfly", func() {
 	var (
-		hoverflyCmd *exec.Cmd
-
-		adminPort         = freeport.GetPort()
-		adminPortAsString = strconv.Itoa(adminPort)
-
-		proxyPort         = freeport.GetPort()
-		proxyPortAsString = strconv.Itoa(proxyPort)
-
 		username = "ft_user"
 		password = "ft_password"
 	)
@@ -28,12 +19,16 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 	Describe("and the credentials are in the hoverctl config", func() {
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverflyWithAuth(adminPort, proxyPort, workingDirectory, username, password)
-			WriteConfigurationWithAuth("localhost", adminPortAsString, proxyPortAsString, false, username, password)
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start("-db", "boltdb", "-add", "-username", username, "-password")
+			hoverfly.Stop()
+			hoverfly.Start("-db", "boltdb", "-auth", "true")
+
+			WriteConfigurationWithAuth("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort(), false, username, password)
 		})
 
 		AfterEach(func() {
-			hoverflyCmd.Process.Kill()
+			hoverfly.Stop()
 		})
 
 		Context("you can get the mode", func() {
@@ -131,12 +126,16 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 	Describe("and the credentials are not in the hoverctl config", func() {
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverflyWithAuth(adminPort, proxyPort, workingDirectory, username, password)
-			WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start("-db", "boltdb", "-add", "-username", username, "-password", password)
+			hoverfly.Stop()
+			hoverfly.Start("-db", "boltdb", "-auth", "true")
+
+			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
 		})
 
 		AfterEach(func() {
-			hoverflyCmd.Process.Kill()
+			hoverfly.Stop()
 		})
 
 		Context("you cannot get the mode", func() {
