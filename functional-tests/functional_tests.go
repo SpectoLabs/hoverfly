@@ -101,13 +101,17 @@ func (this Hoverfly) GetProxyPort() string {
 	return strconv.Itoa(this.proxyPort)
 }
 
-func startHoverflyInternal(adminPort, proxyPort int, commands ...string) *exec.Cmd {
+func startHoverflyInternal(adminPort, proxyPort int, additionalCommands ...string) *exec.Cmd {
 	hoverflyBinaryUri := BuildBinaryPath()
 
-	commands = append(commands, "-ap")
-	commands = append(commands, strconv.Itoa(adminPort))
-	commands = append(commands, "-pp")
-	commands = append(commands, strconv.Itoa(proxyPort))
+	commands := []string{
+		"-ap",
+		strconv.Itoa(adminPort),
+		"-pp",
+		strconv.Itoa(proxyPort),
+	}
+
+	commands = append(commands, additionalCommands...)
 
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, commands...)
 
