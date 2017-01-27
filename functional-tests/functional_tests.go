@@ -1,7 +1,9 @@
 package functional_tests
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -13,6 +15,7 @@ import (
 
 	"io"
 
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/gomega"
 	"github.com/phayes/freeport"
@@ -51,8 +54,20 @@ func (this *Hoverfly) Start(commands ...string) {
 func (this Hoverfly) Stop() error {
 	return this.process.Process.Kill()
 }
+
+func (this Hoverfly) GetMode() string {
+	currentState := &v2.ModeView{}
+	resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/mode", this.adminPort)))
+
+	body, err := ioutil.ReadAll(resp.Body)
+	Expect(err).To(BeNil())
+
+	json.Unmarshal(body, currentState)
+
+	return currentState.Mode
+}
 func (this Hoverfly) SetMode(mode string) {
-	req := sling.New().Put(this.adminUrl + "/api/v2/hoverfly/mode").Body(strings.NewReader(`{"mode":"capture"}`))
+	req := sling.New().Put(this.adminUrl + "/api/v2/hoverfly/mode").Body(strings.NewReader(`{"mode":"` + mode + `"}`))
 	DoRequest(req)
 }
 
@@ -76,6 +91,10 @@ func (this Hoverfly) Proxy(r *sling.Sling) *http.Response {
 	return response
 }
 
+func (this Hoverfly) GetAdminPort() string {
+	return strconv.Itoa(this.adminPort)
+}
+
 func startHoverflyInternal(adminPort, proxyPort int, commands ...string) *exec.Cmd {
 	hoverflyBinaryUri := BuildBinaryPath()
 
@@ -89,7 +108,17 @@ func startHoverflyInternal(adminPort, proxyPort int, commands ...string) *exec.C
 	err := hoverflyCmd.Start()
 
 	BinaryErrorCheck(err, hoverflyBinaryUri)
-	Healthcheck(adminPort)
+
+	healthCheckNeeded := true
+	for _, command := range commands {
+		if command == "-add" {
+			healthCheckNeeded = false
+		}
+	}
+
+	if healthCheckNeeded {
+		Healthcheck(adminPort)
+	}
 
 	return hoverflyCmd
 }
