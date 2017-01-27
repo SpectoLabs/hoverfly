@@ -2,8 +2,6 @@ package hoverctl_end_to_end
 
 import (
 	"io/ioutil"
-	"os/exec"
-	"strings"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	. "github.com/onsi/ginkgo"
@@ -36,9 +34,8 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 		Context("you can get the mode", func() {
 
 			It("and it returns the correct mode", func() {
-				out, _ := exec.Command(hoverctlBinary, "mode").Output()
+				output := functional_tests.Run(hoverctlBinary, "mode")
 
-				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
 			})
 		})
@@ -46,14 +43,12 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 		Context("you can set the mode", func() {
 
 			It("and it correctly sets it", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "mode", "capture").Output()
+				output := functional_tests.Run(hoverctlBinary, "mode", "capture")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly has been set to capture mode"))
 
-				getOutput, _ := exec.Command(hoverctlBinary, "mode").Output()
+				output = functional_tests.Run(hoverctlBinary, "mode")
 
-				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to capture mode"))
 			})
 		})
@@ -96,15 +91,12 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 								"schemaVersion": "v1"
 							}
 						}`), 0644)
-				setOutput, _ := exec.Command(hoverctlBinary, "import", filePath).Output()
-
-				output := strings.TrimSpace(string(setOutput))
+				output := functional_tests.Run(hoverctlBinary, "import", filePath)
 				Expect(output).To(ContainSubstring("Successfully imported from " + filePath))
 
 				newFilePath := generateFileName()
-				setOutput, _ = exec.Command(hoverctlBinary, "export", newFilePath).Output()
 
-				output = strings.TrimSpace(string(setOutput))
+				output = functional_tests.Run(hoverctlBinary, "export", newFilePath)
 				Expect(output).To(ContainSubstring("Successfully exported to " + newFilePath))
 
 				exportFile, err := ioutil.ReadFile(newFilePath)
@@ -117,9 +109,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 			})
 
 			It("and then delete simulations from hoverfly", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "delete", "simulations").Output()
-
-				output := strings.TrimSpace(string(setOutput))
+				output := functional_tests.Run(hoverctlBinary, "delete", "simulations")
 				Expect(output).To(ContainSubstring("Simulations have been deleted from Hoverfly"))
 			})
 		})
@@ -143,9 +133,8 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 		Context("you cannot get the mode", func() {
 
 			It("and it returns an error", func() {
-				out, _ := exec.Command(hoverctlBinary, "mode").Output()
+				output := functional_tests.Run(hoverctlBinary, "mode")
 
-				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			})
 		})
@@ -153,9 +142,8 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 		Context("you cannot set the mode", func() {
 
 			It("and it returns an error", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "mode", "capture").Output()
+				output := functional_tests.Run(hoverctlBinary, "mode", "capture")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			})
 		})
@@ -198,23 +186,18 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 			})
 
 			It("by importing data", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "import", filePath).Output()
-
-				output := strings.TrimSpace(string(setOutput))
+				output := functional_tests.Run(hoverctlBinary, "import", filePath)
 				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			})
 
 			It("and then exporting the data", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "export", filePath).Output()
-
-				output := strings.TrimSpace(string(setOutput))
+				output := functional_tests.Run(hoverctlBinary, "export", filePath)
 				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			})
 
 			It("and then wiping hoverfly", func() {
-				setOutput, _ := exec.Command(hoverctlBinary, "delete", "simulations").Output()
+				output := functional_tests.Run(hoverctlBinary, "delete", "simulations")
 
-				output := strings.TrimSpace(string(setOutput))
 				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			})
 		})

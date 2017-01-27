@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"io"
@@ -182,4 +183,10 @@ func Healthcheck(adminPort int) {
 			return 0
 		}
 	}, time.Second*5).Should(BeNumerically("==", http.StatusOK), "Hoverfly not running on %d but have no extra information", adminPort)
+}
+
+func Run(binary string, commands ...string) string {
+	out, _ := exec.Command(binary, commands...).Output()
+
+	return strings.TrimSpace(string(out))
 }
