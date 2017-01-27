@@ -13,6 +13,7 @@ var _ = Describe("When I use hoverctl", func() {
 	Context("I can get the configuration being used by hoverctl", func() {
 
 		It("prints the location of the config.yaml", func() {
+			WriteConfiguration("test", "7654", "5432")
 			out, _ := exec.Command(hoverctlBinary, "config").Output()
 
 			output := strings.TrimSpace(string(out))
