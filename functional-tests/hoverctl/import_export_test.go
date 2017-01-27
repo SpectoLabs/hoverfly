@@ -100,6 +100,8 @@ var _ = Describe("When I use hoverctl", func() {
 		BeforeEach(func() {
 			hoverfly = functional_tests.NewHoverfly()
 			hoverfly.Start()
+
+			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
 		})
 
 		AfterEach(func() {
