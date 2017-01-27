@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os/exec"
 	"strings"
 
 	"net/http"
@@ -122,7 +121,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				fileName := generateFileName()
 				// Export the data
-				output, _ := exec.Command(hoverctlBinary, "export", fileName, "--admin-port="+hoverfly.GetAdminPort()).Output()
+				output := functional_tests.Run(hoverctlBinary, "export", fileName, "--admin-port="+hoverfly.GetAdminPort())
 
 				Expect(output).To(ContainSubstring("Successfully exported to " + fileName))
 
@@ -142,7 +141,7 @@ var _ = Describe("When I use hoverctl", func() {
 				err := ioutil.WriteFile(fileName, []byte(v2HoverflyData), 0644)
 				Expect(err).To(BeNil())
 
-				output, _ := exec.Command(hoverctlBinary, "import", fileName, "--admin-port="+hoverfly.GetAdminPort()).Output()
+				output := functional_tests.Run(hoverctlBinary, "import", fileName, "--admin-port="+hoverfly.GetAdminPort())
 
 				Expect(output).To(ContainSubstring("Successfully imported from " + fileName))
 
@@ -158,7 +157,7 @@ var _ = Describe("When I use hoverctl", func() {
 				}))
 				defer ts.Close()
 
-				output, _ := exec.Command(hoverctlBinary, "import", ts.URL, "--admin-port="+hoverfly.GetAdminPort()).Output()
+				output := functional_tests.Run(hoverctlBinary, "import", ts.URL, "--admin-port="+hoverfly.GetAdminPort())
 
 				Expect(output).To(ContainSubstring("Successfully imported from " + ts.URL))
 
@@ -173,7 +172,7 @@ var _ = Describe("When I use hoverctl", func() {
 				err := ioutil.WriteFile(fileName, []byte(v1HoverflyData), 0644)
 				Expect(err).To(BeNil())
 
-				output, _ := exec.Command(hoverctlBinary, "import", "--v1", fileName, "--admin-port="+hoverfly.GetAdminPort()).Output()
+				output := functional_tests.Run(hoverctlBinary, "import", "--v1", fileName, "--admin-port="+hoverfly.GetAdminPort())
 
 				Expect(output).To(ContainSubstring("Successfully imported from " + fileName))
 
@@ -217,7 +216,7 @@ var _ = Describe("When I use hoverctl", func() {
 				}`), 0644)
 				Expect(err).To(BeNil())
 
-				output, _ := exec.Command(hoverctlBinary, "import", fileName, "--admin-port="+hoverfly.GetAdminPort()).Output()
+				output := functional_tests.Run(hoverctlBinary, "import", fileName, "--admin-port="+hoverfly.GetAdminPort())
 
 				Expect(output).To(ContainSubstring("Import to Hoverfly failed: Json did not match schema: Object->Key[meta].Value->Object"))
 

@@ -1,9 +1,6 @@
 package hoverctl_end_to_end
 
 import (
-	"os/exec"
-	"strings"
-
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -33,9 +30,8 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("when no delay is set", func() {
 				hoverfly.SetMode("simulate")
 
-				out, _ := exec.Command(hoverctlBinary, "delays").Output()
+				output := functional_tests.Run(hoverctlBinary, "delays")
 
-				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Hoverfly has no delays configured"))
 			})
 
@@ -46,9 +42,8 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("when no delay is set", func() {
 				hoverfly.SetMode("simulate")
 
-				out, _ := exec.Command(hoverctlBinary, "delays", "testdata/delays.json").Output()
+				output := functional_tests.Run(hoverctlBinary, "delays", "testdata/delays.json")
 
-				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Response delays set in Hoverfly"))
 				Expect(output).To(ContainSubstring("host1 - 100ms"))
 				Expect(output).To(ContainSubstring("POST | host2 - 110ms"))

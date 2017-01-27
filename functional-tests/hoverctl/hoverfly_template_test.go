@@ -1,7 +1,6 @@
 package hoverctl_end_to_end
 
 import (
-	"os/exec"
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
@@ -32,15 +31,15 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 			It("getting templates will print out null data", func() {
 
-				out, _ := exec.Command(hoverctlBinary, "templates").Output()
-				output := strings.TrimSpace(string(out))
+				output := functional_tests.Run(hoverctlBinary, "templates")
+
 				Expect(output).To(ContainSubstring("\"data\": null"))
 			})
 
 			It("is possible to set request templates by import", func() {
 
-				out, _ := exec.Command(hoverctlBinary, "templates", "testdata/request-template.json").Output()
-				output := strings.TrimSpace(string(out))
+				output := functional_tests.Run(hoverctlBinary, "templates", "testdata/request-template.json")
+
 				Expect(output).To(ContainSubstring("Request template data set in Hoverfly"))
 				Expect(output).To(ContainSubstring("\"path\": \"/path1\""))
 				Expect(output).To(ContainSubstring("\"path\": \"/path2\""))
@@ -51,24 +50,21 @@ var _ = Describe("When I use hoverfly-cli", func() {
 		Context("With some templates already imported", func() {
 
 			BeforeEach(func() {
-				_, err := exec.Command(hoverctlBinary, "templates", "testdata/request-template.json").Output()
-				if err != nil {
-					Fail("Template import failed: " + err.Error())
-				}
+				functional_tests.Run(hoverctlBinary, "templates", "testdata/request-template.json")
 			})
 
 			It("will print out the existing request template data when getting templates", func() {
 
-				out, _ := exec.Command(hoverctlBinary, "templates").Output()
-				output := strings.TrimSpace(string(out))
+				output := functional_tests.Run(hoverctlBinary, "templates")
+
 				Expect(output).To(ContainSubstring("\"path\": \"/path1\""))
 				Expect(output).To(ContainSubstring("\"path\": \"/path2\""))
 			})
 
 			It("adds the extra request templates when calling import", func() {
 
-				out, _ := exec.Command(hoverctlBinary, "templates", "testdata/request-template.json").Output()
-				output := strings.TrimSpace(string(out))
+				output := functional_tests.Run(hoverctlBinary, "templates", "testdata/request-template.json")
+
 				Expect(output).To(ContainSubstring("Request template data set in Hoverfly"))
 				Expect(output).To(ContainSubstring("\"path\": \"/path1\""))
 				Expect(output).To(ContainSubstring("\"path\": \"/path2\""))
