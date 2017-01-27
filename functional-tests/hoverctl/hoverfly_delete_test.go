@@ -5,41 +5,32 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
 )
 
 var _ = Describe("When I use hoverctl", func() {
-	var (
-		hoverflyCmd *exec.Cmd
-
-		adminPort         = freeport.GetPort()
-		adminPortAsString = strconv.Itoa(adminPort)
-
-		proxyPort         = freeport.GetPort()
-		proxyPortAsString = strconv.Itoa(proxyPort)
-	)
 
 	Describe("with a running hoverfly", func() {
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverfly(adminPort, proxyPort, workingDirectory)
-			WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start()
+
+			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
 		})
 
 		AfterEach(func() {
-			hoverflyCmd.Process.Kill()
+			hoverfly.Stop()
 		})
 
 		Context("I can delete the simulations in Hoverfly", func() {
 			BeforeEach(func() {
-				functional_tests.DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/records", adminPort)).Body(strings.NewReader(`
+				functional_tests.DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())).Body(strings.NewReader(`
 					{
 						"data": [{
 							"request": {
@@ -75,15 +66,14 @@ var _ = Describe("When I use hoverctl", func() {
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Simulations have been deleted from Hoverfly"))
 
-				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
-				bytes, _ := ioutil.ReadAll(resp.Body)
+				bytes, _ := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(string(bytes)).To(Equal(`{"data":null}`))
 			})
 		})
 
 		Context("I can delete the delays in Hoverfly", func() {
 			BeforeEach(func() {
-				functional_tests.DoRequest(sling.New().Put(fmt.Sprintf("http://localhost:%v/api/delays", adminPort)).Body(strings.NewReader(`
+				functional_tests.DoRequest(sling.New().Put(fmt.Sprintf("http://localhost:%v/api/delays", hoverfly.GetAdminPort())).Body(strings.NewReader(`
 						{
 							"data": [
 								{
@@ -103,7 +93,7 @@ var _ = Describe("When I use hoverctl", func() {
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Delays have been deleted from Hoverfly"))
 
-				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/delays", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/delays", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(Equal(`{"data":[]}`))
 			})
@@ -120,7 +110,7 @@ var _ = Describe("When I use hoverctl", func() {
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Middleware has been deleted from Hoverfly"))
 
-				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(Equal(`{"binary":"","script":"","remote":""}`))
 			})
@@ -133,7 +123,7 @@ var _ = Describe("When I use hoverctl", func() {
 				if err != nil {
 					Fail("Failed to read request template test data")
 				}
-				resp := functional_tests.DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/templates", adminPort)).Body(fileReader))
+				resp := functional_tests.DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/templates", hoverfly.GetAdminPort())).Body(fileReader))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(ContainSubstring(`{"message":"2 payloads import complete."}`))
 			})
@@ -144,7 +134,7 @@ var _ = Describe("When I use hoverctl", func() {
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Request templates have been deleted from Hoverfly"))
 
-				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/templates", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/templates", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(ContainSubstring(`{"data":null}`))
 			})
@@ -153,7 +143,7 @@ var _ = Describe("When I use hoverctl", func() {
 		Context("I can delete everything in hoverfly", func() {
 
 			BeforeEach(func() {
-				functional_tests.DoRequest(sling.New().Put(fmt.Sprintf("http://localhost:%v/api/delays", adminPort)).Body(strings.NewReader(`
+				functional_tests.DoRequest(sling.New().Put(fmt.Sprintf("http://localhost:%v/api/delays", hoverfly.GetAdminPort())).Body(strings.NewReader(`
 					{
 						"data": [
 							{
@@ -166,7 +156,7 @@ var _ = Describe("When I use hoverctl", func() {
 							}
 						]`)))
 
-				functional_tests.DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/records", adminPort)).Body(strings.NewReader(`
+				functional_tests.DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())).Body(strings.NewReader(`
 					{
 						"data": [{
 							"request": {
@@ -199,7 +189,7 @@ var _ = Describe("When I use hoverctl", func() {
 				if err != nil {
 					Fail("Failed to read request template test data")
 				}
-				resp := functional_tests.DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/templates", adminPort)).Body(fileReader))
+				resp := functional_tests.DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/templates", hoverfly.GetAdminPort())).Body(fileReader))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(ContainSubstring(`{"message":"2 payloads import complete."}`))
 
@@ -211,19 +201,19 @@ var _ = Describe("When I use hoverctl", func() {
 				output := strings.TrimSpace(string(out))
 				Expect(output).To(ContainSubstring("Delays, middleware, request templates and simulations have all been deleted from Hoverfly"))
 
-				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/delays", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/delays", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(Equal(`{"data":[]}`))
 
-				resp = functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				resp = functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())))
 				bytes, _ = ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(Equal(`{"data":null}`))
 
-				resp = functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/templates", adminPort)))
+				resp = functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/templates", hoverfly.GetAdminPort())))
 				bytes, _ = ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(ContainSubstring(`{"data":null}`))
 
-				resp = functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", adminPort)))
+				resp = functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", hoverfly.GetAdminPort())))
 				bytes, _ = ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(Equal(`{"binary":"","script":"","remote":""}`))
 			})
