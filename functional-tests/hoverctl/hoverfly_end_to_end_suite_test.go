@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -62,22 +61,13 @@ var _ = BeforeSuite(func() {
 
 func SetHoverflyMode(mode string, port int) {
 	req := sling.New().Post(fmt.Sprintf("http://localhost:%v/api/state", port)).Body(strings.NewReader(`{"mode":"` + mode + `"}`))
-	res := DoRequest(req)
+	res := functional_tests.DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
-}
-
-func DoRequest(r *sling.Sling) *http.Response {
-	req, err := r.Request()
-	Expect(err).To(BeNil())
-	response, err := http.DefaultClient.Do(req)
-
-	Expect(err).To(BeNil())
-	return response
 }
 
 func GetHoverflyMode(port int) string {
 	currentState := &stateRequest{}
-	resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/state", port)))
+	resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/state", port)))
 
 	body, err := ioutil.ReadAll(resp.Body)
 	Expect(err).To(BeNil())
@@ -116,7 +106,7 @@ func startHoverflyWithMiddleware(adminPort, proxyPort int, workingDir, binary, s
 
 	request := sling.New().Put(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/middleware", adminPort)).BodyJSON(v2.MiddlewareView{Binary: binary, Script: script})
 
-	DoRequest(request)
+	functional_tests.DoRequest(request)
 
 	return hoverflyCmd
 }
