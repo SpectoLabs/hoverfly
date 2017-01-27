@@ -11,6 +11,10 @@ import (
 
 var _ = Describe("When I use hoverfly-cli", func() {
 
+	var (
+		hoverfly *functional_tests.Hoverfly
+	)
+
 	Context("with a running hoverfly", func() {
 
 		BeforeEach(func() {
