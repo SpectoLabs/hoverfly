@@ -50,8 +50,14 @@ func (this *Hoverfly) Start(commands ...string) {
 	this.proxyUrl = fmt.Sprintf("http://localhost:%v", this.proxyPort)
 }
 
-func (this Hoverfly) Stop() error {
-	return this.process.Process.Kill()
+func (this Hoverfly) Stop() {
+	this.process.Process.Kill()
+	this.deleteBoltDb()
+}
+
+func (this Hoverfly) deleteBoltDb() {
+	workingDirectory, _ := os.Getwd()
+	os.Remove(workingDirectory + "requests.db")
 }
 
 func (this Hoverfly) GetMode() string {
