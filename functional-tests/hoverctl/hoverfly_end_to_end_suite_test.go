@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/yaml.v2"
@@ -24,8 +23,6 @@ const (
 )
 
 var (
-	hoverfly *functional_tests.Hoverfly
-
 	hoverctlBinary   string
 	workingDirectory string
 )

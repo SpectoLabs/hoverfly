@@ -12,6 +12,8 @@ import (
 
 var _ = Describe("When I use hoverctl with a running an authenticated hoverfly", func() {
 	var (
+		hoverfly *functional_tests.Hoverfly
+
 		username = "ft_user"
 		password = "ft_password"
 	)
