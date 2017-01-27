@@ -2,16 +2,18 @@ package hoverctl_end_to_end
 
 import (
 	"fmt"
-	"github.com/dghubble/sling"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/dghubble/sling"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/phayes/freeport"
 )
 
 var _ = Describe("When I use hoverctl", func() {
@@ -86,7 +88,7 @@ var _ = Describe("When I use hoverctl", func() {
 				exec.Command(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort).Output()
 
 				req := sling.New().Post(fmt.Sprintf("http://localhost:%v/api/state", adminPort)).Body(strings.NewReader(`{"mode":"not-a-mode"}`))
-				DoRequest(req)
+				functional_tests.DoRequest(req)
 
 				workingDir, _ := os.Getwd()
 				filePath := filepath.Join(workingDir, ".hoverfly/", "hoverfly."+adminPort+"."+proxyPort+".log")
