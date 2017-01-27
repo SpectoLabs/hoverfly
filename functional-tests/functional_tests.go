@@ -10,7 +10,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	"io"
@@ -67,8 +66,11 @@ func (this Hoverfly) GetMode() string {
 	return currentState.Mode
 }
 func (this Hoverfly) SetMode(mode string) {
-	req := sling.New().Put(this.adminUrl + "/api/v2/hoverfly/mode").Body(strings.NewReader(`{"mode":"` + mode + `"}`))
-	DoRequest(req)
+	newMode := &v2.ModeView{
+		Mode: mode,
+	}
+
+	DoRequest(sling.New().Put(this.adminUrl + "/api/v2/hoverfly/mode").BodyJSON(newMode))
 }
 
 func (this Hoverfly) GetSimulation() io.Reader {
