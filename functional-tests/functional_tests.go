@@ -129,21 +129,18 @@ func (this Hoverfly) startHoverflyInternal(adminPort, proxyPort int, additionalC
 	commands = append(commands, additionalCommands...)
 	this.commands = commands
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, commands...)
-
 	err := hoverflyCmd.Start()
 
 	BinaryErrorCheck(err, hoverflyBinaryUri)
 
-	healthCheckNeeded := true
 	for _, command := range commands {
 		if command == "-add" {
-			healthCheckNeeded = false
+			time.Sleep(time.Second * 3)
+			return hoverflyCmd
 		}
 	}
 
-	if healthCheckNeeded {
-		this.healthcheck()
-	}
+	this.healthcheck()
 
 	return hoverflyCmd
 }
