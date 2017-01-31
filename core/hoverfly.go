@@ -19,18 +19,6 @@ import (
 	"github.com/rusenask/goproxy"
 )
 
-// SimulateMode - default mode when Hoverfly looks for captured requests to respond
-const SimulateMode = "simulate"
-
-// SynthesizeMode - all requests are sent to middleware to create response
-const SynthesizeMode = "synthesize"
-
-// ModifyMode - middleware is applied to outgoing and incoming traffic
-const ModifyMode = "modify"
-
-// CaptureMode - requests are captured and stored in cache
-const CaptureMode = "capture"
-
 // orPanic - wrapper for logging errors
 func orPanic(err error) {
 	if err != nil {
@@ -74,7 +62,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		Authentication: authentication,
 		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification),
 		Cfg:            cfg,
-		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
+		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
 		ResponseDelays: &models.ResponseDelayList{},
 		RequestMatcher: requestMatcher,
 	}
@@ -170,7 +158,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 
 	// Don't delete the error
 	// and definitely don't delay people in capture mode
-	if err != nil || mode == CaptureMode {
+	if err != nil || mode == modes.Capture {
 		return response
 	}
 
