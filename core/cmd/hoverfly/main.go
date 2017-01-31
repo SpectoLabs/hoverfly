@@ -33,6 +33,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	hvc "github.com/SpectoLabs/hoverfly/core/certs"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/rusenask/goproxy"
 )
 
@@ -400,7 +401,7 @@ func createSuperUser(h *hv.Hoverfly) {
 
 func getInitialMode(cfg *hv.Configuration) string {
 	if *webserver {
-		return hv.SimulateMode
+		return modes.Simulate
 	}
 
 	if *capture {
@@ -409,7 +410,7 @@ func getInitialMode(cfg *hv.Configuration) string {
 			log.Fatal("Two or more modes supplied, check your flags")
 		}
 
-		return hv.CaptureMode
+		return modes.Capture
 
 	} else if *synthesize {
 
@@ -421,7 +422,7 @@ func getInitialMode(cfg *hv.Configuration) string {
 			log.Fatal("Two or more modes supplied, check your flags")
 		}
 
-		return hv.SynthesizeMode
+		return modes.Synthesize
 
 	} else if *modify {
 		if !cfg.Middleware.IsSet() {
@@ -432,8 +433,8 @@ func getInitialMode(cfg *hv.Configuration) string {
 			log.Fatal("Two or more modes supplied, check your flags")
 		}
 
-		return hv.ModifyMode
+		return modes.Modify
 	}
 
-	return hv.SimulateMode
+	return modes.Simulate
 }
