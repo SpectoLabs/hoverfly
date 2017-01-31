@@ -93,7 +93,7 @@ func Test_Hoverfly_processRequest_CanSimulateRequest(t *testing.T) {
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
 	// virtualizing
-	dbClient.Cfg.SetMode(SimulateMode)
+	dbClient.Cfg.SetMode("simulate")
 	newResp := dbClient.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
@@ -119,7 +119,7 @@ func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeRequest(t *testing
 	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode(SynthesizeMode)
+	dbClient.Cfg.SetMode("synthesize")
 	newResp := dbClient.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
@@ -144,7 +144,7 @@ func Test_Hoverfly_processRequest_CanModifyRequest(t *testing.T) {
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode(ModifyMode)
+	dbClient.Cfg.SetMode("modify")
 	newResp := dbClient.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
@@ -190,7 +190,7 @@ func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
 	// virtualizing
-	dbClient.Cfg.SetMode(SimulateMode)
+	dbClient.Cfg.SetMode("simulate")
 
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub
@@ -212,7 +212,7 @@ func TestDelayNotAppliedToFailedSimulateRequest(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	// virtualizing
-	dbClient.Cfg.SetMode(SimulateMode)
+	dbClient.Cfg.SetMode("simulate")
 
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub
@@ -264,7 +264,7 @@ func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
 	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode(SynthesizeMode)
+	dbClient.Cfg.SetMode("synthesize")
 
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub
@@ -293,7 +293,7 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode(SynthesizeMode)
+	dbClient.Cfg.SetMode("synthesize")
 
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub
@@ -319,7 +319,7 @@ func TestDelayAppliedToSuccessfulMiddleware(t *testing.T) {
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode(ModifyMode)
+	dbClient.Cfg.SetMode("modify")
 
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub
@@ -345,7 +345,7 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode(ModifyMode)
+	dbClient.Cfg.SetMode("modify")
 
 	stub := ResponseDelayListStub{}
 	dbClient.ResponseDelays = &stub

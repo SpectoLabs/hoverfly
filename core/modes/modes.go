@@ -14,6 +14,18 @@ import (
 	"github.com/rusenask/goproxy"
 )
 
+// SimulateMode - default mode when Hoverfly looks for captured requests to respond
+const Simulate = "simulate"
+
+// SynthesizeMode - all requests are sent to middleware to create response
+const Synthesize = "synthesize"
+
+// ModifyMode - middleware is applied to outgoing and incoming traffic
+const Modify = "modify"
+
+// CaptureMode - requests are captured and stored in cache
+const Capture = "capture"
+
 type Mode interface {
 	Process(*http.Request, models.RequestDetails) (*http.Response, error)
 }
