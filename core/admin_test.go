@@ -258,7 +258,7 @@ func TestGetState(t *testing.T) {
 	m := adminApi.getBoneRouter(dbClient)
 
 	// setting initial mode
-	dbClient.Cfg.SetMode(SimulateMode)
+	dbClient.Cfg.SetMode("simulate")
 
 	req, err := http.NewRequest("GET", "/api/state", nil)
 	Expect(err).To(BeNil())
@@ -273,7 +273,7 @@ func TestGetState(t *testing.T) {
 	sr := v1.StateRequest{}
 	err = json.Unmarshal(body, &sr)
 
-	Expect(sr.Mode).To(Equal(SimulateMode))
+	Expect(sr.Mode).To(Equal("simulate"))
 }
 
 func TestSetSimulateState(t *testing.T) {
@@ -289,7 +289,7 @@ func TestSetSimulateState(t *testing.T) {
 
 	// preparing to set mode through rest api
 	var resp v1.StateRequest
-	resp.Mode = SimulateMode
+	resp.Mode = "simulate"
 
 	requestBytes, err := json.Marshal(&resp)
 	Expect(err).To(BeNil())
@@ -305,7 +305,7 @@ func TestSetSimulateState(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusOK))
 
 	// checking mode
-	Expect(dbClient.Cfg.GetMode()).To(Equal(SimulateMode))
+	Expect(dbClient.Cfg.GetMode()).To(Equal("simulate"))
 }
 
 func TestSetCaptureState(t *testing.T) {
@@ -317,7 +317,7 @@ func TestSetCaptureState(t *testing.T) {
 	m := adminApi.getBoneRouter(dbClient)
 
 	// setting mode to simulate
-	dbClient.Cfg.SetMode(SimulateMode)
+	dbClient.Cfg.SetMode("simulate")
 
 	// preparing to set mode through rest api
 	var resp v1.StateRequest
@@ -349,11 +349,11 @@ func TestSetModifyState(t *testing.T) {
 	m := adminApi.getBoneRouter(dbClient)
 
 	// setting mode to simulate
-	dbClient.Cfg.SetMode(SimulateMode)
+	dbClient.Cfg.SetMode("simulate")
 
 	// preparing to set mode through rest api
 	var resp v1.StateRequest
-	resp.Mode = ModifyMode
+	resp.Mode = "modify"
 
 	requestBytes, err := json.Marshal(&resp)
 	Expect(err).To(BeNil())
@@ -369,7 +369,7 @@ func TestSetModifyState(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusOK))
 
 	// checking mode
-	Expect(dbClient.Cfg.GetMode()).To(Equal(ModifyMode))
+	Expect(dbClient.Cfg.GetMode()).To(Equal("modify"))
 }
 
 func TestSetSynthesizeState(t *testing.T) {
@@ -381,11 +381,11 @@ func TestSetSynthesizeState(t *testing.T) {
 	m := adminApi.getBoneRouter(dbClient)
 
 	// setting mode to simulate
-	dbClient.Cfg.SetMode(SimulateMode)
+	dbClient.Cfg.SetMode("simulate")
 
 	// preparing to set mode through rest api
 	var resp v1.StateRequest
-	resp.Mode = SynthesizeMode
+	resp.Mode = "synthesize"
 
 	requestBytes, err := json.Marshal(&resp)
 	Expect(err).To(BeNil())
@@ -401,7 +401,7 @@ func TestSetSynthesizeState(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusOK))
 
 	// checking mode
-	Expect(dbClient.Cfg.GetMode()).To(Equal(SynthesizeMode))
+	Expect(dbClient.Cfg.GetMode()).To(Equal("synthesize"))
 }
 
 func TestSetRandomState(t *testing.T) {
@@ -413,7 +413,7 @@ func TestSetRandomState(t *testing.T) {
 	m := adminApi.getBoneRouter(dbClient)
 
 	// setting mode to simulate
-	dbClient.Cfg.SetMode(SimulateMode)
+	dbClient.Cfg.SetMode("simulate")
 
 	// preparing to set mode through rest api
 	var resp v1.StateRequest
@@ -433,7 +433,7 @@ func TestSetRandomState(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusBadRequest))
 
 	// checking mode, should not have changed
-	Expect(dbClient.Cfg.GetMode()).To(Equal(SimulateMode))
+	Expect(dbClient.Cfg.GetMode()).To(Equal("simulate"))
 }
 
 func TestSetNoBody(t *testing.T) {
@@ -445,7 +445,7 @@ func TestSetNoBody(t *testing.T) {
 	m := adminApi.getBoneRouter(dbClient)
 
 	// setting mode to simulate
-	dbClient.Cfg.SetMode(SimulateMode)
+	dbClient.Cfg.SetMode("simulate")
 
 	// setting state
 	req, err := http.NewRequest("POST", "/api/state", nil)
@@ -458,7 +458,7 @@ func TestSetNoBody(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusBadRequest))
 
 	// checking mode, should not have changed
-	Expect(dbClient.Cfg.GetMode()).To(Equal(SimulateMode))
+	Expect(dbClient.Cfg.GetMode()).To(Equal("simulate"))
 }
 
 func TestStatsHandler(t *testing.T) {
@@ -490,7 +490,7 @@ func TestStatsHandlerSimulateMetrics(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := adminApi.getBoneRouter(dbClient)
 
-	dbClient.Counter.Counters[SimulateMode].Inc(1)
+	dbClient.Counter.Counters["simulate"].Inc(1)
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)
 	Expect(err).To(BeNil())
@@ -506,7 +506,7 @@ func TestStatsHandlerSimulateMetrics(t *testing.T) {
 	sr := v1.StatsResponse{}
 	err = json.Unmarshal(body, &sr)
 
-	Expect(int(sr.Stats.Counters[SimulateMode])).To(Equal(1))
+	Expect(int(sr.Stats.Counters["simulate"])).To(Equal(1))
 }
 
 func TestStatsHandlerCaptureMetrics(t *testing.T) {
@@ -519,7 +519,7 @@ func TestStatsHandlerCaptureMetrics(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := adminApi.getBoneRouter(dbClient)
 
-	dbClient.Counter.Counters[CaptureMode].Inc(1)
+	dbClient.Counter.Counters["capture"].Inc(1)
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)
 	Expect(err).To(BeNil())
@@ -535,7 +535,7 @@ func TestStatsHandlerCaptureMetrics(t *testing.T) {
 	sr := v1.StatsResponse{}
 	err = json.Unmarshal(body, &sr)
 
-	Expect(int(sr.Stats.Counters[CaptureMode])).To(Equal(1))
+	Expect(int(sr.Stats.Counters["capture"])).To(Equal(1))
 }
 
 func TestStatsHandlerModifyMetrics(t *testing.T) {
@@ -548,7 +548,7 @@ func TestStatsHandlerModifyMetrics(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := adminApi.getBoneRouter(dbClient)
 
-	dbClient.Counter.Counters[ModifyMode].Inc(1)
+	dbClient.Counter.Counters["modify"].Inc(1)
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)
 	Expect(err).To(BeNil())
@@ -564,7 +564,7 @@ func TestStatsHandlerModifyMetrics(t *testing.T) {
 	sr := v1.StatsResponse{}
 	err = json.Unmarshal(body, &sr)
 
-	Expect(int(sr.Stats.Counters[ModifyMode])).To(Equal(1))
+	Expect(int(sr.Stats.Counters["modify"])).To(Equal(1))
 }
 
 func TestStatsHandlerSynthesizeMetrics(t *testing.T) {
@@ -577,7 +577,7 @@ func TestStatsHandlerSynthesizeMetrics(t *testing.T) {
 	defer dbClient.RequestCache.DeleteData()
 	m := adminApi.getBoneRouter(dbClient)
 
-	dbClient.Counter.Counters[SynthesizeMode].Inc(1)
+	dbClient.Counter.Counters["synthesize"].Inc(1)
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)
 	Expect(err).To(BeNil())
@@ -593,7 +593,7 @@ func TestStatsHandlerSynthesizeMetrics(t *testing.T) {
 	sr := v1.StatsResponse{}
 	err = json.Unmarshal(body, &sr)
 
-	Expect(int(sr.Stats.Counters[SynthesizeMode])).To(Equal(1))
+	Expect(int(sr.Stats.Counters["synthesize"])).To(Equal(1))
 }
 
 func TestStatsHandlerRecordCountMetrics(t *testing.T) {

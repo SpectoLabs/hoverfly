@@ -67,8 +67,8 @@ func TestSetMode(t *testing.T) {
 	RegisterTestingT(t)
 
 	cfg := Configuration{}
-	cfg.SetMode(SimulateMode)
-	Expect(cfg.Mode).To(Equal(SimulateMode))
+	cfg.SetMode("simulate")
+	Expect(cfg.Mode).To(Equal("simulate"))
 }
 
 // TestGetMode - tests GetMode function, however it doesn't test
