@@ -160,7 +160,7 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 	}
 
 	if response.StatusCode == 422 {
-		return "", errors.New("Cannot change the mode of Hoverfly when running as a webserver")
+		return "", errors.New("Cannot change the mode of Hoverfly to capture when running as a webserver")
 	}
 
 	apiResponse := h.createAPIStateResponse(response)
