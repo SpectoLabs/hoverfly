@@ -163,7 +163,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("to capture mode", func() {
 				output := functional_tests.Run(hoverctlBinary, "mode", "capture")
 
-				Expect(output).To(ContainSubstring("Cannot change the mode of Hoverfly when running as a webserver"))
+				Expect(output).To(ContainSubstring("Cannot change the mode of Hoverfly to capture when running as a webserver"))
 
 				output = functional_tests.Run(hoverctlBinary, "mode")
 
