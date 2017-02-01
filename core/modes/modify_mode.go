@@ -19,22 +19,22 @@ type ModifyMode struct {
 func (this ModifyMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
 	pair, err := this.Hoverfly.ApplyMiddleware(models.RequestResponsePair{Request: details})
 	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", "modify")
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Modify)
 	}
 
 	modifiedRequest, err := ReconstructRequest(pair)
 	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when rebuilding the modified http request", "modify")
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when rebuilding the modified http request", Modify)
 	}
 
 	resp, err := this.Hoverfly.DoRequest(modifiedRequest)
 	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended desintation", "modify")
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended desintation", Modify)
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when reading the http response body", "modify")
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when reading the http response body", Modify)
 	}
 
 	pair.Response = models.ResponseDetails{
@@ -45,7 +45,7 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 
 	pair, err = this.Hoverfly.ApplyMiddleware(pair)
 	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", "modify")
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Modify)
 	}
 
 	return ReconstructResponse(modifiedRequest, pair), nil

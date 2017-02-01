@@ -29,17 +29,17 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 
 	pair, err := this.Hoverfly.ApplyMiddleware(models.RequestResponsePair{Request: details})
 	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when applying middleware to http request", "capture")
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when applying middleware to http request", Capture)
 	}
 
 	modifiedRequest, err := ReconstructRequest(pair)
 	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when applying middleware to http request", "capture")
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when applying middleware to http request", Capture)
 	}
 
 	response, err := this.Hoverfly.DoRequest(modifiedRequest)
 	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended desintation", "capture")
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended desintation", Capture)
 	}
 
 	respBody, _ := util.GetResponseBody(response)
@@ -53,11 +53,11 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 	// saving response body with request/response meta to cache
 	err = this.Hoverfly.Save(&pair.Request, responseObj)
 	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when saving request and response", "capture")
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when saving request and response", Capture)
 	}
 
 	log.WithFields(log.Fields{
-		"mode":     "capture",
+		"mode":     Capture,
 		"request":  GetRequestLogFields(&pair.Request),
 		"response": GetResponseLogFields(&pair.Response),
 	}).Info("request and response captured")
