@@ -124,7 +124,7 @@ func GetResponseLogFields(response *models.ResponseDetails) *logrus.Fields {
 func ReturnErrorAndLog(request *http.Request, err error, pair *models.RequestResponsePair, msg, mode string) (*http.Response, error) {
 	log.WithFields(log.Fields{
 		"error":    err.Error(),
-		"mode":     "capture",
+		"mode":     mode,
 		"request":  GetRequestLogFields(&pair.Request),
 		"response": GetResponseLogFields(&pair.Response),
 	}).Error(msg)
