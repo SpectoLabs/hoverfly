@@ -12,6 +12,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 )
 
 func (this Hoverfly) GetDestination() string {
@@ -39,10 +40,10 @@ func (this Hoverfly) GetMode() string {
 
 func (this *Hoverfly) SetMode(mode string) error {
 	availableModes := map[string]bool{
-		"simulate":   true,
-		"capture":    true,
-		"modify":     true,
-		"synthesize": true,
+		modes.Simulate:   true,
+		modes.Capture:    true,
+		modes.Modify:     true,
+		modes.Synthesize: true,
 	}
 
 	if mode == "" || !availableModes[mode] {
@@ -50,10 +51,11 @@ func (this *Hoverfly) SetMode(mode string) error {
 		return fmt.Errorf("Not a valid mode")
 	}
 
-	if this.Cfg.Webserver {
-		log.Error("Can't change state when configured as a webserver ")
-		return fmt.Errorf("Can't change state when configured as a webserver")
+	if this.Cfg.Webserver && mode == modes.Capture {
+		log.Error("Can't change mode to when configured as a webserver")
+		return fmt.Errorf("Can't change mode to capture when configured as a webserver")
 	}
+
 	this.Cfg.SetMode(mode)
 	return nil
 }
