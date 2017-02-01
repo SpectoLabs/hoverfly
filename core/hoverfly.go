@@ -69,10 +69,10 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 
 	modeMap := make(map[string]modes.Mode)
 
-	modeMap["capture"] = modes.CaptureMode{Hoverfly: h}
-	modeMap["simulate"] = modes.SimulateMode{Hoverfly: h}
-	modeMap["modify"] = modes.ModifyMode{Hoverfly: h}
-	modeMap["synthesize"] = modes.SynthesizeMode{Hoverfly: h}
+	modeMap[modes.Capture] = modes.CaptureMode{Hoverfly: h}
+	modeMap[modes.Simulate] = modes.SimulateMode{Hoverfly: h}
+	modeMap[modes.Modify] = modes.ModifyMode{Hoverfly: h}
+	modeMap[modes.Synthesize] = modes.SynthesizeMode{Hoverfly: h}
 
 	h.modeMap = modeMap
 
