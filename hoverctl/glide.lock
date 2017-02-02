@@ -119,8 +119,6 @@ imports:
   subpackages:
   - transform
   - unicode/norm
-- name: gopkg.in/alecthomas/kingpin.v2
-  version: e5900212cbf65b181d3d8e08308ef06a01d117cf
 - name: gopkg.in/fsnotify.v1
   version: 7be54206639f256967dd82fa767397ba5f8f48f5
 - name: gopkg.in/tomb.v1
