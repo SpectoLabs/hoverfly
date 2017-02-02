@@ -36,6 +36,7 @@ type HoverflyView struct {
 	MiddlewareView `json:"middleware"`
 	ModeView
 	UsageView
+	VersionView
 }
 
 type SimulationView struct {
