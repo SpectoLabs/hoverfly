@@ -28,7 +28,7 @@ type ModeView struct {
 }
 
 type VersionView struct {
-	Version string `json:"version:`
+	Version string `json:"version"`
 }
 
 type HoverflyView struct {
