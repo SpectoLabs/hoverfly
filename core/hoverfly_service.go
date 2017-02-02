@@ -263,3 +263,7 @@ func (this *Hoverfly) DeleteSimulation() {
 	this.DeleteResponseDelays()
 	this.DeleteRequestCache()
 }
+
+func (this Hoverfly) GetVersion() string {
+	return this.version
+}
