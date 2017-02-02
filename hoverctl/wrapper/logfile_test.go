@@ -1,10 +1,11 @@
-package main
+package wrapper
 
 import (
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"testing"
+
+	. "github.com/onsi/gomega"
 )
 
 var logFile_testDirectory = "/tmp/hoverctl-tests-logfile"

@@ -1,4 +1,4 @@
-package main
+package wrapper
 
 import (
 	"bytes"
@@ -501,7 +501,7 @@ func (h *Hoverfly) runBinary(path string, hoverflyDirectory HoverflyDirectory) (
 	return cmd, nil
 }
 
-func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) error {
+func (h *Hoverfly) Start(hoverflyDirectory HoverflyDirectory) error {
 
 	if !h.isLocal() {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
@@ -570,7 +570,7 @@ func (h *Hoverfly) start(hoverflyDirectory HoverflyDirectory) error {
 	return nil
 }
 
-func (h *Hoverfly) stop(hoverflyDirectory HoverflyDirectory) error {
+func (h *Hoverfly) Stop(hoverflyDirectory HoverflyDirectory) error {
 	if !h.isLocal() {
 		return errors.New("hoverctl can not stop an instance of Hoverfly on a remote host")
 	}

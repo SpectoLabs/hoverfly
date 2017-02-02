@@ -1,12 +1,13 @@
-package main
+package wrapper
 
 import (
 	"errors"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
-	"github.com/hpcloud/tail"
 	"io/ioutil"
 	"path/filepath"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/hpcloud/tail"
 )
 
 type LogFile struct {

@@ -1,11 +1,12 @@
-package main
+package wrapper
 
 import (
-	"github.com/mitchellh/go-homedir"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/mitchellh/go-homedir"
+	. "github.com/onsi/gomega"
 )
 
 var hoverflyDirectory_testDirectory = "/tmp/hoverctl-hoverfly-directory-test"

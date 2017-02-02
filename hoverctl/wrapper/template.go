@@ -1,14 +1,15 @@
-package main
+package wrapper
 
 import (
 	"encoding/json"
 	"errors"
-	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/matching"
-	"github.com/dghubble/sling"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/dghubble/sling"
 )
 
 func (h *Hoverfly) performAPIRequest(slingRequest *sling.Sling) (*http.Response, error) {
