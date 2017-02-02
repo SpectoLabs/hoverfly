@@ -11,6 +11,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -77,10 +78,10 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 	}
 
-	SetConfigurationDefaults()
-	SetConfigurationPaths()
+	wrapper.SetConfigurationDefaults()
+	wrapper.SetConfigurationPaths()
 
-	config := GetConfig()
+	config := wrapper.GetConfig()
 	config = config.SetHost(*hostFlag)
 	config = config.SetAdminPort(*adminPortFlag)
 	config = config.SetProxyPort(*proxyPortFlag)
@@ -92,14 +93,14 @@ func main() {
 	config = config.DisableTls(*disableTlsFlag)
 	config = config.SetDbType(*databaseFlag)
 
-	hoverflyDirectory, err := NewHoverflyDirectory(*config)
+	hoverflyDirectory, err := wrapper.NewHoverflyDirectory(*config)
 	handleIfError(err)
 
-	hoverfly := NewHoverfly(*config)
+	hoverfly := wrapper.NewHoverfly(*config)
 
 	switch kingpin.Parse() {
 	case startCommand.FullCommand():
-		err := hoverfly.start(hoverflyDirectory)
+		err := hoverfly.Start(hoverflyDirectory)
 		handleIfError(err)
 		if config.HoverflyWebserver {
 			log.WithFields(log.Fields{
@@ -114,7 +115,7 @@ func main() {
 		}
 
 	case stopCommand.FullCommand():
-		err := hoverfly.stop(hoverflyDirectory)
+		err := hoverfly.Stop(hoverflyDirectory)
 		handleIfError(err)
 
 		log.Info("Hoverfly has been stopped")
@@ -171,7 +172,7 @@ func main() {
 				handleIfError(err)
 				log.Info("Hoverfly is now set to run the following as middleware")
 			} else {
-				script, err := ReadFile(*middlewareScriptFlag)
+				script, err := wrapper.ReadFile(*middlewareScriptFlag)
 				handleIfError(err)
 
 				middleware, err = hoverfly.SetMiddleware(*middlewareBinaryFlag, string(script), "")
@@ -196,13 +197,13 @@ func main() {
 		simulationData, err := hoverfly.ExportSimulation()
 		handleIfError(err)
 
-		err = WriteFile(*exportNameArg, simulationData)
+		err = wrapper.WriteFile(*exportNameArg, simulationData)
 		handleIfError(err)
 
 		log.Info("Successfully exported to ", *exportNameArg)
 
 	case importCommand.FullCommand():
-		simulationData, err := ReadFile(*importNameArg)
+		simulationData, err := wrapper.ReadFile(*importNameArg)
 		handleIfError(err)
 
 		err = hoverfly.ImportSimulation(string(simulationData), *importV1Flag)
@@ -271,7 +272,7 @@ func main() {
 			printResponseDelays(delays)
 		}
 	case logsCommand.FullCommand():
-		logfile := NewLogFile(hoverflyDirectory, hoverfly.AdminPort, hoverfly.ProxyPort)
+		logfile := wrapper.NewLogFile(hoverflyDirectory, hoverfly.AdminPort, hoverfly.ProxyPort)
 
 		if *followLogsFlag {
 			err := logfile.Tail()
@@ -301,7 +302,7 @@ func main() {
 		}
 	case configCommand.FullCommand():
 		log.Info(config.GetFilepath())
-		configData, _ := ReadFile(config.GetFilepath())
+		configData, _ := wrapper.ReadFile(config.GetFilepath())
 		configLines := strings.Split(string(configData), "\n")
 		for _, line := range configLines {
 			if line != "" {
@@ -311,7 +312,7 @@ func main() {
 	}
 }
 
-func printResponseDelays(delays []ResponseDelaySchema) {
+func printResponseDelays(delays []wrapper.ResponseDelaySchema) {
 	for _, delay := range delays {
 		var delayString string
 		if delay.HttpMethod != "" {
