@@ -15,6 +15,7 @@ type Hoverfly interface {
 	GetMiddleware() (string, string, string)
 	GetMode() string
 	GetStats() metrics.Stats
+	GetVersion() string
 }
 
 type HoverflyHandler struct {
@@ -35,6 +36,7 @@ func (this *HoverflyHandler) Get(w http.ResponseWriter, req *http.Request, next 
 	hoverflyView.Mode = this.Hoverfly.GetMode()
 	hoverflyView.Binary, hoverflyView.Script, hoverflyView.Remote = this.Hoverfly.GetMiddleware()
 	hoverflyView.Usage = this.Hoverfly.GetStats()
+	hoverflyView.Version = this.Hoverfly.GetVersion()
 
 	bytes, _ := json.Marshal(hoverflyView)
 
