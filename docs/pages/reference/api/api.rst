@@ -317,3 +317,20 @@ Example response body:
             }
         }
     }
+
+
+-------------------------------------------------------------------------------------------------------------
+
+
+GET /api/v2/hoverfly/usage
+""""""""""""""""""""""""""
+
+Gets the version of Hoverfly.
+
+Example response body:
+
+::
+
+    {
+        "metrics": "v0.10.1"
+    }
