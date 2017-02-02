@@ -36,6 +36,10 @@ func (this HoverflyStub) GetStats() metrics.Stats {
 	return metrics
 }
 
+func (this HoverflyStub) GetVersion() string {
+	return "test-version"
+}
+
 func TestHoverflyHandlerGetReturnsTheCorrectMode(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -56,6 +60,7 @@ func TestHoverflyHandlerGetReturnsTheCorrectMode(t *testing.T) {
 	Expect(hoverflyView.Binary).To(Equal("test-binary"))
 	Expect(hoverflyView.Script).To(Equal("test-script"))
 	Expect(hoverflyView.Remote).To(Equal("test-remote"))
+	Expect(hoverflyView.Version).To(Equal("test-version"))
 }
 
 func unmarshalHoverflyView(buffer *bytes.Buffer) (HoverflyView, error) {
