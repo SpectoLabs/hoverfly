@@ -1,6 +1,5 @@
 package: github.com/SpectoLabs/hoverfly/hoverctl
 import:
-- package: gopkg.in/alecthomas/kingpin.v2
 - package: github.com/dghubble/sling
 - package: github.com/mitchellh/go-homedir
 - package: github.com/spf13/viper
