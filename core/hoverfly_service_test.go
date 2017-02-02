@@ -528,3 +528,13 @@ func Test_Hoverfly_SetMiddleware_WillSetBinaryWithNoScript(t *testing.T) {
 	script, _ := unit.Cfg.Middleware.GetScript()
 	Expect(script).To(Equal(""))
 }
+
+func Test_Hoverfly_GetVersion_GetsVersion(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Hoverfly{
+		version: "test-version",
+	}
+
+	Expect(unit.GetVersion()).To(Equal("test-version"))
+}
