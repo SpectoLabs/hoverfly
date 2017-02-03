@@ -1,35 +1,31 @@
 package hoverctl_end_to_end
 
 import (
+	"os/exec"
+	"strings"
+
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
-	"os/exec"
-	"strconv"
-	"strings"
 )
 
 var _ = Describe("When I use hoverfly-cli", func() {
 
 	var (
-		hoverflyCmd *exec.Cmd
-
-		adminPort         = freeport.GetPort()
-		adminPortAsString = strconv.Itoa(adminPort)
-
-		proxyPort         = freeport.GetPort()
-		proxyPortAsString = strconv.Itoa(proxyPort)
+		hoverfly *functional_tests.Hoverfly
 	)
 
 	Context("with a running hoverfly", func() {
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverfly(adminPort, proxyPort, workingDirectory)
-			WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start()
+
+			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
 		})
 
 		AfterEach(func() {
-			hoverflyCmd.Process.Kill()
+			hoverfly.Stop()
 		})
 
 		Context("With no templates imported", func() {

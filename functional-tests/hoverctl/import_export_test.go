@@ -5,30 +5,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
 )
 
 var _ = Describe("When I use hoverctl", func() {
+
 	var (
-		hoverflyCmd *exec.Cmd
+		hoverfly *functional_tests.Hoverfly
+	)
 
-		workingDir, _     = os.Getwd()
-		adminPort         = freeport.GetPort()
-		adminPortAsString = strconv.Itoa(adminPort)
-
-		proxyPort = freeport.GetPort()
-
+	var (
 		v1HoverflyData = `
 					{
 						"data": [{
@@ -103,19 +98,22 @@ var _ = Describe("When I use hoverctl", func() {
 	Describe("with a running hoverfly", func() {
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverfly(adminPort, proxyPort, workingDir)
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start()
+
+			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
 		})
 
 		AfterEach(func() {
-			hoverflyCmd.Process.Kill()
+			hoverfly.Stop()
 		})
 
 		Describe("Managing Hoverflies data using the CLI", func() {
 
 			BeforeEach(func() {
-				DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/records", adminPort)).Body(strings.NewReader(v1HoverflyData)))
+				functional_tests.DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())).Body(strings.NewReader(v1HoverflyData)))
 
-				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).ToNot(Equal(`{"data":null}`))
 			})
@@ -124,7 +122,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				fileName := generateFileName()
 				// Export the data
-				output, _ := exec.Command(hoverctlBinary, "export", fileName, "--admin-port="+adminPortAsString).Output()
+				output, _ := exec.Command(hoverctlBinary, "export", fileName, "--admin-port="+hoverfly.GetAdminPort()).Output()
 
 				Expect(output).To(ContainSubstring("Successfully exported to " + fileName))
 
@@ -144,11 +142,11 @@ var _ = Describe("When I use hoverctl", func() {
 				err := ioutil.WriteFile(fileName, []byte(v2HoverflyData), 0644)
 				Expect(err).To(BeNil())
 
-				output, _ := exec.Command(hoverctlBinary, "import", fileName, "--admin-port="+adminPortAsString).Output()
+				output, _ := exec.Command(hoverctlBinary, "import", fileName, "--admin-port="+hoverfly.GetAdminPort()).Output()
 
 				Expect(output).To(ContainSubstring("Successfully imported from " + fileName))
 
-				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
 			})
@@ -160,11 +158,11 @@ var _ = Describe("When I use hoverctl", func() {
 				}))
 				defer ts.Close()
 
-				output, _ := exec.Command(hoverctlBinary, "import", ts.URL, "--admin-port="+adminPortAsString).Output()
+				output, _ := exec.Command(hoverctlBinary, "import", ts.URL, "--admin-port="+hoverfly.GetAdminPort()).Output()
 
 				Expect(output).To(ContainSubstring("Successfully imported from " + ts.URL))
 
-				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
 			})
@@ -175,11 +173,11 @@ var _ = Describe("When I use hoverctl", func() {
 				err := ioutil.WriteFile(fileName, []byte(v1HoverflyData), 0644)
 				Expect(err).To(BeNil())
 
-				output, _ := exec.Command(hoverctlBinary, "import", "--v1", fileName, "--admin-port="+adminPortAsString).Output()
+				output, _ := exec.Command(hoverctlBinary, "import", "--v1", fileName, "--admin-port="+hoverfly.GetAdminPort()).Output()
 
 				Expect(output).To(ContainSubstring("Successfully imported from " + fileName))
 
-				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
 			})
@@ -219,11 +217,11 @@ var _ = Describe("When I use hoverctl", func() {
 				}`), 0644)
 				Expect(err).To(BeNil())
 
-				output, _ := exec.Command(hoverctlBinary, "import", fileName, "--admin-port="+adminPortAsString).Output()
+				output, _ := exec.Command(hoverctlBinary, "import", fileName, "--admin-port="+hoverfly.GetAdminPort()).Output()
 
 				Expect(output).To(ContainSubstring("Import to Hoverfly failed: Json did not match schema: Object->Key[meta].Value->Object"))
 
-				resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", adminPort)))
+				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
 			})

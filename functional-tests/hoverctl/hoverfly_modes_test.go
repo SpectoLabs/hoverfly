@@ -1,40 +1,37 @@
 package hoverctl_end_to_end
 
 import (
+	"os/exec"
+	"strings"
+
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
-	"os/exec"
-	"strconv"
-	"strings"
 )
 
 var _ = Describe("When I use hoverfly-cli", func() {
+
 	var (
-		hoverflyCmd *exec.Cmd
-
-		adminPort         = freeport.GetPort()
-		adminPortAsString = strconv.Itoa(adminPort)
-
-		proxyPort         = freeport.GetPort()
-		proxyPortAsString = strconv.Itoa(proxyPort)
+		hoverfly *functional_tests.Hoverfly
 	)
 
 	Describe("with a running hoverfly", func() {
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverfly(adminPort, proxyPort, workingDirectory)
-			WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start()
+
+			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
 		})
 
 		AfterEach(func() {
-			hoverflyCmd.Process.Kill()
+			hoverfly.Stop()
 		})
 
 		Context("I can get the hoverfly's mode", func() {
 
 			It("when hoverfly is in simulate mode", func() {
-				SetHoverflyMode("simulate", adminPort)
+				hoverfly.SetMode("simulate")
 
 				out, _ := exec.Command(hoverctlBinary, "mode").Output()
 
@@ -43,7 +40,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			})
 
 			It("when hoverfly is in capture mode", func() {
-				SetHoverflyMode("capture", adminPort)
+				hoverfly.SetMode("capture")
 
 				out, _ := exec.Command(hoverctlBinary, "mode").Output()
 
@@ -52,7 +49,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			})
 
 			It("when hoverfly is in synthesize mode", func() {
-				SetHoverflyMode("synthesize", adminPort)
+				hoverfly.SetMode("synthesize")
 
 				out, _ := exec.Command(hoverctlBinary, "mode").Output()
 
@@ -61,7 +58,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			})
 
 			It("when hoverfly is in modify mode", func() {
-				SetHoverflyMode("modify", adminPort)
+				hoverfly.SetMode("modify")
 
 				out, _ := exec.Command(hoverctlBinary, "mode").Output()
 
@@ -82,7 +79,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
-				Expect(GetHoverflyMode(adminPort)).To(Equal(simulate))
+				Expect(hoverfly.GetMode()).To(Equal(simulate))
 			})
 
 			It("to capture mode", func() {
@@ -95,7 +92,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to capture mode"))
-				Expect(GetHoverflyMode(adminPort)).To(Equal(capture))
+				Expect(hoverfly.GetMode()).To(Equal(capture))
 			})
 
 			It("to synthesize mode", func() {
@@ -108,7 +105,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to synthesize mode"))
-				Expect(GetHoverflyMode(adminPort)).To(Equal(synthesize))
+				Expect(hoverfly.GetMode()).To(Equal(synthesize))
 			})
 
 			It("to modify mode", func() {
@@ -121,7 +118,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to modify mode"))
-				Expect(GetHoverflyMode(adminPort)).To(Equal(modify))
+				Expect(hoverfly.GetMode()).To(Equal(modify))
 			})
 		})
 	})
@@ -129,12 +126,14 @@ var _ = Describe("When I use hoverfly-cli", func() {
 	Describe("with a running hoverfly set to run as a webserver", func() {
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverflyWebserver(adminPort, proxyPort, workingDirectory)
-			WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start("-webserver")
+
+			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
 		})
 
 		AfterEach(func() {
-			hoverflyCmd.Process.Kill()
+			hoverfly.Stop()
 		})
 
 		Context("I can get the hoverfly's mode", func() {
@@ -159,7 +158,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
-				Expect(GetHoverflyMode(adminPort)).To(Equal(simulate))
+				Expect(hoverfly.GetMode()).To(Equal(simulate))
 			})
 
 			It("to capture mode", func() {
@@ -172,7 +171,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
-				Expect(GetHoverflyMode(adminPort)).To(Equal(simulate))
+				Expect(hoverfly.GetMode()).To(Equal(simulate))
 			})
 
 			It("to synthesize mode", func() {
@@ -185,7 +184,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
-				Expect(GetHoverflyMode(adminPort)).To(Equal(simulate))
+				Expect(hoverfly.GetMode()).To(Equal(simulate))
 			})
 
 			It("to modify mode", func() {
@@ -198,7 +197,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = strings.TrimSpace(string(getOutput))
 				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
-				Expect(GetHoverflyMode(adminPort)).To(Equal(simulate))
+				Expect(hoverfly.GetMode()).To(Equal(simulate))
 			})
 		})
 	})

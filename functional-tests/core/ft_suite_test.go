@@ -12,11 +12,9 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
@@ -80,47 +78,15 @@ func startHoverflyWithMiddleware(adminPort, proxyPort int, middlewarePath string
 }
 
 func startHoverflyInternal(commands ...string) *exec.Cmd {
-	hoverflyBinaryUri := buildBinaryPath()
+	hoverflyBinaryUri := functional_tests.BuildBinaryPath()
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, commands...)
 
 	err := hoverflyCmd.Start()
 
-	binaryErrorCheck(err, hoverflyBinaryUri)
-	healthcheck(adminPort)
+	functional_tests.BinaryErrorCheck(err, hoverflyBinaryUri)
+	functional_tests.Healthcheck(adminPort)
 
 	return hoverflyCmd
-}
-
-func buildBinaryPath() string {
-	workingDirectory, _ := os.Getwd()
-	return filepath.Join(workingDirectory, "bin/hoverfly")
-}
-
-func binaryErrorCheck(err error, binaryPath string) {
-	if err != nil {
-		fmt.Println("Unable to start Hoverfly")
-		fmt.Println(binaryPath)
-		fmt.Println("Is the binary there?")
-		os.Exit(1)
-	}
-}
-
-func healthcheck(adminPort int) {
-	var err error
-	var resp *http.Response
-
-	hasPassed := Eventually(func() int {
-		resp, err = http.Get(fmt.Sprintf("http://localhost:%v/api/health", adminPort))
-		if err == nil {
-			return resp.StatusCode
-		} else {
-			return 0
-		}
-	}, time.Second*3).Should(BeNumerically("==", http.StatusOK))
-
-	if !hasPassed {
-		fmt.Println(err.Error())
-	}
 }
 
 func stopHoverfly() {
@@ -174,12 +140,6 @@ func ImportHoverflyRecords(payload io.Reader) {
 func ImportHoverflySimulation(payload io.Reader) *http.Response {
 	req := sling.New().Put(hoverflyAdminUrl + "/api/v2/simulation").Body(payload)
 	return functional_tests.DoRequest(req)
-}
-
-func ImportHoverflyTemplates(payload io.Reader) {
-	req := sling.New().Post(hoverflyAdminUrl + "/api/templates").Body(payload)
-	res := functional_tests.DoRequest(req)
-	Expect(res.StatusCode).To(Equal(200))
 }
 
 func CallFakeServerThroughProxy(server *httptest.Server) *http.Response {

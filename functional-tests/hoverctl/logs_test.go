@@ -2,19 +2,22 @@ package hoverctl_end_to_end
 
 import (
 	"fmt"
-	"github.com/dghubble/sling"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/dghubble/sling"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/phayes/freeport"
 )
 
 var _ = Describe("When I use hoverctl", func() {
+
 	var (
 		adminPort = strconv.Itoa(freeport.GetPort())
 		proxyPort = strconv.Itoa(freeport.GetPort())
@@ -68,9 +71,7 @@ var _ = Describe("When I use hoverctl", func() {
 			It("and they get updated when you use hoverfly", func() {
 				exec.Command(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort).Output()
 
-				adminPortAsString, _ := strconv.Atoi(adminPort)
-
-				SetHoverflyMode("capture", adminPortAsString)
+				exec.Command(hoverctlBinary, "mode", "capture").Output()
 
 				workingDir, _ := os.Getwd()
 				filePath := filepath.Join(workingDir, ".hoverfly/", "hoverfly."+adminPort+"."+proxyPort+".log")
@@ -78,15 +79,14 @@ var _ = Describe("When I use hoverctl", func() {
 				file, err := ioutil.ReadFile(filePath)
 				Expect(err).To(BeNil())
 
-				Expect(string(file)).To(ContainSubstring("Handling state change request!"))
-				Expect(string(file)).To(ContainSubstring(`{\"mode\":\"capture\"}`))
+				Expect(string(file)).To(ContainSubstring("Started GET /api/v2/hoverfly/mode"))
 			})
 
 			It("and the stderr is captured in the log file", func() {
 				exec.Command(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort).Output()
 
 				req := sling.New().Post(fmt.Sprintf("http://localhost:%v/api/state", adminPort)).Body(strings.NewReader(`{"mode":"not-a-mode"}`))
-				DoRequest(req)
+				functional_tests.DoRequest(req)
 
 				workingDir, _ := os.Getwd()
 				filePath := filepath.Join(workingDir, ".hoverfly/", "hoverfly."+adminPort+"."+proxyPort+".log")

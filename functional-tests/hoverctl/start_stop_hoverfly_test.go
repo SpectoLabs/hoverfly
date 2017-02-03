@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -91,8 +92,6 @@ var _ = Describe("When I use hoverctl", func() {
 					Fail("Pid file not have an integer in it")
 				}
 
-				GetHoverflyMode(11223)
-
 				setOutput, _ = exec.Command(hoverctlBinary, "stop", "--admin-port=11223").Output()
 
 				output = strings.TrimSpace(string(setOutput))
@@ -126,8 +125,6 @@ var _ = Describe("When I use hoverctl", func() {
 					Fail("Pid file not have an integer in it")
 				}
 
-				GetHoverflyMode(adminPort)
-
 				setOutput, _ = exec.Command(hoverctlBinary, "stop", "--proxy-port=22113").Output()
 
 				output = strings.TrimSpace(string(setOutput))
@@ -159,8 +156,6 @@ var _ = Describe("When I use hoverctl", func() {
 				if _, err := strconv.Atoi(string(data)); err != nil {
 					Fail("Pid file not have an integer in it")
 				}
-
-				GetHoverflyMode(11223)
 
 				setOutput, _ = exec.Command(hoverctlBinary, "stop", "--admin-port=11223", "--proxy-port=22113").Output()
 
@@ -215,7 +210,7 @@ var _ = Describe("When I use hoverctl", func() {
 				}
 
 				request := sling.New().Get("http://localhost:" + proxyPortAsString)
-				response := DoRequest(request)
+				response := functional_tests.DoRequest(request)
 
 				responseBody, err := ioutil.ReadAll(response.Body)
 				Expect(err).To(BeNil())

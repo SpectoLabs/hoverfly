@@ -6,35 +6,32 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os/exec"
-	"strconv"
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phayes/freeport"
 )
 
 var _ = Describe("When I use hoverctl", func() {
+
 	var (
-		hoverflyCmd *exec.Cmd
-
-		adminPort         = freeport.GetPort()
-		adminPortAsString = strconv.Itoa(adminPort)
-
-		proxyPort         = freeport.GetPort()
-		proxyPortAsString = strconv.Itoa(proxyPort)
+		hoverfly *functional_tests.Hoverfly
 	)
 
 	Describe("with a running hoverfly which has middleware configured", func() {
 
 		BeforeEach(func() {
-			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, workingDirectory, "ruby", "#!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend")
-			WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start()
+			hoverfly.SetMiddleware("ruby", "#!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend")
+
+			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
 		})
 
 		AfterEach(func() {
-			hoverflyCmd.Process.Kill()
+			hoverfly.Stop()
 		})
 
 		It("I can get the hoverfly's middleware", func() {
