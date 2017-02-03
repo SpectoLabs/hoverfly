@@ -29,5 +29,5 @@ func init() {
 	RootCmd.AddCommand(logsCmd)
 
 	logsCmd.Flags().BoolVar(&followLogs, "follow-logs", false, "Follow the logs from Hoverfly")
-	logsCmd.Flag("follow-logs").Shorthand("f")
+	logsCmd.Flag("follow-logs")
 }
