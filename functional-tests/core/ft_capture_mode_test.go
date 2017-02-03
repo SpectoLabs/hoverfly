@@ -1,6 +1,7 @@
 package hoverfly_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -137,6 +139,26 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			Expect(payload.Data[0].Response.Status).To(Equal(301))
 			Expect(payload.Data[0].Response.Headers["Location"][0]).To(Equal(fakeServerUrl.String()))
+		})
+
+		It("Should capture a request body from POST", func() {
+
+			var capturedRequestBody string
+
+			fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				requestBody, err := util.GetRequestBody(r)
+				Expect(err).To(BeNil())
+				capturedRequestBody = requestBody
+
+				w.Write([]byte("okay"))
+			}))
+
+			defer fakeServer.Close()
+
+			resp := hoverfly.Proxy(sling.New().Post(fakeServer.URL).Body(bytes.NewBuffer([]byte(`{"title": "a todo"}`))))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			Expect(capturedRequestBody).To(Equal(`{"title": "a todo"}`))
 		})
 	})
 })
