@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/dghubble/sling"
 )
 
@@ -35,7 +35,7 @@ func (h *Hoverfly) performAPIRequest(slingRequest *sling.Sling) (*http.Response,
 
 }
 
-func (h *Hoverfly) GetRequestTemplates() (*matching.RequestTemplateResponsePairPayload, error) {
+func (h *Hoverfly) GetRequestTemplates() (*v1.RequestTemplateResponsePairPayload, error) {
 	url := h.buildURL("/api/templates")
 	slingRequest := sling.New().Get(url)
 	response, err := h.performAPIRequest(slingRequest)
@@ -53,7 +53,7 @@ func (h *Hoverfly) GetRequestTemplates() (*matching.RequestTemplateResponsePairP
 	return requestTemplates, nil
 }
 
-func (h *Hoverfly) SetRequestTemplates(path string) (responseTemplates *matching.RequestTemplateResponsePairPayload, err error) {
+func (h *Hoverfly) SetRequestTemplates(path string) (responseTemplates *v1.RequestTemplateResponsePairPayload, err error) {
 
 	conf, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -82,14 +82,14 @@ func (h *Hoverfly) SetRequestTemplates(path string) (responseTemplates *matching
 	return requestTemplates, nil
 }
 
-func unmarshalRequestTemplates(response *http.Response) (*matching.RequestTemplateResponsePairPayload, error) {
+func unmarshalRequestTemplates(response *http.Response) (*v1.RequestTemplateResponsePairPayload, error) {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Error("Error reading request templates response body: " + err.Error())
 		return nil, err
 	}
 
-	var requestTemplates matching.RequestTemplateResponsePairPayload
+	var requestTemplates v1.RequestTemplateResponsePairPayload
 
 	err = json.Unmarshal(body, &requestTemplates)
 	if err != nil {

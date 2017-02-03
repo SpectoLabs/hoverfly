@@ -3,19 +3,20 @@ package hoverfly_test
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/views"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/dghubble/sling"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
 )
 
 func checkHeadersHttpMiddleware(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
-	var newPairView views.RequestResponsePairView
+	var newPairView v2.RequestResponsePairView
 
 	json.Unmarshal(body, &newPairView)
 
