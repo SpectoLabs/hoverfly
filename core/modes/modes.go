@@ -47,7 +47,7 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 	newRequest, err := http.NewRequest(
 		pair.Request.Method,
 		fmt.Sprintf("%s://%s", pair.Request.Scheme, pair.Request.Destination),
-		ioutil.NopCloser(bytes.NewBuffer([]byte(pair.Request.Body))))
+		bytes.NewBuffer([]byte(pair.Request.Body)))
 
 	if err != nil {
 		return nil, err
