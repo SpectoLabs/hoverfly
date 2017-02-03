@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/views"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -128,12 +128,12 @@ var _ = Describe("When I run Hoverfly", func() {
 			recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 			Expect(err).To(BeNil())
 
-			payload := views.RequestResponsePairPayload{}
+			payload := v1.RequestResponsePairPayload{}
 
 			json.Unmarshal(recordsJson, &payload)
 			Expect(payload.Data).To(HaveLen(1))
 
-			Expect(payload.Data[0].Request.Destination).To(Equal(expectedRedirectDestination))
+			Expect(payload.Data[0].Request.Destination).To(Equal(&expectedRedirectDestination))
 
 			Expect(payload.Data[0].Response.Status).To(Equal(301))
 			Expect(payload.Data[0].Response.Headers["Location"][0]).To(Equal(fakeServerUrl.String()))
