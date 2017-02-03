@@ -1,26 +1,8 @@
-dependencies: hoverfly-dependencies hoverfly-functional-test-dependencies hoverctl-dependencies hoverctl-functional-test-dependencies
-
-hoverfly-dependencies:
-	cd core && \
-	glide --quiet install
-
-hoverctl-dependencies:
-	cd hoverctl && \
-	glide --quiet install
-
-hoverfly-functional-test-dependencies:
-	cd functional-tests && \
-	glide --quiet install
-
-hoverctl-functional-test-dependencies:
-	cd functional-tests/ && \
-	glide --quiet install
-
-hoverfly-test: hoverfly-dependencies
+hoverfly-test:
 	cd core && \
 	go test -v $$(go list ./... | grep -v -E 'vendor')
 
-hoverctl-test: hoverctl-dependencies
+hoverctl-test:
 	cd hoverctl && \
 	go test -v $$(go list ./... | grep -v -E 'vendor')
 
@@ -32,12 +14,12 @@ hoverctl-build: hoverctl-test
 	cd hoverctl && \
 	go build -ldflags "-X main.hoverctlVersion=$(GIT_TAG_NAME)" -o ../target/hoverctl
 
-hoverfly-functional-test: hoverfly-functional-test-dependencies hoverfly-build
+hoverfly-functional-test: hoverfly-build
 	cp target/hoverfly functional-tests/core/bin/hoverfly
 	cd functional-tests/core && \
 	go test -v $(go list ./... | grep -v -E 'vendor')
 
-hoverctl-functional-test: hoverctl-functional-test-dependencies hoverctl-build
+hoverctl-functional-test: hoverctl-build
 	cp target/hoverctl functional-tests/hoverctl/bin/hoverctl
 	cp target/hoverfly functional-tests/hoverctl/bin/hoverfly
 	cd functional-tests/hoverctl && \
