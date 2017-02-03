@@ -7,7 +7,8 @@ hoverctl-test:
 	go test -v $$(go list ./... | grep -v -E 'vendor')
 
 hoverfly-build: hoverfly-test
-	go build -ldflags "-X main.hoverflyVersion=$(GIT_TAG_NAME)" -o target/hoverfly
+	cd core/cmd/hoverfly && \
+	go build -ldflags "-X main.hoverflyVersion=$(GIT_TAG_NAME)" -o ../../../target/hoverfly
 
 hoverctl-build: hoverctl-test
 	cd hoverctl && \
@@ -27,7 +28,8 @@ hoverctl-functional-test: hoverctl-build
 test: hoverfly-functional-test hoverctl-functional-test
 
 build:
-	go build -ldflags "-X main.hoverflyVersion=$(GIT_TAG_NAME)" -o target/hoverfly
+	cd core/cmd/hoverfly && \
+	go build -ldflags "-X main.hoverflyVersion=$(GIT_TAG_NAME)" -o ../../../target/hoverfly
 
 	cd hoverctl && \
 	go build -ldflags "-X main.hoverctlVersion=$(GIT_TAG_NAME)" -o ../target/hoverctl
