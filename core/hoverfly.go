@@ -97,6 +97,7 @@ func GetDefaultHoverflyHTTPClient(tlsVerification bool) *http.Client {
 	return &http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error {
 		return http.ErrUseLastResponse
 	}, Transport: &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: tlsVerification},
 	}}
 }
