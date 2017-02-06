@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"sync"
+	"net/url"
 
 	log "github.com/Sirupsen/logrus"
 	authBackend "github.com/SpectoLabs/hoverfly/core/authentication/backends"
@@ -17,7 +18,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/rusenask/goproxy"
-	"net/url"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond
