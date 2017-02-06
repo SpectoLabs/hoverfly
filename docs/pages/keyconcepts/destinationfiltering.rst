@@ -15,10 +15,10 @@ For example, specifying ``hoverfly.io`` as the destination value will tell Hover
 
 Specifying ``api`` as the `destination` value during :ref:`capture_mode` will tell Hoverfly to capture only URLs that contain the string ``api``. This would include both ``api.hoverfly.io/endpoint`` and ``hoverfly.io/api/endpoint``.
 
+.. seealso::
+
+  This functionality is best understood via a practical example: see :ref:`specific_urls` in the :ref:`tutorials` section.
+
 .. note::
 
-    The destination setting applies to all Hoverfly modes.
-
-.. note::
-
-    If a destination value is set while Hoverfly is running in :ref:`simulate_mode`, requests that are excluded by the destination setting will be passed through to the real URLs. This makes it possible to return both real and simulated responses.
+    The destination setting applies to all Hoverfly modes. If a destination value is set while Hoverfly is running in :ref:`simulate_mode`, requests that are excluded by the destination setting will be passed through to the real URLs. This makes it possible to return both real and simulated responses.
