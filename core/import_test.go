@@ -154,7 +154,7 @@ func TestImportFromURLRedirect(t *testing.T) {
 	defer server.Close()
 	defer dbClient.RequestCache.DeleteData()
 
-	dbClient.HTTP = GetDefaultHoverflyHTTPClient(false)
+	dbClient.HTTP = GetDefaultHoverflyHTTPClient(false, "")
 
 	redirectServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Location", server.URL)

@@ -17,6 +17,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/rusenask/goproxy"
+	"net/url"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond
@@ -72,7 +73,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		RequestCache:   requestCache,
 		MetadataCache:  metadataCache,
 		Authentication: authentication,
-		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification),
+		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.ExternalProxy),
 		Cfg:            cfg,
 		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		ResponseDelays: &models.ResponseDelayList{},
@@ -93,11 +94,23 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 	return h
 }
 
-func GetDefaultHoverflyHTTPClient(tlsVerification bool) *http.Client {
+func GetDefaultHoverflyHTTPClient(tlsVerification bool, externProxy string) *http.Client {
+
+	var proxyURL func(*http.Request) (*url.URL, error)
+	if externProxy == "" {
+		proxyURL = http.ProxyURL(nil)
+	} else {
+		u, err := url.Parse(externProxy)
+		if err != nil {
+			log.Fatalf("Could not parse external proxy: ", err.Error())
+		}
+		proxyURL = http.ProxyURL(u)
+	}
+
 	return &http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error {
 		return http.ErrUseLastResponse
 	}, Transport: &http.Transport{
-		Proxy: http.ProxyFromEnvironment,
+		Proxy: proxyURL,
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: tlsVerification},
 	}}
 }
