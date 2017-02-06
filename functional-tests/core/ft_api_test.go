@@ -490,9 +490,9 @@ var _ = Describe("Interacting with the API", func() {
 		})
 	})
 
-	Context("GET /api/v2/hoverfly/mode", func() {
+	Context("GET /api/v2/hoverfly/version", func() {
 
-		It("Should get the mode", func() {
+		It("Should get the version", func() {
 			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/version")
 			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
