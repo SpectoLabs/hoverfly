@@ -20,7 +20,7 @@ type Configuration struct {
 
 	TLSVerification bool
 
-	ExternalProxy string
+	UpstreamProxy string
 
 	Verbose     bool
 	Development bool
@@ -81,7 +81,7 @@ const (
 
 	HoverflyImportRecordsEV = "HoverflyImport"
 
-	HoverflyExternalProxyPortEV = "ExternalProxy"
+	HoverflyUpstreamProxyPortEV = "UpstreamProxy"
 )
 
 // InitSettings gets and returns initial configuration from env
@@ -104,10 +104,10 @@ func InitSettings() *Configuration {
 	}
 
 	// getting external proxy
-	if os.Getenv(HoverflyExternalProxyPortEV) != "" {
-		appConfig.ExternalProxy = os.Getenv(HoverflyExternalProxyPortEV)
+	if os.Getenv(HoverflyUpstreamProxyPortEV) != "" {
+		appConfig.UpstreamProxy = os.Getenv(HoverflyUpstreamProxyPortEV)
 	} else {
-		appConfig.ExternalProxy = ""
+		appConfig.UpstreamProxy = ""
 	}
 
 	databasePath := os.Getenv(HoverflyDBEV)

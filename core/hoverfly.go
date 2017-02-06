@@ -73,7 +73,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		RequestCache:   requestCache,
 		MetadataCache:  metadataCache,
 		Authentication: authentication,
-		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.ExternalProxy),
+		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.UpstreamProxy),
 		Cfg:            cfg,
 		Counter:        metrics.NewModeCounter([]string{SimulateMode, SynthesizeMode, ModifyMode, CaptureMode}),
 		ResponseDelays: &models.ResponseDelayList{},
@@ -94,15 +94,15 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 	return h
 }
 
-func GetDefaultHoverflyHTTPClient(tlsVerification bool, externalProxy string) *http.Client {
+func GetDefaultHoverflyHTTPClient(tlsVerification bool, upstreamProxy string) *http.Client {
 
 	var proxyURL func(*http.Request) (*url.URL, error)
-	if externalProxy == "" {
+	if upstreamProxy == "" {
 		proxyURL = http.ProxyURL(nil)
 	} else {
-		u, err := url.Parse(externalProxy)
+		u, err := url.Parse(upstreamProxy)
 		if err != nil {
-			log.Fatalf("Could not parse external proxy: ", err.Error())
+			log.Fatalf("Could not parse upstream proxy: ", err.Error())
 		}
 		proxyURL = http.ProxyURL(u)
 	}
