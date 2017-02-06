@@ -83,7 +83,7 @@ var (
 
 	tlsVerification = flag.Bool("tls-verification", true, "turn on/off tls verification for outgoing requests (will not try to verify certificates) - defaults to true")
 
-	externalProxy = flag.String("external-proxy", "", "specify an external proxy for hoverfly to route traffic through")
+	upstreamProxy = flag.String("upstream-proxy", "", "specify an upstream proxy for hoverfly to route traffic through")
 
 	databasePath = flag.String("db-path", "", "database location - supply it to provide specific database location (will be created there if it doesn't exist)")
 	database     = flag.String("db", inmemoryBackend, "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
@@ -208,8 +208,8 @@ func main() {
 	}
 
 	// overriding environment variable (external proxy)
-	if *externalProxy != "" {
-		cfg.ExternalProxy = *externalProxy
+	if *upstreamProxy != "" {
+		cfg.UpstreamProxy = *upstreamProxy
 	}
 
 	// development settings
