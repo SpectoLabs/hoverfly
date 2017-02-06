@@ -94,13 +94,13 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 	return h
 }
 
-func GetDefaultHoverflyHTTPClient(tlsVerification bool, externProxy string) *http.Client {
+func GetDefaultHoverflyHTTPClient(tlsVerification bool, externalProxy string) *http.Client {
 
 	var proxyURL func(*http.Request) (*url.URL, error)
-	if externProxy == "" {
+	if externalProxy == "" {
 		proxyURL = http.ProxyURL(nil)
 	} else {
-		u, err := url.Parse(externProxy)
+		u, err := url.Parse(externalProxy)
 		if err != nil {
 			log.Fatalf("Could not parse external proxy: ", err.Error())
 		}
