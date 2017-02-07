@@ -334,3 +334,20 @@ Example response body:
     {
         "version": "v0.10.1"
     }
+
+
+-------------------------------------------------------------------------------------------------------------
+
+
+GET /api/v2/hoverfly/upstream-proxy
+""""""""""""""""""""""""""
+
+Gets the upstream proxy configured for  Hoverfly.
+
+Example response body:
+
+::
+
+    {
+        "upstream-proxy": "proxy.corp.big-it-company.org:8080"
+    }
