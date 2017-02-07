@@ -322,7 +322,7 @@ Example response body:
 -------------------------------------------------------------------------------------------------------------
 
 
-GET /api/v2/hoverfly/usage
+GET /api/v2/hoverfly/version
 """"""""""""""""""""""""""
 
 Gets the version of Hoverfly.
@@ -332,5 +332,5 @@ Example response body:
 ::
 
     {
-        "metrics": "v0.10.1"
+        "version": "v0.10.1"
     }
