@@ -502,6 +502,18 @@ var _ = Describe("Interacting with the API", func() {
 		})
 	})
 
+	Context("GET /api/v2/hoverfly/upstream-proxy", func() {
+
+		It("Should get the upstream proxy", func() {
+			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/upstream-proxy")
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(string(modeJson)).To(MatchRegexp(`{"upstream-proxy":""}`))
+		})
+	})
+
 	Context("GET /api/records", func() {
 
 		BeforeEach(func() {
