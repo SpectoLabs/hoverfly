@@ -267,3 +267,7 @@ func (this *Hoverfly) DeleteSimulation() {
 func (this Hoverfly) GetVersion() string {
 	return this.version
 }
+
+func (this Hoverfly) GetUpstreamProxy() string {
+	return this.Cfg.UpstreamProxy
+}

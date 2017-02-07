@@ -538,3 +538,15 @@ func Test_Hoverfly_GetVersion_GetsVersion(t *testing.T) {
 
 	Expect(unit.GetVersion()).To(Equal("test-version"))
 }
+
+func Test_Hoverfly_GetUpstreamProxy_GetsUpstreamProxy(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Hoverfly{
+		Cfg: &Configuration{
+			UpstreamProxy: "upstream-proxy.org",
+		},
+	}
+
+	Expect(unit.GetUpstreamProxy()).To(Equal("upstream-proxy.org"))
+}
