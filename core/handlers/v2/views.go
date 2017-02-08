@@ -41,6 +41,7 @@ type HoverflyView struct {
 	ModeView
 	UsageView
 	VersionView
+	UpstreamProxyView
 }
 
 type SimulationView struct {
