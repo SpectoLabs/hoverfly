@@ -332,6 +332,24 @@ var _ = Describe("Interacting with the API", func() {
 		})
 	})
 
+	Context("GET /api/v2/hoverfly", func() {
+
+		It("Should get the hoverfly config", func() {
+			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly")
+
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+
+			hoverflyJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(hoverflyJson).To(MatchRegexp(`"destination":"."`))
+			Expect(hoverflyJson).To(MatchRegexp(`"middleware":{"binary":"","script":"","remote":""}`))
+			Expect(hoverflyJson).To(MatchRegexp(`"usage":{"counters":{"capture":0,"modify":0,"simulate":0,"synthesize":0}}`))
+			Expect(hoverflyJson).To(MatchRegexp(`"version":"v\d+.\d+.\d+"`))
+			Expect(hoverflyJson).To(MatchRegexp(`"upstream-proxy":""`))
+		})
+	})
+
 	Context("GET /api/v2/hoverfly/destination", func() {
 
 		It("Should get the mode", func() {
@@ -342,6 +360,7 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(err).To(BeNil())
 			Expect(modeJson).To(Equal([]byte(`{"destination":"."}`)))
 		})
+
 	})
 
 	Context("PUT /api/v2/hoverfly/destination", func() {
