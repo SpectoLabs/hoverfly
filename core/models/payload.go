@@ -124,7 +124,7 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 	requestDetails := RequestDetails{
 		Path:        req.URL.Path,
 		Method:      req.Method,
-		Destination: req.Host,
+		Destination: strings.ToLower(req.Host),
 		Scheme:      req.URL.Scheme,
 		Query:       util.SortQueryString(req.URL.RawQuery),
 		Body:        string(reqBody),

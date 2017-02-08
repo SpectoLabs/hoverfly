@@ -408,11 +408,22 @@ func GzipString(s string) string {
 }
 
 func Test_NewRequestDetailsFromHttpRequest_SortsQueryString(t *testing.T) {
+	RegisterTestingT(t)
 	request, _ := http.NewRequest("GET", "http://test.org/?a=b&a=a", nil)
 	requestDetails, err := NewRequestDetailsFromHttpRequest(request)
 	Expect(err).To(BeNil())
 
 	Expect(requestDetails.Query).To(Equal("a=a&a=b"))
+}
+
+func Test_NewRequestDetailsFromHttpRequest_LowerCaseDestination(t *testing.T) {
+	RegisterTestingT(t)
+
+	request, _ := http.NewRequest("GET", "http://TEST.ORG/?a=b&a=a", nil)
+	requestDetails, err := NewRequestDetailsFromHttpRequest(request)
+	Expect(err).To(BeNil())
+
+	Expect(requestDetails.Destination).To(Equal("test.org"))
 }
 
 func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *testing.T) {
