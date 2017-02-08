@@ -40,6 +40,10 @@ func (this HoverflyStub) GetVersion() string {
 	return "test-version"
 }
 
+func (this HoverflyStub) GetUpstreamProxy() string {
+	return "test-proxy.com:8080"
+}
+
 func TestHoverflyHandlerGetReturnsTheCorrectMode(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -61,6 +65,7 @@ func TestHoverflyHandlerGetReturnsTheCorrectMode(t *testing.T) {
 	Expect(hoverflyView.Script).To(Equal("test-script"))
 	Expect(hoverflyView.Remote).To(Equal("test-remote"))
 	Expect(hoverflyView.Version).To(Equal("test-version"))
+	Expect(hoverflyView.UpstreamProxy).To(Equal("test-proxy.com:8080"))
 }
 
 func unmarshalHoverflyView(buffer *bytes.Buffer) (HoverflyView, error) {

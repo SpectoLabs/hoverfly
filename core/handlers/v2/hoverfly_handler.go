@@ -16,6 +16,7 @@ type Hoverfly interface {
 	GetMode() string
 	GetStats() metrics.Stats
 	GetVersion() string
+	GetUpstreamProxy() string
 }
 
 type HoverflyHandler struct {
@@ -37,6 +38,7 @@ func (this *HoverflyHandler) Get(w http.ResponseWriter, req *http.Request, next 
 	hoverflyView.Binary, hoverflyView.Script, hoverflyView.Remote = this.Hoverfly.GetMiddleware()
 	hoverflyView.Usage = this.Hoverfly.GetStats()
 	hoverflyView.Version = this.Hoverfly.GetVersion()
+	hoverflyView.UpstreamProxy = this.Hoverfly.GetUpstreamProxy()
 
 	bytes, _ := json.Marshal(hoverflyView)
 
