@@ -116,29 +116,6 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 		})
 
-		Context("I can delete the request templates in Hoverfly", func() {
-			BeforeEach(func() {
-				fileReader, err := os.Open("testdata/request-template.json")
-				defer fileReader.Close()
-				if err != nil {
-					Fail("Failed to read request template test data")
-				}
-				resp := functional_tests.DoRequest(sling.New().Post(fmt.Sprintf("http://localhost:%v/api/templates", hoverfly.GetAdminPort())).Body(fileReader))
-				bytes, _ := ioutil.ReadAll(resp.Body)
-				Expect(string(bytes)).To(ContainSubstring(`{"message":"2 payloads import complete."}`))
-			})
-
-			It("and they should be removed", func() {
-				output := functional_tests.Run(hoverctlBinary, "delete", "templates")
-
-				Expect(output).To(ContainSubstring("Request templates have been deleted from Hoverfly"))
-
-				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/templates", hoverfly.GetAdminPort())))
-				bytes, _ := ioutil.ReadAll(resp.Body)
-				Expect(string(bytes)).To(ContainSubstring(`{"data":null}`))
-			})
-		})
-
 		Context("I can delete everything in hoverfly", func() {
 
 			BeforeEach(func() {
