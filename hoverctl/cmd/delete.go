@@ -7,8 +7,10 @@ import (
 
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "Delete data from Hoverfly",
-	Long:  ``,
+	Short: "Delete simulation in Hoverfly",
+	Long: `
+Will delete simulation from Hoverfly.
+`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		err := hoverfly.DeleteSimulations()
