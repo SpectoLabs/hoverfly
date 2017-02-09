@@ -8,8 +8,17 @@ import (
 
 var startCmd = &cobra.Command{
 	Use:   "start",
-	Short: "Start an instance of Hoverfly",
-	Long:  ``,
+	Short: "Start Hoverfly",
+	Long: `
+Will start Hoverfly. The instance of Hoverfly created
+will be created with the current configurations of hoverctl.
+
+The process ID will be written to a .pid file in the 
+.hoverfly directory.
+
+Instances of Hoverfly are indentified by a composite admin
+port and proxy port.
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 0 {
 			config.SetWebserver(args[0])

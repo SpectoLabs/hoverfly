@@ -12,7 +12,18 @@ var middlewareBinary, middlewareScript, middlewareRemote string
 var middlewareCmd = &cobra.Command{
 	Use:   "middleware",
 	Short: "Get and set Hoverfly's middleware",
-	Long:  ``,
+	Long: `
+Without flags, middleware will print the middleware
+configuration values from Hoverfly.
+
+When flags are provided, those flags will be set on
+Hoverfly. Hoverfly can be set with the following
+combinations of flags: 
+
+	--binary
+	--binary --script
+	--remote
+`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		var middleware v2.MiddlewareView
@@ -53,7 +64,10 @@ var middlewareCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(middlewareCmd)
-	middlewareCmd.PersistentFlags().StringVar(&middlewareBinary, "binary", "", "The binary that middleware should execute")
-	middlewareCmd.PersistentFlags().StringVar(&middlewareScript, "script", "", "The script that middleware should execute")
-	middlewareCmd.PersistentFlags().StringVar(&middlewareRemote, "remote", "", "The remote address that middleware should execute")
+	middlewareCmd.PersistentFlags().StringVar(&middlewareBinary, "binary", "",
+		"Given a binary, the binary will be executed by Hoverfly as middleware")
+	middlewareCmd.PersistentFlags().StringVar(&middlewareScript, "script", "",
+		"Given a path, the contents will be read and will be executed with a binary by Hoverfly as middleware")
+	middlewareCmd.PersistentFlags().StringVar(&middlewareRemote, "remote", "",
+		"Given a URL, the URL will The remote address will be called by Hoverfly as middleware")
 }

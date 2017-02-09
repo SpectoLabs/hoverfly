@@ -9,7 +9,7 @@ import (
 
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "Delete test data from Hoverfly",
+	Short: "Delete data from Hoverfly",
 	Long:  ``,
 
 	Run: func(cmd *cobra.Command, args []string) {

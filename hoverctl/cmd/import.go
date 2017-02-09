@@ -10,15 +10,12 @@ var importV1 bool
 
 // importCmd represents the import command
 var importCmd = &cobra.Command{
-	Use:   "import",
+	Use:   "import [path to simulation]",
 	Short: "Import a simulation into Hoverfly",
-	Long: `Will import a simulation into Hoverfly. The simulation
-provided should be an absolute or relative path to a 
+	Long: `
+Will import a simulation into Hoverfly. The simulation
+provided can be an absolute or relative path to a 
 JSON file.
-	
-	hoverctl import simulation.json
-
-	hoverctl import /home/user/simulation.json
 	`,
 
 	Run: func(cmd *cobra.Command, args []string) {
@@ -34,5 +31,5 @@ JSON file.
 
 func init() {
 	RootCmd.AddCommand(importCmd)
-	importCmd.Flags().BoolVar(&importV1, "v1", false, "This flag can be used to import old simulations from old v1 style schema used pre Hoverfly v0.9.0")
+	importCmd.Flags().BoolVar(&importV1, "v1", false, "Tells Hoverfly that this simulation is formatted in the old v1 style schema used in Hoverfly pre v0.9.0")
 }

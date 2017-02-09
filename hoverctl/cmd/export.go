@@ -7,9 +7,12 @@ import (
 )
 
 var exportCmd = &cobra.Command{
-	Use:   "export",
-	Short: "Import a simulation into Hoverfly",
-	Long:  ``,
+	Use:   "export [path to simulation]",
+	Short: "export a simulation into Hoverfly",
+	Long: `
+Will export a simulation from Hoverfly. The simulation
+will be written to the file provied.
+	`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		simulationData, err := hoverfly.ExportSimulation()
