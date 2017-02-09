@@ -10,7 +10,7 @@ import (
 
 var delaysCmd = &cobra.Command{
 	Use:   "delays",
-	Short: "Get and set response delay config currently loaded in Hoverfly",
+	Short: "Get and set response delays",
 	Long:  ``,
 
 	Run: func(cmd *cobra.Command, args []string) {

@@ -11,9 +11,18 @@ import (
 var dryRun string
 
 var destinationCmd = &cobra.Command{
-	Use:   "destination",
+	Use:   "destination [host (optional)]",
 	Short: "Get and set Hoverfly's current destination",
-	Long:  ``,
+	Long: `
+Without specifying a host, destination will print the
+destination configuration value from Hoverfly.
+
+When a host is specified, that host will be set on
+Hoverfly. That host will be used to whitelist which
+HTTP requests Hoverfly will process. This host can be
+specified as Golang regexp. The default destination is ".".
+This will match against all incoming HTTP requests.
+`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
@@ -47,5 +56,6 @@ var destinationCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(destinationCmd)
-	destinationCmd.Flags().StringVar(&dryRun, "dry-run", "", "Test a url against a regex pattern")
+	destinationCmd.Flags().StringVar(&dryRun, "dry-run", "",
+		"Given a URL, the host regexp will be applied to the URL to allow testing of host regexp")
 }

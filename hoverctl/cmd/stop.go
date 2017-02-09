@@ -7,8 +7,17 @@ import (
 
 var stopCmd = &cobra.Command{
 	Use:   "stop",
-	Short: "Stop an instance of Hoverfly",
-	Long:  ``,
+	Short: "Stop Hoverfly",
+	Long: `
+Will stop Hoverfly.
+
+The .pid file created in the .hoverfly directory by the
+start command will be deleted when the instance of Hoverfly
+is stopped.
+
+Instances of Hoverfly are indentified by a composite admin
+port and proxy port.
+`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		err := hoverfly.Stop(hoverflyDirectory)

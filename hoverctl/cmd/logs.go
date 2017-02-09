@@ -10,7 +10,9 @@ var followLogs bool
 var logsCmd = &cobra.Command{
 	Use:   "logs",
 	Short: "Get the logs from Hoverfly",
-	Long:  ``,
+	Long: `
+Will print the logs from Hoverfly.
+`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		logfile := wrapper.NewLogFile(hoverflyDirectory, hoverfly.AdminPort, hoverfly.ProxyPort)
@@ -28,6 +30,6 @@ var logsCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(logsCmd)
 
-	logsCmd.Flags().BoolVar(&followLogs, "follow-logs", false, "Follow the logs from Hoverfly")
+	logsCmd.Flags().BoolVar(&followLogs, "follow-logs", false, "Will follow the logs from Hoverfly")
 	logsCmd.Flag("follow-logs")
 }
