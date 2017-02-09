@@ -7,21 +7,21 @@ import (
 
 var modeCmd = &cobra.Command{
 	Use:   "mode [capture|simulate|modify|synthesize (optional)]",
-	Short: "Get and set the mode of Hoverfly",
+	Short: "Get and set the Hoverfly mode",
 	Long: `
-Without specifying a mode, mode will print the
-current mode Hoverfly is set to.
+Sets Hoverfly to the mode specified. The mode
+determines how Hoverfly will process incoming
+requests.
 
-When a mode is specified, Hoverfly will be set to that
-mode. The mode determines how Hoverfly will process a 
-request.
+If a mode is not specified, the current Hoverfly 
+mode is shown.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			mode, err := hoverfly.GetMode()
 			handleIfError(err)
 
-			log.Info("Hoverfly is set to ", mode, " mode")
+			log.Info("Hoverfly is currently set to ", mode, " mode")
 		} else {
 			mode, err := hoverfly.SetMode(args[0])
 			handleIfError(err)
