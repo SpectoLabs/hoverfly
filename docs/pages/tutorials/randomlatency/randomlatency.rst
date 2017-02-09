@@ -7,7 +7,9 @@ Using middleware to simulate network latency
 
     Please carefully read through :ref:`middleware` alongside these tutorials to gain a high-level understanding of what we are about to cover.
 
-We will use a python script to apply a random delay of less than one second to every response in a simulation.
+We will use a Python script to apply a random delay of less than one second to every response in a simulation.
+
+Before you proceed, please ensure that you have Python installed. 
 
 Let's begin by writing our middleware. Save the following as ``middleware.py``:
 
