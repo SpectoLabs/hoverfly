@@ -109,7 +109,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 			})
 
 			It("and then delete simulations from hoverfly", func() {
-				output := functional_tests.Run(hoverctlBinary, "delete", "simulations")
+				output := functional_tests.Run(hoverctlBinary, "delete", "simulations", "--force")
 				Expect(output).To(ContainSubstring("Simulation data has been deleted from Hoverfly"))
 			})
 		})
@@ -196,7 +196,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 			})
 
 			It("and then wiping hoverfly", func() {
-				output := functional_tests.Run(hoverctlBinary, "delete", "simulations")
+				output := functional_tests.Run(hoverctlBinary, "delete", "simulations", "--force")
 
 				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			})

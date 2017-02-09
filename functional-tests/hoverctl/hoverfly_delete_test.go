@@ -63,7 +63,7 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 
 			It("and they should be removed", func() {
-				output := functional_tests.Run(hoverctlBinary, "delete", "simulations")
+				output := functional_tests.Run(hoverctlBinary, "delete", "--force")
 
 				Expect(output).To(ContainSubstring("Simulation data has been deleted from Hoverfly"))
 
