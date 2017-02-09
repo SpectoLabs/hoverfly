@@ -11,7 +11,7 @@ var logsCmd = &cobra.Command{
 	Use:   "logs",
 	Short: "Get the logs from Hoverfly",
 	Long: `
-Will print the logs from Hoverfly.
+Shows the Hoverfly logs.
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
@@ -30,6 +30,6 @@ Will print the logs from Hoverfly.
 func init() {
 	RootCmd.AddCommand(logsCmd)
 
-	logsCmd.Flags().BoolVar(&followLogs, "follow-logs", false, "Will follow the logs from Hoverfly")
+	logsCmd.Flags().BoolVar(&followLogs, "follow-logs", false, "Follows the Hoverfly logs")
 	logsCmd.Flag("follow-logs")
 }
