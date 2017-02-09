@@ -10,13 +10,13 @@ var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start Hoverfly",
 	Long: `
-Will start Hoverfly. The instance of Hoverfly created
-will be created with the current configurations of hoverctl.
+Starts an instance of Hoverfly using the current hoverctl
+configuration.
 
-The process ID will be written to a .pid file in the 
-.hoverfly directory.
+The Hoverfly process ID will be written to a "pid" file in the 
+".hoverfly" directory.
 
-Instances of Hoverfly are indentified by a composite admin
+The "pid" file name is composed of the Hoverfly admin
 port and proxy port.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
