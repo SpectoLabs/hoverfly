@@ -29,7 +29,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 			It("should return the destination", func() {
 				output := functional_tests.Run(hoverctlBinary, "destination")
-				Expect(output).To(ContainSubstring("The destination in Hoverfly is set to ."))
+				Expect(output).To(ContainSubstring("Current Hoverfly destination is set to ."))
 			})
 		})
 
@@ -37,10 +37,10 @@ var _ = Describe("When I use hoverctl", func() {
 
 			It("sets the destination", func() {
 				output := functional_tests.Run(hoverctlBinary, "destination", "example.org")
-				Expect(output).To(ContainSubstring("The destination in Hoverfly has been set to example.org"))
+				Expect(output).To(ContainSubstring("Hoverfly destination has been set to example.org"))
 
 				output = functional_tests.Run(hoverctlBinary, "destination")
-				Expect(output).To(ContainSubstring("The destination in Hoverfly is set to example.org"))
+				Expect(output).To(ContainSubstring("Current Hoverfly destination is set to example.org"))
 			})
 		})
 
@@ -51,7 +51,7 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(output).To(ContainSubstring("Regex pattern does not compile"))
 
 				output = functional_tests.Run(hoverctlBinary, "destination")
-				Expect(output).To(ContainSubstring("The destination in Hoverfly is set to ."))
+				Expect(output).To(ContainSubstring("Current Hoverfly destination is set to ."))
 			})
 		})
 	})
@@ -67,12 +67,12 @@ var _ = Describe("When I use hoverctl", func() {
 
 			It("does a dry run and tests if the regex matches the URL - which it does", func() {
 				output := functional_tests.Run(hoverctlBinary, "destination", "hoverfly.io", "--dry-run", "hoverfly.io")
-				Expect(output).To(ContainSubstring("The regex provided matches the dry run URL"))
+				Expect(output).To(ContainSubstring("The regex provided matches the dry-run URL"))
 			})
 
 			It("does a dry run and tests if the regex matches the URL - which it does not", func() {
 				output := functional_tests.Run(hoverctlBinary, "destination", "specto.io", "--dry-run", "hoverfly.io")
-				Expect(output).To(ContainSubstring("The regex provided does not match the dry run URL"))
+				Expect(output).To(ContainSubstring("The regex provided does not match the dry-run URL"))
 			})
 
 		})
