@@ -123,7 +123,7 @@ var _ = Describe("When I use hoverctl", func() {
 				// Export the data
 				output := functional_tests.Run(hoverctlBinary, "export", fileName, "--admin-port="+hoverfly.GetAdminPort())
 
-				Expect(output).To(ContainSubstring("Successfully exported to " + fileName))
+				Expect(output).To(ContainSubstring("Successfully exported simulation to " + fileName))
 
 				data, err := ioutil.ReadFile(fileName)
 				Expect(err).To(BeNil())
@@ -143,7 +143,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				output := functional_tests.Run(hoverctlBinary, "import", fileName, "--admin-port="+hoverfly.GetAdminPort())
 
-				Expect(output).To(ContainSubstring("Successfully imported from " + fileName))
+				Expect(output).To(ContainSubstring("Successfully imported simulation from " + fileName))
 
 				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
@@ -159,7 +159,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				output := functional_tests.Run(hoverctlBinary, "import", ts.URL, "--admin-port="+hoverfly.GetAdminPort())
 
-				Expect(output).To(ContainSubstring("Successfully imported from " + ts.URL))
+				Expect(output).To(ContainSubstring("Successfully imported simulation from " + ts.URL))
 
 				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
@@ -174,7 +174,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				output := functional_tests.Run(hoverctlBinary, "import", "--v1", fileName, "--admin-port="+hoverfly.GetAdminPort())
 
-				Expect(output).To(ContainSubstring("Successfully imported from " + fileName))
+				Expect(output).To(ContainSubstring("Successfully imported simulation from " + fileName))
 
 				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)

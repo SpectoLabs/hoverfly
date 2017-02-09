@@ -32,7 +32,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output := functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to simulate mode"))
 			})
 
 			It("when hoverfly is in capture mode", func() {
@@ -40,7 +40,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output := functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to capture mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to capture mode"))
 			})
 
 			It("when hoverfly is in synthesize mode", func() {
@@ -48,7 +48,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output := functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to synthesize mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to synthesize mode"))
 			})
 
 			It("when hoverfly is in modify mode", func() {
@@ -56,7 +56,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output := functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to modify mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to modify mode"))
 			})
 		})
 
@@ -69,7 +69,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to simulate mode"))
 				Expect(hoverfly.GetMode()).To(Equal(simulate))
 			})
 
@@ -80,7 +80,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to capture mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to capture mode"))
 				Expect(hoverfly.GetMode()).To(Equal(capture))
 			})
 
@@ -91,7 +91,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to synthesize mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to synthesize mode"))
 				Expect(hoverfly.GetMode()).To(Equal(synthesize))
 			})
 
@@ -102,7 +102,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to modify mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to modify mode"))
 				Expect(hoverfly.GetMode()).To(Equal(modify))
 			})
 		})
@@ -126,7 +126,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("when hoverfly is in simulate mode", func() {
 				output := functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to simulate mode"))
 			})
 
 			It("when hoverfly is in synthesize mode", func() {
@@ -134,7 +134,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output := functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to synthesize mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to synthesize mode"))
 			})
 
 			It("when hoverfly is in modify mode", func() {
@@ -142,7 +142,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output := functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to modify mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to modify mode"))
 			})
 
 		})
@@ -156,7 +156,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to simulate mode"))
 				Expect(hoverfly.GetMode()).To(Equal(simulate))
 			})
 
@@ -167,7 +167,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to simulate mode"))
 				Expect(hoverfly.GetMode()).To(Equal(simulate))
 			})
 
@@ -178,7 +178,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to synthesize mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to synthesize mode"))
 				Expect(hoverfly.GetMode()).To(Equal(synthesize))
 			})
 
@@ -189,7 +189,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 
 				output = functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to modify mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to modify mode"))
 				Expect(hoverfly.GetMode()).To(Equal(modify))
 			})
 		})

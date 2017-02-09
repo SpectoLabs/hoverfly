@@ -36,7 +36,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 			It("and it returns the correct mode", func() {
 				output := functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to simulate mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to simulate mode"))
 			})
 		})
 
@@ -49,7 +49,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 
 				output = functional_tests.Run(hoverctlBinary, "mode")
 
-				Expect(output).To(ContainSubstring("Hoverfly is set to capture mode"))
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to capture mode"))
 			})
 		})
 
@@ -92,12 +92,12 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 							}
 						}`), 0644)
 				output := functional_tests.Run(hoverctlBinary, "import", filePath)
-				Expect(output).To(ContainSubstring("Successfully imported from " + filePath))
+				Expect(output).To(ContainSubstring("Successfully imported simulation from " + filePath))
 
 				newFilePath := generateFileName()
 
 				output = functional_tests.Run(hoverctlBinary, "export", newFilePath)
-				Expect(output).To(ContainSubstring("Successfully exported to " + newFilePath))
+				Expect(output).To(ContainSubstring("Successfully exported simulation to " + newFilePath))
 
 				exportFile, err := ioutil.ReadFile(newFilePath)
 				if err != nil {

@@ -35,7 +35,7 @@ var _ = Describe("When I use hoverctl", func() {
 		It("I can get the hoverfly's middleware", func() {
 			output := functional_tests.Run(hoverctlBinary, "middleware")
 
-			Expect(output).To(ContainSubstring("Hoverfly is currently set to run the following as middleware"))
+			Expect(output).To(ContainSubstring("Hoverfly middleware configuration is currently set to"))
 			Expect(output).To(ContainSubstring("Binary: ruby"))
 			Expect(output).To(ContainSubstring(`Script: #!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend`))
 		})
@@ -43,7 +43,7 @@ var _ = Describe("When I use hoverctl", func() {
 		It("I can set the hoverfly's middleware with a binary and a script", func() {
 			output := functional_tests.Run(hoverctlBinary, "middleware", "--binary", "python", "--script", "testdata/add_random_delay.py")
 
-			Expect(output).To(ContainSubstring("Hoverfly is now set to run the following as middleware"))
+			Expect(output).To(ContainSubstring("Hoverfly middleware configuration has been set to"))
 			Expect(output).To(ContainSubstring("Binary: python"))
 			Expect(output).To(ContainSubstring(`Script: #!/usr/bin/env python\nimport sys\nimport logging\nimport random\nfrom time import sleep\n\nlogging.basicConfig(filename='random_delay_middleware.log', level=logging.DEBUG)\nlogging.debug('Random delay middleware is called')\n\n# set delay to random value less than one second\n\nSLEEP_SECS = random.random()\n\ndef main():\n\n    data = sys.stdin.readlines()\n    # this is a json string in one line so we are interested in that one line\n    payload = data[0]\n    logging.debug(\"sleeping for %s seconds\" % SLEEP_SECS)\n    sleep(SLEEP_SECS)\n\n\n    # do not modifying payload, returning same one\n    print(payload)\n\nif __name__ == \"__main__\":\n    main()\n`))
 		})
@@ -65,7 +65,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 			output := functional_tests.Run(hoverctlBinary, "middleware", "--remote", middlewareServer.URL)
 
-			Expect(output).To(ContainSubstring("Hoverfly is now set to run the following as middleware"))
+			Expect(output).To(ContainSubstring("Hoverfly middleware configuration has been set to"))
 			Expect(output).To(ContainSubstring("Remote: " + middlewareServer.URL))
 		})
 
