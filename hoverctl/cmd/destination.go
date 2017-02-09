@@ -12,16 +12,18 @@ var dryRun string
 
 var destinationCmd = &cobra.Command{
 	Use:   "destination [host (optional)]",
-	Short: "Get and set Hoverfly's current destination",
+	Short: "Get and set Hoverfly destination",
 	Long: `
-Without specifying a host, destination will print the
-destination configuration value from Hoverfly.
+The "destination" setting allows you to specify which 
+HTTP requests Hoverfly will process by supplying a 
+Golang regular expression.
 
-When a host is specified, that host will be set on
-Hoverfly. That host will be used to whitelist which
-HTTP requests Hoverfly will process. This host can be
-specified as Golang regexp. The default destination is ".".
-This will match against all incoming HTTP requests.
+The default "destination" setting is ".", meaning that 
+Hoverfly will process all HTTP requests.
+
+If you use "destination" without supplying a value, 
+hoverctl will show the current Hoverfly destination 
+setting.
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
@@ -29,7 +31,7 @@ This will match against all incoming HTTP requests.
 			destination, err := hoverfly.GetDestination()
 			handleIfError(err)
 
-			log.Info("The destination in Hoverfly is set to ", destination)
+			log.Info("Current Hoverfly destination is set to ", destination)
 		} else {
 			regexPattern, err := regexp.Compile(args[0])
 			if err != nil {
@@ -39,15 +41,15 @@ This will match against all incoming HTTP requests.
 
 			if dryRun != "" {
 				if regexPattern.MatchString(dryRun) {
-					log.Info("The regex provided matches the dry run URL")
+					log.Info("The regex provided matches the dry-run URL")
 				} else {
-					log.Fatal("The regex provided does not match the dry run URL")
+					log.Fatal("The regex provided does not match the dry-run URL")
 				}
 			} else {
 				destination, err := hoverfly.SetDestination(args[0])
 				handleIfError(err)
 
-				log.Info("The destination in Hoverfly has been set to ", destination)
+				log.Info("Hoverfly destination has been set to ", destination)
 			}
 
 		}
@@ -57,5 +59,5 @@ This will match against all incoming HTTP requests.
 func init() {
 	RootCmd.AddCommand(destinationCmd)
 	destinationCmd.Flags().StringVar(&dryRun, "dry-run", "",
-		"Given a URL, the host regexp will be applied to the URL to allow testing of host regexp")
+		"The destination regexp will be applied to the URL provided. This allows the regexp to be tested.")
 }
