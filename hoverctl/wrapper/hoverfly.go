@@ -104,26 +104,6 @@ func (h *Hoverfly) DeleteSimulations() error {
 	return nil
 }
 
-func (h *Hoverfly) DeleteDelays() error {
-	slingRequest, err := h.buildDeleteRequest(v1ApiDelays)
-	if err != nil {
-		return err
-	}
-
-	response, err := h.doRequest(slingRequest)
-	if err != nil {
-		return err
-	}
-
-	defer response.Body.Close()
-
-	if response.StatusCode != 200 {
-		return errors.New("Delays were not deleted from Hoverfly")
-	}
-
-	return nil
-}
-
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
 func (h *Hoverfly) GetMode() (string, error) {
 	slingRequest, err := h.buildGetRequest(v2ApiMode)
@@ -600,81 +580,4 @@ func (h *Hoverfly) Stop(hoverflyDirectory HoverflyDirectory) error {
 	}
 
 	return nil
-}
-
-// GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
-func (h *Hoverfly) GetDelays() (rd []ResponseDelaySchema, err error) {
-	slingRequest, err := h.buildGetRequest(v1ApiDelays)
-	if err != nil {
-		return rd, err
-	}
-
-	response, err := h.doRequest(slingRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	defer response.Body.Close()
-
-	apiResponse := createAPIDelaysResponse(response)
-
-	return apiResponse.Data, nil
-}
-
-// Set will go the state endpoint in Hoverfly, sending JSON that will set the mode of Hoverfly
-func (h *Hoverfly) SetDelays(path string) (rd []ResponseDelaySchema, err error) {
-
-	conf, err := ioutil.ReadFile(path)
-	if err != nil {
-		return rd, err
-	}
-
-	slingRequest, err := h.buildPutRequest(v1ApiDelays, string(conf))
-	if err != nil {
-		return rd, err
-	}
-
-	response, err := h.doRequest(slingRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	slingRequest = sling.New().Get(h.buildURL(v1ApiDelays))
-
-	slingRequest, err = h.addAuthIfNeeded(slingRequest)
-	if err != nil {
-		log.Debug(err.Error())
-		return rd, errors.New("Could not authenticate  with Hoverfly")
-	}
-
-	request, err := slingRequest.Request()
-	if err != nil {
-		log.Debug(err.Error())
-		return rd, errors.New("Could not communicate with Hoverfly")
-	}
-
-	response, err = h.httpClient.Do(request)
-	if err != nil {
-		log.Debug(err.Error())
-		return rd, errors.New("Could not communicate with Hoverfly")
-	}
-	apiResponse := createAPIDelaysResponse(response)
-
-	return apiResponse.Data, nil
-}
-
-func createAPIDelaysResponse(response *http.Response) APIDelaySchema {
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Debug(err.Error())
-	}
-
-	var apiResponse APIDelaySchema
-
-	err = json.Unmarshal(body, &apiResponse)
-	if err != nil {
-		log.Debug(err.Error())
-	}
-
-	return apiResponse
 }
