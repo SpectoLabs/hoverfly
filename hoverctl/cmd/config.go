@@ -10,22 +10,20 @@ import (
 
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "Get the configuration being used by hoverctl",
+	Short: "Show hoverctl configuration information",
 	Long: `
-Will print the path to the configuration file currently
-being used by hoverctl along with all of the configuration
-values set.
+Shows the path to the configuration file being used by 
+hoverctl, along with all of the current configuration values.
 
-A configuration file is a YAML file that be can found in
-the $HOME/.hoverfly directory. This directory and the
-configuration file are created when you first use hoverctl.
+The configuration YAML file can found in the "$HOME/.hoverfly" 
+directory. This directory and the file are created when you use
+hoverctl for the first time.
 
-Configuration in hoverctl can be overridden by using the 
-global flags for each of the configuration values. An
-example of this is providing both the --admin-port and
---proxy-port flags when calling the start command. This
-would create several instances of Hoverfly without errors
-due to ports already being used.
+Configuration values can be overridden using global flags. 
+For example, setting the Hoverfly admin and proxy ports using 
+the "--admin-port" and "--proxy-port" flags when calling
+"hoverctl start" will override the corresponding values 
+in the configuration file.
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
