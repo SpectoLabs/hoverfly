@@ -21,8 +21,6 @@ var deleteCmd = &cobra.Command{
 		case "all":
 			err := hoverfly.DeleteSimulations()
 			handleIfError(err)
-			err = hoverfly.DeleteDelays()
-			handleIfError(err)
 			_, err = hoverfly.SetMiddleware("", "", "")
 			handleIfError(err)
 
@@ -32,12 +30,6 @@ var deleteCmd = &cobra.Command{
 			handleIfError(err)
 
 			log.Info("Simulations have been deleted from Hoverfly")
-
-		case "delays":
-			err := hoverfly.DeleteDelays()
-			handleIfError(err)
-
-			log.Info("Delays have been deleted from Hoverfly")
 
 		case "middleware":
 			_, err := hoverfly.SetMiddleware("", "", "")

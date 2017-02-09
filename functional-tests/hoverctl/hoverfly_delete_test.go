@@ -73,33 +73,6 @@ var _ = Describe("When I use hoverctl", func() {
 			})
 		})
 
-		Context("I can delete the delays in Hoverfly", func() {
-			BeforeEach(func() {
-				functional_tests.DoRequest(sling.New().Put(fmt.Sprintf("http://localhost:%v/api/delays", hoverfly.GetAdminPort())).Body(strings.NewReader(`
-						{
-							"data": [
-								{
-									"hostPattern": "virtual\\.com",
-									"delay": 100
-								},
-								{
-									"hostPattern": "virtual\\.com",
-									"delay": 110
-								}
-							]`)))
-			})
-
-			It("and they should be removed", func() {
-				output := functional_tests.Run(hoverctlBinary, "delete", "delays")
-
-				Expect(output).To(ContainSubstring("Delays have been deleted from Hoverfly"))
-
-				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/delays", hoverfly.GetAdminPort())))
-				bytes, _ := ioutil.ReadAll(resp.Body)
-				Expect(string(bytes)).To(Equal(`{"data":[]}`))
-			})
-		})
-
 		Context("I can delete the middleware in Hoverfly", func() {
 			BeforeEach(func() {
 				functional_tests.Run(hoverctlBinary, "middleware", "python testdata/add_random_delay.py")
