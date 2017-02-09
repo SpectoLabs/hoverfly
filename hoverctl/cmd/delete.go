@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"errors"
-
 	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -13,36 +11,10 @@ var deleteCmd = &cobra.Command{
 	Long:  ``,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			args = append(args, "")
-		}
+		err := hoverfly.DeleteSimulations()
+		handleIfError(err)
 
-		switch args[0] {
-		case "all":
-			err := hoverfly.DeleteSimulations()
-			handleIfError(err)
-			_, err = hoverfly.SetMiddleware("", "", "")
-			handleIfError(err)
-
-			log.Info("Delays, middleware, request templates and simulations have all been deleted from Hoverfly")
-		case "simulations":
-			err := hoverfly.DeleteSimulations()
-			handleIfError(err)
-
-			log.Info("Simulations have been deleted from Hoverfly")
-
-		case "middleware":
-			_, err := hoverfly.SetMiddleware("", "", "")
-			handleIfError(err)
-
-			log.Info("Middleware has been deleted from Hoverfly")
-		case "":
-			err := errors.New("You have not specified a resource to delete from Hoverfly")
-			handleIfError(err)
-		default:
-			err := errors.New("You have not specified a valid resource to delete from Hoverfly")
-			handleIfError(err)
-		}
+		log.Info("Simulations have been deleted from Hoverfly")
 	},
 }
 
