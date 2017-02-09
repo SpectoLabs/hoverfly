@@ -65,7 +65,7 @@ var _ = Describe("When I use hoverctl", func() {
 			It("and they should be removed", func() {
 				output := functional_tests.Run(hoverctlBinary, "delete", "simulations")
 
-				Expect(output).To(ContainSubstring("Simulations have been deleted from Hoverfly"))
+				Expect(output).To(ContainSubstring("Simulation data has been deleted from Hoverfly"))
 
 				bytes, _ := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(string(bytes)).To(Equal(`{"data":null}`))
