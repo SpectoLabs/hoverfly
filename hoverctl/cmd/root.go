@@ -33,19 +33,19 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	RootCmd.PersistentFlags().StringVar(&adminPort, "admin-port", "",
-		"Given a port number, the port number is used to override the default Hoverfly admin port (8888)")
+		"A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
 	RootCmd.PersistentFlags().StringVar(&proxyPort, "proxy-port", "",
-		"Given a port number, the port number is used to override the default Hoverfly proxy port (8500)")
+		"A port number for the Hoverfly proxy. Overrides the default Hoverfly proxy port (8500)")
 	RootCmd.PersistentFlags().StringVar(&host, "host", "",
-		"Given a host, the host is used to override the default Hoverfly host (localhost)")
+		"A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
 	RootCmd.PersistentFlags().StringVar(&certificate, "certificate", "",
-		"Given a path, the certificate is used to override the default Hoverfly certificate")
+		"A path to a certificate file. Overrides the default Hoverfly certificate")
 	RootCmd.PersistentFlags().StringVar(&key, "key", "",
-		"Given a path, the key is used to override the default Hoverfly TLS key")
+		"A path to a key file. Overrides the default Hoverfly TLS key")
 	RootCmd.PersistentFlags().BoolVar(&disableTls, "disable-tls", false,
-		"Disable TLS verification")
+		"Disables TLS verification")
 	RootCmd.PersistentFlags().StringVar(&database, "database", "",
-		"Given a database type [memory|boltdb], the database type is used to override the default Hoverfly database type (memory)")
+		"A database type [memory|boltdb]. Overrides the default Hoverfly database type (memory)")
 
 	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Verbose logging from hoverctl")
 	RootCmd.Flag("verbose").Shorthand = "v"
