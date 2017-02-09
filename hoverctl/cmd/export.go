@@ -8,7 +8,7 @@ import (
 
 var exportCmd = &cobra.Command{
 	Use:   "export [path to simulation]",
-	Short: "export a simulation from Hoverfly",
+	Short: "Export a simulation from Hoverfly",
 	Long: `
 Exports a simulation from Hoverfly. The simulation JSON
 will be written to the file path provided.
