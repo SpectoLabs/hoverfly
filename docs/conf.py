@@ -49,7 +49,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Hoverfly'
+project = u'hoverfly'
 copyright = u'2017, SpectoLabs'
 author = u'SpectoLabs'
 

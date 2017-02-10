@@ -16,13 +16,17 @@ var hoverfly wrapper.Hoverfly
 var hoverflyDirectory wrapper.HoverflyDirectory
 var config *wrapper.Config
 
+var version string
+
 var RootCmd = &cobra.Command{
 	Use:   "hoverctl",
 	Short: "hoverctl is the command line tool for Hoverfly",
 	Long:  ``,
 }
 
-func Execute() {
+func Execute(hoverctlVersion string) {
+	version = hoverctlVersion
+
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)

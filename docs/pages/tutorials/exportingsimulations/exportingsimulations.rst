@@ -3,6 +3,11 @@
 Creating and exporting a simulation
 ===================================
 
+.. note::
+   If you are running Hoverfly on a machine that access the internet via a proxy
+   (for example if you are on a corporate network), please follow the :ref:`behind_a_proxy`
+   tutorial before proceeding.
+
 Start Hoverfly and set it to Capture mode
 
 .. code:: bash
@@ -14,7 +19,7 @@ Make a request with cURL, using Hoverfly as a proxy server:
 
 .. code:: bash
 
-    curl --proxy http://localhost:8500 http://time.jsontest.com
+    curl --proxy http://localhost:8500 http://time.jsontest.com    
 
 View the Hoverfly logs
 
