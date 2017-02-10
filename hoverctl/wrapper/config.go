@@ -12,16 +12,17 @@ import (
 type Flags []string
 
 type Config struct {
-	HoverflyHost        string `yaml:"hoverfly.host"`
-	HoverflyAdminPort   string `yaml:"hoverfly.admin.port"`
-	HoverflyProxyPort   string `yaml:"hoverfly.proxy.port"`
-	HoverflyDbType      string `yaml:"hoverfly.db.type"`
-	HoverflyUsername    string `yaml:"hoverfly.username"`
-	HoverflyPassword    string `yaml:"hoverfly.password"`
-	HoverflyWebserver   bool   `yaml:"hoverfly.webserver"`
-	HoverflyCertificate string `yaml:"hoverfly.tls.certificate"`
-	HoverflyKey         string `yaml:"hoverfly.tls.key"`
-	HoverflyDisableTls  bool   `yaml:"hoverfly.tls.disable"`
+	HoverflyHost          string `yaml:"hoverfly.host"`
+	HoverflyAdminPort     string `yaml:"hoverfly.admin.port"`
+	HoverflyProxyPort     string `yaml:"hoverfly.proxy.port"`
+	HoverflyDbType        string `yaml:"hoverfly.db.type"`
+	HoverflyUsername      string `yaml:"hoverfly.username"`
+	HoverflyPassword      string `yaml:"hoverfly.password"`
+	HoverflyWebserver     bool   `yaml:"hoverfly.webserver"`
+	HoverflyCertificate   string `yaml:"hoverfly.tls.certificate"`
+	HoverflyKey           string `yaml:"hoverfly.tls.key"`
+	HoverflyDisableTls    bool   `yaml:"hoverfly.tls.disable"`
+	HoverflyUpstreamProxy string `yaml:"hoverfly.upstream.proxy"`
 }
 
 func GetConfig() *Config {
@@ -115,6 +116,13 @@ func (this *Config) SetKey(key string) *Config {
 	return this
 }
 
+func (this *Config) SetUpstreamProxy(upstreamProxy string) *Config {
+	if len(upstreamProxy) > 0 {
+		this.HoverflyUpstreamProxy = upstreamProxy
+	}
+	return this
+}
+
 func (c *Config) GetFilepath() string {
 	return viper.ConfigFileUsed()
 }
@@ -177,6 +185,10 @@ func (this Config) BuildFlags() Flags {
 		flags = append(flags, "-tls-verification=false")
 	}
 
+	if this.HoverflyUpstreamProxy != "" {
+		flags = append(flags, "-upstream-proxy="+this.HoverflyUpstreamProxy)
+	}
+
 	return flags
 }
 
@@ -196,4 +208,5 @@ func SetConfigurationDefaults() {
 	viper.SetDefault("hoverfly.tls.certificate", "")
 	viper.SetDefault("hoverfly.tls.key", "")
 	viper.SetDefault("hoverfly.tls.disable", false)
+	viper.SetDefault("hoverfly.upsream.proxy", "")
 }
