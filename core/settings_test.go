@@ -83,3 +83,33 @@ func Test_InitSettings_SetsTheWebserverFieldToFalse(t *testing.T) {
 	unit := InitSettings()
 	Expect(unit.Webserver).To(BeFalse())
 }
+
+func Test_SetUpstreamProxy_WillPrependHttpColonSlashSlashToProxyURLWithoutIt(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := InitSettings()
+
+	unit.SetUpstreamProxy("localhost")
+
+	Expect(unit.UpstreamProxy).To(Equal("http://localhost"))
+}
+
+func Test_SetUpstreamProxy_WillNotPrependHttpColonSlashSlashToProxyURLWithIt(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := InitSettings()
+
+	unit.SetUpstreamProxy("http://localhost")
+
+	Expect(unit.UpstreamProxy).To(Equal("http://localhost"))
+}
+
+func Test_SetUpstreamProxy_WillNotPrependHttpColonSlashSlashToProxyURLWithHTTPS(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := InitSettings()
+
+	unit.SetUpstreamProxy("https://localhost")
+
+	Expect(unit.UpstreamProxy).To(Equal("https://localhost"))
+}

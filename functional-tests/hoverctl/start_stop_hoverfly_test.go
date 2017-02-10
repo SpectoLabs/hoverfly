@@ -316,7 +316,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				responseBody, _ := ioutil.ReadAll(response.Body)
 
-				Expect(responseBody).To(ContainSubstring(`"upstream-proxy":"hoverfly.io:8080"`))
+				Expect(responseBody).To(ContainSubstring(`"upstream-proxy":"http://hoverfly.io:8080"`))
 			})
 		})
 	})

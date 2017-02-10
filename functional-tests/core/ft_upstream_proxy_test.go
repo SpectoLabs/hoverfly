@@ -30,7 +30,7 @@ var _ = Describe("When I run two Hoverfly", func() {
 		BeforeEach(func() {
 			hoverflyUpstream.Start()
 			hoverflyUpstream.SetMode("capture")
-			hoverflyUpstreamURL = "http://localhost:" + hoverflyUpstream.GetProxyPort()
+			hoverflyUpstreamURL = "localhost:" + hoverflyUpstream.GetProxyPort()
 
 			hoverflyPassThrough.Start("-upstream-proxy=" + hoverflyUpstreamURL)
 			hoverflyPassThrough.SetMode("capture")
