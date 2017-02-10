@@ -1,13 +1,14 @@
-.. _importing_simulation:
+.. _behind_a_proxy:
 
 Using Hoverfly behind a proxy
 ================================
 
-In some environments, you may already be running behind a proxy. Without configuration,
-Hoverfly will not be able to forward requests.
+In some environments, you may only be able to access the internet via a proxy. For example,
+your organization may route all traffic through a proxy for security reasons.
 
-Hoverfly has the ability to configure an upstream proxy. This configuration value
-can be easily set when starting an instance of Hoverfly.
+If this is the case, you will need to configure Hoverfly to work with the 'upstream' proxy.  
+
+This configuration value can be easily set when starting an instance of Hoverfly.
 
 .. code:: bash
 
