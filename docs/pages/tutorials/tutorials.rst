@@ -19,3 +19,4 @@ Hoverfly can also be controlled via its :ref:`rest_api`, or via :ref:`bindings`.
     https/https
     asawebserver/asawebserver
     specificurls/specificurls
+    behindaproxy/behindaproxy
