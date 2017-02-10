@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"sync"
 
+	"strings"
+
 	log "github.com/Sirupsen/logrus"
 )
 
@@ -39,6 +41,13 @@ func (c *Configuration) SetMode(mode string) {
 	c.mu.Lock()
 	c.Mode = mode
 	c.mu.Unlock()
+}
+
+func (c *Configuration) SetUpstreamProxy(upstreamProxy string) {
+	if !strings.HasPrefix(upstreamProxy, "http://") && !strings.HasPrefix(upstreamProxy, "https://") {
+		upstreamProxy = "http://" + upstreamProxy
+	}
+	c.UpstreamProxy = upstreamProxy
 }
 
 // GetMode - provides safe way to get current mode

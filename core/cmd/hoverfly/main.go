@@ -210,7 +210,7 @@ func main() {
 
 	// overriding environment variable (external proxy)
 	if *upstreamProxy != "" {
-		cfg.UpstreamProxy = *upstreamProxy
+		cfg.SetUpstreamProxy(*upstreamProxy)
 	}
 
 	// development settings
