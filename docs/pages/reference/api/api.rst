@@ -323,7 +323,7 @@ Example response body:
 
 
 GET /api/v2/hoverfly/version
-""""""""""""""""""""""""""
+""""""""""""""""""""""""""""
 
 Gets the version of Hoverfly.
 
@@ -340,7 +340,7 @@ Example response body:
 
 
 GET /api/v2/hoverfly/upstream-proxy
-""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""
 
 Gets the upstream proxy configured for  Hoverfly.
 
