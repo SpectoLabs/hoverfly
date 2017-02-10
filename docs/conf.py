@@ -31,7 +31,8 @@ import shlex
 # ones.
 extensions = [
     'sphinxcontrib.mermaid',
-    'sphinx.ext.extlinks'
+    'sphinx.ext.extlinks',
+    'sphinx.ext.todo'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -157,8 +158,10 @@ if 'READTHEDOCS' not in os.environ:
 html_static_path = ['_static']
 
 html_context = {
-    'css_files': [
-        '_static/theme_overrides.css',  
+   'css_files': [                                                           
+            'https://media.readthedocs.org/css/sphinx_rtd_theme.css',            
+            'https://media.readthedocs.org/css/readthedocs-doc-embed.css',       
+            '_static/theme_overrides.css',   
         ],
     }
 
