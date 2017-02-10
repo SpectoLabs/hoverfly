@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var adminPort, proxyPort, host, certificate, key, database string
+var adminPort, proxyPort, host, certificate, key, database, upstreamProxy string
 var disableTls, verbose bool
 
 var hoverfly wrapper.Hoverfly
@@ -46,6 +46,8 @@ func init() {
 		"Disables TLS verification")
 	RootCmd.PersistentFlags().StringVar(&database, "database", "",
 		"A database type [memory|boltdb]. Overrides the default Hoverfly database type (memory)")
+	RootCmd.PersistentFlags().StringVar(&upstreamProxy, "upstream-proxy", "",
+		"A host for which Hoverfly will proxy its requests to")
 
 	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Verbose logging from hoverctl")
 	RootCmd.Flag("verbose").Shorthand = "v"
@@ -71,6 +73,7 @@ func initConfig() {
 	config = config.SetKey(key)
 	config = config.DisableTls(disableTls)
 	config = config.SetDbType(database)
+	config = config.SetUpstreamProxy(upstreamProxy)
 
 	var err error
 	hoverflyDirectory, err = wrapper.NewHoverflyDirectory(*config)

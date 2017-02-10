@@ -10,16 +10,17 @@ import (
 
 var (
 	defaultConfig = Config{
-		HoverflyHost:        "localhost",
-		HoverflyAdminPort:   "8888",
-		HoverflyProxyPort:   "8500",
-		HoverflyDbType:      "memory",
-		HoverflyWebserver:   false,
-		HoverflyUsername:    "",
-		HoverflyPassword:    "",
-		HoverflyCertificate: "",
-		HoverflyKey:         "",
-		HoverflyDisableTls:  false,
+		HoverflyHost:          "localhost",
+		HoverflyAdminPort:     "8888",
+		HoverflyProxyPort:     "8500",
+		HoverflyDbType:        "memory",
+		HoverflyWebserver:     false,
+		HoverflyUsername:      "",
+		HoverflyPassword:      "",
+		HoverflyCertificate:   "",
+		HoverflyKey:           "",
+		HoverflyDisableTls:    false,
+		HoverflyUpstreamProxy: "",
 	}
 )
 
@@ -275,6 +276,29 @@ func Test_Config_DisableTls_DoesNotOverridesDefaultValueIfDefaultIsPositive(t *t
 	Expect(*result).To(Equal(expected))
 }
 
+func Test_Config_SetUpstreamProxy_OverridesDefaultValue(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	result := GetConfig().SetUpstreamProxy("hoverfly.io:8080")
+
+	expected := defaultConfig
+	expected.HoverflyUpstreamProxy = "hoverfly.io:8080"
+
+	Expect(*result).To(Equal(expected))
+}
+
+func Test_Config_SetUpstreamProxy_DoesNotOverrideWhenEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	result := GetConfig().SetUpstreamProxy("")
+
+	expected := defaultConfig
+
+	Expect(*result).To(Equal(expected))
+}
+
 func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -430,6 +454,17 @@ func Test_Config_BuildFlags_DisableTlsSetsTlsVerificationFlagToFalse(t *testing.
 
 	Expect(unit.BuildFlags()).To(HaveLen(1))
 	Expect(unit.BuildFlags()[0]).To(Equal("-tls-verification=false"))
+}
+
+func Test_Config_BuildFlags_UpstreamProxySetsUpstreamProxyFlag(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Config{
+		HoverflyUpstreamProxy: "hoverfly.io:8080",
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(1))
+	Expect(unit.BuildFlags()[0]).To(Equal("-upstream-proxy=hoverfly.io:8080"))
 }
 
 func Test_Config_BuildFlags_CanBuildFlagsInCorrectOrderWithAllVariables(t *testing.T) {

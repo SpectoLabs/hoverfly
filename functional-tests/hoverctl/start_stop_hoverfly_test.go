@@ -302,5 +302,22 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(data).To(ContainSubstring("Creating bolt db backend."))
 			})
 		})
+
+		Context("You can set upstream proxy for hoverfly", func() {
+
+			It("starts hoverfly with upstream-proxy for environments with a proxy set up already", func() {
+				output := functional_tests.Run(hoverctlBinary, "start", "--upstream-proxy", "hoverfly.io:8080", "-v")
+
+				Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+				response := functional_tests.DoRequest(sling.New().Get("http://localhost:" + adminPortAsString + "/api/v2/hoverfly"))
+
+				Expect(response.StatusCode).To(Equal(200))
+
+				responseBody, _ := ioutil.ReadAll(response.Body)
+
+				Expect(responseBody).To(ContainSubstring(`"upstream-proxy":"hoverfly.io:8080"`))
+			})
+		})
 	})
 })
