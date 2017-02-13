@@ -4,7 +4,7 @@ Creating and exporting a simulation
 ===================================
 
 .. note::
-   If you are running Hoverfly on a machine that access the internet via a proxy
+   If you are running Hoverfly on a machine that accesses the internet via a proxy
    (for example if you are on a corporate network), please follow the :ref:`behind_a_proxy`
    tutorial before proceeding.
 

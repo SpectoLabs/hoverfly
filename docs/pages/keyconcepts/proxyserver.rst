@@ -7,9 +7,11 @@ A proxy server passes requests between a client and server.
 
 .. figure:: proxyserver.mermaid.png
 
-It is sometimes essential to use a proxy server to reach a network, for example, as a security measure. Therefore all network-enabled software can be configured to use a proxy.
+It is sometimes necessary to use a proxy server to reach a network (as a security measure, for example). 
+Because of this, all network-enabled software can be configured to use a proxy server.
 
-The relationship between clients and servers via a proxy server can be one-to-one, one-to-many, many-to-one, or many-to-many.
+The relationship between clients and servers via a proxy server can be one-to-one, one-to-many, 
+many-to-one, or many-to-many.
 
 .. figure:: proxyconfigs.mermaid.png
 

@@ -3,7 +3,7 @@
 Download and installation
 =========================
 
-Hoverfly comes with a command line interface called hoverctl. Archives containing the Hoverfly and hoverctl binaries are available for the major operating systems and architectures.
+Hoverfly comes with a command line interface called **hoverctl**. Archives containing the Hoverfly and hoverctl binaries are available for the major operating systems and architectures.
 
 - :zip_bundle_os_arch:`MacOS 64bit <OSX_amd64>`
 - :zip_bundle_os_arch:`Linux 32bit <linux_386>`
@@ -16,7 +16,7 @@ Download the correct archive, extract the binaries and place them in a directory
 Homebrew (MacOS)
 ~~~~~~~~~~~~~~~~
 
-If you have `homebrew <http://brew.sh/>`_ installed, you can easily install Hoverfly using the ``brew`` command.
+If you have `homebrew <http://brew.sh/>`_, you can install Hoverfly using the ``brew`` command.
 
 .. code:: bash
 
