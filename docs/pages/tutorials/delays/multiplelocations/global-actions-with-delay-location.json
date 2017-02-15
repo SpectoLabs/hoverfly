@@ -1,0 +1,16 @@
+		"globalActions": {
+			"delays": [
+				{
+				"urlPattern": "echo\\.jsontest\\.com\\/a\\/b",
+				"delay": 2000
+				},
+				{
+				"urlPattern": "echo\\.jsontest\\.com\\/b\\/c",
+				"delay": 2000
+				},
+				{
+				"urlPattern": "echo\\.jsontest\\.com\\/c\\/d",
+				"delay": 3000
+				}
+			]
+		}
