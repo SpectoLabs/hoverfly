@@ -32,6 +32,11 @@
 			"Rev": "24bf3506bb5e25bf9fe26f644872f77656d51b57"
 		},
 		{
+			"ImportPath": "github.com/davecgh/go-spew/spew",
+			"Comment": "v1.1.0",
+			"Rev": "346938d642f2ec3594ed81d874461961cd0faa76"
+		},
+		{
 			"ImportPath": "github.com/dghubble/sling",
 			"Comment": "v1.0-14-g5765fe1",
 			"Rev": "5765fe1bdc176ae984b074c8a89980d1f16e6dd8"
@@ -58,6 +63,10 @@
 			"ImportPath": "github.com/go-zoo/bone",
 			"Comment": "v1.1-27-g2b727a8",
 			"Rev": "2b727a8601bc7a74fac33a9583ebba67779c502d"
+		},
+		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "8ee79997227bf9b34611aee7946ae64735e6fd93"
 		},
 		{
 			"ImportPath": "github.com/google/go-querystring/query",
@@ -115,6 +124,10 @@
 			"Rev": "9a905a34e6280ce905da1a32344b25e81011197a"
 		},
 		{
+			"ImportPath": "github.com/hashicorp/hcl/testhelper",
+			"Rev": "9a905a34e6280ce905da1a32344b25e81011197a"
+		},
+		{
 			"ImportPath": "github.com/hpcloud/tail",
 			"Comment": "v1.0.0-2-g915e5fe",
 			"Rev": "915e5feba042395f5fda4dbe9c0e99aeab3088b3"
@@ -149,6 +162,11 @@
 		},
 		{
 			"ImportPath": "github.com/magiconair/properties",
+			"Comment": "v1.7.0",
+			"Rev": "c265cfa48dda6474e208715ca93e987829f572f8"
+		},
+		{
+			"ImportPath": "github.com/magiconair/properties/_third_party/gopkg.in/check.v1",
 			"Comment": "v1.7.0",
 			"Rev": "c265cfa48dda6474e208715ca93e987829f572f8"
 		},
@@ -250,12 +268,27 @@
 			"Rev": "7ce781ea776b2fd506491011353bded2e40c8467"
 		},
 		{
+			"ImportPath": "github.com/onsi/gomega/gbytes",
+			"Comment": "v1.0-91-g7ce781e",
+			"Rev": "7ce781ea776b2fd506491011353bded2e40c8467"
+		},
+		{
+			"ImportPath": "github.com/onsi/gomega/ghttp",
+			"Comment": "v1.0-91-g7ce781e",
+			"Rev": "7ce781ea776b2fd506491011353bded2e40c8467"
+		},
+		{
 			"ImportPath": "github.com/onsi/gomega/internal/assertion",
 			"Comment": "v1.0-91-g7ce781e",
 			"Rev": "7ce781ea776b2fd506491011353bded2e40c8467"
 		},
 		{
 			"ImportPath": "github.com/onsi/gomega/internal/asyncassertion",
+			"Comment": "v1.0-91-g7ce781e",
+			"Rev": "7ce781ea776b2fd506491011353bded2e40c8467"
+		},
+		{
+			"ImportPath": "github.com/onsi/gomega/internal/fakematcher",
 			"Comment": "v1.0-91-g7ce781e",
 			"Rev": "7ce781ea776b2fd506491011353bded2e40c8467"
 		},
@@ -309,6 +342,11 @@
 			"Rev": "e7681b37614941bf73b404e0caa37f19e33b5fed"
 		},
 		{
+			"ImportPath": "github.com/pmezard/go-difflib/difflib",
+			"Comment": "v1.0.0",
+			"Rev": "792786c7400a136282c1664665ae0a8db921c6c2"
+		},
+		{
 			"ImportPath": "github.com/rakyll/statik/fs",
 			"Comment": "v0.1.0-1-g2940084",
 			"Rev": "2940084503a48359b41de178874e862c5bc3efe8"
@@ -346,6 +384,11 @@
 		{
 			"ImportPath": "github.com/spf13/viper",
 			"Rev": "d8a428b8a30606e1d0b355d91edf282609ade1a6"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.1.4-27-g4d4bfba",
+			"Rev": "4d4bfba8f1d1027c4fdbe371823030df51419987"
 		},
 		{
 			"ImportPath": "github.com/tdewolff/buffer",
@@ -397,6 +440,10 @@
 		{
 			"ImportPath": "golang.org/x/sys/unix",
 			"Rev": "d4feaf1a7e61e1d9e79e6c4e76c6349e9cab0a03"
+		},
+		{
+			"ImportPath": "gopkg.in/check.v1",
+			"Rev": "20d25e2804050c1cd24a7eea1e7a6447dd0e74ec"
 		},
 		{
 			"ImportPath": "gopkg.in/fsnotify.v1",
