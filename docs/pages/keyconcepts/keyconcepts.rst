@@ -3,7 +3,7 @@
 Key Concepts
 ============
 
-Hoverfly's functionality is quite broad. You are therefore encouraged to go through these key concepts and understand them clearly before jumping into the :ref:`tutorials`.
+Hoverfly's functionality is quite broad. You are encouraged to take the time to understand these key concepts before jumping into the :ref:`tutorials`.
 
 .. toctree::
    :maxdepth: 2

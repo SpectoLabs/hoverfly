@@ -35,6 +35,11 @@
 
 .wy-menu-vertical li.current a {
     color: #404040 !important;
+    border-right: none !important;
+}
+
+.wy-menu-vertical li.on a, .wy-menu-vertical li.current>a {
+    border: none !important;
 }
 
 h1, h2, .rst-content .toctree-wrapper p.caption, h3, h4, h5, h6, legend {
@@ -44,7 +49,6 @@ h1, h2, .rst-content .toctree-wrapper p.caption, h3, h4, h5, h6, legend {
 body {
     font-family: "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif !important;
     color: #4c4c4c !important;
-    background: #edf0f2 !important;
 }
 
 /*

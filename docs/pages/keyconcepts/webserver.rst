@@ -3,7 +3,7 @@
 Hoverfly as a webserver
 =======================
 
-Sometimes you may not be able to configure your client to use a proxy, or you may simply want to explicitly point your application at Hoverfly. For this reason, Hoverfly can run as a webserver.
+Sometimes you may not be able to configure your client to use a proxy, or you may want to explicitly point your application at Hoverfly. For this reason, Hoverfly can run as a webserver.
 
 .. figure:: webserver.mermaid.png
 
@@ -11,13 +11,13 @@ Sometimes you may not be able to configure your client to use a proxy, or you ma
 
     When running as a webserver, Hoverfly cannot capture traffic (see :ref:`capture_mode`) - it can only be used to simulate and synthesize APIs (see :ref:`simulate_mode`, :ref:`modify_mode` and :ref:`synthesize_mode`). For this reason, when you use Hoverfly as a webserver, you should have Hoverfly simulations ready to be loaded.
 
-When running as a webserver, Hoverfly strips the domain from the endpoint's URL. So for example, if while capturing traffic with Hoverfly running as a proxy you made requests to:
+When running as a webserver, Hoverfly strips the domain from the endpoint URL. For example, if you made requests to the following URL while capturing traffic with Hoverfly running as a proxy:
 
 .. code::
 
       http://echo.jsontest.com/key/value
 
-And Hoverfly is running as a webserver on:
+And Hoverfly is running in simulate mode as a webserver on:
 
 .. code::
 
