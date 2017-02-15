@@ -11,4 +11,5 @@ This page contains the output of:
 
 The command's help content has been placed here for convenience.
 
-.. literalinclude:: output.txt
+.. literalinclude:: hoverctl.output
+   :language: none
