@@ -19,10 +19,9 @@ copyright = u'2017, SpectoLabs'
 author = u'SpectoLabs'
 
 
-# The short X.Y version.
 version = 'v0.10.0'
 # The full version, including alpha/beta/rc tags.
-release = 'v0.10.0'
+release = version
 
 zip_base_url = 'https://github.com/SpectoLabs/hoverfly/releases/download/' + version + '/'
 

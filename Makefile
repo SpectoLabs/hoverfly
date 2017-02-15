@@ -48,4 +48,11 @@ update-version:
 	rm -rf core/hoverfly.go
 	mv core/hoverfly2.go core/hoverfly.go
 	git add core/hoverfly.go
+	awk \
+		-v line=$$(awk '/version/{print NR; exit}' docs/conf.py) \
+		-v version=${VERSION} \
+		'{ if (NR == line) print "version = \x27${VERSION}\x27"; else print $0}' docs/conf.py > docs/conf2.py
+	rm -rf docs/conf.py
+	mv docs/conf2.py docs/conf.py
+	git add docs/conf.py
 	git commit -m "Updated hoverfly version to ${VERSION}"
