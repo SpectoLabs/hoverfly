@@ -37,6 +37,9 @@ build:
 fmt:
 	go fmt $$(go list ./... | grep -v -E 'vendor')
 
+update-dependencies:
+	godep save -t ./...
+
 update-version:
 	awk \
 		-v line=$$(awk '/h.version/{print NR; exit}' core/hoverfly.go) \
