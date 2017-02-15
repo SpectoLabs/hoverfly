@@ -1,14 +1,21 @@
 Applying different delays based on host
 =======================================
 
-To apply a delay of 1 second on responses from ``time.jsontest.com`` and a delay of 2 seconds on responses from ``date.jsontest.com``, save the following inside ``delays.json``.
+Now let's apply a delay of 1 second on responses from ``time.jsontest.com`` and a delay of 2 seconds on responses from ``date.jsontest.com``.
 
-.. literalinclude:: delays.json
+Run the following to create and export a simulation.
+
+.. literalinclude:: delays-capture.sh
+   :language: sh
+
+Edit the ``simulation.json`` file so that the ``"globalActions"`` property looks like this:
+
+.. literalinclude:: global-actions-with-delay-hosts.json
    :language: javascript
 
-Now run the following:
+Now run the following to import the edited ``simulation.json`` file and run the simulation:
 
-.. literalinclude:: delays.sh
+.. literalinclude:: delays-simulate.sh
    :language: sh
 
 You should notice a 1 second delay on responses from ``time.jsontest.com``, and a 2 second delay on responses from ``date.jsontest.com``.
@@ -16,4 +23,4 @@ You should notice a 1 second delay on responses from ``time.jsontest.com``, and 
 
 .. note::
 
-  You can easily get into a situation where your request URL has multiple matches within your ``delays.json`` file. In this case, the first successful match wins.
+  You can easily get into a situation where your request URL has multiple matches. In this case, the first successful match wins.

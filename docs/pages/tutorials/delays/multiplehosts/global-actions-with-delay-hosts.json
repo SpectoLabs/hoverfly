@@ -1,0 +1,12 @@
+		"globalActions": {
+			"delays": [
+				{
+				"urlPattern": "time\\.jsontest\\.com",
+				"delay": 1000
+				},
+				{
+				"urlPattern": "date\\.jsontest\\.com",
+				"delay": 2000
+				}
+			]
+		}

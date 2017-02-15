@@ -1,0 +1,8 @@
+		"globalActions": {
+			"delays": [
+				{
+					"urlPattern": ".",
+					"delay": 2000
+				}
+			]
+		}

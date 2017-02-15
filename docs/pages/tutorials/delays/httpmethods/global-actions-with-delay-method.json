@@ -1,0 +1,9 @@
+		"globalActions": {
+			"delays": [
+				{
+				"urlPattern": "echo\\.jsontest\\.com\\/b\\/c",
+				"delay": 2000,
+				"httpMethod": "GET"
+				}
+			]
+		}
