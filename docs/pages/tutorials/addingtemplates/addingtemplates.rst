@@ -17,7 +17,7 @@ Let's begin by capturing some traffic and exporting a simulation.
 Which gives us this output:
 
  .. literalinclude:: templates.output
-    :language: bash
+    :language: none
 
 If you take a look at your ``simulation.json`` you should notice these lines in your request.
 
