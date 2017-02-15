@@ -19,7 +19,7 @@ Once you have extracted both Hoverfly and hoverctl into a directory on your PATH
 .. code:: bash
 
     hoverctl version
-    hoverfly version
+    hoverfly -version
 
 Both of these commands should return a version number. Now you can run an instance of Hoverfly:
 
