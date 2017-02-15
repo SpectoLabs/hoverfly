@@ -12,57 +12,33 @@ This page contains the output of:
 The command's help content has been placed here for convenience.
 
 ::
+    hoverctl is the command line tool for Hoverfly
 
-    usage: hoverctl [<flags>] <command> [<args> ...]
+    Usage:
+      hoverctl [command]
+
+    Available Commands:
+      config      Show hoverctl configuration information
+      delete      Delete Hoverfly simulation
+      destination Get and set Hoverfly destination
+      export      Export a simulation from Hoverfly
+      import      Import a simulation into Hoverfly
+      logs        Get the logs from Hoverfly
+      middleware  Get and set Hoverfly middleware
+      mode        Get and set the Hoverfly mode
+      start       Start Hoverfly
+      stop        Stop Hoverfly
+      version     Get the version of hoverctl
 
     Flags:
-          --help                     Show context-sensitive help (also try
-                                     --help-long and --help-man).
-      -v, --verbose                  Verbose mode.
-          --host=HOST                Set the host of Hoverfly
-          --admin-port=ADMIN-PORT    Set the admin port of Hoverfly
-          --proxy-port=PROXY-PORT    Set the proxy port of Hoverfly
-          --certificate=CERTIFICATE  Supply path for custom certificate
-          --key=KEY                  Supply path for custom key
-          --disable-tls              Disable TLS verification
-          --version                  Show application version.
+          --admin-port string       A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)
+          --certificate string      A path to a certificate file. Overrides the default Hoverfly certificate
+          --database string         A database type [memory|boltdb]. Overrides the default Hoverfly database type (memory)
+          --disable-tls             Disables TLS verification
+          --host string             A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)
+          --key string              A path to a key file. Overrides the default Hoverfly TLS key
+          --proxy-port string       A port number for the Hoverfly proxy. Overrides the default Hoverfly proxy port (8500)
+          --upstream-proxy string   A host for which Hoverfly will proxy its requests to
+      -v, --verbose                 Verbose logging from hoverctl
 
-    Commands:
-      help [<command>...]
-        Show help.
-
-      mode [<name>]
-        Get Hoverfly's current mode
-
-      destination [<flags>] [<name>]
-        Get Hoverfly's current destination
-
-      middleware [<path>]
-        Get Hoverfly's middleware
-
-      start [<server type>]
-        Start a local instance of Hoverfly
-
-      stop
-        Stop a local instance of Hoverfly
-
-      export <name>
-        Exports data out of Hoverfly
-
-      import [<flags>] <name>
-        Imports data into Hoverfly
-
-      delete [<resource>]
-        Delete test data from Hoverfly
-
-      delays [<path>]
-        Get per-host response delay config currently loaded in Hoverfly
-
-      logs [<flags>]
-        Get the logs from Hoverfly
-
-      templates [<path>]
-        Get set of request templates currently loaded in Hoverfly
-
-      config
-        Get the config being used by hoverctl and Hoverfly
+    Use "hoverctl [command] --help" for more information about a command.
