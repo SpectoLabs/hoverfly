@@ -77,7 +77,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 
 	h.modeMap = modeMap
 
-	h.version = "v0.10.0"
+	h.version = "v0.10.1"
 
 	return h
 }
