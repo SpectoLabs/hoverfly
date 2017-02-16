@@ -8,8 +8,11 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/authentication"
+	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/elazarl/goproxy"
+	"github.com/elazarl/goproxy/ext/auth"
 )
 
 // Creates goproxy.ProxyHttpServer and configures it to be used as a proxy for Hoverfly
@@ -17,6 +20,19 @@ import (
 func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
+
+	if hoverfly.Cfg.AuthEnabled {
+		auth.ProxyBasic(proxy, "hoverfly", func(user, password string) bool {
+
+			proxyUser := &backends.User{
+				Username: user,
+				Password: password,
+			}
+
+			responseStatus, _ := authentication.Login(proxyUser, hoverfly.Authentication, nil, 0)
+			return responseStatus == http.StatusOK
+		})
+	}
 
 	proxy.OnRequest(goproxy.UrlMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).
 		HandleConnect(goproxy.AlwaysMitm)
