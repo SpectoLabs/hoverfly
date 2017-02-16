@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"sync"
 	"net/url"
+	"sync"
 
 	log "github.com/Sirupsen/logrus"
 	authBackend "github.com/SpectoLabs/hoverfly/core/authentication/backends"
@@ -17,7 +17,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
-	"github.com/rusenask/goproxy"
+	"github.com/elazarl/goproxy"
 )
 
 // orPanic - wrapper for logging errors
@@ -98,7 +98,7 @@ func GetDefaultHoverflyHTTPClient(tlsVerification bool, upstreamProxy string) *h
 	return &http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error {
 		return http.ErrUseLastResponse
 	}, Transport: &http.Transport{
-		Proxy: proxyURL,
+		Proxy:           proxyURL,
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: tlsVerification},
 	}}
 }
