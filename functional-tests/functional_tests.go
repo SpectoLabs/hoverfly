@@ -1,6 +1,7 @@
 package functional_tests
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -25,7 +26,6 @@ func DoRequest(r *sling.Sling) *http.Response {
 	req, err := r.Request()
 	Expect(err).To(BeNil())
 	response, err := http.DefaultClient.Do(req)
-
 	Expect(err).To(BeNil())
 	return response
 }
@@ -101,7 +101,7 @@ func (this Hoverfly) Proxy(r *sling.Sling) *http.Response {
 	Expect(err).To(BeNil())
 
 	proxy, _ := url.Parse(this.proxyUrl)
-	proxyHttpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxy)}, CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }}
+	proxyHttpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxy), TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}, CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }}
 	response, err := proxyHttpClient.Do(req)
 
 	Expect(err).To(BeNil())
