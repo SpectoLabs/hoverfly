@@ -22,7 +22,11 @@ var _ = Describe("When I run two Hoverfly", func() {
 	BeforeEach(func() {
 		hoverflyPassThrough = functional_tests.NewHoverfly()
 		hoverflyUpstream = functional_tests.NewHoverfly()
+	})
 
+	AfterEach(func() {
+		hoverflyPassThrough.Stop()
+		hoverflyUpstream.Stop()
 	})
 
 	Context("and configure the upstream proxy", func() {
