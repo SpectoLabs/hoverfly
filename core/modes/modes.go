@@ -11,7 +11,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/rusenask/goproxy"
+	"github.com/elazarl/goproxy"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond

@@ -9,7 +9,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/rusenask/goproxy"
+	"github.com/elazarl/goproxy"
 )
 
 // Creates goproxy.ProxyHttpServer and configures it to be used as a proxy for Hoverfly
