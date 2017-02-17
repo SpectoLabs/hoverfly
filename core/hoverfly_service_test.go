@@ -106,7 +106,7 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairTemplate(t *tes
 	server, unit := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	unit.RequestMatcher.TemplateStore = append(unit.RequestMatcher.TemplateStore, models.RequestTemplateResponsePair{
+	unit.Simulation.Templates = append(unit.Simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Destination: util.StringToPointer("test.com"),
 		},
