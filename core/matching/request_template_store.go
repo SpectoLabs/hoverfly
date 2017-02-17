@@ -12,9 +12,9 @@ import (
 
 type RequestTemplateStore []models.RequestTemplateResponsePair
 
-func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserver bool) (*models.ResponseDetails, error) {
+func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserver bool, simulation *models.Simulation) (*models.ResponseDetails, error) {
 	// iterate through the request templates, looking for template to match request
-	for _, entry := range *this {
+	for _, entry := range simulation.Templates {
 		// TODO: not matching by default on URL and body - need to enable this
 		// TODO: need to enable regex matches
 		// TODO: enable matching on scheme

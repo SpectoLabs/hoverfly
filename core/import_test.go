@@ -332,78 +332,11 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 	Expect(len(hv.RequestMatcher.TemplateStore)).To(Equal(1))
 	Expect(len(hv.Simulation.Templates)).To(Equal(1))
 
-	request := models.NewRequestDetailsFromRequest(requestTemplate)
-	responseFromCache, err := hv.RequestMatcher.TemplateStore.GetResponse(request, false)
-	Expect(err).To(BeNil())
+	Expect(hv.Simulation.Templates[0].RequestTemplate.Method).To(Equal(StringToPointer("GET")))
 
-	response := models.NewResponseDetailsFromResponse(responseView)
-
-	Expect(*responseFromCache).To(Equal(response))
-}
-
-func TestImportImportRequestResponsePairs_CanImportARequestResponsePair_AndRequestTemplateResponsePair(t *testing.T) {
-	RegisterTestingT(t)
-
-	cache := cache.NewInMemoryCache()
-	cfg := Configuration{Webserver: false}
-	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher, Simulation: &models.Simulation{}}
-
-	RegisterTestingT(t)
-
-	requestTemplate := v1.RequestDetailsView{
-		RequestType: StringToPointer("template"),
-		Method:      StringToPointer("GET"),
-	}
-
-	requestView := v1.RequestDetailsView{
-		Method:      StringToPointer("GET"),
-		Path:        StringToPointer("/"),
-		Destination: StringToPointer("test.com"),
-		Scheme:      StringToPointer("http"),
-	}
-
-	responseView := v1.ResponseDetailsView{
-		Status:      200,
-		Body:        "hello_world",
-		EncodedBody: false,
-		Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
-	}
-
-	templatePair := v1.RequestResponsePairView{
-		Request:  requestTemplate,
-		Response: responseView,
-	}
-
-	ordinaryPair := v1.RequestResponsePairView{
-		Request:  requestView,
-		Response: responseView,
-	}
-
-	hv.ImportRequestResponsePairViews([]interfaces.RequestResponsePair{templatePair, ordinaryPair})
-
-	cacheCount, err := hv.RequestCache.RecordsCount()
-	Expect(cacheCount).To(Equal(1))
-	Expect(err).To(BeNil())
-
-	Expect(len(hv.RequestMatcher.TemplateStore)).To(Equal(1))
-	Expect(len(hv.Simulation.Templates)).To(Equal(1))
-
-	request := models.NewRequestDetailsFromRequest(requestTemplate)
-	response := models.NewResponseDetailsFromResponse(responseView)
-
-	pairBytes, err := hv.RequestCache.Get([]byte("76cf08e38439f083de2658b0971df9bf"))
-	Expect(err).To(BeNil())
-
-	savedPair, err := models.NewRequestResponsePairFromBytes(pairBytes)
-	Expect(err).To(BeNil())
-
-	Expect(savedPair.Response).To(Equal(response))
-
-	responseFromCache, err := hv.RequestMatcher.TemplateStore.GetResponse(request, false)
-	Expect(err).To(BeNil())
-	Expect(*responseFromCache).To(Equal(response))
-
+	Expect(hv.Simulation.Templates[0].Response.Status).To(Equal(200))
+	Expect(hv.Simulation.Templates[0].Response.Body).To(Equal("hello_world"))
+	Expect(hv.Simulation.Templates[0].Response.Headers).To(Equal(map[string][]string{"Hoverfly": []string{"testing"}}))
 }
 
 // Helper function for base64 encoding

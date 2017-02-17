@@ -11,14 +11,16 @@ import (
 func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := models.ResponseDetails{
-		Body: "test-body",
-	}
-	templateEntry := models.RequestTemplateResponsePair{
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{},
-		Response:        response,
-	}
-	store := RequestTemplateStore{templateEntry}
+		Response: models.ResponseDetails{
+			Body: "test-body",
+		},
+	})
+
+	store := RequestTemplateStore{}
 
 	r := models.RequestDetails{
 		Method:      "GET",
@@ -27,7 +29,7 @@ func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 			"sdv": []string{"ascd"},
 		},
 	}
-	result, _ := store.GetResponse(r, false)
+	result, _ := store.GetResponse(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 }
@@ -35,19 +37,23 @@ func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 func TestTemplateShouldMatchOnBody(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := models.ResponseDetails{
-		Body: "body",
-	}
-	templateEntry := models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{Body: &response.Body},
-		Response:        response,
-	}
-	store := RequestTemplateStore{templateEntry}
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
+			Body: StringToPointer("body"),
+		},
+		Response: models.ResponseDetails{
+			Body: "body",
+		},
+	})
+
+	store := RequestTemplateStore{}
 
 	r := models.RequestDetails{
 		Body: "body",
 	}
-	result, err := store.GetResponse(r, false)
+	result, err := store.GetResponse(r, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(result.Body).To(Equal("body"))
@@ -56,20 +62,23 @@ func TestTemplateShouldMatchOnBody(t *testing.T) {
 func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := models.ResponseDetails{
-		Body: "test-body",
-	}
 	headers := map[string][]string{
 		"header1": []string{"val1"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := models.RequestTemplateResponsePair{
+
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Headers: headers,
 		},
-		Response: response,
-	}
-	store := RequestTemplateStore{templateEntry}
+		Response: models.ResponseDetails{
+			Body: "test-body",
+		},
+	})
+
+	store := RequestTemplateStore{}
 
 	r := models.RequestDetails{
 		Method:      "GET",
@@ -80,7 +89,7 @@ func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		},
 	}
 
-	result, _ := store.GetResponse(r, false)
+	result, _ := store.GetResponse(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 }
@@ -88,20 +97,23 @@ func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 func TestReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := models.ResponseDetails{
-		Body: "test-body",
-	}
 	headers := map[string][]string{
 		"header1": []string{"val1"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := models.RequestTemplateResponsePair{
+
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Headers: headers,
 		},
-		Response: response,
-	}
-	store := RequestTemplateStore{templateEntry}
+		Response: models.ResponseDetails{
+			Body: "test-body",
+		},
+	})
+
+	store := RequestTemplateStore{}
 
 	r := models.RequestDetails{
 		Method:      "GET",
@@ -111,7 +123,7 @@ func TestReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 		},
 	}
 
-	result, _ := store.GetResponse(r, false)
+	result, _ := store.GetResponse(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -119,20 +131,23 @@ func TestReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 func TestReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := models.ResponseDetails{
-		Body: "test-body",
-	}
 	headers := map[string][]string{
 		"header1": []string{"val1"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := models.RequestTemplateResponsePair{
+
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Headers: headers,
 		},
-		Response: response,
-	}
-	store := RequestTemplateStore{templateEntry}
+		Response: models.ResponseDetails{
+			Body: "test-body",
+		},
+	})
+
+	store := RequestTemplateStore{}
 
 	r := models.RequestDetails{
 		Method:      "GET",
@@ -142,7 +157,7 @@ func TestReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 			"header2": []string{"different"},
 		},
 	}
-	result, _ := store.GetResponse(r, false)
+	result, _ := store.GetResponse(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -150,20 +165,23 @@ func TestReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 func TestReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := models.ResponseDetails{
-		Body: "test-body",
-	}
 	headers := map[string][]string{
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := models.RequestTemplateResponsePair{
+
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Headers: headers,
 		},
-		Response: response,
-	}
-	store := RequestTemplateStore{templateEntry}
+		Response: models.ResponseDetails{
+			Body: "test-body",
+		},
+	})
+
+	store := RequestTemplateStore{}
 
 	r := models.RequestDetails{
 		Method:      "GET",
@@ -174,7 +192,7 @@ func TestReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result, _ := store.GetResponse(r, false)
+	result, _ := store.GetResponse(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 }
@@ -182,21 +200,23 @@ func TestReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := models.ResponseDetails{
-		Body: "test-body",
-	}
 	headers := map[string][]string{
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := models.RequestTemplateResponsePair{
+
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Headers: headers,
 		},
-		Response: response,
-	}
+		Response: models.ResponseDetails{
+			Body: "test-body",
+		},
+	})
 
-	store := RequestTemplateStore{templateEntry}
+	store := RequestTemplateStore{}
 
 	r := models.RequestDetails{
 		Method:      "GET",
@@ -207,7 +227,7 @@ func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 		},
 	}
 
-	result, _ := store.GetResponse(r, false)
+	result, _ := store.GetResponse(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -215,18 +235,19 @@ func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 func TestEndpointMatchWithHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := models.ResponseDetails{
-		Body: "test-body",
-	}
 	headers := map[string][]string{
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
+
 	destination := "testhost.com"
 	method := "GET"
 	path := "/a/1"
 	query := "q=test"
-	templateEntry := models.RequestTemplateResponsePair{
+
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Headers:     headers,
 			Destination: &destination,
@@ -234,9 +255,12 @@ func TestEndpointMatchWithHeaders(t *testing.T) {
 			Method:      &method,
 			Query:       &query,
 		},
-		Response: response,
-	}
-	store := RequestTemplateStore{templateEntry}
+		Response: models.ResponseDetails{
+			Body: "test-body",
+		},
+	})
+
+	store := RequestTemplateStore{}
 
 	r := models.RequestDetails{
 		Method:      "GET",
@@ -248,7 +272,7 @@ func TestEndpointMatchWithHeaders(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result, _ := store.GetResponse(r, false)
+	result, _ := store.GetResponse(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 }
@@ -256,18 +280,19 @@ func TestEndpointMatchWithHeaders(t *testing.T) {
 func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := models.ResponseDetails{
-		Body: "test-body",
-	}
 	headers := map[string][]string{
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
+
 	destination := "testhost.com"
 	method := "GET"
 	path := "/a/1"
 	query := "q=test"
-	templateEntry := models.RequestTemplateResponsePair{
+
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Headers:     headers,
 			Destination: &destination,
@@ -275,9 +300,12 @@ func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 			Method:      &method,
 			Query:       &query,
 		},
-		Response: response,
-	}
-	store := RequestTemplateStore{templateEntry}
+		Response: models.ResponseDetails{
+			Body: "test-body",
+		},
+	})
+
+	store := RequestTemplateStore{}
 
 	r := models.RequestDetails{
 		Method:      "GET",
@@ -290,7 +318,7 @@ func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 		},
 	}
 
-	result, _ := store.GetResponse(r, false)
+	result, _ := store.GetResponse(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -305,7 +333,9 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 	method := "GET"
 	path := ""
 	query := "q=test"
-	templateEntry := models.RequestTemplateResponsePair{
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Destination: &destination,
 			Path:        &path,
@@ -313,15 +343,16 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 			Query:       &query,
 		},
 		Response: response,
-	}
-	store := RequestTemplateStore{templateEntry}
+	})
+
+	store := RequestTemplateStore{}
 
 	r := models.RequestDetails{
 		Method:      "GET",
 		Destination: "testhost.com",
 		Query:       "q=test",
 	}
-	result, _ := store.GetResponse(r, false)
+	result, _ := store.GetResponse(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 
@@ -332,7 +363,7 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 		Query:       "q=test",
 	}
 
-	result, _ = store.GetResponse(r, false)
+	result, _ = store.GetResponse(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -366,16 +397,18 @@ func TestRequestTemplateResponsePairCanBeConvertedToARequestResponsePairView_Whi
 func TestTemplatesCanUseGlobsOnDestinationAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Destination: StringToPointer("*.com"),
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
 		},
-	}
+	})
 
-	store := RequestTemplateStore{requestTemplateResponsePair}
+	store := RequestTemplateStore{}
 
 	request := models.RequestDetails{
 		Method:      "GET",
@@ -383,7 +416,7 @@ func TestTemplatesCanUseGlobsOnDestinationAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err := store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -392,16 +425,18 @@ func TestTemplatesCanUseGlobsOnDestinationAndBeMatched(t *testing.T) {
 func TestTemplatesCanUseGlobsOnPathAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Path: StringToPointer("/api/*"),
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
 		},
-	}
+	})
 
-	store := RequestTemplateStore{requestTemplateResponsePair}
+	store := RequestTemplateStore{}
 
 	request := models.RequestDetails{
 		Method:      "GET",
@@ -409,7 +444,7 @@ func TestTemplatesCanUseGlobsOnPathAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err := store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -418,16 +453,18 @@ func TestTemplatesCanUseGlobsOnPathAndBeMatched(t *testing.T) {
 func TestTemplatesCanUseGlobsOnMethodAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Method: StringToPointer("*T"),
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
 		},
-	}
+	})
 
-	store := RequestTemplateStore{requestTemplateResponsePair}
+	store := RequestTemplateStore{}
 
 	request := models.RequestDetails{
 		Method:      "GET",
@@ -435,7 +472,7 @@ func TestTemplatesCanUseGlobsOnMethodAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err := store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -444,16 +481,18 @@ func TestTemplatesCanUseGlobsOnMethodAndBeMatched(t *testing.T) {
 func TestTemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Scheme: StringToPointer("H*"),
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
 		},
-	}
+	})
 
-	store := RequestTemplateStore{requestTemplateResponsePair}
+	store := RequestTemplateStore{}
 
 	request := models.RequestDetails{
 		Method:      "GET",
@@ -462,7 +501,7 @@ func TestTemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err := store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -471,16 +510,18 @@ func TestTemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 func TestTemplatesCanUseGlobsOnQueryAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Query: StringToPointer("q=*"),
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
 		},
-	}
+	})
 
-	store := RequestTemplateStore{requestTemplateResponsePair}
+	store := RequestTemplateStore{}
 
 	request := models.RequestDetails{
 		Method:      "GET",
@@ -489,7 +530,7 @@ func TestTemplatesCanUseGlobsOnQueryAndBeMatched(t *testing.T) {
 		Query:       "q=anything-i-want",
 	}
 
-	response, err := store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -498,16 +539,18 @@ func TestTemplatesCanUseGlobsOnQueryAndBeMatched(t *testing.T) {
 func TestTemplatesCanUseGlobsOnBodyndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Body: StringToPointer(`{"json": "object", "key": *}`),
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
 		},
-	}
+	})
 
-	store := RequestTemplateStore{requestTemplateResponsePair}
+	store := RequestTemplateStore{}
 
 	request := models.RequestDetails{
 		Method:      "GET",
@@ -516,7 +559,7 @@ func TestTemplatesCanUseGlobsOnBodyndBeMatched(t *testing.T) {
 		Body:        `{"json": "object", "key": "value"}`,
 	}
 
-	response, err := store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -525,16 +568,18 @@ func TestTemplatesCanUseGlobsOnBodyndBeMatched(t *testing.T) {
 func TestTemplatesCanUseGlobsOnBodyAndNotMatchWhenTheBodyIsWrong(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Body: StringToPointer(`{"json": "object", "key": *}`),
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
 		},
-	}
+	})
 
-	store := RequestTemplateStore{requestTemplateResponsePair}
+	store := RequestTemplateStore{}
 
 	request := models.RequestDetails{
 		Method:      "GET",
@@ -543,14 +588,16 @@ func TestTemplatesCanUseGlobsOnBodyAndNotMatchWhenTheBodyIsWrong(t *testing.T) {
 		Body:        `[{"json": "objects", "key": "value"}]`,
 	}
 
-	_, err := store.GetResponse(request, false)
+	_, err := store.GetResponse(request, false, simulation)
 	Expect(err).ToNot(BeNil())
 }
 
 func TestTemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+	simulation := models.NewSimulation()
+
+	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Headers: map[string][]string{
 				"unique-header": []string{"*"},
@@ -559,9 +606,9 @@ func TestTemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 		Response: models.ResponseDetails{
 			Body: "template matched",
 		},
-	}
+	})
 
-	store := RequestTemplateStore{requestTemplateResponsePair}
+	store := RequestTemplateStore{}
 
 	request := models.RequestDetails{
 		Method:      "GET",
@@ -572,7 +619,7 @@ func TestTemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 		},
 	}
 
-	response, err := store.GetResponse(request, false)
+	response, err := store.GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))

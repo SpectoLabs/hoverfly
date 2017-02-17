@@ -53,10 +53,13 @@ type Hoverfly struct {
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
 func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication authBackend.Authentication) *Hoverfly {
+	simulation := models.NewSimulation()
+
 	requestMatcher := matching.RequestMatcher{
 		RequestCache:  requestCache,
 		TemplateStore: matching.RequestTemplateStore{},
 		Webserver:     &cfg.Webserver,
+		Simulation:    simulation,
 	}
 
 	h := &Hoverfly{
@@ -68,6 +71,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
 		ResponseDelays: &models.ResponseDelayList{},
 		RequestMatcher: requestMatcher,
+		Simulation:     simulation,
 	}
 
 	modeMap := make(map[string]modes.Mode)
@@ -78,8 +82,6 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 	modeMap[modes.Synthesize] = modes.SynthesizeMode{Hoverfly: h}
 
 	h.modeMap = modeMap
-
-	h.Simulation = models.NewSimulation()
 
 	h.version = "v0.10.1"
 

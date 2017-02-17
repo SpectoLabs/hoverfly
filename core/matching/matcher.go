@@ -1,16 +1,18 @@
 package matching
 
 import (
+	"net/http"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"net/http"
 )
 
 type RequestMatcher struct {
 	RequestCache  cache.Cache
 	TemplateStore RequestTemplateStore
 	Webserver     *bool
+	Simulation    *models.Simulation
 }
 
 // getResponse returns stored response from cache
@@ -36,7 +38,7 @@ func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.Res
 			"method":      req.Method,
 		}).Warn("Failed to retrieve response from cache")
 
-		response, err := this.TemplateStore.GetResponse(*req, *this.Webserver)
+		response, err := this.TemplateStore.GetResponse(*req, *this.Webserver, this.Simulation)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"key":         key,
