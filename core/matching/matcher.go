@@ -37,7 +37,7 @@ func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.Res
 			"method":      req.Method,
 		}).Warn("Failed to retrieve response from cache")
 
-		response, err := GetResponse(*req, *this.Webserver, this.Simulation)
+		response, err := Match(*req, *this.Webserver, this.Simulation)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"key":         key,
