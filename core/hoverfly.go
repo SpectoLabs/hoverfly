@@ -47,6 +47,8 @@ type Hoverfly struct {
 	version string
 
 	modeMap map[string]modes.Mode
+
+	Simulation *models.Simulation
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
@@ -76,6 +78,8 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 	modeMap[modes.Synthesize] = modes.SynthesizeMode{Hoverfly: h}
 
 	h.modeMap = modeMap
+
+	h.Simulation = models.NewSimulation()
 
 	h.version = "v0.10.1"
 
