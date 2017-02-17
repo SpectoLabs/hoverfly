@@ -38,6 +38,11 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
 		})
 
+		It("should return a 407 (no match in simulate mode) when trying to proxy with incorrect auth credentials", func() {
+			resp := hoverfly.ProxyWithAuth(sling.New().Get("http://hoverfly.io"), "incorrect", "incorrect")
+			Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+		})
+
 		It("should return a 502 (no match in simulate mode) when trying to proxy with auth credentials", func() {
 			resp := hoverfly.ProxyWithAuth(sling.New().Get("http://hoverfly.io"), username, password)
 			Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
