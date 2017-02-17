@@ -91,3 +91,11 @@ func handleIfError(err error) {
 		log.Fatal(err.Error())
 	}
 }
+
+func checkArgAndExit(args []string, message, command string) {
+	if len(args) == 0 {
+		fmt.Println(message)
+		fmt.Println("\nTry hoverctl " + command + " --help for more information")
+		os.Exit(1)
+	}
+}
