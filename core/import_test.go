@@ -329,7 +329,6 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 
 	hv.ImportRequestResponsePairViews([]interfaces.RequestResponsePair{templatePair})
 
-	Expect(len(hv.RequestMatcher.TemplateStore)).To(Equal(1))
 	Expect(len(hv.Simulation.Templates)).To(Equal(1))
 
 	Expect(hv.Simulation.Templates[0].RequestTemplate.Method).To(Equal(StringToPointer("GET")))

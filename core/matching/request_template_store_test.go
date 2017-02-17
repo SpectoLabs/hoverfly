@@ -20,8 +20,6 @@ func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	r := models.RequestDetails{
 		Method:      "GET",
 		Destination: "somehost.com",
@@ -29,7 +27,7 @@ func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 			"sdv": []string{"ascd"},
 		},
 	}
-	result, _ := store.GetResponse(r, false, simulation)
+	result, _ := GetResponse(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 }
@@ -48,12 +46,10 @@ func TestTemplateShouldMatchOnBody(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	r := models.RequestDetails{
 		Body: "body",
 	}
-	result, err := store.GetResponse(r, false, simulation)
+	result, err := GetResponse(r, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(result.Body).To(Equal("body"))
@@ -78,8 +74,6 @@ func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	r := models.RequestDetails{
 		Method:      "GET",
 		Destination: "http://somehost.com",
@@ -89,7 +83,7 @@ func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		},
 	}
 
-	result, _ := store.GetResponse(r, false, simulation)
+	result, _ := GetResponse(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 }
@@ -113,8 +107,6 @@ func TestReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	r := models.RequestDetails{
 		Method:      "GET",
 		Destination: "http://somehost.com",
@@ -123,7 +115,7 @@ func TestReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 		},
 	}
 
-	result, _ := store.GetResponse(r, false, simulation)
+	result, _ := GetResponse(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -147,8 +139,6 @@ func TestReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	r := models.RequestDetails{
 		Method:      "GET",
 		Destination: "somehost.com",
@@ -157,7 +147,7 @@ func TestReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 			"header2": []string{"different"},
 		},
 	}
-	result, _ := store.GetResponse(r, false, simulation)
+	result, _ := GetResponse(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -181,8 +171,6 @@ func TestReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	r := models.RequestDetails{
 		Method:      "GET",
 		Destination: "http://somehost.com",
@@ -192,7 +180,7 @@ func TestReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result, _ := store.GetResponse(r, false, simulation)
+	result, _ := GetResponse(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 }
@@ -216,8 +204,6 @@ func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	r := models.RequestDetails{
 		Method:      "GET",
 		Destination: "http://somehost.com",
@@ -227,7 +213,7 @@ func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 		},
 	}
 
-	result, _ := store.GetResponse(r, false, simulation)
+	result, _ := GetResponse(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -260,8 +246,6 @@ func TestEndpointMatchWithHeaders(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	r := models.RequestDetails{
 		Method:      "GET",
 		Destination: "testhost.com",
@@ -272,7 +256,7 @@ func TestEndpointMatchWithHeaders(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result, _ := store.GetResponse(r, false, simulation)
+	result, _ := GetResponse(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 }
@@ -305,8 +289,6 @@ func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	r := models.RequestDetails{
 		Method:      "GET",
 		Destination: "http://testhost.com",
@@ -318,7 +300,7 @@ func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 		},
 	}
 
-	result, _ := store.GetResponse(r, false, simulation)
+	result, _ := GetResponse(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -345,14 +327,12 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 		Response: response,
 	})
 
-	store := RequestTemplateStore{}
-
 	r := models.RequestDetails{
 		Method:      "GET",
 		Destination: "testhost.com",
 		Query:       "q=test",
 	}
-	result, _ := store.GetResponse(r, false, simulation)
+	result, _ := GetResponse(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 
@@ -363,7 +343,7 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 		Query:       "q=test",
 	}
 
-	result, _ = store.GetResponse(r, false, simulation)
+	result, _ = GetResponse(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -408,15 +388,13 @@ func TestTemplatesCanUseGlobsOnDestinationAndBeMatched(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	request := models.RequestDetails{
 		Method:      "GET",
 		Destination: "testhost.com",
 		Path:        "/api/1",
 	}
 
-	response, err := store.GetResponse(request, false, simulation)
+	response, err := GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -436,15 +414,13 @@ func TestTemplatesCanUseGlobsOnPathAndBeMatched(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	request := models.RequestDetails{
 		Method:      "GET",
 		Destination: "testhost.com",
 		Path:        "/api/1",
 	}
 
-	response, err := store.GetResponse(request, false, simulation)
+	response, err := GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -464,15 +440,13 @@ func TestTemplatesCanUseGlobsOnMethodAndBeMatched(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	request := models.RequestDetails{
 		Method:      "GET",
 		Destination: "testhost.com",
 		Path:        "/api/1",
 	}
 
-	response, err := store.GetResponse(request, false, simulation)
+	response, err := GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -492,8 +466,6 @@ func TestTemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	request := models.RequestDetails{
 		Method:      "GET",
 		Destination: "testhost.com",
@@ -501,7 +473,7 @@ func TestTemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err := store.GetResponse(request, false, simulation)
+	response, err := GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -521,8 +493,6 @@ func TestTemplatesCanUseGlobsOnQueryAndBeMatched(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	request := models.RequestDetails{
 		Method:      "GET",
 		Destination: "testhost.com",
@@ -530,7 +500,7 @@ func TestTemplatesCanUseGlobsOnQueryAndBeMatched(t *testing.T) {
 		Query:       "q=anything-i-want",
 	}
 
-	response, err := store.GetResponse(request, false, simulation)
+	response, err := GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -550,8 +520,6 @@ func TestTemplatesCanUseGlobsOnBodyndBeMatched(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	request := models.RequestDetails{
 		Method:      "GET",
 		Destination: "testhost.com",
@@ -559,7 +527,7 @@ func TestTemplatesCanUseGlobsOnBodyndBeMatched(t *testing.T) {
 		Body:        `{"json": "object", "key": "value"}`,
 	}
 
-	response, err := store.GetResponse(request, false, simulation)
+	response, err := GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -579,8 +547,6 @@ func TestTemplatesCanUseGlobsOnBodyAndNotMatchWhenTheBodyIsWrong(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	request := models.RequestDetails{
 		Method:      "GET",
 		Destination: "testhost.com",
@@ -588,7 +554,7 @@ func TestTemplatesCanUseGlobsOnBodyAndNotMatchWhenTheBodyIsWrong(t *testing.T) {
 		Body:        `[{"json": "objects", "key": "value"}]`,
 	}
 
-	_, err := store.GetResponse(request, false, simulation)
+	_, err := GetResponse(request, false, simulation)
 	Expect(err).ToNot(BeNil())
 }
 
@@ -608,8 +574,6 @@ func TestTemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 		},
 	})
 
-	store := RequestTemplateStore{}
-
 	request := models.RequestDetails{
 		Method:      "GET",
 		Destination: "testhost.com",
@@ -619,7 +583,7 @@ func TestTemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 		},
 	}
 
-	response, err := store.GetResponse(request, false, simulation)
+	response, err := GetResponse(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))

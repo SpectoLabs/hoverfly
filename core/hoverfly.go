@@ -56,10 +56,9 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 	simulation := models.NewSimulation()
 
 	requestMatcher := matching.RequestMatcher{
-		RequestCache:  requestCache,
-		TemplateStore: matching.RequestTemplateStore{},
-		Webserver:     &cfg.Webserver,
-		Simulation:    simulation,
+		RequestCache: requestCache,
+		Webserver:    &cfg.Webserver,
+		Simulation:   simulation,
 	}
 
 	h := &Hoverfly{
