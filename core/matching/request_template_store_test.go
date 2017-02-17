@@ -14,8 +14,8 @@ func TestEmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 	response := models.ResponseDetails{
 		Body: "test-body",
 	}
-	templateEntry := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{},
+	templateEntry := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{},
 		Response:        response,
 	}
 	store := RequestTemplateStore{templateEntry}
@@ -38,8 +38,8 @@ func TestTemplateShouldMatchOnBody(t *testing.T) {
 	response := models.ResponseDetails{
 		Body: "body",
 	}
-	templateEntry := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{Body: &response.Body},
+	templateEntry := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{Body: &response.Body},
 		Response:        response,
 	}
 	store := RequestTemplateStore{templateEntry}
@@ -63,8 +63,8 @@ func TestReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		"header1": []string{"val1"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	templateEntry := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Headers: headers,
 		},
 		Response: response,
@@ -95,8 +95,8 @@ func TestReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 		"header1": []string{"val1"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	templateEntry := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Headers: headers,
 		},
 		Response: response,
@@ -126,8 +126,8 @@ func TestReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 		"header1": []string{"val1"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	templateEntry := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Headers: headers,
 		},
 		Response: response,
@@ -157,8 +157,8 @@ func TestReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	templateEntry := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Headers: headers,
 		},
 		Response: response,
@@ -189,8 +189,8 @@ func TestReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 		"header1": []string{"val1-a", "val1-b"},
 		"header2": []string{"val2"},
 	}
-	templateEntry := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	templateEntry := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Headers: headers,
 		},
 		Response: response,
@@ -226,8 +226,8 @@ func TestEndpointMatchWithHeaders(t *testing.T) {
 	method := "GET"
 	path := "/a/1"
 	query := "q=test"
-	templateEntry := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	templateEntry := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Headers:     headers,
 			Destination: &destination,
 			Path:        &path,
@@ -267,8 +267,8 @@ func TestEndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 	method := "GET"
 	path := "/a/1"
 	query := "q=test"
-	templateEntry := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	templateEntry := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Headers:     headers,
 			Destination: &destination,
 			Path:        &path,
@@ -305,8 +305,8 @@ func TestAbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 	method := "GET"
 	path := ""
 	query := "q=test"
-	templateEntry := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	templateEntry := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Destination: &destination,
 			Path:        &path,
 			Method:      &method,
@@ -342,8 +342,8 @@ func TestRequestTemplateResponsePairCanBeConvertedToARequestResponsePairView_Whi
 
 	method := "POST"
 
-	requestTemplateResponsePair := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Method: &method,
 		},
 		Response: models.ResponseDetails{
@@ -366,8 +366,8 @@ func TestRequestTemplateResponsePairCanBeConvertedToARequestResponsePairView_Whi
 func TestTemplatesCanUseGlobsOnDestinationAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Destination: StringToPointer("*.com"),
 		},
 		Response: models.ResponseDetails{
@@ -392,8 +392,8 @@ func TestTemplatesCanUseGlobsOnDestinationAndBeMatched(t *testing.T) {
 func TestTemplatesCanUseGlobsOnPathAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Path: StringToPointer("/api/*"),
 		},
 		Response: models.ResponseDetails{
@@ -418,8 +418,8 @@ func TestTemplatesCanUseGlobsOnPathAndBeMatched(t *testing.T) {
 func TestTemplatesCanUseGlobsOnMethodAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Method: StringToPointer("*T"),
 		},
 		Response: models.ResponseDetails{
@@ -444,8 +444,8 @@ func TestTemplatesCanUseGlobsOnMethodAndBeMatched(t *testing.T) {
 func TestTemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Scheme: StringToPointer("H*"),
 		},
 		Response: models.ResponseDetails{
@@ -471,8 +471,8 @@ func TestTemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 func TestTemplatesCanUseGlobsOnQueryAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Query: StringToPointer("q=*"),
 		},
 		Response: models.ResponseDetails{
@@ -498,8 +498,8 @@ func TestTemplatesCanUseGlobsOnQueryAndBeMatched(t *testing.T) {
 func TestTemplatesCanUseGlobsOnBodyndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Body: StringToPointer(`{"json": "object", "key": *}`),
 		},
 		Response: models.ResponseDetails{
@@ -525,8 +525,8 @@ func TestTemplatesCanUseGlobsOnBodyndBeMatched(t *testing.T) {
 func TestTemplatesCanUseGlobsOnBodyAndNotMatchWhenTheBodyIsWrong(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Body: StringToPointer(`{"json": "object", "key": *}`),
 		},
 		Response: models.ResponseDetails{
@@ -550,8 +550,8 @@ func TestTemplatesCanUseGlobsOnBodyAndNotMatchWhenTheBodyIsWrong(t *testing.T) {
 func TestTemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestTemplateResponsePair := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Headers: map[string][]string{
 				"unique-header": []string{"*"},
 			},
@@ -583,8 +583,8 @@ func TestRequestTemplateResponsePair_ConvertToRequestResponsePairView_CanBeConve
 
 	method := "POST"
 
-	requestTemplateResponsePair := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	requestTemplateResponsePair := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Method: &method,
 		},
 		Response: models.ResponseDetails{

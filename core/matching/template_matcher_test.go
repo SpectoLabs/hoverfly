@@ -3,7 +3,6 @@ package matching
 import (
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 )
 
@@ -30,38 +29,6 @@ import (
 
 // 	Expect(result.Body).To(Equal("test-body"))
 // }
-
-func Test_headerMatch_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
-	RegisterTestingT(t)
-
-	response := models.ResponseDetails{
-		Body: "test-body",
-	}
-	headers := map[string][]string{
-		"header1": []string{"val1-a", "val1-b"},
-		"header2": []string{"val2"},
-	}
-	templateEntry := RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
-			Headers: headers,
-		},
-		Response: response,
-	}
-	store := RequestTemplateStore{templateEntry}
-
-	r := models.RequestDetails{
-		Method:      "GET",
-		Destination: "http://somehost.com",
-		Body:        "test-body",
-		Headers: map[string][]string{
-			"header1": []string{"val1-a", "val1-b"},
-			"header2": []string{"val2"},
-		},
-	}
-	result, _ := store.GetResponse(r, false)
-
-	Expect(result.Body).To(Equal("test-body"))
-}
 
 func Test_headerMatch(t *testing.T) {
 	RegisterTestingT(t)

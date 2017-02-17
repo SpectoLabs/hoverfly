@@ -1,11 +1,11 @@
 package models
 
 type Simulation struct {
-	Templates []RequestResponsePair
+	Templates []RequestTemplateResponsePair
 }
 
 func NewSimulation() *Simulation {
-	var templates []RequestResponsePair
+	var templates []RequestTemplateResponsePair
 
 	return &Simulation{
 		Templates: templates,
