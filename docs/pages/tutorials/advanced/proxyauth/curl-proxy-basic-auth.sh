@@ -1,0 +1,1 @@
+curl --proxy http://my_user:my_pass@localhost:8500 http://ip.jsontest.com
