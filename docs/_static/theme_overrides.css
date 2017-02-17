@@ -93,6 +93,97 @@ div.wy-menu.rst-pro {
     background-image: none !important;
 }
 
+@media screen and (max-width: 768px) {
+  display: block
+    }
+    img {
+        width: initial !important;
+        height: auto
+    }
+
+@media screen and (max-width: 768px) {
+    .tablet-hide {
+        display: none
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .mobile-hide {
+        display: none !important
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .wy-breadcrumbs-extra {
+        display: none !important
+    }
+    .wy-breadcrumbs li.wy-breadcrumbs-aside {
+        display: none !important
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .rst-content .sidebar {
+        width: 100% !important
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .wy-tray-container {
+        bottom: auto !important;
+        top: 0 !important;
+        width: 100% !important
+    }
+    .wy-tray-container li {
+        width: 100% !important
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .tablet-hide {
+        display: none !important
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .wy-body-for-nav {
+        background: #fcfcfc !important
+    }
+    .wy-nav-top {
+        display: block !important
+    }
+    .wy-nav-side {
+        left: -300px !important
+    }
+    .wy-nav-side.shift {
+        width: 85% !important;
+        left: 0 !important
+    }
+    .wy-side-scroll {
+        width: auto !important
+    }
+    .wy-side-nav-search {
+        width: auto !important
+    }
+    .wy-menu.wy-menu-vertical {
+        width: auto !important
+    }
+    .wy-nav-content-wrap {
+        margin-left: 0 !important
+    }
+    .wy-nav-content-wrap .wy-nav-content {
+        padding: 1.618em !important
+    }
+    .wy-nav-content-wrap.shift {
+        position: fixed !important;
+        min-width: 100% !important;
+        left: 85% !important;
+        top: 0 !important;
+        height: 100% !important;
+        overflow: hidden !important
+    }
+}
+
 /*
 @media screen and (max-width: 768px)
 .wy-nav-top {

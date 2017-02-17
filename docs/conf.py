@@ -31,6 +31,7 @@ language = None
 
 exclude_patterns = ['_build']
 
+
 pygments_style = 'sphinx'
 
 todo_include_todos = False
@@ -49,6 +50,7 @@ html_context = {
             '_static/theme_overrides.css',   
         ],
     }
+
 
 htmlhelp_basename = 'hoverflydoc'
 

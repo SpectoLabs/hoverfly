@@ -1,8 +1,9 @@
+![Hoverfly](core/static/img/hoverfly_logo.png)
+
 [![Circle CI][CircleCI-Image]][CircleCI-Url] 
 [![Documentation Status](https://readthedocs.org/projects/hoverfly/badge/?version=latest)](http://hoverfly.readthedocs.io/en/latest/?badge=latest)
 [![Join the chat at https://gitter.im/SpectoLabs/hoverfly](https://badges.gitter.im/SpectoLabs/hoverfly.svg)](https://gitter.im/SpectoLabs/hoverfly?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-![Hoverfly](core/static/img/hoverfly_logo.png)
 ## API simulations for development and testing
 
 Hoverfly is a lightweight, open source API simulation tool. Using Hoverfly, you can create realistic simulations of the APIs your application depends on.
