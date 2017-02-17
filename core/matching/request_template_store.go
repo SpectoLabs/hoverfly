@@ -2,9 +2,7 @@ package matching
 
 import (
 	"errors"
-	"fmt"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/ryanuber/go-glob"
@@ -47,26 +45,6 @@ func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserv
 		return &entry.Response, nil
 	}
 	return nil, errors.New("No match found")
-}
-
-// ImportPayloads - a function to save given payloads into the database.
-func (this *RequestTemplateStore) ImportPayloads(pairPayload v1.RequestTemplateResponsePairPayload) error {
-	if len(*pairPayload.Data) > 0 {
-		// Convert PayloadView back to Payload for internal storage
-		templateStore := ConvertPayloadToRequestTemplateStore(pairPayload)
-		for _, pl := range templateStore {
-
-			//TODO: add hooks for concsistency with request import
-			// note that importing hoverfly is a disallowed circular import
-
-			*this = append(*this, pl)
-		}
-		log.WithFields(log.Fields{
-			"total": len(*this),
-		}).Info("payloads imported")
-		return nil
-	}
-	return fmt.Errorf("Bad request. Nothing to import!")
 }
 
 func (this RequestTemplateStore) GetPayload() v1.RequestTemplateResponsePairPayload {
