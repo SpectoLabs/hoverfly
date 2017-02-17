@@ -19,6 +19,7 @@ must be provided.
 	`,
 
 	Run: func(cmd *cobra.Command, args []string) {
+		checkArgAndExit(args, "You have not provided a path to simulation", "import")
 		simulationData, err := wrapper.ReadFile(args[0])
 		handleIfError(err)
 
