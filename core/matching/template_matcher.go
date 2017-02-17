@@ -8,7 +8,9 @@ import (
 	glob "github.com/ryanuber/go-glob"
 )
 
-func Match(req models.RequestDetails, webserver bool, simulation *models.Simulation) (*models.ResponseDetails, error) {
+type TemplateMatcher struct{}
+
+func (t TemplateMatcher) Match(req models.RequestDetails, webserver bool, simulation *models.Simulation) (*models.ResponseDetails, error) {
 	// iterate through the request templates, looking for template to match request
 	for _, entry := range simulation.Templates {
 		// TODO: not matching by default on URL and body - need to enable this
