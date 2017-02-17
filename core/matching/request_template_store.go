@@ -69,11 +69,6 @@ func (this *RequestTemplateStore) ImportPayloads(pairPayload v1.RequestTemplateR
 	return fmt.Errorf("Bad request. Nothing to import!")
 }
 
-func (this *RequestTemplateStore) Wipe() {
-	// don't change the pointer here!
-	*this = RequestTemplateStore{}
-}
-
 func (this RequestTemplateStore) GetPayload() v1.RequestTemplateResponsePairPayload {
 	var pairsPayload []v1.RequestTemplateResponsePairView
 	for _, pair := range this {

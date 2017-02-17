@@ -137,10 +137,6 @@ func (this *Hoverfly) ImportTemplates(pairPayload v1.RequestTemplateResponsePair
 	return this.RequestMatcher.TemplateStore.ImportPayloads(pairPayload)
 }
 
-func (this *Hoverfly) DeleteTemplateCache() {
-	this.RequestMatcher.TemplateStore.Wipe()
-}
-
 func (hf *Hoverfly) GetResponseDelays() v1.ResponseDelayPayloadView {
 	return hf.ResponseDelays.ConvertToResponseDelayPayloadView()
 }
@@ -259,7 +255,8 @@ func (this *Hoverfly) PutSimulation(simulationView v2.SimulationView) error {
 }
 
 func (this *Hoverfly) DeleteSimulation() {
-	this.DeleteTemplateCache()
+	var templates []models.RequestTemplateResponsePair
+	this.Simulation.Templates = templates
 	this.DeleteResponseDelays()
 	this.DeleteRequestCache()
 }
