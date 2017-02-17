@@ -45,8 +45,8 @@ func init() {
 
 // Payload structure holds request and response structure
 type RequestResponsePair struct {
-	Response ResponseDetails `json:"response"`
-	Request  RequestDetails  `json:"request"`
+	Response ResponseDetails
+	Request  RequestDetails
 }
 
 func (this RequestResponsePair) Id() string {
@@ -97,13 +97,13 @@ func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.Reque
 
 // RequestDetails stores information about request, it's used for creating unique hash and also as a payload structure
 type RequestDetails struct {
-	Path        string              `json:"path"`
-	Method      string              `json:"method"`
-	Destination string              `json:"destination"`
-	Scheme      string              `json:"scheme"`
-	Query       string              `json:"query"`
-	Body        string              `json:"body"`
-	Headers     map[string][]string `json:"headers"`
+	Path        string
+	Method      string
+	Destination string
+	Scheme      string
+	Query       string
+	Body        string
+	Headers     map[string][]string
 }
 
 func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error) {
@@ -255,9 +255,9 @@ func (r *RequestDetails) getContentType() string {
 // to be bytes, however headers should provide all required information for later decoding
 // by the client.
 type ResponseDetails struct {
-	Status  int                 `json:"status"`
-	Body    string              `json:"body"`
-	Headers map[string][]string `json:"headers"`
+	Status  int
+	Body    string
+	Headers map[string][]string
 }
 
 func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
