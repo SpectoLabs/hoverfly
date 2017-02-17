@@ -8,6 +8,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+var (
+	unit = TemplateMatcher{}
+)
+
 func Test_Match_EmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -27,7 +31,7 @@ func Test_Match_EmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 			"sdv": []string{"ascd"},
 		},
 	}
-	result, _ := Match(r, false, simulation)
+	result, _ := unit.Match(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 }
@@ -49,7 +53,7 @@ func Test_Match_TemplateShouldMatchOnBody(t *testing.T) {
 	r := models.RequestDetails{
 		Body: "body",
 	}
-	result, err := Match(r, false, simulation)
+	result, err := unit.Match(r, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(result.Body).To(Equal("body"))
@@ -83,7 +87,7 @@ func Test_Match_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		},
 	}
 
-	result, _ := Match(r, false, simulation)
+	result, _ := unit.Match(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 }
@@ -115,7 +119,7 @@ func Test_Match_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 		},
 	}
 
-	result, _ := Match(r, false, simulation)
+	result, _ := unit.Match(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -147,7 +151,7 @@ func Test_Match_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 			"header2": []string{"different"},
 		},
 	}
-	result, _ := Match(r, false, simulation)
+	result, _ := unit.Match(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -180,7 +184,7 @@ func Test_Match_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result, _ := Match(r, false, simulation)
+	result, _ := unit.Match(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 }
@@ -213,7 +217,7 @@ func Test_Match_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 		},
 	}
 
-	result, _ := Match(r, false, simulation)
+	result, _ := unit.Match(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -256,7 +260,7 @@ func Test_Match_EndpointMatchWithHeaders(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result, _ := Match(r, false, simulation)
+	result, _ := unit.Match(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 }
@@ -300,7 +304,7 @@ func Test_Match_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 		},
 	}
 
-	result, _ := Match(r, false, simulation)
+	result, _ := unit.Match(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -332,7 +336,7 @@ func Test_Match_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 		Destination: "testhost.com",
 		Query:       "q=test",
 	}
-	result, _ := Match(r, false, simulation)
+	result, _ := unit.Match(r, false, simulation)
 
 	Expect(result.Body).To(Equal("test-body"))
 
@@ -343,7 +347,7 @@ func Test_Match_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 		Query:       "q=test",
 	}
 
-	result, _ = Match(r, false, simulation)
+	result, _ = unit.Match(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
@@ -394,7 +398,7 @@ func Test_Match_TemplatesCanUseGlobsOnDestinationAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err := Match(request, false, simulation)
+	response, err := unit.Match(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -420,7 +424,7 @@ func Test_Match_TemplatesCanUseGlobsOnPathAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err := Match(request, false, simulation)
+	response, err := unit.Match(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -446,7 +450,7 @@ func Test_Match_TemplatesCanUseGlobsOnMethodAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err := Match(request, false, simulation)
+	response, err := unit.Match(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -473,7 +477,7 @@ func Test_Match_TemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err := Match(request, false, simulation)
+	response, err := unit.Match(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -500,7 +504,7 @@ func Test_Match_TemplatesCanUseGlobsOnQueryAndBeMatched(t *testing.T) {
 		Query:       "q=anything-i-want",
 	}
 
-	response, err := Match(request, false, simulation)
+	response, err := unit.Match(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -527,7 +531,7 @@ func Test_Match_TemplatesCanUseGlobsOnBodyndBeMatched(t *testing.T) {
 		Body:        `{"json": "object", "key": "value"}`,
 	}
 
-	response, err := Match(request, false, simulation)
+	response, err := unit.Match(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
@@ -554,7 +558,7 @@ func Test_Match_TemplatesCanUseGlobsOnBodyAndNotMatchWhenTheBodyIsWrong(t *testi
 		Body:        `[{"json": "objects", "key": "value"}]`,
 	}
 
-	_, err := Match(request, false, simulation)
+	_, err := unit.Match(request, false, simulation)
 	Expect(err).ToNot(BeNil())
 }
 
@@ -583,7 +587,7 @@ func Test_Match_TemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 		},
 	}
 
-	response, err := Match(request, false, simulation)
+	response, err := unit.Match(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
