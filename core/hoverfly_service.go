@@ -129,10 +129,6 @@ func (hf Hoverfly) DeleteRequestCache() error {
 	return hf.RequestCache.DeleteData()
 }
 
-func (this Hoverfly) GetTemplates() v1.RequestTemplateResponsePairPayload {
-	return this.RequestMatcher.TemplateStore.GetPayload()
-}
-
 func (hf *Hoverfly) GetResponseDelays() v1.ResponseDelayPayloadView {
 	return hf.ResponseDelays.ConvertToResponseDelayPayloadView()
 }
