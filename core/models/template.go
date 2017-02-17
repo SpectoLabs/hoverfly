@@ -7,8 +7,8 @@ import (
 )
 
 type RequestTemplateResponsePair struct {
-	RequestTemplate RequestTemplate `json:"requestTemplate"`
-	Response        ResponseDetails `json:"response"`
+	RequestTemplate RequestTemplate
+	Response        ResponseDetails
 }
 
 func (this *RequestTemplateResponsePair) ConvertToRequestTemplateResponsePairView() v1.RequestTemplateResponsePairView {
@@ -62,11 +62,11 @@ func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v2.R
 }
 
 type RequestTemplate struct {
-	Path        *string             `json:"path"`
-	Method      *string             `json:"method"`
-	Destination *string             `json:"destination"`
-	Scheme      *string             `json:"scheme"`
-	Query       *string             `json:"query"`
-	Body        *string             `json:"body"`
-	Headers     map[string][]string `json:"headers"`
+	Path        *string
+	Method      *string
+	Destination *string
+	Scheme      *string
+	Query       *string
+	Body        *string
+	Headers     map[string][]string
 }
