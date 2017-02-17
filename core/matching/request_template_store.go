@@ -3,7 +3,6 @@ package matching
 import (
 	"errors"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/ryanuber/go-glob"
 )
@@ -43,19 +42,4 @@ func GetResponse(req models.RequestDetails, webserver bool, simulation *models.S
 		return &entry.Response, nil
 	}
 	return nil, errors.New("No match found")
-}
-
-func ConvertToRequestTemplateResponsePair(pairView v1.RequestTemplateResponsePairView) models.RequestTemplateResponsePair {
-	return models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
-			Path:        pairView.RequestTemplate.Path,
-			Method:      pairView.RequestTemplate.Method,
-			Destination: pairView.RequestTemplate.Destination,
-			Scheme:      pairView.RequestTemplate.Scheme,
-			Query:       pairView.RequestTemplate.Query,
-			Body:        pairView.RequestTemplate.Body,
-			Headers:     pairView.RequestTemplate.Headers,
-		},
-		Response: models.NewResponseDetailsFromResponse(pairView.Response),
-	}
 }
