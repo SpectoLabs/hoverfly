@@ -15,7 +15,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 )
@@ -162,7 +161,7 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.Reques
 			if pairView.GetRequest().GetRequestType() != nil && *pairView.GetRequest().GetRequestType() == *StringToPointer("template") {
 				responseDetails := models.NewResponseDetailsFromResponse(pairView.GetResponse())
 
-				requestTemplate := matching.RequestTemplate{
+				requestTemplate := models.RequestTemplate{
 					Path:        pairView.GetRequest().GetPath(),
 					Method:      pairView.GetRequest().GetMethod(),
 					Destination: pairView.GetRequest().GetDestination(),
@@ -172,12 +171,12 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.Reques
 					Headers:     pairView.GetRequest().GetHeaders(),
 				}
 
-				requestTemplateResponsePair := matching.RequestTemplateResponsePair{
+				requestTemplateResponsePair := models.RequestTemplateResponsePair{
 					RequestTemplate: requestTemplate,
 					Response:        responseDetails,
 				}
 
-				hf.Simulation.Templates = append(hf.Simulation.Templates, pair)
+				hf.Simulation.Templates = append(hf.Simulation.Templates, requestTemplateResponsePair)
 				hf.RequestMatcher.TemplateStore = append(hf.RequestMatcher.TemplateStore, requestTemplateResponsePair)
 				success++
 				continue

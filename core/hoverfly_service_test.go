@@ -6,7 +6,6 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/gorilla/mux"
@@ -107,8 +106,8 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairTemplate(t *tes
 	server, unit := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	unit.RequestMatcher.TemplateStore = append(unit.RequestMatcher.TemplateStore, matching.RequestTemplateResponsePair{
-		RequestTemplate: matching.RequestTemplate{
+	unit.RequestMatcher.TemplateStore = append(unit.RequestMatcher.TemplateStore, models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
 			Destination: util.StringToPointer("test.com"),
 		},
 		Response: models.ResponseDetails{
