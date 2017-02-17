@@ -47,16 +47,6 @@ func (this *RequestTemplateStore) GetResponse(req models.RequestDetails, webserv
 	return nil, errors.New("No match found")
 }
 
-func (this RequestTemplateStore) GetPayload() v1.RequestTemplateResponsePairPayload {
-	var pairsPayload []v1.RequestTemplateResponsePairView
-	for _, pair := range this {
-		pairsPayload = append(pairsPayload, pair.ConvertToRequestTemplateResponsePairView())
-	}
-	return v1.RequestTemplateResponsePairPayload{
-		Data: &pairsPayload,
-	}
-}
-
 func ConvertPayloadToRequestTemplateStore(payload v1.RequestTemplateResponsePairPayload) RequestTemplateStore {
 	var requestTemplateStore RequestTemplateStore
 	for _, pair := range *payload.Data {
