@@ -9,10 +9,9 @@ import (
 )
 
 type RequestMatcher struct {
-	RequestCache  cache.Cache
-	TemplateStore RequestTemplateStore
-	Webserver     *bool
-	Simulation    *models.Simulation
+	RequestCache cache.Cache
+	Webserver    *bool
+	Simulation   *models.Simulation
 }
 
 // getResponse returns stored response from cache
@@ -38,7 +37,7 @@ func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.Res
 			"method":      req.Method,
 		}).Warn("Failed to retrieve response from cache")
 
-		response, err := this.TemplateStore.GetResponse(*req, *this.Webserver, this.Simulation)
+		response, err := GetResponse(*req, *this.Webserver, this.Simulation)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"key":         key,

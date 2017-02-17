@@ -177,7 +177,6 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.Reques
 				}
 
 				hf.Simulation.Templates = append(hf.Simulation.Templates, requestTemplateResponsePair)
-				hf.RequestMatcher.TemplateStore = append(hf.RequestMatcher.TemplateStore, requestTemplateResponsePair)
 				success++
 				continue
 			}
