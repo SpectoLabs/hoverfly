@@ -110,7 +110,6 @@ func GetAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 	list = append(list, &v1.RecordsHandler{Hoverfly: hoverfly})
 	list = append(list, &v1.StateHandler{Hoverfly: hoverfly})
 	list = append(list, &v1.StatsHandler{Hoverfly: hoverfly})
-	list = append(list, &v1.TemplatesHandler{Hoverfly: hoverfly})
 	list = append(list, &v2.HoverflyHandler{Hoverfly: hoverfly})
 	list = append(list, &v2.HoverflyDestinationHandler{Hoverfly: hoverfly})
 	list = append(list, &v2.HoverflyModeHandler{Hoverfly: hoverfly})
