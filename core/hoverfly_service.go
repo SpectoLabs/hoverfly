@@ -218,7 +218,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
 		}
 	}
 
-	for _, v := range hf.RequestMatcher.TemplateStore {
+	for _, v := range hf.Simulation.Templates {
 		pairViews = append(pairViews, v.ConvertToRequestResponsePairView())
 	}
 
