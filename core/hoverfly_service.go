@@ -133,10 +133,6 @@ func (this Hoverfly) GetTemplates() v1.RequestTemplateResponsePairPayload {
 	return this.RequestMatcher.TemplateStore.GetPayload()
 }
 
-func (this *Hoverfly) ImportTemplates(pairPayload v1.RequestTemplateResponsePairPayload) error {
-	return this.RequestMatcher.TemplateStore.ImportPayloads(pairPayload)
-}
-
 func (hf *Hoverfly) GetResponseDelays() v1.ResponseDelayPayloadView {
 	return hf.ResponseDelays.ConvertToResponseDelayPayloadView()
 }
