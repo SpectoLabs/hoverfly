@@ -156,6 +156,9 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.Reques
 		failed := 0
 		for _, pairView := range pairViews {
 
+			// Convert PayloadView back to Payload for internal storage
+			pair := models.NewRequestResponsePairFromRequestResponsePairView(pairView)
+
 			if pairView.GetRequest().GetRequestType() != nil && *pairView.GetRequest().GetRequestType() == *StringToPointer("template") {
 				responseDetails := models.NewResponseDetailsFromResponse(pairView.GetResponse())
 
@@ -174,13 +177,11 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.Reques
 					Response:        responseDetails,
 				}
 
+				hf.Simulation.Templates = append(hf.Simulation.Templates, pair)
 				hf.RequestMatcher.TemplateStore = append(hf.RequestMatcher.TemplateStore, requestTemplateResponsePair)
 				success++
 				continue
 			}
-
-			// Convert PayloadView back to Payload for internal storage
-			pair := models.NewRequestResponsePairFromRequestResponsePairView(pairView)
 
 			if len(pair.Request.Headers) == 0 {
 				pair.Request.Headers = make(map[string][]string)

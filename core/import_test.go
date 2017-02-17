@@ -2,18 +2,19 @@ package hoverfly
 
 import (
 	"encoding/base64"
-	"github.com/SpectoLabs/hoverfly/core/cache"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/matching"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	. "github.com/SpectoLabs/hoverfly/core/util"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
+	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/models"
+	. "github.com/SpectoLabs/hoverfly/core/util"
+	. "github.com/onsi/gomega"
 )
 
 func TestIsURLHTTP(t *testing.T) {
@@ -305,7 +306,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher, Simulation: &models.Simulation{}}
 
 	RegisterTestingT(t)
 
@@ -329,6 +330,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 	hv.ImportRequestResponsePairViews([]interfaces.RequestResponsePair{templatePair})
 
 	Expect(len(hv.RequestMatcher.TemplateStore)).To(Equal(1))
+	Expect(len(hv.Simulation.Templates)).To(Equal(1))
 
 	request := models.NewRequestDetailsFromRequest(requestTemplate)
 	responseFromCache, err := hv.RequestMatcher.TemplateStore.GetResponse(request, false)
@@ -345,7 +347,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestResponsePair_AndReque
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher, Simulation: &models.Simulation{}}
 
 	RegisterTestingT(t)
 
@@ -385,6 +387,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestResponsePair_AndReque
 	Expect(err).To(BeNil())
 
 	Expect(len(hv.RequestMatcher.TemplateStore)).To(Equal(1))
+	Expect(len(hv.Simulation.Templates)).To(Equal(1))
 
 	request := models.NewRequestDetailsFromRequest(requestTemplate)
 	response := models.NewResponseDetailsFromResponse(responseView)
