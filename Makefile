@@ -55,4 +55,6 @@ update-version:
 	rm -rf docs/conf.py
 	mv docs/conf2.py docs/conf.py
 	git add docs/conf.py
+	target/hoverctl > docs/pages/reference/hoverctl/hoverctl.output
+	git add docs/pages/reference/hoverctl/hoverctl.output
 	git commit -m "Updated hoverfly version to ${VERSION}"

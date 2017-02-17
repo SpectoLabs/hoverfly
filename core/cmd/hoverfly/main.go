@@ -34,7 +34,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	hvc "github.com/SpectoLabs/hoverfly/core/certs"
 	"github.com/SpectoLabs/hoverfly/core/modes"
-	"github.com/rusenask/goproxy"
+	"github.com/elazarl/goproxy"
 )
 
 type arrayFlags []string
