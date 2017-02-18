@@ -34,7 +34,7 @@ exclude_patterns = ['_build']
 
 pygments_style = 'sphinx'
 
-todo_include_todos = False
+todo_include_todos = True
 
 if 'READTHEDOCS' not in os.environ:
     import sphinx_rtd_theme
