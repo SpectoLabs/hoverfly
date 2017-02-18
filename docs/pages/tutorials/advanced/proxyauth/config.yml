@@ -1,9 +1,9 @@
-hoverfly.host: localhost
-hoverfly.admin.port: "8888"
-hoverfly.proxy.port: "8500"
+hoverfly.host: hoverfly.example.com
+hoverfly.admin.port: "8880"
+hoverfly.proxy.port: "8555"
 hoverfly.db.type: boltdb
-hoverfly.username: "my_user"
-hoverfly.password: "my_pass"
+hoverfly.username: "my-user"
+hoverfly.password: "my-pass"
 hoverfly.webserver: false
 hoverfly.tls.certificate: ""
 hoverfly.tls.key: ""
