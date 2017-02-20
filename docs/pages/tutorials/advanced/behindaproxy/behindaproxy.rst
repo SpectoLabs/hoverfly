@@ -14,4 +14,8 @@ This configuration value can be easily set when starting an instance of Hoverfly
 
     hoverctl start --upstream-proxy http://localhost:8080
 
-Currently, Hoverfly will only work with unauthenticated proxies.
+.. note::
+
+   If the proxy you are using uses basic HTTP auth, it is possible to provide the authentication credentials as part of the upstream proxy configuration setting.
+   
+   Currently, basic HTTP auth is the only supported authentication method for an authenticated proxy.
