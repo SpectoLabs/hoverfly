@@ -89,7 +89,8 @@ func initConfig() {
 
 func handleIfError(err error) {
 	if err != nil {
-		log.Fatal(err.Error())
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 }
 
