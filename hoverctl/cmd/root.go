@@ -6,6 +6,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
 
@@ -98,4 +99,15 @@ func checkArgAndExit(args []string, message, command string) {
 		fmt.Println("\nTry hoverctl " + command + " --help for more information")
 		os.Exit(1)
 	}
+}
+
+func drawTable(data [][]string) {
+	table := tablewriter.NewWriter(os.Stdout)
+	// table.SetHeader([]string{"Name", "Sign", "Rating"})
+
+	for _, v := range data {
+		table.Append(v)
+	}
+	fmt.Print("\n")
+	table.Render()
 }
