@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	log "github.com/Sirupsen/logrus"
+	"fmt"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
@@ -32,32 +33,32 @@ configuration will be shown.
 		if middlewareBinary == "" && middlewareScript == "" && middlewareRemote == "" {
 			middleware, err = hoverfly.GetMiddleware()
 			handleIfError(err)
-			log.Info("Hoverfly middleware configuration is currently set to")
+			fmt.Println("Hoverfly middleware configuration is currently set to")
 		} else {
 			if middlewareRemote != "" {
 				middleware, err = hoverfly.SetMiddleware("", "", middlewareRemote)
 				handleIfError(err)
-				log.Info("Hoverfly middleware configuration has been set to")
+				fmt.Println("Hoverfly middleware configuration has been set to")
 			} else {
 				script, err := wrapper.ReadFile(middlewareScript)
 				handleIfError(err)
 
 				middleware, err = hoverfly.SetMiddleware(middlewareBinary, string(script), "")
 				handleIfError(err)
-				log.Info("Hoverfly middleware configuration has been set to")
+				fmt.Println("Hoverfly middleware configuration has been set to")
 			}
 		}
 
 		if middleware.Binary != "" {
-			log.Info("Binary: " + middleware.Binary)
+			fmt.Println("Binary: " + middleware.Binary)
 		}
 
 		if middleware.Script != "" {
-			log.Info("Script: " + middleware.Script)
+			fmt.Println("Script: " + middleware.Script)
 		}
 
 		if middleware.Remote != "" {
-			log.Info("Remote: " + middleware.Remote)
+			fmt.Println("Remote: " + middleware.Remote)
 		}
 	},
 }
