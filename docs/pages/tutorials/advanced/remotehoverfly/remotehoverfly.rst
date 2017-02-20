@@ -37,14 +37,5 @@ Now that hoverctl knows the location of the remote Hoverfly instance, run the fo
    The application that is making the request (in this case, cURL), **also** needs to be configured to 
    use the remote Hoverfly instance as a proxy. In this example, it is done using cURL's ``--proxy`` flag.  
 
-.. todo::
-   ``hoverctl start|stop`` starts or stops local processes, and doesn't interact with the 
-   Hoverfly API. This means that if you are using hoverctl to control a remote Hoverfly
-   instance, and you execute ``hoverctl stop``, hoverctl will return an error saying that 
-   there is no Hoverfly instance running. 
-
-   This is not ideal. Ideally, ``hoverctl start|stop`` should return a meaningful error
-   if ``hoverfly.host`` is set to a remote location in the ``config.yml`` file.   
-
 If you are running Hoverfly on a remote host, you may wish to enable authentication on the Hoverfly proxy and admin API.
 This is described in the :ref:`proxyauth` tutorial.                 
