@@ -23,8 +23,8 @@ var _ = Describe("When I use hoverctl", func() {
 			output := functional_tests.Run(hoverctlBinary, "config")
 
 			Expect(output).To(ContainSubstring("hoverfly.host: test"))
-			Expect(output).To(ContainSubstring(`hoverfly.admin.port: \"7654\"`))
-			Expect(output).To(ContainSubstring(`hoverfly.proxy.port: \"5432\"`))
+			Expect(output).To(ContainSubstring(`hoverfly.admin.port: "7654"`))
+			Expect(output).To(ContainSubstring(`hoverfly.proxy.port: "5432"`))
 			Expect(output).To(ContainSubstring("hoverfly.webserver: true"))
 			Expect(output).To(ContainSubstring("hoverfly.username: benjih"))
 			Expect(output).To(ContainSubstring("hoverfly.password: secretpassword"))
