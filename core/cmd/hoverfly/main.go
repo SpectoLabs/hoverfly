@@ -282,7 +282,7 @@ func main() {
 	hoverfly := hv.GetNewHoverfly(cfg, requestCache, metadataCache, authBackend)
 
 	// if add new user supplied - adding it to database
-	if *addNew {
+	if *addNew || *authEnabled {
 		err := hoverfly.Authentication.AddUser(*addUser, *addPassword, *isAdmin)
 		if err != nil {
 			log.WithFields(log.Fields{
