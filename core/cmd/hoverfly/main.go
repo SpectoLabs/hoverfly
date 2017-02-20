@@ -294,7 +294,7 @@ func main() {
 				"username": *addUser,
 			}).Info("user added successfuly")
 		}
-		return
+		cfg.AuthEnabled = true
 	}
 	if cfg.AuthEnabled {
 		if os.Getenv(hv.HoverflyAdminUsernameEV) != "" && os.Getenv(hv.HoverflyAdminPasswordEV) != "" {

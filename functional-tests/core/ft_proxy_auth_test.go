@@ -26,7 +26,6 @@ var _ = Describe("When I run Hoverfly", func() {
 
 		BeforeEach(func() {
 			hoverfly.Start("-db", "boltdb", "-add", "-username", username, "-password", password)
-			hoverfly.Start("-db", "boltdb", "-auth", "true")
 		})
 
 		AfterEach(func() {
