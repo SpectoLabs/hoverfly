@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +27,7 @@ Deletes simulation data from the Hoverfly instance.
 		err := hoverfly.DeleteSimulations()
 		handleIfError(err)
 
-		log.Info("Simulation data has been deleted from Hoverfly")
+		fmt.Println("Simulation data has been deleted from Hoverfly")
 	},
 }
 
@@ -45,9 +44,7 @@ func askForConfirmation() bool {
 		fmt.Printf("Are you sure you want to delete the current simulation? [y/n]: ")
 
 		response, err := reader.ReadString('\n')
-		if err != nil {
-			log.Fatal(err)
-		}
+		handleIfError(err)
 
 		response = strings.ToLower(strings.TrimSpace(response))
 
