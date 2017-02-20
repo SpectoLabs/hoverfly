@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	log "github.com/Sirupsen/logrus"
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -21,12 +22,12 @@ mode is shown.
 			mode, err := hoverfly.GetMode()
 			handleIfError(err)
 
-			log.Info("Hoverfly is currently set to ", mode, " mode")
+			fmt.Println("Hoverfly is currently set to", mode, "mode")
 		} else {
 			mode, err := hoverfly.SetMode(args[0])
 			handleIfError(err)
 
-			log.Info("Hoverfly has been set to ", mode, " mode")
+			fmt.Println("Hoverfly has been set to", mode, "mode")
 		}
 	},
 }
