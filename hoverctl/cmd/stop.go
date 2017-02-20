@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	log "github.com/Sirupsen/logrus"
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +21,7 @@ is stopped.
 		err := hoverfly.Stop(hoverflyDirectory)
 		handleIfError(err)
 
-		log.Info("Hoverfly has been stopped")
+		fmt.Println("Hoverfly has been stopped")
 	},
 }
 

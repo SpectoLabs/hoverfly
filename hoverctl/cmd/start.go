@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	log "github.com/Sirupsen/logrus"
+	"fmt"
+
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
@@ -27,17 +28,21 @@ port and proxy port.
 
 		err := hoverfly.Start(hoverflyDirectory)
 		handleIfError(err)
-		if config.HoverflyWebserver {
-			log.WithFields(log.Fields{
-				"admin-port":     config.HoverflyAdminPort,
-				"webserver-port": config.HoverflyProxyPort,
-			}).Info("Hoverfly is now running as a webserver")
-		} else {
-			log.WithFields(log.Fields{
-				"admin-port": config.HoverflyAdminPort,
-				"proxy-port": config.HoverflyProxyPort,
-			}).Info("Hoverfly is now running")
+
+		data := [][]string{
+			[]string{"admin-port", config.HoverflyAdminPort},
 		}
+
+		if config.HoverflyWebserver {
+			fmt.Println("Hoverfly is now running as a webserver")
+			data = append(data, []string{"webserver-port", config.HoverflyProxyPort})
+		} else {
+			fmt.Println("Hoverfly is now running")
+			data = append(data, []string{"proxy-port", config.HoverflyProxyPort})
+		}
+
+		drawTable(data)
+
 	},
 }
 

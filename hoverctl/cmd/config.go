@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
@@ -27,12 +27,12 @@ in the configuration file.
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Info(config.GetFilepath())
+		fmt.Println(config.GetFilepath())
 		configData, _ := wrapper.ReadFile(config.GetFilepath())
 		configLines := strings.Split(string(configData), "\n")
 		for _, line := range configLines {
 			if line != "" {
-				log.Info(line)
+				fmt.Println(line)
 			}
 		}
 	},

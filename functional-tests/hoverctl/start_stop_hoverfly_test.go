@@ -38,8 +38,8 @@ var _ = Describe("When I use hoverctl", func() {
 				output := functional_tests.Run(hoverctlBinary, "start", "-v")
 
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
-				Expect(output).To(ContainSubstring("admin-port=" + adminPortAsString))
-				Expect(output).To(ContainSubstring("proxy-port=" + proxyPortAsString))
+				Expect(output).To(ContainSubstring("admin-port | " + adminPortAsString))
+				Expect(output).To(ContainSubstring("proxy-port | " + proxyPortAsString))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
 
@@ -72,8 +72,8 @@ var _ = Describe("When I use hoverctl", func() {
 				output := functional_tests.Run(hoverctlBinary, "start", "--admin-port=11223")
 
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
-				Expect(output).To(ContainSubstring("admin-port=11223"))
-				Expect(output).To(ContainSubstring("proxy-port=" + proxyPortAsString))
+				Expect(output).To(ContainSubstring("admin-port | 11223"))
+				Expect(output).To(ContainSubstring("proxy-port | " + proxyPortAsString))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly.11223." + proxyPortAsString + ".pid")
 
@@ -103,8 +103,8 @@ var _ = Describe("When I use hoverctl", func() {
 				output := functional_tests.Run(hoverctlBinary, "start", "--proxy-port=22113")
 
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
-				Expect(output).To(ContainSubstring("admin-port=" + adminPortAsString))
-				Expect(output).To(ContainSubstring("proxy-port=22113"))
+				Expect(output).To(ContainSubstring("admin-port | " + adminPortAsString))
+				Expect(output).To(ContainSubstring("proxy-port | 22113"))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + ".22113.pid")
 
@@ -133,8 +133,8 @@ var _ = Describe("When I use hoverctl", func() {
 				output := functional_tests.Run(hoverctlBinary, "start", "--admin-port=11223", "--proxy-port=22113")
 
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
-				Expect(output).To(ContainSubstring("admin-port=11223"))
-				Expect(output).To(ContainSubstring("proxy-port=22113"))
+				Expect(output).To(ContainSubstring("admin-port | 11223"))
+				Expect(output).To(ContainSubstring("proxy-port | 22113"))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly.11223.22113.pid")
 
@@ -181,8 +181,8 @@ var _ = Describe("When I use hoverctl", func() {
 				output := functional_tests.Run(hoverctlBinary, "start", "webserver", "-v")
 
 				Expect(output).To(ContainSubstring("Hoverfly is now running as a webserver"))
-				Expect(output).To(ContainSubstring("admin-port=" + adminPortAsString))
-				Expect(output).To(ContainSubstring("webserver-port=" + proxyPortAsString))
+				Expect(output).To(ContainSubstring("admin-port     | " + adminPortAsString))
+				Expect(output).To(ContainSubstring("webserver-port | " + proxyPortAsString))
 
 				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
 

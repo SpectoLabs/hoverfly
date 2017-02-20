@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	log "github.com/Sirupsen/logrus"
+	"fmt"
+
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
@@ -26,7 +27,7 @@ must be provided.
 		err = hoverfly.ImportSimulation(string(simulationData), importV1)
 		handleIfError(err)
 
-		log.Info("Successfully imported simulation from ", args[0])
+		fmt.Println("Successfully imported simulation from", args[0])
 	},
 }
 

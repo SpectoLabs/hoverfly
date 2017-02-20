@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	log "github.com/Sirupsen/logrus"
+	"fmt"
+
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
@@ -22,7 +23,7 @@ will be written to the file path provided.
 		err = wrapper.WriteFile(args[0], simulationData)
 		handleIfError(err)
 
-		log.Info("Successfully exported simulation to ", args[0])
+		fmt.Println("Successfully exported simulation to", args[0])
 	},
 }
 
