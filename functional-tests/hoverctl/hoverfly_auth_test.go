@@ -20,7 +20,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 
 		BeforeEach(func() {
 			hoverfly = functional_tests.NewHoverfly()
-			hoverfly.Start("-db", "boltdb", "-add", "-username", username, "-password", password)
+			hoverfly.Start("-db", "boltdb", "-auth", "-username", username, "-password", password)
 
 			WriteConfigurationWithAuth("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort(), false, username, password)
 		})
@@ -118,7 +118,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 
 		BeforeEach(func() {
 			hoverfly = functional_tests.NewHoverfly()
-			hoverfly.Start("-db", "boltdb", "-add", "-username", username, "-password", password)
+			hoverfly.Start("-db", "boltdb", "-auth", "-username", username, "-password", password)
 
 			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
 		})
