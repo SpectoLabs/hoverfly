@@ -10,12 +10,21 @@ If this is the case, you will need to configure Hoverfly to work with the 'upstr
 
 This configuration value can be easily set when starting an instance of Hoverfly.
 
+For example, if the 'upstream' proxy is running on port ``8080`` on host ``corp.proxy``:  
+
 .. code:: bash
 
-    hoverctl start --upstream-proxy http://localhost:8080
+    hoverctl start --upstream-proxy http://corp.proxy:8080
 
-.. note::
+Proxy authentication
+--------------------
 
-   If the proxy you are using uses basic HTTP auth, it is possible to provide the authentication credentials as part of the upstream proxy configuration setting.
+If the proxy you are using uses HTTP basic authentication, you can provide the authentication credentials as part of the upstream proxy configuration setting.
+
+For example:
+
+.. code:: bash
+
+    hoverctl start --upstream-proxy http://my-user:my-pass@corp.proxy:8080
    
-   Currently, basic HTTP auth is the only supported authentication method for an authenticated proxy.
+Currently, HTTP basic authentication is the only supported authentication method for an authenticated proxy.
