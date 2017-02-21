@@ -40,6 +40,4 @@ remote Hoverfly:
    The ``hoverfly.username`` and ``hoverfly.password`` values in the ``config.yml`` file 
    allow hoverctl to authenticate against the admin API of a remote Hoverfly instance. 
    
-   The proxy authentication credentials must **also be provided to the application making the request**,
-   in this case, cURL.
-
+   When using authentication, the Hoverfly proxy port is also authenticated using basic HTTP authentication. This means that any application using Hoverfly must include the authentication credentials as part of the proxy URL. 
