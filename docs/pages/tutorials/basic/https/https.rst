@@ -26,5 +26,10 @@ Curl was able to make the HTTPS request using an HTTPS proxy because we provided
 
 .. note::
 
-  This example uses Curl. If you are using Hoverfly in another environment, you will need to add the certificate to your trust store.
+  This example uses cURL. If you are using Hoverfly in another environment, you will need to add the certificate to your trust store.
   This is done automatically by the Hoverfly Java library (see :ref:`hoverfly_java`).
+
+.. seealso::
+  
+   This example uses Hoverfly's default SSL certificate. Alternatively, you can use Hoverfly to generate
+   a new certificate. For more information, see :ref:`configuressl`. 
