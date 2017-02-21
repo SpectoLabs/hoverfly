@@ -13,16 +13,8 @@ Setting Hoverfly authentication credentials
 In this example, we assume that the steps in the :ref:`remotehoverfly` tutorial have been followed, 
 and that the Hoverfly binary is installed **but not running** on a remote host.
 
-On the **remote host**, run the following command to set the Hoverfly authentication credentials.
-
-.. literalinclude:: hoverfly-set-user-pass.sh
-   :language: sh 
-
-This command will start Hoverfly, set the credentials, and then terminate Hoverfly. A ``requests.db``
-file will be created in the working directory.
-
-Now run the following command to start Hoverfly with authentication enabled, and the default admin and 
-proxy ports overridden.
+On the **remote host**, run the following command to start Hoverfly with authentication credentials, 
+and the default admin and proxy ports overridden.
 
 .. literalinclude:: hoverfly-start-proxy-auth.sh
    :language: sh 
