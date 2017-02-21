@@ -6,17 +6,6 @@ Enabling authentication for the Hoverfly proxy and API
 If you are running Hoverfly on a remote host (see :ref:`remotehoverfly`), you may wish to 
 enable authentication on the Hoverfly proxy and API.
 
-In-memory vs BoltDB persistence
--------------------------------
-
-By default, Hoverfly persists data in memory. Simulation data can then be written to disk using 
-the ``hoverctl export`` command (see :ref:`simulations_io`).
-
-Optionally, Hoverfly can be configured to persist data on disk in a ``requests.db`` file (see
-:ref:`simulations` for more information). This is implemented using the `BoltDB <https://github.com/boltdb/bolt>`_
-database system.
-
-**Hoverfly must be configured to use BoltDB in order for authentication to work**.
 
 Setting Hoverfly authentication credentials
 -------------------------------------------
