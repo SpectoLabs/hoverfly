@@ -16,8 +16,8 @@ For example, if the 'upstream' proxy is running on port ``8080`` on host ``corp.
 
     hoverctl start --upstream-proxy http://corp.proxy:8080
 
-Proxy authentication
---------------------
+Upstream proxy authentication
+-----------------------------
 
 If the proxy you are using uses HTTP basic authentication, you can provide the authentication credentials as part of the upstream proxy configuration setting.
 
