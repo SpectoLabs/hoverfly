@@ -267,7 +267,6 @@ func main() {
 	} else if *database == inmemoryBackend {
 		log.Info("Creating in memory map backend...")
 		log.Warn("Turning off authentication...")
-		cfg.AuthEnabled = false
 
 		requestCache = cache.NewInMemoryCache()
 		metadataCache = cache.NewInMemoryCache()
