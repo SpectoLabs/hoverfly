@@ -16,8 +16,7 @@ Optionally, Hoverfly can be configured to persist data on disk in a ``requests.d
 :ref:`simulations` for more information). This is implemented using the `BoltDB <https://github.com/boltdb/bolt>`_
 database system.
 
-Since authentication credentials must be persisted, **Hoverfly must be configured to use BoltDB
-in order for authentication to work**.
+**Hoverfly must be configured to use BoltDB in order for authentication to work**.
 
 Setting Hoverfly authentication credentials
 -------------------------------------------
@@ -58,7 +57,7 @@ remote Hoverfly:
 
 .. note::
    The ``hoverfly.username`` and ``hoverfly.password`` values in the ``config.yml`` file 
-   allow hoverctl to authenticate against remote Hoverfly instance admin API. 
+   allow hoverctl to authenticate against the admin API of a remote Hoverfly instance. 
    
    The proxy authentication credentials must **also be provided to the application making the request**,
    in this case, cURL.
