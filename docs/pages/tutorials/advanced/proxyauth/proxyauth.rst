@@ -19,6 +19,12 @@ and the default admin and proxy ports overridden.
 .. literalinclude:: hoverfly-start-proxy-auth.sh
    :language: sh 
 
+.. warning::
+  
+   By default, Hoverfly starts with authentication disabled. If you require authentication
+   you must make sure the ``-auth``, ``-username`` and ``-password`` flags are supplied every
+   time Hoverfly is started. 
+
 Configuring hoverctl
 --------------------
 
@@ -40,4 +46,5 @@ remote Hoverfly:
    The ``hoverfly.username`` and ``hoverfly.password`` values in the ``config.yml`` file 
    allow hoverctl to authenticate against the admin API of a remote Hoverfly instance. 
    
-   When using authentication, the Hoverfly proxy port is also authenticated using basic HTTP authentication. This means that any application using Hoverfly must include the authentication credentials as part of the proxy URL. 
+   When using authentication, the Hoverfly proxy port is also authenticated using basic HTTP authentication. 
+   This means that any application using Hoverfly (in this example, cURL) must include the authentication credentials as part of the proxy URL. 
