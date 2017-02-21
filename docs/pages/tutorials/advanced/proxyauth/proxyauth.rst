@@ -6,17 +6,6 @@ Enabling authentication for the Hoverfly proxy and API
 If you are running Hoverfly on a remote host (see :ref:`remotehoverfly`), you may wish to 
 enable authentication on the Hoverfly proxy and API.
 
-In-memory vs BoltDB persistence
--------------------------------
-
-By default, Hoverfly persists data in memory. Simulation data can then be written to disk using 
-the ``hoverctl export`` command (see :ref:`simulations_io`).
-
-Optionally, Hoverfly can be configured to persist data on disk in a ``requests.db`` file (see
-:ref:`simulations` for more information). This is implemented using the `BoltDB <https://github.com/boltdb/bolt>`_
-database system.
-
-**Hoverfly must be configured to use BoltDB in order for authentication to work**.
 
 Setting Hoverfly authentication credentials
 -------------------------------------------
@@ -24,16 +13,8 @@ Setting Hoverfly authentication credentials
 In this example, we assume that the steps in the :ref:`remotehoverfly` tutorial have been followed, 
 and that the Hoverfly binary is installed **but not running** on a remote host.
 
-On the **remote host**, run the following command to set the Hoverfly authentication credentials.
-
-.. literalinclude:: hoverfly-set-user-pass.sh
-   :language: sh 
-
-This command will start Hoverfly, set the credentials, and then terminate Hoverfly. A ``requests.db``
-file will be created in the working directory.
-
-Now run the following command to start Hoverfly with authentication enabled, and the default admin and 
-proxy ports overridden.
+On the **remote host**, run the following command to start Hoverfly with authentication credentials, 
+and the default admin and proxy ports overridden.
 
 .. literalinclude:: hoverfly-start-proxy-auth.sh
    :language: sh 
@@ -59,6 +40,4 @@ remote Hoverfly:
    The ``hoverfly.username`` and ``hoverfly.password`` values in the ``config.yml`` file 
    allow hoverctl to authenticate against the admin API of a remote Hoverfly instance. 
    
-   The proxy authentication credentials must **also be provided to the application making the request**,
-   in this case, cURL.
-
+   When using authentication, the Hoverfly proxy port is also authenticated using basic HTTP authentication. This means that any application using Hoverfly must include the authentication credentials as part of the proxy URL. 
