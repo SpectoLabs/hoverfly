@@ -22,36 +22,6 @@ var _ = Describe("When I use hoverctl", func() {
 	)
 
 	var (
-		v1HoverflyData = `
-					{
-						"data": [{
-							"request": {
-								"requestType": "recording",
-								"path": "/api/bookings",
-								"method": "POST",
-								"destination": "www.my-test.com",
-								"scheme": "http",
-								"query": "",
-								"body": "{\"flightId\": \"1\"}",
-								"headers": {
-									"Content-Type": [
-										"application/json"
-									]
-								}
-							},
-							"response": {
-								"status": 201,
-								"body": "",
-								"encodedBody": false,
-								"headers": {
-									"Location": [
-										"http://localhost/api/bookings/1"
-									]
-								}
-							}
-						}]
-					}`
-
 		v2HoverflyData = `
 			{
 				"data": {
@@ -161,21 +131,6 @@ var _ = Describe("When I use hoverctl", func() {
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				Expect(string(bytes)).To(ContainSubstring(v2HoverflySimulation))
 				Expect(string(bytes)).To(MatchRegexp(v2HoverflyMeta))
-			})
-
-			It("can import v1 simulations", func() {
-
-				fileName := generateFileName()
-				err := ioutil.WriteFile(fileName, []byte(v1HoverflyData), 0644)
-				Expect(err).To(BeNil())
-
-				output := functional_tests.Run(hoverctlBinary, "import", "--v1", fileName, "--admin-port="+hoverfly.GetAdminPort())
-
-				Expect(output).To(ContainSubstring("Successfully imported simulation from " + fileName))
-
-				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/records", hoverfly.GetAdminPort())))
-				bytes, _ := ioutil.ReadAll(resp.Body)
-				Expect(string(bytes)).To(MatchJSON(v1HoverflyData))
 			})
 
 			It("cannot import incorrect json / missing meta", func() {
