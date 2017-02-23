@@ -1,7 +1,6 @@
 package hoverfly_test
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -45,12 +44,9 @@ var _ = Describe("Running Hoverfly", func() {
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get("date")).To(Equal("date"))
 
-			recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).To(MatchJSON(fmt.Sprintf(
-				`{
-					  "data": null
-					}`)))
+			Expect(recordsJson).ToNot(ContainSubstring(`"destination":"127.0.0.1`))
 		})
 
 		It("Should capture if destination is 127.0.0.1", func() {
@@ -61,11 +57,9 @@ var _ = Describe("Running Hoverfly", func() {
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get("date")).To(Equal("date"))
 
-			recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).ToNot(MatchJSON(fmt.Sprintf(`{
-				"data": null
-			}`)))
+			Expect(recordsJson).To(ContainSubstring(`"destination":"127.0.0.1`))
 		})
 
 		It("Should capture if destination is set to port numbers", func() {
@@ -76,11 +70,9 @@ var _ = Describe("Running Hoverfly", func() {
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get("date")).To(Equal("date"))
 
-			recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).ToNot(MatchJSON(fmt.Sprintf(`{
-				"data": null
-			}`)))
+			Expect(recordsJson).To(ContainSubstring(`"destination":"127.0.0.1`))
 		})
 
 		It("Should capture if destination is set to the path", func() {
@@ -91,11 +83,9 @@ var _ = Describe("Running Hoverfly", func() {
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get("date")).To(Equal("date"))
 
-			recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).ToNot(MatchJSON(fmt.Sprintf(`{
-				"data": null
-			}`)))
+			Expect(recordsJson).To(ContainSubstring(`"path":"/path"`))
 		})
 
 		It("Should not capture if destination is set to the wrong path", func() {
@@ -106,11 +96,9 @@ var _ = Describe("Running Hoverfly", func() {
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get("date")).To(Equal("date"))
 
-			recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).To(MatchJSON(fmt.Sprintf(`{
-				"data": null
-			}`)))
+			Expect(recordsJson).ToNot(ContainSubstring(`"path":"/path"`))
 		})
 	})
 })

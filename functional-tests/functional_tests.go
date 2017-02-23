@@ -1,6 +1,7 @@
 package functional_tests
 
 import (
+	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -90,10 +91,16 @@ func (this Hoverfly) SetMiddleware(binary, script string) {
 }
 
 func (this Hoverfly) GetSimulation() io.Reader {
-	res := sling.New().Get(this.adminUrl + "/api/records")
+	res := sling.New().Get(this.adminUrl + "/api/v2/simulation")
 	req := DoRequest(res)
 	Expect(req.StatusCode).To(Equal(200))
 	return req.Body
+}
+
+func (this Hoverfly) ImportSimulation(simulation string) {
+	req := sling.New().Put(this.adminUrl + "/api/v2/simulation").Body(bytes.NewBufferString(simulation))
+	response := DoRequest(req)
+	Expect(response.StatusCode).To(Equal(http.StatusOK))
 }
 
 func (this Hoverfly) Proxy(r *sling.Sling) *http.Response {

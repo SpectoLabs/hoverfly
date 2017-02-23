@@ -1,8 +1,6 @@
 package hoverfly_test
 
 import (
-	"bytes"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -44,104 +42,10 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			It("Should modify the request but not the response", func() {
 				CallFakeServerThroughProxy(fakeServer)
 				expectedDestination := strings.Replace(fakeServerUrl.String(), "http://", "", 1)
-				recordsJson, err := ioutil.ReadAll(ExportHoverflyRecords())
+				recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 				Expect(err).To(BeNil())
-				Expect(recordsJson).To(MatchJSON(fmt.Sprintf(
-					`{
-					  "data": [
-					    {
-					      "response": {
-						"status": 200,
-						"body": "Hello world",
-						"encodedBody": false,
-						"headers": {
-						  "Content-Length": [
-						    "11"
-						  ],
-						  "Content-Type": [
-						    "text/plain"
-						  ],
-						  "Date": [
-						    "date"
-						  ],
-						  "Hoverfly": [
-						    "Was-Here"
-						  ]
-						}
-					      },
-					      "request": {
-					      	"requestType": "recording",
-						"path": "/",
-						"method": "GET",
-						"destination": "%v",
-						"scheme": "http",
-						"query": "",
-						"body": "CHANGED_REQUEST_BODY",
-						"headers": {
-						  "Accept-Encoding": [
-						    "gzip"
-						  ],
-						  "User-Agent": [
-						    "Go-http-client/1.1"
-						  ]
-						}
-					      }
-					    }
-					  ]
-					}`, expectedDestination)))
-			})
-		})
-	})
-
-	Context("When running in simulate mode", func() {
-
-		var (
-			jsonRequestResponsePair *bytes.Buffer
-		)
-
-		BeforeEach(func() {
-			jsonRequestResponsePair = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1", "value2"]}}}, {"request": {"path": "/path2", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
-		})
-
-		Context("without middleware", func() {
-
-			BeforeEach(func() {
-				hoverflyCmd = startHoverfly(adminPort, proxyPort)
-				SetHoverflyMode("simulate")
-				ImportHoverflyRecords(jsonRequestResponsePair)
-			})
-
-			AfterEach(func() {
-				stopHoverfly()
-			})
-
-			It("should return the cached response", func() {
-				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path1"))
-				Expect(resp.StatusCode).To(Equal(201))
-				body, err := ioutil.ReadAll(resp.Body)
-				Expect(err).To(BeNil())
-				Expect(string(body)).To(Equal("body1"))
-				Expect(resp.Header).To(HaveKeyWithValue("Header", []string{"value1", "value2"}))
-			})
-		})
-
-		Context("with middleware", func() {
-
-			BeforeEach(func() {
-				hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "python testdata/middleware.py")
-				SetHoverflyMode("simulate")
-				ImportHoverflyRecords(jsonRequestResponsePair)
-			})
-
-			It("should apply middleware to the cached response", func() {
-				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2"))
-				body, err := ioutil.ReadAll(resp.Body)
-				Expect(err).To(BeNil())
-				Expect(string(body)).To(Equal("CHANGED_RESPONSE_BODY"))
-			})
-
-			AfterEach(func() {
-				stopHoverfly()
+				Expect(recordsJson).To(ContainSubstring(`"destination":"` + expectedDestination + `",`))
+				Expect(recordsJson).To(ContainSubstring(`"body":"CHANGED_REQUEST_BODY",`))
 			})
 		})
 	})
