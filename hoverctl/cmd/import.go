@@ -24,7 +24,7 @@ must be provided.
 		simulationData, err := wrapper.ReadFile(args[0])
 		handleIfError(err)
 
-		err = hoverfly.ImportSimulation(string(simulationData), importV1)
+		err = hoverfly.ImportSimulation(string(simulationData))
 		handleIfError(err)
 
 		fmt.Println("Successfully imported simulation from", args[0])
@@ -33,5 +33,4 @@ must be provided.
 
 func init() {
 	RootCmd.AddCommand(importCmd)
-	importCmd.Flags().BoolVar(&importV1, "v1", false, "Tells Hoverfly that the simulation is formatted according to the old v1 simulation JSON schema used in Hoverfly pre v0.9.0")
 }
