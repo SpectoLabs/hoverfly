@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"fmt"
+	"os/exec"
 
+	"github.com/kardianos/osext"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +15,20 @@ Shows the hoverctl version.
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(version)
+
+		binaryLocation, err := osext.ExecutableFolder()
+		handleIfError(err)
+
+		hoverflyCmd := exec.Command(binaryLocation+"/hoverfly", "-version")
+
+		hoverflyVersion, _ := hoverflyCmd.CombinedOutput()
+
+		data := [][]string{
+			[]string{"hoverctl", version},
+			[]string{"hoverfly", string(hoverflyVersion)},
+		}
+
+		drawTable(data)
 	},
 }
 
