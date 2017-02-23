@@ -366,7 +366,7 @@ func Test_Match_RequestTemplateResponsePairCanBeConvertedToARequestResponsePairV
 		},
 	}
 
-	pairView := requestTemplateResponsePair.ConvertToV1RequestResponsePairView()
+	pairView := requestTemplateResponsePair.ConvertToRequestResponsePairView()
 
 	Expect(pairView.Request.RequestType).To(Equal(StringToPointer("template")))
 	Expect(pairView.Request.Method).To(Equal(StringToPointer("POST")))
