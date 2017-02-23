@@ -42,46 +42,6 @@ func TestGetAllRecords(t *testing.T) {
 	Expect(len(pair.Data)).To(Equal(0))
 }
 
-func TestGetAllRecordsWRecords(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-
-	// inserting some payloads
-	for i := 0; i < 5; i++ {
-		req := &models.RequestDetails{
-			Method:      "GET",
-			Scheme:      "http",
-			Destination: "example.com",
-			Query:       fmt.Sprintf("q=%d", i),
-		}
-
-		dbClient.Save(req, &models.ResponseDetails{})
-	}
-
-	// performing query
-	m := adminApi.getBoneRouter(dbClient)
-
-	req, err := http.NewRequest("GET", "/api/records", nil)
-	Expect(err).To(BeNil())
-
-	//The response recorder used to record HTTP responses
-	respRec := httptest.NewRecorder()
-
-	m.ServeHTTP(respRec, req)
-
-	Expect(respRec.Code).To(Equal(http.StatusOK))
-
-	body, err := ioutil.ReadAll(respRec.Body)
-
-	pair := v1.RequestResponsePairPayload{}
-	err = json.Unmarshal(body, &pair)
-
-	Expect(len(pair.Data)).To(Equal(5))
-}
-
 func TestGetRecordsCount(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -145,56 +105,6 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 	err = json.Unmarshal(body, &rc)
 
 	Expect(rc.Count).To(Equal(5))
-}
-
-func TestExportImportRecords(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
-
-	// inserting some payloads
-	for i := 0; i < 5; i++ {
-		req := &models.RequestDetails{
-			Method:      "GET",
-			Scheme:      "http",
-			Destination: "example.com",
-			Query:       fmt.Sprintf("q=%d", i),
-		}
-
-		dbClient.Save(req, &models.ResponseDetails{})
-	}
-
-	req, err := http.NewRequest("GET", "/api/records", nil)
-	Expect(err).To(BeNil())
-
-	//The response recorder used to record HTTP responses
-	respRec := httptest.NewRecorder()
-
-	m.ServeHTTP(respRec, req)
-
-	Expect(respRec.Code, http.StatusOK)
-
-	body, err := ioutil.ReadAll(respRec.Body)
-
-	// deleting records
-	err = dbClient.RequestCache.DeleteData()
-	Expect(err).To(BeNil())
-
-	// using body to import records again
-	importReq, err := http.NewRequest("POST", "/api/records", ioutil.NopCloser(bytes.NewBuffer(body)))
-	//The response recorder used to record HTTP responses
-	importRec := httptest.NewRecorder()
-
-	m.ServeHTTP(importRec, importReq)
-	Expect(respRec.Code, http.StatusOK)
-
-	// records should be there
-	pairBytes, err := dbClient.RequestCache.GetAllValues()
-	Expect(err).To(BeNil())
-	Expect(len(pairBytes)).To(Equal(5))
 }
 
 func TestDeleteHandler(t *testing.T) {
