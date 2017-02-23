@@ -11,13 +11,13 @@ import (
 	"sync"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/goproxy"
 	authBackend "github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
-	"github.com/elazarl/goproxy"
 )
 
 // orPanic - wrapper for logging errors

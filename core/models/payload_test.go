@@ -71,7 +71,7 @@ func TestResponseDetails_ConvertToV1ResponseDetailsView_WithGzipContentEncodedHe
 	Expect(v1RespView.Body).NotTo(Equal(body))
 	Expect(v1RespView.Body).NotTo(Equal(originalBody))
 
-	base64EncodedBody := "H4sIAAAJbogA/w=="
+	base64EncodedBody := "H4sIAAAAAAAA/w=="
 
 	Expect(v1RespView.Body).To(Equal(base64EncodedBody))
 }
@@ -96,7 +96,7 @@ func TestResponseDetails_ConvertToResponseDetailsView_WithGzipContentEncodedHead
 	Expect(respView.Body).NotTo(Equal(body))
 	Expect(respView.Body).NotTo(Equal(originalBody))
 
-	base64EncodedBody := "H4sIAAAJbogA/w=="
+	base64EncodedBody := "H4sIAAAAAAAA/w=="
 
 	Expect(respView.Body).To(Equal(base64EncodedBody))
 }
@@ -301,7 +301,7 @@ func TestRequestResponsePair_ConvertToV1RequestResponsePairView_WithGzippedRespo
 	Expect(*v1PairView).To(Equal(v1.RequestResponsePairView{
 		Response: v1.ResponseDetailsView{
 			Status:      200,
-			Body:        "H4sIAAAJbogA/w==",
+			Body:        "H4sIAAAAAAAA/w==",
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 			EncodedBody: true},
 		Request: v1.RequestDetailsView{
@@ -341,7 +341,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 	Expect(pairView).To(Equal(v2.RequestResponsePairView{
 		Response: v2.ResponseDetailsView{
 			Status:      200,
-			Body:        "H4sIAAAJbogA/w==",
+			Body:        "H4sIAAAAAAAA/w==",
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 			EncodedBody: true},
 		Request: v2.RequestDetailsView{

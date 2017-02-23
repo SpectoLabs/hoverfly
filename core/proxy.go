@@ -8,11 +8,11 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/goproxy"
+	"github.com/SpectoLabs/goproxy/ext/auth"
 	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/elazarl/goproxy"
-	"github.com/elazarl/goproxy/ext/auth"
 )
 
 // Creates goproxy.ProxyHttpServer and configures it to be used as a proxy for Hoverfly
