@@ -9,7 +9,6 @@ import (
 	"path"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/gorilla/mux"
@@ -207,7 +206,7 @@ func TestReflectBody(t *testing.T) {
 func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 
-	var newPairView v1.RequestResponsePairView
+	var newPairView v2.RequestResponsePairView
 
 	json.Unmarshal(body, &newPairView)
 

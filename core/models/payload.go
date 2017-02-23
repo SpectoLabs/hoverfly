@@ -13,7 +13,6 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -66,10 +65,6 @@ func (this *RequestResponsePair) Encode() ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
-}
-
-func (this *RequestResponsePair) ConvertToV1RequestResponsePairView() *v1.RequestResponsePairView {
-	return &v1.RequestResponsePairView{Response: this.Response.ConvertToV1ResponseDetailsView(), Request: this.Request.ConvertToV1RequestDetailsView()}
 }
 
 func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairView {
@@ -153,20 +148,6 @@ func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 		Query:       util.PointerToString(data.GetQuery()),
 		Body:        util.PointerToString(data.GetBody()),
 		Headers:     data.GetHeaders(),
-	}
-}
-
-func (this *RequestDetails) ConvertToV1RequestDetailsView() v1.RequestDetailsView {
-	s := "recording"
-	return v1.RequestDetailsView{
-		RequestType: &s,
-		Path:        &this.Path,
-		Method:      &this.Method,
-		Destination: &this.Destination,
-		Scheme:      &this.Scheme,
-		Query:       &this.Query,
-		Body:        &this.Body,
-		Headers:     this.Headers,
 	}
 }
 
@@ -269,36 +250,6 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 	}
 
 	return ResponseDetails{Status: data.GetStatus(), Body: body, Headers: data.GetHeaders()}
-}
-
-// This function will create a JSON appriopriate version of ResponseDetails for the v1 API
-// If the response headers indicate that the content is encoded, or it has a non-matching
-// supported mimetype, we base64 encode it.
-func (r *ResponseDetails) ConvertToV1ResponseDetailsView() v1.ResponseDetailsView {
-	needsEncoding := false
-
-	// Check headers for gzip
-	contentEncodingValues := r.Headers["Content-Encoding"]
-	if len(contentEncodingValues) > 0 {
-		needsEncoding = true
-	} else {
-		mimeType := http.DetectContentType([]byte(r.Body))
-		needsEncoding = true
-		for _, v := range supportedMimeTypes {
-			if strings.Contains(mimeType, v) {
-				needsEncoding = false
-				break
-			}
-		}
-	}
-
-	// If contains gzip, base64 encode
-	body := r.Body
-	if needsEncoding {
-		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
-	}
-
-	return v1.ResponseDetailsView{Status: r.Status, Body: body, Headers: r.Headers, EncodedBody: needsEncoding}
 }
 
 // This function will create a JSON appriopriate version of ResponseDetails for the v2 API

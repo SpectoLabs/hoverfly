@@ -64,7 +64,6 @@ type RequestResponsePairPayload struct {
 	Data []RequestResponsePairView `json:"data"`
 }
 
-// PayloadView is used when marshalling and unmarshalling payloads.
 type RequestResponsePairView struct {
 	Response ResponseDetailsView `json:"response"`
 	Request  RequestDetailsView  `json:"request"`
