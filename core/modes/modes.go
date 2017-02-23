@@ -9,9 +9,9 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/elazarl/goproxy"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond

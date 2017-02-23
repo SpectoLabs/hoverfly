@@ -29,12 +29,12 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/goproxy"
 	hv "github.com/SpectoLabs/hoverfly/core"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	hvc "github.com/SpectoLabs/hoverfly/core/certs"
 	"github.com/SpectoLabs/hoverfly/core/modes"
-	"github.com/elazarl/goproxy"
 )
 
 type arrayFlags []string
