@@ -9,7 +9,6 @@ import (
 
 	"net/http"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
@@ -305,7 +304,7 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithEncoding(t *tes
 func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestDetailsView := v1.RequestDetailsView{
+	requestDetailsView := v2.RequestDetailsView{
 		Path:        StringToPointer("/"),
 		Method:      StringToPointer("GET"),
 		Destination: StringToPointer("/"),
