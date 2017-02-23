@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo"
@@ -43,8 +44,7 @@ var _ = Describe("Running Hoverfly with middleware", func() {
 
 			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, server.URL+"/process")
 
-			jsonRequestResponsePair := bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "destination1", "scheme": "http", "query": "", "body": "", "headers": {}}, "response": {"status": 200, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}]}`)
-			ImportHoverflyRecords(jsonRequestResponsePair)
+			ImportHoverflySimulation(bytes.NewBufferString(functional_tests.JsonPayload))
 
 			SetHoverflyMode("simulate")
 		})
@@ -55,7 +55,7 @@ var _ = Describe("Running Hoverfly with middleware", func() {
 		})
 
 		It("the middleware should recieve the request made instead of the request stored in the cache", func() {
-			slingRequest := sling.New().Get("http://destination1/path1").Add("New-Header", "true")
+			slingRequest := sling.New().Get("http://test-server.com/path1").Add("New-Header", "true")
 
 			resp := DoRequestThroughProxy(slingRequest)
 

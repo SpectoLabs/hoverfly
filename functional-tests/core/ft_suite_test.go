@@ -118,23 +118,17 @@ func SetHoverflyDestination(destination string) {
 	Expect(res.StatusCode).To(Equal(200))
 }
 
-func EraseHoverflyRecords() {
-	req := sling.New().Delete(hoverflyAdminUrl + "/api/records")
+func EraseHoverflySimulation() {
+	req := sling.New().Delete(hoverflyAdminUrl + "/api/v2/simulation")
 	res := functional_tests.DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
 }
 
-func ExportHoverflyRecords() io.Reader {
-	res := sling.New().Get(hoverflyAdminUrl + "/api/records")
+func ExportHoverflySimulation() io.Reader {
+	res := sling.New().Get(hoverflyAdminUrl + "/api/v2/simulation")
 	req := functional_tests.DoRequest(res)
 	Expect(req.StatusCode).To(Equal(200))
 	return req.Body
-}
-
-func ImportHoverflyRecords(payload io.Reader) {
-	req := sling.New().Post(hoverflyAdminUrl + "/api/records").Body(payload)
-	res := functional_tests.DoRequest(req)
-	Expect(res.StatusCode).To(Equal(200))
 }
 
 func ImportHoverflySimulation(payload io.Reader) *http.Response {
