@@ -16,32 +16,6 @@ import (
 
 var adminApi = AdminApi{}
 
-func TestGetAllRecords(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
-
-	req, err := http.NewRequest("GET", "/api/records", nil)
-	Expect(err).To(BeNil())
-
-	//The response recorder used to record HTTP responses
-	respRec := httptest.NewRecorder()
-
-	m.ServeHTTP(respRec, req)
-
-	Expect(respRec.Code, http.StatusOK)
-
-	body, err := ioutil.ReadAll(respRec.Body)
-
-	pair := v1.RequestResponsePairPayload{}
-	err = json.Unmarshal(body, &pair)
-
-	Expect(len(pair.Data)).To(Equal(0))
-}
-
 func TestGetRecordsCount(t *testing.T) {
 	RegisterTestingT(t)
 

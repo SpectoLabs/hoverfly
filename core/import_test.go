@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/cache"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -209,13 +209,13 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPair := v1.RequestResponsePairView{
-		Response: v1.ResponseDetailsView{
+	originalPair := v2.RequestResponsePairView{
+		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}}},
-		Request: v1.RequestDetailsView{
+		Request: v2.RequestDetailsView{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
@@ -257,14 +257,14 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 
 	RegisterTestingT(t)
 
-	originalPair1 := v1.RequestResponsePairView{
-		Response: v1.ResponseDetailsView{
+	originalPair1 := v2.RequestResponsePairView{
+		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 		},
-		Request: v1.RequestDetailsView{
+		Request: v2.RequestDetailsView{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
@@ -310,19 +310,19 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 
 	RegisterTestingT(t)
 
-	requestTemplate := v1.RequestDetailsView{
+	requestTemplate := v2.RequestDetailsView{
 		RequestType: StringToPointer("template"),
 		Method:      StringToPointer("GET"),
 	}
 
-	responseView := v1.ResponseDetailsView{
+	responseView := v2.ResponseDetailsView{
 		Status:      200,
 		Body:        "hello_world",
 		EncodedBody: false,
 		Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 	}
 
-	templatePair := v1.RequestResponsePairView{
+	templatePair := v2.RequestResponsePairView{
 		Response: responseView,
 		Request:  requestTemplate,
 	}
@@ -353,13 +353,13 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 
 	RegisterTestingT(t)
 
-	encodedPair := v1.RequestResponsePairView{
-		Response: v1.ResponseDetailsView{
+	encodedPair := v2.RequestResponsePairView{
+		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
-		Request: v1.RequestDetailsView{
+		Request: v2.RequestDetailsView{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
