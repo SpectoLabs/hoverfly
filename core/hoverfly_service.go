@@ -161,33 +161,6 @@ func (hf Hoverfly) GetStats() metrics.Stats {
 	return hf.Counter.Flush()
 }
 
-func (hf Hoverfly) GetRecords() ([]v1.RequestResponsePairView, error) {
-	records, err := hf.RequestCache.GetAllEntries()
-	if err != nil {
-		return nil, err
-	}
-
-	var pairViews []v1.RequestResponsePairView
-
-	for _, v := range records {
-		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
-			pairView := pair.ConvertToV1RequestResponsePairView()
-			pairViews = append(pairViews, *pairView)
-		} else {
-			log.Error(err)
-			return nil, err
-		}
-	}
-
-	for _, v := range hf.Simulation.Templates {
-		pairView := v.ConvertToV1RequestResponsePairView()
-		pairViews = append(pairViews, pairView)
-	}
-
-	return pairViews, nil
-
-}
-
 func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
 	records, err := hf.RequestCache.GetAllEntries()
 	if err != nil {
