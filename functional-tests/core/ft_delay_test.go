@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -52,26 +53,21 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 	Context("When running in simulate mode", func() {
 
-		var (
-			jsonRequestResponsePair *bytes.Buffer
-		)
-
 		BeforeEach(func() {
-			jsonRequestResponsePair = bytes.NewBufferString(`{"data":[{"request": {"path": "/path1", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value1"]}}, "response": {"status": 201, "encodedBody": false, "body": "body1", "headers": {"Header": ["value1"]}}}, {"request": {"path": "/path2", "method": "GET", "destination": "www.virtual.com", "scheme": "http", "query": "", "body": "", "headers": {"Header": ["value2"]}}, "response": {"status": 202, "body": "body2", "headers": {"Header": ["value2"]}}}]}`)
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
+			ImportHoverflySimulation(bytes.NewBufferString(functional_tests.JsonPayload))
 			SetHoverflyResponseDelays("testdata/delays.json")
 			SetHoverflyMode("simulate")
-			ImportHoverflyRecords(jsonRequestResponsePair)
 		})
 
 		It("should delay returning the cached response", func() {
 			start := time.Now()
-			resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2"))
+			resp := DoRequestThroughProxy(sling.New().Get("http://test-server.com/path1"))
 			end := time.Now()
 			reqDuration := end.Sub(start)
 			body, err := ioutil.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
-			Expect(string(body)).To(Equal("body2"))
+			Expect(string(body)).To(Equal("exact match"))
 			Expect(reqDuration > (100 * time.Millisecond)).To(BeTrue())
 		})
 
@@ -90,7 +86,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 		It("should delay returning the response", func() {
 			start := time.Now()
-			resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2"))
+			resp := DoRequestThroughProxy(sling.New().Get("http://test-server.com/path2"))
 			end := time.Now()
 			reqDuration := end.Sub(start)
 			body, err := ioutil.ReadAll(resp.Body)
