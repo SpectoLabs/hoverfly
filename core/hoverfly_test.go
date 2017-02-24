@@ -57,7 +57,6 @@ func Test_Hoverfly_processRequest_CaptureModeReturnsResponseAndSavesIt(t *testin
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
@@ -77,7 +76,6 @@ func Test_Hoverfly_processRequest_CanSimulateRequest(t *testing.T) {
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
@@ -102,7 +100,6 @@ func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeRequest(t *testing
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	// getting reflect middleware
 	err := dbClient.Cfg.Middleware.SetBinary("python")
@@ -175,7 +172,6 @@ func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
@@ -226,7 +222,6 @@ func TestDelayNotAppliedToCaptureRequest(t *testing.T) {
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
@@ -248,7 +243,6 @@ func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	err := dbClient.Cfg.Middleware.SetBinary("python")
 	Expect(err).To(BeNil())
@@ -277,7 +271,6 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	err := dbClient.Cfg.Middleware.SetBinary("python")
 	Expect(err).To(BeNil())
