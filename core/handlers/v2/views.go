@@ -54,7 +54,6 @@ func (this SimulationView) GetValidationSchema() valid.Validator {
 		valid.ObjKV("data", valid.Object(
 			valid.ObjKV("pairs", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
 				valid.ObjKV("request", valid.Object(
-					valid.ObjKV("requestType", valid.Optional(valid.String())),
 					valid.ObjKV("path", valid.Optional(valid.String())),
 					valid.ObjKV("method", valid.Optional(valid.String())),
 					valid.ObjKV("scheme", valid.Optional(valid.String())),
@@ -101,7 +100,6 @@ func (this RequestResponsePairView) GetRequest() interfaces.Request { return thi
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsView struct {
-	RequestType *string             `json:"requestType"`
 	Path        *string             `json:"path"`
 	Method      *string             `json:"method"`
 	Destination *string             `json:"destination"`
@@ -110,9 +108,6 @@ type RequestDetailsView struct {
 	Body        *string             `json:"body"`
 	Headers     map[string][]string `json:"headers"`
 }
-
-//Gets RequestType - required for interfaces.Request
-func (this RequestDetailsView) GetRequestType() *string { return this.RequestType }
 
 //Gets Path - required for interfaces.Request
 func (this RequestDetailsView) GetPath() *string { return this.Path }

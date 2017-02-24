@@ -336,8 +336,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 	RegisterTestingT(t)
 
 	requestTemplate := v2.RequestDetailsView{
-		RequestType: StringToPointer("template"),
-		Method:      StringToPointer("GET"),
+		Method: StringToPointer("GET"),
 	}
 
 	responseView := v2.ResponseDetailsView{

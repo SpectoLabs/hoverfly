@@ -6,7 +6,6 @@ type RequestResponsePair interface {
 }
 
 type Request interface {
-	GetRequestType() *string
 	GetPath() *string
 	GetMethod() *string
 	GetDestination() *string
