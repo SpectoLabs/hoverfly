@@ -8,13 +8,13 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-type RequestMatcher struct {
+type CacheMatcher struct {
 	RequestCache cache.Cache
 	Webserver    *bool
 }
 
 // getResponse returns stored response from cache
-func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.ResponseDetails, *MatchingError) {
+func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.ResponseDetails, *MatchingError) {
 
 	var key string
 
@@ -68,7 +68,7 @@ func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.Res
 	return &pair.Response, nil
 }
 
-func (this *RequestMatcher) SaveRequestResponsePair(pair *models.RequestResponsePair) error {
+func (this *CacheMatcher) SaveRequestResponsePair(pair *models.RequestResponsePair) error {
 	var key string
 
 	if *this.Webserver {
