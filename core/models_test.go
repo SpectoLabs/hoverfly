@@ -164,32 +164,6 @@ func TestScheme(t *testing.T) {
 	Expect(originalFp).To(Equal(newFp))
 }
 
-func TestDeleteAllRecords(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
-
-	// inserting some payloads
-	for i := 0; i < 5; i++ {
-		dbClient.Save(&models.RequestDetails{
-			Destination: "delete_all_records.com",
-			Query:       fmt.Sprintf("q=%i", i),
-		}, &models.ResponseDetails{
-			Status: 200,
-			Body:   "ok",
-		})
-	}
-	err := dbClient.RequestCache.DeleteData()
-	Expect(err).To(BeNil())
-
-	count, err := dbClient.RequestCache.RecordsCount()
-	Expect(err).To(BeNil())
-
-	Expect(count).To(BeZero())
-
-}
-
 func TestRequestResponsePairEncodeDecode(t *testing.T) {
 	RegisterTestingT(t)
 

@@ -64,7 +64,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				Expect(payload.DataView.RequestResponsePairs).To(HaveLen(1))
 
 				Expect(payload.DataView.RequestResponsePairs[0].Request).To(Equal(v2.RequestDetailsView{
-					RequestType: util.StringToPointer("recording"),
+					RequestType: util.StringToPointer("template"),
 					Path:        util.StringToPointer("/"),
 					Method:      util.StringToPointer("GET"),
 					Destination: util.StringToPointer(expectedDestination),
