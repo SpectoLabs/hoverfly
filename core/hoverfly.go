@@ -214,6 +214,12 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 
 // GetResponse returns stored response from cache
 func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
+
+	cachedResponse, cacheErr := hf.RequestMatcher.GetResponse(&requestDetails)
+	if cacheErr == nil {
+		return cachedResponse, nil
+	}
+
 	response, err := matching.TemplateMatcher{}.Match(requestDetails, hf.Cfg.Webserver, hf.Simulation)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -229,6 +235,12 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 			Description: "Could not find recorded request, please record it first!",
 		}
 	}
+
+	hf.RequestMatcher.SaveRequestResponsePair(&models.RequestResponsePair{
+		Request:  requestDetails,
+		Response: *response,
+	})
+
 	return response, nil
 }
 
