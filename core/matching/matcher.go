@@ -95,6 +95,10 @@ func (this *CacheMatcher) SaveRequestResponsePair(pair *models.RequestResponsePa
 	return this.RequestCache.Set([]byte(key), pairBytes)
 }
 
+func (this CacheMatcher) FlushCache() error {
+	return this.RequestCache.DeleteData()
+}
+
 type MatchingError struct {
 	StatusCode  int
 	Description string
