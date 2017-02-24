@@ -44,7 +44,6 @@ var JsonPayload = `{
                     }
                 },
                 "request": {
-                    "requestType": "recording",
                     "path": "/path1",
                     "method": "GET",
                     "destination": "test-server.com",
@@ -101,18 +100,12 @@ var JsonSimulationGetAndPost = `{
                     }
                 },
                 "request": {
-                    "requestType": "recording",
                     "path": "/path1",
                     "method": "GET",
                     "destination": "destination1",
                     "scheme": "http",
                     "query": "",
-                    "body": "",
-                    "headers": {
-                        "Header": [
-						    "value1"
-						]
-                    }
+                    "body": ""
                 }
             },
             {
@@ -123,18 +116,12 @@ var JsonSimulationGetAndPost = `{
                     "headers": {}
                 },
                 "request": {
-                     "requestType": "recording",
                     "path": "/path2/resource",
                     "method": "POST",
                     "destination": "another-destination.com",
                     "scheme": "http",
                     "query": "",
-                    "body": "",
-                    "headers": {
-                        "Header": [
-						    "value1"
-						]
-                    }
+                    "body": ""
                 }
             }
         ],
