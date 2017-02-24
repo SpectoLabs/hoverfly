@@ -26,6 +26,7 @@ const (
 	v2ApiMode        = "/api/v2/hoverfly/mode"
 	v2ApiDestination = "/api/v2/hoverfly/destination"
 	v2ApiMiddleware  = "/api/v2/hoverfly/middleware"
+	v2ApiCache       = "/api/v2/cache"
 )
 
 type APIStateSchema struct {
@@ -266,6 +267,24 @@ func (h *Hoverfly) ImportSimulation(simulationData string) error {
 		var errorView ErrorSchema
 		json.Unmarshal(body, &errorView)
 		return errors.New("Import to Hoverfly failed: " + errorView.ErrorMessage)
+	}
+
+	return nil
+}
+
+func (h *Hoverfly) FlushCache() error {
+	slingRequest, err := h.buildDeleteRequest(v2ApiCache)
+	if err != nil {
+		return err
+	}
+
+	response, err := h.doRequest(slingRequest)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != 200 {
+		return errors.New("Could not flush cache")
 	}
 
 	return nil
