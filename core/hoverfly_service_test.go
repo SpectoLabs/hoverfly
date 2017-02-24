@@ -15,7 +15,6 @@ import (
 var (
 	pairOneRecording = v2.RequestResponsePairView{
 		Request: v2.RequestDetailsView{
-			RequestType: util.StringToPointer("recording"),
 			Destination: util.StringToPointer("test.com"),
 			Path:        util.StringToPointer("/testing"),
 		},
@@ -26,8 +25,7 @@ var (
 
 	pairOneTemplate = v2.RequestResponsePairView{
 		Request: v2.RequestDetailsView{
-			RequestType: util.StringToPointer("template"),
-			Path:        util.StringToPointer("/template"),
+			Path: util.StringToPointer("/template"),
 		},
 		Response: v2.ResponseDetailsView{
 			Body: "template-body",
@@ -90,7 +88,6 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairRecording(t *te
 
 	Expect(simulation.DataView.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(*simulation.DataView.RequestResponsePairs[0].Request.RequestType).To(Equal("recording"))
 	Expect(*simulation.DataView.RequestResponsePairs[0].Request.Destination).To(Equal("testhost.com"))
 	Expect(*simulation.DataView.RequestResponsePairs[0].Request.Path).To(Equal("/test"))
 
@@ -121,7 +118,6 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairTemplate(t *tes
 
 	Expect(simulation.DataView.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(*simulation.DataView.RequestResponsePairs[0].Request.RequestType).To(Equal("template"))
 	Expect(*simulation.DataView.RequestResponsePairs[0].Request.Destination).To(Equal("test.com"))
 	Expect(simulation.DataView.RequestResponsePairs[0].Request.Path).To(BeNil())
 	Expect(simulation.DataView.RequestResponsePairs[0].Request.Method).To(BeNil())
@@ -167,14 +163,12 @@ func TestHoverflyGetSimulationReturnsMultipleRequestResponsePairs(t *testing.T) 
 
 	Expect(*simulation.DataView.RequestResponsePairs[0].Request.Destination).To(Equal("testhost.com"))
 	Expect(*simulation.DataView.RequestResponsePairs[0].Request.Path).To(Equal("/test"))
-	Expect(*simulation.DataView.RequestResponsePairs[0].Request.RequestType).To(Equal("recording"))
 
 	Expect(simulation.DataView.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(simulation.DataView.RequestResponsePairs[0].Response.Body).To(Equal("test"))
 
 	Expect(*simulation.DataView.RequestResponsePairs[1].Request.Destination).To(Equal("testhost.com"))
 	Expect(*simulation.DataView.RequestResponsePairs[1].Request.Path).To(Equal("/test"))
-	Expect(*simulation.DataView.RequestResponsePairs[1].Request.RequestType).To(Equal("recording"))
 
 	Expect(simulation.DataView.RequestResponsePairs[1].Response.Status).To(Equal(200))
 	Expect(simulation.DataView.RequestResponsePairs[1].Response.Body).To(Equal("test"))
@@ -240,7 +234,6 @@ func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 	Expect(importedSimulation.RequestResponsePairs).ToNot(BeNil())
 	Expect(importedSimulation.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(importedSimulation.RequestResponsePairs[0].Request.RequestType).To(Equal(util.StringToPointer("template")))
 	Expect(importedSimulation.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
 	Expect(importedSimulation.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
 
@@ -273,7 +266,6 @@ func TestHoverfly_PutSimulation_ImportsTemplates(t *testing.T) {
 	Expect(importedSimulation.RequestResponsePairs).ToNot(BeNil())
 	Expect(importedSimulation.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(importedSimulation.RequestResponsePairs[0].Request.RequestType).To(Equal(util.StringToPointer("template")))
 	Expect(importedSimulation.RequestResponsePairs[0].Request.Destination).To(BeNil())
 	Expect(importedSimulation.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/template")))
 
@@ -306,13 +298,11 @@ func TestHoverfly_PutSimulation_ImportsRecordingsAndTemplates(t *testing.T) {
 	Expect(importedSimulation.RequestResponsePairs).ToNot(BeNil())
 	Expect(importedSimulation.RequestResponsePairs).To(HaveLen(2))
 
-	Expect(importedSimulation.RequestResponsePairs[0].Request.RequestType).To(Equal(util.StringToPointer("template")))
 	Expect(importedSimulation.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
 	Expect(importedSimulation.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
 
 	Expect(importedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
 
-	Expect(importedSimulation.RequestResponsePairs[1].Request.RequestType).To(Equal(util.StringToPointer("template")))
 	Expect(importedSimulation.RequestResponsePairs[1].Request.Destination).To(BeNil())
 	Expect(importedSimulation.RequestResponsePairs[1].Request.Path).To(Equal(util.StringToPointer("/template")))
 
