@@ -2,20 +2,21 @@ package v1
 
 import (
 	"encoding/json"
+	"net/http"
+	"reflect"
+	"time"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"github.com/gorilla/websocket"
-	"net/http"
-	"reflect"
-	"time"
 )
 
 type HoverflyStats interface {
 	GetStats() metrics.Stats
-	GetRequestCacheCount() (int, error)
+	GetSimulationPairsCount() int
 }
 
 type StatsHandler struct {
@@ -35,16 +36,11 @@ func (this *StatsHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler
 func (this *StatsHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	stats := this.Hoverfly.GetStats()
 
-	count, err := this.Hoverfly.GetRequestCacheCount()
-
-	if err != nil {
-		log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	simulationCount := this.Hoverfly.GetSimulationPairsCount()
 
 	var sr StatsResponse
 	sr.Stats = stats
-	sr.RecordsCount = count
+	sr.RecordsCount = simulationCount
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -92,14 +88,7 @@ func (this *StatsHandler) GetWS(w http.ResponseWriter, r *http.Request) {
 		}).Info("Got message...")
 
 		for _ = range time.Tick(1 * time.Second) {
-			count, err := this.Hoverfly.GetRequestCacheCount()
-			if err != nil {
-				log.WithFields(log.Fields{
-					"message": p,
-					"error":   err.Error(),
-				}).Error("got error while trying to get records count")
-				continue
-			}
+			count := this.Hoverfly.GetSimulationPairsCount()
 			stats := this.Hoverfly.GetStats()
 
 			// checking whether we should send an update

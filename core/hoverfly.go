@@ -18,6 +18,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
+	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 // orPanic - wrapper for logging errors
@@ -220,15 +221,20 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails) error {
 
-	pair := models.RequestResponsePair{
-		Request:  *request,
+	pair := models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
+			Path:        util.StringToPointer(request.Path),
+			Method:      util.StringToPointer(request.Method),
+			Destination: util.StringToPointer(request.Destination),
+			Scheme:      util.StringToPointer(request.Scheme),
+			Query:       util.StringToPointer(request.Query),
+			Body:        util.StringToPointer(request.Body),
+			Headers:     request.Headers,
+		},
 		Response: *response,
 	}
 
-	err := hf.RequestMatcher.SaveRequestResponsePair(&pair)
-	if err != nil {
-		return err
-	}
+	hf.Simulation.Templates = append(hf.Simulation.Templates, pair)
 
 	return nil
 }
@@ -243,4 +249,8 @@ func (this Hoverfly) ApplyMiddleware(pair models.RequestResponsePair) (models.Re
 
 func (this Hoverfly) IsMiddlewareSet() bool {
 	return this.Cfg.Middleware.IsSet()
+}
+
+func (this Hoverfly) GetSimulationPairsCount() int {
+	return len(this.Simulation.Templates)
 }
