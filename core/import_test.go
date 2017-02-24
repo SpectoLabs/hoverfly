@@ -197,8 +197,8 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
-	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher, Simulation: models.NewSimulation()}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	RegisterTestingT(t)
 
@@ -244,8 +244,8 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
-	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher, Simulation: models.NewSimulation()}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	RegisterTestingT(t)
 
@@ -330,8 +330,8 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
-	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher, Simulation: models.NewSimulation()}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	RegisterTestingT(t)
 
@@ -372,8 +372,8 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
-	requestMatcher := matching.RequestMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, RequestMatcher: requestMatcher, Simulation: models.NewSimulation()}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	RegisterTestingT(t)
 

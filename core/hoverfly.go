@@ -33,7 +33,7 @@ func orPanic(err error) {
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
 type Hoverfly struct {
 	RequestCache   cache.Cache
-	RequestMatcher matching.RequestMatcher
+	CacheMatcher   matching.CacheMatcher
 	MetadataCache  cache.Cache
 	Authentication authBackend.Authentication
 	HTTP           *http.Client
@@ -56,7 +56,7 @@ type Hoverfly struct {
 func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication authBackend.Authentication) *Hoverfly {
 	simulation := models.NewSimulation()
 
-	requestMatcher := matching.RequestMatcher{
+	requestMatcher := matching.CacheMatcher{
 		RequestCache: requestCache,
 		Webserver:    &cfg.Webserver,
 	}
@@ -69,7 +69,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		Cfg:            cfg,
 		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
 		ResponseDelays: &models.ResponseDelayList{},
-		RequestMatcher: requestMatcher,
+		CacheMatcher:   requestMatcher,
 		Simulation:     simulation,
 	}
 
@@ -215,7 +215,7 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 // GetResponse returns stored response from cache
 func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
 
-	cachedResponse, cacheErr := hf.RequestMatcher.GetResponse(&requestDetails)
+	cachedResponse, cacheErr := hf.CacheMatcher.GetResponse(&requestDetails)
 	if cacheErr == nil {
 		return cachedResponse, nil
 	}
@@ -236,7 +236,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		}
 	}
 
-	hf.RequestMatcher.SaveRequestResponsePair(&models.RequestResponsePair{
+	hf.CacheMatcher.SaveRequestResponsePair(&models.RequestResponsePair{
 		Request:  requestDetails,
 		Response: *response,
 	})
