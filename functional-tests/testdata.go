@@ -68,7 +68,6 @@ var JsonPayload = `{
                     "headers": {}
                 },
                 "request": {
-                    "requestType": "template",
                     "destination": "template-server.com"
                 }
             }
