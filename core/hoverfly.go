@@ -234,7 +234,7 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		Response: *response,
 	}
 
-	hf.Simulation.Templates = append(hf.Simulation.Templates, pair)
+	hf.Simulation.AddRequestTemplateResponsePair(&pair)
 
 	return nil
 }
