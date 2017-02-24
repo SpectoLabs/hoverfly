@@ -67,12 +67,10 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(pairOneRequest.GetString("method")).Should(Equal("GET"))
 			Expect(pairOneRequest.GetString("path")).Should(Equal("/path1"))
 			Expect(pairOneRequest.GetString("query")).Should(Equal(""))
-			Expect(pairOneRequest.GetString("requestType")).Should(Equal("recording"))
 			Expect(pairOneRequest.GetString("scheme")).Should(Equal("http"))
 
 			pairOneRequestHeaders, _ := pairOneRequest.GetObject("headers")
 			Expect(pairOneRequestHeaders.GetStringArray("Accept-Encoding")).Should(ContainElement("gzip"))
-			Expect(pairOneRequestHeaders.GetStringArray("Content-Type")).Should(ContainElement("text/plain; charset=utf-8"))
 			Expect(pairOneRequestHeaders.GetStringArray("User-Agent")).Should(ContainElement("Go-http-client/1.1"))
 
 			pairOneResponse, err := pairsArray[0].GetObject("response")
@@ -92,7 +90,6 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(pairTwoRequest.GetNull("method")).Should(BeNil())
 			Expect(pairTwoRequest.GetNull("path")).Should(BeNil())
 			Expect(pairTwoRequest.GetNull("query")).Should(BeNil())
-			Expect(pairTwoRequest.GetString("requestType")).Should(Equal("template"))
 			Expect(pairTwoRequest.GetNull("scheme")).Should(BeNil())
 
 			Expect(pairTwoRequest.GetNull("headers")).Should(BeNil())

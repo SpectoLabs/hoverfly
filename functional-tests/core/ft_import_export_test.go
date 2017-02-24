@@ -9,7 +9,6 @@ import (
 	"net/http/httptest"
 	"os"
 
-	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -70,25 +69,6 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 
 		AfterEach(func() {
 			stopHoverfly()
-		})
-
-		Context("When I export", func() {
-
-			BeforeEach(func() {
-				slingRequest := sling.New().Put(hoverflyAdminUrl + "/api/v2/simulation").Body(bytes.NewBufferString(functional_tests.JsonPayload))
-				functional_tests.DoRequest(slingRequest)
-			})
-
-			It("It should contain both templates and snapshots", func() {
-				records := ExportHoverflySimulation()
-
-				recordsBytes, err := ioutil.ReadAll(records)
-				Expect(err).To(BeNil())
-
-				Expect(string(recordsBytes)).To(ContainSubstring("template"))
-				Expect(string(recordsBytes)).To(ContainSubstring("recording"))
-			})
-
 		})
 
 	})
