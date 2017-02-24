@@ -125,8 +125,8 @@ func (this Hoverfly) GetMetadataCache() cache.Cache {
 	return this.MetadataCache
 }
 
-func (hf Hoverfly) DeleteRequestCache() error {
-	return hf.RequestCache.DeleteData()
+func (hf Hoverfly) FlushCache() error {
+	return hf.CacheMatcher.FlushCache()
 }
 
 func (hf *Hoverfly) GetResponseDelays() v1.ResponseDelayPayloadView {
@@ -208,7 +208,7 @@ func (this *Hoverfly) DeleteSimulation() {
 	var templates []models.RequestTemplateResponsePair
 	this.Simulation.Templates = templates
 	this.DeleteResponseDelays()
-	this.DeleteRequestCache()
+	this.FlushCache()
 }
 
 func (this Hoverfly) GetVersion() string {
