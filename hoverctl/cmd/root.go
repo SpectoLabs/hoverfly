@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
@@ -12,6 +14,8 @@ import (
 
 var adminPort, proxyPort, host, certificate, key, database, upstreamProxy string
 var disableTls, verbose bool
+
+var force bool
 
 var hoverfly wrapper.Hoverfly
 var hoverflyDirectory wrapper.HoverflyDirectory
@@ -99,6 +103,25 @@ func checkArgAndExit(args []string, message, command string) {
 		fmt.Println(message)
 		fmt.Println("\nTry hoverctl " + command + " --help for more information")
 		os.Exit(1)
+	}
+}
+
+func askForConfirmation(message string) bool {
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+		fmt.Printf(message + " [y/n]: ")
+
+		response, err := reader.ReadString('\n')
+		handleIfError(err)
+
+		response = strings.ToLower(strings.TrimSpace(response))
+
+		if response == "y" || response == "yes" {
+			return true
+		} else if response == "n" || response == "no" {
+			return false
+		}
 	}
 }
 
