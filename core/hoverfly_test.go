@@ -12,6 +12,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
 
@@ -55,41 +56,41 @@ func TestGetNewHoverfly(t *testing.T) {
 func Test_Hoverfly_processRequest_CaptureModeReturnsResponseAndSavesIt(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
+	server, unit := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode("capture")
+	unit.Cfg.SetMode("capture")
 
-	resp := dbClient.processRequest(r)
+	resp := unit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
-	Expect(dbClient.Simulation.Templates).To(HaveLen(1))
+	Expect(unit.Simulation.Templates).To(HaveLen(1))
 }
 
 func Test_Hoverfly_processRequest_CanSimulateRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
+	server, unit := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 
 	// capturing
-	dbClient.Cfg.SetMode("capture")
-	resp := dbClient.processRequest(r)
+	unit.Cfg.SetMode("capture")
+	resp := unit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
 	// virtualizing
-	dbClient.Cfg.SetMode("simulate")
-	newResp := dbClient.processRequest(r)
+	unit.Cfg.SetMode("simulate")
+	newResp := unit.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
@@ -144,6 +145,117 @@ func Test_Hoverfly_processRequest_CanModifyRequest(t *testing.T) {
 	Expect(newResp).ToNot(BeNil())
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
+	Expect(newResp.Header).To(HaveKeyWithValue("Hoverfly", []string{"Was-Here"}))
+}
+
+func Test_Hoverfly_GetResponse_CanReturnResponseFromCache(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	server.Close()
+
+	unit.RequestMatcher.SaveRequestResponsePair(&models.RequestResponsePair{
+		Request: models.RequestDetails{
+			Destination: "somehost.com",
+			Method:      "POST",
+			Scheme:      "http",
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "cached response",
+		},
+	})
+
+	response, err := unit.GetResponse(models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+	})
+
+	Expect(err).To(BeNil())
+	Expect(response).ToNot(BeNil())
+
+	Expect(response.Status).To(Equal(http.StatusOK))
+	Expect(response.Body).To(Equal("cached response"))
+}
+
+func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	server.Close()
+
+	unit.Simulation.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
+			Destination: util.StringToPointer("somehost.com"),
+			Method:      util.StringToPointer("POST"),
+			Scheme:      util.StringToPointer("http"),
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "template response",
+		},
+	})
+
+	response, err := unit.GetResponse(models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+	})
+
+	Expect(err).To(BeNil())
+	Expect(response).ToNot(BeNil())
+
+	Expect(response.Status).To(Equal(http.StatusOK))
+	Expect(response.Body).To(Equal("template response"))
+}
+
+func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	server.Close()
+
+	unit.Simulation.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
+			Destination: util.StringToPointer("somehost.com"),
+			Method:      util.StringToPointer("POST"),
+			Scheme:      util.StringToPointer("http"),
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "template response",
+		},
+	})
+
+	unit.GetResponse(models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+	})
+
+	Expect(unit.RequestCache.RecordsCount()).Should(Equal(1))
+
+	pairBytes, err := unit.RequestCache.Get([]byte("75b4ae6efa2a3f6d3ee6b9fed4d8c8c5"))
+	Expect(err).To(BeNil())
+
+	cachedRequestResponsePair, err := models.NewRequestResponsePairFromBytes(pairBytes)
+	Expect(err).To(BeNil())
+
+	Expect(cachedRequestResponsePair.Response.Body).To(Equal("template response"))
+
+	unit.Simulation = models.NewSimulation()
+	response, err := unit.GetResponse(models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+	})
+
+	Expect(err).To(BeNil())
+	Expect(response).ToNot(BeNil())
+
+	Expect(response.Status).To(Equal(http.StatusOK))
+	Expect(response.Body).To(Equal("template response"))
 }
 
 type ResponseDelayListStub struct {
