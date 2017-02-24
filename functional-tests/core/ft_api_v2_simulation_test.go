@@ -161,7 +161,6 @@ var _ = Describe("/api/v2/simulation", func() {
 				"data": {
 					"pairs": [{
 						"request": {
-							"requestType": "template",
 							"destination": "templatedurl.com"
 						},
 						"response": {
@@ -203,10 +202,6 @@ var _ = Describe("/api/v2/simulation", func() {
 			requestObject, err := pairsArray[0].GetObject("request")
 			Expect(err).To(BeNil())
 
-			requestType, err := requestObject.GetString("requestType")
-			Expect(err).To(BeNil())
-			Expect(requestType).To(Equal("template"))
-
 			destination, err := requestObject.GetString("destination")
 			Expect(err).To(BeNil())
 			Expect(destination).To(Equal("templatedurl.com"))
@@ -234,7 +229,6 @@ var _ = Describe("/api/v2/simulation", func() {
 				"data": {
 					"pairs": [{
 						"request": {
-							"requestType": "template",
 							"destination": "templatedurl.com"
 						},
 						"response": {
@@ -270,10 +264,6 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			requestObject, err := pairsArray[0].GetObject("request")
 			Expect(err).To(BeNil())
-
-			requestType, err := requestObject.GetString("requestType")
-			Expect(err).To(BeNil())
-			Expect(requestType).To(Equal("template"))
 
 			destination, err := requestObject.GetString("destination")
 			Expect(err).To(BeNil())
