@@ -61,42 +61,6 @@ func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.
 	Expect(simulation.MetaView.TimeExported).ToNot(BeNil())
 }
 
-func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairRecording(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, unit := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
-
-	recording := models.RequestResponsePair{
-		Request: models.RequestDetails{
-			Destination: "testhost.com",
-			Path:        "/test",
-		},
-		Response: models.ResponseDetails{
-			Status: 200,
-			Body:   "test",
-		},
-	}
-
-	recordingBytes, err := recording.Encode()
-	Expect(err).To(BeNil())
-
-	unit.RequestCache.Set([]byte("key"), recordingBytes)
-
-	simulation, err := unit.GetSimulation()
-	Expect(err).To(BeNil())
-
-	Expect(simulation.DataView.RequestResponsePairs).To(HaveLen(1))
-
-	Expect(*simulation.DataView.RequestResponsePairs[0].Request.Destination).To(Equal("testhost.com"))
-	Expect(*simulation.DataView.RequestResponsePairs[0].Request.Path).To(Equal("/test"))
-
-	Expect(simulation.DataView.RequestResponsePairs[0].Response.Status).To(Equal(200))
-	Expect(simulation.DataView.RequestResponsePairs[0].Response.Body).To(Equal("test"))
-
-	Expect(nil).To(BeNil())
-}
-
 func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairTemplate(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -133,28 +97,33 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairTemplate(t *tes
 	Expect(nil).To(BeNil())
 }
 
-func TestHoverflyGetSimulationReturnsMultipleRequestResponsePairs(t *testing.T) {
+func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.T) {
 	RegisterTestingT(t)
 
 	server, unit := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	recording := models.RequestResponsePair{
-		Request: models.RequestDetails{
-			Destination: "testhost.com",
-			Path:        "/test",
+	unit.Simulation.Templates = append(unit.Simulation.Templates, models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
+			Destination: util.StringToPointer("testhost.com"),
+			Path:        util.StringToPointer("/test"),
 		},
 		Response: models.ResponseDetails{
 			Status: 200,
 			Body:   "test",
 		},
-	}
+	})
 
-	recordingBytes, err := recording.Encode()
-	Expect(err).To(BeNil())
-
-	unit.RequestCache.Set([]byte("key"), recordingBytes)
-	unit.RequestCache.Set([]byte("key2"), recordingBytes)
+	unit.Simulation.Templates = append(unit.Simulation.Templates, models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
+			Destination: util.StringToPointer("testhost.com"),
+			Path:        util.StringToPointer("/test"),
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "test",
+		},
+	})
 
 	simulation, err := unit.GetSimulation()
 	Expect(err).To(BeNil())
