@@ -167,3 +167,7 @@ type MetaView struct {
 	HoverflyVersion string `json:"hoverflyVersion"`
 	TimeExported    string `json:"timeExported"`
 }
+
+type CacheView struct {
+	RequestResponsePairs []RequestResponsePairView `json:"cache"`
+}

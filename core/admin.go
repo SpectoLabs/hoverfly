@@ -117,6 +117,7 @@ func GetAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 	list = append(list, &v2.HoverflyVersionHandler{Hoverfly: hoverfly})
 	list = append(list, &v2.HoverflyUpstreamProxyHandler{Hoverfly: hoverfly})
 	list = append(list, &v2.SimulationHandler{Hoverfly: hoverfly})
+	list = append(list, &v2.CacheHandler{Hoverfly: hoverfly})
 
 	return list
 }
