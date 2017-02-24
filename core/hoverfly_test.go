@@ -69,10 +69,7 @@ func Test_Hoverfly_processRequest_CaptureModeReturnsResponseAndSavesIt(t *testin
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
-	count, err := dbClient.RequestCache.RecordsCount()
-	Expect(err).To(BeNil())
-
-	Expect(count).To(Equal(1))
+	Expect(dbClient.Simulation.Templates).To(HaveLen(1))
 }
 
 func Test_Hoverfly_processRequest_CanSimulateRequest(t *testing.T) {
