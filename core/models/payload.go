@@ -152,9 +152,7 @@ func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 }
 
 func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsView {
-	s := "recording"
 	return v2.RequestDetailsView{
-		RequestType: &s,
 		Path:        &this.Path,
 		Method:      &this.Method,
 		Destination: &this.Destination,

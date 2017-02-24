@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	. "github.com/SpectoLabs/hoverfly/core/util"
 )
 
 type RequestTemplateResponsePair struct {
@@ -14,7 +13,6 @@ func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v2.R
 
 	return v2.RequestResponsePairView{
 		Request: v2.RequestDetailsView{
-			RequestType: StringToPointer("template"),
 			Path:        this.RequestTemplate.Path,
 			Method:      this.RequestTemplate.Method,
 			Destination: this.RequestTemplate.Destination,
