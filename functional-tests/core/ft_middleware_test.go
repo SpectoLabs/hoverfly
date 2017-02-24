@@ -44,7 +44,7 @@ var _ = Describe("Running Hoverfly with middleware", func() {
 
 			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, server.URL+"/process")
 
-			ImportHoverflySimulation(bytes.NewBufferString(functional_tests.JsonPayload))
+			ImportHoverflySimulation(bytes.NewBufferString(functional_tests.JsonSimulationGetAndPost))
 
 			SetHoverflyMode("simulate")
 		})
@@ -55,7 +55,7 @@ var _ = Describe("Running Hoverfly with middleware", func() {
 		})
 
 		It("the middleware should recieve the request made instead of the request stored in the cache", func() {
-			slingRequest := sling.New().Get("http://test-server.com/path1").Add("New-Header", "true")
+			slingRequest := sling.New().Get("http://destination1/path1").Add("New-Header", "here")
 
 			resp := DoRequestThroughProxy(slingRequest)
 

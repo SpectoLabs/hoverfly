@@ -240,7 +240,7 @@ func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 	Expect(importedSimulation.RequestResponsePairs).ToNot(BeNil())
 	Expect(importedSimulation.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(importedSimulation.RequestResponsePairs[0].Request.RequestType).To(Equal(util.StringToPointer("recording")))
+	Expect(importedSimulation.RequestResponsePairs[0].Request.RequestType).To(Equal(util.StringToPointer("template")))
 	Expect(importedSimulation.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
 	Expect(importedSimulation.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
 
@@ -306,7 +306,7 @@ func TestHoverfly_PutSimulation_ImportsRecordingsAndTemplates(t *testing.T) {
 	Expect(importedSimulation.RequestResponsePairs).ToNot(BeNil())
 	Expect(importedSimulation.RequestResponsePairs).To(HaveLen(2))
 
-	Expect(importedSimulation.RequestResponsePairs[0].Request.RequestType).To(Equal(util.StringToPointer("recording")))
+	Expect(importedSimulation.RequestResponsePairs[0].Request.RequestType).To(Equal(util.StringToPointer("template")))
 	Expect(importedSimulation.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
 	Expect(importedSimulation.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
 
