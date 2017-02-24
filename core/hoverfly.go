@@ -59,7 +59,6 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 	requestMatcher := matching.RequestMatcher{
 		RequestCache: requestCache,
 		Webserver:    &cfg.Webserver,
-		Simulation:   simulation,
 	}
 
 	h := &Hoverfly{
@@ -215,7 +214,22 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 
 // GetResponse returns stored response from cache
 func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
-	return hf.RequestMatcher.GetResponse(&requestDetails)
+	response, err := matching.TemplateMatcher{}.Match(requestDetails, hf.Cfg.Webserver, hf.Simulation)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error":       err.Error(),
+			"query":       requestDetails.Query,
+			"path":        requestDetails.Path,
+			"destination": requestDetails.Destination,
+			"method":      requestDetails.Method,
+		}).Warn("Failed to find matching request template from template store")
+
+		return nil, &matching.MatchingError{
+			StatusCode:  412,
+			Description: "Could not find recorded request, please record it first!",
+		}
+	}
+	return response, nil
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
