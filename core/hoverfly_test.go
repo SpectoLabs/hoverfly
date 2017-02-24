@@ -400,3 +400,65 @@ func Test_DoRequest_AddsHoverflyHeaderOnSuccessfulRequest(t *testing.T) {
 
 	Expect(response.Header.Get("hoverfly")).To(Equal("Was-Here"))
 }
+
+func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Hoverfly{Simulation: models.NewSimulation()}
+
+	unit.Save(&models.RequestDetails{
+		Body:        "testbody",
+		Destination: "testdestination",
+		Headers:     map[string][]string{"testheader": []string{"testvalue"}},
+		Method:      "testmethod",
+		Path:        "/testpath",
+		Query:       "?query=test",
+		Scheme:      "http",
+	}, &models.ResponseDetails{
+		Body:    "testresponsebody",
+		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Status:  200,
+	})
+
+	Expect(unit.Simulation.Templates).To(HaveLen(1))
+
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Body).To(Equal("testbody"))
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Destination).To(Equal("testdestination"))
+	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Method).To(Equal("testmethod"))
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Path).To(Equal("/testpath"))
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Query).To(Equal("?query=test"))
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Scheme).To(Equal("http"))
+
+	Expect(unit.Simulation.Templates[0].Response.Body).To(Equal("testresponsebody"))
+	Expect(unit.Simulation.Templates[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(unit.Simulation.Templates[0].Response.Status).To(Equal(200))
+}
+
+func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Hoverfly{Simulation: models.NewSimulation()}
+
+	unit.Save(&models.RequestDetails{
+		Destination: "testdestination",
+	}, &models.ResponseDetails{
+		Body:    "testresponsebody",
+		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Status:  200,
+	})
+
+	Expect(unit.Simulation.Templates).To(HaveLen(1))
+
+	// Expect(unit.Simulation.Templates[0].RequestTemplate.Body).To(BeNil())
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Destination).To(Equal("testdestination"))
+	// Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(BeNil())
+	// Expect(*unit.Simulation.Templates[0].RequestTemplate.Method).To(BeNil())
+	// Expect(*unit.Simulation.Templates[0].RequestTemplate.Path).To(BeNil())
+	// Expect(*unit.Simulation.Templates[0].RequestTemplate.Query).To(BeNil())
+	// Expect(*unit.Simulation.Templates[0].RequestTemplate.Scheme).To(BeNil())
+
+	Expect(unit.Simulation.Templates[0].Response.Body).To(Equal("testresponsebody"))
+	Expect(unit.Simulation.Templates[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(unit.Simulation.Templates[0].Response.Status).To(Equal(200))
+}
