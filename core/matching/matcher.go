@@ -11,7 +11,6 @@ import (
 type RequestMatcher struct {
 	RequestCache cache.Cache
 	Webserver    *bool
-	Simulation   *models.Simulation
 }
 
 // getResponse returns stored response from cache
@@ -37,30 +36,10 @@ func (this *RequestMatcher) GetResponse(req *models.RequestDetails) (*models.Res
 			"method":      req.Method,
 		}).Warn("Failed to retrieve response from cache")
 
-		response, err := TemplateMatcher{}.Match(*req, *this.Webserver, this.Simulation)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"key":         key,
-				"error":       err.Error(),
-				"query":       req.Query,
-				"path":        req.Path,
-				"destination": req.Destination,
-				"method":      req.Method,
-			}).Warn("Failed to find matching request template from template store")
-
-			return nil, &MatchingError{
-				StatusCode:  412,
-				Description: "Could not find recorded request, please record it first!",
-			}
+		return nil, &MatchingError{
+			StatusCode:  412,
+			Description: "Could not find recorded request, please record it first!",
 		}
-		log.WithFields(log.Fields{
-			"key":         key,
-			"query":       req.Query,
-			"path":        req.Path,
-			"destination": req.Destination,
-			"method":      req.Method,
-		}).Info("Found template matching request from template store")
-		return response, nil
 	}
 
 	// getting cache response
