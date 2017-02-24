@@ -2,15 +2,17 @@ package v1
 
 import (
 	"encoding/json"
+	"net/http"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
-	"net/http"
 )
 
 type HoverflyCount interface {
 	GetRequestCacheCount() (int, error)
+	GetSimulationPairsCount() int
 }
 
 type CountHandler struct {
@@ -26,30 +28,19 @@ func (this *CountHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler
 
 // RecordsCount returns number of captured requests as a JSON payload
 func (this *CountHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	count, err := this.Hoverfly.GetRequestCacheCount()
+	count := this.Hoverfly.GetSimulationPairsCount()
 
-	if err == nil {
+	w.Header().Set("Content-Type", "application/json")
 
-		w.Header().Set("Content-Type", "application/json")
+	var response RecordsCount
+	response.Count = count
+	b, err := json.Marshal(response)
 
-		var response RecordsCount
-		response.Count = count
-		b, err := json.Marshal(response)
-
-		if err != nil {
-			log.Error(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		} else {
-			w.Write(b)
-			return
-		}
+	if err != nil {
+		log.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		log.WithFields(log.Fields{
-			"Error": err.Error(),
-		}).Error("Failed to get data from cache!")
-
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(500) // can't process this entity
+		w.Write(b)
 		return
 	}
 }

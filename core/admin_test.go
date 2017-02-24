@@ -81,58 +81,6 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 	Expect(rc.Count).To(Equal(5))
 }
 
-func TestDeleteHandler(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
-
-	// inserting some payloads
-	for i := 0; i < 5; i++ {
-		req := &models.RequestDetails{
-			Method:      "GET",
-			Scheme:      "http",
-			Destination: "example.com",
-			Query:       fmt.Sprintf("q=%d", i),
-		}
-
-		dbClient.Save(req, &models.ResponseDetails{})
-	}
-
-	// checking whether we have records
-	pairBytes, err := dbClient.RequestCache.GetAllValues()
-	Expect(err).To(BeNil())
-	Expect(len(pairBytes)).To(Equal(5))
-
-	// deleting through handler
-	deleteReq, err := http.NewRequest("DELETE", "/api/records", nil)
-	//The response recorder used to record HTTP responses
-	rec := httptest.NewRecorder()
-
-	m.ServeHTTP(rec, deleteReq)
-	Expect(rec.Code, http.StatusOK)
-}
-
-func TestDeleteHandlerNoBucket(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
-
-	// deleting through handler
-	importReq, err := http.NewRequest("DELETE", "/api/records", nil)
-	Expect(err).To(BeNil())
-	//The response recorder used to record HTTP responses
-	importRec := httptest.NewRecorder()
-
-	m.ServeHTTP(importRec, importReq)
-	Expect(importRec.Code, http.StatusOK)
-}
-
 func TestGetState(t *testing.T) {
 	RegisterTestingT(t)
 
