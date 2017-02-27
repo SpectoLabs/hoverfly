@@ -122,7 +122,7 @@ func (hf *Hoverfly) SetMiddleware(binary, script, remote string) error {
 }
 
 func (hf Hoverfly) GetRequestCacheCount() (int, error) {
-	return hf.RequestCache.RecordsCount()
+	return len(hf.Simulation.Templates), nil
 }
 
 func (this Hoverfly) GetMetadataCache() cache.Cache {
