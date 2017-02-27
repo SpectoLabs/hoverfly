@@ -54,7 +54,11 @@ type Hoverfly struct {
 func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 	simulation := models.NewSimulation()
 
-	requestCache := cache.NewInMemoryCache()
+	var requestCache cache.Cache
+	if !cfg.DisableCache {
+		requestCache = cache.NewInMemoryCache()
+	}
+
 	metadataCache := cache.NewInMemoryCache()
 
 	authBackend := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
@@ -92,6 +96,10 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
 func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication backends.Authentication) *Hoverfly {
 	simulation := models.NewSimulation()
+
+	if cfg.DisableCache {
+		requestCache = nil
+	}
 
 	cacheMatcher := matching.CacheMatcher{
 		RequestCache: requestCache,
