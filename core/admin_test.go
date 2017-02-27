@@ -19,10 +19,8 @@ var adminApi = AdminApi{}
 func TestGetRecordsCount(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	req, err := http.NewRequest("GET", "/api/count", nil)
 	Expect(err).To(BeNil())
@@ -45,9 +43,7 @@ func TestGetRecordsCount(t *testing.T) {
 func TestGetRecordsCountWRecords(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -58,10 +54,10 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 			Query:       fmt.Sprintf("q=%d", i),
 		}
 
-		dbClient.Save(req, &models.ResponseDetails{})
+		unit.Save(req, &models.ResponseDetails{})
 	}
 	// performing query
-	m := adminApi.getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(unit)
 
 	req, err := http.NewRequest("GET", "/api/count", nil)
 	Expect(err).To(BeNil())
@@ -84,13 +80,11 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 func TestGetState(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// setting initial mode
-	dbClient.Cfg.SetMode("simulate")
+	unit.Cfg.SetMode("simulate")
 
 	req, err := http.NewRequest("GET", "/api/state", nil)
 	Expect(err).To(BeNil())
@@ -111,13 +105,11 @@ func TestGetState(t *testing.T) {
 func TestSetSimulateState(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// setting mode to capture
-	dbClient.Cfg.SetMode("capture")
+	unit.Cfg.SetMode("capture")
 
 	// preparing to set mode through rest api
 	var resp v1.StateRequest
@@ -137,19 +129,17 @@ func TestSetSimulateState(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusOK))
 
 	// checking mode
-	Expect(dbClient.Cfg.GetMode()).To(Equal("simulate"))
+	Expect(unit.Cfg.GetMode()).To(Equal("simulate"))
 }
 
 func TestSetCaptureState(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// setting mode to simulate
-	dbClient.Cfg.SetMode("simulate")
+	unit.Cfg.SetMode("simulate")
 
 	// preparing to set mode through rest api
 	var resp v1.StateRequest
@@ -169,19 +159,17 @@ func TestSetCaptureState(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusOK))
 
 	// checking mode
-	Expect(dbClient.Cfg.GetMode()).To(Equal("capture"))
+	Expect(unit.Cfg.GetMode()).To(Equal("capture"))
 }
 
 func TestSetModifyState(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// setting mode to simulate
-	dbClient.Cfg.SetMode("simulate")
+	unit.Cfg.SetMode("simulate")
 
 	// preparing to set mode through rest api
 	var resp v1.StateRequest
@@ -201,19 +189,17 @@ func TestSetModifyState(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusOK))
 
 	// checking mode
-	Expect(dbClient.Cfg.GetMode()).To(Equal("modify"))
+	Expect(unit.Cfg.GetMode()).To(Equal("modify"))
 }
 
 func TestSetSynthesizeState(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// setting mode to simulate
-	dbClient.Cfg.SetMode("simulate")
+	unit.Cfg.SetMode("simulate")
 
 	// preparing to set mode through rest api
 	var resp v1.StateRequest
@@ -233,19 +219,17 @@ func TestSetSynthesizeState(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusOK))
 
 	// checking mode
-	Expect(dbClient.Cfg.GetMode()).To(Equal("synthesize"))
+	Expect(unit.Cfg.GetMode()).To(Equal("synthesize"))
 }
 
 func TestSetRandomState(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// setting mode to simulate
-	dbClient.Cfg.SetMode("simulate")
+	unit.Cfg.SetMode("simulate")
 
 	// preparing to set mode through rest api
 	var resp v1.StateRequest
@@ -265,19 +249,17 @@ func TestSetRandomState(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusBadRequest))
 
 	// checking mode, should not have changed
-	Expect(dbClient.Cfg.GetMode()).To(Equal("simulate"))
+	Expect(unit.Cfg.GetMode()).To(Equal("simulate"))
 }
 
 func TestSetNoBody(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// setting mode to simulate
-	dbClient.Cfg.SetMode("simulate")
+	unit.Cfg.SetMode("simulate")
 
 	// setting state
 	req, err := http.NewRequest("POST", "/api/state", nil)
@@ -290,16 +272,14 @@ func TestSetNoBody(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusBadRequest))
 
 	// checking mode, should not have changed
-	Expect(dbClient.Cfg.GetMode()).To(Equal("simulate"))
+	Expect(unit.Cfg.GetMode()).To(Equal("simulate"))
 }
 
 func TestStatsHandler(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// deleting through handler
 	req, err := http.NewRequest("GET", "/api/stats", nil)
@@ -317,12 +297,10 @@ func TestStatsHandlerSimulateMetrics(t *testing.T) {
 
 	// test metrics, increases simulate count by 1 and then checks through stats
 	// handler whether it is visible through /stats handler
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
-	dbClient.Counter.Counters["simulate"].Inc(1)
+	unit.Counter.Counters["simulate"].Inc(1)
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)
 	Expect(err).To(BeNil())
@@ -346,12 +324,10 @@ func TestStatsHandlerCaptureMetrics(t *testing.T) {
 
 	// test metrics, increases capture count by 1 and then checks through stats
 	// handler whether it is visible through /stats handler
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
-	dbClient.Counter.Counters["capture"].Inc(1)
+	unit.Counter.Counters["capture"].Inc(1)
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)
 	Expect(err).To(BeNil())
@@ -375,12 +351,10 @@ func TestStatsHandlerModifyMetrics(t *testing.T) {
 
 	// test metrics, increases modify count by 1 and then checks through stats
 	// handler whether it is visible through /stats handler
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
-	dbClient.Counter.Counters["modify"].Inc(1)
+	unit.Counter.Counters["modify"].Inc(1)
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)
 	Expect(err).To(BeNil())
@@ -404,12 +378,10 @@ func TestStatsHandlerSynthesizeMetrics(t *testing.T) {
 
 	// test metrics, increases synthesize count by 1 and then checks through stats
 	// handler whether it is visible through /stats handler
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
-	dbClient.Counter.Counters["synthesize"].Inc(1)
+	unit.Counter.Counters["synthesize"].Inc(1)
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)
 	Expect(err).To(BeNil())
@@ -433,10 +405,8 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 
 	// test metrics, adds 5 new requests and then checks through stats
 	// handler whether it is visible through /stats handler
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
@@ -450,7 +420,7 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 		resp := &http.Response{}
 		resp.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 
-		dbClient.Save(req, &models.ResponseDetails{})
+		unit.Save(req, &models.ResponseDetails{})
 	}
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)
@@ -473,10 +443,8 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 func TestSetMetadata(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// preparing to set mode through rest api
 	var reqBody v1.SetMetadata
@@ -497,7 +465,7 @@ func TestSetMetadata(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusCreated))
 
 	// checking mode
-	metaValue, err := dbClient.MetadataCache.Get([]byte("some_key"))
+	metaValue, err := unit.MetadataCache.Get([]byte("some_key"))
 	Expect(err).To(BeNil())
 	Expect(string(metaValue)).To(Equal("some_val"))
 }
@@ -505,10 +473,8 @@ func TestSetMetadata(t *testing.T) {
 func TestSetMetadataBadBody(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// deleting through handler
 	req, err := http.NewRequest("PUT", "/api/metadata", ioutil.NopCloser(bytes.NewBuffer([]byte("you shall not decode me!!"))))
@@ -524,10 +490,8 @@ func TestSetMetadataBadBody(t *testing.T) {
 func TestSetMetadataMissingKey(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// preparing to set mode through rest api
 	var reqBody v1.SetMetadata
@@ -558,15 +522,13 @@ func TestSetMetadataMissingKey(t *testing.T) {
 func TestGetMetadata(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 	// adding some metadata
 	for i := 0; i < 3; i++ {
 		k := fmt.Sprintf("key_%d", i)
 		v := fmt.Sprintf("val_%d", i)
-		err := dbClient.MetadataCache.Set([]byte(k), []byte(v))
+		err := unit.MetadataCache.Set([]byte(k), []byte(v))
 		Expect(err).To(BeNil())
 	}
 
@@ -596,20 +558,18 @@ func TestGetMetadata(t *testing.T) {
 func TestDeleteMetadata(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 	// adding some metadata
 	for i := 0; i < 3; i++ {
 		k := fmt.Sprintf("key_%d", i)
 		v := fmt.Sprintf("val_%d", i)
-		err := dbClient.MetadataCache.Set([]byte(k), []byte(v))
+		err := unit.MetadataCache.Set([]byte(k), []byte(v))
 		Expect(err).To(BeNil())
 	}
 
 	// checking that metadata is there
-	allMeta, err := dbClient.MetadataCache.GetAllEntries()
+	allMeta, err := unit.MetadataCache.GetAllEntries()
 	Expect(err).To(BeNil())
 	Expect(len(allMeta)).To(Equal(3))
 
@@ -623,7 +583,7 @@ func TestDeleteMetadata(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusOK))
 
 	// checking metadata again, should be zero
-	allMeta, err = dbClient.MetadataCache.GetAllEntries()
+	allMeta, err = unit.MetadataCache.GetAllEntries()
 	Expect(err).To(BeNil())
 	Expect(len(allMeta)).To(Equal(0))
 }
@@ -631,10 +591,8 @@ func TestDeleteMetadata(t *testing.T) {
 func TestDeleteMetadataEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	// deleting it
 	req, err := http.NewRequest("DELETE", "/api/metadata", nil)
@@ -646,7 +604,7 @@ func TestDeleteMetadataEmpty(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusOK))
 
 	// checking metadata again, should be zero
-	allMeta, err := dbClient.MetadataCache.GetAllEntries()
+	allMeta, err := unit.MetadataCache.GetAllEntries()
 	Expect(err).To(BeNil())
 	Expect(len(allMeta)).To(Equal(0))
 }
@@ -654,9 +612,7 @@ func TestDeleteMetadataEmpty(t *testing.T) {
 func TestGetResponseDelays(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	delay := v1.ResponseDelayView{
 		UrlPattern: ".",
@@ -669,9 +625,9 @@ func TestGetResponseDelays(t *testing.T) {
 		Data: delays,
 	}
 
-	dbClient.SetResponseDelays(delaysPayload)
+	unit.SetResponseDelays(delaysPayload)
 
-	m := adminApi.getBoneRouter(dbClient)
+	m := adminApi.getBoneRouter(unit)
 
 	req, err := http.NewRequest("GET", "/api/delays", nil)
 	Expect(err).To(BeNil())
@@ -694,16 +650,14 @@ func TestGetResponseDelays(t *testing.T) {
 func TestDeleteAllResponseDelaysHandler(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 	delay := models.ResponseDelay{
 		UrlPattern: ".",
 		Delay:      100,
 	}
 	delays := models.ResponseDelayList{delay}
-	dbClient.ResponseDelays = &delays
-	m := adminApi.getBoneRouter(dbClient)
+	unit.ResponseDelays = &delays
+	m := adminApi.getBoneRouter(unit)
 
 	req, err := http.NewRequest("DELETE", "/api/delays", nil)
 	Expect(err).To(BeNil())
@@ -713,16 +667,14 @@ func TestDeleteAllResponseDelaysHandler(t *testing.T) {
 	m.ServeHTTP(rec, req)
 	Expect(rec.Code).To(Equal(http.StatusOK))
 
-	Expect(dbClient.ResponseDelays.Len()).To(Equal(0))
+	Expect(unit.ResponseDelays.Len()).To(Equal(0))
 }
 
 func TestUpdateResponseDelays(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	delayOne := v1.ResponseDelayView{
 		UrlPattern: ".",
@@ -746,16 +698,14 @@ func TestUpdateResponseDelays(t *testing.T) {
 	m.ServeHTTP(rec, req)
 	Expect(rec.Code).To(Equal(http.StatusCreated))
 
-	Expect(dbClient.ResponseDelays.ConvertToResponseDelayPayloadView()).To(Equal(delayJson))
+	Expect(unit.ResponseDelays.ConvertToResponseDelayPayloadView()).To(Equal(delayJson))
 }
 
 func TestInvalidJSONSyntaxUpdateResponseDelays(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	delayJson := "{aseuifhksejfc}"
 
@@ -769,16 +719,14 @@ func TestInvalidJSONSyntaxUpdateResponseDelays(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusBadRequest))
 
 	// normal equality checking doesn't work on slices (!!)
-	Expect(dbClient.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
+	Expect(unit.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
 }
 
 func TestInvalidJSONSemanticsUpdateResponseDelays(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	delayJson := "{ \"madeupfield\" : \"somevalue\" }"
 
@@ -792,16 +740,14 @@ func TestInvalidJSONSemanticsUpdateResponseDelays(t *testing.T) {
 	Expect(rec.Code).To(Equal(422))
 
 	// normal equality checking doesn't work on slices (!!)
-	Expect(dbClient.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
+	Expect(unit.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
 }
 
 func TestJSONWithInvalidHostPatternUpdateResponseDelays(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	delayJson := "{ \"data\": [{\"hostPattern\": \"*\", \"delay\": 100}] }"
 
@@ -815,16 +761,14 @@ func TestJSONWithInvalidHostPatternUpdateResponseDelays(t *testing.T) {
 	Expect(rec.Code).To(Equal(422))
 
 	// normal equality checking doesn't work on slices (!!)
-	Expect(dbClient.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
+	Expect(unit.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
 }
 
 func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	delayJson := "{ \"data\" : [{\"hostPattern\": \".\"}] }"
 
@@ -838,16 +782,14 @@ func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
 	Expect(rec.Code).To(Equal(422))
 
 	// normal equality checking doesn't work on slices (!!)
-	Expect(dbClient.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
+	Expect(unit.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
 }
 
 func TestGetMissingURL(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
-	m := adminApi.getBoneRouter(dbClient)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	m := adminApi.getBoneRouter(unit)
 
 	req, err := http.NewRequest("GET", "/api/sdiughvksjv", nil)
 	Expect(err).To(BeNil())

@@ -8,10 +8,11 @@ import (
 	"os"
 	"time"
 
+	"net/url"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/boltdb/bolt"
-	"net/url"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
