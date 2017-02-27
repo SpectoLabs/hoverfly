@@ -5,6 +5,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
@@ -66,6 +67,27 @@ func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.Respo
 	}).Info("Payload found from cache")
 
 	return &pair.Response, nil
+}
+
+func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairView, error) {
+	records, err := this.RequestCache.GetAllEntries()
+	if err != nil {
+		return []v2.RequestResponsePairView{}, err
+	}
+
+	pairViews := []v2.RequestResponsePairView{}
+
+	for _, v := range records {
+		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
+			pairView := pair.ConvertToRequestResponsePairView()
+			pairViews = append(pairViews, pairView)
+		} else {
+			log.Error(err)
+			return []v2.RequestResponsePairView{}, err
+		}
+	}
+
+	return pairViews, nil
 }
 
 func (this *CacheMatcher) SaveRequestResponsePair(pair *models.RequestResponsePair) error {
