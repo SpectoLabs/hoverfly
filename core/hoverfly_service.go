@@ -57,6 +57,10 @@ func (this *Hoverfly) SetMode(mode string) error {
 	}
 
 	this.Cfg.SetMode(mode)
+	if this.Cfg.GetMode() == "capture" {
+		this.CacheMatcher.FlushCache()
+	}
+
 	return nil
 }
 
