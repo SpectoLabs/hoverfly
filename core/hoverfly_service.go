@@ -130,24 +130,7 @@ func (this Hoverfly) GetMetadataCache() cache.Cache {
 }
 
 func (this Hoverfly) GetCache() ([]v2.RequestResponsePairView, error) {
-	records, err := this.RequestCache.GetAllEntries()
-	if err != nil {
-		return []v2.RequestResponsePairView{}, err
-	}
-
-	pairViews := []v2.RequestResponsePairView{}
-
-	for _, v := range records {
-		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
-			pairView := pair.ConvertToRequestResponsePairView()
-			pairViews = append(pairViews, pairView)
-		} else {
-			log.Error(err)
-			return []v2.RequestResponsePairView{}, err
-		}
-	}
-
-	return pairViews, nil
+	return this.CacheMatcher.GetAllResponses()
 }
 
 func (hf Hoverfly) FlushCache() error {
