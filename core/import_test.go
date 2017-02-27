@@ -85,7 +85,6 @@ func TestImportFromDisk(t *testing.T) {
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	err := dbClient.Import("examples/exports/readthedocs.json")
 	Expect(err).To(BeNil())
@@ -98,7 +97,6 @@ func TestImportFromDiskBlankPath(t *testing.T) {
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	err := dbClient.ImportFromDisk("")
 	Expect(err).ToNot(BeNil())
@@ -109,7 +107,6 @@ func TestImportFromDiskWrongJson(t *testing.T) {
 
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	err := dbClient.ImportFromDisk("examples/exports/README.md")
 	Expect(err).ToNot(BeNil())
@@ -127,7 +124,6 @@ func TestImportFromURL(t *testing.T) {
 	// pretending this is the endpoint with given json
 	server, dbClient := testTools(200, string(pairFileBytes))
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	// importing payloads
 	err = dbClient.Import(server.URL)
@@ -148,7 +144,6 @@ func TestImportFromURLRedirect(t *testing.T) {
 	// pretending this is the endpoint with given json
 	server, dbClient := testTools(200, string(pairFileBytes))
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	dbClient.HTTP = GetDefaultHoverflyHTTPClient(false, "")
 
@@ -172,7 +167,6 @@ func TestImportFromURLHTTPFail(t *testing.T) {
 	server, dbClient := testTools(200, `this shouldn't matter anyway`)
 	// closing it immediately
 	server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	err := dbClient.ImportFromURL("somepath")
 	Expect(err).ToNot(BeNil())
@@ -184,7 +178,6 @@ func TestImportFromURLMalformedJSON(t *testing.T) {
 	// testing behaviour when there is no json on the other end
 	server, dbClient := testTools(200, `i am not json :(`)
 	defer server.Close()
-	defer dbClient.RequestCache.DeleteData()
 
 	// importing payloads
 	err := dbClient.Import("http://thiswillbeintercepted.json")
@@ -198,7 +191,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	RegisterTestingT(t)
 
@@ -245,7 +238,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	RegisterTestingT(t)
 
@@ -331,7 +324,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	RegisterTestingT(t)
 
@@ -373,7 +366,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
-	hv := Hoverfly{RequestCache: cache, Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	RegisterTestingT(t)
 

@@ -231,9 +231,9 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 		Scheme:      "http",
 	})
 
-	Expect(unit.RequestCache.RecordsCount()).Should(Equal(1))
+	Expect(unit.CacheMatcher.RequestCache.RecordsCount()).Should(Equal(1))
 
-	pairBytes, err := unit.RequestCache.Get([]byte("75b4ae6efa2a3f6d3ee6b9fed4d8c8c5"))
+	pairBytes, err := unit.CacheMatcher.RequestCache.Get([]byte("75b4ae6efa2a3f6d3ee6b9fed4d8c8c5"))
 	Expect(err).To(BeNil())
 
 	cachedRequestResponsePair, err := models.NewRequestResponsePairFromBytes(pairBytes)
