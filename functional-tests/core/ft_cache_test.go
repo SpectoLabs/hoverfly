@@ -43,4 +43,21 @@ var _ = Describe("Hoverfly cache", func() {
 
 		Expect(cacheArray).To(HaveLen(0))
 	})
+
+	It("should be flushed when importing via the API", func() {
+		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+		req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/cache")
+		res := functional_tests.DoRequest(req)
+		Expect(res.StatusCode).To(Equal(200))
+		responseJson, err := ioutil.ReadAll(res.Body)
+		Expect(err).To(BeNil())
+
+		jsonObject, err := jason.NewObjectFromBytes(responseJson)
+		Expect(err).To(BeNil())
+
+		cacheArray, err := jsonObject.GetObjectArray("cache")
+		Expect(err).To(BeNil())
+
+		Expect(cacheArray).To(HaveLen(0))
+	})
 })
