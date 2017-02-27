@@ -18,10 +18,10 @@ func TestSetKey(t *testing.T) {
 	k := []byte("randomkeyhere")
 	v := []byte("value")
 
-	err := unit.RequestCache.Set(k, v)
+	err := unit.CacheMatcher.RequestCache.Set(k, v)
 	Expect(err).To(BeNil())
 
-	value, err := unit.RequestCache.Get(k)
+	value, err := unit.CacheMatcher.RequestCache.Get(k)
 	Expect(err).To(BeNil())
 	Expect(value).To(Equal(v))
 }
@@ -41,11 +41,11 @@ func TestCacheSetGetWithRequestResponsePair(t *testing.T) {
 	pairBytes, err := json.Marshal(pair)
 	Expect(err).To(BeNil())
 
-	err = unit.RequestCache.Set(key, pairBytes)
+	err = unit.CacheMatcher.RequestCache.Set(key, pairBytes)
 	Expect(err).To(BeNil())
 
 	var p models.RequestResponsePair
-	pairBytes, err = unit.RequestCache.Get(key)
+	pairBytes, err = unit.CacheMatcher.RequestCache.Get(key)
 	err = json.Unmarshal(pairBytes, &p)
 	Expect(err).To(BeNil())
 	Expect(pair.Response.Body).To(Equal(p.Response.Body))
@@ -70,19 +70,19 @@ func TestDeleteBucket(t *testing.T) {
 	k := []byte("randomkeyhere")
 	v := []byte("value")
 	// checking whether bucket is okay
-	err := dbClient.RequestCache.Set(k, v)
+	err := dbClient.CacheMatcher.RequestCache.Set(k, v)
 	Expect(err).To(BeNil())
 
-	value, err := dbClient.RequestCache.Get(k)
+	value, err := dbClient.CacheMatcher.RequestCache.Get(k)
 	Expect(err).To(BeNil())
 	Expect(value).To(Equal(v))
 
 	// deleting bucket
-	err = dbClient.RequestCache.DeleteData()
+	err = dbClient.CacheMatcher.RequestCache.DeleteData()
 	Expect(err).To(BeNil())
 
 	// deleting it again
-	err = dbClient.RequestCache.DeleteData()
+	err = dbClient.CacheMatcher.RequestCache.DeleteData()
 	Expect(err).ToNot(BeNil())
 }
 
@@ -105,11 +105,11 @@ func TestCorruptedPairs(t *testing.T) {
 	k := []byte("randomkeyhere")
 	v := []byte("value")
 
-	err := unit.RequestCache.Set(k, v)
+	err := unit.CacheMatcher.RequestCache.Set(k, v)
 	Expect(err).To(BeNil())
 
 	// corrupted payloads should be just skipped
-	pairBytes, err := unit.RequestCache.GetAllValues()
+	pairBytes, err := unit.CacheMatcher.RequestCache.GetAllValues()
 	Expect(err).To(BeNil())
 	Expect(pairBytes).To(HaveLen(1))
 }
@@ -133,7 +133,7 @@ func TestGetMultipleRecords(t *testing.T) {
 	}
 
 	// getting requests
-	values, err := unit.RequestCache.GetAllValues()
+	values, err := unit.CacheMatcher.RequestCache.GetAllValues()
 	Expect(err).To(BeNil())
 
 	for _, value := range values {
@@ -152,7 +152,7 @@ func TestGetNonExistingKey(t *testing.T) {
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	// getting key
-	_, err := unit.RequestCache.Get([]byte("should not be here"))
+	_, err := unit.CacheMatcher.RequestCache.Get([]byte("should not be here"))
 	Expect(err).ToNot(BeNil())
 }
 
@@ -163,10 +163,10 @@ func TestGetAllKeys(t *testing.T) {
 
 	// inserting some payloads
 	for i := 0; i < 5; i++ {
-		unit.RequestCache.Set([]byte(fmt.Sprintf("key%d", i)), []byte("value"))
+		unit.CacheMatcher.RequestCache.Set([]byte(fmt.Sprintf("key%d", i)), []byte("value"))
 	}
 
-	keys, err := unit.RequestCache.GetAllKeys()
+	keys, err := unit.CacheMatcher.RequestCache.GetAllKeys()
 	Expect(err).To(BeNil())
 	Expect(keys).To(HaveLen(5))
 
@@ -181,7 +181,7 @@ func TestGetAllKeysEmpty(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	keys, err := unit.RequestCache.GetAllKeys()
+	keys, err := unit.CacheMatcher.RequestCache.GetAllKeys()
 	Expect(err).To(BeNil())
 	Expect(keys).To(HaveLen(0))
 }
