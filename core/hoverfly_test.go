@@ -39,15 +39,14 @@ func TestGetNewHoverflyCheckConfig(t *testing.T) {
 func TestGetNewHoverfly(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	dbClient.Cfg.ProxyPort = "6666"
+	unit.Cfg.ProxyPort = "6666"
 
-	err := dbClient.StartProxy()
+	err := unit.StartProxy()
 	Expect(err).To(BeNil())
 
-	newResponse, err := http.Get(fmt.Sprintf("http://localhost:%s/", dbClient.Cfg.ProxyPort))
+	newResponse, err := http.Get(fmt.Sprintf("http://localhost:%s/", unit.Cfg.ProxyPort))
 	Expect(err).To(BeNil())
 	Expect(newResponse.StatusCode).To(Equal(http.StatusInternalServerError))
 
@@ -182,8 +181,7 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromCache(t *testing.T) {
 func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, unit := testTools(201, `{'message': 'here'}`)
-	server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	unit.Simulation.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
@@ -213,8 +211,7 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *tes
 func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, unit := testTools(201, `{'message': 'here'}`)
-	server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	unit.Simulation.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
@@ -435,23 +432,22 @@ func TestDelayAppliedToSuccessfulMiddleware(t *testing.T) {
 func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	err := dbClient.Cfg.Middleware.SetBinary("python")
+	err := unit.Cfg.Middleware.SetBinary("python")
 	Expect(err).To(BeNil())
 
-	err = dbClient.Cfg.Middleware.SetScript(pythonMiddlewareBad)
+	err = unit.Cfg.Middleware.SetScript(pythonMiddlewareBad)
 	Expect(err).To(BeNil())
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode("modify")
+	unit.Cfg.SetMode("modify")
 
 	stub := ResponseDelayListStub{}
-	dbClient.ResponseDelays = &stub
-	newResp := dbClient.processRequest(r)
+	unit.ResponseDelays = &stub
+	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
@@ -461,14 +457,13 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 func Test_Hoverfly_DoRequest_DoesNotPanicWhenCannotMakeRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 	request, err := http.NewRequest("GET", "w.specto.fake", ioutil.NopCloser(bytes.NewBuffer([]byte(""))))
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.DoRequest(request)
+	response, err := unit.DoRequest(request)
 	Expect(response).To(BeNil())
 	Expect(err).ToNot(BeNil())
 }
@@ -476,9 +471,7 @@ func Test_Hoverfly_DoRequest_DoesNotPanicWhenCannotMakeRequest(t *testing.T) {
 func Test_Hoverfly_DoRequest_FailedHTTP(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	// stopping server
-	server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	requestBody := []byte("fizz=buzz")
 
@@ -487,7 +480,7 @@ func Test_Hoverfly_DoRequest_FailedHTTP(t *testing.T) {
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
 	Expect(err).To(BeNil())
 
-	_, err = dbClient.DoRequest(req)
+	_, err = unit.DoRequest(req)
 	Expect(err).ToNot(BeNil())
 }
 
@@ -495,13 +488,12 @@ func Test_Hoverfly_DoRequest_FailedHTTP(t *testing.T) {
 func Test_DoRequest_AddsHoverflyHeaderOnSuccessfulRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	req, err := http.NewRequest("GET", "http://example.com", ioutil.NopCloser(bytes.NewBuffer([]byte(""))))
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.DoRequest(req)
+	response, err := unit.DoRequest(req)
 
 	Expect(response.Header.Get("hoverfly")).To(Equal("Was-Here"))
 }
@@ -509,7 +501,7 @@ func Test_DoRequest_AddsHoverflyHeaderOnSuccessfulRequest(t *testing.T) {
 func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := Hoverfly{Simulation: models.NewSimulation()}
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	unit.Save(&models.RequestDetails{
 		Body:        "testbody",
@@ -543,7 +535,7 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := Hoverfly{Simulation: models.NewSimulation()}
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	unit.Save(&models.RequestDetails{
 		Destination: "testdestination",

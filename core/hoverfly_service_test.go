@@ -4,10 +4,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/gorilla/mux"
@@ -44,23 +42,12 @@ var (
 		UrlPattern: "test.com",
 		Delay:      201,
 	}
-
-	requestCache = cache.NewInMemoryCache()
-
-	unit = Hoverfly{
-		CacheMatcher: matching.CacheMatcher{
-			RequestCache: requestCache,
-		},
-		RequestCache: requestCache,
-		Cfg:          &Configuration{},
-	}
 )
 
 func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, unit := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	simulation, err := unit.GetSimulation()
 	Expect(err).To(BeNil())
@@ -76,8 +63,7 @@ func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.
 func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairTemplate(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, unit := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	unit.Simulation.Templates = append(unit.Simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
@@ -112,8 +98,7 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairTemplate(t *tes
 func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, unit := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	unit.Simulation.Templates = append(unit.Simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
@@ -158,8 +143,7 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 func TestHoverflyGetSimulationReturnsMultipleDelays(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, unit := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	delay1 := models.ResponseDelay{
 		UrlPattern: "test-pattern",
@@ -192,8 +176,7 @@ func TestHoverflyGetSimulationReturnsMultipleDelays(t *testing.T) {
 func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, unit := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	simulationToImport := v2.SimulationView{
 		DataView: v2.DataView{
@@ -224,8 +207,7 @@ func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 func TestHoverfly_PutSimulation_ImportsTemplates(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, unit := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	simulationToImport := v2.SimulationView{
 		DataView: v2.DataView{
@@ -256,8 +238,7 @@ func TestHoverfly_PutSimulation_ImportsTemplates(t *testing.T) {
 func TestHoverfly_PutSimulation_ImportsRecordingsAndTemplates(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, unit := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	simulationToImport := v2.SimulationView{
 		DataView: v2.DataView{
@@ -293,8 +274,7 @@ func TestHoverfly_PutSimulation_ImportsRecordingsAndTemplates(t *testing.T) {
 func TestHoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, unit := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	simulationToImport := v2.SimulationView{
 		DataView: v2.DataView{
@@ -326,7 +306,7 @@ func TestHoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 func Test_Hoverfly_GetMiddleware_ReturnsCorrectValuesFromMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, unit := testTools(201, `{'message': 'here'}`)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 	unit.Cfg.Middleware.SetBinary("python")
 	unit.Cfg.Middleware.SetScript(pythonMiddlewareBasic)
 
@@ -339,7 +319,7 @@ func Test_Hoverfly_GetMiddleware_ReturnsCorrectValuesFromMiddleware(t *testing.T
 func Test_Hoverfly_GetMiddleware_ReturnsEmptyStringsWhenNeitherIsSet(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, unit := testTools(201, `{'message': 'here'}`)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	binary, script, remote := unit.GetMiddleware()
 	Expect(binary).To(Equal(""))
@@ -350,7 +330,7 @@ func Test_Hoverfly_GetMiddleware_ReturnsEmptyStringsWhenNeitherIsSet(t *testing.
 func Test_Hoverfly_GetMiddleware_ReturnsBinaryIfJustBinarySet(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, unit := testTools(201, `{'message': 'here'}`)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 	unit.Cfg.Middleware.SetBinary("python")
 
 	binary, script, remote := unit.GetMiddleware()
@@ -362,7 +342,7 @@ func Test_Hoverfly_GetMiddleware_ReturnsBinaryIfJustBinarySet(t *testing.T) {
 func Test_Hoverfly_GetMiddleware_ReturnsRemotefJustRemoteSet(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, unit := testTools(201, `{'message': 'here'}`)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 	unit.Cfg.Middleware.Remote = "test.com"
 
 	binary, script, remote := unit.GetMiddleware()
@@ -374,7 +354,7 @@ func Test_Hoverfly_GetMiddleware_ReturnsRemotefJustRemoteSet(t *testing.T) {
 func Test_Hoverfly_SetMiddleware_CanSetBinaryAndScript(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, unit := testTools(201, `{'message': 'here'}`)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	err := unit.SetMiddleware("python", pythonMiddlewareBasic, "")
 	Expect(err).To(BeNil())
@@ -389,7 +369,7 @@ func Test_Hoverfly_SetMiddleware_CanSetBinaryAndScript(t *testing.T) {
 func Test_Hoverfly_SetMiddleware_CanSetRemote(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, unit := testTools(201, `{'message': 'here'}`)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	muxRouter := mux.NewRouter()
 	muxRouter.HandleFunc("/process", processHandlerOkay).Methods("POST")
@@ -410,7 +390,7 @@ func Test_Hoverfly_SetMiddleware_CanSetRemote(t *testing.T) {
 func Test_Hoverfly_SetMiddleware_WillErrorIfGivenBadRemote(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, unit := testTools(201, `{'message': 'here'}`)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	err := unit.SetMiddleware("", "", "[]somemadeupwebsite*&*^&$%^")
 	Expect(err).ToNot(BeNil())
@@ -426,7 +406,7 @@ func Test_Hoverfly_SetMiddleware_WillErrorIfGivenBadRemote(t *testing.T) {
 func Test_Hoverfly_SetMiddleware_WillErrorIfGivenBadBinaryAndWillNotChangeMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, unit := testTools(201, `{'message': 'here'}`)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 	unit.Cfg.Middleware.SetBinary("python")
 	unit.Cfg.Middleware.SetScript("test-script")
 
@@ -442,7 +422,7 @@ func Test_Hoverfly_SetMiddleware_WillErrorIfGivenBadBinaryAndWillNotChangeMiddle
 func Test_Hoverfly_SetMiddleware_WillErrorIfGivenScriptAndNoBinaryAndWillNotChangeMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, unit := testTools(201, `{'message': 'here'}`)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 	unit.Cfg.Middleware.SetBinary("python")
 	unit.Cfg.Middleware.SetScript("test-script")
 
@@ -458,7 +438,7 @@ func Test_Hoverfly_SetMiddleware_WillErrorIfGivenScriptAndNoBinaryAndWillNotChan
 func Test_Hoverfly_SetMiddleware_WillDeleteMiddlewareSettingsIfEmptyBinaryAndScriptAndRemote(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, unit := testTools(201, `{'message': 'here'}`)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 	unit.Cfg.Middleware.SetBinary("python")
 	unit.Cfg.Middleware.SetScript("test-script")
 
@@ -474,7 +454,7 @@ func Test_Hoverfly_SetMiddleware_WillDeleteMiddlewareSettingsIfEmptyBinaryAndScr
 func Test_Hoverfly_SetMiddleware_WontSetMiddlewareIfCannotRunScript(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, unit := testTools(201, `{'message': 'here'}`)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	err := unit.SetMiddleware("python", "ewfaet4rafgre", "")
 	Expect(err).ToNot(BeNil())
@@ -488,7 +468,7 @@ func Test_Hoverfly_SetMiddleware_WontSetMiddlewareIfCannotRunScript(t *testing.T
 func Test_Hoverfly_SetMiddleware_WillSetBinaryWithNoScript(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, unit := testTools(201, `{'message': 'here'}`)
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	err := unit.SetMiddleware("cat", "", "")
 	Expect(err).To(BeNil())
@@ -512,17 +492,17 @@ func Test_Hoverfly_GetVersion_GetsVersion(t *testing.T) {
 func Test_Hoverfly_GetUpstreamProxy_GetsUpstreamProxy(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := Hoverfly{
-		Cfg: &Configuration{
-			UpstreamProxy: "upstream-proxy.org",
-		},
-	}
+	unit := NewHoverflyWithConfiguration(&Configuration{
+		UpstreamProxy: "upstream-proxy.org",
+	})
 
 	Expect(unit.GetUpstreamProxy()).To(Equal("upstream-proxy.org"))
 }
 
 func Test_Hoverfly_SetMode_CanSetModeToCapture(t *testing.T) {
 	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	Expect(unit.SetMode("capture")).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("capture"))
@@ -531,12 +511,16 @@ func Test_Hoverfly_SetMode_CanSetModeToCapture(t *testing.T) {
 func Test_Hoverfly_SetMode_CanSetModeToSimulate(t *testing.T) {
 	RegisterTestingT(t)
 
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
 	Expect(unit.SetMode("simulate")).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("simulate"))
 }
 
 func Test_Hoverfly_SetMode_CanSetModeToModify(t *testing.T) {
 	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	Expect(unit.SetMode("modify")).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("modify"))
@@ -545,6 +529,8 @@ func Test_Hoverfly_SetMode_CanSetModeToModify(t *testing.T) {
 func Test_Hoverfly_SetMode_CanSetModeToSynthesize(t *testing.T) {
 	RegisterTestingT(t)
 
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
 	Expect(unit.SetMode("synthesize")).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("synthesize"))
 }
@@ -552,7 +538,7 @@ func Test_Hoverfly_SetMode_CanSetModeToSynthesize(t *testing.T) {
 func Test_Hoverfly_SetMode_CannotSetModeToSomethingInvalid(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit.Cfg.Mode = ""
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	Expect(unit.SetMode("mode")).ToNot(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal(""))
@@ -564,7 +550,7 @@ func Test_Hoverfly_SetMode_CannotSetModeToSomethingInvalid(t *testing.T) {
 func Test_Hoverfly_SetMode_SettingModeToCaptureWipesCache(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit.Cfg.Mode = ""
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	unit.RequestCache.Set([]byte("test"), []byte("test_bytes"))
 
