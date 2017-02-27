@@ -22,6 +22,8 @@ func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.Respo
 		}
 	}
 
+	log.Debug("Checking cache for request")
+
 	var key string
 
 	if *this.Webserver {
@@ -40,11 +42,11 @@ func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.Respo
 			"path":        req.Path,
 			"destination": req.Destination,
 			"method":      req.Method,
-		}).Warn("Failed to retrieve response from cache")
+		}).Debug("Failed to retrieve response from cache")
 
 		return nil, &MatchingError{
 			StatusCode:  412,
-			Description: "Could not find recorded request, please record it first!",
+			Description: "Could not find recorded request in cache",
 		}
 	}
 
@@ -55,10 +57,10 @@ func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.Respo
 			"error": err.Error(),
 			"value": string(pairBytes),
 			"key":   key,
-		}).Error("Failed to decode payload")
+		}).Debug("Failed to decode payload from cache")
 		return nil, &MatchingError{
 			StatusCode:  500,
-			Description: "Failed to decode payload",
+			Description: "Failed to decode payload from cache",
 		}
 	}
 
@@ -69,7 +71,7 @@ func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.Respo
 		"method":      req.Method,
 		"destination": req.Destination,
 		"status":      pair.Response.Status,
-	}).Info("Payload found from cache")
+	}).Info("Response found interface{} cache")
 
 	return &pair.Response, nil
 }
@@ -121,7 +123,7 @@ func (this *CacheMatcher) SaveRequestResponsePair(pair *models.RequestResponsePa
 		"bodyLen":       len(pair.Request.Body),
 		"destination":   pair.Request.Destination,
 		"hashKey":       key,
-	}).Debug("Capturing")
+	}).Debug("Saving response to cache")
 
 	pairBytes, err := pair.Encode()
 
