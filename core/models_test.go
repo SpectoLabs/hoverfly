@@ -8,7 +8,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 )
@@ -121,47 +120,6 @@ func TestGetNotRecordedRequest(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 
 	Expect(response).To(BeNil())
-}
-
-// TestRequestFingerprint tests whether we get correct request ID
-func TestRequestFingerprint(t *testing.T) {
-	RegisterTestingT(t)
-
-	req, err := http.NewRequest("GET", "http://example.com", nil)
-	Expect(err).To(BeNil())
-
-	fp := matching.GetRequestFingerprint(req, []byte(""), false)
-
-	Expect(fp).To(Equal("92a65ed4ca2b7100037a4cba9afd15ea"))
-}
-
-// TestRequestFingerprintBody tests where request body is also used to create unique request ID
-func TestRequestFingerprintBody(t *testing.T) {
-	RegisterTestingT(t)
-
-	req, err := http.NewRequest("GET", "http://example.com", nil)
-	Expect(err).To(BeNil())
-
-	fp := matching.GetRequestFingerprint(req, []byte("some huge XML or JSON here"), false)
-
-	Expect(fp).To(Equal("b3918a54eb6e42652e29e14c21ba8f81"))
-}
-
-func TestScheme(t *testing.T) {
-	RegisterTestingT(t)
-
-	req, err := http.NewRequest("GET", "http://example.com", nil)
-	Expect(err).To(BeNil())
-
-	originalFp := matching.GetRequestFingerprint(req, []byte(""), false)
-
-	httpsReq, err := http.NewRequest("GET", "https://example.com", nil)
-	Expect(err).To(BeNil())
-
-	newFp := matching.GetRequestFingerprint(httpsReq, []byte(""), false)
-
-	// fingerprint should be the same
-	Expect(originalFp).To(Equal(newFp))
 }
 
 func TestRequestResponsePairEncodeDecode(t *testing.T) {
@@ -350,76 +308,4 @@ func TestUpdateDestinationEmpty(t *testing.T) {
 	dbClient.StartProxy()
 	err := dbClient.SetDestination("e^^**#")
 	Expect(err).ToNot(BeNil())
-}
-
-func TestJSONMinifier(t *testing.T) {
-	RegisterTestingT(t)
-
-	// body can be nil here, it's not reading it from request anyway
-	req, err := http.NewRequest("GET", "http://example.com", nil)
-	Expect(err).To(BeNil())
-	req.Header.Add("Content-Type", "application/json")
-
-	fpOne := matching.GetRequestFingerprint(req, []byte(`{"foo": "bar"}`), false)
-	fpTwo := matching.GetRequestFingerprint(req, []byte(`{     "foo":           "bar"}`), false)
-
-	Expect(fpOne).To(Equal(fpTwo))
-}
-
-func TestJSONMinifierWOHeader(t *testing.T) {
-	RegisterTestingT(t)
-
-	// body can be nil here, it's not reading it from request anyway
-	req, err := http.NewRequest("GET", "http://example.com", nil)
-	Expect(err).To(BeNil())
-
-	// application/json header is not set, shouldn't be equal
-	fpOne := matching.GetRequestFingerprint(req, []byte(`{"foo": "bar"}`), false)
-	fpTwo := matching.GetRequestFingerprint(req, []byte(`{     "foo":           "bar"}`), false)
-
-	Expect(fpOne).ToNot(Equal(fpTwo))
-}
-
-var xmlBody = `<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-		  <modelVersion>4.0.0</modelVersion>
-		  <groupId>some ID here</groupId>
-	       </project>`
-
-var xmlBodyTwo = `<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-
-		  <modelVersion>4.0.0</modelVersion>
-
-
-		  <groupId>some ID here</groupId>
-		  
-	       </project>`
-
-func TestXMLMinifier(t *testing.T) {
-	RegisterTestingT(t)
-
-	// body can be nil here, it's not reading it from request anyway
-	req, err := http.NewRequest("GET", "http://example.com", nil)
-	Expect(err).To(BeNil())
-
-	req.Header.Add("Content-Type", "application/xml")
-
-	fpOne := matching.GetRequestFingerprint(req, []byte(xmlBody), false)
-	fpTwo := matching.GetRequestFingerprint(req, []byte(xmlBodyTwo), false)
-	Expect(fpOne).To(Equal(fpTwo))
-}
-
-func TestXMLMinifierWOHeader(t *testing.T) {
-	RegisterTestingT(t)
-
-	// body can be nil here, it's not reading it from request anyway
-	req, err := http.NewRequest("GET", "http://example.com", nil)
-	Expect(err).To(BeNil())
-
-	// application/xml header is not set, shouldn't be equal
-	fpOne := matching.GetRequestFingerprint(req, []byte(xmlBody), false)
-	fpTwo := matching.GetRequestFingerprint(req, []byte(xmlBodyTwo), false)
-	Expect(fpOne).ToNot(Equal(fpTwo))
 }
