@@ -370,3 +370,63 @@ func Test_RequestDetails_Hash_TheHashIncludesTheBody(t *testing.T) {
 
 	Expect(hashedUnit).To(Equal("51834bfe5334158be38ef5209f2b8e29"))
 }
+
+func Test_RequestDetails_HashJSONMinifier(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := RequestDetails{
+		Method:      "GET",
+		Destination: "example.com",
+		Scheme:      "http",
+		Headers: map[string][]string{
+			"Content-Type": []string{"application/json"},
+		},
+	}
+
+	unit2 := unit
+
+	unit.Body = `{"foo": "bar"}`
+	unit2.Body = `{     "foo":           "bar"}`
+
+	fpOne := unit.Hash()
+	fpTwo := unit2.Hash()
+
+	Expect(fpOne).To(Equal(fpTwo))
+}
+
+var xmlBody = `<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+		  <modelVersion>4.0.0</modelVersion>
+		  <groupId>some ID here</groupId>
+	       </project>`
+
+var xmlBodyTwo = `<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+		  <modelVersion>4.0.0</modelVersion>
+
+		  <groupId>some ID here</groupId>
+
+	       </project>`
+
+func Test_RequestDetails_HashXMLMinifier(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := RequestDetails{
+		Method:      "GET",
+		Destination: "example.com",
+		Scheme:      "http",
+		Headers: map[string][]string{
+			"Content-Type": []string{"application/xml"},
+		},
+	}
+
+	unit2 := unit
+
+	unit.Body = xmlBody
+	unit2.Body = xmlBodyTwo
+
+	fpOne := unit.Hash()
+	fpTwo := unit2.Hash()
+	Expect(fpOne).To(Equal(fpTwo))
+}
