@@ -16,7 +16,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	// . "github.com/SpectoLabs/hoverfly/core/util"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -145,10 +144,6 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.Reques
 		failed := 0
 		for _, pairView := range pairViews {
 
-			// // Convert PayloadView back to Payload for internal storage
-			// pair := models.NewRequestResponsePairFromRequestResponsePairView(pairView)
-
-			// if pairView.GetRequest().GetRequestType() != nil && *pairView.GetRequest().GetRequestType() == *StringToPointer("template") {
 			responseDetails := models.NewResponseDetailsFromResponse(pairView.GetResponse())
 
 			requestTemplate := models.RequestTemplate{
@@ -169,34 +164,6 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.Reques
 			hf.Simulation.Templates = append(hf.Simulation.Templates, requestTemplateResponsePair)
 			success++
 			continue
-			// }
-
-			// if len(pair.Request.Headers) == 0 {
-			// 	pair.Request.Headers = make(map[string][]string)
-			// }
-
-			// if _, present := pair.Request.Headers["Content-Type"]; !present {
-			// 	// sniffing content types
-			// 	if isJSON(pair.Request.Body) {
-			// 		pair.Request.Headers["Content-Type"] = []string{"application/json"}
-			// 	} else {
-			// 		ct := http.DetectContentType([]byte(pair.Request.Body))
-			// 		pair.Request.Headers["Content-Type"] = []string{ct}
-			// 	}
-			// }
-
-			// err := hf.RequestMatcher.SaveRequestResponsePair(&pair)
-			// if err != nil {
-			// 	log.WithFields(log.Fields{
-			// 		"error": err.Error(),
-			// 	}).Error("Failed to save payload")
-			// }
-
-			// if err == nil {
-			// 	success++
-			// } else {
-			// 	failed++
-			// }
 		}
 		log.WithFields(log.Fields{
 			"total":      len(pairViews),
