@@ -4,8 +4,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/gorilla/mux"
@@ -41,6 +43,16 @@ var (
 	delayTwo = v1.ResponseDelayView{
 		UrlPattern: "test.com",
 		Delay:      201,
+	}
+
+	requestCache = cache.NewInMemoryCache()
+
+	unit = Hoverfly{
+		CacheMatcher: matching.CacheMatcher{
+			RequestCache: requestCache,
+		},
+		RequestCache: requestCache,
+		Cfg:          &Configuration{},
 	}
 )
 
@@ -507,4 +519,58 @@ func Test_Hoverfly_GetUpstreamProxy_GetsUpstreamProxy(t *testing.T) {
 	}
 
 	Expect(unit.GetUpstreamProxy()).To(Equal("upstream-proxy.org"))
+}
+
+func Test_Hoverfly_SetMode_CanSetModeToCapture(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(unit.SetMode("capture")).To(BeNil())
+	Expect(unit.Cfg.Mode).To(Equal("capture"))
+}
+
+func Test_Hoverfly_SetMode_CanSetModeToSimulate(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(unit.SetMode("simulate")).To(BeNil())
+	Expect(unit.Cfg.Mode).To(Equal("simulate"))
+}
+
+func Test_Hoverfly_SetMode_CanSetModeToModify(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(unit.SetMode("modify")).To(BeNil())
+	Expect(unit.Cfg.Mode).To(Equal("modify"))
+}
+
+func Test_Hoverfly_SetMode_CanSetModeToSynthesize(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(unit.SetMode("synthesize")).To(BeNil())
+	Expect(unit.Cfg.Mode).To(Equal("synthesize"))
+}
+
+func Test_Hoverfly_SetMode_CannotSetModeToSomethingInvalid(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit.Cfg.Mode = ""
+
+	Expect(unit.SetMode("mode")).ToNot(BeNil())
+	Expect(unit.Cfg.Mode).To(Equal(""))
+
+	Expect(unit.SetMode("hoverfly")).ToNot(BeNil())
+	Expect(unit.Cfg.Mode).To(Equal(""))
+}
+
+func Test_Hoverfly_SetMode_SettingModeToCaptureWipesCache(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit.Cfg.Mode = ""
+
+	unit.RequestCache.Set([]byte("test"), []byte("test_bytes"))
+
+	Expect(unit.SetMode("capture")).To(BeNil())
+	Expect(unit.Cfg.Mode).To(Equal("capture"))
+
+	values, _ := unit.RequestCache.GetAllValues()
+	Expect(values).To(HaveLen(0))
 }
