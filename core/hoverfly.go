@@ -32,7 +32,6 @@ func orPanic(err error) {
 
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
 type Hoverfly struct {
-	RequestCache   cache.Cache
 	CacheMatcher   matching.CacheMatcher
 	MetadataCache  cache.Cache
 	Authentication backends.Authentication
@@ -60,20 +59,19 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 
 	authBackend := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
 
-	requestMatcher := matching.CacheMatcher{
+	cacheMatcher := matching.CacheMatcher{
 		RequestCache: requestCache,
 		Webserver:    &cfg.Webserver,
 	}
 
 	h := &Hoverfly{
-		RequestCache:   requestCache,
 		MetadataCache:  metadataCache,
 		Authentication: authBackend,
 		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.UpstreamProxy),
 		Cfg:            cfg,
 		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
 		ResponseDelays: &models.ResponseDelayList{},
-		CacheMatcher:   requestMatcher,
+		CacheMatcher:   cacheMatcher,
 		Simulation:     simulation,
 	}
 
@@ -95,20 +93,19 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication backends.Authentication) *Hoverfly {
 	simulation := models.NewSimulation()
 
-	requestMatcher := matching.CacheMatcher{
+	cacheMatcher := matching.CacheMatcher{
 		RequestCache: requestCache,
 		Webserver:    &cfg.Webserver,
 	}
 
 	h := &Hoverfly{
-		RequestCache:   requestCache,
 		MetadataCache:  metadataCache,
 		Authentication: authentication,
 		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.UpstreamProxy),
 		Cfg:            cfg,
 		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
 		ResponseDelays: &models.ResponseDelayList{},
-		CacheMatcher:   requestMatcher,
+		CacheMatcher:   cacheMatcher,
 		Simulation:     simulation,
 	}
 
@@ -149,8 +146,6 @@ func GetDefaultHoverflyHTTPClient(tlsVerification bool, upstreamProxy string) *h
 
 // StartProxy - starts proxy with current configuration, this method is non blocking.
 func (hf *Hoverfly) StartProxy() error {
-
-	rebuildHashes(hf.RequestCache, hf.Cfg.Webserver)
 
 	if hf.Cfg.ProxyPort == "" {
 		return fmt.Errorf("Proxy port is not set!")

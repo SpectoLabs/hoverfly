@@ -552,11 +552,11 @@ func Test_Hoverfly_SetMode_SettingModeToCaptureWipesCache(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.RequestCache.Set([]byte("test"), []byte("test_bytes"))
+	unit.CacheMatcher.RequestCache.Set([]byte("test"), []byte("test_bytes"))
 
 	Expect(unit.SetMode("capture")).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("capture"))
 
-	values, _ := unit.RequestCache.GetAllValues()
+	values, _ := unit.CacheMatcher.RequestCache.GetAllValues()
 	Expect(values).To(HaveLen(0))
 }
