@@ -88,6 +88,7 @@ var (
 
 	databasePath = flag.String("db-path", "", "database location - supply it to provide specific database location (will be created there if it doesn't exist)")
 	database     = flag.String("db", inmemoryBackend, "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
+	disableCache = flag.Bool("disable-cache", false, "Disable the cache that sits infront of matching")
 )
 
 var CA_CERT = []byte(`-----BEGIN CERTIFICATE-----
@@ -274,6 +275,10 @@ func main() {
 		userCache = cache.NewInMemoryCache()
 	} else {
 		log.Fatalf("unknown database type chosen: %s", *database)
+	}
+	cfg.DisableCache = *disableCache
+	if cfg.DisableCache {
+		requestCache = nil
 	}
 
 	authBackend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
