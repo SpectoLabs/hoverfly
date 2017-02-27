@@ -1,6 +1,8 @@
 package matching
 
 import (
+	"errors"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -14,6 +16,11 @@ type CacheMatcher struct {
 
 // getResponse returns stored response from cache
 func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.ResponseDetails, *MatchingError) {
+	if this.RequestCache == nil {
+		return nil, &MatchingError{
+			Description: "No cache set",
+		}
+	}
 
 	var key string
 
@@ -68,6 +75,12 @@ func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.Respo
 }
 
 func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairView, error) {
+	if this.RequestCache == nil {
+		return nil, &MatchingError{
+			Description: "No cache set",
+		}
+	}
+
 	records, err := this.RequestCache.GetAllEntries()
 	if err != nil {
 		return []v2.RequestResponsePairView{}, err
@@ -89,6 +102,10 @@ func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairView, error)
 }
 
 func (this *CacheMatcher) SaveRequestResponsePair(pair *models.RequestResponsePair) error {
+	if this.RequestCache == nil {
+		return errors.New("No cache set")
+	}
+
 	var key string
 
 	if *this.Webserver {
@@ -116,5 +133,9 @@ func (this *CacheMatcher) SaveRequestResponsePair(pair *models.RequestResponsePa
 }
 
 func (this CacheMatcher) FlushCache() error {
+	if this.RequestCache == nil {
+		return errors.New("No cache set")
+	}
+
 	return this.RequestCache.DeleteData()
 }
