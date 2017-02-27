@@ -12,7 +12,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
-	authBackend "github.com/SpectoLabs/hoverfly/core/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
@@ -35,7 +35,7 @@ type Hoverfly struct {
 	RequestCache   cache.Cache
 	CacheMatcher   matching.CacheMatcher
 	MetadataCache  cache.Cache
-	Authentication authBackend.Authentication
+	Authentication backends.Authentication
 	HTTP           *http.Client
 	Cfg            *Configuration
 	Counter        *metrics.CounterByMode
@@ -52,8 +52,47 @@ type Hoverfly struct {
 	Simulation *models.Simulation
 }
 
+func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
+	simulation := models.NewSimulation()
+
+	requestCache := cache.NewInMemoryCache()
+	metadataCache := cache.NewInMemoryCache()
+
+	authBackend := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
+
+	requestMatcher := matching.CacheMatcher{
+		RequestCache: requestCache,
+		Webserver:    &cfg.Webserver,
+	}
+
+	h := &Hoverfly{
+		RequestCache:   requestCache,
+		MetadataCache:  metadataCache,
+		Authentication: authBackend,
+		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.UpstreamProxy),
+		Cfg:            cfg,
+		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
+		ResponseDelays: &models.ResponseDelayList{},
+		CacheMatcher:   requestMatcher,
+		Simulation:     simulation,
+	}
+
+	modeMap := make(map[string]modes.Mode)
+
+	modeMap[modes.Capture] = modes.CaptureMode{Hoverfly: h}
+	modeMap[modes.Simulate] = modes.SimulateMode{Hoverfly: h}
+	modeMap[modes.Modify] = modes.ModifyMode{Hoverfly: h}
+	modeMap[modes.Synthesize] = modes.SynthesizeMode{Hoverfly: h}
+
+	h.modeMap = modeMap
+
+	h.version = "v0.10.2"
+
+	return h
+}
+
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
-func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication authBackend.Authentication) *Hoverfly {
+func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication backends.Authentication) *Hoverfly {
 	simulation := models.NewSimulation()
 
 	requestMatcher := matching.CacheMatcher{
