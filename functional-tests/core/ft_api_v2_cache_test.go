@@ -19,7 +19,6 @@ var _ = Describe("/api/v2/cache", func() {
 	BeforeEach(func() {
 		hoverfly = functional_tests.NewHoverfly()
 		hoverfly.Start()
-		hoverfly.SetMode("simulate")
 		hoverfly.ImportSimulation(functional_tests.JsonPayload)
 		hoverfly.Proxy(sling.New().Get("http://template-server.com"))
 	})
@@ -64,6 +63,22 @@ var _ = Describe("/api/v2/cache", func() {
 			Expect(response.GetString("body")).Should(Equal("template match"))
 			Expect(response.GetBoolean("encodedBody")).Should(BeFalse())
 		})
+
+		It("should get error when cache is disabled", func() {
+			hoverfly.Stop()
+			hoverfly.Start("-disable-cache")
+
+			req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/cache")
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(500))
+			responseJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+
+			jsonObject, err := jason.NewObjectFromBytes(responseJson)
+			Expect(err).To(BeNil())
+
+			Expect(jsonObject.GetString("error")).Should(Equal("No cache set"))
+		})
 	})
 
 	Context("DELETE", func() {
@@ -82,6 +97,22 @@ var _ = Describe("/api/v2/cache", func() {
 			Expect(err).To(BeNil())
 
 			Expect(cacheArray).To(HaveLen(0))
+		})
+
+		It("should get error when cache is disabled", func() {
+			hoverfly.Stop()
+			hoverfly.Start("-disable-cache")
+
+			req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/cache")
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(500))
+			responseJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+
+			jsonObject, err := jason.NewObjectFromBytes(responseJson)
+			Expect(err).To(BeNil())
+
+			Expect(jsonObject.GetString("error")).Should(Equal("No cache set"))
 		})
 	})
 })
