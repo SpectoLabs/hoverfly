@@ -16,6 +16,16 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func Test_NewHoverflyWithConfiguration_DoesNotCreateCacheIfCfgIsDisabled(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{
+		DisableCache: true,
+	})
+
+	Expect(unit.CacheMatcher.RequestCache).To(BeNil())
+}
+
 func TestGetNewHoverflyCheckConfig(t *testing.T) {
 	RegisterTestingT(t)
 

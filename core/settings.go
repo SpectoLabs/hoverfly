@@ -27,6 +27,8 @@ type Configuration struct {
 	Verbose     bool
 	Development bool
 
+	DisableCache bool
+
 	SecretKey          []byte
 	JWTExpirationDelta int
 	AuthEnabled        bool
