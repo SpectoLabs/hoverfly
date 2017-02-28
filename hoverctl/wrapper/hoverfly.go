@@ -235,7 +235,7 @@ func (h *Hoverfly) FlushCache() error {
 	}
 
 	if response.StatusCode != 200 {
-		return errors.New("Could not flush cache")
+		return errors.New("Cache was not set on Hoverfly")
 	}
 
 	return nil
