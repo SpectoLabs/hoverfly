@@ -50,4 +50,12 @@ var _ = Describe("hoverctl flush cache", func() {
 		Expect(cacheArray).To(HaveLen(0))
 	})
 
+	It("should error nicely when trying to flush but cache is disabled", func() {
+		hoverfly.Stop()
+		hoverfly.Start("-disable-cache")
+		output := functional_tests.Run(hoverctlBinary, "flush", "--force")
+
+		Expect(output).To(ContainSubstring("Cache was not set on Hoverfly"))
+	})
+
 })
