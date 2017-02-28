@@ -21,6 +21,7 @@ var (
 		HoverflyKey:           "",
 		HoverflyDisableTls:    false,
 		HoverflyUpstreamProxy: "",
+		HoverflyCacheDisable:  false,
 	}
 )
 
@@ -299,20 +300,48 @@ func Test_Config_SetUpstreamProxy_DoesNotOverrideWhenEmpty(t *testing.T) {
 	Expect(*result).To(Equal(expected))
 }
 
+func Test_Config_DisableCache_OverridesDefaultValue(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	result := GetConfig().DisableCache(true)
+
+	expected := defaultConfig
+	expected.HoverflyCacheDisable = true
+
+	Expect(*result).To(Equal(expected))
+}
+
+func Test_Config_DisableCache_DoesNotOverridesDefaultValueIfDefaultIsPositive(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+
+	result := GetConfig()
+	result.HoverflyCacheDisable = true
+	result = result.DisableCache(false)
+
+	expected := defaultConfig
+	expected.HoverflyCacheDisable = true
+
+	Expect(*result).To(Equal(expected))
+}
+
 func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testing.T) {
 	RegisterTestingT(t)
 
 	config := Config{
-		HoverflyHost:        "testhost",
-		HoverflyAdminPort:   "1234",
-		HoverflyProxyPort:   "4567",
-		HoverflyDbType:      "boltdb",
-		HoverflyUsername:    "username",
-		HoverflyPassword:    "password",
-		HoverflyWebserver:   true,
-		HoverflyCertificate: "/home/benjih/certificate.pem",
-		HoverflyKey:         "/home/benjih/key.pem",
-		HoverflyDisableTls:  true,
+		HoverflyHost:         "testhost",
+		HoverflyAdminPort:    "1234",
+		HoverflyProxyPort:    "4567",
+		HoverflyDbType:       "boltdb",
+		HoverflyUsername:     "username",
+		HoverflyPassword:     "password",
+		HoverflyWebserver:    true,
+		HoverflyCertificate:  "/home/benjih/certificate.pem",
+		HoverflyKey:          "/home/benjih/key.pem",
+		HoverflyDisableTls:   true,
+		HoverflyCacheDisable: true,
 	}
 
 	wd, _ := os.Getwd()
@@ -337,6 +366,7 @@ func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testin
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.certificate: /home/benjih/certificate.pem"))
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.key: /home/benjih/key.pem"))
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.disable: true"))
+	Expect(string(data)).To(ContainSubstring("hoverfly.cache.disable: true"))
 }
 
 func Test_Config_WriteToFile_WritesTheDefaultConfigObjectToAFileInAYamlFormat(t *testing.T) {
@@ -367,6 +397,7 @@ func Test_Config_WriteToFile_WritesTheDefaultConfigObjectToAFileInAYamlFormat(t 
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.certificate: \"\""))
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.key: \"\""))
 	Expect(string(data)).To(ContainSubstring("hoverfly.tls.disable: false"))
+	Expect(string(data)).To(ContainSubstring("hoverfly.cache.disable: false"))
 }
 
 func Test_Config_BuildFlags_SettingWebserverToTrueAddsTheFlag(t *testing.T) {
@@ -482,4 +513,25 @@ func Test_Config_BuildFlags_CanBuildFlagsInCorrectOrderWithAllVariables(t *testi
 	Expect(unit.BuildFlags()[1]).To(Equal("-cert=certificate.pem"))
 	Expect(unit.BuildFlags()[2]).To(Equal("-key=key.pem"))
 	Expect(unit.BuildFlags()[3]).To(Equal("-tls-verification=false"))
+}
+
+func Test_Config_BuildFlags_CacheDisableBuildsCorrectFlagWhenTrue(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Config{
+		HoverflyCacheDisable: true,
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(1))
+	Expect(unit.BuildFlags()[0]).To(Equal("-disable-cache"))
+}
+
+func Test_Config_BuildFlags_CacheDisableDoesNotBuildCorrectFlagWhenFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Config{
+		HoverflyCacheDisable: false,
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(0))
 }

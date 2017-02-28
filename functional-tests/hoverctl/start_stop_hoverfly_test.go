@@ -319,5 +319,22 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(responseBody).To(ContainSubstring(`"upstream-proxy":"http://hoverfly.io:8080"`))
 			})
 		})
+
+		Context("You can disable the cache for hoverfly", func() {
+
+			It("starts hoverfly without a cache", func() {
+				output := functional_tests.Run(hoverctlBinary, "start", "--disable-cache")
+
+				Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+				response := functional_tests.DoRequest(sling.New().Get("http://localhost:" + adminPortAsString + "/api/v2/cache"))
+
+				Expect(response.StatusCode).To(Equal(500))
+
+				responseBody, _ := ioutil.ReadAll(response.Body)
+
+				Expect(string(responseBody)).To(ContainSubstring(`{"error":"No cache set"}`))
+			})
+		})
 	})
 })
