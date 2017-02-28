@@ -17,6 +17,8 @@ var disableTls, verbose bool
 
 var force bool
 
+var cacheDisable bool
+
 var hoverfly wrapper.Hoverfly
 var hoverflyDirectory wrapper.HoverflyDirectory
 var config *wrapper.Config
@@ -55,6 +57,8 @@ func init() {
 		"Disables TLS verification")
 	RootCmd.PersistentFlags().StringVar(&database, "database", "",
 		"A database type [memory|boltdb]. Overrides the default Hoverfly database type (memory)")
+	RootCmd.PersistentFlags().BoolVar(&cacheDisable, "disable-cache", false,
+		"?")
 	RootCmd.PersistentFlags().StringVar(&upstreamProxy, "upstream-proxy", "",
 		"A host for which Hoverfly will proxy its requests to")
 
@@ -83,6 +87,7 @@ func initConfig() {
 	config = config.DisableTls(disableTls)
 	config = config.SetDbType(database)
 	config = config.SetUpstreamProxy(upstreamProxy)
+	config = config.DisableCache(cacheDisable)
 
 	var err error
 	hoverflyDirectory, err = wrapper.NewHoverflyDirectory(*config)

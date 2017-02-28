@@ -23,6 +23,7 @@ type Config struct {
 	HoverflyKey           string `yaml:"hoverfly.tls.key"`
 	HoverflyDisableTls    bool   `yaml:"hoverfly.tls.disable"`
 	HoverflyUpstreamProxy string `yaml:"hoverfly.upstream.proxy"`
+	HoverflyCacheDisable  bool   `yaml:"hoverfly.cache.disable"`
 }
 
 func GetConfig() *Config {
@@ -134,6 +135,13 @@ func (this *Config) DisableTls(disableTls bool) *Config {
 	return this
 }
 
+func (this *Config) DisableCache(cacheDisable bool) *Config {
+	if this.HoverflyCacheDisable || cacheDisable {
+		this.HoverflyCacheDisable = true
+	}
+	return this
+}
+
 func (c *Config) WriteToFile(hoverflyDirectory HoverflyDirectory) error {
 	data, err := yaml.Marshal(c)
 
@@ -187,6 +195,10 @@ func (this Config) BuildFlags() Flags {
 
 	if this.HoverflyUpstreamProxy != "" {
 		flags = append(flags, "-upstream-proxy="+this.HoverflyUpstreamProxy)
+	}
+
+	if this.HoverflyCacheDisable {
+		flags = append(flags, "-disable-cache")
 	}
 
 	return flags
