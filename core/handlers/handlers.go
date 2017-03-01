@@ -2,8 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/go-zoo/bone"
 	"net/http"
+	"time"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/go-zoo/bone"
+	"github.com/gorilla/websocket"
 )
 
 type ErrorView struct {
@@ -28,4 +32,50 @@ func WriteErrorResponse(response http.ResponseWriter, message string, code int) 
 	}
 	response.WriteHeader(code)
 	WriteResponse(response, errorBytes)
+}
+
+type WebSocketHandler func() ([]byte, error)
+
+func NewWebsocket(handler WebSocketHandler, w http.ResponseWriter, r *http.Request) {
+
+	var wsUpgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+
+	conn, err := wsUpgrader.Upgrade(w, r, nil)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Error("failed to upgrade websocket")
+		return
+	}
+
+	for {
+		messageType, p, err := conn.ReadMessage()
+		if err != nil {
+			return
+		}
+
+		log.WithFields(log.Fields{
+			"message": string(p),
+		}).Debug("Got message...")
+
+		for _ = range time.Tick(1 * time.Second) {
+
+			updateBytes, err := handler()
+
+			if err = conn.WriteMessage(messageType, updateBytes); err != nil {
+				log.WithFields(log.Fields{
+					"message": p,
+					"error":   err.Error(),
+				}).Debug("Got error when writing message...")
+				continue
+			}
+		}
+	}
 }
