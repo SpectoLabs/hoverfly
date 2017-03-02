@@ -31,14 +31,23 @@ func (hook StoreLogsHook) Levels() []logrus.Level {
 	}
 }
 
+type Fields map[string]interface{}
+
 func (hook StoreLogsHook) GetLogsView() v2.LogsView {
-	var logs []v2.LogView
+
+	var logs []map[string]interface{}
 	for _, entry := range hook.Entries {
-		logs = append(logs, v2.LogView{
-			Time:    entry.Time.Format(logrus.DefaultTimestampFormat),
-			Message: entry.Message,
-			Level:   entry.Level.String(),
-		})
+		data := make(map[string]interface{}, len(entry.Data)+3)
+
+		for k, v := range entry.Data {
+			data[k] = v
+		}
+
+		data["time"] = entry.Time.Format(logrus.DefaultTimestampFormat)
+		data["msg"] = entry.Message
+		data["level"] = entry.Level.String()
+
+		logs = append(logs, data)
 	}
 
 	return v2.LogsView{
