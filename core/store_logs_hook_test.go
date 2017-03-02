@@ -42,6 +42,23 @@ func Test_StoreLogsHook_GetLogsView_BuildsLogsViewFromEntriesArray(t *testing.T)
 	logs := unit.GetLogsView()
 
 	Expect(logs.Logs).To(HaveLen(1))
-	Expect(logs.Logs[0].Message).To(Equal("test entry"))
+	Expect(logs.Logs[0]["msg"]).To(Equal("test entry"))
+}
 
+func Test_StoreLogsHook_GetLogsView_LogsContainFields(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewStoreLogsHook()
+
+	unit.Entries = append(unit.Entries, &logrus.Entry{
+		Message: "test entry",
+		Data: logrus.Fields{
+			"test": "field",
+		},
+	})
+
+	logs := unit.GetLogsView()
+
+	Expect(logs.Logs).To(HaveLen(1))
+	Expect(logs.Logs[0]["test"]).To(Equal("field"))
 }
