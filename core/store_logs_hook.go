@@ -16,7 +16,7 @@ func NewStoreLogsHook() *StoreLogsHook {
 }
 
 func (hook *StoreLogsHook) Fire(entry *logrus.Entry) error {
-	hook.Entries = append(hook.Entries, entry)
+	hook.Entries = append([]*logrus.Entry{entry}, hook.Entries...)
 	return nil
 }
 
