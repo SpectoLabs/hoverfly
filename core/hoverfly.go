@@ -48,7 +48,8 @@ type Hoverfly struct {
 
 	modeMap map[string]modes.Mode
 
-	Simulation *models.Simulation
+	Simulation    *models.Simulation
+	StoreLogsHook *StoreLogsHook
 }
 
 func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
@@ -68,6 +69,9 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 		Webserver:    &cfg.Webserver,
 	}
 
+	hook := NewStoreLogsHook()
+	log.AddHook(hook)
+
 	h := &Hoverfly{
 		MetadataCache:  metadataCache,
 		Authentication: authBackend,
@@ -77,6 +81,7 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 		ResponseDelays: &models.ResponseDelayList{},
 		CacheMatcher:   cacheMatcher,
 		Simulation:     simulation,
+		StoreLogsHook:  hook,
 	}
 
 	modeMap := make(map[string]modes.Mode)
@@ -106,6 +111,9 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		Webserver:    &cfg.Webserver,
 	}
 
+	hook := NewStoreLogsHook()
+	log.AddHook(hook)
+
 	h := &Hoverfly{
 		MetadataCache:  metadataCache,
 		Authentication: authentication,
@@ -115,6 +123,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		ResponseDelays: &models.ResponseDelayList{},
 		CacheMatcher:   cacheMatcher,
 		Simulation:     simulation,
+		StoreLogsHook:  hook,
 	}
 
 	modeMap := make(map[string]modes.Mode)
