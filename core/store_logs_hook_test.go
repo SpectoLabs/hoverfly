@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/Sirupsen/logrus"
@@ -78,4 +79,57 @@ func Test_StoreLogsHook_GetLogsView_LogsContainFields(t *testing.T) {
 
 	Expect(logs.Logs).To(HaveLen(1))
 	Expect(logs.Logs[0]["test"]).To(Equal("field"))
+}
+
+func Test_StoreLogsHook_GetLogsView_LimitsTo500Logs(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewStoreLogsHook()
+
+	for i := 0; i <= 501; i++ {
+		unit.Fire(&logrus.Entry{
+			Message: strconv.Itoa(i),
+		})
+	}
+
+	logs := unit.GetLogsView()
+
+	Expect(logs.Logs).To(HaveLen(500))
+	Expect(logs.Logs[0]["msg"]).To(Equal("501"))
+	Expect(logs.Logs[499]["msg"]).To(Equal("2"))
+}
+
+func Test_StoreLogsHook_GetFilteredLogsView_CanSetLimit(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewStoreLogsHook()
+
+	for i := 0; i <= 3; i++ {
+		unit.Fire(&logrus.Entry{
+			Message: strconv.Itoa(i),
+		})
+	}
+
+	logs := unit.GetFilteredLogsView(2)
+
+	Expect(logs.Logs).To(HaveLen(2))
+	Expect(logs.Logs[0]["msg"]).To(Equal("3"))
+	Expect(logs.Logs[1]["msg"]).To(Equal("2"))
+}
+
+func Test_StoreLogsHook_GetFilteredLogsView_DoesNotErrorWhenLimitIsLargerThanArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewStoreLogsHook()
+
+	for i := 0; i <= 2; i++ {
+		unit.Fire(&logrus.Entry{
+			Message: strconv.Itoa(i),
+		})
+	}
+
+	logs := unit.GetFilteredLogsView(1)
+
+	Expect(logs.Logs).To(HaveLen(1))
+	Expect(logs.Logs[0]["msg"]).To(Equal("2"))
 }
