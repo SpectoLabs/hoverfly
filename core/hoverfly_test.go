@@ -305,7 +305,7 @@ func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {
 	dbClient.Cfg.SetMode("simulate")
 
 	stub := ResponseDelayListStub{}
-	dbClient.ResponseDelays = &stub
+	dbClient.Simulation.ResponseDelays = &stub
 
 	newResp := dbClient.processRequest(r)
 
@@ -327,7 +327,7 @@ func TestDelayNotAppliedToFailedSimulateRequest(t *testing.T) {
 	dbClient.Cfg.SetMode("simulate")
 
 	stub := ResponseDelayListStub{}
-	dbClient.ResponseDelays = &stub
+	dbClient.Simulation.ResponseDelays = &stub
 
 	newResp := dbClient.processRequest(r)
 
@@ -348,7 +348,7 @@ func TestDelayNotAppliedToCaptureRequest(t *testing.T) {
 	dbClient.Cfg.SetMode("capture")
 
 	stub := ResponseDelayListStub{}
-	dbClient.ResponseDelays = &stub
+	dbClient.Simulation.ResponseDelays = &stub
 
 	resp := dbClient.processRequest(r)
 
@@ -377,7 +377,7 @@ func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
 	dbClient.Cfg.SetMode("synthesize")
 
 	stub := ResponseDelayListStub{}
-	dbClient.ResponseDelays = &stub
+	dbClient.Simulation.ResponseDelays = &stub
 	newResp := dbClient.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
@@ -405,7 +405,7 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 	dbClient.Cfg.SetMode("synthesize")
 
 	stub := ResponseDelayListStub{}
-	dbClient.ResponseDelays = &stub
+	dbClient.Simulation.ResponseDelays = &stub
 	newResp := dbClient.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
@@ -431,7 +431,7 @@ func TestDelayAppliedToSuccessfulMiddleware(t *testing.T) {
 	dbClient.Cfg.SetMode("modify")
 
 	stub := ResponseDelayListStub{}
-	dbClient.ResponseDelays = &stub
+	dbClient.Simulation.ResponseDelays = &stub
 	newResp := dbClient.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
@@ -456,7 +456,7 @@ func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
 	unit.Cfg.SetMode("modify")
 
 	stub := ResponseDelayListStub{}
-	unit.ResponseDelays = &stub
+	unit.Simulation.ResponseDelays = &stub
 	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))

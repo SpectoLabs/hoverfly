@@ -656,7 +656,7 @@ func TestDeleteAllResponseDelaysHandler(t *testing.T) {
 		Delay:      100,
 	}
 	delays := models.ResponseDelayList{delay}
-	unit.ResponseDelays = &delays
+	unit.Simulation.ResponseDelays = &delays
 	m := adminApi.getBoneRouter(unit)
 
 	req, err := http.NewRequest("DELETE", "/api/delays", nil)
@@ -667,7 +667,7 @@ func TestDeleteAllResponseDelaysHandler(t *testing.T) {
 	m.ServeHTTP(rec, req)
 	Expect(rec.Code).To(Equal(http.StatusOK))
 
-	Expect(unit.ResponseDelays.Len()).To(Equal(0))
+	Expect(unit.Simulation.ResponseDelays.Len()).To(Equal(0))
 }
 
 func TestUpdateResponseDelays(t *testing.T) {
@@ -698,7 +698,7 @@ func TestUpdateResponseDelays(t *testing.T) {
 	m.ServeHTTP(rec, req)
 	Expect(rec.Code).To(Equal(http.StatusCreated))
 
-	Expect(unit.ResponseDelays.ConvertToResponseDelayPayloadView()).To(Equal(delayJson))
+	Expect(unit.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()).To(Equal(delayJson))
 }
 
 func TestInvalidJSONSyntaxUpdateResponseDelays(t *testing.T) {
@@ -719,7 +719,7 @@ func TestInvalidJSONSyntaxUpdateResponseDelays(t *testing.T) {
 	Expect(rec.Code).To(Equal(http.StatusBadRequest))
 
 	// normal equality checking doesn't work on slices (!!)
-	Expect(unit.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
+	Expect(unit.Simulation.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
 }
 
 func TestInvalidJSONSemanticsUpdateResponseDelays(t *testing.T) {
@@ -740,7 +740,7 @@ func TestInvalidJSONSemanticsUpdateResponseDelays(t *testing.T) {
 	Expect(rec.Code).To(Equal(422))
 
 	// normal equality checking doesn't work on slices (!!)
-	Expect(unit.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
+	Expect(unit.Simulation.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
 }
 
 func TestJSONWithInvalidHostPatternUpdateResponseDelays(t *testing.T) {
@@ -761,7 +761,7 @@ func TestJSONWithInvalidHostPatternUpdateResponseDelays(t *testing.T) {
 	Expect(rec.Code).To(Equal(422))
 
 	// normal equality checking doesn't work on slices (!!)
-	Expect(unit.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
+	Expect(unit.Simulation.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
 }
 
 func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
@@ -782,7 +782,7 @@ func TestJSONWithMissingFieldUpdateResponseDelays(t *testing.T) {
 	Expect(rec.Code).To(Equal(422))
 
 	// normal equality checking doesn't work on slices (!!)
-	Expect(unit.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
+	Expect(unit.Simulation.ResponseDelays).To(Equal(&models.ResponseDelayList{}))
 }
 
 func TestGetMissingURL(t *testing.T) {

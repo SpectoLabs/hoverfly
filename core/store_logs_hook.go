@@ -33,6 +33,10 @@ func (hook StoreLogsHook) Levels() []logrus.Level {
 
 type Fields map[string]interface{}
 
+func (hook StoreLogsHook) GetLogsCount() int {
+	return len(hook.Entries)
+}
+
 func (hook StoreLogsHook) GetLogsView() v2.LogsView {
 	return hook.GetFilteredLogsView(500)
 }

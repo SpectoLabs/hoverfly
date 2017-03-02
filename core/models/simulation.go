@@ -1,16 +1,19 @@
 package models
 
-import "reflect"
+import (
+	"reflect"
+)
 
 type Simulation struct {
-	Templates []RequestTemplateResponsePair
+	Templates      []RequestTemplateResponsePair
+	ResponseDelays ResponseDelays
 }
 
 func NewSimulation() *Simulation {
-	var templates []RequestTemplateResponsePair
 
 	return &Simulation{
-		Templates: templates,
+		Templates:      []RequestTemplateResponsePair{},
+		ResponseDelays: &ResponseDelayList{},
 	}
 }
 

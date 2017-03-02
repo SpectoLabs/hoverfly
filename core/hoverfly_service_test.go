@@ -157,7 +157,7 @@ func TestHoverflyGetSimulationReturnsMultipleDelays(t *testing.T) {
 
 	responseDelays := models.ResponseDelayList{delay1, delay2}
 
-	unit.ResponseDelays = &responseDelays
+	unit.Simulation.ResponseDelays = &responseDelays
 
 	simulation, err := unit.GetSimulation()
 	Expect(err).To(BeNil())
@@ -289,7 +289,7 @@ func TestHoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 	err := unit.PutSimulation(simulationToImport)
 	Expect(err).To(BeNil())
 
-	delays := unit.ResponseDelays.ConvertToResponseDelayPayloadView()
+	delays := unit.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()
 	Expect(delays).ToNot(BeNil())
 
 	Expect(delays.Data).To(HaveLen(2))
