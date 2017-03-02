@@ -34,9 +34,17 @@ func (hook StoreLogsHook) Levels() []logrus.Level {
 type Fields map[string]interface{}
 
 func (hook StoreLogsHook) GetLogsView() v2.LogsView {
+	return hook.GetFilteredLogsView(500)
+}
+
+func (hook StoreLogsHook) GetFilteredLogsView(limit int) v2.LogsView {
+
+	if limit > len(hook.Entries) {
+		limit = len(hook.Entries)
+	}
 
 	var logs []map[string]interface{}
-	for _, entry := range hook.Entries {
+	for _, entry := range hook.Entries[:limit] {
 		data := make(map[string]interface{}, len(entry.Data)+3)
 
 		for k, v := range entry.Data {
