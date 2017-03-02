@@ -171,3 +171,13 @@ type MetaView struct {
 type CacheView struct {
 	RequestResponsePairs []RequestResponsePairView `json:"cache"`
 }
+
+type LogsView struct {
+	Logs []LogView `json:"logs"`
+}
+
+type LogView struct {
+	Time    string `json:"time"`
+	Message string `json:"msg"`
+	Level   string `json:"level"`
+}
