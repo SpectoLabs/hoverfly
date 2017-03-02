@@ -173,11 +173,5 @@ type CacheView struct {
 }
 
 type LogsView struct {
-	Logs []LogView `json:"logs"`
-}
-
-type LogView struct {
-	Time    string `json:"time"`
-	Message string `json:"msg"`
-	Level   string `json:"level"`
+	Logs []map[string]interface{} `json:"logs"`
 }
