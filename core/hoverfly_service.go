@@ -138,7 +138,7 @@ func (hf Hoverfly) FlushCache() error {
 }
 
 func (hf *Hoverfly) GetResponseDelays() v1.ResponseDelayPayloadView {
-	return hf.ResponseDelays.ConvertToResponseDelayPayloadView()
+	return hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()
 }
 
 func (hf *Hoverfly) SetResponseDelays(payloadView v1.ResponseDelayPayloadView) error {
@@ -157,12 +157,12 @@ func (hf *Hoverfly) SetResponseDelays(payloadView v1.ResponseDelayPayloadView) e
 		})
 	}
 
-	hf.ResponseDelays = &responseDelays
+	hf.Simulation.ResponseDelays = &responseDelays
 	return nil
 }
 
 func (hf *Hoverfly) DeleteResponseDelays() {
-	hf.ResponseDelays = &models.ResponseDelayList{}
+	hf.Simulation.ResponseDelays = &models.ResponseDelayList{}
 }
 
 func (hf Hoverfly) GetStats() metrics.Stats {
@@ -176,7 +176,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
 		pairViews = append(pairViews, v.ConvertToRequestResponsePairView())
 	}
 
-	responseDelays := hf.ResponseDelays.ConvertToResponseDelayPayloadView()
+	responseDelays := hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()
 
 	return v2.SimulationView{
 		MetaView: v2.MetaView{

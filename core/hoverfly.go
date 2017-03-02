@@ -39,8 +39,6 @@ type Hoverfly struct {
 	Cfg            *Configuration
 	Counter        *metrics.CounterByMode
 
-	ResponseDelays models.ResponseDelays
-
 	Proxy   *goproxy.ProxyHttpServer
 	SL      *StoppableListener
 	mu      sync.Mutex
@@ -78,7 +76,6 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.UpstreamProxy),
 		Cfg:            cfg,
 		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
-		ResponseDelays: &models.ResponseDelayList{},
 		CacheMatcher:   cacheMatcher,
 		Simulation:     simulation,
 		StoreLogsHook:  hook,
@@ -120,7 +117,6 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.UpstreamProxy),
 		Cfg:            cfg,
 		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
-		ResponseDelays: &models.ResponseDelayList{},
 		CacheMatcher:   cacheMatcher,
 		Simulation:     simulation,
 		StoreLogsHook:  hook,
@@ -232,7 +228,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 		return response
 	}
 
-	respDelay := hf.ResponseDelays.GetDelay(requestDetails)
+	respDelay := hf.Simulation.ResponseDelays.GetDelay(requestDetails)
 	if respDelay != nil {
 		respDelay.Execute()
 	}
