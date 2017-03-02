@@ -16,7 +16,7 @@ func Test_NewStoreLogsHook_CreatesNewStructWithInitializedEntryArray(t *testing.
 	Expect(unit.Entries).To(HaveLen(0))
 }
 
-func Test_StoreLogsHook_FireSavesEntryToEntriesArray(t *testing.T) {
+func Test_StoreLogsHook_Fire_SavesEntryToEntriesArray(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewStoreLogsHook()
@@ -27,4 +27,21 @@ func Test_StoreLogsHook_FireSavesEntryToEntriesArray(t *testing.T) {
 
 	Expect(unit.Entries).To(HaveLen(1))
 	Expect(unit.Entries[0].Message).To(Equal("test entry"))
+
+}
+
+func Test_StoreLogsHook_GetLogsView_BuildsLogsViewFromEntriesArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewStoreLogsHook()
+
+	unit.Entries = append(unit.Entries, &logrus.Entry{
+		Message: "test entry",
+	})
+
+	logs := unit.GetLogsView()
+
+	Expect(logs.Logs).To(HaveLen(1))
+	Expect(logs.Logs[0].Message).To(Equal("test entry"))
+
 }
