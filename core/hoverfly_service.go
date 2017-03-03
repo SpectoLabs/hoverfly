@@ -169,7 +169,7 @@ func (hf Hoverfly) GetStats() metrics.Stats {
 	return hf.Counter.Flush()
 }
 
-func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
+func (hf Hoverfly) GetSimulation() (v2.SimulationViewV1, error) {
 	pairViews := make([]v2.RequestResponsePairView, 0)
 
 	for _, v := range hf.Simulation.Templates {
@@ -178,7 +178,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
 
 	responseDelays := hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()
 
-	return v2.SimulationView{
+	return v2.SimulationViewV1{
 		MetaView: v2.MetaView{
 			HoverflyVersion: hf.version,
 			SchemaVersion:   "v1",
@@ -193,7 +193,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationView, error) {
 	}, nil
 }
 
-func (this *Hoverfly) PutSimulation(simulationView v2.SimulationView) error {
+func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV1) error {
 	requestResponsePairViews := make([]interfaces.RequestResponsePair, len(simulationView.RequestResponsePairs))
 	for i, v := range simulationView.RequestResponsePairs {
 		requestResponsePairViews[i] = v
