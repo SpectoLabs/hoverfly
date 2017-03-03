@@ -219,7 +219,9 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			Headers: map[string][]string{"Content-Type": []string{"text/plain"}},
 		},
 		RequestTemplate: models.RequestTemplate{
-			Path:        StringToPointer("/"),
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/"),
+			},
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
 			Scheme:      StringToPointer("scheme"),
@@ -273,7 +275,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
 		RequestTemplate: models.RequestTemplate{
-			Path:        StringToPointer("/"),
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/"),
+			},
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
 			Scheme:      StringToPointer("scheme"),
@@ -290,7 +294,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
 		RequestTemplate: models.RequestTemplate{
-			Path:        StringToPointer("/new/path"),
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/new/path"),
+			},
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
 			Scheme:      StringToPointer("scheme"),
@@ -307,7 +313,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
 		RequestTemplate: models.RequestTemplate{
-			Path:        StringToPointer("/newer/path"),
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/newer/path"),
+			},
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
 			Scheme:      StringToPointer("scheme"),
