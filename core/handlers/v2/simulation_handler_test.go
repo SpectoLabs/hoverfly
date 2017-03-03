@@ -31,7 +31,7 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationViewV1, error) {
 	}
 
 	return SimulationViewV1{
-		DataView{
+		DataViewV1{
 			RequestResponsePairs: []RequestResponsePairView{pairOne},
 			GlobalActions: GlobalActionsView{
 				Delays: []v1.ResponseDelayView{
@@ -87,16 +87,16 @@ func TestSimulationHandler_Get_ReturnsSimulation(t *testing.T) {
 	simulationView, err := unmarshalSimulationViewV1(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(simulationView.DataView.RequestResponsePairs).To(HaveLen(1))
+	Expect(simulationView.DataViewV1.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(simulationView.DataView.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
-	Expect(simulationView.DataView.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
+	Expect(simulationView.DataViewV1.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
+	Expect(simulationView.DataViewV1.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
 
-	Expect(simulationView.DataView.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
+	Expect(simulationView.DataViewV1.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
 
-	Expect(simulationView.DataView.GlobalActions.Delays).To(HaveLen(1))
-	Expect(simulationView.DataView.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
-	Expect(simulationView.DataView.GlobalActions.Delays[0].Delay).To(Equal(100))
+	Expect(simulationView.DataViewV1.GlobalActions.Delays).To(HaveLen(1))
+	Expect(simulationView.DataViewV1.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
+	Expect(simulationView.DataViewV1.GlobalActions.Delays[0].Delay).To(Equal(100))
 
 	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v1"))
 	Expect(simulationView.MetaView.HoverflyVersion).To(Equal("test"))
@@ -153,16 +153,16 @@ func TestSimulationHandler_Delete_CallsGetAfterDelete(t *testing.T) {
 	simulationView, err := unmarshalSimulationViewV1(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(simulationView.DataView.RequestResponsePairs).To(HaveLen(1))
+	Expect(simulationView.DataViewV1.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(simulationView.DataView.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
-	Expect(simulationView.DataView.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
+	Expect(simulationView.DataViewV1.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
+	Expect(simulationView.DataViewV1.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
 
-	Expect(simulationView.DataView.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
+	Expect(simulationView.DataViewV1.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
 
-	Expect(simulationView.DataView.GlobalActions.Delays).To(HaveLen(1))
-	Expect(simulationView.DataView.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
-	Expect(simulationView.DataView.GlobalActions.Delays[0].Delay).To(Equal(100))
+	Expect(simulationView.DataViewV1.GlobalActions.Delays).To(HaveLen(1))
+	Expect(simulationView.DataViewV1.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
+	Expect(simulationView.DataViewV1.GlobalActions.Delays[0].Delay).To(Equal(100))
 
 	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v1"))
 	Expect(simulationView.MetaView.HoverflyVersion).To(Equal("test"))
