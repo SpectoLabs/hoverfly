@@ -178,7 +178,7 @@ func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	simulationToImport := v2.SimulationView{
+	simulationToImport := v2.SimulationViewV1{
 		DataView: v2.DataView{
 			RequestResponsePairs: []v2.RequestResponsePairView{pairOneRecording},
 			GlobalActions: v2.GlobalActionsView{
@@ -209,7 +209,7 @@ func TestHoverfly_PutSimulation_ImportsTemplates(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	simulationToImport := v2.SimulationView{
+	simulationToImport := v2.SimulationViewV1{
 		DataView: v2.DataView{
 			RequestResponsePairs: []v2.RequestResponsePairView{pairOneTemplate},
 			GlobalActions: v2.GlobalActionsView{
@@ -240,7 +240,7 @@ func TestHoverfly_PutSimulation_ImportsRecordingsAndTemplates(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	simulationToImport := v2.SimulationView{
+	simulationToImport := v2.SimulationViewV1{
 		DataView: v2.DataView{
 			RequestResponsePairs: []v2.RequestResponsePairView{pairOneRecording, pairOneTemplate},
 			GlobalActions: v2.GlobalActionsView{
@@ -276,7 +276,7 @@ func TestHoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	simulationToImport := v2.SimulationView{
+	simulationToImport := v2.SimulationViewV1{
 		DataView: v2.DataView{
 			RequestResponsePairs: []v2.RequestResponsePairView{},
 			GlobalActions: v2.GlobalActionsView{
