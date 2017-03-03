@@ -19,7 +19,7 @@ func (t TemplateMatcher) Match(req models.RequestDetails, webserver bool, simula
 
 		template := entry.RequestTemplate
 
-		if template.Body != nil && !glob.Glob(*template.Body, req.Body) {
+		if template.Body != nil && template.Body.ExactMatch != nil && !glob.Glob(*template.Body.ExactMatch, req.Body) {
 			continue
 		}
 
