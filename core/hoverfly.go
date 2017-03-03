@@ -296,7 +296,9 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 
 	pair := models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Path:        util.StringToPointer(request.Path),
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer(request.Path),
+			},
 			Method:      util.StringToPointer(request.Method),
 			Destination: util.StringToPointer(request.Destination),
 			Scheme:      util.StringToPointer(request.Scheme),

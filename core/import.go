@@ -147,7 +147,9 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.Reques
 			responseDetails := models.NewResponseDetailsFromResponse(pairView.GetResponse())
 
 			requestTemplate := models.RequestTemplate{
-				Path:        pairView.GetRequest().GetPath(),
+				Path: &models.RequestFieldMatchers{
+					ExactMatch: pairView.GetRequest().GetPath(),
+				},
 				Method:      pairView.GetRequest().GetMethod(),
 				Destination: pairView.GetRequest().GetDestination(),
 				Scheme:      pairView.GetRequest().GetScheme(),
