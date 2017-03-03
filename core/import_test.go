@@ -10,7 +10,6 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
@@ -195,22 +194,34 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPair := v2.RequestResponsePairViewV1{
+	originalPair := v2.RequestResponsePairViewV2{
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}}},
-		Request: v2.RequestDetailsViewV1{
-			Path:        StringToPointer("/"),
-			Method:      StringToPointer("GET"),
-			Destination: StringToPointer("/"),
-			Scheme:      StringToPointer("scheme"),
-			Query:       StringToPointer(""),
-			Body:        StringToPointer(""),
-			Headers:     map[string][]string{"Hoverfly": []string{"testing"}}}}
+		Request: v2.RequestDetailsViewV2{
+			Path: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("/"),
+			},
+			Method: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("GET"),
+			},
+			Destination: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("/"),
+			},
+			Scheme: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("scheme"),
+			},
+			Query: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer(""),
+			},
+			Body: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer(""),
+			},
+			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	hv.ImportRequestResponsePairViews([]interfaces.RequestResponsePair{originalPair})
+	hv.ImportRequestResponsePairViews([]v2.RequestResponsePairViewV2{originalPair})
 
 	Expect(hv.Simulation.Templates[0]).To(Equal(models.RequestTemplateResponsePair{
 		Response: models.ResponseDetails{
@@ -254,30 +265,47 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 
 	RegisterTestingT(t)
 
-	originalPair1 := v2.RequestResponsePairViewV1{
+	originalPair1 := v2.RequestResponsePairViewV2{
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 		},
-		Request: v2.RequestDetailsViewV1{
-			Path:        StringToPointer("/"),
-			Method:      StringToPointer("GET"),
-			Destination: StringToPointer("/"),
-			Scheme:      StringToPointer("scheme"),
-			Query:       StringToPointer(""),
-			Body:        StringToPointer(""),
-			Headers:     map[string][]string{"Hoverfly": []string{"testing"}}}}
+		Request: v2.RequestDetailsViewV2{
+			Path: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("/"),
+			},
+			Method: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("GET"),
+			},
+			Destination: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("/"),
+			},
+			Scheme: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("scheme"),
+			},
+			Query: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer(""),
+			},
+			Body: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer(""),
+			},
+			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	originalPair2 := originalPair1
-	originalPair2.Request.Path = StringToPointer("/new/path")
+	originalPair2.Request.Path = &v2.RequestFieldMatchersView{
+		ExactMatch: StringToPointer("/new/path"),
+	}
 
 	originalPair3 := originalPair1
-	originalPair3.Request.Path = StringToPointer("/newer/path")
+	originalPair3.Request.Path = &v2.RequestFieldMatchersView{
+		ExactMatch: StringToPointer("/newer/path"),
+	}
 
-	hv.ImportRequestResponsePairViews([]interfaces.RequestResponsePair{originalPair1, originalPair2, originalPair3})
+	hv.ImportRequestResponsePairViews([]v2.RequestResponsePairViewV2{originalPair1, originalPair2, originalPair3})
 
+	Expect(hv.Simulation.Templates).To(HaveLen(3))
 	Expect(hv.Simulation.Templates[0]).To(Equal(models.RequestTemplateResponsePair{
 		Response: models.ResponseDetails{
 			Status:  200,
@@ -376,8 +404,10 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 
 	RegisterTestingT(t)
 
-	requestTemplate := v2.RequestDetailsViewV1{
-		Method: StringToPointer("GET"),
+	requestTemplate := v2.RequestDetailsViewV2{
+		Method: &v2.RequestFieldMatchersView{
+			ExactMatch: StringToPointer("GET"),
+		},
 	}
 
 	responseView := v2.ResponseDetailsView{
@@ -387,12 +417,12 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 		Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 	}
 
-	templatePair := v2.RequestResponsePairViewV1{
+	templatePair := v2.RequestResponsePairViewV2{
 		Response: responseView,
 		Request:  requestTemplate,
 	}
 
-	hv.ImportRequestResponsePairViews([]interfaces.RequestResponsePair{templatePair})
+	hv.ImportRequestResponsePairViews([]v2.RequestResponsePairViewV2{templatePair})
 
 	Expect(len(hv.Simulation.Templates)).To(Equal(1))
 
@@ -418,22 +448,40 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 
 	RegisterTestingT(t)
 
-	encodedPair := v2.RequestResponsePairViewV1{
+	encodedPair := v2.RequestResponsePairViewV2{
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
-		Request: v2.RequestDetailsViewV1{
-			Path:        StringToPointer("/"),
-			Method:      StringToPointer("GET"),
-			Destination: StringToPointer("/"),
-			Scheme:      StringToPointer("scheme"),
-			Query:       StringToPointer(""),
-			Body:        StringToPointer(""),
-			Headers:     map[string][]string{"Hoverfly": []string{"testing"}}}}
+		Request: v2.RequestDetailsViewV2{
+			Path: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("/"),
+			},
+			Method: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("GET"),
+			},
+			Destination: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("/"),
+			},
+			Scheme: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("scheme"),
+			},
+			Query: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer(""),
+			},
+			Body: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer(""),
+			},
+			Headers: map[string][]string{
+				"Hoverfly": []string{
+					"testing",
+				},
+			},
+		},
+	}
 
-	hv.ImportRequestResponsePairViews([]interfaces.RequestResponsePair{encodedPair})
+	hv.ImportRequestResponsePairViews([]v2.RequestResponsePairViewV2{encodedPair})
 
 	Expect(hv.Simulation.Templates[0]).ToNot(Equal(models.RequestResponsePair{
 		Response: models.ResponseDetails{
