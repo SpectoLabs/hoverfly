@@ -161,7 +161,9 @@ var _ = Describe("/api/v2/simulation", func() {
 				"data": {
 					"pairs": [{
 						"request": {
-							"destination": "templatedurl.com"
+							"destination": {
+								"exactMatch": "templatedurl.com"
+							}
 						},
 						"response": {
 							"status": 200,
@@ -229,7 +231,9 @@ var _ = Describe("/api/v2/simulation", func() {
 				"data": {
 					"pairs": [{
 						"request": {
-							"destination": "templatedurl.com"
+							"destination": {
+								"exactMatch": "templatedurl.com"
+							}
 						},
 						"response": {
 							"status": 200,
