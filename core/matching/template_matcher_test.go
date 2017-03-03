@@ -470,7 +470,9 @@ func Test_Match_TemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 
 	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Scheme: StringToPointer("H*"),
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("H*"),
+			},
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
