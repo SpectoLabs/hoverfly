@@ -36,13 +36,24 @@
 					}
 				},
 				"request": {
-					"requestType": "recording",
-					"path": "/",
-					"method": "GET",
-					"destination": "007-spectre.readthedocs.org",
-					"scheme": "http",
-					"query": "",
-					"body": "",
+					"path": {
+						"exactMatch": "/"
+					},
+					"method": {
+						"exactMatch": "GET"
+					},
+					"destination": {
+						"exactMatch": "007-spectre.readthedocs.org"
+					},
+					"scheme": {
+						"exactMatch": "http"
+					},
+					"query":  {
+						"exactMatch": ""
+					},
+					"body":  {
+						"exactMatch": ""
+					},
 					"headers": {
 						"Accept": [
 							"*/*"
@@ -97,13 +108,27 @@
 					}
 				},
 				"request": {
-					"requestType": "recording",
-					"path": "/",
-					"method": "GET",
-					"destination": "007-spectre-film-complet-en-francais.readthedocs.org",
-					"scheme": "http",
-					"query": "",
-					"body": "",
+					"requestType": {
+						"exactMatch": "recording"
+					},
+					"path": {
+						"exactMatch": "/"
+					},
+					"method": {
+						"exactMatch": "GET"
+					},
+					"destination": {
+						"exactMatch": "007-spectre-film-complet-en-francais.readthedocs.org"
+					},
+					"scheme": {
+						"exactMatch": "http"
+					},
+					"query": {
+						"exactMatch": ""
+					},
+					"body": {
+						"exactMatch": ""
+					},
 					"headers": {
 						"Accept": [
 							"*/*"
@@ -163,12 +188,24 @@
 				},
 				"request": {
 					"requestType": "recording",
-					"path": "/",
-					"method": "GET",
-					"destination": "001.readthedocs.org",
-					"scheme": "http",
-					"query": "",
-					"body": "",
+					"path": {
+						"exactMatch": "/"
+					},
+					"method": {
+						"exactMatch": "GET"
+					},
+					"destination": {
+						"exactMatch": "001.readthedocs.org"
+					},
+					"scheme": {
+						"exactMatch": "http"
+					},
+					"query": {
+						"exactMatch": ""
+					},
+					"body": {
+						"exactMatch": ""
+					},
 					"headers": {
 						"Accept": [
 							"*/*"
@@ -228,12 +265,24 @@
 				},
 				"request": {
 					"requestType": "recording",
-					"path": "/",
-					"method": "GET",
-					"destination": "0.readthedocs.org",
-					"scheme": "http",
-					"query": "",
-					"body": "",
+					"path": {
+						"exactMatch": "/"
+					},
+					"method": {
+						"exactMatch": "GET"
+					},
+					"destination": {
+						"exactMatch": "0.readthedocs.org"
+					},
+					"scheme": {
+						"exactMatch": "http"
+					},
+					"query": {
+						"exactMatch": ""
+					},
+					"body": {
+						"exactMatch": ""
+					},
 					"headers": {
 						"Accept": [
 							"*/*"
@@ -293,12 +342,24 @@
 				},
 				"request": {
 					"requestType": "recording",
-					"path": "/",
-					"method": "GET",
-					"destination": "0bin.readthedocs.org",
-					"scheme": "http",
-					"query": "",
-					"body": "",
+					"path": {
+						"exactMatch": "/"
+					},
+					"method": {
+						"exactMatch": "GET"
+					},
+					"destination": {
+						"exactMatch": "0bin.readthedocs.org"
+					},
+					"scheme": {
+						"exactMatch": "http"
+					},
+					"query": {
+						"exactMatch": ""
+					},
+					"body": {
+						"exactMatch": ""
+					},
 					"headers": {
 						"Accept": [
 							"*/*"
