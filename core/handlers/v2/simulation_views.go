@@ -7,6 +7,44 @@ import (
 	valid "github.com/gima/govalid/v1"
 )
 
+type SimulationViewV2 struct {
+	DataViewV2 `json:"data"`
+	MetaView   `json:"meta"`
+}
+
+func (this SimulationViewV2) GetValidationSchema() valid.Validator {
+	return valid.Object(
+		valid.ObjKV("data", valid.Object(
+			valid.ObjKV("pairs", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
+				valid.ObjKV("request", valid.Object(
+					valid.ObjKV("path", valid.Optional(valid.Object())),
+					valid.ObjKV("method", valid.Optional(valid.Object())),
+					valid.ObjKV("scheme", valid.Optional(valid.Object())),
+					valid.ObjKV("query", valid.Optional(valid.Object())),
+					valid.ObjKV("body", valid.Optional(valid.Object())),
+					valid.ObjKV("headers", valid.Optional(valid.Object())),
+				)),
+				valid.ObjKV("response", valid.Object(
+					valid.ObjKV("status", valid.Optional(valid.Number())),
+					valid.ObjKV("body", valid.Optional(valid.String())),
+					valid.ObjKV("encodedBody", valid.Optional(valid.Boolean())),
+					valid.ObjKV("headers", valid.Optional(valid.Object())),
+				)),
+			))))),
+			valid.ObjKV("globalActions", valid.Optional(valid.Object(
+				valid.ObjKV("delays", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
+					valid.ObjKV("urlPattern", valid.Optional(valid.String())),
+					valid.ObjKV("httpMethod", valid.Optional(valid.String())),
+					valid.ObjKV("delay", valid.Optional(valid.Number())),
+				))))),
+			))),
+		)),
+		valid.ObjKV("meta", valid.Object(
+			valid.ObjKV("schemaVersion", valid.String()),
+		)),
+	)
+}
+
 type SimulationViewV1 struct {
 	DataViewV1 `json:"data"`
 	MetaView   `json:"meta"`
@@ -45,10 +83,23 @@ func (this SimulationViewV1) GetValidationSchema() valid.Validator {
 	)
 }
 
+type DataViewV2 struct {
+	RequestResponsePairs []RequestResponsePairViewV2 `json:"pairs"`
+	GlobalActions        GlobalActionsView           `json:"globalActions"`
+}
+
 type DataViewV1 struct {
 	RequestResponsePairViewV1 []RequestResponsePairViewV1 `json:"pairs"`
 	GlobalActions             GlobalActionsView           `json:"globalActions"`
 }
+
+type RequestResponsePairViewV2 struct {
+	Response ResponseDetailsView  `json:"response"`
+	Request  RequestDetailsViewV2 `json:"request"`
+}
+
+//Gets Response - required for interfaces.RequestResponsePairView
+func (this RequestResponsePairViewV2) GetResponse() interfaces.Response { return this.Response }
 
 type RequestResponsePairViewV1 struct {
 	Response ResponseDetailsView  `json:"response"`
@@ -60,6 +111,21 @@ func (this RequestResponsePairViewV1) GetResponse() interfaces.Response { return
 
 //Gets Request - required for interfaces.RequestResponsePairView
 func (this RequestResponsePairViewV1) GetRequest() interfaces.Request { return this.Request }
+
+type RequestFieldMatchersView struct {
+	ExactMatch *string `json:"exactMatch"`
+}
+
+// RequestDetailsView is used when marshalling and unmarshalling RequestDetails
+type RequestDetailsViewV2 struct {
+	Path        *RequestFieldMatchersView `json:"path"`
+	Method      *RequestFieldMatchersView `json:"method"`
+	Destination *RequestFieldMatchersView `json:"destination"`
+	Scheme      *RequestFieldMatchersView `json:"scheme"`
+	Query       *RequestFieldMatchersView `json:"query"`
+	Body        *RequestFieldMatchersView `json:"body"`
+	Headers     map[string][]string       `json:"headers"`
+}
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsViewV1 struct {

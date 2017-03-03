@@ -173,7 +173,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV1, error) {
 	pairViews := make([]v2.RequestResponsePairViewV1, 0)
 
 	for _, v := range hf.Simulation.Templates {
-		pairViews = append(pairViews, v.ConvertToRequestResponsePairView())
+		pairViews = append(pairViews, v.BuildView())
 	}
 
 	responseDelays := hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()

@@ -2,10 +2,27 @@ package models
 
 import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 type RequestFieldMatchers struct {
 	ExactMatch *string
+}
+
+func NewRequestFieldMatchersFromView(matchers *v2.RequestFieldMatchersView) *RequestFieldMatchers {
+	if matchers == nil {
+		return nil
+	}
+
+	return &RequestFieldMatchers{
+		ExactMatch: matchers.ExactMatch,
+	}
+}
+
+func (this RequestFieldMatchers) BuildView() *v2.RequestFieldMatchersView {
+	return &v2.RequestFieldMatchersView{
+		ExactMatch: this.ExactMatch,
+	}
 }
 
 type RequestTemplateResponsePair struct {
@@ -13,7 +30,27 @@ type RequestTemplateResponsePair struct {
 	Response        ResponseDetails
 }
 
-func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairViewV1 {
+func NewRequestTemplateResponsePairFromView(view *v2.RequestResponsePairViewV2) *RequestTemplateResponsePair {
+	if view.Request.Query != nil && view.Request.Query.ExactMatch != nil {
+		sortedQuery := util.SortQueryString(*view.Request.Query.ExactMatch)
+		view.Request.Query.ExactMatch = &sortedQuery
+	}
+
+	return &RequestTemplateResponsePair{
+		RequestTemplate: RequestTemplate{
+			Path:        NewRequestFieldMatchersFromView(view.Request.Path),
+			Method:      NewRequestFieldMatchersFromView(view.Request.Method),
+			Destination: NewRequestFieldMatchersFromView(view.Request.Destination),
+			Scheme:      NewRequestFieldMatchersFromView(view.Request.Scheme),
+			Query:       NewRequestFieldMatchersFromView(view.Request.Query),
+			Body:        NewRequestFieldMatchersFromView(view.Request.Body),
+			Headers:     view.Request.Headers,
+		},
+		Response: NewResponseDetailsFromResponse(view.Response),
+	}
+}
+
+func (this *RequestTemplateResponsePair) BuildView() v2.RequestResponsePairViewV1 {
 
 	var path, method, destination, scheme, query, body *string
 
