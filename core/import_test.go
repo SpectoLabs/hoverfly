@@ -195,7 +195,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPair := v2.RequestResponsePairView{
+	originalPair := v2.RequestResponsePairViewV1{
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
@@ -242,7 +242,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 
 	RegisterTestingT(t)
 
-	originalPair1 := v2.RequestResponsePairView{
+	originalPair1 := v2.RequestResponsePairViewV1{
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
@@ -339,7 +339,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 		Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 	}
 
-	templatePair := v2.RequestResponsePairView{
+	templatePair := v2.RequestResponsePairViewV1{
 		Response: responseView,
 		Request:  requestTemplate,
 	}
@@ -370,7 +370,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 
 	RegisterTestingT(t)
 
-	encodedPair := v2.RequestResponsePairView{
+	encodedPair := v2.RequestResponsePairViewV1{
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        base64String("hello_world"),

@@ -79,7 +79,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 			middlewareServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				body, _ := ioutil.ReadAll(r.Body)
-				var newPairView v2.RequestResponsePairView
+				var newPairView v2.RequestResponsePairViewV1
 
 				json.Unmarshal(body, &newPairView)
 

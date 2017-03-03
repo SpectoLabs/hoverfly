@@ -76,7 +76,7 @@ func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.Respo
 	return &pair.Response, nil
 }
 
-func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairView, error) {
+func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairViewV1, error) {
 	if this.RequestCache == nil {
 		return nil, &MatchingError{
 			Description: "No cache set",
@@ -85,10 +85,10 @@ func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairView, error)
 
 	records, err := this.RequestCache.GetAllEntries()
 	if err != nil {
-		return []v2.RequestResponsePairView{}, err
+		return []v2.RequestResponsePairViewV1{}, err
 	}
 
-	pairViews := []v2.RequestResponsePairView{}
+	pairViews := []v2.RequestResponsePairViewV1{}
 
 	for _, v := range records {
 		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
@@ -96,7 +96,7 @@ func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairView, error)
 			pairViews = append(pairViews, pairView)
 		} else {
 			log.Error(err)
-			return []v2.RequestResponsePairView{}, err
+			return []v2.RequestResponsePairViewV1{}, err
 		}
 	}
 

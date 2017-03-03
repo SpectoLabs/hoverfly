@@ -83,20 +83,20 @@ func (this SimulationViewV1) GetValidationSchema() valid.Validator {
 }
 
 type DataViewV1 struct {
-	RequestResponsePairs []RequestResponsePairView `json:"pairs"`
-	GlobalActions        GlobalActionsView         `json:"globalActions"`
+	RequestResponsePairViewV1 []RequestResponsePairViewV1 `json:"pairs"`
+	GlobalActions             GlobalActionsView           `json:"globalActions"`
 }
 
-type RequestResponsePairView struct {
+type RequestResponsePairViewV1 struct {
 	Response ResponseDetailsView  `json:"response"`
 	Request  RequestDetailsViewV1 `json:"request"`
 }
 
 //Gets Response - required for interfaces.RequestResponsePairView
-func (this RequestResponsePairView) GetResponse() interfaces.Response { return this.Response }
+func (this RequestResponsePairViewV1) GetResponse() interfaces.Response { return this.Response }
 
 //Gets Request - required for interfaces.RequestResponsePairView
-func (this RequestResponsePairView) GetRequest() interfaces.Request { return this.Request }
+func (this RequestResponsePairViewV1) GetRequest() interfaces.Request { return this.Request }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsViewV1 struct {
@@ -169,7 +169,7 @@ type MetaView struct {
 }
 
 type CacheView struct {
-	RequestResponsePairs []RequestResponsePairView `json:"cache"`
+	RequestResponsePairs []RequestResponsePairViewV1 `json:"cache"`
 }
 
 type LogsView struct {
