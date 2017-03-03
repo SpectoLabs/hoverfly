@@ -67,7 +67,9 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePairTemplate(t *tes
 
 	unit.Simulation.Templates = append(unit.Simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Destination: util.StringToPointer("test.com"),
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("test.com"),
+			},
 		},
 		Response: models.ResponseDetails{
 			Status: 200,
@@ -102,7 +104,9 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 
 	unit.Simulation.Templates = append(unit.Simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Destination: util.StringToPointer("testhost.com"),
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("testhost.com"),
+			},
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("/test"),
 			},
@@ -115,7 +119,9 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 
 	unit.Simulation.Templates = append(unit.Simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Destination: util.StringToPointer("testhost.com"),
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("testhost.com"),
+			},
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("/test"),
 			},

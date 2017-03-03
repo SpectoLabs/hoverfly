@@ -15,10 +15,14 @@ type RequestTemplateResponsePair struct {
 
 func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairViewV1 {
 
-	var path, scheme, query *string
+	var path, destination, scheme, query *string
 
 	if this.RequestTemplate.Path != nil {
 		path = this.RequestTemplate.Path.ExactMatch
+	}
+
+	if this.RequestTemplate.Destination != nil {
+		destination = this.RequestTemplate.Destination.ExactMatch
 	}
 
 	if this.RequestTemplate.Scheme != nil {
@@ -33,7 +37,7 @@ func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v2.R
 		Request: v2.RequestDetailsViewV1{
 			Path:        path,
 			Method:      this.RequestTemplate.Method,
-			Destination: this.RequestTemplate.Destination,
+			Destination: destination,
 			Scheme:      scheme,
 			Query:       query,
 			Body:        this.RequestTemplate.Body,
@@ -46,7 +50,7 @@ func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v2.R
 type RequestTemplate struct {
 	Path        *RequestFieldMatchers
 	Method      *string
-	Destination *string
+	Destination *RequestFieldMatchers
 	Scheme      *RequestFieldMatchers
 	Query       *RequestFieldMatchers
 	Body        *string

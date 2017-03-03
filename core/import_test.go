@@ -222,8 +222,10 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/"),
 			},
-			Method:      StringToPointer("GET"),
-			Destination: StringToPointer("/"),
+			Method: StringToPointer("GET"),
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/"),
+			},
 			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("scheme"),
 			},
@@ -282,8 +284,10 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/"),
 			},
-			Method:      StringToPointer("GET"),
-			Destination: StringToPointer("/"),
+			Method: StringToPointer("GET"),
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/"),
+			},
 			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("scheme"),
 			},
@@ -305,8 +309,10 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/new/path"),
 			},
-			Method:      StringToPointer("GET"),
-			Destination: StringToPointer("/"),
+			Method: StringToPointer("GET"),
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/"),
+			},
 			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("scheme"),
 			},
@@ -328,8 +334,10 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/newer/path"),
 			},
-			Method:      StringToPointer("GET"),
-			Destination: StringToPointer("/"),
+			Method: StringToPointer("GET"),
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/"),
+			},
 			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("scheme"),
 			},

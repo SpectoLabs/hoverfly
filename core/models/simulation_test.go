@@ -14,13 +14,15 @@ func Test_Simulation_AddRequestTemplateResponsePair_CanAddAPairToTheArray(t *tes
 
 	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
 		RequestTemplate{
-			Destination: util.StringToPointer("space"),
+			Destination: &RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("space"),
+			},
 		},
 		ResponseDetails{},
 	})
 
 	Expect(unit.Templates).To(HaveLen(1))
-	Expect(*unit.Templates[0].RequestTemplate.Destination).To(Equal("space"))
+	Expect(*unit.Templates[0].RequestTemplate.Destination.ExactMatch).To(Equal("space"))
 }
 
 func Test_Simulation_AddRequestTemplateResponsePair_CanAddAFullPairToTheArray(t *testing.T) {
@@ -30,10 +32,12 @@ func Test_Simulation_AddRequestTemplateResponsePair_CanAddAFullPairToTheArray(t 
 
 	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
 		RequestTemplate{
-			Body:        util.StringToPointer("testbody"),
-			Destination: util.StringToPointer("testdestination"),
-			Headers:     map[string][]string{"testheader": []string{"testvalue"}},
-			Method:      util.StringToPointer("testmethod"),
+			Body: util.StringToPointer("testbody"),
+			Destination: &RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("testdestination"),
+			},
+			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Method:  util.StringToPointer("testmethod"),
 			Path: &RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("/testpath"),
 			},
@@ -54,7 +58,7 @@ func Test_Simulation_AddRequestTemplateResponsePair_CanAddAFullPairToTheArray(t 
 	Expect(unit.Templates).To(HaveLen(1))
 
 	Expect(*unit.Templates[0].RequestTemplate.Body).To(Equal("testbody"))
-	Expect(*unit.Templates[0].RequestTemplate.Destination).To(Equal("testdestination"))
+	Expect(*unit.Templates[0].RequestTemplate.Destination.ExactMatch).To(Equal("testdestination"))
 	Expect(unit.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
 	Expect(*unit.Templates[0].RequestTemplate.Method).To(Equal("testmethod"))
 	Expect(*unit.Templates[0].RequestTemplate.Path.ExactMatch).To(Equal("/testpath"))
@@ -73,14 +77,18 @@ func Test_Simulation_AddRequestTemplateResponsePair_WillNotSaveDuplicates(t *tes
 
 	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
 		RequestTemplate{
-			Destination: util.StringToPointer("space"),
+			Destination: &RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("space"),
+			},
 		},
 		ResponseDetails{},
 	})
 
 	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
 		RequestTemplate{
-			Destination: util.StringToPointer("space"),
+			Destination: &RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("space"),
+			},
 		},
 		ResponseDetails{},
 	})
@@ -95,19 +103,23 @@ func Test_Simulation_AddRequestTemplateResponsePair_WillSaveTwoWhenNotDuplicates
 
 	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
 		RequestTemplate{
-			Destination: util.StringToPointer("space"),
+			Destination: &RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("space"),
+			},
 		},
 		ResponseDetails{},
 	})
 
 	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
 		RequestTemplate{
-			Destination: util.StringToPointer("again"),
+			Destination: &RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("again"),
+			},
 		},
 		ResponseDetails{},
 	})
 
 	Expect(unit.Templates).To(HaveLen(2))
-	Expect(*unit.Templates[0].RequestTemplate.Destination).To(Equal("space"))
-	Expect(*unit.Templates[1].RequestTemplate.Destination).To(Equal("again"))
+	Expect(*unit.Templates[0].RequestTemplate.Destination.ExactMatch).To(Equal("space"))
+	Expect(*unit.Templates[1].RequestTemplate.Destination.ExactMatch).To(Equal("again"))
 }
