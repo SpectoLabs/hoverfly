@@ -227,8 +227,10 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("scheme"),
 			},
-			Query: StringToPointer(""),
-			Body:  StringToPointer(""),
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(""),
+			},
+			Body: StringToPointer(""),
 			Headers: map[string][]string{
 				"Hoverfly": []string{"testing"},
 			},
@@ -285,7 +287,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("scheme"),
 			},
-			Query:   StringToPointer(""),
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(""),
+			},
 			Body:    StringToPointer(""),
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
@@ -306,7 +310,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("scheme"),
 			},
-			Query:   StringToPointer(""),
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(""),
+			},
 			Body:    StringToPointer(""),
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
@@ -327,7 +333,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("scheme"),
 			},
-			Query:   StringToPointer(""),
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(""),
+			},
 			Body:    StringToPointer(""),
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
@@ -413,6 +421,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 			Method:      "GET",
 			Destination: "/",
 			Scheme:      "scheme",
-			Query:       "", Body: "",
-			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}))
+			Query:       "",
+			Body:        "",
+			Headers:     map[string][]string{"Hoverfly": []string{"testing"}}}}))
 }
