@@ -304,7 +304,9 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer(request.Scheme),
 			},
-			Query:   util.StringToPointer(request.Query),
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer(request.Query),
+			},
 			Body:    util.StringToPointer(request.Body),
 			Headers: request.Headers,
 		},

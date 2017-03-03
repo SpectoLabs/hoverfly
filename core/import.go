@@ -155,7 +155,9 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.Reques
 				Scheme: &models.RequestFieldMatchers{
 					ExactMatch: pairView.GetRequest().GetScheme(),
 				},
-				Query:   pairView.GetRequest().GetQuery(),
+				Query: &models.RequestFieldMatchers{
+					ExactMatch: pairView.GetRequest().GetQuery(),
+				},
 				Body:    pairView.GetRequest().GetBody(),
 				Headers: pairView.GetRequest().GetHeaders(),
 			}
