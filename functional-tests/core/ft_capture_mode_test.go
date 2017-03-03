@@ -61,9 +61,9 @@ var _ = Describe("When I run Hoverfly", func() {
 				payload := v2.SimulationViewV1{}
 
 				json.Unmarshal(recordsJson, &payload)
-				Expect(payload.DataView.RequestResponsePairs).To(HaveLen(1))
+				Expect(payload.DataViewV1.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.DataView.RequestResponsePairs[0].Request).To(Equal(v2.RequestDetailsView{
+				Expect(payload.DataViewV1.RequestResponsePairs[0].Request).To(Equal(v2.RequestDetailsView{
 					Path:        util.StringToPointer("/"),
 					Method:      util.StringToPointer("GET"),
 					Destination: util.StringToPointer(expectedDestination),
@@ -76,7 +76,7 @@ var _ = Describe("When I run Hoverfly", func() {
 					},
 				}))
 
-				Expect(payload.DataView.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsView{
+				Expect(payload.DataViewV1.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsView{
 					Status:      200,
 					Body:        "Hello world",
 					EncodedBody: false,
@@ -118,12 +118,12 @@ var _ = Describe("When I run Hoverfly", func() {
 				payload := v2.SimulationViewV1{}
 
 				json.Unmarshal(recordsJson, &payload)
-				Expect(payload.DataView.RequestResponsePairs).To(HaveLen(1))
+				Expect(payload.DataViewV1.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.DataView.RequestResponsePairs[0].Request.Destination).To(Equal(&expectedRedirectDestination))
+				Expect(payload.DataViewV1.RequestResponsePairs[0].Request.Destination).To(Equal(&expectedRedirectDestination))
 
-				Expect(payload.DataView.RequestResponsePairs[0].Response.Status).To(Equal(301))
-				Expect(payload.DataView.RequestResponsePairs[0].Response.Headers["Location"][0]).To(Equal(fakeServerUrl.String()))
+				Expect(payload.DataViewV1.RequestResponsePairs[0].Response.Status).To(Equal(301))
+				Expect(payload.DataViewV1.RequestResponsePairs[0].Response.Headers["Location"][0]).To(Equal(fakeServerUrl.String()))
 			})
 
 			It("Should capture a request body from POST", func() {
