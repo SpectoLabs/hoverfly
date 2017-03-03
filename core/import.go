@@ -102,7 +102,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.PutSimulationV2(simulation)
+	return hf.PutSimulation(simulation)
 }
 
 // ImportFromURL - takes one string value and tries connect to a remote server, then parse response body into
@@ -127,7 +127,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.PutSimulationV2(simulation)
+	return hf.PutSimulation(simulation)
 }
 
 func isJSON(s string) bool {
