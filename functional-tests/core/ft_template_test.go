@@ -34,10 +34,15 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 				}
 			},
 			"request": {
-				"requestType": "template",
-				"path": "/path1",
-				"method": "GET",
-				"destination": "www.virtual.com"
+				"path": {
+					"exactMatch": "/path1"
+				},
+				"method": {
+					"exactMatch": "GET"
+				},
+				"destination": {
+					"exactMatch": "www.virtual.com"
+				}
 			}
 		}, {
 			"response": {
@@ -51,10 +56,15 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 				}
 			},
 			"request": {
-				"requestType": "template",
-				"path": "/path2",
-				"method": "GET",
-				"destination": "www.virtual.com",
+				"path": {
+					"exactMatch": "/path2"
+				},
+				"method": {
+					"exactMatch": "GET"
+				},
+				"destination": {
+					"exactMatch": "www.virtual.com"
+				},
 				"headers": {
 					"Header": ["value2"]
 				}
@@ -67,9 +77,12 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 				"headers": {}
 			},
 			"request": {
-				"requestType": "template",
-				"method": "GET",
-				"destination": "www.randomheader.com",
+				"method": {
+					"exactMatch": "GET"
+				},
+				"destination": {
+					"exactMatch": "www.randomheader.com"
+				},
 				"headers": {
 					"Random": ["*"]
 				}
@@ -82,10 +95,15 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 				"headers": {}
 			},
 			"request": {
-				"requestType": "template",
-				"method": "GET",
-				"destination": "www.query.com",
-				"query": "query1=one&query2=two&query2=three"
+				"method": {
+					"exactMatch": "GET"
+				},
+				"destination": {
+					"exactMatch": "www.query.com"
+				},
+				"query": {
+					"exactMatch": "query1=one&query2=two&query2=three"
+				}
 			}
 		}, {
 			"response": {
@@ -95,10 +113,15 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 				"headers": {}
 			},
 			"request": {
-				"requestType": "template",
-				"method": "GET",
-				"destination": "www.query.com",
-				"query": "query2=two&query1=one"
+				"method": {
+					"exactMatch": "GET"
+				},
+				"destination": {
+					"exactMatch": "www.query.com"
+				},
+				"query": {
+					"exactMatch": "query2=two&query1=one"
+				}
 			}
 		}],
 		"globalActions": {

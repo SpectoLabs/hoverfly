@@ -15,7 +15,7 @@ import (
 
 type HoverflySimulation interface {
 	GetSimulation() (SimulationViewV1, error)
-	PutSimulation(SimulationViewV1) error
+	PutSimulation(SimulationViewV2) error
 	DeleteSimulation()
 }
 
@@ -66,7 +66,7 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 		return
 	}
 
-	var simulationView SimulationViewV1
+	var simulationView SimulationViewV2
 
 	if path, err := simulationView.GetValidationSchema().Validate(jsonMap); err != nil {
 		log.WithFields(log.Fields{

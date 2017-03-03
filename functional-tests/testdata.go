@@ -44,12 +44,24 @@ var JsonPayload = `{
                     }
                 },
                 "request": {
-                    "path": "/path1",
-                    "method": "GET",
-                    "destination": "test-server.com",
-                    "scheme": "http",
-                    "query": "",
-                    "body": "",
+                    "path": {
+						"exactMatch": "/path1"        
+                    },
+                    "method": {
+						"exactMatch": "GET"
+                    },
+                    "destination": {
+						"exactMatch": "test-server.com"
+                    },
+                    "scheme": {
+						"exactMatch": "http"
+                    },
+                    "query": {
+						"exactMatch": ""
+                    },
+                    "body": {
+						"exactMatch": ""
+                    },
                     "headers": {
                         "Accept-Encoding": [
 						    "gzip"
@@ -68,7 +80,9 @@ var JsonPayload = `{
                     "headers": {}
                 },
                 "request": {
-                    "destination": "template-server.com"
+                    "destination": {
+                        "exactMatch": "template-server.com"
+                    }
                 }
             }
         ],
@@ -99,12 +113,24 @@ var JsonSimulationGetAndPost = `{
                     }
                 },
                 "request": {
-                    "path": "/path1",
-                    "method": "GET",
-                    "destination": "destination1",
-                    "scheme": "http",
-                    "query": "",
-                    "body": ""
+                    "path": {
+						"exactMatch": "/path1"
+                    },
+                    "method": {
+						"exactMatch": "GET"
+                    },
+                    "destination": {
+						"exactMatch": "destination1"
+                    },
+                    "scheme": {
+						"exactMatch": "http"
+                    },
+                    "query": {
+						"exactMatch": ""
+                    },
+                    "body": {
+						"exactMatch": ""
+                    }
                 }
             },
             {
@@ -115,12 +141,24 @@ var JsonSimulationGetAndPost = `{
                     "headers": {}
                 },
                 "request": {
-                    "path": "/path2/resource",
-                    "method": "POST",
-                    "destination": "another-destination.com",
-                    "scheme": "http",
-                    "query": "",
-                    "body": ""
+                    "path": {
+						"exactMatch": "/path2/resource"
+                    },
+                    "method": {
+						"exactMatch": "POST"
+                    },
+                    "destination": {
+						"exactMatch": "another-destination.com"
+                    },
+                    "scheme": {
+						"exactMatch": "http"
+                    },
+                    "query": {
+						"exactMatch": ""
+                    },
+                    "body": {
+						"exactMatch": ""
+                    }
                 }
             }
         ],

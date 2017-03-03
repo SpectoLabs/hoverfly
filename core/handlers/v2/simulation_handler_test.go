@@ -16,7 +16,7 @@ import (
 
 type HoverflySimulationStub struct {
 	Deleted    bool
-	Simulation SimulationViewV1
+	Simulation SimulationViewV2
 }
 
 func (this HoverflySimulationStub) GetSimulation() (SimulationViewV1, error) {
@@ -54,7 +54,7 @@ func (this *HoverflySimulationStub) DeleteSimulation() {
 	this.Deleted = true
 }
 
-func (this *HoverflySimulationStub) PutSimulation(simulation SimulationViewV1) error {
+func (this *HoverflySimulationStub) PutSimulation(simulation SimulationViewV2) error {
 	this.Simulation = simulation
 	return nil
 }
@@ -67,7 +67,7 @@ func (this HoverflySimulationErrorStub) GetSimulation() (SimulationViewV1, error
 
 func (this *HoverflySimulationErrorStub) DeleteSimulation() {}
 
-func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationViewV1) error {
+func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationViewV2) error {
 	return fmt.Errorf("error")
 }
 
@@ -200,7 +200,9 @@ func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
 			"pairs": [
 				{
 					"request": {
-						"destination": "test.org"
+						"destination": {
+							"exactMatch": "test.org"
+						}
 					},
 					"response": {
 						"status": 200
@@ -228,10 +230,10 @@ func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
 	makeRequestOnHandler(unit.Put, request)
 
 	Expect(stubHoverfly.Simulation).ToNot(BeNil())
-	Expect(stubHoverfly.Simulation.RequestResponsePairViewV1).ToNot(BeNil())
+	Expect(stubHoverfly.Simulation.RequestResponsePairs).ToNot(BeNil())
 
-	Expect(stubHoverfly.Simulation.RequestResponsePairViewV1[0].Request.Destination).To(Equal(util.StringToPointer("test.org")))
-	Expect(stubHoverfly.Simulation.RequestResponsePairViewV1[0].Response.Status).To(Equal(200))
+	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal(util.StringToPointer("test.org")))
+	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 
 	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].UrlPattern).To(Equal("test.org"))
 	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
