@@ -206,7 +206,7 @@ func TestReflectBody(t *testing.T) {
 func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 
-	var newPairView v2.RequestResponsePairView
+	var newPairView v2.RequestResponsePairViewV1
 
 	json.Unmarshal(body, &newPairView)
 
@@ -510,7 +510,7 @@ func Test_Middleware_SetRemote_CanSetRemote(t *testing.T) {
 
 	remoteMiddleware := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := ioutil.ReadAll(r.Body)
-		var newPairView v2.RequestResponsePairView
+		var newPairView v2.RequestResponsePairViewV1
 
 		json.Unmarshal(body, &newPairView)
 
@@ -567,7 +567,7 @@ func Test_Middleware_Execute_RunsRemoteMiddlewareCorrectly(t *testing.T) {
 
 	middlewareServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := ioutil.ReadAll(r.Body)
-		var newPairView v2.RequestResponsePairView
+		var newPairView v2.RequestResponsePairViewV1
 
 		json.Unmarshal(body, &newPairView)
 

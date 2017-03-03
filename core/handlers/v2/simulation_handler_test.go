@@ -20,7 +20,7 @@ type HoverflySimulationStub struct {
 }
 
 func (this HoverflySimulationStub) GetSimulation() (SimulationViewV1, error) {
-	pairOne := RequestResponsePairView{
+	pairOne := RequestResponsePairViewV1{
 		Request: RequestDetailsViewV1{
 			Destination: util.StringToPointer("test.com"),
 			Path:        util.StringToPointer("/testing"),
@@ -32,7 +32,7 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationViewV1, error) {
 
 	return SimulationViewV1{
 		DataViewV1{
-			RequestResponsePairs: []RequestResponsePairView{pairOne},
+			RequestResponsePairViewV1: []RequestResponsePairViewV1{pairOne},
 			GlobalActions: GlobalActionsView{
 				Delays: []v1.ResponseDelayView{
 					{
@@ -87,12 +87,12 @@ func TestSimulationHandler_Get_ReturnsSimulation(t *testing.T) {
 	simulationView, err := unmarshalSimulationViewV1(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(simulationView.DataViewV1.RequestResponsePairs).To(HaveLen(1))
+	Expect(simulationView.DataViewV1.RequestResponsePairViewV1).To(HaveLen(1))
 
-	Expect(simulationView.DataViewV1.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
-	Expect(simulationView.DataViewV1.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
+	Expect(simulationView.DataViewV1.RequestResponsePairViewV1[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
+	Expect(simulationView.DataViewV1.RequestResponsePairViewV1[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
 
-	Expect(simulationView.DataViewV1.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
+	Expect(simulationView.DataViewV1.RequestResponsePairViewV1[0].Response.Body).To(Equal("test-body"))
 
 	Expect(simulationView.DataViewV1.GlobalActions.Delays).To(HaveLen(1))
 	Expect(simulationView.DataViewV1.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
@@ -153,12 +153,12 @@ func TestSimulationHandler_Delete_CallsGetAfterDelete(t *testing.T) {
 	simulationView, err := unmarshalSimulationViewV1(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(simulationView.DataViewV1.RequestResponsePairs).To(HaveLen(1))
+	Expect(simulationView.DataViewV1.RequestResponsePairViewV1).To(HaveLen(1))
 
-	Expect(simulationView.DataViewV1.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
-	Expect(simulationView.DataViewV1.RequestResponsePairs[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
+	Expect(simulationView.DataViewV1.RequestResponsePairViewV1[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
+	Expect(simulationView.DataViewV1.RequestResponsePairViewV1[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
 
-	Expect(simulationView.DataViewV1.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
+	Expect(simulationView.DataViewV1.RequestResponsePairViewV1[0].Response.Body).To(Equal("test-body"))
 
 	Expect(simulationView.DataViewV1.GlobalActions.Delays).To(HaveLen(1))
 	Expect(simulationView.DataViewV1.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
@@ -228,10 +228,10 @@ func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
 	makeRequestOnHandler(unit.Put, request)
 
 	Expect(stubHoverfly.Simulation).ToNot(BeNil())
-	Expect(stubHoverfly.Simulation.RequestResponsePairs).ToNot(BeNil())
+	Expect(stubHoverfly.Simulation.RequestResponsePairViewV1).ToNot(BeNil())
 
-	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].Request.Destination).To(Equal(util.StringToPointer("test.org")))
-	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
+	Expect(stubHoverfly.Simulation.RequestResponsePairViewV1[0].Request.Destination).To(Equal(util.StringToPointer("test.org")))
+	Expect(stubHoverfly.Simulation.RequestResponsePairViewV1[0].Response.Status).To(Equal(200))
 
 	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].UrlPattern).To(Equal("test.org"))
 	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))

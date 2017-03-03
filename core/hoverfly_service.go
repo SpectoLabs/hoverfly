@@ -129,7 +129,7 @@ func (this Hoverfly) GetMetadataCache() cache.Cache {
 	return this.MetadataCache
 }
 
-func (this Hoverfly) GetCache() ([]v2.RequestResponsePairView, error) {
+func (this Hoverfly) GetCache() ([]v2.RequestResponsePairViewV1, error) {
 	return this.CacheMatcher.GetAllResponses()
 }
 
@@ -170,7 +170,7 @@ func (hf Hoverfly) GetStats() metrics.Stats {
 }
 
 func (hf Hoverfly) GetSimulation() (v2.SimulationViewV1, error) {
-	pairViews := make([]v2.RequestResponsePairView, 0)
+	pairViews := make([]v2.RequestResponsePairViewV1, 0)
 
 	for _, v := range hf.Simulation.Templates {
 		pairViews = append(pairViews, v.ConvertToRequestResponsePairView())
@@ -180,7 +180,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV1, error) {
 
 	return v2.SimulationViewV1{
 		v2.DataViewV1{
-			RequestResponsePairs: pairViews,
+			RequestResponsePairViewV1: pairViews,
 			GlobalActions: v2.GlobalActionsView{
 				Delays: responseDelays.Data,
 			},
@@ -194,8 +194,8 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV1, error) {
 }
 
 func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV1) error {
-	requestResponsePairViews := make([]interfaces.RequestResponsePair, len(simulationView.RequestResponsePairs))
-	for i, v := range simulationView.RequestResponsePairs {
+	requestResponsePairViews := make([]interfaces.RequestResponsePair, len(simulationView.RequestResponsePairViewV1))
+	for i, v := range simulationView.RequestResponsePairViewV1 {
 		requestResponsePairViews[i] = v
 	}
 

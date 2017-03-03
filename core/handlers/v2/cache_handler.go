@@ -10,7 +10,7 @@ import (
 )
 
 type HoverflyCache interface {
-	GetCache() ([]RequestResponsePairView, error)
+	GetCache() ([]RequestResponsePairViewV1, error)
 	FlushCache() error
 }
 
