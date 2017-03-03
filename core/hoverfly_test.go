@@ -533,7 +533,7 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Destination).To(Equal("testdestination"))
 	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Method).To(Equal("testmethod"))
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Path).To(Equal("/testpath"))
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Path.ExactMatch).To(Equal("/testpath"))
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Query).To(Equal("?query=test"))
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Scheme).To(Equal("http"))
 

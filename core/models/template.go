@@ -4,6 +4,10 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
+type RequestFieldMatchers struct {
+	ExactMatch *string
+}
+
 type RequestTemplateResponsePair struct {
 	RequestTemplate RequestTemplate
 	Response        ResponseDetails
@@ -11,9 +15,14 @@ type RequestTemplateResponsePair struct {
 
 func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairViewV1 {
 
+	var path *string
+
+	if this.RequestTemplate.Path != nil {
+		path = this.RequestTemplate.Path.ExactMatch
+	}
 	return v2.RequestResponsePairViewV1{
 		Request: v2.RequestDetailsViewV1{
-			Path:        this.RequestTemplate.Path,
+			Path:        path,
 			Method:      this.RequestTemplate.Method,
 			Destination: this.RequestTemplate.Destination,
 			Scheme:      this.RequestTemplate.Scheme,
@@ -26,7 +35,7 @@ func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v2.R
 }
 
 type RequestTemplate struct {
-	Path        *string
+	Path        *RequestFieldMatchers
 	Method      *string
 	Destination *string
 	Scheme      *string
