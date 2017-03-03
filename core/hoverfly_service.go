@@ -9,7 +9,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
@@ -194,9 +193,58 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV1, error) {
 }
 
 func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV1) error {
-	requestResponsePairViews := make([]interfaces.RequestResponsePair, len(simulationView.RequestResponsePairViewV1))
+	requestResponsePairViews := make([]v2.RequestResponsePairViewV2, len(simulationView.RequestResponsePairViewV1))
 	for i, v := range simulationView.RequestResponsePairViewV1 {
-		requestResponsePairViews[i] = v
+		var path, method, destination, scheme, query, body *v2.RequestFieldMatchersView
+
+		if v.Request.Path != nil {
+			path = &v2.RequestFieldMatchersView{
+				ExactMatch: v.Request.Path,
+			}
+		}
+
+		if v.Request.Method != nil {
+			method = &v2.RequestFieldMatchersView{
+				ExactMatch: v.Request.Method,
+			}
+		}
+
+		if v.Request.Destination != nil {
+			destination = &v2.RequestFieldMatchersView{
+				ExactMatch: v.Request.Destination,
+			}
+		}
+
+		if v.Request.Scheme != nil {
+			scheme = &v2.RequestFieldMatchersView{
+				ExactMatch: v.Request.Scheme,
+			}
+		}
+		if v.Request.Query != nil {
+			query = &v2.RequestFieldMatchersView{
+				ExactMatch: v.Request.Query,
+			}
+		}
+
+		if v.Request.Body != nil {
+			body = &v2.RequestFieldMatchersView{
+				ExactMatch: v.Request.Body,
+			}
+		}
+
+		requestResponsePairViews[i] = v2.RequestResponsePairViewV2{
+
+			Request: v2.RequestDetailsViewV2{
+				Method:      method,
+				Scheme:      scheme,
+				Destination: destination,
+				Path:        path,
+				Query:       query,
+				Body:        body,
+				Headers:     v.Request.Headers,
+			},
+			Response: v.Response,
+		}
 	}
 
 	err := this.ImportRequestResponsePairViews(requestResponsePairViews)

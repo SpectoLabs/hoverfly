@@ -14,7 +14,6 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
@@ -138,42 +137,15 @@ func isJSON(s string) bool {
 }
 
 // ImportRequestResponsePairViews - a function to save given pairs into the database.
-func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []interfaces.RequestResponsePair) error {
+func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v2.RequestResponsePairViewV2) error {
 	if len(pairViews) > 0 {
 		success := 0
 		failed := 0
 		for _, pairView := range pairViews {
 
-			responseDetails := models.NewResponseDetailsFromResponse(pairView.GetResponse())
+			pair := models.NewRequestTemplateResponsePairFromView(&pairView)
 
-			requestTemplate := models.RequestTemplate{
-				Path: &models.RequestFieldMatchers{
-					ExactMatch: pairView.GetRequest().GetPath(),
-				},
-				Method: &models.RequestFieldMatchers{
-					ExactMatch: pairView.GetRequest().GetMethod(),
-				},
-				Destination: &models.RequestFieldMatchers{
-					ExactMatch: pairView.GetRequest().GetDestination(),
-				},
-				Scheme: &models.RequestFieldMatchers{
-					ExactMatch: pairView.GetRequest().GetScheme(),
-				},
-				Query: &models.RequestFieldMatchers{
-					ExactMatch: pairView.GetRequest().GetQuery(),
-				},
-				Body: &models.RequestFieldMatchers{
-					ExactMatch: pairView.GetRequest().GetBody(),
-				},
-				Headers: pairView.GetRequest().GetHeaders(),
-			}
-
-			requestTemplateResponsePair := models.RequestTemplateResponsePair{
-				RequestTemplate: requestTemplate,
-				Response:        responseDetails,
-			}
-
-			hf.Simulation.Templates = append(hf.Simulation.Templates, requestTemplateResponsePair)
+			hf.Simulation.Templates = append(hf.Simulation.Templates, *pair)
 			success++
 			continue
 		}
