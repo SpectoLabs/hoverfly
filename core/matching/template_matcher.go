@@ -24,7 +24,7 @@ func (t TemplateMatcher) Match(req models.RequestDetails, webserver bool, simula
 		}
 
 		if !webserver {
-			if template.Destination != nil && !glob.Glob(*template.Destination, req.Destination) {
+			if template.Destination != nil && template.Destination.ExactMatch != nil && !glob.Glob(*template.Destination.ExactMatch, req.Destination) {
 				continue
 			}
 		}
