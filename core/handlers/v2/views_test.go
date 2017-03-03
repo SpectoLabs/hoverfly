@@ -8,10 +8,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_RequestDetailsView_GetQuery_SortsQueryString(t *testing.T) {
+func Test_RequestDetailsViewV1_GetQuery_SortsQueryString(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := v2.RequestDetailsView{
+	unit := v2.RequestDetailsViewV1{
 		Query: util.StringToPointer("b=b&a=a"),
 	}
 	queryString := unit.GetQuery()
@@ -20,10 +20,10 @@ func Test_RequestDetailsView_GetQuery_SortsQueryString(t *testing.T) {
 	Expect(*queryString).To(Equal("a=a&b=b"))
 }
 
-func Test_RequestDetailsView_GetQuery_ReturnsNilIfNil(t *testing.T) {
+func Test_RequestDetailsViewV1_GetQuery_ReturnsNilIfNil(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := v2.RequestDetailsView{
+	unit := v2.RequestDetailsViewV1{
 		Query: nil,
 	}
 	queryString := unit.GetQuery()
