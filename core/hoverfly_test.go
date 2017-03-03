@@ -197,7 +197,9 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *tes
 		RequestTemplate: models.RequestTemplate{
 			Destination: util.StringToPointer("somehost.com"),
 			Method:      util.StringToPointer("POST"),
-			Scheme:      util.StringToPointer("http"),
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("http"),
+			},
 		},
 		Response: models.ResponseDetails{
 			Status: 200,
@@ -227,7 +229,9 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 		RequestTemplate: models.RequestTemplate{
 			Destination: util.StringToPointer("somehost.com"),
 			Method:      util.StringToPointer("POST"),
-			Scheme:      util.StringToPointer("http"),
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("http"),
+			},
 		},
 		Response: models.ResponseDetails{
 			Status: 200,
@@ -535,7 +539,7 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Method).To(Equal("testmethod"))
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Path.ExactMatch).To(Equal("/testpath"))
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Query).To(Equal("?query=test"))
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Scheme).To(Equal("http"))
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Scheme.ExactMatch).To(Equal("http"))
 
 	Expect(unit.Simulation.Templates[0].Response.Body).To(Equal("testresponsebody"))
 	Expect(unit.Simulation.Templates[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))

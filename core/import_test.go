@@ -224,9 +224,11 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			},
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
-			Scheme:      StringToPointer("scheme"),
-			Query:       StringToPointer(""),
-			Body:        StringToPointer(""),
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("scheme"),
+			},
+			Query: StringToPointer(""),
+			Body:  StringToPointer(""),
 			Headers: map[string][]string{
 				"Hoverfly": []string{"testing"},
 			},
@@ -280,10 +282,12 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			},
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
-			Scheme:      StringToPointer("scheme"),
-			Query:       StringToPointer(""),
-			Body:        StringToPointer(""),
-			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("scheme"),
+			},
+			Query:   StringToPointer(""),
+			Body:    StringToPointer(""),
+			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
 	}))
 
@@ -299,10 +303,12 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			},
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
-			Scheme:      StringToPointer("scheme"),
-			Query:       StringToPointer(""),
-			Body:        StringToPointer(""),
-			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("scheme"),
+			},
+			Query:   StringToPointer(""),
+			Body:    StringToPointer(""),
+			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
 	}))
 
@@ -318,10 +324,12 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			},
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
-			Scheme:      StringToPointer("scheme"),
-			Query:       StringToPointer(""),
-			Body:        StringToPointer(""),
-			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("scheme"),
+			},
+			Query:   StringToPointer(""),
+			Body:    StringToPointer(""),
+			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
 	}))
 }

@@ -301,10 +301,12 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 			},
 			Method:      util.StringToPointer(request.Method),
 			Destination: util.StringToPointer(request.Destination),
-			Scheme:      util.StringToPointer(request.Scheme),
-			Query:       util.StringToPointer(request.Query),
-			Body:        util.StringToPointer(request.Body),
-			Headers:     request.Headers,
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer(request.Scheme),
+			},
+			Query:   util.StringToPointer(request.Query),
+			Body:    util.StringToPointer(request.Body),
+			Headers: request.Headers,
 		},
 		Response: *response,
 	}
