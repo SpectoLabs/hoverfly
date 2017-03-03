@@ -195,8 +195,10 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *tes
 
 	unit.Simulation.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Destination: util.StringToPointer("somehost.com"),
-			Method:      util.StringToPointer("POST"),
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("somehost.com"),
+			},
+			Method: util.StringToPointer("POST"),
 			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("http"),
 			},
@@ -227,8 +229,10 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 
 	unit.Simulation.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Destination: util.StringToPointer("somehost.com"),
-			Method:      util.StringToPointer("POST"),
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("somehost.com"),
+			},
+			Method: util.StringToPointer("POST"),
 			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("http"),
 			},
@@ -534,7 +538,7 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 	Expect(unit.Simulation.Templates).To(HaveLen(1))
 
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Body).To(Equal("testbody"))
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Destination).To(Equal("testdestination"))
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Destination.ExactMatch).To(Equal("testdestination"))
 	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Method).To(Equal("testmethod"))
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Path.ExactMatch).To(Equal("/testpath"))
@@ -562,7 +566,7 @@ func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing
 	Expect(unit.Simulation.Templates).To(HaveLen(1))
 
 	// Expect(unit.Simulation.Templates[0].RequestTemplate.Body).To(BeNil())
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Destination).To(Equal("testdestination"))
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Destination.ExactMatch).To(Equal("testdestination"))
 	// Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(BeNil())
 	// Expect(*unit.Simulation.Templates[0].RequestTemplate.Method).To(BeNil())
 	// Expect(*unit.Simulation.Templates[0].RequestTemplate.Path).To(BeNil())

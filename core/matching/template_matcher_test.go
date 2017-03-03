@@ -239,8 +239,10 @@ func Test_Match_EndpointMatchWithHeaders(t *testing.T) {
 
 	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Headers:     headers,
-			Destination: &destination,
+			Headers: headers,
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: &destination,
+			},
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: &path,
 			},
@@ -286,8 +288,10 @@ func Test_Match_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 
 	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Headers:     headers,
-			Destination: &destination,
+			Headers: headers,
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: &destination,
+			},
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: &path,
 			},
@@ -331,7 +335,9 @@ func Test_Match_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 
 	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Destination: &destination,
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: &destination,
+			},
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: &path,
 			},
@@ -396,7 +402,9 @@ func Test_Match_TemplatesCanUseGlobsOnDestinationAndBeMatched(t *testing.T) {
 
 	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Destination: StringToPointer("*.com"),
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("*.com"),
+			},
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
