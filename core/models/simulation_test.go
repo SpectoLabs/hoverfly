@@ -32,7 +32,9 @@ func Test_Simulation_AddRequestTemplateResponsePair_CanAddAFullPairToTheArray(t 
 
 	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
 		RequestTemplate{
-			Body: util.StringToPointer("testbody"),
+			Body: &RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("testbody"),
+			},
 			Destination: &RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("testdestination"),
 			},
@@ -59,7 +61,7 @@ func Test_Simulation_AddRequestTemplateResponsePair_CanAddAFullPairToTheArray(t 
 
 	Expect(unit.Templates).To(HaveLen(1))
 
-	Expect(*unit.Templates[0].RequestTemplate.Body).To(Equal("testbody"))
+	Expect(*unit.Templates[0].RequestTemplate.Body.ExactMatch).To(Equal("testbody"))
 	Expect(*unit.Templates[0].RequestTemplate.Destination.ExactMatch).To(Equal("testdestination"))
 	Expect(unit.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
 	Expect(*unit.Templates[0].RequestTemplate.Method.ExactMatch).To(Equal("testmethod"))

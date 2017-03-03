@@ -234,7 +234,9 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			Query: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer(""),
 			},
-			Body: StringToPointer(""),
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(""),
+			},
 			Headers: map[string][]string{
 				"Hoverfly": []string{"testing"},
 			},
@@ -298,7 +300,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Query: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer(""),
 			},
-			Body:    StringToPointer(""),
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(""),
+			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
 	}))
@@ -325,7 +329,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Query: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer(""),
 			},
-			Body:    StringToPointer(""),
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(""),
+			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
 	}))
@@ -352,7 +358,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Query: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer(""),
 			},
-			Body:    StringToPointer(""),
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(""),
+			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
 	}))

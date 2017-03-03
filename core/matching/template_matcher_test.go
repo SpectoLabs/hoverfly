@@ -43,7 +43,9 @@ func Test_Match_TemplateShouldMatchOnBody(t *testing.T) {
 
 	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Body: StringToPointer("body"),
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("body"),
+			},
 		},
 		Response: models.ResponseDetails{
 			Body: "body",
@@ -552,7 +554,9 @@ func Test_Match_TemplatesCanUseGlobsOnBodyndBeMatched(t *testing.T) {
 
 	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Body: StringToPointer(`{"json": "object", "key": *}`),
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(`{"json": "object", "key": *}`),
+			},
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
@@ -579,7 +583,9 @@ func Test_Match_TemplatesCanUseGlobsOnBodyAndNotMatchWhenTheBodyIsWrong(t *testi
 
 	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Body: StringToPointer(`{"json": "object", "key": *}`),
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(`{"json": "object", "key": *}`),
+			},
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
