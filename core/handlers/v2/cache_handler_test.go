@@ -18,19 +18,19 @@ type HoverflyCacheStub struct {
 	FlushError  bool
 }
 
-func (this HoverflyCacheStub) GetCache() ([]RequestResponsePairView, error) {
+func (this HoverflyCacheStub) GetCache() ([]RequestResponsePairViewV1, error) {
 	if this.GetError {
 		return nil, errors.New("There was an error")
 	}
 
-	return []RequestResponsePairView{
-		RequestResponsePairView{
+	return []RequestResponsePairViewV1{
+		RequestResponsePairViewV1{
 			Request: RequestDetailsViewV1{
 				Destination: util.StringToPointer("one"),
 			},
 			Response: ResponseDetailsView{},
 		},
-		RequestResponsePairView{
+		RequestResponsePairViewV1{
 			Request: RequestDetailsViewV1{
 				Destination: util.StringToPointer("two"),
 			},
