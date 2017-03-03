@@ -127,7 +127,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 
 	pairView := requestResponsePair.ConvertToRequestResponsePairView()
 
-	Expect(pairView).To(Equal(v2.RequestResponsePairView{
+	Expect(pairView).To(Equal(v2.RequestResponsePairViewV1{
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        respBody,
@@ -165,7 +165,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 
 	pairView := requestResponsePair.ConvertToRequestResponsePairView()
 
-	Expect(pairView).To(Equal(v2.RequestResponsePairView{
+	Expect(pairView).To(Equal(v2.RequestResponsePairViewV1{
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        "H4sIAAAAAAAA/w==",
@@ -234,7 +234,7 @@ func Test_NewRequestDetailsFromHttpRequest_LowerCaseDestination(t *testing.T) {
 func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
-	view := v2.RequestResponsePairView{
+	view := v2.RequestResponsePairViewV1{
 		Request: v2.RequestDetailsViewV1{
 			Path:        StringToPointer("A"),
 			Method:      StringToPointer("A"),
@@ -287,7 +287,7 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *
 func TestRequestResponsePairView_ConvertToRequestResponsePairWithEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
-	view := v2.RequestResponsePairView{
+	view := v2.RequestResponsePairViewV1{
 		Response: v2.ResponseDetailsView{
 			Body:        "ZW5jb2RlZA==",
 			EncodedBody: true,

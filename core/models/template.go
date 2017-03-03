@@ -9,9 +9,9 @@ type RequestTemplateResponsePair struct {
 	Response        ResponseDetails
 }
 
-func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairView {
+func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairViewV1 {
 
-	return v2.RequestResponsePairView{
+	return v2.RequestResponsePairViewV1{
 		Request: v2.RequestDetailsViewV1{
 			Path:        this.RequestTemplate.Path,
 			Method:      this.RequestTemplate.Method,

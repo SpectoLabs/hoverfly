@@ -67,8 +67,8 @@ func (this *RequestResponsePair) Encode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairView {
-	return v2.RequestResponsePairView{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
+func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairViewV1 {
+	return v2.RequestResponsePairViewV1{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
 }
 
 // NewPayloadFromBytes decodes supplied bytes into Payload structure
