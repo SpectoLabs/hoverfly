@@ -63,7 +63,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				json.Unmarshal(recordsJson, &payload)
 				Expect(payload.DataViewV1.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.DataViewV1.RequestResponsePairs[0].Request).To(Equal(v2.RequestDetailsView{
+				Expect(payload.DataViewV1.RequestResponsePairs[0].Request).To(Equal(v2.RequestDetailsViewV1{
 					Path:        util.StringToPointer("/"),
 					Method:      util.StringToPointer("GET"),
 					Destination: util.StringToPointer(expectedDestination),

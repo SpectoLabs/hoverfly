@@ -12,7 +12,7 @@ type RequestTemplateResponsePair struct {
 func (this *RequestTemplateResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairView {
 
 	return v2.RequestResponsePairView{
-		Request: v2.RequestDetailsView{
+		Request: v2.RequestDetailsViewV1{
 			Path:        this.RequestTemplate.Path,
 			Method:      this.RequestTemplate.Method,
 			Destination: this.RequestTemplate.Destination,

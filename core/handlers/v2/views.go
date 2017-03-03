@@ -88,8 +88,8 @@ type DataViewV1 struct {
 }
 
 type RequestResponsePairView struct {
-	Response ResponseDetailsView `json:"response"`
-	Request  RequestDetailsView  `json:"request"`
+	Response ResponseDetailsView  `json:"response"`
+	Request  RequestDetailsViewV1 `json:"request"`
 }
 
 //Gets Response - required for interfaces.RequestResponsePairView
@@ -99,7 +99,7 @@ func (this RequestResponsePairView) GetResponse() interfaces.Response { return t
 func (this RequestResponsePairView) GetRequest() interfaces.Request { return this.Request }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
-type RequestDetailsView struct {
+type RequestDetailsViewV1 struct {
 	Path        *string             `json:"path"`
 	Method      *string             `json:"method"`
 	Destination *string             `json:"destination"`
@@ -110,19 +110,19 @@ type RequestDetailsView struct {
 }
 
 //Gets Path - required for interfaces.Request
-func (this RequestDetailsView) GetPath() *string { return this.Path }
+func (this RequestDetailsViewV1) GetPath() *string { return this.Path }
 
 //Gets Method - required for interfaces.Request
-func (this RequestDetailsView) GetMethod() *string { return this.Method }
+func (this RequestDetailsViewV1) GetMethod() *string { return this.Method }
 
 //Gets Destination - required for interfaces.Request
-func (this RequestDetailsView) GetDestination() *string { return this.Destination }
+func (this RequestDetailsViewV1) GetDestination() *string { return this.Destination }
 
 //Gets Scheme - required for interfaces.Request
-func (this RequestDetailsView) GetScheme() *string { return this.Scheme }
+func (this RequestDetailsViewV1) GetScheme() *string { return this.Scheme }
 
 //Gets Query - required for interfaces.Request
-func (this RequestDetailsView) GetQuery() *string {
+func (this RequestDetailsViewV1) GetQuery() *string {
 	if this.Query == nil {
 		return this.Query
 	}
@@ -131,10 +131,10 @@ func (this RequestDetailsView) GetQuery() *string {
 }
 
 //Gets Body - required for interfaces.Request
-func (this RequestDetailsView) GetBody() *string { return this.Body }
+func (this RequestDetailsViewV1) GetBody() *string { return this.Body }
 
 //Gets Headers - required for interfaces.Request
-func (this RequestDetailsView) GetHeaders() map[string][]string { return this.Headers }
+func (this RequestDetailsViewV1) GetHeaders() map[string][]string { return this.Headers }
 
 // ResponseDetailsView is used when marshalling and
 // unmarshalling requests. This struct's Body may be Base64
