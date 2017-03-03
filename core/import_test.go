@@ -201,7 +201,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}}},
-		Request: v2.RequestDetailsView{
+		Request: v2.RequestDetailsViewV1{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
@@ -249,7 +249,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			EncodedBody: false,
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 		},
-		Request: v2.RequestDetailsView{
+		Request: v2.RequestDetailsViewV1{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
@@ -328,7 +328,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 
 	RegisterTestingT(t)
 
-	requestTemplate := v2.RequestDetailsView{
+	requestTemplate := v2.RequestDetailsViewV1{
 		Method: StringToPointer("GET"),
 	}
 
@@ -376,7 +376,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
-		Request: v2.RequestDetailsView{
+		Request: v2.RequestDetailsViewV1{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
