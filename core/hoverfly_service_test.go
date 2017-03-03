@@ -13,19 +13,25 @@ import (
 )
 
 var (
-	pairOneRecording = v2.RequestResponsePairViewV1{
-		Request: v2.RequestDetailsViewV1{
-			Destination: util.StringToPointer("test.com"),
-			Path:        util.StringToPointer("/testing"),
+	pairOne = v2.RequestResponsePairViewV2{
+		Request: v2.RequestDetailsViewV2{
+			Destination: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("test.com"),
+			},
+			Path: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("/testing"),
+			},
 		},
 		Response: v2.ResponseDetailsView{
 			Body: "test-body",
 		},
 	}
 
-	pairOneTemplate = v2.RequestResponsePairViewV1{
-		Request: v2.RequestDetailsViewV1{
-			Path: util.StringToPointer("/template"),
+	pairTwo = v2.RequestResponsePairViewV2{
+		Request: v2.RequestDetailsViewV2{
+			Path: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("/template"),
+			},
 		},
 		Response: v2.ResponseDetailsView{
 			Body: "template-body",
@@ -188,9 +194,9 @@ func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	simulationToImport := v2.SimulationViewV1{
-		v2.DataViewV1{
-			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{pairOneRecording},
+	simulationToImport := v2.SimulationViewV2{
+		v2.DataViewV2{
+			RequestResponsePairs: []v2.RequestResponsePairViewV2{pairOne},
 			GlobalActions: v2.GlobalActionsView{
 				Delays: []v1.ResponseDelayView{},
 			},
@@ -198,7 +204,7 @@ func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 		v2.MetaView{},
 	}
 
-	unit.PutSimulation(simulationToImport)
+	unit.PutSimulationV2(simulationToImport)
 
 	importedSimulation, err := unit.GetSimulation()
 	Expect(err).To(BeNil())
@@ -219,9 +225,9 @@ func TestHoverfly_PutSimulation_ImportsTemplates(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	simulationToImport := v2.SimulationViewV1{
-		v2.DataViewV1{
-			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{pairOneTemplate},
+	simulationToImport := v2.SimulationViewV2{
+		v2.DataViewV2{
+			RequestResponsePairs: []v2.RequestResponsePairViewV2{pairTwo},
 			GlobalActions: v2.GlobalActionsView{
 				Delays: []v1.ResponseDelayView{},
 			},
@@ -229,7 +235,7 @@ func TestHoverfly_PutSimulation_ImportsTemplates(t *testing.T) {
 		v2.MetaView{},
 	}
 
-	unit.PutSimulation(simulationToImport)
+	unit.PutSimulationV2(simulationToImport)
 
 	importedSimulation, err := unit.GetSimulation()
 	Expect(err).To(BeNil())
@@ -250,9 +256,9 @@ func TestHoverfly_PutSimulation_ImportsRecordingsAndTemplates(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	simulationToImport := v2.SimulationViewV1{
-		v2.DataViewV1{
-			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{pairOneRecording, pairOneTemplate},
+	simulationToImport := v2.SimulationViewV2{
+		v2.DataViewV2{
+			RequestResponsePairs: []v2.RequestResponsePairViewV2{pairOne, pairTwo},
 			GlobalActions: v2.GlobalActionsView{
 				Delays: []v1.ResponseDelayView{},
 			},
@@ -260,7 +266,7 @@ func TestHoverfly_PutSimulation_ImportsRecordingsAndTemplates(t *testing.T) {
 		v2.MetaView{},
 	}
 
-	unit.PutSimulation(simulationToImport)
+	unit.PutSimulationV2(simulationToImport)
 
 	importedSimulation, err := unit.GetSimulation()
 	Expect(err).To(BeNil())
@@ -286,9 +292,9 @@ func TestHoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	simulationToImport := v2.SimulationViewV1{
-		v2.DataViewV1{
-			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{},
+	simulationToImport := v2.SimulationViewV2{
+		v2.DataViewV2{
+			RequestResponsePairs: []v2.RequestResponsePairViewV2{},
 			GlobalActions: v2.GlobalActionsView{
 				Delays: []v1.ResponseDelayView{delayOne, delayTwo},
 			},
@@ -296,7 +302,7 @@ func TestHoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 		v2.MetaView{},
 	}
 
-	err := unit.PutSimulation(simulationToImport)
+	err := unit.PutSimulationV2(simulationToImport)
 	Expect(err).To(BeNil())
 
 	delays := unit.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()

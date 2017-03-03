@@ -90,7 +90,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
 	}
 
-	var simulation v2.SimulationViewV1
+	var simulation v2.SimulationViewV2
 
 	body, err := ioutil.ReadAll(pairsFile)
 	if err != nil {
@@ -102,7 +102,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.PutSimulation(simulation)
+	return hf.PutSimulationV2(simulation)
 }
 
 // ImportFromURL - takes one string value and tries connect to a remote server, then parse response body into
@@ -115,7 +115,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Failed to fetch given URL, error %s", err.Error())
 	}
 
-	var simulation v2.SimulationViewV1
+	var simulation v2.SimulationViewV2
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -127,7 +127,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.PutSimulation(simulation)
+	return hf.PutSimulationV2(simulation)
 }
 
 func isJSON(s string) bool {
