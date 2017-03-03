@@ -45,8 +45,8 @@ type HoverflyView struct {
 }
 
 type SimulationViewV1 struct {
-	DataView `json:"data"`
-	MetaView `json:"meta"`
+	DataViewV1 `json:"data"`
+	MetaView   `json:"meta"`
 }
 
 func (this SimulationViewV1) GetValidationSchema() valid.Validator {
@@ -82,7 +82,7 @@ func (this SimulationViewV1) GetValidationSchema() valid.Validator {
 	)
 }
 
-type DataView struct {
+type DataViewV1 struct {
 	RequestResponsePairs []RequestResponsePairView `json:"pairs"`
 	GlobalActions        GlobalActionsView         `json:"globalActions"`
 }
