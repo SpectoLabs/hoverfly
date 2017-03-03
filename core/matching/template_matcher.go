@@ -31,7 +31,7 @@ func (t TemplateMatcher) Match(req models.RequestDetails, webserver bool, simula
 		if template.Path != nil && template.Path.ExactMatch != nil && !glob.Glob(*template.Path.ExactMatch, req.Path) {
 			continue
 		}
-		if template.Query != nil && !glob.Glob(*template.Query, req.Query) {
+		if template.Query != nil && template.Query.ExactMatch != nil && !glob.Glob(*template.Query.ExactMatch, req.Query) {
 			continue
 		}
 		if !headerMatch(template.Headers, req.Headers) {
