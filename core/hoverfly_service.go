@@ -192,7 +192,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV1, error) {
 	}, nil
 }
 
-func (this *Hoverfly) PutSimulationV2(simulationView v2.SimulationViewV2) error {
+func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV2) error {
 	err := this.ImportRequestResponsePairViews(simulationView.DataViewV2.RequestResponsePairs)
 	if err != nil {
 		return err
@@ -206,7 +206,7 @@ func (this *Hoverfly) PutSimulationV2(simulationView v2.SimulationViewV2) error 
 	return nil
 }
 
-func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV1) error {
+func (this *Hoverfly) PutSimulationV1(simulationView v2.SimulationViewV1) error {
 	requestResponsePairViews := make([]v2.RequestResponsePairViewV2, len(simulationView.RequestResponsePairViewV1))
 	for i, v := range simulationView.RequestResponsePairViewV1 {
 		var path, method, destination, scheme, query, body *v2.RequestFieldMatchersView

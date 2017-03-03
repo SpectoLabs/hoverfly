@@ -36,12 +36,24 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 				{
 					"data": [{
 						"request": {
-							"path": "/path1",
-							"method": "GET",
-							"destination": "destination1",
-							"scheme": "http",
-							"query": "",
-							"body": "",
+							"path": {
+								"exactMatch": "/path1"
+							},
+							"method": {
+								"exactMatch": "GET"
+							},
+							"destination": {
+								"exactMatch": "destination1"
+							},
+							"scheme": {
+								"exactMatch": "http"
+							},
+							"query": {
+								"exactMatch": ""
+							},
+							"body": {
+								"exactMatch": ""
+							},
 							"headers": {}
 						},
 						"response": {
@@ -52,8 +64,9 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 						}
 					}, {
 						"request": {
-							"requestType": "template",
-							"destination": "destination2"
+							"destination": {
+								"exactMatch": "destination2"
+							}
 						},
 						"response": {
 							"status": 200,
