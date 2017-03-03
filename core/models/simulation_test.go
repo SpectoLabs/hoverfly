@@ -37,8 +37,10 @@ func Test_Simulation_AddRequestTemplateResponsePair_CanAddAFullPairToTheArray(t 
 			Path: &RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("/testpath"),
 			},
-			Query:  util.StringToPointer("?query=test"),
-			Scheme: util.StringToPointer("http"),
+			Query: util.StringToPointer("?query=test"),
+			Scheme: &RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("http"),
+			},
 		},
 		ResponseDetails{
 			Body:    "testresponsebody",
@@ -55,7 +57,7 @@ func Test_Simulation_AddRequestTemplateResponsePair_CanAddAFullPairToTheArray(t 
 	Expect(*unit.Templates[0].RequestTemplate.Method).To(Equal("testmethod"))
 	Expect(*unit.Templates[0].RequestTemplate.Path.ExactMatch).To(Equal("/testpath"))
 	Expect(*unit.Templates[0].RequestTemplate.Query).To(Equal("?query=test"))
-	Expect(*unit.Templates[0].RequestTemplate.Scheme).To(Equal("http"))
+	Expect(*unit.Templates[0].RequestTemplate.Scheme.ExactMatch).To(Equal("http"))
 
 	Expect(unit.Templates[0].Response.Body).To(Equal("testresponsebody"))
 	Expect(unit.Templates[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
