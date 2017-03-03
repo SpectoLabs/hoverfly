@@ -246,7 +246,9 @@ func Test_Match_EndpointMatchWithHeaders(t *testing.T) {
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: &path,
 			},
-			Method: &method,
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: &method,
+			},
 			Query: &models.RequestFieldMatchers{
 				ExactMatch: &query,
 			},
@@ -295,7 +297,9 @@ func Test_Match_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: &path,
 			},
-			Method: &method,
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: &method,
+			},
 			Query: &models.RequestFieldMatchers{
 				ExactMatch: &query,
 			},
@@ -341,7 +345,9 @@ func Test_Match_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: &path,
 			},
-			Method: &method,
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: &method,
+			},
 			Query: &models.RequestFieldMatchers{
 				ExactMatch: &query,
 			},
@@ -377,7 +383,9 @@ func Test_Match_RequestTemplateResponsePairCanBeConvertedToARequestResponsePairV
 
 	requestTemplateResponsePair := models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Method: &method,
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: &method,
+			},
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
@@ -458,7 +466,9 @@ func Test_Match_TemplatesCanUseGlobsOnMethodAndBeMatched(t *testing.T) {
 
 	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Method: StringToPointer("*T"),
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("*T"),
+			},
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
@@ -625,7 +635,9 @@ func Test_Match_RequestTemplateResponsePair_ConvertToRequestResponsePairView_Can
 
 	requestTemplateResponsePair := models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
-			Method: &method,
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: &method,
+			},
 		},
 		Response: models.ResponseDetails{
 			Body: "template matched",
