@@ -222,7 +222,9 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/"),
 			},
-			Method: StringToPointer("GET"),
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/"),
 			},
@@ -284,7 +286,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/"),
 			},
-			Method: StringToPointer("GET"),
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/"),
 			},
@@ -309,7 +313,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/new/path"),
 			},
-			Method: StringToPointer("GET"),
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/"),
 			},
@@ -334,7 +340,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/newer/path"),
 			},
-			Method: StringToPointer("GET"),
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/"),
 			},
@@ -380,7 +388,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 
 	Expect(len(hv.Simulation.Templates)).To(Equal(1))
 
-	Expect(hv.Simulation.Templates[0].RequestTemplate.Method).To(Equal(StringToPointer("GET")))
+	Expect(hv.Simulation.Templates[0].RequestTemplate.Method.ExactMatch).To(Equal(StringToPointer("GET")))
 
 	Expect(hv.Simulation.Templates[0].Response.Status).To(Equal(200))
 	Expect(hv.Simulation.Templates[0].Response.Body).To(Equal("hello_world"))
