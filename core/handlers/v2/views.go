@@ -44,12 +44,12 @@ type HoverflyView struct {
 	UpstreamProxyView
 }
 
-type SimulationView struct {
+type SimulationViewV1 struct {
 	DataView `json:"data"`
 	MetaView `json:"meta"`
 }
 
-func (this SimulationView) GetValidationSchema() valid.Validator {
+func (this SimulationViewV1) GetValidationSchema() valid.Validator {
 	return valid.Object(
 		valid.ObjKV("data", valid.Object(
 			valid.ObjKV("pairs", valid.Array(valid.ArrEach(valid.Optional(valid.Object(

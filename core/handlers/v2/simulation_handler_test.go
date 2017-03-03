@@ -16,10 +16,10 @@ import (
 
 type HoverflySimulationStub struct {
 	Deleted    bool
-	Simulation SimulationView
+	Simulation SimulationViewV1
 }
 
-func (this HoverflySimulationStub) GetSimulation() (SimulationView, error) {
+func (this HoverflySimulationStub) GetSimulation() (SimulationViewV1, error) {
 	pairOne := RequestResponsePairView{
 		Request: RequestDetailsView{
 			Destination: util.StringToPointer("test.com"),
@@ -30,7 +30,7 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationView, error) {
 		},
 	}
 
-	return SimulationView{
+	return SimulationViewV1{
 		DataView{
 			RequestResponsePairs: []RequestResponsePairView{pairOne},
 			GlobalActions: GlobalActionsView{
@@ -54,20 +54,20 @@ func (this *HoverflySimulationStub) DeleteSimulation() {
 	this.Deleted = true
 }
 
-func (this *HoverflySimulationStub) PutSimulation(simulation SimulationView) error {
+func (this *HoverflySimulationStub) PutSimulation(simulation SimulationViewV1) error {
 	this.Simulation = simulation
 	return nil
 }
 
 type HoverflySimulationErrorStub struct{}
 
-func (this HoverflySimulationErrorStub) GetSimulation() (SimulationView, error) {
-	return SimulationView{}, fmt.Errorf("error")
+func (this HoverflySimulationErrorStub) GetSimulation() (SimulationViewV1, error) {
+	return SimulationViewV1{}, fmt.Errorf("error")
 }
 
 func (this *HoverflySimulationErrorStub) DeleteSimulation() {}
 
-func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationView) error {
+func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationViewV1) error {
 	return fmt.Errorf("error")
 }
 
@@ -84,7 +84,7 @@ func TestSimulationHandler_Get_ReturnsSimulation(t *testing.T) {
 
 	Expect(response.Code).To(Equal(http.StatusOK))
 
-	simulationView, err := unmarshalSimulationView(response.Body)
+	simulationView, err := unmarshalSimulationViewV1(response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(simulationView.DataView.RequestResponsePairs).To(HaveLen(1))
@@ -150,7 +150,7 @@ func TestSimulationHandler_Delete_CallsGetAfterDelete(t *testing.T) {
 
 	response := makeRequestOnHandler(unit.Delete, request)
 
-	simulationView, err := unmarshalSimulationView(response.Body)
+	simulationView, err := unmarshalSimulationViewV1(response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(simulationView.DataView.RequestResponsePairs).To(HaveLen(1))
@@ -338,17 +338,17 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonIsNotValid(t *testing.T) {
 	Expect(errorView.Error).To(Equal("Invalid json"))
 }
 
-func unmarshalSimulationView(buffer *bytes.Buffer) (SimulationView, error) {
+func unmarshalSimulationViewV1(buffer *bytes.Buffer) (SimulationViewV1, error) {
 	body, err := ioutil.ReadAll(buffer)
 	if err != nil {
-		return SimulationView{}, err
+		return SimulationViewV1{}, err
 	}
 
-	var simulationView SimulationView
+	var simulationView SimulationViewV1
 
 	err = json.Unmarshal(body, &simulationView)
 	if err != nil {
-		return SimulationView{}, err
+		return SimulationViewV1{}, err
 	}
 
 	return simulationView, nil

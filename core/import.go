@@ -91,7 +91,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
 	}
 
-	var simulation v2.SimulationView
+	var simulation v2.SimulationViewV1
 
 	body, err := ioutil.ReadAll(pairsFile)
 	if err != nil {
@@ -116,7 +116,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Failed to fetch given URL, error %s", err.Error())
 	}
 
-	var simulation v2.SimulationView
+	var simulation v2.SimulationViewV1
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
