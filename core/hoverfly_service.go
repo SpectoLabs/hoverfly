@@ -179,16 +179,16 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV1, error) {
 	responseDelays := hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()
 
 	return v2.SimulationViewV1{
-		MetaView: v2.MetaView{
-			HoverflyVersion: hf.version,
-			SchemaVersion:   "v1",
-			TimeExported:    time.Now().Format(time.RFC3339),
-		},
-		DataView: v2.DataView{
+		v2.DataViewV1{
 			RequestResponsePairs: pairViews,
 			GlobalActions: v2.GlobalActionsView{
 				Delays: responseDelays.Data,
 			},
+		},
+		v2.MetaView{
+			HoverflyVersion: hf.version,
+			SchemaVersion:   "v1",
+			TimeExported:    time.Now().Format(time.RFC3339),
 		},
 	}, nil
 }
