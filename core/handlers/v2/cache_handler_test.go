@@ -25,13 +25,13 @@ func (this HoverflyCacheStub) GetCache() ([]RequestResponsePairView, error) {
 
 	return []RequestResponsePairView{
 		RequestResponsePairView{
-			Request: RequestDetailsView{
+			Request: RequestDetailsViewV1{
 				Destination: util.StringToPointer("one"),
 			},
 			Response: ResponseDetailsView{},
 		},
 		RequestResponsePairView{
-			Request: RequestDetailsView{
+			Request: RequestDetailsViewV1{
 				Destination: util.StringToPointer("two"),
 			},
 			Response: ResponseDetailsView{},

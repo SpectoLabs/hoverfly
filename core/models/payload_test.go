@@ -133,7 +133,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 			Body:        respBody,
 			Headers:     map[string][]string{"test_header": []string{"true"}},
 			EncodedBody: false},
-		Request: v2.RequestDetailsView{
+		Request: v2.RequestDetailsViewV1{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
@@ -171,7 +171,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 			Body:        "H4sIAAAAAAAA/w==",
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 			EncodedBody: true},
-		Request: v2.RequestDetailsView{
+		Request: v2.RequestDetailsViewV1{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
 			Destination: StringToPointer("/"),
@@ -235,7 +235,7 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *
 	RegisterTestingT(t)
 
 	view := v2.RequestResponsePairView{
-		Request: v2.RequestDetailsView{
+		Request: v2.RequestDetailsViewV1{
 			Path:        StringToPointer("A"),
 			Method:      StringToPointer("A"),
 			Destination: StringToPointer("A"),
@@ -299,10 +299,10 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithEncoding(t *tes
 	Expect(pair.Response.Body).To(Equal("encoded"))
 }
 
-func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
+func TestRequestDetailsViewV1_ConvertToRequestDetails(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestDetailsView := v2.RequestDetailsView{
+	requestDetailsView := v2.RequestDetailsViewV1{
 		Path:        StringToPointer("/"),
 		Method:      StringToPointer("GET"),
 		Destination: StringToPointer("/"),

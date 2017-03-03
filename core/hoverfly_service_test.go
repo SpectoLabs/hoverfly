@@ -14,7 +14,7 @@ import (
 
 var (
 	pairOneRecording = v2.RequestResponsePairView{
-		Request: v2.RequestDetailsView{
+		Request: v2.RequestDetailsViewV1{
 			Destination: util.StringToPointer("test.com"),
 			Path:        util.StringToPointer("/testing"),
 		},
@@ -24,7 +24,7 @@ var (
 	}
 
 	pairOneTemplate = v2.RequestResponsePairView{
-		Request: v2.RequestDetailsView{
+		Request: v2.RequestDetailsViewV1{
 			Path: util.StringToPointer("/template"),
 		},
 		Response: v2.ResponseDetailsView{

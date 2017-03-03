@@ -21,7 +21,7 @@ type HoverflySimulationStub struct {
 
 func (this HoverflySimulationStub) GetSimulation() (SimulationViewV1, error) {
 	pairOne := RequestResponsePairView{
-		Request: RequestDetailsView{
+		Request: RequestDetailsViewV1{
 			Destination: util.StringToPointer("test.com"),
 			Path:        util.StringToPointer("/testing"),
 		},
