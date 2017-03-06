@@ -58,25 +58,37 @@ var _ = Describe("When I run Hoverfly", func() {
 				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(err).To(BeNil())
 
-				payload := v2.SimulationViewV1{}
+				payload := v2.SimulationViewV2{}
 
 				json.Unmarshal(recordsJson, &payload)
-				Expect(payload.DataViewV1.RequestResponsePairViewV1).To(HaveLen(1))
+				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.DataViewV1.RequestResponsePairViewV1[0].Request).To(Equal(v2.RequestDetailsViewV1{
-					Path:        util.StringToPointer("/"),
-					Method:      util.StringToPointer("GET"),
-					Destination: util.StringToPointer(expectedDestination),
-					Scheme:      util.StringToPointer("http"),
-					Query:       util.StringToPointer(""),
-					Body:        util.StringToPointer(""),
+				Expect(payload.RequestResponsePairs[0].Request).To(Equal(v2.RequestDetailsViewV2{
+					Path: &v2.RequestFieldMatchersView{
+						ExactMatch: util.StringToPointer("/"),
+					},
+					Method: &v2.RequestFieldMatchersView{
+						ExactMatch: util.StringToPointer("GET"),
+					},
+					Destination: &v2.RequestFieldMatchersView{
+						ExactMatch: util.StringToPointer(expectedDestination),
+					},
+					Scheme: &v2.RequestFieldMatchersView{
+						ExactMatch: util.StringToPointer("http"),
+					},
+					Query: &v2.RequestFieldMatchersView{
+						ExactMatch: util.StringToPointer(""),
+					},
+					Body: &v2.RequestFieldMatchersView{
+						ExactMatch: util.StringToPointer(""),
+					},
 					Headers: map[string][]string{
 						"Accept-Encoding": []string{"gzip"},
 						"User-Agent":      []string{"Go-http-client/1.1"},
 					},
 				}))
 
-				Expect(payload.DataViewV1.RequestResponsePairViewV1[0].Response).To(Equal(v2.ResponseDetailsView{
+				Expect(payload.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsView{
 					Status:      200,
 					Body:        "Hello world",
 					EncodedBody: false,
@@ -115,15 +127,15 @@ var _ = Describe("When I run Hoverfly", func() {
 				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(err).To(BeNil())
 
-				payload := v2.SimulationViewV1{}
+				payload := v2.SimulationViewV2{}
 
 				json.Unmarshal(recordsJson, &payload)
-				Expect(payload.DataViewV1.RequestResponsePairViewV1).To(HaveLen(1))
+				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.DataViewV1.RequestResponsePairViewV1[0].Request.Destination).To(Equal(&expectedRedirectDestination))
+				Expect(payload.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal(&expectedRedirectDestination))
 
-				Expect(payload.DataViewV1.RequestResponsePairViewV1[0].Response.Status).To(Equal(301))
-				Expect(payload.DataViewV1.RequestResponsePairViewV1[0].Response.Headers["Location"][0]).To(Equal(fakeServerUrl.String()))
+				Expect(payload.RequestResponsePairs[0].Response.Status).To(Equal(301))
+				Expect(payload.RequestResponsePairs[0].Response.Headers["Location"][0]).To(Equal(fakeServerUrl.String()))
 			})
 
 			It("Should capture a request body from POST", func() {

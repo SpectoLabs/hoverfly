@@ -50,36 +50,36 @@ func NewRequestTemplateResponsePairFromView(view *v2.RequestResponsePairViewV2) 
 	}
 }
 
-func (this *RequestTemplateResponsePair) BuildView() v2.RequestResponsePairViewV1 {
+func (this *RequestTemplateResponsePair) BuildView() v2.RequestResponsePairViewV2 {
 
-	var path, method, destination, scheme, query, body *string
+	var path, method, destination, scheme, query, body *v2.RequestFieldMatchersView
 
 	if this.RequestTemplate.Path != nil {
-		path = this.RequestTemplate.Path.ExactMatch
+		path = this.RequestTemplate.Path.BuildView()
 	}
 
 	if this.RequestTemplate.Method != nil {
-		method = this.RequestTemplate.Method.ExactMatch
+		method = this.RequestTemplate.Method.BuildView()
 	}
 
 	if this.RequestTemplate.Destination != nil {
-		destination = this.RequestTemplate.Destination.ExactMatch
+		destination = this.RequestTemplate.Destination.BuildView()
 	}
 
 	if this.RequestTemplate.Scheme != nil {
-		scheme = this.RequestTemplate.Scheme.ExactMatch
+		scheme = this.RequestTemplate.Scheme.BuildView()
 	}
 
 	if this.RequestTemplate.Query != nil {
-		query = this.RequestTemplate.Query.ExactMatch
+		query = this.RequestTemplate.Query.BuildView()
 	}
 
 	if this.RequestTemplate.Body != nil {
-		body = this.RequestTemplate.Body.ExactMatch
+		body = this.RequestTemplate.Body.BuildView()
 	}
 
-	return v2.RequestResponsePairViewV1{
-		Request: v2.RequestDetailsViewV1{
+	return v2.RequestResponsePairViewV2{
+		Request: v2.RequestDetailsViewV2{
 			Path:        path,
 			Method:      method,
 			Destination: destination,
