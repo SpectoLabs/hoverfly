@@ -396,7 +396,7 @@ func Test_Match_RequestTemplateResponsePairCanBeConvertedToARequestResponsePairV
 
 	pairView := requestTemplateResponsePair.BuildView()
 
-	Expect(pairView.Request.Method).To(Equal(StringToPointer("POST")))
+	Expect(pairView.Request.Method.ExactMatch).To(Equal(StringToPointer("POST")))
 	Expect(pairView.Request.Destination).To(BeNil())
 	Expect(pairView.Request.Path).To(BeNil())
 	Expect(pairView.Request.Scheme).To(BeNil())
@@ -652,7 +652,7 @@ func Test_Match_RequestTemplateResponsePair_ConvertToRequestResponsePairView_Can
 
 	pairView := requestTemplateResponsePair.BuildView()
 
-	Expect(pairView.Request.Method).To(Equal(StringToPointer("POST")))
+	Expect(pairView.Request.Method.ExactMatch).To(Equal(StringToPointer("POST")))
 	Expect(pairView.Request.Destination).To(BeNil())
 	Expect(pairView.Request.Path).To(BeNil())
 	Expect(pairView.Request.Scheme).To(BeNil())

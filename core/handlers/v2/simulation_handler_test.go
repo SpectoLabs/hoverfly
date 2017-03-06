@@ -19,20 +19,24 @@ type HoverflySimulationStub struct {
 	Simulation SimulationViewV2
 }
 
-func (this HoverflySimulationStub) GetSimulation() (SimulationViewV1, error) {
-	pairOne := RequestResponsePairViewV1{
-		Request: RequestDetailsViewV1{
-			Destination: util.StringToPointer("test.com"),
-			Path:        util.StringToPointer("/testing"),
+func (this HoverflySimulationStub) GetSimulation() (SimulationViewV2, error) {
+	pairOne := RequestResponsePairViewV2{
+		Request: RequestDetailsViewV2{
+			Destination: &RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("test.com"),
+			},
+			Path: &RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("/testing"),
+			},
 		},
 		Response: ResponseDetailsView{
 			Body: "test-body",
 		},
 	}
 
-	return SimulationViewV1{
-		DataViewV1{
-			RequestResponsePairViewV1: []RequestResponsePairViewV1{pairOne},
+	return SimulationViewV2{
+		DataViewV2{
+			RequestResponsePairs: []RequestResponsePairViewV2{pairOne},
 			GlobalActions: GlobalActionsView{
 				Delays: []v1.ResponseDelayView{
 					{
@@ -61,8 +65,8 @@ func (this *HoverflySimulationStub) PutSimulation(simulation SimulationViewV2) e
 
 type HoverflySimulationErrorStub struct{}
 
-func (this HoverflySimulationErrorStub) GetSimulation() (SimulationViewV1, error) {
-	return SimulationViewV1{}, fmt.Errorf("error")
+func (this HoverflySimulationErrorStub) GetSimulation() (SimulationViewV2, error) {
+	return SimulationViewV2{}, fmt.Errorf("error")
 }
 
 func (this *HoverflySimulationErrorStub) DeleteSimulation() {}
@@ -84,19 +88,19 @@ func TestSimulationHandler_Get_ReturnsSimulation(t *testing.T) {
 
 	Expect(response.Code).To(Equal(http.StatusOK))
 
-	simulationView, err := unmarshalSimulationViewV1(response.Body)
+	simulationView, err := unmarshalSimulationViewV2(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(simulationView.DataViewV1.RequestResponsePairViewV1).To(HaveLen(1))
+	Expect(simulationView.DataViewV2.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(simulationView.DataViewV1.RequestResponsePairViewV1[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
-	Expect(simulationView.DataViewV1.RequestResponsePairViewV1[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
+	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal(util.StringToPointer("test.com")))
+	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Request.Path.ExactMatch).To(Equal(util.StringToPointer("/testing")))
 
-	Expect(simulationView.DataViewV1.RequestResponsePairViewV1[0].Response.Body).To(Equal("test-body"))
+	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
 
-	Expect(simulationView.DataViewV1.GlobalActions.Delays).To(HaveLen(1))
-	Expect(simulationView.DataViewV1.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
-	Expect(simulationView.DataViewV1.GlobalActions.Delays[0].Delay).To(Equal(100))
+	Expect(simulationView.DataViewV2.GlobalActions.Delays).To(HaveLen(1))
+	Expect(simulationView.DataViewV2.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
+	Expect(simulationView.DataViewV2.GlobalActions.Delays[0].Delay).To(Equal(100))
 
 	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v1"))
 	Expect(simulationView.MetaView.HoverflyVersion).To(Equal("test"))
@@ -150,19 +154,19 @@ func TestSimulationHandler_Delete_CallsGetAfterDelete(t *testing.T) {
 
 	response := makeRequestOnHandler(unit.Delete, request)
 
-	simulationView, err := unmarshalSimulationViewV1(response.Body)
+	simulationView, err := unmarshalSimulationViewV2(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(simulationView.DataViewV1.RequestResponsePairViewV1).To(HaveLen(1))
+	Expect(simulationView.DataViewV2.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(simulationView.DataViewV1.RequestResponsePairViewV1[0].Request.Destination).To(Equal(util.StringToPointer("test.com")))
-	Expect(simulationView.DataViewV1.RequestResponsePairViewV1[0].Request.Path).To(Equal(util.StringToPointer("/testing")))
+	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal(util.StringToPointer("test.com")))
+	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Request.Path.ExactMatch).To(Equal(util.StringToPointer("/testing")))
 
-	Expect(simulationView.DataViewV1.RequestResponsePairViewV1[0].Response.Body).To(Equal("test-body"))
+	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
 
-	Expect(simulationView.DataViewV1.GlobalActions.Delays).To(HaveLen(1))
-	Expect(simulationView.DataViewV1.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
-	Expect(simulationView.DataViewV1.GlobalActions.Delays[0].Delay).To(Equal(100))
+	Expect(simulationView.DataViewV2.GlobalActions.Delays).To(HaveLen(1))
+	Expect(simulationView.DataViewV2.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
+	Expect(simulationView.DataViewV2.GlobalActions.Delays[0].Delay).To(Equal(100))
 
 	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v1"))
 	Expect(simulationView.MetaView.HoverflyVersion).To(Equal("test"))
@@ -340,17 +344,17 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonIsNotValid(t *testing.T) {
 	Expect(errorView.Error).To(Equal("Invalid json"))
 }
 
-func unmarshalSimulationViewV1(buffer *bytes.Buffer) (SimulationViewV1, error) {
+func unmarshalSimulationViewV2(buffer *bytes.Buffer) (SimulationViewV2, error) {
 	body, err := ioutil.ReadAll(buffer)
 	if err != nil {
-		return SimulationViewV1{}, err
+		return SimulationViewV2{}, err
 	}
 
-	var simulationView SimulationViewV1
+	var simulationView SimulationViewV2
 
 	err = json.Unmarshal(body, &simulationView)
 	if err != nil {
-		return SimulationViewV1{}, err
+		return SimulationViewV2{}, err
 	}
 
 	return simulationView, nil

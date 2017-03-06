@@ -62,12 +62,35 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			pairOneRequest, err := pairsArray[0].GetObject("request")
 
-			Expect(pairOneRequest.GetString("body")).Should(Equal(""))
-			Expect(pairOneRequest.GetString("destination")).Should(Equal("test-server.com"))
-			Expect(pairOneRequest.GetString("method")).Should(Equal("GET"))
-			Expect(pairOneRequest.GetString("path")).Should(Equal("/path1"))
-			Expect(pairOneRequest.GetString("query")).Should(Equal(""))
-			Expect(pairOneRequest.GetString("scheme")).Should(Equal("http"))
+			bodyMatchers, err := pairOneRequest.GetObject("body")
+			Expect(err).To(BeNil())
+
+			Expect(bodyMatchers.GetString("exactMatch")).Should(Equal(""))
+
+			destinationMatchers, err := pairOneRequest.GetObject("destination")
+			Expect(err).To(BeNil())
+
+			Expect(destinationMatchers.GetString("exactMatch")).Should(Equal("test-server.com"))
+
+			methodMatchers, err := pairOneRequest.GetObject("method")
+			Expect(err).To(BeNil())
+
+			Expect(methodMatchers.GetString("exactMatch")).Should(Equal("GET"))
+
+			pathMatchers, err := pairOneRequest.GetObject("path")
+			Expect(err).To(BeNil())
+
+			Expect(pathMatchers.GetString("exactMatch")).Should(Equal("/path1"))
+
+			queryMatchers, err := pairOneRequest.GetObject("query")
+			Expect(err).To(BeNil())
+
+			Expect(queryMatchers.GetString("exactMatch")).Should(Equal(""))
+
+			schemeMatchers, err := pairOneRequest.GetObject("scheme")
+			Expect(err).To(BeNil())
+
+			Expect(schemeMatchers.GetString("exactMatch")).Should(Equal("http"))
 
 			pairOneRequestHeaders, _ := pairOneRequest.GetObject("headers")
 			Expect(pairOneRequestHeaders.GetStringArray("Accept-Encoding")).Should(ContainElement("gzip"))
@@ -86,7 +109,11 @@ var _ = Describe("/api/v2/simulation", func() {
 			pairTwoRequest, err := pairsArray[1].GetObject("request")
 
 			Expect(pairTwoRequest.GetNull("body")).Should(BeNil())
-			Expect(pairTwoRequest.GetString("destination")).Should(Equal("template-server.com"))
+
+			destinationMatchers, err = pairTwoRequest.GetObject("destination")
+			Expect(err).To(BeNil())
+
+			Expect(destinationMatchers.GetString("exactMatch")).Should(Equal("template-server.com"))
 			Expect(pairTwoRequest.GetNull("method")).Should(BeNil())
 			Expect(pairTwoRequest.GetNull("path")).Should(BeNil())
 			Expect(pairTwoRequest.GetNull("query")).Should(BeNil())
@@ -204,7 +231,10 @@ var _ = Describe("/api/v2/simulation", func() {
 			requestObject, err := pairsArray[0].GetObject("request")
 			Expect(err).To(BeNil())
 
-			destination, err := requestObject.GetString("destination")
+			destinationMatchers, err := requestObject.GetObject("destination")
+			Expect(err).To(BeNil())
+
+			destination, err := destinationMatchers.GetString("exactMatch")
 			Expect(err).To(BeNil())
 			Expect(destination).To(Equal("templatedurl.com"))
 
@@ -269,7 +299,10 @@ var _ = Describe("/api/v2/simulation", func() {
 			requestObject, err := pairsArray[0].GetObject("request")
 			Expect(err).To(BeNil())
 
-			destination, err := requestObject.GetString("destination")
+			destinationMatchers, err := requestObject.GetObject("destination")
+			Expect(err).To(BeNil())
+
+			destination, err := destinationMatchers.GetString("exactMatch")
 			Expect(err).To(BeNil())
 			Expect(destination).To(Equal("templatedurl.com"))
 
