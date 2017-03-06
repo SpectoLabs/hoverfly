@@ -50,6 +50,84 @@ type SimulationViewV1 struct {
 	MetaView   `json:"meta"`
 }
 
+// func NewRequestFieldMatchersFromView(matchers *v2.RequestFieldMatchersView) *RequestFieldMatchers {
+// 	if matchers == nil {
+// 		return nil
+// 	}
+
+// 	return &RequestFieldMatchers{
+// 		ExactMatch: matchers.ExactMatch,
+// 	}
+// }
+
+func (this SimulationViewV1) Upgrade() SimulationViewV2 {
+	var pairs []RequestResponsePairViewV2
+	for _, pairV1 := range this.RequestResponsePairViewV1 {
+
+		var schemeMatchers, methodMatchers, destinationMatchers, pathMatchers, queryMatchers, bodyMatchers *RequestFieldMatchersView
+		if pairV1.Request.Scheme != nil {
+			schemeMatchers = &RequestFieldMatchersView{
+				ExactMatch: pairV1.Request.Scheme,
+			}
+		}
+
+		if pairV1.Request.Method != nil {
+			methodMatchers = &RequestFieldMatchersView{
+				ExactMatch: pairV1.Request.Method,
+			}
+		}
+
+		if pairV1.Request.Destination != nil {
+			destinationMatchers = &RequestFieldMatchersView{
+				ExactMatch: pairV1.Request.Destination,
+			}
+		}
+
+		if pairV1.Request.Path != nil {
+			pathMatchers = &RequestFieldMatchersView{
+				ExactMatch: pairV1.Request.Path,
+			}
+		}
+
+		if pairV1.Request.Query != nil {
+			queryMatchers = &RequestFieldMatchersView{
+				ExactMatch: pairV1.Request.Query,
+			}
+		}
+
+		if pairV1.Request.Body != nil {
+			bodyMatchers = &RequestFieldMatchersView{
+				ExactMatch: pairV1.Request.Body,
+			}
+		}
+
+		pair := RequestResponsePairViewV2{
+			Request: RequestDetailsViewV2{
+				Scheme:      schemeMatchers,
+				Method:      methodMatchers,
+				Destination: destinationMatchers,
+				Path:        pathMatchers,
+				Query:       queryMatchers,
+				Body:        bodyMatchers,
+				Headers:     pairV1.Request.Headers,
+			},
+			Response: pairV1.Response,
+		}
+		pairs = append(pairs, pair)
+	}
+
+	return SimulationViewV2{
+		DataViewV2{
+			RequestResponsePairs: pairs,
+		},
+		MetaView{
+			SchemaVersion:   "v2",
+			HoverflyVersion: this.HoverflyVersion,
+			TimeExported:    this.TimeExported,
+		},
+	}
+}
+
 func (this SimulationViewV1) GetValidationSchema() valid.Validator {
 	return valid.Object(
 		valid.ObjKV("data", valid.Object(
