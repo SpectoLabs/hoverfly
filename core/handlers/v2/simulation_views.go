@@ -1,6 +1,8 @@
 package v2
 
 import (
+	"time"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -273,4 +275,12 @@ type MetaView struct {
 	SchemaVersion   string `json:"schemaVersion"`
 	HoverflyVersion string `json:"hoverflyVersion"`
 	TimeExported    string `json:"timeExported"`
+}
+
+func NewMetaView(version string) *MetaView {
+	return &MetaView{
+		HoverflyVersion: version,
+		SchemaVersion:   "v2",
+		TimeExported:    time.Now().Format(time.RFC3339),
+	}
 }

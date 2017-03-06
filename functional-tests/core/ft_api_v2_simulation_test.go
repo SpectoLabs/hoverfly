@@ -44,7 +44,7 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(err).To(BeNil())
 			schemaVersion, err := metaObject.GetString("schemaVersion")
 			Expect(err).To(BeNil())
-			Expect(schemaVersion).To(Equal("v1"))
+			Expect(schemaVersion).To(Equal("v2"))
 			hoverflyVersion, err := metaObject.GetString("hoverflyVersion")
 			Expect(err).To(BeNil())
 			Expect(hoverflyVersion).ToNot(BeNil())
@@ -161,7 +161,7 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(err).To(BeNil())
 			schemaVersion, err := metaObject.GetString("schemaVersion")
 			Expect(err).To(BeNil())
-			Expect(schemaVersion).To(Equal("v1"))
+			Expect(schemaVersion).To(Equal("v2"))
 			hoverflyVersion, err := metaObject.GetString("hoverflyVersion")
 			Expect(err).To(BeNil())
 			Expect(hoverflyVersion).ToNot(BeNil())
@@ -201,7 +201,7 @@ var _ = Describe("/api/v2/simulation", func() {
 					}]
 				},
 				"meta": {
-					"schemaVersion": "v1"
+					"schemaVersion": "v2"
 				}
 			}
 			`)
@@ -274,7 +274,7 @@ var _ = Describe("/api/v2/simulation", func() {
 					}]
 				},
 				"meta": {
-					"schemaVersion": "v1"
+					"schemaVersion": "v2"
 				}
 			}
 			`)
@@ -330,7 +330,7 @@ var _ = Describe("/api/v2/simulation", func() {
 					"pairs": []
 				},
 				"meta": {
-                    "schemaVersion": "v1",
+                    "schemaVersion": "v2",
                     "hoverflyVersion": "v0.10.2",
                     "timeExported": "2017-02-23T12:43:48Z"
                 }

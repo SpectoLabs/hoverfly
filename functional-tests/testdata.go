@@ -91,7 +91,7 @@ var JsonPayload = `{
         }
     },
     "meta": {
-        "schemaVersion": "v1",
+        "schemaVersion": "v2",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -167,7 +167,7 @@ var JsonSimulationGetAndPost = `{
         }
     },
     "meta": {
-        "schemaVersion": "v1",
+        "schemaVersion": "v2",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
