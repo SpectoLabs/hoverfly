@@ -3,7 +3,6 @@ package hoverfly
 import (
 	"fmt"
 	"regexp"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
@@ -184,11 +183,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV2, error) {
 				Delays: responseDelays.Data,
 			},
 		},
-		v2.MetaView{
-			HoverflyVersion: hf.version,
-			SchemaVersion:   "v1",
-			TimeExported:    time.Now().Format(time.RFC3339),
-		},
+		*v2.NewMetaView(hf.version),
 	}, nil
 }
 
