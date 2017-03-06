@@ -168,8 +168,8 @@ func (hf Hoverfly) GetStats() metrics.Stats {
 	return hf.Counter.Flush()
 }
 
-func (hf Hoverfly) GetSimulation() (v2.SimulationViewV1, error) {
-	pairViews := make([]v2.RequestResponsePairViewV1, 0)
+func (hf Hoverfly) GetSimulation() (v2.SimulationViewV2, error) {
+	pairViews := make([]v2.RequestResponsePairViewV2, 0)
 
 	for _, v := range hf.Simulation.Templates {
 		pairViews = append(pairViews, v.BuildView())
@@ -177,9 +177,9 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV1, error) {
 
 	responseDelays := hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()
 
-	return v2.SimulationViewV1{
-		v2.DataViewV1{
-			RequestResponsePairViewV1: pairViews,
+	return v2.SimulationViewV2{
+		v2.DataViewV2{
+			RequestResponsePairs: pairViews,
 			GlobalActions: v2.GlobalActionsView{
 				Delays: responseDelays.Data,
 			},

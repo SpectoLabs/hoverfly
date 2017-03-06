@@ -46,7 +46,7 @@ var _ = Describe("Running Hoverfly", func() {
 
 			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).ToNot(ContainSubstring(`"destination":"127.0.0.1`))
+			Expect(recordsJson).ToNot(ContainSubstring(`"destination":{"exactMatch":"127.0.0.1`))
 		})
 
 		It("Should capture if destination is 127.0.0.1", func() {
@@ -59,7 +59,7 @@ var _ = Describe("Running Hoverfly", func() {
 
 			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).To(ContainSubstring(`"destination":"127.0.0.1`))
+			Expect(recordsJson).To(ContainSubstring(`"destination":{"exactMatch":"127.0.0.1`))
 		})
 
 		It("Should capture if destination is set to port numbers", func() {
@@ -72,7 +72,7 @@ var _ = Describe("Running Hoverfly", func() {
 
 			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).To(ContainSubstring(`"destination":"127.0.0.1`))
+			Expect(recordsJson).To(ContainSubstring(`"destination":{"exactMatch":"127.0.0.1`))
 		})
 
 		It("Should capture if destination is set to the path", func() {
@@ -85,7 +85,7 @@ var _ = Describe("Running Hoverfly", func() {
 
 			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).To(ContainSubstring(`"path":"/path"`))
+			Expect(recordsJson).To(ContainSubstring(`"path":{"exactMatch":"/path"}`))
 		})
 
 		It("Should not capture if destination is set to the wrong path", func() {
@@ -98,7 +98,7 @@ var _ = Describe("Running Hoverfly", func() {
 
 			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).ToNot(ContainSubstring(`"path":"/path"`))
+			Expect(recordsJson).ToNot(ContainSubstring(`"path":{"exactMatch":"/path"}`))
 		})
 	})
 })
