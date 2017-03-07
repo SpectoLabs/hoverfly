@@ -8,6 +8,118 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV2Payload(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+		"data": {
+			"pairs": [
+				{
+					"response": {
+						"status": 200,
+						"body": "exact match",
+						"encodedBody": false,
+						"headers": {
+							"Header": [
+								"value"
+							]
+						}
+					},
+					"request": {
+						"destination": {
+							"exactMatch": "test-server.com"
+						}
+					}
+				}
+			],
+			"globalActions": {
+				"delays": []
+			}
+		},
+		"meta": {
+			"schemaVersion": "v2",
+			"hoverflyVersion": "v0.11.0",
+			"timeExported": "2017-02-23T12:43:48Z"
+		}
+	}`))
+
+	Expect(err).To(BeNil())
+
+	Expect(simulation.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(simulation.RequestResponsePairs[0].Request.Body).To(BeNil())
+	Expect(*simulation.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal("test-server.com"))
+	Expect(simulation.RequestResponsePairs[0].Request.Headers).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].Request.Method).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].Request.Path).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].Request.Query).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].Request.Scheme).To(BeNil())
+
+	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal("exact match"))
+	Expect(simulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
+	Expect(simulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Header", []string{"value"}))
+	Expect(simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
+
+	Expect(simulation.SchemaVersion).To(Equal("v2"))
+	Expect(simulation.HoverflyVersion).To(Equal("v0.11.0"))
+	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
+}
+
+func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV1Payload(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+		"data": {
+			"pairs": [
+				{
+					"response": {
+						"status": 200,
+						"body": "exact match",
+						"encodedBody": false,
+						"headers": {
+							"Header": [
+								"value"
+							]
+						}
+					},
+					"request": {
+						"destination":"test-server.com"
+					}
+				}
+			],
+			"globalActions": {
+				"delays": []
+			}
+		},
+		"meta": {
+			"schemaVersion": "v1",
+			"hoverflyVersion": "v0.11.0",
+			"timeExported": "2017-02-23T12:43:48Z"
+		}
+	}`))
+
+	Expect(err).To(BeNil())
+
+	Expect(simulation.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(simulation.RequestResponsePairs[0].Request.Body).To(BeNil())
+	Expect(*simulation.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal("test-server.com"))
+	Expect(simulation.RequestResponsePairs[0].Request.Headers).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].Request.Method).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].Request.Path).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].Request.Query).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].Request.Scheme).To(BeNil())
+
+	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal("exact match"))
+	Expect(simulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
+	Expect(simulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Header", []string{"value"}))
+	Expect(simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
+
+	Expect(simulation.SchemaVersion).To(Equal("v2"))
+	Expect(simulation.HoverflyVersion).To(Equal("v0.11.0"))
+	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
+}
+
 func Test_RequestDetailsViewV1_GetQuery_SortsQueryString(t *testing.T) {
 	RegisterTestingT(t)
 

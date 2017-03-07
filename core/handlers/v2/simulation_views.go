@@ -1,6 +1,8 @@
 package v2
 
 import (
+	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
@@ -8,6 +10,39 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/util"
 	valid "github.com/gima/govalid/v1"
 )
+
+func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, error) {
+	var simulationView SimulationViewV2
+
+	jsonMap := make(map[string]map[string]interface{})
+
+	if err := json.Unmarshal(responseBody, &jsonMap); err != nil {
+		return SimulationViewV2{}, err
+	}
+
+	schemaVersion, found := jsonMap["meta"]["schemaVersion"].(string)
+	if !found {
+		return SimulationViewV2{}, errors.New("Unable to get meta object")
+	}
+
+	if schemaVersion == "v2" {
+		err := json.Unmarshal(responseBody, &simulationView)
+		if err != nil {
+			return SimulationViewV2{}, err
+		}
+	} else {
+		var simulationViewV1 SimulationViewV1
+
+		err := json.Unmarshal(responseBody, &simulationViewV1)
+		if err != nil {
+			return SimulationViewV2{}, err
+		}
+
+		simulationView = simulationViewV1.Upgrade()
+	}
+
+	return simulationView, nil
+}
 
 type SimulationViewV2 struct {
 	DataViewV2 `json:"data"`
