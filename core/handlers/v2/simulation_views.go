@@ -33,6 +33,10 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 	} else {
 		var simulationViewV1 SimulationViewV1
 
+		if path, err := simulationViewV1.GetValidationSchema().Validate(jsonMap); err != nil {
+			return SimulationViewV2{}, errors.New("Invalid v1 simulation: " + path)
+		}
+
 		err := json.Unmarshal(responseBody, &simulationViewV1)
 		if err != nil {
 			return SimulationViewV2{}, err
