@@ -65,6 +65,26 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV2Payload(t *
 	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
 }
 
+func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidV2Simulation(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+		"data": {},
+		"meta": {
+			"schemaVersion": "v2",
+			"hoverflyVersion": "v0.11.0",
+			"timeExported": "2017-02-23T12:43:48Z"
+		}
+	}`))
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("Invalid v2 simulation: Object->Key[data].Value->Object->Key[pairs].Value->Array"))
+
+	Expect(simulation).ToNot(BeNil())
+	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
+	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
+}
+
 func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV1Payload(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -138,7 +158,6 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidV1Sim
 	Expect(simulation).ToNot(BeNil())
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
-
 }
 
 func Test_RequestDetailsViewV1_GetQuery_SortsQueryString(t *testing.T) {
