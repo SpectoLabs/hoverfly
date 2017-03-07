@@ -47,7 +47,7 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationViewV2, error) {
 			},
 		},
 		MetaView{
-			SchemaVersion:   "v1",
+			SchemaVersion:   "v2",
 			HoverflyVersion: "test",
 			TimeExported:    "now",
 		},
@@ -102,7 +102,7 @@ func TestSimulationHandler_Get_ReturnsSimulation(t *testing.T) {
 	Expect(simulationView.DataViewV2.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
 	Expect(simulationView.DataViewV2.GlobalActions.Delays[0].Delay).To(Equal(100))
 
-	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v1"))
+	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v2"))
 	Expect(simulationView.MetaView.HoverflyVersion).To(Equal("test"))
 	Expect(simulationView.MetaView.TimeExported).To(Equal("now"))
 }
@@ -168,7 +168,7 @@ func TestSimulationHandler_Delete_CallsGetAfterDelete(t *testing.T) {
 	Expect(simulationView.DataViewV2.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
 	Expect(simulationView.DataViewV2.GlobalActions.Delays[0].Delay).To(Equal(100))
 
-	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v1"))
+	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v2"))
 	Expect(simulationView.MetaView.HoverflyVersion).To(Equal("test"))
 	Expect(simulationView.MetaView.TimeExported).To(Equal("now"))
 }
@@ -225,7 +225,7 @@ func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
 			}
 		},
 		"meta": {
-			"schemaVersion": "v1"
+			"schemaVersion": "v2"
 		}
 	}
 	`))))
@@ -257,7 +257,9 @@ func TestSimulationHandler_Put_CallsDelete(t *testing.T) {
 			"pairs": [
 				{
 					"request": {
-						"destination": "test.org"
+						"destination": {
+							"exactMatch": "test.org"
+						}
 					},
 					"response": {
 						"status": 200
@@ -276,7 +278,7 @@ func TestSimulationHandler_Put_CallsDelete(t *testing.T) {
 			}
 		},
 		"meta": {
-			"schemaVersion": "v1"
+			"schemaVersion": "v2"
 		}
 	}
 	`))))
