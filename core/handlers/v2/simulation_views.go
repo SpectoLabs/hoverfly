@@ -14,16 +14,17 @@ import (
 func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, error) {
 	var simulationView SimulationViewV2
 
-	jsonMap := make(map[string]map[string]interface{})
+	jsonMap := make(map[string]interface{})
 
 	if err := json.Unmarshal(responseBody, &jsonMap); err != nil {
 		return SimulationViewV2{}, errors.New("Invalid JSON")
 	}
 
-	schemaVersion, found := jsonMap["meta"]["schemaVersion"].(string)
-	if !found {
-		return SimulationViewV2{}, errors.New("Unable to get meta object")
+	if jsonMap["meta"] == nil {
+		return SimulationViewV2{}, errors.New("Invalid JSON, missing \"meta\" object")
 	}
+
+	schemaVersion := jsonMap["meta"].(map[string]interface{})["schemaVersion"].(string)
 
 	if schemaVersion == "v2" {
 		if path, err := simulationView.GetValidationSchema().Validate(jsonMap); err != nil {
