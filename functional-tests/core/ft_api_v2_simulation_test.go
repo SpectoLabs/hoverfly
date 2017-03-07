@@ -357,5 +357,48 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			Expect(pairsArray).To(HaveLen(0))
 		})
+
+		It("should import old v1 simulations and upgrade them to v2 simulations", func() {
+			request := sling.New().Put("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+			request.Body(bytes.NewBufferString(functional_tests.JsonPayloadV1))
+
+			functional_tests.DoRequest(request)
+			getReq := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+
+			getRes := functional_tests.DoRequest(getReq)
+			Expect(getRes.StatusCode).To(Equal(200))
+
+			defer getRes.Body.Close()
+
+			schemaObject, err := jason.NewObjectFromReader(getRes.Body)
+			Expect(err).To(BeNil())
+
+			dataObject, err := schemaObject.GetObject("data")
+			Expect(err).To(BeNil())
+
+			pairsArray, err := dataObject.GetObjectArray("pairs")
+			Expect(err).To(BeNil())
+
+			Expect(pairsArray).To(HaveLen(1))
+
+			requestObject, err := pairsArray[0].GetObject("request")
+			Expect(err).To(BeNil())
+
+			destinationMatchers, err := requestObject.GetObject("destination")
+			Expect(err).To(BeNil())
+			Expect(destinationMatchers.GetString("exactMatch")).Should(Equal("v1-simulation.com"))
+
+			metaObject, err := schemaObject.GetObject("meta")
+			Expect(err).To(BeNil())
+			schemaVersion, err := metaObject.GetString("schemaVersion")
+			Expect(err).To(BeNil())
+			Expect(schemaVersion).To(Equal("v2"))
+			hoverflyVersion, err := metaObject.GetString("hoverflyVersion")
+			Expect(err).To(BeNil())
+			Expect(hoverflyVersion).ToNot(BeNil())
+			timeExported, err := metaObject.GetString("timeExported")
+			Expect(err).To(BeNil())
+			Expect(timeExported).ToNot(BeNil())
+		})
 	})
 })
