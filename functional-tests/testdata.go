@@ -172,3 +172,29 @@ var JsonSimulationGetAndPost = `{
         "timeExported": "2017-02-23T12:43:48Z"
     }
 }`
+
+var JsonPayloadV1 = `{
+    "data": {
+        "pairs": [
+            {
+                "response": {
+                    "status": 200,
+                    "body": "v1 match",
+                    "encodedBody": false,
+                    "headers": {}
+                },
+                "request": {
+                    "destination": "v1-simulation.com"
+                }
+            }
+        ],
+        "globalActions": {
+            "delays": []
+        }
+    },
+    "meta": {
+        "schemaVersion": "v1",
+        "hoverflyVersion": "v0.10.2",
+        "timeExported": "2017-02-23T12:43:48Z"
+    }
+}`

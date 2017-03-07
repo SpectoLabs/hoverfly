@@ -99,7 +99,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 								}]
 							},
 							"meta": {
-								"schemaVersion": "v1"
+								"schemaVersion": "v2"
 							}
 						}`), 0644)
 				output := functional_tests.Run(hoverctlBinary, "import", filePath)

@@ -129,7 +129,7 @@ var _ = Describe("Using Hoverfly to return responses by request templates", func
 		}
 	},
 	"meta": {
-		"schemaVersion": "v1",
+		"schemaVersion": "v2",
 		"hoverflyVersion": "v0.10.0",
 		"timeExported": "2017-01-20T14:03:04Z"
 	}

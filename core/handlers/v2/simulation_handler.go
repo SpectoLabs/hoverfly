@@ -55,29 +55,11 @@ func (this *SimulationHandler) Get(w http.ResponseWriter, req *http.Request, nex
 func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	body, _ := ioutil.ReadAll(req.Body)
 
-	var jsonMap map[string]interface{}
-	err := json.Unmarshal(body, &jsonMap)
+	simulationView, err := NewSimulationViewFromResponseBody(body)
 	if err != nil {
-		log.WithFields(log.Fields{
-			"body": string(body),
-		}).Debug(err.Error())
-
-		handlers.WriteErrorResponse(w, "Invalid json", http.StatusBadRequest)
+		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	var simulationView SimulationViewV2
-
-	if path, err := simulationView.GetValidationSchema().Validate(jsonMap); err != nil {
-		log.WithFields(log.Fields{
-			"body": string(body),
-		}).Debug(err.Error())
-
-		handlers.WriteErrorResponse(w, "Json did not match schema: "+path, http.StatusUnprocessableEntity)
-		return
-	}
-
-	json.Unmarshal(body, &simulationView)
 
 	this.Hoverfly.DeleteSimulation()
 
