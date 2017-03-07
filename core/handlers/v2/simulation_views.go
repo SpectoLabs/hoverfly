@@ -17,7 +17,7 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 	jsonMap := make(map[string]map[string]interface{})
 
 	if err := json.Unmarshal(responseBody, &jsonMap); err != nil {
-		return SimulationViewV2{}, err
+		return SimulationViewV2{}, errors.New("Invalid JSON")
 	}
 
 	schemaVersion, found := jsonMap["meta"]["schemaVersion"].(string)

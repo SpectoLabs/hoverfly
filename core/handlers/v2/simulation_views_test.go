@@ -160,6 +160,19 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidV1Sim
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
 }
 
+func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidJson(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{}{}[^.^]{}{}`))
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("Invalid JSON"))
+
+	Expect(simulation).ToNot(BeNil())
+	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
+	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
+}
+
 func Test_RequestDetailsViewV1_GetQuery_SortsQueryString(t *testing.T) {
 	RegisterTestingT(t)
 
