@@ -85,6 +85,21 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidV2Sim
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
 }
 
+func Test_NewSimulationViewFromResponseBody_WontBlowUpIfMetaIsMissing(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+		"data": {}
+	}`))
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal(`Invalid JSON, missing "meta" object`))
+
+	Expect(simulation).ToNot(BeNil())
+	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
+	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
+}
+
 func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV1Payload(t *testing.T) {
 	RegisterTestingT(t)
 
