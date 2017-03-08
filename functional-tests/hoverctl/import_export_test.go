@@ -69,7 +69,7 @@ var _ = Describe("When I use hoverctl", func() {
 				}
 			}`
 
-		v2HoverflySimulation = `"pairs":[{"response":{"status":201,"body":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]}},"request":{"path":{"exactMatch":"/api/bookings","xpathMatch":null},"method":{"exactMatch":"POST","xpathMatch":null},"destination":{"exactMatch":"www.my-test.com","xpathMatch":null},"scheme":{"exactMatch":"http","xpathMatch":null},"query":{"exactMatch":"","xpathMatch":null},"body":{"exactMatch":"{\"flightId\": \"1\"}","xpathMatch":null},"headers":{"Content-Type":["application/json"]}}}],"globalActions":{"delays":[]}}`
+		v2HoverflySimulation = `"pairs":[{"response":{"status":201,"body":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]}},"request":{"path":{"exactMatch":"/api/bookings"},"method":{"exactMatch":"POST"},"destination":{"exactMatch":"www.my-test.com"},"scheme":{"exactMatch":"http"},"query":{"exactMatch":""},"body":{"exactMatch":"{\"flightId\": \"1\"}"},"headers":{"Content-Type":["application/json"]}}}],"globalActions":{"delays":[]}}`
 
 		v2HoverflyMeta = `"meta":{"schemaVersion":"v2","hoverflyVersion":"v\d+.\d+.\d+","timeExported":`
 	)
