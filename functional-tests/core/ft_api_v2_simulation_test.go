@@ -108,18 +108,18 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			pairTwoRequest, err := pairsArray[1].GetObject("request")
 
-			Expect(pairTwoRequest.GetNull("body")).Should(BeNil())
-
 			destinationMatchers, err = pairTwoRequest.GetObject("destination")
 			Expect(err).To(BeNil())
 
 			Expect(destinationMatchers.GetString("exactMatch")).Should(Equal("template-server.com"))
-			Expect(pairTwoRequest.GetNull("method")).Should(BeNil())
-			Expect(pairTwoRequest.GetNull("path")).Should(BeNil())
-			Expect(pairTwoRequest.GetNull("query")).Should(BeNil())
-			Expect(pairTwoRequest.GetNull("scheme")).Should(BeNil())
+			Expect(pairTwoRequest.GetNull("method")).ShouldNot(Succeed())
+			Expect(pairTwoRequest.GetNull("path")).ShouldNot(Succeed())
+			Expect(pairTwoRequest.GetNull("destination")).ShouldNot(Succeed())
+			Expect(pairTwoRequest.GetNull("query")).ShouldNot(Succeed())
+			Expect(pairTwoRequest.GetNull("scheme")).ShouldNot(Succeed())
+			Expect(pairTwoRequest.GetNull("body")).ShouldNot(Succeed())
 
-			Expect(pairTwoRequest.GetNull("headers")).Should(BeNil())
+			Expect(pairTwoRequest.GetNull("headers")).ShouldNot(Succeed())
 
 			pairTwoResponse, err := pairsArray[1].GetObject("response")
 

@@ -233,13 +233,13 @@ type RequestFieldMatchersView struct {
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsViewV2 struct {
-	Path        *RequestFieldMatchersView `json:"path"`
-	Method      *RequestFieldMatchersView `json:"method"`
-	Destination *RequestFieldMatchersView `json:"destination"`
-	Scheme      *RequestFieldMatchersView `json:"scheme"`
-	Query       *RequestFieldMatchersView `json:"query"`
-	Body        *RequestFieldMatchersView `json:"body"`
-	Headers     map[string][]string       `json:"headers"`
+	Path        *RequestFieldMatchersView `json:"path,omitempty"`
+	Method      *RequestFieldMatchersView `json:"method,omitempty"`
+	Destination *RequestFieldMatchersView `json:"destination,omitempty"`
+	Scheme      *RequestFieldMatchersView `json:"scheme,omitempty"`
+	Query       *RequestFieldMatchersView `json:"query,omitempty"`
+	Body        *RequestFieldMatchersView `json:"body,omitempty"`
+	Headers     map[string][]string       `json:"headers,omitempty"`
 }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
