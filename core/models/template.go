@@ -7,6 +7,7 @@ import (
 
 type RequestFieldMatchers struct {
 	ExactMatch *string
+	XpathMatch *string
 }
 
 func NewRequestFieldMatchersFromView(matchers *v2.RequestFieldMatchersView) *RequestFieldMatchers {
