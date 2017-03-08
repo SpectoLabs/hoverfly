@@ -78,3 +78,11 @@ func Test_FieldMatcher_MatchesFalseWithInvalidXpathMatch_GetAttributeFromElement
 		XpathMatch: util.StringToPointer("/list/item/field[@pop]"),
 	}, xml.Header+"<list><item><field test=\"value\">test</field></item></list>")).To(BeFalse())
 }
+
+func Test_FieldMatcher_MatchesTrueWithXpathMatch_GetElementWithNoValue(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(FieldMatcher(&models.RequestFieldMatchers{
+		XpathMatch: util.StringToPointer("/list/item/field"),
+	}, xml.Header+"<list><item><field></field></item></list>")).To(BeTrue())
+}
