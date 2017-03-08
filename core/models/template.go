@@ -17,12 +17,14 @@ func NewRequestFieldMatchersFromView(matchers *v2.RequestFieldMatchersView) *Req
 
 	return &RequestFieldMatchers{
 		ExactMatch: matchers.ExactMatch,
+		XpathMatch: matchers.XpathMatch,
 	}
 }
 
 func (this RequestFieldMatchers) BuildView() *v2.RequestFieldMatchersView {
 	return &v2.RequestFieldMatchersView{
 		ExactMatch: this.ExactMatch,
+		XpathMatch: this.XpathMatch,
 	}
 }
 
