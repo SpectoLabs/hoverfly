@@ -97,6 +97,34 @@ var JsonPayload = `{
     }
 }`
 
+var XpathSimulation = `{
+    "data": {
+        "pairs": [
+            {
+                "response": {
+                    "status": 200,
+                    "body": "xpath match",
+                    "encodedBody": false,
+                    "headers": {}
+                },
+                "request": {
+                    "body": {
+						"xpathMatch": "//item[count(preceding::item) < 5]"
+                    }
+                }
+            }
+        ],
+        "globalActions": {
+            "delays": []
+        }
+    },
+    "meta": {
+        "schemaVersion": "v2",
+        "hoverflyVersion": "v0.10.2",
+        "timeExported": "2017-02-23T12:43:48Z"
+    }
+}`
+
 var JsonSimulationGetAndPost = `{
     "data": {
         "pairs": [
