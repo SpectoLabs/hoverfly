@@ -29,12 +29,12 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
 			return false
 		}
 
-		result, err := xpathRule.Exec(xTree)
+		results, err := xpathRule.ExecNode(xTree)
 		if err != nil {
 			return false
 		}
 
-		return len(result.String()) > 0
+		return len(results) > 0
 	}
 
 	return false
