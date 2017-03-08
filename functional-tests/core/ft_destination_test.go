@@ -85,7 +85,7 @@ var _ = Describe("Running Hoverfly", func() {
 
 			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).To(ContainSubstring(`"path":{"exactMatch":"/path"}`))
+			Expect(recordsJson).To(ContainSubstring(`"path":{"exactMatch":"/path"`))
 		})
 
 		It("Should not capture if destination is set to the wrong path", func() {
@@ -98,7 +98,7 @@ var _ = Describe("Running Hoverfly", func() {
 
 			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
 			Expect(err).To(BeNil())
-			Expect(recordsJson).ToNot(ContainSubstring(`"path":{"exactMatch":"/path"}`))
+			Expect(recordsJson).ToNot(ContainSubstring(`"path":{"exactMatch":"/path"`))
 		})
 	})
 })
