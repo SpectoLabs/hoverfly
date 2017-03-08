@@ -227,8 +227,8 @@ func (this RequestResponsePairViewV1) GetResponse() interfaces.Response { return
 func (this RequestResponsePairViewV1) GetRequest() interfaces.Request { return this.Request }
 
 type RequestFieldMatchersView struct {
-	ExactMatch *string `json:"exactMatch"`
-	XpathMatch *string `json:"xpathMatch"`
+	ExactMatch *string `json:"exactMatch,omitempty"`
+	XpathMatch *string `json:"xpathMatch,omitempty"`
 }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
