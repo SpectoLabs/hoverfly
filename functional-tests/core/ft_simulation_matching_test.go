@@ -21,8 +21,6 @@ var _ = Describe("When using different matchers", func() {
 	BeforeEach(func() {
 		hoverfly = functional_tests.NewHoverfly()
 		hoverfly.Start()
-
-		hoverfly.ImportSimulation(functional_tests.XpathSimulation)
 	})
 
 	AfterEach(func() {
@@ -32,6 +30,7 @@ var _ = Describe("When using different matchers", func() {
 	Context("Using `xpathMatch`", func() {
 
 		It("should match on the body", func() {
+			hoverfly.ImportSimulation(functional_tests.XpathSimulation)
 			req := sling.New().Get("http://test.com")
 			req.Body(bytes.NewBufferString(xml.Header + "<item></item><item></item><item></item><item></item><item></item>"))
 
@@ -39,6 +38,20 @@ var _ = Describe("When using different matchers", func() {
 			Expect(response.StatusCode).To(Equal(200))
 
 			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("xpath match")))
+		})
+	})
+
+	Context("Using `jsonMatch`", func() {
+
+		It("should match on the body", func() {
+			hoverfly.ImportSimulation(functional_tests.JsonMatchSimulation)
+			req := sling.New().Get("http://test.com")
+			req.Body(bytes.NewBufferString(`{"items": [{}, {}, {}, {}, {}]}`))
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("json match")))
 		})
 	})
 })
