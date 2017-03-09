@@ -3,11 +3,12 @@ package models
 import (
 	"errors"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"regexp"
 	"strings"
 	"time"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 )
 
 type ResponseDelay struct {
@@ -20,7 +21,6 @@ type ResponseDelayList []ResponseDelay
 
 type ResponseDelays interface {
 	GetDelay(request RequestDetails) *ResponseDelay
-	Len() int
 	ConvertToResponseDelayPayloadView() v1.ResponseDelayPayloadView
 }
 
@@ -75,12 +75,4 @@ func (this ResponseDelayList) ConvertToResponseDelayPayloadView() v1.ResponseDel
 	}
 
 	return payloadView
-}
-
-func (this *ResponseDelayList) Len() int {
-	list := []ResponseDelay{}
-	if this != nil {
-		list = append(list, *this...)
-	}
-	return len(list)
 }
