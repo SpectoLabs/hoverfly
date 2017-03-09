@@ -558,10 +558,6 @@
 			"Rev": "d4feaf1a7e61e1d9e79e6c4e76c6349e9cab0a03"
 		},
 		{
-			"ImportPath": "golang.org/x/text/cases",
-			"Rev": "85c29909967d7f171f821e7a42e7b7af76fb9598"
-		},
-		{
 			"ImportPath": "golang.org/x/text/encoding",
 			"Rev": "85c29909967d7f171f821e7a42e7b7af76fb9598"
 		},
@@ -602,23 +598,7 @@
 			"Rev": "85c29909967d7f171f821e7a42e7b7af76fb9598"
 		},
 		{
-			"ImportPath": "golang.org/x/text/encoding/unicode/utf32",
-			"Rev": "85c29909967d7f171f821e7a42e7b7af76fb9598"
-		},
-		{
-			"ImportPath": "golang.org/x/text/internal",
-			"Rev": "85c29909967d7f171f821e7a42e7b7af76fb9598"
-		},
-		{
-			"ImportPath": "golang.org/x/text/internal/gen",
-			"Rev": "85c29909967d7f171f821e7a42e7b7af76fb9598"
-		},
-		{
 			"ImportPath": "golang.org/x/text/internal/tag",
-			"Rev": "85c29909967d7f171f821e7a42e7b7af76fb9598"
-		},
-		{
-			"ImportPath": "golang.org/x/text/internal/testtext",
 			"Rev": "85c29909967d7f171f821e7a42e7b7af76fb9598"
 		},
 		{
@@ -635,18 +615,6 @@
 		},
 		{
 			"ImportPath": "golang.org/x/text/transform",
-			"Rev": "85c29909967d7f171f821e7a42e7b7af76fb9598"
-		},
-		{
-			"ImportPath": "golang.org/x/text/unicode/cldr",
-			"Rev": "85c29909967d7f171f821e7a42e7b7af76fb9598"
-		},
-		{
-			"ImportPath": "golang.org/x/text/unicode/norm",
-			"Rev": "85c29909967d7f171f821e7a42e7b7af76fb9598"
-		},
-		{
-			"ImportPath": "golang.org/x/text/width",
 			"Rev": "85c29909967d7f171f821e7a42e7b7af76fb9598"
 		},
 		{
