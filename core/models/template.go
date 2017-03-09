@@ -9,6 +9,7 @@ type RequestFieldMatchers struct {
 	ExactMatch *string
 	XpathMatch *string
 	JsonMatch  *string
+	RegexMatch *string
 }
 
 func NewRequestFieldMatchersFromView(matchers *v2.RequestFieldMatchersView) *RequestFieldMatchers {
@@ -20,6 +21,7 @@ func NewRequestFieldMatchersFromView(matchers *v2.RequestFieldMatchersView) *Req
 		ExactMatch: matchers.ExactMatch,
 		XpathMatch: matchers.XpathMatch,
 		JsonMatch:  matchers.JsonMatch,
+		RegexMatch: matchers.RegexMatch,
 	}
 }
 
@@ -28,6 +30,7 @@ func (this RequestFieldMatchers) BuildView() *v2.RequestFieldMatchersView {
 		ExactMatch: this.ExactMatch,
 		XpathMatch: this.XpathMatch,
 		JsonMatch:  this.JsonMatch,
+		RegexMatch: this.RegexMatch,
 	}
 }
 

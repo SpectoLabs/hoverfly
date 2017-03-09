@@ -142,3 +142,19 @@ func Test_FieldMatcher_MatchesFalseWithIncorrectJsonMatch_WithExpression(t *test
 		JsonMatch: util.StringToPointer("$.test[*]?(@.field == \"test\")"),
 	}, `{"test": [{"field": "not-test"}]}`)).To(BeFalse())
 }
+
+func Test_FieldMatcher_MatchesTrueWithRegexMatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(FieldMatcher(&models.RequestFieldMatchers{
+		RegexMatch: util.StringToPointer("t[o|a|e]st"),
+	}, `test`)).To(BeTrue())
+}
+
+func Test_FieldMatcher_MatchesFalseWithIncorrectRegexMatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(FieldMatcher(&models.RequestFieldMatchers{
+		RegexMatch: util.StringToPointer("t[o|a]st"),
+	}, `test`)).To(BeFalse())
+}

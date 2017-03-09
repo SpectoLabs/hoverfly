@@ -2,6 +2,7 @@ package matching
 
 import (
 	"bytes"
+	"regexp"
 
 	"github.com/ChrisTrenkamp/goxpath"
 	"github.com/ChrisTrenkamp/goxpath/tree/xmltree"
@@ -52,6 +53,15 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
 		_, ok := eval.Next()
 
 		return ok
+	}
+
+	if field.RegexMatch != nil {
+		match, err := regexp.MatchString(*field.RegexMatch, toMatch)
+		if err != nil {
+			return false
+		}
+
+		return match
 	}
 
 	return false
