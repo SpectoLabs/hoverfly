@@ -60,12 +60,26 @@ var _ = Describe("When using different matchers", func() {
 		It("should match on the body", func() {
 			hoverfly.ImportSimulation(functional_tests.RegexMatchSimulation)
 			req := sling.New().Get("http://test.com")
-			req.Body(bytes.NewBufferString(xml.Header + "<items><item field=\"something\"></item></items>"))
+			req.Body(bytes.NewBufferString(xml.Header + "<items><item field=something></item></items>"))
 
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
 			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("regex match")))
+		})
+	})
+
+	Context("Using `globMatch`", func() {
+
+		It("should match on the body", func() {
+			hoverfly.ImportSimulation(functional_tests.GlobMatchSimulation)
+			req := sling.New().Get("http://test.com")
+			req.Body(bytes.NewBufferString(xml.Header + "<items><item field=something></item></items>"))
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("glob match")))
 		})
 	})
 })
