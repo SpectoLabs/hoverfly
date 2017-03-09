@@ -305,7 +305,7 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonDoesntMatchSchema_MissingDataKe
 	Expect(err).To(BeNil())
 
 	Expect(response.Result().StatusCode).To(Equal(400))
-	Expect(errorView.Error).To(Equal("Invalid v2 simulation: Object->Key[data].Value->Object"))
+	Expect(errorView.Error).To(Equal("Invalid v2 simulation: data is required"))
 }
 
 func TestSimulationHandler_Put_ReturnsErrorIfJsonDoesntMatchSchema_EmptyObject(t *testing.T) {

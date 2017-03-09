@@ -3,12 +3,17 @@ package v2
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
+	"strings"
+
+	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	valid "github.com/gima/govalid/v1"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, error) {
@@ -20,22 +25,43 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 		return SimulationViewV2{}, errors.New("Invalid JSON")
 	}
 
+	v2SchemaLoader := gojsonschema.NewStringLoader(SimulationViewV2JsonSchema)
+	simulationLoader := gojsonschema.NewGoLoader(jsonMap)
+
 	if jsonMap["meta"] == nil {
 		return SimulationViewV2{}, errors.New("Invalid JSON, missing \"meta\" object")
+	}
+
+	if jsonMap["meta"].(map[string]interface{})["schemaVersion"] == nil {
+		return SimulationViewV2{}, errors.New("Invalid JSON, missing \"meta.schemaVersion\" string")
 	}
 
 	schemaVersion := jsonMap["meta"].(map[string]interface{})["schemaVersion"].(string)
 
 	if schemaVersion == "v2" {
-		if path, err := simulationView.GetValidationSchema().Validate(jsonMap); err != nil {
-
-			return SimulationViewV2{}, errors.New("Invalid v2 simulation: " + path)
+		result, err := gojsonschema.Validate(v2SchemaLoader, simulationLoader)
+		if err != nil {
+			log.Error("Error when validating simulaton: " + err.Error())
+			return SimulationViewV2{}, errors.New("Error when validating simulaton")
 		}
-		err := json.Unmarshal(responseBody, &simulationView)
+
+		if !result.Valid() {
+			errorMessage := "Invalid v2 simulation:"
+			for i, parsingError := range result.Errors() {
+				message := strings.Split(parsingError.String(), ":")[1]
+				var comma string
+				if i != 0 {
+					comma = ","
+				}
+				errorMessage = errorMessage + comma + " " + strings.TrimSpace(message)
+			}
+			return simulationView, errors.New(errorMessage)
+		}
+		err = json.Unmarshal(responseBody, &simulationView)
 		if err != nil {
 			return SimulationViewV2{}, err
 		}
-	} else {
+	} else if schemaVersion == "v1" {
 		var simulationViewV1 SimulationViewV1
 
 		if path, err := simulationViewV1.GetValidationSchema().Validate(jsonMap); err != nil {
@@ -56,6 +82,19 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 type SimulationViewV2 struct {
 	DataViewV2 `json:"data"`
 	MetaView   `json:"meta"`
+}
+
+func ValidateSimulationViewV2(simulation map[string]interface{}) bool {
+	schemaLoader := gojsonschema.NewStringLoader(SimulationViewV2JsonSchema)
+	simulationLoader := gojsonschema.NewGoLoader(simulation)
+
+	result, err := gojsonschema.Validate(schemaLoader, simulationLoader)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	fmt.Println(result.Errors())
+	return result.Valid()
 }
 
 func (this SimulationViewV2) GetValidationSchema() valid.Validator {
