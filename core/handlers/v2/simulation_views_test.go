@@ -158,7 +158,13 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidV1Sim
 	RegisterTestingT(t)
 
 	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
-		"data": {},
+		"data": {
+			"pairs": [
+				{
+					
+				}
+			]
+		},
 		"meta": {
 			"schemaVersion": "v1",
 			"hoverflyVersion": "v0.11.0",
@@ -167,7 +173,7 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidV1Sim
 	}`))
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Invalid v1 simulation: Object->Key[data].Value->Object->Key[pairs].Value->Array"))
+	Expect(err.Error()).To(Equal("Invalid v1 simulation: request is required, response is required"))
 
 	Expect(simulation).ToNot(BeNil())
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
