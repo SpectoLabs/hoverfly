@@ -3,7 +3,6 @@ package v2
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"time"
 
 	"strings"
@@ -12,7 +11,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	valid "github.com/gima/govalid/v1"
 	"github.com/xeipuuv/gojsonschema"
 )
 
@@ -100,52 +98,6 @@ type SimulationViewV2 struct {
 	MetaView   `json:"meta"`
 }
 
-func ValidateSimulationViewV2(simulation map[string]interface{}) bool {
-	schemaLoader := gojsonschema.NewStringLoader(SimulationViewV2JsonSchema)
-	simulationLoader := gojsonschema.NewGoLoader(simulation)
-
-	result, err := gojsonschema.Validate(schemaLoader, simulationLoader)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	fmt.Println(result.Errors())
-	return result.Valid()
-}
-
-func (this SimulationViewV2) GetValidationSchema() valid.Validator {
-	return valid.Object(
-		valid.ObjKV("data", valid.Object(
-			valid.ObjKV("pairs", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
-				valid.ObjKV("request", valid.Object(
-					valid.ObjKV("path", valid.Optional(valid.Object())),
-					valid.ObjKV("method", valid.Optional(valid.Object())),
-					valid.ObjKV("scheme", valid.Optional(valid.Object())),
-					valid.ObjKV("query", valid.Optional(valid.Object())),
-					valid.ObjKV("body", valid.Optional(valid.Object())),
-					valid.ObjKV("headers", valid.Optional(valid.Object())),
-				)),
-				valid.ObjKV("response", valid.Object(
-					valid.ObjKV("status", valid.Optional(valid.Number())),
-					valid.ObjKV("body", valid.Optional(valid.String())),
-					valid.ObjKV("encodedBody", valid.Optional(valid.Boolean())),
-					valid.ObjKV("headers", valid.Optional(valid.Object())),
-				)),
-			))))),
-			valid.ObjKV("globalActions", valid.Optional(valid.Object(
-				valid.ObjKV("delays", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
-					valid.ObjKV("urlPattern", valid.Optional(valid.String())),
-					valid.ObjKV("httpMethod", valid.Optional(valid.String())),
-					valid.ObjKV("delay", valid.Optional(valid.Number())),
-				))))),
-			))),
-		)),
-		valid.ObjKV("meta", valid.Object(
-			valid.ObjKV("schemaVersion", valid.String()),
-		)),
-	)
-}
-
 type SimulationViewV1 struct {
 	DataViewV1 `json:"data"`
 	MetaView   `json:"meta"`
@@ -217,39 +169,6 @@ func (this SimulationViewV1) Upgrade() SimulationViewV2 {
 			TimeExported:    this.TimeExported,
 		},
 	}
-}
-
-func (this SimulationViewV1) GetValidationSchema() valid.Validator {
-	return valid.Object(
-		valid.ObjKV("data", valid.Object(
-			valid.ObjKV("pairs", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
-				valid.ObjKV("request", valid.Object(
-					valid.ObjKV("path", valid.Optional(valid.String())),
-					valid.ObjKV("method", valid.Optional(valid.String())),
-					valid.ObjKV("scheme", valid.Optional(valid.String())),
-					valid.ObjKV("query", valid.Optional(valid.String())),
-					valid.ObjKV("body", valid.Optional(valid.String())),
-					valid.ObjKV("headers", valid.Optional(valid.Object())),
-				)),
-				valid.ObjKV("response", valid.Object(
-					valid.ObjKV("status", valid.Optional(valid.Number())),
-					valid.ObjKV("body", valid.Optional(valid.String())),
-					valid.ObjKV("encodedBody", valid.Optional(valid.Boolean())),
-					valid.ObjKV("headers", valid.Optional(valid.Object())),
-				)),
-			))))),
-			valid.ObjKV("globalActions", valid.Optional(valid.Object(
-				valid.ObjKV("delays", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
-					valid.ObjKV("urlPattern", valid.Optional(valid.String())),
-					valid.ObjKV("httpMethod", valid.Optional(valid.String())),
-					valid.ObjKV("delay", valid.Optional(valid.Number())),
-				))))),
-			))),
-		)),
-		valid.ObjKV("meta", valid.Object(
-			valid.ObjKV("schemaVersion", valid.String()),
-		)),
-	)
 }
 
 type DataViewV2 struct {
