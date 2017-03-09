@@ -17,7 +17,7 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
 	}
 
 	if field.ExactMatch != nil {
-		return glob.Glob(*field.ExactMatch, toMatch)
+		return *field.ExactMatch == toMatch
 	}
 
 	if field.XpathMatch != nil {
