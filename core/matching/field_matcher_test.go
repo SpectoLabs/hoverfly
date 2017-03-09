@@ -86,3 +86,59 @@ func Test_FieldMatcher_MatchesTrueWithXpathMatch_GetElementWithNoValue(t *testin
 		XpathMatch: util.StringToPointer("/list/item/field"),
 	}, xml.Header+"<list><item><field></field></item></list>")).To(BeTrue())
 }
+
+func Test_FieldMatcher_MatchesFalseWithInvalidJsonPath(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(FieldMatcher(&models.RequestFieldMatchers{
+		JsonMatch: util.StringToPointer("test"),
+	}, `{"test": "field"}`)).To(BeFalse())
+}
+
+func Test_FieldMatcher_MatchesTrueWithJsonMatch_GetSingleElement(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(FieldMatcher(&models.RequestFieldMatchers{
+		JsonMatch: util.StringToPointer("$.test"),
+	}, `{"test": "field"}`)).To(BeTrue())
+}
+
+func Test_FieldMatcher_MatchesFalseWithIncorrectJsonMatch_GetSingleElement(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(FieldMatcher(&models.RequestFieldMatchers{
+		JsonMatch: util.StringToPointer("$.notAField"),
+	}, `{"test": "field"}`)).To(BeFalse())
+}
+
+func Test_FieldMatcher_MatchesTrueWithJsonMatch_GetElementFromArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(FieldMatcher(&models.RequestFieldMatchers{
+		JsonMatch: util.StringToPointer("$.test[1]"),
+	}, `{"test": [{}, {}]}`)).To(BeTrue())
+}
+
+func Test_FieldMatcher_MatchesFalseWithIncorrectJsonMatch_GetElementFromArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(FieldMatcher(&models.RequestFieldMatchers{
+		JsonMatch: util.StringToPointer("$.test[2]"),
+	}, `{"test": [{}, {}]}`)).To(BeFalse())
+}
+
+func Test_FieldMatcher_MatchesTrueWithJsonMatch_WithExpression(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(FieldMatcher(&models.RequestFieldMatchers{
+		JsonMatch: util.StringToPointer("$.test[*]?(@.field == \"test\")"),
+	}, `{"test": [{"field": "test"}]}`)).To(BeTrue())
+}
+
+func Test_FieldMatcher_MatchesFalseWithIncorrectJsonMatch_WithExpression(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(FieldMatcher(&models.RequestFieldMatchers{
+		JsonMatch: util.StringToPointer("$.test[*]?(@.field == \"test\")"),
+	}, `{"test": [{"field": "not-test"}]}`)).To(BeFalse())
+}
