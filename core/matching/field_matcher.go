@@ -64,5 +64,9 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
 		return match
 	}
 
+	if field.GlobMatch != nil {
+		return glob.Glob(*field.GlobMatch, toMatch)
+	}
+
 	return false
 }

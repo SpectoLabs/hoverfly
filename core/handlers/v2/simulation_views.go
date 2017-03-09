@@ -231,6 +231,7 @@ type RequestFieldMatchersView struct {
 	XpathMatch *string `json:"xpathMatch,omitempty"`
 	JsonMatch  *string `json:"jsonMatch,omitempty"`
 	RegexMatch *string `json:"regexMatch,omitempty"`
+	GlobMatch  *string `json:"globMatch,omitempty"`
 }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
