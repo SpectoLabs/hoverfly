@@ -25,9 +25,6 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 		return SimulationViewV2{}, errors.New("Invalid JSON")
 	}
 
-	v2SchemaLoader := gojsonschema.NewStringLoader(SimulationViewV2JsonSchema)
-	simulationLoader := gojsonschema.NewGoLoader(jsonMap)
-
 	if jsonMap["meta"] == nil {
 		return SimulationViewV2{}, errors.New("Invalid JSON, missing \"meta\" object")
 	}
@@ -38,7 +35,10 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 
 	schemaVersion := jsonMap["meta"].(map[string]interface{})["schemaVersion"].(string)
 
+	simulationLoader := gojsonschema.NewGoLoader(jsonMap)
 	if schemaVersion == "v2" {
+		v2SchemaLoader := gojsonschema.NewStringLoader(SimulationViewV2JsonSchema)
+
 		result, err := gojsonschema.Validate(v2SchemaLoader, simulationLoader)
 		if err != nil {
 			log.Error("Error when validating simulaton: " + err.Error())
@@ -62,13 +62,29 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 			return SimulationViewV2{}, err
 		}
 	} else if schemaVersion == "v1" {
-		var simulationViewV1 SimulationViewV1
-
-		if path, err := simulationViewV1.GetValidationSchema().Validate(jsonMap); err != nil {
-			return SimulationViewV2{}, errors.New("Invalid v1 simulation: " + path)
+		v1SchemaLoader := gojsonschema.NewStringLoader(SimulationViewV1JsonSchema)
+		result, err := gojsonschema.Validate(v1SchemaLoader, simulationLoader)
+		if err != nil {
+			log.Error("Error when validating simulaton: " + err.Error())
+			return SimulationViewV2{}, errors.New("Error when validating simulaton")
 		}
 
-		err := json.Unmarshal(responseBody, &simulationViewV1)
+		if !result.Valid() {
+			errorMessage := "Invalid v1 simulation:"
+			for i, parsingError := range result.Errors() {
+				message := strings.Split(parsingError.String(), ":")[1]
+				var comma string
+				if i != 0 {
+					comma = ","
+				}
+				errorMessage = errorMessage + comma + " " + strings.TrimSpace(message)
+			}
+			return simulationView, errors.New(errorMessage)
+		}
+
+		var simulationViewV1 SimulationViewV1
+
+		err = json.Unmarshal(responseBody, &simulationViewV1)
 		if err != nil {
 			return SimulationViewV2{}, err
 		}
