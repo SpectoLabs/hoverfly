@@ -405,7 +405,7 @@ func Test_Match_RequestTemplateResponsePairCanBeConvertedToARequestResponsePairV
 	Expect(pairView.Response.Body).To(Equal("template matched"))
 }
 
-func Test_Match_TemplatesCanUseGlobsOnDestinationAndBeMatched(t *testing.T) {
+func Test_Match_TemplatesCanUseGlobsAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -413,63 +413,7 @@ func Test_Match_TemplatesCanUseGlobsOnDestinationAndBeMatched(t *testing.T) {
 	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Destination: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer("*.com"),
-			},
-		},
-		Response: models.ResponseDetails{
-			Body: "template matched",
-		},
-	})
-
-	request := models.RequestDetails{
-		Method:      "GET",
-		Destination: "testhost.com",
-		Path:        "/api/1",
-	}
-
-	response, err := unit.Match(request, false, simulation)
-	Expect(err).To(BeNil())
-
-	Expect(response.Body).To(Equal("template matched"))
-}
-
-func Test_Match_TemplatesCanUseGlobsOnPathAndBeMatched(t *testing.T) {
-	RegisterTestingT(t)
-
-	simulation := models.NewSimulation()
-
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
-			Path: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer("/api/*"),
-			},
-		},
-		Response: models.ResponseDetails{
-			Body: "template matched",
-		},
-	})
-
-	request := models.RequestDetails{
-		Method:      "GET",
-		Destination: "testhost.com",
-		Path:        "/api/1",
-	}
-
-	response, err := unit.Match(request, false, simulation)
-	Expect(err).To(BeNil())
-
-	Expect(response.Body).To(Equal("template matched"))
-}
-
-func Test_Match_TemplatesCanUseGlobsOnMethodAndBeMatched(t *testing.T) {
-	RegisterTestingT(t)
-
-	simulation := models.NewSimulation()
-
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
-			Method: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer("*T"),
+				GlobMatch: StringToPointer("*.com"),
 			},
 		},
 		Response: models.ResponseDetails{
@@ -497,7 +441,7 @@ func Test_Match_TemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Scheme: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer("H*"),
+				GlobMatch: StringToPointer("H*"),
 			},
 		},
 		Response: models.ResponseDetails{
@@ -516,91 +460,6 @@ func Test_Match_TemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("template matched"))
-}
-
-func Test_Match_TemplatesCanUseGlobsOnQueryAndBeMatched(t *testing.T) {
-	RegisterTestingT(t)
-
-	simulation := models.NewSimulation()
-
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
-			Query: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer("q=*"),
-			},
-		},
-		Response: models.ResponseDetails{
-			Body: "template matched",
-		},
-	})
-
-	request := models.RequestDetails{
-		Method:      "GET",
-		Destination: "testhost.com",
-		Path:        "/api/1",
-		Query:       "q=anything-i-want",
-	}
-
-	response, err := unit.Match(request, false, simulation)
-	Expect(err).To(BeNil())
-
-	Expect(response.Body).To(Equal("template matched"))
-}
-
-func Test_Match_TemplatesCanUseGlobsOnBodyndBeMatched(t *testing.T) {
-	RegisterTestingT(t)
-
-	simulation := models.NewSimulation()
-
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
-			Body: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer(`{"json": "object", "key": *}`),
-			},
-		},
-		Response: models.ResponseDetails{
-			Body: "template matched",
-		},
-	})
-
-	request := models.RequestDetails{
-		Method:      "GET",
-		Destination: "testhost.com",
-		Path:        "/api/1",
-		Body:        `{"json": "object", "key": "value"}`,
-	}
-
-	response, err := unit.Match(request, false, simulation)
-	Expect(err).To(BeNil())
-
-	Expect(response.Body).To(Equal("template matched"))
-}
-
-func Test_Match_TemplatesCanUseGlobsOnBodyAndNotMatchWhenTheBodyIsWrong(t *testing.T) {
-	RegisterTestingT(t)
-
-	simulation := models.NewSimulation()
-
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
-			Body: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer(`{"json": "object", "key": *}`),
-			},
-		},
-		Response: models.ResponseDetails{
-			Body: "template matched",
-		},
-	})
-
-	request := models.RequestDetails{
-		Method:      "GET",
-		Destination: "testhost.com",
-		Path:        "/api/1",
-		Body:        `[{"json": "objects", "key": "value"}]`,
-	}
-
-	_, err := unit.Match(request, false, simulation)
-	Expect(err).ToNot(BeNil())
 }
 
 func Test_Match_TemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
