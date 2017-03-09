@@ -158,3 +158,19 @@ func Test_FieldMatcher_MatchesFalseWithIncorrectRegexMatch(t *testing.T) {
 		RegexMatch: util.StringToPointer("t[o|a]st"),
 	}, `test`)).To(BeFalse())
 }
+
+func Test_FieldMatcher_MatchesTrueWithGlobMatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(FieldMatcher(&models.RequestFieldMatchers{
+		RegexMatch: util.StringToPointer("t*st"),
+	}, `test`)).To(BeTrue())
+}
+
+func Test_FieldMatcher_MatchesFalseWithIncorrectGlobMatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(FieldMatcher(&models.RequestFieldMatchers{
+		RegexMatch: util.StringToPointer("t*st"),
+	}, `tset`)).To(BeFalse())
+}
