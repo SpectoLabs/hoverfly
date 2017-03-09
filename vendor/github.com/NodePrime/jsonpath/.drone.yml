@@ -1,0 +1,21 @@
+image: nodeprimedev/centos6.5-dev
+env:
+  - REPO=agent
+  - SHORT_COMMIT=$(echo $DRONE_COMMIT | cut -b1-7)    
+  - OS_NAME=$(uname -s | tr A-Z a-z)
+  - HW_ARCH=$(uname -m)
+  - PACKAGE_NAME=$REPO-$OS_NAME-$HW_ARCH-$SHORT_COMMIT.tar.gz
+  - PACKAGE_ROOT=./build
+  - REPORT_ROOT=./build
+  - BUILD_ID=$DRONE_BUILD_NUMBER
+  - GIT_COMMIT=$DRONE_COMMIT
+  - GIT_BRANCH=$DRONE_BRANCH
+script:
+    #################################################################
+    # Commands to execute CI build
+    #################################################################
+  - go get -t ./...
+   # Test all unit tests with race flag
+  - go test -v -race ./...
+   # Run benchmarks
+  - go test -bench=. -test.run PC -test.benchmem ./...
