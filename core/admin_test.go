@@ -667,7 +667,7 @@ func TestDeleteAllResponseDelaysHandler(t *testing.T) {
 	m.ServeHTTP(rec, req)
 	Expect(rec.Code).To(Equal(http.StatusOK))
 
-	Expect(unit.Simulation.ResponseDelays.Len()).To(Equal(0))
+	Expect(unit.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView().Data).To(HaveLen(0))
 }
 
 func TestUpdateResponseDelays(t *testing.T) {
