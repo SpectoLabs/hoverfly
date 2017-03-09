@@ -128,17 +128,6 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 	return requestDetails, nil
 }
 
-func CopyBody(body io.ReadCloser) (resp1, resp2 io.ReadCloser, err error) {
-	var buf bytes.Buffer
-	if _, err = buf.ReadFrom(body); err != nil {
-		return nil, nil, err
-	}
-	if err = body.Close(); err != nil {
-		return nil, nil, err
-	}
-	return ioutil.NopCloser(&buf), ioutil.NopCloser(bytes.NewReader(buf.Bytes())), nil
-}
-
 func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 	return RequestDetails{
 		Path:        util.PointerToString(data.GetPath()),
