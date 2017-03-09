@@ -5,6 +5,7 @@ import (
 
 	"github.com/ChrisTrenkamp/goxpath"
 	"github.com/ChrisTrenkamp/goxpath/tree/xmltree"
+	"github.com/NodePrime/jsonpath"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	glob "github.com/ryanuber/go-glob"
 )
@@ -35,6 +36,22 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
 		}
 
 		return len(results) > 0
+	}
+
+	if field.JsonMatch != nil {
+		paths, err := jsonpath.ParsePaths(*field.JsonMatch)
+		if err != nil {
+			return false
+		}
+
+		eval, err := jsonpath.EvalPathsInBytes([]byte(toMatch), paths)
+		if err != nil {
+			return false
+		}
+
+		_, ok := eval.Next()
+
+		return ok
 	}
 
 	return false
