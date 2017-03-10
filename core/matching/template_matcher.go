@@ -19,25 +19,29 @@ func (t TemplateMatcher) Match(req models.RequestDetails, webserver bool, simula
 
 		template := entry.RequestTemplate
 
-		if template.Body != nil && template.Body.ExactMatch != nil && !glob.Glob(*template.Body.ExactMatch, req.Body) {
+		if !FieldMatcher(template.Body, req.Body) {
 			continue
 		}
 
 		if !webserver {
-			if template.Destination != nil && template.Destination.ExactMatch != nil && !glob.Glob(*template.Destination.ExactMatch, req.Destination) {
+			if !FieldMatcher(template.Destination, req.Destination) {
 				continue
 			}
 		}
-		if template.Path != nil && template.Path.ExactMatch != nil && !glob.Glob(*template.Path.ExactMatch, req.Path) {
+
+		if !FieldMatcher(template.Path, req.Path) {
 			continue
 		}
-		if template.Query != nil && template.Query.ExactMatch != nil && !glob.Glob(*template.Query.ExactMatch, req.Query) {
+
+		if !FieldMatcher(template.Query, req.Query) {
 			continue
 		}
+
+		if !FieldMatcher(template.Method, req.Method) {
+			continue
+		}
+
 		if !headerMatch(template.Headers, req.Headers) {
-			continue
-		}
-		if template.Method != nil && template.Method.ExactMatch != nil && !glob.Glob(*template.Method.ExactMatch, req.Method) {
 			continue
 		}
 
