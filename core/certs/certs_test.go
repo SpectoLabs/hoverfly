@@ -1,4 +1,4 @@
-package certs
+package certs_test
 
 import (
 	"crypto/x509"
@@ -6,10 +6,12 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/SpectoLabs/hoverfly/core/certs"
 )
 
 func TestNewCert(t *testing.T) {
-	x509c, _, err := NewCertificatePair("certy.com", "cert authority", 365*24*time.Hour)
+	x509c, _, err := certs.NewCertificatePair("certy.com", "cert authority", 365*24*time.Hour)
 	if err != nil {
 		t.Errorf("Failed to generate certificate and key pair, got error: %s", err.Error())
 	}
@@ -47,7 +49,7 @@ func TestNewCert(t *testing.T) {
 }
 
 func TestNewPriv(t *testing.T) {
-	_, priv, err := NewCertificatePair("certy.com", "cert authority", 365*24*time.Hour)
+	_, priv, err := certs.NewCertificatePair("certy.com", "cert authority", 365*24*time.Hour)
 	if err != nil {
 		t.Errorf("Failed to generate certificate and key pair, got error: %s", err.Error())
 	}
@@ -59,11 +61,11 @@ func TestNewPriv(t *testing.T) {
 }
 
 func TestTlsCert(t *testing.T) {
-	pub, priv, err := NewCertificatePair("certy.com", "cert authority", 365*24*time.Hour)
+	pub, priv, err := certs.NewCertificatePair("certy.com", "cert authority", 365*24*time.Hour)
 	if err != nil {
 		t.Errorf("Failed to generate certificate and key pair, got error: %s", err.Error())
 	}
-	tlsc, err := GetTLSCertificate(pub, priv, "hoverfly.proxy", 365*24*time.Hour)
+	tlsc, err := certs.GetTLSCertificate(pub, priv, "hoverfly.proxy", 365*24*time.Hour)
 	if err != nil {
 		t.Errorf("Failed to get tls cert, got error: %s", err.Error())
 	}
@@ -72,7 +74,7 @@ func TestTlsCert(t *testing.T) {
 	if x509c == nil {
 		t.Fatal("x509c: got nil, want *x509.Certificate")
 	}
-	if got := x509c.SerialNumber; got.Cmp(MaxSerialNumber) >= 0 {
+	if got := x509c.SerialNumber; got.Cmp(certs.MaxSerialNumber) >= 0 {
 		t.Errorf("x509c.SerialNumber: got %v, want <= MaxSerialNumber", got)
 	}
 	if got, want := x509c.Subject.CommonName, "hoverfly.proxy"; got != want {
@@ -85,7 +87,7 @@ func TestTlsCert(t *testing.T) {
 }
 
 func TestGenerateAndSave(t *testing.T) {
-	tlsc, err := GenerateAndSave("certy", "cert authority", 1*24*time.Hour)
+	tlsc, err := certs.GenerateAndSave("certy", "cert authority", 1*24*time.Hour)
 	if err != nil {
 		t.Errorf("Failed to generate tls certificate, got error: %s", err.Error())
 	}
