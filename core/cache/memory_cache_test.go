@@ -1,8 +1,9 @@
-package cache
+package cache_test
 
 import (
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/cache"
 	. "github.com/onsi/gomega"
 )
 
@@ -16,7 +17,7 @@ var (
 func TestCacheGetIsEmptyByDefault(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := &InMemoryCache{}
+	cache := &cache.InMemoryCache{}
 
 	expectedKey := []byte{'k'}
 
@@ -28,7 +29,7 @@ func TestCacheGetIsEmptyByDefault(t *testing.T) {
 func TestCacheGetAllEntriesIsEmptyByDefault(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := &InMemoryCache{}
+	cache := &cache.InMemoryCache{}
 
 	actualValue, err := cache.GetAllEntries()
 	Expect(err).To(BeNil())
@@ -38,7 +39,7 @@ func TestCacheGetAllEntriesIsEmptyByDefault(t *testing.T) {
 func TestCacheGetAllKeysIsEmptyByDefault(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := &InMemoryCache{}
+	cache := &cache.InMemoryCache{}
 
 	actualValue, err := cache.GetAllKeys()
 	Expect(err).To(BeNil())
@@ -48,7 +49,7 @@ func TestCacheGetAllKeysIsEmptyByDefault(t *testing.T) {
 func TestCacheGetAllValuesIsEmptyByDefault(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := &InMemoryCache{}
+	cache := &cache.InMemoryCache{}
 
 	actualValue, err := cache.GetAllValues()
 	Expect(err).To(BeNil())
@@ -58,7 +59,7 @@ func TestCacheGetAllValuesIsEmptyByDefault(t *testing.T) {
 func TestSetAndGet(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := NewInMemoryCache()
+	cache := cache.NewInMemoryCache()
 
 	err := cache.Set(expectedKey1, expectedValue1)
 	Expect(err).To(BeNil())
@@ -78,7 +79,7 @@ func TestSetAndGet(t *testing.T) {
 func TestInMemoryCache_Get_DoesntLockIfFailed(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := NewInMemoryCache()
+	cache := cache.NewInMemoryCache()
 
 	_, err := cache.Get(expectedKey1)
 	Expect(err).ToNot(BeNil())
@@ -94,7 +95,7 @@ func TestInMemoryCache_Get_DoesntLockIfFailed(t *testing.T) {
 func TestGetAllKeysMem(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := NewInMemoryCache()
+	cache := cache.NewInMemoryCache()
 
 	cache.Set(expectedKey1, expectedValue1)
 	cache.Set(expectedKey2, expectedValue2)
@@ -110,7 +111,7 @@ func TestGetAllKeysMem(t *testing.T) {
 func TestGetAllValuesMem(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := NewInMemoryCache()
+	cache := cache.NewInMemoryCache()
 
 	cache.Set(expectedKey1, expectedValue1)
 	cache.Set(expectedKey2, expectedValue2)
@@ -126,7 +127,7 @@ func TestGetAllValuesMem(t *testing.T) {
 func TestGetAllEntriesMem(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := NewInMemoryCache()
+	cache := cache.NewInMemoryCache()
 
 	cache.Set(expectedKey1, expectedValue1)
 	cache.Set(expectedKey2, expectedValue2)
@@ -142,7 +143,7 @@ func TestGetAllEntriesMem(t *testing.T) {
 func TestGetRecordCount(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := NewInMemoryCache()
+	cache := cache.NewInMemoryCache()
 
 	cache.Set(expectedKey1, expectedValue1)
 	cache.Set(expectedKey2, expectedValue2)
@@ -156,7 +157,7 @@ func TestGetRecordCount(t *testing.T) {
 func TestDeleteData(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := NewInMemoryCache()
+	cache := cache.NewInMemoryCache()
 
 	cache.Set(expectedKey1, expectedValue1)
 	cache.Set(expectedKey2, expectedValue2)
@@ -172,7 +173,7 @@ func TestDeleteData(t *testing.T) {
 func TestDeleteKey(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := NewInMemoryCache()
+	cache := cache.NewInMemoryCache()
 
 	cache.Set(expectedKey1, expectedValue1)
 	cache.Set(expectedKey2, expectedValue2)
@@ -193,7 +194,7 @@ func TestDeleteKey(t *testing.T) {
 func TestThrowErrorIfGettingANotExistingKey(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := NewInMemoryCache()
+	cache := cache.NewInMemoryCache()
 	_, err := cache.Get([]byte("key"))
 	Expect(err).ToNot(BeNil())
 }
