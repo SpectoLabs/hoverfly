@@ -1,8 +1,9 @@
-package authentication
+package authentication_test
 
 import (
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/dgrijalva/jwt-go"
@@ -13,7 +14,7 @@ func TestGenerateToken(t *testing.T) {
 	RegisterTestingT(t)
 
 	ab := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
-	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
+	jwtBackend := authentication.InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 
 	Expect(jwtBackend.GenerateToken("userUUIDhereVeryLong", "userx")).ToNot(BeEmpty())
 }
@@ -25,7 +26,7 @@ func TestAuthenticate(t *testing.T) {
 	username := "beloveduser"
 	passw := "12345"
 	ab.AddUser(username, passw, true)
-	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
+	jwtBackend := authentication.InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 	user := &backends.User{
 		Username: string(username),
 		Password: string(passw),
@@ -40,7 +41,7 @@ func TestAuthenticateFail(t *testing.T) {
 
 	ab := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
 
-	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
+	jwtBackend := authentication.InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 	user := &backends.User{
 		Username: "shouldntbehere",
 		Password: "secret",
@@ -55,7 +56,7 @@ func TestLogout(t *testing.T) {
 
 	ab := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
 
-	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
+	jwtBackend := authentication.InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 
 	tokenString := "exampletokenstring"
 	token := jwt.New(jwt.SigningMethodHS512)
@@ -70,7 +71,7 @@ func TestNotBlacklisted(t *testing.T) {
 	RegisterTestingT(t)
 
 	ab := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
-	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
+	jwtBackend := authentication.InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 
 	tokenString := "exampleTokenStringThatIsNotBlacklisted"
 
