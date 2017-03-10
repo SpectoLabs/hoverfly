@@ -96,16 +96,6 @@ type SimulationViewV1 struct {
 	MetaView   `json:"meta"`
 }
 
-// func NewRequestFieldMatchersFromView(matchers *v2.RequestFieldMatchersView) *RequestFieldMatchers {
-// 	if matchers == nil {
-// 		return nil
-// 	}
-
-// 	return &RequestFieldMatchers{
-// 		ExactMatch: matchers.ExactMatch,
-// 	}
-// }
-
 func (this SimulationViewV1) Upgrade() SimulationViewV2 {
 	var pairs []RequestResponsePairViewV2
 	for _, pairV1 := range this.RequestResponsePairViewV1 {
