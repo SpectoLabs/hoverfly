@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -16,6 +18,19 @@ type ErrorView struct {
 
 type AdminHandler interface {
 	RegisterRoutes(*bone.Mux, *AuthHandler)
+}
+
+func ReadFromRequest(request *http.Request, v interface{}) error {
+	defer request.Body.Close()
+
+	body, _ := ioutil.ReadAll(request.Body)
+
+	err := json.Unmarshal(body, &v)
+	if err != nil {
+		return errors.New("Malformed JSON")
+	}
+
+	return nil
 }
 
 func WriteResponse(response http.ResponseWriter, bytes []byte) {

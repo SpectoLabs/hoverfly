@@ -2,11 +2,11 @@ package v2
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
-	"io/ioutil"
-	"net/http"
 )
 
 type HoverflyMode interface {
@@ -39,15 +39,10 @@ func (this *HoverflyModeHandler) Get(w http.ResponseWriter, req *http.Request, n
 }
 
 func (this *HoverflyModeHandler) Put(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	defer r.Body.Close()
-
 	var modeView ModeView
-
-	body, _ := ioutil.ReadAll(r.Body)
-
-	err := json.Unmarshal(body, &modeView)
+	err := handlers.ReadFromRequest(r, &modeView)
 	if err != nil {
-		handlers.WriteErrorResponse(w, "Malformed JSON", 400)
+		handlers.WriteErrorResponse(w, err.Error(), 400)
 		return
 	}
 
