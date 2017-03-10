@@ -1,281 +1,236 @@
 package v2
 
-var SimulationViewV2JsonSchema = `{
-	"description": "Hoverfly simulation schema",
+var requestResponsePairDefinition = map[string]interface{}{
 	"type": "object",
-	"required": [
-		"data", "meta"
-	],
-	"additionalProperties": false,
-	"properties": {
-		"data": {
-			"type": "object",
-			"properties": {
-				"pairs": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/request-response-pair"
-					}
-				},
-				"globalActions": {
-					"type": "object",
-					"properties": {
-						"delays": {
-							"type": "array",
-							"items": {
-								"$ref": "#/definitions/delay"
-							}
-						}
-					}
-				}
-			}
-		},
-		"meta": {
-			"type": "object",
-			"required": [
-				"schemaVersion"
-			],
-			"properties": {
-				"schemaVersion": {
-					"type": "string"
-				},
-				"hoverflyVersion": {
-					"type": "string"
-				},
-				"timeExported": {
-					"type": "string"
-				}
-			}
-		}
+	"required": []string{
+		"request",
+		"response",
 	},
-	"definitions": {
-		"request-response-pair": {
-			"type": "object",
-			"required": [
-				"request",
-				"response"
-			],
-			"properties": {
-				"request": {
-					"$ref": "#/definitions/request"
-				},
-				"response": {
-					"$ref": "#/definitions/response"
-				}
-			}
+	"properties": map[string]interface{}{
+		"request": map[string]interface{}{
+			"$ref": "#/definitions/request",
 		},
-		"request": {
-			"type": "object",
-			"properties": {
-				"scheme": {
-					"$ref": "#/definitions/field-matchers"
-				},
-				"destination": {
-					"$ref": "#/definitions/field-matchers"
-				},
-				"path": {
-					"$ref": "#/definitions/field-matchers"
-				},
-				"query": {
-					"$ref": "#/definitions/field-matchers"
-				},
-				"body": {
-					"$ref": "#/definitions/field-matchers"
-				},
-				"headers": {
-					"$ref": "#/definitions/headers"
-				}
-			}
+		"response": map[string]interface{}{
+			"$ref": "#/definitions/response",
 		},
-		"response": {
-			"type": "object",
-			"properties": {
-				"body": {
-					"type": "string"
-				},
-				"encodedBody": {
-					"type": "boolean"
-				},
-				"headers": {
-					"$ref": "#/definitions/headers"
-				},
-				"status": {
-					"type": "integer"
-				}
-			}
-		},
-		"field-matchers": {
-			"type": "object",
-			"properties": {
-				"exactMatch": {
-					"type": "string"
-				},
-				"globMatch": {
-					"type": "string"
-				},
-				"regexMatch": {
-					"type": "string"
-				},
-				"xpathMatch": {
-					"type": "string"
-				},
-				"jsonMatch": {
-					"type": "string"
-				}
-			}
-		},
-		"headers": {
-			"type": "object",
-			"additionalProperties": {
-				"type": "array",
-				"items": {
-					"type": "string"
-				}
-			}
-		},
-		"delay": {
-			"type": "object",
-			"properties": {
-				"urlPattern": {
-					"type": "string"
-				},
-				"httpMethod": {
-					"type": "string"
-				},
-				"delay": {
-					"type": "integer"
-				}
-			}
-		}
-	}
-}`
+	},
+}
 
-var SimulationViewV1JsonSchema = `{
-	"description": "Hoverfly simulation schema",
+var requestV1Definition = map[string]interface{}{
 	"type": "object",
-	"required": [
-		"data", "meta"
-	],
-	"additionalProperties": false,
-	"properties": {
-		"data": {
-			"type": "object",
-			"properties": {
-				"pairs": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/request-response-pair"
-					}
-				},
-				"globalActions": {
-					"type": "object",
-					"properties": {
-						"delays": {
-							"type": "array",
-							"items": {
-								"$ref": "#/definitions/delay"
-							}
-						}
-					}
-				}
-			}
+	"properties": map[string]interface{}{
+		"scheme": map[string]interface{}{
+			"type": "string",
 		},
-		"meta": {
-			"type": "object",
-			"required": [
-				"schemaVersion"
-			],
-			"properties": {
-				"schemaVersion": {
-					"type": "string"
-				},
-				"hoverflyVersion": {
-					"type": "string"
-				},
-				"timeExported": {
-					"type": "string"
-				}
-			}
-		}
+		"destination": map[string]interface{}{
+			"type": "string",
+		},
+		"path": map[string]interface{}{
+			"type": "string",
+		},
+		"query": map[string]interface{}{
+			"type": "string",
+		},
+		"body": map[string]interface{}{
+			"type": "string",
+		},
+		"headers": map[string]interface{}{
+			"$ref": "#/definitions/headers",
+		},
 	},
-	"definitions": {
-		"request-response-pair": {
-			"type": "object",
-			"required": [
-				"request",
-				"response"
-			],
-			"properties": {
-				"request": {
-					"$ref": "#/definitions/request"
-				},
-				"response": {
-					"$ref": "#/definitions/response"
-				}
-			}
+}
+
+var requestV2Definition = map[string]interface{}{
+	"type": "object",
+	"properties": map[string]interface{}{
+		"scheme": map[string]interface{}{
+			"$ref": "#/definitions/field-matchers",
 		},
-		"request": {
-			"type": "object",
-			"properties": {
-				"scheme": {
-					"type": "string"
-				},
-				"destination": {
-					"type": "string"
-				},
-				"path": {
-					"type": "string"
-				},
-				"query": {
-					"type": "string"
-				},
-				"body": {
-					"type": "string"
-				},
-				"headers": {
-					"$ref": "#/definitions/headers"
-				}
-			}
+		"destination": map[string]interface{}{
+			"$ref": "#/definitions/field-matchers",
 		},
-		"response": {
-			"type": "object",
-			"properties": {
-				"body": {
-					"type": "string"
-				},
-				"encodedBody": {
-					"type": "boolean"
-				},
-				"headers": {
-					"$ref": "#/definitions/headers"
-				},
-				"status": {
-					"type": "integer"
-				}
-			}
+		"path": map[string]interface{}{
+			"$ref": "#/definitions/field-matchers",
 		},
-		"headers": {
-			"type": "object",
-			"additionalProperties": {
-				"type": "array",
-				"items": {
-					"type": "string"
-				}
-			}
+		"query": map[string]interface{}{
+			"$ref": "#/definitions/field-matchers",
 		},
-		"delay": {
+		"body": map[string]interface{}{
+			"$ref": "#/definitions/field-matchers",
+		},
+		"headers": map[string]interface{}{
+			"$ref": "#/definitions/headers",
+		},
+	},
+}
+
+var responseDefinition = map[string]interface{}{
+	"type": "object",
+	"properties": map[string]interface{}{
+		"body": map[string]interface{}{
+			"type": "string",
+		},
+		"encodedBody": map[string]interface{}{
+			"type": "boolean",
+		},
+		"headers": map[string]interface{}{
+			"$ref": "#/definitions/headers",
+		},
+		"status": map[string]interface{}{
+			"type": "integer",
+		},
+	},
+}
+
+var requestFieldMatchersV2Definition = map[string]interface{}{
+	"type": "object",
+	"properties": map[string]interface{}{
+		"exactMatch": map[string]interface{}{
+			"type": "string",
+		},
+		"globMatch": map[string]interface{}{
+			"type": "string",
+		},
+		"regexMatch": map[string]interface{}{
+			"type": "string",
+		},
+		"xpathMatch": map[string]interface{}{
+			"type": "string",
+		},
+		"jsonMatch": map[string]interface{}{
+			"type": "string",
+		},
+	},
+}
+
+var headersDefinition = map[string]interface{}{
+	"type": "object",
+	"additionalProperties": map[string]interface{}{
+		"type": "array",
+		"items": map[string]interface{}{
+			"type": "string",
+		},
+	},
+}
+
+var delaysDefinition = map[string]interface{}{
+	"type": "object",
+	"properties": map[string]interface{}{
+		"urlPattern": map[string]interface{}{
+			"type": "string",
+		},
+		"httpMethod": map[string]interface{}{
+			"type": "string",
+		},
+		"delay": map[string]interface{}{
+			"type": "integer",
+		},
+	},
+}
+
+var metaDefinition = map[string]interface{}{
+	"type": "object",
+	"required": []string{
+		"schemaVersion",
+	},
+	"properties": map[string]interface{}{
+		"schemaVersion": map[string]interface{}{
+			"type": "string",
+		},
+		"hoverflyVersion": map[string]interface{}{
+			"type": "string",
+		},
+		"timeExported": map[string]interface{}{
+			"type": "string",
+		},
+	},
+}
+
+var SimulationViewV2Schema = map[string]interface{}{
+	"description": "Hoverfly simulation schema",
+	"type":        "object",
+	"required": []string{
+		"data", "meta",
+	},
+	"additionalProperties": false,
+	"properties": map[string]interface{}{
+		"data": map[string]interface{}{
 			"type": "object",
-			"properties": {
-				"urlPattern": {
-					"type": "string"
+			"properties": map[string]interface{}{
+				"pairs": map[string]interface{}{
+					"type": "array",
+					"items": map[string]interface{}{
+						"$ref": "#/definitions/request-response-pair",
+					},
 				},
-				"httpMethod": {
-					"type": "string"
+				"globalActions": map[string]interface{}{
+					"type": "object",
+					"properties": map[string]interface{}{
+						"delays": map[string]interface{}{
+							"type": "array",
+							"items": map[string]interface{}{
+								"$ref": "#/definitions/delay",
+							},
+						},
+					},
 				},
-				"delay": {
-					"type": "integer"
-				}
-			}
-		}
-	}
-}`
+			},
+		},
+		"meta": map[string]interface{}{
+			"$ref": "#/definitions/meta",
+		},
+	},
+	"definitions": map[string]interface{}{
+		"request-response-pair": requestResponsePairDefinition,
+		"request":               requestV2Definition,
+		"response":              responseDefinition,
+		"field-matchers":        requestFieldMatchersV2Definition,
+		"headers":               headersDefinition,
+		"delay":                 delaysDefinition,
+		"meta":                  metaDefinition,
+	},
+}
+
+var SimulationViewV1Schema = map[string]interface{}{
+	"description": "Hoverfly simulation schema",
+	"type":        "object",
+	"required": []string{
+		"data", "meta",
+	},
+	"additionalProperties": false,
+	"properties": map[string]interface{}{
+		"data": map[string]interface{}{
+			"type": "object",
+			"properties": map[string]interface{}{
+				"pairs": map[string]interface{}{
+					"type": "array",
+					"items": map[string]interface{}{
+						"$ref": "#/definitions/request-response-pair",
+					},
+				},
+				"globalActions": map[string]interface{}{
+					"type": "object",
+					"properties": map[string]interface{}{
+						"delays": map[string]interface{}{
+							"type": "array",
+							"items": map[string]interface{}{
+								"$ref": "#/definitions/delay",
+							},
+						},
+					},
+				},
+			},
+		},
+		"meta": map[string]interface{}{
+			"$ref": "#/definitions/meta",
+		},
+	},
+	"definitions": map[string]interface{}{
+		"request-response-pair": requestResponsePairDefinition,
+		"request":               requestV1Definition,
+		"response":              responseDefinition,
+		"headers":               headersDefinition,
+		"delay":                 delaysDefinition,
+		"meta":                  metaDefinition,
+	},
+}
