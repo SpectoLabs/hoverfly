@@ -2,11 +2,11 @@ package v2
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
-	"io/ioutil"
-	"net/http"
 )
 
 type HoverflyDestination interface {
@@ -40,15 +40,10 @@ func (this *HoverflyDestinationHandler) Get(w http.ResponseWriter, req *http.Req
 }
 
 func (this *HoverflyDestinationHandler) Put(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	defer r.Body.Close()
-
 	var destinationView DestinationView
-
-	body, _ := ioutil.ReadAll(r.Body)
-
-	err := json.Unmarshal(body, &destinationView)
+	err := handlers.ReadFromRequest(r, &destinationView)
 	if err != nil {
-		handlers.WriteErrorResponse(w, "Malformed JSON", 400)
+		handlers.WriteErrorResponse(w, err.Error(), 400)
 		return
 	}
 
