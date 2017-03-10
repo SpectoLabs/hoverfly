@@ -52,15 +52,11 @@ func decodeToken(data []byte) (*Token, error) {
 }
 
 func InitJWTAuthenticationBackend(ab backends.Authentication, secret []byte, exp int) *JWTAuthenticationBackend {
-	if authBackendInstance == nil {
-		authBackendInstance = &JWTAuthenticationBackend{
-			SecretKey:          secret,
-			AuthBackend:        ab,
-			JWTExpirationDelta: exp,
-		}
+	return &JWTAuthenticationBackend{
+		SecretKey:          secret,
+		AuthBackend:        ab,
+		JWTExpirationDelta: exp,
 	}
-
-	return authBackendInstance
 }
 
 func (backend *JWTAuthenticationBackend) GenerateToken(userUUID, username string) (string, error) {
