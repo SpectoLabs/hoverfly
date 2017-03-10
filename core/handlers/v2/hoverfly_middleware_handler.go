@@ -2,7 +2,6 @@ package v2
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
@@ -41,19 +40,10 @@ func (this *HoverflyMiddlewareHandler) Get(w http.ResponseWriter, req *http.Requ
 }
 
 func (this *HoverflyMiddlewareHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	defer req.Body.Close()
-
 	var middlewareReq MiddlewareView
-
-	body, err := ioutil.ReadAll(req.Body)
+	err := handlers.ReadFromRequest(req, &middlewareReq)
 	if err != nil {
-		handlers.WriteErrorResponse(w, "Malformed JSON", 400)
-		return
-	}
-
-	err = json.Unmarshal(body, &middlewareReq)
-	if err != nil {
-		handlers.WriteErrorResponse(w, "Malformed JSON", 400)
+		handlers.WriteErrorResponse(w, err.Error(), 400)
 		return
 	}
 
