@@ -1,39 +1,30 @@
 package authentication
 
 import (
-	"os"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/dgrijalva/jwt-go"
+	. "github.com/onsi/gomega"
 )
 
-// TestMain prepares database for testing and then performs a cleanup
-func TestMain(m *testing.M) {
-	setup()
-	retCode := m.Run()
-	// delete test database
-	teardown()
-	// call with result of m.Run()
-	os.Exit(retCode)
-}
-
 func TestGenerateToken(t *testing.T) {
-	ab := backends.NewCacheBasedAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
+	RegisterTestingT(t)
+
+	ab := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
 	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 
-	token, err := jwtBackend.GenerateToken("userUUIDhereVeryLong", "userx")
-	expect(t, err, nil)
-	expect(t, len(token) > 0, true)
+	Expect(jwtBackend.GenerateToken("userUUIDhereVeryLong", "userx")).ToNot(BeEmpty())
 }
 
 func TestAuthenticate(t *testing.T) {
-	ab := backends.NewCacheBasedAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
+	RegisterTestingT(t)
+
+	ab := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
 	username := "beloveduser"
 	passw := "12345"
 	ab.AddUser(username, passw, true)
-
 	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 	user := &backends.User{
 		Username: string(username),
@@ -41,12 +32,13 @@ func TestAuthenticate(t *testing.T) {
 		UUID:     "uuid_here",
 		IsAdmin:  true}
 
-	success := jwtBackend.Authenticate(user)
-	expect(t, success, true)
+	Expect(jwtBackend.Authenticate(user)).To(BeTrue())
 }
 
 func TestAuthenticateFail(t *testing.T) {
-	ab := backends.NewCacheBasedAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
+	RegisterTestingT(t)
+
+	ab := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
 
 	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 	user := &backends.User{
@@ -55,34 +47,32 @@ func TestAuthenticateFail(t *testing.T) {
 		UUID:     "uuid_here",
 		IsAdmin:  true}
 
-	success := jwtBackend.Authenticate(user)
-	expect(t, success, false)
+	Expect(jwtBackend.Authenticate(user)).To(BeFalse())
 }
 
 func TestLogout(t *testing.T) {
-	ab := backends.NewCacheBasedAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
+	RegisterTestingT(t)
+
+	ab := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
 
 	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 
 	tokenString := "exampletokenstring"
 	token := jwt.New(jwt.SigningMethodHS512)
 
-	err := jwtBackend.Logout(tokenString, token)
-	expect(t, err, nil)
+	Expect(jwtBackend.Logout(tokenString, token)).To(BeNil())
 
 	// checking whether token is in blacklist
-
-	blacklisted := jwtBackend.IsInBlacklist(tokenString)
-	expect(t, blacklisted, true)
+	Expect(jwtBackend.IsInBlacklist(tokenString)).To(BeTrue())
 }
 
 func TestNotBlacklisted(t *testing.T) {
-	ab := backends.NewCacheBasedAuthBackend(cache.NewBoltDBCache(TestDB, []byte(backends.TokenBucketName)), cache.NewBoltDBCache(TestDB, []byte(backends.UserBucketName)))
+	RegisterTestingT(t)
 
+	ab := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
 	jwtBackend := InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 
 	tokenString := "exampleTokenStringThatIsNotBlacklisted"
 
-	blacklisted := jwtBackend.IsInBlacklist(tokenString)
-	expect(t, blacklisted, false)
+	Expect(jwtBackend.IsInBlacklist(tokenString)).To(BeFalse())
 }
