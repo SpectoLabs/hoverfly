@@ -1,10 +1,12 @@
-package models
+package models_test
 
 import (
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	. "github.com/onsi/gomega"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/models"
+	. "github.com/onsi/gomega"
 )
 
 func TestConvertJsonStringToResponseDelayConfig(t *testing.T) {
@@ -19,7 +21,7 @@ func TestConvertJsonStringToResponseDelayConfig(t *testing.T) {
 	}`
 	var responseDelayJson v1.ResponseDelayPayloadView
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
-	err := ValidateResponseDelayPayload(responseDelayJson)
+	err := models.ValidateResponseDelayPayload(responseDelayJson)
 	Expect(err).To(BeNil())
 }
 
@@ -34,7 +36,7 @@ func TestErrorIfHostPatternNotSet(t *testing.T) {
 	}`
 	var responseDelayJson v1.ResponseDelayPayloadView
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
-	err := ValidateResponseDelayPayload(responseDelayJson)
+	err := models.ValidateResponseDelayPayload(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
 }
 
@@ -49,7 +51,7 @@ func TestErrprIfDelayNotSet(t *testing.T) {
 	}`
 	var responseDelayJson v1.ResponseDelayPayloadView
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
-	err := ValidateResponseDelayPayload(responseDelayJson)
+	err := models.ValidateResponseDelayPayload(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
 }
 
@@ -65,7 +67,7 @@ func TestHostPatternMustBeAValidRegexPattern(t *testing.T) {
 	}`
 	var responseDelayJson v1.ResponseDelayPayloadView
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
-	err := ValidateResponseDelayPayload(responseDelayJson)
+	err := models.ValidateResponseDelayPayload(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
 }
 
@@ -81,20 +83,20 @@ func TestErrorIfHostPatternUsed(t *testing.T) {
 	}`
 	var responseDelayJson v1.ResponseDelayPayloadView
 	json.Unmarshal([]byte(jsonConf), &responseDelayJson)
-	err := ValidateResponseDelayPayload(responseDelayJson)
+	err := models.ValidateResponseDelayPayload(responseDelayJson)
 	Expect(err).To(Not(BeNil()))
 }
 
 func TestGetDelayWithRegexMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	delay := ResponseDelay{
+	delay := models.ResponseDelay{
 		UrlPattern: "example(.+)",
 		Delay:      100,
 	}
-	delays := ResponseDelayList{delay}
+	delays := models.ResponseDelayList{delay}
 
-	request1 := RequestDetails{
+	request1 := models.RequestDetails{
 		Destination: "delayexample.com",
 		Method:      "method-dummy",
 	}
@@ -102,7 +104,7 @@ func TestGetDelayWithRegexMatch(t *testing.T) {
 	delayMatch := delays.GetDelay(request1)
 	Expect(*delayMatch).To(Equal(delay))
 
-	request2 := RequestDetails{
+	request2 := models.RequestDetails{
 		Destination: "nodelay.com",
 		Method:      "method-dummy",
 	}
@@ -114,17 +116,17 @@ func TestGetDelayWithRegexMatch(t *testing.T) {
 func TestMultipleMatchingDelaysReturnsTheFirst(t *testing.T) {
 	RegisterTestingT(t)
 
-	delayOne := ResponseDelay{
+	delayOne := models.ResponseDelay{
 		UrlPattern: "example.com",
 		Delay:      100,
 	}
-	delayTwo := ResponseDelay{
+	delayTwo := models.ResponseDelay{
 		UrlPattern: "example",
 		Delay:      100,
 	}
-	delays := ResponseDelayList{delayOne, delayTwo}
+	delays := models.ResponseDelayList{delayOne, delayTwo}
 
-	request1 := RequestDetails{
+	request1 := models.RequestDetails{
 		Destination: "delayexample.com",
 		Method:      "method-dummy",
 	}
@@ -136,14 +138,14 @@ func TestMultipleMatchingDelaysReturnsTheFirst(t *testing.T) {
 func TestNoMatchIfMethodsDontMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	delay := ResponseDelay{
+	delay := models.ResponseDelay{
 		UrlPattern: "example.com",
 		Delay:      100,
 		HttpMethod: "PURPLE",
 	}
-	delays := ResponseDelayList{delay}
+	delays := models.ResponseDelayList{delay}
 
-	request := RequestDetails{
+	request := models.RequestDetails{
 		Destination: "delayexample.com",
 		Method:      "GET",
 	}
@@ -155,14 +157,14 @@ func TestNoMatchIfMethodsDontMatch(t *testing.T) {
 func TestReturnMatchIfMethodsMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	delay := ResponseDelay{
+	delay := models.ResponseDelay{
 		UrlPattern: "example.com",
 		Delay:      100,
 		HttpMethod: "GET",
 	}
-	delays := ResponseDelayList{delay}
+	delays := models.ResponseDelayList{delay}
 
-	request := RequestDetails{
+	request := models.RequestDetails{
 		Destination: "delayexample.com",
 		Method:      "GET",
 	}
@@ -174,13 +176,13 @@ func TestReturnMatchIfMethodsMatch(t *testing.T) {
 func TestIfDelayMethodBlankThenMatchesAnyMethod(t *testing.T) {
 	RegisterTestingT(t)
 
-	delay := ResponseDelay{
+	delay := models.ResponseDelay{
 		UrlPattern: "example(.+)",
 		Delay:      100,
 	}
-	delays := ResponseDelayList{delay}
+	delays := models.ResponseDelayList{delay}
 
-	request := RequestDetails{
+	request := models.RequestDetails{
 		Destination: "delayexample.com",
 		Method:      "method-dummy",
 	}
@@ -192,11 +194,11 @@ func TestIfDelayMethodBlankThenMatchesAnyMethod(t *testing.T) {
 func TestResponseDelayList_ConvertToPayloadView(t *testing.T) {
 	RegisterTestingT(t)
 
-	delay := ResponseDelay{
+	delay := models.ResponseDelay{
 		UrlPattern: "example(.+)",
 		Delay:      100,
 	}
-	delays := ResponseDelayList{delay}
+	delays := models.ResponseDelayList{delay}
 
 	payloadView := delays.ConvertToResponseDelayPayloadView()
 

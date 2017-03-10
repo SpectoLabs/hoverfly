@@ -1,4 +1,4 @@
-package models
+package models_test
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
@@ -21,7 +22,7 @@ func TestResponseDetails_ConvertToResponseDetailsView_WithPlainTextResponseDetai
 	body := "hello_world"
 	headers := map[string][]string{"test_header": []string{"true"}}
 
-	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers: headers}
+	originalResp := models.ResponseDetails{Status: statusCode, Body: body, Headers: headers}
 
 	respView := originalResp.ConvertToResponseDetailsView()
 
@@ -41,7 +42,7 @@ func TestResponseDetails_ConvertToResponseDetailsView_WithGzipContentEncodedHead
 	body := GzipString(originalBody)
 	headers := map[string][]string{"Content-Encoding": []string{"gzip"}}
 
-	originalResp := ResponseDetails{Status: statusCode, Body: body, Headers: headers}
+	originalResp := models.ResponseDetails{Status: statusCode, Body: body, Headers: headers}
 
 	respView := originalResp.ConvertToResponseDetailsView()
 
@@ -65,7 +66,7 @@ func TestResponseDetails_ConvertToResponseDetailsView_WithDeflateContentEncodedH
 	statusCode := 200
 	headers := map[string][]string{"Content-Encoding": []string{"deflate"}}
 
-	originalResp := ResponseDetails{Status: statusCode, Body: originalBody, Headers: headers}
+	originalResp := models.ResponseDetails{Status: statusCode, Body: originalBody, Headers: headers}
 
 	respView := originalResp.ConvertToResponseDetailsView()
 
@@ -90,7 +91,7 @@ func TestResponseDetails_ConvertToResponseDetailsView_WithImageBody(t *testing.T
 
 	originalImageBytes, _ := ioutil.ReadAll(file)
 
-	originalResp := ResponseDetails{
+	originalResp := models.ResponseDetails{
 		Status: 200,
 		Body:   string(originalImageBytes),
 	}
@@ -110,12 +111,12 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 
 	respBody := "hello_world"
 
-	requestResponsePair := RequestResponsePair{
-		Response: ResponseDetails{
+	requestResponsePair := models.RequestResponsePair{
+		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    respBody,
 			Headers: map[string][]string{"test_header": []string{"true"}}},
-		Request: RequestDetails{
+		Request: models.RequestDetails{
 			Path:        "/",
 			Method:      "GET",
 			Destination: "/",
@@ -147,12 +148,12 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedResponse(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestResponsePair := RequestResponsePair{
-		Response: ResponseDetails{
+	requestResponsePair := models.RequestResponsePair{
+		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    GzipString("hello_world"),
 			Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}},
-		Request: RequestDetails{
+		Request: models.RequestDetails{
 			Path:        "/",
 			Method:      "GET",
 			Destination: "/",
@@ -186,7 +187,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
 	RegisterTestingT(t)
 
-	requestDetails := RequestDetails{
+	requestDetails := models.RequestDetails{
 		Path:        "/",
 		Method:      "GET",
 		Destination: "/",
@@ -215,7 +216,7 @@ func GzipString(s string) string {
 func Test_NewRequestDetailsFromHttpRequest_SortsQueryString(t *testing.T) {
 	RegisterTestingT(t)
 	request, _ := http.NewRequest("GET", "http://test.org/?a=b&a=a", nil)
-	requestDetails, err := NewRequestDetailsFromHttpRequest(request)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
 	Expect(err).To(BeNil())
 
 	Expect(requestDetails.Query).To(Equal("a=a&a=b"))
@@ -225,7 +226,7 @@ func Test_NewRequestDetailsFromHttpRequest_LowerCaseDestination(t *testing.T) {
 	RegisterTestingT(t)
 
 	request, _ := http.NewRequest("GET", "http://TEST.ORG/?a=b&a=a", nil)
-	requestDetails, err := NewRequestDetailsFromHttpRequest(request)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
 	Expect(err).To(BeNil())
 
 	Expect(requestDetails.Destination).To(Equal("test.org"))
@@ -258,10 +259,10 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *
 		},
 	}
 
-	requestResponsePair := NewRequestResponsePairFromRequestResponsePairView(view)
+	requestResponsePair := models.NewRequestResponsePairFromRequestResponsePairView(view)
 
-	Expect(requestResponsePair).To(Equal(RequestResponsePair{
-		Request: RequestDetails{
+	Expect(requestResponsePair).To(Equal(models.RequestResponsePair{
+		Request: models.RequestDetails{
 			Path:        "A",
 			Method:      "A",
 			Destination: "A",
@@ -273,7 +274,7 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *
 				"C": []string{"D"},
 			},
 		},
-		Response: ResponseDetails{
+		Response: models.ResponseDetails{
 			Status: 1,
 			Body:   "1",
 			Headers: map[string][]string{
@@ -294,7 +295,7 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithEncoding(t *tes
 		},
 	}
 
-	pair := NewRequestResponsePairFromRequestResponsePairView(view)
+	pair := models.NewRequestResponsePairFromRequestResponsePairView(view)
 
 	Expect(pair.Response.Body).To(Equal("encoded"))
 }
@@ -311,7 +312,7 @@ func TestRequestDetailsViewV1_ConvertToRequestDetails(t *testing.T) {
 		Body:        StringToPointer(""),
 		Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}}
 
-	requestDetails := NewRequestDetailsFromRequest(requestDetailsView)
+	requestDetails := models.NewRequestDetailsFromRequest(requestDetailsView)
 
 	Expect(requestDetails.Path).To(Equal(*requestDetailsView.Path))
 	Expect(requestDetails.Method).To(Equal(*requestDetailsView.Method))
@@ -324,7 +325,7 @@ func TestRequestDetailsViewV1_ConvertToRequestDetails(t *testing.T) {
 func Test_RequestDetails_Hash_ItHashes(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := RequestDetails{
+	unit := models.RequestDetails{
 		Method:      "GET",
 		Scheme:      "http",
 		Destination: "test.com",
@@ -340,7 +341,7 @@ func Test_RequestDetails_Hash_ItHashes(t *testing.T) {
 func Test_RequestDetails_Hash_TheHashIgnoresHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := RequestDetails{
+	unit := models.RequestDetails{
 		Method:      "GET",
 		Scheme:      "http",
 		Destination: "test.com",
@@ -357,7 +358,7 @@ func Test_RequestDetails_Hash_TheHashIgnoresHeaders(t *testing.T) {
 func Test_RequestDetails_Hash_TheHashIncludesTheBody(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := RequestDetails{
+	unit := models.RequestDetails{
 		Method:      "GET",
 		Scheme:      "http",
 		Destination: "test.com",
@@ -374,7 +375,7 @@ func Test_RequestDetails_Hash_TheHashIncludesTheBody(t *testing.T) {
 func Test_RequestDetails_HashJSONMinifier(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := RequestDetails{
+	unit := models.RequestDetails{
 		Method:      "GET",
 		Destination: "example.com",
 		Scheme:      "http",
@@ -412,7 +413,7 @@ var xmlBodyTwo = `<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="
 func Test_RequestDetails_HashXMLMinifier(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := RequestDetails{
+	unit := models.RequestDetails{
 		Method:      "GET",
 		Destination: "example.com",
 		Scheme:      "http",
