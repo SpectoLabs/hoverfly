@@ -1,9 +1,11 @@
-package cache
+package cache_test
 
 import (
-	. "github.com/onsi/gomega"
 	"os"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/cache"
+	. "github.com/onsi/gomega"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/boltdb/bolt"
@@ -16,7 +18,7 @@ var testingDatabaseName = "bolt_test.db"
 
 func TestSetGetValue(t *testing.T) {
 	RegisterTestingT(t)
-	db := NewBoltDBCache(TestDB, []byte("bucket1"))
+	db := cache.NewBoltDBCache(TestDB, []byte("bucket1"))
 
 	err := db.Set([]byte("foo"), []byte("bar"))
 	Expect(err).To(BeNil())
@@ -28,7 +30,7 @@ func TestSetGetValue(t *testing.T) {
 func TestRecordsCountZero(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := NewBoltDBCache(TestDB, []byte("bucketRecordsCountZero"))
+	db := cache.NewBoltDBCache(TestDB, []byte("bucketRecordsCountZero"))
 
 	ct, err := db.RecordsCount()
 	Expect(err).To(BeNil())
@@ -38,7 +40,7 @@ func TestRecordsCountZero(t *testing.T) {
 func TestGetAllValues(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := NewBoltDBCache(TestDB, []byte("bucketTestGetAllValues"))
+	db := cache.NewBoltDBCache(TestDB, []byte("bucketTestGetAllValues"))
 
 	err := db.Set([]byte("foo"), []byte("bar"))
 	Expect(err).To(BeNil())
@@ -57,7 +59,7 @@ func TestGetAllValues(t *testing.T) {
 func TestGetAllEntries(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := NewBoltDBCache(TestDB, []byte("bucketTestGetAllEntries"))
+	db := cache.NewBoltDBCache(TestDB, []byte("bucketTestGetAllEntries"))
 
 	err := db.Set([]byte("foo"), []byte("bar"))
 	Expect(err).To(BeNil())
@@ -76,7 +78,7 @@ func TestGetAllEntries(t *testing.T) {
 func TestGetAllKeys(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := NewBoltDBCache(TestDB, []byte("bucketTestGetAllKeys"))
+	db := cache.NewBoltDBCache(TestDB, []byte("bucketTestGetAllKeys"))
 
 	err := db.Set([]byte("foo"), []byte("bar"))
 	Expect(err).To(BeNil())
@@ -95,7 +97,7 @@ func TestGetAllKeys(t *testing.T) {
 func TestDeleteRecords(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := NewBoltDBCache(TestDB, []byte("bucketTestDeleteRecords"))
+	db := cache.NewBoltDBCache(TestDB, []byte("bucketTestDeleteRecords"))
 
 	err := db.Set([]byte("foo"), []byte("bar"))
 	Expect(err).To(BeNil())
@@ -122,7 +124,7 @@ func TestDeleteRecords(t *testing.T) {
 func TestDeleteRecord(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := NewBoltDBCache(TestDB, []byte("bucketTestDeleteRecord"))
+	db := cache.NewBoltDBCache(TestDB, []byte("bucketTestDeleteRecord"))
 
 	err := db.Set([]byte("foo"), []byte("bar"))
 	Expect(err).To(BeNil())
@@ -137,7 +139,7 @@ func TestDeleteRecord(t *testing.T) {
 func TestDeleteNotExisting(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := NewBoltDBCache(TestDB, []byte("bucketTestDeleteNotExisting"))
+	db := cache.NewBoltDBCache(TestDB, []byte("bucketTestDeleteNotExisting"))
 
 	err := db.Delete([]byte("foo"))
 	Expect(err).To(BeNil())
@@ -146,7 +148,7 @@ func TestDeleteNotExisting(t *testing.T) {
 func setup() {
 	// we don't really want to see what's happening
 	log.SetLevel(log.FatalLevel)
-	db := GetDB(testingDatabaseName)
+	db := cache.GetDB(testingDatabaseName)
 	TestDB = db
 }
 
