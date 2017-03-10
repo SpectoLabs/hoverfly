@@ -34,7 +34,7 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 	schemaVersion := jsonMap["meta"].(map[string]interface{})["schemaVersion"].(string)
 
 	if schemaVersion == "v2" {
-		err := ValidateSimulation(jsonMap, SimulationViewV2JsonSchema)
+		err := ValidateSimulation(jsonMap, SimulationViewV2Schema)
 		if err != nil {
 			return simulationView, errors.New("Invalid v2 simulation:" + err.Error())
 		}
@@ -44,7 +44,7 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 			return SimulationViewV2{}, err
 		}
 	} else if schemaVersion == "v1" {
-		err := ValidateSimulation(jsonMap, SimulationViewV1JsonSchema)
+		err := ValidateSimulation(jsonMap, SimulationViewV1Schema)
 		if err != nil {
 			return simulationView, errors.New("Invalid v1 simulation:" + err.Error())
 		}
@@ -72,9 +72,9 @@ type SimulationViewV1 struct {
 	MetaView   `json:"meta"`
 }
 
-func ValidateSimulation(json map[string]interface{}, schema string) error {
+func ValidateSimulation(json, schema map[string]interface{}) error {
 	jsonLoader := gojsonschema.NewGoLoader(json)
-	schemaLoader := gojsonschema.NewStringLoader(schema)
+	schemaLoader := gojsonschema.NewGoLoader(schema)
 
 	result, err := gojsonschema.Validate(schemaLoader, jsonLoader)
 	if err != nil {
