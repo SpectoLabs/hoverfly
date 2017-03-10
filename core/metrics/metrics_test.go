@@ -1,13 +1,15 @@
-package metrics
+package metrics_test
 
 import (
-	. "github.com/onsi/gomega"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/metrics"
+	. "github.com/onsi/gomega"
 )
 
 func TestSimulateInc(t *testing.T) {
 	RegisterTestingT(t)
-	counter := NewModeCounter([]string{"name"})
+	counter := metrics.NewModeCounter([]string{"name"})
 
 	counter.Count("name")
 
@@ -18,7 +20,7 @@ func TestSimulateInc(t *testing.T) {
 
 func TestFlush(t *testing.T) {
 	RegisterTestingT(t)
-	counter := NewModeCounter([]string{"name"})
+	counter := metrics.NewModeCounter([]string{"name"})
 
 	counter.Counters["name"].Inc(1)
 
