@@ -1,8 +1,9 @@
-package models
+package models_test
 
 import (
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
@@ -10,15 +11,15 @@ import (
 func Test_Simulation_AddRequestTemplateResponsePair_CanAddAPairToTheArray(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := NewSimulation()
+	unit := models.NewSimulation()
 
-	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
-		RequestTemplate{
-			Destination: &RequestFieldMatchers{
+	unit.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
+		models.RequestTemplate{
+			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("space"),
 			},
 		},
-		ResponseDetails{},
+		models.ResponseDetails{},
 	})
 
 	Expect(unit.Templates).To(HaveLen(1))
@@ -28,31 +29,31 @@ func Test_Simulation_AddRequestTemplateResponsePair_CanAddAPairToTheArray(t *tes
 func Test_Simulation_AddRequestTemplateResponsePair_CanAddAFullPairToTheArray(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := NewSimulation()
+	unit := models.NewSimulation()
 
-	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
-		RequestTemplate{
-			Body: &RequestFieldMatchers{
+	unit.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
+		models.RequestTemplate{
+			Body: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("testbody"),
 			},
-			Destination: &RequestFieldMatchers{
+			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("testdestination"),
 			},
 			Headers: map[string][]string{"testheader": []string{"testvalue"}},
-			Method: &RequestFieldMatchers{
+			Method: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("testmethod"),
 			},
-			Path: &RequestFieldMatchers{
+			Path: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("/testpath"),
 			},
-			Query: &RequestFieldMatchers{
+			Query: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("?query=test"),
 			},
-			Scheme: &RequestFieldMatchers{
+			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("http"),
 			},
 		},
-		ResponseDetails{
+		models.ResponseDetails{
 			Body:    "testresponsebody",
 			Headers: map[string][]string{"testheader": []string{"testvalue"}},
 			Status:  200,
@@ -77,24 +78,24 @@ func Test_Simulation_AddRequestTemplateResponsePair_CanAddAFullPairToTheArray(t 
 func Test_Simulation_AddRequestTemplateResponsePair_WillNotSaveDuplicates(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := NewSimulation()
+	unit := models.NewSimulation()
 
-	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
-		RequestTemplate{
-			Destination: &RequestFieldMatchers{
+	unit.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
+		models.RequestTemplate{
+			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("space"),
 			},
 		},
-		ResponseDetails{},
+		models.ResponseDetails{},
 	})
 
-	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
-		RequestTemplate{
-			Destination: &RequestFieldMatchers{
+	unit.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
+		models.RequestTemplate{
+			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("space"),
 			},
 		},
-		ResponseDetails{},
+		models.ResponseDetails{},
 	})
 
 	Expect(unit.Templates).To(HaveLen(1))
@@ -103,24 +104,24 @@ func Test_Simulation_AddRequestTemplateResponsePair_WillNotSaveDuplicates(t *tes
 func Test_Simulation_AddRequestTemplateResponsePair_WillSaveTwoWhenNotDuplicates(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := NewSimulation()
+	unit := models.NewSimulation()
 
-	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
-		RequestTemplate{
-			Destination: &RequestFieldMatchers{
+	unit.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
+		models.RequestTemplate{
+			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("space"),
 			},
 		},
-		ResponseDetails{},
+		models.ResponseDetails{},
 	})
 
-	unit.AddRequestTemplateResponsePair(&RequestTemplateResponsePair{
-		RequestTemplate{
-			Destination: &RequestFieldMatchers{
+	unit.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
+		models.RequestTemplate{
+			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("again"),
 			},
 		},
-		ResponseDetails{},
+		models.ResponseDetails{},
 	})
 
 	Expect(unit.Templates).To(HaveLen(2))

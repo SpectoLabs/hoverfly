@@ -1,9 +1,10 @@
-package models
+package models_test
 
 import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
@@ -11,7 +12,7 @@ import (
 func Test_NewRequestFieldMatchersFromView_ReturnsNewStruct(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := NewRequestFieldMatchersFromView(&v2.RequestFieldMatchersView{
+	unit := models.NewRequestFieldMatchersFromView(&v2.RequestFieldMatchersView{
 		ExactMatch: util.StringToPointer("exactly"),
 	})
 
@@ -22,7 +23,7 @@ func Test_NewRequestFieldMatchersFromView_ReturnsNewStruct(t *testing.T) {
 func Test_NewRequestFieldMatchersFromView_WillReturnNilIfGivenNil(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := NewRequestFieldMatchersFromView(nil)
+	unit := models.NewRequestFieldMatchersFromView(nil)
 
 	Expect(unit).To(BeNil())
 }
@@ -30,7 +31,7 @@ func Test_NewRequestFieldMatchersFromView_WillReturnNilIfGivenNil(t *testing.T) 
 func Test_NewRequestFieldMatchers_BuildView(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := RequestFieldMatchers{
+	unit := models.RequestFieldMatchers{
 		ExactMatch: util.StringToPointer("exactly"),
 	}
 
@@ -41,7 +42,7 @@ func Test_NewRequestFieldMatchers_BuildView(t *testing.T) {
 func Test_NewRequestTemplateResponsePairFromView_BuildsPair(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := NewRequestTemplateResponsePairFromView(&v2.RequestResponsePairViewV2{
+	unit := models.NewRequestTemplateResponsePairFromView(&v2.RequestResponsePairViewV2{
 		Request: v2.RequestDetailsViewV2{
 			Path: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("/"),
@@ -61,7 +62,7 @@ func Test_NewRequestTemplateResponsePairFromView_BuildsPair(t *testing.T) {
 func Test_NewRequestTemplateResponsePairFromView_SortsQuery(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := NewRequestTemplateResponsePairFromView(&v2.RequestResponsePairViewV2{
+	unit := models.NewRequestTemplateResponsePairFromView(&v2.RequestResponsePairViewV2{
 		Request: v2.RequestDetailsViewV2{
 			Query: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("b=b&a=a"),
