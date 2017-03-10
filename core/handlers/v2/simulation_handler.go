@@ -38,6 +38,11 @@ func (this *SimulationHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHa
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Delete),
 	))
+
+	mux.Get("/api/v2/simulation/schema", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.GetSchema),
+	))
 }
 
 func (this *SimulationHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
@@ -81,4 +86,10 @@ func (this *SimulationHandler) Delete(w http.ResponseWriter, req *http.Request, 
 	this.Hoverfly.DeleteSimulation()
 
 	this.Get(w, req, next)
+}
+
+func (this *SimulationHandler) GetSchema(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	bytes, _ := json.Marshal(SimulationViewV2Schema)
+
+	handlers.WriteResponse(w, bytes)
 }
