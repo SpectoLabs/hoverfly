@@ -3,6 +3,7 @@ package backends
 import (
 	"bytes"
 	"encoding/json"
+
 	"github.com/pborman/uuid"
 	"golang.org/x/crypto/bcrypt"
 
@@ -99,7 +100,6 @@ func (b *CacheAuthBackend) GetUser(username string) (user *User, err error) {
 		logUserError(err, username)
 		return
 	}
-
 	return
 }
 
