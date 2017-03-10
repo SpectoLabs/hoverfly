@@ -41,7 +41,7 @@ func (t TemplateMatcher) Match(req models.RequestDetails, webserver bool, simula
 			continue
 		}
 
-		if !headerMatch(template.Headers, req.Headers) {
+		if !HeaderMatch(template.Headers, req.Headers) {
 			continue
 		}
 
@@ -54,7 +54,7 @@ func (t TemplateMatcher) Match(req models.RequestDetails, webserver bool, simula
 /**
 Check keys and corresponding values in template headers are also present in request headers
 */
-func headerMatch(templateHeaders, requestHeaders map[string][]string) bool {
+func HeaderMatch(templateHeaders, requestHeaders map[string][]string) bool {
 
 	for templateHeaderKey, templateHeaderValues := range templateHeaders {
 		for requestHeaderKey, requestHeaderValues := range requestHeaders {

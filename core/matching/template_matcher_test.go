@@ -1,15 +1,16 @@
-package matching
+package matching_test
 
 import (
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
 
 var (
-	unit = TemplateMatcher{}
+	unit = matching.TemplateMatcher{}
 )
 
 func Test_Match_EmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
@@ -520,7 +521,7 @@ func Test_Match_RequestTemplateResponsePair_ConvertToRequestResponsePairView_Can
 	Expect(pairView.Response.Body).To(Equal("template matched"))
 }
 
-func Test_headerMatch(t *testing.T) {
+func Test_HeaderMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	tmplHeaders := map[string][]string{
@@ -528,11 +529,11 @@ func Test_headerMatch(t *testing.T) {
 		"header2": []string{"val2"},
 	}
 
-	res := headerMatch(tmplHeaders, tmplHeaders)
+	res := matching.HeaderMatch(tmplHeaders, tmplHeaders)
 	Expect(res).To(BeTrue())
 }
 
-func Test_headerMatch_IgnoreTestCaseInsensitive(t *testing.T) {
+func Test_HeaderMatch_IgnoreTestCaseInsensitive(t *testing.T) {
 	RegisterTestingT(t)
 
 	tmplHeaders := map[string][]string{
@@ -543,7 +544,7 @@ func Test_headerMatch_IgnoreTestCaseInsensitive(t *testing.T) {
 		"HEADER1": []string{"val1"},
 		"Header2": []string{"VAL2"},
 	}
-	res := headerMatch(tmplHeaders, reqHeaders)
+	res := matching.HeaderMatch(tmplHeaders, reqHeaders)
 	Expect(res).To(BeTrue())
 }
 
@@ -557,11 +558,11 @@ func Test_HeaderMatch_MatchingTemplateHasMoreHeaderKeysThanRequestMatchesFalse(t
 	reqHeaders := map[string][]string{
 		"header1": []string{"val1"},
 	}
-	res := headerMatch(tmplHeaders, reqHeaders)
+	res := matching.HeaderMatch(tmplHeaders, reqHeaders)
 	Expect(res).To(BeFalse())
 }
 
-func Test_headerMatch_MatchingTemplateHasMoreHeaderValuesThanRequestMatchesFalse(t *testing.T) {
+func Test_HeaderMatch_MatchingTemplateHasMoreHeaderValuesThanRequestMatchesFalse(t *testing.T) {
 	RegisterTestingT(t)
 
 	tmplHeaders := map[string][]string{
@@ -570,11 +571,11 @@ func Test_headerMatch_MatchingTemplateHasMoreHeaderValuesThanRequestMatchesFalse
 	reqHeaders := map[string][]string{
 		"header2": []string{"val1"},
 	}
-	res := headerMatch(tmplHeaders, reqHeaders)
+	res := matching.HeaderMatch(tmplHeaders, reqHeaders)
 	Expect(res).To(BeFalse())
 }
 
-func Test_headerMatch_MatchingRequestHasMoreHeaderKeysThanTemplateMatchesFalse(t *testing.T) {
+func Test_HeaderMatch_MatchingRequestHasMoreHeaderKeysThanTemplateMatchesFalse(t *testing.T) {
 	RegisterTestingT(t)
 
 	tmplHeaders := map[string][]string{
@@ -584,11 +585,11 @@ func Test_headerMatch_MatchingRequestHasMoreHeaderKeysThanTemplateMatchesFalse(t
 		"HEADER1": []string{"val1"},
 		"header2": []string{"val2"},
 	}
-	res := headerMatch(tmplHeaders, reqHeaders)
+	res := matching.HeaderMatch(tmplHeaders, reqHeaders)
 	Expect(res).To(BeTrue())
 }
 
-func Test_headerMatch_MatchingRequestHasMoreHeaderValuesThanTemplateMatchesFalse(t *testing.T) {
+func Test_HeaderMatch_MatchingRequestHasMoreHeaderValuesThanTemplateMatchesFalse(t *testing.T) {
 	RegisterTestingT(t)
 
 	tmplHeaders := map[string][]string{
@@ -597,6 +598,6 @@ func Test_headerMatch_MatchingRequestHasMoreHeaderValuesThanTemplateMatchesFalse
 	reqHeaders := map[string][]string{
 		"header2": []string{"val1", "val2"},
 	}
-	res := headerMatch(tmplHeaders, reqHeaders)
+	res := matching.HeaderMatch(tmplHeaders, reqHeaders)
 	Expect(res).To(BeTrue())
 }
