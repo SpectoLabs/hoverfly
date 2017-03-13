@@ -28,13 +28,24 @@ Example response body:
               }
             },
             "request": {
-              "requestType": "recording",
-              "path": "/",
-              "method": "GET",
-              "destination": "myhost.io",
-              "scheme": "https",
-              "query": "",
-              "body": "",
+              "path": {
+	        "exactMatch": "/"
+	      }
+              "method": {
+	        "exactMatch": "GET"
+              }
+	      "destination": {
+	        "exactMatch": "myhost.io"
+              }
+	      "scheme": {
+	        "exactMatch": "https"
+              }
+	      "query": {
+	        "exactMatch": ""
+	      }
+              "body": {
+	        "exactMatch": ""
+	      }
               "headers": {
                 "Accept": [
                   "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
@@ -60,14 +71,9 @@ Example response body:
               }
             },
             "request": {
-              "requestType": "template",
-              "path": "/template",
-              "method": null,
-              "destination": null,
-              "scheme": null,
-              "query": null,
-              "body": null,
-              "headers": null
+              "path": {
+	        "exactMatch": "/template"
+	      }
             }
           }
         ],
@@ -76,8 +82,8 @@ Example response body:
         }
       },
       "meta": {
-        "schemaVersion": "v1",
-        "hoverflyVersion": "v0.9.0",
+        "schemaVersion": "v2",
+        "hoverflyVersion": "v0.11.0",
         "timeExported": "2016-11-11T11:53:52Z"
       }
 
@@ -106,13 +112,24 @@ Example request body:
               }
             },
             "request": {
-              "requestType": "recording",
-              "path": "/",
-              "method": "GET",
-              "destination": "myhost.io",
-              "scheme": "https",
-              "query": "",
-              "body": "",
+              "path": {
+	        "exactMatch": "/"
+	      }
+              "method": {
+	        "exactMatch": "GET"
+              }
+	      "destination": {
+	        "exactMatch": "myhost.io"
+              }
+	      "scheme": {
+	        "exactMatch": "https"
+              }
+	      "query": {
+	        "exactMatch": ""
+	      }
+              "body": {
+	        "exactMatch": ""
+	      }
               "headers": {
                 "Accept": [
                   "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
@@ -138,14 +155,9 @@ Example request body:
               }
             },
             "request": {
-              "requestType": "template",
-              "path": "/template",
-              "method": null,
-              "destination": null,
-              "scheme": null,
-              "query": null,
-              "body": null,
-              "headers": null
+              "path": {
+	        "exactMatch": "/template"
+	      }
             }
           }
         ],
@@ -154,8 +166,8 @@ Example request body:
         }
       },
       "meta": {
-        "schemaVersion": "v1",
-        "hoverflyVersion": "v0.9.0",
+        "schemaVersion": "v2",
+        "hoverflyVersion": "v0.11.0",
         "timeExported": "2016-11-11T11:53:52Z"
       }
 
