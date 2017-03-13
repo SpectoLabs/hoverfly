@@ -7,6 +7,6 @@ In this mode, Hoverfly uses traffic captured using :ref:`capture_mode` (which ma
 
 .. figure:: simulate.mermaid.png
 
-Each time Hoverfly receives a request from the application, instead of forwarding it to the intended destination, it looks in the simulation data for a matching response. If it finds a match, it returns the response to the application.
+Each time Hoverfly receives a request from the application, instead of forwarding it to the intended destination, Hoverfly will resolve it. It will first look in a cache (which is configurable). This cache is populated with successful requests and responses that Hoverfly has previously served. If Hoverfly has a matching request in the cache, it will serve the response.
 
-This simple matching strategy won’t always be appropriate however. In some cases you may want Hoverfly to return a single response for a number of different possible requests. This can be done by editing the simulation data (see :ref:`templates`).
+If the request is not found in the cache, the request is then compared against all the requests in the simulation.
