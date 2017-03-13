@@ -44,7 +44,7 @@ var _ = Describe("When using different matchers", func() {
 	Context("Using `jsonMatch`", func() {
 
 		It("should match on the body", func() {
-			hoverfly.ImportSimulation(functional_tests.JsonMatchSimulation)
+			hoverfly.ImportSimulation(functional_tests.JsonPathMatchSimulation)
 			req := sling.New().Get("http://test.com")
 			req.Body(bytes.NewBufferString(`{"items": [{}, {}, {}, {}, {}]}`))
 

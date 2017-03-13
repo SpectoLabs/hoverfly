@@ -39,8 +39,8 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
 		return len(results) > 0
 	}
 
-	if field.JsonMatch != nil {
-		paths, err := jsonpath.ParsePaths(*field.JsonMatch)
+	if field.JsonPathMatch != nil {
+		paths, err := jsonpath.ParsePaths(*field.JsonPathMatch)
 		if err != nil {
 			return false
 		}

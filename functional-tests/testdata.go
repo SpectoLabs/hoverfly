@@ -125,7 +125,7 @@ var XpathSimulation = `{
     }
 }`
 
-var JsonMatchSimulation = `{
+var JsonPathMatchSimulation = `{
     "data": {
         "pairs": [
             {
@@ -137,7 +137,7 @@ var JsonMatchSimulation = `{
                 },
                 "request": {
                     "body": {
-						"jsonMatch": "$.items[4]"
+						"jsonPathMatch": "$.items[4]"
                     }
                 }
             }
