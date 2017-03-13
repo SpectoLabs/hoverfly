@@ -129,10 +129,6 @@ A standard workflow might be:
 3. Edit the JSON to set certain requests to templates, removing the properties for these requests that should be excluded from the match or substituting characters in the URL path for wildcards
 4. Re-import the JSON to Hoverfly
 
-.. note::
-
-    If the ``"requestType"`` property is not defined or not recognized, Hoverfly will treat a request as a ``"recording"``.
-
 .. seealso::
 
     Templating is best understood with a practical example, so please refer to :ref:`addingtemplates` to get hands on experience with templating.
