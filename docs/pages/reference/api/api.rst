@@ -174,6 +174,13 @@ Example request body:
 
 -------------------------------------------------------------------------------------------------------------
 
+GET /api/v2/simulation/schema
+""""""""""""""""""""
+Gets the JSON Schema used to validate the simulation JSON.
+
+
+-------------------------------------------------------------------------------------------------------------
+
 GET /api/v2/hoverfly
 """"""""""""""""""""
 
@@ -354,7 +361,7 @@ Example response body:
 GET /api/v2/hoverfly/upstream-proxy
 """""""""""""""""""""""""""""""""""
 
-Gets the upstream proxy configured for  Hoverfly.
+Gets the upstream proxy configured for Hoverfly.
 
 Example response body:
 
@@ -363,3 +370,27 @@ Example response body:
     {
         "upstream-proxy": "proxy.corp.big-it-company.org:8080"
     }
+
+
+-------------------------------------------------------------------------------------------------------------
+
+
+GET /api/v2/cache
+""""""""""""""""""""
+Gets the requests and responses stored in the cache.
+
+
+-------------------------------------------------------------------------------------------------------------
+
+
+DELETE /api/v2/cache
+""""""""""""""""""""
+Delete all requests and responses stored in the cache.
+
+
+-------------------------------------------------------------------------------------------------------------
+
+
+GET /api/v2/logs
+""""""""""""""""""""
+Gets the logs from Hoverfly.
