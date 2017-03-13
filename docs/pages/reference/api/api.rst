@@ -30,22 +30,22 @@ Example response body:
             "request": {
               "path": {
 	        "exactMatch": "/"
-	      }
+	      },
               "method": {
 	        "exactMatch": "GET"
-              }
+              },
 	      "destination": {
 	        "exactMatch": "myhost.io"
-              }
+              },
 	      "scheme": {
 	        "exactMatch": "https"
-              }
+              },
 	      "query": {
 	        "exactMatch": ""
-	      }
+	      },
               "body": {
 	        "exactMatch": ""
-	      }
+	      },
               "headers": {
                 "Accept": [
                   "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
@@ -86,6 +86,7 @@ Example response body:
         "hoverflyVersion": "v0.11.0",
         "timeExported": "2016-11-11T11:53:52Z"
       }
+    }
 
 
 PUT /api/v2/simulation
@@ -114,22 +115,22 @@ Example request body:
             "request": {
               "path": {
 	        "exactMatch": "/"
-	      }
+	      },
               "method": {
 	        "exactMatch": "GET"
-              }
+              },
 	      "destination": {
 	        "exactMatch": "myhost.io"
-              }
+              },
 	      "scheme": {
 	        "exactMatch": "https"
-              }
+              },
 	      "query": {
 	        "exactMatch": ""
-	      }
+	      },
               "body": {
 	        "exactMatch": ""
-	      }
+	      },
               "headers": {
                 "Accept": [
                   "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
@@ -170,7 +171,7 @@ Example request body:
         "hoverflyVersion": "v0.11.0",
         "timeExported": "2016-11-11T11:53:52Z"
       }
-
+    }
 
 -------------------------------------------------------------------------------------------------------------
 
