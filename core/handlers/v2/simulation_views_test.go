@@ -65,20 +65,19 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV2Payload(t *
 	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
 }
 
-func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidV2Simulation(t *testing.T) {
+func Test_NewSimulationViewFromResponseBody_WontCreateSimulationIfThereIsNoSchemaVersion(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
 		"data": {},
 		"meta": {
-			"schemaVersion": "v2",
 			"hoverflyVersion": "v0.11.0",
 			"timeExported": "2017-02-23T12:43:48Z"
 		}
 	}`))
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Invalid v2 simulation: Object->Key[data].Value->Object->Key[pairs].Value->Array"))
+	Expect(err.Error()).To(Equal("Invalid JSON, missing \"meta.schemaVersion\" string"))
 
 	Expect(simulation).ToNot(BeNil())
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
@@ -159,7 +158,13 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidV1Sim
 	RegisterTestingT(t)
 
 	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
-		"data": {},
+		"data": {
+			"pairs": [
+				{
+					
+				}
+			]
+		},
 		"meta": {
 			"schemaVersion": "v1",
 			"hoverflyVersion": "v0.11.0",
@@ -168,7 +173,7 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidV1Sim
 	}`))
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Invalid v1 simulation: Object->Key[data].Value->Object->Key[pairs].Value->Array"))
+	Expect(err.Error()).To(Equal("Invalid v1 simulation: request is required, response is required"))
 
 	Expect(simulation).ToNot(BeNil())
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))

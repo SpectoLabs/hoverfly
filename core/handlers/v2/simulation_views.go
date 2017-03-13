@@ -5,10 +5,13 @@ import (
 	"errors"
 	"time"
 
+	"strings"
+
+	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	valid "github.com/gima/govalid/v1"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, error) {
@@ -24,25 +27,31 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 		return SimulationViewV2{}, errors.New("Invalid JSON, missing \"meta\" object")
 	}
 
+	if jsonMap["meta"].(map[string]interface{})["schemaVersion"] == nil {
+		return SimulationViewV2{}, errors.New("Invalid JSON, missing \"meta.schemaVersion\" string")
+	}
+
 	schemaVersion := jsonMap["meta"].(map[string]interface{})["schemaVersion"].(string)
 
 	if schemaVersion == "v2" {
-		if path, err := simulationView.GetValidationSchema().Validate(jsonMap); err != nil {
-
-			return SimulationViewV2{}, errors.New("Invalid v2 simulation: " + path)
+		err := ValidateSimulation(jsonMap, SimulationViewV2JsonSchema)
+		if err != nil {
+			return simulationView, errors.New("Invalid v2 simulation:" + err.Error())
 		}
-		err := json.Unmarshal(responseBody, &simulationView)
+
+		err = json.Unmarshal(responseBody, &simulationView)
 		if err != nil {
 			return SimulationViewV2{}, err
 		}
-	} else {
-		var simulationViewV1 SimulationViewV1
-
-		if path, err := simulationViewV1.GetValidationSchema().Validate(jsonMap); err != nil {
-			return SimulationViewV2{}, errors.New("Invalid v1 simulation: " + path)
+	} else if schemaVersion == "v1" {
+		err := ValidateSimulation(jsonMap, SimulationViewV1JsonSchema)
+		if err != nil {
+			return simulationView, errors.New("Invalid v1 simulation:" + err.Error())
 		}
 
-		err := json.Unmarshal(responseBody, &simulationViewV1)
+		var simulationViewV1 SimulationViewV1
+
+		err = json.Unmarshal(responseBody, &simulationViewV1)
 		if err != nil {
 			return SimulationViewV2{}, err
 		}
@@ -58,42 +67,35 @@ type SimulationViewV2 struct {
 	MetaView   `json:"meta"`
 }
 
-func (this SimulationViewV2) GetValidationSchema() valid.Validator {
-	return valid.Object(
-		valid.ObjKV("data", valid.Object(
-			valid.ObjKV("pairs", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
-				valid.ObjKV("request", valid.Object(
-					valid.ObjKV("path", valid.Optional(valid.Object())),
-					valid.ObjKV("method", valid.Optional(valid.Object())),
-					valid.ObjKV("scheme", valid.Optional(valid.Object())),
-					valid.ObjKV("query", valid.Optional(valid.Object())),
-					valid.ObjKV("body", valid.Optional(valid.Object())),
-					valid.ObjKV("headers", valid.Optional(valid.Object())),
-				)),
-				valid.ObjKV("response", valid.Object(
-					valid.ObjKV("status", valid.Optional(valid.Number())),
-					valid.ObjKV("body", valid.Optional(valid.String())),
-					valid.ObjKV("encodedBody", valid.Optional(valid.Boolean())),
-					valid.ObjKV("headers", valid.Optional(valid.Object())),
-				)),
-			))))),
-			valid.ObjKV("globalActions", valid.Optional(valid.Object(
-				valid.ObjKV("delays", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
-					valid.ObjKV("urlPattern", valid.Optional(valid.String())),
-					valid.ObjKV("httpMethod", valid.Optional(valid.String())),
-					valid.ObjKV("delay", valid.Optional(valid.Number())),
-				))))),
-			))),
-		)),
-		valid.ObjKV("meta", valid.Object(
-			valid.ObjKV("schemaVersion", valid.String()),
-		)),
-	)
-}
-
 type SimulationViewV1 struct {
 	DataViewV1 `json:"data"`
 	MetaView   `json:"meta"`
+}
+
+func ValidateSimulation(json map[string]interface{}, schema string) error {
+	jsonLoader := gojsonschema.NewGoLoader(json)
+	schemaLoader := gojsonschema.NewStringLoader(schema)
+
+	result, err := gojsonschema.Validate(schemaLoader, jsonLoader)
+	if err != nil {
+		log.Error("Error when validating simulaton: " + err.Error())
+		return errors.New("Error when validating simulaton")
+	}
+
+	if !result.Valid() {
+		errorMessage := ""
+		for i, parsingError := range result.Errors() {
+			message := strings.Split(parsingError.String(), ":")[1]
+			var comma string
+			if i != 0 {
+				comma = ","
+			}
+			errorMessage = errorMessage + comma + " " + strings.TrimSpace(message)
+		}
+		return errors.New(errorMessage)
+	}
+
+	return nil
 }
 
 func (this SimulationViewV1) Upgrade() SimulationViewV2 {
@@ -162,39 +164,6 @@ func (this SimulationViewV1) Upgrade() SimulationViewV2 {
 			TimeExported:    this.TimeExported,
 		},
 	}
-}
-
-func (this SimulationViewV1) GetValidationSchema() valid.Validator {
-	return valid.Object(
-		valid.ObjKV("data", valid.Object(
-			valid.ObjKV("pairs", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
-				valid.ObjKV("request", valid.Object(
-					valid.ObjKV("path", valid.Optional(valid.String())),
-					valid.ObjKV("method", valid.Optional(valid.String())),
-					valid.ObjKV("scheme", valid.Optional(valid.String())),
-					valid.ObjKV("query", valid.Optional(valid.String())),
-					valid.ObjKV("body", valid.Optional(valid.String())),
-					valid.ObjKV("headers", valid.Optional(valid.Object())),
-				)),
-				valid.ObjKV("response", valid.Object(
-					valid.ObjKV("status", valid.Optional(valid.Number())),
-					valid.ObjKV("body", valid.Optional(valid.String())),
-					valid.ObjKV("encodedBody", valid.Optional(valid.Boolean())),
-					valid.ObjKV("headers", valid.Optional(valid.Object())),
-				)),
-			))))),
-			valid.ObjKV("globalActions", valid.Optional(valid.Object(
-				valid.ObjKV("delays", valid.Array(valid.ArrEach(valid.Optional(valid.Object(
-					valid.ObjKV("urlPattern", valid.Optional(valid.String())),
-					valid.ObjKV("httpMethod", valid.Optional(valid.String())),
-					valid.ObjKV("delay", valid.Optional(valid.Number())),
-				))))),
-			))),
-		)),
-		valid.ObjKV("meta", valid.Object(
-			valid.ObjKV("schemaVersion", valid.String()),
-		)),
-	)
 }
 
 type DataViewV2 struct {

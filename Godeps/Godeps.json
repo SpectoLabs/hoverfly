@@ -152,14 +152,6 @@
 			"Rev": "30411dbcefb7a1da7e84f75530ad3abe4011b4f8"
 		},
 		{
-			"ImportPath": "github.com/gima/govalid/v1",
-			"Rev": "c535894061717218f2b81c7c1aad110769d79bf7"
-		},
-		{
-			"ImportPath": "github.com/gima/govalid/v1/internal",
-			"Rev": "c535894061717218f2b81c7c1aad110769d79bf7"
-		},
-		{
 			"ImportPath": "github.com/go-zoo/bone",
 			"Comment": "v1.1-27-g2b727a8",
 			"Rev": "2b727a8601bc7a74fac33a9583ebba67779c502d"
@@ -532,6 +524,18 @@
 		{
 			"ImportPath": "github.com/tdewolff/strconv",
 			"Rev": "3e8091f4417ebaaa3910da63a45ea394ebbfb0e3"
+		},
+		{
+			"ImportPath": "github.com/xeipuuv/gojsonpointer",
+			"Rev": "6fe8760cad3569743d51ddbb243b26f8456742dc"
+		},
+		{
+			"ImportPath": "github.com/xeipuuv/gojsonreference",
+			"Rev": "e02fc20de94c78484cd5ffb007f8af96be030a45"
+		},
+		{
+			"ImportPath": "github.com/xeipuuv/gojsonschema",
+			"Rev": "ff0417f4272e480246b4507459b3f6ae721a87ac"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/bcrypt",
