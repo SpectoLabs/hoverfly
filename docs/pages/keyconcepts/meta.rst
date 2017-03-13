@@ -9,7 +9,7 @@ The last part of the simulation schema is the meta object. Its purpose is to sto
 .. code:: json
 
     "meta": {
-      "schemaVersion": "v1",
-      "hoverflyVersion": "v0.9.0",
+      "schemaVersion": "v2",
+      "hoverflyVersion": "v0.11.0",
       "timeExported": "2016-11-11T11:53:52Z"
     }
