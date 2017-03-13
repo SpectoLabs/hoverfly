@@ -53,7 +53,7 @@ var _ = Describe("When using different matchers", func() {
 		})
 	})
 
-	Context("Using `jsonMatch`", func() {
+	Context("Using `jsonPathMatch`", func() {
 
 		BeforeEach(func() {
 			hoverfly.ImportSimulation(functional_tests.JsonPathMatchSimulation)
