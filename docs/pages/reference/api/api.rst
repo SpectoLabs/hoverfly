@@ -380,6 +380,42 @@ GET /api/v2/cache
 """"""""""""""""""""
 Gets the requests and responses stored in the cache.
 
+::
+    {
+      "cache": [
+        {
+          "response": {
+            "status": 200,
+            "body": "<h1>Matched on template</h1>",
+            "encodedBody": false,
+            "headers": {
+              "Content-Type": [
+                "text/html; charset=utf-8"
+              ]
+            }
+          },
+          "request": {
+            "path": "/template",
+            "method": "GET",
+            "destination": "hoverfly.io",
+            "scheme": "http", 
+            "query": "",
+            "body": "",
+            "headers": {
+              "Accept":   [
+                "*/*"
+              ],
+              "Proxy-Connection": [
+                "Keep-Alive"
+              ],
+              "User-Agent": [
+                "curl/7.50.2"
+              ]
+            }
+          }
+        }
+      ]
+    }
 
 -------------------------------------------------------------------------------------------------------------
 
@@ -395,3 +431,30 @@ Delete all requests and responses stored in the cache.
 GET /api/v2/logs
 """"""""""""""""""""
 Gets the logs from Hoverfly.
+
+::
+    {
+      "logs": [
+        {
+          "level": "info",
+          "msg": "serving proxy",
+          "time": "2017-03-13T12:22:39Z"
+        },
+        {
+          "destination": ".",
+          "level": "info",
+          "mode": "simulate",
+          "msg": "current proxy configuration",
+          "port": "8500",
+          "time": "2017-03-13T12:22:39Z"
+        },
+        {
+          "Destination": ".",
+          "Mode": "simulate",
+          "ProxyPort": "8500",
+          "level": "info",
+          "msg": "Proxy prepared...",
+          "time": "2017-03-13T12:22:39Z"
+        }
+      ]
+    }
