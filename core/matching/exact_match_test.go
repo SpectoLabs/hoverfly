@@ -18,3 +18,21 @@ func Test_ExactMatch_MatchesFalseWithIncorrectExactMatch(t *testing.T) {
 
 	Expect(matching.ExactMatch("yes", "no")).To(BeFalse())
 }
+
+func Test_ExactMatch_MatchesTrueWithJSON(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.ExactMatch(`{"test":{"json":true,"minified":true}}`, `{"test":{"json":true,"minified":true}}`)).To(BeTrue())
+}
+
+func Test_ExactMatch_MatchesTrueWithUnminifiedJSON(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.ExactMatch(`{"test":{"json":true,"minified":true}}`, `{
+		"test": {
+			"json": true,
+			"minified":
+			true
+		}
+	}`)).To(BeFalse())
+}
