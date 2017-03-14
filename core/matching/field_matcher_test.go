@@ -32,6 +32,24 @@ func Test_FieldMatcher_MatchesFalseWithJsonMatch(t *testing.T) {
 	}, `{"test": [ ] }`)).To(BeFalse())
 }
 
+func Test_FieldMatcher_MatchesTrueWithXmlMatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.FieldMatcher(&models.RequestFieldMatchers{
+		XmlMatch: util.StringToPointer(`<document></document>`),
+	}, `<document></document>`)).To(BeTrue())
+}
+
+func Test_FieldMatcher_MatchesFalseWithXmlMatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.FieldMatcher(&models.RequestFieldMatchers{
+		XmlMatch: util.StringToPointer(`<document></document>`),
+	}, `<document>
+		<test>data</test>
+	</document>`)).To(BeFalse())
+}
+
 func Test_FieldMatcher_MatchesTrue_WithMatchersNotDefined(t *testing.T) {
 	RegisterTestingT(t)
 
