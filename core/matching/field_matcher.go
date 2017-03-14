@@ -19,7 +19,7 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
 	}
 
 	if field.JsonPathMatch != nil {
-		matches = append(matches, JsonMatch(field.JsonPathMatch, toMatch))
+		matches = append(matches, JsonPathMatch(*field.JsonPathMatch, toMatch))
 	}
 
 	if field.RegexMatch != nil {
