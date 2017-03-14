@@ -96,6 +96,22 @@ func SortQueryString(query string) string {
 	return queryBuffer.String()
 }
 
+func GetContentTypeFromHeaders(headers map[string][]string) string {
+	if headers == nil {
+		return ""
+	}
+
+	for _, v := range headers["Content-Type"] {
+		if regexp.MustCompile("[/+]json$").MatchString(v) {
+			return "json"
+		}
+		if regexp.MustCompile("[/+]xml$").MatchString(v) {
+			return "xml"
+		}
+	}
+	return ""
+}
+
 var minifier *minify.M
 
 func GetMinifier() *minify.M {
