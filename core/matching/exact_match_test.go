@@ -31,8 +31,7 @@ func Test_ExactMatch_MatchesTrueWithUnminifiedJSON(t *testing.T) {
 	Expect(matching.ExactMatch(`{"test":{"json":true,"minified":true}}`, `{
 		"test": {
 			"json": true,
-			"minified":
-			true
+			"minified": true
 		}
 	}`)).To(BeFalse())
 }
