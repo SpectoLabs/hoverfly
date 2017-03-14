@@ -36,6 +36,7 @@ func (this RequestFieldMatchers) BuildView() *v2.RequestFieldMatchersView {
 		ExactMatch:    this.ExactMatch,
 		XmlMatch:      this.XmlMatch,
 		XpathMatch:    this.XpathMatch,
+		JsonMatch:     this.JsonMatch,
 		JsonPathMatch: this.JsonPathMatch,
 		RegexMatch:    this.RegexMatch,
 		GlobMatch:     this.GlobMatch,

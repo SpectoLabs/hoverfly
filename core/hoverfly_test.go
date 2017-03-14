@@ -581,3 +581,37 @@ func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing
 	Expect(unit.Simulation.Templates[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
 	Expect(unit.Simulation.Templates[0].Response.Status).To(Equal(200))
 }
+
+func Test_Hoverfly_Save_SavesRequestBodyAsJsonPathIfContentTypeIsJson(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Save(&models.RequestDetails{
+		Body: `{"test": []}`,
+		Headers: map[string][]string{
+			"Content-Type": []string{"application/json"},
+		},
+	}, &models.ResponseDetails{})
+
+	Expect(unit.Simulation.Templates).To(HaveLen(1))
+
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Body.JsonMatch).To(Equal(`{"test": []}`))
+}
+
+func Test_Hoverfly_Save_SavesRequestBodyAsXmlPathIfContentTypeIsXml(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Save(&models.RequestDetails{
+		Body: `<xml>`,
+		Headers: map[string][]string{
+			"Content-Type": []string{"application/xml"},
+		},
+	}, &models.ResponseDetails{})
+
+	Expect(unit.Simulation.Templates).To(HaveLen(1))
+
+	Expect(*unit.Simulation.Templates[0].RequestTemplate.Body.XmlMatch).To(Equal(`<xml>`))
+}
