@@ -44,6 +44,20 @@ func (this *hoverflyCaptureStub) Save(request *models.RequestDetails, response *
 	return nil
 }
 
+func Test_CaptureMode_CanSetArguments(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := &modes.CaptureMode{
+		Hoverfly: &hoverflyCaptureStub{},
+	}
+
+	unit.SetArguments(map[string]string{
+		"test": "value",
+	})
+
+	Expect(unit.Arguments).To(HaveKeyWithValue("test", "value"))
+}
+
 func Test_CaptureMode_WhenGivenARequestItWillMakeTheRequestAndSaveIt(t *testing.T) {
 	RegisterTestingT(t)
 
