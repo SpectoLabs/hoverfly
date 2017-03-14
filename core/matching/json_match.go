@@ -1,7 +1,6 @@
 package matching
 
 import (
-	"encoding/json"
 	"reflect"
 
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -18,17 +17,5 @@ func JsonMatch(matchingString string, toMatch string) bool {
 		return false
 	}
 
-	var matchingJson, toMatchJson map[string]interface{}
-
-	err = json.Unmarshal([]byte(minifiedMatchingString), &matchingJson)
-	if err != nil {
-		return false
-	}
-
-	err = json.Unmarshal([]byte(minifiedToMatch), &toMatchJson)
-	if err != nil {
-		return false
-	}
-
-	return reflect.DeepEqual(matchingJson, toMatchJson)
+	return reflect.DeepEqual(minifiedMatchingString, minifiedToMatch)
 }
