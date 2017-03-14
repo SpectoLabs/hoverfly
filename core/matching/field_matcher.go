@@ -15,7 +15,7 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
 	}
 
 	if field.XpathMatch != nil {
-		matches = append(matches, XpathMatch(field.XpathMatch, toMatch))
+		matches = append(matches, XpathMatch(*field.XpathMatch, toMatch))
 	}
 
 	if field.JsonPathMatch != nil {
