@@ -5,8 +5,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/tdewolff/minify"
+	"github.com/tdewolff/minify/json"
 )
 
 // GetRequestBody will read the http.Request body io.ReadCloser
@@ -89,4 +93,21 @@ func SortQueryString(query string) string {
 		}
 	}
 	return queryBuffer.String()
+}
+
+var minifier *minify.M
+
+func GetMinifier() *minify.M {
+	if minifier == nil {
+		minifier = minify.New()
+		minifier.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
+	}
+
+	return minifier
+}
+
+func MinifyJson(toMinify string) (string, error) {
+	minifier := GetMinifier()
+
+	return minifier.String("application/json", toMinify)
 }
