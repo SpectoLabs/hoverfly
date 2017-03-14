@@ -53,6 +53,35 @@ var _ = Describe("When using different matchers", func() {
 		})
 	})
 
+	Context("Using `jsonMatch`", func() {
+
+		BeforeEach(func() {
+			hoverfly.ImportSimulation(functional_tests.JsonMatchSimulation)
+		})
+
+		It("should match on the body", func() {
+			req := sling.New().Get("http://test.com")
+			req.Body(bytes.NewBufferString(`{
+				"test": "data"
+			}`))
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("json match")))
+		})
+
+		It("should not match on no body", func() {
+			req := sling.New().Get("http://test.com")
+			req.Body(bytes.NewBufferString(`{"test": [ ] }`))
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(502))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+		})
+	})
+
 	Context("Using `jsonPathMatch`", func() {
 
 		BeforeEach(func() {
