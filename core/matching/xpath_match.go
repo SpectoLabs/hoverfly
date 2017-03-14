@@ -7,8 +7,8 @@ import (
 	"github.com/ChrisTrenkamp/goxpath/tree/xmltree"
 )
 
-func XpathMatch(matchingString *string, toMatch string) bool {
-	xpathRule, err := goxpath.Parse(*matchingString)
+func XpathMatch(matchingString string, toMatch string) bool {
+	xpathRule, err := goxpath.Parse(matchingString)
 	if err != nil {
 		return false
 	}
