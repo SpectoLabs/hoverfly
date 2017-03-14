@@ -296,12 +296,12 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 	body := &models.RequestFieldMatchers{
 		ExactMatch: util.StringToPointer(request.Body),
 	}
-
-	if util.GetContentTypeFromHeaders(request.Headers) == "json" {
+	contentType := util.GetContentTypeFromHeaders(request.Headers)
+	if contentType == "json" {
 		body = &models.RequestFieldMatchers{
 			JsonMatch: util.StringToPointer(request.Body),
 		}
-	} else if util.GetContentTypeFromHeaders(request.Headers) == "xml" {
+	} else if contentType == "xml" {
 		body = &models.RequestFieldMatchers{
 			XmlMatch: util.StringToPointer(request.Body),
 		}
