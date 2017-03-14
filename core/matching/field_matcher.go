@@ -23,7 +23,7 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
 	}
 
 	if field.RegexMatch != nil {
-		matches = append(matches, RegexMatch(field.RegexMatch, toMatch))
+		matches = append(matches, RegexMatch(*field.RegexMatch, toMatch))
 	}
 
 	if field.GlobMatch != nil {
