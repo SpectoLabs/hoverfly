@@ -28,6 +28,20 @@ func (this hoverflySynthesizeStub) IsMiddlewareSet() bool {
 	return this.MiddlewareSet
 }
 
+func Test_SynthesizeMode_CanSetArguments(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := &modes.SynthesizeMode{
+		Hoverfly: hoverflySynthesizeStub{},
+	}
+
+	unit.SetArguments(map[string]string{
+		"test": "value",
+	})
+
+	Expect(unit.Arguments).To(HaveKeyWithValue("test", "value"))
+}
+
 func Test_SynthesizeMode_WhenGivenARequestItWillUseMiddlewareToGenerateAResponse(t *testing.T) {
 	RegisterTestingT(t)
 

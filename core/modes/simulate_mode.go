@@ -13,7 +13,12 @@ type HoverflySimulate interface {
 }
 
 type SimulateMode struct {
-	Hoverfly HoverflySimulate
+	Hoverfly  HoverflySimulate
+	Arguments map[string]string
+}
+
+func (this *SimulateMode) SetArguments(arguments map[string]string) {
+	this.Arguments = arguments
 }
 
 func (this SimulateMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {

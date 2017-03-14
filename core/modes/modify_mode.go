@@ -13,7 +13,12 @@ type HoverflyModify interface {
 }
 
 type ModifyMode struct {
-	Hoverfly HoverflyModify
+	Hoverfly  HoverflyModify
+	Arguments map[string]string
+}
+
+func (this *ModifyMode) SetArguments(arguments map[string]string) {
+	this.Arguments = arguments
 }
 
 func (this ModifyMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {

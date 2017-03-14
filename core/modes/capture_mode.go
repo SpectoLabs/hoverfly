@@ -18,7 +18,12 @@ type HoverflyCapture interface {
 }
 
 type CaptureMode struct {
-	Hoverfly HoverflyCapture
+	Hoverfly  HoverflyCapture
+	Arguments map[string]string
+}
+
+func (this *CaptureMode) SetArguments(arguments map[string]string) {
+	this.Arguments = arguments
 }
 
 func (this CaptureMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
