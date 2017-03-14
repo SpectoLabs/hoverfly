@@ -9,38 +9,18 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"regexp"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/tdewolff/minify"
-	"github.com/tdewolff/minify/json"
-	"github.com/tdewolff/minify/xml"
-)
-
-const (
-	contentTypeJSON = "application/json"
-	contentTypeXML  = "application/xml"
-	otherType       = "otherType"
 )
 
 var (
-	rxJSON = regexp.MustCompile("[/+]json$")
-	rxXML  = regexp.MustCompile("[/+]xml$")
 	// mime types which will not be base 64 encoded when exporting as JSON
 	supportedMimeTypes = [...]string{"text", "plain", "css", "html", "json", "xml", "js", "javascript"}
-	minifiers          *minify.M
 )
-
-func init() {
-	// GetNewMinifiers - sets minify.M with prepared xml/json minifiers
-	minifiers = minify.New()
-	minifiers.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
-	minifiers.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
-}
 
 // Payload structure holds request and response structure
 type RequestResponsePair struct {
@@ -163,36 +143,10 @@ func (r *RequestDetails) concatenate(withHost bool) string {
 	buffer.WriteString(r.Method)
 	buffer.WriteString(r.Query)
 	if len(r.Body) > 0 {
-		ct := r.getContentType()
-
-		if ct == contentTypeJSON || ct == contentTypeXML {
-			buffer.WriteString(r.minifyBody(ct))
-		} else {
-			log.WithFields(log.Fields{
-				"content-type": r.Headers["Content-Type"],
-			}).Debug("unknown content type")
-
-			buffer.WriteString(r.Body)
-		}
+		buffer.WriteString(r.Body)
 	}
 
 	return buffer.String()
-}
-
-func (r *RequestDetails) minifyBody(mediaType string) (minified string) {
-	var err error
-	minified, err = minifiers.String(mediaType, r.Body)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error":       err.Error(),
-			"destination": r.Destination,
-			"path":        r.Path,
-			"method":      r.Method,
-		}).Errorf("failed to minify request body, media type given: %s. Request matching might fail", mediaType)
-		return r.Body
-	}
-	log.Debugf("body minified, mediatype: %s", mediaType)
-	return minified
 }
 
 func (r *RequestDetails) Hash() string {
@@ -205,18 +159,6 @@ func (r *RequestDetails) HashWithoutHost() string {
 	h := md5.New()
 	io.WriteString(h, r.concatenate(false))
 	return fmt.Sprintf("%x", h.Sum(nil))
-}
-
-func (r *RequestDetails) getContentType() string {
-	for _, v := range r.Headers["Content-Type"] {
-		if rxJSON.MatchString(v) {
-			return contentTypeJSON
-		}
-		if rxXML.MatchString(v) {
-			return contentTypeXML
-		}
-	}
-	return otherType
 }
 
 // ResponseDetails structure hold response body from external service, body is not decoded and is supposed
