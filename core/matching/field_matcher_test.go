@@ -15,22 +15,6 @@ func Test_FieldMatcher_MatchesTrueWithNilMatchers(t *testing.T) {
 	Expect(matching.FieldMatcher(nil, "no")).To(BeTrue())
 }
 
-func Test_FieldMatcher_MatchesTrueWithRegexMatch(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.FieldMatcher(&models.RequestFieldMatchers{
-		RegexMatch: util.StringToPointer("t[o|a|e]st"),
-	}, `test`)).To(BeTrue())
-}
-
-func Test_FieldMatcher_MatchesFalseWithIncorrectRegexMatch(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.FieldMatcher(&models.RequestFieldMatchers{
-		RegexMatch: util.StringToPointer("t[o|a]st"),
-	}, `test`)).To(BeFalse())
-}
-
 func Test_FieldMatcher_MatchesTrueWithGlobMatch(t *testing.T) {
 	RegisterTestingT(t)
 
