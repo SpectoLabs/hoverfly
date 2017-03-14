@@ -111,3 +111,29 @@ func Test_SortQueryString_PreservesBothEqualsAndNoEqualsWithEmptyValue(t *testin
 
 	Expect(SortQueryString("a&b&c=&d&e=&f=")).To(Equal("a&b&c=&d&e=&f="))
 }
+
+func Test_MinifyJson_MinifiesJsonString(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(MinifyJson(`{
+		"test": {
+			"something": [
+				1, 2, 3
+			]
+		}
+	}`)).To(Equal(`{"test":{"something":[1,2,3]}}`))
+}
+
+func Test_MinifyJson_ErrorsOnInvalidJsonString(t *testing.T) {
+	RegisterTestingT(t)
+
+	_, err := MinifyJson(`{
+		"test": {
+			"something":
+				1, 2, 3
+			
+		}
+	}`)
+
+	Expect(err).ToNot(BeNil())
+}
