@@ -157,6 +157,50 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				Expect(capturedRequestBody).To(Equal(`{"title": "a todo"}`))
 			})
+
+			It("Should capture a JSON request body as a jsonMatch", func() {
+
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Write([]byte("okay"))
+				}))
+
+				defer fakeServer.Close()
+
+				resp := hoverfly.Proxy(sling.New().Post(fakeServer.URL).Add("Content-Type", "application/json").Body(bytes.NewBuffer([]byte(`{"title": "a todo"}`))))
+				Expect(resp.StatusCode).To(Equal(200))
+
+				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
+				Expect(err).To(BeNil())
+
+				payload := v2.SimulationViewV2{}
+
+				json.Unmarshal(recordsJson, &payload)
+				Expect(payload.RequestResponsePairs).To(HaveLen(1))
+
+				Expect(payload.RequestResponsePairs[0].Request.Body.JsonMatch).To(Equal(util.StringToPointer(`{"title": "a todo"}`)))
+			})
+
+			It("Should capture a XML request body as a xmlMatch", func() {
+
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Write([]byte("okay"))
+				}))
+
+				defer fakeServer.Close()
+
+				resp := hoverfly.Proxy(sling.New().Post(fakeServer.URL).Add("Content-Type", "application/xml").Body(bytes.NewBuffer([]byte(`<document/>`))))
+				Expect(resp.StatusCode).To(Equal(200))
+
+				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
+				Expect(err).To(BeNil())
+
+				payload := v2.SimulationViewV2{}
+
+				json.Unmarshal(recordsJson, &payload)
+				Expect(payload.RequestResponsePairs).To(HaveLen(1))
+
+				Expect(payload.RequestResponsePairs[0].Request.Body.XmlMatch).To(Equal(util.StringToPointer(`<document/>`)))
+			})
 		})
 	})
 })
