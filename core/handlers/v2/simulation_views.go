@@ -198,6 +198,7 @@ func (this RequestResponsePairViewV1) GetRequest() interfaces.Request { return t
 type RequestFieldMatchersView struct {
 	ExactMatch    *string `json:"exactMatch,omitempty"`
 	XpathMatch    *string `json:"xpathMatch,omitempty"`
+	JsonMatch     *string `json:"jsonMatch,omitempty"`
 	JsonPathMatch *string `json:"jsonPathMatch,omitempty"`
 	RegexMatch    *string `json:"regexMatch,omitempty"`
 	GlobMatch     *string `json:"globMatch,omitempty"`
