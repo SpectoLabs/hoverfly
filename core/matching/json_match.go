@@ -2,7 +2,6 @@ package matching
 
 import (
 	"encoding/json"
-	"fmt"
 	"reflect"
 
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -31,7 +30,5 @@ func JsonMatch(matchingString string, toMatch string) bool {
 		return false
 	}
 
-	fmt.Println(matchingJson)
-	fmt.Println(toMatchJson)
 	return reflect.DeepEqual(matchingJson, toMatchJson)
 }
