@@ -130,4 +130,49 @@ var _ = Describe("When using different matchers", func() {
 			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
 		})
 	})
+
+	Context("Using multiple matchers", func() {
+
+		BeforeEach(func() {
+			hoverfly.ImportSimulation(functional_tests.MultipleMatchSimulation)
+		})
+
+		It("should match on the body", func() {
+			req := sling.New().Get("http://test.com")
+			req.Body(bytes.NewBufferString(xml.Header + "<items><item field=something></item></items>"))
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("multiple matches")))
+		})
+
+		It("should not match on wrong body", func() {
+			req := sling.New().Get("http://test.com")
+			req.Body(bytes.NewBufferString(xml.Header + "<items><item field=nothing></item></items>"))
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(502))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+		})
+
+		It("should match on the destination", func() {
+			req := sling.New().Get("http://destination.com")
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("multiple matches 2")))
+		})
+
+		It("should not match on wrong destination", func() {
+			req := sling.New().Get("http://destination.io")
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(502))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+		})
+	})
 })
