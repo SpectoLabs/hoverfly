@@ -36,6 +36,20 @@ func (this hoverflyModifyStub) ApplyMiddleware(pair models.RequestResponsePair) 
 	return pair, nil
 }
 
+func Test_ModifyMode_CanSetArguments(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := &modes.ModifyMode{
+		Hoverfly: hoverflyModifyStub{},
+	}
+
+	unit.SetArguments(map[string]string{
+		"test": "value",
+	})
+
+	Expect(unit.Arguments).To(HaveKeyWithValue("test", "value"))
+}
+
 func Test_ModifyMode_WhenGivenARequestItWillModifyTheRequestAndExecuteIt(t *testing.T) {
 	RegisterTestingT(t)
 
