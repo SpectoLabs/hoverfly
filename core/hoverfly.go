@@ -293,6 +293,19 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails) error {
+	body := &models.RequestFieldMatchers{
+		ExactMatch: util.StringToPointer(request.Body),
+	}
+
+	if util.GetContentTypeFromHeaders(request.Headers) == "json" {
+		body = &models.RequestFieldMatchers{
+			JsonMatch: util.StringToPointer(request.Body),
+		}
+	} else if util.GetContentTypeFromHeaders(request.Headers) == "xml" {
+		body = &models.RequestFieldMatchers{
+			XmlMatch: util.StringToPointer(request.Body),
+		}
+	}
 
 	pair := models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
@@ -311,9 +324,7 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 			Query: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer(request.Query),
 			},
-			Body: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer(request.Body),
-			},
+			Body:    body,
 			Headers: request.Headers,
 		},
 		Response: *response,
