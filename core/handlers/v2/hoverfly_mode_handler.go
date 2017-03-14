@@ -12,6 +12,7 @@ import (
 type HoverflyMode interface {
 	GetMode() string
 	SetMode(string) error
+	SetModeArguments(map[string]string)
 }
 
 type HoverflyModeHandler struct {
@@ -51,6 +52,8 @@ func (this *HoverflyModeHandler) Put(w http.ResponseWriter, r *http.Request, nex
 		handlers.WriteErrorResponse(w, err.Error(), 422)
 		return
 	}
+
+	this.Hoverfly.SetModeArguments(modeView.Arguments)
 
 	this.Get(w, r, next)
 }
