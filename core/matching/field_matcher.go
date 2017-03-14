@@ -5,36 +5,28 @@ import (
 )
 
 func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
-	matches := []bool{}
 	if field == nil {
 		return true
 	}
 
-	if field.ExactMatch != nil {
-		matches = append(matches, ExactMatch(*field.ExactMatch, toMatch))
+	if field.ExactMatch != nil && !ExactMatch(*field.ExactMatch, toMatch) {
+		return false
 	}
 
-	if field.XpathMatch != nil {
-		matches = append(matches, XpathMatch(*field.XpathMatch, toMatch))
+	if field.XpathMatch != nil && !XpathMatch(*field.XpathMatch, toMatch) {
+		return false
 	}
 
-	if field.JsonPathMatch != nil {
-		matches = append(matches, JsonPathMatch(*field.JsonPathMatch, toMatch))
+	if field.JsonPathMatch != nil && !JsonPathMatch(*field.JsonPathMatch, toMatch) {
+		return false
 	}
 
-	if field.RegexMatch != nil {
-		matches = append(matches, RegexMatch(*field.RegexMatch, toMatch))
+	if field.RegexMatch != nil && !RegexMatch(*field.RegexMatch, toMatch) {
+		return false
 	}
 
-	if field.GlobMatch != nil {
-		matches = append(matches, GlobMatch(*field.GlobMatch, toMatch))
-	}
-
-	for _, match := range matches {
-		if !match {
-			return false
-		}
-
+	if field.GlobMatch != nil && !GlobMatch(*field.GlobMatch, toMatch) {
+		return false
 	}
 
 	return true
