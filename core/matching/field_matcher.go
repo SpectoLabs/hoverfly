@@ -17,6 +17,10 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
 		return false
 	}
 
+	if field.JsonMatch != nil && !JsonMatch(*field.JsonMatch, toMatch) {
+		return false
+	}
+
 	if field.JsonPathMatch != nil && !JsonPathMatch(*field.JsonPathMatch, toMatch) {
 		return false
 	}
