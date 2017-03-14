@@ -28,6 +28,7 @@ const Capture = "capture"
 
 type Mode interface {
 	Process(*http.Request, models.RequestDetails) (*http.Response, error)
+	SetArguments(arguments map[string]string)
 }
 
 type Hoverfly interface {
