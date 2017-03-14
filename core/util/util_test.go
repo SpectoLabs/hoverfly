@@ -112,6 +112,34 @@ func Test_SortQueryString_PreservesBothEqualsAndNoEqualsWithEmptyValue(t *testin
 	Expect(SortQueryString("a&b&c=&d&e=&f=")).To(Equal("a&b&c=&d&e=&f="))
 }
 
+func Test_GetContentTypeFromHeaders_ReturnsEmptyStringIfHeadersAreNil(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(GetContentTypeFromHeaders(nil)).To(Equal(""))
+}
+
+func Test_GetContentTypeFromHeaders_ReturnsEmptyStringIfHeadersAreEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(GetContentTypeFromHeaders(map[string][]string{})).To(Equal(""))
+}
+
+func Test_GetContentTypeFromHeaders_ReturnsJsonIfJson(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(GetContentTypeFromHeaders(map[string][]string{
+		"Content-Type": []string{"application/json"},
+	})).To(Equal("json"))
+}
+
+func Test_GetContentTypeFromHeaders_ReturnsXmlIfXml(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(GetContentTypeFromHeaders(map[string][]string{
+		"Content-Type": []string{"application/xml"},
+	})).To(Equal("xml"))
+}
+
 func Test_MinifyJson_MinifiesJsonString(t *testing.T) {
 	RegisterTestingT(t)
 
