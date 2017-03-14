@@ -13,6 +13,10 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
 		return false
 	}
 
+	if field.XmlMatch != nil && !XmlMatch(*field.XmlMatch, toMatch) {
+		return false
+	}
+
 	if field.XpathMatch != nil && !XpathMatch(*field.XpathMatch, toMatch) {
 		return false
 	}
