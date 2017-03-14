@@ -15,62 +15,6 @@ func Test_FieldMatcher_MatchesTrueWithNilMatchers(t *testing.T) {
 	Expect(matching.FieldMatcher(nil, "no")).To(BeTrue())
 }
 
-func Test_FieldMatcher_MatchesFalseWithInvalidJsonPath(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.FieldMatcher(&models.RequestFieldMatchers{
-		JsonPathMatch: util.StringToPointer("test"),
-	}, `{"test": "field"}`)).To(BeFalse())
-}
-
-func Test_FieldMatcher_MatchesTrueWithJsonMatch_GetSingleElement(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.FieldMatcher(&models.RequestFieldMatchers{
-		JsonPathMatch: util.StringToPointer("$.test"),
-	}, `{"test": "field"}`)).To(BeTrue())
-}
-
-func Test_FieldMatcher_MatchesFalseWithIncorrectJsonMatch_GetSingleElement(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.FieldMatcher(&models.RequestFieldMatchers{
-		JsonPathMatch: util.StringToPointer("$.notAField"),
-	}, `{"test": "field"}`)).To(BeFalse())
-}
-
-func Test_FieldMatcher_MatchesTrueWithJsonMatch_GetElementFromArray(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.FieldMatcher(&models.RequestFieldMatchers{
-		JsonPathMatch: util.StringToPointer("$.test[1]"),
-	}, `{"test": [{}, {}]}`)).To(BeTrue())
-}
-
-func Test_FieldMatcher_MatchesFalseWithIncorrectJsonMatch_GetElementFromArray(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.FieldMatcher(&models.RequestFieldMatchers{
-		JsonPathMatch: util.StringToPointer("$.test[2]"),
-	}, `{"test": [{}, {}]}`)).To(BeFalse())
-}
-
-func Test_FieldMatcher_MatchesTrueWithJsonMatch_WithExpression(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.FieldMatcher(&models.RequestFieldMatchers{
-		JsonPathMatch: util.StringToPointer("$.test[*]?(@.field == \"test\")"),
-	}, `{"test": [{"field": "test"}]}`)).To(BeTrue())
-}
-
-func Test_FieldMatcher_MatchesFalseWithIncorrectJsonMatch_WithExpression(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.FieldMatcher(&models.RequestFieldMatchers{
-		JsonPathMatch: util.StringToPointer("$.test[*]?(@.field == \"test\")"),
-	}, `{"test": [{"field": "not-test"}]}`)).To(BeFalse())
-}
-
 func Test_FieldMatcher_MatchesTrueWithRegexMatch(t *testing.T) {
 	RegisterTestingT(t)
 
