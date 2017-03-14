@@ -11,6 +11,7 @@ import (
 
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/json"
+	"github.com/tdewolff/minify/xml"
 )
 
 // GetRequestBody will read the http.Request body io.ReadCloser
@@ -101,6 +102,7 @@ func GetMinifier() *minify.M {
 	if minifier == nil {
 		minifier = minify.New()
 		minifier.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
+		minifier.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
 	}
 
 	return minifier
@@ -110,4 +112,10 @@ func MinifyJson(toMinify string) (string, error) {
 	minifier := GetMinifier()
 
 	return minifier.String("application/json", toMinify)
+}
+
+func MinifyXml(toMinify string) (string, error) {
+	minifier := GetMinifier()
+
+	return minifier.String("application/xml", toMinify)
 }

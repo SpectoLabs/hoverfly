@@ -137,3 +137,19 @@ func Test_MinifyJson_ErrorsOnInvalidJsonString(t *testing.T) {
 
 	Expect(err).ToNot(BeNil())
 }
+
+func Test_MinifyXml_MinifiesXmlString(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(MinifyXml(`<xml>
+		<document  key="value">test</document>
+	</xml>`)).To(Equal(`<xml><document key="value">test</document></xml>`))
+}
+
+func Test_MinifyXml_SimplifiesXmlString(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(MinifyXml(`<xml>
+		<document></document>
+	</xml>`)).To(Equal(`<xml><document/></xml>`))
+}
