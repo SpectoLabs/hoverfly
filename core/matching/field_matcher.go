@@ -27,7 +27,7 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) bool {
 	}
 
 	if field.GlobMatch != nil {
-		matches = append(matches, GlobMatch(field.GlobMatch, toMatch))
+		matches = append(matches, GlobMatch(*field.GlobMatch, toMatch))
 	}
 
 	for _, match := range matches {
