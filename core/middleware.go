@@ -227,6 +227,7 @@ func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair
 	}
 
 	req, err := http.NewRequest("POST", this.Remote, bytes.NewBuffer(pairViewBytes))
+	req.Header.Add("Content-Type", "application/json")
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
