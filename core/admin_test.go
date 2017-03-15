@@ -54,7 +54,7 @@ func TestGetRecordsCountWRecords(t *testing.T) {
 			Query:       fmt.Sprintf("q=%d", i),
 		}
 
-		unit.Save(req, &models.ResponseDetails{})
+		unit.Save(req, &models.ResponseDetails{}, nil)
 	}
 	// performing query
 	m := adminApi.getBoneRouter(unit)
@@ -420,7 +420,7 @@ func TestStatsHandlerRecordCountMetrics(t *testing.T) {
 		resp := &http.Response{}
 		resp.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 
-		unit.Save(req, &models.ResponseDetails{})
+		unit.Save(req, &models.ResponseDetails{}, nil)
 	}
 
 	req, err := http.NewRequest("GET", "/api/stats", nil)
