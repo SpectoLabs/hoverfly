@@ -100,6 +100,41 @@ func TestPutSetsTheArguments(t *testing.T) {
 	Expect(stubHoverfly.Arguments).To(HaveKeyWithValue("test", "argument"))
 }
 
+func TestPutResetsTheArgumentsWhenNotSet(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyModeStub{Mode: "test-mode"}
+	unit := HoverflyModeHandler{Hoverfly: stubHoverfly}
+
+	modeView := &ModeView{Arguments: map[string]string{
+		"test": "argument",
+	}}
+
+	bodyBytes, err := json.Marshal(modeView)
+	Expect(err).To(BeNil())
+
+	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/mode", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Put, request)
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	modeView.Arguments = nil
+	bodyBytes, err = json.Marshal(modeView)
+	Expect(err).To(BeNil())
+
+	request, err = http.NewRequest("PUT", "/api/v2/hoverfly/mode", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	Expect(err).To(BeNil())
+
+	response = makeRequestOnHandler(unit.Put, request)
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	_, err = unmarshalModeView(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(stubHoverfly.Arguments).To(BeEmpty())
+}
+
 func TestPutWill422ErrorIfHoverflyErrors(t *testing.T) {
 	RegisterTestingT(t)
 
