@@ -537,7 +537,7 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 		Body:    "testresponsebody",
 		Headers: map[string][]string{"testheader": []string{"testvalue"}},
 		Status:  200,
-	})
+	}, nil)
 
 	Expect(unit.Simulation.Templates).To(HaveLen(1))
 
@@ -565,7 +565,7 @@ func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing
 		Body:    "testresponsebody",
 		Headers: map[string][]string{"testheader": []string{"testvalue"}},
 		Status:  200,
-	})
+	}, nil)
 
 	Expect(unit.Simulation.Templates).To(HaveLen(1))
 
@@ -592,7 +592,7 @@ func Test_Hoverfly_Save_SavesRequestBodyAsJsonPathIfContentTypeIsJson(t *testing
 		Headers: map[string][]string{
 			"Content-Type": []string{"application/json"},
 		},
-	}, &models.ResponseDetails{})
+	}, &models.ResponseDetails{}, nil)
 
 	Expect(unit.Simulation.Templates).To(HaveLen(1))
 
@@ -609,7 +609,7 @@ func Test_Hoverfly_Save_SavesRequestBodyAsXmlPathIfContentTypeIsXml(t *testing.T
 		Headers: map[string][]string{
 			"Content-Type": []string{"application/xml"},
 		},
-	}, &models.ResponseDetails{})
+	}, &models.ResponseDetails{}, nil)
 
 	Expect(unit.Simulation.Templates).To(HaveLen(1))
 
