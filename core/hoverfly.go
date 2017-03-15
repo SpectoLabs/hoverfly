@@ -307,6 +307,20 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		}
 	}
 
+	var headers map[string][]string
+
+	if headersToSave != nil && len(headersToSave) == 0 {
+		headers = request.Headers
+	} else if len(headersToSave) > 0 {
+		headers = map[string][]string{}
+		for _, header := range headersToSave {
+			headerValues := request.Headers[header]
+			if len(headerValues) > 0 {
+				headers[header] = headerValues
+			}
+		}
+	}
+
 	pair := models.RequestTemplateResponsePair{
 		RequestTemplate: models.RequestTemplate{
 			Path: &models.RequestFieldMatchers{
@@ -325,7 +339,7 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 				ExactMatch: util.StringToPointer(request.Query),
 			},
 			Body:    body,
-			Headers: request.Headers,
+			Headers: headers,
 		},
 		Response: *response,
 	}
