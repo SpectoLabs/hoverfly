@@ -543,7 +543,6 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Body.ExactMatch).To(Equal("testbody"))
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Destination.ExactMatch).To(Equal("testdestination"))
-	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Method.ExactMatch).To(Equal("testmethod"))
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Path.ExactMatch).To(Equal("/testpath"))
 	Expect(*unit.Simulation.Templates[0].RequestTemplate.Query.ExactMatch).To(Equal("?query=test"))
@@ -552,6 +551,104 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 	Expect(unit.Simulation.Templates[0].Response.Body).To(Equal("testresponsebody"))
 	Expect(unit.Simulation.Templates[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
 	Expect(unit.Simulation.Templates[0].Response.Status).To(Equal(200))
+}
+
+func Test_Hoverfly_Save_DoesNotSaveRequestHeadersWhenGivenHeadersArrayIsNil(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Save(&models.RequestDetails{
+		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+	}, &models.ResponseDetails{
+		Body:    "testresponsebody",
+		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Status:  200,
+	}, nil)
+
+	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(BeEmpty())
+}
+
+func Test_Hoverfly_Save_SavesAllRequestHeadersWhenGivenEmptyHeadersArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Save(&models.RequestDetails{
+		Headers: map[string][]string{
+			"testheader":  []string{"testvalue"},
+			"testheader2": []string{"testvalue2"},
+		},
+	}, &models.ResponseDetails{
+		Body:    "testresponsebody",
+		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Status:  200,
+	}, []string{})
+
+	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveLen(2))
+	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader2", []string{"testvalue2"}))
+}
+
+func Test_Hoverfly_Save_SavesSpecificRequestHeadersWhenSpecifiedInHeadersArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Save(&models.RequestDetails{
+		Headers: map[string][]string{
+			"testheader":  []string{"testvalue"},
+			"testheader2": []string{"testvalue2"},
+		},
+	}, &models.ResponseDetails{
+		Body:    "testresponsebody",
+		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Status:  200,
+	}, []string{"testheader"})
+
+	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveLen(1))
+	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+}
+
+func Test_Hoverfly_Save_DoesNotSaveAnyRequestHeaderIfItDoesNotMatchEntryInHeadersArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Save(&models.RequestDetails{
+		Headers: map[string][]string{
+			"testheader":  []string{"testvalue"},
+			"testheader2": []string{"testvalue2"},
+		},
+	}, &models.ResponseDetails{
+		Body:    "testresponsebody",
+		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Status:  200,
+	}, []string{"nonmatch"})
+
+	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(BeEmpty())
+}
+
+func Test_Hoverfly_Save_SavesMultipleRequestHeadersWhenMultiplesSpecifiedInHeadersArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Save(&models.RequestDetails{
+		Headers: map[string][]string{
+			"testheader":  []string{"testvalue"},
+			"testheader2": []string{"testvalue2"},
+			"nonmatch":    []string{"nonmatchvalue"},
+		},
+	}, &models.ResponseDetails{
+		Body:    "testresponsebody",
+		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Status:  200,
+	}, []string{"testheader", "nonmatch"})
+
+	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveLen(2))
+	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("nonmatch", []string{"nonmatchvalue"}))
 }
 
 func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing.T) {
