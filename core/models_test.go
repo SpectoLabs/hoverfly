@@ -81,7 +81,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 			Body:   fmt.Sprintf("body here, number=%d", i),
 		}
 
-		dbClient.Save(req, resp)
+		dbClient.Save(req, resp, nil)
 	}
 
 	// now getting responses

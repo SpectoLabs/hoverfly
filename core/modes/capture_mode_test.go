@@ -15,6 +15,7 @@ import (
 type hoverflyCaptureStub struct {
 	SavedRequest  *models.RequestDetails
 	SavedResponse *models.ResponseDetails
+	SavedHeaders  []string
 	MiddlewareSet bool
 }
 
@@ -37,9 +38,10 @@ func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Response
 }
 
 // Save - Stub implementation of modes.HoverflyCapture interface
-func (this *hoverflyCaptureStub) Save(request *models.RequestDetails, response *models.ResponseDetails) error {
+func (this *hoverflyCaptureStub) Save(request *models.RequestDetails, response *models.ResponseDetails, headersToSave []string) error {
 	this.SavedRequest = request
 	this.SavedResponse = response
+	this.SavedHeaders = headersToSave
 
 	return nil
 }

@@ -129,7 +129,7 @@ func TestGetMultipleRecords(t *testing.T) {
 		}, &models.ResponseDetails{
 			Status: 201,
 			Body:   "ok",
-		})
+		}, nil)
 	}
 
 	// getting requests
