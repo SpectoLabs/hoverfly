@@ -56,7 +56,7 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 	}
 
 	// saving response body with request/response meta to cache
-	err = this.Hoverfly.Save(&pair.Request, responseObj, nil)
+	err = this.Hoverfly.Save(&pair.Request, responseObj, []string{})
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when saving request and response", Capture)
 	}
