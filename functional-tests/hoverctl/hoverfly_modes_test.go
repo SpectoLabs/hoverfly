@@ -84,6 +84,45 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				Expect(hoverfly.GetMode()).To(Equal(capture))
 			})
 
+			It("to capture mode and capture all request headers", func() {
+				output := functional_tests.Run(hoverctlBinary, "mode", "capture", "--all-headers")
+
+				Expect(output).To(ContainSubstring("Hoverfly has been set to capture mode and will capture all request headers"))
+
+				output = functional_tests.Run(hoverctlBinary, "mode")
+
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to capture mode"))
+				Expect(hoverfly.GetMode()).To(Equal(capture))
+			})
+
+			It("to capture mode and capture one request header", func() {
+				output := functional_tests.Run(hoverctlBinary, "mode", "capture", "--headers", "Content-Type")
+
+				Expect(output).To(ContainSubstring("Hoverfly has been set to capture mode and will capture Content-Type request header"))
+
+				output = functional_tests.Run(hoverctlBinary, "mode")
+
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to capture mode"))
+				Expect(hoverfly.GetMode()).To(Equal(capture))
+			})
+
+			It("to capture mode and capture two request headers", func() {
+				output := functional_tests.Run(hoverctlBinary, "mode", "capture", "--headers", "Content-Type,User-Agent")
+
+				Expect(output).To(ContainSubstring("Hoverfly has been set to capture mode and will capture Content-Type,User-Agent request headers"))
+
+				output = functional_tests.Run(hoverctlBinary, "mode")
+
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to capture mode"))
+				Expect(hoverfly.GetMode()).To(Equal(capture))
+			})
+
+			It("to capture mode and error if one of the headers is an asterisk", func() {
+				output := functional_tests.Run(hoverctlBinary, "mode", "capture", "--headers", "Content-Type,*")
+
+				Expect(output).To(ContainSubstring("Must provide a list containing only an asterix, or a list containing only headers names"))
+			})
+
 			It("to synthesize mode", func() {
 				output := functional_tests.Run(hoverctlBinary, "mode", "synthesize")
 
