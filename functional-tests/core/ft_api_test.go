@@ -79,7 +79,7 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"mode":"simulate"}`)))
+			Expect(modeJson).To(Equal([]byte(`{"mode":"simulate","arguments":{}}`)))
 		})
 	})
 
@@ -92,13 +92,13 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"mode":"capture"}`)))
+			Expect(modeJson).To(Equal([]byte(`{"mode":"capture","arguments":{}}`)))
 
 			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
 			res = functional_tests.DoRequest(req)
 			modeJson, err = ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"mode":"capture"}`)))
+			Expect(modeJson).To(Equal([]byte(`{"mode":"capture","arguments":{}}`)))
 		})
 
 	})

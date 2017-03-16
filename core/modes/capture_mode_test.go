@@ -53,11 +53,12 @@ func Test_CaptureMode_CanSetArguments(t *testing.T) {
 		Hoverfly: &hoverflyCaptureStub{},
 	}
 
-	unit.SetArguments(map[string]string{
-		"test": "value",
+	unit.SetArguments(modes.ModeArguments{
+		Headers: []string{"value", "two"},
 	})
 
-	Expect(unit.Arguments).To(HaveKeyWithValue("test", "value"))
+	Expect(unit.Arguments.Headers).To(ContainElement("value"))
+	Expect(unit.Arguments.Headers).To(ContainElement("two"))
 }
 
 func Test_CaptureMode_WhenGivenARequestItWillMakeTheRequestAndSaveIt(t *testing.T) {
@@ -91,7 +92,7 @@ func Test_CaptureMode_WhenGivenARequestItWillMakeTheRequestAndSaveIt(t *testing.
 	Expect(hoverflyStub.SavedResponse.Body).To(Equal("test"))
 }
 
-func Test_CaptureMode_IfHeadersArgumentNotSet_CallsSaveWithNilList(t *testing.T) {
+func Test_CaptureMode_IfHeadersArgumentNotSet_CallsSaveWithEmptyList(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverflyStub := &hoverflyCaptureStub{}
@@ -110,8 +111,7 @@ func Test_CaptureMode_IfHeadersArgumentNotSet_CallsSaveWithNilList(t *testing.T)
 	_, err := unit.Process(request, requestDetails)
 	Expect(err).To(BeNil())
 
-	Expect(hoverflyStub.SavedHeaders).To(HaveLen(1))
-	Expect(hoverflyStub.SavedHeaders).To(ContainElement(""))
+	Expect(hoverflyStub.SavedHeaders).To(HaveLen(0))
 }
 
 func Test_CaptureMode_IfHeadersArgumentSetToAll_CallsSaveWithEmptyList(t *testing.T) {
@@ -128,7 +128,9 @@ func Test_CaptureMode_IfHeadersArgumentSetToAll_CallsSaveWithEmptyList(t *testin
 		Destination: "positive-match.com",
 	}
 
-	unit.SetArguments(map[string]string{"headers": "*"})
+	unit.SetArguments(modes.ModeArguments{
+		Headers: []string{"*"},
+	})
 
 	request, _ := http.NewRequest("GET", "http://positive-match.com", nil)
 
@@ -153,7 +155,9 @@ func Test_CaptureMode_IfHeadersArgumentSetToOneHeaders_CallsSaveWithOneHeaderLis
 		Destination: "positive-match.com",
 	}
 
-	unit.SetArguments(map[string]string{"headers": "Content-Type"})
+	unit.SetArguments(modes.ModeArguments{
+		Headers: []string{"Content-Type"},
+	})
 
 	request, _ := http.NewRequest("GET", "http://positive-match.com", nil)
 
