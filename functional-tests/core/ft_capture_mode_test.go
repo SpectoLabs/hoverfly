@@ -82,10 +82,6 @@ var _ = Describe("When I run Hoverfly", func() {
 					Body: &v2.RequestFieldMatchersView{
 						ExactMatch: util.StringToPointer(""),
 					},
-					Headers: map[string][]string{
-						"Accept-Encoding": []string{"gzip"},
-						"User-Agent":      []string{"Go-http-client/1.1"},
-					},
 				}))
 
 				Expect(payload.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsView{
