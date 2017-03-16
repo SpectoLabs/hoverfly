@@ -34,7 +34,7 @@ func Test_Match_EmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 	}
 	result, _ := unit.Match(r, false, simulation)
 
-	Expect(result.Body).To(Equal("test-body"))
+	Expect(result.Response.Body).To(Equal("test-body"))
 }
 
 func Test_Match_TemplateShouldMatchOnBody(t *testing.T) {
@@ -59,7 +59,7 @@ func Test_Match_TemplateShouldMatchOnBody(t *testing.T) {
 	result, err := unit.Match(r, false, simulation)
 	Expect(err).To(BeNil())
 
-	Expect(result.Body).To(Equal("body"))
+	Expect(result.Response.Body).To(Equal("body"))
 }
 
 func Test_Match_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
@@ -92,7 +92,7 @@ func Test_Match_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
 
 	result, _ := unit.Match(r, false, simulation)
 
-	Expect(result.Body).To(Equal("test-body"))
+	Expect(result.Response.Body).To(Equal("test-body"))
 }
 
 func Test_Match_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
@@ -189,7 +189,7 @@ func Test_Match_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 	}
 	result, _ := unit.Match(r, false, simulation)
 
-	Expect(result.Body).To(Equal("test-body"))
+	Expect(result.Response.Body).To(Equal("test-body"))
 }
 
 func Test_Match_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
@@ -273,7 +273,7 @@ func Test_Match_EndpointMatchWithHeaders(t *testing.T) {
 	}
 	result, _ := unit.Match(r, false, simulation)
 
-	Expect(result.Body).To(Equal("test-body"))
+	Expect(result.Response.Body).To(Equal("test-body"))
 }
 
 func Test_Match_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
@@ -365,7 +365,7 @@ func Test_Match_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 	}
 	result, _ := unit.Match(r, false, simulation)
 
-	Expect(result.Body).To(Equal("test-body"))
+	Expect(result.Response.Body).To(Equal("test-body"))
 
 	r = models.RequestDetails{
 		Method:      "GET",
@@ -431,7 +431,7 @@ func Test_Match_TemplatesCanUseGlobsAndBeMatched(t *testing.T) {
 	response, err := unit.Match(request, false, simulation)
 	Expect(err).To(BeNil())
 
-	Expect(response.Body).To(Equal("template matched"))
+	Expect(response.Response.Body).To(Equal("template matched"))
 }
 
 func Test_Match_TemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
@@ -460,7 +460,7 @@ func Test_Match_TemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 	response, err := unit.Match(request, false, simulation)
 	Expect(err).To(BeNil())
 
-	Expect(response.Body).To(Equal("template matched"))
+	Expect(response.Response.Body).To(Equal("template matched"))
 }
 
 func Test_Match_TemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
@@ -491,7 +491,7 @@ func Test_Match_TemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 	response, err := unit.Match(request, false, simulation)
 	Expect(err).To(BeNil())
 
-	Expect(response.Body).To(Equal("template matched"))
+	Expect(response.Response.Body).To(Equal("template matched"))
 }
 
 func Test_Match_RequestTemplateResponsePair_ConvertToRequestResponsePairView_CanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
