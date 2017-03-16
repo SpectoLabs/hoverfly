@@ -156,7 +156,7 @@ func TestPutWill422ErrorIfHoverflyErrors(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
-	Expect(response.Code).To(Equal(http.StatusUnprocessableEntity))
+	Expect(response.Code).To(Equal(http.StatusBadRequest))
 
 	errorViewResponse, err := unmarshalErrorView(response.Body)
 	Expect(err).To(BeNil())
