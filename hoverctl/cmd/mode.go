@@ -39,13 +39,10 @@ mode is shown.
 
 				headersMessage = "and will capture all request headers"
 			} else if len(specficHeaders) > 0 {
-				modeView.Arguments.Headers = append(modeView.Arguments.Headers, strings.Split(specficHeaders, ",")...)
+				splitHeaders := strings.Split(specficHeaders, ",")
+				modeView.Arguments.Headers = append(modeView.Arguments.Headers, splitHeaders...)
 
-				if strings.Contains(specficHeaders, ",") {
-					headersMessage = "and will capture " + specficHeaders + " request headers"
-				} else {
-					headersMessage = "and will capture " + specficHeaders + " request header"
-				}
+				headersMessage = fmt.Sprintln("and will capture the following request headers:", splitHeaders)
 			}
 
 			mode, err := hoverfly.SetModeWithArguments(modeView)
@@ -59,7 +56,7 @@ mode is shown.
 func init() {
 	RootCmd.AddCommand(modeCmd)
 	modeCmd.PersistentFlags().StringVar(&specficHeaders, "headers", "",
-		"?")
+		"A comma separated list of headers to record in capture mode `Content-Type,Authorization`")
 	modeCmd.PersistentFlags().BoolVar(&allHeaders, "all-headers", false,
-		"?")
+		"Record all headers in capture mode")
 }
