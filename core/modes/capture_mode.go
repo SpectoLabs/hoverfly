@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -55,8 +56,15 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		Headers: response.Header,
 	}
 
+	var headersToSave []string
+	if this.Arguments["headers"] == "*" {
+		headersToSave = []string{}
+	} else if this.Arguments["headers"] != "" {
+		headersToSave = strings.Split(this.Arguments["headers"], ",")
+	}
+
 	// saving response body with request/response meta to cache
-	err = this.Hoverfly.Save(&pair.Request, responseObj, []string{})
+	err = this.Hoverfly.Save(&pair.Request, responseObj, headersToSave)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when saving request and response", Capture)
 	}
