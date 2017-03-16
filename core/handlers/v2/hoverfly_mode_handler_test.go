@@ -12,31 +12,29 @@ import (
 )
 
 type HoverflyModeStub struct {
-	Mode      string
-	Arguments ModeArgumentsView
+	ModeView ModeView
 }
 
 func (this HoverflyModeStub) GetMode() string {
-	return this.Mode
+	return this.ModeView.Mode
 }
 
-func (this *HoverflyModeStub) SetMode(mode string) error {
-	this.Mode = mode
-	if mode == "error" {
+func (this *HoverflyModeStub) SetModeWithArguments(modeView ModeView) error {
+	this.ModeView = modeView
+	if modeView.Mode == "error" {
 		return fmt.Errorf("This is an error")
 	}
 
 	return nil
 }
 
-func (this *HoverflyModeStub) SetModeArguments(arguments ModeArgumentsView) {
-	this.Arguments = arguments
-}
-
 func TestGetReturnsTheCorrectModeAndArguments(t *testing.T) {
 	RegisterTestingT(t)
 
-	stubHoverfly := &HoverflyModeStub{Mode: "test-mode"}
+	stubHoverfly := &HoverflyModeStub{ModeView{
+		Mode: "test-mode",
+	}}
+
 	unit := HoverflyModeHandler{Hoverfly: stubHoverfly}
 
 	request, err := http.NewRequest("GET", "/api/v2/hoverfly/mode", nil)
@@ -54,7 +52,9 @@ func TestGetReturnsTheCorrectModeAndArguments(t *testing.T) {
 func TestPutSetsTheNewModeAndReplacesTheTestMode(t *testing.T) {
 	RegisterTestingT(t)
 
-	stubHoverfly := &HoverflyModeStub{Mode: "test-mode"}
+	stubHoverfly := &HoverflyModeStub{ModeView{
+		Mode: "test-mode",
+	}}
 	unit := HoverflyModeHandler{Hoverfly: stubHoverfly}
 
 	modeView := &ModeView{Mode: "new-mode"}
@@ -67,7 +67,7 @@ func TestPutSetsTheNewModeAndReplacesTheTestMode(t *testing.T) {
 
 	response := makeRequestOnHandler(unit.Put, request)
 	Expect(response.Code).To(Equal(http.StatusOK))
-	Expect(stubHoverfly.Mode).To(Equal("new-mode"))
+	Expect(stubHoverfly.ModeView.Mode).To(Equal("new-mode"))
 
 	modeViewResponse, err := unmarshalModeView(response.Body)
 	Expect(err).To(BeNil())
@@ -78,7 +78,10 @@ func TestPutSetsTheNewModeAndReplacesTheTestMode(t *testing.T) {
 func TestPutSetsTheArguments(t *testing.T) {
 	RegisterTestingT(t)
 
-	stubHoverfly := &HoverflyModeStub{Mode: "test-mode"}
+	stubHoverfly := &HoverflyModeStub{ModeView{
+		Mode: "test-mode",
+	}}
+
 	unit := HoverflyModeHandler{Hoverfly: stubHoverfly}
 
 	modeView := &ModeView{Arguments: ModeArgumentsView{
@@ -97,13 +100,16 @@ func TestPutSetsTheArguments(t *testing.T) {
 	_, err = unmarshalModeView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(stubHoverfly.Arguments.Headers).To(ContainElement("argument"))
+	Expect(stubHoverfly.ModeView.Arguments.Headers).To(ContainElement("argument"))
 }
 
 func TestPutResetsTheArgumentsWhenNotSet(t *testing.T) {
 	RegisterTestingT(t)
 
-	stubHoverfly := &HoverflyModeStub{Mode: "test-mode"}
+	stubHoverfly := &HoverflyModeStub{ModeView{
+		Mode: "test-mode",
+	}}
+
 	unit := HoverflyModeHandler{Hoverfly: stubHoverfly}
 
 	modeView := &ModeView{Arguments: ModeArgumentsView{
@@ -132,7 +138,7 @@ func TestPutResetsTheArgumentsWhenNotSet(t *testing.T) {
 	_, err = unmarshalModeView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(stubHoverfly.Arguments).To(Equal(ModeArgumentsView{}))
+	Expect(stubHoverfly.ModeView.Arguments).To(Equal(ModeArgumentsView{}))
 }
 
 func TestPutWill422ErrorIfHoverflyErrors(t *testing.T) {
