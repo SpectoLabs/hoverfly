@@ -91,6 +91,77 @@ func Test_CaptureMode_WhenGivenARequestItWillMakeTheRequestAndSaveIt(t *testing.
 	Expect(hoverflyStub.SavedResponse.Body).To(Equal("test"))
 }
 
+func Test_CaptureMode_IfHeadersArgumentNotSet_CallsSaveWithNilList(t *testing.T) {
+	RegisterTestingT(t)
+
+	hoverflyStub := &hoverflyCaptureStub{}
+
+	unit := &modes.CaptureMode{
+		Hoverfly: hoverflyStub,
+	}
+
+	requestDetails := models.RequestDetails{
+		Scheme:      "http",
+		Destination: "positive-match.com",
+	}
+
+	request, _ := http.NewRequest("GET", "http://positive-match.com", nil)
+
+	_, err := unit.Process(request, requestDetails)
+	Expect(err).To(BeNil())
+
+	Expect(hoverflyStub.SavedHeaders).To(BeNil())
+}
+
+func Test_CaptureMode_IfHeadersArgumentSetToAll_CallsSaveWithEmptyList(t *testing.T) {
+	RegisterTestingT(t)
+
+	hoverflyStub := &hoverflyCaptureStub{}
+
+	unit := &modes.CaptureMode{
+		Hoverfly: hoverflyStub,
+	}
+
+	requestDetails := models.RequestDetails{
+		Scheme:      "http",
+		Destination: "positive-match.com",
+	}
+
+	unit.SetArguments(map[string]string{"headers": "*"})
+
+	request, _ := http.NewRequest("GET", "http://positive-match.com", nil)
+
+	_, err := unit.Process(request, requestDetails)
+	Expect(err).To(BeNil())
+
+	Expect(hoverflyStub.SavedHeaders).To(HaveLen(0))
+}
+
+func Test_CaptureMode_IfHeadersArgumentSetToOneHeaders_CallsSaveWithOneHeaderList(t *testing.T) {
+	RegisterTestingT(t)
+
+	hoverflyStub := &hoverflyCaptureStub{}
+
+	unit := &modes.CaptureMode{
+		Hoverfly: hoverflyStub,
+	}
+
+	requestDetails := models.RequestDetails{
+		Scheme:      "http",
+		Destination: "positive-match.com",
+	}
+
+	unit.SetArguments(map[string]string{"headers": "Content-Type"})
+
+	request, _ := http.NewRequest("GET", "http://positive-match.com", nil)
+
+	_, err := unit.Process(request, requestDetails)
+	Expect(err).To(BeNil())
+
+	Expect(hoverflyStub.SavedHeaders).To(HaveLen(1))
+	Expect(hoverflyStub.SavedHeaders).To(ContainElement("Content-Type"))
+}
+
 func Test_CaptureMode_WhenGivenABadRequestItWillError(t *testing.T) {
 	RegisterTestingT(t)
 
