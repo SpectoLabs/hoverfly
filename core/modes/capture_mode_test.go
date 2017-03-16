@@ -110,7 +110,8 @@ func Test_CaptureMode_IfHeadersArgumentNotSet_CallsSaveWithNilList(t *testing.T)
 	_, err := unit.Process(request, requestDetails)
 	Expect(err).To(BeNil())
 
-	Expect(hoverflyStub.SavedHeaders).To(BeNil())
+	Expect(hoverflyStub.SavedHeaders).To(HaveLen(1))
+	Expect(hoverflyStub.SavedHeaders).To(ContainElement(""))
 }
 
 func Test_CaptureMode_IfHeadersArgumentSetToAll_CallsSaveWithEmptyList(t *testing.T) {
@@ -134,7 +135,8 @@ func Test_CaptureMode_IfHeadersArgumentSetToAll_CallsSaveWithEmptyList(t *testin
 	_, err := unit.Process(request, requestDetails)
 	Expect(err).To(BeNil())
 
-	Expect(hoverflyStub.SavedHeaders).To(HaveLen(0))
+	Expect(hoverflyStub.SavedHeaders).To(HaveLen(1))
+	Expect(hoverflyStub.SavedHeaders).To(ContainElement("*"))
 }
 
 func Test_CaptureMode_IfHeadersArgumentSetToOneHeaders_CallsSaveWithOneHeaderList(t *testing.T) {
