@@ -10,7 +10,7 @@ import (
 
 type TemplateMatcher struct{}
 
-func (t TemplateMatcher) Match(req models.RequestDetails, webserver bool, simulation *models.Simulation) (*models.ResponseDetails, error) {
+func (t TemplateMatcher) Match(req models.RequestDetails, webserver bool, simulation *models.Simulation) (*models.RequestTemplateResponsePair, error) {
 	// iterate through the request templates, looking for template to match request
 	for _, entry := range simulation.Templates {
 		// TODO: not matching by default on URL and body - need to enable this
@@ -46,7 +46,10 @@ func (t TemplateMatcher) Match(req models.RequestDetails, webserver bool, simula
 		}
 
 		// return the first template to match
-		return &entry.Response, nil
+		return &models.RequestTemplateResponsePair{
+			RequestTemplate: template,
+			Response:        entry.Response,
+		}, nil
 	}
 	return nil, errors.New("No match found")
 }
