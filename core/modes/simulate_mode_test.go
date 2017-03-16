@@ -34,20 +34,6 @@ func (this hoverflySimulateStub) ApplyMiddleware(pair models.RequestResponsePair
 	return pair, nil
 }
 
-func Test_SimulateMode_CanSetArguments(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := &modes.SimulateMode{
-		Hoverfly: hoverflySimulateStub{},
-	}
-
-	unit.SetArguments(map[string]string{
-		"test": "value",
-	})
-
-	Expect(unit.Arguments).To(HaveKeyWithValue("test", "value"))
-}
-
 func Test_SimulateMode_WhenGivenAMatchingRequestItReturnsTheCorrectResponse(t *testing.T) {
 	RegisterTestingT(t)
 
