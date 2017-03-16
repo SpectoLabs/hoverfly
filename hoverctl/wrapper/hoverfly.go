@@ -125,7 +125,7 @@ func (h *Hoverfly) SetMode(mode string) (string, error) {
 		return "", err
 	}
 
-	if response.StatusCode == 422 {
+	if response.StatusCode == http.StatusBadRequest {
 		return "", errors.New("Cannot change the mode of Hoverfly to capture when running as a webserver")
 	}
 
