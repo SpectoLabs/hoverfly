@@ -97,6 +97,101 @@ var _ = Describe("When I run Hoverfly", func() {
 				}))
 			})
 
+			It("Should capture all request headers if argument is set to *", func() {
+				hoverfly.SetModeWithArgs("capture", map[string]string{
+					"headers": "*",
+				})
+
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "text/plain")
+					w.Header().Set("Date", "date")
+					w.Write([]byte("Hello world"))
+				}))
+
+				defer fakeServer.Close()
+
+				resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL))
+				Expect(resp.StatusCode).To(Equal(200))
+
+				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
+				Expect(err).To(BeNil())
+
+				payload := v2.SimulationViewV2{}
+
+				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
+				Expect(payload.RequestResponsePairs).To(HaveLen(1))
+
+				Expect(payload.RequestResponsePairs[0].Request.Headers).To(Equal(
+					map[string][]string{
+						"Accept-Encoding": []string{"gzip"},
+						"User-Agent":      []string{"Go-http-client/1.1"},
+					},
+				))
+			})
+
+			It("Should capture User-Agent request headers if argument is set to User-Agent", func() {
+				hoverfly.SetModeWithArgs("capture", map[string]string{
+					"headers": "User-Agent",
+				})
+
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "text/plain")
+					w.Header().Set("Date", "date")
+					w.Write([]byte("Hello world"))
+				}))
+
+				defer fakeServer.Close()
+
+				resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL))
+				Expect(resp.StatusCode).To(Equal(200))
+
+				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
+				Expect(err).To(BeNil())
+
+				payload := v2.SimulationViewV2{}
+
+				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
+				Expect(payload.RequestResponsePairs).To(HaveLen(1))
+
+				Expect(payload.RequestResponsePairs[0].Request.Headers).To(Equal(
+					map[string][]string{
+						"User-Agent": []string{"Go-http-client/1.1"},
+					},
+				))
+			})
+
+			It("Should capture User-Agent and Test request headers if argument is set to User-Agent,Test", func() {
+				hoverfly.SetModeWithArgs("capture", map[string]string{
+					"headers": "User-Agent,Test",
+				})
+
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "text/plain")
+					w.Header().Set("Date", "date")
+					w.Write([]byte("Hello world"))
+				}))
+
+				defer fakeServer.Close()
+
+				resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL).Add("Test", "value"))
+				Expect(resp.StatusCode).To(Equal(200))
+
+				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
+				Expect(err).To(BeNil())
+
+				payload := v2.SimulationViewV2{}
+
+				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
+				Expect(payload.RequestResponsePairs).To(HaveLen(1))
+
+				Expect(payload.RequestResponsePairs[0].Request.Headers).To(Equal(
+					map[string][]string{
+						"User-Agent": []string{"Go-http-client/1.1"},
+						"Test":       []string{"value"},
+					},
+				))
+			})
+
 			It("Should capture a redirect response", func() {
 
 				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
