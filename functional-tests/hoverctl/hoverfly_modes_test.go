@@ -98,7 +98,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("to capture mode and capture one request header", func() {
 				output := functional_tests.Run(hoverctlBinary, "mode", "capture", "--headers", "Content-Type")
 
-				Expect(output).To(ContainSubstring("Hoverfly has been set to capture mode and will capture Content-Type request header"))
+				Expect(output).To(ContainSubstring("Hoverfly has been set to capture mode and will capture the following request headers: [Content-Type]"))
 
 				output = functional_tests.Run(hoverctlBinary, "mode")
 
@@ -109,7 +109,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("to capture mode and capture two request headers", func() {
 				output := functional_tests.Run(hoverctlBinary, "mode", "capture", "--headers", "Content-Type,User-Agent")
 
-				Expect(output).To(ContainSubstring("Hoverfly has been set to capture mode and will capture Content-Type,User-Agent request headers"))
+				Expect(output).To(ContainSubstring("Hoverfly has been set to capture mode and will capture the following request headers: [Content-Type User-Agent]"))
 
 				output = functional_tests.Run(hoverctlBinary, "mode")
 
