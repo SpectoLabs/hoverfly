@@ -267,7 +267,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		return cachedResponse, nil
 	}
 
-	response, err := matching.TemplateMatcher{}.Match(requestDetails, hf.Cfg.Webserver, hf.Simulation)
+	pair, err := matching.TemplateMatcher{}.Match(requestDetails, hf.Cfg.Webserver, hf.Simulation)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":       err.Error(),
@@ -285,10 +285,10 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 	hf.CacheMatcher.SaveRequestResponsePair(&models.RequestResponsePair{
 		Request:  requestDetails,
-		Response: *response,
+		Response: pair.Response,
 	})
 
-	return response, nil
+	return &pair.Response, nil
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
