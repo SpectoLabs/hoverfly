@@ -20,7 +20,11 @@ type MiddlewareView struct {
 
 type ModeView struct {
 	Mode      string            `json:"mode"`
-	Arguments map[string]string `json:"arguments,omitempty"`
+	Arguments ModeArgumentsView `json:"arguments,omitempty"`
+}
+
+type ModeArgumentsView struct {
+	Headers []string `json:"headersWhitelist,omitempty"`
 }
 
 type VersionView struct {

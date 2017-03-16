@@ -28,7 +28,7 @@ const Capture = "capture"
 
 type Mode interface {
 	Process(*http.Request, models.RequestDetails) (*http.Response, error)
-	SetArguments(arguments map[string]string)
+	SetArguments(arguments ModeArguments)
 }
 
 type Hoverfly interface {
@@ -37,6 +37,10 @@ type Hoverfly interface {
 	DoRequest(*http.Request) (*http.Response, error)
 	IsMiddlewareSet() bool
 	Save(*models.RequestDetails, *models.ResponseDetails)
+}
+
+type ModeArguments struct {
+	Headers []string
 }
 
 // ReconstructRequest replaces original request with details provided in Constructor Payload.Request

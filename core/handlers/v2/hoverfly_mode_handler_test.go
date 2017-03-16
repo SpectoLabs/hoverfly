@@ -13,7 +13,7 @@ import (
 
 type HoverflyModeStub struct {
 	Mode      string
-	Arguments map[string]string
+	Arguments ModeArgumentsView
 }
 
 func (this HoverflyModeStub) GetMode() string {
@@ -29,7 +29,7 @@ func (this *HoverflyModeStub) SetMode(mode string) error {
 	return nil
 }
 
-func (this *HoverflyModeStub) SetModeArguments(arguments map[string]string) {
+func (this *HoverflyModeStub) SetModeArguments(arguments ModeArgumentsView) {
 	this.Arguments = arguments
 }
 
@@ -81,8 +81,8 @@ func TestPutSetsTheArguments(t *testing.T) {
 	stubHoverfly := &HoverflyModeStub{Mode: "test-mode"}
 	unit := HoverflyModeHandler{Hoverfly: stubHoverfly}
 
-	modeView := &ModeView{Arguments: map[string]string{
-		"test": "argument",
+	modeView := &ModeView{Arguments: ModeArgumentsView{
+		Headers: []string{"argument"},
 	}}
 
 	bodyBytes, err := json.Marshal(modeView)
@@ -97,7 +97,7 @@ func TestPutSetsTheArguments(t *testing.T) {
 	_, err = unmarshalModeView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(stubHoverfly.Arguments).To(HaveKeyWithValue("test", "argument"))
+	Expect(stubHoverfly.Arguments.Headers).To(ContainElement("argument"))
 }
 
 func TestPutResetsTheArgumentsWhenNotSet(t *testing.T) {
@@ -106,8 +106,8 @@ func TestPutResetsTheArgumentsWhenNotSet(t *testing.T) {
 	stubHoverfly := &HoverflyModeStub{Mode: "test-mode"}
 	unit := HoverflyModeHandler{Hoverfly: stubHoverfly}
 
-	modeView := &ModeView{Arguments: map[string]string{
-		"test": "argument",
+	modeView := &ModeView{Arguments: ModeArgumentsView{
+		Headers: []string{"argument"},
 	}}
 
 	bodyBytes, err := json.Marshal(modeView)
@@ -119,7 +119,7 @@ func TestPutResetsTheArgumentsWhenNotSet(t *testing.T) {
 	response := makeRequestOnHandler(unit.Put, request)
 	Expect(response.Code).To(Equal(http.StatusOK))
 
-	modeView.Arguments = nil
+	modeView.Arguments = ModeArgumentsView{}
 	bodyBytes, err = json.Marshal(modeView)
 	Expect(err).To(BeNil())
 
@@ -132,7 +132,7 @@ func TestPutResetsTheArgumentsWhenNotSet(t *testing.T) {
 	_, err = unmarshalModeView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(stubHoverfly.Arguments).To(BeEmpty())
+	Expect(stubHoverfly.Arguments).To(Equal(ModeArgumentsView{}))
 }
 
 func TestPutWill422ErrorIfHoverflyErrors(t *testing.T) {

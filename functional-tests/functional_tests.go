@@ -75,10 +75,10 @@ func (this Hoverfly) GetMode() string {
 }
 
 func (this Hoverfly) SetMode(mode string) {
-	this.SetModeWithArgs(mode, nil)
+	this.SetModeWithArgs(mode, v2.ModeArgumentsView{})
 }
 
-func (this Hoverfly) SetModeWithArgs(mode string, arguments map[string]string) {
+func (this Hoverfly) SetModeWithArgs(mode string, arguments v2.ModeArgumentsView) {
 	newMode := &v2.ModeView{
 		Mode:      mode,
 		Arguments: arguments,

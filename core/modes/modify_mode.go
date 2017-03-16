@@ -16,7 +16,7 @@ type ModifyMode struct {
 	Hoverfly HoverflyModify
 }
 
-func (this *ModifyMode) SetArguments(arguments map[string]string) {}
+func (this *ModifyMode) SetArguments(arguments ModeArguments) {}
 
 func (this ModifyMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
 	pair, err := this.Hoverfly.ApplyMiddleware(models.RequestResponsePair{Request: details})
