@@ -292,7 +292,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails, headersToSave []string) error {
+func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails, headersWhitelist []string) error {
 	body := &models.RequestFieldMatchers{
 		ExactMatch: util.StringToPointer(request.Body),
 	}
@@ -308,12 +308,15 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 	}
 
 	var headers map[string][]string
+	if headersWhitelist == nil {
+		headersWhitelist = []string{}
+	}
 
-	if headersToSave != nil && len(headersToSave) == 0 {
+	if len(headersWhitelist) >= 1 && headersWhitelist[0] == "*" {
 		headers = request.Headers
-	} else if len(headersToSave) > 0 {
+	} else {
 		headers = map[string][]string{}
-		for _, header := range headersToSave {
+		for _, header := range headersWhitelist {
 			headerValues := request.Headers[header]
 			if len(headerValues) > 0 {
 				headers[header] = headerValues
