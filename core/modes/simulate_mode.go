@@ -16,7 +16,7 @@ type SimulateMode struct {
 	Hoverfly HoverflySimulate
 }
 
-func (this *SimulateMode) SetArguments(arguments map[string]string) {}
+func (this *SimulateMode) SetArguments(arguments ModeArguments) {}
 
 func (this SimulateMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
 	pair := models.RequestResponsePair{

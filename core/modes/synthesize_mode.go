@@ -18,7 +18,7 @@ type SynthesizeMode struct {
 	Hoverfly HoverflySynthesize
 }
 
-func (this *SynthesizeMode) SetArguments(arguments map[string]string) {}
+func (this *SynthesizeMode) SetArguments(arguments ModeArguments) {}
 
 func (this SynthesizeMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
 	pair := models.RequestResponsePair{Request: details}

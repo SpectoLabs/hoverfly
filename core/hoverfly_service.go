@@ -62,8 +62,12 @@ func (this *Hoverfly) SetMode(mode string) error {
 	return nil
 }
 
-func (hf *Hoverfly) SetModeArguments(arguments map[string]string) {
-	hf.modeMap[hf.Cfg.GetMode()].SetArguments(arguments)
+func (hf *Hoverfly) SetModeArguments(argumentsView v2.ModeArgumentsView) {
+	modeArguments := modes.ModeArguments{
+		Headers: argumentsView.Headers,
+	}
+
+	hf.modeMap[hf.Cfg.GetMode()].SetArguments(modeArguments)
 }
 
 func (hf Hoverfly) GetMiddleware() (string, string, string) {

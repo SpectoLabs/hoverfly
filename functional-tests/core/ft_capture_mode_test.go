@@ -98,8 +98,8 @@ var _ = Describe("When I run Hoverfly", func() {
 			})
 
 			It("Should capture all request headers if argument is set to *", func() {
-				hoverfly.SetModeWithArgs("capture", map[string]string{
-					"headers": "*",
+				hoverfly.SetModeWithArgs("capture", v2.ModeArgumentsView{
+					Headers: []string{"*"},
 				})
 
 				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -130,8 +130,8 @@ var _ = Describe("When I run Hoverfly", func() {
 			})
 
 			It("Should capture User-Agent request headers if argument is set to User-Agent", func() {
-				hoverfly.SetModeWithArgs("capture", map[string]string{
-					"headers": "User-Agent",
+				hoverfly.SetModeWithArgs("capture", v2.ModeArgumentsView{
+					Headers: []string{"User-Agent"},
 				})
 
 				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -161,8 +161,8 @@ var _ = Describe("When I run Hoverfly", func() {
 			})
 
 			It("Should capture User-Agent and Test request headers if argument is set to User-Agent,Test", func() {
-				hoverfly.SetModeWithArgs("capture", map[string]string{
-					"headers": "User-Agent,Test",
+				hoverfly.SetModeWithArgs("capture", v2.ModeArgumentsView{
+					Headers: []string{"User-Agent", "Test"},
 				})
 
 				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
