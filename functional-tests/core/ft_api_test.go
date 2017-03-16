@@ -101,6 +101,23 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(modeJson).To(Equal([]byte(`{"mode":"capture","arguments":{}}`)))
 		})
 
+		It("Should error when header arguments use an asterisk and a header", func() {
+			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
+			req.BodyJSON(map[string]interface{}{
+				"mode": "mode",
+				"arguments": map[string][]string{
+					"headersWhitelist": []string{"*", "Content-Type"},
+				},
+			})
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(400))
+			errorJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(errorJson)).To(Equal(`{"error":"Not a valid mode"}`))
+
+		})
+
 	})
 
 	Context("GET /api/v2/hoverfly/middleware", func() {

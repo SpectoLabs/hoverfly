@@ -48,7 +48,7 @@ func (this *HoverflyModeHandler) Put(w http.ResponseWriter, r *http.Request, nex
 
 	err = this.Hoverfly.SetModeWithArguments(modeView)
 	if err != nil {
-		handlers.WriteErrorResponse(w, err.Error(), 422)
+		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 

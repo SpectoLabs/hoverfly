@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 
@@ -64,6 +65,10 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 	this.Cfg.SetMode(modeView.Mode)
 	if this.Cfg.GetMode() == "capture" {
 		this.CacheMatcher.FlushCache()
+	}
+
+	if len(modeView.Arguments.Headers) > 1 && modeView.Arguments.Headers[0] == "*" {
+		return errors.New("Must provide a list containing only an asterix, or a list containing only headers names")
 	}
 
 	modeArguments := modes.ModeArguments{
