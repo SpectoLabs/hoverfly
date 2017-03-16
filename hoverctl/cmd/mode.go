@@ -2,9 +2,14 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/spf13/cobra"
 )
+
+var specficHeaders string
+var allHeaders bool
 
 var modeCmd = &cobra.Command{
 	Use:   "mode [capture|simulate|modify|synthesize (optional)]",
@@ -24,14 +29,37 @@ mode is shown.
 
 			fmt.Println("Hoverfly is currently set to", mode, "mode")
 		} else {
-			mode, err := hoverfly.SetMode(args[0])
+			modeView := v2.ModeView{
+				Mode: args[0],
+			}
+
+			var headersMessage string
+			if allHeaders {
+				modeView.Arguments.Headers = append(modeView.Arguments.Headers, "*")
+
+				headersMessage = "and will capture all request headers"
+			} else if len(specficHeaders) > 0 {
+				modeView.Arguments.Headers = append(modeView.Arguments.Headers, strings.Split(specficHeaders, ",")...)
+
+				if strings.Contains(specficHeaders, ",") {
+					headersMessage = "and will capture " + specficHeaders + " request headers"
+				} else {
+					headersMessage = "and will capture " + specficHeaders + " request header"
+				}
+			}
+
+			mode, err := hoverfly.SetModeWithArguments(modeView)
 			handleIfError(err)
 
-			fmt.Println("Hoverfly has been set to", mode, "mode")
+			fmt.Println("Hoverfly has been set to", mode, "mode", headersMessage)
 		}
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(modeCmd)
+	modeCmd.PersistentFlags().StringVar(&specficHeaders, "headers", "",
+		"?")
+	modeCmd.PersistentFlags().BoolVar(&allHeaders, "all-headers", false,
+		"?")
 }
