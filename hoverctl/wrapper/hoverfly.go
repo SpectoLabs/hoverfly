@@ -13,7 +13,9 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/dghubble/sling"
 	"github.com/kardianos/osext"
 )
@@ -115,18 +117,26 @@ func (h *Hoverfly) GetMode() (string, error) {
 }
 
 // Set will go the state endpoint in Hoverfly, sending JSON that will set the mode of Hoverfly
-func (h *Hoverfly) SetMode(mode string) (string, error) {
-	if mode != "simulate" && mode != "capture" && mode != "modify" && mode != "synthesize" {
-		return "", errors.New(mode + " is not a valid mode")
+func (h *Hoverfly) SetModeWithArguments(modeView v2.ModeView) (string, error) {
+	if modeView.Mode != "simulate" && modeView.Mode != "capture" &&
+		modeView.Mode != "modify" && modeView.Mode != "synthesize" {
+		return "", errors.New(modeView.Mode + " is not a valid mode")
+	}
+	bytes, err := json.Marshal(modeView)
+	if err != nil {
+		return "", err
 	}
 
-	response, err := h.doRequest("PUT", v2ApiMode, `{"mode":"`+mode+`"}`)
+	response, err := h.doRequest("PUT", v2ApiMode, string(bytes))
 	if err != nil {
 		return "", err
 	}
 
 	if response.StatusCode == http.StatusBadRequest {
-		return "", errors.New("Cannot change the mode of Hoverfly to capture when running as a webserver")
+		responseBody, _ := util.GetResponseBody(response)
+		var errorView handlers.ErrorView
+		json.Unmarshal([]byte(responseBody), &errorView)
+		return "", errors.New(errorView.Error)
 	}
 
 	apiResponse := h.createAPIStateResponse(response)
