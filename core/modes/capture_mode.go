@@ -56,12 +56,7 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		Headers: response.Header,
 	}
 
-	var headersToSave []string
-	if this.Arguments["headers"] == "*" {
-		headersToSave = []string{}
-	} else if this.Arguments["headers"] != "" {
-		headersToSave = strings.Split(this.Arguments["headers"], ",")
-	}
+	headersToSave := strings.Split(this.Arguments["headers"], ",")
 
 	// saving response body with request/response meta to cache
 	err = this.Hoverfly.Save(&pair.Request, responseObj, headersToSave)
