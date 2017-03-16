@@ -576,3 +576,27 @@ func Test_Hoverfly_SetMode_SettingModeToCaptureWipesCache(t *testing.T) {
 	values, _ := unit.CacheMatcher.RequestCache.GetAllValues()
 	Expect(values).To(HaveLen(0))
 }
+
+func Test_Hoverfly_SetModeWithARguments_AsteriskCanOnlyBeValidAsTheOnlyHeader(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.CacheMatcher.RequestCache.Set([]byte("test"), []byte("test_bytes"))
+
+	Expect(unit.SetMode("capture")).To(BeNil())
+	Expect(unit.Cfg.Mode).To(Equal("capture"))
+
+	Expect(unit.SetModeWithArguments(v2.ModeView{
+		Arguments: v2.ModeArgumentsView{
+			Headers: []string{"Content-Type", "*"},
+		},
+	})).ToNot(Succeed())
+
+	Expect(unit.SetModeWithArguments(v2.ModeView{
+		Arguments: v2.ModeArgumentsView{
+			Headers: []string{"*"},
+		},
+	})).ToNot(Succeed())
+
+}
