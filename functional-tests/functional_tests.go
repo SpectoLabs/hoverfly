@@ -73,9 +73,15 @@ func (this Hoverfly) GetMode() string {
 
 	return currentState.Mode
 }
+
 func (this Hoverfly) SetMode(mode string) {
+	this.SetModeWithArgs(mode, nil)
+}
+
+func (this Hoverfly) SetModeWithArgs(mode string, arguments map[string]string) {
 	newMode := &v2.ModeView{
-		Mode: mode,
+		Mode:      mode,
+		Arguments: arguments,
 	}
 
 	DoRequest(sling.New().Put(this.adminUrl + "/api/v2/hoverfly/mode").BodyJSON(newMode))
