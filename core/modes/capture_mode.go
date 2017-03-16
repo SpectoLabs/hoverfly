@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -20,10 +19,10 @@ type HoverflyCapture interface {
 
 type CaptureMode struct {
 	Hoverfly  HoverflyCapture
-	Arguments map[string]string
+	Arguments ModeArguments
 }
 
-func (this *CaptureMode) SetArguments(arguments map[string]string) {
+func (this *CaptureMode) SetArguments(arguments ModeArguments) {
 	this.Arguments = arguments
 }
 
@@ -56,10 +55,12 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		Headers: response.Header,
 	}
 
-	headersToSave := strings.Split(this.Arguments["headers"], ",")
+	if this.Arguments.Headers == nil {
+		this.Arguments.Headers = []string{}
+	}
 
 	// saving response body with request/response meta to cache
-	err = this.Hoverfly.Save(&pair.Request, responseObj, headersToSave)
+	err = this.Hoverfly.Save(&pair.Request, responseObj, this.Arguments.Headers)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when saving request and response", Capture)
 	}
