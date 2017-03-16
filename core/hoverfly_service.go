@@ -37,6 +37,13 @@ func (this Hoverfly) GetMode() string {
 }
 
 func (this *Hoverfly) SetMode(mode string) error {
+	return this.SetModeWithArguments(v2.ModeView{
+		Mode: mode,
+	})
+}
+
+func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
+
 	availableModes := map[string]bool{
 		modes.Simulate:   true,
 		modes.Capture:    true,
@@ -44,30 +51,27 @@ func (this *Hoverfly) SetMode(mode string) error {
 		modes.Synthesize: true,
 	}
 
-	if mode == "" || !availableModes[mode] {
-		log.Error("Can't change mode to \"%d\"", mode)
+	if modeView.Mode == "" || !availableModes[modeView.Mode] {
+		log.Error("Can't change mode to \"%d\"", modeView.Mode)
 		return fmt.Errorf("Not a valid mode")
 	}
 
-	if this.Cfg.Webserver && mode == modes.Capture {
+	if this.Cfg.Webserver && modeView.Mode == modes.Capture {
 		log.Error("Can't change mode to when configured as a webserver")
 		return fmt.Errorf("Can't change mode to capture when configured as a webserver")
 	}
 
-	this.Cfg.SetMode(mode)
+	this.Cfg.SetMode(modeView.Mode)
 	if this.Cfg.GetMode() == "capture" {
 		this.CacheMatcher.FlushCache()
 	}
 
-	return nil
-}
-
-func (hf *Hoverfly) SetModeArguments(argumentsView v2.ModeArgumentsView) {
 	modeArguments := modes.ModeArguments{
-		Headers: argumentsView.Headers,
+		Headers: modeView.Arguments.Headers,
 	}
 
-	hf.modeMap[hf.Cfg.GetMode()].SetArguments(modeArguments)
+	this.modeMap[this.Cfg.GetMode()].SetArguments(modeArguments)
+	return nil
 }
 
 func (hf Hoverfly) GetMiddleware() (string, string, string) {
