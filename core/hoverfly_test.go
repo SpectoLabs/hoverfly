@@ -569,7 +569,7 @@ func Test_Hoverfly_Save_DoesNotSaveRequestHeadersWhenGivenHeadersArrayIsNil(t *t
 	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(BeEmpty())
 }
 
-func Test_Hoverfly_Save_SavesAllRequestHeadersWhenGivenEmptyHeadersArray(t *testing.T) {
+func Test_Hoverfly_Save_SavesAllRequestHeadersWhenGivenAnAsterisk(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -583,7 +583,7 @@ func Test_Hoverfly_Save_SavesAllRequestHeadersWhenGivenEmptyHeadersArray(t *test
 		Body:    "testresponsebody",
 		Headers: map[string][]string{"testheader": []string{"testvalue"}},
 		Status:  200,
-	}, []string{})
+	}, []string{"*"})
 
 	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveLen(2))
 	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
