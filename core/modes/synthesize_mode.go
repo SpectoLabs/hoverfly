@@ -15,13 +15,10 @@ type HoverflySynthesize interface {
 }
 
 type SynthesizeMode struct {
-	Hoverfly  HoverflySynthesize
-	Arguments map[string]string
+	Hoverfly HoverflySynthesize
 }
 
-func (this *SynthesizeMode) SetArguments(arguments map[string]string) {
-	this.Arguments = arguments
-}
+func (this *SynthesizeMode) SetArguments(arguments map[string]string) {}
 
 func (this SynthesizeMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
 	pair := models.RequestResponsePair{Request: details}
