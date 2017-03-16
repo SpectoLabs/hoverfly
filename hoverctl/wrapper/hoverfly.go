@@ -133,10 +133,7 @@ func (h *Hoverfly) SetModeWithArguments(modeView v2.ModeView) (string, error) {
 	}
 
 	if response.StatusCode == http.StatusBadRequest {
-		responseBody, _ := util.GetResponseBody(response)
-		var errorView handlers.ErrorView
-		json.Unmarshal([]byte(responseBody), &errorView)
-		return "", errors.New(errorView.Error)
+		return "", h.handlerError(response)
 	}
 
 	apiResponse := h.createAPIStateResponse(response)
@@ -522,4 +519,19 @@ func (h Hoverfly) doRequest(method, url, body string) (*http.Response, error) {
 	}
 
 	return response, nil
+}
+
+func (h Hoverfly) handlerError(response *http.Response) error {
+	responseBody, err := util.GetResponseBody(response)
+	if err != nil {
+		return errors.New("Error when communicating with Hoverfly")
+	}
+
+	var errorView handlers.ErrorView
+	err = json.Unmarshal([]byte(responseBody), &errorView)
+	if err != nil {
+		return errors.New("Error when communicating with Hoverfly")
+	}
+
+	return errors.New(errorView.Error)
 }
