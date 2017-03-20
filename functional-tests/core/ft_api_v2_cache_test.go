@@ -46,16 +46,10 @@ var _ = Describe("/api/v2/cache", func() {
 
 			request, err := cacheArray[0].GetObject("request")
 
-			Expect(request.GetString("body")).Should(Equal(""))
-			Expect(request.GetString("destination")).Should(Equal("template-server.com"))
-			Expect(request.GetString("method")).Should(Equal("GET"))
-			Expect(request.GetString("path")).Should(Equal("/"))
-			Expect(request.GetString("query")).Should(Equal(""))
-			Expect(request.GetString("scheme")).Should(Equal("http"))
+			destinationMatchers, err := request.GetObject("destination")
+			Expect(err).To(BeNil())
 
-			requestHeaders, _ := request.GetObject("headers")
-			Expect(requestHeaders.GetStringArray("Accept-Encoding")).Should(ContainElement("gzip"))
-			Expect(requestHeaders.GetStringArray("User-Agent")).Should(ContainElement("Go-http-client/1.1"))
+			Expect(destinationMatchers.GetString("exactMatch")).Should(Equal("template-server.com"))
 
 			response, err := cacheArray[0].GetObject("response")
 

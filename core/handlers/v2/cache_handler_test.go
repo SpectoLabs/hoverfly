@@ -18,21 +18,25 @@ type HoverflyCacheStub struct {
 	FlushError  bool
 }
 
-func (this HoverflyCacheStub) GetCache() ([]RequestResponsePairViewV1, error) {
+func (this HoverflyCacheStub) GetCache() ([]RequestResponsePairViewV2, error) {
 	if this.GetError {
 		return nil, errors.New("There was an error")
 	}
 
-	return []RequestResponsePairViewV1{
-		RequestResponsePairViewV1{
-			Request: RequestDetailsViewV1{
-				Destination: util.StringToPointer("one"),
+	return []RequestResponsePairViewV2{
+		RequestResponsePairViewV2{
+			Request: RequestDetailsViewV2{
+				Destination: &RequestFieldMatchersView{
+					ExactMatch: util.StringToPointer("one"),
+				},
 			},
 			Response: ResponseDetailsView{},
 		},
-		RequestResponsePairViewV1{
-			Request: RequestDetailsViewV1{
-				Destination: util.StringToPointer("two"),
+		RequestResponsePairViewV2{
+			Request: RequestDetailsViewV2{
+				Destination: &RequestFieldMatchersView{
+					ExactMatch: util.StringToPointer("two"),
+				},
 			},
 			Response: ResponseDetailsView{},
 		},
@@ -66,8 +70,8 @@ func Test_Get_ReturnsTheCache(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(cacheView.RequestResponsePairs).To(HaveLen(2))
-	Expect(*cacheView.RequestResponsePairs[0].Request.Destination).To(Equal("one"))
-	Expect(*cacheView.RequestResponsePairs[1].Request.Destination).To(Equal("two"))
+	Expect(*cacheView.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal("one"))
+	Expect(*cacheView.RequestResponsePairs[1].Request.Destination.ExactMatch).To(Equal("two"))
 }
 
 func Test_Get_ReturnsNiceErrorMessage(t *testing.T) {
