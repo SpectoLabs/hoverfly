@@ -114,38 +114,6 @@ func TestCorruptedPairs(t *testing.T) {
 	Expect(pairBytes).To(HaveLen(1))
 }
 
-func TestGetMultipleRecords(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := NewHoverflyWithConfiguration(&Configuration{})
-
-	// inserting some payloads
-	for i := 0; i < 5; i++ {
-		unit.Save(&models.RequestDetails{
-			Method:      "GET",
-			Scheme:      "http",
-			Destination: "example.com",
-			Query:       fmt.Sprintf("q=%d", i),
-		}, &models.ResponseDetails{
-			Status: 201,
-			Body:   "ok",
-		}, nil)
-	}
-
-	// getting requests
-	values, err := unit.CacheMatcher.RequestCache.GetAllValues()
-	Expect(err).To(BeNil())
-
-	for _, value := range values {
-		if pair, err := models.NewRequestResponsePairFromBytes(value); err == nil {
-			Expect(pair.Request.Method).To(Equal("GET"))
-			Expect(pair.Response.Status).To(Equal(201))
-		} else {
-			t.Error(err)
-		}
-	}
-}
-
 func TestGetNonExistingKey(t *testing.T) {
 	RegisterTestingT(t)
 
