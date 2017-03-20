@@ -51,7 +51,7 @@ func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.Respo
 	}
 
 	// getting cache response
-	pair, err := models.NewRequestResponsePairFromBytes(pairBytes)
+	cachedResponse, err := models.NewCachedResponseFromBytes(pairBytes)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
@@ -70,13 +70,13 @@ func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.Respo
 		"rawQuery":    req.Query,
 		"method":      req.Method,
 		"destination": req.Destination,
-		"status":      pair.Response.Status,
+		"status":      cachedResponse.MatchingPair.Response.Status,
 	}).Info("Response found interface{} cache")
 
-	return &pair.Response, nil
+	return &cachedResponse.MatchingPair.Response, nil
 }
 
-func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairViewV1, error) {
+func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairViewV2, error) {
 	if this.RequestCache == nil {
 		return nil, &MatchingError{
 			Description: "No cache set",
@@ -85,25 +85,25 @@ func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairViewV1, erro
 
 	records, err := this.RequestCache.GetAllEntries()
 	if err != nil {
-		return []v2.RequestResponsePairViewV1{}, err
+		return []v2.RequestResponsePairViewV2{}, err
 	}
 
-	pairViews := []v2.RequestResponsePairViewV1{}
+	pairViews := []v2.RequestResponsePairViewV2{}
 
 	for _, v := range records {
-		if pair, err := models.NewRequestResponsePairFromBytes(v); err == nil {
-			pairView := pair.ConvertToRequestResponsePairView()
+		if cachedResponse, err := models.NewCachedResponseFromBytes(v); err == nil {
+			pairView := cachedResponse.MatchingPair.BuildView()
 			pairViews = append(pairViews, pairView)
 		} else {
 			log.Error(err)
-			return []v2.RequestResponsePairViewV1{}, err
+			return []v2.RequestResponsePairViewV2{}, err
 		}
 	}
 
 	return pairViews, nil
 }
 
-func (this *CacheMatcher) SaveRequestResponsePair(pair *models.RequestResponsePair) error {
+func (this *CacheMatcher) SaveRequestResponsePair(request models.RequestDetails, pair *models.RequestTemplateResponsePair) error {
 	if this.RequestCache == nil {
 		return errors.New("No cache set")
 	}
@@ -111,21 +111,26 @@ func (this *CacheMatcher) SaveRequestResponsePair(pair *models.RequestResponsePa
 	var key string
 
 	if *this.Webserver {
-		key = pair.IdWithoutHost()
+		key = request.HashWithoutHost()
 	} else {
-		key = pair.Id()
+		key = request.Hash()
 	}
 
 	log.WithFields(log.Fields{
-		"path":          pair.Request.Path,
-		"rawQuery":      pair.Request.Query,
-		"requestMethod": pair.Request.Method,
-		"bodyLen":       len(pair.Request.Body),
-		"destination":   pair.Request.Destination,
+		"path":          request.Path,
+		"rawQuery":      request.Query,
+		"requestMethod": request.Method,
+		"bodyLen":       len(request.Body),
+		"destination":   request.Destination,
 		"hashKey":       key,
 	}).Debug("Saving response to cache")
 
-	pairBytes, err := pair.Encode()
+	cachedResponse := models.CachedResponse{
+		Request:      request,
+		MatchingPair: pair,
+	}
+
+	pairBytes, err := cachedResponse.Encode()
 
 	if err != nil {
 		return err

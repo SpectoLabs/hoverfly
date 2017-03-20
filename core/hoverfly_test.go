@@ -163,11 +163,21 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromCache(t *testing.T) {
 	server, unit := testTools(201, `{'message': 'here'}`)
 	server.Close()
 
-	unit.CacheMatcher.SaveRequestResponsePair(&models.RequestResponsePair{
-		Request: models.RequestDetails{
-			Destination: "somehost.com",
-			Method:      "POST",
-			Scheme:      "http",
+	unit.CacheMatcher.SaveRequestResponsePair(models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+	}, &models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("somehost.com"),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("POST"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("http"),
+			},
 		},
 		Response: models.ResponseDetails{
 			Status: 200,
@@ -258,10 +268,10 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 	pairBytes, err := unit.CacheMatcher.RequestCache.Get([]byte("75b4ae6efa2a3f6d3ee6b9fed4d8c8c5"))
 	Expect(err).To(BeNil())
 
-	cachedRequestResponsePair, err := models.NewRequestResponsePairFromBytes(pairBytes)
+	cachedRequestResponsePair, err := models.NewCachedResponseFromBytes(pairBytes)
 	Expect(err).To(BeNil())
 
-	Expect(cachedRequestResponsePair.Response.Body).To(Equal("template response"))
+	Expect(cachedRequestResponsePair.MatchingPair.Response.Body).To(Equal("template response"))
 
 	unit.Simulation = models.NewSimulation()
 	response, err := unit.GetResponse(models.RequestDetails{
