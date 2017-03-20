@@ -163,7 +163,7 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromCache(t *testing.T) {
 	server, unit := testTools(201, `{'message': 'here'}`)
 	server.Close()
 
-	unit.CacheMatcher.SaveRequestResponsePair(models.RequestDetails{
+	unit.CacheMatcher.SaveRequestTemplateResponsePair(models.RequestDetails{
 		Destination: "somehost.com",
 		Method:      "POST",
 		Scheme:      "http",
