@@ -148,7 +148,7 @@ func (this Hoverfly) GetMetadataCache() cache.Cache {
 	return this.MetadataCache
 }
 
-func (this Hoverfly) GetCache() ([]v2.RequestResponsePairViewV1, error) {
+func (this Hoverfly) GetCache() ([]v2.RequestResponsePairViewV2, error) {
 	return this.CacheMatcher.GetAllResponses()
 }
 

@@ -283,10 +283,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		}
 	}
 
-	hf.CacheMatcher.SaveRequestResponsePair(&models.RequestResponsePair{
-		Request:  requestDetails,
-		Response: pair.Response,
-	})
+	hf.CacheMatcher.SaveRequestResponsePair(requestDetails, pair)
 
 	return &pair.Response, nil
 }
