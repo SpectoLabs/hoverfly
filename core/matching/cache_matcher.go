@@ -103,7 +103,7 @@ func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairViewV2, erro
 	return pairViews, nil
 }
 
-func (this *CacheMatcher) SaveRequestResponsePair(request models.RequestDetails, pair *models.RequestTemplateResponsePair) error {
+func (this *CacheMatcher) SaveRequestTemplateResponsePair(request models.RequestDetails, pair *models.RequestTemplateResponsePair) error {
 	if this.RequestCache == nil {
 		return errors.New("No cache set")
 	}
