@@ -45,7 +45,7 @@ type HoverflyView struct {
 }
 
 type CacheView struct {
-	RequestResponsePairs []RequestResponsePairViewV1 `json:"cache"`
+	RequestResponsePairs []RequestResponsePairViewV2 `json:"cache"`
 }
 
 type LogsView struct {

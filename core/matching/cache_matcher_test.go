@@ -30,7 +30,7 @@ func Test_CacheMatcher_SaveRequestResponsePair_WillReturnErrorIfCacheIsNil(t *te
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{}
 
-	err := unit.SaveRequestResponsePair(nil)
+	err := unit.SaveRequestResponsePair(models.RequestDetails{}, nil)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("No cache set"))
 }
