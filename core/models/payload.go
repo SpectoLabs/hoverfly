@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/base64"
-	"encoding/gob"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -28,39 +27,8 @@ type RequestResponsePair struct {
 	Request  RequestDetails
 }
 
-func (this RequestResponsePair) Id() string {
-	return this.Request.Hash()
-}
-
-func (this RequestResponsePair) IdWithoutHost() string {
-	return this.Request.HashWithoutHost()
-}
-
-// Encode method encodes all exported Payload fields to bytes
-func (this *RequestResponsePair) Encode() ([]byte, error) {
-	buf := new(bytes.Buffer)
-	enc := gob.NewEncoder(buf)
-	err := enc.Encode(this)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
 func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestResponsePairViewV1 {
 	return v2.RequestResponsePairViewV1{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
-}
-
-// NewPayloadFromBytes decodes supplied bytes into Payload structure
-func NewRequestResponsePairFromBytes(data []byte) (*RequestResponsePair, error) {
-	var pair *RequestResponsePair
-	buf := bytes.NewBuffer(data)
-	dec := gob.NewDecoder(buf)
-	err := dec.Decode(&pair)
-	if err != nil {
-		return nil, err
-	}
-	return pair, nil
 }
 
 func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.RequestResponsePair) RequestResponsePair {

@@ -122,45 +122,6 @@ func TestGetNotRecordedRequest(t *testing.T) {
 	Expect(response).To(BeNil())
 }
 
-func TestRequestResponsePairEncodeDecode(t *testing.T) {
-	RegisterTestingT(t)
-
-	resp := models.ResponseDetails{
-		Status: 200,
-		Body:   "body here",
-	}
-
-	pair := models.RequestResponsePair{Response: resp}
-
-	pairBytes, err := pair.Encode()
-	Expect(err).To(BeNil())
-
-	pairFromBytes, err := models.NewRequestResponsePairFromBytes(pairBytes)
-	Expect(err).To(BeNil())
-	Expect(pairFromBytes.Response.Body).To(Equal(resp.Body))
-	Expect(pairFromBytes.Response.Status).To(Equal(resp.Status))
-}
-
-func TestRequestResponsePairEncodeEmpty(t *testing.T) {
-	RegisterTestingT(t)
-
-	pair := models.RequestResponsePair{}
-
-	pairBytes, err := pair.Encode()
-	Expect(err).To(BeNil())
-
-	_, err = models.NewRequestResponsePairFromBytes(pairBytes)
-	Expect(err).To(BeNil())
-}
-
-func TestDecodeRandomBytes(t *testing.T) {
-	RegisterTestingT(t)
-
-	bytes := []byte("some random stuff here")
-	_, err := models.NewRequestResponsePairFromBytes(bytes)
-	Expect(err).ToNot(BeNil())
-}
-
 func TestModifyRequest(t *testing.T) {
 	RegisterTestingT(t)
 
