@@ -64,7 +64,7 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 
 	cacheMatcher := matching.CacheMatcher{
 		RequestCache: requestCache,
-		Webserver:    &cfg.Webserver,
+		Webserver:    cfg.Webserver,
 	}
 
 	hook := NewStoreLogsHook()
@@ -105,7 +105,7 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 
 	cacheMatcher := matching.CacheMatcher{
 		RequestCache: requestCache,
-		Webserver:    &cfg.Webserver,
+		Webserver:    cfg.Webserver,
 	}
 
 	hook := NewStoreLogsHook()

@@ -11,7 +11,7 @@ import (
 
 type CacheMatcher struct {
 	RequestCache cache.Cache
-	Webserver    *bool
+	Webserver    bool
 }
 
 // getResponse returns stored response from cache
@@ -26,7 +26,7 @@ func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.Respo
 
 	var key string
 
-	if *this.Webserver {
+	if this.Webserver {
 		key = req.HashWithoutHost()
 	} else {
 		key = req.Hash()
@@ -110,7 +110,7 @@ func (this *CacheMatcher) SaveRequestTemplateResponsePair(request models.Request
 
 	var key string
 
-	if *this.Webserver {
+	if this.Webserver {
 		key = request.HashWithoutHost()
 	} else {
 		key = request.Hash()
@@ -128,6 +128,7 @@ func (this *CacheMatcher) SaveRequestTemplateResponsePair(request models.Request
 	cachedResponse := models.CachedResponse{
 		Request:      request,
 		MatchingPair: pair,
+		HeaderMatch:  len(pair.RequestTemplate.Headers) > 0,
 	}
 
 	pairBytes, err := cachedResponse.Encode()
