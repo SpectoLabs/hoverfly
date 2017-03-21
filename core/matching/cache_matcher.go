@@ -147,3 +147,16 @@ func (this CacheMatcher) FlushCache() error {
 
 	return this.RequestCache.DeleteData()
 }
+
+func (this CacheMatcher) PreloadCache(simulation models.Simulation) error {
+	if this.RequestCache == nil {
+		return errors.New("No cache set")
+	}
+	for _, pair := range simulation.Templates {
+		if requestDetails := pair.RequestTemplate.BuildRequestDetailsFromExactMatches(); requestDetails != nil {
+			this.SaveRequestTemplateResponsePair(*requestDetails, &pair)
+		}
+	}
+
+	return nil
+}

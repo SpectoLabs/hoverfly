@@ -93,3 +93,160 @@ func Test_CacheMatcher_FlushCache_WillReturnErrorIfCacheIsNil(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("No cache set"))
 }
+
+func Test_CacheMatcher_PreloadCache_WillReturnErrorIfCacheIsNil(t *testing.T) {
+	RegisterTestingT(t)
+	unit := matching.CacheMatcher{}
+
+	err := unit.PreloadCache(models.Simulation{})
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("No cache set"))
+}
+
+func Test_CacheMatcher_PreloadCache_WillNotCacheLooseTemplates(t *testing.T) {
+	RegisterTestingT(t)
+	unit := matching.CacheMatcher{
+		RequestCache: cache.NewInMemoryCache(),
+	}
+
+	err := unit.PreloadCache(models.Simulation{
+		Templates: []models.RequestTemplateResponsePair{
+			models.RequestTemplateResponsePair{
+				RequestTemplate: models.RequestTemplate{
+					Body: &models.RequestFieldMatchers{
+						RegexMatch: util.StringToPointer("loose"),
+					},
+				},
+				Response: models.ResponseDetails{
+					Status: 200,
+					Body:   "body",
+				},
+			},
+		},
+	})
+
+	Expect(err).To(BeNil())
+	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
+}
+
+func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchTemplates(t *testing.T) {
+	RegisterTestingT(t)
+	unit := matching.CacheMatcher{
+		RequestCache: cache.NewInMemoryCache(),
+	}
+
+	err := unit.PreloadCache(models.Simulation{
+		Templates: []models.RequestTemplateResponsePair{
+			models.RequestTemplateResponsePair{
+				RequestTemplate: models.RequestTemplate{
+					Body: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("body"),
+					},
+					Destination: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("destination"),
+					},
+					Method: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("method"),
+					},
+					Path: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("path"),
+					},
+					Query: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("query"),
+					},
+					Scheme: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("scheme"),
+					},
+				},
+				Response: models.ResponseDetails{
+					Status: 200,
+					Body:   "body",
+				},
+			},
+		},
+	})
+
+	Expect(err).To(BeNil())
+	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(1))
+}
+
+func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheTemplatesWithoutExactMatches(t *testing.T) {
+	RegisterTestingT(t)
+	unit := matching.CacheMatcher{
+		RequestCache: cache.NewInMemoryCache(),
+	}
+
+	err := unit.PreloadCache(models.Simulation{
+		Templates: []models.RequestTemplateResponsePair{
+			models.RequestTemplateResponsePair{
+				RequestTemplate: models.RequestTemplate{
+					Destination: &models.RequestFieldMatchers{
+						RegexMatch: util.StringToPointer("destination"),
+					},
+				},
+				Response: models.ResponseDetails{
+					Status: 200,
+					Body:   "body",
+				},
+			},
+		},
+	})
+
+	Expect(err).To(BeNil())
+	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
+}
+
+func Test_CacheMatcher_PreloadCache_WillCheckAllTemplatesInSimulation(t *testing.T) {
+	RegisterTestingT(t)
+	unit := matching.CacheMatcher{
+		RequestCache: cache.NewInMemoryCache(),
+	}
+
+	err := unit.PreloadCache(models.Simulation{
+		Templates: []models.RequestTemplateResponsePair{
+			models.RequestTemplateResponsePair{
+				RequestTemplate: models.RequestTemplate{
+					Destination: &models.RequestFieldMatchers{
+						RegexMatch: util.StringToPointer("destination"),
+					},
+				},
+				Response: models.ResponseDetails{
+					Status: 200,
+					Body:   "body",
+				},
+			},
+			models.RequestTemplateResponsePair{
+				RequestTemplate: models.RequestTemplate{
+					Body: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("body"),
+					},
+					Destination: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("destination"),
+					},
+					Headers: map[string][]string{
+						"Headers": []string{"value"},
+					},
+					Method: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("method"),
+					},
+					Path: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("path"),
+					},
+					Query: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("query"),
+					},
+					Scheme: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("scheme"),
+					},
+				},
+				Response: models.ResponseDetails{
+					Status: 200,
+					Body:   "body",
+				},
+			},
+		},
+	})
+
+	Expect(err).To(BeNil())
+	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(1))
+}
