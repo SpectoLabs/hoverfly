@@ -395,7 +395,33 @@ var JsonPayloadV1 = `{
                     "headers": {}
                 },
                 "request": {
+                    "requestType": "template",
                     "destination": "v1-simulation.com"
+                }
+            },
+            {
+                "response": {
+                    "status": 200,
+                    "body": "v1 match",
+                    "encodedBody": false,
+                    "headers": {}
+                },
+                "request": {
+                    "requestType": "recording",
+                    "destination": "v1-simulation.com",
+                    "method": "GET",
+                    "scheme": "http",
+                    "path": "/path",
+                    "query": "",
+                    "body": "",
+                    "headers": {
+                        "Accept-Encoding": [
+						    "gzip"
+						],
+					    "User-Agent": [
+						    "Go-http-client/1.1"
+						]
+                    }
                 }
             }
         ],
