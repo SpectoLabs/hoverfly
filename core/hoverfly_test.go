@@ -287,6 +287,70 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 	Expect(response.Body).To(Equal("template response"))
 }
 
+func Test_Hoverfly_GetResponse_WillReturnCachedResponseIfHeaderMatchIsFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	requestDetails := models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+	}
+
+	unit.CacheMatcher.SaveRequestTemplateResponsePair(requestDetails, &models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{},
+		Response: models.ResponseDetails{
+			Body: "cached response",
+		},
+	})
+
+	response, err := unit.GetResponse(requestDetails)
+	Expect(err).To(BeNil())
+
+	Expect(response.Body).To(Equal("cached response"))
+}
+
+func Test_Hoverfly_GetResponse_WillCheckTemplatesAndReturnTemplateResponseIfCacheHasHeaders(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	requestDetails := models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+	}
+
+	unit.CacheMatcher.SaveRequestTemplateResponsePair(requestDetails, &models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
+			Headers: map[string][]string{
+				"Header": []string{"value"},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "cached response",
+		},
+	})
+
+	unit.Simulation.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
+		RequestTemplate: models.RequestTemplate{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("POST"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "template response",
+		},
+	})
+
+	response, err := unit.GetResponse(requestDetails)
+	Expect(err).To(BeNil())
+
+	Expect(response.Body).To(Equal("template response"))
+}
+
 type ResponseDelayListStub struct {
 	gotDelays int
 }

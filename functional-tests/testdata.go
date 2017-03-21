@@ -416,7 +416,7 @@ var ExactMatchPayload = `{
             {
                 "response": {
                     "status": 200,
-                    "body": "exact match",
+                    "body": "exact match 1",
                     "encodedBody": false,
                     "headers": {
                         "Header": [
@@ -444,11 +444,45 @@ var ExactMatchPayload = `{
 						"exactMatch": ""
                     },
                     "headers": {
-                        "Accept-Encoding": [
-						    "gzip"
-						],
-					    "User-Agent": [
-						    "Go-http-client/1.1"
+                        "Header": [
+						    "value1"
+						]
+                    }
+                }
+            },
+            {
+                "response": {
+                    "status": 200,
+                    "body": "exact match 2",
+                    "encodedBody": false,
+                    "headers": {
+                        "Header": [
+                            "value2"
+                        ]
+                    }
+                },
+                "request": {
+                    "path": {
+						"exactMatch": "/path1"        
+                    },
+                    "method": {
+						"exactMatch": "GET"
+                    },
+                    "destination": {
+						"exactMatch": "test-server.com"
+                    },
+                    "scheme": {
+						"exactMatch": "http"
+                    },
+                    "query": {
+						"exactMatch": ""
+                    },
+                    "body": {
+						"exactMatch": ""
+                    },
+                    "headers": {
+                        "Header": [
+						    "value2"
 						]
                     }
                 }
