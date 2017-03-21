@@ -103,6 +103,11 @@ func (this SimulationViewV1) Upgrade() SimulationViewV2 {
 	for _, pairV1 := range this.RequestResponsePairViewV1 {
 
 		var schemeMatchers, methodMatchers, destinationMatchers, pathMatchers, queryMatchers, bodyMatchers *RequestFieldMatchersView
+		var headers map[string][]string
+
+		if pairV1.Request.RequestType != nil && *pairV1.Request.RequestType != "recording" {
+			headers = pairV1.Request.Headers
+		}
 		if pairV1.Request.Scheme != nil {
 			schemeMatchers = &RequestFieldMatchersView{
 				ExactMatch: pairV1.Request.Scheme,
@@ -147,7 +152,7 @@ func (this SimulationViewV1) Upgrade() SimulationViewV2 {
 				Path:        pathMatchers,
 				Query:       queryMatchers,
 				Body:        bodyMatchers,
-				Headers:     pairV1.Request.Headers,
+				Headers:     headers,
 			},
 			Response: pairV1.Response,
 		}
@@ -218,6 +223,7 @@ type RequestDetailsViewV2 struct {
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsViewV1 struct {
+	RequestType *string             `json:"requestType"`
 	Path        *string             `json:"path"`
 	Method      *string             `json:"method"`
 	Destination *string             `json:"destination"`
