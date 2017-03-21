@@ -75,3 +75,111 @@ func Test_NewRequestTemplateResponsePairFromView_SortsQuery(t *testing.T) {
 
 	Expect(*unit.RequestTemplate.Query.ExactMatch).To(Equal("a=a&b=b"))
 }
+
+func Test_RequestTemplate_BuildRequestDetailsFromExactMatches_GeneratesARequestDetails(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := models.RequestTemplate{
+		Body: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("body"),
+		},
+		Destination: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("destination"),
+		},
+		Method: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("method"),
+		},
+		Path: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("path"),
+		},
+		Query: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("query"),
+		},
+		Scheme: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("scheme"),
+		},
+	}
+
+	Expect(unit.BuildRequestDetailsFromExactMatches()).ToNot(BeNil())
+	Expect(unit.BuildRequestDetailsFromExactMatches()).To(Equal(&models.RequestDetails{
+		Body:        "body",
+		Destination: "destination",
+		Method:      "method",
+		Path:        "path",
+		Query:       "query",
+		Scheme:      "scheme",
+	}))
+}
+
+func Test_RequestTemplate_BuildRequestDetailsFromExactMatches_IncludesHeaders(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := models.RequestTemplate{
+		Body: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("body"),
+		},
+		Destination: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("destination"),
+		},
+		Headers: map[string][]string{
+			"header": []string{"value"},
+		},
+		Method: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("method"),
+		},
+		Path: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("path"),
+		},
+		Query: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("query"),
+		},
+		Scheme: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("scheme"),
+		},
+	}
+
+	Expect(unit.BuildRequestDetailsFromExactMatches()).ToNot(BeNil())
+	Expect(unit.BuildRequestDetailsFromExactMatches()).To(Equal(&models.RequestDetails{
+		Body:        "body",
+		Destination: "destination",
+		Headers: map[string][]string{
+			"header": []string{"value"},
+		},
+		Method: "method",
+		Path:   "path",
+		Query:  "query",
+		Scheme: "scheme",
+	}))
+}
+
+func Test_RequestTemplate_BuildRequestDetailsFromExactMatches_ReturnsNilIfEmptyTemplate(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := models.RequestTemplate{}
+
+	Expect(unit.BuildRequestDetailsFromExactMatches()).To(BeNil())
+}
+
+func Test_RequestTemplate_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissingAnExactMatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := models.RequestTemplate{
+		Destination: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("destination"),
+		},
+		Method: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("method"),
+		},
+		Path: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("path"),
+		},
+		Query: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("query"),
+		},
+		Scheme: &models.RequestFieldMatchers{
+			ExactMatch: util.StringToPointer("scheme"),
+		},
+	}
+
+	Expect(unit.BuildRequestDetailsFromExactMatches()).To(BeNil())
+}
