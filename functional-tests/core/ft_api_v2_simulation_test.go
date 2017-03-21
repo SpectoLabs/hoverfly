@@ -2,8 +2,11 @@ package hoverfly_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
 
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/antonholmquist/jason"
 	"github.com/dghubble/sling"
@@ -359,10 +362,8 @@ var _ = Describe("/api/v2/simulation", func() {
 		})
 
 		It("should import old v1 simulations and upgrade them to v2 simulations", func() {
-			request := sling.New().Put("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
-			request.Body(bytes.NewBufferString(functional_tests.JsonPayloadV1))
+			hoverfly.ImportSimulation(functional_tests.JsonPayloadV1)
 
-			functional_tests.DoRequest(request)
 			getReq := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
 
 			getRes := functional_tests.DoRequest(getReq)
@@ -370,35 +371,38 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			defer getRes.Body.Close()
 
-			schemaObject, err := jason.NewObjectFromReader(getRes.Body)
+			responseBody, err := ioutil.ReadAll(getRes.Body)
 			Expect(err).To(BeNil())
 
-			dataObject, err := schemaObject.GetObject("data")
-			Expect(err).To(BeNil())
+			var simulation v2.SimulationViewV2
 
-			pairsArray, err := dataObject.GetObjectArray("pairs")
-			Expect(err).To(BeNil())
+			json.Unmarshal(responseBody, &simulation)
 
-			Expect(pairsArray).To(HaveLen(1))
+			Expect(simulation.DataViewV2.RequestResponsePairs[0].Request).To(Equal(v2.RequestDetailsViewV2{
+				Destination: &v2.RequestFieldMatchersView{
+					ExactMatch: util.StringToPointer("v1-simulation.com"),
+				}}))
 
-			requestObject, err := pairsArray[0].GetObject("request")
-			Expect(err).To(BeNil())
+			Expect(simulation.DataViewV2.RequestResponsePairs[1].Request).To(Equal(v2.RequestDetailsViewV2{
+				Scheme: &v2.RequestFieldMatchersView{
+					ExactMatch: util.StringToPointer("http"),
+				},
+				Method: &v2.RequestFieldMatchersView{
+					ExactMatch: util.StringToPointer("GET"),
+				},
+				Destination: &v2.RequestFieldMatchersView{
+					ExactMatch: util.StringToPointer("v1-simulation.com"),
+				},
+				Path: &v2.RequestFieldMatchersView{
+					ExactMatch: util.StringToPointer("/path"),
+				},
+				Query: &v2.RequestFieldMatchersView{
+					ExactMatch: util.StringToPointer(""),
+				},
+				Body: &v2.RequestFieldMatchersView{
+					ExactMatch: util.StringToPointer(""),
+				}}))
 
-			destinationMatchers, err := requestObject.GetObject("destination")
-			Expect(err).To(BeNil())
-			Expect(destinationMatchers.GetString("exactMatch")).Should(Equal("v1-simulation.com"))
-
-			metaObject, err := schemaObject.GetObject("meta")
-			Expect(err).To(BeNil())
-			schemaVersion, err := metaObject.GetString("schemaVersion")
-			Expect(err).To(BeNil())
-			Expect(schemaVersion).To(Equal("v2"))
-			hoverflyVersion, err := metaObject.GetString("hoverflyVersion")
-			Expect(err).To(BeNil())
-			Expect(hoverflyVersion).ToNot(BeNil())
-			timeExported, err := metaObject.GetString("timeExported")
-			Expect(err).To(BeNil())
-			Expect(timeExported).ToNot(BeNil())
 		})
 	})
 })

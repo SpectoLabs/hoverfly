@@ -223,6 +223,7 @@ func Test_SimulationViewV1_Upgrade_ReturnsAV2Simulation(t *testing.T) {
 			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{
 				v2.RequestResponsePairViewV1{
 					Request: v2.RequestDetailsViewV1{
+						RequestType: util.StringToPointer("recording"),
 						Scheme:      util.StringToPointer("http"),
 						Body:        util.StringToPointer("body"),
 						Destination: util.StringToPointer("destination"),
@@ -273,7 +274,7 @@ func Test_SimulationViewV1_Upgrade_ReturnsAV2Simulation(t *testing.T) {
 	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Query).To(Equal(v2.RequestFieldMatchersView{
 		ExactMatch: util.StringToPointer("query=query"),
 	}))
-	Expect(simulationViewV2.RequestResponsePairs[0].Request.Headers).To(HaveKeyWithValue("Test", []string{"headers"}))
+	Expect(simulationViewV2.RequestResponsePairs[0].Request.Headers).To(BeEmpty())
 
 	Expect(simulationViewV2.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(simulationViewV2.RequestResponsePairs[0].Response.Body).To(Equal("body"))
