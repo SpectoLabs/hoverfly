@@ -73,6 +73,8 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 	this.Cfg.SetMode(modeView.Mode)
 	if this.Cfg.GetMode() == "capture" {
 		this.CacheMatcher.FlushCache()
+	} else if this.Cfg.GetMode() == "simulate" {
+		this.CacheMatcher.PreloadCache(*this.Simulation)
 	}
 
 	modeArguments := modes.ModeArguments{

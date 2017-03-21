@@ -1,6 +1,7 @@
 package hoverfly_test
 
 import (
+	"encoding/json"
 	"io/ioutil"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
@@ -59,5 +60,43 @@ var _ = Describe("Hoverfly cache", func() {
 		Expect(err).To(BeNil())
 
 		Expect(cacheArray).To(HaveLen(0))
+	})
+
+	It("should preload the cache with exact match templates when put into simulate mode", func() {
+		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+
+		hoverfly.SetMode("simulate")
+
+		req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/cache")
+
+		res := functional_tests.DoRequest(req)
+		Expect(res.StatusCode).To(Equal(200))
+
+		responseBytes, err := ioutil.ReadAll(res.Body)
+		Expect(err).To(BeNil())
+
+		var responseJson map[string]interface{}
+		json.Unmarshal(responseBytes, &responseJson)
+
+		Expect(responseJson["cache"]).To(HaveLen(1))
+	})
+
+	It("should not preload the cache if simulation does not contain exact match templates", func() {
+		hoverfly.ImportSimulation(functional_tests.JsonMatchSimulation)
+
+		hoverfly.SetMode("simulate")
+
+		req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/cache")
+
+		res := functional_tests.DoRequest(req)
+		Expect(res.StatusCode).To(Equal(200))
+
+		responseBytes, err := ioutil.ReadAll(res.Body)
+		Expect(err).To(BeNil())
+
+		var responseJson map[string]interface{}
+		json.Unmarshal(responseBytes, &responseJson)
+
+		Expect(responseJson["cache"]).To(HaveLen(0))
 	})
 })
