@@ -10,11 +10,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_CacheMatcher_GetResponse_WillReturnErrorIfCacheIsNil(t *testing.T) {
+func Test_CacheMatcher_GetCachedResponse_WillReturnErrorIfCacheIsNil(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{}
 
-	_, err := unit.GetResponse(&models.RequestDetails{})
+	_, err := unit.GetCachedResponse(&models.RequestDetails{})
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("No cache set"))
 }
