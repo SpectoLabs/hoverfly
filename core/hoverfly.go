@@ -263,7 +263,7 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
 
 	cachedResponse, cacheErr := hf.CacheMatcher.GetCachedResponse(&requestDetails)
-	if cacheErr == nil {
+	if cacheErr == nil && !cachedResponse.HeaderMatch {
 		return &cachedResponse.MatchingPair.Response, nil
 	}
 

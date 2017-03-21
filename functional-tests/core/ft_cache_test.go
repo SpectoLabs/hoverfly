@@ -99,4 +99,43 @@ var _ = Describe("Hoverfly cache", func() {
 
 		Expect(responseJson["cache"]).To(HaveLen(0))
 	})
+
+	It("should not stop matching on headers by caching the same request twice with different headers", func() {
+		hoverfly.ImportSimulation(functional_tests.ExactMatchPayload)
+
+		hoverfly.SetMode("simulate")
+
+		req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/cache")
+
+		res := functional_tests.DoRequest(req)
+		Expect(res.StatusCode).To(Equal(200))
+
+		responseBytes, err := ioutil.ReadAll(res.Body)
+		Expect(err).To(BeNil())
+
+		var responseJson map[string]interface{}
+		json.Unmarshal(responseBytes, &responseJson)
+
+		Expect(responseJson["cache"]).To(HaveLen(1))
+
+		req = sling.New().Get("http://test-server.com/path1").Add("Header", "value1")
+
+		res = hoverfly.Proxy(req)
+		Expect(res.StatusCode).To(Equal(200))
+
+		responseBytes, err = ioutil.ReadAll(res.Body)
+		Expect(err).To(BeNil())
+
+		Expect(responseBytes).To(Equal([]byte("exact match 1")))
+
+		req = sling.New().Get("http://test-server.com/path1").Add("Header", "value2")
+
+		res = hoverfly.Proxy(req)
+		Expect(res.StatusCode).To(Equal(200))
+
+		responseBytes, err = ioutil.ReadAll(res.Body)
+		Expect(err).To(BeNil())
+
+		Expect(responseBytes).To(Equal([]byte("exact match 2")))
+	})
 })
