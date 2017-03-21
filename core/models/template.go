@@ -119,3 +119,25 @@ type RequestTemplate struct {
 	Body        *RequestFieldMatchers
 	Headers     map[string][]string
 }
+
+func (this RequestTemplate) BuildRequestDetailsFromExactMatches() *RequestDetails {
+	if this.Body == nil || this.Body.ExactMatch == nil ||
+		this.Destination == nil || this.Destination.ExactMatch == nil ||
+		this.Method == nil || this.Method.ExactMatch == nil ||
+		this.Path == nil || this.Path.ExactMatch == nil ||
+		this.Query == nil || this.Query.ExactMatch == nil ||
+		this.Scheme == nil || this.Scheme.ExactMatch == nil {
+		return nil
+	}
+
+	return &RequestDetails{
+		Body:        *this.Body.ExactMatch,
+		Destination: *this.Destination.ExactMatch,
+		Headers:     this.Headers,
+		Method:      *this.Method.ExactMatch,
+		Path:        *this.Path.ExactMatch,
+		Query:       *this.Query.ExactMatch,
+		Scheme:      *this.Scheme.ExactMatch,
+	}
+
+}
