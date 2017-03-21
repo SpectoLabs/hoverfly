@@ -15,7 +15,7 @@ type CacheMatcher struct {
 }
 
 // getResponse returns stored response from cache
-func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.ResponseDetails, *MatchingError) {
+func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models.CachedResponse, *MatchingError) {
 	if this.RequestCache == nil {
 		return nil, &MatchingError{
 			Description: "No cache set",
@@ -73,7 +73,7 @@ func (this *CacheMatcher) GetResponse(req *models.RequestDetails) (*models.Respo
 		"status":      cachedResponse.MatchingPair.Response.Status,
 	}).Info("Response found interface{} cache")
 
-	return &cachedResponse.MatchingPair.Response, nil
+	return cachedResponse, nil
 }
 
 func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairViewV2, error) {
