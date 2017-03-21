@@ -189,7 +189,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
-	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	RegisterTestingT(t)
@@ -260,7 +260,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
-	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	RegisterTestingT(t)
@@ -399,7 +399,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
-	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	RegisterTestingT(t)
@@ -443,7 +443,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 
 	cache := cache.NewInMemoryCache()
 	cfg := Configuration{Webserver: false}
-	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: &cfg.Webserver}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	RegisterTestingT(t)

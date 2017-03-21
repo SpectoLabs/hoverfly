@@ -8,6 +8,7 @@ import (
 type CachedResponse struct {
 	Request      RequestDetails
 	MatchingPair *RequestTemplateResponsePair
+	HeaderMatch  bool
 }
 
 func (this CachedResponse) Encode() ([]byte, error) {
