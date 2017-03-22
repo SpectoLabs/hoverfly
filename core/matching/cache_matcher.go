@@ -75,31 +75,45 @@ func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models
 	return cachedResponse, nil
 }
 
-func (this CacheMatcher) GetAllResponses() ([]v2.RequestResponsePairViewV2, error) {
+func (this CacheMatcher) GetAllResponses() (v2.CacheView, error) {
+	cacheView := v2.CacheView{}
+
 	if this.RequestCache == nil {
-		return nil, &MatchingError{
+		return cacheView, &MatchingError{
 			Description: "No cache set",
 		}
 	}
 
 	records, err := this.RequestCache.GetAllEntries()
 	if err != nil {
-		return []v2.RequestResponsePairViewV2{}, err
+		return cacheView, err
 	}
 
-	pairViews := []v2.RequestResponsePairViewV2{}
-
-	for _, v := range records {
+	for key, v := range records {
 		if cachedResponse, err := models.NewCachedResponseFromBytes(v); err == nil {
-			pairView := cachedResponse.MatchingPair.BuildView()
-			pairViews = append(pairViews, pairView)
+
+			var pair *v2.RequestResponsePairViewV2
+
+			if cachedResponse.MatchingPair != nil {
+				pairView := cachedResponse.MatchingPair.BuildView()
+				pair = &pairView
+			}
+
+			cachedResponseView := v2.CachedResponseView{
+				Key:          key,
+				HeaderMatch:  cachedResponse.HeaderMatch,
+				MatchingPair: pair,
+			}
+
+			cacheView.Cache = append(cacheView.Cache, cachedResponseView)
+
 		} else {
 			log.Error(err)
-			return []v2.RequestResponsePairViewV2{}, err
+			return cacheView, err
 		}
 	}
 
-	return pairViews, nil
+	return cacheView, nil
 }
 
 func (this *CacheMatcher) SaveRequestTemplateResponsePair(request models.RequestDetails, pair *models.RequestTemplateResponsePair) error {
