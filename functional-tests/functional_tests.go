@@ -109,6 +109,19 @@ func (this Hoverfly) ImportSimulation(simulation string) {
 	Expect(response.StatusCode).To(Equal(http.StatusOK))
 }
 
+func (this Hoverfly) ExportSimulation() v2.SimulationViewV2 {
+	reader := this.GetSimulation()
+	simulationBytes, err := ioutil.ReadAll(reader)
+	Expect(err).To(BeNil())
+
+	var simulation v2.SimulationViewV2
+
+	err = json.Unmarshal(simulationBytes, &simulation)
+	Expect(err).To(BeNil())
+
+	return simulation
+}
+
 func (this Hoverfly) Proxy(r *sling.Sling) *http.Response {
 	req, err := r.Request()
 	Expect(err).To(BeNil())

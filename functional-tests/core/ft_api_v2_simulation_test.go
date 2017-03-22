@@ -2,7 +2,6 @@ package hoverfly_test
 
 import (
 	"bytes"
-	"encoding/json"
 	"io/ioutil"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -364,19 +363,7 @@ var _ = Describe("/api/v2/simulation", func() {
 		It("should import old v1 simulations and upgrade them to v2 simulations", func() {
 			hoverfly.ImportSimulation(functional_tests.JsonPayloadV1)
 
-			getReq := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
-
-			getRes := functional_tests.DoRequest(getReq)
-			Expect(getRes.StatusCode).To(Equal(200))
-
-			defer getRes.Body.Close()
-
-			responseBody, err := ioutil.ReadAll(getRes.Body)
-			Expect(err).To(BeNil())
-
-			var simulation v2.SimulationViewV2
-
-			json.Unmarshal(responseBody, &simulation)
+			simulation := hoverfly.ExportSimulation()
 
 			Expect(simulation.DataViewV2.RequestResponsePairs[0].Request).To(Equal(v2.RequestDetailsViewV2{
 				Destination: &v2.RequestFieldMatchersView{
