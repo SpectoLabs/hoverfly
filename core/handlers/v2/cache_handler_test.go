@@ -18,27 +18,33 @@ type HoverflyCacheStub struct {
 	FlushError  bool
 }
 
-func (this HoverflyCacheStub) GetCache() ([]RequestResponsePairViewV2, error) {
+func (this HoverflyCacheStub) GetCache() (CacheView, error) {
 	if this.GetError {
-		return nil, errors.New("There was an error")
+		return CacheView{}, errors.New("There was an error")
 	}
 
-	return []RequestResponsePairViewV2{
-		RequestResponsePairViewV2{
-			Request: RequestDetailsViewV2{
-				Destination: &RequestFieldMatchersView{
-					ExactMatch: util.StringToPointer("one"),
+	return CacheView{
+		Cache: []CachedResponseView{
+			CachedResponseView{
+				MatchingPair: &RequestResponsePairViewV2{
+					Request: RequestDetailsViewV2{
+						Destination: &RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("one"),
+						},
+					},
+					Response: ResponseDetailsView{},
 				},
 			},
-			Response: ResponseDetailsView{},
-		},
-		RequestResponsePairViewV2{
-			Request: RequestDetailsViewV2{
-				Destination: &RequestFieldMatchersView{
-					ExactMatch: util.StringToPointer("two"),
+			CachedResponseView{
+				MatchingPair: &RequestResponsePairViewV2{
+					Request: RequestDetailsViewV2{
+						Destination: &RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("two"),
+						},
+					},
+					Response: ResponseDetailsView{},
 				},
 			},
-			Response: ResponseDetailsView{},
 		},
 	}, nil
 }
@@ -69,9 +75,9 @@ func Test_Get_ReturnsTheCache(t *testing.T) {
 	cacheView, err := unmarshalCacheView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(cacheView.RequestResponsePairs).To(HaveLen(2))
-	Expect(*cacheView.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal("one"))
-	Expect(*cacheView.RequestResponsePairs[1].Request.Destination.ExactMatch).To(Equal("two"))
+	Expect(cacheView.Cache).To(HaveLen(2))
+	Expect(*cacheView.Cache[0].MatchingPair.Request.Destination.ExactMatch).To(Equal("one"))
+	Expect(*cacheView.Cache[1].MatchingPair.Request.Destination.ExactMatch).To(Equal("two"))
 }
 
 func Test_Get_ReturnsNiceErrorMessage(t *testing.T) {

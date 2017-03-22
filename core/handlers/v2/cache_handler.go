@@ -10,7 +10,7 @@ import (
 )
 
 type HoverflyCache interface {
-	GetCache() ([]RequestResponsePairViewV2, error)
+	GetCache() (CacheView, error)
 	FlushCache() error
 }
 
@@ -31,13 +31,13 @@ func (this *CacheHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler
 }
 
 func (this *CacheHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	pairViews, err := this.Hoverfly.GetCache()
+	cacheViews, err := this.Hoverfly.GetCache()
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	bytes, _ := json.Marshal(CacheView{RequestResponsePairs: pairViews})
+	bytes, _ := json.Marshal(cacheViews)
 
 	handlers.WriteResponse(w, bytes)
 }

@@ -122,6 +122,38 @@ func (this Hoverfly) ExportSimulation() v2.SimulationViewV2 {
 	return simulation
 }
 
+func (this Hoverfly) GetCache() v2.CacheView {
+	req := sling.New().Get(this.adminUrl + "/api/v2/cache")
+	response := DoRequest(req)
+	Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+	cacheBytes, err := ioutil.ReadAll(response.Body)
+	Expect(err).To(BeNil())
+
+	var cache v2.CacheView
+
+	err = json.Unmarshal(cacheBytes, &cache)
+	Expect(err).To(BeNil())
+
+	return cache
+}
+
+func (this Hoverfly) FlushCache() v2.CacheView {
+	req := sling.New().Delete(this.adminUrl + "/api/v2/cache")
+	res := DoRequest(req)
+	Expect(res.StatusCode).To(Equal(200))
+
+	cacheBytes, err := ioutil.ReadAll(res.Body)
+	Expect(err).To(BeNil())
+
+	var cache v2.CacheView
+
+	err = json.Unmarshal(cacheBytes, &cache)
+	Expect(err).To(BeNil())
+
+	return cache
+}
+
 func (this Hoverfly) Proxy(r *sling.Sling) *http.Response {
 	req, err := r.Request()
 	Expect(err).To(BeNil())

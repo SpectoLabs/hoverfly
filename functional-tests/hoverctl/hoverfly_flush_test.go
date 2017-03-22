@@ -1,10 +1,7 @@
 package hoverctl_end_to_end
 
 import (
-	"io/ioutil"
-
 	"github.com/SpectoLabs/hoverfly/functional-tests"
-	"github.com/antonholmquist/jason"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -35,19 +32,9 @@ var _ = Describe("hoverctl flush cache", func() {
 
 		Expect(output).To(ContainSubstring("Successfully flushed cache"))
 
-		req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/cache")
-		res := functional_tests.DoRequest(req)
-		Expect(res.StatusCode).To(Equal(200))
-		responseJson, err := ioutil.ReadAll(res.Body)
-		Expect(err).To(BeNil())
+		cacheView := hoverfly.GetCache()
 
-		jsonObject, err := jason.NewObjectFromBytes(responseJson)
-		Expect(err).To(BeNil())
-
-		cacheArray, err := jsonObject.GetObjectArray("cache")
-		Expect(err).To(BeNil())
-
-		Expect(cacheArray).To(HaveLen(0))
+		Expect(cacheView.Cache).To(HaveLen(0))
 	})
 
 	It("should error nicely when trying to flush but cache is disabled", func() {
