@@ -24,68 +24,6 @@ func GzipString(s string) string {
 
 var _ = Describe("Capture > export > importing > simulate flow", func() {
 
-	Describe("When working with a mixed data set of recorded and templated requests", func() {
-
-		var jsonPayload *bytes.Buffer
-
-		BeforeEach(func() {
-			hoverflyCmd = startHoverfly(adminPort, proxyPort)
-			SetHoverflyMode("simulate")
-
-			jsonPayload = bytes.NewBufferString(`
-				{
-					"data": [{
-						"request": {
-							"path": {
-								"exactMatch": "/path1"
-							},
-							"method": {
-								"exactMatch": "GET"
-							},
-							"destination": {
-								"exactMatch": "destination1"
-							},
-							"scheme": {
-								"exactMatch": "http"
-							},
-							"query": {
-								"exactMatch": ""
-							},
-							"body": {
-								"exactMatch": ""
-							},
-							"headers": {}
-						},
-						"response": {
-							"status": 201,
-							"encodedBody": false,
-							"body": "exact match",
-							"headers": {}
-						}
-					}, {
-						"request": {
-							"destination": {
-								"exactMatch": "destination2"
-							}
-						},
-						"response": {
-							"status": 200,
-							"encodedBody": false,
-							"body": "template match",
-							"headers": {}
-						}
-					}]
-				}
-			`)
-
-		})
-
-		AfterEach(func() {
-			stopHoverfly()
-		})
-
-	})
-
 	Describe("When I import and export", func() {
 
 		Context("A plain text response", func() {

@@ -57,7 +57,7 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_CanSaveNilPairs(t *testing
 	Expect(cachedResponse.HeaderMatch).To(BeFalse())
 }
 
-func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillSaveWithHeaderMatchFalseIfNoHeadesWereOnTheMatchingTemplate(t *testing.T) {
+func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillSaveWithHeaderMatchFalseIfNoHeadesWereOnTheRequestMatcher(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
 		RequestCache: cache.NewInMemoryCache(),
@@ -81,7 +81,7 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillSaveWithHeaderMatchFal
 	Expect(cachedResponse.HeaderMatch).To(BeFalse())
 }
 
-func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillSaveWithHeaderMatchTrueHeadesWereOnTheMatchingTemplate(t *testing.T) {
+func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillSaveWithHeaderMatchTrueHeadesWereOnTheRequestMatcher(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
 		RequestCache: cache.NewInMemoryCache(),
@@ -123,7 +123,7 @@ func Test_CacheMatcher_PreloadCache_WillReturnErrorIfCacheIsNil(t *testing.T) {
 	Expect(err.Error()).To(Equal("No cache set"))
 }
 
-func Test_CacheMatcher_PreloadCache_WillNotCacheLooseTemplates(t *testing.T) {
+func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
 		RequestCache: cache.NewInMemoryCache(),
@@ -149,7 +149,7 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheLooseTemplates(t *testing.T) {
 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
 }
 
-func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchTemplates(t *testing.T) {
+func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMatchers(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
 		RequestCache: cache.NewInMemoryCache(),
@@ -190,7 +190,7 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchTemplates
 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(1))
 }
 
-func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheTemplatesWithoutExactMatches(t *testing.T) {
+func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWithoutExactMatches(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
 		RequestCache: cache.NewInMemoryCache(),
@@ -216,7 +216,7 @@ func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheTemplatesWithoutExac
 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
 }
 
-func Test_CacheMatcher_PreloadCache_WillCheckAllTemplatesInSimulation(t *testing.T) {
+func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
 		RequestCache: cache.NewInMemoryCache(),

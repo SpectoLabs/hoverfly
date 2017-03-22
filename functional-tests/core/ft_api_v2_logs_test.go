@@ -21,7 +21,7 @@ var _ = Describe("/api/v2/logs", func() {
 		hoverfly.Start()
 		hoverfly.SetMode("simulate")
 		hoverfly.ImportSimulation(functional_tests.JsonPayload)
-		hoverfly.Proxy(sling.New().Get("http://template-server.com"))
+		hoverfly.Proxy(sling.New().Get("http://destination-server.com"))
 	})
 
 	AfterEach(func() {
