@@ -125,10 +125,12 @@ func (this *CacheMatcher) SaveRequestTemplateResponsePair(request models.Request
 		"hashKey":       key,
 	}).Debug("Saving response to cache")
 
+	headerMatch := pair != nil && len(pair.RequestTemplate.Headers) > 0
+
 	cachedResponse := models.CachedResponse{
 		Request:      request,
 		MatchingPair: pair,
-		HeaderMatch:  len(pair.RequestTemplate.Headers) > 0,
+		HeaderMatch:  headerMatch,
 	}
 
 	pairBytes, err := cachedResponse.Encode()
