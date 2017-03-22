@@ -70,7 +70,6 @@ func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models
 		"rawQuery":    req.Query,
 		"method":      req.Method,
 		"destination": req.Destination,
-		"status":      cachedResponse.MatchingPair.Response.Status,
 	}).Info("Response found interface{} cache")
 
 	return cachedResponse, nil
