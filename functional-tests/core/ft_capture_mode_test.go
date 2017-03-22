@@ -55,12 +55,8 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				expectedDestination := strings.Replace(fakeServer.URL, "http://", "", 1)
 
-				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
-				Expect(err).To(BeNil())
+				payload := hoverfly.ExportSimulation()
 
-				payload := v2.SimulationViewV2{}
-
-				json.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
 				Expect(payload.RequestResponsePairs[0].Request).To(Equal(v2.RequestDetailsViewV2{
@@ -113,12 +109,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL))
 				Expect(resp.StatusCode).To(Equal(200))
 
-				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
-				Expect(err).To(BeNil())
-
-				payload := v2.SimulationViewV2{}
-
-				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
+				payload := hoverfly.ExportSimulation()
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
 				Expect(payload.RequestResponsePairs[0].Request.Headers).To(Equal(
