@@ -2,10 +2,8 @@ package matching
 
 import (
 	"errors"
-	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
-	glob "github.com/ryanuber/go-glob"
 )
 
 type TemplateMatcher struct{}
@@ -41,7 +39,7 @@ func (t TemplateMatcher) Match(req models.RequestDetails, webserver bool, simula
 			continue
 		}
 
-		if !HeaderMatch(template.Headers, req.Headers) {
+		if !HeaderMatcher(template.Headers, req.Headers) {
 			continue
 		}
 
@@ -52,37 +50,4 @@ func (t TemplateMatcher) Match(req models.RequestDetails, webserver bool, simula
 		}, nil
 	}
 	return nil, errors.New("No match found")
-}
-
-/**
-Check keys and corresponding values in template headers are also present in request headers
-*/
-func HeaderMatch(templateHeaders, requestHeaders map[string][]string) bool {
-
-	for templateHeaderKey, templateHeaderValues := range templateHeaders {
-		for requestHeaderKey, requestHeaderValues := range requestHeaders {
-			delete(requestHeaders, requestHeaderKey)
-			requestHeaders[strings.ToLower(requestHeaderKey)] = requestHeaderValues
-
-		}
-
-		requestTemplateValues, templateHeaderMatched := requestHeaders[strings.ToLower(templateHeaderKey)]
-		if !templateHeaderMatched {
-			return false
-		}
-
-		for _, templateHeaderValue := range templateHeaderValues {
-			templateValueMatched := false
-			for _, requestHeaderValue := range requestTemplateValues {
-				if glob.Glob(strings.ToLower(templateHeaderValue), strings.ToLower(requestHeaderValue)) {
-					templateValueMatched = true
-				}
-			}
-
-			if !templateValueMatched {
-				return false
-			}
-		}
-	}
-	return true
 }
