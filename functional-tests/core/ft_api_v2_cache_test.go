@@ -20,7 +20,6 @@ var _ = Describe("/api/v2/cache", func() {
 		hoverfly = functional_tests.NewHoverfly()
 		hoverfly.Start()
 		hoverfly.ImportSimulation(functional_tests.JsonPayload)
-		hoverfly.Proxy(sling.New().Get("http://template-server.com"))
 	})
 
 	AfterEach(func() {
@@ -29,33 +28,27 @@ var _ = Describe("/api/v2/cache", func() {
 
 	Context("GET", func() {
 
-		It("should get request response pairs in cache", func() {
-			req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/cache")
-			res := functional_tests.DoRequest(req)
-			Expect(res.StatusCode).To(Equal(200))
-			responseJson, err := ioutil.ReadAll(res.Body)
-			Expect(err).To(BeNil())
+		It("should cache matches", func() {
+			hoverfly.Proxy(sling.New().Get("http://template-server.com"))
+			cacheView := hoverfly.GetCache()
 
-			jsonObject, err := jason.NewObjectFromBytes(responseJson)
-			Expect(err).To(BeNil())
+			Expect(cacheView.Cache).To(HaveLen(1))
 
-			cacheArray, err := jsonObject.GetObjectArray("cache")
-			Expect(err).To(BeNil())
+			Expect(*cacheView.Cache[0].MatchingPair.Request.Destination.ExactMatch).To(Equal("template-server.com"))
 
-			Expect(cacheArray).To(HaveLen(1))
+			Expect(cacheView.Cache[0].MatchingPair.Response.Status).To(Equal(200))
+			Expect(cacheView.Cache[0].MatchingPair.Response.Body).To(Equal("template match"))
+			Expect(cacheView.Cache[0].MatchingPair.Response.EncodedBody).To(BeFalse())
+		})
 
-			request, err := cacheArray[0].GetObject("request")
+		It("should cache failures", func() {
+			hoverfly.Proxy(sling.New().Get("http://unknown-destination.com"))
+			cacheView := hoverfly.GetCache()
 
-			destinationMatchers, err := request.GetObject("destination")
-			Expect(err).To(BeNil())
+			Expect(cacheView.Cache).To(HaveLen(1))
 
-			Expect(destinationMatchers.GetString("exactMatch")).Should(Equal("template-server.com"))
-
-			response, err := cacheArray[0].GetObject("response")
-
-			Expect(response.GetInt64("status")).Should(Equal(int64(200)))
-			Expect(response.GetString("body")).Should(Equal("template match"))
-			Expect(response.GetBoolean("encodedBody")).Should(BeFalse())
+			Expect(cacheView.Cache[0].Key).To(Equal("0dd6716f7e5f5f06067de145a2933b2d"))
+			Expect(cacheView.Cache[0].MatchingPair).To(BeNil())
 		})
 
 		It("should get error when cache is disabled", func() {
@@ -78,19 +71,10 @@ var _ = Describe("/api/v2/cache", func() {
 	Context("DELETE", func() {
 
 		It("should flush cache", func() {
-			req := sling.New().Delete("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/cache")
-			res := functional_tests.DoRequest(req)
-			Expect(res.StatusCode).To(Equal(200))
-			responseJson, err := ioutil.ReadAll(res.Body)
-			Expect(err).To(BeNil())
 
-			jsonObject, err := jason.NewObjectFromBytes(responseJson)
-			Expect(err).To(BeNil())
+			cacheView := hoverfly.FlushCache()
 
-			cacheArray, err := jsonObject.GetObjectArray("cache")
-			Expect(err).To(BeNil())
-
-			Expect(cacheArray).To(HaveLen(0))
+			Expect(cacheView.Cache).To(HaveLen(0))
 		})
 
 		It("should get error when cache is disabled", func() {
