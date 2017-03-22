@@ -9,20 +9,18 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var (
-	unit = matching.TemplateMatcher{}
-)
+var testResponse = models.ResponseDetails{
+	Body: "request matched",
+}
 
-func Test_Match_EmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
+func Test_RequestMatcher_EmptyRequestMatchersShouldMatchOnAnyRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
 
 	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{},
-		Response: models.ResponseDetails{
-			Body: "test-body",
-		},
+		Response:       testResponse,
 	})
 
 	r := models.RequestDetails{
@@ -32,12 +30,12 @@ func Test_Match_EmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 			"sdv": []string{"ascd"},
 		},
 	}
-	result, _ := unit.Match(r, false, simulation)
+	result, _ := matching.RequestMatcher(r, false, simulation)
 
-	Expect(result.Response.Body).To(Equal("test-body"))
+	Expect(result.Response.Body).To(Equal("request matched"))
 }
 
-func Test_Match_TemplateShouldMatchOnBody(t *testing.T) {
+func Test_RequestMatcher_RequestMatchersShouldMatchOnBody(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -48,21 +46,19 @@ func Test_Match_TemplateShouldMatchOnBody(t *testing.T) {
 				ExactMatch: StringToPointer("body"),
 			},
 		},
-		Response: models.ResponseDetails{
-			Body: "body",
-		},
+		Response: testResponse,
 	})
 
 	r := models.RequestDetails{
 		Body: "body",
 	}
-	result, err := unit.Match(r, false, simulation)
+	result, err := matching.RequestMatcher(r, false, simulation)
 	Expect(err).To(BeNil())
 
-	Expect(result.Response.Body).To(Equal("body"))
+	Expect(result.Response.Body).To(Equal("request matched"))
 }
 
-func Test_Match_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
+func Test_RequestMatcher_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -76,9 +72,7 @@ func Test_Match_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
-		Response: models.ResponseDetails{
-			Body: "test-body",
-		},
+		Response: testResponse,
 	})
 
 	r := models.RequestDetails{
@@ -90,12 +84,12 @@ func Test_Match_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		},
 	}
 
-	result, _ := unit.Match(r, false, simulation)
+	result, _ := matching.RequestMatcher(r, false, simulation)
 
-	Expect(result.Response.Body).To(Equal("test-body"))
+	Expect(result.Response.Body).To(Equal("request matched"))
 }
 
-func Test_Match_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
+func Test_RequestMatcher_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -109,9 +103,7 @@ func Test_Match_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
-		Response: models.ResponseDetails{
-			Body: "test-body",
-		},
+		Response: testResponse,
 	})
 
 	r := models.RequestDetails{
@@ -122,12 +114,12 @@ func Test_Match_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 		},
 	}
 
-	result, _ := unit.Match(r, false, simulation)
+	result, _ := matching.RequestMatcher(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
 
-func Test_Match_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
+func Test_RequestMatcher_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -141,9 +133,7 @@ func Test_Match_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
-		Response: models.ResponseDetails{
-			Body: "test-body",
-		},
+		Response: testResponse,
 	})
 
 	r := models.RequestDetails{
@@ -154,12 +144,12 @@ func Test_Match_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 			"header2": []string{"different"},
 		},
 	}
-	result, _ := unit.Match(r, false, simulation)
+	result, _ := matching.RequestMatcher(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
 
-func Test_Match_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
+func Test_RequestMatcher_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -173,9 +163,7 @@ func Test_Match_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
-		Response: models.ResponseDetails{
-			Body: "test-body",
-		},
+		Response: testResponse,
 	})
 
 	r := models.RequestDetails{
@@ -187,12 +175,12 @@ func Test_Match_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result, _ := unit.Match(r, false, simulation)
+	result, _ := matching.RequestMatcher(r, false, simulation)
 
-	Expect(result.Response.Body).To(Equal("test-body"))
+	Expect(result.Response.Body).To(Equal("request matched"))
 }
 
-func Test_Match_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
+func Test_RequestMatcher_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -206,9 +194,7 @@ func Test_Match_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
-		Response: models.ResponseDetails{
-			Body: "test-body",
-		},
+		Response: testResponse,
 	})
 
 	r := models.RequestDetails{
@@ -220,12 +206,12 @@ func Test_Match_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 		},
 	}
 
-	result, _ := unit.Match(r, false, simulation)
+	result, _ := matching.RequestMatcher(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
 
-func Test_Match_EndpointMatchWithHeaders(t *testing.T) {
+func Test_RequestMatcher_EndpointMatchWithHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -256,9 +242,7 @@ func Test_Match_EndpointMatchWithHeaders(t *testing.T) {
 				ExactMatch: &query,
 			},
 		},
-		Response: models.ResponseDetails{
-			Body: "test-body",
-		},
+		Response: testResponse,
 	})
 
 	r := models.RequestDetails{
@@ -271,12 +255,12 @@ func Test_Match_EndpointMatchWithHeaders(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result, _ := unit.Match(r, false, simulation)
+	result, _ := matching.RequestMatcher(r, false, simulation)
 
-	Expect(result.Response.Body).To(Equal("test-body"))
+	Expect(result.Response.Body).To(Equal("request matched"))
 }
 
-func Test_Match_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
+func Test_RequestMatcher_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -307,9 +291,7 @@ func Test_Match_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 				ExactMatch: &query,
 			},
 		},
-		Response: models.ResponseDetails{
-			Body: "test-body",
-		},
+		Response: testResponse,
 	})
 
 	r := models.RequestDetails{
@@ -323,17 +305,14 @@ func Test_Match_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 		},
 	}
 
-	result, _ := unit.Match(r, false, simulation)
+	result, _ := matching.RequestMatcher(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
 
-func Test_Match_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
+func Test_RequestMatcher_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := models.ResponseDetails{
-		Body: "test-body",
-	}
 	destination := "testhost.com"
 	method := "GET"
 	path := ""
@@ -355,7 +334,7 @@ func Test_Match_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 				ExactMatch: &query,
 			},
 		},
-		Response: response,
+		Response: testResponse,
 	})
 
 	r := models.RequestDetails{
@@ -363,9 +342,9 @@ func Test_Match_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 		Destination: "testhost.com",
 		Query:       "q=test",
 	}
-	result, _ := unit.Match(r, false, simulation)
+	result, _ := matching.RequestMatcher(r, false, simulation)
 
-	Expect(result.Response.Body).To(Equal("test-body"))
+	Expect(result.Response.Body).To(Equal("request matched"))
 
 	r = models.RequestDetails{
 		Method:      "GET",
@@ -374,28 +353,26 @@ func Test_Match_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 		Query:       "q=test",
 	}
 
-	result, _ = unit.Match(r, false, simulation)
+	result, _ = matching.RequestMatcher(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
 
-func Test_Match_RequestTemplateResponsePairCanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
+func Test_RequestMatcher_RequestMatcherResponsePairCanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
 	RegisterTestingT(t)
 
 	method := "POST"
 
-	requestTemplateResponsePair := models.RequestMatcherResponsePair{
+	requestMatcherResponsePair := models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: &method,
 			},
 		},
-		Response: models.ResponseDetails{
-			Body: "template matched",
-		},
+		Response: testResponse,
 	}
 
-	pairView := requestTemplateResponsePair.BuildView()
+	pairView := requestMatcherResponsePair.BuildView()
 
 	Expect(pairView.Request.Method.ExactMatch).To(Equal(StringToPointer("POST")))
 	Expect(pairView.Request.Destination).To(BeNil())
@@ -403,10 +380,10 @@ func Test_Match_RequestTemplateResponsePairCanBeConvertedToARequestResponsePairV
 	Expect(pairView.Request.Scheme).To(BeNil())
 	Expect(pairView.Request.Query).To(BeNil())
 
-	Expect(pairView.Response.Body).To(Equal("template matched"))
+	Expect(pairView.Response.Body).To(Equal("request matched"))
 }
 
-func Test_Match_TemplatesCanUseGlobsAndBeMatched(t *testing.T) {
+func Test_RequestMatcher_RequestMatchersCanUseGlobsAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -417,9 +394,7 @@ func Test_Match_TemplatesCanUseGlobsAndBeMatched(t *testing.T) {
 				GlobMatch: StringToPointer("*.com"),
 			},
 		},
-		Response: models.ResponseDetails{
-			Body: "template matched",
-		},
+		Response: testResponse,
 	})
 
 	request := models.RequestDetails{
@@ -428,13 +403,13 @@ func Test_Match_TemplatesCanUseGlobsAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err := unit.Match(request, false, simulation)
+	response, err := matching.RequestMatcher(request, false, simulation)
 	Expect(err).To(BeNil())
 
-	Expect(response.Response.Body).To(Equal("template matched"))
+	Expect(response.Response.Body).To(Equal("request matched"))
 }
 
-func Test_Match_TemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
+func Test_RequestMatcher_RequestMatchersCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -445,9 +420,7 @@ func Test_Match_TemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 				GlobMatch: StringToPointer("H*"),
 			},
 		},
-		Response: models.ResponseDetails{
-			Body: "template matched",
-		},
+		Response: testResponse,
 	})
 
 	request := models.RequestDetails{
@@ -457,13 +430,13 @@ func Test_Match_TemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err := unit.Match(request, false, simulation)
+	response, err := matching.RequestMatcher(request, false, simulation)
 	Expect(err).To(BeNil())
 
-	Expect(response.Response.Body).To(Equal("template matched"))
+	Expect(response.Response.Body).To(Equal("request matched"))
 }
 
-func Test_Match_TemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
+func Test_RequestMatcher_RequestMatchersCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -474,9 +447,7 @@ func Test_Match_TemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 				"unique-header": []string{"*"},
 			},
 		},
-		Response: models.ResponseDetails{
-			Body: "template matched",
-		},
+		Response: testResponse,
 	})
 
 	request := models.RequestDetails{
@@ -488,13 +459,13 @@ func Test_Match_TemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 		},
 	}
 
-	response, err := unit.Match(request, false, simulation)
+	response, err := matching.RequestMatcher(request, false, simulation)
 	Expect(err).To(BeNil())
 
-	Expect(response.Response.Body).To(Equal("template matched"))
+	Expect(response.Response.Body).To(Equal("request matched"))
 }
 
-func Test_Match_RequestMatcherResponsePair_ConvertToRequestResponsePairView_CanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
+func Test_RequestMatcher_RequestMatcherResponsePair_ConvertToRequestResponsePairView_CanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
 	RegisterTestingT(t)
 
 	method := "POST"
@@ -505,9 +476,7 @@ func Test_Match_RequestMatcherResponsePair_ConvertToRequestResponsePairView_CanB
 				ExactMatch: &method,
 			},
 		},
-		Response: models.ResponseDetails{
-			Body: "template matched",
-		},
+		Response: testResponse,
 	}
 
 	pairView := requestMatcherResponsePair.BuildView()
@@ -518,5 +487,5 @@ func Test_Match_RequestMatcherResponsePair_ConvertToRequestResponsePairView_CanB
 	Expect(pairView.Request.Scheme).To(BeNil())
 	Expect(pairView.Request.Query).To(BeNil())
 
-	Expect(pairView.Response.Body).To(Equal("template matched"))
+	Expect(pairView.Response.Body).To(Equal("request matched"))
 }

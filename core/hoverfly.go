@@ -272,7 +272,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		return &cachedResponse.MatchingPair.Response, nil
 	}
 
-	pair, err := matching.TemplateMatcher{}.Match(requestDetails, hf.Cfg.Webserver, hf.Simulation)
+	pair, err := matching.RequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
 	hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair)
 
 	if err != nil {
