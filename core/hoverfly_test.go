@@ -351,6 +351,26 @@ func Test_Hoverfly_GetResponse_WillCheckTemplatesAndReturnTemplateResponseIfCach
 	Expect(response.Body).To(Equal("template response"))
 }
 
+func Test_Hoverfly_GetResponse_WillCacheMisses(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	requestDetails := models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+	}
+
+	_, err := unit.GetResponse(requestDetails)
+	Expect(err.Error()).To(Equal("Could not find recorded request, please record it first!"))
+
+	cachedResponse, err := unit.CacheMatcher.GetCachedResponse(&requestDetails)
+	Expect(err).To(BeNil())
+
+	Expect(cachedResponse.MatchingPair).To(BeNil())
+}
+
 type ResponseDelayListStub struct {
 	gotDelays int
 }
