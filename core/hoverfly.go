@@ -263,11 +263,18 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
 
 	cachedResponse, cacheErr := hf.CacheMatcher.GetCachedResponse(&requestDetails)
-	if cacheErr == nil && !cachedResponse.HeaderMatch {
+	if cacheErr == nil && cachedResponse.MatchingPair == nil {
+		return nil, &matching.MatchingError{
+			StatusCode:  412,
+			Description: "Could not find recorded request, please record it first!",
+		}
+	} else if cacheErr == nil && !cachedResponse.HeaderMatch {
 		return &cachedResponse.MatchingPair.Response, nil
 	}
 
 	pair, err := matching.TemplateMatcher{}.Match(requestDetails, hf.Cfg.Webserver, hf.Simulation)
+	hf.CacheMatcher.SaveRequestTemplateResponsePair(requestDetails, pair)
+
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":       err.Error(),
@@ -282,8 +289,6 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 			Description: "Could not find recorded request, please record it first!",
 		}
 	}
-
-	hf.CacheMatcher.SaveRequestTemplateResponsePair(requestDetails, pair)
 
 	return &pair.Response, nil
 }
