@@ -394,7 +394,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 	}))
 }
 
-func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(t *testing.T) {
+func TestImportImportRequestResponsePairs_CanImportARequesResponsePairView(t *testing.T) {
 	RegisterTestingT(t)
 
 	cache := cache.NewInMemoryCache()
@@ -404,7 +404,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 
 	RegisterTestingT(t)
 
-	requestTemplate := v2.RequestDetailsViewV2{
+	request := v2.RequestDetailsViewV2{
 		Method: &v2.RequestFieldMatchersView{
 			ExactMatch: StringToPointer("GET"),
 		},
@@ -417,12 +417,12 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 		Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 	}
 
-	templatePair := v2.RequestResponsePairViewV2{
+	requestResponsePair := v2.RequestResponsePairViewV2{
 		Response: responseView,
-		Request:  requestTemplate,
+		Request:  request,
 	}
 
-	hv.ImportRequestResponsePairViews([]v2.RequestResponsePairViewV2{templatePair})
+	hv.ImportRequestResponsePairViews([]v2.RequestResponsePairViewV2{requestResponsePair})
 
 	Expect(len(hv.Simulation.MatchingPairs)).To(Equal(1))
 

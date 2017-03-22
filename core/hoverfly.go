@@ -282,7 +282,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 			"path":        requestDetails.Path,
 			"destination": requestDetails.Destination,
 			"method":      requestDetails.Method,
-		}).Warn("Failed to find matching request template from template store")
+		}).Warn("Failed to find matching request from simulation")
 
 		return nil, &matching.MatchingError{
 			StatusCode:  412,

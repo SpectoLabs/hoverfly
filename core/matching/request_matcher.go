@@ -13,37 +13,37 @@ func RequestMatcher(req models.RequestDetails, webserver bool, simulation *model
 		// TODO: need to enable regex matches
 		// TODO: enable matching on scheme
 
-		template := matchingPair.RequestMatcher
+		requestMatcher := matchingPair.RequestMatcher
 
-		if !FieldMatcher(template.Body, req.Body) {
+		if !FieldMatcher(requestMatcher.Body, req.Body) {
 			continue
 		}
 
 		if !webserver {
-			if !FieldMatcher(template.Destination, req.Destination) {
+			if !FieldMatcher(requestMatcher.Destination, req.Destination) {
 				continue
 			}
 		}
 
-		if !FieldMatcher(template.Path, req.Path) {
+		if !FieldMatcher(requestMatcher.Path, req.Path) {
 			continue
 		}
 
-		if !FieldMatcher(template.Query, req.Query) {
+		if !FieldMatcher(requestMatcher.Query, req.Query) {
 			continue
 		}
 
-		if !FieldMatcher(template.Method, req.Method) {
+		if !FieldMatcher(requestMatcher.Method, req.Method) {
 			continue
 		}
 
-		if !HeaderMatcher(template.Headers, req.Headers) {
+		if !HeaderMatcher(requestMatcher.Headers, req.Headers) {
 			continue
 		}
 
-		// return the first template to match
+		// return the first requestMatcher to match
 		return &models.RequestMatcherResponsePair{
-			RequestMatcher: template,
+			RequestMatcher: requestMatcher,
 			Response:       matchingPair.Response,
 		}, nil
 	}
