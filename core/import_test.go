@@ -88,7 +88,7 @@ func TestImportFromDisk(t *testing.T) {
 	err := dbClient.Import("examples/exports/readthedocs.json")
 	Expect(err).To(BeNil())
 
-	Expect(dbClient.Simulation.Templates).To(HaveLen(5))
+	Expect(dbClient.Simulation.MatchingPairs).To(HaveLen(5))
 }
 
 func TestImportFromDiskBlankPath(t *testing.T) {
@@ -128,7 +128,7 @@ func TestImportFromURL(t *testing.T) {
 	err = dbClient.Import(server.URL)
 	Expect(err).To(BeNil())
 
-	Expect(dbClient.Simulation.Templates).To(HaveLen(5))
+	Expect(dbClient.Simulation.MatchingPairs).To(HaveLen(5))
 }
 
 func TestImportFromURLRedirect(t *testing.T) {
@@ -156,7 +156,7 @@ func TestImportFromURLRedirect(t *testing.T) {
 	err = dbClient.Import(redirectServer.URL)
 	Expect(err).To(BeNil())
 
-	Expect(dbClient.Simulation.Templates).To(HaveLen(5))
+	Expect(dbClient.Simulation.MatchingPairs).To(HaveLen(5))
 }
 
 func TestImportFromURLHTTPFail(t *testing.T) {
@@ -223,13 +223,13 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 
 	hv.ImportRequestResponsePairViews([]v2.RequestResponsePairViewV2{originalPair})
 
-	Expect(hv.Simulation.Templates[0]).To(Equal(models.RequestTemplateResponsePair{
+	Expect(hv.Simulation.MatchingPairs[0]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "hello_world",
 			Headers: map[string][]string{"Content-Type": []string{"text/plain"}},
 		},
-		RequestTemplate: models.RequestTemplate{
+		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/"),
 			},
@@ -305,14 +305,14 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 
 	hv.ImportRequestResponsePairViews([]v2.RequestResponsePairViewV2{originalPair1, originalPair2, originalPair3})
 
-	Expect(hv.Simulation.Templates).To(HaveLen(3))
-	Expect(hv.Simulation.Templates[0]).To(Equal(models.RequestTemplateResponsePair{
+	Expect(hv.Simulation.MatchingPairs).To(HaveLen(3))
+	Expect(hv.Simulation.MatchingPairs[0]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "hello_world",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
-		RequestTemplate: models.RequestTemplate{
+		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/"),
 			},
@@ -335,13 +335,13 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 		},
 	}))
 
-	Expect(hv.Simulation.Templates[1]).To(Equal(models.RequestTemplateResponsePair{
+	Expect(hv.Simulation.MatchingPairs[1]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "hello_world",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
-		RequestTemplate: models.RequestTemplate{
+		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/new/path"),
 			},
@@ -364,13 +364,13 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 		},
 	}))
 
-	Expect(hv.Simulation.Templates[2]).To(Equal(models.RequestTemplateResponsePair{
+	Expect(hv.Simulation.MatchingPairs[2]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "hello_world",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
-		RequestTemplate: models.RequestTemplate{
+		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/newer/path"),
 			},
@@ -424,13 +424,13 @@ func TestImportImportRequestResponsePairs_CanImportARequestTemplateResponsePair(
 
 	hv.ImportRequestResponsePairViews([]v2.RequestResponsePairViewV2{templatePair})
 
-	Expect(len(hv.Simulation.Templates)).To(Equal(1))
+	Expect(len(hv.Simulation.MatchingPairs)).To(Equal(1))
 
-	Expect(hv.Simulation.Templates[0].RequestTemplate.Method.ExactMatch).To(Equal(StringToPointer("GET")))
+	Expect(hv.Simulation.MatchingPairs[0].RequestMatcher.Method.ExactMatch).To(Equal(StringToPointer("GET")))
 
-	Expect(hv.Simulation.Templates[0].Response.Status).To(Equal(200))
-	Expect(hv.Simulation.Templates[0].Response.Body).To(Equal("hello_world"))
-	Expect(hv.Simulation.Templates[0].Response.Headers).To(Equal(map[string][]string{"Hoverfly": []string{"testing"}}))
+	Expect(hv.Simulation.MatchingPairs[0].Response.Status).To(Equal(200))
+	Expect(hv.Simulation.MatchingPairs[0].Response.Body).To(Equal("hello_world"))
+	Expect(hv.Simulation.MatchingPairs[0].Response.Headers).To(Equal(map[string][]string{"Hoverfly": []string{"testing"}}))
 }
 
 // Helper function for base64 encoding
@@ -483,7 +483,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 
 	hv.ImportRequestResponsePairViews([]v2.RequestResponsePairViewV2{encodedPair})
 
-	Expect(hv.Simulation.Templates[0]).ToNot(Equal(models.RequestResponsePair{
+	Expect(hv.Simulation.MatchingPairs[0]).ToNot(Equal(models.RequestResponsePair{
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "hello_world",

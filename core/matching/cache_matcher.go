@@ -116,7 +116,7 @@ func (this CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 	return cacheView, nil
 }
 
-func (this *CacheMatcher) SaveRequestTemplateResponsePair(request models.RequestDetails, pair *models.RequestTemplateResponsePair) error {
+func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestDetails, pair *models.RequestMatcherResponsePair) error {
 	if this.RequestCache == nil {
 		return errors.New("No cache set")
 	}
@@ -138,7 +138,7 @@ func (this *CacheMatcher) SaveRequestTemplateResponsePair(request models.Request
 		"hashKey":       key,
 	}).Debug("Saving response to cache")
 
-	headerMatch := pair != nil && len(pair.RequestTemplate.Headers) > 0
+	headerMatch := pair != nil && len(pair.RequestMatcher.Headers) > 0
 
 	cachedResponse := models.CachedResponse{
 		Request:      request,
@@ -167,9 +167,9 @@ func (this CacheMatcher) PreloadCache(simulation models.Simulation) error {
 	if this.RequestCache == nil {
 		return errors.New("No cache set")
 	}
-	for _, pair := range simulation.Templates {
-		if requestDetails := pair.RequestTemplate.BuildRequestDetailsFromExactMatches(); requestDetails != nil {
-			this.SaveRequestTemplateResponsePair(*requestDetails, &pair)
+	for _, pair := range simulation.MatchingPairs {
+		if requestDetails := pair.RequestMatcher.BuildRequestDetailsFromExactMatches(); requestDetails != nil {
+			this.SaveRequestMatcherResponsePair(*requestDetails, &pair)
 		}
 	}
 

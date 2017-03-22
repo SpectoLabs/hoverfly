@@ -43,19 +43,19 @@ func (this RequestFieldMatchers) BuildView() *v2.RequestFieldMatchersView {
 	}
 }
 
-type RequestTemplateResponsePair struct {
-	RequestTemplate RequestTemplate
-	Response        ResponseDetails
+type RequestMatcherResponsePair struct {
+	RequestMatcher RequestMatcher
+	Response       ResponseDetails
 }
 
-func NewRequestTemplateResponsePairFromView(view *v2.RequestResponsePairViewV2) *RequestTemplateResponsePair {
+func NewRequestMatcherResponsePairFromView(view *v2.RequestResponsePairViewV2) *RequestMatcherResponsePair {
 	if view.Request.Query != nil && view.Request.Query.ExactMatch != nil {
 		sortedQuery := util.SortQueryString(*view.Request.Query.ExactMatch)
 		view.Request.Query.ExactMatch = &sortedQuery
 	}
 
-	return &RequestTemplateResponsePair{
-		RequestTemplate: RequestTemplate{
+	return &RequestMatcherResponsePair{
+		RequestMatcher: RequestMatcher{
 			Path:        NewRequestFieldMatchersFromView(view.Request.Path),
 			Method:      NewRequestFieldMatchersFromView(view.Request.Method),
 			Destination: NewRequestFieldMatchersFromView(view.Request.Destination),
@@ -68,32 +68,32 @@ func NewRequestTemplateResponsePairFromView(view *v2.RequestResponsePairViewV2) 
 	}
 }
 
-func (this *RequestTemplateResponsePair) BuildView() v2.RequestResponsePairViewV2 {
+func (this *RequestMatcherResponsePair) BuildView() v2.RequestResponsePairViewV2 {
 
 	var path, method, destination, scheme, query, body *v2.RequestFieldMatchersView
 
-	if this.RequestTemplate.Path != nil {
-		path = this.RequestTemplate.Path.BuildView()
+	if this.RequestMatcher.Path != nil {
+		path = this.RequestMatcher.Path.BuildView()
 	}
 
-	if this.RequestTemplate.Method != nil {
-		method = this.RequestTemplate.Method.BuildView()
+	if this.RequestMatcher.Method != nil {
+		method = this.RequestMatcher.Method.BuildView()
 	}
 
-	if this.RequestTemplate.Destination != nil {
-		destination = this.RequestTemplate.Destination.BuildView()
+	if this.RequestMatcher.Destination != nil {
+		destination = this.RequestMatcher.Destination.BuildView()
 	}
 
-	if this.RequestTemplate.Scheme != nil {
-		scheme = this.RequestTemplate.Scheme.BuildView()
+	if this.RequestMatcher.Scheme != nil {
+		scheme = this.RequestMatcher.Scheme.BuildView()
 	}
 
-	if this.RequestTemplate.Query != nil {
-		query = this.RequestTemplate.Query.BuildView()
+	if this.RequestMatcher.Query != nil {
+		query = this.RequestMatcher.Query.BuildView()
 	}
 
-	if this.RequestTemplate.Body != nil {
-		body = this.RequestTemplate.Body.BuildView()
+	if this.RequestMatcher.Body != nil {
+		body = this.RequestMatcher.Body.BuildView()
 	}
 
 	return v2.RequestResponsePairViewV2{
@@ -104,13 +104,13 @@ func (this *RequestTemplateResponsePair) BuildView() v2.RequestResponsePairViewV
 			Scheme:      scheme,
 			Query:       query,
 			Body:        body,
-			Headers:     this.RequestTemplate.Headers,
+			Headers:     this.RequestMatcher.Headers,
 		},
 		Response: this.Response.ConvertToResponseDetailsView(),
 	}
 }
 
-type RequestTemplate struct {
+type RequestMatcher struct {
 	Path        *RequestFieldMatchers
 	Method      *RequestFieldMatchers
 	Destination *RequestFieldMatchers
@@ -120,7 +120,7 @@ type RequestTemplate struct {
 	Headers     map[string][]string
 }
 
-func (this RequestTemplate) BuildRequestDetailsFromExactMatches() *RequestDetails {
+func (this RequestMatcher) BuildRequestDetailsFromExactMatches() *RequestDetails {
 	if this.Body == nil || this.Body.ExactMatch == nil ||
 		this.Destination == nil || this.Destination.ExactMatch == nil ||
 		this.Method == nil || this.Method.ExactMatch == nil ||

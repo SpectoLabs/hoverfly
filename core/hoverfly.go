@@ -273,7 +273,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	}
 
 	pair, err := matching.TemplateMatcher{}.Match(requestDetails, hf.Cfg.Webserver, hf.Simulation)
-	hf.CacheMatcher.SaveRequestTemplateResponsePair(requestDetails, pair)
+	hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair)
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -326,8 +326,8 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		}
 	}
 
-	pair := models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	pair := models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer(request.Path),
 			},
@@ -349,7 +349,7 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		Response: *response,
 	}
 
-	hf.Simulation.AddRequestTemplateResponsePair(&pair)
+	hf.Simulation.AddRequestMatcherResponsePair(&pair)
 
 	return nil
 }
@@ -367,5 +367,5 @@ func (this Hoverfly) IsMiddlewareSet() bool {
 }
 
 func (this Hoverfly) GetSimulationPairsCount() int {
-	return len(this.Simulation.Templates)
+	return len(this.Simulation.MatchingPairs)
 }
