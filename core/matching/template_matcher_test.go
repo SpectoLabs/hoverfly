@@ -18,8 +18,8 @@ func Test_Match_EmptyTemplateShouldMatchOnAnyRequest(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{},
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{},
 		Response: models.ResponseDetails{
 			Body: "test-body",
 		},
@@ -42,8 +42,8 @@ func Test_Match_TemplateShouldMatchOnBody(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Body: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("body"),
 			},
@@ -72,8 +72,8 @@ func Test_Match_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
 		Response: models.ResponseDetails{
@@ -105,8 +105,8 @@ func Test_Match_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
 		Response: models.ResponseDetails{
@@ -137,8 +137,8 @@ func Test_Match_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
 		Response: models.ResponseDetails{
@@ -169,8 +169,8 @@ func Test_Match_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
 		Response: models.ResponseDetails{
@@ -202,8 +202,8 @@ func Test_Match_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
 		Response: models.ResponseDetails{
@@ -240,8 +240,8 @@ func Test_Match_EndpointMatchWithHeaders(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: &destination,
@@ -291,8 +291,8 @@ func Test_Match_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: &destination,
@@ -340,8 +340,8 @@ func Test_Match_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 	query := "q=test"
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: &destination,
 			},
@@ -384,8 +384,8 @@ func Test_Match_RequestTemplateResponsePairCanBeConvertedToARequestResponsePairV
 
 	method := "POST"
 
-	requestTemplateResponsePair := models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	requestTemplateResponsePair := models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: &method,
 			},
@@ -411,8 +411,8 @@ func Test_Match_TemplatesCanUseGlobsAndBeMatched(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				GlobMatch: StringToPointer("*.com"),
 			},
@@ -439,8 +439,8 @@ func Test_Match_TemplatesCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Scheme: &models.RequestFieldMatchers{
 				GlobMatch: StringToPointer("H*"),
 			},
@@ -468,8 +468,8 @@ func Test_Match_TemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.Templates = append(simulation.Templates, models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Headers: map[string][]string{
 				"unique-header": []string{"*"},
 			},
@@ -494,13 +494,13 @@ func Test_Match_TemplatesCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 	Expect(response.Response.Body).To(Equal("template matched"))
 }
 
-func Test_Match_RequestTemplateResponsePair_ConvertToRequestResponsePairView_CanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
+func Test_Match_RequestMatcherResponsePair_ConvertToRequestResponsePairView_CanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
 	RegisterTestingT(t)
 
 	method := "POST"
 
-	requestTemplateResponsePair := models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	requestMatcherResponsePair := models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: &method,
 			},
@@ -510,7 +510,7 @@ func Test_Match_RequestTemplateResponsePair_ConvertToRequestResponsePairView_Can
 		},
 	}
 
-	pairView := requestTemplateResponsePair.BuildView()
+	pairView := requestMatcherResponsePair.BuildView()
 
 	Expect(pairView.Request.Method.ExactMatch).To(Equal(StringToPointer("POST")))
 	Expect(pairView.Request.Destination).To(BeNil())

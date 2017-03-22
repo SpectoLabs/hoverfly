@@ -7,7 +7,7 @@ import (
 
 type CachedResponse struct {
 	Request      RequestDetails
-	MatchingPair *RequestTemplateResponsePair
+	MatchingPair *RequestMatcherResponsePair
 	HeaderMatch  bool
 }
 

@@ -143,7 +143,7 @@ func (hf *Hoverfly) SetMiddleware(binary, script, remote string) error {
 }
 
 func (hf Hoverfly) GetRequestCacheCount() (int, error) {
-	return len(hf.Simulation.Templates), nil
+	return len(hf.Simulation.MatchingPairs), nil
 }
 
 func (this Hoverfly) GetMetadataCache() cache.Cache {
@@ -193,7 +193,7 @@ func (hf Hoverfly) GetStats() metrics.Stats {
 func (hf Hoverfly) GetSimulation() (v2.SimulationViewV2, error) {
 	pairViews := make([]v2.RequestResponsePairViewV2, 0)
 
-	for _, v := range hf.Simulation.Templates {
+	for _, v := range hf.Simulation.MatchingPairs {
 		pairViews = append(pairViews, v.BuildView())
 	}
 
@@ -225,8 +225,8 @@ func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV2) error {
 }
 
 func (this *Hoverfly) DeleteSimulation() {
-	var templates []models.RequestTemplateResponsePair
-	this.Simulation.Templates = templates
+	var pairs []models.RequestMatcherResponsePair
+	this.Simulation.MatchingPairs = pairs
 	this.DeleteResponseDelays()
 	this.FlushCache()
 }
