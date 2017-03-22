@@ -18,7 +18,7 @@ var _ = Describe("hoverctl flush cache", func() {
 		hoverfly.Start()
 		hoverfly.SetMode("simulate")
 		hoverfly.ImportSimulation(functional_tests.JsonPayload)
-		hoverfly.Proxy(sling.New().Get("http://template-server.com"))
+		hoverfly.Proxy(sling.New().Get("http://destination-server.com"))
 
 		WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
 	})

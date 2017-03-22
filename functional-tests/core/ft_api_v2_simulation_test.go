@@ -113,7 +113,7 @@ var _ = Describe("/api/v2/simulation", func() {
 			destinationMatchers, err = pairTwoRequest.GetObject("destination")
 			Expect(err).To(BeNil())
 
-			Expect(destinationMatchers.GetString("exactMatch")).Should(Equal("template-server.com"))
+			Expect(destinationMatchers.GetString("exactMatch")).Should(Equal("destination-server.com"))
 			Expect(pairTwoRequest.GetNull("method")).ShouldNot(Succeed())
 			Expect(pairTwoRequest.GetNull("path")).ShouldNot(Succeed())
 			Expect(pairTwoRequest.GetNull("destination")).ShouldNot(Succeed())
@@ -126,7 +126,7 @@ var _ = Describe("/api/v2/simulation", func() {
 			pairTwoResponse, err := pairsArray[1].GetObject("response")
 
 			Expect(pairTwoResponse.GetInt64("status")).Should(Equal(int64(200)))
-			Expect(pairTwoResponse.GetString("body")).Should(Equal("template match"))
+			Expect(pairTwoResponse.GetString("body")).Should(Equal("destination matched"))
 			Expect(pairTwoResponse.GetBoolean("encodedBody")).Should(BeFalse())
 
 			globalActionsObject, err := dataObject.GetObject("globalActions")
@@ -191,12 +191,12 @@ var _ = Describe("/api/v2/simulation", func() {
 					"pairs": [{
 						"request": {
 							"destination": {
-								"exactMatch": "templatedurl.com"
+								"exactMatch": "destination-server.com"
 							}
 						},
 						"response": {
 							"status": 200,
-							"body": "This is the body for the template",
+							"body": "destination matched",
 							"encodedBody": false,
 							"headers": {}
 						}
@@ -238,7 +238,7 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			destination, err := destinationMatchers.GetString("exactMatch")
 			Expect(err).To(BeNil())
-			Expect(destination).To(Equal("templatedurl.com"))
+			Expect(destination).To(Equal("destination-server.com"))
 
 			responseObject, err := pairsArray[0].GetObject("response")
 			Expect(err).To(BeNil())
@@ -249,7 +249,7 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			body, err := responseObject.GetString("body")
 			Expect(err).To(BeNil())
-			Expect(body).To(Equal("This is the body for the template"))
+			Expect(body).To(Equal("destination matched"))
 
 			encodedBody, err := responseObject.GetBoolean("encodedBody")
 			Expect(err).To(BeNil())
@@ -264,12 +264,12 @@ var _ = Describe("/api/v2/simulation", func() {
 					"pairs": [{
 						"request": {
 							"destination": {
-								"exactMatch": "templatedurl.com"
+								"exactMatch": "destination-server.com"
 							}
 						},
 						"response": {
 							"status": 200,
-							"body": "This is the body for the template",
+							"body": "destination matched",
 							"encodedBody": false,
 							"headers": {}
 						}
@@ -306,7 +306,7 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			destination, err := destinationMatchers.GetString("exactMatch")
 			Expect(err).To(BeNil())
-			Expect(destination).To(Equal("templatedurl.com"))
+			Expect(destination).To(Equal("destination-server.com"))
 
 			responseObject, err := pairsArray[0].GetObject("response")
 			Expect(err).To(BeNil())
@@ -317,7 +317,7 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			body, err := responseObject.GetString("body")
 			Expect(err).To(BeNil())
-			Expect(body).To(Equal("This is the body for the template"))
+			Expect(body).To(Equal("destination matched"))
 
 			encodedBody, err := responseObject.GetBoolean("encodedBody")
 			Expect(err).To(BeNil())

@@ -29,15 +29,15 @@ var _ = Describe("/api/v2/cache", func() {
 	Context("GET", func() {
 
 		It("should cache matches", func() {
-			hoverfly.Proxy(sling.New().Get("http://template-server.com"))
+			hoverfly.Proxy(sling.New().Get("http://destination-server.com"))
 			cacheView := hoverfly.GetCache()
 
 			Expect(cacheView.Cache).To(HaveLen(1))
 
-			Expect(*cacheView.Cache[0].MatchingPair.Request.Destination.ExactMatch).To(Equal("template-server.com"))
+			Expect(*cacheView.Cache[0].MatchingPair.Request.Destination.ExactMatch).To(Equal("destination-server.com"))
 
 			Expect(cacheView.Cache[0].MatchingPair.Response.Status).To(Equal(200))
-			Expect(cacheView.Cache[0].MatchingPair.Response.Body).To(Equal("template match"))
+			Expect(cacheView.Cache[0].MatchingPair.Response.Body).To(Equal("destination matched"))
 			Expect(cacheView.Cache[0].MatchingPair.Response.EncodedBody).To(BeFalse())
 		})
 

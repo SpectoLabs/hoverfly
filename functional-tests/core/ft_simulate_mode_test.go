@@ -25,7 +25,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 		hoverfly.Stop()
 	})
 
-	It("should match against recording in simulation", func() {
+	It("should match against the first request matcher in simulation", func() {
 		hoverfly.ImportSimulation(functional_tests.JsonPayload)
 
 		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/path1"))
@@ -36,6 +36,17 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		Expect(string(body)).To(Equal("exact match"))
 		Expect(resp.Header).To(HaveKeyWithValue("Header", []string{"value1", "value2"}))
+	})
+
+	It("should match against the second request matcher in simulation", func() {
+		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+
+		slingRequest := sling.New().Get("http://destination-server.com/should-match-regardless")
+		response := hoverfly.Proxy(slingRequest)
+
+		body, err := ioutil.ReadAll(response.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("destination matched"))
 	})
 
 	It("should apply middleware to the cached response", func() {
@@ -49,16 +60,4 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		Expect(string(body)).To(Equal("CHANGED_RESPONSE_BODY"))
 	})
-
-	It("should match against template in simulation", func() {
-		hoverfly.ImportSimulation(functional_tests.JsonPayload)
-
-		slingRequest := sling.New().Get("http://template-server.com/should-match-regardless")
-		response := hoverfly.Proxy(slingRequest)
-
-		body, err := ioutil.ReadAll(response.Body)
-		Expect(err).To(BeNil())
-		Expect(string(body)).To(Equal("template match"))
-	})
-
 })

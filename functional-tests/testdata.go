@@ -75,13 +75,13 @@ var JsonPayload = `{
             {
                 "response": {
                     "status": 200,
-                    "body": "template match",
+                    "body": "destination matched",
                     "encodedBody": false,
                     "headers": {}
                 },
                 "request": {
                     "destination": {
-                        "exactMatch": "template-server.com"
+                        "exactMatch": "destination-server.com"
                     }
                 }
             }
@@ -395,7 +395,6 @@ var JsonPayloadV1 = `{
                     "headers": {}
                 },
                 "request": {
-                    "requestType": "template",
                     "destination": "v1-simulation.com"
                 }
             },
@@ -516,13 +515,13 @@ var ExactMatchPayload = `{
             {
                 "response": {
                     "status": 200,
-                    "body": "template match",
+                    "body": "destination matched",
                     "encodedBody": false,
                     "headers": {}
                 },
                 "request": {
                     "destination": {
-                        "exactMatch": "template-server.com"
+                        "exactMatch": "destination-server.com"
                     }
                 }
             }
