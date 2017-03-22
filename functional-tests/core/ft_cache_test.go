@@ -20,7 +20,7 @@ var _ = Describe("Hoverfly cache", func() {
 		hoverfly = functional_tests.NewHoverfly()
 		hoverfly.Start()
 		hoverfly.ImportSimulation(functional_tests.JsonPayload)
-		hoverfly.Proxy(sling.New().Get("http://template-server.com"))
+		hoverfly.Proxy(sling.New().Get("http://destination-server.com"))
 	})
 
 	AfterEach(func() {
@@ -42,7 +42,7 @@ var _ = Describe("Hoverfly cache", func() {
 		Expect(cacheView.Cache).To(HaveLen(0))
 	})
 
-	It("should preload the cache with exact match templates when put into simulate mode", func() {
+	It("should preload the cache with exact match request matcher when put into simulate mode", func() {
 		hoverfly.ImportSimulation(functional_tests.JsonPayload)
 
 		hoverfly.SetMode("simulate")
@@ -52,7 +52,7 @@ var _ = Describe("Hoverfly cache", func() {
 		Expect(cacheView.Cache).To(HaveLen(1))
 	})
 
-	It("should not preload the cache if simulation does not contain exact match templates", func() {
+	It("should not preload the cache if simulation does not contain exact match request matcher", func() {
 		hoverfly.ImportSimulation(functional_tests.JsonMatchSimulation)
 
 		hoverfly.SetMode("simulate")

@@ -10,9 +10,9 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Using Hoverfly to return responses by request templates", func() {
+var _ = Describe("Using Hoverfly to return responses by request matchers", func() {
 
-	Context("With a request template loaded for matching on URL + headers", func() {
+	Context("With a request matcher loaded for matching on URL + headers", func() {
 
 		var (
 			jsonRequestResponsePair *bytes.Buffer
