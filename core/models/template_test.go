@@ -39,10 +39,10 @@ func Test_NewRequestFieldMatchers_BuildView(t *testing.T) {
 	Expect(*view.ExactMatch).To(Equal("exactly"))
 }
 
-func Test_NewRequestTemplateResponsePairFromView_BuildsPair(t *testing.T) {
+func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestTemplateResponsePairFromView(&v2.RequestResponsePairViewV2{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestResponsePairViewV2{
 		Request: v2.RequestDetailsViewV2{
 			Path: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("/"),
@@ -53,16 +53,16 @@ func Test_NewRequestTemplateResponsePairFromView_BuildsPair(t *testing.T) {
 		},
 	})
 
-	Expect(*unit.RequestTemplate.Path.ExactMatch).To(Equal("/"))
-	Expect(unit.RequestTemplate.Destination).To(BeNil())
+	Expect(*unit.RequestMatcher.Path.ExactMatch).To(Equal("/"))
+	Expect(unit.RequestMatcher.Destination).To(BeNil())
 
 	Expect(unit.Response.Body).To(Equal("body"))
 }
 
-func Test_NewRequestTemplateResponsePairFromView_SortsQuery(t *testing.T) {
+func Test_NewRequestMatcherResponsePairFromView_SortsQuery(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestTemplateResponsePairFromView(&v2.RequestResponsePairViewV2{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestResponsePairViewV2{
 		Request: v2.RequestDetailsViewV2{
 			Query: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("b=b&a=a"),
@@ -73,13 +73,13 @@ func Test_NewRequestTemplateResponsePairFromView_SortsQuery(t *testing.T) {
 		},
 	})
 
-	Expect(*unit.RequestTemplate.Query.ExactMatch).To(Equal("a=a&b=b"))
+	Expect(*unit.RequestMatcher.Query.ExactMatch).To(Equal("a=a&b=b"))
 }
 
-func Test_RequestTemplate_BuildRequestDetailsFromExactMatches_GeneratesARequestDetails(t *testing.T) {
+func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDetails(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.RequestTemplate{
+	unit := models.RequestMatcher{
 		Body: &models.RequestFieldMatchers{
 			ExactMatch: util.StringToPointer("body"),
 		},
@@ -111,10 +111,10 @@ func Test_RequestTemplate_BuildRequestDetailsFromExactMatches_GeneratesARequestD
 	}))
 }
 
-func Test_RequestTemplate_BuildRequestDetailsFromExactMatches_IncludesHeaders(t *testing.T) {
+func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_IncludesHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.RequestTemplate{
+	unit := models.RequestMatcher{
 		Body: &models.RequestFieldMatchers{
 			ExactMatch: util.StringToPointer("body"),
 		},
@@ -152,18 +152,18 @@ func Test_RequestTemplate_BuildRequestDetailsFromExactMatches_IncludesHeaders(t 
 	}))
 }
 
-func Test_RequestTemplate_BuildRequestDetailsFromExactMatches_ReturnsNilIfEmptyTemplate(t *testing.T) {
+func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.RequestTemplate{}
+	unit := models.RequestMatcher{}
 
 	Expect(unit.BuildRequestDetailsFromExactMatches()).To(BeNil())
 }
 
-func Test_RequestTemplate_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissingAnExactMatch(t *testing.T) {
+func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissingAnExactMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.RequestTemplate{
+	unit := models.RequestMatcher{
 		Destination: &models.RequestFieldMatchers{
 			ExactMatch: util.StringToPointer("destination"),
 		},

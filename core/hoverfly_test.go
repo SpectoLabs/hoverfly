@@ -78,7 +78,7 @@ func Test_Hoverfly_processRequest_CaptureModeReturnsResponseAndSavesIt(t *testin
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
-	Expect(unit.Simulation.Templates).To(HaveLen(1))
+	Expect(unit.Simulation.MatchingPairs).To(HaveLen(1))
 }
 
 func Test_Hoverfly_processRequest_CanSimulateRequest(t *testing.T) {
@@ -163,12 +163,12 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromCache(t *testing.T) {
 	server, unit := testTools(201, `{'message': 'here'}`)
 	server.Close()
 
-	unit.CacheMatcher.SaveRequestTemplateResponsePair(models.RequestDetails{
+	unit.CacheMatcher.SaveRequestMatcherResponsePair(models.RequestDetails{
 		Destination: "somehost.com",
 		Method:      "POST",
 		Scheme:      "http",
-	}, &models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	}, &models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("somehost.com"),
 			},
@@ -203,8 +203,8 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *tes
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("somehost.com"),
 			},
@@ -217,7 +217,7 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *tes
 		},
 		Response: models.ResponseDetails{
 			Status: 200,
-			Body:   "template response",
+			Body:   "response body",
 		},
 	})
 
@@ -231,7 +231,7 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *tes
 	Expect(response).ToNot(BeNil())
 
 	Expect(response.Status).To(Equal(http.StatusOK))
-	Expect(response.Body).To(Equal("template response"))
+	Expect(response.Body).To(Equal("response body"))
 }
 
 func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
@@ -239,8 +239,8 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("somehost.com"),
 			},
@@ -253,7 +253,7 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 		},
 		Response: models.ResponseDetails{
 			Status: 200,
-			Body:   "template response",
+			Body:   "response body",
 		},
 	})
 
@@ -271,7 +271,7 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 	cachedRequestResponsePair, err := models.NewCachedResponseFromBytes(pairBytes)
 	Expect(err).To(BeNil())
 
-	Expect(cachedRequestResponsePair.MatchingPair.Response.Body).To(Equal("template response"))
+	Expect(cachedRequestResponsePair.MatchingPair.Response.Body).To(Equal("response body"))
 
 	unit.Simulation = models.NewSimulation()
 	response, err := unit.GetResponse(models.RequestDetails{
@@ -284,7 +284,7 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 	Expect(response).ToNot(BeNil())
 
 	Expect(response.Status).To(Equal(http.StatusOK))
-	Expect(response.Body).To(Equal("template response"))
+	Expect(response.Body).To(Equal("response body"))
 }
 
 func Test_Hoverfly_GetResponse_WillReturnCachedResponseIfHeaderMatchIsFalse(t *testing.T) {
@@ -298,8 +298,8 @@ func Test_Hoverfly_GetResponse_WillReturnCachedResponseIfHeaderMatchIsFalse(t *t
 		Scheme:      "http",
 	}
 
-	unit.CacheMatcher.SaveRequestTemplateResponsePair(requestDetails, &models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{},
+	unit.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, &models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{},
 		Response: models.ResponseDetails{
 			Body: "cached response",
 		},
@@ -311,7 +311,7 @@ func Test_Hoverfly_GetResponse_WillReturnCachedResponseIfHeaderMatchIsFalse(t *t
 	Expect(response.Body).To(Equal("cached response"))
 }
 
-func Test_Hoverfly_GetResponse_WillCheckTemplatesAndReturnTemplateResponseIfCacheHasHeaders(t *testing.T) {
+func Test_Hoverfly_GetResponse_WillCheckRequestMatchersAndReturnRequestMatcherResponseIfCacheHasHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -322,8 +322,8 @@ func Test_Hoverfly_GetResponse_WillCheckTemplatesAndReturnTemplateResponseIfCach
 		Scheme:      "http",
 	}
 
-	unit.CacheMatcher.SaveRequestTemplateResponsePair(requestDetails, &models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	unit.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, &models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Headers: map[string][]string{
 				"Header": []string{"value"},
 			},
@@ -333,22 +333,22 @@ func Test_Hoverfly_GetResponse_WillCheckTemplatesAndReturnTemplateResponseIfCach
 		},
 	})
 
-	unit.Simulation.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("POST"),
 			},
 		},
 		Response: models.ResponseDetails{
 			Status: 200,
-			Body:   "template response",
+			Body:   "response body",
 		},
 	})
 
 	response, err := unit.GetResponse(requestDetails)
 	Expect(err).To(BeNil())
 
-	Expect(response.Body).To(Equal("template response"))
+	Expect(response.Body).To(Equal("response body"))
 }
 
 func Test_Hoverfly_GetResponse_WillCacheMisses(t *testing.T) {
@@ -633,18 +633,18 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 		Status:  200,
 	}, nil)
 
-	Expect(unit.Simulation.Templates).To(HaveLen(1))
+	Expect(unit.Simulation.MatchingPairs).To(HaveLen(1))
 
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Body.ExactMatch).To(Equal("testbody"))
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Destination.ExactMatch).To(Equal("testdestination"))
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Method.ExactMatch).To(Equal("testmethod"))
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Path.ExactMatch).To(Equal("/testpath"))
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Query.ExactMatch).To(Equal("?query=test"))
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Scheme.ExactMatch).To(Equal("http"))
+	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Body.ExactMatch).To(Equal("testbody"))
+	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("testdestination"))
+	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Method.ExactMatch).To(Equal("testmethod"))
+	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Path.ExactMatch).To(Equal("/testpath"))
+	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Query.ExactMatch).To(Equal("?query=test"))
+	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Scheme.ExactMatch).To(Equal("http"))
 
-	Expect(unit.Simulation.Templates[0].Response.Body).To(Equal("testresponsebody"))
-	Expect(unit.Simulation.Templates[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
-	Expect(unit.Simulation.Templates[0].Response.Status).To(Equal(200))
+	Expect(unit.Simulation.MatchingPairs[0].Response.Body).To(Equal("testresponsebody"))
+	Expect(unit.Simulation.MatchingPairs[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(unit.Simulation.MatchingPairs[0].Response.Status).To(Equal(200))
 }
 
 func Test_Hoverfly_Save_DoesNotSaveRequestHeadersWhenGivenHeadersArrayIsNil(t *testing.T) {
@@ -660,7 +660,7 @@ func Test_Hoverfly_Save_DoesNotSaveRequestHeadersWhenGivenHeadersArrayIsNil(t *t
 		Status:  200,
 	}, nil)
 
-	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(BeEmpty())
+	Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Headers).To(BeEmpty())
 }
 
 func Test_Hoverfly_Save_SavesAllRequestHeadersWhenGivenAnAsterisk(t *testing.T) {
@@ -679,9 +679,9 @@ func Test_Hoverfly_Save_SavesAllRequestHeadersWhenGivenAnAsterisk(t *testing.T) 
 		Status:  200,
 	}, []string{"*"})
 
-	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveLen(2))
-	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
-	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader2", []string{"testvalue2"}))
+	Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Headers).To(HaveLen(2))
+	Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Headers).To(HaveKeyWithValue("testheader2", []string{"testvalue2"}))
 }
 
 func Test_Hoverfly_Save_SavesSpecificRequestHeadersWhenSpecifiedInHeadersArray(t *testing.T) {
@@ -700,8 +700,8 @@ func Test_Hoverfly_Save_SavesSpecificRequestHeadersWhenSpecifiedInHeadersArray(t
 		Status:  200,
 	}, []string{"testheader"})
 
-	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveLen(1))
-	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Headers).To(HaveLen(1))
+	Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
 }
 
 func Test_Hoverfly_Save_DoesNotSaveAnyRequestHeaderIfItDoesNotMatchEntryInHeadersArray(t *testing.T) {
@@ -720,7 +720,7 @@ func Test_Hoverfly_Save_DoesNotSaveAnyRequestHeaderIfItDoesNotMatchEntryInHeader
 		Status:  200,
 	}, []string{"nonmatch"})
 
-	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(BeEmpty())
+	Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Headers).To(BeEmpty())
 }
 
 func Test_Hoverfly_Save_SavesMultipleRequestHeadersWhenMultiplesSpecifiedInHeadersArray(t *testing.T) {
@@ -740,9 +740,9 @@ func Test_Hoverfly_Save_SavesMultipleRequestHeadersWhenMultiplesSpecifiedInHeade
 		Status:  200,
 	}, []string{"testheader", "nonmatch"})
 
-	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveLen(2))
-	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
-	Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("nonmatch", []string{"nonmatchvalue"}))
+	Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Headers).To(HaveLen(2))
+	Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Headers).To(HaveKeyWithValue("nonmatch", []string{"nonmatchvalue"}))
 }
 
 func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing.T) {
@@ -758,19 +758,19 @@ func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing
 		Status:  200,
 	}, nil)
 
-	Expect(unit.Simulation.Templates).To(HaveLen(1))
+	Expect(unit.Simulation.MatchingPairs).To(HaveLen(1))
 
-	// Expect(unit.Simulation.Templates[0].RequestTemplate.Body).To(BeNil())
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Destination.ExactMatch).To(Equal("testdestination"))
-	// Expect(unit.Simulation.Templates[0].RequestTemplate.Headers).To(BeNil())
-	// Expect(*unit.Simulation.Templates[0].RequestTemplate.Method).To(BeNil())
-	// Expect(*unit.Simulation.Templates[0].RequestTemplate.Path).To(BeNil())
-	// Expect(*unit.Simulation.Templates[0].RequestTemplate.Query).To(BeNil())
-	// Expect(*unit.Simulation.Templates[0].RequestTemplate.Scheme).To(BeNil())
+	// Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Body).To(BeNil())
+	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("testdestination"))
+	// Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Headers).To(BeNil())
+	// Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Method).To(BeNil())
+	// Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Path).To(BeNil())
+	// Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Query).To(BeNil())
+	// Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Scheme).To(BeNil())
 
-	Expect(unit.Simulation.Templates[0].Response.Body).To(Equal("testresponsebody"))
-	Expect(unit.Simulation.Templates[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
-	Expect(unit.Simulation.Templates[0].Response.Status).To(Equal(200))
+	Expect(unit.Simulation.MatchingPairs[0].Response.Body).To(Equal("testresponsebody"))
+	Expect(unit.Simulation.MatchingPairs[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(unit.Simulation.MatchingPairs[0].Response.Status).To(Equal(200))
 }
 
 func Test_Hoverfly_Save_SavesRequestBodyAsJsonPathIfContentTypeIsJson(t *testing.T) {
@@ -785,9 +785,9 @@ func Test_Hoverfly_Save_SavesRequestBodyAsJsonPathIfContentTypeIsJson(t *testing
 		},
 	}, &models.ResponseDetails{}, nil)
 
-	Expect(unit.Simulation.Templates).To(HaveLen(1))
+	Expect(unit.Simulation.MatchingPairs).To(HaveLen(1))
 
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Body.JsonMatch).To(Equal(`{"test": []}`))
+	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Body.JsonMatch).To(Equal(`{"test": []}`))
 }
 
 func Test_Hoverfly_Save_SavesRequestBodyAsXmlPathIfContentTypeIsXml(t *testing.T) {
@@ -802,7 +802,7 @@ func Test_Hoverfly_Save_SavesRequestBodyAsXmlPathIfContentTypeIsXml(t *testing.T
 		},
 	}, &models.ResponseDetails{}, nil)
 
-	Expect(unit.Simulation.Templates).To(HaveLen(1))
+	Expect(unit.Simulation.MatchingPairs).To(HaveLen(1))
 
-	Expect(*unit.Simulation.Templates[0].RequestTemplate.Body.XmlMatch).To(Equal(`<xml>`))
+	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Body.XmlMatch).To(Equal(`<xml>`))
 }

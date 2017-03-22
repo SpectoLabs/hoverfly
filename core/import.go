@@ -143,9 +143,9 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v2.RequestRespons
 		failed := 0
 		for _, pairView := range pairViews {
 
-			pair := models.NewRequestTemplateResponsePairFromView(&pairView)
+			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
 
-			hf.Simulation.Templates = append(hf.Simulation.Templates, *pair)
+			hf.Simulation.MatchingPairs = append(hf.Simulation.MatchingPairs, *pair)
 			success++
 			continue
 		}

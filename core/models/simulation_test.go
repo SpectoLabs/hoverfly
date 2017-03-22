@@ -8,13 +8,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_Simulation_AddRequestTemplateResponsePair_CanAddAPairToTheArray(t *testing.T) {
+func Test_Simulation_AddRequestMatcherResponsePair_CanAddAPairToTheArray(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := models.NewSimulation()
 
-	unit.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
-		models.RequestTemplate{
+	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("space"),
 			},
@@ -22,17 +22,17 @@ func Test_Simulation_AddRequestTemplateResponsePair_CanAddAPairToTheArray(t *tes
 		models.ResponseDetails{},
 	})
 
-	Expect(unit.Templates).To(HaveLen(1))
-	Expect(*unit.Templates[0].RequestTemplate.Destination.ExactMatch).To(Equal("space"))
+	Expect(unit.MatchingPairs).To(HaveLen(1))
+	Expect(*unit.MatchingPairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("space"))
 }
 
-func Test_Simulation_AddRequestTemplateResponsePair_CanAddAFullPairToTheArray(t *testing.T) {
+func Test_Simulation_AddRequestMatcherResponsePair_CanAddAFullPairToTheArray(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := models.NewSimulation()
 
-	unit.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
-		models.RequestTemplate{
+	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
 			Body: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("testbody"),
 			},
@@ -60,28 +60,28 @@ func Test_Simulation_AddRequestTemplateResponsePair_CanAddAFullPairToTheArray(t 
 		},
 	})
 
-	Expect(unit.Templates).To(HaveLen(1))
+	Expect(unit.MatchingPairs).To(HaveLen(1))
 
-	Expect(*unit.Templates[0].RequestTemplate.Body.ExactMatch).To(Equal("testbody"))
-	Expect(*unit.Templates[0].RequestTemplate.Destination.ExactMatch).To(Equal("testdestination"))
-	Expect(unit.Templates[0].RequestTemplate.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
-	Expect(*unit.Templates[0].RequestTemplate.Method.ExactMatch).To(Equal("testmethod"))
-	Expect(*unit.Templates[0].RequestTemplate.Path.ExactMatch).To(Equal("/testpath"))
-	Expect(*unit.Templates[0].RequestTemplate.Query.ExactMatch).To(Equal("?query=test"))
-	Expect(*unit.Templates[0].RequestTemplate.Scheme.ExactMatch).To(Equal("http"))
+	Expect(*unit.MatchingPairs[0].RequestMatcher.Body.ExactMatch).To(Equal("testbody"))
+	Expect(*unit.MatchingPairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("testdestination"))
+	Expect(unit.MatchingPairs[0].RequestMatcher.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(*unit.MatchingPairs[0].RequestMatcher.Method.ExactMatch).To(Equal("testmethod"))
+	Expect(*unit.MatchingPairs[0].RequestMatcher.Path.ExactMatch).To(Equal("/testpath"))
+	Expect(*unit.MatchingPairs[0].RequestMatcher.Query.ExactMatch).To(Equal("?query=test"))
+	Expect(*unit.MatchingPairs[0].RequestMatcher.Scheme.ExactMatch).To(Equal("http"))
 
-	Expect(unit.Templates[0].Response.Body).To(Equal("testresponsebody"))
-	Expect(unit.Templates[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
-	Expect(unit.Templates[0].Response.Status).To(Equal(200))
+	Expect(unit.MatchingPairs[0].Response.Body).To(Equal("testresponsebody"))
+	Expect(unit.MatchingPairs[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(unit.MatchingPairs[0].Response.Status).To(Equal(200))
 }
 
-func Test_Simulation_AddRequestTemplateResponsePair_WillNotSaveDuplicates(t *testing.T) {
+func Test_Simulation_AddRequestMatcherResponsePair_WillNotSaveDuplicates(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := models.NewSimulation()
 
-	unit.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
-		models.RequestTemplate{
+	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("space"),
 			},
@@ -89,8 +89,8 @@ func Test_Simulation_AddRequestTemplateResponsePair_WillNotSaveDuplicates(t *tes
 		models.ResponseDetails{},
 	})
 
-	unit.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
-		models.RequestTemplate{
+	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("space"),
 			},
@@ -98,16 +98,16 @@ func Test_Simulation_AddRequestTemplateResponsePair_WillNotSaveDuplicates(t *tes
 		models.ResponseDetails{},
 	})
 
-	Expect(unit.Templates).To(HaveLen(1))
+	Expect(unit.MatchingPairs).To(HaveLen(1))
 }
 
-func Test_Simulation_AddRequestTemplateResponsePair_WillSaveTwoWhenNotDuplicates(t *testing.T) {
+func Test_Simulation_AddRequestMatcherResponsePair_WillSaveTwoWhenNotDuplicates(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := models.NewSimulation()
 
-	unit.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
-		models.RequestTemplate{
+	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("space"),
 			},
@@ -115,8 +115,8 @@ func Test_Simulation_AddRequestTemplateResponsePair_WillSaveTwoWhenNotDuplicates
 		models.ResponseDetails{},
 	})
 
-	unit.AddRequestTemplateResponsePair(&models.RequestTemplateResponsePair{
-		models.RequestTemplate{
+	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("again"),
 			},
@@ -124,7 +124,7 @@ func Test_Simulation_AddRequestTemplateResponsePair_WillSaveTwoWhenNotDuplicates
 		models.ResponseDetails{},
 	})
 
-	Expect(unit.Templates).To(HaveLen(2))
-	Expect(*unit.Templates[0].RequestTemplate.Destination.ExactMatch).To(Equal("space"))
-	Expect(*unit.Templates[1].RequestTemplate.Destination.ExactMatch).To(Equal("again"))
+	Expect(unit.MatchingPairs).To(HaveLen(2))
+	Expect(*unit.MatchingPairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("space"))
+	Expect(*unit.MatchingPairs[1].RequestMatcher.Destination.ExactMatch).To(Equal("again"))
 }

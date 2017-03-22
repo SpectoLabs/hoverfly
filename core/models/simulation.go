@@ -5,27 +5,27 @@ import (
 )
 
 type Simulation struct {
-	Templates      []RequestTemplateResponsePair
+	MatchingPairs  []RequestMatcherResponsePair
 	ResponseDelays ResponseDelays
 }
 
 func NewSimulation() *Simulation {
 
 	return &Simulation{
-		Templates:      []RequestTemplateResponsePair{},
+		MatchingPairs:  []RequestMatcherResponsePair{},
 		ResponseDelays: &ResponseDelayList{},
 	}
 }
 
-func (this *Simulation) AddRequestTemplateResponsePair(pair *RequestTemplateResponsePair) {
+func (this *Simulation) AddRequestMatcherResponsePair(pair *RequestMatcherResponsePair) {
 	var duplicate bool
-	for _, savedPair := range this.Templates {
-		duplicate = reflect.DeepEqual(pair.RequestTemplate, savedPair.RequestTemplate)
+	for _, savedPair := range this.MatchingPairs {
+		duplicate = reflect.DeepEqual(pair.RequestMatcher, savedPair.RequestMatcher)
 		if duplicate {
 			break
 		}
 	}
 	if !duplicate {
-		this.Templates = append(this.Templates, *pair)
+		this.MatchingPairs = append(this.MatchingPairs, *pair)
 	}
 }
