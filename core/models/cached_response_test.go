@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_CachedResponse_Encode_AndDecodeIntoAndOutOfBytes(t *testing.T) {
+func Test_CachedResponse_EncodeAndDecodeIntoAndOutOfBytes(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalUnit := &models.CachedResponse{
@@ -27,6 +27,35 @@ func Test_CachedResponse_Encode_AndDecodeIntoAndOutOfBytes(t *testing.T) {
 			RequestTemplate: models.RequestTemplate{},
 			Response:        models.ResponseDetails{},
 		},
+	}
+
+	encodedBytes, err := originalUnit.Encode()
+	Expect(err).To(BeNil())
+
+	Expect(encodedBytes).ToNot(BeEmpty())
+
+	unit, err := models.NewCachedResponseFromBytes(encodedBytes)
+	Expect(err).To(BeNil())
+
+	Expect(unit).To(Equal(originalUnit))
+}
+
+func Test_CachedResponse_EncodeAndDecode_NilMatchingPair(t *testing.T) {
+	RegisterTestingT(t)
+
+	originalUnit := &models.CachedResponse{
+		Request: models.RequestDetails{
+			Body:        "test",
+			Destination: "test.com",
+			Headers: map[string][]string{
+				"test": []string{"header"},
+			},
+			Method: "GET",
+			Path:   "/test",
+			Query:  "?test=query",
+			Scheme: "http",
+		},
+		MatchingPair: nil,
 	}
 
 	encodedBytes, err := originalUnit.Encode()

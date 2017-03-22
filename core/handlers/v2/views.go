@@ -44,10 +44,16 @@ type HoverflyView struct {
 	UpstreamProxyView
 }
 
-type CacheView struct {
-	RequestResponsePairs []RequestResponsePairViewV2 `json:"cache"`
-}
-
 type LogsView struct {
 	Logs []map[string]interface{} `json:"logs"`
+}
+
+type CacheView struct {
+	Cache []CachedResponseView `json:"cache"`
+}
+
+type CachedResponseView struct {
+	Key          string                     `json:"key"`
+	MatchingPair *RequestResponsePairViewV2 `json:"matchingPair,omitempty"`
+	HeaderMatch  bool                       `json:"headerMatch"`
 }
