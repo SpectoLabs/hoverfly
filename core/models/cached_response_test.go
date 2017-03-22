@@ -23,9 +23,9 @@ func Test_CachedResponse_EncodeAndDecodeIntoAndOutOfBytes(t *testing.T) {
 			Query:  "?test=query",
 			Scheme: "http",
 		},
-		MatchingPair: &models.RequestTemplateResponsePair{
-			RequestTemplate: models.RequestTemplate{},
-			Response:        models.ResponseDetails{},
+		MatchingPair: &models.RequestMatcherResponsePair{
+			RequestMatcher: models.RequestMatcher{},
+			Response:       models.ResponseDetails{},
 		},
 	}
 

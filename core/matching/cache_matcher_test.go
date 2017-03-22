@@ -28,23 +28,23 @@ func Test_CacheMatcher_GetAllResponses_WillReturnErrorIfCacheIsNil(t *testing.T)
 	Expect(err.Error()).To(Equal("No cache set"))
 }
 
-func Test_CacheMatcher_SaveRequestTemplateResponsePair_WillReturnErrorIfCacheIsNil(t *testing.T) {
+func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillReturnErrorIfCacheIsNil(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{}
 
-	err := unit.SaveRequestTemplateResponsePair(models.RequestDetails{}, nil)
+	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("No cache set"))
 }
 
-func Test_CacheMatcher_SaveRequestTemplateResponsePair_CanSaveNilPairs(t *testing.T) {
+func Test_CacheMatcher_SaveRequestMatcherResponsePair_CanSaveNilPairs(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := matching.CacheMatcher{
 		RequestCache: cache.NewInMemoryCache(),
 	}
 
-	err := unit.SaveRequestTemplateResponsePair(models.RequestDetails{}, nil)
+	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil)
 	Expect(err).To(BeNil())
 
 	cacheValues, err := unit.RequestCache.Get([]byte("d41d8cd98f00b204e9800998ecf8427e"))
@@ -57,14 +57,14 @@ func Test_CacheMatcher_SaveRequestTemplateResponsePair_CanSaveNilPairs(t *testin
 	Expect(cachedResponse.HeaderMatch).To(BeFalse())
 }
 
-func Test_CacheMatcher_SaveRequestTemplateResponsePair_WillSaveWithHeaderMatchFalseIfNoHeadesWereOnTheMatchingTemplate(t *testing.T) {
+func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillSaveWithHeaderMatchFalseIfNoHeadesWereOnTheMatchingTemplate(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
 		RequestCache: cache.NewInMemoryCache(),
 	}
 
-	err := unit.SaveRequestTemplateResponsePair(models.RequestDetails{}, &models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, &models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("test"),
 			},
@@ -81,14 +81,14 @@ func Test_CacheMatcher_SaveRequestTemplateResponsePair_WillSaveWithHeaderMatchFa
 	Expect(cachedResponse.HeaderMatch).To(BeFalse())
 }
 
-func Test_CacheMatcher_SaveRequestTemplateResponsePair_WillSaveWithHeaderMatchTrueHeadesWereOnTheMatchingTemplate(t *testing.T) {
+func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillSaveWithHeaderMatchTrueHeadesWereOnTheMatchingTemplate(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
 		RequestCache: cache.NewInMemoryCache(),
 	}
 
-	err := unit.SaveRequestTemplateResponsePair(models.RequestDetails{}, &models.RequestTemplateResponsePair{
-		RequestTemplate: models.RequestTemplate{
+	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, &models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
 			Headers: map[string][]string{
 				"test": []string{"headers"},
 			},
@@ -130,9 +130,9 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheLooseTemplates(t *testing.T) {
 	}
 
 	err := unit.PreloadCache(models.Simulation{
-		Templates: []models.RequestTemplateResponsePair{
-			models.RequestTemplateResponsePair{
-				RequestTemplate: models.RequestTemplate{
+		MatchingPairs: []models.RequestMatcherResponsePair{
+			models.RequestMatcherResponsePair{
+				RequestMatcher: models.RequestMatcher{
 					Body: &models.RequestFieldMatchers{
 						RegexMatch: util.StringToPointer("loose"),
 					},
@@ -156,9 +156,9 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchTemplates
 	}
 
 	err := unit.PreloadCache(models.Simulation{
-		Templates: []models.RequestTemplateResponsePair{
-			models.RequestTemplateResponsePair{
-				RequestTemplate: models.RequestTemplate{
+		MatchingPairs: []models.RequestMatcherResponsePair{
+			models.RequestMatcherResponsePair{
+				RequestMatcher: models.RequestMatcher{
 					Body: &models.RequestFieldMatchers{
 						ExactMatch: util.StringToPointer("body"),
 					},
@@ -197,9 +197,9 @@ func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheTemplatesWithoutExac
 	}
 
 	err := unit.PreloadCache(models.Simulation{
-		Templates: []models.RequestTemplateResponsePair{
-			models.RequestTemplateResponsePair{
-				RequestTemplate: models.RequestTemplate{
+		MatchingPairs: []models.RequestMatcherResponsePair{
+			models.RequestMatcherResponsePair{
+				RequestMatcher: models.RequestMatcher{
 					Destination: &models.RequestFieldMatchers{
 						RegexMatch: util.StringToPointer("destination"),
 					},
@@ -223,9 +223,9 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllTemplatesInSimulation(t *testing
 	}
 
 	err := unit.PreloadCache(models.Simulation{
-		Templates: []models.RequestTemplateResponsePair{
-			models.RequestTemplateResponsePair{
-				RequestTemplate: models.RequestTemplate{
+		MatchingPairs: []models.RequestMatcherResponsePair{
+			models.RequestMatcherResponsePair{
+				RequestMatcher: models.RequestMatcher{
 					Destination: &models.RequestFieldMatchers{
 						RegexMatch: util.StringToPointer("destination"),
 					},
@@ -235,8 +235,8 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllTemplatesInSimulation(t *testing
 					Body:   "body",
 				},
 			},
-			models.RequestTemplateResponsePair{
-				RequestTemplate: models.RequestTemplate{
+			models.RequestMatcherResponsePair{
+				RequestMatcher: models.RequestMatcher{
 					Body: &models.RequestFieldMatchers{
 						ExactMatch: util.StringToPointer("body"),
 					},
