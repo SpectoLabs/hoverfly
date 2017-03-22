@@ -37,6 +37,26 @@ func Test_CacheMatcher_SaveRequestTemplateResponsePair_WillReturnErrorIfCacheIsN
 	Expect(err.Error()).To(Equal("No cache set"))
 }
 
+func Test_CacheMatcher_SaveRequestTemplateResponsePair_CanSaveNilPairs(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := matching.CacheMatcher{
+		RequestCache: cache.NewInMemoryCache(),
+	}
+
+	err := unit.SaveRequestTemplateResponsePair(models.RequestDetails{}, nil)
+	Expect(err).To(BeNil())
+
+	cacheValues, err := unit.RequestCache.Get([]byte("d41d8cd98f00b204e9800998ecf8427e"))
+	Expect(err).To(BeNil())
+
+	cachedResponse, err := models.NewCachedResponseFromBytes(cacheValues)
+	Expect(err).To(BeNil())
+
+	Expect(cachedResponse.MatchingPair).To(BeNil())
+	Expect(cachedResponse.HeaderMatch).To(BeFalse())
+}
+
 func Test_CacheMatcher_SaveRequestTemplateResponsePair_WillSaveWithHeaderMatchFalseIfNoHeadesWereOnTheMatchingTemplate(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
