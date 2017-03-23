@@ -132,3 +132,5 @@ A standard workflow might be:
 .. seealso::
 
     Templating is best understood with a practical example, so please refer to :ref:`addingtemplates` to get hands on experience with templating.
+    
+.. todo:: Delete this page when rewritten into simulations as Request Matchers and Responses

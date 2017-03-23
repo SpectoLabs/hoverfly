@@ -58,3 +58,5 @@ Imagine scanning through a dictionary for a word, and then looking up its defini
     The reason headers are not included in the match is because they can vary depending on the client.
 
 This one-to-one matching strategy is extremely fast, but in some cases you may want Hoverfly to return a single response for more than one request. This is possible using :ref:`templates`.
+
+.. todo:: Delete this page when rewritten into simulations as Request Matchers and Responses

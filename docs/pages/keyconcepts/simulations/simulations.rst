@@ -10,6 +10,7 @@ Simulation JSON can be exported, edited and imported in and out of Hoverfly, and
 .. toctree::
 
     delays
+    meta
 
 .. seealso::
 
@@ -17,5 +18,4 @@ Simulation JSON can be exported, edited and imported in and out of Hoverfly, and
 
 
 
-.. todo:: Move delays onto this page
 .. todo:: Write up about Request Matchers, Responses (Captured Traffic and Delays)
