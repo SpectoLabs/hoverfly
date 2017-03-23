@@ -21,31 +21,10 @@ Imagine scanning through a dictionary for a word, and then looking up its defini
 
 These captured requests are translated into Request Matchers. This request consists all of the same fields as a request but uses matchers instead of exact values.
 
-.. todo:: simulations/basic-simulation.json lines 4 to 24
-
-.. code:: json
-
-    {
-        "scheme": {
-            "exactMatch": "http"
-        },
-        "method": {
-            "exactMatch": "GET"
-        },
-        "destination": {
-            "exactMatch": "docs.hoverfly.io"
-        },
-        "path": {
-            "exactMatch": "/pages/keyconcepts/templates.html"
-        },
-        "query": {
-            "exactMatch": "query=true"
-        },
-        "body": {
-            "exactMatch": "",
-        },
-        "headers": {}
-    }
+.. literalinclude:: ../../simulations/basic-simulation.json
+   :lines: 4-24
+   :linenos:
+   :language: javascript
 
 Not each of the fields is required, meaning it is possible to create partial request matchers that can be matched to more requests. For example, this request matcher will match any request to "docs.hoverfly.io".
 
