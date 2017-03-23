@@ -3,73 +3,161 @@
 Simulation schema
 =================
 
+This is the JSON schema for v2 Hoverfly simulations.
+
 .. code:: json
 
 
-    {
-      "data": {
-        "pairs": [
-          {
-            "response": {
-              "status": 200,
-              "body": "<h1>Matched on recording</h1>",
-              "encodedBody": false,
-              "headers": {
-                "Content-Type": [
-                  "text/html; charset=utf-8"
-                ]
-              }
-            },
-            "request": {
-              "requestType": "recording",
-              "path": "/",
-              "method": "GET",
-              "destination": "myhost.io",
-              "scheme": "https",
-              "query": "",
-              "body": "",
-              "headers": {
-                "Accept": [
-                  "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-                ],
-                "Content-Type": [
-                  "text/plain; charset=utf-8"
-                ],
-                "User-Agent": [
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
-                ]
-              }
-            }
+  {
+    "additionalProperties": false,
+    "definitions": {
+      "delay": {
+        "properties": {
+          "delay": {
+            "type": "integer"
           },
-          {
-            "response": {
-              "status": 200,
-              "body": "<h1>Matched on template</h1>",
-              "encodedBody": false,
-              "headers": {
-                "Content-Type": [
-                  "text/html; charset=utf-8"
-                ]
-              }
-            },
-            "request": {
-              "requestType": "template",
-              "path": "/template",
-              "method": null,
-              "destination": null,
-              "scheme": null,
-              "query": null,
-              "body": null,
-              "headers": null
-            }
+          "httpMethod": {
+            "type": "string"
+          },
+          "urlPattern": {
+            "type": "string"
           }
-        ],
-        "globalActions": {
-          "delays": []
-        }
+        },
+        "type": "object"
+      },
+      "field-matchers": {
+        "properties": {
+          "exactMatch": {
+            "type": "string"
+          },
+          "globMatch": {
+            "type": "string"
+          },
+          "jsonMatch": {
+            "type": "string"
+          },
+          "regexMatch": {
+            "type": "string"
+          },
+          "xpathMatch": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "headers": {
+        "additionalProperties": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "type": "object"
       },
       "meta": {
-        "schemaVersion": "v1",
-        "hoverflyVersion": "v0.9.0",
-        "timeExported": "2016-11-11T11:53:52Z"
+        "properties": {
+          "hoverflyVersion": {
+            "type": "string"
+          },
+          "schemaVersion": {
+            "type": "string"
+          },
+          "timeExported": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schemaVersion"
+        ],
+        "type": "object"
+      },
+      "request": {
+        "properties": {
+          "body": {
+            "$ref": "#/definitions/field-matchers"
+          },
+          "destination": {
+            "$ref": "#/definitions/field-matchers"
+          },
+          "headers": {
+            "$ref": "#/definitions/headers"
+          },
+          "path": {
+            "$ref": "#/definitions/field-matchers"
+          },
+          "query": {
+            "$ref": "#/definitions/field-matchers"
+          },
+          "scheme": {
+            "$ref": "#/definitions/field-matchers"
+          }
+        },
+        "type": "object"
+      },
+      "request-response-pair": {
+        "properties": {
+          "request": {
+            "$ref": "#/definitions/request"
+          },
+          "response": {
+            "$ref": "#/definitions/response"
+          }
+        },
+        "required": [
+          "request",
+          "response"
+        ],
+        "type": "object"
+      },
+      "response": {
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "encodedBody": {
+            "type": "boolean"
+          },
+          "headers": {
+            "$ref": "#/definitions/headers"
+          },
+          "status": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
       }
+    },
+    "description": "Hoverfly simulation schema",
+    "properties": {
+      "data": {
+        "properties": {
+          "globalActions": {
+            "properties": {
+              "delays": {
+                "items": {
+                  "$ref": "#/definitions/delay"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "pairs": {
+            "items": {
+              "$ref": "#/definitions/request-response-pair"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "meta": {
+        "$ref": "#/definitions/meta"
+      }
+    },
+    "required": [
+      "data",
+      "meta"
+    ],
+    "type": "object"
+  }
