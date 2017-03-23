@@ -176,7 +176,7 @@ Example request body:
 -------------------------------------------------------------------------------------------------------------
 
 GET /api/v2/simulation/schema
-""""""""""""""""""""
+"""""""""""""""""""""""""""""
 Gets the JSON Schema used to validate the simulation JSON.
 
 
@@ -381,40 +381,31 @@ GET /api/v2/cache
 Gets the requests and responses stored in the cache.
 
 ::
+
     {
-      "cache": [
-        {
-          "response": {
-            "status": 200,
-            "body": "<h1>Matched on template</h1>",
-            "encodedBody": false,
-            "headers": {
-              "Content-Type": [
-                "text/html; charset=utf-8"
-              ]
+        "cache": [
+            {
+                "key": "2fc8afceec1b6bcf99ff1f547c1f5b11",
+                "matchingPair": {
+                    "request": {
+                        "path": {
+                            "exactMatch": "hoverfly.io"
+                        }
+                    },
+                    "response": {
+                        "status": 200,
+                        "body": "response body",
+                        "encodedBody": false,
+                        "headers": {
+                            "Hoverfly": [
+                                "Was-Here"
+                            ]
+                        }
+                    }
+                },
+                "headerMatch": false
             }
-          },
-          "request": {
-            "path": "/template",
-            "method": "GET",
-            "destination": "hoverfly.io",
-            "scheme": "http", 
-            "query": "",
-            "body": "",
-            "headers": {
-              "Accept":   [
-                "*/*"
-              ],
-              "Proxy-Connection": [
-                "Keep-Alive"
-              ],
-              "User-Agent": [
-                "curl/7.50.2"
-              ]
-            }
-          }
-        }
-      ]
+        ]
     }
 
 -------------------------------------------------------------------------------------------------------------
@@ -433,28 +424,29 @@ GET /api/v2/logs
 Gets the logs from Hoverfly.
 
 ::
+
     {
-      "logs": [
-        {
-          "level": "info",
-          "msg": "serving proxy",
-          "time": "2017-03-13T12:22:39Z"
-        },
-        {
-          "destination": ".",
-          "level": "info",
-          "mode": "simulate",
-          "msg": "current proxy configuration",
-          "port": "8500",
-          "time": "2017-03-13T12:22:39Z"
-        },
-        {
-          "Destination": ".",
-          "Mode": "simulate",
-          "ProxyPort": "8500",
-          "level": "info",
-          "msg": "Proxy prepared...",
-          "time": "2017-03-13T12:22:39Z"
-        }
-      ]
+        "logs": [
+            {
+                "level": "info",
+                "msg": "serving proxy",
+                "time": "2017-03-13T12:22:39Z"
+            },  
+            {
+                "destination": ".",
+                "level": "info",
+                "mode": "simulate",
+                "msg": "current proxy configuration",
+                "port": "8500",
+                "time": "2017-03-13T12:22:39Z"
+            },  
+            {
+                "destination": ".",
+                "Mode": "simulate",
+                "ProxyPort": "8500",
+                "level": "info",
+                "msg": "Proxy prepared...",
+                "time": "2017-03-13T12:22:39Z"
+            },  
+        ]
     }
