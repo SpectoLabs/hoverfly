@@ -16,7 +16,6 @@ Hoverfly's functionality is quite broad. You are encouraged to take the time to 
    templates
    destinationfiltering
    meta
-   delays
    middleware
 
 .. raw:: html
