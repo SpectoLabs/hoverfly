@@ -3,6 +3,8 @@
 Request Matchers and Responses
 ==============================
 
+.. todo:: @tjcunliffe to review
+
 Hoverfly simulates APIs by `matching` responses to incoming requests.
 
 Imagine scanning through a dictionary for a word, and then looking up its definition. Hoverfly does exactly that, but the "word" is the HTTP request that was "captured" in :ref:`capture_mode`. Below is a list of matchable fields on a HTTP request.
@@ -22,7 +24,7 @@ Imagine scanning through a dictionary for a word, and then looking up its defini
 +--------------------+---------------------+-------------------------------------+
 | Body               | string              | ""                                  |
 +--------------------+---------------------+-------------------------------------+
-| Headers            | map[string][]string | "User-Agent: ["http-client"         |
+| Headers            | map[string][]string | "User-Agent: ["http-client"]        |
 +--------------------+---------------------+-------------------------------------+
 
 These captured requests are translated into Request Matchers. This request consists all of the same fields as a request but uses matchers instead of exact values.
@@ -44,23 +46,25 @@ Not each of the fields is required, meaning it is possible to create partial req
 
 Although the default matcher is "exactMatch", there are many other matchers to choose from.
 
-.. todo:: Table for matchers?
+.. todo:: Finish table, not sure its gonna be able to hold all the examples and still look good
 
-.. todo:: ExactMatch - This will be an exact match (capturing requests will use this) String-To-Match -> String-To-Match
-
-.. todo:: ExactMatch - This will be an exact match (capturing requests will use this) String-To-Match -> String-To-Match
-
-.. todo:: XmlMatch - This will be an exact XML match (capturing request bodies with xml content-type will use this) <xml><documents><document></document></documents></xml> -> <xml><documents ><document ></document ></documents ></xml>
-
-.. todo:: XpathMatch - This will execute an Xpath expression, matches if successful
-
-.. todo:: JsonMatch - This will be an exact JSON match (capturing request bodies with json content-type will use this)
-
-.. todo:: JsonPathMatch - This will execute an Json path expression, matches if successful
-
-.. todo:: RegexMatch - This will execute an regex expression, matches if successful | String-To-Match ->
-
-.. todo:: GlobMatch | String-To-Match -> String-*, *-To-Match, *
++------------------------+------------------------------------+
+| Request Field Matchers | Example                            |
++========================+====================================+
+| "exactMatch"           | String-To-Match == String-To-Match |
++------------------------+------------------------------------+
+| "xmlMatch"             | ?                                  |
++------------------------+------------------------------------+
+| "xpathMatch"           | ?                                  |
++------------------------+------------------------------------+
+| "jsonMatch"            | ?                                  |
++------------------------+------------------------------------+
+| "jsonPathMatch"        | ?                                  |
++------------------------+------------------------------------+
+| "regexMatch"           | ?                                  |
++------------------------+------------------------------------+
+| "globMatch"            | ?                                  |
++------------------------+------------------------------------+
 
 Request templates are defined in the :ref:`simulation_schema`.
 
