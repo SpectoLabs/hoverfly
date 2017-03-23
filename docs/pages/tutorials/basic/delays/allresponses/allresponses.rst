@@ -9,12 +9,16 @@ Let's apply a 2 second delay to all responses. First, we need to create and expo
 Take a look at the ``"globalActions"`` property within the ``simulation.json`` file you exported. It
 should look like this:
 
-.. literalinclude:: global-actions.json
+.. literalinclude:: ../../../../simulations/basic-simulation.json
+   :lines: 34-38
+   :linenos:
    :language: javascript
 
 Edit the file so the ``"globalActions"`` property looks like this:
 
-.. literalinclude:: global-actions-with-delay.json
+.. literalinclude:: ../../../../simulations/basic-delay-simulation.json
+   :lines: 18-23
+   :linenos:
    :language: javascript
 
 Hoverfly will apply a delay of 2000ms to all URLs that match the ``"urlPattern"`` value. We want
