@@ -9,6 +9,7 @@ Simulation JSON can be exported, edited and imported in and out of Hoverfly, and
 
 .. toctree::
 
+    request_matchers_and_responses
     delays
     meta
 
