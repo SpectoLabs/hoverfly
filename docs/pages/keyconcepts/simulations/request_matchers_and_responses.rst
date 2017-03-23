@@ -3,10 +3,11 @@
 Request Matchers and Responses
 ==============================
 
-A request matcher is a request within  the simulation that is used to match against incoming requests. A request matcher may include each of the fields available on a request. These are
+Hoverfly simulates APIs by `matching` responses to incoming requests.
+
+Imagine scanning through a dictionary for a word, and then looking up its definition. Hoverfly does exactly that, but the "word" is the HTTP request that was "captured" in :ref:`capture_mode`.
 
 .. code:: json
-
 
     {
         "scheme": "http",
@@ -17,7 +18,43 @@ A request matcher is a request within  the simulation that is used to match agai
         "body": "",
         "headers": {}
     }
-    
+
+These captured requests are translated into Request Matchers. This request consists all of the same fields as a request but uses matchers instead of exact values.
+
+.. code:: json
+
+    {
+        "scheme": {
+            "exactMatch": "http"
+        },
+        "method": {
+            "exactMatch": "GET"
+        },
+        "destination": {
+            "exactMatch": "docs.hoverfly.io"
+        },
+        "path": {
+            "exactMatch": "/pages/keyconcepts/templates.html"
+        },
+        "query": {
+            "exactMatch": "query=true"
+        },
+        "body": {
+            "exactMatch": "",
+        },
+        "headers": {}
+    }
+
+Not each of the fields is required, meaning it is possible to create partial request matchers that can be matched to more requests. For example, this request matcher will match any request to "docs.hoverfly.io".
+
+.. code:: json
+
+    {
+        "destination": {
+            "exactMatch": "docs.hoverfly.io"
+        },
+    }
+
 Each field you want to match again may include one of the several matchers
 
 Request templates are defined in the :ref:`simulation_schema`.
