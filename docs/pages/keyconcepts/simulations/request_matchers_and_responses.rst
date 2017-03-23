@@ -34,6 +34,14 @@ These captured requests are translated into Request Matchers. This request consi
    :linenos:
    :language: javascript
 
+.. raw:: html
+
+   <div>
+        <p class="include-literal-footer">
+            <a href="../../simulations/basic-simulation.json">See this request in its full simulation</a>
+        </p>
+   </div>
+
 Not each of the fields is required, meaning it is possible to create partial request matchers that can be matched to more requests. For example, this request matcher will match any request to "docs.hoverfly.io".
 
 .. code:: json
@@ -75,9 +83,25 @@ With each Request Matcher is a Response. This is what Hoverfly will serve back t
    :linenos:
    :language: javascript
 
+.. raw:: html
+
+   <div>
+        <p class="include-literal-footer">
+            <a href="../../simulations/basic-simulation.json">See this response in its full simulation</a>
+        </p>
+   </div>
+
 Since JSON does not support binary data, binary responses are base64 encoded. This is denoted by the encodedBody field. Hoverfly automatically encodes and decodes the data during the export and import phases.
 
 .. literalinclude:: ../../simulations/basic-encoded-simulation.json
    :lines: 27-28
    :linenos:
    :language: javascript
+
+.. raw:: html
+
+   <div>
+        <p class="include-literal-footer">
+            <a href="../../simulations/basic-simulation.json">See this response in its full simulation</a>
+        </p>
+   </div>
