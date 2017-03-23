@@ -5,7 +5,9 @@ Request Matchers and Responses
 
 A request matcher is a request within  the simulation that is used to match against incoming requests. A request matcher may include each of the fields available on a request. These are
 
-::
+.. code:: json
+
+
     {
         "scheme": "http",
         "method": "GET",
