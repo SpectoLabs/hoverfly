@@ -5,19 +5,25 @@ Request Matchers and Responses
 
 Hoverfly simulates APIs by `matching` responses to incoming requests.
 
-Imagine scanning through a dictionary for a word, and then looking up its definition. Hoverfly does exactly that, but the "word" is the HTTP request that was "captured" in :ref:`capture_mode`.
+Imagine scanning through a dictionary for a word, and then looking up its definition. Hoverfly does exactly that, but the "word" is the HTTP request that was "captured" in :ref:`capture_mode`. Below is a list of matchable fields on a HTTP request.
 
-.. code:: json
-
-    {
-        "scheme": "http",
-        "method": "GET",
-        "destination": "docs.hoverfly.io",
-        "path": "/pages/keyconcepts/templates.html",
-        "query": "query=true",
-        "body": "",
-        "headers": {}
-    }
++--------------------+---------------------+-------------------------------------+
+| HTTP Request field | Value type          | Example                             |
++====================+=====================+=====================================+
+| Scheme             | string              | "https"                             |
++--------------------+---------------------+-------------------------------------+
+| Method             | string              | "GET"                               |
++--------------------+---------------------+-------------------------------------+
+| Destination        | string              | "docs.hoverfly.io"                  |
++--------------------+---------------------+-------------------------------------+
+| Path               | string              | "/pages/keyconcepts/templates.html" |
++--------------------+---------------------+-------------------------------------+
+| Query              | string              | "query=true"                        |
++--------------------+---------------------+-------------------------------------+
+| Body               | string              | ""                                  |
++--------------------+---------------------+-------------------------------------+
+| Headers            | map[string][]string | "User-Agent: ["http-client"         |
++--------------------+---------------------+-------------------------------------+
 
 These captured requests are translated into Request Matchers. This request consists all of the same fields as a request but uses matchers instead of exact values.
 
