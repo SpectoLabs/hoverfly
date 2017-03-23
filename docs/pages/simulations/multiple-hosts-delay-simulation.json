@@ -1,0 +1,35 @@
+{
+    "data": {
+        "pairs": [{
+            "request": {
+                "destination": {
+                    "globMatch": "*"
+                }
+            },
+            "response": {
+                "status": 200,
+                "body": "Delayed response",
+                "encodedBody": false,
+                "headers": {
+                    "Hoverfly": ["Was-Here"]
+                }
+            }
+        }],
+        "globalActions": {
+            "delays": [{
+                    "urlPattern": "time\\.jsontest\\.com",
+                    "delay": 1000
+                },
+                {
+                    "urlPattern": "date\\.jsontest\\.com",
+                    "delay": 2000
+                }
+            ]
+        }
+    },
+    "meta": {
+        "schemaVersion": "v2",
+        "hoverflyVersion": "v0.11.0",
+        "timeExported": "2016-11-11T11:53:52Z"
+    }
+}

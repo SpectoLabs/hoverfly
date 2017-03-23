@@ -3,6 +3,8 @@
 Using middleware to simulate network latency
 ============================================
 
+.. todo:: I'm not sure I like the idea of show people middleware by duplicating functionality that is in Hoverfly...
+
 .. seealso::
 
     Please carefully read through :ref:`middleware` alongside these tutorials to gain a high-level understanding of what we are about to cover.
