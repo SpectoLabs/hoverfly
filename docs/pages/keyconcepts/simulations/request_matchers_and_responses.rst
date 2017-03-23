@@ -55,27 +55,24 @@ Not each of the fields is required, meaning it is possible to create partial req
         },
     }
 
-Each field you want to match again may include one of the several matchers
+Although the default matcher is "exactMatch", there are many other matchers to choose from.
+
+.. todo:: Table for matchers?
+
+.. todo:: ExactMatch - This will be an exact match (capturing requests will use this) String-To-Match -> String-To-Match
+
+.. todo:: ExactMatch - This will be an exact match (capturing requests will use this) String-To-Match -> String-To-Match
+
+.. todo:: XmlMatch - This will be an exact XML match (capturing request bodies with xml content-type will use this) <xml><documents><document></document></documents></xml> -> <xml><documents ><document ></document ></documents ></xml>
+
+.. todo:: XpathMatch - This will execute an Xpath expression, matches if successful
+
+.. todo:: JsonMatch - This will be an exact JSON match (capturing request bodies with json content-type will use this)
+
+.. todo:: JsonPathMatch - This will execute an Json path expression, matches if successful
+
+.. todo:: RegexMatch - This will execute an regex expression, matches if successful | String-To-Match ->
+
+.. todo:: GlobMatch | String-To-Match -> String-*, *-To-Match, *
 
 Request templates are defined in the :ref:`simulation_schema`.
-
-	ExactMatch - This will be an exact match (capturing requests will use this)
-      String-To-Match -> String-To-Match
-
-	XmlMatch - This will be an exact XML match (capturing request bodies with xml content-type will use this)
-     <xml><documents><document></document></documents></xml> -> <xml><documents ><document ></document ></documents ></xml>
-
-	XpathMatch - This will execute an Xpath expression, matches if successful
-      ?
-
-	JsonMatch - This will be an exact JSON match (capturing request bodies with json content-type will use this)
-      ?
-
-	JsonPathMatch - This will execute an Json path expression, matches if successful
-      ?
-
-	RegexMatch - This will execute an regex expression, matches if successful
-      String-To-Match ->
-
-	GlobMatch
-      String-To-Match -> String-*, *-To-Match, *
