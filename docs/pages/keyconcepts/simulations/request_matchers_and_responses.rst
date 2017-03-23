@@ -64,10 +64,14 @@ Although the default matcher is "exactMatch", there are many other matchers to c
 
 Request templates are defined in the :ref:`simulation_schema`.
 
+With each Request Matcher is a Response. This is what Hoverfly will serve back to the client when a match is successful.
+
 .. literalinclude:: ../../simulations/basic-simulation.json
    :lines: 25-32
    :linenos:
    :language: javascript
+
+Since JSON does not support binary data, binary responses are base64 encoded. This is denoted by the encodedBody field. Hoverfly automatically encodes and decodes the data during the export and import phases.
 
 .. literalinclude:: ../../simulations/basic-encoded-simulation.json
    :lines: 27-28
