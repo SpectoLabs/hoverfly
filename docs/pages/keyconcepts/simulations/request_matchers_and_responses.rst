@@ -57,3 +57,13 @@ Although the default matcher is "exactMatch", there are many other matchers to c
 .. todo:: GlobMatch | String-To-Match -> String-*, *-To-Match, *
 
 Request templates are defined in the :ref:`simulation_schema`.
+
+.. literalinclude:: ../../simulations/basic-simulation.json
+   :lines: 25-32
+   :linenos:
+   :language: javascript
+
+.. literalinclude:: ../../simulations/basic-encoded-simulation.json
+   :lines: 27-28
+   :linenos:
+   :language: javascript
