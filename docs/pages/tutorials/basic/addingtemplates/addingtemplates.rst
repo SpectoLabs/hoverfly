@@ -3,6 +3,8 @@
 Adding templates to a simulation
 ================================
 
+.. todo:: This needs totally redoing as templates are now Request Matchers. Potentially not as simple as find and replace.
+
 .. seealso::
 
     Please carefully read through :ref:`templates` alongside this tutorial to gain a high-level understanding of what we are about to cover.
