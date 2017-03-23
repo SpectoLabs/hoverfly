@@ -10,7 +10,9 @@ Run the following to create and export a simulation.
 
 Edit the ``simulation.json`` file so that the ``"globalActions"`` property looks like this:
 
-.. literalinclude:: global-actions-with-delay-hosts.json
+.. literalinclude:: ../../../../simulations/multiple-hosts-delay-simulation.json
+   :lines: 18-28
+   :linenos:
    :language: javascript
 
 Now run the following to import the edited ``simulation.json`` file and run the simulation:

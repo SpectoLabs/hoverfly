@@ -3,6 +3,8 @@
 Middleware
 ==========
 
+.. todo:: Rewrite this so its a bit more generic and then talk about the different ways of running middleware; webserver, or locally with a binary or a script or both
+
 Middleware intercepts traffic between the client and the API (whether real or simulated), and allowing you to manipulate it.
 
 You can use middleware to manipulate data in simulated responses, or to inject unpredictable performance characteristics into your simulation.
