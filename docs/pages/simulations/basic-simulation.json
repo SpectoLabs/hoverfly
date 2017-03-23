@@ -1,0 +1,45 @@
+{
+    "data": {
+        "pairs": [{
+            "request": {
+                "scheme": {
+                    "exactMatch": "http"
+                },
+                "method": {
+                    "exactMatch": "GET"
+                },
+                "destination": {
+                    "exactMatch": "docs.hoverfly.io"
+                },
+                "path": {
+                    "exactMatch": "/pages/keyconcepts/templates.html"
+                },
+                "query": {
+                    "exactMatch": "query=true"
+                },
+                "body": {
+                    "exactMatch": ""
+                },
+                "headers": {}
+            },
+            "response": {
+                "status": 200,
+                "body": "Response from docs.hoverfly.io/pages/keyconcepts/templates.html",
+                "encodedBody": false,
+                "headers": {
+                    "Hoverfly": ["Was-Here"]
+                }
+            }
+        }],
+        "globalActions": {
+            "delays": [
+
+            ]
+        }
+    },
+    "meta": {
+        "schemaVersion": "v2",
+        "hoverflyVersion": "v0.11.0",
+        "timeExported": "2016-11-11T11:53:52Z"
+    }
+}
