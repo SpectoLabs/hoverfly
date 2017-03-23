@@ -16,7 +16,3 @@ Simulation JSON can be exported, edited and imported in and out of Hoverfly, and
 .. seealso::
 
     For a hands-on tutorial of creating and editing simulations, see :ref:`simulations_io`.
-
-
-
-.. todo:: Write up about Request Matchers, Responses (Captured Traffic and Delays)
