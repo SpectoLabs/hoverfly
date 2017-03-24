@@ -1,15 +1,15 @@
-.. pairs:
+.. _pairs:
 
 Request Matchers and Responses
 ==============================
 
-.. todo:: @tjcunliffe to review
+Hoverfly simulates APIs by `matching` incoming requests to requests that it has captured previously, and returning a response that is associated with the matched request.
 
-Hoverfly simulates APIs by `matching` incoming requests to requests that it has captured previously, and returning a response that is associated with the matched request. This is done by scanning through a list of request response pairs. Each pair has both a Request Matcher and a Response.
+Imagine scanning through a dictionary for a word, and then looking up its definition. Hoverfly does exactly that, but the “word” is the HTTP request that was “captured” 
+in Capture mode, and the “definition” is the response.
 
 Request Matcher
 ---------------
-A Request Matcher is a JSON object that defines which HTTP requests should be matched against it. A HTTP request passing through Hoverfly will be inspected and several fields will be extracted.
 
 Hoverfly matches incoming requests to captured requests by comparing the following fields:
 
@@ -37,22 +37,23 @@ When Hoverfly captures a request, it creates a Request Matcher for each field in
  - the request field value 
  - the type of match that will be used to compare the captured request field value to the incoming request field value 
 
-By default, Hoverfly will set the type of match to "exact" for each field. Below is a Request Matcher set from an example Hoverfly simulation JSON file.
+By default, Hoverfly will set the type of match to "exactMatch" for each field. Below is a Request Matcher set from an example Hoverfly simulation JSON file.
 
 .. literalinclude:: ../../simulations/basic-simulation.json
    :lines: 4-24
    :linenos:
    :language: javascript
 
-.. raw:: html
 
-   <div>
-        <p class="include-literal-footer">
-            <a href="../../simulations/basic-simulation.json">See this request in its full simulation</a>
-        </p>
-   </div>
+:ref:`View entire simulation file <basic_simulation>`
 
-Not each of the fields is required, meaning it is possible to create partial request matchers that can be matched to more requests. For example, this request matcher will match any request to "docs.hoverfly.io".
+The matching strategy that Hoverfly uses to compare an incoming request to a captured request can be changed by editing the Request Matchers in the simulation
+JSON file. 
+
+It is not necessary to have a Request Matcher for every request field. By omitting Request Matchers, it is possible to implement **partial matching** - meaning
+that more than Hoverfly will return one response for more than one incoming request. 
+
+For example, this Request Matcher will match any request to "docs.hoverfly.io":
 
 .. code:: json
 
@@ -62,59 +63,88 @@ Not each of the fields is required, meaning it is possible to create partial req
         },
     }
 
-Although the default matcher is "exactMatch", there are many other matchers to choose from.
 
-.. todo:: Finish table, not sure its gonna be able to hold all the examples and still look good
 
-+------------------------+------------------------------------+
-| Request Field Matchers | Example                            |
-+========================+====================================+
-| "exactMatch"           | String-To-Match == String-To-Match |
-+------------------------+------------------------------------+
-| "xmlMatch"             | ?                                  |
-+------------------------+------------------------------------+
-| "xpathMatch"           | ?                                  |
-+------------------------+------------------------------------+
-| "jsonMatch"            | ?                                  |
-+------------------------+------------------------------------+
-| "jsonPathMatch"        | ?                                  |
-+------------------------+------------------------------------+
-| "regexMatch"           | ?                                  |
-+------------------------+------------------------------------+
-| "globMatch"            | ?                                  |
-+------------------------+------------------------------------+
+Matcher types
+-------------
+
+Although the default matcher type is "exactMatch", there are many other matchers to choose from.
+
+.. todo:: Add examples
+
+"exactMatch"
+~~~~~~~~~~~~
+
+Example: 
+
+.. code::
+
+   docs.hoverfly.io == docs.hoverfly.io
+
+
+"xmlMatch"
+~~~~~~~~~~
+
+Example: 
+
+
+"xpathMatch"
+~~~~~~~~~~~~
+
+Example: 
+
+
+"jsonMatch"
+~~~~~~~~~~~
+
+Example: 
+
+
+"jsonPathMatch"
+~~~~~~~~~~~~~~~
+
+Example: 
+
+
+"regexMatch"
+~~~~~~~~~~~~
+
+Example: 
+
+
+"globMatch"
+~~~~~~~~~~~
+
+Example: 
+
+ 
+
+.. todo:: 
+    
+   What does this mean? Should it still be here?
 
 Request templates are defined in the :ref:`simulation_schema`.
 
-Response
---------
+Responses
+---------
 
-With each Request Matcher is a Response. This is what Hoverfly will serve back to the client when a match is successful.
+Each Request Matcher set has a response associated with is. If the request match is successful, Hoverfly will return the response to the client.
 
 .. literalinclude:: ../../simulations/basic-simulation.json
    :lines: 25-32
    :linenos:
    :language: javascript
 
-.. raw:: html
+:ref:`View entire simulation file <basic_simulation>`
 
-   <div>
-        <p class="include-literal-footer">
-            <a href="../../simulations/basic-simulation.json">See this response in its full simulation</a>
-        </p>
-   </div>
+Editing the fields in response, combined with editing the Request Matcher set, makes it possible to configure complex request/response logic. 
 
-Since JSON does not support binary data, binary responses are base64 encoded. This is denoted by the encodedBody field. Hoverfly automatically encodes and decodes the data during the export and import phases.
+Since JSON does not support binary data, binary responses are base64 encoded. This is denoted by the encodedBody field. 
+Hoverfly automatically encodes and decodes the data during the export and import phases.
 
 .. literalinclude:: ../../simulations/basic-encoded-simulation.json
    :lines: 27-28
    :linenos:
    :language: javascript
 
-.. raw:: html
-
-   <div>
-        <p class="include-literal-footer">
-            <a href="../../simulations/basic-simulation.json">See this response in its full simulation</a>
-        </p>
-   </div>
+:ref:`View entire simulation file <basic_encoded_simulation>`
