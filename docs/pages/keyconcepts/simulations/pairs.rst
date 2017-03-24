@@ -1,7 +1,9 @@
 .. _pairs:
 
-Request Matchers and Responses
-==============================
+Request Responses Pairs
+=======================
+
+.. todo:: @tjcunliffe to review
 
 Hoverfly simulates APIs by `matching` incoming requests to requests that it has captured previously, and returning a response that is associated with the matched request.
 
@@ -63,67 +65,7 @@ For example, this Request Matcher will match any request to "docs.hoverfly.io":
         },
     }
 
-
-
-Matcher types
--------------
-
 Although the default matcher type is "exactMatch", there are many other matchers to choose from.
-
-.. todo:: Add examples
-
-"exactMatch"
-~~~~~~~~~~~~
-
-Example: 
-
-.. code::
-
-   docs.hoverfly.io == docs.hoverfly.io
-
-
-"xmlMatch"
-~~~~~~~~~~
-
-Example: 
-
-
-"xpathMatch"
-~~~~~~~~~~~~
-
-Example: 
-
-
-"jsonMatch"
-~~~~~~~~~~~
-
-Example: 
-
-
-"jsonPathMatch"
-~~~~~~~~~~~~~~~
-
-Example: 
-
-
-"regexMatch"
-~~~~~~~~~~~~
-
-Example: 
-
-
-"globMatch"
-~~~~~~~~~~~
-
-Example: 
-
- 
-
-.. todo:: 
-    
-   What does this mean? Should it still be here?
-
-Request templates are defined in the :ref:`simulation_schema`.
 
 Responses
 ---------
