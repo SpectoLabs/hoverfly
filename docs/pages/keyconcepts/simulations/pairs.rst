@@ -5,6 +5,10 @@ Request Responses Pairs
 
 .. todo:: @tjcunliffe to review
 
+.. todo:: Rewrite introduction to include a description of stored/incoming/outgoing requests/responses
+
+.. todo:: Be consistent with terminology
+
 Hoverfly simulates APIs by `matching` incoming requests to requests that it has captured previously, and returning a response that is associated with the matched request.
 
 Imagine scanning through a dictionary for a word, and then looking up its definition. Hoverfly does exactly that, but the “word” is the HTTP request that was “captured” 
@@ -35,9 +39,13 @@ Hoverfly matches incoming requests to captured requests by comparing the followi
 
 When Hoverfly captures a request, it creates a Request Matcher for each field in the request. A Request Matcher consists of:
  
+ .. todo:: Find a better way to display this information
+
  - the request field name 
  - the request field value 
  - the type of match that will be used to compare the captured request field value to the incoming request field value 
+
+.. todo:: Inline code block
 
 By default, Hoverfly will set the type of match to "exactMatch" for each field. Below is a Request Matcher set from an example Hoverfly simulation JSON file.
 
@@ -55,6 +63,8 @@ JSON file.
 It is not necessary to have a Request Matcher for every request field. By omitting Request Matchers, it is possible to implement **partial matching** - meaning
 that more than Hoverfly will return one response for more than one incoming request. 
 
+.. todo:: Inline code block
+
 For example, this request will match any request to "docs.hoverfly.io":
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
@@ -66,6 +76,8 @@ For example, this request will match any request to "docs.hoverfly.io":
 :ref:`View entire simulation file <all_matchers_simulation>`
 
 A request has many different matchers available. When capturing requests, exactMatch will be used as it is the default.
+
+.. todo:: Inline code block
 
 For example, this request is similar to the one above, but will now use a "globMatch" to match any subdomain of "hoverfly.io":
 
@@ -79,6 +91,8 @@ For example, this request is similar to the one above, but will now use a "globM
 
 As well as being different matchers, it is possible to use multiple matchers together.
 
+.. todo:: Inline code block
+
 For example, iterating on the last request, I want to match on any subdomain of but that subdomain has to start with the letter "d". This could be "docs.hoverfly.io" or "dogs.hoverfly.io" but could not be "cats.hoverfly.io":
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
@@ -88,6 +102,8 @@ For example, iterating on the last request, I want to match on any subdomain of 
    
 
 :ref:`View entire simulation file <all_matchers_simulation>`
+
+.. todo:: Fix this see also
 
 .. seealso::
 
