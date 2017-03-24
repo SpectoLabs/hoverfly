@@ -5,29 +5,38 @@ Request Matchers and Responses
 
 .. todo:: @tjcunliffe to review
 
-Hoverfly simulates APIs by `matching` responses to incoming requests.
+Hoverfly simulates APIs by `matching` incoming requests to requests that it has captured previously, and returning a response that is associated with the matched request.
 
-Imagine scanning through a dictionary for a word, and then looking up its definition. Hoverfly does exactly that, but the "word" is the HTTP request that was "captured" in :ref:`capture_mode`. Below is a list of matchable fields on a HTTP request.
+Imagine scanning through a dictionary for a word, and then looking up its definition. Hoverfly does exactly that, but the "word" is the HTTP request that was "captured" in :ref:`capture_mode`, 
+and the "definition" is the response. 
+
+Hoverfly matches incoming requests to captured requests by comparing the following fields:
 
 +--------------------+---------------------+-------------------------------------+
-| HTTP Request field | Value type          | Example                             |
+| HTTP Request Field | Value type          | Example                             |
 +====================+=====================+=====================================+
-| Scheme             | string              | "https"                             |
+| scheme             | string              | "https"                             |
 +--------------------+---------------------+-------------------------------------+
-| Method             | string              | "GET"                               |
+| method             | string              | "GET"                               |
 +--------------------+---------------------+-------------------------------------+
-| Destination        | string              | "docs.hoverfly.io"                  |
+| destination        | string              | "docs.hoverfly.io"                  |
 +--------------------+---------------------+-------------------------------------+
-| Path               | string              | "/pages/keyconcepts/templates.html" |
+| path               | string              | "/pages/keyconcepts/templates.html" |
 +--------------------+---------------------+-------------------------------------+
-| Query              | string              | "query=true"                        |
+| query              | string              | "query=true"                        |
 +--------------------+---------------------+-------------------------------------+
-| Body               | string              | ""                                  |
+| body               | string              | ""                                  |
 +--------------------+---------------------+-------------------------------------+
-| Headers            | map[string][]string | "User-Agent: ["http-client"]        |
+| headers            | map[string][]string | "User-Agent: ["http-client"]"       |
 +--------------------+---------------------+-------------------------------------+
 
-These captured requests are translated into Request Matchers. This request consists all of the same fields as a request but uses matchers instead of exact values.
+When Hoverfly captures a request, it creates a Request Matcher for each field in the request. A Request Matcher consists of:
+ 
+ - the request field name 
+ - the request field value 
+ - the type of match that will be used to compare the captured request field value to the incoming request field value 
+
+By default, Hoverfly will set the type of match to "exact" for each field. Below is a Request Matcher set from an example Hoverfly simulation JSON file.
 
 .. literalinclude:: ../../simulations/basic-simulation.json
    :lines: 4-24
