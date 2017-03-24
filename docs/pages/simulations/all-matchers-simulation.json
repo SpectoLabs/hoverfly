@@ -1,0 +1,58 @@
+{
+    "data": {
+        "pairs": [{
+            "request": {
+                "destination": {
+                    "exactMatch": "docs.hoverfly.io"
+                }
+            },
+            "response": {
+                "status": 200,
+                "body": "Response from docs.hoverfly.io/pages/keyconcepts/templates.html",
+                "encodedBody": false,
+                "headers": {
+                    "Hoverfly": ["Was-Here"]
+                }
+            }
+        }, {
+            "request": {
+                "destination": {
+                    "globMatch": "*.hoverfly.io"
+                }
+            },
+            "response": {
+                "status": 200,
+                "body": "Response from docs.hoverfly.io/pages/keyconcepts/templates.html",
+                "encodedBody": false,
+                "headers": {
+                    "Hoverfly": ["Was-Here"]
+                }
+            }
+        },{
+            "request": {
+                "destination": {
+                    "regexMatch": "(\\Ad)",
+                    "globMatch": "*.hoverfly.io"
+                }
+            },
+            "response": {
+                "status": 200,
+                "body": "Response from docs.hoverfly.io/pages/keyconcepts/templates.html",
+                "encodedBody": false,
+                "headers": {
+                    "Hoverfly": ["Was-Here"]
+                }
+            }
+        }],
+        "globalActions": {
+            "delays": [
+
+            ]
+        }
+    },
+    "meta": {
+        "schemaVersion": "v2",
+        "hoverflyVersion": "v0.11.0",
+        "timeExported": "2016-11-11T11:53:52Z"
+    }
+}
