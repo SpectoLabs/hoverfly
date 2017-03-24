@@ -11,5 +11,6 @@ These reference documents contain information regarding invoking the hoverctl co
 
     hoverctl/hoverctlcommands
     hoverfly/hoverflycommands
+    hoverfly/request_matchers
     api/api
     simulationschema
