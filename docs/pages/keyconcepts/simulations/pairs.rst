@@ -1,14 +1,15 @@
-.. request_matchers_and_responses:
+.. pairs:
 
 Request Matchers and Responses
 ==============================
 
 .. todo:: @tjcunliffe to review
 
-Hoverfly simulates APIs by `matching` incoming requests to requests that it has captured previously, and returning a response that is associated with the matched request.
+Hoverfly simulates APIs by `matching` incoming requests to requests that it has captured previously, and returning a response that is associated with the matched request. This is done by scanning through a list of request response pairs. Each pair has both a Request Matcher and a Response.
 
-Imagine scanning through a dictionary for a word, and then looking up its definition. Hoverfly does exactly that, but the "word" is the HTTP request that was "captured" in :ref:`capture_mode`, 
-and the "definition" is the response. 
+Request Matcher
+---------------
+A Request Matcher is a JSON object that defines which HTTP requests should be matched against it. A HTTP request passing through Hoverfly will be inspected and several fields will be extracted.
 
 Hoverfly matches incoming requests to captured requests by comparing the following fields:
 
@@ -84,6 +85,9 @@ Although the default matcher is "exactMatch", there are many other matchers to c
 +------------------------+------------------------------------+
 
 Request templates are defined in the :ref:`simulation_schema`.
+
+Response
+--------
 
 With each Request Matcher is a Response. This is what Hoverfly will serve back to the client when a match is successful.
 

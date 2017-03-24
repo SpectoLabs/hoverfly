@@ -11,7 +11,7 @@ Simulations consist of **Request Matchers and Responses**, **Delays** and **Meta
 
 .. toctree::
 
-    request_matchers_and_responses
+    pairs
     delays
     meta
 
