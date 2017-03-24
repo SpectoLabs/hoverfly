@@ -1,20 +1,32 @@
 .wy-side-nav-search {
-    background-color: #4c4c4c !important;
+    background-color: #222 !important;
+    color: #fcfcfc !important;
+}
+
+.wy-side-nav-search > a {
+    color: #fcfcfc !important;
+}
+
+.wy-side-nav-search > a:hover {
+    color: #fcfcfc !important;
+}
+
+.wy-side-nav-search > a:visited {
     color: #fcfcfc !important;
 }
 
 .wy-nav-side {
-    background: #4c4c4c !important;
+    background: #222 !important;
 }
 
 .wy-nav-top {
-    background: #4c4c4c !important;
+    background: #222 !important;
     color: #fff !important;
 }
 
 
 .wy-side-nav-search input[type=text] {
-    border-color: #4c4c4c !important;
+    border-color: #222 !important;
 }
 
 .wy-menu-vertical li.current {
@@ -33,8 +45,12 @@
     color: #fcfcfc !important;
 }
 
+.wy-menu-vertical a:visited {
+    color: #fcfcfc !important;
+}
+
 .wy-menu-vertical li.current a {
-    color: #404040 !important;
+    color: #222 !important;
     border-right: none !important;
 }
 
@@ -57,21 +73,22 @@ body {
     color: #4c4c4c !important;
 }
 
-/*
+
 body a {
-    color: #c3996b !important;
+    color: #508793 !important;
     text-decoration: none;
     cursor: pointer;
 }
 
 a:visited {
-    color: #c3996b !important;
+    color: #508793 !important;
 }
 
 a:hover {
-    text-decoration: underline;
+    text-decoration: none;
+    color: #2a586c !important;
 }
-*/
+
 
 
 .wy-alert.wy-alert-info .wy-alert-title, .rst-content .note .wy-alert-title, .rst-content .wy-alert-info.attention .wy-alert-title, .rst-content .wy-alert-info.caution .wy-alert-title, .rst-content .wy-alert-info.danger .wy-alert-title, .rst-content .wy-alert-info.error .wy-alert-title, .rst-content .wy-alert-info.hint .wy-alert-title, .rst-content .wy-alert-info.important .wy-alert-title, .rst-content .wy-alert-info.tip .wy-alert-title, .rst-content .wy-alert-info.warning .wy-alert-title, .rst-content .seealso .wy-alert-title, .rst-content .wy-alert-info.admonition-todo .wy-alert-title, .wy-alert.wy-alert-info .rst-content .admonition-title, .rst-content .wy-alert.wy-alert-info .admonition-title, .rst-content .note .admonition-title, .rst-content .wy-alert-info.attention .admonition-title, .rst-content .wy-alert-info.caution .admonition-title, .rst-content .wy-alert-info.danger .admonition-title, .rst-content .wy-alert-info.error .admonition-title, .rst-content .wy-alert-info.hint .admonition-title, .rst-content .wy-alert-info.important .admonition-title, .rst-content .wy-alert-info.tip .admonition-title, .rst-content .wy-alert-info.warning .admonition-title, .rst-content .seealso .admonition-title, .rst-content .wy-alert-info.admonition-todo .admonition-title {
