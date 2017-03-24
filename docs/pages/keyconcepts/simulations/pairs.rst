@@ -45,8 +45,6 @@ When Hoverfly captures a request, it creates a Request Matcher for each field in
  - the request field value 
  - the type of match that will be used to compare the captured request field value to the incoming request field value 
 
-.. todo:: Inline code block
-
 By default, Hoverfly will set the type of match to "exactMatch" for each field. Below is a Request Matcher set from an example Hoverfly simulation JSON file.
 
 .. literalinclude:: ../../simulations/basic-simulation.json
@@ -63,9 +61,7 @@ JSON file.
 It is not necessary to have a Request Matcher for every request field. By omitting Request Matchers, it is possible to implement **partial matching** - meaning
 that more than Hoverfly will return one response for more than one incoming request. 
 
-.. todo:: Inline code block
-
-For example, this request will match any request to "docs.hoverfly.io":
+For example, this request will match any request to ``docs.hoverfly.io``:
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
    :lines: 4-8
@@ -77,9 +73,7 @@ For example, this request will match any request to "docs.hoverfly.io":
 
 A request has many different matchers available. When capturing requests, exactMatch will be used as it is the default.
 
-.. todo:: Inline code block
-
-For example, this request is similar to the one above, but will now use a "globMatch" to match any subdomain of "hoverfly.io":
+For example, this request is similar to the one above, but will now use a ``globMatch`` to match any subdomain of ``hoverfly.io``:
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
    :lines: 18-22
@@ -91,9 +85,7 @@ For example, this request is similar to the one above, but will now use a "globM
 
 As well as being different matchers, it is possible to use multiple matchers together.
 
-.. todo:: Inline code block
-
-For example, iterating on the last request, I want to match on any subdomain of but that subdomain has to start with the letter "d". This could be "docs.hoverfly.io" or "dogs.hoverfly.io" but could not be "cats.hoverfly.io":
+For example, iterating on the last request, I want to match on any subdomain of but that subdomain has to start with the letter ``d``. This could be ``docs.hoverfly.io`` or ``dogs.hoverfly.io`` but could not be ``cats.hoverfly.io``:
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
    :lines: 32-37
