@@ -64,6 +64,18 @@
     margin-right: 10px;
 }
 
+.matcher-examples .example-icon {
+    text-align: center;
+}
+
+.fa-success {
+    color: #11A674;
+}
+
+.fa-failure {
+    color: #EE593E;
+}
+
 h1, h2, .rst-content .toctree-wrapper p.caption, h3, h4, h5, h6, legend {
     font-family: "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif !important;
 }
