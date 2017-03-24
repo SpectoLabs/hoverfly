@@ -79,7 +79,7 @@ For example, this request is similar to the one above, but will now use a "globM
 
 As well as being different matchers, it is possible to use multiple matchers together.
 
-For example, iterating on the last request, I want to match on any subdomain of "hoverfly.io" but that subdomain has to start with the letter "d". This could be "docs.hoverfly.io" or "dogs.hoverfly.io" but could not be "cats.hoverfly.io":
+For example, iterating on the last request, I want to match on any subdomain of but that subdomain has to start with the letter "d". This could be "docs.hoverfly.io" or "dogs.hoverfly.io" but could not be "cats.hoverfly.io":
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
    :lines: 32-37
@@ -89,7 +89,10 @@ For example, iterating on the last request, I want to match on any subdomain of 
 
 :ref:`View entire simulation file <all_matchers_simulation>`
 
-Although the default matcher type is "exactMatch", there are many other matchers to choose from.
+.. seealso::
+
+    There are a lot more request matchers that you can use. To find out more please check :ref:`_requestmatchers`.
+
 
 Responses
 ---------
