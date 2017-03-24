@@ -9,6 +9,7 @@
 
 .wy-side-nav-search > a:hover {
     color: #fcfcfc !important;
+    background-color: transparent !important;
 }
 
 .wy-side-nav-search > a:visited {
@@ -45,8 +46,16 @@
     color: #fcfcfc !important;
 }
 
+.wy-menu-vertical a:hover {
+    background-color: transparent !important;
+}
+
 .wy-menu-vertical a:visited {
     color: #fcfcfc !important;
+}
+
+.wy-menu-vertical a:active {
+    background-color: transparent !important;
 }
 
 .wy-menu-vertical li.current a {
