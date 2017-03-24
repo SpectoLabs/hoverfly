@@ -14,8 +14,9 @@ import (
 	"net"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"os"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // MaxSerialNumber - nothing very original, big number
