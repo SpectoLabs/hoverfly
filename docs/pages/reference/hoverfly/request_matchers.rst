@@ -3,9 +3,11 @@
 Request Matchers
 ================
 
-.. todo:: Check examples and name them... maybe
 
 A Request Matcher is used to define the desired value for a specific request field when matching against incoming requests. Given a matcher value and provided string to match when matching, each matcher will transform the values and compare differently.
+
+|
+.. todo:: Check examples and name them... maybe
 
 Exact Matcher
 -------------
@@ -39,6 +41,9 @@ Example
             <tr/>
         </tbody>
     </table>
+
+|
+|
 
 Glob Matcher
 ------------
@@ -102,6 +107,9 @@ Example 2
 
 .. todo:: Buy hooverfly.com?
 
+|
+|
+
 Regex Matcher
 ------------
 This request matcher will parse the matcher value as a regular expression. It will execute the expression against the string to match. This will pass only if the expression successfully returns a result.
@@ -162,6 +170,9 @@ Example 2
         </tbody>
     </table>
 
+|
+|
+
 XML Matcher
 -----------
 This request matcher will transform both matcher value and string to match as XML objects and then match on the equality of those objects.
@@ -201,6 +212,9 @@ Example
             <tr/>
         </tbody>
     </table>
+
+|
+|
 
 XPath Matcher
 ------------
@@ -283,6 +297,9 @@ Example 2
         </tbody>
     </table>
 
+|
+|
+
 JSON Matcher
 ------------
 This request matcher will transform both matcher value and string to match as JSON objects and then match on the equality of those objects.
@@ -330,6 +347,9 @@ Example
             <tr/>
         </tbody>
     </table>
+
+|
+|
 
 JSONPath Matcher
 ------------
