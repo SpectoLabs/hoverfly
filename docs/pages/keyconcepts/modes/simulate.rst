@@ -3,8 +3,6 @@
 Simulate mode
 =============
 
-.. todo:: what is meant by "cache (which is configurable)"? What can be configured?
-
 In this mode, Hoverfly uses traffic captured using :ref:`capture_mode` (which may also have been manually edited) to mimic external APIs.
 
 .. figure:: simulate.mermaid.png
