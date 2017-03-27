@@ -112,7 +112,7 @@ var _ = Describe("When I use hoverctl", func() {
 			output := functional_tests.Run(hoverctlBinary, "-v", "middleware", "--binary", "notpython", "--script", "testdata/add_random_delay.py")
 
 			Expect(output).To(ContainSubstring("Hoverfly could not execute this middleware"))
-			Expect(output).To(ContainSubstring(`Invalid middleware: exec: \"notpython\": executable file not found in $PATH`))
+			Expect(output).To(ContainSubstring(`Invalid middleware: exec: "notpython": executable file not found in $PATH`))
 		})
 
 		It("When I use the verbose flag, I see that http://wqrwwewf.wewefwef.specto is not an executable remote middleware", func() {
