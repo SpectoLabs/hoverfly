@@ -1,17 +1,16 @@
-.. request_matchers:
+.. _request_matchers:
 
 Request matchers
 ================
 
+A Request Matcher is used to define the desired value for a specific request field when matching against incoming requests. 
+Given a **matcher value** and **string to match**, each matcher will transform and compare the values in a different way.
 
-A Request Matcher is used to define the desired value for a specific request field when matching against incoming requests. Given a matcher value and provided string to match when matching, each matcher will transform the values and compare differently.
-
-|
-.. todo:: Check examples and name them... maybe
 
 Exact matcher
 -------------
-This request matcher will match on the equality of the matcher value and the string to match. There are no transformations. This is the default request matcher used when capturing with Hoverfly. 
+Evaluates the equality of the matcher value and the string to match. There are no transformations. 
+This is the default Request Matcher type which is set by Hoverfly when requests and responses are captured. 
 
 Example
 """""""
@@ -50,7 +49,8 @@ Example
 
 Glob matcher
 ------------
-This request matcher will match on the equality of the matcher value and the string to match but will allow wildcard matching similar to BASH with the ``*`` character.
+
+Allows wildcard matching (similar to BASH) using the ``*`` character.
 
 Example
 """""""
@@ -93,14 +93,13 @@ Example
         </tbody>
     </table>
 
-.. todo:: Buy hooverfly.com?
-
 |
 |
 
 Regex matcher
 ------------
-This request matcher will parse the matcher value as a regular expression. It will execute the expression against the string to match. This will pass only if the expression successfully returns a result.
+Parses the matcher value as a regular expression which is then executed against the string to match. This will pass only if the regular expression successfully 
+returns a result.
 
 Example
 """""""
@@ -148,7 +147,7 @@ Example
 
 XML matcher
 -----------
-This request matcher will transform both matcher value and string to match as XML objects and then match on the equality of those objects.
+Transforms both the matcher value and string to match into XML objects and then evaluates their equality.
 
 Example
 """""""
@@ -200,7 +199,8 @@ Example
 
 XPath matcher
 ------------
-This request matcher will parse the matcher value as an XPath expression. It will transform the string to match into an XML object and then execute the expression against it. This will pass only if the expression successfully returns a result.
+Parses the matcher value as an XPath expression, transforms the string to match into an XML object and then executes the expression against it. This will pass only if the expression successfully 
+returns a result.
 
 Example
 """""""
@@ -269,7 +269,7 @@ Example
 
 JSON matcher
 ------------
-This request matcher will transform both matcher value and string to match as JSON objects and then match on the equality of those objects.
+Transforms both the matcher value and string to match into JSON objects and then evaluates their equality.
 
 Example
 """""""
@@ -343,7 +343,9 @@ Example
 
 JSONPath matcher
 ----------------
-This request matcher will parse the matcher value as an JSONPath expression. It will transform the string to match into an JSON object and then execute the expression against it. This will pass only if the expression successfully returns a result.
+Parses the matcher value as a JSONPath expression, transforms the string to match into a JSON object and then executes 
+the expression against it. This will pass only if the expression successfully returns a result.
+
 
 Example
 """""""
