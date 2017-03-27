@@ -68,6 +68,11 @@
     text-align: center;
 }
 
+td.example {
+    vertical-align: top !important;
+    white-space: pre !important;
+}
+
 .fa-success {
     color: #11A674;
 }
