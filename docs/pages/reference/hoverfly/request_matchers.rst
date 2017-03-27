@@ -27,7 +27,7 @@ Example
         <thead>
             <tr class="row-odd">
                 <th class="head">Example</th>
-                <th class="head">Success</th>
+                <th class="head">Match</th>
             </tr>
         </thead>
         <tbody>
@@ -62,7 +62,7 @@ Example 1
         <thead>
             <tr class="row-odd">
                 <th class="head">Example</th>
-                <th class="head">Success</th>
+                <th class="head">Match</th>
             </tr>
         </thead>
         <tbody>
@@ -90,7 +90,7 @@ Example 2
         <thead>
             <tr class="row-odd">
                 <th class="head">Example</th>
-                <th class="head">Success</th>
+                <th class="head">Match</th>
             </tr>
         </thead>
         <tbody>
@@ -127,7 +127,7 @@ Example 1
         <thead>
             <tr class="row-odd">
                 <th class="head">Example</th>
-                <th class="head">Success</th>
+                <th class="head">Match</th>
             </tr>
         </thead>
         <tbody>
@@ -155,7 +155,7 @@ Example 2
         <thead>
             <tr class="row-odd">
                 <th class="head">Example</th>
-                <th class="head">Success</th>
+                <th class="head">Match</th>
             </tr>
         </thead>
         <tbody>
@@ -190,7 +190,7 @@ Example
         <thead>
             <tr class="row-odd">
                 <th class="head">Example</th>
-                <th class="head">Success</th>
+                <th class="head">Match</th>
             </tr>
         </thead>
         <tbody>
@@ -233,7 +233,7 @@ Example 1
         <thead>
             <tr class="row-odd">
                 <th class="head">Example</th>
-                <th class="head">Success</th>
+                <th class="head">Match</th>
             </tr>
         </thead>
         <tbody>
@@ -269,7 +269,7 @@ Example 2
         <thead>
             <tr class="row-odd">
                 <th class="head">Example</th>
-                <th class="head">Success</th>
+                <th class="head">Match</th>
             </tr>
         </thead>
         <tbody>
@@ -317,7 +317,7 @@ Example
         <thead>
             <tr class="row-odd">
                 <th class="head">Example</th>
-                <th class="head">Success</th>
+                <th class="head">Match</th>
             </tr>
         </thead>
         <tbody>
@@ -368,7 +368,7 @@ Example 1
         <thead>
             <tr class="row-odd">
                 <th class="head">Example</th>
-                <th class="head">Success</th>
+                <th class="head">Match</th>
             </tr>
         </thead>
         <tbody>
@@ -405,7 +405,7 @@ Example 2
         <thead>
             <tr class="row-odd">
                 <th class="head">Example</th>
-                <th class="head">Success</th>
+                <th class="head">Match</th>
             </tr>
         </thead>
         <tbody>
