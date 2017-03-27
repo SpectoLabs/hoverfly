@@ -95,7 +95,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 			It("can export", func() {
 
-				fileName := generateFileName()
+				fileName := functional_tests.GenerateFileName()
 				// Export the data
 				output := functional_tests.Run(hoverctlBinary, "export", fileName, "--admin-port="+hoverfly.GetAdminPort())
 
@@ -113,7 +113,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 			It("can import", func() {
 
-				fileName := generateFileName()
+				fileName := functional_tests.GenerateFileName()
 				err := ioutil.WriteFile(fileName, []byte(v2HoverflyData), 0644)
 				Expect(err).To(BeNil())
 

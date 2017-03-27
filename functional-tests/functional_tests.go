@@ -2,7 +2,9 @@ package functional_tests
 
 import (
 	"bytes"
+	"crypto/rand"
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -267,4 +269,14 @@ func Run(binary string, commands ...string) string {
 	}
 
 	return strings.TrimSpace(string(out))
+}
+
+func GenerateFileName() string {
+
+	rb := make([]byte, 6)
+	rand.Read(rb)
+
+	rs := base64.URLEncoding.EncodeToString(rb)
+
+	return "testdata-gen/" + rs + ".json"
 }

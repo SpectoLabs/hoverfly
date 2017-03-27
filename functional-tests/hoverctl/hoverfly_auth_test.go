@@ -55,7 +55,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 		Context("you can manage simulations", func() {
 
 			It("by importing and exporting data", func() {
-				filePath := generateFileName()
+				filePath := functional_tests.GenerateFileName()
 				ioutil.WriteFile(filePath,
 					[]byte(`
 						{
@@ -105,7 +105,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 				output := functional_tests.Run(hoverctlBinary, "import", filePath)
 				Expect(output).To(ContainSubstring("Successfully imported simulation from " + filePath))
 
-				newFilePath := generateFileName()
+				newFilePath := functional_tests.GenerateFileName()
 
 				output = functional_tests.Run(hoverctlBinary, "export", newFilePath)
 				Expect(output).To(ContainSubstring("Successfully exported simulation to " + newFilePath))
@@ -163,7 +163,7 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 			var filePath string
 
 			BeforeEach(func() {
-				filePath = generateFileName()
+				filePath = functional_tests.GenerateFileName()
 				ioutil.WriteFile(filePath,
 					[]byte(`
 					{
