@@ -102,6 +102,8 @@ incoming requests to :code:`docs.hoverfly.io` and :code:`dogs.hoverfly.io` will 
     There are many types of Request Matcher. Please refer to :ref:`request_matchers` for a list of the types available, and
     examples of how to use them.
 
+    For a practical example of how to use a Request Matcher, please refer to :ref:`loosematching` in the tutorials section.
+
 
 Responses
 ---------
