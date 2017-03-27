@@ -3,12 +3,6 @@
 Request Responses Pairs
 =======================
 
-.. todo:: @tjcunliffe to review
-
-.. todo:: Rewrite introduction to include a description of stored/incoming/outgoing requests/responses
-
-.. todo:: Be consistent with terminology
-
 Hoverfly simulates APIs by matching **incoming requests** from the client to **stored requests**. Stored requests have an associated
 **stored response** which is returned to the client if the match is successful.  
 
@@ -112,7 +106,7 @@ incoming requests to :code:`docs.hoverfly.io` and :code:`dogs.hoverfly.io` will 
 Responses
 ---------
 
-Each Request Matcher set has a response associated with is. If the request match is successful, Hoverfly will return the response to the client.
+Each Request Matcher Set has a response associated with is. If the request match is successful, Hoverfly will return the response to the client.
 
 .. literalinclude:: ../../simulations/basic-simulation.json
    :lines: 25-32
@@ -122,6 +116,9 @@ Each Request Matcher set has a response associated with is. If the request match
 :ref:`View entire simulation file <basic_simulation>`
 
 Editing the fields in response, combined with editing the Request Matcher set, makes it possible to configure complex request/response logic. 
+
+Binary data in responses
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Since JSON does not support binary data, binary responses are base64 encoded. This is denoted by the encodedBody field. 
 Hoverfly automatically encodes and decodes the data during the export and import phases.
