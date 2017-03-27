@@ -10,7 +10,7 @@ Loose request matching using a Request Matcher
 In some cases you may want Hoverfly to return the same stored response for more than one incoming request. This can be done using
 Request Matchers. 
 
-Let's begin by capturing some traffic and exporting a simulation.
+Let's begin by capturing some traffic and exporting a simulation. This step saves us having to manually create a simulation ourselves and gives us a request to work with.
 
 .. literalinclude:: loosematching.sh
     :language: bash
@@ -44,3 +44,4 @@ The same response is returned, even though we created our simulation with a requ
     - To change how incoming requests are matched to stored responses, capture a simulation, export it, edit it
     - While editing, choose a request field to match on, select a Request Matcher type and a matcher value 
     - Re-import the simulation
+    - Requests can be manually added without capturing the request
