@@ -11,6 +11,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gexec"
 	"gopkg.in/yaml.v2"
 )
 
@@ -39,12 +40,17 @@ func TestHoverflyEndToEnd(t *testing.T) {
 var _ = BeforeSuite(func() {
 	workingDirectory, _ = os.Getwd()
 
-	hoverctlBinary = filepath.Join(workingDirectory, "bin/hoverctl")
-
 	binDirectory := filepath.Join(workingDirectory, "bin")
 
 	os.Setenv("PATH", fmt.Sprintf("%v:%v", binDirectory, os.Getenv("PATH")))
 
+	var err error
+	hoverctlBinary, err = gexec.Build("github.com/SpectoLabs/hoverfly/hoverctl")
+	Expect(err).ShouldNot(HaveOccurred())
+})
+
+var _ = AfterSuite(func() {
+	gexec.CleanupBuildArtifacts()
 })
 
 type testConfig struct {

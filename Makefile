@@ -19,13 +19,12 @@ hoverfly-functional-test: hoverfly-build
 	cd functional-tests/core && \
 	go test -v $(go list ./... | grep -v -E 'vendor')
 
-hoverctl-functional-test: hoverctl-build
-	cp target/hoverctl functional-tests/hoverctl/bin/hoverctl
+hoverctl-functional-test:
 	cp target/hoverfly functional-tests/hoverctl/bin/hoverfly
 	cd functional-tests/hoverctl && \
 	go test -v $(go list ./... | grep -v -E 'vendor')
 
-test: hoverfly-functional-test hoverctl-functional-test
+test: hoverfly-functional-test hoverctl-test hoverctl-functional-test
 
 build:
 	cd core/cmd/hoverfly && \
