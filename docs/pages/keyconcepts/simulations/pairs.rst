@@ -9,43 +9,47 @@ Request Responses Pairs
 
 .. todo:: Be consistent with terminology
 
-Hoverfly simulates APIs by `matching` incoming requests to requests that it has captured previously, and returning a response that is associated with the matched request.
+Hoverfly simulates APIs by matching **incoming requests** from the client to **stored requests**. Stored requests have an associated
+**stored response** which is returned to the client if the match is successful.  
 
-Imagine scanning through a dictionary for a word, and then looking up its definition. Hoverfly does exactly that, but the “word” is the HTTP request that was “captured” 
-in Capture mode, and the “definition” is the response.
+The matching logic that Hoverfly uses to compare incoming requests with stored requests can be configured using **Request Matchers**. 
 
-Request Matcher
----------------
+Request Matchers
+----------------
 
-Hoverfly matches incoming requests to captured requests by comparing the following fields:
-
-+--------------------+---------------------+-------------------------------------+
-| HTTP Request Field | Value type          | Example                             |
-+====================+=====================+=====================================+
-| scheme             | string              | "https"                             |
-+--------------------+---------------------+-------------------------------------+
-| method             | string              | "GET"                               |
-+--------------------+---------------------+-------------------------------------+
-| destination        | string              | "docs.hoverfly.io"                  |
-+--------------------+---------------------+-------------------------------------+
-| path               | string              | "/pages/keyconcepts/templates.html" |
-+--------------------+---------------------+-------------------------------------+
-| query              | string              | "query=true"                        |
-+--------------------+---------------------+-------------------------------------+
-| body               | string              | ""                                  |
-+--------------------+---------------------+-------------------------------------+
-| headers            | map[string][]string | "User-Agent: ["http-client"]"       |
-+--------------------+---------------------+-------------------------------------+
-
-When Hoverfly captures a request, it creates a Request Matcher for each field in the request. A Request Matcher consists of:
+When Hoverfly captures a request, it creates a Request Matcher for each field in the request. A Request Matcher consists of
+the request field name, the type of match which will be used to compare the field in the incoming request to the field in the stored
+request, and the request field value.
  
- .. todo:: Find a better way to display this information
+By default, Hoverfly will set the type of match to :code:`exactMatch` for each field. 
 
- - the request field name 
- - the request field value 
- - the type of match that will be used to compare the captured request field value to the incoming request field value 
+.. seealso::
 
-By default, Hoverfly will set the type of match to "exactMatch" for each field. Below is a Request Matcher set from an example Hoverfly simulation JSON file.
+    There are many types of Request Matcher. Please refer to :ref:`request_matchers` for a list of the types available, and
+    examples of how to use them.
+
+    
+An example Request Matcher Set might look like this:
+
++-------------+-------------+------------------------------------+
+| Field       | Matcher Type| Value                              |
++=============+=============+====================================+
+| scheme      | exactMatch  | "https"                            |
++-------------+-------------+------------------------------------+
+| method      | exactMatch  | "GET"                              |
++-------------+-------------+------------------------------------+
+| destination | exactMatch  | "docs.hoverfly.io"                 |         
++-------------+-------------+------------------------------------+
+| path        | exactMatch  | "/pages/keyconcepts/templates.html"|
++-------------+-------------+------------------------------------+
+| query       | exactMatch  | "query=true"                       |
++-------------+-------------+------------------------------------+
+| body        | exactMatch  | ""                                 |
++-------------+-------------+------------------------------------+
+| headers     | exactMatch  |                                    |
++-------------+-------------+------------------------------------+
+
+In the Hoverfly simulation JSON file, this Request Matcher Set would be represented like this: 
 
 .. literalinclude:: ../../simulations/basic-simulation.json
    :lines: 4-24
@@ -55,13 +59,13 @@ By default, Hoverfly will set the type of match to "exactMatch" for each field. 
 
 :ref:`View entire simulation file <basic_simulation>`
 
-The matching strategy that Hoverfly uses to compare an incoming request to a captured request can be changed by editing the Request Matchers in the simulation
+The matching strategy that Hoverfly uses to compare an incoming request to a stored request can be changed by editing the Request Matchers in the simulation
 JSON file. 
 
 It is not necessary to have a Request Matcher for every request field. By omitting Request Matchers, it is possible to implement **partial matching** - meaning
-that more than Hoverfly will return one response for more than one incoming request. 
+that Hoverfly will return one stored response for multiple incoming requests. 
 
-For example, this request will match any request to ``docs.hoverfly.io``:
+For example, this Request Matcher will match any incoming request to the :code:`docs.hoverfly.io` destination:
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
    :lines: 4-8
@@ -71,9 +75,8 @@ For example, this request will match any request to ``docs.hoverfly.io``:
 
 :ref:`View entire simulation file <all_matchers_simulation>`
 
-A request has many different matchers available. When capturing requests, exactMatch will be used as it is the default.
 
-For example, this request is similar to the one above, but will now use a ``globMatch`` to match any subdomain of ``hoverfly.io``:
+In the example below, the :code:`globMatch` Request Matcher type is used to match any subdomain of :code:`hoverfly.io`:
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
    :lines: 18-22
@@ -83,9 +86,13 @@ For example, this request is similar to the one above, but will now use a ``glob
 
 :ref:`View entire simulation file <all_matchers_simulation>`
 
-As well as being different matchers, it is possible to use multiple matchers together.
+It is also possible to use more than one Request Matcher for each field.
 
-For example, iterating on the last request, I want to match on any subdomain of but that subdomain has to start with the letter ``d``. This could be ``docs.hoverfly.io`` or ``dogs.hoverfly.io`` but could not be ``cats.hoverfly.io``:
+In the example below, a :code:`regexMatch` **and** a :code:`globMatch` are used on the :code:`destination` field. 
+
+This will match on any subdomain of :code:`hoverfly.io` which begins with the letter :code:`d`. This means that
+incoming requests to :code:`docs.hoverfly.io` and :code:`dogs.hoverfly.io` will be matched, but requests to 
+:code:`cats.hoverfly.io` will not be matched.
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
    :lines: 32-37
@@ -95,11 +102,11 @@ For example, iterating on the last request, I want to match on any subdomain of 
 
 :ref:`View entire simulation file <all_matchers_simulation>`
 
-.. todo:: Fix this see also
 
 .. seealso::
 
-    There are a lot more request matchers that you can use. To find out more please check :ref:`_requestmatchers`.
+    There are many types of Request Matcher. Please refer to :ref:`request_matchers` for a list of the types available, and
+    examples of how to use them.
 
 
 Responses
