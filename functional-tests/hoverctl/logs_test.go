@@ -1,4 +1,4 @@
-package hoverctl_end_to_end
+package hoverctl_suite
 
 import (
 	"fmt"
