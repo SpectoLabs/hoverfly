@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
@@ -54,7 +55,16 @@ configuration will be shown.
 		}
 
 		if middleware.Script != "" {
-			fmt.Println("Script: " + middleware.Script)
+			middlewareScript := strings.Split(middleware.Script, "\n")
+			if verbose || len(middlewareScript) < 5 {
+				fmt.Println("Script: " + middleware.Script)
+			}
+			fmt.Println("Script: " + middlewareScript[0] + "\n" +
+				middlewareScript[1] + "\n" +
+				middlewareScript[2] + "\n" +
+				middlewareScript[3] + "\n" +
+				middlewareScript[4] + "\n" +
+				"...")
 		}
 
 		if middleware.Remote != "" {
