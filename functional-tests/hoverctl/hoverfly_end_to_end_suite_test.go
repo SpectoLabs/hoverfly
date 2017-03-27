@@ -1,8 +1,6 @@
 package hoverctl_end_to_end
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -108,14 +106,4 @@ func WriteConfigurationWithAuth(host, adminPort, proxyPort string, webserver boo
 
 	ioutil.WriteFile(filepath, data, 0644)
 
-}
-
-func generateFileName() string {
-
-	rb := make([]byte, 6)
-	rand.Read(rb)
-
-	rs := base64.URLEncoding.EncodeToString(rb)
-
-	return "testdata-gen/" + rs + ".json"
 }
