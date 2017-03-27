@@ -26,11 +26,11 @@ var (
 	workingDirectory string
 )
 
-func TestHoverflyEndToEnd(t *testing.T) {
+func TestHoverctlFunctionalTestSuite(t *testing.T) {
 	os.Mkdir(generatedTestData, os.ModePerm)
 
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Hoverfly End To End Suite")
+	RunSpecs(t, "Hoverctl functional test suite")
 
 	os.RemoveAll(generatedTestData)
 }
