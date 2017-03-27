@@ -41,13 +41,25 @@ var _ = Describe("When I use hoverctl", func() {
 				"\n# encoding: utf-8" +
 				"\nwhile payload = STDIN.gets" +
 				"\nnext unless payload" +
-
-				"\n\nSTDOUT.puts payload" +
-				"\nend"))
+				"\n" +
+				"\n..."))
 		})
 
 		It("I can set the hoverfly's middleware with a binary and a script", func() {
 			output := functional_tests.Run(hoverctlBinary, "middleware", "--binary", "python", "--script", "testdata/add_random_delay.py")
+
+			Expect(output).To(ContainSubstring("Hoverfly middleware configuration has been set to"))
+			Expect(output).To(ContainSubstring("Binary: python"))
+			Expect(output).To(ContainSubstring("Script: #!/usr/bin/env python" +
+				"\nimport sys" +
+				"\nimport logging" +
+				"\nimport random" +
+				"\nfrom time import sleep" +
+				"\n..."))
+		})
+
+		It("prints the full script when in verbose", func() {
+			output := functional_tests.Run(hoverctlBinary, "middleware", "-v", "--binary", "python", "--script", "testdata/add_random_delay.py")
 
 			Expect(output).To(ContainSubstring("Hoverfly middleware configuration has been set to"))
 			Expect(output).To(ContainSubstring("Binary: python"))
