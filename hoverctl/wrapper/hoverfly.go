@@ -210,8 +210,7 @@ func (h *Hoverfly) SetMiddleware(binary, script, remote string) (v2.MiddlewareVi
 		error := &ErrorSchema{}
 
 		json.Unmarshal(errorMessage, error)
-		log.Debug(error.ErrorMessage)
-		return v2.MiddlewareView{}, errors.New("Hoverfly could not execute this middleware")
+		return v2.MiddlewareView{}, errors.New("Hoverfly could not execute this middleware\n\n" + error.ErrorMessage)
 	}
 
 	apiResponse := h.createMiddlewareSchema(response)

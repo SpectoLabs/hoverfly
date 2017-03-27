@@ -257,7 +257,14 @@ func Healthcheck(adminPort int) {
 }
 
 func Run(binary string, commands ...string) string {
-	out, _ := exec.Command(binary, commands...).Output()
+	cmd := exec.Command(binary, commands...)
+	out, err := cmd.Output()
+	if err != nil {
+		exitError, ok := err.(*exec.ExitError)
+		if ok {
+			return string(exitError.Stderr)
+		}
+	}
 
 	return strings.TrimSpace(string(out))
 }

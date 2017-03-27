@@ -98,15 +98,15 @@ func initConfig() {
 
 func handleIfError(err error) {
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 }
 
 func checkArgAndExit(args []string, message, command string) {
 	if len(args) == 0 {
-		fmt.Println(message)
-		fmt.Println("\nTry hoverctl " + command + " --help for more information")
+		fmt.Fprintln(os.Stderr, message)
+		fmt.Fprintln(os.Stderr, "\nTry hoverctl "+command+" --help for more information")
 		os.Exit(1)
 	}
 }
