@@ -22,6 +22,7 @@ var (
 		HoverflyDisableTls:    false,
 		HoverflyUpstreamProxy: "",
 		HoverflyCacheDisable:  false,
+		Targets:               map[string]TargetHoverfly{},
 	}
 )
 
@@ -534,4 +535,41 @@ func Test_Config_BuildFlags_CacheDisableDoesNotBuildCorrectFlagWhenFalse(t *test
 	}
 
 	Expect(unit.BuildFlags()).To(HaveLen(0))
+}
+
+func Test_Config_GetTarget_ReturnsTargetIfAlreadyExists(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := &Config{
+		Targets: map[string]TargetHoverfly{
+			"default": TargetHoverfly{
+				AdminPort: 1234,
+			},
+		},
+	}
+
+	Expect(unit.GetTarget("default").AdminPort).To(Equal(1234))
+}
+
+func Test_Config_GetTarget_ReturnsNilIfTargetDoesntExist(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := defaultConfig
+
+	Expect(unit.GetTarget("default")).To(BeNil())
+}
+
+func Test_Config_NewTarget_AddsTarget(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := defaultConfig
+
+	unit.NewTarget(TargetHoverfly{
+		Name:      "default",
+		AdminPort: 1234,
+	})
+
+	Expect(unit.Targets).To(HaveLen(1))
+
+	Expect(unit.Targets["default"].AdminPort).To(Equal(1234))
 }

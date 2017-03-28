@@ -9,27 +9,43 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type TargetHoverfly struct {
+	Name      string
+	AdminPort int `yaml:"admin.port"`
+}
+
 type Flags []string
 
 type Config struct {
-	HoverflyHost          string `yaml:"hoverfly.host"`
-	HoverflyAdminPort     string `yaml:"hoverfly.admin.port"`
-	HoverflyProxyPort     string `yaml:"hoverfly.proxy.port"`
-	HoverflyDbType        string `yaml:"hoverfly.db.type"`
-	HoverflyUsername      string `yaml:"hoverfly.username"`
-	HoverflyPassword      string `yaml:"hoverfly.password"`
-	HoverflyWebserver     bool   `yaml:"hoverfly.webserver"`
-	HoverflyCertificate   string `yaml:"hoverfly.tls.certificate"`
-	HoverflyKey           string `yaml:"hoverfly.tls.key"`
-	HoverflyDisableTls    bool   `yaml:"hoverfly.tls.disable"`
-	HoverflyUpstreamProxy string `yaml:"hoverfly.upstream.proxy"`
-	HoverflyCacheDisable  bool   `yaml:"hoverfly.cache.disable"`
+	HoverflyHost          string                    `yaml:"hoverfly.host"`
+	HoverflyAdminPort     string                    `yaml:"hoverfly.admin.port"`
+	HoverflyProxyPort     string                    `yaml:"hoverfly.proxy.port"`
+	HoverflyDbType        string                    `yaml:"hoverfly.db.type"`
+	HoverflyUsername      string                    `yaml:"hoverfly.username"`
+	HoverflyPassword      string                    `yaml:"hoverfly.password"`
+	HoverflyWebserver     bool                      `yaml:"hoverfly.webserver"`
+	HoverflyCertificate   string                    `yaml:"hoverfly.tls.certificate"`
+	HoverflyKey           string                    `yaml:"hoverfly.tls.key"`
+	HoverflyDisableTls    bool                      `yaml:"hoverfly.tls.disable"`
+	HoverflyUpstreamProxy string                    `yaml:"hoverfly.upstream.proxy"`
+	HoverflyCacheDisable  bool                      `yaml:"hoverfly.cache.disable"`
+	Targets               map[string]TargetHoverfly `yaml:"targets"`
 }
 
 func GetConfig() *Config {
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Debug(err.Error())
+	}
+
+	targets := map[string]TargetHoverfly{}
+	for key, target := range viper.GetStringMap("targets") {
+		targetHoverfly := TargetHoverfly{
+			Name:      key,
+			AdminPort: target.(map[interface{}]interface{})["admin.port"].(int),
+		}
+
+		targets[key] = targetHoverfly
 	}
 
 	return &Config{
@@ -43,7 +59,22 @@ func GetConfig() *Config {
 		HoverflyCertificate: viper.GetString("hoverfly.tls.certificate"),
 		HoverflyKey:         viper.GetString("hoverfly.tls.key"),
 		HoverflyDisableTls:  viper.GetBool("hoverfly.tls.disable"),
+		Targets:             targets,
 	}
+}
+
+func (this *Config) GetTarget(targetName string) *TargetHoverfly {
+	for key, target := range this.Targets {
+		if key == targetName {
+			return &target
+		}
+	}
+
+	return nil
+}
+
+func (this *Config) NewTarget(target TargetHoverfly) {
+	this.Targets[target.Name] = target
 }
 
 func (this *Config) SetHost(host string) *Config {
@@ -221,4 +252,5 @@ func SetConfigurationDefaults() {
 	viper.SetDefault("hoverfly.tls.key", "")
 	viper.SetDefault("hoverfly.tls.disable", false)
 	viper.SetDefault("hoverfly.upsream.proxy", "")
+	viper.SetDefault("targets", []TargetHoverfly{})
 }
