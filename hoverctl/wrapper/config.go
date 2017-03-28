@@ -11,8 +11,9 @@ import (
 
 type TargetHoverfly struct {
 	Name      string
-	AdminPort int `yaml:"admin.port"`
-	Pid       int `yaml:"pid"`
+	Host      string `yaml:"host"`
+	AdminPort int    `yaml:"admin.port"`
+	Pid       int    `yaml:"pid"`
 }
 
 type Flags []string
@@ -43,6 +44,7 @@ func GetConfig() *Config {
 	for key, target := range viper.GetStringMap("targets") {
 		targetHoverfly := TargetHoverfly{
 			Name:      key,
+			Host:      target.(map[interface{}]interface{})["host"].(string),
 			AdminPort: target.(map[interface{}]interface{})["admin.port"].(int),
 			Pid:       target.(map[interface{}]interface{})["pid"].(int),
 		}

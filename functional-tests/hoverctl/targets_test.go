@@ -21,14 +21,18 @@ var _ = Describe("When using the `targets` command", func() {
 		Context("with targets", func() {
 
 			BeforeEach(func() {
-				functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", "1234")
+				functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", "1234", "--host", "localhost")
 			})
 
 			It("print targets", func() {
 				output := functional_tests.Run(hoverctlBinary, "targets")
 
-				Expect(output).To(ContainSubstring("TARGET NAME | ADMIN PORT "))
+				Expect(output).To(ContainSubstring("TARGET NAME"))
+				Expect(output).To(ContainSubstring("HOST"))
+				Expect(output).To(ContainSubstring("ADMIN PORT"))
+
 				Expect(output).To(ContainSubstring("default"))
+				Expect(output).To(ContainSubstring("localhost"))
 				Expect(output).To(ContainSubstring("1234"))
 			})
 		})
@@ -37,10 +41,14 @@ var _ = Describe("When using the `targets` command", func() {
 	Context("creating targets", func() {
 
 		It("should create the target and print it", func() {
-			output := functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", "1234")
+			output := functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", "1234", "--host", "localhost")
 
-			Expect(output).To(ContainSubstring("TARGET NAME | ADMIN PORT "))
+			Expect(output).To(ContainSubstring("TARGET NAME"))
+			Expect(output).To(ContainSubstring("HOST"))
+			Expect(output).To(ContainSubstring("ADMIN PORT"))
+
 			Expect(output).To(ContainSubstring("default"))
+			Expect(output).To(ContainSubstring("localhost"))
 			Expect(output).To(ContainSubstring("1234"))
 		})
 
