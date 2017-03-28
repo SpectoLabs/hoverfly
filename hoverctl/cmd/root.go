@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var adminPort, proxyPort, host, certificate, key, database, upstreamProxy string
+var targetName, adminPort, proxyPort, host, certificate, key, database, upstreamProxy string
 var disableTls, verbose bool
 
 var force bool
@@ -22,6 +22,7 @@ var cacheDisable bool
 var hoverfly wrapper.Hoverfly
 var hoverflyDirectory wrapper.HoverflyDirectory
 var config *wrapper.Config
+var target *wrapper.TargetHoverfly
 
 var version string
 
@@ -43,6 +44,8 @@ func Execute(hoverctlVersion string) {
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	RootCmd.PersistentFlags().StringVar(&targetName, "target", "default",
+		"A name for an instance of Hoverfly you are trying to communicate with. Overrides the default target (default)")
 	RootCmd.PersistentFlags().StringVar(&adminPort, "admin-port", "",
 		"A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
 	RootCmd.PersistentFlags().StringVar(&proxyPort, "proxy-port", "",
@@ -64,6 +67,7 @@ func init() {
 
 	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Verbose logging from hoverctl")
 	RootCmd.Flag("verbose").Shorthand = "v"
+	RootCmd.Flag("target").Shorthand = "t"
 }
 
 func initConfig() {
@@ -88,6 +92,11 @@ func initConfig() {
 	config = config.SetDbType(database)
 	config = config.SetUpstreamProxy(upstreamProxy)
 	config = config.DisableCache(cacheDisable)
+
+	target = config.GetTarget(targetName)
+	if verbose && target != nil {
+		fmt.Println("Current target: " + target.Name + "\n")
+	}
 
 	var err error
 	hoverflyDirectory, err = wrapper.NewHoverflyDirectory(*config)
