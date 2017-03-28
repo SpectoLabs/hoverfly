@@ -41,7 +41,7 @@ port and proxy port.
 			data = append(data, []string{"proxy-port", config.HoverflyProxyPort})
 		}
 
-		drawTable(data)
+		drawTable(data, false)
 
 	},
 }
