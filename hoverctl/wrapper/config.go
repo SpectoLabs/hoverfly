@@ -12,6 +12,7 @@ import (
 type TargetHoverfly struct {
 	Name      string
 	AdminPort int `yaml:"admin.port"`
+	Pid       int `yaml:"pid"`
 }
 
 type Flags []string
@@ -43,6 +44,7 @@ func GetConfig() *Config {
 		targetHoverfly := TargetHoverfly{
 			Name:      key,
 			AdminPort: target.(map[interface{}]interface{})["admin.port"].(int),
+			Pid:       target.(map[interface{}]interface{})["pid"].(int),
 		}
 
 		targets[key] = targetHoverfly
