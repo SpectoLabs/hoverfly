@@ -14,10 +14,8 @@ Deletes simulation data from the Hoverfly instance.
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		if !force {
-			if !askForConfirmation("Are you sure you want to delete the current simulation?") {
-				return
-			}
+		if !askForConfirmation("Are you sure you want to delete the current simulation?") {
+			return
 		}
 		err := hoverfly.DeleteSimulations()
 		handleIfError(err)
@@ -28,6 +26,4 @@ Deletes simulation data from the Hoverfly instance.
 
 func init() {
 	RootCmd.AddCommand(deleteCmd)
-	deleteCmd.Flags().BoolVar(&force, "force", false,
-		"Delete the simulation without prompting for confirmation")
 }
