@@ -551,6 +551,20 @@ func Test_Config_GetTarget_ReturnsTargetIfAlreadyExists(t *testing.T) {
 	Expect(unit.GetTarget("default").AdminPort).To(Equal(1234))
 }
 
+func Test_Config_GetTarget_GetsDefaultIfTargetNameIsEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := &Config{
+		Targets: map[string]TargetHoverfly{
+			"default": TargetHoverfly{
+				AdminPort: 1234,
+			},
+		},
+	}
+
+	Expect(unit.GetTarget("").AdminPort).To(Equal(1234))
+}
+
 func Test_Config_GetTarget_ReturnsNilIfTargetDoesntExist(t *testing.T) {
 	RegisterTestingT(t)
 

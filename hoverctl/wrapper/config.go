@@ -66,6 +66,10 @@ func GetConfig() *Config {
 }
 
 func (this *Config) GetTarget(targetName string) *TargetHoverfly {
+	if targetName == "" {
+		targetName = "default"
+	}
+
 	for key, target := range this.Targets {
 		if key == targetName {
 			return &target
