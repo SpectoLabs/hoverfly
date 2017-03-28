@@ -83,6 +83,18 @@ func (this *Config) NewTarget(target TargetHoverfly) {
 	this.Targets[target.Name] = target
 }
 
+func (this *Config) DeleteTarget(targetToDelete TargetHoverfly) {
+	targets := map[string]TargetHoverfly{}
+
+	for key, target := range this.Targets {
+		if key != targetToDelete.Name {
+			targets[key] = target
+		}
+	}
+
+	this.Targets = targets
+}
+
 func (this *Config) SetHost(host string) *Config {
 	if len(host) > 0 {
 		this.HoverflyHost = host

@@ -587,3 +587,18 @@ func Test_Config_NewTarget_AddsTarget(t *testing.T) {
 
 	Expect(unit.Targets["default"].AdminPort).To(Equal(1234))
 }
+
+func Test_Config_DeleteTarget_DeletesTarget(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := defaultConfig
+
+	unit.NewTarget(TargetHoverfly{
+		Name:      "default",
+		AdminPort: 1234,
+	})
+
+	Expect(unit.Targets).To(HaveLen(1))
+	unit.DeleteTarget(*unit.GetTarget("default"))
+	Expect(unit.Targets).To(HaveLen(0))
+}
