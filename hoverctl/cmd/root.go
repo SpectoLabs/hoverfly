@@ -44,7 +44,7 @@ func Execute(hoverctlVersion string) {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	RootCmd.PersistentFlags().StringVar(&targetName, "target", "default",
+	RootCmd.PersistentFlags().StringVar(&targetName, "target", "",
 		"A name for an instance of Hoverfly you are trying to communicate with. Overrides the default target (default)")
 	RootCmd.PersistentFlags().StringVar(&adminPort, "admin-port", "",
 		"A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
