@@ -15,10 +15,8 @@ TBC
 	`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		if !force {
-			if !askForConfirmation("Are you sure you want to flush the cache?") {
-				return
-			}
+		if !askForConfirmation("Are you sure you want to flush the cache?") {
+			return
 		}
 
 		err := hoverfly.FlushCache()
@@ -30,6 +28,4 @@ TBC
 
 func init() {
 	RootCmd.AddCommand(flushCmd)
-	flushCmd.Flags().BoolVar(&force, "force", false,
-		"Flush the cache without prompting for confirmation")
 }

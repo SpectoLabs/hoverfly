@@ -41,10 +41,8 @@ Delete target"
 
 	Run: func(cmd *cobra.Command, args []string) {
 		if targetName != "" {
-			if !force {
-				if !askForConfirmation("Are you sure you want to delete the target " + targetName + "?") {
-					return
-				}
+			if !askForConfirmation("Are you sure you want to delete the target " + targetName + "?") {
+				return
 			}
 			config.DeleteTarget(wrapper.TargetHoverfly{
 				Name: targetName,
@@ -89,10 +87,5 @@ func init() {
 	RootCmd.AddCommand(targetsCmd)
 
 	targetsCmd.AddCommand(targetsDeleteCmd)
-	targetsDeleteCmd.Flags().BoolVar(&force, "force", false,
-		"Delete the target without prompting for confirmation")
-
-	targetsDeleteCmd.Flag("force").Shorthand = "f"
-
 	targetsCmd.AddCommand(targetsCreateCmd)
 }
