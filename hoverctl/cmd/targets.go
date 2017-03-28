@@ -21,11 +21,11 @@ Get the current targets registered with hoverctl"
 		}
 
 		data := [][]string{
-			[]string{"Target name", "Admin port"},
+			[]string{"Target name", "Host", "Admin port"},
 		}
 
 		for key, target := range config.Targets {
-			data = append(data, []string{key, strconv.Itoa(target.AdminPort)})
+			data = append(data, []string{key, target.Host, strconv.Itoa(target.AdminPort)})
 		}
 
 		drawTable(data, true)
@@ -71,6 +71,7 @@ Create target"
 			target := wrapper.TargetHoverfly{
 				Name:      targetName,
 				AdminPort: adminPort,
+				Host:      config.HoverflyHost,
 			}
 			config.NewTarget(target)
 
