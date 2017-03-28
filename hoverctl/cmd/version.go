@@ -28,7 +28,7 @@ Shows the hoverctl version.
 			[]string{"hoverfly", string(hoverflyVersion)},
 		}
 
-		drawTable(data)
+		drawTable(data, false)
 	},
 }
 

@@ -139,9 +139,12 @@ func askForConfirmation(message string) bool {
 	}
 }
 
-func drawTable(data [][]string) {
+func drawTable(data [][]string, header bool) {
 	table := tablewriter.NewWriter(os.Stdout)
-	// table.SetHeader([]string{"Name", "Sign", "Rating"})
+	if header {
+		table.SetHeader(data[0])
+		data = data[1:]
+	}
 
 	for _, v := range data {
 		table.Append(v)
