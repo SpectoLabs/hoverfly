@@ -44,6 +44,10 @@ func Execute(hoverctlVersion string) {
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	RootCmd.PersistentFlags().BoolVar(&force, "force", false,
+		"Bypass any confirmation when using hoverctl")
+	RootCmd.Flag("force").Shorthand = "f"
+
 	RootCmd.PersistentFlags().StringVar(&targetName, "target", "",
 		"A name for an instance of Hoverfly you are trying to communicate with. Overrides the default target (default)")
 	RootCmd.PersistentFlags().StringVar(&adminPort, "admin-port", "",
@@ -121,6 +125,9 @@ func checkArgAndExit(args []string, message, command string) {
 }
 
 func askForConfirmation(message string) bool {
+	if force {
+		return true
+	}
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
