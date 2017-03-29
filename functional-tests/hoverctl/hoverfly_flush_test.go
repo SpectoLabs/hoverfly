@@ -20,7 +20,7 @@ var _ = Describe("hoverctl flush cache", func() {
 		hoverfly.ImportSimulation(functional_tests.JsonPayload)
 		hoverfly.Proxy(sling.New().Get("http://destination-server.com"))
 
-		WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
+		functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", hoverfly.GetAdminPort())
 	})
 
 	AfterEach(func() {
@@ -43,6 +43,17 @@ var _ = Describe("hoverctl flush cache", func() {
 		output := functional_tests.Run(hoverctlBinary, "flush", "--force")
 
 		Expect(output).To(ContainSubstring("Cache was not set on Hoverfly"))
+	})
+
+	It("should error nicely when there is no target", func() {
+		functional_tests.Run(hoverctlBinary, "targets", "delete", "--target", "default", "--force")
+		output := functional_tests.Run(hoverctlBinary, "targets")
+
+		Expect(output).To(ContainSubstring("No target"))
+
+		output = functional_tests.Run(hoverctlBinary, "flush", "--force")
+
+		Expect(output).To(ContainSubstring("Cannot flush cache without a target"))
 	})
 
 })

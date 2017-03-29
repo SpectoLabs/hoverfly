@@ -234,8 +234,8 @@ func (h *Hoverfly) ImportSimulation(simulationData string) error {
 	return nil
 }
 
-func (h *Hoverfly) FlushCache() error {
-	response, err := h.doRequest("DELETE", v2ApiCache, "")
+func FlushCache(target TargetHoverfly) error {
+	response, err := doRequest(target, "DELETE", v2ApiCache, "")
 	if err != nil {
 		return err
 	}
@@ -515,6 +515,22 @@ func (h Hoverfly) doRequest(method, url, body string) (*http.Response, error) {
 
 	if response.StatusCode == 401 {
 		return nil, errors.New("Hoverfly requires authentication")
+	}
+
+	return response, nil
+}
+
+func doRequest(target TargetHoverfly, method, url, body string) (*http.Response, error) {
+	url = fmt.Sprintf("http://%v:%v%v", target.Host, target.AdminPort, url)
+
+	request, err := http.NewRequest(method, url, strings.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
 	}
 
 	return response, nil
