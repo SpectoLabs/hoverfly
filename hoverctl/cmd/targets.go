@@ -65,20 +65,31 @@ Create target"
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		if targetName != "" {
-			adminPort, err := strconv.Atoi(config.HoverflyAdminPort)
-			handleIfError(err)
-			target := wrapper.TargetHoverfly{
-				Name:      targetName,
-				AdminPort: adminPort,
-				Host:      config.HoverflyHost,
-			}
-			config.NewTarget(target)
 
-			handleIfError(config.WriteToFile(hoverflyDirectory))
-		} else {
-			handleIfError(errors.New("Cannot create a target without a name"))
+		if targetName == "" {
+			targetName = "default"
 		}
+
+		targetAdminPort := 8888
+
+		if adminPort != "" {
+			adminPort, err := strconv.Atoi(adminPort)
+			handleIfError(err)
+			targetAdminPort = adminPort
+		}
+
+		if host == "" {
+			host = "localhost"
+		}
+
+		newTarget := wrapper.TargetHoverfly{
+			Name:      targetName,
+			AdminPort: targetAdminPort,
+			Host:      host,
+		}
+		config.NewTarget(newTarget)
+
+		handleIfError(config.WriteToFile(hoverflyDirectory))
 
 		targetsCmd.Run(cmd, args)
 	},

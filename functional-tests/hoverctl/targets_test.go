@@ -52,10 +52,16 @@ var _ = Describe("When using the `targets` command", func() {
 			Expect(output).To(ContainSubstring("1234"))
 		})
 
-		It("should fail nicely if no target name is provided", func() {
+		It("should create a default if no target name is provided", func() {
 			output := functional_tests.Run(hoverctlBinary, "targets", "create")
 
-			Expect(output).To(ContainSubstring("Cannot create a target without a name"))
+			Expect(output).To(ContainSubstring("TARGET NAME"))
+			Expect(output).To(ContainSubstring("HOST"))
+			Expect(output).To(ContainSubstring("ADMIN PORT"))
+
+			Expect(output).To(ContainSubstring("default"))
+			Expect(output).To(ContainSubstring("localhost"))
+			Expect(output).To(ContainSubstring("8888"))
 		})
 
 	})
