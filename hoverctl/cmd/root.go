@@ -150,6 +150,10 @@ func askForConfirmation(message string) bool {
 }
 
 func askForInput(value string, sensitive bool) string {
+	if force {
+		return ""
+	}
+
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
