@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 
+	"golang.org/x/crypto/ssh/terminal"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/olekukonko/tablewriter"
@@ -135,15 +137,9 @@ func askForConfirmation(message string) bool {
 	if force {
 		return true
 	}
-	reader := bufio.NewReader(os.Stdin)
 
 	for {
-		fmt.Printf(message + " [y/n]: ")
-
-		response, err := reader.ReadString('\n')
-		handleIfError(err)
-
-		response = strings.ToLower(strings.TrimSpace(response))
+		response := askForInput(message+" [y/n]", false)
 
 		if response == "y" || response == "yes" {
 			return true
@@ -151,6 +147,28 @@ func askForConfirmation(message string) bool {
 			return false
 		}
 	}
+}
+
+func askForInput(value string, sensitive bool) string {
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+		fmt.Printf(value + ": ")
+		if sensitive {
+			responseBytes, err := terminal.ReadPassword(0)
+			handleIfError(err)
+			fmt.Println("")
+
+			return strings.TrimSpace(string(responseBytes))
+		} else {
+			response, err := reader.ReadString('\n')
+			handleIfError(err)
+
+			return strings.TrimSpace(response)
+		}
+	}
+
+	return ""
 }
 
 func drawTable(data [][]string, header bool) {
