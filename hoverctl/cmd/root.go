@@ -124,6 +124,13 @@ func checkArgAndExit(args []string, message, command string) {
 	}
 }
 
+func checkTargetAndExit(target *wrapper.TargetHoverfly, error string) {
+	if target == nil {
+		fmt.Fprintln(os.Stderr, error)
+		os.Exit(1)
+	}
+}
+
 func askForConfirmation(message string) bool {
 	if force {
 		return true

@@ -13,6 +13,7 @@ type TargetHoverfly struct {
 	Name      string
 	Host      string `yaml:"host"`
 	AdminPort int    `yaml:"admin.port"`
+	AuthToken string `yaml:"auth.token"`
 	Pid       int    `yaml:"pid"`
 }
 
@@ -46,6 +47,7 @@ func GetConfig() *Config {
 			Name:      key,
 			Host:      target.(map[interface{}]interface{})["host"].(string),
 			AdminPort: target.(map[interface{}]interface{})["admin.port"].(int),
+			AuthToken: target.(map[interface{}]interface{})["auth.token"].(string),
 			Pid:       target.(map[interface{}]interface{})["pid"].(int),
 		}
 
