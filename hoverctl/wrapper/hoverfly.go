@@ -338,6 +338,45 @@ func (h *Hoverfly) generateAuthToken() (string, error) {
 	return authToken.Token, nil
 }
 
+func Login(target TargetHoverfly, username, password string) (string, error) {
+	credentials := HoverflyAuthSchema{
+		Username: username,
+		Password: password,
+	}
+
+	jsonCredentials, err := json.Marshal(credentials)
+	if err != nil {
+		return "", err
+	}
+
+	request, err := http.NewRequest("POST", buildURL(target, "/api/token-auth"), strings.NewReader(string(jsonCredentials)))
+	if err != nil {
+		return "", err
+	}
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return "", err
+	}
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var authToken HoverflyAuthTokenSchema
+	err = json.Unmarshal(body, &authToken)
+	if err != nil {
+		return "", err
+	}
+
+	return authToken.Token, nil
+}
+
+func buildURL(target TargetHoverfly, endpoint string) string {
+	return fmt.Sprintf("http://%v:%v%v", target.Host, target.AdminPort, endpoint)
+}
+
 func (h *Hoverfly) buildURL(endpoint string) string {
 	return fmt.Sprintf("http://%v:%v%v", h.Host, h.AdminPort, endpoint)
 }
