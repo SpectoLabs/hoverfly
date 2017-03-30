@@ -81,10 +81,12 @@ var _ = Describe("When I use hoverctl", func() {
 			hoverfly.Start()
 
 			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
+			functional_tests.Run(hoverctlBinary, "targets", "create", "-t", "default", "--admin-port", hoverfly.GetAdminPort())
 		})
 
 		AfterEach(func() {
 			hoverfly.Stop()
+			functional_tests.Run(hoverctlBinary, "targets", "delete", "-t", "default")
 		})
 
 		Describe("Managing Hoverflies data using the CLI", func() {

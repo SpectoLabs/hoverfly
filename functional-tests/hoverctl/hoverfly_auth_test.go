@@ -54,71 +54,6 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 
 		Context("you can manage simulations", func() {
 
-			It("by importing and exporting data", func() {
-				filePath := functional_tests.GenerateFileName()
-				ioutil.WriteFile(filePath,
-					[]byte(`
-						{
-							"data": {
-								"pairs": [{
-									"request": {
-										"path": {
-											"exactMatch": "/api/bookings"
-										},
-										"method": {
-											"exactMatch": "POST"
-										},
-										"destination": {
-											"exactMatch": "www.my-test.com"
-										},
-										"scheme": {
-											"exactMatch": "http"
-										},
-										"query": {
-											"exactMatch": ""
-										},
-										"body": {
-											"exactMatch": "{\"flightId\": \"1\"}"
-										},
-										"headers": {
-											"Content-Type": [
-												"application/json"
-											]
-										}
-									},
-									"response": {
-										"status": 201,
-										"body": "",
-										"encodedBody": false,
-										"headers": {
-											"Location": [
-												"http://localhost/api/bookings/1"
-											]
-										}
-									}
-								}]
-							},
-							"meta": {
-								"schemaVersion": "v2"
-							}
-						}`), 0644)
-				output := functional_tests.Run(hoverctlBinary, "import", filePath)
-				Expect(output).To(ContainSubstring("Successfully imported simulation from " + filePath))
-
-				newFilePath := functional_tests.GenerateFileName()
-
-				output = functional_tests.Run(hoverctlBinary, "export", newFilePath)
-				Expect(output).To(ContainSubstring("Successfully exported simulation to " + newFilePath))
-
-				exportFile, err := ioutil.ReadFile(newFilePath)
-				if err != nil {
-					Fail("Failed reading test data")
-				}
-
-				Expect(string(exportFile)).To(ContainSubstring(`"exactMatch": "/api/bookings`))
-				Expect(string(exportFile)).To(ContainSubstring(`"exactMatch": "{\"flightId\": \"1\"}"`))
-			})
-
 			It("and then delete simulations from hoverfly", func() {
 				output := functional_tests.Run(hoverctlBinary, "delete", "simulations", "--force")
 				Expect(output).To(ContainSubstring("Simulation data has been deleted from Hoverfly"))
@@ -197,11 +132,6 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 
 			It("by importing data", func() {
 				output := functional_tests.Run(hoverctlBinary, "import", filePath)
-				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
-			})
-
-			It("and then exporting the data", func() {
-				output := functional_tests.Run(hoverctlBinary, "export", filePath)
 				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			})
 
