@@ -8,11 +8,6 @@ import (
 
 var _ = Describe("When using the `targets` command", func() {
 
-	AfterEach(func() {
-		functional_tests.Run(hoverctlBinary, "targets", "delete", "-f", "--target", "new-target")
-		functional_tests.Run(hoverctlBinary, "targets", "delete", "-f", "--target", "default")
-	})
-
 	Context("viewing targets", func() {
 		Context("with no targets", func() {
 
