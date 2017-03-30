@@ -78,7 +78,6 @@ var _ = Describe("hoverctl login", func() {
 
 		It("should error when flushing", func() {
 			output := functional_tests.Run(hoverctlBinary, "flush", "-f", "-t", "no-auth")
-
 			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
 
@@ -87,6 +86,19 @@ var _ = Describe("hoverctl login", func() {
 			output = functional_tests.Run(hoverctlBinary, "flush", "-f", "-t", "no-auth")
 			Expect(output).ToNot(ContainSubstring("Hoverfly requires authentication"))
 			Expect(output).ToNot(ContainSubstring("Run `hoverctl login -t no-auth`"))
+		})
+
+		It("should error when exporting", func() {
+			filePath := functional_tests.GenerateFileName()
+
+			output := functional_tests.Run(hoverctlBinary, "export", "-t", "no-auth", filePath)
+			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
+			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
+
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+
+			output = functional_tests.Run(hoverctlBinary, "export", "-t", "no-auth", filePath)
+			Expect(output).To(ContainSubstring("Successfully exported simulation to " + filePath))
 		})
 	})
 })
