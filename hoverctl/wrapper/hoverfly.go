@@ -567,9 +567,17 @@ func doRequest(target TargetHoverfly, method, url, body string) (*http.Response,
 		return nil, err
 	}
 
+	if target.AuthToken != "" {
+		request.Header.Add("Authorization", fmt.Sprintf("Bearer %v", target.AuthToken))
+	}
+
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return nil, err
+	}
+
+	if response.StatusCode == 401 {
+		return nil, errors.New("Hoverfly requires authentication\n\nRun `hoverctl login -t " + target.Name + "`")
 	}
 
 	return response, nil

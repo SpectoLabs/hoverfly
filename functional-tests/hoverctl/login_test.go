@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("When using the `login` command", func() {
+var _ = Describe("hoverctl login", func() {
 
 	var (
 		hoverfly *functional_tests.Hoverfly
@@ -60,6 +60,33 @@ var _ = Describe("When using the `login` command", func() {
 			output := functional_tests.Run(hoverctlBinary, "login", "--username", username, "--password", password)
 
 			Expect(output).To(ContainSubstring("Cannot login without a target"))
+		})
+	})
+
+	Context("needing to log in", func() {
+
+		BeforeEach(func() {
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start("-auth", "-username", username, "-password", password)
+
+			functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "no-auth", "--admin-port", hoverfly.GetAdminPort())
+		})
+
+		AfterEach(func() {
+			hoverfly.Stop()
+		})
+
+		It("should error when flushing", func() {
+			output := functional_tests.Run(hoverctlBinary, "flush", "-f", "-t", "no-auth")
+
+			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
+			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
+
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+
+			output = functional_tests.Run(hoverctlBinary, "flush", "-f", "-t", "no-auth")
+			Expect(output).ToNot(ContainSubstring("Hoverfly requires authentication"))
+			Expect(output).ToNot(ContainSubstring("Run `hoverctl login -t no-auth`"))
 		})
 	})
 })
