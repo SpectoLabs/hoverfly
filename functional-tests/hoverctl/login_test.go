@@ -112,5 +112,16 @@ var _ = Describe("hoverctl login", func() {
 			output = functional_tests.Run(hoverctlBinary, "delete", "-t", "no-auth", "--force")
 			Expect(output).To(ContainSubstring("Simulation data has been deleted from Hoverfly"))
 		})
+
+		It("should error when changing destination", func() {
+			output := functional_tests.Run(hoverctlBinary, "destination", "-t", "no-auth", "example.org")
+			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
+			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
+
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+
+			output = functional_tests.Run(hoverctlBinary, "destination", "-t", "no-auth", "example.org")
+			Expect(output).To(ContainSubstring("Hoverfly destination has been set to example.org"))
+		})
 	})
 })

@@ -142,28 +142,28 @@ func (h *Hoverfly) SetModeWithArguments(modeView v2.ModeView) (string, error) {
 }
 
 // GetDestination will go the destination endpoint in Hoverfly, parse the JSON response and return the destination of Hoverfly
-func (h *Hoverfly) GetDestination() (string, error) {
-	response, err := h.doRequest("GET", v2ApiDestination, "")
+func GetDestination(target TargetHoverfly) (string, error) {
+	response, err := doRequest(target, "GET", v2ApiDestination, "")
 	if err != nil {
 		return "", err
 	}
 
 	defer response.Body.Close()
 
-	apiResponse := h.createAPIStateResponse(response)
+	apiResponse := createAPIStateResponse(response)
 
 	return apiResponse.Destination, nil
 }
 
 // SetDestination will go the destination endpoint in Hoverfly, sending JSON that will set the destination of Hoverfly
-func (h *Hoverfly) SetDestination(destination string) (string, error) {
+func SetDestination(target TargetHoverfly, destination string) (string, error) {
 
-	response, err := h.doRequest("PUT", v2ApiDestination, `{"destination":"`+destination+`"}`)
+	response, err := doRequest(target, "PUT", v2ApiDestination, `{"destination":"`+destination+`"}`)
 	if err != nil {
 		return "", err
 	}
 
-	apiResponse := h.createAPIStateResponse(response)
+	apiResponse := createAPIStateResponse(response)
 
 	return apiResponse.Destination, nil
 }
@@ -269,6 +269,22 @@ func ExportSimulation(target TargetHoverfly) ([]byte, error) {
 	}
 
 	return jsonBytes.Bytes(), nil
+}
+
+func createAPIStateResponse(response *http.Response) APIStateSchema {
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Debug(err.Error())
+	}
+
+	var apiResponse APIStateSchema
+
+	err = json.Unmarshal(body, &apiResponse)
+	if err != nil {
+		log.Debug(err.Error())
+	}
+
+	return apiResponse
 }
 
 func (h *Hoverfly) createAPIStateResponse(response *http.Response) APIStateSchema {
