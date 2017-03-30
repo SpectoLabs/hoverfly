@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
 
@@ -29,7 +30,7 @@ setting.
 
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			destination, err := hoverfly.GetDestination()
+			destination, err := wrapper.GetDestination(*target)
 			handleIfError(err)
 
 			fmt.Println("Current Hoverfly destination is set to", destination)
@@ -47,7 +48,7 @@ setting.
 					handleIfError(errors.New("The regex provided does not match the dry-run URL"))
 				}
 			} else {
-				destination, err := hoverfly.SetDestination(args[0])
+				destination, err := wrapper.SetDestination(*target, args[0])
 				handleIfError(err)
 
 				fmt.Println("Hoverfly destination has been set to", destination)
