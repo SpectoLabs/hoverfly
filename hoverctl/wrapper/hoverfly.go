@@ -87,8 +87,8 @@ func NewHoverfly(config Config) Hoverfly {
 }
 
 // Wipe will call the records endpoint in Hoverfly with a DELETE request, triggering Hoverfly to wipe the database
-func (h *Hoverfly) DeleteSimulations() error {
-	response, err := h.doRequest("DELETE", v2ApiSimulation, "")
+func DeleteSimulations(target TargetHoverfly) error {
+	response, err := doRequest(target, "DELETE", v2ApiSimulation, "")
 	if err != nil {
 		return err
 	}

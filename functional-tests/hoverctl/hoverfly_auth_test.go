@@ -52,13 +52,6 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 			})
 		})
 
-		Context("you can manage simulations", func() {
-
-			It("and then delete simulations from hoverfly", func() {
-				output := functional_tests.Run(hoverctlBinary, "delete", "simulations", "--force")
-				Expect(output).To(ContainSubstring("Simulation data has been deleted from Hoverfly"))
-			})
-		})
 	})
 
 	Describe("and the credentials are not in the hoverctl config", func() {
@@ -132,12 +125,6 @@ var _ = Describe("When I use hoverctl with a running an authenticated hoverfly",
 
 			It("by importing data", func() {
 				output := functional_tests.Run(hoverctlBinary, "import", filePath)
-				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
-			})
-
-			It("and then wiping hoverfly", func() {
-				output := functional_tests.Run(hoverctlBinary, "delete", "simulations", "--force")
-
 				Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			})
 		})

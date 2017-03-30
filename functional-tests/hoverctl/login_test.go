@@ -74,6 +74,7 @@ var _ = Describe("hoverctl login", func() {
 
 		AfterEach(func() {
 			hoverfly.Stop()
+			functional_tests.Run(hoverctlBinary, "targets", "delete", "--target", "no-auth")
 		})
 
 		It("should error when flushing", func() {
@@ -99,6 +100,17 @@ var _ = Describe("hoverctl login", func() {
 
 			output = functional_tests.Run(hoverctlBinary, "export", "-t", "no-auth", filePath)
 			Expect(output).To(ContainSubstring("Successfully exported simulation to " + filePath))
+		})
+
+		It("should error when deleting", func() {
+			output := functional_tests.Run(hoverctlBinary, "delete", "-t", "no-auth", "--force")
+			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
+			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
+
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+
+			output = functional_tests.Run(hoverctlBinary, "delete", "-t", "no-auth", "--force")
+			Expect(output).To(ContainSubstring("Simulation data has been deleted from Hoverfly"))
 		})
 	})
 })
