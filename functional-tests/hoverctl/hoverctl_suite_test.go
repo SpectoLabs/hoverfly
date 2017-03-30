@@ -47,6 +47,10 @@ var _ = BeforeSuite(func() {
 	Expect(err).ShouldNot(HaveOccurred())
 })
 
+var _ = BeforeEach(func() {
+	WriteConfiguration("localhost", "8888", "8500")
+})
+
 var _ = AfterSuite(func() {
 	gexec.CleanupBuildArtifacts()
 })
