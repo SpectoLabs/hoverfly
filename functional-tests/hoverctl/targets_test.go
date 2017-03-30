@@ -8,6 +8,11 @@ import (
 
 var _ = Describe("When using the `targets` command", func() {
 
+	AfterEach(func() {
+		functional_tests.Run(hoverctlBinary, "targets", "delete", "-f", "--target", "new-target")
+		functional_tests.Run(hoverctlBinary, "targets", "delete", "-f", "--target", "default")
+	})
+
 	Context("viewing targets", func() {
 		Context("with no targets", func() {
 
@@ -22,6 +27,10 @@ var _ = Describe("When using the `targets` command", func() {
 
 			BeforeEach(func() {
 				functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", "1234", "--host", "localhost")
+			})
+
+			AfterEach(func() {
+				functional_tests.Run(hoverctlBinary, "targets", "delete", "--target", "default")
 			})
 
 			It("print targets", func() {
@@ -41,13 +50,14 @@ var _ = Describe("When using the `targets` command", func() {
 	Context("creating targets", func() {
 
 		It("should create the target and print it", func() {
-			output := functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", "1234", "--host", "localhost")
+
+			output := functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "new-target", "--admin-port", "1234", "--host", "localhost")
 
 			Expect(output).To(ContainSubstring("TARGET NAME"))
 			Expect(output).To(ContainSubstring("HOST"))
 			Expect(output).To(ContainSubstring("ADMIN PORT"))
 
-			Expect(output).To(ContainSubstring("default"))
+			Expect(output).To(ContainSubstring("new-target"))
 			Expect(output).To(ContainSubstring("localhost"))
 			Expect(output).To(ContainSubstring("1234"))
 		})
@@ -63,13 +73,16 @@ var _ = Describe("When using the `targets` command", func() {
 			Expect(output).To(ContainSubstring("localhost"))
 			Expect(output).To(ContainSubstring("8888"))
 		})
-
 	})
 
 	Context("deleting targets", func() {
 
 		BeforeEach(func() {
 			functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", "1234")
+		})
+
+		AfterEach(func() {
+			functional_tests.Run(hoverctlBinary, "targets", "delete", "--target", "default")
 		})
 
 		It("should delete targets and print nice empty message", func() {
