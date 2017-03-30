@@ -247,8 +247,8 @@ func FlushCache(target TargetHoverfly) error {
 	return nil
 }
 
-func (h *Hoverfly) ExportSimulation() ([]byte, error) {
-	response, err := h.doRequest("GET", v2ApiSimulation, "")
+func ExportSimulation(target TargetHoverfly) ([]byte, error) {
+	response, err := doRequest(target, "GET", v2ApiSimulation, "")
 	if err != nil {
 		return nil, err
 	}
