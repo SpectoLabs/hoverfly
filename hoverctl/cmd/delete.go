@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +18,7 @@ Deletes simulation data from the Hoverfly instance.
 		if !askForConfirmation("Are you sure you want to delete the current simulation?") {
 			return
 		}
-		err := hoverfly.DeleteSimulations()
+		err := wrapper.DeleteSimulations(*target)
 		handleIfError(err)
 
 		fmt.Println("Simulation data has been deleted from Hoverfly")

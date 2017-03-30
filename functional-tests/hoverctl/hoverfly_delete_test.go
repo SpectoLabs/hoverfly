@@ -24,10 +24,12 @@ var _ = Describe("When I use hoverctl", func() {
 			hoverfly.Start()
 
 			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
+			functional_tests.Run(hoverctlBinary, "targets", "create", "-t", "default", "--admin-port", hoverfly.GetAdminPort())
 		})
 
 		AfterEach(func() {
 			hoverfly.Stop()
+			functional_tests.Run(hoverctlBinary, "targets", "delete", "-t", "default")
 		})
 
 		Context("I can delete the simulations in Hoverfly", func() {
