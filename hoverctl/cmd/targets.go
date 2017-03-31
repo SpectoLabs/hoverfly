@@ -44,7 +44,7 @@ Delete target"
 			if !askForConfirmation("Are you sure you want to delete the target " + targetName + "?") {
 				return
 			}
-			config.DeleteTarget(wrapper.TargetHoverfly{
+			config.DeleteTarget(wrapper.Target{
 				Name: targetName,
 			})
 
@@ -82,7 +82,7 @@ Create target"
 			host = "localhost"
 		}
 
-		newTarget := wrapper.TargetHoverfly{
+		newTarget := wrapper.Target{
 			Name:      targetName,
 			AdminPort: targetAdminPort,
 			Host:      host,

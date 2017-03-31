@@ -22,7 +22,7 @@ var (
 		HoverflyDisableTls:    false,
 		HoverflyUpstreamProxy: "",
 		HoverflyCacheDisable:  false,
-		Targets:               map[string]TargetHoverfly{},
+		Targets:               map[string]Target{},
 	}
 )
 
@@ -541,8 +541,8 @@ func Test_Config_GetTarget_ReturnsTargetIfAlreadyExists(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := &Config{
-		Targets: map[string]TargetHoverfly{
-			"default": TargetHoverfly{
+		Targets: map[string]Target{
+			"default": Target{
 				AdminPort: 1234,
 			},
 		},
@@ -555,8 +555,8 @@ func Test_Config_GetTarget_GetsDefaultIfTargetNameIsEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := &Config{
-		Targets: map[string]TargetHoverfly{
-			"default": TargetHoverfly{
+		Targets: map[string]Target{
+			"default": Target{
 				AdminPort: 1234,
 			},
 		},
@@ -578,7 +578,7 @@ func Test_Config_NewTarget_AddsTarget(t *testing.T) {
 
 	unit := defaultConfig
 
-	unit.NewTarget(TargetHoverfly{
+	unit.NewTarget(Target{
 		Name:      "default",
 		AdminPort: 1234,
 	})
@@ -593,7 +593,7 @@ func Test_Config_DeleteTarget_DeletesTarget(t *testing.T) {
 
 	unit := defaultConfig
 
-	unit.NewTarget(TargetHoverfly{
+	unit.NewTarget(Target{
 		Name:      "default",
 		AdminPort: 1234,
 	})
