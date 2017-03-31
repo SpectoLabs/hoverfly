@@ -1,6 +1,8 @@
 package hoverctl_suite
 
 import (
+	"io/ioutil"
+
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -85,6 +87,21 @@ var _ = Describe("hoverctl login", func() {
 			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
 
 			output = functional_tests.Run(hoverctlBinary, "flush", "-f", "-t", "no-auth")
+			Expect(output).ToNot(ContainSubstring("Hoverfly requires authentication"))
+			Expect(output).ToNot(ContainSubstring("Run `hoverctl login -t no-auth`"))
+		})
+
+		It("should error when importing", func() {
+			filePath := functional_tests.GenerateFileName()
+			ioutil.WriteFile(filePath, []byte(functional_tests.JsonPayload), 0644)
+
+			output := functional_tests.Run(hoverctlBinary, "import", "-t", "no-auth", filePath)
+			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
+			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
+
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+
+			output = functional_tests.Run(hoverctlBinary, "import", "-t", "no-auth", filePath)
 			Expect(output).ToNot(ContainSubstring("Hoverfly requires authentication"))
 			Expect(output).ToNot(ContainSubstring("Run `hoverctl login -t no-auth`"))
 		})
