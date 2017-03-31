@@ -395,8 +395,8 @@ func (h *Hoverfly) buildURL(endpoint string) string {
 	return fmt.Sprintf("http://%v:%v%v", h.Host, h.AdminPort, endpoint)
 }
 
-func (h *Hoverfly) isLocal() bool {
-	return h.Host == "localhost" || h.Host == "127.0.0.1"
+func isLocal(url string) bool {
+	return url == "localhost" || url == "127.0.0.1"
 }
 
 /*
@@ -429,7 +429,7 @@ func (h *Hoverfly) runBinary(path string, hoverflyDirectory HoverflyDirectory) (
 
 func (h *Hoverfly) Start(hoverflyDirectory HoverflyDirectory) error {
 
-	if !h.isLocal() {
+	if !isLocal(h.Host) {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
 	}
 
@@ -497,7 +497,7 @@ func (h *Hoverfly) Start(hoverflyDirectory HoverflyDirectory) error {
 }
 
 func (h *Hoverfly) Stop(hoverflyDirectory HoverflyDirectory) error {
-	if !h.isLocal() {
+	if !isLocal(h.Host) {
 		return errors.New("hoverctl can not stop an instance of Hoverfly on a remote host")
 	}
 
