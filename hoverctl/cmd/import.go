@@ -24,7 +24,7 @@ must be provided.
 		simulationData, err := wrapper.ReadFile(args[0])
 		handleIfError(err)
 
-		err = hoverfly.ImportSimulation(string(simulationData))
+		err = wrapper.ImportSimulation(*target, string(simulationData))
 		handleIfError(err)
 
 		fmt.Println("Successfully imported simulation from", args[0])
