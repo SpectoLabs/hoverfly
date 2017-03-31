@@ -66,28 +66,24 @@ Create target"
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if targetName == "" {
-			targetName = "default"
-		}
+		newTarget := wrapper.NewDefaultTarget()
 
-		targetAdminPort := 8888
+		if targetName != "" {
+			newTarget.Name = targetName
+		}
 
 		if adminPort != "" {
 			adminPort, err := strconv.Atoi(adminPort)
 			handleIfError(err)
-			targetAdminPort = adminPort
+
+			newTarget.AdminPort = adminPort
 		}
 
-		if host == "" {
-			host = "localhost"
+		if host != "" {
+			newTarget.Host = host
 		}
 
-		newTarget := wrapper.Target{
-			Name:      targetName,
-			AdminPort: targetAdminPort,
-			Host:      host,
-		}
-		config.NewTarget(newTarget)
+		config.NewTarget(*newTarget)
 
 		handleIfError(config.WriteToFile(hoverflyDirectory))
 
