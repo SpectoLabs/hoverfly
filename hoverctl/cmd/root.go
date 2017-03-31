@@ -24,7 +24,7 @@ var cacheDisable bool
 var hoverfly wrapper.Hoverfly
 var hoverflyDirectory wrapper.HoverflyDirectory
 var config *wrapper.Config
-var target *wrapper.TargetHoverfly
+var target *wrapper.Target
 
 var version string
 
@@ -126,7 +126,7 @@ func checkArgAndExit(args []string, message, command string) {
 	}
 }
 
-func checkTargetAndExit(target *wrapper.TargetHoverfly, error string) {
+func checkTargetAndExit(target *wrapper.Target, error string) {
 	if target == nil {
 		fmt.Fprintln(os.Stderr, error)
 		os.Exit(1)
