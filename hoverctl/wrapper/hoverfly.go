@@ -218,8 +218,8 @@ func SetMiddleware(target TargetHoverfly, binary, script, remote string) (v2.Mid
 	return apiResponse, nil
 }
 
-func (h *Hoverfly) ImportSimulation(simulationData string) error {
-	response, err := h.doRequest("PUT", v2ApiSimulation, simulationData)
+func ImportSimulation(target TargetHoverfly, simulationData string) error {
+	response, err := doRequest(target, "PUT", v2ApiSimulation, simulationData)
 	if err != nil {
 		return err
 	}
