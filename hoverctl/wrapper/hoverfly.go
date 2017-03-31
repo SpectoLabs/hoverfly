@@ -103,6 +103,20 @@ func DeleteSimulations(target TargetHoverfly) error {
 }
 
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
+func GetMode(target TargetHoverfly) (string, error) {
+	response, err := doRequest(target, "GET", v2ApiMode, "")
+	if err != nil {
+		return "", err
+	}
+
+	defer response.Body.Close()
+
+	apiResponse := createAPIStateResponse(response)
+
+	return apiResponse.Mode, nil
+}
+
+// GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
 func (h *Hoverfly) GetMode() (string, error) {
 	response, err := h.doRequest("GET", v2ApiMode, "")
 	if err != nil {
@@ -111,13 +125,13 @@ func (h *Hoverfly) GetMode() (string, error) {
 
 	defer response.Body.Close()
 
-	apiResponse := h.createAPIStateResponse(response)
+	apiResponse := createAPIStateResponse(response)
 
 	return apiResponse.Mode, nil
 }
 
 // Set will go the state endpoint in Hoverfly, sending JSON that will set the mode of Hoverfly
-func (h *Hoverfly) SetModeWithArguments(modeView v2.ModeView) (string, error) {
+func SetModeWithArguments(target TargetHoverfly, modeView v2.ModeView) (string, error) {
 	if modeView.Mode != "simulate" && modeView.Mode != "capture" &&
 		modeView.Mode != "modify" && modeView.Mode != "synthesize" {
 		return "", errors.New(modeView.Mode + " is not a valid mode")
@@ -127,7 +141,7 @@ func (h *Hoverfly) SetModeWithArguments(modeView v2.ModeView) (string, error) {
 		return "", err
 	}
 
-	response, err := h.doRequest("PUT", v2ApiMode, string(bytes))
+	response, err := doRequest(target, "PUT", v2ApiMode, string(bytes))
 	if err != nil {
 		return "", err
 	}
@@ -136,7 +150,7 @@ func (h *Hoverfly) SetModeWithArguments(modeView v2.ModeView) (string, error) {
 		return "", handlerError(response)
 	}
 
-	apiResponse := h.createAPIStateResponse(response)
+	apiResponse := createAPIStateResponse(response)
 
 	return apiResponse.Mode, nil
 }
@@ -272,22 +286,6 @@ func ExportSimulation(target TargetHoverfly) ([]byte, error) {
 }
 
 func createAPIStateResponse(response *http.Response) APIStateSchema {
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Debug(err.Error())
-	}
-
-	var apiResponse APIStateSchema
-
-	err = json.Unmarshal(body, &apiResponse)
-	if err != nil {
-		log.Debug(err.Error())
-	}
-
-	return apiResponse
-}
-
-func (h *Hoverfly) createAPIStateResponse(response *http.Response) APIStateSchema {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())
