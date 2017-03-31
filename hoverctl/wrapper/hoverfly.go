@@ -169,20 +169,20 @@ func SetDestination(target TargetHoverfly, destination string) (string, error) {
 }
 
 // GetMiddle will go the middleware endpoint in Hoverfly, parse the JSON response and return the middleware of Hoverfly
-func (h *Hoverfly) GetMiddleware() (v2.MiddlewareView, error) {
-	response, err := h.doRequest("GET", v2ApiMiddleware, "")
+func GetMiddleware(target TargetHoverfly) (v2.MiddlewareView, error) {
+	response, err := doRequest(target, "GET", v2ApiMiddleware, "")
 	if err != nil {
 		return v2.MiddlewareView{}, err
 	}
 
 	defer response.Body.Close()
 
-	middlewareResponse := h.createMiddlewareSchema(response)
+	middlewareResponse := createMiddlewareSchema(response)
 
 	return middlewareResponse, nil
 }
 
-func (h *Hoverfly) SetMiddleware(binary, script, remote string) (v2.MiddlewareView, error) {
+func SetMiddleware(target TargetHoverfly, binary, script, remote string) (v2.MiddlewareView, error) {
 	middlewareRequest := &v2.MiddlewareView{
 		Binary: binary,
 		Script: script,
@@ -194,7 +194,7 @@ func (h *Hoverfly) SetMiddleware(binary, script, remote string) (v2.MiddlewareVi
 		return v2.MiddlewareView{}, err
 	}
 
-	response, err := h.doRequest("PUT", v2ApiMiddleware, string(marshalledMiddleware))
+	response, err := doRequest(target, "PUT", v2ApiMiddleware, string(marshalledMiddleware))
 	if err != nil {
 		return v2.MiddlewareView{}, err
 	}
@@ -213,7 +213,7 @@ func (h *Hoverfly) SetMiddleware(binary, script, remote string) (v2.MiddlewareVi
 		return v2.MiddlewareView{}, errors.New("Hoverfly could not execute this middleware\n\n" + error.ErrorMessage)
 	}
 
-	apiResponse := h.createMiddlewareSchema(response)
+	apiResponse := createMiddlewareSchema(response)
 
 	return apiResponse, nil
 }
@@ -303,7 +303,7 @@ func (h *Hoverfly) createAPIStateResponse(response *http.Response) APIStateSchem
 	return apiResponse
 }
 
-func (h *Hoverfly) createMiddlewareSchema(response *http.Response) v2.MiddlewareView {
+func createMiddlewareSchema(response *http.Response) v2.MiddlewareView {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())

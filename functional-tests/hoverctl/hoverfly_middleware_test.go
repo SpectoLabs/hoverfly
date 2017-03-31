@@ -26,6 +26,7 @@ var _ = Describe("When I use hoverctl", func() {
 			hoverfly.SetMiddleware("ruby", "#!/usr/bin/env ruby\n# encoding: utf-8\nwhile payload = STDIN.gets\nnext unless payload\n\nSTDOUT.puts payload\nend")
 
 			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
+			functional_tests.Run(hoverctlBinary, "targets", "create", "-t", "default", "--admin-port", hoverfly.GetAdminPort())
 		})
 
 		AfterEach(func() {
