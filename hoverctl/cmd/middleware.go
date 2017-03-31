@@ -32,19 +32,19 @@ configuration will be shown.
 		var err error
 
 		if middlewareBinary == "" && middlewareScript == "" && middlewareRemote == "" {
-			middleware, err = hoverfly.GetMiddleware()
+			middleware, err = wrapper.GetMiddleware(*target)
 			handleIfError(err)
 			fmt.Println("Hoverfly middleware configuration is currently set to")
 		} else {
 			if middlewareRemote != "" {
-				middleware, err = hoverfly.SetMiddleware("", "", middlewareRemote)
+				middleware, err = wrapper.SetMiddleware(*target, "", "", middlewareRemote)
 				handleIfError(err)
 				fmt.Println("Hoverfly middleware configuration has been set to")
 			} else {
 				script, err := wrapper.ReadFile(middlewareScript)
 				handleIfError(err)
 
-				middleware, err = hoverfly.SetMiddleware(middlewareBinary, string(script), "")
+				middleware, err = wrapper.SetMiddleware(*target, middlewareBinary, string(script), "")
 				handleIfError(err)
 				fmt.Println("Hoverfly middleware configuration has been set to")
 			}
