@@ -19,6 +19,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			hoverfly.Start()
 
 			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
+			functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", hoverfly.GetAdminPort())
 		})
 
 		AfterEach(func() {
@@ -154,6 +155,7 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			hoverfly.Start("-webserver")
 
 			WriteConfiguration("localhost", hoverfly.GetAdminPort(), hoverfly.GetProxyPort())
+			functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", hoverfly.GetAdminPort())
 		})
 
 		AfterEach(func() {
