@@ -1,6 +1,6 @@
 package wrapper
 
-type TargetHoverfly struct {
+type Target struct {
 	Name      string
 	Host      string `yaml:"host"`
 	AdminPort int    `yaml:"admin.port"`
