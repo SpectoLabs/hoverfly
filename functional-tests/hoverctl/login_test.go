@@ -79,6 +79,28 @@ var _ = Describe("hoverctl login", func() {
 			functional_tests.Run(hoverctlBinary, "targets", "delete", "--target", "no-auth")
 		})
 
+		It("should error when getting the mode", func() {
+			output := functional_tests.Run(hoverctlBinary, "mode", "-t", "no-auth")
+			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
+			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
+
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+
+			output = functional_tests.Run(hoverctlBinary, "mode", "-t", "no-auth")
+			Expect(output).To(ContainSubstring("Hoverfly is currently set to simulate mode"))
+		})
+
+		It("should error when setting the mode", func() {
+			output := functional_tests.Run(hoverctlBinary, "mode", "-t", "no-auth", "capture")
+			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
+			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
+
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+
+			output = functional_tests.Run(hoverctlBinary, "mode", "-t", "no-auth", "capture")
+			Expect(output).To(ContainSubstring("Hoverfly has been set to capture mode"))
+		})
+
 		It("should error when flushing", func() {
 			output := functional_tests.Run(hoverctlBinary, "flush", "-f", "-t", "no-auth")
 			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +25,7 @@ mode is shown.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			mode, err := hoverfly.GetMode()
+			mode, err := wrapper.GetMode(*target)
 			handleIfError(err)
 
 			fmt.Println("Hoverfly is currently set to", mode, "mode")
@@ -45,7 +46,7 @@ mode is shown.
 				headersMessage = fmt.Sprintln("and will capture the following request headers:", splitHeaders)
 			}
 
-			mode, err := hoverfly.SetModeWithArguments(modeView)
+			mode, err := wrapper.SetModeWithArguments(*target, modeView)
 			handleIfError(err)
 
 			fmt.Println("Hoverfly has been set to", mode, "mode", headersMessage)
