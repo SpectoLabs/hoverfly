@@ -26,6 +26,7 @@ var _ = Describe("When I use hoverctl", func() {
 		BeforeEach(func() {
 			functional_tests.Run(hoverctlBinary, "stop", "-v")
 			WriteConfiguration("localhost", adminPortAsString, proxyPortAsString)
+			functional_tests.Run(hoverctlBinary, "targets", "create", "-t", "default", "--admin-port", adminPortAsString)
 		})
 
 		AfterEach(func() {
