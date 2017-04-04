@@ -341,10 +341,6 @@ func buildURL(target Target, endpoint string) string {
 	return fmt.Sprintf("http://%v:%v%v", target.Host, target.AdminPort, endpoint)
 }
 
-func (h *Hoverfly) buildURL(endpoint string) string {
-	return fmt.Sprintf("http://%v:%v%v", h.Host, h.AdminPort, endpoint)
-}
-
 func isLocal(url string) bool {
 	return url == "localhost" || url == "127.0.0.1"
 }
