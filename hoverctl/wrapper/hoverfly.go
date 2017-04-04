@@ -16,7 +16,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/dghubble/sling"
 	"github.com/kardianos/osext"
 )
 
@@ -301,41 +300,6 @@ func createMiddlewareSchema(response *http.Response) v2.MiddlewareView {
 	}
 
 	return middleware
-}
-
-func (h *Hoverfly) generateAuthToken() (string, error) {
-	credentials := HoverflyAuthSchema{
-		Username: h.Username,
-		Password: h.Password,
-	}
-
-	jsonCredentials, err := json.Marshal(credentials)
-	if err != nil {
-		return "", err
-	}
-
-	request, err := sling.New().Post(h.buildURL("/api/token-auth")).Body(strings.NewReader(string(jsonCredentials))).Request()
-	if err != nil {
-		return "", err
-	}
-
-	response, err := h.httpClient.Do(request)
-	if err != nil {
-		return "", err
-	}
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return "", err
-	}
-
-	var authToken HoverflyAuthTokenSchema
-	err = json.Unmarshal(body, &authToken)
-	if err != nil {
-		return "", err
-	}
-
-	return authToken.Token, nil
 }
 
 func Login(target Target, username, password string) (string, error) {
