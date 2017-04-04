@@ -116,20 +116,6 @@ func GetMode(target Target) (string, error) {
 	return apiResponse.Mode, nil
 }
 
-// GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
-func (h *Hoverfly) GetMode() (string, error) {
-	response, err := h.doRequest("GET", v2ApiMode, "")
-	if err != nil {
-		return "", err
-	}
-
-	defer response.Body.Close()
-
-	apiResponse := createAPIStateResponse(response)
-
-	return apiResponse.Mode, nil
-}
-
 // Set will go the state endpoint in Hoverfly, sending JSON that will set the mode of Hoverfly
 func SetModeWithArguments(target Target, modeView v2.ModeView) (string, error) {
 	if modeView.Mode != "simulate" && modeView.Mode != "capture" &&
@@ -427,7 +413,7 @@ func (h *Hoverfly) runBinary(path string, hoverflyDirectory HoverflyDirectory) (
 	return cmd, nil
 }
 
-func (h *Hoverfly) Start(hoverflyDirectory HoverflyDirectory) error {
+func (h *Hoverfly) Start(target Target, hoverflyDirectory HoverflyDirectory) error {
 
 	if !isLocal(h.Host) {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
@@ -440,7 +426,7 @@ func (h *Hoverfly) Start(hoverflyDirectory HoverflyDirectory) error {
 	}
 
 	if pid != 0 {
-		_, err := h.GetMode()
+		_, err := GetMode(target)
 		if err == nil {
 			return errors.New("Hoverfly is already running")
 		}

@@ -26,7 +26,11 @@ port and proxy port.
 			hoverfly = wrapper.NewHoverfly(*config)
 		}
 
-		err := hoverfly.Start(hoverflyDirectory)
+		if target == nil {
+			target = wrapper.NewDefaultTarget()
+		}
+
+		err := hoverfly.Start(*target, hoverflyDirectory)
 		handleIfError(err)
 
 		data := [][]string{
