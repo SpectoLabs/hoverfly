@@ -33,18 +33,7 @@ func GetConfig() *Config {
 		log.Debug(err.Error())
 	}
 
-	targets := map[string]Target{}
-	for key, target := range viper.GetStringMap("targets") {
-		targetHoverfly := Target{
-			Name:      key,
-			Host:      target.(map[interface{}]interface{})["host"].(string),
-			AdminPort: target.(map[interface{}]interface{})["admin.port"].(int),
-			AuthToken: target.(map[interface{}]interface{})["auth.token"].(string),
-			Pid:       target.(map[interface{}]interface{})["pid"].(int),
-		}
-
-		targets[key] = targetHoverfly
-	}
+	targets := getTargetsFromConfig(viper.GetStringMap("targets"))
 
 	return &Config{
 		HoverflyHost:        viper.GetString("hoverfly.host"),
