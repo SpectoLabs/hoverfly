@@ -514,51 +514,6 @@ func (h *Hoverfly) Stop(hoverflyDirectory HoverflyDirectory) error {
 	return nil
 }
 
-func (h Hoverfly) doRequest(method, url, body string) (*http.Response, error) {
-	url = fmt.Sprintf("http://%v:%v%v", h.Host, h.AdminPort, url)
-
-	var request *sling.Sling
-
-	if method == "DELETE" {
-		request = sling.New().Delete(url)
-	} else if method == "PUT" {
-		request = sling.New().Put(url).Body(strings.NewReader(body))
-	} else {
-		request = sling.New().Get(url)
-	}
-
-	if len(h.Username) > 0 || len(h.Password) > 0 && len(h.authToken) == 0 {
-		var err error
-
-		h.authToken, err = h.generateAuthToken()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if len(h.authToken) > 0 {
-		request.Add("Authorization", fmt.Sprintf("Bearer %v", h.authToken))
-	}
-
-	httpRequest, err := request.Request()
-	if err != nil {
-		log.Debug(err.Error())
-		return nil, errors.New("Could not communicate with Hoverfly")
-	}
-
-	response, err := h.httpClient.Do(httpRequest)
-	if err != nil {
-		log.Debug(err.Error())
-		return nil, errors.New("Could not communicate with Hoverfly")
-	}
-
-	if response.StatusCode == 401 {
-		return nil, errors.New("Hoverfly requires authentication")
-	}
-
-	return response, nil
-}
-
 func doRequest(target Target, method, url, body string) (*http.Response, error) {
 	url = fmt.Sprintf("http://%v:%v%v", target.Host, target.AdminPort, url)
 
