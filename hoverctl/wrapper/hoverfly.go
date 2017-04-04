@@ -373,24 +373,18 @@ func (h *Hoverfly) runBinary(path string, hoverflyDirectory HoverflyDirectory) (
 	return cmd, nil
 }
 
-func (h *Hoverfly) Start(target Target, hoverflyDirectory HoverflyDirectory) error {
+func (h *Hoverfly) Start(target *Target, hoverflyDirectory HoverflyDirectory) error {
 
-	if !isLocal(h.Host) {
+	if !isLocal(target.Host) {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
 	}
 
-	pid, err := hoverflyDirectory.GetPid(h.AdminPort, h.ProxyPort)
-	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not read Hoverfly pid file")
-	}
-
-	if pid != 0 {
-		_, err := GetMode(target)
+	if target.Pid != 0 {
+		_, err := GetMode(*target)
 		if err == nil {
 			return errors.New("Hoverfly is already running")
 		}
-		hoverflyDirectory.DeletePid(h.AdminPort, h.ProxyPort)
+		target.Pid = 0
 	}
 
 	binaryLocation, err := osext.ExecutableFolder()
@@ -433,43 +427,28 @@ func (h *Hoverfly) Start(target Target, hoverflyDirectory HoverflyDirectory) err
 		}
 	}
 
-	err = hoverflyDirectory.WritePid(h.AdminPort, h.ProxyPort, cmd.Process.Pid)
-	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not write a pid for Hoverfly")
-	}
+	target.Pid = cmd.Process.Pid
 
 	return nil
 }
 
-func (h *Hoverfly) Stop(hoverflyDirectory HoverflyDirectory) error {
-	if !isLocal(h.Host) {
+func Stop(target *Target, hoverflyDirectory HoverflyDirectory) error {
+	if !isLocal(target.Host) {
 		return errors.New("hoverctl can not stop an instance of Hoverfly on a remote host")
 	}
 
-	pid, err := hoverflyDirectory.GetPid(h.AdminPort, h.ProxyPort)
-
-	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not read Hoverfly pid file")
-	}
-
-	if pid == 0 {
+	if target.Pid == 0 {
 		return errors.New("Hoverfly is not running")
 	}
 
-	hoverflyProcess := os.Process{Pid: pid}
-	err = hoverflyProcess.Kill()
+	hoverflyProcess := os.Process{Pid: target.Pid}
+	err := hoverflyProcess.Kill()
 	if err != nil {
 		log.Info(err.Error())
 		return errors.New("Could not kill Hoverfly")
 	}
 
-	err = hoverflyDirectory.DeletePid(h.AdminPort, h.ProxyPort)
-	if err != nil {
-		log.Debug(err.Error())
-		return errors.New("Could not delete Hoverfly pid")
-	}
+	target.Pid = 0
 
 	return nil
 }
