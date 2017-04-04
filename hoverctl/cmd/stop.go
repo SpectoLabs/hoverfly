@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
 
@@ -18,8 +19,11 @@ is stopped.
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		err := hoverfly.Stop(hoverflyDirectory)
+		err := wrapper.Stop(target, hoverflyDirectory)
 		handleIfError(err)
+
+		config.NewTarget(*target)
+		handleIfError(config.WriteToFile(hoverflyDirectory))
 
 		fmt.Println("Hoverfly has been stopped")
 	},

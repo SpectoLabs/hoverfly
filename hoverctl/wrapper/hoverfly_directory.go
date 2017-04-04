@@ -2,12 +2,9 @@ package wrapper
 
 import (
 	"errors"
-	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/go-homedir"
@@ -38,42 +35,6 @@ func NewHoverflyDirectory(config Config) (HoverflyDirectory, error) {
 	}
 
 	return hoverflyDirectory, nil
-}
-
-func (h *HoverflyDirectory) GetPid(adminPort, proxyPort string) (int, error) {
-	hoverflyPidFile := h.buildPidFilePath(adminPort, proxyPort)
-	if fileIsPresent(hoverflyPidFile) {
-		pidFileData, err := ioutil.ReadFile(hoverflyPidFile)
-		if err != nil {
-			return 0, err
-		}
-
-		pid, err := strconv.Atoi(string(pidFileData))
-		if err != nil {
-			return 0, err
-		}
-
-		return pid, nil
-	}
-
-	return 0, nil
-}
-
-func (h *HoverflyDirectory) WritePid(adminPort, proxyPort string, pid int) error {
-	pidFilePath := h.buildPidFilePath(adminPort, proxyPort)
-	if fileIsPresent(pidFilePath) {
-		return errors.New("Hoverfly pid already exists")
-	}
-	return ioutil.WriteFile(pidFilePath, []byte(strconv.Itoa(pid)), 0644)
-}
-
-func (h *HoverflyDirectory) DeletePid(adminPort, proxyPort string) error {
-	return os.Remove(h.buildPidFilePath(adminPort, proxyPort))
-}
-
-func (h *HoverflyDirectory) buildPidFilePath(adminPort, proxyPort string) string {
-	pidName := fmt.Sprintf("hoverfly.%v.%v.pid", adminPort, proxyPort)
-	return filepath.Join(h.Path, pidName)
 }
 
 func getHomeDirectory() string {
