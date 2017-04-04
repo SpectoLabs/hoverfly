@@ -31,6 +31,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 		AfterEach(func() {
 			functional_tests.Run(hoverctlBinary, "stop", "-v")
+			functional_tests.Run(hoverctlBinary, "targets", "create", "-t", "default", "--admin-port", adminPortAsString)
 		})
 
 		Context("I can control a process of hoverfly", func() {
@@ -41,18 +42,6 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 				Expect(output).To(ContainSubstring("admin-port | " + adminPortAsString))
 				Expect(output).To(ContainSubstring("proxy-port | " + proxyPortAsString))
-
-				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
-
-				if err != nil {
-					Fail("Could not find pid file")
-				}
-
-				Expect(data).ToNot(BeEmpty())
-
-				if _, err := strconv.Atoi(string(data)); err != nil {
-					Fail("Pid file not have an integer in it")
-				}
 			})
 
 			It("by stopping  hoverfly", func() {
@@ -61,12 +50,6 @@ var _ = Describe("When I use hoverctl", func() {
 				output := functional_tests.Run(hoverctlBinary, "stop")
 
 				Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
-
-				_, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
-
-				if err == nil {
-					Fail("Found the pid file that should have been deleted")
-				}
 			})
 
 			It("by starting and stopping hoverfly on a different admin port using a flag", func() {
@@ -76,28 +59,9 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(output).To(ContainSubstring("admin-port | 11223"))
 				Expect(output).To(ContainSubstring("proxy-port | " + proxyPortAsString))
 
-				data, err := ioutil.ReadFile("./.hoverfly/hoverfly.11223." + proxyPortAsString + ".pid")
-
-				if err != nil {
-					Fail("Could not find pid file")
-				}
-
-				Expect(data).ToNot(BeEmpty())
-
-				if _, err := strconv.Atoi(string(data)); err != nil {
-					Fail("Pid file not have an integer in it")
-				}
-
 				output = functional_tests.Run(hoverctlBinary, "stop", "--admin-port=11223")
 
 				Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
-
-				_, err = ioutil.ReadFile("./.hoverfly/hoverfly.11223." + proxyPortAsString + ".pid")
-
-				if err == nil {
-					Fail("Found the pid file that should have been deleted")
-				}
-
 			})
 
 			It("by starting and stopping hoverfly on a different proxy port using a flag", func() {
@@ -107,27 +71,9 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(output).To(ContainSubstring("admin-port | " + adminPortAsString))
 				Expect(output).To(ContainSubstring("proxy-port | 22113"))
 
-				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + ".22113.pid")
-
-				if err != nil {
-					Fail("Could not find pid file")
-				}
-
-				Expect(data).ToNot(BeEmpty())
-
-				if _, err := strconv.Atoi(string(data)); err != nil {
-					Fail("Pid file not have an integer in it")
-				}
-
 				output = functional_tests.Run(hoverctlBinary, "stop", "--proxy-port=22113")
 
 				Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
-
-				_, err = ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + ".22113.pid")
-
-				if err == nil {
-					Fail("Found the pid file that should have been deleted")
-				}
 			})
 
 			It("by starting and stopping hoverfly on a different admin and proxy port using both flag", func() {
@@ -137,27 +83,9 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(output).To(ContainSubstring("admin-port | 11223"))
 				Expect(output).To(ContainSubstring("proxy-port | 22113"))
 
-				data, err := ioutil.ReadFile("./.hoverfly/hoverfly.11223.22113.pid")
-
-				if err != nil {
-					Fail("Could not find pid file")
-				}
-
-				Expect(data).ToNot(BeEmpty())
-
-				if _, err := strconv.Atoi(string(data)); err != nil {
-					Fail("Pid file not have an integer in it")
-				}
-
 				output = functional_tests.Run(hoverctlBinary, "stop", "--admin-port=11223", "--proxy-port=22113")
 
 				Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
-
-				_, err = ioutil.ReadFile("./.hoverfly/hoverfly.11223.22113.pid")
-
-				if err == nil {
-					Fail("Found the pid file that should have been deleted")
-				}
 			})
 
 			It("but you cannot start hoverfly if already running", func() {
@@ -185,18 +113,6 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(output).To(ContainSubstring("admin-port     | " + adminPortAsString))
 				Expect(output).To(ContainSubstring("webserver-port | " + proxyPortAsString))
 
-				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
-
-				if err != nil {
-					Fail("Could not find pid file")
-				}
-
-				Expect(data).ToNot(BeEmpty())
-
-				if _, err := strconv.Atoi(string(data)); err != nil {
-					Fail("Pid file not have an integer in it")
-				}
-
 				request := sling.New().Get("http://localhost:" + proxyPortAsString)
 				response := functional_tests.DoRequest(request)
 
@@ -214,15 +130,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
-				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
-
-				if err != nil {
-					Fail("Could not find pid file")
-				}
-
-				Expect(data).ToNot(BeEmpty())
-
-				data, err = ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
+				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
 
 				if err != nil {
 					Fail("Could not find log file")
@@ -240,15 +148,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
-				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
-
-				if err != nil {
-					Fail("Could not find pid file")
-				}
-
-				Expect(data).ToNot(BeEmpty())
-
-				data, err = ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
+				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
 
 				if err != nil {
 					Fail("Could not find log file")
@@ -285,15 +185,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
-				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".pid")
-
-				if err != nil {
-					Fail("Could not find pid file")
-				}
-
-				Expect(data).ToNot(BeEmpty())
-
-				data, err = ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
+				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
 
 				if err != nil {
 					Fail("Could not find log file")

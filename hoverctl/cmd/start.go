@@ -30,7 +30,7 @@ port and proxy port.
 			target = wrapper.NewDefaultTarget()
 		}
 
-		err := hoverfly.Start(*target, hoverflyDirectory)
+		err := hoverfly.Start(target, hoverflyDirectory)
 		handleIfError(err)
 
 		data := [][]string{
@@ -47,6 +47,8 @@ port and proxy port.
 
 		drawTable(data, false)
 
+		config.NewTarget(*target)
+		handleIfError(config.WriteToFile(hoverflyDirectory))
 	},
 }
 
