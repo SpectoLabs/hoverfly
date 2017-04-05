@@ -38,6 +38,22 @@ func Test_getTargetsFromConfig_adminport(t *testing.T) {
 	}))
 }
 
+func Test_getTargetsFromConfig_proxyport(t *testing.T) {
+	RegisterTestingT(t)
+
+	targets := getTargetsFromConfig(map[string]interface{}{
+		"otherother": map[interface{}]interface{}{
+			"proxy.port": 8765,
+		},
+	})
+
+	Expect(targets).To(HaveLen(1))
+	Expect(targets).To(HaveKeyWithValue("otherother", Target{
+		Name:      "otherother",
+		ProxyPort: 8765,
+	}))
+}
+
 func Test_getTargetsFromConfig_authtoken(t *testing.T) {
 	RegisterTestingT(t)
 
