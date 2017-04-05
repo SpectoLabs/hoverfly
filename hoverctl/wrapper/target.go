@@ -4,11 +4,11 @@ type Target struct {
 	Name      string
 	Host      string `yaml:"host"`
 	AdminPort int    `yaml:"admin.port"`
+	ProxyPort int    `yaml:"proxy.port"`
 	AuthToken string `yaml:"auth.token"`
 	Pid       int    `yaml:"pid"`
 
 	Webserver bool
-	ProxyPort int
 	CachePath string
 
 	CertificatePath  string
@@ -42,6 +42,10 @@ func getTargetsFromConfig(configTargets map[string]interface{}) map[string]Targe
 
 		if targetMap["admin.port"] != nil {
 			targetHoverfly.AdminPort = targetMap["admin.port"].(int)
+		}
+
+		if targetMap["proxy.port"] != nil {
+			targetHoverfly.ProxyPort = targetMap["proxy.port"].(int)
 		}
 
 		if targetMap["auth.token"] != nil {
