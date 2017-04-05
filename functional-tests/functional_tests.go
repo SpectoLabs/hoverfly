@@ -284,3 +284,29 @@ func GenerateFileName() string {
 
 	return "testdata-gen/" + rs + ".json"
 }
+
+func TableToSliceMapStringString(table string) map[string]map[string]string {
+	results := map[string]map[string]string{}
+
+	tableRows := strings.Split(table, "\n")
+	headings := []string{}
+
+	for _, heading := range strings.Split(tableRows[1], "|") {
+		headings = append(headings, strings.TrimSpace(heading))
+	}
+
+	for _, row := range tableRows[2:] {
+		if !strings.Contains(row, "-+-") {
+			rowValues := strings.Split(row, "|")
+
+			result := map[string]string{}
+			for i, value := range rowValues {
+				result[headings[i]] = strings.TrimSpace(value)
+			}
+
+			results[result["TARGET NAME"]] = result
+		}
+	}
+
+	return results
+}
