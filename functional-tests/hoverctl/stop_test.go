@@ -60,10 +60,19 @@ var _ = Describe("hoverctl `stop`", func() {
 			hoverfly.Stop()
 		})
 
-		It("by stopping hoverfly", func() {
+		It("stops Hoverfly", func() {
 			output := functional_tests.Run(hoverctlBinary, "stop")
-
 			Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
+		})
+
+		It("removes the pid from the target", func() {
+			output := functional_tests.Run(hoverctlBinary, "stop")
+			Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
+
+			output = functional_tests.Run(hoverctlBinary, "targets")
+
+			targets := functional_tests.TableToSliceMapStringString(output)
+			Expect(targets["default"]["PID"]).To(Equal("0"))
 		})
 	})
 })
