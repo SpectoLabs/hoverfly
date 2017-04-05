@@ -130,14 +130,10 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
-				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
+				output = functional_tests.Run(hoverctlBinary, "logs")
 
-				if err != nil {
-					Fail("Could not find log file")
-				}
-
-				Expect(data).ToNot(BeEmpty())
-				Expect(data).To(ContainSubstring("Default keys have been overwritten"))
+				Expect(output).ToNot(BeEmpty())
+				Expect(output).To(ContainSubstring("Default keys have been overwritten"))
 			})
 		})
 
@@ -148,14 +144,10 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
-				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
+				output = functional_tests.Run(hoverctlBinary, "logs")
 
-				if err != nil {
-					Fail("Could not find log file")
-				}
-
-				Expect(data).ToNot(BeEmpty())
-				Expect(data).To(ContainSubstring("tls certificate verification is now turned off!"))
+				Expect(output).ToNot(BeEmpty())
+				Expect(output).To(ContainSubstring("tls certificate verification is now turned off!"))
 			})
 		})
 
@@ -185,14 +177,10 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
-				data, err := ioutil.ReadFile("./.hoverfly/hoverfly." + adminPortAsString + "." + proxyPortAsString + ".log")
+				output = functional_tests.Run(hoverctlBinary, "logs")
 
-				if err != nil {
-					Fail("Could not find log file")
-				}
-
-				Expect(data).ToNot(BeEmpty())
-				Expect(data).To(ContainSubstring("Creating bolt db backend."))
+				Expect(output).ToNot(BeEmpty())
+				Expect(output).To(ContainSubstring("Creating bolt db backend."))
 			})
 		})
 
