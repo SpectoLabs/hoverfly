@@ -397,7 +397,7 @@ func (h *Hoverfly) Start(target *Target, hoverflyDirectory HoverflyDirectory) er
 	if err != nil {
 		cmd, err = h.runBinary("hoverfly", hoverflyDirectory)
 		if err != nil {
-			return errors.New("Could not read Hoverfly pid file")
+			return errors.New("Could not start Hoverfly")
 		}
 	}
 
