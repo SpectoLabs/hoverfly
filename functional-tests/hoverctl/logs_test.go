@@ -24,12 +24,13 @@ var _ = Describe("When I use hoverctl", func() {
 
 	BeforeEach(func() {
 		WriteConfiguration("localhost", adminPort, proxyPort)
-		functional_tests.Run(hoverctlBinary, "targets", "create", "-t", "default", "--admin-port", adminPort)
+		functional_tests.Run(hoverctlBinary, "targets", "create", "-t", "default", "--admin-port", adminPort, "--proxy-port", proxyPort)
 	})
 
 	AfterEach(func() {
 		functional_tests.Run(hoverctlBinary, "stop")
 		functional_tests.Run(hoverctlBinary, "targets", "delete", "-t", "default", "-f")
+		functional_tests.Run(hoverctlBinary, "targets", "delete", "-t", "incorrect", "-f")
 	})
 
 	Context("I can get the logs using the log command", func() {
@@ -44,8 +45,9 @@ var _ = Describe("When I use hoverctl", func() {
 
 		It("should return an error if the logs don't exist", func() {
 			functional_tests.Run(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
+			functional_tests.Run(hoverctlBinary, "targets", "create", "-t", "incorrect", "--admin-port", "12345", "--proxy-port", "65432")
 
-			output := functional_tests.Run(hoverctlBinary, "logs", "--admin-port=hotdogs", "--proxy-port=burgers")
+			output := functional_tests.Run(hoverctlBinary, "logs", "-t", "incorrect")
 
 			Expect(output).To(ContainSubstring("Could not open Hoverfly log file"))
 		})

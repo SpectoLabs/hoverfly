@@ -27,7 +27,9 @@ port and proxy port.
 		}
 
 		if target == nil {
-			target = wrapper.NewDefaultTarget()
+			var err error
+			target, err = wrapper.NewTarget(targetName, host, adminPort, proxyPort)
+			handleIfError(err)
 		}
 
 		err := hoverfly.Start(target, hoverflyDirectory)
