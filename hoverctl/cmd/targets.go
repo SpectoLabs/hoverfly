@@ -21,11 +21,11 @@ Get the current targets registered with hoverctl"
 		}
 
 		data := [][]string{
-			[]string{"Target name", "Host", "Admin port"},
+			[]string{"Target name", "Host", "Admin port", "Proxy port"},
 		}
 
 		for key, target := range config.Targets {
-			data = append(data, []string{key, target.Host, strconv.Itoa(target.AdminPort)})
+			data = append(data, []string{key, target.Host, strconv.Itoa(target.AdminPort), strconv.Itoa(target.ProxyPort)})
 		}
 
 		drawTable(data, true)
@@ -77,6 +77,13 @@ Create target"
 			handleIfError(err)
 
 			newTarget.AdminPort = adminPort
+		}
+
+		if proxyPort != "" {
+			proxyPort, err := strconv.Atoi(proxyPort)
+			handleIfError(err)
+
+			newTarget.ProxyPort = proxyPort
 		}
 
 		if host != "" {
