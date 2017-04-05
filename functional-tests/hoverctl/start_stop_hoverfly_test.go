@@ -44,14 +44,6 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(output).To(ContainSubstring("proxy-port | " + proxyPortAsString))
 			})
 
-			It("by stopping  hoverfly", func() {
-				functional_tests.Run(hoverctlBinary, "start")
-
-				output := functional_tests.Run(hoverctlBinary, "stop")
-
-				Expect(output).To(ContainSubstring("Hoverfly has been stopped"))
-			})
-
 			It("by starting and stopping hoverfly on a different admin port using a flag", func() {
 				output := functional_tests.Run(hoverctlBinary, "start", "--admin-port=11223")
 
@@ -95,13 +87,6 @@ var _ = Describe("When I use hoverctl", func() {
 
 				Expect(output).To(ContainSubstring("Hoverfly is already running"))
 			})
-
-			It("but you cannot stop hoverfly if is not running", func() {
-				output := functional_tests.Run(hoverctlBinary, "stop")
-
-				Expect(output).To(ContainSubstring("Hoverfly is not running"))
-			})
-
 		})
 
 		Context("I can control a process of hoverfly running as a webserver", func() {

@@ -446,7 +446,7 @@ func Stop(target *Target, hoverflyDirectory HoverflyDirectory) error {
 	err := hoverflyProcess.Kill()
 	if err != nil {
 		log.Info(err.Error())
-		return errors.New("Could not kill Hoverfly")
+		return errors.New("Could not kill Hoverfly [process " + strconv.Itoa(target.Pid) + "]")
 	}
 
 	target.Pid = 0

@@ -190,6 +190,10 @@ func (this Hoverfly) GetProxyPort() string {
 	return strconv.Itoa(this.proxyPort)
 }
 
+func (this Hoverfly) GetPid() int {
+	return this.process.Process.Pid
+}
+
 func (this Hoverfly) startHoverflyInternal(adminPort, proxyPort int, additionalCommands ...string) *exec.Cmd {
 	hoverflyBinaryUri := BuildBinaryPath()
 
