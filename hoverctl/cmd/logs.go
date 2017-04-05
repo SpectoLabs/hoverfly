@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"strconv"
+
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
@@ -15,7 +17,7 @@ Shows the Hoverfly logs.
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		logfile := wrapper.NewLogFile(hoverflyDirectory, hoverfly.AdminPort, hoverfly.ProxyPort)
+		logfile := wrapper.NewLogFile(hoverflyDirectory, strconv.Itoa(target.AdminPort), strconv.Itoa(target.ProxyPort))
 
 		if followLogs {
 			err := logfile.Tail()
