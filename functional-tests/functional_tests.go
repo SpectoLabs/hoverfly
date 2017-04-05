@@ -310,3 +310,13 @@ func TableToSliceMapStringString(table string) map[string]map[string]string {
 
 	return results
 }
+
+func KillHoverflyTargets(table string) {
+	targets := TableToSliceMapStringString(table)
+	for _, target := range targets {
+		pid, _ := strconv.Atoi(target["PID"])
+		if process, err := os.FindProcess(pid); err == nil {
+			process.Kill()
+		}
+	}
+}
