@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var pidFlag int
+
 var targetsCmd = &cobra.Command{
 	Use:   "targets",
 	Short: "Get the current targets registered with hoverctl",
@@ -21,11 +23,11 @@ Get the current targets registered with hoverctl"
 		}
 
 		data := [][]string{
-			[]string{"Target name", "Host", "Admin port", "Proxy port"},
+			[]string{"Target name", "Pid", "Host", "Admin port", "Proxy port"},
 		}
 
 		for key, target := range config.Targets {
-			data = append(data, []string{key, target.Host, strconv.Itoa(target.AdminPort), strconv.Itoa(target.ProxyPort)})
+			data = append(data, []string{key, strconv.Itoa(target.Pid), target.Host, strconv.Itoa(target.AdminPort), strconv.Itoa(target.ProxyPort)})
 		}
 
 		drawTable(data, true)
@@ -67,6 +69,7 @@ Create target"
 	Run: func(cmd *cobra.Command, args []string) {
 
 		newTarget, err := wrapper.NewTarget(targetName, host, adminPort, proxyPort)
+		newTarget.Pid = pidFlag
 		handleIfError(err)
 
 		config.NewTarget(*newTarget)
@@ -82,4 +85,6 @@ func init() {
 
 	targetsCmd.AddCommand(targetsDeleteCmd)
 	targetsCmd.AddCommand(targetsCreateCmd)
+
+	targetsCreateCmd.Flags().IntVar(&pidFlag, "pid", 0, "Process id for a running instance of Hoverfly")
 }

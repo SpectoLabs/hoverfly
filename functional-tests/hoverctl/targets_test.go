@@ -48,14 +48,21 @@ var _ = Describe("When using the `targets` command", func() {
 
 		It("should create the target and print it", func() {
 
-			output := functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "new-target", "--admin-port", "1234", "--proxy-port", "8765", "--host", "localhost")
+			output := functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "new-target",
+				"--pid", "12345",
+				"--host", "localhost",
+				"--admin-port", "1234",
+				"--proxy-port", "8765",
+			)
 
 			Expect(output).To(ContainSubstring("TARGET NAME"))
+			Expect(output).To(ContainSubstring("PID"))
 			Expect(output).To(ContainSubstring("HOST"))
 			Expect(output).To(ContainSubstring("ADMIN PORT"))
 			Expect(output).To(ContainSubstring("PROXY PORT"))
 
 			Expect(output).To(ContainSubstring("new-target"))
+			Expect(output).To(ContainSubstring("12345"))
 			Expect(output).To(ContainSubstring("localhost"))
 			Expect(output).To(ContainSubstring("1234"))
 			Expect(output).To(ContainSubstring("8765"))
@@ -65,10 +72,12 @@ var _ = Describe("When using the `targets` command", func() {
 			output := functional_tests.Run(hoverctlBinary, "targets", "create")
 
 			Expect(output).To(ContainSubstring("TARGET NAME"))
+			Expect(output).To(ContainSubstring("PID"))
 			Expect(output).To(ContainSubstring("HOST"))
 			Expect(output).To(ContainSubstring("ADMIN PORT"))
 
 			Expect(output).To(ContainSubstring("default"))
+			Expect(output).To(ContainSubstring("0"))
 			Expect(output).To(ContainSubstring("localhost"))
 			Expect(output).To(ContainSubstring("8888"))
 		})
