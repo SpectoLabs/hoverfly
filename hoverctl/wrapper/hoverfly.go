@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -388,6 +389,11 @@ func (h *Hoverfly) Start(target *Target, hoverflyDirectory HoverflyDirectory) er
 		target.Pid = 0
 	}
 
+	err := checkPorts(target.AdminPort, target.ProxyPort)
+	if err != nil {
+		return err
+	}
+
 	binaryLocation, err := osext.ExecutableFolder()
 	if err != nil {
 		log.Debug(err)
@@ -476,6 +482,18 @@ func doRequest(target Target, method, url, body string) (*http.Response, error) 
 	}
 
 	return response, nil
+}
+
+func checkPorts(ports ...int) error {
+	for _, port := range ports {
+		server, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+		if err != nil {
+			return fmt.Errorf("Could not start Hoverfly\n\nPort %v was not free", port)
+		}
+		server.Close()
+	}
+
+	return nil
 }
 
 func handlerError(response *http.Response) error {
