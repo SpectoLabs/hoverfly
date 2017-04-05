@@ -6,6 +6,79 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func Test_NewTarget_ReturnsDefaultWithEmptyStrings(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(NewTarget("", "", "", "")).To(Equal(&Target{
+		Name:      "default",
+		Host:      "localhost",
+		AdminPort: 8888,
+		ProxyPort: 8500,
+	}))
+}
+
+func Test_NewTarget_OverridesNamefNotEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(NewTarget("notdefault", "", "", "")).To(Equal(&Target{
+		Name:      "notdefault",
+		Host:      "localhost",
+		AdminPort: 8888,
+		ProxyPort: 8500,
+	}))
+}
+
+func Test_NewTarget_OverridesHostfNotEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(NewTarget("", "notlocalhost", "", "")).To(Equal(&Target{
+		Name:      "default",
+		Host:      "notlocalhost",
+		AdminPort: 8888,
+		ProxyPort: 8500,
+	}))
+}
+
+func Test_NewTarget_OverridesAdminPortfNotEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(NewTarget("", "", "1234", "")).To(Equal(&Target{
+		Name:      "default",
+		Host:      "localhost",
+		AdminPort: 1234,
+		ProxyPort: 8500,
+	}))
+}
+
+func Test_NewTarget_ErrorsIfAdminPortIsNotANumber(t *testing.T) {
+	RegisterTestingT(t)
+
+	_, err := NewTarget("", "", "notanumber", "")
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("The admin port provided was not a number"))
+}
+
+func Test_NewTarget_OverridesProxyPortfNotEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(NewTarget("", "", "", "8765")).To(Equal(&Target{
+		Name:      "default",
+		Host:      "localhost",
+		AdminPort: 8888,
+		ProxyPort: 8765,
+	}))
+}
+
+func Test_NewTarget_ErrorsIfProxyPortIsNotANumber(t *testing.T) {
+	RegisterTestingT(t)
+
+	_, err := NewTarget("", "", "", "notanumber")
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("The proxy port provided was not a number"))
+}
+
 func Test_getTargetsFromConfig_host(t *testing.T) {
 	RegisterTestingT(t)
 

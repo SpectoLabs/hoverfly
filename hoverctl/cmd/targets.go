@@ -66,29 +66,8 @@ Create target"
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		newTarget := wrapper.NewDefaultTarget()
-
-		if targetName != "" {
-			newTarget.Name = targetName
-		}
-
-		if adminPort != "" {
-			adminPort, err := strconv.Atoi(adminPort)
-			handleIfError(err)
-
-			newTarget.AdminPort = adminPort
-		}
-
-		if proxyPort != "" {
-			proxyPort, err := strconv.Atoi(proxyPort)
-			handleIfError(err)
-
-			newTarget.ProxyPort = proxyPort
-		}
-
-		if host != "" {
-			newTarget.Host = host
-		}
+		newTarget, err := wrapper.NewTarget(targetName, host, adminPort, proxyPort)
+		handleIfError(err)
 
 		config.NewTarget(*newTarget)
 
