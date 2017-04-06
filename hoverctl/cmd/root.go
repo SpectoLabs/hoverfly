@@ -21,7 +21,6 @@ var force bool
 
 var cacheDisable bool
 
-var hoverfly wrapper.Hoverfly
 var hoverflyDirectory wrapper.HoverflyDirectory
 var config *wrapper.Config
 var target *wrapper.Target
@@ -107,8 +106,6 @@ func initConfig() {
 	var err error
 	hoverflyDirectory, err = wrapper.NewHoverflyDirectory(*config)
 	handleIfError(err)
-
-	hoverfly = wrapper.NewHoverfly(*config)
 }
 
 func handleIfError(err error) {

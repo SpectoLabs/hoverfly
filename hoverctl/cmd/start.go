@@ -40,7 +40,7 @@ port and proxy port.
 
 		target.UpstreamProxyUrl = upstreamProxy
 
-		err := hoverfly.Start(target, hoverflyDirectory)
+		err := wrapper.Start(target, hoverflyDirectory)
 		handleIfError(err)
 
 		data := [][]string{
