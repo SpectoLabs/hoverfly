@@ -14,12 +14,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var targetName, adminPort, proxyPort, host, certificate, key, database, upstreamProxy string
-var disableTls, verbose bool
+var targetNameFlag, hostFlag, certificatePathFlag, keyPathFlag, cachePathFlag, upstreamProxyUrlFlag string
+var disableTlsFlag, disableCacheFlag, verbose bool
+
+var adminPortFlag, proxyPortFlag int
 
 var force bool
-
-var cacheDisable bool
 
 var hoverflyDirectory wrapper.HoverflyDirectory
 var config *wrapper.Config
@@ -49,28 +49,29 @@ func init() {
 		"Bypass any confirmation when using hoverctl")
 	RootCmd.Flag("force").Shorthand = "f"
 
-	RootCmd.PersistentFlags().StringVar(&targetName, "target", "",
+	RootCmd.PersistentFlags().StringVar(&targetNameFlag, "target", "",
 		"A name for an instance of Hoverfly you are trying to communicate with. Overrides the default target (default)")
-	RootCmd.PersistentFlags().StringVar(&adminPort, "admin-port", "",
+	RootCmd.PersistentFlags().IntVar(&adminPortFlag, "admin-port", 0,
 		"A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
-	RootCmd.PersistentFlags().StringVar(&proxyPort, "proxy-port", "",
+	RootCmd.PersistentFlags().IntVar(&proxyPortFlag, "proxy-port", 0,
 		"A port number for the Hoverfly proxy. Overrides the default Hoverfly proxy port (8500)")
-	RootCmd.PersistentFlags().StringVar(&host, "host", "",
+	RootCmd.PersistentFlags().StringVar(&hostFlag, "host", "",
 		"A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
-	RootCmd.PersistentFlags().StringVar(&certificate, "certificate", "",
+	RootCmd.PersistentFlags().StringVar(&certificatePathFlag, "certificate", "",
 		"A path to a certificate file. Overrides the default Hoverfly certificate")
-	RootCmd.PersistentFlags().StringVar(&key, "key", "",
+	RootCmd.PersistentFlags().StringVar(&keyPathFlag, "key", "",
 		"A path to a key file. Overrides the default Hoverfly TLS key")
-	RootCmd.PersistentFlags().BoolVar(&disableTls, "disable-tls", false,
+	RootCmd.PersistentFlags().BoolVar(&disableTlsFlag, "disable-tls", false,
 		"Disables TLS verification")
-	RootCmd.PersistentFlags().StringVar(&database, "database", "",
-		"A database type [memory|boltdb]. Overrides the default Hoverfly database type (memory)")
-	RootCmd.PersistentFlags().BoolVar(&cacheDisable, "disable-cache", false,
+	RootCmd.PersistentFlags().StringVar(&cachePathFlag, "cache", "",
+		"A path to a persisted Hoverfly cache. If the cache doesn't exist, Hoverfly will create it")
+	RootCmd.PersistentFlags().BoolVar(&disableCacheFlag, "disable-cache", false,
 		"?")
-	RootCmd.PersistentFlags().StringVar(&upstreamProxy, "upstream-proxy", "",
+	RootCmd.PersistentFlags().StringVar(&upstreamProxyUrlFlag, "upstream-proxy", "",
 		"A host for which Hoverfly will proxy its requests to")
 
 	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Verbose logging from hoverctl")
+
 	RootCmd.Flag("verbose").Shorthand = "v"
 	RootCmd.Flag("target").Shorthand = "t"
 }
@@ -87,7 +88,7 @@ func initConfig() {
 
 	config = wrapper.GetConfig()
 
-	target = config.GetTarget(targetName)
+	target = config.GetTarget(targetNameFlag)
 	if verbose && target != nil {
 		fmt.Println("Current target: " + target.Name + "\n")
 	}

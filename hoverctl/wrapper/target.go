@@ -1,7 +1,6 @@
 package wrapper
 
 import (
-	"errors"
 	"strconv"
 )
 
@@ -33,7 +32,7 @@ func NewDefaultTarget() *Target {
 	}
 }
 
-func NewTarget(name, host, adminPort, proxyPort string) (*Target, error) {
+func NewTarget(name, host string, adminPort, proxyPort int) (*Target, error) {
 	target := NewDefaultTarget()
 	if name != "" {
 		target.Name = name
@@ -43,21 +42,11 @@ func NewTarget(name, host, adminPort, proxyPort string) (*Target, error) {
 		target.Host = host
 	}
 
-	if adminPort != "" {
-		adminPort, err := strconv.Atoi(adminPort)
-		if err != nil {
-			return nil, errors.New("The admin port provided was not a number")
-		}
-
+	if adminPort != 0 {
 		target.AdminPort = adminPort
 	}
 
-	if proxyPort != "" {
-		proxyPort, err := strconv.Atoi(proxyPort)
-		if err != nil {
-			return nil, errors.New("The proxy port provided was not a number")
-		}
-
+	if proxyPort != 0 {
 		target.ProxyPort = proxyPort
 	}
 
