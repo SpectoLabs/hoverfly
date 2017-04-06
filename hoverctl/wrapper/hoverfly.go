@@ -352,7 +352,7 @@ This isn't working as intended, its working, just not how I imagined it.
 */
 
 func (h *Hoverfly) runBinary(target *Target, path string, hoverflyDirectory HoverflyDirectory) (*exec.Cmd, error) {
-	flags := h.config.BuildFlags()
+	flags := target.BuildFlags()
 
 	cmd := exec.Command(path, flags...)
 	log.Debug(cmd.Args)
@@ -421,7 +421,6 @@ func (h *Hoverfly) Start(target *Target, hoverflyDirectory HoverflyDirectory) er
 			return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: %v", statusCode))
 		case <-tick:
 			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/mode", h.AdminPort))
-
 			if err == nil {
 				statusCode = resp.StatusCode
 			} else {
