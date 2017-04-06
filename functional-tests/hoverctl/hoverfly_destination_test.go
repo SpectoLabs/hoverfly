@@ -23,7 +23,6 @@ var _ = Describe("When I use hoverctl", func() {
 
 		AfterEach(func() {
 			hoverfly.Stop()
-			functional_tests.Run(hoverctlBinary, "targets", "delete", "-f", "-t", "default")
 		})
 
 		Context("I can get the hoverfly's destination", func() {
