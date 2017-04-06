@@ -42,12 +42,12 @@ Delete target"
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		if targetName != "" {
-			if !askForConfirmation("Are you sure you want to delete the target " + targetName + "?") {
+		if targetNameFlag != "" {
+			if !askForConfirmation("Are you sure you want to delete the target " + targetNameFlag + "?") {
 				return
 			}
 			config.DeleteTarget(wrapper.Target{
-				Name: targetName,
+				Name: targetNameFlag,
 			})
 
 			handleIfError(config.WriteToFile(hoverflyDirectory))
@@ -68,7 +68,7 @@ Create target"
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		newTarget, err := wrapper.NewTarget(targetName, host, adminPort, proxyPort)
+		newTarget, err := wrapper.NewTarget(targetNameFlag, hostFlag, adminPortFlag, proxyPortFlag)
 		newTarget.Pid = pidFlag
 		handleIfError(err)
 

@@ -142,7 +142,7 @@ var _ = Describe("hoverctl `start`", func() {
 		})
 
 		It("should start an instance of hoverfly with persisted cache", func() {
-			output := functional_tests.Run(hoverctlBinary, "start", "--cache-path", "testdata-gen/cache.db", "-v")
+			output := functional_tests.Run(hoverctlBinary, "start", "--cache", "testdata-gen/cache.db", "-v")
 
 			Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
