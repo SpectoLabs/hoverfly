@@ -8,8 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cachePathFlag string
-
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start Hoverfly",
@@ -27,36 +25,28 @@ port and proxy port.
 
 		if target == nil {
 			var err error
-			target, err = wrapper.NewTarget(targetName, host, adminPort, proxyPort)
+			target, err = wrapper.NewTarget(targetNameFlag, hostFlag, adminPortFlag, proxyPortFlag)
 			handleIfError(err)
 		}
 
-		if adminPort != "" {
-			adminPort, err := strconv.Atoi(adminPort)
-			if err != nil {
-				handleIfError(fmt.Errorf("Admin port is not a number"))
-			}
-			target.AdminPort = adminPort
+		if adminPortFlag != 0 {
+			target.AdminPort = adminPortFlag
 		}
 
-		if proxyPort != "" {
-			proxyPort, err := strconv.Atoi(proxyPort)
-			if err != nil {
-				handleIfError(fmt.Errorf("Proxy port is not a number"))
-			}
-			target.ProxyPort = proxyPort
+		if proxyPortFlag != 0 {
+			target.ProxyPort = proxyPortFlag
 		}
 
 		target.Webserver = len(args) > 0
 		target.CachePath = cachePathFlag
-		target.DisableCache = cacheDisable
+		target.DisableCache = disableCacheFlag
 
-		target.CertificatePath = certificate
-		target.KeyPath = key
-		target.DisableTls = disableTls
+		target.CertificatePath = certificatePathFlag
+		target.KeyPath = keyPathFlag
+		target.DisableTls = disableTlsFlag
 
-		target.UpstreamProxyUrl = upstreamProxy
-		fmt.Println(target)
+		target.UpstreamProxyUrl = upstreamProxyUrlFlag
+
 		err := wrapper.Start(target, hoverflyDirectory)
 		handleIfError(err)
 
@@ -81,5 +71,4 @@ port and proxy port.
 
 func init() {
 	RootCmd.AddCommand(startCmd)
-	startCmd.Flags().StringVar(&cachePathFlag, "cache-path", "", "Something")
 }
