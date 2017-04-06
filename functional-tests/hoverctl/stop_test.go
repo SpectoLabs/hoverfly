@@ -14,10 +14,6 @@ var _ = Describe("hoverctl `stop`", func() {
 		hoverfly = functional_tests.NewHoverfly()
 	)
 
-	AfterEach(func() {
-		functional_tests.Run(hoverctlBinary, "targets", "delete", "-t", "default")
-	})
-
 	Context("without a target", func() {
 		It("should return an error", func() {
 			output := functional_tests.Run(hoverctlBinary, "stop")

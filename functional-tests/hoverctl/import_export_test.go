@@ -85,7 +85,6 @@ var _ = Describe("When I use hoverctl", func() {
 
 		AfterEach(func() {
 			hoverfly.Stop()
-			functional_tests.Run(hoverctlBinary, "targets", "delete", "-t", "default")
 		})
 
 		Describe("Managing Hoverflies data using the CLI", func() {
