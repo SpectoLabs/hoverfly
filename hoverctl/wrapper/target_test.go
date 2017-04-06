@@ -9,7 +9,7 @@ import (
 func Test_NewTarget_ReturnsDefaultWithEmptyStrings(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(NewTarget("", "", "", "")).To(Equal(&Target{
+	Expect(NewTarget("", "", 0, 0)).To(Equal(&Target{
 		Name:      "default",
 		Host:      "localhost",
 		AdminPort: 8888,
@@ -20,7 +20,7 @@ func Test_NewTarget_ReturnsDefaultWithEmptyStrings(t *testing.T) {
 func Test_NewTarget_OverridesNamefNotEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(NewTarget("notdefault", "", "", "")).To(Equal(&Target{
+	Expect(NewTarget("notdefault", "", 0, 0)).To(Equal(&Target{
 		Name:      "notdefault",
 		Host:      "localhost",
 		AdminPort: 8888,
@@ -31,7 +31,7 @@ func Test_NewTarget_OverridesNamefNotEmpty(t *testing.T) {
 func Test_NewTarget_OverridesHostfNotEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(NewTarget("", "notlocalhost", "", "")).To(Equal(&Target{
+	Expect(NewTarget("", "notlocalhost", 0, 0)).To(Equal(&Target{
 		Name:      "default",
 		Host:      "notlocalhost",
 		AdminPort: 8888,
@@ -42,7 +42,7 @@ func Test_NewTarget_OverridesHostfNotEmpty(t *testing.T) {
 func Test_NewTarget_OverridesAdminPortfNotEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(NewTarget("", "", "1234", "")).To(Equal(&Target{
+	Expect(NewTarget("", "", 1234, 0)).To(Equal(&Target{
 		Name:      "default",
 		Host:      "localhost",
 		AdminPort: 1234,
@@ -50,33 +50,15 @@ func Test_NewTarget_OverridesAdminPortfNotEmpty(t *testing.T) {
 	}))
 }
 
-func Test_NewTarget_ErrorsIfAdminPortIsNotANumber(t *testing.T) {
-	RegisterTestingT(t)
-
-	_, err := NewTarget("", "", "notanumber", "")
-
-	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("The admin port provided was not a number"))
-}
-
 func Test_NewTarget_OverridesProxyPortfNotEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(NewTarget("", "", "", "8765")).To(Equal(&Target{
+	Expect(NewTarget("", "", 0, 8765)).To(Equal(&Target{
 		Name:      "default",
 		Host:      "localhost",
 		AdminPort: 8888,
 		ProxyPort: 8765,
 	}))
-}
-
-func Test_NewTarget_ErrorsIfProxyPortIsNotANumber(t *testing.T) {
-	RegisterTestingT(t)
-
-	_, err := NewTarget("", "", "", "notanumber")
-
-	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("The proxy port provided was not a number"))
 }
 
 func Test_getTargetsFromConfig_host(t *testing.T) {
