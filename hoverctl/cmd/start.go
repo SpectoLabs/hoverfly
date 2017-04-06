@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
@@ -30,6 +31,22 @@ port and proxy port.
 			handleIfError(err)
 		}
 
+		if adminPort != "" {
+			adminPort, err := strconv.Atoi(adminPort)
+			if err != nil {
+				handleIfError(fmt.Errorf("Admin port is not a number"))
+			}
+			target.AdminPort = adminPort
+		}
+
+		if proxyPort != "" {
+			proxyPort, err := strconv.Atoi(proxyPort)
+			if err != nil {
+				handleIfError(fmt.Errorf("Proxy port is not a number"))
+			}
+			target.ProxyPort = proxyPort
+		}
+
 		target.Webserver = len(args) > 0
 		target.CachePath = cachePathFlag
 		target.DisableCache = cacheDisable
@@ -39,20 +56,20 @@ port and proxy port.
 		target.DisableTls = disableTls
 
 		target.UpstreamProxyUrl = upstreamProxy
-
+		fmt.Println(target)
 		err := wrapper.Start(target, hoverflyDirectory)
 		handleIfError(err)
 
 		data := [][]string{
-			[]string{"admin-port", config.HoverflyAdminPort},
+			[]string{"admin-port", strconv.Itoa(target.AdminPort)},
 		}
 
 		if target.Webserver {
 			fmt.Println("Hoverfly is now running as a webserver")
-			data = append(data, []string{"webserver-port", config.HoverflyProxyPort})
+			data = append(data, []string{"webserver-port", strconv.Itoa(target.ProxyPort)})
 		} else {
 			fmt.Println("Hoverfly is now running")
-			data = append(data, []string{"proxy-port", config.HoverflyProxyPort})
+			data = append(data, []string{"proxy-port", strconv.Itoa(target.ProxyPort)})
 		}
 
 		drawTable(data, false)
