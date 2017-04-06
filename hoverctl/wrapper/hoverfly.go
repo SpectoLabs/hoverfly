@@ -64,29 +64,6 @@ type ErrorSchema struct {
 	ErrorMessage string `json:"error"`
 }
 
-type Hoverfly struct {
-	Host       string
-	AdminPort  string
-	ProxyPort  string
-	Username   string
-	Password   string
-	authToken  string
-	config     Config
-	httpClient *http.Client
-}
-
-func NewHoverfly(config Config) Hoverfly {
-	return Hoverfly{
-		Host:       config.HoverflyHost,
-		AdminPort:  config.HoverflyAdminPort,
-		ProxyPort:  config.HoverflyProxyPort,
-		Username:   config.HoverflyUsername,
-		Password:   config.HoverflyPassword,
-		config:     config,
-		httpClient: http.DefaultClient,
-	}
-}
-
 // Wipe will call the records endpoint in Hoverfly with a DELETE request, triggering Hoverfly to wipe the database
 func DeleteSimulations(target Target) error {
 	response, err := doRequest(target, "DELETE", v2ApiSimulation, "")
@@ -351,7 +328,7 @@ func isLocal(url string) bool {
 This isn't working as intended, its working, just not how I imagined it.
 */
 
-func (h *Hoverfly) runBinary(target *Target, path string, hoverflyDirectory HoverflyDirectory) (*exec.Cmd, error) {
+func runBinary(target *Target, path string, hoverflyDirectory HoverflyDirectory) (*exec.Cmd, error) {
 	flags := target.BuildFlags()
 
 	cmd := exec.Command(path, flags...)
@@ -375,7 +352,7 @@ func (h *Hoverfly) runBinary(target *Target, path string, hoverflyDirectory Hove
 	return cmd, nil
 }
 
-func (h *Hoverfly) Start(target *Target, hoverflyDirectory HoverflyDirectory) error {
+func Start(target *Target, hoverflyDirectory HoverflyDirectory) error {
 
 	if !isLocal(target.Host) {
 		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
@@ -400,9 +377,9 @@ func (h *Hoverfly) Start(target *Target, hoverflyDirectory HoverflyDirectory) er
 		return errors.New("Could not start Hoverfly")
 	}
 
-	cmd, err := h.runBinary(target, binaryLocation+"/hoverfly", hoverflyDirectory)
+	cmd, err := runBinary(target, binaryLocation+"/hoverfly", hoverflyDirectory)
 	if err != nil {
-		cmd, err = h.runBinary(target, "hoverfly", hoverflyDirectory)
+		cmd, err = runBinary(target, "hoverfly", hoverflyDirectory)
 		if err != nil {
 			return errors.New("Could not start Hoverfly")
 		}
@@ -420,7 +397,7 @@ func (h *Hoverfly) Start(target *Target, hoverflyDirectory HoverflyDirectory) er
 			}
 			return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: %v", statusCode))
 		case <-tick:
-			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/mode", h.AdminPort))
+			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/mode", target.AdminPort))
 			if err == nil {
 				statusCode = resp.StatusCode
 			} else {
