@@ -86,17 +86,6 @@ func initConfig() {
 	wrapper.SetConfigurationPaths()
 
 	config = wrapper.GetConfig()
-	config = config.SetHost(host)
-	config = config.SetAdminPort(adminPort)
-	config = config.SetProxyPort(proxyPort)
-	config = config.SetUsername("")
-	config = config.SetPassword("")
-	config = config.SetCertificate(certificate)
-	config = config.SetKey(key)
-	config = config.DisableTls(disableTls)
-	config = config.SetDbType(database)
-	config = config.SetUpstreamProxy(upstreamProxy)
-	config = config.DisableCache(cacheDisable)
 
 	target = config.GetTarget(targetName)
 	if verbose && target != nil {
