@@ -28,7 +28,6 @@ var _ = Describe("hoverctl login", func() {
 
 		AfterEach(func() {
 			hoverfly.Stop()
-			functional_tests.Run(hoverctlBinary, "targets", "delete", "-f", "--target", "default")
 		})
 
 		It("should log you in successfully with correct credentials", func() {
@@ -76,7 +75,6 @@ var _ = Describe("hoverctl login", func() {
 
 		AfterEach(func() {
 			hoverfly.Stop()
-			functional_tests.Run(hoverctlBinary, "targets", "delete", "--target", "no-auth")
 		})
 
 		It("should error when getting the mode", func() {

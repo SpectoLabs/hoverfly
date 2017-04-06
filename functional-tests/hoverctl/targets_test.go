@@ -24,10 +24,6 @@ var _ = Describe("When using the `targets` command", func() {
 				functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", "1234", "--proxy-port", "8765", "--host", "localhost")
 			})
 
-			AfterEach(func() {
-				functional_tests.Run(hoverctlBinary, "targets", "delete", "--target", "default")
-			})
-
 			It("print targets", func() {
 				output := functional_tests.Run(hoverctlBinary, "targets")
 
@@ -87,10 +83,6 @@ var _ = Describe("When using the `targets` command", func() {
 
 		BeforeEach(func() {
 			functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", "1234")
-		})
-
-		AfterEach(func() {
-			functional_tests.Run(hoverctlBinary, "targets", "delete", "--target", "default")
 		})
 
 		It("should delete targets and print nice empty message", func() {

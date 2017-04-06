@@ -28,8 +28,6 @@ var _ = Describe("When I use hoverctl", func() {
 
 	AfterEach(func() {
 		functional_tests.Run(hoverctlBinary, "stop")
-		functional_tests.Run(hoverctlBinary, "targets", "delete", "-t", "default", "-f")
-		functional_tests.Run(hoverctlBinary, "targets", "delete", "-t", "incorrect", "-f")
 	})
 
 	Context("I can get the logs using the log command", func() {
