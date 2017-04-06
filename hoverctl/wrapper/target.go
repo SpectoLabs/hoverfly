@@ -13,12 +13,14 @@ type Target struct {
 	AuthToken string `yaml:"auth.token"`
 	Pid       int    `yaml:"pid"`
 
-	Webserver bool
-	CachePath string
+	Webserver    bool
+	CachePath    string
+	DisableCache bool
 
-	CertificatePath  string
-	KeyPath          string
-	DisableTls       bool
+	CertificatePath string
+	KeyPath         string
+	DisableTls      bool
+
 	UpstreamProxyUrl string
 }
 
@@ -96,4 +98,46 @@ func getTargetsFromConfig(configTargets map[string]interface{}) map[string]Targe
 	}
 
 	return targets
+}
+
+func (this Target) BuildFlags() Flags {
+	flags := Flags{}
+
+	if this.AdminPort != 0 {
+		flags = append(flags, "-ap="+strconv.Itoa(this.AdminPort))
+	}
+
+	if this.ProxyPort != 0 {
+		flags = append(flags, "-pp="+strconv.Itoa(this.ProxyPort))
+	}
+
+	if this.Webserver {
+		flags = append(flags, "-webserver")
+	}
+
+	if this.CachePath != "" {
+		flags = append(flags, "-db=boltdb", "-db-path="+this.CachePath)
+	}
+
+	if this.DisableCache {
+		flags = append(flags, "-disable-cache")
+	}
+
+	if this.CertificatePath != "" {
+		flags = append(flags, "-cert="+this.CertificatePath)
+	}
+
+	if this.KeyPath != "" {
+		flags = append(flags, "-key="+this.KeyPath)
+	}
+
+	if this.DisableTls {
+		flags = append(flags, "-tls-verification=false")
+	}
+
+	if this.UpstreamProxyUrl != "" {
+		flags = append(flags, "-upstream-proxy="+this.UpstreamProxyUrl)
+	}
+
+	return flags
 }

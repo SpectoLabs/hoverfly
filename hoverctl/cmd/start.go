@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var cachePathFlag string
+
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start Hoverfly",
@@ -21,16 +23,22 @@ The "pid" file name is composed of the Hoverfly admin
 port and proxy port.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 0 {
-			config.SetWebserver(args[0])
-			hoverfly = wrapper.NewHoverfly(*config)
-		}
 
 		if target == nil {
 			var err error
 			target, err = wrapper.NewTarget(targetName, host, adminPort, proxyPort)
 			handleIfError(err)
 		}
+
+		target.Webserver = len(args) > 0
+		target.CachePath = cachePathFlag
+		target.DisableCache = cacheDisable
+
+		target.CertificatePath = certificate
+		target.KeyPath = key
+		target.DisableTls = disableTls
+
+		target.UpstreamProxyUrl = upstreamProxy
 
 		err := hoverfly.Start(target, hoverflyDirectory)
 		handleIfError(err)
@@ -39,7 +47,7 @@ port and proxy port.
 			[]string{"admin-port", config.HoverflyAdminPort},
 		}
 
-		if config.HoverflyWebserver {
+		if target.Webserver {
 			fmt.Println("Hoverfly is now running as a webserver")
 			data = append(data, []string{"webserver-port", config.HoverflyProxyPort})
 		} else {
@@ -56,4 +64,5 @@ port and proxy port.
 
 func init() {
 	RootCmd.AddCommand(startCmd)
+	startCmd.Flags().StringVar(&cachePathFlag, "cache-path", "", "Something")
 }
