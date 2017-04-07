@@ -28,6 +28,8 @@ configuration will be shown.
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
+		checkTargetAndExit(target)
+
 		var middleware v2.MiddlewareView
 		var err error
 

@@ -171,4 +171,13 @@ var _ = Describe("hoverctl login", func() {
 			Expect(output).To(ContainSubstring("Hoverfly middleware configuration is currently set to"))
 		})
 	})
+
+	Context("with a target that doesn't exist", func() {
+		It("should error", func() {
+			output := functional_tests.Run(hoverctlBinary, "login", "--target", "test-target")
+
+			Expect(output).To(ContainSubstring("test-target is not a target"))
+			Expect(output).To(ContainSubstring("Run `hoverctl targets new test-target`"))
+		})
+	})
 })
