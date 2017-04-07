@@ -21,6 +21,12 @@ Login to Hoverfly"
 	Run: func(cmd *cobra.Command, args []string) {
 		checkTargetAndExit(target)
 
+		newTargetFlag, _ := cmd.Flags().GetString("new-target")
+
+		if newTargetFlag != "" {
+			target = wrapper.NewTarget(newTargetFlag, hostFlag, adminPortFlag, proxyPortFlag)
+		}
+
 		if username == "" {
 			username = askForInput("Username", false)
 		}
@@ -55,4 +61,5 @@ func init() {
 
 	loginCmd.Flags().StringVar(&username, "username", "", "Username to login to Hoverfly")
 	loginCmd.Flags().StringVar(&password, "password", "", "Password to login to Hoverfly")
+	loginCmd.Flags().String("new-target", "", "?")
 }
