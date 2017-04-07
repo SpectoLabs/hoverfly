@@ -39,14 +39,14 @@ port and proxy port.
 		}
 
 		target.Webserver = len(args) > 0
-		target.CachePath = cachePathFlag
-		target.DisableCache = disableCacheFlag
+		target.CachePath, _ = cmd.Flags().GetString("cache")
+		target.DisableCache, _ = cmd.Flags().GetBool("disable-cache")
 
-		target.CertificatePath = certificatePathFlag
-		target.KeyPath = keyPathFlag
-		target.DisableTls = disableTlsFlag
+		target.CertificatePath, _ = cmd.Flags().GetString("certificate")
+		target.KeyPath, _ = cmd.Flags().GetString("key")
+		target.DisableTls, _ = cmd.Flags().GetBool("disable-tls")
 
-		target.UpstreamProxyUrl = upstreamProxyUrlFlag
+		target.UpstreamProxyUrl, _ = cmd.Flags().GetString("upstream-proxy")
 
 		err := wrapper.Start(target, hoverflyDirectory)
 		handleIfError(err)
@@ -73,4 +73,11 @@ port and proxy port.
 func init() {
 	RootCmd.AddCommand(startCmd)
 	startCmd.Flags().String("new-target", "", "?")
+
+	startCmd.Flags().String("cache", "", "A path to a persisted Hoverfly cache. If the cache doesn't exist, Hoverfly will create it")
+	startCmd.Flags().Bool("disable-cache", false, "?")
+	startCmd.Flags().String("certificate", "", "A path to a certificate file. Overrides the default Hoverfly certificate")
+	startCmd.Flags().String("key", "", "A path to a key file. Overrides the default Hoverfly TLS key")
+	startCmd.Flags().Bool("disable-tls", false, "Disables TLS verification")
+	startCmd.Flags().String("upstream-proxy", "", "A host for which Hoverfly will proxy its requests to")
 }
