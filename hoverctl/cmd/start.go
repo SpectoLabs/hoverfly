@@ -24,9 +24,7 @@ port and proxy port.
 	Run: func(cmd *cobra.Command, args []string) {
 
 		if target == nil {
-			var err error
-			target, err = wrapper.NewTarget(targetNameFlag, hostFlag, adminPortFlag, proxyPortFlag)
-			handleIfError(err)
+			target = wrapper.NewTarget(targetNameFlag, hostFlag, adminPortFlag, proxyPortFlag)
 		}
 
 		if adminPortFlag != 0 {
