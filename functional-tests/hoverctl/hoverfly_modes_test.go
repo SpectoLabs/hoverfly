@@ -233,4 +233,13 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			})
 		})
 	})
+
+	Context("with a target that doesn't exist", func() {
+		It("should error", func() {
+			output := functional_tests.Run(hoverctlBinary, "mode", "--target", "test-target")
+
+			Expect(output).To(ContainSubstring("test-target is not a target"))
+			Expect(output).To(ContainSubstring("Run `hoverctl targets new test-target`"))
+		})
+	})
 })

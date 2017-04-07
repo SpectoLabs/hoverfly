@@ -117,12 +117,11 @@ func checkArgAndExit(args []string, message, command string) {
 	}
 }
 
-// func checkTarget(target *wrapper.Target) {
-// 	if target == nil {
-// 		handleIfError(fmt.Errorf("%v is not a target\n\nRun `hoverctl targets new %v`", targetNameFlag))
-// 	}
-
-// }
+func checkTargetAndExit(target *wrapper.Target) {
+	if target == nil {
+		handleIfError(fmt.Errorf("%[1]s is not a target\n\nRun `hoverctl targets new %[1]s`", targetNameFlag))
+	}
+}
 
 func askForConfirmation(message string) bool {
 	if force {
