@@ -92,6 +92,7 @@ func initConfig() {
 	if targetNameFlag == "" && target == nil {
 		target = wrapper.NewDefaultTarget()
 	}
+
 	if verbose && target != nil {
 		fmt.Println("Current target: " + target.Name + "\n")
 	}
@@ -115,6 +116,13 @@ func checkArgAndExit(args []string, message, command string) {
 		os.Exit(1)
 	}
 }
+
+// func checkTarget(target *wrapper.Target) {
+// 	if target == nil {
+// 		handleIfError(fmt.Errorf("%v is not a target\n\nRun `hoverctl targets new %v`", targetNameFlag))
+// 	}
+
+// }
 
 func askForConfirmation(message string) bool {
 	if force {

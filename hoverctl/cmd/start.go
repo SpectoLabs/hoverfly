@@ -23,8 +23,10 @@ port and proxy port.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if target == nil {
-			target = wrapper.NewTarget(targetNameFlag, hostFlag, adminPortFlag, proxyPortFlag)
+		newTargetFlag, _ := cmd.Flags().GetString("new-target")
+
+		if newTargetFlag != "" {
+			target = wrapper.NewTarget(newTargetFlag, hostFlag, adminPortFlag, proxyPortFlag)
 		}
 
 		if adminPortFlag != 0 {
@@ -69,4 +71,5 @@ port and proxy port.
 
 func init() {
 	RootCmd.AddCommand(startCmd)
+	startCmd.Flags().String("new-target", "", "?")
 }

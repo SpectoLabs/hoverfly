@@ -47,7 +47,7 @@ var _ = Describe("hoverctl `start`", func() {
 		})
 	})
 
-	Context("without a target, but providing configuration flags", func() {
+	Context("with default target, but providing configuration flags", func() {
 		It("should start an instance of hoverfly setting the admin port based on the flag", func() {
 			randomAdminPort := strconv.Itoa(freeport.GetPort())
 
@@ -83,25 +83,6 @@ var _ = Describe("hoverctl `start`", func() {
 
 			Expect(output).To(ContainSubstring("proxy-port"))
 			Expect(output).To(ContainSubstring(randomProxyPort))
-		})
-
-		It("should create a target using the flags to configure the target", func() {
-			randomAdminPort := strconv.Itoa(freeport.GetPort())
-			randomProxyPort := strconv.Itoa(freeport.GetPort())
-
-			functional_tests.Run(hoverctlBinary, "start",
-				"--target", "notdefault",
-				"--admin-port", randomAdminPort,
-				"--proxy-port", randomProxyPort,
-			)
-
-			output := functional_tests.Run(hoverctlBinary, "targets")
-
-			targets := functional_tests.TableToSliceMapStringString(output)
-			Expect(targets).To(HaveKey("notdefault"))
-			Expect(targets["notdefault"]).To(HaveKeyWithValue("TARGET NAME", "notdefault"))
-			Expect(targets["notdefault"]).To(HaveKeyWithValue("ADMIN PORT", randomAdminPort))
-			Expect(targets["notdefault"]).To(HaveKeyWithValue("PROXY PORT", randomProxyPort))
 		})
 
 		It("should start an instance of hoverfly as a webserver", func() {
@@ -209,9 +190,40 @@ var _ = Describe("hoverctl `start`", func() {
 		})
 	})
 
+	// Context("with a target that doesn't exist", func() {
+	// 	It("should error", func() {
+	// 		output := functional_tests.Run(hoverctlBinary, "start", "--target", "test-target")
+
+	// 		Expect(output).To(ContainSubstring("test-target is not a target"))
+	// 		Expect(output).To(ContainSubstring("Run `hoverctl start --new-target test-target`"))
+	// 	})
+	// })
+
+	Context("with --new-target flag", func() {
+
+		It("should create a target using the flags to configure the target", func() {
+			randomAdminPort := strconv.Itoa(freeport.GetPort())
+			randomProxyPort := strconv.Itoa(freeport.GetPort())
+
+			functional_tests.Run(hoverctlBinary, "start",
+				"--new-target", "notdefault",
+				"--admin-port", randomAdminPort,
+				"--proxy-port", randomProxyPort,
+			)
+
+			output := functional_tests.Run(hoverctlBinary, "targets")
+
+			targets := functional_tests.TableToSliceMapStringString(output)
+			Expect(targets).To(HaveKey("notdefault"))
+			Expect(targets["notdefault"]).To(HaveKeyWithValue("TARGET NAME", "notdefault"))
+			Expect(targets["notdefault"]).To(HaveKeyWithValue("ADMIN PORT", randomAdminPort))
+			Expect(targets["notdefault"]).To(HaveKeyWithValue("PROXY PORT", randomProxyPort))
+		})
+	})
+
 	Context("with a target that has already been started", func() {
 		BeforeEach(func() {
-			functional_tests.Run(hoverctlBinary, "start", "-t", "started")
+			functional_tests.Run(hoverctlBinary, "start", "--new-target", "started")
 		})
 
 		It("should error", func() {
@@ -223,7 +235,7 @@ var _ = Describe("hoverctl `start`", func() {
 
 	Context("with port conflicts", func() {
 		BeforeEach(func() {
-			functional_tests.Run(hoverctlBinary, "start", "-t", "admin-conflict")
+			functional_tests.Run(hoverctlBinary, "start", "--new-target", "admin-conflict")
 		})
 
 		It("errors when the admin port is the same", func() {
