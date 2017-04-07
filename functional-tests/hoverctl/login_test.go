@@ -55,12 +55,11 @@ var _ = Describe("hoverctl login", func() {
 		})
 	})
 
-	Context("logging into Hoverfly with no targets", func() {
-		It("should error nicely if there are no targets", func() {
-			functional_tests.Run(hoverctlBinary, "targets", "delete", "-f", "--target", "default")
+	Context("logging into Hoverfly with hoverfly running", func() {
+		It("should error nicely if it cannot connect", func() {
 			output := functional_tests.Run(hoverctlBinary, "login", "--username", username, "--password", password)
 
-			Expect(output).To(ContainSubstring("Cannot login without a target"))
+			Expect(output).To(ContainSubstring("Failed to login to Hoverfly"))
 		})
 	})
 
