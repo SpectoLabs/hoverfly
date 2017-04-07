@@ -14,14 +14,6 @@ var _ = Describe("hoverctl `stop`", func() {
 		hoverfly = functional_tests.NewHoverfly()
 	)
 
-	Context("without a target", func() {
-		It("should return an error", func() {
-			output := functional_tests.Run(hoverctlBinary, "stop")
-
-			Expect(output).To(ContainSubstring("Cannot stop an instance of Hoverfly without a target"))
-		})
-	})
-
 	Context("without a running instance of Hoverfly", func() {
 		BeforeEach(func() {
 			functional_tests.Run(hoverctlBinary, "targets", "create", "-t", "default")

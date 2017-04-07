@@ -23,8 +23,6 @@ This command will flush this cache regardless of mode.
 	`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		checkTargetAndExit(target, "Cannot flush cache without a target")
-
 		if !askForConfirmation("Are you sure you want to flush the cache?") {
 			return
 		}
