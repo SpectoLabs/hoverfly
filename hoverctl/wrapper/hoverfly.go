@@ -441,7 +441,7 @@ func doRequest(target Target, method, url, body string) (*http.Response, error) 
 
 	request, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Could not connect to Hoverfly at %v:%v", target.Host, target.AdminPort)
 	}
 
 	if target.AuthToken != "" {
@@ -450,7 +450,7 @@ func doRequest(target Target, method, url, body string) (*http.Response, error) 
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Could not connect to Hoverfly at %v:%v", target.Host, target.AdminPort)
 	}
 
 	if response.StatusCode == 401 {

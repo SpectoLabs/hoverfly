@@ -89,6 +89,9 @@ func initConfig() {
 	config = wrapper.GetConfig()
 
 	target = config.GetTarget(targetNameFlag)
+	if targetNameFlag == "" && target == nil {
+		target = wrapper.NewDefaultTarget()
+	}
 	if verbose && target != nil {
 		fmt.Println("Current target: " + target.Name + "\n")
 	}
@@ -109,13 +112,6 @@ func checkArgAndExit(args []string, message, command string) {
 	if len(args) == 0 {
 		fmt.Fprintln(os.Stderr, message)
 		fmt.Fprintln(os.Stderr, "\nTry hoverctl "+command+" --help for more information")
-		os.Exit(1)
-	}
-}
-
-func checkTargetAndExit(target *wrapper.Target, error string) {
-	if target == nil {
-		fmt.Fprintln(os.Stderr, error)
 		os.Exit(1)
 	}
 }
