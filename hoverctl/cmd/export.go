@@ -16,6 +16,8 @@ will be written to the file path provided.
 	`,
 
 	Run: func(cmd *cobra.Command, args []string) {
+		checkTargetAndExit(target)
+
 		checkArgAndExit(args, "You have not provided a path to simulation", "export")
 
 		simulationData, err := wrapper.ExportSimulation(*target)

@@ -15,6 +15,8 @@ Deletes simulation data from the Hoverfly instance.
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
+		checkTargetAndExit(target)
+
 		if !askForConfirmation("Are you sure you want to delete the current simulation?") {
 			return
 		}

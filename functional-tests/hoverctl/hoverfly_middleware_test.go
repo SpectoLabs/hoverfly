@@ -134,4 +134,13 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(ContainSubstring(`Invalid middleware: Could not reach remote middleware`))
 		})
 	})
+
+	Context("with a target that doesn't exist", func() {
+		It("should error", func() {
+			output := functional_tests.Run(hoverctlBinary, "middleware", "--target", "test-target")
+
+			Expect(output).To(ContainSubstring("test-target is not a target"))
+			Expect(output).To(ContainSubstring("Run `hoverctl targets new test-target`"))
+		})
+	})
 })

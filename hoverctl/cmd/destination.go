@@ -29,6 +29,8 @@ setting.
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
+		checkTargetAndExit(target)
+
 		if len(args) == 0 {
 			destination, err := wrapper.GetDestination(*target)
 			handleIfError(err)

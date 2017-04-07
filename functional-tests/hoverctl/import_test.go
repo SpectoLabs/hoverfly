@@ -17,4 +17,13 @@ var _ = Describe("When I import with hoverctl", func() {
 			Expect(output).To(ContainSubstring("Try hoverctl import --help for more information"))
 		})
 	})
+
+	Context("with a target that doesn't exist", func() {
+		It("should error", func() {
+			output := functional_tests.Run(hoverctlBinary, "import", "--target", "test-target")
+
+			Expect(output).To(ContainSubstring("test-target is not a target"))
+			Expect(output).To(ContainSubstring("Run `hoverctl targets new test-target`"))
+		})
+	})
 })
