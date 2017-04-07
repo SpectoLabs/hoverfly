@@ -6,21 +6,21 @@ import (
 
 type Target struct {
 	Name      string
-	Host      string `yaml:"host"`
-	AdminPort int    `yaml:"admin.port"`
-	ProxyPort int    `yaml:"proxy.port"`
-	AuthToken string `yaml:"auth.token"`
-	Pid       int    `yaml:"pid"`
+	Host      string `yaml:"host,omitempty"`
+	AdminPort int    `yaml:"admin.port,omitempty"`
+	ProxyPort int    `yaml:"proxy.port,omitempty"`
+	AuthToken string `yaml:"auth.token,omitempty"`
+	Pid       int    `yaml:"pid,omitempty"`
 
-	Webserver    bool
-	CachePath    string
-	DisableCache bool
+	Webserver    bool   `yaml:",omitempty"`
+	CachePath    string `yaml:",omitempty"`
+	DisableCache bool   `yaml:",omitempty"`
 
-	CertificatePath string
-	KeyPath         string
-	DisableTls      bool
+	CertificatePath string `yaml:",omitempty"`
+	KeyPath         string `yaml:",omitempty"`
+	DisableTls      bool   `yaml:",omitempty"`
 
-	UpstreamProxyUrl string
+	UpstreamProxyUrl string `yaml:",omitempty"`
 }
 
 func NewDefaultTarget() *Target {
