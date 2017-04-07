@@ -19,8 +19,6 @@ is stopped.
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		checkTargetAndExit(target, "Cannot stop an instance of Hoverfly without a target")
-
 		err := wrapper.Stop(target, hoverflyDirectory)
 		handleIfError(err)
 

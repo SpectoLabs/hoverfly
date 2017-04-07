@@ -19,8 +19,6 @@ Login to Hoverfly"
 	`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		checkTargetAndExit(target, "Cannot login without a target")
-
 		if username == "" {
 			username = askForInput("Username", false)
 		}
