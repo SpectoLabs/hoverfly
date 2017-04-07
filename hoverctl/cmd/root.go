@@ -14,12 +14,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var targetNameFlag, hostFlag, certificatePathFlag, keyPathFlag, cachePathFlag, upstreamProxyUrlFlag string
-var disableTlsFlag, disableCacheFlag, verbose bool
-
+var targetNameFlag, hostFlag string
 var adminPortFlag, proxyPortFlag int
 
-var force bool
+var force, verbose bool
 
 var hoverflyDirectory wrapper.HoverflyDirectory
 var config *wrapper.Config
@@ -57,18 +55,6 @@ func init() {
 		"A port number for the Hoverfly proxy. Overrides the default Hoverfly proxy port (8500)")
 	RootCmd.PersistentFlags().StringVar(&hostFlag, "host", "",
 		"A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
-	RootCmd.PersistentFlags().StringVar(&certificatePathFlag, "certificate", "",
-		"A path to a certificate file. Overrides the default Hoverfly certificate")
-	RootCmd.PersistentFlags().StringVar(&keyPathFlag, "key", "",
-		"A path to a key file. Overrides the default Hoverfly TLS key")
-	RootCmd.PersistentFlags().BoolVar(&disableTlsFlag, "disable-tls", false,
-		"Disables TLS verification")
-	RootCmd.PersistentFlags().StringVar(&cachePathFlag, "cache", "",
-		"A path to a persisted Hoverfly cache. If the cache doesn't exist, Hoverfly will create it")
-	RootCmd.PersistentFlags().BoolVar(&disableCacheFlag, "disable-cache", false,
-		"?")
-	RootCmd.PersistentFlags().StringVar(&upstreamProxyUrlFlag, "upstream-proxy", "",
-		"A host for which Hoverfly will proxy its requests to")
 
 	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Verbose logging from hoverctl")
 
