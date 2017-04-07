@@ -63,6 +63,36 @@ var _ = Describe("hoverctl login", func() {
 		})
 	})
 
+	Context("with --new-target flag", func() {
+
+		BeforeEach(func() {
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start("-auth", "-username", username, "-password", password)
+
+		})
+
+		AfterEach(func() {
+			hoverfly.Stop()
+		})
+
+		It("should create a target using the flags to configure the target", func() {
+
+			functional_tests.Run(hoverctlBinary, "login",
+				"--new-target", "notdefault",
+				"--admin-port", hoverfly.GetAdminPort(),
+				"--username", username,
+				"--password", password,
+			)
+
+			output := functional_tests.Run(hoverctlBinary, "targets")
+
+			targets := functional_tests.TableToSliceMapStringString(output)
+			Expect(targets).To(HaveKey("notdefault"))
+			Expect(targets["notdefault"]).To(HaveKeyWithValue("TARGET NAME", "notdefault"))
+			Expect(targets["notdefault"]).To(HaveKeyWithValue("ADMIN PORT", hoverfly.GetAdminPort()))
+		})
+	})
+
 	Context("needing to log in", func() {
 
 		BeforeEach(func() {
