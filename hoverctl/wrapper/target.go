@@ -32,7 +32,7 @@ func NewDefaultTarget() *Target {
 	}
 }
 
-func NewTarget(name, host string, adminPort, proxyPort int) (*Target, error) {
+func NewTarget(name, host string, adminPort, proxyPort int) *Target {
 	target := NewDefaultTarget()
 	if name != "" {
 		target.Name = name
@@ -50,7 +50,7 @@ func NewTarget(name, host string, adminPort, proxyPort int) (*Target, error) {
 		target.ProxyPort = proxyPort
 	}
 
-	return target, nil
+	return target
 }
 
 func getTargetsFromConfig(configTargets map[string]interface{}) map[string]Target {

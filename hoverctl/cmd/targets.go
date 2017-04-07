@@ -68,9 +68,8 @@ Create target"
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		newTarget, err := wrapper.NewTarget(targetNameFlag, hostFlag, adminPortFlag, proxyPortFlag)
+		newTarget := wrapper.NewTarget(targetNameFlag, hostFlag, adminPortFlag, proxyPortFlag)
 		newTarget.Pid = pidFlag
-		handleIfError(err)
 
 		config.NewTarget(*newTarget)
 
