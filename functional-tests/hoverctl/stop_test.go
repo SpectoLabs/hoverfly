@@ -63,4 +63,13 @@ var _ = Describe("hoverctl `stop`", func() {
 			Expect(targets["default"]["PID"]).To(Equal("0"))
 		})
 	})
+
+	Context("with a target that doesn't exist", func() {
+		It("should error", func() {
+			output := functional_tests.Run(hoverctlBinary, "stop", "--target", "test-target")
+
+			Expect(output).To(ContainSubstring("test-target is not a target"))
+			Expect(output).To(ContainSubstring("Run `hoverctl targets new test-target`"))
+		})
+	})
 })

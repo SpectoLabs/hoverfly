@@ -24,6 +24,8 @@ If a mode is not specified, the current Hoverfly
 mode is shown.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		checkTargetAndExit(target)
+
 		if len(args) == 0 {
 			mode, err := wrapper.GetMode(*target)
 			handleIfError(err)

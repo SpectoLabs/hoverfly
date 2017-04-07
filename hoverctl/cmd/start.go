@@ -22,6 +22,7 @@ The "pid" file name is composed of the Hoverfly admin
 port and proxy port.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		checkTargetAndExit(target)
 
 		newTargetFlag, _ := cmd.Flags().GetString("new-target")
 

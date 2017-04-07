@@ -17,4 +17,13 @@ var _ = Describe("When I export with hoverctl", func() {
 			Expect(output).To(ContainSubstring("Try hoverctl export --help for more information"))
 		})
 	})
+
+	Context("with a target that doesn't exist", func() {
+		It("should error", func() {
+			output := functional_tests.Run(hoverctlBinary, "export", "--target", "test-target")
+
+			Expect(output).To(ContainSubstring("test-target is not a target"))
+			Expect(output).To(ContainSubstring("Run `hoverctl targets new test-target`"))
+		})
+	})
 })
