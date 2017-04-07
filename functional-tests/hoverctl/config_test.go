@@ -25,7 +25,6 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(ContainSubstring(`default:`))
 			Expect(output).To(ContainSubstring("name: default"))
 			Expect(output).To(ContainSubstring("host: localhost"))
-			Expect(output).To(ContainSubstring("auth.token: \"\""))
 			Expect(output).To(ContainSubstring("admin.port: 8888"))
 			Expect(output).To(ContainSubstring("proxy.port: 8500"))
 		})
