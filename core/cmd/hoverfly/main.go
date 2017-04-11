@@ -70,11 +70,12 @@ var (
 	destination = flag.String("destination", ".", "destination URI to catch")
 	webserver   = flag.Bool("webserver", false, "start Hoverfly in webserver mode (simulate mode)")
 
-	addNew      = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
-	addUser     = flag.String("username", "", "username for new user")
-	addPassword = flag.String("password", "", "password for new user")
-	isAdmin     = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
-	authEnabled = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
+	addNew          = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
+	addUser         = flag.String("username", "", "username for new user")
+	addPassword     = flag.String("password", "", "password for new user")
+	addPasswordHash = flag.String("password-hash", "", "password hash for new user instead of password")
+	isAdmin         = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
+	authEnabled     = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
 
 	generateCA = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
 	certName   = flag.String("cert-name", "hoverfly.proxy", "cert name")
@@ -285,7 +286,12 @@ func main() {
 
 	// if add new user supplied - adding it to database
 	if *addNew || *authEnabled {
-		err := hoverfly.Authentication.AddUser(*addUser, *addPassword, *isAdmin)
+		var err error
+		if *addPasswordHash != "" {
+			err = hoverfly.Authentication.AddUserHashedPassword(*addUser, *addPasswordHash, *isAdmin)
+		} else {
+			err = hoverfly.Authentication.AddUser(*addUser, *addPassword, *isAdmin)
+		}
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error":    err.Error(),

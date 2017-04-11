@@ -42,6 +42,7 @@ func DecodeUser(user []byte) (*User, error) {
 // Authentication - generic interface for authentication backend
 type Authentication interface {
 	AddUser(username, password string, admin bool) (err error)
+	AddUserHashedPassword(username, passwordHash string, admin bool) (err error)
 	GetUser(username string) (user *User, err error)
 	GetAllUsers() (users []User, err error)
 	InvalidateToken(token string) (err error)
@@ -75,6 +76,23 @@ func (b *CacheAuthBackend) AddUser(username, password string, admin bool) error 
 		UUID:     uuid.New(),
 		Username: username,
 		Password: string(hashedPassword),
+		IsAdmin:  admin,
+	}
+	userBytes, err := user.Encode()
+	if err != nil {
+		logUserError(err, username)
+		return err
+	}
+	err = b.userCache.Set([]byte(username), userBytes)
+	return err
+}
+
+// AddUserHashedPassword - adds user with provided username, hashed password and admin parameters
+func (b *CacheAuthBackend) AddUserHashedPassword(username, hashedPassword string, admin bool) error {
+	user := User{
+		UUID:     uuid.New(),
+		Username: username,
+		Password: hashedPassword,
 		IsAdmin:  admin,
 	}
 	userBytes, err := user.Encode()
