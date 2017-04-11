@@ -2,6 +2,8 @@ package wrapper
 
 import (
 	"strconv"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Target struct {
@@ -21,6 +23,10 @@ type Target struct {
 	DisableTls      bool   `yaml:",omitempty"`
 
 	UpstreamProxyUrl string `yaml:",omitempty"`
+
+	AuthEnabled bool
+	Username    string
+	Password    string
 }
 
 func NewDefaultTarget() *Target {
@@ -126,6 +132,11 @@ func (this Target) BuildFlags() Flags {
 
 	if this.UpstreamProxyUrl != "" {
 		flags = append(flags, "-upstream-proxy="+this.UpstreamProxyUrl)
+	}
+
+	if this.AuthEnabled {
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(this.Password), 10)
+		flags = append(flags, "-auth", "-username", this.Username, "-password-hash", string(hashedPassword))
 	}
 
 	return flags

@@ -397,7 +397,7 @@ func Start(target *Target, hoverflyDirectory HoverflyDirectory) error {
 			}
 			return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: %v", statusCode))
 		case <-tick:
-			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/mode", target.AdminPort))
+			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/health", target.AdminPort))
 			if err == nil {
 				statusCode = resp.StatusCode
 			} else {
