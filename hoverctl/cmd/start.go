@@ -48,6 +48,23 @@ port and proxy port.
 
 		target.UpstreamProxyUrl, _ = cmd.Flags().GetString("upstream-proxy")
 
+		if enableAuth, _ := cmd.Flags().GetBool("auth"); enableAuth {
+			username, _ := cmd.Flags().GetString("username")
+			password, _ := cmd.Flags().GetString("password")
+
+			if username == "" {
+				username = askForInput("Username", false)
+			}
+			if password == "" {
+				password = askForInput("Password", true)
+				fmt.Println("")
+			}
+
+			target.AuthEnabled = true
+			target.Username = username
+			target.Password = password
+		}
+
 		err := wrapper.Start(target, hoverflyDirectory)
 		handleIfError(err)
 
@@ -80,4 +97,8 @@ func init() {
 	startCmd.Flags().String("key", "", "A path to a key file. Overrides the default Hoverfly TLS key")
 	startCmd.Flags().Bool("disable-tls", false, "Disables TLS verification")
 	startCmd.Flags().String("upstream-proxy", "", "A host for which Hoverfly will proxy its requests to")
+
+	startCmd.Flags().Bool("auth", false, "Enable authenticiation on Hoverfly")
+	startCmd.Flags().String("username", "", "Username to authenticate Hoverfly")
+	startCmd.Flags().String("password", "", "Password to authenticate Hoverfly")
 }

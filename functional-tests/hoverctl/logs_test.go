@@ -77,7 +77,7 @@ var _ = Describe("When I use hoverctl", func() {
 				file, err := ioutil.ReadFile(filePath)
 				Expect(err).To(BeNil())
 
-				Expect(string(file)).To(ContainSubstring("Started GET /api/v2/hoverfly/mode"))
+				Expect(string(file)).To(ContainSubstring("Started GET /api/health"))
 			})
 
 			It("and the stderr is captured in the log file", func() {
