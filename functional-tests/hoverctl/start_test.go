@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"strconv"
 
+	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -151,6 +152,22 @@ var _ = Describe("hoverctl `start`", func() {
 			Expect(response.StatusCode).To(Equal(200))
 
 			Expect(ioutil.ReadAll(response.Body)).To(ContainSubstring(`"upstream-proxy":"http://hoverfly.io:8080"`))
+		})
+
+		It("should start hoverfly with authentication", func() {
+			output := functional_tests.Run(hoverctlBinary, "start", "--auth", "--username", "benji", "--password", "securepassword")
+
+			Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+			response := functional_tests.DoRequest(sling.New().Get("http://localhost:8888/api/v2/hoverfly"))
+			Expect(response.StatusCode).To(Equal(401))
+
+			response = functional_tests.DoRequest(sling.New().Post("http://localhost:8888/api/token-auth").BodyJSON(backends.User{
+				Username: "benji",
+				Password: "securepassword",
+			}))
+
+			Expect(response.StatusCode).To(Equal(200))
 		})
 	})
 

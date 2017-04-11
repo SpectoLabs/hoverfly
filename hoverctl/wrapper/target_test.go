@@ -224,6 +224,23 @@ func Test_Target_BuildFlags_UpstreamProxySetsUpstreamProxyFlag(t *testing.T) {
 	Expect(unit.BuildFlags()[0]).To(Equal("-upstream-proxy=hoverfly.io:8080"))
 }
 
+func Test_Target_BuildFlags_IfAuthEnabledThenIncludesUsernameAndPassword(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Target{
+		AuthEnabled: true,
+		Username:    "benji",
+		Password:    "password",
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(5))
+	Expect(unit.BuildFlags()[0]).To(Equal("-auth"))
+	Expect(unit.BuildFlags()[1]).To(Equal("-username"))
+	Expect(unit.BuildFlags()[2]).To(Equal("benji"))
+	Expect(unit.BuildFlags()[3]).To(Equal("-password-hash"))
+	Expect(unit.BuildFlags()[4]).To(ContainSubstring("$2a$10$"))
+}
+
 func Test_Target_BuildFlags_CacheDisableBuildsCorrectFlagWhenTrue(t *testing.T) {
 	RegisterTestingT(t)
 
