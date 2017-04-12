@@ -15,7 +15,12 @@ var loginCmd = &cobra.Command{
 	Use:   "login",
 	Short: "Login to Hoverfly",
 	Long: `
-Login to Hoverfly"
+Will authenticate against the /api/token-auth API endpoint 
+target Hoverfly instance using the provided username and 
+password.
+
+The generated authentication token is then stored on the
+target in the hoverctl configuration file.
 	`,
 
 	Run: func(cmd *cobra.Command, args []string) {
@@ -59,7 +64,8 @@ Login to Hoverfly"
 func init() {
 	RootCmd.AddCommand(loginCmd)
 
-	loginCmd.Flags().StringVar(&username, "username", "", "Username to login to Hoverfly")
-	loginCmd.Flags().StringVar(&password, "password", "", "Password to login to Hoverfly")
-	loginCmd.Flags().String("new-target", "", "?")
+	loginCmd.Flags().String("new-target", "", "A name for a new target that hoverctl will create and associate the Hoverfly instance to")
+
+	loginCmd.Flags().StringVar(&username, "username", "", "Username to authenticate against Hoverfly with")
+	loginCmd.Flags().StringVar(&password, "password", "", "Password to autenticate against Hoverfly with")
 }
