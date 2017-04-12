@@ -13,13 +13,13 @@ var startCmd = &cobra.Command{
 	Short: "Start Hoverfly",
 	Long: `
 Starts an instance of Hoverfly using the current hoverctl
-configuration.
+target configuration.
 
-The Hoverfly process ID will be written to a "pid" file in the 
-".hoverfly" directory.
+To start an instance of Hoverfly as a webserver, add the 
+argument "webserver" to the start command.
 
-The "pid" file name is composed of the Hoverfly admin
-port and proxy port.
+The Hoverfly process ID is stored against the target in the
+hoverctl configuration file.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		checkTargetAndExit(target)
@@ -30,7 +30,7 @@ port and proxy port.
 
 		if target.Pid != 0 {
 			if _, err := wrapper.GetMode(*target); err == nil {
-				handleIfError(fmt.Errorf("Hoverfly is already running"))
+				handleIfError(fmt.Errorf("Target Hoverfly is already running\n\nRun `hoverctl start --new-target <name>`"))
 			}
 
 			target.Pid = 0
@@ -101,10 +101,10 @@ port and proxy port.
 
 func init() {
 	RootCmd.AddCommand(startCmd)
-	startCmd.Flags().String("new-target", "", "?")
+	startCmd.Flags().String("new-target", "", "A name for a new target that hoverctl will create and associate the Hoverfly instance to")
 
 	startCmd.Flags().String("cache", "", "A path to a persisted Hoverfly cache. If the cache doesn't exist, Hoverfly will create it")
-	startCmd.Flags().Bool("disable-cache", false, "?")
+	startCmd.Flags().Bool("disable-cache", false, "Disables the request response cache on Hoverfly")
 	startCmd.Flags().String("certificate", "", "A path to a certificate file. Overrides the default Hoverfly certificate")
 	startCmd.Flags().String("key", "", "A path to a key file. Overrides the default Hoverfly TLS key")
 	startCmd.Flags().Bool("disable-tls", false, "Disables TLS verification")
