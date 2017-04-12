@@ -17,7 +17,7 @@ import (
 var targetNameFlag, hostFlag string
 var adminPortFlag, proxyPortFlag int
 
-var force, verbose bool
+var force, verbose, setDefaultTargetFlag bool
 
 var hoverflyDirectory wrapper.HoverflyDirectory
 var config *wrapper.Config
@@ -38,6 +38,11 @@ func Execute(hoverctlVersion string) {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
+
+	if setDefaultTargetFlag && targetNameFlag != "" {
+		config.DefaultTarget = targetNameFlag
+	}
+	handleIfError(config.WriteToFile(hoverflyDirectory))
 }
 
 func init() {
@@ -49,6 +54,9 @@ func init() {
 
 	RootCmd.PersistentFlags().StringVar(&targetNameFlag, "target", "",
 		"A name for an instance of Hoverfly you are trying to communicate with. Overrides the default target (default)")
+	RootCmd.PersistentFlags().BoolVar(&setDefaultTargetFlag, "set-default", false,
+		"Sets the current target as the default target for hoverctl")
+
 	RootCmd.PersistentFlags().IntVar(&adminPortFlag, "admin-port", 0,
 		"A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
 	RootCmd.PersistentFlags().IntVar(&proxyPortFlag, "proxy-port", 0,

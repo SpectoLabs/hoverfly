@@ -12,7 +12,8 @@ import (
 type Flags []string
 
 type Config struct {
-	Targets map[string]Target `yaml:"targets"`
+	DefaultTarget string            `yaml:"default"`
+	Targets       map[string]Target `yaml:"targets"`
 }
 
 func GetConfig() *Config {
@@ -22,13 +23,14 @@ func GetConfig() *Config {
 	}
 
 	return &Config{
-		Targets: getTargetsFromConfig(viper.GetStringMap("targets")),
+		DefaultTarget: viper.GetString("default"),
+		Targets:       getTargetsFromConfig(viper.GetStringMap("targets")),
 	}
 }
 
 func (this *Config) GetTarget(targetName string) *Target {
 	if targetName == "" {
-		targetName = "default"
+		targetName = this.DefaultTarget
 	}
 
 	for key, target := range this.Targets {
@@ -86,5 +88,6 @@ func SetConfigurationPaths() {
 }
 
 func SetConfigurationDefaults() {
+	viper.SetDefault("default", "default")
 	viper.SetDefault("targets", map[string]Target{})
 }
