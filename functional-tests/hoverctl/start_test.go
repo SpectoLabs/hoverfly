@@ -173,8 +173,7 @@ var _ = Describe("hoverctl `start`", func() {
 
 	Context("with a target", func() {
 		It("should start an instance of Hoverfly with the target configuration", func() {
-			functional_tests.Run(hoverctlBinary, "targets", "create",
-				"--target", "test-target",
+			functional_tests.Run(hoverctlBinary, "targets", "create", "test-target",
 				"--admin-port", "1234",
 				"--proxy-port", "8765",
 			)
@@ -191,8 +190,7 @@ var _ = Describe("hoverctl `start`", func() {
 		})
 
 		It("should update the target with a pid", func() {
-			functional_tests.Run(hoverctlBinary, "targets", "create",
-				"--target", "test-target",
+			functional_tests.Run(hoverctlBinary, "targets", "create", "test-target",
 				"--admin-port", "4567",
 				"--proxy-port", "4342",
 			)
