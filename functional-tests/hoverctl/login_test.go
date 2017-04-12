@@ -23,7 +23,7 @@ var _ = Describe("hoverctl login", func() {
 			hoverfly = functional_tests.NewHoverfly()
 			hoverfly.Start("-auth", "-username", username, "-password", password)
 
-			functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", hoverfly.GetAdminPort())
+			functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--admin-port", hoverfly.GetAdminPort())
 		})
 
 		AfterEach(func() {
@@ -99,7 +99,7 @@ var _ = Describe("hoverctl login", func() {
 			hoverfly = functional_tests.NewHoverfly()
 			hoverfly.Start("-auth", "-username", username, "-password", password)
 
-			functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "no-auth", "--admin-port", hoverfly.GetAdminPort())
+			functional_tests.Run(hoverctlBinary, "targets", "create", "no-auth", "--admin-port", hoverfly.GetAdminPort())
 		})
 
 		AfterEach(func() {

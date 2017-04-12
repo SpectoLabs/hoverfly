@@ -23,7 +23,7 @@ var _ = Describe("When I use hoverctl", func() {
 	)
 
 	BeforeEach(func() {
-		functional_tests.Run(hoverctlBinary, "targets", "create", "-t", "default", "--admin-port", adminPort, "--proxy-port", proxyPort)
+		functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--admin-port", adminPort, "--proxy-port", proxyPort)
 	})
 
 	AfterEach(func() {
@@ -42,7 +42,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 		It("should return an error if the logs don't exist", func() {
 			functional_tests.Run(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
-			functional_tests.Run(hoverctlBinary, "targets", "create", "-t", "incorrect", "--admin-port", "12345", "--proxy-port", "65432")
+			functional_tests.Run(hoverctlBinary, "targets", "create", "incorrect", "--admin-port", "12345", "--proxy-port", "65432")
 
 			output := functional_tests.Run(hoverctlBinary, "logs", "-t", "incorrect")
 
