@@ -214,6 +214,17 @@ var _ = Describe("hoverctl `start`", func() {
 		})
 	})
 
+	Context("with a target with a remote url", func() {
+		BeforeEach(func() {
+			functional_tests.Run(hoverctlBinary, "targets", "new", "remote", "--host", "hoverfly.io")
+		})
+		It("should error", func() {
+			output := functional_tests.Run(hoverctlBinary, "start", "--target", "remote")
+
+			Expect(output).To(ContainSubstring("Unable to start an instance of Hoverfly with the current target host"))
+		})
+	})
+
 	Context("with --new-target flag", func() {
 
 		It("should create a target using the flags to configure the target", func() {
