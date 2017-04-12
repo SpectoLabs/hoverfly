@@ -320,7 +320,7 @@ func buildURL(target Target, endpoint string) string {
 	return fmt.Sprintf("http://%v:%v%v", target.Host, target.AdminPort, endpoint)
 }
 
-func isLocal(url string) bool {
+func IsLocal(url string) bool {
 	return url == "localhost" || url == "127.0.0.1"
 }
 
@@ -353,19 +353,6 @@ func runBinary(target *Target, path string, hoverflyDirectory HoverflyDirectory)
 }
 
 func Start(target *Target, hoverflyDirectory HoverflyDirectory) error {
-
-	if !isLocal(target.Host) {
-		return errors.New("hoverctl can not start an instance of Hoverfly on a remote host")
-	}
-
-	if target.Pid != 0 {
-		_, err := GetMode(*target)
-		if err == nil {
-			return errors.New("Hoverfly is already running")
-		}
-		target.Pid = 0
-	}
-
 	err := checkPorts(target.AdminPort, target.ProxyPort)
 	if err != nil {
 		return err
@@ -416,7 +403,7 @@ func Start(target *Target, hoverflyDirectory HoverflyDirectory) error {
 }
 
 func Stop(target *Target, hoverflyDirectory HoverflyDirectory) error {
-	if !isLocal(target.Host) {
+	if !IsLocal(target.Host) {
 		return errors.New("hoverctl can not stop an instance of Hoverfly on a remote host")
 	}
 

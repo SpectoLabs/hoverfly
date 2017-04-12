@@ -24,6 +24,18 @@ port and proxy port.
 	Run: func(cmd *cobra.Command, args []string) {
 		checkTargetAndExit(target)
 
+		if !wrapper.IsLocal(target.Host) {
+			handleIfError(fmt.Errorf("Unable to start an instance of Hoverfly with the current target host"))
+		}
+
+		if target.Pid != 0 {
+			if _, err := wrapper.GetMode(*target); err == nil {
+				handleIfError(fmt.Errorf("Hoverfly is already running"))
+			}
+
+			target.Pid = 0
+		}
+
 		newTargetFlag, _ := cmd.Flags().GetString("new-target")
 
 		if newTargetFlag != "" {
