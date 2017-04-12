@@ -42,33 +42,32 @@ Delete target"
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		if targetNameFlag != "" {
-			if !askForConfirmation("Are you sure you want to delete the target " + targetNameFlag + "?") {
-				return
-			}
-			config.DeleteTarget(wrapper.Target{
-				Name: targetNameFlag,
-			})
+		checkArgAndExit(args, "Cannot delete a target without a name", "targets delete")
 
-			handleIfError(config.WriteToFile(hoverflyDirectory))
-		} else {
-			handleIfError(errors.New("Cannot delete a target without a name"))
+		if !askForConfirmation("Are you sure you want to delete the target " + args[0] + "?") {
+			return
 		}
+		config.DeleteTarget(wrapper.Target{
+			Name: args[0],
+		})
+
+		handleIfError(config.WriteToFile(hoverflyDirectory))
 
 		targetsCmd.Run(cmd, args)
 	},
 }
 
-var targetsCreateCmd = &cobra.Command{
+var targetsNewCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Create target",
+	Short: "Create a new target",
 	Long: `
 Create target"
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
+		checkArgAndExit(args, "Cannot create a target without a name", "targets new")
 
-		newTarget := wrapper.NewTarget(targetNameFlag, hostFlag, adminPortFlag, proxyPortFlag)
+		newTarget := wrapper.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
 		newTarget.Pid = pidFlag
 
 		config.NewTarget(*newTarget)
@@ -83,7 +82,7 @@ func init() {
 	RootCmd.AddCommand(targetsCmd)
 
 	targetsCmd.AddCommand(targetsDeleteCmd)
-	targetsCmd.AddCommand(targetsCreateCmd)
+	targetsCmd.AddCommand(targetsNewCmd)
 
-	targetsCreateCmd.Flags().IntVar(&pidFlag, "pid", 0, "Process id for a running instance of Hoverfly")
+	targetsNewCmd.Flags().IntVar(&pidFlag, "pid", 0, "Process id for a running instance of Hoverfly")
 }

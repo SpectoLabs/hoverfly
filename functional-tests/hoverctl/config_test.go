@@ -17,13 +17,13 @@ var _ = Describe("When I use hoverctl", func() {
 		})
 
 		It("prints the contents of the config.yaml", func() {
-			functional_tests.Run(hoverctlBinary, "targets", "create")
+			functional_tests.Run(hoverctlBinary, "targets", "create", "config-test")
 
 			output := functional_tests.Run(hoverctlBinary, "config")
 
 			Expect(output).To(ContainSubstring(`targets:`))
-			Expect(output).To(ContainSubstring(`default:`))
-			Expect(output).To(ContainSubstring("name: default"))
+			Expect(output).To(ContainSubstring(`config-test:`))
+			Expect(output).To(ContainSubstring("name: config-test"))
 			Expect(output).To(ContainSubstring("host: localhost"))
 			Expect(output).To(ContainSubstring("admin.port: 8888"))
 			Expect(output).To(ContainSubstring("proxy.port: 8500"))
