@@ -10,7 +10,8 @@ import (
 
 var (
 	defaultConfig = Config{
-		Targets: map[string]Target{},
+		DefaultTarget: "default",
+		Targets:       map[string]Target{},
 	}
 )
 
@@ -69,10 +70,11 @@ func Test_Config_GetTarget_ReturnsTargetIfAlreadyExists(t *testing.T) {
 	Expect(unit.GetTarget("default").AdminPort).To(Equal(1234))
 }
 
-func Test_Config_GetTarget_GetsDefaultIfTargetNameIsEmpty(t *testing.T) {
+func Test_Config_GetTarget_GetsCurrentTargetIfTargetNameIsEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := &Config{
+		DefaultTarget: "default",
 		Targets: map[string]Target{
 			"default": Target{
 				AdminPort: 1234,
