@@ -21,7 +21,7 @@ var _ = Describe("When using the `targets` command", func() {
 		Context("with targets", func() {
 
 			BeforeEach(func() {
-				functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", "1234", "--proxy-port", "8765", "--host", "localhost")
+				functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--admin-port", "1234", "--proxy-port", "8765", "--host", "localhost")
 			})
 
 			It("print targets", func() {
@@ -44,7 +44,7 @@ var _ = Describe("When using the `targets` command", func() {
 
 		It("should create the target and print it", func() {
 
-			output := functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "new-target",
+			output := functional_tests.Run(hoverctlBinary, "targets", "create", "new-target",
 				"--pid", "12345",
 				"--host", "localhost",
 				"--admin-port", "1234",
@@ -64,29 +64,21 @@ var _ = Describe("When using the `targets` command", func() {
 			Expect(output).To(ContainSubstring("8765"))
 		})
 
-		It("should create a default if no target name is provided", func() {
+		It("should not create a target if no target name is provided", func() {
 			output := functional_tests.Run(hoverctlBinary, "targets", "create")
 
-			Expect(output).To(ContainSubstring("TARGET NAME"))
-			Expect(output).To(ContainSubstring("PID"))
-			Expect(output).To(ContainSubstring("HOST"))
-			Expect(output).To(ContainSubstring("ADMIN PORT"))
-
-			Expect(output).To(ContainSubstring("default"))
-			Expect(output).To(ContainSubstring("0"))
-			Expect(output).To(ContainSubstring("localhost"))
-			Expect(output).To(ContainSubstring("8888"))
+			Expect(output).To(ContainSubstring("Cannot create a target without a name"))
 		})
 	})
 
 	Context("deleting targets", func() {
 
 		BeforeEach(func() {
-			functional_tests.Run(hoverctlBinary, "targets", "create", "--target", "default", "--admin-port", "1234")
+			functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--admin-port", "1234")
 		})
 
 		It("should delete targets and print nice empty message", func() {
-			output := functional_tests.Run(hoverctlBinary, "targets", "delete", "--target", "default", "--force")
+			output := functional_tests.Run(hoverctlBinary, "targets", "delete", "default", "--force")
 
 			Expect(output).To(ContainSubstring("No targets registered"))
 		})
