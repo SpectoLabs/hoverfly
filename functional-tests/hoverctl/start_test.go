@@ -221,7 +221,20 @@ var _ = Describe("hoverctl `start`", func() {
 		It("should error", func() {
 			output := functional_tests.Run(hoverctlBinary, "start", "--target", "remote")
 
-			Expect(output).To(ContainSubstring("Unable to start an instance of Hoverfly with the current target host"))
+			Expect(output).To(ContainSubstring("Unable to start an instance of Hoverfly on a remote host (remote host: hoverfly.io)"))
+			Expect(output).To(ContainSubstring("Run `hoverctl start --new-target <name>`"))
+		})
+	})
+
+	Context("with a target with a running hoverfly", func() {
+		BeforeEach(func() {
+			functional_tests.Run(hoverctlBinary, "start", "--new-target", "running")
+		})
+		It("should error", func() {
+			output := functional_tests.Run(hoverctlBinary, "start", "--target", "running")
+
+			Expect(output).To(ContainSubstring("Target Hoverfly is already running"))
+			Expect(output).To(ContainSubstring("Run `hoverctl stop -t running` to stop it"))
 		})
 	})
 
