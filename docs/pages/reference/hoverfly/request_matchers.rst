@@ -97,7 +97,7 @@ Example
 |
 
 Regex matcher
-------------
+-------------
 Parses the matcher value as a regular expression which is then executed against the string to match. This will pass only if the regular expression successfully 
 returns a result.
 
@@ -198,7 +198,7 @@ Example
 |
 
 XPath matcher
-------------
+-------------
 Parses the matcher value as an XPath expression, transforms the string to match into an XML object and then executes the expression against it. This will pass only if the expression successfully 
 returns a result.
 
