@@ -9,8 +9,8 @@ import (
 var _ = Describe("hoverctl --set-default", func() {
 
 	BeforeEach(func() {
-		functional_tests.Run(hoverctlBinary, "targets", "new", "set-default-test1")
-		functional_tests.Run(hoverctlBinary, "targets", "new", "set-default-test2")
+		functional_tests.Run(hoverctlBinary, "targets", "create", "set-default-test1")
+		functional_tests.Run(hoverctlBinary, "targets", "create", "set-default-test2")
 	})
 
 	Context("on a successful command using the --target flag", func() {

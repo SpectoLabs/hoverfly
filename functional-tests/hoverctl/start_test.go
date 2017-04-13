@@ -216,7 +216,7 @@ var _ = Describe("hoverctl `start`", func() {
 
 	Context("with a target with a remote url", func() {
 		BeforeEach(func() {
-			functional_tests.Run(hoverctlBinary, "targets", "new", "remote", "--host", "hoverfly.io")
+			functional_tests.Run(hoverctlBinary, "targets", "create", "remote", "--host", "hoverfly.io")
 		})
 		It("should error", func() {
 			output := functional_tests.Run(hoverctlBinary, "start", "--target", "remote")
