@@ -79,6 +79,44 @@ var _ = Describe("When using the `targets` command", func() {
 		})
 	})
 
+	Context("updating targets", func() {
+
+		It("should update the target and print it", func() {
+			functional_tests.Run(hoverctlBinary, "targets", "create", "new-target")
+			output := functional_tests.Run(hoverctlBinary, "targets", "update", "new-target",
+				"--pid", "12345",
+				"--host", "localhost",
+				"--admin-port", "1234",
+				"--proxy-port", "8765",
+			)
+
+			Expect(output).To(ContainSubstring("TARGET NAME"))
+			Expect(output).To(ContainSubstring("PID"))
+			Expect(output).To(ContainSubstring("HOST"))
+			Expect(output).To(ContainSubstring("ADMIN PORT"))
+			Expect(output).To(ContainSubstring("PROXY PORT"))
+
+			Expect(output).To(ContainSubstring("new-target"))
+			Expect(output).To(ContainSubstring("12345"))
+			Expect(output).To(ContainSubstring("localhost"))
+			Expect(output).To(ContainSubstring("1234"))
+			Expect(output).To(ContainSubstring("8765"))
+		})
+
+		It("should not update a target if no target name is provided", func() {
+			output := functional_tests.Run(hoverctlBinary, "targets", "update")
+
+			Expect(output).To(ContainSubstring("Cannot update a target without a name"))
+		})
+
+		It("should not update a target if target does not exist exists", func() {
+			output := functional_tests.Run(hoverctlBinary, "targets", "update", "not-exists")
+
+			Expect(output).To(ContainSubstring("Target not-exists does not exist"))
+			Expect(output).To(ContainSubstring("Use a different target name or run `hoverctl targets create not-exists`"))
+		})
+	})
+
 	Context("deleting targets", func() {
 
 		BeforeEach(func() {
