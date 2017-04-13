@@ -46,8 +46,8 @@ var _ = Describe("hoverctl flush cache", func() {
 	})
 
 	It("should error nicely when there is no hoverfly", func() {
-		functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--admin-port", "12345")
-		output := functional_tests.Run(hoverctlBinary, "flush", "--force")
+		functional_tests.Run(hoverctlBinary, "targets", "create", "alt-port", "--admin-port", "12345")
+		output := functional_tests.Run(hoverctlBinary, "flush", "-t", "alt-port", "--force")
 
 		Expect(output).To(ContainSubstring("Could not connect to Hoverfly"))
 	})

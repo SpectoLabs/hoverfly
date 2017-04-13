@@ -69,6 +69,14 @@ var _ = Describe("When using the `targets` command", func() {
 
 			Expect(output).To(ContainSubstring("Cannot create a target without a name"))
 		})
+
+		It("should not create a target if target already exists", func() {
+			functional_tests.Run(hoverctlBinary, "targets", "create", "exists")
+			output := functional_tests.Run(hoverctlBinary, "targets", "create", "exists")
+
+			Expect(output).To(ContainSubstring("Target exists already exists"))
+			Expect(output).To(ContainSubstring("Use a different target name or run `hoverctl targets update exists`"))
+		})
 	})
 
 	Context("deleting targets", func() {
