@@ -3,48 +3,59 @@
 Enabling authentication for the Hoverfly proxy and API
 ======================================================
 
-If you are running Hoverfly on a remote host (see :ref:`remotehoverfly`), you may wish to 
-enable authentication on the Hoverfly proxy and API.
+Sometimes, you may need authentication on Hoverfly. An example
+use case would be when running Hoverfly on a remote host.
 
+Hoverfly can provide authentication for both the admin API
+(using a JWT token) and the proxy (using HTTP basic auth).
 
 Setting Hoverfly authentication credentials
 -------------------------------------------
 
-In this example, we assume that the steps in the :ref:`remotehoverfly` tutorial have been followed, 
-and that the Hoverfly binary is installed **but not running** on a remote host.
-
-On the **remote host**, run the following command to start Hoverfly with authentication credentials, 
-and the default admin and proxy ports overridden.
+To start Hoverfly with authentication, all we need to do is run 
+the ``hoverctl start`` command with the flag authentication flag.
 
 .. literalinclude:: hoverfly-start-proxy-auth.sh
    :language: sh 
 
+Running this command will prompt you to enter a username and 
+password. This can be bypassed by providing the ``-username``
+and ``--password`` flags, though this will leave credentials
+in your terminal history.
+
 .. warning::
   
-   By default, Hoverfly starts with authentication disabled. If you require authentication
-   you must make sure the ``-auth``, ``-username`` and ``-password`` flags are supplied every
-   time Hoverfly is started. 
+   By default, hoverctl will start Hoverfly with authentication disabled. If you require authentication
+   you must make sure the ``--auth`` flag are supplied every time Hoverfly is started. 
 
-Configuring hoverctl
---------------------
+Logging in with hoverctl
+------------------------
 
-On your **local machine**, edit your ``~/.hoverfly/config.yml`` so it looks like this:
+Now that Hoverfly has started, trying to interact with it using
+hoverctl will now result in an authentication error. You will now
+need to login with hoverctl.
 
-.. literalinclude:: config.yml
-   :language: none
+.. literalinclude:: login-hoverctl.sh
+   :language: sh 
 
-The ``config.yml`` file will now tell hoverctl the location of the remote Hoverfly instance,
-and provide the credentials required to authenticate.
+This will log you in with the default target, assuming that the
+Hoverfly instance was started with this target.
 
-Run the following commands **on your local machine** to capture and simulate a URL using the 
+There may be situations where a Hoverfly process is started
+externally to hoverctl. When this happens, it is often
+best practice to create a new target for it. You can do this
+with the login command using the ``--new-target`` flag.
+
+In this example, a remote Hoverfly instance has been started
+already for us on the ports 8880 and 8550 (the example from 
+:ref:`remotehoverfly`). To get started, we need to create a 
+new target and log in with it.
+
+.. literalinclude:: login-hoverctl-new-target.sh
+   :language: sh 
+
+Run the following commands to capture and simulate a URL using the 
 remote Hoverfly:
 
 .. literalinclude:: curl-proxy-basic-auth.sh
    :language: sh
-
-.. note::
-   The ``hoverfly.username`` and ``hoverfly.password`` values in the ``config.yml`` file 
-   allow hoverctl to authenticate against the admin API of a remote Hoverfly instance. 
-   
-   When using authentication, the Hoverfly proxy port is also authenticated using basic HTTP authentication. 
-   This means that any application using Hoverfly (in this example, cURL) must include the authentication credentials as part of the proxy URL. 
