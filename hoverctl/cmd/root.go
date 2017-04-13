@@ -34,8 +34,8 @@ func Execute(hoverctlVersion string) {
 		os.Exit(-1)
 	}
 
-	if setDefaultTargetFlag && targetNameFlag != "" {
-		config.DefaultTarget = targetNameFlag
+	if setDefaultTargetFlag && target != nil {
+		config.DefaultTarget = target.Name
 	}
 	handleIfError(config.WriteToFile(hoverflyDirectory))
 }
