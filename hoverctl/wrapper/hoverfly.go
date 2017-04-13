@@ -403,14 +403,6 @@ func Start(target *Target, hoverflyDirectory HoverflyDirectory) error {
 }
 
 func Stop(target *Target, hoverflyDirectory HoverflyDirectory) error {
-	if !IsLocal(target.Host) {
-		return errors.New("hoverctl can not stop an instance of Hoverfly on a remote host")
-	}
-
-	if target.Pid == 0 {
-		return errors.New("Hoverfly is not running")
-	}
-
 	hoverflyProcess := os.Process{Pid: target.Pid}
 	err := hoverflyProcess.Kill()
 	if err != nil {

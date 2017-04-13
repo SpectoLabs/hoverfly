@@ -25,12 +25,12 @@ hoverctl configuration file.
 		checkTargetAndExit(target)
 
 		if !wrapper.IsLocal(target.Host) {
-			handleIfError(fmt.Errorf("Unable to start an instance of Hoverfly with the current target host"))
+			handleIfError(fmt.Errorf("Unable to start an instance of Hoverfly on a remote host (%s host: %s)\n\nRun `hoverctl start --new-target <name>`", target.Name, target.Host))
 		}
 
 		if target.Pid != 0 {
 			if _, err := wrapper.GetMode(*target); err == nil {
-				handleIfError(fmt.Errorf("Target Hoverfly is already running\n\nRun `hoverctl start --new-target <name>`"))
+				handleIfError(fmt.Errorf("Target Hoverfly is already running (pid: %v) \n\nRun `hoverctl stop -t %s` to stop it", target.Pid, target.Name))
 			}
 
 			target.Pid = 0
