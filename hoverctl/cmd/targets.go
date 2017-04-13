@@ -83,6 +83,31 @@ Create target"
 	},
 }
 
+var targetsUpdateCmd = &cobra.Command{
+	Use:   "update",
+	Short: "Update target",
+	Long: `
+Update target
+`,
+
+	Run: func(cmd *cobra.Command, args []string) {
+		checkArgAndExit(args, "Cannot update a target without a name", "targets update")
+
+		if config.GetTarget(args[0]) == nil {
+			handleIfError(fmt.Errorf("Target %s does not exist\n\nUse a different target name or run `hoverctl targets create %[1]s`", args[0]))
+		}
+
+		newTarget := wrapper.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
+		newTarget.Pid = pidFlag
+
+		config.NewTarget(*newTarget)
+
+		handleIfError(config.WriteToFile(hoverflyDirectory))
+
+		targetsCmd.Run(cmd, args)
+	},
+}
+
 var targetsDefaultCmd = &cobra.Command{
 	Use:   "default",
 	Short: "Get and set the default target",
@@ -120,7 +145,9 @@ func init() {
 
 	targetsCmd.AddCommand(targetsDeleteCmd)
 	targetsCmd.AddCommand(targetsNewCmd)
+	targetsCmd.AddCommand(targetsUpdateCmd)
 	targetsCmd.AddCommand(targetsDefaultCmd)
 
 	targetsNewCmd.Flags().IntVar(&pidFlag, "pid", 0, "Process id for a running instance of Hoverfly")
+	targetsUpdateCmd.Flags().IntVar(&pidFlag, "pid", 0, "Process id for a running instance of Hoverfly")
 }
