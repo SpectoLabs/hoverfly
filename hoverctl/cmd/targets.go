@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
@@ -14,7 +15,7 @@ var targetsCmd = &cobra.Command{
 	Use:   "targets",
 	Short: "Get the current targets registered with hoverctl",
 	Long: `
-Get the current targets registered with hoverctl"
+Get the current targets registered with hoverctl
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
@@ -78,11 +79,44 @@ Create target"
 	},
 }
 
+var targetsDefaultCmd = &cobra.Command{
+	Use:   "default",
+	Short: "Get and set the default target",
+	Long: `
+Without a target name, default will print the configuration
+of the current default target."
+`,
+
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(config.Targets) == 0 {
+			handleIfError(errors.New("No targets registered"))
+		}
+
+		if len(args) > 0 {
+			checkTarget := config.GetTarget(args[0])
+			if checkTarget == nil {
+				handleIfError(fmt.Errorf("%[1]s is not a target\n\nRun `hoverctl targets new %[1]s`", args[0]))
+			}
+			config.DefaultTarget = args[0]
+		}
+
+		data := [][]string{
+			[]string{"Target name", "Pid", "Host", "Admin port", "Proxy port"},
+		}
+
+		defaultTarget := config.GetTarget("")
+		data = append(data, []string{defaultTarget.Name, strconv.Itoa(defaultTarget.Pid), defaultTarget.Host, strconv.Itoa(defaultTarget.AdminPort), strconv.Itoa(defaultTarget.ProxyPort)})
+
+		drawTable(data, true)
+	},
+}
+
 func init() {
 	RootCmd.AddCommand(targetsCmd)
 
 	targetsCmd.AddCommand(targetsDeleteCmd)
 	targetsCmd.AddCommand(targetsNewCmd)
+	targetsCmd.AddCommand(targetsDefaultCmd)
 
 	targetsNewCmd.Flags().IntVar(&pidFlag, "pid", 0, "Process id for a running instance of Hoverfly")
 }

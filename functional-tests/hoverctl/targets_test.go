@@ -90,4 +90,60 @@ var _ = Describe("When using the `targets` command", func() {
 		})
 	})
 
+	Context("targets default", func() {
+
+		BeforeEach(func() {
+			functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--admin-port", "1234")
+		})
+
+		It("should print the default target", func() {
+			output := functional_tests.Run(hoverctlBinary, "targets", "default")
+
+			Expect(output).To(ContainSubstring("TARGET NAME"))
+			Expect(output).To(ContainSubstring("HOST"))
+			Expect(output).To(ContainSubstring("ADMIN PORT"))
+			Expect(output).To(ContainSubstring("PROXY PORT"))
+
+			Expect(output).To(ContainSubstring("default"))
+			Expect(output).To(ContainSubstring("localhost"))
+			Expect(output).To(ContainSubstring("1234"))
+			Expect(output).To(ContainSubstring("8500"))
+		})
+
+		It("should set the default target when given a target name", func() {
+			functional_tests.Run(hoverctlBinary, "targets", "create", "alternative", "--admin-port", "1233")
+			output := functional_tests.Run(hoverctlBinary, "targets", "default", "alternative")
+
+			Expect(output).To(ContainSubstring("TARGET NAME"))
+			Expect(output).To(ContainSubstring("HOST"))
+			Expect(output).To(ContainSubstring("ADMIN PORT"))
+			Expect(output).To(ContainSubstring("PROXY PORT"))
+
+			Expect(output).To(ContainSubstring("alternative"))
+			Expect(output).To(ContainSubstring("localhost"))
+			Expect(output).To(ContainSubstring("1233"))
+			Expect(output).To(ContainSubstring("8500"))
+		})
+
+		It("should error when given an invalid target name", func() {
+			output := functional_tests.Run(hoverctlBinary, "targets", "default", "alternative")
+
+			Expect(output).To(ContainSubstring("alternative is not a target\n\nRun `hoverctl targets new alternative`"))
+		})
+
+		It("should not set default when given an invalid target name ", func() {
+			functional_tests.Run(hoverctlBinary, "targets", "default", "alternative")
+			output := functional_tests.Run(hoverctlBinary, "targets", "default")
+
+			Expect(output).To(ContainSubstring("TARGET NAME"))
+			Expect(output).To(ContainSubstring("HOST"))
+			Expect(output).To(ContainSubstring("ADMIN PORT"))
+			Expect(output).To(ContainSubstring("PROXY PORT"))
+
+			Expect(output).To(ContainSubstring("default"))
+			Expect(output).To(ContainSubstring("localhost"))
+			Expect(output).To(ContainSubstring("1234"))
+			Expect(output).To(ContainSubstring("8500"))
+		})
+	})
 })
