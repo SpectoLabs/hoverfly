@@ -68,6 +68,10 @@ Create target"
 	Run: func(cmd *cobra.Command, args []string) {
 		checkArgAndExit(args, "Cannot create a target without a name", "targets new")
 
+		if config.GetTarget(args[0]) != nil {
+			handleIfError(fmt.Errorf("Target %s already exists\n\nUse a different target name or run `hoverctl targets update %[1]s`", args[0]))
+		}
+
 		newTarget := wrapper.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
 		newTarget.Pid = pidFlag
 
