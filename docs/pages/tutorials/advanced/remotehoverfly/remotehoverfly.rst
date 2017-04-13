@@ -5,7 +5,8 @@ Controlling a remote Hoverfly instance with hoverctl
 
 So far, the tutorials have shown how hoverctl can be used to control an instance of Hoverfly running on the same machine.
 
-In some cases, you may wish to use hoverctl to control an instance of Hoverfly running on a remote host. 
+In some cases, you may wish to use hoverctl to control an instance of Hoverfly running on a remote host. With hoverctl,
+we can do this using the targets feature.
 
 In this example, we assume that the remote host is reachable at ``hoverfly.example.com``, and that 
 ports ``8880`` and ``8555`` are available. We will also assume that the Hoverfly binary is installed on the remote host.
@@ -19,9 +20,10 @@ On the **remote host**, start Hoverfly using flags to override the default admin
    For a full list of all Hoverfly flags, please refer to :ref:`hoverfly_commands` in the :ref:`reference` section.
    
 
-On your **local machine**, edit your ``~/.hoverfly/config.yml`` so it looks like this:
+On your **local machine**, we will create the ``remote`` target using hoverctl. This target will be configured to communicate
+with Hoverfly.
 
-.. literalinclude:: config.yml
+.. literalinclude:: create-hoverctl-target.sh
    :language: none
 
 Now that hoverctl knows the location of the remote Hoverfly instance, run the following commands
@@ -30,8 +32,14 @@ Now that hoverctl knows the location of the remote Hoverfly instance, run the fo
 .. literalinclude:: curl-proxy-remote-hoverfly.sh
    :language: sh
 
+You will now need to specific the ``remote`` target every time you want to interact with this remote Hoverfly instance.
+If you are working only with this one remote instance, it is possible to change the default target in hoverctl.
+
+.. literalinclude:: default-hoverctl-target.sh
+   :language: sh
+
 .. note::
-   The ``hoverfly.host`` value in the ``config.yml`` file allows hoverctl to interact with the **admin API** 
+   The ``--host`` value of the hoverctl target allows hoverctl to interact with the **admin API** 
    of the remote Hoverfly instance.
    
    The application that is making the request (in this case, cURL), **also** needs to be configured to 
