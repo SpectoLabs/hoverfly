@@ -117,7 +117,7 @@ of the current default target."
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(config.Targets) == 0 {
+		if config.GetTarget("") == nil {
 			handleIfError(errors.New("No targets registered"))
 		}
 

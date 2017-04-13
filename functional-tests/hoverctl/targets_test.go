@@ -171,6 +171,14 @@ var _ = Describe("When using the `targets` command", func() {
 			Expect(output).To(ContainSubstring("8500"))
 		})
 
+		It("should error when the default points to a non-existing  targets", func() {
+			functional_tests.Run(hoverctlBinary, "targets", "delete", "default", "--force")
+
+			output := functional_tests.Run(hoverctlBinary, "targets", "default")
+
+			Expect(output).To(ContainSubstring("No targets registered"))
+		})
+
 		It("should error when given an invalid target name", func() {
 			output := functional_tests.Run(hoverctlBinary, "targets", "default", "alternative")
 
