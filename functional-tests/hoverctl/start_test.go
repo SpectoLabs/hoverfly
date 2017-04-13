@@ -258,6 +258,17 @@ var _ = Describe("hoverctl `start`", func() {
 			Expect(targets["notdefault"]).To(HaveKeyWithValue("ADMIN PORT", randomAdminPort))
 			Expect(targets["notdefault"]).To(HaveKeyWithValue("PROXY PORT", randomProxyPort))
 		})
+
+		It("should error when trying to create a target that already exists", func() {
+			functional_tests.Run(hoverctlBinary, "targets", "create", "exists")
+
+			output := functional_tests.Run(hoverctlBinary, "start",
+				"--new-target", "exists",
+			)
+
+			Expect(output).To(ContainSubstring("Target exists already exists"))
+			Expect(output).To(ContainSubstring("Use a different target name or run `hoverctl targets update exists`"))
+		})
 	})
 
 	Context("with a target that has already been started", func() {

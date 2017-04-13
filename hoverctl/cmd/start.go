@@ -39,6 +39,9 @@ hoverctl configuration file.
 		newTargetFlag, _ := cmd.Flags().GetString("new-target")
 
 		if newTargetFlag != "" {
+			if config.GetTarget(newTargetFlag) != nil {
+				handleIfError(fmt.Errorf("Target %s already exists\n\nUse a different target name or run `hoverctl targets update %[1]s`", newTargetFlag))
+			}
 			target = wrapper.NewTarget(newTargetFlag, hostFlag, adminPortFlag, proxyPortFlag)
 		}
 
