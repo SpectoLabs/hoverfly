@@ -21,6 +21,14 @@ is stopped.
 	Run: func(cmd *cobra.Command, args []string) {
 		checkTargetAndExit(target)
 
+		if !wrapper.IsLocal(target.Host) {
+			handleIfError(fmt.Errorf("Unable to stop an instance of Hoverfly on a remote host (%s host: %s)\n\nRun `hoverctl start --new-target <name>` to start it", target.Name, target.Host))
+		}
+
+		if target.Pid == 0 {
+			handleIfError(fmt.Errorf("Target Hoverfly is not running\n\nRun `hoverctl start -t %s` to start it", target.Name))
+		}
+
 		err := wrapper.Stop(target, hoverflyDirectory)
 		handleIfError(err)
 
