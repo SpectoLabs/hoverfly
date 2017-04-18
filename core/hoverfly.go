@@ -50,90 +50,72 @@ type Hoverfly struct {
 	StoreLogsHook *StoreLogsHook
 }
 
+func NewHoverfly() *Hoverfly {
+	authBackend := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
+
+	hoverfly := &Hoverfly{
+		Simulation:     models.NewSimulation(),
+		Authentication: authBackend,
+		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
+		StoreLogsHook:  NewStoreLogsHook(),
+	}
+
+	hoverfly.version = "v0.11.1"
+
+	log.AddHook(hoverfly.StoreLogsHook)
+
+	modeMap := make(map[string]modes.Mode)
+
+	modeMap[modes.Capture] = &modes.CaptureMode{Hoverfly: hoverfly}
+	modeMap[modes.Simulate] = &modes.SimulateMode{Hoverfly: hoverfly}
+	modeMap[modes.Modify] = &modes.ModifyMode{Hoverfly: hoverfly}
+	modeMap[modes.Synthesize] = &modes.SynthesizeMode{Hoverfly: hoverfly}
+
+	hoverfly.modeMap = modeMap
+
+	return hoverfly
+}
+
 func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
-	simulation := models.NewSimulation()
+	hoverfly := NewHoverfly()
 
 	var requestCache cache.Cache
 	if !cfg.DisableCache {
 		requestCache = cache.NewInMemoryCache()
 	}
 
-	metadataCache := cache.NewInMemoryCache()
+	hoverfly.MetadataCache = cache.NewInMemoryCache()
 
-	authBackend := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
-
-	cacheMatcher := matching.CacheMatcher{
+	hoverfly.CacheMatcher = matching.CacheMatcher{
 		RequestCache: requestCache,
 		Webserver:    cfg.Webserver,
 	}
 
-	hook := NewStoreLogsHook()
-	log.AddHook(hook)
+	hoverfly.Cfg = cfg
+	hoverfly.HTTP = GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.UpstreamProxy)
 
-	h := &Hoverfly{
-		MetadataCache:  metadataCache,
-		Authentication: authBackend,
-		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.UpstreamProxy),
-		Cfg:            cfg,
-		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
-		CacheMatcher:   cacheMatcher,
-		Simulation:     simulation,
-		StoreLogsHook:  hook,
-	}
-
-	modeMap := make(map[string]modes.Mode)
-
-	modeMap[modes.Capture] = &modes.CaptureMode{Hoverfly: h}
-	modeMap[modes.Simulate] = &modes.SimulateMode{Hoverfly: h}
-	modeMap[modes.Modify] = &modes.ModifyMode{Hoverfly: h}
-	modeMap[modes.Synthesize] = &modes.SynthesizeMode{Hoverfly: h}
-
-	h.modeMap = modeMap
-
-	h.version = "v0.11.1"
-
-	return h
+	return hoverfly
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
 func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication backends.Authentication) *Hoverfly {
-	simulation := models.NewSimulation()
+	hoverfly := NewHoverfly()
 
 	if cfg.DisableCache {
 		requestCache = nil
 	}
 
-	cacheMatcher := matching.CacheMatcher{
+	hoverfly.CacheMatcher = matching.CacheMatcher{
 		RequestCache: requestCache,
 		Webserver:    cfg.Webserver,
 	}
 
-	hook := NewStoreLogsHook()
-	log.AddHook(hook)
+	hoverfly.MetadataCache = metadataCache
+	hoverfly.Authentication = authentication
+	hoverfly.HTTP = GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.UpstreamProxy)
+	hoverfly.Cfg = cfg
 
-	h := &Hoverfly{
-		MetadataCache:  metadataCache,
-		Authentication: authentication,
-		HTTP:           GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.UpstreamProxy),
-		Cfg:            cfg,
-		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
-		CacheMatcher:   cacheMatcher,
-		Simulation:     simulation,
-		StoreLogsHook:  hook,
-	}
-
-	modeMap := make(map[string]modes.Mode)
-
-	modeMap[modes.Capture] = &modes.CaptureMode{Hoverfly: h}
-	modeMap[modes.Simulate] = &modes.SimulateMode{Hoverfly: h}
-	modeMap[modes.Modify] = &modes.ModifyMode{Hoverfly: h}
-	modeMap[modes.Synthesize] = &modes.SynthesizeMode{Hoverfly: h}
-
-	h.modeMap = modeMap
-
-	h.version = "v0.10.2"
-
-	return h
+	return hoverfly
 }
 
 func GetDefaultHoverflyHTTPClient(tlsVerification bool, upstreamProxy string) *http.Client {
