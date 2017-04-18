@@ -8,24 +8,25 @@ Available Commands:
   delete      Delete Hoverfly simulation
   destination Get and set Hoverfly destination
   export      Export a simulation from Hoverfly
+  flush       Flush the internal cache in Hoverfly
   import      Import a simulation into Hoverfly
+  login       Login to Hoverfly
   logs        Get the logs from Hoverfly
   middleware  Get and set Hoverfly middleware
   mode        Get and set the Hoverfly mode
   start       Start Hoverfly
   stop        Stop Hoverfly
+  targets     Get the current targets registered with hoverctl
   version     Get the version of hoverctl
 
 Flags:
-      --admin-port string       A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)
-      --certificate string      A path to a certificate file. Overrides the default Hoverfly certificate
-      --database string         A database type [memory|boltdb]. Overrides the default Hoverfly database type (memory)
-      --disable-tls             Disables TLS verification
-  -h, --help                    help for hoverctl
-      --host string             A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)
-      --key string              A path to a key file. Overrides the default Hoverfly TLS key
-      --proxy-port string       A port number for the Hoverfly proxy. Overrides the default Hoverfly proxy port (8500)
-      --upstream-proxy string   A host for which Hoverfly will proxy its requests to
-  -v, --verbose                 Verbose logging from hoverctl
+      --admin-port int   A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)
+  -f, --force            Bypass any confirmation when using hoverctl
+  -h, --help             help for hoverctl
+      --host string      A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)
+      --proxy-port int   A port number for the Hoverfly proxy. Overrides the default Hoverfly proxy port (8500)
+      --set-default      Sets the current target as the default target for hoverctl
+  -t, --target string    A name for an instance of Hoverfly you are trying to communicate with. Overrides the default target (default)
+  -v, --verbose          Verbose logging from hoverctl
 
 Use "hoverctl [command] --help" for more information about a command.
