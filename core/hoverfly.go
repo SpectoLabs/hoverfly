@@ -90,7 +90,7 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 
 	h.modeMap = modeMap
 
-	h.version = "v0.10.2"
+	h.version = "v0.11.1"
 
 	return h
 }
