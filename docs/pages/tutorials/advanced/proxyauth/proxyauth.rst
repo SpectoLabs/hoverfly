@@ -12,49 +12,52 @@ Hoverfly can provide authentication for both the admin API
 Setting Hoverfly authentication credentials
 -------------------------------------------
 
-To start Hoverfly with authentication, all we need to do is run 
-the ``hoverctl start`` command with the flag authentication flag.
+To start a Hoverfly instance with authentication enabled, you need to run
+the ``hoverctl start`` command with the authentication (``--auth``) flag.
 
 .. literalinclude:: hoverfly-start-proxy-auth.sh
    :language: sh 
 
-Running this command will prompt you to enter a username and 
-password. This can be bypassed by providing the ``-username``
-and ``--password`` flags, though this will leave credentials
-in your terminal history.
+Running this command will prompt you to set a username and 
+password for the Hoverfly instance. 
+
+This can be bypassed by providing the ``--username``
+and ``--password`` flags, although **this will leave credentials
+in your terminal history**.
 
 .. warning::
   
    By default, hoverctl will start Hoverfly with authentication disabled. If you require authentication
    you must make sure the ``--auth`` flag are supplied every time Hoverfly is started. 
 
-Logging in with hoverctl
-------------------------
+Logging in to a Hoverfly instance with hoverctl
+-----------------------------------------------
 
-Now that Hoverfly has started, trying to interact with it using
-hoverctl will now result in an authentication error. You will now
-need to login with hoverctl.
+Now that a Hoverfly instance has started with authentication enabled, you will need to 
+**login** to the instance using hoverctl.
 
 .. literalinclude:: login-hoverctl.sh
    :language: sh 
 
-This will log you in with the default target, assuming that the
-Hoverfly instance was started with this target.
+Running this command will prompt you to enter the username and 
+password you set for the Hoverfly instance. Again, this can be bypassed by providing the ``--username``
+and ``--password`` flags.
 
-There may be situations where a Hoverfly process is started
-externally to hoverctl. When this happens, it is often
-best practice to create a new target for it. You can do this
-with the login command using the ``--new-target`` flag.
+There may be situations in which you need to log into to a Hoverfly instance
+that is already running. In this case, it is best practice to create a new **target**
+for the instance (please see :ref:`remotehoverfly` for more information on **targets**). You can do this using 
+the ``--new-target`` flag.
 
-In this example, a remote Hoverfly instance has been started
-already for us on the ports 8880 and 8550 (the example from 
-:ref:`remotehoverfly`). To get started, we need to create a 
-new target and log in with it.
+In this example, a remote Hoverfly instance is already running on the host ```hoverfly.example.com```, with
+the ports set to 8880 and 8555 and authentication enabled (the example from :ref:`remotehoverfly`). 
+You will need to create a new target (named ``remote``) for the instance and log in with it.
 
 .. literalinclude:: login-hoverctl-new-target.sh
    :language: sh 
 
-Run the following commands to capture and simulate a URL using the 
+You will be prompted to enter the username and password for the instance.
+
+Now run the following commands to capture and simulate a URL using the 
 remote Hoverfly:
 
 .. literalinclude:: curl-proxy-basic-auth.sh
