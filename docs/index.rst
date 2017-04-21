@@ -7,15 +7,6 @@
 .. image:: https://circleci.com/gh/SpectoLabs/hoverfly.svg?style=shield
     :target: https://circleci.com/gh/SpectoLabs/hoverfly
 
-.. image:: https://readthedocs.org/projects/hoverfly/badge/?version=latest
-    :target: https://hoverfly.readthedocs.io/en/latest/
-
-.. image:: https://img.shields.io/badge/license-Apache%202-blue.svg   
-     :target: https://raw.githubusercontent.com/SpectoLabs/hoverfly/master/LICENSE    
-
-.. image:: https://img.shields.io/github/stars/SpectoLabs/hoverfly.svg   
-    :target: https://github.com/SpectoLabs/hoverfly/stargazers
-
 .. image:: https://badges.gitter.im/SpectoLabs/hoverfly.svg
     :target: https://gitter.im/SpectoLabs/hoverfly 
 
