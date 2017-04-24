@@ -23,6 +23,7 @@ type Target struct {
 	DisableTls      bool   `yaml:",omitempty"`
 
 	UpstreamProxyUrl string `yaml:",omitempty"`
+	HttpsOnly        bool   `yaml:",omitempty"`
 
 	AuthEnabled bool
 	Username    string
@@ -132,6 +133,10 @@ func (this Target) BuildFlags() Flags {
 
 	if this.UpstreamProxyUrl != "" {
 		flags = append(flags, "-upstream-proxy="+this.UpstreamProxyUrl)
+	}
+
+	if this.HttpsOnly {
+		flags = append(flags, "-https-only")
 	}
 
 	if this.AuthEnabled {
