@@ -27,6 +27,7 @@ type ProxyHttpServer struct {
 	// ConnectDial will be used to create TCP connections for CONNECT requests
 	// if nil Tr.Dial will be used
 	ConnectDial func(network string, addr string) (net.Conn, error)
+	tlsOnly     bool
 }
 
 var hasPort = regexp.MustCompile(`:\d+$`)
@@ -94,9 +95,14 @@ func removeProxyHeaders(ctx *ProxyCtx, r *http.Request) {
 // Standard net/http function. Shouldn't be used directly, http.Serve will use it.
 func (proxy *ProxyHttpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//r.Header["X-Forwarded-For"] = w.RemoteAddr()
+
 	if r.Method == "CONNECT" {
 		proxy.handleHttps(w, r)
 	} else {
+		if proxy.tlsOnly {
+			http.Error(w, "This proxy requires TLS (HTTPS)", 502)
+			return
+		}
 		ctx := &ProxyCtx{Req: r, Session: atomic.AddInt64(&proxy.sess, 1), proxy: proxy}
 
 		var err error
@@ -142,6 +148,10 @@ func (proxy *ProxyHttpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		}
 		ctx.Logf("Copied %v bytes to client error=%v", nr, err)
 	}
+}
+
+func (proxy *ProxyHttpServer) DisableNonTls(disableNonTls bool) {
+	proxy.tlsOnly = disableNonTls
 }
 
 // New proxy server, logs to StdErr by default
