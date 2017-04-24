@@ -154,6 +154,15 @@ var _ = Describe("hoverctl `start`", func() {
 			Expect(ioutil.ReadAll(response.Body)).To(ContainSubstring(`"upstream-proxy":"http://hoverfly.io:8080"`))
 		})
 
+		It("should start an instance of hoverfly with HTTPS only", func() {
+			output := functional_tests.Run(hoverctlBinary, "start", "--https-only")
+
+			Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+			output = functional_tests.Run(hoverctlBinary, "logs")
+			Expect(output).To(ContainSubstring("Disabling HTTP"))
+		})
+
 		It("should start hoverfly with authentication", func() {
 			output := functional_tests.Run(hoverctlBinary, "start", "--auth", "--username", "benji", "--password", "securepassword")
 
