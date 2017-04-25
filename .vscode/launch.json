@@ -1,0 +1,44 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Hoverfly",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "remotePath": "",
+            "port": 2345,
+            "host": "127.0.0.1",
+            "program": "${workspaceRoot}/core/cmd/hoverfly/main.go",
+            "env": {},
+            "args": ["-auth", "-username", "benji", "-password", "benji"],
+            "showLog": true
+        },
+        {
+            "name": "hoverctl",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "remotePath": "",
+            "port": 2345,
+            "host": "127.0.0.1",
+            "program": "${workspaceRoot}/hoverctl/main.go",
+            "env": {},
+            "args": ["login", "--new-target", "gradual-fuss", "--host", "gradual-fuss-tjcunliffe-dev.hoverfly.io", "--username", "tjcunliffe", "--password", "Password123", "--admin-port", "80"],
+            "showLog": true
+        },
+        {
+            "name": "hoverctlfunc",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "remotePath": "",
+            "port": 2345,
+            "host": "127.0.0.1",
+            "program": "${workspaceRoot}/functional-tests/hoverctl/hoverctl_suite_test.go",
+            "env": {},
+            "args": ["login", "--new-target", "gradual-fuss", "--host", "gradual-fuss-tjcunliffe-dev.hoverfly.io", "--username", "tjcunliffe", "--password", "Password123", "--admin-port", "80"],
+            "showLog": true
+        }
+    ]
+}

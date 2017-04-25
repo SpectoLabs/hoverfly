@@ -2,6 +2,7 @@ package wrapper
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -292,12 +293,20 @@ func Login(target Target, username, password string) (string, error) {
 		return "", err
 	}
 
-	request, err := http.NewRequest("POST", buildURL(target, "/api/token-auth"), strings.NewReader(string(jsonCredentials)))
+	request, err := http.NewRequest("POST", BuildURL(target, "/api/token-auth"), strings.NewReader(string(jsonCredentials)))
 	if err != nil {
 		return "", err
 	}
 
-	response, err := http.DefaultClient.Do(request)
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
+
+	response, err := client.Do(request)
 	if err != nil {
 		return "", err
 	}
@@ -316,12 +325,19 @@ func Login(target Target, username, password string) (string, error) {
 	return authToken.Token, nil
 }
 
-func buildURL(target Target, endpoint string) string {
-	return fmt.Sprintf("http://%v:%v%v", target.Host, target.AdminPort, endpoint)
+func BuildURL(target Target, endpoint string) string {
+	if !strings.HasPrefix(target.Host, "http://") && !strings.HasPrefix(target.Host, "https://") {
+		if IsLocal(target.Host) {
+			return fmt.Sprintf("http://%v:%v%v", target.Host, target.AdminPort, endpoint)
+		} else {
+			return fmt.Sprintf("https://%v:%v%v", target.Host, target.AdminPort, endpoint)
+		}
+	}
+	return fmt.Sprintf("%v:%v%v", target.Host, target.AdminPort, endpoint)
 }
 
 func IsLocal(url string) bool {
-	return url == "localhost" || url == "127.0.0.1"
+	return strings.Contains(url, "localhost") || strings.Contains(url, "127.0.0.1")
 }
 
 /*
