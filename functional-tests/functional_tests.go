@@ -182,6 +182,23 @@ func (this Hoverfly) ProxyWithAuth(r *sling.Sling, user, password string) *http.
 	return response
 }
 
+func (this Hoverfly) GetAPIToken(username, password string) string {
+	response := DoRequest(
+		sling.New().Post(this.adminUrl + "/api/token-auth").BodyJSON(map[string]interface{}{
+			"username": username,
+			"password": password,
+		}),
+	)
+
+	body, err := ioutil.ReadAll(response.Body)
+	Expect(err).To(BeNil())
+
+	bodyMap := make(map[string]interface{})
+	err = json.Unmarshal(body, &bodyMap)
+	Expect(err).To(BeNil())
+
+	return bodyMap["token"].(string)
+}
 func (this Hoverfly) GetAdminPort() string {
 	return strconv.Itoa(this.adminPort)
 }
