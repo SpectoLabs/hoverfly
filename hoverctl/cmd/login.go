@@ -32,6 +32,13 @@ target in the hoverctl configuration file.
 			if config.GetTarget(newTargetFlag) != nil {
 				handleIfError(fmt.Errorf("Target %s already exists\n\nUse a different target name or run `hoverctl targets update %[1]s`", newTargetFlag))
 			}
+
+			// If the host is set to a remote instance, the default HTTPS port
+			// is used instead of 8888 which is set in wrapper.NewTarget()
+			if adminPortFlag == 0 && (hostFlag != "" && !wrapper.IsLocal(hostFlag)) {
+				adminPortFlag = 443
+			}
+
 			target = wrapper.NewTarget(newTargetFlag, hostFlag, adminPortFlag, proxyPortFlag)
 		}
 
