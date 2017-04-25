@@ -2,9 +2,11 @@ package authentication
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/http"
+
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	jwt "github.com/dgrijalva/jwt-go"
-	"net/http"
 )
 
 type TokenAuthentication struct {
@@ -25,6 +27,24 @@ func Login(requestUser *backends.User, ab backends.Authentication, secret []byte
 	}
 
 	return http.StatusUnauthorized, []byte("")
+}
+
+func IsJwtTokenValid(token string, ab backends.Authentication, secret []byte, exp int) bool {
+	authBackend := InitJWTAuthenticationBackend(ab, secret, exp)
+
+	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		} else {
+			return authBackend.SecretKey, nil
+		}
+	})
+
+	if err == nil && jwtToken.Valid && !authBackend.IsInBlacklist(token) {
+		return true
+	} else {
+		return false
+	}
 }
 
 func RefreshToken(requestUser *backends.User, ab backends.Authentication, secret []byte, exp int) []byte {
