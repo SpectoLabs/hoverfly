@@ -2,6 +2,7 @@ package hoverfly
 
 import (
 	"bufio"
+	"encoding/base64"
 	"net"
 	"net/http"
 	"regexp"
@@ -27,7 +28,8 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	}
 
 	if hoverfly.Cfg.AuthEnabled {
-		auth.ProxyBasic(proxy, "hoverfly", func(user, password string) bool {
+		log.Info("Enabling proxy authentication")
+		proxyBasicAndBearer(proxy, "hoverfly", func(user, password string) bool {
 
 			proxyUser := &backends.User{
 				Username: user,
@@ -36,6 +38,8 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 
 			responseStatus, _ := authentication.Login(proxyUser, hoverfly.Authentication, nil, 0)
 			return responseStatus == http.StatusOK
+		}, func(headerToken string) bool {
+			return authentication.IsJwtTokenValid(headerToken, hoverfly.Authentication, hoverfly.Cfg.SecretKey, hoverfly.Cfg.JWTExpirationDelta)
 		})
 	}
 
@@ -160,4 +164,47 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	}).Info("Webserver prepared...")
 
 	return proxy
+}
+
+func proxyBasicAndBearer(proxy *goproxy.ProxyHttpServer, realm string, basicFunc func(user, passwd string) bool, bearerFunc func(token string) bool) {
+
+	proxy.OnRequest().Do(goproxy.FuncReqHandler(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+		if !authFromHeader(req, basicFunc, bearerFunc) {
+			return nil, auth.BasicUnauthorized(req, realm)
+		}
+		return req, nil
+	}))
+
+	proxy.OnRequest().HandleConnect(goproxy.FuncHttpsHandler(func(host string, ctx *goproxy.ProxyCtx) (*goproxy.ConnectAction, string) {
+		if !authFromHeader(ctx.Req, basicFunc, bearerFunc) {
+			ctx.Resp = auth.BasicUnauthorized(ctx.Req, realm)
+			return goproxy.RejectConnect, host
+		}
+		return goproxy.MitmConnect, host
+	}))
+}
+
+func authFromHeader(req *http.Request, basicFunc func(user, passwd string) bool, bearerFunc func(token string) bool) bool {
+	var proxyAuthorizationHeader = "Proxy-Authorization"
+
+	authheader := strings.SplitN(req.Header.Get(proxyAuthorizationHeader), " ", 2)
+	req.Header.Del(proxyAuthorizationHeader)
+	if len(authheader) != 2 {
+		return false
+	}
+	if authheader[0] == "Basic" {
+		userpassraw, err := base64.StdEncoding.DecodeString(authheader[1])
+		if err != nil {
+			return false
+		}
+		userpass := strings.SplitN(string(userpassraw), ":", 2)
+		if len(userpass) != 2 {
+			return false
+		}
+		return basicFunc(userpass[0], userpass[1])
+	} else if authheader[0] == "Bearer" {
+		return bearerFunc(authheader[1])
+	}
+
+	return false
 }
