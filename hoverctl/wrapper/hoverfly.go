@@ -432,7 +432,7 @@ func Stop(target *Target, hoverflyDirectory HoverflyDirectory) error {
 }
 
 func doRequest(target Target, method, url, body string) (*http.Response, error) {
-	url = fmt.Sprintf("http://%v:%v%v", target.Host, target.AdminPort, url)
+	url = BuildURL(target, url)
 
 	request, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
