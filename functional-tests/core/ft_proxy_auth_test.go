@@ -139,4 +139,39 @@ var _ = Describe("When I run Hoverfly", func() {
 			})
 		})
 	})
+
+	Context("with auth turned on and using https", func() {
+
+		BeforeEach(func() {
+			hoverfly.Start("-auth", "-username", username, "-password", password)
+		})
+
+		AfterEach(func() {
+			hoverfly.Stop()
+		})
+
+		// This test fails, if you try to manually execute it using the command below
+		// you will get an error, making me believe this isn't supported
+
+		// curl -proxy benji:password@localhost:8500 https://hoverfly.io
+
+		// It("should return a 502 (no match in simulate mode) when trying to proxy with auth credentials", func() {
+		// 	resp := hoverfly.ProxyWithAuth(sling.New().Get("https://hoverfly.io"), username, password)
+		// 	Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
+		// })
+
+		It("should return a 502 (no match in simulate mode) when using Basic Proxy-Authorization", func() {
+			base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+
+			resp := hoverfly.Proxy(sling.New().Get("https://hoverfly.io").Add("Proxy-Authorization", "Basic "+base64Encoded))
+			Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
+		})
+
+		It("should return a 502 (no match in simulate mode) when using Bearer Proxy-Authorization", func() {
+			token := hoverfly.GetAPIToken(username, password)
+
+			resp := hoverfly.Proxy(sling.New().Get("https://hoverfly.io").Add("Proxy-Authorization", "Bearer "+token))
+			Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
+		})
+	})
 })
