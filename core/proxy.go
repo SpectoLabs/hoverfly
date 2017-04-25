@@ -21,6 +21,7 @@ import (
 func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
+
 	proxy.OnRequest(goproxy.UrlMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).
 		HandleConnect(goproxy.AlwaysMitm)
 
@@ -32,6 +33,10 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	if hoverfly.Cfg.AuthEnabled {
 		log.Info("Enabling proxy authentication")
 		proxyBasicAndBearer(proxy, "hoverfly", func(user, password string) bool {
+			if hoverfly.Cfg.DisableBasicAuth {
+				log.Warn("Attempted basic authentication against proxy, basic authentication is currently disabled")
+				return false
+			}
 
 			proxyUser := &backends.User{
 				Username: user,
