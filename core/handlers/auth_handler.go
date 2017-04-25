@@ -1,15 +1,16 @@
 package handlers
 
 import (
-	"fmt"
-	log "github.com/Sirupsen/logrus"
 	"net/http"
+	"strings"
+
+	log "github.com/Sirupsen/logrus"
 
 	"encoding/json"
+
 	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/codegangsta/negroni"
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-zoo/bone"
 )
 
@@ -46,21 +47,18 @@ func (a *AuthHandler) RequireTokenAuthentication(w http.ResponseWriter, req *htt
 		return
 	}
 
-	authBackend := authentication.InitJWTAuthenticationBackend(a.AB, a.SecretKey, a.JWTExpirationDelta)
-
-	token, err := jwt.ParseFromRequest(req, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-		} else {
-			return authBackend.SecretKey, nil
+	if authorizationValue := req.Header.Get("Authorization"); authorizationValue != "" {
+		// Should be a bearer token
+		if len(authorizationValue) > 6 && strings.ToUpper(authorizationValue[0:7]) == "BEARER " {
+			if authentication.IsJwtTokenValid(authorizationValue[7:], a.AB, a.SecretKey, a.JWTExpirationDelta) {
+				next(w, req)
+			} else {
+				w.WriteHeader(http.StatusUnauthorized)
+			}
 		}
-	})
-
-	if err == nil && token.Valid && !authBackend.IsInBlacklist(req.Header.Get("Authorization")) {
-		next(w, req)
-	} else {
-		w.WriteHeader(http.StatusUnauthorized)
 	}
+
+	w.WriteHeader(http.StatusUnauthorized)
 }
 
 type AllUsersResponse struct {
