@@ -21,6 +21,8 @@ import (
 func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
+	proxy.OnRequest(goproxy.UrlMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).
+		HandleConnect(goproxy.AlwaysMitm)
 
 	if hoverfly.Cfg.HttpsOnly {
 		log.Info("Disabling HTTP")
@@ -42,9 +44,6 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 			return authentication.IsJwtTokenValid(headerToken, hoverfly.Authentication, hoverfly.Cfg.SecretKey, hoverfly.Cfg.JWTExpirationDelta)
 		})
 	}
-
-	proxy.OnRequest(goproxy.UrlMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).
-		HandleConnect(goproxy.AlwaysMitm)
 
 	// enable curl -p for all hosts on port 80
 	proxy.OnRequest(goproxy.UrlMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).
