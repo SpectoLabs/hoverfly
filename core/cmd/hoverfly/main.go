@@ -55,8 +55,6 @@ const boltBackend = "boltdb"
 const inmemoryBackend = "memory"
 
 var (
-	hoverflyVersion string
-
 	version     = flag.Bool("version", false, "get the version of hoverfly")
 	verbose     = flag.Bool("v", false, "should every proxy request be logged to stdout")
 	capture     = flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
@@ -160,7 +158,7 @@ func main() {
 	flag.Parse()
 
 	if *version {
-		fmt.Println(hoverflyVersion)
+		fmt.Println(hv.NewHoverfly().GetVersion())
 		os.Exit(0)
 	}
 
