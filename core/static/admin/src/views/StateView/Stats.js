@@ -88,7 +88,11 @@ export class StatsComponent extends React.Component<void, Props, void> {
 
   componentWillMount () {
     if ('WebSocket' in window) {
-      this.state.ws = new WebSocket('ws:/' + window.location.host + '/api/statsws')
+      if (window.location.protocol === "https:") {
+        this.state.ws = new WebSocket('wss:/' + window.location.host + '/api/statsws')
+      } else {
+        this.state.ws = new WebSocket('ws:/' + window.location.host + '/api/statsws')
+      }
 
       // this.state.ws.onclose = function () {
       //   console.log('Connection is closed, fetching manually')
