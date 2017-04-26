@@ -27,8 +27,8 @@ import {
 export function setMode (mode, token):Action {
   return function (dispatch) {
     dispatch(requestState())
-    return fetch('/api/state', {
-      method: 'POST',
+    return fetch('/api/v2/hoverfly/mode', {
+      method: 'PUT',
       credentials: 'include',
       headers: {
         'Accept': 'application/json',
@@ -126,7 +126,7 @@ export function fetchState (token) {
   }
   return function (dispatch) {
     dispatch(requestState())
-    return fetch('/api/state', {
+    return fetch('/api/v2/hoverfly/mode', {
       credentials: 'include',
       headers: {
         'Authorization': `Bearer ${token}`
