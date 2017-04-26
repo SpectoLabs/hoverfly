@@ -13,7 +13,7 @@ type Props = {
   pushPath: Function
 };
 
-export default class Navigation extends React.Component<void, Props, void> {
+export class Navigation extends React.Component<void, Props, void> {
   static propTypes = {
     pushPath: PropTypes.func.isRequired,
     isAuthenticated: PropTypes.bool.isRequired

@@ -5,7 +5,7 @@ import React, {PropTypes} from 'react'
 import ReactHighcharts from 'react-highcharts'
 import {connect} from 'react-redux'
 
-export default class CountersPie extends React.Component<void, Props, void> {
+export class CountersPie extends React.Component<void, Props, void> {
   constructor (props) {
     super(props)
     this.getOptions = this.getOptions.bind(this)

@@ -228,7 +228,7 @@ StatsComponent.propTypes = {
   info: PropTypes.object.isRequired
 }
 
-export default StatsComponent
+// export default StatsComponent
 
 const mapStateToProps = (state) => ({
   info: state.info
