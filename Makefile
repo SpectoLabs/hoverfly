@@ -8,7 +8,7 @@ hoverctl-test:
 
 hoverfly-build: hoverfly-test
 	cd core/cmd/hoverfly && \
-	go build -ldflags "-X main.hoverflyVersion=$(GIT_TAG_NAME)" -o ../../../target/hoverfly
+	go build -o ../../../target/hoverfly
 
 hoverctl-build: hoverctl-test
 	cd hoverctl && \
@@ -28,7 +28,7 @@ test: hoverfly-functional-test hoverctl-test hoverctl-functional-test
 
 build:
 	cd core/cmd/hoverfly && \
-	go build -ldflags "-X main.hoverflyVersion=$(GIT_TAG_NAME)" -o ../../../target/hoverfly
+	go build -o ../../../target/hoverfly
 
 	cd hoverctl && \
 	go build -ldflags "-X main.hoverctlVersion=$(GIT_TAG_NAME)" -o ../target/hoverctl
