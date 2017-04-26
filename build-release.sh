@@ -7,7 +7,7 @@ ZIP_TARGET_DIR=${DIR}/target
 HF_BUILD_DIR=${DIR}/core/cmd/hoverfly
 HCTL_BUILD_DIR=${DIR}/hoverctl
 LICENSE=${DIR}/LICENSE
-GOX="${GOPATH}/bin/gox -ldflags"
+GOX="${GOPATH}/bin/gox"
 declare -a OSARCH_LIST=("darwin/amd64" "windows/amd64" "windows/386" "linux/amd64" "linux/386")
 
 for OSARCH in "${OSARCH_LIST[@]}"; do
@@ -20,9 +20,9 @@ for OSARCH in "${OSARCH_LIST[@]}"; do
 
   mkdir -p ${BIN_TARGET_DIR}
   cd ${HF_BUILD_DIR}
-  ${GOX} "-X main.hoverflyVersion=${GIT_TAG_NAME}" -osarch="${OSARCH}" -output="${HF_BIN}"
+  ${GOX} -osarch="${OSARCH}" -output="${HF_BIN}"
   cd ${HCTL_BUILD_DIR}
-  ${GOX} "-X main.hoverctlVersion=${GIT_TAG_NAME}" -osarch="${OSARCH}" -output="${HCTL_BIN}"
+  ${GOX} -ldflags "-X main.hoverctlVersion=${GIT_TAG_NAME}" -osarch="${OSARCH}" -output="${HCTL_BIN}"
   echo "${GIT_TAG_NAME} ${SUFFIX}" > ${VERSION_FILE}
   cp ${LICENSE} ${BIN_TARGET_DIR}/LICENSE.txt
   zip -j ${ZIP_FILE} ${BIN_TARGET_DIR}/*
