@@ -41,9 +41,9 @@ update-dependencies:
 
 update-version:
 	awk \
-		-v line=$$(awk '/h.version/{print NR; exit}' core/hoverfly.go) \
+		-v line=$$(awk '/hoverfly.version/{print NR; exit}' core/hoverfly.go) \
 		-v version=${VERSION} \
-		'{ if (NR == line) print "	h.version = \"${VERSION}\""; else print $0}' core/hoverfly.go > core/hoverfly2.go
+		'{ if (NR == line) print "	hoverfly.version = \"${VERSION}\""; else print $0}' core/hoverfly.go > core/hoverfly2.go
 	rm -rf core/hoverfly.go
 	mv core/hoverfly2.go core/hoverfly.go
 	git add core/hoverfly.go
