@@ -39,7 +39,21 @@ var _ = Describe("hoverctl login", func() {
 		It("should not log you with incorrect credentials", func() {
 			output := functional_tests.Run(hoverctlBinary, "login", "--username", "incorrect", "--password", "incorrect")
 
-			Expect(output).To(ContainSubstring("Failed to login to Hoverfly"))
+			Expect(output).To(ContainSubstring("Incorrect username or password"))
+		})
+
+		It("should error after too many failed attempts", func() {
+			output := functional_tests.Run(hoverctlBinary, "login", "--username", "incorrect", "--password", "incorrect")
+			Expect(output).To(ContainSubstring("Incorrect username or password"))
+
+			output = functional_tests.Run(hoverctlBinary, "login", "--username", "incorrect", "--password", "incorrect")
+			Expect(output).To(ContainSubstring("Incorrect username or password"))
+
+			output = functional_tests.Run(hoverctlBinary, "login", "--username", "incorrect", "--password", "incorrect")
+			Expect(output).To(ContainSubstring("Incorrect username or password"))
+
+			output = functional_tests.Run(hoverctlBinary, "login", "--username", "incorrect", "--password", "incorrect")
+			Expect(output).To(ContainSubstring("Too many failed login attempts, please wait 10 minutes"))
 		})
 
 		It("should error nicely if username is missing", func() {
@@ -59,7 +73,7 @@ var _ = Describe("hoverctl login", func() {
 		It("should error nicely if it cannot connect", func() {
 			output := functional_tests.Run(hoverctlBinary, "login", "--username", username, "--password", password)
 
-			Expect(output).To(ContainSubstring("Failed to login to Hoverfly"))
+			Expect(output).To(ContainSubstring("There was an error when logging in"))
 		})
 	})
 

@@ -3,7 +3,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
@@ -55,11 +54,7 @@ target in the hoverctl configuration file.
 
 		token, err := wrapper.Login(*target, username, password)
 		if err != nil {
-			if verbose {
-				fmt.Fprintln(os.Stderr, err.Error())
-			}
-
-			handleIfError(errors.New("Failed to login to Hoverfly"))
+			handleIfError(err)
 		}
 
 		target.AuthToken = token
