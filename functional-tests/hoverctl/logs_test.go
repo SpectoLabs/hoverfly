@@ -83,7 +83,7 @@ var _ = Describe("When I use hoverctl", func() {
 			It("and the stderr is captured in the log file", func() {
 				functional_tests.Run(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
 
-				req := sling.New().Post(fmt.Sprintf("http://localhost:%v/api/state", adminPort)).Body(strings.NewReader(`{"mode":"not-a-mode"}`))
+				req := sling.New().Put(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/mode", adminPort)).Body(strings.NewReader(`{"mode":"not-a-mode"}`))
 				functional_tests.DoRequest(req)
 
 				workingDir, _ := os.Getwd()
@@ -92,7 +92,7 @@ var _ = Describe("When I use hoverctl", func() {
 				file, err := ioutil.ReadFile(filePath)
 				Expect(err).To(BeNil())
 
-				Expect(string(file)).To(ContainSubstring("Wrong mode found, can't change state"))
+				Expect(string(file)).To(ContainSubstring("Can't change mode to"))
 				Expect(string(file)).To(ContainSubstring("not-a-mode"))
 			})
 		})
