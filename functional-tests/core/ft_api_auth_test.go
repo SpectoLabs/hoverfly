@@ -90,4 +90,34 @@ var _ = Describe("When I run Hoverfly with auth", func() {
 			})
 		})
 	})
+
+	Context("Using a password  provided via command line", func() {
+
+		BeforeEach(func() {
+			hoverfly.Start("-auth", "-username", username, "-password", password)
+		})
+
+		AfterEach(func() {
+			hoverfly.Stop()
+		})
+		It("should return a 429 after three incorrect attempts", func() {
+			request := sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/token-auth").BodyJSON(backends.User{
+				Username: username,
+				Password: "wfewrrw",
+			})
+
+			response := functional_tests.DoRequest(request)
+			Expect(response.StatusCode).To(Equal(401))
+
+			response = functional_tests.DoRequest(request)
+			Expect(response.StatusCode).To(Equal(401))
+
+			response = functional_tests.DoRequest(request)
+			Expect(response.StatusCode).To(Equal(401))
+
+			response = functional_tests.DoRequest(request)
+			Expect(response.StatusCode).To(Equal(429))
+		})
+
+	})
 })
