@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"time"
+
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	jwt "github.com/dgrijalva/jwt-go"
 )
@@ -13,8 +15,39 @@ type TokenAuthentication struct {
 	Token string `json:"token" form:"token"`
 }
 
+type FailedAttempts struct {
+	Count      int
+	LastFailed time.Time
+}
+
+var Attempts FailedAttempts
+
+func HasReachedFailedAttemptsLimit(limit int, timeout string) bool {
+	if Attempts.Count >= limit {
+		failureTimeout, _ := time.ParseDuration(timeout)
+
+		if time.Now().Sub(Attempts.LastFailed) > failureTimeout {
+			Attempts.Count = 0
+		} else {
+			updateFailedAttempts()
+			return true
+		}
+	}
+
+	return false
+}
+
+func updateFailedAttempts() {
+	Attempts.Count++
+	Attempts.LastFailed = time.Now()
+}
+
 func Login(requestUser *backends.User, ab backends.Authentication, secret []byte, exp int) (int, []byte) {
 	authBackend := InitJWTAuthenticationBackend(ab, secret, exp)
+
+	if HasReachedFailedAttemptsLimit(3, "10m") {
+		return http.StatusTooManyRequests, []byte("")
+	}
 
 	if authBackend.Authenticate(requestUser) {
 		token, err := authBackend.GenerateToken(requestUser.UUID, requestUser.Username)
@@ -26,6 +59,7 @@ func Login(requestUser *backends.User, ab backends.Authentication, secret []byte
 		}
 	}
 
+	updateFailedAttempts()
 	return http.StatusUnauthorized, []byte("")
 }
 
