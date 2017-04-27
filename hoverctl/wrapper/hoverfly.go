@@ -290,12 +290,12 @@ func Login(target Target, username, password string) (string, error) {
 
 	jsonCredentials, err := json.Marshal(credentials)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("There was an error when preparing to login")
 	}
 
 	request, err := http.NewRequest("POST", BuildURL(target, "/api/token-auth"), strings.NewReader(string(jsonCredentials)))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("There was an error when preparing to login")
 	}
 
 	client := &http.Client{
@@ -308,18 +308,26 @@ func Login(target Target, username, password string) (string, error) {
 
 	response, err := client.Do(request)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("There was an error when logging in")
+	}
+
+	if response.StatusCode == http.StatusTooManyRequests {
+		return "", fmt.Errorf("Too many failed login attempts, please wait 10 minutes")
+	}
+
+	if response.StatusCode == http.StatusUnauthorized {
+		return "", fmt.Errorf("Incorrect username or password")
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("There was an error when logging in")
 	}
 
 	var authToken HoverflyAuthTokenSchema
 	err = json.Unmarshal(body, &authToken)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("There was an error when logging in")
 	}
 
 	return authToken.Token, nil
