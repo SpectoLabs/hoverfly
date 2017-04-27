@@ -26,11 +26,12 @@ func Test_HasReachFailedAttemptsLimit_ReturnsFalseIfAttemptsIsBelowOrEqualToLimi
 	Expect(authentication.HasReachedFailedAttemptsLimit(3, "10s")).To(BeFalse())
 }
 
-func Test_HasReachFailedAttemptsLimit_ReturnsTrueIfAttemptsIsAboveLimit(t *testing.T) {
+func Test_HasReachFailedAttemptsLimit_ReturnsTrueIfAttemptsIsAboveLimit_AndLastFailedIsWithinTheTimeoutPeriod(t *testing.T) {
 	RegisterTestingT(t)
 
 	authentication.Attempts.Count = 4
-	Expect(authentication.HasReachedFailedAttemptsLimit(3, "10s")).To(BeFalse())
+	authentication.Attempts.LastFailed = time.Now()
+	Expect(authentication.HasReachedFailedAttemptsLimit(3, "10s")).To(BeTrue())
 }
 
 func Test_HasReachFailedAttemptsLimit_IncreasesCountIfAttemptsIsAboveLimit_AndLastFailedIsWithinTheTimeoutPeriod(t *testing.T) {
