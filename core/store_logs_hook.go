@@ -1,6 +1,8 @@
 package hoverfly
 
 import (
+	"bytes"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
@@ -65,4 +67,26 @@ func (hook StoreLogsHook) GetFilteredLogsView(limit int) v2.LogsView {
 	return v2.LogsView{
 		Logs: logs,
 	}
+}
+
+func (hook StoreLogsHook) GetLogs() string {
+	return hook.GetFilteredLogs(500)
+}
+
+func (hook StoreLogsHook) GetFilteredLogs(limit int) string {
+
+	if limit > len(hook.Entries) {
+		limit = len(hook.Entries)
+	}
+
+	var buffer bytes.Buffer
+	for _, entry := range hook.Entries[:limit] {
+		entry.Logger = logrus.New()
+		log, err := entry.String()
+		if err == nil {
+			buffer.WriteString(log)
+		}
+	}
+
+	return buffer.String()
 }
