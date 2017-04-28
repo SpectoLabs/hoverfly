@@ -55,8 +55,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverfly(adminPort, proxyPort)
-			ImportHoverflySimulation(bytes.NewBufferString(functional_tests.JsonPayload))
-			SetHoverflyResponseDelays("testdata/delays.json")
+			ImportHoverflySimulation(bytes.NewBufferString(functional_tests.JsonPayloadWithDelays))
 			SetHoverflyMode("simulate")
 		})
 
@@ -80,7 +79,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "python testdata/middleware.py")
-			SetHoverflyResponseDelays("testdata/delays.json")
+			ImportHoverflySimulation(bytes.NewBufferString(functional_tests.JsonPayloadWithDelays))
 			SetHoverflyMode("synthesize")
 		})
 
@@ -106,7 +105,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 		BeforeEach(func() {
 			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, "python testdata/middleware.py")
-			SetHoverflyResponseDelays("testdata/delays.json")
+			ImportHoverflySimulation(bytes.NewBufferString(functional_tests.JsonPayloadWithDelays))
 			SetHoverflyMode("modify")
 		})
 
