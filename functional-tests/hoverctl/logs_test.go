@@ -63,7 +63,8 @@ var _ = Describe("When I use hoverctl", func() {
 				file, err := ioutil.ReadFile(filePath)
 				Expect(err).To(BeNil())
 
-				Expect(string(file)).To(ContainSubstring("listening on :" + adminPort))
+				Expect(string(file)).To(ContainSubstring("Admin interface is starting..."))
+				Expect(string(file)).To(ContainSubstring("serving proxy"))
 			})
 
 			It("and they get updated when you use hoverfly", func() {
