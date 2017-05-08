@@ -52,7 +52,36 @@ var _ = Describe("When I run Hoverfly", func() {
 			})
 		})
 
-		Context("Using the `Proxy-Authorization header`", func() {
+		Context("Using the `X-HOVERFLY-AUTHORIZATION` header", func() {
+
+			It("should return a 502 (no match in simulate mode) when using Basic", func() {
+				base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("X-HOVERFLY-AUTHORIZATION", "Basic "+base64Encoded))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
+			})
+
+			It("should return a 407 when using Basic with an incorrect base64 encoded credentials", func() {
+				base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":incorect"))
+
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("X-HOVERFLY-AUTHORIZATION", "Basic "+base64Encoded))
+				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+			})
+
+			It("should return a 502 (no match in simulate mode) when using Bearer", func() {
+				token := hoverfly.GetAPIToken(username, password)
+
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("X-HOVERFLY-AUTHORIZATION", "Bearer "+token))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
+			})
+
+			It("should return a 407 when using Bearer with an incorrect token", func() {
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("X-HOVERFLY-AUTHORIZATION", "Bearer ewGvdww.wRgFhE34.token"))
+				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+			})
+		})
+
+		Context("Using the `Proxy-Authorization` header", func() {
 
 			It("should return a 502 (no match in simulate mode) when using Basic", func() {
 				base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
@@ -110,7 +139,36 @@ var _ = Describe("When I run Hoverfly", func() {
 			})
 		})
 
-		Context("Using the `Proxy-Authorization header`", func() {
+		Context("Using the `X-HOVERFLY-AUTHORIZATION` header", func() {
+
+			It("should return a 502 (no match in simulate mode) when using Basic", func() {
+				base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("X-HOVERFLY-AUTHORIZATION", "Basic "+base64Encoded))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
+			})
+
+			It("should return a 407 when using Basic with an incorrect base64 encoded credentials", func() {
+				base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":incorect"))
+
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("X-HOVERFLY-AUTHORIZATION", "Basic "+base64Encoded))
+				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+			})
+
+			It("should return a 502 (no match in simulate mode) when using Bearer", func() {
+				token := hoverfly.GetAPIToken(username, password)
+
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("X-HOVERFLY-AUTHORIZATION", "Bearer "+token))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
+			})
+
+			It("should return a 407 when using Bearer with an incorrect token", func() {
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("X-HOVERFLY-AUTHORIZATION", "Bearer ewGvdww.wRgFhE34.token"))
+				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+			})
+		})
+
+		Context("Using the `Proxy-Authorization` header", func() {
 
 			It("should return a 502 (no match in simulate mode) when using Basic", func() {
 				base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
@@ -175,33 +233,72 @@ var _ = Describe("When I run Hoverfly", func() {
 		})
 	})
 
-	Context("with auth turned on disabled auth basic", func() {
+	Context("with auth turned on and disabled standard proxy authorization", func() {
 
 		BeforeEach(func() {
-			hoverfly.Start("-auth", "-username", username, "-password", password, "-disable-basic-auth")
+			hoverfly.Start("-auth", "-username", username, "-password", password, "-disable-standard-proxy-auth")
 		})
 
 		AfterEach(func() {
 			hoverfly.Stop()
 		})
 
-		It("should return a 502 (no match in simulate mode) when trying to proxy with HTTP client proxy authentication config values", func() {
-			resp := hoverfly.ProxyWithAuth(sling.New().Get("https://hoverfly.io"), username, password)
-			Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+		Context("Using the `X-HOVERFLY-AUTHORIZATION` header", func() {
+
+			It("should return a 502 (no match in simulate mode) when using Basic", func() {
+				base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("X-HOVERFLY-AUTHORIZATION", "Basic "+base64Encoded))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
+			})
+
+			It("should return a 407 when using Basic with an incorrect base64 encoded credentials", func() {
+				base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":incorect"))
+
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("X-HOVERFLY-AUTHORIZATION", "Basic "+base64Encoded))
+				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+			})
+
+			It("should return a 502 (no match in simulate mode) when using Bearer", func() {
+				token := hoverfly.GetAPIToken(username, password)
+
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("X-HOVERFLY-AUTHORIZATION", "Bearer "+token))
+				Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
+			})
+
+			It("should return a 407 when using Bearer with an incorrect token", func() {
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("X-HOVERFLY-AUTHORIZATION", "Bearer ewGvdww.wRgFhE34.token"))
+				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+			})
 		})
 
-		It("should return a 407 (no match in simulate mode) when using Basic Proxy-Authorization", func() {
-			base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+		Context("Using the `Proxy-Authorization` header", func() {
 
-			resp := hoverfly.Proxy(sling.New().Get("https://hoverfly.io").Add("Proxy-Authorization", "Basic "+base64Encoded))
-			Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
-		})
+			It("should return a 407 (no match in simulate mode) when using Basic", func() {
+				base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
 
-		It("should return a 502 (no match in simulate mode) when using Bearer Proxy-Authorization", func() {
-			token := hoverfly.GetAPIToken(username, password)
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("Proxy-Authorization", "Basic "+base64Encoded))
+				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+			})
 
-			resp := hoverfly.Proxy(sling.New().Get("https://hoverfly.io").Add("Proxy-Authorization", "Bearer "+token))
-			Expect(resp.StatusCode).To(Equal(http.StatusBadGateway))
+			It("should return a 407 when using Basic with an incorrect base64 encoded credentials", func() {
+				base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":incorect"))
+
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("Proxy-Authorization", "Basic "+base64Encoded))
+				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+			})
+
+			It("should return a 407 (no match in simulate mode) when using Bearer", func() {
+				token := hoverfly.GetAPIToken(username, password)
+
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("Proxy-Authorization", "Bearer "+token))
+				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+			})
+
+			It("should return a 407 when using Bearer with an incorrect token", func() {
+				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("Proxy-Authorization", "Bearer ewGvdww.wRgFhE34.token"))
+				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+			})
 		})
 	})
 })

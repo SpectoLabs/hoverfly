@@ -16,9 +16,16 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
+var disableProxyAuthoriation = false
+
+var XHoverflyAuthorizationHeader = "X-HOVERFLY-AUTHORIZATION"
+var ProxyAuthorizationHeader = "Proxy-Authorization"
+
 // Creates goproxy.ProxyHttpServer and configures it to be used as a proxy for Hoverfly
 // goproxy is given handlers that use the Hoverfly request processing
 func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
+	disableProxyAuthoriation = hoverfly.Cfg.DisableProxyAuthoriation
+
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 
@@ -33,10 +40,6 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	if hoverfly.Cfg.AuthEnabled {
 		log.Info("Enabling proxy authentication")
 		proxyBasicAndBearer(proxy, "hoverfly", func(user, password string) bool {
-			if hoverfly.Cfg.DisableBasicAuth {
-				log.Warn("Attempted basic authentication against proxy, basic authentication is currently disabled")
-				return false
-			}
 
 			proxyUser := &backends.User{
 				Username: user,
@@ -44,6 +47,7 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 			}
 
 			responseStatus, _ := authentication.Login(proxyUser, hoverfly.Authentication, nil, 0)
+
 			return responseStatus == http.StatusOK
 		}, func(headerToken string) bool {
 			return authentication.IsJwtTokenValid(headerToken, hoverfly.Authentication, hoverfly.Cfg.SecretKey, hoverfly.Cfg.JWTExpirationDelta)
@@ -189,10 +193,13 @@ func proxyBasicAndBearer(proxy *goproxy.ProxyHttpServer, realm string, basicFunc
 }
 
 func authFromHeader(req *http.Request, basicFunc func(user, passwd string) bool, bearerFunc func(token string) bool) bool {
-	var proxyAuthorizationHeader = "Proxy-Authorization"
+	headerValue := req.Header.Get(XHoverflyAuthorizationHeader)
+	if headerValue == "" && !disableProxyAuthoriation {
+		headerValue = req.Header.Get(ProxyAuthorizationHeader)
+	}
 
-	authheader := strings.SplitN(req.Header.Get(proxyAuthorizationHeader), " ", 2)
-	req.Header.Del(proxyAuthorizationHeader)
+	authheader := strings.SplitN(headerValue, " ", 2)
+	req.Header.Del(ProxyAuthorizationHeader)
 	if len(authheader) != 2 {
 		return false
 	}

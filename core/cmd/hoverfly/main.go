@@ -74,7 +74,7 @@ var (
 	addPasswordHash  = flag.String("password-hash", "", "password hash for new user instead of password")
 	isAdmin          = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
 	authEnabled      = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
-	disableBasicAuth = flag.Bool("disable-basic-auth", false, "disable Basic authentication, requiring all authentication to use API tokens")
+	disableProxyAuth = flag.Bool("disable-standard-proxy-auth", false, "disables the standard Proxy-Authorization header, only allowing `X-HOVERFLY-AUTHORIZATION`")
 
 	generateCA = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
 	certName   = flag.String("cert-name", "hoverfly.proxy", "cert name")
@@ -214,7 +214,6 @@ func main() {
 	}
 
 	cfg.HttpsOnly = *httpsOnly
-	cfg.DisableBasicAuth = *disableBasicAuth
 
 	// development settings
 	cfg.Development = *dev
@@ -282,6 +281,8 @@ func main() {
 	if cfg.DisableCache {
 		requestCache = nil
 	}
+
+	cfg.DisableProxyAuthoriation = *disableProxyAuth
 
 	authBackend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
 

@@ -32,7 +32,8 @@ type Configuration struct {
 	SecretKey          []byte
 	JWTExpirationDelta int
 	AuthEnabled        bool
-	DisableBasicAuth   bool
+
+	DisableProxyAuthoriation bool
 
 	HttpsOnly bool
 
