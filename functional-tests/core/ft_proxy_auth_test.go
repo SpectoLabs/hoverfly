@@ -5,6 +5,8 @@ import (
 
 	"encoding/base64"
 
+	"io/ioutil"
+
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -279,6 +281,9 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("Proxy-Authorization", "Basic "+base64Encoded))
 				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+
+				responseBody, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(responseBody)).To(Equal("407 `Proxy-Authorization` header is disabled, use `X-HOVERFLY-AUTHORIZATION` instead"))
 			})
 
 			It("should return a 407 when using Basic with an incorrect base64 encoded credentials", func() {
@@ -286,6 +291,9 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("Proxy-Authorization", "Basic "+base64Encoded))
 				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+
+				responseBody, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(responseBody)).To(Equal("407 `Proxy-Authorization` header is disabled, use `X-HOVERFLY-AUTHORIZATION` instead"))
 			})
 
 			It("should return a 407 (no match in simulate mode) when using Bearer", func() {
@@ -293,11 +301,17 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("Proxy-Authorization", "Bearer "+token))
 				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+
+				responseBody, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(responseBody)).To(Equal("407 `Proxy-Authorization` header is disabled, use `X-HOVERFLY-AUTHORIZATION` instead"))
 			})
 
 			It("should return a 407 when using Bearer with an incorrect token", func() {
 				resp := hoverfly.Proxy(sling.New().Get("http://hoverfly.io").Add("Proxy-Authorization", "Bearer ewGvdww.wRgFhE34.token"))
 				Expect(resp.StatusCode).To(Equal(http.StatusProxyAuthRequired))
+
+				responseBody, _ := ioutil.ReadAll(resp.Body)
+				Expect(string(responseBody)).To(Equal("407 `Proxy-Authorization` header is disabled, use `X-HOVERFLY-AUTHORIZATION` instead"))
 			})
 		})
 	})

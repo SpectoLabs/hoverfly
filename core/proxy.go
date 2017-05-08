@@ -2,11 +2,15 @@ package hoverfly
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/base64"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"regexp"
 	"strings"
+
+	"fmt"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
@@ -174,48 +178,69 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	return proxy
 }
 
+func unauthorizedError(request *http.Request, realm, message string) *http.Response {
+	response := auth.BasicUnauthorized(request, realm)
+	response.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(message)))
+	response.ContentLength = int64(len(message))
+
+	return response
+}
+
 func proxyBasicAndBearer(proxy *goproxy.ProxyHttpServer, realm string, basicFunc func(user, passwd string) bool, bearerFunc func(token string) bool) {
 
 	proxy.OnRequest().Do(goproxy.FuncReqHandler(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-		if !authFromHeader(req, basicFunc, bearerFunc) {
-			return nil, auth.BasicUnauthorized(req, realm)
+		err := authFromHeader(req, basicFunc, bearerFunc)
+		if err != nil {
+			return nil, unauthorizedError(req, realm, err.Error())
 		}
 		return req, nil
 	}))
 
 	proxy.OnRequest().HandleConnect(goproxy.FuncHttpsHandler(func(host string, ctx *goproxy.ProxyCtx) (*goproxy.ConnectAction, string) {
-		if !authFromHeader(ctx.Req, basicFunc, bearerFunc) {
-			ctx.Resp = auth.BasicUnauthorized(ctx.Req, realm)
+		err := authFromHeader(ctx.Req, basicFunc, bearerFunc)
+		if err != nil {
+			ctx.Resp = unauthorizedError(ctx.Req, realm, err.Error())
 			return goproxy.RejectConnect, host
 		}
 		return goproxy.MitmConnect, host
 	}))
 }
 
-func authFromHeader(req *http.Request, basicFunc func(user, passwd string) bool, bearerFunc func(token string) bool) bool {
+func authFromHeader(req *http.Request, basicFunc func(user, passwd string) bool, bearerFunc func(token string) bool) error {
 	headerValue := req.Header.Get(XHoverflyAuthorizationHeader)
-	if headerValue == "" && !disableProxyAuthoriation {
+	if headerValue == "" {
 		headerValue = req.Header.Get(ProxyAuthorizationHeader)
+		if headerValue != "" && disableProxyAuthoriation {
+			return fmt.Errorf("407 `Proxy-Authorization` header is disabled, use `X-HOVERFLY-AUTHORIZATION` instead")
+		}
 	}
 
 	authheader := strings.SplitN(headerValue, " ", 2)
 	req.Header.Del(ProxyAuthorizationHeader)
 	if len(authheader) != 2 {
-		return false
+		return fmt.Errorf("407 Proxy authentication required")
 	}
 	if authheader[0] == "Basic" {
 		userpassraw, err := base64.StdEncoding.DecodeString(authheader[1])
 		if err != nil {
-			return false
+			return fmt.Errorf("407 Proxy authentication required")
 		}
 		userpass := strings.SplitN(string(userpassraw), ":", 2)
 		if len(userpass) != 2 {
-			return false
+			return fmt.Errorf("407 Proxy authentication required")
 		}
-		return basicFunc(userpass[0], userpass[1])
+		result := basicFunc(userpass[0], userpass[1])
+		if result == false {
+			return fmt.Errorf("407 Proxy authentication required")
+		}
 	} else if authheader[0] == "Bearer" {
-		return bearerFunc(authheader[1])
+		result := bearerFunc(authheader[1])
+		if result == false {
+			return fmt.Errorf("407 Proxy authentication required")
+		}
+	} else {
+		return fmt.Errorf("407 Unknown authentication type `%v`, only `Basic` or `Bearer` are supported", authheader[0])
 	}
 
-	return false
+	return nil
 }
