@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
@@ -15,6 +16,8 @@ import (
 type HoverflyLogs interface {
 	GetLogsView() LogsView
 	GetFilteredLogsView(int) LogsView
+	GetLogs() string
+	GetFilteredLogs(int) string
 }
 
 type LogsHandler struct {
@@ -35,15 +38,27 @@ func (this *LogsHandler) Get(w http.ResponseWriter, req *http.Request, next http
 
 	queryParams := req.URL.Query()
 	limitQuery, err := strconv.Atoi(queryParams.Get("limit"))
-	if err == nil {
-		logs = this.Hoverfly.GetFilteredLogsView(limitQuery)
+
+	if strings.Contains(req.Header.Get("Content-Type"), "text/plain") {
+		var logs string
+		if err == nil {
+			logs = this.Hoverfly.GetFilteredLogs(limitQuery)
+		} else {
+			logs = this.Hoverfly.GetLogs()
+		}
+
+		handlers.WriteResponse(w, []byte(logs))
 	} else {
-		logs = this.Hoverfly.GetLogsView()
+		if err == nil {
+			logs = this.Hoverfly.GetFilteredLogsView(limitQuery)
+		} else {
+			logs = this.Hoverfly.GetLogsView()
+		}
+
+		bytes, _ := json.Marshal(logs)
+
+		handlers.WriteResponse(w, bytes)
 	}
-
-	bytes, _ := json.Marshal(logs)
-
-	handlers.WriteResponse(w, bytes)
 }
 
 func (this *LogsHandler) GetWS(w http.ResponseWriter, r *http.Request) {

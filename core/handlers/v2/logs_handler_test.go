@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"testing"
 
 	. "github.com/onsi/gomega"
@@ -28,7 +29,15 @@ func (this HoverflyLogsStub) GetFilteredLogsView(limit int) LogsView {
 	}}
 }
 
-func Test_LogsHandler_Get_ReturnsLogs(t *testing.T) {
+func (this HoverflyLogsStub) GetLogs() string {
+	return "a line of logs"
+}
+
+func (this HoverflyLogsStub) GetFilteredLogs(limit int) string {
+	return "filtered logs by " + strconv.Itoa(limit)
+}
+
+func Test_LogsHandler_Get_ReturnsLogsView(t *testing.T) {
 	RegisterTestingT(t)
 
 	stubHoverfly := &HoverflyLogsStub{}
@@ -45,6 +54,25 @@ func Test_LogsHandler_Get_ReturnsLogs(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(logsView.Logs[0]["msg"]).To(Equal("test"))
+}
+
+func Test_LogsHandler_Get_ReturnsLogsInPlaintext(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyLogsStub{}
+	unit := LogsHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "", nil)
+	Expect(err).To(BeNil())
+
+	request.Header.Set("Content-Type", "text/plain")
+
+	response := makeRequestOnHandler(unit.Get, request)
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	logs, _ := ioutil.ReadAll(response.Body)
+
+	Expect(string(logs)).To(Equal("a line of logs"))
 }
 
 func unmarshalLogsView(buffer *bytes.Buffer) (LogsView, error) {
