@@ -88,7 +88,7 @@ export class StatsComponent extends React.Component<void, Props, void> {
 
   componentWillMount () {
     if ('WebSocket' in window) {
-      if (window.location.protocol === "https:") {
+      if (window.location.protocol === 'https:') {
         this.state.ws = new WebSocket('wss:/' + window.location.host + '/api/statsws')
       } else {
         this.state.ws = new WebSocket('ws:/' + window.location.host + '/api/statsws')
