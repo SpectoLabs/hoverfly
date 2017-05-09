@@ -33,6 +33,13 @@ build:
 	cd hoverctl && \
 	go build -ldflags "-X main.hoverctlVersion=$(GIT_TAG_NAME)" -o ../target/hoverctl
 
+build-ui:
+	cd core/static/admin && \
+	npm run compile && \
+	npm run deploy
+	cd core && \
+	statik -src=./static/admin/dist
+
 fmt:
 	go fmt $$(go list ./... | grep -v -E 'vendor')
 
