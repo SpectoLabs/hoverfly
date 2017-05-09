@@ -75,7 +75,7 @@ var (
 	isAdmin         = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
 	authEnabled     = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
 
-	proxyAuthorizationHeader = flag.String("proxy-auth", "default", "Switch the Proxy-Authorization header from proxy-auth `Proxy-Authorization` to header-auth `X-HOVERFLY-AUTHORIZATION`")
+	proxyAuthorizationHeader = flag.String("proxy-auth", "proxy-auth", "Switch the Proxy-Authorization header from proxy-auth `Proxy-Authorization` to header-auth `X-HOVERFLY-AUTHORIZATION`. Switching to header-auth will auto enable -https-only")
 
 	generateCA = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
 	certName   = flag.String("cert-name", "hoverfly.proxy", "cert name")
