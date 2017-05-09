@@ -51,6 +51,7 @@ functional-tests/hoverctl/bin/hoverctl
 functional-tests/hoverctl/.hoverfly/cache/*.json
 functional-tests/hoverctl/.hoverfly/config.yaml
 functional-tests/hoverctl/.hoverfly/*.pid
-functional-tests/hoverctl/bin/hoverctl
-
+functional-tests/hoverctl/testdata-gen
+functional-tests/core/bin/hoverctl
+functional-tests/core/bin/hoverfly
 .DS_Store
