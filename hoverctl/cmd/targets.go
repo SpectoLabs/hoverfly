@@ -24,11 +24,16 @@ Get the current targets registered with hoverctl
 		}
 
 		data := [][]string{
-			[]string{"Target name", "Pid", "Host", "Admin port", "Proxy port"},
+			{"Target name", "Pid", "Host", "Admin port", "Proxy port", "Default"},
 		}
 
 		for key, target := range config.Targets {
-			data = append(data, []string{key, strconv.Itoa(target.Pid), target.Host, strconv.Itoa(target.AdminPort), strconv.Itoa(target.ProxyPort)})
+			defaultMarker := ""
+			if target.Name == config.DefaultTarget {
+				defaultMarker = "X"
+			}
+
+			data = append(data, []string{key, strconv.Itoa(target.Pid), target.Host, strconv.Itoa(target.AdminPort), strconv.Itoa(target.ProxyPort), defaultMarker})
 		}
 
 		drawTable(data, true)
