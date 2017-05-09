@@ -33,7 +33,7 @@ type Configuration struct {
 	JWTExpirationDelta int
 	AuthEnabled        bool
 
-	DisableProxyAuthoriation bool
+	ProxyAuthorizationHeader string
 
 	HttpsOnly bool
 
@@ -170,6 +170,8 @@ func InitSettings() *Configuration {
 	} else {
 		appConfig.TLSVerification = true
 	}
+
+	appConfig.ProxyAuthorizationHeader = "Proxy-Authorization"
 
 	return &appConfig
 }

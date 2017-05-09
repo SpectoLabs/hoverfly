@@ -20,15 +20,12 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
-var disableProxyAuthoriation = false
-
-var XHoverflyAuthorizationHeader = "X-HOVERFLY-AUTHORIZATION"
-var ProxyAuthorizationHeader = "Proxy-Authorization"
+var ProxyAuthorizationHeader string
 
 // Creates goproxy.ProxyHttpServer and configures it to be used as a proxy for Hoverfly
 // goproxy is given handlers that use the Hoverfly request processing
 func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
-	disableProxyAuthoriation = hoverfly.Cfg.DisableProxyAuthoriation
+	ProxyAuthorizationHeader = hoverfly.Cfg.ProxyAuthorizationHeader
 
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
@@ -207,12 +204,10 @@ func proxyBasicAndBearer(proxy *goproxy.ProxyHttpServer, realm string, basicFunc
 }
 
 func authFromHeader(req *http.Request, basicFunc func(user, passwd string) bool, bearerFunc func(token string) bool) error {
-	headerValue := req.Header.Get(XHoverflyAuthorizationHeader)
-	if headerValue == "" {
-		headerValue = req.Header.Get(ProxyAuthorizationHeader)
-		if headerValue != "" && disableProxyAuthoriation {
-			return fmt.Errorf("407 `Proxy-Authorization` header is disabled, use `X-HOVERFLY-AUTHORIZATION` instead")
-		}
+	headerValue := req.Header.Get(ProxyAuthorizationHeader)
+
+	if ProxyAuthorizationHeader != "Proxy-Authorization" && req.Header.Get("Proxy-Authorization") != "" {
+		return fmt.Errorf("407 `Proxy-Authorization` header is disabled, use `X-HOVERFLY-AUTHORIZATION` instead")
 	}
 
 	authheader := strings.SplitN(headerValue, " ", 2)
