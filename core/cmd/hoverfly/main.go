@@ -68,13 +68,14 @@ var (
 	destination = flag.String("destination", ".", "destination URI to catch")
 	webserver   = flag.Bool("webserver", false, "start Hoverfly in webserver mode (simulate mode)")
 
-	addNew           = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
-	addUser          = flag.String("username", "", "username for new user")
-	addPassword      = flag.String("password", "", "password for new user")
-	addPasswordHash  = flag.String("password-hash", "", "password hash for new user instead of password")
-	isAdmin          = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
-	authEnabled      = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
-	disableProxyAuth = flag.Bool("disable-standard-proxy-auth", false, "disables the standard Proxy-Authorization header, only allowing `X-HOVERFLY-AUTHORIZATION`")
+	addNew          = flag.Bool("add", false, "add new user '-add -username hfadmin -password hfpass'")
+	addUser         = flag.String("username", "", "username for new user")
+	addPassword     = flag.String("password", "", "password for new user")
+	addPasswordHash = flag.String("password-hash", "", "password hash for new user instead of password")
+	isAdmin         = flag.Bool("admin", true, "supply '-admin false' to make this non admin user (defaults to 'true') ")
+	authEnabled     = flag.Bool("auth", false, "enable authentication, currently it is disabled by default")
+
+	proxyAuthorizationHeader = flag.String("proxy-auth", "default", "Switch the Proxy-Authorization header from proxy-auth `Proxy-Authorization` to header-auth `X-HOVERFLY-AUTHORIZATION`")
 
 	generateCA = flag.Bool("generate-ca-cert", false, "generate CA certificate and private key for MITM")
 	certName   = flag.String("cert-name", "hoverfly.proxy", "cert name")
@@ -282,7 +283,12 @@ func main() {
 		requestCache = nil
 	}
 
-	cfg.DisableProxyAuthoriation = *disableProxyAuth
+	if *proxyAuthorizationHeader == "header-auth" {
+		log.Warnf("Proxy authentication will use `X-HOVERFLY-AUTHORIZATION` instead of `Proxy-Authorization`")
+		cfg.ProxyAuthorizationHeader = "X-HOVERFLY-AUTHORIZATION"
+		log.Warnf("Setting Hoverfly to only proxy HTTPS requests")
+		cfg.HttpsOnly = true
+	}
 
 	authBackend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
 
