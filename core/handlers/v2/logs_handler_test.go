@@ -5,36 +5,18 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"testing"
 
+	"github.com/Sirupsen/logrus"
 	. "github.com/onsi/gomega"
 )
 
 type HoverflyLogsStub struct{}
 
-func (this HoverflyLogsStub) GetLogsView() LogsView {
-	return LogsView{[]map[string]interface{}{
-		map[string]interface{}{
-			"msg": "test",
-		},
+func (this HoverflyLogsStub) GetLogs(limit int) []*logrus.Entry {
+	return []*logrus.Entry{&logrus.Entry{
+		Message: "a line of logs",
 	}}
-}
-
-func (this HoverflyLogsStub) GetFilteredLogsView(limit int) LogsView {
-	return LogsView{[]map[string]interface{}{
-		map[string]interface{}{
-			"msg": "limited",
-		},
-	}}
-}
-
-func (this HoverflyLogsStub) GetLogs() string {
-	return "a line of logs"
-}
-
-func (this HoverflyLogsStub) GetFilteredLogs(limit int) string {
-	return "filtered logs by " + strconv.Itoa(limit)
 }
 
 func Test_LogsHandler_Get_ReturnsLogsView(t *testing.T) {
@@ -53,7 +35,7 @@ func Test_LogsHandler_Get_ReturnsLogsView(t *testing.T) {
 	logsView, err := unmarshalLogsView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(logsView.Logs[0]["msg"]).To(Equal("test"))
+	Expect(logsView.Logs[0]["msg"]).To(Equal("a line of logs"))
 }
 
 func Test_LogsHandler_Get_ReturnsLogsInPlaintext(t *testing.T) {
@@ -72,7 +54,7 @@ func Test_LogsHandler_Get_ReturnsLogsInPlaintext(t *testing.T) {
 
 	logs, _ := ioutil.ReadAll(response.Body)
 
-	Expect(string(logs)).To(Equal("a line of logs"))
+	Expect(string(logs)).To(ContainSubstring("time=\"0001-01-01T00:00:00Z\" level=panic msg=\"a line of logs\""))
 }
 
 func unmarshalLogsView(buffer *bytes.Buffer) (LogsView, error) {

@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -8,16 +9,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 )
 
 type HoverflyLogs interface {
-	GetLogsView() LogsView
-	GetFilteredLogsView(int) LogsView
-	GetLogs() string
-	GetFilteredLogs(int) string
+	GetLogs(limit int) []*logrus.Entry
 }
 
 type LogsHandler struct {
@@ -34,31 +33,57 @@ func (this *LogsHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler)
 }
 
 func (this *LogsHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var logs LogsView
+	var logs []*logrus.Entry
 
 	queryParams := req.URL.Query()
 	limitQuery, err := strconv.Atoi(queryParams.Get("limit"))
+	if err != nil {
+		limitQuery = 500
+	}
+
+	logs = this.Hoverfly.GetLogs(limitQuery)
 
 	if strings.Contains(req.Header.Get("Content-Type"), "text/plain") {
-		var logs string
-		if err == nil {
-			logs = this.Hoverfly.GetFilteredLogs(limitQuery)
-		} else {
-			logs = this.Hoverfly.GetLogs()
-		}
-
-		handlers.WriteResponse(w, []byte(logs))
+		handlers.WriteResponse(w, []byte(logsToPlainText(logs)))
 	} else {
-		if err == nil {
-			logs = this.Hoverfly.GetFilteredLogsView(limitQuery)
-		} else {
-			logs = this.Hoverfly.GetLogsView()
-		}
-
-		bytes, _ := json.Marshal(logs)
-
+		bytes, _ := json.Marshal(logsToLogsView(logs))
 		handlers.WriteResponse(w, bytes)
 	}
+}
+
+func logsToLogsView(logs []*logrus.Entry) LogsView {
+	var logInterfaces []map[string]interface{}
+	for _, entry := range logs {
+		data := make(map[string]interface{}, len(entry.Data)+3)
+
+		for k, v := range entry.Data {
+			data[k] = v
+		}
+
+		data["time"] = entry.Time.Format(logrus.DefaultTimestampFormat)
+		data["msg"] = entry.Message
+		data["level"] = entry.Level.String()
+
+		logInterfaces = append(logInterfaces, data)
+	}
+
+	return LogsView{
+		Logs: logInterfaces,
+	}
+}
+
+func logsToPlainText(logs []*logrus.Entry) string {
+
+	var buffer bytes.Buffer
+	for _, entry := range logs {
+		entry.Logger = logrus.New()
+		log, err := entry.String()
+		if err == nil {
+			buffer.WriteString(log)
+		}
+	}
+
+	return buffer.String()
 }
 
 func (this *LogsHandler) GetWS(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +91,7 @@ func (this *LogsHandler) GetWS(w http.ResponseWriter, r *http.Request) {
 	var previousLogs LogsView
 
 	handlers.NewWebsocket(func() ([]byte, error) {
-		currentLogs := this.Hoverfly.GetLogsView()
+		currentLogs := logsToLogsView(this.Hoverfly.GetLogs(500))
 
 		if !reflect.DeepEqual(currentLogs, previousLogs) {
 			previousLogs = currentLogs
