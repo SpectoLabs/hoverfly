@@ -1,10 +1,7 @@
 package hoverfly
 
 import (
-	"bytes"
-
 	"github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 type StoreLogsHook struct {
@@ -39,54 +36,10 @@ func (hook StoreLogsHook) GetLogsCount() int {
 	return len(hook.Entries)
 }
 
-func (hook StoreLogsHook) GetLogsView() v2.LogsView {
-	return hook.GetFilteredLogsView(500)
-}
-
-func (hook StoreLogsHook) GetFilteredLogsView(limit int) v2.LogsView {
-
-	if limit > len(hook.Entries) {
-		limit = len(hook.Entries)
+func (hook StoreLogsHook) GetLogs(limit int) []*logrus.Entry {
+	entriesLength := len(hook.Entries)
+	if limit > entriesLength {
+		limit = entriesLength
 	}
-
-	var logs []map[string]interface{}
-	for _, entry := range hook.Entries[:limit] {
-		data := make(map[string]interface{}, len(entry.Data)+3)
-
-		for k, v := range entry.Data {
-			data[k] = v
-		}
-
-		data["time"] = entry.Time.Format(logrus.DefaultTimestampFormat)
-		data["msg"] = entry.Message
-		data["level"] = entry.Level.String()
-
-		logs = append(logs, data)
-	}
-
-	return v2.LogsView{
-		Logs: logs,
-	}
-}
-
-func (hook StoreLogsHook) GetLogs() string {
-	return hook.GetFilteredLogs(500)
-}
-
-func (hook StoreLogsHook) GetFilteredLogs(limit int) string {
-
-	if limit > len(hook.Entries) {
-		limit = len(hook.Entries)
-	}
-
-	var buffer bytes.Buffer
-	for _, entry := range hook.Entries[:limit] {
-		entry.Logger = logrus.New()
-		log, err := entry.String()
-		if err == nil {
-			buffer.WriteString(log)
-		}
-	}
-
-	return buffer.String()
+	return hook.Entries[:limit]
 }
