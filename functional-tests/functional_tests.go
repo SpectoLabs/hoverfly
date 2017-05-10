@@ -318,7 +318,9 @@ func TableToSliceMapStringString(table string) map[string]map[string]string {
 
 			result := map[string]string{}
 			for i, value := range rowValues {
-				result[headings[i]] = strings.TrimSpace(value)
+				if value != "" {
+					result[headings[i]] = strings.TrimSpace(value)
+				}
 			}
 
 			results[result["TARGET NAME"]] = result
