@@ -178,18 +178,9 @@ func SetMiddleware(target Target, binary, script, remote string) (v2.MiddlewareV
 		return v2.MiddlewareView{}, err
 	}
 
-	if response.StatusCode == 403 {
-		return v2.MiddlewareView{}, errors.New("Cannot change the mode of Hoverfly when running as a webserver")
-	}
-
-	if response.StatusCode != 200 {
-		defer response.Body.Close()
-		errorMessage, _ := ioutil.ReadAll(response.Body)
-
-		error := &ErrorSchema{}
-
-		json.Unmarshal(errorMessage, error)
-		return v2.MiddlewareView{}, errors.New("Hoverfly could not execute this middleware\n\n" + error.ErrorMessage)
+	err = handleResponseError(response, "Hoverfly could not execute this middleware")
+	if err != nil {
+		return v2.MiddlewareView{}, err
 	}
 
 	apiResponse := createMiddlewareSchema(response)
@@ -488,4 +479,21 @@ func handlerError(response *http.Response) error {
 	}
 
 	return errors.New(errorView.Error)
+}
+
+func handleResponseError(response *http.Response, errorMessage string) error {
+	if response.StatusCode != 200 {
+		defer response.Body.Close()
+		responseError, _ := ioutil.ReadAll(response.Body)
+
+		error := &ErrorSchema{}
+
+		err := json.Unmarshal(responseError, error)
+		if err != nil {
+			return errors.New(errorMessage + "\n\n" + string(errorMessage))
+		}
+		return errors.New(errorMessage + "\n\n" + error.ErrorMessage)
+	}
+
+	return nil
 }
