@@ -24,18 +24,60 @@ var _ = Describe("When using the `targets` command", func() {
 				functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--admin-port", "1234", "--proxy-port", "8765", "--host", "localhost")
 			})
 
-			It("print targets", func() {
+			It("print default target", func() {
 				output := functional_tests.Run(hoverctlBinary, "targets")
+				targets := functional_tests.TableToSliceMapStringString(output)
 
-				Expect(output).To(ContainSubstring("TARGET NAME"))
-				Expect(output).To(ContainSubstring("HOST"))
-				Expect(output).To(ContainSubstring("ADMIN PORT"))
-				Expect(output).To(ContainSubstring("PROXY PORT"))
+				Expect(targets).To(HaveLen(1))
 
-				Expect(output).To(ContainSubstring("default"))
-				Expect(output).To(ContainSubstring("localhost"))
-				Expect(output).To(ContainSubstring("1234"))
-				Expect(output).To(ContainSubstring("8765"))
+				Expect(targets).To(HaveKey("default"))
+				Expect(targets["default"]).To(Equal(map[string]string{
+					"TARGET NAME": "default",
+					"PID":         "0",
+					"HOST":        "localhost",
+					"ADMIN PORT":  "1234",
+					"PROXY PORT":  "8765",
+					"DEFAULT":     "X",
+				}))
+			})
+
+			It("prints all targets and marks default", func() {
+				functional_tests.Run(hoverctlBinary, "targets", "create", "one", "--admin-port", "1234", "--proxy-port", "8765", "--host", "localhost")
+				functional_tests.Run(hoverctlBinary, "targets", "create", "two", "--admin-port", "1234", "--proxy-port", "8765", "--host", "localhost")
+				output := functional_tests.Run(hoverctlBinary, "targets")
+				targets := functional_tests.TableToSliceMapStringString(output)
+
+				Expect(targets).To(HaveLen(3))
+
+				Expect(targets).To(HaveKey("default"))
+				Expect(targets["default"]).To(Equal(map[string]string{
+					"TARGET NAME": "default",
+					"PID":         "0",
+					"HOST":        "localhost",
+					"ADMIN PORT":  "1234",
+					"PROXY PORT":  "8765",
+					"DEFAULT":     "X",
+				}))
+
+				Expect(targets).To(HaveKey("one"))
+				Expect(targets["one"]).To(Equal(map[string]string{
+					"TARGET NAME": "one",
+					"PID":         "0",
+					"HOST":        "localhost",
+					"ADMIN PORT":  "1234",
+					"PROXY PORT":  "8765",
+					"DEFAULT":     "",
+				}))
+
+				Expect(targets).To(HaveKey("two"))
+				Expect(targets["two"]).To(Equal(map[string]string{
+					"TARGET NAME": "two",
+					"PID":         "0",
+					"HOST":        "localhost",
+					"ADMIN PORT":  "1234",
+					"PROXY PORT":  "8765",
+					"DEFAULT":     "",
+				}))
 			})
 		})
 	})
@@ -50,18 +92,19 @@ var _ = Describe("When using the `targets` command", func() {
 				"--admin-port", "1234",
 				"--proxy-port", "8765",
 			)
+			targets := functional_tests.TableToSliceMapStringString(output)
 
-			Expect(output).To(ContainSubstring("TARGET NAME"))
-			Expect(output).To(ContainSubstring("PID"))
-			Expect(output).To(ContainSubstring("HOST"))
-			Expect(output).To(ContainSubstring("ADMIN PORT"))
-			Expect(output).To(ContainSubstring("PROXY PORT"))
+			Expect(targets).To(HaveLen(1))
 
-			Expect(output).To(ContainSubstring("new-target"))
-			Expect(output).To(ContainSubstring("12345"))
-			Expect(output).To(ContainSubstring("localhost"))
-			Expect(output).To(ContainSubstring("1234"))
-			Expect(output).To(ContainSubstring("8765"))
+			Expect(targets).To(HaveKey("new-target"))
+			Expect(targets["new-target"]).To(Equal(map[string]string{
+				"TARGET NAME": "new-target",
+				"PID":         "12345",
+				"HOST":        "localhost",
+				"ADMIN PORT":  "1234",
+				"PROXY PORT":  "8765",
+				"DEFAULT":     "",
+			}))
 		})
 
 		It("should not create a target if no target name is provided", func() {
@@ -89,18 +132,18 @@ var _ = Describe("When using the `targets` command", func() {
 				"--admin-port", "1234",
 				"--proxy-port", "8765",
 			)
+			targets := functional_tests.TableToSliceMapStringString(output)
 
-			Expect(output).To(ContainSubstring("TARGET NAME"))
-			Expect(output).To(ContainSubstring("PID"))
-			Expect(output).To(ContainSubstring("HOST"))
-			Expect(output).To(ContainSubstring("ADMIN PORT"))
-			Expect(output).To(ContainSubstring("PROXY PORT"))
-
-			Expect(output).To(ContainSubstring("new-target"))
-			Expect(output).To(ContainSubstring("12345"))
-			Expect(output).To(ContainSubstring("localhost"))
-			Expect(output).To(ContainSubstring("1234"))
-			Expect(output).To(ContainSubstring("8765"))
+			Expect(targets).To(HaveLen(1))
+			Expect(targets).To(HaveKey("new-target"))
+			Expect(targets["new-target"]).To(Equal(map[string]string{
+				"TARGET NAME": "new-target",
+				"PID":         "12345",
+				"HOST":        "localhost",
+				"ADMIN PORT":  "1234",
+				"PROXY PORT":  "8765",
+				"DEFAULT":     "",
+			}))
 		})
 
 		It("should not update a target if no target name is provided", func() {
@@ -144,31 +187,35 @@ var _ = Describe("When using the `targets` command", func() {
 
 		It("should print the default target", func() {
 			output := functional_tests.Run(hoverctlBinary, "targets", "default")
+			targets := functional_tests.TableToSliceMapStringString(output)
 
-			Expect(output).To(ContainSubstring("TARGET NAME"))
-			Expect(output).To(ContainSubstring("HOST"))
-			Expect(output).To(ContainSubstring("ADMIN PORT"))
-			Expect(output).To(ContainSubstring("PROXY PORT"))
+			Expect(targets).To(HaveLen(1))
 
-			Expect(output).To(ContainSubstring("default"))
-			Expect(output).To(ContainSubstring("localhost"))
-			Expect(output).To(ContainSubstring("1234"))
-			Expect(output).To(ContainSubstring("8500"))
+			Expect(targets).To(HaveKey("default"))
+			Expect(targets["default"]).To(Equal(map[string]string{
+				"TARGET NAME": "default",
+				"PID":         "0",
+				"HOST":        "localhost",
+				"ADMIN PORT":  "1234",
+				"PROXY PORT":  "8500",
+			}))
 		})
 
 		It("should set the default target when given a target name", func() {
 			functional_tests.Run(hoverctlBinary, "targets", "create", "alternative", "--admin-port", "1233")
 			output := functional_tests.Run(hoverctlBinary, "targets", "default", "alternative")
+			targets := functional_tests.TableToSliceMapStringString(output)
 
-			Expect(output).To(ContainSubstring("TARGET NAME"))
-			Expect(output).To(ContainSubstring("HOST"))
-			Expect(output).To(ContainSubstring("ADMIN PORT"))
-			Expect(output).To(ContainSubstring("PROXY PORT"))
+			Expect(targets).To(HaveLen(1))
 
-			Expect(output).To(ContainSubstring("alternative"))
-			Expect(output).To(ContainSubstring("localhost"))
-			Expect(output).To(ContainSubstring("1233"))
-			Expect(output).To(ContainSubstring("8500"))
+			Expect(targets).To(HaveKey("alternative"))
+			Expect(targets["alternative"]).To(Equal(map[string]string{
+				"TARGET NAME": "alternative",
+				"PID":         "0",
+				"HOST":        "localhost",
+				"ADMIN PORT":  "1233",
+				"PROXY PORT":  "8500",
+			}))
 		})
 
 		It("should error when the default points to a non-existing  targets", func() {
@@ -188,16 +235,18 @@ var _ = Describe("When using the `targets` command", func() {
 		It("should not set default when given an invalid target name ", func() {
 			functional_tests.Run(hoverctlBinary, "targets", "default", "alternative")
 			output := functional_tests.Run(hoverctlBinary, "targets", "default")
+			targets := functional_tests.TableToSliceMapStringString(output)
 
-			Expect(output).To(ContainSubstring("TARGET NAME"))
-			Expect(output).To(ContainSubstring("HOST"))
-			Expect(output).To(ContainSubstring("ADMIN PORT"))
-			Expect(output).To(ContainSubstring("PROXY PORT"))
+			Expect(targets).To(HaveLen(1))
 
-			Expect(output).To(ContainSubstring("default"))
-			Expect(output).To(ContainSubstring("localhost"))
-			Expect(output).To(ContainSubstring("1234"))
-			Expect(output).To(ContainSubstring("8500"))
+			Expect(targets).To(HaveKey("default"))
+			Expect(targets["default"]).To(Equal(map[string]string{
+				"TARGET NAME": "default",
+				"PID":         "0",
+				"HOST":        "localhost",
+				"ADMIN PORT":  "1234",
+				"PROXY PORT":  "8500",
+			}))
 		})
 	})
 })
