@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"syscall"
 
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/olekukonko/tablewriter"
@@ -58,7 +59,7 @@ func askForInput(value string, sensitive bool) string {
 	for {
 		fmt.Printf(value + ": ")
 		if sensitive {
-			responseBytes, err := terminal.ReadPassword(0)
+			responseBytes, err := terminal.ReadPassword(int(syscall.Stdin))
 			handleIfError(err)
 			fmt.Println("")
 
