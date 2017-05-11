@@ -3,7 +3,6 @@ package wrapper
 import (
 	"errors"
 	"os"
-	"path"
 	"path/filepath"
 
 	log "github.com/Sirupsen/logrus"
@@ -30,7 +29,7 @@ func NewHoverflyDirectory(config Config) (HoverflyDirectory, error) {
 
 	} else {
 		hoverflyDirectory = HoverflyDirectory{
-			Path: path.Dir(config.GetFilepath()),
+			Path: filepath.Dir(config.GetFilepath()),
 		}
 	}
 
