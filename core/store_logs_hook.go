@@ -15,7 +15,7 @@ func NewStoreLogsHook() *StoreLogsHook {
 }
 
 func (hook *StoreLogsHook) Fire(entry *logrus.Entry) error {
-	hook.Entries = append([]*logrus.Entry{entry}, hook.Entries...)
+	hook.Entries = append(hook.Entries, entry)
 	return nil
 }
 
@@ -41,5 +41,5 @@ func (hook StoreLogsHook) GetLogs(limit int) []*logrus.Entry {
 	if limit > entriesLength {
 		limit = entriesLength
 	}
-	return hook.Entries[:limit]
+	return hook.Entries[entriesLength-limit:]
 }
