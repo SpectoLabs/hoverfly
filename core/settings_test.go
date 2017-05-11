@@ -61,6 +61,14 @@ func TestSettingsMiddlewareEnv(t *testing.T) {
 	Expect(script).To(Equal(rubyEcho))
 }
 
+func Test_InitSettings_SetsModeToSimulate(t *testing.T) {
+	RegisterTestingT(t)
+
+	settings := InitSettings()
+
+	Expect(settings.Mode).To(Equal("simulate"))
+}
+
 // TestSetMode - tests SetMode function, however it doesn't test
 // whether mutex works correctly or not
 func TestSetMode(t *testing.T) {
