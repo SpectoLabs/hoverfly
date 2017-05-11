@@ -67,7 +67,7 @@ type ErrorSchema struct {
 
 // Wipe will call the records endpoint in Hoverfly with a DELETE request, triggering Hoverfly to wipe the database
 func DeleteSimulations(target Target) error {
-	response, err := doRequest(target, "DELETE", v2ApiSimulation, "")
+	response, err := doRequest(target, "DELETE", v2ApiSimulation, "", nil)
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func DeleteSimulations(target Target) error {
 
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
 func GetMode(target Target) (string, error) {
-	response, err := doRequest(target, "GET", v2ApiMode, "")
+	response, err := doRequest(target, "GET", v2ApiMode, "", nil)
 	if err != nil {
 		return "", err
 	}
@@ -106,7 +106,7 @@ func SetModeWithArguments(target Target, modeView v2.ModeView) (string, error) {
 		return "", err
 	}
 
-	response, err := doRequest(target, "PUT", v2ApiMode, string(bytes))
+	response, err := doRequest(target, "PUT", v2ApiMode, string(bytes), nil)
 	if err != nil {
 		return "", err
 	}
@@ -122,7 +122,7 @@ func SetModeWithArguments(target Target, modeView v2.ModeView) (string, error) {
 
 // GetDestination will go the destination endpoint in Hoverfly, parse the JSON response and return the destination of Hoverfly
 func GetDestination(target Target) (string, error) {
-	response, err := doRequest(target, "GET", v2ApiDestination, "")
+	response, err := doRequest(target, "GET", v2ApiDestination, "", nil)
 	if err != nil {
 		return "", err
 	}
@@ -137,7 +137,7 @@ func GetDestination(target Target) (string, error) {
 // SetDestination will go the destination endpoint in Hoverfly, sending JSON that will set the destination of Hoverfly
 func SetDestination(target Target, destination string) (string, error) {
 
-	response, err := doRequest(target, "PUT", v2ApiDestination, `{"destination":"`+destination+`"}`)
+	response, err := doRequest(target, "PUT", v2ApiDestination, `{"destination":"`+destination+`"}`, nil)
 	if err != nil {
 		return "", err
 	}
@@ -149,7 +149,7 @@ func SetDestination(target Target, destination string) (string, error) {
 
 // GetMiddle will go the middleware endpoint in Hoverfly, parse the JSON response and return the middleware of Hoverfly
 func GetMiddleware(target Target) (v2.MiddlewareView, error) {
-	response, err := doRequest(target, "GET", v2ApiMiddleware, "")
+	response, err := doRequest(target, "GET", v2ApiMiddleware, "", nil)
 	if err != nil {
 		return v2.MiddlewareView{}, err
 	}
@@ -173,7 +173,7 @@ func SetMiddleware(target Target, binary, script, remote string) (v2.MiddlewareV
 		return v2.MiddlewareView{}, err
 	}
 
-	response, err := doRequest(target, "PUT", v2ApiMiddleware, string(marshalledMiddleware))
+	response, err := doRequest(target, "PUT", v2ApiMiddleware, string(marshalledMiddleware), nil)
 	if err != nil {
 		return v2.MiddlewareView{}, err
 	}
@@ -189,7 +189,7 @@ func SetMiddleware(target Target, binary, script, remote string) (v2.MiddlewareV
 }
 
 func ImportSimulation(target Target, simulationData string) error {
-	response, err := doRequest(target, "PUT", v2ApiSimulation, simulationData)
+	response, err := doRequest(target, "PUT", v2ApiSimulation, simulationData, nil)
 	if err != nil {
 		return err
 	}
@@ -205,7 +205,7 @@ func ImportSimulation(target Target, simulationData string) error {
 }
 
 func FlushCache(target Target) error {
-	response, err := doRequest(target, "DELETE", v2ApiCache, "")
+	response, err := doRequest(target, "DELETE", v2ApiCache, "", nil)
 	if err != nil {
 		return err
 	}
@@ -218,7 +218,7 @@ func FlushCache(target Target) error {
 }
 
 func ExportSimulation(target Target) ([]byte, error) {
-	response, err := doRequest(target, "GET", v2ApiSimulation, "")
+	response, err := doRequest(target, "GET", v2ApiSimulation, "", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -430,12 +430,18 @@ func Stop(target *Target, hoverflyDirectory HoverflyDirectory) error {
 	return nil
 }
 
-func doRequest(target Target, method, url, body string) (*http.Response, error) {
+func doRequest(target Target, method, url, body string, headers map[string]string) (*http.Response, error) {
 	url = BuildURL(target, url)
 
 	request, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
 		return nil, fmt.Errorf("Could not connect to Hoverfly at %v:%v", target.Host, target.AdminPort)
+	}
+
+	if headers != nil {
+		for key, value := range headers {
+			request.Header.Add(key, value)
+		}
 	}
 
 	if target.AuthToken != "" {
