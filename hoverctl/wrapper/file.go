@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 
 	"strings"
 
@@ -14,8 +14,8 @@ import (
 )
 
 func WriteFile(filePath string, data []byte) error {
-	basePath := path.Dir(filePath)
-	fileName := path.Base(filePath)
+	basePath := filepath.Dir(filePath)
+	fileName := filepath.Base(filePath)
 	log.Debug(basePath)
 
 	err := os.MkdirAll(basePath, 0644)
