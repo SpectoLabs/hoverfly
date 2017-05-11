@@ -171,6 +171,8 @@ func InitSettings() *Configuration {
 		appConfig.TLSVerification = true
 	}
 
+	appConfig.Mode = "simulate"
+
 	appConfig.ProxyAuthorizationHeader = "Proxy-Authorization"
 
 	return &appConfig
