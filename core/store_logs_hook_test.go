@@ -30,7 +30,7 @@ func Test_StoreLogsHook_Fire_SavesEntryToEntriesArray(t *testing.T) {
 	Expect(unit.Entries[0].Message).To(Equal("test entry"))
 }
 
-func Test_StoreLogsHook_Fire_LogsArePrepended(t *testing.T) {
+func Test_StoreLogsHook_Fire_LogsAreInAscendingOrder(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewStoreLogsHook()
@@ -44,8 +44,8 @@ func Test_StoreLogsHook_Fire_LogsArePrepended(t *testing.T) {
 	})
 
 	Expect(unit.Entries).To(HaveLen(2))
-	Expect(unit.Entries[0].Message).To(Equal("newest"))
-	Expect(unit.Entries[1].Message).To(Equal("oldest"))
+	Expect(unit.Entries[0].Message).To(Equal("oldest"))
+	Expect(unit.Entries[1].Message).To(Equal("newest"))
 }
 
 func Test_StoreLogsHook_NewGetLogs_LimitsLogs(t *testing.T) {
@@ -61,8 +61,8 @@ func Test_StoreLogsHook_NewGetLogs_LimitsLogs(t *testing.T) {
 
 	logs := unit.GetLogs(2)
 	Expect(logs).To(HaveLen(2))
-	Expect(logs[0].Message).To(Equal("log-2"))
-	Expect(logs[1].Message).To(Equal("log-1"))
+	Expect(logs[0].Message).To(Equal("log-1"))
+	Expect(logs[1].Message).To(Equal("log-2"))
 }
 
 func Test_StoreLogsHook_NewGetLogs_AcceptsALimitThatIsTooLarge(t *testing.T) {

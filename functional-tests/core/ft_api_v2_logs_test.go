@@ -43,9 +43,10 @@ var _ = Describe("/api/v2/logs", func() {
 			logsArray, err := jsonObject.GetObjectArray("logs")
 			Expect(err).To(BeNil())
 
-			Expect(len(logsArray)).To(BeNumerically(">", 1))
+			Expect(len(logsArray)).To(BeNumerically(">=", 5))
 
-			Expect(logsArray[0].GetString("msg")).Should(Equal("payloads imported"))
+			Expect(logsArray[0].GetString("msg")).Should(Equal("Proxy prepared..."))
+			Expect(logsArray[4].GetString("msg")).Should(Equal("payloads imported"))
 		})
 
 		It("should limit the logs it returns", func() {

@@ -42,6 +42,7 @@ func (this *LogsHandler) Get(w http.ResponseWriter, req *http.Request, next http
 	if limitQuery == 0 {
 		limitQuery = DefaultLimit
 	}
+
 	logs = this.Hoverfly.GetLogs(limitQuery)
 
 	if strings.Contains(req.Header.Get("Content-Type"), "text/plain") {
