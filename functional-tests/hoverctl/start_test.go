@@ -108,7 +108,7 @@ var _ = Describe("hoverctl `start`", func() {
 
 			Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
-			output = functional_tests.Run(hoverctlBinary, "logs")
+			output = functional_tests.Run(hoverctlBinary, "logs", "--json")
 
 			Expect(output).To(ContainSubstring("Default keys have been overwritten"))
 		})
@@ -118,7 +118,7 @@ var _ = Describe("hoverctl `start`", func() {
 
 			Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
-			output = functional_tests.Run(hoverctlBinary, "logs")
+			output = functional_tests.Run(hoverctlBinary, "logs", "--json")
 
 			Expect(output).To(ContainSubstring("tls certificate verification is now turned off!"))
 		})
@@ -128,7 +128,7 @@ var _ = Describe("hoverctl `start`", func() {
 
 			Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
-			output = functional_tests.Run(hoverctlBinary, "logs")
+			output = functional_tests.Run(hoverctlBinary, "logs", "--json")
 			Expect(output).To(ContainSubstring("Creating bolt db backend."))
 		})
 
@@ -159,7 +159,7 @@ var _ = Describe("hoverctl `start`", func() {
 
 			Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
-			output = functional_tests.Run(hoverctlBinary, "logs")
+			output = functional_tests.Run(hoverctlBinary, "logs", "--json")
 			Expect(output).To(ContainSubstring("Disabling HTTP"))
 		})
 

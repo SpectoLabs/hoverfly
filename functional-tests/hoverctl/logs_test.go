@@ -30,12 +30,12 @@ var _ = Describe("When I use hoverctl", func() {
 		functional_tests.Run(hoverctlBinary, "stop")
 	})
 
-	Context("I can get the logs using the log command", func() {
+	Context("I can get the logs using the log command in JSON format", func() {
 
 		It("should return the logs", func() {
 			functional_tests.Run(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
 
-			output := functional_tests.Run(hoverctlBinary, "logs", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
+			output := functional_tests.Run(hoverctlBinary, "logs", "--json", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
 
 			Expect(output).To(ContainSubstring("listening on :" + adminPort))
 		})
@@ -44,7 +44,7 @@ var _ = Describe("When I use hoverctl", func() {
 			functional_tests.Run(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
 			functional_tests.Run(hoverctlBinary, "targets", "create", "incorrect", "--admin-port", "12345", "--proxy-port", "65432")
 
-			output := functional_tests.Run(hoverctlBinary, "logs", "-t", "incorrect")
+			output := functional_tests.Run(hoverctlBinary, "logs", "--json", "-t", "incorrect")
 
 			Expect(output).To(ContainSubstring("Could not open Hoverfly log file"))
 		})
