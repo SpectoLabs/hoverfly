@@ -19,14 +19,18 @@ Shows the Hoverfly logs.
 	Run: func(cmd *cobra.Command, args []string) {
 		checkTargetAndExit(target)
 
-		logfile := wrapper.NewLogFile(hoverflyDirectory, strconv.Itoa(target.AdminPort), strconv.Itoa(target.ProxyPort))
+		jsonLogs, _ := cmd.Flags().GetBool("json")
 
-		if followLogs {
-			err := logfile.Tail()
-			handleIfError(err)
-		} else {
-			err := logfile.Print()
-			handleIfError(err)
+		if jsonLogs {
+			logfile := wrapper.NewLogFile(hoverflyDirectory, strconv.Itoa(target.AdminPort), strconv.Itoa(target.ProxyPort))
+
+			if followLogs {
+				err := logfile.Tail()
+				handleIfError(err)
+			} else {
+				err := logfile.Print()
+				handleIfError(err)
+			}
 		}
 	},
 }
@@ -34,6 +38,7 @@ Shows the Hoverfly logs.
 func init() {
 	RootCmd.AddCommand(logsCmd)
 
+	logsCmd.Flags().Bool("json", false, "Retrieve the logs in JSON format")
 	logsCmd.Flags().BoolVar(&followLogs, "follow-logs", false, "Follows the Hoverfly logs")
 	logsCmd.Flag("follow-logs")
 }
