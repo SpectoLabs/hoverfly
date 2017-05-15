@@ -189,10 +189,16 @@ func SetMiddleware(target Target, binary, script, remote string) (v2.MiddlewareV
 	return apiResponse, nil
 }
 
-func GetLogs(target Target) ([]string, error) {
-	response, err := doRequest(target, "GET", v2ApiLogs, "", map[string]string{
+func GetLogs(target Target, format string) ([]string, error) {
+	headers := map[string]string{
 		"Content-Type": "text/plain",
-	})
+	}
+
+	if format == "json" {
+		headers["Content-Type"] = "application/json"
+	}
+
+	response, err := doRequest(target, "GET", v2ApiLogs, "", headers)
 	if err != nil {
 		return []string{}, err
 	}
@@ -200,8 +206,12 @@ func GetLogs(target Target) ([]string, error) {
 	defer response.Body.Close()
 
 	responseBody, _ := ioutil.ReadAll(response.Body)
-
-	return strings.SplitAfter(string(responseBody), `\n`), nil
+	if format == "json" {
+		trimmedBody := responseBody[9 : len(responseBody)-2]
+		return strings.SplitAfter(string(trimmedBody), "},"), nil
+	} else {
+		return strings.SplitAfter(string(responseBody), `\n`), nil
+	}
 }
 
 func ImportSimulation(target Target, simulationData string) error {

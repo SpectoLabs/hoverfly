@@ -29,11 +29,17 @@ Shows the Hoverfly logs.
 				err := logfile.Tail()
 				handleIfError(err)
 			} else {
-				err := logfile.Print()
+
+				logs, err := wrapper.GetLogs(*target, "json")
 				handleIfError(err)
+				for _, log := range logs {
+					if log != "" {
+						fmt.Println(log)
+					}
+				}
 			}
 		} else {
-			logs, err := wrapper.GetLogs(*target)
+			logs, err := wrapper.GetLogs(*target, "plain")
 			handleIfError(err)
 			for _, log := range logs {
 				if log != "" {
