@@ -50,6 +50,26 @@ var _ = Describe("When I use hoverctl", func() {
 		})
 	})
 
+	Context("I can get the logs using the log command in plaintext format", func() {
+
+		It("should return the logs", func() {
+			functional_tests.Run(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
+
+			output := functional_tests.Run(hoverctlBinary, "logs", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
+
+			Expect(output).To(ContainSubstring("level=info msg=\"Proxy prepared...\" Destination=. Mode=simulate ProxyPort=" + proxyPort))
+		})
+
+		It("should return an error if the logs don't exist", func() {
+			functional_tests.Run(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
+			functional_tests.Run(hoverctlBinary, "targets", "create", "incorrect", "--admin-port", "12345", "--proxy-port", "65432")
+
+			output := functional_tests.Run(hoverctlBinary, "logs", "-t", "incorrect")
+
+			Expect(output).To(ContainSubstring("Could not connect to Hoverfly at localhost:12345"))
+		})
+	})
+
 	Context("and start Hoverfly using hoverctl", func() {
 
 		Context("the logs get captured in a .log file", func() {
