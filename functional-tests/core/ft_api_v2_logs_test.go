@@ -10,6 +10,16 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func MakeLogsArray(logsJson []*jason.Object) []string {
+	var logs []string
+	for _, log := range logsJson {
+		logMessage, _ := log.GetString("msg")
+		logs = append(logs, logMessage)
+	}
+
+	return logs
+}
+
 var _ = Describe("/api/v2/logs", func() {
 
 	var (
@@ -45,10 +55,12 @@ var _ = Describe("/api/v2/logs", func() {
 
 			Expect(len(logsArray)).To(BeNumerically(">=", 4))
 
-			Expect(logsArray[0].GetString("msg")).Should(Equal("Proxy prepared..."))
-			Expect(logsArray[1].GetString("msg")).Should(Equal("current proxy configuration"))
-			Expect(logsArray[2].GetString("msg")).Should(Equal("serving proxy"))
-			Expect(logsArray[3].GetString("msg")).Should(Equal("Admin interface is starting..."))
+			logs := MakeLogsArray(logsArray)
+
+			Expect(logs).Should(ContainElement("Proxy prepared..."))
+			Expect(logs).Should(ContainElement("current proxy configuration"))
+			Expect(logs).Should(ContainElement("serving proxy"))
+			Expect(logs).Should(ContainElement("Admin interface is starting..."))
 		})
 
 		It("should limit the logs it returns", func() {
