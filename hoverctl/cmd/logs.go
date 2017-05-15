@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
@@ -30,6 +31,14 @@ Shows the Hoverfly logs.
 			} else {
 				err := logfile.Print()
 				handleIfError(err)
+			}
+		} else {
+			logs, err := wrapper.GetLogs(*target)
+			handleIfError(err)
+			for _, log := range logs {
+				if log != "" {
+					fmt.Print(log)
+				}
 			}
 		}
 	},

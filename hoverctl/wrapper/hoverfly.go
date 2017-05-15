@@ -31,6 +31,7 @@ const (
 	v2ApiDestination = "/api/v2/hoverfly/destination"
 	v2ApiMiddleware  = "/api/v2/hoverfly/middleware"
 	v2ApiCache       = "/api/v2/cache"
+	v2ApiLogs        = "/api/v2/logs"
 )
 
 type APIStateSchema struct {
@@ -186,6 +187,21 @@ func SetMiddleware(target Target, binary, script, remote string) (v2.MiddlewareV
 	apiResponse := createMiddlewareSchema(response)
 
 	return apiResponse, nil
+}
+
+func GetLogs(target Target) ([]string, error) {
+	response, err := doRequest(target, "GET", v2ApiLogs, "", map[string]string{
+		"Content-Type": "text/plain",
+	})
+	if err != nil {
+		return []string{}, err
+	}
+
+	defer response.Body.Close()
+
+	responseBody, _ := ioutil.ReadAll(response.Body)
+
+	return strings.SplitAfter(string(responseBody), `\n`), nil
 }
 
 func ImportSimulation(target Target, simulationData string) error {
