@@ -43,7 +43,7 @@ Shows the Hoverfly logs.
 			handleIfError(err)
 			for _, log := range logs {
 				if log != "" {
-					fmt.Print(log)
+					fmt.Println(log)
 				}
 			}
 		}
