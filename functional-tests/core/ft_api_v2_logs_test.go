@@ -43,10 +43,12 @@ var _ = Describe("/api/v2/logs", func() {
 			logsArray, err := jsonObject.GetObjectArray("logs")
 			Expect(err).To(BeNil())
 
-			Expect(len(logsArray)).To(BeNumerically(">=", 5))
+			Expect(len(logsArray)).To(BeNumerically(">=", 4))
 
 			Expect(logsArray[0].GetString("msg")).Should(Equal("Proxy prepared..."))
-			Expect(logsArray[4].GetString("msg")).Should(Equal("payloads imported"))
+			Expect(logsArray[1].GetString("msg")).Should(Equal("current proxy configuration"))
+			Expect(logsArray[2].GetString("msg")).Should(Equal("serving proxy"))
+			Expect(logsArray[3].GetString("msg")).Should(Equal("Admin interface is starting..."))
 		})
 
 		It("should limit the logs it returns", func() {
@@ -64,7 +66,7 @@ var _ = Describe("/api/v2/logs", func() {
 
 			Expect(len(logsArray)).To(Equal(1))
 
-			Expect(logsArray[0].GetString("msg")).Should(Equal("payloads imported"))
+			Expect(logsArray[0].GetString("msg")).Should(Equal("started handling request"))
 		})
 	})
 
@@ -98,7 +100,7 @@ var _ = Describe("/api/v2/logs", func() {
 
 			Expect(len(logsArray)).To(Equal(1))
 
-			Expect(logsArray[0].GetString("msg")).Should(Equal("payloads imported"))
+			Expect(logsArray[0].GetString("msg")).Should(Equal("started handling request"))
 		})
 	})
 })
