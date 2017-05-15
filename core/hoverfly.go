@@ -58,6 +58,7 @@ func NewHoverfly() *Hoverfly {
 		Authentication: authBackend,
 		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
 		StoreLogsHook:  NewStoreLogsHook(),
+		Cfg:            InitSettings(),
 	}
 
 	hoverfly.version = "v0.11.3"
@@ -72,6 +73,8 @@ func NewHoverfly() *Hoverfly {
 	modeMap[modes.Synthesize] = &modes.SynthesizeMode{Hoverfly: hoverfly}
 
 	hoverfly.modeMap = modeMap
+
+	hoverfly.HTTP = GetDefaultHoverflyHTTPClient(hoverfly.Cfg.TLSVerification, hoverfly.Cfg.UpstreamProxy)
 
 	return hoverfly
 }

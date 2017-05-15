@@ -34,6 +34,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	hvc "github.com/SpectoLabs/hoverfly/core/certs"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 )
 
@@ -153,6 +154,7 @@ func init() {
 }
 
 func main() {
+	hoverfly := hv.NewHoverfly()
 	log.SetFormatter(&log.JSONFormatter{})
 	flag.Var(&importFlags, "import", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
 	flag.Var(&destinationFlags, "dest", "specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
@@ -292,7 +294,14 @@ func main() {
 
 	authBackend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
 
-	hoverfly := hv.GetNewHoverfly(cfg, requestCache, metadataCache, authBackend)
+	hoverfly.Cfg = cfg
+	hoverfly.CacheMatcher = matching.CacheMatcher{
+		RequestCache: requestCache,
+		Webserver:    cfg.Webserver,
+	}
+	hoverfly.MetadataCache = metadataCache
+	hoverfly.Authentication = authBackend
+	hoverfly.HTTP = hv.GetDefaultHoverflyHTTPClient(hoverfly.Cfg.TLSVerification, hoverfly.Cfg.UpstreamProxy)
 
 	// if add new user supplied - adding it to database
 	if *addNew || *authEnabled {
