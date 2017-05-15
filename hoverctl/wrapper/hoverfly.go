@@ -210,7 +210,7 @@ func GetLogs(target Target, format string) ([]string, error) {
 		trimmedBody := responseBody[9 : len(responseBody)-2]
 		return strings.SplitAfter(string(trimmedBody), "},"), nil
 	} else {
-		return strings.SplitAfter(string(responseBody), `\n`), nil
+		return strings.Split(string(responseBody), "\n"), nil
 	}
 }
 
