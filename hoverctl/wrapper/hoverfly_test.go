@@ -86,7 +86,6 @@ func Test_BuildUrl_AddsHttpIfHostIsExternal(t *testing.T) {
 
 func Test_SetMiddleware_ReturnsErrorIfAPIResponsesWithError(t *testing.T) {
 	hf := hoverfly.NewHoverfly()
-	hf.Cfg = hoverfly.InitSettings()
 	hf.Cfg.Webserver = true
 	hf.Cfg.Mode = "simulate"
 	hf.StartProxy()

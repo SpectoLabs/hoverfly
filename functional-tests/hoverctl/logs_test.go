@@ -37,7 +37,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 			output := functional_tests.Run(hoverctlBinary, "logs", "--json", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
 
-			Expect(output).To(ContainSubstring("listening on :" + adminPort))
+			Expect(output).To(ContainSubstring(`"Destination":".","Mode":"simulate","ProxyPort":"` + proxyPort + `","level":"info","msg":"Proxy prepared..."`))
 		})
 
 		It("should return an error if the logs don't exist", func() {
@@ -46,7 +46,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 			output := functional_tests.Run(hoverctlBinary, "logs", "--json", "-t", "incorrect")
 
-			Expect(output).To(ContainSubstring("Could not open Hoverfly log file"))
+			Expect(output).To(ContainSubstring("Could not connect to Hoverfly at localhost:12345"))
 		})
 	})
 
