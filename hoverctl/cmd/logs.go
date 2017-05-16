@@ -56,6 +56,5 @@ func init() {
 	RootCmd.AddCommand(logsCmd)
 
 	logsCmd.Flags().Bool("json", false, "Retrieve the logs in JSON format")
-	logsCmd.Flags().BoolVar(&followLogs, "follow-logs", false, "Follows the Hoverfly logs")
-	logsCmd.Flag("follow-logs")
+	logsCmd.Flags().BoolVar(&followLogs, "follow", false, "Follows the Hoverfly logs")
 }
