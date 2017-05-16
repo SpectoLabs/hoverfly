@@ -18,6 +18,11 @@ func ExportSimulation(target configuration.Target) ([]byte, error) {
 
 	defer response.Body.Close()
 
+	err = handleResponseError(response, "Could not retrieve simulation")
+	if err != nil {
+		return nil, err
+	}
+
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Debug(err.Error())
@@ -40,11 +45,9 @@ func ImportSimulation(target configuration.Target, simulationData string) error 
 		return err
 	}
 
-	if response.StatusCode != 200 {
-		body, _ := ioutil.ReadAll(response.Body)
-		var errorView ErrorSchema
-		json.Unmarshal(body, &errorView)
-		return errors.New("Import to Hoverfly failed: " + errorView.ErrorMessage)
+	err = handleResponseError(response, "Could not import simulation")
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -59,8 +62,9 @@ func DeleteSimulations(target configuration.Target) error {
 
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
-		return errors.New("Simulations were not deleted from Hoverfly")
+	err = handleResponseError(response, "Could not delete simulation")
+	if err != nil {
+		return err
 	}
 
 	return nil

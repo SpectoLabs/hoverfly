@@ -66,6 +66,15 @@ type ErrorSchema struct {
 	ErrorMessage string `json:"error"`
 }
 
+func UnmarshalToInterface(response *http.Response, v interface{}) error {
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(body, v)
+}
+
 func createAPIStateResponse(response *http.Response) APIStateSchema {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {

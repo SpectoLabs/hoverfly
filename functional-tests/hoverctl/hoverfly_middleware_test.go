@@ -117,20 +117,21 @@ var _ = Describe("When I use hoverctl", func() {
 		It("I cannae set the hoverfly's middleware when specifying non-existing remote middleware", func() {
 			output := functional_tests.Run(hoverctlBinary, "middleware", "--remote", "http://specto.io/404/nothere")
 
-			Expect(output).To(ContainSubstring("Hoverfly could not execute this middleware"))
+			Expect(output).To(ContainSubstring("Could not set middleware"))
+			Expect(output).To(ContainSubstring("Invalid middleware: Could not reach remote middleware"))
 		})
 
 		It("When I use the verbose flag, I see that notpython is not an executable", func() {
 			output := functional_tests.Run(hoverctlBinary, "-v", "middleware", "--binary", "notpython", "--script", "testdata/add_random_delay.py")
 
-			Expect(output).To(ContainSubstring("Hoverfly could not execute this middleware"))
+			Expect(output).To(ContainSubstring("Could not set middleware"))
 			Expect(output).To(ContainSubstring(`Invalid middleware: exec: "notpython": executable file not found in $PATH`))
 		})
 
 		It("When I use the verbose flag, I see that http://wqrwwewf.wewefwef.specto is not an executable remote middleware", func() {
 			output := functional_tests.Run(hoverctlBinary, "-v", "middleware", "--remote", "http://wqrwwewf.wewefwef.specto")
 
-			Expect(output).To(ContainSubstring("Hoverfly could not execute this middleware"))
+			Expect(output).To(ContainSubstring("Could not set middleware"))
 			Expect(output).To(ContainSubstring(`Invalid middleware: Could not reach remote middleware`))
 		})
 	})

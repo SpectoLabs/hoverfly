@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
+func Test_GetLogs_GetsLogsWithCorrect_Text_Plain_AcceptHeader(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
@@ -21,12 +21,17 @@ func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
 							ExactMatch: util.StringToPointer("GET"),
 						},
 						Path: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("/api/v2/hoverfly/middleware"),
+							ExactMatch: util.StringToPointer("/api/v2/logs"),
+						},
+						Headers: map[string][]string{
+							"Accept": []string{
+								"text/plain",
+							},
 						},
 					},
 					Response: v2.ResponseDetailsView{
 						Status: 200,
-						Body:   `{"binary": "test-binary", "script": "test.script", "remote": "http://test.com"}`,
+						Body:   `logs line 1`,
 					},
 				},
 			},
@@ -36,24 +41,12 @@ func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
 		},
 	})
 
-	response, err := GetMiddleware(target)
+	logs, err := GetLogs(target, "plain")
 	Expect(err).To(BeNil())
-
-	Expect(response.Binary).To(Equal("test-binary"))
-	Expect(response.Script).To(Equal("test.script"))
-	Expect(response.Remote).To(Equal("http://test.com"))
+	Expect(logs[0]).To(Equal("logs line 1"))
 }
 
-func Test_GetMiddleware_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
-	RegisterTestingT(t)
-
-	_, err := GetMiddleware(inaccessibleTarget)
-
-	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Could not connect to Hoverfly at something:1234"))
-}
-
-func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
+func Test_GetLogs_GetsLogsWithCorrect_JSON_AcceptHeader(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
@@ -66,12 +59,17 @@ func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 							ExactMatch: util.StringToPointer("GET"),
 						},
 						Path: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("/api/v2/hoverfly/middleware"),
+							ExactMatch: util.StringToPointer("/api/v2/logs"),
+						},
+						Headers: map[string][]string{
+							"Accept": []string{
+								"application/json",
+							},
 						},
 					},
 					Response: v2.ResponseDetailsView{
-						Status: 400,
-						Body:   `{"error": "test error"}`,
+						Status: 200,
+						Body:   `{"logs":[{"msg": "logs line 1"}]}`,
 					},
 				},
 			},
@@ -81,21 +79,21 @@ func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		},
 	})
 
-	_, err := GetMiddleware(target)
-	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Could not retrieve middleware\n\ntest error"))
+	logs, err := GetLogs(target, "json")
+	Expect(err).To(BeNil())
+	Expect(logs[0]).To(Equal(`{"msg":"logs line 1"}`))
 }
 
-func Test_SetMiddleware_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
+func Test_GetLogs_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, err := SetMiddleware(inaccessibleTarget, "", "", "")
+	_, err := GetLogs(inaccessibleTarget, "plain")
 
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Could not connect to Hoverfly at something:1234"))
 }
 
-func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
+func Test_GetLogs_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
@@ -105,15 +103,15 @@ func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 				v2.RequestResponsePairViewV2{
 					Request: v2.RequestDetailsViewV2{
 						Method: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("PUT"),
+							ExactMatch: util.StringToPointer("GET"),
 						},
 						Path: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("/api/v2/hoverfly/middleware"),
+							ExactMatch: util.StringToPointer("/api/v2/logs"),
 						},
 					},
 					Response: v2.ResponseDetailsView{
 						Status: 400,
-						Body:   `{"error": "test error"}`,
+						Body:   "{\"error\":\"test error\"}",
 					},
 				},
 			},
@@ -123,7 +121,7 @@ func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		},
 	})
 
-	_, err := SetMiddleware(target, "", "", "")
+	_, err := GetLogs(target, "plain")
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Could not set middleware\n\ntest error"))
+	Expect(err.Error()).To(Equal("Could not retrieve logs\n\ntest error"))
 }

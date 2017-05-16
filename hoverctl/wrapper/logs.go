@@ -11,11 +11,11 @@ import (
 
 func GetLogs(target configuration.Target, format string) ([]string, error) {
 	headers := map[string]string{
-		"Content-Type": "text/plain",
+		"Accept": "text/plain",
 	}
 
 	if format == "json" {
-		headers["Content-Type"] = "application/json"
+		headers["Accept"] = "application/json"
 	}
 
 	response, err := doRequest(target, "GET", v2ApiLogs, "", headers)
@@ -24,6 +24,11 @@ func GetLogs(target configuration.Target, format string) ([]string, error) {
 	}
 
 	defer response.Body.Close()
+
+	err = handleResponseError(response, "Could not retrieve logs")
+	if err != nil {
+		return nil, err
+	}
 
 	responseBody, _ := ioutil.ReadAll(response.Body)
 	if format == "json" {
