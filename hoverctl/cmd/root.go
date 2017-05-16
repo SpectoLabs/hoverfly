@@ -5,7 +5,7 @@ import (
 	"os"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
+	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/spf13/cobra"
 )
 
@@ -14,9 +14,9 @@ var adminPortFlag, proxyPortFlag int
 
 var force, verbose, setDefaultTargetFlag bool
 
-var hoverflyDirectory wrapper.HoverflyDirectory
-var config *wrapper.Config
-var target *wrapper.Target
+var hoverflyDirectory configuration.HoverflyDirectory
+var config *configuration.Config
+var target *configuration.Target
 
 var version string
 
@@ -72,14 +72,14 @@ func initConfig() {
 		log.SetLevel(log.DebugLevel)
 	}
 
-	wrapper.SetConfigurationDefaults()
-	wrapper.SetConfigurationPaths()
+	configuration.SetConfigurationDefaults()
+	configuration.SetConfigurationPaths()
 
-	config = wrapper.GetConfig()
+	config = configuration.GetConfig()
 
 	target = config.GetTarget(targetNameFlag)
 	if targetNameFlag == "" && target == nil {
-		target = wrapper.NewDefaultTarget()
+		target = configuration.NewDefaultTarget()
 	}
 
 	if verbose && target != nil {
@@ -87,6 +87,6 @@ func initConfig() {
 	}
 
 	var err error
-	hoverflyDirectory, err = wrapper.NewHoverflyDirectory(*config)
+	hoverflyDirectory, err = configuration.NewHoverflyDirectory(*config)
 	handleIfError(err)
 }

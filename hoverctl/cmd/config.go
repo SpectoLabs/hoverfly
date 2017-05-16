@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
+	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +28,7 @@ in the configuration file.
 
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(config.GetFilepath())
-		configData, _ := wrapper.ReadFile(config.GetFilepath())
+		configData, _ := configuration.ReadFile(config.GetFilepath())
 		configLines := strings.Split(string(configData), "\n")
 		for _, line := range configLines {
 			if line != "" {

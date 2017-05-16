@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
+	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/spf13/cobra"
 )
 
@@ -53,7 +53,7 @@ Delete target"
 		if !askForConfirmation("Are you sure you want to delete the target " + args[0] + "?") {
 			return
 		}
-		config.DeleteTarget(wrapper.Target{
+		config.DeleteTarget(configuration.Target{
 			Name: args[0],
 		})
 
@@ -77,7 +77,7 @@ Create target"
 			handleIfError(fmt.Errorf("Target %s already exists\n\nUse a different target name or run `hoverctl targets update %[1]s`", args[0]))
 		}
 
-		newTarget := wrapper.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
+		newTarget := configuration.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
 		newTarget.Pid = pidFlag
 
 		config.NewTarget(*newTarget)
@@ -102,7 +102,7 @@ Update target
 			handleIfError(fmt.Errorf("Target %s does not exist\n\nUse a different target name or run `hoverctl targets create %[1]s`", args[0]))
 		}
 
-		newTarget := wrapper.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
+		newTarget := configuration.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
 		newTarget.Pid = pidFlag
 
 		config.NewTarget(*newTarget)

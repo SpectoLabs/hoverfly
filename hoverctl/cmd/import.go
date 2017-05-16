@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
@@ -23,7 +24,7 @@ must be provided.
 		checkTargetAndExit(target)
 
 		checkArgAndExit(args, "You have not provided a path to simulation", "import")
-		simulationData, err := wrapper.ReadFile(args[0])
+		simulationData, err := configuration.ReadFile(args[0])
 		handleIfError(err)
 
 		err = wrapper.ImportSimulation(*target, string(simulationData))

@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
@@ -23,7 +24,7 @@ will be written to the file path provided.
 		simulationData, err := wrapper.ExportSimulation(*target)
 		handleIfError(err)
 
-		err = wrapper.WriteFile(args[0], simulationData)
+		err = configuration.WriteFile(args[0], simulationData)
 		handleIfError(err)
 
 		fmt.Println("Successfully exported simulation to", args[0])

@@ -7,6 +7,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	. "github.com/onsi/gomega"
 )
 
@@ -43,7 +44,7 @@ func Test_isLocal_WhenAnotherDNS(t *testing.T) {
 func Test_BuildUrl_AddsHostAdminPortAndPath(t *testing.T) {
 	RegisterTestingT(t)
 
-	target := Target{
+	target := configuration.Target{
 		Host:      "http://localhost",
 		AdminPort: 1234,
 	}
@@ -54,7 +55,7 @@ func Test_BuildUrl_AddsHostAdminPortAndPath(t *testing.T) {
 func Test_BuildUrl_AddsHostAdminPortAndPath_Https(t *testing.T) {
 	RegisterTestingT(t)
 
-	target := Target{
+	target := configuration.Target{
 		Host:      "https://localhost",
 		AdminPort: 1234,
 	}
@@ -65,7 +66,7 @@ func Test_BuildUrl_AddsHostAdminPortAndPath_Https(t *testing.T) {
 func Test_BuildUrl_AddsHttpIfHostIsLocalhost(t *testing.T) {
 	RegisterTestingT(t)
 
-	target := Target{
+	target := configuration.Target{
 		Host:      "localhost",
 		AdminPort: 1234,
 	}
@@ -76,7 +77,7 @@ func Test_BuildUrl_AddsHttpIfHostIsLocalhost(t *testing.T) {
 func Test_BuildUrl_AddsHttpIfHostIsExternal(t *testing.T) {
 	RegisterTestingT(t)
 
-	target := Target{
+	target := configuration.Target{
 		Host:      "test-instance.hoverfly.io",
 		AdminPort: 1234,
 	}
@@ -91,7 +92,7 @@ func Test_SetMiddleware_ReturnsErrorIfAPIResponsesWithError(t *testing.T) {
 	hf.Cfg.Webserver = true
 	hf.StartProxy()
 
-	target := Target{
+	target := configuration.Target{
 		Host:      "localhost",
 		AdminPort: 8500,
 	}
