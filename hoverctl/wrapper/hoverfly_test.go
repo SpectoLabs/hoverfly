@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
@@ -88,15 +87,11 @@ func Test_BuildUrl_AddsHttpIfHostIsExternal(t *testing.T) {
 func Test_SetMiddleware_ReturnsErrorIfAPIResponsesWithError(t *testing.T) {
 	RegisterTestingT(t)
 
-	hf := hoverfly.NewHoverfly()
-	hf.Cfg.Webserver = true
-	hf.StartProxy()
-
 	target := configuration.Target{
 		Host:      "localhost",
 		AdminPort: 8500,
 	}
-	hf.PutSimulation(v2.SimulationViewV2{
+	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
 			RequestResponsePairs: []v2.RequestResponsePairViewV2{
 				v2.RequestResponsePairViewV2{
@@ -121,6 +116,4 @@ func Test_SetMiddleware_ReturnsErrorIfAPIResponsesWithError(t *testing.T) {
 	fmt.Println(err.Error())
 	Expect(err.Error()).To(ContainSubstring("Hoverfly could not execute this middleware"))
 	Expect(err.Error()).To(ContainSubstring("this is a middleware test error"))
-
-	hf.StopProxy()
 }
