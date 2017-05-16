@@ -220,31 +220,6 @@
 			"Rev": "9a905a34e6280ce905da1a32344b25e81011197a"
 		},
 		{
-			"ImportPath": "github.com/hpcloud/tail",
-			"Comment": "v1.0.0-2-g915e5fe",
-			"Rev": "915e5feba042395f5fda4dbe9c0e99aeab3088b3"
-		},
-		{
-			"ImportPath": "github.com/hpcloud/tail/ratelimiter",
-			"Comment": "v1.0.0-2-g915e5fe",
-			"Rev": "915e5feba042395f5fda4dbe9c0e99aeab3088b3"
-		},
-		{
-			"ImportPath": "github.com/hpcloud/tail/util",
-			"Comment": "v1.0.0-2-g915e5fe",
-			"Rev": "915e5feba042395f5fda4dbe9c0e99aeab3088b3"
-		},
-		{
-			"ImportPath": "github.com/hpcloud/tail/watch",
-			"Comment": "v1.0.0-2-g915e5fe",
-			"Rev": "915e5feba042395f5fda4dbe9c0e99aeab3088b3"
-		},
-		{
-			"ImportPath": "github.com/hpcloud/tail/winfile",
-			"Comment": "v1.0.0-2-g915e5fe",
-			"Rev": "915e5feba042395f5fda4dbe9c0e99aeab3088b3"
-		},
-		{
 			"ImportPath": "github.com/inconshreveable/mousetrap",
 			"Rev": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
 		},
