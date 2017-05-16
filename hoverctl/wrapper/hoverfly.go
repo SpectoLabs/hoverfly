@@ -207,17 +207,21 @@ func GetLogs(target Target, format string) ([]string, error) {
 
 	responseBody, _ := ioutil.ReadAll(response.Body)
 	if format == "json" {
-		trimmedBody := responseBody[9 : len(responseBody)-2]
+		var logsView v2.LogsView
+
+		err := json.Unmarshal(responseBody, &logsView)
+		if err != nil {
+			return nil, err
+		}
 
 		var logs []string
-		for _, log := range strings.SplitAfter(string(trimmedBody), "},") {
-			logLength := len(log)
-			if log[len(log)-1:] == `,` {
-				log = log[:logLength-1]
+		for _, log := range logsView.Logs {
+			jsonLog, err := json.Marshal(log)
+			if err != nil {
+				return nil, err
 			}
 
-			logs = append(logs, log)
-
+			logs = append(logs, string(jsonLog))
 		}
 
 		return logs, nil
