@@ -7,7 +7,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
+	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/olekukonko/tablewriter"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -27,7 +27,7 @@ func checkArgAndExit(args []string, message, command string) {
 	}
 }
 
-func checkTargetAndExit(target *wrapper.Target) {
+func checkTargetAndExit(target *configuration.Target) {
 	if target == nil {
 		handleIfError(fmt.Errorf("%[1]s is not a target\n\nRun `hoverctl targets new %[1]s`", targetNameFlag))
 	}

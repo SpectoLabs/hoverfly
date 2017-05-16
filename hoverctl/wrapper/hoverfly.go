@@ -19,6 +19,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/kardianos/osext"
 )
 
@@ -67,7 +68,7 @@ type ErrorSchema struct {
 }
 
 // Wipe will call the records endpoint in Hoverfly with a DELETE request, triggering Hoverfly to wipe the database
-func DeleteSimulations(target Target) error {
+func DeleteSimulations(target configuration.Target) error {
 	response, err := doRequest(target, "DELETE", v2ApiSimulation, "", nil)
 	if err != nil {
 		return err
@@ -83,7 +84,7 @@ func DeleteSimulations(target Target) error {
 }
 
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
-func GetMode(target Target) (string, error) {
+func GetMode(target configuration.Target) (string, error) {
 	response, err := doRequest(target, "GET", v2ApiMode, "", nil)
 	if err != nil {
 		return "", err
@@ -97,7 +98,7 @@ func GetMode(target Target) (string, error) {
 }
 
 // Set will go the state endpoint in Hoverfly, sending JSON that will set the mode of Hoverfly
-func SetModeWithArguments(target Target, modeView v2.ModeView) (string, error) {
+func SetModeWithArguments(target configuration.Target, modeView v2.ModeView) (string, error) {
 	if modeView.Mode != "simulate" && modeView.Mode != "capture" &&
 		modeView.Mode != "modify" && modeView.Mode != "synthesize" {
 		return "", errors.New(modeView.Mode + " is not a valid mode")
@@ -122,7 +123,7 @@ func SetModeWithArguments(target Target, modeView v2.ModeView) (string, error) {
 }
 
 // GetDestination will go the destination endpoint in Hoverfly, parse the JSON response and return the destination of Hoverfly
-func GetDestination(target Target) (string, error) {
+func GetDestination(target configuration.Target) (string, error) {
 	response, err := doRequest(target, "GET", v2ApiDestination, "", nil)
 	if err != nil {
 		return "", err
@@ -136,8 +137,7 @@ func GetDestination(target Target) (string, error) {
 }
 
 // SetDestination will go the destination endpoint in Hoverfly, sending JSON that will set the destination of Hoverfly
-func SetDestination(target Target, destination string) (string, error) {
-
+func SetDestination(target configuration.Target, destination string) (string, error) {
 	response, err := doRequest(target, "PUT", v2ApiDestination, `{"destination":"`+destination+`"}`, nil)
 	if err != nil {
 		return "", err
@@ -149,7 +149,7 @@ func SetDestination(target Target, destination string) (string, error) {
 }
 
 // GetMiddle will go the middleware endpoint in Hoverfly, parse the JSON response and return the middleware of Hoverfly
-func GetMiddleware(target Target) (v2.MiddlewareView, error) {
+func GetMiddleware(target configuration.Target) (v2.MiddlewareView, error) {
 	response, err := doRequest(target, "GET", v2ApiMiddleware, "", nil)
 	if err != nil {
 		return v2.MiddlewareView{}, err
@@ -162,7 +162,7 @@ func GetMiddleware(target Target) (v2.MiddlewareView, error) {
 	return middlewareResponse, nil
 }
 
-func SetMiddleware(target Target, binary, script, remote string) (v2.MiddlewareView, error) {
+func SetMiddleware(target configuration.Target, binary, script, remote string) (v2.MiddlewareView, error) {
 	middlewareRequest := &v2.MiddlewareView{
 		Binary: binary,
 		Script: script,
@@ -189,7 +189,7 @@ func SetMiddleware(target Target, binary, script, remote string) (v2.MiddlewareV
 	return apiResponse, nil
 }
 
-func GetLogs(target Target, format string) ([]string, error) {
+func GetLogs(target configuration.Target, format string) ([]string, error) {
 	headers := map[string]string{
 		"Content-Type": "text/plain",
 	}
@@ -230,7 +230,7 @@ func GetLogs(target Target, format string) ([]string, error) {
 	}
 }
 
-func ImportSimulation(target Target, simulationData string) error {
+func ImportSimulation(target configuration.Target, simulationData string) error {
 	response, err := doRequest(target, "PUT", v2ApiSimulation, simulationData, nil)
 	if err != nil {
 		return err
@@ -246,7 +246,7 @@ func ImportSimulation(target Target, simulationData string) error {
 	return nil
 }
 
-func FlushCache(target Target) error {
+func FlushCache(target configuration.Target) error {
 	response, err := doRequest(target, "DELETE", v2ApiCache, "", nil)
 	if err != nil {
 		return err
@@ -259,7 +259,7 @@ func FlushCache(target Target) error {
 	return nil
 }
 
-func ExportSimulation(target Target) ([]byte, error) {
+func ExportSimulation(target configuration.Target) ([]byte, error) {
 	response, err := doRequest(target, "GET", v2ApiSimulation, "", nil)
 	if err != nil {
 		return nil, err
@@ -315,7 +315,7 @@ func createMiddlewareSchema(response *http.Response) v2.MiddlewareView {
 	return middleware
 }
 
-func Login(target Target, username, password string) (string, error) {
+func Login(target configuration.Target, username, password string) (string, error) {
 	credentials := HoverflyAuthSchema{
 		Username: username,
 		Password: password,
@@ -366,7 +366,7 @@ func Login(target Target, username, password string) (string, error) {
 	return authToken.Token, nil
 }
 
-func BuildURL(target Target, endpoint string) string {
+func BuildURL(target configuration.Target, endpoint string) string {
 	if !strings.HasPrefix(target.Host, "http://") && !strings.HasPrefix(target.Host, "https://") {
 		if IsLocal(target.Host) {
 			return fmt.Sprintf("http://%v:%v%v", target.Host, target.AdminPort, endpoint)
@@ -385,7 +385,7 @@ func IsLocal(url string) bool {
 This isn't working as intended, its working, just not how I imagined it.
 */
 
-func runBinary(target *Target, path string, hoverflyDirectory HoverflyDirectory) (*exec.Cmd, error) {
+func runBinary(target *configuration.Target, path string, hoverflyDirectory configuration.HoverflyDirectory) (*exec.Cmd, error) {
 	flags := target.BuildFlags()
 
 	cmd := exec.Command(path, flags...)
@@ -409,7 +409,7 @@ func runBinary(target *Target, path string, hoverflyDirectory HoverflyDirectory)
 	return cmd, nil
 }
 
-func Start(target *Target, hoverflyDirectory HoverflyDirectory) error {
+func Start(target *configuration.Target, hoverflyDirectory configuration.HoverflyDirectory) error {
 	err := checkPorts(target.AdminPort, target.ProxyPort)
 	if err != nil {
 		return err
@@ -459,7 +459,7 @@ func Start(target *Target, hoverflyDirectory HoverflyDirectory) error {
 	return nil
 }
 
-func Stop(target *Target, hoverflyDirectory HoverflyDirectory) error {
+func Stop(target *configuration.Target, hoverflyDirectory configuration.HoverflyDirectory) error {
 	hoverflyProcess := os.Process{Pid: target.Pid}
 	err := hoverflyProcess.Kill()
 	if err != nil {
@@ -472,7 +472,7 @@ func Stop(target *Target, hoverflyDirectory HoverflyDirectory) error {
 	return nil
 }
 
-func doRequest(target Target, method, url, body string, headers map[string]string) (*http.Response, error) {
+func doRequest(target configuration.Target, method, url, body string, headers map[string]string) (*http.Response, error) {
 	url = BuildURL(target, url)
 
 	request, err := http.NewRequest(method, url, strings.NewReader(body))

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
@@ -43,7 +44,7 @@ configuration will be shown.
 				handleIfError(err)
 				fmt.Println("Hoverfly middleware configuration has been set to")
 			} else {
-				script, err := wrapper.ReadFile(middlewareScript)
+				script, err := configuration.ReadFile(middlewareScript)
 				handleIfError(err)
 
 				middleware, err = wrapper.SetMiddleware(*target, middlewareBinary, string(script), "")
