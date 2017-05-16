@@ -69,7 +69,26 @@ func Test_LogsHandler_Get_SetsTheLimitIfLimitQueryProvided(t *testing.T) {
 	Expect(stubHoverfly.limit).To(Equal(20))
 }
 
-func Test_LogsHandler_Get_ReturnsLogsInPlaintext(t *testing.T) {
+func Test_LogsHandler_Get_ReturnsLogsInPlaintext_UsingAcceptHeader(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyLogsStub{}
+	unit := LogsHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "", nil)
+	Expect(err).To(BeNil())
+
+	request.Header.Set("Accept", "text/plain")
+
+	response := makeRequestOnHandler(unit.Get, request)
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	logs, _ := ioutil.ReadAll(response.Body)
+
+	Expect(string(logs)).To(ContainSubstring("time=\"0001-01-01T00:00:00Z\" level=panic msg=\"a line of logs\""))
+}
+
+func Test_LogsHandler_Get_ReturnsLogsInPlaintext_UsingContentTypeHeader(t *testing.T) {
 	RegisterTestingT(t)
 
 	stubHoverfly := &HoverflyLogsStub{}
