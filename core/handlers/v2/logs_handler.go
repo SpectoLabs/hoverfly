@@ -45,7 +45,8 @@ func (this *LogsHandler) Get(w http.ResponseWriter, req *http.Request, next http
 
 	logs = this.Hoverfly.GetLogs(limitQuery)
 
-	if strings.Contains(req.Header.Get("Content-Type"), "text/plain") {
+	if strings.Contains(req.Header.Get("Accept"), "text/plain") ||
+		strings.Contains(req.Header.Get("Content-Type"), "text/plain") {
 		handlers.WriteResponse(w, []byte(logsToPlainText(logs)))
 	} else {
 		bytes, _ := json.Marshal(logsToLogsView(logs))

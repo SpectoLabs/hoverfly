@@ -82,6 +82,33 @@ var _ = Describe("/api/v2/logs", func() {
 		})
 	})
 
+	Context("GET Accept text/plain", func() {
+
+		It("should get logs", func() {
+			req := sling.New().Get("http://localhost:"+hoverfly.GetAdminPort()+"/api/v2/logs").Add("Accept", "text/plain")
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			responseBody, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+
+			Expect(responseBody).To(ContainSubstring(`msg="Proxy prepared..."`))
+			Expect(responseBody).To(ContainSubstring(`Destination=.`))
+			Expect(responseBody).To(ContainSubstring(`Mode=simulate`))
+			Expect(responseBody).To(ContainSubstring(`ProxyPort=` + hoverfly.GetProxyPort()))
+		})
+
+		It("should limit the logs it returns", func() {
+			req := sling.New().Get("http://localhost:"+hoverfly.GetAdminPort()+"/api/v2/logs?limit=1").Add("Accept", "text/plain")
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			responseBody, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+
+			Expect(responseBody).To(ContainSubstring(`msg="started handling request"`))
+			Expect(responseBody).To(ContainSubstring(`request="/api/v2/logs?limit=1"`))
+		})
+	})
+
 	Context("GET Content-Type text/plain", func() {
 
 		It("should get logs", func() {
@@ -98,21 +125,14 @@ var _ = Describe("/api/v2/logs", func() {
 		})
 
 		It("should limit the logs it returns", func() {
-			req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/logs?limit=1")
+			req := sling.New().Get("http://localhost:"+hoverfly.GetAdminPort()+"/api/v2/logs?limit=1").Add("Content-Type", "text/plain")
 			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
-			responseJson, err := ioutil.ReadAll(res.Body)
+			responseBody, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 
-			jsonObject, err := jason.NewObjectFromBytes(responseJson)
-			Expect(err).To(BeNil())
-
-			logsArray, err := jsonObject.GetObjectArray("logs")
-			Expect(err).To(BeNil())
-
-			Expect(len(logsArray)).To(Equal(1))
-
-			Expect(logsArray[0].GetString("msg")).Should(Equal("started handling request"))
+			Expect(responseBody).To(ContainSubstring(`msg="started handling request"`))
+			Expect(responseBody).To(ContainSubstring(`request="/api/v2/logs?limit=1"`))
 		})
 	})
 })
