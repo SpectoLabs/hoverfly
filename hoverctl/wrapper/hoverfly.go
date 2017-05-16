@@ -208,7 +208,19 @@ func GetLogs(target Target, format string) ([]string, error) {
 	responseBody, _ := ioutil.ReadAll(response.Body)
 	if format == "json" {
 		trimmedBody := responseBody[9 : len(responseBody)-2]
-		return strings.SplitAfter(string(trimmedBody), "},"), nil
+
+		var logs []string
+		for _, log := range strings.SplitAfter(string(trimmedBody), "},") {
+			logLength := len(log)
+			if log[len(log)-1:] == `,` {
+				log = log[:logLength-1]
+			}
+
+			logs = append(logs, log)
+
+		}
+
+		return logs, nil
 	} else {
 		return strings.Split(string(responseBody), "\n"), nil
 	}
