@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"strconv"
+	"time"
 
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
@@ -20,31 +20,33 @@ Shows the Hoverfly logs.
 	Run: func(cmd *cobra.Command, args []string) {
 		checkTargetAndExit(target)
 
+		format := "plain"
+
 		jsonLogs, _ := cmd.Flags().GetBool("json")
-
 		if jsonLogs {
-			logfile := wrapper.NewLogFile(hoverflyDirectory, strconv.Itoa(target.AdminPort), strconv.Itoa(target.ProxyPort))
+			format = "json"
+		}
 
-			if followLogs {
-				err := logfile.Tail()
-				handleIfError(err)
-			} else {
+		logs, err := wrapper.GetLogs(*target, format)
+		handleIfError(err)
 
-				logs, err := wrapper.GetLogs(*target, "json")
-				handleIfError(err)
-				for _, log := range logs {
-					if log != "" {
-						fmt.Println(log)
-					}
-				}
+		logsPrinted := map[string]string{
+			"": "x",
+		}
+
+		for i := 0; i < len(logs); i++ {
+
+			if logs[i] != "" && logsPrinted[logs[i]] != "x" {
+				fmt.Println(logs[i])
+				logsPrinted[logs[i]] = "x"
 			}
-		} else {
-			logs, err := wrapper.GetLogs(*target, "plain")
-			handleIfError(err)
-			for _, log := range logs {
-				if log != "" {
-					fmt.Println(log)
-				}
+
+			if i == len(logs)-1 && followLogs {
+				logs, err = wrapper.GetLogs(*target, format)
+				handleIfError(err)
+
+				i = 0
+				time.Sleep(time.Second * 5)
 			}
 		}
 	},
