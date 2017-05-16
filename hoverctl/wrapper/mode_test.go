@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
+func Test_GetMode_GetsModeFromHoverfly(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
@@ -21,12 +21,12 @@ func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
 							ExactMatch: util.StringToPointer("GET"),
 						},
 						Path: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("/api/v2/hoverfly/middleware"),
+							ExactMatch: util.StringToPointer("/api/v2/hoverfly/mode"),
 						},
 					},
 					Response: v2.ResponseDetailsView{
 						Status: 200,
-						Body:   `{"binary": "test-binary", "script": "test.script", "remote": "http://test.com"}`,
+						Body:   `{"mode": "test-mode"}`,
 					},
 				},
 			},
@@ -36,24 +36,22 @@ func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
 		},
 	})
 
-	response, err := GetMiddleware(target)
+	mode, err := GetMode(target)
 	Expect(err).To(BeNil())
 
-	Expect(response.Binary).To(Equal("test-binary"))
-	Expect(response.Script).To(Equal("test.script"))
-	Expect(response.Remote).To(Equal("http://test.com"))
+	Expect(mode).To(Equal("test-mode"))
 }
 
-func Test_GetMiddleware_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
+func Test_GetMode_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, err := GetMiddleware(inaccessibleTarget)
+	_, err := GetMode(inaccessibleTarget)
 
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Could not connect to Hoverfly at something:1234"))
 }
 
-func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
+func Test_GetMode_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
@@ -66,7 +64,7 @@ func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 							ExactMatch: util.StringToPointer("GET"),
 						},
 						Path: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("/api/v2/hoverfly/middleware"),
+							ExactMatch: util.StringToPointer("/api/v2/hoverfly/mode"),
 						},
 					},
 					Response: v2.ResponseDetailsView{
@@ -81,21 +79,12 @@ func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		},
 	})
 
-	_, err := GetMiddleware(target)
+	_, err := GetMode(target)
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Could not retrieve middleware\n\ntest error"))
+	Expect(err.Error()).To(Equal("Could not retrieve mode\n\ntest error"))
 }
 
-func Test_SetMiddleware_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
-	RegisterTestingT(t)
-
-	_, err := SetMiddleware(inaccessibleTarget, "", "", "")
-
-	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Could not connect to Hoverfly at something:1234"))
-}
-
-func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
+func Test_SetMode_SendsCorrectHTTPRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
@@ -108,7 +97,60 @@ func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 							ExactMatch: util.StringToPointer("PUT"),
 						},
 						Path: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("/api/v2/hoverfly/middleware"),
+							ExactMatch: util.StringToPointer("/api/v2/hoverfly/mode"),
+						},
+						Body: &v2.RequestFieldMatchersView{
+							JsonMatch: util.StringToPointer(`{"mode":"capture","arguments":{}}`),
+						},
+					},
+					Response: v2.ResponseDetailsView{
+						Status: 200,
+						Body:   `{"mode": "capture"}`,
+					},
+				},
+			},
+		},
+		v2.MetaView{
+			SchemaVersion: "v2",
+		},
+	})
+
+	mode, err := SetModeWithArguments(target, v2.ModeView{
+		Mode: "capture",
+	})
+	Expect(err).To(BeNil())
+
+	Expect(mode).To(Equal("capture"))
+}
+
+func Test_SetMode_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
+	RegisterTestingT(t)
+
+	_, err := SetModeWithArguments(inaccessibleTarget, v2.ModeView{
+		Mode: "capture",
+	})
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("Could not connect to Hoverfly at something:1234"))
+}
+
+func Test_SetMode_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
+	RegisterTestingT(t)
+
+	hoverfly.DeleteSimulation()
+	hoverfly.PutSimulation(v2.SimulationViewV2{
+		v2.DataViewV2{
+			RequestResponsePairs: []v2.RequestResponsePairViewV2{
+				v2.RequestResponsePairViewV2{
+					Request: v2.RequestDetailsViewV2{
+						Method: &v2.RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("PUT"),
+						},
+						Path: &v2.RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("/api/v2/hoverfly/mode"),
+						},
+						Body: &v2.RequestFieldMatchersView{
+							JsonMatch: util.StringToPointer(`{"mode":"capture","arguments":{}}`),
 						},
 					},
 					Response: v2.ResponseDetailsView{
@@ -123,7 +165,9 @@ func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		},
 	})
 
-	_, err := SetMiddleware(target, "", "", "")
+	_, err := SetModeWithArguments(target, v2.ModeView{
+		Mode: "capture",
+	})
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Could not set middleware\n\ntest error"))
+	Expect(err.Error()).To(Equal("Could not set mode\n\ntest error"))
 }

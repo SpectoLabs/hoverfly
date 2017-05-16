@@ -3,7 +3,6 @@ package wrapper
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
@@ -18,9 +17,19 @@ func GetMode(target configuration.Target) (string, error) {
 
 	defer response.Body.Close()
 
-	apiResponse := createAPIStateResponse(response)
+	err = handleResponseError(response, "Could not retrieve mode")
+	if err != nil {
+		return "", err
+	}
 
-	return apiResponse.Mode, nil
+	var modeView v2.ModeView
+
+	err = UnmarshalToInterface(response, &modeView)
+	if err != nil {
+		return "", err
+	}
+
+	return modeView.Mode, nil
 }
 
 // Set will go the state endpoint in Hoverfly, sending JSON that will set the mode of Hoverfly
@@ -39,11 +48,17 @@ func SetModeWithArguments(target configuration.Target, modeView v2.ModeView) (st
 		return "", err
 	}
 
-	if response.StatusCode == http.StatusBadRequest {
-		return "", handlerError(response)
+	err = handleResponseError(response, "Could not set mode")
+	if err != nil {
+		return "", err
 	}
 
-	apiResponse := createAPIStateResponse(response)
+	var modeViewResponse v2.ModeView
 
-	return apiResponse.Mode, nil
+	err = UnmarshalToInterface(response, &modeViewResponse)
+	if err != nil {
+		return "", err
+	}
+
+	return modeViewResponse.Mode, nil
 }

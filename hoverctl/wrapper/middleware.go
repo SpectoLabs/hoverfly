@@ -16,9 +16,19 @@ func GetMiddleware(target configuration.Target) (v2.MiddlewareView, error) {
 
 	defer response.Body.Close()
 
-	middlewareResponse := createMiddlewareSchema(response)
+	err = handleResponseError(response, "Could not retrieve middleware")
+	if err != nil {
+		return v2.MiddlewareView{}, err
+	}
 
-	return middlewareResponse, nil
+	var middlewareView v2.MiddlewareView
+
+	err = UnmarshalToInterface(response, &middlewareView)
+	if err != nil {
+		return v2.MiddlewareView{}, err
+	}
+
+	return middlewareView, nil
 }
 
 func SetMiddleware(target configuration.Target, binary, script, remote string) (v2.MiddlewareView, error) {
@@ -38,12 +48,19 @@ func SetMiddleware(target configuration.Target, binary, script, remote string) (
 		return v2.MiddlewareView{}, err
 	}
 
-	err = handleResponseError(response, "Hoverfly could not execute this middleware")
+	defer response.Body.Close()
+
+	err = handleResponseError(response, "Could not set middleware")
 	if err != nil {
 		return v2.MiddlewareView{}, err
 	}
 
-	apiResponse := createMiddlewareSchema(response)
+	var middlewareView v2.MiddlewareView
 
-	return apiResponse, nil
+	err = UnmarshalToInterface(response, &middlewareView)
+	if err != nil {
+		return v2.MiddlewareView{}, err
+	}
+
+	return middlewareView, nil
 }

@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
+func Test_GetDestination_GetsDestinationFromHoverfly(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
@@ -21,12 +21,12 @@ func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
 							ExactMatch: util.StringToPointer("GET"),
 						},
 						Path: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("/api/v2/hoverfly/middleware"),
+							ExactMatch: util.StringToPointer("/api/v2/hoverfly/destination"),
 						},
 					},
 					Response: v2.ResponseDetailsView{
 						Status: 200,
-						Body:   `{"binary": "test-binary", "script": "test.script", "remote": "http://test.com"}`,
+						Body:   `{"destination": "test.com"}`,
 					},
 				},
 			},
@@ -36,24 +36,22 @@ func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
 		},
 	})
 
-	response, err := GetMiddleware(target)
+	destination, err := GetDestination(target)
 	Expect(err).To(BeNil())
 
-	Expect(response.Binary).To(Equal("test-binary"))
-	Expect(response.Script).To(Equal("test.script"))
-	Expect(response.Remote).To(Equal("http://test.com"))
+	Expect(destination).To(Equal("test.com"))
 }
 
-func Test_GetMiddleware_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
+func Test_GetDestination_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, err := GetMiddleware(inaccessibleTarget)
+	_, err := GetDestination(inaccessibleTarget)
 
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Could not connect to Hoverfly at something:1234"))
 }
 
-func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
+func Test_GetDestination_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
@@ -66,12 +64,12 @@ func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 							ExactMatch: util.StringToPointer("GET"),
 						},
 						Path: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("/api/v2/hoverfly/middleware"),
+							ExactMatch: util.StringToPointer("/api/v2/hoverfly/destination"),
 						},
 					},
 					Response: v2.ResponseDetailsView{
 						Status: 400,
-						Body:   `{"error": "test error"}`,
+						Body:   "{\"error\":\"test error\"}",
 					},
 				},
 			},
@@ -81,21 +79,12 @@ func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		},
 	})
 
-	_, err := GetMiddleware(target)
+	_, err := GetDestination(target)
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Could not retrieve middleware\n\ntest error"))
+	Expect(err.Error()).To(Equal("Could not retrieve destination\n\ntest error"))
 }
 
-func Test_SetMiddleware_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
-	RegisterTestingT(t)
-
-	_, err := SetMiddleware(inaccessibleTarget, "", "", "")
-
-	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Could not connect to Hoverfly at something:1234"))
-}
-
-func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
+func Test_SetDestination_SetsDestinationAndPrintsDestination(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
@@ -108,12 +97,12 @@ func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 							ExactMatch: util.StringToPointer("PUT"),
 						},
 						Path: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("/api/v2/hoverfly/middleware"),
+							ExactMatch: util.StringToPointer("/api/v2/hoverfly/destination"),
 						},
 					},
 					Response: v2.ResponseDetailsView{
-						Status: 400,
-						Body:   `{"error": "test error"}`,
+						Status: 200,
+						Body:   `{"destination": "new.com"}`,
 					},
 				},
 			},
@@ -123,7 +112,50 @@ func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		},
 	})
 
-	_, err := SetMiddleware(target, "", "", "")
+	destination, err := SetDestination(target, "new.com")
+	Expect(err).To(BeNil())
+
+	Expect(destination).To(Equal("new.com"))
+}
+
+func Test_SetDestination_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
+	RegisterTestingT(t)
+
+	_, err := SetDestination(inaccessibleTarget, "something")
+
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Could not set middleware\n\ntest error"))
+	Expect(err.Error()).To(Equal("Could not connect to Hoverfly at something:1234"))
+}
+
+func Test_SetDestination_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
+	RegisterTestingT(t)
+
+	hoverfly.DeleteSimulation()
+	hoverfly.PutSimulation(v2.SimulationViewV2{
+		v2.DataViewV2{
+			RequestResponsePairs: []v2.RequestResponsePairViewV2{
+				v2.RequestResponsePairViewV2{
+					Request: v2.RequestDetailsViewV2{
+						Method: &v2.RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("PUT"),
+						},
+						Path: &v2.RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("/api/v2/hoverfly/destination"),
+						},
+					},
+					Response: v2.ResponseDetailsView{
+						Status: 400,
+						Body:   "{\"error\":\"test error\"}",
+					},
+				},
+			},
+		},
+		v2.MetaView{
+			SchemaVersion: "v2",
+		},
+	})
+
+	_, err := SetDestination(target, "new.com")
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("Could not set destination\n\ntest error"))
 }

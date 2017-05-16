@@ -1,8 +1,6 @@
 package wrapper
 
 import (
-	"errors"
-
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 )
 
@@ -12,8 +10,9 @@ func FlushCache(target configuration.Target) error {
 		return err
 	}
 
-	if response.StatusCode != 200 {
-		return errors.New("Cache was not set on Hoverfly")
+	err = handleResponseError(response, "Could not flush cache")
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -1,6 +1,9 @@
 package wrapper
 
-import "github.com/SpectoLabs/hoverfly/hoverctl/configuration"
+import (
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
+)
 
 // GetDestination will go the destination endpoint in Hoverfly, parse the JSON response and return the destination of Hoverfly
 func GetDestination(target configuration.Target) (string, error) {
@@ -11,9 +14,19 @@ func GetDestination(target configuration.Target) (string, error) {
 
 	defer response.Body.Close()
 
-	apiResponse := createAPIStateResponse(response)
+	err = handleResponseError(response, "Could not retrieve destination")
+	if err != nil {
+		return "", err
+	}
 
-	return apiResponse.Destination, nil
+	var destinationView v2.DestinationView
+
+	err = UnmarshalToInterface(response, &destinationView)
+	if err != nil {
+		return "", err
+	}
+
+	return destinationView.Destination, nil
 }
 
 // SetDestination will go the destination endpoint in Hoverfly, sending JSON that will set the destination of Hoverfly
@@ -23,7 +36,17 @@ func SetDestination(target configuration.Target, destination string) (string, er
 		return "", err
 	}
 
-	apiResponse := createAPIStateResponse(response)
+	err = handleResponseError(response, "Could not set destination")
+	if err != nil {
+		return "", err
+	}
 
-	return apiResponse.Destination, nil
+	var destinationView v2.DestinationView
+
+	err = UnmarshalToInterface(response, &destinationView)
+	if err != nil {
+		return "", err
+	}
+
+	return destinationView.Destination, nil
 }
