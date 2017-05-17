@@ -286,6 +286,65 @@ func Test_SimulationViewV1_Upgrade_ReturnsAV2Simulation(t *testing.T) {
 	Expect(simulationViewV2.TimeExported).To(Equal("today"))
 }
 
+func Test_SimulationViewV1_Upgrade_ReturnsGlobMatchesIfTemplate(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := v2.SimulationViewV1{
+		v2.DataViewV1{
+			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{
+				v2.RequestResponsePairViewV1{
+					Request: v2.RequestDetailsViewV1{
+						RequestType: util.StringToPointer("template"),
+						Scheme:      util.StringToPointer("http"),
+						Body:        util.StringToPointer("body"),
+						Destination: util.StringToPointer("destination"),
+						Method:      util.StringToPointer("GET"),
+						Path:        util.StringToPointer("/path"),
+						Query:       util.StringToPointer("query=query"),
+					},
+					Response: v2.ResponseDetailsView{
+						Status:      200,
+						Body:        "body",
+						EncodedBody: false,
+						Headers: map[string][]string{
+							"Test": []string{"headers"},
+						},
+					},
+				},
+			},
+		},
+		v2.MetaView{
+			SchemaVersion:   "v1",
+			HoverflyVersion: "test",
+			TimeExported:    "today",
+		},
+	}
+
+	simulationViewV2 := unit.Upgrade()
+
+	Expect(simulationViewV2.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Scheme).To(Equal(v2.RequestFieldMatchersView{
+		GlobMatch: util.StringToPointer("http"),
+	}))
+	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Body).To(Equal(v2.RequestFieldMatchersView{
+		GlobMatch: util.StringToPointer("body"),
+	}))
+	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Destination).To(Equal(v2.RequestFieldMatchersView{
+		GlobMatch: util.StringToPointer("destination"),
+	}))
+	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Method).To(Equal(v2.RequestFieldMatchersView{
+		GlobMatch: util.StringToPointer("GET"),
+	}))
+	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Path).To(Equal(v2.RequestFieldMatchersView{
+		GlobMatch: util.StringToPointer("/path"),
+	}))
+	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Query).To(Equal(v2.RequestFieldMatchersView{
+		GlobMatch: util.StringToPointer("query=query"),
+	}))
+	Expect(simulationViewV2.RequestResponsePairs[0].Request.Headers).To(BeEmpty())
+}
+
 func Test_SimulationViewV1_Upgrade_CanReturnAnIncompleteRequest(t *testing.T) {
 	RegisterTestingT(t)
 

@@ -105,42 +105,82 @@ func (this SimulationViewV1) Upgrade() SimulationViewV2 {
 		var schemeMatchers, methodMatchers, destinationMatchers, pathMatchers, queryMatchers, bodyMatchers *RequestFieldMatchersView
 		var headers map[string][]string
 
-		if pairV1.Request.RequestType != nil && *pairV1.Request.RequestType != "recording" {
+		isNotRecording := pairV1.Request.RequestType != nil && *pairV1.Request.RequestType != "recording"
+
+		if isNotRecording {
 			headers = pairV1.Request.Headers
 		}
 		if pairV1.Request.Scheme != nil {
-			schemeMatchers = &RequestFieldMatchersView{
-				ExactMatch: pairV1.Request.Scheme,
+
+			if isNotRecording {
+				schemeMatchers = &RequestFieldMatchersView{
+					GlobMatch: pairV1.Request.Scheme,
+				}
+			} else {
+				schemeMatchers = &RequestFieldMatchersView{
+					ExactMatch: pairV1.Request.Scheme,
+				}
 			}
 		}
 
 		if pairV1.Request.Method != nil {
-			methodMatchers = &RequestFieldMatchersView{
-				ExactMatch: pairV1.Request.Method,
+
+			if isNotRecording {
+				methodMatchers = &RequestFieldMatchersView{
+					GlobMatch: pairV1.Request.Method,
+				}
+			} else {
+				methodMatchers = &RequestFieldMatchersView{
+					ExactMatch: pairV1.Request.Method,
+				}
 			}
 		}
 
 		if pairV1.Request.Destination != nil {
-			destinationMatchers = &RequestFieldMatchersView{
-				ExactMatch: pairV1.Request.Destination,
+			if isNotRecording {
+				destinationMatchers = &RequestFieldMatchersView{
+					GlobMatch: pairV1.Request.Destination,
+				}
+			} else {
+				destinationMatchers = &RequestFieldMatchersView{
+					ExactMatch: pairV1.Request.Destination,
+				}
 			}
 		}
 
 		if pairV1.Request.Path != nil {
-			pathMatchers = &RequestFieldMatchersView{
-				ExactMatch: pairV1.Request.Path,
+			if isNotRecording {
+				pathMatchers = &RequestFieldMatchersView{
+					GlobMatch: pairV1.Request.Path,
+				}
+			} else {
+				pathMatchers = &RequestFieldMatchersView{
+					ExactMatch: pairV1.Request.Path,
+				}
 			}
 		}
 
 		if pairV1.Request.Query != nil {
-			queryMatchers = &RequestFieldMatchersView{
-				ExactMatch: pairV1.Request.Query,
+			if isNotRecording {
+				queryMatchers = &RequestFieldMatchersView{
+					GlobMatch: pairV1.Request.Query,
+				}
+			} else {
+				queryMatchers = &RequestFieldMatchersView{
+					ExactMatch: pairV1.Request.Query,
+				}
 			}
 		}
 
 		if pairV1.Request.Body != nil {
-			bodyMatchers = &RequestFieldMatchersView{
-				ExactMatch: pairV1.Request.Body,
+			if isNotRecording {
+				bodyMatchers = &RequestFieldMatchersView{
+					GlobMatch: pairV1.Request.Body,
+				}
+			} else {
+				bodyMatchers = &RequestFieldMatchersView{
+					ExactMatch: pairV1.Request.Body,
+				}
 			}
 		}
 
