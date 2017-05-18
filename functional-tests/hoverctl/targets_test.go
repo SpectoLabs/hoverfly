@@ -207,14 +207,14 @@ var _ = Describe("When using the `targets` command", func() {
 			}))
 		})
 
-		It("should error when the default points to a non-existing  targets", func() {
+		It("the default should automatically get updated to local if the default does not exist", func() {
 			functional_tests.Run(hoverctlBinary, "targets", "create", "newdefault")
 			functional_tests.Run(hoverctlBinary, "targets", "default", "newdefault")
 			functional_tests.Run(hoverctlBinary, "targets", "delete", "newdefault", "--force")
 
 			output := functional_tests.Run(hoverctlBinary, "targets", "default")
 
-			Expect(output).To(ContainSubstring("No targets registered"))
+			Expect(output).To(ContainSubstring("Default target `newdefault` not found, changing default target to `local`"))
 		})
 
 		It("should error when given an invalid target name", func() {
