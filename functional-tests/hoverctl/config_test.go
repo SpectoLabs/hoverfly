@@ -9,7 +9,7 @@ import (
 var _ = Describe("When I use hoverctl", func() {
 
 	BeforeEach(func() {
-		functional_tests.Run(hoverctlBinary, "targets", "create", "default")
+		functional_tests.Run(hoverctlBinary, "targets", "update", "local")
 	})
 
 	AfterEach(func() {

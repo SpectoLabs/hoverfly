@@ -20,7 +20,7 @@ var _ = Describe("hoverctl flush cache", func() {
 		hoverfly.ImportSimulation(functional_tests.JsonPayload)
 		hoverfly.Proxy(sling.New().Get("http://destination-server.com"))
 
-		functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--admin-port", hoverfly.GetAdminPort())
+		functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--admin-port", hoverfly.GetAdminPort())
 	})
 
 	AfterEach(func() {

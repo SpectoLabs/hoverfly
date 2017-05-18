@@ -32,19 +32,19 @@ var _ = Describe("hoverctl `start`", func() {
 			Expect(output).To(ContainSubstring("8500"))
 		})
 
-		It("should create a default target", func() {
+		It("should create a local target", func() {
 			functional_tests.Run(hoverctlBinary, "start")
 
 			output := functional_tests.Run(hoverctlBinary, "targets")
 
 			targets := functional_tests.TableToSliceMapStringString(output)
-			Expect(targets).To(HaveKey("default"))
-			Expect(targets["default"]).To(HaveKeyWithValue("TARGET NAME", "default"))
-			Expect(targets["default"]).To(HaveKeyWithValue("ADMIN PORT", "8888"))
-			Expect(targets["default"]).To(HaveKeyWithValue("PROXY PORT", "8500"))
+			Expect(targets).To(HaveKey("local"))
+			Expect(targets["local"]).To(HaveKeyWithValue("TARGET NAME", "local"))
+			Expect(targets["local"]).To(HaveKeyWithValue("ADMIN PORT", "8888"))
+			Expect(targets["local"]).To(HaveKeyWithValue("PROXY PORT", "8500"))
 
-			Expect(targets["default"]).To(HaveKey("PID"))
-			Expect(strconv.Atoi(targets["default"]["PID"])).To(BeNumerically(">", 1))
+			Expect(targets["local"]).To(HaveKey("PID"))
+			Expect(strconv.Atoi(targets["local"]["PID"])).To(BeNumerically(">", 1))
 		})
 	})
 

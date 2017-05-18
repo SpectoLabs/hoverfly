@@ -88,6 +88,5 @@ func SetConfigurationPaths() {
 }
 
 func SetConfigurationDefaults() {
-	viper.SetDefault("default", "default")
-	viper.SetDefault("targets", map[string]Target{})
+	viper.SetDefault("default", "local")
 }
