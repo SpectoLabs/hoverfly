@@ -9,30 +9,22 @@ import (
 var _ = Describe("When using the `targets` command", func() {
 
 	Context("viewing targets", func() {
-		Context("with no targets", func() {
-
-			It("should fail nicely", func() {
-				output := functional_tests.Run(hoverctlBinary, "targets")
-
-				Expect(output).To(ContainSubstring("No targets registered"))
-			})
-		})
 
 		Context("with targets", func() {
 
 			BeforeEach(func() {
-				functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--admin-port", "1234", "--proxy-port", "8765", "--host", "localhost")
+				functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--admin-port", "1234", "--proxy-port", "8765", "--host", "localhost")
 			})
 
-			It("print default target", func() {
+			It("print default local target", func() {
 				output := functional_tests.Run(hoverctlBinary, "targets")
 				targets := functional_tests.TableToSliceMapStringString(output)
 
 				Expect(targets).To(HaveLen(1))
 
-				Expect(targets).To(HaveKey("default"))
-				Expect(targets["default"]).To(Equal(map[string]string{
-					"TARGET NAME": "default",
+				Expect(targets).To(HaveKey("local"))
+				Expect(targets["local"]).To(Equal(map[string]string{
+					"TARGET NAME": "local",
 					"PID":         "0",
 					"HOST":        "localhost",
 					"ADMIN PORT":  "1234",
@@ -49,9 +41,9 @@ var _ = Describe("When using the `targets` command", func() {
 
 				Expect(targets).To(HaveLen(3))
 
-				Expect(targets).To(HaveKey("default"))
-				Expect(targets["default"]).To(Equal(map[string]string{
-					"TARGET NAME": "default",
+				Expect(targets).To(HaveKey("local"))
+				Expect(targets["local"]).To(Equal(map[string]string{
+					"TARGET NAME": "local",
 					"PID":         "0",
 					"HOST":        "localhost",
 					"ADMIN PORT":  "1234",
@@ -94,8 +86,6 @@ var _ = Describe("When using the `targets` command", func() {
 			)
 			targets := functional_tests.TableToSliceMapStringString(output)
 
-			Expect(targets).To(HaveLen(1))
-
 			Expect(targets).To(HaveKey("new-target"))
 			Expect(targets["new-target"]).To(Equal(map[string]string{
 				"TARGET NAME": "new-target",
@@ -134,7 +124,6 @@ var _ = Describe("When using the `targets` command", func() {
 			)
 			targets := functional_tests.TableToSliceMapStringString(output)
 
-			Expect(targets).To(HaveLen(1))
 			Expect(targets).To(HaveKey("new-target"))
 			Expect(targets["new-target"]).To(Equal(map[string]string{
 				"TARGET NAME": "new-target",
@@ -163,11 +152,11 @@ var _ = Describe("When using the `targets` command", func() {
 	Context("deleting targets", func() {
 
 		BeforeEach(func() {
-			functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--admin-port", "1234")
+			functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--admin-port", "1234")
 		})
 
 		It("should delete targets and print nice empty message", func() {
-			output := functional_tests.Run(hoverctlBinary, "targets", "delete", "default", "--force")
+			output := functional_tests.Run(hoverctlBinary, "targets", "delete", "local", "--force")
 
 			Expect(output).To(ContainSubstring("No targets registered"))
 		})
@@ -182,7 +171,7 @@ var _ = Describe("When using the `targets` command", func() {
 	Context("targets default", func() {
 
 		BeforeEach(func() {
-			functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--admin-port", "1234")
+			functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--admin-port", "1234")
 		})
 
 		It("should print the default target", func() {
@@ -191,9 +180,9 @@ var _ = Describe("When using the `targets` command", func() {
 
 			Expect(targets).To(HaveLen(1))
 
-			Expect(targets).To(HaveKey("default"))
-			Expect(targets["default"]).To(Equal(map[string]string{
-				"TARGET NAME": "default",
+			Expect(targets).To(HaveKey("local"))
+			Expect(targets["local"]).To(Equal(map[string]string{
+				"TARGET NAME": "local",
 				"PID":         "0",
 				"HOST":        "localhost",
 				"ADMIN PORT":  "1234",
@@ -219,7 +208,9 @@ var _ = Describe("When using the `targets` command", func() {
 		})
 
 		It("should error when the default points to a non-existing  targets", func() {
-			functional_tests.Run(hoverctlBinary, "targets", "delete", "default", "--force")
+			functional_tests.Run(hoverctlBinary, "targets", "create", "newdefault")
+			functional_tests.Run(hoverctlBinary, "targets", "default", "newdefault")
+			functional_tests.Run(hoverctlBinary, "targets", "delete", "newdefault", "--force")
 
 			output := functional_tests.Run(hoverctlBinary, "targets", "default")
 
@@ -239,9 +230,9 @@ var _ = Describe("When using the `targets` command", func() {
 
 			Expect(targets).To(HaveLen(1))
 
-			Expect(targets).To(HaveKey("default"))
-			Expect(targets["default"]).To(Equal(map[string]string{
-				"TARGET NAME": "default",
+			Expect(targets).To(HaveKey("local"))
+			Expect(targets["local"]).To(Equal(map[string]string{
+				"TARGET NAME": "local",
 				"PID":         "0",
 				"HOST":        "localhost",
 				"ADMIN PORT":  "1234",

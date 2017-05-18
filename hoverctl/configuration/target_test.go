@@ -10,7 +10,7 @@ func Test_NewTarget_ReturnsDefaultWithEmptyStrings(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(NewTarget("", "", 0, 0)).To(Equal(&Target{
-		Name:      "default",
+		Name:      "local",
 		Host:      "localhost",
 		AdminPort: 8888,
 		ProxyPort: 8500,
@@ -32,7 +32,7 @@ func Test_NewTarget_OverridesHostfNotEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(NewTarget("", "notlocalhost", 0, 0)).To(Equal(&Target{
-		Name:      "default",
+		Name:      "local",
 		Host:      "notlocalhost",
 		AdminPort: 8888,
 		ProxyPort: 8500,
@@ -43,7 +43,7 @@ func Test_NewTarget_OverridesAdminPortfNotEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(NewTarget("", "", 1234, 0)).To(Equal(&Target{
-		Name:      "default",
+		Name:      "local",
 		Host:      "localhost",
 		AdminPort: 1234,
 		ProxyPort: 8500,
@@ -54,7 +54,7 @@ func Test_NewTarget_OverridesProxyPortfNotEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(NewTarget("", "", 0, 8765)).To(Equal(&Target{
-		Name:      "default",
+		Name:      "local",
 		Host:      "localhost",
 		AdminPort: 8888,
 		ProxyPort: 8765,
@@ -65,14 +65,13 @@ func Test_getTargetsFromConfig_host(t *testing.T) {
 	RegisterTestingT(t)
 
 	targets := getTargetsFromConfig(map[string]interface{}{
-		"default": map[interface{}]interface{}{
+		"newtarget": map[interface{}]interface{}{
 			"host": "test.org",
 		},
 	})
 
-	Expect(targets).To(HaveLen(1))
-	Expect(targets).To(HaveKeyWithValue("default", Target{
-		Name: "default",
+	Expect(targets).To(HaveKeyWithValue("newtarget", Target{
+		Name: "newtarget",
 		Host: "test.org",
 	}))
 }
@@ -86,7 +85,6 @@ func Test_getTargetsFromConfig_adminport(t *testing.T) {
 		},
 	})
 
-	Expect(targets).To(HaveLen(1))
 	Expect(targets).To(HaveKeyWithValue("other", Target{
 		Name:      "other",
 		AdminPort: 1234,
@@ -102,7 +100,6 @@ func Test_getTargetsFromConfig_proxyport(t *testing.T) {
 		},
 	})
 
-	Expect(targets).To(HaveLen(1))
 	Expect(targets).To(HaveKeyWithValue("otherother", Target{
 		Name:      "otherother",
 		ProxyPort: 8765,
@@ -118,10 +115,41 @@ func Test_getTargetsFromConfig_authtoken(t *testing.T) {
 		},
 	})
 
-	Expect(targets).To(HaveLen(1))
 	Expect(targets).To(HaveKeyWithValue("anotherother", Target{
 		Name:      "anotherother",
 		AuthToken: "token123:456",
+	}))
+}
+
+func Test_getTargetsFromConfig_AddsLocal(t *testing.T) {
+	RegisterTestingT(t)
+
+	targets := getTargetsFromConfig(map[string]interface{}{})
+
+	Expect(targets).To(HaveKeyWithValue("local", Target{
+		Name:      "local",
+		Host:      "localhost",
+		AdminPort: 8888,
+		ProxyPort: 8500,
+	}))
+}
+
+func Test_getTargetsFromConfig_DoesNotOverwriteLocal(t *testing.T) {
+	RegisterTestingT(t)
+
+	targets := getTargetsFromConfig(map[string]interface{}{
+		"local": map[interface{}]interface{}{
+			"host":       "notlocalhost",
+			"admin.port": 1234,
+			"proxy.port": 4321,
+		},
+	})
+
+	Expect(targets).To(HaveKeyWithValue("local", Target{
+		Name:      "local",
+		Host:      "notlocalhost",
+		AdminPort: 1234,
+		ProxyPort: 4321,
 	}))
 }
 

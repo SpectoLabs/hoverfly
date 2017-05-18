@@ -32,7 +32,7 @@ type Target struct {
 
 func NewDefaultTarget() *Target {
 	return &Target{
-		Name:      "default",
+		Name:      "local",
 		Host:      "localhost",
 		AdminPort: 8888,
 		ProxyPort: 8500,
@@ -91,6 +91,11 @@ func getTargetsFromConfig(configTargets map[string]interface{}) map[string]Targe
 		}
 
 		targets[key] = targetHoverfly
+	}
+
+	if targets["local"] == (Target{}) {
+		localTarget := NewDefaultTarget()
+		targets["local"] = *localTarget
 	}
 
 	return targets

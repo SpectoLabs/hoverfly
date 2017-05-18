@@ -19,7 +19,7 @@ var _ = Describe("hoverctl --set-default", func() {
 				"--target", "set-default-test2",
 				"--set-default")
 
-			Expect(output).To(ContainSubstring("default: default"))
+			Expect(output).To(ContainSubstring("default: local"))
 
 			output = functional_tests.Run(hoverctlBinary, "config", "-v")
 			Expect(output).To(ContainSubstring("default: set-default-test2"))
@@ -31,10 +31,10 @@ var _ = Describe("hoverctl --set-default", func() {
 			output := functional_tests.Run(hoverctlBinary, "config", "-v",
 				"--set-default")
 
-			Expect(output).To(ContainSubstring("default: default"))
+			Expect(output).To(ContainSubstring("default: local"))
 
 			output = functional_tests.Run(hoverctlBinary, "config", "-v")
-			Expect(output).To(ContainSubstring("default: default"))
+			Expect(output).To(ContainSubstring("default: local"))
 		})
 	})
 
@@ -45,7 +45,7 @@ var _ = Describe("hoverctl --set-default", func() {
 				"--set-default")
 
 			output := functional_tests.Run(hoverctlBinary, "config", "-v")
-			Expect(output).To(ContainSubstring("default: default"))
+			Expect(output).To(ContainSubstring("default: local"))
 		})
 	})
 })

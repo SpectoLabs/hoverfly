@@ -10,8 +10,15 @@ import (
 
 var (
 	defaultConfig = Config{
-		DefaultTarget: "default",
-		Targets:       map[string]Target{},
+		DefaultTarget: "local",
+		Targets: map[string]Target{
+			"local": Target{
+				Name:      "local",
+				Host:      "localhost",
+				AdminPort: 8888,
+				ProxyPort: 8500,
+			},
+		},
 	}
 )
 
@@ -96,29 +103,33 @@ func Test_Config_GetTarget_ReturnsNilIfTargetDoesntExist(t *testing.T) {
 func Test_Config_NewTarget_AddsTarget(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := defaultConfig
+	unit := Config{
+		Targets: map[string]Target{},
+	}
 
 	unit.NewTarget(Target{
-		Name:      "default",
+		Name:      "newtarget",
 		AdminPort: 1234,
 	})
 
 	Expect(unit.Targets).To(HaveLen(1))
 
-	Expect(unit.Targets["default"].AdminPort).To(Equal(1234))
+	Expect(unit.Targets["newtarget"].AdminPort).To(Equal(1234))
 }
 
 func Test_Config_DeleteTarget_DeletesTarget(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := defaultConfig
-
-	unit.NewTarget(Target{
-		Name:      "default",
-		AdminPort: 1234,
-	})
+	unit := Config{
+		Targets: map[string]Target{
+			"deleteme": Target{
+				Name:      "deleteme",
+				AdminPort: 1234,
+			},
+		},
+	}
 
 	Expect(unit.Targets).To(HaveLen(1))
-	unit.DeleteTarget(*unit.GetTarget("default"))
+	unit.DeleteTarget(*unit.GetTarget("deleteme"))
 	Expect(unit.Targets).To(HaveLen(0))
 }

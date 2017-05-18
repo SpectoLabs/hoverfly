@@ -16,7 +16,7 @@ var _ = Describe("hoverctl `stop`", func() {
 
 	Context("without a running instance of Hoverfly", func() {
 		BeforeEach(func() {
-			functional_tests.Run(hoverctlBinary, "targets", "create", "default")
+			functional_tests.Run(hoverctlBinary, "targets", "update", "local")
 		})
 
 		It("should return an error", func() {
@@ -28,7 +28,7 @@ var _ = Describe("hoverctl `stop`", func() {
 
 	Context("with an incorrect pid", func() {
 		BeforeEach(func() {
-			functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--pid", "432111")
+			functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--pid", "432111")
 		})
 
 		It("should return an error", func() {
@@ -41,7 +41,7 @@ var _ = Describe("hoverctl `stop`", func() {
 	Context("with a running instance of Hoverfly", func() {
 		BeforeEach(func() {
 			hoverfly.Start()
-			functional_tests.Run(hoverctlBinary, "targets", "create", "default", "--pid", strconv.Itoa(hoverfly.GetPid()))
+			functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--pid", strconv.Itoa(hoverfly.GetPid()))
 		})
 
 		AfterEach(func() {
@@ -60,7 +60,7 @@ var _ = Describe("hoverctl `stop`", func() {
 			output = functional_tests.Run(hoverctlBinary, "targets")
 
 			targets := functional_tests.TableToSliceMapStringString(output)
-			Expect(targets["default"]["PID"]).To(Equal("0"))
+			Expect(targets["local"]["PID"]).To(Equal("0"))
 		})
 	})
 
