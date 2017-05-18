@@ -23,7 +23,7 @@ var _ = Describe("When I use hoverctl", func() {
 	)
 
 	BeforeEach(func() {
-		functional_tests.Run(hoverctlBinary, "targets", "create", "localm", "--admin-port", adminPort, "--proxy-port", proxyPort)
+		functional_tests.Run(hoverctlBinary, "targets", "create", "local", "--admin-port", adminPort, "--proxy-port", proxyPort)
 	})
 
 	AfterEach(func() {
