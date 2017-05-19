@@ -120,7 +120,7 @@ var _ = Describe("hoverctl `start`", func() {
 
 			output = functional_tests.Run(hoverctlBinary, "logs", "--json")
 
-			Expect(output).To(ContainSubstring("tls certificate verification is now turned off!"))
+			Expect(output).To(ContainSubstring("TLS certificate verification has been disabled"))
 		})
 
 		It("should start an instance of hoverfly with persisted cache", func() {
@@ -129,7 +129,7 @@ var _ = Describe("hoverctl `start`", func() {
 			Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
 			output = functional_tests.Run(hoverctlBinary, "logs", "--json")
-			Expect(output).To(ContainSubstring("Creating bolt db backend."))
+			Expect(output).To(ContainSubstring("Using boltdb backend"))
 		})
 
 		It("should start and instance of hoverfly without a cache", func() {
