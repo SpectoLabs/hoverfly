@@ -113,7 +113,7 @@ var _ = Describe("When I use hoverctl", func() {
 				file, err := ioutil.ReadFile(filePath)
 				Expect(err).To(BeNil())
 
-				Expect(string(file)).To(ContainSubstring("Can't change mode to"))
+				Expect(string(file)).To(ContainSubstring("Unknown mode"))
 				Expect(string(file)).To(ContainSubstring("not-a-mode"))
 			})
 		})
