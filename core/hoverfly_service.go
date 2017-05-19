@@ -53,7 +53,9 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 	}
 
 	if modeView.Mode == "" || !availableModes[modeView.Mode] {
-		log.Error("Can't change mode to \"%d\"", modeView.Mode)
+		log.WithFields(log.Fields{
+			"mode": modeView.Mode,
+		}).Error("Unknown mode")
 		return fmt.Errorf("Not a valid mode")
 	}
 
@@ -82,6 +84,11 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 	}
 
 	this.modeMap[this.Cfg.GetMode()].SetArguments(modeArguments)
+
+	log.WithFields(log.Fields{
+		"mode": this.Cfg.GetMode(),
+	}).Info("Mode has been changed")
+
 	return nil
 }
 
