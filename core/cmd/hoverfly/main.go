@@ -148,7 +148,9 @@ func init() {
 	// overriding default goproxy certificate
 	tlsc, err := tls.X509KeyPair(CA_CERT, CA_KEY)
 	if err != nil {
-		log.Fatalf("Failed to load certifiate and key pair, got error: %s", err.Error())
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Fatal("Failed to load certifiate and key pair")
 	}
 	goproxy.GoproxyCa = tlsc
 }
@@ -171,6 +173,7 @@ func main() {
 	if *verbose {
 		// Only log the warning severity or above.
 		log.SetLevel(log.DebugLevel)
+		log.Info("Log level set to verbose")
 	}
 	cfg.Verbose = *verbose
 
@@ -184,36 +187,49 @@ func main() {
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
-			}).Fatal("failed to generate certificate.")
+			}).Fatal("Failed to generate certificate")
 		}
 		goproxy.GoproxyCa = *tlsc
 
 	} else if *cert != "" && *key != "" {
 		tlsc, err := tls.LoadX509KeyPair(*cert, *key)
 		if err != nil {
-			log.Fatalf("Failed to load certifiate and key pair, got error: %s", err.Error())
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Fatal("Failed to load certifiate and key pair")
 		}
+
+		goproxy.GoproxyCa = tlsc
 
 		log.WithFields(log.Fields{
 			"certificate": *cert,
 			"key":         *key,
 		}).Info("Default keys have been overwritten")
-
-		goproxy.GoproxyCa = tlsc
-
 	}
 
 	// overriding environment variables (proxy and admin ports)
 	if *proxyPort != "" {
 		cfg.ProxyPort = *proxyPort
+
+		log.WithFields(log.Fields{
+			"port": *proxyPort,
+		}).Info("Default proxy port has been overwritten")
 	}
 	if *adminPort != "" {
 		cfg.AdminPort = *adminPort
+
+		log.WithFields(log.Fields{
+			"port": *adminPort,
+		}).Info("Default admin port has been overwritten")
 	}
 
 	// overriding environment variable (external proxy)
 	if *upstreamProxy != "" {
 		cfg.SetUpstreamProxy(*upstreamProxy)
+
+		log.WithFields(log.Fields{
+			"url": *upstreamProxy,
+		}).Info("Upstream proxy has been set")
 	}
 
 	cfg.HttpsOnly = *httpsOnly
@@ -241,7 +257,8 @@ func main() {
 	// disabling tls verification if flag or env variable is set to 'false' (defaults to true)
 	if !cfg.TLSVerification || !*tlsVerification {
 		cfg.TLSVerification = false
-		log.Info("tls certificate verification is now turned off!")
+
+		log.Info("TLS certificate verification has been disabled")
 	}
 
 	if len(destinationFlags) > 0 {
@@ -262,27 +279,31 @@ func main() {
 	}
 
 	if *database == boltBackend {
-		log.Info("Creating bolt db backend...")
 		db := cache.GetDB(cfg.DatabasePath)
 		defer db.Close()
 		requestCache = cache.NewBoltDBCache(db, []byte("requestsBucket"))
 		metadataCache = cache.NewBoltDBCache(db, []byte("metadataBucket"))
 		tokenCache = cache.NewBoltDBCache(db, []byte(backends.TokenBucketName))
 		userCache = cache.NewBoltDBCache(db, []byte(backends.UserBucketName))
-	} else if *database == inmemoryBackend {
-		log.Info("Creating in memory map backend...")
-		log.Warn("Turning off authentication...")
 
+		log.Info("Using boltdb backend")
+	} else if *database == inmemoryBackend {
 		requestCache = cache.NewInMemoryCache()
 		metadataCache = cache.NewInMemoryCache()
 		tokenCache = cache.NewInMemoryCache()
 		userCache = cache.NewInMemoryCache()
+
+		log.Info("Using memory backend")
 	} else {
-		log.Fatalf("unknown database type chosen: %s", *database)
+		log.WithFields(log.Fields{
+			"database": *database,
+		}).Fatalf("Unknown database type")
 	}
 	cfg.DisableCache = *disableCache
 	if cfg.DisableCache {
 		requestCache = nil
+
+		log.Info("Request cache has been disabled")
 	}
 
 	if *proxyAuthorizationHeader == "header-auth" {
@@ -315,11 +336,11 @@ func main() {
 			log.WithFields(log.Fields{
 				"error":    err.Error(),
 				"username": *addUser,
-			}).Fatal("failed to add new user")
+			}).Fatal("Failed to add new user")
 		} else {
 			log.WithFields(log.Fields{
 				"username": *addUser,
-			}).Info("user added successfuly")
+			}).Info("User added successfully")
 		}
 		cfg.AuthEnabled = true
 	}
@@ -335,8 +356,8 @@ func main() {
 		users, err := hoverfly.Authentication.GetAllUsers()
 		if err != nil {
 			log.WithFields(log.Fields{
-				"error": err,
-			}).Fatal("got error while trying to get all users")
+				"error": err.Error(),
+			}).Fatal("Failed when retrieving users")
 		}
 		if len(users) < 1 {
 			createSuperUser(hoverfly)
@@ -388,7 +409,7 @@ func main() {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-		}).Fatal("failed to start proxy...")
+		}).Fatal("Failed to start proxy")
 	}
 
 	// starting admin interface, this is blocking
@@ -404,15 +425,15 @@ func createSuperUser(h *hv.Hoverfly) {
 	username, err := reader.ReadString('\n')
 	if err != nil {
 		log.WithFields(log.Fields{
-			"error": err,
-		}).Fatal("error while getting username input")
+			"error": err.Error(),
+		}).Fatal("Failed retrieving username input")
 	}
 	fmt.Print("Enter password (default hf): ")
 	password, err := reader.ReadString('\n')
 	if err != nil {
 		log.WithFields(log.Fields{
-			"error": err,
-		}).Fatal("error while getting password input")
+			"error": err.Error(),
+		}).Fatal("Failed retrieving password input")
 	}
 	// Trim whitespace and use defaults if nothing entered
 	username = strings.TrimSpace(username)
@@ -426,10 +447,12 @@ func createSuperUser(h *hv.Hoverfly) {
 	err = h.Authentication.AddUser(username, password, true)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"error": err,
-		}).Fatal("failed to create user.")
+			"error": err.Error(),
+		}).Fatal("Failed to create user")
 	} else {
-		log.Infof("User: '%s' created.\n", username)
+		log.WithFields(log.Fields{
+			"username": username,
+		}).Info("User created")
 	}
 }
 
