@@ -111,6 +111,7 @@ func GetAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 	list = append(list, &v2.SimulationHandler{Hoverfly: hoverfly})
 	list = append(list, &v2.CacheHandler{Hoverfly: hoverfly})
 	list = append(list, &v2.LogsHandler{Hoverfly: hoverfly.StoreLogsHook})
+	list = append(list, &v2.ShutdownHandler{})
 
 	return list
 }
