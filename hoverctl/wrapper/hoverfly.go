@@ -32,6 +32,9 @@ const (
 	v2ApiMiddleware  = "/api/v2/hoverfly/middleware"
 	v2ApiCache       = "/api/v2/cache"
 	v2ApiLogs        = "/api/v2/logs"
+
+	v2ApiShutdown = "/api/v2/shutdown"
+	v2ApiHealth   = "/api/health"
 )
 
 type APIStateSchema struct {
@@ -251,15 +254,27 @@ func Start(target *configuration.Target, hoverflyDirectory configuration.Hoverfl
 	return nil
 }
 
-func Stop(target *configuration.Target, hoverflyDirectory configuration.HoverflyDirectory) error {
-	hoverflyProcess := os.Process{Pid: target.Pid}
-	err := hoverflyProcess.Kill()
+func Shutdown(target configuration.Target) error {
+	response, err := doRequest(target, "DELETE", v2ApiShutdown, "", nil)
 	if err != nil {
-		log.Info(err.Error())
-		return errors.New("Could not kill Hoverfly [process " + strconv.Itoa(target.Pid) + "]")
+		return err
 	}
 
-	target.Pid = 0
+	defer response.Body.Close()
+
+	err = handleResponseError(response, "Could not stop Hoverfly")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CheckIfRunning(target configuration.Target) error {
+	_, err := doRequest(target, http.MethodGet, v2ApiHealth, "", nil)
+	if err != nil {
+		return fmt.Errorf("Target Hoverfly is not running\n\nRun `hoverctl start -t %s` to start it", target.Name)
+	}
 
 	return nil
 }
