@@ -25,7 +25,6 @@ var _ = Describe("When using the `targets` command", func() {
 				Expect(targets).To(HaveKey("local"))
 				Expect(targets["local"]).To(Equal(map[string]string{
 					"TARGET NAME": "local",
-					"PID":         "0",
 					"HOST":        "localhost",
 					"ADMIN PORT":  "1234",
 					"PROXY PORT":  "8765",
@@ -44,7 +43,6 @@ var _ = Describe("When using the `targets` command", func() {
 				Expect(targets).To(HaveKey("local"))
 				Expect(targets["local"]).To(Equal(map[string]string{
 					"TARGET NAME": "local",
-					"PID":         "0",
 					"HOST":        "localhost",
 					"ADMIN PORT":  "1234",
 					"PROXY PORT":  "8765",
@@ -54,7 +52,6 @@ var _ = Describe("When using the `targets` command", func() {
 				Expect(targets).To(HaveKey("one"))
 				Expect(targets["one"]).To(Equal(map[string]string{
 					"TARGET NAME": "one",
-					"PID":         "0",
 					"HOST":        "localhost",
 					"ADMIN PORT":  "1234",
 					"PROXY PORT":  "8765",
@@ -64,7 +61,6 @@ var _ = Describe("When using the `targets` command", func() {
 				Expect(targets).To(HaveKey("two"))
 				Expect(targets["two"]).To(Equal(map[string]string{
 					"TARGET NAME": "two",
-					"PID":         "0",
 					"HOST":        "localhost",
 					"ADMIN PORT":  "1234",
 					"PROXY PORT":  "8765",
@@ -79,7 +75,6 @@ var _ = Describe("When using the `targets` command", func() {
 		It("should create the target and print it", func() {
 
 			output := functional_tests.Run(hoverctlBinary, "targets", "create", "new-target",
-				"--pid", "12345",
 				"--host", "localhost",
 				"--admin-port", "1234",
 				"--proxy-port", "8765",
@@ -89,7 +84,6 @@ var _ = Describe("When using the `targets` command", func() {
 			Expect(targets).To(HaveKey("new-target"))
 			Expect(targets["new-target"]).To(Equal(map[string]string{
 				"TARGET NAME": "new-target",
-				"PID":         "12345",
 				"HOST":        "localhost",
 				"ADMIN PORT":  "1234",
 				"PROXY PORT":  "8765",
@@ -117,7 +111,6 @@ var _ = Describe("When using the `targets` command", func() {
 		It("should update the target and print it", func() {
 			functional_tests.Run(hoverctlBinary, "targets", "create", "new-target")
 			output := functional_tests.Run(hoverctlBinary, "targets", "update", "new-target",
-				"--pid", "12345",
 				"--host", "localhost",
 				"--admin-port", "1234",
 				"--proxy-port", "8765",
@@ -127,7 +120,6 @@ var _ = Describe("When using the `targets` command", func() {
 			Expect(targets).To(HaveKey("new-target"))
 			Expect(targets["new-target"]).To(Equal(map[string]string{
 				"TARGET NAME": "new-target",
-				"PID":         "12345",
 				"HOST":        "localhost",
 				"ADMIN PORT":  "1234",
 				"PROXY PORT":  "8765",
@@ -183,7 +175,6 @@ var _ = Describe("When using the `targets` command", func() {
 			Expect(targets).To(HaveKey("local"))
 			Expect(targets["local"]).To(Equal(map[string]string{
 				"TARGET NAME": "local",
-				"PID":         "0",
 				"HOST":        "localhost",
 				"ADMIN PORT":  "1234",
 				"PROXY PORT":  "8500",
@@ -200,7 +191,6 @@ var _ = Describe("When using the `targets` command", func() {
 			Expect(targets).To(HaveKey("alternative"))
 			Expect(targets["alternative"]).To(Equal(map[string]string{
 				"TARGET NAME": "alternative",
-				"PID":         "0",
 				"HOST":        "localhost",
 				"ADMIN PORT":  "1233",
 				"PROXY PORT":  "8500",
@@ -233,7 +223,6 @@ var _ = Describe("When using the `targets` command", func() {
 			Expect(targets).To(HaveKey("local"))
 			Expect(targets["local"]).To(Equal(map[string]string{
 				"TARGET NAME": "local",
-				"PID":         "0",
 				"HOST":        "localhost",
 				"ADMIN PORT":  "1234",
 				"PROXY PORT":  "8500",

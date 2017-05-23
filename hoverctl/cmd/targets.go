@@ -9,8 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var pidFlag int
-
 var targetsCmd = &cobra.Command{
 	Use:   "targets",
 	Short: "Get the current targets registered with hoverctl",
@@ -24,7 +22,7 @@ Get the current targets registered with hoverctl
 		}
 
 		data := [][]string{
-			{"Target name", "Pid", "Host", "Admin port", "Proxy port", "Default"},
+			{"Target name", "Host", "Admin port", "Proxy port", "Default"},
 		}
 
 		for key, target := range config.Targets {
@@ -33,7 +31,7 @@ Get the current targets registered with hoverctl
 				defaultMarker = "X"
 			}
 
-			data = append(data, []string{key, strconv.Itoa(target.Pid), target.Host, strconv.Itoa(target.AdminPort), strconv.Itoa(target.ProxyPort), defaultMarker})
+			data = append(data, []string{key, target.Host, strconv.Itoa(target.AdminPort), strconv.Itoa(target.ProxyPort), defaultMarker})
 		}
 
 		drawTable(data, true)
@@ -78,7 +76,6 @@ Create target"
 		}
 
 		newTarget := configuration.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
-		newTarget.Pid = pidFlag
 
 		config.NewTarget(*newTarget)
 
@@ -103,7 +100,6 @@ Update target
 		}
 
 		newTarget := configuration.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
-		newTarget.Pid = pidFlag
 
 		config.NewTarget(*newTarget)
 
@@ -135,11 +131,11 @@ of the current default target."
 		}
 
 		data := [][]string{
-			[]string{"Target name", "Pid", "Host", "Admin port", "Proxy port"},
+			[]string{"Target name", "Host", "Admin port", "Proxy port"},
 		}
 
 		defaultTarget := config.GetTarget("")
-		data = append(data, []string{defaultTarget.Name, strconv.Itoa(defaultTarget.Pid), defaultTarget.Host, strconv.Itoa(defaultTarget.AdminPort), strconv.Itoa(defaultTarget.ProxyPort)})
+		data = append(data, []string{defaultTarget.Name, defaultTarget.Host, strconv.Itoa(defaultTarget.AdminPort), strconv.Itoa(defaultTarget.ProxyPort)})
 
 		drawTable(data, true)
 	},
@@ -152,7 +148,4 @@ func init() {
 	targetsCmd.AddCommand(targetsNewCmd)
 	targetsCmd.AddCommand(targetsUpdateCmd)
 	targetsCmd.AddCommand(targetsDefaultCmd)
-
-	targetsNewCmd.Flags().IntVar(&pidFlag, "pid", 0, "Process id for a running instance of Hoverfly")
-	targetsUpdateCmd.Flags().IntVar(&pidFlag, "pid", 0, "Process id for a running instance of Hoverfly")
 }

@@ -30,7 +30,7 @@ is stopped.
 			handleIfError(err)
 		}
 
-		err = wrapper.Shutdown(*target)
+		err = wrapper.Stop(*target)
 		handleIfError(err)
 
 		config.NewTarget(*target)

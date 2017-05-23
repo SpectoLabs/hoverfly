@@ -31,7 +31,7 @@ var _ = Describe("hoverctl `stop`", func() {
 	Context("with a running instance of Hoverfly", func() {
 		BeforeEach(func() {
 			hoverfly.Start()
-			functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--pid", strconv.Itoa(hoverfly.GetPid()), "--admin-port", hoverfly.GetAdminPort())
+			functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--admin-port", hoverfly.GetAdminPort())
 		})
 
 		AfterEach(func() {
