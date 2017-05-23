@@ -83,7 +83,7 @@ func Test_BuildUrl_AddsHttpIfHostIsExternal(t *testing.T) {
 	Expect(BuildURL(target, "/something")).To(Equal("https://test-instance.hoverfly.io:1234/something"))
 }
 
-func Test_Shutdown_SendsCorrectHTTPRequest(t *testing.T) {
+func Test_Stop_SendsCorrectHTTPRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
@@ -111,20 +111,20 @@ func Test_Shutdown_SendsCorrectHTTPRequest(t *testing.T) {
 		},
 	})
 
-	err := Shutdown(target)
+	err := Stop(target)
 	Expect(err).To(BeNil())
 }
 
-func Test_Shutdown_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
+func Test_Stop_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
 	RegisterTestingT(t)
 
-	err := Shutdown(inaccessibleTarget)
+	err := Stop(inaccessibleTarget)
 
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Could not connect to Hoverfly at something:1234"))
 }
 
-func Test_Shutdown_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
+func Test_Stop_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
@@ -152,7 +152,7 @@ func Test_Shutdown_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		},
 	})
 
-	err := Shutdown(target)
+	err := Stop(target)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Could not stop Hoverfly\n\ntest error"))
 }

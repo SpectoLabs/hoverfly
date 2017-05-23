@@ -29,12 +29,10 @@ hoverctl configuration file.
 			handleIfError(fmt.Errorf("Unable to start an instance of Hoverfly on a remote host (%s host: %s)\n\nRun `hoverctl start --new-target <name>`", target.Name, target.Host))
 		}
 
-		if target.Pid != 0 {
+		if wrapper.CheckIfRunning(*target) == nil {
 			if _, err := wrapper.GetMode(*target); err == nil {
-				handleIfError(fmt.Errorf("Target Hoverfly is already running (pid: %v) \n\nRun `hoverctl stop -t %s` to stop it", target.Pid, target.Name))
+				handleIfError(fmt.Errorf("Target Hoverfly is already running \n\nRun `hoverctl stop -t %s` to stop it", target.Name))
 			}
-
-			target.Pid = 0
 		}
 
 		newTargetFlag, _ := cmd.Flags().GetString("new-target")

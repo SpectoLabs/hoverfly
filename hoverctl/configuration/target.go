@@ -86,10 +86,6 @@ func getTargetsFromConfig(configTargets map[string]interface{}) map[string]Targe
 			targetHoverfly.AuthToken = targetMap["auth.token"].(string)
 		}
 
-		if targetMap["pid"] != nil {
-			targetHoverfly.Pid = targetMap["pid"].(int)
-		}
-
 		targets[key] = targetHoverfly
 	}
 

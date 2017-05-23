@@ -216,9 +216,9 @@ func Start(target *configuration.Target, hoverflyDirectory configuration.Hoverfl
 		return errors.New("Could not start Hoverfly")
 	}
 
-	cmd, err := runBinary(target, binaryLocation+"/hoverfly", hoverflyDirectory)
+	_, err = runBinary(target, binaryLocation+"/hoverfly", hoverflyDirectory)
 	if err != nil {
-		cmd, err = runBinary(target, "hoverfly", hoverflyDirectory)
+		_, err = runBinary(target, "hoverfly", hoverflyDirectory)
 		if err != nil {
 			return errors.New("Could not start Hoverfly")
 		}
@@ -249,12 +249,10 @@ func Start(target *configuration.Target, hoverflyDirectory configuration.Hoverfl
 		}
 	}
 
-	target.Pid = cmd.Process.Pid
-
 	return nil
 }
 
-func Shutdown(target configuration.Target) error {
+func Stop(target configuration.Target) error {
 	response, err := doRequest(target, "DELETE", v2ApiShutdown, "", nil)
 	if err != nil {
 		return err

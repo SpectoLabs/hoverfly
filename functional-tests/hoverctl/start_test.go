@@ -43,8 +43,6 @@ var _ = Describe("hoverctl `start`", func() {
 			Expect(targets["local"]).To(HaveKeyWithValue("ADMIN PORT", "8888"))
 			Expect(targets["local"]).To(HaveKeyWithValue("PROXY PORT", "8500"))
 
-			Expect(targets["local"]).To(HaveKey("PID"))
-			Expect(strconv.Atoi(targets["local"]["PID"])).To(BeNumerically(">", 1))
 		})
 	})
 
@@ -197,21 +195,6 @@ var _ = Describe("hoverctl `start`", func() {
 			Expect(output).To(ContainSubstring("proxy-port"))
 			Expect(output).To(ContainSubstring("8765"))
 		})
-
-		It("should update the target with a pid", func() {
-			functional_tests.Run(hoverctlBinary, "targets", "create", "test-target",
-				"--admin-port", "4567",
-				"--proxy-port", "4342",
-			)
-
-			functional_tests.Run(hoverctlBinary, "start", "--target", "test-target")
-
-			output := functional_tests.Run(hoverctlBinary, "targets")
-
-			targets := functional_tests.TableToSliceMapStringString(output)
-			Expect(targets["test-target"]).To(HaveKey("PID"))
-			Expect(strconv.Atoi(targets["test-target"]["PID"])).To(BeNumerically(">", 1))
-		})
 	})
 
 	Context("with a target that doesn't exist", func() {
@@ -295,7 +278,7 @@ var _ = Describe("hoverctl `start`", func() {
 
 	Context("with port conflicts", func() {
 		BeforeEach(func() {
-			functional_tests.Run(hoverctlBinary, "start", "--new-target", "admin-conflict")
+			functional_tests.Run(hoverctlBinary, "start", "--new-target", "admin-conflict", "--admin-port", "8500", "--proxy-port", "8888")
 		})
 
 		It("errors when the admin port is the same", func() {
