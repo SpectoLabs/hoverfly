@@ -3,11 +3,12 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/metrics"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/metrics"
+	. "github.com/onsi/gomega"
 )
 
 type HoverflyUsageStub struct{}
@@ -42,6 +43,21 @@ func TestHoverflyUsageHandlerGetReturnsMetrics(t *testing.T) {
 	Expect(usageView.Usage.Counters).To(HaveLen(2))
 	Expect(usageView.Usage.Counters).To(HaveKeyWithValue("countOne", int64(1)))
 	Expect(usageView.Usage.Counters).To(HaveKeyWithValue("countTwo", int64(2)))
+}
+
+func Test_HoverflyUsageHandler_Options_GetsOptions(t *testing.T) {
+	RegisterTestingT(t)
+
+	var stubHoverfly HoverflyUsageStub
+	unit := HoverflyUsageHandler{Hoverfly: &stubHoverfly}
+
+	request, err := http.NewRequest("OPTIONS", "/api/v2/hoverfly/usage", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Options, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+	Expect(response.Header().Get("Allow")).To(Equal("OPTIONS, GET"))
 }
 
 func unmarshalUsageView(buffer *bytes.Buffer) (UsageView, error) {

@@ -190,6 +190,21 @@ func TestPutWill400ErrorIfJsonIsBad(t *testing.T) {
 	Expect(errorViewResponse.Error).To(Equal("Malformed JSON"))
 }
 
+func Test_HoverflyModeHandler_Options_GetsOptions(t *testing.T) {
+	RegisterTestingT(t)
+
+	var stubHoverfly HoverflyModeStub
+	unit := HoverflyModeHandler{Hoverfly: &stubHoverfly}
+
+	request, err := http.NewRequest("OPTIONS", "/api/v2/hoverfly/mode", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Options, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+	Expect(response.Header().Get("Allow")).To(Equal("OPTIONS, GET, PUT"))
+}
+
 func unmarshalModeView(buffer *bytes.Buffer) (ModeView, error) {
 	body, err := ioutil.ReadAll(buffer)
 	if err != nil {

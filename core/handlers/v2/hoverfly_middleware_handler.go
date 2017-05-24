@@ -28,6 +28,9 @@ func (this *HoverflyMiddlewareHandler) RegisterRoutes(mux *bone.Mux, am *handler
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Put),
 	))
+	mux.Options("/api/v2/hoverfly/middleware", negroni.New(
+		negroni.HandlerFunc(this.Options),
+	))
 }
 
 func (this *HoverflyMiddlewareHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
@@ -54,4 +57,9 @@ func (this *HoverflyMiddlewareHandler) Put(w http.ResponseWriter, req *http.Requ
 	}
 
 	this.Get(w, req, next)
+}
+
+func (this *HoverflyMiddlewareHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	w.Header().Add("Allow", "OPTIONS, GET, PUT")
+	handlers.WriteResponse(w, []byte(""))
 }

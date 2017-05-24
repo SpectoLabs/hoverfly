@@ -23,10 +23,12 @@ func (this *HoverflyDestinationHandler) RegisterRoutes(mux *bone.Mux, am *handle
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),
 	))
-
 	mux.Put("/api/v2/hoverfly/destination", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Put),
+	))
+	mux.Options("/api/v2/hoverfly/destination", negroni.New(
+		negroni.HandlerFunc(this.Options),
 	))
 }
 
@@ -54,4 +56,9 @@ func (this *HoverflyDestinationHandler) Put(w http.ResponseWriter, r *http.Reque
 	}
 
 	this.Get(w, r, next)
+}
+
+func (this *HoverflyDestinationHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	w.Header().Add("Allow", "OPTIONS, GET, PUT")
+	handlers.WriteResponse(w, []byte(""))
 }

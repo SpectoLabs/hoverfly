@@ -35,6 +35,21 @@ func Test_HoverflyUpstreamProxyHandler_GetReturnsUpstreamProxy(t *testing.T) {
 	Expect(upstreamProxyView.UpstreamProxy).To(Equal("upstream-proxy.org"))
 }
 
+func Test_HoverflyUpstreamProxyHandler_Options_GetsOptions(t *testing.T) {
+	RegisterTestingT(t)
+
+	var stubHoverfly HoverflyUpstreamProxyStub
+	unit := HoverflyUpstreamProxyHandler{Hoverfly: &stubHoverfly}
+
+	request, err := http.NewRequest("OPTIONS", "/api/v2/hoverfly/upstream-proxy", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Options, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+	Expect(response.Header().Get("Allow")).To(Equal("OPTIONS, GET"))
+}
+
 func unmarshalUpsteamProxyView(buffer *bytes.Buffer) (UpstreamProxyView, error) {
 	body, err := ioutil.ReadAll(buffer)
 	if err != nil {

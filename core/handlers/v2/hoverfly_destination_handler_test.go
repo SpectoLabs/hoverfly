@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	. "github.com/onsi/gomega"
 )
 
 type HoverflyDestinationStub struct {
@@ -110,6 +111,21 @@ func TestHoverflyDestinationeHandlerPutWill400ErrorIfJsonIsBad(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(errorViewResponse.Error).To(Equal("Malformed JSON"))
+}
+
+func Test_HoverflyDestinationHandler_Options_GetsOptions(t *testing.T) {
+	RegisterTestingT(t)
+
+	var stubHoverfly HoverflyDestinationStub
+	unit := HoverflyDestinationHandler{Hoverfly: &stubHoverfly}
+
+	request, err := http.NewRequest("OPTIONS", "/api/v2/hoverfly/mode", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Options, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+	Expect(response.Header().Get("Allow")).To(Equal("OPTIONS, GET, PUT"))
 }
 
 func unmarshalDestinationView(buffer *bytes.Buffer) (DestinationView, error) {
