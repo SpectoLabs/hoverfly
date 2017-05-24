@@ -220,3 +220,13 @@ func Test_CountingFieldMatcher_CountsMatches_WhenThereIsNoMatch(t *testing.T) {
 	Expect(matcher.Matched).To(BeFalse())
 	Expect(matcher.TotalMatches).To(Equal(3))
 }
+
+func Test_CountingFieldMatcher_CountZero_WhenFieldIsNil(t *testing.T) {
+	RegisterTestingT(t)
+
+	// Glob, regex, and exact
+	matcher := matching.CountingFieldMatcher(nil, `testtesttest`)
+
+	Expect(matcher.Matched).To(BeTrue())
+	Expect(matcher.TotalMatches).To(Equal(0))
+}
