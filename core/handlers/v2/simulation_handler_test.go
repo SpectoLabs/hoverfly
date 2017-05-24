@@ -346,6 +346,36 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonIsNotValid(t *testing.T) {
 	Expect(errorView.Error).To(Equal("Invalid JSON"))
 }
 
+func Test_SimulationHandler_Options_GetsOptions(t *testing.T) {
+	RegisterTestingT(t)
+
+	var stubHoverfly HoverflySimulationStub
+	unit := SimulationHandler{Hoverfly: &stubHoverfly}
+
+	request, err := http.NewRequest("OPTIONS", "/api/v2/simulation", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Options, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+	Expect(response.Header().Get("Allow")).To(Equal("OPTIONS, GET, PUT, DELETE"))
+}
+
+func Test_SimulationHandler_OptionsSchema_GetsOptions(t *testing.T) {
+	RegisterTestingT(t)
+
+	var stubHoverfly HoverflySimulationStub
+	unit := SimulationHandler{Hoverfly: &stubHoverfly}
+
+	request, err := http.NewRequest("OPTIONS", "/api/v2/simulation/schema", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.OptionsSchema, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+	Expect(response.Header().Get("Allow")).To(Equal("OPTIONS, GET"))
+}
+
 func unmarshalSimulationViewV2(buffer *bytes.Buffer) (SimulationViewV2, error) {
 	body, err := ioutil.ReadAll(buffer)
 	if err != nil {

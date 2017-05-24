@@ -28,20 +28,24 @@ func (this *SimulationHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHa
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),
 	))
-
 	mux.Put("/api/v2/simulation", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Put),
 	))
-
 	mux.Delete("/api/v2/simulation", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Delete),
+	))
+	mux.Options("/api/v2/simulation", negroni.New(
+		negroni.HandlerFunc(this.Options),
 	))
 
 	mux.Get("/api/v2/simulation/schema", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.GetSchema),
+	))
+	mux.Options("/api/v2/simulation/schema", negroni.New(
+		negroni.HandlerFunc(this.Options),
 	))
 }
 
@@ -88,8 +92,17 @@ func (this *SimulationHandler) Delete(w http.ResponseWriter, req *http.Request, 
 	this.Get(w, req, next)
 }
 
+func (this *SimulationHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	w.Header().Add("Allow", "OPTIONS, GET, PUT, DELETE")
+	handlers.WriteResponse(w, []byte(""))
+}
+
 func (this *SimulationHandler) GetSchema(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	bytes, _ := json.Marshal(SimulationViewV2Schema)
 
 	handlers.WriteResponse(w, bytes)
+}
+
+func (this *SimulationHandler) OptionsSchema(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	w.Header().Add("Allow", "OPTIONS, GET")
 }

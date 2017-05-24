@@ -134,6 +134,21 @@ func Test_Delete_ReturnsNiceErrorMessage(t *testing.T) {
 	Expect(errorView.Error).To(Equal("There was an error"))
 }
 
+func Test_CacheHandler_Options_GetsOptions(t *testing.T) {
+	RegisterTestingT(t)
+
+	var stubHoverfly HoverflyCacheStub
+	unit := CacheHandler{Hoverfly: &stubHoverfly}
+
+	request, err := http.NewRequest("OPTIONS", "/api/v2/cache", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Options, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+	Expect(response.Header().Get("Allow")).To(Equal("OPTIONS, GET, DELETE"))
+}
+
 func unmarshalCacheView(buffer *bytes.Buffer) (CacheView, error) {
 	body, err := ioutil.ReadAll(buffer)
 	if err != nil {

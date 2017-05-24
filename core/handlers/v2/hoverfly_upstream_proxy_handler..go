@@ -22,6 +22,9 @@ func (this *HoverflyUpstreamProxyHandler) RegisterRoutes(mux *bone.Mux, am *hand
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),
 	))
+	mux.Options("/api/v2/hoverfly/upstream-proxy", negroni.New(
+		negroni.HandlerFunc(this.Options),
+	))
 }
 
 func (this *HoverflyUpstreamProxyHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
@@ -32,4 +35,9 @@ func (this *HoverflyUpstreamProxyHandler) Get(w http.ResponseWriter, req *http.R
 	bytes, _ := json.Marshal(upstreamProxyView)
 
 	handlers.WriteResponse(w, bytes)
+}
+
+func (this *HoverflyUpstreamProxyHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	w.Header().Add("Allow", "OPTIONS, GET")
+	handlers.WriteResponse(w, []byte(""))
 }

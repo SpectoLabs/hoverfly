@@ -28,6 +28,9 @@ func (this *CacheHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Delete),
 	))
+	mux.Options("/api/v2/cache", negroni.New(
+		negroni.HandlerFunc(this.Options),
+	))
 }
 
 func (this *CacheHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
@@ -50,4 +53,9 @@ func (this *CacheHandler) Delete(w http.ResponseWriter, req *http.Request, next 
 	}
 
 	this.Get(w, req, next)
+}
+
+func (this *CacheHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	w.Header().Add("Allow", "OPTIONS, GET, DELETE")
+	handlers.WriteResponse(w, []byte(""))
 }
