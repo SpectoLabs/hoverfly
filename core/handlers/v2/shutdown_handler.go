@@ -18,6 +18,9 @@ func (this *ShutdownHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHand
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Delete),
 	))
+	mux.Options("/api/v2/shutdown", negroni.New(
+		negroni.HandlerFunc(this.Options),
+	))
 }
 
 func (this *ShutdownHandler) Delete(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
@@ -26,4 +29,9 @@ func (this *ShutdownHandler) Delete(w http.ResponseWriter, req *http.Request, ne
 		log.Warning("Shutting down")
 		os.Exit(0)
 	}()
+}
+
+func (this *ShutdownHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	w.Header().Add("Allow", "OPTIONS, GET")
+	handlers.WriteResponse(w, []byte(""))
 }

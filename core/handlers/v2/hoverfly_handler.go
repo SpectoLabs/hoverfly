@@ -28,6 +28,9 @@ func (this *HoverflyHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHand
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),
 	))
+	mux.Options("/api/v2/hoverfly", negroni.New(
+		negroni.HandlerFunc(this.Options),
+	))
 }
 
 func (this *HoverflyHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
@@ -43,4 +46,9 @@ func (this *HoverflyHandler) Get(w http.ResponseWriter, req *http.Request, next 
 	bytes, _ := json.Marshal(hoverflyView)
 
 	handlers.WriteResponse(w, bytes)
+}
+
+func (this *HoverflyHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	w.Header().Add("Allow", "OPTIONS, GET")
+	handlers.WriteResponse(w, []byte(""))
 }

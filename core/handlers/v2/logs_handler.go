@@ -30,6 +30,9 @@ func (this *LogsHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler)
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),
 	))
+	mux.Options("/api/v2/logs", negroni.New(
+		negroni.HandlerFunc(this.Options),
+	))
 
 	mux.Get("/api/v2/ws/logs", http.HandlerFunc(this.GetWS))
 }
@@ -52,6 +55,11 @@ func (this *LogsHandler) Get(w http.ResponseWriter, req *http.Request, next http
 		bytes, _ := json.Marshal(logsToLogsView(logs))
 		handlers.WriteResponse(w, bytes)
 	}
+}
+
+func (this *LogsHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	w.Header().Add("Allow", "OPTIONS, GET")
+	handlers.WriteResponse(w, []byte(""))
 }
 
 func logsToLogsView(logs []*logrus.Entry) LogsView {

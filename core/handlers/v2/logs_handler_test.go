@@ -138,6 +138,21 @@ func Test_LogsHandler_Get_SetsTheLimitIfLimitQueryProvided_InPlaintext(t *testin
 	Expect(stubHoverfly.limit).To(Equal(20))
 }
 
+func Test_LogsHandler_Options_GetsOptions(t *testing.T) {
+	RegisterTestingT(t)
+
+	var stubHoverfly HoverflyLogsStub
+	unit := LogsHandler{Hoverfly: &stubHoverfly}
+
+	request, err := http.NewRequest("OPTIONS", "/api/v2/logs", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Options, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+	Expect(response.Header().Get("Allow")).To(Equal("OPTIONS, GET"))
+}
+
 func unmarshalLogsView(buffer *bytes.Buffer) (LogsView, error) {
 	body, err := ioutil.ReadAll(buffer)
 	if err != nil {
