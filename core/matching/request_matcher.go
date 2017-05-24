@@ -10,30 +10,29 @@ func RequestMatcher(req models.RequestDetails, webserver bool, simulation *model
 
 	for _, matchingPair := range simulation.MatchingPairs {
 		// TODO: not matching by default on URL and body - need to enable this
-		// TODO: need to enable regex matches
 		// TODO: enable matching on scheme
 
 		requestMatcher := matchingPair.RequestMatcher
 
-		if !FieldMatcher(requestMatcher.Body, req.Body).Matched {
+		if !CountlessFieldMatcher(requestMatcher.Body, req.Body).Matched {
 			continue
 		}
 
 		if !webserver {
-			if !FieldMatcher(requestMatcher.Destination, req.Destination).Matched {
+			if !CountlessFieldMatcher(requestMatcher.Destination, req.Destination).Matched {
 				continue
 			}
 		}
 
-		if !FieldMatcher(requestMatcher.Path, req.Path).Matched {
+		if !CountlessFieldMatcher(requestMatcher.Path, req.Path).Matched {
 			continue
 		}
 
-		if !FieldMatcher(requestMatcher.Query, req.Query).Matched {
+		if !CountlessFieldMatcher(requestMatcher.Query, req.Query).Matched {
 			continue
 		}
 
-		if !FieldMatcher(requestMatcher.Method, req.Method).Matched {
+		if !CountlessFieldMatcher(requestMatcher.Method, req.Method).Matched {
 			continue
 		}
 

@@ -4,7 +4,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) * FieldMatch {
+func CountlessFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *FieldMatch {
 	if field == nil {
 		return countlessFieldMatch(true)
 	}
@@ -40,14 +40,81 @@ func FieldMatcher(field *models.RequestFieldMatchers, toMatch string) * FieldMat
 	return countlessFieldMatch(true)
 }
 
-func countlessFieldMatch(matched bool)  * FieldMatch  {
+func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *FieldMatch {
+
+	fieldMatch := &FieldMatch{Matched: true}
+
+	if field == nil {
+		return countlessFieldMatch(true)
+	}
+
+	if field.ExactMatch != nil {
+		if ExactMatch(*field.ExactMatch, toMatch) {
+			fieldMatch.TotalMatches++
+		} else {
+			fieldMatch.Matched = false
+		}
+	}
+
+	if field.XmlMatch != nil {
+		if XmlMatch(*field.XmlMatch, toMatch) {
+			fieldMatch.TotalMatches++
+		} else {
+			fieldMatch.Matched = false
+		}
+	}
+
+	if field.XpathMatch != nil {
+		if XpathMatch(*field.XpathMatch, toMatch) {
+			fieldMatch.TotalMatches++
+		} else {
+			fieldMatch.Matched = false
+		}
+	}
+
+	if field.JsonMatch != nil {
+		if JsonMatch(*field.JsonMatch, toMatch) {
+			fieldMatch.TotalMatches++
+		} else {
+			fieldMatch.Matched = false
+		}
+	}
+
+	if field.JsonPathMatch != nil {
+		if JsonPathMatch(*field.JsonPathMatch, toMatch) {
+			fieldMatch.TotalMatches++
+		} else {
+			fieldMatch.Matched = false
+		}
+	}
+
+	if field.RegexMatch != nil {
+		if RegexMatch(*field.RegexMatch, toMatch) {
+			fieldMatch.TotalMatches++
+		} else {
+			fieldMatch.Matched = false
+		}
+	}
+
+	if field.GlobMatch != nil {
+		if GlobMatch(*field.GlobMatch, toMatch) {
+			fieldMatch.TotalMatches++
+		} else {
+			fieldMatch.Matched = false
+		}
+	}
+
+	return fieldMatch
+}
+
+func countlessFieldMatch(matched bool) *FieldMatch {
 	return &FieldMatch{
-		Matched: matched,
+		Matched:      matched,
 		TotalMatches: 0,
 	}
 }
 
 type FieldMatch struct {
-	Matched bool
+	Matched      bool
 	TotalMatches int
 }
