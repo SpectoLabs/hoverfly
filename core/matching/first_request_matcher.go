@@ -6,7 +6,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-func RequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (*models.RequestMatcherResponsePair, error) {
+func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (*models.RequestMatcherResponsePair, error) {
 
 	for _, matchingPair := range simulation.MatchingPairs {
 		// TODO: not matching by default on URL and body - need to enable this
