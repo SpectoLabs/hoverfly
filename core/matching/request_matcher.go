@@ -15,25 +15,25 @@ func RequestMatcher(req models.RequestDetails, webserver bool, simulation *model
 
 		requestMatcher := matchingPair.RequestMatcher
 
-		if !FieldMatcher(requestMatcher.Body, req.Body) {
+		if !FieldMatcher(requestMatcher.Body, req.Body).Matched {
 			continue
 		}
 
 		if !webserver {
-			if !FieldMatcher(requestMatcher.Destination, req.Destination) {
+			if !FieldMatcher(requestMatcher.Destination, req.Destination).Matched {
 				continue
 			}
 		}
 
-		if !FieldMatcher(requestMatcher.Path, req.Path) {
+		if !FieldMatcher(requestMatcher.Path, req.Path).Matched {
 			continue
 		}
 
-		if !FieldMatcher(requestMatcher.Query, req.Query) {
+		if !FieldMatcher(requestMatcher.Query, req.Query).Matched {
 			continue
 		}
 
-		if !FieldMatcher(requestMatcher.Method, req.Method) {
+		if !FieldMatcher(requestMatcher.Method, req.Method).Matched {
 			continue
 		}
 
