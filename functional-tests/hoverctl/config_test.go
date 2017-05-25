@@ -108,7 +108,7 @@ var _ = Describe("When I use hoverctl", func() {
 		It("returns the auth-token config of a target", func() {
 			functional_tests.Run(hoverctlBinary, "targets", "create", "test-auth-token", "--admin-port", hoverfly.GetAdminPort())
 
-			functional_tests.Run(hoverctlBinary, "-t", "test-auth-token", "login", "--username", "benjih", "--password", "password")
+			functional_tests.Run(hoverctlBinary, "-t", "test-auth-token", "login", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 			output := functional_tests.Run(hoverctlBinary, "-t", "test-auth-token", "config", "auth-token")
 
 			Expect(output).ToNot(ContainSubstring("No auth token"))
@@ -118,7 +118,7 @@ var _ = Describe("When I use hoverctl", func() {
 			functional_tests.Run(hoverctlBinary, "targets", "create", "test-auth-token-default", "--admin-port", hoverfly.GetAdminPort())
 			functional_tests.Run(hoverctlBinary, "targets", "default", "test-auth-token-default")
 
-			functional_tests.Run(hoverctlBinary, "login", "--username", "benjih", "--password", "password")
+			functional_tests.Run(hoverctlBinary, "login", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 			output := functional_tests.Run(hoverctlBinary, "config", "auth-token")
 
 			Expect(output).ToNot(ContainSubstring("No auth token"))
@@ -127,7 +127,7 @@ var _ = Describe("When I use hoverctl", func() {
 		It("returns an error if there is no auth-token", func() {
 			functional_tests.Run(hoverctlBinary, "targets", "create", "test-auth-token-default", "--admin-port", hoverfly.GetAdminPort())
 
-			functional_tests.Run(hoverctlBinary, "login", "--username", "benjih", "--password", "password")
+			functional_tests.Run(hoverctlBinary, "login", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 			output := functional_tests.Run(hoverctlBinary, "config", "auth-token")
 
 			Expect(output).To(ContainSubstring("No auth token"))

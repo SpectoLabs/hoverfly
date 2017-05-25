@@ -25,12 +25,26 @@ import (
 	"github.com/phayes/freeport"
 )
 
+var HoverflyUsername = "benjih"
+var HoverflyPassword = "password"
+
 func DoRequest(r *sling.Sling) *http.Response {
-	req, err := r.Request()
-	Expect(err).To(BeNil())
-	response, err := http.DefaultClient.Do(req)
+	response, err := doRequest(r)
 	Expect(err).To(BeNil())
 	return response
+}
+
+func doRequest(r *sling.Sling) (*http.Response, error) {
+	req, err := r.Request()
+	if err != nil {
+		return nil, err
+	}
+	response, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
 type Hoverfly struct {
@@ -49,6 +63,13 @@ func NewHoverfly() *Hoverfly {
 	}
 }
 
+func NewHoverflyWithAdminPort(adminPort int) *Hoverfly {
+	return &Hoverfly{
+		adminPort: adminPort,
+		adminUrl:  fmt.Sprintf("http://localhost:%v", adminPort),
+	}
+}
+
 func (this *Hoverfly) Start(commands ...string) {
 	this.process = this.startHoverflyInternal(this.adminPort, this.proxyPort, commands...)
 	this.adminUrl = fmt.Sprintf("http://localhost:%v", this.adminPort)
@@ -57,6 +78,17 @@ func (this *Hoverfly) Start(commands ...string) {
 
 func (this Hoverfly) Stop() {
 	this.process.Process.Kill()
+}
+
+func (this Hoverfly) StopAPIAuthenticated(username, password string) {
+	token, err := this.getAPIToken(username, password)
+	if err != nil {
+		return
+	}
+	_, err = doRequest(sling.New().Delete(this.adminUrl+"/api/v2/shutdown").Add("Authorization", "Bearer "+token))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (this Hoverfly) DeleteBoltDb() {
@@ -183,22 +215,37 @@ func (this Hoverfly) ProxyWithAuth(r *sling.Sling, user, password string) *http.
 }
 
 func (this Hoverfly) GetAPIToken(username, password string) string {
-	response := DoRequest(
+	token, err := this.getAPIToken(username, password)
+	Expect(err).To(BeNil())
+
+	return token
+}
+
+func (this Hoverfly) getAPIToken(username, password string) (string, error) {
+	response, err := doRequest(
 		sling.New().Post(this.adminUrl + "/api/token-auth").BodyJSON(map[string]interface{}{
 			"username": username,
 			"password": password,
 		}),
 	)
+	if err != nil {
+		return "", err
+	}
 
 	body, err := ioutil.ReadAll(response.Body)
-	Expect(err).To(BeNil())
+	if err != nil {
+		return "", err
+	}
 
 	bodyMap := make(map[string]interface{})
 	err = json.Unmarshal(body, &bodyMap)
-	Expect(err).To(BeNil())
+	if err != nil {
+		return "", err
+	}
 
-	return bodyMap["token"].(string)
+	return bodyMap["token"].(string), nil
 }
+
 func (this Hoverfly) GetAdminPort() string {
 	return strconv.Itoa(this.adminPort)
 }
@@ -328,14 +375,4 @@ func TableToSliceMapStringString(table string) map[string]map[string]string {
 	}
 
 	return results
-}
-
-func KillHoverflyTargets(table string) {
-	targets := TableToSliceMapStringString(table)
-	for _, target := range targets {
-		pid, _ := strconv.Atoi(target["PID"])
-		if process, err := os.FindProcess(pid); err == nil {
-			process.Kill()
-		}
-	}
 }

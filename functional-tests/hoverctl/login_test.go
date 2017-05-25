@@ -12,16 +12,13 @@ var _ = Describe("hoverctl login", func() {
 
 	var (
 		hoverfly *functional_tests.Hoverfly
-
-		username = "ft_user"
-		password = "ft_password"
 	)
 
 	Context("logging into Hoverfly", func() {
 
 		BeforeEach(func() {
 			hoverfly = functional_tests.NewHoverfly()
-			hoverfly.Start("-auth", "-username", username, "-password", password)
+			hoverfly.Start("-auth", "-username", functional_tests.HoverflyUsername, "-password", functional_tests.HoverflyPassword)
 
 			functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--admin-port", hoverfly.GetAdminPort())
 		})
@@ -31,7 +28,7 @@ var _ = Describe("hoverctl login", func() {
 		})
 
 		It("should log you in successfully with correct credentials", func() {
-			output := functional_tests.Run(hoverctlBinary, "login", "--username", username, "--password", password)
+			output := functional_tests.Run(hoverctlBinary, "login", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 
 			Expect(output).To(ContainSubstring("Login successful"))
 		})
@@ -57,13 +54,13 @@ var _ = Describe("hoverctl login", func() {
 		})
 
 		It("should error nicely if username is missing", func() {
-			output := functional_tests.Run(hoverctlBinary, "login", "-f", "--password", password)
+			output := functional_tests.Run(hoverctlBinary, "login", "-f", "--password", functional_tests.HoverflyPassword)
 
 			Expect(output).To(ContainSubstring("Missing username or password"))
 		})
 
 		It("should error nicely if password is missing", func() {
-			output := functional_tests.Run(hoverctlBinary, "login", "-f", "--username", username)
+			output := functional_tests.Run(hoverctlBinary, "login", "-f", "--username", functional_tests.HoverflyUsername)
 
 			Expect(output).To(ContainSubstring("Missing username or password"))
 		})
@@ -71,7 +68,7 @@ var _ = Describe("hoverctl login", func() {
 
 	Context("logging into Hoverfly with hoverfly running", func() {
 		It("should error nicely if it cannot connect", func() {
-			output := functional_tests.Run(hoverctlBinary, "login", "--username", username, "--password", password)
+			output := functional_tests.Run(hoverctlBinary, "login", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 
 			Expect(output).To(ContainSubstring("There was an error when logging in"))
 		})
@@ -81,7 +78,7 @@ var _ = Describe("hoverctl login", func() {
 
 		BeforeEach(func() {
 			hoverfly = functional_tests.NewHoverfly()
-			hoverfly.Start("-auth", "-username", username, "-password", password)
+			hoverfly.Start("-auth", "-username", functional_tests.HoverflyUsername, "-password", functional_tests.HoverflyPassword)
 
 		})
 
@@ -94,8 +91,8 @@ var _ = Describe("hoverctl login", func() {
 			functional_tests.Run(hoverctlBinary, "login",
 				"--new-target", "notdefault",
 				"--admin-port", hoverfly.GetAdminPort(),
-				"--username", username,
-				"--password", password,
+				"--username", functional_tests.HoverflyUsername,
+				"--password", functional_tests.HoverflyPassword,
 			)
 
 			output := functional_tests.Run(hoverctlBinary, "targets")
@@ -122,7 +119,7 @@ var _ = Describe("hoverctl login", func() {
 
 		BeforeEach(func() {
 			hoverfly = functional_tests.NewHoverfly()
-			hoverfly.Start("-auth", "-username", username, "-password", password)
+			hoverfly.Start("-auth", "-username", functional_tests.HoverflyUsername, "-password", functional_tests.HoverflyPassword)
 
 			functional_tests.Run(hoverctlBinary, "targets", "create", "no-auth", "--admin-port", hoverfly.GetAdminPort())
 		})
@@ -136,7 +133,7 @@ var _ = Describe("hoverctl login", func() {
 			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
 
-			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 
 			output = functional_tests.Run(hoverctlBinary, "mode", "-t", "no-auth")
 			Expect(output).To(ContainSubstring("Hoverfly is currently set to simulate mode"))
@@ -147,7 +144,7 @@ var _ = Describe("hoverctl login", func() {
 			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
 
-			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 
 			output = functional_tests.Run(hoverctlBinary, "mode", "-t", "no-auth", "capture")
 			Expect(output).To(ContainSubstring("Hoverfly has been set to capture mode"))
@@ -158,7 +155,7 @@ var _ = Describe("hoverctl login", func() {
 			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
 
-			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 
 			output = functional_tests.Run(hoverctlBinary, "flush", "-f", "-t", "no-auth")
 			Expect(output).ToNot(ContainSubstring("Hoverfly requires authentication"))
@@ -173,7 +170,7 @@ var _ = Describe("hoverctl login", func() {
 			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
 
-			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 
 			output = functional_tests.Run(hoverctlBinary, "import", "-t", "no-auth", filePath)
 			Expect(output).ToNot(ContainSubstring("Hoverfly requires authentication"))
@@ -187,7 +184,7 @@ var _ = Describe("hoverctl login", func() {
 			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
 
-			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 
 			output = functional_tests.Run(hoverctlBinary, "export", "-t", "no-auth", filePath)
 			Expect(output).To(ContainSubstring("Successfully exported simulation to " + filePath))
@@ -198,7 +195,7 @@ var _ = Describe("hoverctl login", func() {
 			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
 
-			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 
 			output = functional_tests.Run(hoverctlBinary, "delete", "-t", "no-auth", "--force")
 			Expect(output).To(ContainSubstring("Simulation data has been deleted from Hoverfly"))
@@ -209,7 +206,7 @@ var _ = Describe("hoverctl login", func() {
 			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
 
-			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 
 			output = functional_tests.Run(hoverctlBinary, "destination", "-t", "no-auth", "example.org")
 			Expect(output).To(ContainSubstring("Hoverfly destination has been set to example.org"))
@@ -220,7 +217,7 @@ var _ = Describe("hoverctl login", func() {
 			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))
 			Expect(output).To(ContainSubstring("Run `hoverctl login -t no-auth`"))
 
-			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", username, "--password", password)
+			functional_tests.Run(hoverctlBinary, "login", "-t", "no-auth", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 
 			output = functional_tests.Run(hoverctlBinary, "middleware", "-t", "no-auth")
 			Expect(output).To(ContainSubstring("Hoverfly middleware configuration is currently set to"))
