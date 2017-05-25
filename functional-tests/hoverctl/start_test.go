@@ -16,7 +16,7 @@ var _ = Describe("hoverctl `start`", func() {
 
 	AfterEach(func() {
 		output := functional_tests.Run(hoverctlBinary, "targets")
-		functional_tests.KillHoverflyTargets(output)
+		KillHoverflyTargets(output)
 	})
 
 	Context("without a target", func() {
@@ -164,7 +164,7 @@ var _ = Describe("hoverctl `start`", func() {
 		})
 
 		It("should start hoverfly with authentication", func() {
-			output := functional_tests.Run(hoverctlBinary, "start", "--auth", "--username", "benji", "--password", "securepassword")
+			output := functional_tests.Run(hoverctlBinary, "start", "--auth", "--username", functional_tests.HoverflyUsername, "--password", functional_tests.HoverflyPassword)
 
 			Expect(output).To(ContainSubstring("Hoverfly is now running"))
 
@@ -172,8 +172,8 @@ var _ = Describe("hoverctl `start`", func() {
 			Expect(response.StatusCode).To(Equal(401))
 
 			response = functional_tests.DoRequest(sling.New().Post("http://localhost:8888/api/token-auth").BodyJSON(backends.User{
-				Username: "benji",
-				Password: "securepassword",
+				Username: functional_tests.HoverflyUsername,
+				Password: functional_tests.HoverflyPassword,
 			}))
 
 			Expect(response.StatusCode).To(Equal(200))
@@ -282,10 +282,11 @@ var _ = Describe("hoverctl `start`", func() {
 
 	Context("with a target that has already been started", func() {
 		BeforeEach(func() {
-			functional_tests.Run(hoverctlBinary, "start", "--new-target", "started")
+
 		})
 
 		It("should error", func() {
+			functional_tests.Run(hoverctlBinary, "start", "--new-target", "started")
 			output := functional_tests.Run(hoverctlBinary, "start", "-t", "started")
 
 			Expect(output).To(ContainSubstring("Hoverfly is already running"))

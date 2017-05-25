@@ -5,8 +5,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
@@ -58,4 +60,13 @@ var _ = AfterSuite(func() {
 func WipeConfig() {
 	filepath := filepath.Join(workingDirectory, ".hoverfly", "config.yaml")
 	ioutil.WriteFile(filepath, []byte(""), 0644)
+}
+
+func KillHoverflyTargets(table string) {
+	targets := functional_tests.TableToSliceMapStringString(table)
+	for _, target := range targets {
+		adminPort, _ := strconv.Atoi(target["ADMIN PORT"])
+
+		functional_tests.NewHoverflyWithAdminPort(adminPort).StopAPIAuthenticated(functional_tests.HoverflyUsername, functional_tests.HoverflyPassword)
+	}
 }
