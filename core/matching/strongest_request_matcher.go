@@ -3,7 +3,6 @@ package matching
 import (
 	"errors"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"fmt"
 )
 
 
@@ -23,7 +22,6 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 
 		fieldMatch := CountingFieldMatcher(requestMatcher.Body, req.Body)
 		if !fieldMatch.Matched {
-			fmt.Println("Did not match on body")
 			matched = false
 		}
 		totalMatches += fieldMatch.TotalMatches
@@ -31,7 +29,6 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 		if !webserver {
 			match := CountingFieldMatcher(requestMatcher.Destination, req.Destination)
 			if !match.Matched {
-				fmt.Println("Did not match on destination")
 				matched = false
 			}
 			totalMatches += match.TotalMatches
@@ -39,27 +36,23 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 
 		fieldMatch = CountingFieldMatcher(requestMatcher.Path, req.Path)
 		if !fieldMatch.Matched {
-			fmt.Println("Did not match on path")
 			matched = false
 		}
 		totalMatches += fieldMatch.TotalMatches
 
 		fieldMatch = CountingFieldMatcher(requestMatcher.Query, req.Query)
 		if !fieldMatch.Matched {
-			fmt.Println("Did not match on query")
 			matched = false
 		}
 		totalMatches += fieldMatch.TotalMatches
 
 		fieldMatch = CountingFieldMatcher(requestMatcher.Method, req.Method)
 		if !fieldMatch.Matched {
-			fmt.Println("Did not match on method")
 			matched = false
 		}
 		totalMatches += fieldMatch.TotalMatches
 
 		if !HeaderMatcher(requestMatcher.Headers, req.Headers) {
-			fmt.Println("Did not match on headers")
 			matched = false
 		}
 
@@ -69,11 +62,11 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 				Response:       matchingPair.Response,
 			}
 			strongestMatchTotalMatches = totalMatches
+			closestMatch = nil
 		} else if matched == false && requestMatch == nil && totalMatches >= closestMatchTotalMatches {
 			closestMatchTotalMatches = totalMatches
 			closestMatch = &models.RequestMatcherResponsePair{}
 			*closestMatch = matchingPair
-			fmt.Println("Not Matched")
 		}
 	}
 

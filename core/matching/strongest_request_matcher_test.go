@@ -742,4 +742,47 @@ func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatchesAgain(t *testing.
 	Expect(result.Response.Body).To(Equal("one"))
 }
 
+func Test_ShouldSetClosestMatchBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(`body`),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "one",
+		},
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(`body`),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("POST"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
+	})
+
+	r := models.RequestDetails{
+		Body: `body`,
+		Method: "POST",
+	}
+
+	_, closestMatch, _ := matching.StrongestMatchRequestMatcher(r, false, simulation)
+
+	Expect(closestMatch).To(BeNil())
+}
+
 // Headers
