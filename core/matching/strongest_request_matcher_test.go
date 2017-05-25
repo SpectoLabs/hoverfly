@@ -28,6 +28,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EmptyRequestMatchersShouldMatchOnA
 	}
 	result, _, _ := matching.StrongestMatchRequestMatcher(r, false, simulation)
 
+	Expect(result).ToNot(BeNil())
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
 
@@ -450,7 +451,9 @@ func Test_ShouldReturnClosestMatchIfMatchIsNotFound(t *testing.T) {
 				ExactMatch: StringToPointer("completemiss"),
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "one",
+		},
 	})
 
 	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
@@ -463,7 +466,9 @@ func Test_ShouldReturnClosestMatchIfMatchIsNotFound(t *testing.T) {
 				ExactMatch: StringToPointer("path"),
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
 	})
 
 	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
@@ -475,7 +480,9 @@ func Test_ShouldReturnClosestMatchIfMatchIsNotFound(t *testing.T) {
 				ExactMatch: StringToPointer("path"),
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "three",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -491,4 +498,248 @@ func Test_ShouldReturnClosestMatchIfMatchIsNotFound(t *testing.T) {
 	Expect(*closestMatch.RequestMatcher.Body.ExactMatch).To(Equal(`body`))
 	Expect(*closestMatch.RequestMatcher.Body.GlobMatch).To(Equal(`bod*`))
 	Expect(*closestMatch.RequestMatcher.Path.ExactMatch).To(Equal(`path`))
+	Expect(closestMatch.Response.Body).To(Equal(`two`))
 }
+
+func Test_ShouldReturnClosestMatchIfMatchIsNotFoundAgain(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				RegexMatch: StringToPointer(".*"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("miss"),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "one",
+		},
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(".*"),
+				GlobMatch:  StringToPointer("miss"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("miss"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("miss"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("miss"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "three",
+		},
+	})
+
+	r := models.RequestDetails{
+		Body: "foo",
+		Method: "GET",
+	}
+
+	result, closestMatch, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+
+	Expect(err).ToNot(BeNil())
+	Expect(result).To(BeNil())
+	Expect(closestMatch).ToNot(BeNil())
+	Expect(*closestMatch.RequestMatcher.Body.RegexMatch).To(Equal(`.*`))
+	Expect(*closestMatch.RequestMatcher.Path.ExactMatch).To(Equal(`miss`))
+	Expect(*closestMatch.RequestMatcher.Method.ExactMatch).To(Equal(`GET`))
+	Expect(closestMatch.Response.Body).To(Equal(`one`))
+}
+
+func Test_ShouldNotReturnClosestMatchWhenThereIsAMatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				RegexMatch: StringToPointer(".*"),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "one",
+		},
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("miss"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
+	})
+
+	r := models.RequestDetails{
+		Body: "foo",
+		Method: "GET",
+	}
+
+	result, closestMatch, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+
+	Expect(err).To(BeNil())
+	Expect(result).ToNot(BeNil())
+	Expect(closestMatch).To(BeNil())
+	Expect(result).ToNot(BeNil())
+}
+
+func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatches(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				RegexMatch: StringToPointer(".*"),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "one",
+		},
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("foo"),
+				RegexMatch: StringToPointer(".*"),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+				RegexMatch: StringToPointer(".*"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("foo"),
+				RegexMatch: StringToPointer(".*"),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "three",
+		},
+	})
+
+	r := models.RequestDetails{
+		Body: "foo",
+		Method: "GET",
+	}
+
+	result, closestMatch, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+
+	Expect(err).To(BeNil())
+	Expect(closestMatch).To(BeNil())
+	Expect(result).ToNot(BeNil())
+	Expect(result.Response.Body).To(Equal("two"))
+}
+
+func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatchesAgain(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(`{"foo": "bar"}`),
+				JsonMatch: StringToPointer(`{"foo": "bar"}`),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+				RegexMatch: StringToPointer(".*"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "one",
+		},
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer(`{"foo": "bar"}`),
+				JsonMatch: StringToPointer(`{"foo": "bar"}`),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
+	})
+
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				RegexMatch: StringToPointer(`.*`),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+				RegexMatch: StringToPointer(".*"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "three",
+		},
+	})
+
+	r := models.RequestDetails{
+		Body: `{"foo": "bar"}`,
+		Method: "GET",
+	}
+
+	result, closestMatch, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+
+	Expect(err).To(BeNil())
+	Expect(closestMatch).To(BeNil())
+	Expect(result).ToNot(BeNil())
+	Expect(result.Response.Body).To(Equal("one"))
+}
+
+// Headers
