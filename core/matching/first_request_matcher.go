@@ -36,7 +36,7 @@ func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulat
 			continue
 		}
 
-		if !HeaderMatcher(requestMatcher.Headers, req.Headers).Matched {
+		if !CountlessHeaderMatcher(requestMatcher.Headers, req.Headers).Matched {
 			continue
 		}
 
