@@ -2,7 +2,6 @@ package matching
 
 import (
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"fmt"
 )
 
 func CountlessFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *FieldMatch {
@@ -53,7 +52,6 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 		if ExactMatch(*field.ExactMatch, toMatch) {
 			fieldMatch.TotalMatches++
 		} else {
-			fmt.Println("Exact match")
 			fieldMatch.Matched = false
 		}
 	}
@@ -62,7 +60,6 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 		if XmlMatch(*field.XmlMatch, toMatch) {
 			fieldMatch.TotalMatches++
 		} else {
-			fmt.Println("XML match")
 			fieldMatch.Matched = false
 		}
 	}
@@ -71,7 +68,6 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 		if XpathMatch(*field.XpathMatch, toMatch) {
 			fieldMatch.TotalMatches++
 		} else {
-			fmt.Println("XPath match")
 			fieldMatch.Matched = false
 		}
 	}
@@ -80,7 +76,6 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 		if JsonMatch(*field.JsonMatch, toMatch) {
 			fieldMatch.TotalMatches++
 		} else {
-			fmt.Println("Json match")
 			fieldMatch.Matched = false
 		}
 	}
@@ -89,7 +84,6 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 		if JsonPathMatch(*field.JsonPathMatch, toMatch) {
 			fieldMatch.TotalMatches++
 		} else {
-			fmt.Println("Json Path")
 			fieldMatch.Matched = false
 		}
 	}
@@ -98,7 +92,6 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 		if RegexMatch(*field.RegexMatch, toMatch) {
 			fieldMatch.TotalMatches++
 		} else {
-			fmt.Println("Regex")
 			fieldMatch.Matched = false
 		}
 	}
@@ -107,7 +100,6 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 		if GlobMatch(*field.GlobMatch, toMatch) {
 			fieldMatch.TotalMatches++
 		} else {
-			fmt.Println("Glob")
 			fieldMatch.Matched = false
 		}
 	}
