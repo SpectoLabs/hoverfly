@@ -6,18 +6,17 @@ import (
 	glob "github.com/ryanuber/go-glob"
 )
 
-func HeaderMatcher(matchingHeaders, toMatch map[string][]string) bool {
+func HeaderMatcher(matchingHeaders, toMatch map[string][]string) * FieldMatch {
 
 	for matcherHeaderKey, matcherHeaderValues := range matchingHeaders {
 		for requestHeaderKey, requestHeaderValues := range toMatch {
 			delete(toMatch, requestHeaderKey)
 			toMatch[strings.ToLower(requestHeaderKey)] = requestHeaderValues
-
 		}
 
 		toMatchHeaderValues, toMatchHeaderValuesFound := toMatch[strings.ToLower(matcherHeaderKey)]
 		if !toMatchHeaderValuesFound {
-			return false
+			return countlessFieldMatch(false)
 		}
 
 		for _, matcherHeaderValue := range matcherHeaderValues {
@@ -29,9 +28,9 @@ func HeaderMatcher(matchingHeaders, toMatch map[string][]string) bool {
 			}
 
 			if !matcherHeaderValueMatched {
-				return false
+				return countlessFieldMatch(false)
 			}
 		}
 	}
-	return true
+	return countlessFieldMatch(true)
 }

@@ -52,7 +52,7 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 		}
 		totalMatches += fieldMatch.TotalMatches
 
-		if !HeaderMatcher(requestMatcher.Headers, req.Headers) {
+		if !HeaderMatcher(requestMatcher.Headers, req.Headers).Matched {
 			matched = false
 		}
 
