@@ -194,7 +194,7 @@ func Test_CountingHeaderMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
 		})
 
 	Expect(matcher.Matched).To(BeTrue())
-	Expect(matcher.TotalMatches).To(Equal(2))
+	Expect(matcher.MatchScore).To(Equal(2))
 
 	matcher = matching.CountingHeaderMatcher(
 		map[string][]string{
@@ -208,7 +208,7 @@ func Test_CountingHeaderMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
 		})
 
 	Expect(matcher.Matched).To(BeTrue())
-	Expect(matcher.TotalMatches).To(Equal(3))
+	Expect(matcher.MatchScore).To(Equal(3))
 }
 
 func Test_CountingHeaderMatcher_CountsMatches_WhenThereIsNoMatch(t *testing.T) {
@@ -226,7 +226,7 @@ func Test_CountingHeaderMatcher_CountsMatches_WhenThereIsNoMatch(t *testing.T) {
 		})
 
 	Expect(matcher.Matched).To(BeFalse())
-	Expect(matcher.TotalMatches).To(Equal(3))
+	Expect(matcher.MatchScore).To(Equal(3))
 }
 
 func Test_CountingHeaderMatcher_CountZero_WhenFieldIsNil(t *testing.T) {
@@ -236,5 +236,5 @@ func Test_CountingHeaderMatcher_CountZero_WhenFieldIsNil(t *testing.T) {
 	matcher := matching.CountingFieldMatcher(nil, `testtesttest`)
 
 	Expect(matcher.Matched).To(BeTrue())
-	Expect(matcher.TotalMatches).To(Equal(0))
+	Expect(matcher.MatchScore).To(Equal(0))
 }
