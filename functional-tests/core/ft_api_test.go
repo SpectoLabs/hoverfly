@@ -84,7 +84,7 @@ var _ = Describe("Interacting with the API", func() {
 
 	Context("PUT /api/v2/hoverfly/mode", func() {
 
-		It("Should put the mode", func() {
+		It("Should should get and set capture mode", func() {
 			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
 			req.Body(strings.NewReader(`{"mode":"capture"}`))
 			res := functional_tests.DoRequest(req)
@@ -99,6 +99,55 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(err).To(BeNil())
 			Expect(modeJson).To(Equal([]byte(`{"mode":"capture","arguments":{}}`)))
 		})
+
+		It("Should should get and set modify mode", func() {
+			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
+			req.Body(strings.NewReader(`{"mode":"modify"}`))
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"mode":"modify","arguments":{}}`)))
+
+			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
+			res = functional_tests.DoRequest(req)
+			modeJson, err = ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"mode":"modify","arguments":{}}`)))
+		})
+
+		It("Should should get and set simulate mode", func() {
+			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
+			req.Body(strings.NewReader(`{"mode":"simulate"}`))
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"mode":"simulate","arguments":{"matchingStrategy":"STRONGEST"}}`)))
+
+			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
+			res = functional_tests.DoRequest(req)
+			modeJson, err = ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"mode":"simulate","arguments":{"matchingStrategy":"STRONGEST"}}`)))
+		})
+
+		It("Should should get and set synthesize mode", func() {
+			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
+			req.Body(strings.NewReader(`{"mode":"capture"}`))
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"mode":"capture","arguments":{}}`)))
+
+			req = sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
+			res = functional_tests.DoRequest(req)
+			modeJson, err = ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"mode":"capture","arguments":{}}`)))
+		})
+
 
 		It("Should error when header arguments use an asterisk and a header", func() {
 			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
