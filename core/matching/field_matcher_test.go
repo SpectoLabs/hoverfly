@@ -185,7 +185,7 @@ func Test_CountingFieldMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
 	}, `testtesttest`)
 
 	Expect(matcher.Matched).To(BeTrue())
-	Expect(matcher.TotalMatches).To(Equal(3))
+	Expect(matcher.MatchScore).To(Equal(3))
 
 	// JSON and JSONPath
 	matcher = matching.CountingFieldMatcher(&models.RequestFieldMatchers{
@@ -194,7 +194,7 @@ func Test_CountingFieldMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
 	}, `{"test":true}`)
 
 	Expect(matcher.Matched).To(BeTrue())
-	Expect(matcher.TotalMatches).To(Equal(2))
+	Expect(matcher.MatchScore).To(Equal(2))
 
 	// XML and XMLPath
 	matcher = matching.CountingFieldMatcher(&models.RequestFieldMatchers{
@@ -203,7 +203,7 @@ func Test_CountingFieldMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
 	}, xml.Header+"<list><item><field>test</field></item></list>")
 
 	Expect(matcher.Matched).To(BeTrue())
-	Expect(matcher.TotalMatches).To(Equal(2))
+	Expect(matcher.MatchScore).To(Equal(2))
 }
 
 func Test_CountingFieldMatcher_CountsMatches_WhenThereIsNoMatch(t *testing.T) {
@@ -218,7 +218,7 @@ func Test_CountingFieldMatcher_CountsMatches_WhenThereIsNoMatch(t *testing.T) {
 	}, `testtesttest`)
 
 	Expect(matcher.Matched).To(BeFalse())
-	Expect(matcher.TotalMatches).To(Equal(3))
+	Expect(matcher.MatchScore).To(Equal(3))
 }
 
 func Test_CountingFieldMatcher_CountZero_WhenFieldIsNil(t *testing.T) {
@@ -228,5 +228,5 @@ func Test_CountingFieldMatcher_CountZero_WhenFieldIsNil(t *testing.T) {
 	matcher := matching.CountingFieldMatcher(nil, `testtesttest`)
 
 	Expect(matcher.Matched).To(BeTrue())
-	Expect(matcher.TotalMatches).To(Equal(0))
+	Expect(matcher.MatchScore).To(Equal(0))
 }

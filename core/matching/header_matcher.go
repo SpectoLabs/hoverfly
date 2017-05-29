@@ -43,7 +43,7 @@ func CountlessHeaderMatcher(matchingHeaders, toMatch map[string][]string) * Fiel
 func CountingHeaderMatcher(matchingHeaders, toMatch map[string][]string) * FieldMatch {
 
 	matched := true
-	var matchCount int
+	var matchScore int
 
 	for matcherHeaderKey, matcherHeaderValues := range matchingHeaders {
 
@@ -63,7 +63,7 @@ func CountingHeaderMatcher(matchingHeaders, toMatch map[string][]string) * Field
 			for _, toMatchHeaderValue := range toMatchHeaderValues {
 				if glob.Glob(strings.ToLower(matcherHeaderValue), strings.ToLower(toMatchHeaderValue)) {
 					matcherHeaderValueMatched = true
-					matchCount++
+					matchScore++
 				}
 			}
 
@@ -73,7 +73,7 @@ func CountingHeaderMatcher(matchingHeaders, toMatch map[string][]string) * Field
 		}
 	}
 	return &FieldMatch{
-		Matched: matched,
-		TotalMatches: matchCount,
+		Matched:    matched,
+		MatchScore: matchScore,
 	}
 }
