@@ -6,9 +6,9 @@ import (
 )
 
 
-func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (requestMatch, closestMatch *models.RequestMatcherResponsePair, err error) {
+func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (requestMatch, closestMiss *models.RequestMatcherResponsePair, err error) {
 
-	var closestMatchTotalMatches int
+	var closestMissTotalMatches int
 	var strongestMatchTotalMatches int
 
 	for _, matchingPair := range simulation.MatchingPairs {
@@ -64,11 +64,11 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 				Response:       matchingPair.Response,
 			}
 			strongestMatchTotalMatches = totalMatches
-			closestMatch = nil
-		} else if matched == false && requestMatch == nil && totalMatches >= closestMatchTotalMatches {
-			closestMatchTotalMatches = totalMatches
-			closestMatch = &models.RequestMatcherResponsePair{}
-			*closestMatch = matchingPair
+			closestMiss = nil
+		} else if matched == false && requestMatch == nil && totalMatches >= closestMissTotalMatches {
+			closestMissTotalMatches = totalMatches
+			closestMiss = &models.RequestMatcherResponsePair{}
+			*closestMiss = matchingPair
 		}
 	}
 

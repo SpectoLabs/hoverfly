@@ -437,7 +437,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnHeader
 	Expect(response.Response.Body).To(Equal("request matched"))
 }
 
-func Test_ShouldReturnClosestMatchIfMatchIsNotFound(t *testing.T) {
+func Test_ShouldReturnClosestMissIfMatchIsNotFound(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -490,18 +490,18 @@ func Test_ShouldReturnClosestMatchIfMatchIsNotFound(t *testing.T) {
 		Path: "nomatch",
 	}
 
-	result, closestMatch, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, closestMiss, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).ToNot(BeNil())
 	Expect(result).To(BeNil())
-	Expect(closestMatch).ToNot(BeNil())
-	Expect(*closestMatch.RequestMatcher.Body.ExactMatch).To(Equal(`body`))
-	Expect(*closestMatch.RequestMatcher.Body.GlobMatch).To(Equal(`bod*`))
-	Expect(*closestMatch.RequestMatcher.Path.ExactMatch).To(Equal(`path`))
-	Expect(closestMatch.Response.Body).To(Equal(`two`))
+	Expect(closestMiss).ToNot(BeNil())
+	Expect(*closestMiss.RequestMatcher.Body.ExactMatch).To(Equal(`body`))
+	Expect(*closestMiss.RequestMatcher.Body.GlobMatch).To(Equal(`bod*`))
+	Expect(*closestMiss.RequestMatcher.Path.ExactMatch).To(Equal(`path`))
+	Expect(closestMiss.Response.Body).To(Equal(`two`))
 }
 
-func Test_ShouldReturnClosestMatchIfMatchIsNotFoundAgain(t *testing.T) {
+func Test_ShouldReturnClosestMissIfMatchIsNotFoundAgain(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -557,18 +557,18 @@ func Test_ShouldReturnClosestMatchIfMatchIsNotFoundAgain(t *testing.T) {
 		Method: "GET",
 	}
 
-	result, closestMatch, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, closestMiss, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).ToNot(BeNil())
 	Expect(result).To(BeNil())
-	Expect(closestMatch).ToNot(BeNil())
-	Expect(*closestMatch.RequestMatcher.Body.RegexMatch).To(Equal(`.*`))
-	Expect(*closestMatch.RequestMatcher.Path.ExactMatch).To(Equal(`miss`))
-	Expect(*closestMatch.RequestMatcher.Method.ExactMatch).To(Equal(`GET`))
-	Expect(closestMatch.Response.Body).To(Equal(`one`))
+	Expect(closestMiss).ToNot(BeNil())
+	Expect(*closestMiss.RequestMatcher.Body.RegexMatch).To(Equal(`.*`))
+	Expect(*closestMiss.RequestMatcher.Path.ExactMatch).To(Equal(`miss`))
+	Expect(*closestMiss.RequestMatcher.Method.ExactMatch).To(Equal(`GET`))
+	Expect(closestMiss.Response.Body).To(Equal(`one`))
 }
 
-func Test_ShouldNotReturnClosestMatchWhenThereIsAMatch(t *testing.T) {
+func Test_ShouldNotReturnClosestMissWhenThereIsAMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -606,11 +606,11 @@ func Test_ShouldNotReturnClosestMatchWhenThereIsAMatch(t *testing.T) {
 		Method: "GET",
 	}
 
-	result, closestMatch, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, closestMiss, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).To(BeNil())
 	Expect(result).ToNot(BeNil())
-	Expect(closestMatch).To(BeNil())
+	Expect(closestMiss).To(BeNil())
 	Expect(result).ToNot(BeNil())
 }
 
@@ -669,10 +669,10 @@ func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatches(t *testing.T) {
 		Method: "GET",
 	}
 
-	result, closestMatch, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, closestMiss, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).To(BeNil())
-	Expect(closestMatch).To(BeNil())
+	Expect(closestMiss).To(BeNil())
 	Expect(result).ToNot(BeNil())
 	Expect(result.Response.Body).To(Equal("two"))
 }
@@ -734,15 +734,15 @@ func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatchesAgain(t *testing.
 		Method: "GET",
 	}
 
-	result, closestMatch, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, closestMiss, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).To(BeNil())
-	Expect(closestMatch).To(BeNil())
+	Expect(closestMiss).To(BeNil())
 	Expect(result).ToNot(BeNil())
 	Expect(result.Response.Body).To(Equal("one"))
 }
 
-func Test_ShouldSetClosestMatchBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
+func Test_ShouldSetClosestMissBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -780,9 +780,9 @@ func Test_ShouldSetClosestMatchBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
 		Method: "POST",
 	}
 
-	_, closestMatch, _ := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, closestMiss, _ := matching.StrongestMatchRequestMatcher(r, false, simulation)
 
-	Expect(closestMatch).To(BeNil())
+	Expect(closestMiss).To(BeNil())
 }
 
 func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
@@ -835,15 +835,15 @@ func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
 		},
 	}
 
-	result, closestMatch, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, closestMiss, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).To(BeNil())
-	Expect(closestMatch).To(BeNil())
+	Expect(closestMiss).To(BeNil())
 	Expect(result).ToNot(BeNil())
 	Expect(result.Response.Body).To(Equal("one"))
 }
 
-func Test_ShouldIncludeHeadersInCalculationForClosestMatch(t *testing.T) {
+func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -893,10 +893,10 @@ func Test_ShouldIncludeHeadersInCalculationForClosestMatch(t *testing.T) {
 		},
 	}
 
-	result, closestMatch, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, closestMiss, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).ToNot(BeNil())
 	Expect(result).To(BeNil())
-	Expect(closestMatch).ToNot(BeNil())
-	Expect(closestMatch.Response.Body).To(Equal("one"))
+	Expect(closestMiss).ToNot(BeNil())
+	Expect(closestMiss.Response.Body).To(Equal("one"))
 }
