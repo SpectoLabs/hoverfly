@@ -13,7 +13,7 @@ import (
 type Hoverfly interface {
 	GetDestination() string
 	GetMiddleware() (string, string, string)
-	GetMode() string
+	GetMode() ModeView
 	GetStats() metrics.Stats
 	GetVersion() string
 	GetUpstreamProxy() string
@@ -34,7 +34,7 @@ func (this *HoverflyHandler) Get(w http.ResponseWriter, req *http.Request, next 
 	var hoverflyView HoverflyView
 
 	hoverflyView.Destination = this.Hoverfly.GetDestination()
-	hoverflyView.Mode = this.Hoverfly.GetMode()
+	hoverflyView.Mode = this.Hoverfly.GetMode().Mode
 	hoverflyView.Binary, hoverflyView.Script, hoverflyView.Remote = this.Hoverfly.GetMiddleware()
 	hoverflyView.Usage = this.Hoverfly.GetStats()
 	hoverflyView.Version = this.Hoverfly.GetVersion()

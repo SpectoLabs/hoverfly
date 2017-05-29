@@ -9,6 +9,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/util"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 type HoverflyCapture interface {
@@ -22,7 +23,21 @@ type CaptureMode struct {
 	Arguments ModeArguments
 }
 
+func (this *CaptureMode) View() v2.ModeView {
+	return v2.ModeView{
+		Mode: Capture,
+		Arguments: v2.ModeArgumentsView{
+			Headers:          this.Arguments.Headers,
+			MatchingStrategy: this.Arguments.MatchingStrategy,
+		},
+	}
+}
+
 func (this *CaptureMode) SetArguments(arguments ModeArguments) {
+	this.Arguments = arguments
+}
+
+func (this *CaptureMode) GetArguments(arguments ModeArguments) {
 	this.Arguments = arguments
 }
 

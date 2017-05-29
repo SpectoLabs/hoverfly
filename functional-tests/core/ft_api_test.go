@@ -48,7 +48,6 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(err).To(BeNil())
 			Expect(modeJson).To(Equal([]byte(`{"destination":"."}`)))
 		})
-
 	})
 
 	Context("PUT /api/v2/hoverfly/destination", func() {
@@ -79,7 +78,7 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"mode":"simulate","arguments":{}}`)))
+			Expect(modeJson).To(Equal([]byte(`{"mode":"simulate","arguments":{"matchingStrategy":"STRONGEST"}}`)))
 		})
 	})
 
@@ -118,6 +117,24 @@ var _ = Describe("Interacting with the API", func() {
 
 		})
 
+		It("Should error when setting an invalid matching strategy", func() {
+			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/mode")
+			req.Body(strings.NewReader(`
+			{
+				"mode" : "simulate",
+				"arguments" : {
+					"matchingStrategy" : "INVALID"
+				}
+			}
+			`))
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(400))
+			errorJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(errorJson)).To(Equal(`{"error":"Only matching strategy of FIRST or STRONGEST is permitted"}`))
+
+		})
 	})
 
 	Context("GET /api/v2/hoverfly/middleware", func() {

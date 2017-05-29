@@ -7,6 +7,8 @@ import (
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 var _ = Describe("When I run Hoverfly in simulate mode", func() {
@@ -59,5 +61,47 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 		Expect(err).To(BeNil())
 
 		Expect(string(body)).To(Equal("CHANGED_RESPONSE_BODY"))
+	})
+
+	It("Should perform a strongest match by default", func() {
+
+		hoverfly.ImportSimulation(functional_tests.StrongestMatchProofSimulation)
+
+		slingRequest := sling.New().Get("http://destination.com/should-match-strongest")
+		response := hoverfly.Proxy(slingRequest)
+
+		body, err := ioutil.ReadAll(response.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("second and strongest match"))
+	})
+
+	It("Should perform a strongest match when set explicitly", func() {
+		hoverfly.SetModeWithArgs("simulate", v2.ModeArgumentsView{
+			MatchingStrategy : util.StringToPointer("STRONGEST"),
+		})
+
+		hoverfly.ImportSimulation(functional_tests.StrongestMatchProofSimulation)
+
+		slingRequest := sling.New().Get("http://destination.com/should-match-strongest")
+		response := hoverfly.Proxy(slingRequest)
+
+		body, err := ioutil.ReadAll(response.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("second and strongest match"))
+	})
+
+	It("Should perform a strongest match when set explicitly", func() {
+		hoverfly.SetModeWithArgs("simulate", v2.ModeArgumentsView{
+			MatchingStrategy : util.StringToPointer("FIRST"),
+		})
+
+		hoverfly.ImportSimulation(functional_tests.StrongestMatchProofSimulation)
+
+		slingRequest := sling.New().Get("http://destination.com/should-match-strongest")
+		response := hoverfly.Proxy(slingRequest)
+
+		body, err := ioutil.ReadAll(response.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("first and weakest match"))
 	})
 })
