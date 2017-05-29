@@ -50,7 +50,7 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 
 	if field.ExactMatch != nil {
 		if ExactMatch(*field.ExactMatch, toMatch) {
-			fieldMatch.TotalMatches++
+			fieldMatch.MatchScore++
 		} else {
 			fieldMatch.Matched = false
 		}
@@ -58,7 +58,7 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 
 	if field.XmlMatch != nil {
 		if XmlMatch(*field.XmlMatch, toMatch) {
-			fieldMatch.TotalMatches++
+			fieldMatch.MatchScore++
 		} else {
 			fieldMatch.Matched = false
 		}
@@ -66,7 +66,7 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 
 	if field.XpathMatch != nil {
 		if XpathMatch(*field.XpathMatch, toMatch) {
-			fieldMatch.TotalMatches++
+			fieldMatch.MatchScore++
 		} else {
 			fieldMatch.Matched = false
 		}
@@ -74,7 +74,7 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 
 	if field.JsonMatch != nil {
 		if JsonMatch(*field.JsonMatch, toMatch) {
-			fieldMatch.TotalMatches++
+			fieldMatch.MatchScore++
 		} else {
 			fieldMatch.Matched = false
 		}
@@ -82,7 +82,7 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 
 	if field.JsonPathMatch != nil {
 		if JsonPathMatch(*field.JsonPathMatch, toMatch) {
-			fieldMatch.TotalMatches++
+			fieldMatch.MatchScore++
 		} else {
 			fieldMatch.Matched = false
 		}
@@ -90,7 +90,7 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 
 	if field.RegexMatch != nil {
 		if RegexMatch(*field.RegexMatch, toMatch) {
-			fieldMatch.TotalMatches++
+			fieldMatch.MatchScore++
 		} else {
 			fieldMatch.Matched = false
 		}
@@ -98,7 +98,7 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 
 	if field.GlobMatch != nil {
 		if GlobMatch(*field.GlobMatch, toMatch) {
-			fieldMatch.TotalMatches++
+			fieldMatch.MatchScore++
 		} else {
 			fieldMatch.Matched = false
 		}
@@ -109,12 +109,12 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 
 func countlessFieldMatch(matched bool) *FieldMatch {
 	return &FieldMatch{
-		Matched:      matched,
-		TotalMatches: 0,
+		Matched:    matched,
+		MatchScore: 0,
 	}
 }
 
 type FieldMatch struct {
-	Matched      bool
-	TotalMatches int
+	Matched    bool
+	MatchScore int
 }
