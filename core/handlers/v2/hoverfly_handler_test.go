@@ -17,8 +17,8 @@ func (this HoverflyStub) GetDestination() string {
 	return "test-destination.com"
 }
 
-func (this HoverflyStub) GetMode() string {
-	return "test-mode"
+func (this HoverflyStub) GetMode() ModeView {
+	return ModeView{Mode:"test-mode"}
 }
 
 func (this HoverflyStub) GetMiddleware() (string, string, string) {

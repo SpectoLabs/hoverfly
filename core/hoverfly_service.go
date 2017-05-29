@@ -12,6 +12,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
+	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 func (this Hoverfly) GetDestination() string {
@@ -33,8 +34,8 @@ func (hf *Hoverfly) SetDestination(destination string) (err error) {
 	return
 }
 
-func (this Hoverfly) GetMode() string {
-	return this.Cfg.Mode
+func (this Hoverfly) GetMode() v2.ModeView {
+	return this.modeMap[this.Cfg.Mode].View()
 }
 
 func (this *Hoverfly) SetMode(mode string) error {
@@ -79,8 +80,19 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 		this.CacheMatcher.PreloadCache(*this.Simulation)
 	}
 
+	matchingStrategy := modeView.Arguments.MatchingStrategy
+
+	if this.Cfg.GetMode() == "simulate" {
+		if matchingStrategy == nil {
+			matchingStrategy = util.StringToPointer("STRONGEST")
+		} else if *matchingStrategy != "SIMULATE" && *matchingStrategy != "FIRST"  {
+			return errors.New("Only matching strategy of FIRST or STRONGEST is permitted")
+		}
+	}
+
 	modeArguments := modes.ModeArguments{
-		Headers: modeView.Arguments.Headers,
+		Headers:          modeView.Arguments.Headers,
+		MatchingStrategy: matchingStrategy,
 	}
 
 	this.modeMap[this.Cfg.GetMode()].SetArguments(modeArguments)

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 type HoverflyModify interface {
@@ -14,6 +15,12 @@ type HoverflyModify interface {
 
 type ModifyMode struct {
 	Hoverfly HoverflyModify
+}
+
+func (this *ModifyMode) View() v2.ModeView {
+	return v2.ModeView{
+		Mode: Modify,
+	}
 }
 
 func (this *ModifyMode) SetArguments(arguments ModeArguments) {}
