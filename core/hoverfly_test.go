@@ -189,7 +189,7 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromCache(t *testing.T) {
 		Destination: "somehost.com",
 		Method:      "POST",
 		Scheme:      "http",
-	})
+	}, true)
 
 	Expect(err).To(BeNil())
 	Expect(response).ToNot(BeNil())
@@ -225,7 +225,7 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *tes
 		Destination: "somehost.com",
 		Method:      "POST",
 		Scheme:      "http",
-	})
+	}, true)
 
 	Expect(err).To(BeNil())
 	Expect(response).ToNot(BeNil())
@@ -261,7 +261,7 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 		Destination: "somehost.com",
 		Method:      "POST",
 		Scheme:      "http",
-	})
+	}, true)
 
 	Expect(unit.CacheMatcher.RequestCache.RecordsCount()).Should(Equal(1))
 
@@ -278,7 +278,7 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 		Destination: "somehost.com",
 		Method:      "POST",
 		Scheme:      "http",
-	})
+	}, true)
 
 	Expect(err).To(BeNil())
 	Expect(response).ToNot(BeNil())
@@ -305,7 +305,7 @@ func Test_Hoverfly_GetResponse_WillReturnCachedResponseIfHeaderMatchIsFalse(t *t
 		},
 	})
 
-	response, err := unit.GetResponse(requestDetails)
+	response, err := unit.GetResponse(requestDetails, true)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("cached response"))
@@ -325,7 +325,7 @@ func Test_Hoverfly_GetResponse_WillCheckRequestMatchersAndReturnRequestMatcherRe
 	unit.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, &models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: map[string][]string{
-				"Header": []string{"value"},
+				"Header": {"value"},
 			},
 		},
 		Response: models.ResponseDetails{
@@ -345,7 +345,7 @@ func Test_Hoverfly_GetResponse_WillCheckRequestMatchersAndReturnRequestMatcherRe
 		},
 	})
 
-	response, err := unit.GetResponse(requestDetails)
+	response, err := unit.GetResponse(requestDetails, true)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("response body"))
@@ -362,7 +362,7 @@ func Test_Hoverfly_GetResponse_WillCacheMisses(t *testing.T) {
 		Scheme:      "http",
 	}
 
-	_, err := unit.GetResponse(requestDetails)
+	_, err := unit.GetResponse(requestDetails, true)
 	Expect(err.Error()).To(Equal("Could not find recorded request, please record it first!"))
 
 	cachedResponse, err := unit.CacheMatcher.GetCachedResponse(&requestDetails)
@@ -600,20 +600,6 @@ func Test_Hoverfly_DoRequest_FailedHTTP(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 }
 
-// TestCaptureHeader tests whether request gets new header assigned
-func Test_DoRequest_AddsHoverflyHeaderOnSuccessfulRequest(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := NewHoverflyWithConfiguration(&Configuration{})
-
-	req, err := http.NewRequest("GET", "http://example.com", ioutil.NopCloser(bytes.NewBuffer([]byte(""))))
-	Expect(err).To(BeNil())
-
-	response, err := unit.DoRequest(req)
-
-	Expect(response.Header.Get("hoverfly")).To(Equal("Was-Here"))
-}
-
 func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -798,7 +784,7 @@ func Test_Hoverfly_Save_SavesRequestBodyAsXmlPathIfContentTypeIsXml(t *testing.T
 	unit.Save(&models.RequestDetails{
 		Body: `<xml>`,
 		Headers: map[string][]string{
-			"Content-Type": []string{"application/xml"},
+			"Content-Type": {"application/xml"},
 		},
 	}, &models.ResponseDetails{}, nil)
 

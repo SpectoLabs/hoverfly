@@ -14,7 +14,7 @@ import (
 
 type hoverflySimulateStub struct{}
 
-func (this hoverflySimulateStub) GetResponse(request models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
+func (this hoverflySimulateStub) GetResponse(request models.RequestDetails, strongestMatch bool) (*models.ResponseDetails, *matching.MatchingError) {
 	if request.Destination == "positive-match.com" {
 		return &models.ResponseDetails{
 			Status: 200,

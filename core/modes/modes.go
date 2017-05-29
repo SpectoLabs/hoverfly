@@ -12,6 +12,7 @@ import (
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond
@@ -29,6 +30,7 @@ const Capture = "capture"
 type Mode interface {
 	Process(*http.Request, models.RequestDetails) (*http.Response, error)
 	SetArguments(arguments ModeArguments)
+	View() v2.ModeView
 }
 
 type Hoverfly interface {
@@ -41,6 +43,7 @@ type Hoverfly interface {
 
 type ModeArguments struct {
 	Headers []string
+	MatchingStrategy * string
 }
 
 // ReconstructRequest replaces original request with details provided in Constructor Payload.Request

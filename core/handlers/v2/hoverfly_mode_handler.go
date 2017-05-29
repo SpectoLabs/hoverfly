@@ -10,7 +10,7 @@ import (
 )
 
 type HoverflyMode interface {
-	GetMode() string
+	GetMode() ModeView
 	SetModeWithArguments(ModeView) error
 }
 
@@ -30,10 +30,8 @@ func (this *HoverflyModeHandler) RegisterRoutes(mux *bone.Mux, am *handlers.Auth
 }
 
 func (this *HoverflyModeHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var modeView ModeView
-	modeView.Mode = this.Hoverfly.GetMode()
 
-	bytes, _ := json.Marshal(modeView)
+	bytes, _ := json.Marshal(this.Hoverfly.GetMode())
 
 	handlers.WriteResponse(w, bytes)
 }
@@ -47,6 +45,7 @@ func (this *HoverflyModeHandler) Put(w http.ResponseWriter, r *http.Request, nex
 	}
 
 	err = this.Hoverfly.SetModeWithArguments(modeView)
+
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
