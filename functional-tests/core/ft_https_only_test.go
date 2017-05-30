@@ -28,7 +28,7 @@ var _ = Describe("When I run Hoverfly", func() {
 	Context("and specify https-only on startup", func() {
 
 		BeforeEach(func() {
-			hoverfly.Start("-https-only")
+			hoverfly.Start("-https-only", "-tls-verification=false")
 			hoverfly.SetMode("capture")
 		})
 
