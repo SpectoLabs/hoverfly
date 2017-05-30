@@ -1,21 +1,22 @@
 package matching
 
 import (
+	"encoding/json"
 	"reflect"
-
-	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 func JsonMatch(matchingString string, toMatch string) bool {
-	minifiedMatchingString, err := util.MinifyJson(matchingString)
+	var matchingObject map[string]interface{}
+	err := json.Unmarshal([]byte(matchingString), &matchingObject)
 	if err != nil {
 		return false
 	}
 
-	minifiedToMatch, err := util.MinifyJson(toMatch)
+	var toMatchObject map[string]interface{}
+	err = json.Unmarshal([]byte(toMatch), &toMatchObject)
 	if err != nil {
 		return false
 	}
 
-	return reflect.DeepEqual(minifiedMatchingString, minifiedToMatch)
+	return reflect.DeepEqual(matchingObject, toMatchObject)
 }

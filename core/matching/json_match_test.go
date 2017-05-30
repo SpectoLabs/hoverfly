@@ -13,6 +13,12 @@ func Test_JsonMatch_MatchesTrueWithJSON(t *testing.T) {
 	Expect(matching.JsonMatch(`{"test":{"json":true,"minified":true}}`, `{"test":{"json":true,"minified":true}}`)).To(BeTrue())
 }
 
+func Test_JsonMatch_MatchesTrueWithJSON_InADifferentOrder(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.JsonMatch(`{"test":{"minified":true, "json":true}}`, `{"test":{"json":true,"minified":true}}`)).To(BeTrue())
+}
+
 func Test_JsonMatch_MatchesTrueWithUnminifiedJSON(t *testing.T) {
 	RegisterTestingT(t)
 
