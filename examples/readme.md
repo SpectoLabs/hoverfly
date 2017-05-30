@@ -1,0 +1,1 @@
+This directory contains example middleware and simulations that can be used with Hoverfly.
