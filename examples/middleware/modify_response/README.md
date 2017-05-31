@@ -11,17 +11,17 @@ hoverctl mode modify
 
 ### JavaScript
 ```
-hoverctl middleware --binary node modify_response.js
+hoverctl middleware --binary node --script modify_response.js
 ```
 
 ### Python
 ```
-hoverctl middleware --binary python modify_response.py
+hoverctl middleware --binary python --script modify_response.py
 ```
 
 ### Ruby
 ```
-hoverctl middleware --binary ruby modify_response.rb
+hoverctl middleware --binary ruby --script modify_response.rb
 ```
 
 To find out more, please check the documentation regarding [middleware](https://docs.hoverfly.io/en/latest/pages/keyconcepts/middleware.html).
