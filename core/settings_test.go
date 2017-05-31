@@ -50,7 +50,7 @@ func TestSettingsMiddlewareEnv(t *testing.T) {
 
 	defer os.Setenv("HoverflyMiddleware", "")
 
-	os.Setenv("HoverflyMiddleware", "ruby examples/middleware/ruby_echo/echo.rb")
+	os.Setenv("HoverflyMiddleware", "ruby ../examples/middleware/modify_response/modify_response.rb")
 	cfg := InitSettings()
 
 	Expect(cfg.Middleware.Binary).To(Equal("ruby"))
@@ -58,7 +58,7 @@ func TestSettingsMiddlewareEnv(t *testing.T) {
 	script, err := cfg.Middleware.GetScript()
 	Expect(err).To(BeNil())
 
-	Expect(script).To(Equal(rubyEcho))
+	Expect(script).To(Equal(rubyModifyResponse))
 }
 
 func Test_InitSettings_SetsModeToSimulate(t *testing.T) {

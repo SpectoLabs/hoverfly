@@ -35,6 +35,23 @@ const pythonModifyResponse = "#!/usr/bin/env python\n" +
 	"if __name__ == \"__main__\":\n" +
 	"	main()\n"
 
+const rubyModifyResponse = "#!/usr/bin/env ruby\n" +
+	"# encoding: utf-8\n\n" +
+
+	"require 'rubygems'\n" +
+	"require 'json'\n\n" +
+
+	"while payload = STDIN.gets\n" +
+	"  next unless payload\n\n" +
+
+	"  jsonPayload = JSON.parse(payload)\n\n" +
+
+	"  jsonPayload[\"response\"][\"body\"] = \"body was replaced by middleware FUUUUCCKKK\\n\"\n\n" +
+
+	"  STDOUT.puts jsonPayload.to_json\n\n" +
+
+	"end"
+
 const pythonReflectBody = "#!/usr/bin/env python\n" +
 	"import sys\n" +
 	"import json\n" +
