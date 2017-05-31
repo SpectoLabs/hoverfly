@@ -3,18 +3,20 @@
 ## Usage:
 
 Start hoverfly in synthesize mode and point to this middleware:
-
-    ./hoverfly -synthesize -middleware "./examples/middleware/synthetic_flight_search/synthetic_flight_search.py"
+```
+hoverfly -synthesize -middleware ./synthetic_flight_search.py
+```
 
 Execute client.py:
-    
-    export HTTPS_PROXY=http://localhost:8500/
-    python client.py --origin "AMS" --destination "NYC" --date "2017-15-15"
+```    
+export HTTPS_PROXY=http://localhost:8500/
+python client.py --origin "AMS" --destination "NYC" --date "2017-15-15"
+```
 
 Try different destinations/origins:
-
-    python client.py --origin "AMS" --destination "LLL" --date "2017-15-15" | grep LLL
- 
+```
+python client.py --origin "AMS" --destination "LLL" --date "2017-15-15" | grep LLL
+``` 
 
 ## More info
 

@@ -46,7 +46,7 @@ const rubyModifyResponse = "#!/usr/bin/env ruby\n" +
 
 	"  jsonPayload = JSON.parse(payload)\n\n" +
 
-	"  jsonPayload[\"response\"][\"body\"] = \"body was replaced by middleware FUUUUCCKKK\\n\"\n\n" +
+	"  jsonPayload[\"response\"][\"body\"] = \"body was replaced by middleware\\n\"\n\n" +
 
 	"  STDOUT.puts jsonPayload.to_json\n\n" +
 
