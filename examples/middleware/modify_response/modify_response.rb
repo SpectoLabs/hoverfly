@@ -9,7 +9,7 @@ while payload = STDIN.gets
 
   jsonPayload = JSON.parse(payload)
 
-  jsonPayload["response"]["body"] = "body was replaced by middleware FUUUUCCKKK\n"
+  jsonPayload["response"]["body"] = "body was replaced by middleware\n"
 
   STDOUT.puts jsonPayload.to_json
 
