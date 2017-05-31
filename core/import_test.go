@@ -16,6 +16,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const hoverfly_io_simulation_path = "../examples/simulations/hoverfly.io.json"
+
 func TestIsURLHTTP(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -62,9 +64,7 @@ func TestIsURLWrongTLD(t *testing.T) {
 func TestFileExists(t *testing.T) {
 	RegisterTestingT(t)
 
-	fp := "examples/exports/readthedocs.json"
-
-	ex, err := exists(fp)
+	ex, err := exists(hoverfly_io_simulation_path)
 	Expect(err).To(BeNil())
 	Expect(ex).To(BeTrue())
 }
@@ -85,10 +85,10 @@ func TestImportFromDisk(t *testing.T) {
 	server, dbClient := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	err := dbClient.Import("examples/exports/readthedocs.json")
+	err := dbClient.Import(hoverfly_io_simulation_path)
 	Expect(err).To(BeNil())
 
-	Expect(dbClient.Simulation.MatchingPairs).To(HaveLen(5))
+	Expect(dbClient.Simulation.MatchingPairs).To(HaveLen(2))
 }
 
 func TestImportFromDiskBlankPath(t *testing.T) {
@@ -115,7 +115,7 @@ func TestImportFromURL(t *testing.T) {
 	RegisterTestingT(t)
 
 	// reading file and preparing json payload
-	pairFile, err := os.Open("examples/exports/readthedocs.json")
+	pairFile, err := os.Open(hoverfly_io_simulation_path)
 	Expect(err).To(BeNil())
 	pairFileBytes, err := ioutil.ReadAll(pairFile)
 	Expect(err).To(BeNil())
@@ -128,14 +128,14 @@ func TestImportFromURL(t *testing.T) {
 	err = dbClient.Import(server.URL)
 	Expect(err).To(BeNil())
 
-	Expect(dbClient.Simulation.MatchingPairs).To(HaveLen(5))
+	Expect(dbClient.Simulation.MatchingPairs).To(HaveLen(2))
 }
 
 func TestImportFromURLRedirect(t *testing.T) {
 	RegisterTestingT(t)
 
 	// reading file and preparing json payload
-	pairFile, err := os.Open("examples/exports/readthedocs.json")
+	pairFile, err := os.Open(hoverfly_io_simulation_path)
 	Expect(err).To(BeNil())
 	pairFileBytes, err := ioutil.ReadAll(pairFile)
 	Expect(err).To(BeNil())
@@ -156,7 +156,7 @@ func TestImportFromURLRedirect(t *testing.T) {
 	err = dbClient.Import(redirectServer.URL)
 	Expect(err).To(BeNil())
 
-	Expect(dbClient.Simulation.MatchingPairs).To(HaveLen(5))
+	Expect(dbClient.Simulation.MatchingPairs).To(HaveLen(2))
 }
 
 func TestImportFromURLHTTPFail(t *testing.T) {
