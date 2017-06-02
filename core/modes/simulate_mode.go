@@ -6,11 +6,10 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"strings"
 )
 
 type HoverflySimulate interface {
-	GetResponse(models.RequestDetails, bool) (*models.ResponseDetails, *matching.MatchingError)
+	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
 }
 
@@ -41,7 +40,7 @@ func (this SimulateMode) Process(request *http.Request, details models.RequestDe
 		Request: details,
 	}
 
-	response, matchingErr := this.Hoverfly.GetResponse(details, strings.ToUpper(this.MatchingStrategy) != "FIRST")
+	response, matchingErr := this.Hoverfly.GetResponse(details)
 	if matchingErr != nil {
 		return ReturnErrorAndLog(request, matchingErr, &pair, "There was an error when matching", Simulate)
 	}
