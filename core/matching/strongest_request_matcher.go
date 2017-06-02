@@ -20,33 +20,33 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 
 		requestMatcher := matchingPair.RequestMatcher
 
-		fieldMatch := CountingFieldMatcher(requestMatcher.Body, req.Body)
+		fieldMatch := ScoredFieldMatcher(requestMatcher.Body, req.Body)
 		if !fieldMatch.Matched {
 			matched = false
 		}
 		matchScore += fieldMatch.MatchScore
 
 		if !webserver {
-			match := CountingFieldMatcher(requestMatcher.Destination, req.Destination)
+			match := ScoredFieldMatcher(requestMatcher.Destination, req.Destination)
 			if !match.Matched {
 				matched = false
 			}
 			matchScore += match.MatchScore
 		}
 
-		fieldMatch = CountingFieldMatcher(requestMatcher.Path, req.Path)
+		fieldMatch = ScoredFieldMatcher(requestMatcher.Path, req.Path)
 		if !fieldMatch.Matched {
 			matched = false
 		}
 		matchScore += fieldMatch.MatchScore
 
-		fieldMatch = CountingFieldMatcher(requestMatcher.Query, req.Query)
+		fieldMatch = ScoredFieldMatcher(requestMatcher.Query, req.Query)
 		if !fieldMatch.Matched {
 			matched = false
 		}
 		matchScore += fieldMatch.MatchScore
 
-		fieldMatch = CountingFieldMatcher(requestMatcher.Method, req.Method)
+		fieldMatch = ScoredFieldMatcher(requestMatcher.Method, req.Method)
 		if !fieldMatch.Matched {
 			matched = false
 		}
