@@ -14,7 +14,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"strings"
-	"github.com/onsi/ginkgo"
 )
 
 func (this Hoverfly) GetDestination() string {
