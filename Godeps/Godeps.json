@@ -94,12 +94,12 @@
 		{
 			"ImportPath": "github.com/SpectoLabs/goproxy",
 			"Comment": "v1.0-96-g6016d23",
-			"Rev": "b97fa8e29d6fa3c2c6f3625c0d92359b353794c4"
+			"Rev": "7f8d8488402730a2bff62981f386f85c73703a05"
 		},
 		{
 			"ImportPath": "github.com/SpectoLabs/goproxy/ext/auth",
 			"Comment": "v1.0-97-gd66a182",
-			"Rev": "b97fa8e29d6fa3c2c6f3625c0d92359b353794c4"
+			"Rev": "7f8d8488402730a2bff62981f386f85c73703a05"
 		},
 		{
 			"ImportPath": "github.com/antonholmquist/jason",
