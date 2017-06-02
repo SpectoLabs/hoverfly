@@ -48,8 +48,6 @@ mode is shown.
 
 			var extraInformation string
 
-			ginkgo.GinkgoWriter.Write([]byte("Matching strategy is: " + matchingStrategy + "\n"))
-
 			//TODO: For @benji, convert this whole thing to a switch case for each mode, only allowing the correct functionality for each one
 			if modeView.Mode == modes.Simulate && len(matchingStrategy) > 0 {
 				extraInformation = fmt.Sprintf("with a matching strategy of '%s'", matchingStrategy)

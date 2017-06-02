@@ -4,43 +4,43 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-func CountlessFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *FieldMatch {
+func UnscoredFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *FieldMatch {
 	if field == nil {
-		return countlessFieldMatch(true)
+		return FieldMatchWithNoScore(true)
 	}
 
 	if field.ExactMatch != nil && !ExactMatch(*field.ExactMatch, toMatch) {
-		return countlessFieldMatch(false)
+		return FieldMatchWithNoScore(false)
 	}
 
 	if field.XmlMatch != nil && !XmlMatch(*field.XmlMatch, toMatch) {
-		return countlessFieldMatch(false)
+		return FieldMatchWithNoScore(false)
 	}
 
 	if field.XpathMatch != nil && !XpathMatch(*field.XpathMatch, toMatch) {
-		return countlessFieldMatch(false)
+		return FieldMatchWithNoScore(false)
 	}
 
 	if field.JsonMatch != nil && !JsonMatch(*field.JsonMatch, toMatch) {
-		return countlessFieldMatch(false)
+		return FieldMatchWithNoScore(false)
 	}
 
 	if field.JsonPathMatch != nil && !JsonPathMatch(*field.JsonPathMatch, toMatch) {
-		return countlessFieldMatch(false)
+		return FieldMatchWithNoScore(false)
 	}
 
 	if field.RegexMatch != nil && !RegexMatch(*field.RegexMatch, toMatch) {
-		return countlessFieldMatch(false)
+		return FieldMatchWithNoScore(false)
 	}
 
 	if field.GlobMatch != nil && !GlobMatch(*field.GlobMatch, toMatch) {
-		return countlessFieldMatch(false)
+		return FieldMatchWithNoScore(false)
 	}
 
-	return countlessFieldMatch(true)
+	return FieldMatchWithNoScore(true)
 }
 
-func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *FieldMatch {
+func ScoredFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *FieldMatch {
 
 	fieldMatch := &FieldMatch{Matched: true}
 
@@ -107,7 +107,7 @@ func CountingFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 	return fieldMatch
 }
 
-func countlessFieldMatch(matched bool) *FieldMatch {
+func FieldMatchWithNoScore(matched bool) *FieldMatch {
 	return &FieldMatch{
 		Matched:    matched,
 		MatchScore: 0,

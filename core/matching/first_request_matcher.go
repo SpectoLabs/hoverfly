@@ -14,25 +14,25 @@ func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulat
 
 		requestMatcher := matchingPair.RequestMatcher
 
-		if !CountlessFieldMatcher(requestMatcher.Body, req.Body).Matched {
+		if !UnscoredFieldMatcher(requestMatcher.Body, req.Body).Matched {
 			continue
 		}
 
 		if !webserver {
-			if !CountlessFieldMatcher(requestMatcher.Destination, req.Destination).Matched {
+			if !UnscoredFieldMatcher(requestMatcher.Destination, req.Destination).Matched {
 				continue
 			}
 		}
 
-		if !CountlessFieldMatcher(requestMatcher.Path, req.Path).Matched {
+		if !UnscoredFieldMatcher(requestMatcher.Path, req.Path).Matched {
 			continue
 		}
 
-		if !CountlessFieldMatcher(requestMatcher.Query, req.Query).Matched {
+		if !UnscoredFieldMatcher(requestMatcher.Query, req.Query).Matched {
 			continue
 		}
 
-		if !CountlessFieldMatcher(requestMatcher.Method, req.Method).Matched {
+		if !UnscoredFieldMatcher(requestMatcher.Method, req.Method).Matched {
 			continue
 		}
 
