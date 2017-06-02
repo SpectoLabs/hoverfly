@@ -133,6 +133,25 @@ func Test_ReconstructResponse_AddsHeadersToResponse(t *testing.T) {
 	Expect(response.Header.Get("Header")).To(Equal(headers["Header"][0]))
 }
 
+func Test_ReconstructResponse_AddsHeadersWithCorrectCapitalization(t *testing.T) {
+	RegisterTestingT(t)
+
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	pair := models.RequestResponsePair{}
+
+	headers := make(map[string][]string)
+	headers["HeaderOne"] = []string{"one"}
+	headers["HEADERTWO"] = []string{"two"}
+
+	pair.Response.Headers = headers
+
+	response := modes.ReconstructResponse(req, pair)
+
+	Expect(response.Header["HeaderOne"]).To(Equal([]string{"one"}))
+	Expect(response.Header["HEADERTWO"]).To(Equal([]string{"two"}))
+}
+
 func Test_ReconstructResponse_AddsMultipleHeaderValuesToResponse(t *testing.T) {
 	RegisterTestingT(t)
 
