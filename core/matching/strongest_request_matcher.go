@@ -8,8 +8,8 @@ import (
 
 func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (requestMatch, closestMiss *models.RequestMatcherResponsePair, err error) {
 
-	var closestMissTotalMatches int
-	var strongestMatchTotalMatches int
+	var closestMissScore int
+	var strongestMatchScore int
 
 	for _, matchingPair := range simulation.MatchingPairs {
 		// TODO: not matching by default on URL and body - need to enable this
@@ -58,15 +58,15 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 		}
 		matchScore += fieldMatch.MatchScore
 
-		if matched == true && matchScore >= strongestMatchTotalMatches {
+		if matched == true && matchScore >= strongestMatchScore {
 			requestMatch = &models.RequestMatcherResponsePair{
 				RequestMatcher: requestMatcher,
 				Response:       matchingPair.Response,
 			}
-			strongestMatchTotalMatches = matchScore
+			strongestMatchScore = matchScore
 			closestMiss = nil
-		} else if matched == false && requestMatch == nil && matchScore >= closestMissTotalMatches {
-			closestMissTotalMatches = matchScore
+		} else if matched == false && requestMatch == nil && matchScore >= closestMissScore {
+			closestMissScore = matchScore
 			closestMiss = &models.RequestMatcherResponsePair{}
 			*closestMiss = matchingPair
 		}

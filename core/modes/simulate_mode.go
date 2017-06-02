@@ -6,6 +6,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"strings"
 )
 
 type HoverflySimulate interface {
@@ -29,7 +30,7 @@ func (this *SimulateMode) View() v2.ModeView {
 
 func (this *SimulateMode) SetArguments(arguments ModeArguments) {
 	if arguments.MatchingStrategy == nil {
-		this.MatchingStrategy = "STRONGEST"
+		this.MatchingStrategy = "strongest"
 	} else {
 		this.MatchingStrategy = *arguments.MatchingStrategy
 	}
@@ -40,7 +41,7 @@ func (this SimulateMode) Process(request *http.Request, details models.RequestDe
 		Request: details,
 	}
 
-	response, matchingErr := this.Hoverfly.GetResponse(details, this.MatchingStrategy != "FIRST")
+	response, matchingErr := this.Hoverfly.GetResponse(details, strings.ToUpper(this.MatchingStrategy) != "FIRST")
 	if matchingErr != nil {
 		return ReturnErrorAndLog(request, matchingErr, &pair, "There was an error when matching", Simulate)
 	}

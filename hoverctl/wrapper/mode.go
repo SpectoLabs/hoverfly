@@ -9,27 +9,27 @@ import (
 )
 
 // GetMode will go the state endpoint in Hoverfly, parse the JSON response and return the mode of Hoverfly
-func GetMode(target configuration.Target) (string, error) {
+func GetMode(target configuration.Target) (*v2.ModeView, error) {
 	response, err := doRequest(target, "GET", v2ApiMode, "", nil)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	defer response.Body.Close()
 
 	err = handleResponseError(response, "Could not retrieve mode")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	var modeView v2.ModeView
 
 	err = UnmarshalToInterface(response, &modeView)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return modeView.Mode, nil
+	return &modeView, nil
 }
 
 // Set will go the state endpoint in Hoverfly, sending JSON that will set the mode of Hoverfly
