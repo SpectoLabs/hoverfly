@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	glob "github.com/ryanuber/go-glob"
-	"fmt"
 )
 
 func CountlessHeaderMatcher(matchingHeaders, toMatch map[string][]string) * FieldMatch {
@@ -23,8 +22,6 @@ func CountlessHeaderMatcher(matchingHeaders, toMatch map[string][]string) * Fiel
 		}
 
 		for _, matcherHeaderValue := range matcherHeaderValues {
-			fmt.Println(toMatchHeaderValues)
-
 			matcherHeaderValueMatched := false
 			for _, toMatchHeaderValue := range toMatchHeaderValues {
 				if glob.Glob(strings.ToLower(matcherHeaderValue), strings.ToLower(toMatchHeaderValue)) {

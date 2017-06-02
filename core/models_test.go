@@ -95,7 +95,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 		requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
 		Expect(err).To(BeNil())
 
-		response, err := dbClient.GetResponse(requestDetails, true)
+		response, err := dbClient.GetResponse(requestDetails)
 		Expect(err).To(BeNil())
 
 		Expect(response.Body).To(Equal(fmt.Sprintf("body here, number=%d", i)))
@@ -116,7 +116,7 @@ func TestGetNotRecordedRequest(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
 	Expect(err).To(BeNil())
 
-	response, err := dbClient.GetResponse(requestDetails, true)
+	response, err := dbClient.GetResponse(requestDetails)
 	Expect(err).ToNot(BeNil())
 
 	Expect(response).To(BeNil())

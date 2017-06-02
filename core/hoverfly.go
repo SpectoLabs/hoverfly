@@ -19,6 +19,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/util"
+	"strings"
 )
 
 // orPanic - wrapper for logging errors
@@ -245,7 +246,7 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 }
 
 // GetResponse returns stored response from cache
-func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails, strongestMatch bool) (*models.ResponseDetails, *matching.MatchingError) {
+func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
 
 	cachedResponse, cacheErr := hf.CacheMatcher.GetCachedResponse(&requestDetails)
 	if cacheErr == nil && cachedResponse.MatchingPair == nil {
@@ -259,6 +260,10 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails, strongestM
 
 	var pair *models.RequestMatcherResponsePair
 	var err error
+
+	mode := (hf.modeMap[modes.Simulate]).(*modes.SimulateMode)
+
+	strongestMatch := strings.ToUpper(mode.MatchingStrategy) == "STRONGEST"
 
 	if strongestMatch {
 		pair, _, err = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
