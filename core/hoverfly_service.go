@@ -13,6 +13,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/util"
+	"strings"
+	"github.com/onsi/ginkgo"
 )
 
 func (this Hoverfly) GetDestination() string {
@@ -73,21 +75,23 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 		}
 	}
 
+	matchingStrategy := modeView.Arguments.MatchingStrategy
+	if modeView.Mode == modes.Simulate {
+		if matchingStrategy == nil {
+			matchingStrategy = util.StringToPointer("STRONGEST")
+		}
+
+		if strings.ToUpper(*matchingStrategy) != "STRONGEST" && strings.ToUpper(*matchingStrategy) != "FIRST"  {
+			ginkgo.GinkgoWriter.Write([]byte("Matching strategy is: \n" + *matchingStrategy))
+			return errors.New("Only matching strategy of 'first' or 'strongest' is permitted")
+		}
+	}
+
 	this.Cfg.SetMode(modeView.Mode)
 	if this.Cfg.GetMode() == "capture" {
 		this.CacheMatcher.FlushCache()
 	} else if this.Cfg.GetMode() == "simulate" {
 		this.CacheMatcher.PreloadCache(*this.Simulation)
-	}
-
-	matchingStrategy := modeView.Arguments.MatchingStrategy
-
-	if this.Cfg.GetMode() == "simulate" {
-		if matchingStrategy == nil {
-			matchingStrategy = util.StringToPointer("STRONGEST")
-		} else if *matchingStrategy != "SIMULATE" && *matchingStrategy != "FIRST"  {
-			return errors.New("Only matching strategy of FIRST or STRONGEST is permitted")
-		}
 	}
 
 	modeArguments := modes.ModeArguments{
