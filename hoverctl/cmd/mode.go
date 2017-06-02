@@ -8,7 +8,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 	"github.com/SpectoLabs/hoverfly/core/modes"
-	"github.com/onsi/ginkgo"
 )
 
 var specficHeaders string
