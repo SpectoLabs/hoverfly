@@ -181,7 +181,7 @@ var _ = Describe("Interacting with the API", func() {
 			errorJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 
-			Expect(string(errorJson)).To(Equal(`{"error":"Only matching strategy of FIRST or STRONGEST is permitted"}`))
+			Expect(string(errorJson)).To(Equal(`{"error":"Only matching strategy of 'first' or 'strongest' is permitted"}`))
 
 		})
 	})

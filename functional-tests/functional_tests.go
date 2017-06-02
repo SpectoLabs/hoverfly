@@ -96,7 +96,7 @@ func (this Hoverfly) DeleteBoltDb() {
 	os.Remove(workingDirectory + "requests.db")
 }
 
-func (this Hoverfly) GetMode() string {
+func (this Hoverfly) GetMode() * v2.ModeView {
 	currentState := &v2.ModeView{}
 	resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/mode", this.adminPort)))
 
@@ -105,7 +105,7 @@ func (this Hoverfly) GetMode() string {
 
 	json.Unmarshal(body, currentState)
 
-	return currentState.Mode
+	return currentState
 }
 
 func (this Hoverfly) SetMode(mode string) {

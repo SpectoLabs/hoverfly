@@ -15,7 +15,7 @@ func Test_GetMode_GetsModeFromHoverfly(t *testing.T) {
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
 			RequestResponsePairs: []v2.RequestResponsePairViewV2{
-				v2.RequestResponsePairViewV2{
+				{
 					Request: v2.RequestDetailsViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("GET"),
@@ -26,7 +26,14 @@ func Test_GetMode_GetsModeFromHoverfly(t *testing.T) {
 					},
 					Response: v2.ResponseDetailsView{
 						Status: 200,
-						Body:   `{"mode": "test-mode"}`,
+						Body:
+						`{
+							"mode": "test-mode",
+							"arguments" : {
+								"matchingStrategy":"first",
+								"headersWhitelist":["foo","bar"]
+							}
+						}`,
 					},
 				},
 			},
@@ -39,7 +46,9 @@ func Test_GetMode_GetsModeFromHoverfly(t *testing.T) {
 	mode, err := GetMode(target)
 	Expect(err).To(BeNil())
 
-	Expect(mode).To(Equal("test-mode"))
+	Expect(mode.Mode).To(Equal("test-mode"))
+	Expect(*mode.Arguments.MatchingStrategy).To(Equal("first"))
+	Expect(mode.Arguments.Headers).To(Equal([]string{"foo", "bar"}))
 }
 
 func Test_GetMode_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
@@ -141,7 +150,7 @@ func Test_SetMode_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
 			RequestResponsePairs: []v2.RequestResponsePairViewV2{
-				v2.RequestResponsePairViewV2{
+				{
 					Request: v2.RequestDetailsViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("PUT"),
