@@ -233,7 +233,7 @@ func Test_CountingHeaderMatcher_CountZero_WhenFieldIsNil(t *testing.T) {
 	RegisterTestingT(t)
 
 	// Glob, regex, and exact
-	matcher := matching.CountingFieldMatcher(nil, `testtesttest`)
+	matcher := matching.ScoredFieldMatcher(nil, `testtesttest`)
 
 	Expect(matcher.Matched).To(BeTrue())
 	Expect(matcher.MatchScore).To(Equal(0))

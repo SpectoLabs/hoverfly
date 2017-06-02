@@ -23,8 +23,6 @@ type ModeView struct {
 	Arguments ModeArgumentsView `json:"arguments,omitempty"`
 }
 
-type MatchingStrategy string
-
 type ModeArgumentsView struct {
 	Headers []string `json:"headersWhitelist,omitempty"`
 	MatchingStrategy * string `json:"matchingStrategy,omitempty"`

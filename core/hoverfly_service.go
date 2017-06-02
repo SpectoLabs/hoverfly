@@ -82,7 +82,6 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 		}
 
 		if strings.ToUpper(*matchingStrategy) != "STRONGEST" && strings.ToUpper(*matchingStrategy) != "FIRST"  {
-			ginkgo.GinkgoWriter.Write([]byte("Matching strategy is: \n" + *matchingStrategy))
 			return errors.New("Only matching strategy of 'first' or 'strongest' is permitted")
 		}
 	}
