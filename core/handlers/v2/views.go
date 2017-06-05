@@ -55,6 +55,6 @@ type CacheView struct {
 
 type CachedResponseView struct {
 	Key          string                     `json:"key"`
-	MatchingPair *RequestResponsePairViewV2 `json:"matchingPair,omitempty"`
+	MatchingPair *RequestMatcherResponsePairViewV2 `json:"matchingPair,omitempty"`
 	HeaderMatch  bool                       `json:"headerMatch"`
 }

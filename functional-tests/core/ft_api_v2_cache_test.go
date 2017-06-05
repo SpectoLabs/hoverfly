@@ -34,7 +34,7 @@ var _ = Describe("/api/v2/cache", func() {
 
 			Expect(cacheView.Cache).To(HaveLen(1))
 
-			Expect(*cacheView.Cache[0].MatchingPair.Request.Destination.ExactMatch).To(Equal("destination-server.com"))
+			Expect(*cacheView.Cache[0].MatchingPair.RequestMatcher.Destination.ExactMatch).To(Equal("destination-server.com"))
 
 			Expect(cacheView.Cache[0].MatchingPair.Response.Status).To(Equal(200))
 			Expect(cacheView.Cache[0].MatchingPair.Response.Body).To(Equal("destination matched"))

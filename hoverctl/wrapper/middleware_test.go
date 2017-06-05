@@ -14,9 +14,9 @@ func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestResponsePairViewV2{
-				v2.RequestResponsePairViewV2{
-					Request: v2.RequestDetailsViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
+				v2.RequestMatcherResponsePairViewV2{
+					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("GET"),
 						},
@@ -59,9 +59,9 @@ func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestResponsePairViewV2{
-				v2.RequestResponsePairViewV2{
-					Request: v2.RequestDetailsViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
+				v2.RequestMatcherResponsePairViewV2{
+					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("GET"),
 						},
@@ -101,9 +101,9 @@ func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestResponsePairViewV2{
-				v2.RequestResponsePairViewV2{
-					Request: v2.RequestDetailsViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
+				v2.RequestMatcherResponsePairViewV2{
+					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("PUT"),
 						},

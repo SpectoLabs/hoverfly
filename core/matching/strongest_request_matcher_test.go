@@ -7,6 +7,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 func Test_ClosestRequestMatcherRequestMatcher_EmptyRequestMatchersShouldMatchOnAnyRequest(t *testing.T) {
@@ -553,7 +554,7 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFoundAgain(t *testing.T) {
 	})
 
 	r := models.RequestDetails{
-		Body: "foo",
+		Body:   "foo",
 		Method: "GET",
 	}
 
@@ -602,7 +603,7 @@ func Test_ShouldNotReturnClosestMissWhenThereIsAMatch(t *testing.T) {
 	})
 
 	r := models.RequestDetails{
-		Body: "foo",
+		Body:   "foo",
 		Method: "GET",
 	}
 
@@ -665,7 +666,7 @@ func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatches(t *testing.T) {
 	})
 
 	r := models.RequestDetails{
-		Body: "foo",
+		Body:   "foo",
 		Method: "GET",
 	}
 
@@ -686,7 +687,7 @@ func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatchesAgain(t *testing.
 		RequestMatcher: models.RequestMatcher{
 			Body: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer(`{"foo": "bar"}`),
-				JsonMatch: StringToPointer(`{"foo": "bar"}`),
+				JsonMatch:  StringToPointer(`{"foo": "bar"}`),
 			},
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("GET"),
@@ -702,7 +703,7 @@ func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatchesAgain(t *testing.
 		RequestMatcher: models.RequestMatcher{
 			Body: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer(`{"foo": "bar"}`),
-				JsonMatch: StringToPointer(`{"foo": "bar"}`),
+				JsonMatch:  StringToPointer(`{"foo": "bar"}`),
 			},
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("GET"),
@@ -712,7 +713,6 @@ func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatchesAgain(t *testing.
 			Body: "two",
 		},
 	})
-
 
 	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
@@ -730,7 +730,7 @@ func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatchesAgain(t *testing.
 	})
 
 	r := models.RequestDetails{
-		Body: `{"foo": "bar"}`,
+		Body:   `{"foo": "bar"}`,
 		Method: "GET",
 	}
 
@@ -776,7 +776,7 @@ func Test_ShouldSetClosestMissBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
 	})
 
 	r := models.RequestDetails{
-		Body: `body`,
+		Body:   `body`,
 		Method: "POST",
 	}
 
@@ -798,10 +798,10 @@ func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("GET"),
 			},
-			Headers: map[string][]string {
-				"one": {"one"},
-				"two":  {"one"},
-				"three":  {"one"},
+			Headers: map[string][]string{
+				"one":   {"one"},
+				"two":   {"one"},
+				"three": {"one"},
 			},
 		},
 		Response: models.ResponseDetails{
@@ -826,12 +826,12 @@ func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
 	})
 
 	r := models.RequestDetails{
-		Body: "foo",
+		Body:   "foo",
 		Method: "GET",
-		Headers: map[string][]string {
-			"one": {"one"},
-			"two":  {"one"},
-			"three":  {"one"},
+		Headers: map[string][]string{
+			"one":   {"one"},
+			"two":   {"one"},
+			"three": {"one"},
 		},
 	}
 
@@ -856,10 +856,10 @@ func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("GET"),
 			},
-			Headers: map[string][]string {
-				"one": {"one"},
-				"two":  {"one"},
-				"three":  {"one"},
+			Headers: map[string][]string{
+				"one":   {"one"},
+				"two":   {"one"},
+				"three": {"one"},
 			},
 		},
 		Response: models.ResponseDetails{
@@ -884,12 +884,12 @@ func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
 	})
 
 	r := models.RequestDetails{
-		Body: "foo",
+		Body:   "foo",
 		Method: "MISS",
-		Headers: map[string][]string {
-			"one": {"one"},
-			"two":  {"one"},
-			"three":  {"one"},
+		Headers: map[string][]string{
+			"one":   {"one"},
+			"two":   {"one"},
+			"three": {"one"},
 		},
 	}
 
@@ -900,3 +900,218 @@ func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
 	Expect(closestMiss).ToNot(BeNil())
 	Expect(closestMiss.Response.Body).To(Equal("one"))
 }
+
+func Test_ShouldReturnFieldsMissedInClosestMiss(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				GlobMatch: StringToPointer("miss"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("miss"),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("hit"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("hit"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("miss"),
+			},
+
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("miss"),
+			},
+			Headers: map[string][]string{
+				"hitKey": {"hitValue"},
+			},
+
+		},
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
+	})
+
+	r := models.RequestDetails{
+		Method: "hit",
+		Destination: "hit",
+		Headers: map[string][]string{
+			"hitKey": {"hitValue"},
+		},
+	}
+
+	result, closestMiss, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+
+	Expect(err).ToNot(BeNil())
+	Expect(result).To(BeNil())
+	Expect(closestMiss).ToNot(BeNil())
+	//TODO: Scheme matching?
+	Expect(closestMiss.MissedFields).To(ConsistOf(`body`, `path`, `query`))
+}
+
+func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				GlobMatch: StringToPointer("hit"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("hit"),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("miss"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("miss"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("hit"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("hit"),
+			},
+			Headers: map[string][]string{
+				"miss": {"miss"},
+			},
+
+		},
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
+	})
+
+	r := models.RequestDetails{
+		Body: "hit",
+		Path: "hit",
+		Query: "hit",
+	}
+
+	result, closestMiss, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
+
+	Expect(err).ToNot(BeNil())
+	Expect(result).To(BeNil())
+	Expect(closestMiss).ToNot(BeNil())
+	//TODO: Scheme matching?
+	Expect(closestMiss.MissedFields).To(ConsistOf(`method`, `destination`, `headers`))
+}
+
+func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
+	RegisterTestingT(t)
+
+	miss := &matching.ClosestMiss{
+		RequestDetails: &models.RequestDetails{
+			Path:        "path",
+			Method:      "method",
+			Destination: "destination",
+			Scheme:      "scheme",
+			Query:       "query",
+			Body:        "body",
+			Headers: map[string][]string{
+				"miss": {"miss"},
+			},
+		},
+		Response: &v2.ResponseDetailsView{
+			Body: "hello world",
+			Headers: map[string][]string{
+				"hello": {"world"},
+			},
+			Status: 200,
+		},
+		RequestMatcher: &v2.RequestMatcherViewV2{
+			Body: &v2.RequestFieldMatchersView{
+				GlobMatch: StringToPointer("hit"),
+			},
+			Path: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("hit"),
+			},
+			Method: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("miss"),
+			},
+			Destination: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("miss"),
+			},
+			Query: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("hit"),
+			},
+			Scheme: &v2.RequestFieldMatchersView{
+				ExactMatch: StringToPointer("hit"),
+			},
+			Headers: map[string][]string{
+				"miss": {"miss"},
+			},
+		},
+		MissedFields: []string{"body", "path", "method"},
+	}
+
+	Expect(miss.GetMessage()).To(Equal(
+		`
+
+The following request was made, but was not matched by Hoverfly:
+
+{
+    "Path": "path",
+    "Method": "method",
+    "Destination": "destination",
+    "Scheme": "scheme",
+    "Query": "query",
+    "Body": "body",
+    "Headers": {
+        "miss": [
+            "miss"
+        ]
+    }
+}
+
+The closest miss was the following matcher:
+
+{
+    "path": {
+        "exactMatch": "hit"
+    },
+    "method": {
+        "exactMatch": "miss"
+    },
+    "destination": {
+        "exactMatch": "miss"
+    },
+    "scheme": {
+        "exactMatch": "hit"
+    },
+    "query": {
+        "exactMatch": "hit"
+    },
+    "body": {
+        "globMatch": "hit"
+    },
+    "headers": {
+        "miss": [
+            "miss"
+        ]
+    }
+}
+
+But it did not match on the following fields:
+
+[body, path, method]
+
+Which if hit would have given the following response:
+
+{
+    "status": 200,
+    "body": "hello world",
+    "encodedBody": false,
+    "headers": {
+        "hello": [
+            "world"
+        ]
+    }
+}`))}

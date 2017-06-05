@@ -365,12 +365,12 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			simulation := hoverfly.ExportSimulation()
 
-			Expect(simulation.DataViewV2.RequestResponsePairs[0].Request).To(Equal(v2.RequestDetailsViewV2{
+			Expect(simulation.DataViewV2.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV2{
 				Destination: &v2.RequestFieldMatchersView{
 					ExactMatch: util.StringToPointer("v1-simulation.com"),
 				}}))
 
-			Expect(simulation.DataViewV2.RequestResponsePairs[1].Request).To(Equal(v2.RequestDetailsViewV2{
+			Expect(simulation.DataViewV2.RequestResponsePairs[1].RequestMatcher).To(Equal(v2.RequestMatcherViewV2{
 				Scheme: &v2.RequestFieldMatchersView{
 					ExactMatch: util.StringToPointer("http"),
 				},

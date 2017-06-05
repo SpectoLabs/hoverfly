@@ -14,9 +14,9 @@ func Test_ExportSimulation_GetsModeFromHoverfly(t *testing.T) {
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestResponsePairViewV2{
-				v2.RequestResponsePairViewV2{
-					Request: v2.RequestDetailsViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
+				v2.RequestMatcherResponsePairViewV2{
+					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("GET"),
 						},
@@ -57,9 +57,9 @@ func Test_ExportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestResponsePairViewV2{
-				v2.RequestResponsePairViewV2{
-					Request: v2.RequestDetailsViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
+				v2.RequestMatcherResponsePairViewV2{
+					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("GET"),
 						},
@@ -90,9 +90,9 @@ func Test_ImportSimulation_SendsCorrectHTTPRequest(t *testing.T) {
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestResponsePairViewV2{
-				v2.RequestResponsePairViewV2{
-					Request: v2.RequestDetailsViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
+				v2.RequestMatcherResponsePairViewV2{
+					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("PUT"),
 						},
@@ -134,9 +134,9 @@ func Test_ImportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestResponsePairViewV2{
-				v2.RequestResponsePairViewV2{
-					Request: v2.RequestDetailsViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
+				v2.RequestMatcherResponsePairViewV2{
+					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("PUT"),
 						},
@@ -167,9 +167,9 @@ func Test_DeleteSimulations_SendsCorrectHTTPRequest(t *testing.T) {
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestResponsePairViewV2{
-				v2.RequestResponsePairViewV2{
-					Request: v2.RequestDetailsViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
+				v2.RequestMatcherResponsePairViewV2{
+					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("DELETE"),
 						},
@@ -208,9 +208,9 @@ func Test_DeleteSimulations_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestResponsePairViewV2{
-				v2.RequestResponsePairViewV2{
-					Request: v2.RequestDetailsViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
+				v2.RequestMatcherResponsePairViewV2{
+					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("DELETE"),
 						},
