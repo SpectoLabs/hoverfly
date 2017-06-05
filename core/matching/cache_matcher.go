@@ -92,7 +92,7 @@ func (this CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 	for key, v := range records {
 		if cachedResponse, err := models.NewCachedResponseFromBytes(v); err == nil {
 
-			var pair *v2.RequestResponsePairViewV2
+			var pair *v2.RequestMatcherResponsePairViewV2
 
 			if cachedResponse.MatchingPair != nil {
 				pairView := cachedResponse.MatchingPair.BuildView()

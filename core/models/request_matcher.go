@@ -48,27 +48,27 @@ type RequestMatcherResponsePair struct {
 	Response       ResponseDetails
 }
 
-func NewRequestMatcherResponsePairFromView(view *v2.RequestResponsePairViewV2) *RequestMatcherResponsePair {
-	if view.Request.Query != nil && view.Request.Query.ExactMatch != nil {
-		sortedQuery := util.SortQueryString(*view.Request.Query.ExactMatch)
-		view.Request.Query.ExactMatch = &sortedQuery
+func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV2) *RequestMatcherResponsePair {
+	if view.RequestMatcher.Query != nil && view.RequestMatcher.Query.ExactMatch != nil {
+		sortedQuery := util.SortQueryString(*view.RequestMatcher.Query.ExactMatch)
+		view.RequestMatcher.Query.ExactMatch = &sortedQuery
 	}
 
 	return &RequestMatcherResponsePair{
 		RequestMatcher: RequestMatcher{
-			Path:        NewRequestFieldMatchersFromView(view.Request.Path),
-			Method:      NewRequestFieldMatchersFromView(view.Request.Method),
-			Destination: NewRequestFieldMatchersFromView(view.Request.Destination),
-			Scheme:      NewRequestFieldMatchersFromView(view.Request.Scheme),
-			Query:       NewRequestFieldMatchersFromView(view.Request.Query),
-			Body:        NewRequestFieldMatchersFromView(view.Request.Body),
-			Headers:     view.Request.Headers,
+			Path:        NewRequestFieldMatchersFromView(view.RequestMatcher.Path),
+			Method:      NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
+			Destination: NewRequestFieldMatchersFromView(view.RequestMatcher.Destination),
+			Scheme:      NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
+			Query:       NewRequestFieldMatchersFromView(view.RequestMatcher.Query),
+			Body:        NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
+			Headers:     view.RequestMatcher.Headers,
 		},
 		Response: NewResponseDetailsFromResponse(view.Response),
 	}
 }
 
-func (this *RequestMatcherResponsePair) BuildView() v2.RequestResponsePairViewV2 {
+func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePairViewV2 {
 
 	var path, method, destination, scheme, query, body *v2.RequestFieldMatchersView
 
@@ -96,8 +96,8 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestResponsePairViewV2
 		body = this.RequestMatcher.Body.BuildView()
 	}
 
-	return v2.RequestResponsePairViewV2{
-		Request: v2.RequestDetailsViewV2{
+	return v2.RequestMatcherResponsePairViewV2{
+		RequestMatcher: v2.RequestMatcherViewV2{
 			Path:        path,
 			Method:      method,
 			Destination: destination,

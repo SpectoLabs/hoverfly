@@ -20,8 +20,8 @@ type HoverflySimulationStub struct {
 }
 
 func (this HoverflySimulationStub) GetSimulation() (SimulationViewV2, error) {
-	pairOne := RequestResponsePairViewV2{
-		Request: RequestDetailsViewV2{
+	pairOne := RequestMatcherResponsePairViewV2{
+		RequestMatcher: RequestMatcherViewV2{
 			Destination: &RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("test.com"),
 			},
@@ -36,7 +36,7 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationViewV2, error) {
 
 	return SimulationViewV2{
 		DataViewV2{
-			RequestResponsePairs: []RequestResponsePairViewV2{pairOne},
+			RequestResponsePairs: []RequestMatcherResponsePairViewV2{pairOne},
 			GlobalActions: GlobalActionsView{
 				Delays: []v1.ResponseDelayView{
 					{
@@ -93,8 +93,8 @@ func TestSimulationHandler_Get_ReturnsSimulation(t *testing.T) {
 
 	Expect(simulationView.DataViewV2.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal(util.StringToPointer("test.com")))
-	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Request.Path.ExactMatch).To(Equal(util.StringToPointer("/testing")))
+	Expect(simulationView.DataViewV2.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal(util.StringToPointer("test.com")))
+	Expect(simulationView.DataViewV2.RequestResponsePairs[0].RequestMatcher.Path.ExactMatch).To(Equal(util.StringToPointer("/testing")))
 
 	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
 
@@ -159,8 +159,8 @@ func TestSimulationHandler_Delete_CallsGetAfterDelete(t *testing.T) {
 
 	Expect(simulationView.DataViewV2.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal(util.StringToPointer("test.com")))
-	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Request.Path.ExactMatch).To(Equal(util.StringToPointer("/testing")))
+	Expect(simulationView.DataViewV2.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal(util.StringToPointer("test.com")))
+	Expect(simulationView.DataViewV2.RequestResponsePairs[0].RequestMatcher.Path.ExactMatch).To(Equal(util.StringToPointer("/testing")))
 
 	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
 
@@ -236,7 +236,7 @@ func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
 	Expect(stubHoverfly.Simulation).ToNot(BeNil())
 	Expect(stubHoverfly.Simulation.RequestResponsePairs).ToNot(BeNil())
 
-	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal(util.StringToPointer("test.org")))
+	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal(util.StringToPointer("test.org")))
 	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 
 	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].UrlPattern).To(Equal("test.org"))

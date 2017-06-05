@@ -260,13 +260,14 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 	var pair *models.RequestMatcherResponsePair
 	var err error
+	var closestMiss *matching.ClosestMiss
 
 	mode := (hf.modeMap[modes.Simulate]).(*modes.SimulateMode)
 
 	strongestMatch := strings.ToUpper(mode.MatchingStrategy) == "STRONGEST"
 
 	if strongestMatch {
-		pair, _, err = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
+		pair, closestMiss, err = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
 	} else {
 		pair, err = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
 	}
@@ -282,10 +283,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 			"method":      requestDetails.Method,
 		}).Warn("Failed to find matching request from simulation")
 
-		return nil, &matching.MatchingError{
-			StatusCode:  412,
-			Description: "Could not find recorded request, please record it first!",
-		}
+		return nil, matching.MissedError(closestMiss)
 	}
 
 	return &pair.Response, nil

@@ -99,7 +99,7 @@ func ValidateSimulation(json, schema map[string]interface{}) error {
 }
 
 func (this SimulationViewV1) Upgrade() SimulationViewV2 {
-	var pairs []RequestResponsePairViewV2
+	var pairs []RequestMatcherResponsePairViewV2
 	for _, pairV1 := range this.RequestResponsePairViewV1 {
 
 		var schemeMatchers, methodMatchers, destinationMatchers, pathMatchers, queryMatchers, bodyMatchers *RequestFieldMatchersView
@@ -184,8 +184,8 @@ func (this SimulationViewV1) Upgrade() SimulationViewV2 {
 			}
 		}
 
-		pair := RequestResponsePairViewV2{
-			Request: RequestDetailsViewV2{
+		pair := RequestMatcherResponsePairViewV2{
+			RequestMatcher: RequestMatcherViewV2{
 				Scheme:      schemeMatchers,
 				Method:      methodMatchers,
 				Destination: destinationMatchers,
@@ -212,7 +212,7 @@ func (this SimulationViewV1) Upgrade() SimulationViewV2 {
 }
 
 type DataViewV2 struct {
-	RequestResponsePairs []RequestResponsePairViewV2 `json:"pairs"`
+	RequestResponsePairs []RequestMatcherResponsePairViewV2 `json:"pairs"`
 	GlobalActions        GlobalActionsView           `json:"globalActions"`
 }
 
@@ -221,13 +221,13 @@ type DataViewV1 struct {
 	GlobalActions             GlobalActionsView           `json:"globalActions"`
 }
 
-type RequestResponsePairViewV2 struct {
-	Response ResponseDetailsView  `json:"response"`
-	Request  RequestDetailsViewV2 `json:"request"`
+type RequestMatcherResponsePairViewV2 struct {
+	Response       ResponseDetailsView  `json:"response"`
+	RequestMatcher RequestMatcherViewV2 `json:"request"`
 }
 
 //Gets Response - required for interfaces.RequestResponsePairView
-func (this RequestResponsePairViewV2) GetResponse() interfaces.Response { return this.Response }
+func (this RequestMatcherResponsePairViewV2) GetResponse() interfaces.Response { return this.Response }
 
 type RequestResponsePairViewV1 struct {
 	Response ResponseDetailsView  `json:"response"`
@@ -237,7 +237,7 @@ type RequestResponsePairViewV1 struct {
 //Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestResponsePairViewV1) GetResponse() interfaces.Response { return this.Response }
 
-//Gets Request - required for interfaces.RequestResponsePairView
+//Gets RequestMatcher - required for interfaces.RequestResponsePairView
 func (this RequestResponsePairViewV1) GetRequest() interfaces.Request { return this.Request }
 
 type RequestFieldMatchersView struct {
@@ -251,7 +251,7 @@ type RequestFieldMatchersView struct {
 }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
-type RequestDetailsViewV2 struct {
+type RequestMatcherViewV2 struct {
 	Path        *RequestFieldMatchersView `json:"path,omitempty"`
 	Method      *RequestFieldMatchersView `json:"method,omitempty"`
 	Destination *RequestFieldMatchersView `json:"destination,omitempty"`
@@ -273,19 +273,19 @@ type RequestDetailsViewV1 struct {
 	Headers     map[string][]string `json:"headers"`
 }
 
-//Gets Path - required for interfaces.Request
+//Gets Path - required for interfaces.RequestMatcher
 func (this RequestDetailsViewV1) GetPath() *string { return this.Path }
 
-//Gets Method - required for interfaces.Request
+//Gets Method - required for interfaces.RequestMatcher
 func (this RequestDetailsViewV1) GetMethod() *string { return this.Method }
 
-//Gets Destination - required for interfaces.Request
+//Gets Destination - required for interfaces.RequestMatcher
 func (this RequestDetailsViewV1) GetDestination() *string { return this.Destination }
 
-//Gets Scheme - required for interfaces.Request
+//Gets Scheme - required for interfaces.RequestMatcher
 func (this RequestDetailsViewV1) GetScheme() *string { return this.Scheme }
 
-//Gets Query - required for interfaces.Request
+//Gets Query - required for interfaces.RequestMatcher
 func (this RequestDetailsViewV1) GetQuery() *string {
 	if this.Query == nil {
 		return this.Query
@@ -294,10 +294,10 @@ func (this RequestDetailsViewV1) GetQuery() *string {
 	return &queryString
 }
 
-//Gets Body - required for interfaces.Request
+//Gets Body - required for interfaces.RequestMatcher
 func (this RequestDetailsViewV1) GetBody() *string { return this.Body }
 
-//Gets Headers - required for interfaces.Request
+//Gets Headers - required for interfaces.RequestMatcher
 func (this RequestDetailsViewV1) GetHeaders() map[string][]string { return this.Headers }
 
 // ResponseDetailsView is used when marshalling and
