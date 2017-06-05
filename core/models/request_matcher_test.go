@@ -42,8 +42,8 @@ func Test_NewRequestFieldMatchers_BuildView(t *testing.T) {
 func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestResponsePairViewV2{
-		Request: v2.RequestDetailsViewV2{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV2{
+		RequestMatcher: v2.RequestMatcherViewV2{
 			Path: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("/"),
 			},
@@ -62,8 +62,8 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 func Test_NewRequestMatcherResponsePairFromView_SortsQuery(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestResponsePairViewV2{
-		Request: v2.RequestDetailsViewV2{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV2{
+		RequestMatcher: v2.RequestMatcherViewV2{
 			Query: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("b=b&a=a"),
 			},

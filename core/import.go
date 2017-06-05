@@ -137,7 +137,7 @@ func isJSON(s string) bool {
 }
 
 // ImportRequestResponsePairViews - a function to save given pairs into the database.
-func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v2.RequestResponsePairViewV2) error {
+func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v2.RequestMatcherResponsePairViewV2) error {
 	if len(pairViews) > 0 {
 		success := 0
 		failed := 0

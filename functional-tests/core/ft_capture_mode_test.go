@@ -59,7 +59,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].Request).To(Equal(v2.RequestDetailsViewV2{
+				Expect(payload.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV2{
 					Path: &v2.RequestFieldMatchersView{
 						ExactMatch: util.StringToPointer("/"),
 					},
@@ -112,7 +112,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				payload := hoverfly.ExportSimulation()
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].Request.Headers).To(Equal(
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Headers).To(Equal(
 					map[string][]string{
 						"Accept-Encoding": []string{"gzip"},
 						"User-Agent":      []string{"Go-http-client/1.1"},
@@ -144,7 +144,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].Request.Headers).To(Equal(
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Headers).To(Equal(
 					map[string][]string{
 						"User-Agent": []string{"Go-http-client/1.1"},
 					},
@@ -175,7 +175,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].Request.Headers).To(Equal(
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Headers).To(Equal(
 					map[string][]string{
 						"User-Agent": []string{"Go-http-client/1.1"},
 						"Test":       []string{"value"},
@@ -214,7 +214,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				json.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal(&expectedRedirectDestination))
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal(&expectedRedirectDestination))
 
 				Expect(payload.RequestResponsePairs[0].Response.Status).To(Equal(301))
 				Expect(payload.RequestResponsePairs[0].Response.Headers["Location"][0]).To(Equal(fakeServerUrl.String()))
@@ -259,7 +259,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				json.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].Request.Body.JsonMatch).To(Equal(util.StringToPointer(`{"title": "a todo"}`)))
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body.JsonMatch).To(Equal(util.StringToPointer(`{"title": "a todo"}`)))
 			})
 
 			It("Should capture a XML request body as a xmlMatch", func() {
@@ -281,7 +281,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				json.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].Request.Body.XmlMatch).To(Equal(util.StringToPointer(`<document/>`)))
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body.XmlMatch).To(Equal(util.StringToPointer(`<document/>`)))
 			})
 		})
 	})

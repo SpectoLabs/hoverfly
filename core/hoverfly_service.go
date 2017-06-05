@@ -212,7 +212,7 @@ func (hf Hoverfly) GetStats() metrics.Stats {
 }
 
 func (hf Hoverfly) GetSimulation() (v2.SimulationViewV2, error) {
-	pairViews := make([]v2.RequestResponsePairViewV2, 0)
+	pairViews := make([]v2.RequestMatcherResponsePairViewV2, 0)
 
 	for _, v := range hf.Simulation.MatchingPairs {
 		pairViews = append(pairViews, v.BuildView())

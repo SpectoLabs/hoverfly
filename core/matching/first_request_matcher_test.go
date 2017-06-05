@@ -374,11 +374,11 @@ func Test_FirstMatchRequestMatcher_RequestMatcherResponsePairCanBeConvertedToARe
 
 	pairView := requestMatcherResponsePair.BuildView()
 
-	Expect(pairView.Request.Method.ExactMatch).To(Equal(StringToPointer("POST")))
-	Expect(pairView.Request.Destination).To(BeNil())
-	Expect(pairView.Request.Path).To(BeNil())
-	Expect(pairView.Request.Scheme).To(BeNil())
-	Expect(pairView.Request.Query).To(BeNil())
+	Expect(pairView.RequestMatcher.Method.ExactMatch).To(Equal(StringToPointer("POST")))
+	Expect(pairView.RequestMatcher.Destination).To(BeNil())
+	Expect(pairView.RequestMatcher.Path).To(BeNil())
+	Expect(pairView.RequestMatcher.Scheme).To(BeNil())
+	Expect(pairView.RequestMatcher.Query).To(BeNil())
 
 	Expect(pairView.Response.Body).To(Equal("request matched"))
 }
@@ -481,11 +481,11 @@ func Test_FirstMatchRequestMatcher_RequestMatcherResponsePair_ConvertToRequestRe
 
 	pairView := requestMatcherResponsePair.BuildView()
 
-	Expect(pairView.Request.Method.ExactMatch).To(Equal(StringToPointer("POST")))
-	Expect(pairView.Request.Destination).To(BeNil())
-	Expect(pairView.Request.Path).To(BeNil())
-	Expect(pairView.Request.Scheme).To(BeNil())
-	Expect(pairView.Request.Query).To(BeNil())
+	Expect(pairView.RequestMatcher.Method.ExactMatch).To(Equal(StringToPointer("POST")))
+	Expect(pairView.RequestMatcher.Destination).To(BeNil())
+	Expect(pairView.RequestMatcher.Path).To(BeNil())
+	Expect(pairView.RequestMatcher.Scheme).To(BeNil())
+	Expect(pairView.RequestMatcher.Query).To(BeNil())
 
 	Expect(pairView.Response.Body).To(Equal("request matched"))
 }

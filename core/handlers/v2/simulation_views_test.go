@@ -47,13 +47,13 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV2Payload(t *
 
 	Expect(simulation.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(simulation.RequestResponsePairs[0].Request.Body).To(BeNil())
-	Expect(*simulation.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal("test-server.com"))
-	Expect(simulation.RequestResponsePairs[0].Request.Headers).To(BeNil())
-	Expect(simulation.RequestResponsePairs[0].Request.Method).To(BeNil())
-	Expect(simulation.RequestResponsePairs[0].Request.Path).To(BeNil())
-	Expect(simulation.RequestResponsePairs[0].Request.Query).To(BeNil())
-	Expect(simulation.RequestResponsePairs[0].Request.Scheme).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Body).To(BeNil())
+	Expect(*simulation.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("test-server.com"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Headers).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Method).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Query).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(BeNil())
 
 	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal("exact match"))
 	Expect(simulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
@@ -136,13 +136,13 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV1Payload(t *
 
 	Expect(simulation.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(simulation.RequestResponsePairs[0].Request.Body).To(BeNil())
-	Expect(*simulation.RequestResponsePairs[0].Request.Destination.ExactMatch).To(Equal("test-server.com"))
-	Expect(simulation.RequestResponsePairs[0].Request.Headers).To(BeNil())
-	Expect(simulation.RequestResponsePairs[0].Request.Method).To(BeNil())
-	Expect(simulation.RequestResponsePairs[0].Request.Path).To(BeNil())
-	Expect(simulation.RequestResponsePairs[0].Request.Query).To(BeNil())
-	Expect(simulation.RequestResponsePairs[0].Request.Scheme).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Body).To(BeNil())
+	Expect(*simulation.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("test-server.com"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Headers).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Method).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Query).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(BeNil())
 
 	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal("exact match"))
 	Expect(simulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
@@ -256,25 +256,25 @@ func Test_SimulationViewV1_Upgrade_ReturnsAV2Simulation(t *testing.T) {
 
 	Expect(simulationViewV2.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Scheme).To(Equal(v2.RequestFieldMatchersView{
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Scheme).To(Equal(v2.RequestFieldMatchersView{
 		ExactMatch: util.StringToPointer("http"),
 	}))
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Body).To(Equal(v2.RequestFieldMatchersView{
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Body).To(Equal(v2.RequestFieldMatchersView{
 		ExactMatch: util.StringToPointer("body"),
 	}))
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Destination).To(Equal(v2.RequestFieldMatchersView{
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Destination).To(Equal(v2.RequestFieldMatchersView{
 		ExactMatch: util.StringToPointer("destination"),
 	}))
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Method).To(Equal(v2.RequestFieldMatchersView{
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Method).To(Equal(v2.RequestFieldMatchersView{
 		ExactMatch: util.StringToPointer("GET"),
 	}))
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Path).To(Equal(v2.RequestFieldMatchersView{
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Path).To(Equal(v2.RequestFieldMatchersView{
 		ExactMatch: util.StringToPointer("/path"),
 	}))
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Query).To(Equal(v2.RequestFieldMatchersView{
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Query).To(Equal(v2.RequestFieldMatchersView{
 		ExactMatch: util.StringToPointer("query=query"),
 	}))
-	Expect(simulationViewV2.RequestResponsePairs[0].Request.Headers).To(BeEmpty())
+	Expect(simulationViewV2.RequestResponsePairs[0].RequestMatcher.Headers).To(BeEmpty())
 
 	Expect(simulationViewV2.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(simulationViewV2.RequestResponsePairs[0].Response.Body).To(Equal("body"))
@@ -324,25 +324,25 @@ func Test_SimulationViewV1_Upgrade_ReturnsGlobMatchesIfTemplate(t *testing.T) {
 
 	Expect(simulationViewV2.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Scheme).To(Equal(v2.RequestFieldMatchersView{
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Scheme).To(Equal(v2.RequestFieldMatchersView{
 		GlobMatch: util.StringToPointer("http"),
 	}))
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Body).To(Equal(v2.RequestFieldMatchersView{
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Body).To(Equal(v2.RequestFieldMatchersView{
 		GlobMatch: util.StringToPointer("body"),
 	}))
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Destination).To(Equal(v2.RequestFieldMatchersView{
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Destination).To(Equal(v2.RequestFieldMatchersView{
 		GlobMatch: util.StringToPointer("destination"),
 	}))
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Method).To(Equal(v2.RequestFieldMatchersView{
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Method).To(Equal(v2.RequestFieldMatchersView{
 		GlobMatch: util.StringToPointer("GET"),
 	}))
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Path).To(Equal(v2.RequestFieldMatchersView{
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Path).To(Equal(v2.RequestFieldMatchersView{
 		GlobMatch: util.StringToPointer("/path"),
 	}))
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Query).To(Equal(v2.RequestFieldMatchersView{
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Query).To(Equal(v2.RequestFieldMatchersView{
 		GlobMatch: util.StringToPointer("query=query"),
 	}))
-	Expect(simulationViewV2.RequestResponsePairs[0].Request.Headers).To(BeEmpty())
+	Expect(simulationViewV2.RequestResponsePairs[0].RequestMatcher.Headers).To(BeEmpty())
 }
 
 func Test_SimulationViewV1_Upgrade_CanReturnAnIncompleteRequest(t *testing.T) {
@@ -377,15 +377,15 @@ func Test_SimulationViewV1_Upgrade_CanReturnAnIncompleteRequest(t *testing.T) {
 
 	Expect(simulationViewV2.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(simulationViewV2.RequestResponsePairs[0].Request.Scheme).To(BeNil())
-	Expect(simulationViewV2.RequestResponsePairs[0].Request.Body).To(BeNil())
-	Expect(simulationViewV2.RequestResponsePairs[0].Request.Destination).To(BeNil())
-	Expect(*simulationViewV2.RequestResponsePairs[0].Request.Method).To(Equal(v2.RequestFieldMatchersView{
+	Expect(simulationViewV2.RequestResponsePairs[0].RequestMatcher.Scheme).To(BeNil())
+	Expect(simulationViewV2.RequestResponsePairs[0].RequestMatcher.Body).To(BeNil())
+	Expect(simulationViewV2.RequestResponsePairs[0].RequestMatcher.Destination).To(BeNil())
+	Expect(*simulationViewV2.RequestResponsePairs[0].RequestMatcher.Method).To(Equal(v2.RequestFieldMatchersView{
 		ExactMatch: util.StringToPointer("POST"),
 	}))
-	Expect(simulationViewV2.RequestResponsePairs[0].Request.Path).To(BeNil())
-	Expect(simulationViewV2.RequestResponsePairs[0].Request.Query).To(BeNil())
-	Expect(simulationViewV2.RequestResponsePairs[0].Request.Headers).To(BeNil())
+	Expect(simulationViewV2.RequestResponsePairs[0].RequestMatcher.Path).To(BeNil())
+	Expect(simulationViewV2.RequestResponsePairs[0].RequestMatcher.Query).To(BeNil())
+	Expect(simulationViewV2.RequestResponsePairs[0].RequestMatcher.Headers).To(BeNil())
 
 	Expect(simulationViewV2.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(simulationViewV2.RequestResponsePairs[0].Response.Body).To(Equal("body"))

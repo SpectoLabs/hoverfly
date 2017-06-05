@@ -46,7 +46,7 @@ type ModeArguments struct {
 	MatchingStrategy * string
 }
 
-// ReconstructRequest replaces original request with details provided in Constructor Payload.Request
+// ReconstructRequest replaces original request with details provided in Constructor Payload.RequestMatcher
 func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) {
 	if pair.Request.Destination == "" {
 		return nil, fmt.Errorf("failed to reconstruct request, destination not specified")

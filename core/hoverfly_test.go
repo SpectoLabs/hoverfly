@@ -363,7 +363,7 @@ func Test_Hoverfly_GetResponse_WillCacheMisses(t *testing.T) {
 	}
 
 	_, err := unit.GetResponse(requestDetails)
-	Expect(err.Error()).To(Equal("Could not find recorded request, please record it first!"))
+	Expect(err.Error()).To(Equal("Could not find a match for request, create or record a valid matcher first!"))
 
 	cachedResponse, err := unit.CacheMatcher.GetCachedResponse(&requestDetails)
 	Expect(err).To(BeNil())

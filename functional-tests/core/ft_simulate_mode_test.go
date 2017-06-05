@@ -104,4 +104,69 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 		Expect(err).To(BeNil())
 		Expect(string(body)).To(Equal("first and weakest match"))
 	})
+
+	It("Should log the closest miss", func() {
+
+		hoverfly.ImportSimulation(functional_tests.ClosestMissProofSimulation)
+
+		slingRequest := sling.New().Get("http://destination.com/closest-miss")
+		response := hoverfly.Proxy(slingRequest)
+
+		body, err := ioutil.ReadAll(response.Body)
+		Expect(err).To(BeNil())
+		actual := string(body)
+		expected := `Hoverfly Error!
+
+There was an error when matching
+
+Got error: Could not find a match for request, create or record a valid matcher first!
+
+The following request was made, but was not matched by Hoverfly:
+
+{
+    "Path": "/closest-miss",
+    "Method": "GET",
+    "Destination": "destination.com",
+    "Scheme": "http",
+    "Query": "",
+    "Body": "",
+    "Headers": {
+        "Accept-Encoding": [
+            "gzip"
+        ],
+        "User-Agent": [
+            "Go-http-client/1.1"
+        ]
+    }
+}
+
+The closest miss was the following matcher:
+
+{
+    "path": {
+        "exactMatch": "/closest-miss"
+    },
+    "destination": {
+        "exactMatch": "destination.com"
+    },
+    "body": {
+        "exactMatch": "body"
+    }
+}
+
+But it did not match on the following fields:
+
+[body]
+
+Which if hit would have given the following response:
+
+{
+    "status": 200,
+    "body": "",
+    "encodedBody": false,
+    "headers": null
+}`
+		Expect(actual).To(Equal(
+			expected))
+	})
 })
