@@ -35,6 +35,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	hvc "github.com/SpectoLabs/hoverfly/core/certs"
 	"github.com/SpectoLabs/hoverfly/core/matching"
+	mw "github.com/SpectoLabs/hoverfly/core/middleware"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 )
 
@@ -238,7 +239,7 @@ func main() {
 	cfg.Development = *dev
 
 	// overriding default middleware setting
-	newMiddleware, err := hv.ConvertToNewMiddleware(*middleware)
+	newMiddleware, err := mw.ConvertToNewMiddleware(*middleware)
 	if err != nil {
 		log.Error(err.Error())
 	}

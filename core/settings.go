@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/middleware"
 )
 
 // Configuration - initial structure of configuration
@@ -16,7 +17,7 @@ type Configuration struct {
 	ProxyPort    string
 	Mode         string
 	Destination  string
-	Middleware   Middleware
+	Middleware   middleware.Middleware
 	DatabasePath string
 	Webserver    bool
 
@@ -161,7 +162,7 @@ func InitSettings() *Configuration {
 	}
 
 	// middleware configuration
-	newMiddleware, _ := ConvertToNewMiddleware(os.Getenv(HoverflyMiddlewareEV))
+	newMiddleware, _ := middleware.ConvertToNewMiddleware(os.Getenv(HoverflyMiddlewareEV))
 
 	appConfig.Middleware = *newMiddleware
 

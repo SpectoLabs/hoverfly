@@ -26,41 +26,6 @@ func TestMain(m *testing.M) {
 	os.Exit(retCode)
 }
 
-func TestRequestBodySentToMiddleware(t *testing.T) {
-	RegisterTestingT(t)
-
-	// sends a request with fizz=buzz body, server responds with {'message': 'here'}
-	// then, since it's modify mode - middleware is applied again, this time
-	// middleware takes original request body and replaces response body with it.
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
-
-	dbClient.SetMode("modify")
-
-	requestBody := []byte("fizz=buzz")
-
-	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
-
-	req, err := http.NewRequest("POST", "http://capture_body.com", body)
-	Expect(err).To(BeNil())
-
-	err = dbClient.Cfg.Middleware.SetBinary("python")
-	Expect(err).To(BeNil())
-
-	err = dbClient.Cfg.Middleware.SetScript(pythonReflectBody)
-	Expect(err).To(BeNil())
-
-	resp := dbClient.processRequest(req)
-
-	// body from the request should be in response body, instead of server's response
-	responseBody, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-
-	Expect(err).To(BeNil())
-	Expect(string(responseBody)).To(Equal(string(requestBody)))
-
-}
-
 func TestMatchOnRequestBody(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -120,55 +85,6 @@ func TestGetNotRecordedRequest(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 
 	Expect(response).To(BeNil())
-}
-
-func TestModifyRequest(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
-
-	dbClient.SetMode("modify")
-
-	err := dbClient.Cfg.Middleware.SetBinary("python")
-	Expect(err).To(BeNil())
-
-	err = dbClient.Cfg.Middleware.SetScript(pythonReflectBody)
-	Expect(err).To(BeNil())
-
-	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
-	Expect(err).To(BeNil())
-
-	response := dbClient.processRequest(req)
-
-	// response should be changed to 201
-	Expect(response.StatusCode).To(Equal(http.StatusCreated))
-
-}
-
-func TestModifyRequestWODestination(t *testing.T) {
-	RegisterTestingT(t)
-
-	// tests modify mode but uses different middleware to not supply destination
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
-
-	dbClient.SetMode("modify")
-
-	err := dbClient.Cfg.Middleware.SetBinary("python")
-	Expect(err).To(BeNil())
-
-	err = dbClient.Cfg.Middleware.SetScript(pythonModifyResponse)
-	Expect(err).To(BeNil())
-
-	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
-	Expect(err).To(BeNil())
-
-	response := dbClient.processRequest(req)
-
-	// response should be changed to 201
-	Expect(response.StatusCode).To(Equal(http.StatusCreated))
-
 }
 
 // TODO: Fix by implementing Middleware check in Modify mode

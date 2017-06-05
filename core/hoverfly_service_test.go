@@ -1,6 +1,9 @@
 package hoverfly
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -49,6 +52,19 @@ var (
 		Delay:      201,
 	}
 )
+
+func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
+	body, _ := ioutil.ReadAll(r.Body)
+
+	var newPairView v2.RequestResponsePairViewV1
+
+	json.Unmarshal(body, &newPairView)
+
+	newPairView.Response.Body = "You got straight up messed with"
+
+	pairViewBytes, _ := json.Marshal(newPairView)
+	w.Write(pairViewBytes)
+}
 
 func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.T) {
 	RegisterTestingT(t)

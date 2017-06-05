@@ -16,6 +16,74 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const pythonMiddlewareBasic = "import sys\nprint(sys.stdin.readlines()[0])"
+
+const pythonModifyResponse = "#!/usr/bin/env python\n" +
+	"import sys\n" +
+	"import json\n" +
+
+	"def main():\n" +
+	"	data = sys.stdin.readlines()\n" +
+	"	payload = data[0]\n" +
+
+	"	payload_dict = json.loads(payload)\n" +
+
+	"	payload_dict['response']['status'] = 201\n" +
+	"	payload_dict['response']['body'] = \"body was replaced by middleware\"\n" +
+
+	"	print(json.dumps(payload_dict))\n" +
+
+	"if __name__ == \"__main__\":\n" +
+	"	main()\n"
+
+const rubyModifyResponse = "#!/usr/bin/env ruby\n" +
+	"# encoding: utf-8\n\n" +
+
+	"require 'rubygems'\n" +
+	"require 'json'\n\n" +
+
+	"while payload = STDIN.gets\n" +
+	"  next unless payload\n\n" +
+
+	"  jsonPayload = JSON.parse(payload)\n\n" +
+
+	"  jsonPayload[\"response\"][\"body\"] = \"body was replaced by middleware\\n\"\n\n" +
+
+	"  STDOUT.puts jsonPayload.to_json\n\n" +
+
+	"end"
+
+const pythonReflectBody = "#!/usr/bin/env python\n" +
+	"import sys\n" +
+	"import json\n" +
+
+	"def main():\n" +
+	"	data = sys.stdin.readlines()\n" +
+	"	payload = data[0]\n" +
+
+	"	payload_dict = json.loads(payload)\n" +
+
+	"	payload_dict['response']['status'] = 201\n" +
+	"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
+
+	"	print(json.dumps(payload_dict))\n" +
+
+	"if __name__ == \"__main__\":\n" +
+	"	main()\n"
+
+const pythonMiddlewareBad = "this shouldn't work"
+
+const rubyEcho = "#!/usr/bin/env ruby\n" +
+	"# encoding: utf-8\n" +
+	"while payload = STDIN.gets\n" +
+	"  next unless payload\n" +
+	"\n" +
+	"  STDOUT.puts payload\n" +
+	"\n" +
+	"  STDERR.puts \"Payload data: #{payload}\"\n" +
+	"\n" +
+	"end"
+
 func Test_NewHoverflyWithConfiguration_DoesNotCreateCacheIfCfgIsDisabled(t *testing.T) {
 	RegisterTestingT(t)
 

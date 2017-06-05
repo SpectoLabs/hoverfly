@@ -10,6 +10,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
+	"github.com/SpectoLabs/hoverfly/core/middleware"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -112,7 +113,7 @@ func (hf Hoverfly) GetMiddleware() (string, string, string) {
 }
 
 func (hf *Hoverfly) SetMiddleware(binary, script, remote string) error {
-	newMiddleware := Middleware{}
+	newMiddleware := middleware.Middleware{}
 
 	if binary == "" && script == "" && remote == "" {
 		hf.Cfg.Middleware = newMiddleware
