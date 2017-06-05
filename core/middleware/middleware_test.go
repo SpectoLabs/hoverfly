@@ -1,4 +1,4 @@
-package hoverfly
+package middleware
 
 import (
 	"encoding/json"
@@ -82,6 +82,19 @@ const rubyEcho = "#!/usr/bin/env ruby\n" +
 	"  STDERR.puts \"Payload data: #{payload}\"\n" +
 	"\n" +
 	"end"
+
+func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
+	body, _ := ioutil.ReadAll(r.Body)
+
+	var newPairView v2.RequestResponsePairViewV1
+
+	json.Unmarshal(body, &newPairView)
+
+	newPairView.Response.Body = "You got straight up messed with"
+
+	pairViewBytes, _ := json.Marshal(newPairView)
+	w.Write(pairViewBytes)
+}
 
 func processHandlerOkayButNoResponse(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
@@ -218,19 +231,6 @@ func TestReflectBody(t *testing.T) {
 	Expect(newPair.Response.Body).To(Equal(req.Body))
 	Expect(newPair.Request.Method).To(Equal(req.Method))
 	Expect(newPair.Request.Destination).To(Equal(req.Destination))
-}
-
-func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
-	body, _ := ioutil.ReadAll(r.Body)
-
-	var newPairView v2.RequestResponsePairViewV1
-
-	json.Unmarshal(body, &newPairView)
-
-	newPairView.Response.Body = "You got straight up messed with"
-
-	pairViewBytes, _ := json.Marshal(newPairView)
-	w.Write(pairViewBytes)
 }
 
 func TestExecuteMiddlewareRemotely(t *testing.T) {
