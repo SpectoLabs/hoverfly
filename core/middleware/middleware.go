@@ -1,4 +1,4 @@
-package hoverfly
+package middleware
 
 import (
 	"bytes"
