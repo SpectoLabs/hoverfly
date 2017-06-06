@@ -34,6 +34,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	hvc "github.com/SpectoLabs/hoverfly/core/certs"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	mw "github.com/SpectoLabs/hoverfly/core/middleware"
 	"github.com/SpectoLabs/hoverfly/core/modes"
@@ -181,6 +182,7 @@ func main() {
 	if *dev {
 		// making text pretty
 		log.SetFormatter(&log.TextFormatter{})
+		handlers.EnableCors = true
 	}
 
 	if *generateCA {
