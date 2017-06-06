@@ -1053,7 +1053,8 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 		MissedFields: []string{"body", "path", "method"},
 	}
 
-	Expect(miss.GetMessage()).To(Equal(
+	message := miss.GetMessage()
+	Expect(message).To(Equal(
 		`
 
 The following request was made, but was not matched by Hoverfly:
@@ -1072,7 +1073,7 @@ The following request was made, but was not matched by Hoverfly:
     }
 }
 
-The closest miss was the following matcher:
+The matcher which came closest was:
 
 {
     "path": {
