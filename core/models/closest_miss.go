@@ -22,7 +22,7 @@ func (this *ClosestMiss) GetMessage() string {
 
 	return "\n\nThe following request was made, but was not matched by Hoverfly:\n\n" +
 		string(requestBytes) +
-		"\n\nThe closest miss was the following matcher:\n\n" +
+		"\n\nThe matcher which came closest was:\n\n" +
 		string(matcherBytes) +
 		"\n\nBut it did not match on the following fields:\n\n" +
 		fmt.Sprint("["+strings.Join(this.MissedFields, ", ")+"]") +

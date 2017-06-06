@@ -77,7 +77,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 	It("Should perform a strongest match when set explicitly", func() {
 		hoverfly.SetModeWithArgs("simulate", v2.ModeArgumentsView{
-			MatchingStrategy : util.StringToPointer("STRONGEST"),
+			MatchingStrategy : util.StringToPointer("strongest"),
 		})
 
 		hoverfly.ImportSimulation(functional_tests.StrongestMatchProofSimulation)
@@ -92,7 +92,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 	It("Should perform a strongest match when set explicitly", func() {
 		hoverfly.SetModeWithArgs("simulate", v2.ModeArgumentsView{
-			MatchingStrategy : util.StringToPointer("FIRST"),
+			MatchingStrategy : util.StringToPointer("first"),
 		})
 
 		hoverfly.ImportSimulation(functional_tests.StrongestMatchProofSimulation)
@@ -140,7 +140,7 @@ The following request was made, but was not matched by Hoverfly:
     }
 }
 
-The closest miss was the following matcher:
+The matcher which came closest was:
 
 {
     "path": {
@@ -199,7 +199,7 @@ The following request was made, but was not matched by Hoverfly:
     }
 }
 
-The closest miss was the following matcher:
+The matcher which came closest was:
 
 {
     "path": {
