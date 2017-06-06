@@ -27,7 +27,7 @@ var _ = Describe("hoverfly -dev", func() {
 		res := functional_tests.DoRequest(req)
 		Expect(res.StatusCode).To(Equal(200))
 
-		Expect(res.Header.Get("Access-Control-Allow-Origin")).To(Equal("*"))
+		Expect(res.Header.Get("Access-Control-Allow-Origin")).To(Equal("http://localhost:4200"))
 		Expect(res.Header.Get("Access-Control-Allow-Methods")).To(Equal("GET, PUT, POST, OPTIONS, DELETE"))
 		Expect(res.Header.Get("Access-Control-Allow-Headers")).To(Equal("Origin, X-Requested-With, Content-Type, Accept, Authorization"))
 		Expect(res.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
