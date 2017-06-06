@@ -77,10 +77,10 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 	matchingStrategy := modeView.Arguments.MatchingStrategy
 	if modeView.Mode == modes.Simulate {
 		if matchingStrategy == nil {
-			matchingStrategy = util.StringToPointer("STRONGEST")
+			matchingStrategy = util.StringToPointer("strongest")
 		}
 
-		if strings.ToUpper(*matchingStrategy) != "STRONGEST" && strings.ToUpper(*matchingStrategy) != "FIRST"  {
+		if strings.ToLower(*matchingStrategy) != "strongest" && strings.ToLower(*matchingStrategy) != "first"  {
 			return errors.New("Only matching strategy of 'first' or 'strongest' is permitted")
 		}
 	}

@@ -69,7 +69,7 @@ func NewHoverfly() *Hoverfly {
 	modeMap := make(map[string]modes.Mode)
 
 	modeMap[modes.Capture] = &modes.CaptureMode{Hoverfly: hoverfly}
-	modeMap[modes.Simulate] = &modes.SimulateMode{Hoverfly: hoverfly, MatchingStrategy: "STRONGEST"}
+	modeMap[modes.Simulate] = &modes.SimulateMode{Hoverfly: hoverfly, MatchingStrategy: "strongest"}
 	modeMap[modes.Modify] = &modes.ModifyMode{Hoverfly: hoverfly}
 	modeMap[modes.Synthesize] = &modes.SynthesizeMode{Hoverfly: hoverfly}
 
@@ -261,7 +261,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 	mode := (hf.modeMap[modes.Simulate]).(*modes.SimulateMode)
 
-	strongestMatch := strings.ToUpper(mode.MatchingStrategy) == "STRONGEST"
+	strongestMatch := strings.ToLower(mode.MatchingStrategy) == "strongest"
 
 	if strongestMatch {
 		pair, closestMiss, err = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
