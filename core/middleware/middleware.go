@@ -15,7 +15,6 @@ import (
 	"fmt"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
@@ -193,7 +192,7 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 	}
 
 	if len(stdout.Bytes()) > 0 {
-		var newPairView v2.RequestResponsePairViewV1
+		var newPairView RequestResponsePairView
 
 		err = json.Unmarshal(stdout.Bytes(), &newPairView)
 
@@ -256,7 +255,7 @@ func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair
 		return pair, err
 	}
 
-	var newPairView v2.RequestResponsePairViewV1
+	var newPairView RequestResponsePairView
 
 	err = json.Unmarshal(returnedPairViewBytes, &newPairView)
 	if err != nil {
