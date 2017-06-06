@@ -8,6 +8,7 @@ import (
 type CachedResponse struct {
 	Request      RequestDetails
 	MatchingPair *RequestMatcherResponsePair
+	ClosestMiss  *ClosestMiss
 	HeaderMatch  bool
 }
 

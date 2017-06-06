@@ -500,6 +500,7 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFound(t *testing.T) {
 	Expect(*closestMiss.RequestMatcher.Body.GlobMatch).To(Equal(`bod*`))
 	Expect(*closestMiss.RequestMatcher.Path.ExactMatch).To(Equal(`path`))
 	Expect(closestMiss.Response.Body).To(Equal(`two`))
+	Expect(closestMiss.RequestDetails.Body).To(Equal(`body`))
 }
 
 func Test_ShouldReturnClosestMissIfMatchIsNotFoundAgain(t *testing.T) {
@@ -1007,8 +1008,8 @@ func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
 func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 	RegisterTestingT(t)
 
-	miss := &matching.ClosestMiss{
-		RequestDetails: &models.RequestDetails{
+	miss := &models.ClosestMiss{
+		RequestDetails: models.RequestDetails{
 			Path:        "path",
 			Method:      "method",
 			Destination: "destination",
@@ -1019,14 +1020,14 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 				"miss": {"miss"},
 			},
 		},
-		Response: &v2.ResponseDetailsView{
+		Response: v2.ResponseDetailsView{
 			Body: "hello world",
 			Headers: map[string][]string{
 				"hello": {"world"},
 			},
 			Status: 200,
 		},
-		RequestMatcher: &v2.RequestMatcherViewV2{
+		RequestMatcher: v2.RequestMatcherViewV2{
 			Body: &v2.RequestFieldMatchersView{
 				GlobMatch: StringToPointer("hit"),
 			},

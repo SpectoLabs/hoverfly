@@ -98,7 +98,6 @@ var _ = Describe("When I use hoverfly-cli", func() {
 			It("to simulate mode with an invalid matching strategy", func() {
 				output := functional_tests.Run(hoverctlBinary, "mode", "capture")
 				output = functional_tests.Run(hoverctlBinary, "mode")
-				GinkgoWriter.Write([]byte(output))
 
 				output = functional_tests.Run(hoverctlBinary, "mode", "simulate", "--matching-strategy", "invalid")
 

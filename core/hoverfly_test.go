@@ -11,9 +11,10 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
+	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 func Test_NewHoverflyWithConfiguration_DoesNotCreateCacheIfCfgIsDisabled(t *testing.T) {
@@ -183,7 +184,7 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromCache(t *testing.T) {
 			Status: 200,
 			Body:   "cached response",
 		},
-	})
+	}, nil)
 
 	response, err := unit.GetResponse(models.RequestDetails{
 		Destination: "somehost.com",
@@ -303,7 +304,7 @@ func Test_Hoverfly_GetResponse_WillReturnCachedResponseIfHeaderMatchIsFalse(t *t
 		Response: models.ResponseDetails{
 			Body: "cached response",
 		},
-	})
+	}, nil)
 
 	response, err := unit.GetResponse(requestDetails)
 	Expect(err).To(BeNil())
@@ -331,7 +332,7 @@ func Test_Hoverfly_GetResponse_WillCheckRequestMatchersAndReturnRequestMatcherRe
 		Response: models.ResponseDetails{
 			Body: "cached response",
 		},
-	})
+	}, nil)
 
 	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
@@ -369,7 +370,52 @@ func Test_Hoverfly_GetResponse_WillCacheMisses(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(cachedResponse.MatchingPair).To(BeNil())
+	Expect(cachedResponse.ClosestMiss).To(BeNil())
 }
+
+func Test_Hoverfly_GetResponse_WillCacheClosestMiss(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	unit.PutSimulation(v2.SimulationViewV2{
+		v2.DataViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
+				{
+					RequestMatcher: v2.RequestMatcherViewV2{
+						Method: &v2.RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("closest"),
+						},
+					},
+					Response: v2.ResponseDetailsView{
+						Body:   "closest",
+					},
+				},
+			},
+		},
+		v2.MetaView{
+			SchemaVersion: "v2",
+		},
+	})
+
+	requestDetails := models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+	}
+
+	_, err := unit.GetResponse(requestDetails)
+	Expect(err.Error()).ToNot(BeNil())
+
+	cachedResponse, err := unit.CacheMatcher.GetCachedResponse(&requestDetails)
+	Expect(err).To(BeNil())
+
+	Expect(cachedResponse.MatchingPair).To(BeNil())
+	Expect(*cachedResponse.ClosestMiss.RequestMatcher.Method.ExactMatch).To(Equal("closest"))
+	Expect(cachedResponse.ClosestMiss.Response.Body).To(Equal("closest"))
+	Expect(cachedResponse.ClosestMiss.MissedFields).To(ConsistOf("method"))
+}
+
+
 
 type ResponseDelayListStub struct {
 	gotDelays int

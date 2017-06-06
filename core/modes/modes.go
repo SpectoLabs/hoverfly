@@ -130,5 +130,5 @@ func ReturnErrorAndLog(request *http.Request, err error, pair *models.RequestRes
 func ErrorResponse(req *http.Request, err error, msg string) *http.Response {
 	return goproxy.NewResponse(req,
 		goproxy.ContentTypeText, http.StatusBadGateway,
-		fmt.Sprintf("Hoverfly Error! \n\n%s\n\nGot error: %s", msg, err.Error()))
+		fmt.Sprintf("Hoverfly Error!\n\n%s\n\nGot error: %s", msg, err.Error()))
 }
