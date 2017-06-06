@@ -71,7 +71,6 @@ type AllUsersResponse struct {
 
 func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	if !a.Enabled {
-		w.WriteHeader(http.StatusOK)
 		// returning dummy token
 		token := `{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkR1bW15IHRva2VuIiwiYWRtaW4iOnRydWV9.sKfJparPo3LUmkYoGboBjVfOV3K1qWKUzqx9XFDEsAs"}`
 		WriteResponse(w, []byte(token))
@@ -83,8 +82,11 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	responseStatus, token := authentication.Login(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta)
 
-	WriteResponse(w, token)
-	w.WriteHeader(responseStatus)
+	if responseStatus == http.StatusOK {
+		WriteResponse(w, token)
+	} else {
+		w.WriteHeader(responseStatus)
+	}
 }
 
 func (a *AuthHandler) OptionsLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
