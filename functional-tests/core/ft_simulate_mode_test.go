@@ -105,7 +105,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 		Expect(string(body)).To(Equal("first and weakest match"))
 	})
 
-	It("Should log the closest miss", func() {
+	It("Should respond with the closest miss", func() {
 
 		hoverfly.ImportSimulation(functional_tests.ClosestMissProofSimulation)
 
@@ -114,7 +114,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		body, err := ioutil.ReadAll(response.Body)
 		Expect(err).To(BeNil())
-		actual := string(body)
+
 		expected := `Hoverfly Error!
 
 There was an error when matching
@@ -166,7 +166,6 @@ Which if hit would have given the following response:
     "encodedBody": false,
     "headers": null
 }`
-		Expect(actual).To(Equal(
-			expected))
+		Expect(string(body)).To(Equal(expected))
 	})
 })

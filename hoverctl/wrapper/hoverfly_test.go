@@ -90,7 +90,7 @@ func Test_Stop_SendsCorrectHTTPRequest(t *testing.T) {
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
-				v2.RequestMatcherResponsePairViewV2{
+				{
 					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("DELETE"),
@@ -131,7 +131,7 @@ func Test_Stop_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
-				v2.RequestMatcherResponsePairViewV2{
+				{
 					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("DELETE"),
@@ -165,7 +165,7 @@ func Test_CheckIfRunning_ReturnsNilWhen_HoverflyAccessible(t *testing.T) {
 	hoverfly.PutSimulation(v2.SimulationViewV2{
 		v2.DataViewV2{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
-				v2.RequestMatcherResponsePairViewV2{
+				{
 					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("GET"),

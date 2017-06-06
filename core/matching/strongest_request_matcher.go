@@ -3,14 +3,10 @@ package matching
 import (
 	"errors"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"fmt"
-	"encoding/json"
-	"strings"
 )
 
 
-func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (requestMatch *models.RequestMatcherResponsePair, closestMiss *ClosestMiss, err error) {
+func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (requestMatch *models.RequestMatcherResponsePair, closestMiss *models.ClosestMiss, err error) {
 
 	var closestMissScore int
 	var strongestMatchScore int
@@ -79,10 +75,10 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 		} else if matched == false && requestMatch == nil && matchScore >= closestMissScore {
 			closestMissScore = matchScore
 			view := matchingPair.BuildView()
-			closestMiss = &ClosestMiss{
-				RequestDetails: &req,
-				RequestMatcher: &view.RequestMatcher,
-				Response: &view.Response,
+			closestMiss = &models.ClosestMiss{
+				RequestDetails: req,
+				RequestMatcher: view.RequestMatcher,
+				Response: view.Response,
 				MissedFields: missedFields,
 			}
 		}
@@ -93,27 +89,4 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 	}
 
 	return
-}
-
-type ClosestMiss struct {
-	RequestDetails * models.RequestDetails
-	RequestMatcher * v2.RequestMatcherViewV2
-	Response * v2.ResponseDetailsView
-	MissedFields []string
-}
-
-func (this *ClosestMiss) GetMessage() string {
-
-	requestBytes, _ := json.MarshalIndent(this.RequestDetails, "", "    ")
-	matcherBytes, _ := json.MarshalIndent(this.RequestMatcher, "", "    ")
-	responseBytes, _ := json.MarshalIndent(this.Response, "", "    ")
-
-	return "\n\nThe following request was made, but was not matched by Hoverfly:\n\n" +
-		string(requestBytes) +
-		"\n\nThe closest miss was the following matcher:\n\n" +
-		string(matcherBytes) +
-		"\n\nBut it did not match on the following fields:\n\n" +
-		fmt.Sprint("[" + strings.Join(this.MissedFields, ", ") + "]")  +
-		"\n\nWhich if hit would have given the following response:\n\n" +
-		string(responseBytes)
 }

@@ -93,16 +93,22 @@ func (this CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 		if cachedResponse, err := models.NewCachedResponseFromBytes(v); err == nil {
 
 			var pair *v2.RequestMatcherResponsePairViewV2
+			var closestMiss *v2.ClosestMissView
 
 			if cachedResponse.MatchingPair != nil {
 				pairView := cachedResponse.MatchingPair.BuildView()
 				pair = &pairView
 			}
 
+			if cachedResponse.ClosestMiss != nil {
+				closestMiss = cachedResponse.ClosestMiss.BuildView()
+			}
+
 			cachedResponseView := v2.CachedResponseView{
 				Key:          key,
 				HeaderMatch:  cachedResponse.HeaderMatch,
 				MatchingPair: pair,
+				ClosestMiss: closestMiss,
 			}
 
 			cacheView.Cache = append(cacheView.Cache, cachedResponseView)
@@ -116,7 +122,7 @@ func (this CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 	return cacheView, nil
 }
 
-func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestDetails, pair *models.RequestMatcherResponsePair) error {
+func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestDetails, pair *models.RequestMatcherResponsePair, closestMiss *models.ClosestMiss) error {
 	if this.RequestCache == nil {
 		return errors.New("No cache set")
 	}
@@ -144,6 +150,7 @@ func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestD
 		Request:      request,
 		MatchingPair: pair,
 		HeaderMatch:  headerMatch,
+		ClosestMiss: closestMiss,
 	}
 
 	pairBytes, err := cachedResponse.Encode()
@@ -169,7 +176,7 @@ func (this CacheMatcher) PreloadCache(simulation models.Simulation) error {
 	}
 	for _, pair := range simulation.MatchingPairs {
 		if requestDetails := pair.RequestMatcher.BuildRequestDetailsFromExactMatches(); requestDetails != nil {
-			this.SaveRequestMatcherResponsePair(*requestDetails, &pair)
+			this.SaveRequestMatcherResponsePair(*requestDetails, &pair, nil)
 		}
 	}
 

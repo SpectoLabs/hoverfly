@@ -226,6 +226,12 @@ type RequestMatcherResponsePairViewV2 struct {
 	RequestMatcher RequestMatcherViewV2 `json:"request"`
 }
 
+type ClosestMissView struct {
+	Response       ResponseDetailsView  `json:"response"`
+	RequestMatcher RequestMatcherViewV2 `json:"requestMatcher"`
+	MissedFields   []string `json:"missedFields"`
+}
+
 //Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestMatcherResponsePairViewV2) GetResponse() interfaces.Response { return this.Response }
 
