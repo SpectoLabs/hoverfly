@@ -24,8 +24,8 @@ type ModeView struct {
 }
 
 type ModeArgumentsView struct {
-	Headers []string `json:"headersWhitelist,omitempty"`
-	MatchingStrategy * string `json:"matchingStrategy,omitempty"`
+	Headers          []string `json:"headersWhitelist,omitempty"`
+	MatchingStrategy *string `json:"matchingStrategy,omitempty"`
 }
 
 type VersionView struct {
@@ -57,4 +57,5 @@ type CachedResponseView struct {
 	Key          string                     `json:"key"`
 	MatchingPair *RequestMatcherResponsePairViewV2 `json:"matchingPair,omitempty"`
 	HeaderMatch  bool                       `json:"headerMatch"`
+	ClosestMiss  *ClosestMissView `json:"closestMiss"`
 }

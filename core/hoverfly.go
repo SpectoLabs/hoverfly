@@ -260,7 +260,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 	var pair *models.RequestMatcherResponsePair
 	var err error
-	var closestMiss *matching.ClosestMiss
+	var closestMiss *models.ClosestMiss
 
 	mode := (hf.modeMap[modes.Simulate]).(*modes.SimulateMode)
 
@@ -272,7 +272,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		pair, err = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
 	}
 
-	hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair)
+	hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, closestMiss)
 
 	if err != nil {
 		log.WithFields(log.Fields{

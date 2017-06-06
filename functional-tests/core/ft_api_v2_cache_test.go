@@ -8,6 +8,8 @@ import (
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 var _ = Describe("/api/v2/cache", func() {
@@ -41,7 +43,13 @@ var _ = Describe("/api/v2/cache", func() {
 			Expect(cacheView.Cache[0].MatchingPair.Response.EncodedBody).To(BeFalse())
 		})
 
-		It("should cache failures", func() {
+		It("should cache misses alongside closest miss when strongly matching", func() {
+			hoverfly.SetModeWithArgs("simulate", v2.ModeArgumentsView{
+				MatchingStrategy: util.StringToPointer("strongest"),
+			})
+
+			hoverfly.ImportSimulation(functional_tests.SingleRequestMatcherToResponse)
+
 			hoverfly.Proxy(sling.New().Get("http://unknown-destination.com"))
 			cacheView := hoverfly.GetCache()
 
@@ -49,6 +57,28 @@ var _ = Describe("/api/v2/cache", func() {
 
 			Expect(cacheView.Cache[0].Key).To(Equal("0dd6716f7e5f5f06067de145a2933b2d"))
 			Expect(cacheView.Cache[0].MatchingPair).To(BeNil())
+			Expect(cacheView.Cache[0].ClosestMiss).ToNot(BeNil())
+
+			Expect(*cacheView.Cache[0].ClosestMiss.RequestMatcher.Destination.ExactMatch).To(Equal("miss"))
+			Expect(cacheView.Cache[0].ClosestMiss.MissedFields).To(ConsistOf("destination"))
+			Expect(cacheView.Cache[0].ClosestMiss.Response.Body).To(Equal("body"))
+		})
+
+		It("should cache misses without closest miss when firstly matching", func() {
+			hoverfly.SetModeWithArgs("simulate", v2.ModeArgumentsView{
+				MatchingStrategy: util.StringToPointer("first"),
+			})
+
+			hoverfly.ImportSimulation(functional_tests.SingleRequestMatcherToResponse)
+
+			hoverfly.Proxy(sling.New().Get("http://unknown-destination.com"))
+			cacheView := hoverfly.GetCache()
+
+			Expect(cacheView.Cache).To(HaveLen(1))
+
+			Expect(cacheView.Cache[0].Key).To(Equal("0dd6716f7e5f5f06067de145a2933b2d"))
+			Expect(cacheView.Cache[0].MatchingPair).To(BeNil())
+			Expect(cacheView.Cache[0].ClosestMiss).To(BeNil())
 		})
 
 		It("should get error when cache is disabled", func() {

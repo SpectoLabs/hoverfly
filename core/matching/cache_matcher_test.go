@@ -32,7 +32,7 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillReturnErrorIfCacheIsNi
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{}
 
-	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil)
+	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil, nil)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("No cache set"))
 }
@@ -44,7 +44,7 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_CanSaveNilPairs(t *testing
 		RequestCache: cache.NewInMemoryCache(),
 	}
 
-	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil)
+	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil, nil)
 	Expect(err).To(BeNil())
 
 	cacheValues, err := unit.RequestCache.Get([]byte("d41d8cd98f00b204e9800998ecf8427e"))
@@ -69,7 +69,7 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillSaveWithHeaderMatchFal
 				ExactMatch: util.StringToPointer("test"),
 			},
 		},
-	})
+	}, nil)
 	Expect(err).To(BeNil())
 
 	cacheValues, err := unit.RequestCache.Get([]byte("d41d8cd98f00b204e9800998ecf8427e"))
@@ -93,7 +93,7 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillSaveWithHeaderMatchTru
 				"test": []string{"headers"},
 			},
 		},
-	})
+	}, nil)
 	Expect(err).To(BeNil())
 
 	cacheValues, err := unit.RequestCache.Get([]byte("d41d8cd98f00b204e9800998ecf8427e"))
