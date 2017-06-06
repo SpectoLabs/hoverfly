@@ -25,6 +25,10 @@ func (this *AuthHandler) RegisterRoutes(mux *bone.Mux) {
 
 	mux.Post("/api/token-auth", http.HandlerFunc(this.Login))
 
+	mux.Options("/api/token-auth", negroni.New(
+		negroni.HandlerFunc(this.OptionsLogin),
+	))
+
 	mux.Get("/api/refresh-token-auth", negroni.New(
 		negroni.HandlerFunc(this.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.RefreshToken),
@@ -66,12 +70,11 @@ type AllUsersResponse struct {
 }
 
 func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	if !a.Enabled {
 		w.WriteHeader(http.StatusOK)
 		// returning dummy token
 		token := `{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkR1bW15IHRva2VuIiwiYWRtaW4iOnRydWV9.sKfJparPo3LUmkYoGboBjVfOV3K1qWKUzqx9XFDEsAs"}`
-		w.Write([]byte(token))
+		WriteResponse(w, []byte(token))
 		return
 	}
 	requestUser := new(backends.User)
@@ -80,22 +83,24 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	responseStatus, token := authentication.Login(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta)
 
+	WriteResponse(w, token)
 	w.WriteHeader(responseStatus)
-	w.Write(token)
+}
+
+func (a *AuthHandler) OptionsLogin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	w.Header().Add("Allow", "OPTIONS, POST")
+	WriteResponse(w, []byte(""))
 }
 
 func (a *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	w.Header().Set("Content-Type", "application/json")
-
 	requestUser := new(backends.User)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
 
-	w.Write(authentication.RefreshToken(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta))
+	WriteResponse(w, authentication.RefreshToken(requestUser, a.AB, a.SecretKey, a.JWTExpirationDelta))
 }
 
 func (a *AuthHandler) Logout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	w.Header().Set("Content-Type", "application/json")
 	if !a.Enabled {
 		w.WriteHeader(http.StatusOK)
 		return
@@ -107,6 +112,8 @@ func (a *AuthHandler) Logout(w http.ResponseWriter, r *http.Request, next http.H
 	} else {
 		w.WriteHeader(http.StatusOK)
 	}
+
+	WriteResponse(w, []byte(""))
 }
 
 // GetAllUsersHandler - returns a list of all users
@@ -125,7 +132,7 @@ func (a *AuthHandler) GetAllUsersHandler(w http.ResponseWriter, r *http.Request,
 			log.Error(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
-			w.Write(b)
+			WriteResponse(w, b)
 			return
 		}
 	} else {
