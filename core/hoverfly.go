@@ -250,10 +250,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 	cachedResponse, cacheErr := hf.CacheMatcher.GetCachedResponse(&requestDetails)
 	if cacheErr == nil && cachedResponse.MatchingPair == nil {
-		return nil, &matching.MatchingError{
-			StatusCode:  412,
-			Description: "Could not find recorded request, please record it first!",
-		}
+		return nil, matching.MissedError(cachedResponse.ClosestMiss)
 	} else if cacheErr == nil && !cachedResponse.HeaderMatch {
 		return &cachedResponse.MatchingPair.Response, nil
 	}
