@@ -15,6 +15,7 @@ Hoverfly's functionality is quite broad. You are encouraged to take the time to 
    destinationfiltering
    middleware
    hoverctl
+   troubleshooting
 
 .. raw:: html
 
