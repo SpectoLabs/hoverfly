@@ -76,8 +76,9 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 				"Error": err.Error(),
 			}).Error("Failed to load statikFS, admin UI might not work :(")
 		}
-		mux.Handle("/js/*", http.FileServer(statikFS))
-		mux.Handle("/app.32dc9945fd902da8ed2cccdc8703129f.css", http.FileServer(statikFS))
+		mux.Handle("/*.js", http.FileServer(statikFS))
+		mux.Handle("/*.css", http.FileServer(statikFS))
+		mux.Handle("/*.ico", http.FileServer(statikFS))
 		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			file, err := statikFS.Open("/index.html")
 			if err != nil {
