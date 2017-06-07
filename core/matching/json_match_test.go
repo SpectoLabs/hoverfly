@@ -51,3 +51,31 @@ func Test_JsonMatch_MatchesFalseWithInvalidJSON(t *testing.T) {
 		}
 	}`)).To(BeFalse())
 }
+
+func Test_JsonMatch_MatchesTrueWithTwoEmptyString(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.JsonMatch(``, ``)).To(BeTrue())
+}
+
+func Test_JsonMatch_MatchesFalseAgainstEmptyString(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.JsonMatch(`{
+		"test": {
+			"json": true,
+			"minified": 
+		}
+	}`, ``)).To(BeFalse())
+}
+
+func Test_JsonMatch_MatchesFalseWithEmptyString(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.JsonMatch(``, `{
+		"test": {
+			"json": true,
+			"minified": 
+		}
+	}`)).To(BeFalse())
+}
