@@ -1,8 +1,0 @@
-/node_modules
-.DS_STORE
-*.log
-
-node_modules
-
-dist
-coverage
