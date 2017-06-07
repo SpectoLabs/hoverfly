@@ -88,7 +88,9 @@ func logsToPlainText(logs []*logrus.Entry) string {
 	var buffer bytes.Buffer
 	for _, entry := range logs {
 		entry.Logger = logrus.New()
-		entry.Logger.Formatter = &logrus.TextFormatter{}
+		entry.Logger.Formatter = &logrus.TextFormatter{
+			ForceColors: true,
+		}
 
 		log, err := entry.String()
 		if err == nil {

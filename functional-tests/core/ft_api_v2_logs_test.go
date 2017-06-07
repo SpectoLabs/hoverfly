@@ -91,10 +91,10 @@ var _ = Describe("/api/v2/logs", func() {
 			responseBody, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 
-			Expect(responseBody).To(ContainSubstring(`msg="Proxy prepared..."`))
-			Expect(responseBody).To(ContainSubstring(`Destination=.`))
-			Expect(responseBody).To(ContainSubstring(`Mode=simulate`))
-			Expect(responseBody).To(ContainSubstring(`ProxyPort=` + hoverfly.GetProxyPort()))
+			Expect(responseBody).To(ContainSubstring("Proxy prepared..."))
+			Expect(responseBody).To(ContainSubstring("=."))
+			Expect(responseBody).To(ContainSubstring("=simulate"))
+			Expect(responseBody).To(ContainSubstring("=" + hoverfly.GetProxyPort()))
 		})
 
 		It("should limit the logs it returns", func() {
@@ -104,8 +104,8 @@ var _ = Describe("/api/v2/logs", func() {
 			responseBody, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 
-			Expect(responseBody).To(ContainSubstring(`msg="started handling request"`))
-			Expect(responseBody).To(ContainSubstring(`request="/api/v2/logs?limit=1"`))
+			Expect(responseBody).To(ContainSubstring("started handling request"))
+			Expect(responseBody).To(ContainSubstring("=/api/v2/logs?limit=1"))
 		})
 	})
 
@@ -118,10 +118,10 @@ var _ = Describe("/api/v2/logs", func() {
 			responseBody, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 
-			Expect(responseBody).To(ContainSubstring(`msg="Proxy prepared..."`))
-			Expect(responseBody).To(ContainSubstring(`Destination=.`))
-			Expect(responseBody).To(ContainSubstring(`Mode=simulate`))
-			Expect(responseBody).To(ContainSubstring(`ProxyPort=` + hoverfly.GetProxyPort()))
+			Expect(responseBody).To(ContainSubstring("Proxy prepared..."))
+			Expect(responseBody).To(ContainSubstring("=."))
+			Expect(responseBody).To(ContainSubstring("=simulate"))
+			Expect(responseBody).To(ContainSubstring("=" + hoverfly.GetProxyPort()))
 		})
 
 		It("should limit the logs it returns", func() {
@@ -131,8 +131,8 @@ var _ = Describe("/api/v2/logs", func() {
 			responseBody, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 
-			Expect(responseBody).To(ContainSubstring(`msg="started handling request"`))
-			Expect(responseBody).To(ContainSubstring(`request="/api/v2/logs?limit=1"`))
+			Expect(responseBody).To(ContainSubstring("started handling request"))
+			Expect(responseBody).To(ContainSubstring("=/api/v2/logs?limit=1"))
 		})
 	})
 })
