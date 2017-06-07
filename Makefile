@@ -34,11 +34,12 @@ build:
 	go build -ldflags "-X main.hoverctlVersion=$(GIT_TAG_NAME)" -o ../target/hoverctl
 
 build-ui:
-	cd core/static/admin && \
-	npm run compile && \
-	npm run deploy
+	wget https://github.com/SpectoLabs/hoverfly-ui/releases/download/$(GiT_TAG_NAME)/$(GIT_TAG_NAME).zip
+	unzip $(GIT_TAG_NAME).zip -d hoverfly-ui	
 	cd core && \
-	statik -src=./static/admin/dist
+	statik -src=../hoverfly-ui
+	rm -rf $(GIT_TAG_NAME).zip
+	rm -rf hoverfly-ui
 
 fmt:
 	go fmt $$(go list ./... | grep -v -E 'vendor')
