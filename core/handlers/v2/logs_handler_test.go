@@ -18,7 +18,11 @@ type HoverflyLogsStub struct {
 func (this *HoverflyLogsStub) GetLogs(limit int) []*logrus.Entry {
 	this.limit = limit
 	return []*logrus.Entry{&logrus.Entry{
+		Level:   logrus.InfoLevel,
 		Message: "a line of logs",
+		Data: map[string]interface{}{
+			"custom-field": "field value",
+		},
 	}}
 }
 
@@ -85,7 +89,11 @@ func Test_LogsHandler_Get_ReturnsLogsInPlaintext_UsingAcceptHeader(t *testing.T)
 
 	logs, _ := ioutil.ReadAll(response.Body)
 
-	Expect(string(logs)).To(ContainSubstring("time=\"0001-01-01T00:00:00Z\" level=panic msg=\"a line of logs\""))
+	Expect(string(logs)).To(ContainSubstring("INFO"))
+	Expect(string(logs)).To(ContainSubstring("a line of logs"))
+
+	Expect(string(logs)).To(ContainSubstring("custom-field"))
+	Expect(string(logs)).To(ContainSubstring("field value"))
 }
 
 func Test_LogsHandler_Get_ReturnsLogsInPlaintext_UsingContentTypeHeader(t *testing.T) {
@@ -104,7 +112,11 @@ func Test_LogsHandler_Get_ReturnsLogsInPlaintext_UsingContentTypeHeader(t *testi
 
 	logs, _ := ioutil.ReadAll(response.Body)
 
-	Expect(string(logs)).To(ContainSubstring("time=\"0001-01-01T00:00:00Z\" level=panic msg=\"a line of logs\""))
+	Expect(string(logs)).To(ContainSubstring("INFO"))
+	Expect(string(logs)).To(ContainSubstring("a line of logs"))
+
+	Expect(string(logs)).To(ContainSubstring("custom-field"))
+	Expect(string(logs)).To(ContainSubstring("field value"))
 }
 
 func Test_LogsHandler_Get_SetsTheDefaultLimitIfNoneIsSpecified_InPlaintext(t *testing.T) {
