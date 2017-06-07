@@ -43,7 +43,7 @@ Alternatively, applications themselves can usually be configured to use a proxy.
       - `Firefox Proxy Settings <https://support.mozilla.org/en-US/kb/advanced-panel-settings-in-firefox#w_connection>`_
 
 The difference between a proxy server and a webserver
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A proxy server is a type of webserver. The main difference is that when a webserver recieves a request from a client, it is expected to respond with whatever the intended response is (an HTML page, for example). The data it responds with is generally expected to reside on that server, or within the same network.
 
