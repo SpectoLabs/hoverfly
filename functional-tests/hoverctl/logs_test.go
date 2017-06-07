@@ -57,7 +57,10 @@ var _ = Describe("When I use hoverctl", func() {
 
 			output := functional_tests.Run(hoverctlBinary, "logs", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
 
-			Expect(output).To(ContainSubstring("level=info msg=\"Proxy prepared...\" Destination=. Mode=simulate ProxyPort=" + proxyPort))
+			Expect(output).To(ContainSubstring("Proxy prepared..."))
+			Expect(output).To(ContainSubstring("=."))
+			Expect(output).To(ContainSubstring("=simulate"))
+			Expect(output).To(ContainSubstring("=" + proxyPort))
 		})
 
 		It("should return an error if the logs don't exist", func() {
