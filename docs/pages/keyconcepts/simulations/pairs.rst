@@ -8,6 +8,8 @@ Hoverfly simulates APIs by matching **incoming requests** from the client to **s
 
 The matching logic that Hoverfly uses to compare incoming requests with stored requests can be configured using **Request Matchers**. 
 
+.. _matchers:
+
 Request Matchers
 ----------------
 
