@@ -13,7 +13,7 @@ var testResponse = models.ResponseDetails{
 	Body: "request matched",
 }
 
-func Test_RequestMatcher_EmptyRequestMatchersShouldMatchOnAnyRequest(t *testing.T) {
+func Test_FirstMatchRequestMatcher_EmptyRequestMatchersShouldMatchOnAnyRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -27,15 +27,15 @@ func Test_RequestMatcher_EmptyRequestMatchersShouldMatchOnAnyRequest(t *testing.
 		Method:      "GET",
 		Destination: "somehost.com",
 		Headers: map[string][]string{
-			"sdv": []string{"ascd"},
+			"sdv": {"ascd"},
 		},
 	}
-	result, _ := matching.RequestMatcher(r, false, simulation)
+	result, _ := matching.FirstMatchRequestMatcher(r, false, simulation)
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
 
-func Test_RequestMatcher_RequestMatchersShouldMatchOnBody(t *testing.T) {
+func Test_FirstMatchRequestMatcher_RequestMatchersShouldMatchOnBody(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -52,13 +52,13 @@ func Test_RequestMatcher_RequestMatchersShouldMatchOnBody(t *testing.T) {
 	r := models.RequestDetails{
 		Body: "body",
 	}
-	result, err := matching.RequestMatcher(r, false, simulation)
+	result, err := matching.FirstMatchRequestMatcher(r, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
 
-func Test_RequestMatcher_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
+func Test_FirstMatchRequestMatcher_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -84,12 +84,12 @@ func Test_RequestMatcher_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		},
 	}
 
-	result, _ := matching.RequestMatcher(r, false, simulation)
+	result, _ := matching.FirstMatchRequestMatcher(r, false, simulation)
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
 
-func Test_RequestMatcher_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
+func Test_FirstMatchRequestMatcher_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -114,12 +114,12 @@ func Test_RequestMatcher_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T)
 		},
 	}
 
-	result, _ := matching.RequestMatcher(r, false, simulation)
+	result, _ := matching.FirstMatchRequestMatcher(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
 
-func Test_RequestMatcher_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
+func Test_FirstMatchRequestMatcher_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -144,12 +144,12 @@ func Test_RequestMatcher_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 			"header2": []string{"different"},
 		},
 	}
-	result, _ := matching.RequestMatcher(r, false, simulation)
+	result, _ := matching.FirstMatchRequestMatcher(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
 
-func Test_RequestMatcher_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
+func Test_FirstMatchRequestMatcher_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -175,12 +175,12 @@ func Test_RequestMatcher_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) 
 			"header2": []string{"val2"},
 		},
 	}
-	result, _ := matching.RequestMatcher(r, false, simulation)
+	result, _ := matching.FirstMatchRequestMatcher(r, false, simulation)
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
 
-func Test_RequestMatcher_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
+func Test_FirstMatchRequestMatcher_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -206,12 +206,12 @@ func Test_RequestMatcher_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) 
 		},
 	}
 
-	result, _ := matching.RequestMatcher(r, false, simulation)
+	result, _ := matching.FirstMatchRequestMatcher(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
 
-func Test_RequestMatcher_EndpointMatchWithHeaders(t *testing.T) {
+func Test_FirstMatchRequestMatcher_EndpointMatchWithHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -255,12 +255,12 @@ func Test_RequestMatcher_EndpointMatchWithHeaders(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result, _ := matching.RequestMatcher(r, false, simulation)
+	result, _ := matching.FirstMatchRequestMatcher(r, false, simulation)
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
 
-func Test_RequestMatcher_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
+func Test_FirstMatchRequestMatcher_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 	RegisterTestingT(t)
 
 	headers := map[string][]string{
@@ -305,12 +305,12 @@ func Test_RequestMatcher_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 		},
 	}
 
-	result, _ := matching.RequestMatcher(r, false, simulation)
+	result, _ := matching.FirstMatchRequestMatcher(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
 
-func Test_RequestMatcher_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
+func Test_FirstMatchRequestMatcher_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 	RegisterTestingT(t)
 
 	destination := "testhost.com"
@@ -342,7 +342,7 @@ func Test_RequestMatcher_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 		Destination: "testhost.com",
 		Query:       "q=test",
 	}
-	result, _ := matching.RequestMatcher(r, false, simulation)
+	result, _ := matching.FirstMatchRequestMatcher(r, false, simulation)
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 
@@ -353,12 +353,12 @@ func Test_RequestMatcher_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
 		Query:       "q=test",
 	}
 
-	result, _ = matching.RequestMatcher(r, false, simulation)
+	result, _ = matching.FirstMatchRequestMatcher(r, false, simulation)
 
 	Expect(result).To(BeNil())
 }
 
-func Test_RequestMatcher_RequestMatcherResponsePairCanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
+func Test_FirstMatchRequestMatcher_RequestMatcherResponsePairCanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
 	RegisterTestingT(t)
 
 	method := "POST"
@@ -383,7 +383,7 @@ func Test_RequestMatcher_RequestMatcherResponsePairCanBeConvertedToARequestRespo
 	Expect(pairView.Response.Body).To(Equal("request matched"))
 }
 
-func Test_RequestMatcher_RequestMatchersCanUseGlobsAndBeMatched(t *testing.T) {
+func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -403,13 +403,13 @@ func Test_RequestMatcher_RequestMatchersCanUseGlobsAndBeMatched(t *testing.T) {
 		Path:        "/api/1",
 	}
 
-	response, err := matching.RequestMatcher(request, false, simulation)
+	response, err := matching.FirstMatchRequestMatcher(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Response.Body).To(Equal("request matched"))
 }
 
-func Test_RequestMatcher_RequestMatchersCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
+func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -430,13 +430,13 @@ func Test_RequestMatcher_RequestMatchersCanUseGlobsOnSchemeAndBeMatched(t *testi
 		Path:        "/api/1",
 	}
 
-	response, err := matching.RequestMatcher(request, false, simulation)
+	response, err := matching.FirstMatchRequestMatcher(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Response.Body).To(Equal("request matched"))
 }
 
-func Test_RequestMatcher_RequestMatchersCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
+func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -459,13 +459,13 @@ func Test_RequestMatcher_RequestMatchersCanUseGlobsOnHeadersAndBeMatched(t *test
 		},
 	}
 
-	response, err := matching.RequestMatcher(request, false, simulation)
+	response, err := matching.FirstMatchRequestMatcher(request, false, simulation)
 	Expect(err).To(BeNil())
 
 	Expect(response.Response.Body).To(Equal("request matched"))
 }
 
-func Test_RequestMatcher_RequestMatcherResponsePair_ConvertToRequestResponsePairView_CanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
+func Test_FirstMatchRequestMatcher_RequestMatcherResponsePair_ConvertToRequestResponsePairView_CanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
 	RegisterTestingT(t)
 
 	method := "POST"

@@ -68,7 +68,7 @@ func NewHoverfly() *Hoverfly {
 	modeMap := make(map[string]modes.Mode)
 
 	modeMap[modes.Capture] = &modes.CaptureMode{Hoverfly: hoverfly}
-	modeMap[modes.Simulate] = &modes.SimulateMode{Hoverfly: hoverfly}
+	modeMap[modes.Simulate] = &modes.SimulateMode{Hoverfly: hoverfly, MatchingStrategy: "STRONGEST"}
 	modeMap[modes.Modify] = &modes.ModifyMode{Hoverfly: hoverfly}
 	modeMap[modes.Synthesize] = &modes.SynthesizeMode{Hoverfly: hoverfly}
 
@@ -245,7 +245,7 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 }
 
 // GetResponse returns stored response from cache
-func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
+func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails, strongestMatch bool) (*models.ResponseDetails, *matching.MatchingError) {
 
 	cachedResponse, cacheErr := hf.CacheMatcher.GetCachedResponse(&requestDetails)
 	if cacheErr == nil && cachedResponse.MatchingPair == nil {
@@ -257,7 +257,15 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		return &cachedResponse.MatchingPair.Response, nil
 	}
 
-	pair, err := matching.RequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
+	var pair *models.RequestMatcherResponsePair
+	var err error
+
+	if strongestMatch {
+		pair, _, err = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
+	} else {
+		pair, err = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
+	}
+
 	hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair)
 
 	if err != nil {

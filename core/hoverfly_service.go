@@ -12,6 +12,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
+	"github.com/SpectoLabs/hoverfly/core/util"
+	"strings"
 )
 
 func (this Hoverfly) GetDestination() string {
@@ -33,8 +35,8 @@ func (hf *Hoverfly) SetDestination(destination string) (err error) {
 	return
 }
 
-func (this Hoverfly) GetMode() string {
-	return this.Cfg.Mode
+func (this Hoverfly) GetMode() v2.ModeView {
+	return this.modeMap[this.Cfg.Mode].View()
 }
 
 func (this *Hoverfly) SetMode(mode string) error {
@@ -72,6 +74,17 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 		}
 	}
 
+	matchingStrategy := modeView.Arguments.MatchingStrategy
+	if modeView.Mode == modes.Simulate {
+		if matchingStrategy == nil {
+			matchingStrategy = util.StringToPointer("STRONGEST")
+		}
+
+		if strings.ToUpper(*matchingStrategy) != "STRONGEST" && strings.ToUpper(*matchingStrategy) != "FIRST"  {
+			return errors.New("Only matching strategy of 'first' or 'strongest' is permitted")
+		}
+	}
+
 	this.Cfg.SetMode(modeView.Mode)
 	if this.Cfg.GetMode() == "capture" {
 		this.CacheMatcher.FlushCache()
@@ -80,7 +93,8 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 	}
 
 	modeArguments := modes.ModeArguments{
-		Headers: modeView.Arguments.Headers,
+		Headers:          modeView.Arguments.Headers,
+		MatchingStrategy: matchingStrategy,
 	}
 
 	this.modeMap[this.Cfg.GetMode()].SetArguments(modeArguments)

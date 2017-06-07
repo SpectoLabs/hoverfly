@@ -9,14 +9,15 @@ import (
 	"testing"
 
 	. "github.com/onsi/gomega"
+	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 type HoverflyModeStub struct {
 	ModeView ModeView
 }
 
-func (this HoverflyModeStub) GetMode() string {
-	return this.ModeView.Mode
+func (this HoverflyModeStub) GetMode() ModeView {
+	return this.ModeView
 }
 
 func (this *HoverflyModeStub) SetModeWithArguments(modeView ModeView) error {
@@ -84,9 +85,12 @@ func TestPutSetsTheArguments(t *testing.T) {
 
 	unit := HoverflyModeHandler{Hoverfly: stubHoverfly}
 
-	modeView := &ModeView{Arguments: ModeArgumentsView{
-		Headers: []string{"argument"},
-	}}
+	modeView := &ModeView{
+		Mode: "mode",
+		Arguments: ModeArgumentsView{
+			Headers:          []string{"argument"},
+			MatchingStrategy: util.StringToPointer("strategy"),
+		}}
 
 	bodyBytes, err := json.Marshal(modeView)
 	Expect(err).To(BeNil())
@@ -100,7 +104,9 @@ func TestPutSetsTheArguments(t *testing.T) {
 	_, err = unmarshalModeView(response.Body)
 	Expect(err).To(BeNil())
 
+	Expect(*stubHoverfly.ModeView.Arguments.MatchingStrategy).To(Equal("strategy"))
 	Expect(stubHoverfly.ModeView.Arguments.Headers).To(ContainElement("argument"))
+	Expect(stubHoverfly.ModeView.Mode).To(Equal("mode"))
 }
 
 func TestPutResetsTheArgumentsWhenNotSet(t *testing.T) {

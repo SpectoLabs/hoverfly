@@ -25,6 +25,7 @@ type ModeView struct {
 
 type ModeArgumentsView struct {
 	Headers []string `json:"headersWhitelist,omitempty"`
+	MatchingStrategy * string `json:"matchingStrategy,omitempty"`
 }
 
 type VersionView struct {

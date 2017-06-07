@@ -7,10 +7,12 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 )
 
 var specficHeaders string
 var allHeaders bool
+var matchingStrategy string
 
 var modeCmd = &cobra.Command{
 	Use:   "mode [capture|simulate|modify|synthesize (optional)]",
@@ -30,36 +32,50 @@ mode is shown.
 			mode, err := wrapper.GetMode(*target)
 			handleIfError(err)
 
-			fmt.Println("Hoverfly is currently set to", mode, "mode")
+			var extraInformation string
+
+			if mode.Mode == modes.Simulate {
+				extraInformation = fmt.Sprintf("with a matching strategy of '%s'", *mode.Arguments.MatchingStrategy)
+			}
+
+			fmt.Println("Hoverfly is currently set to", mode.Mode, "mode", extraInformation)
+
 		} else {
 			modeView := v2.ModeView{
 				Mode: args[0],
 			}
 
-			var headersMessage string
-			if allHeaders {
-				modeView.Arguments.Headers = append(modeView.Arguments.Headers, "*")
+			var extraInformation string
 
-				headersMessage = "and will capture all request headers"
+			//TODO: For @benji, convert this whole thing to a switch case for each mode, only allowing the correct functionality for each one
+			if modeView.Mode == modes.Simulate && len(matchingStrategy) > 0 {
+				extraInformation = fmt.Sprintf("with a matching strategy of '%s'", matchingStrategy)
+				modeView.Arguments.MatchingStrategy = &matchingStrategy
+			} else if allHeaders {
+				modeView.Arguments.Headers = append(modeView.Arguments.Headers, "*")
+				extraInformation = "and will capture all request headers"
 			} else if len(specficHeaders) > 0 {
 				splitHeaders := strings.Split(specficHeaders, ",")
 				modeView.Arguments.Headers = append(modeView.Arguments.Headers, splitHeaders...)
 
-				headersMessage = fmt.Sprintln("and will capture the following request headers:", splitHeaders)
+				extraInformation = fmt.Sprintln("and will capture the following request headers:", splitHeaders)
 			}
 
 			mode, err := wrapper.SetModeWithArguments(*target, modeView)
 			handleIfError(err)
 
-			fmt.Println("Hoverfly has been set to", mode, "mode", headersMessage)
+			fmt.Println("Hoverfly has been set to", mode, "mode", extraInformation)
 		}
 	},
 }
 
 func init() {
+
 	RootCmd.AddCommand(modeCmd)
 	modeCmd.PersistentFlags().StringVar(&specficHeaders, "headers", "",
 		"A comma separated list of headers to record in capture mode `Content-Type,Authorization`")
 	modeCmd.PersistentFlags().BoolVar(&allHeaders, "all-headers", false,
 		"Record all headers in capture mode")
+	modeCmd.PersistentFlags().StringVar(&matchingStrategy, "matching-strategy", "strongest",
+		"Sets the matching strategy - 'strongest | first'")
 }
