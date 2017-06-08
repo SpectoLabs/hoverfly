@@ -56,13 +56,11 @@ func (a *AuthHandler) RequireTokenAuthentication(w http.ResponseWriter, req *htt
 		if len(authorizationValue) > 6 && strings.ToUpper(authorizationValue[0:7]) == "BEARER " {
 			if authentication.IsJwtTokenValid(authorizationValue[7:], a.AB, a.SecretKey, a.JWTExpirationDelta) {
 				next(w, req)
-			} else {
-				w.WriteHeader(http.StatusUnauthorized)
 			}
 		}
 	}
 
-	w.WriteHeader(http.StatusUnauthorized)
+	WriteErrorResponse(w, "", http.StatusUnauthorized)
 }
 
 type AllUsersResponse struct {
@@ -85,7 +83,7 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	if responseStatus == http.StatusOK {
 		WriteResponse(w, token)
 	} else {
-		w.WriteHeader(responseStatus)
+		WriteErrorResponse(w, "", responseStatus)
 	}
 }
 
