@@ -6,7 +6,7 @@ import (
 )
 
 func JsonMatch(matchingString string, toMatch string) bool {
-	if matchingString == "" && toMatch == "" {
+	if matchingString == toMatch {
 		return true
 	}
 	var matchingObject map[string]interface{}
