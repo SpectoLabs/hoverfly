@@ -37,26 +37,36 @@ func ReadFromRequest(request *http.Request, v interface{}) error {
 
 func WriteResponse(response http.ResponseWriter, bytes []byte) {
 	response.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	writeCorsHeadersIfEnabled(response)
 
+	response.Write(bytes)
+}
+
+func WriteErrorResponse(response http.ResponseWriter, message string, code int) {
+	writeCorsHeadersIfEnabled(response)
+
+	var errorBytes []byte
+	response.WriteHeader(code)
+	if message != "" {
+		errorView := &ErrorView{Error: message}
+
+		var err error
+		errorBytes, err = json.Marshal(errorView)
+		if err != nil {
+			response.WriteHeader(500)
+			return
+		}
+		WriteResponse(response, errorBytes)
+	}
+}
+
+func writeCorsHeadersIfEnabled(response http.ResponseWriter) {
 	if EnableCors {
 		response.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
 		response.Header().Set("Access-Control-Allow-Methods", "GET, PUT, POST, OPTIONS, DELETE")
 		response.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
 		response.Header().Set("Access-Control-Allow-Credentials", "true")
 	}
-
-	response.Write(bytes)
-}
-
-func WriteErrorResponse(response http.ResponseWriter, message string, code int) {
-	errorView := &ErrorView{Error: message}
-	errorBytes, err := json.Marshal(errorView)
-	if err != nil {
-		response.WriteHeader(500)
-		return
-	}
-	response.WriteHeader(code)
-	WriteResponse(response, errorBytes)
 }
 
 type WebSocketHandler func() ([]byte, error)
