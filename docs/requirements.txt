@@ -12,7 +12,7 @@ pytz==2016.10
 requests==2.12.4
 six==1.10.0
 snowballstemmer==1.2.1
-Sphinx==1.5.1
+Sphinx==1.5.5
 sphinx-rtd-theme==0.1.9
 sphinx-serve==1.0.1
 sphinxcontrib-mermaid==0.1.1
