@@ -24,6 +24,9 @@ By default, Hoverfly will set the type of match to :code:`exactMatch` for each f
     There are many types of Request Matcher. Please refer to :ref:`request_matchers` for a list of the types available, and
     examples of how to use them.
 
+    There alse are two different matching strategies: **strongest match** (default) and **first match** (legacy). Please refer to
+    :ref:`matching` for more information. 
+
     
 An example Request Matcher Set might look like this:
 
@@ -55,7 +58,7 @@ In the Hoverfly simulation JSON file, this Request Matcher Set would be represen
 
 :ref:`View entire simulation file <basic_simulation>`
 
-The matching strategy that Hoverfly uses to compare an incoming request to a stored request can be changed by editing the Request Matchers in the simulation
+The matching logic that Hoverfly uses to compare an incoming request to a stored request can be changed by editing the Request Matchers in the simulation
 JSON file. 
 
 It is not necessary to have a Request Matcher for every request field. By omitting Request Matchers, it is possible to implement **partial matching** - meaning
@@ -105,6 +108,9 @@ incoming requests to :code:`docs.hoverfly.io` and :code:`dogs.hoverfly.io` will 
     examples of how to use them.
 
     For a practical example of how to use a Request Matcher, please refer to :ref:`loosematching` in the tutorials section.
+
+    There alse are two different matching strategies: **strongest match** (default) and **first match** (legacy). Please refer to
+    :ref:`matching` for more information. 
 
 
 Responses
