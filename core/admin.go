@@ -57,41 +57,36 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 		handler.RegisterRoutes(mux, authHandler)
 	}
 
-	if d.Cfg.Development {
-		// since hoverfly is not started from cmd/hoverfly/hoverfly
-		// we have to target to that directory
-		log.Warn("Hoverfly is serving files from /static/admin/dist instead of statik binary!")
-		mux.Handle("/js/*", http.StripPrefix("/js/", http.FileServer(http.Dir("../../static/admin/dist/js"))))
+	// preparing static assets for embedded admin
+	statikFS, err := fs.New()
 
-		mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
-			http.ServeFile(w, r, "../../static/admin/dist/index.html")
-		})
-
-	} else {
-		// preparing static assets for embedded admin
-		statikFS, err := fs.New()
-
-		if err != nil {
-			log.WithFields(log.Fields{
-				"Error": err.Error(),
-			}).Error("Failed to load statikFS, admin UI might not work :(")
-		}
-		mux.Handle("/*.js", http.FileServer(statikFS))
-		mux.Handle("/*.css", http.FileServer(statikFS))
-		mux.Handle("/*.ico", http.FileServer(statikFS))
-		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			file, err := statikFS.Open("/index.html")
-			if err != nil {
-				w.WriteHeader(500)
-				log.WithFields(log.Fields{
-					"error": err,
-				}).Error("got error while opening index file")
-				return
-			}
-			io.Copy(w, file)
-			w.WriteHeader(200)
-		})
+	if err != nil {
+		log.WithFields(log.Fields{
+			"Error": err.Error(),
+		}).Error("Failed to load statikFS, admin UI might not work :(")
 	}
+
+	indexHandler := func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("index.html")
+		file, err := statikFS.Open("/index.html")
+		if err != nil {
+			w.WriteHeader(500)
+			log.WithFields(log.Fields{
+				"error": err,
+			}).Error("got error while opening index file")
+			return
+		}
+		io.Copy(w, file)
+		w.WriteHeader(200)
+	}
+
+	mux.HandleFunc("/dashboard", indexHandler)
+	mux.HandleFunc("/login", indexHandler)
+	mux.Handle("/", http.FileServer(statikFS))
+	mux.Handle("/*.js", http.FileServer(statikFS))
+	mux.Handle("/*.css", http.FileServer(statikFS))
+	mux.Handle("/*.ico", http.FileServer(statikFS))
+
 	return mux
 }
 
