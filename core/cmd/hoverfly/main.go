@@ -237,9 +237,6 @@ func main() {
 
 	cfg.HttpsOnly = *httpsOnly
 
-	// development settings
-	cfg.Development = *dev
-
 	// overriding default middleware setting
 	newMiddleware, err := mw.ConvertToNewMiddleware(*middleware)
 	if err != nil {
