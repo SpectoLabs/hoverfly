@@ -25,8 +25,7 @@ type Configuration struct {
 
 	UpstreamProxy string
 
-	Verbose     bool
-	Development bool
+	Verbose bool
 
 	DisableCache bool
 
