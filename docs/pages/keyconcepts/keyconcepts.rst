@@ -12,6 +12,8 @@ Hoverfly's functionality is quite broad. You are encouraged to take the time to 
    webserver
    modes/modes
    simulations/simulations
+   matching/matching
+   caching/caching
    destinationfiltering
    middleware
    hoverctl

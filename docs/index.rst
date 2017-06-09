@@ -46,6 +46,7 @@ Contents
     pages/keyconcepts/keyconcepts
     pages/bindings/bindings
     pages/tutorials/tutorials
+    pages/troubleshooting/troubleshooting
     pages/reference/reference
     pages/contributing
     pages/community
