@@ -67,7 +67,7 @@ var (
 	proxyPort   = flag.String("pp", "", "proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
 	adminPort   = flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
 	metrics     = flag.Bool("metrics", false, "supply -metrics flag to enable metrics logging to stdout")
-	dev         = flag.Bool("dev", false, "supply -dev flag to serve directly from ./static/dist instead from statik binary")
+	dev         = flag.Bool("dev", false, "Enable CORS headers to allow frontend development")
 	destination = flag.String("destination", ".", "destination URI to catch")
 	webserver   = flag.Bool("webserver", false, "start Hoverfly in webserver mode (simulate mode)")
 
