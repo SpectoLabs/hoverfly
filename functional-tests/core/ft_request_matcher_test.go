@@ -12,6 +12,18 @@ import (
 
 var _ = Describe("Using Hoverfly to return responses by request matchers", func() {
 
+	var (
+		hoverfly *functional_tests.Hoverfly
+	)
+
+	BeforeEach(func() {
+		hoverfly = functional_tests.NewHoverfly()
+	})
+
+	AfterEach(func() {
+		hoverfly.Stop()
+	})
+
 	Context("With a request matcher loaded for matching on URL + headers", func() {
 
 		var (
@@ -140,17 +152,13 @@ var _ = Describe("Using Hoverfly to return responses by request matchers", func(
 		Context("When running in proxy mode", func() {
 
 			BeforeEach(func() {
-				hoverflyCmd = startHoverfly(adminPort, proxyPort)
-				SetHoverflyMode("simulate")
-				ImportHoverflySimulation(jsonRequestResponsePair)
-			})
-
-			AfterEach(func() {
-				stopHoverfly()
+				hoverfly.Start()
+				hoverfly.SetMode("simulate")
+				hoverfly.ImportSimulation(jsonRequestResponsePair.String())
 			})
 
 			It("Should find a match", func() {
-				resp := DoRequestThroughProxy(sling.New().Get("http://www.virtual.com/path2").Add("Header", "value2"))
+				resp := hoverfly.Proxy(sling.New().Get("http://www.virtual.com/path2").Add("Header", "value2"))
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(202))
@@ -158,7 +166,7 @@ var _ = Describe("Using Hoverfly to return responses by request matchers", func(
 			})
 
 			It("Should find a match using wildcards", func() {
-				resp := DoRequestThroughProxy(sling.New().Get("http://www.randomheader.com/unmatched_path").Add("Random", "value2"))
+				resp := hoverfly.Proxy(sling.New().Get("http://www.randomheader.com/unmatched_path").Add("Random", "value2"))
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(203))
@@ -166,7 +174,7 @@ var _ = Describe("Using Hoverfly to return responses by request matchers", func(
 			})
 
 			It("Should find a match using a different order set of query parameters", func() {
-				resp := DoRequestThroughProxy(sling.New().Get("http://www.query.com/?query1=one&query2=two").Add("Random", "value2"))
+				resp := hoverfly.Proxy(sling.New().Get("http://www.query.com/?query1=one&query2=two").Add("Random", "value2"))
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(200))
@@ -174,7 +182,7 @@ var _ = Describe("Using Hoverfly to return responses by request matchers", func(
 			})
 
 			It("Should find a match with two query parameter keys", func() {
-				resp := DoRequestThroughProxy(sling.New().Get("http://www.query.com/?query2=two&query1=one&query2=three").Add("Random", "value2"))
+				resp := hoverfly.Proxy(sling.New().Get("http://www.query.com/?query2=two&query1=one&query2=three").Add("Random", "value2"))
 				body, err := ioutil.ReadAll(resp.Body)
 				Expect(err).To(BeNil())
 				Expect(resp.StatusCode).To(Equal(200))
@@ -185,16 +193,12 @@ var _ = Describe("Using Hoverfly to return responses by request matchers", func(
 		Context("When running in webserver mode", func() {
 
 			BeforeEach(func() {
-				hoverflyCmd = startHoverflyWebServer(adminPort, proxyPort)
-				ImportHoverflySimulation(jsonRequestResponsePair)
-			})
-
-			AfterEach(func() {
-				stopHoverfly()
+				hoverfly.Start("-webserver")
+				hoverfly.ImportSimulation(jsonRequestResponsePair.String())
 			})
 
 			It("Should find a match", func() {
-				request := sling.New().Get("http://localhost:"+proxyPortAsString+"/path2").Add("Header", "value2")
+				request := sling.New().Get("http://localhost:"+hoverfly.GetProxyPort()+"/path2").Add("Header", "value2")
 
 				resp := functional_tests.DoRequest(request)
 				body, err := ioutil.ReadAll(resp.Body)
@@ -204,7 +208,7 @@ var _ = Describe("Using Hoverfly to return responses by request matchers", func(
 			})
 
 			It("Should find a match using wildcards", func() {
-				request := sling.New().Get("http://localhost:"+proxyPortAsString+"/unmatched_path").Add("Random", "whatever-you-like")
+				request := sling.New().Get("http://localhost:"+hoverfly.GetProxyPort()+"/unmatched_path").Add("Random", "whatever-you-like")
 
 				resp := functional_tests.DoRequest(request)
 				body, err := ioutil.ReadAll(resp.Body)
@@ -212,9 +216,6 @@ var _ = Describe("Using Hoverfly to return responses by request matchers", func(
 				Expect(resp.StatusCode).To(Equal(203))
 				Expect(string(body)).To(Equal("body3"))
 			})
-
 		})
-
 	})
-
 })

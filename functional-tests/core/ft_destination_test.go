@@ -4,9 +4,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-
 	"strings"
 
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,89 +14,91 @@ import (
 
 var _ = Describe("Running Hoverfly", func() {
 
+	var (
+		hoverfly   *functional_tests.Hoverfly
+		fakeServer *httptest.Server
+	)
+
+	BeforeEach(func() {
+		hoverfly = functional_tests.NewHoverfly()
+		hoverfly.Start()
+		hoverfly.SetMode("capture")
+
+		fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "text/plain")
+			w.Header().Set("date", "date")
+			w.Write([]byte("Hello world"))
+		}))
+	})
+
+	AfterEach(func() {
+		hoverfly.Stop()
+		fakeServer.Close()
+	})
+
 	Context("in capture mode", func() {
 
-		var fakeServer *httptest.Server
-
-		BeforeEach(func() {
-			hoverflyCmd = startHoverfly(adminPort, proxyPort)
-			SetHoverflyMode("capture")
-
-			fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Content-Type", "text/plain")
-				w.Header().Set("date", "date")
-				w.Write([]byte("Hello world"))
-			}))
-
-		})
-
-		AfterEach(func() {
-			stopHoverfly()
-
-			fakeServer.Close()
-		})
-
 		It("Should not capture if destination does not match", func() {
-			SetHoverflyDestination("notlocalhost")
+			hoverfly.SetDestination("notlocalhost")
 
-			resp := CallFakeServerThroughProxy(fakeServer)
+			resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL))
 
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get("date")).To(Equal("date"))
 
-			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
+			recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 			Expect(err).To(BeNil())
 			Expect(recordsJson).ToNot(ContainSubstring(`"destination":{"exactMatch":"127.0.0.1`))
 		})
 
 		It("Should capture if destination is 127.0.0.1", func() {
-			SetHoverflyDestination("127.0.0.1")
+			hoverfly.SetDestination("127.0.0.1")
 
-			resp := CallFakeServerThroughProxy(fakeServer)
+			resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL))
 
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get("date")).To(Equal("date"))
 
-			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
+			recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 			Expect(err).To(BeNil())
 			Expect(recordsJson).To(ContainSubstring(`"destination":{"exactMatch":"127.0.0.1`))
 		})
 
 		It("Should capture if destination is set to port numbers", func() {
-			SetHoverflyDestination(strings.Replace(fakeServer.URL, "http://127.0.0.1", "", 1))
+			hoverfly.SetDestination(strings.Replace(fakeServer.URL, "http://127.0.0.1", "", 1))
 
-			resp := CallFakeServerThroughProxy(fakeServer)
+			resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL))
 
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get("date")).To(Equal("date"))
 
-			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
+			recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 			Expect(err).To(BeNil())
 			Expect(recordsJson).To(ContainSubstring(`"destination":{"exactMatch":"127.0.0.1`))
 		})
 
 		It("Should capture if destination is set to the path", func() {
-			SetHoverflyDestination("/path")
+			hoverfly.SetDestination("/path")
 
-			resp := DoRequestThroughProxy(sling.New().Get(fakeServer.URL + "/path"))
+			resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL + "/path"))
 
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get("date")).To(Equal("date"))
 
-			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
+			recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 			Expect(err).To(BeNil())
 			Expect(recordsJson).To(ContainSubstring(`"path":{"exactMatch":"/path"`))
 		})
 
 		It("Should not capture if destination is set to the wrong path", func() {
-			SetHoverflyDestination("/wrongpath")
+			hoverfly.SetDestination("/wrongpath")
 
-			resp := DoRequestThroughProxy(sling.New().Get(fakeServer.URL + "/path"))
+			resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL + "/path"))
 
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get("date")).To(Equal("date"))
 
-			recordsJson, err := ioutil.ReadAll(ExportHoverflySimulation())
+			recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 			Expect(err).To(BeNil())
 			Expect(recordsJson).ToNot(ContainSubstring(`"path":{"exactMatch":"/path"`))
 		})
