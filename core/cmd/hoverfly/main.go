@@ -94,6 +94,8 @@ var (
 	databasePath = flag.String("db-path", "", "database location - supply it to provide specific database location (will be created there if it doesn't exist)")
 	database     = flag.String("db", inmemoryBackend, "Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk")
 	disableCache = flag.Bool("disable-cache", false, "Disable the cache that sits infront of matching")
+
+	logsFormat = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\" (default \"plaintext\")")
 )
 
 var CA_CERT = []byte(`-----BEGIN CERTIFICATE-----
@@ -160,15 +162,19 @@ func init() {
 func main() {
 	hoverfly := hv.NewHoverfly()
 
-	log.SetFormatter(&log.TextFormatter{
-		ForceColors:      true,
-		DisableTimestamp: false,
-		FullTimestamp:    true,
-	})
 	// log.SetFormatter(&log.JSONFormatter{})
 	flag.Var(&importFlags, "import", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
 	flag.Var(&destinationFlags, "dest", "specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
 	flag.Parse()
+	if *logsFormat == "json" {
+		log.SetFormatter(&log.JSONFormatter{})
+	} else {
+		log.SetFormatter(&log.TextFormatter{
+			ForceColors:      true,
+			DisableTimestamp: false,
+			FullTimestamp:    true,
+		})
+	}
 
 	if *version {
 		fmt.Println(hv.NewHoverfly().GetVersion())
