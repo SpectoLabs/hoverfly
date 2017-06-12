@@ -1,4 +1,4 @@
-![Hoverfly](core/static/img/hoverfly_logo.png)
+![Hoverfly](https://raw.githubusercontent.com/SpectoLabs/hoverfly/master/hoverfly_logo.png)
 
 [![Circle CI][CircleCI-Image]][CircleCI-Url] 
 [![Documentation Status](https://readthedocs.org/projects/hoverfly/badge/?version=latest)](http://hoverfly.readthedocs.io/en/latest/?badge=latest)
