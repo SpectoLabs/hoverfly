@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"time"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
@@ -80,7 +82,7 @@ var _ = Describe("/api/v2/journal", func() {
 				Expect(journalView.Journal[0].Response.Body).To(Equal("Hoverfly Error!\n\nThere was an error when matching\n\nGot error: Could not find a match for request, create or record a valid matcher first!"))
 				Expect(journalView.Journal[0].Response.Headers["Content-Type"]).To(ContainElement("text/plain"))
 
-				Expect(journalView.Journal[0].Latency).To(BeNumerically("<", 1))
+				Expect(journalView.Journal[0].Latency).To(BeNumerically("<", time.Millisecond))
 				Expect(journalView.Journal[0].Mode).To(Equal("simulate"))
 			})
 

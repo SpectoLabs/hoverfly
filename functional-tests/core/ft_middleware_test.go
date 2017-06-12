@@ -1,7 +1,6 @@
 package hoverfly_test
 
 import (
-	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -35,6 +34,19 @@ var server *httptest.Server
 
 var _ = Describe("Running Hoverfly with middleware", func() {
 
+	var (
+		hoverfly *functional_tests.Hoverfly
+	)
+
+	BeforeEach(func() {
+		hoverfly = functional_tests.NewHoverfly()
+	})
+
+	AfterEach(func() {
+		hoverfly.Stop()
+		server.Close()
+	})
+
 	Context("in simulate mode", func() {
 
 		BeforeEach(func() {
@@ -42,22 +54,15 @@ var _ = Describe("Running Hoverfly with middleware", func() {
 			muxRouter.HandleFunc("/process", checkHeadersHttpMiddleware).Methods("POST")
 			server = httptest.NewServer(muxRouter)
 
-			hoverflyCmd = startHoverflyWithMiddleware(adminPort, proxyPort, server.URL+"/process")
-
-			ImportHoverflySimulation(bytes.NewBufferString(functional_tests.JsonSimulationGetAndPost))
-
-			SetHoverflyMode("simulate")
-		})
-
-		AfterEach(func() {
-			server.Close()
-			stopHoverfly()
+			hoverfly.Start("-middleware", server.URL+"/process")
+			hoverfly.ImportSimulation(functional_tests.JsonSimulationGetAndPost)
+			hoverfly.SetMode("simulate")
 		})
 
 		It("the middleware should recieve the request made instead of the request stored in the cache", func() {
 			slingRequest := sling.New().Get("http://destination1/path1").Add("New-Header", "here")
 
-			resp := DoRequestThroughProxy(slingRequest)
+			resp := hoverfly.Proxy(slingRequest)
 
 			body, _ := ioutil.ReadAll(resp.Body)
 

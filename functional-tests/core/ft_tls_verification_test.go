@@ -58,7 +58,6 @@ var _ = Describe("When I run Hoverfly", func() {
 
 		BeforeEach(func() {
 			hoverfly.Start("-tls-verification=true")
-			hoverfly.Start()
 			hoverfly.SetMode("capture")
 		})
 
@@ -88,7 +87,6 @@ var _ = Describe("When I run Hoverfly", func() {
 
 		BeforeEach(func() {
 			hoverfly.Start("-tls-verification=false")
-			hoverfly.Start()
 			hoverfly.SetMode("capture")
 		})
 
