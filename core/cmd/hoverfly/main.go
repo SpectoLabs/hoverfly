@@ -159,7 +159,13 @@ func init() {
 
 func main() {
 	hoverfly := hv.NewHoverfly()
-	log.SetFormatter(&log.JSONFormatter{})
+
+	log.SetFormatter(&log.TextFormatter{
+		ForceColors:      true,
+		DisableTimestamp: false,
+		FullTimestamp:    true,
+	})
+	// log.SetFormatter(&log.JSONFormatter{})
 	flag.Var(&importFlags, "import", "import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
 	flag.Var(&destinationFlags, "dest", "specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
 	flag.Parse()
@@ -180,8 +186,6 @@ func main() {
 	cfg.Verbose = *verbose
 
 	if *dev {
-		// making text pretty
-		log.SetFormatter(&log.TextFormatter{})
 		handlers.EnableCors = true
 	}
 
