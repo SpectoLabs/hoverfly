@@ -89,7 +89,9 @@ func logsToPlainText(logs []*logrus.Entry) string {
 	for _, entry := range logs {
 		entry.Logger = logrus.New()
 		entry.Logger.Formatter = &logrus.TextFormatter{
-			ForceColors: true,
+			ForceColors:      true,
+			DisableTimestamp: false,
+			FullTimestamp:    true,
 		}
 
 		log, err := entry.String()
