@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"fmt"
 
@@ -85,7 +86,9 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	// processing connections
 	proxy.OnRequest(goproxy.UrlMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+			startTime := time.Now()
 			resp := hoverfly.processRequest(r)
+			hoverfly.Journal.NewEntry(r, resp, hoverfly.Cfg.Mode, startTime)
 			return r, resp
 		})
 
