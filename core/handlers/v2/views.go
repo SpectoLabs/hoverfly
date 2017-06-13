@@ -1,6 +1,8 @@
 package v2
 
 import (
+	"time"
+
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 )
 
@@ -25,7 +27,7 @@ type ModeView struct {
 
 type ModeArgumentsView struct {
 	Headers          []string `json:"headersWhitelist,omitempty"`
-	MatchingStrategy *string `json:"matchingStrategy,omitempty"`
+	MatchingStrategy *string  `json:"matchingStrategy,omitempty"`
 }
 
 type VersionView struct {
@@ -54,8 +56,16 @@ type CacheView struct {
 }
 
 type CachedResponseView struct {
-	Key          string                     `json:"key"`
+	Key          string                            `json:"key"`
 	MatchingPair *RequestMatcherResponsePairViewV2 `json:"matchingPair,omitempty"`
-	HeaderMatch  bool                       `json:"headerMatch"`
-	ClosestMiss  *ClosestMissView `json:"closestMiss"`
+	HeaderMatch  bool                              `json:"headerMatch"`
+	ClosestMiss  *ClosestMissView                  `json:"closestMiss"`
+}
+
+type JournalEntryView struct {
+	Request     RequestDetailsViewV1 `json:"request"`
+	Response    ResponseDetailsView  `json:"response"`
+	Mode        string               `json:"mode"`
+	TimeStarted time.Time            `json:"timeStarted"`
+	Latency     time.Duration        `json:"latency"`
 }

@@ -16,6 +16,7 @@ import (
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/journal"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -50,6 +51,7 @@ type Hoverfly struct {
 
 	Simulation    *models.Simulation
 	StoreLogsHook *StoreLogsHook
+	Journal       *journal.Journal
 }
 
 func NewHoverfly() *Hoverfly {
@@ -60,6 +62,7 @@ func NewHoverfly() *Hoverfly {
 		Authentication: authBackend,
 		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
 		StoreLogsHook:  NewStoreLogsHook(),
+		Journal:        journal.NewJournal(),
 		Cfg:            InitSettings(),
 	}
 
