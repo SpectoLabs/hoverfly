@@ -13,10 +13,11 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
+	"time"
 )
 
 type HoverflyLogs interface {
-	GetLogs(limit int) []*logrus.Entry
+	GetLogs(limit int, from *time.Time) []*logrus.Entry
 }
 
 type LogsHandler struct {
@@ -46,7 +47,7 @@ func (this *LogsHandler) Get(w http.ResponseWriter, req *http.Request, next http
 		limitQuery = DefaultLimit
 	}
 
-	logs = this.Hoverfly.GetLogs(limitQuery)
+	logs = this.Hoverfly.GetLogs(limitQuery, nil)
 
 	if strings.Contains(req.Header.Get("Accept"), "text/plain") ||
 		strings.Contains(req.Header.Get("Content-Type"), "text/plain") {
@@ -108,7 +109,7 @@ func (this *LogsHandler) GetWS(w http.ResponseWriter, r *http.Request) {
 	var previousLogs LogsView
 
 	handlers.NewWebsocket(func() ([]byte, error) {
-		currentLogs := logsToLogsView(this.Hoverfly.GetLogs(500))
+		currentLogs := logsToLogsView(this.Hoverfly.GetLogs(500, nil))
 
 		if !reflect.DeepEqual(currentLogs, previousLogs) {
 			previousLogs = currentLogs

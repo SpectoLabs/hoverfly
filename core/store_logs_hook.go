@@ -2,6 +2,7 @@ package hoverfly
 
 import (
 	"github.com/Sirupsen/logrus"
+	"time"
 )
 
 type StoreLogsHook struct {
@@ -36,10 +37,24 @@ func (hook StoreLogsHook) GetLogsCount() int {
 	return len(hook.Entries)
 }
 
-func (hook StoreLogsHook) GetLogs(limit int) []*logrus.Entry {
+func (hook StoreLogsHook) GetLogs(limit int, from *time.Time) []*logrus.Entry {
 	entriesLength := len(hook.Entries)
 	if limit > entriesLength {
 		limit = entriesLength
 	}
-	return hook.Entries[entriesLength-limit:]
+
+	if from != nil {
+		entries := []*logrus.Entry{}
+		for i := entriesLength - 1; i > 0; i-- {
+			if len(entries) < limit {
+				entry := hook.Entries[i]
+				if entry.Time.After(*from) {
+					entries = append(entries, entry)
+				}
+			}
+		}
+		return entries
+	} else {
+		return hook.Entries[entriesLength-limit:]
+	}
 }

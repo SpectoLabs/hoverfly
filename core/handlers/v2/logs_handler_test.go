@@ -9,13 +9,14 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	. "github.com/onsi/gomega"
+	"time"
 )
 
 type HoverflyLogsStub struct {
 	limit int
 }
 
-func (this *HoverflyLogsStub) GetLogs(limit int) []*logrus.Entry {
+func (this *HoverflyLogsStub) GetLogs(limit int, from *time.Time) []*logrus.Entry {
 	this.limit = limit
 	return []*logrus.Entry{&logrus.Entry{
 		Level:   logrus.InfoLevel,
