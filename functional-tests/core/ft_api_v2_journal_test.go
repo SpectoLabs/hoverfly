@@ -135,4 +135,29 @@ var _ = Describe("/api/v2/journal", func() {
 			Expect(journal[1].Mode).To(Equal("capture"))
 		})
 	})
+
+	Context("DELETE", func() {
+		It("should delete journal entries", func() {
+			hoverfly.Proxy(sling.New().Get("http://localhost:" + hoverfly.GetAdminPort()))
+			hoverfly.Proxy(sling.New().Get("http://localhost:" + hoverfly.GetAdminPort()))
+
+			req := sling.New().Delete("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+			functional_tests.DoRequest(req)
+
+			req = sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+			res := functional_tests.DoRequest(req)
+
+			Expect(res.StatusCode).To(Equal(200))
+
+			responseJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+
+			var journal []v2.JournalEntryView
+
+			err = json.Unmarshal(responseJson, &journal)
+			Expect(err).To(BeNil())
+
+			Expect(journal).To(HaveLen(0))
+		})
+	})
 })
