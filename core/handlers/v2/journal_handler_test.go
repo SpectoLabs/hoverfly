@@ -11,15 +11,24 @@ import (
 )
 
 type HoverflyJournalStub struct {
-	limit int
+	limit   int
+	deleted bool
 }
 
 func (this *HoverflyJournalStub) GetEntries() []JournalEntryView {
-	return []JournalEntryView{
-		JournalEntryView{
-			Mode: "test",
-		},
+	if this.deleted {
+		return []JournalEntryView{}
+	} else {
+		return []JournalEntryView{
+			JournalEntryView{
+				Mode: "test",
+			},
+		}
 	}
+}
+
+func (this *HoverflyJournalStub) DeleteEntries() {
+	this.deleted = true
 }
 
 func Test_JournalHandler_Get_ReturnsJournal(t *testing.T) {
@@ -42,6 +51,27 @@ func Test_JournalHandler_Get_ReturnsJournal(t *testing.T) {
 	Expect(journalView[0].Mode).To(Equal("test"))
 }
 
+func Test_JournalHandler_Delete_CallsDelete(t *testing.T) {
+	RegisterTestingT(t)
+
+	var stubHoverfly HoverflyJournalStub
+	unit := JournalHandler{Hoverfly: &stubHoverfly}
+
+	request, err := http.NewRequest("DELETE", "/api/v2/journal", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Delete, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	journalView, err := unmarshalJournalEntryView(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(journalView).To(HaveLen(0))
+
+	Expect(stubHoverfly.deleted).To(BeTrue())
+}
+
 func Test_JournalHandler_Options_GetsOptions(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -54,7 +84,7 @@ func Test_JournalHandler_Options_GetsOptions(t *testing.T) {
 	response := makeRequestOnHandler(unit.Options, request)
 
 	Expect(response.Code).To(Equal(http.StatusOK))
-	Expect(response.Header().Get("Allow")).To(Equal("OPTIONS, GET"))
+	Expect(response.Header().Get("Allow")).To(Equal("OPTIONS, GET, DELETE"))
 }
 
 func unmarshalJournalEntryView(buffer *bytes.Buffer) ([]JournalEntryView, error) {
