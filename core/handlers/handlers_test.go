@@ -18,11 +18,28 @@ func Test_WriteResponse_WritesResponseToBody(t *testing.T) {
 	handlers.WriteResponse(response, []byte("Test body"))
 
 	Expect(response.Code).To(Equal(200))
-	Expect(response.HeaderMap["Content-Type"]).To(ContainElement("application/json; charset=UTF-8"))
+	Expect(response.HeaderMap["Content-Type"]).To(ContainElement("text/plain; charset=utf-8"))
 
 	bodyBytes, err := ioutil.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 	Expect(string(bodyBytes)).Should(Equal("Test body"))
+}
+
+func Test_WriteResponse_CorrectlySetsContentType(t *testing.T) {
+	RegisterTestingT(t)
+
+	jsonResponse := httptest.NewRecorder()
+	// jsonBytes, _ := json.Marshal(map[string]string{
+	// 	"json": "true",
+	// })
+	handlers.WriteResponse(jsonResponse, []byte("{\"body\": \"json\"}"))
+
+	Expect(jsonResponse.HeaderMap["Content-Type"]).To(ContainElement("application/json; charset=utf-8"))
+
+	xmlResponse := httptest.NewRecorder()
+	handlers.WriteResponse(xmlResponse, []byte("<?xml>"))
+	Expect(xmlResponse.HeaderMap["Content-Type"]).To(ContainElement("text/xml; charset=utf-8"))
+
 }
 
 func Test_WriteResponseError_WritesErrorMessage(t *testing.T) {
@@ -33,7 +50,7 @@ func Test_WriteResponseError_WritesErrorMessage(t *testing.T) {
 	handlers.WriteErrorResponse(response, "This is an error", 5555)
 
 	Expect(response.Code).To(Equal(5555))
-	Expect(response.HeaderMap["Content-Type"]).To(ContainElement("application/json; charset=UTF-8"))
+	Expect(response.HeaderMap["Content-Type"]).To(ContainElement("application/json; charset=utf-8"))
 
 	errorView, err := unmarshalErrorView(response.Body)
 	Expect(err).To(BeNil())
