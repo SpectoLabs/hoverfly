@@ -49,7 +49,7 @@ func (hook StoreLogsHook) GetLogs(limit int, from *time.Time) []*logrus.Entry {
 			if len(entries) < limit {
 				entry := hook.Entries[i]
 				if entry.Time.After(*from) {
-					entries = append(entries, entry)
+					entries = append([]*logrus.Entry{entry}, entries...)
 				}
 			}
 		}

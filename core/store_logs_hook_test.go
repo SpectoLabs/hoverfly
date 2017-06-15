@@ -108,7 +108,7 @@ func Test_StoreLogsHook_GetLogs_FilteredByFromDateTimeAndLimit(t *testing.T) {
 	for i := 0; i <= 3; i++ {
 		unit.Fire(&logrus.Entry{
 			Time: time.Date(2017, 6, 14, 10, 0, i, 0, time.Local),
-			Message: "log-0",
+			Message: "log-" + strconv.Itoa(i),
 		})
 	}
 
@@ -117,6 +117,11 @@ func Test_StoreLogsHook_GetLogs_FilteredByFromDateTimeAndLimit(t *testing.T) {
 	logs := unit.GetLogs(2, &queryDate)
 	Expect(logs).To(HaveLen(2))
 	expectPrecision, _ := time.ParseDuration("1s")
-	Expect(logs[0].Time).To(BeTemporally("==",time.Date(2017, 6, 14, 10, 0, 3, 0, time.Local), expectPrecision))
-	Expect(logs[1].Time).To(BeTemporally("==",time.Date(2017, 6, 14, 10, 0, 2, 0, time.Local), expectPrecision))
+
+	Expect(logs[0].Message).To(Equal("log-2"))
+	Expect(logs[0].Time).To(BeTemporally("==",time.Date(2017, 6, 14, 10, 0, 2, 0, time.Local), expectPrecision))
+
+	Expect(logs[1].Message).To(Equal("log-3"))
+	Expect(logs[1].Time).To(BeTemporally("==",time.Date(2017, 6, 14, 10, 0, 3, 0, time.Local), expectPrecision))
+
 }

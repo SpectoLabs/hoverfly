@@ -8,6 +8,8 @@ import (
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"strconv"
+	"time"
 )
 
 func MakeLogsArray(logsJson []*jason.Object) []string {
@@ -79,6 +81,33 @@ var _ = Describe("/api/v2/logs", func() {
 			Expect(len(logsArray)).To(Equal(1))
 
 			Expect(logsArray[0].GetString("msg")).Should(Equal("started handling request"))
+		})
+
+		It("should query the logs by from time", func() {
+			time.Sleep(time.Second)
+			now := time.Now()
+
+			hoverfly.Proxy(sling.New().Get("https://hoverfly.io"))
+
+			req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/logs?from=" + strconv.FormatInt(now.Unix(), 10))
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			responseJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+
+			jsonObject, err := jason.NewObjectFromBytes(responseJson)
+			Expect(err).To(BeNil())
+
+			logsArray, err := jsonObject.GetObjectArray("logs")
+			Expect(err).To(BeNil())
+
+			Expect(len(logsArray)).To(Equal(3))
+
+			for _, log := range logsArray {
+				timeStr, _ := log.GetString("time")
+				logTime, _ := time.Parse(time.RFC3339, timeStr)
+				Expect(logTime.Unix()).Should(BeNumerically(">=", now.Unix()))
+			}
 		})
 	})
 
