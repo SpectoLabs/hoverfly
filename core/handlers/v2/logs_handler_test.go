@@ -14,10 +14,12 @@ import (
 
 type HoverflyLogsStub struct {
 	limit int
+	from *time.Time
 }
 
 func (this *HoverflyLogsStub) GetLogs(limit int, from *time.Time) []*logrus.Entry {
 	this.limit = limit
+	this.from  = from
 	return []*logrus.Entry{&logrus.Entry{
 		Level:   logrus.InfoLevel,
 		Message: "a line of logs",
@@ -58,6 +60,7 @@ func Test_LogsHandler_Get_SetsTheDefaultLimitIfNoneIsSpecified(t *testing.T) {
 	makeRequestOnHandler(unit.Get, request)
 
 	Expect(stubHoverfly.limit).To(Equal(500))
+	Expect(stubHoverfly.from).To(BeNil())
 }
 
 func Test_LogsHandler_Get_SetsTheLimitIfLimitQueryProvided(t *testing.T) {
@@ -73,6 +76,35 @@ func Test_LogsHandler_Get_SetsTheLimitIfLimitQueryProvided(t *testing.T) {
 
 	Expect(stubHoverfly.limit).To(Equal(20))
 }
+
+func Test_LogsHandler_Get_SetsTheFromTimeIfFromQueryProvided(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyLogsStub{}
+	unit := LogsHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "?from=1497521986", nil)
+	Expect(err).To(BeNil())
+
+	makeRequestOnHandler(unit.Get, request)
+
+	Expect(stubHoverfly.from.Unix()).To(Equal(int64(1497521986)))
+}
+
+func Test_LogsHandler_Get_DoesNotSetTimeIfFromQueryIsBadTime(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyLogsStub{}
+	unit := LogsHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "?from=bad-time", nil)
+	Expect(err).To(BeNil())
+
+	makeRequestOnHandler(unit.Get, request)
+
+	Expect(stubHoverfly.from).To(BeNil())
+}
+
 
 func Test_LogsHandler_Get_ReturnsLogsInPlaintext_UsingAcceptHeader(t *testing.T) {
 	RegisterTestingT(t)
