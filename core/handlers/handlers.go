@@ -36,7 +36,7 @@ func ReadFromRequest(request *http.Request, v interface{}) error {
 }
 
 func WriteResponse(response http.ResponseWriter, bytes []byte) {
-	response.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	response.Header().Set("Content-Type", detectContentType(bytes))
 	writeCorsHeadersIfEnabled(response)
 
 	response.Write(bytes)
@@ -67,6 +67,18 @@ func writeCorsHeadersIfEnabled(response http.ResponseWriter) {
 		response.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
 		response.Header().Set("Access-Control-Allow-Credentials", "true")
 	}
+}
+
+// http.DetectContentType does not detect JSON. This private function
+// is intended to wrap and extend http.DetectContentType to allow us
+// to detect JSON and return the correct Content-Type.
+func detectContentType(body []byte) string {
+	var js interface{}
+	if json.Unmarshal(body, &js) == nil {
+		return "application/json; charset=utf-8"
+	}
+
+	return http.DetectContentType(body)
 }
 
 type WebSocketHandler func() ([]byte, error)
