@@ -29,9 +29,6 @@ func Test_WriteResponse_CorrectlySetsContentType(t *testing.T) {
 	RegisterTestingT(t)
 
 	jsonResponse := httptest.NewRecorder()
-	// jsonBytes, _ := json.Marshal(map[string]string{
-	// 	"json": "true",
-	// })
 	handlers.WriteResponse(jsonResponse, []byte("{\"body\": \"json\"}"))
 
 	Expect(jsonResponse.HeaderMap["Content-Type"]).To(ContainElement("application/json; charset=utf-8"))
