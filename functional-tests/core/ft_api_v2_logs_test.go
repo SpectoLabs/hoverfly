@@ -3,13 +3,14 @@ package hoverfly_test
 import (
 	"io/ioutil"
 
+	"strconv"
+	"time"
+
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/antonholmquist/jason"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"strconv"
-	"time"
 )
 
 func MakeLogsArray(logsJson []*jason.Object) []string {
@@ -80,7 +81,7 @@ var _ = Describe("/api/v2/logs", func() {
 
 			Expect(len(logsArray)).To(Equal(1))
 
-			Expect(logsArray[0].GetString("msg")).Should(Equal("started handling request"))
+			Expect(logsArray[0].GetString("msg")).Should(Equal("payloads imported"))
 		})
 
 		It("should query the logs by from time", func() {
@@ -101,7 +102,7 @@ var _ = Describe("/api/v2/logs", func() {
 			logsArray, err := jsonObject.GetObjectArray("logs")
 			Expect(err).To(BeNil())
 
-			Expect(len(logsArray)).To(Equal(3))
+			Expect(len(logsArray)).To(Equal(2))
 
 			for _, log := range logsArray {
 				timeStr, _ := log.GetString("time")
@@ -133,8 +134,12 @@ var _ = Describe("/api/v2/logs", func() {
 			responseBody, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 
-			Expect(responseBody).To(ContainSubstring("started handling request"))
-			Expect(responseBody).To(ContainSubstring("=/api/v2/logs?limit=1"))
+			Expect(responseBody).To(ContainSubstring("payloads imported"))
+
+			Expect(responseBody).ToNot(ContainSubstring("Using memory backend"))
+			Expect(responseBody).ToNot(ContainSubstring("Proxy prepared"))
+			Expect(responseBody).ToNot(ContainSubstring("current proxy configuration"))
+			Expect(responseBody).ToNot(ContainSubstring("Admin interface is starting..."))
 		})
 	})
 
@@ -160,8 +165,12 @@ var _ = Describe("/api/v2/logs", func() {
 			responseBody, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 
-			Expect(responseBody).To(ContainSubstring("started handling request"))
-			Expect(responseBody).To(ContainSubstring("=/api/v2/logs?limit=1"))
+			Expect(responseBody).To(ContainSubstring("payloads imported"))
+
+			Expect(responseBody).ToNot(ContainSubstring("Using memory backend"))
+			Expect(responseBody).ToNot(ContainSubstring("Proxy prepared"))
+			Expect(responseBody).ToNot(ContainSubstring("current proxy configuration"))
+			Expect(responseBody).ToNot(ContainSubstring("Admin interface is starting..."))
 		})
 	})
 })
