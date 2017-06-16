@@ -2,14 +2,16 @@ package wrapper
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"strings"
+	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 )
 
-func GetLogs(target configuration.Target, format string) ([]string, error) {
+func GetLogs(target configuration.Target, format string, filterTime *time.Time) ([]string, error) {
 	headers := map[string]string{
 		"Accept": "text/plain",
 	}
@@ -18,7 +20,12 @@ func GetLogs(target configuration.Target, format string) ([]string, error) {
 		headers["Accept"] = "application/json"
 	}
 
-	response, err := doRequest(target, "GET", v2ApiLogs, "", headers)
+	url := v2ApiLogs
+	if filterTime != nil {
+		url = fmt.Sprintf("%v%v%v", url, "?from=", filterTime.Unix())
+	}
+
+	response, err := doRequest(target, "GET", url, "", headers)
 	if err != nil {
 		return []string{}, err
 	}
@@ -51,6 +58,15 @@ func GetLogs(target configuration.Target, format string) ([]string, error) {
 
 		return logs, nil
 	} else {
-		return strings.Split(string(responseBody), "\n"), nil
+		if string(responseBody) == "" {
+			return []string{}, err
+		}
+		logs := strings.Split(string(responseBody), "\n")
+		lastLogPosition := len(logs) - 1
+		if logs[lastLogPosition] == "" {
+			return logs[:lastLogPosition], nil
+		}
+
+		return logs, nil
 	}
 }
