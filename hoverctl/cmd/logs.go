@@ -27,26 +27,20 @@ Shows the Hoverfly logs.
 			format = "json"
 		}
 
-		logs, err := wrapper.GetLogs(*target, format)
-		handleIfError(err)
+		var lastLogRequestTime *time.Time
 
-		logsPrinted := map[string]string{
-			"": "x",
-		}
+		for followLogs || lastLogRequestTime == nil {
+			logs, err := wrapper.GetLogs(*target, format, lastLogRequestTime)
+			currentLogRequestTime := time.Now()
+			handleIfError(err)
 
-		for i := 0; i < len(logs); i++ {
-
-			if logs[i] != "" && logsPrinted[logs[i]] != "x" {
-				fmt.Println(logs[i])
-				logsPrinted[logs[i]] = "x"
+			for _, log := range logs {
+				fmt.Println(log)
 			}
 
-			if i == len(logs)-1 && followLogs {
-				logs, err = wrapper.GetLogs(*target, format)
-				handleIfError(err)
-
-				i = 0
-				time.Sleep(time.Second * 5)
+			lastLogRequestTime = &currentLogRequestTime
+			if followLogs {
+				time.Sleep(time.Second * 2)
 			}
 		}
 	},
