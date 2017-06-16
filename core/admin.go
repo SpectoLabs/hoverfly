@@ -25,7 +25,7 @@ func (this *AdminApi) StartAdminInterface(hoverfly *Hoverfly) {
 
 	// starting admin interface
 	mux := this.getBoneRouter(hoverfly)
-	n := negroni.Classic()
+	n := negroni.New(negroni.NewRecovery(), negroni.NewStatic(http.Dir("public")))
 
 	n.UseHandler(mux)
 
