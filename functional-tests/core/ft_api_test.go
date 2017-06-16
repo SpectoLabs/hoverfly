@@ -35,12 +35,13 @@ var _ = Describe("Interacting with the API", func() {
 			Expect(hoverflyJson).To(MatchRegexp(`"usage":{"counters":{"capture":0,"modify":0,"simulate":0,"synthesize":0}}`))
 			Expect(hoverflyJson).To(MatchRegexp(`"version":"v\d+.\d+.\d+"`))
 			Expect(hoverflyJson).To(MatchRegexp(`"upstream-proxy":""`))
+			Expect(hoverflyJson).To(MatchRegexp(`"mode":"simulate","arguments":{"matchingStrategy":"strongest"}`))
 		})
 	})
 
 	Context("GET /api/v2/hoverfly/destination", func() {
 
-		It("Should get the mode", func() {
+		It("Should get the destination", func() {
 			req := sling.New().Get(hoverflyAdminUrl + "/api/v2/hoverfly/destination")
 			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
@@ -52,7 +53,7 @@ var _ = Describe("Interacting with the API", func() {
 
 	Context("PUT /api/v2/hoverfly/destination", func() {
 
-		It("Should put the mode", func() {
+		It("Should put the destination", func() {
 			req := sling.New().Put(hoverflyAdminUrl + "/api/v2/hoverfly/destination")
 			req.Body(strings.NewReader(`{"destination":"test.com"}`))
 			res := functional_tests.DoRequest(req)

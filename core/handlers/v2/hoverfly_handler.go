@@ -38,6 +38,7 @@ func (this *HoverflyHandler) Get(w http.ResponseWriter, req *http.Request, next 
 
 	hoverflyView.Destination = this.Hoverfly.GetDestination()
 	hoverflyView.Mode = this.Hoverfly.GetMode().Mode
+	hoverflyView.Arguments = this.Hoverfly.GetMode().Arguments
 	hoverflyView.Binary, hoverflyView.Script, hoverflyView.Remote = this.Hoverfly.GetMiddleware()
 	hoverflyView.Usage = this.Hoverfly.GetStats()
 	hoverflyView.Version = this.Hoverfly.GetVersion()
