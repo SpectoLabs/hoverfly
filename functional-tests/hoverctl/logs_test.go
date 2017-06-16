@@ -1,15 +1,9 @@
 package hoverctl_suite
 
 import (
-	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
-	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phayes/freeport"
@@ -70,55 +64,6 @@ var _ = Describe("When I use hoverctl", func() {
 			output := functional_tests.Run(hoverctlBinary, "logs", "-t", "incorrect")
 
 			Expect(output).To(ContainSubstring("Could not connect to Hoverfly at localhost:12345"))
-		})
-	})
-
-	Context("and start Hoverfly using hoverctl", func() {
-
-		Context("the logs get captured in a .log file", func() {
-
-			It("and I can see it has started", func() {
-				functional_tests.Run(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
-
-				workingDir, _ := os.Getwd()
-				filePath := filepath.Join(workingDir, ".hoverfly/", "hoverfly."+adminPort+"."+proxyPort+".log")
-
-				file, err := ioutil.ReadFile(filePath)
-				Expect(err).To(BeNil())
-
-				Expect(string(file)).To(ContainSubstring("Admin interface is starting..."))
-				Expect(string(file)).To(ContainSubstring("serving proxy"))
-			})
-
-			It("and they get updated when you use hoverfly", func() {
-				functional_tests.Run(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
-
-				functional_tests.Run(hoverctlBinary, "mode", "capture")
-
-				workingDir, _ := os.Getwd()
-				filePath := filepath.Join(workingDir, ".hoverfly/", "hoverfly."+adminPort+"."+proxyPort+".log")
-
-				file, err := ioutil.ReadFile(filePath)
-				Expect(err).To(BeNil())
-
-				Expect(string(file)).To(ContainSubstring("Started GET /api/health"))
-			})
-
-			It("and the stderr is captured in the log file", func() {
-				functional_tests.Run(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
-
-				req := sling.New().Put(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/mode", adminPort)).Body(strings.NewReader(`{"mode":"not-a-mode"}`))
-				functional_tests.DoRequest(req)
-
-				workingDir, _ := os.Getwd()
-				filePath := filepath.Join(workingDir, ".hoverfly/", "hoverfly."+adminPort+"."+proxyPort+".log")
-
-				file, err := ioutil.ReadFile(filePath)
-				Expect(err).To(BeNil())
-
-				Expect(string(file)).To(ContainSubstring("Unknown mode"))
-				Expect(string(file)).To(ContainSubstring("not-a-mode"))
-			})
 		})
 	})
 
