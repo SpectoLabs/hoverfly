@@ -12,7 +12,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
-	"github.com/meatballhat/negroni-logrus"
 
 	handlers "github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
@@ -28,7 +27,6 @@ func (this *AdminApi) StartAdminInterface(hoverfly *Hoverfly) {
 	mux := this.getBoneRouter(hoverfly)
 	n := negroni.Classic()
 
-	n.Use(negronilogrus.NewMiddlewareFromLogger(log.StandardLogger(), "admin"))
 	n.UseHandler(mux)
 
 	// admin interface starting message
