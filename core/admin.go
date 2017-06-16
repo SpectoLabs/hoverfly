@@ -34,7 +34,7 @@ func (this *AdminApi) StartAdminInterface(hoverfly *Hoverfly) {
 		"AdminPort": hoverfly.Cfg.AdminPort,
 	}).Info("Admin interface is starting...")
 
-	n.Run(fmt.Sprintf(":%s", hoverfly.Cfg.AdminPort))
+	http.ListenAndServe(fmt.Sprintf(":%s", hoverfly.Cfg.AdminPort), n)
 }
 
 // getBoneRouter returns mux for admin interface
