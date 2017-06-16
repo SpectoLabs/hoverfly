@@ -80,7 +80,7 @@ hoverctl configuration file.
 			target.Password = password
 		}
 
-		err := wrapper.Start(target, hoverflyDirectory)
+		err := wrapper.Start(target)
 		handleIfError(err)
 
 		data := [][]string{

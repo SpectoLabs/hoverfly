@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -180,22 +179,13 @@ func IsLocal(url string) bool {
 This isn't working as intended, its working, just not how I imagined it.
 */
 
-func runBinary(target *configuration.Target, path string, hoverflyDirectory configuration.HoverflyDirectory) (*exec.Cmd, error) {
+func runBinary(target *configuration.Target, path string) (*exec.Cmd, error) {
 	flags := target.BuildFlags()
 
 	cmd := exec.Command(path, flags...)
 	log.Debug(cmd.Args)
-	file, err := os.Create(hoverflyDirectory.Path + "/hoverfly." + strconv.Itoa(target.AdminPort) + "." + strconv.Itoa(target.ProxyPort) + ".log")
-	if err != nil {
-		log.Debug(err)
-		return nil, errors.New("Could not create log file")
-	}
 
-	cmd.Stdout = file
-	cmd.Stderr = file
-	defer file.Close()
-
-	err = cmd.Start()
+	err := cmd.Start()
 	if err != nil {
 		log.Debug(err)
 		return nil, errors.New("Could not start Hoverfly")
@@ -204,7 +194,7 @@ func runBinary(target *configuration.Target, path string, hoverflyDirectory conf
 	return cmd, nil
 }
 
-func Start(target *configuration.Target, hoverflyDirectory configuration.HoverflyDirectory) error {
+func Start(target *configuration.Target) error {
 	err := checkPorts(target.AdminPort, target.ProxyPort)
 	if err != nil {
 		return err
@@ -216,9 +206,9 @@ func Start(target *configuration.Target, hoverflyDirectory configuration.Hoverfl
 		return errors.New("Could not start Hoverfly")
 	}
 
-	_, err = runBinary(target, binaryLocation+"/hoverfly", hoverflyDirectory)
+	_, err = runBinary(target, binaryLocation+"/hoverfly")
 	if err != nil {
-		_, err = runBinary(target, "hoverfly", hoverflyDirectory)
+		_, err = runBinary(target, "hoverfly")
 		if err != nil {
 			return errors.New("Could not start Hoverfly")
 		}
