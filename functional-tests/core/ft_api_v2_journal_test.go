@@ -217,4 +217,40 @@ var _ = Describe("/api/v2/journal", func() {
 			})
 		})
 	})
+
+	Context("with -journal-size=100", func() {
+
+		BeforeEach(func() {
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start("-journal-size=100")
+		})
+
+		AfterEach(func() {
+			hoverfly.Stop()
+		})
+
+		Context("GET", func() {
+
+			It("should not exceed size", func() {
+				for i := 0; i < 111; i++ {
+					hoverfly.Proxy(sling.New().Get("http://hoverfly.io"))
+				}
+
+				req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(200))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var journal []v2.JournalEntryView
+
+				err = json.Unmarshal(responseJson, &journal)
+				Expect(err).To(BeNil())
+
+				Expect(journal).To(HaveLen(100))
+			})
+		})
+	})
 })
