@@ -35,6 +35,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	hvc "github.com/SpectoLabs/hoverfly/core/certs"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
+	"github.com/SpectoLabs/hoverfly/core/journal"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	mw "github.com/SpectoLabs/hoverfly/core/middleware"
 	"github.com/SpectoLabs/hoverfly/core/modes"
@@ -96,6 +97,8 @@ var (
 	disableCache = flag.Bool("disable-cache", false, "Disable the cache that sits infront of matching")
 
 	logsFormat = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\" (default \"plaintext\")")
+
+	enableJournal = flag.Bool("journal", true, "Enable or disable request/response journal (default \"true\")")
 )
 
 var CA_CERT = []byte(`-----BEGIN CERTIFICATE-----
@@ -179,6 +182,10 @@ func main() {
 	if *version {
 		fmt.Println(hv.NewHoverfly().GetVersion())
 		os.Exit(0)
+	}
+
+	if !*enableJournal {
+		hoverfly.Journal = journal.NewDisabledJournal()
 	}
 
 	// getting settings
