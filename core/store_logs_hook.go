@@ -1,21 +1,27 @@
 package hoverfly
 
 import (
-	"github.com/Sirupsen/logrus"
 	"time"
+
+	"github.com/Sirupsen/logrus"
 )
 
 type StoreLogsHook struct {
-	Entries []*logrus.Entry
+	Entries   []*logrus.Entry
+	LogsLimit int
 }
 
 func NewStoreLogsHook() *StoreLogsHook {
 	return &StoreLogsHook{
-		Entries: []*logrus.Entry{},
+		Entries:   []*logrus.Entry{},
+		LogsLimit: 1000,
 	}
 }
 
 func (hook *StoreLogsHook) Fire(entry *logrus.Entry) error {
+	if len(hook.Entries) >= hook.LogsLimit {
+		hook.Entries = append(hook.Entries[:0], hook.Entries[1:]...)
+	}
 	hook.Entries = append(hook.Entries, entry)
 	return nil
 }
