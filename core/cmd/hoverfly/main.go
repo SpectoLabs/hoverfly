@@ -99,6 +99,7 @@ var (
 	logsFormat = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\" (default \"plaintext\")")
 
 	enableJournal = flag.Bool("journal", true, "Enable or disable request/response journal (default \"true\")")
+	journalSize   = flag.Int("journal-size", 1000, "Set the size of request/response journal (default \"1000\")")
 )
 
 var CA_CERT = []byte(`-----BEGIN CERTIFICATE-----
@@ -187,6 +188,8 @@ func main() {
 	if !*enableJournal {
 		hoverfly.Journal = journal.NewDisabledJournal()
 	}
+
+	hoverfly.Journal.EntryLimit = *journalSize
 
 	// getting settings
 	cfg := hv.InitSettings()
