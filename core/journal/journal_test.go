@@ -16,7 +16,8 @@ func Test_NewJournal_ProducesAJournalWithAnEmptyArray(t *testing.T) {
 
 	unit := journal.NewJournal()
 
-	entries := unit.GetEntries()
+	entries, err := unit.GetEntries()
+	Expect(err).To(BeNil())
 
 	Expect(entries).ToNot(BeNil())
 	Expect(entries).To(HaveLen(0))
@@ -31,7 +32,7 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 
 	nowTime := time.Now()
 
-	unit.NewEntry(request, &http.Response{
+	err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -40,8 +41,10 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 			},
 		},
 	}, "test-mode", nowTime)
+	Expect(err).To(BeNil())
 
-	entries := unit.GetEntries()
+	entries, err := unit.GetEntries()
+	Expect(err).To(BeNil())
 
 	Expect(entries).ToNot(BeNil())
 	Expect(entries).To(HaveLen(1))
@@ -69,7 +72,7 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 
 	nowTime := time.Now()
 
-	unit.NewEntry(request, &http.Response{
+	err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -78,9 +81,10 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 			},
 		},
 	}, "test-mode", nowTime)
+	Expect(err).To(BeNil())
 
 	request.Method = "DELETE"
-	unit.NewEntry(request, &http.Response{
+	err = unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -89,14 +93,36 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 			},
 		},
 	}, "test-mode", nowTime)
+	Expect(err).To(BeNil())
 
-	entries := unit.GetEntries()
+	entries, err := unit.GetEntries()
+	Expect(err).To(BeNil())
 
 	Expect(entries).ToNot(BeNil())
 	Expect(entries).To(HaveLen(2))
 
 	Expect(*entries[0].Request.Method).To(Equal("GET"))
 	Expect(*entries[1].Request.Method).To(Equal("DELETE"))
+}
+
+func Test_Journal_NewEntry_WhenDisabledReturnsError(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewDisabledJournal()
+
+	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
+	err := unit.NewEntry(request, &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Header: http.Header{
+			"test-header": []string{
+				"one", "two",
+			},
+		},
+	}, "test-mode", time.Now())
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("No journal set"))
 }
 
 func Test_Journal_DeleteEntries_DeletesAllEntries(t *testing.T) {
@@ -118,9 +144,31 @@ func Test_Journal_DeleteEntries_DeletesAllEntries(t *testing.T) {
 		},
 	}, "test-mode", nowTime)
 
-	unit.DeleteEntries()
+	err := unit.DeleteEntries()
+	Expect(err).To(BeNil())
 
-	entries := unit.GetEntries()
+	entries, err := unit.GetEntries()
+	Expect(err).To(BeNil())
 
 	Expect(entries).To(HaveLen(0))
+}
+
+func Test_Journal_DeleteEntries_WhenDisabledReturnsError(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewDisabledJournal()
+
+	err := unit.DeleteEntries()
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("No journal set"))
+}
+
+func Test_Journal_GetEntries_WhenDisabledReturnsError(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewDisabledJournal()
+
+	_, err := unit.GetEntries()
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("No journal set"))
 }

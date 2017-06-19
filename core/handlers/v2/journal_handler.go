@@ -10,8 +10,8 @@ import (
 )
 
 type HoverflyJournal interface {
-	GetEntries() []JournalEntryView
-	DeleteEntries()
+	GetEntries() ([]JournalEntryView, error)
+	DeleteEntries() error
 }
 
 type JournalHandler struct {
@@ -33,12 +33,23 @@ func (this *JournalHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandl
 }
 
 func (this *JournalHandler) Get(response http.ResponseWriter, request *http.Request, next http.HandlerFunc) {
-	bytes, _ := json.Marshal(this.Hoverfly.GetEntries())
+	entries, err := this.Hoverfly.GetEntries()
+	if err != nil {
+		handlers.WriteErrorResponse(response, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	bytes, _ := json.Marshal(entries)
 	handlers.WriteResponse(response, bytes)
 }
 
 func (this *JournalHandler) Delete(response http.ResponseWriter, request *http.Request, next http.HandlerFunc) {
-	this.Hoverfly.DeleteEntries()
+	err := this.Hoverfly.DeleteEntries()
+	if err != nil {
+		handlers.WriteErrorResponse(response, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	this.Get(response, request, next)
 }
 

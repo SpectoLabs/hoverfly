@@ -1,6 +1,7 @@
 package journal
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -27,7 +28,15 @@ func NewJournal() *Journal {
 	}
 }
 
-func (this *Journal) NewEntry(request *http.Request, response *http.Response, mode string, started time.Time) {
+func NewDisabledJournal() *Journal {
+	return &Journal{}
+}
+
+func (this *Journal) NewEntry(request *http.Request, response *http.Response, mode string, started time.Time) error {
+	if this.entries == nil {
+		return fmt.Errorf("No journal set")
+	}
+
 	payloadRequest, _ := models.NewRequestDetailsFromHttpRequest(request)
 
 	respBody, _ := util.GetResponseBody(response)
@@ -45,9 +54,15 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 		TimeStarted: started,
 		Latency:     time.Since(started),
 	})
+
+	return nil
 }
 
-func (this Journal) GetEntries() []v2.JournalEntryView {
+func (this Journal) GetEntries() ([]v2.JournalEntryView, error) {
+	if this.entries == nil {
+		return []v2.JournalEntryView{}, fmt.Errorf("No journal set")
+	}
+
 	journalEntryViews := []v2.JournalEntryView{}
 	for _, journalEntry := range this.entries {
 		journalEntryViews = append(journalEntryViews, v2.JournalEntryView{
@@ -58,9 +73,15 @@ func (this Journal) GetEntries() []v2.JournalEntryView {
 			Latency:     (journalEntry.Latency / time.Millisecond),
 		})
 	}
-	return journalEntryViews
+	return journalEntryViews, nil
 }
 
-func (this *Journal) DeleteEntries() {
+func (this *Journal) DeleteEntries() error {
+	if this.entries == nil {
+		return fmt.Errorf("No journal set")
+	}
+
 	this.entries = []JournalEntry{}
+
+	return nil
 }
