@@ -19,12 +19,14 @@ type JournalEntry struct {
 }
 
 type Journal struct {
-	entries []JournalEntry
+	entries    []JournalEntry
+	EntryLimit int
 }
 
 func NewJournal() *Journal {
 	return &Journal{
-		entries: []JournalEntry{},
+		entries:    []JournalEntry{},
+		EntryLimit: 1000,
 	}
 }
 
@@ -45,6 +47,10 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 		Status:  response.StatusCode,
 		Body:    string(respBody),
 		Headers: response.Header,
+	}
+
+	if len(this.entries) >= this.EntryLimit {
+		this.entries = append(this.entries[:0], this.entries[1:]...)
 	}
 
 	this.entries = append(this.entries, JournalEntry{
