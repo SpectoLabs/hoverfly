@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"testing"
 	"time"
 
@@ -21,6 +22,8 @@ func Test_NewJournal_ProducesAJournalWithAnEmptyArray(t *testing.T) {
 
 	Expect(entries).ToNot(BeNil())
 	Expect(entries).To(HaveLen(0))
+
+	Expect(unit.EntryLimit).To(Equal(1000))
 }
 
 func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
@@ -61,6 +64,41 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 	Expect(entries[0].Mode).To(Equal("test-mode"))
 	Expect(entries[0].TimeStarted).To(Equal(nowTime))
 	Expect(entries[0].Latency).To(BeNumerically("<", 1))
+}
+
+func Test_Journal_NewEntry_RespectsEntryLimit(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+	unit.EntryLimit = 5
+
+	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
+
+	for i := 1; i < 8; i++ {
+		err := unit.NewEntry(request, &http.Response{
+			StatusCode: 200,
+			Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+			Header: http.Header{
+				"test-header": []string{
+					"one", "two",
+				},
+			},
+		}, strconv.Itoa(i), time.Now())
+		Expect(err).To(BeNil())
+	}
+
+	entries, err := unit.GetEntries()
+	Expect(err).To(BeNil())
+
+	Expect(entries).ToNot(BeNil())
+	Expect(entries).To(HaveLen(5))
+
+	Expect(entries[0].Mode).To(Equal("3"))
+	Expect(entries[1].Mode).To(Equal("4"))
+	Expect(entries[2].Mode).To(Equal("5"))
+	Expect(entries[3].Mode).To(Equal("6"))
+	Expect(entries[4].Mode).To(Equal("7"))
+
 }
 
 func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
