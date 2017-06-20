@@ -174,6 +174,23 @@ func Test_ReconstructResponse_AddsMultipleHeaderValuesToResponse(t *testing.T) {
 	Expect(values[2]).To(Equal("three"))
 }
 
+func Test_ReconstructResponse_MakesACopyOfTheHeadersWithoutReusingTheSamePointer(t *testing.T) {
+	RegisterTestingT(t)
+
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	pair := models.RequestResponsePair{}
+
+	headers := make(http.Header)
+	headers["Header"] = []string{"one", "two", "three"}
+
+	pair.Response.Headers = headers
+
+	response := modes.ReconstructResponse(req, pair)
+
+	Expect(response.Header).ToNot(BeIdenticalTo(headers))
+}
+
 func Test_ReconstructResponse_CanReturnACompleteHttpResponseWithAllFieldsFilled(t *testing.T) {
 	RegisterTestingT(t)
 
