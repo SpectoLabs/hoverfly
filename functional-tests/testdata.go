@@ -76,8 +76,7 @@ var JsonPayload = `{
                 "response": {
                     "status": 200,
                     "body": "destination matched",
-                    "encodedBody": false,
-                    "headers": {}
+                    "encodedBody": false
                 },
                 "request": {
                     "destination": {

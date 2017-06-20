@@ -3,12 +3,12 @@ package hoverfly_test
 import (
 	"io/ioutil"
 
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 var _ = Describe("When I run Hoverfly in simulate mode", func() {
@@ -40,7 +40,31 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 		Expect(resp.Header).To(HaveKeyWithValue("Header", []string{"value1", "value2"}))
 	})
 
+	It("should match against the first request matcher in simulation over HTTPS", func() {
+		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+
+		resp := hoverfly.Proxy(sling.New().Get("https://test-server.com/path1"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err := ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+
+		Expect(string(body)).To(Equal("exact match"))
+		Expect(resp.Header).To(HaveKeyWithValue("Header", []string{"value1", "value2"}))
+	})
+
 	It("should match against the second request matcher in simulation", func() {
+		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+
+		slingRequest := sling.New().Get("http://destination-server.com/should-match-regardless")
+		response := hoverfly.Proxy(slingRequest)
+
+		body, err := ioutil.ReadAll(response.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("destination matched"))
+	})
+
+	It("should match against the second request matcher in simulation over HTTPS", func() {
 		hoverfly.ImportSimulation(functional_tests.JsonPayload)
 
 		slingRequest := sling.New().Get("http://destination-server.com/should-match-regardless")
@@ -77,7 +101,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 	It("Should perform a strongest match when set explicitly", func() {
 		hoverfly.SetModeWithArgs("simulate", v2.ModeArgumentsView{
-			MatchingStrategy : util.StringToPointer("strongest"),
+			MatchingStrategy: util.StringToPointer("strongest"),
 		})
 
 		hoverfly.ImportSimulation(functional_tests.StrongestMatchProofSimulation)
@@ -92,7 +116,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 	It("Should perform a strongest match when set explicitly", func() {
 		hoverfly.SetModeWithArgs("simulate", v2.ModeArgumentsView{
-			MatchingStrategy : util.StringToPointer("first"),
+			MatchingStrategy: util.StringToPointer("first"),
 		})
 
 		hoverfly.ImportSimulation(functional_tests.StrongestMatchProofSimulation)
@@ -163,8 +187,7 @@ Which if hit would have given the following response:
 {
     "status": 200,
     "body": "",
-    "encodedBody": false,
-    "headers": null
+    "encodedBody": false
 }`
 		Expect(string(body)).To(Equal(expected))
 
@@ -222,8 +245,7 @@ Which if hit would have given the following response:
 {
     "status": 200,
     "body": "",
-    "encodedBody": false,
-    "headers": null
+    "encodedBody": false
 }`
 		Expect(string(body)).To(Equal(expected))
 	})

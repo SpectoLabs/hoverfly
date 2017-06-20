@@ -213,7 +213,7 @@ func (this SimulationViewV1) Upgrade() SimulationViewV2 {
 
 type DataViewV2 struct {
 	RequestResponsePairs []RequestMatcherResponsePairViewV2 `json:"pairs"`
-	GlobalActions        GlobalActionsView           `json:"globalActions"`
+	GlobalActions        GlobalActionsView                  `json:"globalActions"`
 }
 
 type DataViewV1 struct {
@@ -229,7 +229,7 @@ type RequestMatcherResponsePairViewV2 struct {
 type ClosestMissView struct {
 	Response       ResponseDetailsView  `json:"response"`
 	RequestMatcher RequestMatcherViewV2 `json:"requestMatcher"`
-	MissedFields   []string `json:"missedFields"`
+	MissedFields   []string             `json:"missedFields"`
 }
 
 //Gets Response - required for interfaces.RequestResponsePairView
@@ -313,7 +313,7 @@ type ResponseDetailsView struct {
 	Status      int                 `json:"status"`
 	Body        string              `json:"body"`
 	EncodedBody bool                `json:"encodedBody"`
-	Headers     map[string][]string `json:"headers"`
+	Headers     map[string][]string `json:"headers,omitempty"`
 }
 
 //Gets Status - required for interfaces.Response
