@@ -10,6 +10,8 @@ import (
 	"net/url"
 	"sync"
 
+	"strings"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
@@ -19,7 +21,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"strings"
 )
 
 // orPanic - wrapper for logging errors

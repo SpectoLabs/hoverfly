@@ -10,9 +10,9 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond
@@ -42,8 +42,8 @@ type Hoverfly interface {
 }
 
 type ModeArguments struct {
-	Headers []string
-	MatchingStrategy * string
+	Headers          []string
+	MatchingStrategy *string
 }
 
 // ReconstructRequest replaces original request with details provided in Constructor Payload.RequestMatcher
@@ -79,7 +79,14 @@ func ReconstructResponse(request *http.Request, pair models.RequestResponsePair)
 	response.ContentLength = int64(buf.Len())
 	response.Body = ioutil.NopCloser(buf)
 	response.StatusCode = pair.Response.Status
-	response.Header = pair.Response.Headers
+
+	headers := make(http.Header)
+
+	for k, v := range pair.Response.Headers {
+		headers[k] = v
+	}
+
+	response.Header = headers
 
 	return response
 }
