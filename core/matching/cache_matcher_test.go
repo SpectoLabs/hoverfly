@@ -54,55 +54,6 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_CanSaveNilPairs(t *testing
 	Expect(err).To(BeNil())
 
 	Expect(cachedResponse.MatchingPair).To(BeNil())
-	Expect(cachedResponse.HeaderMatch).To(BeFalse())
-}
-
-func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillSaveWithHeaderMatchFalseIfNoHeadesWereOnTheRequestMatcher(t *testing.T) {
-	RegisterTestingT(t)
-	unit := matching.CacheMatcher{
-		RequestCache: cache.NewInMemoryCache(),
-	}
-
-	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, &models.RequestMatcherResponsePair{
-		RequestMatcher: models.RequestMatcher{
-			Destination: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("test"),
-			},
-		},
-	}, nil)
-	Expect(err).To(BeNil())
-
-	cacheValues, err := unit.RequestCache.Get([]byte("d41d8cd98f00b204e9800998ecf8427e"))
-	Expect(err).To(BeNil())
-
-	cachedResponse, err := models.NewCachedResponseFromBytes(cacheValues)
-	Expect(err).To(BeNil())
-
-	Expect(cachedResponse.HeaderMatch).To(BeFalse())
-}
-
-func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillSaveWithHeaderMatchTrueHeadesWereOnTheRequestMatcher(t *testing.T) {
-	RegisterTestingT(t)
-	unit := matching.CacheMatcher{
-		RequestCache: cache.NewInMemoryCache(),
-	}
-
-	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, &models.RequestMatcherResponsePair{
-		RequestMatcher: models.RequestMatcher{
-			Headers: map[string][]string{
-				"test": []string{"headers"},
-			},
-		},
-	}, nil)
-	Expect(err).To(BeNil())
-
-	cacheValues, err := unit.RequestCache.Get([]byte("d41d8cd98f00b204e9800998ecf8427e"))
-	Expect(err).To(BeNil())
-
-	cachedResponse, err := models.NewCachedResponseFromBytes(cacheValues)
-	Expect(err).To(BeNil())
-
-	Expect(cachedResponse.HeaderMatch).To(BeTrue())
 }
 
 func Test_CacheMatcher_FlushCache_WillReturnErrorIfCacheIsNil(t *testing.T) {
@@ -224,7 +175,59 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 
 	err := unit.PreloadCache(models.Simulation{
 		MatchingPairs: []models.RequestMatcherResponsePair{
+			{
+				RequestMatcher: models.RequestMatcher{
+					Destination: &models.RequestFieldMatchers{
+						RegexMatch: util.StringToPointer("destination"),
+					},
+				},
+				Response: models.ResponseDetails{
+					Status: 200,
+					Body:   "body",
+				},
+			},
 			models.RequestMatcherResponsePair{
+				RequestMatcher: models.RequestMatcher{
+					Body: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("body"),
+					},
+					Destination: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("destination"),
+					},
+					Method: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("method"),
+					},
+					Path: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("path"),
+					},
+					Query: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("query"),
+					},
+					Scheme: &models.RequestFieldMatchers{
+						ExactMatch: util.StringToPointer("scheme"),
+					},
+				},
+				Response: models.ResponseDetails{
+					Status: 200,
+					Body:   "body",
+				},
+			},
+		},
+	})
+
+	Expect(err).To(BeNil())
+	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(1))
+}
+
+func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T) {
+	RegisterTestingT(t)
+	unit := matching.CacheMatcher{
+		RequestCache: cache.NewInMemoryCache(),
+	}
+
+	err := unit.PreloadCache(models.Simulation{
+		MatchingPairs: []models.RequestMatcherResponsePair{
+			{
 				RequestMatcher: models.RequestMatcher{
 					Destination: &models.RequestFieldMatchers{
 						RegexMatch: util.StringToPointer("destination"),
@@ -268,5 +271,5 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 	})
 
 	Expect(err).To(BeNil())
-	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(1))
+	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
 }

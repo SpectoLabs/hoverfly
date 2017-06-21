@@ -6,9 +6,9 @@ import (
 	glob "github.com/ryanuber/go-glob"
 )
 
-func CountlessHeaderMatcher(matchingHeaders, toMatch map[string][]string) * FieldMatch {
+func CountlessHeaderMatcher(requestMatcherHeaders, toMatch map[string][]string) * FieldMatch {
 
-	for matcherHeaderKey, matcherHeaderValues := range matchingHeaders {
+	for matcherHeaderKey, matcherHeaderValues := range requestMatcherHeaders {
 
 		// Make everything lowercase, as headers are case insensitive
 		for requestHeaderKey, requestHeaderValues := range toMatch {
@@ -37,12 +37,12 @@ func CountlessHeaderMatcher(matchingHeaders, toMatch map[string][]string) * Fiel
 	return FieldMatchWithNoScore(true)
 }
 
-func CountingHeaderMatcher(matchingHeaders, toMatch map[string][]string) * FieldMatch {
+func CountingHeaderMatcher(requestMatcherHeaders, toMatch map[string][]string) * FieldMatch {
 
 	matched := true
 	var matchScore int
 
-	for matcherHeaderKey, matcherHeaderValues := range matchingHeaders {
+	for matcherHeaderKey, matcherHeaderValues := range requestMatcherHeaders {
 
 		// Make everything lowercase, as headers are case insensitive
 		for requestHeaderKey, requestHeaderValues := range toMatch {

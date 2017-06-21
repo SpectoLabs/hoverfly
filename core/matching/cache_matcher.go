@@ -106,9 +106,8 @@ func (this CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 
 			cachedResponseView := v2.CachedResponseView{
 				Key:          key,
-				HeaderMatch:  cachedResponse.HeaderMatch,
 				MatchingPair: pair,
-				ClosestMiss: closestMiss,
+				ClosestMiss:  closestMiss,
 			}
 
 			cacheView.Cache = append(cacheView.Cache, cachedResponseView)
@@ -122,9 +121,20 @@ func (this CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 	return cacheView, nil
 }
 
-func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestDetails, pair *models.RequestMatcherResponsePair, closestMiss *models.ClosestMiss) error {
+// TODO: This would be easier to reason about if we had two methods, "CacheHit" and "CacheHit" in order to reduce bloating
+func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestDetails, pair *models.RequestMatcherResponsePair, matchError *models.MatchError) error {
 	if this.RequestCache == nil {
 		return errors.New("No cache set")
+	}
+
+	// Do not cache misses if the only thing they missed on was headers because a subsequent request which is the same
+	// but with different headers will need to go through matching
+	if matchError != nil && matchError.MatchedOnAllButHeadersAtLeastOnce {
+		return nil
+		// And do not cache hits if they matched on headers because a subsequent request which is the same
+		// but with different headers will need to go through matching
+	} else if pair != nil && pair.RequestMatcher.IncludesHeaderMatching() {
+		return nil
 	}
 
 	var key string
@@ -144,13 +154,13 @@ func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestD
 		"hashKey":       key,
 	}).Debug("Saving response to cache")
 
-	headerMatch := pair != nil && len(pair.RequestMatcher.Headers) > 0
-
 	cachedResponse := models.CachedResponse{
 		Request:      request,
 		MatchingPair: pair,
-		HeaderMatch:  headerMatch,
-		ClosestMiss: closestMiss,
+	}
+
+	if matchError != nil {
+		cachedResponse.ClosestMiss = matchError.ClosestMiss
 	}
 
 	pairBytes, err := cachedResponse.Encode()

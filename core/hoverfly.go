@@ -255,25 +255,24 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	cachedResponse, cacheErr := hf.CacheMatcher.GetCachedResponse(&requestDetails)
 	if cacheErr == nil && cachedResponse.MatchingPair == nil {
 		return nil, matching.MissedError(cachedResponse.ClosestMiss)
-	} else if cacheErr == nil && !cachedResponse.HeaderMatch {
+	} else if cacheErr == nil {
 		return &cachedResponse.MatchingPair.Response, nil
 	}
 
 	var pair *models.RequestMatcherResponsePair
-	var err error
-	var closestMiss *models.ClosestMiss
+	var err * models.MatchError
 
 	mode := (hf.modeMap[modes.Simulate]).(*modes.SimulateMode)
 
 	strongestMatch := strings.ToLower(mode.MatchingStrategy) == "strongest"
 
 	if strongestMatch {
-		pair, closestMiss, err = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
+		pair, err = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
 	} else {
 		pair, err = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
 	}
 
-	hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, closestMiss)
+	hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, err)
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -284,7 +283,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 			"method":      requestDetails.Method,
 		}).Warn("Failed to find matching request from simulation")
 
-		return nil, matching.MissedError(closestMiss)
+		return nil, matching.MissedError(err.ClosestMiss)
 	}
 
 	return &pair.Response, nil

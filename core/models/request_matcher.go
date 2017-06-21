@@ -120,6 +120,10 @@ type RequestMatcher struct {
 	Headers     map[string][]string
 }
 
+func (this RequestMatcher) IncludesHeaderMatching() bool {
+	return this.Headers != nil && len(this.Headers) > 0
+}
+
 func (this RequestMatcher) BuildRequestDetailsFromExactMatches() *RequestDetails {
 	if this.Body == nil || this.Body.ExactMatch == nil ||
 		this.Destination == nil || this.Destination.ExactMatch == nil ||
@@ -139,5 +143,29 @@ func (this RequestMatcher) BuildRequestDetailsFromExactMatches() *RequestDetails
 		Query:       *this.Query.ExactMatch,
 		Scheme:      *this.Scheme.ExactMatch,
 	}
+}
 
+type MatchError struct {
+	ClosestMiss                       *ClosestMiss
+	error                             string
+	MatchedOnAllButHeadersAtLeastOnce bool
+}
+
+func NewMatchErrorWithClosestMiss(closestMiss * ClosestMiss, error string, matchedOnAllButHeadersAtLeastOnce bool) * MatchError {
+	return &MatchError{
+		ClosestMiss:                       closestMiss,
+		error:                             error,
+		MatchedOnAllButHeadersAtLeastOnce: matchedOnAllButHeadersAtLeastOnce,
+	}
+}
+
+func NewMatchError(error string, matchedOnAllButHeadersAtLeastOnce bool) * MatchError {
+	return &MatchError{
+		error:                             error,
+		MatchedOnAllButHeadersAtLeastOnce: matchedOnAllButHeadersAtLeastOnce,
+	}
+}
+
+func (this MatchError) Error() string {
+	return this.error
 }

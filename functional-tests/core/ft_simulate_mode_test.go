@@ -251,7 +251,8 @@ Which if hit would have given the following response:
 	})
 
 	It("should no longer cause issue #607", func() {
-		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+
+		hoverfly.ImportSimulation(functional_tests.Issue607)
 
 		// Match
 		i := sling.New().Get("https://domain.com/billing/v1/servicequotes/123456?saleschannel=RETAIL")
@@ -261,7 +262,6 @@ Which if hit would have given the following response:
 		i.Set("Authorization", "Bearer token")
 		i.Set("Cache-Control", "no-cache")
 		i.Set("Channelid", "RETAIL")
-		i.Set("Content-Length", "0")
 		i.Set("Content-Type", "application/json")
 		i.Set("Interactionid", "123456787")
 		i.Set("Senderid", "ACUI")
@@ -269,7 +269,9 @@ Which if hit would have given the following response:
 		i.Set("Workflowid", "CHANGEMSISDN")
 
 		resp := hoverfly.Proxy(i)
+
 		Expect(resp.StatusCode).To(Equal(200))
+		Expect(hoverfly.GetCache().Cache).To(BeEmpty()) // Don't cache hits which include header matching
 
 		// Miss
 		i = sling.New().Get("https://domain.com/billing/v1/servicequotes/123456?saleschannel=RETAIL")
@@ -279,7 +281,6 @@ Which if hit would have given the following response:
 		i.Set("Authorization", "Bearer token")
 		i.Set("Cache-Control", "no-cache")
 		i.Set("Channelid", "RETAIL")
-		i.Set("Content-Length", "0")
 		i.Set("Content-Type", "application/json")
 		i.Set("Interactionid", "123456787")
 		i.Set("Senderid", "ACUI")
@@ -287,7 +288,8 @@ Which if hit would have given the following response:
 		i.Set("Workflowid", "CHANGEMSISDN")
 
 		resp = hoverfly.Proxy(i)
-		Expect(resp.StatusCode).To(Equal(503))
+		Expect(resp.StatusCode).To(Equal(502))
+		Expect(hoverfly.GetCache().Cache).To(BeEmpty()) // Don't cache misses when only headers were not matched
 
 		// Match again
 		i = sling.New().Get("https://domain.com/billing/v1/servicequotes/123456?saleschannel=RETAIL")
@@ -297,7 +299,6 @@ Which if hit would have given the following response:
 		i.Set("Authorization", "Bearer token")
 		i.Set("Cache-Control", "no-cache")
 		i.Set("Channelid", "RETAIL")
-		i.Set("Content-Length", "0")
 		i.Set("Content-Type", "application/json")
 		i.Set("Interactionid", "123456787")
 		i.Set("Senderid", "ACUI")
@@ -305,6 +306,11 @@ Which if hit would have given the following response:
 		i.Set("Workflowid", "CHANGEMSISDN")
 
 		resp = hoverfly.Proxy(i)
+
+		body, _ := ioutil.ReadAll(resp.Body)
+		GinkgoWriter.Write(body)
+
 		Expect(resp.StatusCode).To(Equal(200))
+		Expect(hoverfly.GetCache().Cache).To(BeEmpty()) // Don't cache hits which include header matching
 	})
 })
