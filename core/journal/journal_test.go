@@ -8,7 +8,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/journal"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
 
@@ -212,4 +214,218 @@ func Test_Journal_GetEntries_WhenDisabledReturnsError(t *testing.T) {
 	_, err := unit.GetEntries()
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Journal disabled"))
+}
+
+func Test_Journal_GetFilteredLogs_WillFilterOnRequestFields(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	request, _ := http.NewRequest("GET", "http://hoverfly.io/path/one?one=1&two=2", bytes.NewBufferString(`{"meta:{"field": "value"}}`))
+	request.Header.Add("Accept", "application/json")
+
+	unit.NewEntry(request, &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+	}, "test-mode", time.Now())
+
+	// Body
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Body: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer(`{"meta:{"field": "value"}}`),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Body: &v2.RequestFieldMatchersView{
+				GlobMatch: util.StringToPointer(`{"meta:{"field": "*"}}`),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Body: &v2.RequestFieldMatchersView{
+				JsonMatch: util.StringToPointer(`{"meta:{"field": "value"}}`),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Body: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer(`{"meta:{"field": "other-value"}}`),
+			},
+		},
+	})).To(HaveLen(0))
+
+	// Destination
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Destination: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("hoverfly.io"),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Destination: &v2.RequestFieldMatchersView{
+				GlobMatch: util.StringToPointer("*.io"),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Destination: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("hoverfly.com"),
+			},
+		},
+	})).To(HaveLen(0))
+
+	// Destination
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Method: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("GET"),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Method: &v2.RequestFieldMatchersView{
+				GlobMatch: util.StringToPointer("*"),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Method: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("POST"),
+			},
+		},
+	})).To(HaveLen(0))
+
+	// Path
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Path: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("/path/one"),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Path: &v2.RequestFieldMatchersView{
+				GlobMatch: util.StringToPointer("/path/*"),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Path: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("/path/two"),
+			},
+		},
+	})).To(HaveLen(0))
+
+	// Query
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Query: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("one=1&two=2"),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Query: &v2.RequestFieldMatchersView{
+				GlobMatch: util.StringToPointer("*one=1*"),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Query: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("one=1"),
+			},
+		},
+	})).To(HaveLen(0))
+
+	// Scheme
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Scheme: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("http"),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Scheme: &v2.RequestFieldMatchersView{
+				GlobMatch: util.StringToPointer("*"),
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Scheme: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("nothttp"),
+			},
+		},
+	})).To(HaveLen(0))
+
+	// Headers
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Headers: map[string][]string{
+				"Accept": []string{"application/json"},
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{
+			Headers: map[string][]string{
+				"Accept": []string{"application/xml"},
+			},
+		},
+	})).To(HaveLen(0))
+}
+
+func Test_Journal_GetFilteredLogs_WillReturnEmptyIfRequestMatcherIsEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	request, _ := http.NewRequest("GET", "http://hoverfly.io/path/one?one=1&two=2", bytes.NewBufferString(`{"meta:{"field": "value"}}`))
+	request.Header.Add("Accept", "application/json")
+
+	unit.NewEntry(request, &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+	}, "test-mode", time.Now())
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV2{},
+	})).To(HaveLen(0))
 }

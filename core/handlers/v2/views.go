@@ -73,3 +73,7 @@ type JournalEntryView struct {
 	TimeStarted string               `json:"timeStarted"`
 	Latency     time.Duration        `json:"latency"`
 }
+
+type JournalEntryFilterView struct {
+	Request RequestMatcherViewV2 `json:"request"`
+}
