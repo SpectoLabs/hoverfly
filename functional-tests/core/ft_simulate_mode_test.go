@@ -249,4 +249,62 @@ Which if hit would have given the following response:
 }`
 		Expect(string(body)).To(Equal(expected))
 	})
+
+	It("should no longer cause issue #607", func() {
+		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+
+		// Match
+		i := sling.New().Get("https://domain.com/billing/v1/servicequotes/123456?saleschannel=RETAIL")
+		i.Set("Accept", "application/json")
+		i.Set("Activityid", "ChangeMSISDN_CR_PushtoBill(Get)-200")
+		i.Set("Applicationid", "ACUI")
+		i.Set("Authorization", "Bearer token")
+		i.Set("Cache-Control", "no-cache")
+		i.Set("Channelid", "RETAIL")
+		i.Set("Content-Length", "0")
+		i.Set("Content-Type", "application/json")
+		i.Set("Interactionid", "123456787")
+		i.Set("Senderid", "ACUI")
+		i.Set("User-Agent", "curl/7.54.0")
+		i.Set("Workflowid", "CHANGEMSISDN")
+
+		resp := hoverfly.Proxy(i)
+		Expect(resp.StatusCode).To(Equal(200))
+
+		// Miss
+		i = sling.New().Get("https://domain.com/billing/v1/servicequotes/123456?saleschannel=RETAIL")
+		i.Set("Accept", "application/json")
+		i.Set("Activityid", "ChangeMSISDN_Procedural(Get)-200")
+		i.Set("Applicationid", "ACUI")
+		i.Set("Authorization", "Bearer token")
+		i.Set("Cache-Control", "no-cache")
+		i.Set("Channelid", "RETAIL")
+		i.Set("Content-Length", "0")
+		i.Set("Content-Type", "application/json")
+		i.Set("Interactionid", "123456787")
+		i.Set("Senderid", "ACUI")
+		i.Set("User-Agent", "curl/7.54.0")
+		i.Set("Workflowid", "CHANGEMSISDN")
+
+		resp = hoverfly.Proxy(i)
+		Expect(resp.StatusCode).To(Equal(503))
+
+		// Match again
+		i = sling.New().Get("https://domain.com/billing/v1/servicequotes/123456?saleschannel=RETAIL")
+		i.Set("Accept", "application/json")
+		i.Set("Activityid", "ChangeMSISDN_CR_PushtoBill(Get)-200")
+		i.Set("Applicationid", "ACUI")
+		i.Set("Authorization", "Bearer token")
+		i.Set("Cache-Control", "no-cache")
+		i.Set("Channelid", "RETAIL")
+		i.Set("Content-Length", "0")
+		i.Set("Content-Type", "application/json")
+		i.Set("Interactionid", "123456787")
+		i.Set("Senderid", "ACUI")
+		i.Set("User-Agent", "curl/7.54.0")
+		i.Set("Workflowid", "CHANGEMSISDN")
+
+		resp = hoverfly.Proxy(i)
+		Expect(resp.StatusCode).To(Equal(200))
+	})
 })
