@@ -1,15 +1,15 @@
 package matching
 
 import (
-	"errors"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-
-func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (requestMatch *models.RequestMatcherResponsePair, closestMiss *models.ClosestMiss, err error) {
+func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (requestMatch *models.RequestMatcherResponsePair, err * models.MatchError) {
 
 	var closestMissScore int
 	var strongestMatchScore int
+	var closestMiss *models.ClosestMiss
+	matchedOnAllButHeadersAtLeastOnce := false
 
 	for _, matchingPair := range simulation.MatchingPairs {
 		// TODO: not matching by default on URL and body - need to enable this
@@ -18,11 +18,13 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 		missedFields := make([]string, 0)
 		var matchScore int
 		matched := true
+		matchedOnAllButHeaders := true
 
 		requestMatcher := matchingPair.RequestMatcher
 
 		fieldMatch := ScoredFieldMatcher(requestMatcher.Body, req.Body)
 		if !fieldMatch.Matched {
+			matchedOnAllButHeaders = false
 			matched = false
 			missedFields = append(missedFields, "body")
 		}
@@ -31,6 +33,7 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 		if !webserver {
 			match := ScoredFieldMatcher(requestMatcher.Destination, req.Destination)
 			if !match.Matched {
+				matchedOnAllButHeaders = false
 				matched = false
 				missedFields = append(missedFields, "destination")
 			}
@@ -39,6 +42,7 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 
 		fieldMatch = ScoredFieldMatcher(requestMatcher.Path, req.Path)
 		if !fieldMatch.Matched {
+			matchedOnAllButHeaders = false
 			matched = false
 			missedFields = append(missedFields, "path")
 		}
@@ -46,6 +50,7 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 
 		fieldMatch = ScoredFieldMatcher(requestMatcher.Query, req.Query)
 		if !fieldMatch.Matched {
+			matchedOnAllButHeaders = false
 			matched = false
 			missedFields = append(missedFields, "query")
 		}
@@ -53,6 +58,7 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 
 		fieldMatch = ScoredFieldMatcher(requestMatcher.Method, req.Method)
 		if !fieldMatch.Matched {
+			matchedOnAllButHeaders = false
 			matched = false
 			missedFields = append(missedFields, "method")
 		}
@@ -62,6 +68,9 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 		if !fieldMatch.Matched {
 			matched = false
 			missedFields = append(missedFields, "headers")
+			if matchedOnAllButHeaders {
+				matchedOnAllButHeadersAtLeastOnce = true
+			}
 		}
 		matchScore += fieldMatch.MatchScore
 
@@ -78,14 +87,14 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 			closestMiss = &models.ClosestMiss{
 				RequestDetails: req,
 				RequestMatcher: view.RequestMatcher,
-				Response: view.Response,
-				MissedFields: missedFields,
+				Response:       view.Response,
+				MissedFields:   missedFields,
 			}
 		}
 	}
 
 	if requestMatch == nil {
-		err = errors.New("No match found")
+		err = models.NewMatchErrorWithClosestMiss(closestMiss,"No match found", matchedOnAllButHeadersAtLeastOnce)
 	}
 
 	return

@@ -189,7 +189,7 @@ func Test_CountingHeaderMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
 			"header1": {"val1", "val2"},
 		},
 		map[string][]string{
-			"header1": {"val1", "val2"},
+			"header1":     {"val1", "val2"},
 			"extraHeader": {"extraHeader1", "extraHeader2"},
 		})
 
@@ -202,8 +202,8 @@ func Test_CountingHeaderMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
 			"header2": {"val3"},
 		},
 		map[string][]string{
-			"header1": {"val1", "val2"},
-			"header2": {"val3", "extra"},
+			"header1":     {"val1", "val2"},
+			"header2":     {"val3", "extra"},
 			"extraHeader": {"extraHeader1", "extraHeader2"},
 		})
 
@@ -220,8 +220,8 @@ func Test_CountingHeaderMatcher_CountsMatches_WhenThereIsNoMatch(t *testing.T) {
 			"header2": {"val3", "nomatch"},
 		},
 		map[string][]string{
-			"header1": {"val1", "val2"},
-			"header2": {"val3", "extra"},
+			"header1":     {"val1", "val2"},
+			"header2":     {"val3", "extra"},
 			"extraHeader": {"extraHeader1", "extraHeader2"},
 		})
 

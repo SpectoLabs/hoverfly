@@ -489,3 +489,189 @@ func Test_FirstMatchRequestMatcher_RequestMatcherResponsePair_ConvertToRequestRe
 
 	Expect(pairView.Response.Body).To(Equal("request matched"))
 }
+
+func Test_ShouldStoreIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("POST"),
+			},
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("body"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("http"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("?foo=bar"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/foo"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("www.test.com"),
+			},
+			Headers: map[string][]string {
+				"foo" : {"bar"},
+			},
+		},
+		Response: testResponse,
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: testResponse,
+	})
+
+	r := models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query:       "?foo=bar",
+		Scheme: "http",
+		Body: "body",
+		Path: "/foo",
+		Headers: map[string][]string {
+			"miss" : {"me"},
+		},
+	}
+
+	_, err := matching.FirstMatchRequestMatcher(r, false, simulation)
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.MatchedOnAllButHeadersAtLeastOnce).To(BeTrue())
+}
+
+func Test_ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("POST"),
+			},
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("body"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("http"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("?foo=bar"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/foo"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("www.test.com"),
+			},
+			Headers: map[string][]string {
+				"foo" : {"bar"},
+			},
+		},
+		Response: testResponse,
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: testResponse,
+	})
+
+	r := models.RequestDetails{
+		Method:      "MISS",
+		Destination: "www.test.com",
+		Query:       "?foo=bar",
+		Scheme: "http",
+		Body: "body",
+		Path: "/foo",
+		Headers: map[string][]string {
+			"miss" : {"me"},
+		},
+	}
+
+	_, err := matching.FirstMatchRequestMatcher(r, false, simulation)
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.MatchedOnAllButHeadersAtLeastOnce).To(BeFalse())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "miss",
+		Query:       "?foo=bar",
+		Scheme: "http",
+		Body: "body",
+		Path: "/foo",
+		Headers: map[string][]string {
+			"miss" : {"me"},
+		},
+	}
+
+	_, err = matching.FirstMatchRequestMatcher(r, false, simulation)
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.MatchedOnAllButHeadersAtLeastOnce).To(BeFalse())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query:       "miss",
+		Scheme: "http",
+		Body: "body",
+		Path: "/foo",
+		Headers: map[string][]string {
+			"miss" : {"me"},
+		},
+	}
+
+	_, err = matching.FirstMatchRequestMatcher(r, false, simulation)
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.MatchedOnAllButHeadersAtLeastOnce).To(BeFalse())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query:       "?foo=bar",
+		Scheme: "http",
+		Body: "miss",
+		Path: "/foo",
+		Headers: map[string][]string {
+			"miss" : {"me"},
+		},
+	}
+
+	_, err = matching.FirstMatchRequestMatcher(r, false, simulation)
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.MatchedOnAllButHeadersAtLeastOnce).To(BeFalse())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query:       "?foo=bar",
+		Scheme: "http",
+		Body: "body",
+		Path: "miss",
+		Headers: map[string][]string {
+			"miss" : {"me"},
+		},
+	}
+
+	_, err = matching.FirstMatchRequestMatcher(r, false, simulation)
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.MatchedOnAllButHeadersAtLeastOnce).To(BeFalse())
+}
