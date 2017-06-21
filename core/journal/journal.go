@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
@@ -76,6 +77,57 @@ func (this Journal) GetEntries() ([]v2.JournalEntryView, error) {
 		})
 	}
 	return journalEntryViews, nil
+}
+
+func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFilterView) ([]v2.JournalEntryView, error) {
+	requestMatcher := models.RequestMatcher{
+		Path:        models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Path),
+		Method:      models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Method),
+		Destination: models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Destination),
+		Scheme:      models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Scheme),
+		Query:       models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Query),
+		Body:        models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
+		Headers:     journalEntryFilterView.Request.Headers,
+	}
+	allEntries, err := this.GetEntries()
+	if err != nil {
+		return []v2.JournalEntryView{}, err
+	}
+
+	filteredEntries := []v2.JournalEntryView{}
+
+	for _, entry := range allEntries {
+		if requestMatcher.Body == nil && requestMatcher.Destination == nil &&
+			requestMatcher.Headers == nil && requestMatcher.Method == nil &&
+			requestMatcher.Path == nil && requestMatcher.Query == nil &&
+			requestMatcher.Scheme == nil {
+			continue
+		}
+		if !matching.UnscoredFieldMatcher(requestMatcher.Body, *entry.Request.Body).Matched {
+			continue
+		}
+		if !matching.UnscoredFieldMatcher(requestMatcher.Destination, *entry.Request.Destination).Matched {
+			continue
+		}
+		if !matching.UnscoredFieldMatcher(requestMatcher.Method, *entry.Request.Method).Matched {
+			continue
+		}
+		if !matching.UnscoredFieldMatcher(requestMatcher.Path, *entry.Request.Path).Matched {
+			continue
+		}
+		if !matching.UnscoredFieldMatcher(requestMatcher.Query, *entry.Request.Query).Matched {
+			continue
+		}
+		if !matching.UnscoredFieldMatcher(requestMatcher.Scheme, *entry.Request.Scheme).Matched {
+			continue
+		}
+		if !matching.CountlessHeaderMatcher(requestMatcher.Headers, entry.Request.Headers).Matched {
+			continue
+		}
+		filteredEntries = append(filteredEntries, entry)
+	}
+
+	return filteredEntries, nil
 }
 
 func (this *Journal) DeleteEntries() error {
