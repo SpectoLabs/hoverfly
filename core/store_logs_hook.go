@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Sirupsen/logrus"
@@ -19,6 +20,9 @@ func NewStoreLogsHook() *StoreLogsHook {
 }
 
 func (hook *StoreLogsHook) Fire(entry *logrus.Entry) error {
+	if hook.LogsLimit == 0 {
+		return nil
+	}
 	if len(hook.Entries) >= hook.LogsLimit {
 		hook.Entries = append(hook.Entries[:0], hook.Entries[1:]...)
 	}
@@ -43,7 +47,10 @@ func (hook StoreLogsHook) GetLogsCount() int {
 	return len(hook.Entries)
 }
 
-func (hook StoreLogsHook) GetLogs(limit int, from *time.Time) []*logrus.Entry {
+func (hook StoreLogsHook) GetLogs(limit int, from *time.Time) ([]*logrus.Entry, error) {
+	if hook.LogsLimit == 0 {
+		return []*logrus.Entry{}, fmt.Errorf("Logs disabled")
+	}
 	entriesLength := len(hook.Entries)
 	if limit > entriesLength {
 		limit = entriesLength
@@ -59,8 +66,8 @@ func (hook StoreLogsHook) GetLogs(limit int, from *time.Time) []*logrus.Entry {
 				}
 			}
 		}
-		return entries
+		return entries, nil
 	} else {
-		return hook.Entries[entriesLength-limit:]
+		return hook.Entries[entriesLength-limit:], nil
 	}
 }

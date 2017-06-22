@@ -9,15 +9,16 @@ import (
 	"strconv"
 	"strings"
 
+	"time"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
-	"time"
 )
 
 type HoverflyLogs interface {
-	GetLogs(limit int, from *time.Time) []*logrus.Entry
+	GetLogs(limit int, from *time.Time) ([]*logrus.Entry, error)
 }
 
 type LogsHandler struct {
@@ -39,8 +40,6 @@ func (this *LogsHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler)
 }
 
 func (this *LogsHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	var logs []*logrus.Entry
-
 	queryParams := req.URL.Query()
 	limitQuery, _ := strconv.Atoi(queryParams.Get("limit"))
 	if limitQuery == 0 {
@@ -56,7 +55,11 @@ func (this *LogsHandler) Get(w http.ResponseWriter, req *http.Request, next http
 		fromTime = &fromTimeValue
 	}
 
-	logs = this.Hoverfly.GetLogs(limitQuery, fromTime)
+	logs, err := this.Hoverfly.GetLogs(limitQuery, fromTime)
+	if err != nil {
+		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	if strings.Contains(req.Header.Get("Accept"), "text/plain") ||
 		strings.Contains(req.Header.Get("Content-Type"), "text/plain") {
@@ -118,7 +121,8 @@ func (this *LogsHandler) GetWS(w http.ResponseWriter, r *http.Request) {
 	var previousLogs LogsView
 
 	handlers.NewWebsocket(func() ([]byte, error) {
-		currentLogs := logsToLogsView(this.Hoverfly.GetLogs(500, nil))
+		logs, _ := this.Hoverfly.GetLogs(500, nil)
+		currentLogs := logsToLogsView(logs)
 
 		if !reflect.DeepEqual(currentLogs, previousLogs) {
 			previousLogs = currentLogs
