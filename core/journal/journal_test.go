@@ -146,7 +146,8 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 func Test_Journal_NewEntry_WhenDisabledReturnsError(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := journal.NewDisabledJournal()
+	unit := journal.NewJournal()
+	unit.EntryLimit = 0
 
 	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
 	err := unit.NewEntry(request, &http.Response{
@@ -160,7 +161,7 @@ func Test_Journal_NewEntry_WhenDisabledReturnsError(t *testing.T) {
 	}, "test-mode", time.Now())
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("No journal set"))
+	Expect(err.Error()).To(Equal("Journal disabled"))
 }
 
 func Test_Journal_DeleteEntries_DeletesAllEntries(t *testing.T) {
@@ -194,19 +195,21 @@ func Test_Journal_DeleteEntries_DeletesAllEntries(t *testing.T) {
 func Test_Journal_DeleteEntries_WhenDisabledReturnsError(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := journal.NewDisabledJournal()
+	unit := journal.NewJournal()
+	unit.EntryLimit = 0
 
 	err := unit.DeleteEntries()
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("No journal set"))
+	Expect(err.Error()).To(Equal("Journal disabled"))
 }
 
 func Test_Journal_GetEntries_WhenDisabledReturnsError(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := journal.NewDisabledJournal()
+	unit := journal.NewJournal()
+	unit.EntryLimit = 0
 
 	_, err := unit.GetEntries()
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("No journal set"))
+	Expect(err.Error()).To(Equal("Journal disabled"))
 }
