@@ -56,11 +56,11 @@ func Test_JournalHandler_Get_ReturnsJournal(t *testing.T) {
 
 	Expect(response.Code).To(Equal(http.StatusOK))
 
-	journalView, err := unmarshalJournalEntryView(response.Body)
+	journalView, err := unmarshalJournalView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(journalView).To(HaveLen(1))
-	Expect(journalView[0].Mode).To(Equal("test"))
+	Expect(journalView.Journal).To(HaveLen(1))
+	Expect(journalView.Journal[0].Mode).To(Equal("test"))
 }
 
 func Test_JournalHandler_Get_Error(t *testing.T) {
@@ -97,10 +97,10 @@ func Test_JournalHandler_Delete_CallsDelete(t *testing.T) {
 
 	Expect(response.Code).To(Equal(http.StatusOK))
 
-	journalView, err := unmarshalJournalEntryView(response.Body)
+	journalView, err := unmarshalJournalView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(journalView).To(HaveLen(0))
+	Expect(journalView.Journal).To(HaveLen(0))
 
 	Expect(stubHoverfly.deleted).To(BeTrue())
 }
@@ -141,17 +141,17 @@ func Test_JournalHandler_Options_GetsOptions(t *testing.T) {
 	Expect(response.Header().Get("Allow")).To(Equal("OPTIONS, GET, DELETE"))
 }
 
-func unmarshalJournalEntryView(buffer *bytes.Buffer) ([]JournalEntryView, error) {
+func unmarshalJournalView(buffer *bytes.Buffer) (JournalView, error) {
 	body, err := ioutil.ReadAll(buffer)
 	if err != nil {
-		return []JournalEntryView{}, err
+		return JournalView{}, err
 	}
 
-	var journalView []JournalEntryView
+	var journalView JournalView
 
 	err = json.Unmarshal(body, &journalView)
 	if err != nil {
-		return []JournalEntryView{}, err
+		return JournalView{}, err
 	}
 
 	return journalView, nil
