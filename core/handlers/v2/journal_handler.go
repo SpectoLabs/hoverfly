@@ -33,13 +33,16 @@ func (this *JournalHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandl
 }
 
 func (this *JournalHandler) Get(response http.ResponseWriter, request *http.Request, next http.HandlerFunc) {
+	var journalView JournalView
 	entries, err := this.Hoverfly.GetEntries()
 	if err != nil {
 		handlers.WriteErrorResponse(response, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	bytes, _ := json.Marshal(entries)
+	journalView.Journal = entries
+
+	bytes, _ := json.Marshal(journalView)
 	handlers.WriteResponse(response, bytes)
 }
 

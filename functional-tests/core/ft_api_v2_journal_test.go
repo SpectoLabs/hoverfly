@@ -41,12 +41,12 @@ var _ = Describe("/api/v2/journal", func() {
 				responseJson, err := ioutil.ReadAll(res.Body)
 				Expect(err).To(BeNil())
 
-				var journal []v2.JournalEntryView
+				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journal)
+				err = json.Unmarshal(responseJson, &journalView)
 				Expect(err).To(BeNil())
 
-				Expect(journal).To(HaveLen(0))
+				Expect(journalView.Journal).To(HaveLen(0))
 			})
 
 			It("should display one item in the journal", func() {
@@ -60,27 +60,27 @@ var _ = Describe("/api/v2/journal", func() {
 				responseJson, err := ioutil.ReadAll(res.Body)
 				Expect(err).To(BeNil())
 
-				var journal []v2.JournalEntryView
+				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journal)
+				err = json.Unmarshal(responseJson, &journalView)
 				Expect(err).To(BeNil())
 
-				Expect(journal).To(HaveLen(1))
+				Expect(journalView.Journal).To(HaveLen(1))
 
-				Expect(*journal[0].Request.Scheme).To(Equal("http"))
-				Expect(*journal[0].Request.Method).To(Equal("GET"))
-				Expect(*journal[0].Request.Destination).To(Equal("hoverfly.io"))
-				Expect(*journal[0].Request.Path).To(Equal("/"))
-				Expect(*journal[0].Request.Query).To(Equal(""))
-				Expect(journal[0].Request.Headers["Accept-Encoding"]).To(ContainElement("gzip"))
-				Expect(journal[0].Request.Headers["User-Agent"]).To(ContainElement("Go-http-client/1.1"))
+				Expect(*journalView.Journal[0].Request.Scheme).To(Equal("http"))
+				Expect(*journalView.Journal[0].Request.Method).To(Equal("GET"))
+				Expect(*journalView.Journal[0].Request.Destination).To(Equal("hoverfly.io"))
+				Expect(*journalView.Journal[0].Request.Path).To(Equal("/"))
+				Expect(*journalView.Journal[0].Request.Query).To(Equal(""))
+				Expect(journalView.Journal[0].Request.Headers["Accept-Encoding"]).To(ContainElement("gzip"))
+				Expect(journalView.Journal[0].Request.Headers["User-Agent"]).To(ContainElement("Go-http-client/1.1"))
 
-				Expect(journal[0].Response.Status).To(Equal(502))
-				Expect(journal[0].Response.Body).To(Equal("Hoverfly Error!\n\nThere was an error when matching\n\nGot error: Could not find a match for request, create or record a valid matcher first!"))
-				Expect(journal[0].Response.Headers["Content-Type"]).To(ContainElement("text/plain"))
+				Expect(journalView.Journal[0].Response.Status).To(Equal(502))
+				Expect(journalView.Journal[0].Response.Body).To(Equal("Hoverfly Error!\n\nThere was an error when matching\n\nGot error: Could not find a match for request, create or record a valid matcher first!"))
+				Expect(journalView.Journal[0].Response.Headers["Content-Type"]).To(ContainElement("text/plain"))
 
-				Expect(journal[0].Latency).To(BeNumerically("<", 1))
-				Expect(journal[0].Mode).To(Equal("simulate"))
+				Expect(journalView.Journal[0].Latency).To(BeNumerically("<", 1))
+				Expect(journalView.Journal[0].Mode).To(Equal("simulate"))
 			})
 
 			It("should display multiple items in the journal", func() {
@@ -96,21 +96,21 @@ var _ = Describe("/api/v2/journal", func() {
 				responseJson, err := ioutil.ReadAll(res.Body)
 				Expect(err).To(BeNil())
 
-				var journal []v2.JournalEntryView
+				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journal)
+				err = json.Unmarshal(responseJson, &journalView)
 				Expect(err).To(BeNil())
 
-				Expect(journal).To(HaveLen(3))
+				Expect(journalView.Journal).To(HaveLen(3))
 
-				Expect(*journal[0].Request.Destination).To(Equal("hoverfly.io"))
-				Expect(*journal[0].Request.Path).To(Equal("/"))
+				Expect(*journalView.Journal[0].Request.Destination).To(Equal("hoverfly.io"))
+				Expect(*journalView.Journal[0].Request.Path).To(Equal("/"))
 
-				Expect(*journal[1].Request.Destination).To(Equal("github.com"))
-				Expect(*journal[1].Request.Path).To(Equal("/SpectoLabs/hoverfly"))
+				Expect(*journalView.Journal[1].Request.Destination).To(Equal("github.com"))
+				Expect(*journalView.Journal[1].Request.Path).To(Equal("/SpectoLabs/hoverfly"))
 
-				Expect(*journal[2].Request.Destination).To(Equal("specto.io"))
-				Expect(*journal[2].Request.Path).To(Equal("/"))
+				Expect(*journalView.Journal[2].Request.Destination).To(Equal("specto.io"))
+				Expect(*journalView.Journal[2].Request.Path).To(Equal("/"))
 			})
 
 			It("should display the mode each request was in", func() {
@@ -128,15 +128,15 @@ var _ = Describe("/api/v2/journal", func() {
 				responseJson, err := ioutil.ReadAll(res.Body)
 				Expect(err).To(BeNil())
 
-				var journal []v2.JournalEntryView
+				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journal)
+				err = json.Unmarshal(responseJson, &journalView)
 				Expect(err).To(BeNil())
 
-				Expect(journal).To(HaveLen(2))
+				Expect(journalView.Journal).To(HaveLen(2))
 
-				Expect(journal[0].Mode).To(Equal("simulate"))
-				Expect(journal[1].Mode).To(Equal("capture"))
+				Expect(journalView.Journal[0].Mode).To(Equal("simulate"))
+				Expect(journalView.Journal[1].Mode).To(Equal("capture"))
 			})
 		})
 
@@ -156,12 +156,12 @@ var _ = Describe("/api/v2/journal", func() {
 				responseJson, err := ioutil.ReadAll(res.Body)
 				Expect(err).To(BeNil())
 
-				var journal []v2.JournalEntryView
+				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journal)
+				err = json.Unmarshal(responseJson, &journalView)
 				Expect(err).To(BeNil())
 
-				Expect(journal).To(HaveLen(0))
+				Expect(journalView.Journal).To(HaveLen(0))
 			})
 		})
 	})
@@ -244,12 +244,12 @@ var _ = Describe("/api/v2/journal", func() {
 				responseJson, err := ioutil.ReadAll(res.Body)
 				Expect(err).To(BeNil())
 
-				var journal []v2.JournalEntryView
+				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journal)
+				err = json.Unmarshal(responseJson, &journalView)
 				Expect(err).To(BeNil())
 
-				Expect(journal).To(HaveLen(100))
+				Expect(journalView.Journal).To(HaveLen(100))
 			})
 		})
 	})
