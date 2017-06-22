@@ -170,7 +170,7 @@ var _ = Describe("/api/v2/journal", func() {
 
 		BeforeEach(func() {
 			hoverfly = functional_tests.NewHoverfly()
-			hoverfly.Start("-journal=false")
+			hoverfly.Start("-journal-size=0")
 		})
 
 		AfterEach(func() {
@@ -193,7 +193,7 @@ var _ = Describe("/api/v2/journal", func() {
 				err = json.Unmarshal(responseJson, &errorView)
 				Expect(err).To(BeNil())
 
-				Expect(errorView.Error).To(Equal("No journal set"))
+				Expect(errorView.Error).To(Equal("Journal disabled"))
 			})
 		})
 
@@ -213,7 +213,7 @@ var _ = Describe("/api/v2/journal", func() {
 				err = json.Unmarshal(responseJson, &errorView)
 				Expect(err).To(BeNil())
 
-				Expect(errorView.Error).To(Equal("No journal set"))
+				Expect(errorView.Error).To(Equal("Journal disabled"))
 			})
 		})
 	})

@@ -30,13 +30,9 @@ func NewJournal() *Journal {
 	}
 }
 
-func NewDisabledJournal() *Journal {
-	return &Journal{}
-}
-
 func (this *Journal) NewEntry(request *http.Request, response *http.Response, mode string, started time.Time) error {
-	if this.entries == nil {
-		return fmt.Errorf("No journal set")
+	if this.EntryLimit == 0 {
+		return fmt.Errorf("Journal disabled")
 	}
 
 	payloadRequest, _ := models.NewRequestDetailsFromHttpRequest(request)
@@ -65,8 +61,8 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 }
 
 func (this Journal) GetEntries() ([]v2.JournalEntryView, error) {
-	if this.entries == nil {
-		return []v2.JournalEntryView{}, fmt.Errorf("No journal set")
+	if this.EntryLimit == 0 {
+		return []v2.JournalEntryView{}, fmt.Errorf("Journal disabled")
 	}
 
 	journalEntryViews := []v2.JournalEntryView{}
@@ -83,8 +79,8 @@ func (this Journal) GetEntries() ([]v2.JournalEntryView, error) {
 }
 
 func (this *Journal) DeleteEntries() error {
-	if this.entries == nil {
-		return fmt.Errorf("No journal set")
+	if this.EntryLimit == 0 {
+		return fmt.Errorf("Journal disabled")
 	}
 
 	this.entries = []JournalEntry{}
