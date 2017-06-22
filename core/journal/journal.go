@@ -75,7 +75,7 @@ func (this Journal) GetEntries() ([]v2.JournalEntryView, error) {
 			Request:     journalEntry.Request.ConvertToRequestDetailsView(),
 			Response:    journalEntry.Response.ConvertToResponseDetailsView(),
 			Mode:        journalEntry.Mode,
-			TimeStarted: journalEntry.TimeStarted,
+			TimeStarted: journalEntry.TimeStarted.Format(time.RFC3339),
 			Latency:     (journalEntry.Latency / time.Millisecond),
 		})
 	}

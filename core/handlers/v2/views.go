@@ -70,6 +70,6 @@ type JournalEntryView struct {
 	Request     RequestDetailsViewV1 `json:"request"`
 	Response    ResponseDetailsView  `json:"response"`
 	Mode        string               `json:"mode"`
-	TimeStarted time.Time            `json:"timeStarted"`
+	TimeStarted string               `json:"timeStarted"`
 	Latency     time.Duration        `json:"latency"`
 }

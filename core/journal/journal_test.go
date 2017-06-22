@@ -62,7 +62,7 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 	Expect(entries[0].Response.Headers["test-header"]).To(ContainElement("two"))
 
 	Expect(entries[0].Mode).To(Equal("test-mode"))
-	Expect(entries[0].TimeStarted).To(Equal(nowTime))
+	Expect(entries[0].TimeStarted).To(Equal(nowTime.Format(time.RFC3339)))
 	Expect(entries[0].Latency).To(BeNumerically("<", 1))
 }
 
