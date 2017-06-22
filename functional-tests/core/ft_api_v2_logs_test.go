@@ -3,10 +3,12 @@ package hoverfly_test
 import (
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
 
 	"strconv"
 	"time"
 
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/antonholmquist/jason"
@@ -70,6 +72,41 @@ var _ = Describe("/api/v2/logs", func() {
 				Expect(err).To(BeNil())
 
 				Expect(logs.Logs).To(HaveLen(100))
+			})
+		})
+	})
+
+	Context("with log-size=0", func() {
+
+		BeforeEach(func() {
+			hoverfly.Start("-logs-size=0")
+		})
+
+		AfterEach(func() {
+			hoverfly.Stop()
+		})
+
+		Context("GET", func() {
+
+			It("should be disabled", func() {
+				for i := 0; i < 111; i++ {
+					hoverfly.Proxy(sling.New().Get("http://hoverfly.io"))
+				}
+
+				req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/logs")
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(http.StatusInternalServerError))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var errorView handlers.ErrorView
+
+				err = json.Unmarshal(responseJson, &errorView)
+				Expect(err).To(BeNil())
+
+				Expect(errorView.Error).To(Equal("Logs disabled"))
 			})
 		})
 	})

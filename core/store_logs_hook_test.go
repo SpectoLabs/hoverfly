@@ -70,6 +70,27 @@ func Test_StoreLogsHook_Fire_RespectLogsLimit(t *testing.T) {
 	Expect(unit.Entries[4].Message).To(Equal("7"))
 }
 
+func Test_StoreLogsHook_Fire_IfLogsLimitIs0StoreLogsHookIsDisabled(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewStoreLogsHook()
+	unit.LogsLimit = 0
+
+	for i := 1; i < 8; i++ {
+		unit.Fire(&logrus.Entry{
+			Message: strconv.Itoa(i),
+		})
+	}
+
+	Expect(unit.Entries).To(HaveLen(0))
+
+	entries, err := unit.GetLogs(100, nil)
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("Logs disabled"))
+
+	Expect(entries).To(HaveLen(0))
+}
+
 func Test_StoreLogsHook_GetLogs_LimitsLogs(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -81,7 +102,9 @@ func Test_StoreLogsHook_GetLogs_LimitsLogs(t *testing.T) {
 		})
 	}
 
-	logs := unit.GetLogs(2, nil)
+	logs, err := unit.GetLogs(2, nil)
+	Expect(err).To(BeNil())
+
 	Expect(logs).To(HaveLen(2))
 	Expect(logs[0].Message).To(Equal("log-1"))
 	Expect(logs[1].Message).To(Equal("log-2"))
@@ -96,7 +119,9 @@ func Test_StoreLogsHook_GetLogs_AcceptsALimitThatIsTooLarge(t *testing.T) {
 		Message: "log-0",
 	})
 
-	logs := unit.GetLogs(1000, nil)
+	logs, err := unit.GetLogs(1000, nil)
+	Expect(err).To(BeNil())
+
 	Expect(logs).To(HaveLen(1))
 	Expect(logs[0].Message).To(Equal("log-0"))
 }
@@ -115,7 +140,9 @@ func Test_StoreLogsHook_GetLogs_FilteredByFromDateTime(t *testing.T) {
 
 	queryDate := time.Date(2017, 6, 14, 10, 0, 1, 0, time.Local)
 
-	logs := unit.GetLogs(100, &queryDate)
+	logs, err := unit.GetLogs(100, &queryDate)
+	Expect(err).To(BeNil())
+
 	Expect(logs).To(HaveLen(1))
 	expectPrecision, _ := time.ParseDuration("1s")
 	Expect(logs[0].Time).To(BeTemporally("==", time.Date(2017, 6, 14, 10, 0, 2, 0, time.Local), expectPrecision))
@@ -135,7 +162,9 @@ func Test_StoreLogsHook_GetLogs_FilteredByFromDateTimeAndLimit(t *testing.T) {
 
 	queryDate := time.Date(2017, 6, 14, 10, 0, 0, 0, time.Local)
 
-	logs := unit.GetLogs(2, &queryDate)
+	logs, err := unit.GetLogs(2, &queryDate)
+	Expect(err).To(BeNil())
+
 	Expect(logs).To(HaveLen(2))
 	expectPrecision, _ := time.ParseDuration("1s")
 

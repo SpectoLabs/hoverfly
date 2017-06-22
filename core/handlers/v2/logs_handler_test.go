@@ -7,26 +7,34 @@ import (
 	"net/http"
 	"testing"
 
+	"time"
+
+	"fmt"
+
 	"github.com/Sirupsen/logrus"
 	. "github.com/onsi/gomega"
-	"time"
 )
 
 type HoverflyLogsStub struct {
-	limit int
-	from *time.Time
+	limit    int
+	from     *time.Time
+	disabled bool
 }
 
-func (this *HoverflyLogsStub) GetLogs(limit int, from *time.Time) []*logrus.Entry {
+func (this *HoverflyLogsStub) GetLogs(limit int, from *time.Time) ([]*logrus.Entry, error) {
+	if this.disabled {
+		return []*logrus.Entry{}, fmt.Errorf("Logs disabled")
+	}
+
 	this.limit = limit
-	this.from  = from
+	this.from = from
 	return []*logrus.Entry{&logrus.Entry{
 		Level:   logrus.InfoLevel,
 		Message: "a line of logs",
 		Data: map[string]interface{}{
 			"custom-field": "field value",
 		},
-	}}
+	}}, nil
 }
 
 func Test_LogsHandler_Get_ReturnsLogsView(t *testing.T) {
@@ -105,7 +113,6 @@ func Test_LogsHandler_Get_DoesNotSetTimeIfFromQueryIsBadTime(t *testing.T) {
 	Expect(stubHoverfly.from).To(BeNil())
 }
 
-
 func Test_LogsHandler_Get_ReturnsLogsInPlaintext_UsingAcceptHeader(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -181,6 +188,28 @@ func Test_LogsHandler_Get_SetsTheLimitIfLimitQueryProvided_InPlaintext(t *testin
 	makeRequestOnHandler(unit.Get, request)
 
 	Expect(stubHoverfly.limit).To(Equal(20))
+}
+
+func Test_LogsHandler_Get_ErrorsIfDisabled(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyLogsStub{
+		disabled: true,
+	}
+	unit := LogsHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "", nil)
+	Expect(err).To(BeNil())
+
+	request.Header.Set("Content-Type", "text/plain")
+
+	response := makeRequestOnHandler(unit.Get, request)
+	Expect(response.Code).To(Equal(http.StatusInternalServerError))
+
+	errorView, err := unmarshalErrorView(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(errorView.Error).To(Equal("Logs disabled"))
 }
 
 func Test_LogsHandler_Options_GetsOptions(t *testing.T) {
