@@ -206,7 +206,7 @@ var _ = Describe("/api/v2/journal", func() {
 				err = json.Unmarshal(responseJson, &errorView)
 				Expect(err).To(BeNil())
 
-				Expect(errorView.Error).To(Equal("Malformed JSON"))
+				Expect(errorView.Error).To(Equal("No \"request\" object in search parameters"))
 			})
 		})
 

@@ -62,7 +62,7 @@ func (this *JournalHandler) Post(response http.ResponseWriter, request *http.Req
 		handlers.WriteErrorResponse(response, err.Error(), http.StatusBadRequest)
 		return
 	} else if journalEntryFilterView.Request == nil {
-		handlers.WriteErrorResponse(response, "Malformed JSON", http.StatusBadRequest)
+		handlers.WriteErrorResponse(response, "No \"request\" object in search parameters", http.StatusBadRequest)
 		return
 	}
 
