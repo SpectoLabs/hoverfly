@@ -1,6 +1,7 @@
 package hoverfly_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -140,6 +141,75 @@ var _ = Describe("/api/v2/journal", func() {
 			})
 		})
 
+		Context("POST", func() {
+
+			BeforeEach(func() {
+				hoverfly.Proxy(sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/first"))
+				hoverfly.Proxy(sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/second"))
+			})
+
+			It("should filter", func() {
+				req := sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				req.Body(bytes.NewBufferString(`{
+					"request": {
+						"path": {
+							"exactMatch": "/first"
+						}
+					}
+				}`))
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(http.StatusOK))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var journalView v2.JournalView
+
+				err = json.Unmarshal(responseJson, &journalView)
+				Expect(err).To(BeNil())
+
+				Expect(journalView.Journal).To(HaveLen(1))
+				Expect(*journalView.Journal[0].Request.Path).To(Equal("/first"))
+			})
+
+			It("should error when body is malformed JSON", func() {
+				req := sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				req.Body(bytes.NewBufferString(`not json`))
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(http.StatusBadRequest))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var errorView handlers.ErrorView
+
+				err = json.Unmarshal(responseJson, &errorView)
+				Expect(err).To(BeNil())
+
+				Expect(errorView.Error).To(Equal("Malformed JSON"))
+			})
+
+			It("should error when body has no request", func() {
+				req := sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				req.Body(bytes.NewBufferString(`{"norequest": true}`))
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(http.StatusBadRequest))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var errorView handlers.ErrorView
+
+				err = json.Unmarshal(responseJson, &errorView)
+				Expect(err).To(BeNil())
+
+				Expect(errorView.Error).To(Equal("Malformed JSON"))
+			})
+		})
+
 		Context("DELETE", func() {
 			It("should delete journal entries", func() {
 				hoverfly.Proxy(sling.New().Get("http://localhost:" + hoverfly.GetAdminPort()))
@@ -181,6 +251,33 @@ var _ = Describe("/api/v2/journal", func() {
 
 			It("should return an error", func() {
 				req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(http.StatusInternalServerError))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var errorView handlers.ErrorView
+
+				err = json.Unmarshal(responseJson, &errorView)
+				Expect(err).To(BeNil())
+
+				Expect(errorView.Error).To(Equal("Journal disabled"))
+			})
+		})
+
+		Context("POST", func() {
+
+			It("should return an error", func() {
+				req := sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				req.Body(bytes.NewBufferString(`{
+					"request": {
+						"path": {
+							"exactMatch": "/first"
+						}
+					}
+				}`))
 				res := functional_tests.DoRequest(req)
 
 				Expect(res.StatusCode).To(Equal(http.StatusInternalServerError))
