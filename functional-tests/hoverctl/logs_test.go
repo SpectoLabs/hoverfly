@@ -72,7 +72,7 @@ var _ = Describe("When I use hoverctl", func() {
 			output := functional_tests.Run(hoverctlBinary, "logs", "--target", "test-target")
 
 			Expect(output).To(ContainSubstring("test-target is not a target"))
-			Expect(output).To(ContainSubstring("Run `hoverctl targets new test-target`"))
+			Expect(output).To(ContainSubstring("Run `hoverctl targets create test-target`"))
 		})
 	})
 })
