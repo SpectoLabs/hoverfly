@@ -210,7 +210,7 @@ var _ = Describe("When using the `targets` command", func() {
 		It("should error when given an invalid target name", func() {
 			output := functional_tests.Run(hoverctlBinary, "targets", "default", "alternative")
 
-			Expect(output).To(ContainSubstring("alternative is not a target\n\nRun `hoverctl targets new alternative`"))
+			Expect(output).To(ContainSubstring("alternative is not a target\n\nRun `hoverctl targets create alternative`"))
 		})
 
 		It("should not set default when given an invalid target name ", func() {

@@ -29,7 +29,7 @@ func checkArgAndExit(args []string, message, command string) {
 
 func checkTargetAndExit(target *configuration.Target) {
 	if target == nil {
-		handleIfError(fmt.Errorf("%[1]s is not a target\n\nRun `hoverctl targets new %[1]s`", targetNameFlag))
+		handleIfError(fmt.Errorf("%[1]s is not a target\n\nRun `hoverctl targets create %[1]s`", targetNameFlag))
 	}
 }
 

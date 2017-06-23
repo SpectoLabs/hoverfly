@@ -69,7 +69,7 @@ Create target"
 `,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		checkArgAndExit(args, "Cannot create a target without a name", "targets new")
+		checkArgAndExit(args, "Cannot create a target without a name", "targets create")
 
 		if config.GetTarget(args[0]) != nil {
 			handleIfError(fmt.Errorf("Target %s already exists\n\nUse a different target name or run `hoverctl targets update %[1]s`", args[0]))
@@ -125,7 +125,7 @@ of the current default target."
 		if len(args) > 0 {
 			checkTarget := config.GetTarget(args[0])
 			if checkTarget == nil {
-				handleIfError(fmt.Errorf("%[1]s is not a target\n\nRun `hoverctl targets new %[1]s`", args[0]))
+				handleIfError(fmt.Errorf("%[1]s is not a target\n\nRun `hoverctl targets create %[1]s`", args[0]))
 			}
 			config.DefaultTarget = args[0]
 		}
