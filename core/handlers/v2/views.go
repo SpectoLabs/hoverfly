@@ -75,5 +75,5 @@ type JournalEntryView struct {
 }
 
 type JournalEntryFilterView struct {
-	Request RequestMatcherViewV2 `json:"request"`
+	Request *RequestMatcherViewV2 `json:"request"`
 }

@@ -11,6 +11,7 @@ import (
 
 type HoverflyJournal interface {
 	GetEntries() ([]JournalEntryView, error)
+	GetFilteredEntries(journalEntryFilterView JournalEntryFilterView) ([]JournalEntryView, error)
 	DeleteEntries() error
 }
 
@@ -23,6 +24,10 @@ func (this *JournalHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandl
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),
 	))
+	mux.Post("/api/v2/journal", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Post),
+	))
 	mux.Delete("/api/v2/journal", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Delete),
@@ -34,7 +39,34 @@ func (this *JournalHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandl
 
 func (this *JournalHandler) Get(response http.ResponseWriter, request *http.Request, next http.HandlerFunc) {
 	var journalView JournalView
+
 	entries, err := this.Hoverfly.GetEntries()
+	if err != nil {
+		handlers.WriteErrorResponse(response, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	journalView.Journal = entries
+
+	bytes, _ := json.Marshal(journalView)
+	handlers.WriteResponse(response, bytes)
+}
+
+func (this *JournalHandler) Post(response http.ResponseWriter, request *http.Request, next http.HandlerFunc) {
+	var journalView JournalView
+
+	var journalEntryFilterView JournalEntryFilterView
+
+	err := handlers.ReadFromRequest(request, &journalEntryFilterView)
+	if err != nil {
+		handlers.WriteErrorResponse(response, err.Error(), http.StatusBadRequest)
+		return
+	} else if journalEntryFilterView.Request == nil {
+		handlers.WriteErrorResponse(response, "Malformed JSON", http.StatusBadRequest)
+		return
+	}
+
+	entries, err := this.Hoverfly.GetFilteredEntries(journalEntryFilterView)
 	if err != nil {
 		handlers.WriteErrorResponse(response, err.Error(), http.StatusInternalServerError)
 		return
@@ -57,6 +89,6 @@ func (this *JournalHandler) Delete(response http.ResponseWriter, request *http.R
 }
 
 func (this *JournalHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	w.Header().Add("Allow", "OPTIONS, GET, DELETE")
+	w.Header().Add("Allow", "OPTIONS, GET, DELETE, POST")
 	handlers.WriteResponse(w, []byte(""))
 }
