@@ -172,7 +172,7 @@ func Test_JournalHandler_Post_MalformedJson_EmptyRequest(t *testing.T) {
 	errorView, err := unmarshalErrorView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(errorView.Error).To(Equal("Malformed JSON"))
+	Expect(errorView.Error).To(Equal("No \"request\" object in search parameters"))
 }
 
 func Test_JournalHandler_Post_JournalError(t *testing.T) {
