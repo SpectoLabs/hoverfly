@@ -16,67 +16,6 @@ import (
 
 var adminApi = AdminApi{}
 
-func TestGetRecordsCount(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := NewHoverflyWithConfiguration(&Configuration{})
-	m := adminApi.getBoneRouter(unit)
-
-	req, err := http.NewRequest("GET", "/api/count", nil)
-	Expect(err).To(BeNil())
-
-	//The response recorder used to record HTTP responses
-	respRec := httptest.NewRecorder()
-
-	m.ServeHTTP(respRec, req)
-
-	Expect(respRec.Code, http.StatusOK)
-
-	body, err := ioutil.ReadAll(respRec.Body)
-
-	rc := v1.RecordsCount{}
-	err = json.Unmarshal(body, &rc)
-
-	Expect(rc.Count).To(Equal(0))
-}
-
-func TestGetRecordsCountWRecords(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := NewHoverflyWithConfiguration(&Configuration{})
-
-	// inserting some payloads
-	for i := 0; i < 5; i++ {
-		req := &models.RequestDetails{
-			Method:      "GET",
-			Scheme:      "http",
-			Destination: "example.com",
-			Query:       fmt.Sprintf("q=%d", i),
-		}
-
-		unit.Save(req, &models.ResponseDetails{}, nil)
-	}
-	// performing query
-	m := adminApi.getBoneRouter(unit)
-
-	req, err := http.NewRequest("GET", "/api/count", nil)
-	Expect(err).To(BeNil())
-
-	//The response recorder used to record HTTP responses
-	respRec := httptest.NewRecorder()
-
-	m.ServeHTTP(respRec, req)
-
-	Expect(respRec.Code, http.StatusOK)
-
-	body, err := ioutil.ReadAll(respRec.Body)
-
-	rc := v1.RecordsCount{}
-	err = json.Unmarshal(body, &rc)
-
-	Expect(rc.Count).To(Equal(5))
-}
-
 func TestStatsHandler(t *testing.T) {
 	RegisterTestingT(t)
 
