@@ -193,10 +193,10 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidJson(
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
 }
 
-func Test_RequestDetailsViewV1_GetQuery_SortsQueryString(t *testing.T) {
+func Test_RequestDetailsView_GetQuery_SortsQueryString(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := v2.RequestDetailsViewV1{
+	unit := v2.RequestDetailsView{
 		Query: util.StringToPointer("b=b&a=a"),
 	}
 	queryString := unit.GetQuery()
@@ -205,10 +205,10 @@ func Test_RequestDetailsViewV1_GetQuery_SortsQueryString(t *testing.T) {
 	Expect(*queryString).To(Equal("a=a&b=b"))
 }
 
-func Test_RequestDetailsViewV1_GetQuery_ReturnsNilIfNil(t *testing.T) {
+func Test_RequestDetailsView_GetQuery_ReturnsNilIfNil(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := v2.RequestDetailsViewV1{
+	unit := v2.RequestDetailsView{
 		Query: nil,
 	}
 	queryString := unit.GetQuery()
@@ -222,7 +222,7 @@ func Test_SimulationViewV1_Upgrade_ReturnsAV2Simulation(t *testing.T) {
 		v2.DataViewV1{
 			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{
 				v2.RequestResponsePairViewV1{
-					Request: v2.RequestDetailsViewV1{
+					Request: v2.RequestDetailsView{
 						RequestType: util.StringToPointer("recording"),
 						Scheme:      util.StringToPointer("http"),
 						Body:        util.StringToPointer("body"),
@@ -293,7 +293,7 @@ func Test_SimulationViewV1_Upgrade_ReturnsGlobMatchesIfTemplate(t *testing.T) {
 		v2.DataViewV1{
 			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{
 				v2.RequestResponsePairViewV1{
-					Request: v2.RequestDetailsViewV1{
+					Request: v2.RequestDetailsView{
 						RequestType: util.StringToPointer("template"),
 						Scheme:      util.StringToPointer("http"),
 						Body:        util.StringToPointer("body"),
@@ -352,7 +352,7 @@ func Test_SimulationViewV1_Upgrade_CanReturnAnIncompleteRequest(t *testing.T) {
 		v2.DataViewV1{
 			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{
 				v2.RequestResponsePairViewV1{
-					Request: v2.RequestDetailsViewV1{
+					Request: v2.RequestDetailsView{
 						Method: util.StringToPointer("POST"),
 					},
 					Response: v2.ResponseDetailsView{

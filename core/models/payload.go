@@ -88,8 +88,8 @@ func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 	}
 }
 
-func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsViewV1 {
-	return v2.RequestDetailsViewV1{
+func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsView {
+	return v2.RequestDetailsView{
 		Path:        &this.Path,
 		Method:      &this.Method,
 		Destination: &this.Destination,

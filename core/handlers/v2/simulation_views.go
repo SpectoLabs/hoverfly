@@ -236,8 +236,8 @@ type ClosestMissView struct {
 func (this RequestMatcherResponsePairViewV2) GetResponse() interfaces.Response { return this.Response }
 
 type RequestResponsePairViewV1 struct {
-	Response ResponseDetailsView  `json:"response"`
-	Request  RequestDetailsViewV1 `json:"request"`
+	Response ResponseDetailsView `json:"response"`
+	Request  RequestDetailsView  `json:"request"`
 }
 
 //Gets Response - required for interfaces.RequestResponsePairView
@@ -268,8 +268,8 @@ type RequestMatcherViewV2 struct {
 }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
-type RequestDetailsViewV1 struct {
-	RequestType *string             `json:"requestType"`
+type RequestDetailsView struct {
+	RequestType *string             `json:"requestType,omitempty"`
 	Path        *string             `json:"path"`
 	Method      *string             `json:"method"`
 	Destination *string             `json:"destination"`
@@ -280,19 +280,19 @@ type RequestDetailsViewV1 struct {
 }
 
 //Gets Path - required for interfaces.RequestMatcher
-func (this RequestDetailsViewV1) GetPath() *string { return this.Path }
+func (this RequestDetailsView) GetPath() *string { return this.Path }
 
 //Gets Method - required for interfaces.RequestMatcher
-func (this RequestDetailsViewV1) GetMethod() *string { return this.Method }
+func (this RequestDetailsView) GetMethod() *string { return this.Method }
 
 //Gets Destination - required for interfaces.RequestMatcher
-func (this RequestDetailsViewV1) GetDestination() *string { return this.Destination }
+func (this RequestDetailsView) GetDestination() *string { return this.Destination }
 
 //Gets Scheme - required for interfaces.RequestMatcher
-func (this RequestDetailsViewV1) GetScheme() *string { return this.Scheme }
+func (this RequestDetailsView) GetScheme() *string { return this.Scheme }
 
 //Gets Query - required for interfaces.RequestMatcher
-func (this RequestDetailsViewV1) GetQuery() *string {
+func (this RequestDetailsView) GetQuery() *string {
 	if this.Query == nil {
 		return this.Query
 	}
@@ -301,10 +301,10 @@ func (this RequestDetailsViewV1) GetQuery() *string {
 }
 
 //Gets Body - required for interfaces.RequestMatcher
-func (this RequestDetailsViewV1) GetBody() *string { return this.Body }
+func (this RequestDetailsView) GetBody() *string { return this.Body }
 
 //Gets Headers - required for interfaces.RequestMatcher
-func (this RequestDetailsViewV1) GetHeaders() map[string][]string { return this.Headers }
+func (this RequestDetailsView) GetHeaders() map[string][]string { return this.Headers }
 
 // ResponseDetailsView is used when marshalling and
 // unmarshalling requests. This struct's Body may be Base64
