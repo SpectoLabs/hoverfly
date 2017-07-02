@@ -23,6 +23,7 @@ import (
 	"github.com/dghubble/sling"
 	. "github.com/onsi/gomega"
 	"github.com/phayes/freeport"
+	"github.com/onsi/ginkgo"
 )
 
 var HoverflyUsername = "benjih"
@@ -148,14 +149,28 @@ func (this Hoverfly) ImportSimulation(simulation string) {
 	req := sling.New().Put(this.adminUrl + "/api/v2/simulation").Body(bytes.NewBufferString(simulation))
 	response := DoRequest(req)
 	Expect(response.StatusCode).To(Equal(http.StatusOK))
+	importedSimulationBytes, err := ioutil.ReadAll(response.Body)
+	Expect(err).To(BeNil())
+	ginkgo.GinkgoWriter.Write(importedSimulationBytes)
 }
 
-func (this Hoverfly) ExportSimulation() v2.SimulationViewV2 {
+// Used for debugging when trying to find out why a functional test is failing
+func (this Hoverfly) WriteLogsIfError() {
+	req := sling.New().Get(this.adminUrl + "/api/v2/logs").Add("Accept", "text/plain")
+	res := DoRequest(req)
+	Expect(res.StatusCode).To(Equal(200))
+
+	logs, err := ioutil.ReadAll(res.Body)
+	Expect(err).To(BeNil())
+	ginkgo.GinkgoWriter.Write(logs) // Only writes when test fails
+}
+
+func (this Hoverfly) ExportSimulation() v2.SimulationViewV3 {
 	reader := this.GetSimulation()
 	simulationBytes, err := ioutil.ReadAll(reader)
 	Expect(err).To(BeNil())
 
-	var simulation v2.SimulationViewV2
+	var simulation v2.SimulationViewV3
 
 	err = json.Unmarshal(simulationBytes, &simulation)
 	Expect(err).To(BeNil())

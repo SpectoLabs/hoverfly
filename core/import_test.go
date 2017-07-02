@@ -194,12 +194,14 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPair := v2.RequestMatcherResponsePairViewV2{
+	originalPair := v2.RequestMatcherResponsePairViewV3{
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
-			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}}},
+			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}},
+			Templated: true,
+		},
 		RequestMatcher: v2.RequestMatcherViewV2{
 			Path: &v2.RequestFieldMatchersView{
 				ExactMatch: StringToPointer("/"),
@@ -221,13 +223,14 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV2{originalPair})
+	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV3{originalPair})
 
 	Expect(hv.Simulation.MatchingPairs[0]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "hello_world",
 			Headers: map[string][]string{"Content-Type": []string{"text/plain"}},
+			Templated: true,
 		},
 		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
@@ -255,7 +258,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 	}))
 }
 
-func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) {
+func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateExplicitlyOrExplicitly(t *testing.T) {
 	RegisterTestingT(t)
 
 	cache := cache.NewInMemoryCache()
@@ -265,7 +268,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 
 	RegisterTestingT(t)
 
-	originalPair1 := v2.RequestMatcherResponsePairViewV2{
+	originalPair1 := v2.RequestMatcherResponsePairViewV3{
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        "hello_world",
@@ -294,6 +297,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	originalPair2 := originalPair1
+	originalPair2.Response.Templated = false
 	originalPair2.RequestMatcher.Path = &v2.RequestFieldMatchersView{
 		ExactMatch: StringToPointer("/new/path"),
 	}
@@ -302,8 +306,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 	originalPair3.RequestMatcher.Path = &v2.RequestFieldMatchersView{
 		ExactMatch: StringToPointer("/newer/path"),
 	}
+	originalPair3.Response.Templated = true
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV2{originalPair1, originalPair2, originalPair3})
+	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV3{originalPair1, originalPair2, originalPair3})
 
 	Expect(hv.Simulation.MatchingPairs).To(HaveLen(3))
 	Expect(hv.Simulation.MatchingPairs[0]).To(Equal(models.RequestMatcherResponsePair{
@@ -311,6 +316,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Status:  200,
 			Body:    "hello_world",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
+			Templated: false,
 		},
 		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
@@ -340,6 +346,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Status:  200,
 			Body:    "hello_world",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
+			Templated: false,
 		},
 		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
@@ -369,6 +376,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairs(t *testing.T) 
 			Status:  200,
 			Body:    "hello_world",
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
+			Templated: true,
 		},
 		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
@@ -417,12 +425,12 @@ func TestImportImportRequestResponsePairs_CanImportARequesResponsePairView(t *te
 		Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 	}
 
-	requestResponsePair := v2.RequestMatcherResponsePairViewV2{
+	requestResponsePair := v2.RequestMatcherResponsePairViewV3{
 		Response:       responseView,
 		RequestMatcher: request,
 	}
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV2{requestResponsePair})
+	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV3{requestResponsePair})
 
 	Expect(len(hv.Simulation.MatchingPairs)).To(Equal(1))
 
@@ -448,7 +456,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 
 	RegisterTestingT(t)
 
-	encodedPair := v2.RequestMatcherResponsePairViewV2{
+	encodedPair := v2.RequestMatcherResponsePairViewV3{
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        base64String("hello_world"),
@@ -481,7 +489,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 		},
 	}
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV2{encodedPair})
+	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV3{encodedPair})
 
 	Expect(hv.Simulation.MatchingPairs[0]).ToNot(Equal(models.RequestResponsePair{
 		Response: models.ResponseDetails{

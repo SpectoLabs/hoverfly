@@ -12,36 +12,37 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/xeipuuv/gojsonschema"
+	"fmt"
 )
 
-func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, error) {
-	var simulationView SimulationViewV2
+func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV3, error) {
+	var simulationView SimulationViewV3
 
 	jsonMap := make(map[string]interface{})
 
 	if err := json.Unmarshal(responseBody, &jsonMap); err != nil {
-		return SimulationViewV2{}, errors.New("Invalid JSON")
+		return SimulationViewV3{}, errors.New("Invalid JSON")
 	}
 
 	if jsonMap["meta"] == nil {
-		return SimulationViewV2{}, errors.New("Invalid JSON, missing \"meta\" object")
+		return SimulationViewV3{}, errors.New("Invalid JSON, missing \"meta\" object")
 	}
 
 	if jsonMap["meta"].(map[string]interface{})["schemaVersion"] == nil {
-		return SimulationViewV2{}, errors.New("Invalid JSON, missing \"meta.schemaVersion\" string")
+		return SimulationViewV3{}, errors.New("Invalid JSON, missing \"meta.schemaVersion\" string")
 	}
 
 	schemaVersion := jsonMap["meta"].(map[string]interface{})["schemaVersion"].(string)
 
-	if schemaVersion == "v2" {
-		err := ValidateSimulation(jsonMap, SimulationViewV2Schema)
+	if schemaVersion == "v3" || schemaVersion == "v2" {
+		err := ValidateSimulation(jsonMap, SimulationViewV3Schema)
 		if err != nil {
-			return simulationView, errors.New("Invalid v2 simulation:" + err.Error())
+			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation:", schemaVersion)+ err.Error())
 		}
 
 		err = json.Unmarshal(responseBody, &simulationView)
 		if err != nil {
-			return SimulationViewV2{}, err
+			return SimulationViewV3{}, err
 		}
 	} else if schemaVersion == "v1" {
 		err := ValidateSimulation(jsonMap, SimulationViewV1Schema)
@@ -53,16 +54,17 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 
 		err = json.Unmarshal(responseBody, &simulationViewV1)
 		if err != nil {
-			return SimulationViewV2{}, err
+			return SimulationViewV3{}, err
 		}
 
 		simulationView = simulationViewV1.Upgrade()
 	}
 
+	simulationView.MetaView.SchemaVersion = "v3"
 	return simulationView, nil
 }
 
-type SimulationViewV2 struct {
+type SimulationViewV3 struct {
 	DataViewV2 `json:"data"`
 	MetaView   `json:"meta"`
 }
@@ -98,8 +100,8 @@ func ValidateSimulation(json, schema map[string]interface{}) error {
 	return nil
 }
 
-func (this SimulationViewV1) Upgrade() SimulationViewV2 {
-	var pairs []RequestMatcherResponsePairViewV2
+func (this SimulationViewV1) Upgrade() SimulationViewV3 {
+	var pairs []RequestMatcherResponsePairViewV3
 	for _, pairV1 := range this.RequestResponsePairViewV1 {
 
 		var schemeMatchers, methodMatchers, destinationMatchers, pathMatchers, queryMatchers, bodyMatchers *RequestFieldMatchersView
@@ -184,7 +186,7 @@ func (this SimulationViewV1) Upgrade() SimulationViewV2 {
 			}
 		}
 
-		pair := RequestMatcherResponsePairViewV2{
+		pair := RequestMatcherResponsePairViewV3{
 			RequestMatcher: RequestMatcherViewV2{
 				Scheme:      schemeMatchers,
 				Method:      methodMatchers,
@@ -199,12 +201,12 @@ func (this SimulationViewV1) Upgrade() SimulationViewV2 {
 		pairs = append(pairs, pair)
 	}
 
-	return SimulationViewV2{
+	return SimulationViewV3{
 		DataViewV2{
 			RequestResponsePairs: pairs,
 		},
 		MetaView{
-			SchemaVersion:   "v2",
+			SchemaVersion:   "v3",
 			HoverflyVersion: this.HoverflyVersion,
 			TimeExported:    this.TimeExported,
 		},
@@ -212,7 +214,7 @@ func (this SimulationViewV1) Upgrade() SimulationViewV2 {
 }
 
 type DataViewV2 struct {
-	RequestResponsePairs []RequestMatcherResponsePairViewV2 `json:"pairs"`
+	RequestResponsePairs []RequestMatcherResponsePairViewV3 `json:"pairs"`
 	GlobalActions        GlobalActionsView                  `json:"globalActions"`
 }
 
@@ -221,7 +223,7 @@ type DataViewV1 struct {
 	GlobalActions             GlobalActionsView           `json:"globalActions"`
 }
 
-type RequestMatcherResponsePairViewV2 struct {
+type RequestMatcherResponsePairViewV3 struct {
 	Response       ResponseDetailsView  `json:"response"`
 	RequestMatcher RequestMatcherViewV2 `json:"request"`
 }
@@ -233,7 +235,7 @@ type ClosestMissView struct {
 }
 
 //Gets Response - required for interfaces.RequestResponsePairView
-func (this RequestMatcherResponsePairViewV2) GetResponse() interfaces.Response { return this.Response }
+func (this RequestMatcherResponsePairViewV3) GetResponse() interfaces.Response { return this.Response }
 
 type RequestResponsePairViewV1 struct {
 	Response ResponseDetailsView `json:"response"`
@@ -314,6 +316,7 @@ type ResponseDetailsView struct {
 	Body        string              `json:"body"`
 	EncodedBody bool                `json:"encodedBody"`
 	Headers     map[string][]string `json:"headers,omitempty"`
+	Templated   bool				`json:"templated"`
 }
 
 //Gets Status - required for interfaces.Response
@@ -324,6 +327,8 @@ func (this ResponseDetailsView) GetBody() string { return this.Body }
 
 // Gets EncodedBody - required for interfaces.Response
 func (this ResponseDetailsView) GetEncodedBody() bool { return this.EncodedBody }
+
+func (this ResponseDetailsView) GetTemplated() bool { return this.Templated }
 
 // Gets Headers - required for interfaces.Response
 func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.Headers }
@@ -341,7 +346,7 @@ type MetaView struct {
 func NewMetaView(version string) *MetaView {
 	return &MetaView{
 		HoverflyVersion: version,
-		SchemaVersion:   "v2",
+		SchemaVersion:   "v3",
 		TimeExported:    time.Now().Format(time.RFC3339),
 	}
 }

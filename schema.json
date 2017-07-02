@@ -112,6 +112,9 @@
         },
         "status": {
           "type": "integer"
+        },
+        "templated": {
+          "type": "boolean"
         }
       },
       "type": "object"

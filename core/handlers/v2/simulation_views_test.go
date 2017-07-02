@@ -8,6 +8,65 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV3Payload(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+		"data": {
+			"pairs": [
+				{
+					"response": {
+						"status": 200,
+						"body": "exact match",
+						"encodedBody": false,
+						"headers": {
+							"Header": [
+								"value"
+							]
+						},
+						"templated":true
+					},
+					"request": {
+						"destination": {
+							"exactMatch": "test-server.com"
+						}
+					}
+				}
+			],
+			"globalActions": {
+				"delays": []
+			}
+		},
+		"meta": {
+			"schemaVersion": "v3",
+			"hoverflyVersion": "v0.11.0",
+			"timeExported": "2017-02-23T12:43:48Z"
+		}
+	}`))
+
+	Expect(err).To(BeNil())
+
+	Expect(simulation.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Body).To(BeNil())
+	Expect(*simulation.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("test-server.com"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Headers).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Method).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Query).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(BeNil())
+
+	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal("exact match"))
+	Expect(simulation.RequestResponsePairs[0].Response.Templated).To(BeTrue())
+	Expect(simulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
+	Expect(simulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Header", []string{"value"}))
+	Expect(simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
+
+	Expect(simulation.SchemaVersion).To(Equal("v3"))
+	Expect(simulation.HoverflyVersion).To(Equal("v0.11.0"))
+	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
+}
+
 func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV2Payload(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -56,11 +115,12 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV2Payload(t *
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(BeNil())
 
 	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal("exact match"))
+	Expect(simulation.RequestResponsePairs[0].Response.Templated).To(BeFalse())
 	Expect(simulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
 	Expect(simulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Header", []string{"value"}))
 	Expect(simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 
-	Expect(simulation.SchemaVersion).To(Equal("v2"))
+	Expect(simulation.SchemaVersion).To(Equal("v3"))
 	Expect(simulation.HoverflyVersion).To(Equal("v0.11.0"))
 	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
 }
@@ -148,8 +208,9 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV1Payload(t *
 	Expect(simulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
 	Expect(simulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Header", []string{"value"}))
 	Expect(simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
+	Expect(simulation.RequestResponsePairs[0].Response.Templated).To(BeFalse())
 
-	Expect(simulation.SchemaVersion).To(Equal("v2"))
+	Expect(simulation.SchemaVersion).To(Equal("v3"))
 	Expect(simulation.HoverflyVersion).To(Equal("v0.11.0"))
 	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
 }
@@ -215,13 +276,13 @@ func Test_RequestDetailsView_GetQuery_ReturnsNilIfNil(t *testing.T) {
 	Expect(queryString).To(BeNil())
 }
 
-func Test_SimulationViewV1_Upgrade_ReturnsAV2Simulation(t *testing.T) {
+func Test_SimulationViewV1_Upgrade_ReturnsAV3Simulation(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := v2.SimulationViewV1{
 		v2.DataViewV1{
 			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{
-				v2.RequestResponsePairViewV1{
+				{
 					Request: v2.RequestDetailsView{
 						RequestType: util.StringToPointer("recording"),
 						Scheme:      util.StringToPointer("http"),
@@ -277,11 +338,12 @@ func Test_SimulationViewV1_Upgrade_ReturnsAV2Simulation(t *testing.T) {
 	Expect(simulationViewV2.RequestResponsePairs[0].RequestMatcher.Headers).To(BeEmpty())
 
 	Expect(simulationViewV2.RequestResponsePairs[0].Response.Status).To(Equal(200))
+	Expect(simulationViewV2.RequestResponsePairs[0].Response.Templated).To(BeFalse())
 	Expect(simulationViewV2.RequestResponsePairs[0].Response.Body).To(Equal("body"))
 	Expect(simulationViewV2.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
 	Expect(simulationViewV2.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Test", []string{"headers"}))
 
-	Expect(simulationViewV2.SchemaVersion).To(Equal("v2"))
+	Expect(simulationViewV2.SchemaVersion).To(Equal("v3"))
 	Expect(simulationViewV2.HoverflyVersion).To(Equal("test"))
 	Expect(simulationViewV2.TimeExported).To(Equal("today"))
 }
@@ -292,7 +354,7 @@ func Test_SimulationViewV1_Upgrade_ReturnsGlobMatchesIfTemplate(t *testing.T) {
 	unit := v2.SimulationViewV1{
 		v2.DataViewV1{
 			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{
-				v2.RequestResponsePairViewV1{
+				{
 					Request: v2.RequestDetailsView{
 						RequestType: util.StringToPointer("template"),
 						Scheme:      util.StringToPointer("http"),
@@ -351,7 +413,7 @@ func Test_SimulationViewV1_Upgrade_CanReturnAnIncompleteRequest(t *testing.T) {
 	unit := v2.SimulationViewV1{
 		v2.DataViewV1{
 			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{
-				v2.RequestResponsePairViewV1{
+				{
 					Request: v2.RequestDetailsView{
 						Method: util.StringToPointer("POST"),
 					},

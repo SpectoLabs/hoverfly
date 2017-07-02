@@ -10,8 +10,6 @@ import (
 	"net/url"
 	"sync"
 
-	"strings"
-
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
@@ -22,6 +20,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/util"
+	"strings"
+	"github.com/SpectoLabs/hoverfly/core/templating"
 )
 
 // orPanic - wrapper for logging errors
@@ -249,8 +249,8 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 
 }
 
-// GetResponse returns stored response from cache
-func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
+// GetResponse returns stored response from cache TODO: // We should only need one of these two parameters
+func (hf *Hoverfly) GetResponse(request *http.Request, requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
 
 	cachedResponse, cacheErr := hf.CacheMatcher.GetCachedResponse(&requestDetails)
 	if cacheErr == nil && cachedResponse.MatchingPair == nil {
@@ -266,10 +266,19 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 	strongestMatch := strings.ToLower(mode.MatchingStrategy) == "strongest"
 
+	// Matching
 	if strongestMatch {
 		pair, err = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
 	} else {
 		pair, err = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
+	}
+
+	// Templating
+	if err == nil && pair.Response.Templated == true {
+		responseBody, err := templating.ApplyTemplate(request, pair.Response.Body)
+		if err == nil {
+			pair.Response.Body = responseBody
+		}
 	}
 
 	hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, err)
