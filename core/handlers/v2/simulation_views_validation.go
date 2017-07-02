@@ -40,7 +40,7 @@ var requestV1Definition = map[string]interface{}{
 	},
 }
 
-var requestV2Definition = map[string]interface{}{
+var requestV3Definition = map[string]interface{}{
 	"type": "object",
 	"properties": map[string]interface{}{
 		"scheme": map[string]interface{}{
@@ -64,7 +64,28 @@ var requestV2Definition = map[string]interface{}{
 	},
 }
 
-var responseDefinition = map[string]interface{}{
+var responseDefinitionV3 = map[string]interface{}{
+	"type": "object",
+	"properties": map[string]interface{}{
+		"body": map[string]interface{}{
+			"type": "string",
+		},
+		"encodedBody": map[string]interface{}{
+			"type": "boolean",
+		},
+		"headers": map[string]interface{}{
+			"$ref": "#/definitions/headers",
+		},
+		"status": map[string]interface{}{
+			"type": "integer",
+		},
+		"templated": map[string]interface{}{
+			"type": "boolean",
+		},
+	},
+}
+
+var responseDefinitionV1 = map[string]interface{}{
 	"type": "object",
 	"properties": map[string]interface{}{
 		"body": map[string]interface{}{
@@ -82,7 +103,7 @@ var responseDefinition = map[string]interface{}{
 	},
 }
 
-var requestFieldMatchersV2Definition = map[string]interface{}{
+var requestFieldMatchersV3Definition = map[string]interface{}{
 	"type": "object",
 	"properties": map[string]interface{}{
 		"exactMatch": map[string]interface{}{
@@ -146,7 +167,7 @@ var metaDefinition = map[string]interface{}{
 	},
 }
 
-var SimulationViewV2Schema = map[string]interface{}{
+var SimulationViewV3Schema = map[string]interface{}{
 	"description": "Hoverfly simulation schema",
 	"type":        "object",
 	"required": []string{
@@ -182,14 +203,15 @@ var SimulationViewV2Schema = map[string]interface{}{
 	},
 	"definitions": map[string]interface{}{
 		"request-response-pair": requestResponsePairDefinition,
-		"request":               requestV2Definition,
-		"response":              responseDefinition,
-		"field-matchers":        requestFieldMatchersV2Definition,
+		"request":               requestV3Definition,
+		"response":              responseDefinitionV3,
+		"field-matchers":        requestFieldMatchersV3Definition,
 		"headers":               headersDefinition,
 		"delay":                 delaysDefinition,
 		"meta":                  metaDefinition,
 	},
 }
+
 
 var SimulationViewV1Schema = map[string]interface{}{
 	"description": "Hoverfly simulation schema",
@@ -228,7 +250,7 @@ var SimulationViewV1Schema = map[string]interface{}{
 	"definitions": map[string]interface{}{
 		"request-response-pair": requestResponsePairDefinition,
 		"request":               requestV1Definition,
-		"response":              responseDefinition,
+		"response":              responseDefinitionV1,
 		"headers":               headersDefinition,
 		"delay":                 delaysDefinition,
 		"meta":                  metaDefinition,

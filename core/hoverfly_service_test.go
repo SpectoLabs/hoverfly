@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	pairOne = v2.RequestMatcherResponsePairViewV2{
+	pairOne = v2.RequestMatcherResponsePairViewV3{
 		RequestMatcher: v2.RequestMatcherViewV2{
 			Destination: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("test.com"),
@@ -30,7 +30,7 @@ var (
 		},
 	}
 
-	pairTwo = v2.RequestMatcherResponsePairViewV2{
+	pairTwo = v2.RequestMatcherResponsePairViewV3{
 		RequestMatcher: v2.RequestMatcherViewV2{
 			Path: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("/path"),
@@ -77,7 +77,7 @@ func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
 
-	Expect(simulation.MetaView.SchemaVersion).To(Equal("v2"))
+	Expect(simulation.MetaView.SchemaVersion).To(Equal("v3"))
 	Expect(simulation.MetaView.HoverflyVersion).To(MatchRegexp(`v\d+.\d+.\d+`))
 	Expect(simulation.MetaView.TimeExported).ToNot(BeNil())
 }
@@ -210,9 +210,9 @@ func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	simulationToImport := v2.SimulationViewV2{
+	simulationToImport := v2.SimulationViewV3{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{pairOne},
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{pairOne},
 			GlobalActions: v2.GlobalActionsView{
 				Delays: []v1.ResponseDelayView{},
 			},
@@ -241,9 +241,9 @@ func TestHoverfly_PutSimulation_ImportsSimulationViews(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	simulationToImport := v2.SimulationViewV2{
+	simulationToImport := v2.SimulationViewV3{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{pairTwo},
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{pairTwo},
 			GlobalActions: v2.GlobalActionsView{
 				Delays: []v1.ResponseDelayView{},
 			},
@@ -272,9 +272,9 @@ func TestHoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	simulationToImport := v2.SimulationViewV2{
+	simulationToImport := v2.SimulationViewV3{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{},
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{},
 			GlobalActions: v2.GlobalActionsView{
 				Delays: []v1.ResponseDelayView{delayOne, delayTwo},
 			},

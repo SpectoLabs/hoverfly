@@ -141,7 +141,7 @@ var _ = Describe("Using Hoverfly to return responses by request matchers", func(
 		}
 	},
 	"meta": {
-		"schemaVersion": "v2",
+		"schemaVersion": "v3",
 		"hoverflyVersion": "v0.10.0",
 		"timeExported": "2017-01-20T14:03:04Z"
 	}

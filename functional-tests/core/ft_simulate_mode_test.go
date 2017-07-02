@@ -187,7 +187,8 @@ Which if hit would have given the following response:
 {
     "status": 200,
     "body": "",
-    "encodedBody": false
+    "encodedBody": false,
+    "templated": false
 }`
 		Expect(string(body)).To(Equal(expected))
 
@@ -245,7 +246,8 @@ Which if hit would have given the following response:
 {
     "status": 200,
     "body": "",
-    "encodedBody": false
+    "encodedBody": false,
+    "templated": false
 }`
 		Expect(string(body)).To(Equal(expected))
 	})
@@ -312,5 +314,55 @@ Which if hit would have given the following response:
 
 		Expect(resp.StatusCode).To(Equal(200))
 		Expect(hoverfly.GetCache().Cache).To(BeEmpty()) // Don't cache hits which include header matching
+	})
+
+	It("should template response if templating is enabled", func() {
+		hoverfly.ImportSimulation(functional_tests.TemplatingEnabled)
+
+		hoverfly.WriteLogsIfError()
+
+		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com?one=foo"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err := ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+
+		Expect(string(body)).To(Equal("foo"))
+	})
+
+	It("should not template response if templating is disabled explicitely", func() {
+		hoverfly.ImportSimulation(functional_tests.TemplatingDisabled)
+
+		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com?one=foo"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err := ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+
+		Expect(string(body)).To(Equal("{{ Request.QueryParam.singular }}"))
+	})
+
+	It("should not template response if templating is not explcitely enabled or disabled", func() {
+		hoverfly.ImportSimulation(functional_tests.TemplatingDisabledByDefault)
+
+		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com?one=foo"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err := ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+
+		Expect(string(body)).To(Equal("{{ Request.QueryParam.one }}"))
+	})
+
+	It("should not crash when templating a response if templating variable does not exist", func() {
+		hoverfly.ImportSimulation(functional_tests.TemplatingEnabled)
+
+		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com?wrong=foo"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err := ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+
+		Expect(string(body)).To(Equal(""))
 	})
 })

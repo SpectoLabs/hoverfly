@@ -48,7 +48,7 @@ type RequestMatcherResponsePair struct {
 	Response       ResponseDetails
 }
 
-func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV2) *RequestMatcherResponsePair {
+func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV3) *RequestMatcherResponsePair {
 	if view.RequestMatcher.Query != nil && view.RequestMatcher.Query.ExactMatch != nil {
 		sortedQuery := util.SortQueryString(*view.RequestMatcher.Query.ExactMatch)
 		view.RequestMatcher.Query.ExactMatch = &sortedQuery
@@ -68,7 +68,7 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 	}
 }
 
-func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePairViewV2 {
+func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePairViewV3 {
 
 	var path, method, destination, scheme, query, body *v2.RequestFieldMatchersView
 
@@ -96,7 +96,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 		body = this.RequestMatcher.Body.BuildView()
 	}
 
-	return v2.RequestMatcherResponsePairViewV2{
+	return v2.RequestMatcherResponsePairViewV3{
 		RequestMatcher: v2.RequestMatcherViewV2{
 			Path:        path,
 			Method:      method,

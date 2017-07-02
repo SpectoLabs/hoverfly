@@ -155,7 +155,7 @@
 		}
 	},
 	"meta": {
-		"schemaVersion": "v2",
+		"schemaVersion": "v3",
 		"hoverflyVersion": "v0.11.4",
 		"timeExported": "2017-05-30T14:23:44+01:00"
 	}

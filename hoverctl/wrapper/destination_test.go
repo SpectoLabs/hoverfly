@@ -12,10 +12,10 @@ func Test_GetDestination_GetsDestinationFromHoverfly(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV2{
+	hoverfly.PutSimulation(v2.SimulationViewV3{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
-				v2.RequestMatcherResponsePairViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
+				v2.RequestMatcherResponsePairViewV3{
 					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("GET"),
@@ -55,10 +55,10 @@ func Test_GetDestination_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV2{
+	hoverfly.PutSimulation(v2.SimulationViewV3{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
-				v2.RequestMatcherResponsePairViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
+				v2.RequestMatcherResponsePairViewV3{
 					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("GET"),
@@ -88,10 +88,10 @@ func Test_SetDestination_SetsDestinationAndPrintsDestination(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV2{
+	hoverfly.PutSimulation(v2.SimulationViewV3{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
-				v2.RequestMatcherResponsePairViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
+				v2.RequestMatcherResponsePairViewV3{
 					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("PUT"),
@@ -131,10 +131,10 @@ func Test_SetDestination_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV2{
+	hoverfly.PutSimulation(v2.SimulationViewV3{
 		v2.DataViewV2{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
-				v2.RequestMatcherResponsePairViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
+				v2.RequestMatcherResponsePairViewV3{
 					RequestMatcher: v2.RequestMatcherViewV2{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("PUT"),

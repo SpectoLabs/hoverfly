@@ -14,8 +14,8 @@ import (
 )
 
 type HoverflySimulation interface {
-	GetSimulation() (SimulationViewV2, error)
-	PutSimulation(SimulationViewV2) error
+	GetSimulation() (SimulationViewV3, error)
+	PutSimulation(SimulationViewV3) error
 	DeleteSimulation()
 }
 
@@ -98,7 +98,7 @@ func (this *SimulationHandler) Options(w http.ResponseWriter, r *http.Request, n
 }
 
 func (this *SimulationHandler) GetSchema(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	bytes, _ := json.Marshal(SimulationViewV2Schema)
+	bytes, _ := json.Marshal(SimulationViewV3Schema)
 
 	handlers.WriteResponse(w, bytes)
 }

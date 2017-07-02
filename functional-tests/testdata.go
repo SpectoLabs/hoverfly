@@ -90,7 +90,7 @@ var JsonPayload = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -150,7 +150,7 @@ var JsonPayloadPreloadCache = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -228,7 +228,7 @@ var JsonPayloadWithDelays = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -256,7 +256,7 @@ var XmlSimulation = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -284,7 +284,7 @@ var XpathSimulation = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -312,7 +312,7 @@ var JsonPathMatchSimulation = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -340,7 +340,7 @@ var RegexMatchSimulation = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -368,7 +368,7 @@ var GlobMatchSimulation = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -396,7 +396,7 @@ var JsonMatchSimulation = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -439,7 +439,7 @@ var MultipleMatchSimulation = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -515,7 +515,7 @@ var JsonSimulationGetAndPost = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -668,7 +668,7 @@ var ExactMatchPayload = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -710,7 +710,7 @@ var StrongestMatchProofSimulation = `{
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.10.2",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -766,7 +766,7 @@ var ClosestMissProofSimulation = `{
 		}
 	},
 	"meta": {
-		"schemaVersion": "v2",
+		"schemaVersion": "v3",
 		"hoverflyVersion": "v0.10.2",
 		"timeExported": "2017-02-23T12:43:48Z"
 	}
@@ -791,10 +791,93 @@ var SingleRequestMatcherToResponse = `{
 		}
 	},
 	"meta": {
-		"schemaVersion": "v2",
+		"schemaVersion": "v3",
 		"hoverflyVersion": "v0.10.2",
 		"timeExported": "2017-02-23T12:43:48Z"
 	}
+}`
+
+var TemplatingEnabled = `{
+    "data": {
+        "pairs": [
+            {
+                "response": {
+                    "status": 200,
+                    "body": "{{ Request.QueryParam.one }}",
+                    "encodedBody": false,
+                    "templated" : true
+                },
+                "request": {
+                    "method": {
+						"exactMatch": "GET"
+                    }
+                }
+            }
+        ],
+        "globalActions": {
+            "delays": []
+        }
+    },
+    "meta": {
+        "schemaVersion": "v3",
+        "hoverflyVersion": "v0.10.2",
+        "timeExported": "2017-02-23T12:43:48Z"
+    }
+}`
+
+var TemplatingDisabled = `{
+    "data": {
+        "pairs": [
+            {
+                "response": {
+                    "status": 200,
+                    "body": "{{ Request.QueryParam.singular }}",
+                    "encodedBody": false,
+                    "templated" : false
+                },
+                "request": {
+                    "method": {
+						"exactMatch": "GET"
+                    }
+                }
+            }
+        ],
+        "globalActions": {
+            "delays": []
+        }
+    },
+    "meta": {
+        "schemaVersion": "v3",
+        "hoverflyVersion": "v0.10.2",
+        "timeExported": "2017-02-23T12:43:48Z"
+    }
+}`
+
+var TemplatingDisabledByDefault = `{
+    "data": {
+        "pairs": [
+            {
+                "response": {
+                    "status": 200,
+                    "body": "{{ Request.QueryParam.one }}",
+                    "encodedBody": false
+                },
+                "request": {
+                    "method": {
+						"exactMatch": "GET"
+                    }
+                }
+            }
+        ],
+        "globalActions": {
+            "delays": []
+        }
+    },
+    "meta": {
+        "schemaVersion": "v3",
+        "hoverflyVersion": "v0.10.2",
+        "timeExported": "2017-02-23T12:43:48Z"
+    }
 }`
 
 var Issue607 = `
@@ -886,7 +969,7 @@ var Issue607 = `
 		}
 	},
 	"meta": {
-		"schemaVersion": "v2",
+		"schemaVersion": "v3",
 		"hoverflyVersion": "v0.12.0",
 		"timeExported": "2017-06-13T10:55:12-07:00"
 	}

@@ -53,5 +53,6 @@ functional-tests/hoverctl/.hoverfly/config.yaml
 functional-tests/hoverctl/.hoverfly/*.pid
 functional-tests/hoverctl/testdata-gen
 functional-tests/core/bin/hoverctl
-functional-tests/core/bin/hoverfly
+**Godeps**
 .DS_Store
+test.db
