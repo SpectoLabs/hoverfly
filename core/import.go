@@ -90,7 +90,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
 	}
 
-	var simulation v2.SimulationViewV2
+	var simulation v2.SimulationViewV3
 
 	body, err := ioutil.ReadAll(pairsFile)
 	if err != nil {
@@ -115,7 +115,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Failed to fetch given URL, error %s", err.Error())
 	}
 
-	var simulation v2.SimulationViewV2
+	var simulation v2.SimulationViewV3
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -137,7 +137,7 @@ func isJSON(s string) bool {
 }
 
 // ImportRequestResponsePairViews - a function to save given pairs into the database.
-func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v2.RequestMatcherResponsePairViewV2) error {
+func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v2.RequestMatcherResponsePairViewV3) error {
 	if len(pairViews) > 0 {
 		success := 0
 		failed := 0

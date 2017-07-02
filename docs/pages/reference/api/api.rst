@@ -68,7 +68,8 @@ Example response body:
                 "Content-Type": [
                   "text/html; charset=utf-8"
                 ]
-              }
+              },
+              "templated": false
             },
             "request": {
               "path": {
@@ -82,7 +83,7 @@ Example response body:
         }
       },
       "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.11.0",
         "timeExported": "2016-11-11T11:53:52Z"
       }
@@ -167,7 +168,7 @@ Example request body:
         }
       },
       "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.11.0",
         "timeExported": "2016-11-11T11:53:52Z"
       }

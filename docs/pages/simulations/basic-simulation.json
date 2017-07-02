@@ -28,7 +28,8 @@
                 "encodedBody": false,
                 "headers": {
                     "Hoverfly": ["Was-Here"]
-                }
+                },
+                "templated": "false"
             }
         }],
         "globalActions": {
@@ -38,7 +39,7 @@
         }
     },
     "meta": {
-        "schemaVersion": "v2",
+        "schemaVersion": "v3",
         "hoverflyVersion": "v0.11.0",
         "timeExported": "2016-11-11T11:53:52Z"
     }

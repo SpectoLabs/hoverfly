@@ -42,7 +42,7 @@ func Test_NewRequestFieldMatchers_BuildView(t *testing.T) {
 func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV2{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV3{
 		RequestMatcher: v2.RequestMatcherViewV2{
 			Path: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("/"),
@@ -62,7 +62,7 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 func Test_NewRequestMatcherResponsePairFromView_SortsQuery(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV2{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV3{
 		RequestMatcher: v2.RequestMatcherViewV2{
 			Query: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("b=b&a=a"),
@@ -74,6 +74,24 @@ func Test_NewRequestMatcherResponsePairFromView_SortsQuery(t *testing.T) {
 	})
 
 	Expect(*unit.RequestMatcher.Query.ExactMatch).To(Equal("a=a&b=b"))
+}
+
+func Test_NewRequestMatcherResponsePairFromView_StoresTemplated(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV3{
+		RequestMatcher: v2.RequestMatcherViewV2{
+			Query: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("b=b&a=a"),
+			},
+		},
+		Response: v2.ResponseDetailsView{
+			Body: "body",
+			Templated: true,
+		},
+	})
+
+	Expect(unit.Response.Templated).To(BeTrue())
 }
 
 func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDetails(t *testing.T) {

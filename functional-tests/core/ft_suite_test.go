@@ -28,7 +28,6 @@ var (
 	adminPort = freeport.GetPort()
 
 	proxyPort         = freeport.GetPort()
-	proxyPortAsString = strconv.Itoa(proxyPort)
 )
 
 func TestHoverfly(t *testing.T) {

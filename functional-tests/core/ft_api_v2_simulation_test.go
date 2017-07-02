@@ -46,7 +46,7 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(err).To(BeNil())
 			schemaVersion, err := metaObject.GetString("schemaVersion")
 			Expect(err).To(BeNil())
-			Expect(schemaVersion).To(Equal("v2"))
+			Expect(schemaVersion).To(Equal("v3"))
 			hoverflyVersion, err := metaObject.GetString("hoverflyVersion")
 			Expect(err).To(BeNil())
 			Expect(hoverflyVersion).ToNot(BeNil())
@@ -163,7 +163,7 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(err).To(BeNil())
 			schemaVersion, err := metaObject.GetString("schemaVersion")
 			Expect(err).To(BeNil())
-			Expect(schemaVersion).To(Equal("v2"))
+			Expect(schemaVersion).To(Equal("v3"))
 			hoverflyVersion, err := metaObject.GetString("hoverflyVersion")
 			Expect(err).To(BeNil())
 			Expect(hoverflyVersion).ToNot(BeNil())
@@ -198,12 +198,13 @@ var _ = Describe("/api/v2/simulation", func() {
 							"status": 200,
 							"body": "destination matched",
 							"encodedBody": false,
-							"headers": {}
+							"headers": {},
+							"templated" : false
 						}
 					}]
 				},
 				"meta": {
-					"schemaVersion": "v2"
+					"schemaVersion": "v3"
 				}
 			}
 			`)
@@ -271,12 +272,13 @@ var _ = Describe("/api/v2/simulation", func() {
 							"status": 200,
 							"body": "destination matched",
 							"encodedBody": false,
-							"headers": {}
+							"headers": {},
+							"templated": true
 						}
 					}]
 				},
 				"meta": {
-					"schemaVersion": "v2"
+					"schemaVersion": "v3"
 				}
 			}
 			`)
