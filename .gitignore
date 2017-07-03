@@ -56,3 +56,4 @@ functional-tests/core/bin/hoverctl
 **Godeps**
 .DS_Store
 test.db
+/vendor/vendor.json
