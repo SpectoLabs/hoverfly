@@ -12,7 +12,7 @@ type TemplatingData struct {
 
 type Request struct {
 	QueryParam map[string][]string
-	PathParam  []string
+	Path  []string
 	Scheme     string
 }
 
@@ -32,11 +32,11 @@ func NewTemplatingDataFromRequest(request *http.Request) * TemplatingData {
 
 	requestPath := request.URL.Path
 
-	pathParams := strings.Split(requestPath, "/")[1:]
+	Path := strings.Split(requestPath, "/")[1:]
 
 	return &TemplatingData{
 		Request: Request{
-			PathParam: pathParams,
+			Path: Path,
 			QueryParam: request.URL.Query(),
 			Scheme: request.URL.Scheme,
 		},
