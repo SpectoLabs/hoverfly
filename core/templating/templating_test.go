@@ -7,20 +7,20 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/templating"
 )
 
-func Test_ShouldCreateTemplatingDataPathParamsFromRequest(t *testing.T) {
+func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	actual := NewTemplatingDataFomRequest("http://www.test.com/foo/bar?cheese=1&ham=2&cheese=3")
 
-	Expect(actual.Request.PathParam).To(ConsistOf("foo", "bar"))
+	Expect(actual.Request.Path).To(ConsistOf("foo", "bar"))
 }
 
-func Test_ShouldCreateTemplatingDataPathParamsFromRequestWithNoPathParams(t *testing.T) {
+func Test_ShouldCreateTemplatingDataPathsFromRequestWithNoPaths(t *testing.T) {
 	RegisterTestingT(t)
 
 	actual := NewTemplatingDataFomRequest("http://www.test.com?cheese=1&ham=2&cheese=3")
 
-	Expect(actual.Request.PathParam).To(BeEmpty())
+	Expect(actual.Request.Path).To(BeEmpty())
 }
 
 func Test_ShouldCreateTemplatingDataQueryParamsFromRequest(t *testing.T) {
@@ -78,9 +78,9 @@ Query param value by index: {{ Request.QueryParam.multiple.[1] }}
 List of query param values: {{ Request.QueryParam.multiple}}
 Looping through query params: {{#each Request.QueryParam.multiple}}{{ this }}-{{/each}}
 
-Path param value: {{ Request.PathParam.[0] }}
-All path param values: {{ Request.PathParam }}
-Looping through path params: {{#each Request.PathParam}}{{ this }}-{{/each}}`)
+Path param value: {{ Request.Path.[0] }}
+All path param values: {{ Request.Path }}
+Looping through path params: {{#each Request.Path}}{{ this }}-{{/each}}`)
 
 	Expect(err).To(BeNil())
 
@@ -117,9 +117,9 @@ Query param value by index:{{ Request.QueryParam.multiple.[1] }}
 List of query param values:{{ Request.QueryParam.multiple}}
 Looping through query params:{{#each Request.QueryParam.multiple}}{{ this }}{{/each}}
 
-Path param value:{{ Request.PathParam.[0] }}
-All path param values:{{ Request.PathParam }}
-Looping through path params:{{#each Request.PathParam}}{{ this }}{{/each}}`)
+Path param value:{{ Request.Path.[0] }}
+All path param values:{{ Request.Path }}
+Looping through path params:{{#each Request.Path}}{{ this }}{{/each}}`)
 
 	Expect(err).To(BeNil())
 
