@@ -391,5 +391,22 @@ var _ = Describe("/api/v2/simulation", func() {
 				}}))
 
 		})
+
+		It("should error when importing unknown version", func() {
+			request := sling.New().Put("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+			payload := bytes.NewBufferString(`{
+				"data": {},
+				"meta": {
+					"schemaVersion": "r3"
+				}
+			}`)
+
+			request.Body(payload)
+			response := functional_tests.DoRequest(request)
+			Expect(response.StatusCode).To(Equal(400))
+
+			responseBody, _ := ioutil.ReadAll(response.Body)
+			Expect(string(responseBody)).To(Equal(`{"error":"Invalid simulation: schema version r3 is not supported by this version of Hoverfly, you may need to update Hoverfly"}`))
+		})
 	})
 })
