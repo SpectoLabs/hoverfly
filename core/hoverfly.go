@@ -66,7 +66,7 @@ func NewHoverfly() *Hoverfly {
 		Cfg:            InitSettings(),
 	}
 
-	hoverfly.version = "v0.12.2"
+	hoverfly.version = "v0.12.3"
 
 	log.AddHook(hoverfly.StoreLogsHook)
 
