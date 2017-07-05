@@ -180,6 +180,28 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidV1Sim
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
 }
 
+func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromUnknownSchemaVersion(t *testing.T) {
+	RegisterTestingT(t)
+
+	_, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+		"data": {
+			"pairs": [
+				{
+					
+				}
+			]
+		},
+		"meta": {
+			"schemaVersion": "r3",
+			"hoverflyVersion": "v0.11.0",
+			"timeExported": "2017-02-23T12:43:48Z"
+		}
+	}`))
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("Invalid simulation: schema version r3 is not supported by this version of Hoverfly, you may need to update Hoverfly"))
+}
+
 func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidJson(t *testing.T) {
 	RegisterTestingT(t)
 

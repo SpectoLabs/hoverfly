@@ -3,6 +3,7 @@ package v2
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"strings"
@@ -20,15 +21,15 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 	jsonMap := make(map[string]interface{})
 
 	if err := json.Unmarshal(responseBody, &jsonMap); err != nil {
-		return SimulationViewV2{}, errors.New("Invalid JSON")
+		return SimulationViewV2{}, fmt.Errorf("Invalid JSON")
 	}
 
 	if jsonMap["meta"] == nil {
-		return SimulationViewV2{}, errors.New("Invalid JSON, missing \"meta\" object")
+		return SimulationViewV2{}, fmt.Errorf("Invalid JSON, missing \"meta\" object")
 	}
 
 	if jsonMap["meta"].(map[string]interface{})["schemaVersion"] == nil {
-		return SimulationViewV2{}, errors.New("Invalid JSON, missing \"meta.schemaVersion\" string")
+		return SimulationViewV2{}, fmt.Errorf("Invalid JSON, missing \"meta.schemaVersion\" string")
 	}
 
 	schemaVersion := jsonMap["meta"].(map[string]interface{})["schemaVersion"].(string)
@@ -57,6 +58,8 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV2, e
 		}
 
 		simulationView = simulationViewV1.Upgrade()
+	} else {
+		return simulationView, fmt.Errorf("Invalid simulation: schema version %v is not supported by this version of Hoverfly, you may need to update Hoverfly", schemaVersion)
 	}
 
 	return simulationView, nil
