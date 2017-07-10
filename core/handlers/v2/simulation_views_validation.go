@@ -212,6 +212,50 @@ var SimulationViewV3Schema = map[string]interface{}{
 	},
 }
 
+var SimulationViewV2Schema = map[string]interface{}{
+	"description": "Hoverfly simulation schema",
+	"type":        "object",
+	"required": []string{
+		"data", "meta",
+	},
+	"additionalProperties": false,
+	"properties": map[string]interface{}{
+		"data": map[string]interface{}{
+			"type": "object",
+			"properties": map[string]interface{}{
+				"pairs": map[string]interface{}{
+					"type": "array",
+					"items": map[string]interface{}{
+						"$ref": "#/definitions/request-response-pair",
+					},
+				},
+				"globalActions": map[string]interface{}{
+					"type": "object",
+					"properties": map[string]interface{}{
+						"delays": map[string]interface{}{
+							"type": "array",
+							"items": map[string]interface{}{
+								"$ref": "#/definitions/delay",
+							},
+						},
+					},
+				},
+			},
+		},
+		"meta": map[string]interface{}{
+			"$ref": "#/definitions/meta",
+		},
+	},
+	"definitions": map[string]interface{}{
+		"request-response-pair": requestResponsePairDefinition,
+		"request":               requestV3Definition,
+		"response":              responseDefinitionV1,
+		"field-matchers":        requestFieldMatchersV3Definition,
+		"headers":               headersDefinition,
+		"delay":                 delaysDefinition,
+		"meta":                  metaDefinition,
+	},
+}
 
 var SimulationViewV1Schema = map[string]interface{}{
 	"description": "Hoverfly simulation schema",

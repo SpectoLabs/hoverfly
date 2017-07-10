@@ -13,10 +13,10 @@ func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
 
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV3{
-		v2.DataViewV2{
+		v2.DataViewV3{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
 				v2.RequestMatcherResponsePairViewV3{
-					RequestMatcher: v2.RequestMatcherViewV2{
+					RequestMatcher: v2.RequestMatcherViewV3{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("GET"),
 						},
@@ -24,7 +24,7 @@ func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
 							ExactMatch: util.StringToPointer("/api/v2/hoverfly/middleware"),
 						},
 					},
-					Response: v2.ResponseDetailsView{
+					Response: v2.ResponseDetailsViewV3{
 						Status: 200,
 						Body:   `{"binary": "test-binary", "script": "test.script", "remote": "http://test.com"}`,
 					},
@@ -58,10 +58,10 @@ func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV3{
-		v2.DataViewV2{
+		v2.DataViewV3{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
 				v2.RequestMatcherResponsePairViewV3{
-					RequestMatcher: v2.RequestMatcherViewV2{
+					RequestMatcher: v2.RequestMatcherViewV3{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("GET"),
 						},
@@ -69,7 +69,7 @@ func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 							ExactMatch: util.StringToPointer("/api/v2/hoverfly/middleware"),
 						},
 					},
-					Response: v2.ResponseDetailsView{
+					Response: v2.ResponseDetailsViewV3{
 						Status: 400,
 						Body:   `{"error": "test error"}`,
 					},
@@ -100,10 +100,10 @@ func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV3{
-		v2.DataViewV2{
+		v2.DataViewV3{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
 				v2.RequestMatcherResponsePairViewV3{
-					RequestMatcher: v2.RequestMatcherViewV2{
+					RequestMatcher: v2.RequestMatcherViewV3{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("PUT"),
 						},
@@ -111,7 +111,7 @@ func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 							ExactMatch: util.StringToPointer("/api/v2/hoverfly/middleware"),
 						},
 					},
-					Response: v2.ResponseDetailsView{
+					Response: v2.ResponseDetailsViewV3{
 						Status: 400,
 						Body:   `{"error": "test error"}`,
 					},

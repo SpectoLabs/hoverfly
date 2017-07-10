@@ -62,6 +62,12 @@ type CachedResponseView struct {
 	ClosestMiss  *ClosestMissView                  `json:"closestMiss"`
 }
 
+type ClosestMissView struct {
+	Response       ResponseDetailsViewV3 `json:"response"`
+	RequestMatcher RequestMatcherViewV3  `json:"requestMatcher"`
+	MissedFields   []string              `json:"missedFields"`
+}
+
 type JournalView struct {
 	Journal []JournalEntryView `json:"journal"`
 }

@@ -21,7 +21,7 @@ type HoverflySimulationStub struct {
 
 func (this HoverflySimulationStub) GetSimulation() (SimulationViewV3, error) {
 	pairOne := RequestMatcherResponsePairViewV3{
-		RequestMatcher: RequestMatcherViewV2{
+		RequestMatcher: RequestMatcherViewV3{
 			Destination: &RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("test.com"),
 			},
@@ -29,13 +29,13 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationViewV3, error) {
 				ExactMatch: util.StringToPointer("/testing"),
 			},
 		},
-		Response: ResponseDetailsView{
+		Response: ResponseDetailsViewV3{
 			Body: "test-body",
 		},
 	}
 
 	return SimulationViewV3{
-		DataViewV2{
+		DataViewV3{
 			RequestResponsePairs: []RequestMatcherResponsePairViewV3{pairOne},
 			GlobalActions: GlobalActionsView{
 				Delays: []v1.ResponseDelayView{
@@ -93,16 +93,16 @@ func TestSimulationHandler_Get_ReturnsSimulation(t *testing.T) {
 	simulationView, err := unmarshalSimulationViewV3(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(simulationView.DataViewV2.RequestResponsePairs).To(HaveLen(1))
+	Expect(simulationView.DataViewV3.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(simulationView.DataViewV2.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal(util.StringToPointer("test.com")))
-	Expect(simulationView.DataViewV2.RequestResponsePairs[0].RequestMatcher.Path.ExactMatch).To(Equal(util.StringToPointer("/testing")))
+	Expect(simulationView.DataViewV3.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal(util.StringToPointer("test.com")))
+	Expect(simulationView.DataViewV3.RequestResponsePairs[0].RequestMatcher.Path.ExactMatch).To(Equal(util.StringToPointer("/testing")))
 
-	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
+	Expect(simulationView.DataViewV3.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
 
-	Expect(simulationView.DataViewV2.GlobalActions.Delays).To(HaveLen(1))
-	Expect(simulationView.DataViewV2.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
-	Expect(simulationView.DataViewV2.GlobalActions.Delays[0].Delay).To(Equal(100))
+	Expect(simulationView.DataViewV3.GlobalActions.Delays).To(HaveLen(1))
+	Expect(simulationView.DataViewV3.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
+	Expect(simulationView.DataViewV3.GlobalActions.Delays[0].Delay).To(Equal(100))
 
 	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v3"))
 	Expect(simulationView.MetaView.HoverflyVersion).To(Equal("test"))
@@ -159,16 +159,16 @@ func TestSimulationHandler_Delete_CallsGetAfterDelete(t *testing.T) {
 	simulationView, err := unmarshalSimulationViewV3(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(simulationView.DataViewV2.RequestResponsePairs).To(HaveLen(1))
+	Expect(simulationView.DataViewV3.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(simulationView.DataViewV2.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal(util.StringToPointer("test.com")))
-	Expect(simulationView.DataViewV2.RequestResponsePairs[0].RequestMatcher.Path.ExactMatch).To(Equal(util.StringToPointer("/testing")))
+	Expect(simulationView.DataViewV3.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal(util.StringToPointer("test.com")))
+	Expect(simulationView.DataViewV3.RequestResponsePairs[0].RequestMatcher.Path.ExactMatch).To(Equal(util.StringToPointer("/testing")))
 
-	Expect(simulationView.DataViewV2.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
+	Expect(simulationView.DataViewV3.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
 
-	Expect(simulationView.DataViewV2.GlobalActions.Delays).To(HaveLen(1))
-	Expect(simulationView.DataViewV2.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
-	Expect(simulationView.DataViewV2.GlobalActions.Delays[0].Delay).To(Equal(100))
+	Expect(simulationView.DataViewV3.GlobalActions.Delays).To(HaveLen(1))
+	Expect(simulationView.DataViewV3.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
+	Expect(simulationView.DataViewV3.GlobalActions.Delays[0].Delay).To(Equal(100))
 
 	Expect(simulationView.MetaView.SchemaVersion).To(Equal("v3"))
 	Expect(simulationView.MetaView.HoverflyVersion).To(Equal("test"))

@@ -27,22 +27,22 @@ func (this HoverflyCacheStub) GetCache() (CacheView, error) {
 		Cache: []CachedResponseView{
 			CachedResponseView{
 				MatchingPair: &RequestMatcherResponsePairViewV3{
-					RequestMatcher: RequestMatcherViewV2{
+					RequestMatcher: RequestMatcherViewV3{
 						Destination: &RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("one"),
 						},
 					},
-					Response: ResponseDetailsView{},
+					Response: ResponseDetailsViewV3{},
 				},
 			},
 			CachedResponseView{
 				MatchingPair: &RequestMatcherResponsePairViewV3{
-					RequestMatcher: RequestMatcherViewV2{
+					RequestMatcher: RequestMatcherViewV3{
 						Destination: &RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("two"),
 						},
 					},
-					Response: ResponseDetailsView{},
+					Response: ResponseDetailsViewV3{},
 				},
 			},
 		},
