@@ -97,7 +97,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 	}
 
 	return v2.RequestMatcherResponsePairViewV3{
-		RequestMatcher: v2.RequestMatcherViewV2{
+		RequestMatcher: v2.RequestMatcherViewV3{
 			Path:        path,
 			Method:      method,
 			Destination: destination,
@@ -106,7 +106,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 			Body:        body,
 			Headers:     this.RequestMatcher.Headers,
 		},
-		Response: this.Response.ConvertToResponseDetailsView(),
+		Response: this.Response.ConvertToResponseDetailsViewV3(),
 	}
 }
 
@@ -151,17 +151,17 @@ type MatchError struct {
 	MatchedOnAllButHeadersAtLeastOnce bool
 }
 
-func NewMatchErrorWithClosestMiss(closestMiss * ClosestMiss, error string, matchedOnAllButHeadersAtLeastOnce bool) * MatchError {
+func NewMatchErrorWithClosestMiss(closestMiss *ClosestMiss, error string, matchedOnAllButHeadersAtLeastOnce bool) *MatchError {
 	return &MatchError{
-		ClosestMiss:                       closestMiss,
-		error:                             error,
+		ClosestMiss: closestMiss,
+		error:       error,
 		MatchedOnAllButHeadersAtLeastOnce: matchedOnAllButHeadersAtLeastOnce,
 	}
 }
 
-func NewMatchError(error string, matchedOnAllButHeadersAtLeastOnce bool) * MatchError {
+func NewMatchError(error string, matchedOnAllButHeadersAtLeastOnce bool) *MatchError {
 	return &MatchError{
-		error:                             error,
+		error: error,
 		MatchedOnAllButHeadersAtLeastOnce: matchedOnAllButHeadersAtLeastOnce,
 	}
 }

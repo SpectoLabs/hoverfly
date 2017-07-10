@@ -1,16 +1,17 @@
 package models
 
 import (
-	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"encoding/json"
+	"fmt"
 	"strings"
+
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 type ClosestMiss struct {
 	RequestDetails RequestDetails
-	Response       v2.ResponseDetailsView
-	RequestMatcher v2.RequestMatcherViewV2
+	Response       v2.ResponseDetailsViewV3
+	RequestMatcher v2.RequestMatcherViewV3
 	MissedFields   []string
 }
 
@@ -30,10 +31,10 @@ func (this *ClosestMiss) GetMessage() string {
 		string(responseBytes)
 }
 
-func (this * ClosestMiss) BuildView() *v2.ClosestMissView{
+func (this *ClosestMiss) BuildView() *v2.ClosestMissView {
 	return &v2.ClosestMissView{
-		Response: this.Response,
+		Response:       this.Response,
 		RequestMatcher: this.RequestMatcher,
-		MissedFields: this.MissedFields,
+		MissedFields:   this.MissedFields,
 	}
 }

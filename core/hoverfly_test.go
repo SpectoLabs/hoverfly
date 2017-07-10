@@ -11,10 +11,10 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 const pythonMiddlewareBasic = "import sys\nprint(sys.stdin.readlines()[0])"
@@ -446,16 +446,16 @@ func Test_Hoverfly_GetResponse_WillCacheClosestMiss(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 	unit.PutSimulation(v2.SimulationViewV3{
-		v2.DataViewV2{
+		v2.DataViewV3{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
 				{
-					RequestMatcher: v2.RequestMatcherViewV2{
+					RequestMatcher: v2.RequestMatcherViewV3{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("closest"),
 						},
 					},
-					Response: v2.ResponseDetailsView{
-						Body:   "closest",
+					Response: v2.ResponseDetailsViewV3{
+						Body: "closest",
 					},
 				},
 			},
@@ -482,8 +482,6 @@ func Test_Hoverfly_GetResponse_WillCacheClosestMiss(t *testing.T) {
 	Expect(cachedResponse.ClosestMiss.Response.Body).To(Equal("closest"))
 	Expect(cachedResponse.ClosestMiss.MissedFields).To(ConsistOf("method"))
 }
-
-
 
 type ResponseDelayListStub struct {
 	gotDelays int

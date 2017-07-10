@@ -59,7 +59,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV2{
+				Expect(payload.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV3{
 					Path: &v2.RequestFieldMatchersView{
 						ExactMatch: util.StringToPointer("/"),
 					},
@@ -80,7 +80,7 @@ var _ = Describe("When I run Hoverfly", func() {
 					},
 				}))
 
-				Expect(payload.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsView{
+				Expect(payload.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsViewV3{
 					Status:      200,
 					Body:        "Hello world",
 					EncodedBody: false,
@@ -90,6 +90,7 @@ var _ = Describe("When I run Hoverfly", func() {
 						"Date":           []string{"date"},
 						"Hoverfly":       []string{"Was-Here"},
 					},
+					Templated: false,
 				}))
 			})
 
