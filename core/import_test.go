@@ -195,14 +195,14 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 	RegisterTestingT(t)
 
 	originalPair := v2.RequestMatcherResponsePairViewV3{
-		Response: v2.ResponseDetailsView{
+		Response: v2.ResponseDetailsViewV3{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}},
-			Templated: true,
+			Templated:   true,
 		},
-		RequestMatcher: v2.RequestMatcherViewV2{
+		RequestMatcher: v2.RequestMatcherViewV3{
 			Path: &v2.RequestFieldMatchersView{
 				ExactMatch: StringToPointer("/"),
 			},
@@ -227,9 +227,9 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 
 	Expect(hv.Simulation.MatchingPairs[0]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
-			Status:  200,
-			Body:    "hello_world",
-			Headers: map[string][]string{"Content-Type": []string{"text/plain"}},
+			Status:    200,
+			Body:      "hello_world",
+			Headers:   map[string][]string{"Content-Type": []string{"text/plain"}},
 			Templated: true,
 		},
 		RequestMatcher: models.RequestMatcher{
@@ -269,13 +269,13 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 	RegisterTestingT(t)
 
 	originalPair1 := v2.RequestMatcherResponsePairViewV3{
-		Response: v2.ResponseDetailsView{
+		Response: v2.ResponseDetailsViewV3{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 		},
-		RequestMatcher: v2.RequestMatcherViewV2{
+		RequestMatcher: v2.RequestMatcherViewV3{
 			Path: &v2.RequestFieldMatchersView{
 				ExactMatch: StringToPointer("/"),
 			},
@@ -313,9 +313,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 	Expect(hv.Simulation.MatchingPairs).To(HaveLen(3))
 	Expect(hv.Simulation.MatchingPairs[0]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
-			Status:  200,
-			Body:    "hello_world",
-			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
+			Status:    200,
+			Body:      "hello_world",
+			Headers:   map[string][]string{"Hoverfly": []string{"testing"}},
 			Templated: false,
 		},
 		RequestMatcher: models.RequestMatcher{
@@ -343,9 +343,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 
 	Expect(hv.Simulation.MatchingPairs[1]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
-			Status:  200,
-			Body:    "hello_world",
-			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
+			Status:    200,
+			Body:      "hello_world",
+			Headers:   map[string][]string{"Hoverfly": []string{"testing"}},
 			Templated: false,
 		},
 		RequestMatcher: models.RequestMatcher{
@@ -373,9 +373,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 
 	Expect(hv.Simulation.MatchingPairs[2]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
-			Status:  200,
-			Body:    "hello_world",
-			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
+			Status:    200,
+			Body:      "hello_world",
+			Headers:   map[string][]string{"Hoverfly": []string{"testing"}},
 			Templated: true,
 		},
 		RequestMatcher: models.RequestMatcher{
@@ -412,13 +412,13 @@ func TestImportImportRequestResponsePairs_CanImportARequesResponsePairView(t *te
 
 	RegisterTestingT(t)
 
-	request := v2.RequestMatcherViewV2{
+	request := v2.RequestMatcherViewV3{
 		Method: &v2.RequestFieldMatchersView{
 			ExactMatch: StringToPointer("GET"),
 		},
 	}
 
-	responseView := v2.ResponseDetailsView{
+	responseView := v2.ResponseDetailsViewV3{
 		Status:      200,
 		Body:        "hello_world",
 		EncodedBody: false,
@@ -457,12 +457,12 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 	RegisterTestingT(t)
 
 	encodedPair := v2.RequestMatcherResponsePairViewV3{
-		Response: v2.ResponseDetailsView{
+		Response: v2.ResponseDetailsViewV3{
 			Status:      200,
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
-		RequestMatcher: v2.RequestMatcherViewV2{
+		RequestMatcher: v2.RequestMatcherViewV3{
 			Path: &v2.RequestFieldMatchersView{
 				ExactMatch: StringToPointer("/"),
 			},

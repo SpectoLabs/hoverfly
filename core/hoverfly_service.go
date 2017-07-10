@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"regexp"
 
+	"strings"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
@@ -14,7 +16,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"strings"
 )
 
 func (this Hoverfly) GetDestination() string {
@@ -81,7 +82,7 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 			matchingStrategy = util.StringToPointer("strongest")
 		}
 
-		if strings.ToLower(*matchingStrategy) != "strongest" && strings.ToLower(*matchingStrategy) != "first"  {
+		if strings.ToLower(*matchingStrategy) != "strongest" && strings.ToLower(*matchingStrategy) != "first" {
 			return errors.New("Only matching strategy of 'first' or 'strongest' is permitted")
 		}
 	}
@@ -222,7 +223,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV3, error) {
 	responseDelays := hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()
 
 	return v2.SimulationViewV3{
-		v2.DataViewV2{
+		v2.DataViewV3{
 			RequestResponsePairs: pairViews,
 			GlobalActions: v2.GlobalActionsView{
 				Delays: responseDelays.Data,
@@ -233,7 +234,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV3, error) {
 }
 
 func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV3) error {
-	err := this.ImportRequestResponsePairViews(simulationView.DataViewV2.RequestResponsePairs)
+	err := this.ImportRequestResponsePairViews(simulationView.DataViewV3.RequestResponsePairs)
 	if err != nil {
 		return err
 	}

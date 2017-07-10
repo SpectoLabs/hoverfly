@@ -3,11 +3,11 @@ package matching_test
 import (
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 func Test_ClosestRequestMatcherRequestMatcher_EmptyRequestMatchersShouldMatchOnAnyRequest(t *testing.T) {
@@ -639,8 +639,8 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testin
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("www.test.com"),
 			},
-			Headers: map[string][]string {
-				"foo" : {"bar"},
+			Headers: map[string][]string{
+				"foo": {"bar"},
 			},
 		},
 		Response: testResponse,
@@ -659,11 +659,11 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testin
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query:       "?foo=bar",
-		Scheme: "http",
-		Body: "body",
-		Path: "/foo",
-		Headers: map[string][]string {
-			"miss" : {"me"},
+		Scheme:      "http",
+		Body:        "body",
+		Path:        "/foo",
+		Headers: map[string][]string{
+			"miss": {"me"},
 		},
 	}
 
@@ -698,8 +698,8 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("www.test.com"),
 			},
-			Headers: map[string][]string {
-				"foo" : {"bar"},
+			Headers: map[string][]string{
+				"foo": {"bar"},
 			},
 		},
 		Response: testResponse,
@@ -718,11 +718,11 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 		Method:      "MISS",
 		Destination: "www.test.com",
 		Query:       "?foo=bar",
-		Scheme: "http",
-		Body: "body",
-		Path: "/foo",
-		Headers: map[string][]string {
-			"miss" : {"me"},
+		Scheme:      "http",
+		Body:        "body",
+		Path:        "/foo",
+		Headers: map[string][]string{
+			"miss": {"me"},
 		},
 	}
 
@@ -735,11 +735,11 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 		Method:      "POST",
 		Destination: "miss",
 		Query:       "?foo=bar",
-		Scheme: "http",
-		Body: "body",
-		Path: "/foo",
-		Headers: map[string][]string {
-			"miss" : {"me"},
+		Scheme:      "http",
+		Body:        "body",
+		Path:        "/foo",
+		Headers: map[string][]string{
+			"miss": {"me"},
 		},
 	}
 
@@ -752,11 +752,11 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query:       "miss",
-		Scheme: "http",
-		Body: "body",
-		Path: "/foo",
-		Headers: map[string][]string {
-			"miss" : {"me"},
+		Scheme:      "http",
+		Body:        "body",
+		Path:        "/foo",
+		Headers: map[string][]string{
+			"miss": {"me"},
 		},
 	}
 
@@ -769,11 +769,11 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query:       "?foo=bar",
-		Scheme: "http",
-		Body: "miss",
-		Path: "/foo",
-		Headers: map[string][]string {
-			"miss" : {"me"},
+		Scheme:      "http",
+		Body:        "miss",
+		Path:        "/foo",
+		Headers: map[string][]string{
+			"miss": {"me"},
 		},
 	}
 
@@ -786,11 +786,11 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query:       "?foo=bar",
-		Scheme: "http",
-		Body: "body",
-		Path: "miss",
-		Headers: map[string][]string {
-			"miss" : {"me"},
+		Scheme:      "http",
+		Body:        "body",
+		Path:        "miss",
+		Headers: map[string][]string{
+			"miss": {"me"},
 		},
 	}
 
@@ -1112,7 +1112,6 @@ func Test_ShouldReturnFieldsMissedInClosestMiss(t *testing.T) {
 			Headers: map[string][]string{
 				"hitKey": {"hitValue"},
 			},
-
 		},
 		Response: models.ResponseDetails{
 			Body: "two",
@@ -1120,7 +1119,7 @@ func Test_ShouldReturnFieldsMissedInClosestMiss(t *testing.T) {
 	})
 
 	r := models.RequestDetails{
-		Method: "hit",
+		Method:      "hit",
 		Destination: "hit",
 		Headers: map[string][]string{
 			"hitKey": {"hitValue"},
@@ -1164,7 +1163,6 @@ func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
 			Headers: map[string][]string{
 				"miss": {"miss"},
 			},
-
 		},
 		Response: models.ResponseDetails{
 			Body: "two",
@@ -1172,8 +1170,8 @@ func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
 	})
 
 	r := models.RequestDetails{
-		Body: "hit",
-		Path: "hit",
+		Body:  "hit",
+		Path:  "hit",
 		Query: "hit",
 	}
 
@@ -1201,14 +1199,14 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 				"miss": {"miss"},
 			},
 		},
-		Response: v2.ResponseDetailsView{
+		Response: v2.ResponseDetailsViewV3{
 			Body: "hello world",
 			Headers: map[string][]string{
 				"hello": {"world"},
 			},
 			Status: 200,
 		},
-		RequestMatcher: v2.RequestMatcherViewV2{
+		RequestMatcher: v2.RequestMatcherViewV3{
 			Body: &v2.RequestFieldMatchersView{
 				GlobMatch: StringToPointer("hit"),
 			},
@@ -1298,4 +1296,5 @@ Which if hit would have given the following response:
         ]
     },
     "templated": false
-}`))}
+}`))
+}
