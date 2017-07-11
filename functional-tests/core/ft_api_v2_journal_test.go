@@ -238,6 +238,194 @@ var _ = Describe("/api/v2/journal", func() {
 		})
 	})
 
+	Context("With journal enabled and Hoverfly as a webserver", func() {
+
+		BeforeEach(func() {
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start("-webserver")
+		})
+
+		AfterEach(func() {
+			hoverfly.Stop()
+		})
+
+		Context("GET", func() {
+
+			It("should display an empty journal", func() {
+				req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(200))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var journalView v2.JournalView
+
+				err = json.Unmarshal(responseJson, &journalView)
+				Expect(err).To(BeNil())
+
+				Expect(journalView.Journal).To(HaveLen(0))
+			})
+
+			It("should display one item in the journal", func() {
+				functional_tests.DoRequest(sling.New().Get("http://localhost:" + hoverfly.GetProxyPort()))
+
+				req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(200))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var journalView v2.JournalView
+
+				err = json.Unmarshal(responseJson, &journalView)
+				Expect(err).To(BeNil())
+
+				Expect(journalView.Journal).To(HaveLen(1))
+
+				Expect(*journalView.Journal[0].Request.Scheme).To(Equal("http"))
+				Expect(*journalView.Journal[0].Request.Method).To(Equal("GET"))
+				Expect(*journalView.Journal[0].Request.Destination).To(Equal("localhost:" + hoverfly.GetProxyPort()))
+				Expect(*journalView.Journal[0].Request.Path).To(Equal("/"))
+				Expect(*journalView.Journal[0].Request.Query).To(Equal(""))
+				Expect(journalView.Journal[0].Request.Headers["Accept-Encoding"]).To(ContainElement("gzip"))
+				Expect(journalView.Journal[0].Request.Headers["User-Agent"]).To(ContainElement("Go-http-client/1.1"))
+
+				Expect(journalView.Journal[0].Response.Status).To(Equal(502))
+				Expect(journalView.Journal[0].Response.Body).To(Equal("Hoverfly Error!\n\nThere was an error when matching\n\nGot error: Could not find a match for request, create or record a valid matcher first!"))
+				Expect(journalView.Journal[0].Response.Headers["Content-Type"]).To(ContainElement("text/plain"))
+
+				Expect(journalView.Journal[0].Latency).To(BeNumerically("<", time.Millisecond))
+				Expect(journalView.Journal[0].Mode).To(Equal("simulate"))
+			})
+
+			It("should display multiple items in the journal", func() {
+				functional_tests.DoRequest(sling.New().Get("http://localhost:" + hoverfly.GetProxyPort() + "/first"))
+				functional_tests.DoRequest(sling.New().Get("http://localhost:" + hoverfly.GetProxyPort() + "/second"))
+				functional_tests.DoRequest(sling.New().Get("http://localhost:" + hoverfly.GetProxyPort() + "/third"))
+
+				req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(200))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var journalView v2.JournalView
+
+				err = json.Unmarshal(responseJson, &journalView)
+				Expect(err).To(BeNil())
+
+				Expect(journalView.Journal).To(HaveLen(3))
+
+				Expect(*journalView.Journal[0].Request.Path).To(ContainSubstring("/first"))
+
+				Expect(*journalView.Journal[1].Request.Path).To(ContainSubstring("/second"))
+
+				Expect(*journalView.Journal[2].Request.Path).To(ContainSubstring("/third"))
+			})
+		})
+
+		Context("POST", func() {
+
+			BeforeEach(func() {
+				functional_tests.DoRequest(sling.New().Get("http://localhost:" + hoverfly.GetProxyPort() + "/first"))
+				functional_tests.DoRequest(sling.New().Get("http://localhost:" + hoverfly.GetProxyPort() + "/second"))
+			})
+
+			It("should filter", func() {
+				req := sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				req.Body(bytes.NewBufferString(`{
+					"request": {
+						"path": {
+							"exactMatch": "/first"
+						}
+					}
+				}`))
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(http.StatusOK))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var journalView v2.JournalView
+
+				err = json.Unmarshal(responseJson, &journalView)
+				Expect(err).To(BeNil())
+
+				Expect(journalView.Journal).To(HaveLen(1))
+				Expect(*journalView.Journal[0].Request.Path).To(Equal("/first"))
+			})
+
+			It("should error when body is malformed JSON", func() {
+				req := sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				req.Body(bytes.NewBufferString(`not json`))
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(http.StatusBadRequest))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var errorView handlers.ErrorView
+
+				err = json.Unmarshal(responseJson, &errorView)
+				Expect(err).To(BeNil())
+
+				Expect(errorView.Error).To(Equal("Malformed JSON"))
+			})
+
+			It("should error when body has no request", func() {
+				req := sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				req.Body(bytes.NewBufferString(`{"norequest": true}`))
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(http.StatusBadRequest))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var errorView handlers.ErrorView
+
+				err = json.Unmarshal(responseJson, &errorView)
+				Expect(err).To(BeNil())
+
+				Expect(errorView.Error).To(Equal("No \"request\" object in search parameters"))
+			})
+		})
+
+		Context("DELETE", func() {
+			It("should delete journal entries", func() {
+				hoverfly.Proxy(sling.New().Get("http://localhost:" + hoverfly.GetAdminPort()))
+				hoverfly.Proxy(sling.New().Get("http://localhost:" + hoverfly.GetAdminPort()))
+
+				req := sling.New().Delete("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				functional_tests.DoRequest(req)
+
+				req = sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
+				res := functional_tests.DoRequest(req)
+
+				Expect(res.StatusCode).To(Equal(200))
+
+				responseJson, err := ioutil.ReadAll(res.Body)
+				Expect(err).To(BeNil())
+
+				var journalView v2.JournalView
+
+				err = json.Unmarshal(responseJson, &journalView)
+				Expect(err).To(BeNil())
+
+				Expect(journalView.Journal).To(HaveLen(0))
+			})
+		})
+
+	})
+
 	Context("With journal disabled", func() {
 
 		BeforeEach(func() {
