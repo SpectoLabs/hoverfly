@@ -111,7 +111,7 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDe
 			ExactMatch: util.StringToPointer("path"),
 		},
 		Query: &models.RequestFieldMatchers{
-			ExactMatch: util.StringToPointer("query"),
+			ExactMatch: util.StringToPointer("query=two"),
 		},
 		Scheme: &models.RequestFieldMatchers{
 			ExactMatch: util.StringToPointer("scheme"),
@@ -124,7 +124,7 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDe
 		Destination: "destination",
 		Method:      "method",
 		Path:        "path",
-		Query:       "query",
+		Query:       map[string][]string{"query": []string{"two"}},
 		Scheme:      "scheme",
 	}))
 }
@@ -149,7 +149,7 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_IncludesHeaders(t *
 			ExactMatch: util.StringToPointer("path"),
 		},
 		Query: &models.RequestFieldMatchers{
-			ExactMatch: util.StringToPointer("query"),
+			ExactMatch: util.StringToPointer("query=one"),
 		},
 		Scheme: &models.RequestFieldMatchers{
 			ExactMatch: util.StringToPointer("scheme"),
@@ -165,7 +165,7 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_IncludesHeaders(t *
 		},
 		Method: "method",
 		Path:   "path",
-		Query:  "query",
+		Query:  map[string][]string{"query": []string{"one"}},
 		Scheme: "scheme",
 	}))
 }

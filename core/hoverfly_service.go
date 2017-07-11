@@ -146,7 +146,7 @@ func (hf *Hoverfly) SetMiddleware(binary, script, remote string) error {
 			Method:      "GET",
 			Destination: "www.test.com",
 			Scheme:      "",
-			Query:       "",
+			Query:       map[string][]string{},
 			Body:        "",
 			Headers:     map[string][]string{"test_header": []string{"true"}},
 		},

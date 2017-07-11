@@ -501,7 +501,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 			Method:      "GET",
 			Destination: "/",
 			Scheme:      "scheme",
-			Query:       "",
+			Query:       map[string][]string{},
 			Body:        "",
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}}}}))
 }

@@ -10,6 +10,8 @@ import (
 	"net/url"
 	"sync"
 
+	"strings"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
@@ -19,9 +21,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
-	"github.com/SpectoLabs/hoverfly/core/util"
-	"strings"
 	"github.com/SpectoLabs/hoverfly/core/templating"
+	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 // orPanic - wrapper for logging errors
@@ -249,8 +250,8 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 
 }
 
-// GetResponse returns stored response from cache TODO: // We should only need one of these two parameters
-func (hf *Hoverfly) GetResponse(request *http.Request, requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
+// GetResponse returns stored response from cache
+func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
 
 	cachedResponse, cacheErr := hf.CacheMatcher.GetCachedResponse(&requestDetails)
 	if cacheErr == nil && cachedResponse.MatchingPair == nil {
@@ -260,7 +261,7 @@ func (hf *Hoverfly) GetResponse(request *http.Request, requestDetails models.Req
 	}
 
 	var pair *models.RequestMatcherResponsePair
-	var err * models.MatchError
+	var err *models.MatchError
 
 	mode := (hf.modeMap[modes.Simulate]).(*modes.SimulateMode)
 
@@ -275,7 +276,7 @@ func (hf *Hoverfly) GetResponse(request *http.Request, requestDetails models.Req
 
 	// Templating
 	if err == nil && pair.Response.Templated == true {
-		responseBody, err := templating.ApplyTemplate(request, pair.Response.Body)
+		responseBody, err := templating.ApplyTemplate(&requestDetails, pair.Response.Body)
 		if err == nil {
 			pair.Response.Body = responseBody
 		}
@@ -346,7 +347,7 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 				ExactMatch: util.StringToPointer(request.Scheme),
 			},
 			Query: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer(request.Query),
+				ExactMatch: util.StringToPointer(request.QueryString()),
 			},
 			Body:    body,
 			Headers: headers,

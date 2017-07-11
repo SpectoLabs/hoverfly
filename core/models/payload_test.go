@@ -121,7 +121,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 			Method:      "GET",
 			Destination: "/",
 			Scheme:      "scheme",
-			Query:       "",
+			Query:       map[string][]string{},
 			Body:        "",
 			Headers:     map[string][]string{"test_header": []string{"true"}}},
 	}
@@ -158,7 +158,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 			Method:      "GET",
 			Destination: "/",
 			Scheme:      "scheme",
-			Query:       "",
+			Query:       map[string][]string{},
 			Body:        "",
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 		},
@@ -192,8 +192,9 @@ func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
 		Method:      "GET",
 		Destination: "/",
 		Scheme:      "scheme",
-		Query:       "", Body: "",
-		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}}
+		Query:       map[string][]string{},
+		Body:        "",
+		Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}}
 
 	requestDetailsView := requestDetails.ConvertToRequestDetailsView()
 
@@ -201,7 +202,7 @@ func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
 	Expect(requestDetailsView.Method).To(Equal(StringToPointer(requestDetails.Method)))
 	Expect(requestDetailsView.Destination).To(Equal(StringToPointer(requestDetails.Destination)))
 	Expect(requestDetailsView.Scheme).To(Equal(StringToPointer(requestDetails.Scheme)))
-	Expect(requestDetailsView.Query).To(Equal(StringToPointer(requestDetails.Query)))
+	Expect(requestDetailsView.Query).To(Equal(StringToPointer("")))
 	Expect(requestDetailsView.Headers).To(Equal(requestDetails.Headers))
 }
 
@@ -219,7 +220,9 @@ func Test_NewRequestDetailsFromHttpRequest_SortsQueryString(t *testing.T) {
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
 	Expect(err).To(BeNil())
 
-	Expect(requestDetails.Query).To(Equal("a=a&a=b"))
+	Expect(requestDetails.Query["a"]).To(ContainElement("a"))
+	Expect(requestDetails.Query["a"]).To(ContainElement("b"))
+	Expect(requestDetails.QueryString()).To(Equal("a=a&a=b"))
 }
 
 func Test_NewRequestDetailsFromHttpRequest_LowerCaseDestination(t *testing.T) {
@@ -267,8 +270,10 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *
 			Method:      "A",
 			Destination: "A",
 			Scheme:      "A",
-			Query:       "A",
-			Body:        "A",
+			Query: map[string][]string{
+				"A": []string{""},
+			},
+			Body: "A",
 			Headers: map[string][]string{
 				"A": []string{"B"},
 				"C": []string{"D"},
@@ -289,6 +294,9 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithEncoding(t *tes
 	RegisterTestingT(t)
 
 	view := v2.RequestResponsePairViewV1{
+		Request: v2.RequestDetailsView{
+			Query: StringToPointer("somehthing=something"),
+		},
 		Response: v2.ResponseDetailsView{
 			Body:        "ZW5jb2RlZA==",
 			EncodedBody: true,
@@ -318,7 +326,7 @@ func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 	Expect(requestDetails.Method).To(Equal(*requestDetailsView.Method))
 	Expect(requestDetails.Destination).To(Equal(*requestDetailsView.Destination))
 	Expect(requestDetails.Scheme).To(Equal(*requestDetailsView.Scheme))
-	Expect(requestDetails.Query).To(Equal(*requestDetailsView.Query))
+	Expect(requestDetails.Query).To(Equal(map[string][]string{}))
 	Expect(requestDetails.Headers).To(Equal(requestDetailsView.Headers))
 }
 
@@ -330,7 +338,9 @@ func Test_RequestDetails_Hash_ItHashes(t *testing.T) {
 		Scheme:      "http",
 		Destination: "test.com",
 		Path:        "/testing",
-		Query:       "query=true",
+		Query: map[string][]string{
+			"query": []string{"true"},
+		},
 	}
 
 	hashedUnit := unit.Hash()
@@ -346,8 +356,10 @@ func Test_RequestDetails_Hash_TheHashIgnoresHeaders(t *testing.T) {
 		Scheme:      "http",
 		Destination: "test.com",
 		Path:        "/testing",
-		Query:       "query=true",
-		Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
+		Query: map[string][]string{
+			"query": []string{"true"},
+		},
+		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}},
 	}
 
 	hashedUnit := unit.Hash()
@@ -363,8 +375,10 @@ func Test_RequestDetails_Hash_TheHashIncludesTheBody(t *testing.T) {
 		Scheme:      "http",
 		Destination: "test.com",
 		Path:        "/testing",
-		Query:       "query=true",
-		Body:        "tidy text",
+		Query: map[string][]string{
+			"query": []string{"true"},
+		},
+		Body: "tidy text",
 	}
 
 	hashedUnit := unit.Hash()
