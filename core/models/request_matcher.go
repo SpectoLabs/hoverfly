@@ -1,6 +1,8 @@
 package models
 
 import (
+	"net/url"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
@@ -134,13 +136,15 @@ func (this RequestMatcher) BuildRequestDetailsFromExactMatches() *RequestDetails
 		return nil
 	}
 
+	query, _ := url.ParseQuery(*this.Query.ExactMatch)
+
 	return &RequestDetails{
 		Body:        *this.Body.ExactMatch,
 		Destination: *this.Destination.ExactMatch,
 		Headers:     this.Headers,
 		Method:      *this.Method.ExactMatch,
 		Path:        *this.Path.ExactMatch,
-		Query:       *this.Query.ExactMatch,
+		Query:       query,
 		Scheme:      *this.Scheme.ExactMatch,
 	}
 }

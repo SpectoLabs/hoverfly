@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -38,13 +39,26 @@ func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.Reque
 	}
 }
 
+func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
+	query, _ := url.ParseQuery(*data.GetQuery())
+	return RequestDetails{
+		Path:        util.PointerToString(data.GetPath()),
+		Method:      util.PointerToString(data.GetMethod()),
+		Destination: util.PointerToString(data.GetDestination()),
+		Scheme:      util.PointerToString(data.GetScheme()),
+		Query:       query,
+		Body:        util.PointerToString(data.GetBody()),
+		Headers:     data.GetHeaders(),
+	}
+}
+
 // RequestDetails stores information about request, it's used for creating unique hash and also as a payload structure
 type RequestDetails struct {
 	Path        string
 	Method      string
 	Destination string
 	Scheme      string
-	Query       string
+	Query       map[string][]string
 	Body        string
 	Headers     map[string][]string
 }
@@ -69,35 +83,32 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 		Method:      req.Method,
 		Destination: strings.ToLower(req.Host),
 		Scheme:      req.URL.Scheme,
-		Query:       util.SortQueryString(req.URL.RawQuery),
+		Query:       req.URL.Query(),
 		Body:        string(reqBody),
 		Headers:     req.Header,
 	}
 	return requestDetails, nil
 }
 
-func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
-	return RequestDetails{
-		Path:        util.PointerToString(data.GetPath()),
-		Method:      util.PointerToString(data.GetMethod()),
-		Destination: util.PointerToString(data.GetDestination()),
-		Scheme:      util.PointerToString(data.GetScheme()),
-		Query:       util.PointerToString(data.GetQuery()),
-		Body:        util.PointerToString(data.GetBody()),
-		Headers:     data.GetHeaders(),
-	}
-}
-
 func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsView {
+	queryString := this.QueryString()
+
 	return v2.RequestDetailsView{
 		Path:        &this.Path,
 		Method:      &this.Method,
 		Destination: &this.Destination,
 		Scheme:      &this.Scheme,
-		Query:       &this.Query,
+		Query:       &queryString,
 		Body:        &this.Body,
 		Headers:     this.Headers,
 	}
+}
+
+func (this *RequestDetails) QueryString() string {
+	var values url.Values
+	values = this.Query
+
+	return util.SortQueryString(values.Encode())
 }
 
 func (r *RequestDetails) concatenate(withHost bool) string {
@@ -109,7 +120,7 @@ func (r *RequestDetails) concatenate(withHost bool) string {
 
 	buffer.WriteString(r.Path)
 	buffer.WriteString(r.Method)
-	buffer.WriteString(r.Query)
+	buffer.WriteString(r.QueryString())
 	if len(r.Body) > 0 {
 		buffer.WriteString(r.Body)
 	}

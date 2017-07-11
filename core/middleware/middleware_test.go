@@ -170,7 +170,7 @@ func TestChangeBodyMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
-	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
+	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x"}
 
 	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
@@ -192,7 +192,7 @@ func TestMalformedRequestResponsePairWithMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
 	resp := models.ResponseDetails{Status: 201, Body: "original body"}
-	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
+	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x"}
 
 	malformedPair := models.RequestResponsePair{Response: resp, Request: req}
 
@@ -213,7 +213,7 @@ func TestMalformedRequestResponsePairWithMiddleware(t *testing.T) {
 func TestReflectBody(t *testing.T) {
 	RegisterTestingT(t)
 
-	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: "", Body: "request_body_here"}
+	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Body: "request_body_here"}
 
 	originalPair := models.RequestResponsePair{Request: req}
 
@@ -500,7 +500,7 @@ func Test_Middleware_Execute_RunsMiddlewareCorrectly(t *testing.T) {
 	Expect(unit.Binary).To(Equal(binary))
 
 	resp := models.ResponseDetails{Status: 0, Body: "original body"}
-	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
+	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x"}
 
 	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
@@ -600,8 +600,7 @@ func Test_Middleware_Execute_RunsRemoteMiddlewareCorrectly(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	resp := models.ResponseDetails{Status: 0, Body: "original body"}
-	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x", Query: ""}
-
+	req := models.RequestDetails{Path: "/", Method: "GET", Destination: "hostname-x"}
 	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
 	resultPair, err := unit.Execute(originalPair)

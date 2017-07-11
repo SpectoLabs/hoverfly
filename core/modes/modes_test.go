@@ -15,10 +15,12 @@ func TestReconstructRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	request := models.RequestDetails{
-		Scheme:      "http",
-		Path:        "/random-path",
-		Method:      "GET",
-		Query:       "?foo=bar",
+		Scheme: "http",
+		Path:   "/random-path",
+		Method: "GET",
+		Query: map[string][]string{
+			"foo": []string{"bar"},
+		},
 		Destination: "test-destination.com",
 	}
 	pair := models.RequestResponsePair{Request: request}
@@ -29,7 +31,7 @@ func TestReconstructRequest(t *testing.T) {
 	Expect(newRequest.Method).To(Equal("GET"))
 	Expect(newRequest.URL.Path).To(Equal("/random-path"))
 	Expect(newRequest.Host).To(Equal("test-destination.com"))
-	Expect(newRequest.URL.RawQuery).To(Equal("?foo=bar"))
+	Expect(newRequest.URL.RawQuery).To(Equal("foo=bar"))
 }
 
 func Test_ReconstructRequest_BodyRequestResponsePair(t *testing.T) {
@@ -39,7 +41,6 @@ func Test_ReconstructRequest_BodyRequestResponsePair(t *testing.T) {
 		Scheme:      "http",
 		Path:        "/another-path",
 		Method:      "POST",
-		Query:       "",
 		Destination: "test-destination.com",
 		Body:        "new request body here",
 	}
@@ -66,7 +67,6 @@ func Test_ReconstructRequest_HeadersInPair(t *testing.T) {
 		Scheme:      "http",
 		Path:        "/another-path",
 		Method:      "POST",
-		Query:       "",
 		Destination: "test-destination.com",
 		Body:        "new request body here",
 		Headers: map[string][]string{

@@ -3,18 +3,18 @@ package modes
 import (
 	"net/http"
 
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 type HoverflySimulate interface {
-	GetResponse(*http.Request, models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
+	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
 }
 
 type SimulateMode struct {
-	Hoverfly HoverflySimulate
+	Hoverfly         HoverflySimulate
 	MatchingStrategy string
 }
 
@@ -41,7 +41,7 @@ func (this SimulateMode) Process(request *http.Request, details models.RequestDe
 		Request: details,
 	}
 
-	response, matchingErr := this.Hoverfly.GetResponse(request, details)
+	response, matchingErr := this.Hoverfly.GetResponse(details)
 
 	if matchingErr != nil {
 		return ReturnErrorAndLog(request, matchingErr, &pair, "There was an error when matching", Simulate)
