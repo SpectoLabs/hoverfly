@@ -152,7 +152,7 @@ The following request was made, but was not matched by Hoverfly:
     "Method": "GET",
     "Destination": "destination.com",
     "Scheme": "http",
-    "Query": "",
+    "Query": {},
     "Body": "",
     "Headers": {
         "Accept-Encoding": [
@@ -211,7 +211,7 @@ The following request was made, but was not matched by Hoverfly:
     "Method": "GET",
     "Destination": "destination.com",
     "Scheme": "http",
-    "Query": "",
+    "Query": {},
     "Body": "",
     "Headers": {
         "Accept-Encoding": [

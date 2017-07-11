@@ -63,7 +63,7 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 
 	newRequest.Method = pair.Request.Method
 	newRequest.URL.Path = pair.Request.Path
-	newRequest.URL.RawQuery = pair.Request.Query
+	newRequest.URL.RawQuery = pair.Request.QueryString()
 	newRequest.Header = pair.Request.Headers
 
 	return newRequest, nil

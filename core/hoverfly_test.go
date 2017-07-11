@@ -254,7 +254,7 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromCache(t *testing.T) {
 		},
 	}, nil)
 
-	response, err := unit.GetResponse(nil, models.RequestDetails{
+	response, err := unit.GetResponse(models.RequestDetails{
 		Destination: "somehost.com",
 		Method:      "POST",
 		Scheme:      "http",
@@ -290,7 +290,7 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *tes
 		},
 	})
 
-	response, err := unit.GetResponse(nil, models.RequestDetails{
+	response, err := unit.GetResponse(models.RequestDetails{
 		Destination: "somehost.com",
 		Method:      "POST",
 		Scheme:      "http",
@@ -326,7 +326,7 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 		},
 	})
 
-	unit.GetResponse(nil, models.RequestDetails{
+	unit.GetResponse(models.RequestDetails{
 		Destination: "somehost.com",
 		Method:      "POST",
 		Scheme:      "http",
@@ -343,7 +343,7 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 	Expect(cachedRequestResponsePair.MatchingPair.Response.Body).To(Equal("response body"))
 
 	unit.Simulation = models.NewSimulation()
-	response, err := unit.GetResponse(nil, models.RequestDetails{
+	response, err := unit.GetResponse(models.RequestDetails{
 		Destination: "somehost.com",
 		Method:      "POST",
 		Scheme:      "http",
@@ -374,7 +374,7 @@ func Test_Hoverfly_GetResponse_WillReturnCachedResponseIfHeaderMatchIsFalse(t *t
 		},
 	}, nil)
 
-	response, err := unit.GetResponse(nil, requestDetails)
+	response, err := unit.GetResponse(requestDetails)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("cached response"))
@@ -414,7 +414,7 @@ func Test_Hoverfly_GetResponse_WillCheckRequestMatchersAndReturnRequestMatcherRe
 		},
 	})
 
-	response, err := unit.GetResponse(nil, requestDetails)
+	response, err := unit.GetResponse(requestDetails)
 	Expect(err).To(BeNil())
 
 	Expect(response.Body).To(Equal("response body"))
@@ -431,7 +431,7 @@ func Test_Hoverfly_GetResponse_WillCacheMisses(t *testing.T) {
 		Scheme:      "http",
 	}
 
-	_, err := unit.GetResponse(nil, requestDetails)
+	_, err := unit.GetResponse(requestDetails)
 	Expect(err.Error()).To(Equal("Could not find a match for request, create or record a valid matcher first!"))
 
 	cachedResponse, err := unit.CacheMatcher.GetCachedResponse(&requestDetails)
@@ -471,7 +471,7 @@ func Test_Hoverfly_GetResponse_WillCacheClosestMiss(t *testing.T) {
 		Scheme:      "http",
 	}
 
-	_, err := unit.GetResponse(nil, requestDetails)
+	_, err := unit.GetResponse(requestDetails)
 	Expect(err.Error()).ToNot(BeNil())
 
 	cachedResponse, err := unit.CacheMatcher.GetCachedResponse(&requestDetails)
@@ -723,8 +723,10 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 		Headers:     map[string][]string{"testheader": []string{"testvalue"}},
 		Method:      "testmethod",
 		Path:        "/testpath",
-		Query:       "?query=test",
-		Scheme:      "http",
+		Query: map[string][]string{
+			"query": []string{"test"},
+		},
+		Scheme: "http",
 	}, &models.ResponseDetails{
 		Body:    "testresponsebody",
 		Headers: map[string][]string{"testheader": []string{"testvalue"}},
@@ -737,7 +739,7 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("testdestination"))
 	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Method.ExactMatch).To(Equal("testmethod"))
 	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Path.ExactMatch).To(Equal("/testpath"))
-	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Query.ExactMatch).To(Equal("?query=test"))
+	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Query.ExactMatch).To(Equal("query=test"))
 	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Scheme.ExactMatch).To(Equal("http"))
 
 	Expect(unit.Simulation.MatchingPairs[0].Response.Body).To(Equal("testresponsebody"))

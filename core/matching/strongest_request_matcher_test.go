@@ -247,7 +247,9 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMatchWithHeaders(t *testin
 		Method:      "GET",
 		Destination: "testhost.com",
 		Path:        "/a/1",
-		Query:       "q=test",
+		Query: map[string][]string{
+			"q": []string{"test"},
+		},
 		Headers: map[string][]string{
 			"header1": {"val1-a", "val1-b"},
 			"header2": {"val2"},
@@ -296,7 +298,9 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMismatchWithHeadersReturns
 		Method:      "GET",
 		Destination: "http://testhost.com",
 		Path:        "/a/1",
-		Query:       "q=different",
+		Query: map[string][]string{
+			"q": []string{"different"},
+		},
 		Headers: map[string][]string{
 			"header1": {"val1-a", "val1-b"},
 			"header2": {"val2"},
@@ -338,7 +342,9 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 	r := models.RequestDetails{
 		Method:      "GET",
 		Destination: "testhost.com",
-		Query:       "q=test",
+		Query: map[string][]string{
+			"q": []string{"test"},
+		},
 	}
 	result, _ := matching.StrongestMatchRequestMatcher(r, false, simulation)
 
@@ -348,7 +354,9 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 		Method:      "GET",
 		Destination: "testhost.com",
 		Path:        "/a/1",
-		Query:       "q=test",
+		Query: map[string][]string{
+			"q": []string{"test"},
+		},
 	}
 
 	result, _ = matching.StrongestMatchRequestMatcher(r, false, simulation)
@@ -631,7 +639,7 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testin
 				ExactMatch: StringToPointer("http"),
 			},
 			Query: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer("?foo=bar"),
+				ExactMatch: StringToPointer("foo=bar"),
 			},
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("/foo"),
@@ -658,10 +666,12 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testin
 	r := models.RequestDetails{
 		Method:      "POST",
 		Destination: "www.test.com",
-		Query:       "?foo=bar",
-		Scheme:      "http",
-		Body:        "body",
-		Path:        "/foo",
+		Query: map[string][]string{
+			"foo": []string{"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
 		Headers: map[string][]string{
 			"miss": {"me"},
 		},
@@ -717,10 +727,12 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 	r := models.RequestDetails{
 		Method:      "MISS",
 		Destination: "www.test.com",
-		Query:       "?foo=bar",
-		Scheme:      "http",
-		Body:        "body",
-		Path:        "/foo",
+		Query: map[string][]string{
+			"foo": []string{"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
 		Headers: map[string][]string{
 			"miss": {"me"},
 		},
@@ -734,10 +746,12 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 	r = models.RequestDetails{
 		Method:      "POST",
 		Destination: "miss",
-		Query:       "?foo=bar",
-		Scheme:      "http",
-		Body:        "body",
-		Path:        "/foo",
+		Query: map[string][]string{
+			"foo": []string{"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
 		Headers: map[string][]string{
 			"miss": {"me"},
 		},
@@ -751,10 +765,12 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 	r = models.RequestDetails{
 		Method:      "POST",
 		Destination: "www.test.com",
-		Query:       "miss",
-		Scheme:      "http",
-		Body:        "body",
-		Path:        "/foo",
+		Query: map[string][]string{
+			"miss": []string{""},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
 		Headers: map[string][]string{
 			"miss": {"me"},
 		},
@@ -768,10 +784,12 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 	r = models.RequestDetails{
 		Method:      "POST",
 		Destination: "www.test.com",
-		Query:       "?foo=bar",
-		Scheme:      "http",
-		Body:        "miss",
-		Path:        "/foo",
+		Query: map[string][]string{
+			"foo": []string{"bar"},
+		},
+		Scheme: "http",
+		Body:   "miss",
+		Path:   "/foo",
 		Headers: map[string][]string{
 			"miss": {"me"},
 		},
@@ -785,10 +803,12 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 	r = models.RequestDetails{
 		Method:      "POST",
 		Destination: "www.test.com",
-		Query:       "?foo=bar",
-		Scheme:      "http",
-		Body:        "body",
-		Path:        "miss",
+		Query: map[string][]string{
+			"foo": []string{"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "miss",
 		Headers: map[string][]string{
 			"miss": {"me"},
 		},
@@ -1155,7 +1175,7 @@ func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
 				ExactMatch: StringToPointer("miss"),
 			},
 			Query: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer("hit"),
+				ExactMatch: StringToPointer("hit="),
 			},
 			Scheme: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("hit"),
@@ -1170,9 +1190,11 @@ func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
 	})
 
 	r := models.RequestDetails{
-		Body:  "hit",
-		Path:  "hit",
-		Query: "hit",
+		Body: "hit",
+		Path: "hit",
+		Query: map[string][]string{
+			"hit": []string{""},
+		},
 	}
 
 	result, err := matching.StrongestMatchRequestMatcher(r, false, simulation)
@@ -1193,8 +1215,10 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 			Method:      "method",
 			Destination: "destination",
 			Scheme:      "scheme",
-			Query:       "query",
-			Body:        "body",
+			Query: map[string][]string{
+				"query": []string{""},
+			},
+			Body: "body",
 			Headers: map[string][]string{
 				"miss": {"miss"},
 			},
@@ -1243,7 +1267,11 @@ The following request was made, but was not matched by Hoverfly:
     "Method": "method",
     "Destination": "destination",
     "Scheme": "scheme",
-    "Query": "query",
+    "Query": {
+        "query": [
+            ""
+        ]
+    },
     "Body": "body",
     "Headers": {
         "miss": [

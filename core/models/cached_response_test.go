@@ -20,7 +20,9 @@ func Test_CachedResponse_EncodeAndDecodeIntoAndOutOfBytes(t *testing.T) {
 			},
 			Method: "GET",
 			Path:   "/test",
-			Query:  "?test=query",
+			Query: map[string][]string{
+				"test": []string{"query"},
+			},
 			Scheme: "http",
 		},
 		MatchingPair: &models.RequestMatcherResponsePair{
@@ -52,7 +54,9 @@ func Test_CachedResponse_EncodeAndDecode_NilMatchingPair(t *testing.T) {
 			},
 			Method: "GET",
 			Path:   "/test",
-			Query:  "?test=query",
+			Query: map[string][]string{
+				"test": []string{"query"},
+			},
 			Scheme: "http",
 		},
 		MatchingPair: nil,

@@ -1,9 +1,10 @@
 package templating
 
 import (
-	"github.com/aymerick/raymond"
-	"net/http"
 	"strings"
+
+	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/aymerick/raymond"
 )
 
 type TemplatingData struct {
@@ -12,13 +13,13 @@ type TemplatingData struct {
 
 type Request struct {
 	QueryParam map[string][]string
-	Path  []string
+	Path       []string
 	Scheme     string
 }
 
-func ApplyTemplate(request *http.Request, responseBody string) (string, error) {
+func ApplyTemplate(requestDetails *models.RequestDetails, responseBody string) (string, error) {
 
-	t := NewTemplatingDataFromRequest(request)
+	t := NewTemplatingDataFromRequest(requestDetails)
 
 	if rendered, err := raymond.Render(responseBody, t); err == nil {
 		responseBody = rendered
@@ -28,17 +29,12 @@ func ApplyTemplate(request *http.Request, responseBody string) (string, error) {
 	}
 }
 
-func NewTemplatingDataFromRequest(request *http.Request) * TemplatingData {
-
-	requestPath := request.URL.Path
-
-	Path := strings.Split(requestPath, "/")[1:]
-
+func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails) *TemplatingData {
 	return &TemplatingData{
 		Request: Request{
-			Path: Path,
-			QueryParam: request.URL.Query(),
-			Scheme: request.URL.Scheme,
+			Path:       strings.Split(requestDetails.Path, "/")[1:],
+			QueryParam: requestDetails.Query,
+			Scheme:     requestDetails.Scheme,
 		},
 	}
 

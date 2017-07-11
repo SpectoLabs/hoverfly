@@ -2,15 +2,20 @@ package templating_test
 
 import (
 	"testing"
-	. "github.com/onsi/gomega"
-	"net/http"
+
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/templating"
+	. "github.com/onsi/gomega"
 )
 
 func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := NewTemplatingDataFomRequest("http://www.test.com/foo/bar?cheese=1&ham=2&cheese=3")
+	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+		Path:        "/foo/bar",
+	})
 
 	Expect(actual.Request.Path).To(ConsistOf("foo", "bar"))
 }
@@ -18,7 +23,10 @@ func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 func Test_ShouldCreateTemplatingDataPathsFromRequestWithNoPaths(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := NewTemplatingDataFomRequest("http://www.test.com?cheese=1&ham=2&cheese=3")
+	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+	})
 
 	Expect(actual.Request.Path).To(BeEmpty())
 }
@@ -26,7 +34,14 @@ func Test_ShouldCreateTemplatingDataPathsFromRequestWithNoPaths(t *testing.T) {
 func Test_ShouldCreateTemplatingDataQueryParamsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := NewTemplatingDataFomRequest("http://www.test.com/foo/bar?cheese=1&ham=2&cheese=3")
+	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+		Query: map[string][]string{
+			"cheese": {"1", "3"},
+			"ham":    {"2"},
+		},
+	})
 
 	Expect(actual.Request.QueryParam).To(HaveKeyWithValue("cheese", []string{"1", "3"}))
 	Expect(actual.Request.QueryParam).To(HaveKeyWithValue("ham", []string{"2"}))
@@ -36,7 +51,10 @@ func Test_ShouldCreateTemplatingDataQueryParamsFromRequest(t *testing.T) {
 func Test_ShouldCreateTemplatingDataQueryParamsFromRequestWithNoQueryParams(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := NewTemplatingDataFomRequest("http://www.test.com/foo/bar")
+	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+	})
 
 	Expect(actual.Request.QueryParam).To(BeEmpty())
 }
@@ -44,30 +62,29 @@ func Test_ShouldCreateTemplatingDataQueryParamsFromRequestWithNoQueryParams(t *t
 func Test_ShouldCreateTemplatingDataHttpScheme(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := NewTemplatingDataFomRequest("http://www.test.com/foo/bar")
-
-	Expect(actual.Request.QueryParam).To(BeEmpty())
-}
-
-func Test_ShouldCreateTemplatingDataQueryScheme(t *testing.T) {
-	RegisterTestingT(t)
-
-	actual := NewTemplatingDataFomRequest("http://www.test.com/foo/bar")
+	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+	})
 
 	Expect(actual.Request.Scheme).To(Equal("http"))
-
-	actual = NewTemplatingDataFomRequest("https://www.test.com/foo/bar")
-
-	Expect(actual.Request.Scheme).To(Equal("https"))
 }
 
 func TestApplyTemplateWithQueryParams(t *testing.T) {
 	RegisterTestingT(t)
 
-	request, err := http.NewRequest("GET", "http://www.foo.com/foo/bar?singular=1&multiple=2&multiple=3", nil)
-	Expect(err).To(BeNil())
+	requestDetails := &models.RequestDetails{
+		Method:      "GET",
+		Scheme:      "http",
+		Destination: "foo.com",
+		Path:        "/foo/bar",
+		Query: map[string][]string{
+			"singular": {"1"},
+			"multiple": {"2", "3"},
+		},
+	}
 
-	template, err := templating.ApplyTemplate(request, `
+	template, err := templating.ApplyTemplate(requestDetails, `
 Scheme: {{ Request.Scheme }}
 
 Query param value: {{ Request.QueryParam.singular }}
@@ -103,10 +120,13 @@ Looping through path params: foo-bar-`))
 func TestTemplatingWithParametersWhichDoNotExistDoNotErrorAndAreEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
-	request, err := http.NewRequest("GET", "http://www.foo.com", nil)
-	Expect(err).To(BeNil())
+	requestDetails := &models.RequestDetails{
+		Method:      "GET",
+		Scheme:      "http",
+		Destination: "foo.com",
+	}
 
-	template, err := templating.ApplyTemplate(request, `
+	template, err := templating.ApplyTemplate(requestDetails, `
 Scheme:{{ Request.Scheme }}
 
 Query param value:{{ Request.QueryParam.singular }}
@@ -137,12 +157,4 @@ Looping through query params:
 Path param value:
 All path param values:
 Looping through path params:`))
-}
-
-func NewTemplatingDataFomRequest(url string) *templating.TemplatingData {
-	r, err := http.NewRequest("GET", url, nil)
-
-	Expect(err).To(BeNil())
-
-	return templating.NewTemplatingDataFromRequest(r)
 }

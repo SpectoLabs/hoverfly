@@ -2,10 +2,9 @@ package matching
 
 import (
 	"github.com/SpectoLabs/hoverfly/core/models"
-
 )
 
-func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (*models.RequestMatcherResponsePair, * models.MatchError) {
+func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (*models.RequestMatcherResponsePair, *models.MatchError) {
 
 	matchedOnAllButHeadersAtLeastOnce := false
 
@@ -33,7 +32,7 @@ func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulat
 			continue
 		}
 
-		if !UnscoredFieldMatcher(requestMatcher.Query, req.Query).Matched {
+		if !UnscoredFieldMatcher(requestMatcher.Query, req.QueryString()).Matched {
 			matchedOnAllButHeaders = false
 			continue
 		}
