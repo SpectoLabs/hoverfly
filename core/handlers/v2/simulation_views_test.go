@@ -476,3 +476,109 @@ func Test_SimulationViewV1_Upgrade_CanReturnAnIncompleteRequest(t *testing.T) {
 	Expect(simulationViewV2.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
 	Expect(simulationViewV2.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Test", []string{"headers"}))
 }
+
+func Test_SimulationViewV1_Upgrade_UnescapesRequestQueryParameters(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := v2.SimulationViewV1{
+		v2.DataViewV1{
+			RequestResponsePairViewV1: []v2.RequestResponsePairViewV1{
+				{
+					Request: v2.RequestDetailsView{
+						Query: util.StringToPointer("q=10%20Downing%20Street%20London"),
+					},
+					Response: v2.ResponseDetailsView{
+						Status:      200,
+						Body:        "body",
+						EncodedBody: false,
+						Headers: map[string][]string{
+							"Test": []string{"headers"},
+						},
+					},
+				},
+			},
+		},
+		v2.MetaView{
+			SchemaVersion:   "v1",
+			HoverflyVersion: "test",
+			TimeExported:    "today",
+		},
+	}
+
+	simulationViewV3 := unit.Upgrade()
+
+	Expect(simulationViewV3.RequestResponsePairs).To(HaveLen(1))
+	Expect(*simulationViewV3.RequestResponsePairs[0].RequestMatcher.Query.ExactMatch).To(Equal("q=10 Downing Street London"))
+}
+
+func Test_SimulationViewV2_Upgrade_UnescapesExactMatchRequestQueryParameters(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := v2.SimulationViewV2{
+		v2.DataViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
+				{
+					RequestMatcher: v2.RequestMatcherViewV2{
+						Query: &v2.RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("q=10%20Downing%20Street%20London"),
+						},
+					},
+					Response: v2.ResponseDetailsView{
+						Status:      200,
+						Body:        "body",
+						EncodedBody: false,
+						Headers: map[string][]string{
+							"Test": []string{"headers"},
+						},
+					},
+				},
+			},
+		},
+		v2.MetaView{
+			SchemaVersion:   "v1",
+			HoverflyVersion: "test",
+			TimeExported:    "today",
+		},
+	}
+
+	simulationViewV3 := unit.Upgrade()
+
+	Expect(simulationViewV3.RequestResponsePairs).To(HaveLen(1))
+	Expect(*simulationViewV3.RequestResponsePairs[0].RequestMatcher.Query.ExactMatch).To(Equal("q=10 Downing Street London"))
+}
+
+func Test_SimulationViewV2_Upgrade_UnescapesGlobMatchRequestQueryParameters(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := v2.SimulationViewV2{
+		v2.DataViewV2{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV2{
+				{
+					RequestMatcher: v2.RequestMatcherViewV2{
+						Query: &v2.RequestFieldMatchersView{
+							GlobMatch: util.StringToPointer("q=*%20London"),
+						},
+					},
+					Response: v2.ResponseDetailsView{
+						Status:      200,
+						Body:        "body",
+						EncodedBody: false,
+						Headers: map[string][]string{
+							"Test": []string{"headers"},
+						},
+					},
+				},
+			},
+		},
+		v2.MetaView{
+			SchemaVersion:   "v2",
+			HoverflyVersion: "test",
+			TimeExported:    "today",
+		},
+	}
+
+	simulationViewV3 := unit.Upgrade()
+
+	Expect(simulationViewV3.RequestResponsePairs).To(HaveLen(1))
+	Expect(*simulationViewV3.RequestResponsePairs[0].RequestMatcher.Query.GlobMatch).To(Equal("q=* London"))
+}
