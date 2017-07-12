@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	log "github.com/Sirupsen/logrus"
 
@@ -63,7 +64,9 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 
 	newRequest.Method = pair.Request.Method
 	newRequest.URL.Path = pair.Request.Path
-	newRequest.URL.RawQuery = pair.Request.QueryString()
+
+	t := &url.URL{Path: pair.Request.QueryString()}
+	newRequest.URL.RawQuery = t.String()
 	newRequest.Header = pair.Request.Headers
 
 	return newRequest, nil
