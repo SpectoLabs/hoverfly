@@ -1,6 +1,8 @@
 package v2
 
 import (
+	"net/url"
+
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
@@ -73,13 +75,14 @@ func (this SimulationViewV1) Upgrade() SimulationViewV3 {
 		}
 
 		if pairV1.Request.Query != nil {
+			query, _ := url.QueryUnescape(*pairV1.Request.Query)
 			if isNotRecording {
 				queryMatchers = &RequestFieldMatchersView{
-					GlobMatch: pairV1.Request.Query,
+					GlobMatch: &query,
 				}
 			} else {
 				queryMatchers = &RequestFieldMatchersView{
-					ExactMatch: pairV1.Request.Query,
+					ExactMatch: &query,
 				}
 			}
 		}
