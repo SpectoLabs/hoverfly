@@ -1,5 +1,9 @@
 package v2
 
+import (
+	"net/url"
+)
+
 type SimulationViewV2 struct {
 	DataViewV2 `json:"data"`
 	MetaView   `json:"meta"`
@@ -9,6 +13,16 @@ func (this SimulationViewV2) Upgrade() SimulationViewV3 {
 	requestReponsePairsV3 := []RequestMatcherResponsePairViewV3{}
 
 	for _, requestResponsePairV2 := range this.DataViewV2.RequestResponsePairs {
+		if requestResponsePairV2.RequestMatcher.Query != nil {
+			if requestResponsePairV2.RequestMatcher.Query.ExactMatch != nil {
+				unescapedQuery, _ := url.QueryUnescape(*requestResponsePairV2.RequestMatcher.Query.ExactMatch)
+				requestResponsePairV2.RequestMatcher.Query.ExactMatch = &unescapedQuery
+			}
+			if requestResponsePairV2.RequestMatcher.Query.GlobMatch != nil {
+				unescapedQuery, _ := url.QueryUnescape(*requestResponsePairV2.RequestMatcher.Query.GlobMatch)
+				requestResponsePairV2.RequestMatcher.Query.GlobMatch = &unescapedQuery
+			}
+		}
 		requestResponsePairV3 := RequestMatcherResponsePairViewV3{
 			RequestMatcher: RequestMatcherViewV3{
 				Body:        requestResponsePairV2.RequestMatcher.Body,
