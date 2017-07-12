@@ -189,7 +189,7 @@ func Test_CountingFieldMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
 
 	// JSON and JSONPath
 	matcher = matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
-		JsonMatch:  util.StringToPointer(`{"test":true}`),
+		JsonMatch:     util.StringToPointer(`{"test":true}`),
 		JsonPathMatch: util.StringToPointer(`$.test`),
 	}, `{"test":true}`)
 
@@ -198,7 +198,7 @@ func Test_CountingFieldMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
 
 	// XML and XMLPath
 	matcher = matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
-		XmlMatch:  util.StringToPointer(xml.Header+"<list><item><field>test</field></item></list>"),
+		XmlMatch:   util.StringToPointer(xml.Header + "<list><item><field>test</field></item></list>"),
 		XpathMatch: util.StringToPointer(`/list/item[1]/field`),
 	}, xml.Header+"<list><item><field>test</field></item></list>")
 
@@ -211,9 +211,9 @@ func Test_CountingFieldMatcher_CountsMatches_WhenThereIsNoMatch(t *testing.T) {
 
 	// Glob, regex, and exact
 	matcher := matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
-		GlobMatch:  util.StringToPointer("*test"),
-		RegexMatch: util.StringToPointer(".*"),
-		ExactMatch: util.StringToPointer("testtesttest"),
+		GlobMatch:     util.StringToPointer("*test"),
+		RegexMatch:    util.StringToPointer(".*"),
+		ExactMatch:    util.StringToPointer("testtesttest"),
 		JsonPathMatch: util.StringToPointer(`$.notmatch`),
 	}, `testtesttest`)
 
