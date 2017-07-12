@@ -385,3 +385,39 @@ func Test_RequestDetails_Hash_TheHashIncludesTheBody(t *testing.T) {
 
 	Expect(hashedUnit).To(Equal("51834bfe5334158be38ef5209f2b8e29"))
 }
+
+func Test_RequestDetails_QueryString_ConvertsMapToString(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestDetails := models.RequestDetails{
+		Query: map[string][]string{
+			"test": {"value"},
+		},
+	}
+
+	Expect(requestDetails.QueryString()).To(Equal("test=value"))
+}
+
+func Test_RequestDetails_QueryString_HandlesMultipleValuesAsOneValue(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestDetails := models.RequestDetails{
+		Query: map[string][]string{
+			"test": {"value,value2"},
+		},
+	}
+
+	Expect(requestDetails.QueryString()).To(Equal("test=value,value2"))
+}
+
+func Test_RequestDetails_QueryString_HandlesSpaces(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestDetails := models.RequestDetails{
+		Query: map[string][]string{
+			"test": {"val ue"},
+		},
+	}
+
+	Expect(requestDetails.QueryString()).To(Equal("test=val ue"))
+}

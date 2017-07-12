@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"sort"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -104,11 +105,29 @@ func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsView 
 	}
 }
 
+// TODO: Remove this
+// This only exists as there are parts of Hoverfly that still
+// require the request query parameters to be a string and not
+// a map
 func (this *RequestDetails) QueryString() string {
-	var values url.Values
-	values = this.Query
-
-	return util.SortQueryString(values.Encode())
+	var buf bytes.Buffer
+	keys := make([]string, 0, len(this.Query))
+	for k := range this.Query {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		vs := this.Query[k]
+		prefix := k + "="
+		for _, v := range vs {
+			if buf.Len() > 0 {
+				buf.WriteByte('&')
+			}
+			buf.WriteString(prefix)
+			buf.WriteString(v)
+		}
+	}
+	return util.SortQueryString(buf.String())
 }
 
 func (r *RequestDetails) concatenate(withHost bool) string {
