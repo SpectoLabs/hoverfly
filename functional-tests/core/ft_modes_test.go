@@ -99,6 +99,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 
 		var fakeServer *httptest.Server
 		var requestBody string
+		var requestQuery string
 
 		Context("With middleware", func() {
 
@@ -109,6 +110,7 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					body, _ := ioutil.ReadAll(r.Body)
 					requestBody = string(body)
+					requestQuery = r.URL.RawQuery
 					w.Header().Set("Content-Type", "text/plain")
 					w.Header().Set("Date", "date")
 					w.Write([]byte("Hello world"))
@@ -116,9 +118,10 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 			})
 
 			It("Should modify the request using middleware", func() {
-				resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL))
+				resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL + "?test=a&test=b c,d"))
 				Expect(resp.StatusCode).To(Equal(200))
 				Expect(requestBody).To(Equal("CHANGED_REQUEST_BODY"))
+				Expect(requestQuery).To(Equal("test=a&test=b%20c,d"))
 			})
 
 			It("Should modify the response using middleware", func() {
