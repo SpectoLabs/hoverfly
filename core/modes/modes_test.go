@@ -34,6 +34,28 @@ func TestReconstructRequest(t *testing.T) {
 	Expect(newRequest.URL.RawQuery).To(Equal("foo=bar"))
 }
 
+func Test_ReconstructRequest_QueryRequestResponsePair(t *testing.T) {
+	RegisterTestingT(t)
+
+	request := models.RequestDetails{
+		Scheme:      "http",
+		Path:        "/another-path",
+		Method:      "GET",
+		Destination: "test-destination.com",
+		Query: map[string][]string{
+			"key": {"value 1", "value 2"},
+		},
+	}
+	pair := models.RequestResponsePair{Request: request}
+
+	newRequest, err := modes.ReconstructRequest(pair)
+
+	Expect(err).To(BeNil())
+	Expect(newRequest.Host).To(Equal("test-destination.com"))
+	Expect(newRequest.URL.RawQuery).To(Equal("key=value%201&key=value%202"))
+
+}
+
 func Test_ReconstructRequest_BodyRequestResponsePair(t *testing.T) {
 	RegisterTestingT(t)
 
