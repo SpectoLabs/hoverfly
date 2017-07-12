@@ -28,7 +28,7 @@ Currently, the following data is available through templating:
 +------------------------------+----------------------------------------------+----------------------------------------------+--------+
 | Query parameter value (list) | {{ Request.QueryParam.NameOfParameter.[1] }} | http://www.foo.com?myParam=bar1&myParam=bar2 | bar2   |
 +------------------------------+----------------------------------------------+----------------------------------------------+--------+
-| Path parameter value         | {{ Request.Path.[1] }}                  | http://www.foo.com/zero/one/two              | one    |
+| Path parameter value         | {{ Request.Path.[1] }}                       | http://www.foo.com/zero/one/two              | one    |
 +------------------------------+----------------------------------------------+----------------------------------------------+--------+
 
 Conditional Templating, Looping and More
