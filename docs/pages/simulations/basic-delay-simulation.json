@@ -1,30 +1,38 @@
 {
-    "data": {
-        "pairs": [{
-            "request": {
-                "destination": {
-                    "globMatch": "*"
-                }
-            },
-            "response": {
-                "status": 200,
-                "body": "Delayed response",
-                "encodedBody": false,
-                "headers": {
-                    "Hoverfly": ["Was-Here"]
-                }
-            }
-        }],
-        "globalActions": {
-            "delays": [{
-                "urlPattern": ".",
-                "delay": 2000
-            }]
+  "data": {
+    "pairs": [
+      {
+        "response": {
+          "status": 200,
+          "body": "Delayed response",
+          "encodedBody": false,
+          "headers": {
+            "Hoverfly": [
+              "Was-Here"
+            ]
+          },
+          "templated": false
+        },
+        "request": {
+          "destination": {
+            "globMatch": "*"
+          }
         }
-    },
-    "meta": {
-        "schemaVersion": "v2",
-        "hoverflyVersion": "v0.11.0",
-        "timeExported": "2016-11-11T11:53:52Z"
+      }
+    ],
+    "globalActions": {
+      "delays": [
+        {
+          "urlPattern": ".",
+          "httpMethod": "",
+          "delay": 2000
+        }
+      ]
     }
+  },
+  "meta": {
+    "schemaVersion": "v3",
+    "hoverflyVersion": "v0.13.0",
+    "timeExported": "2017-07-13T16:16:43+01:00"
+  }
 }

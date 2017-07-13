@@ -1,45 +1,47 @@
 {
-    "data": {
-        "pairs": [{
-            "request": {
-                "scheme": {
-                    "exactMatch": "http"
-                },
-                "method": {
-                    "exactMatch": "GET"
-                },
-                "destination": {
-                    "exactMatch": "docs.hoverfly.io"
-                },
-                "path": {
-                    "exactMatch": "/pages/keyconcepts/templates.html"
-                },
-                "query": {
-                    "exactMatch": "query=true"
-                },
-                "body": {
-                    "exactMatch": ""
-                },
-                "headers": {}
-            },
-            "response": {
-                "status": 200,
-                "body": "YmFzZTY0IGVuY29kZWQ=",
-                "encodedBody": true,
-                "headers": {
-                    "Hoverfly": ["Was-Here"]
-                }
-            }
-        }],
-        "globalActions": {
-            "delays": [
-
-            ]
-        }
-    },
-    "meta": {
-        "schemaVersion": "v2",
-        "hoverflyVersion": "v0.11.0",
-        "timeExported": "2016-11-11T11:53:52Z"
-    }
+	"data": {
+		"pairs": [
+			{
+				"response": {
+					"status": 200,
+					"body": "YmFzZTY0IGVuY29kZWQ=",
+					"encodedBody": true,
+					"headers": {
+						"Hoverfly": [
+							"Was-Here"
+						]
+					},
+					"templated": false
+				},
+				"request": {
+					"path": {
+						"exactMatch": "/pages/keyconcepts/templates.html"
+					},
+					"method": {
+						"exactMatch": "GET"
+					},
+					"destination": {
+						"exactMatch": "docs.hoverfly.io"
+					},
+					"scheme": {
+						"exactMatch": "http"
+					},
+					"query": {
+						"exactMatch": "query=true"
+					},
+					"body": {
+						"exactMatch": ""
+					}
+				}
+			}
+		],
+		"globalActions": {
+			"delays": []
+		}
+	},
+	"meta": {
+		"schemaVersion": "v3",
+		"hoverflyVersion": "v0.13.0",
+		"timeExported": "2017-07-13T16:34:30+01:00"
+	}
 }
