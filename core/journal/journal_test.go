@@ -205,6 +205,32 @@ func Test_Journal_DeleteEntries_WhenDisabledReturnsError(t *testing.T) {
 	Expect(err.Error()).To(Equal("Journal disabled"))
 }
 
+func Test_Journal_GetEntries_TurnsTimeDurationToMilliseconds(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
+	err := unit.NewEntry(request, &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Header: http.Header{
+			"test-header": []string{
+				"one", "two",
+			},
+		},
+	}, "test-mode", time.Now())
+
+	Expect(err).To(BeNil())
+
+	entries, err := unit.GetEntries()
+	Expect(err).To(BeNil())
+	Expect(entries).To(HaveLen(1))
+
+	Expect(entries[0].Latency).To(BeNumerically(">", 0))
+	Expect(entries[0].Latency).To(BeNumerically("<", 0.1))
+}
+
 func Test_Journal_GetEntries_WhenDisabledReturnsError(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -216,7 +242,7 @@ func Test_Journal_GetEntries_WhenDisabledReturnsError(t *testing.T) {
 	Expect(err.Error()).To(Equal("Journal disabled"))
 }
 
-func Test_Journal_GetFilteredLogs_WillFilterOnRequestFields(t *testing.T) {
+func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := journal.NewJournal()
@@ -412,7 +438,7 @@ func Test_Journal_GetFilteredLogs_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(0))
 }
 
-func Test_Journal_GetFilteredLogs_WillReturnEmptyIfRequestMatcherIsEmpty(t *testing.T) {
+func Test_Journal_GetFilteredEntries_WillReturnEmptyIfRequestMatcherIsEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := journal.NewJournal()
