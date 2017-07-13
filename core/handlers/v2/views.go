@@ -1,8 +1,6 @@
 package v2
 
 import (
-	"time"
-
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 )
 
@@ -77,7 +75,7 @@ type JournalEntryView struct {
 	Response    ResponseDetailsView `json:"response"`
 	Mode        string              `json:"mode"`
 	TimeStarted string              `json:"timeStarted"`
-	Latency     time.Duration       `json:"latency"`
+	Latency     float64             `json:"latency"`
 }
 
 type JournalEntryFilterView struct {

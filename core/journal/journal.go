@@ -73,7 +73,7 @@ func (this Journal) GetEntries() ([]v2.JournalEntryView, error) {
 			Response:    journalEntry.Response.ConvertToResponseDetailsView(),
 			Mode:        journalEntry.Mode,
 			TimeStarted: journalEntry.TimeStarted.Format(time.RFC3339),
-			Latency:     (journalEntry.Latency / time.Millisecond),
+			Latency:     (journalEntry.Latency.Seconds() * 1e3),
 		})
 	}
 	return journalEntryViews, nil
