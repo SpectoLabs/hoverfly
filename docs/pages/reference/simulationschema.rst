@@ -7,7 +7,6 @@ This is the JSON schema for v2 Hoverfly simulations.
 
 .. code:: json
 
-
   {
     "additionalProperties": false,
     "definitions": {
@@ -122,6 +121,9 @@ This is the JSON schema for v2 Hoverfly simulations.
           },
           "status": {
             "type": "integer"
+          },
+          "templated": {
+            "type": "boolean"
           }
         },
         "type": "object"
