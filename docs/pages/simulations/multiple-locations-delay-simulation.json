@@ -1,39 +1,48 @@
 {
-    "data": {
-        "pairs": [{
-            "request": {
-                "destination": {
-                    "globMatch": "*"
-                }
-            },
-            "response": {
-                "status": 200,
-                "body": "Delayed response",
-                "encodedBody": false,
-                "headers": {
-                    "Hoverfly": ["Was-Here"]
-                }
-            }
-        }],
-        "globalActions": {
-            "delays": [{
-                    "urlPattern": "echo\\.jsontest\\.com\\/a\\/b",
-                    "delay": 2000
-                },
-                {
-                    "urlPattern": "echo\\.jsontest\\.com\\/b\\/c",
-                    "delay": 2000
-                },
-                {
-                    "urlPattern": "echo\\.jsontest\\.com\\/c\\/d",
-                    "delay": 3000
-                }
-            ]
-        }
-    },
-    "meta": {
-        "schemaVersion": "v2",
-        "hoverflyVersion": "v0.11.0",
-        "timeExported": "2016-11-11T11:53:52Z"
-    }
+	"data": {
+		"pairs": [
+			{
+				"response": {
+					"status": 200,
+					"body": "Delayed response",
+					"encodedBody": false,
+					"headers": {
+						"Hoverfly": [
+							"Was-Here"
+						]
+					},
+					"templated": false
+				},
+				"request": {
+					"destination": {
+						"globMatch": "*"
+					}
+				}
+			}
+		],
+		"globalActions": {
+			"delays": [
+				{
+					"urlPattern": "echo\\.jsontest\\.com\\/a\\/b",
+					"httpMethod": "",
+					"delay": 2000
+				},
+				{
+					"urlPattern": "echo\\.jsontest\\.com\\/b\\/c",
+					"httpMethod": "",
+					"delay": 2000
+				},
+				{
+					"urlPattern": "echo\\.jsontest\\.com\\/c\\/d",
+					"httpMethod": "",
+					"delay": 3000
+				}
+			]
+		}
+	},
+	"meta": {
+		"schemaVersion": "v3",
+		"hoverflyVersion": "v0.13.0",
+		"timeExported": "2017-07-13T16:47:19+01:00"
+	}
 }
