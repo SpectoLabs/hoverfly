@@ -11,6 +11,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
+var RFC3339Milli = "2006-01-02T15:04:05.000Z07:00"
+
 type JournalEntry struct {
 	Request     *models.RequestDetails
 	Response    *models.ResponseDetails
@@ -72,7 +74,7 @@ func (this Journal) GetEntries() ([]v2.JournalEntryView, error) {
 			Request:     journalEntry.Request.ConvertToRequestDetailsView(),
 			Response:    journalEntry.Response.ConvertToResponseDetailsView(),
 			Mode:        journalEntry.Mode,
-			TimeStarted: journalEntry.TimeStarted.Format(time.RFC3339),
+			TimeStarted: journalEntry.TimeStarted.Format(RFC3339Milli),
 			Latency:     (journalEntry.Latency.Seconds() * 1e3),
 		})
 	}
