@@ -223,6 +223,10 @@ var JsonPayloadWithDelays = `{
                     {
                         "urlPattern": "test-server\\.com",
                         "delay": 110
+                    },
+                    {
+                        "urlPattern": "localhost(.*)",
+                        "delay": 110
                     }
             ]
         }
