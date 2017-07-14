@@ -112,7 +112,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 		It("should delay returning the response", func() {
 			start := time.Now()
-			resp := hoverfly.Proxy(sling.New().Get("http://www.virtual.com/path2"))
+			resp := hoverfly.Proxy(sling.New().Get("http://localhost:" + hoverfly.GetAdminPort()))
 			end := time.Now()
 			reqDuration := end.Sub(start)
 			body, err := ioutil.ReadAll(resp.Body)
