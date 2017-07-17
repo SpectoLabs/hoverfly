@@ -9,8 +9,7 @@ GET /api/v2/simulation
 
 Gets all simulation data. The simulation JSON contains all the information Hoverfly can hold; this includes recordings, templates, delays and metadata.
 
-Example response body:
-
+**Example response body**
 ::
 
     {
@@ -95,8 +94,7 @@ PUT /api/v2/simulation
 
 This puts the supplied simulation JSON into Hoverfly, overwriting any existing simulation data.
 
-Example request body:
-
+**Example request body**
 ::
 
     {
@@ -188,8 +186,7 @@ GET /api/v2/hoverfly
 
 Gets configuration information from the running instance of Hoverfly.
 
-Example response body:
-
+**Example response body**
 ::
 
     {
@@ -220,8 +217,7 @@ GET /api/v2/hoverfly/destination
 Gets the current destination setting for the running instance of
 Hoverfly.
 
-Example response body:
-
+**Example response body**
 ::
 
     {
@@ -235,8 +231,7 @@ PUT /api/v2/hoverfly/destination
 Sets a new destination for the running instance of Hoverfly, overwriting
 the existing destination setting.
 
-Example request body:
-
+**Example request body**
 ::
 
     {
@@ -254,14 +249,13 @@ Gets the middleware settings for the running instance of Hoverfly. This
 could be either an executable binary, a script that can be executed with 
 a binary or a URL to remote middleware.
 
-Example response body:
-
+**Example response body**
 ::
 
     {
         "binary": "python",
-	"script": "#python code goes here",
-	"remote": ""
+	      "script": "#python code goes here",
+	      "remote": ""
     }
 
 
@@ -273,14 +267,13 @@ for the running instance of Hoverfly. The middleware being set
 can be either an executable binary located on the host, a script
 and the binary to execute it or the URL to a remote middleware.
 
-Example request body:
-
+**Example request body**
 ::
 
     {
         "binary": "python",
-	"script": "#python code goes here",
-	"remote": ""
+	      "script": "#python code goes here",
+	      "remote": ""
     }
 
 
@@ -292,8 +285,7 @@ GET /api/v2/hoverfly/mode
 
 Gets the mode for the running instance of Hoverfly.
 
-Example response body:
-
+**Example response body**
 ::
 
     {
@@ -307,8 +299,7 @@ PUT /api/v2/hoverfly/mode
 
 Changes the mode of the running instance of Hoverfly.
 
-Example request body:
-
+**Example request body**
 ::
 
     {
@@ -324,8 +315,7 @@ GET /api/v2/hoverfly/usage
 
 Gets metrics information for the running instance of Hoverfly.
 
-Example response body:
-
+**Example response body**
 ::
 
     {
@@ -348,8 +338,7 @@ GET /api/v2/hoverfly/version
 
 Gets the version of Hoverfly.
 
-Example response body:
-
+**Example response body**
 ::
 
     {
@@ -365,8 +354,7 @@ GET /api/v2/hoverfly/upstream-proxy
 
 Gets the upstream proxy configured for Hoverfly.
 
-Example response body:
-
+**Example response body**
 ::
 
     {
@@ -381,6 +369,7 @@ GET /api/v2/cache
 """"""""""""""""""""
 Gets the requests and responses stored in the cache.
 
+**Example response body**
 ::
 
     {
@@ -424,6 +413,7 @@ GET /api/v2/logs
 """"""""""""""""""""
 Gets the logs from Hoverfly.
 
+**Example response body**
 ::
 
     {
@@ -450,4 +440,81 @@ Gets the logs from Hoverfly.
                 "time": "2017-03-13T12:22:39Z"
             },  
         ]
+    }
+
+
+-------------------------------------------------------------------------------------------------------------
+
+
+GET /api/v2/journal
+"""""""""""""""""""
+Gets the journal from Hoverfly. Each journal entry contains both the request Hoverfly recieved and the response 
+it served along with the mode Hoverfly was in, the time the request was recieved and the time taken for Hoverfly
+to process the request. Latency is in milliseconds.
+
+**Example response body**
+::
+  {
+    "journal": [
+      {
+        "request": {
+          "path": "/",
+          "method": "GET",
+          "destination": "hoverfly.io",
+          "scheme": "http",
+          "query": "",
+          "body": "",
+          "headers": {
+            "Accept": [
+              "*/*"
+            ],
+            "Proxy-Connection": [
+              "Keep-Alive"
+            ],
+            "User-Agent": [
+              "curl/7.50.2"
+            ]
+          }
+        },
+        "response": {
+          "status": 502,
+          "body": "Hoverfly Error!\n\nThere was an error when matching\n\nGot error: Could not find a match for request, create or record a valid matcher first!",
+          "encodedBody": false,
+          "headers": {
+            "Content-Type": [
+              "text/plain"
+            ]
+          }
+        },
+        "mode": "simulate",
+        "timeStarted": "2017-07-17T10:41:59.168+01:00",
+        "latency": 0.61334
+      }
+    ]
+  }
+
+
+-------------------------------------------------------------------------------------------------------------
+
+
+DELETE /api/v2/journal
+""""""""""""""""""""""
+Delete all entries stored in the journal.
+
+
+-------------------------------------------------------------------------------------------------------------
+
+
+POST /api/v2/journal
+""""""""""""""""""""
+Filter and search entries stored in the journal.
+
+**Example request body**
+::
+    {
+        "request": {
+            "destination": {
+              "exactMatch": "hoverfly.io"
+            }
+        }
     }
