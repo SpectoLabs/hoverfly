@@ -4,7 +4,7 @@ Troubleshooting
 ===============
 
 Why isn't Hoverfly matching my request?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When Hoverfly cannot match a response to an incoming request, it will return information on the closest match:
 
@@ -66,13 +66,13 @@ Here, you can see which fields did not match. In this case, it was the ``body``.
 You can also view this information by running ``hoverctl logs``.
 
 Why isn't Hoverfly returning the closest match when it cannot match a request?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Hoverfly will only provide this information when the matching strategy is set to **strongest match** (the default). If you
 are using the **first match** matching strategy, the closet match information will not be returned.  
 
 How can I view the Hoverfly logs?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
 
