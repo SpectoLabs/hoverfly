@@ -46,3 +46,19 @@ To remove old versions :
 
     brew cleanup hoverfly
 
+Docker
+~~~~~~
+
+If you have `Docker <https://www.docker.com/>`_, you can run Hoverfly using the ``docker`` command.
+
+.. code:: bash
+
+    docker run -d -p 8888:8888 -p 8500:8500 spectolabs/hoverfly:latest
+
+This will run the latest version of the `Hoverfly Docker image <https://hub.docker.com/r/spectolabs/hoverfly/>`_. 
+This Docker image does not contain hoverctl. Our recommendation is to have hoverctl on your host machine and then 
+configure hoverctl to use the newly started Hoverfly Docker instance as a new target.
+
+.. seealso::
+
+    For a tutorial of creating a new target in hoverctl, see :ref:`remotehoverfly`.
