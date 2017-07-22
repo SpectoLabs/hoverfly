@@ -4,12 +4,13 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (requestMatch *models.RequestMatcherResponsePair, err *models.MatchError) {
+func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (requestMatch *models.RequestMatcherResponsePair, err *models.MatchError, cachable bool) {
 
 	var closestMissScore int
 	var strongestMatchScore int
 	var closestMiss *models.ClosestMiss
 	matchedOnAllButHeadersAtLeastOnce := false
+	cachable = true
 
 	for _, matchingPair := range simulation.MatchingPairs {
 		// TODO: not matching by default on URL and body - need to enable this
@@ -93,9 +94,25 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 		}
 	}
 
+	cachable = isCachable(requestMatch, matchedOnAllButHeadersAtLeastOnce)
+
 	if requestMatch == nil {
 		err = models.NewMatchErrorWithClosestMiss(closestMiss, "No match found", matchedOnAllButHeadersAtLeastOnce)
 	}
 
 	return
+}
+
+func isCachable(requestMatch *models.RequestMatcherResponsePair, matchedOnAllButHeadersAtLeastOnce bool) (bool) {
+	// Do not cache misses if the only thing they missed on was headers because a subsequent request which is the same
+	// but with different headers will need to go through matching
+	if requestMatch == nil && matchedOnAllButHeadersAtLeastOnce {
+		return false
+		// And do not cache hits if they matched on headers because a subsequent request which is the same
+		// but with different headers will need to go through matching
+	} else if requestMatch != nil && requestMatch.RequestMatcher.IncludesHeaderMatching() {
+		return false
+	}
+
+	return true
 }

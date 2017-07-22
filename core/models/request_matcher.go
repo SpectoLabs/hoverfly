@@ -126,13 +126,17 @@ func (this RequestMatcher) IncludesHeaderMatching() bool {
 	return this.Headers != nil && len(this.Headers) > 0
 }
 
-func (this RequestMatcher) BuildRequestDetailsFromExactMatches() *RequestDetails {
+func (this RequestMatcher) ToEageralyCachable() *RequestDetails {
 	if this.Body == nil || this.Body.ExactMatch == nil ||
 		this.Destination == nil || this.Destination.ExactMatch == nil ||
 		this.Method == nil || this.Method.ExactMatch == nil ||
 		this.Path == nil || this.Path.ExactMatch == nil ||
 		this.Query == nil || this.Query.ExactMatch == nil ||
 		this.Scheme == nil || this.Scheme.ExactMatch == nil {
+		return nil
+	}
+
+	if this.Headers != nil && len(this.Headers) > 0 {
 		return nil
 	}
 
@@ -150,23 +154,23 @@ func (this RequestMatcher) BuildRequestDetailsFromExactMatches() *RequestDetails
 }
 
 type MatchError struct {
-	ClosestMiss                       *ClosestMiss
-	error                             string
-	MatchedOnAllButHeadersAtLeastOnce bool
+	ClosestMiss *ClosestMiss
+	error       string
+	IsCachable  bool
 }
 
-func NewMatchErrorWithClosestMiss(closestMiss *ClosestMiss, error string, matchedOnAllButHeadersAtLeastOnce bool) *MatchError {
+func NewMatchErrorWithClosestMiss(closestMiss *ClosestMiss, error string, isCachable bool) *MatchError {
 	return &MatchError{
 		ClosestMiss: closestMiss,
 		error:       error,
-		MatchedOnAllButHeadersAtLeastOnce: matchedOnAllButHeadersAtLeastOnce,
+		IsCachable:  isCachable,
 	}
 }
 
 func NewMatchError(error string, matchedOnAllButHeadersAtLeastOnce bool) *MatchError {
 	return &MatchError{
-		error: error,
-		MatchedOnAllButHeadersAtLeastOnce: matchedOnAllButHeadersAtLeastOnce,
+		error:      error,
+		IsCachable: matchedOnAllButHeadersAtLeastOnce,
 	}
 }
 
