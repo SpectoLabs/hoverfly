@@ -380,46 +380,6 @@ func Test_Hoverfly_GetResponse_WillReturnCachedResponseIfHeaderMatchIsFalse(t *t
 	Expect(response.Body).To(Equal("cached response"))
 }
 
-func Test_Hoverfly_GetResponse_WillCheckRequestMatchersAndReturnRequestMatcherResponseIfCacheHasHeaders(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := NewHoverflyWithConfiguration(&Configuration{})
-
-	requestDetails := models.RequestDetails{
-		Destination: "somehost.com",
-		Method:      "POST",
-		Scheme:      "http",
-	}
-
-	unit.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, &models.RequestMatcherResponsePair{
-		RequestMatcher: models.RequestMatcher{
-			Headers: map[string][]string{
-				"Header": {"value"},
-			},
-		},
-		Response: models.ResponseDetails{
-			Body: "cached response",
-		},
-	}, nil)
-
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-		RequestMatcher: models.RequestMatcher{
-			Method: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("POST"),
-			},
-		},
-		Response: models.ResponseDetails{
-			Status: 200,
-			Body:   "response body",
-		},
-	})
-
-	response, err := unit.GetResponse(requestDetails)
-	Expect(err).To(BeNil())
-
-	Expect(response.Body).To(Equal("response body"))
-}
-
 func Test_Hoverfly_GetResponse_WillCacheMisses(t *testing.T) {
 	RegisterTestingT(t)
 

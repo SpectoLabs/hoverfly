@@ -262,6 +262,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 	var pair *models.RequestMatcherResponsePair
 	var err *models.MatchError
+	var cachable bool
 
 	mode := (hf.modeMap[modes.Simulate]).(*modes.SimulateMode)
 
@@ -269,9 +270,9 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 	// Matching
 	if strongestMatch {
-		pair, err = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
+		pair, err, cachable = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
 	} else {
-		pair, err = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
+		pair, err, cachable = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation)
 	}
 
 	// Templating
@@ -282,7 +283,10 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		}
 	}
 
-	hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, err)
+	// Caching
+	if cachable {
+		hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, err)
+	}
 
 	if err != nil {
 		log.WithFields(log.Fields{

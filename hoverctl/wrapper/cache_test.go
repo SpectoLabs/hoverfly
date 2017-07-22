@@ -15,7 +15,7 @@ func Test_FlushCache_GetsMiddlewareFromHoverfly(t *testing.T) {
 	hoverfly.PutSimulation(v2.SimulationViewV3{
 		v2.DataViewV3{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
-				v2.RequestMatcherResponsePairViewV3{
+				{
 					RequestMatcher: v2.RequestMatcherViewV3{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("DELETE"),

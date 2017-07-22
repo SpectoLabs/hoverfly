@@ -127,16 +127,6 @@ func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestD
 		return errors.New("No cache set")
 	}
 
-	// Do not cache misses if the only thing they missed on was headers because a subsequent request which is the same
-	// but with different headers will need to go through matching
-	if matchError != nil && matchError.MatchedOnAllButHeadersAtLeastOnce {
-		return nil
-		// And do not cache hits if they matched on headers because a subsequent request which is the same
-		// but with different headers will need to go through matching
-	} else if pair != nil && pair.RequestMatcher.IncludesHeaderMatching() {
-		return nil
-	}
-
 	var key string
 
 	if this.Webserver {
@@ -185,7 +175,7 @@ func (this CacheMatcher) PreloadCache(simulation models.Simulation) error {
 		return errors.New("No cache set")
 	}
 	for _, pair := range simulation.MatchingPairs {
-		if requestDetails := pair.RequestMatcher.BuildRequestDetailsFromExactMatches(); requestDetails != nil {
+		if requestDetails := pair.RequestMatcher.ToEageralyCachable(); requestDetails != nil {
 			this.SaveRequestMatcherResponsePair(*requestDetails, &pair, nil)
 		}
 	}

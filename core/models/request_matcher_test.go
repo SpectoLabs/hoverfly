@@ -118,8 +118,8 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDe
 		},
 	}
 
-	Expect(unit.BuildRequestDetailsFromExactMatches()).ToNot(BeNil())
-	Expect(unit.BuildRequestDetailsFromExactMatches()).To(Equal(&models.RequestDetails{
+	Expect(unit.ToEageralyCachable()).ToNot(BeNil())
+	Expect(unit.ToEageralyCachable()).To(Equal(&models.RequestDetails{
 		Body:        "body",
 		Destination: "destination",
 		Method:      "method",
@@ -129,53 +129,12 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDe
 	}))
 }
 
-func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_IncludesHeaders(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := models.RequestMatcher{
-		Body: &models.RequestFieldMatchers{
-			ExactMatch: util.StringToPointer("body"),
-		},
-		Destination: &models.RequestFieldMatchers{
-			ExactMatch: util.StringToPointer("destination"),
-		},
-		Headers: map[string][]string{
-			"header": []string{"value"},
-		},
-		Method: &models.RequestFieldMatchers{
-			ExactMatch: util.StringToPointer("method"),
-		},
-		Path: &models.RequestFieldMatchers{
-			ExactMatch: util.StringToPointer("path"),
-		},
-		Query: &models.RequestFieldMatchers{
-			ExactMatch: util.StringToPointer("query=one"),
-		},
-		Scheme: &models.RequestFieldMatchers{
-			ExactMatch: util.StringToPointer("scheme"),
-		},
-	}
-
-	Expect(unit.BuildRequestDetailsFromExactMatches()).ToNot(BeNil())
-	Expect(unit.BuildRequestDetailsFromExactMatches()).To(Equal(&models.RequestDetails{
-		Body:        "body",
-		Destination: "destination",
-		Headers: map[string][]string{
-			"header": []string{"value"},
-		},
-		Method: "method",
-		Path:   "path",
-		Query:  map[string][]string{"query": []string{"one"}},
-		Scheme: "scheme",
-	}))
-}
-
 func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := models.RequestMatcher{}
 
-	Expect(unit.BuildRequestDetailsFromExactMatches()).To(BeNil())
+	Expect(unit.ToEageralyCachable()).To(BeNil())
 }
 
 func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissingAnExactMatch(t *testing.T) {
@@ -199,5 +158,5 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissing
 		},
 	}
 
-	Expect(unit.BuildRequestDetailsFromExactMatches()).To(BeNil())
+	Expect(unit.ToEageralyCachable()).To(BeNil())
 }

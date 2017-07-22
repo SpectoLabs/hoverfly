@@ -238,7 +238,7 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 					Body:   "body",
 				},
 			},
-			models.RequestMatcherResponsePair{
+			{
 				RequestMatcher: models.RequestMatcher{
 					Body: &models.RequestFieldMatchers{
 						ExactMatch: util.StringToPointer("body"),
