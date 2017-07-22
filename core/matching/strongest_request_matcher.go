@@ -94,7 +94,7 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 		}
 	}
 
-	cachable = isCachable(requestMatch, matchedOnAllButHeadersAtLeastOnce)
+	cachable = isCachable(requestMatch, matchedOnAllButHeadersAtLeastOnce, false)
 
 	if requestMatch == nil {
 		err = models.NewMatchErrorWithClosestMiss(closestMiss, "No match found", matchedOnAllButHeadersAtLeastOnce)
@@ -103,15 +103,17 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 	return
 }
 
-func isCachable(requestMatch *models.RequestMatcherResponsePair, matchedOnAllButHeadersAtLeastOnce bool) (bool) {
+func isCachable(requestMatch *models.RequestMatcherResponsePair, matchedOnAllButHeadersAtLeastOnce bool, matchedOnAllButStateAtLeastOnce bool) (bool) {
 	// Do not cache misses if the only thing they missed on was headers because a subsequent request which is the same
 	// but with different headers will need to go through matching
-	if requestMatch == nil && matchedOnAllButHeadersAtLeastOnce {
+	if requestMatch == nil && (matchedOnAllButHeadersAtLeastOnce || matchedOnAllButStateAtLeastOnce) {
 		return false
 		// And do not cache hits if they matched on headers because a subsequent request which is the same
 		// but with different headers will need to go through matching
-	} else if requestMatch != nil && requestMatch.RequestMatcher.IncludesHeaderMatching() {
-		return false
+	} else if requestMatch != nil {
+		if requestMatch.RequestMatcher.IncludesHeaderMatching() || requestMatch.RequestMatcher.IncludesStateMatching() {
+			return false
+		}
 	}
 
 	return true

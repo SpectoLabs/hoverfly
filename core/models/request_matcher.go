@@ -120,10 +120,15 @@ type RequestMatcher struct {
 	Query       *RequestFieldMatchers
 	Body        *RequestFieldMatchers
 	Headers     map[string][]string
+	RequiresState map[string]string
 }
 
 func (this RequestMatcher) IncludesHeaderMatching() bool {
 	return this.Headers != nil && len(this.Headers) > 0
+}
+
+func (this RequestMatcher) IncludesStateMatching() bool {
+	return this.RequiresState != nil && len(this.RequiresState) > 0
 }
 
 func (this RequestMatcher) ToEageralyCachable() *RequestDetails {
@@ -156,21 +161,18 @@ func (this RequestMatcher) ToEageralyCachable() *RequestDetails {
 type MatchError struct {
 	ClosestMiss *ClosestMiss
 	error       string
-	IsCachable  bool
 }
 
 func NewMatchErrorWithClosestMiss(closestMiss *ClosestMiss, error string, isCachable bool) *MatchError {
 	return &MatchError{
 		ClosestMiss: closestMiss,
 		error:       error,
-		IsCachable:  isCachable,
 	}
 }
 
 func NewMatchError(error string, matchedOnAllButHeadersAtLeastOnce bool) *MatchError {
 	return &MatchError{
 		error:      error,
-		IsCachable: matchedOnAllButHeadersAtLeastOnce,
 	}
 }
 

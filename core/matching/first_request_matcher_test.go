@@ -30,7 +30,7 @@ func Test_FirstMatchRequestMatcher_EmptyRequestMatchersShouldMatchOnAnyRequest(t
 			"sdv": {"ascd"},
 		},
 	}
-	result, _, _  := matching.FirstMatchRequestMatcher(r, false, simulation)
+	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
@@ -52,7 +52,7 @@ func Test_FirstMatchRequestMatcher_RequestMatchersShouldMatchOnBody(t *testing.T
 	r := models.RequestDetails{
 		Body: "body",
 	}
-	result, err, _  := matching.FirstMatchRequestMatcher(r, false, simulation)
+	result, err, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 	Expect(err).To(BeNil())
 
 	Expect(result.Response.Body).To(Equal("request matched"))
@@ -84,7 +84,7 @@ func Test_FirstMatchRequestMatcher_ReturnResponseWhenAllHeadersMatch(t *testing.
 		},
 	}
 
-	result, _, _  := matching.FirstMatchRequestMatcher(r, false, simulation)
+	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
@@ -114,7 +114,7 @@ func Test_FirstMatchRequestMatcher_ReturnNilWhenOneHeaderNotPresentInRequest(t *
 		},
 	}
 
-	result, _, _  := matching.FirstMatchRequestMatcher(r, false, simulation)
+	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(result).To(BeNil())
 }
@@ -144,7 +144,7 @@ func Test_FirstMatchRequestMatcher_ReturnNilWhenOneHeaderValueDifferent(t *testi
 			"header2": []string{"different"},
 		},
 	}
-	result, _, _  := matching.FirstMatchRequestMatcher(r, false, simulation)
+	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(result).To(BeNil())
 }
@@ -175,7 +175,7 @@ func Test_FirstMatchRequestMatcher_ReturnResponseWithMultiValuedHeaderMatch(t *t
 			"header2": []string{"val2"},
 		},
 	}
-	result, _, _  := matching.FirstMatchRequestMatcher(r, false, simulation)
+	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
@@ -206,7 +206,7 @@ func Test_FirstMatchRequestMatcher_ReturnNilWithDifferentMultiValuedHeaders(t *t
 		},
 	}
 
-	result, _, _  := matching.FirstMatchRequestMatcher(r, false, simulation)
+	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(result).To(BeNil())
 }
@@ -257,7 +257,7 @@ func Test_FirstMatchRequestMatcher_EndpointMatchWithHeaders(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result, _, _  := matching.FirstMatchRequestMatcher(r, false, simulation)
+	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
@@ -309,7 +309,7 @@ func Test_FirstMatchRequestMatcher_EndpointMismatchWithHeadersReturnsNil(t *test
 		},
 	}
 
-	result, _, _  := matching.FirstMatchRequestMatcher(r, false, simulation)
+	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(result).To(BeNil())
 }
@@ -348,7 +348,7 @@ func Test_FirstMatchRequestMatcher_AbleToMatchAnEmptyPathInAReasonableWay(t *tes
 			"q": []string{"test"},
 		},
 	}
-	result, _, _  := matching.FirstMatchRequestMatcher(r, false, simulation)
+	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 
@@ -361,7 +361,7 @@ func Test_FirstMatchRequestMatcher_AbleToMatchAnEmptyPathInAReasonableWay(t *tes
 		},
 	}
 
-	result, _, _  = matching.FirstMatchRequestMatcher(r, false, simulation)
+	result, _, _ = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(result).To(BeNil())
 }
@@ -411,7 +411,7 @@ func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsAndBeMatched(t *tes
 		Path:        "/api/1",
 	}
 
-	response, err, _  := matching.FirstMatchRequestMatcher(request, false, simulation)
+	response, err, _ := matching.FirstMatchRequestMatcher(request, false, simulation, make(map[string]string))
 	Expect(err).To(BeNil())
 
 	Expect(response.Response.Body).To(Equal("request matched"))
@@ -438,7 +438,7 @@ func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsOnSchemeAndBeMatche
 		Path:        "/api/1",
 	}
 
-	response, err, _  := matching.FirstMatchRequestMatcher(request, false, simulation)
+	response, err, _ := matching.FirstMatchRequestMatcher(request, false, simulation, make(map[string]string))
 	Expect(err).To(BeNil())
 
 	Expect(response.Response.Body).To(Equal("request matched"))
@@ -467,7 +467,7 @@ func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsOnHeadersAndBeMatch
 		},
 	}
 
-	response, err, _  := matching.FirstMatchRequestMatcher(request, false, simulation)
+	response, err, _ := matching.FirstMatchRequestMatcher(request, false, simulation, make(map[string]string))
 	Expect(err).To(BeNil())
 
 	Expect(response.Response.Body).To(Equal("request matched"))
@@ -498,7 +498,7 @@ func Test_FirstMatchRequestMatcher_RequestMatcherResponsePair_ConvertToRequestRe
 	Expect(pairView.Response.Body).To(Equal("request matched"))
 }
 
-func Test_ShouldStoreIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
+func Test_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -553,13 +553,13 @@ func Test_ShouldStoreIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing
 		},
 	}
 
-	_, err, _  := matching.FirstMatchRequestMatcher(r, false, simulation)
+	_, err, cachable := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.IsCachable).To(BeTrue())
+	Expect(cachable).To(BeFalse())
 }
 
-func Test_ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
+func Test_ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -614,16 +614,16 @@ func Test_ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T
 		},
 	}
 
-	_, err, _  := matching.FirstMatchRequestMatcher(r, false, simulation)
+	_, err, cachable := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.IsCachable).To(BeFalse())
+	Expect(cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
 		Destination: "miss",
 		Query: map[string][]string{
-			"foo": []string{"bar"},
+			"foo": {"bar"},
 		},
 		Scheme: "http",
 		Body:   "body",
@@ -633,10 +633,10 @@ func Test_ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T
 		},
 	}
 
-	_, err, _  = matching.FirstMatchRequestMatcher(r, false, simulation)
+	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.IsCachable).To(BeFalse())
+	Expect(cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -652,16 +652,16 @@ func Test_ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T
 		},
 	}
 
-	_, err, _  = matching.FirstMatchRequestMatcher(r, false, simulation)
+	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.IsCachable).To(BeFalse())
+	Expect(cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query: map[string][]string{
-			"foo": []string{"bar"},
+			"foo": {"bar"},
 		},
 		Scheme: "http",
 		Body:   "miss",
@@ -671,16 +671,16 @@ func Test_ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T
 		},
 	}
 
-	_, err, _  = matching.FirstMatchRequestMatcher(r, false, simulation)
+	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.IsCachable).To(BeFalse())
+	Expect(cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query: map[string][]string{
-			"foo": []string{"bar"},
+			"foo": {"bar"},
 		},
 		Scheme: "http",
 		Body:   "body",
@@ -690,8 +690,217 @@ func Test_ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T
 		},
 	}
 
-	_, err, _  = matching.FirstMatchRequestMatcher(r, false, simulation)
+	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.IsCachable).To(BeFalse())
+	Expect(cachable).To(BeTrue())
 }
+
+func Test_FirstMatchRequestMatcher_RequestMatchersShouldMatchOnStateAndNotBeCachable(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			RequiresState: map[string]string{"key1": "value1", "key2": "value2"},
+		},
+		Response: testResponse,
+	})
+
+	r := models.RequestDetails{
+		Body: "body",
+	}
+	
+	result, err, cachable := matching.FirstMatchRequestMatcher(
+		r,
+		false,
+		simulation,
+		map[string]string{"key1": "value1", "key2": "value2"})
+
+	Expect(err).To(BeNil())
+	Expect(cachable).To(BeFalse())
+	Expect(result.Response.Body).To(Equal("request matched"))
+}
+
+
+func Test_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeastOnce(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("POST"),
+			},
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("body"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("http"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("foo=bar"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/foo"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("www.test.com"),
+			},
+			RequiresState: map[string]string{
+				"foo": "bar",
+			},
+		},
+		Response: testResponse,
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: testResponse,
+	})
+
+	r := models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
+	}
+
+	_, err, cachable := matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeFalse())
+}
+
+func Test_ShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("POST"),
+			},
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("body"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("http"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("?foo=bar"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/foo"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("www.test.com"),
+			},
+			RequiresState: map[string]string{
+				"foo": "bar",
+			},
+		},
+		Response: testResponse,
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: testResponse,
+	})
+
+	r := models.RequestDetails{
+		Method:      "MISS",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
+	}
+
+	_, err, cachable := matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "miss",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
+	}
+
+	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"miss": []string{""},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
+	}
+
+	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "miss",
+		Path:   "/foo",
+	}
+
+	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "miss",
+	}
+
+	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+}
+
