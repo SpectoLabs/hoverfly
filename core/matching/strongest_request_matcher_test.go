@@ -622,7 +622,7 @@ func Test_ShouldNotReturnClosestMissWhenThereIsAMatch(t *testing.T) {
 	Expect(result).ToNot(BeNil())
 }
 
-func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
+func Test__NotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -677,13 +677,13 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testin
 		},
 	}
 
-	_, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, err, cachable  := matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.IsCachable).To(BeTrue())
+	Expect(cachable).To(BeFalse())
 }
 
-func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
+func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -738,10 +738,10 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 		},
 	}
 
-	_, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, err, cachable  := matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.IsCachable).To(BeFalse())
+	Expect(cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -757,10 +757,10 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 		},
 	}
 
-	_, err, _  = matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, err, cachable  = matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.IsCachable).To(BeFalse())
+	Expect(cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -776,10 +776,10 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 		},
 	}
 
-	_, err, _  = matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, err, cachable  = matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.IsCachable).To(BeFalse())
+	Expect(cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -795,10 +795,10 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 		},
 	}
 
-	_, err, _  = matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, err, cachable  = matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.IsCachable).To(BeFalse())
+	Expect(cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -817,7 +817,7 @@ func Test__ShouldStoreIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.
 	_, err, _  = matching.StrongestMatchRequestMatcher(r, false, simulation)
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.IsCachable).To(BeFalse())
+	Expect(cachable).To(BeTrue())
 }
 
 func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatches(t *testing.T) {
