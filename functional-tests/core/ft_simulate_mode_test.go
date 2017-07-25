@@ -164,6 +164,10 @@ The following request was made, but was not matched by Hoverfly:
     }
 }
 
+Whilst Hoverfly has the following state:
+
+{}
+
 The matcher which came closest was:
 
 {
@@ -222,6 +226,10 @@ The following request was made, but was not matched by Hoverfly:
         ]
     }
 }
+
+Whilst Hoverfly has the following state:
+
+{}
 
 The matcher which came closest was:
 
