@@ -27,7 +27,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EmptyRequestMatchersShouldMatchOnA
 			"sdv": {"ascd"},
 		},
 	}
-	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(result).ToNot(BeNil())
 	Expect(result.Response.Body).To(Equal("request matched"))
@@ -50,7 +50,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersShouldMatchOnBody(t
 	r := models.RequestDetails{
 		Body: "body",
 	}
-	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 	Expect(err).To(BeNil())
 
 	Expect(result.Response.Body).To(Equal("request matched"))
@@ -82,7 +82,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWhenAllHeadersMatch(
 		},
 	}
 
-	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
@@ -112,7 +112,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderNotPresentIn
 		},
 	}
 
-	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(result).To(BeNil())
 }
@@ -142,7 +142,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderValueDiffere
 			"header2": {"different"},
 		},
 	}
-	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(result).To(BeNil())
 }
@@ -173,7 +173,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWithMultiValuedHeade
 			"header2": {"val2"},
 		},
 	}
-	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
@@ -204,7 +204,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWithDifferentMultiValuedH
 		},
 	}
 
-	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(result).To(BeNil())
 }
@@ -255,7 +255,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMatchWithHeaders(t *testin
 			"header2": {"val2"},
 		},
 	}
-	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
@@ -307,7 +307,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMismatchWithHeadersReturns
 		},
 	}
 
-	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(result).To(BeNil())
 }
@@ -346,7 +346,7 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 			"q": []string{"test"},
 		},
 	}
-	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, _, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(result.Response.Body).To(Equal("request matched"))
 
@@ -359,7 +359,7 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 		},
 	}
 
-	result, _, _  = matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, _, _  = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(result).To(BeNil())
 }
@@ -384,7 +384,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsAndBeMat
 		Path:        "/api/1",
 	}
 
-	response, err, _  := matching.StrongestMatchRequestMatcher(request, false, simulation)
+	response, err, _  := matching.StrongestMatchRequestMatcher(request, false, simulation, map[string]string{})
 	Expect(err).To(BeNil())
 
 	Expect(response.Response.Body).To(Equal("request matched"))
@@ -411,7 +411,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnScheme
 		Path:        "/api/1",
 	}
 
-	response, err, _  := matching.StrongestMatchRequestMatcher(request, false, simulation)
+	response, err, _  := matching.StrongestMatchRequestMatcher(request, false, simulation, map[string]string{})
 	Expect(err).To(BeNil())
 
 	Expect(response.Response.Body).To(Equal("request matched"))
@@ -440,7 +440,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnHeader
 		},
 	}
 
-	response, err, _  := matching.StrongestMatchRequestMatcher(request, false, simulation)
+	response, err, _  := matching.StrongestMatchRequestMatcher(request, false, simulation, map[string]string{})
 	Expect(err).To(BeNil())
 
 	Expect(response.Response.Body).To(Equal("request matched"))
@@ -499,7 +499,7 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFound(t *testing.T) {
 		Path: "nomatch",
 	}
 
-	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).ToNot(BeNil())
 	Expect(result).To(BeNil())
@@ -567,7 +567,7 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFoundAgain(t *testing.T) {
 		Method: "GET",
 	}
 
-	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).ToNot(BeNil())
 	Expect(result).To(BeNil())
@@ -616,7 +616,7 @@ func Test_ShouldNotReturnClosestMissWhenThereIsAMatch(t *testing.T) {
 		Method: "GET",
 	}
 
-	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).To(BeNil())
 	Expect(result).ToNot(BeNil())
@@ -677,7 +677,7 @@ func Test__NotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *test
 		},
 	}
 
-	_, err, cachable  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, err, cachable  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).ToNot(BeNil())
 	Expect(cachable).To(BeFalse())
@@ -738,7 +738,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	_, err, cachable  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, err, cachable  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).ToNot(BeNil())
 	Expect(cachable).To(BeTrue())
@@ -757,7 +757,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	_, err, cachable  = matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, err, cachable  = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).ToNot(BeNil())
 	Expect(cachable).To(BeTrue())
@@ -776,7 +776,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	_, err, cachable  = matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, err, cachable  = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).ToNot(BeNil())
 	Expect(cachable).To(BeTrue())
@@ -795,7 +795,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	_, err, cachable  = matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, err, cachable  = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).ToNot(BeNil())
 	Expect(cachable).To(BeTrue())
@@ -814,7 +814,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	_, err, _  = matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, err, _  = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).ToNot(BeNil())
 	Expect(cachable).To(BeTrue())
@@ -875,7 +875,7 @@ func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatches(t *testing.T) {
 		Method: "GET",
 	}
 
-	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).To(BeNil())
 	Expect(result).ToNot(BeNil())
@@ -938,7 +938,7 @@ func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatchesAgain(t *testing.
 		Method: "GET",
 	}
 
-	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).To(BeNil())
 	Expect(result).ToNot(BeNil())
@@ -983,7 +983,7 @@ func Test_ShouldSetClosestMissBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
 		Method: "POST",
 	}
 
-	_, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	_, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).To(BeNil())
 }
@@ -1038,7 +1038,7 @@ func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
 		},
 	}
 
-	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).To(BeNil())
 	Expect(result).ToNot(BeNil())
@@ -1095,7 +1095,64 @@ func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
 		},
 	}
 
-	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+
+	Expect(err).ToNot(BeNil())
+	Expect(result).To(BeNil())
+	Expect(err.ClosestMiss).ToNot(BeNil())
+	Expect(err.ClosestMiss.Response.Body).To(Equal("one"))
+}
+
+func Test_ShouldIncludeStateInCalculationForClosestMiss(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				RegexMatch: StringToPointer(".*"),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+			RequiresState: map[string]string{
+				"one":   "one",
+				"two":   "one",
+				"three": "one",
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "one",
+		},
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("foo"),
+				RegexMatch: StringToPointer(".*"),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+				RegexMatch: StringToPointer(".*"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
+	})
+
+	r := models.RequestDetails{
+		Body:   "foo",
+		Method: "MISS",
+	}
+
+	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{
+		"one":   "one",
+		"two":   "one",
+		"three": "one",
+	})
 
 	Expect(err).ToNot(BeNil())
 	Expect(result).To(BeNil())
@@ -1146,7 +1203,7 @@ func Test_ShouldReturnFieldsMissedInClosestMiss(t *testing.T) {
 		},
 	}
 
-	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).ToNot(BeNil())
 	Expect(result).To(BeNil())
@@ -1197,7 +1254,7 @@ func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
 		},
 	}
 
-	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation)
+	result, err, _  := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
 	Expect(err).ToNot(BeNil())
 	Expect(result).To(BeNil())
@@ -1216,12 +1273,16 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 			Destination: "destination",
 			Scheme:      "scheme",
 			Query: map[string][]string{
-				"query": []string{""},
+				"query": {""},
 			},
 			Body: "body",
 			Headers: map[string][]string{
 				"miss": {"miss"},
 			},
+		},
+		State: map[string]string {
+			"key1" : "value2",
+			"key3" : "value4",
 		},
 		Response: v2.ResponseDetailsViewV3{
 			Body: "hello world",
@@ -1280,6 +1341,13 @@ The following request was made, but was not matched by Hoverfly:
     }
 }
 
+Whilst Hoverfly has the following state:
+
+{
+    "key1": "value2",
+    "key3": "value4"
+}
+
 The matcher which came closest was:
 
 {
@@ -1326,3 +1394,410 @@ Which if hit would have given the following response:
     "templated": false
 }`))
 }
+
+func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("POST"),
+			},
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("body"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("http"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("foo=bar"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/foo"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("www.test.com"),
+			},
+			Headers: map[string][]string{
+				"foo": {"bar"},
+			},
+		},
+		Response: testResponse,
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: testResponse,
+	})
+
+	r := models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"foo": []string{"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
+		Headers: map[string][]string{
+			"miss": {"me"},
+		},
+	}
+
+	_, err, cachable := matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeFalse())
+}
+
+func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("POST"),
+			},
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("body"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("http"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("?foo=bar"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/foo"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("www.test.com"),
+			},
+			Headers: map[string][]string{
+				"foo": {"bar"},
+			},
+		},
+		Response: testResponse,
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: testResponse,
+	})
+
+	r := models.RequestDetails{
+		Method:      "MISS",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"foo": []string{"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
+		Headers: map[string][]string{
+			"miss": {"me"},
+		},
+	}
+
+	_, err, cachable := matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "miss",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
+		Headers: map[string][]string{
+			"miss": {"me"},
+		},
+	}
+
+	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"miss": []string{""},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
+		Headers: map[string][]string{
+			"miss": {"me"},
+		},
+	}
+
+	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "miss",
+		Path:   "/foo",
+		Headers: map[string][]string{
+			"miss": {"me"},
+		},
+	}
+
+	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "miss",
+		Headers: map[string][]string{
+			"miss": {"me"},
+		},
+	}
+
+	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+}
+
+func Test_StrongestMatchRequestMatcher_RequestMatchersShouldMatchOnStateAndNotBeCachable(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			RequiresState: map[string]string{"key1": "value1", "key2": "value2"},
+		},
+		Response: testResponse,
+	})
+
+	r := models.RequestDetails{
+		Body: "body",
+	}
+
+	result, err, cachable := matching.StrongestMatchRequestMatcher(
+		r,
+		false,
+		simulation,
+		map[string]string{"key1": "value1", "key2": "value2"})
+
+	Expect(err).To(BeNil())
+	Expect(cachable).To(BeFalse())
+	Expect(result.Response.Body).To(Equal("request matched"))
+}
+
+
+func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeastOnce(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("POST"),
+			},
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("body"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("http"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("foo=bar"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/foo"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("www.test.com"),
+			},
+			RequiresState: map[string]string{
+				"foo": "bar",
+			},
+		},
+		Response: testResponse,
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: testResponse,
+	})
+
+	r := models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
+	}
+
+	_, err, cachable := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeFalse())
+}
+
+func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("POST"),
+			},
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("body"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("http"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("?foo=bar"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("/foo"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("www.test.com"),
+			},
+			RequiresState: map[string]string{
+				"foo": "bar",
+			},
+		},
+		Response: testResponse,
+	})
+
+	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: StringToPointer("GET"),
+			},
+		},
+		Response: testResponse,
+	})
+
+	r := models.RequestDetails{
+		Method:      "MISS",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
+	}
+
+	_, err, cachable := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "miss",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
+	}
+
+	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"miss": []string{""},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "/foo",
+	}
+
+	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "miss",
+		Path:   "/foo",
+	}
+
+	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+
+	r = models.RequestDetails{
+		Method:      "POST",
+		Destination: "www.test.com",
+		Query: map[string][]string{
+			"foo": {"bar"},
+		},
+		Scheme: "http",
+		Body:   "body",
+		Path:   "miss",
+	}
+
+	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+
+	Expect(err).ToNot(BeNil())
+	Expect(cachable).To(BeTrue())
+}
+

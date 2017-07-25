@@ -498,7 +498,7 @@ func Test_FirstMatchRequestMatcher_RequestMatcherResponsePair_ConvertToRequestRe
 	Expect(pairView.Response.Body).To(Equal("request matched"))
 }
 
-func Test_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
+func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -559,7 +559,7 @@ func Test_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t 
 	Expect(cachable).To(BeFalse())
 }
 
-func Test_ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
+func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -724,7 +724,7 @@ func Test_FirstMatchRequestMatcher_RequestMatchersShouldMatchOnStateAndNotBeCach
 }
 
 
-func Test_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeastOnce(t *testing.T) {
+func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeastOnce(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -782,7 +782,7 @@ func Test_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeastOnce(t *t
 	Expect(cachable).To(BeFalse())
 }
 
-func Test_ShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes(t *testing.T) {
+func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()

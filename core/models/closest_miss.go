@@ -13,6 +13,7 @@ type ClosestMiss struct {
 	Response       v2.ResponseDetailsViewV3
 	RequestMatcher v2.RequestMatcherViewV3
 	MissedFields   []string
+	State          map[string]string
 }
 
 func (this *ClosestMiss) GetMessage() string {
@@ -20,9 +21,12 @@ func (this *ClosestMiss) GetMessage() string {
 	requestBytes, _ := json.MarshalIndent(this.RequestDetails, "", "    ")
 	matcherBytes, _ := json.MarshalIndent(this.RequestMatcher, "", "    ")
 	responseBytes, _ := json.MarshalIndent(this.Response, "", "    ")
+	currentState, _ := json.MarshalIndent(this.State, "", "    ")
 
 	return "\n\nThe following request was made, but was not matched by Hoverfly:\n\n" +
 		string(requestBytes) +
+		"\n\nWhilst Hoverfly has the following state:\n\n" +
+		string(currentState) +
 		"\n\nThe matcher which came closest was:\n\n" +
 		string(matcherBytes) +
 		"\n\nBut it did not match on the following fields:\n\n" +

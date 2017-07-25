@@ -4,7 +4,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation) (requestMatch *models.RequestMatcherResponsePair, err *models.MatchError, cachable bool) {
+func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation, state map[string]string) (requestMatch *models.RequestMatcherResponsePair, err *models.MatchError, cachable bool) {
 
 	var closestMissScore int
 	var strongestMatchScore int
@@ -75,6 +75,16 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 		}
 		matchScore += fieldMatch.MatchScore
 
+		fieldMatch = ScoredStateMatcher(state, requestMatcher.RequiresState)
+		if !fieldMatch.Matched {
+			matched = false
+			missedFields = append(missedFields, "state")
+			if matchedOnAllButHeaders {
+				matchedOnAllButHeadersAtLeastOnce = true
+			}
+		}
+		matchScore += fieldMatch.MatchScore
+
 		if matched == true && matchScore >= strongestMatchScore {
 			requestMatch = &models.RequestMatcherResponsePair{
 				RequestMatcher: requestMatcher,
@@ -90,6 +100,7 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 				RequestMatcher: view.RequestMatcher,
 				Response:       view.Response,
 				MissedFields:   missedFields,
+				State: state,
 			}
 		}
 	}
