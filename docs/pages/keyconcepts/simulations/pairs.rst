@@ -51,7 +51,7 @@ An example Request Matcher Set might look like this:
 In the Hoverfly simulation JSON file, this Request Matcher Set would be represented like this: 
 
 .. literalinclude:: ../../simulations/basic-simulation.json
-   :lines: 4-24
+   :lines: 16-35
    :linenos:
    :language: javascript
 
@@ -67,7 +67,7 @@ that Hoverfly will return one stored response for multiple incoming requests.
 For example, this Request Matcher will match any incoming request to the :code:`docs.hoverfly.io` destination:
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
-   :lines: 4-8
+   :lines: 17-19
    :linenos:
    :language: javascript
 
@@ -78,7 +78,7 @@ For example, this Request Matcher will match any incoming request to the :code:`
 In the example below, the :code:`globMatch` Request Matcher type is used to match any subdomain of :code:`hoverfly.io`:
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
-   :lines: 18-22
+   :lines: 35-37
    :linenos:
    :language: javascript
    
@@ -94,7 +94,7 @@ incoming requests to :code:`docs.hoverfly.io` and :code:`dogs.hoverfly.io` will 
 :code:`cats.hoverfly.io` will not be matched.
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
-   :lines: 32-37
+   :lines: 53-56
    :linenos:
    :language: javascript
    
@@ -119,7 +119,7 @@ Responses
 Each Request Matcher Set has a response associated with is. If the request match is successful, Hoverfly will return the response to the client.
 
 .. literalinclude:: ../../simulations/basic-simulation.json
-   :lines: 25-32
+   :lines: 5-15
    :linenos:
    :language: javascript
 
@@ -134,7 +134,7 @@ Since JSON does not support binary data, binary responses are base64 encoded. Th
 Hoverfly automatically encodes and decodes the data during the export and import phases.
 
 .. literalinclude:: ../../simulations/basic-encoded-simulation.json
-   :lines: 27-28
+   :lines: 7-8
    :linenos:
    :language: javascript
 
