@@ -16,10 +16,24 @@ Middleware works differently depending on the Hoverfly mode.
 - Synthesize mode: middleware **creates responses**
 - Modify mode: middleware affects **requests and responses**
 
-You can write middleware in any language as long as it can be executed by the shell on the Hoverfly host. Middleware could be a binary file, or a script.
+You can write middleware in any language. There are two different types of middleware.
+
+Local Middleware
+----------------
+Hoverfly has the ability to invoke middleware by executing a script or binary file on a host operating system. 
+The only requires are that the provided middleware can be executed and sends the Middleware JSON schema to stdout
+when the Middleware JSON schema is received on stdin.
+
+HTTP Middleware
+---------------
+Hoverfly can also send middleware requests to a HTTP server instead of running a process locally. The benefits of this 
+are that Hoverfly does not initiate the process, giving more control to the user. The only requirements are that Hoverfly can
+POST the Middleware JSON schema to middleware URL provided and the middleware HTTP server respones with a 200 and the 
+Middleware JSON schema is in the response.
+
 
 Middleware Interface
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 When middleware is called by Hoverfly, it expects to receive and return JSON (see :ref:`simulation_schema`). Middleware can be used to modify the values in the JSON but **must not** modify the schema itself.
 
