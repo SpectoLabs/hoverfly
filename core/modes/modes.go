@@ -64,6 +64,7 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 
 	newRequest.Method = pair.Request.Method
 	newRequest.URL.Path = pair.Request.Path
+	newRequest.URL.RawPath = pair.Request.RawPath
 
 	t := &url.URL{Path: pair.Request.QueryString()}
 	newRequest.URL.RawQuery = t.String()

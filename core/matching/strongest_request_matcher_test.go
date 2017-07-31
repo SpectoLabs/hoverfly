@@ -1264,6 +1264,7 @@ The following request was made, but was not matched by Hoverfly:
 
 {
     "Path": "path",
+    "RawPath": "",
     "Method": "method",
     "Destination": "destination",
     "Scheme": "scheme",

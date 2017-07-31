@@ -187,6 +187,9 @@ type RequestDetailsView struct {
 //Gets Path - required for interfaces.RequestMatcher
 func (this RequestDetailsView) GetPath() *string { return this.Path }
 
+//Gets RawPath - required for interfaces.RequestDetailsView
+func (this RequestDetailsView) GetRawPath() *string { return nil }
+
 //Gets Method - required for interfaces.RequestMatcher
 func (this RequestDetailsView) GetMethod() *string { return this.Method }
 
