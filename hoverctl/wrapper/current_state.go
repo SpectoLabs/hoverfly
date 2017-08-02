@@ -36,6 +36,8 @@ func GetCurrentState(target configuration.Target) (map[string]string, error) {
 func PatchCurrentState(target configuration.Target, key, value string) (error) {
 
 	toPatch := make(map[string]string)
+	toPatch[key] = value
+
 	marshal, err := json.Marshal(toPatch)
 
 	if err != nil {
