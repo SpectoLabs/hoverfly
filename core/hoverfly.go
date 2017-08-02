@@ -50,6 +50,8 @@ type Hoverfly struct {
 
 	modeMap map[string]modes.Mode
 
+	state map[string]string
+
 	Simulation    *models.Simulation
 	StoreLogsHook *StoreLogsHook
 	Journal       *journal.Journal
@@ -65,6 +67,7 @@ func NewHoverfly() *Hoverfly {
 		StoreLogsHook:  NewStoreLogsHook(),
 		Journal:        journal.NewJournal(),
 		Cfg:            InitSettings(),
+		state: make(map[string]string),
 	}
 
 	hoverfly.version = "v0.13.0"
@@ -257,6 +260,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	if cacheErr == nil && cachedResponse.MatchingPair == nil {
 		return nil, matching.MissedError(cachedResponse.ClosestMiss)
 	} else if cacheErr == nil {
+		hf.TransitionState(cachedResponse.MatchingPair.Response.TransitionsState)
 		return &cachedResponse.MatchingPair.Response, nil
 	}
 
@@ -275,11 +279,17 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		pair, err, cachable = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, map[string]string{})
 	}
 
-	// Templating
-	if err == nil && pair.Response.Templated == true {
-		responseBody, err := templating.ApplyTemplate(&requestDetails, pair.Response.Body)
-		if err == nil {
-			pair.Response.Body = responseBody
+	if err == nil {
+		// Templating
+		if pair.Response.Templated == true {
+			responseBody, err := templating.ApplyTemplate(&requestDetails, pair.Response.Body)
+			if err == nil {
+				pair.Response.Body = responseBody
+			}
+		}
+		// State transitions
+		if pair.Response.TransitionsState != nil {
+			hf.TransitionState(pair.Response.TransitionsState)
 		}
 	}
 
@@ -301,6 +311,12 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	}
 
 	return &pair.Response, nil
+}
+
+func (hf * Hoverfly) TransitionState(transition map[string]string) {
+	for k, v := range transition {
+		hf.state[k] = v
+	}
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
@@ -378,4 +394,22 @@ func (this Hoverfly) IsMiddlewareSet() bool {
 
 func (this Hoverfly) GetSimulationPairsCount() int {
 	return len(this.Simulation.MatchingPairs)
+}
+
+func (this * Hoverfly) GetState() map[string]string {
+	return this.state
+}
+
+func (this * Hoverfly) SetState(state map[string]string) {
+	this.state = state
+}
+
+func (this * Hoverfly) PatchState(toPatch map[string]string) {
+	for k, v := range toPatch {
+		this.state[k] = v
+	}
+}
+
+func (this * Hoverfly) ClearState() {
+	this.state = make(map[string]string)
 }

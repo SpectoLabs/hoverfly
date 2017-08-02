@@ -167,6 +167,7 @@ type ResponseDetails struct {
 	Body      string
 	Headers   map[string][]string
 	Templated bool
+	TransitionsState map[string]string
 }
 
 func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
