@@ -11,7 +11,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type HoverflyStub struct{}
+type HoverflyStub struct{
+}
 
 func (this HoverflyStub) GetDestination() string {
 	return "test-destination.com"
@@ -46,6 +47,19 @@ func (this HoverflyStub) GetVersion() string {
 
 func (this HoverflyStub) GetUpstreamProxy() string {
 	return "test-proxy.com:8080"
+}
+
+func (this * HoverflyStub) GetState() map[string]string {
+	return nil
+}
+
+func (this * HoverflyStub) SetState(state map[string]string) {
+}
+
+func (this * HoverflyStub) PatchState(state map[string]string) {
+}
+
+func (this * HoverflyStub) ClearState() {
 }
 
 func TestHoverflyHandlerGetReturnsTheCorrectMode(t *testing.T) {

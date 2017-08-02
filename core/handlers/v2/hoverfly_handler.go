@@ -16,6 +16,10 @@ type Hoverfly interface {
 	GetMode() ModeView
 	GetStats() metrics.Stats
 	GetVersion() string
+	GetState() map[string]string
+	SetState(map[string]string)
+	PatchState(map[string]string)
+	ClearState()
 	GetUpstreamProxy() string
 }
 
