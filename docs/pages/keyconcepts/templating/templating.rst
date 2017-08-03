@@ -1,4 +1,4 @@
-.. _matching:
+.. _templating:
 
 
 Templating

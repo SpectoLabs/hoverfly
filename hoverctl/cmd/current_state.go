@@ -110,7 +110,7 @@ separated by a space.
 }
 
 var deleteCurrentStateCommand = &cobra.Command{
-	Use:   "delete",
+	Use:   "delete-all",
 	Short: "Deletes current state",
 	Long: `
 Deletes the current state of Hoverfly. By current state, we
