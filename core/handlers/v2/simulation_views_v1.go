@@ -12,8 +12,8 @@ type SimulationViewV1 struct {
 	MetaView   `json:"meta"`
 }
 
-func (this SimulationViewV1) Upgrade() SimulationViewV3 {
-	var pairs []RequestMatcherResponsePairViewV3
+func (this SimulationViewV1) Upgrade() SimulationViewV4 {
+	var pairs []RequestMatcherResponsePairViewV4
 	for _, pairV1 := range this.RequestResponsePairViewV1 {
 
 		var schemeMatchers, methodMatchers, destinationMatchers, pathMatchers, queryMatchers, bodyMatchers *RequestFieldMatchersView
@@ -99,8 +99,8 @@ func (this SimulationViewV1) Upgrade() SimulationViewV3 {
 			}
 		}
 
-		pair := RequestMatcherResponsePairViewV3{
-			RequestMatcher: RequestMatcherViewV3{
+		pair := RequestMatcherResponsePairViewV4{
+			RequestMatcher: RequestMatcherViewV4{
 				Scheme:      schemeMatchers,
 				Method:      methodMatchers,
 				Destination: destinationMatchers,
@@ -109,7 +109,7 @@ func (this SimulationViewV1) Upgrade() SimulationViewV3 {
 				Body:        bodyMatchers,
 				Headers:     headers,
 			},
-			Response: ResponseDetailsViewV3{
+			Response: ResponseDetailsViewV4{
 				Body:        pairV1.Response.Body,
 				EncodedBody: pairV1.Response.EncodedBody,
 				Headers:     pairV1.Response.Headers,
@@ -120,8 +120,8 @@ func (this SimulationViewV1) Upgrade() SimulationViewV3 {
 		pairs = append(pairs, pair)
 	}
 
-	return SimulationViewV3{
-		DataViewV3{
+	return SimulationViewV4{
+		DataViewV4{
 			RequestResponsePairs: pairs,
 		},
 		MetaView{
@@ -168,6 +168,10 @@ func (this ResponseDetailsView) GetBody() string { return this.Body }
 func (this ResponseDetailsView) GetEncodedBody() bool { return this.EncodedBody }
 
 func (this ResponseDetailsView) GetTemplated() bool { return false }
+
+func (this ResponseDetailsView) GetTransitionsState() map[string]string { return nil }
+
+func (this ResponseDetailsView) GetRemovesState() []string { return nil }
 
 // Gets Headers - required for interfaces.Response
 func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.Headers }

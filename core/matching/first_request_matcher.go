@@ -16,10 +16,12 @@ func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulat
 		requestMatcher := matchingPair.RequestMatcher
 		matchedOnAllButHeaders := true
 		matchedOnAllButState := true
+		isAMatch := true
 
 		if !UnscoredFieldMatcher(requestMatcher.Body, req.Body).Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
+			isAMatch = false
 			continue
 		}
 
@@ -27,6 +29,7 @@ func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulat
 			if !UnscoredFieldMatcher(requestMatcher.Destination, req.Destination).Matched {
 				matchedOnAllButHeaders = false
 				matchedOnAllButState = false
+				isAMatch = false
 				continue
 			}
 		}
@@ -34,32 +37,43 @@ func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulat
 		if !UnscoredFieldMatcher(requestMatcher.Path, req.Path).Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
+			isAMatch = false
 			continue
 		}
 
 		if !UnscoredFieldMatcher(requestMatcher.Query, req.QueryString()).Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
+			isAMatch = false
 			continue
 		}
 
 		if !UnscoredFieldMatcher(requestMatcher.Method, req.Method).Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
+			isAMatch = false
 			continue
 		}
 
 		if !CountlessHeaderMatcher(requestMatcher.Headers, req.Headers).Matched {
-			if matchedOnAllButHeaders {
-				matchedOnAllButHeadersAtLeastOnce = true
-			}
-			continue
+			matchedOnAllButState = false
+			isAMatch = false
 		}
 
 		if !UnscoredStateMatcher(currentState, requestMatcher.RequiresState).Matched {
-			if matchedOnAllButState {
-				matchedOnAllButStateAtLeastOnce = true
-			}
+			matchedOnAllButHeaders = false
+			isAMatch = false
+		}
+
+		if matchedOnAllButHeaders {
+			matchedOnAllButHeadersAtLeastOnce = true
+		}
+
+		if matchedOnAllButState {
+			matchedOnAllButStateAtLeastOnce = true
+		}
+
+		if !isAMatch {
 			continue
 		}
 

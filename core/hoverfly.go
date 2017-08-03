@@ -260,7 +260,12 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	if cacheErr == nil && cachedResponse.MatchingPair == nil {
 		return nil, matching.MissedError(cachedResponse.ClosestMiss)
 	} else if cacheErr == nil {
-		hf.TransitionState(cachedResponse.MatchingPair.Response.TransitionsState)
+		if cachedResponse.MatchingPair.Response.TransitionsState != nil {
+			hf.TransitionState(cachedResponse.MatchingPair.Response.TransitionsState)
+		}
+		if cachedResponse.MatchingPair.Response.RemovesState != nil {
+			hf.RemoveState(cachedResponse.MatchingPair.Response.RemovesState)
+		}
 		return &cachedResponse.MatchingPair.Response, nil
 	}
 
@@ -274,9 +279,9 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 	// Matching
 	if strongestMatch {
-		pair, err, cachable = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, map[string]string{})
+		pair, err, cachable = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
 	} else {
-		pair, err, cachable = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, map[string]string{})
+		pair, err, cachable = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
 	}
 
 	if err == nil {
@@ -290,6 +295,9 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		// State transitions
 		if pair.Response.TransitionsState != nil {
 			hf.TransitionState(pair.Response.TransitionsState)
+		}
+		if pair.Response.RemovesState != nil {
+			hf.RemoveState(pair.Response.RemovesState)
 		}
 	}
 
@@ -316,6 +324,12 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 func (hf * Hoverfly) TransitionState(transition map[string]string) {
 	for k, v := range transition {
 		hf.state[k] = v
+	}
+}
+
+func (hf * Hoverfly) RemoveState(toRemove []string) {
+	for _, key := range toRemove {
+		delete(hf.state, key)
 	}
 }
 

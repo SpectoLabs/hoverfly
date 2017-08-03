@@ -1,7 +1,7 @@
 package matching
 
 
-func UnscoredStateMatcher(currentState map[string]string, requiredState map[string]string) *FieldMatch {
+func UnscoredStateMatcher(currentState, requiredState map[string]string) *FieldMatch {
 	if requiredState == nil || len(requiredState) == 0 {
 		return FieldMatchWithNoScore(true)
 	}
@@ -26,7 +26,7 @@ func UnscoredStateMatcher(currentState map[string]string, requiredState map[stri
 	return FieldMatchWithNoScore(true)
 }
 
-func ScoredStateMatcher(currentState map[string]string, requiredState map[string]string) *FieldMatch {
+func ScoredStateMatcher(currentState, requiredState map[string]string) *FieldMatch {
 
 	score := 0
 	matched := true

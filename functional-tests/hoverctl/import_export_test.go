@@ -72,7 +72,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 		v3HoverflySimulation = `"pairs":[{"response":{"status":201,"body":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]},"templated":false},"request":{"path":{"exactMatch":"/api/bookings"},"method":{"exactMatch":"POST"},"destination":{"exactMatch":"www.my-test.com"},"scheme":{"exactMatch":"http"},"query":{"exactMatch":""},"body":{"exactMatch":"{\"flightId\": \"1\"}"},"headers":{"Content-Type":["application/json"]}}}],"globalActions":{"delays":[]}}`
 
-		v3HoverflyMeta = `"meta":{"schemaVersion":"v3","hoverflyVersion":"v\d+.\d+.\d+","timeExported":`
+		v3HoverflyMeta = `"meta":{"schemaVersion":"v4","hoverflyVersion":"v\d+.\d+.\d+","timeExported":`
 	)
 
 	Describe("with a running hoverfly", func() {

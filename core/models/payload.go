@@ -163,11 +163,12 @@ func (r *RequestDetails) HashWithoutHost() string {
 // to be bytes, however headers should provide all required information for later decoding
 // by the client.
 type ResponseDetails struct {
-	Status    int
-	Body      string
-	Headers   map[string][]string
-	Templated bool
+	Status           int
+	Body             string
+	Headers          map[string][]string
+	Templated        bool
 	TransitionsState map[string]string
+	RemovesState     []string
 }
 
 func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
@@ -178,7 +179,14 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 		body = string(decoded)
 	}
 
-	return ResponseDetails{Status: data.GetStatus(), Body: body, Headers: data.GetHeaders(), Templated: data.GetTemplated()}
+	return ResponseDetails{
+		Status:           data.GetStatus(),
+		Body:             body,
+		Headers:          data.GetHeaders(),
+		Templated:        data.GetTemplated(),
+		TransitionsState: data.GetTransitionsState(),
+		RemovesState:     data.GetRemovesState(),
+	}
 }
 
 // This function will create a JSON appriopriate version of ResponseDetails for the v2 API
@@ -216,7 +224,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsView() v2.ResponseDetailsView 
 	}
 }
 
-func (r *ResponseDetails) ConvertToResponseDetailsViewV3() v2.ResponseDetailsViewV3 {
+func (r *ResponseDetails) ConvertToResponseDetailsViewV4() v2.ResponseDetailsViewV4 {
 	needsEncoding := false
 
 	// Check headers for gzip
@@ -240,11 +248,13 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV3() v2.ResponseDetailsVie
 		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
 	}
 
-	return v2.ResponseDetailsViewV3{
+	return v2.ResponseDetailsViewV4{
 		Status:      r.Status,
 		Body:        body,
 		Headers:     r.Headers,
 		EncodedBody: needsEncoding,
 		Templated:   r.Templated,
+		RemovesState: r.RemovesState,
+		TransitionsState: r.TransitionsState,
 	}
 }

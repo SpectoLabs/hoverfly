@@ -13,26 +13,36 @@ import (
 	"github.com/xeipuuv/gojsonschema"
 )
 
-func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV3, error) {
-	var simulationView SimulationViewV3
+func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV4, error) {
+	var simulationView SimulationViewV4
 
 	jsonMap := make(map[string]interface{})
 
 	if err := json.Unmarshal(responseBody, &jsonMap); err != nil {
-		return SimulationViewV3{}, errors.New("Invalid JSON")
+		return SimulationViewV4{}, errors.New("Invalid JSON")
 	}
 
 	if jsonMap["meta"] == nil {
-		return SimulationViewV3{}, errors.New("Invalid JSON, missing \"meta\" object")
+		return SimulationViewV4{}, errors.New("Invalid JSON, missing \"meta\" object")
 	}
 
 	if jsonMap["meta"].(map[string]interface{})["schemaVersion"] == nil {
-		return SimulationViewV3{}, errors.New("Invalid JSON, missing \"meta.schemaVersion\" string")
+		return SimulationViewV4{}, errors.New("Invalid JSON, missing \"meta.schemaVersion\" string")
 	}
 
 	schemaVersion := jsonMap["meta"].(map[string]interface{})["schemaVersion"].(string)
 
-	if schemaVersion == "v3" {
+	if schemaVersion == "v4" {
+		err := ValidateSimulation(jsonMap, SimulationViewV4Schema)
+		if err != nil {
+			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation:", schemaVersion) + err.Error())
+		}
+
+		err = json.Unmarshal(responseBody, &simulationView)
+		if err != nil {
+			return SimulationViewV4{}, err
+		}
+	} else if schemaVersion == "v3" {
 		err := ValidateSimulation(jsonMap, SimulationViewV3Schema)
 		if err != nil {
 			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation:", schemaVersion) + err.Error())
@@ -40,7 +50,7 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV3, e
 
 		err = json.Unmarshal(responseBody, &simulationView)
 		if err != nil {
-			return SimulationViewV3{}, err
+			return SimulationViewV4{}, err
 		}
 	} else if schemaVersion == "v2" {
 		err := ValidateSimulation(jsonMap, SimulationViewV3Schema)
@@ -52,7 +62,7 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV3, e
 
 		err = json.Unmarshal(responseBody, &simulationViewV2)
 		if err != nil {
-			return SimulationViewV3{}, err
+			return SimulationViewV4{}, err
 		}
 
 		simulationView = simulationViewV2.Upgrade()
@@ -66,7 +76,7 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV3, e
 
 		err = json.Unmarshal(responseBody, &simulationViewV1)
 		if err != nil {
-			return SimulationViewV3{}, err
+			return SimulationViewV4{}, err
 		}
 
 		simulationView = simulationViewV1.Upgrade()
@@ -85,7 +95,7 @@ func ValidateSimulation(json, schema map[string]interface{}) error {
 	result, err := gojsonschema.Validate(schemaLoader, jsonLoader)
 	if err != nil {
 		log.Error("Error when validating simulaton: " + err.Error())
-		return errors.New("Error when validating simulaton")
+		return errors.New("Error when validating simulaton" + err.Error())
 	}
 
 	if !result.Valid() {
@@ -117,7 +127,7 @@ type MetaView struct {
 func NewMetaView(version string) *MetaView {
 	return &MetaView{
 		HoverflyVersion: version,
-		SchemaVersion:   "v3",
+		SchemaVersion:   "v4",
 		TimeExported:    time.Now().Format(time.RFC3339),
 	}
 }

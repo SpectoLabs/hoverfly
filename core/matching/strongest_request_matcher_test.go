@@ -1284,14 +1284,14 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 			"key1" : "value2",
 			"key3" : "value4",
 		},
-		Response: v2.ResponseDetailsViewV3{
+		Response: v2.ResponseDetailsViewV4{
 			Body: "hello world",
 			Headers: map[string][]string{
 				"hello": {"world"},
 			},
 			Status: 200,
 		},
-		RequestMatcher: v2.RequestMatcherViewV3{
+		RequestMatcher: v2.RequestMatcherViewV4{
 			Body: &v2.RequestFieldMatchersView{
 				GlobMatch: StringToPointer("hit"),
 			},
@@ -1800,4 +1800,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 	Expect(err).ToNot(BeNil())
 	Expect(cachable).To(BeTrue())
 }
+
+
+
 

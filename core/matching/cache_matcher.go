@@ -92,7 +92,7 @@ func (this CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 	for key, v := range records {
 		if cachedResponse, err := models.NewCachedResponseFromBytes(v); err == nil {
 
-			var pair *v2.RequestMatcherResponsePairViewV3
+			var pair *v2.RequestMatcherResponsePairViewV4
 			var closestMiss *v2.ClosestMissView
 
 			if cachedResponse.MatchingPair != nil {
@@ -175,7 +175,7 @@ func (this CacheMatcher) PreloadCache(simulation models.Simulation) error {
 		return errors.New("No cache set")
 	}
 	for _, pair := range simulation.MatchingPairs {
-		if requestDetails := pair.RequestMatcher.ToEageralyCachable(); requestDetails != nil {
+		if requestDetails := pair.RequestMatcher.ToEagerlyCachable(); requestDetails != nil {
 			this.SaveRequestMatcherResponsePair(*requestDetails, &pair, nil)
 		}
 	}

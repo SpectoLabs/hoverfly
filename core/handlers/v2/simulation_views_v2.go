@@ -9,8 +9,8 @@ type SimulationViewV2 struct {
 	MetaView   `json:"meta"`
 }
 
-func (this SimulationViewV2) Upgrade() SimulationViewV3 {
-	requestReponsePairsV3 := []RequestMatcherResponsePairViewV3{}
+func (this SimulationViewV2) Upgrade() SimulationViewV4 {
+	requestReponsePairsV3 := []RequestMatcherResponsePairViewV4{}
 
 	for _, requestResponsePairV2 := range this.DataViewV2.RequestResponsePairs {
 		if requestResponsePairV2.RequestMatcher.Query != nil {
@@ -23,8 +23,8 @@ func (this SimulationViewV2) Upgrade() SimulationViewV3 {
 				requestResponsePairV2.RequestMatcher.Query.GlobMatch = &unescapedQuery
 			}
 		}
-		requestResponsePairV3 := RequestMatcherResponsePairViewV3{
-			RequestMatcher: RequestMatcherViewV3{
+		requestResponsePairV3 := RequestMatcherResponsePairViewV4{
+			RequestMatcher: RequestMatcherViewV4{
 				Body:        requestResponsePairV2.RequestMatcher.Body,
 				Destination: requestResponsePairV2.RequestMatcher.Destination,
 				Headers:     requestResponsePairV2.RequestMatcher.Headers,
@@ -33,7 +33,7 @@ func (this SimulationViewV2) Upgrade() SimulationViewV3 {
 				Query:       requestResponsePairV2.RequestMatcher.Query,
 				Scheme:      requestResponsePairV2.RequestMatcher.Scheme,
 			},
-			Response: ResponseDetailsViewV3{
+			Response: ResponseDetailsViewV4{
 				Body:        requestResponsePairV2.Response.Body,
 				EncodedBody: requestResponsePairV2.Response.EncodedBody,
 				Headers:     requestResponsePairV2.Response.Headers,
@@ -45,8 +45,8 @@ func (this SimulationViewV2) Upgrade() SimulationViewV3 {
 		requestReponsePairsV3 = append(requestReponsePairsV3, requestResponsePairV3)
 	}
 
-	return SimulationViewV3{
-		DataViewV3: DataViewV3{
+	return SimulationViewV4{
+		DataViewV4: DataViewV4{
 			RequestResponsePairs: requestReponsePairsV3,
 			GlobalActions:        this.GlobalActions,
 		},

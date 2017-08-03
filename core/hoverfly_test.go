@@ -15,6 +15,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
+	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 )
 
 const pythonMiddlewareBasic = "import sys\nprint(sys.stdin.readlines()[0])"
@@ -405,16 +407,16 @@ func Test_Hoverfly_GetResponse_WillCacheClosestMiss(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
-	unit.PutSimulation(v2.SimulationViewV3{
-		v2.DataViewV3{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
+	unit.PutSimulation(v2.SimulationViewV4{
+		v2.DataViewV4{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV4{
 				{
-					RequestMatcher: v2.RequestMatcherViewV3{
+					RequestMatcher: v2.RequestMatcherViewV4{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("closest"),
 						},
 					},
-					Response: v2.ResponseDetailsViewV3{
+					Response: v2.ResponseDetailsViewV4{
 						Body: "closest",
 					},
 				},
@@ -865,4 +867,231 @@ func Test_Hoverfly_Save_SavesRequestBodyAsXmlPathIfContentTypeIsXml(t *testing.T
 	Expect(unit.Simulation.MatchingPairs).To(HaveLen(1))
 
 	Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Body.XmlMatch).To(Equal(`<xml>`))
+}
+
+func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := `{
+		"data": {
+			"pairs": [{
+					"request": {
+						"path": {
+							"exactMatch": "/basket"
+						}
+					},
+					"response": {
+						"status": 200,
+						"body": "empty"
+					}
+				},
+				{
+					"request": {
+						"path": {
+							"exactMatch": "/basket"
+						},
+						"requiresState": {
+							"eggs": "present"
+						}
+					},
+					"response": {
+						"status": 200,
+						"body": "eggs"
+					}
+				},
+				{
+					"request": {
+						"path": {
+							"exactMatch": "/basket"
+						},
+						"requiresState": {
+							"bacon": "present"
+						}
+					},
+					"response": {
+						"status": 200,
+						"body": "bacon"
+					}
+				},
+				{
+					"request": {
+						"path": {
+							"exactMatch": "/basket"
+						},
+						"requiresState": {
+							"eggs": "present",
+							"bacon": "present"
+						}
+					},
+					"response": {
+						"status": 200,
+						"body": "eggs, bacon"
+					}
+				},
+				{
+					"request": {
+						"path": {
+							"exactMatch": "/add-eggs"
+						}
+					},
+					"response": {
+						"status": 200,
+						"body": "added eggs",
+						"transitionsState": {
+							"eggs": "present"
+						}
+					}
+				},
+				{
+					"request": {
+						"path": {
+							"exactMatch": "/add-bacon"
+						}
+					},
+					"response": {
+						"status": 200,
+						"body": "added bacon",
+						"transitionsState": {
+							"bacon": "present"
+						}
+					}
+				},
+				{
+					"request": {
+						"path": {
+							"exactMatch": "/remove-eggs"
+						}
+					},
+					"response": {
+						"status": 200,
+						"body": "removed eggs",
+						"removesState": ["eggs"]
+					}
+				},
+				{
+					"request": {
+						"path": {
+							"exactMatch": "/remove-bacon"
+						}
+					},
+					"response": {
+						"status": 200,
+						"body": "removed bacon",
+						"removesState": ["bacon"]
+					}
+				}
+			],
+			"globalActions": {
+				"delays": []
+			}
+		},
+		"meta": {
+			"schemaVersion": "v4",
+			"hoverflyVersion": "v0.10.2",
+			"timeExported": "2017-02-23T12:43:48Z"
+		}
+	}`
+
+	v4 := &v2.SimulationViewV4{}
+
+	json.Unmarshal([]byte(simulation), v4)
+
+	hoverfly := NewHoverfly()
+	hoverfly.CacheMatcher = matching.CacheMatcher{
+		RequestCache: cache.NewInMemoryCache(),
+	}
+	hoverfly.PutSimulation(*v4)
+
+	hoverfly.SetMode("simulate")
+
+	response, _ := hoverfly.GetResponse(models.RequestDetails{
+		Path: "/basket",
+	})
+	Expect(string(response.Body)).To(Equal(`empty`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/add-eggs",
+	})
+	Expect(string(response.Body)).To(Equal(`added eggs`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/basket",
+	})
+	Expect(string(response.Body)).To(Equal(`eggs`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/add-bacon",
+	})
+	Expect(string(response.Body)).To(Equal(`added bacon`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/basket",
+	})
+	Expect(string(response.Body)).To(Equal(`eggs, bacon`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/remove-eggs",
+	})
+	Expect(string(response.Body)).To(Equal(`removed eggs`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/basket",
+	})
+	Expect(string(response.Body)).To(Equal(`bacon`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/remove-bacon",
+	})
+	Expect(string(response.Body)).To(Equal(`removed bacon`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/basket",
+	})
+	Expect(string(response.Body)).To(Equal(`empty`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/basket",
+	})
+	Expect(string(response.Body)).To(Equal(`empty`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/add-eggs",
+	})
+	Expect(string(response.Body)).To(Equal(`added eggs`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/basket",
+	})
+	Expect(string(response.Body)).To(Equal(`eggs`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/add-bacon",
+	})
+	Expect(string(response.Body)).To(Equal(`added bacon`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/basket",
+	})
+
+	Expect(string(response.Body)).To(Equal(`eggs, bacon`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/remove-eggs",
+	})
+	Expect(string(response.Body)).To(Equal(`removed eggs`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/basket",
+	})
+	Expect(string(response.Body)).To(Equal(`bacon`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/remove-bacon",
+	})
+	Expect(string(response.Body)).To(Equal(`removed bacon`))
+
+	response, _ = hoverfly.GetResponse(models.RequestDetails{
+		Path: "/basket",
+	})
+	Expect(string(response.Body)).To(Equal(`empty`))
 }

@@ -21,4 +21,6 @@ type Response interface {
 	GetEncodedBody() bool
 	GetTemplated() bool
 	GetHeaders() map[string][]string
+	GetTransitionsState() map[string]string
+	GetRemovesState() []string
 }

@@ -165,12 +165,12 @@ func (this Hoverfly) WriteLogsIfError() {
 	ginkgo.GinkgoWriter.Write(logs) // Only writes when test fails
 }
 
-func (this Hoverfly) ExportSimulation() v2.SimulationViewV3 {
+func (this Hoverfly) ExportSimulation() v2.SimulationViewV4 {
 	reader := this.GetSimulation()
 	simulationBytes, err := ioutil.ReadAll(reader)
 	Expect(err).To(BeNil())
 
-	var simulation v2.SimulationViewV3
+	var simulation v2.SimulationViewV4
 
 	err = json.Unmarshal(simulationBytes, &simulation)
 	Expect(err).To(BeNil())
@@ -215,7 +215,17 @@ func (this Hoverfly) Proxy(r *sling.Sling) *http.Response {
 	Expect(err).To(BeNil())
 
 	proxy, _ := url.Parse(this.proxyUrl)
-	proxyHttpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxy), TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}, CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }}
+	proxyHttpClient := &http.Client{
+		Transport: &http.Transport{
+			Proxy: http.ProxyURL(proxy),
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
 	response, err := proxyHttpClient.Do(req)
 
 	Expect(err).To(BeNil())
