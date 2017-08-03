@@ -50,7 +50,7 @@ type RequestMatcherResponsePair struct {
 	Response       ResponseDetails
 }
 
-func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV3) *RequestMatcherResponsePair {
+func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV4) *RequestMatcherResponsePair {
 	if view.RequestMatcher.Query != nil && view.RequestMatcher.Query.ExactMatch != nil {
 		sortedQuery := util.SortQueryString(*view.RequestMatcher.Query.ExactMatch)
 		view.RequestMatcher.Query.ExactMatch = &sortedQuery
@@ -65,12 +65,13 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 			Query:       NewRequestFieldMatchersFromView(view.RequestMatcher.Query),
 			Body:        NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
 			Headers:     view.RequestMatcher.Headers,
+			RequiresState: view.RequestMatcher.RequiresState,
 		},
 		Response: NewResponseDetailsFromResponse(view.Response),
 	}
 }
 
-func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePairViewV3 {
+func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePairViewV4 {
 
 	var path, method, destination, scheme, query, body *v2.RequestFieldMatchersView
 
@@ -98,8 +99,8 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 		body = this.RequestMatcher.Body.BuildView()
 	}
 
-	return v2.RequestMatcherResponsePairViewV3{
-		RequestMatcher: v2.RequestMatcherViewV3{
+	return v2.RequestMatcherResponsePairViewV4{
+		RequestMatcher: v2.RequestMatcherViewV4{
 			Path:        path,
 			Method:      method,
 			Destination: destination,
@@ -107,8 +108,9 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 			Query:       query,
 			Body:        body,
 			Headers:     this.RequestMatcher.Headers,
+			RequiresState: this.RequestMatcher.RequiresState,
 		},
-		Response: this.Response.ConvertToResponseDetailsViewV3(),
+		Response: this.Response.ConvertToResponseDetailsViewV4(),
 	}
 }
 
@@ -131,7 +133,7 @@ func (this RequestMatcher) IncludesStateMatching() bool {
 	return this.RequiresState != nil && len(this.RequiresState) > 0
 }
 
-func (this RequestMatcher) ToEageralyCachable() *RequestDetails {
+func (this RequestMatcher) ToEagerlyCachable() *RequestDetails {
 	if this.Body == nil || this.Body.ExactMatch == nil ||
 		this.Destination == nil || this.Destination.ExactMatch == nil ||
 		this.Method == nil || this.Method.ExactMatch == nil ||
@@ -142,6 +144,10 @@ func (this RequestMatcher) ToEageralyCachable() *RequestDetails {
 	}
 
 	if this.Headers != nil && len(this.Headers) > 0 {
+		return nil
+	}
+
+	if this.RequiresState != nil && len(this.RequiresState) > 0 {
 		return nil
 	}
 

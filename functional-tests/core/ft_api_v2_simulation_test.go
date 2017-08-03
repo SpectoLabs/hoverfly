@@ -46,7 +46,7 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(err).To(BeNil())
 			schemaVersion, err := metaObject.GetString("schemaVersion")
 			Expect(err).To(BeNil())
-			Expect(schemaVersion).To(Equal("v3"))
+			Expect(schemaVersion).To(Equal("v4"))
 			hoverflyVersion, err := metaObject.GetString("hoverflyVersion")
 			Expect(err).To(BeNil())
 			Expect(hoverflyVersion).ToNot(BeNil())
@@ -163,7 +163,7 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(err).To(BeNil())
 			schemaVersion, err := metaObject.GetString("schemaVersion")
 			Expect(err).To(BeNil())
-			Expect(schemaVersion).To(Equal("v3"))
+			Expect(schemaVersion).To(Equal("v4"))
 			hoverflyVersion, err := metaObject.GetString("hoverflyVersion")
 			Expect(err).To(BeNil())
 			Expect(hoverflyVersion).ToNot(BeNil())
@@ -192,6 +192,9 @@ var _ = Describe("/api/v2/simulation", func() {
 						"request": {
 							"destination": {
 								"exactMatch": "destination-server.com"
+							},
+							"requiresState" : {
+								"burger" : "present"
 							}
 						},
 						"response": {
@@ -199,18 +202,24 @@ var _ = Describe("/api/v2/simulation", func() {
 							"body": "destination matched",
 							"encodedBody": false,
 							"headers": {},
-							"templated" : false
+							"templated" : false,
+							"transitionsState" : {
+								"foo" : "bar"
+							},
+							"removesState" : ["ham"]
 						}
 					}]
 				},
 				"meta": {
-					"schemaVersion": "v3"
+					"schemaVersion": "v4"
 				}
 			}
 			`)
 
 			req.Body(payload)
 			res := functional_tests.DoRequest(req)
+			bytes, _ := ioutil.ReadAll(res.Body)
+			GinkgoWriter.Write(bytes)
 			Expect(res.StatusCode).To(Equal(200))
 
 			getReq := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
@@ -367,12 +376,12 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			simulation := hoverfly.ExportSimulation()
 
-			Expect(simulation.DataViewV3.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV3{
+			Expect(simulation.DataViewV4.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV4{
 				Destination: &v2.RequestFieldMatchersView{
 					ExactMatch: util.StringToPointer("v1-simulation.com"),
 				}}))
 
-			Expect(simulation.DataViewV3.RequestResponsePairs[1].RequestMatcher).To(Equal(v2.RequestMatcherViewV3{
+			Expect(simulation.DataViewV4.RequestResponsePairs[1].RequestMatcher).To(Equal(v2.RequestMatcherViewV4{
 				Scheme: &v2.RequestFieldMatchersView{
 					ExactMatch: util.StringToPointer("http"),
 				},

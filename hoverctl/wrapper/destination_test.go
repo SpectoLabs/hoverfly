@@ -12,11 +12,11 @@ func Test_GetDestination_GetsDestinationFromHoverfly(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV3{
-		v2.DataViewV3{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
-				v2.RequestMatcherResponsePairViewV3{
-					RequestMatcher: v2.RequestMatcherViewV3{
+	hoverfly.PutSimulation(v2.SimulationViewV4{
+		v2.DataViewV4{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV4{
+				v2.RequestMatcherResponsePairViewV4{
+					RequestMatcher: v2.RequestMatcherViewV4{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("GET"),
 						},
@@ -24,7 +24,7 @@ func Test_GetDestination_GetsDestinationFromHoverfly(t *testing.T) {
 							ExactMatch: util.StringToPointer("/api/v2/hoverfly/destination"),
 						},
 					},
-					Response: v2.ResponseDetailsViewV3{
+					Response: v2.ResponseDetailsViewV4{
 						Status: 200,
 						Body:   `{"destination": "test.com"}`,
 					},
@@ -55,11 +55,11 @@ func Test_GetDestination_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV3{
-		v2.DataViewV3{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
-				v2.RequestMatcherResponsePairViewV3{
-					RequestMatcher: v2.RequestMatcherViewV3{
+	hoverfly.PutSimulation(v2.SimulationViewV4{
+		v2.DataViewV4{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV4{
+				v2.RequestMatcherResponsePairViewV4{
+					RequestMatcher: v2.RequestMatcherViewV4{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("GET"),
 						},
@@ -67,7 +67,7 @@ func Test_GetDestination_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 							ExactMatch: util.StringToPointer("/api/v2/hoverfly/destination"),
 						},
 					},
-					Response: v2.ResponseDetailsViewV3{
+					Response: v2.ResponseDetailsViewV4{
 						Status: 400,
 						Body:   "{\"error\":\"test error\"}",
 					},
@@ -88,11 +88,11 @@ func Test_SetDestination_SetsDestinationAndPrintsDestination(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV3{
-		v2.DataViewV3{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
-				v2.RequestMatcherResponsePairViewV3{
-					RequestMatcher: v2.RequestMatcherViewV3{
+	hoverfly.PutSimulation(v2.SimulationViewV4{
+		v2.DataViewV4{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV4{
+				v2.RequestMatcherResponsePairViewV4{
+					RequestMatcher: v2.RequestMatcherViewV4{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("PUT"),
 						},
@@ -100,7 +100,7 @@ func Test_SetDestination_SetsDestinationAndPrintsDestination(t *testing.T) {
 							ExactMatch: util.StringToPointer("/api/v2/hoverfly/destination"),
 						},
 					},
-					Response: v2.ResponseDetailsViewV3{
+					Response: v2.ResponseDetailsViewV4{
 						Status: 200,
 						Body:   `{"destination": "new.com"}`,
 					},
@@ -131,11 +131,11 @@ func Test_SetDestination_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV3{
-		v2.DataViewV3{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV3{
-				v2.RequestMatcherResponsePairViewV3{
-					RequestMatcher: v2.RequestMatcherViewV3{
+	hoverfly.PutSimulation(v2.SimulationViewV4{
+		v2.DataViewV4{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV4{
+				v2.RequestMatcherResponsePairViewV4{
+					RequestMatcher: v2.RequestMatcherViewV4{
 						Method: &v2.RequestFieldMatchersView{
 							ExactMatch: util.StringToPointer("PUT"),
 						},
@@ -143,7 +143,7 @@ func Test_SetDestination_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 							ExactMatch: util.StringToPointer("/api/v2/hoverfly/destination"),
 						},
 					},
-					Response: v2.ResponseDetailsViewV3{
+					Response: v2.ResponseDetailsViewV4{
 						Status: 400,
 						Body:   "{\"error\":\"test error\"}",
 					},

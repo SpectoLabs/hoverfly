@@ -59,7 +59,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV3{
+				Expect(payload.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV4{
 					Path: &v2.RequestFieldMatchersView{
 						ExactMatch: util.StringToPointer("/"),
 					},
@@ -80,7 +80,7 @@ var _ = Describe("When I run Hoverfly", func() {
 					},
 				}))
 
-				Expect(payload.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsViewV3{
+				Expect(payload.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsViewV4{
 					Status:      200,
 					Body:        "Hello world",
 					EncodedBody: false,
@@ -140,7 +140,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(err).To(BeNil())
 
-				payload := v2.SimulationViewV3{}
+				payload := v2.SimulationViewV4{}
 
 				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
@@ -171,7 +171,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(err).To(BeNil())
 
-				payload := v2.SimulationViewV3{}
+				payload := v2.SimulationViewV4{}
 
 				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
@@ -210,7 +210,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(err).To(BeNil())
 
-				payload := v2.SimulationViewV3{}
+				payload := v2.SimulationViewV4{}
 
 				json.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
@@ -255,7 +255,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(err).To(BeNil())
 
-				payload := v2.SimulationViewV3{}
+				payload := v2.SimulationViewV4{}
 
 				json.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
@@ -277,7 +277,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(err).To(BeNil())
 
-				payload := v2.SimulationViewV3{}
+				payload := v2.SimulationViewV4{}
 
 				json.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))

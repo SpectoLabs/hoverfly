@@ -42,13 +42,13 @@ func Test_NewRequestFieldMatchers_BuildView(t *testing.T) {
 func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV3{
-		RequestMatcher: v2.RequestMatcherViewV3{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV4{
+		RequestMatcher: v2.RequestMatcherViewV4{
 			Path: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("/"),
 			},
 		},
-		Response: v2.ResponseDetailsViewV3{
+		Response: v2.ResponseDetailsViewV4{
 			Body: "body",
 		},
 	})
@@ -62,13 +62,13 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 func Test_NewRequestMatcherResponsePairFromView_SortsQuery(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV3{
-		RequestMatcher: v2.RequestMatcherViewV3{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV4{
+		RequestMatcher: v2.RequestMatcherViewV4{
 			Query: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("b=b&a=a"),
 			},
 		},
-		Response: v2.ResponseDetailsViewV3{
+		Response: v2.ResponseDetailsViewV4{
 			Body: "body",
 		},
 	})
@@ -79,13 +79,13 @@ func Test_NewRequestMatcherResponsePairFromView_SortsQuery(t *testing.T) {
 func Test_NewRequestMatcherResponsePairFromView_StoresTemplated(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV3{
-		RequestMatcher: v2.RequestMatcherViewV3{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV4{
+		RequestMatcher: v2.RequestMatcherViewV4{
 			Query: &v2.RequestFieldMatchersView{
 				ExactMatch: util.StringToPointer("b=b&a=a"),
 			},
 		},
-		Response: v2.ResponseDetailsViewV3{
+		Response: v2.ResponseDetailsViewV4{
 			Body:      "body",
 			Templated: true,
 		},
@@ -118,8 +118,8 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDe
 		},
 	}
 
-	Expect(unit.ToEageralyCachable()).ToNot(BeNil())
-	Expect(unit.ToEageralyCachable()).To(Equal(&models.RequestDetails{
+	Expect(unit.ToEagerlyCachable()).ToNot(BeNil())
+	Expect(unit.ToEagerlyCachable()).To(Equal(&models.RequestDetails{
 		Body:        "body",
 		Destination: "destination",
 		Method:      "method",
@@ -134,7 +134,7 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfEmpty(t
 
 	unit := models.RequestMatcher{}
 
-	Expect(unit.ToEageralyCachable()).To(BeNil())
+	Expect(unit.ToEagerlyCachable()).To(BeNil())
 }
 
 func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissingAnExactMatch(t *testing.T) {
@@ -158,5 +158,5 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissing
 		},
 	}
 
-	Expect(unit.ToEageralyCachable()).To(BeNil())
+	Expect(unit.ToEagerlyCachable()).To(BeNil())
 }

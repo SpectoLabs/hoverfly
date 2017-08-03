@@ -14,8 +14,8 @@ import (
 )
 
 type HoverflySimulation interface {
-	GetSimulation() (SimulationViewV3, error)
-	PutSimulation(SimulationViewV3) error
+	GetSimulation() (SimulationViewV4, error)
+	PutSimulation(SimulationViewV4) error
 	DeleteSimulation()
 }
 

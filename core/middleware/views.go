@@ -64,4 +64,8 @@ func (this ResponseDetailsView) GetEncodedBody() bool { return this.EncodedBody 
 
 func (this ResponseDetailsView) GetTemplated() bool { return false }
 
+func (this ResponseDetailsView) GetTransitionsState() map[string]string { return nil }
+
+func (this ResponseDetailsView) GetRemovesState() []string { return nil }
+
 func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.Headers }
