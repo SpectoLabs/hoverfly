@@ -59,7 +59,7 @@ var _ = Describe("When I use hoverctl", func() {
 					output = functional_tests.Run(hoverctlBinary, "current-state", "get-all", "--admin-port="+hoverfly.GetAdminPort())
 					Expect(output).To(ContainSubstring("Current state of Hoverfly:\n\"cheese\"=\"ham\"\n\"foo\"=\"bar\""))
 
-					output = functional_tests.Run(hoverctlBinary, "current-state", "delete", "--admin-port="+hoverfly.GetAdminPort())
+					output = functional_tests.Run(hoverctlBinary, "current-state", "delete-all", "--admin-port="+hoverfly.GetAdminPort())
 					Expect(output).To(ContainSubstring("Current state has been deleted"))
 
 					output = functional_tests.Run(hoverctlBinary, "current-state", "get-all", "--admin-port="+hoverfly.GetAdminPort())
