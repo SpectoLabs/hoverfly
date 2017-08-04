@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 
 	"fmt"
+
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -21,7 +22,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 		hoverfly = functional_tests.NewHoverfly()
 		hoverfly.Start()
 		hoverfly.SetMode("simulate")
-		stateURL = "http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly/current-state"
+		stateURL = "http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/state"
 	})
 
 	AfterEach(func() {
