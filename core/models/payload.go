@@ -249,12 +249,12 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV4() v2.ResponseDetailsVie
 	}
 
 	return v2.ResponseDetailsViewV4{
-		Status:      r.Status,
-		Body:        body,
-		Headers:     r.Headers,
-		EncodedBody: needsEncoding,
-		Templated:   r.Templated,
-		RemovesState: r.RemovesState,
+		Status:           r.Status,
+		Body:             body,
+		Headers:          r.Headers,
+		EncodedBody:      needsEncoding,
+		Templated:        r.Templated,
+		RemovesState:     r.RemovesState,
 		TransitionsState: r.TransitionsState,
 	}
 }

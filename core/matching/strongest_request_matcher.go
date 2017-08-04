@@ -89,12 +89,12 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 		matchScore += fieldMatch.MatchScore
 
 		// This only counts if there was actually a matcher for headers
-		if matchedOnAllButHeaders && requestMatcher.Headers != nil && len(requestMatcher.Headers) > 0  {
+		if matchedOnAllButHeaders && requestMatcher.Headers != nil && len(requestMatcher.Headers) > 0 {
 			matchedOnAllButHeadersAtLeastOnce = true
 		}
 
 		// This only counts of there was actually a matcher for state
-		if matchedOnAllButState && requestMatcher.RequiresState != nil && len(requestMatcher.RequiresState) > 0{
+		if matchedOnAllButState && requestMatcher.RequiresState != nil && len(requestMatcher.RequiresState) > 0 {
 			matchedOnAllButStateAtLeastOnce = true
 		}
 
@@ -127,7 +127,7 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 	return
 }
 
-func isCachable(requestMatch *models.RequestMatcherResponsePair, matchedOnAllButHeadersAtLeastOnce bool, matchedOnAllButStateAtLeastOnce bool) (bool) {
+func isCachable(requestMatch *models.RequestMatcherResponsePair, matchedOnAllButHeadersAtLeastOnce bool, matchedOnAllButStateAtLeastOnce bool) bool {
 	// Do not cache misses if the only thing they missed on was headers/state because a subsequent request which is the same
 	// but with different headers/state will need to go through matching
 	if requestMatch == nil && (matchedOnAllButHeadersAtLeastOnce || matchedOnAllButStateAtLeastOnce) {

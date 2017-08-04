@@ -3,11 +3,11 @@ package hoverfly_test
 import (
 	"io/ioutil"
 
+	"fmt"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"fmt"
 )
 
 var _ = Describe("When I run Hoverfly in simulate mode", func() {

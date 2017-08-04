@@ -6,7 +6,7 @@ import (
 	glob "github.com/ryanuber/go-glob"
 )
 
-func CountlessHeaderMatcher(requestMatcherHeaders, toMatch map[string][]string) * FieldMatch {
+func CountlessHeaderMatcher(requestMatcherHeaders, toMatch map[string][]string) *FieldMatch {
 
 	for matcherHeaderKey, matcherHeaderValues := range requestMatcherHeaders {
 
@@ -37,7 +37,7 @@ func CountlessHeaderMatcher(requestMatcherHeaders, toMatch map[string][]string) 
 	return FieldMatchWithNoScore(true)
 }
 
-func CountingHeaderMatcher(requestMatcherHeaders, toMatch map[string][]string) * FieldMatch {
+func CountingHeaderMatcher(requestMatcherHeaders, toMatch map[string][]string) *FieldMatch {
 
 	matched := true
 	var matchScore int

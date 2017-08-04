@@ -27,7 +27,7 @@ var (
 
 	adminPort = freeport.GetPort()
 
-	proxyPort         = freeport.GetPort()
+	proxyPort = freeport.GetPort()
 )
 
 func TestHoverfly(t *testing.T) {

@@ -1,9 +1,9 @@
 package wrapper
 
 import (
+	"encoding/json"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	ioutil "io/ioutil"
-	"encoding/json"
 )
 
 func GetCurrentState(target configuration.Target) (map[string]string, error) {
@@ -33,7 +33,7 @@ func GetCurrentState(target configuration.Target) (map[string]string, error) {
 	return currentState, nil
 }
 
-func PatchCurrentState(target configuration.Target, key, value string) (error) {
+func PatchCurrentState(target configuration.Target, key, value string) error {
 
 	toPatch := make(map[string]string)
 	toPatch[key] = value
@@ -49,7 +49,7 @@ func PatchCurrentState(target configuration.Target, key, value string) (error) {
 	return err
 }
 
-func DeleteCurrentState(target configuration.Target) (error) {
+func DeleteCurrentState(target configuration.Target) error {
 
 	_, err := doRequest(target, "DELETE", v2ApiCurrentState, "", nil)
 

@@ -372,7 +372,7 @@ var requestV4Definition = map[string]interface{}{
 		"requiresState": map[string]interface{}{
 			"type": "object",
 			"patternProperties": map[string]interface{}{
-				".{1,}": map[string]interface{}{ "type": "string" },
+				".{1,}": map[string]interface{}{"type": "string"},
 			},
 		},
 	},
@@ -402,7 +402,7 @@ var responseDefinitionV4 = map[string]interface{}{
 		"transitionsState": map[string]interface{}{
 			"type": "object",
 			"patternProperties": map[string]interface{}{
-				".{1,}": map[string]interface{}{ "type": "string" },
+				".{1,}": map[string]interface{}{"type": "string"},
 			},
 		},
 	},

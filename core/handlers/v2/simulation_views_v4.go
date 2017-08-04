@@ -28,20 +28,20 @@ type RequestMatcherViewV4 struct {
 	Query         *RequestFieldMatchersView `json:"query,omitempty"`
 	Body          *RequestFieldMatchersView `json:"body,omitempty"`
 	Headers       map[string][]string       `json:"headers,omitempty"`
-	RequiresState map[string]string       `json:"requiresState,omitempty"`
+	RequiresState map[string]string         `json:"requiresState,omitempty"`
 }
 
 //Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestMatcherResponsePairViewV4) GetResponse() interfaces.Response { return this.Response }
 
 type ResponseDetailsViewV4 struct {
-	Status           int                 	`json:"status"`
-	Body             string              	`json:"body"`
-	EncodedBody      bool                	`json:"encodedBody"`
-	Headers          map[string][]string 	`json:"headers,omitempty"`
-	Templated        bool                	`json:"templated"`
-	TransitionsState map[string]string    `json:"transitionsState,omitempty"`
-	RemovesState     []string       		`json:"removesState,omitempty"`
+	Status           int                 `json:"status"`
+	Body             string              `json:"body"`
+	EncodedBody      bool                `json:"encodedBody"`
+	Headers          map[string][]string `json:"headers,omitempty"`
+	Templated        bool                `json:"templated"`
+	TransitionsState map[string]string   `json:"transitionsState,omitempty"`
+	RemovesState     []string            `json:"removesState,omitempty"`
 }
 
 //Gets Status - required for interfaces.Response
@@ -55,7 +55,9 @@ func (this ResponseDetailsViewV4) GetEncodedBody() bool { return this.EncodedBod
 
 func (this ResponseDetailsViewV4) GetTemplated() bool { return this.Templated }
 
-func (this ResponseDetailsViewV4) GetTransitionsState() map[string]string { return this.TransitionsState }
+func (this ResponseDetailsViewV4) GetTransitionsState() map[string]string {
+	return this.TransitionsState
+}
 
 func (this ResponseDetailsViewV4) GetRemovesState() []string { return this.RemovesState }
 

@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
-	"github.com/SpectoLabs/hoverfly/core/modes"
 )
 
 var specficHeaders string

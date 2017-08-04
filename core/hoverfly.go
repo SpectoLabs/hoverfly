@@ -67,7 +67,7 @@ func NewHoverfly() *Hoverfly {
 		StoreLogsHook:  NewStoreLogsHook(),
 		Journal:        journal.NewJournal(),
 		Cfg:            InitSettings(),
-		state: make(map[string]string),
+		state:          make(map[string]string),
 	}
 
 	hoverfly.version = "v0.13.0"
@@ -321,13 +321,13 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	return &pair.Response, nil
 }
 
-func (hf * Hoverfly) TransitionState(transition map[string]string) {
+func (hf *Hoverfly) TransitionState(transition map[string]string) {
 	for k, v := range transition {
 		hf.state[k] = v
 	}
 }
 
-func (hf * Hoverfly) RemoveState(toRemove []string) {
+func (hf *Hoverfly) RemoveState(toRemove []string) {
 	for _, key := range toRemove {
 		delete(hf.state, key)
 	}
@@ -410,20 +410,20 @@ func (this Hoverfly) GetSimulationPairsCount() int {
 	return len(this.Simulation.MatchingPairs)
 }
 
-func (this * Hoverfly) GetState() map[string]string {
+func (this *Hoverfly) GetState() map[string]string {
 	return this.state
 }
 
-func (this * Hoverfly) SetState(state map[string]string) {
+func (this *Hoverfly) SetState(state map[string]string) {
 	this.state = state
 }
 
-func (this * Hoverfly) PatchState(toPatch map[string]string) {
+func (this *Hoverfly) PatchState(toPatch map[string]string) {
 	for k, v := range toPatch {
 		this.state[k] = v
 	}
 }
 
-func (this * Hoverfly) ClearState() {
+func (this *Hoverfly) ClearState() {
 	this.state = make(map[string]string)
 }
