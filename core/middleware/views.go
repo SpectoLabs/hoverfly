@@ -21,7 +21,6 @@ func (this RequestResponsePairView) GetRequest() interfaces.Request { return thi
 type RequestDetailsView struct {
 	RequestType *string             `json:"requestType"`
 	Path        *string             `json:"path"`
-	RawPath     *string             `json:"rawPath"`
 	Method      *string             `json:"method"`
 	Destination *string             `json:"destination"`
 	Scheme      *string             `json:"scheme"`
@@ -31,8 +30,6 @@ type RequestDetailsView struct {
 }
 
 func (this RequestDetailsView) GetPath() *string { return this.Path }
-
-func (this RequestDetailsView) GetRawPath() *string { return this.RawPath }
 
 func (this RequestDetailsView) GetMethod() *string { return this.Method }
 
