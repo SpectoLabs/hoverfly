@@ -58,13 +58,13 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 
 	return &RequestMatcherResponsePair{
 		RequestMatcher: RequestMatcher{
-			Path:        NewRequestFieldMatchersFromView(view.RequestMatcher.Path),
-			Method:      NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
-			Destination: NewRequestFieldMatchersFromView(view.RequestMatcher.Destination),
-			Scheme:      NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
-			Query:       NewRequestFieldMatchersFromView(view.RequestMatcher.Query),
-			Body:        NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
-			Headers:     view.RequestMatcher.Headers,
+			Path:          NewRequestFieldMatchersFromView(view.RequestMatcher.Path),
+			Method:        NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
+			Destination:   NewRequestFieldMatchersFromView(view.RequestMatcher.Destination),
+			Scheme:        NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
+			Query:         NewRequestFieldMatchersFromView(view.RequestMatcher.Query),
+			Body:          NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
+			Headers:       view.RequestMatcher.Headers,
 			RequiresState: view.RequestMatcher.RequiresState,
 		},
 		Response: NewResponseDetailsFromResponse(view.Response),
@@ -101,13 +101,13 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 
 	return v2.RequestMatcherResponsePairViewV4{
 		RequestMatcher: v2.RequestMatcherViewV4{
-			Path:        path,
-			Method:      method,
-			Destination: destination,
-			Scheme:      scheme,
-			Query:       query,
-			Body:        body,
-			Headers:     this.RequestMatcher.Headers,
+			Path:          path,
+			Method:        method,
+			Destination:   destination,
+			Scheme:        scheme,
+			Query:         query,
+			Body:          body,
+			Headers:       this.RequestMatcher.Headers,
 			RequiresState: this.RequestMatcher.RequiresState,
 		},
 		Response: this.Response.ConvertToResponseDetailsViewV4(),
@@ -115,13 +115,13 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 }
 
 type RequestMatcher struct {
-	Path        *RequestFieldMatchers
-	Method      *RequestFieldMatchers
-	Destination *RequestFieldMatchers
-	Scheme      *RequestFieldMatchers
-	Query       *RequestFieldMatchers
-	Body        *RequestFieldMatchers
-	Headers     map[string][]string
+	Path          *RequestFieldMatchers
+	Method        *RequestFieldMatchers
+	Destination   *RequestFieldMatchers
+	Scheme        *RequestFieldMatchers
+	Query         *RequestFieldMatchers
+	Body          *RequestFieldMatchers
+	Headers       map[string][]string
 	RequiresState map[string]string
 }
 
@@ -178,7 +178,7 @@ func NewMatchErrorWithClosestMiss(closestMiss *ClosestMiss, error string, isCach
 
 func NewMatchError(error string, matchedOnAllButHeadersAtLeastOnce bool) *MatchError {
 	return &MatchError{
-		error:      error,
+		error: error,
 	}
 }
 

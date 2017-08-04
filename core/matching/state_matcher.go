@@ -1,6 +1,5 @@
 package matching
 
-
 func UnscoredStateMatcher(currentState, requiredState map[string]string) *FieldMatch {
 	if requiredState == nil || len(requiredState) == 0 {
 		return FieldMatchWithNoScore(true)
@@ -47,7 +46,7 @@ func ScoredStateMatcher(currentState, requiredState map[string]string) *FieldMat
 	}
 
 	return &FieldMatch{
-		Matched: matched,
+		Matched:    matched,
 		MatchScore: score,
 	}
 }

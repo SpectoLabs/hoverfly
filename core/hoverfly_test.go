@@ -8,15 +8,15 @@ import (
 	"os"
 	"testing"
 
+	"encoding/json"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
-	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 )
 
 const pythonMiddlewareBasic = "import sys\nprint(sys.stdin.readlines()[0])"

@@ -711,7 +711,7 @@ func Test_FirstMatchRequestMatcher_RequestMatchersShouldMatchOnStateAndNotBeCach
 	r := models.RequestDetails{
 		Body: "body",
 	}
-	
+
 	result, err, cachable := matching.FirstMatchRequestMatcher(
 		r,
 		false,
@@ -722,7 +722,6 @@ func Test_FirstMatchRequestMatcher_RequestMatchersShouldMatchOnStateAndNotBeCach
 	Expect(cachable).To(BeFalse())
 	Expect(result.Response.Body).To(Equal("request matched"))
 }
-
 
 func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeastOnce(t *testing.T) {
 	RegisterTestingT(t)
@@ -903,4 +902,3 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 	Expect(err).ToNot(BeNil())
 	Expect(cachable).To(BeTrue())
 }
-

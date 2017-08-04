@@ -2,10 +2,11 @@ package matching
 
 import (
 	"testing"
+
 	. "github.com/onsi/gomega"
 )
 
-func Test_UnscoredShouldMatchIfBothCurrentAndRequiredStateAreNil(t *testing.T) {
+func Test_UnscoredStateMatcher_ShouldMatchIfBothCurrentAndRequiredStateAreNil(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := UnscoredStateMatcher(nil, nil)
@@ -14,7 +15,7 @@ func Test_UnscoredShouldMatchIfBothCurrentAndRequiredStateAreNil(t *testing.T) {
 	Expect(match.MatchScore).To(Equal(0))
 }
 
-func Test_UnscoredShouldMatchIfCurrentStateIsNilAndRequiredStateIsEmpty(t *testing.T) {
+func Test_UnscoredStateMatcher_ShouldMatchIfCurrentStateIsNilAndRequiredStateIsEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := UnscoredStateMatcher(nil, make(map[string]string))
@@ -23,7 +24,7 @@ func Test_UnscoredShouldMatchIfCurrentStateIsNilAndRequiredStateIsEmpty(t *testi
 	Expect(match.MatchScore).To(Equal(0))
 }
 
-func Test_UnscoredShouldMatchIfCurrentStateIEmptyAndRequiredStateIsNil(t *testing.T) {
+func Test_UnscoredStateMatcher_ShouldMatchIfCurrentStateIEmptyAndRequiredStateIsNil(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := UnscoredStateMatcher(make(map[string]string), nil)
@@ -32,7 +33,7 @@ func Test_UnscoredShouldMatchIfCurrentStateIEmptyAndRequiredStateIsNil(t *testin
 	Expect(match.MatchScore).To(Equal(0))
 }
 
-func Test_UnscoredShouldNotMatchIfRequiredStateLengthIsGreaterThanActualStateLength(t *testing.T) {
+func Test_UnscoredStateMatcher_ShouldNotMatchIfRequiredStateLengthIsGreaterThanActualStateLength(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := UnscoredStateMatcher(make(map[string]string), map[string]string{"foo": "bar"})
@@ -41,7 +42,7 @@ func Test_UnscoredShouldNotMatchIfRequiredStateLengthIsGreaterThanActualStateLen
 	Expect(match.MatchScore).To(Equal(0))
 }
 
-func Test_UnscoredShouldNotMatchIfLengthsAreTheSameButKeysAreDifferent(t *testing.T) {
+func Test_UnscoredStateMatcher_ShouldNotMatchIfLengthsAreTheSameButKeysAreDifferent(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := UnscoredStateMatcher(
@@ -52,7 +53,7 @@ func Test_UnscoredShouldNotMatchIfLengthsAreTheSameButKeysAreDifferent(t *testin
 	Expect(match.MatchScore).To(Equal(0))
 }
 
-func Test_UnscoredShouldNotMatchIfKeysAreTheSameButValuesAreDifferent(t *testing.T) {
+func Test_UnscoredStateMatcher_ShouldNotMatchIfKeysAreTheSameButValuesAreDifferent(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := UnscoredStateMatcher(
@@ -63,7 +64,7 @@ func Test_UnscoredShouldNotMatchIfKeysAreTheSameButValuesAreDifferent(t *testing
 	Expect(match.MatchScore).To(Equal(0))
 }
 
-func Test_UnscoredShouldMatchIsKeysAndValuesAreTheSame(t *testing.T) {
+func Test_UnscoredStateMatcher_ShouldMatchIsKeysAndValuesAreTheSame(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := UnscoredStateMatcher(
@@ -74,25 +75,7 @@ func Test_UnscoredShouldMatchIsKeysAndValuesAreTheSame(t *testing.T) {
 	Expect(match.MatchScore).To(Equal(0))
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-func Test_ScoredShouldMatchIfBothCurrentAndRequiredStateAreNil(t *testing.T) {
+func Test_ScoredStateMatcher_houldMatchIfBothCurrentAndRequiredStateAreNil(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := ScoredStateMatcher(nil, nil)
@@ -101,7 +84,7 @@ func Test_ScoredShouldMatchIfBothCurrentAndRequiredStateAreNil(t *testing.T) {
 	Expect(match.MatchScore).To(Equal(0))
 }
 
-func Test_ScoredShouldMatchIfCurrentStateIsNilAndRequiredStateIsEmpty(t *testing.T) {
+func Test_ScoredStateMatcher_ShouldMatchIfCurrentStateIsNilAndRequiredStateIsEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := ScoredStateMatcher(nil, make(map[string]string))
@@ -110,7 +93,7 @@ func Test_ScoredShouldMatchIfCurrentStateIsNilAndRequiredStateIsEmpty(t *testing
 	Expect(match.MatchScore).To(Equal(0))
 }
 
-func Test_ScoredShouldMatchIfCurrentStateIEmptyAndRequiredStateIsNil(t *testing.T) {
+func Test_ScoredStateMatcher_ShouldMatchIfCurrentStateIEmptyAndRequiredStateIsNil(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := ScoredStateMatcher(make(map[string]string), nil)
@@ -119,7 +102,7 @@ func Test_ScoredShouldMatchIfCurrentStateIEmptyAndRequiredStateIsNil(t *testing.
 	Expect(match.MatchScore).To(Equal(0))
 }
 
-func Test_ScoredShouldNotMatchIfRequiredStateLengthIsGreaterThanActualStateLength(t *testing.T) {
+func Test_ScoredStateMatcher_ShouldNotMatchIfRequiredStateLengthIsGreaterThanActualStateLength(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := ScoredStateMatcher(make(map[string]string), map[string]string{"foo": "bar"})
@@ -128,7 +111,7 @@ func Test_ScoredShouldNotMatchIfRequiredStateLengthIsGreaterThanActualStateLengt
 	Expect(match.MatchScore).To(Equal(0))
 }
 
-func Test_ScoredShouldNotMatchIfLengthsAreTheSameButKeysAreDifferent(t *testing.T) {
+func Test_ScoredStateMatcher_ShouldNotMatchIfLengthsAreTheSameButKeysAreDifferent(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := ScoredStateMatcher(
@@ -139,7 +122,7 @@ func Test_ScoredShouldNotMatchIfLengthsAreTheSameButKeysAreDifferent(t *testing.
 	Expect(match.MatchScore).To(Equal(0))
 }
 
-func Test_ScoredShouldNotMatchIfKeysAreTheSameButValuesAreDifferent(t *testing.T) {
+func Test_ScoredStateMatcher_ShouldNotMatchIfKeysAreTheSameButValuesAreDifferent(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := ScoredStateMatcher(
@@ -150,7 +133,7 @@ func Test_ScoredShouldNotMatchIfKeysAreTheSameButValuesAreDifferent(t *testing.T
 	Expect(match.MatchScore).To(Equal(1))
 }
 
-func Test_ScoredShouldMatchIsKeysAndValuesAreTheSame(t *testing.T) {
+func Test_ScoredStateMatcher_ShouldMatchIsKeysAndValuesAreTheSame(t *testing.T) {
 	RegisterTestingT(t)
 
 	match := ScoredStateMatcher(

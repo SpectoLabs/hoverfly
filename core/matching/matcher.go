@@ -11,7 +11,7 @@ func (this MatchingError) Error() string {
 	return this.Description
 }
 
-func MissedError(miss * models.ClosestMiss) * MatchingError {
+func MissedError(miss *models.ClosestMiss) *MatchingError {
 	description := "Could not find a match for request, create or record a valid matcher first!"
 
 	if miss != nil {

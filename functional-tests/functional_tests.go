@@ -21,9 +21,9 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/dghubble/sling"
+	"github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phayes/freeport"
-	"github.com/onsi/ginkgo"
 )
 
 var HoverflyUsername = "benjih"
@@ -156,7 +156,7 @@ func (this Hoverfly) ImportSimulation(simulation string) {
 
 // Used for debugging when trying to find out why a functional test is failing
 func (this Hoverfly) WriteLogsIfError() {
-	req := sling.New().Get(this.adminUrl + "/api/v2/logs").Add("Accept", "text/plain")
+	req := sling.New().Get(this.adminUrl+"/api/v2/logs").Add("Accept", "text/plain")
 	res := DoRequest(req)
 	Expect(res.StatusCode).To(Equal(200))
 

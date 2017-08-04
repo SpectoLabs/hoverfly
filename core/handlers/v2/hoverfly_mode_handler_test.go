@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"testing"
 
-	. "github.com/onsi/gomega"
 	"github.com/SpectoLabs/hoverfly/core/util"
+	. "github.com/onsi/gomega"
 )
 
 type HoverflyModeStub struct {
