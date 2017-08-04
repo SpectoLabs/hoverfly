@@ -44,7 +44,6 @@ func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 	query, _ := url.ParseQuery(*data.GetQuery())
 	return RequestDetails{
 		Path:        util.PointerToString(data.GetPath()),
-		RawPath:     util.PointerToString(data.GetRawPath()),
 		Method:      util.PointerToString(data.GetMethod()),
 		Destination: util.PointerToString(data.GetDestination()),
 		Scheme:      util.PointerToString(data.GetScheme()),
@@ -57,7 +56,6 @@ func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 // RequestDetails stores information about request, it's used for creating unique hash and also as a payload structure
 type RequestDetails struct {
 	Path        string
-	RawPath     string
 	Method      string
 	Destination string
 	Scheme      string
@@ -81,9 +79,14 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 		return RequestDetails{}, err
 	}
 
+	// Request not always have RawPath, but we want to use it if exists for perservind encoding
+	var urlPath = req.URL.RawPath
+	if (urlPath == "") {
+		urlPath = req.URL.Path
+	}
+
 	requestDetails := RequestDetails{
-		Path:        req.URL.Path,
-		RawPath:     req.URL.RawPath,
+		Path:        urlPath,
 		Method:      req.Method,
 		Destination: strings.ToLower(req.Host),
 		Scheme:      req.URL.Scheme,

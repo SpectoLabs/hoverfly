@@ -55,7 +55,7 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 
 	newRequest, err := http.NewRequest(
 		pair.Request.Method,
-		fmt.Sprintf("%s://%s", pair.Request.Scheme, pair.Request.Destination),
+		fmt.Sprintf("%s://%s%s", pair.Request.Scheme, pair.Request.Destination, pair.Request.Path),
 		bytes.NewBuffer([]byte(pair.Request.Body)))
 
 	if err != nil {
@@ -63,8 +63,6 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 	}
 
 	newRequest.Method = pair.Request.Method
-	newRequest.URL.Path = pair.Request.Path
-	newRequest.URL.RawPath = pair.Request.RawPath
 
 	t := &url.URL{Path: pair.Request.QueryString()}
 	newRequest.URL.RawQuery = t.String()

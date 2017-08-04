@@ -149,7 +149,6 @@ The following request was made, but was not matched by Hoverfly:
 
 {
     "Path": "/closest-miss",
-    "RawPath": "",
     "Method": "GET",
     "Destination": "destination.com",
     "Scheme": "http",
@@ -209,7 +208,6 @@ The following request was made, but was not matched by Hoverfly:
 
 {
     "Path": "/closest-miss",
-    "RawPath": "",
     "Method": "GET",
     "Destination": "destination.com",
     "Scheme": "http",
