@@ -92,7 +92,6 @@ func GetAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 	var list []handlers.AdminHandler
 
 	list = append(list, &v1.HealthHandler{})
-	list = append(list, &v1.MetadataHandler{Hoverfly: hoverfly})
 	list = append(list, &v2.HoverflyHandler{Hoverfly: hoverfly})
 	list = append(list, &v2.HoverflyDestinationHandler{Hoverfly: hoverfly})
 	list = append(list, &v2.HoverflyModeHandler{Hoverfly: hoverfly})
