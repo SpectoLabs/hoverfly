@@ -4,39 +4,40 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"io/ioutil"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
-	"io/ioutil"
 )
 
-type CurrentStateHandler struct {
+type StateHandler struct {
 	Hoverfly Hoverfly
 }
 
-func (this *CurrentStateHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
-	mux.Get("/api/v2/hoverfly/current-state", negroni.New(
+func (this *StateHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
+	mux.Get("/api/v2/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Get),
 	))
-	mux.Delete("/api/v2/hoverfly/current-state", negroni.New(
+	mux.Delete("/api/v2/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Delete),
 	))
-	mux.Put("/api/v2/hoverfly/current-state", negroni.New(
+	mux.Put("/api/v2/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Put),
 	))
-	mux.Patch("/api/v2/hoverfly/current-state", negroni.New(
+	mux.Patch("/api/v2/state", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Patch),
 	))
-	mux.Options("/api/v2/hoverfly/current-state", negroni.New(
+	mux.Options("/api/v2/state", negroni.New(
 		negroni.HandlerFunc(this.Options),
 	))
 }
 
-func (this *CurrentStateHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (this *StateHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
 	marshal, err := json.Marshal(this.Hoverfly.GetState())
 
@@ -49,12 +50,12 @@ func (this *CurrentStateHandler) Get(w http.ResponseWriter, req *http.Request, n
 	w.WriteHeader(http.StatusOK)
 }
 
-func (this *CurrentStateHandler) Delete(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (this *StateHandler) Delete(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	this.Hoverfly.ClearState()
 	w.WriteHeader(http.StatusOK)
 }
 
-func (this *CurrentStateHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (this *StateHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
 	var toPut map[string]string
 
@@ -75,7 +76,7 @@ func (this *CurrentStateHandler) Put(w http.ResponseWriter, req *http.Request, n
 	w.WriteHeader(http.StatusOK)
 }
 
-func (this *CurrentStateHandler) Patch(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (this *StateHandler) Patch(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
 	var toPatch map[string]string
 
@@ -97,7 +98,7 @@ func (this *CurrentStateHandler) Patch(w http.ResponseWriter, req *http.Request,
 	w.WriteHeader(http.StatusOK)
 }
 
-func (this *CurrentStateHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func (this *StateHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Header().Add("Allow", "OPTIONS, GET, DELETE, PUT, PATCH")
 	handlers.WriteResponse(w, []byte(""))
 }

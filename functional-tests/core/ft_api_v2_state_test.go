@@ -1,11 +1,12 @@
 package hoverfly_test
 
 import (
+	"io/ioutil"
+
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
 )
 
 var _ = Describe("Working with the current state of Hoverfly via the API", func() {
@@ -26,7 +27,7 @@ var _ = Describe("Working with the current state of Hoverfly via the API", func(
 
 		hoverfly.Start()
 
-		stateURL := "http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly/current-state"
+		stateURL := "http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/state"
 
 		// PUT
 		req := sling.New().Put(stateURL).BodyJSON(map[string]string{"foo": "bar", "cheese": "ham"})
