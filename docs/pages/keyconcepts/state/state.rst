@@ -35,7 +35,7 @@ In the above case, the following matches results would occur when making a reque
 +===============================+==========+====================================================+
 | eggs=present,bacon=large      | true     | Required and current state are equal               |
 +-------------------------------+----------+----------------------------------------------------+
-| eggs=present,bacon=large,f=x  | false    | Additional state 'f=x' is not used by this matcher |
+| eggs=present,bacon=large,f=x  | true    | Additional state 'f=x' is not used by this matcher |
 +-------------------------------+----------+----------------------------------------------------+
 | eggs=present                  | false    | Bacon is missing                                   |
 +-------------------------------+----------+----------------------------------------------------+
@@ -59,9 +59,9 @@ A response includes two fields, `transitionsState` and `removesState` which alte
         "transitionsState" : {
             "payment-flow" : "complete",
         },
-        "deletesState" : {
+        "removesState" : [
             "basket"
-        }
+        ]
     }
 
 In the above case, the following changes to Hoverflies internal state would be made on a match:
