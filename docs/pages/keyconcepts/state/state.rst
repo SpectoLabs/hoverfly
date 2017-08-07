@@ -84,8 +84,8 @@ This is why Hoverctl comes with commands that let you orchestrate it's state. So
 
 .. code:: bash
 
-    $ hoverctl current-state --help
-    $ hoverctl current-state get-all
-    $ hoverctl current-state get key
-    $ hoverctl current-state set key value
-    $ hoverctl current-state delete-all
+    $ hoverctl state-store --help
+    $ hoverctl state-store get-all
+    $ hoverctl state-store get key
+    $ hoverctl state-store set key value
+    $ hoverctl state-store delete-all

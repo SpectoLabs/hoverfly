@@ -518,3 +518,54 @@ Filter and search entries stored in the journal.
             }
         }
     }
+
+
+-------------------------------------------------------------------------------------------------------------
+
+
+GET /api/v2/state
+"""""""""""""""""""
+Gets the state from Hoverfly. State is represented as a set of key value pairs.
+
+**Example response body**
+::
+  {
+    "state": {
+      "page_state": "CHECKOUT"
+    }
+  }
+
+
+-------------------------------------------------------------------------------------------------------------
+
+DELETE /api/v2/state
+"""""""""""""""""""
+Deletes all state from Hoverfly.
+
+-------------------------------------------------------------------------------------------------------------
+
+PUT /api/v2/state
+"""""""""""""""""""
+Deletes all state from Hoverfly and then sets the state to match the state in the request body.
+
+**Example request body**
+::
+  {
+    "state": {
+      "page_state": "CHECKOUT"
+    }
+  }
+
+-------------------------------------------------------------------------------------------------------------
+
+PATCH /api/v2/state
+"""""""""""""""""""
+Updates state in Hoverfly. Will update each state key referenced in the request body. 
+
+**Example request body**
+::
+  {
+    "state": {
+      "page_state": "CHECKOUT"
+    }
+  }
