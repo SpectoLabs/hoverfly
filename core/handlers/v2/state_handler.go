@@ -39,7 +39,9 @@ func (this *StateHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler
 
 func (this *StateHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	marshal, err := json.Marshal(this.Hoverfly.GetState())
+	marshal, err := json.Marshal(StateView{
+		State: this.Hoverfly.GetState(),
+	})
 
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
@@ -57,20 +59,22 @@ func (this *StateHandler) Delete(w http.ResponseWriter, req *http.Request, next 
 
 func (this *StateHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var toPut map[string]string
+	toPut := &StateView{}
 
-	body, err := ioutil.ReadAll(req.Body)
+	responseBody, err := ioutil.ReadAll(req.Body)
 
-	err = json.Unmarshal(body, &toPut)
+	err = json.Unmarshal(responseBody, &toPut)
 
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	this.Hoverfly.SetState(toPut)
+	this.Hoverfly.SetState(toPut.State)
 
-	marshal, _ := json.Marshal(this.Hoverfly.GetState())
+	marshal, _ := json.Marshal(StateView{
+		State: this.Hoverfly.GetState(),
+	})
 
 	handlers.WriteResponse(w, marshal)
 	w.WriteHeader(http.StatusOK)
@@ -78,7 +82,7 @@ func (this *StateHandler) Put(w http.ResponseWriter, req *http.Request, next htt
 
 func (this *StateHandler) Patch(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var toPatch map[string]string
+	toPatch := &StateView{}
 
 	body, err := ioutil.ReadAll(req.Body)
 
@@ -89,9 +93,11 @@ func (this *StateHandler) Patch(w http.ResponseWriter, req *http.Request, next h
 		return
 	}
 
-	this.Hoverfly.PatchState(toPatch)
+	this.Hoverfly.PatchState(toPatch.State)
 
-	marshal, _ := json.Marshal(this.Hoverfly.GetState())
+	marshal, _ := json.Marshal(StateView{
+		State: this.Hoverfly.GetState(),
+	})
 
 	handlers.WriteResponse(w, marshal)
 
