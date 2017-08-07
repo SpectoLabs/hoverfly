@@ -81,7 +81,7 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 
 	// Request not always have RawPath, but we want to use it if exists for perservind encoding
 	var urlPath = req.URL.RawPath
-	if (urlPath == "") {
+	if urlPath == "" {
 		urlPath = req.URL.Path
 	}
 

@@ -225,6 +225,16 @@ func Test_NewRequestDetailsFromHttpRequest_SortsQueryString(t *testing.T) {
 	Expect(requestDetails.QueryString()).To(Equal("a=a&a=b"))
 }
 
+func Test_NewRequestDetailsFromHttpRequest_UsesRawPathIfAvailable(t *testing.T) {
+	RegisterTestingT(t)
+	request, _ := http.NewRequest("GET", "http://test.org/hoverfly%20rocks", nil)
+	request.URL.RawPath = "/hoverfly%20rocks"
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
+	Expect(err).To(BeNil())
+
+	Expect(requestDetails.Path).To(Equal("/hoverfly%20rocks"))
+}
+
 func Test_NewRequestDetailsFromHttpRequest_LowerCaseDestination(t *testing.T) {
 	RegisterTestingT(t)
 
