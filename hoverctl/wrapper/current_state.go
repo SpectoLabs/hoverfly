@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	ioutil "io/ioutil"
 
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 )
 
@@ -17,29 +18,30 @@ func GetCurrentState(target configuration.Target) (map[string]string, error) {
 
 	defer res.Body.Close()
 
-	bytes, err := ioutil.ReadAll(res.Body)
+	responseBody, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
 		return nil, err
 	}
 
-	var currentState = make(map[string]string)
+	currentState := &v2.StateView{}
 
-	err = json.Unmarshal(bytes, &currentState)
+	err = json.Unmarshal(responseBody, currentState)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return currentState, nil
+	return currentState.State, nil
 }
 
 func PatchCurrentState(target configuration.Target, key, value string) error {
 
-	toPatch := make(map[string]string)
-	toPatch[key] = value
-
-	marshal, err := json.Marshal(toPatch)
+	marshal, err := json.Marshal(&v2.StateView{
+		State: map[string]string{
+			key: value,
+		},
+	})
 
 	if err != nil {
 		return err

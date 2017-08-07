@@ -34,7 +34,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		GinkgoWriter.Write([]byte(`hello world`))
 
-		assertState(stateURL, `{}`)
+		assertState(stateURL, `{"state":{}}`)
 
 		GinkgoWriter.Write([]byte(`1`))
 
@@ -48,7 +48,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		GinkgoWriter.Write([]byte(`3`))
 
-		assertState(stateURL, `{"eggs":"present"}`)
+		assertState(stateURL, `{"state": {"eggs":"present"}}`)
 
 		GinkgoWriter.Write([]byte(`4`))
 
@@ -69,7 +69,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		GinkgoWriter.Write([]byte(`6`))
 
-		assertState(stateURL, `{"eggs":"present","bacon":"present"}`)
+		assertState(stateURL, `{"state":{"eggs":"present","bacon":"present"}}`)
 
 		GinkgoWriter.Write([]byte(`7`))
 
@@ -83,7 +83,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		GinkgoWriter.Write([]byte(`9`))
 
-		assertState(stateURL, `{"bacon":"present"}`)
+		assertState(stateURL, `{"state": {"bacon":"present"}}`)
 
 		GinkgoWriter.Write([]byte(`10`))
 
@@ -97,7 +97,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		GinkgoWriter.Write([]byte(`12`))
 
-		assertState(stateURL, `{}`)
+		assertState(stateURL, `{"state":{}}`)
 
 		GinkgoWriter.Write([]byte(`13`))
 
@@ -108,7 +108,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		// Repeat it all to make sure caching has not broken anything
 
-		assertState(stateURL, `{}`)
+		assertState(stateURL, `{"state":{}}`)
 
 		GinkgoWriter.Write([]byte(`15`))
 
@@ -122,7 +122,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		GinkgoWriter.Write([]byte(`17`))
 
-		assertState(stateURL, `{"eggs":"present"}`)
+		assertState(stateURL, `{"state":{"eggs":"present"}}`)
 
 		GinkgoWriter.Write([]byte(`18`))
 
@@ -136,7 +136,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		GinkgoWriter.Write([]byte(`20`))
 
-		assertState(stateURL, `{"eggs":"present","bacon":"present"}`)
+		assertState(stateURL, `{"state": {"eggs":"present","bacon":"present"}}`)
 
 		GinkgoWriter.Write([]byte(`21`))
 
@@ -150,7 +150,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		GinkgoWriter.Write([]byte(`23`))
 
-		assertState(stateURL, `{"bacon":"present"}`)
+		assertState(stateURL, `{"state":{"bacon":"present"}}`)
 
 		GinkgoWriter.Write([]byte(`24`))
 
@@ -164,7 +164,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 		GinkgoWriter.Write([]byte(`26`))
 
-		assertState(stateURL, `{}`)
+		assertState(stateURL, `{"state":{}}`)
 
 		GinkgoWriter.Write([]byte(`27`))
 
