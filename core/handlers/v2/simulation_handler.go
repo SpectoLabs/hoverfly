@@ -98,7 +98,7 @@ func (this *SimulationHandler) Options(w http.ResponseWriter, r *http.Request, n
 }
 
 func (this *SimulationHandler) GetSchema(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	bytes, _ := json.Marshal(SimulationViewV3Schema)
+	bytes, _ := json.Marshal(SimulationViewV4Schema)
 
 	handlers.WriteResponse(w, bytes)
 }

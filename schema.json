@@ -78,6 +78,14 @@
         "query": {
           "$ref": "#/definitions/field-matchers"
         },
+        "requiresState": {
+          "patternProperties": {
+            ".{1,}": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
         "scheme": {
           "$ref": "#/definitions/field-matchers"
         }
@@ -110,11 +118,22 @@
         "headers": {
           "$ref": "#/definitions/headers"
         },
+        "removesState": {
+          "type": "array"
+        },
         "status": {
           "type": "integer"
         },
         "templated": {
           "type": "boolean"
+        },
+        "transitionsState": {
+          "patternProperties": {
+            ".{1,}": {
+              "type": "string"
+            }
+          },
+          "type": "object"
         }
       },
       "type": "object"
