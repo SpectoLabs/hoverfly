@@ -1,11 +1,11 @@
-.. _templating:
+.. _state:
 
 
 State
 -----
 
-Hoverfly contains a map of keys and values which it uses to store it's internal state. Some matchers can be made to only
-match when Hoverfly is in a certain state, and other matchers can be set to mutate Hoverflies state.
+Hoverfly contains a map of keys and values which it uses to store it's internal state. Some :ref:`request_matchers` can be made to only
+match when Hoverfly is in a certain state, and other matchers can be set to mutate Hoverfly's state.
 
 
 Requiring State in order to Match
@@ -13,7 +13,8 @@ Requiring State in order to Match
 
 A matcher can include a field `requiresState`, which dictates the state Hoverfly must be in for there to be a match:
 
-.. code::json
+.. code:: json
+
     "request": {
         "path": {
             "exactMatch": "/basket"
@@ -35,7 +36,7 @@ In the above case, the following matches results would occur when making a reque
 +===============================+==========+====================================================+
 | eggs=present,bacon=large      | true     | Required and current state are equal               |
 +-------------------------------+----------+----------------------------------------------------+
-| eggs=present,bacon=large,f=x  | true    | Additional state 'f=x' is not used by this matcher |
+| eggs=present,bacon=large,f=x  | true     | Additional state 'f=x' is not used by this matcher |
 +-------------------------------+----------+----------------------------------------------------+
 | eggs=present                  | false    | Bacon is missing                                   |
 +-------------------------------+----------+----------------------------------------------------+
@@ -47,7 +48,8 @@ Setting State when Performing a Match
 
 A response includes two fields, `transitionsState` and `removesState` which alter Hoverflies internal state during a match:
 
-.. code::json
+.. code:: json
+
     "request": {
         "path": {
             "exactMatch": "/pay"
@@ -79,7 +81,7 @@ In the above case, the following changes to Hoverflies internal state would be m
 Managing state via Hoverctl
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It could potentially be tricky to reason about the current state of Hoverfly, or to get Hoverfly in a state that you desire for testing.
+It could be tricky to reason about the current state of Hoverfly, or to get Hoverfly in a state that you desire for testing.
 This is why Hoverctl comes with commands that let you orchestrate it's state. Some useful commands are:
 
 .. code:: bash

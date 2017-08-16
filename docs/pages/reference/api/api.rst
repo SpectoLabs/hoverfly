@@ -524,7 +524,7 @@ Filter and search entries stored in the journal.
 
 
 GET /api/v2/state
-"""""""""""""""""""
+"""""""""""""""""
 Gets the state from Hoverfly. State is represented as a set of key value pairs.
 
 **Example response body**
@@ -539,7 +539,7 @@ Gets the state from Hoverfly. State is represented as a set of key value pairs.
 -------------------------------------------------------------------------------------------------------------
 
 DELETE /api/v2/state
-"""""""""""""""""""
+""""""""""""""""""""
 Deletes all state from Hoverfly.
 
 -------------------------------------------------------------------------------------------------------------
