@@ -252,3 +252,25 @@ func (this Hoverfly) GetVersion() string {
 func (this Hoverfly) GetUpstreamProxy() string {
 	return this.Cfg.UpstreamProxy
 }
+
+func (this Hoverfly) IsMiddlewareSet() bool {
+	return this.Cfg.Middleware.IsSet()
+}
+
+func (this *Hoverfly) GetState() map[string]string {
+	return this.state
+}
+
+func (this *Hoverfly) SetState(state map[string]string) {
+	this.state = state
+}
+
+func (this *Hoverfly) PatchState(toPatch map[string]string) {
+	for k, v := range toPatch {
+		this.state[k] = v
+	}
+}
+
+func (this *Hoverfly) ClearState() {
+	this.state = make(map[string]string)
+}
