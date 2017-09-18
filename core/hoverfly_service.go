@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
@@ -169,20 +168,12 @@ func (hf Hoverfly) GetRequestCacheCount() (int, error) {
 	return len(hf.Simulation.MatchingPairs), nil
 }
 
-func (this Hoverfly) GetMetadataCache() cache.Cache {
-	return this.MetadataCache
-}
-
 func (this Hoverfly) GetCache() (v2.CacheView, error) {
 	return this.CacheMatcher.GetAllResponses()
 }
 
 func (hf Hoverfly) FlushCache() error {
 	return hf.CacheMatcher.FlushCache()
-}
-
-func (hf *Hoverfly) GetResponseDelays() v1.ResponseDelayPayloadView {
-	return hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()
 }
 
 func (hf *Hoverfly) SetResponseDelays(payloadView v1.ResponseDelayPayloadView) error {

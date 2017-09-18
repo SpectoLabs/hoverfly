@@ -37,7 +37,6 @@ func orPanic(err error) {
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
 type Hoverfly struct {
 	CacheMatcher   matching.CacheMatcher
-	MetadataCache  cache.Cache
 	Authentication backends.Authentication
 	HTTP           *http.Client
 	Cfg            *Configuration
@@ -96,8 +95,6 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 		requestCache = cache.NewInMemoryCache()
 	}
 
-	hoverfly.MetadataCache = cache.NewInMemoryCache()
-
 	hoverfly.CacheMatcher = matching.CacheMatcher{
 		RequestCache: requestCache,
 		Webserver:    cfg.Webserver,
@@ -110,7 +107,7 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
-func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache, authentication backends.Authentication) *Hoverfly {
+func GetNewHoverfly(cfg *Configuration, requestCache cache.Cache, authentication backends.Authentication) *Hoverfly {
 	hoverfly := NewHoverfly()
 
 	if cfg.DisableCache {
@@ -122,7 +119,6 @@ func GetNewHoverfly(cfg *Configuration, requestCache, metadataCache cache.Cache,
 		Webserver:    cfg.Webserver,
 	}
 
-	hoverfly.MetadataCache = metadataCache
 	hoverfly.Authentication = authentication
 	hoverfly.HTTP = GetDefaultHoverflyHTTPClient(cfg.TLSVerification, cfg.UpstreamProxy)
 	hoverfly.Cfg = cfg

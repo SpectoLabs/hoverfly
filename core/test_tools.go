@@ -42,16 +42,14 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 
 	// creating random buckets for everyone!
 	bucket := GetRandomName(10)
-	metaBucket := GetRandomName(10)
 
 	requestCache := cache.NewBoltDBCache(TestDB, bucket)
-	metaCache := cache.NewBoltDBCache(TestDB, metaBucket)
 
 	cfg := InitSettings()
 	// disabling auth for testing
 	cfg.AuthEnabled = false
 
-	dbClient := GetNewHoverfly(cfg, requestCache, metaCache, nil)
+	dbClient := GetNewHoverfly(cfg, requestCache, nil)
 
 	tr := &http.Transport{
 		Proxy: func(req *http.Request) (*url.URL, error) {

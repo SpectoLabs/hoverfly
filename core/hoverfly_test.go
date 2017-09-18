@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"encoding/json"
+
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
@@ -104,12 +105,11 @@ func TestGetNewHoverflyCheckConfig(t *testing.T) {
 
 	db := cache.GetDB("testing2.db")
 	requestCache := cache.NewBoltDBCache(db, []byte("requestBucket"))
-	metaCache := cache.NewBoltDBCache(db, []byte("metaBucket"))
 	tokenCache := cache.NewBoltDBCache(db, []byte("tokenBucket"))
 	userCache := cache.NewBoltDBCache(db, []byte("userBucket"))
 	backend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
 
-	dbClient := GetNewHoverfly(cfg, requestCache, metaCache, backend)
+	dbClient := GetNewHoverfly(cfg, requestCache, backend)
 
 	Expect(dbClient.Cfg).To(Equal(cfg))
 

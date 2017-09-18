@@ -286,7 +286,6 @@ func main() {
 	}
 
 	var requestCache cache.Cache
-	var metadataCache cache.Cache
 	var tokenCache cache.Cache
 	var userCache cache.Cache
 
@@ -298,14 +297,12 @@ func main() {
 		db := cache.GetDB(cfg.DatabasePath)
 		defer db.Close()
 		requestCache = cache.NewBoltDBCache(db, []byte("requestsBucket"))
-		metadataCache = cache.NewBoltDBCache(db, []byte("metadataBucket"))
 		tokenCache = cache.NewBoltDBCache(db, []byte(backends.TokenBucketName))
 		userCache = cache.NewBoltDBCache(db, []byte(backends.UserBucketName))
 
 		log.Info("Using boltdb backend")
 	} else if *database == inmemoryBackend {
 		requestCache = cache.NewInMemoryCache()
-		metadataCache = cache.NewInMemoryCache()
 		tokenCache = cache.NewInMemoryCache()
 		userCache = cache.NewInMemoryCache()
 
@@ -336,7 +333,6 @@ func main() {
 		RequestCache: requestCache,
 		Webserver:    cfg.Webserver,
 	}
-	hoverfly.MetadataCache = metadataCache
 	hoverfly.Authentication = authBackend
 	hoverfly.HTTP = hv.GetDefaultHoverflyHTTPClient(hoverfly.Cfg.TLSVerification, hoverfly.Cfg.UpstreamProxy)
 
@@ -389,14 +385,12 @@ func main() {
 				"error":  err.Error(),
 				"import": ev,
 			}).Fatal("Environment variable for importing was set but failed to import this resource")
-		} else {
-			err = hoverfly.MetadataCache.Set([]byte("import_from_env_variable"), []byte(ev))
 		}
 	}
 
 	// importing stuff
 	if len(importFlags) > 0 {
-		for i, v := range importFlags {
+		for _, v := range importFlags {
 			if v != "" {
 				log.WithFields(log.Fields{
 					"import": v,
@@ -407,8 +401,6 @@ func main() {
 						"error":  err.Error(),
 						"import": v,
 					}).Fatal("Failed to import given resource")
-				} else {
-					err = hoverfly.MetadataCache.Set([]byte(fmt.Sprintf("import_%d", i+1)), []byte(v))
 				}
 			}
 		}
