@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/benjih/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 )
@@ -29,7 +28,7 @@ func (this *HealthHandler) Get(w http.ResponseWriter, req *http.Request, next ht
 
 	bytes, err := util.JSONMarshal(response)
 	if err != nil {
-		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

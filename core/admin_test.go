@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/go-zoo/bone"
 	. "github.com/onsi/gomega"
 )
 
@@ -14,7 +15,8 @@ func TestGetMissingURL(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
-	m := adminApi.getBoneRouter(unit)
+	router := bone.New()
+	m := adminApi.addAdminApiRoutes(router, unit)
 
 	req, err := http.NewRequest("GET", "/api/sdiughvksjv", nil)
 	Expect(err).To(BeNil())
