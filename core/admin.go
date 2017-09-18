@@ -14,7 +14,6 @@ import (
 	"github.com/go-zoo/bone"
 
 	handlers "github.com/SpectoLabs/hoverfly/core/handlers"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
@@ -91,7 +90,7 @@ func (this *AdminApi) getBoneRouter(d *Hoverfly) *bone.Mux {
 func GetAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 	var list []handlers.AdminHandler
 
-	list = append(list, &v1.HealthHandler{})
+	list = append(list, &handlers.HealthHandler{})
 	list = append(list, &v2.HoverflyHandler{Hoverfly: hoverfly})
 	list = append(list, &v2.HoverflyDestinationHandler{Hoverfly: hoverfly})
 	list = append(list, &v2.HoverflyModeHandler{Hoverfly: hoverfly})

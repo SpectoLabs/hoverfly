@@ -5,16 +5,6 @@ import (
 	"encoding/json"
 )
 
-// recordedRequests struct encapsulates payload data
-type StoredMetadata struct {
-	Data map[string]string `json:"data"`
-}
-
-type SetMetadata struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
 type MessageResponse struct {
 	Message string `json:"message"`
 }
