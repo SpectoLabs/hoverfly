@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 
@@ -56,7 +57,7 @@ func (this *SimulationHandler) Get(w http.ResponseWriter, req *http.Request, nex
 		return
 	}
 
-	bytes, _ := json.Marshal(simulationView)
+	bytes, _ := util.JSONMarshal(simulationView)
 
 	handlers.WriteResponse(w, bytes)
 }
