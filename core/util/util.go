@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -10,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/tdewolff/minify"
-	"github.com/tdewolff/minify/json"
+	mjson "github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
 )
 
@@ -112,12 +113,20 @@ func GetContentTypeFromHeaders(headers map[string][]string) string {
 	return ""
 }
 
+func JSONMarshal(t interface{}) ([]byte, error) {
+	buffer := &bytes.Buffer{}
+	encoder := json.NewEncoder(buffer)
+	encoder.SetEscapeHTML(false)
+	err := encoder.Encode(t)
+	return buffer.Bytes(), err
+}
+
 var minifier *minify.M
 
 func GetMinifier() *minify.M {
 	if minifier == nil {
 		minifier = minify.New()
-		minifier.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
+		minifier.AddFuncRegexp(regexp.MustCompile("[/+]json$"), mjson.Minify)
 		minifier.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
 	}
 

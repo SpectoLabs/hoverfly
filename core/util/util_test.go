@@ -140,6 +140,17 @@ func Test_GetContentTypeFromHeaders_ReturnsXmlIfXml(t *testing.T) {
 	})).To(Equal("xml"))
 }
 
+func Test_JSONMarshal_MarshalsIntoJson(t *testing.T) {
+	RegisterTestingT(t)
+
+	jsonBytes, err := JSONMarshal(map[string]string{
+		"test": "testing",
+	})
+
+	Expect(err).To(BeNil())
+	Expect(string(jsonBytes)).To(Equal(`{"test":"testing"}` + "\n"))
+}
+
 func Test_MinifyJson_MinifiesJsonString(t *testing.T) {
 	RegisterTestingT(t)
 
