@@ -94,6 +94,14 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 		Body:        string(reqBody),
 		Headers:     req.Header,
 	}
+
+	for key, value := range requestDetails.Query {
+		if strings.HasPrefix(key, "./") {
+			requestDetails.Query[key[2:]] = value
+			delete(requestDetails.Query, key)
+		}
+	}
+
 	return requestDetails, nil
 }
 

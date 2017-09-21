@@ -3,6 +3,7 @@ package models_test
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -223,6 +224,16 @@ func Test_NewRequestDetailsFromHttpRequest_SortsQueryString(t *testing.T) {
 	Expect(requestDetails.Query["a"]).To(ContainElement("a"))
 	Expect(requestDetails.Query["a"]).To(ContainElement("b"))
 	Expect(requestDetails.QueryString()).To(Equal("a=a&a=b"))
+}
+
+func Test_NewRequestDetailsFromHttpRequest_StripsArbitaryGolangColonEscaping(t *testing.T) {
+	RegisterTestingT(t)
+	request, _ := http.NewRequest("GET", "http://test.org/?a=b:c", nil)
+	fmt.Println(request.URL.RawQuery)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
+	Expect(err).To(BeNil())
+
+	Expect(requestDetails.Query["a"]).To(ContainElement("b:c"))
 }
 
 func Test_NewRequestDetailsFromHttpRequest_UsesRawPathIfAvailable(t *testing.T) {
