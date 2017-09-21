@@ -61,13 +61,14 @@ configuration will be shown.
 			middlewareScript := strings.Split(middleware.Script, "\n")
 			if verbose || len(middlewareScript) < 5 {
 				fmt.Println("Script: " + middleware.Script)
+			} else {
+				fmt.Println("Script: " + middlewareScript[0] + "\n" +
+					middlewareScript[1] + "\n" +
+					middlewareScript[2] + "\n" +
+					middlewareScript[3] + "\n" +
+					middlewareScript[4] + "\n" +
+					"...")
 			}
-			fmt.Println("Script: " + middlewareScript[0] + "\n" +
-				middlewareScript[1] + "\n" +
-				middlewareScript[2] + "\n" +
-				middlewareScript[3] + "\n" +
-				middlewareScript[4] + "\n" +
-				"...")
 		}
 
 		if middleware.Remote != "" {
