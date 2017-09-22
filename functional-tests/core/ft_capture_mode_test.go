@@ -284,6 +284,25 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body.XmlMatch).To(Equal(util.StringToPointer(`<document/>`)))
 			})
+
+			It("Should pass through the original query", func() {
+
+				var capturedRequestQuery string
+
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					capturedRequestQuery = r.URL.RawQuery
+
+					w.Write([]byte("okay"))
+				}))
+
+				defer fakeServer.Close()
+
+				request, _ := sling.New().Post(fakeServer.URL + "?z=1&y=2&x=3").Request()
+				request.URL.RawQuery = "z=1&y=2&x=3"
+				hoverfly.ProxyRequest(request)
+
+				Expect(capturedRequestQuery).To(Equal("z=1&y=2&x=3"))
+			})
 		})
 	})
 })

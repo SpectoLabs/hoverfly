@@ -71,6 +71,30 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 	return newRequest, nil
 }
 
+
+// ReconstructRequest replaces original request with details provided in Constructor Payload.RequestMatcher
+func ReconstructRequestForPassThrough(pair models.RequestResponsePair) (*http.Request, error) {
+	if pair.Request.Destination == "" {
+		return nil, fmt.Errorf("failed to reconstruct request, destination not specified")
+	}
+
+	newRequest, err := http.NewRequest(
+		pair.Request.Method,
+		fmt.Sprintf("%s://%s%s", pair.Request.Scheme, pair.Request.Destination, pair.Request.Path),
+		bytes.NewBuffer([]byte(pair.Request.Body)))
+
+	if err != nil {
+		return nil, err
+	}
+
+	newRequest.Method = pair.Request.Method
+
+	newRequest.URL.RawQuery = pair.Request.GetRawQuery()
+	newRequest.Header = pair.Request.Headers
+
+	return newRequest, nil
+}
+
 // ReconstructResponse changes original response with details provided in Constructor Payload.Response
 func ReconstructResponse(request *http.Request, pair models.RequestResponsePair) *http.Response {
 	response := &http.Response{}

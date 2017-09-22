@@ -52,7 +52,7 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when applying middleware to http request", Capture)
 	}
 
-	modifiedRequest, err := ReconstructRequest(pair)
+	modifiedRequest, err := ReconstructRequestForPassThrough(pair)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when applying middleware to http request", Capture)
 	}
