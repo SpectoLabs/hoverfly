@@ -45,6 +45,17 @@ var _ = Describe("When I use hoverctl", func() {
 				"\n..."))
 		})
 
+		It("I can get the hoverfly's middleware with script less than 5 lines", func() {
+			hoverfly.SetMiddleware("node", "#!/usr/bin/env node\nprocess.stdin.resume();process.stdin.setEncoding('utf8');\nprocess.stdin.on('data', function(data) {var parsed_json = JSON.parse(data);process.stdout.write(JSON.stringify(parsed_json));});")
+			output := functional_tests.Run(hoverctlBinary, "middleware")
+
+			Expect(output).To(ContainSubstring("Hoverfly middleware configuration is currently set to"))
+			Expect(output).To(ContainSubstring("Binary: node"))
+			Expect(output).To(ContainSubstring("Script: #!/usr/bin/env node" +
+				"\nprocess.stdin.resume();process.stdin.setEncoding('utf8');" +
+				"\nprocess.stdin.on('data', function(data) {var parsed_json = JSON.parse(data);process.stdout.write(JSON.stringify(parsed_json));});"))
+		})
+
 		It("I can set the hoverfly's middleware with a binary and a script", func() {
 			output := functional_tests.Run(hoverctlBinary, "middleware", "--binary", "python", "--script", "testdata/add_random_delay.py")
 
