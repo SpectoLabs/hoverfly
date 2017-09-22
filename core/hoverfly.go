@@ -138,7 +138,10 @@ func GetDefaultHoverflyHTTPClient(tlsVerification bool, upstreamProxy string) *h
 		return http.ErrUseLastResponse
 	}, Transport: &http.Transport{
 		Proxy:           proxyURL,
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: !tlsVerification},
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: !tlsVerification,
+			Renegotiation: tls.RenegotiateFreelyAsClient,
+		},
 	}}
 }
 
