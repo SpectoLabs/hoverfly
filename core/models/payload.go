@@ -62,6 +62,7 @@ type RequestDetails struct {
 	Query       map[string][]string
 	Body        string
 	Headers     map[string][]string
+	rawQuery 	string
 }
 
 func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error) {
@@ -93,6 +94,7 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 		Query:       req.URL.Query(),
 		Body:        string(reqBody),
 		Headers:     req.Header,
+		rawQuery:    req.URL.RawQuery,
 	}
 
 	for key, value := range requestDetails.Query {
@@ -271,4 +273,8 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV4() v2.ResponseDetailsVie
 		RemovesState:     r.RemovesState,
 		TransitionsState: r.TransitionsState,
 	}
+}
+
+func (this RequestDetails) GetRawQuery() string {
+	return this.rawQuery
 }

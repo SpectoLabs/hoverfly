@@ -214,6 +214,11 @@ func (this Hoverfly) Proxy(r *sling.Sling) *http.Response {
 	req, err := r.Request()
 	Expect(err).To(BeNil())
 
+	return this.ProxyRequest(req)
+}
+
+func (this Hoverfly) ProxyRequest(req *http.Request) *http.Response {
+
 	proxy, _ := url.Parse(this.proxyUrl)
 	proxyHttpClient := &http.Client{
 		Transport: &http.Transport{
