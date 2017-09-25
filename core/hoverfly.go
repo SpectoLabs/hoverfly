@@ -64,7 +64,7 @@ func NewHoverfly() *Hoverfly {
 		state:          make(map[string]string),
 	}
 
-	hoverfly.version = "v0.14.0"
+	hoverfly.version = "v0.14.1"
 
 	log.AddHook(hoverfly.StoreLogsHook)
 
