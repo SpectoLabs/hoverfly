@@ -15,8 +15,8 @@ type DataViewV4 struct {
 }
 
 type RequestMatcherResponsePairViewV4 struct {
-	Response       ResponseDetailsViewV4 `json:"response"`
 	RequestMatcher RequestMatcherViewV4  `json:"request"`
+	Response       ResponseDetailsViewV4 `json:"response"`
 }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
