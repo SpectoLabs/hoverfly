@@ -87,7 +87,7 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePair(t *testing.T) 
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.MatchingPairs = append(unit.Simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("test.com"),
@@ -124,10 +124,10 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.MatchingPairs = append(unit.Simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("testhost.com"),
+				ExactMatch: util.StringToPointer("testhost-0.com"),
 			},
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("/test"),
@@ -139,10 +139,10 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 		},
 	})
 
-	unit.Simulation.MatchingPairs = append(unit.Simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("testhost.com"),
+				ExactMatch: util.StringToPointer("testhost-1.com"),
 			},
 			Path: &models.RequestFieldMatchers{
 				ExactMatch: util.StringToPointer("/test"),
@@ -159,13 +159,13 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 
 	Expect(simulation.DataViewV4.RequestResponsePairs).To(HaveLen(2))
 
-	Expect(*simulation.DataViewV4.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("testhost.com"))
+	Expect(*simulation.DataViewV4.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("testhost-0.com"))
 	Expect(*simulation.DataViewV4.RequestResponsePairs[0].RequestMatcher.Path.ExactMatch).To(Equal("/test"))
 
 	Expect(simulation.DataViewV4.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(simulation.DataViewV4.RequestResponsePairs[0].Response.Body).To(Equal("test"))
 
-	Expect(*simulation.DataViewV4.RequestResponsePairs[1].RequestMatcher.Destination.ExactMatch).To(Equal("testhost.com"))
+	Expect(*simulation.DataViewV4.RequestResponsePairs[1].RequestMatcher.Destination.ExactMatch).To(Equal("testhost-1.com"))
 	Expect(*simulation.DataViewV4.RequestResponsePairs[1].RequestMatcher.Path.ExactMatch).To(Equal("/test"))
 
 	Expect(simulation.DataViewV4.RequestResponsePairs[1].Response.Status).To(Equal(200))

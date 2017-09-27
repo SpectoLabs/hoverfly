@@ -174,7 +174,7 @@ func (this CacheMatcher) PreloadCache(simulation models.Simulation) error {
 	if this.RequestCache == nil {
 		return errors.New("No cache set")
 	}
-	for _, pair := range simulation.MatchingPairs {
+	for _, pair := range simulation.GetMatchingPairs() {
 		if requestDetails := pair.RequestMatcher.ToEagerlyCachable(); requestDetails != nil {
 			this.SaveRequestMatcherResponsePair(*requestDetails, &pair, nil)
 		}

@@ -18,7 +18,7 @@ func Test_FirstMatchRequestMatcher_EmptyRequestMatchersShouldMatchOnAnyRequest(t
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{},
 		Response:       testResponse,
 	})
@@ -40,7 +40,7 @@ func Test_FirstMatchRequestMatcher_RequestMatchersShouldMatchOnBody(t *testing.T
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("body"),
@@ -68,7 +68,7 @@ func Test_FirstMatchRequestMatcher_ReturnResponseWhenAllHeadersMatch(t *testing.
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
@@ -99,7 +99,7 @@ func Test_FirstMatchRequestMatcher_ReturnNilWhenOneHeaderNotPresentInRequest(t *
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
@@ -129,7 +129,7 @@ func Test_FirstMatchRequestMatcher_ReturnNilWhenOneHeaderValueDifferent(t *testi
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
@@ -159,7 +159,7 @@ func Test_FirstMatchRequestMatcher_ReturnResponseWithMultiValuedHeaderMatch(t *t
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
@@ -190,7 +190,7 @@ func Test_FirstMatchRequestMatcher_ReturnNilWithDifferentMultiValuedHeaders(t *t
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
@@ -226,7 +226,7 @@ func Test_FirstMatchRequestMatcher_EndpointMatchWithHeaders(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 			Destination: &models.RequestFieldMatchers{
@@ -277,7 +277,7 @@ func Test_FirstMatchRequestMatcher_EndpointMismatchWithHeadersReturnsNil(t *test
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 			Destination: &models.RequestFieldMatchers{
@@ -323,7 +323,7 @@ func Test_FirstMatchRequestMatcher_AbleToMatchAnEmptyPathInAReasonableWay(t *tes
 	query := "q=test"
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				ExactMatch: &destination,
@@ -396,7 +396,7 @@ func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsAndBeMatched(t *tes
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
 				GlobMatch: StringToPointer("*.com"),
@@ -422,7 +422,7 @@ func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsOnSchemeAndBeMatche
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Scheme: &models.RequestFieldMatchers{
 				GlobMatch: StringToPointer("H*"),
@@ -449,7 +449,7 @@ func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsOnHeadersAndBeMatch
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: map[string][]string{
 				"unique-header": []string{"*"},
@@ -503,7 +503,7 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLe
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("POST"),
@@ -530,7 +530,7 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLe
 		Response: testResponse,
 	})
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("GET"),
@@ -564,7 +564,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("POST"),
@@ -591,7 +591,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		Response: testResponse,
 	})
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("GET"),
@@ -701,7 +701,7 @@ func Test_FirstMatchRequestMatcher_RequestMatchersShouldMatchOnStateAndNotBeCach
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			RequiresState: map[string]string{"key1": "value1", "key2": "value2"},
 		},
@@ -728,7 +728,7 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeas
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("POST"),
@@ -755,7 +755,7 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeas
 		Response: testResponse,
 	})
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("GET"),
@@ -786,7 +786,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 
 	simulation := models.NewSimulation()
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("POST"),
@@ -813,7 +813,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		Response: testResponse,
 	})
 
-	simulation.MatchingPairs = append(simulation.MatchingPairs, models.RequestMatcherResponsePair{
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
 				ExactMatch: StringToPointer("GET"),
