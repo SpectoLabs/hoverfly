@@ -72,7 +72,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	if err == nil {
 		// Templating
 		if pair.Response.Templated == true {
-			responseBody, err := templating.ApplyTemplate(&requestDetails, pair.Response.Body)
+			responseBody, err := templating.ApplyTemplate(&requestDetails, hf.state, pair.Response.Body)
 			if err == nil {
 				pair.Response.Body = responseBody
 			}
