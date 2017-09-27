@@ -88,7 +88,7 @@ func TestImportFromDisk(t *testing.T) {
 	err := dbClient.Import(hoverfly_io_simulation_path)
 	Expect(err).To(BeNil())
 
-	Expect(dbClient.Simulation.MatchingPairs).To(HaveLen(2))
+	Expect(dbClient.Simulation.GetMatchingPairs()).To(HaveLen(2))
 }
 
 func TestImportFromDiskBlankPath(t *testing.T) {
@@ -128,7 +128,7 @@ func TestImportFromURL(t *testing.T) {
 	err = dbClient.Import(server.URL)
 	Expect(err).To(BeNil())
 
-	Expect(dbClient.Simulation.MatchingPairs).To(HaveLen(2))
+	Expect(dbClient.Simulation.GetMatchingPairs()).To(HaveLen(2))
 }
 
 func TestImportFromURLRedirect(t *testing.T) {
@@ -156,7 +156,7 @@ func TestImportFromURLRedirect(t *testing.T) {
 	err = dbClient.Import(redirectServer.URL)
 	Expect(err).To(BeNil())
 
-	Expect(dbClient.Simulation.MatchingPairs).To(HaveLen(2))
+	Expect(dbClient.Simulation.GetMatchingPairs()).To(HaveLen(2))
 }
 
 func TestImportFromURLHTTPFail(t *testing.T) {
@@ -225,7 +225,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 
 	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV4{originalPair})
 
-	Expect(hv.Simulation.MatchingPairs[0]).To(Equal(models.RequestMatcherResponsePair{
+	Expect(hv.Simulation.GetMatchingPairs()[0]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
 			Status:    200,
 			Body:      "hello_world",
@@ -310,8 +310,8 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 
 	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV4{originalPair1, originalPair2, originalPair3})
 
-	Expect(hv.Simulation.MatchingPairs).To(HaveLen(3))
-	Expect(hv.Simulation.MatchingPairs[0]).To(Equal(models.RequestMatcherResponsePair{
+	Expect(hv.Simulation.GetMatchingPairs()).To(HaveLen(3))
+	Expect(hv.Simulation.GetMatchingPairs()[0]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
 			Status:    200,
 			Body:      "hello_world",
@@ -341,7 +341,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 		},
 	}))
 
-	Expect(hv.Simulation.MatchingPairs[1]).To(Equal(models.RequestMatcherResponsePair{
+	Expect(hv.Simulation.GetMatchingPairs()[1]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
 			Status:    200,
 			Body:      "hello_world",
@@ -371,7 +371,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 		},
 	}))
 
-	Expect(hv.Simulation.MatchingPairs[2]).To(Equal(models.RequestMatcherResponsePair{
+	Expect(hv.Simulation.GetMatchingPairs()[2]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
 			Status:    200,
 			Body:      "hello_world",
@@ -432,13 +432,13 @@ func TestImportImportRequestResponsePairs_CanImportARequesResponsePairView(t *te
 
 	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV4{requestResponsePair})
 
-	Expect(len(hv.Simulation.MatchingPairs)).To(Equal(1))
+	Expect(len(hv.Simulation.GetMatchingPairs())).To(Equal(1))
 
-	Expect(hv.Simulation.MatchingPairs[0].RequestMatcher.Method.ExactMatch).To(Equal(StringToPointer("GET")))
+	Expect(hv.Simulation.GetMatchingPairs()[0].RequestMatcher.Method.ExactMatch).To(Equal(StringToPointer("GET")))
 
-	Expect(hv.Simulation.MatchingPairs[0].Response.Status).To(Equal(200))
-	Expect(hv.Simulation.MatchingPairs[0].Response.Body).To(Equal("hello_world"))
-	Expect(hv.Simulation.MatchingPairs[0].Response.Headers).To(Equal(map[string][]string{"Hoverfly": []string{"testing"}}))
+	Expect(hv.Simulation.GetMatchingPairs()[0].Response.Status).To(Equal(200))
+	Expect(hv.Simulation.GetMatchingPairs()[0].Response.Body).To(Equal("hello_world"))
+	Expect(hv.Simulation.GetMatchingPairs()[0].Response.Headers).To(Equal(map[string][]string{"Hoverfly": []string{"testing"}}))
 }
 
 // Helper function for base64 encoding
@@ -491,7 +491,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 
 	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV4{encodedPair})
 
-	Expect(hv.Simulation.MatchingPairs[0]).ToNot(Equal(models.RequestResponsePair{
+	Expect(hv.Simulation.GetMatchingPairs()[0]).ToNot(Equal(models.RequestResponsePair{
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "hello_world",

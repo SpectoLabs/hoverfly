@@ -80,21 +80,21 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *tes
 		RequestCache: cache.NewInMemoryCache(),
 	}
 
-	err := unit.PreloadCache(models.Simulation{
-		MatchingPairs: []models.RequestMatcherResponsePair{
-			models.RequestMatcherResponsePair{
-				RequestMatcher: models.RequestMatcher{
-					Body: &models.RequestFieldMatchers{
-						RegexMatch: util.StringToPointer("loose"),
-					},
-				},
-				Response: models.ResponseDetails{
-					Status: 200,
-					Body:   "body",
-				},
+	simulation := models.NewSimulation()
+
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				RegexMatch: util.StringToPointer("loose"),
 			},
 		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "body",
+		},
 	})
+
+	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
@@ -106,36 +106,36 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMa
 		RequestCache: cache.NewInMemoryCache(),
 	}
 
-	err := unit.PreloadCache(models.Simulation{
-		MatchingPairs: []models.RequestMatcherResponsePair{
-			models.RequestMatcherResponsePair{
-				RequestMatcher: models.RequestMatcher{
-					Body: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("body"),
-					},
-					Destination: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("destination"),
-					},
-					Method: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("method"),
-					},
-					Path: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("path"),
-					},
-					Query: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("query"),
-					},
-					Scheme: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("scheme"),
-					},
-				},
-				Response: models.ResponseDetails{
-					Status: 200,
-					Body:   "body",
-				},
+	simulation := models.NewSimulation()
+
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("body"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("destination"),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("method"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("path"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("query"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("scheme"),
 			},
 		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "body",
+		},
 	})
+
+	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(1))
@@ -147,21 +147,21 @@ func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWitho
 		RequestCache: cache.NewInMemoryCache(),
 	}
 
-	err := unit.PreloadCache(models.Simulation{
-		MatchingPairs: []models.RequestMatcherResponsePair{
-			models.RequestMatcherResponsePair{
-				RequestMatcher: models.RequestMatcher{
-					Destination: &models.RequestFieldMatchers{
-						RegexMatch: util.StringToPointer("destination"),
-					},
-				},
-				Response: models.ResponseDetails{
-					Status: 200,
-					Body:   "body",
-				},
+	simulation := models.NewSimulation()
+
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: &models.RequestFieldMatchers{
+				RegexMatch: util.StringToPointer("destination"),
 			},
 		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "body",
+		},
 	})
+
+	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
@@ -173,47 +173,48 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 		RequestCache: cache.NewInMemoryCache(),
 	}
 
-	err := unit.PreloadCache(models.Simulation{
-		MatchingPairs: []models.RequestMatcherResponsePair{
-			{
-				RequestMatcher: models.RequestMatcher{
-					Destination: &models.RequestFieldMatchers{
-						RegexMatch: util.StringToPointer("destination"),
-					},
-				},
-				Response: models.ResponseDetails{
-					Status: 200,
-					Body:   "body",
-				},
-			},
-			models.RequestMatcherResponsePair{
-				RequestMatcher: models.RequestMatcher{
-					Body: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("body"),
-					},
-					Destination: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("destination"),
-					},
-					Method: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("method"),
-					},
-					Path: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("path"),
-					},
-					Query: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("query"),
-					},
-					Scheme: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("scheme"),
-					},
-				},
-				Response: models.ResponseDetails{
-					Status: 200,
-					Body:   "body",
-				},
+	simulation := models.NewSimulation()
+
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: &models.RequestFieldMatchers{
+				RegexMatch: util.StringToPointer("destination"),
 			},
 		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "body",
+		},
 	})
+
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("body"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("destination"),
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("method"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("path"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("query"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("scheme"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "body",
+		},
+	})
+
+	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(1))
@@ -225,50 +226,51 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 		RequestCache: cache.NewInMemoryCache(),
 	}
 
-	err := unit.PreloadCache(models.Simulation{
-		MatchingPairs: []models.RequestMatcherResponsePair{
-			{
-				RequestMatcher: models.RequestMatcher{
-					Destination: &models.RequestFieldMatchers{
-						RegexMatch: util.StringToPointer("destination"),
-					},
-				},
-				Response: models.ResponseDetails{
-					Status: 200,
-					Body:   "body",
-				},
-			},
-			{
-				RequestMatcher: models.RequestMatcher{
-					Body: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("body"),
-					},
-					Destination: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("destination"),
-					},
-					Headers: map[string][]string{
-						"Headers": []string{"value"},
-					},
-					Method: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("method"),
-					},
-					Path: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("path"),
-					},
-					Query: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("query"),
-					},
-					Scheme: &models.RequestFieldMatchers{
-						ExactMatch: util.StringToPointer("scheme"),
-					},
-				},
-				Response: models.ResponseDetails{
-					Status: 200,
-					Body:   "body",
-				},
+	simulation := models.NewSimulation()
+
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: &models.RequestFieldMatchers{
+				RegexMatch: util.StringToPointer("destination"),
 			},
 		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "body",
+		},
 	})
+
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("body"),
+			},
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("destination"),
+			},
+			Headers: map[string][]string{
+				"Headers": {"value"},
+			},
+			Method: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("method"),
+			},
+			Path: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("path"),
+			},
+			Query: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("query"),
+			},
+			Scheme: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("scheme"),
+			},
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "body",
+		},
+	})
+
+	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))

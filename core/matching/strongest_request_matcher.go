@@ -13,7 +13,7 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 	matchedOnAllButStateAtLeastOnce := false
 	cachable = true
 
-	for _, matchingPair := range simulation.MatchingPairs {
+	for _, matchingPair := range simulation.GetMatchingPairs() {
 		// TODO: not matching by default on URL and body - need to enable this
 		// TODO: enable matching on scheme
 

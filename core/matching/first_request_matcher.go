@@ -9,7 +9,7 @@ func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulat
 	matchedOnAllButHeadersAtLeastOnce := false
 	matchedOnAllButStateAtLeastOnce := false
 
-	for _, matchingPair := range simulation.MatchingPairs {
+	for _, matchingPair := range simulation.GetMatchingPairs() {
 		// TODO: not matching by default on URL and body - need to enable this
 		// TODO: enable matching on scheme
 
