@@ -11,7 +11,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
-	"github.com/SpectoLabs/hoverfly/core/templating"
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
@@ -68,10 +67,27 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 			pair, err, cachable = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
 		}
 
-		// Cache result
-		if cachable {
-			hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, err)
+	if err == nil {
+		// Templating
+		if pair.Response.Templated == true {
+			responseBody, err := hf.templator.ApplyTemplate(&requestDetails, pair.Response.Body)
+			if err == nil {
+				pair.Response.Body = responseBody
+			}
 		}
+		// State transitions
+		if pair.Response.TransitionsState != nil {
+			hf.TransitionState(pair.Response.TransitionsState)
+		}
+		if pair.Response.RemovesState != nil {
+			hf.RemoveState(pair.Response.RemovesState)
+		}
+	}
+
+	// Caching
+	if cachable {
+		hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, err)
+	}
 
 		// If we miss, just return
 		if err != nil {

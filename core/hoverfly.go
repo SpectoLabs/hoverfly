@@ -17,6 +17,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
+	"github.com/SpectoLabs/hoverfly/core/templating"
 )
 
 // orPanic - wrapper for logging errors
@@ -49,9 +50,11 @@ type Hoverfly struct {
 	Simulation    *models.Simulation
 	StoreLogsHook *StoreLogsHook
 	Journal       *journal.Journal
+	templator     *templating.Templator
 }
 
 func NewHoverfly() *Hoverfly {
+
 	authBackend := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
 
 	hoverfly := &Hoverfly{
@@ -62,6 +65,7 @@ func NewHoverfly() *Hoverfly {
 		Journal:        journal.NewJournal(),
 		Cfg:            InitSettings(),
 		state:          make(map[string]string),
+		templator:      templating.NewTemplator(),
 	}
 
 	hoverfly.version = "v0.14.1"
