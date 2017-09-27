@@ -6,6 +6,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/templating"
 	. "github.com/onsi/gomega"
+	"time"
 )
 
 func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
@@ -97,7 +98,7 @@ func TestApplyTemplateWithQueryParams(t *testing.T) {
 		},
 	}
 
-	template, err := templating.ApplyTemplate(requestDetails,
+	template, err := templating.NewTemplator().ApplyTemplate(requestDetails,
 		make(map[string]string),
 		`
 Scheme: {{ Request.Scheme }}
@@ -141,7 +142,7 @@ func TestTemplatingWithParametersWhichDoNotExistDoNotErrorAndAreEmpty(t *testing
 		Destination: "foo.com",
 	}
 
-	template, err := templating.ApplyTemplate(requestDetails,
+	template, err := templating.NewTemplator().ApplyTemplate(requestDetails,
 		map[string]string{
 			"one": "A",
 			"two": "B",
@@ -183,4 +184,24 @@ Looping through path params:
 
 State One: A
 State Two: B`))
+}
+
+func TestTemplatingWithHelperMethodsForDates(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, `{{iso8601DateTime}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal(time.Now().UTC().Format("2006-01-02T15:04:05Z07:00")))
+
+	template, err = templating.NewTemplator().ApplyTemplate(&models.RequestDetails{
+		Query: map[string][]string{
+			"plusDays": {"2"},
+		},
+	}, `{{iso8601DateTimePlusDays Request.QueryParam.plusDays}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal(time.Now().AddDate(0, 0, 2).UTC().Format("2006-01-02T15:04:05Z07:00")))
 }
