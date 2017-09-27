@@ -9,6 +9,7 @@ import (
 
 type TemplatingData struct {
 	Request Request
+	State      map[string]string
 }
 
 type Request struct {
@@ -17,9 +18,9 @@ type Request struct {
 	Scheme     string
 }
 
-func ApplyTemplate(requestDetails *models.RequestDetails, responseBody string) (string, error) {
+func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]string, responseBody string) (string, error) {
 
-	t := NewTemplatingDataFromRequest(requestDetails)
+	t := NewTemplatingDataFromRequest(requestDetails, state)
 
 	if rendered, err := raymond.Render(responseBody, t); err == nil {
 		responseBody = rendered
@@ -29,13 +30,14 @@ func ApplyTemplate(requestDetails *models.RequestDetails, responseBody string) (
 	}
 }
 
-func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails) *TemplatingData {
+func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails, state map[string]string) *TemplatingData {
 	return &TemplatingData{
 		Request: Request{
 			Path:       strings.Split(requestDetails.Path, "/")[1:],
 			QueryParam: requestDetails.Query,
 			Scheme:     requestDetails.Scheme,
 		},
+		State: state,
 	}
 
 }

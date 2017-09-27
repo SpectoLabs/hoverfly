@@ -11,11 +11,14 @@ import (
 func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
-		Scheme:      "http",
-		Destination: "test.com",
-		Path:        "/foo/bar",
-	})
+	actual := templating.NewTemplatingDataFromRequest(
+		&models.RequestDetails{
+			Scheme:      "http",
+			Destination: "test.com",
+			Path:        "/foo/bar",
+		},
+		make(map[string]string),
+	)
 
 	Expect(actual.Request.Path).To(ConsistOf("foo", "bar"))
 }
@@ -23,10 +26,13 @@ func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 func Test_ShouldCreateTemplatingDataPathsFromRequestWithNoPaths(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
-		Scheme:      "http",
-		Destination: "test.com",
-	})
+	actual := templating.NewTemplatingDataFromRequest(
+		&models.RequestDetails{
+			Scheme:      "http",
+			Destination: "test.com",
+		},
+		make(map[string]string),
+	)
 
 	Expect(actual.Request.Path).To(BeEmpty())
 }
@@ -34,14 +40,17 @@ func Test_ShouldCreateTemplatingDataPathsFromRequestWithNoPaths(t *testing.T) {
 func Test_ShouldCreateTemplatingDataQueryParamsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
-		Scheme:      "http",
-		Destination: "test.com",
-		Query: map[string][]string{
-			"cheese": {"1", "3"},
-			"ham":    {"2"},
+	actual := templating.NewTemplatingDataFromRequest(
+		&models.RequestDetails{
+			Scheme:      "http",
+			Destination: "test.com",
+			Query: map[string][]string{
+				"cheese": {"1", "3"},
+				"ham":    {"2"},
+			},
 		},
-	})
+		make(map[string]string),
+	)
 
 	Expect(actual.Request.QueryParam).To(HaveKeyWithValue("cheese", []string{"1", "3"}))
 	Expect(actual.Request.QueryParam).To(HaveKeyWithValue("ham", []string{"2"}))
@@ -54,7 +63,9 @@ func Test_ShouldCreateTemplatingDataQueryParamsFromRequestWithNoQueryParams(t *t
 	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
 		Scheme:      "http",
 		Destination: "test.com",
-	})
+	},
+		make(map[string]string),
+	)
 
 	Expect(actual.Request.QueryParam).To(BeEmpty())
 }
@@ -65,7 +76,9 @@ func Test_ShouldCreateTemplatingDataHttpScheme(t *testing.T) {
 	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
 		Scheme:      "http",
 		Destination: "test.com",
-	})
+	},
+		make(map[string]string),
+	)
 
 	Expect(actual.Request.Scheme).To(Equal("http"))
 }
@@ -84,7 +97,9 @@ func TestApplyTemplateWithQueryParams(t *testing.T) {
 		},
 	}
 
-	template, err := templating.ApplyTemplate(requestDetails, `
+	template, err := templating.ApplyTemplate(requestDetails,
+		make(map[string]string),
+		`
 Scheme: {{ Request.Scheme }}
 
 Query param value: {{ Request.QueryParam.singular }}
@@ -126,7 +141,12 @@ func TestTemplatingWithParametersWhichDoNotExistDoNotErrorAndAreEmpty(t *testing
 		Destination: "foo.com",
 	}
 
-	template, err := templating.ApplyTemplate(requestDetails, `
+	template, err := templating.ApplyTemplate(requestDetails,
+		map[string]string{
+			"one": "A",
+			"two": "B",
+		},
+		`
 Scheme:{{ Request.Scheme }}
 
 Query param value:{{ Request.QueryParam.singular }}
@@ -139,7 +159,10 @@ Looping through query params:{{#each Request.QueryParam.multiple}}{{ this }}{{/e
 
 Path param value:{{ Request.Path.[0] }}
 All path param values:{{ Request.Path }}
-Looping through path params:{{#each Request.Path}}{{ this }}{{/each}}`)
+Looping through path params:{{#each Request.Path}}{{ this }}{{/each}}
+
+State One: {{ State.one }}
+State Two: {{ State.two }}`)
 
 	Expect(err).To(BeNil())
 
@@ -156,5 +179,8 @@ Looping through query params:
 
 Path param value:
 All path param values:
-Looping through path params:`))
+Looping through path params:
+
+State One: A
+State Two: B`))
 }

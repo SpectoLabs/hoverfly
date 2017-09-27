@@ -338,6 +338,19 @@ Which if hit would have given the following response:
 		Expect(string(body)).To(Equal("foo"))
 	})
 
+	It("should be able to use state in templating", func() {
+		hoverfly.ImportSimulation(functional_tests.TemplatingEnabledWithStateInBody)
+
+		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/one"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/two"))
+		Expect(resp.StatusCode).To(Equal(200))
+		body, err := ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("state for eggs"))
+	})
+
 	It("should not template response if templating is disabled explicitely", func() {
 		hoverfly.ImportSimulation(functional_tests.TemplatingDisabled)
 
