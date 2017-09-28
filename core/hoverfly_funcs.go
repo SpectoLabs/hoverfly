@@ -48,10 +48,10 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	// Get the cached response and return if there is a miss
 	if cacheErr == nil && cachedResponse.MatchingPair == nil {
 		return nil, matching.MissedError(cachedResponse.ClosestMiss)
-	// If it's cached, use that response
+		// If it's cached, use that response
 	} else if cacheErr == nil {
 		response = cachedResponse.MatchingPair.Response
-	//If it's not cached, perform matching to find a hit
+		//If it's not cached, perform matching to find a hit
 	} else {
 		var pair *models.RequestMatcherResponsePair
 		var err *models.MatchError

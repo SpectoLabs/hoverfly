@@ -9,7 +9,7 @@ import (
 
 type TemplatingData struct {
 	Request Request
-	State      map[string]string
+	State   map[string]string
 }
 
 type Request struct {

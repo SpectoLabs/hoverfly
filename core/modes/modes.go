@@ -71,7 +71,6 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 	return newRequest, nil
 }
 
-
 // ReconstructRequest replaces original request with details provided in Constructor Payload.RequestMatcher
 func ReconstructRequestForPassThrough(pair models.RequestResponsePair) (*http.Request, error) {
 	if pair.Request.Destination == "" {
