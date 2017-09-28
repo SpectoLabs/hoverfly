@@ -324,7 +324,7 @@ Which if hit would have given the following response:
 		Expect(hoverfly.GetCache().Cache).To(BeEmpty()) // Don't cache hits which include header matching
 	})
 
-	It("should template response if templating is enabled", func() {
+	It("should template response if templating is enabled and cache template not response", func() {
 		hoverfly.ImportSimulation(functional_tests.TemplatingEnabled)
 
 		hoverfly.WriteLogsIfError()
@@ -336,6 +336,14 @@ Which if hit would have given the following response:
 		Expect(err).To(BeNil())
 
 		Expect(string(body)).To(Equal("foo"))
+
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com?one=bar"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err = ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+
+		Expect(string(body)).To(Equal("bar"))
 	})
 
 	It("should be able to use state in templating", func() {
