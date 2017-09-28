@@ -41,69 +41,72 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 // GetResponse returns stored response from cache
 func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
 
+	var response models.ResponseDetails
+
 	cachedResponse, cacheErr := hf.CacheMatcher.GetCachedResponse(&requestDetails)
+
+	// Get the cached response and return if there is a miss
 	if cacheErr == nil && cachedResponse.MatchingPair == nil {
 		return nil, matching.MissedError(cachedResponse.ClosestMiss)
+	// If it's cached, use that response
 	} else if cacheErr == nil {
-		if cachedResponse.MatchingPair.Response.TransitionsState != nil {
-			hf.TransitionState(cachedResponse.MatchingPair.Response.TransitionsState)
-		}
-		if cachedResponse.MatchingPair.Response.RemovesState != nil {
-			hf.RemoveState(cachedResponse.MatchingPair.Response.RemovesState)
-		}
-		return &cachedResponse.MatchingPair.Response, nil
-	}
-
-	var pair *models.RequestMatcherResponsePair
-	var err *models.MatchError
-	var cachable bool
-
-	mode := (hf.modeMap[modes.Simulate]).(*modes.SimulateMode)
-
-	strongestMatch := strings.ToLower(mode.MatchingStrategy) == "strongest"
-
-	// Matching
-	if strongestMatch {
-		pair, err, cachable = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
+		response = cachedResponse.MatchingPair.Response
+	//If it's not cached, perform matching to find a hit
 	} else {
-		pair, err, cachable = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
-	}
+		var pair *models.RequestMatcherResponsePair
+		var err *models.MatchError
+		var cachable bool
 
-	if err == nil {
-		// Templating
-		if pair.Response.Templated == true {
-			responseBody, err := templating.ApplyTemplate(&requestDetails, hf.state, pair.Response.Body)
-			if err == nil {
-				pair.Response.Body = responseBody
-			}
+		mode := (hf.modeMap[modes.Simulate]).(*modes.SimulateMode)
+
+		strongestMatch := strings.ToLower(mode.MatchingStrategy) == "strongest"
+
+		// Matching
+		if strongestMatch {
+			pair, err, cachable = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
+		} else {
+			pair, err, cachable = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
 		}
-		// State transitions
-		if pair.Response.TransitionsState != nil {
-			hf.TransitionState(pair.Response.TransitionsState)
+
+		// Cache result
+		if cachable {
+			hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, err)
 		}
-		if pair.Response.RemovesState != nil {
-			hf.RemoveState(pair.Response.RemovesState)
+
+		// If we miss, just return
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":       err.Error(),
+				"query":       requestDetails.Query,
+				"path":        requestDetails.Path,
+				"destination": requestDetails.Destination,
+				"method":      requestDetails.Method,
+			}).Warn("Failed to find matching request from simulation")
+
+			return nil, matching.MissedError(err.ClosestMiss)
+		} else {
+			response = pair.Response
 		}
 	}
 
-	// Caching
-	if cachable {
-		hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, err)
+	// Templating applies at the end, once we have loaded a response. Comes BEFORE state transitions,
+	// as we use the current state in templates
+	if response.Templated == true {
+		responseBody, err := templating.ApplyTemplate(&requestDetails, hf.state, response.Body)
+		if err == nil {
+			response.Body = responseBody
+		}
 	}
 
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error":       err.Error(),
-			"query":       requestDetails.Query,
-			"path":        requestDetails.Path,
-			"destination": requestDetails.Destination,
-			"method":      requestDetails.Method,
-		}).Warn("Failed to find matching request from simulation")
-
-		return nil, matching.MissedError(err.ClosestMiss)
+	// State transitions after we have the response
+	if response.TransitionsState != nil {
+		hf.TransitionState(response.TransitionsState)
+	}
+	if response.RemovesState != nil {
+		hf.RemoveState(response.RemovesState)
 	}
 
-	return &pair.Response, nil
+	return &response, nil
 }
 
 func (hf *Hoverfly) TransitionState(transition map[string]string) {
