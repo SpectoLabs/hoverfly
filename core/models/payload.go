@@ -62,7 +62,7 @@ type RequestDetails struct {
 	Query       map[string][]string
 	Body        string
 	Headers     map[string][]string
-	rawQuery 	string
+	rawQuery    string
 }
 
 func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error) {
