@@ -189,7 +189,7 @@ State Two: B`))
 func TestTemplatingWithHelperMethodsForDates(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, `{{iso8601DateTime}}`)
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{iso8601DateTime}}`)
 
 	Expect(err).To(BeNil())
 
@@ -199,7 +199,7 @@ func TestTemplatingWithHelperMethodsForDates(t *testing.T) {
 		Query: map[string][]string{
 			"plusDays": {"2"},
 		},
-	}, `{{iso8601DateTimePlusDays Request.QueryParam.plusDays}}`)
+	}, make(map[string]string), `{{iso8601DateTimePlusDays Request.QueryParam.plusDays}}`)
 
 	Expect(err).To(BeNil())
 

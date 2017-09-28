@@ -67,27 +67,10 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 			pair, err, cachable = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
 		}
 
-	if err == nil {
-		// Templating
-		if pair.Response.Templated == true {
-			responseBody, err := hf.templator.ApplyTemplate(&requestDetails, pair.Response.Body)
-			if err == nil {
-				pair.Response.Body = responseBody
-			}
+		// Cache result
+		if cachable {
+			hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, err)
 		}
-		// State transitions
-		if pair.Response.TransitionsState != nil {
-			hf.TransitionState(pair.Response.TransitionsState)
-		}
-		if pair.Response.RemovesState != nil {
-			hf.RemoveState(pair.Response.RemovesState)
-		}
-	}
-
-	// Caching
-	if cachable {
-		hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, err)
-	}
 
 		// If we miss, just return
 		if err != nil {
@@ -108,7 +91,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	// Templating applies at the end, once we have loaded a response. Comes BEFORE state transitions,
 	// as we use the current state in templates
 	if response.Templated == true {
-		responseBody, err := templating.ApplyTemplate(&requestDetails, hf.state, response.Body)
+		responseBody, err := hf.templator.ApplyTemplate(&requestDetails, hf.state, response.Body)
 		if err == nil {
 			response.Body = responseBody
 		}

@@ -41,9 +41,9 @@ Additional data can come from helper methods. Current we only have some for the 
 +---------------------------------------------------------+-----------------------------------------------------------+-----------------------------+
 | Description                                             | Example                                                   |  Result                     |
 +=========================================================+===========================================================+=============================+
-| The current data, formatted in iso8601                  | {{ iso8601DateTime }}                                     |  2006-01-02T15:04:05Z07:00  |
+| The current date, formatted in iso8601                  | {{ iso8601DateTime }}                                     |  2006-01-02T15:04:05Z07:00  |
 +---------------------------------------------------------+-----------------------------------------------------------+-----------------------------+
-| The current data, formatted in iso8601, with days added | {{ iso8601DateTimePlusDays Request.QueryParam.plusDays }} |  2006-02-02T15:04:05Z07:00  |
+| The current date, formatted in iso8601, with days added | {{ iso8601DateTimePlusDays Request.QueryParam.plusDays }} |  2006-02-02T15:04:05Z07:00  |
 +---------------------------------------------------------+-----------------------------------------------------------+-----------------------------+
 
 Conditional Templating, Looping and More
