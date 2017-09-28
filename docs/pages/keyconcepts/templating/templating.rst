@@ -30,7 +30,7 @@ Currently, the following data is available through templating:
 +------------------------------+----------------------------------------------+----------------------------------------------+--------+
 | Path parameter value         | {{ Request.Path.[1] }}                       | http://www.foo.com/zero/one/two              | one    |
 +------------------------------+----------------------------------------------+----------------------------------------------+--------+
-| State                        | {{ Path.basket }}                            | State Store = {"basket":"eggs"}              | eggs   |
+| State                        | {{ State.basket }}                           | State Store = {"basket":"eggs"}              | eggs   |
 +------------------------------+----------------------------------------------+----------------------------------------------+--------+
 
 Conditional Templating, Looping and More
