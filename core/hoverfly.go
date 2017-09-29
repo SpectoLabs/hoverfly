@@ -68,7 +68,7 @@ func NewHoverfly() *Hoverfly {
 		templator:      templating.NewTemplator(),
 	}
 
-	hoverfly.version = "v0.14.1"
+	hoverfly.version = "v0.14.2"
 
 	log.AddHook(hoverfly.StoreLogsHook)
 
