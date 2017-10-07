@@ -115,7 +115,7 @@ This means that Hoverfly will return the Response contained within Request Respo
 
 .. note::
    
-   If there is more than one strongest match, Hoverfly will pick the first one that appears in the simulation file.
+   When there are multiple matches all with the same score, Hoverfly will pick the last one in the simulation.
 
     
 The strongest match strategy makes it much easier to identify why Hoverfly has not returned a Response to an incoming Request. 
