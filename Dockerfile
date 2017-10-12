@@ -1,4 +1,4 @@
-FROM golang:1.8.1
+FROM golang:1.9.1
 
 MAINTAINER benji.hooper@specto.io
 
