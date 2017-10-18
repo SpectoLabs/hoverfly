@@ -45,25 +45,49 @@ To contribute, please:
 
 To read more about forking model, check out this link: [forking workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow).
 
-## Building, running & testing
 
-```bash
-cd $GOPATH/src
-mkdir -p github.com/SpectoLabs/
-cd github.com/SpectoLabs/
-git clone https://github.com/SpectoLabs/hoverfly.git
-# or: git clone https://github.com/<your_username>/hoverfly.git
-cd hoverfly
-make build
-```
+## Setup for local development
+
+### Build
+1. Install Go. You should follow the download and installation instructions for your OS from [official Go website](https://golang.org/dl). If you have installed Go before 
+using either `apt-get` or `homebrew`, you should uninstall those first.
+1. After the installation, find out the `GOPATH` using `go env`, and then setup a source folder there
+
+    ```bash
+    mkdir $GOPATH/src
+    ```
+1. Clone the hoverfly project into your Go source folder:
+    ```bash
+    cd $GOPATH/src
+    mkdir -p github.com/SpectoLabs/
+    cd github.com/SpectoLabs/
+    git clone https://github.com/SpectoLabs/hoverfly.git
+    # or: git clone https://github.com/<your_username>/hoverfly.git
+    ```
+1. Finally you can run the build
+
+    ```bash
+    cd hoverfly
+    make build 
+    ```
 
 Notice the binaries are in the ``target`` directory.
 
-Finally to test your build:
+
+### Test
+
+You should be able to execute all unit and functional tests with: 
 
 ```bash
 make test
 ```
+
+Some middleware tests may fail if you don't have `ruby` and `python` setup in your environment. If you are using Mac, you can install them with [Homebrew](https://brew.sh/):
+```bash
+brew install ruby
+brew install python
+``` 
+
 
 ## License
 
