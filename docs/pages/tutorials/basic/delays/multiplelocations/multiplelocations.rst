@@ -9,7 +9,7 @@ Now let's apply different delays based on location. Run the following to create 
 Edit the ``simulation.json`` file so that the ``"globalActions"`` property looks like this:
 
 .. literalinclude:: ../../../../simulations/multiple-locations-delay-simulation.json
-   :lines: 18-32
+   :lines: 23-41
    :linenos:
    :language: javascript
 
