@@ -87,6 +87,7 @@ var (
 	key        = flag.String("key", "", "private key of the CA used to sign MITM certificates")
 
 	tlsVerification = flag.Bool("tls-verification", true, "turn on/off tls verification for outgoing requests (will not try to verify certificates) - defaults to true")
+	plainHttpTunneling = flag.Bool("plain-http-tunneling", false, "use plain http tunneling to host with non-443 port - defaults to false")
 
 	upstreamProxy = flag.String("upstream-proxy", "", "specify an upstream proxy for hoverfly to route traffic through")
 	httpsOnly     = flag.Bool("https-only", false, "allow only secure secure requests to be proxied by hoverfly")
@@ -252,6 +253,7 @@ func main() {
 	}
 
 	cfg.HttpsOnly = *httpsOnly
+	cfg.PlainHttpTunneling = *plainHttpTunneling
 
 	// overriding default middleware setting
 	newMiddleware, err := mw.ConvertToNewMiddleware(*middleware)
