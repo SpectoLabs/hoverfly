@@ -32,7 +32,12 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	proxy := goproxy.NewProxyHttpServer()
 
 	proxy.OnRequest(goproxy.UrlMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).
-		HandleConnect(goproxy.AlwaysMitm)
+		HandleConnect(goproxy.FuncHttpsHandler(func(host string, ctx *goproxy.ProxyCtx) (*goproxy.ConnectAction, string) {
+			if hoverfly.Cfg.PlainHttpTunneling && !strings.HasSuffix(host, ":443") {
+				return goproxy.HTTPMitmConnect, host
+			}
+			return goproxy.MitmConnect, host
+	}))
 
 	if hoverfly.Cfg.HttpsOnly {
 		log.Info("Disabling HTTP")

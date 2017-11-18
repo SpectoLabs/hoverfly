@@ -37,6 +37,8 @@ type Configuration struct {
 
 	HttpsOnly bool
 
+	PlainHttpTunneling bool
+
 	ProxyControlWG sync.WaitGroup
 
 	mu sync.Mutex

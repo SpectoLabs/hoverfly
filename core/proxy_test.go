@@ -5,6 +5,10 @@ import (
 	"testing"
 
 	. "github.com/onsi/gomega"
+	"bufio"
+	"net"
+
+	"net/http/httptest"
 )
 
 func Test_authFromHeader_ShouldRemoveProxyAuthorizationHeader(t *testing.T) {
@@ -82,4 +86,36 @@ func Test_authFromHeader_Bearer_ShouldPassJwtTokenOntoFunction(t *testing.T) {
 	})).To(BeNil())
 
 	Expect(bearerToken).To(Equal("gregg.EEewGREQ.GDSG"))
+}
+
+func Test_NewProxy_ShouldHandleConnectForHttps(t *testing.T) {
+	RegisterTestingT(t)
+	https := httptest.NewTLSServer(nil)
+	testHoverfly := NewHoverfly()
+	shouldHandleConnect(t, testHoverfly, https.URL)
+}
+
+func Test_NewProxy_ShouldHandleConnectForHttp(t *testing.T) {
+	RegisterTestingT(t)
+	var httpServer = httptest.NewServer(nil)
+	testHoverfly := NewHoverfly()
+	testHoverfly.Cfg.PlainHttpTunneling = true
+	shouldHandleConnect(t, testHoverfly, httpServer.URL)
+}
+
+func shouldHandleConnect(t *testing.T, hoverfly *Hoverfly, url string) {
+	proxy := NewProxy(hoverfly)
+	proxyServer := httptest.NewServer(proxy)
+	defer proxyServer.Close()
+	conn, err := net.Dial("tcp", proxyServer.Listener.Addr().String())
+	if err != nil {
+		t.Fatal("dialing to proxy", err)
+	}
+	connReq, err := http.NewRequest("CONNECT", url, nil)
+	if err != nil {
+		t.Fatal("create new request", connReq)
+	}
+	connReq.Write(conn)
+	resp, err := http.ReadResponse(bufio.NewReader(conn), connReq)
+	Expect(resp.StatusCode).To(Equal(200))
 }

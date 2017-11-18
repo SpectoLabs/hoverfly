@@ -121,3 +121,11 @@ func Test_SetUpstreamProxy_WillNotPrependHttpColonSlashSlashToProxyURLWithHTTPS(
 
 	Expect(unit.UpstreamProxy).To(Equal("https://localhost"))
 }
+
+func Test_InitSettings_SetsPlainHttpTunnelingToFalse(t *testing.T) {
+	RegisterTestingT(t)
+
+	settings := InitSettings()
+
+	Expect(settings.PlainHttpTunneling).To(Equal(false))
+}
