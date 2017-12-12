@@ -28,6 +28,9 @@ const Modify = "modify"
 // CaptureMode - requests are captured and stored in cache
 const Capture = "capture"
 
+// SpyMode - simulateMode but will call real service when cache miss
+const Spy = "spy"
+
 type Mode interface {
 	Process(*http.Request, models.RequestDetails) (*http.Response, error)
 	SetArguments(arguments ModeArguments)
