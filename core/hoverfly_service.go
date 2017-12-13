@@ -53,6 +53,7 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 		modes.Capture:    true,
 		modes.Modify:     true,
 		modes.Synthesize: true,
+		modes.Spy:        true,
 	}
 
 	if modeView.Mode == "" || !availableModes[modeView.Mode] {
@@ -90,6 +91,8 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 	if this.Cfg.GetMode() == "capture" {
 		this.CacheMatcher.FlushCache()
 	} else if this.Cfg.GetMode() == "simulate" {
+		this.CacheMatcher.PreloadCache(*this.Simulation)
+	} else if this.Cfg.GetMode() == "spy" {
 		this.CacheMatcher.PreloadCache(*this.Simulation)
 	}
 
