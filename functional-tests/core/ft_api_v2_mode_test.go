@@ -89,18 +89,34 @@ var _ = Describe("/api/v2/hoverfly/mode", func() {
 
 		It("Should should get and set synthesize mode", func() {
 			req := sling.New().Put("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly/mode")
-			req.Body(strings.NewReader(`{"mode":"capture"}`))
+			req.Body(strings.NewReader(`{"mode":"synthesize"}`))
 			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"mode":"capture","arguments":{}}`)))
+			Expect(modeJson).To(Equal([]byte(`{"mode":"synthesize","arguments":{}}`)))
 
 			req = sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly/mode")
 			res = functional_tests.DoRequest(req)
 			modeJson, err = ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"mode":"capture","arguments":{}}`)))
+			Expect(modeJson).To(Equal([]byte(`{"mode":"synthesize","arguments":{}}`)))
+		})
+
+		It("Should should get and set spy mode", func() {
+			req := sling.New().Put("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly/mode")
+			req.Body(strings.NewReader(`{"mode":"spy"}`))
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+			modeJson, err := ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"mode":"spy","arguments":{}}`)))
+
+			req = sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly/mode")
+			res = functional_tests.DoRequest(req)
+			modeJson, err = ioutil.ReadAll(res.Body)
+			Expect(err).To(BeNil())
+			Expect(modeJson).To(Equal([]byte(`{"mode":"spy","arguments":{}}`)))
 		})
 
 		It("Should error when header arguments use an asterisk and a header", func() {
