@@ -63,6 +63,7 @@ var (
 	capture     = flag.Bool("capture", false, "start Hoverfly in capture mode - transparently intercepts and saves requests/response")
 	synthesize  = flag.Bool("synthesize", false, "start Hoverfly in synthesize mode (middleware is required)")
 	modify      = flag.Bool("modify", false, "start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic")
+	spy         = flag.Bool("spy", false, "start Hoverfly in spy mode, similar to simulate but calls real server when cache miss")
 	middleware  = flag.String("middleware", "", "should proxy use middleware")
 	proxyPort   = flag.String("pp", "", "proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
 	adminPort   = flag.String("ap", "", "admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
@@ -473,7 +474,7 @@ func getInitialMode(cfg *hv.Configuration) string {
 
 	if *capture {
 		// checking whether user supplied other modes
-		if *synthesize == true || *modify == true {
+		if *synthesize == true || *modify == true || *spy == true {
 			log.Fatal("Two or more modes supplied, check your flags")
 		}
 
@@ -485,7 +486,7 @@ func getInitialMode(cfg *hv.Configuration) string {
 			log.Fatal("Synthesize mode chosen although middleware not supplied")
 		}
 
-		if *capture == true || *modify == true {
+		if *capture == true || *modify == true || *spy == true {
 			log.Fatal("Two or more modes supplied, check your flags")
 		}
 
@@ -496,11 +497,17 @@ func getInitialMode(cfg *hv.Configuration) string {
 			log.Fatal("Modify mode chosen although middleware not supplied")
 		}
 
-		if *capture == true || *synthesize == true {
+		if *capture == true || *synthesize == true || *spy == true {
 			log.Fatal("Two or more modes supplied, check your flags")
 		}
 
 		return modes.Modify
+	} else if *spy {
+		if *capture == true || *synthesize == true || *modify == true {
+			log.Fatal("Two or more modes supplied, check your flags")
+		}
+
+		return modes.Spy
 	}
 
 	return modes.Simulate

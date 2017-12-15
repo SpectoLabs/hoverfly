@@ -60,7 +60,7 @@ func NewHoverfly() *Hoverfly {
 	hoverfly := &Hoverfly{
 		Simulation:     models.NewSimulation(),
 		Authentication: authBackend,
-		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture}),
+		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture, modes.Spy}),
 		StoreLogsHook:  NewStoreLogsHook(),
 		Journal:        journal.NewJournal(),
 		Cfg:            InitSettings(),
@@ -78,6 +78,7 @@ func NewHoverfly() *Hoverfly {
 	modeMap[modes.Simulate] = &modes.SimulateMode{Hoverfly: hoverfly, MatchingStrategy: "strongest"}
 	modeMap[modes.Modify] = &modes.ModifyMode{Hoverfly: hoverfly}
 	modeMap[modes.Synthesize] = &modes.SynthesizeMode{Hoverfly: hoverfly}
+	modeMap[modes.Spy] = &modes.SpyMode{Hoverfly: hoverfly}
 
 	hoverfly.modeMap = modeMap
 
