@@ -21,6 +21,7 @@ type Hoverfly interface {
 	PatchState(map[string]string)
 	ClearState()
 	GetUpstreamProxy() string
+	IsWebServer() bool
 }
 
 type HoverflyHandler struct {
@@ -47,6 +48,7 @@ func (this *HoverflyHandler) Get(w http.ResponseWriter, req *http.Request, next 
 	hoverflyView.Usage = this.Hoverfly.GetStats()
 	hoverflyView.Version = this.Hoverfly.GetVersion()
 	hoverflyView.UpstreamProxy = this.Hoverfly.GetUpstreamProxy()
+	hoverflyView.IsWebServer = this.Hoverfly.IsWebServer()
 
 	bytes, _ := json.Marshal(hoverflyView)
 

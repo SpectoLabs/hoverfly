@@ -255,6 +255,11 @@ func (this Hoverfly) GetUpstreamProxy() string {
 	return this.Cfg.UpstreamProxy
 }
 
+func (this Hoverfly) IsWebServer() bool {
+
+	return this.Cfg.Webserver
+}
+
 func (this Hoverfly) IsMiddlewareSet() bool {
 	return this.Cfg.Middleware.IsSet()
 }
