@@ -199,3 +199,61 @@ func Test_CheckIfRunning_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Target Hoverfly is not running\n\nRun `hoverctl start -t ` to start it"))
 }
+
+func Test_GetHoverfly_GetsHoverfly(t *testing.T) {
+	RegisterTestingT(t)
+
+	hoverfly.DeleteSimulation()
+	hoverfly.PutSimulation(v2.SimulationViewV4{
+		v2.DataViewV4{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV4{
+				{
+					RequestMatcher: v2.RequestMatcherViewV4{
+						Method: &v2.RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("GET"),
+						},
+						Path: &v2.RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("/api/v2/hoverfly"),
+						},
+					},
+					Response: v2.ResponseDetailsViewV4{
+						Status: 200,
+						Body: `{
+							"destination": ".",
+							"middleware": {
+								"binary": "",
+								"script": "",
+								"remote": ""
+							},
+							"mode": "simulate",
+							"arguments": {
+								"matchingStrategy": "strongest"
+							},
+							"isWebServer": false,
+							"usage": {
+								"counters": {
+									"capture": 0,
+									"modify": 0,
+									"simulate": 0,
+									"spy": 0,
+									"synthesize": 0
+								}
+							},
+							"version": "v0.14.2",
+							"upstream-proxy": ""
+						}`,
+					},
+				},
+			},
+		},
+		v2.MetaView{
+			SchemaVersion: "v2",
+		},
+	})
+
+	hoverfly, err := GetHoverfly(target)
+	Expect(err).To(BeNil())
+
+	Expect(hoverfly.IsWebServer).To(BeFalse())
+	Expect(hoverfly.Version).To(Equal("v0.14.2"))
+}

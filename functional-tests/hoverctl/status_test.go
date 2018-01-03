@@ -70,6 +70,28 @@ var _ = Describe("when I use hoverctl status", func() {
 		})
 	})
 
+	Describe("with a running hoverfly as a webserver", func() {
+
+		BeforeEach(func() {
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start("-webserver")
+
+			functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--admin-port", hoverfly.GetAdminPort())
+		})
+
+		AfterEach(func() {
+			hoverfly.Stop()
+		})
+
+		Describe("should get the status of Hoverfly", func() {
+
+			It("should get proxy type from Hoverfly", func() {
+				output := functional_tests.Run(hoverctlBinary, "status")
+				Expect(output).To(ContainSubstring("Proxy type | reverse (webserver)"))
+			})
+		})
+	})
+
 	Describe("without a running hoverfly", func() {
 
 		Describe("should not get the status of Hoverfly", func() {
