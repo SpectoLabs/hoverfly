@@ -15,7 +15,7 @@ var allHeaders bool
 var matchingStrategy string
 
 var modeCmd = &cobra.Command{
-	Use:   "mode [capture|simulate|modify|synthesize (optional)]",
+	Use:   "mode [capture|simulate|spy|modify|synthesize (optional)]",
 	Short: "Get and set the Hoverfly mode",
 	Long: `
 Sets Hoverfly to the mode specified. The mode
