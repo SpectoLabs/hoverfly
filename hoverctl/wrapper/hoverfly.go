@@ -22,9 +22,6 @@ import (
 )
 
 const (
-	v1ApiDelays     = "/api/delays"
-	v1ApiSimulation = "/api/records"
-
 	v2ApiSimulation  = "/api/v2/simulation"
 	v2ApiMode        = "/api/v2/hoverfly/mode"
 	v2ApiDestination = "/api/v2/hoverfly/destination"
@@ -32,6 +29,7 @@ const (
 	v2ApiMiddleware  = "/api/v2/hoverfly/middleware"
 	v2ApiCache       = "/api/v2/cache"
 	v2ApiLogs        = "/api/v2/logs"
+	v2ApiHoverfly 	 = "/api/v2/hoverfly"
 
 	v2ApiShutdown = "/api/v2/shutdown"
 	v2ApiHealth   = "/api/health"
@@ -266,6 +264,30 @@ func CheckIfRunning(target configuration.Target) error {
 	}
 
 	return nil
+}
+
+// GetHoverfly will get the Hoverfly API which contains current configurations
+func GetHoverfly(target configuration.Target) (*v2.HoverflyView, error) {
+	response, err := doRequest(target, http.MethodGet, v2ApiHoverfly, "", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer response.Body.Close()
+
+	err = handleResponseError(response, "Could not retrieve hoverfly information")
+	if err != nil {
+		return nil, err
+	}
+
+	var hoverflyView v2.HoverflyView
+
+	err = UnmarshalToInterface(response, &hoverflyView)
+	if err != nil {
+		return nil, err
+	}
+
+	return &hoverflyView, nil
 }
 
 func doRequest(target configuration.Target, method, url, body string, headers map[string]string) (*http.Response, error) {

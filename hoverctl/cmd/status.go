@@ -20,14 +20,14 @@ mode and middleware set.
 	Run: func(cmd *cobra.Command, args []string) {
 		checkTargetAndExit(target)
 
-		mode, err := wrapper.GetMode(*target)
-		handleIfError(err)
-
 		middleware, err := wrapper.GetMiddleware(*target)
 		handleIfError(err)
 
+		hoverflyInfo, err := wrapper.GetHoverfly(*target)
+		handleIfError(err)
+
 		var proxyType string
-		if target.Webserver {
+		if hoverflyInfo.IsWebServer {
 			proxyType = "reverse (webserver)"
 		} else {
 			proxyType = "forward"
@@ -46,7 +46,7 @@ mode and middleware set.
 			{"Admin port", strconv.Itoa(target.AdminPort)},
 			{"Proxy port", strconv.Itoa(target.ProxyPort)},
 			{"Proxy type", proxyType},
-			{"Mode", mode.Mode},
+			{"Mode", hoverflyInfo.Mode},
 			{"Middleware", middlewareStatus},
 		}
 
