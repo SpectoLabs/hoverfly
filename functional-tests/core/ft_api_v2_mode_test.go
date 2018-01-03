@@ -110,13 +110,13 @@ var _ = Describe("/api/v2/hoverfly/mode", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"mode":"spy","arguments":{}}`)))
+			Expect(modeJson).To(Equal([]byte(`{"mode":"spy","arguments":{"matchingStrategy":"strongest"}}`)))
 
 			req = sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly/mode")
 			res = functional_tests.DoRequest(req)
 			modeJson, err = ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"mode":"spy","arguments":{}}`)))
+			Expect(modeJson).To(Equal([]byte(`{"mode":"spy","arguments":{"matchingStrategy":"strongest"}}`)))
 		})
 
 		It("Should error when header arguments use an asterisk and a header", func() {
@@ -124,7 +124,7 @@ var _ = Describe("/api/v2/hoverfly/mode", func() {
 			req.BodyJSON(map[string]interface{}{
 				"mode": "mode",
 				"arguments": map[string][]string{
-					"headersWhitelist": []string{"*", "Content-Type"},
+					"headersWhitelist": {"*", "Content-Type"},
 				},
 			})
 			res := functional_tests.DoRequest(req)
