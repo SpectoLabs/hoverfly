@@ -55,4 +55,42 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(response.StatusCode).To(Equal(http.StatusOK))
 		})
 	})
+
+	Context("using plain http tunneling", func() {
+
+		BeforeEach(func() {
+			hoverfly.Start("-plain-http-tunneling")
+		})
+
+		AfterEach(func() {
+			hoverfly.Stop()
+		})
+
+		It("should response OK on CONNECT request", func() {
+
+			hoverfly.ImportSimulation(`{
+				"data": {
+					"pairs": [
+						{
+							"request": {
+								"destination": {
+									"exactMatch": "hoverfly.io"
+								}
+							},
+							"response": {
+								"status": 200,
+								"body": "OK"
+							}
+						}
+					]
+				},
+				"meta": {
+					"schemaVersion": "v3"
+				}
+			}`)
+			req, _ := http.NewRequest(http.MethodConnect, "http://hoverfly.io", nil)
+			response := hoverfly.ProxyRequest(req)
+			Expect(response.StatusCode).To(Equal(http.StatusOK))
+		})
+	})
 })
