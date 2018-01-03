@@ -28,6 +28,10 @@ type ModeArgumentsView struct {
 	MatchingStrategy *string  `json:"matchingStrategy,omitempty"`
 }
 
+type IsWebServerView struct {
+	IsWebServer bool `json:"isWebServer"`
+}
+
 type VersionView struct {
 	Version string `json:"version"`
 }
@@ -40,6 +44,7 @@ type HoverflyView struct {
 	DestinationView
 	MiddlewareView `json:"middleware"`
 	ModeView
+	IsWebServerView
 	UsageView
 	VersionView
 	UpstreamProxyView

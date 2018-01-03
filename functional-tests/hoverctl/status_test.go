@@ -32,6 +32,7 @@ var _ = Describe("when I use hoverctl status", func() {
 				Expect(output).To(ContainSubstring("Hoverfly   | running"))
 				Expect(output).To(ContainSubstring("Admin port |    " + hoverfly.GetAdminPort()))
 				Expect(output).To(ContainSubstring("Proxy port |     8500"))
+				Expect(output).To(ContainSubstring("Proxy type | forward"))
 				Expect(output).To(ContainSubstring("Mode       | simulate"))
 				Expect(output).To(ContainSubstring("Middleware | disabled"))
 			})

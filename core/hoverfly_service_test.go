@@ -495,6 +495,16 @@ func Test_Hoverfly_GetUpstreamProxy_GetsUpstreamProxy(t *testing.T) {
 	Expect(unit.GetUpstreamProxy()).To(Equal("upstream-proxy.org"))
 }
 
+func Test_Hoverfly_IsWebServer_GetsIsWebServer(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{
+		Webserver: true,
+	})
+
+	Expect(unit.IsWebServer()).To(BeTrue())
+}
+
 func Test_Hoverfly_SetMode_CanSetModeToCapture(t *testing.T) {
 	RegisterTestingT(t)
 

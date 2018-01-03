@@ -26,6 +26,13 @@ mode and middleware set.
 		middleware, err := wrapper.GetMiddleware(*target)
 		handleIfError(err)
 
+		var proxyType string
+		if target.Webserver {
+			proxyType = "reverse (webserver)"
+		} else {
+			proxyType = "forward"
+		}
+
 		var middlewareStatus string
 
 		if middleware.Binary == "" && middleware.Script == "" && middleware.Remote == "" {
@@ -38,6 +45,7 @@ mode and middleware set.
 			{"Hoverfly", "running"},
 			{"Admin port", strconv.Itoa(target.AdminPort)},
 			{"Proxy port", strconv.Itoa(target.ProxyPort)},
+			{"Proxy type", proxyType},
 			{"Mode", mode.Mode},
 			{"Middleware", middlewareStatus},
 		}
