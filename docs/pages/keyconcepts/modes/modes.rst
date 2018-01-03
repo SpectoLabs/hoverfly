@@ -3,11 +3,12 @@
 Hoverfly modes
 ==============
 
-Hoverfly has four different modes. It can only run in one mode at any one time.
+Hoverfly has five different modes. It can only run in one mode at any one time.
 
 .. toctree::
 
     capture
     simulate
+    spy
     synthesize
     modify
