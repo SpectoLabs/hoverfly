@@ -44,3 +44,12 @@ You'll now see a ``simulation.json`` file in your current working directory, whi
 In case you are curious, the sequence diagram for this process looks like this:
 
 .. figure:: exportingsimulations.mermaid.png
+
+
+.. note::
+   By default, request headers are not captured. If you want to capture headers, you will need to specify them when setting capture mode.
+
+   .. code:: bash
+
+      hoverctl mode capture --headers "User-Agent,Content-Type,Authorization"
+      hoverctl mode capture --all-headers
