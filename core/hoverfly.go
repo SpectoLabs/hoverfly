@@ -170,7 +170,7 @@ func (hf *Hoverfly) StartProxy() error {
 	}).Info("current proxy configuration")
 
 	// creating TCP listener
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", hf.Cfg.ProxyPort))
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", hf.Cfg.ListenOnHost, hf.Cfg.ProxyPort))
 	if err != nil {
 		return err
 	}

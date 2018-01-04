@@ -15,6 +15,7 @@ import (
 type Configuration struct {
 	AdminPort    string
 	ProxyPort    string
+	ListenOnHost string
 	Mode         string
 	Destination  string
 	Middleware   middleware.Middleware
@@ -72,6 +73,8 @@ const DefaultPort = "8500"
 // DefaultAdminPort - default admin interface port
 const DefaultAdminPort = "8888"
 
+const DefaultListenOnHost = "127.0.0.1"
+
 // DefaultDatabasePath - default database name that will be created
 // or used by Hoverfly
 const DefaultDatabasePath = "requests.db"
@@ -119,6 +122,8 @@ func InitSettings() *Configuration {
 	} else {
 		appConfig.ProxyPort = DefaultPort
 	}
+
+	appConfig.ListenOnHost = DefaultListenOnHost
 
 	// getting external proxy
 	if os.Getenv(HoverflyUpstreamProxyPortEV) != "" {

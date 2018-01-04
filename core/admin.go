@@ -35,7 +35,7 @@ func (this *AdminApi) StartAdminInterface(hoverfly *Hoverfly) {
 		"AdminPort": hoverfly.Cfg.AdminPort,
 	}).Info("Admin interface is starting...")
 
-	http.ListenAndServe(fmt.Sprintf(":%s", hoverfly.Cfg.AdminPort), n)
+	http.ListenAndServe(fmt.Sprintf("%s:%s", hoverfly.Cfg.ListenOnHost, hoverfly.Cfg.AdminPort), n)
 }
 
 // Will add the handlers to the router.
