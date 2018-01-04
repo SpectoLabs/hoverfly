@@ -194,6 +194,7 @@ func runBinary(target *configuration.Target, path string) (*exec.Cmd, error) {
 }
 
 func Start(target *configuration.Target) error {
+	// TODO only check port if is it localhost
 	err := checkPorts(target.AdminPort, target.ProxyPort)
 	if err != nil {
 		return err
@@ -322,7 +323,7 @@ func doRequest(target configuration.Target, method, url, body string, headers ma
 
 func checkPorts(ports ...int) error {
 	for _, port := range ports {
-		server, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+		server, err := net.Listen("tcp", "127.0.0.1:"+strconv.Itoa(port))
 		if err != nil {
 			return fmt.Errorf("Could not start Hoverfly\n\nPort %v was not free", port)
 		}

@@ -45,6 +45,13 @@ func TestSettingsDefaultProxyPort(t *testing.T) {
 	Expect(cfg.ProxyPort).To(Equal(DefaultPort))
 }
 
+func TestSettingsDefaultListenOnHost(t *testing.T) {
+	RegisterTestingT(t)
+
+	cfg := InitSettings()
+	Expect(cfg.ListenOnHost).To(Equal("127.0.0.1"))
+}
+
 func TestSettingsMiddlewareEnv(t *testing.T) {
 	RegisterTestingT(t)
 
