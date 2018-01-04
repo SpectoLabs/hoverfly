@@ -245,7 +245,7 @@ Example
             Hoverfly Documentation
         &lt;/document&gt;
     &lt;/documents&gt;</td>
-                <td>/documents[2]</td>
+                <td>/documents/document[2]</td>
                 <td class="example-icon"><span class="fa fa-times fa-failure"></span></td>
             <tr/>
             <tr class="row-odd">
@@ -258,7 +258,7 @@ Example
             Hoverfly Documentation
         &lt;/document&gt;
     &lt;/documents&gt;</td>
-                <td>/documents[2]</td>
+                <td>/documents/document[2]</td>
                 <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
             <tr/>
         </tbody>
