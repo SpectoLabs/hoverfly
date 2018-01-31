@@ -63,7 +63,7 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 	return nil
 }
 
-func (this Journal) GetEntries() ([]v2.JournalEntryView, error) {
+func (this Journal) GetEntries(offset int, limit int) ([]v2.JournalEntryView, error) {
 	if this.EntryLimit == 0 {
 		return []v2.JournalEntryView{}, fmt.Errorf("Journal disabled")
 	}
@@ -91,7 +91,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		Body:        models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
 		Headers:     journalEntryFilterView.Request.Headers,
 	}
-	allEntries, err := this.GetEntries()
+	allEntries, err := this.GetEntries(0, this.EntryLimit)
 	if err != nil {
 		return []v2.JournalEntryView{}, err
 	}

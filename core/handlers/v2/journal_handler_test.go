@@ -20,7 +20,7 @@ type HoverflyJournalStub struct {
 	journalEntryFilterView JournalEntryFilterView
 }
 
-func (this *HoverflyJournalStub) GetEntries() ([]JournalEntryView, error) {
+func (this *HoverflyJournalStub) GetEntries(offset int, limit int) ([]JournalEntryView, error) {
 	if this.error {
 		return []JournalEntryView{}, fmt.Errorf("entries error")
 	}
