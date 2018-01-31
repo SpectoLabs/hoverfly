@@ -16,27 +16,33 @@ import (
 type HoverflyJournalStub struct {
 	deleted                bool
 	error                  bool
-	limit				   int
-	offset				   int
+	limit                  int
+	offset                 int
 	journalEntryFilterView JournalEntryFilterView
 }
 
-func (this *HoverflyJournalStub) GetEntries(offset int, limit int) ([]JournalEntryView, error) {
+func (this *HoverflyJournalStub) GetEntries(offset int, limit int) (JournalView, error) {
 	this.offset = offset
 	this.limit = limit
+
+	journalView := JournalView{
+		Journal: []JournalEntryView{},
+		Offset:  offset,
+		Limit:   limit,
+		Total:   0,
+	}
 	if this.error {
-		return []JournalEntryView{}, fmt.Errorf("entries error")
+		return journalView, fmt.Errorf("entries error")
 	}
 
-	if this.deleted {
-		return []JournalEntryView{}, nil
-	} else {
-		return []JournalEntryView{
-			JournalEntryView{
+	if !this.deleted  {
+		journalView.Journal = []JournalEntryView{{
 				Mode: "test",
-			},
-		}, nil
+			}}
+		journalView.Total = 1
 	}
+
+	return journalView, nil
 }
 
 func (this *HoverflyJournalStub) GetFilteredEntries(journalEntryFilterView JournalEntryFilterView) ([]JournalEntryView, error) {
@@ -115,6 +121,13 @@ func Test_JournalHandler_Get_WithPagingQuery(t *testing.T) {
 
 	Expect(stubHoverfly.limit).To(Equal(25))
 	Expect(stubHoverfly.offset).To(Equal(50))
+
+	journalView, err := unmarshalJournalView(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(journalView.Total).To(Equal(1))
+	Expect(journalView.Offset).To(Equal(50))
+	Expect(journalView.Limit).To(Equal(25))
 }
 
 func Test_JournalHandler_Get_Error(t *testing.T) {

@@ -63,40 +63,45 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 	return nil
 }
 
-func (this Journal) GetEntries(offset int, limit int) ([]v2.JournalEntryView, error) {
+func (this Journal) GetEntries(offset int, limit int) (v2.JournalView, error) {
+	journalView := v2.JournalView{
+		Journal: []v2.JournalEntryView{},
+		Offset: 0,
+		Limit: v2.DefaultJournalLimit,
+		Total: 0,
+	}
+
 	if this.EntryLimit == 0 {
-		return []v2.JournalEntryView{}, fmt.Errorf("Journal disabled")
+		return journalView, fmt.Errorf("Journal disabled")
 	}
 
 	totalElements := len(this.entries)
-	journalEntryViews := []v2.JournalEntryView{}
 
 	if offset < 0 {
 		offset = 0
 	} else if offset >= totalElements {
-		return journalEntryViews, nil
+		return journalView, nil
 	}
+
 
 	endIndex := offset + limit
 	if endIndex > totalElements {
 		endIndex = totalElements
 	}
 
-	page := this.entries[offset:endIndex]
-
-	for _, journalEntry := range page {
-		journalEntryViews = append(journalEntryViews, v2.JournalEntryView{
-			Request:     journalEntry.Request.ConvertToRequestDetailsView(),
-			Response:    journalEntry.Response.ConvertToResponseDetailsView(),
-			Mode:        journalEntry.Mode,
-			TimeStarted: journalEntry.TimeStarted.Format(RFC3339Milli),
-			Latency:     journalEntry.Latency.Seconds() * 1e3,
-		})
-	}
-	return journalEntryViews, nil
+	journalView.Journal = convertJournalEntries(this.entries[offset:endIndex])
+	journalView.Offset = offset
+	journalView.Limit = limit
+	journalView.Total = totalElements
+	return journalView, nil
 }
 
 func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFilterView) ([]v2.JournalEntryView, error) {
+	filteredEntries := []v2.JournalEntryView{}
+	if this.EntryLimit == 0 {
+		return filteredEntries, fmt.Errorf("Journal disabled")
+	}
+
 	requestMatcher := models.RequestMatcher{
 		Path:        models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Path),
 		Method:      models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Method),
@@ -105,13 +110,10 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		Query:       models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Query),
 		Body:        models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
 		Headers:     journalEntryFilterView.Request.Headers,
-	}
-	allEntries, err := this.GetEntries(0, this.EntryLimit)
-	if err != nil {
-		return []v2.JournalEntryView{}, err
+
 	}
 
-	filteredEntries := []v2.JournalEntryView{}
+	allEntries := convertJournalEntries(this.entries)
 
 	for _, entry := range allEntries {
 		if requestMatcher.Body == nil && requestMatcher.Destination == nil &&
@@ -155,4 +157,21 @@ func (this *Journal) DeleteEntries() error {
 	this.entries = []JournalEntry{}
 
 	return nil
+}
+
+func convertJournalEntries(entries []JournalEntry) []v2.JournalEntryView {
+
+	journalEntryViews := []v2.JournalEntryView{}
+
+	for _, journalEntry := range entries {
+		journalEntryViews = append(journalEntryViews, v2.JournalEntryView{
+			Request:     journalEntry.Request.ConvertToRequestDetailsView(),
+			Response:    journalEntry.Response.ConvertToResponseDetailsView(),
+			Mode:        journalEntry.Mode,
+			TimeStarted: journalEntry.TimeStarted.Format(RFC3339Milli),
+			Latency:     journalEntry.Latency.Seconds() * 1e3,
+		})
+	}
+
+	return journalEntryViews
 }

@@ -19,7 +19,8 @@ func Test_NewJournal_ProducesAJournalWithAnEmptyArray(t *testing.T) {
 
 	unit := journal.NewJournal()
 
-	entries, err := unit.GetEntries(0, 25)
+	journalView, err := unit.GetEntries(0, 25)
+	entries := journalView.Journal
 	Expect(err).To(BeNil())
 
 	Expect(entries).ToNot(BeNil())
@@ -48,7 +49,8 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 	}, "test-mode", nowTime)
 	Expect(err).To(BeNil())
 
-	entries, err := unit.GetEntries(0, 25)
+	journalView, err := unit.GetEntries(0, 25)
+	entries := journalView.Journal
 	Expect(err).To(BeNil())
 
 	Expect(entries).ToNot(BeNil())
@@ -89,7 +91,8 @@ func Test_Journal_NewEntry_RespectsEntryLimit(t *testing.T) {
 		Expect(err).To(BeNil())
 	}
 
-	entries, err := unit.GetEntries(0, 25)
+	journalView, err := unit.GetEntries(0, 25)
+	entries := journalView.Journal
 	Expect(err).To(BeNil())
 
 	Expect(entries).ToNot(BeNil())
@@ -135,7 +138,8 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 	}, "test-mode", nowTime)
 	Expect(err).To(BeNil())
 
-	entries, err := unit.GetEntries(0, 25)
+	journalView, err := unit.GetEntries(0, 25)
+	entries := journalView.Journal
 	Expect(err).To(BeNil())
 
 	Expect(entries).ToNot(BeNil())
@@ -188,10 +192,10 @@ func Test_Journal_DeleteEntries_DeletesAllEntries(t *testing.T) {
 	err := unit.DeleteEntries()
 	Expect(err).To(BeNil())
 
-	entries, err := unit.GetEntries(0, 25)
+	journalView, err := unit.GetEntries(0, 25)
 	Expect(err).To(BeNil())
 
-	Expect(entries).To(HaveLen(0))
+	Expect(journalView.Journal).To(HaveLen(0))
 }
 
 func Test_Journal_DeleteEntries_WhenDisabledReturnsError(t *testing.T) {
@@ -223,7 +227,8 @@ func Test_Journal_GetEntries_TurnsTimeDurationToMilliseconds(t *testing.T) {
 
 	Expect(err).To(BeNil())
 
-	entries, err := unit.GetEntries(0, 25)
+	journalView, err := unit.GetEntries(0, 25)
+	entries := journalView.Journal
 	Expect(err).To(BeNil())
 	Expect(entries).To(HaveLen(1))
 
@@ -258,27 +263,37 @@ func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
 		unit.NewEntry(request, response, "test-mode", time.Now())
 	}
 
-	entries, err := unit.GetEntries(0, 2)
+	journalView, err := unit.GetEntries(0, 2)
 	Expect(err).To(BeNil())
-	Expect(entries).To(HaveLen(2))
-	Expect(*entries[0].Request.Query).To(Equal("id=0"))
-	Expect(*entries[1].Request.Query).To(Equal("id=1"))
-
-	entries, _ = unit.GetEntries(2, 2)
-	Expect(entries).To(HaveLen(2))
-	Expect(*entries[0].Request.Query).To(Equal("id=2"))
-	Expect(*entries[1].Request.Query).To(Equal("id=3"))
+	Expect(journalView.Journal).To(HaveLen(2))
+	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=0"))
+	Expect(*journalView.Journal[1].Request.Query).To(Equal("id=1"))
+	Expect(journalView.Limit).To(Equal(2))
+	Expect(journalView.Offset).To(Equal(0))
+	Expect(journalView.Total).To(Equal(5))
 
 
-	entries, _ = unit.GetEntries(4, 2)
-	Expect(entries).To(HaveLen(1))
-	Expect(*entries[0].Request.Query).To(Equal("id=4"))
+	journalView, _ = unit.GetEntries(2, 2)
+	Expect(journalView.Journal).To(HaveLen(2))
+	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=2"))
+	Expect(*journalView.Journal[1].Request.Query).To(Equal("id=3"))
+	Expect(journalView.Limit).To(Equal(2))
+	Expect(journalView.Offset).To(Equal(2))
+	Expect(journalView.Total).To(Equal(5))
 
-	entries, err = unit.GetEntries(-1, 2)
+
+	journalView, _ = unit.GetEntries(4, 2)
+	Expect(journalView.Journal).To(HaveLen(1))
+	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=4"))
+	Expect(journalView.Limit).To(Equal(2))
+	Expect(journalView.Offset).To(Equal(4))
+	Expect(journalView.Total).To(Equal(5))
+
+	journalView, err = unit.GetEntries(-1, 2)
 	Expect(err).To(BeNil())
-	Expect(entries).To(HaveLen(2))
-	Expect(*entries[0].Request.Query).To(Equal("id=0"))
-	Expect(*entries[1].Request.Query).To(Equal("id=1"))
+	Expect(journalView.Journal).To(HaveLen(2))
+	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=0"))
+	Expect(*journalView.Journal[1].Request.Query).To(Equal("id=1"))
 }
 
 func Test_Journal_GetEntries_ReturnEmptyPageIfOffsetIsLargerThanTotalElements(t *testing.T) {
@@ -296,9 +311,9 @@ func Test_Journal_GetEntries_ReturnEmptyPageIfOffsetIsLargerThanTotalElements(t 
 		unit.NewEntry(request, response, "test-mode", time.Now())
 	}
 
-	entries, err := unit.GetEntries(10, 2)
+	journalView, err := unit.GetEntries(10, 2)
 	Expect(err).To(BeNil())
-	Expect(entries).To(HaveLen(0))
+	Expect(journalView.Journal).To(HaveLen(0))
 }
 
 func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
