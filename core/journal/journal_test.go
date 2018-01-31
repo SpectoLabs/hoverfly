@@ -243,24 +243,63 @@ func Test_Journal_GetEntries_WhenDisabledReturnsError(t *testing.T) {
 }
 
 
-//func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
-//	RegisterTestingT(t)
-//
-//	unit := journal.NewJournal()
-//
-//	response := &http.Response{
-//		StatusCode: 200,
-//		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
-//	}
-//
-//	for i:= 0; i < 5; i++ {
-//		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id=" + strconv.Itoa(i), nil)
-//		unit.NewEntry(request, response, "test-mode", time.Now())
-//	}
-//
-//	unit.GetEntries()
-//
-//}
+func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	response := &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+	}
+
+	for i:= 0; i < 5; i++ {
+		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id=" + strconv.Itoa(i), nil)
+		unit.NewEntry(request, response, "test-mode", time.Now())
+	}
+
+	entries, err := unit.GetEntries(0, 2)
+	Expect(err).To(BeNil())
+	Expect(entries).To(HaveLen(2))
+	Expect(*entries[0].Request.Query).To(Equal("id=0"))
+	Expect(*entries[1].Request.Query).To(Equal("id=1"))
+
+	entries, _ = unit.GetEntries(2, 2)
+	Expect(entries).To(HaveLen(2))
+	Expect(*entries[0].Request.Query).To(Equal("id=2"))
+	Expect(*entries[1].Request.Query).To(Equal("id=3"))
+
+
+	entries, _ = unit.GetEntries(4, 2)
+	Expect(entries).To(HaveLen(1))
+	Expect(*entries[0].Request.Query).To(Equal("id=4"))
+
+	entries, err = unit.GetEntries(-1, 2)
+	Expect(err).To(BeNil())
+	Expect(entries).To(HaveLen(2))
+	Expect(*entries[0].Request.Query).To(Equal("id=0"))
+	Expect(*entries[1].Request.Query).To(Equal("id=1"))
+}
+
+func Test_Journal_GetEntries_ReturnEmptyPageIfOffsetIsLargerThanTotalElements(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	response := &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+	}
+
+	for i:= 0; i < 5; i++ {
+		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id=" + strconv.Itoa(i), nil)
+		unit.NewEntry(request, response, "test-mode", time.Now())
+	}
+
+	entries, err := unit.GetEntries(10, 2)
+	Expect(err).To(BeNil())
+	Expect(entries).To(HaveLen(0))
+}
 
 func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	RegisterTestingT(t)

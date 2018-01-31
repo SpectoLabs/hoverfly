@@ -68,14 +68,29 @@ func (this Journal) GetEntries(offset int, limit int) ([]v2.JournalEntryView, er
 		return []v2.JournalEntryView{}, fmt.Errorf("Journal disabled")
 	}
 
+	totalElements := len(this.entries)
 	journalEntryViews := []v2.JournalEntryView{}
-	for _, journalEntry := range this.entries {
+
+	if offset < 0 {
+		offset = 0
+	} else if offset >= totalElements {
+		return journalEntryViews, nil
+	}
+
+	endIndex := offset + limit
+	if endIndex > totalElements {
+		endIndex = totalElements
+	}
+
+	page := this.entries[offset:endIndex]
+
+	for _, journalEntry := range page {
 		journalEntryViews = append(journalEntryViews, v2.JournalEntryView{
 			Request:     journalEntry.Request.ConvertToRequestDetailsView(),
 			Response:    journalEntry.Response.ConvertToResponseDetailsView(),
 			Mode:        journalEntry.Mode,
 			TimeStarted: journalEntry.TimeStarted.Format(RFC3339Milli),
-			Latency:     (journalEntry.Latency.Seconds() * 1e3),
+			Latency:     journalEntry.Latency.Seconds() * 1e3,
 		})
 	}
 	return journalEntryViews, nil
