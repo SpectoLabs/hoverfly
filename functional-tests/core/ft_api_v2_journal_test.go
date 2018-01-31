@@ -505,11 +505,11 @@ var _ = Describe("/api/v2/journal", func() {
 		})
 	})
 
-	Context("with -journal-size=100", func() {
+	Context("with -journal-size=10", func() {
 
 		BeforeEach(func() {
 			hoverfly = functional_tests.NewHoverfly()
-			hoverfly.Start("-journal-size=100")
+			hoverfly.Start("-journal-size=10")
 		})
 
 		AfterEach(func() {
@@ -519,7 +519,7 @@ var _ = Describe("/api/v2/journal", func() {
 		Context("GET", func() {
 
 			It("should not exceed size", func() {
-				for i := 0; i < 111; i++ {
+				for i := 0; i < 10; i++ {
 					hoverfly.Proxy(sling.New().Get("http://hoverfly.io"))
 				}
 
@@ -536,7 +536,7 @@ var _ = Describe("/api/v2/journal", func() {
 				err = json.Unmarshal(responseJson, &journalView)
 				Expect(err).To(BeNil())
 
-				Expect(journalView.Journal).To(HaveLen(100))
+				Expect(journalView.Journal).To(HaveLen(10))
 			})
 		})
 	})
