@@ -19,7 +19,7 @@ func Test_NewJournal_ProducesAJournalWithAnEmptyArray(t *testing.T) {
 
 	unit := journal.NewJournal()
 
-	entries, err := unit.GetEntries()
+	entries, err := unit.GetEntries(0, 25)
 	Expect(err).To(BeNil())
 
 	Expect(entries).ToNot(BeNil())
@@ -48,7 +48,7 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 	}, "test-mode", nowTime)
 	Expect(err).To(BeNil())
 
-	entries, err := unit.GetEntries()
+	entries, err := unit.GetEntries(0, 25)
 	Expect(err).To(BeNil())
 
 	Expect(entries).ToNot(BeNil())
@@ -89,7 +89,7 @@ func Test_Journal_NewEntry_RespectsEntryLimit(t *testing.T) {
 		Expect(err).To(BeNil())
 	}
 
-	entries, err := unit.GetEntries()
+	entries, err := unit.GetEntries(0, 25)
 	Expect(err).To(BeNil())
 
 	Expect(entries).ToNot(BeNil())
@@ -135,7 +135,7 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 	}, "test-mode", nowTime)
 	Expect(err).To(BeNil())
 
-	entries, err := unit.GetEntries()
+	entries, err := unit.GetEntries(0, 25)
 	Expect(err).To(BeNil())
 
 	Expect(entries).ToNot(BeNil())
@@ -188,7 +188,7 @@ func Test_Journal_DeleteEntries_DeletesAllEntries(t *testing.T) {
 	err := unit.DeleteEntries()
 	Expect(err).To(BeNil())
 
-	entries, err := unit.GetEntries()
+	entries, err := unit.GetEntries(0, 25)
 	Expect(err).To(BeNil())
 
 	Expect(entries).To(HaveLen(0))
@@ -223,7 +223,7 @@ func Test_Journal_GetEntries_TurnsTimeDurationToMilliseconds(t *testing.T) {
 
 	Expect(err).To(BeNil())
 
-	entries, err := unit.GetEntries()
+	entries, err := unit.GetEntries(0, 25)
 	Expect(err).To(BeNil())
 	Expect(entries).To(HaveLen(1))
 
@@ -237,10 +237,30 @@ func Test_Journal_GetEntries_WhenDisabledReturnsError(t *testing.T) {
 	unit := journal.NewJournal()
 	unit.EntryLimit = 0
 
-	_, err := unit.GetEntries()
+	_, err := unit.GetEntries(0, 25)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Journal disabled"))
 }
+
+
+//func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
+//	RegisterTestingT(t)
+//
+//	unit := journal.NewJournal()
+//
+//	response := &http.Response{
+//		StatusCode: 200,
+//		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+//	}
+//
+//	for i:= 0; i < 5; i++ {
+//		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id=" + strconv.Itoa(i), nil)
+//		unit.NewEntry(request, response, "test-mode", time.Now())
+//	}
+//
+//	unit.GetEntries()
+//
+//}
 
 func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	RegisterTestingT(t)

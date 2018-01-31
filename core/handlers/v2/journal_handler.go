@@ -10,7 +10,7 @@ import (
 )
 
 type HoverflyJournal interface {
-	GetEntries() ([]JournalEntryView, error)
+	GetEntries(offset int, limit int) ([]JournalEntryView, error)
 	GetFilteredEntries(journalEntryFilterView JournalEntryFilterView) ([]JournalEntryView, error)
 	DeleteEntries() error
 }
@@ -40,7 +40,7 @@ func (this *JournalHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandl
 func (this *JournalHandler) Get(response http.ResponseWriter, request *http.Request, next http.HandlerFunc) {
 	var journalView JournalView
 
-	entries, err := this.Hoverfly.GetEntries()
+	entries, err := this.Hoverfly.GetEntries(0, 25)
 	if err != nil {
 		handlers.WriteErrorResponse(response, err.Error(), http.StatusInternalServerError)
 		return
