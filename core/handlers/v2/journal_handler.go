@@ -13,7 +13,7 @@ import (
 const DefaultJournalLimit = 25
 
 type HoverflyJournal interface {
-	GetEntries(offset int, limit int) ([]JournalEntryView, error)
+	GetEntries(offset int, limit int) (JournalView, error)
 	GetFilteredEntries(journalEntryFilterView JournalEntryFilterView) ([]JournalEntryView, error)
 	DeleteEntries() error
 }
@@ -50,14 +50,11 @@ func (this *JournalHandler) Get(response http.ResponseWriter, request *http.Requ
 		limit = DefaultJournalLimit
 	}
 
-	entries, err := this.Hoverfly.GetEntries(offset, limit)
+	journalView, err := this.Hoverfly.GetEntries(offset, limit)
 	if err != nil {
 		handlers.WriteErrorResponse(response, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	var journalView JournalView
-	journalView.Journal = entries
 
 	bytes, _ := json.Marshal(journalView)
 	handlers.WriteResponse(response, bytes)

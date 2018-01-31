@@ -73,6 +73,9 @@ type ClosestMissView struct {
 
 type JournalView struct {
 	Journal []JournalEntryView `json:"journal"`
+	Offset 	int				   `json:"offset"`
+	Limit	int				   `json:"limit"`
+	Total 	int				   `json:"total"`
 }
 
 type JournalEntryView struct {
