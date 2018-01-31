@@ -14,13 +14,16 @@ import (
 )
 
 type HoverflyJournalStub struct {
-	limit                  int
 	deleted                bool
 	error                  bool
+	limit				   int
+	offset				   int
 	journalEntryFilterView JournalEntryFilterView
 }
 
 func (this *HoverflyJournalStub) GetEntries(offset int, limit int) ([]JournalEntryView, error) {
+	this.offset = offset
+	this.limit = limit
 	if this.error {
 		return []JournalEntryView{}, fmt.Errorf("entries error")
 	}
@@ -76,6 +79,42 @@ func Test_JournalHandler_Get_ReturnsJournal(t *testing.T) {
 
 	Expect(journalView.Journal).To(HaveLen(1))
 	Expect(journalView.Journal[0].Mode).To(Equal("test"))
+}
+
+func Test_JournalHandler_Get_SetDefaultPagingQueryIfNotSpecified(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyJournalStub{}
+
+	unit := JournalHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "/api/v2/journal", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Get, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	Expect(stubHoverfly.limit).To(Equal(25))
+	Expect(stubHoverfly.offset).To(Equal(0))
+}
+
+func Test_JournalHandler_Get_WithPagingQuery(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyJournalStub{}
+
+	unit := JournalHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "/api/v2/journal?offset=50&limit=25", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Get, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	Expect(stubHoverfly.limit).To(Equal(25))
+	Expect(stubHoverfly.offset).To(Equal(50))
 }
 
 func Test_JournalHandler_Get_Error(t *testing.T) {

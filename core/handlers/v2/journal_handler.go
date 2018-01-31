@@ -7,7 +7,10 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
+	"strconv"
 )
+
+const DefaultJournalLimit = 25
 
 type HoverflyJournal interface {
 	GetEntries(offset int, limit int) ([]JournalEntryView, error)
@@ -38,14 +41,22 @@ func (this *JournalHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandl
 }
 
 func (this *JournalHandler) Get(response http.ResponseWriter, request *http.Request, next http.HandlerFunc) {
-	var journalView JournalView
 
-	entries, err := this.Hoverfly.GetEntries(0, 25)
+	queryParams := request.URL.Query()
+	offset, _ := strconv.Atoi(queryParams.Get("offset"))
+	limit, _ := strconv.Atoi(queryParams.Get("limit"))
+
+	if limit == 0 {
+		limit = DefaultJournalLimit
+	}
+
+	entries, err := this.Hoverfly.GetEntries(offset, limit)
 	if err != nil {
 		handlers.WriteErrorResponse(response, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	var journalView JournalView
 	journalView.Journal = entries
 
 	bytes, _ := json.Marshal(journalView)
