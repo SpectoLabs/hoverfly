@@ -25,7 +25,7 @@ type LogsHandler struct {
 	Hoverfly HoverflyLogs
 }
 
-var DefaultLimit = 500
+const DefaultLogLimit = 500
 
 func (this *LogsHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
 	mux.Get("/api/v2/logs", negroni.New(
@@ -43,7 +43,7 @@ func (this *LogsHandler) Get(w http.ResponseWriter, req *http.Request, next http
 	queryParams := req.URL.Query()
 	limitQuery, _ := strconv.Atoi(queryParams.Get("limit"))
 	if limitQuery == 0 {
-		limitQuery = DefaultLimit
+		limitQuery = DefaultLogLimit
 	}
 
 	fromQuery, _ := strconv.Atoi(queryParams.Get("from"))
