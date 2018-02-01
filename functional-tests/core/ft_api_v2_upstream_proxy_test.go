@@ -32,7 +32,7 @@ var _ = Describe("/api/v2/hoverfly/upstream-proxy", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(string(modeJson)).To(MatchRegexp(`{"upstream-proxy":""}`))
+			Expect(string(modeJson)).To(MatchRegexp(`{"upstreamProxy":""}`))
 		})
 	})
 })

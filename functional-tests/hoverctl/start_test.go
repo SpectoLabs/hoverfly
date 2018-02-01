@@ -149,7 +149,7 @@ var _ = Describe("hoverctl `start`", func() {
 			response := functional_tests.DoRequest(sling.New().Get("http://localhost:8888/api/v2/hoverfly"))
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).To(ContainSubstring(`"upstream-proxy":"http://hoverfly.io:8080"`))
+			Expect(ioutil.ReadAll(response.Body)).To(ContainSubstring(`"upstreamProxy":"http://hoverfly.io:8080"`))
 		})
 
 		It("should start an instance of hoverfly with HTTPS only", func() {

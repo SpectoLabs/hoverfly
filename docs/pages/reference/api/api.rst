@@ -358,7 +358,7 @@ Gets the upstream proxy configured for Hoverfly.
 ::
 
     {
-        "upstream-proxy": "proxy.corp.big-it-company.org:8080"
+        "upstreamProxy": "proxy.corp.big-it-company.org:8080"
     }
 
 

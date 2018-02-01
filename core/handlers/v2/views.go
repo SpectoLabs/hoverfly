@@ -37,7 +37,7 @@ type VersionView struct {
 }
 
 type UpstreamProxyView struct {
-	UpstreamProxy string `json:"upstream-proxy"`
+	UpstreamProxy string `json:"upstreamProxy"`
 }
 
 type HoverflyView struct {

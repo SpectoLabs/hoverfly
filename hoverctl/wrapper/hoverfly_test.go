@@ -240,7 +240,7 @@ func Test_GetHoverfly_GetsHoverfly(t *testing.T) {
 								}
 							},
 							"version": "v0.14.2",
-							"upstream-proxy": ""
+							"upstreamProxy": ""
 						}`,
 					},
 				},
