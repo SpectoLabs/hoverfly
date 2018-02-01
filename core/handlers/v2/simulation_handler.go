@@ -16,6 +16,7 @@ import (
 
 type HoverflySimulation interface {
 	GetSimulation() (SimulationViewV4, error)
+	GetFilteredSimulation(string) (SimulationViewV4, error)
 	PutSimulation(SimulationViewV4) error
 	DeleteSimulation()
 }
@@ -51,7 +52,15 @@ func (this *SimulationHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHa
 }
 
 func (this *SimulationHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	simulationView, err := this.Hoverfly.GetSimulation()
+	urlPattern := req.URL.Query().Get("urlPattern")
+
+	var err error
+	var simulationView SimulationViewV4
+	if urlPattern == "" {
+		simulationView, err = this.Hoverfly.GetSimulation()
+	} else {
+		simulationView, err = this.Hoverfly.GetFilteredSimulation(urlPattern)
+	}
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return

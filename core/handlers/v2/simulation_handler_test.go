@@ -17,6 +17,8 @@ import (
 type HoverflySimulationStub struct {
 	Deleted    bool
 	Simulation SimulationViewV4
+	UrlPattern string
+	Filtered   bool
 }
 
 func (this HoverflySimulationStub) GetSimulation() (SimulationViewV4, error) {
@@ -54,6 +56,12 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationViewV4, error) {
 	}, nil
 }
 
+func (this *HoverflySimulationStub) GetFilteredSimulation(urlPattern string) (SimulationViewV4, error) {
+	this.Filtered = true
+	this.UrlPattern = urlPattern
+	return this.GetSimulation()
+}
+
 func (this *HoverflySimulationStub) DeleteSimulation() {
 	this.Deleted = true
 }
@@ -66,6 +74,10 @@ func (this *HoverflySimulationStub) PutSimulation(simulation SimulationViewV4) e
 type HoverflySimulationErrorStub struct{}
 
 func (this HoverflySimulationErrorStub) GetSimulation() (SimulationViewV4, error) {
+	return SimulationViewV4{}, fmt.Errorf("error")
+}
+
+func (this HoverflySimulationErrorStub) GetFilteredSimulation(urlPattern string) (SimulationViewV4, error) {
 	return SimulationViewV4{}, fmt.Errorf("error")
 }
 
@@ -126,6 +138,47 @@ func TestSimulationHandler_Get_ReturnsErrorIfHoverflyErrors(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(errorView.Error).To(Equal("error"))
+}
+
+func TestSimulationHandler_Get_WithEmptyUrlPatternShouldNotFilterSimulation(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationStub{}
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "?urlPattern=", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Get, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	simulationView, err := unmarshalSimulationViewV3(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(simulationView.DataViewV4.RequestResponsePairs).To(HaveLen(1))
+	Expect(stubHoverfly.Filtered).To(BeFalse())
+}
+
+func TestSimulationHandler_Get_WithUrlPatternShouldFilterSimulation(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationStub{}
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "?urlPattern=foo.com", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Get, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	simulationView, err := unmarshalSimulationViewV3(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(simulationView.DataViewV4.RequestResponsePairs).To(HaveLen(1))
+	Expect(stubHoverfly.Filtered).To(BeTrue())
+	Expect(stubHoverfly.UrlPattern).To(Equal("foo.com"))
 }
 
 func TestSimulationHandler_Delete_CallsDelete(t *testing.T) {
