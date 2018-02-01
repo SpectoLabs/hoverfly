@@ -19,12 +19,16 @@ type HoverflyJournalStub struct {
 	error                  bool
 	limit                  int
 	offset                 int
+	from				   *time.Time
+	to					   *time.Time
 	journalEntryFilterView JournalEntryFilterView
 }
 
 func (this *HoverflyJournalStub) GetEntries(offset int, limit int, from *time.Time, to *time.Time) (JournalView, error) {
 	this.offset = offset
 	this.limit = limit
+	this.from = from
+	this.to = to
 
 	journalView := JournalView{
 		Journal: []JournalEntryView{},
@@ -130,6 +134,40 @@ func Test_JournalHandler_Get_WithPagingQuery(t *testing.T) {
 	Expect(journalView.Offset).To(Equal(50))
 	Expect(journalView.Limit).To(Equal(25))
 }
+
+func Test_JournalHandler_Get_WithDateTimeQuery(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyJournalStub{}
+
+	unit := JournalHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "/api/v2/journal?from=1517498951&to=1517498986", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Get, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	Expect(stubHoverfly.from.Unix()).To(Equal(int64(1517498951)))
+	Expect(stubHoverfly.to.Unix()).To(Equal(int64(1517498986)))
+}
+
+func Test_JournalHandler_Get_DoesNotSetTimeIfDateTimeQueryIsBadTime(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyJournalStub{}
+
+	unit := JournalHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "/api/v2/journal?from=bad-time", nil)
+	Expect(err).To(BeNil())
+
+	makeRequestOnHandler(unit.Get, request)
+
+	Expect(stubHoverfly.from).To(BeNil())
+}
+
 
 func Test_JournalHandler_Get_Error(t *testing.T) {
 	RegisterTestingT(t)
