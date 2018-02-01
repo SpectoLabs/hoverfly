@@ -15,6 +15,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
+	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 type HoverflyLogs interface {
@@ -46,14 +47,7 @@ func (this *LogsHandler) Get(w http.ResponseWriter, req *http.Request, next http
 		limitQuery = DefaultLogLimit
 	}
 
-	fromQuery, _ := strconv.Atoi(queryParams.Get("from"))
-
-	var fromTime *time.Time
-	if fromQuery != 0 {
-
-		fromTimeValue := time.Unix(int64(fromQuery), 0)
-		fromTime = &fromTimeValue
-	}
+	fromTime := util.GetUnixTimeQueryParam(req, "from")
 
 	logs, err := this.Hoverfly.GetLogs(limitQuery, fromTime)
 	if err != nil {
