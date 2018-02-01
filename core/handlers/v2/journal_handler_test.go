@@ -11,6 +11,7 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
+	"time"
 )
 
 type HoverflyJournalStub struct {
@@ -21,7 +22,7 @@ type HoverflyJournalStub struct {
 	journalEntryFilterView JournalEntryFilterView
 }
 
-func (this *HoverflyJournalStub) GetEntries(offset int, limit int) (JournalView, error) {
+func (this *HoverflyJournalStub) GetEntries(offset int, limit int, from *time.Time, to *time.Time) (JournalView, error) {
 	this.offset = offset
 	this.limit = limit
 

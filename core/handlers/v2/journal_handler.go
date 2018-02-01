@@ -8,12 +8,13 @@ import (
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"strconv"
+	"time"
 )
 
 const DefaultJournalLimit = 25
 
 type HoverflyJournal interface {
-	GetEntries(offset int, limit int) (JournalView, error)
+	GetEntries(offset int, limit int, from *time.Time, to *time.Time) (JournalView, error)
 	GetFilteredEntries(journalEntryFilterView JournalEntryFilterView) ([]JournalEntryView, error)
 	DeleteEntries() error
 }
@@ -50,7 +51,7 @@ func (this *JournalHandler) Get(response http.ResponseWriter, request *http.Requ
 		limit = DefaultJournalLimit
 	}
 
-	journalView, err := this.Hoverfly.GetEntries(offset, limit)
+	journalView, err := this.Hoverfly.GetEntries(offset, limit, nil, nil)
 	if err != nil {
 		handlers.WriteErrorResponse(response, err.Error(), http.StatusInternalServerError)
 		return

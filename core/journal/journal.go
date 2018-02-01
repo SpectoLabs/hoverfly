@@ -63,7 +63,7 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 	return nil
 }
 
-func (this Journal) GetEntries(offset int, limit int) (v2.JournalView, error) {
+func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.Time) (v2.JournalView, error) {
 	journalView := v2.JournalView{
 		Journal: []v2.JournalEntryView{},
 		Offset: 0,
@@ -75,7 +75,23 @@ func (this Journal) GetEntries(offset int, limit int) (v2.JournalView, error) {
 		return journalView, fmt.Errorf("Journal disabled")
 	}
 
-	totalElements := len(this.entries)
+	selectedEntries := []JournalEntry{}
+
+	if from != nil || to != nil {
+		for _, entry := range this.entries {
+			if from != nil && entry.TimeStarted.Before(*from) {
+				continue
+			}
+			if to != nil && entry.TimeStarted.After(*to) {
+				continue
+			}
+			selectedEntries = append(selectedEntries, entry)
+		}
+	} else {
+		selectedEntries = this.entries
+	}
+
+	totalElements := len(selectedEntries)
 
 	if offset < 0 {
 		offset = 0
@@ -83,13 +99,12 @@ func (this Journal) GetEntries(offset int, limit int) (v2.JournalView, error) {
 		return journalView, nil
 	}
 
-
 	endIndex := offset + limit
 	if endIndex > totalElements {
 		endIndex = totalElements
 	}
 
-	journalView.Journal = convertJournalEntries(this.entries[offset:endIndex])
+	journalView.Journal = convertJournalEntries(selectedEntries[offset:endIndex])
 	journalView.Offset = offset
 	journalView.Limit = limit
 	journalView.Total = totalElements
