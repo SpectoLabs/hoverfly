@@ -46,12 +46,27 @@ func (this *JournalHandler) Get(response http.ResponseWriter, request *http.Requ
 	queryParams := request.URL.Query()
 	offset, _ := strconv.Atoi(queryParams.Get("offset"))
 	limit, _ := strconv.Atoi(queryParams.Get("limit"))
+	fromQuery, _ := strconv.Atoi(queryParams.Get("from"))
+	toQuery, _ := strconv.Atoi(queryParams.Get("to"))
+
+	var fromTime *time.Time
+	var toTime *time.Time
 
 	if limit == 0 {
 		limit = DefaultJournalLimit
 	}
 
-	journalView, err := this.Hoverfly.GetEntries(offset, limit, nil, nil)
+	if fromQuery != 0 {
+		fromTimeValue := time.Unix(int64(fromQuery), 0)
+		fromTime = &fromTimeValue
+	}
+
+	if toQuery != 0 {
+		toTimeValue := time.Unix(int64(toQuery), 0)
+		toTime = &toTimeValue
+	}
+
+	journalView, err := this.Hoverfly.GetEntries(offset, limit, fromTime, toTime)
 	if err != nil {
 		handlers.WriteErrorResponse(response, err.Error(), http.StatusInternalServerError)
 		return
