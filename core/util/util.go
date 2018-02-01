@@ -13,6 +13,8 @@ import (
 	"github.com/tdewolff/minify"
 	mjson "github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
+	"strconv"
+	"time"
 )
 
 // GetRequestBody will read the http.Request body io.ReadCloser
@@ -41,6 +43,16 @@ func GetResponseBody(response *http.Response) (string, error) {
 	response.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 
 	return string(bodyBytes), nil
+}
+
+func GetUnixTimeQueryParam(request *http.Request, paramName string) *time.Time {
+	var timeQuery *time.Time
+	epochValue, _ := strconv.Atoi(request.URL.Query().Get(paramName))
+	if epochValue != 0 {
+		timeValue := time.Unix(int64(epochValue), 0)
+		timeQuery = &timeValue
+	}
+	return timeQuery
 }
 
 func StringToPointer(value string) *string {

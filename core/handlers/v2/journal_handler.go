@@ -9,6 +9,7 @@ import (
 	"github.com/go-zoo/bone"
 	"strconv"
 	"time"
+	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 const DefaultJournalLimit = 25
@@ -46,24 +47,11 @@ func (this *JournalHandler) Get(response http.ResponseWriter, request *http.Requ
 	queryParams := request.URL.Query()
 	offset, _ := strconv.Atoi(queryParams.Get("offset"))
 	limit, _ := strconv.Atoi(queryParams.Get("limit"))
-	fromQuery, _ := strconv.Atoi(queryParams.Get("from"))
-	toQuery, _ := strconv.Atoi(queryParams.Get("to"))
-
-	var fromTime *time.Time
-	var toTime *time.Time
+	fromTime := util.GetUnixTimeQueryParam(request, "from")
+	toTime := util.GetUnixTimeQueryParam(request, "to")
 
 	if limit == 0 {
 		limit = DefaultJournalLimit
-	}
-
-	if fromQuery != 0 {
-		fromTimeValue := time.Unix(int64(fromQuery), 0)
-		fromTime = &fromTimeValue
-	}
-
-	if toQuery != 0 {
-		toTimeValue := time.Unix(int64(toQuery), 0)
-		toTime = &toTimeValue
 	}
 
 	journalView, err := this.Hoverfly.GetEntries(offset, limit, fromTime, toTime)
