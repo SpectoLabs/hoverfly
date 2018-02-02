@@ -70,6 +70,75 @@ var _ = Describe("When I use hoverctl", func() {
 				}
 			}`
 
+		v3HoverflyDataWithMultiplePairs = `
+			{
+				"data": {
+					"pairs": [{
+						"response": {
+							"status": 201,
+							"body": "",
+							"encodedBody": false,
+							"headers": {
+								"Location": ["http://localhost/api/bookings/1"]
+							},
+							"templated": false
+						},
+						"request": {
+							"path": {
+								"exactMatch": "/api/bookings"
+							},
+							"method": {
+								"exactMatch": "POST"
+							},
+							"destination": {
+								"exactMatch": "www.my-test.com"
+							},
+							"scheme": {
+								"exactMatch": "http"
+							},
+							"query": {
+								"exactMatch": ""
+							},
+							"body": {
+								"exactMatch": "{\"flightId\": \"1\"}"
+							},
+							"headers": {
+								"Content-Type": ["application/json"]
+							}
+						}
+					}, {
+						"response": {
+							"status": 201,
+							"body": "",
+							"encodedBody": false,
+							"headers": {
+								"Location": ["http://localhost/api/bookings/1"]
+							},
+							"templated": false
+						},
+						"request": {
+							"path": {
+								"exactMatch": "/api/bookings"
+							},
+							"method": {
+								"exactMatch": "POST"
+							},
+							"destination": {
+								"exactMatch": "www.other-test.com"
+							}
+						}
+					}],
+					"globalActions": {
+						"delays": []
+					}
+				},
+				"meta": {
+					"schemaVersion": "v3",
+					"hoverflyVersion": "v0.9.2",
+					"timeExported": "2016-11-10T12:27:46Z"
+				}
+			}`
+
 		v3HoverflySimulation = `"pairs":[{"request":{"path":{"exactMatch":"/api/bookings"},"method":{"exactMatch":"POST"},"destination":{"exactMatch":"www.my-test.com"},"scheme":{"exactMatch":"http"},"query":{"exactMatch":""},"body":{"exactMatch":"{\"flightId\": \"1\"}"},"headers":{"Content-Type":["application/json"]}},"response":{"status":201,"body":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]},"templated":false}}],"globalActions":{"delays":[]}}`
 
 		v3HoverflyMeta = `"meta":{"schemaVersion":"v4","hoverflyVersion":"v\d+.\d+.\d+","timeExported":`
@@ -99,6 +168,25 @@ var _ = Describe("When I use hoverctl", func() {
 				fileName := functional_tests.GenerateFileName()
 				// Export the data
 				output := functional_tests.Run(hoverctlBinary, "export", fileName, "--admin-port="+hoverfly.GetAdminPort())
+
+				Expect(output).To(ContainSubstring("Successfully exported simulation to " + fileName))
+
+				data, err := ioutil.ReadFile(fileName)
+				Expect(err).To(BeNil())
+
+				buffer := new(bytes.Buffer)
+				json.Compact(buffer, data)
+
+				Expect(buffer.String()).To(ContainSubstring(v3HoverflySimulation))
+				Expect(buffer.String()).To(MatchRegexp(v3HoverflyMeta))
+			})
+
+			It("can export with url pattern", func() {
+
+				hoverfly.ImportSimulation(v3HoverflyDataWithMultiplePairs)
+				fileName := functional_tests.GenerateFileName()
+				// Export the data
+				output := functional_tests.Run(hoverctlBinary, "export", fileName, "--admin-port="+hoverfly.GetAdminPort(), "--url-pattern=my-test.com")
 
 				Expect(output).To(ContainSubstring("Successfully exported simulation to " + fileName))
 
