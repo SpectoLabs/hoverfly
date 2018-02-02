@@ -36,16 +36,55 @@ func Test_ExportSimulation_GetsModeFromHoverfly(t *testing.T) {
 		},
 	})
 
-	simulation, err := ExportSimulation(target)
+	simulation, err := ExportSimulation(target, "")
 	Expect(err).To(BeNil())
 
 	Expect(string(simulation)).To(Equal("{\n\t\"simulation\": true\n}"))
 }
 
+func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
+	RegisterTestingT(t)
+
+	hoverfly.DeleteSimulation()
+	hoverfly.PutSimulation(v2.SimulationViewV4{
+		v2.DataViewV4{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV4{
+				{
+					RequestMatcher: v2.RequestMatcherViewV4{
+						Method: &v2.RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("GET"),
+						},
+						Path: &v2.RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("/api/v2/simulation"),
+						},
+						Query: &v2.RequestFieldMatchersView{
+						ExactMatch: util.StringToPointer("urlPattern=test-(.+).com"),
+					},
+					},
+					Response: v2.ResponseDetailsViewV4{
+						Status: 200,
+						Body:   `{"simulation": true}`,
+					},
+				},
+			},
+		},
+		v2.MetaView{
+			SchemaVersion: "v2",
+		},
+	})
+
+	simulation, err := ExportSimulation(target, "test-(.+).com")
+	Expect(err).To(BeNil())
+
+	Expect(string(simulation)).To(Equal("{\n\t\"simulation\": true\n}"))
+}
+
+
+
 func Test_ExportSimulation_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, err := ExportSimulation(inaccessibleTarget)
+	_, err := ExportSimulation(inaccessibleTarget, "")
 
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Could not connect to Hoverfly at something:1234"))
@@ -79,7 +118,7 @@ func Test_ExportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		},
 	})
 
-	_, err := ExportSimulation(target)
+	_, err := ExportSimulation(target, "")
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Could not retrieve simulation\n\ntest error"))
 }
