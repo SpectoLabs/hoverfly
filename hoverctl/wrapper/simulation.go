@@ -8,10 +8,16 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
+	"net/url"
 )
 
-func ExportSimulation(target configuration.Target) ([]byte, error) {
-	response, err := doRequest(target, "GET", v2ApiSimulation, "", nil)
+func ExportSimulation(target configuration.Target, urlPattern string) ([]byte, error) {
+
+	requestUrl := v2ApiSimulation
+	if len(urlPattern) > 0 {
+		requestUrl += "?urlPattern=" + url.QueryEscape(urlPattern)
+	}
+	response, err := doRequest(target, "GET", requestUrl, "", nil)
 	if err != nil {
 		return nil, err
 	}

@@ -26,4 +26,12 @@ var _ = Describe("When I export with hoverctl", func() {
 			Expect(output).To(ContainSubstring("Run `hoverctl targets create test-target`"))
 		})
 	})
+
+	Context("without providing an urlPattern", func() {
+		It("it should fail nicely", func() {
+			output := functional_tests.Run(hoverctlBinary, "export", "--url-pattern")
+
+			Expect(output).To(ContainSubstring("Error: flag needs an argument: --url-pattern"))
+		})
+	})
 })
