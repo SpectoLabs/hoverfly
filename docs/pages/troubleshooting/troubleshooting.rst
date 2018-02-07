@@ -68,8 +68,7 @@ You can also view this information by running ``hoverctl logs``.
 Why isn't Hoverfly returning the closest match when it cannot match a request?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Hoverfly will only provide this information when the matching strategy is set to **strongest match** (the default). If you
-are using the **first match** matching strategy, the closet match information will not be returned.  
+Hoverfly will only provide this information when the matching strategy is set to **strongest match** (the default). If you are using the **first match** matching strategy, the closet match information will not be returned.
 
 How can I view the Hoverfly logs?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,3 +76,14 @@ How can I view the Hoverfly logs?
 .. code:: bash
 
     hoverctl logs
+
+
+Why am I not able to access my Hoverfly remotely?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+That's because Hoverfly is bind to loopback interface by default, meaning that you can only access to it on localhost. To access it remotely, you can specify the IP address it listens on. For example, setting ``0.0.0.0`` to listen on all network interfaces.
+
+.. code:: bash
+
+    hoverfly -listen-on-host 0.0.0.0
+
