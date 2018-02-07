@@ -273,6 +273,47 @@ func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
 	Expect(*simulation.RequestResponsePairs[1].RequestMatcher.Destination.ExactMatch).To(Equal("test-2.com"))
 }
 
+func TestHoverfly_GetFilteredSimulationReturnBlankSimulation_IfThereIsNoMatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("foo.com"),
+			},
+		},
+	})
+
+	simulation, err := unit.GetFilteredSimulation("test-(.+).com")
+	Expect(err).To(BeNil())
+
+	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
+	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
+
+	Expect(simulation.MetaView.SchemaVersion).To(Equal("v4"))
+	Expect(simulation.MetaView.HoverflyVersion).To(MatchRegexp(`v\d+.\d+.\d+`))
+	Expect(simulation.MetaView.TimeExported).ToNot(BeNil())
+}
+
+func TestHoverfly_GetFilteredSimulationReturnError_OnInvalidRegexQuery(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: &models.RequestFieldMatchers{
+				ExactMatch: util.StringToPointer("foo.com"),
+			},
+		},
+	})
+
+	_, err := unit.GetFilteredSimulation("test-(.+.com")
+	Expect(err).NotTo(BeNil())
+}
+
 func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T) {
 	RegisterTestingT(t)
 
