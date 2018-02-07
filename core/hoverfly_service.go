@@ -214,7 +214,9 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV4, error) {
 		pairViews = append(pairViews, v.BuildView())
 	}
 
-	return v2.BuildSimulationView(pairViews, hf.Simulation.ResponseDelays, hf.version), nil
+	return v2.BuildSimulationView(pairViews,
+			hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView(),
+			hf.version), nil
 }
 
 func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV4, error) {
@@ -240,7 +242,9 @@ func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV4
 		}
 	}
 
-	return v2.BuildSimulationView(pairViews, hf.Simulation.ResponseDelays, hf.version), nil
+	return v2.BuildSimulationView(pairViews,
+		hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView(),
+		hf.version), nil
 }
 
 func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV4) error {
