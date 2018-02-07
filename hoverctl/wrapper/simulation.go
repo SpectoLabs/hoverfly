@@ -9,13 +9,14 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"net/url"
+	"fmt"
 )
 
 func ExportSimulation(target configuration.Target, urlPattern string) ([]byte, error) {
 
 	requestUrl := v2ApiSimulation
 	if len(urlPattern) > 0 {
-		requestUrl += "?urlPattern=" + url.QueryEscape(urlPattern)
+		requestUrl = fmt.Sprintf("%s?urlPattern=%s", requestUrl, url.QueryEscape(urlPattern))
 	}
 	response, err := doRequest(target, "GET", requestUrl, "", nil)
 	if err != nil {

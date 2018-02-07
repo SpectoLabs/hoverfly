@@ -11,6 +11,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/xeipuuv/gojsonschema"
+	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV4, error) {
@@ -129,5 +130,18 @@ func NewMetaView(version string) *MetaView {
 		HoverflyVersion: version,
 		SchemaVersion:   "v4",
 		TimeExported:    time.Now().Format(time.RFC3339),
+	}
+}
+
+func BuildSimulationView(pairViews []RequestMatcherResponsePairViewV4, delays models.ResponseDelays,  version string) SimulationViewV4 {
+	responseDelays := delays.ConvertToResponseDelayPayloadView()
+	return SimulationViewV4{
+		DataViewV4{
+			RequestResponsePairs: pairViews,
+			GlobalActions: GlobalActionsView{
+				Delays: responseDelays.Data,
+			},
+		},
+		*NewMetaView(version),
 	}
 }
