@@ -92,6 +92,18 @@ func initConfig() {
 		fmt.Println("Current target: " + target.Name + "\n")
 	}
 
+	if adminPortFlag != 0 {
+		target.AdminPort = adminPortFlag
+	}
+
+	if proxyPortFlag != 0 {
+		target.ProxyPort = proxyPortFlag
+	}
+
+	if hostFlag != "" {
+		target.Host = hostFlag
+	}
+
 	var err error
 	hoverflyDirectory, err = configuration.NewHoverflyDirectory(*config)
 	handleIfError(err)
