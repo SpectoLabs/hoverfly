@@ -54,6 +54,7 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 		modes.Modify:     true,
 		modes.Synthesize: true,
 		modes.Spy:        true,
+		modes.Diff:       true,
 	}
 
 	if modeView.Mode == "" || !availableModes[modeView.Mode] {
@@ -299,4 +300,12 @@ func (this *Hoverfly) PatchState(toPatch map[string]string) {
 
 func (this *Hoverfly) ClearState() {
 	this.state = make(map[string]string)
+}
+
+func (this *Hoverfly) GetDiff() map[v2.SimpleRequestDefinitionView][]string {
+	return this.responsesDiff
+}
+
+func (this *Hoverfly) ClearDiff() {
+	this.responsesDiff = make(map[v2.SimpleRequestDefinitionView][]string)
 }

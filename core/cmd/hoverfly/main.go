@@ -64,6 +64,7 @@ var (
 	synthesize  = flag.Bool("synthesize", false, "Start Hoverfly in synthesize mode (middleware is required)")
 	modify      = flag.Bool("modify", false, "Start Hoverfly in modify mode - applies middleware (required) to both outgoing and incoming HTTP traffic")
 	spy         = flag.Bool("spy", false, "Start Hoverfly in spy mode, similar to simulate but calls real server when cache miss")
+	diff         = flag.Bool("diff", false, "Start Hoverfly in diff mode - calls real server and compares the actual response with the expected simulation config if present")
 	middleware  = flag.String("middleware", "", "Should proxy use middleware")
 	proxyPort   = flag.String("pp", "", "Proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
 	adminPort   = flag.String("ap", "", "Admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
@@ -483,7 +484,7 @@ func getInitialMode(cfg *hv.Configuration) string {
 
 	if *capture {
 		// checking whether user supplied other modes
-		if *synthesize == true || *modify == true || *spy == true {
+		if *synthesize == true || *modify == true || *spy == true || *diff == true {
 			log.Fatal("Two or more modes supplied, check your flags")
 		}
 
@@ -495,7 +496,7 @@ func getInitialMode(cfg *hv.Configuration) string {
 			log.Fatal("Synthesize mode chosen although middleware not supplied")
 		}
 
-		if *capture == true || *modify == true || *spy == true {
+		if *capture == true || *modify == true || *spy == true || *diff == true {
 			log.Fatal("Two or more modes supplied, check your flags")
 		}
 
@@ -506,17 +507,23 @@ func getInitialMode(cfg *hv.Configuration) string {
 			log.Fatal("Modify mode chosen although middleware not supplied")
 		}
 
-		if *capture == true || *synthesize == true || *spy == true {
+		if *capture == true || *synthesize == true || *spy == true || *diff == true {
 			log.Fatal("Two or more modes supplied, check your flags")
 		}
 
 		return modes.Modify
 	} else if *spy {
-		if *capture == true || *synthesize == true || *modify == true {
+		if *capture == true || *synthesize == true || *modify == true || *diff == true {
 			log.Fatal("Two or more modes supplied, check your flags")
 		}
 
 		return modes.Spy
+	} else if *diff {
+		if *capture == true || *synthesize == true || *modify == true || *spy == true {
+			log.Fatal("Two or more modes supplied, check your flags")
+		}
+
+		return modes.Diff
 	}
 
 	return modes.Simulate

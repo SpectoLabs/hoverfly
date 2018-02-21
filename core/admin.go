@@ -110,6 +110,7 @@ func getAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 		&v2.JournalHandler{Hoverfly: hoverfly.Journal},
 		&v2.ShutdownHandler{},
 		&v2.StateHandler{Hoverfly: hoverfly},
+		&v2.DiffHandler{Hoverfly: hoverfly},
 	}
 
 	return list

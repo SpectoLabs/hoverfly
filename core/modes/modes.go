@@ -31,6 +31,9 @@ const Capture = "capture"
 // SpyMode - simulateMode but will call real service when cache miss
 const Spy = "spy"
 
+// DiffMode - calls real service and compares response with simulation
+const Diff = "diff"
+
 type Mode interface {
 	Process(*http.Request, models.RequestDetails) (*http.Response, error)
 	SetArguments(arguments ModeArguments)

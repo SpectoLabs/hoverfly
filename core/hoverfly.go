@@ -18,6 +18,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/templating"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 // orPanic - wrapper for logging errors
@@ -51,6 +52,8 @@ type Hoverfly struct {
 	StoreLogsHook *StoreLogsHook
 	Journal       *journal.Journal
 	templator     *templating.Templator
+
+	responsesDiff map[v2.SimpleRequestDefinitionView][]string
 }
 
 func NewHoverfly() *Hoverfly {
@@ -60,12 +63,13 @@ func NewHoverfly() *Hoverfly {
 	hoverfly := &Hoverfly{
 		Simulation:     models.NewSimulation(),
 		Authentication: authBackend,
-		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture, modes.Spy}),
+		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture, modes.Spy, modes.Diff}),
 		StoreLogsHook:  NewStoreLogsHook(),
 		Journal:        journal.NewJournal(),
 		Cfg:            InitSettings(),
 		state:          make(map[string]string),
 		templator:      templating.NewTemplator(),
+		responsesDiff:  make(map[v2.SimpleRequestDefinitionView][]string),
 	}
 
 	hoverfly.version = "v0.15.1"
@@ -79,6 +83,7 @@ func NewHoverfly() *Hoverfly {
 	modeMap[modes.Modify] = &modes.ModifyMode{Hoverfly: hoverfly}
 	modeMap[modes.Synthesize] = &modes.SynthesizeMode{Hoverfly: hoverfly}
 	modeMap[modes.Spy] = &modes.SpyMode{Hoverfly: hoverfly}
+	modeMap[modes.Diff] = &modes.DiffMode{Hoverfly: hoverfly}
 
 	hoverfly.modeMap = modeMap
 
@@ -211,13 +216,17 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 		return modes.ErrorResponse(req, err, "Could not interpret HTTP request")
 	}
 
-	mode := hf.Cfg.GetMode()
+	modeName := hf.Cfg.GetMode()
+	mode := hf.modeMap[modeName]
+	response, err := mode.Process(req, requestDetails)
 
-	response, err := hf.modeMap[mode].Process(req, requestDetails)
+	if modeName == modes.Diff {
+		hf.handleResponseDiff(req, mode)
+	}
 
 	// Don't delete the error
 	// and definitely don't delay people in capture mode
-	if err != nil || mode == modes.Capture {
+	if err != nil || modeName == modes.Capture {
 		return response
 	}
 
@@ -227,4 +236,24 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	}
 
 	return response
+}
+
+func (hf *Hoverfly) handleResponseDiff(request *http.Request, mode modes.Mode) {
+	switch mode.(type) {
+	case *modes.DiffMode:
+		diffMode := mode.(*modes.DiffMode)
+		errorMessage := diffMode.GetMessage()
+
+		if errorMessage.GetErrorMessage() != "" {
+			requestView := v2.SimpleRequestDefinitionView{
+				Method: request.Method,
+				Host:   request.URL.Host,
+				Path:   request.URL.Path,
+				Query:  request.URL.RawQuery,
+			}
+
+			diffs := hf.responsesDiff[requestView]
+			hf.responsesDiff[requestView] = append(diffs, errorMessage.GetErrorMessage())
+		}
+	}
 }
