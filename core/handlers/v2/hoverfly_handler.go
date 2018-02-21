@@ -22,6 +22,8 @@ type Hoverfly interface {
 	ClearState()
 	GetUpstreamProxy() string
 	IsWebServer() bool
+	GetDiff() map[SimpleRequestDefinitionView][]string
+	ClearDiff()
 }
 
 type HoverflyHandler struct {

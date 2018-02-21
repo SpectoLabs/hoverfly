@@ -93,3 +93,19 @@ type JournalEntryFilterView struct {
 type StateView struct {
 	State map[string]string `json:"state"`
 }
+
+type DiffView struct {
+	Diff []ResponseDiffForRequestView `json:"diff"`
+}
+
+type ResponseDiffForRequestView struct {
+	Request     SimpleRequestDefinitionView `json:"request"`
+	DiffMessage []string                    `json:"diffMessage"`
+}
+
+type SimpleRequestDefinitionView struct {
+	Method string `json:"method"`
+	Host   string `json:"host"`
+	Path   string `json:"path"`
+	Query  string `json:"query"`
+}

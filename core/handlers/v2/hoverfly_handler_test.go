@@ -65,6 +65,13 @@ func (this *HoverflyStub) IsWebServer() bool {
 	return false
 }
 
+func (this *HoverflyStub) GetDiff() map[SimpleRequestDefinitionView][]string {
+	return nil
+}
+
+func (this *HoverflyStub) ClearDiff() {
+}
+
 func TestHoverflyHandlerGetReturnsTheCorrectMode(t *testing.T) {
 	RegisterTestingT(t)
 
