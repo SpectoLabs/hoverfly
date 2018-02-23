@@ -22,16 +22,16 @@ import (
 
 var DiffErrorMsg DiffErrorMessage
 
+const errorMsgTemplate = "The \"%s\" parameter is not same - the expected value was [%s], but the actual one [%s]\n"
+
 type HoverflyDiff interface {
 	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
-	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
 	DoRequest(*http.Request) (*http.Response, error)
 }
 
 type DiffMode struct {
 	Hoverfly         HoverflyDiff
 	MatchingStrategy string
-	DiffErrorMessage DiffErrorMessage
 }
 
 func (this DiffMode) View() v2.ModeView {
@@ -89,8 +89,8 @@ func (this DiffMode) Process(request *http.Request, details models.RequestDetail
 	} else {
 		log.WithFields(log.Fields{
 			"mode":   Diff,
-			"method": request.Method,
-			"url":    request.URL,
+			"method": modifiedRequest.Method,
+			"url":    modifiedRequest.URL,
 		}).Info("There was no simulation matched for the request")
 	}
 
@@ -107,7 +107,7 @@ func diffResponse(expected *models.ResponseDetails, actual *models.ResponseDetai
 
 type DiffErrorMessage struct {
 	DiffMessage bytes.Buffer
-	counter     int
+	Counter     int
 }
 
 func (message *DiffErrorMessage) GetErrorMessage() string {
@@ -116,9 +116,9 @@ func (message *DiffErrorMessage) GetErrorMessage() string {
 
 func (message *DiffErrorMessage) write(parameterName string, expected interface{}, actual interface{}) {
 	message.DiffMessage.WriteString(
-		fmt.Sprintf("(%d)The \"%s\" parameter is not same - the expected value was [%s], but the actual one [%s]\n",
-			message.counter, parameterName, expected, actual))
-	message.counter++
+		fmt.Sprintf("(%d)"+errorMsgTemplate,
+			message.Counter+1, parameterName, fmt.Sprint(expected), fmt.Sprint(actual)))
+	message.Counter++
 }
 
 func headerDiff(message *DiffErrorMessage, expected map[string][]string, actual map[string][]string) bool {
