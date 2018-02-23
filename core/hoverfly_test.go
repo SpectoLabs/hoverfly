@@ -1095,3 +1095,40 @@ func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
 	})
 	Expect(string(response.Body)).To(Equal(`empty`))
 }
+
+func Test_Hoverfly_processRequest_CanHandleResponseDiff(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, expectedUnit := testTools(201, `{'message': 'expected'}`)
+
+	r, err := http.NewRequest("GET", "http://somehost.com", nil)
+	Expect(err).To(BeNil())
+
+	// capturing
+	expectedUnit.Cfg.SetMode("capture")
+	resp := expectedUnit.processRequest(r)
+
+	Expect(resp).ToNot(BeNil())
+	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+
+	server.Close()
+	server, actualUnit := testTools(201, `{'message': 'actual'}`)
+	defer server.Close()
+
+	// comparing
+	actualUnit.Cfg.SetMode("diff")
+	actualUnit.Simulation = expectedUnit.Simulation
+	newResp := actualUnit.processRequest(r)
+
+	Expect(newResp).ToNot(BeNil())
+	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
+	Expect(len(actualUnit.responsesDiff)).To(Equal(1))
+	requestDef := v2.SimpleRequestDefinitionView{
+		Method: "GET",
+		Host:   "somehost.com",}
+	Expect(len(actualUnit.responsesDiff[requestDef])).To(Equal(1))
+	Expect(actualUnit.responsesDiff[requestDef][0]).NotTo(Equal(""))
+	Expect(actualUnit.responsesDiff[requestDef][0]).To(ContainSubstring(
+		"The \"body/message\" parameter is not same - the expected value was [expected], but the actual one [actual]"))
+
+}
