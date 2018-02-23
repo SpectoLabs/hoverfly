@@ -192,7 +192,7 @@ Gets configuration information from the running instance of Hoverfly.
     {
         "destination": ".",
         "middleware": {
-		"binary": "python",
+        "binary": "python",
 		"script": "# a python script would go here",
 		"remote": ""
 	},
@@ -569,3 +569,34 @@ Updates state in Hoverfly. Will update each state key referenced in the request 
       "page_state": "CHECKOUT"
     }
   }
+
+-------------------------------------------------------------------------------------------------------------
+
+
+GET /api/v2/diff
+"""""""""""""""""
+Gets all reports containing response differences from Hoverfly. The diffs are represented as lists of strings grouped by the same requests.
+
+**Example response body**
+::
+ {
+   "diff":[
+      {
+         "request":{
+            "method":"GET",
+            "host":"my.service.com",
+            "path":"/users/myaccount",
+            "query":""
+         },
+         "diffMessage":[
+            "(1)The \"body/email\" parameter is not same - the expected value was [expected@email.com], but the actual one [actual@email.com]"
+         ]
+      }
+   ]
+ }
+
+-------------------------------------------------------------------------------------------------------------
+
+DELETE /api/v2/diff
+""""""""""""""""""""
+Deletes all reports containing differences from Hoverfly.
