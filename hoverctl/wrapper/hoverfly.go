@@ -30,6 +30,7 @@ const (
 	v2ApiCache       = "/api/v2/cache"
 	v2ApiLogs        = "/api/v2/logs"
 	v2ApiHoverfly    = "/api/v2/hoverfly"
+	v2ApiDiff        = "/api/v2/diff"
 
 	v2ApiShutdown = "/api/v2/shutdown"
 	v2ApiHealth   = "/api/health"
