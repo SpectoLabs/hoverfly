@@ -19,7 +19,7 @@ func Test_NewJournal_ProducesAJournalWithAnEmptyArray(t *testing.T) {
 
 	unit := journal.NewJournal()
 
-	journalView, err := unit.GetEntries(0, 25, nil, nil)
+	journalView, err := unit.GetEntries(0, 25, nil, nil, "")
 	entries := journalView.Journal
 	Expect(err).To(BeNil())
 
@@ -49,7 +49,7 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 	}, "test-mode", nowTime)
 	Expect(err).To(BeNil())
 
-	journalView, err := unit.GetEntries(0, 25, nil, nil)
+	journalView, err := unit.GetEntries(0, 25, nil, nil, "")
 	entries := journalView.Journal
 	Expect(err).To(BeNil())
 
@@ -91,7 +91,7 @@ func Test_Journal_NewEntry_RespectsEntryLimit(t *testing.T) {
 		Expect(err).To(BeNil())
 	}
 
-	journalView, err := unit.GetEntries(0, 25, nil, nil)
+	journalView, err := unit.GetEntries(0, 25, nil, nil, "")
 	entries := journalView.Journal
 	Expect(err).To(BeNil())
 
@@ -138,7 +138,7 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 	}, "test-mode", nowTime)
 	Expect(err).To(BeNil())
 
-	journalView, err := unit.GetEntries(0, 25, nil, nil)
+	journalView, err := unit.GetEntries(0, 25, nil, nil, "")
 	entries := journalView.Journal
 	Expect(err).To(BeNil())
 
@@ -192,7 +192,7 @@ func Test_Journal_DeleteEntries_DeletesAllEntries(t *testing.T) {
 	err := unit.DeleteEntries()
 	Expect(err).To(BeNil())
 
-	journalView, err := unit.GetEntries(0, 25, nil, nil)
+	journalView, err := unit.GetEntries(0, 25, nil, nil, "")
 	Expect(err).To(BeNil())
 
 	Expect(journalView.Journal).To(HaveLen(0))
@@ -227,7 +227,7 @@ func Test_Journal_GetEntries_TurnsTimeDurationToMilliseconds(t *testing.T) {
 
 	Expect(err).To(BeNil())
 
-	journalView, err := unit.GetEntries(0, 25, nil, nil)
+	journalView, err := unit.GetEntries(0, 25, nil, nil, "")
 	entries := journalView.Journal
 	Expect(err).To(BeNil())
 	Expect(entries).To(HaveLen(1))
@@ -242,10 +242,65 @@ func Test_Journal_GetEntries_WhenDisabledReturnsError(t *testing.T) {
 	unit := journal.NewJournal()
 	unit.EntryLimit = 0
 
-	_, err := unit.GetEntries(0, 25, nil, nil)
+	_, err := unit.GetEntries(0, 25, nil, nil, "")
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Journal disabled"))
 }
+
+func Test_Journal_GetEntries_WithInvalidSortKeyReturnsError(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	_, err := unit.GetEntries(0, 25, nil, nil, "time")
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("'time' is not a valid sort key, use timeStarted or latency"))
+}
+
+func Test_Journal_GetEntries_WithInvalidSortOrderReturnError(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	_, err := unit.GetEntries(0, 25, nil, nil, "latency:slow")
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("'slow' is not a valid sort order. use asc or desc"))
+}
+
+func Test_Journal_GetEntries_ReturnResultsSortedDescendinglyByTimeStarted(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	response := &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+	}
+
+	for i:= 0; i < 5; i++ {
+		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id=" + strconv.Itoa(i), nil)
+		unit.NewEntry(request, response, "test-mode", time.Now())
+	}
+
+	journalView, err := unit.GetEntries(0, 2, nil, nil, "timeStarted:desc")
+	Expect(err).To(BeNil())
+	Expect(journalView.Journal).To(HaveLen(2))
+	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=4"))
+	Expect(*journalView.Journal[1].Request.Query).To(Equal("id=3"))
+
+
+	journalView, _ = unit.GetEntries(2, 2, nil, nil, "timeStarted:desc")
+	Expect(journalView.Journal).To(HaveLen(2))
+	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=2"))
+	Expect(*journalView.Journal[1].Request.Query).To(Equal("id=1"))
+
+
+	journalView, _ = unit.GetEntries(4, 2, nil, nil, "timeStarted:desc")
+	Expect(journalView.Journal).To(HaveLen(1))
+	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=0"))
+}
+
 
 
 func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
@@ -263,7 +318,7 @@ func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
 		unit.NewEntry(request, response, "test-mode", time.Now())
 	}
 
-	journalView, err := unit.GetEntries(0, 2, nil, nil)
+	journalView, err := unit.GetEntries(0, 2, nil, nil, "")
 	Expect(err).To(BeNil())
 	Expect(journalView.Journal).To(HaveLen(2))
 	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=0"))
@@ -273,7 +328,7 @@ func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
 	Expect(journalView.Total).To(Equal(5))
 
 
-	journalView, _ = unit.GetEntries(2, 2, nil, nil)
+	journalView, _ = unit.GetEntries(2, 2, nil, nil, "")
 	Expect(journalView.Journal).To(HaveLen(2))
 	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=2"))
 	Expect(*journalView.Journal[1].Request.Query).To(Equal("id=3"))
@@ -282,14 +337,14 @@ func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
 	Expect(journalView.Total).To(Equal(5))
 
 
-	journalView, _ = unit.GetEntries(4, 2, nil, nil)
+	journalView, _ = unit.GetEntries(4, 2, nil, nil, "")
 	Expect(journalView.Journal).To(HaveLen(1))
 	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=4"))
 	Expect(journalView.Limit).To(Equal(2))
 	Expect(journalView.Offset).To(Equal(4))
 	Expect(journalView.Total).To(Equal(5))
 
-	journalView, err = unit.GetEntries(-1, 2, nil, nil)
+	journalView, err = unit.GetEntries(-1, 2, nil, nil, "")
 	Expect(err).To(BeNil())
 	Expect(journalView.Journal).To(HaveLen(2))
 	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=0"))
@@ -311,7 +366,7 @@ func Test_Journal_GetEntries_ReturnEmptyPageIfOffsetIsLargerThanTotalElements(t 
 		unit.NewEntry(request, response, "test-mode", time.Now())
 	}
 
-	journalView, err := unit.GetEntries(10, 2, nil, nil)
+	journalView, err := unit.GetEntries(10, 2, nil, nil, "")
 	Expect(err).To(BeNil())
 	Expect(journalView.Journal).To(HaveLen(0))
 }
@@ -334,7 +389,7 @@ func Test_Journal_GetEntries_FilteredByTimeWindow(t *testing.T) {
 	fromQuery := time.Date(2018, 2, 1, 2, 0, 1, 0, time.Local)
 	toQuery := time.Date(2018, 2, 1, 2, 0, 3, 0, time.Local)
 
-	journalView, err := unit.GetEntries(0, 25, &fromQuery, &toQuery)
+	journalView, err := unit.GetEntries(0, 25, &fromQuery, &toQuery, "")
 	entries := journalView.Journal
 	Expect(err).To(BeNil())
 	Expect(entries).To(HaveLen(3))

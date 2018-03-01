@@ -24,7 +24,7 @@ type HoverflyJournalStub struct {
 	journalEntryFilterView JournalEntryFilterView
 }
 
-func (this *HoverflyJournalStub) GetEntries(offset int, limit int, from *time.Time, to *time.Time) (JournalView, error) {
+func (this *HoverflyJournalStub) GetEntries(offset int, limit int, from *time.Time, to *time.Time, sort string) (JournalView, error) {
 	this.offset = offset
 	this.limit = limit
 	this.from = from
