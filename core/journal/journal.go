@@ -85,6 +85,7 @@ func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.
 
 	selectedEntries := []JournalEntry{}
 
+	// Filtering
 	if from != nil || to != nil {
 		for _, entry := range this.entries {
 			if from != nil && entry.TimeStarted.Before(*from) {
@@ -99,9 +100,18 @@ func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.
 		selectedEntries = append(selectedEntries, this.entries...)
 	}
 
+	// Sorting
 	if sortKey == "timestarted" && sortOrder == "desc" {
 		sorting.Slice(selectedEntries, func(i, j int) bool {
 			return selectedEntries[i].TimeStarted.After(selectedEntries[j].TimeStarted)
+		})
+	} else if sortKey == "latency" {
+		sorting.Slice(selectedEntries, func(i, j int) bool {
+			if sortOrder == "desc" {
+				return selectedEntries[i].Latency > selectedEntries[j].Latency
+			} else {
+				return selectedEntries[i].Latency < selectedEntries[j].Latency
+			}
 		})
 	}
 

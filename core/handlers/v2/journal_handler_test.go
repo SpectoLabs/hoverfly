@@ -21,6 +21,7 @@ type HoverflyJournalStub struct {
 	offset                 int
 	from				   *time.Time
 	to					   *time.Time
+	sort				   string
 	journalEntryFilterView JournalEntryFilterView
 }
 
@@ -29,6 +30,7 @@ func (this *HoverflyJournalStub) GetEntries(offset int, limit int, from *time.Ti
 	this.limit = limit
 	this.from = from
 	this.to = to
+	this.sort = sort
 
 	journalView := JournalView{
 		Journal: []JournalEntryView{},
@@ -135,6 +137,23 @@ func Test_JournalHandler_Get_WithPagingQuery(t *testing.T) {
 	Expect(journalView.Limit).To(Equal(25))
 }
 
+func Test_JournalHandler_Get_WithSortQuery(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyJournalStub{}
+
+	unit := JournalHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "/api/v2/journal?sort=timeStarted:desc", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Get, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	Expect(stubHoverfly.sort).To(Equal("timeStarted:desc"))
+}
+
 func Test_JournalHandler_Get_WithDateTimeQuery(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -167,6 +186,8 @@ func Test_JournalHandler_Get_DoesNotSetTimeIfDateTimeQueryIsBadTime(t *testing.T
 
 	Expect(stubHoverfly.from).To(BeNil())
 }
+
+
 
 
 func Test_JournalHandler_Get_Error(t *testing.T) {
