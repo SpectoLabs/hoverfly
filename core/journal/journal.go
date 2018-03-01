@@ -9,6 +9,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
+	"strings"
+	sorting "sort"
 )
 
 var RFC3339Milli = "2006-01-02T15:04:05.000Z07:00"
@@ -63,7 +65,7 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 	return nil
 }
 
-func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.Time) (v2.JournalView, error) {
+func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.Time, sort string) (v2.JournalView, error) {
 	journalView := v2.JournalView{
 		Journal: []v2.JournalEntryView{},
 		Offset: 0,
@@ -73,6 +75,12 @@ func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.
 
 	if this.EntryLimit == 0 {
 		return journalView, fmt.Errorf("Journal disabled")
+	}
+
+	sortKey, sortOrder, err := getSortParameters(sort)
+
+	if err != nil {
+		return journalView, err
 	}
 
 	selectedEntries := []JournalEntry{}
@@ -88,7 +96,13 @@ func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.
 			selectedEntries = append(selectedEntries, entry)
 		}
 	} else {
-		selectedEntries = this.entries
+		selectedEntries = append(selectedEntries, this.entries...)
+	}
+
+	if sortKey == "timestarted" && sortOrder == "desc" {
+		sorting.Slice(selectedEntries, func(i, j int) bool {
+			return selectedEntries[i].TimeStarted.After(selectedEntries[j].TimeStarted)
+		})
 	}
 
 	totalElements := len(selectedEntries)
@@ -189,4 +203,28 @@ func convertJournalEntries(entries []JournalEntry) []v2.JournalEntryView {
 	}
 
 	return journalEntryViews
+}
+
+func getSortParameters(sort string) (string, string, error) {
+	sortParams := strings.Split(sort, ":")
+
+	sortKey := strings.ToLower(sortParams[0])
+	if sortKey == "" {
+		sortKey = "timestarted"
+	}
+	sortOrder := "asc"
+
+	if sortKey != "timestarted" && sortKey != "latency" {
+		return sortKey, sortOrder, fmt.Errorf("'%s' is not a valid sort key, use timeStarted or latency", sortKey)
+	}
+
+	if len(sortParams) > 1{
+		sortOrder = strings.ToLower(sortParams[1])
+
+		if sortOrder != "asc" && sortOrder != "desc" {
+			return sortKey, sortOrder, fmt.Errorf("'%s' is not a valid sort order. use asc or desc", sortOrder)
+		}
+	}
+
+	return sortKey, sortOrder, nil
 }

@@ -15,7 +15,7 @@ import (
 const DefaultJournalLimit = 25
 
 type HoverflyJournal interface {
-	GetEntries(offset int, limit int, from *time.Time, to *time.Time) (JournalView, error)
+	GetEntries(offset int, limit int, from *time.Time, to *time.Time, sort string) (JournalView, error)
 	GetFilteredEntries(journalEntryFilterView JournalEntryFilterView) ([]JournalEntryView, error)
 	DeleteEntries() error
 }
@@ -49,12 +49,13 @@ func (this *JournalHandler) Get(response http.ResponseWriter, request *http.Requ
 	limit, _ := strconv.Atoi(queryParams.Get("limit"))
 	fromTime := util.GetUnixTimeQueryParam(request, "from")
 	toTime := util.GetUnixTimeQueryParam(request, "to")
+	sort := queryParams.Get("sort")
 
 	if limit == 0 {
 		limit = DefaultJournalLimit
 	}
 
-	journalView, err := this.Hoverfly.GetEntries(offset, limit, fromTime, toTime)
+	journalView, err := this.Hoverfly.GetEntries(offset, limit, fromTime, toTime, sort)
 	if err != nil {
 		handlers.WriteErrorResponse(response, err.Error(), http.StatusInternalServerError)
 		return
