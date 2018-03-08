@@ -208,6 +208,17 @@ func Test_Target_BuildFlags_DbTypeSetsTheDbFlag(t *testing.T) {
 	Expect(unit.BuildFlags()[1]).To(Equal("-db-path=cache.db"))
 }
 
+func Test_Target_BuildFlags_ListenOnSetsListenOnHostFlag(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := Target{
+		ListenOnHost: "0.0.0.0",
+	}
+
+	Expect(unit.BuildFlags()).To(HaveLen(1))
+	Expect(unit.BuildFlags()[0]).To(Equal("-listen-on-host=0.0.0.0"))
+}
+
 func Test_Target_BuildFlags_CertificateSetsCertFlag(t *testing.T) {
 	RegisterTestingT(t)
 

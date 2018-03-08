@@ -55,6 +55,7 @@ hoverctl configuration file.
 		target.Webserver = len(args) > 0
 		target.CachePath, _ = cmd.Flags().GetString("cache")
 		target.DisableCache, _ = cmd.Flags().GetBool("disable-cache")
+		target.ListenOnHost, _ = cmd.Flags().GetString("listen-on-host")
 
 		target.CertificatePath, _ = cmd.Flags().GetString("certificate")
 		target.KeyPath, _ = cmd.Flags().GetString("key")
@@ -113,6 +114,7 @@ func init() {
 	startCmd.Flags().Bool("disable-tls", false, "Disables TLS verification")
 	startCmd.Flags().String("upstream-proxy", "", "A host for which Hoverfly will proxy its requests to")
 	startCmd.Flags().Bool("https-only", false, "Disables insecure HTTP traffic in Hoverfly")
+	startCmd.Flags().String("listen-on-host", "", "Binds hoverfly listener to a host")
 
 	startCmd.Flags().Bool("auth", false, "Enable authenticiation on Hoverfly")
 	startCmd.Flags().String("username", "", "Username to authenticate Hoverfly")
