@@ -17,6 +17,7 @@ type Target struct {
 	Webserver    bool   `yaml:",omitempty"`
 	CachePath    string `yaml:",omitempty"`
 	DisableCache bool   `yaml:",omitempty"`
+	ListenOnHost string `yaml:",omitempty"`
 
 	CertificatePath string `yaml:",omitempty"`
 	KeyPath         string `yaml:",omitempty"`
@@ -118,6 +119,10 @@ func (this Target) BuildFlags() Flags {
 
 	if this.DisableCache {
 		flags = append(flags, "-disable-cache")
+	}
+
+	if this.ListenOnHost != "" {
+		flags = append(flags, "-listen-on-host="+this.ListenOnHost)
 	}
 
 	if this.CertificatePath != "" {

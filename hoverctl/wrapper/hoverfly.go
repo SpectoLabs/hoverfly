@@ -29,7 +29,7 @@ const (
 	v2ApiMiddleware  = "/api/v2/hoverfly/middleware"
 	v2ApiCache       = "/api/v2/cache"
 	v2ApiLogs        = "/api/v2/logs"
-	v2ApiHoverfly 	 = "/api/v2/hoverfly"
+	v2ApiHoverfly    = "/api/v2/hoverfly"
 
 	v2ApiShutdown = "/api/v2/shutdown"
 	v2ApiHealth   = "/api/health"
