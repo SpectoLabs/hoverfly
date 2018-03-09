@@ -17,12 +17,15 @@ func Test_MiddlewareError_ToString(t *testing.T) {
 	err.Command = "just -a 'command'"
 	Expect(err.Error()).To(Equal("Just a message\nCommand: just -a 'command'"))
 
+	err.Url = "http://justa.url"
+	Expect(err.Error()).To(Equal("Just a message\nCommand: just -a 'command'\nURL: http://justa.url"))
+
 	err.Stdin = "{stdin}"
-	Expect(err.Error()).To(Equal("Just a message\nCommand: just -a 'command'\n\nSTDIN:\n{stdin}"))
+	Expect(err.Error()).To(Equal("Just a message\nCommand: just -a 'command'\nURL: http://justa.url\n\nSTDIN:\n{stdin}"))
 
 	err.Stdout = "{stdout}"
-	Expect(err.Error()).To(Equal("Just a message\nCommand: just -a 'command'\n\nSTDIN:\n{stdin}\n\nSTDOUT:\n{stdout}"))
+	Expect(err.Error()).To(Equal("Just a message\nCommand: just -a 'command'\nURL: http://justa.url\n\nSTDIN:\n{stdin}\n\nSTDOUT:\n{stdout}"))
 
 	err.Stderr = "{stderr}"
-	Expect(err.Error()).To(Equal("Just a message\nCommand: just -a 'command'\n\nSTDIN:\n{stdin}\n\nSTDOUT:\n{stdout}\n\nSTDERR:\n{stderr}"))
+	Expect(err.Error()).To(Equal("Just a message\nCommand: just -a 'command'\nURL: http://justa.url\n\nSTDIN:\n{stdin}\n\nSTDOUT:\n{stdout}\n\nSTDERR:\n{stderr}"))
 }
