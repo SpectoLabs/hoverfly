@@ -129,7 +129,10 @@ var _ = Describe("When I use hoverctl", func() {
 			output := functional_tests.Run(hoverctlBinary, "middleware", "--remote", "http://specto.io/404/nothere")
 
 			Expect(output).To(ContainSubstring("Could not set middleware"))
-			Expect(output).To(ContainSubstring("Invalid middleware: Could not reach remote middleware"))
+			Expect(output).To(ContainSubstring("Error when communicating with remote middleware: received 404"))
+			Expect(output).To(ContainSubstring("URL: http://specto.io/404/nothere"))
+			Expect(output).To(ContainSubstring("STDIN:"))
+			Expect(output).To(ContainSubstring(`{"response":{"status":200,"body":"ok","encodedBody":false,"headers":{"test_header":["true"]}},"request":{"path":"/","method":"GET","destination":"www.test.com","scheme":"","query":"","body":"","headers":{"test_header":["true"]}}}`))
 		})
 
 		It("When I use the verbose flag, I see that notpython is not an executable", func() {
@@ -143,7 +146,11 @@ var _ = Describe("When I use hoverctl", func() {
 			output := functional_tests.Run(hoverctlBinary, "-v", "middleware", "--remote", "http://wqrwwewf.wewefwef.specto")
 
 			Expect(output).To(ContainSubstring("Could not set middleware"))
-			Expect(output).To(ContainSubstring(`Invalid middleware: Could not reach remote middleware`))
+			Expect(output).To(ContainSubstring(`Error when communicating with remote middleware:`))
+			Expect(output).To(ContainSubstring("Post http://wqrwwewf.wewefwef.specto: dial tcp: lookup wqrwwewf.wewefwef.specto on "))
+			Expect(output).To(ContainSubstring("URL: http://wqrwwewf.wewefwef.specto"))
+			Expect(output).To(ContainSubstring("STDIN:"))
+			Expect(output).To(ContainSubstring(`{"response":{"status":200,"body":"ok","encodedBody":false,"headers":{"test_header":["true"]}},"request":{"path":"/","method":"GET","destination":"www.test.com","scheme":"","query":"","body":"","headers":{"test_header":["true"]}}}`))
 		})
 	})
 
