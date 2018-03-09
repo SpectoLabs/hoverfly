@@ -122,6 +122,7 @@ func (this *Middleware) SetRemote(remoteUrl string) error {
 		return fmt.Errorf("Could not reach remote middleware")
 	}
 	this.Remote = remoteUrl
+	fmt.Println(this.Remote)
 	return nil
 }
 

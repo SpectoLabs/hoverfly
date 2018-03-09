@@ -24,7 +24,6 @@ const pythonModifyResponse = "#!/usr/bin/env python\n" +
 	"def main():\n" +
 	"	data = sys.stdin.readlines()\n" +
 	"	payload = data[0]\n" +
-
 	"	payload_dict = json.loads(payload)\n" +
 
 	"	payload_dict['response']['status'] = 201\n" +
@@ -208,12 +207,14 @@ func Test_Middleware_executeMiddlewareRemotely_ReturnsErrorIfDoesntGetA200_AndSa
 
 	unit := &Middleware{}
 
-	err := unit.SetRemote(server.URL + "/process")
-	Expect(err).ToNot(BeNil())
+	unit.Remote = server.URL + "/process"
 
 	newPair, err := unit.executeMiddlewareRemotely(originalPair)
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Error when communicating with remote middleware"))
+	Expect(err.Error()).To(ContainSubstring("Error when communicating with remote middleware: received 404"))
+	Expect(err.Error()).To(ContainSubstring("URL: " + server.URL))
+	Expect(err.Error()).To(ContainSubstring("STDIN:"))
+	Expect(err.Error()).To(ContainSubstring(`{"response":{"status":0,"body":"Normal body","encodedBody":false},"request":{"path":"","method":"","destination":"","scheme":"","query":"","body":"","headers":null}}`))
 
 	Expect(newPair).To(Equal(originalPair))
 }
@@ -239,7 +240,10 @@ func Test_Middleware_executeMiddlewareRemotely_ReturnsErrorIfNoRequestResponsePa
 
 	untouchedPair, err := unit.executeMiddlewareRemotely(originalPair)
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("unexpected end of JSON input"))
+	Expect(err.Error()).To(ContainSubstring("Error when trying to serialize response from remote middleware"))
+	Expect(err.Error()).To(ContainSubstring("URL: " + server.URL))
+	Expect(err.Error()).To(ContainSubstring("STDIN:"))
+	Expect(err.Error()).To(ContainSubstring(`{"response":{"status":0,"body":"Normal body","encodedBody":false},"request":{"path":"","method":"","destination":"","scheme":"","query":"","body":"","headers":null}}`))
 
 	Expect(untouchedPair).To(Equal(originalPair))
 }
