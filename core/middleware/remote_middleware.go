@@ -22,18 +22,19 @@ func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair
 	}
 
 	req, err := http.NewRequest("POST", this.Remote, bytes.NewBuffer(pairViewBytes))
-	req.Header.Add("Content-Type", "application/json")
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Error("Error when building request to remote middleware")
 		return pair, &MiddlewareError{
 			OriginalError: err,
-			Message:       "Error when building request to remote middleware: " + err.Error(),
+			Message:       "Error when building request to remote middleware: ",
 			Url:           this.Remote,
 			Stdin:         string(pairViewBytes),
 		}
 	}
+
+	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -42,7 +43,7 @@ func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair
 		}).Error("Error when communicating with remote middleware")
 		return pair, &MiddlewareError{
 			OriginalError: err,
-			Message:       "Error when communicating with remote middleware: " + err.Error(),
+			Message:       "Error when communicating with remote middleware:\n " + err.Error(),
 			Url:           this.Remote,
 			Stdin:         string(pairViewBytes),
 		}

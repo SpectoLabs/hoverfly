@@ -91,3 +91,39 @@ func Test_Middleware_executeMiddlewareRemotely_ReturnsErrorIfNoRequestResponsePa
 
 	Expect(untouchedPair).To(Equal(originalPair))
 }
+
+func Test_Middleware_executeMiddlewareRemotely_ReturnsError_WebsiteIsUnreachable(t *testing.T) {
+	RegisterTestingT(t)
+
+	originalPair := models.RequestResponsePair{
+		Response: models.ResponseDetails{
+			Body: "Normal body",
+		},
+	}
+
+	unit := &Middleware{}
+
+	unit.Remote = "[]somemadeupwebsite"
+
+	untouchedPair, err := unit.executeMiddlewareRemotely(originalPair)
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(ContainSubstring("Error when communicating with remote middleware:"))
+	Expect(err.Error()).To(ContainSubstring("Post []somemadeupwebsite: unsupported protocol scheme"))
+	Expect(err.Error()).To(ContainSubstring("URL: []somemadeupwebsite"))
+	Expect(err.Error()).To(ContainSubstring("STDIN:"))
+	Expect(err.Error()).To(ContainSubstring(`{"response":{"status":0,"body":"Normal body","encodedBody":false},"request":{"path":"","method":"","destination":"","scheme":"","query":"","body":"","headers":null}}`))
+
+	Expect(untouchedPair).To(Equal(originalPair))
+
+	unit.Remote = "http://localhost:4321/spectolabs/hoverfly"
+
+	untouchedPair, err = unit.executeMiddlewareRemotely(originalPair)
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(ContainSubstring("Error when communicating with remote middleware:"))
+	Expect(err.Error()).To(ContainSubstring("Post http://localhost:4321/spectolabs/hoverfly: dial tcp 127.0.0.1:4321: getsockopt: connection refused"))
+	Expect(err.Error()).To(ContainSubstring("URL: http://localhost:4321/spectolabs/hoverfly"))
+	Expect(err.Error()).To(ContainSubstring("STDIN:"))
+	Expect(err.Error()).To(ContainSubstring(`{"response":{"status":0,"body":"Normal body","encodedBody":false},"request":{"path":"","method":"","destination":"","scheme":"","query":"","body":"","headers":null}}`))
+
+	Expect(untouchedPair).To(Equal(originalPair))
+}

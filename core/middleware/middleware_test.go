@@ -119,15 +119,6 @@ func Test_ConvertToNewMiddleware_WillCreateAMiddlewareObjectFromAUrlString(t *te
 	Expect(unit.Remote).To(Equal(server.URL + "/process"))
 }
 
-func Test_ConvertToNewMiddleware_ReturnsErrorIfUrlIsUnaccessible(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit, err := ConvertToNewMiddleware("http://specto.io/404/process")
-	Expect(err).ToNot(BeNil())
-
-	Expect(unit).To(BeNil())
-}
-
 func Test_ConvertToNewMiddleware_WillCreateAMiddlewareObjectFromASingleBinary(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -398,28 +389,6 @@ func Test_Middleware_SetRemote_CanSetRemote(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(unit.Remote).To(Equal(remoteMiddleware.URL))
-}
-
-func Test_Middleware_SetRemote_WontSetRemoteIfRemoteDoesntExist(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := Middleware{}
-
-	err := unit.SetRemote("http://www.specto.io/madeupmiddlewareendpoint")
-	Expect(err).ToNot(BeNil())
-
-	Expect(unit.Remote).To(Equal(""))
-}
-
-func Test_Middleware_SetRemote_WontSetRemoteIfCouldNeverExist(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := Middleware{}
-
-	err := unit.SetRemote("[]somemadeupwebsite*&*^&$%^")
-	Expect(err).ToNot(BeNil())
-
-	Expect(unit.Remote).To(Equal(""))
 }
 
 func Test_Middleware_SetRemote_CanBeSetToEmptyStringWithoutError(t *testing.T) {
