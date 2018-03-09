@@ -8,15 +8,19 @@ type MiddlewareError struct {
 	OriginalError error
 	Message       string
 	Command       string
+	Url           string
 	Stdin         string
 	Stdout        string
 	Stderr        string
 }
 
-func (m MiddlewareError) Error() string {
+func (m *MiddlewareError) Error() string {
 	errorString := fmt.Sprintf("%s", m.Message)
 	if m.Command != "" {
 		errorString = fmt.Sprintf(errorString+"\nCommand: %s", m.Command)
+	}
+	if m.Url != "" {
+		errorString = fmt.Sprintf(errorString+"\nURL: %s", m.Url)
 	}
 	if m.Stdin != "" {
 		errorString = fmt.Sprintf(errorString+"\n\nSTDIN:\n%s", m.Stdin)
