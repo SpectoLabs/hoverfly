@@ -50,7 +50,7 @@ func ScoredFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *Fie
 
 	if field.ExactMatch != nil {
 		if ExactMatch(*field.ExactMatch, toMatch) {
-			fieldMatch.MatchScore++
+			fieldMatch.MatchScore = fieldMatch.MatchScore + 2
 		} else {
 			fieldMatch.Matched = false
 		}

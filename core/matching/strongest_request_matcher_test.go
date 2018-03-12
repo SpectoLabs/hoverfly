@@ -1015,7 +1015,6 @@ func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer("foo"),
 				RegexMatch: StringToPointer(".*"),
 			},
 			Method: &models.RequestFieldMatchers{
@@ -1072,7 +1071,6 @@ func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer("foo"),
 				RegexMatch: StringToPointer(".*"),
 			},
 			Method: &models.RequestFieldMatchers{
@@ -1096,63 +1094,6 @@ func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
 	}
 
 	result, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
-
-	Expect(err).ToNot(BeNil())
-	Expect(result).To(BeNil())
-	Expect(err.ClosestMiss).ToNot(BeNil())
-	Expect(err.ClosestMiss.Response.Body).To(Equal("one"))
-}
-
-func Test_ShouldIncludeStateInCalculationForClosestMiss(t *testing.T) {
-	RegisterTestingT(t)
-
-	simulation := models.NewSimulation()
-
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-		RequestMatcher: models.RequestMatcher{
-			Body: &models.RequestFieldMatchers{
-				RegexMatch: StringToPointer(".*"),
-			},
-			Method: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer("GET"),
-			},
-			RequiresState: map[string]string{
-				"one":   "one",
-				"two":   "one",
-				"three": "one",
-			},
-		},
-		Response: models.ResponseDetails{
-			Body: "one",
-		},
-	})
-
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-		RequestMatcher: models.RequestMatcher{
-			Body: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer("foo"),
-				RegexMatch: StringToPointer(".*"),
-			},
-			Method: &models.RequestFieldMatchers{
-				ExactMatch: StringToPointer("GET"),
-				RegexMatch: StringToPointer(".*"),
-			},
-		},
-		Response: models.ResponseDetails{
-			Body: "two",
-		},
-	})
-
-	r := models.RequestDetails{
-		Body:   "foo",
-		Method: "MISS",
-	}
-
-	result, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{
-		"one":   "one",
-		"two":   "one",
-		"three": "one",
-	})
 
 	Expect(err).ToNot(BeNil())
 	Expect(result).To(BeNil())

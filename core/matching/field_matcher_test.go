@@ -92,13 +92,13 @@ func Test_CountlessFieldMatcher__WithMultipleMatchers_AlsoMatchesFalse(t *testin
 	}, `testtesttest`).Matched).To(BeFalse())
 }
 
-func Test_CountingFieldMatcher_MatchesTrue_WithNilMatchers(t *testing.T) {
+func Test_ScoredFieldMatcher_MatchesTrue_WithNilMatchers(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.ScoredFieldMatcher(nil, "test").Matched).To(BeTrue())
 }
 
-func Test_CountingFieldMatcher_MatchesTrueWithJsonMatch(t *testing.T) {
+func Test_ScoredFieldMatcher_MatchesTrueWithJsonMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
@@ -106,7 +106,7 @@ func Test_CountingFieldMatcher_MatchesTrueWithJsonMatch(t *testing.T) {
 	}, `{"test": true}`).Matched).To(BeTrue())
 }
 
-func Test_CountingFieldMatcher_MatchesFalseWithJsonMatch(t *testing.T) {
+func Test_ScoredFieldMatcher_MatchesFalseWithJsonMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
@@ -114,7 +114,7 @@ func Test_CountingFieldMatcher_MatchesFalseWithJsonMatch(t *testing.T) {
 	}, `{"test": [ ] }`).Matched).To(BeFalse())
 }
 
-func Test_CountingFieldMatcher_MatchesTrueWithXmlMatch(t *testing.T) {
+func Test_ScoredFieldMatcher_MatchesTrueWithXmlMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
@@ -122,7 +122,7 @@ func Test_CountingFieldMatcher_MatchesTrueWithXmlMatch(t *testing.T) {
 	}, `<document></document>`).Matched).To(BeTrue())
 }
 
-func Test_CountingFieldMatcher_MatchesFalseWithXmlMatch(t *testing.T) {
+func Test_ScoredFieldMatcher_MatchesFalseWithXmlMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
@@ -132,13 +132,13 @@ func Test_CountingFieldMatcher_MatchesFalseWithXmlMatch(t *testing.T) {
 	</document>`).Matched).To(BeFalse())
 }
 
-func Test_CountingFieldMatcher_MatchesTrue_WithMatchersNotDefined(t *testing.T) {
+func Test_ScoredFieldMatcher_MatchesTrue_WithMatchersNotDefined(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.ScoredFieldMatcher(&models.RequestFieldMatchers{}, "test").Matched).To(BeTrue())
 }
 
-func Test_CountingFieldMatcher_WithMultipleMatchers_MatchesTrue(t *testing.T) {
+func Test_ScoredFieldMatcher_WithMultipleMatchers_MatchesTrue(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
@@ -147,7 +147,15 @@ func Test_CountingFieldMatcher_WithMultipleMatchers_MatchesTrue(t *testing.T) {
 	}, `testtesttest`).Matched).To(BeTrue())
 }
 
-func Test_CountingFieldMatcher_WithMultipleMatchers_AlsoMatchesTrue(t *testing.T) {
+func Test_ScoredFieldMatcher_WithExactMatch_ScoresDouble(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
+		ExactMatch: util.StringToPointer("testtesttest"),
+	}, `testtesttest`).MatchScore).To(Equal(2))
+}
+
+func Test_ScoredFieldMatcher_WithMultipleMatchers_AlsoMatchesTrue(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
@@ -156,7 +164,7 @@ func Test_CountingFieldMatcher_WithMultipleMatchers_AlsoMatchesTrue(t *testing.T
 	}, xml.Header+"<list><item><field>test</field></item></list>").Matched).To(BeTrue())
 }
 
-func Test_CountingFieldMatcher_WithMultipleMatchers_MatchesFalse(t *testing.T) {
+func Test_ScoredFieldMatcher_WithMultipleMatchers_MatchesFalse(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
@@ -165,7 +173,7 @@ func Test_CountingFieldMatcher_WithMultipleMatchers_MatchesFalse(t *testing.T) {
 	}, `testtesttest`).Matched).To(BeFalse())
 }
 
-func Test_CountingFieldMatcher__WithMultipleMatchers_AlsoMatchesFalse(t *testing.T) {
+func Test_ScoredFieldMatcher__WithMultipleMatchers_AlsoMatchesFalse(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
@@ -174,7 +182,7 @@ func Test_CountingFieldMatcher__WithMultipleMatchers_AlsoMatchesFalse(t *testing
 	}, `testtesttest`).Matched).To(BeFalse())
 }
 
-func Test_CountingFieldMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
+func Test_ScoredFieldMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	// Glob, regex, and exact
@@ -185,7 +193,7 @@ func Test_CountingFieldMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
 	}, `testtesttest`)
 
 	Expect(matcher.Matched).To(BeTrue())
-	Expect(matcher.MatchScore).To(Equal(3))
+	Expect(matcher.MatchScore).To(Equal(4))
 
 	// JSON and JSONPath
 	matcher = matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
@@ -206,7 +214,7 @@ func Test_CountingFieldMatcher_CountsMatches_WhenThereIsAMatch(t *testing.T) {
 	Expect(matcher.MatchScore).To(Equal(2))
 }
 
-func Test_CountingFieldMatcher_CountsMatches_WhenThereIsNoMatch(t *testing.T) {
+func Test_ScoredFieldMatcher_CountsMatches_WhenThereIsNoMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	// Glob, regex, and exact
@@ -218,10 +226,10 @@ func Test_CountingFieldMatcher_CountsMatches_WhenThereIsNoMatch(t *testing.T) {
 	}, `testtesttest`)
 
 	Expect(matcher.Matched).To(BeFalse())
-	Expect(matcher.MatchScore).To(Equal(3))
+	Expect(matcher.MatchScore).To(Equal(4))
 }
 
-func Test_CountingFieldMatcher_CountZero_WhenFieldIsNil(t *testing.T) {
+func Test_ScoredFieldMatcher_CountZero_WhenFieldIsNil(t *testing.T) {
 	RegisterTestingT(t)
 
 	// Glob, regex, and exact
