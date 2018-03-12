@@ -30,12 +30,12 @@ var _ = Describe("When I use hoverctl", func() {
 			Describe("when the state is empty", func() {
 
 				It("Returns empty when getting all", func() {
-					output := functional_tests.Run(hoverctlBinary, "state-store", "get-all", "--admin-port="+hoverfly.GetAdminPort())
+					output := functional_tests.Run(hoverctlBinary, "state-store", "get-all")
 					Expect(output).To(ContainSubstring("The state for Hoverfly is empty"))
 				})
 
 				It("Returns empty for missing key", func() {
-					output := functional_tests.Run(hoverctlBinary, "state-store", "get", "foo", "--admin-port="+hoverfly.GetAdminPort())
+					output := functional_tests.Run(hoverctlBinary, "state-store", "get", "foo")
 					Expect(output).To(ContainSubstring("State is not set for the key: foo"))
 				})
 
@@ -44,30 +44,30 @@ var _ = Describe("When I use hoverctl", func() {
 			Describe("when mutating state", func() {
 
 				It("Can set, get, and get-all and delete state", func() {
-					output := functional_tests.Run(hoverctlBinary, "state-store", "set", "foo", "bar", "--admin-port="+hoverfly.GetAdminPort())
+					output := functional_tests.Run(hoverctlBinary, "state-store", "set", "foo", "bar")
 					Expect(output).To(ContainSubstring("Successfully set state key and value:\n\"foo\"=\"bar\""))
 
-					output = functional_tests.Run(hoverctlBinary, "state-store", "get", "foo", "--admin-port="+hoverfly.GetAdminPort())
+					output = functional_tests.Run(hoverctlBinary, "state-store", "get", "foo")
 					Expect(output).To(ContainSubstring("State of \"foo\":\nbar"))
 
-					output = functional_tests.Run(hoverctlBinary, "state-store", "set", "cheese", "ham", "--admin-port="+hoverfly.GetAdminPort())
+					output = functional_tests.Run(hoverctlBinary, "state-store", "set", "cheese", "ham")
 					Expect(output).To(ContainSubstring("Successfully set state key and value:\n\"cheese\"=\"ham\""))
 
-					output = functional_tests.Run(hoverctlBinary, "state-store", "get", "cheese", "--admin-port="+hoverfly.GetAdminPort())
+					output = functional_tests.Run(hoverctlBinary, "state-store", "get", "cheese")
 					Expect(output).To(ContainSubstring("State of \"cheese\":\nham"))
 
-					output = functional_tests.Run(hoverctlBinary, "state-store", "get-all", "--admin-port="+hoverfly.GetAdminPort())
+					output = functional_tests.Run(hoverctlBinary, "state-store", "get-all")
 					Expect(output).To(ContainSubstring("State of Hoverfly:\n"))
 					Expect(output).To(ContainSubstring(`"cheese"="ham"`))
 					Expect(output).To(ContainSubstring(`"foo"="bar"`))
 
-					output = functional_tests.Run(hoverctlBinary, "state-store", "delete-all", "--admin-port="+hoverfly.GetAdminPort())
+					output = functional_tests.Run(hoverctlBinary, "state-store", "delete-all")
 					Expect(output).To(ContainSubstring("State has been deleted"))
 
-					output = functional_tests.Run(hoverctlBinary, "state-store", "get-all", "--admin-port="+hoverfly.GetAdminPort())
+					output = functional_tests.Run(hoverctlBinary, "state-store", "get-all")
 					Expect(output).To(ContainSubstring("The state for Hoverfly is empty"))
 
-					output = functional_tests.Run(hoverctlBinary, "state-store", "get", "foo", "--admin-port="+hoverfly.GetAdminPort())
+					output = functional_tests.Run(hoverctlBinary, "state-store", "get", "foo")
 					Expect(output).To(ContainSubstring("State is not set for the key: foo"))
 				})
 

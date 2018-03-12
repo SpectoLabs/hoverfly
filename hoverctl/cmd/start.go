@@ -37,6 +37,9 @@ hoverctl configuration file.
 
 		newTargetFlag, _ := cmd.Flags().GetString("new-target")
 
+		adminPortFlag, err := cmd.Flags().GetInt("admin-port")
+		handleIfError(err)
+
 		if newTargetFlag != "" {
 			if config.GetTarget(newTargetFlag) != nil {
 				handleIfError(fmt.Errorf("Target %s already exists\n\nUse a different target name or run `hoverctl targets update %[1]s`", newTargetFlag))
@@ -83,7 +86,7 @@ hoverctl configuration file.
 			target.Password = password
 		}
 
-		err := wrapper.Start(target)
+		err = wrapper.Start(target)
 		handleIfError(err)
 
 		data := [][]string{
@@ -109,6 +112,7 @@ func init() {
 	RootCmd.AddCommand(startCmd)
 	startCmd.Flags().String("new-target", "", "A name for a new target that hoverctl will create and associate the Hoverfly instance to")
 
+	startCmd.Flags().Int("admin-port", 0, "A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
 	startCmd.Flags().String("host", "", "A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
 
 	startCmd.Flags().String("cache", "", "A path to a persisted Hoverfly cache. If the cache doesn't exist, Hoverfly will create it")

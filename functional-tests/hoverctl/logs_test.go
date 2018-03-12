@@ -29,7 +29,7 @@ var _ = Describe("When I use hoverctl", func() {
 		It("should return the logs", func() {
 			functional_tests.Run(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
 
-			output := functional_tests.Run(hoverctlBinary, "logs", "--json", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
+			output := functional_tests.Run(hoverctlBinary, "logs", "--json")
 
 			Expect(output).To(ContainSubstring(`"Destination":".","Mode":"simulate","ProxyPort":"` + proxyPort + `","level":"info","msg":"Proxy prepared..."`))
 		})
@@ -49,7 +49,7 @@ var _ = Describe("When I use hoverctl", func() {
 		It("should return the logs", func() {
 			functional_tests.Run(hoverctlBinary, "start", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
 
-			output := functional_tests.Run(hoverctlBinary, "logs", "--admin-port="+adminPort, "--proxy-port="+proxyPort)
+			output := functional_tests.Run(hoverctlBinary, "logs")
 
 			Expect(output).To(ContainSubstring("Proxy prepared..."))
 			Expect(output).To(ContainSubstring("=."))

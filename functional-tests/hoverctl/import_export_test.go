@@ -167,7 +167,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 				fileName := functional_tests.GenerateFileName()
 				// Export the data
-				output := functional_tests.Run(hoverctlBinary, "export", fileName, "--admin-port="+hoverfly.GetAdminPort())
+				output := functional_tests.Run(hoverctlBinary, "export", fileName)
 
 				Expect(output).To(ContainSubstring("Successfully exported simulation to " + fileName))
 
@@ -186,7 +186,7 @@ var _ = Describe("When I use hoverctl", func() {
 				hoverfly.ImportSimulation(v3HoverflyDataWithMultiplePairs)
 				fileName := functional_tests.GenerateFileName()
 				// Export the data
-				output := functional_tests.Run(hoverctlBinary, "export", fileName, "--admin-port="+hoverfly.GetAdminPort(), "--url-pattern=my-test.com")
+				output := functional_tests.Run(hoverctlBinary, "export", fileName, "--url-pattern=my-test.com")
 
 				Expect(output).To(ContainSubstring("Successfully exported simulation to " + fileName))
 
@@ -206,7 +206,7 @@ var _ = Describe("When I use hoverctl", func() {
 				err := ioutil.WriteFile(fileName, []byte(v3HoverflyData), 0644)
 				Expect(err).To(BeNil())
 
-				output := functional_tests.Run(hoverctlBinary, "import", fileName, "--admin-port="+hoverfly.GetAdminPort())
+				output := functional_tests.Run(hoverctlBinary, "import", fileName)
 
 				Expect(output).To(ContainSubstring("Successfully imported simulation from " + fileName))
 
@@ -223,7 +223,7 @@ var _ = Describe("When I use hoverctl", func() {
 				}))
 				defer ts.Close()
 
-				output := functional_tests.Run(hoverctlBinary, "import", ts.URL, "--admin-port="+hoverfly.GetAdminPort())
+				output := functional_tests.Run(hoverctlBinary, "import", ts.URL)
 
 				Expect(output).To(ContainSubstring("Successfully imported simulation from " + ts.URL))
 
