@@ -39,6 +39,8 @@ hoverctl configuration file.
 
 		adminPortFlag, err := cmd.Flags().GetInt("admin-port")
 		handleIfError(err)
+		proxyPortFlag, err := cmd.Flags().GetInt("proxy-port")
+		handleIfError(err)
 
 		if newTargetFlag != "" {
 			if config.GetTarget(newTargetFlag) != nil {
@@ -113,6 +115,7 @@ func init() {
 	startCmd.Flags().String("new-target", "", "A name for a new target that hoverctl will create and associate the Hoverfly instance to")
 
 	startCmd.Flags().Int("admin-port", 0, "A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
+	startCmd.Flags().Int("proxy-port", 0, "A port number for the Hoverfly proxy. Overrides the default Hoverfly proxy port (8500)")
 	startCmd.Flags().String("host", "", "A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
 
 	startCmd.Flags().String("cache", "", "A path to a persisted Hoverfly cache. If the cache doesn't exist, Hoverfly will create it")
