@@ -41,6 +41,8 @@ hoverctl configuration file.
 			if config.GetTarget(newTargetFlag) != nil {
 				handleIfError(fmt.Errorf("Target %s already exists\n\nUse a different target name or run `hoverctl targets update %[1]s`", newTargetFlag))
 			}
+			hostFlag, err := cmd.Flags().GetString("host")
+			handleIfError(err)
 			target = configuration.NewTarget(newTargetFlag, hostFlag, adminPortFlag, proxyPortFlag)
 		}
 
@@ -106,6 +108,8 @@ hoverctl configuration file.
 func init() {
 	RootCmd.AddCommand(startCmd)
 	startCmd.Flags().String("new-target", "", "A name for a new target that hoverctl will create and associate the Hoverfly instance to")
+
+	startCmd.Flags().String("host", "", "A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
 
 	startCmd.Flags().String("cache", "", "A path to a persisted Hoverfly cache. If the cache doesn't exist, Hoverfly will create it")
 	startCmd.Flags().Bool("disable-cache", false, "Disables the request response cache on Hoverfly")
