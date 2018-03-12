@@ -39,6 +39,8 @@ target in the hoverctl configuration file.
 			handleIfError(err)
 			adminPortFlag, err := cmd.Flags().GetInt("admin-port")
 			handleIfError(err)
+			proxyPortFlag, err := cmd.Flags().GetInt("proxy-port")
+			handleIfError(err)
 			if adminPortFlag == 0 && (hostFlag != "" && !wrapper.IsLocal(hostFlag)) {
 				adminPortFlag = 443
 			}
@@ -76,6 +78,7 @@ func init() {
 
 	loginCmd.Flags().String("new-target", "", "A name for a new target that hoverctl will create and associate the Hoverfly instance to")
 	loginCmd.Flags().Int("admin-port", 0, "A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
+	loginCmd.Flags().Int("proxy-port", 0, "A port number for the Hoverfly proxy. Overrides the default Hoverfly proxy port (8500)")
 	loginCmd.Flags().String("host", "", "A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
 	loginCmd.Flags().StringVar(&username, "username", "", "Username to authenticate against Hoverfly with")
 	loginCmd.Flags().StringVar(&password, "password", "", "Password to autenticate against Hoverfly with")
