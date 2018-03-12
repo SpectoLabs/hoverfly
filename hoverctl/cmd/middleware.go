@@ -39,6 +39,7 @@ configuration will be shown.
 			fmt.Println("Hoverfly middleware configuration is currently set to")
 		} else {
 			if middlewareRemote != "" {
+				fmt.Println("Testing middleware against Hoverfly...")
 				middleware, err = wrapper.SetMiddleware(*target, "", "", middlewareRemote)
 				handleIfError(err)
 				fmt.Println("Hoverfly middleware configuration has been set to")
@@ -49,6 +50,7 @@ configuration will be shown.
 					handleIfError(err)
 				}
 
+				fmt.Println("Testing middleware against Hoverfly...")
 				middleware, err = wrapper.SetMiddleware(*target, middlewareBinary, string(script), "")
 				handleIfError(err)
 
