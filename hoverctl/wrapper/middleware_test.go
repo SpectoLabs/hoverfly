@@ -125,5 +125,5 @@ func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 
 	_, err := SetMiddleware(target, "", "", "")
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Could not set middleware\n\ntest error"))
+	Expect(err.Error()).To(Equal("Could not set middleware, it may have failed the test\n\ntest error"))
 }

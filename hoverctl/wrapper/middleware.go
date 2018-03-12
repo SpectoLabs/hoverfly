@@ -50,7 +50,7 @@ func SetMiddleware(target configuration.Target, binary, script, remote string) (
 
 	defer response.Body.Close()
 
-	err = handleResponseError(response, "Could not set middleware")
+	err = handleResponseError(response, "Could not set middleware, it may have failed the test")
 	if err != nil {
 		return v2.MiddlewareView{}, err
 	}
