@@ -130,15 +130,6 @@ func Test_ConvertToNewMiddleware_WillCreateAMiddlewareObjectFromASingleBinary(t 
 	Expect(unit.Remote).To(Equal(""))
 }
 
-func Test_ConvertToNewMiddleware_ReturnsErrorIfBinaryIsUnaccessible(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit, err := ConvertToNewMiddleware("fake-binary")
-	Expect(err).ToNot(BeNil())
-
-	Expect(unit).To(BeNil())
-}
-
 func Test_ConvertToNewMiddleware_WillCreateAMiddlewareObjectFromASingleBinaryAndScript(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -164,16 +155,6 @@ func Test_Middleware_SetBinary_SetsBinaryIfItCanRunIt(t *testing.T) {
 	err := unit.SetBinary("go")
 	Expect(err).To(BeNil())
 	Expect(unit.Binary).To(Equal("go"))
-}
-
-func Test_Middleware_SetBinary_DoesNotSetIfCantRun(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := Middleware{}
-
-	err := unit.SetBinary("|{}|")
-	Expect(err).ToNot(BeNil())
-	Expect(unit.Binary).To(Equal(""))
 }
 
 func Test_Middleware_SetBinary_SetsStringToEmpty(t *testing.T) {

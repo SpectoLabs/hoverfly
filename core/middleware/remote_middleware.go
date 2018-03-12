@@ -43,7 +43,7 @@ func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair
 		}).Error("Error when communicating with remote middleware")
 		return pair, &MiddlewareError{
 			OriginalError: err,
-			Message:       "Error when communicating with remote middleware:\n " + err.Error(),
+			Message:       "Error when communicating with remote middleware:",
 			Url:           this.Remote,
 			Stdin:         string(pairViewBytes),
 		}
