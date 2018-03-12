@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 
@@ -68,7 +67,6 @@ func (this *Middleware) SetScript(scriptContent string) error {
 	}
 
 	this.Script = script
-
 	return nil
 }
 
@@ -99,13 +97,6 @@ func (this *Middleware) SetBinary(binary string) error {
 		this.Binary = ""
 		return nil
 	}
-	testCommand := exec.Command(binary)
-	if err := testCommand.Start(); err != nil {
-		return err
-	}
-
-	testCommand.Process.Kill()
-
 	this.Binary = binary
 	return nil
 }

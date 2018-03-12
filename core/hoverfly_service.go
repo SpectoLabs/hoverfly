@@ -116,10 +116,9 @@ func (hf Hoverfly) GetMiddleware() (string, string, string) {
 }
 
 func (hf *Hoverfly) SetMiddleware(binary, script, remote string) error {
-	newMiddleware := middleware.Middleware{}
-
+	newMiddleware := &middleware.Middleware{}
 	if binary == "" && script == "" && remote == "" {
-		hf.Cfg.Middleware = newMiddleware
+		hf.Cfg.Middleware = *newMiddleware
 		return nil
 	}
 
@@ -134,7 +133,7 @@ func (hf *Hoverfly) SetMiddleware(binary, script, remote string) error {
 
 	err = newMiddleware.SetScript(script)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	err = newMiddleware.SetRemote(remote)
@@ -158,12 +157,12 @@ func (hf *Hoverfly) SetMiddleware(binary, script, remote string) error {
 			Headers: map[string][]string{"test_header": []string{"true"}},
 		},
 	}
+
 	_, err = newMiddleware.Execute(testData)
 	if err != nil {
 		return err
 	}
-
-	hf.Cfg.Middleware = newMiddleware
+	hf.Cfg.Middleware = *newMiddleware
 	return nil
 }
 
@@ -215,8 +214,8 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV4, error) {
 	}
 
 	return v2.BuildSimulationView(pairViews,
-			hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView(),
-			hf.version), nil
+		hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView(),
+		hf.version), nil
 }
 
 func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV4, error) {

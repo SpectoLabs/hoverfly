@@ -19,6 +19,9 @@ func (m *MiddlewareError) Error() string {
 	if m.Command != "" {
 		errorString = fmt.Sprintf(errorString+"\nCommand: %s", m.Command)
 	}
+	if m.OriginalError != nil {
+		errorString = fmt.Sprintf(errorString+"\n%s", m.OriginalError.Error())
+	}
 	if m.Url != "" {
 		errorString = fmt.Sprintf(errorString+"\nURL: %s", m.Url)
 	}
