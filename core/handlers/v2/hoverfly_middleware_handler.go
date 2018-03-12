@@ -52,7 +52,7 @@ func (this *HoverflyMiddlewareHandler) Put(w http.ResponseWriter, req *http.Requ
 
 	err = this.Hoverfly.SetMiddleware(middlewareReq.Binary, middlewareReq.Script, middlewareReq.Remote)
 	if err != nil {
-		handlers.WriteErrorResponse(w, "Invalid middleware: "+err.Error(), 422)
+		handlers.WriteErrorResponse(w, err.Error(), 422)
 		return
 	}
 

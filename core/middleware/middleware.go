@@ -9,7 +9,6 @@ import (
 
 	"fmt"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
@@ -116,16 +115,6 @@ func (this *Middleware) Execute(pair models.RequestResponsePair) (models.Request
 	} else {
 		return this.executeMiddlewareRemotely(pair)
 	}
-}
-
-func buildLogFields(fields map[string]string) log.Fields {
-	logFields := log.Fields{}
-	for field, _ := range fields {
-		if fields[field] != "" {
-			logFields[field] = fields[field]
-		}
-	}
-	return logFields
 }
 
 func (this Middleware) IsSet() bool {
