@@ -33,7 +33,6 @@ configuration will be shown.
 
 		var middleware v2.MiddlewareView
 		var err error
-
 		if middlewareBinary == "" && middlewareScript == "" && middlewareRemote == "" {
 			middleware, err = wrapper.GetMiddleware(*target)
 			handleIfError(err)
@@ -44,11 +43,15 @@ configuration will be shown.
 				handleIfError(err)
 				fmt.Println("Hoverfly middleware configuration has been set to")
 			} else {
-				script, err := configuration.ReadFile(middlewareScript)
-				handleIfError(err)
+				var script []byte
+				if middlewareScript != "" {
+					script, err = configuration.ReadFile(middlewareScript)
+					handleIfError(err)
+				}
 
 				middleware, err = wrapper.SetMiddleware(*target, middlewareBinary, string(script), "")
 				handleIfError(err)
+
 				fmt.Println("Hoverfly middleware configuration has been set to")
 			}
 		}
