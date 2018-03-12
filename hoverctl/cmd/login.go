@@ -35,6 +35,8 @@ target in the hoverctl configuration file.
 
 			// If the host is set to a remote instance, the default HTTPS port
 			// is used instead of 8888 which is set in wrapper.NewTarget()
+			hostFlag, err := cmd.Flags().GetString("host")
+			handleIfError(err)
 			if adminPortFlag == 0 && (hostFlag != "" && !wrapper.IsLocal(hostFlag)) {
 				adminPortFlag = 443
 			}
@@ -71,7 +73,7 @@ func init() {
 	RootCmd.AddCommand(loginCmd)
 
 	loginCmd.Flags().String("new-target", "", "A name for a new target that hoverctl will create and associate the Hoverfly instance to")
-
+	loginCmd.Flags().String("host", "", "A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
 	loginCmd.Flags().StringVar(&username, "username", "", "Username to authenticate against Hoverfly with")
 	loginCmd.Flags().StringVar(&password, "password", "", "Password to autenticate against Hoverfly with")
 }

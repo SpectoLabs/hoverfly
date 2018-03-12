@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var targetNameFlag, hostFlag string
+var targetNameFlag string
 var adminPortFlag, proxyPortFlag int
 
 var force, verbose, setDefaultTargetFlag bool
@@ -56,8 +56,6 @@ func init() {
 		"A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
 	RootCmd.PersistentFlags().IntVar(&proxyPortFlag, "proxy-port", 0,
 		"A port number for the Hoverfly proxy. Overrides the default Hoverfly proxy port (8500)")
-	RootCmd.PersistentFlags().StringVar(&hostFlag, "host", "",
-		"A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
 
 	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Verbose logging from hoverctl")
 

@@ -75,6 +75,9 @@ Create target"
 			handleIfError(fmt.Errorf("Target %s already exists\n\nUse a different target name or run `hoverctl targets update %[1]s`", args[0]))
 		}
 
+		hostFlag, err := cmd.Flags().GetString("host")
+		handleIfError(err)
+
 		newTarget := configuration.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
 
 		config.NewTarget(*newTarget)
@@ -98,6 +101,9 @@ Update target
 		if config.GetTarget(args[0]) == nil {
 			handleIfError(fmt.Errorf("Target %s does not exist\n\nUse a different target name or run `hoverctl targets create %[1]s`", args[0]))
 		}
+
+		hostFlag, err := cmd.Flags().GetString("host")
+		handleIfError(err)
 
 		newTarget := configuration.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
 
@@ -148,4 +154,7 @@ func init() {
 	targetsCmd.AddCommand(targetsNewCmd)
 	targetsCmd.AddCommand(targetsUpdateCmd)
 	targetsCmd.AddCommand(targetsDefaultCmd)
+
+	targetsNewCmd.Flags().String("host", "", "A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
+	targetsUpdateCmd.Flags().String("host", "", "A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
 }
