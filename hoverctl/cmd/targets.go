@@ -77,6 +77,8 @@ Create target"
 
 		hostFlag, err := cmd.Flags().GetString("host")
 		handleIfError(err)
+		adminPortFlag, err := cmd.Flags().GetInt("admin-port")
+		handleIfError(err)
 
 		newTarget := configuration.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
 
@@ -103,6 +105,8 @@ Update target
 		}
 
 		hostFlag, err := cmd.Flags().GetString("host")
+		handleIfError(err)
+		adminPortFlag, err := cmd.Flags().GetInt("admin-port")
 		handleIfError(err)
 
 		newTarget := configuration.NewTarget(args[0], hostFlag, adminPortFlag, proxyPortFlag)
@@ -155,6 +159,8 @@ func init() {
 	targetsCmd.AddCommand(targetsUpdateCmd)
 	targetsCmd.AddCommand(targetsDefaultCmd)
 
+	targetsNewCmd.Flags().Int("admin-port", 0, "A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
 	targetsNewCmd.Flags().String("host", "", "A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
+	targetsUpdateCmd.Flags().Int("admin-port", 0, "A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
 	targetsUpdateCmd.Flags().String("host", "", "A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
 }

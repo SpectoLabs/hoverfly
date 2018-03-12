@@ -10,7 +10,7 @@ import (
 )
 
 var targetNameFlag string
-var adminPortFlag, proxyPortFlag int
+var proxyPortFlag int
 
 var force, verbose, setDefaultTargetFlag bool
 
@@ -52,8 +52,6 @@ func init() {
 	RootCmd.PersistentFlags().BoolVar(&setDefaultTargetFlag, "set-default", false,
 		"Sets the current target as the default target for hoverctl")
 
-	RootCmd.PersistentFlags().IntVar(&adminPortFlag, "admin-port", 0,
-		"A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
 	RootCmd.PersistentFlags().IntVar(&proxyPortFlag, "proxy-port", 0,
 		"A port number for the Hoverfly proxy. Overrides the default Hoverfly proxy port (8500)")
 
