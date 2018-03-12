@@ -37,11 +37,11 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 	middlewareCommand.Stderr = &stderr
 
 	if err := middlewareCommand.Start(); err != nil {
-		log.WithFields(buildLogFields(map[string]string{
+		log.WithFields(log.Fields{
 			"sdtdout": string(stdout.Bytes()),
 			"sdtderr": string(stderr.Bytes()),
 			"error":   err.Error(),
-		})).Error("Middleware failed to start")
+		}).Error("Middleware failed to start")
 		return pair, &MiddlewareError{
 			OriginalError: err,
 			Message:       "Middleware failed to start",
@@ -53,13 +53,13 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 	}
 
 	if err := middlewareCommand.Wait(); err != nil {
-		log.WithFields(buildLogFields(map[string]string{
+		log.WithFields(log.Fields{
 			"command": this.toString(),
 			"stdin":   string(pairViewBytes),
 			"sdtdout": string(stdout.Bytes()),
 			"sdtderr": string(stderr.Bytes()),
 			"error":   err.Error(),
-		})).Error("Middleware failed")
+		}).Error("Middleware failed")
 		return pair, &MiddlewareError{
 			OriginalError: err,
 			Message:       "Middleware failed",

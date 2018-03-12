@@ -103,7 +103,7 @@ func TestHoverflyMiddlewareHandlerPutWill422ErrorIfHoverflyErrors(t *testing.T) 
 	errorViewResponse, err := unmarshalErrorView(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(errorViewResponse.Error).To(Equal("Invalid middleware: error"))
+	Expect(errorViewResponse.Error).To(Equal("error"))
 }
 
 func TestHoverflyMiddlewareHandlerPutWill400ErrorIfJsonIsBad(t *testing.T) {
