@@ -103,9 +103,16 @@ func (this *DiffMode) addEntry(parameterName string, expected interface{}, actua
 	this.DiffReport.DiffEntries = append(this.DiffReport.DiffEntries,
 		v2.DiffReportEntry{
 			Field:    parameterName,
-			Expected: fmt.Sprint(expected),
-			Actual:   fmt.Sprint(actual),
+			Expected: nullOrValue(expected),
+			Actual:   nullOrValue(actual),
 		})
+}
+
+func nullOrValue(value interface{}) string {
+	if value == nil {
+		return "null"
+	}
+	return fmt.Sprint(value)
 }
 
 func (this *DiffMode) headerDiff(expected map[string][]string, actual map[string][]string) bool {
