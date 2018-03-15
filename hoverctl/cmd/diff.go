@@ -10,7 +10,7 @@ import (
 )
 
 var diffStoreCmd = &cobra.Command{
-	Use:   "diff-store",
+	Use:   "diff",
 	Short: "Manage the diffs for Hoverfly",
 	Long: `
 This allows you to get or clean the differences 
@@ -23,7 +23,7 @@ as lists of strings grouped by the same requests.
 const errorMsgTemplate = "The \"%s\" parameter is not same - the expected value was [%s], but the actual one [%s]\n"
 
 var getAllDiffStoreCmd = &cobra.Command{
-	Use:   "get-all",
+	Use:   "get",
 	Short: "Gets all diffs stored in Hoverfly",
 	Long: `
 Returns all differences between expected and actual responses from Hoverfly.
@@ -61,7 +61,7 @@ Returns all differences between expected and actual responses from Hoverfly.
 }
 
 var deleteDiffsCmd = &cobra.Command{
-	Use:   "delete-all",
+	Use:   "delete",
 	Short: "Deletes all diffs",
 	Long: `
 Deletes all differences between expected and actual responses stored in Hoverfly.
