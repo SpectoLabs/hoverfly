@@ -58,8 +58,8 @@ func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 							ExactMatch: util.StringToPointer("/api/v2/simulation"),
 						},
 						Query: &v2.RequestFieldMatchersView{
-						ExactMatch: util.StringToPointer("urlPattern=test-(.+).com"),
-					},
+							ExactMatch: util.StringToPointer("urlPattern=test-(.+).com"),
+						},
 					},
 					Response: v2.ResponseDetailsViewV4{
 						Status: 200,
@@ -78,8 +78,6 @@ func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 
 	Expect(string(simulation)).To(Equal("{\n\t\"simulation\": true\n}"))
 }
-
-
 
 func Test_ExportSimulation_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
 	RegisterTestingT(t)

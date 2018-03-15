@@ -35,7 +35,7 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 				return goproxy.HTTPMitmConnect, host
 			}
 			return goproxy.MitmConnect, host
-	}))
+		}))
 
 	if hoverfly.Cfg.HttpsOnly {
 		log.Info("Disabling HTTP")

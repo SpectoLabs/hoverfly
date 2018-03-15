@@ -46,17 +46,17 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 
 	response, matchingErr := this.Hoverfly.GetResponse(details)
 
-  	if matchingErr != nil {
-  		log.Info("Going to call real server")
-    	modifiedRequest, err := ReconstructRequestForPassThrough(pair)
-    	if err == nil {
-      		response, err := this.Hoverfly.DoRequest(modifiedRequest)
-      		if err == nil {
-      			log.Info("Going to return response from real server")
-        		return response, nil
-      		}
-    	}
-  	}
+	if matchingErr != nil {
+		log.Info("Going to call real server")
+		modifiedRequest, err := ReconstructRequestForPassThrough(pair)
+		if err == nil {
+			response, err := this.Hoverfly.DoRequest(modifiedRequest)
+			if err == nil {
+				log.Info("Going to return response from real server")
+				return response, nil
+			}
+		}
+	}
 
 	if matchingErr != nil {
 		return ReturnErrorAndLog(request, matchingErr, &pair, "There was an error when matching", Simulate)

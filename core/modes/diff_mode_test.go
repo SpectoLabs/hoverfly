@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"testing"
 
+	"bytes"
+	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
-	"bytes"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"encoding/json"
 )
 
 type hoverflyDiffStub struct{}

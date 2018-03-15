@@ -1125,7 +1125,7 @@ func Test_Hoverfly_processRequest_CanHandleResponseDiff(t *testing.T) {
 	Expect(len(actualUnit.responsesDiff)).To(Equal(1))
 	requestDef := v2.SimpleRequestDefinitionView{
 		Method: "GET",
-		Host:   "somehost.com",}
+		Host:   "somehost.com"}
 	Expect(len(actualUnit.responsesDiff[requestDef])).To(Equal(1))
 	Expect(actualUnit.responsesDiff[requestDef][0]).NotTo(Equal(""))
 	Expect(actualUnit.responsesDiff[requestDef][0]).To(ContainSubstring(

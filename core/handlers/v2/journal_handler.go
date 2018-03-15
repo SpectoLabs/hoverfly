@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	"strconv"
 	"time"
-	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 const DefaultJournalLimit = 25

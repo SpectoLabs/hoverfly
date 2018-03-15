@@ -5,8 +5,8 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/aymerick/raymond"
-	"time"
 	"strconv"
+	"time"
 )
 
 type TemplatingData struct {
@@ -20,8 +20,7 @@ type Request struct {
 	Scheme     string
 }
 
-type Templator struct{
-
+type Templator struct {
 }
 
 var helpersRegistered = false

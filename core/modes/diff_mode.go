@@ -5,19 +5,19 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 
+	"bytes"
+	"compress/flate"
+	"compress/gzip"
+	"encoding/json"
+	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"reflect"
-	"encoding/json"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"fmt"
-	"bytes"
-	"compress/gzip"
-	"io/ioutil"
-	"io"
 	"github.com/dsnet/compress/brotli"
-	"compress/flate"
+	"io"
+	"io/ioutil"
+	"reflect"
 	"time"
 )
 
@@ -114,8 +114,7 @@ func (this *DiffMode) headerDiff(expected map[string][]string, actual map[string
 		if _, ok := actual[k]; !ok {
 			this.addEntry("header/"+k, expected[k], nil)
 			same = false
-		} else
-		if !reflect.DeepEqual(expected[k], actual[k]) {
+		} else if !reflect.DeepEqual(expected[k], actual[k]) {
 			this.addEntry("header/"+k, expected[k], actual[k])
 			same = false
 		}
