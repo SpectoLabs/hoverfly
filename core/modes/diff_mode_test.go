@@ -208,7 +208,7 @@ func TestJsonDiff_WhenDifferentThenCreatesErrorMessage(t *testing.T) {
 	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
 		v2.DiffReportEntry{"test/fooBool", "true", "false"}))
 	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
-		v2.DiffReportEntry{"test/anotherExpFoo", "foo", "<nil>"}))
+		v2.DiffReportEntry{"test/anotherExpFoo", "foo", "null"}))
 	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
 		v2.DiffReportEntry{"test/nested/baz", "boo", "bar"}))
 }
