@@ -1127,8 +1127,8 @@ func Test_Hoverfly_processRequest_CanHandleResponseDiff(t *testing.T) {
 		Method: "GET",
 		Host:   "somehost.com"}
 	Expect(len(actualUnit.responsesDiff[requestDef])).To(Equal(1))
-	Expect(actualUnit.responsesDiff[requestDef][0]).NotTo(Equal(""))
-	Expect(actualUnit.responsesDiff[requestDef][0]).To(ContainSubstring(
-		"The \"body/message\" parameter is not same - the expected value was [expected], but the actual one [actual]"))
+	Expect(actualUnit.responsesDiff[requestDef][0].DiffEntries).NotTo(BeEmpty())
+	Expect(actualUnit.responsesDiff[requestDef][0].DiffEntries).To(ContainElement(
+		v2.DiffReportEntry{Field: "body/message", Expected: "expected", Actual: "actual"}))
 
 }
