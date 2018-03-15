@@ -9,8 +9,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"strings"
 	sorting "sort"
+	"strings"
 )
 
 var RFC3339Milli = "2006-01-02T15:04:05.000Z07:00"
@@ -68,9 +68,9 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.Time, sort string) (v2.JournalView, error) {
 	journalView := v2.JournalView{
 		Journal: []v2.JournalEntryView{},
-		Offset: 0,
-		Limit: v2.DefaultJournalLimit,
-		Total: 0,
+		Offset:  0,
+		Limit:   v2.DefaultJournalLimit,
+		Total:   0,
 	}
 
 	if this.EntryLimit == 0 {
@@ -149,7 +149,6 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		Query:       models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Query),
 		Body:        models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
 		Headers:     journalEntryFilterView.Request.Headers,
-
 	}
 
 	allEntries := convertJournalEntries(this.entries)
@@ -228,7 +227,7 @@ func getSortParameters(sort string) (string, string, error) {
 		return sortKey, sortOrder, fmt.Errorf("'%s' is not a valid sort key, use timeStarted or latency", sortKey)
 	}
 
-	if len(sortParams) > 1{
+	if len(sortParams) > 1 {
 		sortOrder = strings.ToLower(sortParams[1])
 
 		if sortOrder != "asc" && sortOrder != "desc" {

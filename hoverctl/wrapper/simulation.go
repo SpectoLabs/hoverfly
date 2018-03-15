@@ -6,10 +6,10 @@ import (
 	"errors"
 	"io/ioutil"
 
+	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"net/url"
-	"fmt"
 )
 
 func ExportSimulation(target configuration.Target, urlPattern string) ([]byte, error) {

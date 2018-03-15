@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	. "github.com/onsi/gomega"
 	"bufio"
+	. "github.com/onsi/gomega"
 	"net"
 
 	"net/http/httptest"

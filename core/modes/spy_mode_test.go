@@ -88,7 +88,7 @@ func Test_SpyMode_WhenGivenANonMatchingRequestItWillMakeTheRequestAndReturnIt(t 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(string(responseBody)).To(Equal("test"))	
+	Expect(string(responseBody)).To(Equal("test"))
 }
 
 func Test_SpyMode_WhenGivenAMatchingRequesAndMiddlewareFaislItReturnsAnError(t *testing.T) {

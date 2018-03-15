@@ -19,9 +19,9 @@ type HoverflyJournalStub struct {
 	error                  bool
 	limit                  int
 	offset                 int
-	from				   *time.Time
-	to					   *time.Time
-	sort				   string
+	sort                   string
+	from                   *time.Time
+	to                     *time.Time
 	journalEntryFilterView JournalEntryFilterView
 }
 
@@ -42,10 +42,10 @@ func (this *HoverflyJournalStub) GetEntries(offset int, limit int, from *time.Ti
 		return journalView, fmt.Errorf("entries error")
 	}
 
-	if !this.deleted  {
+	if !this.deleted {
 		journalView.Journal = []JournalEntryView{{
-				Mode: "test",
-			}}
+			Mode: "test",
+		}}
 		journalView.Total = 1
 	}
 
@@ -186,9 +186,6 @@ func Test_JournalHandler_Get_DoesNotSetTimeIfDateTimeQueryIsBadTime(t *testing.T
 
 	Expect(stubHoverfly.from).To(BeNil())
 }
-
-
-
 
 func Test_JournalHandler_Get_Error(t *testing.T) {
 	RegisterTestingT(t)

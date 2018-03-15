@@ -278,8 +278,8 @@ func Test_Journal_GetEntries_ReturnResultsSortedDescendinglyByTimeStarted(t *tes
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 	}
 
-	for i:= 0; i < 5; i++ {
-		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id=" + strconv.Itoa(i), nil)
+	for i := 0; i < 5; i++ {
+		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id="+strconv.Itoa(i), nil)
 		unit.NewEntry(request, response, "test-mode", time.Now())
 	}
 
@@ -289,12 +289,10 @@ func Test_Journal_GetEntries_ReturnResultsSortedDescendinglyByTimeStarted(t *tes
 	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=4"))
 	Expect(*journalView.Journal[1].Request.Query).To(Equal("id=3"))
 
-
 	journalView, _ = unit.GetEntries(2, 2, nil, nil, "timeStarted:desc")
 	Expect(journalView.Journal).To(HaveLen(2))
 	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=2"))
 	Expect(*journalView.Journal[1].Request.Query).To(Equal("id=1"))
-
 
 	journalView, _ = unit.GetEntries(4, 2, nil, nil, "timeStarted:desc")
 	Expect(journalView.Journal).To(HaveLen(1))
@@ -311,18 +309,17 @@ func Test_Journal_GetEntries_ReturnResultsSortedAscendinglyByLatency(t *testing.
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 	}
 
-	for i:= 0; i < 3; i++ {
-		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id=" + strconv.Itoa(i), nil)
+	for i := 0; i < 3; i++ {
+		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id="+strconv.Itoa(i), nil)
 		unit.NewEntry(request, response, "test-mode", time.Now())
 	}
 
 	journalView, err := unit.GetEntries(0, 5, nil, nil, "latency:asc")
 	Expect(err).To(BeNil())
 	Expect(journalView.Journal).To(HaveLen(3))
- 	Expect(journalView.Journal[0].Latency).Should(BeNumerically("<=", journalView.Journal[1].Latency))
- 	Expect(journalView.Journal[1].Latency).Should(BeNumerically("<=", journalView.Journal[2].Latency))
+	Expect(journalView.Journal[0].Latency).Should(BeNumerically("<=", journalView.Journal[1].Latency))
+	Expect(journalView.Journal[1].Latency).Should(BeNumerically("<=", journalView.Journal[2].Latency))
 }
-
 
 func Test_Journal_GetEntries_ReturnResultsSortedDescendinglyByLatency(t *testing.T) {
 	RegisterTestingT(t)
@@ -334,8 +331,8 @@ func Test_Journal_GetEntries_ReturnResultsSortedDescendinglyByLatency(t *testing
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 	}
 
-	for i:= 0; i < 3; i++ {
-		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id=" + strconv.Itoa(i), nil)
+	for i := 0; i < 3; i++ {
+		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id="+strconv.Itoa(i), nil)
 		unit.NewEntry(request, response, "test-mode", time.Now())
 	}
 
@@ -345,7 +342,6 @@ func Test_Journal_GetEntries_ReturnResultsSortedDescendinglyByLatency(t *testing
 	Expect(journalView.Journal[0].Latency).Should(BeNumerically(">=", journalView.Journal[1].Latency))
 	Expect(journalView.Journal[1].Latency).Should(BeNumerically(">=", journalView.Journal[2].Latency))
 }
-
 
 func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
 	RegisterTestingT(t)
@@ -357,8 +353,8 @@ func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 	}
 
-	for i:= 0; i < 5; i++ {
-		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id=" + strconv.Itoa(i), nil)
+	for i := 0; i < 5; i++ {
+		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id="+strconv.Itoa(i), nil)
 		unit.NewEntry(request, response, "test-mode", time.Now())
 	}
 
@@ -371,7 +367,6 @@ func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
 	Expect(journalView.Offset).To(Equal(0))
 	Expect(journalView.Total).To(Equal(5))
 
-
 	journalView, _ = unit.GetEntries(2, 2, nil, nil, "")
 	Expect(journalView.Journal).To(HaveLen(2))
 	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=2"))
@@ -379,7 +374,6 @@ func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
 	Expect(journalView.Limit).To(Equal(2))
 	Expect(journalView.Offset).To(Equal(2))
 	Expect(journalView.Total).To(Equal(5))
-
 
 	journalView, _ = unit.GetEntries(4, 2, nil, nil, "")
 	Expect(journalView.Journal).To(HaveLen(1))
@@ -405,8 +399,8 @@ func Test_Journal_GetEntries_ReturnEmptyPageIfOffsetIsLargerThanTotalElements(t 
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 	}
 
-	for i:= 0; i < 5; i++ {
-		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id=" + strconv.Itoa(i), nil)
+	for i := 0; i < 5; i++ {
+		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id="+strconv.Itoa(i), nil)
 		unit.NewEntry(request, response, "test-mode", time.Now())
 	}
 
@@ -425,8 +419,8 @@ func Test_Journal_GetEntries_FilteredByTimeWindow(t *testing.T) {
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 	}
 
-	for i:= 0; i < 5; i++ {
-		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id=" + strconv.Itoa(i), nil)
+	for i := 0; i < 5; i++ {
+		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id="+strconv.Itoa(i), nil)
 		unit.NewEntry(request, response, "test-mode", time.Date(2018, 2, 1, 2, 0, i, 0, time.Local))
 	}
 
