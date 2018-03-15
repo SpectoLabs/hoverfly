@@ -18,11 +18,8 @@ import (
 	"io"
 	"github.com/dsnet/compress/brotli"
 	"compress/flate"
+	"time"
 )
-
-var DiffErrorMsg DiffErrorMessage
-
-const errorMsgTemplate = "The \"%s\" parameter is not same - the expected value was [%s], but the actual one [%s]\n"
 
 type HoverflyDiff interface {
 	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
@@ -32,9 +29,10 @@ type HoverflyDiff interface {
 type DiffMode struct {
 	Hoverfly         HoverflyDiff
 	MatchingStrategy string
+	DiffReport       v2.DiffReport
 }
 
-func (this DiffMode) View() v2.ModeView {
+func (this *DiffMode) View() v2.ModeView {
 	return v2.ModeView{
 		Mode: Diff,
 		Arguments: v2.ModeArgumentsView{
@@ -43,11 +41,7 @@ func (this DiffMode) View() v2.ModeView {
 	}
 }
 
-func (this DiffMode) GetMessage() DiffErrorMessage {
-	return DiffErrorMsg
-}
-
-func (this DiffMode) SetArguments(arguments ModeArguments) {
+func (this *DiffMode) SetArguments(arguments ModeArguments) {
 	if arguments.MatchingStrategy == nil {
 		this.MatchingStrategy = "strongest"
 	} else {
@@ -56,8 +50,8 @@ func (this DiffMode) SetArguments(arguments ModeArguments) {
 }
 
 //TODO: We should only need one of these two parameters
-func (this DiffMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
-	DiffErrorMsg = DiffErrorMessage{}
+func (this *DiffMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
+	this.DiffReport = v2.DiffReport{Timestamp: time.Now().Format(time.RFC3339)}
 
 	actualPair := models.RequestResponsePair{
 		Request: details,
@@ -85,7 +79,7 @@ func (this DiffMode) Process(request *http.Request, details models.RequestDetail
 			Headers: actualResponse.Header,
 		}
 
-		diffResponse(simResponse, actualResponseDetails)
+		this.diffResponse(simResponse, actualResponseDetails)
 	} else {
 		log.WithFields(log.Fields{
 			"mode":   Diff,
@@ -97,39 +91,32 @@ func (this DiffMode) Process(request *http.Request, details models.RequestDetail
 	return actualResponse, nil
 }
 
-func diffResponse(expected *models.ResponseDetails, actual *models.ResponseDetails) {
+func (this *DiffMode) diffResponse(expected *models.ResponseDetails, actual *models.ResponseDetails) {
 	if expected.Status != 0 && expected.Status != actual.Status {
-		DiffErrorMsg.write("status", expected.Status, actual.Status)
+		this.addEntry("status", expected.Status, actual.Status)
 	}
-	headerDiff(&DiffErrorMsg, expected.Headers, actual.Headers)
-	bodyDiff(&DiffErrorMsg, expected, actual)
+	this.headerDiff(expected.Headers, actual.Headers)
+	this.bodyDiff(expected, actual)
 }
 
-type DiffErrorMessage struct {
-	DiffMessage bytes.Buffer
-	Counter     int
+func (this *DiffMode) addEntry(parameterName string, expected interface{}, actual interface{}) {
+	this.DiffReport.DiffEntries = append(this.DiffReport.DiffEntries,
+		v2.DiffReportEntry{
+			Field:    parameterName,
+			Expected: fmt.Sprint(expected),
+			Actual:   fmt.Sprint(actual),
+		})
 }
 
-func (message *DiffErrorMessage) GetErrorMessage() string {
-	return message.DiffMessage.String()
-}
-
-func (message *DiffErrorMessage) write(parameterName string, expected interface{}, actual interface{}) {
-	message.DiffMessage.WriteString(
-		fmt.Sprintf("(%d)"+errorMsgTemplate,
-			message.Counter+1, parameterName, fmt.Sprint(expected), fmt.Sprint(actual)))
-	message.Counter++
-}
-
-func headerDiff(message *DiffErrorMessage, expected map[string][]string, actual map[string][]string) bool {
+func (this *DiffMode) headerDiff(expected map[string][]string, actual map[string][]string) bool {
 	same := true
 	for k := range expected {
 		if _, ok := actual[k]; !ok {
-			message.write("header/"+k, expected[k], "undefined")
+			this.addEntry("header/"+k, expected[k], nil)
 			same = false
 		} else
 		if !reflect.DeepEqual(expected[k], actual[k]) {
-			message.write("header/"+k, expected[k], actual[k])
+			this.addEntry("header/"+k, expected[k], actual[k])
 			same = false
 		}
 
@@ -137,25 +124,25 @@ func headerDiff(message *DiffErrorMessage, expected map[string][]string, actual 
 	return same
 }
 
-func bodyDiff(message *DiffErrorMessage, expected *models.ResponseDetails, actual *models.ResponseDetails) bool {
+func (this *DiffMode) bodyDiff(expected *models.ResponseDetails, actual *models.ResponseDetails) bool {
 	var expectedJson, actualJson interface{}
 
 	err := unmarshalResponseToInterface(expected, &expectedJson)
 	if err != nil {
-		return doDeepEqual(message, expected.Body, actual.Body)
+		return this.doDeepEqual(expected.Body, actual.Body)
 	}
 
 	err = unmarshalResponseToInterface(actual, &actualJson)
 	if err != nil {
-		return doDeepEqual(message, expected.Body, actual.Body)
+		return this.doDeepEqual(expected.Body, actual.Body)
 	}
 
-	return JsonDiff(message, "body", expectedJson.(map[string]interface{}), actualJson.(map[string]interface{}))
+	return this.JsonDiff("body", expectedJson.(map[string]interface{}), actualJson.(map[string]interface{}))
 }
 
-func doDeepEqual(message *DiffErrorMessage, expected string, actual string) bool {
+func (this *DiffMode) doDeepEqual(expected string, actual string) bool {
 	if !reflect.DeepEqual(expected, actual) {
-		message.write("body", expected, actual)
+		this.addEntry("body", expected, actual)
 		return false
 	}
 	return true
@@ -230,30 +217,30 @@ func decompress(body []byte, encodings []string) ([]byte, error) {
 	return body, err
 }
 
-func JsonDiff(message *DiffErrorMessage, prefix string, expected map[string]interface{}, actual map[string]interface{}) bool {
+func (this *DiffMode) JsonDiff(prefix string, expected map[string]interface{}, actual map[string]interface{}) bool {
 	same := true
 	for k := range expected {
 		param := prefix + "/" + k
 		if _, ok := actual[k]; !ok {
-			message.write(param, expected[k], "undefined")
+			this.addEntry(param, expected[k], nil)
 			same = false
 		} else if reflect.TypeOf(expected[k]) != reflect.TypeOf(actual[k]) {
-			message.write(param, expected[k], actual[k])
+			this.addEntry(param, expected[k], actual[k])
 			same = false
 		} else {
 			switch expected[k].(type) {
 			default:
 				if expected[k] != actual[k] {
-					message.write(param, expected[k], actual[k])
+					this.addEntry(param, expected[k], actual[k])
 					same = false
 				}
 			case map[string]interface{}:
-				if !JsonDiff(message, param, expected[k].(map[string]interface{}), actual[k].(map[string]interface{})) {
+				if !this.JsonDiff(param, expected[k].(map[string]interface{}), actual[k].(map[string]interface{})) {
 					same = false
 				}
 			case []interface{}:
 				if !reflect.DeepEqual(expected[k], actual[k]) {
-					message.write(param, expected[k], actual[k])
+					this.addEntry(param, expected[k], actual[k])
 					same = false
 				}
 			}

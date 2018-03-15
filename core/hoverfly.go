@@ -53,7 +53,7 @@ type Hoverfly struct {
 	Journal       *journal.Journal
 	templator     *templating.Templator
 
-	responsesDiff map[v2.SimpleRequestDefinitionView][]string
+	responsesDiff map[v2.SimpleRequestDefinitionView][]v2.DiffReport
 }
 
 func NewHoverfly() *Hoverfly {
@@ -69,7 +69,7 @@ func NewHoverfly() *Hoverfly {
 		Cfg:            InitSettings(),
 		state:          make(map[string]string),
 		templator:      templating.NewTemplator(),
-		responsesDiff:  make(map[v2.SimpleRequestDefinitionView][]string),
+		responsesDiff:  make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport),
 	}
 
 	hoverfly.version = "v0.15.1"
@@ -242,9 +242,8 @@ func (hf *Hoverfly) handleResponseDiff(request *http.Request, mode modes.Mode) {
 	switch mode.(type) {
 	case *modes.DiffMode:
 		diffMode := mode.(*modes.DiffMode)
-		errorMessage := diffMode.GetMessage()
 
-		if errorMessage.GetErrorMessage() != "" {
+		if len(diffMode.DiffReport.DiffEntries) > 0 {
 			requestView := v2.SimpleRequestDefinitionView{
 				Method: request.Method,
 				Host:   request.URL.Host,
@@ -253,7 +252,7 @@ func (hf *Hoverfly) handleResponseDiff(request *http.Request, mode modes.Mode) {
 			}
 
 			diffs := hf.responsesDiff[requestView]
-			hf.responsesDiff[requestView] = append(diffs, errorMessage.GetErrorMessage())
+			hf.responsesDiff[requestView] = append(diffs, diffMode.DiffReport)
 		}
 	}
 }

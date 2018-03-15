@@ -302,10 +302,10 @@ func (this *Hoverfly) ClearState() {
 	this.state = make(map[string]string)
 }
 
-func (this *Hoverfly) GetDiff() map[v2.SimpleRequestDefinitionView][]string {
+func (this *Hoverfly) GetDiff() map[v2.SimpleRequestDefinitionView][]v2.DiffReport {
 	return this.responsesDiff
 }
 
 func (this *Hoverfly) ClearDiff() {
-	this.responsesDiff = make(map[v2.SimpleRequestDefinitionView][]string)
+	this.responsesDiff = make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport)
 }

@@ -32,8 +32,8 @@ func (this *DiffHandler) Get(w http.ResponseWriter, req *http.Request, next http
 	var diffsToReturn []ResponseDiffForRequestView
 	for request, value := range this.Hoverfly.GetDiff() {
 		diffsToReturn = append(diffsToReturn, ResponseDiffForRequestView{
-			Request:		request,
-			DiffMessage:	value,
+			Request:    request,
+			DiffReport: value,
 		})
 	}
 

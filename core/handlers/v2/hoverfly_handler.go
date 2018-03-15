@@ -22,7 +22,7 @@ type Hoverfly interface {
 	ClearState()
 	GetUpstreamProxy() string
 	IsWebServer() bool
-	GetDiff() map[SimpleRequestDefinitionView][]string
+	GetDiff() map[SimpleRequestDefinitionView][]DiffReport
 	ClearDiff()
 }
 

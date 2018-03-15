@@ -10,7 +10,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 	"bytes"
-	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"encoding/json"
 )
 
@@ -90,8 +90,7 @@ func Test_DiffMode_WhenGivenAMatchingRequestReturningTheSameResponse(t *testing.
 	Expect(len(response.Header)).To(Equal(2))
 	Expect(response.Header["header"]).To(Equal([]string{"expected"}))
 	Expect(response.Header["source"]).To(Equal([]string{"service"}))
-	message := unit.GetMessage().DiffMessage
-	Expect(message.String()).To(Equal(""))
+	Expect(len(unit.DiffReport.DiffEntries)).To(Equal(0))
 }
 
 func Test_DiffMode_WhenGivenAMatchingRequestReturningDifferentResponse(t *testing.T) {
@@ -121,10 +120,10 @@ func Test_DiffMode_WhenGivenAMatchingRequestReturningDifferentResponse(t *testin
 	Expect(len(response.Header)).To(Equal(2))
 	Expect(response.Header["header"]).To(Equal([]string{"actual"}))
 	Expect(response.Header["source"]).To(Equal([]string{"service"}))
-	verifyParamsDiffAreInMessage(unit.GetMessage(),
-		paramDiff{"header/source", "[simulation]", "[service]"},
-		paramDiff{"header/header", "[simulated]", "[actual]"},
-		paramDiff{"body", "simulated", "actual"})
+	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
+		v2.DiffReportEntry{"header/source", "[simulation]", "[service]"},
+		v2.DiffReportEntry{"header/header", "[simulated]", "[actual]"},
+		v2.DiffReportEntry{"body", "simulated", "actual"}))
 }
 
 func Test_DiffMode_WhenGivenANonMatchingRequestDiffIsEmpty(t *testing.T) {
@@ -155,8 +154,7 @@ func Test_DiffMode_WhenGivenANonMatchingRequestDiffIsEmpty(t *testing.T) {
 	Expect(len(response.Header)).To(Equal(2))
 	Expect(response.Header["header"]).To(Equal([]string{"actual"}))
 	Expect(response.Header["source"]).To(Equal([]string{"service"}))
-	message := unit.GetMessage().DiffMessage
-	Expect(message.String()).To(Equal(""))
+	Expect(unit.DiffReport.DiffEntries).To(BeEmpty())
 }
 
 type paramDiff struct {
@@ -193,23 +191,26 @@ func TestJsonDiff_WhenDifferentThenCreatesErrorMessage(t *testing.T) {
 	_ = json.Unmarshal(expected, &jsonExpected)
 	_ = json.Unmarshal(actual, &jsonActual)
 
-	diffMessage := DiffErrorMessage{}
+	diffMode := DiffMode{DiffReport: v2.DiffReport{}}
 
 	// when
-	result := JsonDiff(&diffMessage, "test", jsonExpected.(map[string]interface{}), jsonActual.(map[string]interface{}))
+	result := diffMode.JsonDiff("test", jsonExpected.(map[string]interface{}), jsonActual.(map[string]interface{}))
 
 	// then
 	Expect(result).To(Equal(false))
-	Expect(diffMessage.Counter).To(Equal(6))
-	Expect(diffMessage.DiffMessage.String()).NotTo(Equal(""))
-	verifyParamsDiffAreInMessage(diffMessage,
-		paramDiff{"test/foo", "bar", "baz"},
-		paramDiff{"test/fooInt", "1", "2"},
-		paramDiff{"test/fooDouble", "0", "0.1"},
-		paramDiff{"test/fooBool", "true", "false"},
-		paramDiff{"test/fooBool", "true", "false"},
-		paramDiff{"test/anotherExpFoo", "foo", "undefined"},
-		paramDiff{"test/nested/baz", "boo", "bar"})
+	Expect(len(diffMode.DiffReport.DiffEntries)).To(Equal(6))
+	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
+		v2.DiffReportEntry{"test/foo", "bar", "baz"}))
+	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
+		v2.DiffReportEntry{"test/fooInt", "1", "2"}))
+	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
+		v2.DiffReportEntry{"test/fooDouble", "0", "0.1"}))
+	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
+		v2.DiffReportEntry{"test/fooBool", "true", "false"}))
+	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
+		v2.DiffReportEntry{"test/anotherExpFoo", "foo", "<nil>"}))
+	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
+		v2.DiffReportEntry{"test/nested/baz", "boo", "bar"}))
 }
 
 func TestJsonDiff_WhenExpectedEmptyThenReturnsTrue(t *testing.T) {
@@ -221,7 +222,7 @@ func TestJsonDiff_WhenExpectedEmptyThenReturnsTrue(t *testing.T) {
 	"bar": {
 		"baz": "xyzzy"
 	},
-	"xyzzy": [1,2]		
+	"xyzzy": [1,2]
 	}`)
 
 	expected := []byte(`{}`)
@@ -231,15 +232,14 @@ func TestJsonDiff_WhenExpectedEmptyThenReturnsTrue(t *testing.T) {
 	var jsonExpected interface{}
 	_ = json.Unmarshal(expected, &jsonExpected)
 
-	diffMessage := DiffErrorMessage{}
+	diffMode := DiffMode{DiffReport: v2.DiffReport{}}
 
 	// when
-	result := JsonDiff(&diffMessage, "test", jsonExpected.(map[string]interface{}), jsonActual.(map[string]interface{}))
+	result := diffMode.JsonDiff("test", jsonExpected.(map[string]interface{}), jsonActual.(map[string]interface{}))
 
 	// then
 	Expect(result).To(Equal(true))
-	Expect(diffMessage.Counter).To(Equal(0))
-	Expect(diffMessage.DiffMessage.String()).To(Equal(""))
+	Expect(len(diffMode.DiffReport.DiffEntries)).To(Equal(0))
 }
 
 func TestJsonDiff_WhenSameThenReturnsTrue(t *testing.T) {
@@ -251,26 +251,18 @@ func TestJsonDiff_WhenSameThenReturnsTrue(t *testing.T) {
 	"bar": {
 		"baz": "xyzzy"
 	},
-	"xyzzy": [1,2]		
+	"xyzzy": [1,2]
 	}`)
 
 	var jsonObject interface{}
 	_ = json.Unmarshal(data, &jsonObject)
 
-	diffMessage := DiffErrorMessage{}
+	diffMode := DiffMode{DiffReport: v2.DiffReport{}}
 
 	// when
-	result := JsonDiff(&diffMessage, "test", jsonObject.(map[string]interface{}), jsonObject.(map[string]interface{}))
+	result := diffMode.JsonDiff("test", jsonObject.(map[string]interface{}), jsonObject.(map[string]interface{}))
 
 	// then
 	Expect(result).To(Equal(true))
-	Expect(diffMessage.Counter).To(Equal(0))
-	Expect(diffMessage.DiffMessage.String()).To(Equal(""))
-}
-
-func verifyParamsDiffAreInMessage(diffMessage DiffErrorMessage, params ...paramDiff) {
-	for _, param := range params {
-		Expect(diffMessage.DiffMessage.String()).To(
-			ContainSubstring(fmt.Sprintf(errorMsgTemplate, param.param, param.expected, param.actual)))
-	}
+	Expect(len(diffMode.DiffReport.DiffEntries)).To(Equal(0))
 }
