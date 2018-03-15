@@ -4,25 +4,26 @@ import (
 	"net/http"
 	"testing"
 
-	. "github.com/onsi/gomega"
 	"bytes"
-	"io/ioutil"
 	"encoding/json"
+	. "github.com/onsi/gomega"
+	"io/ioutil"
+	"time"
 )
 
 type DiffHOverflyStub struct {
 	*HoverflyStub
 }
 
-func (this *DiffHOverflyStub) GetDiff() map[SimpleRequestDefinitionView][]string {
+func (this *DiffHOverflyStub) GetDiff() map[SimpleRequestDefinitionView][]DiffReport {
 	return diffView
 }
 
 func (this *DiffHOverflyStub) ClearDiff() {
-	diffView = make(map[SimpleRequestDefinitionView][]string)
+	diffView = make(map[SimpleRequestDefinitionView][]DiffReport)
 }
 
-var diffView map[SimpleRequestDefinitionView][]string
+var diffView map[SimpleRequestDefinitionView][]DiffReport
 
 func TestDiffHandlerGetReturnsTheCorrectDiff(t *testing.T) {
 	RegisterTestingT(t)
@@ -48,10 +49,10 @@ func TestDiffHandlerGetReturnsTheCorrectDiff(t *testing.T) {
 	Expect(req.Path).To(Equal("testPath"))
 	Expect(req.Query).To(Equal("testQuery"))
 
-	message := diffView.Diff[0].DiffMessage
-	Expect(len(message)).To(Equal(2))
-	Expect(message[0]).To(Equal("test first diff message"))
-	Expect(message[1]).To(Equal("test second diff message"))
+	report := diffView.Diff[0].DiffReport
+	Expect(len(report)).To(Equal(2))
+	Expect(report[0].DiffEntries).To(ConsistOf(DiffReportEntry{"first", "expected1", "actual1"}))
+	Expect(report[1].DiffEntries).To(ConsistOf(DiffReportEntry{"second", "expected2", "actual2"}))
 }
 
 func TestDiffHandlerDeleteCleansAllStoredDiffs(t *testing.T) {
@@ -100,13 +101,26 @@ func createRequest(method string) (DiffHandler, *http.Request, error) {
 }
 
 func initializeDiff() {
-	diffView = map[SimpleRequestDefinitionView][]string{
+	diffView = map[SimpleRequestDefinitionView][]DiffReport{
 		SimpleRequestDefinitionView{
 			Host:   "testHost",
 			Method: "testMethod",
 			Path:   "testPath",
 			Query:  "testQuery",
-		}: {"test first diff message", "test second diff message"},
+		}: {
+			{
+				Timestamp: time.Now().Format(time.RFC3339),
+				DiffEntries: []DiffReportEntry{
+					{"first", "expected1", "actual1"},
+				},
+			},
+			{
+				Timestamp: time.Now().Format(time.RFC3339),
+				DiffEntries: []DiffReportEntry{
+					{"second", "expected2", "actual2"},
+				},
+			},
+		},
 	}
 }
 

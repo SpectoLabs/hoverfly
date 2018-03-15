@@ -65,7 +65,7 @@ func (this *HoverflyStub) IsWebServer() bool {
 	return false
 }
 
-func (this *HoverflyStub) GetDiff() map[SimpleRequestDefinitionView][]string {
+func (this *HoverflyStub) GetDiff() map[SimpleRequestDefinitionView][]DiffReport {
 	return nil
 }
 

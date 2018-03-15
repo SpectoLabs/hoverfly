@@ -73,9 +73,9 @@ type ClosestMissView struct {
 
 type JournalView struct {
 	Journal []JournalEntryView `json:"journal"`
-	Offset 	int				   `json:"offset"`
-	Limit	int				   `json:"limit"`
-	Total 	int				   `json:"total"`
+	Offset  int                `json:"offset"`
+	Limit   int                `json:"limit"`
+	Total   int                `json:"total"`
 }
 
 type JournalEntryView struct {
@@ -99,8 +99,8 @@ type DiffView struct {
 }
 
 type ResponseDiffForRequestView struct {
-	Request     SimpleRequestDefinitionView `json:"request"`
-	DiffMessage []string                    `json:"diffMessage"`
+	Request    SimpleRequestDefinitionView `json:"request"`
+	DiffReport []DiffReport                `json:"diffReports"`
 }
 
 type SimpleRequestDefinitionView struct {
@@ -108,4 +108,15 @@ type SimpleRequestDefinitionView struct {
 	Host   string `json:"host"`
 	Path   string `json:"path"`
 	Query  string `json:"query"`
+}
+
+type DiffReport struct {
+	Timestamp   string            `json:"timestamp"`
+	DiffEntries []DiffReportEntry `json:"diffEntries"`
+}
+
+type DiffReportEntry struct {
+	Field    string `json:"field"`
+	Expected string `json:"expected"`
+	Actual   string `json:"actual"`
 }
