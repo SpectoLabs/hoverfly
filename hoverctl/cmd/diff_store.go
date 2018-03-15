@@ -47,7 +47,7 @@ Returns all differences between expected and actual responses from Hoverfly.
 					fmt.Sprint(len(diffsWithRequest.DiffReport)))
 
 				for index, diff := range diffsWithRequest.DiffReport {
-					output = output + "\n[" + fmt.Sprint(index+1) + ".]\n" + diffReportMessage(diff) + "\n"
+					output = output + fmt.Sprintf("\n%s. recorded at %s\n%s\n", fmt.Sprint(index+1), diff.Timestamp, diffReportMessage(diff))
 				}
 			}
 
