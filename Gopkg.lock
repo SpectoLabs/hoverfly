@@ -29,12 +29,6 @@
   version = "v1.0-alpha3"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/NodePrime/jsonpath"
-  packages = ["."]
-  revision = "84403ded544328c99be3472727667179eef23a91"
-
-[[projects]]
   name = "github.com/Sirupsen/logrus"
   packages = ["."]
   revision = "cd7d1bbe41066b6c1f19780f895901052150a575"
@@ -367,9 +361,18 @@
   packages = ["."]
   revision = "a83829b6f1293c91addabc89d0571c246397bbf4"
 
+[[projects]]
+  name = "k8s.io/client-go"
+  packages = [
+    "third_party/forked/golang/template",
+    "util/jsonpath"
+  ]
+  revision = "78700dec6369ba22221b72770783300f143df150"
+  version = "v6.0.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "33d1aab3fd0e5644c4739f354da86da894041ecb22ee2e83ab8dd640035e8d25"
+  inputs-digest = "ac36f8b3f9dd32b00db42cb8c8c15a9a2b6de7054cc6cc6510bc62280afb5d98"
   solver-name = "gps-cdcl"
   solver-version = 1

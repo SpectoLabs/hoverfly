@@ -40,7 +40,7 @@ func Test_JsonPathMatch_MatchesFalseWithIncorrectJsonMatch_GetElementFromArray(t
 func Test_JsonPathMatch_MatchesTrueWithJsonMatch_WithExpression(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matching.JsonPathMatch("$.test[*]?(@.field == \"test\")", `{"test": [{"field": "test"}]}`)).To(BeTrue())
+	Expect(matching.JsonPathMatch("$.test[?(@.field == \"test\")]", `{"test": [{"field": "test"}]}`)).To(BeTrue())
 }
 
 func Test_JsonPathMatch_MatchesFalseWithIncorrectJsonMatch_WithExpression(t *testing.T) {

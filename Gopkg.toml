@@ -31,10 +31,6 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/NodePrime/jsonpath"
-
-[[constraint]]
-  branch = "master"
   name = "github.com/antonholmquist/jason"
 
 [[constraint]]
@@ -60,3 +56,7 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[[constraint]]
+  name = "k8s.io/client-go"
+  version = "6.0.0"
