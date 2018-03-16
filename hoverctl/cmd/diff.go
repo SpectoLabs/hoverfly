@@ -35,26 +35,28 @@ Returns all differences between expected and actual responses from Hoverfly.
 		if len(args) == 0 {
 			diffs, err := wrapper.GetAllDiffs(*target)
 			handleIfError(err)
+			var output bytes.Buffer
 
-			output := ""
 			for _, diffsWithRequest := range diffs {
-				output = fmt.Sprintf("\nFor the request with the simple definition:\n"+
-					"\n Method: %s \n Host: %s \n Path: %s \n Query:  %s \n\nhave been recorded %s diff(s):\n",
-					diffsWithRequest.Request.Method,
-					diffsWithRequest.Request.Host,
-					diffsWithRequest.Request.Path,
-					diffsWithRequest.Request.Query,
-					fmt.Sprint(len(diffsWithRequest.DiffReport)))
+				output.WriteString(
+					fmt.Sprintf("\nFor the request with the simple definition:\n"+
+						"\n Method: %s \n Host: %s \n Path: %s \n Query:  %s \n\nhave been recorded %s diff(s):\n",
+						diffsWithRequest.Request.Method,
+						diffsWithRequest.Request.Host,
+						diffsWithRequest.Request.Path,
+						diffsWithRequest.Request.Query,
+						fmt.Sprint(len(diffsWithRequest.DiffReport))))
 
 				for index, diff := range diffsWithRequest.DiffReport {
-					output = output + fmt.Sprintf("\n%s. recorded at %s\n%s\n", fmt.Sprint(index+1), diff.Timestamp, diffReportMessage(diff))
+					output.WriteString(fmt.Sprintf("\n%s. recorded at %s\n%s\n",
+						fmt.Sprint(index+1), diff.Timestamp, diffReportMessage(diff)))
 				}
 			}
 
-			if output == "" {
+			if len(output.Bytes()) == 0 {
 				fmt.Println("There are no diffs stored in Hoverfly")
 			} else {
-				fmt.Println(output)
+				fmt.Println(output.String())
 			}
 		}
 	},
