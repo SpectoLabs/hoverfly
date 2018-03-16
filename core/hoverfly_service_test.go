@@ -729,3 +729,87 @@ func Test_Hoverfly_SetModeWithARguments_AsteriskCanOnlyBeValidAsTheOnlyHeader(t 
 	})).ToNot(Succeed())
 
 }
+
+func Test_Hoverfly_AddDiff_AddEntry(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	Expect(unit.responsesDiff).To(HaveLen(0))
+
+	key := v2.SimpleRequestDefinitionView{
+		Host: "test.com",
+	}
+
+	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{v2.DiffReportEntry{}}})
+
+	Expect(unit.responsesDiff).To(HaveLen(1))
+
+	diffReports := unit.responsesDiff[key]
+	Expect(diffReports).To(HaveLen(1))
+	Expect(diffReports[0].Timestamp).To(Equal("now"))
+}
+
+func Test_Hoverfly_AddDiff_AppendsEntry(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	Expect(unit.responsesDiff).To(HaveLen(0))
+
+	key := v2.SimpleRequestDefinitionView{
+		Host: "test.com",
+	}
+
+	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{v2.DiffReportEntry{Actual: "1"}}})
+	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{v2.DiffReportEntry{Actual: "2"}}})
+
+	Expect(unit.responsesDiff).To(HaveLen(1))
+
+	diffReports := unit.responsesDiff[key]
+	Expect(diffReports).To(HaveLen(2))
+	Expect(diffReports[0].DiffEntries[0].Actual).To(Equal("1"))
+	Expect(diffReports[1].DiffEntries[0].Actual).To(Equal("2"))
+}
+
+func Test_Hoverfly_AddDiff_AddEntry_DiffrentKey(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	Expect(unit.responsesDiff).To(HaveLen(0))
+
+	key := v2.SimpleRequestDefinitionView{
+		Host: "test.com",
+	}
+
+	keyTwo := v2.SimpleRequestDefinitionView{
+		Method: "POST",
+		Host:   "test.com",
+	}
+
+	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{v2.DiffReportEntry{Actual: "1"}}})
+	unit.AddDiff(keyTwo, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{v2.DiffReportEntry{Actual: "2"}}})
+
+	Expect(unit.responsesDiff).To(HaveLen(2))
+
+	diffReports := unit.responsesDiff[key]
+	Expect(diffReports).To(HaveLen(1))
+	Expect(diffReports[0].DiffEntries[0].Actual).To(Equal("1"))
+
+	diffReports = unit.responsesDiff[keyTwo]
+	Expect(diffReports).To(HaveLen(1))
+	Expect(diffReports[0].DiffEntries[0].Actual).To(Equal("2"))
+}
+
+func Test_Hoverfly_AddDiff_DoesntAddDiffReport_NoEntries(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	Expect(unit.responsesDiff).To(HaveLen(0))
+
+	key := v2.SimpleRequestDefinitionView{
+		Host: "test.com",
+	}
+
+	unit.AddDiff(key, v2.DiffReport{Timestamp: "now"})
+
+	Expect(unit.responsesDiff).To(HaveLen(0))
+}
