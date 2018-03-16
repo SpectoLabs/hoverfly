@@ -8,6 +8,7 @@ import (
 
 	"bytes"
 	"encoding/json"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -63,6 +64,9 @@ func (this hoverflyDiffStub) GetResponse(requestDetails models.RequestDetails) (
 	}
 }
 
+func (this hoverflyDiffStub) AddDiff(key v2.SimpleRequestDefinitionView, diffReport v2.DiffReport) {
+}
+
 func Test_DiffMode_WhenGivenAMatchingRequestReturningTheSameResponse(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -72,8 +76,10 @@ func Test_DiffMode_WhenGivenAMatchingRequestReturningTheSameResponse(t *testing.
 	}
 
 	request := models.RequestDetails{
+		Method:      "GET",
 		Scheme:      "http",
 		Destination: "positive-match-with-same-response.com",
+		Path:        "/",
 	}
 
 	// when

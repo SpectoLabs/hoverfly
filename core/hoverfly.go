@@ -220,10 +220,6 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	mode := hf.modeMap[modeName]
 	response, err := mode.Process(req, requestDetails)
 
-	if modeName == modes.Diff {
-		hf.handleResponseDiff(req, mode)
-	}
-
 	// Don't delete the error
 	// and definitely don't delay people in capture mode
 	if err != nil || modeName == modes.Capture {
@@ -236,23 +232,4 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	}
 
 	return response
-}
-
-func (hf *Hoverfly) handleResponseDiff(request *http.Request, mode modes.Mode) {
-	switch mode.(type) {
-	case *modes.DiffMode:
-		diffMode := mode.(*modes.DiffMode)
-
-		if len(diffMode.DiffReport.DiffEntries) > 0 {
-			requestView := v2.SimpleRequestDefinitionView{
-				Method: request.Method,
-				Host:   request.URL.Host,
-				Path:   request.URL.Path,
-				Query:  request.URL.RawQuery,
-			}
-
-			diffs := hf.responsesDiff[requestView]
-			hf.responsesDiff[requestView] = append(diffs, diffMode.DiffReport)
-		}
-	}
 }
