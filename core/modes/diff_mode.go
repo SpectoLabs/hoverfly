@@ -10,20 +10,22 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"reflect"
+	"time"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/dsnet/compress/brotli"
-	"io"
-	"io/ioutil"
-	"reflect"
-	"time"
 )
 
 type HoverflyDiff interface {
 	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
 	DoRequest(*http.Request) (*http.Response, error)
+	AddDiff(requestView v2.SimpleRequestDefinitionView, diffReport v2.DiffReport)
 }
 
 type DiffMode struct {
@@ -80,6 +82,12 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 		}
 
 		this.diffResponse(simResponse, actualResponseDetails)
+		this.Hoverfly.AddDiff(v2.SimpleRequestDefinitionView{
+			Method: modifiedRequest.Method,
+			Host:   modifiedRequest.URL.Host,
+			Path:   modifiedRequest.URL.Path,
+			Query:  modifiedRequest.URL.RawQuery,
+		}, this.DiffReport)
 	} else {
 		log.WithFields(log.Fields{
 			"mode":   Diff,
