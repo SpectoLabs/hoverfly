@@ -1,4 +1,4 @@
-package parse
+package parse // import "github.com/tdewolff/parse"
 
 // Copy returns a copy of the given byte slice.
 func Copy(src []byte) (dst []byte) {

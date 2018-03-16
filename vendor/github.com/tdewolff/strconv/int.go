@@ -1,4 +1,4 @@
-package strconv
+package strconv // import "github.com/tdewolff/strconv"
 
 import "math"
 

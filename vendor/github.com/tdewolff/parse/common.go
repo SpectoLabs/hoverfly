@@ -1,5 +1,5 @@
 // Package parse contains a collection of parsers for various formats in its subpackages.
-package parse
+package parse // import "github.com/tdewolff/parse"
 
 import (
 	"encoding/base64"

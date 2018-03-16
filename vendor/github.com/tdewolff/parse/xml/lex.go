@@ -1,5 +1,5 @@
 // Package xml is an XML1.0 lexer following the specifications at http://www.w3.org/TR/xml/.
-package xml
+package xml // import "github.com/tdewolff/parse/xml"
 
 import (
 	"io"
