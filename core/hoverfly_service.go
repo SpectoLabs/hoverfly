@@ -309,3 +309,10 @@ func (this *Hoverfly) GetDiff() map[v2.SimpleRequestDefinitionView][]v2.DiffRepo
 func (this *Hoverfly) ClearDiff() {
 	this.responsesDiff = make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport)
 }
+
+func (this *Hoverfly) AddDiff(requestView v2.SimpleRequestDefinitionView, diffReport v2.DiffReport) {
+	if len(diffReport.DiffEntries) > 0 {
+		diffs := this.responsesDiff[requestView]
+		this.responsesDiff[requestView] = append(diffs, diffReport)
+	}
+}
