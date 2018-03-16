@@ -1,4 +1,4 @@
-package xml
+package xml // import "github.com/tdewolff/minify/xml"
 
 import "github.com/tdewolff/parse/xml"
 

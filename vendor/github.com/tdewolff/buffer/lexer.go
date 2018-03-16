@@ -1,4 +1,4 @@
-package buffer
+package buffer // import "github.com/tdewolff/buffer"
 
 import "io"
 

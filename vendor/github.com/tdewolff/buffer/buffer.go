@@ -5,7 +5,7 @@ The `Reader` and `Writer` types implement the `io.Reader` and `io.Writer` respec
 The `Shifter` type is useful for building lexers because it keeps track of the start and end position of a byte selection, and shifts the bytes whenever a valid token is found.
 The `Lexer` is however an improved version of `Shifter`, allowing zero-copy for the parser by using a (kind of) ring buffer underneath.
 */
-package buffer
+package buffer // import "github.com/tdewolff/buffer"
 
 // defaultBufSize specifies the default initial length of internal buffers.
 var defaultBufSize = 4096
