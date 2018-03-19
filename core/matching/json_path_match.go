@@ -16,13 +16,13 @@ func JsonPathMatch(matchingString string, toMatch string) bool {
 
 	err := jsonPath.Parse(matchingString)
 	if err != nil {
-		log.Errorf("Failed to parse jsonpath string %s: %s", matchingString, err.Error())
+		log.Errorf("Failed to parse json path string %s: %s", matchingString, err.Error())
 		return false
 	}
 
 	var data map[string]interface{}
 	if err := json.Unmarshal([]byte(toMatch), &data); err != nil {
-		log.Errorf("Failed to unmarshal body to JSON: ", err.Error())
+		log.Errorf("Failed to unmarshal body to JSON: %s", err.Error())
 		return false
 	}
 
@@ -30,6 +30,7 @@ func JsonPathMatch(matchingString string, toMatch string) bool {
 
 	err = jsonPath.Execute(buf, data)
 	if err != nil {
+		log.Errorf("Failed to execute json path match: %s", err.Error())
 		return false
 	}
 
