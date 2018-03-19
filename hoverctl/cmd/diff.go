@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"bytes"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
@@ -20,7 +21,7 @@ as lists of strings grouped by the same requests.
 	`,
 }
 
-const errorMsgTemplate = "The \"%s\" parameter is not same - the expected value was [%s], but the actual one [%s]\n"
+const errorMsgTemplate = "\"%s\"\nthe expected value was [%s], but actual value was [%s]\n\n"
 
 var getAllDiffStoreCmd = &cobra.Command{
 	Use:   "get",
@@ -38,17 +39,24 @@ Returns all differences between expected and actual responses from Hoverfly.
 			var output bytes.Buffer
 
 			for _, diffsWithRequest := range diffs {
+
+				diffString := "diff"
+				if len(diffsWithRequest.DiffReport) > 1 {
+					diffString = "diffs"
+				}
 				output.WriteString(
-					fmt.Sprintf("\nFor the request with the simple definition:\n"+
-						"\n Method: %s \n Host: %s \n Path: %s \n Query:  %s \n\nhave been recorded %s diff(s):\n",
+					fmt.Sprintf("For request:\n"+
+						"\n Method: %s \n Host: %s \n Path: %s \n Query:  %s \n\n%s %s recorded:\n",
 						diffsWithRequest.Request.Method,
 						diffsWithRequest.Request.Host,
 						diffsWithRequest.Request.Path,
 						diffsWithRequest.Request.Query,
-						fmt.Sprint(len(diffsWithRequest.DiffReport))))
+						fmt.Sprint(len(diffsWithRequest.DiffReport)),
+						diffString,
+					))
 
 				for index, diff := range diffsWithRequest.DiffReport {
-					output.WriteString(fmt.Sprintf("\n%s. recorded at %s\n%s\n",
+					output.WriteString(fmt.Sprintf("\n%s. %s\n%s\n",
 						fmt.Sprint(index+1), diff.Timestamp, diffReportMessage(diff)))
 				}
 			}
