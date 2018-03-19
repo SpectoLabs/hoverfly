@@ -16,7 +16,7 @@ func JsonPathMatch(matchingString string, toMatch string) bool {
 
 	err := jsonPath.Parse(matchingString)
 	if err != nil {
-		log.Errorf("Failed to parse json path string %s: %s", matchingString, err.Error())
+		log.Errorf("Failed to parse json path query %s: %s", matchingString, err.Error())
 		return false
 	}
 
