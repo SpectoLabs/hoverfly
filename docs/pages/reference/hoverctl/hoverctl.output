@@ -8,6 +8,7 @@ Available Commands:
   config      Show hoverctl configuration information
   delete      Delete Hoverfly simulation
   destination Get and set Hoverfly destination
+  diff        Manage the diffs for Hoverfly
   export      Export a simulation from Hoverfly
   flush       Flush the internal cache in Hoverfly
   import      Import a simulation into Hoverfly
@@ -23,13 +24,10 @@ Available Commands:
   version     Get the version of hoverctl
 
 Flags:
-      --admin-port int   A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)
-  -f, --force            Bypass any confirmation when using hoverctl
-  -h, --help             help for hoverctl
-      --host string      A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)
-      --proxy-port int   A port number for the Hoverfly proxy. Overrides the default Hoverfly proxy port (8500)
-      --set-default      Sets the current target as the default target for hoverctl
-  -t, --target string    A name for an instance of Hoverfly you are trying to communicate with. Overrides the default target (default)
-  -v, --verbose          Verbose logging from hoverctl
+  -f, --force           Bypass any confirmation when using hoverctl
+  -h, --help            help for hoverctl
+      --set-default     Sets the current target as the default target for hoverctl
+  -t, --target string   A name for an instance of Hoverfly you are trying to communicate with. Overrides the default target (default)
+  -v, --verbose         Verbose logging from hoverctl
 
 Use "hoverctl [command] --help" for more information about a command.
