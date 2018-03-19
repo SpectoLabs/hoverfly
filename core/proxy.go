@@ -82,6 +82,16 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 			})
 	}
 
+	// Set content length
+	proxy.OnResponse().DoFunc(func(r *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
+		if r.Header.Get("Content-Length") == "" {
+			responseBytes, _ := ioutil.ReadAll(r.Body)
+			r.Header.Set("Content-Length", fmt.Sprintf("%v", len(responseBytes)))
+			r.Body = ioutil.NopCloser(bytes.NewReader(responseBytes))
+		}
+		return r
+	})
+
 	// intercepts response
 	proxy.OnResponse(goproxy.UrlMatches(regexp.MustCompile(hoverfly.Cfg.Destination))).DoFunc(
 		func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
