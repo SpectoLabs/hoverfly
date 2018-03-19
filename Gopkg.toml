@@ -60,3 +60,7 @@
 [[constraint]]
   name = "k8s.io/client-go"
   version = "6.0.0"
+
+[[constraint]]
+  name = "github.com/SpectoLabs/goproxy"
+  revision = "1dea5983e671e3bdefb224f2683e5c23678be35e"
