@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	log "github.com/Sirupsen/logrus"
 	"k8s.io/client-go/util/jsonpath"
 )
 
@@ -15,11 +16,13 @@ func JsonPathMatch(matchingString string, toMatch string) bool {
 
 	err := jsonPath.Parse(matchingString)
 	if err != nil {
+		log.Errorf("Failed to parse jsonpath string %s: %s", matchingString, err.Error())
 		return false
 	}
 
 	var data map[string]interface{}
 	if err := json.Unmarshal([]byte(toMatch), &data); err != nil {
+		log.Errorf("Failed to unmarshal body to JSON: ", err.Error())
 		return false
 	}
 
