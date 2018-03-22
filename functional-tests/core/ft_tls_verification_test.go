@@ -49,7 +49,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			responseBody, _ := ioutil.ReadAll(resp.Body)
 
 			Expect(string(responseBody)).To(ContainSubstring("Hoverfly Error!"))
-			Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended desintation"))
+			Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended destination"))
 			Expect(string(responseBody)).To(ContainSubstring("x509: certificate signed by unknown authority"))
 		})
 	})
