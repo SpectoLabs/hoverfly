@@ -59,7 +59,7 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 
 	response, err := this.Hoverfly.DoRequest(modifiedRequest)
 	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended desintation", Capture)
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended destination", Capture)
 	}
 
 	respBody, _ := util.GetResponseBody(response)
