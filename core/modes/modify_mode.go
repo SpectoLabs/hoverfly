@@ -38,7 +38,7 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 
 	resp, err := this.Hoverfly.DoRequest(modifiedRequest)
 	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended desintation", Modify)
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended destination", Modify)
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)

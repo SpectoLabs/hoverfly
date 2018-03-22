@@ -90,7 +90,7 @@ func Test_ModifyMode_WhenGivenABadRequestItWillError(t *testing.T) {
 	responseBody, err := ioutil.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 
-	Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended desintation"))
+	Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended destination"))
 	Expect(string(responseBody)).To(ContainSubstring("Could not reach error.com"))
 }
 
