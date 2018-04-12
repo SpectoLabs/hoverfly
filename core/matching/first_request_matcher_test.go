@@ -30,9 +30,9 @@ func Test_FirstMatchRequestMatcher_EmptyRequestMatchersShouldMatchOnAnyRequest(t
 			"sdv": {"ascd"},
 		},
 	}
-	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_FirstMatchRequestMatcher_RequestMatchersShouldMatchOnBody(t *testing.T) {
@@ -52,10 +52,10 @@ func Test_FirstMatchRequestMatcher_RequestMatchersShouldMatchOnBody(t *testing.T
 	r := models.RequestDetails{
 		Body: "body",
 	}
-	result, err, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
-	Expect(err).To(BeNil())
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	Expect(result.Error).To(BeNil())
 
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_FirstMatchRequestMatcher_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
@@ -84,9 +84,9 @@ func Test_FirstMatchRequestMatcher_ReturnResponseWhenAllHeadersMatch(t *testing.
 		},
 	}
 
-	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_FirstMatchRequestMatcher_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
@@ -114,9 +114,9 @@ func Test_FirstMatchRequestMatcher_ReturnNilWhenOneHeaderNotPresentInRequest(t *
 		},
 	}
 
-	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(result).To(BeNil())
+	Expect(result.Pair).To(BeNil())
 }
 
 func Test_FirstMatchRequestMatcher_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
@@ -144,9 +144,9 @@ func Test_FirstMatchRequestMatcher_ReturnNilWhenOneHeaderValueDifferent(t *testi
 			"header2": []string{"different"},
 		},
 	}
-	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(result).To(BeNil())
+	Expect(result.Pair).To(BeNil())
 }
 
 func Test_FirstMatchRequestMatcher_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
@@ -175,9 +175,9 @@ func Test_FirstMatchRequestMatcher_ReturnResponseWithMultiValuedHeaderMatch(t *t
 			"header2": []string{"val2"},
 		},
 	}
-	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_FirstMatchRequestMatcher_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
@@ -206,9 +206,9 @@ func Test_FirstMatchRequestMatcher_ReturnNilWithDifferentMultiValuedHeaders(t *t
 		},
 	}
 
-	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(result).To(BeNil())
+	Expect(result.Pair).To(BeNil())
 }
 
 func Test_FirstMatchRequestMatcher_EndpointMatchWithHeaders(t *testing.T) {
@@ -257,9 +257,9 @@ func Test_FirstMatchRequestMatcher_EndpointMatchWithHeaders(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_FirstMatchRequestMatcher_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
@@ -309,9 +309,9 @@ func Test_FirstMatchRequestMatcher_EndpointMismatchWithHeadersReturnsNil(t *test
 		},
 	}
 
-	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(result).To(BeNil())
+	Expect(result.Pair).To(BeNil())
 }
 
 func Test_FirstMatchRequestMatcher_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
@@ -348,9 +348,9 @@ func Test_FirstMatchRequestMatcher_AbleToMatchAnEmptyPathInAReasonableWay(t *tes
 			"q": []string{"test"},
 		},
 	}
-	result, _, _ := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 
 	r = models.RequestDetails{
 		Method:      "GET",
@@ -361,9 +361,9 @@ func Test_FirstMatchRequestMatcher_AbleToMatchAnEmptyPathInAReasonableWay(t *tes
 		},
 	}
 
-	result, _, _ = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(result).To(BeNil())
+	Expect(result.Pair).To(BeNil())
 }
 
 func Test_FirstMatchRequestMatcher_RequestMatcherResponsePairCanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
@@ -411,10 +411,10 @@ func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsAndBeMatched(t *tes
 		Path:        "/api/1",
 	}
 
-	response, err, _ := matching.FirstMatchRequestMatcher(request, false, simulation, make(map[string]string))
-	Expect(err).To(BeNil())
+	result := matching.FirstMatchRequestMatcher(request, false, simulation, make(map[string]string))
+	Expect(result.Error).To(BeNil())
 
-	Expect(response.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
@@ -438,10 +438,10 @@ func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsOnSchemeAndBeMatche
 		Path:        "/api/1",
 	}
 
-	response, err, _ := matching.FirstMatchRequestMatcher(request, false, simulation, make(map[string]string))
-	Expect(err).To(BeNil())
+	result := matching.FirstMatchRequestMatcher(request, false, simulation, make(map[string]string))
+	Expect(result.Error).To(BeNil())
 
-	Expect(response.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
@@ -467,10 +467,10 @@ func Test_FirstMatchRequestMatcher_RequestMatchersCanUseGlobsOnHeadersAndBeMatch
 		},
 	}
 
-	response, err, _ := matching.FirstMatchRequestMatcher(request, false, simulation, make(map[string]string))
-	Expect(err).To(BeNil())
+	result := matching.FirstMatchRequestMatcher(request, false, simulation, make(map[string]string))
+	Expect(result.Error).To(BeNil())
 
-	Expect(response.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_FirstMatchRequestMatcher_RequestMatcherResponsePair_ConvertToRequestResponsePairView_CanBeConvertedToARequestResponsePairView_WhileIncomplete(t *testing.T) {
@@ -553,10 +553,10 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLe
 		},
 	}
 
-	_, err, cachable := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeFalse())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeFalse())
 }
 
 func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
@@ -614,10 +614,10 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		},
 	}
 
-	_, err, cachable := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -633,10 +633,10 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		},
 	}
 
-	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -652,10 +652,10 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		},
 	}
 
-	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -671,10 +671,10 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		},
 	}
 
-	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -690,10 +690,10 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		},
 	}
 
-	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result = matching.FirstMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 }
 
 func Test_FirstMatchRequestMatcher_RequestMatchersShouldMatchOnStateAndNotBeCachable(t *testing.T) {
@@ -712,15 +712,15 @@ func Test_FirstMatchRequestMatcher_RequestMatchersShouldMatchOnStateAndNotBeCach
 		Body: "body",
 	}
 
-	result, err, cachable := matching.FirstMatchRequestMatcher(
+	result := matching.FirstMatchRequestMatcher(
 		r,
 		false,
 		simulation,
 		map[string]string{"key1": "value1", "key2": "value2"})
 
-	Expect(err).To(BeNil())
-	Expect(cachable).To(BeFalse())
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Error).To(BeNil())
+	Expect(result.Cachable).To(BeFalse())
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeastOnce(t *testing.T) {
@@ -775,10 +775,10 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeas
 		Path:   "/foo",
 	}
 
-	_, err, cachable := matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeFalse())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeFalse())
 }
 
 func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes(t *testing.T) {
@@ -833,10 +833,10 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		Path:   "/foo",
 	}
 
-	_, err, cachable := matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+	result := matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -849,10 +849,10 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		Path:   "/foo",
 	}
 
-	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+	result = matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -865,10 +865,10 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		Path:   "/foo",
 	}
 
-	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+	result = matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -881,10 +881,10 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		Path:   "/foo",
 	}
 
-	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+	result = matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -897,8 +897,8 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		Path:   "miss",
 	}
 
-	_, err, cachable = matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+	result = matching.FirstMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 }
