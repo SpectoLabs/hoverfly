@@ -5,8 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"strings"
-
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -58,14 +56,8 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 		mode := (hf.modeMap[modes.Simulate]).(*modes.SimulateMode)
 
-		strongestMatch := strings.ToLower(mode.MatchingStrategy) == "strongest"
-
 		// Matching
-		if strongestMatch {
-			pair, err, cachable = matching.StrongestMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
-		} else {
-			pair, err, cachable = matching.FirstMatchRequestMatcher(requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
-		}
+		pair, err, cachable = matching.Match(mode.MatchingStrategy, requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
 
 		// Cache result
 		if cachable {
