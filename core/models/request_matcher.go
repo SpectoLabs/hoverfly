@@ -56,16 +56,25 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 		view.RequestMatcher.Query.ExactMatch = &sortedQuery
 	}
 
+	var headersWithMatchers map[string]*RequestFieldMatchers
+	for key, view := range view.RequestMatcher.HeadersWithMatchers {
+		if headersWithMatchers == nil {
+			headersWithMatchers = map[string]*RequestFieldMatchers{}
+		}
+		headersWithMatchers[key] = NewRequestFieldMatchersFromView(view)
+	}
+
 	return &RequestMatcherResponsePair{
 		RequestMatcher: RequestMatcher{
-			Path:          NewRequestFieldMatchersFromView(view.RequestMatcher.Path),
-			Method:        NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
-			Destination:   NewRequestFieldMatchersFromView(view.RequestMatcher.Destination),
-			Scheme:        NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
-			Query:         NewRequestFieldMatchersFromView(view.RequestMatcher.Query),
-			Body:          NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
-			Headers:       view.RequestMatcher.Headers,
-			RequiresState: view.RequestMatcher.RequiresState,
+			Path:                NewRequestFieldMatchersFromView(view.RequestMatcher.Path),
+			Method:              NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
+			Destination:         NewRequestFieldMatchersFromView(view.RequestMatcher.Destination),
+			Scheme:              NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
+			Query:               NewRequestFieldMatchersFromView(view.RequestMatcher.Query),
+			Body:                NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
+			Headers:             view.RequestMatcher.Headers,
+			HeadersWithMatchers: headersWithMatchers,
+			RequiresState:       view.RequestMatcher.RequiresState,
 		},
 		Response: NewResponseDetailsFromResponse(view.Response),
 	}
@@ -99,34 +108,41 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 		body = this.RequestMatcher.Body.BuildView()
 	}
 
+	headersWithMatchers := map[string]*v2.RequestFieldMatchersView{}
+	for key, matcher := range this.RequestMatcher.HeadersWithMatchers {
+		headersWithMatchers[key] = matcher.BuildView()
+	}
+
 	return v2.RequestMatcherResponsePairViewV4{
 		RequestMatcher: v2.RequestMatcherViewV4{
-			Path:          path,
-			Method:        method,
-			Destination:   destination,
-			Scheme:        scheme,
-			Query:         query,
-			Body:          body,
-			Headers:       this.RequestMatcher.Headers,
-			RequiresState: this.RequestMatcher.RequiresState,
+			Path:                path,
+			Method:              method,
+			Destination:         destination,
+			Scheme:              scheme,
+			Query:               query,
+			Body:                body,
+			Headers:             this.RequestMatcher.Headers,
+			HeadersWithMatchers: headersWithMatchers,
+			RequiresState:       this.RequestMatcher.RequiresState,
 		},
 		Response: this.Response.ConvertToResponseDetailsViewV4(),
 	}
 }
 
 type RequestMatcher struct {
-	Path          *RequestFieldMatchers
-	Method        *RequestFieldMatchers
-	Destination   *RequestFieldMatchers
-	Scheme        *RequestFieldMatchers
-	Query         *RequestFieldMatchers
-	Body          *RequestFieldMatchers
-	Headers       map[string][]string
-	RequiresState map[string]string
+	Path                *RequestFieldMatchers
+	Method              *RequestFieldMatchers
+	Destination         *RequestFieldMatchers
+	Scheme              *RequestFieldMatchers
+	Query               *RequestFieldMatchers
+	Body                *RequestFieldMatchers
+	Headers             map[string][]string
+	HeadersWithMatchers map[string]*RequestFieldMatchers
+	RequiresState       map[string]string
 }
 
 func (this RequestMatcher) IncludesHeaderMatching() bool {
-	return this.Headers != nil && len(this.Headers) > 0
+	return (this.Headers != nil && len(this.Headers) > 0) || (this.HeadersWithMatchers != nil && len(this.HeadersWithMatchers) > 0)
 }
 
 func (this RequestMatcher) IncludesStateMatching() bool {
