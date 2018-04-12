@@ -5,12 +5,13 @@ import (
 	"net/http"
 	"time"
 
+	sorting "sort"
+	"strings"
+
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	sorting "sort"
-	"strings"
 )
 
 var RFC3339Milli = "2006-01-02T15:04:05.000Z07:00"
@@ -178,7 +179,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		if !matching.UnscoredFieldMatcher(requestMatcher.Scheme, *entry.Request.Scheme).Matched {
 			continue
 		}
-		if !matching.CountlessHeaderMatcher(requestMatcher.Headers, entry.Request.Headers).Matched {
+		if !matching.HeaderMatching(requestMatcher.Headers, entry.Request.Headers).Matched {
 			continue
 		}
 		filteredEntries = append(filteredEntries, entry)
