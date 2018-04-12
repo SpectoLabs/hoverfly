@@ -4,7 +4,10 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation, state map[string]string) (requestMatch *models.RequestMatcherResponsePair, err *models.MatchError, cachable bool) {
+func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation, state map[string]string) *MatchingResult {
+	var requestMatch *models.RequestMatcherResponsePair
+	var err *models.MatchError
+	var cachable bool
 
 	var closestMissScore int
 	var strongestMatchScore int
@@ -124,39 +127,9 @@ func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, sim
 		err = models.NewMatchErrorWithClosestMiss(closestMiss, "No match found", matchedOnAllButHeadersAtLeastOnce)
 	}
 
-	return
-}
-
-func isCachable(requestMatch *models.RequestMatcherResponsePair, matchedOnAllButHeadersAtLeastOnce bool, matchedOnAllButStateAtLeastOnce bool) bool {
-	// Do not cache misses if the only thing they missed on was headers/state because a subsequent request which is the same
-	// but with different headers/state will need to go through matching
-	if requestMatch == nil && (matchedOnAllButHeadersAtLeastOnce || matchedOnAllButStateAtLeastOnce) {
-		return false
-	} else if requestMatch != nil {
-
-		// And do not cache hits if they matched on headers because a subsequent request which is the same
-		// but with different headers wouldn't match
-		if requestMatch.RequestMatcher.IncludesHeaderMatching() {
-			return false
-		}
-
-		// And do not cache hits if another request matched on all but headers, as it could be stronger match
-		if matchedOnAllButHeadersAtLeastOnce {
-			return false
-		}
-
-		// And do not cache hits if they matched on state because a subsequent request which is the same
-		// but with different state wouldn't match
-		if requestMatch.RequestMatcher.IncludesStateMatching() {
-			return false
-		}
-
-		// And don't cache hits if another matcher matched on everything apart from state, as we would potentially hit
-		// that matcher in the future if state changed
-		if matchedOnAllButStateAtLeastOnce {
-			return false
-		}
+	return &MatchingResult{
+		Pair:     requestMatch,
+		Error:    err,
+		Cachable: cachable,
 	}
-
-	return true
 }
