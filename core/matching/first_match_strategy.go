@@ -55,7 +55,7 @@ func FirstMatchStrategy(req models.RequestDetails, webserver bool, simulation *m
 			continue
 		}
 
-		if !CountlessHeaderMatcher(requestMatcher.Headers, req.Headers).Matched {
+		if !HeaderMatching(requestMatcher.Headers, req.Headers).Matched {
 			matchedOnAllButState = false
 			isAMatch = false
 		}
