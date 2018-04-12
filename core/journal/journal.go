@@ -179,7 +179,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		if !matching.UnscoredFieldMatcher(requestMatcher.Scheme, *entry.Request.Scheme).Matched {
 			continue
 		}
-		if !matching.HeaderMatching(requestMatcher.Headers, entry.Request.Headers).Matched {
+		if !matching.HeaderMatching(requestMatcher, entry.Request.Headers).Matched {
 			continue
 		}
 		filteredEntries = append(filteredEntries, entry)

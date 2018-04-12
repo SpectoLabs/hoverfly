@@ -75,7 +75,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 		}
 		matchScore += fieldMatch.MatchScore
 
-		fieldMatch = HeaderMatching(requestMatcher.Headers, req.Headers)
+		fieldMatch = HeaderMatching(requestMatcher, req.Headers)
 		if !fieldMatch.Matched {
 			matched = false
 			matchedOnAllButState = false
