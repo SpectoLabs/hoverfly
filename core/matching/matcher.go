@@ -8,7 +8,7 @@ import (
 
 func Match(strongestMatch string, req models.RequestDetails, webserver bool, simulation *models.Simulation, state map[string]string) *MatchingResult {
 	if strings.ToLower(strongestMatch) == "strongest" {
-		return StrongestMatchRequestMatcher(req, webserver, simulation, state)
+		return StrongestMatchStrategy(req, webserver, simulation, state)
 	} else {
 		return FirstMatchStrategy(req, webserver, simulation, state)
 	}
