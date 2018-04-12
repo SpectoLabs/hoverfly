@@ -4,7 +4,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-func StrongestMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation, state map[string]string) *MatchingResult {
+func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulation *models.Simulation, state map[string]string) *MatchingResult {
 	var requestMatch *models.RequestMatcherResponsePair
 	var err *models.MatchError
 	var cachable bool
