@@ -3,13 +3,16 @@ package matching
 import (
 	"strings"
 
+	"github.com/SpectoLabs/hoverfly/core/models"
 	glob "github.com/ryanuber/go-glob"
 )
 
-func HeaderMatching(requestMatcherHeaders, toMatch map[string][]string) *FieldMatch {
+func HeaderMatching(requestMatcher models.RequestMatcher, toMatch map[string][]string) *FieldMatch {
 
 	matched := true
 	var matchScore int
+
+	requestMatcherHeaders := requestMatcher.Headers
 
 	for matcherHeaderKey, matcherHeaderValues := range requestMatcherHeaders {
 
