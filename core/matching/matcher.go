@@ -1,6 +1,18 @@
 package matching
 
-import "github.com/SpectoLabs/hoverfly/core/models"
+import (
+	"strings"
+
+	"github.com/SpectoLabs/hoverfly/core/models"
+)
+
+func Match(strongestMatch string, req models.RequestDetails, webserver bool, simulation *models.Simulation, state map[string]string) (requestMatch *models.RequestMatcherResponsePair, err *models.MatchError, cachable bool) {
+	if strings.ToLower(strongestMatch) == "strongest" {
+		return StrongestMatchRequestMatcher(req, webserver, simulation, state)
+	} else {
+		return FirstMatchRequestMatcher(req, webserver, simulation, state)
+	}
+}
 
 type MatchingError struct {
 	StatusCode  int
