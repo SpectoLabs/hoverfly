@@ -10,7 +10,7 @@ func Match(strongestMatch string, req models.RequestDetails, webserver bool, sim
 	if strings.ToLower(strongestMatch) == "strongest" {
 		return StrongestMatchRequestMatcher(req, webserver, simulation, state)
 	} else {
-		return FirstMatchRequestMatcher(req, webserver, simulation, state)
+		return FirstMatchStrategy(req, webserver, simulation, state)
 	}
 }
 

@@ -4,7 +4,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation, currentState map[string]string) *MatchingResult {
+func FirstMatchStrategy(req models.RequestDetails, webserver bool, simulation *models.Simulation, currentState map[string]string) *MatchingResult {
 
 	matchedOnAllButHeadersAtLeastOnce := false
 	matchedOnAllButStateAtLeastOnce := false
