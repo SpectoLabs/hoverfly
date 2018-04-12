@@ -27,10 +27,10 @@ func Test_ClosestRequestMatcherRequestMatcher_EmptyRequestMatchersShouldMatchOnA
 			"sdv": {"ascd"},
 		},
 	}
-	result, _, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(result).ToNot(BeNil())
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair).ToNot(BeNil())
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersShouldMatchOnBody(t *testing.T) {
@@ -50,10 +50,10 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersShouldMatchOnBody(t
 	r := models.RequestDetails{
 		Body: "body",
 	}
-	result, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
-	Expect(err).To(BeNil())
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	Expect(result.Error).To(BeNil())
 
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
@@ -82,9 +82,9 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWhenAllHeadersMatch(
 		},
 	}
 
-	result, _, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
@@ -112,9 +112,9 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderNotPresentIn
 		},
 	}
 
-	result, _, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(result).To(BeNil())
+	Expect(result.Pair).To(BeNil())
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
@@ -142,9 +142,9 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderValueDiffere
 			"header2": {"different"},
 		},
 	}
-	result, _, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(result).To(BeNil())
+	Expect(result.Pair).To(BeNil())
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
@@ -173,9 +173,9 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWithMultiValuedHeade
 			"header2": {"val2"},
 		},
 	}
-	result, _, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
@@ -204,9 +204,9 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWithDifferentMultiValuedH
 		},
 	}
 
-	result, _, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(result).To(BeNil())
+	Expect(result.Pair).To(BeNil())
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_EndpointMatchWithHeaders(t *testing.T) {
@@ -255,9 +255,9 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMatchWithHeaders(t *testin
 			"header2": {"val2"},
 		},
 	}
-	result, _, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
@@ -307,9 +307,9 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMismatchWithHeadersReturns
 		},
 	}
 
-	result, _, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(result).To(BeNil())
+	Expect(result.Pair).To(BeNil())
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T) {
@@ -346,9 +346,9 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 			"q": []string{"test"},
 		},
 	}
-	result, _, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 
 	r = models.RequestDetails{
 		Method:      "GET",
@@ -359,9 +359,9 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 		},
 	}
 
-	result, _, _ = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(result).To(BeNil())
+	Expect(result.Pair).To(BeNil())
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsAndBeMatched(t *testing.T) {
@@ -384,10 +384,10 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsAndBeMat
 		Path:        "/api/1",
 	}
 
-	response, err, _ := matching.StrongestMatchRequestMatcher(request, false, simulation, map[string]string{})
-	Expect(err).To(BeNil())
+	result := matching.StrongestMatchRequestMatcher(request, false, simulation, map[string]string{})
+	Expect(result.Error).To(BeNil())
 
-	Expect(response.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnSchemeAndBeMatched(t *testing.T) {
@@ -411,10 +411,10 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnScheme
 		Path:        "/api/1",
 	}
 
-	response, err, _ := matching.StrongestMatchRequestMatcher(request, false, simulation, map[string]string{})
-	Expect(err).To(BeNil())
+	result := matching.StrongestMatchRequestMatcher(request, false, simulation, map[string]string{})
+	Expect(result.Error).To(BeNil())
 
-	Expect(response.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnHeadersAndBeMatched(t *testing.T) {
@@ -440,10 +440,10 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnHeader
 		},
 	}
 
-	response, err, _ := matching.StrongestMatchRequestMatcher(request, false, simulation, map[string]string{})
-	Expect(err).To(BeNil())
+	result := matching.StrongestMatchRequestMatcher(request, false, simulation, map[string]string{})
+	Expect(result.Error).To(BeNil())
 
-	Expect(response.Response.Body).To(Equal("request matched"))
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_ShouldReturnClosestMissIfMatchIsNotFound(t *testing.T) {
@@ -499,16 +499,16 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFound(t *testing.T) {
 		Path: "nomatch",
 	}
 
-	result, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).ToNot(BeNil())
-	Expect(result).To(BeNil())
-	Expect(err.ClosestMiss).ToNot(BeNil())
-	Expect(*err.ClosestMiss.RequestMatcher.Body.ExactMatch).To(Equal(`body`))
-	Expect(*err.ClosestMiss.RequestMatcher.Body.GlobMatch).To(Equal(`bod*`))
-	Expect(*err.ClosestMiss.RequestMatcher.Path.ExactMatch).To(Equal(`path`))
-	Expect(err.ClosestMiss.Response.Body).To(Equal(`two`))
-	Expect(err.ClosestMiss.RequestDetails.Body).To(Equal(`body`))
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Pair).To(BeNil())
+	Expect(result.Error.ClosestMiss).ToNot(BeNil())
+	Expect(*result.Error.ClosestMiss.RequestMatcher.Body.ExactMatch).To(Equal(`body`))
+	Expect(*result.Error.ClosestMiss.RequestMatcher.Body.GlobMatch).To(Equal(`bod*`))
+	Expect(*result.Error.ClosestMiss.RequestMatcher.Path.ExactMatch).To(Equal(`path`))
+	Expect(result.Error.ClosestMiss.Response.Body).To(Equal(`two`))
+	Expect(result.Error.ClosestMiss.RequestDetails.Body).To(Equal(`body`))
 }
 
 func Test_ShouldReturnClosestMissIfMatchIsNotFoundAgain(t *testing.T) {
@@ -567,15 +567,15 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFoundAgain(t *testing.T) {
 		Method: "GET",
 	}
 
-	result, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).ToNot(BeNil())
-	Expect(result).To(BeNil())
-	Expect(err.ClosestMiss).ToNot(BeNil())
-	Expect(*err.ClosestMiss.RequestMatcher.Body.RegexMatch).To(Equal(`.*`))
-	Expect(*err.ClosestMiss.RequestMatcher.Path.ExactMatch).To(Equal(`miss`))
-	Expect(*err.ClosestMiss.RequestMatcher.Method.ExactMatch).To(Equal(`GET`))
-	Expect(err.ClosestMiss.Response.Body).To(Equal(`one`))
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Pair).To(BeNil())
+	Expect(result.Error.ClosestMiss).ToNot(BeNil())
+	Expect(*result.Error.ClosestMiss.RequestMatcher.Body.RegexMatch).To(Equal(`.*`))
+	Expect(*result.Error.ClosestMiss.RequestMatcher.Path.ExactMatch).To(Equal(`miss`))
+	Expect(*result.Error.ClosestMiss.RequestMatcher.Method.ExactMatch).To(Equal(`GET`))
+	Expect(result.Error.ClosestMiss.Response.Body).To(Equal(`one`))
 }
 
 func Test_ShouldNotReturnClosestMissWhenThereIsAMatch(t *testing.T) {
@@ -616,10 +616,10 @@ func Test_ShouldNotReturnClosestMissWhenThereIsAMatch(t *testing.T) {
 		Method: "GET",
 	}
 
-	result, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).To(BeNil())
-	Expect(result).ToNot(BeNil())
+	Expect(result.Error).To(BeNil())
+	Expect(result.Pair).ToNot(BeNil())
 }
 
 func Test__NotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
@@ -677,10 +677,10 @@ func Test__NotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *test
 		},
 	}
 
-	_, err, cachable := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeFalse())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeFalse())
 }
 
 func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
@@ -738,10 +738,10 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	_, err, cachable := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -757,10 +757,10 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -776,10 +776,10 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -795,10 +795,10 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -814,10 +814,10 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	_, err, _ = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 }
 
 func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatches(t *testing.T) {
@@ -875,11 +875,11 @@ func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatches(t *testing.T) {
 		Method: "GET",
 	}
 
-	result, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).To(BeNil())
-	Expect(result).ToNot(BeNil())
-	Expect(result.Response.Body).To(Equal("two"))
+	Expect(result.Error).To(BeNil())
+	Expect(result.Pair).ToNot(BeNil())
+	Expect(result.Pair.Response.Body).To(Equal("two"))
 }
 
 func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatchesAgain(t *testing.T) {
@@ -938,11 +938,11 @@ func Test_ShouldReturnStrongestMatchWhenThereAreMultipleMatchesAgain(t *testing.
 		Method: "GET",
 	}
 
-	result, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).To(BeNil())
-	Expect(result).ToNot(BeNil())
-	Expect(result.Response.Body).To(Equal("one"))
+	Expect(result.Error).To(BeNil())
+	Expect(result.Pair).ToNot(BeNil())
+	Expect(result.Pair.Response.Body).To(Equal("one"))
 }
 
 func Test_ShouldSetClosestMissBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
@@ -983,9 +983,9 @@ func Test_ShouldSetClosestMissBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
 		Method: "POST",
 	}
 
-	_, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).To(BeNil())
+	Expect(result.Error).To(BeNil())
 }
 
 func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
@@ -1037,11 +1037,11 @@ func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
 		},
 	}
 
-	result, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).To(BeNil())
-	Expect(result).ToNot(BeNil())
-	Expect(result.Response.Body).To(Equal("one"))
+	Expect(result.Error).To(BeNil())
+	Expect(result.Pair).ToNot(BeNil())
+	Expect(result.Pair.Response.Body).To(Equal("one"))
 }
 
 func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
@@ -1093,12 +1093,12 @@ func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
 		},
 	}
 
-	result, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).ToNot(BeNil())
-	Expect(result).To(BeNil())
-	Expect(err.ClosestMiss).ToNot(BeNil())
-	Expect(err.ClosestMiss.Response.Body).To(Equal("one"))
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Pair).To(BeNil())
+	Expect(result.Error.ClosestMiss).ToNot(BeNil())
+	Expect(result.Error.ClosestMiss.Response.Body).To(Equal("one"))
 }
 
 func Test_ShouldReturnFieldsMissedInClosestMiss(t *testing.T) {
@@ -1144,13 +1144,13 @@ func Test_ShouldReturnFieldsMissedInClosestMiss(t *testing.T) {
 		},
 	}
 
-	result, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).ToNot(BeNil())
-	Expect(result).To(BeNil())
-	Expect(err.ClosestMiss).ToNot(BeNil())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Pair).To(BeNil())
+	Expect(result.Error.ClosestMiss).ToNot(BeNil())
 	//TODO: Scheme matching?
-	Expect(err.ClosestMiss.MissedFields).To(ConsistOf(`body`, `path`, `query`))
+	Expect(result.Error.ClosestMiss.MissedFields).To(ConsistOf(`body`, `path`, `query`))
 }
 
 func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
@@ -1195,13 +1195,13 @@ func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
 		},
 	}
 
-	result, err, _ := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{})
 
-	Expect(err).ToNot(BeNil())
-	Expect(result).To(BeNil())
-	Expect(err.ClosestMiss).ToNot(BeNil())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Pair).To(BeNil())
+	Expect(result.Error.ClosestMiss).ToNot(BeNil())
 	//TODO: Scheme matching?
-	Expect(err.ClosestMiss.MissedFields).To(ConsistOf(`method`, `destination`, `headers`))
+	Expect(result.Error.ClosestMiss.MissedFields).To(ConsistOf(`method`, `destination`, `headers`))
 }
 
 func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
@@ -1391,10 +1391,10 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeader
 		},
 	}
 
-	_, err, cachable := matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeFalse())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeFalse())
 }
 
 func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
@@ -1452,10 +1452,10 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		},
 	}
 
-	_, err, cachable := matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1471,10 +1471,10 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		},
 	}
 
-	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1490,10 +1490,10 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		},
 	}
 
-	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1509,10 +1509,10 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		},
 	}
 
-	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1528,10 +1528,10 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		},
 	}
 
-	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, make(map[string]string))
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 }
 
 func Test_StrongestMatchRequestMatcher_RequestMatchersShouldMatchOnStateAndNotBeCachable(t *testing.T) {
@@ -1550,15 +1550,15 @@ func Test_StrongestMatchRequestMatcher_RequestMatchersShouldMatchOnStateAndNotBe
 		Body: "body",
 	}
 
-	result, err, cachable := matching.StrongestMatchRequestMatcher(
+	result := matching.StrongestMatchRequestMatcher(
 		r,
 		false,
 		simulation,
 		map[string]string{"key1": "value1", "key2": "value2"})
 
-	Expect(err).To(BeNil())
-	Expect(cachable).To(BeFalse())
-	Expect(result.Response.Body).To(Equal("request matched"))
+	Expect(result.Error).To(BeNil())
+	Expect(result.Cachable).To(BeFalse())
+	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
 func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeastOnce(t *testing.T) {
@@ -1613,10 +1613,10 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateA
 		Path:   "/foo",
 	}
 
-	_, err, cachable := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeFalse())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeFalse())
 }
 
 func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes(t *testing.T) {
@@ -1671,10 +1671,10 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "/foo",
 	}
 
-	_, err, cachable := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+	result := matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1687,10 +1687,10 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "/foo",
 	}
 
-	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1703,10 +1703,10 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "/foo",
 	}
 
-	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1719,10 +1719,10 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "/foo",
 	}
 
-	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1735,8 +1735,8 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "miss",
 	}
 
-	_, err, cachable = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
+	result = matching.StrongestMatchRequestMatcher(r, false, simulation, map[string]string{"miss": "me"})
 
-	Expect(err).ToNot(BeNil())
-	Expect(cachable).To(BeTrue())
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Cachable).To(BeTrue())
 }

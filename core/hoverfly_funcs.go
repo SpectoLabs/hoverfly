@@ -50,33 +50,29 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		response = cachedResponse.MatchingPair.Response
 		//If it's not cached, perform matching to find a hit
 	} else {
-		var pair *models.RequestMatcherResponsePair
-		var err *models.MatchError
-		var cachable bool
-
 		mode := (hf.modeMap[modes.Simulate]).(*modes.SimulateMode)
 
 		// Matching
-		pair, err, cachable = matching.Match(mode.MatchingStrategy, requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
+		result := matching.Match(mode.MatchingStrategy, requestDetails, hf.Cfg.Webserver, hf.Simulation, hf.state)
 
 		// Cache result
-		if cachable {
-			hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, pair, err)
+		if result.Cachable {
+			hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, result.Pair, result.Error)
 		}
 
 		// If we miss, just return
-		if err != nil {
+		if result.Error != nil {
 			log.WithFields(log.Fields{
-				"error":       err.Error(),
+				"error":       result.Error.Error(),
 				"query":       requestDetails.Query,
 				"path":        requestDetails.Path,
 				"destination": requestDetails.Destination,
 				"method":      requestDetails.Method,
 			}).Warn("Failed to find matching request from simulation")
 
-			return nil, matching.MissedError(err.ClosestMiss)
+			return nil, matching.MissedError(result.Error.ClosestMiss)
 		} else {
-			response = pair.Response
+			response = result.Pair.Response
 		}
 	}
 

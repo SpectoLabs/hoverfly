@@ -4,7 +4,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation, currentState map[string]string) (*models.RequestMatcherResponsePair, *models.MatchError, bool) {
+func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulation *models.Simulation, currentState map[string]string) *MatchingResult {
 
 	matchedOnAllButHeadersAtLeastOnce := false
 	matchedOnAllButStateAtLeastOnce := false
@@ -82,9 +82,16 @@ func FirstMatchRequestMatcher(req models.RequestDetails, webserver bool, simulat
 			RequestMatcher: requestMatcher,
 			Response:       matchingPair.Response,
 		}
-
-		return match, nil, isCachable(match, matchedOnAllButHeadersAtLeastOnce, matchedOnAllButStateAtLeastOnce)
+		return &MatchingResult{
+			Pair:     match,
+			Error:    nil,
+			Cachable: isCachable(match, matchedOnAllButHeadersAtLeastOnce, matchedOnAllButStateAtLeastOnce),
+		}
 	}
 
-	return nil, models.NewMatchError("No match found", matchedOnAllButHeadersAtLeastOnce), isCachable(nil, matchedOnAllButHeadersAtLeastOnce, matchedOnAllButStateAtLeastOnce)
+	return &MatchingResult{
+		Pair:     nil,
+		Error:    models.NewMatchError("No match found", matchedOnAllButHeadersAtLeastOnce),
+		Cachable: isCachable(nil, matchedOnAllButHeadersAtLeastOnce, matchedOnAllButStateAtLeastOnce),
+	}
 }
