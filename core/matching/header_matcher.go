@@ -9,19 +9,42 @@ import (
 
 func HeaderMatching(requestMatcher models.RequestMatcher, toMatch map[string][]string) *FieldMatch {
 
+	// // Make everything lowercase, as headers are case insensitive
+	// for requestHeaderKey, requestHeaderValues := range toMatch {
+	// 	delete(toMatch, requestHeaderKey)
+	// 	toMatch[strings.ToLower(requestHeaderKey)] = requestHeaderValues
+	// }
+
 	matched := true
 	var matchScore int
+
+	requestMatcherHeadersWithMatchers := requestMatcher.HeadersWithMatchers
+
+	for matcherHeaderKey, matcherHeaderValue := range requestMatcherHeadersWithMatchers {
+		matcherHeaderValueMatched := false
+
+		toMatchHeaderValues, found := toMatch[strings.ToLower(matcherHeaderKey)]
+		if !found {
+			matched = false
+		}
+
+		fieldMatch := ScoredFieldMatcher(matcherHeaderValue, strings.Join(toMatchHeaderValues, ";"))
+		matcherHeaderValueMatched = fieldMatch.Matched
+		matchScore += fieldMatch.MatchScore
+
+		if !matcherHeaderValueMatched {
+			matched = false
+		}
+	}
 
 	requestMatcherHeaders := requestMatcher.Headers
 
 	for matcherHeaderKey, matcherHeaderValues := range requestMatcherHeaders {
-
 		// Make everything lowercase, as headers are case insensitive
 		for requestHeaderKey, requestHeaderValues := range toMatch {
 			delete(toMatch, requestHeaderKey)
 			toMatch[strings.ToLower(requestHeaderKey)] = requestHeaderValues
 		}
-
 		toMatchHeaderValues, found := toMatch[strings.ToLower(matcherHeaderKey)]
 		if !found {
 			matched = false
