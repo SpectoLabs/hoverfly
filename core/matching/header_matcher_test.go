@@ -5,168 +5,310 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/types"
 )
+
+type headerMatchingTest struct {
+	name                string
+	headers             map[string][]string
+	headersWithMatchers map[string]*models.RequestFieldMatchers
+	toMatchHeaders      map[string][]string
+	equals              types.GomegaMatcher
+	matchEquals         types.GomegaMatcher
+}
+
+var tests = []headerMatchingTest{
+	headerMatchingTest{
+		name: "basic",
+		headers: map[string][]string{
+			"header1": {"val1"},
+			"header2": {"val2"},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1": {"val1"},
+			"header2": {"val2"},
+		},
+		equals: BeTrue(),
+	},
+	{
+		name: "IgnoreTestCaseInsensitive",
+		headers: map[string][]string{
+			"header1": {"val1"},
+			"header2": {"val2"},
+		},
+		toMatchHeaders: map[string][]string{
+			"HEADER1": {"val1"},
+			"Header2": {"VAL2"},
+		},
+		equals: BeTrue(),
+	},
+	{
+		name: "MatchingHeadersHasMoreKeysThanRequestMatchesFalse",
+		headers: map[string][]string{
+			"header1": {"val1"},
+			"header2": {"val2"},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1": {"val1"},
+		},
+		equals: BeFalse(),
+	},
+	{
+		name: "MatchingHeadersHasMoreValuesThanRequestMatchesFalse",
+		headers: map[string][]string{
+			"header2": {"val1", "val2"},
+		},
+		toMatchHeaders: map[string][]string{
+			"header2": {"val1"},
+		},
+		equals: BeFalse(),
+	},
+	{
+		name: "MatchingHeadersHasLessKeysThanRequestMatchesTrue",
+		headers: map[string][]string{
+			"header2": {"val2"},
+		},
+		toMatchHeaders: map[string][]string{
+			"HEADER1": {"val1"},
+			"header2": {"val2"},
+		},
+		equals: BeTrue(),
+	},
+	{
+		name: "RequestHeadersContainsAllOFMatcherHeaders",
+		headers: map[string][]string{
+			"header2": {"val2"},
+		},
+		toMatchHeaders: map[string][]string{
+			"header2": {"val1", "val2"},
+		},
+		equals: BeTrue(),
+	},
+	{
+		name: "ShouldNotMatchUnlessAllHeadersValuesAreFound",
+		headers: map[string][]string{
+			"header2": {"val1", "val2"},
+		},
+		toMatchHeaders: map[string][]string{
+			"header2": {"val1", "nomatch"},
+		},
+		equals: BeFalse(),
+	},
+	{
+		name: "CountsMatches_WhenThereIsAMatch",
+		headers: map[string][]string{
+			"header1": {"val1", "val2"},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1":     {"val1", "val2"},
+			"extraHeader": {"extraHeader1", "extraHeader2"},
+		},
+		equals:      BeTrue(),
+		matchEquals: Equal(2),
+	},
+	{
+		name: "CountsMatches_WhenThereIsAMatch_2",
+		headers: map[string][]string{
+			"header1": {"val1", "val2"},
+			"header2": {"val3"},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1":     {"val1", "val2"},
+			"header2":     {"val3", "extra"},
+			"extraHeader": {"extraHeader1", "extraHeader2"},
+		},
+		equals:      BeTrue(),
+		matchEquals: Equal(3),
+	},
+	{
+		name: "basic",
+		headers: map[string][]string{
+			"header1": {"val1", "val2"},
+			"header2": {"val3", "nomatch"},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1":     {"val1", "val2"},
+			"header2":     {"val3", "extra"},
+			"extraHeader": {"extraHeader1", "extraHeader2"},
+		},
+		equals:      BeFalse(),
+		matchEquals: Equal(3),
+	},
+	{
+		name: "headersWithMatchers 1 header 1 value",
+		headersWithMatchers: map[string]*models.RequestFieldMatchers{
+			"header1": {
+				ExactMatch: util.StringToPointer("val1"),
+			},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1": {"val1"},
+		},
+		equals:      BeTrue(),
+		matchEquals: Equal(2),
+	},
+	{
+		name: "headersWithMatchers 1 header 2 values",
+		headersWithMatchers: map[string]*models.RequestFieldMatchers{
+			"header1": {
+				ExactMatch: util.StringToPointer("val1;val2"),
+			},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1": {"val1", "val2"},
+		},
+		equals:      BeTrue(),
+		matchEquals: Equal(2),
+	},
+	{
+		name: "headersWithMatchers fail",
+		headersWithMatchers: map[string]*models.RequestFieldMatchers{
+			"header1": {
+				ExactMatch: util.StringToPointer("val1"),
+			},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1": {"val2"},
+		},
+		equals:      BeFalse(),
+		matchEquals: Equal(0),
+	},
+	{
+		name: "headersWithMatchers 2 headers",
+		headersWithMatchers: map[string]*models.RequestFieldMatchers{
+			"header1": {
+				ExactMatch: util.StringToPointer("val1"),
+			},
+			"header2": {
+				GlobMatch: util.StringToPointer("*a*"),
+			},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1": {"val1"},
+			"header2": {"val1"},
+		},
+		equals:      BeTrue(),
+		matchEquals: Equal(3),
+	},
+	{
+		name: "headersWithMatchers 2 headers fail",
+		headersWithMatchers: map[string]*models.RequestFieldMatchers{
+			"header1": {
+				ExactMatch: util.StringToPointer("val1"),
+			},
+			"header2": {
+				GlobMatch: util.StringToPointer("*a*"),
+			},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1": {"val1"},
+		},
+		equals:      BeFalse(),
+		matchEquals: Equal(2),
+	},
+	{
+		name: "headersWithMatchers 2 matchers",
+		headersWithMatchers: map[string]*models.RequestFieldMatchers{
+			"header1": {
+				ExactMatch: util.StringToPointer("val1"),
+				RegexMatch: util.StringToPointer(".*"),
+			},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1": {"val1"},
+		},
+		equals:      BeTrue(),
+		matchEquals: Equal(3),
+	},
+	{
+		name: "headersWithMatchers 2 matchers 1 fail",
+		headersWithMatchers: map[string]*models.RequestFieldMatchers{
+			"header1": {
+				ExactMatch: util.StringToPointer("val1"),
+				RegexMatch: util.StringToPointer("val2"),
+			},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1": {"val1"},
+		},
+		equals:      BeFalse(),
+		matchEquals: Equal(2),
+	},
+	{
+		name: "headersWithMatchers case insensitive",
+		headersWithMatchers: map[string]*models.RequestFieldMatchers{
+			"HEADER1": {
+				ExactMatch: util.StringToPointer("val1"),
+			},
+		},
+		toMatchHeaders: map[string][]string{
+			"header1": {"val1"},
+		},
+		equals:      BeTrue(),
+		matchEquals: Equal(2),
+	},
+	{
+		name: "headersWithMatchers case insensitive fail",
+		headersWithMatchers: map[string]*models.RequestFieldMatchers{
+			"HEADER1": {
+				ExactMatch: util.StringToPointer("val1"),
+			},
+		},
+		toMatchHeaders: map[string][]string{
+			"soemthing-else": {"val1"},
+		},
+		equals:      BeFalse(),
+		matchEquals: Equal(0),
+	},
+	{
+		name: "headersWithMatchers defaults to original headers",
+		headersWithMatchers: map[string]*models.RequestFieldMatchers{
+			"soemthing-else": {
+				ExactMatch: util.StringToPointer("val1"),
+			},
+		},
+		headers: map[string][]string{
+			"soemthing-else": {"val1"},
+		},
+		toMatchHeaders: map[string][]string{
+			"soemthing-else": {"val1"},
+		},
+		equals:      BeTrue(),
+		matchEquals: Equal(3),
+	},
+	{
+		name: "headersWithMatchers defaults to original headers fail",
+		headersWithMatchers: map[string]*models.RequestFieldMatchers{
+			"soemthing-else": {
+				ExactMatch: util.StringToPointer("val1"),
+			},
+		},
+		headers: map[string][]string{
+			"HEADER1": {"val1"},
+		},
+		toMatchHeaders: map[string][]string{
+			"soemthing-else": {"val1"},
+		},
+		equals:      BeFalse(),
+		matchEquals: Equal(2),
+	},
+}
 
 func Test_HeaderMatching(t *testing.T) {
 	RegisterTestingT(t)
 
-	matcherHeaders := map[string][]string{
-		"header1": {"val1"},
-		"header2": {"val2"},
+	for _, test := range tests {
+		result := matching.HeaderMatching(models.RequestMatcher{
+			Headers:             test.headers,
+			HeadersWithMatchers: test.headersWithMatchers,
+		}, test.toMatchHeaders)
+
+		Expect(result.Matched).To(test.equals, test.name)
+		if test.matchEquals != nil {
+			Expect(result.MatchScore).To(test.matchEquals, test.name)
+		}
 	}
 
-	Expect(matching.HeaderMatching(models.RequestMatcher{
-		Headers: matcherHeaders,
-	}, matcherHeaders).Matched).To(BeTrue())
-}
-
-func Test_HeaderMatching_IgnoreTestCaseInsensitive(t *testing.T) {
-	RegisterTestingT(t)
-
-	matcherHeaders := map[string][]string{
-		"header1": {"val1"},
-		"header2": {"val2"},
-	}
-	reqHeaders := map[string][]string{
-		"HEADER1": {"val1"},
-		"Header2": {"VAL2"},
-	}
-	Expect(matching.HeaderMatching(models.RequestMatcher{
-		Headers: matcherHeaders,
-	}, reqHeaders).Matched).To(BeTrue())
-}
-
-func Test_HeaderMatching_MatchingHeadersHasMoreKeysThanRequestMatchesFalse(t *testing.T) {
-	RegisterTestingT(t)
-
-	matcherHeaders := map[string][]string{
-		"header1": {"val1"},
-		"header2": {"val2"},
-	}
-	reqHeaders := map[string][]string{
-		"header1": {"val1"},
-	}
-	Expect(matching.HeaderMatching(models.RequestMatcher{
-		Headers: matcherHeaders,
-	}, reqHeaders).Matched).To(BeFalse())
-}
-
-func Test_HeaderMatching_MatchingHeadersHasMoreValuesThanRequestMatchesFalse(t *testing.T) {
-	RegisterTestingT(t)
-
-	matcherHeaders := map[string][]string{
-		"header2": {"val1", "val2"},
-	}
-	reqHeaders := map[string][]string{
-		"header2": {"val1"},
-	}
-	Expect(matching.HeaderMatching(models.RequestMatcher{
-		Headers: matcherHeaders,
-	}, reqHeaders).Matched).To(BeFalse())
-}
-
-func Test_HeaderMatching_MatchingHeadersHasLessKeysThanRequestMatchesTrue(t *testing.T) {
-	RegisterTestingT(t)
-
-	matcherHeaders := map[string][]string{
-		"header2": {"val2"},
-	}
-	reqHeaders := map[string][]string{
-		"HEADER1": {"val1"},
-		"header2": {"val2"},
-	}
-	Expect(matching.HeaderMatching(models.RequestMatcher{
-		Headers: matcherHeaders,
-	}, reqHeaders).Matched).To(BeTrue())
-}
-
-func Test_HeaderMatching_RequestHeadersContainsAllOFMatcherHeaders(t *testing.T) {
-	RegisterTestingT(t)
-
-	matcherHeaders := map[string][]string{
-		"header2": {"val2"},
-	}
-	reqHeaders := map[string][]string{
-		"header2": {"val1", "val2"},
-	}
-	Expect(matching.HeaderMatching(models.RequestMatcher{
-		Headers: matcherHeaders,
-	}, reqHeaders).Matched).To(BeTrue())
-}
-
-func Test_HeaderMatching_ShouldNotMatchUnlessAllHeadersValuesAreFound(t *testing.T) {
-	RegisterTestingT(t)
-
-	matcherHeaders := map[string][]string{
-		"header2": {"val1", "val2"},
-	}
-	reqHeaders := map[string][]string{
-		"header2": {"val1", "nomatch"},
-	}
-	Expect(matching.HeaderMatching(models.RequestMatcher{
-		Headers: matcherHeaders,
-	}, reqHeaders).Matched).To(BeFalse())
-}
-
-func Test_HeaderMatching_CountsMatches_WhenThereIsAMatch(t *testing.T) {
-	RegisterTestingT(t)
-
-	match := matching.HeaderMatching(models.RequestMatcher{
-		Headers: map[string][]string{
-			"header1": {"val1", "val2"},
-		},
-	},
-
-		map[string][]string{
-			"header1":     {"val1", "val2"},
-			"extraHeader": {"extraHeader1", "extraHeader2"},
-		})
-
-	Expect(match.Matched).To(BeTrue())
-	Expect(match.MatchScore).To(Equal(2))
-
-	match = matching.HeaderMatching(models.RequestMatcher{
-		Headers: map[string][]string{
-			"header1": {"val1", "val2"},
-			"header2": {"val3"},
-		},
-	},
-		map[string][]string{
-			"header1":     {"val1", "val2"},
-			"header2":     {"val3", "extra"},
-			"extraHeader": {"extraHeader1", "extraHeader2"},
-		})
-
-	Expect(match.Matched).To(BeTrue())
-	Expect(match.MatchScore).To(Equal(3))
-}
-
-func Test_HeaderMatching_CountsMatches_WhenThereIsNoMatch(t *testing.T) {
-	RegisterTestingT(t)
-
-	match := matching.HeaderMatching(models.RequestMatcher{
-		Headers: map[string][]string{
-			"header1": {"val1", "val2"},
-			"header2": {"val3", "nomatch"},
-		},
-	},
-		map[string][]string{
-			"header1":     {"val1", "val2"},
-			"header2":     {"val3", "extra"},
-			"extraHeader": {"extraHeader1", "extraHeader2"},
-		})
-
-	Expect(match.Matched).To(BeFalse())
-	Expect(match.MatchScore).To(Equal(3))
-}
-
-func Test_HeaderMatching_CountZero_WhenFieldIsNil(t *testing.T) {
-	RegisterTestingT(t)
-
-	// Glob, regex, and exact
-	match := matching.ScoredFieldMatcher(nil, `testtesttest`)
-
-	Expect(match.Matched).To(BeTrue())
-	Expect(match.MatchScore).To(Equal(0))
 }
