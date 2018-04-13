@@ -250,6 +250,19 @@ var tests = []headerMatchingTest{
 		matchEquals: Equal(2),
 	},
 	{
+		name: "headersWithMatchers headers case insensitive",
+		headersWithMatchers: map[string]*models.RequestFieldMatchers{
+			"HEADER1": {
+				ExactMatch: util.StringToPointer("val1"),
+			},
+		},
+		toMatchHeaders: map[string][]string{
+			"Header1": {"val1"},
+		},
+		equals:      BeTrue(),
+		matchEquals: Equal(2),
+	},
+	{
 		name: "headersWithMatchers case insensitive fail",
 		headersWithMatchers: map[string]*models.RequestFieldMatchers{
 			"HEADER1": {
