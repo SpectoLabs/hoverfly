@@ -231,4 +231,31 @@ var _ = Describe("	When using different matchers", func() {
 			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
 		})
 	})
+
+	Context("Using header matchers", func() {
+
+		BeforeEach(func() {
+			hoverfly.ImportSimulation(functional_tests.HeaderMatchersSimulation)
+		})
+
+		It("should match on the headers", func() {
+			req := sling.New().Get("http://test.com")
+			req.Set("test", "test")
+
+			response := hoverfly.Proxy(req)
+			// Expect(response.StatusCode).To(Equal(200))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("header matchers matches")))
+		})
+
+		It("should match on the headers", func() {
+			req := sling.New().Get("http://test.com")
+			req.Set("test2", "one;two;three")
+
+			response := hoverfly.Proxy(req)
+			// Expect(response.StatusCode).To(Equal(200))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("header matchers matches")))
+		})
+	})
 })
