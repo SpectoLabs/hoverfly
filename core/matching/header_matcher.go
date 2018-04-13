@@ -1,6 +1,7 @@
 package matching
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -21,12 +22,21 @@ func HeaderMatching(requestMatcher models.RequestMatcher, toMatch map[string][]s
 	requestMatcherHeadersWithMatchers := requestMatcher.HeadersWithMatchers
 
 	for matcherHeaderKey, matcherHeaderValue := range requestMatcherHeadersWithMatchers {
+		// Make everything lowercase, as headers are case insensitive
+		for requestHeaderKey, requestHeaderValues := range toMatch {
+			delete(toMatch, requestHeaderKey)
+			toMatch[strings.ToLower(requestHeaderKey)] = requestHeaderValues
+		}
+		fmt.Println(toMatch)
+		fmt.Println("matcher key: " + matcherHeaderKey)
 		matcherHeaderValueMatched := false
 
 		toMatchHeaderValues, found := toMatch[strings.ToLower(matcherHeaderKey)]
 		if !found {
 			matched = false
 		}
+
+		fmt.Println("header values: " + strings.Join(toMatchHeaderValues, ";"))
 
 		fieldMatch := ScoredFieldMatcher(matcherHeaderValue, strings.Join(toMatchHeaderValues, ";"))
 		matcherHeaderValueMatched = fieldMatch.Matched
