@@ -29,6 +29,7 @@ type RequestMatcherViewV4 struct {
 	Body                *RequestFieldMatchersView            `json:"body,omitempty"`
 	Headers             map[string][]string                  `json:"headers,omitempty"`
 	HeadersWithMatchers map[string]*RequestFieldMatchersView `json:"headersWithMatchers,omitempty"`
+	QueriesWithMatchers map[string]*RequestFieldMatchersView `json:"queriesWithMatchers,omitempty"`
 	RequiresState       map[string]string                    `json:"requiresState,omitempty"`
 }
 
