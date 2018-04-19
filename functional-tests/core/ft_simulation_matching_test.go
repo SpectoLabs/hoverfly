@@ -243,7 +243,7 @@ var _ = Describe("	When using different matchers", func() {
 			req.Set("test", "test")
 
 			response := hoverfly.Proxy(req)
-			// Expect(response.StatusCode).To(Equal(200))
+			Expect(response.StatusCode).To(Equal(200))
 
 			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("header matchers matches")))
 		})
@@ -253,9 +253,34 @@ var _ = Describe("	When using different matchers", func() {
 			req.Set("test2", "one;two;three")
 
 			response := hoverfly.Proxy(req)
-			// Expect(response.StatusCode).To(Equal(200))
+			Expect(response.StatusCode).To(Equal(200))
 
 			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("header matchers matches")))
+		})
+	})
+
+	Context("Using query matchers", func() {
+
+		BeforeEach(func() {
+			hoverfly.ImportSimulation(functional_tests.QueryMatchersSimulation)
+		})
+
+		It("should match on the queries", func() {
+			req := sling.New().Get("http://test.com/?test=test")
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("query matchers matches")))
+		})
+
+		It("should match on the queries", func() {
+			req := sling.New().Get("http://test.com?test=test1&test=test2")
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("query matchers matches")))
 		})
 	})
 })
