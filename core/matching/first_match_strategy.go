@@ -60,6 +60,11 @@ func FirstMatchStrategy(req models.RequestDetails, webserver bool, simulation *m
 			isAMatch = false
 		}
 
+		if !QueryMatching(requestMatcher, req.Query).Matched {
+			matchedOnAllButState = false
+			isAMatch = false
+		}
+
 		if !UnscoredStateMatcher(currentState, requestMatcher.RequiresState).Matched {
 			matchedOnAllButHeaders = false
 			isAMatch = false
