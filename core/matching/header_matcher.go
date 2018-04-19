@@ -27,13 +27,12 @@ func HeaderMatching(requestMatcher models.RequestMatcher, toMatch map[string][]s
 			delete(toMatch, requestHeaderKey)
 			toMatch[strings.ToLower(requestHeaderKey)] = requestHeaderValues
 		}
-		fmt.Println(toMatch)
-		fmt.Println("matcher key: " + matcherHeaderKey)
 		matcherHeaderValueMatched := false
 
 		toMatchHeaderValues, found := toMatch[strings.ToLower(matcherHeaderKey)]
 		if !found {
 			matched = false
+			continue
 		}
 
 		fmt.Println("header values: " + strings.Join(toMatchHeaderValues, ";"))
