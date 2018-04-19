@@ -83,6 +83,14 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 		}
 		matchScore += fieldMatch.MatchScore
 
+		fieldMatch = QueryMatching(requestMatcher, req.Query)
+		if !fieldMatch.Matched {
+			matched = false
+			matchedOnAllButState = false
+			missedFields = append(missedFields, "queries")
+		}
+		matchScore += fieldMatch.MatchScore
+
 		fieldMatch = ScoredStateMatcher(state, requestMatcher.RequiresState)
 		if !fieldMatch.Matched {
 			matched = false
