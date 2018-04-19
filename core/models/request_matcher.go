@@ -64,6 +64,14 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 		headersWithMatchers[key] = NewRequestFieldMatchersFromView(view)
 	}
 
+	var queriesWithMatchers map[string]*RequestFieldMatchers
+	for key, view := range view.RequestMatcher.QueriesWithMatchers {
+		if queriesWithMatchers == nil {
+			queriesWithMatchers = map[string]*RequestFieldMatchers{}
+		}
+		queriesWithMatchers[key] = NewRequestFieldMatchersFromView(view)
+	}
+
 	return &RequestMatcherResponsePair{
 		RequestMatcher: RequestMatcher{
 			Path:                NewRequestFieldMatchersFromView(view.RequestMatcher.Path),
@@ -74,6 +82,7 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 			Body:                NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
 			Headers:             view.RequestMatcher.Headers,
 			HeadersWithMatchers: headersWithMatchers,
+			QueriesWithMatchers: queriesWithMatchers,
 			RequiresState:       view.RequestMatcher.RequiresState,
 		},
 		Response: NewResponseDetailsFromResponse(view.Response),
@@ -113,6 +122,11 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 		headersWithMatchers[key] = matcher.BuildView()
 	}
 
+	queriesWithMatchers := map[string]*v2.RequestFieldMatchersView{}
+	for key, matcher := range this.RequestMatcher.QueriesWithMatchers {
+		queriesWithMatchers[key] = matcher.BuildView()
+	}
+
 	return v2.RequestMatcherResponsePairViewV4{
 		RequestMatcher: v2.RequestMatcherViewV4{
 			Path:                path,
@@ -123,6 +137,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 			Body:                body,
 			Headers:             this.RequestMatcher.Headers,
 			HeadersWithMatchers: headersWithMatchers,
+			QueriesWithMatchers: queriesWithMatchers,
 			RequiresState:       this.RequestMatcher.RequiresState,
 		},
 		Response: this.Response.ConvertToResponseDetailsViewV4(),
@@ -138,6 +153,7 @@ type RequestMatcher struct {
 	Body                *RequestFieldMatchers
 	Headers             map[string][]string
 	HeadersWithMatchers map[string]*RequestFieldMatchers
+	QueriesWithMatchers map[string]*RequestFieldMatchers
 	RequiresState       map[string]string
 }
 

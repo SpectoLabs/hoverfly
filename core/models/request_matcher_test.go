@@ -52,6 +52,11 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 					ExactMatch: util.StringToPointer("header value"),
 				},
 			},
+			QueriesWithMatchers: map[string]*v2.RequestFieldMatchersView{
+				"Query": &v2.RequestFieldMatchersView{
+					ExactMatch: util.StringToPointer("query value"),
+				},
+			},
 		},
 		Response: v2.ResponseDetailsViewV4{
 			Body: "body",
@@ -60,6 +65,7 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 
 	Expect(*unit.RequestMatcher.Path.ExactMatch).To(Equal("/"))
 	Expect(*unit.RequestMatcher.HeadersWithMatchers["Header"].ExactMatch).To(Equal("header value"))
+	Expect(*unit.RequestMatcher.QueriesWithMatchers["Query"].ExactMatch).To(Equal("query value"))
 	Expect(unit.RequestMatcher.Destination).To(BeNil())
 
 	Expect(unit.Response.Body).To(Equal("body"))
@@ -78,6 +84,21 @@ func Test_NewRequestMatcherResponsePairFromView_LeavesHeadersWithMatchersNil(t *
 	})
 
 	Expect(unit.RequestMatcher.HeadersWithMatchers).To(BeNil())
+}
+
+func Test_NewRequestMatcherResponsePairFromView_LeavesQueriesWithMatchersNil(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV4{
+		RequestMatcher: v2.RequestMatcherViewV4{
+			Path: &v2.RequestFieldMatchersView{
+				ExactMatch: util.StringToPointer("/"),
+			},
+		},
+		Response: v2.ResponseDetailsViewV4{},
+	})
+
+	Expect(unit.RequestMatcher.QueriesWithMatchers).To(BeNil())
 }
 
 func Test_NewRequestMatcherResponsePairFromView_SortsQuery(t *testing.T) {
