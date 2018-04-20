@@ -10,32 +10,35 @@ func UnscoredFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 		return FieldMatchWithNoScore(true)
 	}
 
-	if field.ExactMatch != nil && !matchers.ExactMatch(*field.ExactMatch, toMatch) {
-		return FieldMatchWithNoScore(false)
-	}
-
-	if field.XmlMatch != nil && !matchers.XmlMatch(*field.XmlMatch, toMatch) {
-		return FieldMatchWithNoScore(false)
-	}
-
-	if field.XpathMatch != nil && !matchers.XpathMatch(*field.XpathMatch, toMatch) {
-		return FieldMatchWithNoScore(false)
-	}
-
-	if field.JsonMatch != nil && !matchers.JsonMatch(*field.JsonMatch, toMatch) {
-		return FieldMatchWithNoScore(false)
-	}
-
-	if field.JsonPathMatch != nil && !matchers.JsonPathMatch(*field.JsonPathMatch, toMatch) {
-		return FieldMatchWithNoScore(false)
-	}
-
-	if field.RegexMatch != nil && !matchers.RegexMatch(*field.RegexMatch, toMatch) {
-		return FieldMatchWithNoScore(false)
-	}
-
-	if field.GlobMatch != nil && !matchers.GlobMatch(*field.GlobMatch, toMatch) {
-		return FieldMatchWithNoScore(false)
+	switch field.Matcher {
+	case "exact":
+		if !matchers.ExactMatch(field.Value.(string), toMatch) {
+			return FieldMatchWithNoScore(false)
+		}
+	case "xml":
+		if !matchers.XmlMatch(field.Value.(string), toMatch) {
+			return FieldMatchWithNoScore(false)
+		}
+	case "xpath":
+		if !matchers.XpathMatch(field.Value.(string), toMatch) {
+			return FieldMatchWithNoScore(false)
+		}
+	case "json":
+		if !matchers.JsonMatch(field.Value.(string), toMatch) {
+			return FieldMatchWithNoScore(false)
+		}
+	case "jsonpath":
+		if !matchers.JsonPathMatch(field.Value.(string), toMatch) {
+			return FieldMatchWithNoScore(false)
+		}
+	case "regex":
+		if !matchers.RegexMatch(field.Value.(string), toMatch) {
+			return FieldMatchWithNoScore(false)
+		}
+	case "glob":
+		if !matchers.GlobMatch(field.Value.(string), toMatch) {
+			return FieldMatchWithNoScore(false)
+		}
 	}
 
 	return FieldMatchWithNoScore(true)
