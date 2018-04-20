@@ -52,57 +52,46 @@ func ScoredFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *Fie
 		return fieldMatch
 	}
 
-	if field.ExactMatch != nil {
-		if matchers.ExactMatch(*field.ExactMatch, toMatch) {
+	switch field.Matcher {
+	case "exact":
+		if matchers.ExactMatch(field.Value.(string), toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 2
 		} else {
 			fieldMatch.Matched = false
 		}
-	}
-
-	if field.XmlMatch != nil {
-		if matchers.XmlMatch(*field.XmlMatch, toMatch) {
-			fieldMatch.MatchScore++
+	case "xml":
+		if matchers.XmlMatch(field.Value.(string), toMatch) {
+			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
-	}
-
-	if field.XpathMatch != nil {
-		if matchers.XpathMatch(*field.XpathMatch, toMatch) {
-			fieldMatch.MatchScore++
+	case "xpath":
+		if matchers.XpathMatch(field.Value.(string), toMatch) {
+			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
-	}
-
-	if field.JsonMatch != nil {
-		if matchers.JsonMatch(*field.JsonMatch, toMatch) {
-			fieldMatch.MatchScore++
+	case "json":
+		if matchers.JsonMatch(field.Value.(string), toMatch) {
+			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
-	}
-
-	if field.JsonPathMatch != nil {
-		if matchers.JsonPathMatch(*field.JsonPathMatch, toMatch) {
-			fieldMatch.MatchScore++
+	case "jsonpath":
+		if matchers.JsonPathMatch(field.Value.(string), toMatch) {
+			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
-	}
-
-	if field.RegexMatch != nil {
-		if matchers.RegexMatch(*field.RegexMatch, toMatch) {
-			fieldMatch.MatchScore++
+	case "regex":
+		if matchers.RegexMatch(field.Value.(string), toMatch) {
+			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
-	}
-
-	if field.GlobMatch != nil {
-		if matchers.GlobMatch(*field.GlobMatch, toMatch) {
-			fieldMatch.MatchScore++
+	case "glob":
+		if matchers.GlobMatch(field.Value.(string), toMatch) {
+			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}

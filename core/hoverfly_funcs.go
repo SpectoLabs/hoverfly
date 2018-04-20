@@ -111,15 +111,21 @@ func (hf *Hoverfly) RemoveState(toRemove []string) {
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails, headersWhitelist []string) error {
 	body := &models.RequestFieldMatchers{
+		Matcher:    "exact",
+		Value:      request.Body,
 		ExactMatch: util.StringToPointer(request.Body),
 	}
 	contentType := util.GetContentTypeFromHeaders(request.Headers)
 	if contentType == "json" {
 		body = &models.RequestFieldMatchers{
+			Matcher:   "json",
+			Value:     request.Body,
 			JsonMatch: util.StringToPointer(request.Body),
 		}
 	} else if contentType == "xml" {
 		body = &models.RequestFieldMatchers{
+			Matcher:  "xml",
+			Value:    request.Body,
 			XmlMatch: util.StringToPointer(request.Body),
 		}
 	}
@@ -144,18 +150,28 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 	pair := models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      request.Path,
 				ExactMatch: util.StringToPointer(request.Path),
 			},
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      request.Method,
 				ExactMatch: util.StringToPointer(request.Method),
 			},
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      request.Destination,
 				ExactMatch: util.StringToPointer(request.Destination),
 			},
 			Scheme: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      request.Scheme,
 				ExactMatch: util.StringToPointer(request.Scheme),
 			},
 			Query: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      request.QueryString(),
 				ExactMatch: util.StringToPointer(request.QueryString()),
 			},
 			Body:    body,

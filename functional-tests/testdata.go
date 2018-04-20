@@ -780,7 +780,7 @@ var StrongestMatchProofSimulation = `{
                 },
                 "request": {
                     "destination": {
-                        "exactMatch": "destination.com"
+                        "regexMatch": "destination.*"
                     }
                 }
             },
@@ -793,8 +793,7 @@ var StrongestMatchProofSimulation = `{
                 },
                 "request": {
                     "destination": {
-                        "exactMatch": "destination.com",
-                        "globMatch" : "dest*"
+                        "exactMatch": "destination.com"
                     }
                 }
             }
