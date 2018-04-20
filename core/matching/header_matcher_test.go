@@ -140,6 +140,8 @@ var tests = []headerMatchingTest{
 		name: "headersWithMatchers 1 header 1 value",
 		headersWithMatchers: map[string]*models.RequestFieldMatchers{
 			"header1": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 		},
@@ -153,6 +155,8 @@ var tests = []headerMatchingTest{
 		name: "headersWithMatchers 1 header 2 values",
 		headersWithMatchers: map[string]*models.RequestFieldMatchers{
 			"header1": {
+				Matcher:    "exact",
+				Value:      "val1;val2",
 				ExactMatch: util.StringToPointer("val1;val2"),
 			},
 		},
@@ -166,6 +170,8 @@ var tests = []headerMatchingTest{
 		name: "headersWithMatchers fail",
 		headersWithMatchers: map[string]*models.RequestFieldMatchers{
 			"header1": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 		},
@@ -179,9 +185,13 @@ var tests = []headerMatchingTest{
 		name: "headersWithMatchers 2 headers",
 		headersWithMatchers: map[string]*models.RequestFieldMatchers{
 			"header1": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 			"header2": {
+				Matcher:   "glob",
+				Value:     "*a*",
 				GlobMatch: util.StringToPointer("*a*"),
 			},
 		},
@@ -196,6 +206,8 @@ var tests = []headerMatchingTest{
 		name: "headersWithMatchers 2 headers fail",
 		headersWithMatchers: map[string]*models.RequestFieldMatchers{
 			"header1": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 			"header2": {
@@ -209,37 +221,11 @@ var tests = []headerMatchingTest{
 		matchEquals: Equal(2),
 	},
 	{
-		name: "headersWithMatchers 2 matchers",
-		headersWithMatchers: map[string]*models.RequestFieldMatchers{
-			"header1": {
-				ExactMatch: util.StringToPointer("val1"),
-				RegexMatch: util.StringToPointer(".*"),
-			},
-		},
-		toMatchHeaders: map[string][]string{
-			"header1": {"val1"},
-		},
-		equals:      BeTrue(),
-		matchEquals: Equal(3),
-	},
-	{
-		name: "headersWithMatchers 2 matchers 1 fail",
-		headersWithMatchers: map[string]*models.RequestFieldMatchers{
-			"header1": {
-				ExactMatch: util.StringToPointer("val1"),
-				RegexMatch: util.StringToPointer("val2"),
-			},
-		},
-		toMatchHeaders: map[string][]string{
-			"header1": {"val1"},
-		},
-		equals:      BeFalse(),
-		matchEquals: Equal(2),
-	},
-	{
 		name: "headersWithMatchers case insensitive",
 		headersWithMatchers: map[string]*models.RequestFieldMatchers{
 			"HEADER1": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 		},
@@ -253,6 +239,8 @@ var tests = []headerMatchingTest{
 		name: "headersWithMatchers headers case insensitive",
 		headersWithMatchers: map[string]*models.RequestFieldMatchers{
 			"HEADER1": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 		},
@@ -266,6 +254,8 @@ var tests = []headerMatchingTest{
 		name: "headersWithMatchers case insensitive fail",
 		headersWithMatchers: map[string]*models.RequestFieldMatchers{
 			"HEADER1": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 		},
@@ -279,6 +269,8 @@ var tests = []headerMatchingTest{
 		name: "headersWithMatchers defaults to original headers",
 		headersWithMatchers: map[string]*models.RequestFieldMatchers{
 			"soemthing-else": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 		},
@@ -295,6 +287,8 @@ var tests = []headerMatchingTest{
 		name: "headersWithMatchers defaults to original headers fail",
 		headersWithMatchers: map[string]*models.RequestFieldMatchers{
 			"soemthing-else": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 		},
