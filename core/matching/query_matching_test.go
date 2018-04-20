@@ -23,6 +23,8 @@ var queryMatchingTests = []queryMatchingTest{
 		name: "basic",
 		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
 			"query1": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 		},
@@ -35,6 +37,8 @@ var queryMatchingTests = []queryMatchingTest{
 		name: "basic fail",
 		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
 			"query1": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 		},
@@ -47,9 +51,13 @@ var queryMatchingTests = []queryMatchingTest{
 		name: "2 query parameters",
 		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
 			"query1": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 			"query2": {
+				Matcher:   "glob",
+				Value:     "*a*",
 				GlobMatch: util.StringToPointer("*a*"),
 			},
 		},
@@ -64,9 +72,13 @@ var queryMatchingTests = []queryMatchingTest{
 		name: "2 query parameters fail missing query",
 		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
 			"query1": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 			"query2": {
+				Matcher:   "glob",
+				Value:     "*a*",
 				GlobMatch: util.StringToPointer("*a*"),
 			},
 		},
@@ -80,9 +92,13 @@ var queryMatchingTests = []queryMatchingTest{
 		name: "2 query parameters fail bad match",
 		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
 			"query1": {
+				Matcher:    "exact",
+				Value:      "val1",
 				ExactMatch: util.StringToPointer("val1"),
 			},
 			"query2": {
+				Matcher:   "glob",
+				Value:     "*a*",
 				GlobMatch: util.StringToPointer("*a*"),
 			},
 		},
@@ -92,20 +108,6 @@ var queryMatchingTests = []queryMatchingTest{
 		},
 		equals:      BeFalse(),
 		matchEquals: Equal(2),
-	},
-	{
-		name: "2 matchers",
-		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
-			"query1": {
-				ExactMatch: util.StringToPointer("val1"),
-				RegexMatch: util.StringToPointer(".*"),
-			},
-		},
-		toMatchQueries: map[string][]string{
-			"query1": {"val1"},
-		},
-		equals:      BeTrue(),
-		matchEquals: Equal(3),
 	},
 }
 
