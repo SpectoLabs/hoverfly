@@ -8,6 +8,8 @@ import (
 )
 
 type RequestFieldMatchers struct {
+	Matcher       string
+	Value         interface{}
 	ExactMatch    *string
 	XmlMatch      *string
 	XpathMatch    *string
@@ -22,7 +24,47 @@ func NewRequestFieldMatchersFromView(matchers *v2.RequestFieldMatchersView) *Req
 		return nil
 	}
 
+	var matcher string
+	var value interface{}
+
+	if matchers.ExactMatch != nil {
+		matcher = "exact"
+		value = *matchers.ExactMatch
+	}
+
+	if matchers.XmlMatch != nil {
+		matcher = "xml"
+		value = *matchers.XmlMatch
+	}
+
+	if matchers.XpathMatch != nil {
+		matcher = "xpath"
+		value = *matchers.XpathMatch
+	}
+
+	if matchers.JsonMatch != nil {
+		matcher = "json"
+		value = *matchers.JsonMatch
+	}
+
+	if matchers.JsonPathMatch != nil {
+		matcher = "jsonpath"
+		value = *matchers.JsonPathMatch
+	}
+
+	if matchers.RegexMatch != nil {
+		matcher = "regex"
+		value = *matchers.RegexMatch
+	}
+
+	if matchers.GlobMatch != nil {
+		matcher = "glob"
+		value = *matchers.GlobMatch
+	}
+
 	return &RequestFieldMatchers{
+		Matcher:       matcher,
+		Value:         value,
 		ExactMatch:    matchers.ExactMatch,
 		XmlMatch:      matchers.XmlMatch,
 		XpathMatch:    matchers.XpathMatch,
