@@ -234,21 +234,33 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 		},
 		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/",
 				ExactMatch: StringToPointer("/"),
 			},
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "GET",
 				ExactMatch: StringToPointer("GET"),
 			},
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/",
 				ExactMatch: StringToPointer("/"),
 			},
 			Scheme: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "scheme",
 				ExactMatch: StringToPointer("scheme"),
 			},
 			Query: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "",
 				ExactMatch: StringToPointer(""),
 			},
 			Body: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "",
 				ExactMatch: StringToPointer(""),
 			},
 			Headers: map[string][]string{
@@ -320,21 +332,33 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 		},
 		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/",
 				ExactMatch: StringToPointer("/"),
 			},
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "GET",
 				ExactMatch: StringToPointer("GET"),
 			},
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/",
 				ExactMatch: StringToPointer("/"),
 			},
 			Scheme: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "scheme",
 				ExactMatch: StringToPointer("scheme"),
 			},
 			Query: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "",
 				ExactMatch: StringToPointer(""),
 			},
 			Body: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "",
 				ExactMatch: StringToPointer(""),
 			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
@@ -350,21 +374,33 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 		},
 		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/new/path",
 				ExactMatch: StringToPointer("/new/path"),
 			},
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "GET",
 				ExactMatch: StringToPointer("GET"),
 			},
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/",
 				ExactMatch: StringToPointer("/"),
 			},
 			Scheme: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "scheme",
 				ExactMatch: StringToPointer("scheme"),
 			},
 			Query: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "",
 				ExactMatch: StringToPointer(""),
 			},
 			Body: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "",
 				ExactMatch: StringToPointer(""),
 			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
@@ -380,21 +416,33 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 		},
 		RequestMatcher: models.RequestMatcher{
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/newer/path",
 				ExactMatch: StringToPointer("/newer/path"),
 			},
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "GET",
 				ExactMatch: StringToPointer("GET"),
 			},
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/",
 				ExactMatch: StringToPointer("/"),
 			},
 			Scheme: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "scheme",
 				ExactMatch: StringToPointer("scheme"),
 			},
 			Query: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "",
 				ExactMatch: StringToPointer(""),
 			},
 			Body: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "",
 				ExactMatch: StringToPointer(""),
 			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
