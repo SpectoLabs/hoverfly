@@ -230,15 +230,23 @@ func Test_FirstMatchStrategy_EndpointMatchWithHeaders(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "testhost.com",
 				ExactMatch: &destination,
 			},
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/a/1",
 				ExactMatch: &path,
 			},
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "GET",
 				ExactMatch: &method,
 			},
 			Query: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "q=test",
 				ExactMatch: &query,
 			},
 		},
@@ -281,6 +289,8 @@ func Test_FirstMatchStrategy_EndpointMismatchWithHeadersReturnsNil(t *testing.T)
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "testhost.com",
 				ExactMatch: &destination,
 			},
 			Path: &models.RequestFieldMatchers{
@@ -326,15 +336,23 @@ func Test_FirstMatchStrategy_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T
 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "testhost.com",
 				ExactMatch: &destination,
 			},
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "",
 				ExactMatch: &path,
 			},
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "GET",
 				ExactMatch: &method,
 			},
 			Query: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "q=test",
 				ExactMatch: &query,
 			},
 		},
@@ -506,21 +524,33 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLe
 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "POST",
 				ExactMatch: StringToPointer("POST"),
 			},
 			Body: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "body",
 				ExactMatch: StringToPointer("body"),
 			},
 			Scheme: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "http",
 				ExactMatch: StringToPointer("http"),
 			},
 			Query: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "foo=bar",
 				ExactMatch: StringToPointer("foo=bar"),
 			},
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/foo",
 				ExactMatch: StringToPointer("/foo"),
 			},
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "www.test.com",
 				ExactMatch: StringToPointer("www.test.com"),
 			},
 			Headers: map[string][]string{
@@ -533,6 +563,8 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLe
 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "GET",
 				ExactMatch: StringToPointer("GET"),
 			},
 		},
@@ -567,21 +599,33 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "POST",
 				ExactMatch: StringToPointer("POST"),
 			},
 			Body: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "body",
 				ExactMatch: StringToPointer("body"),
 			},
 			Scheme: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "http",
 				ExactMatch: StringToPointer("http"),
 			},
 			Query: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "?foo=bar",
 				ExactMatch: StringToPointer("?foo=bar"),
 			},
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/foo",
 				ExactMatch: StringToPointer("/foo"),
 			},
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "www.test.com",
 				ExactMatch: StringToPointer("www.test.com"),
 			},
 			Headers: map[string][]string{
@@ -594,6 +638,8 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "GET",
 				ExactMatch: StringToPointer("GET"),
 			},
 		},
@@ -731,21 +777,33 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeas
 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "POST",
 				ExactMatch: StringToPointer("POST"),
 			},
 			Body: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "body",
 				ExactMatch: StringToPointer("body"),
 			},
 			Scheme: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "http",
 				ExactMatch: StringToPointer("http"),
 			},
 			Query: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "foo=bar",
 				ExactMatch: StringToPointer("foo=bar"),
 			},
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/foo",
 				ExactMatch: StringToPointer("/foo"),
 			},
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "www.test.com",
 				ExactMatch: StringToPointer("www.test.com"),
 			},
 			RequiresState: map[string]string{
@@ -758,6 +816,8 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeas
 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "GET",
 				ExactMatch: StringToPointer("GET"),
 			},
 		},
@@ -789,21 +849,33 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "POST",
 				ExactMatch: StringToPointer("POST"),
 			},
 			Body: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "body",
 				ExactMatch: StringToPointer("body"),
 			},
 			Scheme: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "http",
 				ExactMatch: StringToPointer("http"),
 			},
 			Query: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "?foo=bar",
 				ExactMatch: StringToPointer("?foo=bar"),
 			},
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/foo",
 				ExactMatch: StringToPointer("/foo"),
 			},
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "www.test.com",
 				ExactMatch: StringToPointer("www.test.com"),
 			},
 			RequiresState: map[string]string{
@@ -816,6 +888,8 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "GET",
 				ExactMatch: StringToPointer("GET"),
 			},
 		},

@@ -20,6 +20,8 @@ func Test_CountlessFieldMatcher_MatchesTrueWithJsonMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.UnscoredFieldMatcher(&models.RequestFieldMatchers{
+		Matcher:   "json",
+		Value:     `{"test":true}`,
 		JsonMatch: util.StringToPointer(`{"test":true}`),
 	}, `{"test": true}`).Matched).To(BeTrue())
 }
@@ -28,6 +30,8 @@ func Test_CountlessFieldMatcher_MatchesFalseWithJsonMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.UnscoredFieldMatcher(&models.RequestFieldMatchers{
+		Matcher:   "json",
+		Value:     `{"test":true}`,
 		JsonMatch: util.StringToPointer(`{"test":true}`),
 	}, `{"test": [ ] }`).Matched).To(BeFalse())
 }
@@ -44,6 +48,8 @@ func Test_CountlessFieldMatcher_MatchesFalseWithXmlMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matching.UnscoredFieldMatcher(&models.RequestFieldMatchers{
+		Matcher:  "xml",
+		Value:    "`<document></document>`",
 		XmlMatch: util.StringToPointer(`<document></document>`),
 	}, `<document>
 		<test>data</test>
@@ -72,24 +78,6 @@ func Test_CountlessFieldMatcher_WithMultipleMatchers_AlsoMatchesTrue(t *testing.
 		XpathMatch: util.StringToPointer("/list/item[1]/field"),
 		RegexMatch: util.StringToPointer("test"),
 	}, xml.Header+"<list><item><field>test</field></item></list>").Matched).To(BeTrue())
-}
-
-func Test_CountlessFieldMatcher_WithMultipleMatchers_MatchesFalse(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.UnscoredFieldMatcher(&models.RequestFieldMatchers{
-		ExactMatch: util.StringToPointer("testtesttest"),
-		RegexMatch: util.StringToPointer("tst"),
-	}, `testtesttest`).Matched).To(BeFalse())
-}
-
-func Test_CountlessFieldMatcher__WithMultipleMatchers_AlsoMatchesFalse(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.UnscoredFieldMatcher(&models.RequestFieldMatchers{
-		GlobMatch:     util.StringToPointer("*test"),
-		JsonPathMatch: util.StringToPointer("$.test[1]"),
-	}, `testtesttest`).Matched).To(BeFalse())
 }
 
 func Test_ScoredFieldMatcher_MatchesTrue_WithNilMatchers(t *testing.T) {
