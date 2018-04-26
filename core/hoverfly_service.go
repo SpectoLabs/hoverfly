@@ -230,12 +230,12 @@ func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV5
 	for _, v := range hf.Simulation.GetMatchingPairs() {
 
 		var urlStringToMatch string
-		if v.RequestMatcher.Destination != nil {
-			urlStringToMatch += util.PointerToString(v.RequestMatcher.Destination.ExactMatch)
-		}
-		if v.RequestMatcher.Path != nil {
-			urlStringToMatch += util.PointerToString(v.RequestMatcher.Path.ExactMatch)
-		}
+		// if v.RequestMatcher.Destination != nil {
+		// 	urlStringToMatch += util.PointerToString(v.RequestMatcher.Destination.ExactMatch)
+		// }
+		// if v.RequestMatcher.Path != nil {
+		// 	urlStringToMatch += util.PointerToString(v.RequestMatcher.Path.ExactMatch)
+		// }
 
 		if regexPattern.MatchString(urlStringToMatch) {
 			pairViews = append(pairViews, v.BuildView())
@@ -247,8 +247,8 @@ func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV5
 		hf.version), nil
 }
 
-func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV4) error {
-	err := this.ImportRequestResponsePairViews(simulationView.DataViewV4.RequestResponsePairs)
+func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV5) error {
+	err := this.ImportRequestResponsePairViews(simulationView.DataViewV5.RequestResponsePairs)
 	if err != nil {
 		return err
 	}

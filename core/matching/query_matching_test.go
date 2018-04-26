@@ -5,14 +5,13 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
 )
 
 type queryMatchingTest struct {
 	name                string
-	queriesWithMatchers map[string]*models.RequestFieldMatchers
+	queriesWithMatchers map[string][]models.RequestFieldMatchers
 	toMatchQueries      map[string][]string
 	equals              types.GomegaMatcher
 	matchEquals         types.GomegaMatcher
@@ -21,11 +20,12 @@ type queryMatchingTest struct {
 var queryMatchingTests = []queryMatchingTest{
 	{
 		name: "basic",
-		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
+		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
 			"query1": {
-				Matcher:    "exact",
-				Value:      "val1",
-				ExactMatch: util.StringToPointer("val1"),
+				{
+					Matcher: "exact",
+					Value:   "val1",
+				},
 			},
 		},
 		toMatchQueries: map[string][]string{
@@ -35,11 +35,12 @@ var queryMatchingTests = []queryMatchingTest{
 	},
 	{
 		name: "basic fail",
-		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
+		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
 			"query1": {
-				Matcher:    "exact",
-				Value:      "val1",
-				ExactMatch: util.StringToPointer("val1"),
+				{
+					Matcher: "exact",
+					Value:   "val1",
+				},
 			},
 		},
 		toMatchQueries: map[string][]string{
@@ -49,16 +50,18 @@ var queryMatchingTests = []queryMatchingTest{
 	},
 	{
 		name: "2 query parameters",
-		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
+		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
 			"query1": {
-				Matcher:    "exact",
-				Value:      "val1",
-				ExactMatch: util.StringToPointer("val1"),
+				{
+					Matcher: "exact",
+					Value:   "val1",
+				},
 			},
 			"query2": {
-				Matcher:   "glob",
-				Value:     "*a*",
-				GlobMatch: util.StringToPointer("*a*"),
+				{
+					Matcher: "glob",
+					Value:   "*a*",
+				},
 			},
 		},
 		toMatchQueries: map[string][]string{
@@ -70,16 +73,18 @@ var queryMatchingTests = []queryMatchingTest{
 	},
 	{
 		name: "2 query parameters fail missing query",
-		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
+		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
 			"query1": {
-				Matcher:    "exact",
-				Value:      "val1",
-				ExactMatch: util.StringToPointer("val1"),
+				{
+					Matcher: "exact",
+					Value:   "val1",
+				},
 			},
 			"query2": {
-				Matcher:   "glob",
-				Value:     "*a*",
-				GlobMatch: util.StringToPointer("*a*"),
+				{
+					Matcher: "glob",
+					Value:   "*a*",
+				},
 			},
 		},
 		toMatchQueries: map[string][]string{
@@ -90,16 +95,18 @@ var queryMatchingTests = []queryMatchingTest{
 	},
 	{
 		name: "2 query parameters fail bad match",
-		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
+		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
 			"query1": {
-				Matcher:    "exact",
-				Value:      "val1",
-				ExactMatch: util.StringToPointer("val1"),
+				{
+					Matcher: "exact",
+					Value:   "val1",
+				},
 			},
 			"query2": {
-				Matcher:   "glob",
-				Value:     "*a*",
-				GlobMatch: util.StringToPointer("*a*"),
+				{
+					Matcher: "glob",
+					Value:   "*a*",
+				},
 			},
 		},
 		toMatchQueries: map[string][]string{

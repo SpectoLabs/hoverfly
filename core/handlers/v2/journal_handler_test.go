@@ -9,9 +9,9 @@ import (
 
 	"fmt"
 
-	"github.com/SpectoLabs/hoverfly/core/util"
-	. "github.com/onsi/gomega"
 	"time"
+
+	. "github.com/onsi/gomega"
 )
 
 type HoverflyJournalStub struct {
@@ -215,12 +215,18 @@ func Test_JournalHandler_Post_CallsFilter(t *testing.T) {
 	unit := JournalHandler{Hoverfly: &stubHoverfly}
 
 	journalEntryFilterView := JournalEntryFilterView{
-		Request: &RequestMatcherViewV2{
-			Destination: &RequestFieldMatchersView{
-				ExactMatch: util.StringToPointer("hoverfly.io"),
+		Request: &RequestMatcherViewV5{
+			Destination: []MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "hoverfly.io",
+				},
 			},
-			Path: &RequestFieldMatchersView{
-				GlobMatch: util.StringToPointer("*"),
+			Path: []MatcherViewV5{
+				{
+					Matcher: "glob",
+					Value:   "*",
+				},
 			},
 		},
 	}
@@ -240,8 +246,8 @@ func Test_JournalHandler_Post_CallsFilter(t *testing.T) {
 	Expect(journalView.Journal).To(HaveLen(1))
 	Expect(journalView.Journal[0].Mode).To(Equal("test"))
 
-	Expect(*stubHoverfly.journalEntryFilterView.Request.Destination.ExactMatch).To(Equal("hoverfly.io"))
-	Expect(*stubHoverfly.journalEntryFilterView.Request.Path.GlobMatch).To(Equal("*"))
+	Expect(stubHoverfly.journalEntryFilterView.Request.Destination[0].Value).To(Equal("hoverfly.io"))
+	Expect(stubHoverfly.journalEntryFilterView.Request.Path[0].Value).To(Equal("*"))
 }
 
 func Test_JournalHandler_Post_MalformedJson(t *testing.T) {
@@ -294,12 +300,18 @@ func Test_JournalHandler_Post_JournalError(t *testing.T) {
 	unit := JournalHandler{Hoverfly: &stubHoverfly}
 
 	requestMatcher := JournalEntryFilterView{
-		Request: &RequestMatcherViewV2{
-			Destination: &RequestFieldMatchersView{
-				ExactMatch: util.StringToPointer("hoverfly.io"),
+		Request: &RequestMatcherViewV5{
+			Destination: []MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "hoverfly.io",
+				},
 			},
-			Path: &RequestFieldMatchersView{
-				GlobMatch: util.StringToPointer("*"),
+			Path: []MatcherViewV5{
+				{
+					Matcher: "glob",
+					Value:   "*",
+				},
 			},
 		},
 	}
