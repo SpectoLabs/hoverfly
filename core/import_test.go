@@ -12,7 +12,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	. "github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
 
@@ -194,36 +193,54 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 
 	RegisterTestingT(t)
 
-	originalPair := v2.RequestMatcherResponsePairViewV4{
-		Response: v2.ResponseDetailsViewV4{
+	originalPair := v2.RequestMatcherResponsePairViewV5{
+		Response: v2.ResponseDetailsViewV5{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}},
 			Templated:   true,
 		},
-		RequestMatcher: v2.RequestMatcherViewV4{
-			Path: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("/"),
+		RequestMatcher: v2.RequestMatcherViewV5{
+			Path: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "/",
+				},
 			},
-			Method: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("GET"),
+			Method: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "GET",
+				},
 			},
-			Destination: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("/"),
+			Destination: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "/",
+				},
 			},
-			Scheme: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("scheme"),
+			Scheme: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "scheme",
+				},
 			},
-			Query: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer(""),
+			Query: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
-			Body: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer(""),
+			Body: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV4{originalPair})
+	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{originalPair})
 
 	Expect(hv.Simulation.GetMatchingPairs()[0]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
@@ -233,35 +250,41 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			Templated: true,
 		},
 		RequestMatcher: models.RequestMatcher{
-			Path: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "/",
-				ExactMatch: StringToPointer("/"),
+			Path: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "/",
+				},
 			},
-			Method: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "GET",
-				ExactMatch: StringToPointer("GET"),
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "GET",
+				},
 			},
-			Destination: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "/",
-				ExactMatch: StringToPointer("/"),
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "/",
+				},
 			},
-			Scheme: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "scheme",
-				ExactMatch: StringToPointer("scheme"),
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "scheme",
+				},
 			},
-			Query: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "",
-				ExactMatch: StringToPointer(""),
+			Query: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
-			Body: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "",
-				ExactMatch: StringToPointer(""),
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
 			Headers: map[string][]string{
 				"Hoverfly": []string{"testing"},
@@ -280,47 +303,71 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 
 	RegisterTestingT(t)
 
-	originalPair1 := v2.RequestMatcherResponsePairViewV4{
-		Response: v2.ResponseDetailsViewV4{
+	originalPair1 := v2.RequestMatcherResponsePairViewV5{
+		Response: v2.ResponseDetailsViewV5{
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 		},
-		RequestMatcher: v2.RequestMatcherViewV4{
-			Path: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("/"),
+		RequestMatcher: v2.RequestMatcherViewV5{
+			Path: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "/",
+				},
 			},
-			Method: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("GET"),
+			Method: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "GET",
+				},
 			},
-			Destination: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("/"),
+			Destination: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "/",
+				},
 			},
-			Scheme: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("scheme"),
+			Scheme: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "scheme",
+				},
 			},
-			Query: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer(""),
+			Query: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
-			Body: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer(""),
+			Body: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
 	originalPair2 := originalPair1
 	originalPair2.Response.Templated = false
-	originalPair2.RequestMatcher.Path = &v2.RequestFieldMatchersView{
-		ExactMatch: StringToPointer("/new/path"),
+	originalPair2.RequestMatcher.Path = []v2.MatcherViewV5{
+		{
+			Matcher: "exact",
+			Value:   "/new/path",
+		},
 	}
 
 	originalPair3 := originalPair1
-	originalPair3.RequestMatcher.Path = &v2.RequestFieldMatchersView{
-		ExactMatch: StringToPointer("/newer/path"),
+	originalPair3.RequestMatcher.Path = []v2.MatcherViewV5{
+		{
+			Matcher: "exact",
+			Value:   "/newer/path",
+		},
 	}
 	originalPair3.Response.Templated = true
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV4{originalPair1, originalPair2, originalPair3})
+	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{originalPair1, originalPair2, originalPair3})
 
 	Expect(hv.Simulation.GetMatchingPairs()).To(HaveLen(3))
 	Expect(hv.Simulation.GetMatchingPairs()[0]).To(Equal(models.RequestMatcherResponsePair{
@@ -331,35 +378,41 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 			Templated: false,
 		},
 		RequestMatcher: models.RequestMatcher{
-			Path: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "/",
-				ExactMatch: StringToPointer("/"),
+			Path: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "/",
+				},
 			},
-			Method: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "GET",
-				ExactMatch: StringToPointer("GET"),
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "GET",
+				},
 			},
-			Destination: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "/",
-				ExactMatch: StringToPointer("/"),
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "/",
+				},
 			},
-			Scheme: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "scheme",
-				ExactMatch: StringToPointer("scheme"),
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "scheme",
+				},
 			},
-			Query: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "",
-				ExactMatch: StringToPointer(""),
+			Query: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
-			Body: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "",
-				ExactMatch: StringToPointer(""),
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
@@ -373,35 +426,41 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 			Templated: false,
 		},
 		RequestMatcher: models.RequestMatcher{
-			Path: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "/new/path",
-				ExactMatch: StringToPointer("/new/path"),
+			Path: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "/new/path",
+				},
 			},
-			Method: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "GET",
-				ExactMatch: StringToPointer("GET"),
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "GET",
+				},
 			},
-			Destination: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "/",
-				ExactMatch: StringToPointer("/"),
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "/",
+				},
 			},
-			Scheme: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "scheme",
-				ExactMatch: StringToPointer("scheme"),
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "scheme",
+				},
 			},
-			Query: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "",
-				ExactMatch: StringToPointer(""),
+			Query: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
-			Body: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "",
-				ExactMatch: StringToPointer(""),
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
@@ -415,35 +474,41 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 			Templated: true,
 		},
 		RequestMatcher: models.RequestMatcher{
-			Path: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "/newer/path",
-				ExactMatch: StringToPointer("/newer/path"),
+			Path: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "/newer/path",
+				},
 			},
-			Method: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "GET",
-				ExactMatch: StringToPointer("GET"),
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "GET",
+				},
 			},
-			Destination: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "/",
-				ExactMatch: StringToPointer("/"),
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "/",
+				},
 			},
-			Scheme: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "scheme",
-				ExactMatch: StringToPointer("scheme"),
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "scheme",
+				},
 			},
-			Query: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "",
-				ExactMatch: StringToPointer(""),
+			Query: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
-			Body: &models.RequestFieldMatchers{
-				Matcher:    "exact",
-				Value:      "",
-				ExactMatch: StringToPointer(""),
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
 		},
@@ -460,29 +525,34 @@ func TestImportImportRequestResponsePairs_CanImportARequesResponsePairView(t *te
 
 	RegisterTestingT(t)
 
-	request := v2.RequestMatcherViewV4{
-		Method: &v2.RequestFieldMatchersView{
-			ExactMatch: StringToPointer("GET"),
+	request := v2.RequestMatcherViewV5{
+		Method: []v2.MatcherViewV5{
+			{
+				Matcher: "exact",
+				Value:   "GET",
+			},
 		},
 	}
 
-	responseView := v2.ResponseDetailsViewV4{
+	responseView := v2.ResponseDetailsViewV5{
 		Status:      200,
 		Body:        "hello_world",
 		EncodedBody: false,
 		Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
 	}
 
-	requestResponsePair := v2.RequestMatcherResponsePairViewV4{
+	requestResponsePair := v2.RequestMatcherResponsePairViewV5{
 		Response:       responseView,
 		RequestMatcher: request,
 	}
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV4{requestResponsePair})
+	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{requestResponsePair})
 
 	Expect(len(hv.Simulation.GetMatchingPairs())).To(Equal(1))
 
-	Expect(hv.Simulation.GetMatchingPairs()[0].RequestMatcher.Method.ExactMatch).To(Equal(StringToPointer("GET")))
+	Expect(hv.Simulation.GetMatchingPairs()[0].RequestMatcher.Method).To(HaveLen(1))
+	Expect(hv.Simulation.GetMatchingPairs()[0].RequestMatcher.Method[0].Matcher).To(Equal("exact"))
+	Expect(hv.Simulation.GetMatchingPairs()[0].RequestMatcher.Method[0].Value).To(Equal("GET"))
 
 	Expect(hv.Simulation.GetMatchingPairs()[0].Response.Status).To(Equal(200))
 	Expect(hv.Simulation.GetMatchingPairs()[0].Response.Body).To(Equal("hello_world"))
@@ -504,30 +574,48 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 
 	RegisterTestingT(t)
 
-	encodedPair := v2.RequestMatcherResponsePairViewV4{
-		Response: v2.ResponseDetailsViewV4{
+	encodedPair := v2.RequestMatcherResponsePairViewV5{
+		Response: v2.ResponseDetailsViewV5{
 			Status:      200,
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
-		RequestMatcher: v2.RequestMatcherViewV4{
-			Path: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("/"),
+		RequestMatcher: v2.RequestMatcherViewV5{
+			Path: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "/",
+				},
 			},
-			Method: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("GET"),
+			Method: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "GET",
+				},
 			},
-			Destination: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("/"),
+			Destination: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "/",
+				},
 			},
-			Scheme: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("scheme"),
+			Scheme: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "scheme",
+				},
 			},
-			Query: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer(""),
+			Query: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
-			Body: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer(""),
+			Body: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "",
+				},
 			},
 			Headers: map[string][]string{
 				"Hoverfly": []string{
@@ -537,7 +625,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 		},
 	}
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV4{encodedPair})
+	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
 
 	Expect(hv.Simulation.GetMatchingPairs()[0]).ToNot(Equal(models.RequestResponsePair{
 		Response: models.ResponseDetails{

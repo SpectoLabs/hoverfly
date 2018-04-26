@@ -10,13 +10,12 @@ import (
 	"fmt"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
 
 type HoverflySimulationStub struct {
 	Deleted    bool
-	Simulation SimulationViewV4
+	Simulation SimulationViewV5
 	UrlPattern string
 	Filtered   bool
 }
@@ -72,7 +71,7 @@ func (this *HoverflySimulationStub) DeleteSimulation() {
 	this.Deleted = true
 }
 
-func (this *HoverflySimulationStub) PutSimulation(simulation SimulationViewV4) error {
+func (this *HoverflySimulationStub) PutSimulation(simulation SimulationViewV5) error {
 	this.Simulation = simulation
 	return nil
 }
@@ -89,7 +88,7 @@ func (this HoverflySimulationErrorStub) GetFilteredSimulation(urlPattern string)
 
 func (this *HoverflySimulationErrorStub) DeleteSimulation() {}
 
-func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationViewV4) error {
+func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationViewV5) error {
 	indent, _ := json.MarshalIndent(simulation, "", "    ")
 	fmt.Println(string(indent))
 	return fmt.Errorf("error")
@@ -303,7 +302,8 @@ func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
 	Expect(stubHoverfly.Simulation).ToNot(BeNil())
 	Expect(stubHoverfly.Simulation.RequestResponsePairs).ToNot(BeNil())
 
-	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal(util.StringToPointer("test.org")))
+	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("test.org"))
 	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 
 	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].UrlPattern).To(Equal("test.org"))

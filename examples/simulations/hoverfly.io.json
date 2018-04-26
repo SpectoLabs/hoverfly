@@ -46,24 +46,42 @@
 					}
 				},
 				"request": {
-					"path": {
-						"exactMatch": "/"
-					},
-					"method": {
-						"exactMatch": "GET"
-					},
-					"destination": {
-						"exactMatch": "hoverfly.io"
-					},
-					"scheme": {
-						"exactMatch": "http"
-					},
-					"query": {
-						"exactMatch": ""
-					},
-					"body": {
-						"exactMatch": ""
-					}
+					"path": [
+						{
+							"matcher": "exact",
+							"value": "/"
+						}
+					],
+					"method": [
+						{
+							"matcher": "exact",
+							"value": "GET"
+						}
+					],
+					"destination": [
+						{
+							"matcher": "exact",
+							"value": "hoverfly.io"
+						}
+					],
+					"scheme": [
+						{
+							"matcher": "exact",
+							"value": "http"
+						}
+					],
+					"query": [
+						{
+							"matcher": "exact",
+							"value": ""
+						}
+					],
+					"body": [
+						{
+							"matcher": "exact",
+							"value": ""
+						}
+					]
 				}
 			},
 			{
@@ -129,24 +147,42 @@
 					}
 				},
 				"request": {
-					"path": {
-						"exactMatch": "/"
-					},
-					"method": {
-						"exactMatch": "GET"
-					},
-					"destination": {
-						"exactMatch": "hoverfly.io"
-					},
-					"scheme": {
-						"exactMatch": "https"
-					},
-					"query": {
-						"exactMatch": ""
-					},
-					"body": {
-						"exactMatch": ""
-					}
+					"path": [
+						{
+							"matcher": "exact",
+							"value": "/"
+						}
+					],
+					"method": [
+						{
+							"matcher": "exact",
+							"value": "GET"
+						}
+					],
+					"destination": [
+						{
+							"matcher": "exact",
+							"value": "hoverfly.io"
+						}
+					],
+					"scheme": [
+						{
+							"matcher": "exact",
+							"value": "https"
+						}
+					],
+					"query": [
+						{
+							"matcher": "exact",
+							"value": ""
+						}
+					],
+					"body": [
+						{
+							"matcher": "exact",
+							"value": ""
+						}
+					]
 				}
 			}
 		],
@@ -155,8 +191,8 @@
 		}
 	},
 	"meta": {
-		"schemaVersion": "v3",
-		"hoverflyVersion": "v0.11.4",
+		"schemaVersion": "v5",
+		"hoverflyVersion": "v0.17.0",
 		"timeExported": "2017-05-30T14:23:44+01:00"
 	}
 }
