@@ -476,85 +476,88 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnHeader
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
-// func Test_ShouldReturnClosestMissIfMatchIsNotFound(t *testing.T) {
-// 	RegisterTestingT(t)
+func Test_ShouldReturnClosestMissIfMatchIsNotFound(t *testing.T) {
+	RegisterTestingT(t)
 
-// 	simulation := models.NewSimulation()
+	simulation := models.NewSimulation()
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Body: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "completemiss",
-// 				},
-// 			},
-// 			Path: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "completemiss",
-// 				},
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Body: "one",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "completemiss",
+				},
+			},
+			Path: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "completemiss",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "one",
+		},
+	})
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Body: []models.RequestFieldMatchers{
-// 				Matcher:    "exact",
-// 				Value:      "body",
-// 				ExactMatch: StringToPointer("body"),
-// 				GlobMatch:  StringToPointer("bod*"),
-// 			},
-// 			Path: []models.RequestFieldMatchers{
-// 				Matcher:    "exact",
-// 				Value:      "path",
-// 				ExactMatch: StringToPointer("path"),
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Body: "two",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "body",
+				},
+			},
+			Path: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "path",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
+	})
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Body: []models.RequestFieldMatchers{
-// 				Matcher:    "glob",
-// 				Value:      "body",
-// 				ExactMatch: StringToPointer("body"),
-// 			},
-// 			Path: []models.RequestFieldMatchers{
-// 				Matcher:    "exact",
-// 				Value:      "path",
-// 				ExactMatch: StringToPointer("path"),
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Body: "three",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "body",
+				},
+			},
+			Path: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "path",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "three",
+		},
+	})
 
-// 	r := models.RequestDetails{
-// 		Body: "body",
-// 		Path: "nomatch",
-// 	}
+	r := models.RequestDetails{
+		Body: "body",
+		Path: "nomatch",
+	}
 
-// 	result := matching.StrongestMatchStrategy(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchStrategy(r, false, simulation, map[string]string{})
 
-// 	Expect(result.Error).ToNot(BeNil())
-// 	Expect(result.Pair).To(BeNil())
-// 	Expect(result.Error.ClosestMiss).ToNot(BeNil())
-// 	Expect(result.Error.ClosestMiss.RequestMatcher.Body[0].Matcher).To(Equal(`exact`))
-// 	Expect(result.Error.ClosestMiss.RequestMatcher.Body[0].Value).To(Equal(`body`))
-// 	Expect(result.Error.ClosestMiss.RequestMatcher.Path[0].Matcher).To(Equal(`exact`))
-// 	Expect(result.Error.ClosestMiss.RequestMatcher.Path[0].Value).To(Equal(`path`))
-// 	Expect(result.Error.ClosestMiss.Response.Body).To(Equal(`two`))
-// 	Expect(result.Error.ClosestMiss.RequestDetails.Body).To(Equal(`body`))
-// }
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Pair).To(BeNil())
+	Expect(result.Error.ClosestMiss).ToNot(BeNil())
+	Expect(result.Error.ClosestMiss.RequestMatcher.Body[0].Matcher).To(Equal(`exact`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Body[0].Value).To(Equal(`body`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Path[0].Matcher).To(Equal(`exact`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Path[0].Value).To(Equal(`path`))
+	Expect(result.Error.ClosestMiss.Response.Body).To(Equal(`two`))
+	Expect(result.Error.ClosestMiss.RequestDetails.Body).To(Equal(`body`))
+}
 
 func Test_ShouldReturnClosestMissIfMatchIsNotFoundAgain(t *testing.T) {
 	RegisterTestingT(t)
@@ -943,180 +946,183 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 	Expect(result.Cachable).To(BeTrue())
 }
 
-// func Test_ShouldSetClosestMissBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
-// 	RegisterTestingT(t)
+func Test_ShouldSetClosestMissBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
+	RegisterTestingT(t)
 
-// 	simulation := models.NewSimulation()
+	simulation := models.NewSimulation()
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Body: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "body",
-// 				},
-// 			},
-// 			Method: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "GET",
-// 				},
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Body: "one",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "body",
+				},
+			},
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "GET",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "one",
+		},
+	})
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Body: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "GET",
-// 				},
-// 			},
-// 			Method: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "POST",
-// 				},
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Body: "two",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "body",
+				},
+			},
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "POST",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
+	})
 
-// 	r := models.RequestDetails{
-// 		Body:   `body`,
-// 		Method: "POST",
-// 	}
+	r := models.RequestDetails{
+		Body:   `body`,
+		Method: "POST",
+	}
 
-// 	result := matching.StrongestMatchStrategy(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchStrategy(r, false, simulation, map[string]string{})
 
-// 	Expect(result.Error).To(BeNil())
-// }
+	Expect(result.Error).To(BeNil())
+}
 
-// func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
-// 	RegisterTestingT(t)
+func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
+	RegisterTestingT(t)
 
-// 	simulation := models.NewSimulation()
+	simulation := models.NewSimulation()
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Body: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "regex",
-// 					Value:   ".*",
-// 				},
-// 			},
-// 			Method: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "GET",
-// 				},
-// 			},
-// 			Headers: map[string][]string{
-// 				"one":   {"one"},
-// 				"two":   {"one"},
-// 				"three": {"one"},
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Body: "one",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "regex",
+					Value:   ".*",
+				},
+			},
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "GET",
+				},
+			},
+			Headers: map[string][]string{
+				"one":   {"one"},
+				"two":   {"one"},
+				"three": {"one"},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "one",
+		},
+	})
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Body: []models.RequestFieldMatchers{
-// 				RegexMatch: StringToPointer(".*"),
-// 			},
-// 			Method: []models.RequestFieldMatchers{
-// 				ExactMatch: StringToPointer("GET"),
-// 				RegexMatch: StringToPointer(".*"),
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Body: "two",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "regex",
+					Value:   ".*",
+				},
+			},
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "GET",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
+	})
 
-// 	r := models.RequestDetails{
-// 		Body:   "foo",
-// 		Method: "GET",
-// 		Headers: map[string][]string{
-// 			"one":   {"one"},
-// 			"two":   {"one"},
-// 			"three": {"one"},
-// 		},
-// 	}
+	r := models.RequestDetails{
+		Body:   "foo",
+		Method: "GET",
+		Headers: map[string][]string{
+			"one":   {"one"},
+			"two":   {"one"},
+			"three": {"one"},
+		},
+	}
 
-// 	result := matching.StrongestMatchStrategy(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchStrategy(r, false, simulation, map[string]string{})
 
-// 	Expect(result.Error).To(BeNil())
-// 	Expect(result.Pair).ToNot(BeNil())
-// 	Expect(result.Pair.Response.Body).To(Equal("one"))
-// }
+	Expect(result.Error).To(BeNil())
+	Expect(result.Pair).ToNot(BeNil())
+	Expect(result.Pair.Response.Body).To(Equal("one"))
+}
 
-// func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
-// 	RegisterTestingT(t)
+func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
+	RegisterTestingT(t)
 
-// 	simulation := models.NewSimulation()
+	simulation := models.NewSimulation()
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Method: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "GET",
-// 				},
-// 			},
-// 			Headers: map[string][]string{
-// 				"one":   {"one"},
-// 				"two":   {"one"},
-// 				"three": {"one"},
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Body: "one",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "GET",
+				},
+			},
+			Headers: map[string][]string{
+				"one":   {"one"},
+				"two":   {"one"},
+				"three": {"one"},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "one",
+		},
+	})
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Method: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "regex",
-// 					Value:   "GET",
-// 				},
-// 				// ExactMatch: StringToPointer("GET"),
-// 				ExactMatch: StringToPointer("GET"),
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Body: "two",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "regex",
+					Value:   "GET",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "two",
+		},
+	})
 
-// 	r := models.RequestDetails{
-// 		Body:   "foo",
-// 		Method: "MISS",
-// 		Headers: map[string][]string{
-// 			"one":   {"one"},
-// 			"two":   {"one"},
-// 			"three": {"one"},
-// 		},
-// 	}
+	r := models.RequestDetails{
+		Body:   "foo",
+		Method: "MISS",
+		Headers: map[string][]string{
+			"one":   {"one"},
+			"two":   {"one"},
+			"three": {"one"},
+		},
+	}
 
-// 	result := matching.StrongestMatchStrategy(r, false, simulation, map[string]string{})
+	result := matching.StrongestMatchStrategy(r, false, simulation, map[string]string{})
 
-// 	// Expect(result.Error).ToNot(BeNil())
-// 	Expect(result.Pair).To(BeNil())
-// 	// Expect(result.Error.ClosestMiss).ToNot(BeNil())
-// 	Expect(result.Error.ClosestMiss.Response.Body).To(Equal("one"))
-// }
+	Expect(result.Error).ToNot(BeNil())
+	Expect(result.Pair).To(BeNil())
+	Expect(result.Error.ClosestMiss).ToNot(BeNil())
+	Expect(result.Error.ClosestMiss.Response.Body).To(Equal("one"))
+}
 
 func Test_ShouldReturnFieldsMissedInClosestMiss(t *testing.T) {
 	RegisterTestingT(t)
