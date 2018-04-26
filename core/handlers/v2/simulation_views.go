@@ -38,7 +38,7 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV5, e
 		if err != nil {
 			return SimulationViewV5{}, err
 		}
-	} else if schemaVersion == "v4" {
+	} else if schemaVersion == "v4" || schemaVersion == "v3" {
 		err := ValidateSimulation(jsonMap, SimulationViewV4Schema)
 		if err != nil {
 			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation:", schemaVersion) + err.Error())
@@ -52,20 +52,6 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV5, e
 		}
 
 		simulationView = upgradeV4(simulationViewV4)
-	} else if schemaVersion == "v3" {
-		err := ValidateSimulation(jsonMap, SimulationViewV3Schema)
-		if err != nil {
-			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation:", schemaVersion) + err.Error())
-		}
-
-		var simulationViewV3 SimulationViewV3
-
-		err = json.Unmarshal(responseBody, &simulationViewV3)
-		if err != nil {
-			return SimulationViewV5{}, err
-		}
-
-		simulationView = upgradeV3(simulationViewV3)
 	} else if schemaVersion == "v2" {
 		err := ValidateSimulation(jsonMap, SimulationViewV2Schema)
 		if err != nil {

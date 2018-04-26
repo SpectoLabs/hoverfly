@@ -154,9 +154,12 @@ var _ = Describe("/api/v2/journal", func() {
 				req := sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/journal")
 				req.Body(bytes.NewBufferString(`{
 					"request": {
-						"path": {
-							"exactMatch": "/first"
-						}
+						"path": [
+							{
+								"matcher": "exact",
+								"value": "/first"
+							}
+						]
 					}
 				}`))
 				res := functional_tests.DoRequest(req)
