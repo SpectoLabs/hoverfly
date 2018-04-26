@@ -75,15 +75,10 @@ func NewRequestFieldMatchersFromView(matchers *v2.RequestFieldMatchersView) *Req
 	}
 }
 
-func (this RequestFieldMatchers) BuildView() *v2.RequestFieldMatchersView {
-	return &v2.RequestFieldMatchersView{
-		ExactMatch:    this.ExactMatch,
-		XmlMatch:      this.XmlMatch,
-		XpathMatch:    this.XpathMatch,
-		JsonMatch:     this.JsonMatch,
-		JsonPathMatch: this.JsonPathMatch,
-		RegexMatch:    this.RegexMatch,
-		GlobMatch:     this.GlobMatch,
+func (this RequestFieldMatchers) BuildView() v2.MatcherViewV5 {
+	return v2.MatcherViewV5{
+		Matcher: this.Matcher,
+		Value:   this.Value,
 	}
 }
 
@@ -131,46 +126,46 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 	}
 }
 
-func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePairViewV4 {
+func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePairViewV5 {
 
-	var path, method, destination, scheme, query, body *v2.RequestFieldMatchersView
+	var path, method, destination, scheme, query, body []v2.MatcherViewV5
 
 	if this.RequestMatcher.Path != nil {
-		path = this.RequestMatcher.Path.BuildView()
+		path = append(path, this.RequestMatcher.Path.BuildView())
 	}
 
 	if this.RequestMatcher.Method != nil {
-		method = this.RequestMatcher.Method.BuildView()
+		method = append(method, this.RequestMatcher.Method.BuildView())
 	}
 
 	if this.RequestMatcher.Destination != nil {
-		destination = this.RequestMatcher.Destination.BuildView()
+		destination = append(destination, this.RequestMatcher.Destination.BuildView())
 	}
 
 	if this.RequestMatcher.Scheme != nil {
-		scheme = this.RequestMatcher.Scheme.BuildView()
+		scheme = append(scheme, this.RequestMatcher.Scheme.BuildView())
 	}
 
 	if this.RequestMatcher.Query != nil {
-		query = this.RequestMatcher.Query.BuildView()
+		query = append(query, this.RequestMatcher.Query.BuildView())
 	}
 
 	if this.RequestMatcher.Body != nil {
-		body = this.RequestMatcher.Body.BuildView()
+		body = append(body, this.RequestMatcher.Body.BuildView())
 	}
 
-	headersWithMatchers := map[string]*v2.RequestFieldMatchersView{}
+	headersWithMatchers := map[string][]v2.MatcherViewV5{}
 	for key, matcher := range this.RequestMatcher.HeadersWithMatchers {
-		headersWithMatchers[key] = matcher.BuildView()
+		headersWithMatchers[key] = []v2.MatcherViewV5{matcher.BuildView()}
 	}
 
-	queriesWithMatchers := map[string]*v2.RequestFieldMatchersView{}
+	queriesWithMatchers := map[string][]v2.MatcherViewV5{}
 	for key, matcher := range this.RequestMatcher.QueriesWithMatchers {
-		queriesWithMatchers[key] = matcher.BuildView()
+		queriesWithMatchers[key] = []v2.MatcherViewV5{matcher.BuildView()}
 	}
 
-	return v2.RequestMatcherResponsePairViewV4{
-		RequestMatcher: v2.RequestMatcherViewV4{
+	return v2.RequestMatcherResponsePairViewV5{
+		RequestMatcher: v2.RequestMatcherViewV5{
 			Path:                path,
 			Method:              method,
 			Destination:         destination,
@@ -182,7 +177,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 			QueriesWithMatchers: queriesWithMatchers,
 			RequiresState:       this.RequestMatcher.RequiresState,
 		},
-		Response: this.Response.ConvertToResponseDetailsViewV4(),
+		Response: this.Response.ConvertToResponseDetailsViewV5(),
 	}
 }
 

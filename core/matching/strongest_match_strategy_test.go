@@ -532,8 +532,10 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFound(t *testing.T) {
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Pair).To(BeNil())
 	Expect(result.Error.ClosestMiss).ToNot(BeNil())
-	Expect(*result.Error.ClosestMiss.RequestMatcher.Body.ExactMatch).To(Equal(`body`))
-	Expect(*result.Error.ClosestMiss.RequestMatcher.Path.ExactMatch).To(Equal(`path`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Body[0].Matcher).To(Equal(`exact`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Body[0].Value).To(Equal(`body`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Path[0].Matcher).To(Equal(`exact`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Path[0].Value).To(Equal(`path`))
 	Expect(result.Error.ClosestMiss.Response.Body).To(Equal(`two`))
 	Expect(result.Error.ClosestMiss.RequestDetails.Body).To(Equal(`body`))
 }
@@ -613,9 +615,12 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFoundAgain(t *testing.T) {
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Pair).To(BeNil())
 	Expect(result.Error.ClosestMiss).ToNot(BeNil())
-	Expect(*result.Error.ClosestMiss.RequestMatcher.Body.RegexMatch).To(Equal(`.*`))
-	Expect(*result.Error.ClosestMiss.RequestMatcher.Path.ExactMatch).To(Equal(`miss`))
-	Expect(*result.Error.ClosestMiss.RequestMatcher.Method.ExactMatch).To(Equal(`GET`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Body[0].Matcher).To(Equal(`regex`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Body[0].Value).To(Equal(`.*`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Path[0].Matcher).To(Equal(`exact`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Path[0].Value).To(Equal(`miss`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Method[0].Matcher).To(Equal(`exact`))
+	Expect(result.Error.ClosestMiss.RequestMatcher.Method[0].Value).To(Equal(`GET`))
 	Expect(result.Error.ClosestMiss.Response.Body).To(Equal(`one`))
 }
 
@@ -1191,31 +1196,49 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 			"key1": "value2",
 			"key3": "value4",
 		},
-		Response: v2.ResponseDetailsViewV4{
+		Response: v2.ResponseDetailsViewV5{
 			Body: "hello world",
 			Headers: map[string][]string{
 				"hello": {"world"},
 			},
 			Status: 200,
 		},
-		RequestMatcher: v2.RequestMatcherViewV4{
-			Body: &v2.RequestFieldMatchersView{
-				GlobMatch: StringToPointer("hit"),
+		RequestMatcher: v2.RequestMatcherViewV5{
+			Body: []v2.MatcherViewV5{
+				{
+					Matcher: "glob",
+					Value:   "hit",
+				},
 			},
-			Path: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("hit"),
+			Path: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "hit",
+				},
 			},
-			Method: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("miss"),
+			Method: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "miss",
+				},
 			},
-			Destination: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("miss"),
+			Destination: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "miss",
+				},
 			},
-			Query: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("hit"),
+			Query: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "hit",
+				},
 			},
-			Scheme: &v2.RequestFieldMatchersView{
-				ExactMatch: StringToPointer("hit"),
+			Scheme: []v2.MatcherViewV5{
+				{
+					Matcher: "exact",
+					Value:   "hit",
+				},
 			},
 			Headers: map[string][]string{
 				"miss": {"miss"},
@@ -1258,24 +1281,48 @@ Whilst Hoverfly has the following state:
 The matcher which came closest was:
 
 {
-    "path": {
-        "exactMatch": "hit"
-    },
-    "method": {
-        "exactMatch": "miss"
-    },
-    "destination": {
-        "exactMatch": "miss"
-    },
-    "scheme": {
-        "exactMatch": "hit"
-    },
-    "query": {
-        "exactMatch": "hit"
-    },
-    "body": {
-        "globMatch": "hit"
-    },
+    "path": [
+        {
+            "matcher": "exact",
+            "value": "hit",
+            "config": null
+        }
+    ],
+    "method": [
+        {
+            "matcher": "exact",
+            "value": "miss",
+            "config": null
+        }
+    ],
+    "destination": [
+        {
+            "matcher": "exact",
+            "value": "miss",
+            "config": null
+        }
+    ],
+    "scheme": [
+        {
+            "matcher": "exact",
+            "value": "hit",
+            "config": null
+        }
+    ],
+    "query": [
+        {
+            "matcher": "exact",
+            "value": "hit",
+            "config": null
+        }
+    ],
+    "body": [
+        {
+            "matcher": "glob",
+            "value": "hit",
+            "config": null
+        }
+    ],
     "headers": {
         "miss": [
             "miss"

@@ -392,6 +392,8 @@ func Test_FirstMatchStrategy_RequestMatcherResponsePairCanBeConvertedToARequestR
 	requestMatcherResponsePair := models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "POST",
 				ExactMatch: &method,
 			},
 		},
@@ -400,7 +402,7 @@ func Test_FirstMatchStrategy_RequestMatcherResponsePairCanBeConvertedToARequestR
 
 	pairView := requestMatcherResponsePair.BuildView()
 
-	Expect(pairView.RequestMatcher.Method.ExactMatch).To(Equal(StringToPointer("POST")))
+	Expect(pairView.RequestMatcher.Method[0].Value).To(Equal("POST"))
 	Expect(pairView.RequestMatcher.Destination).To(BeNil())
 	Expect(pairView.RequestMatcher.Path).To(BeNil())
 	Expect(pairView.RequestMatcher.Scheme).To(BeNil())
@@ -499,6 +501,8 @@ func Test_FirstMatchStrategy_RequestMatcherResponsePair_ConvertToRequestResponse
 	requestMatcherResponsePair := models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "POST",
 				ExactMatch: &method,
 			},
 		},
@@ -507,7 +511,8 @@ func Test_FirstMatchStrategy_RequestMatcherResponsePair_ConvertToRequestResponse
 
 	pairView := requestMatcherResponsePair.BuildView()
 
-	Expect(pairView.RequestMatcher.Method.ExactMatch).To(Equal(StringToPointer("POST")))
+	Expect(pairView.RequestMatcher.Method[0].Matcher).To(Equal("exact"))
+	Expect(pairView.RequestMatcher.Method[0].Value).To(Equal("POST"))
 	Expect(pairView.RequestMatcher.Destination).To(BeNil())
 	Expect(pairView.RequestMatcher.Path).To(BeNil())
 	Expect(pairView.RequestMatcher.Scheme).To(BeNil())

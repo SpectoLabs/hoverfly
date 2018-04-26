@@ -132,9 +132,9 @@ func NewMetaView(version string) *MetaView {
 	}
 }
 
-func BuildSimulationView(pairViews []RequestMatcherResponsePairViewV4, delayView v1.ResponseDelayPayloadView, version string) SimulationViewV4 {
-	return SimulationViewV4{
-		DataViewV4{
+func BuildSimulationView(pairViews []RequestMatcherResponsePairViewV5, delayView v1.ResponseDelayPayloadView, version string) SimulationViewV5 {
+	return SimulationViewV5{
+		DataViewV5{
 			RequestResponsePairs: pairViews,
 			GlobalActions: GlobalActionsView{
 				Delays: delayView.Data,

@@ -165,12 +165,12 @@ func (this Hoverfly) WriteLogsIfError() {
 	ginkgo.GinkgoWriter.Write(logs) // Only writes when test fails
 }
 
-func (this Hoverfly) ExportSimulation() v2.SimulationViewV4 {
+func (this Hoverfly) ExportSimulation() v2.SimulationViewV5 {
 	reader := this.GetSimulation()
 	simulationBytes, err := ioutil.ReadAll(reader)
 	Expect(err).To(BeNil())
 
-	var simulation v2.SimulationViewV4
+	var simulation v2.SimulationViewV5
 
 	err = json.Unmarshal(simulationBytes, &simulation)
 	Expect(err).To(BeNil())

@@ -275,6 +275,41 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV4() v2.ResponseDetailsVie
 	}
 }
 
+func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsViewV5 {
+	needsEncoding := false
+
+	// Check headers for gzip
+	contentEncodingValues := r.Headers["Content-Encoding"]
+	if len(contentEncodingValues) > 0 {
+		needsEncoding = true
+	} else {
+		mimeType := http.DetectContentType([]byte(r.Body))
+		needsEncoding = true
+		for _, v := range supportedMimeTypes {
+			if strings.Contains(mimeType, v) {
+				needsEncoding = false
+				break
+			}
+		}
+	}
+
+	// If contains gzip, base64 encode
+	body := r.Body
+	if needsEncoding {
+		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
+	}
+
+	return v2.ResponseDetailsViewV5{
+		Status:           r.Status,
+		Body:             body,
+		Headers:          r.Headers,
+		EncodedBody:      needsEncoding,
+		Templated:        r.Templated,
+		RemovesState:     r.RemovesState,
+		TransitionsState: r.TransitionsState,
+	}
+}
+
 func (this RequestDetails) GetRawQuery() string {
 	return this.rawQuery
 }

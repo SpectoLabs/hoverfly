@@ -58,8 +58,10 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 				expectedDestination := strings.Replace(fakeServerUrl.String(), "http://", "", 1)
 				simulation := hoverfly.ExportSimulation()
 
-				Expect(*simulation.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal(expectedDestination))
-				Expect(*simulation.RequestResponsePairs[0].RequestMatcher.Body.ExactMatch).To(Equal("CHANGED_REQUEST_BODY"))
+				Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+				Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal(expectedDestination))
+				Expect(simulation.RequestResponsePairs[0].RequestMatcher.Body[0].Matcher).To(Equal("exact"))
+				Expect(simulation.RequestResponsePairs[0].RequestMatcher.Body[0].Value).To(Equal("CHANGED_REQUEST_BODY"))
 			})
 		})
 	})

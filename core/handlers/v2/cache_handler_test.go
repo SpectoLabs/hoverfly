@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
 
@@ -26,23 +25,29 @@ func (this HoverflyCacheStub) GetCache() (CacheView, error) {
 	return CacheView{
 		Cache: []CachedResponseView{
 			CachedResponseView{
-				MatchingPair: &RequestMatcherResponsePairViewV4{
-					RequestMatcher: RequestMatcherViewV4{
-						Destination: &RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("one"),
+				MatchingPair: &RequestMatcherResponsePairViewV5{
+					RequestMatcher: RequestMatcherViewV5{
+						Destination: []MatcherViewV5{
+							MatcherViewV5{
+								Matcher: "exact",
+								Value:   "one",
+							},
 						},
 					},
-					Response: ResponseDetailsViewV4{},
+					Response: ResponseDetailsViewV5{},
 				},
 			},
 			CachedResponseView{
-				MatchingPair: &RequestMatcherResponsePairViewV4{
-					RequestMatcher: RequestMatcherViewV4{
-						Destination: &RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("two"),
+				MatchingPair: &RequestMatcherResponsePairViewV5{
+					RequestMatcher: RequestMatcherViewV5{
+						Destination: []MatcherViewV5{
+							MatcherViewV5{
+								Matcher: "exact",
+								Value:   "two",
+							},
 						},
 					},
-					Response: ResponseDetailsViewV4{},
+					Response: ResponseDetailsViewV5{},
 				},
 			},
 		},
@@ -76,8 +81,10 @@ func Test_Get_ReturnsTheCache(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(cacheView.Cache).To(HaveLen(2))
-	Expect(*cacheView.Cache[0].MatchingPair.RequestMatcher.Destination.ExactMatch).To(Equal("one"))
-	Expect(*cacheView.Cache[1].MatchingPair.RequestMatcher.Destination.ExactMatch).To(Equal("two"))
+	Expect(cacheView.Cache[0].MatchingPair.RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(cacheView.Cache[0].MatchingPair.RequestMatcher.Destination[0].Value).To(Equal("one"))
+	Expect(cacheView.Cache[1].MatchingPair.RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(cacheView.Cache[1].MatchingPair.RequestMatcher.Destination[0].Value).To(Equal("two"))
 }
 
 func Test_Get_ReturnsNiceErrorMessage(t *testing.T) {

@@ -36,7 +36,8 @@ var _ = Describe("/api/v2/cache", func() {
 
 			Expect(cacheView.Cache).To(HaveLen(1))
 
-			Expect(*cacheView.Cache[0].MatchingPair.RequestMatcher.Destination.ExactMatch).To(Equal("destination-server.com"))
+			Expect(cacheView.Cache[0].MatchingPair.RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+			Expect(cacheView.Cache[0].MatchingPair.RequestMatcher.Destination[0].Value).To(Equal("destination-server.com"))
 
 			Expect(cacheView.Cache[0].MatchingPair.Response.Status).To(Equal(200))
 			Expect(cacheView.Cache[0].MatchingPair.Response.Body).To(Equal("destination matched"))
@@ -59,7 +60,8 @@ var _ = Describe("/api/v2/cache", func() {
 			Expect(cacheView.Cache[0].MatchingPair).To(BeNil())
 			Expect(cacheView.Cache[0].ClosestMiss).ToNot(BeNil())
 
-			Expect(*cacheView.Cache[0].ClosestMiss.RequestMatcher.Destination.ExactMatch).To(Equal("miss"))
+			Expect(cacheView.Cache[0].MatchingPair.RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+			Expect(cacheView.Cache[0].MatchingPair.RequestMatcher.Destination[0].Value).To(Equal("miss"))
 			Expect(cacheView.Cache[0].ClosestMiss.MissedFields).To(ConsistOf("destination"))
 			Expect(cacheView.Cache[0].ClosestMiss.Response.Body).To(Equal("body"))
 		})
