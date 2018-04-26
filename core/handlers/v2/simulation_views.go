@@ -141,7 +141,7 @@ type MetaView struct {
 func NewMetaView(version string) *MetaView {
 	return &MetaView{
 		HoverflyVersion: version,
-		SchemaVersion:   "v4",
+		SchemaVersion:   "v5",
 		TimeExported:    time.Now().Format(time.RFC3339),
 	}
 }
