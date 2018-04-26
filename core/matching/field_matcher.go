@@ -5,10 +5,12 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
-func UnscoredFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *FieldMatch {
-	if field == nil {
+func UnscoredFieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMatch {
+	if fields == nil || len(fields) == 0 {
 		return FieldMatchWithNoScore(true)
 	}
+
+	field := fields[0]
 
 	switch field.Matcher {
 	case "exact":
@@ -44,13 +46,15 @@ func UnscoredFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *F
 	return FieldMatchWithNoScore(true)
 }
 
-func ScoredFieldMatcher(field *models.RequestFieldMatchers, toMatch string) *FieldMatch {
+func ScoredFieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMatch {
 
 	fieldMatch := &FieldMatch{Matched: true}
 
-	if field == nil {
+	if fields == nil || len(fields) == 0 {
 		return fieldMatch
 	}
+
+	field := fields[0]
 
 	switch field.Matcher {
 	case "exact":

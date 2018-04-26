@@ -16,7 +16,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
 
@@ -240,14 +239,23 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromCache(t *testing.T) {
 		Scheme:      "http",
 	}, &models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
-			Destination: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("somehost.com"),
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "somehost.com",
+				},
 			},
-			Method: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("POST"),
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "POST",
+				},
 			},
-			Scheme: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("http"),
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "http",
+				},
 			},
 		},
 		Response: models.ResponseDetails{
@@ -276,14 +284,23 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *tes
 
 	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
-			Destination: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("somehost.com"),
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "somehost.com",
+				},
 			},
-			Method: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("POST"),
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "POST",
+				},
 			},
-			Scheme: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("http"),
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "http",
+				},
 			},
 		},
 		Response: models.ResponseDetails{
@@ -312,14 +329,23 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 
 	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
-			Destination: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("somehost.com"),
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "somehost.com",
+				},
 			},
-			Method: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("POST"),
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "POST",
+				},
 			},
-			Scheme: &models.RequestFieldMatchers{
-				ExactMatch: util.StringToPointer("http"),
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "http",
+				},
 			},
 		},
 		Response: models.ResponseDetails{
@@ -407,16 +433,19 @@ func Test_Hoverfly_GetResponse_WillCacheClosestMiss(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
-	unit.PutSimulation(v2.SimulationViewV4{
-		v2.DataViewV4{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV4{
+	unit.PutSimulation(v2.SimulationViewV5{
+		v2.DataViewV5{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
 				{
-					RequestMatcher: v2.RequestMatcherViewV4{
-						Method: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("closest"),
+					RequestMatcher: v2.RequestMatcherViewV5{
+						Method: []v2.MatcherViewV5{
+							{
+								Matcher: "exact",
+								Value:   "closest",
+							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV4{
+					Response: v2.ResponseDetailsViewV5{
 						Body: "closest",
 					},
 				},
@@ -699,12 +728,24 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
 
-	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body.ExactMatch).To(Equal("testbody"))
-	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Destination.ExactMatch).To(Equal("testdestination"))
-	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Method.ExactMatch).To(Equal("testmethod"))
-	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Path.ExactMatch).To(Equal("/testpath"))
-	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query.ExactMatch).To(Equal("query=test"))
-	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Scheme.ExactMatch).To(Equal("http"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body[0].Matcher).To(Equal("exact"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body[0].Value).To(Equal("testbody"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Destination).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Method).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Method[0].Matcher).To(Equal("exact"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Method[0].Value).To(Equal("testmethod"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Path).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Path[0].Matcher).To(Equal("exact"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Path[0].Value).To(Equal("/testpath"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query[0].Matcher).To(Equal("exact"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query[0].Value).To(Equal("query=test"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Scheme).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Scheme[0].Matcher).To(Equal("exact"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Scheme[0].Value).To(Equal("http"))
 
 	Expect(unit.Simulation.GetMatchingPairs()[0].Response.Body).To(Equal("testresponsebody"))
 	Expect(unit.Simulation.GetMatchingPairs()[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
@@ -824,8 +865,10 @@ func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
 
-	// Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Body).To(BeNil())
-	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Destination.ExactMatch).To(Equal("testdestination"))
+	// Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Body).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Destination).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
 	// Expect(unit.Simulation.MatchingPairs[0].RequestMatcher.Headers).To(BeNil())
 	// Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Method).To(BeNil())
 	// Expect(*unit.Simulation.MatchingPairs[0].RequestMatcher.Path).To(BeNil())
@@ -851,7 +894,9 @@ func Test_Hoverfly_Save_SavesRequestBodyAsJsonPathIfContentTypeIsJson(t *testing
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
 
-	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body.JsonMatch).To(Equal(`{"test": []}`))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body[0].Matcher).To(Equal("json"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body[0].Value).To(Equal(`{"test": []}`))
 }
 
 func Test_Hoverfly_Save_SavesRequestBodyAsXmlPathIfContentTypeIsXml(t *testing.T) {
@@ -868,7 +913,9 @@ func Test_Hoverfly_Save_SavesRequestBodyAsXmlPathIfContentTypeIsXml(t *testing.T
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
 
-	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body.XmlMatch).To(Equal(`<xml>`))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body[0].Matcher).To(Equal("xml"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body[0].Value).To(Equal(`<xml>`))
 }
 
 func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
@@ -878,9 +925,12 @@ func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
 		"data": {
 			"pairs": [{
 					"request": {
-						"path": {
-							"exactMatch": "/basket"
-						}
+						"path": [
+							{
+								"matcher": "exact",
+								"value": "/basket"
+							}
+						]
 					},
 					"response": {
 						"status": 200,
@@ -889,9 +939,12 @@ func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
 				},
 				{
 					"request": {
-						"path": {
-							"exactMatch": "/basket"
-						},
+						"path": [
+							{
+								"matcher": "exact",
+								"value": "/basket"
+							}
+						],
 						"requiresState": {
 							"eggs": "present"
 						}
@@ -903,9 +956,12 @@ func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
 				},
 				{
 					"request": {
-						"path": {
-							"exactMatch": "/basket"
-						},
+						"path": [
+							{
+								"matcher": "exact",
+								"value": "/basket"
+							}
+						],
 						"requiresState": {
 							"bacon": "present"
 						}
@@ -917,9 +973,12 @@ func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
 				},
 				{
 					"request": {
-						"path": {
-							"exactMatch": "/basket"
-						},
+						"path": [
+							{
+								"matcher": "exact",
+								"value": "/basket"
+							}
+						],
 						"requiresState": {
 							"eggs": "present",
 							"bacon": "present"
@@ -932,9 +991,12 @@ func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
 				},
 				{
 					"request": {
-						"path": {
-							"exactMatch": "/add-eggs"
-						}
+						"path": [
+							{
+								"matcher": "exact",
+								"value": "/add-eggs"
+							}
+						]
 					},
 					"response": {
 						"status": 200,
@@ -946,9 +1008,12 @@ func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
 				},
 				{
 					"request": {
-						"path": {
-							"exactMatch": "/add-bacon"
-						}
+						"path": [
+							{
+								"matcher": "exact",
+								"value": "/add-bacon"
+							}
+						]
 					},
 					"response": {
 						"status": 200,
@@ -960,9 +1025,12 @@ func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
 				},
 				{
 					"request": {
-						"path": {
-							"exactMatch": "/remove-eggs"
-						}
+						"path": [
+							{
+								"matcher": "exact",
+								"value": "/remove-eggs"
+							}
+						]
 					},
 					"response": {
 						"status": 200,
@@ -972,9 +1040,12 @@ func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
 				},
 				{
 					"request": {
-						"path": {
-							"exactMatch": "/remove-bacon"
-						}
+						"path": [
+							{
+								"matcher": "exact",
+								"value": "/remove-bacon"
+							}
+						]
 					},
 					"response": {
 						"status": 200,
@@ -988,21 +1059,21 @@ func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
 			}
 		},
 		"meta": {
-			"schemaVersion": "v4",
+			"schemaVersion": "v5",
 			"hoverflyVersion": "v0.10.2",
 			"timeExported": "2017-02-23T12:43:48Z"
 		}
 	}`
 
-	v4 := &v2.SimulationViewV4{}
+	v5 := &v2.SimulationViewV5{}
 
-	json.Unmarshal([]byte(simulation), v4)
+	json.Unmarshal([]byte(simulation), v5)
 
 	hoverfly := NewHoverfly()
 	hoverfly.CacheMatcher = matching.CacheMatcher{
 		RequestCache: cache.NewInMemoryCache(),
 	}
-	hoverfly.PutSimulation(*v4)
+	hoverfly.PutSimulation(*v5)
 
 	hoverfly.SetMode("simulate")
 
