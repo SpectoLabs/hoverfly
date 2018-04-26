@@ -230,12 +230,12 @@ func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV5
 	for _, v := range hf.Simulation.GetMatchingPairs() {
 
 		var urlStringToMatch string
-		// if v.RequestMatcher.Destination != nil {
-		// 	urlStringToMatch += util.PointerToString(v.RequestMatcher.Destination.ExactMatch)
-		// }
-		// if v.RequestMatcher.Path != nil {
-		// 	urlStringToMatch += util.PointerToString(v.RequestMatcher.Path.ExactMatch)
-		// }
+		if v.RequestMatcher.Destination != nil && len(v.RequestMatcher.Destination) != 0 && v.RequestMatcher.Destination[0].Matcher == "exact" {
+			urlStringToMatch += v.RequestMatcher.Destination[0].Value.(string)
+		}
+		if v.RequestMatcher.Path != nil && len(v.RequestMatcher.Path) != 0 && v.RequestMatcher.Path[0].Matcher == "exact" {
+			urlStringToMatch += v.RequestMatcher.Path[0].Value.(string)
+		}
 
 		if regexPattern.MatchString(urlStringToMatch) {
 			pairViews = append(pairViews, v.BuildView())

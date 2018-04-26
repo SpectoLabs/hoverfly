@@ -73,34 +73,34 @@ func Test_CacheMatcher_PreloadCache_WillReturnErrorIfCacheIsNil(t *testing.T) {
 	Expect(err.Error()).To(Equal("No cache set"))
 }
 
-// func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *testing.T) {
-// 	RegisterTestingT(t)
-// 	unit := matching.CacheMatcher{
-// 		RequestCache: cache.NewInMemoryCache(),
-// 	}
+func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *testing.T) {
+	RegisterTestingT(t)
+	unit := matching.CacheMatcher{
+		RequestCache: cache.NewInMemoryCache(),
+	}
 
-// 	simulation := models.NewSimulation()
+	simulation := models.NewSimulation()
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Body: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "regex",
-// 					Value:   "loose",
-// 				},
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Status: 200,
-// 			Body:   "body",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "regex",
+					Value:   "loose",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "body",
+		},
+	})
 
-// 	err := unit.PreloadCache(*simulation)
+	err := unit.PreloadCache(*simulation)
 
-// 	Expect(err).To(BeNil())
-// 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
-// }
+	Expect(err).To(BeNil())
+	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
+}
 
 func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMatchers(t *testing.T) {
 	RegisterTestingT(t)
@@ -162,34 +162,34 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMa
 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(1))
 }
 
-// func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWithoutExactMatches(t *testing.T) {
-// 	RegisterTestingT(t)
-// 	unit := matching.CacheMatcher{
-// 		RequestCache: cache.NewInMemoryCache(),
-// 	}
+func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWithoutExactMatches(t *testing.T) {
+	RegisterTestingT(t)
+	unit := matching.CacheMatcher{
+		RequestCache: cache.NewInMemoryCache(),
+	}
 
-// 	simulation := models.NewSimulation()
+	simulation := models.NewSimulation()
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Destination: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "regex",
-// 					Value:   "destination",
-// 				},
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Status: 200,
-// 			Body:   "body",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: "regex",
+					Value:   "destination",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "body",
+		},
+	})
 
-// 	err := unit.PreloadCache(*simulation)
+	err := unit.PreloadCache(*simulation)
 
-// 	Expect(err).To(BeNil())
-// 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
-// }
+	Expect(err).To(BeNil())
+	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
+}
 
 func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *testing.T) {
 	RegisterTestingT(t)
@@ -265,79 +265,79 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(1))
 }
 
-// func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T) {
-// 	RegisterTestingT(t)
-// 	unit := matching.CacheMatcher{
-// 		RequestCache: cache.NewInMemoryCache(),
-// 	}
+func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T) {
+	RegisterTestingT(t)
+	unit := matching.CacheMatcher{
+		RequestCache: cache.NewInMemoryCache(),
+	}
 
-// 	simulation := models.NewSimulation()
+	simulation := models.NewSimulation()
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Destination: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "regex",
-// 					Value:   "destination",
-// 				},
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Status: 200,
-// 			Body:   "body",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: "regex",
+					Value:   "destination",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "body",
+		},
+	})
 
-// 	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
-// 		RequestMatcher: models.RequestMatcher{
-// 			Body: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "body",
-// 				},
-// 			},
-// 			Destination: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "destination",
-// 				},
-// 			},
-// 			Headers: map[string][]string{
-// 				"Headers": {"value"},
-// 			},
-// 			Method: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "method",
-// 				},
-// 			},
-// 			Path: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "path",
-// 				},
-// 			},
-// 			Query: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "query",
-// 				},
-// 			},
-// 			Scheme: []models.RequestFieldMatchers{
-// 				{
-// 					Matcher: "exact",
-// 					Value:   "scheme",
-// 				},
-// 			},
-// 		},
-// 		Response: models.ResponseDetails{
-// 			Status: 200,
-// 			Body:   "body",
-// 		},
-// 	})
+	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "body",
+				},
+			},
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "destination",
+				},
+			},
+			Headers: map[string][]string{
+				"Headers": {"value"},
+			},
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "method",
+				},
+			},
+			Path: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "path",
+				},
+			},
+			Query: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "query",
+				},
+			},
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "scheme",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "body",
+		},
+	})
 
-// 	err := unit.PreloadCache(*simulation)
+	err := unit.PreloadCache(*simulation)
 
-// 	Expect(err).To(BeNil())
-// 	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
-// }
+	Expect(err).To(BeNil())
+	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
+}

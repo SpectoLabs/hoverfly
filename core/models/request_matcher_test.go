@@ -167,102 +167,102 @@ func Test_NewRequestMatcherResponsePairFromView_StoresTemplated(t *testing.T) {
 	Expect(unit.Response.Templated).To(BeTrue())
 }
 
-// func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDetails(t *testing.T) {
-// 	RegisterTestingT(t)
+func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDetails(t *testing.T) {
+	RegisterTestingT(t)
 
-// 	unit := models.RequestMatcher{
-// 		Body: []models.RequestFieldMatchers{
-// 			{
-// 				Matcher: "exact",
-// 				Value:   "body",
-// 			},
-// 		},
-// 		Destination: []models.RequestFieldMatchers{
-// 			{
-// 				Matcher: "exact",
-// 				Value:   "destination",
-// 			},
-// 		},
-// 		Method: []models.RequestFieldMatchers{
-// 			{
-// 				Matcher: "exact",
-// 				Value:   "method",
-// 			},
-// 		},
-// 		Path: []models.RequestFieldMatchers{
-// 			{
-// 				Matcher: "exact",
-// 				Value:   "path",
-// 			},
-// 		},
-// 		Query: []models.RequestFieldMatchers{
-// 			{
-// 				Matcher: "exact",
-// 				Value:   "query=two",
-// 			},
-// 		},
-// 		Scheme: []models.RequestFieldMatchers{
-// 			{
-// 				Matcher: "exact",
-// 				Value:   "scheme",
-// 			},
-// 		},
-// 	}
+	unit := models.RequestMatcher{
+		Body: []models.RequestFieldMatchers{
+			{
+				Matcher: "exact",
+				Value:   "body",
+			},
+		},
+		Destination: []models.RequestFieldMatchers{
+			{
+				Matcher: "exact",
+				Value:   "destination",
+			},
+		},
+		Method: []models.RequestFieldMatchers{
+			{
+				Matcher: "exact",
+				Value:   "method",
+			},
+		},
+		Path: []models.RequestFieldMatchers{
+			{
+				Matcher: "exact",
+				Value:   "path",
+			},
+		},
+		Query: []models.RequestFieldMatchers{
+			{
+				Matcher: "exact",
+				Value:   "query=two",
+			},
+		},
+		Scheme: []models.RequestFieldMatchers{
+			{
+				Matcher: "exact",
+				Value:   "scheme",
+			},
+		},
+	}
 
-// 	Expect(unit.ToEagerlyCachable()).ToNot(BeNil())
-// 	Expect(unit.ToEagerlyCachable()).To(Equal(&models.RequestDetails{
-// 		Body:        "body",
-// 		Destination: "destination",
-// 		Method:      "method",
-// 		Path:        "path",
-// 		Query:       map[string][]string{"query": []string{"two"}},
-// 		Scheme:      "scheme",
-// 	}))
-// }
+	Expect(unit.ToEagerlyCachable()).ToNot(BeNil())
+	Expect(unit.ToEagerlyCachable()).To(Equal(&models.RequestDetails{
+		Body:        "body",
+		Destination: "destination",
+		Method:      "method",
+		Path:        "path",
+		Query:       map[string][]string{"query": []string{"two"}},
+		Scheme:      "scheme",
+	}))
+}
 
-// func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfEmpty(t *testing.T) {
-// 	RegisterTestingT(t)
+func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfEmpty(t *testing.T) {
+	RegisterTestingT(t)
 
-// 	unit := models.RequestMatcher{}
+	unit := models.RequestMatcher{}
 
-// 	Expect(unit.ToEagerlyCachable()).To(BeNil())
-// }
+	Expect(unit.ToEagerlyCachable()).To(BeNil())
+}
 
-// func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissingAnExactMatch(t *testing.T) {
-// 	RegisterTestingT(t)
+func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissingAnExactMatch(t *testing.T) {
+	RegisterTestingT(t)
 
-// 	unit := models.RequestMatcher{
-// 		Destination: []models.RequestFieldMatchers{
-// 			{
-// 				Matcher: "exact",
-// 				Value:   "destination",
-// 			},
-// 		},
-// 		Method: []models.RequestFieldMatchers{
-// 			{
-// 				Matcher: "exact",
-// 				Value:   "method",
-// 			},
-// 		},
-// 		Path: []models.RequestFieldMatchers{
-// 			{
-// 				Matcher: "exact",
-// 				Value:   "path",
-// 			},
-// 		},
-// 		Query: []models.RequestFieldMatchers{
-// 			{
-// 				Matcher: "exact",
-// 				Value:   "query",
-// 			},
-// 		},
-// 		Scheme: []models.RequestFieldMatchers{
-// 			{
-// 				Matcher: "exact",
-// 				Value:   "query",
-// 			},
-// 		},
-// 	}
+	unit := models.RequestMatcher{
+		Destination: []models.RequestFieldMatchers{
+			{
+				Matcher: "exact",
+				Value:   "destination",
+			},
+		},
+		Method: []models.RequestFieldMatchers{
+			{
+				Matcher: "exact",
+				Value:   "method",
+			},
+		},
+		Path: []models.RequestFieldMatchers{
+			{
+				Matcher: "exact",
+				Value:   "path",
+			},
+		},
+		Query: []models.RequestFieldMatchers{
+			{
+				Matcher: "exact",
+				Value:   "query",
+			},
+		},
+		Scheme: []models.RequestFieldMatchers{
+			{
+				Matcher: "exact",
+				Value:   "query",
+			},
+		},
+	}
 
-// 	Expect(unit.ToEagerlyCachable()).To(BeNil())
-// }
+	Expect(unit.ToEagerlyCachable()).To(BeNil())
+}
