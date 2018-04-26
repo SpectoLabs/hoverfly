@@ -120,11 +120,13 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 				RequiresState: nil,
 			},
 			Response: ResponseDetailsViewV5{
-				Body:        pairV1.Response.Body,
-				EncodedBody: pairV1.Response.EncodedBody,
-				Headers:     pairV1.Response.Headers,
-				Status:      pairV1.Response.Status,
-				Templated:   false,
+				Body:             pairV1.Response.Body,
+				EncodedBody:      pairV1.Response.EncodedBody,
+				Headers:          pairV1.Response.Headers,
+				Status:           pairV1.Response.Status,
+				Templated:        false,
+				TransitionsState: nil,
+				RemovesState:     nil,
 			},
 		}
 		pairs = append(pairs, pair)
@@ -183,11 +185,13 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
 				RequiresState: nil,
 			},
 			Response: ResponseDetailsViewV5{
-				Body:        requestResponsePairV2.Response.Body,
-				EncodedBody: requestResponsePairV2.Response.EncodedBody,
-				Headers:     requestResponsePairV2.Response.Headers,
-				Status:      requestResponsePairV2.Response.Status,
-				Templated:   false,
+				Body:             requestResponsePairV2.Response.Body,
+				EncodedBody:      requestResponsePairV2.Response.EncodedBody,
+				Headers:          requestResponsePairV2.Response.Headers,
+				Status:           requestResponsePairV2.Response.Status,
+				Templated:        false,
+				TransitionsState: nil,
+				RemovesState:     nil,
 			},
 		}
 
@@ -248,11 +252,13 @@ func upgradeV3(originalSimulation SimulationViewV3) SimulationViewV5 {
 				RequiresState: nil,
 			},
 			Response: ResponseDetailsViewV5{
-				Body:        requestResponsePairV2.Response.Body,
-				EncodedBody: requestResponsePairV2.Response.EncodedBody,
-				Headers:     requestResponsePairV2.Response.Headers,
-				Status:      requestResponsePairV2.Response.Status,
-				Templated:   requestResponsePairV2.Response.Templated,
+				Body:             requestResponsePairV2.Response.Body,
+				EncodedBody:      requestResponsePairV2.Response.EncodedBody,
+				Headers:          requestResponsePairV2.Response.Headers,
+				Status:           requestResponsePairV2.Response.Status,
+				Templated:        requestResponsePairV2.Response.Templated,
+				TransitionsState: nil,
+				RemovesState:     nil,
 			},
 		}
 
@@ -313,11 +319,13 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 				RequiresState: requestResponsePairV2.RequestMatcher.RequiresState,
 			},
 			Response: ResponseDetailsViewV5{
-				Body:        requestResponsePairV2.Response.Body,
-				EncodedBody: requestResponsePairV2.Response.EncodedBody,
-				Headers:     requestResponsePairV2.Response.Headers,
-				Status:      requestResponsePairV2.Response.Status,
-				Templated:   requestResponsePairV2.Response.Templated,
+				Body:             requestResponsePairV2.Response.Body,
+				EncodedBody:      requestResponsePairV2.Response.EncodedBody,
+				Headers:          requestResponsePairV2.Response.Headers,
+				Status:           requestResponsePairV2.Response.Status,
+				Templated:        requestResponsePairV2.Response.Templated,
+				TransitionsState: requestResponsePairV2.Response.TransitionsState,
+				RemovesState:     requestResponsePairV2.Response.RemovesState,
 			},
 		}
 
