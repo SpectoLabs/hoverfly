@@ -66,24 +66,6 @@ func Test_CountlessFieldMatcher_MatchesTrue_WithMatchersNotDefined(t *testing.T)
 	Expect(matching.UnscoredFieldMatcher([]models.RequestFieldMatchers{}, "test").Matched).To(BeTrue())
 }
 
-// func Test_CountlessFieldMatcher_WithMultipleMatchers_MatchesTrue(t *testing.T) {
-// 	RegisterTestingT(t)
-
-// 	Expect(matching.UnscoredFieldMatcher([]models.RequestFieldMatchers{
-// 		ExactMatch: util.StringToPointer("testtesttest"),
-// 		RegexMatch: util.StringToPointer("test"),
-// 	}, `testtesttest`).Matched).To(BeTrue())
-// }
-
-// func Test_CountlessFieldMatcher_WithMultipleMatchers_AlsoMatchesTrue(t *testing.T) {
-// 	RegisterTestingT(t)
-
-// 	Expect(matching.UnscoredFieldMatcher([]models.RequestFieldMatchers{
-// 		XpathMatch: util.StringToPointer("/list/item[1]/field"),
-// 		RegexMatch: util.StringToPointer("test"),
-// 	}, xml.Header+"<list><item><field>test</field></item></list>").Matched).To(BeTrue())
-// }
-
 func Test_ScoredFieldMatcher_MatchesTrue_WithNilMatchers(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -142,15 +124,6 @@ func Test_ScoredFieldMatcher_MatchesTrue_WithMatchersNotDefined(t *testing.T) {
 	Expect(matching.ScoredFieldMatcher([]models.RequestFieldMatchers{}, "test").Matched).To(BeTrue())
 }
 
-// func Test_ScoredFieldMatcher_WithMultipleMatchers_MatchesTrue(t *testing.T) {
-// 	RegisterTestingT(t)
-
-// 	Expect(matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
-// 		ExactMatch: util.StringToPointer("testtesttest"),
-// 		RegexMatch: util.StringToPointer("test"),
-// 	}, `testtesttest`).Matched).To(BeTrue())
-// }
-
 func Test_ScoredFieldMatcher_WithExactMatch_ScoresDouble(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -161,15 +134,6 @@ func Test_ScoredFieldMatcher_WithExactMatch_ScoresDouble(t *testing.T) {
 		},
 	}, `testtesttest`).MatchScore).To(Equal(2))
 }
-
-// func Test_ScoredFieldMatcher_WithMultipleMatchers_AlsoMatchesTrue(t *testing.T) {
-// 	RegisterTestingT(t)
-
-// 	Expect(matching.ScoredFieldMatcher(&models.RequestFieldMatchers{
-// 		XpathMatch: util.StringToPointer("/list/item[1]/field"),
-// 		RegexMatch: util.StringToPointer("test"),
-// 	}, xml.Header+"<list><item><field>test</field></item></list>").Matched).To(BeTrue())
-// }
 
 func Test_ScoredFieldMatcher_CountZero_WhenFieldIsNil(t *testing.T) {
 	RegisterTestingT(t)
