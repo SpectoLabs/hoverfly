@@ -44,7 +44,7 @@ var queryMatchingTests = []queryMatchingTest{
 		equals: BeFalse(),
 	},
 	{
-		name: "2 headers",
+		name: "2 query parameters",
 		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
 			"query1": {
 				ExactMatch: util.StringToPointer("val1"),
@@ -61,7 +61,7 @@ var queryMatchingTests = []queryMatchingTest{
 		matchEquals: Equal(3),
 	},
 	{
-		name: "2 headers fail missing query",
+		name: "2 query parameters fail missing query",
 		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
 			"query1": {
 				ExactMatch: util.StringToPointer("val1"),
@@ -77,7 +77,7 @@ var queryMatchingTests = []queryMatchingTest{
 		matchEquals: Equal(2),
 	},
 	{
-		name: "2 headers fail bad match",
+		name: "2 query parameters fail bad match",
 		queriesWithMatchers: map[string]*models.RequestFieldMatchers{
 			"query1": {
 				ExactMatch: util.StringToPointer("val1"),
