@@ -55,6 +55,10 @@ var _ = Describe("Capture > export > importing > simulate flow", func() {
 
 				// Wipe the records in Hoverfly
 				EraseHoverflySimulation()
+				buf := new(bytes.Buffer)
+				buf.ReadFrom(exportedRecords)
+				fmt.Println("fucking hell")
+				fmt.Println(buf.String())
 
 				// Import the same data into Hoverfly
 				ImportHoverflySimulation(exportedRecords)

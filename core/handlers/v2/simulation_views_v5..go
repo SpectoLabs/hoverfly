@@ -36,7 +36,7 @@ type RequestMatcherViewV5 struct {
 type MatcherViewV5 struct {
 	Matcher string                 `json:"matcher"`
 	Value   interface{}            `json:"value"`
-	Config  map[string]interface{} `json:"config"`
+	Config  map[string]interface{} `json:"config,omitempty"`
 }
 
 //Gets Response - required for interfaces.RequestResponsePairView

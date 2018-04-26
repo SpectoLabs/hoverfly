@@ -174,22 +174,19 @@ The matcher which came closest was:
     "path": [
         {
             "matcher": "exact",
-            "value": "/closest-miss",
-            "config": null
+            "value": "/closest-miss"
         }
     ],
     "destination": [
         {
             "matcher": "exact",
-            "value": "destination.com",
-            "config": null
+            "value": "destination.com"
         }
     ],
     "body": [
         {
             "matcher": "exact",
-            "value": "body",
-            "config": null
+            "value": "body"
         }
     ]
 }
@@ -246,15 +243,24 @@ Whilst Hoverfly has the following state:
 The matcher which came closest was:
 
 {
-    "path": {
-        "exactMatch": "/closest-miss"
-    },
-    "destination": {
-        "exactMatch": "destination.com"
-    },
-    "body": {
-        "exactMatch": "body"
-    }
+    "path": [
+        {
+            "matcher": "exact",
+            "value": "/closest-miss"
+        }
+    ],
+    "destination": [
+        {
+            "matcher": "exact",
+            "value": "destination.com"
+        }
+    ],
+    "body": [
+        {
+            "matcher": "exact",
+            "value": "body"
+        }
+    ]
 }
 
 But it did not match on the following fields:
