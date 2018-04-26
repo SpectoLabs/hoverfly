@@ -90,6 +90,8 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePair(t *testing.T) 
 	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "test.com",
 				ExactMatch: util.StringToPointer("test.com"),
 			},
 		},
@@ -102,9 +104,10 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePair(t *testing.T) 
 	simulation, err := unit.GetSimulation()
 	Expect(err).To(BeNil())
 
-	Expect(simulation.DataViewV4.RequestResponsePairs).To(HaveLen(1))
+	Expect(simulation.DataViewV5.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(*simulation.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("test.com"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("test.com"))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path).To(BeNil())
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Method).To(BeNil())
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Query).To(BeNil())
@@ -127,9 +130,13 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "testhost-0.com",
 				ExactMatch: util.StringToPointer("testhost-0.com"),
 			},
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/test",
 				ExactMatch: util.StringToPointer("/test"),
 			},
 		},
@@ -142,9 +149,13 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "testhost-1.com",
 				ExactMatch: util.StringToPointer("testhost-1.com"),
 			},
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/test",
 				ExactMatch: util.StringToPointer("/test"),
 			},
 		},
@@ -157,19 +168,23 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 	simulation, err := unit.GetSimulation()
 	Expect(err).To(BeNil())
 
-	Expect(simulation.DataViewV4.RequestResponsePairs).To(HaveLen(2))
+	Expect(simulation.DataViewV5.RequestResponsePairs).To(HaveLen(2))
 
-	Expect(*simulation.DataViewV4.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("testhost-0.com"))
-	Expect(*simulation.DataViewV4.RequestResponsePairs[0].RequestMatcher.Path.ExactMatch).To(Equal("/test"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("testhost-0.com"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal("exact"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("/test"))
 
-	Expect(simulation.DataViewV4.RequestResponsePairs[0].Response.Status).To(Equal(200))
-	Expect(simulation.DataViewV4.RequestResponsePairs[0].Response.Body).To(Equal("test"))
+	Expect(simulation.DataViewV5.RequestResponsePairs[0].Response.Status).To(Equal(200))
+	Expect(simulation.DataViewV5.RequestResponsePairs[0].Response.Body).To(Equal("test"))
 
-	Expect(*simulation.DataViewV4.RequestResponsePairs[1].RequestMatcher.Destination.ExactMatch).To(Equal("testhost-1.com"))
-	Expect(*simulation.DataViewV4.RequestResponsePairs[1].RequestMatcher.Path.ExactMatch).To(Equal("/test"))
+	Expect(simulation.RequestResponsePairs[1].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(simulation.RequestResponsePairs[1].RequestMatcher.Destination[0].Value).To(Equal("testhost-1.com"))
+	Expect(simulation.RequestResponsePairs[1].RequestMatcher.Path[0].Matcher).To(Equal("exact"))
+	Expect(simulation.RequestResponsePairs[1].RequestMatcher.Path[0].Value).To(Equal("/test"))
 
-	Expect(simulation.DataViewV4.RequestResponsePairs[1].Response.Status).To(Equal(200))
-	Expect(simulation.DataViewV4.RequestResponsePairs[1].Response.Body).To(Equal("test"))
+	Expect(simulation.DataViewV5.RequestResponsePairs[1].Response.Status).To(Equal(200))
+	Expect(simulation.DataViewV5.RequestResponsePairs[1].Response.Body).To(Equal("test"))
 }
 
 func TestHoverflyGetSimulationReturnsMultipleDelays(t *testing.T) {
@@ -194,15 +209,15 @@ func TestHoverflyGetSimulationReturnsMultipleDelays(t *testing.T) {
 	simulation, err := unit.GetSimulation()
 	Expect(err).To(BeNil())
 
-	Expect(simulation.DataViewV4.GlobalActions.Delays).To(HaveLen(2))
+	Expect(simulation.DataViewV5.GlobalActions.Delays).To(HaveLen(2))
 
-	Expect(simulation.DataViewV4.GlobalActions.Delays[0].UrlPattern).To(Equal("test-pattern"))
-	Expect(simulation.DataViewV4.GlobalActions.Delays[0].HttpMethod).To(Equal(""))
-	Expect(simulation.DataViewV4.GlobalActions.Delays[0].Delay).To(Equal(100))
+	Expect(simulation.DataViewV5.GlobalActions.Delays[0].UrlPattern).To(Equal("test-pattern"))
+	Expect(simulation.DataViewV5.GlobalActions.Delays[0].HttpMethod).To(Equal(""))
+	Expect(simulation.DataViewV5.GlobalActions.Delays[0].Delay).To(Equal(100))
 
-	Expect(simulation.DataViewV4.GlobalActions.Delays[1].UrlPattern).To(Equal(""))
-	Expect(simulation.DataViewV4.GlobalActions.Delays[1].HttpMethod).To(Equal("test"))
-	Expect(simulation.DataViewV4.GlobalActions.Delays[1].Delay).To(Equal(200))
+	Expect(simulation.DataViewV5.GlobalActions.Delays[1].UrlPattern).To(Equal(""))
+	Expect(simulation.DataViewV5.GlobalActions.Delays[1].HttpMethod).To(Equal("test"))
+	Expect(simulation.DataViewV5.GlobalActions.Delays[1].Delay).To(Equal(200))
 }
 
 func TestHoverfly_GetFilteredSimulation_WithPlainTextUrlQuery(t *testing.T) {
@@ -221,6 +236,8 @@ func TestHoverfly_GetFilteredSimulation_WithPlainTextUrlQuery(t *testing.T) {
 	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "bar.com",
 				ExactMatch: util.StringToPointer("bar.com"),
 			},
 		},
@@ -229,9 +246,10 @@ func TestHoverfly_GetFilteredSimulation_WithPlainTextUrlQuery(t *testing.T) {
 	simulation, err := unit.GetFilteredSimulation("bar.com")
 	Expect(err).To(BeNil())
 
-	Expect(simulation.DataViewV4.RequestResponsePairs).To(HaveLen(1))
+	Expect(simulation.DataViewV5.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(*simulation.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("bar.com"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("bar.com"))
 }
 
 func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
@@ -250,6 +268,8 @@ func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
 	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "test-1.com",
 				ExactMatch: util.StringToPointer("test-1.com"),
 			},
 		},
@@ -258,6 +278,8 @@ func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
 	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "test-2.com",
 				ExactMatch: util.StringToPointer("test-2.com"),
 			},
 		},
@@ -266,10 +288,12 @@ func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
 	simulation, err := unit.GetFilteredSimulation("test-(.+).com")
 	Expect(err).To(BeNil())
 
-	Expect(simulation.DataViewV4.RequestResponsePairs).To(HaveLen(2))
+	Expect(simulation.RequestResponsePairs).To(HaveLen(2))
 
-	Expect(*simulation.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("test-1.com"))
-	Expect(*simulation.RequestResponsePairs[1].RequestMatcher.Destination.ExactMatch).To(Equal("test-2.com"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("test-1.com"))
+	Expect(simulation.RequestResponsePairs[1].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(simulation.RequestResponsePairs[1].RequestMatcher.Destination[0].Value).To(Equal("test-2.com"))
 }
 
 func TestHoverfly_GetFilteredSimulationReturnBlankSimulation_IfThereIsNoMatch(t *testing.T) {
@@ -321,9 +345,13 @@ func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T)
 	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "foo.com",
 				ExactMatch: util.StringToPointer("foo.com"),
 			},
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/api/v1",
 				ExactMatch: util.StringToPointer("/api/v1"),
 			},
 		},
@@ -332,9 +360,13 @@ func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T)
 	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "foo.com",
 				ExactMatch: util.StringToPointer("foo.com"),
 			},
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/api/v2",
 				ExactMatch: util.StringToPointer("/api/v2"),
 			},
 		},
@@ -343,9 +375,13 @@ func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T)
 	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "bar.com",
 				ExactMatch: util.StringToPointer("bar.com"),
 			},
 			Path: &models.RequestFieldMatchers{
+				Matcher:    "exact",
+				Value:      "/api/v1",
 				ExactMatch: util.StringToPointer("/api/v1"),
 			},
 		},
@@ -354,10 +390,12 @@ func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T)
 	simulation, err := unit.GetFilteredSimulation("foo.com/api/v1")
 	Expect(err).To(BeNil())
 
-	Expect(simulation.DataViewV4.RequestResponsePairs).To(HaveLen(1))
+	Expect(simulation.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(*simulation.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal("foo.com"))
-	Expect(*simulation.RequestResponsePairs[0].RequestMatcher.Path.ExactMatch).To(Equal("/api/v1"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("foo.com"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal("exact"))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("/api/v1"))
 }
 
 func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
@@ -385,8 +423,10 @@ func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 	Expect(importedSimulation.RequestResponsePairs).ToNot(BeNil())
 	Expect(importedSimulation.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(importedSimulation.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal(util.StringToPointer("test.com")))
-	Expect(importedSimulation.RequestResponsePairs[0].RequestMatcher.Path.ExactMatch).To(Equal(util.StringToPointer("/testing")))
+	Expect(importedSimulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(importedSimulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("test.com"))
+	Expect(importedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal("exact"))
+	Expect(importedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("/testing"))
 
 	Expect(importedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
 }
@@ -417,7 +457,8 @@ func TestHoverfly_PutSimulation_ImportsSimulationViews(t *testing.T) {
 	Expect(importedSimulation.RequestResponsePairs).To(HaveLen(1))
 
 	Expect(importedSimulation.RequestResponsePairs[0].RequestMatcher.Destination).To(BeNil())
-	Expect(importedSimulation.RequestResponsePairs[0].RequestMatcher.Path.ExactMatch).To(Equal(util.StringToPointer("/path")))
+	Expect(importedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal("exact"))
+	Expect(importedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("/path"))
 
 	Expect(importedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("pair2-body"))
 }

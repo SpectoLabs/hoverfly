@@ -59,28 +59,46 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV4{
-					Path: &v2.RequestFieldMatchersView{
-						ExactMatch: util.StringToPointer("/"),
+				Expect(payload.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV5{
+					Path: []v2.MatcherViewV5{
+						{
+							Matcher: "exact",
+							Value:   "/",
+						},
 					},
-					Method: &v2.RequestFieldMatchersView{
-						ExactMatch: util.StringToPointer("GET"),
+					Method: []v2.MatcherViewV5{
+						{
+							Matcher: "exact",
+							Value:   "GET",
+						},
 					},
-					Destination: &v2.RequestFieldMatchersView{
-						ExactMatch: util.StringToPointer(expectedDestination),
+					Destination: []v2.MatcherViewV5{
+						{
+							Matcher: "exact",
+							Value:   expectedDestination,
+						},
 					},
-					Scheme: &v2.RequestFieldMatchersView{
-						ExactMatch: util.StringToPointer("http"),
+					Scheme: []v2.MatcherViewV5{
+						{
+							Matcher: "exact",
+							Value:   "http",
+						},
 					},
-					Query: &v2.RequestFieldMatchersView{
-						ExactMatch: util.StringToPointer(""),
+					Query: []v2.MatcherViewV5{
+						{
+							Matcher: "exact",
+							Value:   "",
+						},
 					},
-					Body: &v2.RequestFieldMatchersView{
-						ExactMatch: util.StringToPointer(""),
+					Body: []v2.MatcherViewV5{
+						{
+							Matcher: "exact",
+							Value:   "",
+						},
 					},
 				}))
 
-				Expect(payload.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsViewV4{
+				Expect(payload.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsViewV5{
 					Status:      200,
 					Body:        "Hello world",
 					EncodedBody: false,
@@ -140,7 +158,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(err).To(BeNil())
 
-				payload := v2.SimulationViewV4{}
+				payload := v2.SimulationViewV5{}
 
 				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
@@ -171,7 +189,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(err).To(BeNil())
 
-				payload := v2.SimulationViewV4{}
+				payload := v2.SimulationViewV5{}
 
 				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
@@ -210,12 +228,13 @@ var _ = Describe("When I run Hoverfly", func() {
 				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(err).To(BeNil())
 
-				payload := v2.SimulationViewV4{}
+				payload := v2.SimulationViewV5{}
 
 				json.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].RequestMatcher.Destination.ExactMatch).To(Equal(&expectedRedirectDestination))
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal(`exact`))
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal(expectedRedirectDestination))
 
 				Expect(payload.RequestResponsePairs[0].Response.Status).To(Equal(301))
 				Expect(payload.RequestResponsePairs[0].Response.Headers["Location"][0]).To(Equal(fakeServerUrl.String()))
@@ -255,12 +274,13 @@ var _ = Describe("When I run Hoverfly", func() {
 				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(err).To(BeNil())
 
-				payload := v2.SimulationViewV4{}
+				payload := v2.SimulationViewV5{}
 
 				json.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body.JsonMatch).To(Equal(util.StringToPointer(`{"title": "a todo"}`)))
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body[0].Matcher).To(Equal(`json`))
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body[0].Value).To(Equal(`{"title": "a todo"}`))
 			})
 
 			It("Should capture a XML request body as a xmlMatch", func() {
@@ -277,12 +297,13 @@ var _ = Describe("When I run Hoverfly", func() {
 				recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
 				Expect(err).To(BeNil())
 
-				payload := v2.SimulationViewV4{}
+				payload := v2.SimulationViewV5{}
 
 				json.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body.XmlMatch).To(Equal(util.StringToPointer(`<document/>`)))
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body[0].Matcher).To(Equal(`xml`))
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body[0].Value).To(Equal(`<document/>`))
 			})
 
 			It("Should pass through the original query", func() {

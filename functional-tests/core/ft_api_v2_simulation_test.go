@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/antonholmquist/jason"
 	"github.com/dghubble/sling"
@@ -64,35 +63,41 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			pairOneRequest, err := pairsArray[0].GetObject("request")
 
-			bodyMatchers, err := pairOneRequest.GetObject("body")
+			bodyMatchers, err := pairOneRequest.GetObjectArray("body")
 			Expect(err).To(BeNil())
 
-			Expect(bodyMatchers.GetString("exactMatch")).Should(Equal(""))
+			Expect(bodyMatchers[0].GetString("matcher")).Should(Equal("exact"))
+			Expect(bodyMatchers[0].GetString("value")).Should(Equal(""))
 
-			destinationMatchers, err := pairOneRequest.GetObject("destination")
+			destinationMatchers, err := pairOneRequest.GetObjectArray("destination")
 			Expect(err).To(BeNil())
 
-			Expect(destinationMatchers.GetString("exactMatch")).Should(Equal("test-server.com"))
+			Expect(destinationMatchers[0].GetString("matcher")).Should(Equal("exact"))
+			Expect(destinationMatchers[0].GetString("value")).Should(Equal("test-server.com"))
 
-			methodMatchers, err := pairOneRequest.GetObject("method")
+			methodMatchers, err := pairOneRequest.GetObjectArray("method")
 			Expect(err).To(BeNil())
 
-			Expect(methodMatchers.GetString("exactMatch")).Should(Equal("GET"))
+			Expect(methodMatchers[0].GetString("matcher")).Should(Equal("exact"))
+			Expect(methodMatchers[0].GetString("value")).Should(Equal("GET"))
 
-			pathMatchers, err := pairOneRequest.GetObject("path")
+			pathMatchers, err := pairOneRequest.GetObjectArray("path")
 			Expect(err).To(BeNil())
 
-			Expect(pathMatchers.GetString("exactMatch")).Should(Equal("/path1"))
+			Expect(pathMatchers[0].GetString("matcher")).Should(Equal("exact"))
+			Expect(pathMatchers[0].GetString("value")).Should(Equal("/path1"))
 
-			queryMatchers, err := pairOneRequest.GetObject("query")
+			queryMatchers, err := pairOneRequest.GetObjectArray("query")
 			Expect(err).To(BeNil())
 
-			Expect(queryMatchers.GetString("exactMatch")).Should(Equal(""))
+			Expect(queryMatchers[0].GetString("matcher")).Should(Equal("exact"))
+			Expect(queryMatchers[0].GetString("value")).Should(Equal(""))
 
-			schemeMatchers, err := pairOneRequest.GetObject("scheme")
+			schemeMatchers, err := pairOneRequest.GetObjectArray("scheme")
 			Expect(err).To(BeNil())
 
-			Expect(schemeMatchers.GetString("exactMatch")).Should(Equal("http"))
+			Expect(schemeMatchers[0].GetString("matcher")).Should(Equal("exact"))
+			Expect(schemeMatchers[0].GetString("value")).Should(Equal("http"))
 
 			pairOneRequestHeaders, _ := pairOneRequest.GetObject("headers")
 			Expect(pairOneRequestHeaders.GetStringArray("Accept-Encoding")).Should(ContainElement("gzip"))
@@ -110,10 +115,12 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			pairTwoRequest, err := pairsArray[1].GetObject("request")
 
-			destinationMatchers, err = pairTwoRequest.GetObject("destination")
+			destinationMatchers, err = pairTwoRequest.GetObjectArray("destination")
 			Expect(err).To(BeNil())
 
-			Expect(destinationMatchers.GetString("exactMatch")).Should(Equal("destination-server.com"))
+			Expect(destinationMatchers[0].GetString("matcher")).Should(Equal("exact"))
+			Expect(destinationMatchers[0].GetString("value")).Should(Equal("destination-server.com"))
+
 			Expect(pairTwoRequest.GetNull("method")).ShouldNot(Succeed())
 			Expect(pairTwoRequest.GetNull("path")).ShouldNot(Succeed())
 			Expect(pairTwoRequest.GetNull("destination")).ShouldNot(Succeed())
@@ -243,12 +250,16 @@ var _ = Describe("/api/v2/simulation", func() {
 			requestObject, err := pairsArray[0].GetObject("request")
 			Expect(err).To(BeNil())
 
-			destinationMatchers, err := requestObject.GetObject("destination")
+			destinationMatchers, err := requestObject.GetObjectArray("destination")
 			Expect(err).To(BeNil())
 
-			destination, err := destinationMatchers.GetString("exactMatch")
+			destinationMatcher, err := destinationMatchers[0].GetString("matcher")
 			Expect(err).To(BeNil())
-			Expect(destination).To(Equal("destination-server.com"))
+			Expect(destinationMatcher).To(Equal("exact"))
+
+			destinationValue, err := destinationMatchers[0].GetString("value")
+			Expect(err).To(BeNil())
+			Expect(destinationValue).To(Equal("destination-server.com"))
 
 			responseObject, err := pairsArray[0].GetObject("response")
 			Expect(err).To(BeNil())
@@ -312,12 +323,16 @@ var _ = Describe("/api/v2/simulation", func() {
 			requestObject, err := pairsArray[0].GetObject("request")
 			Expect(err).To(BeNil())
 
-			destinationMatchers, err := requestObject.GetObject("destination")
+			destinationMatchers, err := requestObject.GetObjectArray("destination")
 			Expect(err).To(BeNil())
 
-			destination, err := destinationMatchers.GetString("exactMatch")
+			destinationMatcher, err := destinationMatchers[0].GetString("matcher")
 			Expect(err).To(BeNil())
-			Expect(destination).To(Equal("destination-server.com"))
+			Expect(destinationMatcher).To(Equal("exact"))
+
+			destinationValue, err := destinationMatchers[0].GetString("value")
+			Expect(err).To(BeNil())
+			Expect(destinationValue).To(Equal("destination-server.com"))
 
 			responseObject, err := pairsArray[0].GetObject("response")
 			Expect(err).To(BeNil())
@@ -376,29 +391,50 @@ var _ = Describe("/api/v2/simulation", func() {
 
 			simulation := hoverfly.ExportSimulation()
 
-			Expect(simulation.DataViewV4.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV4{
-				Destination: &v2.RequestFieldMatchersView{
-					ExactMatch: util.StringToPointer("v1-simulation.com"),
+			Expect(simulation.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV5{
+				Destination: []v2.MatcherViewV5{
+					{
+						Matcher: "exact",
+						Value:   "v1-simulation.com",
+					},
 				}}))
 
-			Expect(simulation.DataViewV4.RequestResponsePairs[1].RequestMatcher).To(Equal(v2.RequestMatcherViewV4{
-				Scheme: &v2.RequestFieldMatchersView{
-					ExactMatch: util.StringToPointer("http"),
+			Expect(simulation.RequestResponsePairs[1].RequestMatcher).To(Equal(v2.RequestMatcherViewV5{
+				Scheme: []v2.MatcherViewV5{
+					{
+						Matcher: "exact",
+						Value:   "http",
+					},
 				},
-				Method: &v2.RequestFieldMatchersView{
-					ExactMatch: util.StringToPointer("GET"),
+				Method: []v2.MatcherViewV5{
+					{
+						Matcher: "exact",
+						Value:   "GET",
+					},
 				},
-				Destination: &v2.RequestFieldMatchersView{
-					ExactMatch: util.StringToPointer("v1-simulation.com"),
+				Destination: []v2.MatcherViewV5{
+					{
+						Matcher: "exact",
+						Value:   "v1-simulation.com",
+					},
 				},
-				Path: &v2.RequestFieldMatchersView{
-					ExactMatch: util.StringToPointer("/path"),
+				Path: []v2.MatcherViewV5{
+					{
+						Matcher: "exact",
+						Value:   "/path",
+					},
 				},
-				Query: &v2.RequestFieldMatchersView{
-					ExactMatch: util.StringToPointer(""),
+				Query: []v2.MatcherViewV5{
+					{
+						Matcher: "exact",
+						Value:   "",
+					},
 				},
-				Body: &v2.RequestFieldMatchersView{
-					ExactMatch: util.StringToPointer(""),
+				Body: []v2.MatcherViewV5{
+					{
+						Matcher: "exact",
+						Value:   "",
+					},
 				}}))
 
 		})

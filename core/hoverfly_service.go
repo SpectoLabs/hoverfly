@@ -207,8 +207,8 @@ func (hf Hoverfly) GetStats() metrics.Stats {
 	return hf.Counter.Flush()
 }
 
-func (hf Hoverfly) GetSimulation() (v2.SimulationViewV4, error) {
-	pairViews := make([]v2.RequestMatcherResponsePairViewV4, 0)
+func (hf Hoverfly) GetSimulation() (v2.SimulationViewV5, error) {
+	pairViews := make([]v2.RequestMatcherResponsePairViewV5, 0)
 
 	for _, v := range hf.Simulation.GetMatchingPairs() {
 		pairViews = append(pairViews, v.BuildView())
@@ -219,12 +219,12 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV4, error) {
 		hf.version), nil
 }
 
-func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV4, error) {
-	pairViews := make([]v2.RequestMatcherResponsePairViewV4, 0)
+func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV5, error) {
+	pairViews := make([]v2.RequestMatcherResponsePairViewV5, 0)
 	regexPattern, err := regexp.Compile(urlPattern)
 
 	if err != nil {
-		return v2.SimulationViewV4{}, err
+		return v2.SimulationViewV5{}, err
 	}
 
 	for _, v := range hf.Simulation.GetMatchingPairs() {

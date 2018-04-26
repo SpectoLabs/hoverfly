@@ -32,11 +32,13 @@ func Test_NewRequestFieldMatchers_BuildView(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := models.RequestFieldMatchers{
-		ExactMatch: util.StringToPointer("exactly"),
+		Matcher: "exact",
+		Value:   "exactly",
 	}
 
 	view := unit.BuildView()
-	Expect(*view.ExactMatch).To(Equal("exactly"))
+	Expect(view.Matcher).To(Equal("exact"))
+	Expect(view.Value).To(Equal("exactly"))
 }
 
 func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
