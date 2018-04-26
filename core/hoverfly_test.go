@@ -440,7 +440,9 @@ func Test_Hoverfly_GetResponse_WillCacheClosestMiss(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(cachedResponse.MatchingPair).To(BeNil())
-	Expect(*cachedResponse.ClosestMiss.RequestMatcher.Method.ExactMatch).To(Equal("closest"))
+	Expect(cachedResponse.ClosestMiss.RequestMatcher.Method[0].Matcher).To(Equal("exact"))
+	Expect(cachedResponse.ClosestMiss.RequestMatcher.Method[0].Value).To(Equal("closest"))
+
 	Expect(cachedResponse.ClosestMiss.Response.Body).To(Equal("closest"))
 	Expect(cachedResponse.ClosestMiss.MissedFields).To(ConsistOf("method"))
 }

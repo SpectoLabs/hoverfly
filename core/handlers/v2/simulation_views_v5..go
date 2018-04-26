@@ -10,7 +10,7 @@ type SimulationViewV5 struct {
 }
 
 type DataViewV5 struct {
-	RequestResponsePairs []RequestMatcherResponsePairViewV4 `json:"pairs"`
+	RequestResponsePairs []RequestMatcherResponsePairViewV5 `json:"pairs"`
 	GlobalActions        GlobalActionsView                  `json:"globalActions"`
 }
 
@@ -21,16 +21,16 @@ type RequestMatcherResponsePairViewV5 struct {
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestMatcherViewV5 struct {
-	Path                []MatcherViewV5             `json:"path,omitempty"`
-	Method              []MatcherViewV5             `json:"method,omitempty"`
-	Destination         []MatcherViewV5             `json:"destination,omitempty"`
-	Scheme              []MatcherViewV5             `json:"scheme,omitempty"`
-	Query               []MatcherViewV5             `json:"query,omitempty"`
-	Body                []MatcherViewV5             `json:"body,omitempty"`
-	Headers             map[string][]string         `json:"headers,omitempty"`
-	HeadersWithMatchers map[string]*[]MatcherViewV5 `json:"headersWithMatchers,omitempty"`
-	QueriesWithMatchers map[string]*[]MatcherViewV5 `json:"queriesWithMatchers,omitempty"`
-	RequiresState       map[string]string           `json:"requiresState,omitempty"`
+	Path                []MatcherViewV5            `json:"path,omitempty"`
+	Method              []MatcherViewV5            `json:"method,omitempty"`
+	Destination         []MatcherViewV5            `json:"destination,omitempty"`
+	Scheme              []MatcherViewV5            `json:"scheme,omitempty"`
+	Query               []MatcherViewV5            `json:"query,omitempty"`
+	Body                []MatcherViewV5            `json:"body,omitempty"`
+	Headers             map[string][]string        `json:"headers,omitempty"`
+	HeadersWithMatchers map[string][]MatcherViewV5 `json:"headersWithMatchers,omitempty"`
+	QueriesWithMatchers map[string][]MatcherViewV5 `json:"queriesWithMatchers,omitempty"`
+	RequiresState       map[string]string          `json:"requiresState,omitempty"`
 }
 
 type MatcherViewV5 struct {
