@@ -1372,43 +1372,37 @@ The matcher which came closest was:
     "path": [
         {
             "matcher": "exact",
-            "value": "hit",
-            "config": null
+            "value": "hit"
         }
     ],
     "method": [
         {
             "matcher": "exact",
-            "value": "miss",
-            "config": null
+            "value": "miss"
         }
     ],
     "destination": [
         {
             "matcher": "exact",
-            "value": "miss",
-            "config": null
+            "value": "miss"
         }
     ],
     "scheme": [
         {
             "matcher": "exact",
-            "value": "hit",
-            "config": null
+            "value": "hit"
         }
     ],
     "query": [
         {
             "matcher": "exact",
-            "value": "hit",
-            "config": null
+            "value": "hit"
         }
     ],
     "body": [
         {
             "matcher": "glob",
-            "value": "hit",
-            "config": null
+            "value": "hit"
         }
     ],
     "headers": {
