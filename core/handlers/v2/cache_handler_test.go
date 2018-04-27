@@ -28,10 +28,7 @@ func (this HoverflyCacheStub) GetCache() (CacheView, error) {
 				MatchingPair: &RequestMatcherResponsePairViewV5{
 					RequestMatcher: RequestMatcherViewV5{
 						Destination: []MatcherViewV5{
-							MatcherViewV5{
-								Matcher: "exact",
-								Value:   "one",
-							},
+							NewMatcherView("exact", "one"),
 						},
 					},
 					Response: ResponseDetailsViewV5{},
@@ -41,10 +38,7 @@ func (this HoverflyCacheStub) GetCache() (CacheView, error) {
 				MatchingPair: &RequestMatcherResponsePairViewV5{
 					RequestMatcher: RequestMatcherViewV5{
 						Destination: []MatcherViewV5{
-							MatcherViewV5{
-								Matcher: "exact",
-								Value:   "two",
-							},
+							NewMatcherView("exact", "two"),
 						},
 					},
 					Response: ResponseDetailsViewV5{},

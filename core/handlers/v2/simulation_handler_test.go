@@ -24,16 +24,10 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationViewV5, error) {
 	pairOne := RequestMatcherResponsePairViewV5{
 		RequestMatcher: RequestMatcherViewV5{
 			Destination: []MatcherViewV5{
-				{
-					Matcher: "exact",
-					Value:   "test.com",
-				},
+				NewMatcherView("exact", "test.com"),
 			},
 			Path: []MatcherViewV5{
-				{
-					Matcher: "exact",
-					Value:   "/testing",
-				},
+				NewMatcherView("exact", "/testing"),
 			},
 		},
 		Response: ResponseDetailsViewV5{
