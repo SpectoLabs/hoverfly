@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
 
@@ -12,19 +11,25 @@ func Test_FlushCache_GetsMiddlewareFromHoverfly(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV4{
-		v2.DataViewV4{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV4{
+	hoverfly.PutSimulation(v2.SimulationViewV5{
+		v2.DataViewV5{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
 				{
-					RequestMatcher: v2.RequestMatcherViewV4{
-						Method: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("DELETE"),
+					RequestMatcher: v2.RequestMatcherViewV5{
+						Method: []v2.MatcherViewV5{
+							{
+								Matcher: "exact",
+								Value:   "DELETE",
+							},
 						},
-						Path: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("/api/v2/cache"),
+						Path: []v2.MatcherViewV5{
+							{
+								Matcher: "exact",
+								Value:   "/api/v2/cache",
+							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV4{
+					Response: v2.ResponseDetailsViewV5{
 						Status: 200,
 						Body:   `{"binary": "test-binary", "script": "test.script", "remote": "http://test.com"}`,
 					},
@@ -53,19 +58,25 @@ func Test_FlushCache_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV4{
-		v2.DataViewV4{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV4{
-				v2.RequestMatcherResponsePairViewV4{
-					RequestMatcher: v2.RequestMatcherViewV4{
-						Method: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("DELETE"),
+	hoverfly.PutSimulation(v2.SimulationViewV5{
+		v2.DataViewV5{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+				v2.RequestMatcherResponsePairViewV5{
+					RequestMatcher: v2.RequestMatcherViewV5{
+						Method: []v2.MatcherViewV5{
+							{
+								Matcher: "exact",
+								Value:   "DELETE",
+							},
 						},
-						Path: &v2.RequestFieldMatchersView{
-							ExactMatch: util.StringToPointer("/api/v2/cache"),
+						Path: []v2.MatcherViewV5{
+							{
+								Matcher: "exact",
+								Value:   "/api/v2/cache",
+							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV4{
+					Response: v2.ResponseDetailsViewV5{
 						Status: 400,
 						Body:   "{\"error\":\"test error\"}",
 					},
