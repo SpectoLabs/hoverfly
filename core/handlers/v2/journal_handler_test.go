@@ -217,16 +217,10 @@ func Test_JournalHandler_Post_CallsFilter(t *testing.T) {
 	journalEntryFilterView := JournalEntryFilterView{
 		Request: &RequestMatcherViewV5{
 			Destination: []MatcherViewV5{
-				{
-					Matcher: "exact",
-					Value:   "hoverfly.io",
-				},
+				NewMatcherView("exact", "hoverfly.io"),
 			},
 			Path: []MatcherViewV5{
-				{
-					Matcher: "glob",
-					Value:   "*",
-				},
+				NewMatcherView("glob", "*"),
 			},
 		},
 	}
@@ -302,16 +296,10 @@ func Test_JournalHandler_Post_JournalError(t *testing.T) {
 	requestMatcher := JournalEntryFilterView{
 		Request: &RequestMatcherViewV5{
 			Destination: []MatcherViewV5{
-				{
-					Matcher: "exact",
-					Value:   "hoverfly.io",
-				},
+				NewMatcherView("exact", "hoverfly.io"),
 			},
 			Path: []MatcherViewV5{
-				{
-					Matcher: "glob",
-					Value:   "*",
-				},
+				NewMatcherView("glob", "*"),
 			},
 		},
 	}
