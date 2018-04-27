@@ -7,6 +7,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func Test_GlobMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.GlobMatch(1, "yes")).To(BeFalse())
+}
+
 func Test_GlobMatch_MatchesTrueWithGlobMatch(t *testing.T) {
 	RegisterTestingT(t)
 

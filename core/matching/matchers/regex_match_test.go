@@ -7,6 +7,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func Test_RegexMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.RegexMatch(1, "yes")).To(BeFalse())
+}
 func Test_RegexMatch_MatchesTrueWithRegexMatch(t *testing.T) {
 	RegisterTestingT(t)
 

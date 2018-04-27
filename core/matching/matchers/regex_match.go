@@ -2,11 +2,16 @@ package matchers
 
 import "regexp"
 
-func RegexMatch(matchingString string, toMatch string) bool {
-	match, err := regexp.MatchString(matchingString, toMatch)
+func RegexMatch(match interface{}, toMatch string) bool {
+	matchString, ok := match.(string)
+	if !ok {
+		return false
+	}
+
+	result, err := regexp.MatchString(matchString, toMatch)
 	if err != nil {
 		return false
 	}
 
-	return match
+	return result
 }

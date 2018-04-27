@@ -6,8 +6,13 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
-func XmlMatch(matchingString string, toMatch string) bool {
-	minifiedMatchingString, err := util.MinifyXml(matchingString)
+func XmlMatch(match interface{}, toMatch string) bool {
+	matchString, ok := match.(string)
+	if !ok {
+		return false
+	}
+
+	minifiedMatch, err := util.MinifyXml(matchString)
 	if err != nil {
 		return false
 	}
@@ -17,5 +22,5 @@ func XmlMatch(matchingString string, toMatch string) bool {
 		return false
 	}
 
-	return reflect.DeepEqual(minifiedMatchingString, minifiedToMatch)
+	return reflect.DeepEqual(minifiedMatch, minifiedToMatch)
 }
