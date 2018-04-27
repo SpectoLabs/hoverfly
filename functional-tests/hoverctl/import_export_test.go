@@ -36,24 +36,42 @@ var _ = Describe("When I use hoverctl", func() {
 							"templated": false
 						},
 						"request": {
-							"path": {
-								"exactMatch": "/api/bookings"
-							},
-							"method": {
-								"exactMatch": "POST"
-							},
-							"destination": {
-								"exactMatch": "www.my-test.com"
-							},
-							"scheme": {
-								"exactMatch": "http"
-							},
-							"query": {
-								"exactMatch": ""
-							},
-							"body": {
-								"exactMatch": "{\"flightId\": \"1\"}"
-							},
+							"path": [
+								{
+									"matcher": "exact",
+									"value": "/api/bookings"
+								}
+							],
+							"method": [
+								{
+									"matcher": "exact",
+									"value": "POST"
+								}
+							],
+							"destination": [
+								{
+									"matcher": "exact",
+									"value": "www.my-test.com"
+								}
+							],
+							"scheme": [
+								{
+									"matcher": "exact",
+									"value": "http"
+								}
+							],
+							"query": [
+								{
+									"matcher": "exact",
+									"value": ""
+								}
+							],
+							"body": [
+								{
+									"matcher": "exact",
+									"value": "{\"flightId\": \"1\"}"
+								}
+							],
 							"headers": {
 								"Content-Type": ["application/json"]
 							}
@@ -64,7 +82,7 @@ var _ = Describe("When I use hoverctl", func() {
 					}
 				},
 				"meta": {
-					"schemaVersion": "v3",
+					"schemaVersion": "v5",
 					"hoverflyVersion": "v0.9.2",
 					"timeExported": "2016-11-10T12:27:46Z"
 				}
@@ -84,24 +102,42 @@ var _ = Describe("When I use hoverctl", func() {
 							"templated": false
 						},
 						"request": {
-							"path": {
-								"exactMatch": "/api/bookings"
-							},
-							"method": {
-								"exactMatch": "POST"
-							},
-							"destination": {
-								"exactMatch": "www.my-test.com"
-							},
-							"scheme": {
-								"exactMatch": "http"
-							},
-							"query": {
-								"exactMatch": ""
-							},
-							"body": {
-								"exactMatch": "{\"flightId\": \"1\"}"
-							},
+							"path": [
+								{
+									"matcher": "exact",
+									"value": "/api/bookings"
+								}
+							],
+							"method": [
+								{
+									"matcher": "exact",
+									"value": "POST"
+								}
+							],
+							"destination": [
+								{
+									"matcher": "exact",
+									"value": "www.my-test.com"
+								}
+							],
+							"scheme": [
+								{
+									"matcher": "exact",
+									"value": "http"
+								}
+							],
+							"query": [
+								{
+									"matcher": "exact",
+									"value": ""
+								}
+							],
+							"body": [
+								{
+									"matcher": "exact",
+									"value": "{\"flightId\": \"1\"}"
+								}
+							],
 							"headers": {
 								"Content-Type": ["application/json"]
 							}
@@ -117,15 +153,24 @@ var _ = Describe("When I use hoverctl", func() {
 							"templated": false
 						},
 						"request": {
-							"path": {
-								"exactMatch": "/api/bookings"
-							},
-							"method": {
-								"exactMatch": "POST"
-							},
-							"destination": {
-								"exactMatch": "www.other-test.com"
-							}
+							"path": [
+								{
+									"matcher": "exact",
+									"value": "/api/bookings"
+								}
+							],
+							"method": [
+								{
+									"matcher": "exact",
+									"value": "POST"
+								}
+							],
+							"destination": [
+								{
+									"matcher": "exact",
+									"value": "www.other-test.com"
+								}
+							]
 						}
 					}],
 					"globalActions": {
@@ -133,15 +178,15 @@ var _ = Describe("When I use hoverctl", func() {
 					}
 				},
 				"meta": {
-					"schemaVersion": "v3",
+					"schemaVersion": "v5",
 					"hoverflyVersion": "v0.9.2",
 					"timeExported": "2016-11-10T12:27:46Z"
 				}
 			}`
 
-		v3HoverflySimulation = `"pairs":[{"request":{"path":{"exactMatch":"/api/bookings"},"method":{"exactMatch":"POST"},"destination":{"exactMatch":"www.my-test.com"},"scheme":{"exactMatch":"http"},"query":{"exactMatch":""},"body":{"exactMatch":"{\"flightId\": \"1\"}"},"headers":{"Content-Type":["application/json"]}},"response":{"status":201,"body":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]},"templated":false}}],"globalActions":{"delays":[]}}`
+		v3HoverflySimulation = `"pairs":[{"request":{"path":[{"matcher":"exact","value":"/api/bookings"}],"method":[{"matcher":"exact","value":"POST"}],"destination":[{"matcher":"exact","value":"www.my-test.com"}],"scheme":[{"matcher":"exact","value":"http"}],"query":[{"matcher":"exact","value":""}],"body":[{"matcher":"exact","value":"{\"flightId\": \"1\"}"}],"headers":{"Content-Type":["application/json"]}},"response":{"status":201,"body":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]},"templated":false}}],"globalActions":{"delays":[]}}`
 
-		v3HoverflyMeta = `"meta":{"schemaVersion":"v4","hoverflyVersion":"v\d+.\d+.\d+","timeExported":`
+		v3HoverflyMeta = `"meta":{"schemaVersion":"v5","hoverflyVersion":"v\d+.\d+.\d+","timeExported":`
 	)
 
 	Describe("with a running hoverfly", func() {
