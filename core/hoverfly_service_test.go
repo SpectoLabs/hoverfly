@@ -18,16 +18,10 @@ var (
 	pairOne = v2.RequestMatcherResponsePairViewV5{
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Destination: []v2.MatcherViewV5{
-				{
-					Matcher: "exact",
-					Value:   "test.com",
-				},
+				v2.NewMatcherView("exact", "test.com"),
 			},
 			Path: []v2.MatcherViewV5{
-				{
-					Matcher: "exact",
-					Value:   "/testing",
-				},
+				v2.NewMatcherView("exact", "/testing"),
 			},
 		},
 		Response: v2.ResponseDetailsViewV5{
