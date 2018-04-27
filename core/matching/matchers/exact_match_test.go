@@ -7,6 +7,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func Test_ExactMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.ExactMatch(1, "yes")).To(BeFalse())
+}
+
 func Test_ExactMatch_MatchesTrueWithExactMatch(t *testing.T) {
 	RegisterTestingT(t)
 

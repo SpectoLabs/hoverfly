@@ -2,6 +2,11 @@ package matchers
 
 import glob "github.com/ryanuber/go-glob"
 
-func GlobMatch(matchingString string, toMatch string) bool {
-	return glob.Glob(matchingString, toMatch)
+func GlobMatch(match interface{}, toMatch string) bool {
+	matchString, ok := match.(string)
+	if !ok {
+		return false
+	}
+
+	return glob.Glob(matchString, toMatch)
 }

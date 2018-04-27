@@ -8,6 +8,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func Test_XpathMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.XpathMatch(1, "yes")).To(BeFalse())
+}
+
 func Test_XpathMatch_MatchesTrue(t *testing.T) {
 	RegisterTestingT(t)
 

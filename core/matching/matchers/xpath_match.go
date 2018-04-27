@@ -8,10 +8,15 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-func XpathMatch(matchingString string, toMatch string) bool {
-	xpathRule, err := goxpath.Parse(matchingString)
+func XpathMatch(match interface{}, toMatch string) bool {
+	matchString, ok := match.(string)
+	if !ok {
+		return false
+	}
+
+	xpathRule, err := goxpath.Parse(matchString)
 	if err != nil {
-		log.Errorf("Failed to parse xpath query %s: %s", matchingString, err.Error())
+		log.Errorf("Failed to parse xpath query %s: %s", matchString, err.Error())
 		return false
 	}
 

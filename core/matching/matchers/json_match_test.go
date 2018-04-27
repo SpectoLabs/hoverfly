@@ -7,6 +7,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func Test_JsonMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonMatch(1, "yes")).To(BeFalse())
+}
 func Test_JsonMatch_MatchesTrueWithJSON(t *testing.T) {
 	RegisterTestingT(t)
 

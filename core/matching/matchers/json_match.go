@@ -5,12 +5,17 @@ import (
 	"reflect"
 )
 
-func JsonMatch(matchingString string, toMatch string) bool {
-	if matchingString == toMatch {
+func JsonMatch(match interface{}, toMatch string) bool {
+	matchString, ok := match.(string)
+	if !ok {
+		return false
+	}
+
+	if matchString == toMatch {
 		return true
 	}
 	var matchingObject map[string]interface{}
-	err := json.Unmarshal([]byte(matchingString), &matchingObject)
+	err := json.Unmarshal([]byte(matchString), &matchingObject)
 	if err != nil {
 		return false
 	}
