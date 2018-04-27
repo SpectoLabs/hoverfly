@@ -10,6 +10,7 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/journal"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	. "github.com/onsi/gomega"
 )
 
@@ -454,7 +455,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Body: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   `{"meta:{"field": "value"}}`,
 				},
 			},
@@ -465,7 +466,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Body: []v2.MatcherViewV5{
 				{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   `{"meta:{"field": "*"}}`,
 				},
 			},
@@ -476,7 +477,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Body: []v2.MatcherViewV5{
 				{
-					Matcher: "json",
+					Matcher: matchers.Json,
 					Value:   `{"meta:{"field": "value"}}`,
 				},
 			},
@@ -487,7 +488,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Body: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   `{"meta:{"field": "other-value"}}`,
 				},
 			},
@@ -500,7 +501,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Destination: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   `hoverfly.io`,
 				},
 			},
@@ -511,7 +512,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Destination: []v2.MatcherViewV5{
 				{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   "*.io",
 				},
 			},
@@ -522,7 +523,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Destination: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "not-hoverfly.com",
 				},
 			},
@@ -535,7 +536,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Method: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
@@ -546,7 +547,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Method: []v2.MatcherViewV5{
 				{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   "*",
 				},
 			},
@@ -557,7 +558,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Method: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "POST",
 				},
 			},
@@ -570,7 +571,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/path/one",
 				},
 			},
@@ -581,7 +582,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   "/path/*",
 				},
 			},
@@ -592,7 +593,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/path/two",
 				},
 			},
@@ -605,7 +606,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Query: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "one=1&two=2",
 				},
 			},
@@ -616,7 +617,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Query: []v2.MatcherViewV5{
 				{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   "one=1*",
 				},
 			},
@@ -627,7 +628,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Query: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "does-not-match",
 				},
 			},
@@ -640,7 +641,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Scheme: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "http",
 				},
 			},
@@ -651,7 +652,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Scheme: []v2.MatcherViewV5{
 				{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   "*",
 				},
 			},
@@ -662,7 +663,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		Request: &v2.RequestMatcherViewV5{
 			Scheme: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "not-http",
 				},
 			},

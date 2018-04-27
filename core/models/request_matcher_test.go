@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 )
@@ -13,7 +14,7 @@ func Test_NewRequestFieldMatchersFromView_ReturnsNewStruct(t *testing.T) {
 
 	unit := models.NewRequestFieldMatchersFromView([]v2.MatcherViewV5{
 		{
-			Matcher: "exact",
+			Matcher: matchers.Exact,
 			Value:   "exactly",
 		},
 	})
@@ -36,7 +37,7 @@ func Test_NewRequestFieldMatchers_BuildView(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := models.RequestFieldMatchers{
-		Matcher: "exact",
+		Matcher: matchers.Exact,
 		Value:   "exactly",
 	}
 
@@ -52,14 +53,14 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			HeadersWithMatchers: map[string][]v2.MatcherViewV5{
 				"Header": {
 					{
-						Matcher: "exact",
+						Matcher: matchers.Exact,
 						Value:   "header value",
 					},
 				},
@@ -67,7 +68,7 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 			QueriesWithMatchers: map[string][]v2.MatcherViewV5{
 				"Query": {
 					{
-						Matcher: "exact",
+						Matcher: matchers.Exact,
 						Value:   "query value",
 					},
 				},
@@ -97,7 +98,7 @@ func Test_NewRequestMatcherResponsePairFromView_LeavesHeadersWithMatchersNil(t *
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
@@ -115,7 +116,7 @@ func Test_NewRequestMatcherResponsePairFromView_LeavesQueriesWithMatchersNil(t *
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
@@ -133,7 +134,7 @@ func Test_NewRequestMatcherResponsePairFromView_SortsQuery(t *testing.T) {
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Query: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "b=b&a=a",
 				},
 			},
@@ -153,7 +154,7 @@ func Test_NewRequestMatcherResponsePairFromView_StoresTemplated(t *testing.T) {
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
@@ -173,37 +174,37 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDe
 	unit := models.RequestMatcher{
 		Body: []models.RequestFieldMatchers{
 			{
-				Matcher: "exact",
+				Matcher: matchers.Exact,
 				Value:   "body",
 			},
 		},
 		Destination: []models.RequestFieldMatchers{
 			{
-				Matcher: "exact",
+				Matcher: matchers.Exact,
 				Value:   "destination",
 			},
 		},
 		Method: []models.RequestFieldMatchers{
 			{
-				Matcher: "exact",
+				Matcher: matchers.Exact,
 				Value:   "method",
 			},
 		},
 		Path: []models.RequestFieldMatchers{
 			{
-				Matcher: "exact",
+				Matcher: matchers.Exact,
 				Value:   "path",
 			},
 		},
 		Query: []models.RequestFieldMatchers{
 			{
-				Matcher: "exact",
+				Matcher: matchers.Exact,
 				Value:   "query=two",
 			},
 		},
 		Scheme: []models.RequestFieldMatchers{
 			{
-				Matcher: "exact",
+				Matcher: matchers.Exact,
 				Value:   "scheme",
 			},
 		},
@@ -234,31 +235,31 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissing
 	unit := models.RequestMatcher{
 		Destination: []models.RequestFieldMatchers{
 			{
-				Matcher: "exact",
+				Matcher: matchers.Exact,
 				Value:   "destination",
 			},
 		},
 		Method: []models.RequestFieldMatchers{
 			{
-				Matcher: "exact",
+				Matcher: matchers.Exact,
 				Value:   "method",
 			},
 		},
 		Path: []models.RequestFieldMatchers{
 			{
-				Matcher: "exact",
+				Matcher: matchers.Exact,
 				Value:   "path",
 			},
 		},
 		Query: []models.RequestFieldMatchers{
 			{
-				Matcher: "exact",
+				Matcher: matchers.Exact,
 				Value:   "query",
 			},
 		},
 		Scheme: []models.RequestFieldMatchers{
 			{
-				Matcher: "exact",
+				Matcher: matchers.Exact,
 				Value:   "query",
 			},
 		},

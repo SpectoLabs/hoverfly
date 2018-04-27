@@ -6,6 +6,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
+var Xml = "xml"
+
 func XmlMatch(match interface{}, toMatch string) bool {
 	matchString, ok := match.(string)
 	if !ok {

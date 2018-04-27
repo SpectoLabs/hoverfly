@@ -15,6 +15,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 )
@@ -241,19 +242,19 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromCache(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "somehost.com",
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "POST",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "http",
 				},
 			},
@@ -286,19 +287,19 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *tes
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "somehost.com",
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "POST",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "http",
 				},
 			},
@@ -331,19 +332,19 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "somehost.com",
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "POST",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "http",
 				},
 			},
@@ -440,7 +441,7 @@ func Test_Hoverfly_GetResponse_WillCacheClosestMiss(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "closest",
 							},
 						},

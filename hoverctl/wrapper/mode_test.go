@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	. "github.com/onsi/gomega"
 )
 
@@ -18,13 +19,13 @@ func Test_GetMode_GetsModeFromHoverfly(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/mode",
 							},
 						},
@@ -75,13 +76,13 @@ func Test_GetMode_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/mode",
 							},
 						},
@@ -114,19 +115,19 @@ func Test_SetMode_SendsCorrectHTTPRequest(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "PUT",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/mode",
 							},
 						},
 						Body: []v2.MatcherViewV5{
 							{
-								Matcher: "json",
+								Matcher: matchers.Json,
 								Value:   `{"mode":"capture","arguments":{}}`,
 							},
 						},
@@ -173,13 +174,13 @@ func Test_SetMode_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "PUT",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/mode",
 							},
 						},

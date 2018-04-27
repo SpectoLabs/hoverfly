@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
@@ -140,7 +141,7 @@ var tests = []headerMatchingTest{
 		headersWithMatchers: map[string][]models.RequestFieldMatchers{
 			"header1": {
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "val1",
 				},
 			},
@@ -156,7 +157,7 @@ var tests = []headerMatchingTest{
 		headersWithMatchers: map[string][]models.RequestFieldMatchers{
 			"header1": {
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "val1;val2",
 				},
 			},
@@ -172,7 +173,7 @@ var tests = []headerMatchingTest{
 		headersWithMatchers: map[string][]models.RequestFieldMatchers{
 			"header1": {
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "val1",
 				},
 			},
@@ -188,13 +189,13 @@ var tests = []headerMatchingTest{
 		headersWithMatchers: map[string][]models.RequestFieldMatchers{
 			"header1": {
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "val1",
 				},
 			},
 			"header2": {
 				{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   "*a*",
 				},
 			},
@@ -211,13 +212,13 @@ var tests = []headerMatchingTest{
 		headersWithMatchers: map[string][]models.RequestFieldMatchers{
 			"header1": {
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "val1",
 				},
 			},
 			"header2": {
 				{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   "*a*",
 				},
 			},
@@ -233,7 +234,7 @@ var tests = []headerMatchingTest{
 		headersWithMatchers: map[string][]models.RequestFieldMatchers{
 			"HEADER1": {
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "val1",
 				},
 			},
@@ -249,7 +250,7 @@ var tests = []headerMatchingTest{
 		headersWithMatchers: map[string][]models.RequestFieldMatchers{
 			"HEADER1": {
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "val1",
 				},
 			},
@@ -265,7 +266,7 @@ var tests = []headerMatchingTest{
 		headersWithMatchers: map[string][]models.RequestFieldMatchers{
 			"HEADER1": {
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "val1",
 				},
 			},
@@ -281,7 +282,7 @@ var tests = []headerMatchingTest{
 		headersWithMatchers: map[string][]models.RequestFieldMatchers{
 			"soemthing-else": {
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "val1",
 				},
 			},
@@ -300,7 +301,7 @@ var tests = []headerMatchingTest{
 		headersWithMatchers: map[string][]models.RequestFieldMatchers{
 			"soemthing-else": {
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "val1",
 				},
 			},

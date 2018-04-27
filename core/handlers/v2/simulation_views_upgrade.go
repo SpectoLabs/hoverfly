@@ -1,8 +1,9 @@
 package v2
 
 import (
-	"fmt"
 	"net/url"
+
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 )
 
 func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
@@ -26,12 +27,12 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 
 			if isNotRecording {
 				schemeMatchers = append(schemeMatchers, MatcherViewV5{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   *pairV1.Request.Scheme,
 				})
 			} else {
 				schemeMatchers = append(schemeMatchers, MatcherViewV5{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   *pairV1.Request.Scheme,
 				})
 			}
@@ -40,12 +41,12 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 		if pairV1.Request.Method != nil {
 			if isNotRecording {
 				methodMatchers = append(methodMatchers, MatcherViewV5{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   *pairV1.Request.Method,
 				})
 			} else {
 				methodMatchers = append(methodMatchers, MatcherViewV5{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   *pairV1.Request.Method,
 				})
 			}
@@ -54,12 +55,12 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 		if pairV1.Request.Destination != nil {
 			if isNotRecording {
 				destinationMatchers = append(destinationMatchers, MatcherViewV5{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   *pairV1.Request.Destination,
 				})
 			} else {
 				destinationMatchers = append(destinationMatchers, MatcherViewV5{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   *pairV1.Request.Destination,
 				})
 			}
@@ -68,12 +69,12 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 		if pairV1.Request.Path != nil {
 			if isNotRecording {
 				pathMatchers = append(pathMatchers, MatcherViewV5{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   *pairV1.Request.Path,
 				})
 			} else {
 				pathMatchers = append(pathMatchers, MatcherViewV5{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   *pairV1.Request.Path,
 				})
 			}
@@ -83,12 +84,12 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 			query, _ := url.QueryUnescape(*pairV1.Request.Query)
 			if isNotRecording {
 				queryMatchers = append(queryMatchers, MatcherViewV5{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   query,
 				})
 			} else {
 				queryMatchers = append(queryMatchers, MatcherViewV5{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   query,
 				})
 			}
@@ -97,12 +98,12 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 		if pairV1.Request.Body != nil {
 			if isNotRecording {
 				bodyMatchers = append(bodyMatchers, MatcherViewV5{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   *pairV1.Request.Body,
 				})
 			} else {
 				bodyMatchers = append(bodyMatchers, MatcherViewV5{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   *pairV1.Request.Body,
 				})
 			}
@@ -161,14 +162,14 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
 			if requestResponsePairV2.RequestMatcher.Query.ExactMatch != nil {
 				unescapedQuery, _ := url.QueryUnescape(*requestResponsePairV2.RequestMatcher.Query.ExactMatch)
 				queryMatchers = append(queryMatchers, MatcherViewV5{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   unescapedQuery,
 				})
 			}
 			if requestResponsePairV2.RequestMatcher.Query.GlobMatch != nil {
 				unescapedQuery, _ := url.QueryUnescape(*requestResponsePairV2.RequestMatcher.Query.GlobMatch)
 				queryMatchers = append(queryMatchers, MatcherViewV5{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   unescapedQuery,
 				})
 			}
@@ -228,14 +229,14 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 			if requestResponsePairV2.RequestMatcher.Query.ExactMatch != nil {
 				unescapedQuery, _ := url.QueryUnescape(*requestResponsePairV2.RequestMatcher.Query.ExactMatch)
 				queryMatchers = append(queryMatchers, MatcherViewV5{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   unescapedQuery,
 				})
 			}
 			if requestResponsePairV2.RequestMatcher.Query.GlobMatch != nil {
 				unescapedQuery, _ := url.QueryUnescape(*requestResponsePairV2.RequestMatcher.Query.GlobMatch)
 				queryMatchers = append(queryMatchers, MatcherViewV5{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   unescapedQuery,
 				})
 			}
@@ -275,53 +276,52 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 }
 
 func v2GetMatchersFromRequestFieldMatchersView(requestFieldMatchers *RequestFieldMatchersView) []MatcherViewV5 {
-	matchers := []MatcherViewV5{}
+	matcherViews := []MatcherViewV5{}
 	if requestFieldMatchers != nil {
 		if requestFieldMatchers.ExactMatch != nil {
-			matchers = append(matchers, MatcherViewV5{
-				Matcher: "exact",
+			matcherViews = append(matcherViews, MatcherViewV5{
+				Matcher: matchers.Exact,
 				Value:   *requestFieldMatchers.ExactMatch,
 			})
 		}
 		if requestFieldMatchers.GlobMatch != nil {
-			matchers = append(matchers, MatcherViewV5{
-				Matcher: "glob",
+			matcherViews = append(matcherViews, MatcherViewV5{
+				Matcher: matchers.Glob,
 				Value:   *requestFieldMatchers.GlobMatch,
 			})
 		}
 		if requestFieldMatchers.JsonMatch != nil {
-			matchers = append(matchers, MatcherViewV5{
-				Matcher: "json",
+			matcherViews = append(matcherViews, MatcherViewV5{
+				Matcher: matchers.Json,
 				Value:   *requestFieldMatchers.JsonMatch,
 			})
 		}
 		if requestFieldMatchers.JsonPathMatch != nil {
-			matchers = append(matchers, MatcherViewV5{
-				Matcher: "jsonpath",
+			matcherViews = append(matcherViews, MatcherViewV5{
+				Matcher: matchers.JsonPath,
 				Value:   *requestFieldMatchers.JsonPathMatch,
 			})
 		}
 		if requestFieldMatchers.RegexMatch != nil {
-			fmt.Println("in regex")
-			matchers = append(matchers, MatcherViewV5{
-				Matcher: "regex",
+			matcherViews = append(matcherViews, MatcherViewV5{
+				Matcher: matchers.Regex,
 				Value:   *requestFieldMatchers.RegexMatch,
 			})
 		}
 		if requestFieldMatchers.XmlMatch != nil {
-			matchers = append(matchers, MatcherViewV5{
-				Matcher: "xml",
+			matcherViews = append(matcherViews, MatcherViewV5{
+				Matcher: matchers.Xml,
 				Value:   *requestFieldMatchers.XmlMatch,
 			})
 		}
 		if requestFieldMatchers.XpathMatch != nil {
-			matchers = append(matchers, MatcherViewV5{
-				Matcher: "xpath",
+			matcherViews = append(matcherViews, MatcherViewV5{
+				Matcher: matchers.Xpath,
 				Value:   *requestFieldMatchers.XpathMatch,
 			})
 		}
 	}
-	return matchers
+	return matcherViews
 }
 
 func newMetaView(originalMeta MetaView) MetaView {

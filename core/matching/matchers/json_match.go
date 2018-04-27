@@ -5,6 +5,8 @@ import (
 	"reflect"
 )
 
+var Json = "json"
+
 func JsonMatch(match interface{}, toMatch string) bool {
 	matchString, ok := match.(string)
 	if !ok {

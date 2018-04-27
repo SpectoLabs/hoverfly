@@ -11,6 +11,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 )
@@ -204,37 +205,37 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			Method: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
 			Destination: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			Scheme: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "scheme",
 				},
 			},
 			Query: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
 			Body: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
@@ -252,37 +253,37 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "scheme",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
@@ -313,37 +314,37 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			Method: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
 			Destination: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			Scheme: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "scheme",
 				},
 			},
 			Query: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
 			Body: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
@@ -353,7 +354,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 	originalPair2.Response.Templated = false
 	originalPair2.RequestMatcher.Path = []v2.MatcherViewV5{
 		{
-			Matcher: "exact",
+			Matcher: matchers.Exact,
 			Value:   "/new/path",
 		},
 	}
@@ -361,7 +362,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 	originalPair3 := originalPair1
 	originalPair3.RequestMatcher.Path = []v2.MatcherViewV5{
 		{
-			Matcher: "exact",
+			Matcher: matchers.Exact,
 			Value:   "/newer/path",
 		},
 	}
@@ -380,37 +381,37 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 		RequestMatcher: models.RequestMatcher{
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "scheme",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
@@ -428,37 +429,37 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 		RequestMatcher: models.RequestMatcher{
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/new/path",
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "scheme",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
@@ -476,37 +477,37 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 		RequestMatcher: models.RequestMatcher{
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/newer/path",
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "scheme",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
@@ -528,7 +529,7 @@ func TestImportImportRequestResponsePairs_CanImportARequesResponsePairView(t *te
 	request := v2.RequestMatcherViewV5{
 		Method: []v2.MatcherViewV5{
 			{
-				Matcher: "exact",
+				Matcher: matchers.Exact,
 				Value:   "GET",
 			},
 		},
@@ -583,37 +584,37 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			Method: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
 			Destination: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 			Scheme: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "scheme",
 				},
 			},
 			Query: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
 			Body: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
