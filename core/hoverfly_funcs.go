@@ -7,6 +7,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -112,7 +113,7 @@ func (hf *Hoverfly) RemoveState(toRemove []string) {
 func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails, headersWhitelist []string) error {
 	body := []models.RequestFieldMatchers{
 		{
-			Matcher: "exact",
+			Matcher: matchers.Exact,
 			Value:   request.Body,
 		},
 	}
@@ -120,14 +121,14 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 	if contentType == "json" {
 		body = []models.RequestFieldMatchers{
 			{
-				Matcher: "json",
+				Matcher: matchers.Json,
 				Value:   request.Body,
 			},
 		}
 	} else if contentType == "xml" {
 		body = []models.RequestFieldMatchers{
 			{
-				Matcher: "xml",
+				Matcher: matchers.Xml,
 				Value:   request.Body,
 			},
 		}
@@ -154,31 +155,31 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		RequestMatcher: models.RequestMatcher{
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   request.Path,
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   request.Method,
 				},
 			},
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   request.Destination,
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   request.Scheme,
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   request.QueryString(),
 				},
 			},

@@ -5,6 +5,7 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 )
@@ -85,7 +86,7 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *tes
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "regex",
+					Matcher: matchers.Regex,
 					Value:   "loose",
 				},
 			},
@@ -114,38 +115,38 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMa
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "body",
 				},
 			},
 
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "destination",
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "method",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "path",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "query",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "scheme",
 				},
 			},
@@ -174,7 +175,7 @@ func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWitho
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "regex",
+					Matcher: matchers.Regex,
 					Value:   "destination",
 				},
 			},
@@ -203,7 +204,7 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "regex",
+					Matcher: matchers.Regex,
 					Value:   "destination",
 				},
 			},
@@ -218,37 +219,37 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "body",
 				},
 			},
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "destination",
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "method",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "path",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "query",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "scheme",
 				},
 			},
@@ -277,7 +278,7 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "regex",
+					Matcher: matchers.Regex,
 					Value:   "destination",
 				},
 			},
@@ -292,13 +293,13 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "body",
 				},
 			},
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "destination",
 				},
 			},
@@ -307,25 +308,25 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "method",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "path",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "query",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "scheme",
 				},
 			},

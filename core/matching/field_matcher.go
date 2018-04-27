@@ -16,43 +16,43 @@ func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMa
 	field := fields[0]
 
 	switch field.Matcher {
-	case "exact":
+	case matchers.Exact:
 		if matchers.ExactMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 2
 		} else {
 			fieldMatch.Matched = false
 		}
-	case "xml":
+	case matchers.Xml:
 		if matchers.XmlMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
-	case "xpath":
+	case matchers.Xpath:
 		if matchers.XpathMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
-	case "json":
+	case matchers.Json:
 		if matchers.JsonMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
-	case "jsonpath":
+	case matchers.JsonPath:
 		if matchers.JsonPathMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
-	case "regex":
+	case matchers.Regex:
 		if matchers.RegexMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
-	case "glob":
+	case matchers.Glob:
 		if matchers.GlobMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {

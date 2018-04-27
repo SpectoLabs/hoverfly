@@ -11,6 +11,7 @@ import (
 
 	"time"
 
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	. "github.com/onsi/gomega"
 )
 
@@ -217,10 +218,10 @@ func Test_JournalHandler_Post_CallsFilter(t *testing.T) {
 	journalEntryFilterView := JournalEntryFilterView{
 		Request: &RequestMatcherViewV5{
 			Destination: []MatcherViewV5{
-				NewMatcherView("exact", "hoverfly.io"),
+				NewMatcherView(matchers.Exact, "hoverfly.io"),
 			},
 			Path: []MatcherViewV5{
-				NewMatcherView("glob", "*"),
+				NewMatcherView(matchers.Glob, "*"),
 			},
 		},
 	}
@@ -296,10 +297,10 @@ func Test_JournalHandler_Post_JournalError(t *testing.T) {
 	requestMatcher := JournalEntryFilterView{
 		Request: &RequestMatcherViewV5{
 			Destination: []MatcherViewV5{
-				NewMatcherView("exact", "hoverfly.io"),
+				NewMatcherView(matchers.Exact, "hoverfly.io"),
 			},
 			Path: []MatcherViewV5{
-				NewMatcherView("glob", "*"),
+				NewMatcherView(matchers.Glob, "*"),
 			},
 		},
 	}

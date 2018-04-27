@@ -8,6 +8,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+var Xpath = "xpath"
+
 func XpathMatch(match interface{}, toMatch string) bool {
 	matchString, ok := match.(string)
 	if !ok {
