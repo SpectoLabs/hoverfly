@@ -161,22 +161,22 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 			requestMatcher.Scheme == nil {
 			continue
 		}
-		if !matching.UnscoredFieldMatcher(requestMatcher.Body, *entry.Request.Body).Matched {
+		if !matching.FieldMatcher(requestMatcher.Body, *entry.Request.Body).Matched {
 			continue
 		}
-		if !matching.UnscoredFieldMatcher(requestMatcher.Destination, *entry.Request.Destination).Matched {
+		if !matching.FieldMatcher(requestMatcher.Destination, *entry.Request.Destination).Matched {
 			continue
 		}
-		if !matching.UnscoredFieldMatcher(requestMatcher.Method, *entry.Request.Method).Matched {
+		if !matching.FieldMatcher(requestMatcher.Method, *entry.Request.Method).Matched {
 			continue
 		}
-		if !matching.UnscoredFieldMatcher(requestMatcher.Path, *entry.Request.Path).Matched {
+		if !matching.FieldMatcher(requestMatcher.Path, *entry.Request.Path).Matched {
 			continue
 		}
-		if !matching.UnscoredFieldMatcher(requestMatcher.Query, *entry.Request.Query).Matched {
+		if !matching.FieldMatcher(requestMatcher.Query, *entry.Request.Query).Matched {
 			continue
 		}
-		if !matching.UnscoredFieldMatcher(requestMatcher.Scheme, *entry.Request.Scheme).Matched {
+		if !matching.FieldMatcher(requestMatcher.Scheme, *entry.Request.Scheme).Matched {
 			continue
 		}
 		if !matching.HeaderMatching(requestMatcher, entry.Request.Headers).Matched {

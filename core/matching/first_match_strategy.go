@@ -18,7 +18,7 @@ func FirstMatchStrategy(req models.RequestDetails, webserver bool, simulation *m
 		matchedOnAllButState := true
 		isAMatch := true
 
-		if !UnscoredFieldMatcher(requestMatcher.Body, req.Body).Matched {
+		if !FieldMatcher(requestMatcher.Body, req.Body).Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
 			isAMatch = false
@@ -26,7 +26,7 @@ func FirstMatchStrategy(req models.RequestDetails, webserver bool, simulation *m
 		}
 
 		if !webserver {
-			if !UnscoredFieldMatcher(requestMatcher.Destination, req.Destination).Matched {
+			if !FieldMatcher(requestMatcher.Destination, req.Destination).Matched {
 				matchedOnAllButHeaders = false
 				matchedOnAllButState = false
 				isAMatch = false
@@ -34,21 +34,21 @@ func FirstMatchStrategy(req models.RequestDetails, webserver bool, simulation *m
 			}
 		}
 
-		if !UnscoredFieldMatcher(requestMatcher.Path, req.Path).Matched {
+		if !FieldMatcher(requestMatcher.Path, req.Path).Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
 			isAMatch = false
 			continue
 		}
 
-		if !UnscoredFieldMatcher(requestMatcher.Query, req.QueryString()).Matched {
+		if !FieldMatcher(requestMatcher.Query, req.QueryString()).Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
 			isAMatch = false
 			continue
 		}
 
-		if !UnscoredFieldMatcher(requestMatcher.Method, req.Method).Matched {
+		if !FieldMatcher(requestMatcher.Method, req.Method).Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
 			isAMatch = false
@@ -65,7 +65,7 @@ func FirstMatchStrategy(req models.RequestDetails, webserver bool, simulation *m
 			isAMatch = false
 		}
 
-		if !UnscoredStateMatcher(currentState, requestMatcher.RequiresState).Matched {
+		if !StateMatcher(currentState, requestMatcher.RequiresState).Matched {
 			matchedOnAllButHeaders = false
 			isAMatch = false
 		}
