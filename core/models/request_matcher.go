@@ -8,15 +8,8 @@ import (
 )
 
 type RequestFieldMatchers struct {
-	Matcher       string
-	Value         interface{}
-	ExactMatch    *string
-	XmlMatch      *string
-	XpathMatch    *string
-	JsonMatch     *string
-	JsonPathMatch *string
-	RegexMatch    *string
-	GlobMatch     *string
+	Matcher string
+	Value   interface{}
 }
 
 func NewRequestFieldMatchersFromView(matchers []v2.MatcherViewV5) []RequestFieldMatchers {
