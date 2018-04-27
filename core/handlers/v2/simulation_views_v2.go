@@ -1,57 +1,8 @@
 package v2
 
-import (
-	"net/url"
-)
-
 type SimulationViewV2 struct {
 	DataViewV2 `json:"data"`
 	MetaView   `json:"meta"`
-}
-
-func (this SimulationViewV2) Upgrade() SimulationViewV4 {
-	requestReponsePairsV3 := []RequestMatcherResponsePairViewV4{}
-
-	for _, requestResponsePairV2 := range this.DataViewV2.RequestResponsePairs {
-		if requestResponsePairV2.RequestMatcher.Query != nil {
-			if requestResponsePairV2.RequestMatcher.Query.ExactMatch != nil {
-				unescapedQuery, _ := url.QueryUnescape(*requestResponsePairV2.RequestMatcher.Query.ExactMatch)
-				requestResponsePairV2.RequestMatcher.Query.ExactMatch = &unescapedQuery
-			}
-			if requestResponsePairV2.RequestMatcher.Query.GlobMatch != nil {
-				unescapedQuery, _ := url.QueryUnescape(*requestResponsePairV2.RequestMatcher.Query.GlobMatch)
-				requestResponsePairV2.RequestMatcher.Query.GlobMatch = &unescapedQuery
-			}
-		}
-		requestResponsePairV3 := RequestMatcherResponsePairViewV4{
-			RequestMatcher: RequestMatcherViewV4{
-				Body:        requestResponsePairV2.RequestMatcher.Body,
-				Destination: requestResponsePairV2.RequestMatcher.Destination,
-				Headers:     requestResponsePairV2.RequestMatcher.Headers,
-				Method:      requestResponsePairV2.RequestMatcher.Method,
-				Path:        requestResponsePairV2.RequestMatcher.Path,
-				Query:       requestResponsePairV2.RequestMatcher.Query,
-				Scheme:      requestResponsePairV2.RequestMatcher.Scheme,
-			},
-			Response: ResponseDetailsViewV4{
-				Body:        requestResponsePairV2.Response.Body,
-				EncodedBody: requestResponsePairV2.Response.EncodedBody,
-				Headers:     requestResponsePairV2.Response.Headers,
-				Status:      requestResponsePairV2.Response.Status,
-				Templated:   false,
-			},
-		}
-
-		requestReponsePairsV3 = append(requestReponsePairsV3, requestResponsePairV3)
-	}
-
-	return SimulationViewV4{
-		DataViewV4: DataViewV4{
-			RequestResponsePairs: requestReponsePairsV3,
-			GlobalActions:        this.GlobalActions,
-		},
-		MetaView: this.MetaView,
-	}
 }
 
 type DataViewV2 struct {
