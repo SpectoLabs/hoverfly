@@ -60,8 +60,8 @@ var _ = Describe("/api/v2/cache", func() {
 			Expect(cacheView.Cache[0].MatchingPair).To(BeNil())
 			Expect(cacheView.Cache[0].ClosestMiss).ToNot(BeNil())
 
-			Expect(cacheView.Cache[0].MatchingPair.RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
-			Expect(cacheView.Cache[0].MatchingPair.RequestMatcher.Destination[0].Value).To(Equal("miss"))
+			Expect(cacheView.Cache[0].ClosestMiss.RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+			Expect(cacheView.Cache[0].ClosestMiss.RequestMatcher.Destination[0].Value).To(Equal("miss"))
 			Expect(cacheView.Cache[0].ClosestMiss.MissedFields).To(ConsistOf("destination"))
 			Expect(cacheView.Cache[0].ClosestMiss.Response.Body).To(Equal("body"))
 		})
