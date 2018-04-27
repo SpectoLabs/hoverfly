@@ -33,8 +33,12 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV5, e
 	schemaVersion := jsonMap["meta"].(map[string]interface{})["schemaVersion"].(string)
 
 	if schemaVersion == "v5" {
+		err := ValidateSimulation(jsonMap, SimulationViewV5Schema)
+		if err != nil {
+			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation:", schemaVersion) + err.Error())
+		}
 
-		err := json.Unmarshal(responseBody, &simulationView)
+		err = json.Unmarshal(responseBody, &simulationView)
 		if err != nil {
 			return SimulationViewV5{}, err
 		}

@@ -1,175 +1,171 @@
 {
-  "additionalProperties": false,
-  "definitions": {
-    "delay": {
-      "properties": {
-        "delay": {
-          "type": "integer"
-        },
-        "httpMethod": {
-          "type": "string"
-        },
-        "urlPattern": {
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "field-matchers": {
-      "properties": {
-        "exactMatch": {
-          "type": "string"
-        },
-        "globMatch": {
-          "type": "string"
-        },
-        "jsonMatch": {
-          "type": "string"
-        },
-        "regexMatch": {
-          "type": "string"
-        },
-        "xpathMatch": {
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "headers": {
-      "additionalProperties": {
-        "items": {
-          "type": "string"
-        },
-        "type": "array"
-      },
-      "type": "object"
-    },
-    "meta": {
-      "properties": {
-        "hoverflyVersion": {
-          "type": "string"
-        },
-        "schemaVersion": {
-          "type": "string"
-        },
-        "timeExported": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "schemaVersion"
-      ],
-      "type": "object"
-    },
-    "request": {
-      "properties": {
-        "body": {
-          "$ref": "#/definitions/field-matchers"
-        },
-        "destination": {
-          "$ref": "#/definitions/field-matchers"
-        },
-        "headers": {
-          "$ref": "#/definitions/headers"
-        },
-        "path": {
-          "$ref": "#/definitions/field-matchers"
-        },
-        "query": {
-          "$ref": "#/definitions/field-matchers"
-        },
-        "requiresState": {
-          "patternProperties": {
-            ".{1,}": {
-              "type": "string"
-            }
-          },
-          "type": "object"
-        },
-        "scheme": {
-          "$ref": "#/definitions/field-matchers"
-        }
-      },
-      "type": "object"
-    },
-    "request-response-pair": {
-      "properties": {
-        "request": {
-          "$ref": "#/definitions/request"
-        },
-        "response": {
-          "$ref": "#/definitions/response"
-        }
-      },
-      "required": [
-        "request",
-        "response"
-      ],
-      "type": "object"
-    },
-    "response": {
-      "properties": {
-        "body": {
-          "type": "string"
-        },
-        "encodedBody": {
-          "type": "boolean"
-        },
-        "headers": {
-          "$ref": "#/definitions/headers"
-        },
-        "removesState": {
-          "type": "array"
-        },
-        "status": {
-          "type": "integer"
-        },
-        "templated": {
-          "type": "boolean"
-        },
-        "transitionsState": {
-          "patternProperties": {
-            ".{1,}": {
-              "type": "string"
-            }
-          },
-          "type": "object"
-        }
-      },
-      "type": "object"
-    }
-  },
-  "description": "Hoverfly simulation schema",
-  "properties": {
-    "data": {
-      "properties": {
-        "globalActions": {
-          "properties": {
-            "delays": {
-              "items": {
-                "$ref": "#/definitions/delay"
-              },
-              "type": "array"
-            }
-          },
-          "type": "object"
-        },
-        "pairs": {
-          "items": {
-            "$ref": "#/definitions/request-response-pair"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "meta": {
-      "$ref": "#/definitions/meta"
-    }
-  },
-  "required": [
-    "data",
-    "meta"
-  ],
-  "type": "object"
+	"additionalProperties": false,
+	"definitions": {
+		"delay": {
+			"properties": {
+				"delay": {
+					"type": "integer"
+				},
+				"httpMethod": {
+					"type": "string"
+				},
+				"urlPattern": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"field-matchers": {
+			"properties": {
+				"matcher": {
+					"type": "string"
+				},
+				"value": {}
+			},
+			"type": "object"
+		},
+		"headers": {
+			"additionalProperties": {
+				"items": {
+					"type": "string"
+				},
+				"type": "array"
+			},
+			"type": "object"
+		},
+		"meta": {
+			"properties": {
+				"hoverflyVersion": {
+					"type": "string"
+				},
+				"schemaVersion": {
+					"type": "string"
+				},
+				"timeExported": {
+					"type": "string"
+				}
+			},
+			"required": ["schemaVersion"],
+			"type": "object"
+		},
+		"request": {
+			"properties": {
+				"body": {
+					"items": {
+						"$ref": "#/definitions/field-matchers"
+					},
+					"type": "array"
+				},
+				"destination": {
+					"items": {
+						"$ref": "#/definitions/field-matchers"
+					},
+					"type": "array"
+				},
+				"headers": {
+					"$ref": "#/definitions/headers"
+				},
+				"path": {
+					"items": {
+						"$ref": "#/definitions/field-matchers"
+					},
+					"type": "array"
+				},
+				"query": {
+					"items": {
+						"$ref": "#/definitions/field-matchers"
+					},
+					"type": "array"
+				},
+				"requiresState": {
+					"patternProperties": {
+						".{1,}": {
+							"type": "string"
+						}
+					},
+					"type": "object"
+				},
+				"scheme": {
+					"items": {
+						"$ref": "#/definitions/field-matchers"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
+		"request-response-pair": {
+			"properties": {
+				"request": {
+					"$ref": "#/definitions/request"
+				},
+				"response": {
+					"$ref": "#/definitions/response"
+				}
+			},
+			"required": ["request", "response"],
+			"type": "object"
+		},
+		"response": {
+			"properties": {
+				"body": {
+					"type": "string"
+				},
+				"encodedBody": {
+					"type": "boolean"
+				},
+				"headers": {
+					"$ref": "#/definitions/headers"
+				},
+				"removesState": {
+					"type": "array"
+				},
+				"status": {
+					"type": "integer"
+				},
+				"templated": {
+					"type": "boolean"
+				},
+				"transitionsState": {
+					"patternProperties": {
+						".{1,}": {
+							"type": "string"
+						}
+					},
+					"type": "object"
+				}
+			},
+			"type": "object"
+		}
+	},
+	"description": "Hoverfly simulation schema",
+	"properties": {
+		"data": {
+			"properties": {
+				"globalActions": {
+					"properties": {
+						"delays": {
+							"items": {
+								"$ref": "#/definitions/delay"
+							},
+							"type": "array"
+						}
+					},
+					"type": "object"
+				},
+				"pairs": {
+					"items": {
+						"$ref": "#/definitions/request-response-pair"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
+		"meta": {
+			"$ref": "#/definitions/meta"
+		}
+	},
+	"required": ["data", "meta"],
+	"type": "object"
 }
