@@ -8,16 +8,16 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_CountlessFieldMatcher_MatchesTrue_WithNilMatchers(t *testing.T) {
+func Test_FieldMatcher_MatchesTrue_WithNilMatchers(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matching.UnscoredFieldMatcher(nil, "test").Matched).To(BeTrue())
+	Expect(matching.FieldMatcher(nil, "test").Matched).To(BeTrue())
 }
 
-func Test_CountlessFieldMatcher_MatchesTrueWithJsonMatch(t *testing.T) {
+func Test_FieldMatcher_MatchesTrueWithJsonMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matching.UnscoredFieldMatcher([]models.RequestFieldMatchers{
+	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
 		{
 			Matcher: "json",
 			Value:   `{"test":true}`,
@@ -25,10 +25,10 @@ func Test_CountlessFieldMatcher_MatchesTrueWithJsonMatch(t *testing.T) {
 	}, `{"test": true}`).Matched).To(BeTrue())
 }
 
-func Test_CountlessFieldMatcher_MatchesFalseWithJsonMatch(t *testing.T) {
+func Test_FieldMatcher_MatchesFalseWithJsonMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matching.UnscoredFieldMatcher([]models.RequestFieldMatchers{
+	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
 		{
 			Matcher: "json",
 			Value:   `{"test":true}`,
@@ -36,10 +36,10 @@ func Test_CountlessFieldMatcher_MatchesFalseWithJsonMatch(t *testing.T) {
 	}, `{"test": [ ] }`).Matched).To(BeFalse())
 }
 
-func Test_CountlessFieldMatcher_MatchesTrueWithXmlMatch(t *testing.T) {
+func Test_FieldMatcher_MatchesTrueWithXmlMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matching.UnscoredFieldMatcher([]models.RequestFieldMatchers{
+	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
 		{
 			Matcher: "xml",
 			Value:   `<document></document>`,
@@ -47,68 +47,10 @@ func Test_CountlessFieldMatcher_MatchesTrueWithXmlMatch(t *testing.T) {
 	}, `<document></document>`).Matched).To(BeTrue())
 }
 
-func Test_CountlessFieldMatcher_MatchesFalseWithXmlMatch(t *testing.T) {
+func Test_FieldMatcher_MatchesFalseWithXmlMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matching.UnscoredFieldMatcher([]models.RequestFieldMatchers{
-		{
-			Matcher: "xml",
-			Value:   "`<document></document>`",
-		},
-	}, `<document>
-		<test>data</test>
-	</document>`).Matched).To(BeFalse())
-}
-
-func Test_CountlessFieldMatcher_MatchesTrue_WithMatchersNotDefined(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.UnscoredFieldMatcher([]models.RequestFieldMatchers{}, "test").Matched).To(BeTrue())
-}
-
-func Test_ScoredFieldMatcher_MatchesTrue_WithNilMatchers(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.ScoredFieldMatcher(nil, "test").Matched).To(BeTrue())
-}
-
-func Test_ScoredFieldMatcher_MatchesTrueWithJsonMatch(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.ScoredFieldMatcher([]models.RequestFieldMatchers{
-		{
-			Matcher: "json",
-			Value:   `{"test":true}`,
-		},
-	}, `{"test": true}`).Matched).To(BeTrue())
-}
-
-func Test_ScoredFieldMatcher_MatchesFalseWithJsonMatch(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.ScoredFieldMatcher([]models.RequestFieldMatchers{
-		{
-			Matcher: "json",
-			Value:   `{"test":true}`,
-		},
-	}, `{"test": [ ] }`).Matched).To(BeFalse())
-}
-
-func Test_ScoredFieldMatcher_MatchesTrueWithXmlMatch(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.ScoredFieldMatcher([]models.RequestFieldMatchers{
-		{
-			Matcher: "xml",
-			Value:   `<document></document>`,
-		},
-	}, `<document></document>`).Matched).To(BeTrue())
-}
-
-func Test_ScoredFieldMatcher_MatchesFalseWithXmlMatch(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matching.ScoredFieldMatcher([]models.RequestFieldMatchers{
+	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
 		{
 			Matcher: "xml",
 			Value:   "<document></document>",
@@ -118,16 +60,16 @@ func Test_ScoredFieldMatcher_MatchesFalseWithXmlMatch(t *testing.T) {
 	</document>`).Matched).To(BeFalse())
 }
 
-func Test_ScoredFieldMatcher_MatchesTrue_WithMatchersNotDefined(t *testing.T) {
+func Test_FieldMatcher_MatchesTrue_WithMatchersNotDefined(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matching.ScoredFieldMatcher([]models.RequestFieldMatchers{}, "test").Matched).To(BeTrue())
+	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{}, "test").Matched).To(BeTrue())
 }
 
-func Test_ScoredFieldMatcher_WithExactMatch_ScoresDouble(t *testing.T) {
+func Test_FieldMatcher_WithExactMatch_ScoresDouble(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matching.ScoredFieldMatcher([]models.RequestFieldMatchers{
+	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
 		{
 			Matcher: "exact",
 			Value:   "testtesttest",
@@ -135,11 +77,11 @@ func Test_ScoredFieldMatcher_WithExactMatch_ScoresDouble(t *testing.T) {
 	}, `testtesttest`).MatchScore).To(Equal(2))
 }
 
-func Test_ScoredFieldMatcher_CountZero_WhenFieldIsNil(t *testing.T) {
+func Test_FieldMatcher_CountZero_WhenFieldIsNil(t *testing.T) {
 	RegisterTestingT(t)
 
 	// Glob, regex, and exact
-	matcher := matching.ScoredFieldMatcher(nil, `testtesttest`)
+	matcher := matching.FieldMatcher(nil, `testtesttest`)
 
 	Expect(matcher.Matched).To(BeTrue())
 	Expect(matcher.MatchScore).To(Equal(0))

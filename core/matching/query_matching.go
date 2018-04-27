@@ -22,7 +22,7 @@ func QueryMatching(requestMatcher models.RequestMatcher, toMatch map[string][]st
 			continue
 		}
 
-		fieldMatch := ScoredFieldMatcher(matcherQueryValue, strings.Join(toMatchQueryValues, ";"))
+		fieldMatch := FieldMatcher(matcherQueryValue, strings.Join(toMatchQueryValues, ";"))
 		matcherHeaderValueMatched = fieldMatch.Matched
 		matchScore += fieldMatch.MatchScore
 

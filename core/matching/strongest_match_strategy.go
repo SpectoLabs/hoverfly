@@ -28,7 +28,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 
 		requestMatcher := matchingPair.RequestMatcher
 
-		fieldMatch := ScoredFieldMatcher(requestMatcher.Body, req.Body)
+		fieldMatch := FieldMatcher(requestMatcher.Body, req.Body)
 		if !fieldMatch.Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
@@ -38,7 +38,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 		matchScore += fieldMatch.MatchScore
 
 		if !webserver {
-			match := ScoredFieldMatcher(requestMatcher.Destination, req.Destination)
+			match := FieldMatcher(requestMatcher.Destination, req.Destination)
 			if !match.Matched {
 				matchedOnAllButHeaders = false
 				matchedOnAllButState = false
@@ -48,7 +48,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 			matchScore += match.MatchScore
 		}
 
-		fieldMatch = ScoredFieldMatcher(requestMatcher.Path, req.Path)
+		fieldMatch = FieldMatcher(requestMatcher.Path, req.Path)
 		if !fieldMatch.Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
@@ -57,7 +57,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 		}
 		matchScore += fieldMatch.MatchScore
 
-		fieldMatch = ScoredFieldMatcher(requestMatcher.Query, req.QueryString())
+		fieldMatch = FieldMatcher(requestMatcher.Query, req.QueryString())
 		if !fieldMatch.Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
@@ -66,7 +66,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 		}
 		matchScore += fieldMatch.MatchScore
 
-		fieldMatch = ScoredFieldMatcher(requestMatcher.Method, req.Method)
+		fieldMatch = FieldMatcher(requestMatcher.Method, req.Method)
 		if !fieldMatch.Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
@@ -91,7 +91,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 		}
 		matchScore += fieldMatch.MatchScore
 
-		fieldMatch = ScoredStateMatcher(state, requestMatcher.RequiresState)
+		fieldMatch = StateMatcher(state, requestMatcher.RequiresState)
 		if !fieldMatch.Matched {
 			matched = false
 			matchedOnAllButHeaders = false
