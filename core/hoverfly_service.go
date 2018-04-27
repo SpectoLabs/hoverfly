@@ -10,6 +10,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/middleware"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -230,10 +231,10 @@ func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV5
 	for _, v := range hf.Simulation.GetMatchingPairs() {
 
 		var urlStringToMatch string
-		if v.RequestMatcher.Destination != nil && len(v.RequestMatcher.Destination) != 0 && v.RequestMatcher.Destination[0].Matcher == "exact" {
+		if v.RequestMatcher.Destination != nil && len(v.RequestMatcher.Destination) != 0 && v.RequestMatcher.Destination[0].Matcher == matchers.Exact {
 			urlStringToMatch += v.RequestMatcher.Destination[0].Value.(string)
 		}
-		if v.RequestMatcher.Path != nil && len(v.RequestMatcher.Path) != 0 && v.RequestMatcher.Path[0].Matcher == "exact" {
+		if v.RequestMatcher.Path != nil && len(v.RequestMatcher.Path) != 0 && v.RequestMatcher.Path[0].Matcher == matchers.Exact {
 			urlStringToMatch += v.RequestMatcher.Path[0].Value.(string)
 		}
 

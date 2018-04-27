@@ -3,6 +3,7 @@ package models_test
 import (
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 )
@@ -16,7 +17,7 @@ func Test_Simulation_AddRequestMatcherResponsePair_CanAddAPairToTheArray(t *test
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "space",
 				},
 			},
@@ -38,38 +39,38 @@ func Test_Simulation_AddRequestMatcherResponsePair_CanAddAFullPairToTheArray(t *
 		models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "testbody",
 				},
 			},
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "testdestination",
 				},
 			},
 			Headers: map[string][]string{"testheader": []string{"testvalue"}},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "testmethod",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/testpath",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "?query=test",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "http",
 				},
 			},
@@ -111,7 +112,7 @@ func Test_Simulation_AddRequestMatcherResponsePair_WillNotSaveDuplicates(t *test
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "space",
 				},
 			},
@@ -123,7 +124,7 @@ func Test_Simulation_AddRequestMatcherResponsePair_WillNotSaveDuplicates(t *test
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "space",
 				},
 			},
@@ -143,7 +144,7 @@ func Test_Simulation_AddRequestMatcherResponsePair_WillSaveTwoWhenNotDuplicates(
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "space",
 				},
 			},
@@ -155,7 +156,7 @@ func Test_Simulation_AddRequestMatcherResponsePair_WillSaveTwoWhenNotDuplicates(
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "again",
 				},
 			},
@@ -177,7 +178,7 @@ func Test_Simulation_GetMatchingPairs(t *testing.T) {
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "space",
 				},
 			},
@@ -198,7 +199,7 @@ func Test_Simulation_DeleteMatchingPairs(t *testing.T) {
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "space",
 				},
 			},

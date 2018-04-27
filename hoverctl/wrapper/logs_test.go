@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	. "github.com/onsi/gomega"
 )
 
@@ -20,13 +21,13 @@ func Test_GetLogs_GetsLogsWithCorrect_Text_Plain_AcceptHeader(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/logs",
 							},
 						},
@@ -67,13 +68,13 @@ func Test_GetLogs_CanHandleEmptyTextPlainLogResponse(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/logs",
 							},
 						},
@@ -111,13 +112,13 @@ func Test_GetLogs_CanHandleEmptyLineAtEndOfTextPlainLogResponse(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/logs",
 							},
 						},
@@ -157,13 +158,13 @@ func Test_GetLogs_GetsLogsWithCorrect_JSON_AcceptHeader(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/logs",
 							},
 						},
@@ -210,13 +211,13 @@ func Test_GetLogs_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/logs",
 							},
 						},
@@ -249,19 +250,19 @@ func Test_GetLogs_FiltersByDateWhenFilterTimeProvided(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/logs",
 							},
 						},
 						Query: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "from=684552180",
 							},
 						},

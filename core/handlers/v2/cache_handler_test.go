@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	. "github.com/onsi/gomega"
 )
 
@@ -28,7 +29,7 @@ func (this HoverflyCacheStub) GetCache() (CacheView, error) {
 				MatchingPair: &RequestMatcherResponsePairViewV5{
 					RequestMatcher: RequestMatcherViewV5{
 						Destination: []MatcherViewV5{
-							NewMatcherView("exact", "one"),
+							NewMatcherView(matchers.Exact, "one"),
 						},
 					},
 					Response: ResponseDetailsViewV5{},
@@ -38,7 +39,7 @@ func (this HoverflyCacheStub) GetCache() (CacheView, error) {
 				MatchingPair: &RequestMatcherResponsePairViewV5{
 					RequestMatcher: RequestMatcherViewV5{
 						Destination: []MatcherViewV5{
-							NewMatcherView("exact", "two"),
+							NewMatcherView(matchers.Exact, "two"),
 						},
 					},
 					Response: ResponseDetailsViewV5{},

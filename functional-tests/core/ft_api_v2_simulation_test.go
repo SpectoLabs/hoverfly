@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/antonholmquist/jason"
 	"github.com/dghubble/sling"
@@ -394,7 +395,7 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(simulation.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV5{
 				Destination: []v2.MatcherViewV5{
 					{
-						Matcher: "exact",
+						Matcher: matchers.Exact,
 						Value:   "v1-simulation.com",
 					},
 				}}))
@@ -402,37 +403,37 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(simulation.RequestResponsePairs[1].RequestMatcher).To(Equal(v2.RequestMatcherViewV5{
 				Scheme: []v2.MatcherViewV5{
 					{
-						Matcher: "exact",
+						Matcher: matchers.Exact,
 						Value:   "http",
 					},
 				},
 				Method: []v2.MatcherViewV5{
 					{
-						Matcher: "exact",
+						Matcher: matchers.Exact,
 						Value:   "GET",
 					},
 				},
 				Destination: []v2.MatcherViewV5{
 					{
-						Matcher: "exact",
+						Matcher: matchers.Exact,
 						Value:   "v1-simulation.com",
 					},
 				},
 				Path: []v2.MatcherViewV5{
 					{
-						Matcher: "exact",
+						Matcher: matchers.Exact,
 						Value:   "/path",
 					},
 				},
 				Query: []v2.MatcherViewV5{
 					{
-						Matcher: "exact",
+						Matcher: matchers.Exact,
 						Value:   "",
 					},
 				},
 				Body: []v2.MatcherViewV5{
 					{
-						Matcher: "exact",
+						Matcher: matchers.Exact,
 						Value:   "",
 					},
 				}}))

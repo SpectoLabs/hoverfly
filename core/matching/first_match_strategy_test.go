@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 )
@@ -43,7 +44,7 @@ func Test_FirstMatchStrategy_RequestMatchersShouldMatchOnBody(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "body",
 				},
 			},
@@ -228,25 +229,25 @@ func Test_FirstMatchStrategy_EndpointMatchWithHeaders(t *testing.T) {
 			Headers: headers,
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "testhost.com",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/a/1",
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "q=test",
 				},
 			},
@@ -286,25 +287,25 @@ func Test_FirstMatchStrategy_EndpointMismatchWithHeadersReturnsNil(t *testing.T)
 			Headers: headers,
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "testhost.com",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/a/1",
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "q=test",
 				},
 			},
@@ -339,25 +340,25 @@ func Test_FirstMatchStrategy_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "testhost.com",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "",
 				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "q=test",
 				},
 			},
@@ -397,7 +398,7 @@ func Test_FirstMatchStrategy_RequestMatcherResponsePairCanBeConvertedToARequestR
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "POST",
 				},
 			},
@@ -427,7 +428,7 @@ func Test_FirstMatchStrategy_RequestMatchersCanUseGlobsAndBeMatched(t *testing.T
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   "*.com",
 				},
 			},
@@ -456,7 +457,7 @@ func Test_FirstMatchStrategy_RequestMatchersCanUseGlobsOnSchemeAndBeMatched(t *t
 		RequestMatcher: models.RequestMatcher{
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "glob",
+					Matcher: matchers.Glob,
 					Value:   "H*",
 				},
 			},
@@ -513,7 +514,7 @@ func Test_FirstMatchStrategy_RequestMatcherResponsePair_ConvertToRequestResponse
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "POST",
 				},
 			},
@@ -542,37 +543,37 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLe
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "POST",
 				},
 			},
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "body",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "http",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "foo=bar",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/foo",
 				},
 			},
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "www.test.com",
 				},
 			},
@@ -587,7 +588,7 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLe
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
@@ -624,37 +625,37 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "POST",
 				},
 			},
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "body",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "http",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "?foo=bar",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/foo",
 				},
 			},
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "www.test.com",
 				},
 			},
@@ -669,7 +670,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
@@ -809,37 +810,37 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeas
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "POST",
 				},
 			},
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "body",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "http",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "foo=bar",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/foo",
 				},
 			},
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "www.test.com",
 				},
 			},
@@ -854,7 +855,7 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeas
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},
@@ -888,37 +889,37 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "POST",
 				},
 			},
 			Body: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "body",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "http",
 				},
 			},
 			Query: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "?foo=bar",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/foo",
 				},
 			},
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "www.test.com",
 				},
 			},
@@ -933,7 +934,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "GET",
 				},
 			},

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 )
@@ -19,7 +20,7 @@ func Test_FieldMatcher_MatchesTrueWithJsonMatch(t *testing.T) {
 
 	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
 		{
-			Matcher: "json",
+			Matcher: matchers.Json,
 			Value:   `{"test":true}`,
 		},
 	}, `{"test": true}`).Matched).To(BeTrue())
@@ -30,7 +31,7 @@ func Test_FieldMatcher_MatchesFalseWithJsonMatch(t *testing.T) {
 
 	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
 		{
-			Matcher: "json",
+			Matcher: matchers.Json,
 			Value:   `{"test":true}`,
 		},
 	}, `{"test": [ ] }`).Matched).To(BeFalse())
@@ -41,7 +42,7 @@ func Test_FieldMatcher_MatchesTrueWithXmlMatch(t *testing.T) {
 
 	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
 		{
-			Matcher: "xml",
+			Matcher: matchers.Xml,
 			Value:   `<document></document>`,
 		},
 	}, `<document></document>`).Matched).To(BeTrue())
@@ -52,7 +53,7 @@ func Test_FieldMatcher_MatchesFalseWithXmlMatch(t *testing.T) {
 
 	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
 		{
-			Matcher: "xml",
+			Matcher: matchers.Xml,
 			Value:   "<document></document>",
 		},
 	}, `<document>
@@ -71,7 +72,7 @@ func Test_FieldMatcher_WithExactMatch_ScoresDouble(t *testing.T) {
 
 	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
 		{
-			Matcher: "exact",
+			Matcher: matchers.Exact,
 			Value:   "testtesttest",
 		},
 	}, `testtesttest`).MatchScore).To(Equal(2))

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	. "github.com/onsi/gomega"
 )
 
@@ -18,13 +19,13 @@ func Test_FlushCache_GetsMiddlewareFromHoverfly(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "DELETE",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/cache",
 							},
 						},
@@ -65,13 +66,13 @@ func Test_FlushCache_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "DELETE",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/cache",
 							},
 						},

@@ -10,6 +10,7 @@ import (
 	"fmt"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	. "github.com/onsi/gomega"
 )
 
@@ -24,10 +25,10 @@ func (this HoverflySimulationStub) GetSimulation() (SimulationViewV5, error) {
 	pairOne := RequestMatcherResponsePairViewV5{
 		RequestMatcher: RequestMatcherViewV5{
 			Destination: []MatcherViewV5{
-				NewMatcherView("exact", "test.com"),
+				NewMatcherView(matchers.Exact, "test.com"),
 			},
 			Path: []MatcherViewV5{
-				NewMatcherView("exact", "/testing"),
+				NewMatcherView(matchers.Exact, "/testing"),
 			},
 		},
 		Response: ResponseDetailsViewV5{

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	. "github.com/onsi/gomega"
 )
 
@@ -18,13 +19,13 @@ func Test_GetDestination_GetsDestinationFromHoverfly(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/destination",
 							},
 						},
@@ -67,13 +68,13 @@ func Test_GetDestination_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/destination",
 							},
 						},
@@ -106,13 +107,13 @@ func Test_SetDestination_SetsDestinationAndPrintsDestination(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "PUT",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/destination",
 							},
 						},
@@ -155,13 +156,13 @@ func Test_SetDestination_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "PUT",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/destination",
 							},
 						},

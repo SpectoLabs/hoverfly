@@ -4,6 +4,7 @@ import (
 	"net/url"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
@@ -40,7 +41,7 @@ type RequestMatcherResponsePair struct {
 
 func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV5) *RequestMatcherResponsePair {
 	for i, matcher := range view.RequestMatcher.Query {
-		if matcher.Matcher == "exact" {
+		if matcher.Matcher == matchers.Exact {
 			sortedQuery := util.SortQueryString(matcher.Value.(string))
 			view.RequestMatcher.Query[i].Value = sortedQuery
 		}
@@ -187,12 +188,12 @@ func (this RequestMatcher) IncludesStateMatching() bool {
 }
 
 func (this RequestMatcher) ToEagerlyCachable() *RequestDetails {
-	if this.Body == nil || len(this.Body) != 1 || this.Body[0].Matcher != "exact" ||
-		this.Destination == nil || len(this.Destination) != 1 || this.Destination[0].Matcher != "exact" ||
-		this.Method == nil || len(this.Method) != 1 || this.Method[0].Matcher != "exact" ||
-		this.Path == nil || len(this.Path) != 1 || this.Path[0].Matcher != "exact" ||
-		this.Query == nil || len(this.Query) != 1 || this.Query[0].Matcher != "exact" ||
-		this.Scheme == nil || len(this.Scheme) != 1 || this.Scheme[0].Matcher != "exact" {
+	if this.Body == nil || len(this.Body) != 1 || this.Body[0].Matcher != matchers.Exact ||
+		this.Destination == nil || len(this.Destination) != 1 || this.Destination[0].Matcher != matchers.Exact ||
+		this.Method == nil || len(this.Method) != 1 || this.Method[0].Matcher != matchers.Exact ||
+		this.Path == nil || len(this.Path) != 1 || this.Path[0].Matcher != matchers.Exact ||
+		this.Query == nil || len(this.Query) != 1 || this.Query[0].Matcher != matchers.Exact ||
+		this.Scheme == nil || len(this.Scheme) != 1 || this.Scheme[0].Matcher != matchers.Exact {
 		return nil
 	}
 

@@ -9,6 +9,7 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/gomega"
@@ -18,10 +19,10 @@ var (
 	pairOne = v2.RequestMatcherResponsePairViewV5{
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Destination: []v2.MatcherViewV5{
-				v2.NewMatcherView("exact", "test.com"),
+				v2.NewMatcherView(matchers.Exact, "test.com"),
 			},
 			Path: []v2.MatcherViewV5{
-				v2.NewMatcherView("exact", "/testing"),
+				v2.NewMatcherView(matchers.Exact, "/testing"),
 			},
 		},
 		Response: v2.ResponseDetailsViewV5{
@@ -33,7 +34,7 @@ var (
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/path",
 				},
 			},
@@ -93,7 +94,7 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePair(t *testing.T) 
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "test.com",
 				},
 			},
@@ -135,13 +136,13 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "testhost-0.com",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/test",
 				},
 			},
@@ -156,13 +157,13 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "testhost-1.com",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/test",
 				},
 			},
@@ -237,7 +238,7 @@ func TestHoverfly_GetFilteredSimulation_WithPlainTextUrlQuery(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "foo.com",
 				},
 			},
@@ -248,7 +249,7 @@ func TestHoverfly_GetFilteredSimulation_WithPlainTextUrlQuery(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "bar.com",
 				},
 			},
@@ -273,7 +274,7 @@ func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "foo.com",
 				},
 			},
@@ -284,7 +285,7 @@ func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "test-1.com",
 				},
 			},
@@ -295,7 +296,7 @@ func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "test-2.com",
 				},
 			},
@@ -322,7 +323,7 @@ func TestHoverfly_GetFilteredSimulationReturnBlankSimulation_IfThereIsNoMatch(t 
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "foo.com",
 				},
 			},
@@ -349,7 +350,7 @@ func TestHoverfly_GetFilteredSimulationReturnError_OnInvalidRegexQuery(t *testin
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "foo.com",
 				},
 			},
@@ -369,13 +370,13 @@ func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T)
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "foo.com",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/api/v1",
 				},
 			},
@@ -386,13 +387,13 @@ func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T)
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "foo.com",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/api/v2",
 				},
 			},
@@ -403,13 +404,13 @@ func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T)
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "bar.com",
 				},
 			},
 			Path: []models.RequestFieldMatchers{
 				{
-					Matcher: "exact",
+					Matcher: matchers.Exact,
 					Value:   "/api/v1",
 				},
 			},

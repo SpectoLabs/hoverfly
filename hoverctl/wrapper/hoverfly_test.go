@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	. "github.com/onsi/gomega"
 )
@@ -93,13 +94,13 @@ func Test_Stop_SendsCorrectHTTPRequest(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "DELETE",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/shutdown",
 							},
 						},
@@ -140,13 +141,13 @@ func Test_Stop_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "DELETE",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/shutdown",
 							},
 						},
@@ -180,13 +181,13 @@ func Test_CheckIfRunning_ReturnsNilWhen_HoverflyAccessible(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/public",
 							},
 						},
@@ -228,13 +229,13 @@ func Test_GetHoverfly_GetsHoverfly(t *testing.T) {
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
 						Path: []v2.MatcherViewV5{
 							{
-								Matcher: "exact",
+								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly",
 							},
 						},

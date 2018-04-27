@@ -9,6 +9,8 @@ import (
 	"k8s.io/client-go/util/jsonpath"
 )
 
+var JsonPath = "jsonpath"
+
 func JsonPathMatch(match interface{}, toMatch string) bool {
 	matchString, ok := match.(string)
 	if !ok {
