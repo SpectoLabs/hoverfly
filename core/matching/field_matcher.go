@@ -17,43 +17,43 @@ func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMa
 
 	switch field.Matcher {
 	case "exact":
-		if matchers.ExactMatch(field.Value.(string), toMatch) {
+		if matchers.ExactMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 2
 		} else {
 			fieldMatch.Matched = false
 		}
 	case "xml":
-		if matchers.XmlMatch(field.Value.(string), toMatch) {
+		if matchers.XmlMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
 	case "xpath":
-		if matchers.XpathMatch(field.Value.(string), toMatch) {
+		if matchers.XpathMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
 	case "json":
-		if matchers.JsonMatch(field.Value.(string), toMatch) {
+		if matchers.JsonMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
 	case "jsonpath":
-		if matchers.JsonPathMatch(field.Value.(string), toMatch) {
+		if matchers.JsonPathMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
 	case "regex":
-		if matchers.RegexMatch(field.Value.(string), toMatch) {
+		if matchers.RegexMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false
 		}
 	case "glob":
-		if matchers.GlobMatch(field.Value.(string), toMatch) {
+		if matchers.GlobMatch(field.Value, toMatch) {
 			fieldMatch.MatchScore = fieldMatch.MatchScore + 1
 		} else {
 			fieldMatch.Matched = false

@@ -9,14 +9,19 @@ import (
 	"k8s.io/client-go/util/jsonpath"
 )
 
-func JsonPathMatch(matchingString string, toMatch string) bool {
-	matchingString = prepareJsonPathQuery(matchingString)
+func JsonPathMatch(match interface{}, toMatch string) bool {
+	matchString, ok := match.(string)
+	if !ok {
+		return false
+	}
+
+	matchString = prepareJsonPathQuery(matchString)
 
 	jsonPath := jsonpath.New("")
 
-	err := jsonPath.Parse(matchingString)
+	err := jsonPath.Parse(matchString)
 	if err != nil {
-		log.Errorf("Failed to parse json path query %s: %s", matchingString, err.Error())
+		log.Errorf("Failed to parse json path query %s: %s", matchString, err.Error())
 		return false
 	}
 
@@ -35,7 +40,7 @@ func JsonPathMatch(matchingString string, toMatch string) bool {
 	}
 
 	returnedString := buf.String()
-	if returnedString == matchingString {
+	if returnedString == matchString {
 		return false
 	}
 

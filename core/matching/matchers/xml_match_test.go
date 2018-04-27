@@ -7,6 +7,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func Test_XmlMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.XmlMatch(1, "yes")).To(BeFalse())
+}
 func Test_XmlMatch_MatchesTrueWithXML(t *testing.T) {
 	RegisterTestingT(t)
 

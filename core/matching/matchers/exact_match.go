@@ -1,5 +1,10 @@
 package matchers
 
-func ExactMatch(matchingString string, toMatch string) bool {
-	return matchingString == toMatch
+func ExactMatch(match interface{}, toMatch string) bool {
+	matchString, ok := match.(string)
+	if !ok {
+		return false
+	}
+
+	return matchString == toMatch
 }
