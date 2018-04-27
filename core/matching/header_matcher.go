@@ -34,7 +34,7 @@ func HeaderMatching(requestMatcher models.RequestMatcher, toMatch map[string][]s
 			continue
 		}
 
-		fieldMatch := ScoredFieldMatcher(matcherHeaderValue, strings.Join(toMatchHeaderValues, ";"))
+		fieldMatch := FieldMatcher(matcherHeaderValue, strings.Join(toMatchHeaderValues, ";"))
 		matcherHeaderValueMatched = fieldMatch.Matched
 		matchScore += fieldMatch.MatchScore
 
