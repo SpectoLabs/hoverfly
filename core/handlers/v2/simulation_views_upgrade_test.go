@@ -411,3 +411,188 @@ func Test_upgradeV2_Upgrade_KeepsEncodedResponsesEncoded(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeTrue())
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("YmFzZTY0IGVuY29kZWQ="))
 }
+
+func Test_upgradeV4_ReturnsAnUpgradedSimulation(t *testing.T) {
+	RegisterTestingT(t)
+
+	v4Simulation := SimulationViewV4{
+		DataViewV4{
+			RequestResponsePairs: []RequestMatcherResponsePairViewV4{
+				{
+					RequestMatcher: RequestMatcherViewV4{
+						Scheme: &RequestFieldMatchersView{
+							RegexMatch: util.StringToPointer("http"),
+						},
+						Method: &RequestFieldMatchersView{
+							XpathMatch: util.StringToPointer("*"),
+						},
+						Query: &RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("query=query"),
+						},
+						Destination: &RequestFieldMatchersView{
+							GlobMatch: util.StringToPointer("*"),
+						},
+						Path: &RequestFieldMatchersView{
+							JsonMatch: util.StringToPointer("*"),
+						},
+						Body: &RequestFieldMatchersView{
+							XmlMatch: util.StringToPointer("*"),
+						},
+						Headers: map[string][]string{
+							"Test": []string{"headers"},
+						},
+					},
+					Response: ResponseDetailsViewV4{
+						Status:      200,
+						Body:        "body",
+						EncodedBody: false,
+						Headers: map[string][]string{
+							"Test": []string{"headers"},
+						},
+					},
+				},
+			},
+		},
+		v2Meta,
+	}
+
+	upgradedSimulation := upgradeV4(v4Simulation)
+
+	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme[0].Matcher).To(Equal("regex"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme[0].Value).To(Equal("http"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body[0].Matcher).To(Equal("xml"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body[0].Value).To(Equal("*"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("*"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Matcher).To(Equal("xpath"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Value).To(Equal("*"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal("json"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("*"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Value).To(Equal("query=query"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Templated).To(BeFalse())
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("body"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Test", []string{"headers"}))
+
+	Expect(upgradedSimulation.SchemaVersion).To(Equal("v5"))
+	Expect(upgradedSimulation.HoverflyVersion).To(Equal("test"))
+	Expect(upgradedSimulation.TimeExported).To(Equal("today"))
+}
+
+func Test_upgradeV4_Upgrade_KeepsEncodedResponsesEncoded(t *testing.T) {
+	RegisterTestingT(t)
+
+	v4Simulation := SimulationViewV4{
+		DataViewV4{
+			RequestResponsePairs: []RequestMatcherResponsePairViewV4{
+				{
+					RequestMatcher: RequestMatcherViewV4{
+						Query: &RequestFieldMatchersView{
+							GlobMatch: util.StringToPointer("q=*%20London"),
+						},
+					},
+					Response: ResponseDetailsViewV4{
+						Status:      200,
+						Body:        "YmFzZTY0IGVuY29kZWQ=",
+						EncodedBody: true,
+						Headers: map[string][]string{
+							"Test": []string{"headers"},
+						},
+					},
+				},
+			},
+		},
+		v2Meta,
+	}
+
+	upgradedSimulation := upgradeV4(v4Simulation)
+
+	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeTrue())
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("YmFzZTY0IGVuY29kZWQ="))
+}
+
+func Test_upgradeV4_UnescapesExactMatchRequestQueryParameters(t *testing.T) {
+	RegisterTestingT(t)
+
+	v4Simulation := SimulationViewV4{
+		DataViewV4{
+			RequestResponsePairs: []RequestMatcherResponsePairViewV4{
+				{
+					RequestMatcher: RequestMatcherViewV4{
+						Query: &RequestFieldMatchersView{
+							ExactMatch: util.StringToPointer("q=10%20Downing%20Street%20London"),
+						},
+					},
+					Response: ResponseDetailsViewV4{
+						Status:      200,
+						Body:        "body",
+						EncodedBody: false,
+						Headers: map[string][]string{
+							"Test": []string{"headers"},
+						},
+					},
+				},
+			},
+		},
+		v2Meta,
+	}
+
+	upgradedSimulation := upgradeV4(v4Simulation)
+
+	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Value).To(Equal("q=10 Downing Street London"))
+}
+
+func Test_upgradeV4_UnescapesGlobMatchRequestQueryParameters(t *testing.T) {
+	RegisterTestingT(t)
+
+	v4Simulation := SimulationViewV4{
+		DataViewV4{
+			RequestResponsePairs: []RequestMatcherResponsePairViewV4{
+				{
+					RequestMatcher: RequestMatcherViewV4{
+						Query: &RequestFieldMatchersView{
+							GlobMatch: util.StringToPointer("q=*%20London"),
+						},
+					},
+					Response: ResponseDetailsViewV4{
+						Status:      200,
+						Body:        "body",
+						EncodedBody: false,
+						Headers: map[string][]string{
+							"Test": []string{"headers"},
+						},
+					},
+				},
+			},
+		},
+		v2Meta,
+	}
+
+	upgradedSimulation := upgradeV4(v4Simulation)
+
+	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Value).To(Equal("q=* London"))
+}
