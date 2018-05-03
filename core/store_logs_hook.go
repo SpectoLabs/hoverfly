@@ -43,10 +43,6 @@ func (hook StoreLogsHook) Levels() []logrus.Level {
 
 type Fields map[string]interface{}
 
-func (hook StoreLogsHook) GetLogsCount() int {
-	return len(hook.Entries)
-}
-
 func (hook StoreLogsHook) GetLogs(limit int, from *time.Time) ([]*logrus.Entry, error) {
 	if hook.LogsLimit == 0 {
 		return []*logrus.Entry{}, fmt.Errorf("Logs disabled")
