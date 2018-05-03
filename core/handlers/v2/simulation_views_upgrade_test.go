@@ -412,6 +412,44 @@ func Test_upgradeV2_Upgrade_KeepsEncodedResponsesEncoded(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("YmFzZTY0IGVuY29kZWQ="))
 }
 
+func Test_upgradeV2_HandlesMultipleMatchers(t *testing.T) {
+	RegisterTestingT(t)
+
+	v2Simulation := SimulationViewV2{
+		DataViewV2{
+			RequestResponsePairs: []RequestMatcherResponsePairViewV2{
+				{
+					RequestMatcher: RequestMatcherViewV2{
+						Query: &RequestFieldMatchersView{
+							GlobMatch:  util.StringToPointer("testglob"),
+							ExactMatch: util.StringToPointer("testexact"),
+						},
+					},
+					Response: ResponseDetailsView{
+						Status:      200,
+						Body:        "body",
+						EncodedBody: false,
+						Headers: map[string][]string{
+							"Test": []string{"headers"},
+						},
+					},
+				},
+			},
+		},
+		v2Meta,
+	}
+
+	upgradedSimulation := upgradeV2(v2Simulation)
+
+	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(2))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Value).To(Equal("testexact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[1].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[1].Value).To(Equal("testglob"))
+}
+
 func Test_upgradeV4_ReturnsAnUpgradedSimulation(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -595,4 +633,42 @@ func Test_upgradeV4_UnescapesGlobMatchRequestQueryParameters(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(1))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal("glob"))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Value).To(Equal("q=* London"))
+}
+
+func Test_upgradeV4_HandlesMultipleMatchers(t *testing.T) {
+	RegisterTestingT(t)
+
+	v4Simulation := SimulationViewV4{
+		DataViewV4{
+			RequestResponsePairs: []RequestMatcherResponsePairViewV4{
+				{
+					RequestMatcher: RequestMatcherViewV4{
+						Query: &RequestFieldMatchersView{
+							GlobMatch:  util.StringToPointer("testglob"),
+							ExactMatch: util.StringToPointer("testexact"),
+						},
+					},
+					Response: ResponseDetailsViewV4{
+						Status:      200,
+						Body:        "body",
+						EncodedBody: false,
+						Headers: map[string][]string{
+							"Test": []string{"headers"},
+						},
+					},
+				},
+			},
+		},
+		v2Meta,
+	}
+
+	upgradedSimulation := upgradeV4(v4Simulation)
+
+	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(2))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Value).To(Equal("testexact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[1].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[1].Value).To(Equal("testglob"))
 }
