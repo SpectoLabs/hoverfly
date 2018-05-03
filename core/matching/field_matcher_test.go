@@ -78,6 +78,51 @@ func Test_FieldMatcher_WithExactMatch_ScoresDouble(t *testing.T) {
 	}, `testtesttest`).MatchScore).To(Equal(2))
 }
 
+func Test_FieldMatcher_WithMultipleMatchers_MatchesOnBoth(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
+		{
+			Matcher: matchers.Exact,
+			Value:   "test",
+		},
+		{
+			Matcher: matchers.Exact,
+			Value:   "test",
+		},
+	}, `test`).Matched).To(BeTrue())
+}
+
+func Test_FieldMatcher_WithMultipleMatchers_FailsOnOne(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
+		{
+			Matcher: matchers.Exact,
+			Value:   "test",
+		},
+		{
+			Matcher: matchers.Exact,
+			Value:   "nottest",
+		},
+	}, `test`).Matched).To(BeFalse())
+}
+
+func Test_FieldMatcher_WithMultipleMatchers_ScoresDouble(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
+		{
+			Matcher: matchers.Exact,
+			Value:   "test",
+		},
+		{
+			Matcher: matchers.Exact,
+			Value:   "test",
+		},
+	}, `test`).MatchScore).To(Equal(4))
+}
+
 func Test_FieldMatcher_CountZero_WhenFieldIsNil(t *testing.T) {
 	RegisterTestingT(t)
 
