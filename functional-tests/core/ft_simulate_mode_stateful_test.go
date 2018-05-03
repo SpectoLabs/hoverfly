@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -28,7 +29,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 	})
 
 	It("should be able to transition through states", func() {
-		hoverfly.ImportSimulation(functional_tests.StatePayload)
+		hoverfly.ImportSimulation(testdata.StatePayload)
 
 		GinkgoWriter.Write([]byte(`hello world`))
 

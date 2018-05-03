@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -65,7 +66,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 		BeforeEach(func() {
 			hoverfly.Start()
-			hoverfly.ImportSimulation(functional_tests.JsonPayloadWithDelays)
+			hoverfly.ImportSimulation(testdata.Delays)
 			hoverfly.SetMode("simulate")
 		})
 
@@ -85,7 +86,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 		BeforeEach(func() {
 			hoverfly.Start("-middleware", "python testdata/middleware.py")
-			hoverfly.ImportSimulation(functional_tests.JsonPayloadWithDelays)
+			hoverfly.ImportSimulation(testdata.Delays)
 			hoverfly.SetMode("synthesize")
 		})
 
@@ -106,7 +107,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 		BeforeEach(func() {
 			hoverfly.Start("-middleware", "python testdata/middleware.py")
-			hoverfly.ImportSimulation(functional_tests.JsonPayloadWithDelays)
+			hoverfly.ImportSimulation(testdata.Delays)
 			hoverfly.SetMode("modify")
 		})
 
