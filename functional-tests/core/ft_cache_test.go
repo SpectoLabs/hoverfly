@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,7 +19,7 @@ var _ = Describe("Hoverfly cache", func() {
 	BeforeEach(func() {
 		hoverfly = functional_tests.NewHoverfly()
 		hoverfly.Start()
-		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+		hoverfly.ImportSimulation(testdata.JsonPayload)
 		hoverfly.Proxy(sling.New().Get("http://destination-server.com"))
 	})
 
@@ -35,14 +36,14 @@ var _ = Describe("Hoverfly cache", func() {
 	})
 
 	It("should be flushed when importing via the API", func() {
-		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+		hoverfly.ImportSimulation(testdata.JsonPayload)
 		cacheView := hoverfly.GetCache()
 
 		Expect(cacheView.Cache).To(HaveLen(0))
 	})
 
 	It("should preload the cache with exact match request matcher when put into simulate mode", func() {
-		hoverfly.ImportSimulation(functional_tests.JsonPayloadPreloadCache)
+		hoverfly.ImportSimulation(testdata.PreloadCache)
 
 		hoverfly.SetMode("simulate")
 
@@ -52,7 +53,7 @@ var _ = Describe("Hoverfly cache", func() {
 	})
 
 	It("should not preload the cache if simulation does not contain exact match request matcher", func() {
-		hoverfly.ImportSimulation(functional_tests.JsonMatchSimulation)
+		hoverfly.ImportSimulation(testdata.JsonMatch)
 
 		hoverfly.SetMode("simulate")
 
@@ -62,7 +63,7 @@ var _ = Describe("Hoverfly cache", func() {
 	})
 
 	It("should not cache hits when matching on headers", func() {
-		hoverfly.ImportSimulation(functional_tests.ExactMatchPayload)
+		hoverfly.ImportSimulation(testdata.ExactMatch)
 
 		hoverfly.SetMode("simulate")
 
@@ -80,7 +81,7 @@ var _ = Describe("Hoverfly cache", func() {
 	})
 
 	It("should not cache misses when matched on all fields but headers", func() {
-		hoverfly.ImportSimulation(functional_tests.ExactMatchPayload)
+		hoverfly.ImportSimulation(testdata.ExactMatch)
 
 		hoverfly.SetMode("simulate")
 
