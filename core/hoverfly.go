@@ -21,15 +21,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/templating"
 )
 
-// orPanic - wrapper for logging errors
-func orPanic(err error) {
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Panic("Got error.")
-	}
-}
-
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
 type Hoverfly struct {
 	CacheMatcher   matching.CacheMatcher
