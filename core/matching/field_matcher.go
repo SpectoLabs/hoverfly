@@ -14,49 +14,14 @@ func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMa
 	}
 
 	for _, field := range fields {
-		switch field.Matcher {
-		case matchers.Exact:
-			if matchers.ExactMatch(field.Value, toMatch) {
+		if matchers.Matchers[field.Matcher](field.Value, toMatch) {
+			if field.Matcher == matchers.Exact {
 				fieldMatch.MatchScore = fieldMatch.MatchScore + 2
 			} else {
-				fieldMatch.Matched = false
-			}
-		case matchers.Xml:
-			if matchers.XmlMatch(field.Value, toMatch) {
 				fieldMatch.MatchScore = fieldMatch.MatchScore + 1
-			} else {
-				fieldMatch.Matched = false
 			}
-		case matchers.Xpath:
-			if matchers.XpathMatch(field.Value, toMatch) {
-				fieldMatch.MatchScore = fieldMatch.MatchScore + 1
-			} else {
-				fieldMatch.Matched = false
-			}
-		case matchers.Json:
-			if matchers.JsonMatch(field.Value, toMatch) {
-				fieldMatch.MatchScore = fieldMatch.MatchScore + 1
-			} else {
-				fieldMatch.Matched = false
-			}
-		case matchers.JsonPath:
-			if matchers.JsonPathMatch(field.Value, toMatch) {
-				fieldMatch.MatchScore = fieldMatch.MatchScore + 1
-			} else {
-				fieldMatch.Matched = false
-			}
-		case matchers.Regex:
-			if matchers.RegexMatch(field.Value, toMatch) {
-				fieldMatch.MatchScore = fieldMatch.MatchScore + 1
-			} else {
-				fieldMatch.Matched = false
-			}
-		case matchers.Glob:
-			if matchers.GlobMatch(field.Value, toMatch) {
-				fieldMatch.MatchScore = fieldMatch.MatchScore + 1
-			} else {
-				fieldMatch.Matched = false
-			}
+		} else {
+			fieldMatch.Matched = false
 		}
 	}
 
