@@ -11,6 +11,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/antonholmquist/jason"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -116,7 +117,7 @@ var _ = Describe("/api/v2/logs", func() {
 		BeforeEach(func() {
 			hoverfly.Start()
 			hoverfly.SetMode("simulate")
-			hoverfly.ImportSimulation(functional_tests.JsonPayload)
+			hoverfly.ImportSimulation(testdata.JsonPayload)
 			hoverfly.Proxy(sling.New().Get("http://destination-server.com"))
 		})
 

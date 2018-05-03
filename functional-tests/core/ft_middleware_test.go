@@ -8,6 +8,7 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/dghubble/sling"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo"
@@ -55,7 +56,7 @@ var _ = Describe("Running Hoverfly with middleware", func() {
 			server = httptest.NewServer(muxRouter)
 
 			hoverfly.Start("-middleware", server.URL+"/process")
-			hoverfly.ImportSimulation(functional_tests.JsonSimulationGetAndPost)
+			hoverfly.ImportSimulation(testdata.JsonGetAndPost)
 			hoverfly.SetMode("simulate")
 		})
 

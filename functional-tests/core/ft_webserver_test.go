@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/dghubble/sling"
 )
 
@@ -20,7 +21,7 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 		hoverfly = functional_tests.NewHoverfly()
 		hoverfly.Start("-webserver")
 		hoverfly.SetMode("simulate")
-		hoverfly.ImportSimulation(functional_tests.JsonSimulationGetAndPost)
+		hoverfly.ImportSimulation(testdata.JsonGetAndPost)
 	})
 
 	AfterEach(func() {

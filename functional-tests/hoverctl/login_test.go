@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -164,7 +165,7 @@ var _ = Describe("hoverctl login", func() {
 
 		It("should error when importing", func() {
 			filePath := functional_tests.GenerateFileName()
-			ioutil.WriteFile(filePath, []byte(functional_tests.JsonPayload), 0644)
+			ioutil.WriteFile(filePath, []byte(testdata.JsonPayload), 0644)
 
 			output := functional_tests.Run(hoverctlBinary, "import", "-t", "no-auth", filePath)
 			Expect(output).To(ContainSubstring("Hoverfly requires authentication"))

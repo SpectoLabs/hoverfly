@@ -7,6 +7,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/antonholmquist/jason"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -23,7 +24,7 @@ var _ = Describe("/api/v2/simulation", func() {
 		hoverfly = functional_tests.NewHoverfly()
 		hoverfly.Start()
 		hoverfly.SetMode("simulate")
-		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+		hoverfly.ImportSimulation(testdata.JsonPayload)
 	})
 
 	AfterEach(func() {
@@ -388,7 +389,7 @@ var _ = Describe("/api/v2/simulation", func() {
 		})
 
 		It("should import old v1 simulations and upgrade them to v2 simulations", func() {
-			hoverfly.ImportSimulation(functional_tests.JsonPayloadV1)
+			hoverfly.ImportSimulation(testdata.JsonPayloadV1)
 
 			simulation := hoverfly.ExportSimulation()
 

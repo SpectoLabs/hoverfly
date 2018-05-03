@@ -2,6 +2,7 @@ package hoverctl_suite
 
 import (
 	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,7 +18,7 @@ var _ = Describe("hoverctl flush cache", func() {
 		hoverfly = functional_tests.NewHoverfly()
 		hoverfly.Start()
 		hoverfly.SetMode("simulate")
-		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+		hoverfly.ImportSimulation(testdata.JsonPayload)
 		hoverfly.Proxy(sling.New().Get("http://destination-server.com"))
 
 		functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--admin-port", hoverfly.GetAdminPort())

@@ -6,6 +6,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/antonholmquist/jason"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -21,7 +22,7 @@ var _ = Describe("/api/v2/cache", func() {
 	BeforeEach(func() {
 		hoverfly = functional_tests.NewHoverfly()
 		hoverfly.Start()
-		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+		hoverfly.ImportSimulation(testdata.JsonPayload)
 	})
 
 	AfterEach(func() {
@@ -49,7 +50,7 @@ var _ = Describe("/api/v2/cache", func() {
 				MatchingStrategy: util.StringToPointer("strongest"),
 			})
 
-			hoverfly.ImportSimulation(functional_tests.SingleRequestMatcherToResponse)
+			hoverfly.ImportSimulation(testdata.SingleRequestMatcherToResponse)
 
 			hoverfly.Proxy(sling.New().Get("http://unknown-destination.com"))
 			cacheView := hoverfly.GetCache()
@@ -71,7 +72,7 @@ var _ = Describe("/api/v2/cache", func() {
 				MatchingStrategy: util.StringToPointer("first"),
 			})
 
-			hoverfly.ImportSimulation(functional_tests.SingleRequestMatcherToResponse)
+			hoverfly.ImportSimulation(testdata.SingleRequestMatcherToResponse)
 
 			hoverfly.Proxy(sling.New().Get("http://unknown-destination.com"))
 			cacheView := hoverfly.GetCache()

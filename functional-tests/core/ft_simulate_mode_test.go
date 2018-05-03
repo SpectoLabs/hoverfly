@@ -6,6 +6,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -28,7 +29,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 	})
 
 	It("should match against the first request matcher in simulation", func() {
-		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+		hoverfly.ImportSimulation(testdata.JsonPayload)
 
 		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/path1"))
 		Expect(resp.StatusCode).To(Equal(200))
@@ -41,7 +42,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 	})
 
 	It("should match against the first request matcher in simulation over HTTPS", func() {
-		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+		hoverfly.ImportSimulation(testdata.JsonPayload)
 
 		resp := hoverfly.Proxy(sling.New().Get("https://test-server.com/path1"))
 		Expect(resp.StatusCode).To(Equal(200))
@@ -54,7 +55,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 	})
 
 	It("should match against the second request matcher in simulation", func() {
-		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+		hoverfly.ImportSimulation(testdata.JsonPayload)
 
 		slingRequest := sling.New().Get("http://destination-server.com/should-match-regardless")
 		response := hoverfly.Proxy(slingRequest)
@@ -65,7 +66,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 	})
 
 	It("should match against the second request matcher in simulation over HTTPS", func() {
-		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+		hoverfly.ImportSimulation(testdata.JsonPayload)
 
 		slingRequest := sling.New().Get("http://destination-server.com/should-match-regardless")
 		response := hoverfly.Proxy(slingRequest)
@@ -77,7 +78,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 	It("should apply middleware to the cached response", func() {
 		hoverfly.SetMiddleware("python", functional_tests.Middleware)
-		hoverfly.ImportSimulation(functional_tests.JsonPayload)
+		hoverfly.ImportSimulation(testdata.JsonPayload)
 
 		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/path1"))
 
@@ -89,7 +90,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 	It("Should perform a strongest match by default", func() {
 
-		hoverfly.ImportSimulation(functional_tests.StrongestMatchProofSimulation)
+		hoverfly.ImportSimulation(testdata.StrongestMatchProof)
 
 		slingRequest := sling.New().Get("http://destination.com/should-match-strongest")
 		response := hoverfly.Proxy(slingRequest)
@@ -104,7 +105,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 			MatchingStrategy: util.StringToPointer("strongest"),
 		})
 
-		hoverfly.ImportSimulation(functional_tests.StrongestMatchProofSimulation)
+		hoverfly.ImportSimulation(testdata.StrongestMatchProof)
 
 		slingRequest := sling.New().Get("http://destination.com/should-match-strongest")
 		response := hoverfly.Proxy(slingRequest)
@@ -119,7 +120,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 			MatchingStrategy: util.StringToPointer("first"),
 		})
 
-		hoverfly.ImportSimulation(functional_tests.StrongestMatchProofSimulation)
+		hoverfly.ImportSimulation(testdata.StrongestMatchProof)
 
 		slingRequest := sling.New().Get("http://destination.com/should-match-strongest")
 		response := hoverfly.Proxy(slingRequest)
@@ -131,7 +132,7 @@ var _ = Describe("When I run Hoverfly in simulate mode", func() {
 
 	It("Should respond with the closest miss, once from matchers & once from cache", func() {
 
-		hoverfly.ImportSimulation(functional_tests.ClosestMissProofSimulation)
+		hoverfly.ImportSimulation(testdata.ClosestMissProof)
 
 		slingRequest := sling.New().Get("http://destination.com/closest-miss")
 		response := hoverfly.Proxy(slingRequest)
@@ -280,7 +281,7 @@ Which if hit would have given the following response:
 
 	It("should no longer cause issue #607", func() {
 
-		hoverfly.ImportSimulation(functional_tests.Issue607)
+		hoverfly.ImportSimulation(testdata.Issue607)
 
 		// Match
 		i := sling.New().Get("https://domain.com/billing/v1/servicequotes/123456?saleschannel=RETAIL")
@@ -343,7 +344,7 @@ Which if hit would have given the following response:
 	})
 
 	It("should template response if templating is enabled and cache template not response", func() {
-		hoverfly.ImportSimulation(functional_tests.TemplatingEnabled)
+		hoverfly.ImportSimulation(testdata.TemplatingEnabled)
 
 		hoverfly.WriteLogsIfError()
 
@@ -365,7 +366,7 @@ Which if hit would have given the following response:
 	})
 
 	It("should be able to use state in templating", func() {
-		hoverfly.ImportSimulation(functional_tests.TemplatingEnabledWithStateInBody)
+		hoverfly.ImportSimulation(testdata.TemplatingEnabledWithStateInBody)
 
 		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/one"))
 		Expect(resp.StatusCode).To(Equal(200))
@@ -378,7 +379,7 @@ Which if hit would have given the following response:
 	})
 
 	It("should not template response if templating is disabled explicitely", func() {
-		hoverfly.ImportSimulation(functional_tests.TemplatingDisabled)
+		hoverfly.ImportSimulation(testdata.TemplatingDisabled)
 
 		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com?one=foo"))
 		Expect(resp.StatusCode).To(Equal(200))
@@ -390,7 +391,7 @@ Which if hit would have given the following response:
 	})
 
 	It("should not template response if templating is not explcitely enabled or disabled", func() {
-		hoverfly.ImportSimulation(functional_tests.TemplatingDisabledByDefault)
+		hoverfly.ImportSimulation(testdata.TemplatingDisabledByDefault)
 
 		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com?one=foo"))
 		Expect(resp.StatusCode).To(Equal(200))
@@ -402,7 +403,7 @@ Which if hit would have given the following response:
 	})
 
 	It("should not crash when templating a response if templating variable does not exist", func() {
-		hoverfly.ImportSimulation(functional_tests.TemplatingEnabled)
+		hoverfly.ImportSimulation(testdata.TemplatingEnabled)
 
 		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com?wrong=foo"))
 		Expect(resp.StatusCode).To(Equal(200))
