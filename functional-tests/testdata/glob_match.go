@@ -1,6 +1,38 @@
 package testdata
 
 var GlobMatch = `{
+	"data": {
+		"pairs": [
+			{
+				"request": {
+					"body": [
+						{
+							"matcher": "glob",
+							"value": "*<item field=*>*"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "glob match",
+					"encodedBody": false,
+					"templated": false
+				}
+			}
+		],
+		"globalActions": {
+			"delays": []
+		}
+	},
+	"meta": {
+		"schemaVersion": "v5",
+		"hoverflyVersion": "v0.17.0",
+		"timeExported": "2018-05-03T12:15:49+01:00"
+	}
+}
+`
+
+var V3GlobMatch = `{
     "data": {
         "pairs": [
             {

@@ -1,6 +1,149 @@
 package testdata
 
 var ExactMatch = `{
+	"data": {
+		"pairs": [
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
+							"value": "/path1"
+						}
+					],
+					"method": [
+						{
+							"matcher": "exact",
+							"value": "GET"
+						}
+					],
+					"destination": [
+						{
+							"matcher": "exact",
+							"value": "test-server.com"
+						}
+					],
+					"scheme": [
+						{
+							"matcher": "exact",
+							"value": "http"
+						}
+					],
+					"query": [
+						{
+							"matcher": "exact",
+							"value": ""
+						}
+					],
+					"body": [
+						{
+							"matcher": "exact",
+							"value": ""
+						}
+					],
+					"headers": {
+						"Header": [
+							"value1"
+						]
+					}
+				},
+				"response": {
+					"status": 200,
+					"body": "exact match 1",
+					"encodedBody": false,
+					"headers": {
+						"Header": [
+							"value1"
+						]
+					},
+					"templated": false
+				}
+			},
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
+							"value": "/path1"
+						}
+					],
+					"method": [
+						{
+							"matcher": "exact",
+							"value": "GET"
+						}
+					],
+					"destination": [
+						{
+							"matcher": "exact",
+							"value": "test-server.com"
+						}
+					],
+					"scheme": [
+						{
+							"matcher": "exact",
+							"value": "http"
+						}
+					],
+					"query": [
+						{
+							"matcher": "exact",
+							"value": ""
+						}
+					],
+					"body": [
+						{
+							"matcher": "exact",
+							"value": ""
+						}
+					],
+					"headers": {
+						"Header": [
+							"value2"
+						]
+					}
+				},
+				"response": {
+					"status": 200,
+					"body": "exact match 2",
+					"encodedBody": false,
+					"headers": {
+						"Header": [
+							"value2"
+						]
+					},
+					"templated": false
+				}
+			},
+			{
+				"request": {
+					"destination": [
+						{
+							"matcher": "exact",
+							"value": "destination-server.com"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "destination matched",
+					"encodedBody": false,
+					"templated": false
+				}
+			}
+		],
+		"globalActions": {
+			"delays": []
+		}
+	},
+	"meta": {
+		"schemaVersion": "v5",
+		"hoverflyVersion": "v0.17.0",
+		"timeExported": "2018-05-03T12:12:46+01:00"
+	}
+}`
+
+var V3ExactMatch = `{
     "data": {
         "pairs": [
             {
