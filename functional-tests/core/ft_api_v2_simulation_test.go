@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"io/ioutil"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/antonholmquist/jason"
@@ -386,59 +384,6 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(err).To(BeNil())
 
 			Expect(pairsArray).To(HaveLen(0))
-		})
-
-		It("should import old v1 simulations and upgrade them to v2 simulations", func() {
-			hoverfly.ImportSimulation(testdata.JsonPayloadV1)
-
-			simulation := hoverfly.ExportSimulation()
-
-			Expect(simulation.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV5{
-				Destination: []v2.MatcherViewV5{
-					{
-						Matcher: matchers.Exact,
-						Value:   "v1-simulation.com",
-					},
-				}}))
-
-			Expect(simulation.RequestResponsePairs[1].RequestMatcher).To(Equal(v2.RequestMatcherViewV5{
-				Scheme: []v2.MatcherViewV5{
-					{
-						Matcher: matchers.Exact,
-						Value:   "http",
-					},
-				},
-				Method: []v2.MatcherViewV5{
-					{
-						Matcher: matchers.Exact,
-						Value:   "GET",
-					},
-				},
-				Destination: []v2.MatcherViewV5{
-					{
-						Matcher: matchers.Exact,
-						Value:   "v1-simulation.com",
-					},
-				},
-				Path: []v2.MatcherViewV5{
-					{
-						Matcher: matchers.Exact,
-						Value:   "/path",
-					},
-				},
-				Query: []v2.MatcherViewV5{
-					{
-						Matcher: matchers.Exact,
-						Value:   "",
-					},
-				},
-				Body: []v2.MatcherViewV5{
-					{
-						Matcher: matchers.Exact,
-						Value:   "",
-					},
-				}}))
-
 		})
 
 		It("should error when importing unknown version", func() {

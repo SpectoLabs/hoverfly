@@ -66,7 +66,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 		BeforeEach(func() {
 			hoverfly.Start()
-			hoverfly.ImportSimulation(testdata.Delays)
+			hoverfly.ImportSimulation(testdata.V3Delays)
 			hoverfly.SetMode("simulate")
 		})
 
@@ -86,7 +86,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 		BeforeEach(func() {
 			hoverfly.Start("-middleware", "python testdata/middleware.py")
-			hoverfly.ImportSimulation(testdata.Delays)
+			hoverfly.ImportSimulation(testdata.V3Delays)
 			hoverfly.SetMode("synthesize")
 		})
 
@@ -107,7 +107,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 
 		BeforeEach(func() {
 			hoverfly.Start("-middleware", "python testdata/middleware.py")
-			hoverfly.ImportSimulation(testdata.Delays)
+			hoverfly.ImportSimulation(testdata.V3Delays)
 			hoverfly.SetMode("modify")
 		})
 
