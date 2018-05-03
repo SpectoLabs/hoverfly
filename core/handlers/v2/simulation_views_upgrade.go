@@ -241,16 +241,31 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 				})
 			}
 		}
+
+		headersWithMatchers := map[string][]MatcherViewV5{}
+
+		for key, value := range requestResponsePairV2.RequestMatcher.HeadersWithMatchers {
+			headersWithMatchers[key] = v2GetMatchersFromRequestFieldMatchersView(value)
+		}
+
+		queriesWithMatchers := map[string][]MatcherViewV5{}
+
+		for key, value := range requestResponsePairV2.RequestMatcher.QueriesWithMatchers {
+			queriesWithMatchers[key] = v2GetMatchersFromRequestFieldMatchersView(value)
+		}
+
 		requestResponsePair := RequestMatcherResponsePairViewV5{
 			RequestMatcher: RequestMatcherViewV5{
-				Destination:   destinationMatchers,
-				Headers:       requestResponsePairV2.RequestMatcher.Headers,
-				Method:        methodMatchers,
-				Path:          pathMatchers,
-				Query:         queryMatchers,
-				Scheme:        schemeMatchers,
-				Body:          bodyMatchers,
-				RequiresState: requestResponsePairV2.RequestMatcher.RequiresState,
+				Destination:         destinationMatchers,
+				Headers:             requestResponsePairV2.RequestMatcher.Headers,
+				Method:              methodMatchers,
+				Path:                pathMatchers,
+				Query:               queryMatchers,
+				Scheme:              schemeMatchers,
+				Body:                bodyMatchers,
+				HeadersWithMatchers: headersWithMatchers,
+				QueriesWithMatchers: queriesWithMatchers,
+				RequiresState:       requestResponsePairV2.RequestMatcher.RequiresState,
 			},
 			Response: ResponseDetailsViewV5{
 				Body:             requestResponsePairV2.Response.Body,
