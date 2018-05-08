@@ -6,7 +6,10 @@ func StateMatcher(currentState, requiredState map[string]string) *FieldMatch {
 	matched := true
 
 	if requiredState == nil || len(requiredState) == 0 {
-		return FieldMatchWithNoScore(true)
+		return &FieldMatch{
+			Matched: true,
+			Score:   0,
+		}
 	}
 
 	for key, value := range requiredState {
