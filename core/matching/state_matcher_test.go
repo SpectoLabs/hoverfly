@@ -12,7 +12,7 @@ func Test_StateMatcher_houldMatchIfBothCurrentAndRequiredStateAreNil(t *testing.
 	match := StateMatcher(nil, nil)
 
 	Expect(match.Matched).To(BeTrue())
-	Expect(match.MatchScore).To(Equal(0))
+	Expect(match.Score).To(Equal(0))
 }
 
 func Test_StateMatcher_ShouldMatchIfCurrentStateIsNilAndRequiredStateIsEmpty(t *testing.T) {
@@ -21,7 +21,7 @@ func Test_StateMatcher_ShouldMatchIfCurrentStateIsNilAndRequiredStateIsEmpty(t *
 	match := StateMatcher(nil, make(map[string]string))
 
 	Expect(match.Matched).To(BeTrue())
-	Expect(match.MatchScore).To(Equal(0))
+	Expect(match.Score).To(Equal(0))
 }
 
 func Test_StateMatcher_ShouldMatchIfCurrentStateIEmptyAndRequiredStateIsNil(t *testing.T) {
@@ -30,7 +30,7 @@ func Test_StateMatcher_ShouldMatchIfCurrentStateIEmptyAndRequiredStateIsNil(t *t
 	match := StateMatcher(make(map[string]string), nil)
 
 	Expect(match.Matched).To(BeTrue())
-	Expect(match.MatchScore).To(Equal(0))
+	Expect(match.Score).To(Equal(0))
 }
 
 func Test_StateMatcher_ShouldNotMatchIfRequiredStateLengthIsGreaterThanActualStateLength(t *testing.T) {
@@ -39,7 +39,7 @@ func Test_StateMatcher_ShouldNotMatchIfRequiredStateLengthIsGreaterThanActualSta
 	match := StateMatcher(make(map[string]string), map[string]string{"foo": "bar"})
 
 	Expect(match.Matched).To(BeFalse())
-	Expect(match.MatchScore).To(Equal(0))
+	Expect(match.Score).To(Equal(0))
 }
 
 func Test_StateMatcher_ShouldNotMatchIfLengthsAreTheSameButKeysAreDifferent(t *testing.T) {
@@ -50,7 +50,7 @@ func Test_StateMatcher_ShouldNotMatchIfLengthsAreTheSameButKeysAreDifferent(t *t
 		map[string]string{"adasd": "bar", "sadsad": "ham"})
 
 	Expect(match.Matched).To(BeFalse())
-	Expect(match.MatchScore).To(Equal(0))
+	Expect(match.Score).To(Equal(0))
 }
 
 func Test_StateMatcher_ShouldNotMatchIfKeysAreTheSameButValuesAreDifferent(t *testing.T) {
@@ -61,7 +61,7 @@ func Test_StateMatcher_ShouldNotMatchIfKeysAreTheSameButValuesAreDifferent(t *te
 		map[string]string{"foo": "adsad", "cheese": "ham"})
 
 	Expect(match.Matched).To(BeFalse())
-	Expect(match.MatchScore).To(Equal(1))
+	Expect(match.Score).To(Equal(1))
 }
 
 func Test_StateMatcher_ShouldMatchIsKeysAndValuesAreTheSame(t *testing.T) {
@@ -72,5 +72,5 @@ func Test_StateMatcher_ShouldMatchIsKeysAndValuesAreTheSame(t *testing.T) {
 		map[string]string{"foo": "bar", "cheese": "ham"})
 
 	Expect(match.Matched).To(BeTrue())
-	Expect(match.MatchScore).To(Equal(2))
+	Expect(match.Score).To(Equal(2))
 }

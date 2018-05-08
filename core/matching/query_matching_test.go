@@ -129,7 +129,7 @@ func Test_QueryMatching(t *testing.T) {
 
 		Expect(result.Matched).To(test.equals, test.name)
 		if test.matchEquals != nil {
-			Expect(result.MatchScore).To(test.matchEquals, test.name)
+			Expect(result.Score).To(test.matchEquals, test.name)
 		}
 	}
 
