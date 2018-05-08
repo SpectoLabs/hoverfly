@@ -16,9 +16,9 @@ func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMa
 	for _, field := range fields {
 		if matchers.Matchers[field.Matcher](field.Value, toMatch) {
 			if field.Matcher == matchers.Exact {
-				fieldMatch.MatchScore = fieldMatch.MatchScore + 2
+				fieldMatch.Score = fieldMatch.Score + 2
 			} else {
-				fieldMatch.MatchScore = fieldMatch.MatchScore + 1
+				fieldMatch.Score = fieldMatch.Score + 1
 			}
 		} else {
 			fieldMatch.Matched = false
@@ -30,12 +30,12 @@ func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMa
 
 func FieldMatchWithNoScore(matched bool) *FieldMatch {
 	return &FieldMatch{
-		Matched:    matched,
-		MatchScore: 0,
+		Matched: matched,
+		Score:   0,
 	}
 }
 
 type FieldMatch struct {
-	Matched    bool
-	MatchScore int
+	Matched bool
+	Score   int
 }

@@ -9,7 +9,7 @@ import (
 func QueryMatching(requestMatcher models.RequestMatcher, toMatch map[string][]string) *FieldMatch {
 
 	matched := true
-	var matchScore int
+	var score int
 
 	requestMatcherQueriesWithMatchers := requestMatcher.QueriesWithMatchers
 
@@ -24,7 +24,7 @@ func QueryMatching(requestMatcher models.RequestMatcher, toMatch map[string][]st
 
 		fieldMatch := FieldMatcher(matcherQueryValue, strings.Join(toMatchQueryValues, ";"))
 		matcherHeaderValueMatched = fieldMatch.Matched
-		matchScore += fieldMatch.MatchScore
+		score += fieldMatch.Score
 
 		if !matcherHeaderValueMatched {
 			matched = false
@@ -32,7 +32,7 @@ func QueryMatching(requestMatcher models.RequestMatcher, toMatch map[string][]st
 	}
 
 	return &FieldMatch{
-		Matched:    matched,
-		MatchScore: matchScore,
+		Matched: matched,
+		Score:   score,
 	}
 }

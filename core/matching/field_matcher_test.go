@@ -155,7 +155,7 @@ func Test_FieldMatcher(t *testing.T) {
 			Expect(result.Matched).To(test.equals, test.name)
 		}
 		if test.scoreEquals != nil {
-			Expect(result.MatchScore).To(test.scoreEquals, test.name)
+			Expect(result.Score).To(test.scoreEquals, test.name)
 		}
 	}
 

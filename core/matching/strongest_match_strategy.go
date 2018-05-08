@@ -21,7 +21,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 		// TODO: enable matching on scheme
 
 		missedFields := make([]string, 0)
-		var matchScore int
+		var score int
 		matched := true
 		matchedOnAllButHeaders := true
 		matchedOnAllButState := true
@@ -35,7 +35,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 			matched = false
 			missedFields = append(missedFields, "body")
 		}
-		matchScore += fieldMatch.MatchScore
+		score += fieldMatch.Score
 
 		if !webserver {
 			match := FieldMatcher(requestMatcher.Destination, req.Destination)
@@ -45,7 +45,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 				matched = false
 				missedFields = append(missedFields, "destination")
 			}
-			matchScore += match.MatchScore
+			score += match.Score
 		}
 
 		fieldMatch = FieldMatcher(requestMatcher.Path, req.Path)
@@ -55,7 +55,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 			matched = false
 			missedFields = append(missedFields, "path")
 		}
-		matchScore += fieldMatch.MatchScore
+		score += fieldMatch.Score
 
 		fieldMatch = FieldMatcher(requestMatcher.Query, req.QueryString())
 		if !fieldMatch.Matched {
@@ -64,7 +64,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 			matched = false
 			missedFields = append(missedFields, "query")
 		}
-		matchScore += fieldMatch.MatchScore
+		score += fieldMatch.Score
 
 		fieldMatch = FieldMatcher(requestMatcher.Method, req.Method)
 		if !fieldMatch.Matched {
@@ -73,7 +73,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 			matched = false
 			missedFields = append(missedFields, "method")
 		}
-		matchScore += fieldMatch.MatchScore
+		score += fieldMatch.Score
 
 		fieldMatch = HeaderMatching(requestMatcher, req.Headers)
 		if !fieldMatch.Matched {
@@ -81,7 +81,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 			matchedOnAllButState = false
 			missedFields = append(missedFields, "headers")
 		}
-		matchScore += fieldMatch.MatchScore
+		score += fieldMatch.Score
 
 		fieldMatch = QueryMatching(requestMatcher, req.Query)
 		if !fieldMatch.Matched {
@@ -89,7 +89,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 			matchedOnAllButState = false
 			missedFields = append(missedFields, "queries")
 		}
-		matchScore += fieldMatch.MatchScore
+		score += fieldMatch.Score
 
 		fieldMatch = StateMatcher(state, requestMatcher.RequiresState)
 		if !fieldMatch.Matched {
@@ -97,7 +97,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 			matchedOnAllButHeaders = false
 			missedFields = append(missedFields, "state")
 		}
-		matchScore += fieldMatch.MatchScore
+		score += fieldMatch.Score
 
 		// This only counts if there was actually a matcher for headers
 		if matchedOnAllButHeaders && requestMatcher.Headers != nil && len(requestMatcher.Headers) > 0 {
@@ -109,15 +109,15 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 			matchedOnAllButStateAtLeastOnce = true
 		}
 
-		if matched == true && matchScore >= strongestMatchScore {
+		if matched == true && score >= strongestMatchScore {
 			requestMatch = &models.RequestMatcherResponsePair{
 				RequestMatcher: requestMatcher,
 				Response:       matchingPair.Response,
 			}
-			strongestMatchScore = matchScore
+			strongestMatchScore = score
 			closestMiss = nil
-		} else if matched == false && requestMatch == nil && matchScore >= closestMissScore {
-			closestMissScore = matchScore
+		} else if matched == false && requestMatch == nil && score >= closestMissScore {
+			closestMissScore = score
 			view := matchingPair.BuildView()
 			closestMiss = &models.ClosestMiss{
 				RequestDetails: req,
