@@ -15,6 +15,16 @@ func Test_FieldMatcher_MatchesTrue_WithNilMatchers(t *testing.T) {
 	Expect(matching.FieldMatcher(nil, "test").Matched).To(BeTrue())
 }
 
+func Test_FieldMatcher_MatchesTrueWithDefaultMatcherWhichIsExactMatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matching.FieldMatcher([]models.RequestFieldMatchers{
+		{
+			Value: `test`,
+		},
+	}, `test`).Matched).To(BeTrue())
+}
+
 func Test_FieldMatcher_MatchesTrueWithJsonMatch(t *testing.T) {
 	RegisterTestingT(t)
 
