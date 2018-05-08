@@ -28,13 +28,6 @@ func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMa
 	return fieldMatch
 }
 
-func FieldMatchWithNoScore(matched bool) *FieldMatch {
-	return &FieldMatch{
-		Matched: matched,
-		Score:   0,
-	}
-}
-
 type FieldMatch struct {
 	Matched bool
 	Score   int
