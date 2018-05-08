@@ -16,7 +16,7 @@ func HeaderMatching(requestMatcher models.RequestMatcher, toMatch map[string][]s
 	// }
 
 	matched := true
-	var matchScore int
+	var score int
 
 	requestMatcherHeadersWithMatchers := requestMatcher.HeadersWithMatchers
 
@@ -36,7 +36,7 @@ func HeaderMatching(requestMatcher models.RequestMatcher, toMatch map[string][]s
 
 		fieldMatch := FieldMatcher(matcherHeaderValue, strings.Join(toMatchHeaderValues, ";"))
 		matcherHeaderValueMatched = fieldMatch.Matched
-		matchScore += fieldMatch.MatchScore
+		score += fieldMatch.Score
 
 		if !matcherHeaderValueMatched {
 			matched = false
@@ -61,7 +61,7 @@ func HeaderMatching(requestMatcher models.RequestMatcher, toMatch map[string][]s
 			for _, toMatchHeaderValue := range toMatchHeaderValues {
 				if glob.Glob(strings.ToLower(matcherHeaderValue), strings.ToLower(toMatchHeaderValue)) {
 					matcherHeaderValueMatched = true
-					matchScore++
+					score++
 				}
 			}
 
@@ -71,7 +71,7 @@ func HeaderMatching(requestMatcher models.RequestMatcher, toMatch map[string][]s
 		}
 	}
 	return &FieldMatch{
-		Matched:    matched,
-		MatchScore: matchScore,
+		Matched: matched,
+		Score:   score,
 	}
 }

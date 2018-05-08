@@ -21,7 +21,7 @@ func StateMatcher(currentState, requiredState map[string]string) *FieldMatch {
 	}
 
 	return &FieldMatch{
-		Matched:    matched,
-		MatchScore: score,
+		Matched: matched,
+		Score:   score,
 	}
 }
