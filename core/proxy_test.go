@@ -2,11 +2,13 @@ package hoverfly
 
 import (
 	"net/http"
+	"net/url"
 	"testing"
 
 	"bufio"
-	. "github.com/onsi/gomega"
 	"net"
+
+	. "github.com/onsi/gomega"
 
 	"net/http/httptest"
 )
@@ -118,4 +120,166 @@ func shouldHandleConnect(t *testing.T, hoverfly *Hoverfly, url string) {
 	connReq.Write(conn)
 	resp, err := http.ReadResponse(bufio.NewReader(conn), connReq)
 	Expect(resp.StatusCode).To(Equal(200))
+}
+
+func Test_matchesFilter_ShouldMatchHostDestination(t *testing.T) {
+	RegisterTestingT(t)
+	httpResult := matchesFilter("test.com")(&http.Request{
+		URL: &url.URL{
+			Scheme: "http",
+			Host:   "test.com",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpResult).To(BeTrue())
+
+	httpsResult := matchesFilter("test.com")(&http.Request{
+		URL: &url.URL{
+			Scheme: "https",
+			Host:   "test.com",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpsResult).To(BeTrue())
+}
+
+func Test_matchesFilter_ShouldMatchPathDestination(t *testing.T) {
+	RegisterTestingT(t)
+	httpResult := matchesFilter("/testing")(&http.Request{
+		URL: &url.URL{
+			Scheme: "http",
+			Host:   "test.com",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpResult).To(BeTrue())
+
+	httpsResult := matchesFilter("/testing")(&http.Request{
+		URL: &url.URL{
+			Scheme: "https",
+			Host:   "test.com",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpsResult).To(BeTrue())
+}
+
+func Test_matchesFilter_ShouldMatchHostAndPathDestination(t *testing.T) {
+	RegisterTestingT(t)
+	httpResult := matchesFilter("test.com/testing")(&http.Request{
+		URL: &url.URL{
+			Scheme: "http",
+			Host:   "test.com",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpResult).To(BeTrue())
+
+	httpsResult := matchesFilter("test.com/testing")(&http.Request{
+		URL: &url.URL{
+			Scheme: "https",
+			Host:   "test.com",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpsResult).To(BeTrue())
+}
+
+func Test_matchesFilter_ShouldMatchSchemeDestination(t *testing.T) {
+	RegisterTestingT(t)
+	httpResult := matchesFilter("https")(&http.Request{
+		URL: &url.URL{
+			Scheme: "http",
+			Host:   "test.com",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpResult).To(BeFalse())
+
+	httpsResult := matchesFilter("https://")(&http.Request{
+		URL: &url.URL{
+			Scheme: "https",
+			Host:   "test.com",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpsResult).To(BeTrue())
+}
+
+func Test_matchesFilter_ShouldMatchSchemeAndHostDestination(t *testing.T) {
+	RegisterTestingT(t)
+	httpResult := matchesFilter("https://test.com")(&http.Request{
+		URL: &url.URL{
+			Scheme: "http",
+			Host:   "test.com",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpResult).To(BeFalse())
+
+	httpsResult := matchesFilter("https://test.com")(&http.Request{
+		URL: &url.URL{
+			Scheme: "https",
+			Host:   "test.com",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpsResult).To(BeTrue())
+}
+
+func Test_matchesFilter_ShouldMatchSchemeAndHostAndPathDestination(t *testing.T) {
+	RegisterTestingT(t)
+	httpResult := matchesFilter("https://test.com/testing")(&http.Request{
+		URL: &url.URL{
+			Scheme: "http",
+			Host:   "test.com",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpResult).To(BeFalse())
+
+	httpsResult := matchesFilter("https://test.com/testing")(&http.Request{
+		URL: &url.URL{
+			Scheme: "https",
+			Host:   "test.com",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpsResult).To(BeTrue())
+}
+
+func Test_matchesFilter_ShoulRemoveSslPortFromHostToMatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	httpsResult := matchesFilter("https://test.com/testing")(&http.Request{
+		URL: &url.URL{
+			Scheme: "https",
+			Host:   "test.com:443",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpsResult).To(BeTrue())
+
+	noSchemeResult := matchesFilter("https://test.com/testing")(&http.Request{
+		URL: &url.URL{
+			Scheme: "",
+			Host:   "test.com:443",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(noSchemeResult).To(BeTrue())
+}
+
+func Test_matchesFilter_ShoulRemovePathFromFilterIfConnectRequest(t *testing.T) {
+	RegisterTestingT(t)
+
+	removedPathResult := matchesFilter("https://test.com/testing")(&http.Request{
+		Method: http.MethodConnect,
+		URL: &url.URL{
+			Scheme: "https",
+			Host:   "test.com:443",
+			Path:   "",
+		},
+	}, nil)
+	Expect(removedPathResult).To(BeTrue())
 }
