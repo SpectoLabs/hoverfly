@@ -188,8 +188,11 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		},
 		Response: *response,
 	}
-
-	hf.Simulation.AddPair(&pair)
+	if recordSequence {
+		hf.Simulation.AddPairInSequence(&pair, hf.state)
+	} else {
+		hf.Simulation.AddPair(&pair)
+	}
 
 	return nil
 }
