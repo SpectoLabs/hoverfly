@@ -4,9 +4,10 @@ import (
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/state"
 )
 
-func Match(strongestMatch string, req models.RequestDetails, webserver bool, simulation *models.Simulation, state map[string]string) *MatchingResult {
+func Match(strongestMatch string, req models.RequestDetails, webserver bool, simulation *models.Simulation, state *state.State) *MatchingResult {
 	if strings.ToLower(strongestMatch) == "strongest" {
 		return StrongestMatchStrategy(req, webserver, simulation, state)
 	} else {

@@ -6,6 +6,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/state"
 	. "github.com/onsi/gomega"
 )
 
@@ -30,7 +31,7 @@ func Test_FirstMatchStrategy_EmptyRequestMatchersShouldMatchOnAnyRequest(t *test
 			"sdv": {"ascd"},
 		},
 	}
-	result := matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
@@ -55,7 +56,7 @@ func Test_FirstMatchStrategy_RequestMatchersShouldMatchOnBody(t *testing.T) {
 	r := models.RequestDetails{
 		Body: "body",
 	}
-	result := matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 	Expect(result.Error).To(BeNil())
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
@@ -87,7 +88,7 @@ func Test_FirstMatchStrategy_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
 		},
 	}
 
-	result := matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
@@ -117,7 +118,7 @@ func Test_FirstMatchStrategy_ReturnNilWhenOneHeaderNotPresentInRequest(t *testin
 		},
 	}
 
-	result := matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Pair).To(BeNil())
 }
@@ -147,7 +148,7 @@ func Test_FirstMatchStrategy_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) 
 			"header2": []string{"different"},
 		},
 	}
-	result := matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Pair).To(BeNil())
 }
@@ -178,7 +179,7 @@ func Test_FirstMatchStrategy_ReturnResponseWithMultiValuedHeaderMatch(t *testing
 			"header2": []string{"val2"},
 		},
 	}
-	result := matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
@@ -209,7 +210,7 @@ func Test_FirstMatchStrategy_ReturnNilWithDifferentMultiValuedHeaders(t *testing
 		},
 	}
 
-	result := matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Pair).To(BeNil())
 }
@@ -267,7 +268,7 @@ func Test_FirstMatchStrategy_EndpointMatchWithHeaders(t *testing.T) {
 			"header2": []string{"val2"},
 		},
 	}
-	result := matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
@@ -326,7 +327,7 @@ func Test_FirstMatchStrategy_EndpointMismatchWithHeadersReturnsNil(t *testing.T)
 		},
 	}
 
-	result := matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Pair).To(BeNil())
 }
@@ -373,7 +374,7 @@ func Test_FirstMatchStrategy_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T
 			"q": []string{"test"},
 		},
 	}
-	result := matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 
@@ -386,7 +387,7 @@ func Test_FirstMatchStrategy_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T
 		},
 	}
 
-	result = matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result = matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Pair).To(BeNil())
 }
@@ -442,7 +443,7 @@ func Test_FirstMatchStrategy_RequestMatchersCanUseGlobsAndBeMatched(t *testing.T
 		Path:        "/api/1",
 	}
 
-	result := matching.FirstMatchStrategy(request, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(request, false, simulation, &state.State{State: make(map[string]string)})
 	Expect(result.Error).To(BeNil())
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
@@ -472,7 +473,7 @@ func Test_FirstMatchStrategy_RequestMatchersCanUseGlobsOnSchemeAndBeMatched(t *t
 		Path:        "/api/1",
 	}
 
-	result := matching.FirstMatchStrategy(request, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(request, false, simulation, &state.State{State: make(map[string]string)})
 	Expect(result.Error).To(BeNil())
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
@@ -501,7 +502,7 @@ func Test_FirstMatchStrategy_RequestMatchersCanUseGlobsOnHeadersAndBeMatched(t *
 		},
 	}
 
-	result := matching.FirstMatchStrategy(request, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(request, false, simulation, &state.State{State: make(map[string]string)})
 	Expect(result.Error).To(BeNil())
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
@@ -610,7 +611,7 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLe
 		},
 	}
 
-	result := matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeFalse())
@@ -692,7 +693,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		},
 	}
 
-	result := matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -711,7 +712,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		},
 	}
 
-	result = matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result = matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -730,7 +731,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		},
 	}
 
-	result = matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result = matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -749,7 +750,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		},
 	}
 
-	result = matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result = matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -768,7 +769,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 		},
 	}
 
-	result = matching.FirstMatchStrategy(r, false, simulation, make(map[string]string))
+	result = matching.FirstMatchStrategy(r, false, simulation, &state.State{State: make(map[string]string)})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -794,7 +795,7 @@ func Test_FirstMatchStrategy_RequestMatchersShouldMatchOnStateAndNotBeCachable(t
 		r,
 		false,
 		simulation,
-		map[string]string{"key1": "value1", "key2": "value2"})
+		&state.State{State: map[string]string{"key1": "value1", "key2": "value2"}})
 
 	Expect(result.Error).To(BeNil())
 	Expect(result.Cachable).To(BeFalse())
@@ -874,7 +875,7 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeas
 		Path:   "/foo",
 	}
 
-	result := matching.FirstMatchStrategy(r, false, simulation, map[string]string{"miss": "me"})
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeFalse())
@@ -953,7 +954,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		Path:   "/foo",
 	}
 
-	result := matching.FirstMatchStrategy(r, false, simulation, map[string]string{"miss": "me"})
+	result := matching.FirstMatchStrategy(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -969,7 +970,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		Path:   "/foo",
 	}
 
-	result = matching.FirstMatchStrategy(r, false, simulation, map[string]string{"miss": "me"})
+	result = matching.FirstMatchStrategy(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -985,7 +986,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		Path:   "/foo",
 	}
 
-	result = matching.FirstMatchStrategy(r, false, simulation, map[string]string{"miss": "me"})
+	result = matching.FirstMatchStrategy(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -1001,7 +1002,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		Path:   "/foo",
 	}
 
-	result = matching.FirstMatchStrategy(r, false, simulation, map[string]string{"miss": "me"})
+	result = matching.FirstMatchStrategy(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -1017,7 +1018,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		Path:   "miss",
 	}
 
-	result = matching.FirstMatchStrategy(r, false, simulation, map[string]string{"miss": "me"})
+	result = matching.FirstMatchStrategy(r, false, simulation, &state.State{map[string]string{"miss": "me"}})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())

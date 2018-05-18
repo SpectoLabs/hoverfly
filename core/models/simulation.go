@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+
+	"github.com/SpectoLabs/hoverfly/core/state"
 )
 
 type Simulation struct {
@@ -32,7 +34,7 @@ func (this *Simulation) AddPair(pair *RequestMatcherResponsePair) {
 	}
 }
 
-func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, state map[string]string) {
+func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, state *state.State) {
 	var duplicate bool
 
 	updates := map[int]RequestMatcherResponsePair{}
@@ -68,7 +70,7 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 			if sequenceState == "" {
 				sequenceState = "1"
 				nextSequenceState = "2"
-				state["sequence"] = "1"
+				state.State["sequence"] = "1"
 
 			} else {
 				currentSequenceState, _ := strconv.Atoi(sequenceState)

@@ -18,6 +18,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
+	"github.com/SpectoLabs/hoverfly/core/state"
 	"github.com/SpectoLabs/hoverfly/core/templating"
 )
 
@@ -37,7 +38,7 @@ type Hoverfly struct {
 
 	modeMap map[string]modes.Mode
 
-	state map[string]string
+	state *state.State
 
 	Simulation    *models.Simulation
 	StoreLogsHook *StoreLogsHook
@@ -58,7 +59,7 @@ func NewHoverfly() *Hoverfly {
 		StoreLogsHook:  NewStoreLogsHook(),
 		Journal:        journal.NewJournal(),
 		Cfg:            InitSettings(),
-		state:          make(map[string]string),
+		state:          state.NewState(),
 		templator:      templating.NewTemplator(),
 		responsesDiff:  make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport),
 	}

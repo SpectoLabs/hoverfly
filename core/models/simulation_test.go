@@ -5,6 +5,7 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/state"
 	. "github.com/onsi/gomega"
 )
 
@@ -153,7 +154,7 @@ func Test_Simulation_AddPairInSequence_CanAddAFullPairToTheArray(t *testing.T) {
 			Headers: map[string][]string{"testheader": []string{"testvalue"}},
 			Status:  200,
 		},
-	}, map[string]string{})
+	}, &state.State{State: map[string]string{}})
 
 	Expect(unit.GetMatchingPairs()).To(HaveLen(1))
 
@@ -195,7 +196,7 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 			Headers: map[string][]string{"testheader": []string{"testvalue"}},
 			Status:  200,
 		},
-	}, map[string]string{})
+	}, &state.State{State: map[string]string{}})
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
@@ -211,7 +212,7 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 			Headers: map[string][]string{"testheader": []string{"testvalue"}},
 			Status:  200,
 		},
-	}, map[string]string{})
+	}, &state.State{State: map[string]string{}})
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
@@ -227,7 +228,7 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 			Headers: map[string][]string{"testheader": []string{"testvalue"}},
 			Status:  200,
 		},
-	}, map[string]string{})
+	}, &state.State{State: map[string]string{}})
 
 	Expect(unit.GetMatchingPairs()).To(HaveLen(3))
 
@@ -288,7 +289,7 @@ func Test_Simulation_AddPairInSequence_CanBeUsedWithAddPair(t *testing.T) {
 			Headers: map[string][]string{"testheader": []string{"testvalue"}},
 			Status:  200,
 		},
-	}, map[string]string{})
+	}, &state.State{State: map[string]string{}})
 
 	Expect(unit.GetMatchingPairs()).To(HaveLen(2))
 
