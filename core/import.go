@@ -15,6 +15,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/state"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -138,6 +139,7 @@ func isJSON(s string) bool {
 
 // ImportRequestResponsePairViews - a function to save given pairs into the database.
 func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v2.RequestMatcherResponsePairViewV5) error {
+	initialStates := map[string]string{}
 	if len(pairViews) > 0 {
 		success := 0
 		failed := 0
@@ -146,9 +148,15 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v2.RequestMatcher
 			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
 
 			hf.Simulation.AddPair(pair)
+			for k, v := range pair.RequestMatcher.RequiresState {
+				initialStates[k] = v
+			}
 			success++
 			continue
 		}
+
+		hf.state = state.NewStateFromState(initialStates)
+
 		log.WithFields(log.Fields{
 			"total":      len(pairViews),
 			"successful": success,
@@ -156,5 +164,6 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v2.RequestMatcher
 		}).Info("payloads imported")
 		return nil
 	}
+
 	return nil
 }
