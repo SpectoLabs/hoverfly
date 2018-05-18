@@ -80,7 +80,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	// Templating applies at the end, once we have loaded a response. Comes BEFORE state transitions,
 	// as we use the current state in templates
 	if response.Templated == true {
-		responseBody, err := hf.templator.ApplyTemplate(&requestDetails, hf.state, response.Body)
+		responseBody, err := hf.templator.ApplyTemplate(&requestDetails, hf.state.State, response.Body)
 		if err == nil {
 			response.Body = responseBody
 		}
@@ -88,25 +88,13 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 	// State transitions after we have the response
 	if response.TransitionsState != nil {
-		hf.TransitionState(response.TransitionsState)
+		hf.state.PatchState(response.TransitionsState)
 	}
 	if response.RemovesState != nil {
-		hf.RemoveState(response.RemovesState)
+		hf.state.RemoveState(response.RemovesState)
 	}
 
 	return &response, nil
-}
-
-func (hf *Hoverfly) TransitionState(transition map[string]string) {
-	for k, v := range transition {
-		hf.state[k] = v
-	}
-}
-
-func (hf *Hoverfly) RemoveState(toRemove []string) {
-	for _, key := range toRemove {
-		delete(hf.state, key)
-	}
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache

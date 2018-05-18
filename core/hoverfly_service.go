@@ -15,6 +15,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/middleware"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
+	"github.com/SpectoLabs/hoverfly/core/state"
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
@@ -287,21 +288,19 @@ func (this Hoverfly) IsMiddlewareSet() bool {
 }
 
 func (this *Hoverfly) GetState() map[string]string {
-	return this.state
+	return this.state.State
 }
 
 func (this *Hoverfly) SetState(state map[string]string) {
-	this.state = state
+	this.state.SetState(state)
 }
 
 func (this *Hoverfly) PatchState(toPatch map[string]string) {
-	for k, v := range toPatch {
-		this.state[k] = v
-	}
+	this.state.PatchState(toPatch)
 }
 
 func (this *Hoverfly) ClearState() {
-	this.state = make(map[string]string)
+	this.state = state.NewState()
 }
 
 func (this *Hoverfly) GetDiff() map[v2.SimpleRequestDefinitionView][]v2.DiffReport {
