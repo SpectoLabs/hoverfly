@@ -735,7 +735,7 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 		Body:    "testresponsebody",
 		Headers: map[string][]string{"testheader": []string{"testvalue"}},
 		Status:  200,
-	}, nil)
+	}, nil, false)
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
 
@@ -774,7 +774,7 @@ func Test_Hoverfly_Save_DoesNotSaveRequestHeadersWhenGivenHeadersArrayIsNil(t *t
 		Body:    "testresponsebody",
 		Headers: map[string][]string{"testheader": []string{"testvalue"}},
 		Status:  200,
-	}, nil)
+	}, nil, false)
 
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(BeEmpty())
 }
@@ -793,7 +793,7 @@ func Test_Hoverfly_Save_SavesAllRequestHeadersWhenGivenAnAsterisk(t *testing.T) 
 		Body:    "testresponsebody",
 		Headers: map[string][]string{"testheader": []string{"testvalue"}},
 		Status:  200,
-	}, []string{"*"})
+	}, []string{"*"}, false)
 
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveLen(2))
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
@@ -814,7 +814,7 @@ func Test_Hoverfly_Save_SavesSpecificRequestHeadersWhenSpecifiedInHeadersArray(t
 		Body:    "testresponsebody",
 		Headers: map[string][]string{"testheader": []string{"testvalue"}},
 		Status:  200,
-	}, []string{"testheader"})
+	}, []string{"testheader"}, false)
 
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveLen(1))
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
@@ -834,7 +834,7 @@ func Test_Hoverfly_Save_DoesNotSaveAnyRequestHeaderIfItDoesNotMatchEntryInHeader
 		Body:    "testresponsebody",
 		Headers: map[string][]string{"testheader": []string{"testvalue"}},
 		Status:  200,
-	}, []string{"nonmatch"})
+	}, []string{"nonmatch"}, false)
 
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(BeEmpty())
 }
@@ -854,7 +854,7 @@ func Test_Hoverfly_Save_SavesMultipleRequestHeadersWhenMultiplesSpecifiedInHeade
 		Body:    "testresponsebody",
 		Headers: map[string][]string{"testheader": []string{"testvalue"}},
 		Status:  200,
-	}, []string{"testheader", "nonmatch"})
+	}, []string{"testheader", "nonmatch"}, false)
 
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveLen(2))
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
@@ -872,7 +872,7 @@ func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing
 		Body:    "testresponsebody",
 		Headers: map[string][]string{"testheader": []string{"testvalue"}},
 		Status:  200,
-	}, nil)
+	}, nil, false)
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
 
@@ -901,7 +901,7 @@ func Test_Hoverfly_Save_SavesRequestBodyAsJsonPathIfContentTypeIsJson(t *testing
 		Headers: map[string][]string{
 			"Content-Type": []string{"application/json"},
 		},
-	}, &models.ResponseDetails{}, nil)
+	}, &models.ResponseDetails{}, nil, false)
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
 
@@ -920,7 +920,7 @@ func Test_Hoverfly_Save_SavesRequestBodyAsXmlPathIfContentTypeIsXml(t *testing.T
 		Headers: map[string][]string{
 			"Content-Type": {"application/xml"},
 		},
-	}, &models.ResponseDetails{}, nil)
+	}, &models.ResponseDetails{}, nil, false)
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
 
@@ -1237,7 +1237,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 			Body:   fmt.Sprintf("body here, number=%d", i),
 		}
 
-		dbClient.Save(req, resp, nil)
+		dbClient.Save(req, resp, nil, false)
 	}
 
 	// now getting responses

@@ -15,7 +15,7 @@ import (
 type HoverflyCapture interface {
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
 	DoRequest(*http.Request) (*http.Response, error)
-	Save(*models.RequestDetails, *models.ResponseDetails, []string) error
+	Save(*models.RequestDetails, *models.ResponseDetails, []string, bool) error
 }
 
 type CaptureMode struct {
@@ -76,7 +76,7 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 	}
 
 	// saving response body with request/response meta to cache
-	err = this.Hoverfly.Save(&pair.Request, responseObj, this.Arguments.Headers)
+	err = this.Hoverfly.Save(&pair.Request, responseObj, this.Arguments.Headers, this.Arguments.Stateful)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when saving request and response", Capture)
 	}
