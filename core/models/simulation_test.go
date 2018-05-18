@@ -236,18 +236,74 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.RequiresState["sequence"]).To(Equal("1"))
 
 	Expect(unit.GetMatchingPairs()[0].Response.Body).To(Equal("1"))
+	Expect(unit.GetMatchingPairs()[0].Response.TransitionsState["sequence"]).To(Equal("2"))
 
 	Expect(unit.GetMatchingPairs()[1].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[1].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
 	Expect(unit.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence"]).To(Equal("2"))
 
 	Expect(unit.GetMatchingPairs()[1].Response.Body).To(Equal("2"))
+	Expect(unit.GetMatchingPairs()[1].Response.TransitionsState["sequence"]).To(Equal("3"))
 
 	Expect(unit.GetMatchingPairs()[2].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[2].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
 	Expect(unit.GetMatchingPairs()[2].RequestMatcher.RequiresState["sequence"]).To(Equal("3"))
 
 	Expect(unit.GetMatchingPairs()[2].Response.Body).To(Equal("3"))
+	Expect(unit.GetMatchingPairs()[2].Response.TransitionsState["sequence"]).To(Equal(""))
+}
+
+func Test_Simulation_AddPairInSequence_CanBeUsedWithAddPair(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := models.NewSimulation()
+
+	unit.AddPair(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "testdestination",
+				},
+			},
+		},
+		models.ResponseDetails{
+			Body:    "1",
+			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Status:  200,
+		},
+	})
+
+	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "testdestination",
+				},
+			},
+		},
+		models.ResponseDetails{
+			Body:    "2",
+			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Status:  200,
+		},
+	}, map[string]string{})
+
+	Expect(unit.GetMatchingPairs()).To(HaveLen(2))
+
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.RequiresState["sequence"]).To(Equal("1"))
+
+	Expect(unit.GetMatchingPairs()[0].Response.Body).To(Equal("1"))
+	Expect(unit.GetMatchingPairs()[0].Response.TransitionsState["sequence"]).To(Equal("2"))
+
+	Expect(unit.GetMatchingPairs()[1].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(unit.GetMatchingPairs()[1].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
+	Expect(unit.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence"]).To(Equal("2"))
+
+	Expect(unit.GetMatchingPairs()[1].Response.Body).To(Equal("2"))
 }
 func Test_Simulation_AddPair_WillNotSaveDuplicates(t *testing.T) {
 	RegisterTestingT(t)
