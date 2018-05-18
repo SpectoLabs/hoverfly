@@ -12,7 +12,6 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
@@ -38,14 +37,6 @@ type Mode interface {
 	Process(*http.Request, models.RequestDetails) (*http.Response, error)
 	SetArguments(arguments ModeArguments)
 	View() v2.ModeView
-}
-
-type Hoverfly interface {
-	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
-	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
-	DoRequest(*http.Request) (*http.Response, error)
-	IsMiddlewareSet() bool
-	Save(*models.RequestDetails, *models.ResponseDetails)
 }
 
 type ModeArguments struct {
