@@ -142,7 +142,7 @@ func InitSettings() *Configuration {
 	if os.Getenv(HoverflySecretEV) != "" {
 		appConfig.SecretKey = []byte(os.Getenv(HoverflySecretEV))
 	} else {
-		appConfig.SecretKey = GetRandomName(10)
+		appConfig.SecretKey = getRandomName(10)
 	}
 
 	if os.Getenv(HoverflyTokenExpirationEV) != "" {
