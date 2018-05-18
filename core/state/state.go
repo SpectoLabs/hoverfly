@@ -1,5 +1,9 @@
 package state
 
+import (
+	"strings"
+)
+
 type State struct {
 	State map[string]string
 }
@@ -8,6 +12,20 @@ func NewState() *State {
 	return &State{
 		State: map[string]string{},
 	}
+}
+
+func NewStateFromState(incomingState map[string]string) *State {
+	state := &State{
+		State: map[string]string{},
+	}
+
+	for stateKey, _ := range incomingState {
+		if strings.Contains(stateKey, "sequence") {
+			state.State[stateKey] = "1"
+		}
+	}
+
+	return state
 }
 
 func (s *State) GetState(key string) string {

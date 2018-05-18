@@ -642,3 +642,37 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 			Body:        "",
 			Headers:     map[string][]string{"Hoverfly": []string{"testing"}}}}))
 }
+
+func TestImportImportRequestResponsePairs_SetsState(t *testing.T) {
+	RegisterTestingT(t)
+
+	cache := cache.NewInMemoryCache()
+	cfg := Configuration{Webserver: false}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
+
+	RegisterTestingT(t)
+
+	encodedPair := v2.RequestMatcherResponsePairViewV5{
+		Response: v2.ResponseDetailsViewV5{
+			Status:      200,
+			Body:        base64String("hello_world"),
+			EncodedBody: true,
+			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
+		RequestMatcher: v2.RequestMatcherViewV5{
+			Body: []v2.MatcherViewV5{
+				{
+					Matcher: matchers.Exact,
+					Value:   "",
+				},
+			},
+			RequiresState: map[string]string{
+				"sequence:1": "1",
+			},
+		},
+	}
+
+	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
+
+	Expect(hv.state.GetState("sequence:1")).To(Equal("1"))
+}
