@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/state"
 )
@@ -40,6 +41,7 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 	updates := map[int]RequestMatcherResponsePair{}
 
 	var counter int
+	sequenceKey := "sequence:0"
 
 	for i, savedPair := range this.matchingPairs {
 
@@ -64,20 +66,27 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 			if pair.RequestMatcher.RequiresState == nil {
 				pair.RequestMatcher.RequiresState = map[string]string{}
 			}
+			sequenceKey = getNewSequenceKey(state)
+			for key, _ := range savedPair.RequestMatcher.RequiresState {
+				if strings.Contains(key, "sequence:") {
+					sequenceKey = key
+					break
+				}
+			}
 
-			sequenceState := savedPair.RequestMatcher.RequiresState["sequence"]
+			sequenceState := savedPair.RequestMatcher.RequiresState[sequenceKey]
 			nextSequenceState := ""
 			if sequenceState == "" {
 				sequenceState = "1"
 				nextSequenceState = "2"
-				state.State["sequence"] = "1"
+				state.State[sequenceKey] = "1"
 
 			} else {
 				currentSequenceState, _ := strconv.Atoi(sequenceState)
 				nextSequenceState = strconv.Itoa(currentSequenceState + 1)
 			}
-			savedPair.RequestMatcher.RequiresState["sequence"] = sequenceState
-			savedPair.Response.TransitionsState["sequence"] = nextSequenceState
+			savedPair.RequestMatcher.RequiresState[sequenceKey] = sequenceState
+			savedPair.Response.TransitionsState[sequenceKey] = nextSequenceState
 			updates[i] = savedPair
 		}
 	}
@@ -86,12 +95,25 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 		this.matchingPairs[i] = updatedPair
 	}
 
-	fmt.Println(counter)
 	if counter != 0 {
-		pair.RequestMatcher.RequiresState["sequence"] = strconv.Itoa(counter + 1)
+		pair.RequestMatcher.RequiresState[sequenceKey] = strconv.Itoa(counter + 1)
 	}
 
 	this.matchingPairs = append(this.matchingPairs, *pair)
+}
+
+func getNewSequenceKey(state *state.State) string {
+	returnKey := ""
+	i := 0
+	for returnKey == "" {
+		tempKey := fmt.Sprintf("sequence:%v", i)
+		if state.GetState(tempKey) == "" {
+			returnKey = tempKey
+		} else {
+			i = i + 1
+		}
+	}
+	return returnKey
 }
 
 func (this *Simulation) GetMatchingPairs() []RequestMatcherResponsePair {
