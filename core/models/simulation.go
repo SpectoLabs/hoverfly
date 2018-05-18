@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -66,7 +65,7 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 			if pair.RequestMatcher.RequiresState == nil {
 				pair.RequestMatcher.RequiresState = map[string]string{}
 			}
-			sequenceKey = getNewSequenceKey(state)
+			sequenceKey = state.GetNewSequenceKey()
 			for key, _ := range savedPair.RequestMatcher.RequiresState {
 				if strings.Contains(key, "sequence:") {
 					sequenceKey = key
@@ -79,7 +78,7 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 			if sequenceState == "" {
 				sequenceState = "1"
 				nextSequenceState = "2"
-				state.State[sequenceKey] = "1"
+				state.SetState(map[string]string{sequenceKey: "1"})
 
 			} else {
 				currentSequenceState, _ := strconv.Atoi(sequenceState)
@@ -100,20 +99,6 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 	}
 
 	this.matchingPairs = append(this.matchingPairs, *pair)
-}
-
-func getNewSequenceKey(state *state.State) string {
-	returnKey := ""
-	i := 0
-	for returnKey == "" {
-		tempKey := fmt.Sprintf("sequence:%v", i)
-		if state.GetState(tempKey) == "" {
-			returnKey = tempKey
-		} else {
-			i = i + 1
-		}
-	}
-	return returnKey
 }
 
 func (this *Simulation) GetMatchingPairs() []RequestMatcherResponsePair {

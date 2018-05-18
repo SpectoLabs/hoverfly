@@ -1,6 +1,7 @@
 package state
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -46,4 +47,18 @@ func (s *State) RemoveState(toRemove []string) {
 	for _, key := range toRemove {
 		delete(s.State, key)
 	}
+}
+
+func (s *State) GetNewSequenceKey() string {
+	returnKey := ""
+	i := 0
+	for returnKey == "" {
+		tempKey := fmt.Sprintf("sequence:%v", i)
+		if s.State[tempKey] == "" {
+			returnKey = tempKey
+		} else {
+			i = i + 1
+		}
+	}
+	return returnKey
 }
