@@ -1086,7 +1086,7 @@ func Test_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
 	}
 	hoverfly.PutSimulation(*v5)
 
-	hoverfly.SetMode("simulate")
+	hoverfly.SetModeWithArguments(v2.ModeView{Mode: "simulate"})
 
 	response, _ := hoverfly.GetResponse(models.RequestDetails{
 		Path: "/basket",
