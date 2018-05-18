@@ -40,7 +40,6 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 	var counter int
 
 	for i, savedPair := range this.matchingPairs {
-		fmt.Println("loop")
 
 		pairNoState := pair.RequestMatcher
 		pairNoState.RequiresState = nil
@@ -50,11 +49,14 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 
 		duplicate = reflect.DeepEqual(pairNoState, savedPairNoState)
 		if duplicate {
-			fmt.Println("dup")
 			counter = counter + 1
 
 			if savedPair.RequestMatcher.RequiresState == nil {
 				savedPair.RequestMatcher.RequiresState = map[string]string{}
+			}
+
+			if savedPair.Response.TransitionsState == nil {
+				savedPair.Response.TransitionsState = map[string]string{}
 			}
 
 			if pair.RequestMatcher.RequiresState == nil {
@@ -62,13 +64,19 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 			}
 
 			sequenceState := savedPair.RequestMatcher.RequiresState["sequence"]
+			nextSequenceState := ""
 			if sequenceState == "" {
 				sequenceState = "1"
+				nextSequenceState = "2"
 				state["sequence"] = "1"
-				savedPair.RequestMatcher.RequiresState["sequence"] = sequenceState
-				updates[i] = savedPair
-			}
 
+			} else {
+				currentSequenceState, _ := strconv.Atoi(sequenceState)
+				nextSequenceState = strconv.Itoa(currentSequenceState + 1)
+			}
+			savedPair.RequestMatcher.RequiresState["sequence"] = sequenceState
+			savedPair.Response.TransitionsState["sequence"] = nextSequenceState
+			updates[i] = savedPair
 		}
 	}
 
