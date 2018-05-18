@@ -20,12 +20,12 @@ func Test_NewStateFromState_InitializesStateForSequenceKeys(t *testing.T) {
 
 	b := state.NewStateFromState(map[string]string{
 		"test":       "test",
-		"sequence":   "true",
+		"sequence:0": "true",
 		"sequence:1": "true",
 	})
 	Expect(b).ToNot(BeNil())
 	Expect(b.State).To(Equal(map[string]string{
-		"sequence":   "1",
+		"sequence:0": "1",
 		"sequence:1": "1",
 	}))
 }

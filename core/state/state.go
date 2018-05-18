@@ -20,7 +20,7 @@ func NewStateFromState(incomingState map[string]string) *State {
 	}
 
 	for stateKey, _ := range incomingState {
-		if strings.Contains(stateKey, "sequence") {
+		if strings.Contains(stateKey, "sequence:") {
 			state.State[stateKey] = "1"
 		}
 	}
