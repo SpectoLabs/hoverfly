@@ -11,6 +11,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/gomega"
 )
@@ -777,12 +778,26 @@ func Test_Hoverfly_SetMode_SettingModeToCaptureWipesCache(t *testing.T) {
 	Expect(values).To(HaveLen(0))
 }
 
-func Test_Hoverfly_SetModeWithARguments_AsteriskCanOnlyBeValidAsTheOnlyHeader(t *testing.T) {
+func Test_Hoverfly_SetModeWithArguments_Stateful(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.CacheMatcher.RequestCache.Set([]byte("test"), []byte("test_bytes"))
+	Expect(unit.SetModeWithArguments(v2.ModeView{
+		Mode: "capture",
+		Arguments: v2.ModeArgumentsView{
+			Stateful: true,
+		},
+	})).To(Succeed())
+
+	storedMode := unit.modeMap[modes.Capture].View()
+	Expect(storedMode.Arguments.Stateful).To(BeTrue())
+}
+
+func Test_Hoverfly_SetModeWithArguments_AsteriskCanOnlyBeValidAsTheOnlyHeader(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	Expect(unit.SetMode("capture")).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("capture"))
@@ -798,7 +813,6 @@ func Test_Hoverfly_SetModeWithARguments_AsteriskCanOnlyBeValidAsTheOnlyHeader(t 
 			Headers: []string{"*"},
 		},
 	})).ToNot(Succeed())
-
 }
 
 func Test_Hoverfly_AddDiff_AddEntry(t *testing.T) {

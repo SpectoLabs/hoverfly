@@ -12,6 +12,7 @@ import (
 
 var specficHeaders string
 var allHeaders bool
+var stateful bool
 var matchingStrategy string
 
 var modeCmd = &cobra.Command{
@@ -61,6 +62,8 @@ mode is shown.
 				extraInformation = fmt.Sprintln("and will capture the following request headers:", splitHeaders)
 			}
 
+			modeView.Arguments.Stateful = stateful
+
 			mode, err := wrapper.SetModeWithArguments(*target, modeView)
 			handleIfError(err)
 
@@ -78,4 +81,6 @@ func init() {
 		"Record all headers in capture mode")
 	modeCmd.PersistentFlags().StringVar(&matchingStrategy, "matching-strategy", "strongest",
 		"Sets the matching strategy - 'strongest | first'")
+	modeCmd.PersistentFlags().BoolVar(&stateful, "stateful", false,
+		"Record stateful responses as a sequence in capture mode")
 }
