@@ -716,62 +716,83 @@ func Test_Hoverfly_IsWebServer_GetsIsWebServer(t *testing.T) {
 	Expect(unit.IsWebServer()).To(BeTrue())
 }
 
-func Test_Hoverfly_SetMode_CanSetModeToCapture(t *testing.T) {
+func Test_Hoverfly_SetModeWithArguments_CanSetModeToCapture(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	Expect(unit.SetMode("capture")).To(BeNil())
+	Expect(unit.SetModeWithArguments(
+		v2.ModeView{
+			Mode: "capture",
+		})).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("capture"))
 }
 
-func Test_Hoverfly_SetMode_CanSetModeToSimulate(t *testing.T) {
+func Test_Hoverfly_SetModeWithArguments_CanSetModeToSimulate(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	Expect(unit.SetMode("simulate")).To(BeNil())
+	Expect(unit.SetModeWithArguments(
+		v2.ModeView{
+			Mode: "simulate",
+		})).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("simulate"))
 }
 
-func Test_Hoverfly_SetMode_CanSetModeToModify(t *testing.T) {
+func Test_Hoverfly_SetModeWithArguments_CanSetModeToModify(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	Expect(unit.SetMode("modify")).To(BeNil())
+	Expect(unit.SetModeWithArguments(
+		v2.ModeView{
+			Mode: "modify",
+		})).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("modify"))
 }
 
-func Test_Hoverfly_SetMode_CanSetModeToSynthesize(t *testing.T) {
+func Test_Hoverfly_SetModeWithArguments_CanSetModeToSynthesize(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	Expect(unit.SetMode("synthesize")).To(BeNil())
+	Expect(unit.SetModeWithArguments(
+		v2.ModeView{
+			Mode: "synthesize",
+		})).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("synthesize"))
 }
 
-func Test_Hoverfly_SetMode_CannotSetModeToSomethingInvalid(t *testing.T) {
+func Test_Hoverfly_SetModeWithArguments_CannotSetModeToSomethingInvalid(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	Expect(unit.SetMode("mode")).ToNot(BeNil())
+	Expect(unit.SetModeWithArguments(
+		v2.ModeView{
+			Mode: "mode",
+		})).ToNot(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal(""))
 
-	Expect(unit.SetMode("hoverfly")).ToNot(BeNil())
+	Expect(unit.SetModeWithArguments(
+		v2.ModeView{
+			Mode: "hoverfly",
+		})).ToNot(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal(""))
 }
 
-func Test_Hoverfly_SetMode_SettingModeToCaptureWipesCache(t *testing.T) {
+func Test_Hoverfly_SetModeWithArguments_SettingModeToCaptureWipesCache(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	unit.CacheMatcher.RequestCache.Set([]byte("test"), []byte("test_bytes"))
 
-	Expect(unit.SetMode("capture")).To(BeNil())
+	Expect(unit.SetModeWithArguments(
+		v2.ModeView{
+			Mode: "capture",
+		})).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("capture"))
 
 	values, _ := unit.CacheMatcher.RequestCache.GetAllValues()
@@ -799,7 +820,10 @@ func Test_Hoverfly_SetModeWithArguments_AsteriskCanOnlyBeValidAsTheOnlyHeader(t 
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	Expect(unit.SetMode("capture")).To(BeNil())
+	Expect(unit.SetModeWithArguments(
+		v2.ModeView{
+			Mode: "capture",
+		})).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("capture"))
 
 	Expect(unit.SetModeWithArguments(v2.ModeView{
