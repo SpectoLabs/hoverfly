@@ -293,7 +293,7 @@ func Test_Hoverfly_GetResponse_CanReturnResponseFromSimulationAndNotCache(t *tes
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -338,7 +338,7 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{

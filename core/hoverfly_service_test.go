@@ -91,7 +91,7 @@ func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePair(t *testing.T) 
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -133,7 +133,7 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -154,7 +154,7 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 		},
 	})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -235,7 +235,7 @@ func TestHoverfly_GetFilteredSimulation_WithPlainTextUrlQuery(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -246,7 +246,7 @@ func TestHoverfly_GetFilteredSimulation_WithPlainTextUrlQuery(t *testing.T) {
 		},
 	})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -271,7 +271,7 @@ func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -282,7 +282,7 @@ func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
 		},
 	})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -293,7 +293,7 @@ func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
 		},
 	})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -320,7 +320,7 @@ func TestHoverfly_GetFilteredSimulationReturnBlankSimulation_IfThereIsNoMatch(t 
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -347,7 +347,7 @@ func TestHoverfly_GetFilteredSimulationReturnError_OnInvalidRegexQuery(t *testin
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -367,7 +367,7 @@ func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -384,7 +384,7 @@ func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T)
 		},
 	})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -401,7 +401,7 @@ func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T)
 		},
 	})
 
-	unit.Simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{

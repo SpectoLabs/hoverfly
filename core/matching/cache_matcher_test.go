@@ -82,7 +82,7 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *tes
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -111,7 +111,7 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMa
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -171,7 +171,7 @@ func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWitho
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -200,7 +200,7 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -215,7 +215,7 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 		},
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -274,7 +274,7 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -289,7 +289,7 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 		},
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{

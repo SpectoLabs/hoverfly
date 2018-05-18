@@ -145,7 +145,7 @@ func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v2.RequestMatcher
 
 			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
 
-			hf.Simulation.AddRequestMatcherResponsePair(pair)
+			hf.Simulation.AddPair(pair)
 			success++
 			continue
 		}

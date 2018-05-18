@@ -17,7 +17,7 @@ func NewSimulation() *Simulation {
 	}
 }
 
-func (this *Simulation) AddRequestMatcherResponsePair(pair *RequestMatcherResponsePair) {
+func (this *Simulation) AddPair(pair *RequestMatcherResponsePair) {
 	var duplicate bool
 	for _, savedPair := range this.matchingPairs {
 		duplicate = reflect.DeepEqual(pair.RequestMatcher, savedPair.RequestMatcher)

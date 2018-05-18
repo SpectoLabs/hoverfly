@@ -189,7 +189,7 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		Response: *response,
 	}
 
-	hf.Simulation.AddRequestMatcherResponsePair(&pair)
+	hf.Simulation.AddPair(&pair)
 
 	return nil
 }
