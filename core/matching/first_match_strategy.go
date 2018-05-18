@@ -2,9 +2,10 @@ package matching
 
 import (
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/state"
 )
 
-func FirstMatchStrategy(req models.RequestDetails, webserver bool, simulation *models.Simulation, currentState map[string]string) *MatchingResult {
+func FirstMatchStrategy(req models.RequestDetails, webserver bool, simulation *models.Simulation, currentState *state.State) *MatchingResult {
 
 	matchedOnAllButHeadersAtLeastOnce := false
 	matchedOnAllButStateAtLeastOnce := false

@@ -2,9 +2,10 @@ package matching
 
 import (
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/state"
 )
 
-func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulation *models.Simulation, state map[string]string) *MatchingResult {
+func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulation *models.Simulation, state *state.State) *MatchingResult {
 	var requestMatch *models.RequestMatcherResponsePair
 	var err *models.MatchError
 	var cachable bool
@@ -124,7 +125,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 				RequestMatcher: view.RequestMatcher,
 				Response:       view.Response,
 				MissedFields:   missedFields,
-				State:          state,
+				State:          state.State,
 			}
 		}
 	}

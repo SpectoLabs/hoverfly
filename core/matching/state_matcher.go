@@ -1,6 +1,8 @@
 package matching
 
-func StateMatcher(currentState, requiredState map[string]string) *FieldMatch {
+import "github.com/SpectoLabs/hoverfly/core/state"
+
+func StateMatcher(currentState *state.State, requiredState map[string]string) *FieldMatch {
 
 	score := 0
 	matched := true
@@ -13,10 +15,10 @@ func StateMatcher(currentState, requiredState map[string]string) *FieldMatch {
 	}
 
 	for key, value := range requiredState {
-		if _, ok := currentState[key]; !ok {
+		if _, ok := currentState.State[key]; !ok {
 			matched = false
 		}
-		if currentState[key] != value {
+		if currentState.State[key] != value {
 			matched = false
 		} else {
 			score++
