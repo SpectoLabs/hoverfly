@@ -110,7 +110,7 @@ func (hf *Hoverfly) RemoveState(toRemove []string) {
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails, headersWhitelist []string) error {
+func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails, headersWhitelist []string, recordSequence bool) error {
 	body := []models.RequestFieldMatchers{
 		{
 			Matcher: matchers.Exact,
