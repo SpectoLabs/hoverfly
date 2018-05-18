@@ -24,13 +24,8 @@ const (
 
 const testingDatabaseName = "test.db" // very original
 
-// Client structure to be injected into functions to perform HTTP calls
-type Client struct {
-	HTTPClient *http.Client
-}
-
 // TestDB - holds connection to database during tests
-var TestDB *bolt.DB
+var testDB *bolt.DB
 
 func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 
@@ -41,9 +36,9 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 	}))
 
 	// creating random buckets for everyone!
-	bucket := GetRandomName(10)
+	bucket := getRandomName(10)
 
-	requestCache := cache.NewBoltDBCache(TestDB, bucket)
+	requestCache := cache.NewBoltDBCache(testDB, bucket)
 
 	cfg := InitSettings()
 	// disabling auth for testing
@@ -63,8 +58,8 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 
 var src = rand.NewSource(time.Now().UnixNano())
 
-// GetRandomName - provides random name for buckets. Each test case gets it's own bucket
-func GetRandomName(n int) []byte {
+// getRandomName - provides random name for buckets. Each test case gets it's own bucket
+func getRandomName(n int) []byte {
 	b := make([]byte, n)
 	for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
 		if remain == 0 {
@@ -85,11 +80,11 @@ func setup() {
 	// we don't really want to see what's happening
 	log.SetLevel(log.FatalLevel)
 	db := cache.GetDB(testingDatabaseName)
-	TestDB = db
+	testDB = db
 }
 
 // teardown does some cleanup after tests
 func teardown() {
-	TestDB.Close()
+	testDB.Close()
 	os.Remove(testingDatabaseName)
 }

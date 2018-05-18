@@ -251,7 +251,7 @@ func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV5
 }
 
 func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV5) error {
-	err := this.ImportRequestResponsePairViews(simulationView.DataViewV5.RequestResponsePairs)
+	err := this.importRequestResponsePairViews(simulationView.DataViewV5.RequestResponsePairs)
 	if err != nil {
 		return err
 	}

@@ -54,7 +54,7 @@ func TestCacheSetGetWithRequestResponsePair(t *testing.T) {
 func TestGetNonExistingBucket(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewBoltDBCache(TestDB, []byte("somebucket"))
+	cache := cache.NewBoltDBCache(testDB, []byte("somebucket"))
 
 	_, err := cache.Get([]byte("whatever"))
 	Expect(err).ToNot(BeNil())
@@ -89,7 +89,7 @@ func TestDeleteBucket(t *testing.T) {
 func TestGetAllRequestNoBucket(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewBoltDBCache(TestDB, []byte("somebucket"))
+	cache := cache.NewBoltDBCache(testDB, []byte("somebucket"))
 
 	cache.CurrentBucket = []byte("no_bucket_for_TestGetAllRequestNoBucket")
 	_, err := cache.GetAllValues()
