@@ -8,12 +8,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_Simulation_AddRequestMatcherResponsePair_CanAddAPairToTheArray(t *testing.T) {
+func Test_Simulation_AddPair_CanAddAPairToTheArray(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := models.NewSimulation()
 
-	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.AddPair(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -30,12 +30,12 @@ func Test_Simulation_AddRequestMatcherResponsePair_CanAddAPairToTheArray(t *test
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Value).To(Equal("space"))
 }
 
-func Test_Simulation_AddRequestMatcherResponsePair_CanAddAFullPairToTheArray(t *testing.T) {
+func Test_Simulation_AddPair_CanAddAFullPairToTheArray(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := models.NewSimulation()
 
-	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.AddPair(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -103,12 +103,12 @@ func Test_Simulation_AddRequestMatcherResponsePair_CanAddAFullPairToTheArray(t *
 	Expect(unit.GetMatchingPairs()[0].Response.Status).To(Equal(200))
 }
 
-func Test_Simulation_AddRequestMatcherResponsePair_WillNotSaveDuplicates(t *testing.T) {
+func Test_Simulation_AddPair_WillNotSaveDuplicates(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := models.NewSimulation()
 
-	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.AddPair(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -120,7 +120,7 @@ func Test_Simulation_AddRequestMatcherResponsePair_WillNotSaveDuplicates(t *test
 		models.ResponseDetails{},
 	})
 
-	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.AddPair(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -135,12 +135,12 @@ func Test_Simulation_AddRequestMatcherResponsePair_WillNotSaveDuplicates(t *test
 	Expect(unit.GetMatchingPairs()).To(HaveLen(1))
 }
 
-func Test_Simulation_AddRequestMatcherResponsePair_WillSaveTwoWhenNotDuplicates(t *testing.T) {
+func Test_Simulation_AddPair_WillSaveTwoWhenNotDuplicates(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := models.NewSimulation()
 
-	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.AddPair(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -152,7 +152,7 @@ func Test_Simulation_AddRequestMatcherResponsePair_WillSaveTwoWhenNotDuplicates(
 		models.ResponseDetails{},
 	})
 
-	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.AddPair(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -174,7 +174,7 @@ func Test_Simulation_GetMatchingPairs(t *testing.T) {
 
 	unit := models.NewSimulation()
 
-	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.AddPair(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -195,7 +195,7 @@ func Test_Simulation_DeleteMatchingPairs(t *testing.T) {
 
 	unit := models.NewSimulation()
 
-	unit.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	unit.AddPair(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{

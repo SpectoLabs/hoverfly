@@ -15,7 +15,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EmptyRequestMatchersShouldMatchOnA
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{},
 		Response:       testResponse,
 	})
@@ -38,7 +38,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersShouldMatchOnBody(t
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -69,7 +69,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWhenAllHeadersMatch(
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
@@ -100,7 +100,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderNotPresentIn
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
@@ -130,7 +130,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderValueDiffere
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
@@ -160,7 +160,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWithMultiValuedHeade
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
@@ -191,7 +191,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWithDifferentMultiValuedH
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
@@ -222,7 +222,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMatchWithHeaders(t *testin
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 			Destination: []models.RequestFieldMatchers{
@@ -280,7 +280,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMismatchWithHeadersReturns
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 			Destination: []models.RequestFieldMatchers{
@@ -334,7 +334,7 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -394,7 +394,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsAndBeMat
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -423,7 +423,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnScheme
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Scheme: []models.RequestFieldMatchers{
 				{
@@ -453,7 +453,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnHeader
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Headers: map[string][]string{
 				"unique-header": {"*"},
@@ -482,7 +482,7 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFound(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -502,7 +502,7 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFound(t *testing.T) {
 		},
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -522,7 +522,7 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFound(t *testing.T) {
 		},
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -565,7 +565,7 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFoundAgain(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -591,7 +591,7 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFoundAgain(t *testing.T) {
 		},
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -612,7 +612,7 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFoundAgain(t *testing.T) {
 		},
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -656,7 +656,7 @@ func Test_ShouldNotReturnClosestMissWhenThereIsAMatch(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -676,7 +676,7 @@ func Test_ShouldNotReturnClosestMissWhenThereIsAMatch(t *testing.T) {
 		},
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -712,7 +712,7 @@ func Test__NotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *test
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -757,7 +757,7 @@ func Test__NotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *test
 		Response: testResponse,
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -794,7 +794,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -839,7 +839,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		Response: testResponse,
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -952,7 +952,7 @@ func Test_ShouldSetClosestMissBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -972,7 +972,7 @@ func Test_ShouldSetClosestMissBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
 		},
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -1007,7 +1007,7 @@ func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -1032,7 +1032,7 @@ func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
 		},
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -1074,7 +1074,7 @@ func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -1093,7 +1093,7 @@ func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
 		},
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -1130,7 +1130,7 @@ func Test_ShouldReturnFieldsMissedInClosestMiss(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -1200,7 +1200,7 @@ func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -1437,7 +1437,7 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeader
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -1482,7 +1482,7 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeader
 		Response: testResponse,
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -1519,7 +1519,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -1564,7 +1564,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		Response: testResponse,
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -1677,7 +1677,7 @@ func Test_StrongestMatchStrategy_RequestMatchersShouldMatchOnStateAndNotBeCachab
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			RequiresState: map[string]string{"key1": "value1", "key2": "value2"},
 		},
@@ -1704,7 +1704,7 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateA
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -1749,7 +1749,7 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateA
 		Response: testResponse,
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -1783,7 +1783,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 
 	simulation := models.NewSimulation()
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
@@ -1828,7 +1828,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Response: testResponse,
 	})
 
-	simulation.AddRequestMatcherResponsePair(&models.RequestMatcherResponsePair{
+	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Method: []models.RequestFieldMatchers{
 				{
