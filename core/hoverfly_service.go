@@ -66,7 +66,7 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 	}
 
 	if this.Cfg.Webserver && modeView.Mode == modes.Capture {
-		log.Error("Can't change mode to when configured as a webserver")
+		log.Error("Cannot change the mode of Hoverfly to capture when running as a webserver")
 		return fmt.Errorf("Cannot change the mode of Hoverfly to capture when running as a webserver")
 	}
 
@@ -101,6 +101,7 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 	modeArguments := modes.ModeArguments{
 		Headers:          modeView.Arguments.Headers,
 		MatchingStrategy: matchingStrategy,
+		Stateful:         modeView.Arguments.Stateful,
 	}
 
 	this.modeMap[this.Cfg.GetMode()].SetArguments(modeArguments)

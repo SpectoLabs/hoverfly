@@ -36,7 +36,8 @@ func Test_GetMode_GetsModeFromHoverfly(t *testing.T) {
 							"mode": "test-mode",
 							"arguments" : {
 								"matchingStrategy":"first",
-								"headersWhitelist":["foo","bar"]
+								"headersWhitelist":["foo","bar"],
+								"stateful": true
 							}
 						}`,
 					},
@@ -54,6 +55,7 @@ func Test_GetMode_GetsModeFromHoverfly(t *testing.T) {
 	Expect(mode.Mode).To(Equal("test-mode"))
 	Expect(*mode.Arguments.MatchingStrategy).To(Equal("first"))
 	Expect(mode.Arguments.Headers).To(Equal([]string{"foo", "bar"}))
+	Expect(mode.Arguments.Stateful).To(BeTrue())
 }
 
 func Test_GetMode_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {

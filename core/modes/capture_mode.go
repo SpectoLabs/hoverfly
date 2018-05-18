@@ -29,6 +29,7 @@ func (this *CaptureMode) View() v2.ModeView {
 		Arguments: v2.ModeArgumentsView{
 			Headers:          this.Arguments.Headers,
 			MatchingStrategy: this.Arguments.MatchingStrategy,
+			Stateful:         this.Arguments.Stateful,
 		},
 	}
 }

@@ -51,6 +51,7 @@ type Hoverfly interface {
 type ModeArguments struct {
 	Headers          []string
 	MatchingStrategy *string
+	Stateful         bool
 }
 
 // ReconstructRequest replaces original request with details provided in Constructor Payload.RequestMatcher
