@@ -11,7 +11,7 @@ import (
 
 var adminApi = AdminApi{}
 
-func TestGetMissingURL(t *testing.T) {
+func Test_AdminAPI_Serves404(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})

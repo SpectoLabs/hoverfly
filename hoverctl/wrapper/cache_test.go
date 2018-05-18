@@ -10,7 +10,6 @@ import (
 
 func Test_FlushCache_GetsMiddlewareFromHoverfly(t *testing.T) {
 	RegisterTestingT(t)
-
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV5{
 		v2.DataViewV5{

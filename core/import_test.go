@@ -241,7 +241,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			},
 			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{originalPair})
+	hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{originalPair})
 
 	Expect(hv.Simulation.GetMatchingPairs()[0]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
@@ -368,7 +368,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 	}
 	originalPair3.Response.Templated = true
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{originalPair1, originalPair2, originalPair3})
+	hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{originalPair1, originalPair2, originalPair3})
 
 	Expect(hv.Simulation.GetMatchingPairs()).To(HaveLen(3))
 	Expect(hv.Simulation.GetMatchingPairs()[0]).To(Equal(models.RequestMatcherResponsePair{
@@ -547,7 +547,7 @@ func TestImportImportRequestResponsePairs_CanImportARequesResponsePairView(t *te
 		RequestMatcher: request,
 	}
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{requestResponsePair})
+	hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{requestResponsePair})
 
 	Expect(len(hv.Simulation.GetMatchingPairs())).To(Equal(1))
 
@@ -626,7 +626,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 		},
 	}
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
+	hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
 
 	Expect(hv.Simulation.GetMatchingPairs()[0]).ToNot(Equal(models.RequestResponsePair{
 		Response: models.ResponseDetails{
@@ -672,7 +672,7 @@ func TestImportImportRequestResponsePairs_SetsState(t *testing.T) {
 		},
 	}
 
-	hv.ImportRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
+	hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
 
 	Expect(hv.state.GetState("sequence:1")).To(Equal("1"))
 }

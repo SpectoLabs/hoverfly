@@ -131,14 +131,8 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 	return hf.PutSimulation(simulation)
 }
 
-func isJSON(s string) bool {
-	var js map[string]interface{}
-	return json.Unmarshal([]byte(s), &js) == nil
-
-}
-
-// ImportRequestResponsePairViews - a function to save given pairs into the database.
-func (hf *Hoverfly) ImportRequestResponsePairViews(pairViews []v2.RequestMatcherResponsePairViewV5) error {
+// importRequestResponsePairViews - a function to save given pairs into the database.
+func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcherResponsePairViewV5) error {
 	initialStates := map[string]string{}
 	if len(pairViews) > 0 {
 		success := 0
