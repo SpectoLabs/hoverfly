@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -325,6 +326,54 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				Expect(capturedRequestQuery).To(Equal("z=1&y=2&x=3"))
 			})
+		})
+	})
+
+	Context("When running in capture mode with stateful capturing enabled", func() {
+
+		BeforeEach(func() {
+			hoverfly.SetModeWithArgs("capture", v2.ModeArgumentsView{
+				Stateful: true,
+			})
+		})
+
+		It("Should capture duplicate pair", func() {
+
+			statefulServerResponse := 0
+
+			fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				statefulServerResponse = statefulServerResponse + 1
+				w.Header().Set("Content-Type", "text/plain")
+				w.Header().Set("Date", "date")
+				w.Write([]byte(strconv.Itoa(statefulServerResponse)))
+			}))
+
+			defer fakeServer.Close()
+
+			resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			resp = hoverfly.Proxy(sling.New().Get(fakeServer.URL))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			resp = hoverfly.Proxy(sling.New().Get(fakeServer.URL))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			payload := hoverfly.ExportSimulation()
+
+			Expect(payload.RequestResponsePairs).To(HaveLen(3))
+
+			Expect(payload.RequestResponsePairs[0].RequestMatcher.RequiresState).To(Equal(map[string]string{"sequence:0": "1"}))
+			Expect(payload.RequestResponsePairs[0].Response.Body).To(Equal("1"))
+			Expect(payload.RequestResponsePairs[0].Response.TransitionsState).To(Equal(map[string]string{"sequence:0": "2"}))
+
+			Expect(payload.RequestResponsePairs[1].RequestMatcher.RequiresState).To(Equal(map[string]string{"sequence:0": "2"}))
+			Expect(payload.RequestResponsePairs[1].Response.Body).To(Equal("2"))
+			Expect(payload.RequestResponsePairs[1].Response.TransitionsState).To(Equal(map[string]string{"sequence:0": "3"}))
+
+			Expect(payload.RequestResponsePairs[2].RequestMatcher.RequiresState).To(Equal(map[string]string{"sequence:0": "3"}))
+			Expect(payload.RequestResponsePairs[2].Response.Body).To(Equal("3"))
+			Expect(payload.RequestResponsePairs[2].Response.TransitionsState).To(BeNil())
 		})
 	})
 })
