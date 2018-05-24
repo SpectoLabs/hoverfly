@@ -64,25 +64,25 @@ func TestGetNonExistingBucket(t *testing.T) {
 func TestDeleteBucket(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
+	server, unit := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
 	k := []byte("randomkeyhere")
 	v := []byte("value")
 	// checking whether bucket is okay
-	err := dbClient.CacheMatcher.RequestCache.Set(k, v)
+	err := unit.CacheMatcher.RequestCache.Set(k, v)
 	Expect(err).To(BeNil())
 
-	value, err := dbClient.CacheMatcher.RequestCache.Get(k)
+	value, err := unit.CacheMatcher.RequestCache.Get(k)
 	Expect(err).To(BeNil())
 	Expect(value).To(Equal(v))
 
 	// deleting bucket
-	err = dbClient.CacheMatcher.RequestCache.DeleteData()
+	err = unit.CacheMatcher.RequestCache.DeleteData()
 	Expect(err).To(BeNil())
 
 	// deleting it again
-	err = dbClient.CacheMatcher.RequestCache.DeleteData()
+	err = unit.CacheMatcher.RequestCache.DeleteData()
 	Expect(err).ToNot(BeNil())
 }
 

@@ -82,32 +82,29 @@ func TestFileDoesNotExist(t *testing.T) {
 func TestImportFromDisk(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	err := dbClient.Import(hoverfly_io_simulation_path)
+	err := unit.Import(hoverfly_io_simulation_path)
 	Expect(err).To(BeNil())
 
-	Expect(dbClient.Simulation.GetMatchingPairs()).To(HaveLen(2))
+	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(2))
 }
 
 func TestImportFromDiskBlankPath(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	err := dbClient.ImportFromDisk("")
+	err := unit.ImportFromDisk("")
 	Expect(err).ToNot(BeNil())
 }
 
 func TestImportFromDiskWrongJson(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	err := dbClient.ImportFromDisk("examples/exports/README.md")
+	err := unit.ImportFromDisk("examples/exports/README.md")
 	Expect(err).ToNot(BeNil())
 }
 
@@ -121,14 +118,14 @@ func TestImportFromURL(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	// pretending this is the endpoint with given json
-	server, dbClient := testTools(200, string(pairFileBytes))
+	server, unit := testTools(200, string(pairFileBytes))
 	defer server.Close()
 
 	// importing payloads
-	err = dbClient.Import(server.URL)
+	err = unit.Import(server.URL)
 	Expect(err).To(BeNil())
 
-	Expect(dbClient.Simulation.GetMatchingPairs()).To(HaveLen(2))
+	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(2))
 }
 
 func TestImportFromURLRedirect(t *testing.T) {
@@ -141,10 +138,10 @@ func TestImportFromURLRedirect(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	// pretending this is the endpoint with given json
-	server, dbClient := testTools(200, string(pairFileBytes))
+	server, unit := testTools(200, string(pairFileBytes))
 	defer server.Close()
 
-	dbClient.HTTP = GetDefaultHoverflyHTTPClient(false, "")
+	unit.HTTP = GetDefaultHoverflyHTTPClient(false, "")
 
 	redirectServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Location", server.URL)
@@ -153,21 +150,19 @@ func TestImportFromURLRedirect(t *testing.T) {
 	defer redirectServer.Close()
 
 	// importing payloads
-	err = dbClient.Import(redirectServer.URL)
+	err = unit.Import(redirectServer.URL)
 	Expect(err).To(BeNil())
 
-	Expect(dbClient.Simulation.GetMatchingPairs()).To(HaveLen(2))
+	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(2))
 }
 
 func TestImportFromURLHTTPFail(t *testing.T) {
 	RegisterTestingT(t)
 
 	// this tests simulates unreachable server
-	server, dbClient := testTools(200, `this shouldn't matter anyway`)
-	// closing it immediately
-	server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	err := dbClient.ImportFromURL("somepath")
+	err := unit.ImportFromURL("somepath")
 	Expect(err).ToNot(BeNil())
 }
 
@@ -175,11 +170,10 @@ func TestImportFromURLMalformedJSON(t *testing.T) {
 	RegisterTestingT(t)
 
 	// testing behaviour when there is no json on the other end
-	server, dbClient := testTools(200, `i am not json :(`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	// importing payloads
-	err := dbClient.Import("http://thiswillbeintercepted.json")
+	err := unit.Import("http://thiswillbeintercepted.json")
 	// we should get error
 	Expect(err).ToNot(BeNil())
 }
