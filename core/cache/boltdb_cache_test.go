@@ -16,39 +16,59 @@ var TestDB *bolt.DB
 
 var testingDatabaseName = "bolt_test.db"
 
-func TestSetGetValue(t *testing.T) {
+func Test_BoltDBCache_Get_NonExistingKey(t *testing.T) {
 	RegisterTestingT(t)
-	db := cache.NewBoltDBCache(TestDB, []byte("bucket1"))
 
-	err := db.Set([]byte("foo"), []byte("bar"))
+	unit := cache.NewBoltDBCache(TestDB, []byte("somebucket"))
+
+	// getting key
+	_, err := unit.Get([]byte("should not be here"))
+	Expect(err).ToNot(BeNil())
+}
+
+func Test_BoltDBCache_Get_NonExistingBucket(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := cache.NewBoltDBCache(TestDB, []byte("somebucket"))
+
+	_, err := unit.Get([]byte("whatever"))
+	Expect(err).ToNot(BeNil())
+	Expect(err).To(MatchError("Bucket \"somebucket\" not found!"))
+}
+
+func Test_BoltDBCache_Set_GetValue(t *testing.T) {
+	RegisterTestingT(t)
+	unit := cache.NewBoltDBCache(TestDB, []byte("bucket1"))
+
+	err := unit.Set([]byte("foo"), []byte("bar"))
 	Expect(err).To(BeNil())
 
-	val, err := db.Get([]byte("foo"))
+	val, err := unit.Get([]byte("foo"))
 	Expect(string(val)).To(Equal("bar"))
 }
 
-func TestRecordsCountZero(t *testing.T) {
+func Test_BoltDBCache_RecordsCountZero(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := cache.NewBoltDBCache(TestDB, []byte("bucketRecordsCountZero"))
+	unit := cache.NewBoltDBCache(TestDB, []byte("bucketRecordsCountZero"))
 
-	ct, err := db.RecordsCount()
+	ct, err := unit.RecordsCount()
 	Expect(err).To(BeNil())
 	Expect(ct).To(Equal(0))
 }
 
-func TestGetAllValues(t *testing.T) {
+func Test_BoltDBCache_GetAllValues(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := cache.NewBoltDBCache(TestDB, []byte("bucketTestGetAllValues"))
+	unit := cache.NewBoltDBCache(TestDB, []byte("bucketTestGetAllValues"))
 
-	err := db.Set([]byte("foo"), []byte("bar"))
+	err := unit.Set([]byte("foo"), []byte("bar"))
 	Expect(err).To(BeNil())
 
-	err = db.Set([]byte("foo2"), []byte("bar"))
+	err = unit.Set([]byte("foo2"), []byte("bar"))
 	Expect(err).To(BeNil())
 
-	vals, err := db.GetAllValues()
+	vals, err := unit.GetAllValues()
 	Expect(err).To(BeNil())
 
 	for i := 0; i < 2; i++ {
@@ -56,18 +76,18 @@ func TestGetAllValues(t *testing.T) {
 	}
 }
 
-func TestGetAllEntries(t *testing.T) {
+func Test_BoltDBCache_GetAllEntries(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := cache.NewBoltDBCache(TestDB, []byte("bucketTestGetAllEntries"))
+	unit := cache.NewBoltDBCache(TestDB, []byte("bucketTestGetAllEntries"))
 
-	err := db.Set([]byte("foo"), []byte("bar"))
+	err := unit.Set([]byte("foo"), []byte("bar"))
 	Expect(err).To(BeNil())
 
-	err = db.Set([]byte("foo2"), []byte("bar"))
+	err = unit.Set([]byte("foo2"), []byte("bar"))
 	Expect(err).To(BeNil())
 
-	vals, err := db.GetAllEntries()
+	vals, err := unit.GetAllEntries()
 	Expect(err).To(BeNil())
 
 	for _, v := range vals {
@@ -75,18 +95,18 @@ func TestGetAllEntries(t *testing.T) {
 	}
 }
 
-func TestGetAllKeys(t *testing.T) {
+func Test_BoltDBCache_GetAllKeys(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := cache.NewBoltDBCache(TestDB, []byte("bucketTestGetAllKeys"))
+	unit := cache.NewBoltDBCache(TestDB, []byte("bucketTestGetAllKeys"))
 
-	err := db.Set([]byte("foo"), []byte("bar"))
+	err := unit.Set([]byte("foo"), []byte("bar"))
 	Expect(err).To(BeNil())
 
-	err = db.Set([]byte("foo2"), []byte("bar"))
+	err = unit.Set([]byte("foo2"), []byte("bar"))
 	Expect(err).To(BeNil())
 
-	keys, err := db.GetAllKeys()
+	keys, err := unit.GetAllKeys()
 	Expect(err).To(BeNil())
 
 	Expect(keys).To(HaveKeyWithValue("foo", true))
@@ -94,62 +114,62 @@ func TestGetAllKeys(t *testing.T) {
 	Expect(keys).ToNot(HaveKey("foo10"))
 }
 
-func TestDeleteRecords(t *testing.T) {
+func Test_BoltDBCache_DeleteData(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := cache.NewBoltDBCache(TestDB, []byte("bucketTestDeleteRecords"))
+	unit := cache.NewBoltDBCache(TestDB, []byte("bucketTestDeleteRecords"))
 
-	err := db.Set([]byte("foo"), []byte("bar"))
+	err := unit.Set([]byte("foo"), []byte("bar"))
 	Expect(err).To(BeNil())
 
-	err = db.Set([]byte("foo2"), []byte("bar"))
+	err = unit.Set([]byte("foo2"), []byte("bar"))
 	Expect(err).To(BeNil())
 
-	err = db.Set([]byte("foo3"), []byte("bar"))
+	err = unit.Set([]byte("foo3"), []byte("bar"))
 	Expect(err).To(BeNil())
 
-	ct, err := db.RecordsCount()
+	ct, err := unit.RecordsCount()
 	Expect(err).To(BeNil())
 	Expect(ct).To(Equal(3))
 
-	err = db.DeleteData()
+	err = unit.DeleteData()
 	Expect(err).To(BeNil())
 
-	ctNew, err := db.RecordsCount()
+	ctNew, err := unit.RecordsCount()
 	Expect(err).To(BeNil())
 	Expect(ctNew).To(Equal(0))
 
 }
 
-func TestDeleteRecord(t *testing.T) {
+func Test_BoltDBCache_Delete(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := cache.NewBoltDBCache(TestDB, []byte("bucketTestDeleteRecord"))
+	unit := cache.NewBoltDBCache(TestDB, []byte("bucketTestDeleteRecord"))
 
-	err := db.Set([]byte("foo"), []byte("bar"))
+	err := unit.Set([]byte("foo"), []byte("bar"))
 	Expect(err).To(BeNil())
 
-	err = db.Delete([]byte("foo"))
+	err = unit.Delete([]byte("foo"))
 	Expect(err).To(BeNil())
 
-	_, err = db.Get([]byte("foo"))
+	_, err = unit.Get([]byte("foo"))
 	Expect(err).ToNot(BeNil())
 }
 
-func TestDeleteNotExisting(t *testing.T) {
+func Test_BoltDBCache_Delete_NotExisting(t *testing.T) {
 	RegisterTestingT(t)
 
-	db := cache.NewBoltDBCache(TestDB, []byte("bucketTestDeleteNotExisting"))
+	unit := cache.NewBoltDBCache(TestDB, []byte("bucketTestDeleteNotExisting"))
 
-	err := db.Delete([]byte("foo"))
+	err := unit.Delete([]byte("foo"))
 	Expect(err).To(BeNil())
 }
 
 func setup() {
 	// we don't really want to see what's happening
 	log.SetLevel(log.FatalLevel)
-	db := cache.GetDB(testingDatabaseName)
-	TestDB = db
+	unit := cache.GetDB(testingDatabaseName)
+	TestDB = unit
 }
 
 // teardown does some cleanup after tests
