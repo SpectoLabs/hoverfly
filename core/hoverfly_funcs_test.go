@@ -795,3 +795,25 @@ func Test_Hoverfly_Save_SavesRequestBodyAsXmlPathIfContentTypeIsXml(t *testing.T
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body[0].Matcher).To(Equal("xml"))
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Body[0].Value).To(Equal(`<xml>`))
 }
+
+func Test_Hoverfly_Save_CanAddPairStatefully(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Save(&models.RequestDetails{
+		Body: `body`,
+	}, &models.ResponseDetails{}, nil, true)
+
+	unit.Save(&models.RequestDetails{
+		Body: `body`,
+	}, &models.ResponseDetails{}, nil, true)
+
+	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(2))
+
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.RequiresState).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.RequiresState["sequence:0"]).To(Equal("1"))
+
+	Expect(unit.Simulation.GetMatchingPairs()[1].RequestMatcher.RequiresState).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence:0"]).To(Equal("2"))
+}
