@@ -2,24 +2,24 @@ package hoverfly
 
 import (
 	"fmt"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	. "github.com/onsi/gomega"
 )
 
 func TestHoverflyListener(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	proxyPort := "9777"
 
-	dbClient.Cfg.ProxyPort = proxyPort
+	unit.Cfg.ProxyPort = proxyPort
 	// starting hoverfly
-	dbClient.Proxy = NewProxy(dbClient)
-	dbClient.StartProxy()
+	unit.Proxy = NewProxy(unit)
+	unit.StartProxy()
 
 	// checking whether it's running
 	response, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))
@@ -35,17 +35,16 @@ func TestHoverflyListener(t *testing.T) {
 func TestStopHoverflyListener(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	proxyPort := "9778"
 
-	dbClient.Cfg.ProxyPort = proxyPort
+	unit.Cfg.ProxyPort = proxyPort
 	// starting hoverfly
-	dbClient.Proxy = NewProxy(dbClient)
-	dbClient.StartProxy()
+	unit.Proxy = NewProxy(unit)
+	unit.StartProxy()
 
-	dbClient.StopProxy()
+	unit.StopProxy()
 
 	// checking whether it's stopped
 	_, err := http.Get(fmt.Sprintf("http://localhost:%s/", proxyPort))

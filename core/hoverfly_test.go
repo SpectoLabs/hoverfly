@@ -115,15 +115,15 @@ func TestGetNewHoverflyCheckConfig(t *testing.T) {
 	userCache := cache.NewBoltDBCache(db, []byte("userBucket"))
 	backend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)
 
-	dbClient := GetNewHoverfly(cfg, requestCache, backend)
+	unit := GetNewHoverfly(cfg, requestCache, backend)
 
-	Expect(dbClient.Cfg).To(Equal(cfg))
+	Expect(unit.Cfg).To(Equal(cfg))
 
 	// deleting this database
 	os.Remove("testing2.db")
 }
 
-func TestGetNewHoverfly(t *testing.T) {
+func Test_NewHoverflyWithConfiguration(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -185,14 +185,13 @@ func Test_Hoverfly_processRequest_CanSimulateRequest(t *testing.T) {
 func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(InitSettings())
 
 	// getting reflect middleware
-	err := dbClient.Cfg.Middleware.SetBinary("python")
+	err := unit.Cfg.Middleware.SetBinary("python")
 	Expect(err).To(BeNil())
 
-	err = dbClient.Cfg.Middleware.SetScript(pythonReflectBody)
+	err = unit.Cfg.Middleware.SetScript(pythonReflectBody)
 	Expect(err).To(BeNil())
 
 	bodyBytes := []byte("request_body_here")
@@ -200,8 +199,8 @@ func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeRequest(t *testing
 	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode("synthesize")
-	newResp := dbClient.processRequest(r)
+	unit.Cfg.SetMode("synthesize")
+	newResp := unit.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
@@ -213,20 +212,19 @@ func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeRequest(t *testing
 func Test_Hoverfly_processRequest_CanModifyRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(InitSettings())
 
-	err := dbClient.Cfg.Middleware.SetBinary("python")
+	err := unit.Cfg.Middleware.SetBinary("python")
 	Expect(err).To(BeNil())
 
-	err = dbClient.Cfg.Middleware.SetScript(pythonModifyResponse)
+	err = unit.Cfg.Middleware.SetScript(pythonModifyResponse)
 	Expect(err).To(BeNil())
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode("modify")
-	newResp := dbClient.processRequest(r)
+	unit.Cfg.SetMode("modify")
+	newResp := unit.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
 
@@ -255,87 +253,86 @@ func (this ResponseDelayListStub) ConvertToResponseDelayPayloadView() v1.Respons
 	return v1.ResponseDelayPayloadView{}
 }
 
-func TestDelayAppliedToSuccessfulSimulateRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_DelayAppliedToSuccessfulSimulateRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
+	server, unit := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 
 	// capturing
-	dbClient.Cfg.SetMode("capture")
-	resp := dbClient.processRequest(r)
+	unit.Cfg.SetMode("capture")
+	resp := unit.processRequest(r)
 
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
 	// virtualizing
-	dbClient.Cfg.SetMode("simulate")
+	unit.Cfg.SetMode("simulate")
 
 	stub := ResponseDelayListStub{}
-	dbClient.Simulation.ResponseDelays = &stub
+	unit.Simulation.ResponseDelays = &stub
 
-	newResp := dbClient.processRequest(r)
+	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
 	Expect(stub.gotDelays, Equal(1))
 }
 
-func TestDelayNotAppliedToFailedSimulateRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_DelayNotAppliedToFailedSimulateRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
+	server, unit := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 
 	// virtualizing
-	dbClient.Cfg.SetMode("simulate")
+	unit.Cfg.SetMode("simulate")
 
 	stub := ResponseDelayListStub{}
-	dbClient.Simulation.ResponseDelays = &stub
+	unit.Simulation.ResponseDelays = &stub
 
-	newResp := dbClient.processRequest(r)
+	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
 }
 
-func TestDelayNotAppliedToCaptureRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_DelayNotAppliedToCaptureRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
+	server, unit := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
 	r, err := http.NewRequest("GET", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode("capture")
+	unit.Cfg.SetMode("capture")
 
 	stub := ResponseDelayListStub{}
-	dbClient.Simulation.ResponseDelays = &stub
+	unit.Simulation.ResponseDelays = &stub
 
-	resp := dbClient.processRequest(r)
+	resp := unit.processRequest(r)
 
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
 	Expect(stub.gotDelays).To(Equal(0))
 }
 
-func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_DelayAppliedToSynthesizeRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	err := dbClient.Cfg.Middleware.SetBinary("python")
+	err := unit.Cfg.Middleware.SetBinary("python")
 	Expect(err).To(BeNil())
 
-	err = dbClient.Cfg.Middleware.SetScript(pythonReflectBody)
+	err = unit.Cfg.Middleware.SetScript(pythonReflectBody)
 	Expect(err).To(BeNil())
 
 	bodyBytes := []byte("request_body_here")
@@ -343,27 +340,27 @@ func TestDelayAppliedToSynthesizeRequest(t *testing.T) {
 	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode("synthesize")
+	unit.Cfg.SetMode("synthesize")
 
 	stub := ResponseDelayListStub{}
-	dbClient.Simulation.ResponseDelays = &stub
-	newResp := dbClient.processRequest(r)
+	unit.Simulation.ResponseDelays = &stub
+	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
 	Expect(stub.gotDelays).To(Equal(1))
 }
 
-func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_DelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
+	server, unit := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	err := dbClient.Cfg.Middleware.SetBinary("python")
+	err := unit.Cfg.Middleware.SetBinary("python")
 	Expect(err).To(BeNil())
 
-	err = dbClient.Cfg.Middleware.SetScript(pythonMiddlewareBad)
+	err = unit.Cfg.Middleware.SetScript(pythonMiddlewareBad)
 	Expect(err).To(BeNil())
 
 	bodyBytes := []byte("request_body_here")
@@ -371,44 +368,44 @@ func TestDelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
 	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode("synthesize")
+	unit.Cfg.SetMode("synthesize")
 
 	stub := ResponseDelayListStub{}
-	dbClient.Simulation.ResponseDelays = &stub
-	newResp := dbClient.processRequest(r)
+	unit.Simulation.ResponseDelays = &stub
+	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
 }
 
-func TestDelayAppliedToSuccessfulMiddleware(t *testing.T) {
+func Test_Hoverfly_processRequest_DelayAppliedToSuccessfulMiddleware(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(201, `{'message': 'here'}`)
+	server, unit := testTools(201, `{'message': 'here'}`)
 	defer server.Close()
 
-	err := dbClient.Cfg.Middleware.SetBinary("python")
+	err := unit.Cfg.Middleware.SetBinary("python")
 	Expect(err).To(BeNil())
 
-	err = dbClient.Cfg.Middleware.SetScript(pythonModifyResponse)
+	err = unit.Cfg.Middleware.SetScript(pythonModifyResponse)
 	Expect(err).To(BeNil())
 
 	r, err := http.NewRequest("POST", "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 
-	dbClient.Cfg.SetMode("modify")
+	unit.Cfg.SetMode("modify")
 
 	stub := ResponseDelayListStub{}
-	dbClient.Simulation.ResponseDelays = &stub
-	newResp := dbClient.processRequest(r)
+	unit.Simulation.ResponseDelays = &stub
+	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
 	Expect(stub.gotDelays).To(Equal(1))
 }
 
-func TestDelayNotAppliedToFailedModifyRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_DelayNotAppliedToFailedModifyRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -473,8 +470,7 @@ func Test_Hoverfly_processRequest_CanHandleResponseDiff(t *testing.T) {
 func TestMatchOnRequestBody(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	defer server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	// preparing and saving requests/responses with unique bodies
 	for i := 0; i < 5; i++ {
@@ -490,7 +486,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 			Body:   fmt.Sprintf("body here, number=%d", i),
 		}
 
-		dbClient.Save(req, resp, nil, false)
+		unit.Save(req, resp, nil, false)
 	}
 
 	// now getting responses
@@ -504,7 +500,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 		requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
 		Expect(err).To(BeNil())
 
-		response, err := dbClient.GetResponse(requestDetails)
+		response, err := unit.GetResponse(requestDetails)
 		Expect(err).To(BeNil())
 
 		Expect(response.Body).To(Equal(fmt.Sprintf("body here, number=%d", i)))
@@ -518,19 +514,19 @@ func TestMatchOnRequestBody(t *testing.T) {
 // func TestModifyRequestNoMiddleware(t *testing.T) {
 // 	RegisterTestingT(t)
 
-// 	server, dbClient := testTools(201, `{'message': 'here'}`)
+// 	server, unit := testTools(201, `{'message': 'here'}`)
 // 	defer server.Close()
 
-// 	dbClient.SetMode("modify")
+// 	unit.SetMode("modify")
 
-// 	dbClient.Cfg.Middleware.Binary = ""
-// 	dbClient.Cfg.Middleware.Script = nil
-// 	dbClient.Cfg.Middleware.Remote = ""
+// 	unit.Cfg.Middleware.Binary = ""
+// 	unit.Cfg.Middleware.Script = nil
+// 	unit.Cfg.Middleware.Remote = ""
 
 // 	req, err := http.NewRequest("GET", "http://very-interesting-website.com/q=123", nil)
 // 	Expect(err).To(BeNil())
 
-// 	response := dbClient.processRequest(req)
+// 	response := unit.processRequest(req)
 
 // 	responseBody, err := ioutil.ReadAll(response.Body)
 
@@ -542,38 +538,9 @@ func TestMatchOnRequestBody(t *testing.T) {
 func Test_Hoverfly_StartProxy_StartProxyWOPort(t *testing.T) {
 	RegisterTestingT(t)
 
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	// stopping server
-	server.Close()
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	unit.Cfg.ProxyPort = ""
 
-	dbClient.Cfg.ProxyPort = ""
-
-	err := dbClient.StartProxy()
-	Expect(err).ToNot(BeNil())
-}
-
-func Test_Hoverfly_SetDestination_SetDestination(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	// stopping server
-	server.Close()
-	dbClient.Cfg.ProxyPort = "5556"
-	err := dbClient.StartProxy()
-	Expect(err).To(BeNil())
-	dbClient.SetDestination("newdest")
-
-	Expect(dbClient.Cfg.Destination).To(Equal("newdest"))
-}
-
-func Test_Hoverfly_SetDestination_UpdateDestinationEmpty(t *testing.T) {
-	RegisterTestingT(t)
-
-	server, dbClient := testTools(200, `{'message': 'here'}`)
-	// stopping server
-	server.Close()
-	dbClient.Cfg.ProxyPort = "5557"
-	dbClient.StartProxy()
-	err := dbClient.SetDestination("e^^**#")
+	err := unit.StartProxy()
 	Expect(err).ToNot(BeNil())
 }

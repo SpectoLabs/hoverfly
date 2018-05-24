@@ -70,7 +70,31 @@ func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
 	w.Write(pairViewBytes)
 }
 
-func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.T) {
+func Test_Hoverfly_SetDestination_SetDestination(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Cfg.ProxyPort = "5556"
+	err := unit.StartProxy()
+	Expect(err).To(BeNil())
+	unit.SetDestination("newdest")
+
+	Expect(unit.Cfg.Destination).To(Equal("newdest"))
+}
+
+func Test_Hoverfly_SetDestination_UpdateDestinationEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Cfg.ProxyPort = "5557"
+	unit.StartProxy()
+	err := unit.SetDestination("e^^**#")
+	Expect(err).ToNot(BeNil())
+}
+
+func Test_Hoverfly_GetSimulation_ReturnsBlankSimulation_ifThereIsNoData(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -86,7 +110,7 @@ func TestHoverflyGetSimulationReturnsBlankSimulation_ifThereIsNoData(t *testing.
 	Expect(simulation.MetaView.TimeExported).ToNot(BeNil())
 }
 
-func TestHoverfly_GetSimulation_ReturnsASingleRequestResponsePair(t *testing.T) {
+func Test_Hoverfly_GetSimulation_ReturnsASingleRequestResponsePair(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -197,7 +221,7 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleRequestResponsePairs(t *testing.
 	Expect(simulation.DataViewV5.RequestResponsePairs[1].Response.Body).To(Equal("test"))
 }
 
-func TestHoverflyGetSimulationReturnsMultipleDelays(t *testing.T) {
+func Test_Hoverfly_GetSimulation_ReturnsMultipleDelays(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -230,7 +254,7 @@ func TestHoverflyGetSimulationReturnsMultipleDelays(t *testing.T) {
 	Expect(simulation.DataViewV5.GlobalActions.Delays[1].Delay).To(Equal(200))
 }
 
-func TestHoverfly_GetFilteredSimulation_WithPlainTextUrlQuery(t *testing.T) {
+func Test_Hoverfly_GetFilteredSimulation_WithPlainTextUrlQuery(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -266,7 +290,7 @@ func TestHoverfly_GetFilteredSimulation_WithPlainTextUrlQuery(t *testing.T) {
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("bar.com"))
 }
 
-func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
+func Test_Hoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -315,7 +339,7 @@ func TestHoverfly_GetFilteredSimulation_WithRegexUrlQuery(t *testing.T) {
 	Expect(simulation.RequestResponsePairs[1].RequestMatcher.Destination[0].Value).To(Equal("test-2.com"))
 }
 
-func TestHoverfly_GetFilteredSimulationReturnBlankSimulation_IfThereIsNoMatch(t *testing.T) {
+func Test_Hoverfly_GetFilteredSimulation_ReturnBlankSimulation_IfThereIsNoMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -342,7 +366,7 @@ func TestHoverfly_GetFilteredSimulationReturnBlankSimulation_IfThereIsNoMatch(t 
 	Expect(simulation.MetaView.TimeExported).ToNot(BeNil())
 }
 
-func TestHoverfly_GetFilteredSimulationReturnError_OnInvalidRegexQuery(t *testing.T) {
+func Test_Hoverfly_GetFilteredSimulationReturnError_OnInvalidRegexQuery(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -362,7 +386,7 @@ func TestHoverfly_GetFilteredSimulationReturnError_OnInvalidRegexQuery(t *testin
 	Expect(err).NotTo(BeNil())
 }
 
-func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T) {
+func Test_Hoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -429,7 +453,7 @@ func TestHoverfly_GetFilteredSimulation_WithUrlQueryContainingPath(t *testing.T)
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("/api/v1"))
 }
 
-func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
+func Test_Hoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -462,7 +486,7 @@ func TestHoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 	Expect(importedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("test-body"))
 }
 
-func TestHoverfly_PutSimulation_ImportsSimulationViews(t *testing.T) {
+func Test_Hoverfly_PutSimulation_ImportsSimulationViews(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
@@ -494,7 +518,7 @@ func TestHoverfly_PutSimulation_ImportsSimulationViews(t *testing.T) {
 	Expect(importedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("pair2-body"))
 }
 
-func TestHoverfly_PutSimulation_ImportsDelays(t *testing.T) {
+func Test_Hoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
