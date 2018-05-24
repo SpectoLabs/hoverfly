@@ -14,93 +14,103 @@ var (
 	expectedValue2 = []byte{'B'}
 )
 
-func TestCacheGetIsEmptyByDefault(t *testing.T) {
+func Test_InMemoryCache_Get_NonExistingKey(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := &cache.InMemoryCache{}
+	unit := cache.NewBoltDBCache(TestDB, []byte("somebucket"))
+
+	// getting key
+	_, err := unit.Get([]byte("should not be here"))
+	Expect(err).ToNot(BeNil())
+}
+
+func Test_InMemoryCache_CacheGetIsEmptyByDefault(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := &cache.InMemoryCache{}
 
 	expectedKey := []byte{'k'}
 
-	actualValue, err := cache.Get(expectedKey)
+	actualValue, err := unit.Get(expectedKey)
 	Expect(err).ToNot(BeNil())
 	Expect(actualValue).To(HaveLen(0))
 }
 
-func TestCacheGetAllEntriesIsEmptyByDefault(t *testing.T) {
+func Test_InMemoryCache_CacheGetAllEntriesIsEmptyByDefault(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := &cache.InMemoryCache{}
+	unit := &cache.InMemoryCache{}
 
-	actualValue, err := cache.GetAllEntries()
+	actualValue, err := unit.GetAllEntries()
 	Expect(err).To(BeNil())
 	Expect(actualValue).To(HaveLen(0))
 }
 
-func TestCacheGetAllKeysIsEmptyByDefault(t *testing.T) {
+func Test_InMemoryCache_CacheGetAllKeysIsEmptyByDefault(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := &cache.InMemoryCache{}
+	unit := &cache.InMemoryCache{}
 
-	actualValue, err := cache.GetAllKeys()
+	actualValue, err := unit.GetAllKeys()
 	Expect(err).To(BeNil())
 	Expect(actualValue).To(HaveLen(0))
 }
 
-func TestCacheGetAllValuesIsEmptyByDefault(t *testing.T) {
+func Test_InMemoryCache_CacheGetAllValuesIsEmptyByDefault(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := &cache.InMemoryCache{}
+	unit := &cache.InMemoryCache{}
 
-	actualValue, err := cache.GetAllValues()
+	actualValue, err := unit.GetAllValues()
 	Expect(err).To(BeNil())
 	Expect(actualValue).To(HaveLen(0))
 }
 
-func TestSetAndGet(t *testing.T) {
+func Test_InMemoryCache_SetAndGet(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	unit := cache.NewInMemoryCache()
 
-	err := cache.Set(expectedKey1, expectedValue1)
+	err := unit.Set(expectedKey1, expectedValue1)
 	Expect(err).To(BeNil())
 
-	err = cache.Set(expectedKey2, expectedValue2)
+	err = unit.Set(expectedKey2, expectedValue2)
 	Expect(err).To(BeNil())
 
-	actualValue, err := cache.Get(expectedKey1)
+	actualValue, err := unit.Get(expectedKey1)
 	Expect(err).To(BeNil())
 	Expect(actualValue).To(Equal(expectedValue1))
 
-	actualValue, err = cache.Get(expectedKey2)
+	actualValue, err = unit.Get(expectedKey2)
 	Expect(err).To(BeNil())
 	Expect(actualValue).To(Equal(expectedValue2))
 }
 
-func TestInMemoryCache_Get_DoesntLockIfFailed(t *testing.T) {
+func Test_InMemoryCache_Get_DoesntLockIfFailed(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	unit := cache.NewInMemoryCache()
 
-	_, err := cache.Get(expectedKey1)
+	_, err := unit.Get(expectedKey1)
 	Expect(err).ToNot(BeNil())
 
-	err = cache.Set(expectedKey1, expectedValue1)
+	err = unit.Set(expectedKey1, expectedValue1)
 	Expect(err).To(BeNil())
 
-	actualValue, err := cache.Get(expectedKey1)
+	actualValue, err := unit.Get(expectedKey1)
 	Expect(err).To(BeNil())
 	Expect(actualValue).To(Equal(expectedValue1))
 }
 
-func TestGetAllKeysMem(t *testing.T) {
+func Test_InMemoryCache_GetAllKeysMem(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	unit := cache.NewInMemoryCache()
 
-	cache.Set(expectedKey1, expectedValue1)
-	cache.Set(expectedKey2, expectedValue2)
+	unit.Set(expectedKey1, expectedValue1)
+	unit.Set(expectedKey2, expectedValue2)
 
-	keys, err := cache.GetAllKeys()
+	keys, err := unit.GetAllKeys()
 	Expect(err).To(BeNil())
 
 	Expect(keys).To(HaveLen(2))
@@ -108,15 +118,15 @@ func TestGetAllKeysMem(t *testing.T) {
 	Expect(keys).To(HaveKey(string(expectedKey2)))
 }
 
-func TestGetAllValuesMem(t *testing.T) {
+func Test_InMemoryCache_GetAllValuesMem(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	unit := cache.NewInMemoryCache()
 
-	cache.Set(expectedKey1, expectedValue1)
-	cache.Set(expectedKey2, expectedValue2)
+	unit.Set(expectedKey1, expectedValue1)
+	unit.Set(expectedKey2, expectedValue2)
 
-	values, err := cache.GetAllValues()
+	values, err := unit.GetAllValues()
 	Expect(err).To(BeNil())
 
 	Expect(values).To(HaveLen(2))
@@ -124,15 +134,15 @@ func TestGetAllValuesMem(t *testing.T) {
 	Expect(values).To(ContainElement(expectedValue2))
 }
 
-func TestGetAllEntriesMem(t *testing.T) {
+func Test_InMemoryCache_GetAllEntriesMem(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	unit := cache.NewInMemoryCache()
 
-	cache.Set(expectedKey1, expectedValue1)
-	cache.Set(expectedKey2, expectedValue2)
+	unit.Set(expectedKey1, expectedValue1)
+	unit.Set(expectedKey2, expectedValue2)
 
-	entries, err := cache.GetAllEntries()
+	entries, err := unit.GetAllEntries()
 	Expect(err).To(BeNil())
 
 	Expect(entries).To(HaveLen(2))
@@ -140,61 +150,61 @@ func TestGetAllEntriesMem(t *testing.T) {
 	Expect(entries).To(HaveKeyWithValue(string(expectedKey2), expectedValue2))
 }
 
-func TestGetRecordCount(t *testing.T) {
+func Test_InMemoryCache_GetRecordCount(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	unit := cache.NewInMemoryCache()
 
-	cache.Set(expectedKey1, expectedValue1)
-	cache.Set(expectedKey2, expectedValue2)
+	unit.Set(expectedKey1, expectedValue1)
+	unit.Set(expectedKey2, expectedValue2)
 
-	recordCount, err := cache.RecordsCount()
+	recordCount, err := unit.RecordsCount()
 	Expect(err).To(BeNil())
 
 	Expect(recordCount).To(Equal(2))
 }
 
-func TestDeleteData(t *testing.T) {
+func Test_InMemoryCache_DeleteData(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	unit := cache.NewInMemoryCache()
 
-	cache.Set(expectedKey1, expectedValue1)
-	cache.Set(expectedKey2, expectedValue2)
+	unit.Set(expectedKey1, expectedValue1)
+	unit.Set(expectedKey2, expectedValue2)
 
-	cache.DeleteData()
+	unit.DeleteData()
 
-	recordCount, err := cache.RecordsCount()
+	recordCount, err := unit.RecordsCount()
 	Expect(err).To(BeNil())
 
 	Expect(recordCount).To(Equal(0))
 }
 
-func TestDeleteKey(t *testing.T) {
+func Test_InMemoryCache_DeleteKey(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	unit := cache.NewInMemoryCache()
 
-	cache.Set(expectedKey1, expectedValue1)
-	cache.Set(expectedKey2, expectedValue2)
+	unit.Set(expectedKey1, expectedValue1)
+	unit.Set(expectedKey2, expectedValue2)
 
-	cache.Delete([]byte(expectedKey1))
+	unit.Delete([]byte(expectedKey1))
 
-	value, err := cache.Get(expectedKey1)
+	value, err := unit.Get(expectedKey1)
 	Expect(err).ToNot(BeNil())
 
 	Expect(value).To(HaveLen(0))
 
-	count, err := cache.RecordsCount()
+	count, err := unit.RecordsCount()
 	Expect(err).To(BeNil())
 
 	Expect(count).To(Equal(1))
 }
 
-func TestThrowErrorIfGettingANotExistingKey(t *testing.T) {
+func Test_InMemoryCache_ThrowErrorIfGettingANotExistingKey(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
-	_, err := cache.Get([]byte("key"))
+	unit := cache.NewInMemoryCache()
+	_, err := unit.Get([]byte("key"))
 	Expect(err).ToNot(BeNil())
 }
