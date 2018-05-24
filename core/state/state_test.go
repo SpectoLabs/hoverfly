@@ -30,6 +30,80 @@ func Test_NewStateFromState_InitializesStateForSequenceKeys(t *testing.T) {
 	}))
 }
 
+func Test_GetState(t *testing.T) {
+	RegisterTestingT(t)
+
+	s := state.NewState()
+	s.State = map[string]string{
+		"test1": "1",
+		"test2": "2",
+		"test3": "3",
+	}
+
+	Expect(s).ToNot(BeNil())
+	Expect(s.GetState("test1")).To(Equal("1"))
+	Expect(s.GetState("test2")).To(Equal("2"))
+	Expect(s.GetState("test3")).To(Equal("3"))
+}
+
+func Test_PatchState(t *testing.T) {
+	RegisterTestingT(t)
+
+	s := state.NewState()
+	s.State = map[string]string{
+		"test1": "1",
+		"test2": "2",
+		"test3": "3",
+	}
+
+	s.PatchState(map[string]string{
+		"test1": "modified",
+	})
+
+	Expect(s).ToNot(BeNil())
+	Expect(s.State).To(Equal(map[string]string{
+		"test1": "modified",
+		"test2": "2",
+		"test3": "3",
+	}))
+
+	s.PatchState(map[string]string{
+		"test2": "modified",
+		"test3": "modified",
+	})
+
+	Expect(s).ToNot(BeNil())
+	Expect(s.State).To(Equal(map[string]string{
+		"test1": "modified",
+		"test2": "modified",
+		"test3": "modified",
+	}))
+}
+
+func Test_RemoveState(t *testing.T) {
+	RegisterTestingT(t)
+
+	s := state.NewState()
+	s.State = map[string]string{
+		"test1": "1",
+		"test2": "2",
+		"test3": "3",
+	}
+
+	s.RemoveState([]string{"test1"})
+
+	Expect(s).ToNot(BeNil())
+	Expect(s.State).To(Equal(map[string]string{
+		"test2": "2",
+		"test3": "3",
+	}))
+
+	s.RemoveState([]string{"test2", "test3"})
+
+	Expect(s).ToNot(BeNil())
+	Expect(s.State).To(Equal(map[string]string{}))
+}
+
 func Test_State_GetNewSequenceKey_ReturnsFirstFreeInSequence(t *testing.T) {
 	RegisterTestingT(t)
 
