@@ -417,56 +417,102 @@ Which if hit would have given the following response:
 	It("should be able to iterate through sequenced stateful pairs", func() {
 		hoverfly.ImportSimulation(testdata.Sequenced)
 
-		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/"))
+		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
 		Expect(resp.StatusCode).To(Equal(200))
 
 		body, err := ioutil.ReadAll(resp.Body)
 		Expect(err).To(BeNil())
-		Expect(string(body)).To(Equal("response 1"))
+		Expect(string(body)).To(Equal("response 1a"))
 
-		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/"))
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
 		Expect(resp.StatusCode).To(Equal(200))
 
 		body, err = ioutil.ReadAll(resp.Body)
 		Expect(err).To(BeNil())
-		Expect(string(body)).To(Equal("response 2"))
+		Expect(string(body)).To(Equal("response 2a"))
 
-		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/"))
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
 		Expect(resp.StatusCode).To(Equal(200))
 
 		body, err = ioutil.ReadAll(resp.Body)
 		Expect(err).To(BeNil())
-		Expect(string(body)).To(Equal("response 3"))
+		Expect(string(body)).To(Equal("response 3a"))
 	})
 
 	It("after iterating through all pairs in sequence, it stays on the last pair", func() {
 		hoverfly.ImportSimulation(testdata.Sequenced)
 
-		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/"))
+		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
 		Expect(resp.StatusCode).To(Equal(200))
 
-		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/"))
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
 		Expect(resp.StatusCode).To(Equal(200))
 
-		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/"))
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
 		Expect(resp.StatusCode).To(Equal(200))
 
 		body, err := ioutil.ReadAll(resp.Body)
 		Expect(err).To(BeNil())
-		Expect(string(body)).To(Equal("response 3"))
+		Expect(string(body)).To(Equal("response 3a"))
 
-		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/"))
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
 		Expect(resp.StatusCode).To(Equal(200))
 
 		body, err = ioutil.ReadAll(resp.Body)
 		Expect(err).To(BeNil())
-		Expect(string(body)).To(Equal("response 3"))
+		Expect(string(body)).To(Equal("response 3a"))
 
-		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/"))
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
 		Expect(resp.StatusCode).To(Equal(200))
 
 		body, err = ioutil.ReadAll(resp.Body)
 		Expect(err).To(BeNil())
-		Expect(string(body)).To(Equal("response 3"))
+		Expect(string(body)).To(Equal("response 3a"))
+	})
+
+	It("should be able to iterate through different sequenced stateful pairs", func() {
+		hoverfly.ImportSimulation(testdata.Sequenced)
+
+		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err := ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("response 1a"))
+
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/b"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err = ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("response 1b"))
+
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err = ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("response 2a"))
+
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/b"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err = ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("response 2b"))
+
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err = ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("response 3a"))
+
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/b"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err = ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("response 2b"))
 	})
 })

@@ -6,7 +6,7 @@ var Sequenced = `{
 			"request": {
 				"path": [{
 					"matcher": "exact",
-					"value": "/"
+					"value": "/a"
 				}],
 				"requiresState": {
 					"sequence:0": "1"
@@ -14,7 +14,7 @@ var Sequenced = `{
 			},
 			"response": {
 				"status": 200,
-				"body": "response 1",
+				"body": "response 1a",
 				"encodedBody": false,
 				"headers": {
 					"Content-Type": ["text/plain"],
@@ -30,7 +30,7 @@ var Sequenced = `{
 			"request": {
 				"path": [{
 					"matcher": "exact",
-					"value": "/"
+					"value": "/a"
 				}],
 				"requiresState": {
 					"sequence:0": "2"
@@ -38,7 +38,7 @@ var Sequenced = `{
 			},
 			"response": {
 				"status": 200,
-				"body": "response 2",
+				"body": "response 2a",
 				"encodedBody": false,
 				"headers": {
 					"Content-Type": ["text/plain"],
@@ -54,7 +54,7 @@ var Sequenced = `{
 			"request": {
 				"path": [{
 					"matcher": "exact",
-					"value": "/"
+					"value": "/a"
 				}],
 				"requiresState": {
 					"sequence:0": "3"
@@ -62,7 +62,52 @@ var Sequenced = `{
 			},
 			"response": {
 				"status": 200,
-				"body": "response 3",
+				"body": "response 3a",
+				"encodedBody": false,
+				"headers": {
+					"Content-Type": ["text/plain"],
+					"Date": ["date"],
+					"Hoverfly": ["Was-Here"]
+				},
+				"templated": false
+			}
+		}, {
+			"request": {
+				"path": [{
+					"matcher": "exact",
+					"value": "/b"
+				}],
+				"requiresState": {
+					"sequence:1": "1"
+				}
+			},
+			"response": {
+				"status": 200,
+				"body": "response 1b",
+				"encodedBody": false,
+				"headers": {
+					"Content-Type": ["text/plain"],
+					"Date": ["date"],
+					"Hoverfly": ["Was-Here"]
+				},
+				"templated": false,
+				"transitionsState": {
+					"sequence:1": "2"
+				}
+			}
+		}, {
+			"request": {
+				"path": [{
+					"matcher": "exact",
+					"value": "/b"
+				}],
+				"requiresState": {
+					"sequence:1": "2"
+				}
+			},
+			"response": {
+				"status": 200,
+				"body": "response 2b",
 				"encodedBody": false,
 				"headers": {
 					"Content-Type": ["text/plain"],
