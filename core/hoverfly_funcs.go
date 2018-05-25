@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/matching"
@@ -139,6 +140,16 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		}
 	}
 
+	requestHeaders := map[string][]models.RequestFieldMatchers{}
+	for headerKey, headerValues := range headers {
+		requestHeaders[headerKey] = []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   strings.Join(headerValues, ";"),
+			},
+		}
+	}
+
 	pair := models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Path: []models.RequestFieldMatchers{
@@ -171,8 +182,8 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 					Value:   request.QueryString(),
 				},
 			},
-			Body:    body,
-			Headers: headers,
+			Body:                body,
+			HeadersWithMatchers: requestHeaders,
 		},
 		Response: *response,
 	}
