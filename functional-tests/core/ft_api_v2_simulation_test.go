@@ -100,8 +100,16 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(schemeMatchers[0].GetString("value")).Should(Equal("http"))
 
 			pairOneRequestHeaders, _ := pairOneRequest.GetObject("headers")
-			Expect(pairOneRequestHeaders.GetStringArray("Accept-Encoding")).Should(ContainElement("gzip"))
-			Expect(pairOneRequestHeaders.GetStringArray("User-Agent")).Should(ContainElement("Go-http-client/1.1"))
+
+			acceptEncodingMatchers, _ := pairOneRequestHeaders.GetObjectArray("Accept-Encoding")
+			Expect(acceptEncodingMatchers).To(HaveLen(1))
+			Expect(acceptEncodingMatchers[0].GetString("matcher")).Should(Equal("exact"))
+			Expect(acceptEncodingMatchers[0].GetString("value")).Should(Equal("gzip"))
+
+			userAgentMatchers, _ := pairOneRequestHeaders.GetObjectArray("User-Agent")
+			Expect(userAgentMatchers).To(HaveLen(1))
+			Expect(userAgentMatchers[0].GetString("matcher")).Should(Equal("exact"))
+			Expect(userAgentMatchers[0].GetString("value")).Should(Equal("Go-http-client/1.1"))
 
 			pairOneResponse, err := pairsArray[0].GetObject("response")
 

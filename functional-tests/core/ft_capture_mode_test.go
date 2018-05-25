@@ -133,7 +133,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				payload := hoverfly.ExportSimulation()
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].RequestMatcher.HeadersWithMatchers).To(Equal(
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Headers).To(Equal(
 					map[string][]v2.MatcherViewV5{
 						"Accept-Encoding": []v2.MatcherViewV5{
 							{
@@ -174,7 +174,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].RequestMatcher.HeadersWithMatchers).To(Equal(
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Headers).To(Equal(
 					map[string][]v2.MatcherViewV5{
 						"User-Agent": []v2.MatcherViewV5{
 							{
@@ -209,7 +209,7 @@ var _ = Describe("When I run Hoverfly", func() {
 				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].RequestMatcher.HeadersWithMatchers).To(Equal(
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.Headers).To(Equal(
 					map[string][]v2.MatcherViewV5{
 						"User-Agent": []v2.MatcherViewV5{
 							{
