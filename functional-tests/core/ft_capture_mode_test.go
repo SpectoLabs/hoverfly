@@ -133,12 +133,21 @@ var _ = Describe("When I run Hoverfly", func() {
 				payload := hoverfly.ExportSimulation()
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].RequestMatcher.Headers).To(Equal(
-					map[string][]string{
-						"Accept-Encoding": []string{"gzip"},
-						"User-Agent":      []string{"Go-http-client/1.1"},
-					},
-				))
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.HeadersWithMatchers).To(Equal(
+					map[string][]v2.MatcherViewV5{
+						"Accept-Encoding": []v2.MatcherViewV5{
+							{
+								Matcher: "exact",
+								Value:   "gzip",
+							},
+						},
+						"User-Agent": []v2.MatcherViewV5{
+							{
+								Matcher: "exact",
+								Value:   "Go-http-client/1.1",
+							},
+						},
+					}))
 			})
 
 			It("Should capture User-Agent request headers if argument is set to User-Agent", func() {
@@ -165,11 +174,15 @@ var _ = Describe("When I run Hoverfly", func() {
 				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].RequestMatcher.Headers).To(Equal(
-					map[string][]string{
-						"User-Agent": []string{"Go-http-client/1.1"},
-					},
-				))
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.HeadersWithMatchers).To(Equal(
+					map[string][]v2.MatcherViewV5{
+						"User-Agent": []v2.MatcherViewV5{
+							{
+								Matcher: "exact",
+								Value:   "Go-http-client/1.1",
+							},
+						},
+					}))
 			})
 
 			It("Should capture User-Agent and Test request headers if argument is set to User-Agent,Test", func() {
@@ -196,10 +209,21 @@ var _ = Describe("When I run Hoverfly", func() {
 				Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
-				Expect(payload.RequestResponsePairs[0].RequestMatcher.Headers).To(Equal(
-					map[string][]string{
-						"User-Agent": []string{"Go-http-client/1.1"},
-						"Test":       []string{"value"},
+				Expect(payload.RequestResponsePairs[0].RequestMatcher.HeadersWithMatchers).To(Equal(
+					map[string][]v2.MatcherViewV5{
+						"User-Agent": []v2.MatcherViewV5{
+							{
+								Matcher: "exact",
+								Value:   "Go-http-client/1.1",
+							},
+						},
+
+						"Test": []v2.MatcherViewV5{
+							{
+								Matcher: "exact",
+								Value:   "value",
+							},
+						},
 					},
 				))
 			})
