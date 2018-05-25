@@ -43,10 +43,16 @@ var Delays = `{
 					],
 					"headers": {
 						"Accept-Encoding": [
-							"gzip"
+							{
+								"matcher": "glob",
+								"value": "gzip"
+							}
 						],
 						"User-Agent": [
-							"Go-http-client/1.1"
+							{
+								"matcher": "glob",
+								"value": "Go-http-client/1.1"
+							}
 						]
 					}
 				},

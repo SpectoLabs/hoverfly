@@ -5,7 +5,7 @@ var HeaderMatchers = `{
 		"pairs": [
 			{
 				"request": {
-					"headersWithMatchers": {
+					"headers": {
 						"test": [
 							{
 								"matcher": "exact",
@@ -23,7 +23,7 @@ var HeaderMatchers = `{
 			},
 			{
 				"request": {
-					"headersWithMatchers": {
+					"headers": {
 						"test2": [
 							{
 								"matcher": "exact",

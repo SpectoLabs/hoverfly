@@ -63,7 +63,7 @@
 					"type": "array"
 				},
 				"headers": {
-					"$ref": "#/definitions/headers"
+					"$ref": "#/definitions/request-headers"
 				},
 				"path": {
 					"items": {
@@ -91,6 +91,15 @@
 					},
 					"type": "array"
 				}
+			},
+			"type": "object"
+		},
+		"request-headers": {
+			"additionalProperties": {
+				"items": {
+					"$ref": "#/definitions/field-matchers"
+				},
+				"type": "array"
 			},
 			"type": "object"
 		},

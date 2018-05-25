@@ -50,7 +50,12 @@ func Test_Simulation_AddPair_CanAddAFullPairToTheArray(t *testing.T) {
 					Value:   "testdestination",
 				},
 			},
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]models.RequestFieldMatchers{"testheader": []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "testvalue",
+				},
+			}},
 			Method: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -89,7 +94,12 @@ func Test_Simulation_AddPair_CanAddAFullPairToTheArray(t *testing.T) {
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Body[0].Value).To(Equal("testbody"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
-	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveKeyWithValue("testheader", []models.RequestFieldMatchers{
+		{
+			Matcher: "exact",
+			Value:   "testvalue",
+		},
+	}))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Method[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Method[0].Value).To(Equal("testmethod"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Path[0].Matcher).To(Equal("exact"))
@@ -123,7 +133,12 @@ func Test_Simulation_AddPairInSequence_CanAddAFullPairToTheArray(t *testing.T) {
 					Value:   "testdestination",
 				},
 			},
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]models.RequestFieldMatchers{"testheader": []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "testvalue",
+				},
+			}},
 			Method: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -162,7 +177,12 @@ func Test_Simulation_AddPairInSequence_CanAddAFullPairToTheArray(t *testing.T) {
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Body[0].Value).To(Equal("testbody"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
-	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveKeyWithValue("testheader", []models.RequestFieldMatchers{
+		{
+			Matcher: "exact",
+			Value:   "testvalue",
+		},
+	}))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Method[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Method[0].Value).To(Equal("testmethod"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Path[0].Matcher).To(Equal("exact"))

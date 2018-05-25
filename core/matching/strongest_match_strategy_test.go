@@ -63,9 +63,19 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersShouldMatchOnBody(t
 func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": {"val1"},
-		"header2": {"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1",
+			},
+		},
+		"header2": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -94,9 +104,19 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWhenAllHeadersMatch(
 func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": {"val1"},
-		"header2": {"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1",
+			},
+		},
+		"header2": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -124,9 +144,19 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderNotPresentIn
 func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": {"val1"},
-		"header2": {"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1",
+			},
+		},
+		"header2": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -154,9 +184,19 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderValueDiffere
 func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": {"val1-a", "val1-b"},
-		"header2": {"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1-a;val1-b",
+			},
+		},
+		"header2": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -185,11 +225,20 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWithMultiValuedHeade
 func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": {"val1-a", "val1-b"},
-		"header2": {"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1-a;val1-b",
+			},
+		},
+		"header2": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
-
 	simulation := models.NewSimulation()
 
 	simulation.AddPair(&models.RequestMatcherResponsePair{
@@ -216,9 +265,19 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWithDifferentMultiValuedH
 func Test_ClosestRequestMatcherRequestMatcher_EndpointMatchWithHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": {"val1-a", "val1-b"},
-		"header2": {"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1-a;val1-b",
+			},
+		},
+		"header2": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -274,9 +333,19 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMatchWithHeaders(t *testin
 func Test_ClosestRequestMatcherRequestMatcher_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": {"val1-a", "val1-b"},
-		"header2": {"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1-a;val1-b",
+			},
+		},
+		"header2": {
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -456,8 +525,13 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnHeader
 
 	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
-			Headers: map[string][]string{
-				"unique-header": {"*"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"unique-header": {
+					{
+						Matcher: matchers.Glob,
+						Value:   "*",
+					},
+				},
 			},
 		},
 		Response: testResponse,
@@ -751,8 +825,13 @@ func Test__NotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *test
 					Value:   "www.test.com",
 				},
 			},
-			Headers: map[string][]string{
-				"foo": {"bar"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"foo": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "bar",
+					},
+				},
 			},
 		},
 		Response: testResponse,
@@ -833,8 +912,13 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 					Value:   "www.test.com",
 				},
 			},
-			Headers: map[string][]string{
-				"foo": {"bar"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"foo": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "bar",
+					},
+				},
 			},
 		},
 		Response: testResponse,
@@ -1022,10 +1106,25 @@ func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
 					Value:   "GET",
 				},
 			},
-			Headers: map[string][]string{
-				"one":   {"one"},
-				"two":   {"one"},
-				"three": {"one"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"one": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "one",
+					},
+				},
+				"two": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "one",
+					},
+				},
+				"three": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "one",
+					},
+				},
 			},
 		},
 		Response: models.ResponseDetails{
@@ -1083,10 +1182,25 @@ func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
 					Value:   "GET",
 				},
 			},
-			Headers: map[string][]string{
-				"one":   {"one"},
-				"two":   {"one"},
-				"three": {"one"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"one": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "one",
+					},
+				},
+				"two": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "one",
+					},
+				},
+				"three": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "one",
+					},
+				},
 			},
 		},
 		Response: models.ResponseDetails{
@@ -1170,8 +1284,13 @@ func Test_ShouldReturnFieldsMissedInClosestMiss(t *testing.T) {
 					Value:   "miss",
 				},
 			},
-			Headers: map[string][]string{
-				"hitKey": {"hitValue"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"hitKey": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "hitValue",
+					},
+				},
 			},
 		},
 		Response: models.ResponseDetails{
@@ -1239,8 +1358,13 @@ func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
 					Value:   "hit",
 				},
 			},
-			Headers: map[string][]string{
-				"miss": {"miss"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"miss": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "miss",
+					},
+				},
 			},
 		},
 		Response: models.ResponseDetails{
@@ -1330,8 +1454,13 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 					Value:   "hit",
 				},
 			},
-			Headers: map[string][]string{
-				"miss": {"miss"},
+			Headers: map[string][]v2.MatcherViewV5{
+				"miss": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "miss",
+					},
+				},
 			},
 		},
 		MissedFields: []string{"body", "path", "method"},
@@ -1409,7 +1538,10 @@ The matcher which came closest was:
     ],
     "headers": {
         "miss": [
-            "miss"
+            {
+                "matcher": "exact",
+                "value": "miss"
+            }
         ]
     }
 }
@@ -1476,8 +1608,13 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeader
 					Value:   "www.test.com",
 				},
 			},
-			Headers: map[string][]string{
-				"foo": {"bar"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"foo": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "bar",
+					},
+				},
 			},
 		},
 		Response: testResponse,
@@ -1558,8 +1695,13 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 					Value:   "www.test.com",
 				},
 			},
-			Headers: map[string][]string{
-				"foo": {"bar"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"foo": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "bar",
+					},
+				},
 			},
 		},
 		Response: testResponse,

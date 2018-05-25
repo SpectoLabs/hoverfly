@@ -303,8 +303,13 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 					Value:   "destination",
 				},
 			},
-			Headers: map[string][]string{
-				"Headers": {"value"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"Headers": []models.RequestFieldMatchers{
+					{
+						Matcher: matchers.Exact,
+						Value:   "value",
+					},
+				},
 			},
 			Method: []models.RequestFieldMatchers{
 				{

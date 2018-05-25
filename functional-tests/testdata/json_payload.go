@@ -43,10 +43,16 @@ var JsonPayload = `{
 					],
 					"headers": {
 						"Accept-Encoding": [
-							"gzip"
+							{
+								"matcher": "exact",
+								"value": "gzip"
+							}
 						],
 						"User-Agent": [
-							"Go-http-client/1.1"
+							{
+								"matcher": "exact",
+								"value": "Go-http-client/1.1"
+							}
 						]
 					}
 				},
