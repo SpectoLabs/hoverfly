@@ -182,8 +182,8 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 					Value:   request.QueryString(),
 				},
 			},
-			Body:                body,
-			HeadersWithMatchers: requestHeaders,
+			Body:    body,
+			Headers: requestHeaders,
 		},
 		Response: *response,
 	}

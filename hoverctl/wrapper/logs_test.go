@@ -31,9 +31,12 @@ func Test_GetLogs_GetsLogsWithCorrect_Text_Plain_AcceptHeader(t *testing.T) {
 								Value:   "/api/v2/logs",
 							},
 						},
-						Headers: map[string][]string{
-							"Accept": []string{
-								"text/plain",
+						Headers: map[string][]v2.MatcherViewV5{
+							"Accept": []v2.MatcherViewV5{
+								{
+									Matcher: matchers.Exact,
+									Value:   "text/plain",
+								},
 							},
 						},
 					},
@@ -78,9 +81,12 @@ func Test_GetLogs_CanHandleEmptyTextPlainLogResponse(t *testing.T) {
 								Value:   "/api/v2/logs",
 							},
 						},
-						Headers: map[string][]string{
-							"Accept": []string{
-								"text/plain",
+						Headers: map[string][]v2.MatcherViewV5{
+							"Accept": []v2.MatcherViewV5{
+								{
+									Matcher: matchers.Exact,
+									Value:   "text/plain",
+								},
 							},
 						},
 					},
@@ -122,9 +128,12 @@ func Test_GetLogs_CanHandleEmptyLineAtEndOfTextPlainLogResponse(t *testing.T) {
 								Value:   "/api/v2/logs",
 							},
 						},
-						Headers: map[string][]string{
-							"Accept": []string{
-								"text/plain",
+						Headers: map[string][]v2.MatcherViewV5{
+							"Accept": []v2.MatcherViewV5{
+								{
+									Matcher: matchers.Exact,
+									Value:   "text/plain",
+								},
 							},
 						},
 					},
@@ -168,9 +177,12 @@ func Test_GetLogs_GetsLogsWithCorrect_JSON_AcceptHeader(t *testing.T) {
 								Value:   "/api/v2/logs",
 							},
 						},
-						Headers: map[string][]string{
-							"Accept": []string{
-								"application/json",
+						Headers: map[string][]v2.MatcherViewV5{
+							"Accept": []v2.MatcherViewV5{
+								{
+									Matcher: matchers.Exact,
+									Value:   "application/json",
+								},
 							},
 						},
 					},

@@ -56,7 +56,21 @@ var V5JsonPayload = `{
 							"matcher": "exact",
 							"value": ""
 						}
-					]
+					],
+					"headers": {
+                        "Accept-Encoding": [
+						    {
+								"matcher": "glob",
+								"value": "gzip"
+							}
+						],
+					    "User-Agent": [
+						    {
+								"matcher": "glob",
+								"value": "Go-http-client/1.1"
+							}
+						]
+                    }
 				},
 				"response": {
 					"status": 200,

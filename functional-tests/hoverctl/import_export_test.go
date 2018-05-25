@@ -22,7 +22,7 @@ var _ = Describe("When I use hoverctl", func() {
 	)
 
 	var (
-		v3HoverflyData = `
+		hoverflyData = `
 			{
 				"data": {
 					"pairs": [{
@@ -73,7 +73,12 @@ var _ = Describe("When I use hoverctl", func() {
 								}
 							],
 							"headers": {
-								"Content-Type": ["application/json"]
+								"Content-Type": [
+									{
+										"matcher": "exact",
+										"value": "application/json"
+									}
+								]
 							}
 						}
 					}],
@@ -88,7 +93,7 @@ var _ = Describe("When I use hoverctl", func() {
 				}
 			}`
 
-		v3HoverflyDataWithMultiplePairs = `
+		hoverflyDataWithMultiplePairs = `
 			{
 				"data": {
 					"pairs": [{
@@ -139,7 +144,12 @@ var _ = Describe("When I use hoverctl", func() {
 								}
 							],
 							"headers": {
-								"Content-Type": ["application/json"]
+								"Content-Type": [
+									{
+										"matcher": "exact",
+										"value": "application/json"
+									}
+								]
 							}
 						}
 					}, {
@@ -184,9 +194,9 @@ var _ = Describe("When I use hoverctl", func() {
 				}
 			}`
 
-		v3HoverflySimulation = `"pairs":[{"request":{"path":[{"matcher":"exact","value":"/api/bookings"}],"method":[{"matcher":"exact","value":"POST"}],"destination":[{"matcher":"exact","value":"www.my-test.com"}],"scheme":[{"matcher":"exact","value":"http"}],"query":[{"matcher":"exact","value":""}],"body":[{"matcher":"exact","value":"{\"flightId\": \"1\"}"}],"headers":{"Content-Type":["application/json"]}},"response":{"status":201,"body":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]},"templated":false}}],"globalActions":{"delays":[]}}`
+		hoverflySimulation = `"pairs":[{"request":{"path":[{"matcher":"exact","value":"/api/bookings"}],"method":[{"matcher":"exact","value":"POST"}],"destination":[{"matcher":"exact","value":"www.my-test.com"}],"scheme":[{"matcher":"exact","value":"http"}],"query":[{"matcher":"exact","value":""}],"body":[{"matcher":"exact","value":"{\"flightId\": \"1\"}"}],"headers":{"Content-Type":[{"matcher":"exact","value":"application/json"}]}},"response":{"status":201,"body":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]},"templated":false}}],"globalActions":{"delays":[]}}`
 
-		v3HoverflyMeta = `"meta":{"schemaVersion":"v5","hoverflyVersion":"v\d+.\d+.\d+","timeExported":`
+		hoverflyMeta = `"meta":{"schemaVersion":"v5","hoverflyVersion":"v\d+.\d+.\d+","timeExported":`
 	)
 
 	Describe("with a running hoverfly", func() {
@@ -205,7 +215,7 @@ var _ = Describe("When I use hoverctl", func() {
 		Describe("Managing Hoverflies data using the CLI", func() {
 
 			BeforeEach(func() {
-				hoverfly.ImportSimulation(v3HoverflyData)
+				hoverfly.ImportSimulation(hoverflyData)
 			})
 
 			It("can export", func() {
@@ -222,13 +232,13 @@ var _ = Describe("When I use hoverctl", func() {
 				buffer := new(bytes.Buffer)
 				json.Compact(buffer, data)
 
-				Expect(buffer.String()).To(ContainSubstring(v3HoverflySimulation))
-				Expect(buffer.String()).To(MatchRegexp(v3HoverflyMeta))
+				Expect(buffer.String()).To(ContainSubstring(hoverflySimulation))
+				Expect(buffer.String()).To(MatchRegexp(hoverflyMeta))
 			})
 
 			It("can export with url pattern", func() {
 
-				hoverfly.ImportSimulation(v3HoverflyDataWithMultiplePairs)
+				hoverfly.ImportSimulation(hoverflyDataWithMultiplePairs)
 				fileName := functional_tests.GenerateFileName()
 				// Export the data
 				output := functional_tests.Run(hoverctlBinary, "export", fileName, "--url-pattern=my-test.com")
@@ -241,14 +251,14 @@ var _ = Describe("When I use hoverctl", func() {
 				buffer := new(bytes.Buffer)
 				json.Compact(buffer, data)
 
-				Expect(buffer.String()).To(ContainSubstring(v3HoverflySimulation))
-				Expect(buffer.String()).To(MatchRegexp(v3HoverflyMeta))
+				Expect(buffer.String()).To(ContainSubstring(hoverflySimulation))
+				Expect(buffer.String()).To(MatchRegexp(hoverflyMeta))
 			})
 
 			It("can import", func() {
 
 				fileName := functional_tests.GenerateFileName()
-				err := ioutil.WriteFile(fileName, []byte(v3HoverflyData), 0644)
+				err := ioutil.WriteFile(fileName, []byte(hoverflyData), 0644)
 				Expect(err).To(BeNil())
 
 				output := functional_tests.Run(hoverctlBinary, "import", fileName)
@@ -257,14 +267,14 @@ var _ = Describe("When I use hoverctl", func() {
 
 				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/simulation", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
-				Expect(string(bytes)).To(ContainSubstring(v3HoverflySimulation))
-				Expect(string(bytes)).To(MatchRegexp(v3HoverflyMeta))
+				Expect(string(bytes)).To(ContainSubstring(hoverflySimulation))
+				Expect(string(bytes)).To(MatchRegexp(hoverflyMeta))
 			})
 
 			It("can import over http", func() {
 				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "application/json")
-					fmt.Fprintln(w, v3HoverflyData)
+					fmt.Fprintln(w, hoverflyData)
 				}))
 				defer ts.Close()
 
@@ -274,8 +284,8 @@ var _ = Describe("When I use hoverctl", func() {
 
 				resp := functional_tests.DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/simulation", hoverfly.GetAdminPort())))
 				bytes, _ := ioutil.ReadAll(resp.Body)
-				Expect(string(bytes)).To(ContainSubstring(v3HoverflySimulation))
-				Expect(string(bytes)).To(MatchRegexp(v3HoverflyMeta))
+				Expect(string(bytes)).To(ContainSubstring(hoverflySimulation))
+				Expect(string(bytes)).To(MatchRegexp(hoverflyMeta))
 			})
 
 			// TODO: Fix this test

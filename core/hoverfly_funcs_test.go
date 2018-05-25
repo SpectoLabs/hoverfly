@@ -640,14 +640,14 @@ func Test_Hoverfly_Save_SavesAllRequestHeadersWhenGivenAnAsterisk(t *testing.T) 
 		Status:  200,
 	}, []string{"*"}, false)
 
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers).To(HaveLen(2))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers["testheader"]).To(HaveLen(1))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers["testheader"][0]).To(Equal(models.RequestFieldMatchers{
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveLen(2))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["testheader"]).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["testheader"][0]).To(Equal(models.RequestFieldMatchers{
 		Matcher: "exact",
 		Value:   "testvalue",
 	}))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers["testheader2"]).To(HaveLen(1))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers["testheader2"][0]).To(Equal(models.RequestFieldMatchers{
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["testheader2"]).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["testheader2"][0]).To(Equal(models.RequestFieldMatchers{
 		Matcher: "exact",
 		Value:   "testvalue2",
 	}))
@@ -669,9 +669,9 @@ func Test_Hoverfly_Save_SavesSpecificRequestHeadersWhenSpecifiedInHeadersArray(t
 		Status:  200,
 	}, []string{"testheader"}, false)
 
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers).To(HaveLen(1))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers["testheader"]).To(HaveLen(1))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers["testheader"][0]).To(Equal(models.RequestFieldMatchers{
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["testheader"]).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["testheader"][0]).To(Equal(models.RequestFieldMatchers{
 		Matcher: "exact",
 		Value:   "testvalue",
 	}))
@@ -713,14 +713,14 @@ func Test_Hoverfly_Save_SavesMultipleRequestHeadersWhenMultiplesSpecifiedInHeade
 		Status:  200,
 	}, []string{"testheader", "nonmatch"}, false)
 
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers).To(HaveLen(2))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers["testheader"]).To(HaveLen(1))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers["testheader"][0]).To(Equal(models.RequestFieldMatchers{
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveLen(2))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["testheader"]).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["testheader"][0]).To(Equal(models.RequestFieldMatchers{
 		Matcher: "exact",
 		Value:   "testvalue",
 	}))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers["nonmatch"]).To(HaveLen(1))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.HeadersWithMatchers["nonmatch"][0]).To(Equal(models.RequestFieldMatchers{
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["nonmatch"]).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["nonmatch"][0]).To(Equal(models.RequestFieldMatchers{
 		Matcher: "exact",
 		Value:   "nonmatchvalue",
 	}))

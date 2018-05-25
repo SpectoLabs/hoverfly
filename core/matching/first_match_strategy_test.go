@@ -65,9 +65,19 @@ func Test_FirstMatchStrategy_RequestMatchersShouldMatchOnBody(t *testing.T) {
 func Test_FirstMatchStrategy_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": []string{"val1"},
-		"header2": []string{"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1",
+			},
+		},
+		"header2": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -96,9 +106,19 @@ func Test_FirstMatchStrategy_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
 func Test_FirstMatchStrategy_ReturnNilWhenOneHeaderNotPresentInRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": []string{"val1"},
-		"header2": []string{"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1",
+			},
+		},
+		"header2": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -126,9 +146,19 @@ func Test_FirstMatchStrategy_ReturnNilWhenOneHeaderNotPresentInRequest(t *testin
 func Test_FirstMatchStrategy_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": []string{"val1"},
-		"header2": []string{"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1",
+			},
+		},
+		"header2": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -156,9 +186,19 @@ func Test_FirstMatchStrategy_ReturnNilWhenOneHeaderValueDifferent(t *testing.T) 
 func Test_FirstMatchStrategy_ReturnResponseWithMultiValuedHeaderMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": []string{"val1-a", "val1-b"},
-		"header2": []string{"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1-a;val1-b",
+			},
+		},
+		"header2": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -187,9 +227,19 @@ func Test_FirstMatchStrategy_ReturnResponseWithMultiValuedHeaderMatch(t *testing
 func Test_FirstMatchStrategy_ReturnNilWithDifferentMultiValuedHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": []string{"val1-a", "val1-b"},
-		"header2": []string{"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1-a;val1-b",
+			},
+		},
+		"header2": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -218,9 +268,19 @@ func Test_FirstMatchStrategy_ReturnNilWithDifferentMultiValuedHeaders(t *testing
 func Test_FirstMatchStrategy_EndpointMatchWithHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": []string{"val1-a", "val1-b"},
-		"header2": []string{"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1-a;val1-b",
+			},
+		},
+		"header2": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -276,9 +336,19 @@ func Test_FirstMatchStrategy_EndpointMatchWithHeaders(t *testing.T) {
 func Test_FirstMatchStrategy_EndpointMismatchWithHeadersReturnsNil(t *testing.T) {
 	RegisterTestingT(t)
 
-	headers := map[string][]string{
-		"header1": []string{"val1-a", "val1-b"},
-		"header2": []string{"val2"},
+	headers := map[string][]models.RequestFieldMatchers{
+		"header1": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val1-a;val1-b",
+			},
+		},
+		"header2": []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "val2",
+			},
+		},
 	}
 
 	simulation := models.NewSimulation()
@@ -486,8 +556,13 @@ func Test_FirstMatchStrategy_RequestMatchersCanUseGlobsOnHeadersAndBeMatched(t *
 
 	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
-			Headers: map[string][]string{
-				"unique-header": []string{"*"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"unique-header": []models.RequestFieldMatchers{
+					{
+						Matcher: matchers.Glob,
+						Value:   "*",
+					},
+				},
 			},
 		},
 		Response: testResponse,
@@ -578,8 +653,13 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLe
 					Value:   "www.test.com",
 				},
 			},
-			Headers: map[string][]string{
-				"foo": {"bar"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"foo": []models.RequestFieldMatchers{
+					{
+						Matcher: matchers.Exact,
+						Value:   "bar",
+					},
+				},
 			},
 		},
 		Response: testResponse,
@@ -660,8 +740,13 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 					Value:   "www.test.com",
 				},
 			},
-			Headers: map[string][]string{
-				"foo": {"bar"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"foo": []models.RequestFieldMatchers{
+					{
+						Matcher: matchers.Exact,
+						Value:   "bar",
+					},
+				},
 			},
 		},
 		Response: testResponse,

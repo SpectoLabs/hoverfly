@@ -43,7 +43,10 @@ var ExactMatch = `{
 					],
 					"headers": {
 						"Header": [
-							"value1"
+							{
+								"matcher": "glob",
+								"value": "value1"
+							}
 						]
 					}
 				},
@@ -99,7 +102,10 @@ var ExactMatch = `{
 					],
 					"headers": {
 						"Header": [
-							"value2"
+							{
+								"matcher": "glob",
+								"value": "value2"
+							}
 						]
 					}
 				},

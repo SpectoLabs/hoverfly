@@ -27,6 +27,17 @@ func NewRequestFieldMatchersFromView(matchers []v2.MatcherViewV5) []RequestField
 	return convertedMatchers
 }
 
+func NewRequestFieldMatchersFromMapView(mapMatchers map[string][]v2.MatcherViewV5) map[string][]RequestFieldMatchers {
+	var matchers map[string][]RequestFieldMatchers
+	for key, view := range mapMatchers {
+		if matchers == nil {
+			matchers = map[string][]RequestFieldMatchers{}
+		}
+		matchers[key] = NewRequestFieldMatchersFromView(view)
+	}
+	return matchers
+}
+
 func (this RequestFieldMatchers) BuildView() v2.MatcherViewV5 {
 	return v2.MatcherViewV5{
 		Matcher: this.Matcher,
@@ -46,21 +57,6 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 			view.RequestMatcher.Query[i].Value = sortedQuery
 		}
 	}
-	var headersWithMatchers map[string][]RequestFieldMatchers
-	for key, view := range view.RequestMatcher.HeadersWithMatchers {
-		if headersWithMatchers == nil {
-			headersWithMatchers = map[string][]RequestFieldMatchers{}
-		}
-		headersWithMatchers[key] = NewRequestFieldMatchersFromView(view)
-	}
-
-	var queriesWithMatchers map[string][]RequestFieldMatchers
-	for key, view := range view.RequestMatcher.QueriesWithMatchers {
-		if queriesWithMatchers == nil {
-			queriesWithMatchers = map[string][]RequestFieldMatchers{}
-		}
-		queriesWithMatchers[key] = NewRequestFieldMatchersFromView(view)
-	}
 
 	return &RequestMatcherResponsePair{
 		RequestMatcher: RequestMatcher{
@@ -70,9 +66,8 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 			Scheme:              NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
 			Query:               NewRequestFieldMatchersFromView(view.RequestMatcher.Query),
 			Body:                NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
-			Headers:             view.RequestMatcher.Headers,
-			HeadersWithMatchers: headersWithMatchers,
-			QueriesWithMatchers: queriesWithMatchers,
+			Headers:             NewRequestFieldMatchersFromMapView(view.RequestMatcher.Headers),
+			QueriesWithMatchers: NewRequestFieldMatchersFromMapView(view.RequestMatcher.QueriesWithMatchers),
 			RequiresState:       view.RequestMatcher.RequiresState,
 		},
 		Response: NewResponseDetailsFromResponse(view.Response),
@@ -132,7 +127,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 	}
 
 	headersWithMatchers := map[string][]v2.MatcherViewV5{}
-	for key, matchers := range this.RequestMatcher.HeadersWithMatchers {
+	for key, matchers := range this.RequestMatcher.Headers {
 		views := []v2.MatcherViewV5{}
 		for _, matcher := range matchers {
 			views = append(views, matcher.BuildView())
@@ -157,8 +152,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 			Scheme:              scheme,
 			Query:               query,
 			Body:                body,
-			Headers:             this.RequestMatcher.Headers,
-			HeadersWithMatchers: headersWithMatchers,
+			Headers:             headersWithMatchers,
 			QueriesWithMatchers: queriesWithMatchers,
 			RequiresState:       this.RequestMatcher.RequiresState,
 		},
@@ -173,14 +167,13 @@ type RequestMatcher struct {
 	Scheme              []RequestFieldMatchers
 	Query               []RequestFieldMatchers
 	Body                []RequestFieldMatchers
-	Headers             map[string][]string
-	HeadersWithMatchers map[string][]RequestFieldMatchers
+	Headers             map[string][]RequestFieldMatchers
 	QueriesWithMatchers map[string][]RequestFieldMatchers
 	RequiresState       map[string]string
 }
 
 func (this RequestMatcher) IncludesHeaderMatching() bool {
-	return (this.Headers != nil && len(this.Headers) > 0) || (this.HeadersWithMatchers != nil && len(this.HeadersWithMatchers) > 0)
+	return (this.Headers != nil && len(this.Headers) > 0)
 }
 
 func (this RequestMatcher) IncludesStateMatching() bool {
@@ -210,7 +203,6 @@ func (this RequestMatcher) ToEagerlyCachable() *RequestDetails {
 	return &RequestDetails{
 		Body:        this.Body[0].Value.(string),
 		Destination: this.Destination[0].Value.(string),
-		Headers:     this.Headers,
 		Method:      this.Method[0].Value.(string),
 		Path:        this.Path[0].Value.(string),
 		Query:       query,

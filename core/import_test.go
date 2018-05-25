@@ -233,7 +233,14 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 					Value:   "",
 				},
 			},
-			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
+			Headers: map[string][]v2.MatcherViewV5{
+				"Hoverfly": []v2.MatcherViewV5{
+					{
+						Matcher: matchers.Exact,
+						Value:   "testing",
+					},
+				},
+			}}}
 
 	hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{originalPair})
 
@@ -281,8 +288,13 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 					Value:   "",
 				},
 			},
-			Headers: map[string][]string{
-				"Hoverfly": []string{"testing"},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"Hoverfly": []models.RequestFieldMatchers{
+					{
+						Matcher: matchers.Exact,
+						Value:   "testing",
+					},
+				},
 			},
 		},
 	}))
@@ -342,7 +354,14 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 					Value:   "",
 				},
 			},
-			Headers: map[string][]string{"Hoverfly": []string{"testing"}}}}
+			Headers: map[string][]v2.MatcherViewV5{
+				"Hoverfly": []v2.MatcherViewV5{
+					{
+						Matcher: matchers.Exact,
+						Value:   "testing",
+					},
+				},
+			}}}
 
 	originalPair2 := originalPair1
 	originalPair2.Response.Templated = false
@@ -409,7 +428,14 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 					Value:   "",
 				},
 			},
-			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"Hoverfly": []models.RequestFieldMatchers{
+					{
+						Matcher: matchers.Exact,
+						Value:   "testing",
+					},
+				},
+			},
 		},
 	}))
 
@@ -457,7 +483,14 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 					Value:   "",
 				},
 			},
-			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"Hoverfly": []models.RequestFieldMatchers{
+					{
+						Matcher: matchers.Exact,
+						Value:   "testing",
+					},
+				},
+			},
 		},
 	}))
 
@@ -505,7 +538,14 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 					Value:   "",
 				},
 			},
-			Headers: map[string][]string{"Hoverfly": []string{"testing"}},
+			Headers: map[string][]models.RequestFieldMatchers{
+				"Hoverfly": []models.RequestFieldMatchers{
+					{
+						Matcher: matchers.Exact,
+						Value:   "testing",
+					},
+				},
+			},
 		},
 	}))
 }
@@ -612,9 +652,12 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 					Value:   "",
 				},
 			},
-			Headers: map[string][]string{
-				"Hoverfly": []string{
-					"testing",
+			Headers: map[string][]v2.MatcherViewV5{
+				"Hoverfly": []v2.MatcherViewV5{
+					{
+						Matcher: matchers.Exact,
+						Value:   "testing",
+					},
 				},
 			},
 		},

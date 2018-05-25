@@ -43,37 +43,70 @@ var Issue607 = `{
 					],
 					"headers": {
 						"Accept": [
-							"application/json"
+							{
+								"matcher": "exact",
+								"value": "application/json"
+							}
 						],
 						"Activityid": [
-							"ChangeMSISDN_CR_PushtoBill(Get)-200"
+							{
+								"matcher": "exact",
+								"value": "ChangeMSISDN_CR_PushtoBill(Get)-200"
+							}
 						],
 						"Applicationid": [
-							"ACUI"
+							{
+								"matcher": "exact",
+								"value": "ACUI"
+							}
 						],
 						"Authorization": [
-							"Bearer token"
+							{
+								"matcher": "exact",
+								"value": "Bearer token"
+							}
 						],
 						"Cache-Control": [
-							"no-cache"
+							{
+								"matcher": "exact",
+								"value": "no-cache"
+							}
 						],
 						"Channelid": [
-							"RETAIL"
+							{
+								"matcher": "exact",
+								"value": "RETAIL"
+							}
 						],
 						"Content-Type": [
-							"application/json"
+							{
+								"matcher": "exact",
+								"value": "application/json"
+							}
 						],
 						"Interactionid": [
-							"123456787"
+							{
+								"matcher": "exact",
+								"value": "123456787"
+							}
 						],
 						"Senderid": [
-							"ACUI"
+							{
+								"matcher": "exact",
+								"value": "ACUI"
+							}
 						],
 						"User-Agent": [
-							"curl/7.54.0"
+							{
+								"matcher": "exact",
+								"value": "curl/7.54.0"
+							}
 						],
 						"Workflowid": [
-							"CHANGEMSISDN"
+							{
+								"matcher": "exact",
+								"value": "CHANGEMSISDN"
+							}
 						]
 					}
 				},

@@ -3,6 +3,7 @@ package v2
 import (
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
@@ -56,30 +57,35 @@ func Test_upgradeV1_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme[0].Value).To(Equal("http"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body[0].Value).To(Equal("body"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("destination"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Value).To(Equal("GET"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("/path"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Value).To(Equal("query=query"))
 
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers).To(BeEmpty())
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveKeyWithValue("Test", []MatcherViewV5{
+		{
+			Matcher: matchers.Glob,
+			Value:   "headers",
+		},
+	}))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Templated).To(BeFalse())
@@ -126,27 +132,27 @@ func Test_upgradeV1_HandlesTemplates(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme[0].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme[0].Matcher).To(Equal(matchers.Glob))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme[0].Value).To(Equal("http"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body[0].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body[0].Matcher).To(Equal(matchers.Glob))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body[0].Value).To(Equal("body"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal(matchers.Glob))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("destination"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Matcher).To(Equal(matchers.Glob))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Value).To(Equal("GET"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal(matchers.Glob))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("/path"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal(matchers.Glob))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Value).To(Equal("query=query"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers).To(BeEmpty())
@@ -186,7 +192,7 @@ func Test_upgradeV1_HandlesIncompleteRequest(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(0))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Value).To(Equal("POST"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
@@ -296,7 +302,7 @@ func Test_upgradeV2_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("*"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Value).To(Equal("query=query"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
@@ -340,7 +346,7 @@ func Test_upgradeV2_UnescapesExactMatchRequestQueryParameters(t *testing.T) {
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Value).To(Equal("q=10 Downing Street London"))
 }
 
@@ -375,7 +381,7 @@ func Test_upgradeV2_UnescapesGlobMatchRequestQueryParameters(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal(matchers.Glob))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Value).To(Equal("q=* London"))
 }
 
@@ -444,9 +450,9 @@ func Test_upgradeV2_HandlesMultipleMatchers(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(2))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[0].Value).To(Equal("testexact"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[1].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[1].Matcher).To(Equal(matchers.Glob))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query[1].Value).To(Equal("testglob"))
 }
 
@@ -706,12 +712,98 @@ func Test_upgradeV4_HandlesNewHeaders(t *testing.T) {
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.HeadersWithMatchers).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.HeadersWithMatchers["test"]).To(HaveLen(2))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.HeadersWithMatchers["test"][0].Matcher).To(Equal("exact"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.HeadersWithMatchers["test"][0].Value).To(Equal("testexact"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.HeadersWithMatchers["test"][1].Matcher).To(Equal("glob"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.HeadersWithMatchers["test"][1].Value).To(Equal("testglob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test"]).To(HaveLen(2))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test"][0].Matcher).To(Equal("exact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test"][0].Value).To(Equal("testexact"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test"][1].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test"][1].Value).To(Equal("testglob"))
+}
+
+func Test_upgradeV4_HandlesOldHeaders(t *testing.T) {
+	RegisterTestingT(t)
+
+	v4Simulation := SimulationViewV4{
+		DataViewV4{
+			RequestResponsePairs: []RequestMatcherResponsePairViewV4{
+				{
+					RequestMatcher: RequestMatcherViewV4{
+						Headers: map[string][]string{
+							"test": []string{"headers"},
+						},
+					},
+					Response: ResponseDetailsViewV4{
+						Status:      200,
+						Body:        "body",
+						EncodedBody: false,
+					},
+				},
+			},
+		},
+		v2Meta,
+	}
+
+	upgradedSimulation := upgradeV4(v4Simulation)
+
+	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test"]).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test"][0].Matcher).To(Equal(matchers.Glob))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test"][0].Value).To(Equal("headers"))
+}
+
+func Test_upgradeV4_HandlesOldAndHeaders(t *testing.T) {
+	RegisterTestingT(t)
+
+	v4Simulation := SimulationViewV4{
+		DataViewV4{
+			RequestResponsePairs: []RequestMatcherResponsePairViewV4{
+				{
+					RequestMatcher: RequestMatcherViewV4{
+						Headers: map[string][]string{
+							"test1": []string{"headers"},
+							"test2": []string{"headers"},
+						},
+						HeadersWithMatchers: map[string]*RequestFieldMatchersView{
+							"test1": &RequestFieldMatchersView{
+								ExactMatch: util.StringToPointer("headers"),
+							},
+							"test3": &RequestFieldMatchersView{
+								GlobMatch: util.StringToPointer("headers"),
+							},
+						},
+					},
+					Response: ResponseDetailsViewV4{
+						Status:      200,
+						Body:        "body",
+						EncodedBody: false,
+					},
+				},
+			},
+		},
+		v2Meta,
+	}
+
+	upgradedSimulation := upgradeV4(v4Simulation)
+
+	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveLen(3))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test1"]).To(HaveLen(2))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test1"][0].Matcher).To(Equal(matchers.Glob))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test1"][0].Value).To(Equal("headers"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test1"][1].Matcher).To(Equal(matchers.Exact))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test1"][1].Value).To(Equal("headers"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test2"]).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test2"][0].Matcher).To(Equal(matchers.Glob))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test2"][0].Value).To(Equal("headers"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test3"]).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test3"][0].Matcher).To(Equal(matchers.Glob))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers["test3"][0].Value).To(Equal("headers"))
 }
 
 func Test_upgradeV4_HandlesNewQueries(t *testing.T) {

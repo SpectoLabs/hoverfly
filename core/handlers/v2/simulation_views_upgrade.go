@@ -2,6 +2,7 @@ package v2
 
 import (
 	"net/url"
+	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 )
@@ -16,13 +17,9 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 		pathMatchers := []MatcherViewV5{}
 		queryMatchers := []MatcherViewV5{}
 		bodyMatchers := []MatcherViewV5{}
-		var headers map[string][]string
 
 		isNotRecording := pairV1.Request.RequestType != nil && *pairV1.Request.RequestType != "recording"
 
-		if isNotRecording {
-			headers = pairV1.Request.Headers
-		}
 		if pairV1.Request.Scheme != nil {
 
 			if isNotRecording {
@@ -109,6 +106,8 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 			}
 		}
 
+		headersWithMatchers := getMatchersFromRequestHeaders(pairV1.Request.Headers)
+
 		pair := RequestMatcherResponsePairViewV5{
 			RequestMatcher: RequestMatcherViewV5{
 				Scheme:        schemeMatchers,
@@ -117,7 +116,7 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 				Path:          pathMatchers,
 				Query:         queryMatchers,
 				Body:          bodyMatchers,
-				Headers:       headers,
+				Headers:       headersWithMatchers,
 				RequiresState: nil,
 			},
 			Response: ResponseDetailsViewV5{
@@ -174,10 +173,13 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
 				})
 			}
 		}
+
+		headersWithMatchers := getMatchersFromRequestHeaders(requestResponsePairV2.RequestMatcher.Headers)
+
 		requestResponsePair := RequestMatcherResponsePairViewV5{
 			RequestMatcher: RequestMatcherViewV5{
 				Destination:   destinationMatchers,
-				Headers:       requestResponsePairV2.RequestMatcher.Headers,
+				Headers:       headersWithMatchers,
 				Method:        methodMatchers,
 				Path:          pathMatchers,
 				Query:         queryMatchers,
@@ -242,10 +244,15 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 			}
 		}
 
-		headersWithMatchers := map[string][]MatcherViewV5{}
+		headersWithMatchers := getMatchersFromRequestHeaders(requestResponsePairV2.RequestMatcher.Headers)
 
 		for key, value := range requestResponsePairV2.RequestMatcher.HeadersWithMatchers {
-			headersWithMatchers[key] = v2GetMatchersFromRequestFieldMatchersView(value)
+			values := v2GetMatchersFromRequestFieldMatchersView(value)
+			if headersWithMatchers[key] == nil {
+				headersWithMatchers[key] = values
+			} else {
+				headersWithMatchers[key] = append(headersWithMatchers[key], values...)
+			}
 		}
 
 		queriesWithMatchers := map[string][]MatcherViewV5{}
@@ -257,13 +264,12 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 		requestResponsePair := RequestMatcherResponsePairViewV5{
 			RequestMatcher: RequestMatcherViewV5{
 				Destination:         destinationMatchers,
-				Headers:             requestResponsePairV2.RequestMatcher.Headers,
 				Method:              methodMatchers,
 				Path:                pathMatchers,
 				Query:               queryMatchers,
 				Scheme:              schemeMatchers,
 				Body:                bodyMatchers,
-				HeadersWithMatchers: headersWithMatchers,
+				Headers:             headersWithMatchers,
 				QueriesWithMatchers: queriesWithMatchers,
 				RequiresState:       requestResponsePairV2.RequestMatcher.RequiresState,
 			},
@@ -288,6 +294,19 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 		},
 		newMetaView(originalSimulation.MetaView),
 	}
+}
+
+func getMatchersFromRequestHeaders(headers map[string][]string) map[string][]MatcherViewV5 {
+	requestHeaders := map[string][]MatcherViewV5{}
+	for headerKey, headerValues := range headers {
+		requestHeaders[headerKey] = []MatcherViewV5{
+			{
+				Matcher: matchers.Glob,
+				Value:   strings.Join(headerValues, ";"),
+			},
+		}
+	}
+	return requestHeaders
 }
 
 func v2GetMatchersFromRequestFieldMatchersView(requestFieldMatchers *RequestFieldMatchersView) []MatcherViewV5 {

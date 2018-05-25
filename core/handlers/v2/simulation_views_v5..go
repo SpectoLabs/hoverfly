@@ -27,8 +27,7 @@ type RequestMatcherViewV5 struct {
 	Scheme              []MatcherViewV5            `json:"scheme,omitempty"`
 	Query               []MatcherViewV5            `json:"query,omitempty"`
 	Body                []MatcherViewV5            `json:"body,omitempty"`
-	Headers             map[string][]string        `json:"headers,omitempty"`
-	HeadersWithMatchers map[string][]MatcherViewV5 `json:"headersWithMatchers,omitempty"`
+	Headers             map[string][]MatcherViewV5 `json:"headers,omitempty"`
 	QueriesWithMatchers map[string][]MatcherViewV5 `json:"queriesWithMatchers,omitempty"`
 	RequiresState       map[string]string          `json:"requiresState,omitempty"`
 }

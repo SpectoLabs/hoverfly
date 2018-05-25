@@ -149,7 +149,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		Scheme:      models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Scheme),
 		Query:       models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Query),
 		Body:        models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
-		Headers:     journalEntryFilterView.Request.Headers,
+		Headers:     models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Headers),
 	}
 
 	allEntries := convertJournalEntries(this.entries)

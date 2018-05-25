@@ -674,16 +674,26 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
 		Request: &v2.RequestMatcherViewV5{
-			Headers: map[string][]string{
-				"Accept": []string{"application/json"},
+			Headers: map[string][]v2.MatcherViewV5{
+				"Accept": []v2.MatcherViewV5{
+					{
+						Matcher: matchers.Exact,
+						Value:   "application/json",
+					},
+				},
 			},
 		},
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
 		Request: &v2.RequestMatcherViewV5{
-			Headers: map[string][]string{
-				"Accept": []string{"application/xml"},
+			Headers: map[string][]v2.MatcherViewV5{
+				"Accept": []v2.MatcherViewV5{
+					{
+						Matcher: matchers.Exact,
+						Value:   "application/xml",
+					},
+				},
 			},
 		},
 	})).To(HaveLen(0))

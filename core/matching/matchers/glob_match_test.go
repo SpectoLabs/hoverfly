@@ -49,6 +49,14 @@ func Test_GlobMatch_MatchesTrueWithGlobMatch_MatchesLowerCase(t *testing.T) {
 	Expect(matchers.GlobMatch("*est", `test`)).To(BeTrue())
 }
 
+func Test_GlobMatch_MatchesTrueWithGlobMatch_MatchesAstrik(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.GlobMatch("*est", `*est`)).To(BeTrue())
+	Expect(matchers.GlobMatch("t*est", `t*est`)).To(BeTrue())
+	Expect(matchers.GlobMatch("test*", `test*`)).To(BeTrue())
+}
+
 func Test_GlobMatch_MatchesFalseWithGlobMatch_UpperCase(t *testing.T) {
 	RegisterTestingT(t)
 

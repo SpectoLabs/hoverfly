@@ -78,7 +78,9 @@ var _ = Describe("Using Hoverfly to return responses by request matchers", func(
 					"exactMatch": "www.virtual.com"
 				},
 				"headers": {
-					"Header": ["value2"]
+					"Header": [
+						"value2"
+					]
 				}
 			}
 		}, {
