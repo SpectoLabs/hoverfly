@@ -86,12 +86,6 @@ var _ = Describe("When I run Hoverfly", func() {
 							Value:   "http",
 						},
 					},
-					Query: []v2.MatcherViewV5{
-						{
-							Matcher: matchers.Exact,
-							Value:   "",
-						},
-					},
 					Body: []v2.MatcherViewV5{
 						{
 							Matcher: matchers.Exact,
