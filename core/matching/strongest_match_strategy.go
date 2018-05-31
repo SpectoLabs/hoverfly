@@ -58,7 +58,7 @@ func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulatio
 		}
 		score += fieldMatch.Score
 
-		fieldMatch = FieldMatcher(requestMatcher.Query, req.QueryString())
+		fieldMatch = FieldMatcher(requestMatcher.DepricatedQuery, req.QueryString())
 		if !fieldMatch.Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
