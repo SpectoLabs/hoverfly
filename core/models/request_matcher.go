@@ -51,10 +51,10 @@ type RequestMatcherResponsePair struct {
 }
 
 func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV5) *RequestMatcherResponsePair {
-	for i, matcher := range view.RequestMatcher.Query {
+	for i, matcher := range view.RequestMatcher.DepricatedQuery {
 		if matcher.Matcher == matchers.Exact {
 			sortedQuery := util.SortQueryString(matcher.Value.(string))
-			view.RequestMatcher.Query[i].Value = sortedQuery
+			view.RequestMatcher.DepricatedQuery[i].Value = sortedQuery
 		}
 	}
 
@@ -64,7 +64,7 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 			Method:              NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
 			Destination:         NewRequestFieldMatchersFromView(view.RequestMatcher.Destination),
 			Scheme:              NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
-			Query:               NewRequestFieldMatchersFromView(view.RequestMatcher.Query),
+			Query:               NewRequestFieldMatchersFromView(view.RequestMatcher.DepricatedQuery),
 			Body:                NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
 			Headers:             NewRequestFieldMatchersFromMapView(view.RequestMatcher.Headers),
 			QueriesWithMatchers: NewRequestFieldMatchersFromMapView(view.RequestMatcher.QueriesWithMatchers),
@@ -150,7 +150,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 			Method:              method,
 			Destination:         destination,
 			Scheme:              scheme,
-			Query:               query,
+			DepricatedQuery:     query,
 			Body:                body,
 			Headers:             headersWithMatchers,
 			QueriesWithMatchers: queriesWithMatchers,

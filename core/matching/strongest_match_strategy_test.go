@@ -1442,7 +1442,7 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 					Value:   "miss",
 				},
 			},
-			Query: []v2.MatcherViewV5{
+			DepricatedQuery: []v2.MatcherViewV5{
 				{
 					Matcher: matchers.Exact,
 					Value:   "hit",
@@ -1524,12 +1524,6 @@ The matcher which came closest was:
             "value": "hit"
         }
     ],
-    "query": [
-        {
-            "matcher": "exact",
-            "value": "hit"
-        }
-    ],
     "body": [
         {
             "matcher": "glob",
@@ -1543,7 +1537,13 @@ The matcher which came closest was:
                 "value": "miss"
             }
         ]
-    }
+    },
+    "depricatedQuery": [
+        {
+            "matcher": "exact",
+            "value": "hit"
+        }
+    ]
 }
 
 But it did not match on the following fields:

@@ -29,7 +29,7 @@ var JsonPayload = `{
 							"value": "http"
 						}
 					],
-					"query": [
+					"depricatedQuery": [
 						{
 							"matcher": "exact",
 							"value": ""

@@ -221,7 +221,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 					Value:   "scheme",
 				},
 			},
-			Query: []v2.MatcherViewV5{
+			DepricatedQuery: []v2.MatcherViewV5{
 				{
 					Matcher: matchers.Exact,
 					Value:   "",
@@ -342,7 +342,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 					Value:   "scheme",
 				},
 			},
-			Query: []v2.MatcherViewV5{
+			DepricatedQuery: []v2.MatcherViewV5{
 				{
 					Matcher: matchers.Exact,
 					Value:   "",
@@ -640,7 +640,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 					Value:   "scheme",
 				},
 			},
-			Query: []v2.MatcherViewV5{
+			DepricatedQuery: []v2.MatcherViewV5{
 				{
 					Matcher: matchers.Exact,
 					Value:   "",

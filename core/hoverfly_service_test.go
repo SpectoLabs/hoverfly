@@ -140,7 +140,7 @@ func Test_Hoverfly_GetSimulation_ReturnsASingleRequestResponsePair(t *testing.T)
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("test.com"))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path).To(BeNil())
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Method).To(BeNil())
-	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Query).To(BeNil())
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.DepricatedQuery).To(BeNil())
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(BeNil())
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveLen(0))
 
