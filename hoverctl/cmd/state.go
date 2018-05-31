@@ -9,9 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var stateStoreCmd = &cobra.Command{
-	Use:   "state-store",
-	Short: "Manage the state for Hoverfly",
+var stateCmd = &cobra.Command{
+	Use:     "state",
+	Aliases: []string{"state-store"},
+	Short:   "Manage the state for Hoverfly",
 	Long: `
 This allows you to inspect and modify the
 state stored in Hoverfly. The state is a map
@@ -20,7 +21,7 @@ for matching.
 	`,
 }
 
-var getAllStateStoreCmd = &cobra.Command{
+var getAllStateCmd = &cobra.Command{
 	Use:   "get-all",
 	Short: "Gets all of the the state",
 	Long: `
@@ -48,7 +49,7 @@ Returns all of the state keys and their values from Hoverfly.
 	},
 }
 
-var getStateStoreCmd = &cobra.Command{
+var getStateCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Gets the state of a single key",
 	Long: `
@@ -79,7 +80,7 @@ Provide a single argument, the state key.
 	},
 }
 
-var setStateStoreCmd = &cobra.Command{
+var setStateCmd = &cobra.Command{
 	Use:   "set",
 	Short: "Sets the state",
 	Long: `
@@ -104,7 +105,7 @@ separated by a space.
 	},
 }
 
-var deleteStateStoreCmd = &cobra.Command{
+var deleteStateCmd = &cobra.Command{
 	Use:   "delete-all",
 	Short: "Deletes all state",
 	Long: `
@@ -123,9 +124,9 @@ Provide two arguments, the state key and the state value.
 }
 
 func init() {
-	RootCmd.AddCommand(stateStoreCmd)
-	stateStoreCmd.AddCommand(getStateStoreCmd)
-	stateStoreCmd.AddCommand(getAllStateStoreCmd)
-	stateStoreCmd.AddCommand(setStateStoreCmd)
-	stateStoreCmd.AddCommand(deleteStateStoreCmd)
+	RootCmd.AddCommand(stateCmd)
+	stateCmd.AddCommand(getStateCmd)
+	stateCmd.AddCommand(getAllStateCmd)
+	stateCmd.AddCommand(setStateCmd)
+	stateCmd.AddCommand(deleteStateCmd)
 }
