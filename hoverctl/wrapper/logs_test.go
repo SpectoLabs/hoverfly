@@ -272,10 +272,12 @@ func Test_GetLogs_FiltersByDateWhenFilterTimeProvided(t *testing.T) {
 								Value:   "/api/v2/logs",
 							},
 						},
-						DepricatedQuery: []v2.MatcherViewV5{
-							{
-								Matcher: matchers.Exact,
-								Value:   "from=684552180",
+						Query: map[string][]v2.MatcherViewV5{
+							"from": []v2.MatcherViewV5{
+								{
+									Matcher: matchers.Exact,
+									Value:   "684552180",
+								},
 							},
 						},
 					},
