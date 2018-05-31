@@ -60,15 +60,15 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 
 	return &RequestMatcherResponsePair{
 		RequestMatcher: RequestMatcher{
-			Path:                NewRequestFieldMatchersFromView(view.RequestMatcher.Path),
-			Method:              NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
-			Destination:         NewRequestFieldMatchersFromView(view.RequestMatcher.Destination),
-			Scheme:              NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
-			DepricatedQuery:     NewRequestFieldMatchersFromView(view.RequestMatcher.DepricatedQuery),
-			Body:                NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
-			Headers:             NewRequestFieldMatchersFromMapView(view.RequestMatcher.Headers),
-			QueriesWithMatchers: NewRequestFieldMatchersFromMapView(view.RequestMatcher.Query),
-			RequiresState:       view.RequestMatcher.RequiresState,
+			Path:            NewRequestFieldMatchersFromView(view.RequestMatcher.Path),
+			Method:          NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
+			Destination:     NewRequestFieldMatchersFromView(view.RequestMatcher.Destination),
+			Scheme:          NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
+			DepricatedQuery: NewRequestFieldMatchersFromView(view.RequestMatcher.DepricatedQuery),
+			Body:            NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
+			Headers:         NewRequestFieldMatchersFromMapView(view.RequestMatcher.Headers),
+			Query:           NewRequestFieldMatchersFromMapView(view.RequestMatcher.Query),
+			RequiresState:   view.RequestMatcher.RequiresState,
 		},
 		Response: NewResponseDetailsFromResponse(view.Response),
 	}
@@ -136,7 +136,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 	}
 
 	queriesWithMatchers := map[string][]v2.MatcherViewV5{}
-	for key, matchers := range this.RequestMatcher.QueriesWithMatchers {
+	for key, matchers := range this.RequestMatcher.Query {
 		views := []v2.MatcherViewV5{}
 		for _, matcher := range matchers {
 			views = append(views, matcher.BuildView())
@@ -161,15 +161,15 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 }
 
 type RequestMatcher struct {
-	Path                []RequestFieldMatchers
-	Method              []RequestFieldMatchers
-	Destination         []RequestFieldMatchers
-	Scheme              []RequestFieldMatchers
-	DepricatedQuery     []RequestFieldMatchers
-	Body                []RequestFieldMatchers
-	Headers             map[string][]RequestFieldMatchers
-	QueriesWithMatchers map[string][]RequestFieldMatchers
-	RequiresState       map[string]string
+	Path            []RequestFieldMatchers
+	Method          []RequestFieldMatchers
+	Destination     []RequestFieldMatchers
+	Scheme          []RequestFieldMatchers
+	DepricatedQuery []RequestFieldMatchers
+	Body            []RequestFieldMatchers
+	Headers         map[string][]RequestFieldMatchers
+	Query           map[string][]RequestFieldMatchers
+	RequiresState   map[string]string
 }
 
 func (this RequestMatcher) IncludesHeaderMatching() bool {
