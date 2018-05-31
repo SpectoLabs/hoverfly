@@ -116,6 +116,7 @@ func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsView 
 		Destination: &this.Destination,
 		Scheme:      &this.Scheme,
 		Query:       &queryString,
+		QueryMap:    this.Query,
 		Body:        &this.Body,
 		Headers:     this.Headers,
 	}
