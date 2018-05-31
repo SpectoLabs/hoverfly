@@ -303,7 +303,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMatchWithHeaders(t *testin
 					Value:   "GET",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "q=test",
@@ -371,7 +371,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMismatchWithHeadersReturns
 					Value:   "GET",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "q=test",
@@ -424,7 +424,7 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 					Value:   "GET",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "q=test",
@@ -807,7 +807,7 @@ func Test__NotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *test
 					Value:   "http",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "foo=bar",
@@ -894,7 +894,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 					Value:   "http",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "?foo=bar",
@@ -1271,7 +1271,7 @@ func Test_ShouldReturnFieldsMissedInClosestMiss(t *testing.T) {
 					Value:   "hit",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "miss",
@@ -1346,7 +1346,7 @@ func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
 					Value:   "miss",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "hit=",
@@ -1594,7 +1594,7 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeader
 					Value:   "http",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "foo=bar",
@@ -1681,7 +1681,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 					Value:   "http",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "?foo=bar",
@@ -1871,7 +1871,7 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateA
 					Value:   "http",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "foo=bar",
@@ -1950,7 +1950,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 					Value:   "http",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "?foo=bar",

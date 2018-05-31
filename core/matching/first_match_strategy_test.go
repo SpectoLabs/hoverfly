@@ -306,7 +306,7 @@ func Test_FirstMatchStrategy_EndpointMatchWithHeaders(t *testing.T) {
 					Value:   "GET",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "q=test",
@@ -374,7 +374,7 @@ func Test_FirstMatchStrategy_EndpointMismatchWithHeadersReturnsNil(t *testing.T)
 					Value:   "GET",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "q=test",
@@ -427,7 +427,7 @@ func Test_FirstMatchStrategy_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T
 					Value:   "GET",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "q=test",
@@ -637,7 +637,7 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLe
 					Value:   "http",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "foo=bar",
@@ -724,7 +724,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 					Value:   "http",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "?foo=bar",
@@ -914,7 +914,7 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeas
 					Value:   "http",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "foo=bar",
@@ -993,7 +993,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 					Value:   "http",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "?foo=bar",

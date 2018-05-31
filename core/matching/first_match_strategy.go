@@ -42,7 +42,7 @@ func FirstMatchStrategy(req models.RequestDetails, webserver bool, simulation *m
 			continue
 		}
 
-		if !FieldMatcher(requestMatcher.Query, req.QueryString()).Matched {
+		if !FieldMatcher(requestMatcher.DepricatedQuery, req.QueryString()).Matched {
 			matchedOnAllButHeaders = false
 			matchedOnAllButState = false
 			isAMatch = false

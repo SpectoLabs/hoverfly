@@ -64,7 +64,7 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 			Method:              NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
 			Destination:         NewRequestFieldMatchersFromView(view.RequestMatcher.Destination),
 			Scheme:              NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
-			Query:               NewRequestFieldMatchersFromView(view.RequestMatcher.DepricatedQuery),
+			DepricatedQuery:     NewRequestFieldMatchersFromView(view.RequestMatcher.DepricatedQuery),
 			Body:                NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
 			Headers:             NewRequestFieldMatchersFromMapView(view.RequestMatcher.Headers),
 			QueriesWithMatchers: NewRequestFieldMatchersFromMapView(view.RequestMatcher.Query),
@@ -118,9 +118,9 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 		body = views
 	}
 
-	if this.RequestMatcher.Query != nil && len(this.RequestMatcher.Query) != 0 {
+	if this.RequestMatcher.DepricatedQuery != nil && len(this.RequestMatcher.DepricatedQuery) != 0 {
 		views := []v2.MatcherViewV5{}
-		for _, matcher := range this.RequestMatcher.Query {
+		for _, matcher := range this.RequestMatcher.DepricatedQuery {
 			views = append(views, matcher.BuildView())
 		}
 		query = views
@@ -165,7 +165,7 @@ type RequestMatcher struct {
 	Method              []RequestFieldMatchers
 	Destination         []RequestFieldMatchers
 	Scheme              []RequestFieldMatchers
-	Query               []RequestFieldMatchers
+	DepricatedQuery     []RequestFieldMatchers
 	Body                []RequestFieldMatchers
 	Headers             map[string][]RequestFieldMatchers
 	QueriesWithMatchers map[string][]RequestFieldMatchers
@@ -185,7 +185,7 @@ func (this RequestMatcher) ToEagerlyCachable() *RequestDetails {
 		this.Destination == nil || len(this.Destination) != 1 || this.Destination[0].Matcher != matchers.Exact ||
 		this.Method == nil || len(this.Method) != 1 || this.Method[0].Matcher != matchers.Exact ||
 		this.Path == nil || len(this.Path) != 1 || this.Path[0].Matcher != matchers.Exact ||
-		this.Query == nil || len(this.Query) != 1 || this.Query[0].Matcher != matchers.Exact ||
+		this.DepricatedQuery == nil || len(this.DepricatedQuery) != 1 || this.DepricatedQuery[0].Matcher != matchers.Exact ||
 		this.Scheme == nil || len(this.Scheme) != 1 || this.Scheme[0].Matcher != matchers.Exact {
 		return nil
 	}
@@ -198,7 +198,7 @@ func (this RequestMatcher) ToEagerlyCachable() *RequestDetails {
 		return nil
 	}
 
-	query, _ := url.ParseQuery(this.Query[0].Value.(string))
+	query, _ := url.ParseQuery(this.DepricatedQuery[0].Value.(string))
 
 	return &RequestDetails{
 		Body:        this.Body[0].Value.(string),

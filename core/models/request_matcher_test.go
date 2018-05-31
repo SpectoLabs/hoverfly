@@ -144,7 +144,7 @@ func Test_NewRequestMatcherResponsePairFromView_SortsDepricatedQuery(t *testing.
 		},
 	})
 
-	Expect(unit.RequestMatcher.Query[0].Value).To(Equal("a=a&b=b"))
+	Expect(unit.RequestMatcher.DepricatedQuery[0].Value).To(Equal("a=a&b=b"))
 }
 
 func Test_NewRequestMatcherResponsePairFromView_StoresTemplated(t *testing.T) {
@@ -196,7 +196,7 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDe
 				Value:   "path",
 			},
 		},
-		Query: []models.RequestFieldMatchers{
+		DepricatedQuery: []models.RequestFieldMatchers{
 			{
 				Matcher: matchers.Exact,
 				Value:   "query=two",
@@ -251,7 +251,7 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissing
 				Value:   "path",
 			},
 		},
-		Query: []models.RequestFieldMatchers{
+		DepricatedQuery: []models.RequestFieldMatchers{
 			{
 				Matcher: matchers.Exact,
 				Value:   "query",

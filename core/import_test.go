@@ -276,7 +276,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 					Value:   "scheme",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "",
@@ -416,7 +416,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 					Value:   "scheme",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "",
@@ -471,7 +471,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 					Value:   "scheme",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "",
@@ -526,7 +526,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 					Value:   "scheme",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "",

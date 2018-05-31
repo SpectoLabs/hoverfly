@@ -68,7 +68,7 @@ func Test_Simulation_AddPair_CanAddAFullPairToTheArray(t *testing.T) {
 					Value:   "/testpath",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "?query=test",
@@ -104,8 +104,8 @@ func Test_Simulation_AddPair_CanAddAFullPairToTheArray(t *testing.T) {
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Method[0].Value).To(Equal("testmethod"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Path[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Path[0].Value).To(Equal("/testpath"))
-	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Query[0].Matcher).To(Equal("exact"))
-	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Query[0].Value).To(Equal("?query=test"))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.DepricatedQuery[0].Matcher).To(Equal("exact"))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.DepricatedQuery[0].Value).To(Equal("?query=test"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Scheme[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Scheme[0].Value).To(Equal("http"))
 
@@ -151,7 +151,7 @@ func Test_Simulation_AddPairInSequence_CanAddAFullPairToTheArray(t *testing.T) {
 					Value:   "/testpath",
 				},
 			},
-			Query: []models.RequestFieldMatchers{
+			DepricatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "?query=test",
@@ -187,8 +187,8 @@ func Test_Simulation_AddPairInSequence_CanAddAFullPairToTheArray(t *testing.T) {
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Method[0].Value).To(Equal("testmethod"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Path[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Path[0].Value).To(Equal("/testpath"))
-	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Query[0].Matcher).To(Equal("exact"))
-	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Query[0].Value).To(Equal("?query=test"))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.DepricatedQuery[0].Matcher).To(Equal("exact"))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.DepricatedQuery[0].Value).To(Equal("?query=test"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Scheme[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Scheme[0].Value).To(Equal("http"))
 
