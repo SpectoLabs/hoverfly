@@ -72,10 +72,7 @@
 					"type": "array"
 				},
 				"query": {
-					"items": {
-						"$ref": "#/definitions/field-matchers"
-					},
-					"type": "array"
+					"$ref": "#/definitions/request-queries"
 				},
 				"requiresState": {
 					"patternProperties": {
@@ -95,6 +92,15 @@
 			"type": "object"
 		},
 		"request-headers": {
+			"additionalProperties": {
+				"items": {
+					"$ref": "#/definitions/field-matchers"
+				},
+				"type": "array"
+			},
+			"type": "object"
+		},
+		"request-queries": {
 			"additionalProperties": {
 				"items": {
 					"$ref": "#/definitions/field-matchers"

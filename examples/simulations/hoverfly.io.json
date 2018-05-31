@@ -70,12 +70,7 @@
 							"value": "http"
 						}
 					],
-					"query": [
-						{
-							"matcher": "exact",
-							"value": ""
-						}
-					],
+					"query": {},
 					"body": [
 						{
 							"matcher": "exact",
@@ -171,12 +166,7 @@
 							"value": "https"
 						}
 					],
-					"query": [
-						{
-							"matcher": "exact",
-							"value": ""
-						}
-					],
+					"query": {},
 					"body": [
 						{
 							"matcher": "exact",

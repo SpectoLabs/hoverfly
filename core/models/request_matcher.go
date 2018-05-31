@@ -67,7 +67,7 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 			Query:               NewRequestFieldMatchersFromView(view.RequestMatcher.DepricatedQuery),
 			Body:                NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
 			Headers:             NewRequestFieldMatchersFromMapView(view.RequestMatcher.Headers),
-			QueriesWithMatchers: NewRequestFieldMatchersFromMapView(view.RequestMatcher.QueriesWithMatchers),
+			QueriesWithMatchers: NewRequestFieldMatchersFromMapView(view.RequestMatcher.Query),
 			RequiresState:       view.RequestMatcher.RequiresState,
 		},
 		Response: NewResponseDetailsFromResponse(view.Response),
@@ -146,15 +146,15 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 
 	return v2.RequestMatcherResponsePairViewV5{
 		RequestMatcher: v2.RequestMatcherViewV5{
-			Path:                path,
-			Method:              method,
-			Destination:         destination,
-			Scheme:              scheme,
-			DepricatedQuery:     query,
-			Body:                body,
-			Headers:             headersWithMatchers,
-			QueriesWithMatchers: queriesWithMatchers,
-			RequiresState:       this.RequestMatcher.RequiresState,
+			Path:            path,
+			Method:          method,
+			Destination:     destination,
+			Scheme:          scheme,
+			DepricatedQuery: query,
+			Body:            body,
+			Headers:         headersWithMatchers,
+			Query:           queriesWithMatchers,
+			RequiresState:   this.RequestMatcher.RequiresState,
 		},
 		Response: this.Response.ConvertToResponseDetailsViewV5(),
 	}

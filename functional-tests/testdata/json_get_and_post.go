@@ -29,12 +29,6 @@ var JsonGetAndPost = `{
 							"value": "http"
 						}
 					],
-					"query": [
-						{
-							"matcher": "exact",
-							"value": ""
-						}
-					],
 					"body": [
 						{
 							"matcher": "exact",
@@ -79,12 +73,6 @@ var JsonGetAndPost = `{
 						{
 							"matcher": "exact",
 							"value": "http"
-						}
-					],
-					"query": [
-						{
-							"matcher": "exact",
-							"value": ""
 						}
 					],
 					"body": [
