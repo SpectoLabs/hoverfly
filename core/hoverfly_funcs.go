@@ -186,9 +186,9 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 					Value:   request.Scheme,
 				},
 			},
-			QueriesWithMatchers: queries,
-			Body:                body,
-			Headers:             requestHeaders,
+			Query:   queries,
+			Body:    body,
+			Headers: requestHeaders,
 		},
 		Response: *response,
 	}

@@ -156,7 +156,7 @@ func Test_QueryMatching(t *testing.T) {
 
 	for _, test := range queryMatchingTests {
 		result := matching.QueryMatching(models.RequestMatcher{
-			QueriesWithMatchers: test.queriesWithMatchers,
+			Query: test.queriesWithMatchers,
 		}, test.toMatchQueries)
 
 		Expect(result.Matched).To(test.equals, test.name)

@@ -596,8 +596,8 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Path).To(HaveLen(1))
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Path[0].Matcher).To(Equal("exact"))
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Path[0].Value).To(Equal("/testpath"))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.QueriesWithMatchers).To(HaveLen(1))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.QueriesWithMatchers).To(HaveKeyWithValue("query", []models.RequestFieldMatchers{
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveLen(1))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveKeyWithValue("query", []models.RequestFieldMatchers{
 		{
 			Matcher: matchers.Exact,
 			Value:   "test",
@@ -769,7 +769,7 @@ func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing
 		Value:   "",
 	}))
 
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.QueriesWithMatchers).To(HaveLen(0))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveLen(0))
 
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveLen(0))
 
