@@ -143,13 +143,13 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 	}
 
 	requestMatcher := models.RequestMatcher{
-		Path:        models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Path),
-		Method:      models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Method),
-		Destination: models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Destination),
-		Scheme:      models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Scheme),
-		Query:       models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.DepricatedQuery),
-		Body:        models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
-		Headers:     models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Headers),
+		Path:            models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Path),
+		Method:          models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Method),
+		Destination:     models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Destination),
+		Scheme:          models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Scheme),
+		DepricatedQuery: models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.DepricatedQuery),
+		Body:            models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
+		Headers:         models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Headers),
 	}
 
 	allEntries := convertJournalEntries(this.entries)
@@ -157,7 +157,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 	for _, entry := range allEntries {
 		if requestMatcher.Body == nil && requestMatcher.Destination == nil &&
 			requestMatcher.Headers == nil && requestMatcher.Method == nil &&
-			requestMatcher.Path == nil && requestMatcher.Query == nil &&
+			requestMatcher.Path == nil && requestMatcher.DepricatedQuery == nil &&
 			requestMatcher.Scheme == nil {
 			continue
 		}
@@ -173,7 +173,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		if !matching.FieldMatcher(requestMatcher.Path, *entry.Request.Path).Matched {
 			continue
 		}
-		if !matching.FieldMatcher(requestMatcher.Query, *entry.Request.Query).Matched {
+		if !matching.FieldMatcher(requestMatcher.DepricatedQuery, *entry.Request.Query).Matched {
 			continue
 		}
 		if !matching.FieldMatcher(requestMatcher.Scheme, *entry.Request.Scheme).Matched {
