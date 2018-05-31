@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var diffStoreCmd = &cobra.Command{
+var diffCmd = &cobra.Command{
 	Use:   "diff",
 	Short: "Manage the diffs for Hoverfly",
 	Long: `
@@ -23,7 +23,7 @@ as lists of strings grouped by the same requests.
 
 const errorMsgTemplate = "\"%s\"\nthe expected value was [%s], but actual value was [%s]\n\n"
 
-var getAllDiffStoreCmd = &cobra.Command{
+var getAllDiffCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Gets all diffs stored in Hoverfly",
 	Long: `
@@ -95,7 +95,7 @@ func diffReportMessage(report v2.DiffReport) string {
 }
 
 func init() {
-	RootCmd.AddCommand(diffStoreCmd)
-	diffStoreCmd.AddCommand(getAllDiffStoreCmd)
-	diffStoreCmd.AddCommand(deleteDiffsCmd)
+	RootCmd.AddCommand(diffCmd)
+	diffCmd.AddCommand(getAllDiffCmd)
+	diffCmd.AddCommand(deleteDiffsCmd)
 }
