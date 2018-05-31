@@ -65,7 +65,7 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 					},
 				},
 			},
-			QueriesWithMatchers: map[string][]v2.MatcherViewV5{
+			Query: map[string][]v2.MatcherViewV5{
 				"Query": {
 					{
 						Matcher: matchers.Exact,

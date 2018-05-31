@@ -450,7 +450,8 @@ var SimulationViewV5Schema = map[string]interface{}{
 		"response":              responseDefinitionV4,
 		"field-matchers":        requestFieldMatchersV5Definition,
 		"headers":               headersDefinition,
-		"request-headers":       headersV5Definition,
+		"request-headers":       v5MatchersMapDefinition,
+		"request-queries":       v5MatchersMapDefinition,
 		"delay":                 delaysDefinition,
 		"meta":                  metaDefinition,
 	},
@@ -478,10 +479,7 @@ var requestV5Definition = map[string]interface{}{
 			},
 		},
 		"query": map[string]interface{}{
-			"type": "array",
-			"items": map[string]interface{}{
-				"$ref": "#/definitions/field-matchers",
-			},
+			"$ref": "#/definitions/request-queries",
 		},
 		"body": map[string]interface{}{
 			"type": "array",
@@ -511,7 +509,7 @@ var requestFieldMatchersV5Definition = map[string]interface{}{
 	},
 }
 
-var headersV5Definition = map[string]interface{}{
+var v5MatchersMapDefinition = map[string]interface{}{
 	"type": "object",
 	"additionalProperties": map[string]interface{}{
 		"type": "array",

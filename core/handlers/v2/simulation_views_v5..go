@@ -21,15 +21,15 @@ type RequestMatcherResponsePairViewV5 struct {
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestMatcherViewV5 struct {
-	Path                []MatcherViewV5            `json:"path,omitempty"`
-	Method              []MatcherViewV5            `json:"method,omitempty"`
-	Destination         []MatcherViewV5            `json:"destination,omitempty"`
-	Scheme              []MatcherViewV5            `json:"scheme,omitempty"`
-	Body                []MatcherViewV5            `json:"body,omitempty"`
-	Headers             map[string][]MatcherViewV5 `json:"headers,omitempty"`
-	QueriesWithMatchers map[string][]MatcherViewV5 `json:"queriesWithMatchers,omitempty"`
-	RequiresState       map[string]string          `json:"requiresState,omitempty"`
-	DepricatedQuery     []MatcherViewV5            `json:"depricatedQuery,omitempty"`
+	Path            []MatcherViewV5            `json:"path,omitempty"`
+	Method          []MatcherViewV5            `json:"method,omitempty"`
+	Destination     []MatcherViewV5            `json:"destination,omitempty"`
+	Scheme          []MatcherViewV5            `json:"scheme,omitempty"`
+	Body            []MatcherViewV5            `json:"body,omitempty"`
+	Headers         map[string][]MatcherViewV5 `json:"headers,omitempty"`
+	Query           map[string][]MatcherViewV5 `json:"query,omitempty"`
+	RequiresState   map[string]string          `json:"requiresState,omitempty"`
+	DepricatedQuery []MatcherViewV5            `json:"depricatedQuery,omitempty"`
 }
 
 type MatcherViewV5 struct {
