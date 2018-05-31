@@ -117,6 +117,38 @@ var queryMatchingTests = []queryMatchingTest{
 		equals:      BeFalse(),
 		matchEquals: Equal(2),
 	},
+	{
+		name: "Can handle different cases 1",
+		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
+			"urlPattern": {
+				{
+					Matcher: matchers.Glob,
+					Value:   "test-(.+).com",
+				},
+			},
+		},
+		toMatchQueries: map[string][]string{
+			"urlPattern": {"test-(.+).com"},
+		},
+		equals:      BeTrue(),
+		matchEquals: Equal(1),
+	},
+	{
+		name: "Can handle different cases 2",
+		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
+			"urlPattern": {
+				{
+					Matcher: matchers.Glob,
+					Value:   "test-(.+).com",
+				},
+			},
+		},
+		toMatchQueries: map[string][]string{
+			"URLPATTERN": {"test-(.+).com"},
+		},
+		equals:      BeTrue(),
+		matchEquals: Equal(1),
+	},
 }
 
 func Test_QueryMatching(t *testing.T) {
