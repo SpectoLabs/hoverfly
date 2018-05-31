@@ -87,12 +87,6 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(pathMatchers[0].GetString("matcher")).Should(Equal("exact"))
 			Expect(pathMatchers[0].GetString("value")).Should(Equal("/path1"))
 
-			queryMatchers, err := pairOneRequest.GetObjectArray("depricatedQuery")
-			Expect(err).To(BeNil())
-
-			Expect(queryMatchers[0].GetString("matcher")).Should(Equal("exact"))
-			Expect(queryMatchers[0].GetString("value")).Should(Equal(""))
-
 			schemeMatchers, err := pairOneRequest.GetObjectArray("scheme")
 			Expect(err).To(BeNil())
 
