@@ -69,10 +69,12 @@ func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 								Value:   "/api/v2/simulation",
 							},
 						},
-						DepricatedQuery: []v2.MatcherViewV5{
-							{
-								Matcher: matchers.Exact,
-								Value:   "urlPattern=test-(.+).com",
+						Query: map[string][]v2.MatcherViewV5{
+							"urlPattern": []v2.MatcherViewV5{
+								{
+									Matcher: matchers.Exact,
+									Value:   "test-(.+).com",
+								},
 							},
 						},
 					},

@@ -127,7 +127,7 @@ func Test_NewRequestMatcherResponsePairFromView_LeavesQueriesWithMatchersNil(t *
 	Expect(unit.RequestMatcher.QueriesWithMatchers).To(BeNil())
 }
 
-func Test_NewRequestMatcherResponsePairFromView_SortsQuery(t *testing.T) {
+func Test_NewRequestMatcherResponsePairFromView_SortsDepricatedQuery(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV5{
