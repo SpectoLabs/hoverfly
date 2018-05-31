@@ -141,6 +141,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 			Destination: StringToPointer("/"),
 			Scheme:      StringToPointer("scheme"),
 			Query:       StringToPointer(""),
+			QueryMap:    map[string][]string{},
 			Body:        StringToPointer(""),
 			Headers:     map[string][]string{"test_header": []string{"true"}}},
 	}))
@@ -179,6 +180,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 			Destination: StringToPointer("/"),
 			Scheme:      StringToPointer("scheme"),
 			Query:       StringToPointer(""),
+			QueryMap:    map[string][]string{},
 			Body:        StringToPointer(""),
 			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
 		},

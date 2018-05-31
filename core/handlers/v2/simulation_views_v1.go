@@ -62,6 +62,7 @@ type RequestDetailsView struct {
 	Destination *string             `json:"destination"`
 	Scheme      *string             `json:"scheme"`
 	Query       *string             `json:"query"`
+	QueryMap    map[string][]string `json:"-"`
 	Body        *string             `json:"body"`
 	Headers     map[string][]string `json:"headers"`
 }

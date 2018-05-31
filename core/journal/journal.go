@@ -149,6 +149,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		Scheme:          models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Scheme),
 		DepricatedQuery: models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.DepricatedQuery),
 		Body:            models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
+		Query:           models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Query),
 		Headers:         models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Headers),
 	}
 
@@ -158,7 +159,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		if requestMatcher.Body == nil && requestMatcher.Destination == nil &&
 			requestMatcher.Headers == nil && requestMatcher.Method == nil &&
 			requestMatcher.Path == nil && requestMatcher.DepricatedQuery == nil &&
-			requestMatcher.Scheme == nil {
+			requestMatcher.Scheme == nil && requestMatcher.Query == nil {
 			continue
 		}
 		if !matching.FieldMatcher(requestMatcher.Body, *entry.Request.Body).Matched {
@@ -177,6 +178,9 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 			continue
 		}
 		if !matching.FieldMatcher(requestMatcher.Scheme, *entry.Request.Scheme).Matched {
+			continue
+		}
+		if !matching.QueryMatching(requestMatcher, entry.Request.QueryMap).Matched {
 			continue
 		}
 		if !matching.HeaderMatching(requestMatcher, entry.Request.Headers).Matched {
