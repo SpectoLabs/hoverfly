@@ -485,7 +485,7 @@ func Test_FirstMatchStrategy_RequestMatcherResponsePairCanBeConvertedToARequestR
 	Expect(pairView.RequestMatcher.Destination).To(BeNil())
 	Expect(pairView.RequestMatcher.Path).To(BeNil())
 	Expect(pairView.RequestMatcher.Scheme).To(BeNil())
-	Expect(pairView.RequestMatcher.Query).To(BeNil())
+	Expect(pairView.RequestMatcher.DepricatedQuery).To(BeNil())
 
 	Expect(pairView.Response.Body).To(Equal("request matched"))
 }
@@ -605,7 +605,7 @@ func Test_FirstMatchStrategy_RequestMatcherResponsePair_ConvertToRequestResponse
 	Expect(pairView.RequestMatcher.Destination).To(BeNil())
 	Expect(pairView.RequestMatcher.Path).To(BeNil())
 	Expect(pairView.RequestMatcher.Scheme).To(BeNil())
-	Expect(pairView.RequestMatcher.Query).To(BeNil())
+	Expect(pairView.RequestMatcher.DepricatedQuery).To(BeNil())
 
 	Expect(pairView.Response.Body).To(Equal("request matched"))
 }

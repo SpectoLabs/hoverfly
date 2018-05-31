@@ -45,7 +45,7 @@ var V5JsonPayload = `{
 							"value": "http"
 						}
 					],
-					"query": [
+					"depricatedQuery": [
 						{
 							"matcher": "exact",
 							"value": ""

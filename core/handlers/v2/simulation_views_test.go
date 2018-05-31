@@ -53,7 +53,7 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV3Payload(t *
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Method).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path).To(HaveLen(0))
-	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(0))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.DepricatedQuery).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(HaveLen(0))
 
 	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal("exact match"))
@@ -112,7 +112,7 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV2Payload(t *
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Method).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path).To(HaveLen(0))
-	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(0))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.DepricatedQuery).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(HaveLen(0))
 
 	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal("exact match"))
@@ -203,7 +203,7 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV1Payload(t *
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Method).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path).To(HaveLen(0))
-	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(0))
+	Expect(simulation.RequestResponsePairs[0].RequestMatcher.DepricatedQuery).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(HaveLen(0))
 
 	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal("exact match"))
