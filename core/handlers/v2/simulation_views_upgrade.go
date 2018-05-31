@@ -263,15 +263,15 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 
 		requestResponsePair := RequestMatcherResponsePairViewV5{
 			RequestMatcher: RequestMatcherViewV5{
-				Destination:         destinationMatchers,
-				Method:              methodMatchers,
-				Path:                pathMatchers,
-				Scheme:              schemeMatchers,
-				Body:                bodyMatchers,
-				Headers:             headersWithMatchers,
-				QueriesWithMatchers: queriesWithMatchers,
-				RequiresState:       requestResponsePairV2.RequestMatcher.RequiresState,
-				DepricatedQuery:     queryMatchers,
+				Destination:     destinationMatchers,
+				Method:          methodMatchers,
+				Path:            pathMatchers,
+				Scheme:          schemeMatchers,
+				Body:            bodyMatchers,
+				Headers:         headersWithMatchers,
+				Query:           queriesWithMatchers,
+				RequiresState:   requestResponsePairV2.RequestMatcher.RequiresState,
+				DepricatedQuery: queryMatchers,
 			},
 			Response: ResponseDetailsViewV5{
 				Body:             requestResponsePairV2.Response.Body,

@@ -5,7 +5,7 @@ var QueryMatchers = `{
 		"pairs": [
 			{
 				"request": {
-					"queriesWithMatchers": {
+					"query": {
 						"test": [
 							{
 								"matcher": "exact",
@@ -23,7 +23,7 @@ var QueryMatchers = `{
 			},
 			{
 				"request": {
-					"queriesWithMatchers": {
+					"query": {
 						"test": [
 							{
 								"matcher": "exact",
