@@ -13,6 +13,10 @@ func QueryMatching(requestMatcher models.RequestMatcher, toMatch map[string][]st
 
 	requestMatcherQueriesWithMatchers := requestMatcher.QueriesWithMatchers
 
+	for key, value := range toMatch {
+		toMatch[strings.ToLower(key)] = value
+	}
+
 	for matcherQueryKey, matcherQueryValue := range requestMatcherQueriesWithMatchers {
 		matcherHeaderValueMatched := false
 
