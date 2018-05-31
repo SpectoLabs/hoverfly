@@ -132,7 +132,7 @@ func Test_NewRequestMatcherResponsePairFromView_SortsQuery(t *testing.T) {
 
 	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV5{
 		RequestMatcher: v2.RequestMatcherViewV5{
-			Query: []v2.MatcherViewV5{
+			DepricatedQuery: []v2.MatcherViewV5{
 				{
 					Matcher: matchers.Exact,
 					Value:   "b=b&a=a",

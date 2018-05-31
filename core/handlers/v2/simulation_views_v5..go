@@ -25,11 +25,11 @@ type RequestMatcherViewV5 struct {
 	Method              []MatcherViewV5            `json:"method,omitempty"`
 	Destination         []MatcherViewV5            `json:"destination,omitempty"`
 	Scheme              []MatcherViewV5            `json:"scheme,omitempty"`
-	Query               []MatcherViewV5            `json:"query,omitempty"`
 	Body                []MatcherViewV5            `json:"body,omitempty"`
 	Headers             map[string][]MatcherViewV5 `json:"headers,omitempty"`
 	QueriesWithMatchers map[string][]MatcherViewV5 `json:"queriesWithMatchers,omitempty"`
 	RequiresState       map[string]string          `json:"requiresState,omitempty"`
+	DepricatedQuery     []MatcherViewV5            `json:"depricatedQuery,omitempty"`
 }
 
 type MatcherViewV5 struct {

@@ -147,7 +147,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		Method:      models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Method),
 		Destination: models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Destination),
 		Scheme:      models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Scheme),
-		Query:       models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Query),
+		Query:       models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.DepricatedQuery),
 		Body:        models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
 		Headers:     models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Headers),
 	}
