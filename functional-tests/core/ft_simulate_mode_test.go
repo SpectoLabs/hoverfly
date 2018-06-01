@@ -439,6 +439,32 @@ Which if hit would have given the following response:
 		Expect(string(body)).To(Equal("response 3a"))
 	})
 
+	It("should be able to iterate through sequenced stateful pairs using custom sequence names", func() {
+		hoverfly.ImportSimulation(testdata.SequencedCustom)
+
+		resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err := ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("response 1a"))
+
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err = ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("response 2a"))
+
+		resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/a"))
+		Expect(resp.StatusCode).To(Equal(200))
+
+		body, err = ioutil.ReadAll(resp.Body)
+		Expect(err).To(BeNil())
+		Expect(string(body)).To(Equal("response 3a"))
+	})
+
+
 	It("after iterating through all pairs in sequence, it stays on the last pair", func() {
 		hoverfly.ImportSimulation(testdata.Sequenced)
 
