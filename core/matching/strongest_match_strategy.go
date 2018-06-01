@@ -5,139 +5,84 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/state"
 )
 
-func StrongestMatchStrategy(req models.RequestDetails, webserver bool, simulation *models.Simulation, state *state.State) *MatchingResult {
-	var requestMatch *models.RequestMatcherResponsePair
-	var err *models.MatchError
-	var cachable bool
+type StrongestMatchStrategy struct {
+	matchedOnAllButHeaders            bool
+	matchedOnAllButState              bool
+	matchedOnAllButHeadersAtLeastOnce bool
+	matchedOnAllButStateAtLeastOnce   bool
+	matched                           bool
+	score                             int
+	strongestMatchScore               int
+	closestMissScore                  int
+	closestMiss                       *models.ClosestMiss
+	missedFields                      []string
+	requestMatch                      *models.RequestMatcherResponsePair
+}
 
-	var closestMissScore int
-	var strongestMatchScore int
-	var closestMiss *models.ClosestMiss
-	matchedOnAllButHeadersAtLeastOnce := false
-	matchedOnAllButStateAtLeastOnce := false
-	cachable = true
+func (s *StrongestMatchStrategy) PreMatching() {
+	s.matched = true
+	s.missedFields = make([]string, 0)
+	s.matchedOnAllButHeaders = true
+	s.matchedOnAllButState = true
+	s.score = 0
+}
 
-	for _, matchingPair := range simulation.GetMatchingPairs() {
-		// TODO: not matching by default on URL and body - need to enable this
-		// TODO: enable matching on scheme
-
-		missedFields := make([]string, 0)
-		var score int
-		matched := true
-		matchedOnAllButHeaders := true
-		matchedOnAllButState := true
-
-		requestMatcher := matchingPair.RequestMatcher
-
-		fieldMatch := FieldMatcher(requestMatcher.Body, req.Body)
-		if !fieldMatch.Matched {
-			matchedOnAllButHeaders = false
-			matchedOnAllButState = false
-			matched = false
-			missedFields = append(missedFields, "body")
+func (s *StrongestMatchStrategy) Matching(fieldMatch *FieldMatch, field string) {
+	if !fieldMatch.Matched {
+		if field != "headers" {
+			s.matchedOnAllButHeaders = false
 		}
-		score += fieldMatch.Score
-
-		if !webserver {
-			match := FieldMatcher(requestMatcher.Destination, req.Destination)
-			if !match.Matched {
-				matchedOnAllButHeaders = false
-				matchedOnAllButState = false
-				matched = false
-				missedFields = append(missedFields, "destination")
-			}
-			score += match.Score
+		if field != "state" {
+			s.matchedOnAllButState = false
 		}
+		s.matched = false
+		s.missedFields = append(s.missedFields, field)
+	}
+	s.score += fieldMatch.Score
+}
 
-		fieldMatch = FieldMatcher(requestMatcher.Path, req.Path)
-		if !fieldMatch.Matched {
-			matchedOnAllButHeaders = false
-			matchedOnAllButState = false
-			matched = false
-			missedFields = append(missedFields, "path")
+func (s *StrongestMatchStrategy) PostMatching(req models.RequestDetails, requestMatcher models.RequestMatcher, matchingPair models.RequestMatcherResponsePair, state *state.State) *MatchingResult {
+	// This only counts if there was actually a matcher for headers
+	if s.matchedOnAllButHeaders && requestMatcher.Headers != nil && len(requestMatcher.Headers) > 0 {
+		s.matchedOnAllButHeadersAtLeastOnce = true
+	}
+
+	// This only counts of there was actually a matcher for state
+	if s.matchedOnAllButState && requestMatcher.RequiresState != nil && len(requestMatcher.RequiresState) > 0 {
+		s.matchedOnAllButStateAtLeastOnce = true
+	}
+
+	if s.matched == true && s.score >= s.strongestMatchScore {
+		s.requestMatch = &models.RequestMatcherResponsePair{
+			RequestMatcher: requestMatcher,
+			Response:       matchingPair.Response,
 		}
-		score += fieldMatch.Score
-
-		fieldMatch = FieldMatcher(requestMatcher.DepricatedQuery, req.QueryString())
-		if !fieldMatch.Matched {
-			matchedOnAllButHeaders = false
-			matchedOnAllButState = false
-			matched = false
-			missedFields = append(missedFields, "query")
-		}
-		score += fieldMatch.Score
-
-		fieldMatch = FieldMatcher(requestMatcher.Method, req.Method)
-		if !fieldMatch.Matched {
-			matchedOnAllButHeaders = false
-			matchedOnAllButState = false
-			matched = false
-			missedFields = append(missedFields, "method")
-		}
-		score += fieldMatch.Score
-
-		fieldMatch = HeaderMatching(requestMatcher, req.Headers)
-		if !fieldMatch.Matched {
-			matched = false
-			matchedOnAllButState = false
-			missedFields = append(missedFields, "headers")
-		}
-		score += fieldMatch.Score
-
-		fieldMatch = QueryMatching(requestMatcher, req.Query)
-		if !fieldMatch.Matched {
-			matched = false
-			matchedOnAllButState = false
-			missedFields = append(missedFields, "queries")
-		}
-		score += fieldMatch.Score
-
-		fieldMatch = StateMatcher(state, requestMatcher.RequiresState)
-		if !fieldMatch.Matched {
-			matched = false
-			matchedOnAllButHeaders = false
-			missedFields = append(missedFields, "state")
-		}
-		score += fieldMatch.Score
-
-		// This only counts if there was actually a matcher for headers
-		if matchedOnAllButHeaders && requestMatcher.Headers != nil && len(requestMatcher.Headers) > 0 {
-			matchedOnAllButHeadersAtLeastOnce = true
-		}
-
-		// This only counts of there was actually a matcher for state
-		if matchedOnAllButState && requestMatcher.RequiresState != nil && len(requestMatcher.RequiresState) > 0 {
-			matchedOnAllButStateAtLeastOnce = true
-		}
-
-		if matched == true && score >= strongestMatchScore {
-			requestMatch = &models.RequestMatcherResponsePair{
-				RequestMatcher: requestMatcher,
-				Response:       matchingPair.Response,
-			}
-			strongestMatchScore = score
-			closestMiss = nil
-		} else if matched == false && requestMatch == nil && score >= closestMissScore {
-			closestMissScore = score
-			view := matchingPair.BuildView()
-			closestMiss = &models.ClosestMiss{
-				RequestDetails: req,
-				RequestMatcher: view.RequestMatcher,
-				Response:       view.Response,
-				MissedFields:   missedFields,
-				State:          state.State,
-			}
+		s.strongestMatchScore = s.score
+		s.closestMiss = nil
+	} else if s.matched == false && s.requestMatch == nil && s.score >= s.closestMissScore {
+		s.closestMissScore = s.score
+		view := matchingPair.BuildView()
+		s.closestMiss = &models.ClosestMiss{
+			RequestDetails: req,
+			RequestMatcher: view.RequestMatcher,
+			Response:       view.Response,
+			MissedFields:   s.missedFields,
+			State:          state.State,
 		}
 	}
 
-	cachable = isCachable(requestMatch, matchedOnAllButHeadersAtLeastOnce, matchedOnAllButStateAtLeastOnce)
+	return nil
+}
 
-	if requestMatch == nil {
-		err = models.NewMatchErrorWithClosestMiss(closestMiss, "No match found", matchedOnAllButHeadersAtLeastOnce)
+func (s *StrongestMatchStrategy) Result() *MatchingResult {
+	cachable := isCachable(s.requestMatch, s.matchedOnAllButHeadersAtLeastOnce, s.matchedOnAllButStateAtLeastOnce)
+	var err *models.MatchError
+	if s.requestMatch == nil {
+		err = models.NewMatchErrorWithClosestMiss(s.closestMiss, "No match found", s.matchedOnAllButHeadersAtLeastOnce)
 	}
 
 	return &MatchingResult{
-		Pair:     requestMatch,
+		Pair:     s.requestMatch,
 		Error:    err,
 		Cachable: cachable,
 	}
