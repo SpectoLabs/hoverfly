@@ -29,7 +29,7 @@ var ExactMatch = `{
 							"value": "http"
 						}
 					],
-					"depricatedQuery": [
+					"deprecatedQuery": [
 						{
 							"matcher": "exact",
 							"value": ""
@@ -88,7 +88,7 @@ var ExactMatch = `{
 							"value": "http"
 						}
 					],
-					"depricatedQuery": [
+					"deprecatedQuery": [
 						{
 							"matcher": "exact",
 							"value": ""

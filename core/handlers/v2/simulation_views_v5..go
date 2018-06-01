@@ -29,7 +29,7 @@ type RequestMatcherViewV5 struct {
 	Headers         map[string][]MatcherViewV5 `json:"headers,omitempty"`
 	Query           map[string][]MatcherViewV5 `json:"query,omitempty"`
 	RequiresState   map[string]string          `json:"requiresState,omitempty"`
-	DepricatedQuery []MatcherViewV5            `json:"depricatedQuery,omitempty"`
+	DeprecatedQuery []MatcherViewV5            `json:"deprecatedQuery,omitempty"`
 }
 
 type MatcherViewV5 struct {
