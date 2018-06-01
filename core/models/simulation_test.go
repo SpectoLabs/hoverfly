@@ -254,24 +254,24 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
-	Expect(unit.GetMatchingPairs()[0].RequestMatcher.RequiresState["sequence:0"]).To(Equal("1"))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.RequiresState["sequence:1"]).To(Equal("1"))
 
 	Expect(unit.GetMatchingPairs()[0].Response.Body).To(Equal("1"))
-	Expect(unit.GetMatchingPairs()[0].Response.TransitionsState["sequence:0"]).To(Equal("2"))
+	Expect(unit.GetMatchingPairs()[0].Response.TransitionsState["sequence:1"]).To(Equal("2"))
 
 	Expect(unit.GetMatchingPairs()[1].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[1].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
-	Expect(unit.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence:0"]).To(Equal("2"))
+	Expect(unit.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence:1"]).To(Equal("2"))
 
 	Expect(unit.GetMatchingPairs()[1].Response.Body).To(Equal("2"))
-	Expect(unit.GetMatchingPairs()[1].Response.TransitionsState["sequence:0"]).To(Equal("3"))
+	Expect(unit.GetMatchingPairs()[1].Response.TransitionsState["sequence:1"]).To(Equal("3"))
 
 	Expect(unit.GetMatchingPairs()[2].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[2].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
-	Expect(unit.GetMatchingPairs()[2].RequestMatcher.RequiresState["sequence:0"]).To(Equal("3"))
+	Expect(unit.GetMatchingPairs()[2].RequestMatcher.RequiresState["sequence:1"]).To(Equal("3"))
 
 	Expect(unit.GetMatchingPairs()[2].Response.Body).To(Equal("3"))
-	Expect(unit.GetMatchingPairs()[2].Response.TransitionsState["sequence:0"]).To(Equal(""))
+	Expect(unit.GetMatchingPairs()[2].Response.TransitionsState["sequence:2"]).To(Equal(""))
 }
 
 func Test_Simulation_AddPairInSequence_CanBeUsedWithAddPair(t *testing.T) {
@@ -315,14 +315,14 @@ func Test_Simulation_AddPairInSequence_CanBeUsedWithAddPair(t *testing.T) {
 
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
-	Expect(unit.GetMatchingPairs()[0].RequestMatcher.RequiresState["sequence:0"]).To(Equal("1"))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.RequiresState["sequence:1"]).To(Equal("1"))
 
 	Expect(unit.GetMatchingPairs()[0].Response.Body).To(Equal("1"))
-	Expect(unit.GetMatchingPairs()[0].Response.TransitionsState["sequence:0"]).To(Equal("2"))
+	Expect(unit.GetMatchingPairs()[0].Response.TransitionsState["sequence:1"]).To(Equal("2"))
 
 	Expect(unit.GetMatchingPairs()[1].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[1].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
-	Expect(unit.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence:0"]).To(Equal("2"))
+	Expect(unit.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence:1"]).To(Equal("2"))
 
 	Expect(unit.GetMatchingPairs()[1].Response.Body).To(Equal("2"))
 }
@@ -402,27 +402,27 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
-	Expect(unit.GetMatchingPairs()[0].RequestMatcher.RequiresState["sequence:0"]).To(Equal("1"))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.RequiresState["sequence:1"]).To(Equal("1"))
 
 	Expect(unit.GetMatchingPairs()[0].Response.Body).To(Equal("1"))
-	Expect(unit.GetMatchingPairs()[0].Response.TransitionsState["sequence:0"]).To(Equal("2"))
+	Expect(unit.GetMatchingPairs()[0].Response.TransitionsState["sequence:1"]).To(Equal("2"))
 
 	Expect(unit.GetMatchingPairs()[1].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[1].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
-	Expect(unit.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence:0"]).To(Equal("2"))
+	Expect(unit.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence:1"]).To(Equal("2"))
 
 	Expect(unit.GetMatchingPairs()[1].Response.Body).To(Equal("2"))
 
 	Expect(unit.GetMatchingPairs()[2].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[2].RequestMatcher.Destination[0].Value).To(Equal("different"))
-	Expect(unit.GetMatchingPairs()[2].RequestMatcher.RequiresState["sequence:1"]).To(Equal("1"))
+	Expect(unit.GetMatchingPairs()[2].RequestMatcher.RequiresState["sequence:2"]).To(Equal("1"))
 
 	Expect(unit.GetMatchingPairs()[2].Response.Body).To(Equal("different1"))
-	Expect(unit.GetMatchingPairs()[2].Response.TransitionsState["sequence:1"]).To(Equal("2"))
+	Expect(unit.GetMatchingPairs()[2].Response.TransitionsState["sequence:2"]).To(Equal("2"))
 
 	Expect(unit.GetMatchingPairs()[3].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
 	Expect(unit.GetMatchingPairs()[3].RequestMatcher.Destination[0].Value).To(Equal("different"))
-	Expect(unit.GetMatchingPairs()[3].RequestMatcher.RequiresState["sequence:1"]).To(Equal("2"))
+	Expect(unit.GetMatchingPairs()[3].RequestMatcher.RequiresState["sequence:2"]).To(Equal("2"))
 
 	Expect(unit.GetMatchingPairs()[3].Response.Body).To(Equal("different2"))
 }

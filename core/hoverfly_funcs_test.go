@@ -832,8 +832,8 @@ func Test_Hoverfly_Save_CanAddPairStatefully(t *testing.T) {
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(2))
 
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.RequiresState).To(HaveLen(1))
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.RequiresState["sequence:0"]).To(Equal("1"))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.RequiresState["sequence:1"]).To(Equal("1"))
 
 	Expect(unit.Simulation.GetMatchingPairs()[1].RequestMatcher.RequiresState).To(HaveLen(1))
-	Expect(unit.Simulation.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence:0"]).To(Equal("2"))
+	Expect(unit.Simulation.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence:1"]).To(Equal("2"))
 }

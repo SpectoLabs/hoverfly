@@ -9,7 +9,7 @@ var Sequenced = `{
 					"value": "/a"
 				}],
 				"requiresState": {
-					"sequence:0": "1"
+					"sequence:1": "1"
 				}
 			},
 			"response": {
@@ -23,7 +23,7 @@ var Sequenced = `{
 				},
 				"templated": false,
 				"transitionsState": {
-					"sequence:0": "2"
+					"sequence:1": "2"
 				}
 			}
 		}, {
@@ -33,7 +33,7 @@ var Sequenced = `{
 					"value": "/a"
 				}],
 				"requiresState": {
-					"sequence:0": "2"
+					"sequence:1": "2"
 				}
 			},
 			"response": {
@@ -47,7 +47,7 @@ var Sequenced = `{
 				},
 				"templated": false,
 				"transitionsState": {
-					"sequence:0": "3"
+					"sequence:1": "3"
 				}
 			}
 		}, {
@@ -57,7 +57,7 @@ var Sequenced = `{
 					"value": "/a"
 				}],
 				"requiresState": {
-					"sequence:0": "3"
+					"sequence:1": "3"
 				}
 			},
 			"response": {
@@ -78,7 +78,7 @@ var Sequenced = `{
 					"value": "/b"
 				}],
 				"requiresState": {
-					"sequence:1": "1"
+					"sequence:2": "1"
 				}
 			},
 			"response": {
@@ -92,7 +92,7 @@ var Sequenced = `{
 				},
 				"templated": false,
 				"transitionsState": {
-					"sequence:1": "2"
+					"sequence:2": "2"
 				}
 			}
 		}, {
@@ -102,7 +102,7 @@ var Sequenced = `{
 					"value": "/b"
 				}],
 				"requiresState": {
-					"sequence:1": "2"
+					"sequence:2": "2"
 				}
 			},
 			"response": {

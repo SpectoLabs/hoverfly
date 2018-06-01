@@ -51,7 +51,7 @@ func (s *State) RemoveState(toRemove []string) {
 
 func (s *State) GetNewSequenceKey() string {
 	returnKey := ""
-	i := 0
+	i := 1
 	for returnKey == "" {
 		tempKey := fmt.Sprintf("sequence:%v", i)
 		if s.State[tempKey] == "" {

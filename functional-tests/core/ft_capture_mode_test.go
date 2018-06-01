@@ -381,15 +381,15 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			Expect(payload.RequestResponsePairs).To(HaveLen(3))
 
-			Expect(payload.RequestResponsePairs[0].RequestMatcher.RequiresState).To(Equal(map[string]string{"sequence:0": "1"}))
+			Expect(payload.RequestResponsePairs[0].RequestMatcher.RequiresState).To(Equal(map[string]string{"sequence:1": "1"}))
 			Expect(payload.RequestResponsePairs[0].Response.Body).To(Equal("1"))
-			Expect(payload.RequestResponsePairs[0].Response.TransitionsState).To(Equal(map[string]string{"sequence:0": "2"}))
+			Expect(payload.RequestResponsePairs[0].Response.TransitionsState).To(Equal(map[string]string{"sequence:1": "2"}))
 
-			Expect(payload.RequestResponsePairs[1].RequestMatcher.RequiresState).To(Equal(map[string]string{"sequence:0": "2"}))
+			Expect(payload.RequestResponsePairs[1].RequestMatcher.RequiresState).To(Equal(map[string]string{"sequence:1": "2"}))
 			Expect(payload.RequestResponsePairs[1].Response.Body).To(Equal("2"))
-			Expect(payload.RequestResponsePairs[1].Response.TransitionsState).To(Equal(map[string]string{"sequence:0": "3"}))
+			Expect(payload.RequestResponsePairs[1].Response.TransitionsState).To(Equal(map[string]string{"sequence:1": "3"}))
 
-			Expect(payload.RequestResponsePairs[2].RequestMatcher.RequiresState).To(Equal(map[string]string{"sequence:0": "3"}))
+			Expect(payload.RequestResponsePairs[2].RequestMatcher.RequiresState).To(Equal(map[string]string{"sequence:1": "3"}))
 			Expect(payload.RequestResponsePairs[2].Response.Body).To(Equal("3"))
 			Expect(payload.RequestResponsePairs[2].Response.TransitionsState).To(BeNil())
 		})
