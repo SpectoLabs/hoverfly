@@ -9,9 +9,9 @@ import (
 
 func Match(strongestMatch string, req models.RequestDetails, webserver bool, simulation *models.Simulation, state *state.State) *MatchingResult {
 	if strings.ToLower(strongestMatch) == "strongest" {
-		return StrongestMatchStrategy(req, webserver, simulation, state)
+		return MatchingStrategyRunner(req, webserver, simulation, state, &StrongestMatchStrategy{})
 	} else {
-		return FirstMatchStrategy(req, webserver, simulation, state)
+		return MatchingStrategyRunner(req, webserver, simulation, state, &FirstMatchStrategy{})
 	}
 }
 

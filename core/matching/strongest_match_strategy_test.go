@@ -28,7 +28,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EmptyRequestMatchersShouldMatchOnA
 			"sdv": {"ascd"},
 		},
 	}
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Pair).ToNot(BeNil())
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
@@ -54,7 +54,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersShouldMatchOnBody(t
 	r := models.RequestDetails{
 		Body: "body",
 	}
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 	Expect(result.Error).To(BeNil())
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
@@ -96,7 +96,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWhenAllHeadersMatch(
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
@@ -136,7 +136,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderNotPresentIn
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Pair).To(BeNil())
 }
@@ -176,7 +176,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderValueDiffere
 			"header2": {"different"},
 		},
 	}
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Pair).To(BeNil())
 }
@@ -217,7 +217,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWithMultiValuedHeade
 			"header2": {"val2"},
 		},
 	}
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
@@ -257,7 +257,7 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWithDifferentMultiValuedH
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Pair).To(BeNil())
 }
@@ -325,7 +325,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMatchWithHeaders(t *testin
 			"header2": {"val2"},
 		},
 	}
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
@@ -394,7 +394,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMismatchWithHeadersReturns
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Pair).To(BeNil())
 }
@@ -441,7 +441,7 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 			"q": []string{"test"},
 		},
 	}
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 
@@ -454,7 +454,7 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 		},
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Pair).To(BeNil())
 }
@@ -482,7 +482,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsAndBeMat
 		Path:        "/api/1",
 	}
 
-	result := matching.StrongestMatchStrategy(request, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(request, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 	Expect(result.Error).To(BeNil())
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
@@ -512,7 +512,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnScheme
 		Path:        "/api/1",
 	}
 
-	result := matching.StrongestMatchStrategy(request, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(request, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 	Expect(result.Error).To(BeNil())
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
@@ -546,7 +546,7 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnHeader
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(request, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(request, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 	Expect(result.Error).To(BeNil())
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
@@ -622,7 +622,7 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFound(t *testing.T) {
 		Path: "nomatch",
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Pair).To(BeNil())
@@ -712,7 +712,7 @@ func Test_ShouldReturnClosestMissIfMatchIsNotFoundAgain(t *testing.T) {
 		Method: "GET",
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Pair).To(BeNil())
@@ -776,7 +776,7 @@ func Test_ShouldNotReturnClosestMissWhenThereIsAMatch(t *testing.T) {
 		Method: "GET",
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).To(BeNil())
 	Expect(result.Pair).ToNot(BeNil())
@@ -863,7 +863,7 @@ func Test__NotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *test
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeFalse())
@@ -950,7 +950,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -969,7 +969,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -988,7 +988,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -1007,7 +1007,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -1026,7 +1026,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		},
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -1082,7 +1082,7 @@ func Test_ShouldSetClosestMissBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
 		Method: "POST",
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).To(BeNil())
 }
@@ -1162,7 +1162,7 @@ func Test_ShouldIncludeHeadersInCalculationForStrongestMatch(t *testing.T) {
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).To(BeNil())
 	Expect(result.Pair).ToNot(BeNil())
@@ -1232,7 +1232,7 @@ func Test_ShouldIncludeHeadersInCalculationForClosestMiss(t *testing.T) {
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Pair).To(BeNil())
@@ -1306,7 +1306,7 @@ func Test_ShouldReturnFieldsMissedInClosestMiss(t *testing.T) {
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Pair).To(BeNil())
@@ -1380,7 +1380,7 @@ func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Pair).To(BeNil())
@@ -1650,7 +1650,7 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeader
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeFalse())
@@ -1737,7 +1737,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		},
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -1756,7 +1756,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		},
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -1775,7 +1775,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		},
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -1794,7 +1794,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		},
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -1813,13 +1813,13 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		},
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{State: map[string]string{}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
 }
 
-func Test_StrongestMatchStrategy_RequestMatchersShouldMatchOnStateAndNotBeCachable(t *testing.T) {
+func Test_MatchingStrategyRunner_RequestMatchersShouldMatchOnStateAndNotBeCachable(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -1835,11 +1835,12 @@ func Test_StrongestMatchStrategy_RequestMatchersShouldMatchOnStateAndNotBeCachab
 		Body: "body",
 	}
 
-	result := matching.StrongestMatchStrategy(
+	result := matching.MatchingStrategyRunner(
 		r,
 		false,
 		simulation,
-		&state.State{map[string]string{"key1": "value1", "key2": "value2"}})
+		&state.State{map[string]string{"key1": "value1", "key2": "value2"}},
+		&matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).To(BeNil())
 	Expect(result.Cachable).To(BeFalse())
@@ -1919,7 +1920,7 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateA
 		Path:   "/foo",
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{map[string]string{"miss": "me"}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeFalse())
@@ -1998,7 +1999,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "/foo",
 	}
 
-	result := matching.StrongestMatchStrategy(r, false, simulation, &state.State{map[string]string{"miss": "me"}})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -2014,7 +2015,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "/foo",
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{map[string]string{"miss": "me"}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -2030,7 +2031,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "/foo",
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{map[string]string{"miss": "me"}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -2046,7 +2047,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "/foo",
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{map[string]string{"miss": "me"}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -2062,7 +2063,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "miss",
 	}
 
-	result = matching.StrongestMatchStrategy(r, false, simulation, &state.State{map[string]string{"miss": "me"}})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
