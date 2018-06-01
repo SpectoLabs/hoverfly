@@ -29,7 +29,7 @@ var Issue607 = `{
 							"value": "https"
 						}
 					],
-					"depricatedQuery": [
+					"deprecatedQuery": [
 						{
 							"matcher": "exact",
 							"value": "saleschannel=RETAIL"

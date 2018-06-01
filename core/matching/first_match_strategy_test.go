@@ -306,7 +306,7 @@ func Test_FirstMatchStrategy_EndpointMatchWithHeaders(t *testing.T) {
 					Value:   "GET",
 				},
 			},
-			DepricatedQuery: []models.RequestFieldMatchers{
+			DeprecatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "q=test",
@@ -374,7 +374,7 @@ func Test_FirstMatchStrategy_EndpointMismatchWithHeadersReturnsNil(t *testing.T)
 					Value:   "GET",
 				},
 			},
-			DepricatedQuery: []models.RequestFieldMatchers{
+			DeprecatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "q=test",
@@ -427,7 +427,7 @@ func Test_FirstMatchStrategy_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T
 					Value:   "GET",
 				},
 			},
-			DepricatedQuery: []models.RequestFieldMatchers{
+			DeprecatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "q=test",
@@ -637,7 +637,7 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLe
 					Value:   "http",
 				},
 			},
-			DepricatedQuery: []models.RequestFieldMatchers{
+			DeprecatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "foo=bar",
@@ -724,7 +724,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 					Value:   "http",
 				},
 			},
-			DepricatedQuery: []models.RequestFieldMatchers{
+			DeprecatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "?foo=bar",
@@ -915,7 +915,7 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeas
 					Value:   "http",
 				},
 			},
-			DepricatedQuery: []models.RequestFieldMatchers{
+			DeprecatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "foo=bar",
@@ -994,7 +994,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 					Value:   "http",
 				},
 			},
-			DepricatedQuery: []models.RequestFieldMatchers{
+			DeprecatedQuery: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
 					Value:   "?foo=bar",

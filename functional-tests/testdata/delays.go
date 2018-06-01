@@ -29,7 +29,7 @@ var Delays = `{
 							"value": "http"
 						}
 					],
-					"depricatedQuery": [
+					"deprecatedQuery": [
 						{
 							"matcher": "exact",
 							"value": ""

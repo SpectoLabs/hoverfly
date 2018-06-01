@@ -117,7 +117,7 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 				Body:            bodyMatchers,
 				Headers:         headersWithMatchers,
 				RequiresState:   nil,
-				DepricatedQuery: queryMatchers,
+				DeprecatedQuery: queryMatchers,
 			},
 			Response: ResponseDetailsViewV5{
 				Body:             pairV1.Response.Body,
@@ -185,7 +185,7 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
 				Scheme:          schemeMatchers,
 				Body:            bodyMatchers,
 				RequiresState:   nil,
-				DepricatedQuery: queryMatchers,
+				DeprecatedQuery: queryMatchers,
 			},
 			Response: ResponseDetailsViewV5{
 				Body:             requestResponsePairV2.Response.Body,
@@ -271,7 +271,7 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 				Headers:         headersWithMatchers,
 				Query:           queriesWithMatchers,
 				RequiresState:   requestResponsePairV2.RequestMatcher.RequiresState,
-				DepricatedQuery: queryMatchers,
+				DeprecatedQuery: queryMatchers,
 			},
 			Response: ResponseDetailsViewV5{
 				Body:             requestResponsePairV2.Response.Body,

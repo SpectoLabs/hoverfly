@@ -29,7 +29,7 @@ var PreloadCache = `{
 							"value": "http"
 						}
 					],
-					"depricatedQuery": [
+					"deprecatedQuery": [
 						{
 							"matcher": "exact",
 							"value": ""

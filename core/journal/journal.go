@@ -147,7 +147,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		Method:          models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Method),
 		Destination:     models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Destination),
 		Scheme:          models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Scheme),
-		DepricatedQuery: models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.DepricatedQuery),
+		DeprecatedQuery: models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.DeprecatedQuery),
 		Body:            models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
 		Query:           models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Query),
 		Headers:         models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Headers),
@@ -158,7 +158,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 	for _, entry := range allEntries {
 		if requestMatcher.Body == nil && requestMatcher.Destination == nil &&
 			requestMatcher.Headers == nil && requestMatcher.Method == nil &&
-			requestMatcher.Path == nil && requestMatcher.DepricatedQuery == nil &&
+			requestMatcher.Path == nil && requestMatcher.DeprecatedQuery == nil &&
 			requestMatcher.Scheme == nil && requestMatcher.Query == nil {
 			continue
 		}
@@ -174,7 +174,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		if !matching.FieldMatcher(requestMatcher.Path, *entry.Request.Path).Matched {
 			continue
 		}
-		if !matching.FieldMatcher(requestMatcher.DepricatedQuery, *entry.Request.Query).Matched {
+		if !matching.FieldMatcher(requestMatcher.DeprecatedQuery, *entry.Request.Query).Matched {
 			continue
 		}
 		if !matching.FieldMatcher(requestMatcher.Scheme, *entry.Request.Scheme).Matched {

@@ -51,10 +51,10 @@ type RequestMatcherResponsePair struct {
 }
 
 func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV5) *RequestMatcherResponsePair {
-	for i, matcher := range view.RequestMatcher.DepricatedQuery {
+	for i, matcher := range view.RequestMatcher.DeprecatedQuery {
 		if matcher.Matcher == matchers.Exact {
 			sortedQuery := util.SortQueryString(matcher.Value.(string))
-			view.RequestMatcher.DepricatedQuery[i].Value = sortedQuery
+			view.RequestMatcher.DeprecatedQuery[i].Value = sortedQuery
 		}
 	}
 
@@ -64,7 +64,7 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 			Method:          NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
 			Destination:     NewRequestFieldMatchersFromView(view.RequestMatcher.Destination),
 			Scheme:          NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
-			DepricatedQuery: NewRequestFieldMatchersFromView(view.RequestMatcher.DepricatedQuery),
+			DeprecatedQuery: NewRequestFieldMatchersFromView(view.RequestMatcher.DeprecatedQuery),
 			Body:            NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
 			Headers:         NewRequestFieldMatchersFromMapView(view.RequestMatcher.Headers),
 			Query:           NewRequestFieldMatchersFromMapView(view.RequestMatcher.Query),
@@ -118,9 +118,9 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 		body = views
 	}
 
-	if this.RequestMatcher.DepricatedQuery != nil && len(this.RequestMatcher.DepricatedQuery) != 0 {
+	if this.RequestMatcher.DeprecatedQuery != nil && len(this.RequestMatcher.DeprecatedQuery) != 0 {
 		views := []v2.MatcherViewV5{}
-		for _, matcher := range this.RequestMatcher.DepricatedQuery {
+		for _, matcher := range this.RequestMatcher.DeprecatedQuery {
 			views = append(views, matcher.BuildView())
 		}
 		query = views
@@ -150,7 +150,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 			Method:          method,
 			Destination:     destination,
 			Scheme:          scheme,
-			DepricatedQuery: query,
+			DeprecatedQuery: query,
 			Body:            body,
 			Headers:         headersWithMatchers,
 			Query:           queriesWithMatchers,
@@ -165,7 +165,7 @@ type RequestMatcher struct {
 	Method          []RequestFieldMatchers
 	Destination     []RequestFieldMatchers
 	Scheme          []RequestFieldMatchers
-	DepricatedQuery []RequestFieldMatchers
+	DeprecatedQuery []RequestFieldMatchers
 	Body            []RequestFieldMatchers
 	Headers         map[string][]RequestFieldMatchers
 	Query           map[string][]RequestFieldMatchers
@@ -185,7 +185,7 @@ func (this RequestMatcher) ToEagerlyCachable() *RequestDetails {
 		this.Destination == nil || len(this.Destination) != 1 || this.Destination[0].Matcher != matchers.Exact ||
 		this.Method == nil || len(this.Method) != 1 || this.Method[0].Matcher != matchers.Exact ||
 		this.Path == nil || len(this.Path) != 1 || this.Path[0].Matcher != matchers.Exact ||
-		this.DepricatedQuery == nil || len(this.DepricatedQuery) != 1 || this.DepricatedQuery[0].Matcher != matchers.Exact ||
+		this.DeprecatedQuery == nil || len(this.DeprecatedQuery) != 1 || this.DeprecatedQuery[0].Matcher != matchers.Exact ||
 		this.Scheme == nil || len(this.Scheme) != 1 || this.Scheme[0].Matcher != matchers.Exact {
 		return nil
 	}
@@ -198,7 +198,7 @@ func (this RequestMatcher) ToEagerlyCachable() *RequestDetails {
 		return nil
 	}
 
-	query, _ := url.ParseQuery(this.DepricatedQuery[0].Value.(string))
+	query, _ := url.ParseQuery(this.DeprecatedQuery[0].Value.(string))
 
 	return &RequestDetails{
 		Body:        this.Body[0].Value.(string),
