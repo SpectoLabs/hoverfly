@@ -649,7 +649,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
 		Request: &v2.RequestMatcherViewV5{
-			DepricatedQuery: []v2.MatcherViewV5{
+			DeprecatedQuery: []v2.MatcherViewV5{
 				{
 					Matcher: matchers.Exact,
 					Value:   "one=1&two=2",
@@ -660,7 +660,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
 		Request: &v2.RequestMatcherViewV5{
-			DepricatedQuery: []v2.MatcherViewV5{
+			DeprecatedQuery: []v2.MatcherViewV5{
 				{
 					Matcher: matchers.Glob,
 					Value:   "one=1*",
@@ -671,7 +671,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
 		Request: &v2.RequestMatcherViewV5{
-			DepricatedQuery: []v2.MatcherViewV5{
+			DeprecatedQuery: []v2.MatcherViewV5{
 				{
 					Matcher: matchers.Exact,
 					Value:   "does-not-match",
