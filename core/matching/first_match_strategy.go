@@ -5,99 +5,72 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/state"
 )
 
-func FirstMatchStrategy(req models.RequestDetails, webserver bool, simulation *models.Simulation, currentState *state.State) *MatchingResult {
+type FirstMatchStrategy struct {
+	matchedOnAllButHeaders            bool
+	matchedOnAllButState              bool
+	matched                           bool
+	matchedOnAllButHeadersAtLeastOnce bool
+	matchedOnAllButStateAtLeastOnce   bool
+	matchingPair                      *models.RequestMatcherResponsePair
+}
 
-	matchedOnAllButHeadersAtLeastOnce := false
-	matchedOnAllButStateAtLeastOnce := false
+func (s *FirstMatchStrategy) PreMatching() {
+	s.matchedOnAllButHeaders = true
+	s.matchedOnAllButState = true
+	s.matched = true
+}
 
-	for _, matchingPair := range simulation.GetMatchingPairs() {
-		// TODO: not matching by default on URL and body - need to enable this
-		// TODO: enable matching on scheme
+func (s *FirstMatchStrategy) Matching(fieldMatch *FieldMatch, field string) {
+	if !fieldMatch.Matched {
 
-		requestMatcher := matchingPair.RequestMatcher
-		matchedOnAllButHeaders := true
-		matchedOnAllButState := true
-		isAMatch := true
+		if field != "headers" {
+			s.matchedOnAllButState = false
 
-		if !FieldMatcher(requestMatcher.Body, req.Body).Matched {
-			matchedOnAllButHeaders = false
-			matchedOnAllButState = false
-			isAMatch = false
-			continue
 		}
+		if field != "state" {
+			s.matchedOnAllButHeaders = false
 
-		if !webserver {
-			if !FieldMatcher(requestMatcher.Destination, req.Destination).Matched {
-				matchedOnAllButHeaders = false
-				matchedOnAllButState = false
-				isAMatch = false
-				continue
-			}
 		}
+		s.matched = false
+	}
+}
 
-		if !FieldMatcher(requestMatcher.Path, req.Path).Matched {
-			matchedOnAllButHeaders = false
-			matchedOnAllButState = false
-			isAMatch = false
-			continue
-		}
+func (s *FirstMatchStrategy) PostMatching(req models.RequestDetails, requestMatcher models.RequestMatcher, matchingPair models.RequestMatcherResponsePair, state *state.State) *MatchingResult {
+	if s.matchedOnAllButHeaders {
+		s.matchedOnAllButHeadersAtLeastOnce = true
+	}
 
-		if !FieldMatcher(requestMatcher.DepricatedQuery, req.QueryString()).Matched {
-			matchedOnAllButHeaders = false
-			matchedOnAllButState = false
-			isAMatch = false
-			continue
-		}
+	if s.matchedOnAllButState {
+		s.matchedOnAllButStateAtLeastOnce = true
+	}
+	if s.matched && s.matchingPair == nil {
+		s.matchingPair = &matchingPair
+		return s.Result()
+	}
 
-		if !FieldMatcher(requestMatcher.Method, req.Method).Matched {
-			matchedOnAllButHeaders = false
-			matchedOnAllButState = false
-			isAMatch = false
-			continue
-		}
+	return nil
+}
 
-		if !HeaderMatching(requestMatcher, req.Headers).Matched {
-			matchedOnAllButState = false
-			isAMatch = false
-		}
+func (s *FirstMatchStrategy) Result() *MatchingResult {
+	if s.matchedOnAllButHeaders {
+		s.matchedOnAllButHeadersAtLeastOnce = true
+	}
 
-		if !QueryMatching(requestMatcher, req.Query).Matched {
-			matchedOnAllButState = false
-			isAMatch = false
-		}
+	if s.matchedOnAllButState {
+		s.matchedOnAllButStateAtLeastOnce = true
+	}
+	if s.matchingPair != nil {
 
-		if !StateMatcher(currentState, requestMatcher.RequiresState).Matched {
-			matchedOnAllButHeaders = false
-			isAMatch = false
-		}
-
-		if matchedOnAllButHeaders {
-			matchedOnAllButHeadersAtLeastOnce = true
-		}
-
-		if matchedOnAllButState {
-			matchedOnAllButStateAtLeastOnce = true
-		}
-
-		if !isAMatch {
-			continue
-		}
-
-		// return the first requestMatcher to match
-		match := &models.RequestMatcherResponsePair{
-			RequestMatcher: requestMatcher,
-			Response:       matchingPair.Response,
-		}
 		return &MatchingResult{
-			Pair:     match,
+			Pair:     s.matchingPair,
 			Error:    nil,
-			Cachable: isCachable(match, matchedOnAllButHeadersAtLeastOnce, matchedOnAllButStateAtLeastOnce),
+			Cachable: isCachable(s.matchingPair, s.matchedOnAllButHeadersAtLeastOnce, s.matchedOnAllButStateAtLeastOnce),
 		}
 	}
 
 	return &MatchingResult{
 		Pair:     nil,
-		Error:    models.NewMatchError("No match found", matchedOnAllButHeadersAtLeastOnce),
-		Cachable: isCachable(nil, matchedOnAllButHeadersAtLeastOnce, matchedOnAllButStateAtLeastOnce),
+		Error:    models.NewMatchError("No match found", s.matchedOnAllButHeadersAtLeastOnce),
+		Cachable: isCachable(nil, s.matchedOnAllButHeadersAtLeastOnce, s.matchedOnAllButStateAtLeastOnce),
 	}
 }
