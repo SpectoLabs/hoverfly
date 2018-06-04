@@ -56,9 +56,9 @@ fields.
 +-------------+--------------+-------------------------+-----------+-------------+----------+
 | Field       | Matcher Type | Value                   | Score     | Total Score | Matched? |
 +=============+==============+=========================+===========+=============+==========+
-| method      | exactMatch   | DELETE                  | +0        | 1           | false    |
+| method      | exact        | DELETE                  | +0        | 1           | false    |
 +-------------+--------------+-------------------------+-----------+             +          |
-| destination | exactMatch   | www.destination.com     | +1        |             |          |
+| destination | exact        | www.destination.com     | +1        |             |          |
 +-------------+--------------+-------------------------+-----------+-------------+----------+
 
 This pair contains two Request Matchers. The **method** value in the incoming request (``GET``) does not match
@@ -73,7 +73,7 @@ is treated as unmatched (**Matched?** = ``false``).
 +-------------+--------------+-------------------------+-----------+-------------+----------+
 | Field       | Matcher Type | Value                   | Score     | Total Score | Matched? |
 +=============+==============+=========================+===========+=============+==========+
-| method      | exactMatch   | GET                     | +1        | 1           | true     |
+| method      | exact        | GET                     | +1        | 1           | true     |
 +-------------+--------------+-------------------------+-----------+-------------+----------+
 
 This pair contains one Request Matcher. The **method** value in the incoming request (``GET``) matches
@@ -86,9 +86,9 @@ failed, it is treated as matched.
 +-------------+--------------+-------------------------+-----------+-------------+----------+
 | Field       | Matcher Type | Value                   | Score     | Total Score | Matched? |
 +=============+==============+=========================+===========+=============+==========+
-| method      | exactMatch   | GET                     | +1        | 2           | true     |
+| method      | exact        | GET                     | +1        | 2           | true     |
 +-------------+--------------+-------------------------+-----------+             +          |
-| destination | exactMatch   | www.destination.com     | +1        |             |          |
+| destination | exact        | www.destination.com     | +1        |             |          |
 +-------------+--------------+-------------------------+-----------+-------------+----------+
 
 In this pair, the **method** and **destination** values in the incoming request both match the 
@@ -101,9 +101,9 @@ corresponding Request Matcher values. This gives the pair a total score of 2, an
 +-------------+--------------+-------------------------+-----------+-------------+----------+
 | Field       | Matcher Type | Value                   | Score     | Total Score | Matched? |
 +=============+==============+=========================+===========+=============+==========+
-| method      | exactMatch   | GET                     | +1        | 1           | false    |
+| method      | exact        | GET                     | +1        | 1           | false    |
 +-------------+--------------+-------------------------+-----------+             +          |
-| destination | exactMatch   | www.miss.com            | +0        |             |          |
+| destination | exact        | www.miss.com            | +0        |             |          |
 +-------------+--------------+-------------------------+-----------+-------------+----------+
 
 This pair is treated as unmatched because the **destination** matcher failed. 

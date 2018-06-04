@@ -16,9 +16,12 @@ A matcher can include a field `requiresState`, which dictates the state Hoverfly
 .. code:: json
 
     "request": {
-        "path": {
-            "exactMatch": "/basket"
-        },
+        "path": [
+            {
+                "matcher": "exact",
+                "value": "/basket"
+            }
+        ]
         "requiresState": {
             "eggs": "present",
             "bacon" : "large"
@@ -51,9 +54,12 @@ A response includes two fields, `transitionsState` and `removesState` which alte
 .. code:: json
 
     "request": {
-        "path": {
-            "exactMatch": "/pay"
-        }
+        "path": [
+            {
+                "matcher": "exact",
+                "value": "/pay"
+            }
+        ]
     },
     "response": {
         "status": 200,
@@ -86,11 +92,11 @@ This is why Hoverctl comes with commands that let you orchestrate it's state. So
 
 .. code:: bash
 
-    $ hoverctl state-store --help
-    $ hoverctl state-store get-all
-    $ hoverctl state-store get key
-    $ hoverctl state-store set key value
-    $ hoverctl state-store delete-all
+    $ hoverctl state --help
+    $ hoverctl state get-all
+    $ hoverctl state get key
+    $ hoverctl state set key value
+    $ hoverctl state delete-all
 
 Stateful sequences
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
