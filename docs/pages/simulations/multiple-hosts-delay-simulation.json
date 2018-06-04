@@ -2,6 +2,14 @@
 	"data": {
 		"pairs": [
 			{
+				"request": {
+					"destination": [
+						{
+							"matcher": "glob",
+							"value": "*"
+						}
+					]
+				},
 				"response": {
 					"status": 200,
 					"body": "Delayed response",
@@ -12,11 +20,6 @@
 						]
 					},
 					"templated": false
-				},
-				"request": {
-					"destination": {
-						"globMatch": "*"
-					}
 				}
 			}
 		],
@@ -36,8 +39,8 @@
 		}
 	},
 	"meta": {
-		"schemaVersion": "v3",
-		"hoverflyVersion": "v0.13.0",
-		"timeExported": "2017-07-13T16:46:29+01:00"
+		"schemaVersion": "v5",
+		"hoverflyVersion": "v0.17.0",
+		"timeExported": "2018-06-04T10:29:57+01:00"
 	}
 }

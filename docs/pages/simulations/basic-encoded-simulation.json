@@ -1,47 +1,67 @@
 {
-  "data": {
-    "pairs": [
-      {
-        "response": {
-          "status": 200,
-          "body": "YmFzZTY0IGVuY29kZWQ=",
-          "encodedBody": true,
-          "headers": {
-            "Hoverfly": [
-              "Was-Here"
-            ]
-          },
-          "templated": false
-        },
-        "request": {
-          "path": {
-            "exactMatch": "/pages/keyconcepts/templates.html"
-          },
-          "method": {
-            "exactMatch": "GET"
-          },
-          "destination": {
-            "exactMatch": "docs.hoverfly.io"
-          },
-          "scheme": {
-            "exactMatch": "http"
-          },
-          "query": {
-            "exactMatch": "query=true"
-          },
-          "body": {
-            "exactMatch": ""
-          }
-        }
-      }
-    ],
-    "globalActions": {
-      "delays": []
-    }
-  },
-  "meta": {
-    "schemaVersion": "v3",
-    "hoverflyVersion": "v0.13.0",
-    "timeExported": "2017-07-13T16:34:30+01:00"
-  }
+	"data": {
+		"pairs": [
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
+							"value": "/pages/keyconcepts/templates.html"
+						}
+					],
+					"method": [
+						{
+							"matcher": "exact",
+							"value": "GET"
+						}
+					],
+					"destination": [
+						{
+							"matcher": "exact",
+							"value": "docs.hoverfly.io"
+						}
+					],
+					"scheme": [
+						{
+							"matcher": "exact",
+							"value": "http"
+						}
+					],
+					"body": [
+						{
+							"matcher": "exact",
+							"value": ""
+						}
+					],
+					"query": {
+						"query": [
+							{
+								"matcher": "exact",
+								"value": "true"
+							}
+						]
+					}
+				},
+				"response": {
+					"status": 200,
+					"body": "YmFzZTY0IGVuY29kZWQ=",
+					"encodedBody": true,
+					"headers": {
+						"Hoverfly": [
+							"Was-Here"
+						]
+					},
+					"templated": false
+				}
+			}
+		],
+		"globalActions": {
+			"delays": []
+		}
+	},
+	"meta": {
+		"schemaVersion": "v5",
+		"hoverflyVersion": "v0.17.0",
+		"timeExported": "2018-06-04T10:29:57+01:00"
+	}
 }
