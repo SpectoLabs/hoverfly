@@ -17,8 +17,8 @@ Example
 
 .. code:: json
    
-   "exactMatch": "?"
-
+   "matcher": "exact"
+   "value": "?"
 
 .. raw:: html
     
@@ -57,7 +57,8 @@ Example
 
 .. code:: json
    
-   "globMatch": "?"
+   "matcher": "glob"
+   "value": "?"
 
 .. raw:: html
     
@@ -106,7 +107,8 @@ Example
 
 .. code:: json
    
-   "regexMatch": "?"
+   "matcher": "regex"
+   "value": "?"
 
 .. raw:: html
     
@@ -154,7 +156,8 @@ Example
 
 .. code:: json
    
-   "xmlMatch": "?"
+   "matcher": "xml"
+   "value": "?"
 
 .. raw:: html
     
@@ -207,7 +210,8 @@ Example
 
 .. code:: json
    
-   "xpathMatch": "?"
+   "matcher": "xpath"
+   "value": "?"
 
 .. raw:: html
     
@@ -276,7 +280,8 @@ Example
 
 .. code:: json
    
-   "jsonMatch": "?"
+   "matcher": "json"
+   "value": "?"
 
 .. raw:: html
     
@@ -352,7 +357,8 @@ Example
 
 .. code:: json
    
-   "jsonPathMatch": "?"
+   "matcher": "jsonpath"
+   "value": "?"
 
 .. raw:: html
     
