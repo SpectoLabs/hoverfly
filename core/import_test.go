@@ -221,12 +221,6 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 					Value:   "scheme",
 				},
 			},
-			DeprecatedQuery: []v2.MatcherViewV5{
-				{
-					Matcher: matchers.Exact,
-					Value:   "",
-				},
-			},
 			Body: []v2.MatcherViewV5{
 				{
 					Matcher: matchers.Exact,
@@ -243,6 +237,8 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			}}}
 
 	hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{originalPair})
+	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{originalPair})
+	Expect(result.WarningMessages).To(HaveLen(0))
 
 	Expect(hv.Simulation.GetMatchingPairs()[0]).To(Equal(models.RequestMatcherResponsePair{
 		Response: models.ResponseDetails{
@@ -274,12 +270,6 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 				{
 					Matcher: matchers.Exact,
 					Value:   "scheme",
-				},
-			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "",
 				},
 			},
 			Body: []models.RequestFieldMatchers{
@@ -342,12 +332,6 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 					Value:   "scheme",
 				},
 			},
-			DeprecatedQuery: []v2.MatcherViewV5{
-				{
-					Matcher: matchers.Exact,
-					Value:   "",
-				},
-			},
 			Body: []v2.MatcherViewV5{
 				{
 					Matcher: matchers.Exact,
@@ -381,7 +365,8 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 	}
 	originalPair3.Response.Templated = true
 
-	hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{originalPair1, originalPair2, originalPair3})
+	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{originalPair1, originalPair2, originalPair3})
+	Expect(result.WarningMessages).To(HaveLen(0))
 
 	Expect(hv.Simulation.GetMatchingPairs()).To(HaveLen(3))
 	Expect(hv.Simulation.GetMatchingPairs()[0]).To(Equal(models.RequestMatcherResponsePair{
@@ -414,12 +399,6 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 				{
 					Matcher: matchers.Exact,
 					Value:   "scheme",
-				},
-			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "",
 				},
 			},
 			Body: []models.RequestFieldMatchers{
@@ -471,12 +450,6 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 					Value:   "scheme",
 				},
 			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "",
-				},
-			},
 			Body: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -524,12 +497,6 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 				{
 					Matcher: matchers.Exact,
 					Value:   "scheme",
-				},
-			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "",
 				},
 			},
 			Body: []models.RequestFieldMatchers{
@@ -581,7 +548,8 @@ func TestImportImportRequestResponsePairs_CanImportARequesResponsePairView(t *te
 		RequestMatcher: request,
 	}
 
-	hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{requestResponsePair})
+	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{requestResponsePair})
+	Expect(result.WarningMessages).To(HaveLen(0))
 
 	Expect(len(hv.Simulation.GetMatchingPairs())).To(Equal(1))
 
@@ -640,12 +608,6 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 					Value:   "scheme",
 				},
 			},
-			DeprecatedQuery: []v2.MatcherViewV5{
-				{
-					Matcher: matchers.Exact,
-					Value:   "",
-				},
-			},
 			Body: []v2.MatcherViewV5{
 				{
 					Matcher: matchers.Exact,
@@ -663,7 +625,8 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 		},
 	}
 
-	hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
+	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
+	Expect(result.WarningMessages).To(HaveLen(0))
 
 	Expect(hv.Simulation.GetMatchingPairs()[0]).ToNot(Equal(models.RequestResponsePair{
 		Response: models.ResponseDetails{
@@ -709,7 +672,39 @@ func TestImportImportRequestResponsePairs_SetsState(t *testing.T) {
 		},
 	}
 
-	hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
+	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
+	Expect(result.WarningMessages).To(HaveLen(0))
 
 	Expect(hv.state.GetState("sequence:1")).To(Equal("1"))
+}
+
+func TestImportImportRequestResponsePairs_ReturnsWarningsIfDeprecatedQuerytSet(t *testing.T) {
+	RegisterTestingT(t)
+
+	cache := cache.NewInMemoryCache()
+	cfg := Configuration{Webserver: false}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
+
+	RegisterTestingT(t)
+
+	encodedPair := v2.RequestMatcherResponsePairViewV5{
+		Response: v2.ResponseDetailsViewV5{
+			Status:      200,
+			Body:        base64String("hello_world"),
+			EncodedBody: true,
+			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
+		RequestMatcher: v2.RequestMatcherViewV5{
+			DeprecatedQuery: []v2.MatcherViewV5{
+				v2.MatcherViewV5{
+					Matcher: "exact",
+					Value:   "deprecated",
+				},
+			},
+		},
+	}
+
+	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
+
+	Expect(result.WarningMessages).To(HaveLen(1))
 }

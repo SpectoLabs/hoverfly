@@ -103,7 +103,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.PutSimulation(simulation)
+	return hf.PutSimulation(simulation).GetError()
 }
 
 // ImportFromURL - takes one string value and tries connect to a remote server, then parse response body into
@@ -128,16 +128,17 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.PutSimulation(simulation)
+	return hf.PutSimulation(simulation).GetError()
 }
 
 // importRequestResponsePairViews - a function to save given pairs into the database.
-func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcherResponsePairViewV5) error {
+func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcherResponsePairViewV5) v2.SimulationImportResult {
+	importResult := v2.SimulationImportResult{}
 	initialStates := map[string]string{}
 	if len(pairViews) > 0 {
 		success := 0
 		failed := 0
-		for _, pairView := range pairViews {
+		for i, pairView := range pairViews {
 
 			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
 
@@ -146,6 +147,11 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 				initialStates[k] = v
 			}
 			success++
+
+			if pairView.RequestMatcher.DeprecatedQuery != nil && len(pairView.RequestMatcher.DeprecatedQuery) != 0 {
+				importResult.AddDeprecatedQueryWarning(i)
+			}
+
 			continue
 		}
 
@@ -156,8 +162,8 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 			"successful": success,
 			"failed":     failed,
 		}).Info("payloads imported")
-		return nil
+		return importResult
 	}
 
-	return nil
+	return importResult
 }

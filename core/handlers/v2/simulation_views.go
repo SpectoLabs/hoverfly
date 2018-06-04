@@ -147,3 +147,32 @@ func BuildSimulationView(pairViews []RequestMatcherResponsePairViewV5, delayView
 		*NewMetaView(version),
 	}
 }
+
+const deprecatedQueryMessage = "Usage of depricated field `deprecatedQuery` on data.pairs[%v].request.deprecatedQuery, please update your simulation to use `query` field"
+const deprecatedQueryDocs = "https://hoverfly.readthedocs.io/en/latest/pages/troubleshooting/troubleshooting.html#why-does-my-simulation-have-a-deprecatedquery-field"
+
+type SimulationImportResult struct {
+	err             error                     `json:"error,omitempty"`
+	WarningMessages []SimulationImportWarning `json:"warnings,omitempty"`
+}
+
+type SimulationImportWarning struct {
+	Message  string `json:"message,omitempty"`
+	DocsLink string `json:"documentation,omitempty"`
+}
+
+func (s *SimulationImportResult) AddError(err error) {
+	s.err = err
+}
+
+func (s SimulationImportResult) GetError() error {
+	return s.err
+}
+
+func (s *SimulationImportResult) AddDeprecatedQueryWarning(requestNumber int) {
+	warning := fmt.Sprintf("WARNING: %s", fmt.Sprintf(deprecatedQueryMessage, requestNumber))
+	if s.WarningMessages == nil {
+		s.WarningMessages = []SimulationImportWarning{}
+	}
+	s.WarningMessages = append(s.WarningMessages, SimulationImportWarning{Message: warning, DocsLink: deprecatedQueryDocs})
+}
