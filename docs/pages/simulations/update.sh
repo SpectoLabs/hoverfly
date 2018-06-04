@@ -17,3 +17,4 @@ hoverctl export pages/simulations/multiple-hosts-delay-simulation.json
 hoverctl import pages/simulations/multiple-locations-delay-simulation.json
 hoverctl export pages/simulations/multiple-locations-delay-simulation.json
 hoverctl stop
+sed -i 's/\t/   /g' pages/simulations/*.json
