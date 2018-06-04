@@ -51,7 +51,7 @@ An example Request Matcher Set might look like this:
 In the Hoverfly simulation JSON file, this Request Matcher Set would be represented like this: 
 
 .. literalinclude:: ../../simulations/basic-simulation.json
-   :lines: 16-35
+   :lines: 5-44
    :linenos:
    :language: javascript
 
@@ -67,7 +67,7 @@ that Hoverfly will return one stored response for multiple incoming requests.
 For example, this Request Matcher will match any incoming request to the :code:`docs.hoverfly.io` destination:
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
-   :lines: 17-19
+   :lines: 6-11
    :linenos:
    :language: javascript
 
@@ -78,7 +78,7 @@ For example, this Request Matcher will match any incoming request to the :code:`
 In the example below, the :code:`globMatch` Request Matcher type is used to match any subdomain of :code:`hoverfly.io`:
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
-   :lines: 35-37
+   :lines: 27-32
    :linenos:
    :language: javascript
    
@@ -94,7 +94,7 @@ incoming requests to :code:`docs.hoverfly.io` and :code:`dogs.hoverfly.io` will 
 :code:`cats.hoverfly.io` will not be matched.
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
-   :lines: 53-56
+   :lines: 48-57
    :linenos:
    :language: javascript
    
