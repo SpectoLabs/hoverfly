@@ -11,7 +11,7 @@ Run the following to create and export a simulation.
 Edit the ``simulation.json`` file so that the ``"globalActions"`` property looks like this:
 
 .. literalinclude:: ../../../../simulations/multiple-hosts-delay-simulation.json
-   :lines: 23-36
+   :lines: 26-39
    :linenos:
    :language: javascript
 

@@ -11,7 +11,7 @@ Run the following to create and export a simulation.
 Edit the ``simulation.json`` file so that the ``"globalActions"`` property looks like this:
 
 .. literalinclude:: ../../../../simulations/get-method-delay-simulation.json
-   :lines: 23-31
+   :lines: 26-34
    :linenos:
    :language: javascript
 
