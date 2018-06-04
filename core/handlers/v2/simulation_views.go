@@ -148,7 +148,7 @@ func BuildSimulationView(pairViews []RequestMatcherResponsePairViewV5, delayView
 	}
 }
 
-const deprecatedQueryMessage = "Usage of depricated field `deprecatedQuery` on data.pairs[%v].request.deprecatedQuery, please update your simulation to use `query` field"
+const deprecatedQueryMessage = "Usage of deprecated field `deprecatedQuery` on data.pairs[%v].request.deprecatedQuery, please update your simulation to use `query` field"
 const deprecatedQueryDocs = "https://hoverfly.readthedocs.io/en/latest/pages/troubleshooting/troubleshooting.html#why-does-my-simulation-have-a-deprecatedquery-field"
 
 type SimulationImportResult struct {

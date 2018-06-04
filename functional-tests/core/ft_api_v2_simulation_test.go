@@ -415,7 +415,7 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(response.StatusCode).To(Equal(http.StatusOK))
 
 			responseBody, _ := ioutil.ReadAll(response.Body)
-			Expect(string(responseBody)).To(ContainSubstring("WARNING: Usage of depricated field `deprecatedQuery` on data.pairs[1].request.deprecatedQuery, please update your simulation to use `query` field"))
+			Expect(string(responseBody)).To(ContainSubstring("WARNING: Usage of deprecated field `deprecatedQuery` on data.pairs[1].request.deprecatedQuery, please update your simulation to use `query` field"))
 			Expect(string(responseBody)).To(ContainSubstring("https://hoverfly.readthedocs.io/en/latest/pages/troubleshooting/troubleshooting.html#why-does-my-simulation-have-a-deprecatedquery-field"))
 		})
 	})
