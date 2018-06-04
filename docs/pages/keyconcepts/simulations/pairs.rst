@@ -130,7 +130,7 @@ Editing the fields in response, combined with editing the Request Matcher set, m
 Binary data in responses
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-JSON is a text-based file format so it has no intrinsic support for binary data. Therefore if Hoverfly a response body containin] binary data (images, gzipped, etc), the response body will be base64 encoded and the `encodedBody` field set to true.
+JSON is a text-based file format so it has no intrinsic support for binary data. Therefore if Hoverfly a response body contains binary data (images, gzipped, etc), the response body will be base64 encoded and the `encodedBody` field set to true.
 
 .. literalinclude:: ../../simulations/basic-encoded-simulation.json
    :lines: 47-48
