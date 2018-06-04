@@ -534,7 +534,7 @@ func Test_Hoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 	}
 
 	err := unit.PutSimulation(simulationToImport)
-	Expect(err).To(BeNil())
+	Expect(err.GetError()).To(BeNil())
 
 	delays := unit.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()
 	Expect(delays).ToNot(BeNil())

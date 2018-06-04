@@ -277,3 +277,29 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidJson(
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
 }
+
+func Test_SimulationImportResult_AddDeprecatedQueryWarning_AddsWarning(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := v2.SimulationImportResult{}
+	unit.AddDeprecatedQueryWarning(15)
+
+	Expect(unit.WarningMessages).To(HaveLen(1))
+
+	Expect(unit.WarningMessages[0].Message).To(ContainSubstring("WARNING"))
+	Expect(unit.WarningMessages[0].Message).To(ContainSubstring("deprecatedQuery"))
+	Expect(unit.WarningMessages[0].Message).To(ContainSubstring("data.pairs[15].request.deprecatedQuery"))
+}
+
+func Test_SimulationImportResult_WriteResponse_IncludesMultipleWarnings(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := v2.SimulationImportResult{}
+	unit.AddDeprecatedQueryWarning(15)
+	unit.AddDeprecatedQueryWarning(30)
+	unit.AddDeprecatedQueryWarning(45)
+
+	Expect(unit.WarningMessages[0].Message).To(ContainSubstring("data.pairs[15].request.deprecatedQuery"))
+	Expect(unit.WarningMessages[1].Message).To(ContainSubstring("data.pairs[30].request.deprecatedQuery"))
+	Expect(unit.WarningMessages[2].Message).To(ContainSubstring("data.pairs[45].request.deprecatedQuery"))
+}
