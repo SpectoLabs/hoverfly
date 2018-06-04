@@ -130,8 +130,7 @@ Editing the fields in response, combined with editing the Request Matcher set, m
 Binary data in responses
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Since JSON does not support binary data, binary responses are base64 encoded. This is denoted by the encodedBody field. 
-Hoverfly automatically encodes and decodes the data during the export and import phases.
+JSON is a text-based file format so it has no intrinsic support for binary data. Therefore if Hoverfly a response body containin] binary data (images, gzipped, etc), the response body will be base64 encoded and the `encodedBody` field set to true.
 
 .. literalinclude:: ../../simulations/basic-encoded-simulation.json
    :lines: 47-48
