@@ -80,23 +80,23 @@ How can I view the Hoverfly logs?
     hoverctl logs
 
 
-Why does my simulation have a ``depricatedQuery`` field?
+Why does my simulation have a ``deprecatedQuery`` field?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Older simulations that have been upgraded through newer versions of Hoverfly may now contain a field 
-on requests called ``depricatedQuery``. With the v5 simulation schema, the request query field was
+on requests called ``deprecatedQuery``. With the v5 simulation schema, the request query field was
 updated to more fully represent request query paramters. This involves storing queries based on
 query keys, similarly to how headers are stored in a simulation.
 
-Currently the ``depricatedQuery`` field will work and works alongside the ``query`` field and support
+Currently the ``deprecatedQuery`` field will work and works alongside the ``query`` field and support
 for this field will eventually be dropped.
 
-If you have ``depricatedQuery`` field, you should remove it by splitting it by query keys.
+If you have ``deprecatedQuery`` field, you should remove it by splitting it by query keys.
 
 
 .. code:: json
 
-    "depricatedQuery": "page=20&pageSize=15"
+    "deprecatedQuery": "page=20&pageSize=15"
 
 .. code:: json
 
@@ -115,7 +115,7 @@ If you have ``depricatedQuery`` field, you should remove it by splitting it by q
         ],
     }
 
-If you cannot update your ``depricatedQuery`` from your simulation for a technical reason, feel free to 
+If you cannot update your ``deprecatedQuery`` from your simulation for a technical reason, feel free to 
 raise an issue on Hoverfly.
 
 Why am I not able to access my Hoverfly remotely?
