@@ -10,14 +10,14 @@ Take a look at the ``"globalActions"`` property within the ``simulation.json`` f
 should look like this:
 
 .. literalinclude:: ../../../../simulations/basic-simulation.json
-   :lines: 38-40
+   :lines: 58-60
    :linenos:
    :language: javascript
 
 Edit the file so the ``"globalActions"`` property looks like this:
 
 .. literalinclude:: ../../../../simulations/basic-delay-simulation.json
-   :lines: 23-31
+   :lines: 26-34
    :linenos:
    :language: javascript
 
