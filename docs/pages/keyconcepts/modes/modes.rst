@@ -12,3 +12,4 @@ Hoverfly has five different modes. It can only run in one mode at any one time.
     spy
     synthesize
     modify
+    diff
