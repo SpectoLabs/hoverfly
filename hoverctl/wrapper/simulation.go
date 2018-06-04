@@ -7,9 +7,11 @@ import (
 	"io/ioutil"
 
 	"fmt"
-	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"net/url"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 )
 
 func ExportSimulation(target configuration.Target, urlPattern string) ([]byte, error) {
@@ -55,6 +57,16 @@ func ImportSimulation(target configuration.Target, simulationData string) error 
 	err = handleResponseError(response, "Could not import simulation")
 	if err != nil {
 		return err
+	}
+
+	responseBytes, _ := ioutil.ReadAll(response.Body)
+
+	result := &v2.SimulationImportResult{}
+	json.Unmarshal(responseBytes, result)
+
+	for _, warning := range result.WarningMessages {
+		fmt.Println(warning.Message)
+		fmt.Println(warning.DocsLink + "\n")
 	}
 
 	return nil
