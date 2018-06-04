@@ -1,3 +1,6 @@
-"path": {
-	"globMatch": "/foo/*/bar/spam"
-},
+"path": [
+	{
+	   "matcher": "glob",
+	   "value": "/foo/*/bar/spam"
+	}
+ ]
