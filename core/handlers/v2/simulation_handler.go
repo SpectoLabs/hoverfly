@@ -17,7 +17,7 @@ import (
 type HoverflySimulation interface {
 	GetSimulation() (SimulationViewV5, error)
 	GetFilteredSimulation(string) (SimulationViewV5, error)
-	PutSimulation(SimulationViewV5) error
+	PutSimulation(SimulationViewV5) SimulationImportResult
 	DeleteSimulation()
 }
 
@@ -82,14 +82,20 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 
 	this.Hoverfly.DeleteSimulation()
 
-	err = this.Hoverfly.PutSimulation(simulationView)
-	if err != nil {
+	result := this.Hoverfly.PutSimulation(simulationView)
+	if result.err != nil {
 
 		log.WithFields(log.Fields{
 			"body": string(body),
 		}).Debug(err.Error())
 
 		handlers.WriteErrorResponse(w, "An error occured: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if len(result.WarningMessages) > 0 {
+		bytes, _ := util.JSONMarshal(result)
+
+		handlers.WriteResponse(w, bytes)
 		return
 	}
 

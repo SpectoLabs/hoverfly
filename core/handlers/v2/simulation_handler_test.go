@@ -66,9 +66,9 @@ func (this *HoverflySimulationStub) DeleteSimulation() {
 	this.Deleted = true
 }
 
-func (this *HoverflySimulationStub) PutSimulation(simulation SimulationViewV5) error {
+func (this *HoverflySimulationStub) PutSimulation(simulation SimulationViewV5) SimulationImportResult {
 	this.Simulation = simulation
-	return nil
+	return SimulationImportResult{}
 }
 
 type HoverflySimulationErrorStub struct{}
@@ -83,10 +83,28 @@ func (this HoverflySimulationErrorStub) GetFilteredSimulation(urlPattern string)
 
 func (this *HoverflySimulationErrorStub) DeleteSimulation() {}
 
-func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationViewV5) error {
-	indent, _ := json.MarshalIndent(simulation, "", "    ")
-	fmt.Println(string(indent))
-	return fmt.Errorf("error")
+func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationViewV5) SimulationImportResult {
+	return SimulationImportResult{
+		err: fmt.Errorf("error"),
+	}
+}
+
+type HoverflySimulationWarningStub struct{}
+
+func (this HoverflySimulationWarningStub) GetSimulation() (SimulationViewV5, error) {
+	return SimulationViewV5{}, fmt.Errorf("error")
+}
+
+func (this HoverflySimulationWarningStub) GetFilteredSimulation(urlPattern string) (SimulationViewV5, error) {
+	return SimulationViewV5{}, fmt.Errorf("error")
+}
+
+func (this *HoverflySimulationWarningStub) DeleteSimulation() {}
+
+func (this *HoverflySimulationWarningStub) PutSimulation(simulation SimulationViewV5) SimulationImportResult {
+	return SimulationImportResult{
+		WarningMessages: []SimulationImportWarning{{"This is a warning", "url"}},
+	}
 }
 
 func TestSimulationHandler_Get_ReturnsSimulation(t *testing.T) {
@@ -408,6 +426,57 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonIsNotValid(t *testing.T) {
 	Expect(errorView.Error).To(Equal("Invalid JSON"))
 }
 
+func TestSimulationHandler_Put_ReturnsWarnings(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationWarningStub{}
+
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`
+		{
+			"data": {
+				"pairs": [
+					{
+						"request": {
+							"destination": {
+								"exactMatch": "test.org"
+							}
+						},
+						"response": {
+							"status": 200
+						}
+					}
+				],
+	
+				"globalActions": {
+					"delays": [
+						{
+							"urlPattern": "test.org",
+							"httpMethod": "GET",
+							"delay": 200
+						}
+					]
+				}
+			},
+			"meta": {
+				"schemaVersion": "v3"
+			}
+		}
+		`))))
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Put, request)
+
+	resultView, err := unmarshalResultView(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(response.Result().StatusCode).To(Equal(http.StatusOK))
+	Expect(resultView.WarningMessages[0].Message).To(Equal("This is a warning"))
+	Expect(resultView.WarningMessages[0].DocsLink).To(Equal("url"))
+
+}
+
 func Test_SimulationHandler_Options_GetsOptions(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -452,4 +521,20 @@ func unmarshalSimulationViewV5(buffer *bytes.Buffer) (SimulationViewV5, error) {
 	}
 
 	return simulationView, nil
+}
+
+func unmarshalResultView(buffer *bytes.Buffer) (SimulationImportResult, error) {
+	body, err := ioutil.ReadAll(buffer)
+	if err != nil {
+		return SimulationImportResult{}, err
+	}
+
+	var result SimulationImportResult
+
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return SimulationImportResult{}, err
+	}
+
+	return result, nil
 }
