@@ -1,3 +1,6 @@
-"path": {
-	"exactMatch": "/foo/baz/bar/spam"
-},
+"path": [
+	{
+	   "matcher": "exact",
+	   "value": "/foo/baz/bar/spam"
+	}
+ ]
