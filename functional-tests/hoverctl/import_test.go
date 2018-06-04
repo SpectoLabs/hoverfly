@@ -99,7 +99,7 @@ var _ = Describe("When I import with hoverctl", func() {
 			Expect(err).To(BeNil())
 
 			output := functional_tests.Run(hoverctlBinary, "import", fileName)
-			Expect(output).To(ContainSubstring("WARNING: Usage of depricated field `deprecatedQuery` on data.pairs[0].request.deprecatedQuery, please update your simulation to use `query` field"))
+			Expect(output).To(ContainSubstring("WARNING: Usage of deprecated field `deprecatedQuery` on data.pairs[0].request.deprecatedQuery, please update your simulation to use `query` field"))
 			Expect(output).To(ContainSubstring("https://hoverfly.readthedocs.io/en/latest/pages/troubleshooting/troubleshooting.html#why-does-my-simulation-have-a-deprecatedquery-field"))
 			Expect(output).To(ContainSubstring("Successfully imported simulation "))
 
