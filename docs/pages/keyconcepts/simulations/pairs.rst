@@ -17,7 +17,7 @@ When Hoverfly captures a request, it creates a Request Matcher for each field in
 the request field name, the type of match which will be used to compare the field in the incoming request to the field in the stored
 request, and the request field value.
  
-By default, Hoverfly will set the type of match to :code:`exactMatch` for each field. 
+By default, Hoverfly will set the type of match to :code:`exact` for each field. 
 
 .. seealso::
 
@@ -33,19 +33,19 @@ An example Request Matcher Set might look like this:
 +-------------+-------------+------------------------------------+
 | Field       | Matcher Type| Value                              |
 +=============+=============+====================================+
-| scheme      | exactMatch  | "https"                            |
+| scheme      | exact       | "https"                            |
 +-------------+-------------+------------------------------------+
-| method      | exactMatch  | "GET"                              |
+| method      | exact       | "GET"                              |
 +-------------+-------------+------------------------------------+
-| destination | exactMatch  | "docs.hoverfly.io"                 |         
+| destination | exact       | "docs.hoverfly.io"                 |         
 +-------------+-------------+------------------------------------+
-| path        | exactMatch  | "/pages/keyconcepts/templates.html"|
+| path        | exact       | "/pages/keyconcepts/templates.html"|
 +-------------+-------------+------------------------------------+
-| query       | exactMatch  | "query=true"                       |
+| query       | exact       | "query=true"                       |
 +-------------+-------------+------------------------------------+
-| body        | exactMatch  | ""                                 |
+| body        | exact       | ""                                 |
 +-------------+-------------+------------------------------------+
-| headers     | exactMatch  |                                    |
+| headers     | exact       |                                    |
 +-------------+-------------+------------------------------------+
 
 In the Hoverfly simulation JSON file, this Request Matcher Set would be represented like this: 
@@ -119,7 +119,7 @@ Responses
 Each Request Matcher Set has a response associated with is. If the request match is successful, Hoverfly will return the response to the client.
 
 .. literalinclude:: ../../simulations/basic-simulation.json
-   :lines: 5-15
+   :lines: 45-55
    :linenos:
    :language: javascript
 
@@ -134,7 +134,7 @@ Since JSON does not support binary data, binary responses are base64 encoded. Th
 Hoverfly automatically encodes and decodes the data during the export and import phases.
 
 .. literalinclude:: ../../simulations/basic-encoded-simulation.json
-   :lines: 7-8
+   :lines: 47-48
    :linenos:
    :language: javascript
 
