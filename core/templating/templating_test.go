@@ -3,10 +3,11 @@ package templating_test
 import (
 	"testing"
 
+	"time"
+
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/templating"
 	. "github.com/onsi/gomega"
-	"time"
 )
 
 func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
@@ -204,4 +205,105 @@ func TestTemplatingWithHelperMethodsForDates(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(template).To(Equal(time.Now().AddDate(0, 0, 2).UTC().Format("2006-01-02T15:04:05Z07:00")))
+}
+
+func Test_ApplyTemplate_randomString(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{randomString}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{randomString}}`))))
+}
+
+func Test_ApplyTemplate_randomStringLength(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{randomStringLength 2}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{randomStringLength 2}}`))))
+	Expect(template).To(HaveLen(2))
+}
+
+func Test_ApplyTemplate_randomBoolean(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{randomBoolean}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{randomBoolean}}`))))
+}
+
+func Test_ApplyTemplate_randomInteger(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{randomInteger}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{randomInteger}}`))))
+}
+
+func Test_ApplyTemplate_randomIntegerRange(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{randomIntegerRange 7 8}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{randomIntegerRange 7 8}}`))))
+}
+
+func Test_ApplyTemplate_randomFloat(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{randomFloat}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{randomFloat}}`))))
+}
+
+func Test_ApplyTemplate_randomFloatRange(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{randomFloatRange 7.0 8.0}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{randomFloatRange 7.0 8.0}}`))))
+}
+
+func Test_ApplyTemplate_randomEmail(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{randomEmai}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{randomEmail}}`))))
+}
+
+func Test_ApplyTemplate_randomIPv4(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{randomIPv4}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{randomIPv4}}`))))
+}
+
+func Test_ApplyTemplate_randomIPv6(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{randomIPv6}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{randomIPv6}}`))))
 }
