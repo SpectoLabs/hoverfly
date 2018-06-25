@@ -28,6 +28,15 @@ func randomStringLength(length int) string {
 func randomBoolean() string {
 	return strconv.FormatBool(util.RandomBoolean())
 }
+
+func randomInteger() string {
+	return strconv.Itoa(util.RandomInteger())
+}
+
+func randomIntegerRange(min, max int) string {
+	return strconv.Itoa(util.RandomIntegerRange(min, max))
+}
+
 func randomEmail() string {
 	return fake.EmailAddress()
 }
