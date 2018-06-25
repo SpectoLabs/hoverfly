@@ -16,9 +16,7 @@ const (
 
 func RandomString() string {
 	rand.Seed(time.Now().Unix())
-	min := 3
-	max := 16
-	return RandomStringWithLength(rand.Intn(max-min) + min)
+	return RandomStringWithLength(RandomIntegerRange(3, 16))
 }
 
 func RandomStringWithLength(length int) string {
@@ -36,6 +34,16 @@ func RandomStringWithLength(length int) string {
 	}
 
 	return string(b)
+}
+
+func RandomInteger() int {
+	rand.Seed(time.Now().Unix())
+	return rand.Int()
+}
+
+func RandomIntegerRange(min, max int) int {
+	rand.Seed(time.Now().Unix())
+	return rand.Intn(max-min) + min
 }
 
 func RandomBoolean() bool {
