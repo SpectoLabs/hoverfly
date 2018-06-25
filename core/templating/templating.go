@@ -3,10 +3,12 @@ package templating
 import (
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/aymerick/raymond"
 	"strconv"
 	"time"
+
+	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/aymerick/raymond"
 )
 
 type TemplatingData struct {
@@ -35,6 +37,14 @@ func NewTemplator() *Templator {
 		raymond.RegisterHelper("iso8601DateTimePlusDays", func(days string) string {
 			atoi, _ := strconv.Atoi(days)
 			return time.Now().AddDate(0, 0, atoi).UTC().Format("2006-01-02T15:04:05Z07:00")
+		})
+
+		raymond.RegisterHelper("randomString", func() string {
+			return util.RandomString()
+		})
+
+		raymond.RegisterHelper("randomStringLength", func(length int) string {
+			return util.RandomStringWithLength(length)
 		})
 
 		helpersRegistered = true
