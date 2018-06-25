@@ -69,6 +69,12 @@
   revision = "24bf3506bb5e25bf9fe26f644872f77656d51b57"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/corpix/uarand"
+  packages = ["."]
+  revision = "2b8494104d86337cdd41d0a49cbed8e4583c0ab4"
+
+[[projects]]
   name = "github.com/dghubble/sling"
   packages = ["."]
   revision = "5765fe1bdc176ae984b074c8a89980d1f16e6dd8"
@@ -134,6 +140,12 @@
     "json/token"
   ]
   revision = "9a905a34e6280ce905da1a32344b25e81011197a"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/icrowley/fake"
+  packages = ["."]
+  revision = "4178557ae428460c3780a381c824a1f3aceb6325"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -373,6 +385,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "367ec95d16c9675bad0edae14fc113418ea6a5ce3dc734864fb212146aa12244"
+  inputs-digest = "6f8c9123a4fce5abf3b18d9bbff2447315b904934c46063bb35ab9e8574f1c93"
   solver-name = "gps-cdcl"
   solver-version = 1
