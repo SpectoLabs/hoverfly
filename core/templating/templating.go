@@ -3,11 +3,7 @@ package templating
 import (
 	"strings"
 
-	"strconv"
-	"time"
-
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/aymerick/raymond"
 )
 
@@ -30,22 +26,10 @@ var helpersRegistered = false
 func NewTemplator() *Templator {
 
 	if !helpersRegistered {
-		raymond.RegisterHelper("iso8601DateTime", func() string {
-			return time.Now().UTC().Format("2006-01-02T15:04:05Z07:00")
-		})
-
-		raymond.RegisterHelper("iso8601DateTimePlusDays", func(days string) string {
-			atoi, _ := strconv.Atoi(days)
-			return time.Now().AddDate(0, 0, atoi).UTC().Format("2006-01-02T15:04:05Z07:00")
-		})
-
-		raymond.RegisterHelper("randomString", func() string {
-			return util.RandomString()
-		})
-
-		raymond.RegisterHelper("randomStringLength", func(length int) string {
-			return util.RandomStringWithLength(length)
-		})
+		raymond.RegisterHelper("iso8601DateTime", iso8601DateTime)
+		raymond.RegisterHelper("iso8601DateTimePlusDays", iso8601DateTimePlusDays)
+		raymond.RegisterHelper("randomString", randomString)
+		raymond.RegisterHelper("randomStringLength", randomStringLength)
 
 		helpersRegistered = true
 	}
