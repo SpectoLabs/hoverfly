@@ -46,6 +46,16 @@ func RandomIntegerRange(min, max int) int {
 	return rand.Intn(max-min) + min
 }
 
+func RandomFloat() float64 {
+	rand.Seed(time.Now().Unix())
+	return rand.Float64()
+}
+
+func RandomFloatRange(min, max float64) float64 {
+	rand.Seed(time.Now().Unix())
+	return min + rand.Float64()*(max-min)
+}
+
 func RandomBoolean() bool {
 	cache := src.Int63()
 	return cache&0x01 == 1
