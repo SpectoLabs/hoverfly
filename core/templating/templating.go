@@ -30,6 +30,10 @@ func NewTemplator() *Templator {
 		raymond.RegisterHelper("iso8601DateTimePlusDays", iso8601DateTimePlusDays)
 		raymond.RegisterHelper("randomString", randomString)
 		raymond.RegisterHelper("randomStringLength", randomStringLength)
+		raymond.RegisterHelper("randomBoolean", randomBoolean)
+		raymond.RegisterHelper("randomEmail", randomEmail)
+		raymond.RegisterHelper("randomIPv4", randomIPv4)
+		raymond.RegisterHelper("randomIPv6", randomIPv6)
 
 		helpersRegistered = true
 	}

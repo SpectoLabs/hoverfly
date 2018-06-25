@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/icrowley/fake"
 )
 
 func iso8601DateTime() string {
@@ -22,4 +23,19 @@ func randomString() string {
 
 func randomStringLength(length int) string {
 	return util.RandomStringWithLength(length)
+}
+
+func randomBoolean() string {
+	return strconv.FormatBool(util.RandomBoolean())
+}
+func randomEmail() string {
+	return fake.EmailAddress()
+}
+
+func randomIPv4() string {
+	return fake.IPv4()
+}
+
+func randomIPv6() string {
+	return fake.IPv6()
 }
