@@ -33,6 +33,8 @@ func NewTemplator() *Templator {
 		raymond.RegisterHelper("randomBoolean", randomBoolean)
 		raymond.RegisterHelper("randomInteger", randomInteger)
 		raymond.RegisterHelper("randomIntegerRange", randomIntegerRange)
+		raymond.RegisterHelper("randomFloat", randomFloat)
+		raymond.RegisterHelper("randomFloatRange", randomFloatRange)
 		raymond.RegisterHelper("randomEmail", randomEmail)
 		raymond.RegisterHelper("randomIPv4", randomIPv4)
 		raymond.RegisterHelper("randomIPv6", randomIPv6)

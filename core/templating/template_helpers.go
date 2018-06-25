@@ -37,6 +37,14 @@ func randomIntegerRange(min, max int) string {
 	return strconv.Itoa(util.RandomIntegerRange(min, max))
 }
 
+func randomFloat() string {
+	return strconv.FormatFloat(util.RandomFloat(), 'f', 6, 64)
+}
+
+func randomFloatRange(min, max float64) string {
+	return strconv.FormatFloat(util.RandomFloatRange(min, max), 'f', 6, 64)
+}
+
 func randomEmail() string {
 	return fake.EmailAddress()
 }
