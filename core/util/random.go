@@ -37,3 +37,8 @@ func RandomStringWithLength(length int) string {
 
 	return string(b)
 }
+
+func RandomBoolean() bool {
+	cache := src.Int63()
+	return cache&0x01 == 1
+}
