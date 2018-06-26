@@ -1,6 +1,7 @@
 package hoverfly_test
 
 import (
+	"io/ioutil"
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
@@ -53,6 +54,76 @@ var _ = Describe("When I run Hoverfly", func() {
 			}`)
 			response := hoverfly.Proxy(sling.New().Get("http://hoverfly.io?query=something%20with%20a%20space"))
 			Expect(response.StatusCode).To(Equal(http.StatusOK))
+		})
+
+		It("should set Content-Length if empty", func() {
+
+			hoverfly.ImportSimulation(`{
+				"data": {
+					"pairs": [
+						{
+							"request": {
+								"path": {
+									"exactMatch": "/path"
+								}
+							},
+							"response": {
+								"status": 200,
+								"body": "OK"
+							}
+						}
+					]
+				},
+				"meta": {
+					"schemaVersion": "v3"
+				}
+			}`)
+			response := hoverfly.Proxy(sling.New().Get("http://hoverfly.io/path"))
+			Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+			body, err := ioutil.ReadAll(response.Body)
+			Expect(err).To(BeNil())
+			Expect(string(body)).To(Equal("OK"))
+
+			Expect(response.Header.Get("Content-Length")).To(Equal("2"))
+			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
+		})
+
+		It("should not set Content-Length if not empty", func() {
+
+			hoverfly.ImportSimulation(`{
+				"data": {
+					"pairs": [
+						{
+							"request": {
+								"path": {
+									"exactMatch": "/path"
+								}
+							},
+							"response": {
+								"status": 200,
+								"body": "OK",
+								"headers": {
+									"Content-Length": ["5555"]
+								}
+							}
+						}
+					]
+				},
+				"meta": {
+					"schemaVersion": "v3"
+				}
+			}`)
+			response := hoverfly.Proxy(sling.New().Get("http://hoverfly.io/path"))
+			Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+			body, err := ioutil.ReadAll(response.Body)
+			Expect(err).To(Not(BeNil()))
+			Expect(err.Error()).To(Equal("unexpected EOF"))
+			Expect(string(body)).To(Equal("OK"))
+
+			Expect(response.Header.Get("Content-length")).To(Equal("5555"))
+			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
 		})
 	})
 
