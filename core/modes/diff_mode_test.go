@@ -1,7 +1,7 @@
 package modes
 
 import (
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -9,8 +9,8 @@ import (
 	"bytes"
 	"encoding/json"
 
+	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
 )
@@ -20,7 +20,7 @@ type hoverflyDiffStub struct{}
 func (this hoverflyDiffStub) DoRequest(request *http.Request) (*http.Response, error) {
 	response := &http.Response{}
 	if request.Host == "error.com" {
-		return nil, errors.New("Could not reach error.com")
+		return nil, fmt.Errorf("Could not reach error.com")
 	}
 
 	if request.Host == "positive-match-with-same-response.com" {
@@ -43,7 +43,7 @@ func (this hoverflyDiffStub) DoRequest(request *http.Request) (*http.Response, e
 	return response, nil
 }
 
-func (this hoverflyDiffStub) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
+func (this hoverflyDiffStub) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError) {
 	if requestDetails.Destination == "positive-match-with-same-response.com" {
 		return &models.ResponseDetails{
 			Status:  200,
@@ -57,9 +57,9 @@ func (this hoverflyDiffStub) GetResponse(requestDetails models.RequestDetails) (
 			Headers: map[string][]string{"header": {"simulated"}, "source": {"simulation"}},
 		}, nil
 	} else {
-		return nil, &matching.MatchingError{
-			Description: "matching-error",
-			StatusCode:  500,
+		return nil, &errors.HoverflyError{
+			Message:    "matching-error",
+			StatusCode: 500,
 		}
 	}
 }

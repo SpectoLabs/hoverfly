@@ -3,13 +3,13 @@ package modes
 import (
 	"net/http"
 
+	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 type HoverflySimulate interface {
-	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
+	GetResponse(models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError)
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
 }
 

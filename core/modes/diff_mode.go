@@ -3,6 +3,8 @@ package modes
 import (
 	"net/http"
 
+	"github.com/SpectoLabs/hoverfly/core/errors"
+
 	log "github.com/Sirupsen/logrus"
 
 	"bytes"
@@ -16,14 +18,13 @@ import (
 	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/dsnet/compress/brotli"
 )
 
 type HoverflyDiff interface {
-	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
+	GetResponse(models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError)
 	DoRequest(*http.Request) (*http.Response, error)
 	AddDiff(requestView v2.SimpleRequestDefinitionView, diffReport v2.DiffReport)
 }

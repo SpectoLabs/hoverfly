@@ -3,15 +3,16 @@ package modes
 import (
 	"net/http"
 
+	"github.com/SpectoLabs/hoverfly/core/errors"
+
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
 type HoverflySpy interface {
-	GetResponse(models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError)
+	GetResponse(models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError)
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
 	DoRequest(*http.Request) (*http.Response, error)
 }
