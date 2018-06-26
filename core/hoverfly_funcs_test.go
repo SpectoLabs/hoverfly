@@ -557,6 +557,38 @@ func Test_Hoverfly_GetResponse_GetNotRecordedRequest(t *testing.T) {
 
 	response, err := unit.GetResponse(requestDetails)
 	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("Could not find a match for request, create or record a valid matcher first!"))
+
+	Expect(response).To(BeNil())
+}
+
+func Test_Hoverfly_GetResponse_Errors_ContentLengthMismatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "hoverfly.io",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "1",
+			Headers: map[string][]string{
+				"Content-Length": []string{"42"},
+			},
+		},
+	})
+
+	response, err := unit.GetResponse(models.RequestDetails{
+		Destination: "hoverfly.io",
+	})
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("Response contains incorrect Content-Length header. Please correct or remove header."))
 
 	Expect(response).To(BeNil())
 }

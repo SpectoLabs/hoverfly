@@ -97,7 +97,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
 		})
 
-		It("should not set Content-Length if not empty", func() {
+		It("should error if Content-Length is incorrect", func() {
 
 			hoverfly.ImportSimulation(`{
 				"data": {
@@ -126,14 +126,17 @@ var _ = Describe("When I run Hoverfly", func() {
 				}
 			}`)
 			response := hoverfly.Proxy(sling.New().Get("https://hoverfly.io/path"))
-			Expect(response.StatusCode).To(Equal(http.StatusOK))
+			Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
 
 			body, err := ioutil.ReadAll(response.Body)
 			Expect(err).To(BeNil())
-			Expect(string(body)).To(Equal("OK"))
+			Expect(string(body)).To(ContainSubstring(`Hoverfly Error!`))
+			Expect(string(body)).To(ContainSubstring(`There was an error when matching`))
+			Expect(string(body)).To(ContainSubstring(`Got error: Response contains incorrect Content-Length header. Please correct or remove header.`))
 
-			// These will always be empty as they are excluded by net/http
-			Expect(response.Header.Get("Content-Length")).To(Equal(""))
+			// Not set or calculated
+			Expect(response.Header.Get("Content-length")).To(Equal(""))
+			// Is set, but not actually added by net/http when building struct
 			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
 		})
 	})
