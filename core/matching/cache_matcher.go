@@ -1,10 +1,9 @@
 package matching
 
 import (
-	"errors"
-
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
@@ -15,11 +14,9 @@ type CacheMatcher struct {
 }
 
 // getResponse returns stored response from cache
-func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models.CachedResponse, *MatchingError) {
+func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models.CachedResponse, *errors.HoverflyError) {
 	if this.RequestCache == nil {
-		return nil, &MatchingError{
-			Description: "No cache set",
-		}
+		return nil, errors.NoCacheSetError()
 	}
 
 	log.Debug("Checking cache for request")
@@ -44,10 +41,7 @@ func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models
 			"method":      req.Method,
 		}).Debug("Failed to retrieve response from cache")
 
-		return nil, &MatchingError{
-			StatusCode:  412,
-			Description: "Could not find recorded request in cache",
-		}
+		return nil, errors.RecordedRequestNotInCacheError()
 	}
 
 	// getting cache response
@@ -58,10 +52,7 @@ func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models
 			"value": string(pairBytes),
 			"key":   key,
 		}).Debug("Failed to decode payload from cache")
-		return nil, &MatchingError{
-			StatusCode:  500,
-			Description: "Failed to decode payload from cache",
-		}
+		return nil, errors.DecodePayloadError()
 	}
 
 	log.WithFields(log.Fields{
@@ -79,9 +70,7 @@ func (this CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 	cacheView := v2.CacheView{}
 
 	if this.RequestCache == nil {
-		return cacheView, &MatchingError{
-			Description: "No cache set",
-		}
+		return cacheView, errors.NoCacheSetError()
 	}
 
 	records, err := this.RequestCache.GetAllEntries()
@@ -124,7 +113,7 @@ func (this CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 // TODO: This would be easier to reason about if we had two methods, "CacheHit" and "CacheHit" in order to reduce bloating
 func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestDetails, pair *models.RequestMatcherResponsePair, matchError *models.MatchError) error {
 	if this.RequestCache == nil {
-		return errors.New("No cache set")
+		return errors.NoCacheSetError()
 	}
 
 	var key string
@@ -164,7 +153,7 @@ func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestD
 
 func (this CacheMatcher) FlushCache() error {
 	if this.RequestCache == nil {
-		return errors.New("No cache set")
+		return errors.NoCacheSetError()
 	}
 
 	return this.RequestCache.DeleteData()
@@ -172,7 +161,7 @@ func (this CacheMatcher) FlushCache() error {
 
 func (this CacheMatcher) PreloadCache(simulation models.Simulation) error {
 	if this.RequestCache == nil {
-		return errors.New("No cache set")
+		return errors.NoCacheSetError()
 	}
 	for _, pair := range simulation.GetMatchingPairs() {
 		if requestDetails := pair.RequestMatcher.ToEagerlyCachable(); requestDetails != nil {
