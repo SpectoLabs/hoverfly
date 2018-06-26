@@ -125,6 +125,44 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(response.Header.Get("Content-length")).To(Equal("5555"))
 			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
 		})
+
+		It("should not set Content-Length if Transfer-Encoding set", func() {
+
+			hoverfly.ImportSimulation(`{
+				"data": {
+					"pairs": [
+						{
+							"request": {
+								"path": {
+									"exactMatch": "/path"
+								}
+							},
+							"response": {
+								"status": 200,
+								"body": "OK",
+								"headers": {
+									"Transfer-Encoding": ["chunked"]
+								}
+							}
+						}
+					]
+				},
+				"meta": {
+					"schemaVersion": "v3"
+				}
+			}`)
+			response := hoverfly.Proxy(sling.New().Get("http://hoverfly.io/path"))
+			Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+			body, err := ioutil.ReadAll(response.Body)
+			Expect(err).To(BeNil())
+			Expect(string(body)).To(Equal("OK"))
+
+			// Should be empty as Transfer-Encoding was set
+			Expect(response.Header.Get("Content-length")).To(Equal(""))
+			// Will always be empty as they are excluded by net/http
+			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
+		})
 	})
 
 	Context("using plain http tunneling", func() {
