@@ -22,3 +22,9 @@ func MatchingFailedError(closestMiss *models.ClosestMiss) *HoverflyError {
 		StatusCode: 412,
 	}
 }
+
+func ContentLengthMismatchError() *HoverflyError {
+	return &HoverflyError{
+		Message: "Response contains incorrect Content-Length header. Please correct or remove header.",
+	}
+}
