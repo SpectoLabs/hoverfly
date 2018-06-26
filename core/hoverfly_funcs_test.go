@@ -593,6 +593,38 @@ func Test_Hoverfly_GetResponse_Errors_ContentLengthMismatch(t *testing.T) {
 	Expect(response).To(BeNil())
 }
 
+func Test_Hoverfly_GetResponse_Errors_ContentLengthAndTransferEncoding(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: "exact",
+					Value:   "hoverfly.io",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "1",
+			Headers: map[string][]string{
+				"Content-Length":    []string{"42"},
+				"Transfer-Encoding": []string{"chunked"},
+			},
+		},
+	})
+
+	response, err := unit.GetResponse(models.RequestDetails{
+		Destination: "hoverfly.io",
+	})
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("Response contains both Content-Length and Transfer-Encoding headers, which is invalid. Please remove one of these headers."))
+
+	Expect(response).To(BeNil())
+}
+
 func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 	RegisterTestingT(t)
 

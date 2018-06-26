@@ -99,6 +99,14 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		hf.state.RemoveState(response.RemovesState)
 	}
 
+	// Check to make sure if Content-Length and Transfer-Encodign header are present
+	// If they are, return Hoverfly error
+	if len(response.Headers["Content-Length"]) > 0 && len(response.Headers["Transfer-Encoding"]) > 0 {
+		return nil, errors.ContentLengthAndTransferEncodingHeaderError()
+	}
+
+	// Check to make sure if Content-Length header is present, it is correct
+	// If not, return Hoverfly error
 	if len(response.Headers["Content-Length"]) > 0 {
 		contentLength, err := strconv.Atoi(response.Headers["Content-Length"][0])
 		if err == nil && contentLength != len(response.Body) {
