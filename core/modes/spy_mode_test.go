@@ -2,12 +2,12 @@ package modes_test
 
 import (
 	"bytes"
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	. "github.com/onsi/gomega"
@@ -19,7 +19,7 @@ type hoverflySpyStub struct{}
 func (this hoverflySpyStub) DoRequest(request *http.Request) (*http.Response, error) {
 	response := &http.Response{}
 	if request.Host == "error.com" {
-		return nil, errors.New("Could not reach error.com")
+		return nil, fmt.Errorf("Could not reach error.com")
 	}
 
 	response.StatusCode = 200
@@ -28,22 +28,22 @@ func (this hoverflySpyStub) DoRequest(request *http.Request) (*http.Response, er
 	return response, nil
 }
 
-func (this hoverflySpyStub) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
+func (this hoverflySpyStub) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError) {
 	if requestDetails.Destination == "positive-match.com" {
 		return &models.ResponseDetails{
 			Status: 200,
 		}, nil
 	} else {
-		return nil, &matching.MatchingError{
-			Description: "matching-error",
-			StatusCode:  500,
+		return nil, &errors.HoverflyError{
+			Message:    "matching-error",
+			StatusCode: 500,
 		}
 	}
 }
 
 func (this hoverflySpyStub) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	if pair.Request.Path == "middleware-error" {
-		return pair, errors.New("middleware-error")
+		return pair, fmt.Errorf("middleware-error")
 	}
 	return pair, nil
 }

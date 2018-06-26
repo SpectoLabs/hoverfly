@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -39,7 +40,7 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 }
 
 // GetResponse returns stored response from cache
-func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
+func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError) {
 
 	var response models.ResponseDetails
 
@@ -47,7 +48,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 	// Get the cached response and return if there is a miss
 	if cacheErr == nil && cachedResponse.MatchingPair == nil {
-		return nil, matching.MissedError(cachedResponse.ClosestMiss)
+		return nil, errors.MatchingFailedError(cachedResponse.ClosestMiss)
 		// If it's cached, use that response
 	} else if cacheErr == nil {
 		response = cachedResponse.MatchingPair.Response
@@ -73,7 +74,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 				"method":      requestDetails.Method,
 			}).Warn("Failed to find matching request from simulation")
 
-			return nil, matching.MissedError(result.Error.ClosestMiss)
+			return nil, errors.MatchingFailedError(result.Error.ClosestMiss)
 		} else {
 			response = result.Pair.Response
 		}
@@ -101,8 +102,8 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	if len(response.Headers["Content-Length"]) > 0 {
 		contentLength, err := strconv.Atoi(response.Headers["Content-Length"][0])
 		if err == nil && contentLength != len(response.Body) {
-			return nil, &matching.MatchingError{
-				Description: "Response contains incorrect Content-Length header. Please correct or remove header.",
+			return nil, &errors.HoverflyError{
+				Message: "Response contains incorrect Content-Length header. Please correct or remove header.",
 			}
 		}
 	}

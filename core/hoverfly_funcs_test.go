@@ -239,8 +239,8 @@ func Test_Hoverfly_GetResponse_WillCacheMisses(t *testing.T) {
 	_, err := unit.GetResponse(requestDetails)
 	Expect(err.Error()).To(Equal("Could not find a match for request, create or record a valid matcher first!"))
 
-	cachedResponse, err := unit.CacheMatcher.GetCachedResponse(&requestDetails)
-	Expect(err).To(BeNil())
+	cachedResponse, matchingErr := unit.CacheMatcher.GetCachedResponse(&requestDetails)
+	Expect(matchingErr).To(BeNil())
 
 	Expect(cachedResponse.MatchingPair).To(BeNil())
 	Expect(cachedResponse.ClosestMiss).To(BeNil())
@@ -282,8 +282,8 @@ func Test_Hoverfly_GetResponse_WillCacheClosestMiss(t *testing.T) {
 	_, err := unit.GetResponse(requestDetails)
 	Expect(err.Error()).ToNot(BeNil())
 
-	cachedResponse, err := unit.CacheMatcher.GetCachedResponse(&requestDetails)
-	Expect(err).To(BeNil())
+	cachedResponse, matchingErr := unit.CacheMatcher.GetCachedResponse(&requestDetails)
+	Expect(matchingErr).To(BeNil())
 
 	Expect(cachedResponse.MatchingPair).To(BeNil())
 	Expect(cachedResponse.ClosestMiss.RequestMatcher.Method[0].Matcher).To(Equal("exact"))

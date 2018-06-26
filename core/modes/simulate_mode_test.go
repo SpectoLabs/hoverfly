@@ -1,12 +1,12 @@
 package modes_test
 
 import (
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/matching"
+	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	. "github.com/onsi/gomega"
@@ -14,22 +14,22 @@ import (
 
 type hoverflySimulateStub struct{}
 
-func (this hoverflySimulateStub) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *matching.MatchingError) {
+func (this hoverflySimulateStub) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError) {
 	if requestDetails.Destination == "positive-match.com" {
 		return &models.ResponseDetails{
 			Status: 200,
 		}, nil
 	} else {
-		return nil, &matching.MatchingError{
-			Description: "matching-error",
-			StatusCode:  500,
+		return nil, &errors.HoverflyError{
+			Message:    "matching-error",
+			StatusCode: 500,
 		}
 	}
 }
 
 func (this hoverflySimulateStub) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	if pair.Request.Path == "middleware-error" {
-		return pair, errors.New("middleware-error")
+		return pair, fmt.Errorf("middleware-error")
 	}
 	return pair, nil
 }
