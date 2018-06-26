@@ -44,12 +44,6 @@ func MatchingFailedError(closestMiss *models.ClosestMiss) *HoverflyError {
 	}
 }
 
-func ContentLengthMismatchError() *HoverflyError {
-	return &HoverflyError{
-		Message: "Response contains incorrect Content-Length header. Please correct or remove header.",
-	}
-}
-
 func MiddlewareNotSetError() *HoverflyError {
 	return &HoverflyError{
 		Message: "Cannot execute middleware as middleware has not been correctly set",
