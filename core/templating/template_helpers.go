@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/satori/go.uuid"
+	"github.com/pborman/uuid"
 
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/icrowley/fake"
@@ -60,5 +60,5 @@ func randomIPv6() string {
 }
 
 func randomUuid() string {
-	return uuid.NewV4().String()
+	return uuid.New()
 }
