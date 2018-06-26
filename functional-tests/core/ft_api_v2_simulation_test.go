@@ -430,5 +430,17 @@ var _ = Describe("/api/v2/simulation", func() {
 			responseBody, _ := ioutil.ReadAll(response.Body)
 			Expect(string(responseBody)).To(ContainSubstring("WARNING: Response contains both Content-Length and Transfer-Encoding headers on data.pairs[0].response, please remove one of these headers"))
 		})
+
+		It("should warn when importing responses with content length that is incorrect", func() {
+			request := sling.New().Put("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+			payload := bytes.NewBufferString(testdata.IncorrectContentLength)
+
+			request.Body(payload)
+			response := functional_tests.DoRequest(request)
+			Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+			responseBody, _ := ioutil.ReadAll(response.Body)
+			Expect(string(responseBody)).To(ContainSubstring("WARNING: Response contains incorrect Content-Length header on data.pairs[0].response, please correct or remove header"))
+		})
 	})
 })

@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"io/ioutil"
@@ -154,6 +155,13 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 
 			if len(pairView.Response.Headers["Content-Length"]) > 0 && len(pairView.Response.Headers["Transfer-Encoding"]) > 0 {
 				importResult.AddContentLengthAndTransferEncodingWarning(i)
+			}
+
+			if len(pairView.Response.Headers["Content-Length"]) > 0 {
+				contentLength, err := strconv.Atoi(pairView.Response.Headers["Content-Length"][0])
+				if err == nil && contentLength != len(pairView.Response.Body) {
+					importResult.AddContentLengthMismatchWarning(i)
+				}
 			}
 
 			continue
