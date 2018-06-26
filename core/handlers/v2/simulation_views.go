@@ -150,6 +150,7 @@ func BuildSimulationView(pairViews []RequestMatcherResponsePairViewV5, delayView
 
 const deprecatedQueryMessage = "Usage of deprecated field `deprecatedQuery` on data.pairs[%v].request.deprecatedQuery, please update your simulation to use `query` field"
 const deprecatedQueryDocs = "https://hoverfly.readthedocs.io/en/latest/pages/troubleshooting/troubleshooting.html#why-does-my-simulation-have-a-deprecatedquery-field"
+const ContentLengthAndTransferEncodingMessage = "Response contains both Content-Length and Transfer-Encoding headers on data.pairs[%v].response, please remove one of these headers"
 
 type SimulationImportResult struct {
 	err             error                     `json:"error,omitempty"`
@@ -175,4 +176,12 @@ func (s *SimulationImportResult) AddDeprecatedQueryWarning(requestNumber int) {
 		s.WarningMessages = []SimulationImportWarning{}
 	}
 	s.WarningMessages = append(s.WarningMessages, SimulationImportWarning{Message: warning, DocsLink: deprecatedQueryDocs})
+}
+
+func (s *SimulationImportResult) AddContentLengthAndTransferEncodingWarning(requestNumber int) {
+	warning := fmt.Sprintf("WARNING: %s", fmt.Sprintf(ContentLengthAndTransferEncodingMessage, requestNumber))
+	if s.WarningMessages == nil {
+		s.WarningMessages = []SimulationImportWarning{}
+	}
+	s.WarningMessages = append(s.WarningMessages, SimulationImportWarning{Message: warning})
 }
