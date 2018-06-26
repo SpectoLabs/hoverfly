@@ -49,3 +49,9 @@ func ContentLengthMismatchError() *HoverflyError {
 		Message: "Response contains incorrect Content-Length header. Please correct or remove header.",
 	}
 }
+
+func ContentLengthAndTransferEncodingHeaderError() *HoverflyError {
+	return &HoverflyError{
+		Message: "Response contains both Content-Length and Transfer-Encoding headers, which is invalid. Please remove one of these headers.",
+	}
+}
