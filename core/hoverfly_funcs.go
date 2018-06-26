@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -97,15 +96,6 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	}
 	if response.RemovesState != nil {
 		hf.state.RemoveState(response.RemovesState)
-	}
-
-	// Check to make sure if Content-Length header is present, it is correct
-	// If not, return Hoverfly error
-	if len(response.Headers["Content-Length"]) > 0 {
-		contentLength, err := strconv.Atoi(response.Headers["Content-Length"][0])
-		if err == nil && contentLength != len(response.Body) {
-			return nil, errors.ContentLengthMismatchError()
-		}
 	}
 
 	return &response, nil

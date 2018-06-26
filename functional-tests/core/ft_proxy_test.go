@@ -114,16 +114,16 @@ var _ = Describe("When I run Hoverfly", func() {
 					"schemaVersion": "v3"
 				}
 			}`)
+
 			response := hoverfly.Proxy(sling.New().Get("http://hoverfly.io/path"))
-			Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
+			Expect(response.StatusCode).To(Equal(http.StatusOK))
 
 			body, err := ioutil.ReadAll(response.Body)
-			Expect(err).To(BeNil())
-			Expect(string(body)).To(ContainSubstring(`Hoverfly Error!`))
-			Expect(string(body)).To(ContainSubstring(`There was an error when matching`))
-			Expect(string(body)).To(ContainSubstring(`Got error: Response contains incorrect Content-Length header. Please correct or remove header.`))
+			Expect(err).To(Not(BeNil()))
+			Expect(err.Error()).To(Equal("unexpected EOF"))
+			Expect(string(body)).To(Equal("OK"))
 
-			Expect(response.Header.Get("Content-length")).To(Equal("145"))
+			Expect(response.Header.Get("Content-length")).To(Equal("5555"))
 			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
 		})
 
@@ -152,6 +152,7 @@ var _ = Describe("When I run Hoverfly", func() {
 					"schemaVersion": "v3"
 				}
 			}`)
+
 			response := hoverfly.Proxy(sling.New().Get("http://hoverfly.io/path"))
 			Expect(response.StatusCode).To(Equal(http.StatusOK))
 
