@@ -84,6 +84,8 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		responseBody, err := hf.templator.ApplyTemplate(&requestDetails, hf.state.State, response.Body)
 		if err == nil {
 			response.Body = responseBody
+		} else {
+			log.Warn("Response Template " + err.Error())
 		}
 	}
 
