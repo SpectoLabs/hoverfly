@@ -284,7 +284,6 @@ func Test_ApplyTemplate_randomEmail(t *testing.T) {
 	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{randomEmai}}`)
 
 	Expect(err).To(BeNil())
-
 	Expect(template).To(Not(Equal(ContainSubstring(`{{randomEmail}}`))))
 }
 
@@ -306,4 +305,14 @@ func Test_ApplyTemplate_randomIPv6(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(template).To(Not(Equal(ContainSubstring(`{{randomIPv6}}`))))
+}
+
+func Test_ApplyTemplate_randomUuid(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{randomUuid}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{randomUuid}}`))))
 }

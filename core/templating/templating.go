@@ -38,6 +38,7 @@ func NewTemplator() *Templator {
 		raymond.RegisterHelper("randomEmail", randomEmail)
 		raymond.RegisterHelper("randomIPv4", randomIPv4)
 		raymond.RegisterHelper("randomIPv6", randomIPv6)
+		raymond.RegisterHelper("randomUuid", randomUuid)
 
 		helpersRegistered = true
 	}
