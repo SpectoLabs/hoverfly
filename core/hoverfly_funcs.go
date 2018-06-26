@@ -102,9 +102,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	if len(response.Headers["Content-Length"]) > 0 {
 		contentLength, err := strconv.Atoi(response.Headers["Content-Length"][0])
 		if err == nil && contentLength != len(response.Body) {
-			return nil, &errors.HoverflyError{
-				Message: "Response contains incorrect Content-Length header. Please correct or remove header.",
-			}
+			return nil, errors.ContentLengthMismatchError()
 		}
 	}
 
