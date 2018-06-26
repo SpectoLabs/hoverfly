@@ -418,5 +418,17 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(string(responseBody)).To(ContainSubstring("WARNING: Usage of deprecated field `deprecatedQuery` on data.pairs[1].request.deprecatedQuery, please update your simulation to use `query` field"))
 			Expect(string(responseBody)).To(ContainSubstring("https://hoverfly.readthedocs.io/en/latest/pages/troubleshooting/troubleshooting.html#why-does-my-simulation-have-a-deprecatedquery-field"))
 		})
+
+		It("should warn when importing responses with content length and encoding", func() {
+			request := sling.New().Put("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+			payload := bytes.NewBufferString(testdata.ContentLengthAndTransferEncoding)
+
+			request.Body(payload)
+			response := functional_tests.DoRequest(request)
+			Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+			responseBody, _ := ioutil.ReadAll(response.Body)
+			Expect(string(responseBody)).To(ContainSubstring("WARNING: Response contains both Content-Length and Transfer-Encoding headers on data.pairs[0].response, please remove one of these headers"))
+		})
 	})
 })
