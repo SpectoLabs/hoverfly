@@ -50,12 +50,6 @@ func ContentLengthMismatchError() *HoverflyError {
 	}
 }
 
-func ContentLengthAndTransferEncodingHeaderError() *HoverflyError {
-	return &HoverflyError{
-		Message: "Response contains both Content-Length and Transfer-Encoding headers, which is invalid. Please remove one of these headers.",
-	}
-}
-
 func MiddlewareNotSetError() *HoverflyError {
 	return &HoverflyError{
 		Message: "Cannot execute middleware as middleware has not been correctly set",
