@@ -11,6 +11,27 @@ func (err HoverflyError) Error() string {
 	return err.Message
 }
 
+func NoCacheSetError() *HoverflyError {
+	return &HoverflyError{
+		Message:    "No cache set",
+		StatusCode: 412,
+	}
+}
+
+func RecordedRequestNotInCacheError() *HoverflyError {
+	return &HoverflyError{
+		Message:    "Could not find recorded request in cache",
+		StatusCode: 412,
+	}
+}
+
+func DecodePayloadError() *HoverflyError {
+	return &HoverflyError{
+		Message:    "Failed to decode payload from cache",
+		StatusCode: 500,
+	}
+}
+
 func MatchingFailedError(closestMiss *models.ClosestMiss) *HoverflyError {
 	message := "Could not find a match for request, create or record a valid matcher first!"
 

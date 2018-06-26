@@ -54,12 +54,3 @@ func isCachable(requestMatch *models.RequestMatcherResponsePair, matchedOnAllBut
 
 	return true
 }
-
-type MatchingError struct {
-	StatusCode  int
-	Description string
-}
-
-func (this MatchingError) Error() string {
-	return this.Description
-}
