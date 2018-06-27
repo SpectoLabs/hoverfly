@@ -124,6 +124,9 @@ workflows:
   pipeline:
     jobs:
       - build
+          filters:
+            tags:
+              only: /.*/
       - deploy-master:
           requires:
             - build
@@ -131,6 +134,8 @@ workflows:
             branches:
               only: master
       - deploy-release:
+          requires:
+            - build
           filters:
             tags:
               only: /.*/
