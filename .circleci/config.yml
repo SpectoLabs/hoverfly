@@ -123,7 +123,7 @@ workflows:
   version: 2
   pipeline:
     jobs:
-      - build
+      - build:
           filters:
             tags:
               only: /.*/
