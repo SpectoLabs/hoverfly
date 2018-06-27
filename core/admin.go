@@ -70,7 +70,6 @@ func (this *AdminApi) addDashboardRoutes(router *bone.Mux) *bone.Mux {
 	}
 
 	indexHandler := func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("index.html")
 		file, err := statikFS.Open("/index.html")
 		if err != nil {
 			w.WriteHeader(500)
