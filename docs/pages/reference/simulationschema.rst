@@ -3,7 +3,7 @@
 Simulation schema
 =================
 
-This is the JSON schema for v2 Hoverfly simulations.
+This is the JSON schema for v5 Hoverfly simulations.
 
 .. code:: json
 
@@ -26,21 +26,10 @@ This is the JSON schema for v2 Hoverfly simulations.
       },
       "field-matchers": {
         "properties": {
-          "exactMatch": {
+          "matcher": {
             "type": "string"
           },
-          "globMatch": {
-            "type": "string"
-          },
-          "jsonMatch": {
-            "type": "string"
-          },
-          "regexMatch": {
-            "type": "string"
-          },
-          "xpathMatch": {
-            "type": "string"
-          }
+          "value": {}
         },
         "type": "object"
       },
@@ -65,31 +54,67 @@ This is the JSON schema for v2 Hoverfly simulations.
             "type": "string"
           }
         },
-        "required": [
-          "schemaVersion"
-        ],
+        "required": ["schemaVersion"],
         "type": "object"
       },
       "request": {
         "properties": {
           "body": {
-            "$ref": "#/definitions/field-matchers"
+            "items": {
+              "$ref": "#/definitions/field-matchers"
+            },
+            "type": "array"
           },
           "destination": {
-            "$ref": "#/definitions/field-matchers"
+            "items": {
+              "$ref": "#/definitions/field-matchers"
+            },
+            "type": "array"
           },
           "headers": {
-            "$ref": "#/definitions/headers"
+            "$ref": "#/definitions/request-headers"
           },
           "path": {
-            "$ref": "#/definitions/field-matchers"
+            "items": {
+              "$ref": "#/definitions/field-matchers"
+            },
+            "type": "array"
           },
           "query": {
-            "$ref": "#/definitions/field-matchers"
+            "$ref": "#/definitions/request-queries"
+          },
+          "requiresState": {
+            "patternProperties": {
+              ".{1,}": {
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "scheme": {
-            "$ref": "#/definitions/field-matchers"
+            "items": {
+              "$ref": "#/definitions/field-matchers"
+            },
+            "type": "array"
           }
+        },
+        "type": "object"
+      },
+      "request-headers": {
+        "additionalProperties": {
+          "items": {
+            "$ref": "#/definitions/field-matchers"
+          },
+          "type": "array"
+        },
+        "type": "object"
+      },
+      "request-queries": {
+        "additionalProperties": {
+          "items": {
+            "$ref": "#/definitions/field-matchers"
+          },
+          "type": "array"
         },
         "type": "object"
       },
@@ -102,10 +127,7 @@ This is the JSON schema for v2 Hoverfly simulations.
             "$ref": "#/definitions/response"
           }
         },
-        "required": [
-          "request",
-          "response"
-        ],
+        "required": ["request", "response"],
         "type": "object"
       },
       "response": {
@@ -119,11 +141,22 @@ This is the JSON schema for v2 Hoverfly simulations.
           "headers": {
             "$ref": "#/definitions/headers"
           },
+          "removesState": {
+            "type": "array"
+          },
           "status": {
             "type": "integer"
           },
           "templated": {
             "type": "boolean"
+          },
+          "transitionsState": {
+            "patternProperties": {
+              ".{1,}": {
+                "type": "string"
+              }
+            },
+            "type": "object"
           }
         },
         "type": "object"
@@ -157,9 +190,6 @@ This is the JSON schema for v2 Hoverfly simulations.
         "$ref": "#/definitions/meta"
       }
     },
-    "required": [
-      "data",
-      "meta"
-    ],
+    "required": ["data", "meta"],
     "type": "object"
   }
