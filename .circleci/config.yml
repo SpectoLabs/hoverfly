@@ -1,0 +1,140 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.10
+      - image: circleci/node:6.10.3
+
+    environment:
+      GOPATH: /go
+
+    working_directory: /go/src/github.com/SpectoLabs/hoverfly
+
+    steps:
+      - checkout
+      - run:
+          name: Install Ruby
+          command: |
+            sudo apt-get install ruby -f
+      - run:
+          name: Install Node
+          command: |
+            sudo apt-get install nodejs -f
+            sudo ln -s /usr/bin/nodejs /usr/bin/node
+      - run:
+          name: Test
+          command: |
+            make test
+
+  deploy-master:
+    docker:
+      - image: circleci/golang:1.10
+
+    environment:
+      GOPATH: /go
+
+    working_directory: /go/src/github.com/SpectoLabs/hoverfly
+
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run:
+          name: Make build
+          command: |
+            GIT_TAG_NAME=master-$CIRCLE_BUILD_NUM make build
+      - run:
+          name: Build and push master Docker image
+          command: |
+            docker build -t spectolabs/hoverfly:master  -f core/Dockerfile .
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push spectolabs/hoverfly:master
+      - run:
+          name: Install gox
+          command: |
+            go get github.com/mitchellh/gox
+      - run:
+          name: Install gcloud
+          command: |
+            echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
+            curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-207.0.0-linux-x86_64.tar.gz | tar xz
+            ./google-cloud-sdk/install.sh -q --path-update true
+            ./google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+            ./google-cloud-sdk/bin/gcloud config set project $GCLOUD_PROJECT
+            ./google-cloud-sdk/bin/gcloud init
+      - run:
+          name: Build cross platform releases
+          command: |
+            GIT_TAG_NAME=master-$CIRCLE_BUILD_NUM SHELL=/bin/bash $GOPATH/src/github.com/SpectoLabs/hoverfly/build-release.sh
+      - run:
+          name: Upload dated cross platform releases to GCS
+          command: |
+            cd $GOPATH/src/github.com/SpectoLabs/hoverfly/target && for f in hoverfly_bundle*;do ../google-cloud-sdk/bin/gsutil cp $f gs://hoverfly-master-builds/$(date +%Y%m%d%H%M)/$f; done
+      - run:
+          name: Upload latest cross platform releases to GCS
+          command: |
+            cd $GOPATH/src/github.com/SpectoLabs/hoverfly/target && for f in hoverfly_bundle*;do ../google-cloud-sdk/bin/gsutil cp $f gs://hoverfly-master-builds/latest/$f; done
+      - run:
+          name: Set read access in GCS            
+          command: |
+            ./google-cloud-sdk/bin/gsutil -m acl set -R -a public-read gs://hoverfly-master-builds
+
+  deploy-release:
+    docker:
+      - image: circleci/golang:1.10
+
+    environment:
+      GOPATH: /go
+
+    working_directory: /go/src/github.com/SpectoLabs/hoverfly
+
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run:
+          name: Make build
+          command: |
+            GIT_TAG_NAME=master-$CIRCLE_BUILD_NUM make build
+      - run:
+          name: Build and push master Docker image
+          command: |
+            docker build -t spectolabs/hoverfly:$CIRCLE_TAG -f core/Dockerfile .
+            docker tag spectolabs/hoverfly:$CIRCLE_TAG spectolabs/hoverfly:latest
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push spectolabs/hoverfly:$CIRCLE_TAG
+            docker push spectolabs/hoverfly:latest
+      - run:
+          name: Install gox
+          command: |
+            go get github.com/mitchellh/gox
+      - run:
+          name: Install github-release
+          command: |
+            go get github.com/aktau/github-release
+      - run:
+          name: Build cross platform releases
+          command: |
+            GIT_TAG_NAME=master-$CIRCLE_BUILD_NUM SHELL=/bin/bash $GOPATH/src/github.com/SpectoLabs/hoverfly/build-release.sh
+      - run:
+          name: Upload latest cross platform releases to Github
+          command: |
+            cd $GOPATH/src/github.com/SpectoLabs/hoverfly/target && for f in hoverfly_bundle*;do github-release upload  --user SpectoLabs --repo hoverfly --tag \"$CIRCLE_TAG\" --name \"$f\" --file \"$f\"; done
+
+workflows:
+  version: 2
+  pipeline:
+    jobs:
+      - build
+      - deploy-master:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - deploy-release:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*/
