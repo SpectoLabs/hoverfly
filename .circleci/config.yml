@@ -131,8 +131,6 @@ workflows:
             branches:
               only: master
       - deploy-release:
-          requires:
-            - build
           filters:
             tags:
               only: /.*/
