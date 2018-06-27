@@ -3,8 +3,7 @@ package errors
 import "github.com/SpectoLabs/hoverfly/core/models"
 
 type HoverflyError struct {
-	Message    string
-	StatusCode int
+	Message string
 }
 
 func (err HoverflyError) Error() string {
@@ -13,22 +12,19 @@ func (err HoverflyError) Error() string {
 
 func NoCacheSetError() *HoverflyError {
 	return &HoverflyError{
-		Message:    "No cache set",
-		StatusCode: 412,
+		Message: "No cache set",
 	}
 }
 
 func RecordedRequestNotInCacheError() *HoverflyError {
 	return &HoverflyError{
-		Message:    "Could not find recorded request in cache",
-		StatusCode: 412,
+		Message: "Could not find recorded request in cache",
 	}
 }
 
 func DecodePayloadError() *HoverflyError {
 	return &HoverflyError{
-		Message:    "Failed to decode payload from cache",
-		StatusCode: 500,
+		Message: "Failed to decode payload from cache",
 	}
 }
 
@@ -39,8 +35,7 @@ func MatchingFailedError(closestMiss *models.ClosestMiss) *HoverflyError {
 		message = message + closestMiss.GetMessage()
 	}
 	return &HoverflyError{
-		Message:    message,
-		StatusCode: 412,
+		Message: message,
 	}
 }
 
