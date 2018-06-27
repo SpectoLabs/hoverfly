@@ -117,16 +117,14 @@ jobs:
       - run:
           name: Upload latest cross platform releases to Github
           command: |
-            cd $GOPATH/src/github.com/SpectoLabs/hoverfly/target && for f in hoverfly_bundle*;do github-release upload  --user SpectoLabs --repo hoverfly --tag "$CIRCLE_TAG" --name "$f" --file "$f"; done
+            "cd $GOPATH/src/github.com/SpectoLabs/hoverfly/target && for f in hoverfly_bundle*;do github-release upload  --user SpectoLabs --repo hoverfly --tag \"$CIRCLE_TAG\" --name \"$f\" --file \"$f\"; done"
 
 workflows:
   version: 2
   pipeline:
     jobs:
       - build
-          filters:
-            tags:
-              only: /.*/
+
       - deploy-master:
           requires:
             - build
