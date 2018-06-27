@@ -35,8 +35,7 @@ func (this hoverflySpyStub) GetResponse(requestDetails models.RequestDetails) (*
 		}, nil
 	} else {
 		return nil, &errors.HoverflyError{
-			Message:    "matching-error",
-			StatusCode: 500,
+			Message: "matching-error",
 		}
 	}
 }
