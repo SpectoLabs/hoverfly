@@ -107,7 +107,7 @@ If you have ``deprecatedQuery`` field, you should remove it by splitting it by q
                 "value": "20"
             }
         ],
-        "page": [
+        "pageSize": [
             {
                 "matcher": "exact",
                 "value": "15"
