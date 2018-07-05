@@ -2,14 +2,16 @@ package templating
 
 import (
 	"strings"
+	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/aymerick/raymond"
 )
 
 type TemplatingData struct {
-	Request Request
-	State   map[string]string
+	Request         Request
+	State           map[string]string
+	CurrentDateTime func(string, string, string) string
 }
 
 type Request struct {
@@ -24,21 +26,27 @@ type Templator struct {
 var helpersRegistered = false
 
 func NewTemplator() *Templator {
+	t := templateHelpers{
+		now: time.Now,
+	}
 
 	if !helpersRegistered {
-		raymond.RegisterHelper("iso8601DateTime", iso8601DateTime)
-		raymond.RegisterHelper("iso8601DateTimePlusDays", iso8601DateTimePlusDays)
-		raymond.RegisterHelper("randomString", randomString)
-		raymond.RegisterHelper("randomStringLength", randomStringLength)
-		raymond.RegisterHelper("randomBoolean", randomBoolean)
-		raymond.RegisterHelper("randomInteger", randomInteger)
-		raymond.RegisterHelper("randomIntegerRange", randomIntegerRange)
-		raymond.RegisterHelper("randomFloat", randomFloat)
-		raymond.RegisterHelper("randomFloatRange", randomFloatRange)
-		raymond.RegisterHelper("randomEmail", randomEmail)
-		raymond.RegisterHelper("randomIPv4", randomIPv4)
-		raymond.RegisterHelper("randomIPv6", randomIPv6)
-		raymond.RegisterHelper("randomUuid", randomUuid)
+		raymond.RegisterHelper("iso8601DateTime", t.iso8601DateTime)
+		raymond.RegisterHelper("iso8601DateTimePlusDays", t.iso8601DateTimePlusDays)
+		raymond.RegisterHelper("currentDateTime", t.currentDateTime)
+		raymond.RegisterHelper("currentDateTimeAdd", t.currentDateTimeAdd)
+		raymond.RegisterHelper("currentDateTimeSubtract", t.currentDateTimeSubtract)
+		raymond.RegisterHelper("randomString", t.randomString)
+		raymond.RegisterHelper("randomStringLength", t.randomStringLength)
+		raymond.RegisterHelper("randomBoolean", t.randomBoolean)
+		raymond.RegisterHelper("randomInteger", t.randomInteger)
+		raymond.RegisterHelper("randomIntegerRange", t.randomIntegerRange)
+		raymond.RegisterHelper("randomFloat", t.randomFloat)
+		raymond.RegisterHelper("randomFloatRange", t.randomFloatRange)
+		raymond.RegisterHelper("randomEmail", t.randomEmail)
+		raymond.RegisterHelper("randomIPv4", t.randomIPv4)
+		raymond.RegisterHelper("randomIPv6", t.randomIPv6)
+		raymond.RegisterHelper("randomUuid", t.randomUuid)
 
 		helpersRegistered = true
 	}
@@ -66,6 +74,9 @@ func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails, state m
 			Scheme:     requestDetails.Scheme,
 		},
 		State: state,
+		CurrentDateTime: func(a1, a2, a3 string) string {
+			return a1 + " " + a2 + " " + a3
+		},
 	}
 
 }

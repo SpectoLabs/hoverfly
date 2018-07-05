@@ -10,55 +10,93 @@ import (
 	"github.com/icrowley/fake"
 )
 
-func iso8601DateTime() string {
-	return time.Now().UTC().Format("2006-01-02T15:04:05Z07:00")
+type templateHelpers struct {
+	now func() time.Time
 }
 
-func iso8601DateTimePlusDays(days string) string {
+func (t templateHelpers) iso8601DateTime() string {
+	return t.now().UTC().Format("2006-01-02T15:04:05Z07:00")
+}
+
+func (t templateHelpers) iso8601DateTimePlusDays(days string) string {
 	atoi, _ := strconv.Atoi(days)
-	return time.Now().AddDate(0, 0, atoi).UTC().Format("2006-01-02T15:04:05Z07:00")
+	return t.now().AddDate(0, 0, atoi).UTC().Format("2006-01-02T15:04:05Z07:00")
 }
 
-func randomString() string {
+func (t templateHelpers) currentDateTime(format string) string {
+	formatted := t.now().UTC().Format(format)
+	if formatted == format {
+		return t.now().UTC().Format("2006-01-02T15:04:05Z07:00")
+	}
+	return formatted
+}
+
+func (t templateHelpers) currentDateTimeAdd(addTime string, format string) string {
+	now := t.now()
+	duration, err := ParseDuration(addTime)
+	if err == nil {
+		now = now.Add(duration)
+	}
+	formatted := now.UTC().Format(format)
+	if formatted == format {
+		return now.UTC().Format("2006-01-02T15:04:05Z07:00")
+	}
+	return formatted
+}
+
+func (t templateHelpers) currentDateTimeSubtract(subtractTime string, format string) string {
+	now := t.now()
+	duration, err := ParseDuration(subtractTime)
+	if err == nil {
+		now = now.Add(-duration)
+	}
+	formatted := now.UTC().Format(format)
+	if formatted == format {
+		return now.UTC().Format("2006-01-02T15:04:05Z07:00")
+	}
+	return formatted
+}
+
+func (t templateHelpers) randomString() string {
 	return util.RandomString()
 }
 
-func randomStringLength(length int) string {
+func (t templateHelpers) randomStringLength(length int) string {
 	return util.RandomStringWithLength(length)
 }
 
-func randomBoolean() string {
+func (t templateHelpers) randomBoolean() string {
 	return strconv.FormatBool(util.RandomBoolean())
 }
 
-func randomInteger() string {
+func (t templateHelpers) randomInteger() string {
 	return strconv.Itoa(util.RandomInteger())
 }
 
-func randomIntegerRange(min, max int) string {
+func (t templateHelpers) randomIntegerRange(min, max int) string {
 	return strconv.Itoa(util.RandomIntegerRange(min, max))
 }
 
-func randomFloat() string {
+func (t templateHelpers) randomFloat() string {
 	return strconv.FormatFloat(util.RandomFloat(), 'f', 6, 64)
 }
 
-func randomFloatRange(min, max float64) string {
+func (t templateHelpers) randomFloatRange(min, max float64) string {
 	return strconv.FormatFloat(util.RandomFloatRange(min, max), 'f', 6, 64)
 }
 
-func randomEmail() string {
+func (t templateHelpers) randomEmail() string {
 	return fake.EmailAddress()
 }
 
-func randomIPv4() string {
+func (t templateHelpers) randomIPv4() string {
 	return fake.IPv4()
 }
 
-func randomIPv6() string {
+func (t templateHelpers) randomIPv6() string {
 	return fake.IPv6()
 }
 
-func randomUuid() string {
+func (t templateHelpers) randomUuid() string {
 	return uuid.New()
 }
