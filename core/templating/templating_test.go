@@ -207,6 +207,36 @@ func TestTemplatingWithHelperMethodsForDates(t *testing.T) {
 	Expect(template).To(Equal(time.Now().AddDate(0, 0, 2).UTC().Format("2006-01-02T15:04:05Z07:00")))
 }
 
+func Test_ApplyTemplate_currentDateTime(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{currentDateTime "2006-01-02T15:04:05Z07:00"}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{currentDateTime "2006-01-02T15:04:05Z07:00"}}`))))
+}
+
+func Test_ApplyTemplate_currentDateTimeAdd(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{currentDateTimeAdd "5m" "2006-01-02T15:04:05Z07:00"}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{currentDateTimeAdd "5m" "2006-01-02T15:04:05Z07:00"}}`))))
+}
+
+func Test_ApplyTemplate_currentDateTimeSubtract(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{currentDateTimeSubtract "5m" "2006-01-02T15:04:05Z07:00"}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{currentDateTimeSubtract "5m" "2006-01-02T15:04:05Z07:00"}}`))))
+}
+
 func Test_ApplyTemplate_randomString(t *testing.T) {
 	RegisterTestingT(t)
 
