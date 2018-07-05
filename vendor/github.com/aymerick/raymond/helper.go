@@ -31,6 +31,7 @@ func init() {
 	RegisterHelper("each", eachHelper)
 	RegisterHelper("log", logHelper)
 	RegisterHelper("lookup", lookupHelper)
+	RegisterHelper("equal", equalHelper)
 }
 
 // RegisterHelper registers a global helper. That helper will be available to all templates.
@@ -368,4 +369,14 @@ func logHelper(message string) interface{} {
 // #lookup helper
 func lookupHelper(obj interface{}, field string, options *Options) interface{} {
 	return Str(options.Eval(obj, field))
+}
+
+// #equal helper
+// Ref: https://github.com/aymerick/raymond/issues/7
+func equalHelper(a interface{}, b interface{}, options *Options) interface{} {
+	if Str(a) == Str(b) {
+		return options.Fn()
+	}
+
+	return ""
 }

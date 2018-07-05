@@ -22,6 +22,7 @@ The full API documentation is available here: <http://godoc.org/github.com/aymer
     - [The `with` block helper](#the-with-block-helper)
     - [The `lookup` helper](#the-lookup-helper)
     - [The `log` helper](#the-log-helper)
+    - [The `equal` helper](#the-equal-helper)
   - [Block Helpers](#block-helpers)
     - [Block Evaluation](#block-evaluation)
     - [Conditional](#conditional)
@@ -84,7 +85,7 @@ func main() {
 
     result, err := raymond.Render(tpl, ctx)
     if err != nil {
-        panic("Please fill a bug :)")
+        panic("Please report a bug :)")
     }
 
     fmt.Print(result)
@@ -189,9 +190,9 @@ result := tpl.MustExec(ctx)
 
 The rendering context can contain any type of values, including `array`, `slice`, `map`, `struct` and `func`.
 
-When using structs, be warned that only exported fields are accessible. However you can access exported fields in template with their lowercase names.
+When using structs, be warned that only exported fields are accessible. However you can access exported fields in template with their lowercase names. For example, both `{{author.firstName}}` and `{{Author.FirstName}}` references give the same result, as long as `Author` and `FirstName` are exported struct fields.
 
-For example, both `{{author.firstName}}` and `{{Author.FirstName}}` references give the same result, as long as `Author` and `FirstName` are exported struct fields.
+More, you can use the `handlebars` struct tag to specify a template variable name different from the struct field name.
 
 ```go
 package main
@@ -211,15 +212,9 @@ func main() {
 
   {{#each comments}}
   <h2>By {{author.firstName}} {{author.lastName}}</h2>
-  <div class="body">{{body}}</div>
+  <div class="body">{{content}}</div>
   {{/each}}
 </div>`
-
-    type Post struct {
-        Author   Person
-        Body     string
-        Comments []Comment
-    }
 
     type Person struct {
         FirstName string
@@ -228,7 +223,13 @@ func main() {
 
     type Comment struct {
         Author Person
-        Body   string
+        Body   string `handlebars:"content"`
+    }
+
+    type Post struct {
+        Author   Person
+        Body     string
+        Comments []Comment
     }
 
     ctx := Post{
@@ -261,7 +262,6 @@ Output:
   <div class="body">LOL!</div>
 </div>
 ```
-
 
 ## HTML Escaping
 
@@ -641,6 +641,41 @@ The `log` helper allows for logging while rendering a template.
 ```
 
 Note that the handlebars.js `@level` variable is not supported.
+
+
+#### The `equal` helper
+
+The `equal` helper renders a block if the string version of both arguments are equals.
+
+For example that template:
+
+```html
+{{#equal foo "bar"}}foo is bar{{/equal}}
+{{#equal foo baz}}foo is the same as baz{{/equal}}
+{{#equal nb 0}}nothing{{/equal}}
+{{#equal nb 1}}there is one{{/equal}}
+{{#equal nb "1"}}everything is stringified before comparison{{/equal}}
+```
+
+With that context:
+
+```go
+ctx := map[string]interface{}{
+    "foo": "bar",
+    "baz": "bar",
+    "nb":  1,
+}
+```
+
+Outputs:
+
+```html
+foo is bar
+foo is the same as baz
+
+there is one
+everything is stringified before comparison
+```
 
 
 ### Block Helpers
