@@ -55,8 +55,8 @@
     "lexer",
     "parser"
   ]
-  revision = "a2232af10b53ef1ae5a767f5178db3a6c1dab655"
-  version = "v2.0.1"
+  revision = "2eebd0f5dd9564c0c6e439df11d8a3c7b9b9ab11"
+  version = "v2.0.2"
 
 [[projects]]
   name = "github.com/boltdb/bolt"

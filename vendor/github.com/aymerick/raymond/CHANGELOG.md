@@ -1,5 +1,10 @@
 # Raymond Changelog
 
+### Raymond 2.0.2 _(March 22, 2018)_
+
+- [IMPROVEMENT] Add the #equal helper (#7)
+- [IMPROVEMENT] Add struct tag template variable support (#8)
+
 ### Raymond 2.0.1 _(June 01, 2016)_
 
 - [BUGFIX] Removes data races [#3](https://github.com/aymerick/raymond/issues/3) - Thanks [@markbates](https://github.com/markbates)
