@@ -106,7 +106,7 @@ Example Durations
 +-----------+-------------------+
 | 1h30m     | 1 hour 5 minutes  |
 +-----------+-------------------+
-| 1y10d     | Millisecond       |
+| 1y10d     | 1 year 10 days    |
 +-----------+-------------------+
 
 Date time formats
