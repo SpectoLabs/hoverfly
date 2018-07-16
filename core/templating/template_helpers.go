@@ -5,12 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/aymerick/raymond"
 	"github.com/pborman/uuid"
 	"k8s.io/client-go/util/jsonpath"
 
+	"github.com/ChrisTrenkamp/goxpath"
+	"github.com/ChrisTrenkamp/goxpath/tree/xmltree"
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/icrowley/fake"
@@ -109,7 +112,14 @@ func (t templateHelpers) randomUuid() string {
 
 func (t templateHelpers) requestBody(queryType, query string, options *raymond.Options) string {
 	toMatch := options.Value("request").(Request).body
-	return t.jsonPath(query, toMatch)
+	queryType = strings.ToLower(queryType)
+	if queryType == "jsonpath" {
+		return t.jsonPath(query, toMatch)
+	} else if queryType == "xpath" {
+		return t.xPath(query, toMatch)
+	}
+	log.Errorf("Unknown query type \"%s\" for templating Request.Body", queryType)
+	return ""
 }
 
 func (t templateHelpers) jsonPath(query, toMatch string) string {
@@ -138,6 +148,27 @@ func (t templateHelpers) jsonPath(query, toMatch string) string {
 	}
 
 	return buf.String()
+}
+
+func (t templateHelpers) xPath(query, toMatch string) string {
+	xpathRule, err := goxpath.Parse(query)
+	if err != nil {
+		log.Errorf("Failed to parse xpath query %s: %s", query, err.Error())
+		return ""
+	}
+
+	xTree, err := xmltree.ParseXML(bytes.NewBufferString(toMatch))
+	if err != nil {
+		log.Errorf("Failed to load XML tree: %s", err.Error())
+		return ""
+	}
+
+	results, err := xpathRule.ExecNode(xTree)
+	if err != nil {
+		log.Errorf("Failed to execute xpath match: %s", err.Error())
+		return ""
+	}
+	return results.String()
 }
 
 func prepareJsonPathQuery(query string) string {
