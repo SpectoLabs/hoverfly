@@ -15,8 +15,7 @@ var TemplatingDisabledByDefault = `{
 				"response": {
 					"status": 200,
 					"body": "{{ Request.QueryParam.one }}",
-					"encodedBody": false,
-					"templated": false
+					"encodedBody": false
 				}
 			}
 		],
