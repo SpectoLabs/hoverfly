@@ -55,3 +55,9 @@ func Test_XpathMatch_MatchesTrue_GetElementWithNoValue(t *testing.T) {
 
 	Expect(matchers.XpathMatch("/list/item/field", xml.Header+"<list><item><field></field></item></list>")).To(BeTrue())
 }
+
+func Test_XpathMatch_MatchesTrue_WithoutHeader(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.XpathMatch("/list/item/field", "<list><item><field></field></item></list>")).To(BeTrue())
+}
