@@ -346,3 +346,13 @@ func Test_ApplyTemplate_randomUuid(t *testing.T) {
 
 	Expect(template).To(Not(Equal(ContainSubstring(`{{randomUuid}}`))))
 }
+
+func Test_ApplyTemplate_Request_Body(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := templating.NewTemplator().ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ Request.Body jsonPath "$.test" }}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{Request.Body jsonPath \"$.test\"}}`))))
+}

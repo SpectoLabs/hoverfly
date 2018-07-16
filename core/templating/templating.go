@@ -18,6 +18,8 @@ type Request struct {
 	QueryParam map[string][]string
 	Path       []string
 	Scheme     string
+	Body       func(queryType, query string, options *raymond.Options) string
+	body       string
 }
 
 type Templator struct {
@@ -47,6 +49,7 @@ func NewTemplator() *Templator {
 		raymond.RegisterHelper("randomIPv4", t.randomIPv4)
 		raymond.RegisterHelper("randomIPv6", t.randomIPv6)
 		raymond.RegisterHelper("randomUuid", t.randomUuid)
+		raymond.RegisterHelper("Request.body jsonPath", t.jsonPath)
 
 		helpersRegistered = true
 	}
@@ -72,6 +75,8 @@ func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails, state m
 			Path:       strings.Split(requestDetails.Path, "/")[1:],
 			QueryParam: requestDetails.Query,
 			Scheme:     requestDetails.Scheme,
+			Body:       templateHelpers{}.requestBody,
+			body:       requestDetails.Body,
 		},
 		State: state,
 		CurrentDateTime: func(a1, a2, a3 string) string {
