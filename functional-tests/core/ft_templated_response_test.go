@@ -2,12 +2,17 @@ package hoverfly_test
 
 import (
 	"io/ioutil"
+	"net"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/pborman/uuid"
 )
 
 var _ = Describe("When I run Hoverfly", func() {
@@ -102,4 +107,178 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(string(body)).To(Equal(""))
 		})
 	})
+
+	Context("in simulate mode, template helpers", func() {
+
+		BeforeEach(func() {
+			hoverfly.Start()
+			hoverfly.SetMode("simulate")
+		})
+
+		It("randomString", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomString"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			_, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+		})
+
+		It("randomStringLength10", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomStringLength10"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(len(string(body))).To(Equal(10))
+		})
+
+		It("randomBoolean", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomBoolean"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			_, err = strconv.ParseBool(string(body))
+			Expect(err).To(BeNil())
+		})
+
+		It("randomInteger", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomInteger"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			parsedInt, err := strconv.ParseInt(string(body), 10, 0)
+			Expect(err).To(BeNil())
+
+			Expect(parsedInt > 0).To(BeTrue())
+		})
+
+		It("randomIntegerRange", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomIntegerRange1-10"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			parsedInt, err := strconv.ParseInt(string(body), 10, 0)
+			Expect(err).To(BeNil())
+
+			Expect(parsedInt > 1 && parsedInt < 10).To(BeTrue())
+		})
+
+		It("randomFloat", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomFloat"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			parsedFloat, err := strconv.ParseFloat(string(body), 1)
+			Expect(err).To(BeNil())
+
+			Expect(parsedFloat > 0).To(BeTrue())
+		})
+
+		It("randomFloatRange", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomFloatRange1-10"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			parsedFloat, err := strconv.ParseFloat(string(body), 1)
+			Expect(err).To(BeNil())
+
+			Expect(parsedFloat > 1 && parsedFloat < 10).To(BeTrue())
+		})
+
+		It("randomEmail", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomEmail"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(IsEmail(string(body))).To(BeTrue())
+		})
+
+		It("randomIPv4", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomIPv4"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(IsIPv4(string(body))).To(BeTrue())
+		})
+
+		It("randomIPv6", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomIPv6"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(IsIPv6(string(body))).To(BeTrue())
+		})
+
+		It("randomUuid", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomuuid"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+			returnedUuid := uuid.Parse(string(body))
+
+			Expect(returnedUuid).To(Not(BeNil()))
+		})
+	})
 })
+
+// Credit: https://github.com/asaskevich/govalidator
+func IsIPv4(input string) bool {
+	ip := net.ParseIP(input)
+	return ip != nil && strings.Contains(input, ".")
+}
+
+// Credit: https://github.com/asaskevich/govalidator
+func IsIPv6(input string) bool {
+	ip := net.ParseIP(input)
+	return ip != nil && strings.Contains(input, ":")
+}
+
+// Credit: https://github.com/badoux/checkmai
+func IsEmail(email string) bool {
+	emailRegexp := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+
+	if !emailRegexp.MatchString(email) {
+		return false
+	}
+	return true
+}
