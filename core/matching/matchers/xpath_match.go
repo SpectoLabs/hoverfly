@@ -32,7 +32,10 @@ func XpathExecution(matchString, toMatch string) (tree.NodeSet, error) {
 		return nil, err
 	}
 
-	xTree, err := xmltree.ParseXML(bytes.NewBufferString(toMatch))
+	xTree, err := xmltree.ParseXML(bytes.NewBufferString(toMatch), func(s *xmltree.ParseOptions) {
+		s.Strict = false
+	})
+
 	if err != nil {
 		log.Errorf("Failed to load XML tree: %s", err.Error())
 		return nil, err
