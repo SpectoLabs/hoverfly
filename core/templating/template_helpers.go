@@ -1,11 +1,17 @@
 package templating
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
+	"github.com/aymerick/raymond"
 	"github.com/pborman/uuid"
+	"k8s.io/client-go/util/jsonpath"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/icrowley/fake"
 )
@@ -99,4 +105,45 @@ func (t templateHelpers) randomIPv6() string {
 
 func (t templateHelpers) randomUuid() string {
 	return uuid.New()
+}
+
+func (t templateHelpers) requestBody(queryType, query string, options *raymond.Options) string {
+	toMatch := options.Value("request").(Request).body
+	return t.jsonPath(query, toMatch)
+}
+
+func (t templateHelpers) jsonPath(query, toMatch string) string {
+	query = prepareJsonPathQuery(query)
+
+	jsonPath := jsonpath.New("")
+
+	err := jsonPath.Parse(query)
+	if err != nil {
+		log.Errorf("Failed to parse json path query %s: %s", query, err.Error())
+		return ""
+	}
+
+	var data map[string]interface{}
+	if err := json.Unmarshal([]byte(toMatch), &data); err != nil {
+		log.Errorf("Failed to unmarshal body to JSON: %s", err.Error())
+		return ""
+	}
+
+	buf := new(bytes.Buffer)
+
+	err = jsonPath.Execute(buf, data)
+	if err != nil {
+		log.Errorf("Failed to execute json path match: %s", err.Error())
+		return ""
+	}
+
+	return buf.String()
+}
+
+func prepareJsonPathQuery(query string) string {
+	if string(query[0:1]) != "{" && string(query[len(query)-1:]) != "}" {
+		query = fmt.Sprintf("{%s}", query)
+	}
+
+	return query
 }
