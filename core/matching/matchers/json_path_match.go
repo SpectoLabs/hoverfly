@@ -18,35 +18,38 @@ func JsonPathMatch(match interface{}, toMatch string) bool {
 	}
 
 	matchString = prepareJsonPathQuery(matchString)
+	returnedString, err := JsonPathExecution(matchString, toMatch)
+	if err != nil || returnedString == matchString {
+		return false
+	}
 
+	return true
+}
+
+func JsonPathExecution(matchString, toMatch string) (string, error) {
 	jsonPath := jsonpath.New("")
 
 	err := jsonPath.Parse(matchString)
 	if err != nil {
 		log.Errorf("Failed to parse json path query %s: %s", matchString, err.Error())
-		return false
+		return "", err
 	}
 
 	var data map[string]interface{}
 	if err := json.Unmarshal([]byte(toMatch), &data); err != nil {
 		log.Errorf("Failed to unmarshal body to JSON: %s", err.Error())
-		return false
+		return "", err
 	}
 
 	buf := new(bytes.Buffer)
 
 	err = jsonPath.Execute(buf, data)
 	if err != nil {
-		log.Errorf("Failed to execute json path match: %s", err.Error())
-		return false
+		log.Errorf("err to execute json path match: %s", err.Error())
+		return "", err
 	}
 
-	returnedString := buf.String()
-	if returnedString == matchString {
-		return false
-	}
-
-	return true
+	return buf.String(), nil
 }
 
 func prepareJsonPathQuery(query string) string {
