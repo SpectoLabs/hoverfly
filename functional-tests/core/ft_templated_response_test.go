@@ -277,7 +277,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(err).To(BeNil())
 
 			// TODO: Handle this?
-			Expect(string(body)).To(Equal("{map[] [Request] http %!s(func(string, string, *raymond.Options) string=0x876690) }"))
+			Expect(string(body)).To(Equal("{map[] [Request] http %!s(func(string, string, *raymond.Options) string=0x8766c0)  GET}"))
 		})
 
 		It("Request.Body jsonpath", func() {
@@ -326,6 +326,18 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal(""))
+		})
+
+		It("Request.Method", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request.Method"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Equal("GET"))
 		})
 
 		It("Request.Scheme", func() {

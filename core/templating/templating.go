@@ -20,6 +20,7 @@ type Request struct {
 	Scheme     string
 	Body       func(queryType, query string, options *raymond.Options) string
 	body       string
+	Method     string
 }
 
 type Templator struct {
@@ -77,6 +78,7 @@ func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails, state m
 			Scheme:     requestDetails.Scheme,
 			Body:       templateHelpers{}.requestBody,
 			body:       requestDetails.Body,
+			Method:     requestDetails.Method,
 		},
 		State: state,
 		CurrentDateTime: func(a1, a2, a3 string) string {
