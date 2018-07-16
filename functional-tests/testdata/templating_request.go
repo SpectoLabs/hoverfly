@@ -56,6 +56,22 @@ var TemplatingRequest = `{
 					"path": [
 						{
 							"matcher": "exact",
+							"value": "/Request.Method"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "{{ Request.Method }}",
+					"encodedBody": false,
+					"templated": true
+				}
+			},
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
 							"value": "/Request.Scheme"
 						}
 					]
