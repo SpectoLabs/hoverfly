@@ -1,6 +1,7 @@
 package hoverfly_test
 
 import (
+	"bytes"
 	"io/ioutil"
 	"net"
 	"regexp"
@@ -176,8 +177,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			parsedInt, err := strconv.ParseInt(string(body), 10, 0)
 			Expect(err).To(BeNil())
-
-			Expect(parsedInt > 1 && parsedInt < 10).To(BeTrue())
+			Expect(parsedInt >= 1 && parsedInt <= 10).To(BeTrue())
 		})
 
 		It("randomFloat", func() {
@@ -207,7 +207,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			parsedFloat, err := strconv.ParseFloat(string(body), 1)
 			Expect(err).To(BeNil())
 
-			Expect(parsedFloat > 1 && parsedFloat < 10).To(BeTrue())
+			Expect(parsedFloat >= 1 && parsedFloat <= 10).To(BeTrue())
 		})
 
 		It("randomEmail", func() {
@@ -258,6 +258,139 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			Expect(returnedUuid).To(Not(BeNil()))
 		})
+	})
+
+	Context("in simulate mode, template request", func() {
+
+		BeforeEach(func() {
+			hoverfly.Start()
+			hoverfly.SetMode("simulate")
+		})
+
+		It("Request", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			// TODO: Handle this?
+			Expect(string(body)).To(Equal("{map[] [Request] http %!s(func(string, string, *raymond.Options) string=0x876690) }"))
+		})
+
+		It("Request.Body jsonpath", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+			resp := hoverfly.Proxy(sling.New().Post("http://test-server.com/Request.Body_jsonpath").BodyJSON(map[string]string{
+				"test": "value",
+			}))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Equal("value"))
+		})
+
+		It("Request.Body jsonpath incorect", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+			resp := hoverfly.Proxy(sling.New().Post("http://test-server.com/Request.Body_jsonpath").BodyJSON(map[string]string{
+				"nottest": "value",
+			}))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Equal(""))
+		})
+
+		It("Request.Body xpath", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+			resp := hoverfly.Proxy(sling.New().Post("http://test-server.com/Request.Body_xpath").Body(bytes.NewBuffer([]byte(`<?xml version="1.0" encoding="UTF-8"?><root><text>value</text></root>`))))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Equal("value"))
+		})
+
+		It("Request.Body xpath incorect", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+			resp := hoverfly.Proxy(sling.New().Post("http://test-server.com/Request.Body_xpath").Body(bytes.NewBuffer([]byte(`<?xml version="1.0" encoding="UTF-8"?><root><nottext>test</text></root>`))))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Equal(""))
+		})
+
+		It("Request.Scheme", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request.Scheme"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Equal("http"))
+		})
+
+		It("Request.Path", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/one/two/three/Request.Path"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			// TODO: Handle this?
+			Expect(string(body)).To(Equal("onetwothreeRequest.Path"))
+		})
+
+		It("Request.Path.[0]", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/one/two/three/Request.Path0"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			// TODO: Handle this?
+			Expect(string(body)).To(Equal("one"))
+		})
+
+		It("Request.QueryParam", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request.QueryParam?query=param"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			// TODO: Handle this?
+			Expect(string(body)).To(Equal("map[query:[param]]"))
+		})
+
+		It("Request.QueryParam.query", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request.QueryParam.query?query=param"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Equal("param"))
+		})
+
 	})
 })
 
