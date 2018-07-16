@@ -604,7 +604,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
 		Request: &v2.RequestMatcherViewV5{
-			Query: map[string][]v2.MatcherViewV5{
+			Query: &v2.QueryMatcherViewV5{
 				"one": []v2.MatcherViewV5{
 					{
 						Matcher: matchers.Exact,
@@ -623,7 +623,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
 		Request: &v2.RequestMatcherViewV5{
-			Query: map[string][]v2.MatcherViewV5{
+			Query: &v2.QueryMatcherViewV5{
 				"one": []v2.MatcherViewV5{
 					{
 						Matcher: matchers.Glob,
@@ -636,7 +636,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
 		Request: &v2.RequestMatcherViewV5{
-			Query: map[string][]v2.MatcherViewV5{
+			Query: &v2.QueryMatcherViewV5{
 				"three": []v2.MatcherViewV5{
 					{
 						Matcher: matchers.Glob,

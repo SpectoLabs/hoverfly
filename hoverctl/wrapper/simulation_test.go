@@ -69,7 +69,7 @@ func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 								Value:   "/api/v2/simulation",
 							},
 						},
-						Query: map[string][]v2.MatcherViewV5{
+						Query: &v2.QueryMatcherViewV5{
 							"urlPattern": []v2.MatcherViewV5{
 								{
 									Matcher: matchers.Exact,

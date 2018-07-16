@@ -27,10 +27,12 @@ type RequestMatcherViewV5 struct {
 	Scheme          []MatcherViewV5            `json:"scheme,omitempty"`
 	Body            []MatcherViewV5            `json:"body,omitempty"`
 	Headers         map[string][]MatcherViewV5 `json:"headers,omitempty"`
-	Query           map[string][]MatcherViewV5 `json:"query,omitempty"`
+	Query           *QueryMatcherViewV5        `json:"query,omitempty"`
 	RequiresState   map[string]string          `json:"requiresState,omitempty"`
 	DeprecatedQuery []MatcherViewV5            `json:"deprecatedQuery,omitempty"`
 }
+
+type QueryMatcherViewV5 map[string][]MatcherViewV5
 
 type MatcherViewV5 struct {
 	Matcher string                 `json:"matcher"`

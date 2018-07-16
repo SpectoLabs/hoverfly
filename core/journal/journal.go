@@ -149,7 +149,7 @@ func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFil
 		Scheme:          models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Scheme),
 		DeprecatedQuery: models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.DeprecatedQuery),
 		Body:            models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
-		Query:           models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Query),
+		Query:           models.NewQueryRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Query),
 		Headers:         models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Headers),
 	}
 

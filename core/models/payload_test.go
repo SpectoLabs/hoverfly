@@ -3,7 +3,6 @@ package models_test
 import (
 	"bytes"
 	"compress/gzip"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -231,7 +230,6 @@ func Test_NewRequestDetailsFromHttpRequest_SortsQueryString(t *testing.T) {
 func Test_NewRequestDetailsFromHttpRequest_StripsArbitaryGolangColonEscaping(t *testing.T) {
 	RegisterTestingT(t)
 	request, _ := http.NewRequest("GET", "http://test.org/?a=b:c", nil)
-	fmt.Println(request.URL.RawQuery)
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
 	Expect(err).To(BeNil())
 

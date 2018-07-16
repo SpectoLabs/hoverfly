@@ -29,9 +29,11 @@ type RequestMatcherViewV4 struct {
 	Body                *RequestFieldMatchersView            `json:"body,omitempty"`
 	Headers             map[string][]string                  `json:"headers,omitempty"`
 	HeadersWithMatchers map[string]*RequestFieldMatchersView `json:"headersWithMatchers,omitempty"`
-	QueriesWithMatchers map[string]*RequestFieldMatchersView `json:"queriesWithMatchers,omitempty"`
+	QueriesWithMatchers *QueryMatcherViewV4                  `json:"queriesWithMatchers,omitempty"`
 	RequiresState       map[string]string                    `json:"requiresState,omitempty"`
 }
+
+type QueryMatcherViewV4 map[string]*RequestFieldMatchersView
 
 //Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestMatcherResponsePairViewV4) GetResponse() interfaces.Response { return this.Response }

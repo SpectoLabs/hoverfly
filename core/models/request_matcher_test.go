@@ -65,7 +65,7 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 					},
 				},
 			},
-			Query: map[string][]v2.MatcherViewV5{
+			Query: &v2.QueryMatcherViewV5{
 				"Query": {
 					{
 						Matcher: matchers.Exact,
@@ -84,8 +84,8 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 	Expect(unit.RequestMatcher.Path[0].Value).To(Equal("/"))
 	Expect(unit.RequestMatcher.Headers["Header"][0].Matcher).To(Equal("exact"))
 	Expect(unit.RequestMatcher.Headers["Header"][0].Value).To(Equal("header value"))
-	Expect(unit.RequestMatcher.Query["Query"][0].Matcher).To(Equal("exact"))
-	Expect(unit.RequestMatcher.Query["Query"][0].Value).To(Equal("query value"))
+	Expect((*unit.RequestMatcher.Query)["Query"][0].Matcher).To(Equal("exact"))
+	Expect((*unit.RequestMatcher.Query)["Query"][0].Value).To(Equal("query value"))
 	Expect(unit.RequestMatcher.Destination).To(BeNil())
 
 	Expect(unit.Response.Body).To(Equal("body"))
