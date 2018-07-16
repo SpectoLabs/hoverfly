@@ -92,6 +92,7 @@ var _ = Describe("When I run Hoverfly", func() {
 							Value:   "",
 						},
 					},
+					Query: &v2.QueryMatcherViewV5{},
 				}))
 
 				Expect(payload.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsViewV5{

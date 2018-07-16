@@ -1442,7 +1442,7 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 					Value:   "miss",
 				},
 			},
-			Query: map[string][]v2.MatcherViewV5{
+			Query: &v2.QueryMatcherViewV5{
 				"query": []v2.MatcherViewV5{
 					{
 						Matcher: matchers.Exact,

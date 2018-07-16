@@ -12,7 +12,7 @@ import (
 
 type queryMatchingTest struct {
 	name                string
-	queriesWithMatchers map[string][]models.RequestFieldMatchers
+	queriesWithMatchers *models.QueryRequestFieldMatchers
 	toMatchQueries      map[string][]string
 	equals              types.GomegaMatcher
 	matchEquals         types.GomegaMatcher
@@ -20,8 +20,24 @@ type queryMatchingTest struct {
 
 var queryMatchingTests = []queryMatchingTest{
 	{
+		name:                "nil",
+		queriesWithMatchers: nil,
+		toMatchQueries: map[string][]string{
+			"query1": {"val1"},
+		},
+		equals: BeTrue(),
+	},
+	{
+		name:                "empty",
+		queriesWithMatchers: &models.QueryRequestFieldMatchers{},
+		toMatchQueries: map[string][]string{
+			"query1": {"val1"},
+		},
+		equals: BeFalse(),
+	},
+	{
 		name: "basic",
-		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
+		queriesWithMatchers: &models.QueryRequestFieldMatchers{
 			"query1": {
 				{
 					Matcher: matchers.Exact,
@@ -36,7 +52,7 @@ var queryMatchingTests = []queryMatchingTest{
 	},
 	{
 		name: "basic fail",
-		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
+		queriesWithMatchers: &models.QueryRequestFieldMatchers{
 			"query1": {
 				{
 					Matcher: matchers.Exact,
@@ -51,7 +67,7 @@ var queryMatchingTests = []queryMatchingTest{
 	},
 	{
 		name: "2 query parameters",
-		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
+		queriesWithMatchers: &models.QueryRequestFieldMatchers{
 			"query1": {
 				{
 					Matcher: matchers.Exact,
@@ -74,7 +90,7 @@ var queryMatchingTests = []queryMatchingTest{
 	},
 	{
 		name: "2 query parameters fail missing query",
-		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
+		queriesWithMatchers: &models.QueryRequestFieldMatchers{
 			"query1": {
 				{
 					Matcher: matchers.Exact,
@@ -96,7 +112,7 @@ var queryMatchingTests = []queryMatchingTest{
 	},
 	{
 		name: "2 query parameters fail bad match",
-		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
+		queriesWithMatchers: &models.QueryRequestFieldMatchers{
 			"query1": {
 				{
 					Matcher: matchers.Exact,
@@ -119,7 +135,7 @@ var queryMatchingTests = []queryMatchingTest{
 	},
 	{
 		name: "Can handle different cases 1",
-		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
+		queriesWithMatchers: &models.QueryRequestFieldMatchers{
 			"urlPattern": {
 				{
 					Matcher: matchers.Glob,
@@ -135,7 +151,7 @@ var queryMatchingTests = []queryMatchingTest{
 	},
 	{
 		name: "Can handle different cases 2",
-		queriesWithMatchers: map[string][]models.RequestFieldMatchers{
+		queriesWithMatchers: &models.QueryRequestFieldMatchers{
 			"urlPattern": {
 				{
 					Matcher: matchers.Glob,

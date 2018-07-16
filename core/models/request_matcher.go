@@ -38,6 +38,21 @@ func NewRequestFieldMatchersFromMapView(mapMatchers map[string][]v2.MatcherViewV
 	return matchers
 }
 
+func NewQueryRequestFieldMatchersFromMapView(mapMatchers *v2.QueryMatcherViewV5) *QueryRequestFieldMatchers {
+	var matchers *QueryRequestFieldMatchers
+	if mapMatchers != nil {
+		matchers = &QueryRequestFieldMatchers{}
+		for key, view := range *mapMatchers {
+			if matchers == nil {
+				matchers = &QueryRequestFieldMatchers{}
+			}
+			matchers.Add(key, NewRequestFieldMatchersFromView(view))
+		}
+	}
+
+	return matchers
+}
+
 func (this RequestFieldMatchers) BuildView() v2.MatcherViewV5 {
 	return v2.MatcherViewV5{
 		Matcher: this.Matcher,
@@ -67,7 +82,7 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 			DeprecatedQuery: NewRequestFieldMatchersFromView(view.RequestMatcher.DeprecatedQuery),
 			Body:            NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
 			Headers:         NewRequestFieldMatchersFromMapView(view.RequestMatcher.Headers),
-			Query:           NewRequestFieldMatchersFromMapView(view.RequestMatcher.Query),
+			Query:           NewQueryRequestFieldMatchersFromMapView(view.RequestMatcher.Query),
 			RequiresState:   view.RequestMatcher.RequiresState,
 		},
 		Response: NewResponseDetailsFromResponse(view.Response),
@@ -135,13 +150,16 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 		headersWithMatchers[key] = views
 	}
 
-	queriesWithMatchers := map[string][]v2.MatcherViewV5{}
-	for key, matchers := range this.RequestMatcher.Query {
-		views := []v2.MatcherViewV5{}
-		for _, matcher := range matchers {
-			views = append(views, matcher.BuildView())
+	var queriesWithMatchers *v2.QueryMatcherViewV5
+	if this.RequestMatcher.Query != nil {
+		queriesWithMatchers = &v2.QueryMatcherViewV5{}
+		for key, matchers := range *this.RequestMatcher.Query {
+			views := []v2.MatcherViewV5{}
+			for _, matcher := range matchers {
+				views = append(views, matcher.BuildView())
+			}
+			(*queriesWithMatchers)[key] = views
 		}
-		queriesWithMatchers[key] = views
 	}
 
 	return v2.RequestMatcherResponsePairViewV5{
@@ -168,8 +186,14 @@ type RequestMatcher struct {
 	DeprecatedQuery []RequestFieldMatchers
 	Body            []RequestFieldMatchers
 	Headers         map[string][]RequestFieldMatchers
-	Query           map[string][]RequestFieldMatchers
+	Query           *QueryRequestFieldMatchers
 	RequiresState   map[string]string
+}
+
+type QueryRequestFieldMatchers map[string][]RequestFieldMatchers
+
+func (q *QueryRequestFieldMatchers) Add(k string, v []RequestFieldMatchers) {
+	(*q)[k] = v
 }
 
 func (this RequestMatcher) IncludesHeaderMatching() bool {

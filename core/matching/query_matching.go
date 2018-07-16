@@ -11,11 +11,31 @@ func QueryMatching(requestMatcher models.RequestMatcher, toMatch map[string][]st
 	matched := true
 	var score int
 
+	if requestMatcher.Query == nil {
+		return &FieldMatch{
+			Matched: true,
+			Score:   1,
+		}
+	}
+
+	if len(*requestMatcher.Query) == 0 {
+		if len(toMatch) == 0 {
+			return &FieldMatch{
+				Matched: true,
+				Score:   1,
+			}
+		}
+		return &FieldMatch{
+			Matched: false,
+			Score:   0,
+		}
+	}
+
 	for key, value := range toMatch {
 		toMatch[strings.ToLower(key)] = value
 	}
 
-	for matcherQueryKey, matcherQueryValue := range requestMatcher.Query {
+	for matcherQueryKey, matcherQueryValue := range *requestMatcher.Query {
 		matcherHeaderValueMatched := false
 
 		toMatchQueryValues, found := toMatch[strings.ToLower(matcherQueryKey)]

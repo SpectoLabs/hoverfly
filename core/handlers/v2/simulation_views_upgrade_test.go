@@ -814,7 +814,7 @@ func Test_upgradeV4_HandlesNewQueries(t *testing.T) {
 			RequestResponsePairs: []RequestMatcherResponsePairViewV4{
 				{
 					RequestMatcher: RequestMatcherViewV4{
-						QueriesWithMatchers: map[string]*RequestFieldMatchersView{
+						QueriesWithMatchers: &QueryMatcherViewV4{
 							"test": &RequestFieldMatchersView{
 								GlobMatch:  util.StringToPointer("testglob"),
 								ExactMatch: util.StringToPointer("testexact"),
@@ -839,10 +839,10 @@ func Test_upgradeV4_HandlesNewQueries(t *testing.T) {
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
 
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query["test"]).To(HaveLen(2))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query["test"][0].Matcher).To(Equal("exact"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query["test"][0].Value).To(Equal("testexact"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query["test"][1].Matcher).To(Equal("glob"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query["test"][1].Value).To(Equal("testglob"))
+	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)).To(HaveLen(1))
+	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)["test"]).To(HaveLen(2))
+	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)["test"][0].Matcher).To(Equal("exact"))
+	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)["test"][0].Value).To(Equal("testexact"))
+	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)["test"][1].Matcher).To(Equal("glob"))
+	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)["test"][1].Value).To(Equal("testglob"))
 }

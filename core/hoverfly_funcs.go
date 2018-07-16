@@ -153,14 +153,14 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		}
 	}
 
-	queries := map[string][]models.RequestFieldMatchers{}
+	queries := &models.QueryRequestFieldMatchers{}
 	for key, values := range request.Query {
-		queries[key] = []models.RequestFieldMatchers{
+		queries.Add(key, []models.RequestFieldMatchers{
 			{
 				Matcher: matchers.Exact,
 				Value:   strings.Join(values, "&"),
 			},
-		}
+		})
 	}
 
 	pair := models.RequestMatcherResponsePair{

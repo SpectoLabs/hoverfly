@@ -272,7 +272,7 @@ func Test_GetLogs_FiltersByDateWhenFilterTimeProvided(t *testing.T) {
 								Value:   "/api/v2/logs",
 							},
 						},
-						Query: map[string][]v2.MatcherViewV5{
+						Query: &v2.QueryMatcherViewV5{
 							"from": []v2.MatcherViewV5{
 								{
 									Matcher: matchers.Exact,

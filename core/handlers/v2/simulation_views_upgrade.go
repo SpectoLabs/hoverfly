@@ -255,10 +255,12 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 			}
 		}
 
-		queriesWithMatchers := map[string][]MatcherViewV5{}
-
-		for key, value := range requestResponsePairV2.RequestMatcher.QueriesWithMatchers {
-			queriesWithMatchers[key] = v2GetMatchersFromRequestFieldMatchersView(value)
+		var queriesWithMatchers *QueryMatcherViewV5
+		if requestResponsePairV2.RequestMatcher.QueriesWithMatchers != nil {
+			queriesWithMatchers = &QueryMatcherViewV5{}
+			for key, value := range *requestResponsePairV2.RequestMatcher.QueriesWithMatchers {
+				(*queriesWithMatchers)[key] = v2GetMatchersFromRequestFieldMatchersView(value)
+			}
 		}
 
 		requestResponsePair := RequestMatcherResponsePairViewV5{
