@@ -4,6 +4,7 @@ import (
 	"bytes"
 
 	"github.com/ChrisTrenkamp/goxpath"
+	"github.com/ChrisTrenkamp/goxpath/tree"
 	"github.com/ChrisTrenkamp/goxpath/tree/xmltree"
 	log "github.com/Sirupsen/logrus"
 )
@@ -16,23 +17,32 @@ func XpathMatch(match interface{}, toMatch string) bool {
 		return false
 	}
 
+	results, err := XpathExecution(matchString, toMatch)
+	if err != nil {
+		return false
+	}
+
+	return len(results) > 0
+}
+
+func XpathExecution(matchString, toMatch string) (tree.NodeSet, error) {
 	xpathRule, err := goxpath.Parse(matchString)
 	if err != nil {
 		log.Errorf("Failed to parse xpath query %s: %s", matchString, err.Error())
-		return false
+		return nil, err
 	}
 
 	xTree, err := xmltree.ParseXML(bytes.NewBufferString(toMatch))
 	if err != nil {
 		log.Errorf("Failed to load XML tree: %s", err.Error())
-		return false
+		return nil, err
 	}
 
 	results, err := xpathRule.ExecNode(xTree)
 	if err != nil {
 		log.Errorf("Failed to execute xpath match: %s", err.Error())
-		return false
+		return nil, err
 	}
 
-	return len(results) > 0
+	return results, nil
 }

@@ -1,8 +1,6 @@
 package templating
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -10,11 +8,9 @@ import (
 
 	"github.com/aymerick/raymond"
 	"github.com/pborman/uuid"
-	"k8s.io/client-go/util/jsonpath"
 
-	"github.com/ChrisTrenkamp/goxpath"
-	"github.com/ChrisTrenkamp/goxpath/tree/xmltree"
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/icrowley/fake"
 )
@@ -125,50 +121,19 @@ func (t templateHelpers) requestBody(queryType, query string, options *raymond.O
 func (t templateHelpers) jsonPath(query, toMatch string) string {
 	query = prepareJsonPathQuery(query)
 
-	jsonPath := jsonpath.New("")
-
-	err := jsonPath.Parse(query)
+	result, err := matchers.JsonPathExecution(query, toMatch)
 	if err != nil {
-		log.Errorf("Failed to parse json path query %s: %s", query, err.Error())
 		return ""
 	}
-
-	var data map[string]interface{}
-	if err := json.Unmarshal([]byte(toMatch), &data); err != nil {
-		log.Errorf("Failed to unmarshal body to JSON: %s", err.Error())
-		return ""
-	}
-
-	buf := new(bytes.Buffer)
-
-	err = jsonPath.Execute(buf, data)
-	if err != nil {
-		log.Errorf("Failed to execute json path match: %s", err.Error())
-		return ""
-	}
-
-	return buf.String()
+	return result
 }
 
 func (t templateHelpers) xPath(query, toMatch string) string {
-	xpathRule, err := goxpath.Parse(query)
+	result, err := matchers.XpathExecution(query, toMatch)
 	if err != nil {
-		log.Errorf("Failed to parse xpath query %s: %s", query, err.Error())
 		return ""
 	}
-
-	xTree, err := xmltree.ParseXML(bytes.NewBufferString(toMatch))
-	if err != nil {
-		log.Errorf("Failed to load XML tree: %s", err.Error())
-		return ""
-	}
-
-	results, err := xpathRule.ExecNode(xTree)
-	if err != nil {
-		log.Errorf("Failed to execute xpath match: %s", err.Error())
-		return ""
-	}
-	return results.String()
+	return result.String()
 }
 
 func prepareJsonPathQuery(query string) string {
