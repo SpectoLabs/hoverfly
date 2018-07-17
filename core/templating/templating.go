@@ -50,7 +50,6 @@ func NewTemplator() *Templator {
 		raymond.RegisterHelper("randomIPv4", t.randomIPv4)
 		raymond.RegisterHelper("randomIPv6", t.randomIPv6)
 		raymond.RegisterHelper("randomUuid", t.randomUuid)
-		raymond.RegisterHelper("Request.body jsonPath", t.jsonPath)
 
 		helpersRegistered = true
 	}
