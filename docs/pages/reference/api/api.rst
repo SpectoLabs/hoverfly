@@ -289,7 +289,8 @@ Gets the mode for the running instance of Hoverfly.
 ::
 
     {
-        mode: "simulate"
+        "mode": "capture",
+        "arguments": {}
     }
 
 --------------
@@ -303,7 +304,7 @@ Changes the mode of the running instance of Hoverfly.
 ::
 
     {
-        mode: "simulate"
+        "mode": "capture"
     }
 
 
