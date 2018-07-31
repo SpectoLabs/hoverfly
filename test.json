@@ -1,0 +1,114 @@
+{
+	"data": {
+		"pairs": [
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
+							"value": "/todos/1"
+						}
+					],
+					"method": [
+						{
+							"matcher": "exact",
+							"value": "GET"
+						}
+					],
+					"destination": [
+						{
+							"matcher": "exact",
+							"value": "jsonplaceholder.typicode.com"
+						}
+					],
+					"scheme": [
+						{
+							"matcher": "exact",
+							"value": "https"
+						}
+					],
+					"body": [
+						{
+							"matcher": "exact",
+							"value": ""
+						}
+					],
+					"query": {}
+				},
+				"response": {
+					"status": 200,
+					"body": "{\n  \"userId\": 2,\n  \"id\": 2,\n  \"title\": \"delectus aut autem\",\n  \"completed\": false\n}",
+					"encodedBody": false,
+					"headers": {
+						"Access-Control-Allow-Credentials": [
+							"true"
+						],
+						"Cache-Control": [
+							"public, max-age=14400"
+						],
+						"Cf-Cache-Status": [
+							"HIT"
+						],
+						"Cf-Ray": [
+							"4430d5054c49357e-LHR"
+						],
+						"Connection": [
+							"keep-alive"
+						],
+						"Content-Type": [
+							"application/json; charset=utf-16"
+						],
+						"Date": [
+							"Tue, 31 Jul 2018 14:42:31 GMT"
+						],
+						"Etag": [
+							"W/\"53-hfEnumeNh6YirfjyjaujcOPPT+s\""
+						],
+						"Expect-Ct": [
+							"max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\""
+						],
+						"Expires": [
+							"Tue, 31 Jul 2018 18:42:31 GMT"
+						],
+						"Hoverfly": [
+							"Was-Here"
+						],
+						"Pragma": [
+							"no-cache"
+						],
+						"Server": [
+							"cloudflare"
+						],
+						"Set-Cookie": [
+							"__cfduid=d4d2e44e105b040e9bc4ec5f0982244741533048151; expires=Wed, 31-Jul-19 14:42:31 GMT; path=/; domain=.typicode.com; HttpOnly"
+						],
+						"Transfer-Encoding": [
+							"chunked"
+						],
+						"Vary": [
+							"Origin, Accept-Encoding"
+						],
+						"Via": [
+							"1.1 vegur"
+						],
+						"X-Content-Type-Options": [
+							"nosniff"
+						],
+						"X-Powered-By": [
+							"Express"
+						]
+					},
+					"templated": false
+				}
+			}
+		],
+		"globalActions": {
+			"delays": []
+		}
+	},
+	"meta": {
+		"schemaVersion": "v5",
+		"hoverflyVersion": "v0.17.2",
+		"timeExported": "2018-07-31T15:43:34+01:00"
+	}
+}
