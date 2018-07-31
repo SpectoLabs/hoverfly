@@ -129,13 +129,7 @@ func nullOrValue(value interface{}) string {
 func (this *DiffMode) headerDiff(expected map[string][]string, actual map[string][]string, headersWhitelist []string) bool {
 	same := true
 	for k := range expected {
-		// if len(headersWhitelist) == 1 && headersWhitelist[0] != "*" {
-		// 	continue
-		// }
-		shouldContinue := true
-		if len(headersWhitelist) > 0 {
-			shouldContinue = false
-		}
+		shouldContinue := false
 		for _, header := range headersWhitelist {
 			if k == header || header == "*" {
 				shouldContinue = true

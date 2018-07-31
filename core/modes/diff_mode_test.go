@@ -131,8 +131,6 @@ func Test_DiffMode_WhenGivenAMatchingRequestReturningDifferentResponse(t *testin
 	Expect(response.Header["header"]).To(Equal([]string{"actual"}))
 	Expect(response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
-		v2.DiffReportEntry{"header/source", "[simulation]", "[service]"},
-		v2.DiffReportEntry{"header/header", "[simulated]", "[actual]"},
 		v2.DiffReportEntry{"body", "simulated", "actual"}))
 }
 
