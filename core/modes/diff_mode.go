@@ -30,26 +30,24 @@ type HoverflyDiff interface {
 }
 
 type DiffMode struct {
-	Hoverfly         HoverflyDiff
-	MatchingStrategy string
-	DiffReport       v2.DiffReport
+	Hoverfly   HoverflyDiff
+	DiffReport v2.DiffReport
+	Arguments  ModeArguments
 }
 
 func (this *DiffMode) View() v2.ModeView {
 	return v2.ModeView{
 		Mode: Diff,
 		Arguments: v2.ModeArgumentsView{
-			MatchingStrategy: &this.MatchingStrategy,
+			Headers:          this.Arguments.Headers,
+			MatchingStrategy: this.Arguments.MatchingStrategy,
+			Stateful:         this.Arguments.Stateful,
 		},
 	}
 }
 
 func (this *DiffMode) SetArguments(arguments ModeArguments) {
-	if arguments.MatchingStrategy == nil {
-		this.MatchingStrategy = "strongest"
-	} else {
-		this.MatchingStrategy = *arguments.MatchingStrategy
-	}
+	this.Arguments = arguments
 }
 
 //TODO: We should only need one of these two parameters
@@ -73,6 +71,10 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 		return ReturnErrorAndLog(request, err, &actualPair, "There was an error when forwarding the request to the intended destination", Diff)
 	}
 
+	if this.Arguments.Headers == nil {
+		this.Arguments.Headers = []string{}
+	}
+
 	if simRespErr == nil {
 		respBody, _ := util.GetResponseBody(actualResponse)
 
@@ -82,7 +84,7 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 			Headers: actualResponse.Header,
 		}
 
-		this.diffResponse(simResponse, actualResponseDetails)
+		this.diffResponse(simResponse, actualResponseDetails, this.Arguments.Headers)
 		this.Hoverfly.AddDiff(v2.SimpleRequestDefinitionView{
 			Method: modifiedRequest.Method,
 			Host:   modifiedRequest.URL.Host,
@@ -100,11 +102,11 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 	return actualResponse, nil
 }
 
-func (this *DiffMode) diffResponse(expected *models.ResponseDetails, actual *models.ResponseDetails) {
+func (this *DiffMode) diffResponse(expected *models.ResponseDetails, actual *models.ResponseDetails, headersWhitelist []string) {
 	if expected.Status != 0 && expected.Status != actual.Status {
 		this.addEntry("status", expected.Status, actual.Status)
 	}
-	this.headerDiff(expected.Headers, actual.Headers)
+	this.headerDiff(expected.Headers, actual.Headers, headersWhitelist)
 	this.bodyDiff(expected, actual)
 }
 
@@ -124,9 +126,24 @@ func nullOrValue(value interface{}) string {
 	return fmt.Sprint(value)
 }
 
-func (this *DiffMode) headerDiff(expected map[string][]string, actual map[string][]string) bool {
+func (this *DiffMode) headerDiff(expected map[string][]string, actual map[string][]string, headersWhitelist []string) bool {
 	same := true
 	for k := range expected {
+		// if len(headersWhitelist) == 1 && headersWhitelist[0] != "*" {
+		// 	continue
+		// }
+		shouldContinue := true
+		if len(headersWhitelist) > 0 {
+			shouldContinue = false
+		}
+		for _, header := range headersWhitelist {
+			if k == header || header == "*" {
+				shouldContinue = true
+			}
+		}
+		if !shouldContinue {
+			continue
+		}
 		if _, ok := actual[k]; !ok {
 			this.addEntry("header/"+k, expected[k], nil)
 			same = false
