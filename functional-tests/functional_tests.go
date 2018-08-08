@@ -28,6 +28,7 @@ import (
 
 var HoverflyUsername = "benjih"
 var HoverflyPassword = "password"
+var BinaryPrefix = ""
 
 func DoRequest(r *sling.Sling) *http.Response {
 	response, err := doRequest(r)
@@ -326,12 +327,13 @@ func (this Hoverfly) startHoverflyInternal(adminPort, proxyPort int, additionalC
 
 func BuildBinaryPath() string {
 	workingDirectory, _ := os.Getwd()
-	return filepath.Join(workingDirectory, "bin/hoverfly")
+	return filepath.Join(workingDirectory, BinaryPrefix, "bin/hoverfly")
 }
 
 func BinaryErrorCheck(err error, binaryPath string) {
 	if err != nil {
 		fmt.Println("Unable to start Hoverfly")
+		fmt.Println(os.Getwd())
 		fmt.Println(binaryPath)
 		fmt.Println("Is the binary there?")
 		os.Exit(1)

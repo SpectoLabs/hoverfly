@@ -1,4 +1,4 @@
-package hoverfly_test
+package api_test
 
 import (
 	"bytes"
@@ -33,7 +33,7 @@ var _ = Describe("/api/v2/simulation/schema", func() {
 			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 
-			fileBytes, err := ioutil.ReadFile("../../schema.json")
+			fileBytes, err := ioutil.ReadFile("../../../schema.json")
 			Expect(err).To(BeNil(), "schema.json not found")
 
 			fileBuffer := new(bytes.Buffer)

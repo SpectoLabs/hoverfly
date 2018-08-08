@@ -14,10 +14,12 @@ hoverctl-build: hoverctl-test
 	cd hoverctl && \
 	go build -ldflags "-X main.hoverctlVersion=$(GIT_TAG_NAME)" -o ../target/hoverctl
 
-hoverfly-functional-test: hoverfly-build
+CORE_FUNCTIONAL_TESTS = $(shell cd functional-tests/core && go list ./...)
+
+hoverfly-functional-test: build
 	cp target/hoverfly functional-tests/core/bin/hoverfly
 	cd functional-tests/core && \
-	go test -v $(go list ./... | grep -v -E 'vendor')
+	go test -v $(CORE_FUNCTIONAL_TESTS)
 
 hoverctl-functional-test:
 	cp target/hoverfly functional-tests/hoverctl/bin/hoverfly
