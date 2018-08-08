@@ -30,9 +30,9 @@ var (
 	proxyPort = freeport.GetPort()
 )
 
-func TestHoverfly(t *testing.T) {
+func TestCore(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Hoverfly Suite")
+	RunSpecs(t, "Core Suite")
 }
 
 var _ = BeforeSuite(func() {
