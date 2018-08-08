@@ -102,11 +102,11 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 	return actualResponse, nil
 }
 
-func (this *DiffMode) diffResponse(expected *models.ResponseDetails, actual *models.ResponseDetails, headersWhitelist []string) {
+func (this *DiffMode) diffResponse(expected *models.ResponseDetails, actual *models.ResponseDetails, headersBlacklist []string) {
 	if expected.Status != 0 && expected.Status != actual.Status {
 		this.addEntry("status", expected.Status, actual.Status)
 	}
-	this.headerDiff(expected.Headers, actual.Headers, headersWhitelist)
+	this.headerDiff(expected.Headers, actual.Headers, headersBlacklist)
 	this.bodyDiff(expected, actual)
 }
 
@@ -126,16 +126,16 @@ func nullOrValue(value interface{}) string {
 	return fmt.Sprint(value)
 }
 
-func (this *DiffMode) headerDiff(expected map[string][]string, actual map[string][]string, headersWhitelist []string) bool {
+func (this *DiffMode) headerDiff(expected map[string][]string, actual map[string][]string, headersBlacklist []string) bool {
 	same := true
 	for k := range expected {
 		shouldContinue := false
-		for _, header := range headersWhitelist {
+		for _, header := range headersBlacklist {
 			if k == header || header == "*" {
 				shouldContinue = true
 			}
 		}
-		if !shouldContinue {
+		if shouldContinue {
 			continue
 		}
 		if _, ok := actual[k]; !ok {
