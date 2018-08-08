@@ -1,4 +1,4 @@
-package hoverfly_test
+package api_test
 
 import (
 	"bytes"
