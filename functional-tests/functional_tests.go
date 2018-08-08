@@ -49,6 +49,16 @@ func doRequest(r *sling.Sling) (*http.Response, error) {
 	return response, nil
 }
 
+func Unmarshal(data []byte, to interface{}) {
+	Expect(json.Unmarshal(data, to)).To(BeNil())
+}
+
+func UnmarshalFromResponse(res *http.Response, to interface{}) {
+	responseJson, err := ioutil.ReadAll(res.Body)
+	Expect(err).To(BeNil())
+	Unmarshal(responseJson, to)
+}
+
 type Hoverfly struct {
 	adminPort int
 	adminUrl  string
@@ -95,7 +105,7 @@ func (this Hoverfly) StopAPIAuthenticated(username, password string) {
 
 func (this Hoverfly) DeleteBoltDb() {
 	workingDirectory, _ := os.Getwd()
-	os.Remove(workingDirectory + "requests.db")
+	Expect(os.Remove(workingDirectory + "requests.db")).To(BeNil())
 }
 
 func (this Hoverfly) GetMode() *v2.ModeView {
@@ -105,7 +115,8 @@ func (this Hoverfly) GetMode() *v2.ModeView {
 	body, err := ioutil.ReadAll(resp.Body)
 	Expect(err).To(BeNil())
 
-	json.Unmarshal(body, currentState)
+	err = json.Unmarshal(body, currentState)
+	Expect(err).To(BeNil())
 
 	return currentState
 }

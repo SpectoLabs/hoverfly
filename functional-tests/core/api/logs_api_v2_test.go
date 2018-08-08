@@ -1,7 +1,6 @@
 package api_test
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
@@ -64,13 +63,9 @@ var _ = Describe("/api/v2/logs", func() {
 
 				Expect(res.StatusCode).To(Equal(200))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var logs v2.LogsView
 
-				err = json.Unmarshal(responseJson, &logs)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &logs)
 
 				Expect(logs.Logs).To(HaveLen(100))
 			})
@@ -99,13 +94,9 @@ var _ = Describe("/api/v2/logs", func() {
 
 				Expect(res.StatusCode).To(Equal(http.StatusInternalServerError))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var errorView handlers.ErrorView
 
-				err = json.Unmarshal(responseJson, &errorView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &errorView)
 
 				Expect(errorView.Error).To(Equal("Logs disabled"))
 			})

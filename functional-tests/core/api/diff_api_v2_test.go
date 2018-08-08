@@ -1,7 +1,6 @@
 package api_test
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -83,11 +82,9 @@ var _ = Describe("/api/v2/hoverfly/diff", func() {
 			req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/diff")
 			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
-			diffJson, err := ioutil.ReadAll(res.Body)
-			Expect(err).To(BeNil())
 
 			var diffs v2.DiffView
-			json.Unmarshal(diffJson, &diffs)
+			functional_tests.UnmarshalFromResponse(res, &diffs)
 
 			Expect(diffs.Diff).To(HaveLen(1))
 			Expect(diffs.Diff[0].Request).To(Equal(v2.SimpleRequestDefinitionView{
@@ -130,11 +127,9 @@ var _ = Describe("/api/v2/hoverfly/diff", func() {
 			req = sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/diff")
 			res = functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
-			diffJson, err := ioutil.ReadAll(res.Body)
-			Expect(err).To(BeNil())
 
 			var diffs v2.DiffView
-			json.Unmarshal(diffJson, &diffs)
+			functional_tests.UnmarshalFromResponse(res, &diffs)
 
 			Expect(diffs.Diff).To(BeNil())
 		})
