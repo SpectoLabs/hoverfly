@@ -2,8 +2,6 @@ package api_test
 
 import (
 	"bytes"
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"time"
@@ -41,13 +39,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(200))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journalView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &journalView)
 
 				Expect(journalView.Journal).To(HaveLen(0))
 			})
@@ -60,13 +54,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(200))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journalView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &journalView)
 
 				Expect(journalView.Journal).To(HaveLen(1))
 
@@ -96,13 +86,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(200))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journalView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &journalView)
 
 				Expect(journalView.Journal).To(HaveLen(3))
 
@@ -128,13 +114,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(200))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journalView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &journalView)
 
 				Expect(journalView.Journal).To(HaveLen(2))
 
@@ -166,13 +148,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(http.StatusOK))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journalView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &journalView)
 
 				Expect(journalView.Journal).To(HaveLen(1))
 				Expect(*journalView.Journal[0].Request.Path).To(Equal("/first"))
@@ -185,13 +163,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(http.StatusBadRequest))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var errorView handlers.ErrorView
 
-				err = json.Unmarshal(responseJson, &errorView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &errorView)
 
 				Expect(errorView.Error).To(Equal("Malformed JSON"))
 			})
@@ -203,13 +177,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(http.StatusBadRequest))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var errorView handlers.ErrorView
 
-				err = json.Unmarshal(responseJson, &errorView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &errorView)
 
 				Expect(errorView.Error).To(Equal("No \"request\" object in search parameters"))
 			})
@@ -228,13 +198,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(200))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journalView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &journalView)
 
 				Expect(journalView.Journal).To(HaveLen(0))
 			})
@@ -260,13 +226,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(200))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journalView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &journalView)
 
 				Expect(journalView.Journal).To(HaveLen(0))
 			})
@@ -279,13 +241,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(200))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journalView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &journalView)
 
 				Expect(journalView.Journal).To(HaveLen(1))
 
@@ -315,13 +273,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(200))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journalView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &journalView)
 
 				Expect(journalView.Journal).To(HaveLen(3))
 
@@ -356,13 +310,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(http.StatusOK))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journalView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &journalView)
 
 				Expect(journalView.Journal).To(HaveLen(1))
 				Expect(*journalView.Journal[0].Request.Path).To(Equal("/first"))
@@ -375,13 +325,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(http.StatusBadRequest))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var errorView handlers.ErrorView
 
-				err = json.Unmarshal(responseJson, &errorView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &errorView)
 
 				Expect(errorView.Error).To(Equal("Malformed JSON"))
 			})
@@ -393,13 +339,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(http.StatusBadRequest))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var errorView handlers.ErrorView
 
-				err = json.Unmarshal(responseJson, &errorView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &errorView)
 
 				Expect(errorView.Error).To(Equal("No \"request\" object in search parameters"))
 			})
@@ -418,13 +360,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(200))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journalView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &journalView)
 
 				Expect(journalView.Journal).To(HaveLen(0))
 			})
@@ -451,13 +389,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(http.StatusInternalServerError))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var errorView handlers.ErrorView
 
-				err = json.Unmarshal(responseJson, &errorView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &errorView)
 
 				Expect(errorView.Error).To(Equal("Journal disabled"))
 			})
@@ -481,13 +415,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(http.StatusInternalServerError))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var errorView handlers.ErrorView
 
-				err = json.Unmarshal(responseJson, &errorView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &errorView)
 
 				Expect(errorView.Error).To(Equal("Journal disabled"))
 			})
@@ -501,13 +431,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(http.StatusInternalServerError))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var errorView handlers.ErrorView
 
-				err = json.Unmarshal(responseJson, &errorView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &errorView)
 
 				Expect(errorView.Error).To(Equal("Journal disabled"))
 			})
@@ -537,13 +463,9 @@ var _ = Describe("/api/v2/journal", func() {
 
 				Expect(res.StatusCode).To(Equal(200))
 
-				responseJson, err := ioutil.ReadAll(res.Body)
-				Expect(err).To(BeNil())
-
 				var journalView v2.JournalView
 
-				err = json.Unmarshal(responseJson, &journalView)
-				Expect(err).To(BeNil())
+				functional_tests.UnmarshalFromResponse(res, &journalView)
 
 				Expect(journalView.Journal).To(HaveLen(10))
 			})

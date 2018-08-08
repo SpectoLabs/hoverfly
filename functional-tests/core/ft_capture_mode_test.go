@@ -251,7 +251,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				payload := v2.SimulationViewV5{}
 
-				json.Unmarshal(recordsJson, &payload)
+				functional_tests.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
 				Expect(payload.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal(`exact`))
@@ -297,7 +297,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				payload := v2.SimulationViewV5{}
 
-				json.Unmarshal(recordsJson, &payload)
+				functional_tests.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
 				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body[0].Matcher).To(Equal(`json`))
@@ -320,7 +320,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				payload := v2.SimulationViewV5{}
 
-				json.Unmarshal(recordsJson, &payload)
+				functional_tests.Unmarshal(recordsJson, &payload)
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))
 
 				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body[0].Matcher).To(Equal(`xml`))

@@ -1,8 +1,6 @@
 package hoverfly
 
 import (
-	"encoding/json"
-
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
@@ -36,7 +34,7 @@ var _ = Describe("Running Hoverfly with older simulations", func() {
 
 			simulation := v2.SimulationViewV5{}
 
-			json.Unmarshal([]byte(testdata.V5JsonPayload), &simulation)
+			functional_tests.Unmarshal([]byte(testdata.V5JsonPayload), &simulation)
 
 			Expect(upgradedSimulation.DataViewV5).To(Equal(simulation.DataViewV5))
 		})
@@ -54,7 +52,7 @@ var _ = Describe("Running Hoverfly with older simulations", func() {
 
 			simulation := v2.SimulationViewV5{}
 
-			json.Unmarshal([]byte(testdata.Delays), &simulation)
+			functional_tests.Unmarshal([]byte(testdata.Delays), &simulation)
 
 			Expect(upgradedSimulation.DataViewV5).To(Equal(simulation.DataViewV5))
 		})
@@ -65,7 +63,7 @@ var _ = Describe("Running Hoverfly with older simulations", func() {
 
 			simulation := v2.SimulationViewV5{}
 
-			json.Unmarshal([]byte(testdata.ClosestMissProof), &simulation)
+			functional_tests.Unmarshal([]byte(testdata.ClosestMissProof), &simulation)
 
 			Expect(upgradedSimulation.DataViewV5).To(Equal(simulation.DataViewV5))
 		})
@@ -76,7 +74,7 @@ var _ = Describe("Running Hoverfly with older simulations", func() {
 
 			simulation := v2.SimulationViewV5{}
 
-			json.Unmarshal([]byte(testdata.ExactMatch), &simulation)
+			functional_tests.Unmarshal([]byte(testdata.ExactMatch), &simulation)
 
 			Expect(upgradedSimulation.DataViewV5).To(Equal(simulation.DataViewV5))
 		})
@@ -87,7 +85,7 @@ var _ = Describe("Running Hoverfly with older simulations", func() {
 
 			simulation := v2.SimulationViewV5{}
 
-			json.Unmarshal([]byte(testdata.GlobMatch), &simulation)
+			functional_tests.Unmarshal([]byte(testdata.GlobMatch), &simulation)
 
 			Expect(upgradedSimulation.DataViewV5).To(Equal(simulation.DataViewV5))
 		})
@@ -98,7 +96,7 @@ var _ = Describe("Running Hoverfly with older simulations", func() {
 
 			simulation := v2.SimulationViewV5{}
 
-			json.Unmarshal([]byte(testdata.XmlMatch), &simulation)
+			functional_tests.Unmarshal([]byte(testdata.XmlMatch), &simulation)
 
 			Expect(upgradedSimulation.DataViewV5).To(Equal(simulation.DataViewV5))
 		})
@@ -109,7 +107,7 @@ var _ = Describe("Running Hoverfly with older simulations", func() {
 
 			simulation := v2.SimulationViewV5{}
 
-			json.Unmarshal([]byte(testdata.XpathMatch), &simulation)
+			functional_tests.Unmarshal([]byte(testdata.XpathMatch), &simulation)
 
 			Expect(upgradedSimulation.DataViewV5).To(Equal(simulation.DataViewV5))
 		})
@@ -127,7 +125,7 @@ var _ = Describe("Running Hoverfly with older simulations", func() {
 
 			simulation := v2.SimulationViewV5{}
 
-			json.Unmarshal([]byte(testdata.QueryMatchers), &simulation)
+			functional_tests.Unmarshal([]byte(testdata.QueryMatchers), &simulation)
 
 			Expect(upgradedSimulation.DataViewV5).To(Equal(simulation.DataViewV5))
 		})
@@ -138,7 +136,7 @@ var _ = Describe("Running Hoverfly with older simulations", func() {
 
 			simulation := v2.SimulationViewV5{}
 
-			json.Unmarshal([]byte(testdata.HeaderMatchers), &simulation)
+			functional_tests.Unmarshal([]byte(testdata.HeaderMatchers), &simulation)
 
 			Expect(upgradedSimulation.DataViewV5).To(Equal(simulation.DataViewV5))
 		})
