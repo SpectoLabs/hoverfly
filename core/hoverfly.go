@@ -64,7 +64,7 @@ func NewHoverfly() *Hoverfly {
 		responsesDiff:  make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport),
 	}
 
-	hoverfly.version = "v0.17.2"
+	hoverfly.version = "v0.17.3"
 
 	log.AddHook(hoverfly.StoreLogsHook)
 

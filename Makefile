@@ -67,4 +67,3 @@ update-version:
 	target/hoverctl > docs/pages/reference/hoverctl/hoverctl.output
 	git add docs/pages/reference/hoverctl/hoverctl.output
 	git commit -m "Updated hoverfly version to ${VERSION}"
-	git tag ${VERSION}
