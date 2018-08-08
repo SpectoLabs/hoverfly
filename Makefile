@@ -16,7 +16,7 @@ hoverctl-build: hoverctl-test
 
 CORE_FUNCTIONAL_TESTS = $(shell cd functional-tests/core && go list ./...)
 
-hoverfly-functional-test: build
+hoverfly-functional-test: hoverfly-build
 	cp target/hoverfly functional-tests/core/bin/hoverfly
 	cd functional-tests/core && \
 	go test -v $(CORE_FUNCTIONAL_TESTS)
