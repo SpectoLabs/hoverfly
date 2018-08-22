@@ -78,7 +78,7 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 			if sequenceState == "" {
 				sequenceState = "1"
 				nextSequenceState = "2"
-				state.SetState(map[string]string{sequenceKey: "1"})
+				state.PatchState(map[string]string{sequenceKey: "1"})
 
 			} else {
 				currentSequenceState, _ := strconv.Atoi(sequenceState)
