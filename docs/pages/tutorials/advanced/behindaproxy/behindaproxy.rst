@@ -16,6 +16,17 @@ For example, if the 'upstream' proxy is running on port ``8080`` on host ``corp.
 
     hoverctl start --upstream-proxy http://corp.proxy:8080
 
+Configuring Hoverfly with a PAC file
+------------------------------------
+
+If you have a PAC file for configuring clients with the proxy set up in your environment, you can use this to configure Hoverfly.
+
+For example:
+
+.. code:: bash
+
+    hoverctl start --pac-file path/to/file.pac
+
 Upstream proxy authentication
 -----------------------------
 
