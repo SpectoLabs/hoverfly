@@ -1,0 +1,3 @@
+language: go
+install: make install_deps
+script: make test

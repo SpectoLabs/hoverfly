@@ -125,12 +125,14 @@ func (aggregator *Aggregator) registerSuiteBeginning(configAndSuite configAndSui
 
 	aggregator.stenographer.AnnounceSuite(configAndSuite.summary.SuiteDescription, configAndSuite.config.RandomSeed, configAndSuite.config.RandomizeAllSpecs, aggregator.config.Succinct)
 
+	numberOfSpecsToRun := 0
 	totalNumberOfSpecs := 0
-	if len(aggregator.aggregatedSuiteBeginnings) > 0 {
-		totalNumberOfSpecs = configAndSuite.summary.NumberOfSpecsBeforeParallelization
+	for _, configAndSuite := range aggregator.aggregatedSuiteBeginnings {
+		numberOfSpecsToRun += configAndSuite.summary.NumberOfSpecsThatWillBeRun
+		totalNumberOfSpecs += configAndSuite.summary.NumberOfTotalSpecs
 	}
 
-	aggregator.stenographer.AnnounceTotalNumberOfSpecs(totalNumberOfSpecs, aggregator.config.Succinct)
+	aggregator.stenographer.AnnounceNumberOfSpecs(numberOfSpecsToRun, totalNumberOfSpecs, aggregator.config.Succinct)
 	aggregator.stenographer.AnnounceAggregatedParallelRun(aggregator.nodeCount, aggregator.config.Succinct)
 	aggregator.flushCompletedSpecs()
 }
@@ -207,7 +209,7 @@ func (aggregator *Aggregator) announceSpec(specSummary *types.SpecSummary) {
 	case types.SpecStatePending:
 		aggregator.stenographer.AnnouncePendingSpec(specSummary, aggregator.config.NoisyPendings && !aggregator.config.Succinct)
 	case types.SpecStateSkipped:
-		aggregator.stenographer.AnnounceSkippedSpec(specSummary, aggregator.config.Succinct || !aggregator.config.NoisySkippings, aggregator.config.FullTrace)
+		aggregator.stenographer.AnnounceSkippedSpec(specSummary, aggregator.config.Succinct, aggregator.config.FullTrace)
 	case types.SpecStateTimedOut:
 		aggregator.stenographer.AnnounceSpecTimedOut(specSummary, aggregator.config.Succinct, aggregator.config.FullTrace)
 	case types.SpecStatePanicked:
@@ -237,7 +239,6 @@ func (aggregator *Aggregator) registerSuiteEnding(suite *types.SuiteSummary) (fi
 		aggregatedSuiteSummary.NumberOfFailedSpecs += suiteSummary.NumberOfFailedSpecs
 		aggregatedSuiteSummary.NumberOfPendingSpecs += suiteSummary.NumberOfPendingSpecs
 		aggregatedSuiteSummary.NumberOfSkippedSpecs += suiteSummary.NumberOfSkippedSpecs
-		aggregatedSuiteSummary.NumberOfFlakedSpecs += suiteSummary.NumberOfFlakedSpecs
 	}
 
 	aggregatedSuiteSummary.RunTime = time.Since(aggregator.startTime)
