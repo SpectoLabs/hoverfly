@@ -35,8 +35,11 @@ func (this *HoverflyPACHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthH
 
 func (this *HoverflyPACHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	pacFile := this.Hoverfly.GetPACFile()
-
+	if pacFile == nil {
+		handlers.WriteErrorResponse(w, "Not found", 404)
+	}
 	handlers.WriteResponse(w, pacFile)
+	w.Header().Set("Content-Type", "application/x-ns-proxy-autoconfig")
 }
 
 func (this *HoverflyPACHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
