@@ -25,6 +25,7 @@ type Configuration struct {
 	TLSVerification bool
 
 	UpstreamProxy string
+	PACFile       []byte
 
 	Verbose bool
 

@@ -311,3 +311,11 @@ func (this *Hoverfly) AddDiff(requestView v2.SimpleRequestDefinitionView, diffRe
 		this.responsesDiff[requestView] = append(diffs, diffReport)
 	}
 }
+
+func (this *Hoverfly) GetPACFile() []byte {
+	return this.Cfg.PACFile
+}
+
+func (this *Hoverfly) SetPACFile(pacFile []byte) {
+	this.Cfg.PACFile = pacFile
+}
