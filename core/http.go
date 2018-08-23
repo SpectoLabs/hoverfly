@@ -49,16 +49,22 @@ func GetHttpClient(hf *Hoverfly, host string) (*http.Client, error) {
 		if err != nil {
 			return nil, errors.New("Unable to parse PAC file\n\n" + err.Error())
 		}
-
-		for _, s := range strings.Split(result, ";") {
-			if s == "DIRECT" {
-				log.Println("DIRECT")
-				return GetDefaultHoverflyHTTPClient(hf.Cfg.TLSVerification, ""), nil
-			}
-			if s[0:6] == "PROXY " {
-				return GetDefaultHoverflyHTTPClient(hf.Cfg.TLSVerification, s[6:]), nil
-			}
+		if client := parsePACFileResult(result, hf.Cfg.TLSVerification); client != nil {
+			return client, nil
 		}
+
 	}
 	return hf.HTTP, nil
+}
+
+func parsePACFileResult(result string, tlsVerification bool) *http.Client {
+	for _, s := range strings.Split(result, ";") {
+		if s == "DIRECT" {
+			return GetDefaultHoverflyHTTPClient(tlsVerification, "")
+		}
+		if s[0:6] == "PROXY " {
+			return GetDefaultHoverflyHTTPClient(tlsVerification, s[6:])
+		}
+	}
+	return nil
 }
