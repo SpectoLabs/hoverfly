@@ -426,6 +426,152 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 
 	Expect(unit.GetMatchingPairs()[3].Response.Body).To(Equal("different2"))
 }
+
+func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := models.NewSimulation()
+
+	state := state.NewState()
+
+	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "testdestination",
+				},
+			},
+		},
+		models.ResponseDetails{
+			Body:    "1",
+			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Status:  200,
+		},
+	}, state)
+
+	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "testdestination",
+				},
+			},
+		},
+		models.ResponseDetails{
+			Body:    "2",
+			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Status:  200,
+		},
+	}, state)
+
+	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "different",
+				},
+			},
+		},
+		models.ResponseDetails{
+			Body:    "different1",
+			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Status:  200,
+		},
+	}, state)
+
+	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "different",
+				},
+			},
+		},
+		models.ResponseDetails{
+			Body:    "different2",
+			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Status:  200,
+		},
+	}, state)
+
+	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "third",
+				},
+			},
+		},
+		models.ResponseDetails{
+			Body:    "third1",
+			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Status:  200,
+		},
+	}, state)
+
+	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
+		models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "third",
+				},
+			},
+		},
+		models.ResponseDetails{
+			Body:    "third2",
+			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Status:  200,
+		},
+	}, state)
+
+	Expect(unit.GetMatchingPairs()).To(HaveLen(6))
+
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
+	Expect(unit.GetMatchingPairs()[0].RequestMatcher.RequiresState["sequence:1"]).To(Equal("1"))
+
+	Expect(unit.GetMatchingPairs()[0].Response.Body).To(Equal("1"))
+	Expect(unit.GetMatchingPairs()[0].Response.TransitionsState["sequence:1"]).To(Equal("2"))
+
+	Expect(unit.GetMatchingPairs()[1].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(unit.GetMatchingPairs()[1].RequestMatcher.Destination[0].Value).To(Equal("testdestination"))
+	Expect(unit.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence:1"]).To(Equal("2"))
+
+	Expect(unit.GetMatchingPairs()[1].Response.Body).To(Equal("2"))
+
+	Expect(unit.GetMatchingPairs()[2].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(unit.GetMatchingPairs()[2].RequestMatcher.Destination[0].Value).To(Equal("different"))
+	Expect(unit.GetMatchingPairs()[2].RequestMatcher.RequiresState["sequence:2"]).To(Equal("1"))
+
+	Expect(unit.GetMatchingPairs()[2].Response.Body).To(Equal("different1"))
+	Expect(unit.GetMatchingPairs()[2].Response.TransitionsState["sequence:2"]).To(Equal("2"))
+
+	Expect(unit.GetMatchingPairs()[3].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(unit.GetMatchingPairs()[3].RequestMatcher.Destination[0].Value).To(Equal("different"))
+	Expect(unit.GetMatchingPairs()[3].RequestMatcher.RequiresState["sequence:2"]).To(Equal("2"))
+
+	Expect(unit.GetMatchingPairs()[3].Response.Body).To(Equal("different2"))
+
+	Expect(unit.GetMatchingPairs()[4].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(unit.GetMatchingPairs()[4].RequestMatcher.Destination[0].Value).To(Equal("third"))
+	Expect(unit.GetMatchingPairs()[4].RequestMatcher.RequiresState["sequence:3"]).To(Equal("1"))
+
+	Expect(unit.GetMatchingPairs()[4].Response.Body).To(Equal("third1"))
+	Expect(unit.GetMatchingPairs()[4].Response.TransitionsState["sequence:3"]).To(Equal("2"))
+
+	Expect(unit.GetMatchingPairs()[5].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(unit.GetMatchingPairs()[5].RequestMatcher.Destination[0].Value).To(Equal("third"))
+	Expect(unit.GetMatchingPairs()[5].RequestMatcher.RequiresState["sequence:3"]).To(Equal("2"))
+
+	Expect(unit.GetMatchingPairs()[5].Response.Body).To(Equal("third2"))
+}
+
 func Test_Simulation_AddPair_WillNotSaveDuplicates(t *testing.T) {
 	RegisterTestingT(t)
 
