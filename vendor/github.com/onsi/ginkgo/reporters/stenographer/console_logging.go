@@ -22,24 +22,24 @@ func (s *consoleStenographer) colorize(colorCode string, format string, args ...
 }
 
 func (s *consoleStenographer) printBanner(text string, bannerCharacter string) {
-	fmt.Fprintln(s.w, text)
-	fmt.Fprintln(s.w, strings.Repeat(bannerCharacter, len(text)))
+	fmt.Println(text)
+	fmt.Println(strings.Repeat(bannerCharacter, len(text)))
 }
 
 func (s *consoleStenographer) printNewLine() {
-	fmt.Fprintln(s.w, "")
+	fmt.Println("")
 }
 
 func (s *consoleStenographer) printDelimiter() {
-	fmt.Fprintln(s.w, s.colorize(grayColor, "%s", strings.Repeat("-", 30)))
+	fmt.Println(s.colorize(grayColor, "%s", strings.Repeat("-", 30)))
 }
 
 func (s *consoleStenographer) print(indentation int, format string, args ...interface{}) {
-	fmt.Fprint(s.w, s.indent(indentation, format, args...))
+	fmt.Print(s.indent(indentation, format, args...))
 }
 
 func (s *consoleStenographer) println(indentation int, format string, args ...interface{}) {
-	fmt.Fprintln(s.w, s.indent(indentation, format, args...))
+	fmt.Println(s.indent(indentation, format, args...))
 }
 
 func (s *consoleStenographer) indent(indentation int, format string, args ...interface{}) string {

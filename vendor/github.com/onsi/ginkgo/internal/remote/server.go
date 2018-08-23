@@ -9,16 +9,13 @@ package remote
 
 import (
 	"encoding/json"
+	"github.com/onsi/ginkgo/config"
+	"github.com/onsi/ginkgo/reporters"
+	"github.com/onsi/ginkgo/types"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"sync"
-
-	"github.com/onsi/ginkgo/internal/spec_iterator"
-
-	"github.com/onsi/ginkgo/config"
-	"github.com/onsi/ginkgo/reporters"
-	"github.com/onsi/ginkgo/types"
 )
 
 /*
@@ -32,7 +29,6 @@ type Server struct {
 	lock            *sync.Mutex
 	beforeSuiteData types.RemoteBeforeSuiteData
 	parallelTotal   int
-	counter         int
 }
 
 //Create a new server, automatically selecting a port
@@ -45,7 +41,7 @@ func NewServer(parallelTotal int) (*Server, error) {
 		listener:        listener,
 		lock:            &sync.Mutex{},
 		alives:          make([]func() bool, parallelTotal),
-		beforeSuiteData: types.RemoteBeforeSuiteData{Data: nil, State: types.RemoteBeforeSuiteStatePending},
+		beforeSuiteData: types.RemoteBeforeSuiteData{nil, types.RemoteBeforeSuiteStatePending},
 		parallelTotal:   parallelTotal,
 	}, nil
 }
@@ -67,8 +63,6 @@ func (server *Server) Start() {
 	//synchronization endpoints
 	mux.HandleFunc("/BeforeSuiteState", server.handleBeforeSuiteState)
 	mux.HandleFunc("/RemoteAfterSuiteData", server.handleRemoteAfterSuiteData)
-	mux.HandleFunc("/counter", server.handleCounter)
-	mux.HandleFunc("/has-counter", server.handleHasCounter) //for backward compatibility
 
 	go httpServer.Serve(server.listener)
 }
@@ -207,18 +201,4 @@ func (server *Server) handleRemoteAfterSuiteData(writer http.ResponseWriter, req
 
 	enc := json.NewEncoder(writer)
 	enc.Encode(afterSuiteData)
-}
-
-func (server *Server) handleCounter(writer http.ResponseWriter, request *http.Request) {
-	c := spec_iterator.Counter{}
-	server.lock.Lock()
-	c.Index = server.counter
-	server.counter = server.counter + 1
-	server.lock.Unlock()
-
-	json.NewEncoder(writer).Encode(c)
-}
-
-func (server *Server) handleHasCounter(writer http.ResponseWriter, request *http.Request) {
-	writer.Write([]byte(""))
 }

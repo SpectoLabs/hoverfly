@@ -59,6 +59,12 @@
   version = "v2.0.2"
 
 [[projects]]
+  name = "github.com/benjih/gopac"
+  packages = ["."]
+  revision = "aa2174f991767165c7f485c6625d181c872ac1fc"
+  version = "v1.0.1"
+
+[[projects]]
   name = "github.com/boltdb/bolt"
   packages = ["."]
   revision = "d97499360d1ecebc492ea66c7447ea948f417620"
@@ -249,6 +255,20 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/robertkrimen/otto"
+  packages = [
+    ".",
+    "ast",
+    "dbg",
+    "file",
+    "parser",
+    "registry",
+    "token"
+  ]
+  revision = "15f95af6e78dcd2030d8195a138bd88d4f403546"
+
+[[projects]]
+  branch = "master"
   name = "github.com/ryanuber/go-glob"
   packages = ["."]
   revision = "256dc444b735e061061cf46c809487313d5b0065"
@@ -369,6 +389,15 @@
   revision = "85c29909967d7f171f821e7a42e7b7af76fb9598"
 
 [[projects]]
+  name = "gopkg.in/sourcemap.v1"
+  packages = [
+    ".",
+    "base64vlq"
+  ]
+  revision = "6e83acea0053641eff084973fee085f0c193c61a"
+  version = "v1.0.5"
+
+[[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "a83829b6f1293c91addabc89d0571c246397bbf4"
@@ -385,6 +414,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "46e3c5cdaf532213d77c2fb54b22dc1511610a2396f3ccc45828a36dce8a3932"
+  inputs-digest = "8fef80545e7c532fe55d755e436b0530ab4ab8c3439f9dcb0aee9c41face8456"
   solver-name = "gps-cdcl"
   solver-version = 1
