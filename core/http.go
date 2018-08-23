@@ -16,6 +16,9 @@ func GetDefaultHoverflyHTTPClient(tlsVerification bool, upstreamProxy string) *h
 	if upstreamProxy == "" {
 		proxyURL = http.ProxyURL(nil)
 	} else {
+		if upstreamProxy[0:4] != "http" {
+			upstreamProxy = "http://" + upstreamProxy
+		}
 		u, err := url.Parse(upstreamProxy)
 		if err != nil {
 			log.Fatalf("Could not parse upstream proxy: ", err.Error())
@@ -41,7 +44,6 @@ func GetHttpClient(hf *Hoverfly, host string) *http.Client {
 			log.Fatalf("Failed to parse PAC (%s)", err)
 		}
 
-		// find the proxy entry for host check.immun.es
 		result, err := parser.FindProxy("", host)
 
 		if err != nil {

@@ -222,6 +222,14 @@ func (this Hoverfly) FlushCache() v2.CacheView {
 	return cache
 }
 
+func (this Hoverfly) SetPACFile(pacFile string) {
+	req := sling.New().Put(this.adminUrl + "/api/v2/hoverfly/pac").Body(bytes.NewBufferString(pacFile))
+	response := DoRequest(req)
+	Expect(response.StatusCode).To(Equal(http.StatusOK), "Failed to set PAC file")
+	_, err := ioutil.ReadAll(response.Body)
+	Expect(err).To(BeNil())
+}
+
 func (this Hoverfly) Proxy(r *sling.Sling) *http.Response {
 	req, err := r.Request()
 	Expect(err).To(BeNil())
