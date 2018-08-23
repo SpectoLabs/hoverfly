@@ -322,3 +322,7 @@ func (this *Hoverfly) SetPACFile(pacFile []byte) {
 	}
 	this.Cfg.PACFile = pacFile
 }
+
+func (this *Hoverfly) DeletePACFile() {
+	this.Cfg.PACFile = nil
+}

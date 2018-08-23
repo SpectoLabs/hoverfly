@@ -21,6 +21,10 @@ func (this *HoverflyPacStub) SetPACFile(PACFile []byte) {
 	this.PACFile = PACFile
 }
 
+func (this *HoverflyPacStub) DeletePACFile() {
+	this.PACFile = nil
+}
+
 func Test_HoverflyPACHandler_Get_ReturnsPACfile(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -84,4 +88,27 @@ func Test_HoverflyPACHandler_Put_ReturnsPACfile(t *testing.T) {
 
 	Expect(string(bodyBytes)).To(Equal("PACFILE"))
 	Expect(string(stubHoverfly.PACFile)).To(Equal("PACFILE"))
+}
+
+func Test_HoverflyPACHandler_Delete_DeletesPACfile(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyPacStub{
+		PACFile: []byte("PACFILE"),
+	}
+
+	unit := HoverflyPACHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("DELETE", "", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Delete, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	bodyBytes, err := ioutil.ReadAll(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(string(bodyBytes)).To(Equal(""))
+	Expect(stubHoverfly.PACFile).To(BeNil())
 }

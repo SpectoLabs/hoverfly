@@ -978,3 +978,15 @@ func Test_Hoverfly_SetPACFile_SetsPACFileToNilIfEmpty(t *testing.T) {
 
 	Expect(unit.Cfg.PACFile).To(BeNil())
 }
+
+func Test_Hoverfly_DeletePACFile(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{
+		PACFile: []byte("PACFILE"),
+	})
+
+	unit.DeletePACFile()
+
+	Expect(unit.Cfg.PACFile).To(BeNil())
+}

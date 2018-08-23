@@ -12,6 +12,7 @@ import (
 type HoverflyPAC interface {
 	GetPACFile() []byte
 	SetPACFile([]byte)
+	DeletePACFile()
 }
 
 type HoverflyPACHandler struct {
@@ -27,6 +28,10 @@ func (this *HoverflyPACHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthH
 	mux.Put("/api/v2/hoverfly/pac", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Put),
+	))
+	mux.Delete("/api/v2/hoverfly/pac", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Delete),
 	))
 	mux.Options("/api/v2/hoverfly/pac", negroni.New(
 		negroni.HandlerFunc(this.Options),
@@ -53,7 +58,11 @@ func (this *HoverflyPACHandler) Put(w http.ResponseWriter, req *http.Request, ne
 	this.Get(w, req, next)
 }
 
+func (this *HoverflyPACHandler) Delete(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	this.Hoverfly.DeletePACFile()
+}
+
 func (this *HoverflyPACHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	w.Header().Add("Allow", "OPTIONS, GET, PUT")
+	w.Header().Add("Allow", "OPTIONS, GET, PUT, DELETE")
 	handlers.WriteResponse(w, []byte(""))
 }
