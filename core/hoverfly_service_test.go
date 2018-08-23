@@ -946,3 +946,35 @@ func Test_Hoverfly_AddDiff_DoesntAddDiffReport_NoEntries(t *testing.T) {
 
 	Expect(unit.responsesDiff).To(HaveLen(0))
 }
+
+func Test_Hoverfly_GetPACFile_GetsPACFile(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{
+		PACFile: []byte("PACFILE"),
+	})
+
+	Expect(string(unit.GetPACFile())).To(Equal("PACFILE"))
+}
+
+func Test_Hoverfly_SetPACFile_SetsPACFile(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.SetPACFile([]byte("PACFILE"))
+
+	Expect(string(unit.Cfg.PACFile)).To(Equal("PACFILE"))
+}
+
+func Test_Hoverfly_SetPACFile_SetsPACFileToNilIfEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{
+		PACFile: []byte("PACFILE"),
+	})
+
+	unit.SetPACFile([]byte(""))
+
+	Expect(unit.Cfg.PACFile).To(BeNil())
+}

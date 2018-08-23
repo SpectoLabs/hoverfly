@@ -317,5 +317,8 @@ func (this *Hoverfly) GetPACFile() []byte {
 }
 
 func (this *Hoverfly) SetPACFile(pacFile []byte) {
+	if len(pacFile) == 0 {
+		pacFile = nil
+	}
 	this.Cfg.PACFile = pacFile
 }
