@@ -295,4 +295,27 @@ var _ = Describe("hoverctl `start`", func() {
 			Expect(output).To(ContainSubstring("Port 8500 was not free"))
 		})
 	})
+
+	Context("with pac-file", func() {
+		BeforeEach(func() {
+		})
+
+		It("starts with pac file when defined", func() {
+			output := functional_tests.Run(hoverctlBinary, "start", "--pac-file", "testdata/test.pac")
+
+			Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+			response := functional_tests.DoRequest(sling.New().Get("http://localhost:8888/api/v2/hoverfly/pac"))
+			Expect(response.StatusCode).To(Equal(200))
+			responseBody, err := ioutil.ReadAll(response.Body)
+			Expect(err).To(BeNil())
+			Expect(string(responseBody)).To(ContainSubstring(`function FindProxyForURL(url, host) {`))
+		})
+
+		It("errors when pac file not found", func() {
+			output := functional_tests.Run(hoverctlBinary, "start", "--pac-file", "unknown.pac")
+
+			Expect(output).To(ContainSubstring("File not found: unknown.pac"))
+		})
+	})
 })

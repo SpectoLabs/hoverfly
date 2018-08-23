@@ -27,6 +27,7 @@ const (
 	v2ApiDestination = "/api/v2/hoverfly/destination"
 	v2ApiState       = "/api/v2/state"
 	v2ApiMiddleware  = "/api/v2/hoverfly/middleware"
+	v2ApiPac         = "/api/v2/hoverfly/pac"
 	v2ApiCache       = "/api/v2/cache"
 	v2ApiLogs        = "/api/v2/logs"
 	v2ApiHoverfly    = "/api/v2/hoverfly"
@@ -238,6 +239,10 @@ func Start(target *configuration.Target) error {
 		if statusCode == 200 {
 			break
 		}
+	}
+
+	if target.PACFile != "" {
+		SetPACFile(*target)
 	}
 
 	return nil

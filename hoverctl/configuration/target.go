@@ -24,6 +24,7 @@ type Target struct {
 	DisableTls      bool   `yaml:",omitempty"`
 
 	UpstreamProxyUrl string `yaml:",omitempty"`
+	PACFile          string `yaml:",omitempty"`
 	HttpsOnly        bool   `yaml:",omitempty"`
 
 	AuthEnabled bool

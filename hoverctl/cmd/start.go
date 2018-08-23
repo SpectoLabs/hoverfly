@@ -71,6 +71,13 @@ hoverctl configuration file.
 		target.UpstreamProxyUrl, _ = cmd.Flags().GetString("upstream-proxy")
 		target.HttpsOnly, _ = cmd.Flags().GetBool("https-only")
 
+		if pacFileLocation, _ := cmd.Flags().GetString("pac-file"); pacFileLocation != "" {
+
+			pacFileData, err := configuration.ReadFile(pacFileLocation)
+			handleIfError(err)
+			target.PACFile = string(pacFileData)
+		}
+
 		if enableAuth, _ := cmd.Flags().GetBool("auth"); enableAuth {
 			username, _ := cmd.Flags().GetString("username")
 			password, _ := cmd.Flags().GetString("password")
@@ -124,6 +131,7 @@ func init() {
 	startCmd.Flags().String("key", "", "A path to a key file. Overrides the default Hoverfly TLS key")
 	startCmd.Flags().Bool("disable-tls", false, "Disables TLS verification")
 	startCmd.Flags().String("upstream-proxy", "", "A host for which Hoverfly will proxy its requests to")
+	startCmd.Flags().String("pac-file", "", "Configure upstream proxy by PAC file")
 	startCmd.Flags().Bool("https-only", false, "Disables insecure HTTP traffic in Hoverfly")
 	startCmd.Flags().String("listen-on-host", "", "Binds hoverfly listener to a host")
 
