@@ -2,6 +2,7 @@ package hoverfly
 
 import (
 	"crypto/tls"
+	"errors"
 	"net/http"
 	"net/url"
 	"strings"
@@ -37,28 +38,27 @@ func GetDefaultHoverflyHTTPClient(tlsVerification bool, upstreamProxy string) *h
 	}}
 }
 
-func GetHttpClient(hf *Hoverfly, host string) *http.Client {
+func GetHttpClient(hf *Hoverfly, host string) (*http.Client, error) {
 	if hf.Cfg.PACFile != nil {
 		parser := new(gopac.Parser)
 		if err := parser.ParseBytes(hf.Cfg.PACFile); err != nil {
-			log.Fatalf("Failed to parse PAC (%s)", err)
+			return nil, errors.New("Unable to parse PAC file\n\n" + err.Error())
 		}
 
 		result, err := parser.FindProxy("", host)
-
 		if err != nil {
-			log.Fatalf("Failed to find proxy entry (%s)", err)
+			return nil, errors.New("Unable to parse PAC file\n\n" + err.Error())
 		}
 
 		for _, s := range strings.Split(result, ";") {
 			if s == "DIRECT" {
 				log.Println("DIRECT")
-				return GetDefaultHoverflyHTTPClient(hf.Cfg.TLSVerification, "")
+				return GetDefaultHoverflyHTTPClient(hf.Cfg.TLSVerification, ""), nil
 			}
 			if s[0:6] == "PROXY " {
-				return GetDefaultHoverflyHTTPClient(hf.Cfg.TLSVerification, s[6:])
+				return GetDefaultHoverflyHTTPClient(hf.Cfg.TLSVerification, s[6:]), nil
 			}
 		}
 	}
-	return hf.HTTP
+	return hf.HTTP, nil
 }

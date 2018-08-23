@@ -157,5 +157,31 @@ var _ = Describe("When I run Hoverfly with a PAC file", func() {
 
 			Expect(string(bodyBytes)).To(Equal("hoverfly upstream proxy 1"))
 		})
+
+		It("Should error appropriately if PAC file is invalid", func() {
+			hoverflyPassThrough.SetPACFile(`BADPACFILE`)
+
+			resp := hoverflyPassThrough.Proxy(sling.New().Get("http://example.com"))
+			Expect(resp.StatusCode).To(Equal(502))
+
+			bodyBytes, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(bodyBytes)).To(ContainSubstring("Got error: Unable to parse PAC file"))
+			Expect(string(bodyBytes)).To(ContainSubstring("ReferenceError: 'BADPACFILE' is not defined"))
+
+			hoverflyPassThrough.SetPACFile(`function FindProxyForURL(url, host) {
+				&BADPACFILE&
+			}`)
+
+			resp = hoverflyPassThrough.Proxy(sling.New().Get("http://example.com"))
+			Expect(resp.StatusCode).To(Equal(502))
+
+			bodyBytes, err = ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(bodyBytes)).To(ContainSubstring("Got error: Unable to parse PAC file"))
+			Expect(string(bodyBytes)).To(ContainSubstring("(anonymous): Line 2:5 Unexpected token & (and 1 more errors)"))
+		})
 	})
 })
