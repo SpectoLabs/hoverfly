@@ -59,12 +59,6 @@
   version = "v2.0.2"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/benjih/gopac"
-  packages = ["."]
-  revision = "4b741b52a635e76165a079411ff7c1f211f34b30"
-
-[[projects]]
   name = "github.com/boltdb/bolt"
   packages = ["."]
   revision = "d97499360d1ecebc492ea66c7447ea948f417620"
@@ -158,6 +152,12 @@
   packages = ["."]
   revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
   version = "v1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/jackwakefield/gopac"
+  packages = ["."]
+  revision = "c4d2e0b9a672ebe23166683a72536344384b0e99"
 
 [[projects]]
   name = "github.com/kardianos/osext"
@@ -414,6 +414,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "59a61348994606d82d73327567f331b81574e7b2bf5c7ce83876a27b801d85fc"
+  inputs-digest = "868df94f6bd7ba5b5165cb4eaab8cad32d057e9cdc3e1f3d9030b47cb8518a5c"
   solver-name = "gps-cdcl"
   solver-version = 1

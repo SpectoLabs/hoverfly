@@ -71,4 +71,4 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/benjih/gopac"
+  name = "github.com/jackwakefield/gopac"

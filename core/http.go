@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/benjih/gopac"
+	"github.com/jackwakefield/gopac"
 )
 
 func GetDefaultHoverflyHTTPClient(tlsVerification bool, upstreamProxy string) *http.Client {
