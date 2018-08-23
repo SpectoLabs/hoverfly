@@ -68,3 +68,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/icrowley/fake"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/benjih/gopac"

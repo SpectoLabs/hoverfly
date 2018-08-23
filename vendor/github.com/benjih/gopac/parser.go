@@ -57,6 +57,17 @@ func (parser *Parser) Parse(path string) error {
 	return parser.rt.run(string(contents))
 }
 
+// ParseBytes loads a proxy auto-config (PAC) file using the given byte array
+func (parser *Parser) ParseBytes(contents []byte) error {
+	if !parser.initialised {
+		if err := parser.init(); err != nil {
+			return err
+		}
+	}
+
+	return parser.rt.run(string(contents))
+}
+
 // ParseUrl downloads and parses a proxy auto-config (PAC) file using the given
 // URL returning an error if the file fails to load.
 func (parser *Parser) ParseUrl(url string) error {

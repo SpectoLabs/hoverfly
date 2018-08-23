@@ -59,10 +59,10 @@
   version = "v2.0.2"
 
 [[projects]]
+  branch = "master"
   name = "github.com/benjih/gopac"
   packages = ["."]
-  revision = "aa2174f991767165c7f485c6625d181c872ac1fc"
-  version = "v1.0.1"
+  revision = "4b741b52a635e76165a079411ff7c1f211f34b30"
 
 [[projects]]
   name = "github.com/boltdb/bolt"
@@ -414,6 +414,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8fef80545e7c532fe55d755e436b0530ab4ab8c3439f9dcb0aee9c41face8456"
+  inputs-digest = "59a61348994606d82d73327567f331b81574e7b2bf5c7ce83876a27b801d85fc"
   solver-name = "gps-cdcl"
   solver-version = 1
