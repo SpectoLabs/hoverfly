@@ -1,11 +1,9 @@
 package hoverfly
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
-	"net/url"
 	"sync"
 
 	log "github.com/Sirupsen/logrus"
@@ -121,30 +119,6 @@ func GetNewHoverfly(cfg *Configuration, requestCache cache.Cache, authentication
 	hoverfly.Cfg = cfg
 
 	return hoverfly
-}
-
-func GetDefaultHoverflyHTTPClient(tlsVerification bool, upstreamProxy string) *http.Client {
-
-	var proxyURL func(*http.Request) (*url.URL, error)
-	if upstreamProxy == "" {
-		proxyURL = http.ProxyURL(nil)
-	} else {
-		u, err := url.Parse(upstreamProxy)
-		if err != nil {
-			log.Fatalf("Could not parse upstream proxy: ", err.Error())
-		}
-		proxyURL = http.ProxyURL(u)
-	}
-
-	return &http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error {
-		return http.ErrUseLastResponse
-	}, Transport: &http.Transport{
-		Proxy: proxyURL,
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: !tlsVerification,
-			Renegotiation:      tls.RenegotiateFreelyAsClient,
-		},
-	}}
 }
 
 // StartProxy - starts proxy with current configuration, this method is non blocking.

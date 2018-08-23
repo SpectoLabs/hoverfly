@@ -25,7 +25,8 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 
 	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
 
-	resp, err := hf.HTTP.Do(request)
+	client := GetHttpClient(hf, request.Host)
+	resp, err := client.Do(request)
 
 	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
 	if err != nil {
