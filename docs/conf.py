@@ -19,7 +19,7 @@ copyright = u'2017, SpectoLabs'
 author = u'SpectoLabs'
 
 
-version = 'v0.17.3'
+version = 'v0.17.4'
 # The full version, including alpha/beta/rc tags.
 release = version
 
