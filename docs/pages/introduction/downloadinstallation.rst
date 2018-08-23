@@ -32,7 +32,7 @@ To show which versions are installed in your machine:
 
 .. code:: bash
 
-    brew list --version hoverfly
+    brew list --versions hoverfly
 
 You can switch to a previously installed version as well:
 
