@@ -62,12 +62,15 @@ func (s *StrongestMatchStrategy) PostMatching(req models.RequestDetails, request
 	} else if s.matched == false && s.requestMatch == nil && s.score >= s.closestMissScore {
 		s.closestMissScore = s.score
 		view := matchingPair.BuildView()
+		state.RWMutex.RLock()
+		copy_state := state.State
+		state.RWMutex.RUnlock()
 		s.closestMiss = &models.ClosestMiss{
 			RequestDetails: req,
 			RequestMatcher: view.RequestMatcher,
 			Response:       view.Response,
 			MissedFields:   s.missedFields,
-			State:          state.State,
+			State:          copy_state,
 		}
 	}
 
