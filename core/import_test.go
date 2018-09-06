@@ -780,3 +780,70 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthMismatch(t
 	Expect(result.WarningMessages).To(HaveLen(1))
 	Expect(result.WarningMessages[0].Message).To(ContainSubstring("Response contains incorrect Content-Length header on data.pairs[0].response, please correct or remove header"))
 }
+
+func TestImportImportRequestResponsePairs_ReturnsNoWarnings(t *testing.T) {
+	RegisterTestingT(t)
+
+	cache := cache.NewInMemoryCache()
+	cfg := Configuration{Webserver: false}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
+
+	RegisterTestingT(t)
+
+	encodedPair := v2.RequestMatcherResponsePairViewV5{
+		Response: v2.ResponseDetailsViewV5{
+			Status: 200,
+			Body:   "hello_world",
+			Headers: map[string][]string{
+				"Content-Length": []string{"11"},
+			},
+		},
+		RequestMatcher: v2.RequestMatcherViewV5{
+			Destination: []v2.MatcherViewV5{
+				v2.MatcherViewV5{
+					Matcher: "exact",
+					Value:   "hoverfly.io",
+				},
+			},
+		},
+	}
+
+	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
+
+	Expect(result.WarningMessages).To(HaveLen(0))
+}
+
+func TestImportImportRequestResponsePairs_ReturnsNoWarnings_Encoded(t *testing.T) {
+	RegisterTestingT(t)
+
+	cache := cache.NewInMemoryCache()
+	cfg := Configuration{Webserver: false}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
+
+	RegisterTestingT(t)
+
+	encodedPair := v2.RequestMatcherResponsePairViewV5{
+		Response: v2.ResponseDetailsViewV5{
+			Status:      200,
+			Body:        base64String("hello_world"),
+			EncodedBody: true,
+			Headers: map[string][]string{
+				"Content-Length": []string{"11"},
+			},
+		},
+		RequestMatcher: v2.RequestMatcherViewV5{
+			Destination: []v2.MatcherViewV5{
+				v2.MatcherViewV5{
+					Matcher: "exact",
+					Value:   "hoverfly.io",
+				},
+			},
+		},
+	}
+
+	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
+
+	Expect(result.WarningMessages).To(HaveLen(0))
+}
