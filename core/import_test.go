@@ -726,7 +726,7 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthAndTransfe
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
 			Headers: map[string][]string{
-				"Content-Length":    []string{"16"},
+				"Content-Length":    []string{"11"},
 				"Transfer-Encoding": []string{"chunked"},
 			},
 		},
