@@ -15,17 +15,18 @@ func StateMatcher(currentState *state.State, requiredState map[string]string) *F
 	}
 
 	currentState.RWMutex.RLock()
+	copy_state := currentState.State
+	currentState.RWMutex.RUnlock()
 	for key, value := range requiredState {
-		if _, ok := currentState.State[key]; !ok {
+		if _, ok := copy_state[key]; !ok {
 			matched = false
 		}
-		if currentState.State[key] != value {
+		if copy_state[key] != value {
 			matched = false
 		} else {
 			score++
 		}
 	}
-	currentState.RWMutex.RUnlock()
 
 	return &FieldMatch{
 		Matched: matched,
