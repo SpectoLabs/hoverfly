@@ -19,7 +19,12 @@ type Config struct {
 func GetConfig() *Config {
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Debug(err.Error())
+		log.Debug("Error reading config")
+		if err.Error() == `Unsupported Config Type ""` {
+			log.Debug("viper not properly configured, if this is the first time executing hoverctl, please try te command again")
+		} else {
+			log.Debug(err.Error())
+		}
 	}
 
 	return &Config{
