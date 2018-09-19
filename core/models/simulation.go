@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/SpectoLabs/hoverfly/core/state"
 )
@@ -11,6 +12,7 @@ import (
 type Simulation struct {
 	matchingPairs  []RequestMatcherResponsePair
 	ResponseDelays ResponseDelays
+	RWMutex        sync.RWMutex
 }
 
 func NewSimulation() *Simulation {
@@ -23,6 +25,7 @@ func NewSimulation() *Simulation {
 
 func (this *Simulation) AddPair(pair *RequestMatcherResponsePair) {
 	var duplicate bool
+	this.RWMutex.Lock()
 	for _, savedPair := range this.matchingPairs {
 		duplicate = reflect.DeepEqual(pair.RequestMatcher, savedPair.RequestMatcher)
 		if duplicate {
@@ -32,6 +35,7 @@ func (this *Simulation) AddPair(pair *RequestMatcherResponsePair) {
 	if !duplicate {
 		this.matchingPairs = append(this.matchingPairs, *pair)
 	}
+	this.RWMutex.Unlock()
 }
 
 func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, state *state.State) {
@@ -42,10 +46,11 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 	var counter int
 	sequenceKey := "sequence:0"
 
-	for i, savedPair := range this.matchingPairs {
+	pairNoState := pair.RequestMatcher
+	pairNoState.RequiresState = nil
 
-		pairNoState := pair.RequestMatcher
-		pairNoState.RequiresState = nil
+	this.RWMutex.Lock()
+	for i, savedPair := range this.matchingPairs {
 
 		savedPairNoState := savedPair.RequestMatcher
 		savedPairNoState.RequiresState = nil
@@ -99,13 +104,19 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 	}
 
 	this.matchingPairs = append(this.matchingPairs, *pair)
+	this.RWMutex.Unlock()
 }
 
 func (this *Simulation) GetMatchingPairs() []RequestMatcherResponsePair {
-	return this.matchingPairs
+	this.RWMutex.RLock()
+	pairs := this.matchingPairs
+	this.RWMutex.RUnlock()
+	return pairs
 }
 
 func (this *Simulation) DeleteMatchingPairs() {
 	var pairs []RequestMatcherResponsePair
+	this.RWMutex.Lock()
 	this.matchingPairs = pairs
+	this.RWMutex.Unlock()
 }
