@@ -27,6 +27,11 @@ type Target struct {
 	PACFile          string `yaml:",omitempty"`
 	HttpsOnly        bool   `yaml:",omitempty"`
 
+	ClientAuthenticationDestination string
+	ClientAuthenticationClientCert  string
+	ClientAuthenticationClientKey   string
+	ClientAuthenticationCACert      string
+
 	AuthEnabled bool
 	Username    string
 	Password    string
@@ -149,6 +154,22 @@ func (this Target) BuildFlags() Flags {
 	if this.AuthEnabled {
 		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(this.Password), 10)
 		flags = append(flags, "-auth", "-username", this.Username, "-password-hash", string(hashedPassword))
+	}
+
+	if this.ClientAuthenticationDestination != "" {
+		flags = append(flags, "-client-authentication-destination="+this.ClientAuthenticationDestination)
+	}
+
+	if this.ClientAuthenticationClientCert != "" {
+		flags = append(flags, "-client-authentication-client-cert="+this.ClientAuthenticationClientCert)
+	}
+
+	if this.ClientAuthenticationClientKey != "" {
+		flags = append(flags, "-client-authentication-client-key="+this.ClientAuthenticationClientKey)
+	}
+
+	if this.ClientAuthenticationCACert != "" {
+		flags = append(flags, "-client-authentication-ca-cert="+this.ClientAuthenticationCACert)
 	}
 
 	return flags

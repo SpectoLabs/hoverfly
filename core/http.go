@@ -2,9 +2,12 @@ package hoverfly
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"errors"
+	"io/ioutil"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -54,6 +57,58 @@ func GetHttpClient(hf *Hoverfly, host string) (*http.Client, error) {
 		}
 
 	}
+
+	if hf.Cfg.ClientAuthenticationDestination != "" {
+
+		re := regexp.MustCompile(hf.Cfg.ClientAuthenticationDestination)
+
+		if re.MatchString(host) {
+
+			// Load client cert
+			cert, err := tls.LoadX509KeyPair(
+				hf.Cfg.ClientAuthenticationClientCert,
+				hf.Cfg.ClientAuthenticationClientKey,
+			)
+
+			if err != nil {
+				return nil, errors.New("Unable to load client certs file\n\n" + err.Error())
+			}
+
+			caCertPool := x509.NewCertPool()
+
+			var tlsConfig *tls.Config
+
+			if hf.Cfg.ClientAuthenticationCACert != "" {
+				// Load CA cert
+				caCert, err := ioutil.ReadFile(hf.Cfg.ClientAuthenticationCACert)
+
+				if err != nil {
+					return nil, errors.New("Unable to load ca certs file\n\n" + err.Error())
+				}
+
+				caCertPool.AppendCertsFromPEM(caCert)
+
+				tlsConfig = &tls.Config{
+					Certificates: []tls.Certificate{cert},
+					RootCAs:      caCertPool,
+				}
+			} else {
+				tlsConfig = &tls.Config{
+					Certificates:       []tls.Certificate{cert},
+					RootCAs:            caCertPool,
+					InsecureSkipVerify: true,
+				}
+			}
+
+			tlsConfig.BuildNameToCertificate()
+
+			transport := &http.Transport{TLSClientConfig: tlsConfig}
+			client := &http.Client{Transport: transport}
+
+			return client, nil
+		}
+	}
+
 	return hf.HTTP, nil
 }
 

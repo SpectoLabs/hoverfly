@@ -103,6 +103,11 @@ var (
 	logsSize   = flag.Int("logs-size", 1000, "Set the amount of logs to be stored in memory (default \"1000\")")
 
 	journalSize = flag.Int("journal-size", 1000, "Set the size of request/response journal (default \"1000\")")
+
+	clientAuthenticationDestination = flag.String("client-authentication-destination", "", "Regular expression of desination with client authentication")
+	clientAuthenticationClientCert  = flag.String("client-authentication-client-cert", "", "Path to the client certification file used for authentication")
+	clientAuthenticationClientKey   = flag.String("client-authentication-client-key", "", "Path to the client key file used for authentication")
+	clientAuthenticationCACert      = flag.String("client-authentication-ca-cert", "", "Path to the ca cert file used for authentication")
 )
 
 var CA_CERT = []byte(`-----BEGIN CERTIFICATE-----
@@ -265,6 +270,11 @@ func main() {
 
 	cfg.HttpsOnly = *httpsOnly
 	cfg.PlainHttpTunneling = *plainHttpTunneling
+
+	cfg.ClientAuthenticationDestination = *clientAuthenticationDestination
+	cfg.ClientAuthenticationClientCert = *clientAuthenticationClientCert
+	cfg.ClientAuthenticationClientKey = *clientAuthenticationClientKey
+	cfg.ClientAuthenticationCACert = *clientAuthenticationCACert
 
 	// overriding default middleware setting
 	newMiddleware, err := mw.ConvertToNewMiddleware(*middleware)
