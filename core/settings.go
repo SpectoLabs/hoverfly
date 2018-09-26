@@ -41,6 +41,11 @@ type Configuration struct {
 
 	PlainHttpTunneling bool
 
+	ClientAuthenticationDestination string
+	ClientAuthenticationClientCert  string
+	ClientAuthenticationClientKey   string
+	ClientAuthenticationCACert      string
+
 	ProxyControlWG sync.WaitGroup
 
 	mu sync.Mutex
