@@ -421,11 +421,11 @@ func Test_Journal_GetEntries_FilteredByTimeWindow(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		request, _ := http.NewRequest("GET", "http://hoverfly.io/path?id="+strconv.Itoa(i), nil)
-		unit.NewEntry(request, response, "test-mode", time.Date(2018, 2, 1, 2, 0, i, 0, time.Local))
+		unit.NewEntry(request, response, "test-mode", time.Date(2018, 2, 1, 2, 0, i, 0, time.UTC))
 	}
 
-	fromQuery := time.Date(2018, 2, 1, 2, 0, 1, 0, time.Local)
-	toQuery := time.Date(2018, 2, 1, 2, 0, 3, 0, time.Local)
+	fromQuery := time.Date(2018, 2, 1, 2, 0, 1, 0, time.UTC)
+	toQuery := time.Date(2018, 2, 1, 2, 0, 3, 0, time.UTC)
 
 	journalView, err := unit.GetEntries(0, 25, &fromQuery, &toQuery, "")
 	entries := journalView.Journal
