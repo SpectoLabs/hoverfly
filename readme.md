@@ -12,7 +12,7 @@ Hoverfly is a lightweight, open source API simulation tool. Using Hoverfly, you 
 * Simulate network latency, random failures or rate limits to test edge-cases
 * Extend and customize with any programming language
 * Export, share, edit and import API simulations
-* CLI and native language bindings for [Java](https://hoverfly-java.readthedocs.io/en/latest/) and [Python](https://hoverpy.readthedocs.io/en/latest/)
+* CLI and native language bindings for [Java](https://hoverfly-java.readthedocs.io/en/latest/)
 * REST API
 * Lightweight, high-performance, run anywhere
 * Apache 2 license
