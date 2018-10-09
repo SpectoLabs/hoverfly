@@ -1,7 +1,7 @@
 .. _behind_a_proxy:
 
 Using Hoverfly behind a proxy
-================================
+=============================
 
 In some environments, you may only be able to access the internet via a proxy. For example,
 your organization may route all traffic through a proxy for security reasons.
