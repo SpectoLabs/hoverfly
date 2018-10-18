@@ -3,6 +3,7 @@ package matching
 import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/state"
+	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 type StrongestMatchStrategy struct {
@@ -63,14 +64,14 @@ func (s *StrongestMatchStrategy) PostMatching(req models.RequestDetails, request
 		s.closestMissScore = s.score
 		view := matchingPair.BuildView()
 		state.RWMutex.RLock()
-		copy_state := state.State
+		copyState := util.CopyMap(state.State)
 		state.RWMutex.RUnlock()
 		s.closestMiss = &models.ClosestMiss{
 			RequestDetails: req,
 			RequestMatcher: view.RequestMatcher,
 			Response:       view.Response,
 			MissedFields:   s.missedFields,
-			State:          copy_state,
+			State:          copyState,
 		}
 	}
 
