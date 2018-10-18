@@ -156,3 +156,11 @@ func MinifyXml(toMinify string) (string, error) {
 
 	return minifier.String("application/xml", toMinify)
 }
+
+func CopyMap(originalMap map[string]string) map[string]string {
+	newMap := make(map[string]string)
+	for key, value := range originalMap {
+		newMap[key] = value
+	}
+	return newMap
+}
