@@ -18,6 +18,8 @@ import (
 	"github.com/go-zoo/bone"
 )
 
+const defaultTimestampFormat = time.RFC3339
+
 type HoverflyLogs interface {
 	GetLogs(limit int, from *time.Time) ([]*logrus.Entry, error)
 }
@@ -78,7 +80,7 @@ func logsToLogsView(logs []*logrus.Entry) LogsView {
 			data[k] = v
 		}
 
-		data["time"] = entry.Time.Format(logrus.DefaultTimestampFormat)
+		data["time"] = entry.Time.Format(defaultTimestampFormat)
 		data["msg"] = entry.Message
 		data["level"] = entry.Level.String()
 

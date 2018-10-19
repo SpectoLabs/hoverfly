@@ -31,7 +31,8 @@
 [[projects]]
   name = "github.com/Sirupsen/logrus"
   packages = ["."]
-  revision = "cd7d1bbe41066b6c1f19780f895901052150a575"
+  revision = "ad15b42461921f1fb3529b058c6786c6a45d5162"
+  version = "v1.1.1"
 
 [[projects]]
   name = "github.com/SpectoLabs/goproxy"
@@ -163,6 +164,12 @@
   name = "github.com/kardianos/osext"
   packages = ["."]
   revision = "29ae4ffbc9a6fe9fb2bc5029050ce6996ea1d3bc"
+
+[[projects]]
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
+  version = "v1.0.1"
 
 [[projects]]
   name = "github.com/magiconair/properties"
