@@ -31,7 +31,6 @@ var _ = Describe("Running Hoverfly with delays", func() {
 	Context("When running in capture mode", func() {
 
 		var fakeServer *httptest.Server
-		var fakeServerUrl *url.URL
 
 		BeforeEach(func() {
 			hoverfly.Start()
@@ -42,7 +41,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
 				w.Write([]byte("Hello world"))
 			}))
 
-			fakeServerUrl, _ = url.Parse(fakeServer.URL)
+			url.Parse(fakeServer.URL)
 			hoverfly.SetMode("capture")
 		})
 
