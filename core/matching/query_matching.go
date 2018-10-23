@@ -31,14 +31,15 @@ func QueryMatching(requestMatcher models.RequestMatcher, toMatch map[string][]st
 		}
 	}
 
+	lowercaseKeyMap := make(map[string][]string)
 	for key, value := range toMatch {
-		toMatch[strings.ToLower(key)] = value
+		lowercaseKeyMap[strings.ToLower(key)] = value
 	}
 
 	for matcherQueryKey, matcherQueryValue := range *requestMatcher.Query {
 		matcherHeaderValueMatched := false
 
-		toMatchQueryValues, found := toMatch[strings.ToLower(matcherQueryKey)]
+		toMatchQueryValues, found := lowercaseKeyMap[strings.ToLower(matcherQueryKey)]
 		if !found {
 			matched = false
 			continue
