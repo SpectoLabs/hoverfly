@@ -25,7 +25,7 @@ func GetDefaultHoverflyHTTPClient(tlsVerification bool, upstreamProxy string) *h
 		}
 		u, err := url.Parse(upstreamProxy)
 		if err != nil {
-			log.Fatalf("Could not parse upstream proxy: ", err.Error())
+			log.Fatalf("Could not parse upstream proxy: %s", err.Error())
 		}
 		proxyURL = http.ProxyURL(u)
 	}
