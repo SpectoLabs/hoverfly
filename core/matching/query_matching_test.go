@@ -182,3 +182,26 @@ func Test_QueryMatching(t *testing.T) {
 	}
 
 }
+
+func Test_QueryMatching_ShouldNotModifySourceQueries(t *testing.T) {
+	RegisterTestingT(t)
+
+	toMatch := map[string][]string{
+		"urlPattern": {"test-(.+).com"},
+	}
+
+	result := matching.QueryMatching(models.RequestMatcher{
+		Query: &models.QueryRequestFieldMatchers{
+			"urlPattern": {
+				{
+					Matcher: matchers.Glob,
+					Value:   "test-(.+).com",
+				},
+			},
+		},
+	}, toMatch)
+
+	Expect(result.Matched).To(BeTrue())
+	Expect(len(toMatch)).To(Equal(1))
+	Expect(toMatch["urlPattern"]).To(Equal([]string{"test-(.+).com"}))
+}
