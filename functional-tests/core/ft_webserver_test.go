@@ -49,6 +49,18 @@ var _ = Describe("When running Hoverfly as a webserver", func() {
 
 					Expect(response.Header).To(HaveKeyWithValue("Header", []string{"value1", "value2"}))
 				})
+
+				It("and it should increment the usage counter", func() {
+					request := sling.New().Get("http://localhost:" + hoverfly.GetProxyPort() + "/path1")
+					functional_tests.DoRequest(request)
+
+					req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly/usage")
+					res := functional_tests.DoRequest(req)
+					Expect(res.StatusCode).To(Equal(200))
+					modeJson, err := ioutil.ReadAll(res.Body)
+					Expect(err).To(BeNil())
+					Expect(modeJson).To(Equal([]byte(`{"usage":{"counters":{"capture":0,"diff":0,"modify":0,"simulate":1,"spy":0,"synthesize":0}}}`)))
+				})
 			})
 
 			Context("using POST", func() {

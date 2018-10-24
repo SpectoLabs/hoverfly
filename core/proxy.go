@@ -140,9 +140,10 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 
 		w.Header().Set("Req", r.RequestURI)
 		w.Header().Set("Resp", resp.Header.Get("Content-Length"))
-
 		w.WriteHeader(resp.StatusCode)
 		w.Write([]byte(body))
+
+		hoverfly.Counter.Count(hoverfly.Cfg.GetMode())
 	})
 
 	if hoverfly.Cfg.Verbose {
