@@ -27,7 +27,7 @@ Hoverfly is developed and maintained by [SpectoLabs](https://specto.io).
 
 ## Hoverfly Cloud
 
-Hoverfly Cloud - API simulations as a service. [Sign up for the private beta.](https://hoverfly.io/hoverfly-cloud)
+Hoverfly Cloud - API simulations as a service. [Sign up here.](https://hoverfly.io/hoverfly-cloud)
 
 ## Contributing
 
