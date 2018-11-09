@@ -119,7 +119,8 @@ func ValidateSimulation(json, schema map[string]interface{}) error {
 }
 
 type GlobalActionsView struct {
-	Delays []v1.ResponseDelayView `json:"delays"`
+	Delays          []v1.ResponseDelayView          `json:"delays"`
+	DelaysLogNormal []v1.ResponseDelayLogNormalView `json:"delays-log-normal"`
 }
 
 type MetaView struct {
@@ -136,12 +137,18 @@ func NewMetaView(version string) *MetaView {
 	}
 }
 
-func BuildSimulationView(pairViews []RequestMatcherResponsePairViewV5, delayView v1.ResponseDelayPayloadView, version string) SimulationViewV5 {
+func BuildSimulationView(
+	pairViews []RequestMatcherResponsePairViewV5,
+	delayView v1.ResponseDelayPayloadView,
+	delayLogNormalView v1.ResponseDelayLogNormalPayloadView,
+	version string,
+) SimulationViewV5 {
 	return SimulationViewV5{
 		DataViewV5{
 			RequestResponsePairs: pairViews,
 			GlobalActions: GlobalActionsView{
-				Delays: delayView.Data,
+				Delays:          delayView.Data,
+				DelaysLogNormal: delayLogNormalView.Data,
 			},
 		},
 		*NewMetaView(version),

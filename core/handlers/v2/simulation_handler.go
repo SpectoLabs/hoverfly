@@ -87,9 +87,9 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 
 		log.WithFields(log.Fields{
 			"body": string(body),
-		}).Debug(err.Error())
+		}).Debug(result.err.Error())
 
-		handlers.WriteErrorResponse(w, "An error occured: "+err.Error(), http.StatusInternalServerError)
+		handlers.WriteErrorResponse(w, "An error occured: "+result.err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if len(result.WarningMessages) > 0 {

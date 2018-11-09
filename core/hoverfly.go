@@ -197,5 +197,10 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 		respDelay.Execute()
 	}
 
+	respDelayLogNormal := hf.Simulation.ResponseDelaysLogNormal.GetDelay(requestDetails)
+	if respDelayLogNormal != nil {
+		respDelayLogNormal.Execute()
+	}
+
 	return response
 }

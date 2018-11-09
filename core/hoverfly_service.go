@@ -3,6 +3,7 @@ package hoverfly
 import (
 	"errors"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/delay"
 	"regexp"
 
 	"strings"
@@ -202,8 +203,41 @@ func (hf *Hoverfly) SetResponseDelays(payloadView v1.ResponseDelayPayloadView) e
 	return nil
 }
 
+func (hf *Hoverfly) SetResponseDelaysLogNormal(payloadView v1.ResponseDelayLogNormalPayloadView) error {
+	err := models.ValidateResponseDelayLogNormalPayload(payloadView)
+	if err != nil {
+		return err
+	}
+
+	var responseDelaysLogNormal models.ResponseDelayLogNormalList
+
+	for _, responseDelayView := range payloadView.Data {
+		responseDelaysLogNormal = append(responseDelaysLogNormal, models.ResponseDelayLogNormal{
+			UrlPattern: responseDelayView.UrlPattern,
+			HttpMethod: responseDelayView.HttpMethod,
+			Min:        responseDelayView.Min,
+			Max:        responseDelayView.Max,
+			Mean:       responseDelayView.Mean,
+			Median:     responseDelayView.Median,
+			DelayGenerator: delay.NewLogNormalGenerator(
+				responseDelayView.Min,
+				responseDelayView.Max,
+				responseDelayView.Mean,
+				responseDelayView.Median,
+			),
+		})
+	}
+
+	hf.Simulation.ResponseDelaysLogNormal = &responseDelaysLogNormal
+	return nil
+}
+
 func (hf *Hoverfly) DeleteResponseDelays() {
 	hf.Simulation.ResponseDelays = &models.ResponseDelayList{}
+}
+
+func (hf *Hoverfly) DeleteResponseDelaysLogNormal() {
+	hf.Simulation.ResponseDelaysLogNormal = &models.ResponseDelayLogNormalList{}
 }
 
 func (hf Hoverfly) GetStats() metrics.Stats {
@@ -219,6 +253,7 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV5, error) {
 
 	return v2.BuildSimulationView(pairViews,
 		hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView(),
+		hf.Simulation.ResponseDelaysLogNormal.ConvertToResponseDelayLogNormalPayloadView(),
 		hf.version), nil
 }
 
@@ -247,6 +282,7 @@ func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV5
 
 	return v2.BuildSimulationView(pairViews,
 		hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView(),
+		hf.Simulation.ResponseDelaysLogNormal.ConvertToResponseDelayLogNormalPayloadView(),
 		hf.version), nil
 }
 
@@ -254,6 +290,7 @@ func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV5) v2.Simul
 	result := this.importRequestResponsePairViews(simulationView.DataViewV5.RequestResponsePairs)
 
 	result.AddError(this.SetResponseDelays(v1.ResponseDelayPayloadView{Data: simulationView.GlobalActions.Delays}))
+	result.AddError(this.SetResponseDelaysLogNormal(v1.ResponseDelayLogNormalPayloadView{Data: simulationView.GlobalActions.DelaysLogNormal}))
 
 	return result
 }
@@ -261,6 +298,7 @@ func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV5) v2.Simul
 func (this *Hoverfly) DeleteSimulation() {
 	this.Simulation.DeleteMatchingPairs()
 	this.DeleteResponseDelays()
+	this.DeleteResponseDelaysLogNormal()
 	this.FlushCache()
 }
 

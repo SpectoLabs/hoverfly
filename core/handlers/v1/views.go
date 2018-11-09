@@ -28,3 +28,16 @@ type ResponseDelayView struct {
 type ResponseDelayPayloadView struct {
 	Data []ResponseDelayView `json:"data"`
 }
+
+type ResponseDelayLogNormalPayloadView struct {
+	Data []ResponseDelayLogNormalView `json:"data"`
+}
+
+type ResponseDelayLogNormalView struct {
+	UrlPattern string `json:"urlPattern"`
+	HttpMethod string `json:"httpMethod"`
+	Min        int    `json:"min"`
+	Max        int    `json:"max"`
+	Mean       int    `json:"mean"`
+	Median     int    `json:"median"`
+}

@@ -10,16 +10,18 @@ import (
 )
 
 type Simulation struct {
-	matchingPairs  []RequestMatcherResponsePair
-	ResponseDelays ResponseDelays
-	RWMutex        sync.RWMutex
+	matchingPairs           []RequestMatcherResponsePair
+	ResponseDelays          ResponseDelays
+	ResponseDelaysLogNormal ResponseDelaysLogNormal
+	RWMutex                 sync.RWMutex
 }
 
 func NewSimulation() *Simulation {
 
 	return &Simulation{
-		matchingPairs:  []RequestMatcherResponsePair{},
-		ResponseDelays: &ResponseDelayList{},
+		matchingPairs:           []RequestMatcherResponsePair{},
+		ResponseDelays:          &ResponseDelayList{},
+		ResponseDelaysLogNormal: &ResponseDelayLogNormalList{},
 	}
 }
 

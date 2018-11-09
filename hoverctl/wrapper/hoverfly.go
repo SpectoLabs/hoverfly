@@ -363,7 +363,7 @@ func handleResponseError(response *http.Response, errorMessage string) error {
 
 		err := json.Unmarshal(responseError, error)
 		if err != nil {
-			return errors.New(errorMessage + "\n\n" + string(errorMessage))
+			return errors.New(errorMessage + "\n\n" + string(responseError))
 		}
 		return errors.New(errorMessage + "\n\n" + error.ErrorMessage)
 	}

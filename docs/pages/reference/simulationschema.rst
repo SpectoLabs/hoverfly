@@ -24,6 +24,29 @@ This is the JSON schema for v5 Hoverfly simulations.
         },
         "type": "object"
       },
+      "delays-log-normal": {
+        "properties": {
+          "min": {
+            "type": "integer"
+          },
+          "max": {
+            "type": "integer"
+          },
+          "mean": {
+            "type": "integer"
+          },
+          "median": {
+            "type": "integer"
+          },
+          "httpMethod": {
+            "type": "string"
+          },
+          "urlPattern": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "field-matchers": {
         "properties": {
           "matcher": {
@@ -171,6 +194,12 @@ This is the JSON schema for v5 Hoverfly simulations.
               "delays": {
                 "items": {
                   "$ref": "#/definitions/delay"
+                },
+                "type": "array"
+              },
+              "delays-log-normal": {
+                "items": {
+                  "$ref": "#/definitions/delay-log-normal"
                 },
                 "type": "array"
               }
