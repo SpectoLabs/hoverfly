@@ -15,6 +15,29 @@
 			},
 			"type": "object"
 		},
+		"delays-log-normal": {
+			"properties": {
+				"min": {
+					"type": "integer"
+				},
+				"max": {
+					"type": "integer"
+				},
+				"mean": {
+					"type": "integer"
+				},
+				"median": {
+					"type": "integer"
+				},
+				"httpMethod": {
+					"type": "string"
+				},
+				"urlPattern": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"field-matchers": {
 			"properties": {
 				"matcher": {
@@ -162,6 +185,12 @@
 						"delays": {
 							"items": {
 								"$ref": "#/definitions/delay"
+							},
+							"type": "array"
+						},
+						"delays-log-normal": {
+							"items": {
+								"$ref": "#/definitions/delay-log-normal"
 							},
 							"type": "array"
 						}

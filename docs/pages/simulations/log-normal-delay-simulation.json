@@ -1,0 +1,44 @@
+{
+   "data": {
+      "pairs": [
+         {
+            "request": {
+               "destination": [
+                  {
+                     "matcher": "glob",
+                     "value": "*"
+                  }
+               ]
+            },
+            "response": {
+               "status": 200,
+               "body": "Delayed response",
+               "encodedBody": false,
+               "headers": {
+                  "Hoverfly": [
+                     "Was-Here"
+                  ]
+               },
+               "templated": false
+            }
+         }
+      ],
+      "globalActions": {
+         "delays-log-normal": [
+            {
+               "urlPattern": ".",
+               "httpMethod": "",
+               "min": 100,
+               "max": 10000,
+               "mean": 5000,
+               "median": 500
+            }
+         ]
+      }
+   },
+   "meta": {
+      "schemaVersion": "v5",
+      "hoverflyVersion": "v0.17.0",
+      "timeExported": "2018-06-04T10:29:57+01:00"
+   }
+}

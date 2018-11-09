@@ -55,6 +55,23 @@ var (
 		UrlPattern: "test.com",
 		Delay:      201,
 	}
+
+	delayLogNormalOne = v1.ResponseDelayLogNormalView{
+		UrlPattern: ".",
+		HttpMethod: "GET",
+		Min:        100,
+		Max:        400,
+		Mean:       300,
+		Median:     200,
+	}
+
+	delayLogNormalTwo = v1.ResponseDelayLogNormalView{
+		UrlPattern: "test.com",
+		Min:        101,
+		Max:        401,
+		Mean:       301,
+		Median:     201,
+	}
 )
 
 func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
@@ -254,6 +271,46 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleDelays(t *testing.T) {
 	Expect(simulation.DataViewV5.GlobalActions.Delays[1].Delay).To(Equal(200))
 }
 
+func Test_Hoverfly_GetSimulation_ReturnsMultipleDelaysLogNormal(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	delay1 := models.ResponseDelayLogNormal{
+		UrlPattern: "test-pattern",
+		Min:        100,
+		Max:        400,
+		Mean:       300,
+		Median:     200,
+	}
+
+	delay2 := models.ResponseDelayLogNormal{
+		HttpMethod: "test",
+		Min:        101,
+		Max:        401,
+		Mean:       301,
+		Median:     201,
+	}
+
+	responseDelays := models.ResponseDelayLogNormalList{delay1, delay2}
+
+	unit.Simulation.ResponseDelaysLogNormal = &responseDelays
+
+	simulation, err := unit.GetSimulation()
+	Expect(err).To(BeNil())
+
+	Expect(simulation.DataViewV5.GlobalActions.DelaysLogNormal).To(HaveLen(2))
+
+	Expect(simulation.DataViewV5.GlobalActions.DelaysLogNormal[0].Min).To(Equal(delay1.Min))
+	Expect(simulation.DataViewV5.GlobalActions.DelaysLogNormal[0].Max).To(Equal(delay1.Max))
+	Expect(simulation.DataViewV5.GlobalActions.DelaysLogNormal[0].Mean).To(Equal(delay1.Mean))
+	Expect(simulation.DataViewV5.GlobalActions.DelaysLogNormal[0].Median).To(Equal(delay1.Median))
+	Expect(simulation.DataViewV5.GlobalActions.DelaysLogNormal[1].Min).To(Equal(delay2.Min))
+	Expect(simulation.DataViewV5.GlobalActions.DelaysLogNormal[1].Max).To(Equal(delay2.Max))
+	Expect(simulation.DataViewV5.GlobalActions.DelaysLogNormal[1].Mean).To(Equal(delay2.Mean))
+	Expect(simulation.DataViewV5.GlobalActions.DelaysLogNormal[1].Median).To(Equal(delay2.Median))
+}
+
 func Test_Hoverfly_GetFilteredSimulation_WithPlainTextUrlQuery(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -360,6 +417,7 @@ func Test_Hoverfly_GetFilteredSimulation_ReturnBlankSimulation_IfThereIsNoMatch(
 
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
+	Expect(simulation.GlobalActions.DelaysLogNormal).To(HaveLen(0))
 
 	Expect(simulation.MetaView.SchemaVersion).To(Equal("v5"))
 	Expect(simulation.MetaView.HoverflyVersion).To(MatchRegexp(`v\d+.\d+.\d+`))
@@ -548,6 +606,33 @@ func Test_Hoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 	Expect(delays.Data[1].UrlPattern).To(Equal("test.com"))
 	Expect(delays.Data[1].HttpMethod).To(Equal(""))
 	Expect(delays.Data[1].Delay).To(Equal(201))
+}
+
+func Test_Hoverfly_PutSimulation_ImportsDelaysLogNormal(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	simulationToImport := v2.SimulationViewV5{
+		v2.DataViewV5{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{},
+			GlobalActions: v2.GlobalActionsView{
+				DelaysLogNormal: []v1.ResponseDelayLogNormalView{delayLogNormalOne, delayLogNormalTwo},
+			},
+		},
+		v2.MetaView{},
+	}
+
+	err := unit.PutSimulation(simulationToImport)
+	Expect(err.GetError()).To(BeNil())
+
+	delays := unit.Simulation.ResponseDelaysLogNormal.ConvertToResponseDelayLogNormalPayloadView()
+	Expect(delays).ToNot(BeNil())
+
+	Expect(delays.Data).To(HaveLen(2))
+
+	Expect(delays.Data[0]).To(Equal(delayLogNormalOne))
+	Expect(delays.Data[1]).To(Equal(delayLogNormalTwo))
 }
 
 func Test_Hoverfly_GetMiddleware_ReturnsCorrectValuesFromMiddleware(t *testing.T) {

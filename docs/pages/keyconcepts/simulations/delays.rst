@@ -16,5 +16,7 @@ and an optional HTTP method value.
 
   This functionality is best understood via a practical example: see :ref:`adding_delays` in the :ref:`tutorials` section.
 
+  You can use :ref:`lognormal` for realistic delay.
+
   You can also apply delays to simulations using :ref:`middleware` (see the :ref:`randomlatency` tutorial).
   Using middleware to apply delays sacrifices performance for flexibility. 

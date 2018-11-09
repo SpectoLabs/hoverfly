@@ -33,7 +33,10 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV3Payload(t *
 				}
 			],
 			"globalActions": {
-				"delays": []
+				"delays": [],
+				"delays-log-normal": [
+					{"min": 1, "max": 4, "mean": 3, "median" :2}
+				]
 			}
 		},
 		"meta": {
@@ -61,6 +64,11 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV3Payload(t *
 	Expect(simulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
 	Expect(simulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Header", []string{"value"}))
 	Expect(simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
+
+	Expect(simulation.GlobalActions.DelaysLogNormal[0].Min).To(Equal(1))
+	Expect(simulation.GlobalActions.DelaysLogNormal[0].Max).To(Equal(4))
+	Expect(simulation.GlobalActions.DelaysLogNormal[0].Mean).To(Equal(3))
+	Expect(simulation.GlobalActions.DelaysLogNormal[0].Median).To(Equal(2))
 
 	Expect(simulation.SchemaVersion).To(Equal("v3"))
 	Expect(simulation.HoverflyVersion).To(Equal("v0.11.0"))
@@ -92,7 +100,10 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV2Payload(t *
 				}
 			],
 			"globalActions": {
-				"delays": []
+				"delays": [],
+				"delays-log-normal": [
+					{"min": 1, "max": 4, "mean": 3, "median" :2}
+				]
 			}
 		},
 		"meta": {
@@ -121,6 +132,11 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV2Payload(t *
 	Expect(simulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Header", []string{"value"}))
 	Expect(simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 
+	Expect(simulation.GlobalActions.DelaysLogNormal[0].Min).To(Equal(1))
+	Expect(simulation.GlobalActions.DelaysLogNormal[0].Max).To(Equal(4))
+	Expect(simulation.GlobalActions.DelaysLogNormal[0].Mean).To(Equal(3))
+	Expect(simulation.GlobalActions.DelaysLogNormal[0].Median).To(Equal(2))
+
 	Expect(simulation.SchemaVersion).To(Equal("v3"))
 	Expect(simulation.HoverflyVersion).To(Equal("v0.11.0"))
 	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
@@ -143,6 +159,7 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationIfThereIsNoSchem
 	Expect(simulation).ToNot(BeNil())
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
+	Expect(simulation.GlobalActions.DelaysLogNormal).To(HaveLen(0))
 }
 
 func Test_NewSimulationViewFromResponseBody_WontBlowUpIfMetaIsMissing(t *testing.T) {
@@ -158,6 +175,7 @@ func Test_NewSimulationViewFromResponseBody_WontBlowUpIfMetaIsMissing(t *testing
 	Expect(simulation).ToNot(BeNil())
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
+	Expect(simulation.GlobalActions.DelaysLogNormal).To(HaveLen(0))
 }
 
 func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV1Payload(t *testing.T) {
@@ -276,6 +294,7 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidJson(
 	Expect(simulation).ToNot(BeNil())
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
+	Expect(simulation.GlobalActions.DelaysLogNormal).To(HaveLen(0))
 }
 
 func Test_SimulationImportResult_AddDeprecatedQueryWarning_AddsWarning(t *testing.T) {

@@ -253,6 +253,27 @@ func (this ResponseDelayListStub) ConvertToResponseDelayPayloadView() v1.Respons
 	return v1.ResponseDelayPayloadView{}
 }
 
+type ResponseDelayLogNormalListStub struct {
+	gotDelays int
+}
+
+func (this *ResponseDelayLogNormalListStub) Json() []byte {
+	return nil
+}
+
+func (this *ResponseDelayLogNormalListStub) Len() int {
+	return this.Len()
+}
+
+func (this *ResponseDelayLogNormalListStub) GetDelay(request models.RequestDetails) *models.ResponseDelayLogNormal {
+	this.gotDelays++
+	return nil
+}
+
+func (this ResponseDelayLogNormalListStub) ConvertToResponseDelayLogNormalPayloadView() v1.ResponseDelayLogNormalPayloadView {
+	return v1.ResponseDelayLogNormalPayloadView{}
+}
+
 func Test_Hoverfly_processRequest_DelayAppliedToSuccessfulSimulateRequest(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -273,12 +294,15 @@ func Test_Hoverfly_processRequest_DelayAppliedToSuccessfulSimulateRequest(t *tes
 
 	stub := ResponseDelayListStub{}
 	unit.Simulation.ResponseDelays = &stub
+	stubLogNormal := ResponseDelayLogNormalListStub{}
+	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
 
 	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
 	Expect(stub.gotDelays, Equal(1))
+	Expect(stubLogNormal.gotDelays, Equal(1))
 }
 
 func Test_Hoverfly_processRequest_DelayNotAppliedToFailedSimulateRequest(t *testing.T) {
@@ -295,12 +319,15 @@ func Test_Hoverfly_processRequest_DelayNotAppliedToFailedSimulateRequest(t *test
 
 	stub := ResponseDelayListStub{}
 	unit.Simulation.ResponseDelays = &stub
+	stubLogNormal := ResponseDelayLogNormalListStub{}
+	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
 
 	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
+	Expect(stubLogNormal.gotDelays).To(Equal(0))
 }
 
 func Test_Hoverfly_processRequest_DelayNotAppliedToCaptureRequest(t *testing.T) {
@@ -316,12 +343,15 @@ func Test_Hoverfly_processRequest_DelayNotAppliedToCaptureRequest(t *testing.T) 
 
 	stub := ResponseDelayListStub{}
 	unit.Simulation.ResponseDelays = &stub
+	stubLogNormal := ResponseDelayLogNormalListStub{}
+	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
 
 	resp := unit.processRequest(r)
 
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
 	Expect(stub.gotDelays).To(Equal(0))
+	Expect(stubLogNormal.gotDelays).To(Equal(0))
 }
 
 func Test_Hoverfly_processRequest_DelayAppliedToSynthesizeRequest(t *testing.T) {
@@ -344,11 +374,14 @@ func Test_Hoverfly_processRequest_DelayAppliedToSynthesizeRequest(t *testing.T) 
 
 	stub := ResponseDelayListStub{}
 	unit.Simulation.ResponseDelays = &stub
+	stubLogNormal := ResponseDelayLogNormalListStub{}
+	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
 	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
 	Expect(stub.gotDelays).To(Equal(1))
+	Expect(stubLogNormal.gotDelays).To(Equal(1))
 }
 
 func Test_Hoverfly_processRequest_DelayNotAppliedToFailedSynthesizeRequest(t *testing.T) {
@@ -372,11 +405,14 @@ func Test_Hoverfly_processRequest_DelayNotAppliedToFailedSynthesizeRequest(t *te
 
 	stub := ResponseDelayListStub{}
 	unit.Simulation.ResponseDelays = &stub
+	stubLogNormal := ResponseDelayLogNormalListStub{}
+	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
 	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
+	Expect(stubLogNormal.gotDelays).To(Equal(0))
 }
 
 func Test_Hoverfly_processRequest_DelayAppliedToSuccessfulMiddleware(t *testing.T) {
@@ -398,11 +434,14 @@ func Test_Hoverfly_processRequest_DelayAppliedToSuccessfulMiddleware(t *testing.
 
 	stub := ResponseDelayListStub{}
 	unit.Simulation.ResponseDelays = &stub
+	stubLogNormal := ResponseDelayLogNormalListStub{}
+	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
 	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
 	Expect(stub.gotDelays).To(Equal(1))
+	Expect(stubLogNormal.gotDelays).To(Equal(1))
 }
 
 func Test_Hoverfly_processRequest_DelayNotAppliedToFailedModifyRequest(t *testing.T) {
@@ -423,11 +462,14 @@ func Test_Hoverfly_processRequest_DelayNotAppliedToFailedModifyRequest(t *testin
 
 	stub := ResponseDelayListStub{}
 	unit.Simulation.ResponseDelays = &stub
+	stubLogNormal := ResponseDelayLogNormalListStub{}
+	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
 	newResp := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
 	Expect(stub.gotDelays).To(Equal(0))
+	Expect(stubLogNormal.gotDelays).To(Equal(0))
 }
 
 func Test_Hoverfly_processRequest_CanHandleResponseDiff(t *testing.T) {
