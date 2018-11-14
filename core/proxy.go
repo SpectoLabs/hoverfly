@@ -117,7 +117,6 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Warn("NonproxyHandler")
 		startTime := time.Now()
 		r.URL.Scheme = "http"
 		resp := hoverfly.processRequest(r)
