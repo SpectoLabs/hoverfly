@@ -60,6 +60,7 @@ const inmemoryBackend = "memory"
 var (
 	version      = flag.Bool("version", false, "Get the version of hoverfly")
 	verbose      = flag.Bool("v", false, "Should every proxy request be logged to stdout")
+	logLevelFlag = flag.String("log-level", "info", "Set log level (panic, fatal, error, warn, info or debug)")
 	capture      = flag.Bool("capture", false, "Start Hoverfly in capture mode - transparently intercepts and saves requests/response")
 	synthesize   = flag.Bool("synthesize", false, "Start Hoverfly in synthesize mode (middleware is required)")
 	modify       = flag.Bool("modify", false, "Start Hoverfly in modify mode - applies middleware (required) to both outgoing and incoming HTTP traffic")
@@ -198,6 +199,14 @@ func main() {
 
 	// getting settings
 	cfg := hv.InitSettings()
+
+	logLevel, err := log.ParseLevel(*logLevelFlag)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"log-level": *logLevelFlag,
+		}).Fatalf("Unknown log-level value")
+	}
+	log.SetLevel(logLevel)
 
 	if *verbose {
 		// Only log the warning severity or above.
