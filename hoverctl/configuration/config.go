@@ -21,7 +21,7 @@ func GetConfig() *Config {
 	if err != nil {
 		log.Debug("Error reading config")
 		if err.Error() == `Unsupported Config Type ""` {
-			log.Debug("viper not properly configured, if this is the first time executing hoverctl, please try te command again")
+			log.Debug("viper not properly configured, if this is the first time executing hoverctl, please try the command again")
 		} else {
 			log.Debug(err.Error())
 		}

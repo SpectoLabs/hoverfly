@@ -53,3 +53,16 @@ func Test_JsonPathMatch_MatchesFalseWithIncorrectJsonMatch_WithExpression(t *tes
 
 	Expect(matchers.JsonPathMatch("$.test[*]?(@.field == \"test\")", `{"test": [{"field": "not-test"}]}`)).To(BeFalse())
 }
+
+// TODO the following JSONPath expressions are not supported at the moment
+//func Test_JsonPathMatch_MatchesTrueWithJsonMatch_WithRootLevelObjectFilter(t *testing.T) {
+//	RegisterTestingT(t)
+//
+//	Expect(matchers.JsonPathMatch("$[?(@.field == \"test\")]", `{"field": "test"}`)).To(BeTrue())
+//}
+//
+//func Test_JsonPathMatch_MatchesTrueWithJsonMatch_WithObjectFilter(t *testing.T) {
+//	RegisterTestingT(t)
+//
+//	Expect(matchers.JsonPathMatch("$.test[?(@.field == \"test\")]", `{"test": {"field": "test"}}`)).To(BeTrue())
+//}
