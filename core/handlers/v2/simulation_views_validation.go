@@ -149,6 +149,30 @@ var delaysDefinition = map[string]interface{}{
 	},
 }
 
+var delaysLogNormalDefinition = map[string]interface{}{
+	"type": "object",
+	"properties": map[string]interface{}{
+		"urlPattern": map[string]interface{}{
+			"type": "string",
+		},
+		"httpMethod": map[string]interface{}{
+			"type": "string",
+		},
+		"min": map[string]interface{}{
+			"type": "integer",
+		},
+		"max": map[string]interface{}{
+			"type": "integer",
+		},
+		"mean": map[string]interface{}{
+			"type": "integer",
+		},
+		"median": map[string]interface{}{
+			"type": "integer",
+		},
+	},
+}
+
 var metaDefinition = map[string]interface{}{
 	"type": "object",
 	"required": []string{
@@ -436,6 +460,12 @@ var SimulationViewV5Schema = map[string]interface{}{
 								"$ref": "#/definitions/delay",
 							},
 						},
+						"delaysLogNormal": map[string]interface{}{
+							"type": "array",
+							"items": map[string]interface{}{
+								"$ref": "#/definitions/delay-log-normal",
+							},
+						},
 					},
 				},
 			},
@@ -453,6 +483,7 @@ var SimulationViewV5Schema = map[string]interface{}{
 		"request-headers":       v5MatchersMapDefinition,
 		"request-queries":       v5MatchersMapDefinition,
 		"delay":                 delaysDefinition,
+		"delay-log-normal":      delaysLogNormalDefinition,
 		"meta":                  metaDefinition,
 	},
 }
