@@ -34,7 +34,7 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV3Payload(t *
 			],
 			"globalActions": {
 				"delays": [],
-				"delays-log-normal": [
+				"delaysLogNormal": [
 					{"min": 1, "max": 4, "mean": 3, "median" :2}
 				]
 			}
@@ -101,7 +101,7 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV2Payload(t *
 			],
 			"globalActions": {
 				"delays": [],
-				"delays-log-normal": [
+				"delaysLogNormal": [
 					{"min": 1, "max": 4, "mean": 3, "median" :2}
 				]
 			}

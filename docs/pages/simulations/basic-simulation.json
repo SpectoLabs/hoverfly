@@ -57,7 +57,7 @@
       ],
       "globalActions": {
          "delays": [],
-         "delays-log-normal": []
+         "delaysLogNormal": []
       }
    },
    "meta": {
