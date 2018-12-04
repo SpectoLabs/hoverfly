@@ -17,8 +17,8 @@
 		},
 		"delay-log-normal": {
 			"properties": {
-				"min": {
-					"type": "integer"
+				"httpMethod": {
+					"type": "string"
 				},
 				"max": {
 					"type": "integer"
@@ -29,8 +29,8 @@
 				"median": {
 					"type": "integer"
 				},
-				"httpMethod": {
-					"type": "string"
+				"min": {
+					"type": "integer"
 				},
 				"urlPattern": {
 					"type": "string"
