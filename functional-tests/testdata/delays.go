@@ -103,7 +103,8 @@ var Delays = `{
 					"httpMethod": "",
 					"delay": 110
 				}
-			]
+			],
+			"delaysLogNormal": []
 		}
 	},
 	"meta": {

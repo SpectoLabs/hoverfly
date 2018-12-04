@@ -15,7 +15,7 @@
 			},
 			"type": "object"
 		},
-		"delaysLogNormal": {
+		"delay-log-normal": {
 			"properties": {
 				"min": {
 					"type": "integer"

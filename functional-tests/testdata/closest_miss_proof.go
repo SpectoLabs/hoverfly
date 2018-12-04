@@ -55,7 +55,8 @@ var ClosestMissProof = `{
 			}
 		],
 		"globalActions": {
-			"delays": []
+			"delays": [],
+			"delaysLogNormal": []
 		}
 	},
 	"meta": {

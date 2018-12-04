@@ -41,7 +41,8 @@ var QueryMatchers = `{
 			}
 		],
 		"globalActions": {
-			"delays": []
+			"delays": [],
+			"delaysLogNormal": []
 		}
 	},
 	"meta": {

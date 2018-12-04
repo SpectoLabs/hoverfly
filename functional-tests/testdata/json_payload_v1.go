@@ -81,7 +81,8 @@ var V5JsonPayload = `{
 			}
 		],
 		"globalActions": {
-			"delays": []
+			"delays": [],
+			"delaysLogNormal": []
 		}
 	},
 	"meta": {

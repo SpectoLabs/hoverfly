@@ -21,7 +21,8 @@ var XmlMatch = `{
 			}
 		],
 		"globalActions": {
-			"delays": []
+			"delays": [],
+			"delaysLogNormal": []
 		}
 	},
 	"meta": {

@@ -139,7 +139,8 @@ var ExactMatch = `{
 			}
 		],
 		"globalActions": {
-			"delays": []
+			"delays": [],
+			"delaysLogNormal": []
 		}
 	},
 	"meta": {
