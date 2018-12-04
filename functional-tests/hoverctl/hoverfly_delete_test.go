@@ -68,7 +68,7 @@ var _ = Describe("When I use hoverctl", func() {
 				Expect(output).To(ContainSubstring("Simulation data has been deleted from Hoverfly"))
 
 				bytes, _ := ioutil.ReadAll(hoverfly.GetSimulation())
-				Expect(string(bytes)).To(ContainSubstring(`"data":{"pairs":[],"globalActions":{"delays":[]}}`))
+				Expect(string(bytes)).To(ContainSubstring(`"data":{"pairs":[],"globalActions":{"delays":[],"delaysLogNormal":[]}}`))
 			})
 		})
 
