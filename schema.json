@@ -15,7 +15,7 @@
 			},
 			"type": "object"
 		},
-		"delays-log-normal": {
+		"delaysLogNormal": {
 			"properties": {
 				"min": {
 					"type": "integer"
@@ -188,7 +188,7 @@
 							},
 							"type": "array"
 						},
-						"delays-log-normal": {
+						"delaysLogNormal": {
 							"items": {
 								"$ref": "#/definitions/delay-log-normal"
 							},

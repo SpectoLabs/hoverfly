@@ -24,7 +24,7 @@
          }
       ],
       "globalActions": {
-         "delays-log-normal": [
+         "delaysLogNormal": [
             {
                "urlPattern": ".",
                "httpMethod": "",

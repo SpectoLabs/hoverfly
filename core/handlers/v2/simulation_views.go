@@ -120,7 +120,7 @@ func ValidateSimulation(json, schema map[string]interface{}) error {
 
 type GlobalActionsView struct {
 	Delays          []v1.ResponseDelayView          `json:"delays"`
-	DelaysLogNormal []v1.ResponseDelayLogNormalView `json:"delays-log-normal"`
+	DelaysLogNormal []v1.ResponseDelayLogNormalView `json:"delaysLogNormal"`
 }
 
 type MetaView struct {
