@@ -24,7 +24,7 @@ This is the JSON schema for v5 Hoverfly simulations.
         },
         "type": "object"
       },
-      "delaysLogNormal": {
+      "delay-log-normal": {
         "properties": {
           "min": {
             "type": "integer"
