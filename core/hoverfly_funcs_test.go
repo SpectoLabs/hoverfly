@@ -613,6 +613,33 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 	Expect(unit.Simulation.GetMatchingPairs()[0].Response.Status).To(Equal(200))
 }
 
+
+func Test_Hoverfly_Save_SavesRequestContainsMultiValueQuery(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	_ = unit.Save(&models.RequestDetails{
+		Query: map[string][]string{
+			"query": {"value1", "value2"},
+		},
+	}, &models.ResponseDetails{
+		Body:    "testresponsebody",
+		Headers: map[string][]string{"testheader": {"testvalue"}},
+		Status:  200,
+	}, nil, false)
+
+	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
+
+	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveLen(1))
+	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveKeyWithValue("query", []models.RequestFieldMatchers{
+		{
+			Matcher: matchers.Exact,
+			Value:   "value1;value2",
+		},
+	}))
+}
+
 func Test_Hoverfly_Save_DoesNotSaveRequestHeadersWhenGivenHeadersArrayIsNil(t *testing.T) {
 	RegisterTestingT(t)
 
