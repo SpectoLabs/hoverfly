@@ -7,10 +7,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV3Payload(t *testing.T) {
+func Test_NewSimulationViewFromRequestBody_CanCreateSimulationFromV3Payload(t *testing.T) {
 	RegisterTestingT(t)
 
-	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+	simulation, err := v2.NewSimulationViewFromRequestBody([]byte(`{
 		"data": {
 			"pairs": [
 				{
@@ -75,10 +75,10 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV3Payload(t *
 	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
 }
 
-func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV2Payload(t *testing.T) {
+func Test_NewSimulationViewFromRequestBody_CanCreateSimulationFromV2Payload(t *testing.T) {
 	RegisterTestingT(t)
 
-	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+	simulation, err := v2.NewSimulationViewFromRequestBody([]byte(`{
 		"data": {
 			"pairs": [
 				{
@@ -142,10 +142,10 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV2Payload(t *
 	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
 }
 
-func Test_NewSimulationViewFromResponseBody_WontCreateSimulationIfThereIsNoSchemaVersion(t *testing.T) {
+func Test_NewSimulationViewFromRequestBody_WontCreateSimulationIfThereIsNoSchemaVersion(t *testing.T) {
 	RegisterTestingT(t)
 
-	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+	simulation, err := v2.NewSimulationViewFromRequestBody([]byte(`{
 		"data": {},
 		"meta": {
 			"hoverflyVersion": "v0.11.0",
@@ -162,10 +162,10 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationIfThereIsNoSchem
 	Expect(simulation.GlobalActions.DelaysLogNormal).To(HaveLen(0))
 }
 
-func Test_NewSimulationViewFromResponseBody_WontBlowUpIfMetaIsMissing(t *testing.T) {
+func Test_NewSimulationViewFromRequestBody_WontBlowUpIfMetaIsMissing(t *testing.T) {
 	RegisterTestingT(t)
 
-	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+	simulation, err := v2.NewSimulationViewFromRequestBody([]byte(`{
 		"data": {}
 	}`))
 
@@ -178,10 +178,10 @@ func Test_NewSimulationViewFromResponseBody_WontBlowUpIfMetaIsMissing(t *testing
 	Expect(simulation.GlobalActions.DelaysLogNormal).To(HaveLen(0))
 }
 
-func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV1Payload(t *testing.T) {
+func Test_NewSimulationViewFromRequestBody_CanCreateSimulationFromV1Payload(t *testing.T) {
 	RegisterTestingT(t)
 
-	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+	simulation, err := v2.NewSimulationViewFromRequestBody([]byte(`{
 		"data": {
 			"pairs": [
 				{
@@ -235,10 +235,10 @@ func Test_NewSimulationViewFromResponseBody_CanCreateSimulationFromV1Payload(t *
 	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
 }
 
-func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidV1Simulation(t *testing.T) {
+func Test_NewSimulationViewFromRequestBody_WontCreateSimulationFromInvalidV1Simulation(t *testing.T) {
 	RegisterTestingT(t)
 
-	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+	simulation, err := v2.NewSimulationViewFromRequestBody([]byte(`{
 		"data": {
 			"pairs": [
 				{
@@ -254,17 +254,47 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidV1Sim
 	}`))
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Invalid v1 simulation: request is required, response is required"))
+	Expect(err.Error()).To(Equal("Invalid v1 simulation: [Error for <request>: request is required; Error for <response>: response is required]"))
 
 	Expect(simulation).ToNot(BeNil())
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
 }
 
-func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromUnknownSchemaVersion(t *testing.T) {
+
+func Test_NewSimulationViewFromRequestBody_ReturnErrorMessagesOnInvalidSimulation(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, err := v2.NewSimulationViewFromResponseBody([]byte(`{
+	simulation, err := v2.NewSimulationViewFromRequestBody([]byte(`{
+	"data": {
+		"pairs": [
+			{
+				"request": [],
+				"response": []
+			
+			}
+		],
+		"globalActions": {
+			"delays": []
+		}
+	},
+	"meta": {
+		"schemaVersion": "v4"
+	}
+}`))
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("Invalid v4 simulation: [Error for <data.pairs.0.request>: Invalid type. Expected: object, given: array; Error for <data.pairs.0.response>: Invalid type. Expected: object, given: array]"))
+
+	Expect(simulation).ToNot(BeNil())
+	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
+	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
+}
+
+func Test_NewSimulationViewFromRequestBody_WontCreateSimulationFromUnknownSchemaVersion(t *testing.T) {
+	RegisterTestingT(t)
+
+	_, err := v2.NewSimulationViewFromRequestBody([]byte(`{
 		"data": {
 			"pairs": [
 				{
@@ -283,10 +313,10 @@ func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromUnknownSchem
 	Expect(err.Error()).To(Equal("Invalid simulation: schema version r3 is not supported by this version of Hoverfly, you may need to update Hoverfly"))
 }
 
-func Test_NewSimulationViewFromResponseBody_WontCreateSimulationFromInvalidJson(t *testing.T) {
+func Test_NewSimulationViewFromRequestBody_WontCreateSimulationFromInvalidJson(t *testing.T) {
 	RegisterTestingT(t)
 
-	simulation, err := v2.NewSimulationViewFromResponseBody([]byte(`{}{}[^.^]{}{}`))
+	simulation, err := v2.NewSimulationViewFromRequestBody([]byte(`{}{}[^.^]{}{}`))
 
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Invalid JSON"))

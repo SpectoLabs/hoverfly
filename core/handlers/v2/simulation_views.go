@@ -13,7 +13,7 @@ import (
 	"github.com/xeipuuv/gojsonschema"
 )
 
-func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV5, error) {
+func NewSimulationViewFromRequestBody(responseBody []byte) (SimulationViewV5, error) {
 	var simulationView SimulationViewV5
 
 	jsonMap := make(map[string]interface{})
@@ -35,7 +35,7 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV5, e
 	if schemaVersion == "v5" {
 		err := ValidateSimulation(jsonMap, SimulationViewV5Schema)
 		if err != nil {
-			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation:", schemaVersion) + err.Error())
+			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation: ", schemaVersion) + err.Error())
 		}
 
 		err = json.Unmarshal(responseBody, &simulationView)
@@ -45,7 +45,7 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV5, e
 	} else if schemaVersion == "v4" || schemaVersion == "v3" {
 		err := ValidateSimulation(jsonMap, SimulationViewV4Schema)
 		if err != nil {
-			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation:", schemaVersion) + err.Error())
+			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation: ", schemaVersion) + err.Error())
 		}
 
 		var simulationViewV4 SimulationViewV4
@@ -59,7 +59,7 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV5, e
 	} else if schemaVersion == "v2" {
 		err := ValidateSimulation(jsonMap, SimulationViewV2Schema)
 		if err != nil {
-			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation:", schemaVersion) + err.Error())
+			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation: ", schemaVersion) + err.Error())
 		}
 
 		var simulationViewV2 SimulationViewV2
@@ -73,7 +73,7 @@ func NewSimulationViewFromResponseBody(responseBody []byte) (SimulationViewV5, e
 	} else if schemaVersion == "v1" {
 		err := ValidateSimulation(jsonMap, SimulationViewV1Schema)
 		if err != nil {
-			return simulationView, errors.New("Invalid v1 simulation:" + err.Error())
+			return simulationView, errors.New("Invalid v1 simulation: " + err.Error())
 		}
 
 		var simulationViewV1 SimulationViewV1
@@ -98,20 +98,18 @@ func ValidateSimulation(json, schema map[string]interface{}) error {
 
 	result, err := gojsonschema.Validate(schemaLoader, jsonLoader)
 	if err != nil {
-		log.Error("Error when validating simulaton: " + err.Error())
-		return errors.New("Error when validating simulaton" + err.Error())
+		log.Error("Error when validating simulation: " + err.Error())
+		return errors.New("Error when validating simulation" + err.Error())
 	}
 
 	if !result.Valid() {
-		errorMessage := ""
-		for i, parsingError := range result.Errors() {
-			message := strings.Split(parsingError.String(), ":")[1]
-			var comma string
-			if i != 0 {
-				comma = ","
-			}
-			errorMessage = errorMessage + comma + " " + strings.TrimSpace(message)
+		// TODO return as an array in a custom error struct
+		var resultDetails []string
+		for _, parsingError := range result.Errors() {
+			resultDetails = append(resultDetails, fmt.Sprintf("Error for <%s>: %s", parsingError.Field(), parsingError.Description()))
 		}
+
+		errorMessage := fmt.Sprintf("[%s]", strings.Join(resultDetails, "; "))
 		return errors.New(errorMessage)
 	}
 
