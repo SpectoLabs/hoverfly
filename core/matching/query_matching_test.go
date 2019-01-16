@@ -205,3 +205,28 @@ func Test_QueryMatching_ShouldNotModifySourceQueries(t *testing.T) {
 	Expect(len(toMatch)).To(Equal(1))
 	Expect(toMatch["urlPattern"]).To(Equal([]string{"test-(.+).com"}))
 }
+
+func Test_QueryMatching_ShouldMatchMultiValueQuery(t *testing.T) {
+	RegisterTestingT(t)
+
+	toMatch := map[string][]string{
+		"fq": {
+			"+feederstate:SUCCESS",
+			"-folderpath:5",
+			"groups:(0)",
+		},
+	}
+
+	result := matching.QueryMatching(models.RequestMatcher{
+		Query: &models.QueryRequestFieldMatchers{
+			"fq": {
+				{
+					Matcher: matchers.Exact,
+					Value:   "+feederstate:SUCCESS&-folderpath:5&groups:(0)",
+				},
+			},
+		},
+	}, toMatch)
+
+	Expect(result.Matched).To(BeTrue())
+}
