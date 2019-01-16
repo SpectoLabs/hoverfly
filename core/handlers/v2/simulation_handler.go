@@ -74,7 +74,7 @@ func (this *SimulationHandler) Get(w http.ResponseWriter, req *http.Request, nex
 func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	body, _ := ioutil.ReadAll(req.Body)
 
-	simulationView, err := NewSimulationViewFromResponseBody(body)
+	simulationView, err := NewSimulationViewFromRequestBody(body)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
@@ -89,7 +89,7 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 			"body": string(body),
 		}).Debug(result.err.Error())
 
-		handlers.WriteErrorResponse(w, "An error occured: "+result.err.Error(), http.StatusInternalServerError)
+		handlers.WriteErrorResponse(w, "An error occurred: "+result.err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if len(result.WarningMessages) > 0 {
