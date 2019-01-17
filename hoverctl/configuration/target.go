@@ -67,43 +67,6 @@ func NewTarget(name, host string, adminPort, proxyPort int) *Target {
 	return target
 }
 
-func getTargetsFromConfig(configTargets map[string]interface{}) map[string]Target {
-	targets := map[string]Target{}
-
-	for key, target := range configTargets {
-		targetMap := target.(map[interface{}]interface{})
-
-		targetHoverfly := Target{}
-
-		targetHoverfly.Name = key
-
-		if targetMap["host"] != nil {
-			targetHoverfly.Host = targetMap["host"].(string)
-		}
-
-		if targetMap["admin.port"] != nil {
-			targetHoverfly.AdminPort = targetMap["admin.port"].(int)
-		}
-
-		if targetMap["proxy.port"] != nil {
-			targetHoverfly.ProxyPort = targetMap["proxy.port"].(int)
-		}
-
-		if targetMap["auth.token"] != nil {
-			targetHoverfly.AuthToken = targetMap["auth.token"].(string)
-		}
-
-		targets[key] = targetHoverfly
-	}
-
-	if targets["local"] == (Target{}) {
-		localTarget := NewDefaultTarget()
-		targets["local"] = *localTarget
-	}
-
-	return targets
-}
-
 func (this Target) BuildFlags() Flags {
 	flags := Flags{}
 

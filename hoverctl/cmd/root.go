@@ -72,9 +72,9 @@ func initConfig() {
 	if config.GetTarget(config.DefaultTarget) == nil {
 		fmt.Printf("Default target `%v` not found, changing default target to `local`", config.DefaultTarget)
 		config.DefaultTarget = "local"
-
 	}
 
+	// TODO there could be bug here
 	target = config.GetTarget(targetNameFlag)
 	if targetNameFlag == "" && target == nil {
 		target = configuration.NewDefaultTarget()

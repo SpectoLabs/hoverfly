@@ -27,10 +27,28 @@ func GetConfig() *Config {
 		}
 	}
 
-	return &Config{
-		DefaultTarget: viper.GetString("default"),
-		Targets:       getTargetsFromConfig(viper.GetStringMap("targets")),
+	config := &Config{}
+	err = viper.Unmarshal(config)
+
+	if err != nil {
+		log.Debug("Error parsing config")
+		log.Debug(err.Error())
 	}
+
+	if config.DefaultTarget == "" {
+		config.DefaultTarget = viper.GetString("default")
+	}
+
+	if config.Targets == nil {
+		config.Targets = map[string]Target{}
+	}
+
+	if config.Targets["local"] == (Target{}) {
+		localTarget := NewDefaultTarget()
+		config.Targets["local"] = *localTarget
+	}
+
+	return config
 }
 
 func (this *Config) GetTarget(targetName string) *Target {
