@@ -238,7 +238,7 @@ func matchesFilter(filter string) goproxy.ReqConditionFunc {
 	return func(req *http.Request, ctx *goproxy.ProxyCtx) bool {
 
 		scheme := req.URL.Scheme
-		host := req.URL.Host
+		host := req.Host		// relative URL does not have host value, and this is a safer way to get the hostname from request struct
 		path := req.URL.Path
 
 		if scheme == "https" || strings.Contains(host, ":443") {

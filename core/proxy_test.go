@@ -125,6 +125,7 @@ func shouldHandleConnect(t *testing.T, hoverfly *Hoverfly, url string) {
 func Test_matchesFilter_ShouldMatchHostDestination(t *testing.T) {
 	RegisterTestingT(t)
 	httpResult := matchesFilter("test.com")(&http.Request{
+		Host: "test.com",
 		URL: &url.URL{
 			Scheme: "http",
 			Host:   "test.com",
@@ -134,6 +135,7 @@ func Test_matchesFilter_ShouldMatchHostDestination(t *testing.T) {
 	Expect(httpResult).To(BeTrue())
 
 	httpsResult := matchesFilter("test.com")(&http.Request{
+		Host: "test.com",
 		URL: &url.URL{
 			Scheme: "https",
 			Host:   "test.com",
@@ -146,6 +148,7 @@ func Test_matchesFilter_ShouldMatchHostDestination(t *testing.T) {
 func Test_matchesFilter_ShouldMatchPathDestination(t *testing.T) {
 	RegisterTestingT(t)
 	httpResult := matchesFilter("/testing")(&http.Request{
+		Host: "test.com",
 		URL: &url.URL{
 			Scheme: "http",
 			Host:   "test.com",
@@ -155,6 +158,7 @@ func Test_matchesFilter_ShouldMatchPathDestination(t *testing.T) {
 	Expect(httpResult).To(BeTrue())
 
 	httpsResult := matchesFilter("/testing")(&http.Request{
+		Host: "test.com",
 		URL: &url.URL{
 			Scheme: "https",
 			Host:   "test.com",
@@ -167,6 +171,7 @@ func Test_matchesFilter_ShouldMatchPathDestination(t *testing.T) {
 func Test_matchesFilter_ShouldMatchHostAndPathDestination(t *testing.T) {
 	RegisterTestingT(t)
 	httpResult := matchesFilter("test.com/testing")(&http.Request{
+		Host: "test.com",
 		URL: &url.URL{
 			Scheme: "http",
 			Host:   "test.com",
@@ -176,6 +181,7 @@ func Test_matchesFilter_ShouldMatchHostAndPathDestination(t *testing.T) {
 	Expect(httpResult).To(BeTrue())
 
 	httpsResult := matchesFilter("test.com/testing")(&http.Request{
+		Host: "test.com",
 		URL: &url.URL{
 			Scheme: "https",
 			Host:   "test.com",
@@ -188,6 +194,7 @@ func Test_matchesFilter_ShouldMatchHostAndPathDestination(t *testing.T) {
 func Test_matchesFilter_ShouldMatchSchemeDestination(t *testing.T) {
 	RegisterTestingT(t)
 	httpResult := matchesFilter("https")(&http.Request{
+		Host: "test.com",
 		URL: &url.URL{
 			Scheme: "http",
 			Host:   "test.com",
@@ -197,6 +204,7 @@ func Test_matchesFilter_ShouldMatchSchemeDestination(t *testing.T) {
 	Expect(httpResult).To(BeFalse())
 
 	httpsResult := matchesFilter("https://")(&http.Request{
+		Host: "test.com",
 		URL: &url.URL{
 			Scheme: "https",
 			Host:   "test.com",
@@ -209,6 +217,7 @@ func Test_matchesFilter_ShouldMatchSchemeDestination(t *testing.T) {
 func Test_matchesFilter_ShouldMatchSchemeAndHostDestination(t *testing.T) {
 	RegisterTestingT(t)
 	httpResult := matchesFilter("https://test.com")(&http.Request{
+		Host: "test.com",
 		URL: &url.URL{
 			Scheme: "http",
 			Host:   "test.com",
@@ -218,6 +227,7 @@ func Test_matchesFilter_ShouldMatchSchemeAndHostDestination(t *testing.T) {
 	Expect(httpResult).To(BeFalse())
 
 	httpsResult := matchesFilter("https://test.com")(&http.Request{
+		Host: "test.com",
 		URL: &url.URL{
 			Scheme: "https",
 			Host:   "test.com",
@@ -230,6 +240,7 @@ func Test_matchesFilter_ShouldMatchSchemeAndHostDestination(t *testing.T) {
 func Test_matchesFilter_ShouldMatchSchemeAndHostAndPathDestination(t *testing.T) {
 	RegisterTestingT(t)
 	httpResult := matchesFilter("https://test.com/testing")(&http.Request{
+		Host: "test.com",
 		URL: &url.URL{
 			Scheme: "http",
 			Host:   "test.com",
@@ -239,6 +250,7 @@ func Test_matchesFilter_ShouldMatchSchemeAndHostAndPathDestination(t *testing.T)
 	Expect(httpResult).To(BeFalse())
 
 	httpsResult := matchesFilter("https://test.com/testing")(&http.Request{
+		Host: "test.com",
 		URL: &url.URL{
 			Scheme: "https",
 			Host:   "test.com",
@@ -252,6 +264,7 @@ func Test_matchesFilter_ShoulRemoveSslPortFromHostToMatch(t *testing.T) {
 	RegisterTestingT(t)
 
 	httpsResult := matchesFilter("https://test.com/testing")(&http.Request{
+		Host: "test.com:443",
 		URL: &url.URL{
 			Scheme: "https",
 			Host:   "test.com:443",
@@ -261,6 +274,7 @@ func Test_matchesFilter_ShoulRemoveSslPortFromHostToMatch(t *testing.T) {
 	Expect(httpsResult).To(BeTrue())
 
 	noSchemeResult := matchesFilter("https://test.com/testing")(&http.Request{
+		Host: "test.com:443",
 		URL: &url.URL{
 			Scheme: "",
 			Host:   "test.com:443",
@@ -274,6 +288,7 @@ func Test_matchesFilter_ShoulRemovePathFromFilterIfConnectRequest(t *testing.T) 
 	RegisterTestingT(t)
 
 	removedPathResult := matchesFilter("https://test.com/testing")(&http.Request{
+		Host: "test.com:443",
 		Method: http.MethodConnect,
 		URL: &url.URL{
 			Scheme: "https",
@@ -283,3 +298,18 @@ func Test_matchesFilter_ShoulRemovePathFromFilterIfConnectRequest(t *testing.T) 
 	}, nil)
 	Expect(removedPathResult).To(BeTrue())
 }
+
+
+func Test_matchesFilter_ShouldGetHostNameFromRequest(t *testing.T) {
+	RegisterTestingT(t)
+
+	httpResult := matchesFilter("/testing")(&http.Request{
+		Host: "test.com",
+		URL: &url.URL{
+			Scheme: "http",
+			Path:   "/testing",
+		},
+	}, nil)
+	Expect(httpResult).To(BeTrue())
+}
+
