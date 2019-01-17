@@ -71,7 +71,7 @@ var (
 	adminPort    = flag.String("ap", "", "Admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
 	listenOnHost = flag.String("listen-on-host", "", "Specify which network interface to bind to, eg. 0.0.0.0 will bind to all interfaces. By default hoverfly will only bind ports to loopback interface")
 	metrics      = flag.Bool("metrics", false, "Supply -metrics flag to enable metrics logging to stdout")
-	dev          = flag.Bool("dev", false, "Enable CORS headers to allow frontend development")
+	dev          = flag.Bool("dev", false, "Enable CORS headers to allow Hoverfly Admin UI development")
 	destination  = flag.String("destination", ".", "Destination URI to catch")
 	webserver    = flag.Bool("webserver", false, "Start Hoverfly in webserver mode (simulate mode)")
 
