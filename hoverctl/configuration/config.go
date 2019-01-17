@@ -42,10 +42,25 @@ func GetConfig() *Config {
 	if config.Targets == nil {
 		config.Targets = map[string]Target{}
 	}
+	defaultTarget := NewDefaultTarget()
 
+	// Initialize local target
 	if config.Targets["local"] == (Target{}) {
-		localTarget := NewDefaultTarget()
-		config.Targets["local"] = *localTarget
+		config.Targets["local"] = *defaultTarget
+	} else {
+		localTarget := config.Targets["local"]
+		if localTarget.Host == "" {
+			localTarget.Host = defaultTarget.Host
+		}
+
+		if localTarget.AdminPort == 0 {
+			localTarget.AdminPort = defaultTarget.AdminPort
+		}
+
+		if localTarget.ProxyPort == 0 {
+			localTarget.ProxyPort = defaultTarget.ProxyPort
+		}
+		config.Targets["local"] = localTarget
 	}
 
 	return config

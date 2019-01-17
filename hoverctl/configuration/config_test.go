@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -26,6 +27,20 @@ func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
 	RegisterTestingT(t)
 
 	SetConfigurationDefaults()
+	result := GetConfig()
+
+	Expect(*result).To(Equal(defaultConfig))
+}
+
+func Test_GetConfigWillInitializeMissingDefaultValues(t *testing.T) {
+	RegisterTestingT(t)
+
+	SetConfigurationDefaults()
+	viper.Set("targets", map[string]Target{
+		"local": {
+			Name:      "local",
+		},
+	})
 	result := GetConfig()
 
 	Expect(*result).To(Equal(defaultConfig))
