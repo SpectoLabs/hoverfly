@@ -27,10 +27,10 @@ type Target struct {
 	PACFile          string `yaml:",omitempty"`
 	HttpsOnly        bool   `yaml:",omitempty"`
 
-	ClientAuthenticationDestination string
-	ClientAuthenticationClientCert  string
-	ClientAuthenticationClientKey   string
-	ClientAuthenticationCACert      string
+	ClientAuthenticationDestination string `yaml:",omitempty"`
+	ClientAuthenticationClientCert  string `yaml:",omitempty"`
+	ClientAuthenticationClientKey   string `yaml:",omitempty"`
+	ClientAuthenticationCACert      string `yaml:",omitempty"`
 
 	AuthEnabled bool
 	Username    string
