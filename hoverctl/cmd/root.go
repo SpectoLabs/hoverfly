@@ -74,7 +74,6 @@ func initConfig() {
 		config.DefaultTarget = "local"
 	}
 
-	// TODO there could be bug here
 	target = config.GetTarget(targetNameFlag)
 	if targetNameFlag == "" && target == nil {
 		target = configuration.NewDefaultTarget()

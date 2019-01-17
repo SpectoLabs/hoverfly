@@ -12,7 +12,7 @@ import (
 type Flags []string
 
 type Config struct {
-	DefaultTarget string            `mapstructure:"default" yaml:"default"`
+	DefaultTarget string            `mapstructure:"default" yaml:"default"`	// viper uses mapstructure to unmarshall
 	Targets       map[string]Target `yaml:"targets"`
 }
 
@@ -44,24 +44,28 @@ func parseConfig() *Config {
 		config.Targets = map[string]Target{}
 	}
 	defaultTarget := NewDefaultTarget()
+
 	// Initialize local target
 	if config.Targets["local"] == (Target{}) {
 		config.Targets["local"] = *defaultTarget
-	} else {
-		localTarget := config.Targets["local"]
-		if localTarget.Host == "" {
-			localTarget.Host = defaultTarget.Host
-		}
-
-		if localTarget.AdminPort == 0 {
-			localTarget.AdminPort = defaultTarget.AdminPort
-		}
-
-		if localTarget.ProxyPort == 0 {
-			localTarget.ProxyPort = defaultTarget.ProxyPort
-		}
-		config.Targets["local"] = localTarget
 	}
+
+	// Assume default value for any required config
+	for key, target := range config.Targets {
+		if target.Host == "" {
+			target.Host = defaultTarget.Host
+		}
+
+		if target.AdminPort == 0 {
+			target.AdminPort = defaultTarget.AdminPort
+		}
+
+		if target.ProxyPort == 0 {
+			target.ProxyPort = defaultTarget.ProxyPort
+		}
+		config.Targets[key] = target
+	}
+
 	return config
 }
 
