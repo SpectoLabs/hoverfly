@@ -12,7 +12,7 @@ import (
 type Flags []string
 
 type Config struct {
-	DefaultTarget string            `mapstructure:"default"`
+	DefaultTarget string            `mapstructure:"default" yaml:"default"`
 	Targets       map[string]Target `yaml:"targets"`
 }
 

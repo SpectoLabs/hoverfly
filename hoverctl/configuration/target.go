@@ -9,9 +9,9 @@ import (
 type Target struct {
 	Name      string
 	Host      string `yaml:"host,omitempty"`
-	AdminPort int    `mapstructure:"admin.port,omitempty"`
-	ProxyPort int    `mapstructure:"proxy.port,omitempty"`
-	AuthToken string `mapstructure:"auth.token,omitempty"`
+	AdminPort int    `mapstructure:"admin.port,omitempty" yaml:"admin.port,omitempty"`
+	ProxyPort int    `mapstructure:"proxy.port,omitempty" yaml:"proxy.port,omitempty"`
+	AuthToken string `mapstructure:"auth.token,omitempty" yaml:"auth.token,omitempty"`
 	Pid       int    `yaml:"pid,omitempty"`
 
 	Webserver    bool   `yaml:",omitempty"`
