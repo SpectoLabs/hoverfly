@@ -256,6 +256,17 @@ func Test_NewRequestDetailsFromHttpRequest_LowerCaseDestination(t *testing.T) {
 	Expect(requestDetails.Destination).To(Equal("test.org"))
 }
 
+
+func Test_NewRequestDetailsFromHttpRequest_HandleNonAbsoluteURL(t *testing.T) {
+	RegisterTestingT(t)
+	request, _ := http.NewRequest("GET", "/hello", nil)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
+	Expect(err).To(BeNil())
+
+	Expect(requestDetails.Scheme).To(Equal("http"))
+	Expect(requestDetails.Path).To(Equal("/hello"))
+}
+
 func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *testing.T) {
 	RegisterTestingT(t)
 
