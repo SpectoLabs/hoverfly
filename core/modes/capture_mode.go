@@ -55,7 +55,7 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 
 	modifiedRequest, err := ReconstructRequestForPassThrough(pair)
 	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when applying middleware to http request", Capture)
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when preparing request for pass through", Capture)
 	}
 
 	response, err := this.Hoverfly.DoRequest(modifiedRequest)

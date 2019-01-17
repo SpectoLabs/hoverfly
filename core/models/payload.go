@@ -86,11 +86,18 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 		urlPath = req.URL.Path
 	}
 
+	// Proxy tunnel request gives relative URL, and we should manually set scheme to HTTP
+	var scheme string
+	if req.URL.IsAbs()  {
+		scheme = req.URL.Scheme
+	} else {
+		scheme = "http"
+	}
 	requestDetails := RequestDetails{
 		Path:        urlPath,
 		Method:      req.Method,
 		Destination: strings.ToLower(req.Host),
-		Scheme:      req.URL.Scheme,
+		Scheme:      scheme,
 		Query:       req.URL.Query(),
 		Body:        string(reqBody),
 		Headers:     req.Header,
