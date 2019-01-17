@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"bytes"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"os"
@@ -32,18 +33,96 @@ func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
 	Expect(*result).To(Equal(defaultConfig))
 }
 
-func Test_GetConfigWillInitializeMissingDefaultValues(t *testing.T) {
+//func Test_GetConfigWillInitializeMissingDefaultValues(t *testing.T) {
+//	RegisterTestingT(t)
+//
+//	viper.SetConfigType("yaml")
+//	var configSource = []byte(`
+//default: local
+//targets:
+//  local:
+//    name: local
+//    authenabled: false
+//    username: ""
+//    password: ""
+//  remote:
+//    name: remote
+//`)
+//
+//	_ = viper.ReadConfig(bytes.NewBuffer(configSource))
+//
+//	result := parseConfig()
+//
+//	Expect(*result).To(Equal(Config{
+//		DefaultTarget: "local",
+//		Targets: map[string]Target{
+//			"local": {
+//				Name:      "local",
+//				Host:      "localhost",
+//				AdminPort: 8888,
+//				ProxyPort: 8500,
+//			},
+//
+//			"remote": {
+//				Name:      "remote",
+//				Host:      "localhost",
+//				AdminPort: 8888,
+//				ProxyPort: 8500,
+//			},
+//		},
+//	}))
+//}
+
+func Test_GetConfigWillReadConfigFromAYamlFile(t *testing.T) {
 	RegisterTestingT(t)
 
-	SetConfigurationDefaults()
-	viper.Set("targets", map[string]Target{
-		"local": {
-			Name:      "local",
-		},
-	})
-	result := GetConfig()
+	viper.SetConfigType("yaml")
+	var configSource = []byte(`
+default: local
+targets:
+  local:
+    name: local
+    host: localhost
+    admin.port: 8888
+    proxy.port: 8500
+    authenabled: false
+    username: ""
+    password: ""
+  remote:
+    name: remote
+    host: hoverfly.cloud
+    admin.port: 2345
+    proxy.port: 9875
+    authenabled: true
+    username: "admin"
+    password: "123"
+`)
 
-	Expect(*result).To(Equal(defaultConfig))
+	_ = viper.ReadConfig(bytes.NewBuffer(configSource))
+
+	result := parseConfig()
+
+	Expect(*result).To(Equal(Config{
+		DefaultTarget: "local",
+		Targets: map[string]Target{
+			"local": {
+				Name:      "local",
+				Host:      "localhost",
+				AdminPort: 8888,
+				ProxyPort: 8500,
+			},
+
+			"remote": {
+				Name:      "remote",
+				Host:      "hoverfly.cloud",
+				AdminPort: 2345,
+				ProxyPort: 9875,
+				AuthEnabled: true,
+				Username: 	"admin",
+				Password: 	"123",
+			},
+		},
+	}))
 }
 
 func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testing.T) {

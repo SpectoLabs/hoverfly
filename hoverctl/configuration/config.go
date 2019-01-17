@@ -12,7 +12,7 @@ import (
 type Flags []string
 
 type Config struct {
-	DefaultTarget string            `yaml:"default"`
+	DefaultTarget string            `mapstructure:"default"`
 	Targets       map[string]Target `yaml:"targets"`
 }
 
@@ -27,23 +27,23 @@ func GetConfig() *Config {
 		}
 	}
 
-	config := &Config{}
-	err = viper.Unmarshal(config)
+	return parseConfig()
+}
 
+func parseConfig() *Config {
+	config := &Config{}
+	err := viper.Unmarshal(config)
 	if err != nil {
 		log.Debug("Error parsing config")
 		log.Debug(err.Error())
 	}
-
 	if config.DefaultTarget == "" {
 		config.DefaultTarget = viper.GetString("default")
 	}
-
 	if config.Targets == nil {
 		config.Targets = map[string]Target{}
 	}
 	defaultTarget := NewDefaultTarget()
-
 	// Initialize local target
 	if config.Targets["local"] == (Target{}) {
 		config.Targets["local"] = *defaultTarget
@@ -62,7 +62,6 @@ func GetConfig() *Config {
 		}
 		config.Targets["local"] = localTarget
 	}
-
 	return config
 }
 
