@@ -123,7 +123,7 @@ func Test_Hoverfly_GetSimulation_ReturnsBlankSimulation_ifThereIsNoData(t *testi
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
 
 	Expect(simulation.MetaView.SchemaVersion).To(Equal("v5"))
-	Expect(simulation.MetaView.HoverflyVersion).To(MatchRegexp(`v\d+.\d+.\d+`))
+	Expect(simulation.MetaView.HoverflyVersion).To(MatchRegexp(`v\d+.\d+.\d+(-rc.\d)*`))
 	Expect(simulation.MetaView.TimeExported).ToNot(BeNil())
 }
 
@@ -420,7 +420,7 @@ func Test_Hoverfly_GetFilteredSimulation_ReturnBlankSimulation_IfThereIsNoMatch(
 	Expect(simulation.GlobalActions.DelaysLogNormal).To(HaveLen(0))
 
 	Expect(simulation.MetaView.SchemaVersion).To(Equal("v5"))
-	Expect(simulation.MetaView.HoverflyVersion).To(MatchRegexp(`v\d+.\d+.\d+`))
+	Expect(simulation.MetaView.HoverflyVersion).To(MatchRegexp(`v\d+.\d+.\d+(-rc.\d)*`))
 	Expect(simulation.MetaView.TimeExported).ToNot(BeNil())
 }
 
