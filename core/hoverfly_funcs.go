@@ -162,7 +162,7 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		queries.Add(key, []models.RequestFieldMatchers{
 			{
 				Matcher: matchers.Exact,
-				Value:   strings.Join(values, "&"),
+				Value:   strings.Join(values, ";"),
 			},
 		})
 	}
