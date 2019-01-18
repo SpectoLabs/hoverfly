@@ -1,6 +1,8 @@
 package configuration
 
 import (
+	"bytes"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -12,7 +14,7 @@ var (
 	defaultConfig = Config{
 		DefaultTarget: "local",
 		Targets: map[string]Target{
-			"local": Target{
+			"local": {
 				Name:      "local",
 				Host:      "localhost",
 				AdminPort: 8888,
@@ -31,12 +33,104 @@ func Test_GetConfigWillReturnTheDefaultValues(t *testing.T) {
 	Expect(*result).To(Equal(defaultConfig))
 }
 
+func Test_GetConfigWillInitializeMissingDefaultValues(t *testing.T) {
+	RegisterTestingT(t)
+
+	viper.SetConfigType("yaml")
+	var configSource = []byte(`
+default: local
+targets:
+ local:
+   name: local
+   authenabled: false
+   username: ""
+   password: ""
+ remote:
+   name: remote
+`)
+
+	_ = viper.ReadConfig(bytes.NewBuffer(configSource))
+
+	result := parseConfig()
+
+	Expect(*result).To(Equal(Config{
+		DefaultTarget: "local",
+		Targets: map[string]Target{
+			"local": {
+				Name:      "local",
+				Host:      "localhost",
+				AdminPort: 8888,
+				ProxyPort: 8500,
+			},
+
+			"remote": {
+				Name:      "remote",
+				Host:      "localhost",
+				AdminPort: 8888,
+				ProxyPort: 8500,
+			},
+		},
+	}))
+}
+
+func Test_GetConfigWillReadConfigFromAYamlFile(t *testing.T) {
+	RegisterTestingT(t)
+
+	viper.SetConfigType("yaml")
+	var configSource = []byte(`
+default: local
+targets:
+  local:
+    name: local
+    host: localhost
+    admin.port: 8888
+    proxy.port: 8500
+    authenabled: false
+    username: ""
+    password: ""
+  remote:
+    name: remote
+    host: hoverfly.cloud
+    admin.port: 2345
+    proxy.port: 9875
+    authenabled: true
+    username: "admin"
+    password: "123"
+`)
+
+	_ = viper.ReadConfig(bytes.NewBuffer(configSource))
+
+	result := parseConfig()
+
+	Expect(*result).To(Equal(Config{
+		DefaultTarget: "local",
+		Targets: map[string]Target{
+			"local": {
+				Name:      "local",
+				Host:      "localhost",
+				AdminPort: 8888,
+				ProxyPort: 8500,
+			},
+
+			"remote": {
+				Name:      "remote",
+				Host:      "hoverfly.cloud",
+				AdminPort: 2345,
+				ProxyPort: 9875,
+				AuthEnabled: true,
+				Username: 	"admin",
+				Password: 	"123",
+			},
+		},
+	}))
+}
+
 func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testing.T) {
 	RegisterTestingT(t)
 
 	config := Config{
 		Targets: map[string]Target{
-			"test-target": Target{
+			"test-target": {
 				Name:      "test-target",
 				AdminPort: 1234,
 				ProxyPort: 8765,
@@ -54,7 +148,7 @@ func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testin
 	Expect(err).To(BeNil())
 
 	data, _ := ioutil.ReadFile(hoverflyDirectory.Path + "/config.yaml")
-	os.Remove(hoverflyDirectory.Path + "/config.yaml")
+	_ = os.Remove(hoverflyDirectory.Path + "/config.yaml")
 
 	Expect(string(data)).To(ContainSubstring(`targets:`))
 	Expect(string(data)).To(ContainSubstring(`test-target:`))
@@ -68,7 +162,7 @@ func Test_Config_GetTarget_ReturnsTargetIfAlreadyExists(t *testing.T) {
 
 	unit := &Config{
 		Targets: map[string]Target{
-			"default": Target{
+			"default": {
 				AdminPort: 1234,
 			},
 		},
@@ -83,7 +177,7 @@ func Test_Config_GetTarget_GetsCurrentTargetIfTargetNameIsEmpty(t *testing.T) {
 	unit := &Config{
 		DefaultTarget: "default",
 		Targets: map[string]Target{
-			"default": Target{
+			"default": {
 				AdminPort: 1234,
 			},
 		},
@@ -122,7 +216,7 @@ func Test_Config_DeleteTarget_DeletesTarget(t *testing.T) {
 
 	unit := Config{
 		Targets: map[string]Target{
-			"deleteme": Target{
+			"deleteme": {
 				Name:      "deleteme",
 				AdminPort: 1234,
 			},

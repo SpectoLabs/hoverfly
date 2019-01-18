@@ -12,7 +12,7 @@ import (
 type Flags []string
 
 type Config struct {
-	DefaultTarget string            `yaml:"default"`
+	DefaultTarget string            `mapstructure:"default" yaml:"default"`	// viper uses mapstructure to unmarshall
 	Targets       map[string]Target `yaml:"targets"`
 }
 
@@ -27,10 +27,46 @@ func GetConfig() *Config {
 		}
 	}
 
-	return &Config{
-		DefaultTarget: viper.GetString("default"),
-		Targets:       getTargetsFromConfig(viper.GetStringMap("targets")),
+	return parseConfig()
+}
+
+func parseConfig() *Config {
+	config := &Config{}
+	err := viper.Unmarshal(config)
+	if err != nil {
+		log.Debug("Error parsing config")
+		log.Debug(err.Error())
 	}
+	if config.DefaultTarget == "" {
+		config.DefaultTarget = viper.GetString("default")
+	}
+	if config.Targets == nil {
+		config.Targets = map[string]Target{}
+	}
+	defaultTarget := NewDefaultTarget()
+
+	// Initialize local target
+	if config.Targets["local"] == (Target{}) {
+		config.Targets["local"] = *defaultTarget
+	}
+
+	// Assume default value for any required config
+	for key, target := range config.Targets {
+		if target.Host == "" {
+			target.Host = defaultTarget.Host
+		}
+
+		if target.AdminPort == 0 {
+			target.AdminPort = defaultTarget.AdminPort
+		}
+
+		if target.ProxyPort == 0 {
+			target.ProxyPort = defaultTarget.ProxyPort
+		}
+		config.Targets[key] = target
+	}
+
+	return config
 }
 
 func (this *Config) GetTarget(targetName string) *Target {
