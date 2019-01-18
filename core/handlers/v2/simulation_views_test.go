@@ -284,7 +284,7 @@ func Test_NewSimulationViewFromRequestBody_ReturnErrorMessagesOnInvalidSimulatio
 }`))
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Invalid v4 simulation: [Error for <data.pairs.0.request>: Invalid type. Expected: object, given: array; Error for <data.pairs.0.response>: Invalid type. Expected: object, given: array]"))
+	Expect(err.Error()).To(MatchRegexp(`Invalid v4 simulation: \[Error for <data.pairs.0.request|response>: Invalid type. Expected: object, given: array; Error for <data.pairs.0.response|request>: Invalid type. Expected: object, given: array\]`))
 
 	Expect(simulation).ToNot(BeNil())
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
