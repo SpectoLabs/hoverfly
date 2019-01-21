@@ -1,74 +1,90 @@
 Usage of hoverfly:
     -add
-        add new user '-add -username hfadmin -password hfpass'
+        Add new user '-add -username hfadmin -password hfpass'
     -admin
-        supply '-admin false' to make this non admin user (defaults to 'true')  (default true)
+        Supply '-admin false' to make this non admin user (defaults to 'true')  (default true)
     -ap string
-        admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)
+        Admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)
     -auth
-        enable authentication, currently it is disabled by default
+        Enable authentication, currently it is disabled by default
     -capture
-        start Hoverfly in capture mode - transparently intercepts and saves requests/response
+        Start Hoverfly in capture mode - transparently intercepts and saves requests/response
     -cert string
         CA certificate used to sign MITM certificates
     -cert-name string
-        cert name (default "hoverfly.proxy")
+        Cert name (default "hoverfly.proxy")
     -cert-org string
-        organisation name for new cert (default "Hoverfly Authority")
+        Organisation name for new cert (default "Hoverfly Authority")
+    -client-authentication-ca-cert string
+        Path to the ca cert file used for authentication
+    -client-authentication-client-cert string
+        Path to the client certification file used for authentication
+    -client-authentication-client-key string
+        Path to the client key file used for authentication
+    -client-authentication-destination string
+        Regular expression of desination with client authentication
     -db string
-        Persistance storage to use - 'boltdb' or 'memory' which will not write anything to disk (default "memory")
+        Storage to use - 'boltdb' or 'memory' which will not write anything to disk (default "memory")
     -db-path string
-        database location - supply it to provide specific database location (will be created there if it doesn't exist)
+        Database location - supply it to provide specific database location (will be created there if it doesn't exist)
     -dest value
-        specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'
+        Specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'
     -destination string
-        destination URI to catch (default ".")
+        Destination URI to catch (default ".")
     -dev
-        Enable CORS headers to allow frontend development
+        Enable CORS headers to allow Hoverfly Admin UI development
+    -diff
+        Start Hoverfly in diff mode - calls real server and compares the actual response with the expected simulation config if present
     -disable-cache
-        Disable the cache that sits infront of matching
+        Disable the cache that sits in front of matching
     -generate-ca-cert
-        generate CA certificate and private key for MITM
+        Generate CA certificate and private key for MITM
     -https-only
-        allow only secure secure requests to be proxied by hoverfly
+        Allow only secure secure requests to be proxied by hoverfly
     -httptest.serve string
         if non-empty, httptest.NewServer serves on this address and blocks
     -import value
-        import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'
+        Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'
     -journal-size int
         Set the size of request/response journal (default "1000") (default 1000)
     -key string
-        private key of the CA used to sign MITM certificates
+        Private key of the CA used to sign MITM certificates
+    -listen-on-host string
+        Specify which network interface to bind to, eg. 0.0.0.0 will bind to all interfaces. By default hoverfly will only bind ports to loopback interface
+    -log-level string
+        Set log level (panic, fatal, error, warn, info or debug) (default "info")
     -logs string
         Specify format for logs, options are "plaintext" and "json" (default "plaintext") (default "plaintext")
     -logs-size int
         Set the amount of logs to be stored in memory (default "1000") (default 1000)
     -metrics
-        supply -metrics flag to enable metrics logging to stdout
+        Supply -metrics flag to enable metrics logging to stdout
     -middleware string
-        should proxy use middleware
+        Should proxy use middleware
     -modify
-        start Hoverfly in modify mode - applies middleware (required) to both outgoing and incomming HTTP traffic
+        Start Hoverfly in modify mode - applies middleware (required) to both outgoing and incoming HTTP traffic
     -password string
-        password for new user
+        Password for new user
     -password-hash string
-        password hash for new user instead of password
+        Password hash for new user instead of password
     -plain-http-tunneling
-        use plain http tunneling to host with non-443 port - defaults to false
+        Use plain http tunneling to host with non-443 port - defaults to false
     -pp string
-        proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)
+        Proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)
     -proxy-auth Proxy-Authorization
         Switch the Proxy-Authorization header from proxy-auth Proxy-Authorization to header-auth `X-HOVERFLY-AUTHORIZATION`. Switching to header-auth will auto enable -https-only (default "proxy-auth")
+    -spy
+        Start Hoverfly in spy mode, similar to simulate but calls real server when cache miss
     -synthesize
-        start Hoverfly in synthesize mode (middleware is required)
+        Start Hoverfly in synthesize mode (middleware is required)
     -tls-verification
-        turn on/off tls verification for outgoing requests (will not try to verify certificates) - defaults to true (default true)
+        Turn on/off tls verification for outgoing requests (will not try to verify certificates) - defaults to true (default true)
     -upstream-proxy string
-        specify an upstream proxy for hoverfly to route traffic through
+        Specify an upstream proxy for hoverfly to route traffic through
     -username string
-        username for new user
-    -v    should every proxy request be logged to stdout
+        Username for new user
+    -v	Should every proxy request be logged to stdout
     -version
-        get the version of hoverfly
+        Get the version of hoverfly
     -webserver
-        start Hoverfly in webserver mode (simulate mode)
+        Start Hoverfly in webserver mode (simulate mode)
