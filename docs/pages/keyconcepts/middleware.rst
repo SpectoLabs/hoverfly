@@ -12,9 +12,14 @@ You can use middleware to manipulate data in simulated responses, or to inject u
 Middleware works differently depending on the Hoverfly mode.
 
 - Capture mode: middleware affects only **outgoing requests**
-- Simulate mode: middleware affects only **incoming responses** (cache contents remain untouched)
+- Simulate/Spy mode: middleware affects only **responses** (cache contents remain untouched)
 - Synthesize mode: middleware **creates responses**
 - Modify mode: middleware affects **requests and responses**
+
+.. note::
+
+    Middleware is applied after rendering the templating functions (see :ref:`templating`) in the response body.
+
 
 You can write middleware in any language. There are two different types of middleware.
 
@@ -28,7 +33,7 @@ HTTP Middleware
 ---------------
 Hoverfly can also send middleware requests to a HTTP server instead of running a process locally. The benefits of this 
 are that Hoverfly does not initiate the process, giving more control to the user. The only requirements are that Hoverfly can
-POST the Middleware JSON schema to middleware URL provided and the middleware HTTP server respones with a 200 and the 
+POST the Middleware JSON schema to middleware URL provided and the middleware HTTP server responses with a 200 and the
 Middleware JSON schema is in the response.
 
 
