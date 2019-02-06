@@ -150,7 +150,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 			Expect(output).To(ContainSubstring("Could not set middleware, it may have failed the test"))
 			Expect(output).To(ContainSubstring(`Error when communicating with remote middleware:`))
-			Expect(output).To(ContainSubstring("Post http://wqrwwewf.wewefwef.specto: dial tcp: lookup wqrwwewf.wewefwef.specto on "))
+			Expect(output).To(MatchRegexp("Post http://wqrwwewf.wewefwef.specto: dial tcp: lookup wqrwwewf.wewefwef.specto on|no such host"))
 			Expect(output).To(ContainSubstring("URL: http://wqrwwewf.wewefwef.specto"))
 			Expect(output).To(ContainSubstring("STDIN:"))
 			Expect(output).To(ContainSubstring(`{"response":{"status":200,"body":"ok","encodedBody":false,"headers":{"test_header":["true"]}},"request":{"path":"/","method":"GET","destination":"www.test.com","scheme":"","query":"","body":"","headers":{"test_header":["true"]}}}`))
