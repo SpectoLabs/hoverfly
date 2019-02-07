@@ -40,13 +40,13 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_CanSaveNilPairs(t *testing
 	RegisterTestingT(t)
 
 	unit := matching.CacheMatcher{
-		NewRequestCache: cache.NewDefaultLRUCache(),
+		RequestCache: cache.NewDefaultLRUCache(),
 	}
 
 	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil, nil)
 	Expect(err).To(BeNil())
 
-	cachedResponse, found := unit.NewRequestCache.Get("d41d8cd98f00b204e9800998ecf8427e")
+	cachedResponse, found := unit.RequestCache.Get("d41d8cd98f00b204e9800998ecf8427e")
 	Expect(found).To(BeTrue())
 
 	//cachedResponse, err := models.NewCachedResponseFromBytes(cacheValues)
@@ -76,7 +76,7 @@ func Test_CacheMatcher_PreloadCache_WillReturnErrorIfCacheIsNil(t *testing.T) {
 func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		NewRequestCache: cache.NewDefaultLRUCache(),
+		RequestCache: cache.NewDefaultLRUCache(),
 	}
 
 	simulation := models.NewSimulation()
@@ -99,13 +99,13 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *tes
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.NewRequestCache.Len()).To(Equal(0))
+	Expect(unit.RequestCache.Len()).To(Equal(0))
 }
 
 func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMatchers(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		NewRequestCache: cache.NewDefaultLRUCache(),
+		RequestCache: cache.NewDefaultLRUCache(),
 	}
 
 	simulation := models.NewSimulation()
@@ -159,13 +159,13 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMa
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.NewRequestCache.Len()).To(Equal(1))
+	Expect(unit.RequestCache.Len()).To(Equal(1))
 }
 
 func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWithoutExactMatches(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		NewRequestCache: cache.NewDefaultLRUCache(),
+		RequestCache: cache.NewDefaultLRUCache(),
 	}
 
 	simulation := models.NewSimulation()
@@ -188,13 +188,13 @@ func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWitho
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.NewRequestCache.Len()).To(Equal(0))
+	Expect(unit.RequestCache.Len()).To(Equal(0))
 }
 
 func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		NewRequestCache: cache.NewDefaultLRUCache(),
+		RequestCache: cache.NewDefaultLRUCache(),
 	}
 
 	simulation := models.NewSimulation()
@@ -262,13 +262,13 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.NewRequestCache.Len()).To(Equal(1))
+	Expect(unit.RequestCache.Len()).To(Equal(1))
 }
 
 func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		NewRequestCache: cache.NewDefaultLRUCache(),
+		RequestCache: cache.NewDefaultLRUCache(),
 	}
 
 	simulation := models.NewSimulation()
@@ -344,5 +344,5 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.NewRequestCache.Len()).To(Equal(0))
+	Expect(unit.RequestCache.Len()).To(Equal(0))
 }
