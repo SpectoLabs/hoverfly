@@ -177,15 +177,12 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 		Scheme:      "http",
 	})
 
-	Expect(unit.CacheMatcher.RequestCache.RecordsCount()).Should(Equal(1))
+	Expect(len(unit.CacheMatcher.NewRequestCache.Items())).Should(Equal(1))
 
-	pairBytes, err := unit.CacheMatcher.RequestCache.Get([]byte("75b4ae6efa2a3f6d3ee6b9fed4d8c8c5"))
-	Expect(err).To(BeNil())
+	cachedRequestResponsePair, found := unit.CacheMatcher.NewRequestCache.Get("75b4ae6efa2a3f6d3ee6b9fed4d8c8c5")
+	Expect(found).To(BeTrue())
 
-	cachedRequestResponsePair, err := models.NewCachedResponseFromBytes(pairBytes)
-	Expect(err).To(BeNil())
-
-	Expect(cachedRequestResponsePair.MatchingPair.Response.Body).To(Equal("response body"))
+	Expect(cachedRequestResponsePair.(models.CachedResponse).MatchingPair.Response.Body).To(Equal("response body"))
 
 	unit.Simulation = models.NewSimulation()
 	response, err := unit.GetResponse(models.RequestDetails{
@@ -570,7 +567,7 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 	unit.Save(&models.RequestDetails{
 		Body:        "testbody",
 		Destination: "testdestination",
-		Headers:     map[string][]string{"testheader": []string{"testvalue"}},
+		Headers:     map[string][]string{"testheader": {"testvalue"}},
 		Method:      "testmethod",
 		Path:        "/testpath",
 		Query: map[string][]string{

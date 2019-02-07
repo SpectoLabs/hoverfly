@@ -38,6 +38,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	mw "github.com/SpectoLabs/hoverfly/core/middleware"
 	"github.com/SpectoLabs/hoverfly/core/modes"
+	goCache "github.com/patrickmn/go-cache"
 )
 
 type arrayFlags []string
@@ -317,7 +318,8 @@ func main() {
 		cfg.Destination = *destination
 	}
 
-	var requestCache cache.Cache
+	//var requestCache cache.Cache
+	var newRequestCache *goCache.Cache
 	var tokenCache cache.Cache
 	var userCache cache.Cache
 
@@ -328,13 +330,14 @@ func main() {
 	if *database == boltBackend {
 		db := cache.GetDB(cfg.DatabasePath)
 		defer db.Close()
-		requestCache = cache.NewBoltDBCache(db, []byte("requestsBucket"))
+		//requestCache = cache.NewBoltDBCache(db, []byte("requestsBucket"))
 		tokenCache = cache.NewBoltDBCache(db, []byte(backends.TokenBucketName))
 		userCache = cache.NewBoltDBCache(db, []byte(backends.UserBucketName))
 
 		log.Info("Using boltdb backend")
 	} else if *database == inmemoryBackend {
-		requestCache = cache.NewInMemoryCache()
+		newRequestCache = goCache.New(5*time.Minute, 10*time.Minute)
+		//requestCache = cache.NewInMemoryCache()
 		tokenCache = cache.NewInMemoryCache()
 		userCache = cache.NewInMemoryCache()
 
@@ -346,7 +349,7 @@ func main() {
 	}
 	cfg.DisableCache = *disableCache
 	if cfg.DisableCache {
-		requestCache = nil
+		newRequestCache = nil
 
 		log.Info("Request cache has been disabled")
 	}
@@ -362,7 +365,7 @@ func main() {
 
 	hoverfly.Cfg = cfg
 	hoverfly.CacheMatcher = matching.CacheMatcher{
-		RequestCache: requestCache,
+		NewRequestCache: newRequestCache,
 		Webserver:    cfg.Webserver,
 	}
 	hoverfly.Authentication = authBackend

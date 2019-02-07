@@ -66,7 +66,6 @@ func signHost(ca tls.Certificate, hosts []string) (cert tls.Certificate, err err
 			template.IPAddresses = append(template.IPAddresses, ip)
 		} else {
 			template.DNSNames = append(template.DNSNames, h)
-			template.Subject.CommonName = h
 		}
 	}
 	var csprng CounterEncryptorRand
@@ -74,7 +73,7 @@ func signHost(ca tls.Certificate, hosts []string) (cert tls.Certificate, err err
 		return
 	}
 	var certpriv *rsa.PrivateKey
-	if certpriv, err = rsa.GenerateKey(&csprng, 2048); err != nil {
+	if certpriv, err = rsa.GenerateKey(&csprng, 1024); err != nil {
 		return
 	}
 	var derBytes []byte

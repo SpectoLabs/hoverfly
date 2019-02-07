@@ -2,12 +2,13 @@ package matching_test
 
 import (
 	"testing"
+	"time"
 
-	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
+	goCache "github.com/patrickmn/go-cache"
 )
 
 func Test_CacheMatcher_GetCachedResponse_WillReturnErrorIfCacheIsNil(t *testing.T) {
@@ -41,19 +42,19 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_CanSaveNilPairs(t *testing
 	RegisterTestingT(t)
 
 	unit := matching.CacheMatcher{
-		RequestCache: cache.NewInMemoryCache(),
+		NewRequestCache: goCache.New(5*time.Minute, 10*time.Minute),
 	}
 
 	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil, nil)
 	Expect(err).To(BeNil())
 
-	cacheValues, err := unit.RequestCache.Get([]byte("d41d8cd98f00b204e9800998ecf8427e"))
-	Expect(err).To(BeNil())
+	cachedResponse, found := unit.NewRequestCache.Get("d41d8cd98f00b204e9800998ecf8427e")
+	Expect(found).To(BeTrue())
 
-	cachedResponse, err := models.NewCachedResponseFromBytes(cacheValues)
-	Expect(err).To(BeNil())
+	//cachedResponse, err := models.NewCachedResponseFromBytes(cacheValues)
+	//Expect(err).To(BeNil())
 
-	Expect(cachedResponse.MatchingPair).To(BeNil())
+	Expect(cachedResponse.(models.CachedResponse).MatchingPair).To(BeNil())
 }
 
 func Test_CacheMatcher_FlushCache_WillReturnErrorIfCacheIsNil(t *testing.T) {
@@ -77,7 +78,7 @@ func Test_CacheMatcher_PreloadCache_WillReturnErrorIfCacheIsNil(t *testing.T) {
 func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		RequestCache: cache.NewInMemoryCache(),
+		NewRequestCache: goCache.New(5*time.Minute, 10*time.Minute),
 	}
 
 	simulation := models.NewSimulation()
@@ -100,13 +101,13 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *tes
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
+	Expect(unit.NewRequestCache.Items()).To(HaveLen(0))
 }
 
 func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMatchers(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		RequestCache: cache.NewInMemoryCache(),
+		NewRequestCache: goCache.New(5*time.Minute, 10*time.Minute),
 	}
 
 	simulation := models.NewSimulation()
@@ -160,13 +161,13 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMa
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(1))
+	Expect(unit.NewRequestCache.Items()).To(HaveLen(1))
 }
 
 func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWithoutExactMatches(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		RequestCache: cache.NewInMemoryCache(),
+		NewRequestCache: goCache.New(5*time.Minute, 10*time.Minute),
 	}
 
 	simulation := models.NewSimulation()
@@ -189,13 +190,13 @@ func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWitho
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
+	Expect(unit.NewRequestCache.Items()).To(HaveLen(0))
 }
 
 func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		RequestCache: cache.NewInMemoryCache(),
+		NewRequestCache: goCache.New(5*time.Minute, 10*time.Minute),
 	}
 
 	simulation := models.NewSimulation()
@@ -263,13 +264,13 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(1))
+	Expect(unit.NewRequestCache.Items()).To(HaveLen(1))
 }
 
 func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		RequestCache: cache.NewInMemoryCache(),
+		NewRequestCache: goCache.New(5*time.Minute, 10*time.Minute),
 	}
 
 	simulation := models.NewSimulation()
@@ -304,7 +305,7 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 				},
 			},
 			Headers: map[string][]models.RequestFieldMatchers{
-				"Headers": []models.RequestFieldMatchers{
+				"Headers": {
 					{
 						Matcher: matchers.Exact,
 						Value:   "value",
@@ -345,5 +346,5 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.RequestCache.GetAllKeys()).To(HaveLen(0))
+	Expect(unit.NewRequestCache.Items()).To(HaveLen(0))
 }

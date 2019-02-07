@@ -6,16 +6,18 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	goCache "github.com/patrickmn/go-cache"
 )
 
 type CacheMatcher struct {
 	RequestCache cache.Cache
 	Webserver    bool
+	NewRequestCache *goCache.Cache
 }
 
 // getResponse returns stored response from cache
 func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models.CachedResponse, *errors.HoverflyError) {
-	if this.RequestCache == nil {
+	if this.NewRequestCache == nil {
 		return nil, errors.NoCacheSetError()
 	}
 
@@ -29,12 +31,12 @@ func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models
 		key = req.Hash()
 	}
 
-	pairBytes, err := this.RequestCache.Get([]byte(key))
+	cachedResponse, found := this.NewRequestCache.Get(key)
 
-	if err != nil {
+	if !found {
 		log.WithFields(log.Fields{
 			"key":         key,
-			"error":       err.Error(),
+			//"error":       err.Error(),
 			"query":       req.Query,
 			"path":        req.Path,
 			"destination": req.Destination,
@@ -45,15 +47,15 @@ func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models
 	}
 
 	// getting cache response
-	cachedResponse, err := models.NewCachedResponseFromBytes(pairBytes)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-			"value": string(pairBytes),
-			"key":   key,
-		}).Debug("Failed to decode payload from cache")
-		return nil, errors.DecodePayloadError()
-	}
+	//cachedResponse, err := models.NewCachedResponseFromBytes(pairBytes)
+	//if err != nil {
+	//	log.WithFields(log.Fields{
+	//		"error": err.Error(),
+	//		"value": string(pairBytes),
+	//		"key":   key,
+	//	}).Debug("Failed to decode payload from cache")
+	//	return nil, errors.DecodePayloadError()
+	//}
 
 	log.WithFields(log.Fields{
 		"key":         key,
@@ -63,48 +65,50 @@ func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models
 		"destination": req.Destination,
 	}).Info("Response found interface{} cache")
 
-	return cachedResponse, nil
+	response := cachedResponse.(models.CachedResponse)
+	return &response, nil
 }
 
-func (this CacheMatcher) GetAllResponses() (v2.CacheView, error) {
+func (this *CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 	cacheView := v2.CacheView{}
 
-	if this.RequestCache == nil {
+	if this.NewRequestCache == nil {
 		return cacheView, errors.NoCacheSetError()
 	}
 
-	records, err := this.RequestCache.GetAllEntries()
-	if err != nil {
-		return cacheView, err
-	}
+	records := this.NewRequestCache.Items()
+	//if err != nil {
+	//	return cacheView, err
+	//}
 
 	for key, v := range records {
-		if cachedResponse, err := models.NewCachedResponseFromBytes(v); err == nil {
+		cachedResponse := v.Object.(models.CachedResponse)
+		//if cachedResponse, err := models.NewCachedResponseFromBytes(v); err == nil {
 
-			var pair *v2.RequestMatcherResponsePairViewV5
-			var closestMiss *v2.ClosestMissView
+		var pair *v2.RequestMatcherResponsePairViewV5
+		var closestMiss *v2.ClosestMissView
 
-			if cachedResponse.MatchingPair != nil {
-				pairView := cachedResponse.MatchingPair.BuildView()
-				pair = &pairView
-			}
-
-			if cachedResponse.ClosestMiss != nil {
-				closestMiss = cachedResponse.ClosestMiss.BuildView()
-			}
-
-			cachedResponseView := v2.CachedResponseView{
-				Key:          key,
-				MatchingPair: pair,
-				ClosestMiss:  closestMiss,
-			}
-
-			cacheView.Cache = append(cacheView.Cache, cachedResponseView)
-
-		} else {
-			log.Error(err)
-			return cacheView, err
+		if cachedResponse.MatchingPair != nil {
+			pairView := cachedResponse.MatchingPair.BuildView()
+			pair = &pairView
 		}
+
+		if cachedResponse.ClosestMiss != nil {
+			closestMiss = cachedResponse.ClosestMiss.BuildView()
+		}
+
+		cachedResponseView := v2.CachedResponseView{
+			Key:          key,
+			MatchingPair: pair,
+			ClosestMiss:  closestMiss,
+		}
+
+		cacheView.Cache = append(cacheView.Cache, cachedResponseView)
+
+		//} else {
+		//	log.Error(err)
+		//	return cacheView, err
+		//}
 	}
 
 	return cacheView, nil
@@ -112,7 +116,7 @@ func (this CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 
 // TODO: This would be easier to reason about if we had two methods, "CacheHit" and "CacheHit" in order to reduce bloating
 func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestDetails, pair *models.RequestMatcherResponsePair, matchError *models.MatchError) error {
-	if this.RequestCache == nil {
+	if this.NewRequestCache == nil {
 		return errors.NoCacheSetError()
 	}
 
@@ -142,25 +146,27 @@ func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestD
 		cachedResponse.ClosestMiss = matchError.ClosestMiss
 	}
 
-	pairBytes, err := cachedResponse.Encode()
+	//pairBytes, err := cachedResponse.Encode()
 
-	if err != nil {
-		return err
-	}
+	//if err != nil {
+	//	return err
+	//}
 
-	return this.RequestCache.Set([]byte(key), pairBytes)
+	this.NewRequestCache.Set(key, cachedResponse, goCache.DefaultExpiration)
+	return nil
 }
 
-func (this CacheMatcher) FlushCache() error {
-	if this.RequestCache == nil {
+func (this *CacheMatcher) FlushCache() error {
+	if this.NewRequestCache == nil {
 		return errors.NoCacheSetError()
 	}
 
-	return this.RequestCache.DeleteData()
+	this.NewRequestCache.Flush()
+	return nil
 }
 
-func (this CacheMatcher) PreloadCache(simulation models.Simulation) error {
-	if this.RequestCache == nil {
+func (this *CacheMatcher) PreloadCache(simulation models.Simulation) error {
+	if this.NewRequestCache == nil {
 		return errors.NoCacheSetError()
 	}
 	for _, pair := range simulation.GetMatchingPairs() {

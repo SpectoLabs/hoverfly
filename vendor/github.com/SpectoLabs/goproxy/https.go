@@ -189,7 +189,7 @@ func (proxy *ProxyHttpServer) handleHttps(w http.ResponseWriter, r *http.Request
 			clientTlsReader := bufio.NewReader(rawClientTls)
 			for !isEof(clientTlsReader) {
 				req, err := http.ReadRequest(clientTlsReader)
-				var ctx = &ProxyCtx{Req: req, Session: atomic.AddInt64(&proxy.sess, 1), proxy: proxy, UserData: ctx.UserData}
+				var ctx = &ProxyCtx{Req: req, Session: atomic.AddInt64(&proxy.sess, 1), proxy: proxy}
 				if err != nil && err != io.EOF {
 					return
 				}
@@ -243,10 +243,12 @@ func (proxy *ProxyHttpServer) handleHttps(w http.ResponseWriter, r *http.Request
 				// Since we don't know the length of resp, return chunked encoded response
 				// TODO: use a more reasonable scheme
 
-				resp.Header.Del("Content-Length")
+				// Note from Benji
+				// The way we use goproxy, I do not think this is neede for us
+				// https://github.com/SpectoLabs/hoverfly/issues/697
+
+				// resp.Header.Del("Content-Length")
 				resp.Header.Set("Transfer-Encoding", "chunked")
-				// Force connection close otherwise chrome will keep CONNECT tunnel open forever
-				resp.Header.Set("Connection", "close")
 				if err := resp.Header.Write(rawClientTls); err != nil {
 					ctx.Warnf("Cannot write TLS response header from mitm'd client: %v", err)
 					return
@@ -321,10 +323,6 @@ func dialerFromEnv(proxy *ProxyHttpServer) func(network, addr string) (net.Conn,
 }
 
 func (proxy *ProxyHttpServer) NewConnectDialToProxy(https_proxy string) func(network, addr string) (net.Conn, error) {
-	return proxy.NewConnectDialToProxyWithHandler(https_proxy, nil)
-}
-
-func (proxy *ProxyHttpServer) NewConnectDialToProxyWithHandler(https_proxy string, connectReqHandler func(req *http.Request)) func(network, addr string) (net.Conn, error) {
 	u, err := url.Parse(https_proxy)
 	if err != nil {
 		return nil
@@ -339,9 +337,6 @@ func (proxy *ProxyHttpServer) NewConnectDialToProxyWithHandler(https_proxy strin
 				URL:    &url.URL{Opaque: addr},
 				Host:   addr,
 				Header: make(http.Header),
-			}
-			if connectReqHandler != nil {
-				connectReqHandler(connectReq)
 			}
 			c, err := proxy.dial(network, u.Host)
 			if err != nil {
@@ -384,9 +379,6 @@ func (proxy *ProxyHttpServer) NewConnectDialToProxyWithHandler(https_proxy strin
 				URL:    &url.URL{Opaque: addr},
 				Host:   addr,
 				Header: make(http.Header),
-			}
-			if connectReqHandler != nil {
-				connectReqHandler(connectReq)
 			}
 			connectReq.Write(c)
 			// Read response.
