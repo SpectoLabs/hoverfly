@@ -25,7 +25,7 @@ func (this HoverflyCacheStub) GetCache() (CacheView, error) {
 
 	return CacheView{
 		Cache: []CachedResponseView{
-			CachedResponseView{
+			{
 				MatchingPair: &RequestMatcherResponsePairViewV5{
 					RequestMatcher: RequestMatcherViewV5{
 						Destination: []MatcherViewV5{
@@ -35,7 +35,7 @@ func (this HoverflyCacheStub) GetCache() (CacheView, error) {
 					Response: ResponseDetailsViewV5{},
 				},
 			},
-			CachedResponseView{
+			{
 				MatchingPair: &RequestMatcherResponsePairViewV5{
 					RequestMatcher: RequestMatcherViewV5{
 						Destination: []MatcherViewV5{

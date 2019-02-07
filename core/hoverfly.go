@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"sync"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
@@ -18,6 +19,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/state"
 	"github.com/SpectoLabs/hoverfly/core/templating"
+
+	goCache "github.com/patrickmn/go-cache"
 )
 
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
@@ -85,14 +88,17 @@ func NewHoverfly() *Hoverfly {
 func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 	hoverfly := NewHoverfly()
 
-	var requestCache cache.Cache
+	//var requestCache cache.Cache
+	var newCache *goCache.Cache
 	if !cfg.DisableCache {
-		requestCache = cache.NewInMemoryCache()
+		//requestCache = cache.NewInMemoryCache()
+		newCache = goCache.New(5*time.Minute, 10*time.Minute)
 	}
 
 	hoverfly.CacheMatcher = matching.CacheMatcher{
-		RequestCache: requestCache,
+		//RequestCache: requestCache,
 		Webserver:    cfg.Webserver,
+		NewRequestCache: newCache,
 	}
 
 	hoverfly.Cfg = cfg
