@@ -43,6 +43,10 @@ build-ui:
 	rm -rf $(GIT_TAG_NAME).zip
 	rm -rf hoverfly-ui
 
+benchmark:
+	cd core && \
+	go test -bench=BenchmarkProcessRequest -run=XXX -cpuprofile profile_cpu.out -memprofile profile_mem.out --benchtime=20s
+
 fmt:
 	go fmt $$(go list ./... | grep -v -E 'vendor')
 

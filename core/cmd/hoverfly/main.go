@@ -329,13 +329,11 @@ func main() {
 	if *database == boltBackend {
 		db := cache.GetDB(cfg.DatabasePath)
 		defer db.Close()
-		//requestCache = cache.NewBoltDBCache(db, []byte("requestsBucket"))
 		tokenCache = cache.NewBoltDBCache(db, []byte(backends.TokenBucketName))
 		userCache = cache.NewBoltDBCache(db, []byte(backends.UserBucketName))
 
 		log.Info("Using boltdb backend")
 	} else if *database == inmemoryBackend {
-		requestCache = cache.NewDefaultLRUCache()
 		tokenCache = cache.NewInMemoryCache()
 		userCache = cache.NewInMemoryCache()
 
@@ -347,9 +345,10 @@ func main() {
 	}
 	cfg.DisableCache = *disableCache
 	if cfg.DisableCache {
-		requestCache = nil
-
 		log.Info("Request cache has been disabled")
+	} else {
+		// Request cache is always in-memory
+		requestCache = cache.NewDefaultLRUCache()
 	}
 
 	if *proxyAuthorizationHeader == "header-auth" {
