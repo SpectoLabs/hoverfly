@@ -181,7 +181,7 @@ func TestImportFromURLMalformedJSON(t *testing.T) {
 func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
@@ -228,7 +228,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 				},
 			},
 			Headers: map[string][]v2.MatcherViewV5{
-				"Hoverfly": []v2.MatcherViewV5{
+				"Hoverfly": {
 					{
 						Matcher: matchers.Exact,
 						Value:   "testing",
@@ -244,7 +244,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 		Response: models.ResponseDetails{
 			Status:    200,
 			Body:      "hello_world",
-			Headers:   map[string][]string{"Content-Type": []string{"text/plain"}},
+			Headers:   map[string][]string{"Content-Type": {"text/plain"}},
 			Templated: true,
 		},
 		RequestMatcher: models.RequestMatcher{
@@ -279,7 +279,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 				},
 			},
 			Headers: map[string][]models.RequestFieldMatchers{
-				"Hoverfly": []models.RequestFieldMatchers{
+				"Hoverfly": {
 					{
 						Matcher: matchers.Exact,
 						Value:   "testing",
@@ -293,7 +293,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateExplicitlyOrExplicitly(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
@@ -305,7 +305,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
-			Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
+			Headers:     map[string][]string{"Hoverfly": {"testing"}},
 		},
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
@@ -457,7 +457,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 				},
 			},
 			Headers: map[string][]models.RequestFieldMatchers{
-				"Hoverfly": []models.RequestFieldMatchers{
+				"Hoverfly": {
 					{
 						Matcher: matchers.Exact,
 						Value:   "testing",
@@ -471,7 +471,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 		Response: models.ResponseDetails{
 			Status:    200,
 			Body:      "hello_world",
-			Headers:   map[string][]string{"Hoverfly": []string{"testing"}},
+			Headers:   map[string][]string{"Hoverfly": {"testing"}},
 			Templated: true,
 		},
 		RequestMatcher: models.RequestMatcher{
@@ -506,7 +506,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 				},
 			},
 			Headers: map[string][]models.RequestFieldMatchers{
-				"Hoverfly": []models.RequestFieldMatchers{
+				"Hoverfly": {
 					{
 						Matcher: matchers.Exact,
 						Value:   "testing",
@@ -520,7 +520,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 func TestImportImportRequestResponsePairs_CanImportARequesResponsePairView(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
@@ -540,7 +540,7 @@ func TestImportImportRequestResponsePairs_CanImportARequesResponsePairView(t *te
 		Status:      200,
 		Body:        "hello_world",
 		EncodedBody: false,
-		Headers:     map[string][]string{"Hoverfly": []string{"testing"}},
+		Headers:     map[string][]string{"Hoverfly": {"testing"}},
 	}
 
 	requestResponsePair := v2.RequestMatcherResponsePairViewV5{
@@ -559,7 +559,7 @@ func TestImportImportRequestResponsePairs_CanImportARequesResponsePairView(t *te
 
 	Expect(hv.Simulation.GetMatchingPairs()[0].Response.Status).To(Equal(200))
 	Expect(hv.Simulation.GetMatchingPairs()[0].Response.Body).To(Equal("hello_world"))
-	Expect(hv.Simulation.GetMatchingPairs()[0].Response.Headers).To(Equal(map[string][]string{"Hoverfly": []string{"testing"}}))
+	Expect(hv.Simulation.GetMatchingPairs()[0].Response.Headers).To(Equal(map[string][]string{"Hoverfly": {"testing"}}))
 }
 
 // Helper function for base64 encoding
@@ -570,7 +570,7 @@ func base64String(s string) string {
 func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
@@ -582,7 +582,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 			Status:      200,
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
-			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
+			Headers:     map[string][]string{"Content-Encoding": {"gzip"}}},
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
@@ -615,7 +615,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 				},
 			},
 			Headers: map[string][]v2.MatcherViewV5{
-				"Hoverfly": []v2.MatcherViewV5{
+				"Hoverfly": {
 					{
 						Matcher: matchers.Exact,
 						Value:   "testing",
@@ -632,7 +632,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "hello_world",
-			Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}},
+			Headers: map[string][]string{"Content-Encoding": {"gzip"}}},
 		Request: models.RequestDetails{
 			Path:        "/",
 			Method:      "GET",
@@ -640,13 +640,13 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 			Scheme:      "scheme",
 			Query:       map[string][]string{},
 			Body:        "",
-			Headers:     map[string][]string{"Hoverfly": []string{"testing"}}}}))
+			Headers:     map[string][]string{"Hoverfly": {"testing"}}}}))
 }
 
 func TestImportImportRequestResponsePairs_SetsState(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
@@ -658,7 +658,7 @@ func TestImportImportRequestResponsePairs_SetsState(t *testing.T) {
 			Status:      200,
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
-			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
+			Headers:     map[string][]string{"Content-Encoding": {"gzip"}}},
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Body: []v2.MatcherViewV5{
 				{
@@ -681,7 +681,7 @@ func TestImportImportRequestResponsePairs_SetsState(t *testing.T) {
 func TestImportImportRequestResponsePairs_ReturnsWarningsIfDeprecatedQuerytSet(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
@@ -693,10 +693,10 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsIfDeprecatedQuerytSet(t
 			Status:      200,
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
-			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}},
+			Headers:     map[string][]string{"Content-Encoding": {"gzip"}}},
 		RequestMatcher: v2.RequestMatcherViewV5{
 			DeprecatedQuery: []v2.MatcherViewV5{
-				v2.MatcherViewV5{
+				{
 					Matcher: "exact",
 					Value:   "deprecated",
 				},
@@ -713,7 +713,7 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsIfDeprecatedQuerytSet(t
 func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthAndTransferEncodingSet(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
@@ -726,13 +726,13 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthAndTransfe
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
 			Headers: map[string][]string{
-				"Content-Length":    []string{"11"},
-				"Transfer-Encoding": []string{"chunked"},
+				"Content-Length":    {"11"},
+				"Transfer-Encoding": {"chunked"},
 			},
 		},
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Destination: []v2.MatcherViewV5{
-				v2.MatcherViewV5{
+				{
 					Matcher: "exact",
 					Value:   "hoverfly.io",
 				},
@@ -749,7 +749,7 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthAndTransfe
 func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthMismatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
@@ -762,12 +762,12 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthMismatch(t
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
 			Headers: map[string][]string{
-				"Content-Length": []string{"1234"},
+				"Content-Length": {"1234"},
 			},
 		},
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Destination: []v2.MatcherViewV5{
-				v2.MatcherViewV5{
+				{
 					Matcher: "exact",
 					Value:   "hoverfly.io",
 				},
@@ -784,7 +784,7 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthMismatch(t
 func TestImportImportRequestResponsePairs_ReturnsNoWarnings(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
@@ -796,12 +796,12 @@ func TestImportImportRequestResponsePairs_ReturnsNoWarnings(t *testing.T) {
 			Status: 200,
 			Body:   "hello_world",
 			Headers: map[string][]string{
-				"Content-Length": []string{"11"},
+				"Content-Length": {"11"},
 			},
 		},
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Destination: []v2.MatcherViewV5{
-				v2.MatcherViewV5{
+				{
 					Matcher: "exact",
 					Value:   "hoverfly.io",
 				},
@@ -817,7 +817,7 @@ func TestImportImportRequestResponsePairs_ReturnsNoWarnings(t *testing.T) {
 func TestImportImportRequestResponsePairs_ReturnsNoWarnings_Encoded(t *testing.T) {
 	RegisterTestingT(t)
 
-	cache := cache.NewInMemoryCache()
+	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
@@ -830,12 +830,12 @@ func TestImportImportRequestResponsePairs_ReturnsNoWarnings_Encoded(t *testing.T
 			Body:        base64String("hello_world"),
 			EncodedBody: true,
 			Headers: map[string][]string{
-				"Content-Length": []string{"11"},
+				"Content-Length": {"11"},
 			},
 		},
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Destination: []v2.MatcherViewV5{
-				v2.MatcherViewV5{
+				{
 					Matcher: "exact",
 					Value:   "hoverfly.io",
 				},

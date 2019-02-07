@@ -318,8 +318,7 @@ func main() {
 		cfg.Destination = *destination
 	}
 
-	//var requestCache cache.Cache
-	var newRequestCache *lru.Cache
+	var requestCache *lru.Cache
 	var tokenCache cache.Cache
 	var userCache cache.Cache
 
@@ -336,7 +335,7 @@ func main() {
 
 		log.Info("Using boltdb backend")
 	} else if *database == inmemoryBackend {
-		newRequestCache = cache.NewDefaultLRUCache()
+		requestCache = cache.NewDefaultLRUCache()
 		tokenCache = cache.NewInMemoryCache()
 		userCache = cache.NewInMemoryCache()
 
@@ -348,7 +347,7 @@ func main() {
 	}
 	cfg.DisableCache = *disableCache
 	if cfg.DisableCache {
-		newRequestCache = nil
+		requestCache = nil
 
 		log.Info("Request cache has been disabled")
 	}
@@ -364,7 +363,7 @@ func main() {
 
 	hoverfly.Cfg = cfg
 	hoverfly.CacheMatcher = matching.CacheMatcher{
-		NewRequestCache: newRequestCache,
+		RequestCache: requestCache,
 		Webserver:    cfg.Webserver,
 	}
 	hoverfly.Authentication = authBackend

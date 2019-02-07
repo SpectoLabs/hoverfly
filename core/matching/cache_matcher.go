@@ -2,7 +2,6 @@ package matching
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -10,14 +9,13 @@ import (
 )
 
 type CacheMatcher struct {
-	RequestCache cache.Cache
 	Webserver    bool
-	NewRequestCache *lruCache.Cache
+	RequestCache *lruCache.Cache
 }
 
 // getResponse returns stored response from cache
 func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models.CachedResponse, *errors.HoverflyError) {
-	if this.NewRequestCache == nil {
+	if this.RequestCache == nil {
 		return nil, errors.NoCacheSetError()
 	}
 
@@ -31,7 +29,7 @@ func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models
 		key = req.Hash()
 	}
 
-	cachedResponse, found := this.NewRequestCache.Get(key)
+	cachedResponse, found := this.RequestCache.Get(key)
 
 	if !found {
 		log.WithFields(log.Fields{
@@ -60,14 +58,14 @@ func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models
 func (this *CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 	cacheView := v2.CacheView{}
 
-	if this.NewRequestCache == nil {
+	if this.RequestCache == nil {
 		return cacheView, errors.NoCacheSetError()
 	}
 
-	keys := this.NewRequestCache.Keys()
+	keys := this.RequestCache.Keys()
 
 	for _, key := range keys {
-		value, _ := this.NewRequestCache.Get(key)
+		value, _ := this.RequestCache.Get(key)
 		cachedResponse := value.(models.CachedResponse)
 
 		var pair *v2.RequestMatcherResponsePairViewV5
@@ -96,7 +94,7 @@ func (this *CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 
 // TODO: This would be easier to reason about if we had two methods, "CacheHit" and "CacheHit" in order to reduce bloating
 func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestDetails, pair *models.RequestMatcherResponsePair, matchError *models.MatchError) error {
-	if this.NewRequestCache == nil {
+	if this.RequestCache == nil {
 		return errors.NoCacheSetError()
 	}
 
@@ -126,21 +124,21 @@ func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestD
 		cachedResponse.ClosestMiss = matchError.ClosestMiss
 	}
 
-	this.NewRequestCache.Add(key, cachedResponse)
+	this.RequestCache.Add(key, cachedResponse)
 	return nil
 }
 
 func (this *CacheMatcher) FlushCache() error {
-	if this.NewRequestCache == nil {
+	if this.RequestCache == nil {
 		return errors.NoCacheSetError()
 	}
 
-	this.NewRequestCache.Purge()
+	this.RequestCache.Purge()
 	return nil
 }
 
 func (this *CacheMatcher) PreloadCache(simulation models.Simulation) error {
-	if this.NewRequestCache == nil {
+	if this.RequestCache == nil {
 		return errors.NoCacheSetError()
 	}
 	for _, pair := range simulation.GetMatchingPairs() {

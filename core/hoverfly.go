@@ -86,17 +86,14 @@ func NewHoverfly() *Hoverfly {
 func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 	hoverfly := NewHoverfly()
 
-	//var requestCache cache.Cache
-	var newCache *lru.Cache
+	var requestCache *lru.Cache
 	if !cfg.DisableCache {
-		newCache = cache.NewDefaultLRUCache()
-		//requestCache = cache.NewInMemoryCache()
+		requestCache = cache.NewDefaultLRUCache()
 	}
 
 	hoverfly.CacheMatcher = matching.CacheMatcher{
-		//RequestCache: requestCache,
 		Webserver:    cfg.Webserver,
-		NewRequestCache: newCache,
+		RequestCache: requestCache,
 	}
 
 	hoverfly.Cfg = cfg
@@ -106,7 +103,7 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
-func GetNewHoverfly(cfg *Configuration, requestCache cache.Cache, authentication backends.Authentication) *Hoverfly {
+func GetNewHoverfly(cfg *Configuration, requestCache *lru.Cache, authentication backends.Authentication) *Hoverfly {
 	hoverfly := NewHoverfly()
 
 	if cfg.DisableCache {
