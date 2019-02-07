@@ -6,13 +6,13 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	goCache "github.com/patrickmn/go-cache"
+	lruCache "github.com/hashicorp/golang-lru"
 )
 
 type CacheMatcher struct {
 	RequestCache cache.Cache
 	Webserver    bool
-	NewRequestCache *goCache.Cache
+	NewRequestCache *lruCache.Cache
 }
 
 // getResponse returns stored response from cache
@@ -36,7 +36,6 @@ func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models
 	if !found {
 		log.WithFields(log.Fields{
 			"key":         key,
-			//"error":       err.Error(),
 			"query":       req.Query,
 			"path":        req.Path,
 			"destination": req.Destination,
@@ -45,17 +44,6 @@ func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models
 
 		return nil, errors.RecordedRequestNotInCacheError()
 	}
-
-	// getting cache response
-	//cachedResponse, err := models.NewCachedResponseFromBytes(pairBytes)
-	//if err != nil {
-	//	log.WithFields(log.Fields{
-	//		"error": err.Error(),
-	//		"value": string(pairBytes),
-	//		"key":   key,
-	//	}).Debug("Failed to decode payload from cache")
-	//	return nil, errors.DecodePayloadError()
-	//}
 
 	log.WithFields(log.Fields{
 		"key":         key,
@@ -76,14 +64,11 @@ func (this *CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 		return cacheView, errors.NoCacheSetError()
 	}
 
-	records := this.NewRequestCache.Items()
-	//if err != nil {
-	//	return cacheView, err
-	//}
+	keys := this.NewRequestCache.Keys()
 
-	for key, v := range records {
-		cachedResponse := v.Object.(models.CachedResponse)
-		//if cachedResponse, err := models.NewCachedResponseFromBytes(v); err == nil {
+	for _, key := range keys {
+		value, _ := this.NewRequestCache.Get(key)
+		cachedResponse := value.(models.CachedResponse)
 
 		var pair *v2.RequestMatcherResponsePairViewV5
 		var closestMiss *v2.ClosestMissView
@@ -98,17 +83,12 @@ func (this *CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 		}
 
 		cachedResponseView := v2.CachedResponseView{
-			Key:          key,
+			Key:          key.(string),
 			MatchingPair: pair,
 			ClosestMiss:  closestMiss,
 		}
 
 		cacheView.Cache = append(cacheView.Cache, cachedResponseView)
-
-		//} else {
-		//	log.Error(err)
-		//	return cacheView, err
-		//}
 	}
 
 	return cacheView, nil
@@ -146,13 +126,7 @@ func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestD
 		cachedResponse.ClosestMiss = matchError.ClosestMiss
 	}
 
-	//pairBytes, err := cachedResponse.Encode()
-
-	//if err != nil {
-	//	return err
-	//}
-
-	this.NewRequestCache.Set(key, cachedResponse, goCache.DefaultExpiration)
+	this.NewRequestCache.Add(key, cachedResponse)
 	return nil
 }
 
@@ -161,7 +135,7 @@ func (this *CacheMatcher) FlushCache() error {
 		return errors.NoCacheSetError()
 	}
 
-	this.NewRequestCache.Flush()
+	this.NewRequestCache.Purge()
 	return nil
 }
 

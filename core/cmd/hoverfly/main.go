@@ -24,6 +24,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"github.com/hashicorp/golang-lru"
 	"os"
 	"strings"
 	"time"
@@ -38,7 +39,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	mw "github.com/SpectoLabs/hoverfly/core/middleware"
 	"github.com/SpectoLabs/hoverfly/core/modes"
-	goCache "github.com/patrickmn/go-cache"
 )
 
 type arrayFlags []string
@@ -319,7 +319,7 @@ func main() {
 	}
 
 	//var requestCache cache.Cache
-	var newRequestCache *goCache.Cache
+	var newRequestCache *lru.Cache
 	var tokenCache cache.Cache
 	var userCache cache.Cache
 
@@ -336,8 +336,7 @@ func main() {
 
 		log.Info("Using boltdb backend")
 	} else if *database == inmemoryBackend {
-		newRequestCache = goCache.New(5*time.Minute, 10*time.Minute)
-		//requestCache = cache.NewInMemoryCache()
+		newRequestCache = cache.NewDefaultLRUCache()
 		tokenCache = cache.NewInMemoryCache()
 		userCache = cache.NewInMemoryCache()
 

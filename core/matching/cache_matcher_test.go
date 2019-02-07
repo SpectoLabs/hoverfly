@@ -1,14 +1,12 @@
 package matching_test
 
 import (
-	"testing"
-	"time"
-
+	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
-	goCache "github.com/patrickmn/go-cache"
+	"testing"
 )
 
 func Test_CacheMatcher_GetCachedResponse_WillReturnErrorIfCacheIsNil(t *testing.T) {
@@ -42,7 +40,7 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_CanSaveNilPairs(t *testing
 	RegisterTestingT(t)
 
 	unit := matching.CacheMatcher{
-		NewRequestCache: goCache.New(5*time.Minute, 10*time.Minute),
+		NewRequestCache: cache.NewDefaultLRUCache(),
 	}
 
 	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil, nil)
@@ -78,7 +76,7 @@ func Test_CacheMatcher_PreloadCache_WillReturnErrorIfCacheIsNil(t *testing.T) {
 func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		NewRequestCache: goCache.New(5*time.Minute, 10*time.Minute),
+		NewRequestCache: cache.NewDefaultLRUCache(),
 	}
 
 	simulation := models.NewSimulation()
@@ -101,13 +99,13 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *tes
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.NewRequestCache.Items()).To(HaveLen(0))
+	Expect(unit.NewRequestCache.Len()).To(Equal(0))
 }
 
 func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMatchers(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		NewRequestCache: goCache.New(5*time.Minute, 10*time.Minute),
+		NewRequestCache: cache.NewDefaultLRUCache(),
 	}
 
 	simulation := models.NewSimulation()
@@ -161,13 +159,13 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMa
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.NewRequestCache.Items()).To(HaveLen(1))
+	Expect(unit.NewRequestCache.Len()).To(Equal(1))
 }
 
 func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWithoutExactMatches(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		NewRequestCache: goCache.New(5*time.Minute, 10*time.Minute),
+		NewRequestCache: cache.NewDefaultLRUCache(),
 	}
 
 	simulation := models.NewSimulation()
@@ -190,13 +188,13 @@ func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWitho
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.NewRequestCache.Items()).To(HaveLen(0))
+	Expect(unit.NewRequestCache.Len()).To(Equal(0))
 }
 
 func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		NewRequestCache: goCache.New(5*time.Minute, 10*time.Minute),
+		NewRequestCache: cache.NewDefaultLRUCache(),
 	}
 
 	simulation := models.NewSimulation()
@@ -264,13 +262,13 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.NewRequestCache.Items()).To(HaveLen(1))
+	Expect(unit.NewRequestCache.Len()).To(Equal(1))
 }
 
 func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{
-		NewRequestCache: goCache.New(5*time.Minute, 10*time.Minute),
+		NewRequestCache: cache.NewDefaultLRUCache(),
 	}
 
 	simulation := models.NewSimulation()
@@ -346,5 +344,5 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.NewRequestCache.Items()).To(HaveLen(0))
+	Expect(unit.NewRequestCache.Len()).To(Equal(0))
 }
