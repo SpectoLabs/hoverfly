@@ -1,5 +1,7 @@
 package cache
 
+import "github.com/hashicorp/golang-lru"
+
 // Cache - cache interface used to store and retrieve request/response payloads or anything else
 type Cache interface {
 	Set(key, value []byte) error
@@ -10,4 +12,10 @@ type Cache interface {
 	Delete(key []byte) error
 	DeleteData() error
 	GetAllKeys() (map[string]bool, error)
+}
+
+
+func NewDefaultLRUCache() *lru.Cache {
+	c, _ := lru.New(128)
+	return c
 }

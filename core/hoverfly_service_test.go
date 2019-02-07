@@ -2,7 +2,6 @@ package hoverfly
 
 import (
 	"encoding/json"
-	"github.com/patrickmn/go-cache"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -897,7 +896,7 @@ func Test_Hoverfly_SetModeWithArguments_SettingModeToCaptureWipesCache(t *testin
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.CacheMatcher.NewRequestCache.Set("test", "test_bytes", cache.NoExpiration)
+	unit.CacheMatcher.NewRequestCache.Add("test", "test_bytes")
 
 	Expect(unit.SetModeWithArguments(
 		v2.ModeView{
@@ -905,7 +904,7 @@ func Test_Hoverfly_SetModeWithArguments_SettingModeToCaptureWipesCache(t *testin
 		})).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("capture"))
 
-	Expect(unit.CacheMatcher.NewRequestCache.Items()).To(HaveLen(0))
+	Expect(unit.CacheMatcher.NewRequestCache.Len()).To(Equal(0))
 }
 
 func Test_Hoverfly_SetModeWithArguments_Stateful(t *testing.T) {
