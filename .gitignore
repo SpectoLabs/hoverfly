@@ -46,6 +46,7 @@ target
 # Vim
 *.swp
 *.swo
+*.out
 
 core/cmd/hoverfly/hoverfly
 hoverctl/hoverctl

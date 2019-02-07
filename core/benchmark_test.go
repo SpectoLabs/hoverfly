@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func BenchmarkNewWebserverProxy(b *testing.B) {
+func BenchmarkProcessRequest(b *testing.B) {
 
 	RegisterTestingT(b)
 	hoverfly := NewHoverflyWithConfiguration(&Configuration{
@@ -76,15 +76,13 @@ func BenchmarkNewWebserverProxy(b *testing.B) {
 	request, _ := http.NewRequest(http.MethodGet, "http://localhost:8500/bar", nil)
 	var resp *http.Response
 
-	b.Run("BenchmarkNewWebserverProxy", func(b *testing.B) {
+	b.Run("Simple simulation", func(b *testing.B) {
 
 		for n := 0; n < b.N; n++ {
 			resp = hoverfly.processRequest(request)
-			//http.Get("http://localhost:8500/bar")
 		}
 	})
 
-	//Expect(err).To(BeNil())
 	Expect(resp.StatusCode).To(Equal(200))
 
 	hoverfly.StopProxy()
