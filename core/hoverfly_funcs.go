@@ -2,6 +2,7 @@ package hoverfly
 
 import (
 	"bytes"
+	"github.com/aymerick/raymond"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -46,6 +47,7 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError) {
 
 	var response models.ResponseDetails
+	var cachedResponse *models.CachedResponse
 
 	cachedResponse, cacheErr := hf.CacheMatcher.GetCachedResponse(&requestDetails)
 
@@ -64,7 +66,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 		// Cache result
 		if result.Cachable {
-			hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, result.Pair, result.Error)
+			cachedResponse, _ = hf.CacheMatcher.SaveRequestMatcherResponsePair(requestDetails, result.Pair, result.Error)
 		}
 
 		// If we miss, just return
@@ -86,7 +88,20 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	// Templating applies at the end, once we have loaded a response. Comes BEFORE state transitions,
 	// as we use the current state in templates
 	if response.Templated == true {
-		responseBody, err := hf.templator.ApplyTemplate(&requestDetails, hf.state.State, response.Body)
+
+		var template *raymond.Template
+		if cachedResponse != nil && cachedResponse.ResponseTemplate != nil {
+			template = cachedResponse.ResponseTemplate
+		} else {
+
+			template, _ = hf.templator.ParseTemplate(response.Body)
+			if cachedResponse != nil {
+				cachedResponse.ResponseTemplate = template
+			}
+		}
+
+		responseBody, err :=  hf.templator.RenderTemplate(template, &requestDetails, hf.state.State)
+
 		if err == nil {
 			response.Body = responseBody
 		} else {
