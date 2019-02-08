@@ -93,7 +93,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		if cachedResponse != nil && cachedResponse.ResponseTemplate != nil {
 			template = cachedResponse.ResponseTemplate
 		} else {
-
+			// Parse and cache the template
 			template, _ = hf.templator.ParseTemplate(response.Body)
 			if cachedResponse != nil {
 				cachedResponse.ResponseTemplate = template
@@ -105,7 +105,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		if err == nil {
 			response.Body = responseBody
 		} else {
-			log.Warn("Response Template " + err.Error())
+			log.Warnf("Failed to render response template: %s", err.Error())
 		}
 	}
 

@@ -1,6 +1,7 @@
 package templating
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -63,21 +64,13 @@ func (*Templator) ParseTemplate(responseBody string) (*raymond.Template, error) 
 }
 
 func (*Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.RequestDetails, state map[string]string) (string, error) {
+	if tpl == nil {
+		return "", fmt.Errorf("template cannot be nil")
+	}
 	ctx := NewTemplatingDataFromRequest(requestDetails, state)
 	return tpl.Exec(ctx)
 }
 
-func (*Templator) ApplyTemplate(requestDetails *models.RequestDetails, state map[string]string, responseBody string) (string, error) {
-
-	t := NewTemplatingDataFromRequest(requestDetails, state)
-
-	if rendered, err := raymond.Render(responseBody, t); err == nil {
-		responseBody = rendered
-		return responseBody, nil
-	} else {
-		return "", err
-	}
-}
 
 func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails, state map[string]string) *TemplatingData {
 	return &TemplatingData{
