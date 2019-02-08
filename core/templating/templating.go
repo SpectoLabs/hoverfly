@@ -57,6 +57,16 @@ func NewTemplator() *Templator {
 	return &Templator{}
 }
 
+func (*Templator) ParseTemplate(responseBody string) (*raymond.Template, error) {
+
+	return raymond.Parse(responseBody)
+}
+
+func (*Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.RequestDetails, state map[string]string) (string, error) {
+	ctx := NewTemplatingDataFromRequest(requestDetails, state)
+	return tpl.Exec(ctx)
+}
+
 func (*Templator) ApplyTemplate(requestDetails *models.RequestDetails, state map[string]string, responseBody string) (string, error) {
 
 	t := NewTemplatingDataFromRequest(requestDetails, state)
