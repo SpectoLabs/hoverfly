@@ -33,8 +33,6 @@ target in the hoverctl configuration file.
 				handleIfError(fmt.Errorf("Target %s already exists\n\nUse a different target name or run `hoverctl targets update %[1]s`", newTargetFlag))
 			}
 
-			// If the host is set to a remote instance, the default HTTPS port
-			// is used instead of 8888 which is set in wrapper.NewTarget()
 			hostFlag, err := cmd.Flags().GetString("host")
 			handleIfError(err)
 			adminPortFlag, err := cmd.Flags().GetInt("admin-port")
@@ -53,7 +51,7 @@ target in the hoverctl configuration file.
 		}
 
 		if username == "" || password == "" {
-			handleIfError(errors.New("Missing username or password"))
+			handleIfError(errors.New("missing username or password"))
 		}
 
 		token, err := wrapper.Login(*target, username, password)
@@ -76,7 +74,7 @@ func init() {
 	loginCmd.Flags().String("new-target", "", "A name for a new target that hoverctl will create and associate the Hoverfly instance to")
 	loginCmd.Flags().Int("admin-port", 0, "A port number for the Hoverfly API/GUI. Overrides the default Hoverfly admin port (8888)")
 	loginCmd.Flags().Int("proxy-port", 0, "A port number for the Hoverfly proxy. Overrides the default Hoverfly proxy port (8500)")
-	loginCmd.Flags().String("host", "", "A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost)")
+	loginCmd.Flags().String("host", "", "A host on which a Hoverfly instance is running. Overrides the default Hoverfly host (localhost). HTTP protocol is assumed if scheme is not specified.")
 	loginCmd.Flags().StringVar(&username, "username", "", "Username to authenticate against Hoverfly with")
-	loginCmd.Flags().StringVar(&password, "password", "", "Password to autenticate against Hoverfly with")
+	loginCmd.Flags().StringVar(&password, "password", "", "Password to authenticate against Hoverfly with")
 }
