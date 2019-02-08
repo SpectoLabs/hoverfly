@@ -57,13 +57,13 @@ var _ = Describe("hoverctl login", func() {
 		It("should error nicely if username is missing", func() {
 			output := functional_tests.Run(hoverctlBinary, "login", "-f", "--password", functional_tests.HoverflyPassword)
 
-			Expect(output).To(ContainSubstring("Missing username or password"))
+			Expect(output).To(ContainSubstring("missing username or password"))
 		})
 
 		It("should error nicely if password is missing", func() {
 			output := functional_tests.Run(hoverctlBinary, "login", "-f", "--username", functional_tests.HoverflyUsername)
 
-			Expect(output).To(ContainSubstring("Missing username or password"))
+			Expect(output).To(ContainSubstring("missing username or password"))
 		})
 	})
 
