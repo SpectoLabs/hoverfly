@@ -22,12 +22,6 @@ func RecordedRequestNotInCacheError() *HoverflyError {
 	}
 }
 
-func DecodePayloadError() *HoverflyError {
-	return &HoverflyError{
-		Message: "Failed to decode payload from cache",
-	}
-}
-
 func MatchingFailedError(closestMiss *models.ClosestMiss) *HoverflyError {
 	message := "Could not find a match for request, create or record a valid matcher first!"
 
