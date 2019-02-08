@@ -290,6 +290,104 @@ func Test_Hoverfly_GetResponse_WillCacheClosestMiss(t *testing.T) {
 	Expect(cachedResponse.ClosestMiss.MissedFields).To(ConsistOf("method"))
 }
 
+func Test_Hoverfly_GetResponse_WillCacheTemplateIfNotInCache(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "somehost.com",
+				},
+			},
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "POST",
+				},
+			},
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "http",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "{{ randomUuid }}",
+			Templated: true,
+		},
+	})
+
+	unit.GetResponse(models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+	})
+
+	Expect(unit.CacheMatcher.RequestCache.RecordsCount()).Should(Equal(1))
+
+	cachedRequestResponsePair, found := unit.CacheMatcher.RequestCache.Get("75b4ae6efa2a3f6d3ee6b9fed4d8c8c5")
+	Expect(found).To(BeTrue())
+
+	Expect(cachedRequestResponsePair.(*models.CachedResponse).MatchingPair.Response.Body).To(Equal("{{ randomUuid }}"))
+	Expect(cachedRequestResponsePair.(*models.CachedResponse).ResponseTemplate).NotTo(BeNil())
+}
+
+func Test_Hoverfly_GetResponse_ShouldReturnEmptyTextIfResponseTemplateIsNotRenderable(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "somehost.com",
+				},
+			},
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "POST",
+				},
+			},
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "http",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "hello {{ unknownFunc }}",
+			Templated: true,
+		},
+	})
+
+	response, err := unit.GetResponse(models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+	})
+
+	Expect(err).To(BeNil())
+	Expect(response.Body).To(Equal("hello "))
+
+	Expect(unit.CacheMatcher.RequestCache.RecordsCount()).Should(Equal(1))
+
+	cachedRequestResponsePair, found := unit.CacheMatcher.RequestCache.Get("75b4ae6efa2a3f6d3ee6b9fed4d8c8c5")
+	Expect(found).To(BeTrue())
+
+	Expect(cachedRequestResponsePair.(*models.CachedResponse).MatchingPair.Response.Body).To(Equal("hello {{ unknownFunc }}"))
+}
+
 func Test_Hoverfly_GetResponse_TransitioningBetweenStatesWhenSimulating(t *testing.T) {
 	RegisterTestingT(t)
 
