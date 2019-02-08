@@ -61,7 +61,7 @@ func Test_BuildUrl_AddsHostAdminPortAndPath_Https(t *testing.T) {
 	Expect(BuildURL(target, "/something")).To(Equal("https://localhost:1234/something"))
 }
 
-func Test_BuildUrl_AddsHttpIfHostIsLocalhost(t *testing.T) {
+func Test_BuildUrl_AddsHttpAsDefaultProtocol(t *testing.T) {
 	RegisterTestingT(t)
 
 	target := configuration.Target{
@@ -72,16 +72,6 @@ func Test_BuildUrl_AddsHttpIfHostIsLocalhost(t *testing.T) {
 	Expect(BuildURL(target, "/something")).To(Equal("http://localhost:1234/something"))
 }
 
-func Test_BuildUrl_AddsHttpIfHostIsExternal(t *testing.T) {
-	RegisterTestingT(t)
-
-	target := configuration.Target{
-		Host:      "test-instance.hoverfly.io",
-		AdminPort: 1234,
-	}
-
-	Expect(BuildURL(target, "/something")).To(Equal("https://test-instance.hoverfly.io:1234/something"))
-}
 
 func Test_Stop_SendsCorrectHTTPRequest(t *testing.T) {
 	RegisterTestingT(t)

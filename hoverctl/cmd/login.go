@@ -41,9 +41,6 @@ target in the hoverctl configuration file.
 			handleIfError(err)
 			proxyPortFlag, err := cmd.Flags().GetInt("proxy-port")
 			handleIfError(err)
-			if adminPortFlag == 0 && (hostFlag != "" && !wrapper.IsLocal(hostFlag)) {
-				adminPortFlag = 443
-			}
 
 			target = configuration.NewTarget(newTargetFlag, hostFlag, adminPortFlag, proxyPortFlag)
 		}

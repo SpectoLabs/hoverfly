@@ -163,11 +163,11 @@ func Login(target configuration.Target, username, password string) (string, erro
 
 func BuildURL(target configuration.Target, endpoint string) string {
 	if !strings.HasPrefix(target.Host, "http://") && !strings.HasPrefix(target.Host, "https://") {
-		if IsLocal(target.Host) {
+		//if IsLocal(target.Host) {
 			return fmt.Sprintf("http://%v:%v%v", target.Host, target.AdminPort, endpoint)
-		} else {
-			return fmt.Sprintf("https://%v:%v%v", target.Host, target.AdminPort, endpoint)
-		}
+		//} else {
+		//	return fmt.Sprintf("https://%v:%v%v", target.Host, target.AdminPort, endpoint)
+		//}
 	}
 	return fmt.Sprintf("%v:%v%v", target.Host, target.AdminPort, endpoint)
 }
