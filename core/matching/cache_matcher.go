@@ -68,7 +68,7 @@ func (this *CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 	}
 
 	for key, value := range entries {
-		cachedResponse := value.(models.CachedResponse)
+		cachedResponse := value.(*models.CachedResponse)
 
 		var pair *v2.RequestMatcherResponsePairViewV5
 		var closestMiss *v2.ClosestMissView
@@ -126,7 +126,7 @@ func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestD
 		cachedResponse.ClosestMiss = matchError.ClosestMiss
 	}
 
-	err := this.RequestCache.Set(key, cachedResponse)
+	err := this.RequestCache.Set(key, &cachedResponse)
 	return &cachedResponse, err
 }
 
