@@ -51,8 +51,8 @@ func (this *CacheMatcher) GetCachedResponse(req *models.RequestDetails) (*models
 		"destination": req.Destination,
 	}).Info("Response found interface{} cache")
 
-	response := cachedResponse.(models.CachedResponse)
-	return &response, nil
+	response := cachedResponse.(*models.CachedResponse)
+	return response, nil
 }
 
 func (this *CacheMatcher) GetAllResponses() (v2.CacheView, error) {
@@ -95,9 +95,9 @@ func (this *CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 }
 
 // TODO: This would be easier to reason about if we had two methods, "CacheHit" and "CacheHit" in order to reduce bloating
-func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestDetails, pair *models.RequestMatcherResponsePair, matchError *models.MatchError) error {
+func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestDetails, pair *models.RequestMatcherResponsePair, matchError *models.MatchError) (*models.CachedResponse, error) {
 	if this.RequestCache == nil {
-		return errors.NoCacheSetError()
+		return nil, errors.NoCacheSetError()
 	}
 
 	var key string
@@ -126,7 +126,8 @@ func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestD
 		cachedResponse.ClosestMiss = matchError.ClosestMiss
 	}
 
-	return this.RequestCache.Set(key, cachedResponse)
+	err := this.RequestCache.Set(key, cachedResponse)
+	return &cachedResponse, err
 }
 
 func (this *CacheMatcher) FlushCache() error {
