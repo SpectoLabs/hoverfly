@@ -182,7 +182,7 @@ func Test_Hoverfly_GetResponse_WillCacheResponseIfNotInCache(t *testing.T) {
 	cachedRequestResponsePair, found := unit.CacheMatcher.RequestCache.Get("75b4ae6efa2a3f6d3ee6b9fed4d8c8c5")
 	Expect(found).To(BeTrue())
 
-	Expect(cachedRequestResponsePair.(models.CachedResponse).MatchingPair.Response.Body).To(Equal("response body"))
+	Expect(cachedRequestResponsePair.(*models.CachedResponse).MatchingPair.Response.Body).To(Equal("response body"))
 
 	unit.Simulation = models.NewSimulation()
 	response, err := unit.GetResponse(models.RequestDetails{

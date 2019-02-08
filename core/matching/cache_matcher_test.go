@@ -31,9 +31,10 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_WillReturnErrorIfCacheIsNi
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{}
 
-	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil, nil)
+	cachedResponse, err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil, nil)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("No cache set"))
+	Expect(cachedResponse).To(BeNil())
 }
 
 func Test_CacheMatcher_SaveRequestMatcherResponsePair_CanSaveNilPairs(t *testing.T) {
@@ -43,13 +44,10 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_CanSaveNilPairs(t *testing
 		RequestCache: cache.NewDefaultLRUCache(),
 	}
 
-	err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil, nil)
+	cachedResponse, err := unit.SaveRequestMatcherResponsePair(models.RequestDetails{}, nil, nil)
 	Expect(err).To(BeNil())
 
-	cachedResponse, found := unit.RequestCache.Get("d41d8cd98f00b204e9800998ecf8427e")
-	Expect(found).To(BeTrue())
-
-	Expect(cachedResponse.(models.CachedResponse).MatchingPair).To(BeNil())
+	Expect(cachedResponse.MatchingPair).To(BeNil())
 }
 
 func Test_CacheMatcher_FlushCache_WillReturnErrorIfCacheIsNil(t *testing.T) {
