@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 
@@ -98,9 +99,8 @@ func ReconstructResponse(request *http.Request, pair models.RequestResponsePair)
 	response.Request = request
 
 	// adding body, length, status code
-	buf := bytes.NewBufferString(pair.Response.Body)
-	response.ContentLength = int64(buf.Len())
-	response.Body = ioutil.NopCloser(buf)
+	response.ContentLength = -1
+	response.Body = ioutil.NopCloser(strings.NewReader(pair.Response.Body))
 	response.StatusCode = pair.Response.Status
 
 	headers := make(http.Header)
