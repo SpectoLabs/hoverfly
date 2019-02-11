@@ -66,21 +66,21 @@ var (
 	modify       = flag.Bool("modify", false, "Start Hoverfly in modify mode - applies middleware (required) to both outgoing and incoming HTTP traffic")
 	spy          = flag.Bool("spy", false, "Start Hoverfly in spy mode, similar to simulate but calls real server when cache miss")
 	diff         = flag.Bool("diff", false, "Start Hoverfly in diff mode - calls real server and compares the actual response with the expected simulation config if present")
-	middleware   = flag.String("middleware", "", "Should proxy use middleware")
+	middleware   = flag.String("middleware", "", "Should proxy using middleware")
 	proxyPort    = flag.String("pp", "", "Proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
 	adminPort    = flag.String("ap", "", "Admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
 	listenOnHost = flag.String("listen-on-host", "", "Specify which network interface to bind to, eg. 0.0.0.0 will bind to all interfaces. By default hoverfly will only bind ports to loopback interface")
-	metrics      = flag.Bool("metrics", false, "Supply -metrics flag to enable metrics logging to stdout")
+	metrics      = flag.Bool("metrics", false, "Enable metrics logging to stdout")
 	dev          = flag.Bool("dev", false, "Enable CORS headers to allow Hoverfly Admin UI development")
-	destination  = flag.String("destination", ".", "Destination URI to catch")
+	destination  = flag.String("destination", ".", "Control which URLs Hoverfly should intercept and process, it can be string or regex")
 	webserver    = flag.Bool("webserver", false, "Start Hoverfly in webserver mode (simulate mode)")
 
 	addNew          = flag.Bool("add", false, "Add new user '-add -username hfadmin -password hfpass'")
 	addUser         = flag.String("username", "", "Username for new user")
 	addPassword     = flag.String("password", "", "Password for new user")
 	addPasswordHash = flag.String("password-hash", "", "Password hash for new user instead of password")
-	isAdmin         = flag.Bool("admin", true, "Supply '-admin false' to make this non admin user (defaults to 'true') ")
-	authEnabled     = flag.Bool("auth", false, "Enable authentication, currently it is disabled by default")
+	isAdmin         = flag.Bool("admin", true, "Supply '-admin=false' to make this non admin user")
+	authEnabled     = flag.Bool("auth", false, "Enable authentication")
 
 	proxyAuthorizationHeader = flag.String("proxy-auth", "proxy-auth", "Switch the Proxy-Authorization header from proxy-auth `Proxy-Authorization` to header-auth `X-HOVERFLY-AUTHORIZATION`. Switching to header-auth will auto enable -https-only")
 
@@ -90,8 +90,8 @@ var (
 	cert       = flag.String("cert", "", "CA certificate used to sign MITM certificates")
 	key        = flag.String("key", "", "Private key of the CA used to sign MITM certificates")
 
-	tlsVerification    = flag.Bool("tls-verification", true, "Turn on/off tls verification for outgoing requests (will not try to verify certificates) - defaults to true")
-	plainHttpTunneling = flag.Bool("plain-http-tunneling", false, "Use plain http tunneling to host with non-443 port - defaults to false")
+	tlsVerification    = flag.Bool("tls-verification", true, "Turn on/off tls verification for outgoing requests (will not try to verify certificates)")
+	plainHttpTunneling = flag.Bool("plain-http-tunneling", false, "Use plain http tunneling to host with non-443 port")
 
 	upstreamProxy = flag.String("upstream-proxy", "", "Specify an upstream proxy for hoverfly to route traffic through")
 	httpsOnly     = flag.Bool("https-only", false, "Allow only secure secure requests to be proxied by hoverfly")
@@ -100,12 +100,12 @@ var (
 	database     = flag.String("db", inmemoryBackend, "Storage to use - 'boltdb' or 'memory' which will not write anything to disk")
 	disableCache = flag.Bool("disable-cache", false, "Disable the cache that sits in front of matching")
 
-	logsFormat = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\" (default \"plaintext\")")
-	logsSize   = flag.Int("logs-size", 1000, "Set the amount of logs to be stored in memory (default \"1000\")")
+	logsFormat = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\"")
+	logsSize   = flag.Int("logs-size", 1000, "Set the amount of logs to be stored in memory")
 
-	journalSize = flag.Int("journal-size", 1000, "Set the size of request/response journal (default \"1000\")")
+	journalSize = flag.Int("journal-size", 1000, "Set the size of request/response journal")
 
-	clientAuthenticationDestination = flag.String("client-authentication-destination", "", "Regular expression of desination with client authentication")
+	clientAuthenticationDestination = flag.String("client-authentication-destination", "", "Regular expression of destination with client authentication")
 	clientAuthenticationClientCert  = flag.String("client-authentication-client-cert", "", "Path to the client certification file used for authentication")
 	clientAuthenticationClientKey   = flag.String("client-authentication-client-key", "", "Path to the client key file used for authentication")
 	clientAuthenticationCACert      = flag.String("client-authentication-ca-cert", "", "Path to the ca cert file used for authentication")
@@ -167,7 +167,7 @@ func init() {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-		}).Fatal("Failed to load certifiate and key pair")
+		}).Fatal("Failed to load certificate and key pair")
 	}
 	goproxy.GoproxyCa = tlsc
 }
@@ -233,7 +233,7 @@ func main() {
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
-			}).Fatal("Failed to load certifiate and key pair")
+			}).Fatal("Failed to load certificate and key pair")
 		}
 
 		goproxy.GoproxyCa = tlsc

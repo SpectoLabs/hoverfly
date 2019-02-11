@@ -71,8 +71,6 @@ func askForInput(value string, sensitive bool) string {
 			return strings.TrimSpace(response)
 		}
 	}
-
-	return ""
 }
 
 func drawTable(data [][]string, header bool) {
