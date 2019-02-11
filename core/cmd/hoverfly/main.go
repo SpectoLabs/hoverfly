@@ -66,7 +66,7 @@ var (
 	modify       = flag.Bool("modify", false, "Start Hoverfly in modify mode - applies middleware (required) to both outgoing and incoming HTTP traffic")
 	spy          = flag.Bool("spy", false, "Start Hoverfly in spy mode, similar to simulate but calls real server when cache miss")
 	diff         = flag.Bool("diff", false, "Start Hoverfly in diff mode - calls real server and compares the actual response with the expected simulation config if present")
-	middleware   = flag.String("middleware", "", "Should proxy using middleware")
+	middleware   = flag.String("middleware", "", "Should proxy use middleware")
 	proxyPort    = flag.String("pp", "", "Proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
 	adminPort    = flag.String("ap", "", "Admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
 	listenOnHost = flag.String("listen-on-host", "", "Specify which network interface to bind to, eg. 0.0.0.0 will bind to all interfaces. By default hoverfly will only bind ports to loopback interface")
@@ -98,12 +98,13 @@ var (
 
 	databasePath = flag.String("db-path", "", "Database location - supply it to provide specific database location (will be created there if it doesn't exist)")
 	database     = flag.String("db", inmemoryBackend, "Storage to use - 'boltdb' or 'memory' which will not write anything to disk")
-	disableCache = flag.Bool("disable-cache", false, "Disable the cache that sits in front of matching")
+	disableCache = flag.Bool("disable-cache", false, "Disable request/response cache (the cache that sits in front of matching)")
 
 	logsFormat = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\"")
 	logsSize   = flag.Int("logs-size", 1000, "Set the amount of logs to be stored in memory")
 
 	journalSize = flag.Int("journal-size", 1000, "Set the size of request/response journal")
+	cacheSize 	= flag.Int("cache-size", 1000, "Set the size of request/response cache")
 
 	clientAuthenticationDestination = flag.String("client-authentication-destination", "", "Regular expression of destination with client authentication")
 	clientAuthenticationClientCert  = flag.String("client-authentication-client-cert", "", "Path to the client certification file used for authentication")
@@ -175,7 +176,6 @@ func init() {
 func main() {
 	hoverfly := hv.NewHoverfly()
 
-	// log.SetFormatter(&log.JSONFormatter{})
 	flag.Var(&importFlags, "import", "Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
 	flag.Var(&destinationFlags, "dest", "Specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
 	flag.Parse()
@@ -194,6 +194,20 @@ func main() {
 		os.Exit(0)
 	}
 
+	if *journalSize < 0 {
+		*journalSize = 0
+	}
+
+	if *logsSize < 0 {
+		*logsSize = 0
+	}
+
+	if *cacheSize <= 0 {
+		log.WithFields(log.Fields{
+			"cache-size": *logsSize,
+		}).Fatal("Cache size must be a positive number, alternatively use the disable-cache flag")
+	}
+
 	hoverfly.StoreLogsHook.LogsLimit = *logsSize
 	hoverfly.Journal.EntryLimit = *journalSize
 
@@ -204,7 +218,7 @@ func main() {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"log-level": *logLevelFlag,
-		}).Fatalf("Unknown log-level value")
+		}).Fatal("Unknown log-level value")
 	}
 	log.SetLevel(logLevel)
 
@@ -340,14 +354,20 @@ func main() {
 	} else {
 		log.WithFields(log.Fields{
 			"database": *database,
-		}).Fatalf("Unknown database type")
+		}).Fatal("Unknown database type")
 	}
 	cfg.DisableCache = *disableCache
 	if cfg.DisableCache {
 		log.Info("Request cache has been disabled")
 	} else {
 		// Request cache is always in-memory
-		requestCache = cache.NewDefaultLRUCache()
+		requestCache, err = cache.NewLRUCache(*cacheSize)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":    err.Error(),
+				"cache-size": *cacheSize,
+			}).Fatal("Failed to create cache")
+		}
 	}
 
 	if *proxyAuthorizationHeader == "header-auth" {

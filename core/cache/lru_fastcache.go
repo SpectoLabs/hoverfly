@@ -10,8 +10,16 @@ type LRUFastCache struct {
 }
 
 func NewDefaultLRUCache() *LRUFastCache {
-	c, _ := lru.New(128)
+	c, _ := lru.New(1000)
 	return &LRUFastCache{ cache: c }
+}
+
+func NewLRUCache(size int) (*LRUFastCache, error) {
+	c, err := lru.New(size)
+	if err != nil {
+		return nil, err
+	}
+	return &LRUFastCache{ cache: c }, nil
 }
 
 func (c *LRUFastCache) Set(key, value interface{}) (err error) {

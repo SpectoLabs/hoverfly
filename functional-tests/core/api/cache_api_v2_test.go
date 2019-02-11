@@ -99,6 +99,18 @@ var _ = Describe("/api/v2/cache", func() {
 
 			Expect(jsonObject.GetString("error")).Should(Equal("No cache set"))
 		})
+
+		It("should be able to set cache size", func() {
+			hoverfly.Stop()
+			hoverfly.Start("-cache-size=1")
+
+			hoverfly.Proxy(sling.New().Get("http://destination-server.com"))
+			hoverfly.Proxy(sling.New().Get("http://unknown-destination.com"))
+			cacheView := hoverfly.GetCache()
+
+			Expect(cacheView.Cache).To(HaveLen(1))
+			Expect(cacheView.Cache[0].Key).To(Equal("0dd6716f7e5f5f06067de145a2933b2d"))
+		})
 	})
 
 	Context("DELETE", func() {
