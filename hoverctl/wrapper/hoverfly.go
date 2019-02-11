@@ -14,9 +14,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/kardianos/osext"
 )
@@ -78,38 +76,6 @@ func UnmarshalToInterface(response *http.Response, v interface{}) error {
 	return json.Unmarshal(body, v)
 }
 
-func createAPIStateResponse(response *http.Response) APIStateSchema {
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Debug(err.Error())
-	}
-
-	var apiResponse APIStateSchema
-
-	err = json.Unmarshal(body, &apiResponse)
-	if err != nil {
-		log.Debug(err.Error())
-	}
-
-	return apiResponse
-}
-
-func createMiddlewareSchema(response *http.Response) v2.MiddlewareView {
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Debug(err.Error())
-	}
-
-	var middleware v2.MiddlewareView
-
-	err = json.Unmarshal(body, &middleware)
-	if err != nil {
-		log.Debug(err.Error())
-	}
-
-	return middleware
-}
-
 func Login(target configuration.Target, username, password string) (string, error) {
 	credentials := HoverflyAuthSchema{
 		Username: username,
@@ -163,11 +129,7 @@ func Login(target configuration.Target, username, password string) (string, erro
 
 func BuildURL(target configuration.Target, endpoint string) string {
 	if !strings.HasPrefix(target.Host, "http://") && !strings.HasPrefix(target.Host, "https://") {
-		//if IsLocal(target.Host) {
-			return fmt.Sprintf("http://%v:%v%v", target.Host, target.AdminPort, endpoint)
-		//} else {
-		//	return fmt.Sprintf("https://%v:%v%v", target.Host, target.AdminPort, endpoint)
-		//}
+		return fmt.Sprintf("http://%v:%v%v", target.Host, target.AdminPort, endpoint)
 	}
 	return fmt.Sprintf("%v:%v%v", target.Host, target.AdminPort, endpoint)
 }
@@ -337,21 +299,6 @@ func checkPorts(ports ...int) error {
 	}
 
 	return nil
-}
-
-func handlerError(response *http.Response) error {
-	responseBody, err := util.GetResponseBody(response)
-	if err != nil {
-		return errors.New("Error when communicating with Hoverfly")
-	}
-
-	var errorView handlers.ErrorView
-	err = json.Unmarshal([]byte(responseBody), &errorView)
-	if err != nil {
-		return errors.New("Error when communicating with Hoverfly")
-	}
-
-	return errors.New(errorView.Error)
 }
 
 func handleResponseError(response *http.Response, errorMessage string) error {
