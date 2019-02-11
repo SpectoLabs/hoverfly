@@ -155,7 +155,7 @@ func init() {
 	startCmd.Flags().String("client-authentication-client-key", "", "Path to client key file used for authentication")
 	startCmd.Flags().String("client-authentication-ca-cert", "", "Path to ca cert file used for authentication")
 
-	startCmd.Flags().Bool("auth", false, "Enable authenticiation on Hoverfly")
+	startCmd.Flags().Bool("auth", false, "Enable authentication on Hoverfly")
 	startCmd.Flags().String("username", "", "Username to authenticate Hoverfly")
 	startCmd.Flags().String("password", "", "Password to authenticate Hoverfly")
 }

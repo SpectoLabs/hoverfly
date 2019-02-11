@@ -181,7 +181,7 @@ func unmarshalResponseToInterface(response *models.ResponseDetails, output inter
 	encodings := response.Headers["Content-Encoding"]
 	decompressedBody, err := decompress(body, encodings)
 	if err != nil {
-		fmt.Errorf("It wasn't possible to decompress the response body: %s ", err)
+		return fmt.Errorf("It wasn't possible to decompress the response body: %s ", err)
 	} else {
 		body = decompressedBody
 	}

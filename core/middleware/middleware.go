@@ -43,8 +43,6 @@ func ConvertToNewMiddleware(middleware string) (*Middleware, error) {
 		}
 		return newMiddleware, nil
 	}
-
-	return nil, nil
 }
 
 func (this *Middleware) SetScript(scriptContent string) error {
