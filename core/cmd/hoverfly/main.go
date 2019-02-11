@@ -24,7 +24,6 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"github.com/hashicorp/golang-lru"
 	"os"
 	"strings"
 	"time"
@@ -318,7 +317,7 @@ func main() {
 		cfg.Destination = *destination
 	}
 
-	var requestCache *lru.Cache
+	var requestCache cache.FastCache
 	var tokenCache cache.Cache
 	var userCache cache.Cache
 
