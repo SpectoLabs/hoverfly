@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	. "github.com/onsi/gomega"
+	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
@@ -122,12 +123,17 @@ func BenchmarkProcessRequest(b *testing.B) {
 	}
 }`), &templated)
 
+	bytes, _ := ioutil.ReadFile("../testdata/large_response_body.json")
+	largeResponse := v2.SimulationViewV5{}
+	_ = json.Unmarshal(bytes, &largeResponse)
+
 	benchmarks := []struct{
 		name string
 		simulation v2.SimulationViewV5
 	} {
 		{"Simple simulation", simulation},
 		{"Templated simulation", templated},
+		{"Large response body", largeResponse},
 	}
 
 	fmt.Println(hoverfly.StartProxy())
