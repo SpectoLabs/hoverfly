@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// Cache used for storing requests and responses in memory
+// Cache used for storing serialized data in memory
 type InMemoryCache struct {
 	elements map[string][]byte
 	sync.RWMutex

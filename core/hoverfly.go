@@ -14,11 +14,9 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/state"
 	"github.com/SpectoLabs/hoverfly/core/templating"
-	"github.com/hashicorp/golang-lru"
 	"net"
 	"net/http"
 	"sync"
-
 )
 
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
@@ -86,7 +84,7 @@ func NewHoverfly() *Hoverfly {
 func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 	hoverfly := NewHoverfly()
 
-	var requestCache *lru.Cache
+	var requestCache cache.FastCache
 	if !cfg.DisableCache {
 		requestCache = cache.NewDefaultLRUCache()
 	}
@@ -103,7 +101,7 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 }
 
 // GetNewHoverfly returns a configured ProxyHttpServer and DBClient
-func GetNewHoverfly(cfg *Configuration, requestCache *lru.Cache, authentication backends.Authentication) *Hoverfly {
+func GetNewHoverfly(cfg *Configuration, requestCache cache.FastCache, authentication backends.Authentication) *Hoverfly {
 	hoverfly := NewHoverfly()
 
 	if cfg.DisableCache {

@@ -2,15 +2,15 @@ package matching
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	lruCache "github.com/hashicorp/golang-lru"
 )
 
 type CacheMatcher struct {
 	Webserver    bool
-	RequestCache *lruCache.Cache
+	RequestCache cache.FastCache
 }
 
 // getResponse returns stored response from cache
@@ -62,10 +62,12 @@ func (this *CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 		return cacheView, errors.NoCacheSetError()
 	}
 
-	keys := this.RequestCache.Keys()
+	entries, err := this.RequestCache.GetAllEntries()
+	if err != nil {
+		return cacheView, err
+	}
 
-	for _, key := range keys {
-		value, _ := this.RequestCache.Get(key)
+	for key, value := range entries {
 		cachedResponse := value.(models.CachedResponse)
 
 		var pair *v2.RequestMatcherResponsePairViewV5
@@ -124,8 +126,7 @@ func (this *CacheMatcher) SaveRequestMatcherResponsePair(request models.RequestD
 		cachedResponse.ClosestMiss = matchError.ClosestMiss
 	}
 
-	this.RequestCache.Add(key, cachedResponse)
-	return nil
+	return this.RequestCache.Set(key, cachedResponse)
 }
 
 func (this *CacheMatcher) FlushCache() error {
@@ -133,8 +134,7 @@ func (this *CacheMatcher) FlushCache() error {
 		return errors.NoCacheSetError()
 	}
 
-	this.RequestCache.Purge()
-	return nil
+	return this.RequestCache.DeleteData()
 }
 
 func (this *CacheMatcher) PreloadCache(simulation models.Simulation) error {

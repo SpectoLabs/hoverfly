@@ -896,7 +896,7 @@ func Test_Hoverfly_SetModeWithArguments_SettingModeToCaptureWipesCache(t *testin
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	unit.CacheMatcher.RequestCache.Add("test", "test_bytes")
+	unit.CacheMatcher.RequestCache.Set("test", "test_bytes")
 
 	Expect(unit.SetModeWithArguments(
 		v2.ModeView{
@@ -904,7 +904,7 @@ func Test_Hoverfly_SetModeWithArguments_SettingModeToCaptureWipesCache(t *testin
 		})).To(BeNil())
 	Expect(unit.Cfg.Mode).To(Equal("capture"))
 
-	Expect(unit.CacheMatcher.RequestCache.Len()).To(Equal(0))
+	Expect(unit.CacheMatcher.RequestCache.RecordsCount()).To(Equal(0))
 }
 
 func Test_Hoverfly_SetModeWithArguments_Stateful(t *testing.T) {

@@ -49,9 +49,6 @@ func Test_CacheMatcher_SaveRequestMatcherResponsePair_CanSaveNilPairs(t *testing
 	cachedResponse, found := unit.RequestCache.Get("d41d8cd98f00b204e9800998ecf8427e")
 	Expect(found).To(BeTrue())
 
-	//cachedResponse, err := models.NewCachedResponseFromBytes(cacheValues)
-	//Expect(err).To(BeNil())
-
 	Expect(cachedResponse.(models.CachedResponse).MatchingPair).To(BeNil())
 }
 
@@ -99,7 +96,7 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *tes
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.RequestCache.Len()).To(Equal(0))
+	Expect(unit.RequestCache.RecordsCount()).To(Equal(0))
 }
 
 func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMatchers(t *testing.T) {
@@ -159,7 +156,7 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMa
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.RequestCache.Len()).To(Equal(1))
+	Expect(unit.RequestCache.RecordsCount()).To(Equal(1))
 }
 
 func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWithoutExactMatches(t *testing.T) {
@@ -188,7 +185,7 @@ func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWitho
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.RequestCache.Len()).To(Equal(0))
+	Expect(unit.RequestCache.RecordsCount()).To(Equal(0))
 }
 
 func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *testing.T) {
@@ -262,7 +259,7 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.RequestCache.Len()).To(Equal(1))
+	Expect(unit.RequestCache.RecordsCount()).To(Equal(1))
 }
 
 func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T) {
@@ -344,5 +341,5 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 	err := unit.PreloadCache(*simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.RequestCache.Len()).To(Equal(0))
+	Expect(unit.RequestCache.RecordsCount()).To(Equal(0))
 }

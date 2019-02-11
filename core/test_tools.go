@@ -35,11 +35,6 @@ func testTools(code int, body string) (*httptest.Server, *Hoverfly) {
 		fmt.Fprintln(w, body)
 	}))
 
-	// creating random buckets for everyone!
-	//bucket := getRandomName(10)
-
-	//requestCache := cache.NewBoltDBCache(testDB, bucket)
-
 	cfg := InitSettings()
 	// disabling auth for testing
 	cfg.AuthEnabled = false
