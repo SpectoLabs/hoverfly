@@ -30,6 +30,7 @@ type Configuration struct {
 	Verbose bool
 
 	DisableCache bool
+	CacheSize int
 
 	SecretKey          []byte
 	JWTExpirationDelta int
@@ -187,6 +188,8 @@ func InitSettings() *Configuration {
 	appConfig.Mode = "simulate"
 
 	appConfig.ProxyAuthorizationHeader = "Proxy-Authorization"
+
+	appConfig.CacheSize = 1000
 
 	return &appConfig
 }

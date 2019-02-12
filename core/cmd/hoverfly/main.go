@@ -357,15 +357,16 @@ func main() {
 		}).Fatal("Unknown database type")
 	}
 	cfg.DisableCache = *disableCache
+	cfg.CacheSize = *cacheSize
 	if cfg.DisableCache {
 		log.Info("Request cache has been disabled")
 	} else {
 		// Request cache is always in-memory
-		requestCache, err = cache.NewLRUCache(*cacheSize)
+		requestCache, err = cache.NewLRUCache(cfg.CacheSize)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error":    err.Error(),
-				"cache-size": *cacheSize,
+				"cache-size": cfg.CacheSize,
 			}).Fatal("Failed to create cache")
 		}
 	}

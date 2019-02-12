@@ -86,7 +86,12 @@ func NewHoverflyWithConfiguration(cfg *Configuration) *Hoverfly {
 
 	var requestCache cache.FastCache
 	if !cfg.DisableCache {
-		requestCache = cache.NewDefaultLRUCache()
+		if cfg.CacheSize > 0 {
+			requestCache, _ = cache.NewLRUCache(cfg.CacheSize)
+		} else {
+			// Backward compatibility, always set default cache if cache size is not configured
+			requestCache = cache.NewDefaultLRUCache()
+		}
 	}
 
 	hoverfly.CacheMatcher = matching.CacheMatcher{
