@@ -55,7 +55,14 @@ If you have `Docker <https://www.docker.com/>`_, you can run Hoverfly using the 
 
     docker run -d -p 8888:8888 -p 8500:8500 spectolabs/hoverfly:latest
 
-This will run the latest version of the `Hoverfly Docker image <https://hub.docker.com/r/spectolabs/hoverfly/>`_. 
+This will run the latest version of the `Hoverfly Docker image <https://hub.docker.com/r/spectolabs/hoverfly/>`_.
+
+You can also pass Hoverfly configuration flags when starting with Docker. For example if you need to run Hoverfly in webserver mode:
+
+.. code:: bash
+
+    docker run -d -p 8888:8888 -p 8500:8500 spectolabs/hoverfly:latest -webserver
+
 This Docker image does not contain hoverctl. Our recommendation is to have hoverctl on your host machine and then 
 configure hoverctl to use the newly started Hoverfly Docker instance as a new target.
 
