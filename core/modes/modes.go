@@ -98,7 +98,7 @@ func ReconstructResponse(request *http.Request, pair models.RequestResponsePair)
 	response := &http.Response{}
 	response.Request = request
 
-	// adding body, length, status code
+	// ContentLength is unknown (-1), HTTP package knows what to do
 	response.ContentLength = -1
 	response.Body = ioutil.NopCloser(strings.NewReader(pair.Response.Body))
 	response.StatusCode = pair.Response.Status
