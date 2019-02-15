@@ -25,6 +25,7 @@ Available Commands:
 
 Flags:
   -f, --force           Bypass any confirmation when using hoverctl
+  -h, --help            help for hoverctl
       --set-default     Sets the current target as the default target for hoverctl
   -t, --target string   A name for an instance of Hoverfly you are trying to communicate with. Overrides the default target (default)
   -v, --verbose         Verbose logging from hoverctl
