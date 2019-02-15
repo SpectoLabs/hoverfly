@@ -87,6 +87,9 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			Expect(response.Header.Get("Content-Length")).To(Equal("2"))
 			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
+
+			Expect(response.ContentLength).To(Equal(int64(2)))
+			Expect(response.TransferEncoding).To(BeNil())
 		})
 
 		It("should error if Content-Length is incorrect", func() {
@@ -123,8 +126,11 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(err.Error()).To(Equal("unexpected EOF"))
 			Expect(string(body)).To(Equal("OK"))
 
-			Expect(response.Header.Get("Content-length")).To(Equal("5555"))
+			Expect(response.Header.Get("Content-length")).To(Equal("5555"))  // Just to make sure we don't delete the Content-Length Header
 			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
+
+			Expect(response.ContentLength).To(Equal(int64(5555)))
+			Expect(response.TransferEncoding).To(BeNil())
 		})
 
 		It("should not set Content-Length if Transfer-Encoding set", func() {
@@ -164,6 +170,9 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(response.Header.Get("Content-length")).To(Equal(""))
 			// Will always be empty as they are excluded by net/http
 			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
+
+			Expect(response.ContentLength).To(Equal(int64(-1)))
+			Expect(response.TransferEncoding).To(Equal([]string{"chunked"}))
 		})
 	})
 
