@@ -2,6 +2,7 @@ package goproxy
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/tls"
 	"errors"
 	"io"
@@ -157,6 +158,14 @@ func (proxy *ProxyHttpServer) handleHttps(w http.ResponseWriter, r *http.Request
 				defer resp.Body.Close()
 			}
 			resp = proxy.filterResponse(resp, ctx)
+
+			// According to here: https://github.com/golang/go/issues/923
+			// There should not be an issue writing out body with an unknown ContentLength, but it's not the case for ConnectHTTPMitm
+			if resp.ContentLength == -1 {
+				responseBytes, _ := ioutil.ReadAll(resp.Body)
+				resp.Body = ioutil.NopCloser(bytes.NewReader(responseBytes))
+				resp.ContentLength = int64(len(responseBytes))
+			}
 			if err := resp.Write(proxyClient); err != nil {
 				httpError(proxyClient, ctx, err)
 				return
