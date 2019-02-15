@@ -2,11 +2,13 @@ Usage of hoverfly:
     -add
         Add new user '-add -username hfadmin -password hfpass'
     -admin
-        Supply '-admin false' to make this non admin user (defaults to 'true')  (default true)
+        Supply '-admin=false' to make this non admin user (default true)
     -ap string
         Admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)
     -auth
-        Enable authentication, currently it is disabled by default
+        Enable authentication
+    -cache-size int
+        Set the size of request/response cache (default 1000)
     -capture
         Start Hoverfly in capture mode - transparently intercepts and saves requests/response
     -cert string
@@ -22,7 +24,7 @@ Usage of hoverfly:
     -client-authentication-client-key string
         Path to the client key file used for authentication
     -client-authentication-destination string
-        Regular expression of desination with client authentication
+        Regular expression of destination with client authentication
     -db string
         Storage to use - 'boltdb' or 'memory' which will not write anything to disk (default "memory")
     -db-path string
@@ -30,13 +32,13 @@ Usage of hoverfly:
     -dest value
         Specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'
     -destination string
-        Destination URI to catch (default ".")
+        Control which URLs Hoverfly should intercept and process, it can be string or regex (default ".")
     -dev
         Enable CORS headers to allow Hoverfly Admin UI development
     -diff
         Start Hoverfly in diff mode - calls real server and compares the actual response with the expected simulation config if present
     -disable-cache
-        Disable the cache that sits in front of matching
+        Disable request/response cache (the cache that sits in front of matching)
     -generate-ca-cert
         Generate CA certificate and private key for MITM
     -https-only
@@ -46,7 +48,7 @@ Usage of hoverfly:
     -import value
         Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'
     -journal-size int
-        Set the size of request/response journal (default "1000") (default 1000)
+        Set the size of request/response journal (default 1000)
     -key string
         Private key of the CA used to sign MITM certificates
     -listen-on-host string
@@ -54,11 +56,11 @@ Usage of hoverfly:
     -log-level string
         Set log level (panic, fatal, error, warn, info or debug) (default "info")
     -logs string
-        Specify format for logs, options are "plaintext" and "json" (default "plaintext") (default "plaintext")
+        Specify format for logs, options are "plaintext" and "json" (default "plaintext")
     -logs-size int
-        Set the amount of logs to be stored in memory (default "1000") (default 1000)
+        Set the amount of logs to be stored in memory (default 1000)
     -metrics
-        Supply -metrics flag to enable metrics logging to stdout
+        Enable metrics logging to stdout
     -middleware string
         Should proxy use middleware
     -modify
@@ -68,7 +70,7 @@ Usage of hoverfly:
     -password-hash string
         Password hash for new user instead of password
     -plain-http-tunneling
-        Use plain http tunneling to host with non-443 port - defaults to false
+        Use plain http tunneling to host with non-443 port
     -pp string
         Proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)
     -proxy-auth Proxy-Authorization
@@ -78,7 +80,7 @@ Usage of hoverfly:
     -synthesize
         Start Hoverfly in synthesize mode (middleware is required)
     -tls-verification
-        Turn on/off tls verification for outgoing requests (will not try to verify certificates) - defaults to true (default true)
+        Turn on/off tls verification for outgoing requests (will not try to verify certificates) (default true)
     -upstream-proxy string
         Specify an upstream proxy for hoverfly to route traffic through
     -username string
