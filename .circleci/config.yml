@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Build and push master Docker image
           command: |
-            docker build -t spectolabs/hoverfly:master  -f core/Dockerfile .
+            docker build -t spectolabs/hoverfly:master .
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push spectolabs/hoverfly:master
       - run:
@@ -97,7 +97,7 @@ jobs:
       - run:
           name: Build and push master Docker image
           command: |
-            docker build -t spectolabs/hoverfly:$CIRCLE_TAG -f core/Dockerfile .
+            docker build -t spectolabs/hoverfly:$CIRCLE_TAG .
             docker tag spectolabs/hoverfly:$CIRCLE_TAG spectolabs/hoverfly:latest
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push spectolabs/hoverfly:$CIRCLE_TAG
