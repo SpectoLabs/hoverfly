@@ -17,12 +17,15 @@ We can now run Hoverfly with the standard ``capture`` then ``simulate`` workflow
 
     hoverctl start
     hoverctl mode capture
-    curl --proxy https://localhost:8500 https://example.com --cacert cert.pem
+    curl --proxy localhost:8500 https://example.com --cacert cert.pem
     hoverctl mode simulate
-    curl --proxy https://localhost:8500 https://example.com --cacert cert.pem
+    curl --proxy localhost:8500 https://example.com --cacert cert.pem
     hoverctl stop
 
-Curl was able to make the HTTPS request using an HTTPS proxy because we provided it with Hoverfly's SSL certificate.
+
+Curl makes the HTTPS request by first establishing a TLS tunnel to the destination with Hoverfly using the HTTP CONNECT method.
+As curl has supplied Hoverfly's SSL certificate, Hoverfly is then able to intercept and capture the traffic.
+Effectively SSL-encrypted communication (HTTPS) is established through an unencrypted HTTP proxy.
 
 .. note::
 
