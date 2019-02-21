@@ -1,18 +1,23 @@
 .. _capturingsequences:
 
-Capturing a sequence of responses
-=================================
+Capturing a stateful sequence of responses
+==========================================
 
-You may want capture the same request multiple times. You may to do this because the response served changes.
-An example of this could include a response that returns the time.
+By default Hoverfly will store a given request/response pair once only.
+If the same request returns different responses you may want capture the sequence of changing request/response pairs.
+You may want to do this because the API is stateful rather stateless.
 
-To record a sequence of duplicate requests, we need to enable stateful recording in capture mode.
+A simple example of this is an API that returns the time.
+
+To record a sequence of request/responses where the request is the same but the response is different,
+we need to enable stateful recording in capture mode.
 
 .. code:: bash
 
+    hoverctl start
     hoverctl mode capture --stateful
 
-Now that we have enabled stateful recording, we can make several capture several duplicate requests.
+Now that we have enabled stateful recording, we can capture several request/response pairs.
 
 .. code:: bash
 
@@ -43,7 +48,7 @@ update each request we make until we reach the end of our recorded sequence.
     }
 
 If we look at the simulation captured, can see that the requests have the ``requiresState`` fields set.
-a sequence counter.
+You will see Hoverfly has added a state variable called sequence:1 that acts as a counter.
 
 .. code:: json
 
@@ -55,13 +60,20 @@ a sequence counter.
         "sequence:1": "2"
     }
 
-We can also see that the first respone has `transitionsState`` field set.
+We can also see that the first response has `transitionsState`` field set.
 
 .. code:: json
 
     "transitionsState": {
         "sequence:1": "2"
     }
+
+Note that Hoverfly will automatically set the state for any "sequence:" key to "1" on import.
+If you want to use a more meaningful key name you will need to initialise the state as follows:
+
+.. code:: bash
+
+    hoverctl state set shopping-basket empty
 
 .. seealso::
 
