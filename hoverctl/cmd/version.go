@@ -24,8 +24,8 @@ Shows the hoverctl version.
 		hoverflyVersion, _ := hoverflyCmd.CombinedOutput()
 
 		data := [][]string{
-			[]string{"hoverctl", version},
-			[]string{"hoverfly", string(hoverflyVersion)},
+			{"hoverctl", version},
+			{"hoverfly", string(hoverflyVersion)},
 		}
 
 		drawTable(data, false)

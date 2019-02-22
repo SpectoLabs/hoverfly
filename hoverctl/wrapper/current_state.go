@@ -2,7 +2,7 @@ package wrapper
 
 import (
 	"encoding/json"
-	ioutil "io/ioutil"
+	"io/ioutil"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"

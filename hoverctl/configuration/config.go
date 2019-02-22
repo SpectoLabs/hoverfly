@@ -111,9 +111,9 @@ func (c *Config) WriteToFile(hoverflyDirectory HoverflyDirectory) error {
 		return err
 	}
 
-	filepath := filepath.Join(hoverflyDirectory.Path, "config.yaml")
+	configPath := filepath.Join(hoverflyDirectory.Path, "config.yaml")
 
-	err = ioutil.WriteFile(filepath, data, 0644)
+	err = ioutil.WriteFile(configPath, data, 0644)
 
 	if err != nil {
 		log.Debug(err.Error())

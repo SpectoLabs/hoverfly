@@ -306,13 +306,13 @@ func handleResponseError(response *http.Response, errorMessage string) error {
 		defer response.Body.Close()
 		responseError, _ := ioutil.ReadAll(response.Body)
 
-		error := &ErrorSchema{}
+		errSchema := &ErrorSchema{}
 
-		err := json.Unmarshal(responseError, error)
+		err := json.Unmarshal(responseError, errSchema)
 		if err != nil {
 			return errors.New(errorMessage + "\n\n" + string(responseError))
 		}
-		return errors.New(errorMessage + "\n\n" + error.ErrorMessage)
+		return errors.New(errorMessage + "\n\n" + errSchema.ErrorMessage)
 	}
 
 	return nil

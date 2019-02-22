@@ -8,14 +8,14 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var hoverflyDirectory_testDirectory = "/tmp/hoverctl-hoverfly-directory-test"
+var hoverflydirectoryTestdirectory = "/tmp/hoverctl-hoverfly-directory-test"
 
 func hoverflyDirectory_setup() {
-	os.Mkdir(hoverflyDirectory_testDirectory, 0777)
+	os.Mkdir(hoverflydirectoryTestdirectory, 0777)
 }
 
 func hoverflyDirectory_teardown() {
-	os.RemoveAll(hoverflyDirectory_testDirectory)
+	os.RemoveAll(hoverflydirectoryTestdirectory)
 }
 
 func Test_getHomeDir_ReturnsHomeDirectoryOfSystem(t *testing.T) {
@@ -34,9 +34,9 @@ func Test_createHoverflyDirectory_CreatesADirectory(t *testing.T) {
 	RegisterTestingT(t)
 	hoverflyDirectory_setup()
 
-	result := createHoverflyDirectory(hoverflyDirectory_testDirectory)
+	result := createHoverflyDirectory(hoverflydirectoryTestdirectory)
 
-	Expect(result).To(Equal(hoverflyDirectory_testDirectory + "/.hoverfly"))
+	Expect(result).To(Equal(hoverflydirectoryTestdirectory + "/.hoverfly"))
 
 	fileInfo, _ := os.Stat(result)
 

@@ -114,7 +114,7 @@ hoverctl configuration file.
 		handleIfError(err)
 
 		data := [][]string{
-			[]string{"admin-port", strconv.Itoa(target.AdminPort)},
+			{"admin-port", strconv.Itoa(target.AdminPort)},
 		}
 
 		if target.Webserver {
