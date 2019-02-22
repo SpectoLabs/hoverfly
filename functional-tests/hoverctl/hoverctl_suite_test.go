@@ -58,8 +58,8 @@ var _ = AfterSuite(func() {
 })
 
 func WipeConfig() {
-	filepath := filepath.Join(workingDirectory, ".hoverfly", "config.yaml")
-	ioutil.WriteFile(filepath, []byte(""), 0644)
+	configPath := filepath.Join(workingDirectory, ".hoverfly", "config.yaml")
+	ioutil.WriteFile(configPath, []byte(""), 0644)
 }
 
 func KillHoverflyTargets(table string) {

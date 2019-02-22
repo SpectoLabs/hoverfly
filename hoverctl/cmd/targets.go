@@ -145,7 +145,7 @@ of the current default target."
 		}
 
 		data := [][]string{
-			[]string{"Target name", "Host", "Admin port", "Proxy port"},
+			{"Target name", "Host", "Admin port", "Proxy port"},
 		}
 
 		defaultTarget := config.GetTarget("")

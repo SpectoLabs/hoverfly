@@ -61,7 +61,7 @@ func Test_FlushCache_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	hoverfly.PutSimulation(v2.SimulationViewV5{
 		v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
-				v2.RequestMatcherResponsePairViewV5{
+				{
 					RequestMatcher: v2.RequestMatcherViewV5{
 						Method: []v2.MatcherViewV5{
 							{

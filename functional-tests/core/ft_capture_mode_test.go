@@ -100,10 +100,10 @@ var _ = Describe("When I run Hoverfly", func() {
 					Body:        "Hello world",
 					EncodedBody: false,
 					Headers: map[string][]string{
-						"Content-Length": []string{"11"},
-						"Content-Type":   []string{"text/plain"},
-						"Date":           []string{"date"},
-						"Hoverfly":       []string{"Was-Here"},
+						"Content-Length": {"11"},
+						"Content-Type":   {"text/plain"},
+						"Date":           {"date"},
+						"Hoverfly":       {"Was-Here"},
 					},
 					Templated: false,
 				}))
@@ -130,13 +130,13 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				Expect(payload.RequestResponsePairs[0].RequestMatcher.Headers).To(Equal(
 					map[string][]v2.MatcherViewV5{
-						"Accept-Encoding": []v2.MatcherViewV5{
+						"Accept-Encoding": {
 							{
 								Matcher: "exact",
 								Value:   "gzip",
 							},
 						},
-						"User-Agent": []v2.MatcherViewV5{
+						"User-Agent": {
 							{
 								Matcher: "exact",
 								Value:   "Go-http-client/1.1",
@@ -171,7 +171,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				Expect(payload.RequestResponsePairs[0].RequestMatcher.Headers).To(Equal(
 					map[string][]v2.MatcherViewV5{
-						"User-Agent": []v2.MatcherViewV5{
+						"User-Agent": {
 							{
 								Matcher: "exact",
 								Value:   "Go-http-client/1.1",
@@ -206,14 +206,14 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				Expect(payload.RequestResponsePairs[0].RequestMatcher.Headers).To(Equal(
 					map[string][]v2.MatcherViewV5{
-						"User-Agent": []v2.MatcherViewV5{
+						"User-Agent": {
 							{
 								Matcher: "exact",
 								Value:   "Go-http-client/1.1",
 							},
 						},
 
-						"Test": []v2.MatcherViewV5{
+						"Test": {
 							{
 								Matcher: "exact",
 								Value:   "value",

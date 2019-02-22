@@ -8,8 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var importV1 bool
-
 // importCmd represents the import command
 var importCmd = &cobra.Command{
 	Use:   "import [path to simulation]",
