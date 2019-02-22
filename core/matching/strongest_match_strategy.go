@@ -82,7 +82,7 @@ func (s *StrongestMatchStrategy) Result() *MatchingResult {
 	cachable := isCachable(s.requestMatch, s.matchedOnAllButHeadersAtLeastOnce, s.matchedOnAllButStateAtLeastOnce)
 	var err *models.MatchError
 	if s.requestMatch == nil {
-		err = models.NewMatchErrorWithClosestMiss(s.closestMiss, "No match found", s.matchedOnAllButHeadersAtLeastOnce)
+		err = models.NewMatchErrorWithClosestMiss(s.closestMiss, "No match found")
 	}
 
 	return &MatchingResult{

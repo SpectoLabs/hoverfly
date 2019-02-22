@@ -131,7 +131,7 @@ func Test_DiffMode_WhenGivenAMatchingRequestReturningDifferentResponse(t *testin
 	Expect(response.Header["header"]).To(Equal([]string{"actual"}))
 	Expect(response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
-		v2.DiffReportEntry{"header/source", "[simulation]", "[service]"},
+		v2.DiffReportEntry{Field: "header/source", Expected: "[simulation]", Actual: "[service]"},
 		v2.DiffReportEntry{"header/header", "[simulated]", "[actual]"},
 		v2.DiffReportEntry{"body", "simulated", "actual"}))
 }
@@ -274,12 +274,6 @@ func Test_DiffMode_WhenGivenANonMatchingRequestDiffIsEmpty(t *testing.T) {
 	Expect(response.Header["header"]).To(Equal([]string{"actual"}))
 	Expect(response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(unit.DiffReport.DiffEntries).To(BeEmpty())
-}
-
-type paramDiff struct {
-	param    string
-	expected string
-	actual   string
 }
 
 func Test_JsonDiff_WhenDifferentThenCreatesErrorMessage(t *testing.T) {

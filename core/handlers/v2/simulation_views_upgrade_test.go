@@ -35,7 +35,7 @@ func Test_upgradeV1_ReturnsAnUpgradedSimulation(t *testing.T) {
 						Path:        util.StringToPointer("/path"),
 						Query:       util.StringToPointer("query=query"),
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 					Response: ResponseDetailsView{
@@ -43,7 +43,7 @@ func Test_upgradeV1_ReturnsAnUpgradedSimulation(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -118,7 +118,7 @@ func Test_upgradeV1_HandlesTemplates(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -172,7 +172,7 @@ func Test_upgradeV1_HandlesIncompleteRequest(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -216,7 +216,7 @@ func Test_upgradeV1_Upgrade_UnescapesRequestQueryParameters(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -260,7 +260,7 @@ func Test_upgradeV2_ReturnsAnUpgradedSimulation(t *testing.T) {
 							XmlMatch: util.StringToPointer("*"),
 						},
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 					Response: ResponseDetailsView{
@@ -268,7 +268,7 @@ func Test_upgradeV2_ReturnsAnUpgradedSimulation(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -333,7 +333,7 @@ func Test_upgradeV2_UnescapesExactMatchRequestQueryParameters(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -367,7 +367,7 @@ func Test_upgradeV2_UnescapesGlobMatchRequestQueryParameters(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -402,7 +402,7 @@ func Test_upgradeV2_Upgrade_KeepsEncodedResponsesEncoded(t *testing.T) {
 						Body:        "YmFzZTY0IGVuY29kZWQ=",
 						EncodedBody: true,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -436,7 +436,7 @@ func Test_upgradeV2_HandlesMultipleMatchers(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -483,7 +483,7 @@ func Test_upgradeV4_ReturnsAnUpgradedSimulation(t *testing.T) {
 							XmlMatch: util.StringToPointer("*"),
 						},
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 					Response: ResponseDetailsViewV4{
@@ -491,7 +491,7 @@ func Test_upgradeV4_ReturnsAnUpgradedSimulation(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -556,7 +556,7 @@ func Test_upgradeV4_Upgrade_KeepsEncodedResponsesEncoded(t *testing.T) {
 						Body:        "YmFzZTY0IGVuY29kZWQ=",
 						EncodedBody: true,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -589,7 +589,7 @@ func Test_upgradeV4_UnescapesExactMatchRequestQueryParameters(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -623,7 +623,7 @@ func Test_upgradeV4_UnescapesGlobMatchRequestQueryParameters(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -659,7 +659,7 @@ func Test_upgradeV4_HandlesMultipleMatchers(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -688,7 +688,7 @@ func Test_upgradeV4_HandlesNewHeaders(t *testing.T) {
 				{
 					RequestMatcher: RequestMatcherViewV4{
 						HeadersWithMatchers: map[string]*RequestFieldMatchersView{
-							"test": &RequestFieldMatchersView{
+							"test": {
 								GlobMatch:  util.StringToPointer("testglob"),
 								ExactMatch: util.StringToPointer("testexact"),
 							},
@@ -699,7 +699,7 @@ func Test_upgradeV4_HandlesNewHeaders(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -729,7 +729,7 @@ func Test_upgradeV4_HandlesOldHeaders(t *testing.T) {
 				{
 					RequestMatcher: RequestMatcherViewV4{
 						Headers: map[string][]string{
-							"test": []string{"headers"},
+							"test": {"headers"},
 						},
 					},
 					Response: ResponseDetailsViewV4{
@@ -762,14 +762,14 @@ func Test_upgradeV4_HandlesOldAndHeaders(t *testing.T) {
 				{
 					RequestMatcher: RequestMatcherViewV4{
 						Headers: map[string][]string{
-							"test1": []string{"headers"},
-							"test2": []string{"headers"},
+							"test1": {"headers"},
+							"test2": {"headers"},
 						},
 						HeadersWithMatchers: map[string]*RequestFieldMatchersView{
-							"test1": &RequestFieldMatchersView{
+							"test1": {
 								ExactMatch: util.StringToPointer("headers"),
 							},
-							"test3": &RequestFieldMatchersView{
+							"test3": {
 								GlobMatch: util.StringToPointer("headers"),
 							},
 						},
@@ -826,7 +826,7 @@ func Test_upgradeV4_HandlesNewQueries(t *testing.T) {
 						Body:        "body",
 						EncodedBody: false,
 						Headers: map[string][]string{
-							"Test": []string{"headers"},
+							"Test": {"headers"},
 						},
 					},
 				},
@@ -839,7 +839,7 @@ func Test_upgradeV4_HandlesNewQueries(t *testing.T) {
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
 
-	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)).To(HaveLen(1))
+	Expect(*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query).To(HaveLen(1))
 	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)["test"]).To(HaveLen(2))
 	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)["test"][0].Matcher).To(Equal("exact"))
 	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)["test"][0].Value).To(Equal("testexact"))

@@ -16,7 +16,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const hoverfly_io_simulation_path = "../examples/simulations/hoverfly.io.json"
+const hoverflyIoSimulationPath = "../examples/simulations/hoverfly.io.json"
 
 func TestIsURLHTTP(t *testing.T) {
 	RegisterTestingT(t)
@@ -64,7 +64,7 @@ func TestIsURLWrongTLD(t *testing.T) {
 func TestFileExists(t *testing.T) {
 	RegisterTestingT(t)
 
-	ex, err := exists(hoverfly_io_simulation_path)
+	ex, err := exists(hoverflyIoSimulationPath)
 	Expect(err).To(BeNil())
 	Expect(ex).To(BeTrue())
 }
@@ -84,7 +84,7 @@ func TestImportFromDisk(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	err := unit.Import(hoverfly_io_simulation_path)
+	err := unit.Import(hoverflyIoSimulationPath)
 	Expect(err).To(BeNil())
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(2))
@@ -112,7 +112,7 @@ func TestImportFromURL(t *testing.T) {
 	RegisterTestingT(t)
 
 	// reading file and preparing json payload
-	pairFile, err := os.Open(hoverfly_io_simulation_path)
+	pairFile, err := os.Open(hoverflyIoSimulationPath)
 	Expect(err).To(BeNil())
 	pairFileBytes, err := ioutil.ReadAll(pairFile)
 	Expect(err).To(BeNil())
@@ -132,7 +132,7 @@ func TestImportFromURLRedirect(t *testing.T) {
 	RegisterTestingT(t)
 
 	// reading file and preparing json payload
-	pairFile, err := os.Open(hoverfly_io_simulation_path)
+	pairFile, err := os.Open(hoverflyIoSimulationPath)
 	Expect(err).To(BeNil())
 	pairFileBytes, err := ioutil.ReadAll(pairFile)
 	Expect(err).To(BeNil())
@@ -193,7 +193,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 			Status:      200,
 			Body:        "hello_world",
 			EncodedBody: false,
-			Headers:     map[string][]string{"Content-Type": []string{"text/plain"}},
+			Headers:     map[string][]string{"Content-Type": {"text/plain"}},
 			Templated:   true,
 		},
 		RequestMatcher: v2.RequestMatcherViewV5{
@@ -339,7 +339,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 				},
 			},
 			Headers: map[string][]v2.MatcherViewV5{
-				"Hoverfly": []v2.MatcherViewV5{
+				"Hoverfly": {
 					{
 						Matcher: matchers.Exact,
 						Value:   "testing",
@@ -373,7 +373,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 		Response: models.ResponseDetails{
 			Status:    200,
 			Body:      "hello_world",
-			Headers:   map[string][]string{"Hoverfly": []string{"testing"}},
+			Headers:   map[string][]string{"Hoverfly": {"testing"}},
 			Templated: false,
 		},
 		RequestMatcher: models.RequestMatcher{
@@ -408,7 +408,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 				},
 			},
 			Headers: map[string][]models.RequestFieldMatchers{
-				"Hoverfly": []models.RequestFieldMatchers{
+				"Hoverfly": {
 					{
 						Matcher: matchers.Exact,
 						Value:   "testing",
@@ -422,7 +422,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 		Response: models.ResponseDetails{
 			Status:    200,
 			Body:      "hello_world",
-			Headers:   map[string][]string{"Hoverfly": []string{"testing"}},
+			Headers:   map[string][]string{"Hoverfly": {"testing"}},
 			Templated: false,
 		},
 		RequestMatcher: models.RequestMatcher{

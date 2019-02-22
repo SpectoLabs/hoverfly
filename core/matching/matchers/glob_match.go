@@ -1,6 +1,6 @@
 package matchers
 
-import glob "github.com/ryanuber/go-glob"
+import "github.com/ryanuber/go-glob"
 
 var Glob = "glob"
 

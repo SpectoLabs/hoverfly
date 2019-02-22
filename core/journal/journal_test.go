@@ -720,7 +720,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
 		Request: &v2.RequestMatcherViewV5{
 			Headers: map[string][]v2.MatcherViewV5{
-				"Accept": []v2.MatcherViewV5{
+				"Accept": {
 					{
 						Matcher: matchers.Exact,
 						Value:   "application/json",
@@ -733,7 +733,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
 		Request: &v2.RequestMatcherViewV5{
 			Headers: map[string][]v2.MatcherViewV5{
-				"Accept": []v2.MatcherViewV5{
+				"Accept": {
 					{
 						Matcher: matchers.Exact,
 						Value:   "application/xml",

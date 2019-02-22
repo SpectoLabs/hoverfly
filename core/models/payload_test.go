@@ -20,7 +20,7 @@ func TestResponseDetails_ConvertToResponseDetailsView_WithPlainTextResponseDetai
 
 	statusCode := 200
 	body := "hello_world"
-	headers := map[string][]string{"test_header": []string{"true"}}
+	headers := map[string][]string{"test_header": {"true"}}
 
 	originalResp := models.ResponseDetails{Status: statusCode, Body: body, Headers: headers}
 
@@ -40,7 +40,7 @@ func TestResponseDetails_ConvertToResponseDetailsView_WithGzipContentEncodedHead
 
 	statusCode := 200
 	body := GzipString(originalBody)
-	headers := map[string][]string{"Content-Encoding": []string{"gzip"}}
+	headers := map[string][]string{"Content-Encoding": {"gzip"}}
 
 	originalResp := models.ResponseDetails{Status: statusCode, Body: body, Headers: headers}
 
@@ -64,7 +64,7 @@ func TestResponseDetails_ConvertToResponseDetailsView_WithDeflateContentEncodedH
 	originalBody := "this_should_be_encoded_but_its_not_important"
 
 	statusCode := 200
-	headers := map[string][]string{"Content-Encoding": []string{"deflate"}}
+	headers := map[string][]string{"Content-Encoding": {"deflate"}}
 
 	originalResp := models.ResponseDetails{Status: statusCode, Body: originalBody, Headers: headers}
 
@@ -115,7 +115,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    respBody,
-			Headers: map[string][]string{"test_header": []string{"true"}}},
+			Headers: map[string][]string{"test_header": {"true"}}},
 		Request: models.RequestDetails{
 			Path:        "/",
 			Method:      "GET",
@@ -123,7 +123,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 			Scheme:      "scheme",
 			Query:       map[string][]string{},
 			Body:        "",
-			Headers:     map[string][]string{"test_header": []string{"true"}}},
+			Headers:     map[string][]string{"test_header": {"true"}}},
 	}
 
 	pairView := requestResponsePair.ConvertToRequestResponsePairView()
@@ -132,7 +132,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        respBody,
-			Headers:     map[string][]string{"test_header": []string{"true"}},
+			Headers:     map[string][]string{"test_header": {"true"}},
 			EncodedBody: false},
 		Request: v2.RequestDetailsView{
 			Path:        StringToPointer("/"),
@@ -142,7 +142,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 			Query:       StringToPointer(""),
 			QueryMap:    map[string][]string{},
 			Body:        StringToPointer(""),
-			Headers:     map[string][]string{"test_header": []string{"true"}}},
+			Headers:     map[string][]string{"test_header": {"true"}}},
 	}))
 }
 
@@ -153,7 +153,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    GzipString("hello_world"),
-			Headers: map[string][]string{"Content-Encoding": []string{"gzip"}}},
+			Headers: map[string][]string{"Content-Encoding": {"gzip"}}},
 		Request: models.RequestDetails{
 			Path:        "/",
 			Method:      "GET",
@@ -161,7 +161,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 			Scheme:      "scheme",
 			Query:       map[string][]string{},
 			Body:        "",
-			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
+			Headers:     map[string][]string{"Content-Encoding": {"gzip"}},
 		},
 	}
 
@@ -171,7 +171,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 		Response: v2.ResponseDetailsView{
 			Status:      200,
 			Body:        "H4sIAAAAAAAA/w==",
-			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
+			Headers:     map[string][]string{"Content-Encoding": {"gzip"}},
 			EncodedBody: true},
 		Request: v2.RequestDetailsView{
 			Path:        StringToPointer("/"),
@@ -181,7 +181,7 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 			Query:       StringToPointer(""),
 			QueryMap:    map[string][]string{},
 			Body:        StringToPointer(""),
-			Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}},
+			Headers:     map[string][]string{"Content-Encoding": {"gzip"}},
 		},
 	}))
 }
@@ -196,7 +196,7 @@ func TestRequestDetails_ConvertToRequestDetailsView(t *testing.T) {
 		Scheme:      "scheme",
 		Query:       map[string][]string{},
 		Body:        "",
-		Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}}
+		Headers:     map[string][]string{"Content-Encoding": {"gzip"}}}
 
 	requestDetailsView := requestDetails.ConvertToRequestDetailsView()
 
@@ -279,8 +279,8 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *
 			Query:       StringToPointer("A"),
 			Body:        StringToPointer("A"),
 			Headers: map[string][]string{
-				"A": []string{"B"},
-				"C": []string{"D"},
+				"A": {"B"},
+				"C": {"D"},
 			},
 		},
 		Response: v2.ResponseDetailsView{
@@ -288,8 +288,8 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *
 			Body:        "1",
 			EncodedBody: false,
 			Headers: map[string][]string{
-				"1": []string{"2"},
-				"3": []string{"4"},
+				"1": {"2"},
+				"3": {"4"},
 			},
 		},
 	}
@@ -303,20 +303,20 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *
 			Destination: "A",
 			Scheme:      "A",
 			Query: map[string][]string{
-				"A": []string{""},
+				"A": {""},
 			},
 			Body: "A",
 			Headers: map[string][]string{
-				"A": []string{"B"},
-				"C": []string{"D"},
+				"A": {"B"},
+				"C": {"D"},
 			},
 		},
 		Response: models.ResponseDetails{
 			Status: 1,
 			Body:   "1",
 			Headers: map[string][]string{
-				"1": []string{"2"},
-				"3": []string{"4"},
+				"1": {"2"},
+				"3": {"4"},
 			},
 		},
 	}))
@@ -350,7 +350,7 @@ func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 		Scheme:      StringToPointer("scheme"),
 		Query:       StringToPointer(""),
 		Body:        StringToPointer(""),
-		Headers:     map[string][]string{"Content-Encoding": []string{"gzip"}}}
+		Headers:     map[string][]string{"Content-Encoding": {"gzip"}}}
 
 	requestDetails := models.NewRequestDetailsFromRequest(requestDetailsView)
 
@@ -371,7 +371,7 @@ func Test_RequestDetails_Hash_ItHashes(t *testing.T) {
 		Destination: "test.com",
 		Path:        "/testing",
 		Query: map[string][]string{
-			"query": []string{"true"},
+			"query": {"true"},
 		},
 	}
 
@@ -389,9 +389,9 @@ func Test_RequestDetails_Hash_TheHashIgnoresHeaders(t *testing.T) {
 		Destination: "test.com",
 		Path:        "/testing",
 		Query: map[string][]string{
-			"query": []string{"true"},
+			"query": {"true"},
 		},
-		Headers: map[string][]string{"Content-Encoding": []string{"gzip"}},
+		Headers: map[string][]string{"Content-Encoding": {"gzip"}},
 	}
 
 	hashedUnit := unit.Hash()
@@ -408,7 +408,7 @@ func Test_RequestDetails_Hash_TheHashIncludesTheBody(t *testing.T) {
 		Destination: "test.com",
 		Path:        "/testing",
 		Query: map[string][]string{
-			"query": []string{"true"},
+			"query": {"true"},
 		},
 		Body: "tidy text",
 	}

@@ -19,7 +19,7 @@ func TestReconstructRequest(t *testing.T) {
 		Path:   "/random-path",
 		Method: "GET",
 		Query: map[string][]string{
-			"foo": []string{"bar"},
+			"foo": {"bar"},
 		},
 		Destination: "test-destination.com",
 	}
@@ -92,7 +92,7 @@ func Test_ReconstructRequest_HeadersInPair(t *testing.T) {
 		Destination: "test-destination.com",
 		Body:        "new request body here",
 		Headers: map[string][]string{
-			"Header": []string{"ValueX"},
+			"Header": {"ValueX"},
 		},
 	}
 	pair := models.RequestResponsePair{Request: request}

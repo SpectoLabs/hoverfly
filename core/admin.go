@@ -13,7 +13,7 @@ import (
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 
-	handlers "github.com/SpectoLabs/hoverfly/core/handlers"
+	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
@@ -41,10 +41,10 @@ func (this *AdminApi) StartAdminInterface(hoverfly *Hoverfly) {
 // Will add the handlers to the router.
 func (this *AdminApi) addAdminApiRoutes(router *bone.Mux, d *Hoverfly) *bone.Mux {
 	authHandler := &handlers.AuthHandler{
-		d.Authentication,
-		d.Cfg.SecretKey,
-		d.Cfg.JWTExpirationDelta,
-		d.Cfg.AuthEnabled,
+		AB:                 d.Authentication,
+		SecretKey:          d.Cfg.SecretKey,
+		JWTExpirationDelta: d.Cfg.JWTExpirationDelta,
+		Enabled:            d.Cfg.AuthEnabled,
 	}
 
 	authHandler.RegisterRoutes(router)

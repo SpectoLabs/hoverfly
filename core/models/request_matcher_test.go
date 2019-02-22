@@ -216,7 +216,7 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDe
 		Destination: "destination",
 		Method:      "method",
 		Path:        "path",
-		Query:       map[string][]string{"query": []string{"two"}},
+		Query:       map[string][]string{"query": {"two"}},
 		Scheme:      "scheme",
 	}))
 }

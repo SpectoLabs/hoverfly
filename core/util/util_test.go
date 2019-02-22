@@ -128,7 +128,7 @@ func Test_GetContentTypeFromHeaders_ReturnsJsonIfJson(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(GetContentTypeFromHeaders(map[string][]string{
-		"Content-Type": []string{"application/json"},
+		"Content-Type": {"application/json"},
 	})).To(Equal("json"))
 }
 
@@ -136,7 +136,7 @@ func Test_GetContentTypeFromHeaders_ReturnsXmlIfXml(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(GetContentTypeFromHeaders(map[string][]string{
-		"Content-Type": []string{"application/xml"},
+		"Content-Type": {"application/xml"},
 	})).To(Equal("xml"))
 }
 

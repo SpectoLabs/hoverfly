@@ -70,7 +70,7 @@ func (s *FirstMatchStrategy) Result() *MatchingResult {
 
 	return &MatchingResult{
 		Pair:     nil,
-		Error:    models.NewMatchError("No match found", s.matchedOnAllButHeadersAtLeastOnce),
+		Error:    models.NewMatchError("No match found"),
 		Cachable: isCachable(nil, s.matchedOnAllButHeadersAtLeastOnce, s.matchedOnAllButStateAtLeastOnce),
 	}
 }

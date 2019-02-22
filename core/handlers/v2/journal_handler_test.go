@@ -60,7 +60,7 @@ func (this *HoverflyJournalStub) GetFilteredEntries(journalEntryFilterView Journ
 
 	this.journalEntryFilterView = journalEntryFilterView
 	return []JournalEntryView{
-		JournalEntryView{
+		{
 			Mode: "test",
 		},
 	}, nil
