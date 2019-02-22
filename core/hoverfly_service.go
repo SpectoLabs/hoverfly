@@ -154,12 +154,12 @@ func (hf *Hoverfly) SetMiddleware(binary, script, remote string) error {
 			Scheme:      "",
 			Query:       map[string][]string{},
 			Body:        "",
-			Headers:     map[string][]string{"test_header": []string{"true"}},
+			Headers:     map[string][]string{"test_header": {"true"}},
 		},
 		Response: models.ResponseDetails{
 			Status:  200,
 			Body:    "ok",
-			Headers: map[string][]string{"test_header": []string{"true"}},
+			Headers: map[string][]string{"test_header": {"true"}},
 		},
 	}
 

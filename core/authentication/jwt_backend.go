@@ -2,7 +2,7 @@ package authentication
 
 import (
 	log "github.com/Sirupsen/logrus"
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 
 	"bytes"
@@ -19,11 +19,8 @@ type JWTAuthenticationBackend struct {
 }
 
 const (
-	tokenDuration = 72
 	expireOffset  = 3600
 )
-
-var authBackendInstance *JWTAuthenticationBackend = nil
 
 //Token - container for jwt.Token for encoding
 type Token struct {
@@ -38,17 +35,6 @@ func (t *Token) Encode() ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
-}
-
-func decodeToken(data []byte) (*Token, error) {
-	var t *Token
-	buf := bytes.NewBuffer(data)
-	dec := gob.NewDecoder(buf)
-	err := dec.Decode(&t)
-	if err != nil {
-		return nil, err
-	}
-	return t, nil
 }
 
 func InitJWTAuthenticationBackend(ab backends.Authentication, secret []byte, exp int) *JWTAuthenticationBackend {

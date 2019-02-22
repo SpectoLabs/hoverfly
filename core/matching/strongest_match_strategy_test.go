@@ -319,7 +319,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMatchWithHeaders(t *testin
 		Destination: "testhost.com",
 		Path:        "/a/1",
 		Query: map[string][]string{
-			"q": []string{"test"},
+			"q": {"test"},
 		},
 		Headers: map[string][]string{
 			"header1": {"val1-a", "val1-b"},
@@ -387,7 +387,7 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMismatchWithHeadersReturns
 		Destination: "http://testhost.com",
 		Path:        "/a/1",
 		Query: map[string][]string{
-			"q": []string{"different"},
+			"q": {"different"},
 		},
 		Headers: map[string][]string{
 			"header1": {"val1-a", "val1-b"},
@@ -439,7 +439,7 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 		Method:      "GET",
 		Destination: "testhost.com",
 		Query: map[string][]string{
-			"q": []string{"test"},
+			"q": {"test"},
 		},
 	}
 	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
@@ -451,7 +451,7 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 		Destination: "testhost.com",
 		Path:        "/a/1",
 		Query: map[string][]string{
-			"q": []string{"test"},
+			"q": {"test"},
 		},
 	}
 
@@ -854,7 +854,7 @@ func Test__NotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *test
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query: map[string][]string{
-			"foo": []string{"bar"},
+			"foo": {"bar"},
 		},
 		Scheme: "http",
 		Body:   "body",
@@ -941,7 +941,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		Method:      "MISS",
 		Destination: "www.test.com",
 		Query: map[string][]string{
-			"foo": []string{"bar"},
+			"foo": {"bar"},
 		},
 		Scheme: "http",
 		Body:   "body",
@@ -960,7 +960,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		Method:      "POST",
 		Destination: "miss",
 		Query: map[string][]string{
-			"foo": []string{"bar"},
+			"foo": {"bar"},
 		},
 		Scheme: "http",
 		Body:   "body",
@@ -979,7 +979,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query: map[string][]string{
-			"miss": []string{""},
+			"miss": {""},
 		},
 		Scheme: "http",
 		Body:   "body",
@@ -998,7 +998,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query: map[string][]string{
-			"foo": []string{"bar"},
+			"foo": {"bar"},
 		},
 		Scheme: "http",
 		Body:   "miss",
@@ -1017,7 +1017,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query: map[string][]string{
-			"foo": []string{"bar"},
+			"foo": {"bar"},
 		},
 		Scheme: "http",
 		Body:   "body",
@@ -1377,7 +1377,7 @@ func Test_ShouldReturnFieldsMissedInClosestMissAgain(t *testing.T) {
 		Body: "hit",
 		Path: "hit",
 		Query: map[string][]string{
-			"hit": []string{""},
+			"hit": {""},
 		},
 	}
 
@@ -1641,7 +1641,7 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeader
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query: map[string][]string{
-			"foo": []string{"bar"},
+			"foo": {"bar"},
 		},
 		Scheme: "http",
 		Body:   "body",
@@ -1728,7 +1728,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		Method:      "MISS",
 		Destination: "www.test.com",
 		Query: map[string][]string{
-			"foo": []string{"bar"},
+			"foo": {"bar"},
 		},
 		Scheme: "http",
 		Body:   "body",
@@ -1766,7 +1766,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query: map[string][]string{
-			"miss": []string{""},
+			"miss": {""},
 		},
 		Scheme: "http",
 		Body:   "body",
@@ -2025,7 +2025,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Method:      "POST",
 		Destination: "www.test.com",
 		Query: map[string][]string{
-			"miss": []string{""},
+			"miss": {""},
 		},
 		Scheme: "http",
 		Body:   "body",

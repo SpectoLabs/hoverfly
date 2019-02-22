@@ -957,7 +957,7 @@ func Test_Hoverfly_AddDiff_AddEntry(t *testing.T) {
 		Host: "test.com",
 	}
 
-	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{v2.DiffReportEntry{}}})
+	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{{}}})
 
 	Expect(unit.responsesDiff).To(HaveLen(1))
 
@@ -976,8 +976,8 @@ func Test_Hoverfly_AddDiff_AppendsEntry(t *testing.T) {
 		Host: "test.com",
 	}
 
-	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{v2.DiffReportEntry{Actual: "1"}}})
-	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{v2.DiffReportEntry{Actual: "2"}}})
+	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{{Actual: "1"}}})
+	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{{Actual: "2"}}})
 
 	Expect(unit.responsesDiff).To(HaveLen(1))
 
@@ -1002,8 +1002,8 @@ func Test_Hoverfly_AddDiff_AddEntry_DiffrentKey(t *testing.T) {
 		Host:   "test.com",
 	}
 
-	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{v2.DiffReportEntry{Actual: "1"}}})
-	unit.AddDiff(keyTwo, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{v2.DiffReportEntry{Actual: "2"}}})
+	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{{Actual: "1"}}})
+	unit.AddDiff(keyTwo, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{{Actual: "2"}}})
 
 	Expect(unit.responsesDiff).To(HaveLen(2))
 

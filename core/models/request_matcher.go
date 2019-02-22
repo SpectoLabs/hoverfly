@@ -197,7 +197,7 @@ func (q *QueryRequestFieldMatchers) Add(k string, v []RequestFieldMatchers) {
 }
 
 func (this RequestMatcher) IncludesHeaderMatching() bool {
-	return (this.Headers != nil && len(this.Headers) > 0)
+	return this.Headers != nil && len(this.Headers) > 0
 }
 
 func (this RequestMatcher) IncludesStateMatching() bool {
@@ -239,14 +239,14 @@ type MatchError struct {
 	error       string
 }
 
-func NewMatchErrorWithClosestMiss(closestMiss *ClosestMiss, error string, isCachable bool) *MatchError {
+func NewMatchErrorWithClosestMiss(closestMiss *ClosestMiss, error string) *MatchError {
 	return &MatchError{
 		ClosestMiss: closestMiss,
 		error:       error,
 	}
 }
 
-func NewMatchError(error string, matchedOnAllButHeadersAtLeastOnce bool) *MatchError {
+func NewMatchError(error string) *MatchError {
 	return &MatchError{
 		error: error,
 	}

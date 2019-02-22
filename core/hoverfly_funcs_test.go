@@ -669,12 +669,12 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 		Method:      "testmethod",
 		Path:        "/testpath",
 		Query: map[string][]string{
-			"query": []string{"test"},
+			"query": {"test"},
 		},
 		Scheme: "http",
 	}, &models.ResponseDetails{
 		Body:    "testresponsebody",
-		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Headers: map[string][]string{"testheader": {"testvalue"}},
 		Status:  200,
 	}, nil, false)
 
@@ -741,10 +741,10 @@ func Test_Hoverfly_Save_DoesNotSaveRequestHeadersWhenGivenHeadersArrayIsNil(t *t
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	unit.Save(&models.RequestDetails{
-		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Headers: map[string][]string{"testheader": {"testvalue"}},
 	}, &models.ResponseDetails{
 		Body:    "testresponsebody",
-		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Headers: map[string][]string{"testheader": {"testvalue"}},
 		Status:  200,
 	}, nil, false)
 
@@ -758,12 +758,12 @@ func Test_Hoverfly_Save_SavesAllRequestHeadersWhenGivenAnAsterisk(t *testing.T) 
 
 	unit.Save(&models.RequestDetails{
 		Headers: map[string][]string{
-			"testheader":  []string{"testvalue"},
-			"testheader2": []string{"testvalue2"},
+			"testheader":  {"testvalue"},
+			"testheader2": {"testvalue2"},
 		},
 	}, &models.ResponseDetails{
 		Body:    "testresponsebody",
-		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Headers: map[string][]string{"testheader": {"testvalue"}},
 		Status:  200,
 	}, []string{"*"}, false)
 
@@ -787,12 +787,12 @@ func Test_Hoverfly_Save_SavesSpecificRequestHeadersWhenSpecifiedInHeadersArray(t
 
 	unit.Save(&models.RequestDetails{
 		Headers: map[string][]string{
-			"testheader":  []string{"testvalue"},
-			"testheader2": []string{"testvalue2"},
+			"testheader":  {"testvalue"},
+			"testheader2": {"testvalue2"},
 		},
 	}, &models.ResponseDetails{
 		Body:    "testresponsebody",
-		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Headers: map[string][]string{"testheader": {"testvalue"}},
 		Status:  200,
 	}, []string{"testheader"}, false)
 
@@ -811,12 +811,12 @@ func Test_Hoverfly_Save_DoesNotSaveAnyRequestHeaderIfItDoesNotMatchEntryInHeader
 
 	unit.Save(&models.RequestDetails{
 		Headers: map[string][]string{
-			"testheader":  []string{"testvalue"},
-			"testheader2": []string{"testvalue2"},
+			"testheader":  {"testvalue"},
+			"testheader2": {"testvalue2"},
 		},
 	}, &models.ResponseDetails{
 		Body:    "testresponsebody",
-		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Headers: map[string][]string{"testheader": {"testvalue"}},
 		Status:  200,
 	}, []string{"nonmatch"}, false)
 
@@ -830,13 +830,13 @@ func Test_Hoverfly_Save_SavesMultipleRequestHeadersWhenMultiplesSpecifiedInHeade
 
 	unit.Save(&models.RequestDetails{
 		Headers: map[string][]string{
-			"testheader":  []string{"testvalue"},
-			"testheader2": []string{"testvalue2"},
-			"nonmatch":    []string{"nonmatchvalue"},
+			"testheader":  {"testvalue"},
+			"testheader2": {"testvalue2"},
+			"nonmatch":    {"nonmatchvalue"},
 		},
 	}, &models.ResponseDetails{
 		Body:    "testresponsebody",
-		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Headers: map[string][]string{"testheader": {"testvalue"}},
 		Status:  200,
 	}, []string{"testheader", "nonmatch"}, false)
 
@@ -862,7 +862,7 @@ func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing
 		Destination: "testdestination",
 	}, &models.ResponseDetails{
 		Body:    "testresponsebody",
-		Headers: map[string][]string{"testheader": []string{"testvalue"}},
+		Headers: map[string][]string{"testheader": {"testvalue"}},
 		Status:  200,
 	}, nil, false)
 
@@ -909,7 +909,7 @@ func Test_Hoverfly_Save_SavesRequestBodyAsJsonPathIfContentTypeIsJson(t *testing
 	unit.Save(&models.RequestDetails{
 		Body: `{"test": []}`,
 		Headers: map[string][]string{
-			"Content-Type": []string{"application/json"},
+			"Content-Type": {"application/json"},
 		},
 	}, &models.ResponseDetails{}, nil, false)
 

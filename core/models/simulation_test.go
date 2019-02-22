@@ -50,7 +50,7 @@ func Test_Simulation_AddPair_CanAddAFullPairToTheArray(t *testing.T) {
 					Value:   "testdestination",
 				},
 			},
-			Headers: map[string][]models.RequestFieldMatchers{"testheader": []models.RequestFieldMatchers{
+			Headers: map[string][]models.RequestFieldMatchers{"testheader": {
 				{
 					Matcher: "exact",
 					Value:   "testvalue",
@@ -83,7 +83,7 @@ func Test_Simulation_AddPair_CanAddAFullPairToTheArray(t *testing.T) {
 		},
 		models.ResponseDetails{
 			Body:    "testresponsebody",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	})
@@ -133,7 +133,7 @@ func Test_Simulation_AddPairInSequence_CanAddAFullPairToTheArray(t *testing.T) {
 					Value:   "testdestination",
 				},
 			},
-			Headers: map[string][]models.RequestFieldMatchers{"testheader": []models.RequestFieldMatchers{
+			Headers: map[string][]models.RequestFieldMatchers{"testheader": {
 				{
 					Matcher: "exact",
 					Value:   "testvalue",
@@ -166,7 +166,7 @@ func Test_Simulation_AddPairInSequence_CanAddAFullPairToTheArray(t *testing.T) {
 		},
 		models.ResponseDetails{
 			Body:    "testresponsebody",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, &state.State{State: map[string]string{}})
@@ -213,7 +213,7 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 		},
 		models.ResponseDetails{
 			Body:    "1",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, &state.State{State: map[string]string{}})
@@ -229,7 +229,7 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 		},
 		models.ResponseDetails{
 			Body:    "2",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, &state.State{State: map[string]string{}})
@@ -245,7 +245,7 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 		},
 		models.ResponseDetails{
 			Body:    "3",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, &state.State{State: map[string]string{}})
@@ -290,7 +290,7 @@ func Test_Simulation_AddPairInSequence_CanBeUsedWithAddPair(t *testing.T) {
 		},
 		models.ResponseDetails{
 			Body:    "1",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	})
@@ -306,7 +306,7 @@ func Test_Simulation_AddPairInSequence_CanBeUsedWithAddPair(t *testing.T) {
 		},
 		models.ResponseDetails{
 			Body:    "2",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, &state.State{State: map[string]string{}})
@@ -345,7 +345,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 		},
 		models.ResponseDetails{
 			Body:    "1",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, state)
@@ -361,7 +361,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 		},
 		models.ResponseDetails{
 			Body:    "2",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, state)
@@ -377,7 +377,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 		},
 		models.ResponseDetails{
 			Body:    "different1",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, state)
@@ -393,7 +393,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 		},
 		models.ResponseDetails{
 			Body:    "different2",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, state)
@@ -445,7 +445,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 		},
 		models.ResponseDetails{
 			Body:    "1",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, state)
@@ -461,7 +461,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 		},
 		models.ResponseDetails{
 			Body:    "2",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, state)
@@ -477,7 +477,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 		},
 		models.ResponseDetails{
 			Body:    "different1",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, state)
@@ -493,7 +493,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 		},
 		models.ResponseDetails{
 			Body:    "different2",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, state)
@@ -509,7 +509,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 		},
 		models.ResponseDetails{
 			Body:    "third1",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, state)
@@ -525,7 +525,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 		},
 		models.ResponseDetails{
 			Body:    "third2",
-			Headers: map[string][]string{"testheader": []string{"testvalue"}},
+			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
 		},
 	}, state)

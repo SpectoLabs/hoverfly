@@ -73,7 +73,7 @@ func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, stat
 				pair.RequestMatcher.RequiresState = map[string]string{}
 			}
 			sequenceKey = state.GetNewSequenceKey()
-			for key, _ := range savedPair.RequestMatcher.RequiresState {
+			for key := range savedPair.RequestMatcher.RequiresState {
 				if strings.Contains(key, "sequence:") {
 					sequenceKey = key
 					break

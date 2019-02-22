@@ -28,7 +28,7 @@ func (this *HoverflyLogsStub) GetLogs(limit int, from *time.Time) ([]*logrus.Ent
 
 	this.limit = limit
 	this.from = from
-	return []*logrus.Entry{&logrus.Entry{
+	return []*logrus.Entry{{
 		Level:   logrus.InfoLevel,
 		Message: "a line of logs",
 		Data: map[string]interface{}{

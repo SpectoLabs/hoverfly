@@ -16,9 +16,6 @@ func NewBoltDBCache(db *bolt.DB, bucket []byte) *BoltCache {
 	}
 }
 
-// RequestsBucketName - default name for BoltDB bucket
-const RequestsBucketName = "rqbucket"
-
 // BoltCache - container to implement Cache instance with BoltDB backend for storage
 type BoltCache struct {
 	DS            *bolt.DB

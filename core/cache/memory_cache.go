@@ -58,11 +58,11 @@ func (c *InMemoryCache) GetAllEntries() (map[string][]byte, error) {
 	return dest, nil
 }
 
-func (c *InMemoryCache) RecordsCount() (count int, err error) {
+func (c *InMemoryCache) RecordsCount() (int, error) {
 	c.RLock()
-	len := len(c.elements)
+	count := len(c.elements)
 	c.RUnlock()
-	return len, nil
+	return count, nil
 }
 
 func (c *InMemoryCache) DeleteData() (err error) {
@@ -75,7 +75,7 @@ func (c *InMemoryCache) DeleteData() (err error) {
 func (c *InMemoryCache) GetAllKeys() (keys map[string]bool, err error) {
 	c.RLock()
 	keys = make(map[string]bool)
-	for k, _ := range c.elements {
+	for k := range c.elements {
 		keys[k] = true
 	}
 	c.RUnlock()
