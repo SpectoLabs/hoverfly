@@ -11,6 +11,7 @@ import (
 type RequestFieldMatchers struct {
 	Matcher string
 	Value   interface{}
+	DoMatch  *RequestFieldMatchers
 }
 
 func NewRequestFieldMatchersFromView(matchers []v2.MatcherViewV5) []RequestFieldMatchers {
@@ -19,10 +20,17 @@ func NewRequestFieldMatchersFromView(matchers []v2.MatcherViewV5) []RequestField
 	}
 	convertedMatchers := []RequestFieldMatchers{}
 	for _, matcher := range matchers {
-		convertedMatchers = append(convertedMatchers, RequestFieldMatchers{
+		fieldMatchers := RequestFieldMatchers{
 			Matcher: matcher.Matcher,
 			Value:   matcher.Value,
-		})
+		}
+
+		if matcher.DoMatch != nil {
+			fieldMatchers.DoMatch = &RequestFieldMatchers{}
+			fieldMatchers.DoMatch.Matcher = matcher.DoMatch.Matcher
+			fieldMatchers.DoMatch.Value = matcher.DoMatch.Value
+		}
+		convertedMatchers = append(convertedMatchers, fieldMatchers)
 	}
 	return convertedMatchers
 }

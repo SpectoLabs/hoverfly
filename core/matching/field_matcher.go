@@ -14,11 +14,24 @@ func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMa
 	}
 
 	for _, field := range fields {
-		if matchers.Matchers[field.Matcher](field.Value, toMatch) {
+		if matched, result := matchers.Matchers[field.Matcher](field.Value, toMatch); matched {
 			if field.Matcher == matchers.Exact {
 				fieldMatch.Score = fieldMatch.Score + 2
 			} else {
 				fieldMatch.Score = fieldMatch.Score + 1
+			}
+			// TODO recursion
+			if field.DoMatch != nil {
+				if matched, _ := matchers.Matchers[field.DoMatch.Matcher](field.DoMatch.Value, result); matched {
+					if field.DoMatch.Matcher == matchers.Exact {
+						fieldMatch.Score = fieldMatch.Score + 2
+					} else {
+						fieldMatch.Score = fieldMatch.Score + 1
+					}
+
+				} else {
+					fieldMatch.Matched = false
+				}
 			}
 		} else {
 			fieldMatch.Matched = false

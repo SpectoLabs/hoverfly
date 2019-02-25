@@ -37,6 +37,7 @@ type QueryMatcherViewV5 map[string][]MatcherViewV5
 type MatcherViewV5 struct {
 	Matcher string                 `json:"matcher"`
 	Value   interface{}            `json:"value"`
+	DoMatch *MatcherViewV5		   `json:"doMatch,omitempty"`
 	Config  map[string]interface{} `json:"config,omitempty"`
 }
 

@@ -11,18 +11,18 @@ import (
 
 var Xpath = "xpath"
 
-func XpathMatch(match interface{}, toMatch string) bool {
+func XpathMatch(match interface{}, toMatch string) (bool, string) {
 	matchString, ok := match.(string)
 	if !ok {
-		return false
+		return false, ""
 	}
 
 	results, err := XpathExecution(matchString, toMatch)
 	if err != nil {
-		return false
+		return false, ""
 	}
 
-	return len(results) > 0
+	return len(results) > 0, results.String()
 }
 
 func XpathExecution(matchString, toMatch string) (tree.NodeSet, error) {

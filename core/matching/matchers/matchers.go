@@ -1,6 +1,6 @@
 package matchers
 
-type MatcherFunc func(data interface{}, toMatch string) bool
+type MatcherFunc func(data interface{}, toMatch string) (bool, string)
 
 var Matchers = map[string]MatcherFunc{
 	// Default matcher

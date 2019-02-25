@@ -144,6 +144,47 @@ var fieldMatcherTests = []fieldMatcherTest{
 		toMatch:     "test",
 		scoreEquals: Equal(4),
 	},
+	{
+		name: "WithMatcherChaining_ScoresDoMatch",
+		matchers: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.JsonPath,
+				Value: 	 "$.user.id",
+				DoMatch: &models.RequestFieldMatchers{
+					Matcher: matchers.Exact,
+					Value:   "123",
+				},
+			},
+		},
+		toMatch: `{
+			"user": {
+				"id": 123,
+				"name": "john"
+			}
+
+		}`,
+		scoreEquals: Equal(3),
+	},
+	{
+		name: "WithMatcherChaining_FalseIfDoMatchFailed",
+		matchers: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.JsonPath,
+				Value: 	 "$.user.id",
+				DoMatch: &models.RequestFieldMatchers{
+					Matcher: matchers.Exact,
+					Value:   "123",
+				},
+			},
+		},
+		toMatch: `{
+			"user": {
+				"id": 321
+			}
+
+		}`,
+		equals:	BeFalse(),
+	},
 }
 
 func Test_FieldMatcher(t *testing.T) {

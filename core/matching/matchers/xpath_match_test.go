@@ -29,13 +29,16 @@ func Test_XpathMatch_MatchesFalseWithIncorectXpathMatch(t *testing.T) {
 func Test_XpathMatch_MatchesTrue_GetAnElementFromAnArray(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.XpathMatch("/list/item[1]/field", xml.Header+"<list><item><field>test</field></item></list>")).To(BeTrue())
+	isMatched, result := matchers.XpathMatch("/list/item[1]/field", xml.Header+"<list><item><field>test</field></item></list>")
+	Expect(isMatched).To(BeTrue())
+	Expect(result).To(Equal("test"))
 }
 
 func Test_XpathMatch_MatchesFalse_GetAnElementFromAnArray(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.XpathMatch("/list/item[1]/pop", xml.Header+"<list><item><field>test</field></item></list>")).To(BeFalse())
+	isMatched, _ := matchers.XpathMatch("/list/item[1]/pop", xml.Header+"<list><item><field>test</field></item></list>")
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XpathMatch_MatchesTrue_GetAttributeFromElement(t *testing.T) {

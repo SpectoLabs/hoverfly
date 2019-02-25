@@ -11,19 +11,19 @@ import (
 
 var JsonPath = "jsonpath"
 
-func JsonPathMatch(match interface{}, toMatch string) bool {
+func JsonPathMatch(match interface{}, toMatch string) (bool, string) {
 	matchString, ok := match.(string)
 	if !ok {
-		return false
+		return false, ""
 	}
 
 	matchString = prepareJsonPathQuery(matchString)
 	returnedString, err := JsonPathExecution(matchString, toMatch)
 	if err != nil || returnedString == matchString {
-		return false
+		return false, ""
 	}
 
-	return true
+	return true, returnedString
 }
 
 func JsonPathExecution(matchString, toMatch string) (string, error) {

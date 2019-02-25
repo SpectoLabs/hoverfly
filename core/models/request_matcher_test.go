@@ -25,6 +25,28 @@ func Test_NewRequestFieldMatchersFromView_ReturnsNewStruct(t *testing.T) {
 	Expect(unit[0].Value).To(Equal("exactly"))
 }
 
+func Test_NewRequestFieldMatchersFromView_ReturnsNewStructWithChainingMatcher(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := models.NewRequestFieldMatchersFromView([]v2.MatcherViewV5{
+		{
+			Matcher: matchers.JsonPath,
+			Value: 	 "$.user.id",
+			DoMatch: &v2.MatcherViewV5{
+				Matcher: matchers.Exact,
+				Value: 	 "123",
+			},
+		},
+	})
+
+	Expect(unit).ToNot(BeNil())
+	Expect(unit).To(HaveLen(1))
+	Expect(unit[0].Matcher).To(Equal("jsonpath"))
+	Expect(unit[0].Value).To(Equal("$.user.id"))
+	Expect(unit[0].DoMatch.Matcher).To(Equal("exact"))
+	Expect(unit[0].DoMatch.Value).To(Equal("123"))
+}
+
 func Test_NewRequestFieldMatchersFromView_WillReturnNilIfGivenNil(t *testing.T) {
 	RegisterTestingT(t)
 

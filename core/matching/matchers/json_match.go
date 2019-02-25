@@ -7,26 +7,26 @@ import (
 
 var Json = "json"
 
-func JsonMatch(match interface{}, toMatch string) bool {
+func JsonMatch(match interface{}, toMatch string) (bool, string) {
 	matchString, ok := match.(string)
 	if !ok {
-		return false
+		return false, ""
 	}
 
 	if matchString == toMatch {
-		return true
+		return true, toMatch
 	}
 	var matchingObject map[string]interface{}
 	err := json.Unmarshal([]byte(matchString), &matchingObject)
 	if err != nil {
-		return false
+		return false, ""
 	}
 
 	var toMatchObject map[string]interface{}
 	err = json.Unmarshal([]byte(toMatch), &toMatchObject)
 	if err != nil {
-		return false
+		return false, ""
 	}
 
-	return reflect.DeepEqual(matchingObject, toMatchObject)
+	return reflect.DeepEqual(matchingObject, toMatchObject), toMatch
 }
