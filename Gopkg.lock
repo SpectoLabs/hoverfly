@@ -40,7 +40,7 @@
     ".",
     "ext/auth"
   ]
-  revision = "7f7f48f6cfc35287b46ad3ef95aafbf1c247f7e3"
+  revision = "04eaec60149482b840c282245794775076c34e62"
 
 [[projects]]
   branch = "master"
