@@ -83,17 +83,6 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 			})
 	}
 
-	// Set content length only if both Content-Length and Transfer-Encoding are absent
-	proxy.OnResponse().DoFunc(func(r *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
-		if r.Body != nil && r.Header.Get("Content-Length") == "" && r.Header.Get("Transfer-Encoding") == "" {
-			responseBytes, _ := ioutil.ReadAll(r.Body)
-			r.Header.Set("Content-Length", fmt.Sprintf("%v", len(responseBytes)))
-			r.Body = ioutil.NopCloser(bytes.NewReader(responseBytes))
-			r.ContentLength = int64(len(responseBytes))
-		}
-		return r
-	})
-
 	// intercepts response
 	proxy.OnResponse(matchesFilter(hoverfly.Cfg.Destination)).DoFunc(
 		func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {

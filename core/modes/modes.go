@@ -98,8 +98,7 @@ func ReconstructResponse(request *http.Request, pair models.RequestResponsePair)
 	response := &http.Response{}
 	response.Request = request
 
-	// ContentLength is unknown (-1), HTTP package knows what to do
-	response.ContentLength = -1
+	response.ContentLength = int64(len(pair.Response.Body))
 	response.Body = ioutil.NopCloser(strings.NewReader(pair.Response.Body))
 	response.StatusCode = pair.Response.Status
 
@@ -110,6 +109,10 @@ func ReconstructResponse(request *http.Request, pair models.RequestResponsePair)
 	}
 
 	response.Header = headers
+
+	if response.ContentLength > 0 && response.Header.Get("Content-Length") == "" && response.Header.Get("Transfer-Encoding") == "" {
+		response.Header.Set("Content-Length", fmt.Sprintf("%v", response.ContentLength))
+	}
 
 	return response
 }

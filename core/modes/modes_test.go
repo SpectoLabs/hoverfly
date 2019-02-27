@@ -138,6 +138,96 @@ func Test_ReconstructResponse_ReturnsAResponseWithBody(t *testing.T) {
 	Expect(string(responseBody)).To(Equal("test body"))
 }
 
+func Test_ReconstructResponse_ReturnsAResponseWithCorrectContentLength(t *testing.T) {
+	RegisterTestingT(t)
+
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	pair := models.RequestResponsePair{
+		Response: models.ResponseDetails{
+			Body: "test body",
+		},
+	}
+
+	response := modes.ReconstructResponse(req, pair)
+
+	Expect(response.ContentLength).To(Equal(int64(9)))
+}
+
+func Test_ReconstructResponse_ReturnEmptyBodyWithCorrectContentLength(t *testing.T) {
+	RegisterTestingT(t)
+
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	pair := models.RequestResponsePair{
+		Response: models.ResponseDetails{
+			Body: "",
+		},
+	}
+
+	response := modes.ReconstructResponse(req, pair)
+
+	Expect(response.ContentLength).To(Equal(int64(0)))
+	Expect(response.Header.Get("Content-Length")).To(Equal(""))
+
+}
+
+func Test_ReconstructResponse_SetContentLengthHeader(t *testing.T) {
+	RegisterTestingT(t)
+
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	pair := models.RequestResponsePair{
+		Response: models.ResponseDetails{
+			Body: "test body",
+		},
+	}
+
+	response := modes.ReconstructResponse(req, pair)
+
+	Expect(response.Header.Get("Content-Length")).To(Equal("9"))
+}
+
+func Test_ReconstructResponse_DoesNotSetContentLengthHeaderIfTransferEncodingHeaderPresent(t *testing.T) {
+	RegisterTestingT(t)
+
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	pair := models.RequestResponsePair{
+		Response: models.ResponseDetails{
+			Body: "test body",
+			Headers: map[string][]string{
+				"Transfer-Encoding": {"chunked"},
+			},
+		},
+	}
+
+	response := modes.ReconstructResponse(req, pair)
+
+	Expect(response.Header.Get("Content-Length")).To(Equal(""))
+}
+
+func Test_ReconstructResponse_DoesNotChangeContentLengthHeaderIfPresent(t *testing.T) {
+	RegisterTestingT(t)
+
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	pair := models.RequestResponsePair{
+		Response: models.ResponseDetails{
+			Body: "test body",
+			Headers: map[string][]string{
+				"Content-Length": {"10"},
+			},
+		},
+	}
+
+	response := modes.ReconstructResponse(req, pair)
+
+	Expect(response.ContentLength).To(Equal(int64(9)))
+	Expect(response.Header.Get("Content-Length")).To(Equal("10"))
+}
+
+
 func Test_ReconstructResponse_AddsHeadersToResponse(t *testing.T) {
 	RegisterTestingT(t)
 
