@@ -8,59 +8,82 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_XpathMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.XpathMatch(1, "yes")).To(BeFalse())
+var xpathMatchTests = []matchTest{
+	{
+		name:    "MatchesFalseWithIncorrectDataType",
+		match:   1,
+		toMatch: "yes",
+		matched: false,
+		result:  "",
+	},
+	{
+		name:    "MatchesTrue",
+		match:   "/root/text",
+		toMatch: xml.Header+"<root><text>test</text></root>",
+		matched: true,
+		result:  "test",
+	},
+	{
+		name:    "MatchesFalseWithIncorrectXpathMatch",
+		match:   "/pop",
+		toMatch: xml.Header+"<root><text>test</text></root>",
+		matched: false,
+		result:  "",
+	},
+	{
+		name:    "MatchesTrue_GetAnElementFromAnArray",
+		match:   "/list/item[1]/field",
+		toMatch: xml.Header+"<list><item><field>test</field></item></list>",
+		matched: true,
+		result:  "test",
+	},
+	{
+		name:    "MatchesFalse_GetAnElementFromAnArray",
+		match:   "/list/item[1]/pop",
+		toMatch: xml.Header+"<list><item><field>test</field></item></list>",
+		matched: false,
+		result:  "",
+	},
+	{
+		name:    "MatchesTrue_GetAttributeFromElement",
+		match:   "/list/item/field[@test]",
+		toMatch: xml.Header+"<list><item><field test=\"value\">test</field></item></list>",
+		matched: true,
+		result:  "test",
+	},
+	{
+		name:    "MatchesFalse_GetAttributeFromElement",
+		match:   "/list/item/field[@pop]",
+		toMatch: xml.Header+"<list><item><field test=\"value\">test</field></item></list>",
+		matched: false,
+		result:  "",
+	},
+	{
+		name:    "MatchesTrue_GetElementWithNoValue",
+		match:   "/list/item/field",
+		toMatch: xml.Header+"<list><item><field></field></item></list>",
+		matched: true,
+		result:  "",
+	},
+	{
+		name:    "MatchesTrue_WithoutHeader",
+		match:   "/list/item/field",
+		toMatch: "<list><item><field></field></item></list>",
+		matched: true,
+		result:  "",
+	},
 }
 
-func Test_XpathMatch_MatchesTrue(t *testing.T) {
+func Test_XpathMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.XpathMatch("/root/text", xml.Header+"<root><text>test</text></root>")).To(BeTrue())
-}
+	for _, test := range xpathMatchTests {
+		t.Run(test.name, func(t *testing.T) {
 
-func Test_XpathMatch_MatchesFalseWithIncorectXpathMatch(t *testing.T) {
-	RegisterTestingT(t)
+			isMatched, result := matchers.XpathMatch(test.match, test.toMatch)
 
-	Expect(matchers.XpathMatch("/pop", xml.Header+"<root><text>test</text></root>")).To(BeFalse())
-}
-
-func Test_XpathMatch_MatchesTrue_GetAnElementFromAnArray(t *testing.T) {
-	RegisterTestingT(t)
-
-	isMatched, result := matchers.XpathMatch("/list/item[1]/field", xml.Header+"<list><item><field>test</field></item></list>")
-	Expect(isMatched).To(BeTrue())
-	Expect(result).To(Equal("test"))
-}
-
-func Test_XpathMatch_MatchesFalse_GetAnElementFromAnArray(t *testing.T) {
-	RegisterTestingT(t)
-
-	isMatched, _ := matchers.XpathMatch("/list/item[1]/pop", xml.Header+"<list><item><field>test</field></item></list>")
-	Expect(isMatched).To(BeFalse())
-}
-
-func Test_XpathMatch_MatchesTrue_GetAttributeFromElement(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.XpathMatch("/list/item/field[@test]", xml.Header+"<list><item><field test=\"value\">test</field></item></list>")).To(BeTrue())
-}
-
-func Test_XpathMatch_MatchesFalse_GetAttributeFromElement(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.XpathMatch("/list/item/field[@pop]", xml.Header+"<list><item><field test=\"value\">test</field></item></list>")).To(BeFalse())
-}
-
-func Test_XpathMatch_MatchesTrue_GetElementWithNoValue(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.XpathMatch("/list/item/field", xml.Header+"<list><item><field></field></item></list>")).To(BeTrue())
-}
-
-func Test_XpathMatch_MatchesTrue_WithoutHeader(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.XpathMatch("/list/item/field", "<list><item><field></field></item></list>")).To(BeTrue())
+			Expect(isMatched).To(Equal(test.matched))
+			Expect(result).To(Equal(test.result))
+		})
+	}
 }

@@ -8,21 +8,26 @@ import (
 
 var Xml = "xml"
 
-func XmlMatch(match interface{}, toMatch string) (bool, string) {
+func XmlMatch(match interface{}, toMatch string) (matched bool, result string) {
 	matchString, ok := match.(string)
 	if !ok {
-		return false, ""
+		return
 	}
 
 	minifiedMatch, err := util.MinifyXml(matchString)
 	if err != nil {
-		return false, ""
+		return
 	}
 
 	minifiedToMatch, err := util.MinifyXml(toMatch)
 	if err != nil {
-		return false, ""
+		return
 	}
 
-	return reflect.DeepEqual(minifiedMatch, minifiedToMatch), toMatch
+	matched = reflect.DeepEqual(minifiedMatch, minifiedToMatch)
+
+	if matched {
+		result = toMatch
+	}
+	return
 }

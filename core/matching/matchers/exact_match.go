@@ -2,12 +2,16 @@ package matchers
 
 var Exact = "exact"
 
-func ExactMatch(match interface{}, toMatch string) (bool, string) {
+func ExactMatch(match interface{}, toMatch string) (matched bool, result string) {
 	matchString, ok := match.(string)
 	if !ok {
-		return false, ""
+		return
 	}
 
-	// TODO only return toMatch string if the matching is true
-	return matchString == toMatch, toMatch
+	matched = matchString == toMatch
+
+	if matched {
+		result = toMatch
+	}
+	return
 }

@@ -4,16 +4,20 @@ import "regexp"
 
 var Regex = "regex"
 
-func RegexMatch(match interface{}, toMatch string) (bool, string) {
+func RegexMatch(match interface{}, toMatch string) (matched bool, result string) {
 	matchString, ok := match.(string)
 	if !ok {
-		return false, ""
+		return
 	}
 
-	result, err := regexp.MatchString(matchString, toMatch)
+	matched, err := regexp.MatchString(matchString, toMatch)
 	if err != nil {
-		return false, ""
+		return
 	}
 
-	return result, toMatch
+	if matched {
+		result = toMatch
+	}
+
+	return
 }

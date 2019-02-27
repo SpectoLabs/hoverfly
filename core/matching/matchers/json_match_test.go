@@ -1,4 +1,4 @@
-package matchers_test
+ package matchers_test
 
 import (
 	"testing"
@@ -7,80 +7,125 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_JsonMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.JsonMatch(1, "yes")).To(BeFalse())
-}
-func Test_JsonMatch_MatchesTrueWithJSON(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.JsonMatch(`{"test":{"json":true,"minified":true}}`, `{"test":{"json":true,"minified":true}}`)).To(BeTrue())
-}
-
-func Test_JsonMatch_MatchesTrueWithJSON_InADifferentOrder(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.JsonMatch(`{"test":{"minified":true, "json":true}}`, `{"test":{"json":true,"minified":true}}`)).To(BeTrue())
-}
-
-func Test_JsonMatch_MatchesTrueWithUnminifiedJSON(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.JsonMatch(`{"test":{"json":true,"minified":true}}`, `{
+var jsonMatchTests = []matchTest{
+	{
+		name:    "MatchesFalseWithIncorrectDataType",
+		match:   1,
+		toMatch: "yes",
+		matched: false,
+		result:  "",
+	},
+	{
+		name:    "MatchesTrueWithJSON",
+		match:   `{"test":{"json":true,"minified":true}}`,
+		toMatch: `{"test":{"json":true,"minified":true}}`,
+		matched: true,
+		result:  `{"test":{"json":true,"minified":true}}`,
+	},
+	{
+		name:    "MatchesTrueWithJSON_InADifferentOrder",
+		match:   `{"test":{"minified":true, "json":true}}`,
+		toMatch: `{"test":{"json":true,"minified":true}}`,
+		matched: true,
+		result:  `{"test":{"json":true,"minified":true}}`,
+	},
+	{
+		name:      "MatchesTrueWithUnminifiedJSON",
+		match:     `{"test":{"json":true,"minified":true}}`,
+		toMatch:   `{
 		"test": {
 			"json": true,
 			"minified": true
 		}
-	}`)).To(BeTrue())
-}
-
-func Test_JsonMatch_MatchesFalseWithInvalidJSONAsMatcher(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.JsonMatch(`"test":"json":true,"minified"`, `{
+	}`,
+		matched: true,
+		result:    `{
 		"test": {
 			"json": true,
 			"minified": true
 		}
-	}`)).To(BeFalse())
-}
-
-func Test_JsonMatch_MatchesFalseWithInvalidJSON(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.JsonMatch(`{"test":{"json":true,"minified":true}}`, `{
+	}`,
+	},
+	{
+		name:      "MatchesFalseReturnsEmptyString",
+		match:     `{"test":{"json":true,"minified":true}}`,
+		toMatch:   `{
+		"test": {
+			"json": false,
+			"minified": false
+		}
+	}`,
+		matched: false,
+		result:  "",
+	},
+	{
+		name:      "MatchesFalseWithInvalidJSONAsMatcher",
+		match:     `"test":"json":true,"minified"`,
+		toMatch:   `{
+		"test": {
+			"json": true,
+			"minified": true
+		}
+	}`,
+		matched: false,
+		result:  "",
+	},
+	{
+		name:      "MatchesFalseWithInvalidJSON",
+		match:     `{"test":{"json":true,"minified":true}}`,
+		toMatch:   `{
 		"test": {
 			"json": true,
 			"minified": 
 		}
-	}`)).To(BeFalse())
-}
-
-func Test_JsonMatch_MatchesTrueWithTwoEmptyString(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.JsonMatch(``, ``)).To(BeTrue())
-}
-
-func Test_JsonMatch_MatchesFalseAgainstEmptyString(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.JsonMatch(`{
+	}`,
+		matched: false,
+		result:  "",
+	},
+	{
+		name:    "MatchesTrueWithTwoEmptyString",
+		match:   "",
+		toMatch: "",
+		matched: true,
+		result:  "",
+	},
+	{
+		name:      "MatchesFalseAgainstEmptyString",
+		match:     `{
 		"test": {
 			"json": true,
 			"minified": 
 		}
-	}`, ``)).To(BeFalse())
-}
-
-func Test_JsonMatch_MatchesFalseWithEmptyString(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.JsonMatch(``, `{
+	}`,
+		toMatch: "",
+		matched: false,
+		result:  "",
+	},
+	{
+		name:      "MatchesFalseWithEmptyString",
+		match:     "",
+		toMatch:   `{
 		"test": {
 			"json": true,
 			"minified": 
 		}
-	}`)).To(BeFalse())
+	}`,
+		matched: false,
+		result:  "",
+	},
 }
+
+func Test_JsonMatch(t *testing.T) {
+	RegisterTestingT(t)
+
+	for _, test := range jsonMatchTests {
+		t.Run(test.name, func(t *testing.T) {
+
+			isMatched, result := matchers.JsonMatch(test.match, test.toMatch)
+
+			Expect(isMatched).To(Equal(test.matched))
+			Expect(result).To(Equal(test.result))
+		})
+	}
+}
+

@@ -7,19 +7,40 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_RegexMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.RegexMatch(1, "yes")).To(BeFalse())
+var regexMatchTests = []matchTest{
+	{
+		name:    "MatchesFalseWithIncorrectDataType",
+		match:   1,
+		toMatch: "yes",
+		matched: false,
+		result:  "",
+	},
+	{
+		name:    "MatchesTrueWithRegexMatch",
+		match:   "t[o|a|e]st",
+		toMatch: "test",
+		matched: true,
+		result:  "test",
+	},
+	{
+		name:    "MatchesFalseWithIncorrectRegexMatch",
+		match:   "t[o|a]st",
+		toMatch: "test",
+		matched: false,
+		result:  "",
+	},
 }
-func Test_RegexMatch_MatchesTrueWithRegexMatch(t *testing.T) {
+
+func Test_RegexMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.RegexMatch("t[o|a|e]st", `test`)).To(BeTrue())
-}
+	for _, test := range regexMatchTests {
+		t.Run(test.name, func(t *testing.T) {
 
-func Test_RegexMatch_MatchesFalseWithIncorrectRegexMatch(t *testing.T) {
-	RegisterTestingT(t)
+			isMatched, result := matchers.RegexMatch(test.match, test.toMatch)
 
-	Expect(matchers.RegexMatch("t[o|a]st", `test`)).To(BeFalse())
+			Expect(isMatched).To(Equal(test.matched))
+			Expect(result).To(Equal(test.result))
+		})
+	}
 }

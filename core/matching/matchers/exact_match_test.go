@@ -7,37 +7,68 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_ExactMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.ExactMatch(1, "yes")).To(BeFalse())
+type matchTest struct {
+	name    string
+	match   interface{}
+	toMatch string
+	matched bool
+	result  interface{}
 }
 
-func Test_ExactMatch_MatchesTrueWithExactMatch(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.ExactMatch("yes", "yes")).To(BeTrue())
-}
-
-func Test_ExactMatch_MatchesFalseWithIncorrectExactMatch(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.ExactMatch("yes", "no")).To(BeFalse())
-}
-
-func Test_ExactMatch_MatchesTrueWithJSON(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.ExactMatch(`{"test":{"json":true,"minified":true}}`, `{"test":{"json":true,"minified":true}}`)).To(BeTrue())
-}
-
-func Test_ExactMatch_MatchesTrueWithUnminifiedJSON(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.ExactMatch(`{"test":{"json":true,"minified":true}}`, `{
+var exactMatchTests = []matchTest{
+	{
+		name:    "MatchesFalseWithIncorrectDataType",
+		match:   1,
+		toMatch: "yes",
+		matched: false,
+		result:  "",
+	},
+	{
+		name:    "MatchesTrueWithExactMatch",
+		match:   "yes",
+		toMatch: "yes",
+		matched: true,
+		result:  "yes",
+	},
+	{
+		name:    "MatchesFalseWithIncorrectExactMatch",
+		match:   "yes",
+		toMatch: "no",
+		matched: false,
+		result:  "",
+	},
+	{
+		name:    "MatchesTrueWithJSON",
+		match:   `{"test":{"json":true,"minified":true}}`,
+		toMatch: `{"test":{"json":true,"minified":true}}`,
+		matched: true,
+		result:  `{"test":{"json":true,"minified":true}}`,
+	},
+	{
+		name: 		"MatchesFalseWithUnminifiedJSON",
+		match: 		`{"test":{"json":true,"minified":true}}`,
+		toMatch: 	`{
 		"test": {
 			"json": true,
 			"minified": true
 		}
-	}`)).To(BeFalse())
+	}`,
+		matched: false,
+		result:  "",
+	},
+}
+
+func Test_ExactMatch(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	for _, test := range exactMatchTests {
+		t.Run(test.name, func(t *testing.T) {
+
+			isMatched, result := matchers.ExactMatch(test.match, test.toMatch)
+
+			Expect(isMatched).To(Equal(test.matched))
+			Expect(result).To(Equal(test.result))
+		})
+	}
 }

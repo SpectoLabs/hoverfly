@@ -7,10 +7,10 @@ import (
 
 var Json = "json"
 
-func JsonMatch(match interface{}, toMatch string) (bool, string) {
+func JsonMatch(match interface{}, toMatch string) (matched bool, result string) {
 	matchString, ok := match.(string)
 	if !ok {
-		return false, ""
+		return
 	}
 
 	if matchString == toMatch {
@@ -19,14 +19,19 @@ func JsonMatch(match interface{}, toMatch string) (bool, string) {
 	var matchingObject map[string]interface{}
 	err := json.Unmarshal([]byte(matchString), &matchingObject)
 	if err != nil {
-		return false, ""
+		return
 	}
 
 	var toMatchObject map[string]interface{}
 	err = json.Unmarshal([]byte(toMatch), &toMatchObject)
 	if err != nil {
-		return false, ""
+		return
 	}
 
-	return reflect.DeepEqual(matchingObject, toMatchObject), toMatch
+	matched = reflect.DeepEqual(matchingObject, toMatchObject)
+	if matched {
+		result = toMatch
+	}
+
+	return
 }

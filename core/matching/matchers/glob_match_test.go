@@ -7,64 +7,89 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Test_GlobMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.GlobMatch(1, "yes")).To(BeFalse())
+var globMatchTests = []matchTest {
+	{
+		name:    "MatchesFalseWithIncorrectDataType",
+		match:   1,
+		toMatch: "yes",
+		matched: false,
+		result:  "",
+	},
+	{
+		name:    "MatchesTrueWithGlobMatch",
+		match:   "t*st",
+		toMatch: "test",
+		matched: true,
+		result:  "test",
+	},
+	{
+		name:    "MatchesZeroExtraCharactersAtEnd",
+		match:   "test*",
+		toMatch: "test",
+		matched: true,
+		result:  "test",
+	},
+	{
+		name:    "MatchesZeroExtraCharactersAtStart",
+		match:   "*test",
+		toMatch: "test",
+		matched: true,
+		result:  "test",
+	},
+	{
+		name:    "MatchesZeroExtraCharactersAtStartAndEnd",
+		match:   "*test*",
+		toMatch: "test",
+		matched: true,
+		result:  "test",
+	},
+	{
+		name:    "MatchesUpperCase",
+		match:   "*est",
+		toMatch: "Test",
+		matched: true,
+		result:  "Test",
+	},
+	{
+		name:    "MatchesLowerCase",
+		match:   "*est",
+		toMatch: "test",
+		matched: true,
+		result:  "test",
+	},
+	{
+		name:    "MatchesAstrik",
+		match:   "*est",
+		toMatch: "*est",
+		matched: true,
+		result:  "*est",
+	},
+	{
+		name:    "MatchesFalseWithGlobMatch_UpperCase",
+		match:   "*esT",
+		toMatch: "test",
+		matched: false,
+		result:  "",
+	},
+	{
+		name:    "MatchesFalseWithIncorrectGlobMatch",
+		match:   "t*st",
+		toMatch: "tset",
+		matched: false,
+		result:  "",
+	},
 }
 
-func Test_GlobMatch_MatchesTrueWithGlobMatch(t *testing.T) {
+func Test_GlobMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.GlobMatch("t*st", `test`)).To(BeTrue())
-}
+	for _, test := range globMatchTests {
+		t.Run(test.name, func(t *testing.T) {
 
-func Test_GlobMatch_MatchesTrueWithGlobMatch_MatchesZeroExtraCharactersAtEnd(t *testing.T) {
-	RegisterTestingT(t)
+			isMatched, result := matchers.GlobMatch(test.match, test.toMatch)
 
-	Expect(matchers.GlobMatch("test*", `test`)).To(BeTrue())
-}
-
-func Test_GlobMatch_MatchesTrueWithGlobMatch_MatchesZeroExtraCharactersAtStart(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.GlobMatch("*test", `test`)).To(BeTrue())
-}
-
-func Test_GlobMatch_MatchesTrueWithGlobMatch_MatchesZeroExtraCharactersAtStartAndEnd(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.GlobMatch("*test*", `test`)).To(BeTrue())
-}
-
-func Test_GlobMatch_MatchesTrueWithGlobMatch_MatchesUpperCase(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.GlobMatch("*est", `Test`)).To(BeTrue())
-}
-
-func Test_GlobMatch_MatchesTrueWithGlobMatch_MatchesLowerCase(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.GlobMatch("*est", `test`)).To(BeTrue())
-}
-
-func Test_GlobMatch_MatchesTrueWithGlobMatch_MatchesAstrik(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.GlobMatch("*est", `*est`)).To(BeTrue())
-	Expect(matchers.GlobMatch("t*est", `t*est`)).To(BeTrue())
-	Expect(matchers.GlobMatch("test*", `test*`)).To(BeTrue())
-}
-
-func Test_GlobMatch_MatchesFalseWithGlobMatch_UpperCase(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.GlobMatch("*esT", `test`)).To(BeFalse())
-}
-
-func Test_GlobMatch_MatchesFalseWithIncorrectGlobMatch(t *testing.T) {
-	RegisterTestingT(t)
-
-	Expect(matchers.GlobMatch("t*st", `tset`)).To(BeFalse())
+			Expect(isMatched).To(Equal(test.matched))
+			Expect(result).To(Equal(test.result))
+		})
+	}
 }
