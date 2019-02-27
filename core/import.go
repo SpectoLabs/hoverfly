@@ -159,8 +159,7 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 
 			if len(pairView.Response.Headers["Content-Length"]) > 0 {
 				contentLength, err := strconv.Atoi(pairView.Response.Headers["Content-Length"][0])
-				response := models.NewResponseDetailsFromResponse(pairView.Response)
-				if err == nil && contentLength != len(response.Body) {
+				if err == nil && contentLength != len(pair.Response.Body) {
 					importResult.AddContentLengthMismatchWarning(i)
 				}
 			}
