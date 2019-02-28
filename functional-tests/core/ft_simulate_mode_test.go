@@ -2,6 +2,7 @@ package hoverfly_test
 
 import (
 	"io/ioutil"
+	"os"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -468,5 +469,20 @@ Which if hit would have given the following response:
 		body, err = ioutil.ReadAll(resp.Body)
 		Expect(err).To(BeNil())
 		Expect(string(body)).To(Equal("response 2b"))
+	})
+
+	It("Should simulate a base64 encoded body with correct content length", func() {
+		pwd, _ := os.Getwd()
+		expectedFile := "/testdata/1x1.png"
+		expectedImage, _ := ioutil.ReadFile(pwd + expectedFile)
+		hoverfly.ImportSimulation(testdata.Base64EncodedBody)
+
+		slingRequest := sling.New().Get("http://test-server.com/image.png")
+		response := hoverfly.Proxy(slingRequest)
+
+		body, err := ioutil.ReadAll(response.Body)
+		Expect(err).To(BeNil())
+		Expect(body).To(Equal(expectedImage))
+		Expect(response.Header.Get("Content-Length")).To(Equal("67"))
 	})
 })
