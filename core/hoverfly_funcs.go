@@ -1,9 +1,7 @@
 package hoverfly
 
 import (
-	"bytes"
 	"github.com/aymerick/raymond"
-	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -22,17 +20,12 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
 
-	requestBody, _ := ioutil.ReadAll(request.Body)
-
-	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
-
 	client, err := GetHttpClient(hf, request.Host)
 	if err != nil {
 		return nil, err
 	}
 	resp, err := client.Do(request)
 
-	request.Body = ioutil.NopCloser(bytes.NewReader(requestBody))
 	if err != nil {
 		return nil, err
 	}
