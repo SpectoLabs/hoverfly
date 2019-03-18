@@ -5,7 +5,7 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/errors"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"

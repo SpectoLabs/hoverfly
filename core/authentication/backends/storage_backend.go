@@ -7,7 +7,7 @@ import (
 	"github.com/pborman/uuid"
 	"golang.org/x/crypto/bcrypt"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 )
 

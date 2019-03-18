@@ -11,7 +11,7 @@ import (
 
 	"time"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/codegangsta/negroni"

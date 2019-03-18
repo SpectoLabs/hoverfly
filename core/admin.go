@@ -9,7 +9,7 @@ import (
 	_ "github.com/SpectoLabs/hoverfly/core/statik"
 	"github.com/rakyll/statik/fs"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 

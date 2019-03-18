@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"

@@ -29,7 +29,7 @@
   version = "v1.0-alpha3"
 
 [[projects]]
-  name = "github.com/Sirupsen/logrus"
+  name = "github.com/sirupsen/logrus"
   packages = ["."]
   revision = "ad15b42461921f1fb3529b058c6786c6a45d5162"
   version = "v1.1.1"

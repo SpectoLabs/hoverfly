@@ -16,7 +16,7 @@ import (
 
 	"os"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // MaxSerialNumber - nothing very original, big number

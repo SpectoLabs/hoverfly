@@ -1,7 +1,7 @@
 package matching
 
 import (
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"

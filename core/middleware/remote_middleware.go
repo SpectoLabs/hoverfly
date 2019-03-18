@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 

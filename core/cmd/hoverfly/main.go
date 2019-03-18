@@ -28,7 +28,7 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
 	hv "github.com/SpectoLabs/hoverfly/core"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"

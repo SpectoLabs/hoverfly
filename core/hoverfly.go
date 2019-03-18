@@ -2,7 +2,7 @@ package hoverfly
 
 import (
 	"fmt"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"

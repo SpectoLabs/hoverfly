@@ -12,7 +12,7 @@ import (
 
 	"fmt"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/goproxy/ext/auth"
 	"github.com/SpectoLabs/hoverfly/core/authentication"

@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // StoppableListener - wrapper for tcp listener that can stop

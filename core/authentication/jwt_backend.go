@@ -1,7 +1,7 @@
 package authentication
 
 import (
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 

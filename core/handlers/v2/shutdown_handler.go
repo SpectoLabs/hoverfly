@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"os"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"

@@ -5,7 +5,7 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/errors"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	"bytes"
 	"compress/flate"

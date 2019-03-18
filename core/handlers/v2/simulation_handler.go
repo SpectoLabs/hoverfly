@@ -11,7 +11,7 @@ import (
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type HoverflySimulation interface {
