@@ -92,6 +92,8 @@ func removeProxyHeaders(ctx *ProxyCtx, r *http.Request) {
 	//   options that are desired for that particular connection and MUST NOT
 	//   be communicated by proxies over further connections.
 	r.Header.Del("Connection")
+	// If request.Close is not set to false, the transfer.writeHeader function will still write the "Connection: close" header
+	r.Close = false
 }
 
 // Standard net/http function. Shouldn't be used directly, http.Serve will use it.
@@ -141,8 +143,10 @@ func (proxy *ProxyHttpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		// the Content-Length header should be set.
 
 		// Note from Benji
-		// The way we use goproxy, I do not think this is neede for us
+		// The way we use goproxy, I do not think this is needed for us
 		// https://github.com/SpectoLabs/hoverfly/issues/697
+		// Hoverfly does not use proxy.filterResponse to change response body, hence the content length is not changed
+		// Hoverfly manages the Content Length header on its own
 
 		// if origBody != resp.Body {
 		// resp.Header.Del("Content-Length")

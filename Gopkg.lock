@@ -29,18 +29,12 @@
   version = "v1.0-alpha3"
 
 [[projects]]
-  name = "github.com/sirupsen/logrus"
-  packages = ["."]
-  revision = "ad15b42461921f1fb3529b058c6786c6a45d5162"
-  version = "v1.1.1"
-
-[[projects]]
   name = "github.com/SpectoLabs/goproxy"
   packages = [
     ".",
     "ext/auth"
   ]
-  revision = "04eaec60149482b840c282245794775076c34e62"
+  revision = "050cbde4e150a66ef7aee6a1b484c4ec4176016d"
 
 [[projects]]
   branch = "master"
@@ -290,6 +284,12 @@
   revision = "256dc444b735e061061cf46c809487313d5b0065"
 
 [[projects]]
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  revision = "ad15b42461921f1fb3529b058c6786c6a45d5162"
+  version = "v1.1.1"
+
+[[projects]]
   name = "github.com/spf13/cast"
   packages = ["."]
   revision = "27b586b42e29bec072fe7379259cc719e1289da6"
@@ -461,6 +461,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2c4ec2a3f2a070f87f1e45a6352fa0e449b4b18e19b4d60117cc23fce626a814"
+  inputs-digest = "84c45916ce6d22572d401abaea30f8d29fa2cac63b91fe945466d45d9ff3ad94"
   solver-name = "gps-cdcl"
   solver-version = 1
