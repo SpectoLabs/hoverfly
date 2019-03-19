@@ -19,6 +19,8 @@ const (
 	capture           = "capture"
 	synthesize        = "synthesize"
 	modify            = "modify"
+	spy            	  = "spy"
+	diff              = "diff"
 	generatedTestData = "testdata-gen"
 )
 
