@@ -146,7 +146,7 @@ func Test_SetMode_SendsCorrectHTTPRequest(t *testing.T) {
 		},
 	})
 
-	mode, err := SetModeWithArguments(target, v2.ModeView{
+	mode, err := SetModeWithArguments(target, &v2.ModeView{
 		Mode: "capture",
 	})
 	Expect(err).To(BeNil())
@@ -157,7 +157,7 @@ func Test_SetMode_SendsCorrectHTTPRequest(t *testing.T) {
 func Test_SetMode_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
 	RegisterTestingT(t)
 
-	_, err := SetModeWithArguments(inaccessibleTarget, v2.ModeView{
+	_, err := SetModeWithArguments(inaccessibleTarget, &v2.ModeView{
 		Mode: "capture",
 	})
 
@@ -199,7 +199,7 @@ func Test_SetMode_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		},
 	})
 
-	_, err := SetModeWithArguments(target, v2.ModeView{
+	_, err := SetModeWithArguments(target, &v2.ModeView{
 		Mode: "capture",
 	})
 	Expect(err).ToNot(BeNil())

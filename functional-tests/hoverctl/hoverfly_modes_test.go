@@ -180,6 +180,50 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				Expect(output).To(ContainSubstring("Hoverfly is currently set to modify mode"))
 				Expect(hoverfly.GetMode().Mode).To(Equal(modify))
 			})
+
+			It("to spy mode", func() {
+				output := functional_tests.Run(hoverctlBinary, "mode", "spy")
+
+				Expect(output).To(ContainSubstring("Hoverfly has been set to spy mode"))
+
+				output = functional_tests.Run(hoverctlBinary, "mode")
+
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to spy mode"))
+				Expect(hoverfly.GetMode().Mode).To(Equal(spy))
+			})
+
+			It("to diff mode", func() {
+				output := functional_tests.Run(hoverctlBinary, "mode", "diff")
+
+				Expect(output).To(ContainSubstring("Hoverfly has been set to diff mode"))
+
+				output = functional_tests.Run(hoverctlBinary, "mode")
+
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to diff mode"))
+				Expect(hoverfly.GetMode().Mode).To(Equal(diff))
+			})
+
+			It("to diff mode and exclude all response headers", func() {
+				output := functional_tests.Run(hoverctlBinary, "mode", "diff", "--all-headers")
+
+				Expect(output).To(ContainSubstring("Hoverfly has been set to diff mode and will exclude all response headers from diffing"))
+
+				output = functional_tests.Run(hoverctlBinary, "mode")
+
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to diff mode"))
+				Expect(hoverfly.GetMode().Mode).To(Equal(diff))
+			})
+
+			It("to diff mode and exclude one response header", func() {
+				output := functional_tests.Run(hoverctlBinary, "mode", "diff", "--headers", "Content-Type")
+
+				Expect(output).To(ContainSubstring("Hoverfly has been set to diff mode and will exclude the following response headers from diffing: [Content-Type]"))
+
+				output = functional_tests.Run(hoverctlBinary, "mode")
+
+				Expect(output).To(ContainSubstring("Hoverfly is currently set to diff mode"))
+				Expect(hoverfly.GetMode().Mode).To(Equal(diff))
+			})
 		})
 	})
 

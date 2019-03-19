@@ -33,7 +33,7 @@ func GetMode(target configuration.Target) (*v2.ModeView, error) {
 }
 
 // Set will go the state endpoint in Hoverfly, sending JSON that will set the mode of Hoverfly
-func SetModeWithArguments(target configuration.Target, modeView v2.ModeView) (string, error) {
+func SetModeWithArguments(target configuration.Target, modeView *v2.ModeView) (string, error) {
 	if modeView.Mode != "simulate" && modeView.Mode != "capture" &&
 		modeView.Mode != "modify" && modeView.Mode != "synthesize" &&
 		modeView.Mode != "spy" && modeView.Mode != "diff" {
