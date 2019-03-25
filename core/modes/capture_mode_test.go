@@ -34,6 +34,14 @@ func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Response
 	response.StatusCode = 200
 	response.Body = ioutil.NopCloser(bytes.NewBufferString("test"))
 
+	if request.Host == "trailer.com" {
+		response.Header = make(http.Header)
+		response.Header.Set("Content-Type", "application/json")
+		response.Trailer = make(http.Header)
+		response.Trailer.Set("X-Streaming-Error", "Connection closed")
+		response.Trailer.Set("X-Bin-Id", "xyz")
+	}
+
 	return response, nil
 }
 
@@ -198,4 +206,33 @@ func Test_CaptureMode_WhenGivenABadRequestItWillError(t *testing.T) {
 
 	Expect(hoverflyStub.SavedRequest).To(BeNil())
 	Expect(hoverflyStub.SavedResponse).To(BeNil())
+}
+
+func Test_CaptureMode_SavesResponseTrailersIfPresent(t *testing.T) {
+	RegisterTestingT(t)
+
+	hoverflyStub := &hoverflyCaptureStub{}
+
+	unit := &modes.CaptureMode{
+		Hoverfly: hoverflyStub,
+	}
+
+	requestDetails := models.RequestDetails{
+		Scheme:      "http",
+		Destination: "trailer.com",
+	}
+
+	request, _ := http.NewRequest("GET", "http://trailer.com", nil)
+
+	response, err := unit.Process(request, requestDetails)
+	Expect(err).To(BeNil())
+
+	Expect(response.Header).To(HaveLen(1))
+	Expect(response.Trailer).To(HaveLen(2))
+
+	Expect(hoverflyStub.SavedResponse.Headers).To(HaveLen(4))
+	Expect(hoverflyStub.SavedResponse.Headers["Content-Type"]).To(ConsistOf("application/json"))
+	Expect(hoverflyStub.SavedResponse.Headers["Trailer"]).To(ConsistOf("X-Streaming-Error", "X-Bin-Id"))
+	Expect(hoverflyStub.SavedResponse.Headers["X-Streaming-Error"]).To(ConsistOf("Connection closed"))
+	Expect(hoverflyStub.SavedResponse.Headers["X-Bin-Id"]).To(ConsistOf("xyz"))
 }

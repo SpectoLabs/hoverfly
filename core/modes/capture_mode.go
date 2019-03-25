@@ -64,11 +64,12 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 	}
 
 	respBody, _ := util.GetResponseBody(response)
+	respHeaders := util.GetResponseHeaders(response)
 
 	responseObj := &models.ResponseDetails{
 		Status:  response.StatusCode,
 		Body:    string(respBody),
-		Headers: response.Header,
+		Headers: respHeaders,
 	}
 
 	if this.Arguments.Headers == nil {
