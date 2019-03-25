@@ -104,8 +104,18 @@ func ReconstructResponse(request *http.Request, pair models.RequestResponsePair)
 
 	headers := make(http.Header)
 
+	// Make copy to prevent modifying the simulation
 	for k, v := range pair.Response.Headers {
 		headers[k] = v
+	}
+
+	if keys, present := headers["Trailer"]; present {
+		response.Trailer = make(http.Header)
+		for _, key := range keys {
+			response.Trailer[key] = headers[key]
+			delete(headers, key)
+		}
+		delete(headers, "Trailer")
 	}
 
 	response.Header = headers

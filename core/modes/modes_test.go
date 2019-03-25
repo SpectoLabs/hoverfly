@@ -303,6 +303,57 @@ func Test_ReconstructResponse_MakesACopyOfTheHeadersWithoutReusingTheSamePointer
 	Expect(response.Header).ToNot(BeIdenticalTo(headers))
 }
 
+func Test_ReconstructResponse_SetTrailerIfPresent(t *testing.T) {
+	RegisterTestingT(t)
+
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	pair := models.RequestResponsePair{}
+
+	headers := make(http.Header)
+	headers["Header"] = []string{"one"}
+	headers["Trailer"] = []string{"Trailer-One", "Trailer-Two"}
+	headers["Trailer-One"] = []string{"1"}
+	headers["Trailer-Two"] = []string{"2"}
+
+	pair.Response.Headers = headers
+
+	response := modes.ReconstructResponse(req, pair)
+
+	Expect(response.Header).To(HaveLen(1))
+	Expect(response.Header.Get("Header")).To(Equal("one"))
+	Expect(response.Trailer).To(HaveLen(2))
+	Expect(response.Trailer.Get("Trailer-One")).To(Equal("1"))
+	Expect(response.Trailer.Get("Trailer-Two")).To(Equal("2"))
+}
+
+func Test_ReconstructResponse_SetTrailerShouldNotModifyTheOriginalSimulation(t *testing.T) {
+	RegisterTestingT(t)
+
+	req, _ := http.NewRequest("GET", "http://example.com", nil)
+
+	pair := models.RequestResponsePair{}
+
+	headers := make(http.Header)
+	headers["Header"] = []string{"one"}
+	headers["Trailer"] = []string{"Trailer-One", "Trailer-Two"}
+	headers["Trailer-One"] = []string{"1"}
+	headers["Trailer-Two"] = []string{"2"}
+
+	pair.Response.Headers = headers
+
+	response := modes.ReconstructResponse(req, pair)
+
+	Expect(response.Header).To(HaveLen(1))
+
+	// the original simulation should stay the same
+	Expect(pair.Response.Headers).To(HaveLen(4))
+	Expect(pair.Response.Headers["Header"]).To(ConsistOf("one"))
+	Expect(pair.Response.Headers["Trailer"]).To(ConsistOf("Trailer-One", "Trailer-Two"))
+	Expect(pair.Response.Headers["Trailer-One"]).To(ConsistOf("1"))
+	Expect(pair.Response.Headers["Trailer-Two"]).To(ConsistOf("2"))
+}
+
 func Test_ReconstructResponse_CanReturnACompleteHttpResponseWithAllFieldsFilled(t *testing.T) {
 	RegisterTestingT(t)
 
