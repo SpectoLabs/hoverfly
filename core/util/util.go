@@ -45,6 +45,26 @@ func GetResponseBody(response *http.Response) (string, error) {
 	return string(bodyBytes), nil
 }
 
+func GetResponseHeaders(response *http.Response) map[string][]string {
+	if response.Trailer == nil {
+		return response.Header
+	}
+
+	headers := make(map[string][]string)
+	for key, value := range response.Header {
+		headers[key] = value
+	}
+
+	var trailerKeys []string
+	for key, value := range response.Trailer {
+		headers[key] = value
+		trailerKeys = append(trailerKeys, key)
+	}
+
+	headers["Trailer"] = trailerKeys
+	return headers
+}
+
 func GetUnixTimeQueryParam(request *http.Request, paramName string) *time.Time {
 	var timeQuery *time.Time
 	epochValue, _ := strconv.Atoi(request.URL.Query().Get(paramName))
