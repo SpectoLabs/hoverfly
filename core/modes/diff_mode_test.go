@@ -39,6 +39,13 @@ func (this hoverflyDiffStub) DoRequest(request *http.Request) (*http.Response, e
 			Body:       ioutil.NopCloser(bytes.NewBufferString("actual")),
 			Header:     map[string][]string{"header": {"actual"}, "source": {"service"}},
 		}, nil
+	case "positive-match-with-different-trailers.com":
+		return &http.Response{
+			StatusCode: 200,
+			Body:       ioutil.NopCloser(bytes.NewBufferString("actual")),
+			Header:     map[string][]string{"header": {"actual"}},
+			Trailer:	map[string][]string{"trailer1": {"actual"}},
+		}, nil
 	default:
 		return &http.Response{
 			StatusCode: 200,
@@ -54,6 +61,12 @@ func (this hoverflyDiffStub) GetResponse(requestDetails models.RequestDetails) (
 			Status:  200,
 			Body:    "expected",
 			Headers: map[string][]string{"header": {"expected"}},
+		}, nil
+	case "positive-match-with-different-trailers.com":
+		return &models.ResponseDetails{
+			Status:  200,
+			Body:    "actual",
+			Headers: map[string][]string{"header": {"simulated"}, "Trailer": {"trailer1"}, "trailer1": {"simulated"}},
 		}, nil
 	case "positive-match-with-different-response.com":
 		return &models.ResponseDetails{
@@ -132,8 +145,36 @@ func Test_DiffMode_WhenGivenAMatchingRequestReturningDifferentResponse(t *testin
 	Expect(response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
 		v2.DiffReportEntry{Field: "header/source", Expected: "[simulation]", Actual: "[service]"},
-		v2.DiffReportEntry{"header/header", "[simulated]", "[actual]"},
-		v2.DiffReportEntry{"body", "simulated", "actual"}))
+		v2.DiffReportEntry{Field: "header/header", Expected: "[simulated]", Actual: "[actual]"},
+		v2.DiffReportEntry{Field: "body", Expected: "simulated", Actual: "actual"}))
+}
+
+func Test_DiffMode_IncludeResponseTrailerForDiffing(t *testing.T) {
+	RegisterTestingT(t)
+
+	//given
+	unit := &DiffMode{
+		Hoverfly: hoverflyDiffStub{},
+	}
+
+	request := models.RequestDetails{
+		Scheme:      "http",
+		Destination: "positive-match-with-different-trailers.com",
+	}
+
+	// when
+	response, err := unit.Process(nil, request)
+
+	// then
+	Expect(err).To(BeNil())
+	Expect(response.StatusCode).To(Equal(http.StatusOK))
+
+	Expect(len(response.Header)).To(Equal(1))
+	Expect(response.Header["header"]).To(Equal([]string{"actual"}))
+	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
+		v2.DiffReportEntry{Field: "header/header", Expected: "[simulated]", Actual: "[actual]"},
+		v2.DiffReportEntry{Field: "header/trailer1", Expected: "[simulated]", Actual: "[actual]"},
+		))
 }
 
 func Test_DiffMode_BlacklistAllHeaders(t *testing.T) {

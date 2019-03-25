@@ -77,11 +77,12 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 
 	if simRespErr == nil {
 		respBody, _ := util.GetResponseBody(actualResponse)
+		respHeaders := util.GetResponseHeaders(actualResponse)
 
 		actualResponseDetails := &models.ResponseDetails{
 			Status:  actualResponse.StatusCode,
 			Body:    string(respBody),
-			Headers: actualResponse.Header,
+			Headers: respHeaders,
 		}
 
 		this.diffResponse(simResponse, actualResponseDetails, this.Arguments.Headers)
