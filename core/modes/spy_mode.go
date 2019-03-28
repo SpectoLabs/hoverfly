@@ -49,7 +49,7 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 
 	if matchingErr != nil {
 		log.Info("Going to call real server")
-		modifiedRequest, err := ReconstructRequestForPassThrough(pair)
+		modifiedRequest, err := ReconstructRequest(pair)
 		if err == nil {
 			response, err := this.Hoverfly.DoRequest(modifiedRequest)
 			if err == nil {

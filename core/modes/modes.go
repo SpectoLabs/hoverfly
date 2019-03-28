@@ -62,33 +62,16 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 	}
 
 	newRequest.Method = pair.Request.Method
-
-	t := &url.URL{Path: pair.Request.QueryString()}
-	newRequest.URL.RawQuery = t.String()
 	newRequest.Header = pair.Request.Headers
 
-	return newRequest, nil
-}
-
-// ReconstructRequest replaces original request with details provided in Constructor Payload.RequestMatcher
-func ReconstructRequestForPassThrough(pair models.RequestResponsePair) (*http.Request, error) {
-	if pair.Request.Destination == "" {
-		return nil, fmt.Errorf("failed to reconstruct request, destination not specified")
+	if pair.Request.GetRawQuery() == "" {
+		// rawQuery is empty if middleware is applied, as unexported fields are not marshal, hence re-encoding of the query params is needed here
+		t := &url.URL{Path: pair.Request.QueryString()}
+		newRequest.URL.RawQuery = t.String()
+	} else {
+		// otherwise we use the original raw query for pass-through
+		newRequest.URL.RawQuery = pair.Request.GetRawQuery()
 	}
-
-	newRequest, err := http.NewRequest(
-		pair.Request.Method,
-		fmt.Sprintf("%s://%s%s", pair.Request.Scheme, pair.Request.Destination, pair.Request.Path),
-		bytes.NewBuffer([]byte(pair.Request.Body)))
-
-	if err != nil {
-		return nil, err
-	}
-
-	newRequest.Method = pair.Request.Method
-
-	newRequest.URL.RawQuery = pair.Request.GetRawQuery()
-	newRequest.Header = pair.Request.Headers
 
 	return newRequest, nil
 }

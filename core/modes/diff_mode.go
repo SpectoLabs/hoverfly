@@ -61,7 +61,7 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 	simResponse, simRespErr := this.Hoverfly.GetResponse(details)
 
 	log.Info("Going to call real server")
-	modifiedRequest, err := ReconstructRequestForPassThrough(actualPair)
+	modifiedRequest, err := ReconstructRequest(actualPair)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &actualPair, "There was an error when reconstructing the request.", Diff)
 	}
