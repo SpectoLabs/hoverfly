@@ -54,3 +54,166 @@ func Test_JsonPartialMatch_MatchesFalseInvalidJson(t *testing.T) {
 
 	Expect(matchers.JsonPartialMatch(`{"test":{"json":true,"minified":true}}`, `{"test":{"json":true,"minified":}}`)).To(BeFalse())
 }
+
+func Test_JsonPartialMatch_MatchesTrueDeep(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonPartialMatch(
+		`{
+  "fieldA": "valueA"
+}`,
+		`{
+	"test": {
+		"json": true,
+		"minified": true,
+		"someObject": {
+			"fieldA": "valueA"
+		}
+}}`)).To(BeTrue())
+}
+
+func Test_JsonPartialMatch_MatchesTrueDeepArrayInside(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonPartialMatch(
+		`{
+  "NAME": "79684881033",
+  "REDIRECT_NUMBER": "79684881033"
+}`,
+		`{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "result": {
+    "redirect_type": 1,
+    "followme_struct": [
+      3,
+      [
+        {
+          "I_FOLLOW_ORDER": "1",
+          "ACTIVE": "Y",
+          "NAME": "79684881033",
+          "REDIRECT_NUMBER": "79684881033",
+          "PERIOD": "always",
+          "PERIOD_DESCRIPTION": "always",
+          "TIMEOUT": "15"
+        },
+        {
+          "I_FOLLOW_ORDER": "2",
+          "ACTIVE": "Y",
+          "NAME": "79684881034",
+          "REDIRECT_NUMBER": "79684881034",
+          "PERIOD": "always",
+          "PERIOD_DESCRIPTION": "always",
+          "TIMEOUT": "15"
+        }
+      ]
+    ]
+  }
+}`)).To(BeTrue())
+}
+
+func Test_JsonPartialMatch_MatchesTrueDeepComplexWithArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonPartialMatch(
+		`{
+    "redirect_type": 1,
+    "followme_struct": [
+      3,
+      [
+        {
+          "I_FOLLOW_ORDER": "2",
+          "ACTIVE": "Y",
+          "NAME": "79684881034",
+          "REDIRECT_NUMBER": "79684881034",
+          "PERIOD": "always",
+          "PERIOD_DESCRIPTION": "always",
+          "TIMEOUT": "15"
+        }
+      ]
+    ]
+}`,
+		`{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "result": {
+    "redirect_type": 1,
+    "followme_struct": [
+      3,
+      [
+        {
+          "I_FOLLOW_ORDER": "1",
+          "ACTIVE": "Y",
+          "NAME": "79684881033",
+          "REDIRECT_NUMBER": "79684881033",
+          "PERIOD": "always",
+          "PERIOD_DESCRIPTION": "always",
+          "TIMEOUT": "15"
+        },
+        {
+          "I_FOLLOW_ORDER": "2",
+          "ACTIVE": "Y",
+          "NAME": "79684881034",
+          "REDIRECT_NUMBER": "79684881034",
+          "PERIOD": "always",
+          "PERIOD_DESCRIPTION": "always",
+          "TIMEOUT": "15"
+        }
+      ]
+    ]
+  }
+}`)).To(BeTrue())
+}
+
+func Test_JsonPartialMatch_MatchesFalseDeepComplexWithArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonPartialMatch(
+		`{
+    "redirect_type": 1,
+    "followme_struct": [
+      3,
+      [
+        {
+          "I_FOLLOW_ORDER": "2",
+          "ACTIVE": "Y",
+          "NAME": "WRONG_NAME",
+          "REDIRECT_NUMBER": "79684881034",
+          "PERIOD": "always",
+          "PERIOD_DESCRIPTION": "always",
+          "TIMEOUT": "15"
+        }
+      ]
+    ]
+}`,
+		`{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "result": {
+    "redirect_type": 1,
+    "followme_struct": [
+      3,
+      [
+        {
+          "I_FOLLOW_ORDER": "1",
+          "ACTIVE": "Y",
+          "NAME": "79684881033",
+          "REDIRECT_NUMBER": "79684881033",
+          "PERIOD": "always",
+          "PERIOD_DESCRIPTION": "always",
+          "TIMEOUT": "15"
+        },
+        {
+          "I_FOLLOW_ORDER": "2",
+          "ACTIVE": "Y",
+          "NAME": "79684881034",
+          "REDIRECT_NUMBER": "79684881034",
+          "PERIOD": "always",
+          "PERIOD_DESCRIPTION": "always",
+          "TIMEOUT": "15"
+        }
+      ]
+    ]
+  }
+}`)).To(BeFalse())
+}
