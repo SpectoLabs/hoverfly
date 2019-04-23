@@ -113,3 +113,31 @@ func Test_SpyMode_WhenGivenAMatchingRequesAndMiddlewareFaislItReturnsAnError(t *
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when executing middleware"))
 	Expect(string(responseBody)).To(ContainSubstring("middleware-error"))
 }
+
+func Test_SpyMode_ShouldReturnErrorOnRemoteServiceCall(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := &modes.SpyMode{
+		Hoverfly: hoverflySpyStub{},
+	}
+
+	requestDetails := models.RequestDetails{
+		Scheme:      "http",
+		Destination: "error.com",
+	}
+
+	request, err := http.NewRequest("GET", "http://error.com", nil)
+	Expect(err).To(BeNil())
+
+	response, err := unit.Process(request, requestDetails)
+	Expect(err).ToNot(BeNil())
+
+	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
+
+	responseBody, err := ioutil.ReadAll(response.Body)
+	Expect(err).To(BeNil())
+
+	Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended destination"))
+	Expect(string(responseBody)).To(ContainSubstring("Could not reach error.com"))
+
+}
