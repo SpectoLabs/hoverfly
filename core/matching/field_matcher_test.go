@@ -144,6 +144,17 @@ var fieldMatcherTests = []fieldMatcherTest{
 		toMatch:     "test",
 		scoreEquals: Equal(4),
 	},
+	{
+		name: "MatcherNameShouldBeCaseInsensitive",
+		matchers: []models.RequestFieldMatchers{
+			{
+				Matcher: "XML",
+				Value:   `<document></document>`,
+			},
+		},
+		toMatch: `<document></document>`,
+		equals:  BeTrue(),
+	},
 }
 
 func Test_FieldMatcher(t *testing.T) {
