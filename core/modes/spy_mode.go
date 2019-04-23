@@ -50,17 +50,16 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 	if matchingErr != nil {
 		log.Info("Going to call real server")
 		modifiedRequest, err := ReconstructRequest(pair)
-		if err == nil {
-			response, err := this.Hoverfly.DoRequest(modifiedRequest)
-			if err == nil {
-				log.Info("Going to return response from real server")
-				return response, nil
-			}
+		if err != nil {
+			return ReturnErrorAndLog(request, err, &pair, "There was an error when reconstructing the request.", Spy)
 		}
-	}
-
-	if matchingErr != nil {
-		return ReturnErrorAndLog(request, matchingErr, &pair, "There was an error when matching", Simulate)
+		response, err := this.Hoverfly.DoRequest(modifiedRequest)
+		if err == nil {
+			log.Info("Going to return response from real server")
+			return response, nil
+		} else {
+			return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended destination", Spy)
+		}
 	}
 
 	pair.Response = *response
@@ -68,6 +67,6 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 	if pair, err := this.Hoverfly.ApplyMiddleware(pair); err == nil {
 		return ReconstructResponse(request, pair), nil
 	} else {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Simulate)
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Spy)
 	}
 }
