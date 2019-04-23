@@ -96,9 +96,9 @@ var (
 	upstreamProxy = flag.String("upstream-proxy", "", "Specify an upstream proxy for hoverfly to route traffic through")
 	httpsOnly     = flag.Bool("https-only", false, "Allow only secure secure requests to be proxied by hoverfly")
 
-	databasePath = flag.String("db-path", "", "Database location - supply it to provide specific database location (will be created there if it doesn't exist)")
-	database     = flag.String("db", inmemoryBackend, "Storage to use - 'boltdb' or 'memory' which will not write anything to disk")
-	disableCache = flag.Bool("disable-cache", false, "Disable request/response cache (the cache that sits in front of matching)")
+	databasePath = flag.String("db-path", "", "A path to a BoltDB file with persisted user and token data for authentication (DEPRECATED)")
+	database     = flag.String("db", inmemoryBackend, "Storage to use - 'boltdb' or 'memory' which will not write anything to disk (DEPRECATED)")
+	disableCache = flag.Bool("disable-cache", false, "Disable the request/response cache (the cache that sits in front of matching)")
 
 	logsFormat = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\"")
 	logsSize   = flag.Int("logs-size", 1000, "Set the amount of logs to be stored in memory")
