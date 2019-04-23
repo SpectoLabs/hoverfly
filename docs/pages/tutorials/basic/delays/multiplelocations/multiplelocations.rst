@@ -19,3 +19,7 @@ Now run the following to import the edited ``simulation.json`` file and run the 
    :language: sh
 
 You should notice a 2 second delay on responses from ``echo.jsontest.com/a/b`` and ``echo.jsontest.com/b/c``, and a 3 second delay on the response from ``echo.jsontest.com/c/d``.
+
+.. note::
+
+  When you use :ref:`webserver`, you should replace or remove any original host pattern in the ``urlPattern`` filter, because the endpoint URL is based on Hoverfly webserver address (eg. ``http://localhost:8888``).
