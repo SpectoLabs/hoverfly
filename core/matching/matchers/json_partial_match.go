@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-var JsonPartial = "jsonPartial"
+var JsonPartial = "jsonpartial"
 
 func JsonPartialMatch(match interface{}, toMatch string) bool {
 	var expected, actual map[string]interface{}
