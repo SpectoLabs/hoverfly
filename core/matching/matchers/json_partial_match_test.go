@@ -10,7 +10,22 @@ import (
 func Test_JsonPartialMatch_MatchesTrueWithEqualsJSON(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.JsonPartialMatch(`{"test":{"json":true,"minified":true}}`, `{"test":{"json":true,"minified":true}}`)).To(BeTrue())
+	Expect(matchers.JsonPartialMatch(`
+	{
+        "name": "Object 2",
+        "set": false,
+        "age": 400
+    }`, `{
+"objects": [
+    {
+        "name": "Object 1",
+        "set": true
+    },{
+        "name": "Object 2",
+        "set": false,
+        "age": 400
+    }]
+}`)).To(BeTrue())
 }
 
 func Test_JsonPartialMatch_MatchesTrueWithNotOrderedJSON(t *testing.T) {
