@@ -346,6 +346,95 @@ Example
 |
 |
 
+JSON partial matcher
+--------------------
+Unlike a JSON matcher which does the full matching of two JSON documents, this matcher evaluates if the matcher value is a subset of the incoming JSON document. The matcher ignores any absent fields and lets you match only the part of JSON document you care about.
+
+Example
+"""""""
+
+.. code:: json
+
+   "matcher": "jsonPartial"
+   "value": "?"
+
+.. raw:: html
+
+    <table border="1" class="docutils matcher-examples">
+        <thead>
+            <tr class="row-odd">
+                <th class="head">String to match</th>
+                <th class="head">Matcher value</th>
+                <th class="head">Match</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="row-even">
+                <td class="example">{
+    "objects": [
+        {
+            "name": "Object 1",
+        },{
+            "name": "Object 2",
+            "set": false,
+            "age": 400
+        }]
+    }</td>
+                <td class="example">{
+    "objects": [
+        {
+            "name": "Object 1"
+        },{
+            "name": "Object 2"
+        }]
+    }</td>
+                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
+            <tr/>
+    <tr class="row-odd">
+        <td class="example">
+        {
+            "name": "Object 2",
+            "set": false,
+            "age": 400
+        }
+        </td>
+                <td class="example">{
+    "objects": [
+        {
+            "name": "Object 1"
+        },{
+            "name": "Object 2"
+        }]
+    }</td>
+                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
+            <tr/>
+            <tr class="row-even">
+                <td class="example">{
+    "objects": [
+        {
+            "name": "Object 1",
+            "set": true
+        }]
+    }</td>
+                <td class="example">{
+    "objects": [
+        {
+            "name": "Object 1",
+            "set": true
+        },{
+            "name": "Object 2",
+            "set": false,
+            "age": 400
+        }]
+    }</td>
+                <td class="example-icon"><span class="fa fa-times fa-failure"></span></td>
+            <tr/>
+        </tbody>
+    </table>
+
+|
+|
+
 JSONPath matcher
 ----------------
 Parses the matcher value as a JSONPath expression, transforms the string to match into a JSON object and then executes 
