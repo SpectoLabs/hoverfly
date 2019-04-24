@@ -391,21 +391,21 @@ Example
                 <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
             <tr/>
     <tr class="row-odd">
-        <td class="example">
+        <td class="example">{
+    "objects": [
         {
+            "name": "Object 1",
+        },{
             "name": "Object 2",
             "set": false,
             "age": 400
-        }
-        </td>
-                <td class="example">{
-    "objects": [
-        {
-            "name": "Object 1"
-        },{
-            "name": "Object 2"
         }]
     }</td>
+                <td class="example">{
+            "name": "Object 2",
+            "set": false,
+            "age": 400
+        }</td>
                 <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
             <tr/>
             <tr class="row-even">
