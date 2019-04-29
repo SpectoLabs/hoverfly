@@ -16,16 +16,11 @@ Welcome to the Hoverfly issue tracker! Before creating an issue, please note:
 -->
 
 ## Description of the bug
-A clear and concise description of what the bug is.
 
 ## Context information (for bug reports)
 What you were doing
 
 ## Steps to reproduce the issue
-
-1.
-2.
-3.
 
 ### Observed result
 **Hoverfly error messages seen (If none, say none)**
@@ -39,8 +34,5 @@ What you were doing
 
 
 ## Additional relevant information
-If not indicated above:
-1. OS and version: e.g. macOS Mojave, Windows 10, Red Hat Linux, ...
-2. Hoverfly version: e.g.0.17.7
-3. Tools/Browser you were using
-4. Anything that might help us to diagnose the problem
+1. Hoverfly version: e.g.0.17.7
+2. Anything that might help us to diagnose the problem
