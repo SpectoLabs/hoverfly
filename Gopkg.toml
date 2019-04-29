@@ -63,7 +63,7 @@
 
 [[constraint]]
   name = "github.com/SpectoLabs/goproxy"
-  revision = "050cbde4e150a66ef7aee6a1b484c4ec4176016d"
+  revision = "099e21af66f620451825ea916202f28975083a61"
 
 [[constraint]]
   branch = "master"
