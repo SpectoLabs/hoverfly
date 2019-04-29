@@ -17,9 +17,6 @@ Welcome to the Hoverfly issue tracker! Before creating an issue, please note:
 
 ## Description of the bug
 
-## Context information (for bug reports)
-What you were doing
-
 ## Steps to reproduce the issue
 
 ### Observed result
@@ -34,5 +31,5 @@ What you were doing
 
 
 ## Additional relevant information
-1. Hoverfly version: e.g.0.17.7
+1. Hoverfly version: 
 2. Anything that might help us to diagnose the problem
