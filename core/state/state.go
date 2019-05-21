@@ -17,18 +17,17 @@ func NewState() *State {
 	}
 }
 
-func NewStateFromState(incomingState map[string]string) *State {
-	state := &State{
-		State: map[string]string{},
-	}
+func (s *State) InitializeSequences(incomingState map[string]string) {
+
+	s.RWMutex.Lock()
 
 	for stateKey := range incomingState {
 		if strings.Contains(stateKey, "sequence:") {
-			state.State[stateKey] = "1"
+			s.State[stateKey] = "1"
 		}
 	}
 
-	return state
+	s.RWMutex.Unlock()
 }
 
 func (s *State) GetState(key string) string {

@@ -186,8 +186,6 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
-	RegisterTestingT(t)
-
 	originalPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
 			Status:      200,
@@ -297,8 +295,6 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
-
-	RegisterTestingT(t)
 
 	originalPair1 := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -517,15 +513,13 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 	}))
 }
 
-func TestImportImportRequestResponsePairs_CanImportARequesResponsePairView(t *testing.T) {
+func TestImportImportRequestResponsePairs_CanImportARequestResponsePairView(t *testing.T) {
 	RegisterTestingT(t)
 
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
-
-	RegisterTestingT(t)
 
 	request := v2.RequestMatcherViewV5{
 		Method: []v2.MatcherViewV5{
@@ -574,8 +568,6 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
-
-	RegisterTestingT(t)
 
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -651,8 +643,6 @@ func TestImportImportRequestResponsePairs_SetsState(t *testing.T) {
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
-	RegisterTestingT(t)
-
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
 			Status:      200,
@@ -678,7 +668,7 @@ func TestImportImportRequestResponsePairs_SetsState(t *testing.T) {
 	Expect(hv.state.GetState("sequence:1")).To(Equal("1"))
 }
 
-func TestImportImportRequestResponsePairs_ReturnsWarningsIfDeprecatedQuerytSet(t *testing.T) {
+func TestImportImportRequestResponsePairsMultipleTimes_SetsAllStates(t *testing.T) {
 	RegisterTestingT(t)
 
 	cache := cache.NewDefaultLRUCache()
@@ -686,7 +676,56 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsIfDeprecatedQuerytSet(t
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
+	pair1 := v2.RequestMatcherResponsePairViewV5{
+		Response: v2.ResponseDetailsViewV5{
+			Status:      200,
+			Body:        "hello_world"},
+		RequestMatcher: v2.RequestMatcherViewV5{
+			Path: []v2.MatcherViewV5{
+				{
+					Matcher: matchers.Exact,
+					Value:   "/1",
+				},
+			},
+			RequiresState: map[string]string{
+				"sequence:1": "1",
+			},
+		},
+	}
+	pair2 := v2.RequestMatcherResponsePairViewV5{
+		Response: v2.ResponseDetailsViewV5{
+			Status:      200,
+			Body:        "hello_world"},
+		RequestMatcher: v2.RequestMatcherViewV5{
+			Body: []v2.MatcherViewV5{
+				{
+					Matcher: matchers.Exact,
+					Value:   "/2",
+				},
+			},
+			RequiresState: map[string]string{
+				"sequence:2": "1",
+			},
+		},
+	}
+
+
+	result1 := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{pair1})
+	Expect(result1.WarningMessages).To(HaveLen(0))
+	result2 := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{pair2})
+	Expect(result2.WarningMessages).To(HaveLen(0))
+
+	Expect(hv.state.GetState("sequence:1")).To(Equal("1"))
+	Expect(hv.state.GetState("sequence:2")).To(Equal("1"))
+}
+
+func TestImportImportRequestResponsePairs_ReturnsWarningsIfDeprecatedQuerytSet(t *testing.T) {
 	RegisterTestingT(t)
+
+	cache := cache.NewDefaultLRUCache()
+	cfg := Configuration{Webserver: false}
+	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -717,8 +756,6 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthAndTransfe
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
-
-	RegisterTestingT(t)
 
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -754,8 +791,6 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthMismatch(t
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
-	RegisterTestingT(t)
-
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
 			Status:      200,
@@ -789,8 +824,6 @@ func TestImportImportRequestResponsePairs_ReturnsNoWarnings(t *testing.T) {
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
-	RegisterTestingT(t)
-
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
 			Status: 200,
@@ -821,8 +854,6 @@ func TestImportImportRequestResponsePairs_ReturnsNoWarnings_Encoded(t *testing.T
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
-
-	RegisterTestingT(t)
 
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{

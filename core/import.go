@@ -3,6 +3,7 @@ package hoverfly
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/state"
 	"net/url"
 	"os"
 	"path"
@@ -13,10 +14,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/state"
+	log "github.com/sirupsen/logrus"
 )
 
 // Import is a function that based on input decides whether it is a local resource or whether
@@ -167,7 +167,10 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 			continue
 		}
 
-		hf.state = state.NewStateFromState(initialStates)
+		if hf.state == nil {
+			hf.state = state.NewState()
+		}
+		hf.state.InitializeSequences(initialStates)
 
 		log.WithFields(log.Fields{
 			"total":      len(pairViews),
