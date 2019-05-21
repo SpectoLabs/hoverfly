@@ -172,6 +172,14 @@ This puts the supplied simulation JSON into Hoverfly, overwriting any existing s
       }
     }
 
+
+-------------------------------------------------------------------------------------------------------------
+
+DELETE /api/v2/simulation
+"""""""""""""""""""""""""
+
+Unsets the simulation data for Hoverfly.
+
 -------------------------------------------------------------------------------------------------------------
 
 GET /api/v2/simulation/schema
