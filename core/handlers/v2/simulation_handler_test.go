@@ -477,6 +477,105 @@ func TestSimulationHandler_Put_ReturnsWarnings(t *testing.T) {
 
 }
 
+func TestSimulationHandler_Post_PassesDataIntoHoverfly(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationStub{}
+
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("POST", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`
+	{
+		"data": {
+			"pairs": [
+				{
+					"request": {
+						"destination": {
+							"exactMatch": "test.org"
+						}
+					},
+					"response": {
+						"status": 200
+					}
+				}
+			],
+
+			"globalActions": {
+				"delays": [
+					{
+						"urlPattern": "test.org",
+						"httpMethod": "GET",
+						"delay": 200
+					}
+				]
+			}
+		},
+		"meta": {
+			"schemaVersion": "v3"
+		}
+	}
+	`))))
+	Expect(err).To(BeNil())
+
+	makeRequestOnHandler(unit.Post, request)
+
+	Expect(stubHoverfly.Simulation).ToNot(BeNil())
+	Expect(stubHoverfly.Simulation.RequestResponsePairs).ToNot(BeNil())
+
+	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("exact"))
+	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("test.org"))
+	Expect(stubHoverfly.Simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
+
+	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].UrlPattern).To(Equal("test.org"))
+	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].HttpMethod).To(Equal("GET"))
+	Expect(stubHoverfly.Simulation.GlobalActions.Delays[0].Delay).To(Equal(200))
+}
+
+func TestSimulationHandler_Post_NotCallsDelete(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflySimulationStub{}
+
+	unit := SimulationHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("POST", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`
+	{
+		"data": {
+			"pairs": [
+				{
+					"request": {
+						"destination": {
+							"exactMatch": "test.org"
+						}
+					},
+					"response": {
+						"status": 200
+					}
+				}
+			],
+
+			"globalActions": {
+				"delays": [
+					{
+						"urlPattern": "test.org",
+						"httpMethod": "GET",
+						"delay": 200
+					}
+				]
+			}
+		},
+		"meta": {
+			"schemaVersion": "v3"
+		}
+	}
+	`))))
+	Expect(err).To(BeNil())
+
+	makeRequestOnHandler(unit.Post, request)
+
+	Expect(stubHoverfly.Deleted).To(BeFalse())
+}
+
 func Test_SimulationHandler_Options_GetsOptions(t *testing.T) {
 	RegisterTestingT(t)
 

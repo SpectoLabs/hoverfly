@@ -443,4 +443,254 @@ var _ = Describe("/api/v2/simulation", func() {
 			Expect(string(responseBody)).To(ContainSubstring("WARNING: Response contains incorrect Content-Length header on data.pairs[0].response, please correct or remove header"))
 		})
 	})
+
+	Context("POST", func() {
+
+		It("Should append data using a POST", func() {
+			// BeforeEach always imports a simulation into hoverfly, we need to clear the data for this test
+			req := sling.New().Delete("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+
+			req = sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+			payload := bytes.NewBufferString(`
+			{
+				"data": {
+					"pairs": [{
+						"request": {
+							"destination": {
+								"exactMatch": "destination-server.com"
+							},
+							"requiresState" : {
+								"burger" : "present"
+							}
+						},
+						"response": {
+							"status": 200,
+							"body": "destination matched",
+							"encodedBody": false,
+							"headers": {},
+							"templated" : false,
+							"transitionsState" : {
+								"foo" : "bar"
+							},
+							"removesState" : ["ham"]
+						}
+					}]
+				},
+				"meta": {
+					"schemaVersion": "v4"
+				}
+			}
+			`)
+
+			req.Body(payload)
+			res = functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+
+
+			req = sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+			payload = bytes.NewBufferString(`
+			{
+				"data": {
+					"pairs": [{
+						"request": {
+							"destination": {
+								"exactMatch": "destination-server2.com"
+							},
+							"requiresState" : {
+								"burger" : "present"
+							}
+						},
+						"response": {
+							"status": 400,
+							"body": "destination2 matched",
+							"encodedBody": false,
+							"headers": {},
+							"templated" : false,
+							"transitionsState" : {
+								"foo" : "bar"
+							},
+							"removesState" : ["ham"]
+						}
+					}]
+				},
+				"meta": {
+					"schemaVersion": "v4"
+				}
+			}
+			`)
+
+			req.Body(payload)
+			res = functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+
+			getReq := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+
+			getRes := functional_tests.DoRequest(getReq)
+			Expect(getRes.StatusCode).To(Equal(200))
+
+			defer getRes.Body.Close()
+
+			schemaObject, err := jason.NewObjectFromReader(getRes.Body)
+			Expect(err).To(BeNil())
+
+			dataObject, err := schemaObject.GetObject("data")
+			Expect(err).To(BeNil())
+
+			pairsArray, err := dataObject.GetObjectArray("pairs")
+			Expect(err).To(BeNil())
+
+			Expect(pairsArray).To(HaveLen(2))
+
+			requestObject1, err := pairsArray[0].GetObject("request")
+			Expect(err).To(BeNil())
+
+			destinationMatchers1, err := requestObject1.GetObjectArray("destination")
+			Expect(err).To(BeNil())
+
+			destinationMatcher1, err := destinationMatchers1[0].GetString("matcher")
+			Expect(err).To(BeNil())
+			Expect(destinationMatcher1).To(Equal("exact"))
+
+			destinationValue1, err := destinationMatchers1[0].GetString("value")
+			Expect(err).To(BeNil())
+			Expect(destinationValue1).To(Equal("destination-server.com"))
+
+			responseObject1, err := pairsArray[0].GetObject("response")
+			Expect(err).To(BeNil())
+
+			status1, err := responseObject1.GetNumber("status")
+			Expect(err).To(BeNil())
+			Expect(status1.String()).To(Equal("200"))
+
+			body1, err := responseObject1.GetString("body")
+			Expect(err).To(BeNil())
+			Expect(body1).To(Equal("destination matched"))
+
+			requestObject, err := pairsArray[1].GetObject("request")
+			Expect(err).To(BeNil())
+
+			destinationMatchers2, err := requestObject.GetObjectArray("destination")
+			Expect(err).To(BeNil())
+
+			destinationMatcher2, err := destinationMatchers2[0].GetString("matcher")
+			Expect(err).To(BeNil())
+			Expect(destinationMatcher2).To(Equal("exact"))
+
+			destinationValue2, err := destinationMatchers2[0].GetString("value")
+			Expect(err).To(BeNil())
+			Expect(destinationValue2).To(Equal("destination-server2.com"))
+
+			responseObject2, err := pairsArray[1].GetObject("response")
+			Expect(err).To(BeNil())
+
+			status2, err := responseObject2.GetNumber("status")
+			Expect(err).To(BeNil())
+			Expect(status2.String()).To(Equal("400"))
+
+			body2, err := responseObject2.GetString("body")
+			Expect(err).To(BeNil())
+			Expect(body2).To(Equal("destination2 matched"))
+		})
+
+		It("Should not append data with identical request matchers using a POST", func() {
+			// BeforeEach always imports a simulation into hoverfly, we need to clear the data for this test
+			req := sling.New().Delete("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+
+			req = sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+			simulation := `
+			{
+				"data": {
+					"pairs": [{
+						"request": {
+							"destination": {
+								"exactMatch": "destination-server.com"
+							},
+							"requiresState" : {
+								"burger" : "present"
+							}
+						},
+						"response": {
+							"status": 200,
+							"body": "destination matched",
+							"encodedBody": false,
+							"headers": {},
+							"templated" : false,
+							"transitionsState" : {
+								"foo" : "bar"
+							},
+							"removesState" : ["ham"]
+						}
+					}]
+				},
+				"meta": {
+					"schemaVersion": "v4"
+				}
+			}
+			`
+			payload := bytes.NewBufferString(simulation)
+
+			req.Body(payload)
+			res = functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+
+
+			req = sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+			payload = bytes.NewBufferString(simulation)
+
+			req.Body(payload)
+			res = functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(200))
+
+			getReq := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
+
+			getRes := functional_tests.DoRequest(getReq)
+			Expect(getRes.StatusCode).To(Equal(200))
+
+			defer getRes.Body.Close()
+
+			schemaObject, err := jason.NewObjectFromReader(getRes.Body)
+			Expect(err).To(BeNil())
+
+			dataObject, err := schemaObject.GetObject("data")
+			Expect(err).To(BeNil())
+
+			pairsArray, err := dataObject.GetObjectArray("pairs")
+			Expect(err).To(BeNil())
+
+			Expect(pairsArray).To(HaveLen(1))
+
+			requestObject, err := pairsArray[0].GetObject("request")
+			Expect(err).To(BeNil())
+
+			destinationMatchers, err := requestObject.GetObjectArray("destination")
+			Expect(err).To(BeNil())
+
+			destinationMatcher, err := destinationMatchers[0].GetString("matcher")
+			Expect(err).To(BeNil())
+			Expect(destinationMatcher).To(Equal("exact"))
+
+			destinationValue, err := destinationMatchers[0].GetString("value")
+			Expect(err).To(BeNil())
+			Expect(destinationValue).To(Equal("destination-server.com"))
+
+			responseObject, err := pairsArray[0].GetObject("response")
+			Expect(err).To(BeNil())
+
+			status, err := responseObject.GetNumber("status")
+			Expect(err).To(BeNil())
+			Expect(status.String()).To(Equal("200"))
+
+			body, err := responseObject.GetString("body")
+			Expect(err).To(BeNil())
+			Expect(body).To(Equal("destination matched"))
+
+			encodedBody, err := responseObject.GetBoolean("encodedBody")
+			Expect(err).To(BeNil())
+			Expect(encodedBody).To(BeFalse())
+		})
+	})
 })
