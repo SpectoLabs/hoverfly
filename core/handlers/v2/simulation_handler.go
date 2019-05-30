@@ -34,6 +34,10 @@ func (this *SimulationHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHa
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Put),
 	))
+	mux.Post("/api/v2/simulation", negroni.New(
+		negroni.HandlerFunc(am.RequireTokenAuthentication),
+		negroni.HandlerFunc(this.Post),
+	))
 	mux.Delete("/api/v2/simulation", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(this.Delete),
@@ -81,6 +85,37 @@ func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, nex
 	}
 
 	this.Hoverfly.DeleteSimulation()
+
+	result := this.Hoverfly.PutSimulation(simulationView)
+	if result.err != nil {
+
+		log.WithFields(log.Fields{
+			"body": string(body),
+		}).Debug(result.err.Error())
+
+		handlers.WriteErrorResponse(w, "An error occurred: "+result.err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if len(result.WarningMessages) > 0 {
+		bytes, _ := util.JSONMarshal(result)
+
+		handlers.WriteResponse(w, bytes)
+		return
+	}
+
+	this.Get(w, req, next)
+}
+
+
+// TODO Refactor to reduce duplicated code
+func (this *SimulationHandler) Post(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	body, _ := ioutil.ReadAll(req.Body)
+
+	simulationView, err := NewSimulationViewFromRequestBody(body)
+	if err != nil {
+		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	result := this.Hoverfly.PutSimulation(simulationView)
 	if result.err != nil {
