@@ -2,6 +2,7 @@ package v2
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"io/ioutil"
@@ -76,61 +77,17 @@ func (this *SimulationHandler) Get(w http.ResponseWriter, req *http.Request, nex
 }
 
 func (this *SimulationHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	body, _ := ioutil.ReadAll(req.Body)
-
-	simulationView, err := NewSimulationViewFromRequestBody(body)
+	err := this.addSimulation(w, req, true)
 	if err != nil {
-		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	this.Hoverfly.DeleteSimulation()
-
-	result := this.Hoverfly.PutSimulation(simulationView)
-	if result.err != nil {
-
-		log.WithFields(log.Fields{
-			"body": string(body),
-		}).Debug(result.err.Error())
-
-		handlers.WriteErrorResponse(w, "An error occurred: "+result.err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if len(result.WarningMessages) > 0 {
-		bytes, _ := util.JSONMarshal(result)
-
-		handlers.WriteResponse(w, bytes)
 		return
 	}
 
 	this.Get(w, req, next)
 }
 
-
-// TODO Refactor to reduce duplicated code
 func (this *SimulationHandler) Post(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	body, _ := ioutil.ReadAll(req.Body)
-
-	simulationView, err := NewSimulationViewFromRequestBody(body)
+	err := this.addSimulation(w, req, false)
 	if err != nil {
-		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	result := this.Hoverfly.PutSimulation(simulationView)
-	if result.err != nil {
-
-		log.WithFields(log.Fields{
-			"body": string(body),
-		}).Debug(result.err.Error())
-
-		handlers.WriteErrorResponse(w, "An error occurred: "+result.err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if len(result.WarningMessages) > 0 {
-		bytes, _ := util.JSONMarshal(result)
-
-		handlers.WriteResponse(w, bytes)
 		return
 	}
 
@@ -156,4 +113,36 @@ func (this *SimulationHandler) GetSchema(w http.ResponseWriter, req *http.Reques
 
 func (this *SimulationHandler) OptionsSchema(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Header().Add("Allow", "OPTIONS, GET")
+}
+
+func (this *SimulationHandler) addSimulation(w http.ResponseWriter, req *http.Request, overrideExisting bool) error {
+	body, _ := ioutil.ReadAll(req.Body)
+
+	simulationView, err := NewSimulationViewFromRequestBody(body)
+	if err != nil {
+		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
+		return err
+	}
+
+	if overrideExisting {
+		this.Hoverfly.DeleteSimulation()
+	}
+
+	result := this.Hoverfly.PutSimulation(simulationView)
+	if result.err != nil {
+
+		log.WithFields(log.Fields{
+			"body": string(body),
+		}).Debug(result.err.Error())
+
+		handlers.WriteErrorResponse(w, "An error occurred: "+result.err.Error(), http.StatusInternalServerError)
+		return err
+	}
+	if len(result.WarningMessages) > 0 {
+		bytes, _ := util.JSONMarshal(result)
+
+		handlers.WriteResponse(w, bytes)
+		return fmt.Errorf("import simulation result has warnings")
+	}
+	return nil
 }
