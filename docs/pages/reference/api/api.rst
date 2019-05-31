@@ -16,6 +16,66 @@ Gets all simulation data. The simulation JSON contains all the information Hover
       "data": {
         "pairs": [
           {
+            "request": {
+              "path": [
+                {
+                  "matcher": "exact",
+                  "value": "/"
+                }
+              ],
+              "method": [
+                {
+                  "matcher": "exact",
+                  "value": "GET"
+                }
+              ],
+              "destination": [
+                {
+                  "matcher": "exact",
+                  "value": "myhost.io"
+                }
+              ],
+              "scheme": [
+                {
+                  "matcher": "exact",
+                  "value": "https"
+                }
+              ],
+              "body": [
+                {
+                  "matcher": "exact",
+                  "value": ""
+                }
+              ],
+              "headers": {
+                "Accept": [
+                  {
+                    "matcher": "glob",
+                    "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+                  }
+                ],
+                "Content-Type": [
+                  {
+                    "matcher": "glob",
+                    "value": "text/plain; charset=utf-8"
+                  }
+                ],
+                "User-Agent": [
+                  {
+                    "matcher": "glob",
+                    "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
+                  }
+                ]
+              },
+              "query": {
+                "status": [
+                  {
+                    "matcher": "exact",
+                    "value": "available"
+                  }
+                ]
+              }
+            },
             "response": {
               "status": 200,
               "body": "<h1>Matched on recording</h1>",
@@ -24,41 +84,19 @@ Gets all simulation data. The simulation JSON contains all the information Hover
                 "Content-Type": [
                   "text/html; charset=utf-8"
                 ]
-              }
-            },
-            "request": {
-              "path": {
-	        "exactMatch": "/"
-	      },
-              "method": {
-	        "exactMatch": "GET"
               },
-	      "destination": {
-	        "exactMatch": "myhost.io"
-              },
-	      "scheme": {
-	        "exactMatch": "https"
-              },
-	      "query": {
-	        "exactMatch": ""
-	      },
-              "body": {
-	        "exactMatch": ""
-	      },
-              "headers": {
-                "Accept": [
-                  "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-                ],
-                "Content-Type": [
-                  "text/plain; charset=utf-8"
-                ],
-                "User-Agent": [
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
-                ]
-              }
+              "templated": false
             }
           },
           {
+            "request": {
+              "path": [
+                {
+                  "matcher": "exact",
+                  "value": "/template"
+                }
+              ]
+            },
             "response": {
               "status": 200,
               "body": "<h1>Matched on template</h1>",
@@ -69,22 +107,18 @@ Gets all simulation data. The simulation JSON contains all the information Hover
                 ]
               },
               "templated": false
-            },
-            "request": {
-              "path": {
-	        "exactMatch": "/template"
-	      }
             }
           }
         ],
         "globalActions": {
-          "delays": []
+          "delays": [],
+          "delaysLogNormal": []
         }
       },
       "meta": {
-        "schemaVersion": "v3",
-        "hoverflyVersion": "v0.11.0",
-        "timeExported": "2016-11-11T11:53:52Z"
+        "schemaVersion": "v5",
+        "hoverflyVersion": "v1.0.0",
+        "timeExported": "2019-05-30T22:14:24+01:00"
       }
     }
 
@@ -101,6 +135,66 @@ This puts the supplied simulation JSON into Hoverfly, overwriting any existing s
       "data": {
         "pairs": [
           {
+            "request": {
+              "path": [
+                {
+                  "matcher": "exact",
+                  "value": "/"
+                }
+              ],
+              "method": [
+                {
+                  "matcher": "exact",
+                  "value": "GET"
+                }
+              ],
+              "destination": [
+                {
+                  "matcher": "exact",
+                  "value": "myhost.io"
+                }
+              ],
+              "scheme": [
+                {
+                  "matcher": "exact",
+                  "value": "https"
+                }
+              ],
+              "body": [
+                {
+                  "matcher": "exact",
+                  "value": ""
+                }
+              ],
+              "headers": {
+                "Accept": [
+                  {
+                    "matcher": "glob",
+                    "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+                  }
+                ],
+                "Content-Type": [
+                  {
+                    "matcher": "glob",
+                    "value": "text/plain; charset=utf-8"
+                  }
+                ],
+                "User-Agent": [
+                  {
+                    "matcher": "glob",
+                    "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
+                  }
+                ]
+              },
+              "query": {
+                "status": [
+                  {
+                    "matcher": "exact",
+                    "value": "available"
+                  }
+                ]
+              }
+            },
             "response": {
               "status": 200,
               "body": "<h1>Matched on recording</h1>",
@@ -109,41 +203,19 @@ This puts the supplied simulation JSON into Hoverfly, overwriting any existing s
                 "Content-Type": [
                   "text/html; charset=utf-8"
                 ]
-              }
-            },
-            "request": {
-              "path": {
-	        "exactMatch": "/"
-	      },
-              "method": {
-	        "exactMatch": "GET"
               },
-	      "destination": {
-	        "exactMatch": "myhost.io"
-              },
-	      "scheme": {
-	        "exactMatch": "https"
-              },
-	      "query": {
-	        "exactMatch": ""
-	      },
-              "body": {
-	        "exactMatch": ""
-	      },
-              "headers": {
-                "Accept": [
-                  "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-                ],
-                "Content-Type": [
-                  "text/plain; charset=utf-8"
-                ],
-                "User-Agent": [
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
-                ]
-              }
+              "templated": false
             }
           },
           {
+            "request": {
+              "path": [
+                {
+                  "matcher": "exact",
+                  "value": "/template"
+                }
+              ]
+            },
             "response": {
               "status": 200,
               "body": "<h1>Matched on template</h1>",
@@ -152,28 +224,141 @@ This puts the supplied simulation JSON into Hoverfly, overwriting any existing s
                 "Content-Type": [
                   "text/html; charset=utf-8"
                 ]
-              }
-            },
-            "request": {
-              "path": {
-	        "exactMatch": "/template"
-	      }
+              },
+              "templated": false
             }
           }
         ],
         "globalActions": {
-          "delays": []
+          "delays": [],
+          "delaysLogNormal": []
         }
       },
       "meta": {
-        "schemaVersion": "v3",
-        "hoverflyVersion": "v0.11.0",
-        "timeExported": "2016-11-11T11:53:52Z"
+        "schemaVersion": "v5",
+        "hoverflyVersion": "v1.0.0",
+        "timeExported": "2019-05-30T22:14:24+01:00"
       }
     }
 
+POST /api/v2/simulation
+"""""""""""""""""""""""
 
--------------------------------------------------------------------------------------------------------------
+This appends the supplied simulation JSON to the existing simulation data in Hoverfly. Any pair that has request data identical to the existing ones will not be added.
+
+**Example request body**
+::
+
+    {
+      "data": {
+        "pairs": [
+          {
+            "request": {
+              "path": [
+                {
+                  "matcher": "exact",
+                  "value": "/"
+                }
+              ],
+              "method": [
+                {
+                  "matcher": "exact",
+                  "value": "GET"
+                }
+              ],
+              "destination": [
+                {
+                  "matcher": "exact",
+                  "value": "myhost.io"
+                }
+              ],
+              "scheme": [
+                {
+                  "matcher": "exact",
+                  "value": "https"
+                }
+              ],
+              "body": [
+                {
+                  "matcher": "exact",
+                  "value": ""
+                }
+              ],
+              "headers": {
+                "Accept": [
+                  {
+                    "matcher": "glob",
+                    "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+                  }
+                ],
+                "Content-Type": [
+                  {
+                    "matcher": "glob",
+                    "value": "text/plain; charset=utf-8"
+                  }
+                ],
+                "User-Agent": [
+                  {
+                    "matcher": "glob",
+                    "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
+                  }
+                ]
+              },
+              "query": {
+                "status": [
+                  {
+                    "matcher": "exact",
+                    "value": "available"
+                  }
+                ]
+              }
+            },
+            "response": {
+              "status": 200,
+              "body": "<h1>Matched on recording</h1>",
+              "encodedBody": false,
+              "headers": {
+                "Content-Type": [
+                  "text/html; charset=utf-8"
+                ]
+              },
+              "templated": false
+            }
+          },
+          {
+            "request": {
+              "path": [
+                {
+                  "matcher": "exact",
+                  "value": "/template"
+                }
+              ]
+            },
+            "response": {
+              "status": 200,
+              "body": "<h1>Matched on template</h1>",
+              "encodedBody": false,
+              "headers": {
+                "Content-Type": [
+                  "text/html; charset=utf-8"
+                ]
+              },
+              "templated": false
+            }
+          }
+        ],
+        "globalActions": {
+          "delays": [],
+          "delaysLogNormal": []
+        }
+      },
+      "meta": {
+        "schemaVersion": "v5",
+        "hoverflyVersion": "v1.0.0",
+        "timeExported": "2019-05-30T22:14:24+01:00"
+      }
+    }
+
 
 DELETE /api/v2/simulation
 """""""""""""""""""""""""
