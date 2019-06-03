@@ -26,6 +26,7 @@ type Target struct {
 	UpstreamProxyUrl string `yaml:",omitempty"`
 	PACFile          string `yaml:",omitempty"`
 	HttpsOnly        bool   `yaml:",omitempty"`
+	CORS       	 	bool   `yaml:",omitempty"`
 
 	ClientAuthenticationDestination string `yaml:",omitempty"`
 	ClientAuthenticationClientCert  string `yaml:",omitempty"`
@@ -119,6 +120,10 @@ func (this Target) BuildFlags() Flags {
 	if this.AuthEnabled {
 		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(this.Password), 10)
 		flags = append(flags, "-auth", "-username", this.Username, "-password-hash", string(hashedPassword))
+	}
+
+	if this.CORS {
+		flags = append(flags, "-cors")
 	}
 
 	if this.ClientAuthenticationDestination != "" {
