@@ -8,8 +8,8 @@ import (
 
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	log "github.com/sirupsen/logrus"
 	"github.com/xeipuuv/gojsonschema"
 )
 
@@ -157,6 +157,7 @@ const deprecatedQueryMessage = "Usage of deprecated field `deprecatedQuery` on d
 const deprecatedQueryDocs = "https://hoverfly.readthedocs.io/en/latest/pages/troubleshooting/troubleshooting.html#why-does-my-simulation-have-a-deprecatedquery-field"
 const ContentLengthAndTransferEncodingMessage = "Response contains both Content-Length and Transfer-Encoding headers on data.pairs[%v].response, please remove one of these headers"
 const ContentLengthMismatchMessage = "Response contains incorrect Content-Length header on data.pairs[%v].response, please correct or remove header"
+const pairIgnoredMessage = "data.pairs[%v] is not added due to a conflict with the existing simulation"
 
 type SimulationImportResult struct {
 	err             error                     `json:"error,omitempty"`
@@ -194,6 +195,14 @@ func (s *SimulationImportResult) AddContentLengthAndTransferEncodingWarning(requ
 
 func (s *SimulationImportResult) AddContentLengthMismatchWarning(requestNumber int) {
 	warning := fmt.Sprintf("WARNING: %s", fmt.Sprintf(ContentLengthMismatchMessage, requestNumber))
+	if s.WarningMessages == nil {
+		s.WarningMessages = []SimulationImportWarning{}
+	}
+	s.WarningMessages = append(s.WarningMessages, SimulationImportWarning{Message: warning})
+}
+
+func (s *SimulationImportResult) AddPairIgnoredWarning(requestNumber int) {
+	warning := fmt.Sprintf("WARNING: %s", fmt.Sprintf(pairIgnoredMessage, requestNumber))
 	if s.WarningMessages == nil {
 		s.WarningMessages = []SimulationImportWarning{}
 	}

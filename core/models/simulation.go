@@ -25,7 +25,8 @@ func NewSimulation() *Simulation {
 	}
 }
 
-func (this *Simulation) AddPair(pair *RequestMatcherResponsePair) {
+// Return a boolean indicates if the pair is added or not.
+func (this *Simulation) AddPair(pair *RequestMatcherResponsePair) bool {
 	var duplicate bool
 	this.RWMutex.Lock()
 	for _, savedPair := range this.matchingPairs {
@@ -38,6 +39,7 @@ func (this *Simulation) AddPair(pair *RequestMatcherResponsePair) {
 		this.matchingPairs = append(this.matchingPairs, *pair)
 	}
 	this.RWMutex.Unlock()
+	return !duplicate
 }
 
 func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, state *state.State) {

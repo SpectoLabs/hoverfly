@@ -143,11 +143,15 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 
 			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
 
-			hf.Simulation.AddPair(pair)
-			for k, v := range pair.RequestMatcher.RequiresState {
-				initialStates[k] = v
+			isAdded := hf.Simulation.AddPair(pair)
+			if isAdded {
+				for k, v := range pair.RequestMatcher.RequiresState {
+					initialStates[k] = v
+				}
+				success++
+			} else {
+				importResult.AddPairIgnoredWarning(i)
 			}
-			success++
 
 			if pairView.RequestMatcher.DeprecatedQuery != nil && len(pairView.RequestMatcher.DeprecatedQuery) != 0 {
 				importResult.AddDeprecatedQueryWarning(i)

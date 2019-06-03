@@ -577,7 +577,7 @@ func Test_Simulation_AddPair_WillNotSaveDuplicates(t *testing.T) {
 
 	unit := models.NewSimulation()
 
-	unit.AddPair(&models.RequestMatcherResponsePair{
+	isAdded := unit.AddPair(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -589,7 +589,9 @@ func Test_Simulation_AddPair_WillNotSaveDuplicates(t *testing.T) {
 		models.ResponseDetails{},
 	})
 
-	unit.AddPair(&models.RequestMatcherResponsePair{
+	Expect(isAdded).To(BeTrue())
+
+	isAdded = unit.AddPair(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -601,6 +603,7 @@ func Test_Simulation_AddPair_WillNotSaveDuplicates(t *testing.T) {
 		models.ResponseDetails{},
 	})
 
+	Expect(isAdded).To(BeFalse())
 	Expect(unit.GetMatchingPairs()).To(HaveLen(1))
 }
 
@@ -609,7 +612,7 @@ func Test_Simulation_AddPair_WillSaveTwoWhenNotDuplicates(t *testing.T) {
 
 	unit := models.NewSimulation()
 
-	unit.AddPair(&models.RequestMatcherResponsePair{
+	isAdded := unit.AddPair(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -620,8 +623,9 @@ func Test_Simulation_AddPair_WillSaveTwoWhenNotDuplicates(t *testing.T) {
 		},
 		models.ResponseDetails{},
 	})
+	Expect(isAdded).To(BeTrue())
 
-	unit.AddPair(&models.RequestMatcherResponsePair{
+	isAdded = unit.AddPair(&models.RequestMatcherResponsePair{
 		models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
@@ -632,6 +636,7 @@ func Test_Simulation_AddPair_WillSaveTwoWhenNotDuplicates(t *testing.T) {
 		},
 		models.ResponseDetails{},
 	})
+	Expect(isAdded).To(BeTrue())
 
 	Expect(unit.GetMatchingPairs()).To(HaveLen(2))
 	Expect(unit.GetMatchingPairs()[0].RequestMatcher.Destination[0].Value).To(Equal("space"))
