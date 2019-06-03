@@ -294,7 +294,11 @@ func main() {
 
 	cfg.HttpsOnly = *httpsOnly
 	cfg.PlainHttpTunneling = *plainHttpTunneling
-	cfg.CORS = *cors
+
+	if *cors {
+		cfg.CORS = *cors
+		log.Info("CORS has been enabled")
+	}
 
 	cfg.ClientAuthenticationDestination = *clientAuthenticationDestination
 	cfg.ClientAuthenticationClientCert = *clientAuthenticationClientCert

@@ -176,6 +176,15 @@ var _ = Describe("hoverctl `start`", func() {
 
 			Expect(response.StatusCode).To(Equal(200))
 		})
+
+		It("should start an instance of hoverfly with CORS enabled", func() {
+			output := functional_tests.Run(hoverctlBinary, "start", "--cors")
+
+			Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+			output = functional_tests.Run(hoverctlBinary, "logs", "--json")
+			Expect(output).To(ContainSubstring("CORS has been enabled"))
+		})
 	})
 
 	Context("with a target", func() {
