@@ -13,9 +13,11 @@ var importCmd = &cobra.Command{
 	Use:   "import [path to simulation]",
 	Short: "Import a simulation into Hoverfly",
 	Long: `
-Imports a simulation into Hoverfly. An absolute or
+Imports a simulation into Hoverfly. Any existing 
+simulation data will be replaced. An absolute or
 relative path to a Hoverfly simulation JSON file
-must be provided.
+must be provided. To add multiple simulations,
+use "hoverctl simulation add [paths]" instead.
 	`,
 
 	Run: func(cmd *cobra.Command, args []string) {

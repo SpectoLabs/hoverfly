@@ -42,7 +42,7 @@ Currently, you can get the following data from request to the response via templ
 Helper Methods
 --------------
 
-Additional data can come from helper methods. Current we only have some for the current data, but this list is likely to expand:
+Additional data can come from helper methods. These are the ones Hoverfly currently support:
 
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Description                                               | Example                                                   |  Result                                 |
@@ -83,7 +83,7 @@ Additional data can come from helper methods. Current we only have some for the 
 | A random UUID                                             | {{ randomUuid }}                                          |  7b791f3d-d7f4-4635-8ea1-99568d821562   |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Replace all occurrences of the old value with the new     | {{ replace Request.Body "be" "mock" }}                    |                                         |
-| value in the target string                                | (where Request.Body has the value of "to be or not to be" |  to mock or not to mock                  |
+| value in the target string                                | (where Request.Body has the value of "to be or not to be" |  to mock or not to mock                 |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 
 Durations
