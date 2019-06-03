@@ -105,6 +105,7 @@ var (
 
 	journalSize = flag.Int("journal-size", 1000, "Set the size of request/response journal")
 	cacheSize 	= flag.Int("cache-size", 1000, "Set the size of request/response cache")
+	cors     = flag.Bool("cors", false, "Enable CORS support")
 
 	clientAuthenticationDestination = flag.String("client-authentication-destination", "", "Regular expression of destination with client authentication")
 	clientAuthenticationClientCert  = flag.String("client-authentication-client-cert", "", "Path to the client certification file used for authentication")
@@ -293,6 +294,7 @@ func main() {
 
 	cfg.HttpsOnly = *httpsOnly
 	cfg.PlainHttpTunneling = *plainHttpTunneling
+	cfg.CORS = *cors
 
 	cfg.ClientAuthenticationDestination = *clientAuthenticationDestination
 	cfg.ClientAuthenticationClientCert = *clientAuthenticationClientCert

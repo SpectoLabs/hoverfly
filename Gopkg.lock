@@ -86,11 +86,11 @@
   revision = "2b8494104d86337cdd41d0a49cbed8e4583c0ab4"
 
 [[projects]]
-  digest = "1:55bb3f6c9201208f06c4d53023cc0b06d0a07bebb4c569359c92322419792eb7"
+  digest = "1:fba61d8584058169c5bd4625196f33077ba937f7131625d4440686c5e4cff380"
   name = "github.com/dghubble/sling"
   packages = ["."]
   pruneopts = "UT"
-  revision = "5765fe1bdc176ae984b074c8a89980d1f16e6dd8"
+  revision = "e2624bf29a7de45ab0802b09aea94ca0a7815c5f"
 
 [[projects]]
   digest = "1:31a0d1b8824d51a2af03e9561d584811b2d7dd6593483aca5c37439c85081f5a"

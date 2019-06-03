@@ -184,7 +184,7 @@ func (hf *Hoverfly) StopProxy() {
 // returns HTTP response.
 func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	if hf.Cfg.CORS {
-		if req.Method == http.MethodOptions && req.Header.Get("Origin") != "" && req.Header.Get("Access-Control-Request-Method") != "" {
+		if req.Method == http.MethodOptions && req.Header.Get("Origin") != "" && req.Header.Get("Access-Control-Request-Methods") != "" {
 			resp := &http.Response{}
 			resp.Request = req
 			resp.Header = make(http.Header)
