@@ -208,10 +208,13 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	mode := hf.modeMap[modeName]
 	response, err := mode.Process(req, requestDetails)
 
-	// TODO CORS add CORS header to response
-	// TODO should get CORS headers value from the a cors configuration
-	// Don't delete the error
 	// and definitely don't delay people in capture mode
+	// Don't delete the error
+	// TODO should get CORS headers value from the a cors configuration
+	if err == nil && hf.Cfg.CORS && req.Header.Get("Origin") != "" {
+		response.Header.Add("Access-Control-Allow-Origin", "*")
+	}
+
 	if err != nil || modeName == modes.Capture {
 		return response
 	}
