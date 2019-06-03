@@ -197,6 +197,7 @@ func Test_ImportSimulation_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
 	Expect(err.Error()).To(Equal("Could not connect to Hoverfly at something:1234"))
 }
 
+
 func Test_ImportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -235,6 +236,50 @@ func Test_ImportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Could not import simulation\n\ntest error"))
 }
+func Test_AddSimulation_SendsCorrectHTTPRequest(t *testing.T) {
+	RegisterTestingT(t)
+
+	hoverfly.DeleteSimulation()
+	hoverfly.PutSimulation(v2.SimulationViewV5{
+		v2.DataViewV5{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+				{
+					RequestMatcher: v2.RequestMatcherViewV5{
+						Method: []v2.MatcherViewV5{
+							{
+								Matcher: matchers.Exact,
+								Value:   "POST",
+							},
+						},
+						Path: []v2.MatcherViewV5{
+							{
+								Matcher: matchers.Exact,
+								Value:   "/api/v2/simulation",
+							},
+						},
+						Body: []v2.MatcherViewV5{
+							{
+								Matcher: "json",
+								Value:   `{"simulation": true}`,
+							},
+						},
+					},
+					Response: v2.ResponseDetailsViewV5{
+						Status: 200,
+						Body:   `{"simulation": true}`,
+					},
+				},
+			},
+		},
+		v2.MetaView{
+			SchemaVersion: "v2",
+		},
+	})
+
+	err := AddSimulation(target, `{"simulation": true}`)
+	Expect(err).To(BeNil())
+}
+
 
 func Test_DeleteSimulations_SendsCorrectHTTPRequest(t *testing.T) {
 	RegisterTestingT(t)
