@@ -509,6 +509,56 @@ func Test_Hoverfly_processRequest_CanHandleResponseDiff(t *testing.T) {
 
 }
 
+func Test_Hoverfly_processRequest_CanHandlePreflightRequestWhenCORSEnabled(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	r, err := http.NewRequest(http.MethodOptions, "http://somehost.com", nil)
+	Expect(err).To(BeNil())
+	r.Header.Set("Origin", "http://originhost.com")
+	r.Header.Set("Access-Control-Request-Method", "PUT,POST")
+	r.Header.Set("Access-Control-Request-Headers", "X-PINGOTHER,Content-Type")
+
+	unit.Cfg.CORS = true
+	newResp := unit.processRequest(r)
+
+	Expect(newResp).ToNot(BeNil())
+	Expect(newResp.StatusCode).To(Equal(http.StatusOK))
+	Expect(newResp.Header.Get("Origin")).To(Equal("*"))
+	Expect(newResp.Header.Get("Access-Control-Allow-Methods")).To(Equal("GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"))
+	Expect(newResp.Header.Get("Access-Control-Max-Age")).To(Equal("1800"))
+	Expect(newResp.Header.Get("Access-Control-Allow-Credentials")).To(Equal(""))
+	Expect(newResp.Header.Get("Access-Control-Allow-Headers")).To(Equal("X-PINGOTHER,Content-Type"))
+	responseBody, err := ioutil.ReadAll(newResp.Body)
+	Expect(string(responseBody)).To(Equal(""))
+}
+
+
+
+func Test_Hoverfly_processRequest_IgnoreInvalidPreflightRequestWhenCORSEnabled(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	r, err := http.NewRequest(http.MethodOptions, "http://somehost.com", nil)
+	Expect(err).To(BeNil())
+	r.Header.Set("Origin", "http://originhost.com")
+	// missing Access-Control-Allow-Methods header is not a valid pre-flight request
+
+	unit.Cfg.CORS = true
+	unit.Cfg.SetMode("capture")
+
+	resp := unit.processRequest(r)
+
+	Expect(resp).ToNot(BeNil())
+	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+	Expect(resp.Header.Get("Origin")).To(Equal(""))
+	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
+}
+
 func TestMatchOnRequestBody(t *testing.T) {
 	RegisterTestingT(t)
 
