@@ -37,3 +37,23 @@ Stop Hoverfly:
 .. code:: bash
 
     hoverctl stop
+
+
+.. note:: Importing multiple simulations:
+
+    The above example shows importing one simulation into Hoverfly. You can also import multiple simulations:
+
+    .. code:: bash
+
+        hoverctl simulation add foo.json bar.json
+
+
+    When starting with `hoverfly` command, you can do:
+
+    .. code:: bash
+
+        hoverfly -import foo.json -import bar.json
+
+
+    Hoverfly appends any unique pair to the existing simulation by comparing the equality of the request JSON objects.
+    If a conflict occurs, the pair is not added.

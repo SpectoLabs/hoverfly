@@ -15,15 +15,19 @@ This allows you to manage simulation data in Hoverfly.
 	`,
 }
 
-
 var addSimulationCmd = &cobra.Command{
-	Use:   "add",
-	Short: "Add simulations into Hoverfly",
+	Use:   "add [path to simulations]",
+	Short: "Add one or more simulations into Hoverfly",
 	Long: `
-Appends simulations to existing Hoverfly simulation. 
-You may provide absolute or relative paths to multiple 
-Hoverfly simulation files. Any pairs that have identical 
-requests to those in the existing data will be ignored.
+Adds one or more simulation files to Hoverfly to the 
+existing simulation data. 
+
+Any request/response pairs that have an identical request 
+to those in the existing data will be discarded with a 
+warning message. 
+
+You may provide an absolute or relative path to each 
+simulation file.
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 
