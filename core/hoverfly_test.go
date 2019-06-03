@@ -518,7 +518,7 @@ func Test_Hoverfly_processRequest_CanHandlePreflightRequestWhenCORSEnabled(t *te
 	r, err := http.NewRequest(http.MethodOptions, "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 	r.Header.Set("Origin", "http://originhost.com")
-	r.Header.Set("Access-Control-Request-Method", "PUT,POST")
+	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
 	r.Header.Set("Access-Control-Request-Headers", "X-PINGOTHER,Content-Type")
 
 	unit.Cfg.CORS = true

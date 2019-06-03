@@ -1,13 +1,11 @@
 language: go
 go:
-  - 1.5.3
-  - 1.6
+  - 1.9
+  - "1.10.x"
+  - "1.11.x"
   - tip
-before_install:
-  - go get github.com/golang/lint/golint
 install:
-  - go get -v .
+  - go get golang.org/x/lint/golint
+  - go get -v -t .
 script:
-  - go test -v .
-  - go vet ./...
-  - golint ./...
+  - ./test
