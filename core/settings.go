@@ -41,6 +41,7 @@ type Configuration struct {
 	HttpsOnly bool
 
 	PlainHttpTunneling bool
+	CORS bool
 
 	ClientAuthenticationDestination string
 	ClientAuthenticationClientCert  string
