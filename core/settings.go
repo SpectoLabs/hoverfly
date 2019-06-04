@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"github.com/SpectoLabs/hoverfly/core/cors"
 	"os"
 	"strconv"
 	"sync"
@@ -41,7 +42,7 @@ type Configuration struct {
 	HttpsOnly bool
 
 	PlainHttpTunneling bool
-	CORS bool
+	CORS cors.Configs
 
 	ClientAuthenticationDestination string
 	ClientAuthenticationClientCert  string

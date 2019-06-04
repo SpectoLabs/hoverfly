@@ -145,3 +145,12 @@ func Test_InitSettings_SetsDefaultCacheSize(t *testing.T) {
 
 	Expect(settings.CacheSize).To(Equal(1000))
 }
+
+// TODO get CORS configs from env var
+func Test_InitSettings_SetsCORSToDisabled(t *testing.T) {
+	RegisterTestingT(t)
+
+	settings := InitSettings()
+
+	Expect(settings.CORS.Enabled).To(BeFalse())
+}

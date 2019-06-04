@@ -43,7 +43,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			resp := hoverfly.Proxy(sling.New().Options(fakeServer.URL).Add("Origin", "http://some-host.com").Add("Access-Control-Request-Methods", "POST"))
 			Expect(resp.StatusCode).To(Equal(200))
-			Expect(resp.Header.Get("Origin")).To(Equal("*"))
+			Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("*"))
 			Expect(resp.Header.Get("Access-Control-Allow-Methods")).To(Equal("GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"))
 
 			responseBody, _ := ioutil.ReadAll(resp.Body)

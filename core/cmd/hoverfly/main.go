@@ -28,16 +28,17 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
 	hv "github.com/SpectoLabs/hoverfly/core"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	hvc "github.com/SpectoLabs/hoverfly/core/certs"
+	cs "github.com/SpectoLabs/hoverfly/core/cors"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	mw "github.com/SpectoLabs/hoverfly/core/middleware"
 	"github.com/SpectoLabs/hoverfly/core/modes"
+	log "github.com/sirupsen/logrus"
 )
 
 type arrayFlags []string
@@ -296,7 +297,7 @@ func main() {
 	cfg.PlainHttpTunneling = *plainHttpTunneling
 
 	if *cors {
-		cfg.CORS = *cors
+		cfg.CORS = *cs.DefaultCORSConfigs()
 		log.Info("CORS has been enabled")
 	}
 
