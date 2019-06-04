@@ -1,9 +1,7 @@
 package hoverfly
 
 import (
-	"bytes"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
@@ -15,7 +13,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/state"
 	"github.com/SpectoLabs/hoverfly/core/templating"
-	"io/ioutil"
+	log "github.com/sirupsen/logrus"
 	"net"
 	"net/http"
 	"sync"
@@ -183,20 +181,10 @@ func (hf *Hoverfly) StopProxy() {
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
 func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
-	if hf.Cfg.CORS {
-		if req.Method == http.MethodOptions && req.Header.Get("Origin") != "" && req.Header.Get("Access-Control-Request-Methods") != "" {
-			resp := &http.Response{}
-			resp.Request = req
-			resp.Header = make(http.Header)
-			resp.Header.Add("Origin", "*")
-			resp.Header.Add("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS")
-			resp.Header.Add("Access-Control-Max-Age", "1800")
-			resp.Header.Add("Access-Control-Allow-Headers", req.Header.Get("Access-Control-Request-Headers"))
-			resp.StatusCode = http.StatusOK
-			buf := bytes.NewBufferString("")
-			resp.ContentLength = 0
-			resp.Body = ioutil.NopCloser(buf)
-			return resp
+	if hf.Cfg.CORS.Enabled {
+		response := hf.Cfg.CORS.InterceptNewPreflightRequest(req)
+		if response != nil {
+			return response
 		}
 	}
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
@@ -210,9 +198,8 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 
 	// and definitely don't delay people in capture mode
 	// Don't delete the error
-	// TODO should get CORS headers value from the a cors configuration
-	if err == nil && hf.Cfg.CORS && req.Header.Get("Origin") != "" {
-		response.Header.Add("Access-Control-Allow-Origin", "*")
+	if err == nil && hf.Cfg.CORS.Enabled {
+		hf.Cfg.CORS.AddCORSHeaders(req, response)
 	}
 
 	if err != nil || modeName == modes.Capture {

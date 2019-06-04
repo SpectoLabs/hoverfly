@@ -18,6 +18,16 @@ type MiddlewareView struct {
 	Remote string `json:"remote"`
 }
 
+type CORSView struct {
+	Enabled 			bool	`json:"enabled"`
+	AllowOrigin 		string 	`json:"allowOrigin"`
+	AllowMethods 		string 	`json:"allowMethods"`
+	AllowHeaders 		string 	`json:"allowHeaders"`
+	PreflightMaxAge 	int64 	`json:"preflightMaxAge"`
+	AllowCredentials 	bool 	`json:"allowCredentials"`
+	ExposeHeaders 		string 	`json:"exposeHeaders,omitempty"`
+}
+
 type ModeView struct {
 	Mode      string            `json:"mode"`
 	Arguments ModeArgumentsView `json:"arguments,omitempty"`

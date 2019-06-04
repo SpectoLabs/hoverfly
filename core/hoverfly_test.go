@@ -3,6 +3,7 @@ package hoverfly
 import (
 	"bytes"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/cors"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -522,15 +523,15 @@ func Test_Hoverfly_processRequest_CanHandlePreflightRequestWhenCORSEnabled(t *te
 	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
 	r.Header.Set("Access-Control-Request-Headers", "X-PINGOTHER,Content-Type")
 
-	unit.Cfg.CORS = true
+	unit.Cfg.CORS = *cors.DefaultCORSConfigs()
 	resp := unit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusOK))
-	Expect(resp.Header.Get("Origin")).To(Equal("*"))
+	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("*"))
 	Expect(resp.Header.Get("Access-Control-Allow-Methods")).To(Equal("GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"))
 	Expect(resp.Header.Get("Access-Control-Max-Age")).To(Equal("1800"))
-	Expect(resp.Header.Get("Access-Control-Allow-Credentials")).To(Equal(""))
+	Expect(resp.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
 	Expect(resp.Header.Get("Access-Control-Allow-Headers")).To(Equal("X-PINGOTHER,Content-Type"))
 	responseBody, err := ioutil.ReadAll(resp.Body)
 	Expect(string(responseBody)).To(Equal(""))
@@ -549,7 +550,7 @@ func Test_Hoverfly_processRequest_IgnoreInvalidPreflightRequestWhenCORSEnabled(t
 	r.Header.Set("Origin", "http://originhost.com")
 	// missing Access-Control-Allow-Methods header is not a valid pre-flight request
 
-	unit.Cfg.CORS = true
+	unit.Cfg.CORS = *cors.DefaultCORSConfigs()
 	unit.Cfg.SetMode("capture")
 
 	resp := unit.processRequest(r)
@@ -579,14 +580,14 @@ func Test_Hoverfly_processRequest_AddCORSHeadersToResponseWhenCORSEnabled(t *tes
 	Expect(resp.Header.Get("Origin")).To(Equal(""))
 
 	// virtualizing
-	unit.Cfg.CORS = true
+	unit.Cfg.CORS = *cors.DefaultCORSConfigs()
 	unit.Cfg.SetMode("simulate")
 	newResp := unit.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 	Expect(newResp.Header.Get("Access-Control-Allow-Origin")).To(Equal("*"))
-	Expect(newResp.Header.Get("Access-Control-Allow-Credentials")).To(Equal(""))
+	Expect(newResp.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
 	Expect(newResp.Header.Get("Access-Control-Expose-Headers")).To(Equal(""))
 }
 
@@ -600,7 +601,7 @@ func Test_Hoverfly_processRequest_ShouldNotAddCORSHeadersIfRequestHasNoOriginWhe
 	Expect(err).To(BeNil())
 
 	// capturing
-	unit.Cfg.CORS = true
+	unit.Cfg.CORS = *cors.DefaultCORSConfigs()
 	unit.Cfg.SetMode("capture")
 	resp := unit.processRequest(r)
 
