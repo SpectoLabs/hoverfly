@@ -182,7 +182,7 @@ func Test_Hoverfly_processRequest_CanSimulateRequest(t *testing.T) {
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 }
 
-func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(InitSettings())
@@ -209,10 +209,11 @@ func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeRequest(t *testing
 	Expect(string(b)).To(Equal(string(bodyBytes)))
 }
 
-func Test_Hoverfly_processRequest_CanModifyRequest(t *testing.T) {
+func Test_Hoverfly_processRequest_CanModifyResponse(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := NewHoverflyWithConfiguration(InitSettings())
+	server, unit := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
 
 	err := unit.Cfg.Middleware.SetBinary("python")
 	Expect(err).To(BeNil())
