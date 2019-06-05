@@ -319,6 +319,20 @@ func (this Hoverfly) IsMiddlewareSet() bool {
 	return this.Cfg.Middleware.IsSet()
 }
 
+func (this Hoverfly) GetCORS() v2.CORSView {
+	cors := this.Cfg.CORS
+	return v2.CORSView{
+		Enabled:          cors.Enabled,
+		AllowOrigin:      cors.AllowOrigin,
+		AllowMethods:     cors.AllowMethods,
+		AllowHeaders:     cors.AllowHeaders,
+		PreflightMaxAge:  cors.PreflightMaxAge,
+		AllowCredentials: cors.AllowCredentials,
+		ExposeHeaders:    cors.ExposeHeaders,
+	}
+}
+
+
 func (this *Hoverfly) GetState() map[string]string {
 	return this.state.State
 }

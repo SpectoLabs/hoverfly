@@ -182,7 +182,7 @@ func (hf *Hoverfly) StopProxy() {
 // returns HTTP response.
 func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	if hf.Cfg.CORS.Enabled {
-		response := hf.Cfg.CORS.InterceptNewPreflightRequest(req)
+		response := hf.Cfg.CORS.InterceptPreflightRequest(req)
 		if response != nil {
 			return response
 		}
