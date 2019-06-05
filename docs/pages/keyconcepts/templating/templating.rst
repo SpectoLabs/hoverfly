@@ -82,6 +82,9 @@ Additional data can come from helper methods. Current we only have some for the 
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | A random UUID                                             | {{ randomUuid }}                                          |  7b791f3d-d7f4-4635-8ea1-99568d821562   |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Replace all occurrences of the old value with the new     | {{ replace Request.Body "be" "mock" }}                    |                                         |
+| value in the target string                                | (where Request.Body has the value of "to be or not to be" |  to mock or not to mock                  |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 
 Durations
 ~~~~~~~~~

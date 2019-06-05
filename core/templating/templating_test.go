@@ -357,6 +357,20 @@ func Test_ApplyTemplate_Request_Body(t *testing.T) {
 	Expect(template).To(Not(Equal(ContainSubstring(`{{Request.Body jsonPath \"$.test\"}}`))))
 }
 
+func Test_ApplyTemplate_ReplaceStringInQueryParams(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Query: map[string][]string{
+			"sound":    {"oink,oink,oink"},
+		},
+	}, make(map[string]string), `{{ replace Request.QueryParam.sound "oink" "moo" }}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal(`moo,moo,moo`))
+}
+
 func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]string, responseBody string) (string, error) {
 	templator := templating.NewTemplator()
 	template, _ := templator.ParseTemplate(responseBody)

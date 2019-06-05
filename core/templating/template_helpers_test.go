@@ -115,3 +115,13 @@ func Test_currentDateTimeSubtract_failure(t *testing.T) {
 	Expect(unit.currentDateTimeSubtract("1s", "cat")).To(Equal("2017-12-31T23:59:59Z"))
 	Expect(unit.currentDateTimeSubtract("cat", "cat")).To(Equal("2018-01-01T00:00:00Z"))
 }
+
+func Test_replace(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := templateHelpers{
+		now: testNow,
+	}
+
+	Expect(unit.replace("oink, oink, oink", "oink", "moo")).To(Equal("moo, moo, moo"))
+}
