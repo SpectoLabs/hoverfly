@@ -136,6 +136,10 @@ func (t templateHelpers) xPath(query, toMatch string) string {
 	return result.String()
 }
 
+func (t templateHelpers) replace(target, oldValue, newValue string) string {
+	return strings.Replace(target, oldValue, newValue, -1)
+}
+
 func prepareJsonPathQuery(query string) string {
 	if string(query[0:1]) != "{" && string(query[len(query)-1:]) != "}" {
 		query = fmt.Sprintf("{%s}", query)
