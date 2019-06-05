@@ -1,6 +1,7 @@
 package hoverctl_suite
 
 import (
+	"github.com/antonholmquist/jason"
 	"io/ioutil"
 	"strconv"
 
@@ -139,6 +140,27 @@ var _ = Describe("hoverctl `start`", func() {
 			Expect(response.StatusCode).To(Equal(500))
 
 			Expect(ioutil.ReadAll(response.Body)).To(ContainSubstring(`{"error":"No cache set"}`))
+		})
+
+		It("starts hoverfly with import flags", func() {
+			output := functional_tests.Run(hoverctlBinary, "start", "--import=testdata/sim1.json", "--import=testdata/sim2.json")
+
+			Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+			response := functional_tests.DoRequest(sling.New().Get("http://localhost:8888/api/v2/simulation"))
+			Expect(response.StatusCode).To(Equal(200))
+			defer response.Body.Close()
+
+			schemaObject, err := jason.NewObjectFromReader(response.Body)
+			Expect(err).To(BeNil())
+
+			dataObject, err := schemaObject.GetObject("data")
+			Expect(err).To(BeNil())
+
+			pairsArray, err := dataObject.GetObjectArray("pairs")
+			Expect(err).To(BeNil())
+
+			Expect(pairsArray).To(HaveLen(2))
 		})
 
 		It("starts hoverfly with upstream-proxy for environments with a proxy set up already", func() {

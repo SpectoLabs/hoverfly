@@ -46,7 +46,7 @@ func parseConfig() *Config {
 	defaultTarget := NewDefaultTarget()
 
 	// Initialize local target
-	if config.Targets["local"] == (Target{}) {
+	if val, present := config.Targets["local"]; !present || val.Name == "" {
 		config.Targets["local"] = *defaultTarget
 	}
 
