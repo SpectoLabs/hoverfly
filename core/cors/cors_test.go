@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func Test_InterceptNewPreflightRequest_ReturnSuccessResponseWithDefaultHeaders(t *testing.T) {
+func Test_InterceptPreflightRequest_ReturnSuccessResponseWithDefaultHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := DefaultCORSConfigs()
@@ -16,7 +16,7 @@ func Test_InterceptNewPreflightRequest_ReturnSuccessResponseWithDefaultHeaders(t
 	Expect(err).To(BeNil())
 	r.Header.Set("Origin", "http://originhost.com")
 	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
-	resp := unit.InterceptNewPreflightRequest(r)
+	resp := unit.InterceptPreflightRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -29,7 +29,7 @@ func Test_InterceptNewPreflightRequest_ReturnSuccessResponseWithDefaultHeaders(t
 	Expect(string(responseBody)).To(Equal(""))
 }
 
-func Test_InterceptNewPreflightRequest_ReturnNilIfRequestIsNotOptions(t *testing.T) {
+func Test_InterceptPreflightRequest_ReturnNilIfRequestIsNotOptions(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := DefaultCORSConfigs()
@@ -38,12 +38,12 @@ func Test_InterceptNewPreflightRequest_ReturnNilIfRequestIsNotOptions(t *testing
 	Expect(err).To(BeNil())
 	r.Header.Set("Origin", "http://originhost.com")
 	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
-	resp := unit.InterceptNewPreflightRequest(r)
+	resp := unit.InterceptPreflightRequest(r)
 
 	Expect(resp).To(BeNil())
 }
 
-func Test_InterceptNewPreflightRequest_ReturnNilIfRequestHasNoOriginHeader(t *testing.T) {
+func Test_InterceptPreflightRequest_ReturnNilIfRequestHasNoOriginHeader(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := DefaultCORSConfigs()
@@ -51,12 +51,12 @@ func Test_InterceptNewPreflightRequest_ReturnNilIfRequestHasNoOriginHeader(t *te
 	r, err := http.NewRequest(http.MethodOptions, "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
-	resp := unit.InterceptNewPreflightRequest(r)
+	resp := unit.InterceptPreflightRequest(r)
 
 	Expect(resp).To(BeNil())
 }
 
-func Test_InterceptNewPreflightRequest_ReturnNilIfRequestHasNoRequestMethodsHeader(t *testing.T) {
+func Test_InterceptPreflightRequest_ReturnNilIfRequestHasNoRequestMethodsHeader(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := DefaultCORSConfigs()
@@ -64,12 +64,12 @@ func Test_InterceptNewPreflightRequest_ReturnNilIfRequestHasNoRequestMethodsHead
 	r, err := http.NewRequest(http.MethodOptions, "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 	r.Header.Set("Origin", "http://originhost.com")
-	resp := unit.InterceptNewPreflightRequest(r)
+	resp := unit.InterceptPreflightRequest(r)
 
 	Expect(resp).To(BeNil())
 }
 
-func Test_InterceptNewPreflightRequest_ShouldEchoAllowHeaders(t *testing.T) {
+func Test_InterceptPreflightRequest_ShouldEchoAllowHeaders(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := DefaultCORSConfigs()
@@ -79,14 +79,14 @@ func Test_InterceptNewPreflightRequest_ShouldEchoAllowHeaders(t *testing.T) {
 	r.Header.Set("Origin", "http://originhost.com")
 	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
 	r.Header.Set("Access-Control-Request-Headers", "X-PINGOTHER,Content-Type")
-	resp := unit.InterceptNewPreflightRequest(r)
+	resp := unit.InterceptPreflightRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusOK))
 	Expect(resp.Header.Get("Access-Control-Allow-Headers")).To(Equal("X-PINGOTHER,Content-Type"))
 }
 
-func Test_InterceptNewPreflightRequest_ShouldNotSetAllowCredentialsHeaderIfFalse(t *testing.T) {
+func Test_InterceptPreflightRequest_ShouldNotSetAllowCredentialsHeaderIfFalse(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := DefaultCORSConfigs()
@@ -96,7 +96,7 @@ func Test_InterceptNewPreflightRequest_ShouldNotSetAllowCredentialsHeaderIfFalse
 	Expect(err).To(BeNil())
 	r.Header.Set("Origin", "http://originhost.com")
 	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
-	resp := unit.InterceptNewPreflightRequest(r)
+	resp := unit.InterceptPreflightRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusOK))

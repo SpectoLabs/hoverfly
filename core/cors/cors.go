@@ -29,7 +29,7 @@ func DefaultCORSConfigs() *Configs {
 	}
 }
 
-func (c *Configs) InterceptNewPreflightRequest(r *http.Request) *http.Response {
+func (c *Configs) InterceptPreflightRequest(r *http.Request) *http.Response {
 	if r.Method != http.MethodOptions || r.Header.Get("Origin") == "" || r.Header.Get("Access-Control-Request-Methods") == "" {
 		return nil
 	}
@@ -55,15 +55,16 @@ func (c *Configs) InterceptNewPreflightRequest(r *http.Request) *http.Response {
 }
 
 func (c *Configs) AddCORSHeaders(r *http.Request, resp *http.Response) {
-	if r.Header.Get("Origin") != "" {
+	if r.Header.Get("Origin") == "" {
+		return
+	}
 
-		if resp.Header == nil {
-			resp.Header = make(http.Header)
-		}
-		resp.Header.Add("Access-Control-Allow-Origin", c.AllowOrigin)
-		resp.Header.Add("Access-Control-Expose-Headers", c.ExposeHeaders)
-		if c.AllowCredentials {
-			resp.Header.Add("Access-Control-Allow-Credentials", "true")
-		}
+	if resp.Header == nil {
+		resp.Header = make(http.Header)
+	}
+	resp.Header.Add("Access-Control-Allow-Origin", c.AllowOrigin)
+	resp.Header.Add("Access-Control-Expose-Headers", c.ExposeHeaders)
+	if c.AllowCredentials {
+		resp.Header.Add("Access-Control-Allow-Credentials", "true")
 	}
 }

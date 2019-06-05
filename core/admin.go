@@ -104,6 +104,7 @@ func getAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 		&v2.HoverflyVersionHandler{Hoverfly: hoverfly},
 		&v2.HoverflyUpstreamProxyHandler{Hoverfly: hoverfly},
 		&v2.HoverflyPACHandler{Hoverfly: hoverfly},
+		&v2.HoverflyCORSHandler{Hoverfly: hoverfly},
 		&v2.SimulationHandler{Hoverfly: hoverfly},
 		&v2.CacheHandler{Hoverfly: hoverfly},
 		&v2.LogsHandler{Hoverfly: hoverfly.StoreLogsHook},
