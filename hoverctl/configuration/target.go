@@ -35,6 +35,8 @@ type Target struct {
 	AuthEnabled bool
 	Username    string
 	Password    string
+
+	Simulations	[]string	`yaml:",omitempty"`
 }
 
 func NewDefaultTarget() *Target {
@@ -133,6 +135,12 @@ func (this Target) BuildFlags() Flags {
 
 	if this.ClientAuthenticationCACert != "" {
 		flags = append(flags, "-client-authentication-ca-cert="+this.ClientAuthenticationCACert)
+	}
+
+	if len(this.Simulations) > 0 {
+		for _, val := range this.Simulations {
+			flags = append(flags, "-import="+val)
+		}
 	}
 
 	return flags

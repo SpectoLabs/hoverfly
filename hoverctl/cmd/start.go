@@ -73,6 +73,8 @@ hoverctl configuration file.
 		target.UpstreamProxyUrl, _ = cmd.Flags().GetString("upstream-proxy")
 		target.HttpsOnly, _ = cmd.Flags().GetBool("https-only")
 
+		target.Simulations, _ = cmd.Flags().GetStringSlice("import")
+
 		if pacFileLocation, _ := cmd.Flags().GetString("pac-file"); pacFileLocation != "" {
 
 			pacFileData, err := configuration.ReadFile(pacFileLocation)
@@ -158,4 +160,6 @@ func init() {
 	startCmd.Flags().Bool("auth", false, "Enable authentication on Hoverfly")
 	startCmd.Flags().String("username", "", "Username to authenticate Hoverfly")
 	startCmd.Flags().String("password", "", "Password to authenticate Hoverfly")
+
+	startCmd.Flags().StringSlice("import", []string{}, "Simulations to import")
 }
