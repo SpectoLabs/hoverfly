@@ -63,7 +63,9 @@ func (c *Configs) AddCORSHeaders(r *http.Request, resp *http.Response) {
 		resp.Header = make(http.Header)
 	}
 	resp.Header.Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-	resp.Header.Add("Access-Control-Expose-Headers", c.ExposeHeaders)
+	if c.ExposeHeaders != "" {
+		resp.Header.Add("Access-Control-Expose-Headers", c.ExposeHeaders)
+	}
 	if c.AllowCredentials {
 		resp.Header.Add("Access-Control-Allow-Credentials", "true")
 	}
