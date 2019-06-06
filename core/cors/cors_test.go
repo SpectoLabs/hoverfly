@@ -20,7 +20,7 @@ func Test_InterceptPreflightRequest_ReturnSuccessResponseWithDefaultHeaders(t *t
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusOK))
-	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("*"))
+	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("http://originhost.com"))
 	Expect(resp.Header.Get("Access-Control-Allow-Methods")).To(Equal("GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"))
 	Expect(resp.Header.Get("Access-Control-Max-Age")).To(Equal("1800"))
 	Expect(resp.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
@@ -117,7 +117,7 @@ func Test_AddCORSHeaders_ShouldAddDefaultCORSHeadersToResponse(t *testing.T) {
 	unit.AddCORSHeaders(r, resp)
 
 	Expect(resp).ToNot(BeNil())
-	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("*"))
+	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("http://originhost.com"))
 	Expect(resp.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
 	Expect(resp.Header.Get("Access-Control-Expose-Headers")).To(Equal(""))
 }
@@ -153,7 +153,7 @@ func Test_AddCORSHeaders_ShouldNotSetAllowCredentialsHeaderIfFalse(t *testing.T)
 	unit.AddCORSHeaders(r, resp)
 
 	Expect(resp).ToNot(BeNil())
-	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("*"))
+	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("http://originhost.com"))
 	Expect(resp.Header.Get("Access-Control-Allow-Credentials")).To(Equal(""))
 	Expect(resp.Header.Get("Access-Control-Expose-Headers")).To(Equal(""))
 }

@@ -528,7 +528,7 @@ func Test_Hoverfly_processRequest_CanHandlePreflightRequestWhenCORSEnabled(t *te
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusOK))
-	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("*"))
+	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("http://originhost.com"))
 	Expect(resp.Header.Get("Access-Control-Allow-Methods")).To(Equal("GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"))
 	Expect(resp.Header.Get("Access-Control-Max-Age")).To(Equal("1800"))
 	Expect(resp.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
@@ -586,7 +586,7 @@ func Test_Hoverfly_processRequest_AddCORSHeadersToResponseWhenCORSEnabled(t *tes
 
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
-	Expect(newResp.Header.Get("Access-Control-Allow-Origin")).To(Equal("*"))
+	Expect(newResp.Header.Get("Access-Control-Allow-Origin")).To(Equal("http://originhost.com"))
 	Expect(newResp.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
 	Expect(newResp.Header.Get("Access-Control-Expose-Headers")).To(Equal(""))
 }
