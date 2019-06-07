@@ -37,17 +37,20 @@ func (c *Configs) InterceptPreflightRequest(r *http.Request) *http.Response {
 	resp := &http.Response{}
 	resp.Request = r
 	resp.Header = make(http.Header)
-	resp.Header.Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	resp.Header.Set("Access-Control-Allow-Origin", c.getAllowOrigin(r))
 	resp.Header.Set("Access-Control-Allow-Methods", c.AllowMethods)
 	resp.Header.Set("Access-Control-Max-Age", strconv.FormatInt(c.PreflightMaxAge, 10))
-	if r.Header.Get("Access-Control-Request-Headers") == "" {
-		resp.Header.Set("Access-Control-Allow-Headers", c.AllowHeaders)
-	} else {
-		resp.Header.Set("Access-Control-Allow-Headers", r.Header.Get("Access-Control-Request-Headers"))
+	allowHeaders := r.Header.Get("Access-Control-Request-Headers")
+
+	if allowHeaders == "" {
+		allowHeaders = c.AllowHeaders
 	}
+	resp.Header.Set("Access-Control-Allow-Headers", allowHeaders)
+
 	if c.AllowCredentials {
 		resp.Header.Set("Access-Control-Allow-Credentials", "true")
 	}
+
 	resp.StatusCode = http.StatusOK
 	buf := bytes.NewBufferString("")
 	resp.ContentLength = 0
@@ -63,11 +66,22 @@ func (c *Configs) AddCORSHeaders(r *http.Request, resp *http.Response) {
 	if resp.Header == nil {
 		resp.Header = make(http.Header)
 	}
-	resp.Header.Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-	if c.ExposeHeaders != "" {
-		resp.Header.Set("Access-Control-Expose-Headers", c.ExposeHeaders)
-	}
+
+	resp.Header.Set("Access-Control-Allow-Origin", c.getAllowOrigin(r))
+
 	if c.AllowCredentials {
 		resp.Header.Set("Access-Control-Allow-Credentials", "true")
 	}
+
+	if c.ExposeHeaders != "" {
+		resp.Header.Set("Access-Control-Expose-Headers", c.ExposeHeaders)
+	}
+}
+
+func (c *Configs) getAllowOrigin(r *http.Request) string {
+	allowOrigin := c.AllowOrigin
+	if c.AllowCredentials && allowOrigin == "*" {
+		allowOrigin = r.Header.Get("Origin")
+	}
+	return allowOrigin
 }
