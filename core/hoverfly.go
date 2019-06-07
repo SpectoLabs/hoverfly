@@ -196,12 +196,12 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	mode := hf.modeMap[modeName]
 	response, err := mode.Process(req, requestDetails)
 
-	// and definitely don't delay people in capture mode
-	// Don't delete the error
 	if err == nil && hf.Cfg.CORS.Enabled {
 		hf.Cfg.CORS.AddCORSHeaders(req, response)
 	}
 
+	// and definitely don't delay people in capture mode
+	// Don't delete the error
 	if err != nil || modeName == modes.Capture {
 		return response
 	}
