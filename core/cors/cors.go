@@ -29,6 +29,7 @@ func DefaultCORSConfigs() *Configs {
 	}
 }
 
+// TODO provide config to pass through OPTIONS call
 func (c *Configs) InterceptPreflightRequest(r *http.Request) *http.Response {
 	if r.Method != http.MethodOptions || r.Header.Get("Origin") == "" || r.Header.Get("Access-Control-Request-Methods") == "" {
 		return nil
@@ -36,16 +37,16 @@ func (c *Configs) InterceptPreflightRequest(r *http.Request) *http.Response {
 	resp := &http.Response{}
 	resp.Request = r
 	resp.Header = make(http.Header)
-	resp.Header.Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-	resp.Header.Add("Access-Control-Allow-Methods", c.AllowMethods)
-	resp.Header.Add("Access-Control-Max-Age", strconv.FormatInt(c.PreflightMaxAge, 10))
+	resp.Header.Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	resp.Header.Set("Access-Control-Allow-Methods", c.AllowMethods)
+	resp.Header.Set("Access-Control-Max-Age", strconv.FormatInt(c.PreflightMaxAge, 10))
 	if r.Header.Get("Access-Control-Request-Headers") == "" {
-		resp.Header.Add("Access-Control-Allow-Headers", c.AllowHeaders)
+		resp.Header.Set("Access-Control-Allow-Headers", c.AllowHeaders)
 	} else {
-		resp.Header.Add("Access-Control-Allow-Headers", r.Header.Get("Access-Control-Request-Headers"))
+		resp.Header.Set("Access-Control-Allow-Headers", r.Header.Get("Access-Control-Request-Headers"))
 	}
 	if c.AllowCredentials {
-		resp.Header.Add("Access-Control-Allow-Credentials", "true")
+		resp.Header.Set("Access-Control-Allow-Credentials", "true")
 	}
 	resp.StatusCode = http.StatusOK
 	buf := bytes.NewBufferString("")
@@ -62,11 +63,11 @@ func (c *Configs) AddCORSHeaders(r *http.Request, resp *http.Response) {
 	if resp.Header == nil {
 		resp.Header = make(http.Header)
 	}
-	resp.Header.Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	resp.Header.Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 	if c.ExposeHeaders != "" {
-		resp.Header.Add("Access-Control-Expose-Headers", c.ExposeHeaders)
+		resp.Header.Set("Access-Control-Expose-Headers", c.ExposeHeaders)
 	}
 	if c.AllowCredentials {
-		resp.Header.Add("Access-Control-Allow-Credentials", "true")
+		resp.Header.Set("Access-Control-Allow-Credentials", "true")
 	}
 }
