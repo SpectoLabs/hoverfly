@@ -577,7 +577,6 @@ func Test_Hoverfly_processRequest_AddCORSHeadersToResponseWhenCORSEnabled(t *tes
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
-	Expect(resp.Header.Get("Origin")).To(Equal(""))
 
 	// virtualizing
 	unit.Cfg.CORS = *cors.DefaultCORSConfigs()
@@ -608,6 +607,36 @@ func Test_Hoverfly_processRequest_ShouldNotAddCORSHeadersIfRequestHasNoOriginWhe
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal(""))
+}
+
+func Test_Hoverfly_processRequest_ShouldNotCaptureCORSHeadersAddedByHoverfly(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	r, err := http.NewRequest("GET", "http://somehost.com", nil)
+	Expect(err).To(BeNil())
+	r.Header.Set("Origin", "http://originhost.com")
+
+	// capturing
+	unit.Cfg.CORS = *cors.DefaultCORSConfigs()
+	unit.Cfg.SetMode("capture")
+	resp := unit.processRequest(r)
+
+	Expect(resp).ToNot(BeNil())
+	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+
+	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("http://originhost.com"))
+	Expect(resp.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
+	Expect(resp.Header.Get("Access-Control-Expose-Headers")).To(Equal(""))
+
+	pairs := unit.Simulation.GetMatchingPairs()
+	Expect(len(pairs)).To(Equal(1))
+
+	for key := range pairs[0].Response.Headers {
+		Expect(key).NotTo(ContainSubstring("Access-Control-"))
+	}
 }
 
 func TestMatchOnRequestBody(t *testing.T) {

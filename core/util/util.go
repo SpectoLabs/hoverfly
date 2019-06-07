@@ -46,13 +46,15 @@ func GetResponseBody(response *http.Response) (string, error) {
 }
 
 func GetResponseHeaders(response *http.Response) map[string][]string {
-	if response.Trailer == nil {
-		return response.Header
-	}
 
+	// Make a copy of the response headers, preventing any changes to response being saved into the simulation
 	headers := make(map[string][]string)
 	for key, value := range response.Header {
 		headers[key] = value
+	}
+
+	if response.Trailer == nil {
+		return headers
 	}
 
 	var trailerKeys []string
