@@ -59,7 +59,7 @@ func (c *Configs) InterceptPreflightRequest(r *http.Request) *http.Response {
 }
 
 func (c *Configs) AddCORSHeaders(r *http.Request, resp *http.Response) {
-	if r.Header.Get("Origin") == "" {
+	if r.Header.Get("Origin") == "" || (resp.Header != nil &&  resp.Header.Get("Access-Control-Allow-Origin") != "") {
 		return
 	}
 

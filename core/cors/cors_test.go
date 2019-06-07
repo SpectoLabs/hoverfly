@@ -156,6 +156,7 @@ func Test_AddCORSHeaders_ShouldNotAddCORSHeadersIfRequestHasNoOriginHeader(t *te
 	Expect(resp.Header.Get("Access-Control-Expose-Headers")).To(Equal(""))
 }
 
+
 func Test_AddCORSHeaders_ShouldNotSetAllowCredentialsHeaderIfFalse(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -193,4 +194,25 @@ func Test_AddCORSHeaders_ShouldSetExposeHeadersIfPresent(t *testing.T) {
 	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("http://originhost.com"))
 	Expect(resp.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
 	Expect(resp.Header.Get("Access-Control-Expose-Headers")).To(Equal("Content-Type"))
+}
+
+func Test_AddCORSHeaders_ShouldPreserveExistingCORSHeaders(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := DefaultCORSConfigs()
+
+	r, err := http.NewRequest(http.MethodGet, "http://somehost.com", nil)
+	Expect(err).To(BeNil())
+	r.Header.Set("Origin", "http://originhost.com")
+
+	resp := &http.Response{}
+	resp.Header = make(http.Header)
+	resp.Header.Set("Access-Control-Allow-Origin", "*")
+
+	unit.AddCORSHeaders(r, resp)
+
+	Expect(resp).ToNot(BeNil())
+	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("*"))
+	Expect(resp.Header.Get("Access-Control-Allow-Credentials")).To(Equal(""))
+	Expect(resp.Header.Get("Access-Control-Expose-Headers")).To(Equal(""))
 }
