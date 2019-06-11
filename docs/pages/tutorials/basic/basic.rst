@@ -14,5 +14,6 @@ Basic tutorials
     modifyingresponses/modifyingresponses
     https/https
     asawebserver/asawebserver
+    cors/enablecors
     specificurls/specificurls
     capturingsequences/capturingsequences

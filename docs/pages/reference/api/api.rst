@@ -383,12 +383,17 @@ Gets configuration information from the running instance of Hoverfly.
 ::
 
     {
+        "cors": {
+            "enabled": true,
+            "allowOrigin": "*",
+            "allowMethods": "GET,POST,PUT,OPTIONS"
+        },
         "destination": ".",
         "middleware": {
-        "binary": "python",
-		"script": "# a python script would go here",
-		"remote": ""
-	},
+            "binary": "python",
+            "script": "# a python script would go here",
+            "remote": ""
+        },
         "mode": "simulate",
         "usage": {
             "counters": {
@@ -398,6 +403,25 @@ Gets configuration information from the running instance of Hoverfly.
                 "synthesize": 0
             }
         }
+    }
+
+-------------------------------------------------------------------------------------------------------------
+
+GET /api/v2/hoverfly/cors
+"""""""""""""""""""""""""
+
+Gets CORS configuration information from the running instance of Hoverfly.
+
+**Example response body**
+::
+
+    {
+        "enabled": true,
+        "allowOrigin": "*",
+        "allowMethods": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS",
+        "allowHeaders": "Content-Type, Origin, Accept, Authorization, Content-Length, X-Requested-With",
+        "preflightMaxAge": 1800,
+        "allowCredentials": true
     }
 
 
