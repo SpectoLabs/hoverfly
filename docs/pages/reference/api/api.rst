@@ -447,8 +447,8 @@ a binary or a URL to remote middleware.
 
     {
         "binary": "python",
-	      "script": "#python code goes here",
-	      "remote": ""
+        "script": "#python code goes here",
+        "remote": ""
     }
 
 
@@ -465,8 +465,8 @@ and the binary to execute it or the URL to a remote middleware.
 
     {
         "binary": "python",
-	      "script": "#python code goes here",
-	      "remote": ""
+        "script": "#python code goes here",
+        "remote": ""
     }
 
 
