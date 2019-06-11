@@ -20,11 +20,11 @@ type MiddlewareView struct {
 
 type CORSView struct {
 	Enabled 			bool	`json:"enabled"`
-	AllowOrigin 		string 	`json:"allowOrigin"`
-	AllowMethods 		string 	`json:"allowMethods"`
-	AllowHeaders 		string 	`json:"allowHeaders"`
-	PreflightMaxAge 	int64 	`json:"preflightMaxAge"`
-	AllowCredentials 	bool 	`json:"allowCredentials"`
+	AllowOrigin 		string 	`json:"allowOrigin,omitempty"`
+	AllowMethods 		string 	`json:"allowMethods,omitempty"`
+	AllowHeaders 		string 	`json:"allowHeaders,omitempty"`
+	PreflightMaxAge 	int64 	`json:"preflightMaxAge,omitempty"`
+	AllowCredentials 	bool 	`json:"allowCredentials,omitempty"`
 	ExposeHeaders 		string 	`json:"exposeHeaders,omitempty"`
 }
 
@@ -52,8 +52,9 @@ type UpstreamProxyView struct {
 }
 
 type HoverflyView struct {
+	CORSView 		`json:"cors"`
 	DestinationView
-	MiddlewareView `json:"middleware"`
+	MiddlewareView 	`json:"middleware"`
 	ModeView
 	IsWebServerView
 	UsageView

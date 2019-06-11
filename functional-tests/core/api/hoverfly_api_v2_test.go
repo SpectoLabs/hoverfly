@@ -34,6 +34,7 @@ var _ = Describe("/api/v2/hoverfly", func() {
 
 			hoverflyJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
+			Expect(hoverflyJson).To(MatchRegexp(`"cors":{"enabled":false}`))
 			Expect(hoverflyJson).To(MatchRegexp(`"destination":"."`))
 			Expect(hoverflyJson).To(MatchRegexp(`"middleware":{"binary":"","script":"","remote":""}`))
 			Expect(hoverflyJson).To(MatchRegexp(`"usage":{"counters":{"capture":0,"diff":0,"modify":0,"simulate":0,"spy":0,"synthesize":0}}`))

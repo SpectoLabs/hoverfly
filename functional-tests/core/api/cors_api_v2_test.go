@@ -32,7 +32,7 @@ var _ = Describe("/api/v2/hoverfly/cors", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"enabled":false,"allowOrigin":"","allowMethods":"","allowHeaders":"","preflightMaxAge":0,"allowCredentials":false}`)))
+			Expect(modeJson).To(Equal([]byte(`{"enabled":false}`)))
 		})
 	})
 })

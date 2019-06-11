@@ -9,8 +9,13 @@ import (
 	"github.com/go-zoo/bone"
 )
 
+type HoverflyDiff interface {
+	GetDiff() map[SimpleRequestDefinitionView][]DiffReport
+	ClearDiff()
+}
+
 type DiffHandler struct {
-	Hoverfly Hoverfly
+	Hoverfly HoverflyDiff
 }
 
 func (this *DiffHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {

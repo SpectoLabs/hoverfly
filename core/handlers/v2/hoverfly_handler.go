@@ -11,6 +11,7 @@ import (
 )
 
 type Hoverfly interface {
+	GetCORS() CORSView
 	GetDestination() string
 	GetMiddleware() (string, string, string)
 	GetMode() ModeView
@@ -22,8 +23,6 @@ type Hoverfly interface {
 	ClearState()
 	GetUpstreamProxy() string
 	IsWebServer() bool
-	GetDiff() map[SimpleRequestDefinitionView][]DiffReport
-	ClearDiff()
 }
 
 type HoverflyHandler struct {
@@ -43,6 +42,7 @@ func (this *HoverflyHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHand
 func (this *HoverflyHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	var hoverflyView HoverflyView
 
+	hoverflyView.CORSView = this.Hoverfly.GetCORS()
 	hoverflyView.Destination = this.Hoverfly.GetDestination()
 	hoverflyView.Mode = this.Hoverfly.GetMode().Mode
 	hoverflyView.Arguments = this.Hoverfly.GetMode().Arguments
