@@ -41,6 +41,13 @@ mode and middleware set.
 			middlewareStatus = "enabled"
 		}
 
+		var corsStatus string
+		if hoverflyInfo.CORSView.Enabled {
+			corsStatus = "enabled"
+		} else {
+			corsStatus = "disabled"
+		}
+
 		data := [][]string{
 			{"Hoverfly", "running"},
 			{"Admin port", strconv.Itoa(target.AdminPort)},
@@ -48,6 +55,7 @@ mode and middleware set.
 			{"Proxy type", proxyType},
 			{"Mode", hoverflyInfo.Mode},
 			{"Middleware", middlewareStatus},
+			{"CORS", corsStatus },
 		}
 
 		drawTable(data, false)
