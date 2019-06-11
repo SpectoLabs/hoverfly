@@ -35,6 +35,7 @@ var _ = Describe("when I use hoverctl status", func() {
 				Expect(output).To(ContainSubstring("Proxy type | forward"))
 				Expect(output).To(ContainSubstring("Mode       | simulate"))
 				Expect(output).To(ContainSubstring("Middleware | disabled"))
+				Expect(output).To(ContainSubstring("CORS       | disabled"))
 			})
 
 			It("should get the mode from Hoverfly", func() {
@@ -88,6 +89,28 @@ var _ = Describe("when I use hoverctl status", func() {
 			It("should get proxy type from Hoverfly", func() {
 				output := functional_tests.Run(hoverctlBinary, "status")
 				Expect(output).To(ContainSubstring("Proxy type | reverse (webserver)"))
+			})
+		})
+	})
+
+	Describe("with Hoverfly has CORS enabled", func() {
+
+		BeforeEach(func() {
+			hoverfly = functional_tests.NewHoverfly()
+			hoverfly.Start("-cors")
+
+			functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--admin-port", hoverfly.GetAdminPort())
+		})
+
+		AfterEach(func() {
+			hoverfly.Stop()
+		})
+
+		Describe("should get the status of Hoverfly", func() {
+
+			It("should get the CORS status from Hoverfly", func() {
+				output := functional_tests.Run(hoverctlBinary, "status")
+				Expect(output).To(ContainSubstring("CORS       | enabled"))
 			})
 		})
 	})
