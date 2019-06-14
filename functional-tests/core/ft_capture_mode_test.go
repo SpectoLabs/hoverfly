@@ -92,7 +92,78 @@ var _ = Describe("When I run Hoverfly", func() {
 							Value:   "",
 						},
 					},
-					Query: &v2.QueryMatcherViewV5{},
+				}))
+
+				Expect(payload.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsViewV5{
+					Status:      200,
+					Body:        "Hello world",
+					EncodedBody: false,
+					Headers: map[string][]string{
+						"Content-Length": {"11"},
+						"Content-Type":   {"text/plain"},
+						"Date":           {"date"},
+						"Hoverfly":       {"Was-Here"},
+					},
+					Templated: false,
+				}))
+			})
+
+			It("Should not capture the existing request and response", func() {
+
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "text/plain")
+					w.Header().Set("Date", "date")
+					w.Write([]byte("Hello world"))
+				}))
+
+				defer fakeServer.Close()
+				expectedDestination := strings.Replace(fakeServer.URL, "http://", "", 1)
+
+				existingSimBytes, err := ioutil.ReadFile("testdata/fake-server.json")
+				Expect(err).To(BeNil())
+				existingSim := string(existingSimBytes)
+				existingSim = strings.Replace(existingSim, "127.0.0.1:53751", expectedDestination, 1)
+				hoverfly.ImportSimulation(existingSim)
+
+				resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL))
+				Expect(resp.StatusCode).To(Equal(200))
+
+
+				payload := hoverfly.ExportSimulation()
+
+				Expect(payload.RequestResponsePairs).To(HaveLen(1))
+
+				Expect(payload.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV5{
+					Path: []v2.MatcherViewV5{
+						{
+							Matcher: matchers.Exact,
+							Value:   "/",
+						},
+					},
+					Method: []v2.MatcherViewV5{
+						{
+							Matcher: matchers.Exact,
+							Value:   "GET",
+						},
+					},
+					Destination: []v2.MatcherViewV5{
+						{
+							Matcher: matchers.Exact,
+							Value:   expectedDestination,
+						},
+					},
+					Scheme: []v2.MatcherViewV5{
+						{
+							Matcher: matchers.Exact,
+							Value:   "http",
+						},
+					},
+					Body: []v2.MatcherViewV5{
+						{
+							Matcher: matchers.Exact,
+							Value:   "",
+						},
+					},
 				}))
 
 				Expect(payload.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsViewV5{
