@@ -892,9 +892,9 @@ func Test_Hoverfly_Save_SavesIncompleteRequestAndResponseToSimulation(t *testing
 		Value:   "",
 	}))
 
-	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveLen(0))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(BeNil())
 
-	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveLen(0))
+	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(BeNil())
 
 	Expect(unit.Simulation.GetMatchingPairs()[0].Response.Body).To(Equal("testresponsebody"))
 	Expect(unit.Simulation.GetMatchingPairs()[0].Response.Headers).To(HaveKeyWithValue("testheader", []string{"testvalue"}))

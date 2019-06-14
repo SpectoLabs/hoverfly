@@ -1,0 +1,69 @@
+{
+  "data": {
+    "pairs": [
+      {
+        "request": {
+          "path": [
+            {
+              "matcher": "exact",
+              "value": "/"
+            }
+          ],
+          "method": [
+            {
+              "matcher": "exact",
+              "value": "GET"
+            }
+          ],
+          "destination": [
+            {
+              "matcher": "exact",
+              "value": "127.0.0.1:53751"
+            }
+          ],
+          "scheme": [
+            {
+              "matcher": "exact",
+              "value": "http"
+            }
+          ],
+          "body": [
+            {
+              "matcher": "exact",
+              "value": ""
+            }
+          ]
+        },
+        "response": {
+          "status": 200,
+          "body": "Hello world",
+          "encodedBody": false,
+          "headers": {
+            "Content-Length": [
+              "11"
+            ],
+            "Content-Type": [
+              "text/plain"
+            ],
+            "Date": [
+              "date"
+            ],
+            "Hoverfly": [
+              "Was-Here"
+            ]
+          },
+          "templated": false
+        }
+      }
+    ],
+    "globalActions": {
+      "delays": [],
+      "delaysLogNormal": []
+    }
+  },
+  "meta": {
+    "schemaVersion": "v5",
+    "hoverflyVersion": "v1.0.0",
+    "timeExported": "2019-06-14T12:00:42+01:00"
+  }
+}

@@ -155,24 +155,30 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		}
 	}
 
-	requestHeaders := map[string][]models.RequestFieldMatchers{}
-	for headerKey, headerValues := range headers {
-		requestHeaders[headerKey] = []models.RequestFieldMatchers{
-			{
-				Matcher: matchers.Exact,
-				Value:   strings.Join(headerValues, ";"),
-			},
+	var requestHeaders map[string][]models.RequestFieldMatchers
+	if len(headers) > 0 {
+		requestHeaders = map[string][]models.RequestFieldMatchers{}
+		for headerKey, headerValues := range headers {
+			requestHeaders[headerKey] = []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   strings.Join(headerValues, ";"),
+				},
+			}
 		}
 	}
 
-	queries := &models.QueryRequestFieldMatchers{}
-	for key, values := range request.Query {
-		queries.Add(key, []models.RequestFieldMatchers{
-			{
-				Matcher: matchers.Exact,
-				Value:   strings.Join(values, ";"),
-			},
-		})
+	var queries *models.QueryRequestFieldMatchers
+	if len(request.Query) > 0 {
+		queries = &models.QueryRequestFieldMatchers{}
+		for key, values := range request.Query {
+			queries.Add(key, []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   strings.Join(values, ";"),
+				},
+			})
+		}
 	}
 
 	pair := models.RequestMatcherResponsePair{
