@@ -16,6 +16,7 @@ Available Commands:
   logs        Get the logs from Hoverfly
   middleware  Get and set Hoverfly middleware
   mode        Get and set the Hoverfly mode
+  simulation  Manage the simulation for Hoverfly
   start       Start Hoverfly
   state       Manage the state for Hoverfly
   status      Get the current status of Hoverfly
