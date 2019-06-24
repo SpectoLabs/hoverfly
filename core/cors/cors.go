@@ -30,6 +30,7 @@ func DefaultCORSConfigs() *Configs {
 }
 
 // TODO provide config to pass through OPTIONS call
+// Intercept pre-flight request and return 200 response with CORS headers
 func (c *Configs) InterceptPreflightRequest(r *http.Request) *http.Response {
 	if r.Method != http.MethodOptions || r.Header.Get("Origin") == "" || r.Header.Get("Access-Control-Request-Methods") == "" {
 		return nil
@@ -58,6 +59,7 @@ func (c *Configs) InterceptPreflightRequest(r *http.Request) *http.Response {
 	return resp
 }
 
+// Add CORS headers to the response if the request contains Origin header
 func (c *Configs) AddCORSHeaders(r *http.Request, resp *http.Response) {
 	if r.Header.Get("Origin") == "" || (resp.Header != nil &&  resp.Header.Get("Access-Control-Allow-Origin") != "") {
 		return
@@ -78,6 +80,7 @@ func (c *Configs) AddCORSHeaders(r *http.Request, resp *http.Response) {
 	}
 }
 
+// Safely get Allow-Origin header value. The value cannot be a wildcard while Allow-Credentials is enabled
 func (c *Configs) getAllowOrigin(r *http.Request) string {
 	allowOrigin := c.AllowOrigin
 	if c.AllowCredentials && allowOrigin == "*" {
