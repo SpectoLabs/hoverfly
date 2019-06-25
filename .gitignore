@@ -62,3 +62,4 @@ functional-tests/core/bin/hoverctl
 test.db
 /vendor/vendor.json
 config.yaml
+/testdata/large_file.json
