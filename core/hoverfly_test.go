@@ -155,6 +155,7 @@ func Test_Hoverfly_processRequest_CaptureModeReturnsResponseAndSavesIt(t *testin
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+	Expect(resp.Header).To(HaveKeyWithValue("Hoverfly", []string{"Was-Here"}))
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
 }
@@ -181,6 +182,49 @@ func Test_Hoverfly_processRequest_CanSimulateRequest(t *testing.T) {
 
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
+}
+
+func Test_Hoverfly_processRequest_CanSimulateRequestInSpyMode(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	r, err := http.NewRequest("GET", "http://somehost.com", nil)
+	Expect(err).To(BeNil())
+
+	// capturing
+	unit.Cfg.SetMode("capture")
+	resp := unit.processRequest(r)
+
+	Expect(resp).ToNot(BeNil())
+	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+
+	// virtualizing
+	unit.Cfg.SetMode("spy")
+	newResp := unit.processRequest(r)
+
+	Expect(newResp).ToNot(BeNil())
+	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
+	Expect(newResp.Header).To(HaveKeyWithValue("Hoverfly", []string{"Was-Here"}))
+}
+
+func Test_Hoverfly_processRequest_CanSpyRequest(t *testing.T) {
+	RegisterTestingT(t)
+
+	server, unit := testTools(201, `{'message': 'here'}`)
+	defer server.Close()
+
+	r, err := http.NewRequest("GET", "http://somehost.com", nil)
+	Expect(err).To(BeNil())
+
+	// virtualizing
+	unit.Cfg.SetMode("spy")
+	resp := unit.processRequest(r)
+
+	Expect(resp).ToNot(BeNil())
+	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
+	Expect(resp.Header).To(HaveKeyWithValue("Hoverfly", []string{"Was-Here", "Forwarded"}))
 }
 
 func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeResponse(t *testing.T) {
