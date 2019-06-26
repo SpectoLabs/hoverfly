@@ -30,7 +30,11 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
-	resp.Header.Set("hoverfly", "Was-Here")
+	resp.Header.Set("Hoverfly", "Was-Here")
+
+	if hf.Cfg.Mode == "spy" {
+		resp.Header.Add("Hoverfly", "Forwarded")
+	}
 
 	return resp, nil
 
