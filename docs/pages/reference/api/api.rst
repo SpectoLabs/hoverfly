@@ -507,7 +507,12 @@ Gets the mode for the running instance of Hoverfly.
 
     {
         "mode": "capture",
-        "arguments": {}
+        "arguments": {
+            "headersWhitelist": [
+                "*"
+            ],
+            "stateful": true
+        }
     }
 
 --------------
@@ -515,13 +520,19 @@ Gets the mode for the running instance of Hoverfly.
 PUT /api/v2/hoverfly/mode
 """""""""""""""""""""""""
 
-Changes the mode of the running instance of Hoverfly.
+Changes the mode of the running instance of Hoverfly. Pass additional arguments to set the mode options.
 
 **Example request body**
 ::
 
     {
-        "mode": "capture"
+        "mode": "capture",
+        "arguments": {
+            "headersWhitelist": [
+                "*"
+            ],
+            "stateful": true
+        }
     }
 
 
