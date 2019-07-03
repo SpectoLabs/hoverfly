@@ -42,6 +42,12 @@ func (this *Simulation) AddPair(pair *RequestMatcherResponsePair) bool {
 	return !duplicate
 }
 
+func (this *Simulation) AddPairWithoutCheck(pair *RequestMatcherResponsePair) {
+	this.RWMutex.Lock()
+	this.matchingPairs = append(this.matchingPairs, *pair)
+	this.RWMutex.Unlock()
+}
+
 func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, state *state.State) {
 	var duplicate bool
 

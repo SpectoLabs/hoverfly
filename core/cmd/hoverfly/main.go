@@ -104,9 +104,10 @@ var (
 	logsFormat = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\"")
 	logsSize   = flag.Int("logs-size", 1000, "Set the amount of logs to be stored in memory")
 
-	journalSize = flag.Int("journal-size", 1000, "Set the size of request/response journal")
-	cacheSize 	= flag.Int("cache-size", 1000, "Set the size of request/response cache")
-	cors     = flag.Bool("cors", false, "Enable CORS support")
+	journalSize 	= flag.Int("journal-size", 1000, "Set the size of request/response journal")
+	cacheSize 		= flag.Int("cache-size", 1000, "Set the size of request/response cache")
+	cors     		= flag.Bool("cors", false, "Enable CORS support")
+	skipImportCheck	= flag.Bool("skip-import-check", false, "Skip duplicate request check when importing simulations")
 
 	clientAuthenticationDestination = flag.String("client-authentication-destination", "", "Regular expression of destination with client authentication")
 	clientAuthenticationClientCert  = flag.String("client-authentication-client-cert", "", "Path to the client certification file used for authentication")
@@ -300,6 +301,8 @@ func main() {
 		cfg.CORS = *cs.DefaultCORSConfigs()
 		log.Info("CORS has been enabled")
 	}
+
+	cfg.SkipImportCheck = *skipImportCheck
 
 	cfg.ClientAuthenticationDestination = *clientAuthenticationDestination
 	cfg.ClientAuthenticationClientCert = *clientAuthenticationClientCert

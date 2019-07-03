@@ -1,0 +1,46 @@
+package hoverfly_test
+
+import (
+	"encoding/json"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"io/ioutil"
+)
+
+var _ = Describe("When I run Hoverfly", func() {
+
+	var (
+		hoverfly *functional_tests.Hoverfly
+	)
+
+	BeforeEach(func() {
+		hoverfly = functional_tests.NewHoverfly()
+	})
+
+	AfterEach(func() {
+		hoverfly.Stop()
+	})
+
+	Context("with skip import check", func() {
+
+		BeforeEach(func() {
+			hoverfly.Start("-skip-import-check=true")
+		})
+
+		It("should skip duplicate pair check", func() {
+
+			hoverfly.ImportSimulation(testdata.DuplicatePairs)
+
+			recordsJson, err := ioutil.ReadAll(hoverfly.GetSimulation())
+			Expect(err).To(BeNil())
+
+			payload := v2.SimulationViewV5{}
+
+			Expect(json.Unmarshal(recordsJson, &payload)).To(Succeed())
+			Expect(payload.RequestResponsePairs).To(HaveLen(2))
+		})
+	})
+})

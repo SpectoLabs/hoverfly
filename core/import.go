@@ -143,8 +143,15 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 
 			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
 
-			isAdded := hf.Simulation.AddPair(pair)
-			if isAdded {
+			var isPairAdded bool
+			if hf.Cfg.SkipImportCheck {
+				hf.Simulation.AddPairWithoutCheck(pair)
+				isPairAdded = true
+			} else {
+				isPairAdded = hf.Simulation.AddPair(pair)
+			}
+
+			if isPairAdded {
 				for k, v := range pair.RequestMatcher.RequiresState {
 					initialStates[k] = v
 				}

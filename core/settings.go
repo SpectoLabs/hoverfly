@@ -44,6 +44,8 @@ type Configuration struct {
 	PlainHttpTunneling bool
 	CORS cors.Configs
 
+	SkipImportCheck bool
+
 	ClientAuthenticationDestination string
 	ClientAuthenticationClientCert  string
 	ClientAuthenticationClientKey   string
@@ -93,6 +95,7 @@ const DefaultJWTExpirationDelta = 1 * 24 * 60 * 60
 
 // Environment variables
 const (
+	// TODO Should use naming convention for environment variables
 	HoverflyAuthEnabledEV     = "HoverflyAuthEnabled"
 	HoverflySecretEV          = "HoverflySecret"
 	HoverflyTokenExpirationEV = "HoverflyTokenExpiration"
@@ -111,6 +114,7 @@ const (
 	HoverflyImportRecordsEV = "HoverflyImport"
 
 	HoverflyUpstreamProxyPortEV = "UpstreamProxy"
+	HoverflySkipImportCheckEV = "SKIP_IMPORT_CHECK"
 )
 
 // InitSettings gets and returns initial configuration from env
@@ -185,6 +189,12 @@ func InitSettings() *Configuration {
 		appConfig.TLSVerification = false
 	} else {
 		appConfig.TLSVerification = true
+	}
+
+	if os.Getenv(HoverflySkipImportCheckEV) == "true" {
+		appConfig.SkipImportCheck = true
+	} else {
+		appConfig.SkipImportCheck = false
 	}
 
 	appConfig.Mode = "simulate"
