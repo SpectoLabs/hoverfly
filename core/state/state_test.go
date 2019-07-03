@@ -54,9 +54,18 @@ func Test_GetState(t *testing.T) {
 	}
 
 	Expect(s).ToNot(BeNil())
-	Expect(s.GetState("test1")).To(Equal("1"))
-	Expect(s.GetState("test2")).To(Equal("2"))
-	Expect(s.GetState("test3")).To(Equal("3"))
+	Eventually(func() string {
+			val, _ := s.GetState("test1")
+			return val
+	}).Should(Equal("1"))
+	Eventually(func() string {
+			val, _ := s.GetState("test2")
+			return val
+	}).Should(Equal("2"))
+	Eventually(func() string {
+			val, _ := s.GetState("test3")
+			return val
+	}).Should(Equal("3"))
 }
 
 func Test_PatchState(t *testing.T) {

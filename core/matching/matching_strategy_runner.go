@@ -3,16 +3,20 @@ package matching
 import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/state"
+	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 type MatchingStrategy interface {
 	PreMatching()
 	Matching(*FieldMatch, string)
-	PostMatching(models.RequestDetails, models.RequestMatcher, models.RequestMatcherResponsePair, *state.State) *MatchingResult
+	PostMatching(models.RequestDetails, models.RequestMatcher, models.RequestMatcherResponsePair, map[string]string) *MatchingResult
 	Result() *MatchingResult
 }
 
 func MatchingStrategyRunner(req models.RequestDetails, webserver bool, simulation *models.Simulation, state *state.State, strategy MatchingStrategy) *MatchingResult {
+	state.RWMutex.RLock()
+	copyState := util.CopyMap(state.State)
+	state.RWMutex.RUnlock()
 	for _, matchingPair := range simulation.GetMatchingPairs() {
 		requestMatcher := matchingPair.RequestMatcher
 		strategy.PreMatching()
@@ -35,7 +39,7 @@ func MatchingStrategyRunner(req models.RequestDetails, webserver bool, simulatio
 
 		strategy.Matching(StateMatcher(state, requestMatcher.RequiresState), "state")
 
-		if result := strategy.PostMatching(req, requestMatcher, matchingPair, state); result != nil {
+		if result := strategy.PostMatching(req, requestMatcher, matchingPair, copyState); result != nil {
 			return result
 		}
 	}

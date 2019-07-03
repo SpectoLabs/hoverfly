@@ -2,7 +2,6 @@ package matching
 
 import (
 	"github.com/SpectoLabs/hoverfly/core/state"
-	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 func StateMatcher(currentState *state.State, requiredState map[string]string) *FieldMatch {
@@ -17,14 +16,12 @@ func StateMatcher(currentState *state.State, requiredState map[string]string) *F
 		}
 	}
 
-	currentState.RWMutex.RLock()
-	copyState := util.CopyMap(currentState.State)
-	currentState.RWMutex.RUnlock()
 	for key, value := range requiredState {
-		if _, ok := copyState[key]; !ok {
+		currentStateValue, ok := currentState.GetState(key)
+		if !ok {
 			matched = false
 		}
-		if copyState[key] != value {
+		if currentStateValue != value {
 			matched = false
 		} else {
 			score++
