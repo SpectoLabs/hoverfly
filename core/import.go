@@ -144,7 +144,7 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
 
 			var isPairAdded bool
-			if hf.Cfg.SkipImportCheck {
+			if hf.Cfg.NoImportCheck {
 				hf.Simulation.AddPairWithoutCheck(pair)
 				isPairAdded = true
 			} else {

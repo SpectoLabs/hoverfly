@@ -73,6 +73,7 @@ hoverctl configuration file.
 		target.UpstreamProxyUrl, _ = cmd.Flags().GetString("upstream-proxy")
 		target.HttpsOnly, _ = cmd.Flags().GetBool("https-only")
 		target.CORS, _ = cmd.Flags().GetBool("cors")
+		target.NoImportCheck, _ = cmd.Flags().GetBool("no-import-check")
 
 		target.Simulations, _ = cmd.Flags().GetStringSlice("import")
 
@@ -153,6 +154,7 @@ func init() {
 	startCmd.Flags().Bool("https-only", false, "Disable insecure HTTP traffic in Hoverfly")
 	startCmd.Flags().String("listen-on-host", "", "Bind hoverfly listener to a host")
 	startCmd.Flags().Bool("cors", false, "Enable CORS support")
+	startCmd.Flags().Bool("no-import-check", false, "Skip duplicate request check when importing simulations")
 
 	startCmd.Flags().String("client-authentication-destination", "", "Regular expression for hosts need client authentication")
 	startCmd.Flags().String("client-authentication-client-cert", "", "Path to client certificate file used for authentication")

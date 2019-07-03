@@ -163,5 +163,5 @@ func TestSettingsSkipDuplicatePairCheckEnv(t *testing.T) {
 	os.Setenv("SKIP_IMPORT_CHECK", "true")
 	cfg := InitSettings()
 
-	Expect(cfg.SkipImportCheck).To(BeTrue())
+	Expect(cfg.NoImportCheck).To(BeTrue())
 }

@@ -26,7 +26,8 @@ type Target struct {
 	UpstreamProxyUrl string `yaml:",omitempty"`
 	PACFile          string `yaml:",omitempty"`
 	HttpsOnly        bool   `yaml:",omitempty"`
-	CORS       	 	bool   `yaml:",omitempty"`
+	CORS             bool   `yaml:",omitempty"`
+	NoImportCheck    bool   `yaml:",omitempty"`
 
 	ClientAuthenticationDestination string `yaml:",omitempty"`
 	ClientAuthenticationClientCert  string `yaml:",omitempty"`
@@ -140,6 +141,10 @@ func (this Target) BuildFlags() Flags {
 
 	if this.ClientAuthenticationCACert != "" {
 		flags = append(flags, "-client-authentication-ca-cert="+this.ClientAuthenticationCACert)
+	}
+
+	if this.NoImportCheck {
+		flags = append(flags, "-no-import-check")
 	}
 
 	if len(this.Simulations) > 0 {

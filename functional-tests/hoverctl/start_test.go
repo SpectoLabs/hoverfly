@@ -207,6 +207,15 @@ var _ = Describe("hoverctl `start`", func() {
 			output = functional_tests.Run(hoverctlBinary, "logs", "--json")
 			Expect(output).To(ContainSubstring("CORS has been enabled"))
 		})
+
+		It("should start an instance of hoverfly with import check disabled", func() {
+			output := functional_tests.Run(hoverctlBinary, "start", "--no-import-check")
+
+			Expect(output).To(ContainSubstring("Hoverfly is now running"))
+
+			output = functional_tests.Run(hoverctlBinary, "logs", "--json")
+			Expect(output).To(ContainSubstring("Import check has been disabled"))
+		})
 	})
 
 	Context("with a target", func() {
