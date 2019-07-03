@@ -2,7 +2,6 @@ package matching
 
 import (
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/state"
 )
 
 type FirstMatchStrategy struct {
@@ -35,7 +34,7 @@ func (s *FirstMatchStrategy) Matching(fieldMatch *FieldMatch, field string) {
 	}
 }
 
-func (s *FirstMatchStrategy) PostMatching(req models.RequestDetails, requestMatcher models.RequestMatcher, matchingPair models.RequestMatcherResponsePair, state *state.State) *MatchingResult {
+func (s *FirstMatchStrategy) PostMatching(req models.RequestDetails, requestMatcher models.RequestMatcher, matchingPair models.RequestMatcherResponsePair, state map[string]string) *MatchingResult {
 	if s.matchedOnAllButHeaders {
 		s.matchedOnAllButHeadersAtLeastOnce = true
 	}

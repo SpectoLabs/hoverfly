@@ -664,7 +664,10 @@ func TestImportImportRequestResponsePairs_SetsState(t *testing.T) {
 	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{encodedPair})
 	Expect(result.WarningMessages).To(HaveLen(0))
 
-	Expect(hv.state.GetState("sequence:1")).To(Equal("1"))
+	Eventually(func() string {
+			val,_ := hv.state.GetState("sequence:1")
+			return val
+	}).Should(Equal("1"))
 }
 
 func TestImportImportRequestResponsePairsMultipleTimes_SetsAllStates(t *testing.T) {
@@ -714,8 +717,14 @@ func TestImportImportRequestResponsePairsMultipleTimes_SetsAllStates(t *testing.
 	result2 := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{pair2})
 	Expect(result2.WarningMessages).To(HaveLen(0))
 
-	Expect(hv.state.GetState("sequence:1")).To(Equal("1"))
-	Expect(hv.state.GetState("sequence:2")).To(Equal("1"))
+	Eventually(func() string {
+			val,_ := hv.state.GetState("sequence:1")
+			return val
+	}).Should(Equal("1"))
+	Eventually(func() string {
+			val,_ := hv.state.GetState("sequence:2")
+			return val
+	}).Should(Equal("1"))
 }
 
 func TestImportImportRequestResponsePairs_ReturnsWarningsIfDeprecatedQuerytSet(t *testing.T) {

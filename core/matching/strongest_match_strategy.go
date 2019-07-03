@@ -2,8 +2,6 @@ package matching
 
 import (
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/state"
-	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 type StrongestMatchStrategy struct {
@@ -42,7 +40,7 @@ func (s *StrongestMatchStrategy) Matching(fieldMatch *FieldMatch, field string) 
 	s.score += fieldMatch.Score
 }
 
-func (s *StrongestMatchStrategy) PostMatching(req models.RequestDetails, requestMatcher models.RequestMatcher, matchingPair models.RequestMatcherResponsePair, state *state.State) *MatchingResult {
+func (s *StrongestMatchStrategy) PostMatching(req models.RequestDetails, requestMatcher models.RequestMatcher, matchingPair models.RequestMatcherResponsePair, state map[string]string) *MatchingResult {
 	// This only counts if there was actually a matcher for headers
 	if s.matchedOnAllButHeaders && requestMatcher.Headers != nil && len(requestMatcher.Headers) > 0 {
 		s.matchedOnAllButHeadersAtLeastOnce = true
@@ -63,15 +61,12 @@ func (s *StrongestMatchStrategy) PostMatching(req models.RequestDetails, request
 	} else if s.matched == false && s.requestMatch == nil && s.score >= s.closestMissScore {
 		s.closestMissScore = s.score
 		view := matchingPair.BuildView()
-		state.RWMutex.RLock()
-		copyState := util.CopyMap(state.State)
-		state.RWMutex.RUnlock()
 		s.closestMiss = &models.ClosestMiss{
 			RequestDetails: req,
 			RequestMatcher: view.RequestMatcher,
 			Response:       view.Response,
 			MissedFields:   s.missedFields,
-			State:          copyState,
+			State:          state,
 		}
 	}
 
