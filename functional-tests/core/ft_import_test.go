@@ -24,10 +24,10 @@ var _ = Describe("When I run Hoverfly", func() {
 		hoverfly.Stop()
 	})
 
-	Context("with skip import check", func() {
+	Context("with -no-import-check", func() {
 
 		BeforeEach(func() {
-			hoverfly.Start("-skip-import-check=true")
+			hoverfly.Start("-no-import-check")
 		})
 
 		It("should skip duplicate pair check", func() {

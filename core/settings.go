@@ -44,7 +44,7 @@ type Configuration struct {
 	PlainHttpTunneling bool
 	CORS cors.Configs
 
-	SkipImportCheck bool
+	NoImportCheck bool
 
 	ClientAuthenticationDestination string
 	ClientAuthenticationClientCert  string
@@ -192,9 +192,9 @@ func InitSettings() *Configuration {
 	}
 
 	if os.Getenv(HoverflySkipImportCheckEV) == "true" {
-		appConfig.SkipImportCheck = true
+		appConfig.NoImportCheck = true
 	} else {
-		appConfig.SkipImportCheck = false
+		appConfig.NoImportCheck = false
 	}
 
 	appConfig.Mode = "simulate"
