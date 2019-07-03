@@ -154,3 +154,14 @@ func Test_InitSettings_SetsCORSToDisabled(t *testing.T) {
 
 	Expect(settings.CORS.Enabled).To(BeFalse())
 }
+
+func TestSettingsSkipDuplicatePairCheckEnv(t *testing.T) {
+	RegisterTestingT(t)
+
+	defer os.Setenv("SKIP_IMPORT_CHECK", "")
+
+	os.Setenv("SKIP_IMPORT_CHECK", "true")
+	cfg := InitSettings()
+
+	Expect(cfg.SkipImportCheck).To(BeTrue())
+}
