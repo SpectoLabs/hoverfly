@@ -41,7 +41,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			fakeServer.StartTLS()
 			defer fakeServer.Close()
 
-			resp := hoverfly.Proxy(sling.New().Options(fakeServer.URL).Add("Origin", "http://some-host.com").Add("Access-Control-Request-Methods", "POST"))
+			resp := hoverfly.Proxy(sling.New().Options(fakeServer.URL).Add("Origin", "http://some-host.com").Add("Access-Control-Request-Method", "POST"))
 			Expect(resp.StatusCode).To(Equal(200))
 			Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("http://some-host.com"))
 			Expect(resp.Header.Get("Access-Control-Allow-Methods")).To(Equal("GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"))

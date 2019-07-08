@@ -32,7 +32,7 @@ func DefaultCORSConfigs() *Configs {
 // TODO provide config to pass through OPTIONS call
 // Intercept pre-flight request and return 200 response with CORS headers
 func (c *Configs) InterceptPreflightRequest(r *http.Request) *http.Response {
-	if r.Method != http.MethodOptions || r.Header.Get("Origin") == "" || r.Header.Get("Access-Control-Request-Methods") == "" {
+	if r.Method != http.MethodOptions || r.Header.Get("Origin") == "" || r.Header.Get("Access-Control-Request-Method") == "" {
 		return nil
 	}
 	resp := &http.Response{}
