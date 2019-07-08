@@ -15,7 +15,7 @@ func Test_InterceptPreflightRequest_ReturnSuccessResponseWithDefaultHeaders(t *t
 	r, err := http.NewRequest(http.MethodOptions, "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 	r.Header.Set("Origin", "http://originhost.com")
-	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
+	r.Header.Set("Access-Control-Request-Method", "PUT")
 	resp := unit.InterceptPreflightRequest(r)
 
 	Expect(resp).ToNot(BeNil())
@@ -37,7 +37,7 @@ func Test_InterceptPreflightRequest_ReturnNilIfRequestIsNotOptions(t *testing.T)
 	r, err := http.NewRequest(http.MethodGet, "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 	r.Header.Set("Origin", "http://originhost.com")
-	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
+	r.Header.Set("Access-Control-Request-Method", "PUT")
 	resp := unit.InterceptPreflightRequest(r)
 
 	Expect(resp).To(BeNil())
@@ -50,7 +50,7 @@ func Test_InterceptPreflightRequest_ReturnNilIfRequestHasNoOriginHeader(t *testi
 
 	r, err := http.NewRequest(http.MethodOptions, "http://somehost.com", nil)
 	Expect(err).To(BeNil())
-	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
+	r.Header.Set("Access-Control-Request-Method", "PUT")
 	resp := unit.InterceptPreflightRequest(r)
 
 	Expect(resp).To(BeNil())
@@ -77,7 +77,7 @@ func Test_InterceptPreflightRequest_ShouldEchoAllowHeaders(t *testing.T) {
 	r, err := http.NewRequest(http.MethodOptions, "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 	r.Header.Set("Origin", "http://originhost.com")
-	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
+	r.Header.Set("Access-Control-Request-Method", "PUT")
 	r.Header.Set("Access-Control-Request-Headers", "X-PINGOTHER,Content-Type")
 	resp := unit.InterceptPreflightRequest(r)
 
@@ -95,7 +95,7 @@ func Test_InterceptPreflightRequest_ShouldNotSetAllowCredentialsHeaderIfFalse(t 
 	r, err := http.NewRequest(http.MethodOptions, "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 	r.Header.Set("Origin", "http://originhost.com")
-	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
+	r.Header.Set("Access-Control-Request-Method", "PUT")
 	resp := unit.InterceptPreflightRequest(r)
 
 	Expect(resp).ToNot(BeNil())
@@ -112,7 +112,7 @@ func Test_InterceptPreflightRequest_UseDefaultAllowOriginValueIfAllowCredentials
 	r, err := http.NewRequest(http.MethodOptions, "http://somehost.com", nil)
 	Expect(err).To(BeNil())
 	r.Header.Set("Origin", "http://originhost.com")
-	r.Header.Set("Access-Control-Request-Methods", "PUT,POST")
+	r.Header.Set("Access-Control-Request-Method", "PUT")
 	resp := unit.InterceptPreflightRequest(r)
 
 	Expect(resp).ToNot(BeNil())
