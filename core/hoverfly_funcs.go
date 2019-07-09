@@ -91,13 +91,13 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 			template = cachedResponse.ResponseTemplate
 		} else {
 			// Parse and cache the template
-			template, _ = hf.templator.ParseTemplate(response.Body)
+			template, _ = hf.Templator.ParseTemplate(response.Body)
 			if cachedResponse != nil {
 				cachedResponse.ResponseTemplate = template
 			}
 		}
 
-		responseBody, err :=  hf.templator.RenderTemplate(template, &requestDetails, hf.state.State)
+		responseBody, err :=  hf.Templator.RenderTemplate(template, &requestDetails, hf.state.State)
 
 		if err == nil {
 			response.Body = responseBody

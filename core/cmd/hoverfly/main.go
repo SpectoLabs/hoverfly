@@ -24,7 +24,9 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/templating"
 	"os"
+	"plugin"
 	"strings"
 	"time"
 
@@ -178,6 +180,34 @@ func init() {
 
 func main() {
 	hoverfly := hv.NewHoverfly()
+
+	// Load plugins
+	pluginPath := "./plugins/fake_data_helper.so"
+	mod, err := plugin.Open(pluginPath)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Fatal("Failed to load plugins")
+	}
+
+	symHelper, err := mod.Lookup("HelperDef")
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Fatal("Failed to lookup plugin by symbol")
+	}
+
+	var helperDef templating.CustomHelperDef
+	helperDef, ok := symHelper.(templating.CustomHelperDef)
+	if !ok {
+		log.WithFields(log.Fields{
+			"error": "not ok",
+		}).Fatal("Unexpected type from custom helper plugin")
+	}
+
+	hoverfly.Templator.RegisterHelper(helperDef)
+
 
 	flag.Var(&importFlags, "import", "Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
 	flag.Var(&destinationFlags, "dest", "Specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")

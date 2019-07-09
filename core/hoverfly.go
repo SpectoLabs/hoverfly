@@ -40,7 +40,7 @@ type Hoverfly struct {
 	Simulation    *models.Simulation
 	StoreLogsHook *StoreLogsHook
 	Journal       *journal.Journal
-	templator     *templating.Templator
+	Templator     *templating.Templator
 
 	responsesDiff map[v2.SimpleRequestDefinitionView][]v2.DiffReport
 }
@@ -57,7 +57,7 @@ func NewHoverfly() *Hoverfly {
 		Journal:        journal.NewJournal(),
 		Cfg:            InitSettings(),
 		state:          state.NewState(),
-		templator:      templating.NewTemplator(),
+		Templator:      templating.NewTemplator(),
 		responsesDiff:  make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport),
 	}
 

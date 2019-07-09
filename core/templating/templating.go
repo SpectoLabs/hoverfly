@@ -9,6 +9,12 @@ import (
 	"github.com/aymerick/raymond"
 )
 
+
+type CustomHelperDef interface {
+	Helper() string
+	Name() string
+}
+
 type TemplatingData struct {
 	Request         Request
 	State           map[string]string
@@ -70,6 +76,10 @@ func (*Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.R
 	}
 	ctx := NewTemplatingDataFromRequest(requestDetails, state)
 	return tpl.Exec(ctx)
+}
+
+func (*Templator) RegisterHelper(def CustomHelperDef) {
+	raymond.RegisterHelper(def.Name(), def.Helper)
 }
 
 
