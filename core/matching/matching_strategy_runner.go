@@ -37,7 +37,7 @@ func MatchingStrategyRunner(req models.RequestDetails, webserver bool, simulatio
 
 		strategy.Matching(QueryMatching(requestMatcher, req.Query), "queries")
 
-		strategy.Matching(StateMatcher(state, requestMatcher.RequiresState), "state")
+		strategy.Matching(StateMatcher(copyState, requestMatcher.RequiresState), "state")
 
 		if result := strategy.PostMatching(req, requestMatcher, matchingPair, copyState); result != nil {
 			return result
