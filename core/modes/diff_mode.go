@@ -40,8 +40,6 @@ func (this *DiffMode) View() v2.ModeView {
 		Mode: Diff,
 		Arguments: v2.ModeArgumentsView{
 			Headers:          this.Arguments.Headers,
-			MatchingStrategy: this.Arguments.MatchingStrategy,
-			Stateful:         this.Arguments.Stateful,
 		},
 	}
 }

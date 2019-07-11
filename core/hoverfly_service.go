@@ -84,19 +84,24 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 	if modeView.Mode == modes.Simulate {
 		if matchingStrategy == nil {
 			matchingStrategy = util.StringToPointer("strongest")
-		}
-
-		if strings.ToLower(*matchingStrategy) != "strongest" && strings.ToLower(*matchingStrategy) != "first" {
+		} else if strings.ToLower(*matchingStrategy) != "strongest" && strings.ToLower(*matchingStrategy) != "first" {
 			return errors.New("Only matching strategy of 'first' or 'strongest' is permitted")
+		}
+	}
+
+	onRepeatedRequest := modeView.Arguments.OnRepeatedRequest
+	if modeView.Mode == modes.Capture {
+		if onRepeatedRequest == nil {
+			onRepeatedRequest = util.StringToPointer("ignore")
+		} else if strings.ToLower(*onRepeatedRequest) != "ignore" && strings.ToLower(*onRepeatedRequest) != "overwrite" {
+			return errors.New("The '-on-repeated-request' flag must have the value of either 'ignore' or 'overwrite'")
 		}
 	}
 
 	this.Cfg.SetMode(modeView.Mode)
 	if this.Cfg.GetMode() == "capture" {
 		this.CacheMatcher.FlushCache()
-	} else if this.Cfg.GetMode() == "simulate" {
-		this.CacheMatcher.PreloadCache(*this.Simulation)
-	} else if this.Cfg.GetMode() == "spy" {
+	} else if this.Cfg.GetMode() == "simulate" || this.Cfg.GetMode() == "spy" {
 		this.CacheMatcher.PreloadCache(*this.Simulation)
 	}
 
@@ -104,6 +109,7 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 		Headers:          modeView.Arguments.Headers,
 		MatchingStrategy: matchingStrategy,
 		Stateful:         modeView.Arguments.Stateful,
+		OnRepeatedRequest:modeView.Arguments.OnRepeatedRequest,
 	}
 
 	this.modeMap[this.Cfg.GetMode()].SetArguments(modeArguments)
@@ -128,7 +134,7 @@ func (hf *Hoverfly) SetMiddleware(binary, script, remote string) error {
 	}
 
 	if binary == "" && script != "" {
-		return fmt.Errorf("Cannot run script with no binary")
+		return fmt.Errorf("cannot run script with no binary")
 	}
 
 	err := newMiddleware.SetBinary(binary)
