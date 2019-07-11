@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/cors"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -702,7 +703,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 			Body:   fmt.Sprintf("body here, number=%d", i),
 		}
 
-		unit.Save(req, resp, nil, false)
+		unit.Save(req, resp, &modes.ModeArguments{})
 	}
 
 	// now getting responses
