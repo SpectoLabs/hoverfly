@@ -62,7 +62,7 @@ var _ = Describe("/api/v2/hoverfly/mode", func() {
 				"mode":"capture",
 				"arguments" : {
 					"stateful" : true,
-					"onRepeatedRequest": "overwrite",
+					"overwriteDuplicate":true,
 					"headersWhitelist": ["*"]
 				}
 			}`))
@@ -70,13 +70,13 @@ var _ = Describe("/api/v2/hoverfly/mode", func() {
 			Expect(res.StatusCode).To(Equal(200))
 			modeJson, err := ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"mode":"capture","arguments":{"headersWhitelist":["*"],"stateful":true,"onRepeatedRequest":"overwrite"}}`)))
+			Expect(modeJson).To(Equal([]byte(`{"mode":"capture","arguments":{"headersWhitelist":["*"],"stateful":true,"overwriteDuplicate":true}}`)))
 
 			req = sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly/mode")
 			res = functional_tests.DoRequest(req)
 			modeJson, err = ioutil.ReadAll(res.Body)
 			Expect(err).To(BeNil())
-			Expect(modeJson).To(Equal([]byte(`{"mode":"capture","arguments":{"headersWhitelist":["*"],"stateful":true,"onRepeatedRequest":"overwrite"}}`)))
+			Expect(modeJson).To(Equal([]byte(`{"mode":"capture","arguments":{"headersWhitelist":["*"],"stateful":true,"overwriteDuplicate":true}}`)))
 		})
 
 		It("Should get and set modify mode", func() {

@@ -42,6 +42,24 @@ func (this *Simulation) AddPair(pair *RequestMatcherResponsePair) bool {
 	return !duplicate
 }
 
+func (this *Simulation) AddPairWithOverwritingDuplicate(pair *RequestMatcherResponsePair) bool {
+	var duplicate bool
+	this.RWMutex.Lock()
+
+	for i, savedPair := range this.matchingPairs {
+		duplicate = reflect.DeepEqual(pair.RequestMatcher, savedPair.RequestMatcher)
+		if duplicate {
+			this.matchingPairs[i] = *pair
+			break
+		}
+	}
+	if !duplicate {
+		this.matchingPairs = append(this.matchingPairs, *pair)
+	}
+	this.RWMutex.Unlock()
+	return !duplicate
+}
+
 func (this *Simulation) AddPairWithoutCheck(pair *RequestMatcherResponsePair) {
 	this.RWMutex.Lock()
 	this.matchingPairs = append(this.matchingPairs, *pair)

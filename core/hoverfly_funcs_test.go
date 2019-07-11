@@ -961,3 +961,39 @@ func Test_Hoverfly_Save_CanAddPairStatefully(t *testing.T) {
 	Expect(unit.Simulation.GetMatchingPairs()[1].RequestMatcher.RequiresState).To(HaveLen(1))
 	Expect(unit.Simulation.GetMatchingPairs()[1].RequestMatcher.RequiresState["sequence:1"]).To(Equal("2"))
 }
+
+func Test_Hoverfly_Save_IgnoreRepeatedRequestByDefault(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	_ = unit.Save(&models.RequestDetails{
+		Body: `body`,
+	}, &models.ResponseDetails{ Status: 401 }, &modes.ModeArguments{})
+
+	_ = unit.Save(&models.RequestDetails{
+		Body: `body`,
+	}, &models.ResponseDetails{ Status: 200 }, &modes.ModeArguments{})
+
+	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
+
+	Expect(unit.Simulation.GetMatchingPairs()[0].Response.Status).To(Equal(401))
+}
+
+func Test_Hoverfly_Save_CanOverwriteExistingDuplicatedPair(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	_ = unit.Save(&models.RequestDetails{
+		Body: `body`,
+	}, &models.ResponseDetails{ Status: 401 }, &modes.ModeArguments{ OverwriteDuplicate: true })
+
+	_ = unit.Save(&models.RequestDetails{
+		Body: `body`,
+	}, &models.ResponseDetails{ Status: 200 }, &modes.ModeArguments{ OverwriteDuplicate: true })
+
+	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
+
+	Expect(unit.Simulation.GetMatchingPairs()[0].Response.Status).To(Equal(200))
+}

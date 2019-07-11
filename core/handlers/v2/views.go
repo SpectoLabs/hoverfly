@@ -37,7 +37,7 @@ type ModeArgumentsView struct {
 	Headers          	[]string `json:"headersWhitelist,omitempty"`
 	MatchingStrategy 	*string  `json:"matchingStrategy,omitempty"`
 	Stateful         	bool     `json:"stateful,omitempty"`
-	OnRepeatedRequest 	*string  `json:"onRepeatedRequest,omitempty"`
+	OverwriteDuplicate 	bool  	 `json:"overwriteDuplicate,omitempty"`
 }
 
 type IsWebServerView struct {

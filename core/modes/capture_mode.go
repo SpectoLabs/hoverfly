@@ -29,7 +29,7 @@ func (this *CaptureMode) View() v2.ModeView {
 		Arguments: v2.ModeArgumentsView{
 			Headers:          	this.Arguments.Headers,
 			Stateful:         	this.Arguments.Stateful,
-			OnRepeatedRequest:	this.Arguments.OnRepeatedRequest,
+			OverwriteDuplicate:	this.Arguments.OverwriteDuplicate,
 		},
 	}
 }
