@@ -46,10 +46,10 @@ func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Response
 }
 
 // Save - Stub implementation of modes.HoverflyCapture interface
-func (this *hoverflyCaptureStub) Save(request *models.RequestDetails, response *models.ResponseDetails, headersToSave []string, recordSequence bool) error {
+func (this *hoverflyCaptureStub) Save(request *models.RequestDetails, response *models.ResponseDetails, modeArgs *modes.ModeArguments) error {
 	this.SavedRequest = request
 	this.SavedResponse = response
-	this.SavedHeaders = headersToSave
+	this.SavedHeaders = modeArgs.Headers
 
 	return nil
 }
