@@ -44,7 +44,7 @@ type ModeArguments struct {
 	Headers          	[]string
 	MatchingStrategy 	*string
 	Stateful         	bool
-	OnRepeatedRequest	*string
+	OverwriteDuplicate	bool
 }
 
 // ReconstructRequest replaces original request with details provided in Constructor Payload.RequestMatcher

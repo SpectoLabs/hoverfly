@@ -89,15 +89,6 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 		}
 	}
 
-	onRepeatedRequest := modeView.Arguments.OnRepeatedRequest
-	if modeView.Mode == modes.Capture {
-		if onRepeatedRequest == nil {
-			onRepeatedRequest = util.StringToPointer("ignore")
-		} else if strings.ToLower(*onRepeatedRequest) != "ignore" && strings.ToLower(*onRepeatedRequest) != "overwrite" {
-			return errors.New("The '-on-repeated-request' flag must have the value of either 'ignore' or 'overwrite'")
-		}
-	}
-
 	this.Cfg.SetMode(modeView.Mode)
 	if this.Cfg.GetMode() == "capture" {
 		this.CacheMatcher.FlushCache()
@@ -106,10 +97,10 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 	}
 
 	modeArguments := modes.ModeArguments{
-		Headers:          modeView.Arguments.Headers,
-		MatchingStrategy: matchingStrategy,
-		Stateful:         modeView.Arguments.Stateful,
-		OnRepeatedRequest:modeView.Arguments.OnRepeatedRequest,
+		Headers:          	modeView.Arguments.Headers,
+		MatchingStrategy: 	matchingStrategy,
+		Stateful:         	modeView.Arguments.Stateful,
+		OverwriteDuplicate:	modeView.Arguments.OverwriteDuplicate,
 	}
 
 	this.modeMap[this.Cfg.GetMode()].SetArguments(modeArguments)

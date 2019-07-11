@@ -218,6 +218,8 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 	}
 	if modeArgs.Stateful {
 		hf.Simulation.AddPairInSequence(&pair, hf.state)
+	} else if modeArgs.OverwriteDuplicate {
+		hf.Simulation.AddPairWithOverwritingDuplicate(&pair)
 	} else {
 		hf.Simulation.AddPair(&pair)
 	}
