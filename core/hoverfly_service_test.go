@@ -2,6 +2,7 @@ package hoverfly
 
 import (
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -945,6 +946,41 @@ func Test_Hoverfly_SetModeWithArguments_AsteriskCanOnlyBeValidAsTheOnlyHeader(t 
 			Headers: []string{"*"},
 		},
 	})).ToNot(Succeed())
+}
+
+
+func Test_Hoverfly_SetModeWithArguments_OnRepeatedRequests(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	Expect(unit.SetModeWithArguments(v2.ModeView{
+		Mode: "capture",
+		Arguments: v2.ModeArgumentsView{
+			OnRepeatedRequest: util.StringToPointer("overwrite"),
+		},
+	})).To(Succeed())
+
+	storedMode := unit.modeMap[modes.Capture].View()
+	Expect(storedMode.Arguments.OnRepeatedRequest).To(Equal(util.StringToPointer("overwrite")))
+}
+
+
+func Test_Hoverfly_SetModeWithArguments_OnRepeatedRequests_ShouldValidateInputValue(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	err := unit.SetModeWithArguments(v2.ModeView{
+		Mode: "capture",
+		Arguments: v2.ModeArgumentsView{
+			OnRepeatedRequest: util.StringToPointer("do-nothing"),
+		},
+	})
+
+	Expect(err).ToNot(BeNil())
+	Expect(err.Error()).To(Equal("The '-on-repeated-request' flag must have the value of either 'ignore' or 'overwrite'"))
+
 }
 
 func Test_Hoverfly_AddDiff_AddEntry(t *testing.T) {

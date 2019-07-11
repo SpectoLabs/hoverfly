@@ -34,9 +34,10 @@ type ModeView struct {
 }
 
 type ModeArgumentsView struct {
-	Headers          []string `json:"headersWhitelist,omitempty"`
-	MatchingStrategy *string  `json:"matchingStrategy,omitempty"`
-	Stateful         bool     `json:"stateful,omitempty"`
+	Headers          	[]string `json:"headersWhitelist,omitempty"`
+	MatchingStrategy 	*string  `json:"matchingStrategy,omitempty"`
+	Stateful         	bool     `json:"stateful,omitempty"`
+	OnRepeatedRequest 	*string  `json:"onRepeatedRequest,omitempty"`
 }
 
 type IsWebServerView struct {
