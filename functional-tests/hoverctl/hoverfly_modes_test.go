@@ -159,6 +159,16 @@ var _ = Describe("When I use hoverfly-cli", func() {
 				Expect(output).To(ContainSubstring("Must provide a list containing only an asterix, or a list containing only headers names"))
 			})
 
+			It("to capture mode and overwrite duplicated requests", func() {
+				output := functional_tests.Run(hoverctlBinary, "mode", "capture", "--overwrite-duplicate")
+
+				Expect(output).To(ContainSubstring("Hoverfly has been set to capture mode"))
+
+				modeView := hoverfly.GetMode()
+				Expect(modeView.Mode).To(Equal(capture))
+				Expect(modeView.Arguments.OverwriteDuplicate).To(BeTrue())
+			})
+
 			It("to synthesize mode", func() {
 				output := functional_tests.Run(hoverctlBinary, "mode", "synthesize")
 

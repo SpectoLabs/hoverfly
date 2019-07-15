@@ -13,6 +13,7 @@ import (
 var specificHeaders string
 var allHeaders bool
 var stateful bool
+var overwriteDuplicate bool
 var matchingStrategy string
 
 var modeCmd = &cobra.Command{
@@ -48,6 +49,7 @@ mode is shown.
 				break
 			case modes.Capture:
 				modeView.Arguments.Stateful = stateful
+				modeView.Arguments.OverwriteDuplicate = overwriteDuplicate
 				setHeaderArgument(modeView)
 				break
 			case modes.Diff:
@@ -114,4 +116,6 @@ func init() {
 		"Sets the matching strategy - 'strongest | first'")
 	modeCmd.PersistentFlags().BoolVar(&stateful, "stateful", false,
 		"Record stateful responses as a sequence in capture mode")
+	modeCmd.PersistentFlags().BoolVar(&overwriteDuplicate, "overwrite-duplicate", false,
+		"Overwrite duplicate requests in capture mode")
 }
