@@ -33,14 +33,14 @@
   version = "v1.0-alpha3"
 
 [[projects]]
-  digest = "1:b2f2de0c7af0bef60b0e7b00382c8db6a8df3d02fee84a46140e20c93574e59d"
+  digest = "1:1e612cb847e05643d018ad6aafd5ad4ba0f96b28d6600db49c8bc4c136845a7d"
   name = "github.com/SpectoLabs/goproxy"
   packages = [
     ".",
     "ext/auth",
   ]
   pruneopts = "UT"
-  revision = "099e21af66f620451825ea916202f28975083a61"
+  revision = "a367174a0440fb1e2fac76a394b2db8151f38286"
 
 [[projects]]
   branch = "master"
