@@ -117,6 +117,7 @@ func Test_ReconstructResponse_ReturnsAResponseWithCorrectStatus(t *testing.T) {
 	response := modes.ReconstructResponse(req, pair)
 
 	Expect(response.StatusCode).To(Equal(404))
+	Expect(response.Status).To(Equal("Not Found"))
 }
 
 func Test_ReconstructResponse_ReturnsAResponseWithBody(t *testing.T) {
