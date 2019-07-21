@@ -5,7 +5,7 @@ Capturing a stateful sequence of responses
 
 By default Hoverfly will store a given request/response pair once only.
 If the same request returns different responses you may want capture the sequence of changing request/response pairs.
-You may want to do this because the API is stateful rather stateless.
+You may want to do this because the API is stateful rather than stateless.
 
 A simple example of this is an API that returns the time.
 
