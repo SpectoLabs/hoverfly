@@ -20,7 +20,6 @@ jobs:
           name: Install Node
           command: |
             sudo apt-get install nodejs -f
-            sudo ln -s /usr/bin/nodejs /usr/bin/node
       - run:
           name: Test
           command: |
