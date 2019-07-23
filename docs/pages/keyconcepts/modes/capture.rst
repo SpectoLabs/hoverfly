@@ -24,11 +24,11 @@ can be generated using a manual process.
 Usually, Capture mode is used as the starting point in the process of creating an API simulation. Captured 
 data is then exported and modified before being re-imported into Hoverfly for use as a simulation.
 
-By default, Hoverfly will overwrite duplicate requests if the request has not changed. This can be a problem
+By default, Hoverfly will ignore duplicate requests if the request has not changed. This can be a problem
 when trying to capture a stateful endpoint that may return a different response each time you make a request.
 
-Using the stateful mode argument when setting Hoverfly to capture mode will disable this duplicate overwrite
-feature, enabling you to capture sequences of responses and play them back in :ref:`simulate_mode` in order.
+Using the stateful mode argument when setting Hoverfly to capture mode will disable the duplicate request check,
+ enabling you to capture sequences of responses and play them back in :ref:`simulate_mode` in order.
 
 .. seealso::
 

@@ -511,7 +511,8 @@ Gets the mode for the running instance of Hoverfly.
             "headersWhitelist": [
                 "*"
             ],
-            "stateful": true
+            "stateful": true,
+            "overwriteDuplicate": true
         }
     }
 
@@ -531,7 +532,8 @@ Changes the mode of the running instance of Hoverfly. Pass additional arguments 
             "headersWhitelist": [
                 "*"
             ],
-            "stateful": true
+            "stateful": true,
+            "overwriteDuplicate": true
         }
     }
 

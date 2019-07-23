@@ -1,92 +1,94 @@
 Usage of hoverfly:
-    -add
+  -add
         Add new user '-add -username hfadmin -password hfpass'
-    -admin
+  -admin
         Supply '-admin=false' to make this non admin user (default true)
-    -ap string
+  -ap string
         Admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)
-    -auth
+  -auth
         Enable authentication
-    -cache-size int
+  -cache-size int
         Set the size of request/response cache (default 1000)
-    -capture
+  -capture
         Start Hoverfly in capture mode - transparently intercepts and saves requests/response
-    -cert string
+  -cert string
         CA certificate used to sign MITM certificates
-    -cert-name string
+  -cert-name string
         Cert name (default "hoverfly.proxy")
-    -cert-org string
+  -cert-org string
         Organisation name for new cert (default "Hoverfly Authority")
-    -client-authentication-ca-cert string
+  -client-authentication-ca-cert string
         Path to the ca cert file used for authentication
-    -client-authentication-client-cert string
+  -client-authentication-client-cert string
         Path to the client certification file used for authentication
-    -client-authentication-client-key string
+  -client-authentication-client-key string
         Path to the client key file used for authentication
-    -client-authentication-destination string
+  -client-authentication-destination string
         Regular expression of destination with client authentication
-    -db string
-        Storage to use - 'boltdb' or 'memory' which will not write anything to disk (default "memory")
-    -db-path string
-        Database location - supply it to provide specific database location (will be created there if it doesn't exist)
-    -dest value
+  -cors
+        Enable CORS support
+  -db string
+        Storage to use - 'boltdb' or 'memory' which will not write anything to disk (DEPRECATED) (default "memory")
+  -db-path string
+        A path to a BoltDB file with persisted user and token data for authentication (DEPRECATED)
+  -dest value
         Specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'
-    -destination string
+  -destination string
         Control which URLs Hoverfly should intercept and process, it can be string or regex (default ".")
-    -dev
+  -dev
         Enable CORS headers to allow Hoverfly Admin UI development
-    -diff
+  -diff
         Start Hoverfly in diff mode - calls real server and compares the actual response with the expected simulation config if present
-    -disable-cache
-        Disable request/response cache (the cache that sits in front of matching)
-    -generate-ca-cert
+  -disable-cache
+        Disable the request/response cache (the cache that sits in front of matching)
+  -generate-ca-cert
         Generate CA certificate and private key for MITM
-    -https-only
+  -https-only
         Allow only secure secure requests to be proxied by hoverfly
-    -httptest.serve string
-        if non-empty, httptest.NewServer serves on this address and blocks
-    -import value
+  -import value
         Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'
-    -journal-size int
+  -journal-size int
         Set the size of request/response journal (default 1000)
-    -key string
+  -key string
         Private key of the CA used to sign MITM certificates
-    -listen-on-host string
+  -listen-on-host string
         Specify which network interface to bind to, eg. 0.0.0.0 will bind to all interfaces. By default hoverfly will only bind ports to loopback interface
-    -log-level string
+  -log-level string
         Set log level (panic, fatal, error, warn, info or debug) (default "info")
-    -logs string
+  -logs string
         Specify format for logs, options are "plaintext" and "json" (default "plaintext")
-    -logs-size int
+  -logs-size int
         Set the amount of logs to be stored in memory (default 1000)
-    -metrics
+  -metrics
         Enable metrics logging to stdout
-    -middleware string
-        Should proxy use middleware
-    -modify
+  -middleware string
+        Set middleware by passing the name of the binary and the path of the middleware script separated by space. (i.e. '-middleware "python script.py"')
+  -modify
         Start Hoverfly in modify mode - applies middleware (required) to both outgoing and incoming HTTP traffic
-    -password string
+  -no-import-check
+        Skip duplicate request check when importing simulations
+  -password string
         Password for new user
-    -password-hash string
+  -password-hash string
         Password hash for new user instead of password
-    -plain-http-tunneling
+  -plain-http-tunneling
         Use plain http tunneling to host with non-443 port
-    -pp string
+  -pp string
         Proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)
-    -proxy-auth Proxy-Authorization
+  -proxy-auth Proxy-Authorization
         Switch the Proxy-Authorization header from proxy-auth Proxy-Authorization to header-auth `X-HOVERFLY-AUTHORIZATION`. Switching to header-auth will auto enable -https-only (default "proxy-auth")
-    -spy
+  -spy
         Start Hoverfly in spy mode, similar to simulate but calls real server when cache miss
-    -synthesize
+  -synthesize
         Start Hoverfly in synthesize mode (middleware is required)
-    -tls-verification
+  -tls-verification
         Turn on/off tls verification for outgoing requests (will not try to verify certificates) (default true)
-    -upstream-proxy string
+  -upstream-proxy string
         Specify an upstream proxy for hoverfly to route traffic through
-    -username string
+  -username string
         Username for new user
-    -v	Should every proxy request be logged to stdout
-    -version
+  -v    Should every proxy request be logged to stdout
+  -version
         Get the version of hoverfly
-    -webserver
+  -webserver
         Start Hoverfly in webserver mode (simulate mode)
