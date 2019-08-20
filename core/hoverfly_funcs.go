@@ -86,23 +86,20 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	// as we use the current state in templates
 	if response.Templated == true {
 
-		var template *raymond.Template
-		if cachedResponse != nil && cachedResponse.ResponseTemplate != nil {
-			template = cachedResponse.ResponseTemplate
-		} else {
-			// Parse and cache the template
-			template, _ = hf.templator.ParseTemplate(response.Body)
-			if cachedResponse != nil {
-				cachedResponse.ResponseTemplate = template
-			}
-		}
-
-		responseBody, err :=  hf.templator.RenderTemplate(template, &requestDetails, hf.state.State)
+		responseBody, err := hf.applyBodyTemplating(&requestDetails, &response, cachedResponse)
 
 		if err == nil {
 			response.Body = responseBody
 		} else {
-			log.Warnf("Failed to render response template: %s", err.Error())
+			log.Warnf("Failed to applying body templating: %s", err.Error())
+		}
+
+		responseHeaders, err := hf.applyHeadersTemplating(&requestDetails, &response, cachedResponse)
+
+		if err == nil {
+			response.Headers = responseHeaders
+		} else {
+			log.Warnf("Failed to applying headers templating: %s", err.Error())
 		}
 	}
 
@@ -115,6 +112,65 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	}
 
 	return &response, nil
+}
+
+func (hf *Hoverfly) applyBodyTemplating(requestDetails *models.RequestDetails, response *models.ResponseDetails, cachedResponse *models.CachedResponse) (string, error) {
+	var template *raymond.Template
+	if cachedResponse != nil && cachedResponse.ResponseTemplate != nil {
+		template = cachedResponse.ResponseTemplate
+	} else {
+		// Parse and cache the template
+		template, _ = hf.templator.ParseTemplate(response.Body)
+		if cachedResponse != nil {
+			cachedResponse.ResponseTemplate = template
+		}
+	}
+
+	return hf.templator.RenderTemplate(template, requestDetails, hf.state.State)
+}
+
+func (hf *Hoverfly) applyHeadersTemplating(requestDetails *models.RequestDetails, response *models.ResponseDetails, cachedResponse *models.CachedResponse) (map[string][]string, error) {
+	var headersTemplates map[string][]*raymond.Template
+	if cachedResponse != nil && cachedResponse.ResponseHeadersTemplates != nil {
+		headersTemplates = cachedResponse.ResponseHeadersTemplates
+	} else {
+		var header []*raymond.Template
+		headersTemplates = map[string][]*raymond.Template{}
+		// Parse and cache headers templates
+		for k, v := range response.Headers {
+			header = make([]*raymond.Template, len(v))
+			for i, h := range v {
+				header[i], _ = hf.templator.ParseTemplate(h)
+			}
+
+			headersTemplates[k] = header
+		}
+
+		if cachedResponse != nil {
+			cachedResponse.ResponseHeadersTemplates = headersTemplates
+		}
+	}
+
+	var (
+		header []string
+		err error
+	)
+	headers := map[string][]string{}
+
+	// Render headers templates
+	for k, v := range headersTemplates {
+		header = make([]string, len(v))
+		for i, h := range v {
+			header[i], err = hf.templator.RenderTemplate(h, requestDetails, hf.state.State)
+
+			if err != nil {
+				return nil, err
+			}
+		}
+		headers[k] = header
+	}
+
+	return headers, nil
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache

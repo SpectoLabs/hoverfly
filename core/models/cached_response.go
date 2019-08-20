@@ -9,4 +9,5 @@ type CachedResponse struct {
 	MatchingPair *RequestMatcherResponsePair
 	ClosestMiss  *ClosestMiss
 	ResponseTemplate *raymond.Template
+	ResponseHeadersTemplates map[string][]*raymond.Template
 }

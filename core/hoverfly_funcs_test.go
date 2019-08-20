@@ -321,6 +321,11 @@ func Test_Hoverfly_GetResponse_WillCacheTemplateIfNotInCache(t *testing.T) {
 			Status: 200,
 			Body:   "{{ randomUuid }}",
 			Templated: true,
+			Headers: map[string][]string{
+				"X-Image-Id": {
+					"{{ randomInteger }}",
+				},
+			},
 		},
 	})
 
@@ -336,6 +341,7 @@ func Test_Hoverfly_GetResponse_WillCacheTemplateIfNotInCache(t *testing.T) {
 	Expect(found).To(BeTrue())
 
 	Expect(cachedRequestResponsePair.(*models.CachedResponse).MatchingPair.Response.Body).To(Equal("{{ randomUuid }}"))
+	Expect(cachedRequestResponsePair.(*models.CachedResponse).MatchingPair.Response.Headers["X-Image-Id"][0]).To(Equal("{{ randomInteger }}"))
 	Expect(cachedRequestResponsePair.(*models.CachedResponse).ResponseTemplate).NotTo(BeNil())
 }
 
