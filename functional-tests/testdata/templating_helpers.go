@@ -88,6 +88,25 @@ var TemplatingHelpers = `{
 					"path": [
 						{
 							"matcher": "exact",
+							"value": "/randomIntegerHeader"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "",
+					"encodedBody": false,
+					"headers": {
+						"X-Image-Id": ["{{ randomInteger }}"]
+					},
+					"templated": true
+				}
+			},
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
 							"value": "/randomFloat"
 						}
 					]
