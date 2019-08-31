@@ -166,6 +166,21 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(parsedInt > 0).To(BeTrue())
 		})
 
+		It("randomInteger in header", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomIntegerHeader"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			imageId := resp.Header.Get("X-Image-Id")
+			Expect(imageId).NotTo(BeEmpty())
+
+			parsedImageId, err := strconv.ParseInt(imageId, 10, 0)
+			Expect(err).To(BeNil())
+
+			Expect(parsedImageId > 0).To(BeTrue())
+		})
+
 		It("randomIntegerRange", func() {
 			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
 
