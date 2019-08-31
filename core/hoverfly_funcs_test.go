@@ -345,6 +345,58 @@ func Test_Hoverfly_GetResponse_WillCacheTemplateIfNotInCache(t *testing.T) {
 	Expect(cachedRequestResponsePair.(*models.CachedResponse).ResponseTemplate).NotTo(BeNil())
 }
 
+func Test_Hoverfly_GetResponse_WillCacheHeaderTemplateIfNotInCache(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "somehost.com",
+				},
+			},
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "POST",
+				},
+			},
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "http",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Templated: true,
+			Headers: map[string][]string{
+				"X-Image-Id": {
+					"{{ randomInteger }}",
+				},
+			},
+		},
+	})
+
+	unit.GetResponse(models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+	})
+
+	Expect(unit.CacheMatcher.RequestCache.RecordsCount()).Should(Equal(1))
+
+	cachedRequestResponsePair, found := unit.CacheMatcher.RequestCache.Get("75b4ae6efa2a3f6d3ee6b9fed4d8c8c5")
+	Expect(found).To(BeTrue())
+
+	Expect(cachedRequestResponsePair.(*models.CachedResponse).MatchingPair.Response.Headers["X-Image-Id"][0]).To(Equal("{{ randomInteger }}"))
+	Expect(cachedRequestResponsePair.(*models.CachedResponse).ResponseTemplate).NotTo(BeNil())
+}
+
 func Test_Hoverfly_GetResponse_ShouldReturnEmptyTextIfResponseTemplateIsNotRenderable(t *testing.T) {
 	RegisterTestingT(t)
 
