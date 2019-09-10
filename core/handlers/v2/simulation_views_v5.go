@@ -17,6 +17,8 @@ type DataViewV5 struct {
 type RequestMatcherResponsePairViewV5 struct {
 	RequestMatcher RequestMatcherViewV5  `json:"request"`
 	Response       ResponseDetailsViewV5 `json:"response"`
+	StartTime      int64                 `json:"starttime"`
+	EndTime        int64                 `json:"endtime"`
 }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails

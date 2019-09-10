@@ -24,7 +24,7 @@ import (
 )
 
 type HoverflyDiff interface {
-	GetResponse(models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError)
+	GetResponse(models.RequestDetails) (*models.RequestMatcherResponsePair, *errors.HoverflyError)
 	DoRequest(*http.Request) (*http.Response, error)
 	AddDiff(requestView v2.SimpleRequestDefinitionView, diffReport v2.DiffReport)
 }
@@ -39,7 +39,7 @@ func (this *DiffMode) View() v2.ModeView {
 	return v2.ModeView{
 		Mode: Diff,
 		Arguments: v2.ModeArgumentsView{
-			Headers:          this.Arguments.Headers,
+			Headers: this.Arguments.Headers,
 		},
 	}
 }
@@ -56,7 +56,8 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 		Request: details,
 	}
 
-	simResponse, simRespErr := this.Hoverfly.GetResponse(details)
+	simMatchingPair, simRespErr := this.Hoverfly.GetResponse(details)
+	simResponse := &simMatchingPair.Response
 
 	log.Info("Going to call real server")
 	modifiedRequest, err := ReconstructRequest(actualPair)

@@ -1,12 +1,11 @@
 package models
 
 import (
+	"github.com/SpectoLabs/hoverfly/core/state"
 	"reflect"
 	"strconv"
 	"strings"
 	"sync"
-
-	"github.com/SpectoLabs/hoverfly/core/state"
 )
 
 type Simulation struct {
@@ -68,7 +67,6 @@ func (this *Simulation) AddPairWithoutCheck(pair *RequestMatcherResponsePair) {
 
 func (this *Simulation) AddPairInSequence(pair *RequestMatcherResponsePair, state *state.State) {
 	var duplicate bool
-
 	updates := map[int]RequestMatcherResponsePair{}
 
 	var counter int

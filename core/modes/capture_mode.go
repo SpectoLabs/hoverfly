@@ -4,18 +4,19 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	log "github.com/sirupsen/logrus"
 )
 
 type HoverflyCapture interface {
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
 	DoRequest(*http.Request) (*http.Response, error)
-	Save(*models.RequestDetails, *models.ResponseDetails, *ModeArguments) error
+	Save(*models.RequestDetails, *models.ResponseDetails, int64, int64, *ModeArguments) error
 }
 
 type CaptureMode struct {
@@ -27,9 +28,9 @@ func (this *CaptureMode) View() v2.ModeView {
 	return v2.ModeView{
 		Mode: Capture,
 		Arguments: v2.ModeArgumentsView{
-			Headers:          	this.Arguments.Headers,
-			Stateful:         	this.Arguments.Stateful,
-			OverwriteDuplicate:	this.Arguments.OverwriteDuplicate,
+			Headers:            this.Arguments.Headers,
+			Stateful:           this.Arguments.Stateful,
+			OverwriteDuplicate: this.Arguments.OverwriteDuplicate,
 		},
 	}
 }
@@ -44,6 +45,8 @@ func (this *CaptureMode) GetArguments(arguments ModeArguments) {
 
 func (this CaptureMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
 	// this is mainly for testing, since when you create
+	startTime := time.Now().Unix()
+
 	if request.Body == nil {
 		request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 	}
@@ -76,8 +79,10 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		this.Arguments.Headers = []string{}
 	}
 
+	endTime := time.Now().Unix()
+
 	// saving response body with request/response meta to cache
-	err = this.Hoverfly.Save(&pair.Request, responseObj, &this.Arguments)
+	err = this.Hoverfly.Save(&pair.Request, responseObj, startTime, endTime, &this.Arguments)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when saving request and response", Capture)
 	}

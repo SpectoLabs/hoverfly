@@ -41,9 +41,9 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 }
 
 // GetResponse returns stored response from cache
-func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError) {
+func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.RequestMatcherResponsePair, *errors.HoverflyError) {
 
-	var response models.ResponseDetails
+	var matchingPair models.RequestMatcherResponsePair
 	var cachedResponse *models.CachedResponse
 
 	cachedResponse, cacheErr := hf.CacheMatcher.GetCachedResponse(&requestDetails)
@@ -53,7 +53,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		return nil, errors.MatchingFailedError(cachedResponse.ClosestMiss)
 		// If it's cached, use that response
 	} else if cacheErr == nil {
-		response = cachedResponse.MatchingPair.Response
+		matchingPair = *cachedResponse.MatchingPair
 		//If it's not cached, perform matching to find a hit
 	} else {
 		mode := (hf.modeMap[modes.Simulate]).(*modes.SimulateMode)
@@ -78,10 +78,11 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 			return nil, errors.MatchingFailedError(result.Error.ClosestMiss)
 		} else {
-			response = result.Pair.Response
+			matchingPair = *result.Pair
 		}
 	}
 
+	response := matchingPair.Response
 	// Templating applies at the end, once we have loaded a response. Comes BEFORE state transitions,
 	// as we use the current state in templates
 	if response.Templated == true {
@@ -111,7 +112,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 		hf.state.RemoveState(response.RemovesState)
 	}
 
-	return &response, nil
+	return &matchingPair, nil
 }
 
 func (hf *Hoverfly) applyBodyTemplating(requestDetails *models.RequestDetails, response *models.ResponseDetails, cachedResponse *models.CachedResponse) (string, error) {
@@ -153,7 +154,7 @@ func (hf *Hoverfly) applyHeadersTemplating(requestDetails *models.RequestDetails
 
 	var (
 		header []string
-		err error
+		err    error
 	)
 	headers := map[string][]string{}
 
@@ -174,7 +175,7 @@ func (hf *Hoverfly) applyHeadersTemplating(requestDetails *models.RequestDetails
 }
 
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
-func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails, modeArgs *modes.ModeArguments) error {
+func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails, startTime int64, endTime int64, modeArgs *modes.ModeArguments) error {
 	body := []models.RequestFieldMatchers{
 		{
 			Matcher: matchers.Exact,
@@ -270,7 +271,9 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 			Body:    body,
 			Headers: requestHeaders,
 		},
-		Response: *response,
+		Response:  *response,
+		StartTime: startTime,
+		EndTime:   endTime,
 	}
 	if modeArgs.Stateful {
 		hf.Simulation.AddPairInSequence(&pair, hf.state)
@@ -289,4 +292,8 @@ func (this Hoverfly) ApplyMiddleware(pair models.RequestResponsePair) (models.Re
 	}
 
 	return pair, nil
+}
+
+func (this Hoverfly) ApplyDatabaseChanges(startTime int64, endTime int64) {
+
 }
