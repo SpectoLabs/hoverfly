@@ -228,7 +228,6 @@ func Test_ReconstructResponse_DoesNotChangeContentLengthHeaderIfPresent(t *testi
 	Expect(response.Header.Get("Content-Length")).To(Equal("10"))
 }
 
-
 func Test_ReconstructResponse_AddsHeadersToResponse(t *testing.T) {
 	RegisterTestingT(t)
 

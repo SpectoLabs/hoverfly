@@ -11,11 +11,11 @@ import (
 
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
+	"github.com/sirupsen/logrus"
 )
 
 const defaultTimestampFormat = time.RFC3339

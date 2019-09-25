@@ -128,7 +128,6 @@ var _ = Describe("When I run Hoverfly", func() {
 				resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL))
 				Expect(resp.StatusCode).To(Equal(200))
 
-
 				payload := hoverfly.ExportSimulation()
 
 				Expect(payload.RequestResponsePairs).To(HaveLen(1))

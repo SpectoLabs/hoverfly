@@ -378,7 +378,7 @@ func main() {
 		requestCache, err = cache.NewLRUCache(cfg.CacheSize)
 		if err != nil {
 			log.WithFields(log.Fields{
-				"error":    err.Error(),
+				"error":      err.Error(),
 				"cache-size": cfg.CacheSize,
 			}).Fatal("Failed to create cache")
 		}

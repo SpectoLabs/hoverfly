@@ -12,12 +12,12 @@ import (
 
 	"fmt"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/goproxy/ext/auth"
 	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/util"
+	log "github.com/sirupsen/logrus"
 )
 
 var ProxyAuthorizationHeader string
@@ -228,7 +228,7 @@ func matchesFilter(filter string) goproxy.ReqConditionFunc {
 	return func(req *http.Request, ctx *goproxy.ProxyCtx) bool {
 
 		scheme := req.URL.Scheme
-		host := req.Host		// relative URL does not have host value, and this is a safer way to get the hostname from request struct
+		host := req.Host // relative URL does not have host value, and this is a safer way to get the hostname from request struct
 		path := req.URL.Path
 
 		if scheme == "https" || strings.Contains(host, ":443") {

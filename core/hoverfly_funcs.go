@@ -153,7 +153,7 @@ func (hf *Hoverfly) applyHeadersTemplating(requestDetails *models.RequestDetails
 
 	var (
 		header []string
-		err error
+		err    error
 	)
 	headers := map[string][]string{}
 

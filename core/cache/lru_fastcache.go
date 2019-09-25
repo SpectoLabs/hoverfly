@@ -11,7 +11,7 @@ type LRUFastCache struct {
 
 func NewDefaultLRUCache() *LRUFastCache {
 	c, _ := lru.New(1000)
-	return &LRUFastCache{ cache: c }
+	return &LRUFastCache{cache: c}
 }
 
 func NewLRUCache(size int) (*LRUFastCache, error) {
@@ -19,7 +19,7 @@ func NewLRUCache(size int) (*LRUFastCache, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &LRUFastCache{ cache: c }, nil
+	return &LRUFastCache{cache: c}, nil
 }
 
 func (c *LRUFastCache) Set(key, value interface{}) (err error) {
@@ -50,4 +50,3 @@ func (c *LRUFastCache) DeleteData() (err error) {
 	c.cache.Purge()
 	return nil
 }
-

@@ -362,7 +362,7 @@ func Test_ApplyTemplate_ReplaceStringInQueryParams(t *testing.T) {
 
 	template, err := ApplyTemplate(&models.RequestDetails{
 		Query: map[string][]string{
-			"sound":    {"oink,oink,oink"},
+			"sound": {"oink,oink,oink"},
 		},
 	}, make(map[string]string), `{{ replace Request.QueryParam.sound "oink" "moo" }}`)
 

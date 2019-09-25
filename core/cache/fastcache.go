@@ -8,5 +8,3 @@ type FastCache interface {
 	RecordsCount() (int, error)
 	DeleteData() error
 }
-
-

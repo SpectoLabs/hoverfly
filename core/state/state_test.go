@@ -55,16 +55,16 @@ func Test_GetState(t *testing.T) {
 
 	Expect(s).ToNot(BeNil())
 	Eventually(func() string {
-			val, _ := s.GetState("test1")
-			return val
+		val, _ := s.GetState("test1")
+		return val
 	}).Should(Equal("1"))
 	Eventually(func() string {
-			val, _ := s.GetState("test2")
-			return val
+		val, _ := s.GetState("test2")
+		return val
 	}).Should(Equal("2"))
 	Eventually(func() string {
-			val, _ := s.GetState("test3")
-			return val
+		val, _ := s.GetState("test3")
+		return val
 	}).Should(Equal("3"))
 }
 

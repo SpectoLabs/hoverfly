@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/go-zoo/bone"
 	"github.com/gorilla/websocket"
+	log "github.com/sirupsen/logrus"
 )
 
 var EnableCors bool

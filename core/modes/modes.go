@@ -41,10 +41,10 @@ type Mode interface {
 }
 
 type ModeArguments struct {
-	Headers          	[]string
-	MatchingStrategy 	*string
-	Stateful         	bool
-	OverwriteDuplicate	bool
+	Headers            []string
+	MatchingStrategy   *string
+	Stateful           bool
+	OverwriteDuplicate bool
 }
 
 // ReconstructRequest replaces original request with details provided in Constructor Payload.RequestMatcher

@@ -318,8 +318,8 @@ func Test_Hoverfly_GetResponse_WillCacheTemplateIfNotInCache(t *testing.T) {
 			},
 		},
 		Response: models.ResponseDetails{
-			Status: 200,
-			Body:   "{{ randomUuid }}",
+			Status:    200,
+			Body:      "{{ randomUuid }}",
 			Templated: true,
 		},
 	})
@@ -366,7 +366,7 @@ func Test_Hoverfly_GetResponse_WillCacheHeaderTemplateIfNotInCache(t *testing.T)
 			},
 		},
 		Response: models.ResponseDetails{
-			Status: 200,
+			Status:    200,
 			Templated: true,
 			Headers: map[string][]string{
 				"X-Image-Id": {
@@ -418,8 +418,8 @@ func Test_Hoverfly_GetResponse_ShouldReturnEmptyTextIfResponseTemplateIsNotRende
 			},
 		},
 		Response: models.ResponseDetails{
-			Status: 200,
-			Body:   "hello {{ unknownFunc }}",
+			Status:    200,
+			Body:      "hello {{ unknownFunc }}",
 			Templated: true,
 		},
 	})
@@ -761,7 +761,6 @@ func Test_Hoverfly_Save_SavesRequestAndResponseToSimulation(t *testing.T) {
 	Expect(unit.Simulation.GetMatchingPairs()[0].Response.Status).To(Equal(200))
 }
 
-
 func Test_Hoverfly_Save_SavesRequestContainsMultiValueQuery(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -891,7 +890,7 @@ func Test_Hoverfly_Save_SavesMultipleRequestHeadersWhenMultiplesSpecifiedInHeade
 		Body:    "testresponsebody",
 		Headers: map[string][]string{"testheader": {"testvalue"}},
 		Status:  200,
-	},  &modes.ModeArguments{Headers: []string{"testheader", "nonmatch"}})
+	}, &modes.ModeArguments{Headers: []string{"testheader", "nonmatch"}})
 
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers).To(HaveLen(2))
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["testheader"]).To(HaveLen(1))
@@ -999,11 +998,11 @@ func Test_Hoverfly_Save_CanAddPairStatefully(t *testing.T) {
 
 	_ = unit.Save(&models.RequestDetails{
 		Body: `body`,
-	}, &models.ResponseDetails{}, &modes.ModeArguments{ Stateful: true })
+	}, &models.ResponseDetails{}, &modes.ModeArguments{Stateful: true})
 
 	_ = unit.Save(&models.RequestDetails{
 		Body: `body`,
-	}, &models.ResponseDetails{}, &modes.ModeArguments{ Stateful: true })
+	}, &models.ResponseDetails{}, &modes.ModeArguments{Stateful: true})
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(2))
 
@@ -1021,11 +1020,11 @@ func Test_Hoverfly_Save_IgnoreRepeatedRequestByDefault(t *testing.T) {
 
 	_ = unit.Save(&models.RequestDetails{
 		Body: `body`,
-	}, &models.ResponseDetails{ Status: 401 }, &modes.ModeArguments{})
+	}, &models.ResponseDetails{Status: 401}, &modes.ModeArguments{})
 
 	_ = unit.Save(&models.RequestDetails{
 		Body: `body`,
-	}, &models.ResponseDetails{ Status: 200 }, &modes.ModeArguments{})
+	}, &models.ResponseDetails{Status: 200}, &modes.ModeArguments{})
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
 
@@ -1039,11 +1038,11 @@ func Test_Hoverfly_Save_CanOverwriteExistingDuplicatedPair(t *testing.T) {
 
 	_ = unit.Save(&models.RequestDetails{
 		Body: `body`,
-	}, &models.ResponseDetails{ Status: 401 }, &modes.ModeArguments{ OverwriteDuplicate: true })
+	}, &models.ResponseDetails{Status: 401}, &modes.ModeArguments{OverwriteDuplicate: true})
 
 	_ = unit.Save(&models.RequestDetails{
 		Body: `body`,
-	}, &models.ResponseDetails{ Status: 200 }, &modes.ModeArguments{ OverwriteDuplicate: true })
+	}, &models.ResponseDetails{Status: 200}, &modes.ModeArguments{OverwriteDuplicate: true})
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
 

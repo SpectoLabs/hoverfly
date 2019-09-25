@@ -13,11 +13,10 @@ import (
 
 type HoverflyStub struct{}
 
-
 func (this HoverflyStub) GetCORS() CORSView {
 	return CORSView{
-		Enabled: 		true,
-		AllowOrigin: 	"*",
+		Enabled:     true,
+		AllowOrigin: "*",
 	}
 }
 

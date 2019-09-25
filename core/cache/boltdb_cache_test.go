@@ -7,8 +7,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	. "github.com/onsi/gomega"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/boltdb/bolt"
+	log "github.com/sirupsen/logrus"
 )
 
 // TestDB - holds connection to database during tests

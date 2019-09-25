@@ -11,8 +11,8 @@ import (
 
 	"fmt"
 
-	"github.com/sirupsen/logrus"
 	. "github.com/onsi/gomega"
+	"github.com/sirupsen/logrus"
 )
 
 type HoverflyLogsStub struct {

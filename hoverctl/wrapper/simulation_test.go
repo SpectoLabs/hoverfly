@@ -197,7 +197,6 @@ func Test_ImportSimulation_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
 	Expect(err.Error()).To(Equal("Could not connect to Hoverfly at something:1234"))
 }
 
-
 func Test_ImportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -279,7 +278,6 @@ func Test_AddSimulation_SendsCorrectHTTPRequest(t *testing.T) {
 	err := AddSimulation(target, `{"simulation": true}`)
 	Expect(err).To(BeNil())
 }
-
 
 func Test_DeleteSimulations_SendsCorrectHTTPRequest(t *testing.T) {
 	RegisterTestingT(t)

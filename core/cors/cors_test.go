@@ -120,7 +120,6 @@ func Test_InterceptPreflightRequest_UseDefaultAllowOriginValueIfAllowCredentials
 	Expect(resp.Header.Get("Access-Control-Allow-Origin")).To(Equal("*"))
 }
 
-
 func Test_AddCORSHeaders_ShouldAddDefaultCORSHeadersToResponse(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -156,7 +155,6 @@ func Test_AddCORSHeaders_ShouldNotAddCORSHeadersIfRequestHasNoOriginHeader(t *te
 	Expect(resp.Header.Get("Access-Control-Expose-Headers")).To(Equal(""))
 }
 
-
 func Test_AddCORSHeaders_ShouldNotSetAllowCredentialsHeaderIfFalse(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -181,7 +179,6 @@ func Test_AddCORSHeaders_ShouldSetExposeHeadersIfPresent(t *testing.T) {
 
 	unit := DefaultCORSConfigs()
 	unit.ExposeHeaders = "Content-Type"
-
 
 	r, err := http.NewRequest(http.MethodGet, "http://somehost.com", nil)
 	Expect(err).To(BeNil())

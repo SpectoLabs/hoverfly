@@ -947,7 +947,6 @@ func Test_Hoverfly_SetModeWithArguments_AsteriskCanOnlyBeValidAsTheOnlyHeader(t 
 	})).ToNot(Succeed())
 }
 
-
 func Test_Hoverfly_SetModeWithArguments_OverwriteDuplicate(t *testing.T) {
 	RegisterTestingT(t)
 

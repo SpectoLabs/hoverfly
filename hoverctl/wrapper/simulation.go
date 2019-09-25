@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"net/url"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
+	log "github.com/sirupsen/logrus"
 )
 
 func ExportSimulation(target configuration.Target, urlPattern string) ([]byte, error) {

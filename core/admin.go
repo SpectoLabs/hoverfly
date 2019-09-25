@@ -9,9 +9,9 @@ import (
 	_ "github.com/SpectoLabs/hoverfly/core/statik"
 	"github.com/rakyll/statik/fs"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"

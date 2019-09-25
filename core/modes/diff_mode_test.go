@@ -44,7 +44,7 @@ func (this hoverflyDiffStub) DoRequest(request *http.Request) (*http.Response, e
 			StatusCode: 200,
 			Body:       ioutil.NopCloser(bytes.NewBufferString("actual")),
 			Header:     map[string][]string{"header": {"actual"}},
-			Trailer:	map[string][]string{"trailer1": {"actual"}},
+			Trailer:    map[string][]string{"trailer1": {"actual"}},
 		}, nil
 	default:
 		return &http.Response{
@@ -174,7 +174,7 @@ func Test_DiffMode_IncludeResponseTrailerForDiffing(t *testing.T) {
 	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
 		v2.DiffReportEntry{Field: "header/header", Expected: "[simulated]", Actual: "[actual]"},
 		v2.DiffReportEntry{Field: "header/trailer1", Expected: "[simulated]", Actual: "[actual]"},
-		))
+	))
 }
 
 func Test_DiffMode_BlacklistAllHeaders(t *testing.T) {

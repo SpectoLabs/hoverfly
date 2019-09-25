@@ -24,7 +24,6 @@ func Test_LRUFastCache_Get_NonExistingKey(t *testing.T) {
 	Expect(found).To(BeFalse())
 }
 
-
 func Test_LRUFastCache_CacheGetAllEntriesIsEmptyByDefault(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -34,7 +33,6 @@ func Test_LRUFastCache_CacheGetAllEntriesIsEmptyByDefault(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(actualValue).To(HaveLen(0))
 }
-
 
 func Test_LRUFastCache_SetAndGet(t *testing.T) {
 	RegisterTestingT(t)

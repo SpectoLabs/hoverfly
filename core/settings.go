@@ -8,8 +8,8 @@ import (
 
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/middleware"
+	log "github.com/sirupsen/logrus"
 )
 
 // Configuration - initial structure of configuration
@@ -31,7 +31,7 @@ type Configuration struct {
 	Verbose bool
 
 	DisableCache bool
-	CacheSize int
+	CacheSize    int
 
 	SecretKey          []byte
 	JWTExpirationDelta int
@@ -42,7 +42,7 @@ type Configuration struct {
 	HttpsOnly bool
 
 	PlainHttpTunneling bool
-	CORS cors.Configs
+	CORS               cors.Configs
 
 	NoImportCheck bool
 
@@ -114,7 +114,7 @@ const (
 	HoverflyImportRecordsEV = "HoverflyImport"
 
 	HoverflyUpstreamProxyPortEV = "UpstreamProxy"
-	HoverflySkipImportCheckEV = "SKIP_IMPORT_CHECK"
+	HoverflySkipImportCheckEV   = "SKIP_IMPORT_CHECK"
 )
 
 // InitSettings gets and returns initial configuration from env

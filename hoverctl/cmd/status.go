@@ -55,7 +55,7 @@ mode and middleware set.
 			{"Proxy type", proxyType},
 			{"Mode", hoverflyInfo.Mode},
 			{"Middleware", middlewareStatus},
-			{"CORS", corsStatus },
+			{"CORS", corsStatus},
 		}
 
 		drawTable(data, false)

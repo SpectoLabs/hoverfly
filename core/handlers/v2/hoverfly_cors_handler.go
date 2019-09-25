@@ -36,7 +36,6 @@ func (h *HoverflyCORSHandler) Get(w http.ResponseWriter, req *http.Request, next
 	handlers.WriteResponse(w, corsBytes)
 }
 
-
 func (h *HoverflyCORSHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Header().Add("Allow", "OPTIONS, GET, PUT")
 	handlers.WriteResponse(w, []byte(""))

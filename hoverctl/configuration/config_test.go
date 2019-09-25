@@ -116,13 +116,13 @@ targets:
 			},
 
 			"remote": {
-				Name:      "remote",
-				Host:      "hoverfly.cloud",
-				AdminPort: 2345,
-				ProxyPort: 9875,
+				Name:        "remote",
+				Host:        "hoverfly.cloud",
+				AdminPort:   2345,
+				ProxyPort:   9875,
 				AuthEnabled: true,
-				Username: 	"admin",
-				Password: 	"123",
+				Username:    "admin",
+				Password:    "123",
 				Simulations: []string{"foo.json", "bar.json"},
 			},
 		},
@@ -135,9 +135,9 @@ func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testin
 	config := Config{
 		Targets: map[string]Target{
 			"test-target": {
-				Name:      "test-target",
-				AdminPort: 1234,
-				ProxyPort: 8765,
+				Name:        "test-target",
+				AdminPort:   1234,
+				ProxyPort:   8765,
 				Simulations: []string{"foo.json", "bar.json"},
 			},
 		},

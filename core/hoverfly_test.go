@@ -582,8 +582,6 @@ func Test_Hoverfly_processRequest_CanHandlePreflightRequestWhenCORSEnabled(t *te
 	Expect(string(responseBody)).To(Equal(""))
 }
 
-
-
 func Test_Hoverfly_processRequest_IgnoreInvalidPreflightRequestWhenCORSEnabled(t *testing.T) {
 	RegisterTestingT(t)
 

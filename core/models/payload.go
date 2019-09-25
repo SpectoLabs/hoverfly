@@ -12,10 +12,10 @@ import (
 	"sort"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -88,7 +88,7 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 
 	// Proxy tunnel request gives relative URL, and we should manually set scheme to HTTP
 	var scheme string
-	if req.URL.IsAbs()  {
+	if req.URL.IsAbs() {
 		scheme = req.URL.Scheme
 	} else {
 		scheme = "http"

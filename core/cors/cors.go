@@ -8,24 +8,24 @@ import (
 )
 
 type Configs struct {
-	Enabled 			bool
-	AllowOrigin 		string
-	AllowMethods 		string
-	AllowHeaders 		string
-	PreflightMaxAge 	int64
-	AllowCredentials 	bool
-	ExposeHeaders 		string
+	Enabled          bool
+	AllowOrigin      string
+	AllowMethods     string
+	AllowHeaders     string
+	PreflightMaxAge  int64
+	AllowCredentials bool
+	ExposeHeaders    string
 }
 
 func DefaultCORSConfigs() *Configs {
-	return &Configs {
-		Enabled: true,
-		AllowOrigin: "*",
-		AllowMethods: "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS",
-		AllowHeaders: "Content-Type,Origin,Accept,Authorization,Content-Length,X-Requested-With",
-		PreflightMaxAge: 1800,
+	return &Configs{
+		Enabled:          true,
+		AllowOrigin:      "*",
+		AllowMethods:     "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS",
+		AllowHeaders:     "Content-Type,Origin,Accept,Authorization,Content-Length,X-Requested-With",
+		PreflightMaxAge:  1800,
 		AllowCredentials: true,
-		ExposeHeaders: "",
+		ExposeHeaders:    "",
 	}
 }
 
@@ -61,7 +61,7 @@ func (c *Configs) InterceptPreflightRequest(r *http.Request) *http.Response {
 
 // Add CORS headers to the response if the request contains Origin header
 func (c *Configs) AddCORSHeaders(r *http.Request, resp *http.Response) {
-	if r.Header.Get("Origin") == "" || (resp.Header != nil &&  resp.Header.Get("Access-Control-Allow-Origin") != "") {
+	if r.Header.Get("Origin") == "" || (resp.Header != nil && resp.Header.Get("Access-Control-Allow-Origin") != "") {
 		return
 	}
 

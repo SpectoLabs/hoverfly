@@ -72,7 +72,6 @@ func (*Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.R
 	return tpl.Exec(ctx)
 }
 
-
 func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails, state map[string]string) *TemplatingData {
 	return &TemplatingData{
 		Request: Request{

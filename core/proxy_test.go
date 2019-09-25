@@ -288,7 +288,7 @@ func Test_matchesFilter_ShoulRemovePathFromFilterIfConnectRequest(t *testing.T) 
 	RegisterTestingT(t)
 
 	removedPathResult := matchesFilter("https://test.com/testing")(&http.Request{
-		Host: "test.com:443",
+		Host:   "test.com:443",
 		Method: http.MethodConnect,
 		URL: &url.URL{
 			Scheme: "https",
@@ -298,7 +298,6 @@ func Test_matchesFilter_ShoulRemovePathFromFilterIfConnectRequest(t *testing.T) 
 	}, nil)
 	Expect(removedPathResult).To(BeTrue())
 }
-
 
 func Test_matchesFilter_ShouldGetHostNameFromRequest(t *testing.T) {
 	RegisterTestingT(t)
@@ -312,4 +311,3 @@ func Test_matchesFilter_ShouldGetHostNameFromRequest(t *testing.T) {
 	}, nil)
 	Expect(httpResult).To(BeTrue())
 }
-

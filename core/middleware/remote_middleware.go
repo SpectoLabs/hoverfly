@@ -8,8 +8,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	log "github.com/sirupsen/logrus"
 )
 
 func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair) (models.RequestResponsePair, error) {

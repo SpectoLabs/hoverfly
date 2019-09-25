@@ -15,11 +15,10 @@ type HoverflyCORSStub struct {
 
 func (h HoverflyCORSStub) GetCORS() CORSView {
 	return CORSView{
-		Enabled: 		true,
-		AllowOrigin: 	"*",
+		Enabled:     true,
+		AllowOrigin: "*",
 	}
 }
-
 
 func TestH_HoverflyCORSHandler_GetReturnsTheCorrectDestination(t *testing.T) {
 	RegisterTestingT(t)
@@ -39,7 +38,6 @@ func TestH_HoverflyCORSHandler_GetReturnsTheCorrectDestination(t *testing.T) {
 	Expect(corsView.Enabled).To(BeTrue())
 	Expect(corsView.AllowOrigin).To(Equal("*"))
 }
-
 
 func Test_HoverflyCORSHandler_Options_GetsOptions(t *testing.T) {
 	RegisterTestingT(t)

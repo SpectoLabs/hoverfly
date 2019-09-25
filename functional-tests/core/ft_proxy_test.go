@@ -126,7 +126,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(err.Error()).To(Equal("unexpected EOF"))
 			Expect(string(body)).To(Equal("OK"))
 
-			Expect(response.Header.Get("Content-length")).To(Equal("5555"))  // Just to make sure we don't delete the Content-Length Header
+			Expect(response.Header.Get("Content-length")).To(Equal("5555")) // Just to make sure we don't delete the Content-Length Header
 			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
 
 			Expect(response.ContentLength).To(Equal(int64(5555)))

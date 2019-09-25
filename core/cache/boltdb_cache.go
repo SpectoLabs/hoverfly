@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/boltdb/bolt"
+	log "github.com/sirupsen/logrus"
 )
 
 // NewBoltDBCache - returns new BoltCache instance

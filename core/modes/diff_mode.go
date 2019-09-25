@@ -39,7 +39,7 @@ func (this *DiffMode) View() v2.ModeView {
 	return v2.ModeView{
 		Mode: Diff,
 		Arguments: v2.ModeArgumentsView{
-			Headers:          this.Arguments.Headers,
+			Headers: this.Arguments.Headers,
 		},
 	}
 }

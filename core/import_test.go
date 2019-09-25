@@ -665,8 +665,8 @@ func TestImportImportRequestResponsePairs_SetsState(t *testing.T) {
 	Expect(result.WarningMessages).To(HaveLen(0))
 
 	Eventually(func() string {
-			val,_ := hv.state.GetState("sequence:1")
-			return val
+		val, _ := hv.state.GetState("sequence:1")
+		return val
 	}).Should(Equal("1"))
 }
 
@@ -680,8 +680,8 @@ func TestImportImportRequestResponsePairsMultipleTimes_SetsAllStates(t *testing.
 
 	pair1 := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
-			Status:      200,
-			Body:        "hello_world"},
+			Status: 200,
+			Body:   "hello_world"},
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Path: []v2.MatcherViewV5{
 				{
@@ -696,8 +696,8 @@ func TestImportImportRequestResponsePairsMultipleTimes_SetsAllStates(t *testing.
 	}
 	pair2 := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
-			Status:      200,
-			Body:        "hello_world"},
+			Status: 200,
+			Body:   "hello_world"},
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Body: []v2.MatcherViewV5{
 				{
@@ -711,19 +711,18 @@ func TestImportImportRequestResponsePairsMultipleTimes_SetsAllStates(t *testing.
 		},
 	}
 
-
 	result1 := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{pair1})
 	Expect(result1.WarningMessages).To(HaveLen(0))
 	result2 := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV5{pair2})
 	Expect(result2.WarningMessages).To(HaveLen(0))
 
 	Eventually(func() string {
-			val,_ := hv.state.GetState("sequence:1")
-			return val
+		val, _ := hv.state.GetState("sequence:1")
+		return val
 	}).Should(Equal("1"))
 	Eventually(func() string {
-			val,_ := hv.state.GetState("sequence:2")
-			return val
+		val, _ := hv.state.GetState("sequence:2")
+		return val
 	}).Should(Equal("1"))
 }
 
@@ -823,7 +822,6 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthMismatch(t
 	Expect(result.WarningMessages).To(HaveLen(1))
 	Expect(result.WarningMessages[0].Message).To(ContainSubstring("Response contains incorrect Content-Length header on data.pairs[0].response, please correct or remove header"))
 }
-
 
 func TestImportRequestResponsePairs_ReturnsWarningsIfAPairIsNotAddedDueToConflict(t *testing.T) {
 	RegisterTestingT(t)

@@ -261,7 +261,6 @@ func Test_NewSimulationViewFromRequestBody_WontCreateSimulationFromInvalidV1Simu
 	Expect(simulation.GlobalActions.Delays).To(HaveLen(0))
 }
 
-
 func Test_NewSimulationViewFromRequestBody_ReturnErrorMessagesOnInvalidSimulation(t *testing.T) {
 	RegisterTestingT(t)
 

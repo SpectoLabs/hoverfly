@@ -38,7 +38,7 @@ type Target struct {
 	Username    string
 	Password    string
 
-	Simulations	[]string	`yaml:",omitempty"`
+	Simulations []string `yaml:",omitempty"`
 }
 
 func NewDefaultTarget() *Target {

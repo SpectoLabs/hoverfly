@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"os/exec"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	log "github.com/sirupsen/logrus"
 )
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware

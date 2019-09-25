@@ -10,8 +10,8 @@ import (
 	"regexp"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/jackwakefield/gopac"
+	log "github.com/sirupsen/logrus"
 )
 
 func GetDefaultHoverflyHTTPClient(tlsVerification bool, upstreamProxy string) *http.Client {

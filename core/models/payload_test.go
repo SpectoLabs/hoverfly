@@ -256,7 +256,6 @@ func Test_NewRequestDetailsFromHttpRequest_LowerCaseDestination(t *testing.T) {
 	Expect(requestDetails.Destination).To(Equal("test.org"))
 }
 
-
 func Test_NewRequestDetailsFromHttpRequest_HandleNonAbsoluteURL(t *testing.T) {
 	RegisterTestingT(t)
 	request, _ := http.NewRequest("GET", "/hello", nil)

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	log "github.com/sirupsen/logrus"
 )
 
 type ResponseDelay struct {

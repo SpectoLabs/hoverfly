@@ -488,7 +488,6 @@ var _ = Describe("/api/v2/simulation", func() {
 			res = functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 
-
 			req = sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
 			payload = bytes.NewBufferString(`
 			{
@@ -636,7 +635,6 @@ var _ = Describe("/api/v2/simulation", func() {
 			req.Body(payload)
 			res = functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
-
 
 			req = sling.New().Post("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/simulation")
 			payload = bytes.NewBufferString(simulation)

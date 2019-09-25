@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"regexp"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 

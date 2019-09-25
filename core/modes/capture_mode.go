@@ -8,8 +8,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	log "github.com/sirupsen/logrus"
 )
 
 type HoverflyCapture interface {
@@ -27,9 +27,9 @@ func (this *CaptureMode) View() v2.ModeView {
 	return v2.ModeView{
 		Mode: Capture,
 		Arguments: v2.ModeArgumentsView{
-			Headers:          	this.Arguments.Headers,
-			Stateful:         	this.Arguments.Stateful,
-			OverwriteDuplicate:	this.Arguments.OverwriteDuplicate,
+			Headers:            this.Arguments.Headers,
+			Stateful:           this.Arguments.Stateful,
+			OverwriteDuplicate: this.Arguments.OverwriteDuplicate,
 		},
 	}
 }

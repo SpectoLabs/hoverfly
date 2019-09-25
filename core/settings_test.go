@@ -137,7 +137,6 @@ func Test_InitSettings_SetsPlainHttpTunnelingToFalse(t *testing.T) {
 	Expect(settings.PlainHttpTunneling).To(Equal(false))
 }
 
-
 func Test_InitSettings_SetsDefaultCacheSize(t *testing.T) {
 	RegisterTestingT(t)
 

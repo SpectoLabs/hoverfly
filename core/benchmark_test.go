@@ -12,7 +12,6 @@ import (
 	"time"
 )
 
-
 func BenchmarkPutSimulationAPI(b *testing.B) {
 	RegisterTestingT(b)
 
@@ -161,10 +160,10 @@ func BenchmarkProcessRequest(b *testing.B) {
 	largeResponse := v2.SimulationViewV5{}
 	_ = json.Unmarshal(bytes, &largeResponse)
 
-	benchmarks := []struct{
-		name string
+	benchmarks := []struct {
+		name       string
 		simulation v2.SimulationViewV5
-	} {
+	}{
 		{"Simple simulation", simulation},
 		{"Templated simulation", templated},
 		{"Large response body", largeResponse},
@@ -186,7 +185,6 @@ func BenchmarkProcessRequest(b *testing.B) {
 			}
 		})
 	}
-
 
 	Expect(resp.StatusCode).To(Equal(200))
 

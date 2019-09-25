@@ -1,8 +1,8 @@
 package authentication
 
 import (
-	log "github.com/sirupsen/logrus"
 	"github.com/dgrijalva/jwt-go"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 
 	"bytes"
@@ -19,7 +19,7 @@ type JWTAuthenticationBackend struct {
 }
 
 const (
-	expireOffset  = 3600
+	expireOffset = 3600
 )
 
 //Token - container for jwt.Token for encoding

@@ -72,7 +72,6 @@ func Test_BuildUrl_AddsHttpAsDefaultProtocol(t *testing.T) {
 	Expect(BuildURL(target, "/something")).To(Equal("http://localhost:1234/something"))
 }
 
-
 func Test_Stop_SendsCorrectHTTPRequest(t *testing.T) {
 	RegisterTestingT(t)
 

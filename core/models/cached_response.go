@@ -5,9 +5,9 @@ import (
 )
 
 type CachedResponse struct {
-	Request      RequestDetails
-	MatchingPair *RequestMatcherResponsePair
-	ClosestMiss  *ClosestMiss
-	ResponseTemplate *raymond.Template
+	Request                  RequestDetails
+	MatchingPair             *RequestMatcherResponsePair
+	ClosestMiss              *ClosestMiss
+	ResponseTemplate         *raymond.Template
 	ResponseHeadersTemplates map[string][]*raymond.Template
 }

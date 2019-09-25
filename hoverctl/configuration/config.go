@@ -12,7 +12,7 @@ import (
 type Flags []string
 
 type Config struct {
-	DefaultTarget string            `mapstructure:"default" yaml:"default"`	// viper uses mapstructure to unmarshall
+	DefaultTarget string            `mapstructure:"default" yaml:"default"` // viper uses mapstructure to unmarshall
 	Targets       map[string]Target `yaml:"targets"`
 }
 

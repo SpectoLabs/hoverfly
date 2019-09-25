@@ -9,10 +9,10 @@ import (
 	"github.com/aymerick/raymond"
 	"github.com/pborman/uuid"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/icrowley/fake"
+	log "github.com/sirupsen/logrus"
 )
 
 type templateHelpers struct {
