@@ -40,6 +40,7 @@ func NewTemplator() *Templator {
 		raymond.RegisterHelper("currentDateTime", t.currentDateTime)
 		raymond.RegisterHelper("currentDateTimeAdd", t.currentDateTimeAdd)
 		raymond.RegisterHelper("currentDateTimeSubtract", t.currentDateTimeSubtract)
+		raymond.RegisterHelper("now", t.nowHelper)
 		raymond.RegisterHelper("randomString", t.randomString)
 		raymond.RegisterHelper("randomStringLength", t.randomStringLength)
 		raymond.RegisterHelper("randomBoolean", t.randomBoolean)

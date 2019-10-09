@@ -237,6 +237,17 @@ func Test_ApplyTemplate_currentDateTimeSubtract(t *testing.T) {
 	Expect(template).To(Not(Equal(ContainSubstring(`{{currentDateTimeSubtract "5m" "2006-01-02T15:04:05Z07:00"}}`))))
 }
 
+
+func Test_ApplyTemplate_now(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{now "" "unix"}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Not(Equal(ContainSubstring(`{{now "" "unix"}}`))))
+}
+
 func Test_ApplyTemplate_randomString(t *testing.T) {
 	RegisterTestingT(t)
 
