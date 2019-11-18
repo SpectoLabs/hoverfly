@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"sync"
 
 	sorting "sort"
 	"strings"
@@ -27,6 +28,7 @@ type JournalEntry struct {
 type Journal struct {
 	entries    []JournalEntry
 	EntryLimit int
+	mutex      sync.Mutex
 }
 
 func NewJournal() *Journal {
@@ -51,6 +53,7 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 		Headers: response.Header,
 	}
 
+	this.mutex.Lock()
 	if len(this.entries) >= this.EntryLimit {
 		this.entries = append(this.entries[:0], this.entries[1:]...)
 	}
@@ -62,6 +65,7 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 		TimeStarted: started,
 		Latency:     time.Since(started),
 	})
+	this.mutex.Unlock()
 
 	return nil
 }
