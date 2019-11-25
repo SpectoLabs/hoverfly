@@ -292,7 +292,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(err).To(BeNil())
 
 			// TODO: Handle this?
-			Expect(string(body)).To(ContainSubstring("{map[] [Request] http %!s(func(string, string, *raymond.Options)"))
+			Expect(string(body)).To(ContainSubstring("[Request] http %!s(func(string, string, *raymond.Options)"))
 		})
 
 		It("Request.Body jsonpath", func() {
