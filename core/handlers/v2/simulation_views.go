@@ -169,7 +169,7 @@ type SimulationImportWarning struct {
 	DocsLink string `json:"documentation,omitempty"`
 }
 
-func (s *SimulationImportResult) AddError(err error) {
+func (s *SimulationImportResult) SetError(err error) {
 	s.err = err
 }
 
