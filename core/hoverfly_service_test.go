@@ -56,6 +56,10 @@ var (
 		Delay:      201,
 	}
 
+	invalidDelay = v1.ResponseDelayView{
+		UrlPattern: "test.com",
+	}
+
 	delayLogNormalOne = v1.ResponseDelayLogNormalView{
 		UrlPattern: ".",
 		HttpMethod: "GET",
@@ -606,6 +610,27 @@ func Test_Hoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 	Expect(delays.Data[1].UrlPattern).To(Equal("test.com"))
 	Expect(delays.Data[1].HttpMethod).To(Equal(""))
 	Expect(delays.Data[1].Delay).To(Equal(201))
+}
+
+func Test_Hoverfly_PutSimulation_ImportsDelaysWithValidationError(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	simulationToImport := v2.SimulationViewV5{
+		v2.DataViewV5{
+			GlobalActions: v2.GlobalActionsView{
+				Delays: []v1.ResponseDelayView{delayOne, invalidDelay},
+			},
+		},
+		v2.MetaView{},
+	}
+
+	err := unit.PutSimulation(simulationToImport)
+	Expect(err.GetError()).NotTo(BeNil())
+
+	delays := unit.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()
+	Expect(delays.Data).To(BeEmpty())
 }
 
 func Test_Hoverfly_PutSimulation_ImportsDelaysLogNormal(t *testing.T) {
