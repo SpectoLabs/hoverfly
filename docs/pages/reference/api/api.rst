@@ -635,9 +635,10 @@ Gets the requests and responses stored in the cache.
                 "key": "2fc8afceec1b6bcf99ff1f547c1f5b11",
                 "matchingPair": {
                     "request": {
-                        "path": {
-                            "exactMatch": "hoverfly.io"
-                        }
+                        "path": [{
+                            "matcher": "exact",
+                            "value": "hoverfly.io"
+                        }]
                     },
                     "response": {
                         "status": 200,
@@ -650,7 +651,8 @@ Gets the requests and responses stored in the cache.
                         }
                     }
                 },
-                "headerMatch": false
+                "headerMatch": false,
+                "closestMiss": null
             }
         ]
     }
@@ -770,9 +772,10 @@ Filter and search entries stored in the journal.
 ::
     {
         "request": {
-            "destination": {
-              "exactMatch": "hoverfly.io"
-            }
+            "destination": [{
+              "matcher": "exact",
+              "value": "hoverfly.io"
+            }]
         }
     }
 
