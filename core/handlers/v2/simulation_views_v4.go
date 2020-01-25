@@ -54,6 +54,9 @@ func (this ResponseDetailsViewV4) GetStatus() int { return this.Status }
 // Gets Body - required for interfaces.Response
 func (this ResponseDetailsViewV4) GetBody() string { return this.Body }
 
+// Gets BodyFile - required for interfaces.Response
+func (this ResponseDetailsViewV4) GetBodyFile() string { return "" }
+
 // Gets EncodedBody - required for interfaces.Response
 func (this ResponseDetailsViewV4) GetEncodedBody() bool { return this.EncodedBody }
 

@@ -64,6 +64,8 @@ func (this ResponseDetailsView) GetStatus() int { return this.Status }
 
 func (this ResponseDetailsView) GetBody() string { return this.Body }
 
+func (this ResponseDetailsView) GetBodyFile() string { return this.BodyFile }
+
 func (this ResponseDetailsView) GetEncodedBody() bool { return this.EncodedBody }
 
 func (this ResponseDetailsView) GetTemplated() bool { return false }
