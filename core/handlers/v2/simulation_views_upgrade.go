@@ -198,7 +198,7 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
 			},
 		}
 
-		requestReponsePairs = append(requestReponsePairs, requestResponsePair)
+		requestResponsePairs = append(requestResponsePairs, requestResponsePair)
 	}
 
 	return SimulationViewV5{

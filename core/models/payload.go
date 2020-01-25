@@ -196,6 +196,7 @@ type ResponseDetailsLogNormal struct {
 type ResponseDetails struct {
 	Status           int
 	Body             string
+	BodyFile         string
 	Headers          map[string][]string
 	Templated        bool
 	TransitionsState map[string]string
@@ -205,16 +206,21 @@ type ResponseDetails struct {
 }
 
 func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
-	body := data.GetBody()
+	var body string
 
-	if data.GetEncodedBody() == true {
-		decoded, _ := base64.StdEncoding.DecodeString(data.GetBody())
-		body = string(decoded)
+	if len(data.GetBody()) > 0 {
+		body = data.GetBody()
+
+		if data.GetEncodedBody() == true {
+			decoded, _ := base64.StdEncoding.DecodeString(data.GetBody())
+			body = string(decoded)
+		}
 	}
 
 	details := ResponseDetails{
 		Status:           data.GetStatus(),
 		Body:             body,
+		BodyFile:         data.GetBodyFile(),
 		Headers:          data.GetHeaders(),
 		Templated:        data.GetTemplated(),
 		TransitionsState: data.GetTransitionsState(),
@@ -234,7 +240,7 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 	return details
 }
 
-// This function will create a JSON appriopriate version of ResponseDetails for the v2 API
+// This function will create a JSON appropriate version of ResponseDetails for the v2 API
 // If the response headers indicate that the content is encoded, or it has a non-matching
 // supported mimetype, we base64 encode it.
 func (r *ResponseDetails) ConvertToResponseDetailsView() v2.ResponseDetailsView {
@@ -296,6 +302,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 	view := v2.ResponseDetailsViewV5{
 		Status:           r.Status,
 		Body:             body,
+		BodyFile:         r.BodyFile,
 		Headers:          r.Headers,
 		EncodedBody:      needsEncoding,
 		Templated:        r.Templated,

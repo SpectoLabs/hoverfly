@@ -202,6 +202,7 @@ Which if hit would have given the following response:
 {
     "status": 200,
     "body": "",
+    "bodyFile": "",
     "encodedBody": false,
     "templated": false,
     "fixedDelay": 0
@@ -275,6 +276,7 @@ Which if hit would have given the following response:
 {
     "status": 200,
     "body": "",
+    "bodyFile": "",
     "encodedBody": false,
     "templated": false,
     "fixedDelay": 0

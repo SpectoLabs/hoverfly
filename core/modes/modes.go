@@ -2,13 +2,13 @@ package modes
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -92,12 +92,22 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 }
 
 // ReconstructResponse changes original response with details provided in Constructor Payload.Response
-func ReconstructResponse(request *http.Request, pair models.RequestResponsePair) *http.Response {
+func ReconstructResponse(request *http.Request, pair models.RequestResponsePair) (*http.Response, error) {
 	response := &http.Response{}
 	response.Request = request
 
-	response.ContentLength = int64(len(pair.Response.Body))
-	response.Body = ioutil.NopCloser(strings.NewReader(pair.Response.Body))
+	body := pair.Response.Body
+
+	if len(pair.Response.BodyFile) > 0 {
+		b, err := ioutil.ReadFile(pair.Response.BodyFile)
+		if err != nil {
+			return nil, errors.New("Cannot read bodyFile " + err.Error())
+		}
+		body = string(b[:])
+	}
+
+	response.ContentLength = int64(len(body))
+	response.Body = ioutil.NopCloser(strings.NewReader(body))
 	response.StatusCode = pair.Response.Status
 	response.Status = http.StatusText(pair.Response.Status)
 
@@ -123,7 +133,7 @@ func ReconstructResponse(request *http.Request, pair models.RequestResponsePair)
 		response.Header.Set("Content-Length", fmt.Sprintf("%v", response.ContentLength))
 	}
 
-	return response
+	return response, nil
 }
 
 func GetRequestLogFields(request *models.RequestDetails) *logrus.Fields {

@@ -40,7 +40,7 @@ type MatcherViewV5 struct {
 	Config  map[string]interface{} `json:"config,omitempty"`
 }
 
-func NewMatcherView(matcher string, value interface{}) MatcherViewV5 {
+func NewMatcherViewV5(matcher string, value interface{}) MatcherViewV5 {
 	return MatcherViewV5{
 		Matcher: matcher,
 		Value:   value,
@@ -67,6 +67,9 @@ func (this ResponseDetailsViewV5) GetStatus() int { return this.Status }
 
 // Gets Body - required for interfaces.Response
 func (this ResponseDetailsViewV5) GetBody() string { return this.Body }
+
+// Gets BodyFile - required for interfaces.Response
+func (this ResponseDetailsViewV5) GetBodyFile() string { return "" }
 
 // Gets EncodedBody - required for interfaces.Response
 func (this ResponseDetailsViewV5) GetEncodedBody() bool { return this.EncodedBody }

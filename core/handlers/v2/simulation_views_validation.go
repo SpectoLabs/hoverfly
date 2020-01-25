@@ -438,6 +438,9 @@ var responseDefinitionV5 = map[string]interface{}{
 		"body": map[string]interface{}{
 			"type": "string",
 		},
+		"bodyFile": map[string]interface{}{
+			"type": "string",
+		},
 		"encodedBody": map[string]interface{}{
 			"type": "boolean",
 		},
