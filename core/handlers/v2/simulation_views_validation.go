@@ -70,6 +70,9 @@ var responseDefinitionV3 = map[string]interface{}{
 		"body": map[string]interface{}{
 			"type": "string",
 		},
+		"bodyFile": map[string]interface{}{
+			"type": "string",
+		},
 		"encodedBody": map[string]interface{}{
 			"type": "boolean",
 		},
@@ -89,6 +92,9 @@ var responseDefinitionV1 = map[string]interface{}{
 	"type": "object",
 	"properties": map[string]interface{}{
 		"body": map[string]interface{}{
+			"type": "string",
+		},
+		"bodyFile": map[string]interface{}{
 			"type": "string",
 		},
 		"encodedBody": map[string]interface{}{
@@ -406,6 +412,9 @@ var responseDefinitionV4 = map[string]interface{}{
 	"type": "object",
 	"properties": map[string]interface{}{
 		"body": map[string]interface{}{
+			"type": "string",
+		},
+		"bodyFile": map[string]interface{}{
 			"type": "string",
 		},
 		"encodedBody": map[string]interface{}{

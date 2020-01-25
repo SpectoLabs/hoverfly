@@ -52,5 +52,10 @@ func (this SynthesizeMode) Process(request *http.Request, details models.Request
 		"request": GetRequestLogFields(&pair.Request),
 	}).Info("synthetic response created successfuly")
 
-	return ReconstructResponse(request, pair), nil
+	reconstructedResponse, err := ReconstructResponse(request, pair)
+	if err != nil {
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when reconstructing response", Synthesize)
+	}
+
+	return reconstructedResponse, nil
 }

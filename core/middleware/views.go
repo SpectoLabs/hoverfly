@@ -52,6 +52,7 @@ func (this RequestDetailsView) GetHeaders() map[string][]string { return this.He
 type ResponseDetailsView struct {
 	Status      int                 `json:"status"`
 	Body        string              `json:"body"`
+	BodyFile    string              `json:"bodyFile"`
 	EncodedBody bool                `json:"encodedBody"`
 	Headers     map[string][]string `json:"headers"`
 }
@@ -59,6 +60,8 @@ type ResponseDetailsView struct {
 func (this ResponseDetailsView) GetStatus() int { return this.Status }
 
 func (this ResponseDetailsView) GetBody() string { return this.Body }
+
+func (this ResponseDetailsView) GetBodyFile() string { return this.BodyFile }
 
 func (this ResponseDetailsView) GetEncodedBody() bool { return this.EncodedBody }
 

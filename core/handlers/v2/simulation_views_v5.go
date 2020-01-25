@@ -53,6 +53,7 @@ func (this RequestMatcherResponsePairViewV5) GetResponse() interfaces.Response {
 type ResponseDetailsViewV5 struct {
 	Status           int                 `json:"status"`
 	Body             string              `json:"body"`
+	BodyFile         string              `json:"bodyFile"`
 	EncodedBody      bool                `json:"encodedBody"`
 	Headers          map[string][]string `json:"headers,omitempty"`
 	Templated        bool                `json:"templated"`
@@ -65,6 +66,9 @@ func (this ResponseDetailsViewV5) GetStatus() int { return this.Status }
 
 // Gets Body - required for interfaces.Response
 func (this ResponseDetailsViewV5) GetBody() string { return this.Body }
+
+// Gets Body - required for interfaces.Response
+func (this ResponseDetailsViewV5) GetBodyFile() string { return this.BodyFile }
 
 // Gets EncodedBody - required for interfaces.Response
 func (this ResponseDetailsViewV5) GetEncodedBody() bool { return this.EncodedBody }

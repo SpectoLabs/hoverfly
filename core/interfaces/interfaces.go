@@ -18,6 +18,7 @@ type Request interface {
 type Response interface {
 	GetStatus() int
 	GetBody() string
+	GetBodyFile() string
 	GetEncodedBody() bool
 	GetTemplated() bool
 	GetHeaders() map[string][]string
