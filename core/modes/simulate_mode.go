@@ -49,9 +49,15 @@ func (this SimulateMode) Process(request *http.Request, details models.RequestDe
 
 	pair.Response = *response
 
-	if pair, err := this.Hoverfly.ApplyMiddleware(pair); err == nil {
-		return ReconstructResponse(request, pair), nil
-	} else {
+	pair, err := this.Hoverfly.ApplyMiddleware(pair)
+	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Simulate)
 	}
+
+	reconstructedResponse, err := ReconstructResponse(request, pair)
+	if err != nil {
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when reconstructing response", Simulate)
+	}
+
+	return reconstructedResponse, nil
 }
