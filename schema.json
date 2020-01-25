@@ -149,6 +149,9 @@
 				"body": {
 					"type": "string"
 				},
+				"bodyFile": {
+					"type": "string"
+				},
 				"encodedBody": {
 					"type": "boolean"
 				},
