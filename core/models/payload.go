@@ -189,6 +189,7 @@ func (r *RequestDetails) HashWithoutHost() string {
 type ResponseDetails struct {
 	Status           int
 	Body             string
+	BodyFile         string
 	Headers          map[string][]string
 	Templated        bool
 	TransitionsState map[string]string
@@ -196,16 +197,21 @@ type ResponseDetails struct {
 }
 
 func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
-	body := data.GetBody()
+	var body string
 
-	if data.GetEncodedBody() == true {
-		decoded, _ := base64.StdEncoding.DecodeString(data.GetBody())
-		body = string(decoded)
+	if len(data.GetBody()) > 0 {
+		body = data.GetBody()
+
+		if data.GetEncodedBody() == true {
+			decoded, _ := base64.StdEncoding.DecodeString(data.GetBody())
+			body = string(decoded)
+		}
 	}
 
 	return ResponseDetails{
 		Status:           data.GetStatus(),
 		Body:             body,
+		BodyFile:         data.GetBodyFile(),
 		Headers:          data.GetHeaders(),
 		Templated:        data.GetTemplated(),
 		TransitionsState: data.GetTransitionsState(),
@@ -275,6 +281,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 	return v2.ResponseDetailsViewV5{
 		Status:           r.Status,
 		Body:             body,
+		BodyFile:         r.BodyFile,
 		Headers:          r.Headers,
 		EncodedBody:      needsEncoding,
 		Templated:        r.Templated,
