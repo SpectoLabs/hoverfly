@@ -49,6 +49,10 @@ func (this *Hoverfly) SetMode(mode string) error {
 	})
 }
 
+func (this *Hoverfly) canSwitchWebserverMode(modeView v2.ModeView) bool {
+	return modeView.Mode != modes.Capture && modeView.Mode != modes.Modify
+}
+
 func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 
 	availableModes := map[string]bool{
@@ -67,9 +71,9 @@ func (this *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 		return fmt.Errorf("Not a valid mode")
 	}
 
-	if this.Cfg.Webserver && modeView.Mode == modes.Capture {
-		log.Error("Cannot change the mode of Hoverfly to capture when running as a webserver")
-		return fmt.Errorf("Cannot change the mode of Hoverfly to capture when running as a webserver")
+	if this.Cfg.Webserver && !this.canSwitchWebserverMode(modeView) {
+		log.Errorf("Cannot change the mode of Hoverfly to %s when running as a webserver", modeView.Mode)
+		return fmt.Errorf("Cannot change the mode of Hoverfly to %s when running as a webserver", modeView.Mode)
 	}
 
 	for _, header := range modeView.Arguments.Headers {
