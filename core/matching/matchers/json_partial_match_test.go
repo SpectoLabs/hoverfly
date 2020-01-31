@@ -232,3 +232,24 @@ func Test_JsonPartialMatch_MatchesFalseDeepComplexWithArray(t *testing.T) {
   }
 }`)).To(BeFalse())
 }
+
+func Test_JsonPartialMatch_MatchesTrueWithJSONRootAsArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonPartialMatch(`
+	{
+        "name": "Object 2",
+        "set": false,
+        "age": 400
+    }`, `[{
+"objects": [
+    {
+        "name": "Object 1",
+        "set": true
+    },{
+        "name": "Object 2",
+        "set": false,
+        "age": 400
+    }]
+}]`)).To(BeTrue())
+}
