@@ -7,22 +7,43 @@ import (
 var JsonPartial = "jsonpartial"
 
 func JsonPartialMatch(match interface{}, toMatch string) bool {
-	var expected, actual map[string]interface{}
+	var expected map[string]interface{}
+	var toMatchType interface{}
 	matchString, ok := match.(string)
 	if !ok {
 		return false
 	}
 
-	err0 := json.Unmarshal([]byte(matchString), &expected)
-	err1 := json.Unmarshal([]byte(toMatch), &actual)
+	err0 := json.Unmarshal([]byte(toMatch), &toMatchType)
+	err1 := json.Unmarshal([]byte(matchString), &expected)
 	if err0 != nil || err1 != nil {
 		return false
 	}
 
-	nodes := getAllNodesFromMap(actual)
-	for _, node := range nodes {
-		if mapContainsMap(expected, node) {
-			return true
+	switch toMatchType.(type) {
+	case []interface{}:
+		var actual []interface{}
+		err2 := json.Unmarshal([]byte(toMatch), &actual) // has type []interface{}
+		if err2 != nil {
+			return false
+		}
+		nodes := getAllNodesFromArray(actual)
+		for _, node := range nodes {
+			if mapContainsMap(expected, node) {
+				return true
+			}
+		}
+	default:
+		var actual map[string]interface{}
+		err3 := json.Unmarshal([]byte(toMatch), &actual) // has type interface{}
+		if err3 != nil {
+			return false
+		}
+		nodes := getAllNodesFromMap(actual)
+		for _, node := range nodes {
+			if mapContainsMap(expected, node) {
+				return true
+			}
 		}
 	}
 	return false
