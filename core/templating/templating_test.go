@@ -85,7 +85,40 @@ func Test_ShouldCreateTemplatingDataHttpScheme(t *testing.T) {
 	Expect(actual.Request.Scheme).To(Equal("http"))
 }
 
-func TestApplyTemplateWithQueryParams(t *testing.T) {
+func Test_ShouldCreateTemplatingDataHeaderFromRequest(t *testing.T) {
+	RegisterTestingT(t)
+
+	actual := templating.NewTemplatingDataFromRequest(
+		&models.RequestDetails{
+			Scheme:      "http",
+			Destination: "test.com",
+			Headers: map[string][]string{
+				"cheese": {"1", "3"},
+				"ham":    {"2"},
+			},
+		},
+		make(map[string]string),
+	)
+
+	Expect(actual.Request.Header).To(HaveKeyWithValue("cheese", []string{"1", "3"}))
+	Expect(actual.Request.Header).To(HaveKeyWithValue("ham", []string{"2"}))
+	Expect(actual.Request.Header).To(HaveLen(2))
+}
+
+func Test_ShouldCreateTemplatingDataHeaderFromRequestWithNoHeader(t *testing.T) {
+	RegisterTestingT(t)
+
+	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+	},
+		make(map[string]string),
+	)
+
+	Expect(actual.Request.Header).To(BeEmpty())
+}
+
+func TestApplyTemplateWithRequestDetails(t *testing.T) {
 	RegisterTestingT(t)
 
 	requestDetails := &models.RequestDetails{
@@ -96,6 +129,10 @@ func TestApplyTemplateWithQueryParams(t *testing.T) {
 		Query: map[string][]string{
 			"singular": {"1"},
 			"multiple": {"2", "3"},
+		},
+		Headers: map[string][]string{
+			"X-Singular": {"a"},
+			"X-Multiple": {"b", "c"},
 		},
 	}
 
@@ -111,6 +148,11 @@ Query param value by index: {{ Request.QueryParam.multiple.[1] }}
 
 List of query param values: {{ Request.QueryParam.multiple}}
 Looping through query params: {{#each Request.QueryParam.multiple}}{{ this }}-{{/each}}
+
+Header value: {{ Request.Header.X-Singular }}
+Header value by index: {{ Request.Header.X-Multiple.[0] }}
+Header value by index: {{ Request.Header.X-Multiple.[1] }}
+List of header values: {{ Request.Header.X-Multiple}}
 
 Path param value: {{ Request.Path.[0] }}
 All path param values: {{ Request.Path }}
@@ -128,6 +170,11 @@ Query param value by index: 3
 
 List of query param values: 23
 Looping through query params: 2-3-
+
+Header value: a
+Header value by index: b
+Header value by index: c
+List of header values: bc
 
 Path param value: foo
 All path param values: foobar
@@ -159,6 +206,11 @@ Query param value by index:{{ Request.QueryParam.multiple.[1] }}
 List of query param values:{{ Request.QueryParam.multiple}}
 Looping through query params:{{#each Request.QueryParam.multiple}}{{ this }}{{/each}}
 
+Header value: {{ Request.Header.X-Singular }}
+Header value by index: {{ Request.Header.X-Multiple.[0] }}
+Header value by index: {{ Request.Header.X-Multiple.[1] }}
+List of header values: {{ Request.Header.X-Multiple}}
+
 Path param value:{{ Request.Path.[0] }}
 All path param values:{{ Request.Path }}
 Looping through path params:{{#each Request.Path}}{{ this }}{{/each}}
@@ -178,6 +230,11 @@ Query param value by index:
 
 List of query param values:
 Looping through query params:
+
+Header value: 
+Header value by index: 
+Header value by index: 
+List of header values: 
 
 Path param value:
 All path param values:

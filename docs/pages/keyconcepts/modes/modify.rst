@@ -3,6 +3,10 @@
 Modify mode
 ===========
 
+.. note::
+
+    Hoverfly cannot be set to Modify mode when running as a webserver (see :ref:`webserver`).
+
 Modify mode is similar to :ref:`capture_mode`, except it **does not save the requests and responses**.
 In Modify mode, Hoverfly will pass each request to a :ref:`middleware` executable before forwarding
 it to the destination. Responses will also be passed to middleware before being returned to the client.
