@@ -20,25 +20,16 @@ func JsonPartialMatch(match interface{}, toMatch string) bool {
 		return false
 	}
 
-	switch toMatchType.(type) {
-	case []interface{}:
-		var actual []interface{}
-		err2 := json.Unmarshal([]byte(toMatch), &actual) // has type []interface{}
-		if err2 != nil {
-			return false
-		}
+	actual, ok := toMatchType.(map[string]interface{})
+	if !ok {
+		actual := toMatchType.([]interface{}) // has type []interface{}
 		nodes := getAllNodesFromArray(actual)
 		for _, node := range nodes {
 			if mapContainsMap(expected, node) {
 				return true
 			}
 		}
-	default:
-		var actual map[string]interface{}
-		err3 := json.Unmarshal([]byte(toMatch), &actual) // has type interface{}
-		if err3 != nil {
-			return false
-		}
+	} else { // has type interface{}
 		nodes := getAllNodesFromMap(actual)
 		for _, node := range nodes {
 			if mapContainsMap(expected, node) {
@@ -46,6 +37,7 @@ func JsonPartialMatch(match interface{}, toMatch string) bool {
 			}
 		}
 	}
+
 	return false
 }
 
