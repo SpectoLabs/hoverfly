@@ -13,7 +13,7 @@ type RequestFieldMatchers struct {
 	Value   interface{}
 }
 
-func NewRequestFieldMatchersFromView(matchers []v2.MatcherViewV5) []RequestFieldMatchers {
+func NewRequestFieldMatchersFromView(matchers []v2.MatcherViewV6) []RequestFieldMatchers {
 	if matchers == nil {
 		return nil
 	}
@@ -27,7 +27,7 @@ func NewRequestFieldMatchersFromView(matchers []v2.MatcherViewV5) []RequestField
 	return convertedMatchers
 }
 
-func NewRequestFieldMatchersFromMapView(mapMatchers map[string][]v2.MatcherViewV5) map[string][]RequestFieldMatchers {
+func NewRequestFieldMatchersFromMapView(mapMatchers map[string][]v2.MatcherViewV6) map[string][]RequestFieldMatchers {
 	var matchers map[string][]RequestFieldMatchers
 	for key, view := range mapMatchers {
 		if matchers == nil {
@@ -38,7 +38,7 @@ func NewRequestFieldMatchersFromMapView(mapMatchers map[string][]v2.MatcherViewV
 	return matchers
 }
 
-func NewQueryRequestFieldMatchersFromMapView(mapMatchers *v2.QueryMatcherViewV5) *QueryRequestFieldMatchers {
+func NewQueryRequestFieldMatchersFromMapView(mapMatchers *v2.QueryMatcherViewV6) *QueryRequestFieldMatchers {
 	var matchers *QueryRequestFieldMatchers
 	if mapMatchers != nil {
 		matchers = &QueryRequestFieldMatchers{}
@@ -53,8 +53,8 @@ func NewQueryRequestFieldMatchersFromMapView(mapMatchers *v2.QueryMatcherViewV5)
 	return matchers
 }
 
-func (this RequestFieldMatchers) BuildView() v2.MatcherViewV5 {
-	return v2.MatcherViewV5{
+func (this RequestFieldMatchers) BuildView() v2.MatcherViewV6 {
+	return v2.MatcherViewV6{
 		Matcher: this.Matcher,
 		Value:   this.Value,
 	}
@@ -65,7 +65,7 @@ type RequestMatcherResponsePair struct {
 	Response       ResponseDetails
 }
 
-func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV5) *RequestMatcherResponsePair {
+func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV6) *RequestMatcherResponsePair {
 	for i, matcher := range view.RequestMatcher.DeprecatedQuery {
 		if matcher.Matcher == matchers.Exact {
 			sortedQuery := util.SortQueryString(matcher.Value.(string))
@@ -89,12 +89,12 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 	}
 }
 
-func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePairViewV5 {
+func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePairViewV6 {
 
-	var path, method, destination, scheme, query, body []v2.MatcherViewV5
+	var path, method, destination, scheme, query, body []v2.MatcherViewV6
 
 	if this.RequestMatcher.Path != nil && len(this.RequestMatcher.Path) != 0 {
-		views := []v2.MatcherViewV5{}
+		views := []v2.MatcherViewV6{}
 		for _, matcher := range this.RequestMatcher.Path {
 			views = append(views, matcher.BuildView())
 		}
@@ -102,7 +102,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 	}
 
 	if this.RequestMatcher.Method != nil && len(this.RequestMatcher.Method) != 0 {
-		views := []v2.MatcherViewV5{}
+		views := []v2.MatcherViewV6{}
 		for _, matcher := range this.RequestMatcher.Method {
 			views = append(views, matcher.BuildView())
 		}
@@ -110,7 +110,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 	}
 
 	if this.RequestMatcher.Destination != nil && len(this.RequestMatcher.Destination) != 0 {
-		views := []v2.MatcherViewV5{}
+		views := []v2.MatcherViewV6{}
 		for _, matcher := range this.RequestMatcher.Destination {
 			views = append(views, matcher.BuildView())
 		}
@@ -118,7 +118,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 	}
 
 	if this.RequestMatcher.Scheme != nil && len(this.RequestMatcher.Scheme) != 0 {
-		views := []v2.MatcherViewV5{}
+		views := []v2.MatcherViewV6{}
 		for _, matcher := range this.RequestMatcher.Scheme {
 			views = append(views, matcher.BuildView())
 		}
@@ -126,7 +126,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 	}
 
 	if this.RequestMatcher.Body != nil && len(this.RequestMatcher.Body) != 0 {
-		views := []v2.MatcherViewV5{}
+		views := []v2.MatcherViewV6{}
 		for _, matcher := range this.RequestMatcher.Body {
 			views = append(views, matcher.BuildView())
 		}
@@ -134,27 +134,27 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 	}
 
 	if this.RequestMatcher.DeprecatedQuery != nil && len(this.RequestMatcher.DeprecatedQuery) != 0 {
-		views := []v2.MatcherViewV5{}
+		views := []v2.MatcherViewV6{}
 		for _, matcher := range this.RequestMatcher.DeprecatedQuery {
 			views = append(views, matcher.BuildView())
 		}
 		query = views
 	}
 
-	headersWithMatchers := map[string][]v2.MatcherViewV5{}
+	headersWithMatchers := map[string][]v2.MatcherViewV6{}
 	for key, matchers := range this.RequestMatcher.Headers {
-		views := []v2.MatcherViewV5{}
+		views := []v2.MatcherViewV6{}
 		for _, matcher := range matchers {
 			views = append(views, matcher.BuildView())
 		}
 		headersWithMatchers[key] = views
 	}
 
-	var queriesWithMatchers *v2.QueryMatcherViewV5
+	var queriesWithMatchers *v2.QueryMatcherViewV6
 	if this.RequestMatcher.Query != nil {
-		queriesWithMatchers = &v2.QueryMatcherViewV5{}
+		queriesWithMatchers = &v2.QueryMatcherViewV6{}
 		for key, matchers := range *this.RequestMatcher.Query {
-			views := []v2.MatcherViewV5{}
+			views := []v2.MatcherViewV6{}
 			for _, matcher := range matchers {
 				views = append(views, matcher.BuildView())
 			}
@@ -162,8 +162,8 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 		}
 	}
 
-	return v2.RequestMatcherResponsePairViewV5{
-		RequestMatcher: v2.RequestMatcherViewV5{
+	return v2.RequestMatcherResponsePairViewV6{
+		RequestMatcher: v2.RequestMatcherViewV6{
 			Path:            path,
 			Method:          method,
 			Destination:     destination,
@@ -174,7 +174,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 			Query:           queriesWithMatchers,
 			RequiresState:   this.RequestMatcher.RequiresState,
 		},
-		Response: this.Response.ConvertToResponseDetailsViewV5(),
+		Response: this.Response.ConvertToResponseDetailsViewV6(),
 	}
 }
 

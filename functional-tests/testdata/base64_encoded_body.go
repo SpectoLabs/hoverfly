@@ -37,7 +37,7 @@ var Base64EncodedBody = `{
 		}
 	},
 	"meta": {
-		"schemaVersion": "v5",
+		"schemaVersion": "v6",
 		"hoverflyVersion": "v1.0.0-rc.2",
 		"timeExported": "2019-02-28T14:48:28Z"
 	}

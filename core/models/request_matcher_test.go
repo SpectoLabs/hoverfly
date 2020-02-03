@@ -12,7 +12,7 @@ import (
 func Test_NewRequestFieldMatchersFromView_ReturnsNewStruct(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestFieldMatchersFromView([]v2.MatcherViewV5{
+	unit := models.NewRequestFieldMatchersFromView([]v2.MatcherViewV6{
 		{
 			Matcher: matchers.Exact,
 			Value:   "exactly",
@@ -49,15 +49,15 @@ func Test_NewRequestFieldMatchers_BuildView(t *testing.T) {
 func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV5{
-		RequestMatcher: v2.RequestMatcherViewV5{
-			Path: []v2.MatcherViewV5{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
+		RequestMatcher: v2.RequestMatcherViewV6{
+			Path: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
-			Headers: map[string][]v2.MatcherViewV5{
+			Headers: map[string][]v2.MatcherViewV6{
 				"Header": {
 					{
 						Matcher: matchers.Exact,
@@ -65,7 +65,7 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 					},
 				},
 			},
-			Query: &v2.QueryMatcherViewV5{
+			Query: &v2.QueryMatcherViewV6{
 				"Query": {
 					{
 						Matcher: matchers.Exact,
@@ -74,7 +74,7 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 				},
 			},
 		},
-		Response: v2.ResponseDetailsViewV5{
+		Response: v2.ResponseDetailsViewV6{
 			Body: "body",
 		},
 	})
@@ -94,16 +94,16 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 func Test_NewRequestMatcherResponsePairFromView_LeavesHeadersWithMatchersNil(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV5{
-		RequestMatcher: v2.RequestMatcherViewV5{
-			Path: []v2.MatcherViewV5{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
+		RequestMatcher: v2.RequestMatcherViewV6{
+			Path: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 		},
-		Response: v2.ResponseDetailsViewV5{},
+		Response: v2.ResponseDetailsViewV6{},
 	})
 
 	Expect(unit.RequestMatcher.Headers).To(BeNil())
@@ -112,16 +112,16 @@ func Test_NewRequestMatcherResponsePairFromView_LeavesHeadersWithMatchersNil(t *
 func Test_NewRequestMatcherResponsePairFromView_LeavesQueriesWithMatchersNil(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV5{
-		RequestMatcher: v2.RequestMatcherViewV5{
-			Path: []v2.MatcherViewV5{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
+		RequestMatcher: v2.RequestMatcherViewV6{
+			Path: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 		},
-		Response: v2.ResponseDetailsViewV5{},
+		Response: v2.ResponseDetailsViewV6{},
 	})
 
 	Expect(unit.RequestMatcher.Query).To(BeNil())
@@ -130,16 +130,16 @@ func Test_NewRequestMatcherResponsePairFromView_LeavesQueriesWithMatchersNil(t *
 func Test_NewRequestMatcherResponsePairFromView_SortsDeprecatedQuery(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV5{
-		RequestMatcher: v2.RequestMatcherViewV5{
-			DeprecatedQuery: []v2.MatcherViewV5{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
+		RequestMatcher: v2.RequestMatcherViewV6{
+			DeprecatedQuery: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "b=b&a=a",
 				},
 			},
 		},
-		Response: v2.ResponseDetailsViewV5{
+		Response: v2.ResponseDetailsViewV6{
 			Body: "body",
 		},
 	})
@@ -150,16 +150,16 @@ func Test_NewRequestMatcherResponsePairFromView_SortsDeprecatedQuery(t *testing.
 func Test_NewRequestMatcherResponsePairFromView_StoresTemplated(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV5{
-		RequestMatcher: v2.RequestMatcherViewV5{
-			Path: []v2.MatcherViewV5{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
+		RequestMatcher: v2.RequestMatcherViewV6{
+			Path: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "/",
 				},
 			},
 		},
-		Response: v2.ResponseDetailsViewV5{
+		Response: v2.ResponseDetailsViewV6{
 			Body:      "body",
 			Templated: true,
 		},

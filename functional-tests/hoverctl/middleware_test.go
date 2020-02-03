@@ -135,7 +135,7 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(ContainSubstring("Error when communicating with remote middleware: received 404"))
 			Expect(output).To(ContainSubstring("URL: http://specto.io/404/nothere"))
 			Expect(output).To(ContainSubstring("STDIN:"))
-			Expect(output).To(ContainSubstring(`{"response":{"status":200,"body":"ok","bodyFile":"","encodedBody":false,"headers":{"test_header":["true"]}},"request":{"path":"/","method":"GET","destination":"www.test.com","scheme":"","query":"","body":"","headers":{"test_header":["true"]}}}`))
+			Expect(output).To(ContainSubstring(`{"response":{"status":200,"body":"ok","encodedBody":false,"headers":{"test_header":["true"]}},"request":{"path":"/","method":"GET","destination":"www.test.com","scheme":"","query":"","body":"","headers":{"test_header":["true"]}}}`))
 		})
 
 		It("When I use the verbose flag, I see that notpython is not an executable", func() {
@@ -153,7 +153,7 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(MatchRegexp("Post http://wqrwwewf.wewefwef.specto: dial tcp: lookup wqrwwewf.wewefwef.specto on|no such host"))
 			Expect(output).To(ContainSubstring("URL: http://wqrwwewf.wewefwef.specto"))
 			Expect(output).To(ContainSubstring("STDIN:"))
-			Expect(output).To(ContainSubstring(`{"response":{"status":200,"body":"ok","bodyFile":"","encodedBody":false,"headers":{"test_header":["true"]}},"request":{"path":"/","method":"GET","destination":"www.test.com","scheme":"","query":"","body":"","headers":{"test_header":["true"]}}}`))
+			Expect(output).To(ContainSubstring(`{"response":{"status":200,"body":"ok","encodedBody":false,"headers":{"test_header":["true"]}},"request":{"path":"/","method":"GET","destination":"www.test.com","scheme":"","query":"","body":"","headers":{"test_header":["true"]}}}`))
 		})
 	})
 

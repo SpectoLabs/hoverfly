@@ -46,7 +46,7 @@ var QueryMatchers = `{
 		}
 	},
 	"meta": {
-		"schemaVersion": "v5",
+		"schemaVersion" : "v6",
 		"hoverflyVersion": "v0.17.0",
 		"timeExported": "2018-05-03T12:47:30+01:00"
 	}

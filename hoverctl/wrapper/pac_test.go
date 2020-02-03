@@ -12,25 +12,25 @@ func Test_SetPACFile_CanSetPACFile(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "PUT",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/pac",
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body:   `PACFILE`,
 					},
@@ -50,25 +50,25 @@ func Test_SetPACFile_ServerError(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "PUT",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/pac",
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 400,
 						Body:   `PACFILE`,
 					},

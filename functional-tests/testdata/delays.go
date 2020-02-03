@@ -108,7 +108,7 @@ var Delays = `{
 		}
 	},
 	"meta": {
-		"schemaVersion": "v5",
+		"schemaVersion" : "v6",
 		"hoverflyVersion": "v0.17.0",
 		"timeExported": "2018-05-03T11:56:26+01:00"
 	}
