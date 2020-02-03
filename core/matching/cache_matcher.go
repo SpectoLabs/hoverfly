@@ -70,7 +70,7 @@ func (this *CacheMatcher) GetAllResponses() (v2.CacheView, error) {
 	for key, value := range entries {
 		cachedResponse := value.(*models.CachedResponse)
 
-		var pair *v2.RequestMatcherResponsePairViewV5
+		var pair *v2.RequestMatcherResponsePairViewV6
 		var closestMiss *v2.ClosestMissView
 
 		if cachedResponse.MatchingPair != nil {

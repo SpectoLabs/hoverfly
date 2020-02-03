@@ -452,8 +452,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	// Body
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Body: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Body: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   `{"meta:{"field": "value"}}`,
@@ -463,8 +463,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Body: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Body: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Glob,
 					Value:   `{"meta:{"field": "*"}}`,
@@ -474,8 +474,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Body: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Body: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Json,
 					Value:   `{"meta:{"field": "value"}}`,
@@ -485,8 +485,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Body: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Body: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   `{"meta:{"field": "other-value"}}`,
@@ -498,8 +498,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	// Destination
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Destination: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Destination: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   `hoverfly.io`,
@@ -509,8 +509,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Destination: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Destination: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Glob,
 					Value:   "*.io",
@@ -520,8 +520,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Destination: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Destination: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "not-hoverfly.com",
@@ -533,8 +533,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	// Destination
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Method: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Method: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "GET",
@@ -544,8 +544,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Method: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Method: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Glob,
 					Value:   "*",
@@ -555,8 +555,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Method: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Method: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "POST",
@@ -568,8 +568,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	// Path
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Path: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Path: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "/path/one",
@@ -579,8 +579,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Path: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Path: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Glob,
 					Value:   "/path/*",
@@ -590,8 +590,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Path: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Path: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "/path/two",
@@ -603,15 +603,15 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	// Query
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Query: &v2.QueryMatcherViewV5{
-				"one": []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Query: &v2.QueryMatcherViewV6{
+				"one": []v2.MatcherViewV6{
 					{
 						Matcher: matchers.Exact,
 						Value:   "1",
 					},
 				},
-				"two": []v2.MatcherViewV5{
+				"two": []v2.MatcherViewV6{
 					{
 						Matcher: matchers.Exact,
 						Value:   "2",
@@ -622,9 +622,9 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Query: &v2.QueryMatcherViewV5{
-				"one": []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Query: &v2.QueryMatcherViewV6{
+				"one": []v2.MatcherViewV6{
 					{
 						Matcher: matchers.Glob,
 						Value:   "*",
@@ -635,9 +635,9 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Query: &v2.QueryMatcherViewV5{
-				"three": []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Query: &v2.QueryMatcherViewV6{
+				"three": []v2.MatcherViewV6{
 					{
 						Matcher: matchers.Glob,
 						Value:   "*",
@@ -648,8 +648,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(0))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			DeprecatedQuery: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			DeprecatedQuery: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "one=1&two=2",
@@ -659,8 +659,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			DeprecatedQuery: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			DeprecatedQuery: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Glob,
 					Value:   "one=1*",
@@ -670,8 +670,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			DeprecatedQuery: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			DeprecatedQuery: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "does-not-match",
@@ -683,8 +683,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	// Scheme
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Scheme: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Scheme: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "http",
@@ -694,8 +694,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Scheme: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Scheme: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Glob,
 					Value:   "*",
@@ -705,8 +705,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Scheme: []v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Scheme: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "not-http",
@@ -718,8 +718,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	// Headers
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Headers: map[string][]v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Headers: map[string][]v2.MatcherViewV6{
 				"Accept": {
 					{
 						Matcher: matchers.Exact,
@@ -731,8 +731,8 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	})).To(HaveLen(1))
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			Headers: map[string][]v2.MatcherViewV5{
+		Request: &v2.RequestMatcherViewV6{
+			Headers: map[string][]v2.MatcherViewV6{
 				"Accept": {
 					{
 						Matcher: matchers.Exact,
@@ -758,6 +758,6 @@ func Test_Journal_GetFilteredEntries_WillReturnEmptyIfRequestMatcherIsEmpty(t *t
 	}, "test-mode", time.Now())
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{},
+		Request: &v2.RequestMatcherViewV6{},
 	})).To(HaveLen(0))
 }

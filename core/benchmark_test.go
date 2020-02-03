@@ -55,7 +55,7 @@ func BenchmarkProcessRequest(b *testing.B) {
 		Mode:      "simulate",
 	})
 
-	simulation := v2.SimulationViewV5{}
+	simulation := v2.SimulationViewV6{}
 	_ = json.Unmarshal([]byte(`{
 	"data": {
 		"pairs": [{
@@ -99,13 +99,13 @@ func BenchmarkProcessRequest(b *testing.B) {
 		}
 	},
 	"meta": {
-		"schemaVersion": "v5",
+		"schemaVersion": "v6",
 		"hoverflyVersion": "v0.17.0",
 		"timeExported": "2017-05-30T14:23:44+01:00"
 	}
 }`), &simulation)
 
-	templated := v2.SimulationViewV5{}
+	templated := v2.SimulationViewV6{}
 	_ = json.Unmarshal([]byte(`{
 	"data": {
 		"pairs": [{
@@ -150,19 +150,19 @@ func BenchmarkProcessRequest(b *testing.B) {
 		}
 	},
 	"meta": {
-		"schemaVersion": "v5",
+		"schemaVersion": "v6",
 		"hoverflyVersion": "v0.17.0",
 		"timeExported": "2017-05-30T14:23:44+01:00"
 	}
 }`), &templated)
 
 	bytes, _ := ioutil.ReadFile("../testdata/large_response_body.json")
-	largeResponse := v2.SimulationViewV5{}
+	largeResponse := v2.SimulationViewV6{}
 	_ = json.Unmarshal(bytes, &largeResponse)
 
 	benchmarks := []struct {
 		name       string
-		simulation v2.SimulationViewV5
+		simulation v2.SimulationViewV6
 	}{
 		{"Simple simulation", simulation},
 		{"Templated simulation", templated},
