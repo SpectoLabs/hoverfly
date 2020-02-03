@@ -199,13 +199,17 @@ type ResponseDetails struct {
 func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 	var body string
 
-	if len(data.GetBody()) > 0 {
-		body = data.GetBody()
-
-		if data.GetEncodedBody() == true {
-			decoded, _ := base64.StdEncoding.DecodeString(data.GetBody())
-			body = string(decoded)
+	if len(data.GetBodyFile()) > 0 {
+		if b, err := ioutil.ReadFile(data.GetBodyFile()); err == nil {
+			body = string(b[:])
 		}
+	} else {
+		body = data.GetBody()
+	}
+
+	if data.GetEncodedBody() == true {
+		decoded, _ := base64.StdEncoding.DecodeString(body)
+		body = string(decoded)
 	}
 
 	return ResponseDetails{
