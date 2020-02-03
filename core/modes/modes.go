@@ -2,7 +2,6 @@ package modes
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
@@ -92,22 +91,12 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 }
 
 // ReconstructResponse changes original response with details provided in Constructor Payload.Response
-func ReconstructResponse(request *http.Request, pair models.RequestResponsePair) (*http.Response, error) {
+func ReconstructResponse(request *http.Request, pair models.RequestResponsePair) *http.Response {
 	response := &http.Response{}
 	response.Request = request
 
-	body := pair.Response.Body
-
-	if len(pair.Response.BodyFile) > 0 {
-		b, err := ioutil.ReadFile(pair.Response.BodyFile)
-		if err != nil {
-			return nil, errors.New("Cannot read bodyFile " + err.Error())
-		}
-		body = string(b[:])
-	}
-
-	response.ContentLength = int64(len(body))
-	response.Body = ioutil.NopCloser(strings.NewReader(body))
+	response.ContentLength = int64(len(pair.Response.Body))
+	response.Body = ioutil.NopCloser(strings.NewReader(pair.Response.Body))
 	response.StatusCode = pair.Response.Status
 	response.Status = http.StatusText(pair.Response.Status)
 
@@ -133,7 +122,7 @@ func ReconstructResponse(request *http.Request, pair models.RequestResponsePair)
 		response.Header.Set("Content-Length", fmt.Sprintf("%v", response.ContentLength))
 	}
 
-	return response, nil
+	return response
 }
 
 func GetRequestLogFields(request *models.RequestDetails) *logrus.Fields {

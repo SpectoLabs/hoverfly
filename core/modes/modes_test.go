@@ -114,8 +114,7 @@ func Test_ReconstructResponse_ReturnsAResponseWithCorrectStatus(t *testing.T) {
 		},
 	}
 
-	response, err := modes.ReconstructResponse(req, pair)
-	Expect(err).To(BeNil())
+	response := modes.ReconstructResponse(req, pair)
 
 	Expect(response.StatusCode).To(Equal(404))
 	Expect(response.Status).To(Equal("Not Found"))
@@ -132,8 +131,7 @@ func Test_ReconstructResponse_ReturnsAResponseWithBody(t *testing.T) {
 		},
 	}
 
-	response, err := modes.ReconstructResponse(req, pair)
-	Expect(err).To(BeNil())
+	response := modes.ReconstructResponse(req, pair)
 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	Expect(err).To(BeNil())
@@ -152,8 +150,7 @@ func Test_ReconstructResponse_ReturnsAResponseWithCorrectContentLength(t *testin
 		},
 	}
 
-	response, err := modes.ReconstructResponse(req, pair)
-	Expect(err).To(BeNil())
+	response := modes.ReconstructResponse(req, pair)
 
 	Expect(response.ContentLength).To(Equal(int64(9)))
 }
@@ -169,8 +166,7 @@ func Test_ReconstructResponse_ReturnEmptyBodyWithCorrectContentLength(t *testing
 		},
 	}
 
-	response, err := modes.ReconstructResponse(req, pair)
-	Expect(err).To(BeNil())
+	response := modes.ReconstructResponse(req, pair)
 
 	Expect(response.ContentLength).To(Equal(int64(0)))
 	Expect(response.Header.Get("Content-Length")).To(Equal(""))
@@ -188,8 +184,7 @@ func Test_ReconstructResponse_SetContentLengthHeader(t *testing.T) {
 		},
 	}
 
-	response, err := modes.ReconstructResponse(req, pair)
-	Expect(err).To(BeNil())
+	response := modes.ReconstructResponse(req, pair)
 
 	Expect(response.Header.Get("Content-Length")).To(Equal("9"))
 }
@@ -208,9 +203,8 @@ func Test_ReconstructResponse_DoesNotSetContentLengthHeaderIfTransferEncodingHea
 		},
 	}
 
-	response, err := modes.ReconstructResponse(req, pair)
+	response := modes.ReconstructResponse(req, pair)
 
-	Expect(err).To(BeNil())
 	Expect(response.Header.Get("Content-Length")).To(Equal(""))
 }
 
@@ -228,8 +222,7 @@ func Test_ReconstructResponse_DoesNotChangeContentLengthHeaderIfPresent(t *testi
 		},
 	}
 
-	response, err := modes.ReconstructResponse(req, pair)
-	Expect(err).To(BeNil())
+	response := modes.ReconstructResponse(req, pair)
 
 	Expect(response.ContentLength).To(Equal(int64(9)))
 	Expect(response.Header.Get("Content-Length")).To(Equal("10"))
@@ -247,9 +240,8 @@ func Test_ReconstructResponse_AddsHeadersToResponse(t *testing.T) {
 
 	pair.Response.Headers = headers
 
-	response, err := modes.ReconstructResponse(req, pair)
+	response := modes.ReconstructResponse(req, pair)
 
-	Expect(err).To(BeNil())
 	Expect(response.Header.Get("Header")).To(Equal(headers["Header"][0]))
 }
 
@@ -266,9 +258,8 @@ func Test_ReconstructResponse_AddsHeadersWithCorrectCapitalization(t *testing.T)
 
 	pair.Response.Headers = headers
 
-	response, err := modes.ReconstructResponse(req, pair)
+	response := modes.ReconstructResponse(req, pair)
 
-	Expect(err).To(BeNil())
 	Expect(response.Header["HeaderOne"]).To(Equal([]string{"one"}))
 	Expect(response.Header["HEADERTWO"]).To(Equal([]string{"two"}))
 }
@@ -285,8 +276,7 @@ func Test_ReconstructResponse_AddsMultipleHeaderValuesToResponse(t *testing.T) {
 
 	pair.Response.Headers = headers
 
-	response, err := modes.ReconstructResponse(req, pair)
-	Expect(err).To(BeNil())
+	response := modes.ReconstructResponse(req, pair)
 
 	values, ok := response.Header["Header"]
 	Expect(ok).To(BeTrue())
@@ -309,8 +299,7 @@ func Test_ReconstructResponse_MakesACopyOfTheHeadersWithoutReusingTheSamePointer
 
 	pair.Response.Headers = headers
 
-	response, err := modes.ReconstructResponse(req, pair)
-	Expect(err).To(BeNil())
+	response := modes.ReconstructResponse(req, pair)
 
 	Expect(response.Header).ToNot(BeIdenticalTo(headers))
 }
@@ -330,9 +319,8 @@ func Test_ReconstructResponse_SetTrailerIfPresent(t *testing.T) {
 
 	pair.Response.Headers = headers
 
-	response, err := modes.ReconstructResponse(req, pair)
+	response := modes.ReconstructResponse(req, pair)
 
-	Expect(err).To(BeNil())
 	Expect(response.Header).To(HaveLen(1))
 	Expect(response.Header.Get("Header")).To(Equal("one"))
 	Expect(response.Trailer).To(HaveLen(2))
@@ -355,9 +343,8 @@ func Test_ReconstructResponse_SetTrailerShouldNotModifyTheOriginalSimulation(t *
 
 	pair.Response.Headers = headers
 
-	response, err := modes.ReconstructResponse(req, pair)
+	response := modes.ReconstructResponse(req, pair)
 
-	Expect(err).To(BeNil())
 	Expect(response.Header).To(HaveLen(1))
 
 	// the original simulation should stay the same
@@ -385,8 +372,7 @@ func Test_ReconstructResponse_CanReturnACompleteHttpResponseWithAllFieldsFilled(
 	headers["Other"] = []string{"header"}
 	pair.Response.Headers = headers
 
-	response, err := modes.ReconstructResponse(req, pair)
-	Expect(err).To(BeNil())
+	response := modes.ReconstructResponse(req, pair)
 
 	Expect(response.StatusCode).To(Equal(201))
 
