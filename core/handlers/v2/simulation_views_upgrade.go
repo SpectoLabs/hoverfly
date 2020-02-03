@@ -141,7 +141,7 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV6 {
 }
 
 func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV6 {
-	requestReponsePairs := []RequestMatcherResponsePairViewV6{}
+	requestResponsePairs := []RequestMatcherResponsePairViewV6{}
 
 	for _, requestResponsePairV2 := range originalSimulation.DataViewV2.RequestResponsePairs {
 		schemeMatchers := []MatcherViewV6{}
@@ -198,12 +198,12 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV6 {
 			},
 		}
 
-		requestReponsePairs = append(requestReponsePairs, requestResponsePair)
+		requestResponsePairs = append(requestResponsePairs, requestResponsePair)
 	}
 
 	return SimulationViewV6{
 		DataViewV6{
-			RequestResponsePairs: requestReponsePairs,
+			RequestResponsePairs: requestResponsePairs,
 			GlobalActions:        originalSimulation.GlobalActions,
 		},
 		newMetaView(originalSimulation.MetaView),
@@ -283,6 +283,85 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV6 {
 				Templated:        requestResponsePairV2.Response.Templated,
 				TransitionsState: requestResponsePairV2.Response.TransitionsState,
 				RemovesState:     requestResponsePairV2.Response.RemovesState,
+			},
+		}
+
+		requestResponsePairs = append(requestResponsePairs, requestResponsePair)
+	}
+
+	return SimulationViewV6{
+		DataViewV6{
+			RequestResponsePairs: requestResponsePairs,
+			GlobalActions:        originalSimulation.GlobalActions,
+		},
+		newMetaView(originalSimulation.MetaView),
+	}
+}
+
+func upgradeV5(originalSimulation SimulationViewV5) SimulationViewV6 {
+	requestResponsePairs := []RequestMatcherResponsePairViewV6{}
+	makeV6Matcher := func(v5Matchers []MatcherViewV5) []MatcherViewV6 {
+		matcherViews := []MatcherViewV6{}
+
+		for _, v5Matcher := range v5Matchers {
+			matcherViews = append(matcherViews, MatcherViewV6{
+				Matcher: v5Matcher.Matcher,
+				Value:   v5Matcher.Value,
+				Config:  v5Matcher.Config,
+			})
+		}
+
+		return matcherViews
+	}
+
+	for _, requestResponsePairV5 := range originalSimulation.DataViewV5.RequestResponsePairs {
+		schemeMatchers := []MatcherViewV6{}
+		methodMatchers := []MatcherViewV6{}
+		destinationMatchers := []MatcherViewV6{}
+		pathMatchers := []MatcherViewV6{}
+		bodyMatchers := []MatcherViewV6{}
+		deprecatedQueryMatchers := []MatcherViewV6{}
+		headersMatchers := map[string][]MatcherViewV6{}
+
+		for v5HeaderKey, v5HeaderMatchers := range requestResponsePairV5.RequestMatcher.Headers {
+			headersMatchers[v5HeaderKey] = makeV6Matcher(v5HeaderMatchers)
+		}
+
+		var queriesMatchers *QueryMatcherViewV6
+		if requestResponsePairV5.RequestMatcher.Query != nil {
+			queriesMatchers = &QueryMatcherViewV6{}
+			for key, value := range *requestResponsePairV5.RequestMatcher.Query {
+				(*queriesMatchers)[key] = makeV6Matcher(value)
+			}
+		}
+
+		schemeMatchers = makeV6Matcher(requestResponsePairV5.RequestMatcher.Scheme)
+		methodMatchers = makeV6Matcher(requestResponsePairV5.RequestMatcher.Method)
+		destinationMatchers = makeV6Matcher(requestResponsePairV5.RequestMatcher.Destination)
+		pathMatchers = makeV6Matcher(requestResponsePairV5.RequestMatcher.Path)
+		bodyMatchers = makeV6Matcher(requestResponsePairV5.RequestMatcher.Body)
+		deprecatedQueryMatchers = makeV6Matcher(requestResponsePairV5.RequestMatcher.DeprecatedQuery)
+
+		requestResponsePair := RequestMatcherResponsePairViewV6{
+			RequestMatcher: RequestMatcherViewV6{
+				Destination:     destinationMatchers,
+				Method:          methodMatchers,
+				Path:            pathMatchers,
+				Scheme:          schemeMatchers,
+				Body:            bodyMatchers,
+				Headers:         headersMatchers,
+				Query:           queriesMatchers,
+				RequiresState:   requestResponsePairV5.RequestMatcher.RequiresState,
+				DeprecatedQuery: deprecatedQueryMatchers,
+			},
+			Response: ResponseDetailsViewV6{
+				Body:             requestResponsePairV5.Response.Body,
+				EncodedBody:      requestResponsePairV5.Response.EncodedBody,
+				Headers:          requestResponsePairV5.Response.Headers,
+				Status:           requestResponsePairV5.Response.Status,
+				Templated:        requestResponsePairV5.Response.Templated,
+				TransitionsState: requestResponsePairV5.Response.TransitionsState,
+				RemovesState:     requestResponsePairV5.Response.RemovesState,
 			},
 		}
 
