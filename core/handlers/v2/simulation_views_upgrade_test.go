@@ -80,7 +80,7 @@ func Test_upgradeV1_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("query=query"))
 
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveKeyWithValue("Test", []MatcherViewV5{
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveKeyWithValue("Test", []MatcherViewV6{
 		{
 			Matcher: matchers.Glob,
 			Value:   "headers",
@@ -93,7 +93,7 @@ func Test_upgradeV1_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Test", []string{"headers"}))
 
-	Expect(upgradedSimulation.SchemaVersion).To(Equal("v5"))
+	Expect(upgradedSimulation.SchemaVersion).To(Equal("v6"))
 	Expect(upgradedSimulation.HoverflyVersion).To(Equal("test"))
 	Expect(upgradedSimulation.TimeExported).To(Equal("today"))
 }
@@ -311,7 +311,7 @@ func Test_upgradeV2_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Test", []string{"headers"}))
 
-	Expect(upgradedSimulation.SchemaVersion).To(Equal("v5"))
+	Expect(upgradedSimulation.SchemaVersion).To(Equal("v6"))
 	Expect(upgradedSimulation.HoverflyVersion).To(Equal("test"))
 	Expect(upgradedSimulation.TimeExported).To(Equal("today"))
 }
@@ -534,7 +534,7 @@ func Test_upgradeV4_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Test", []string{"headers"}))
 
-	Expect(upgradedSimulation.SchemaVersion).To(Equal("v5"))
+	Expect(upgradedSimulation.SchemaVersion).To(Equal("v6"))
 	Expect(upgradedSimulation.HoverflyVersion).To(Equal("test"))
 	Expect(upgradedSimulation.TimeExported).To(Equal("today"))
 }

@@ -116,7 +116,7 @@ Gets all simulation data. The simulation JSON contains all the information Hover
         }
       },
       "meta": {
-        "schemaVersion": "v5",
+        "schemaVersion": "v6",
         "hoverflyVersion": "v1.0.0",
         "timeExported": "2019-05-30T22:14:24+01:00"
       }
@@ -235,7 +235,7 @@ This puts the supplied simulation JSON into Hoverfly, overwriting any existing s
         }
       },
       "meta": {
-        "schemaVersion": "v5",
+        "schemaVersion": "v6",
         "hoverflyVersion": "v1.0.0",
         "timeExported": "2019-05-30T22:14:24+01:00"
       }
@@ -353,7 +353,7 @@ This appends the supplied simulation JSON to the existing simulation data in Hov
         }
       },
       "meta": {
-        "schemaVersion": "v5",
+        "schemaVersion": "v6",
         "hoverflyVersion": "v1.0.0",
         "timeExported": "2019-05-30T22:14:24+01:00"
       }

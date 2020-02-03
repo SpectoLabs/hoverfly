@@ -24,7 +24,7 @@ var EmptyQuery = `{
 		}
 	},
 	"meta": {
-		"schemaVersion": "v5",
+		"schemaVersion" : "v6",
 		"hoverflyVersion": "v0.17.3"
 	}
 }`
@@ -52,7 +52,7 @@ var NoQuery = `{
 		}
 	},
 	"meta": {
-		"schemaVersion": "v5",
+		"schemaVersion" : "v6",
 		"hoverflyVersion": "v0.17.3"
 	}
 }`

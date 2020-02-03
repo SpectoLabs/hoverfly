@@ -16,9 +16,9 @@ import (
 )
 
 type HoverflySimulation interface {
-	GetSimulation() (SimulationViewV5, error)
-	GetFilteredSimulation(string) (SimulationViewV5, error)
-	PutSimulation(SimulationViewV5) SimulationImportResult
+	GetSimulation() (SimulationViewV6, error)
+	GetFilteredSimulation(string) (SimulationViewV6, error)
+	PutSimulation(SimulationViewV6) SimulationImportResult
 	DeleteSimulation()
 }
 
@@ -60,7 +60,7 @@ func (this *SimulationHandler) Get(w http.ResponseWriter, req *http.Request, nex
 	urlPattern := req.URL.Query().Get("urlPattern")
 
 	var err error
-	var simulationView SimulationViewV5
+	var simulationView SimulationViewV6
 	if urlPattern == "" {
 		simulationView, err = this.Hoverfly.GetSimulation()
 	} else {
@@ -106,7 +106,7 @@ func (this *SimulationHandler) Options(w http.ResponseWriter, r *http.Request, n
 }
 
 func (this *SimulationHandler) GetSchema(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	bytes, _ := json.Marshal(SimulationViewV5Schema)
+	bytes, _ := json.Marshal(SimulationViewV6Schema)
 
 	handlers.WriteResponse(w, bytes)
 }

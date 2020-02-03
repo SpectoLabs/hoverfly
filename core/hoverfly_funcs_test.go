@@ -248,19 +248,19 @@ func Test_Hoverfly_GetResponse_WillCacheClosestMiss(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
-	unit.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	unit.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "closest",
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Body: "closest",
 					},
 				},
@@ -582,21 +582,21 @@ func Test_Hoverfly_GetResponse_TransitioningBetweenStatesWhenSimulating(t *testi
 			}
 		},
 		"meta": {
-			"schemaVersion": "v5",
+			"schemaVersion": "v6",
 			"hoverflyVersion": "v0.10.2",
 			"timeExported": "2017-02-23T12:43:48Z"
 		}
 	}`
 
-	v5 := &v2.SimulationViewV5{}
+	v6 := &v2.SimulationViewV6{}
 
-	json.Unmarshal([]byte(simulation), v5)
+	json.Unmarshal([]byte(simulation), v6)
 
 	hoverfly := NewHoverfly()
 	hoverfly.CacheMatcher = matching.CacheMatcher{
 		RequestCache: cache.NewDefaultLRUCache(),
 	}
-	hoverfly.PutSimulation(*v5)
+	hoverfly.PutSimulation(*v6)
 
 	hoverfly.SetModeWithArguments(v2.ModeView{Mode: "simulate"})
 

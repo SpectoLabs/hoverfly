@@ -12,25 +12,25 @@ func Test_ExportSimulation_GetsModeFromHoverfly(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/simulation",
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body:   `{"simulation": true}`,
 					},
@@ -52,25 +52,25 @@ func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/simulation",
 							},
 						},
-						Query: &v2.QueryMatcherViewV5{
-							"urlPattern": []v2.MatcherViewV5{
+						Query: &v2.QueryMatcherViewV6{
+							"urlPattern": []v2.MatcherViewV6{
 								{
 									Matcher: matchers.Exact,
 									Value:   "test-(.+).com",
@@ -78,7 +78,7 @@ func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body:   `{"simulation": true}`,
 					},
@@ -109,25 +109,25 @@ func Test_ExportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/simulation",
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 400,
 						Body:   "{\"error\":\"test error\"}",
 					},
@@ -148,31 +148,31 @@ func Test_ImportSimulation_SendsCorrectHTTPRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "PUT",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/simulation",
 							},
 						},
-						Body: []v2.MatcherViewV5{
+						Body: []v2.MatcherViewV6{
 							{
 								Matcher: "json",
 								Value:   `{"simulation": true}`,
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body:   `{"simulation": true}`,
 					},
@@ -201,25 +201,25 @@ func Test_ImportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "PUT",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/simulation",
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 400,
 						Body:   "{\"error\":\"test error\"}",
 					},
@@ -239,31 +239,31 @@ func Test_AddSimulation_SendsCorrectHTTPRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "POST",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/simulation",
 							},
 						},
-						Body: []v2.MatcherViewV5{
+						Body: []v2.MatcherViewV6{
 							{
 								Matcher: "json",
 								Value:   `{"simulation": true}`,
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body:   `{"simulation": true}`,
 					},
@@ -283,25 +283,25 @@ func Test_DeleteSimulations_SendsCorrectHTTPRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "DELETE",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/simulation",
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body:   `{"simulation": true}`,
 					},
@@ -330,25 +330,25 @@ func Test_DeleteSimulations_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "DELETE",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/simulation",
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 400,
 						Body:   "{\"error\":\"test error\"}",
 					},

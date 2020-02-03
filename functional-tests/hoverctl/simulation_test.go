@@ -76,7 +76,7 @@ var _ = Describe("When I add simulation with hoverctl", func() {
 					}
 				},
 				"meta": {
-					"schemaVersion": "v5"
+					"schemaVersion": "v6"
 				}
 			}`), 0644)
 			Expect(err).To(BeNil())
@@ -109,7 +109,7 @@ var _ = Describe("When I add simulation with hoverctl", func() {
 					}
 				},
 				"meta": {
-					"schemaVersion": "v5"
+					"schemaVersion": "v6"
 				}
 			}`), 0644)
 			Expect(err).To(BeNil())

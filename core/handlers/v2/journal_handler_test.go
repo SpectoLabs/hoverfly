@@ -234,12 +234,12 @@ func Test_JournalHandler_Post_CallsFilter(t *testing.T) {
 	unit := JournalHandler{Hoverfly: &stubHoverfly}
 
 	journalEntryFilterView := JournalEntryFilterView{
-		Request: &RequestMatcherViewV5{
-			Destination: []MatcherViewV5{
-				NewMatcherView(matchers.Exact, "hoverfly.io"),
+		Request: &RequestMatcherViewV6{
+			Destination: []MatcherViewV6{
+				NewMatcherViewV6(matchers.Exact, "hoverfly.io"),
 			},
-			Path: []MatcherViewV5{
-				NewMatcherView(matchers.Glob, "*"),
+			Path: []MatcherViewV6{
+				NewMatcherViewV6(matchers.Glob, "*"),
 			},
 		},
 	}
@@ -313,12 +313,12 @@ func Test_JournalHandler_Post_JournalError(t *testing.T) {
 	unit := JournalHandler{Hoverfly: &stubHoverfly}
 
 	requestMatcher := JournalEntryFilterView{
-		Request: &RequestMatcherViewV5{
-			Destination: []MatcherViewV5{
-				NewMatcherView(matchers.Exact, "hoverfly.io"),
+		Request: &RequestMatcherViewV6{
+			Destination: []MatcherViewV6{
+				NewMatcherViewV6(matchers.Exact, "hoverfly.io"),
 			},
-			Path: []MatcherViewV5{
-				NewMatcherView(matchers.Glob, "*"),
+			Path: []MatcherViewV6{
+				NewMatcherViewV6(matchers.Glob, "*"),
 			},
 		},
 	}

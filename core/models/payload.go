@@ -219,7 +219,7 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 	}
 }
 
-// This function will create a JSON appriopriate version of ResponseDetails for the v2 API
+// This function will create a JSON appropriate version of ResponseDetails for the v2 API
 // If the response headers indicate that the content is encoded, or it has a non-matching
 // supported mimetype, we base64 encode it.
 func (r *ResponseDetails) ConvertToResponseDetailsView() v2.ResponseDetailsView {
@@ -254,7 +254,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsView() v2.ResponseDetailsView 
 	}
 }
 
-func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsViewV5 {
+func (r *ResponseDetails) ConvertToResponseDetailsViewV6() v2.ResponseDetailsViewV6 {
 	needsEncoding := false
 
 	// Check headers for gzip
@@ -278,7 +278,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
 	}
 
-	return v2.ResponseDetailsViewV5{
+	return v2.ResponseDetailsViewV6{
 		Status:           r.Status,
 		Body:             body,
 		BodyFile:         r.BodyFile,

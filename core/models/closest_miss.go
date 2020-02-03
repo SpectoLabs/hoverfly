@@ -10,8 +10,8 @@ import (
 
 type ClosestMiss struct {
 	RequestDetails RequestDetails
-	Response       v2.ResponseDetailsViewV5
-	RequestMatcher v2.RequestMatcherViewV5
+	Response       v2.ResponseDetailsViewV6
+	RequestMatcher v2.RequestMatcherViewV6
 	MissedFields   []string
 	State          map[string]string
 }
