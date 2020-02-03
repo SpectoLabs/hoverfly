@@ -69,10 +69,5 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Spy)
 	}
 
-	reconstructedResponse, err := ReconstructResponse(request, pair)
-	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when reconstructing response", Spy)
-	}
-
-	return reconstructedResponse, nil
+	return ReconstructResponse(request, pair), nil
 }

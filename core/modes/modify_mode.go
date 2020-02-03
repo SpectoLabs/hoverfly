@@ -57,10 +57,5 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Modify)
 	}
 
-	reconstructedResponse, err := ReconstructResponse(modifiedRequest, pair)
-	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when reconstructing response", Modify)
-	}
-
-	return reconstructedResponse, nil
+	return ReconstructResponse(modifiedRequest, pair), nil
 }
