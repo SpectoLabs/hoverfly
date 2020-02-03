@@ -14,24 +14,24 @@ func Test_GetLogs_GetsLogsWithCorrect_Text_Plain_AcceptHeader(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/logs",
 							},
 						},
-						Headers: map[string][]v2.MatcherViewV5{
+						Headers: map[string][]v2.MatcherViewV6{
 							"Accept": {
 								{
 									Matcher: matchers.Exact,
@@ -40,7 +40,7 @@ func Test_GetLogs_GetsLogsWithCorrect_Text_Plain_AcceptHeader(t *testing.T) {
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body:   "logs line 1\nlogs line 2",
 					},
@@ -64,24 +64,24 @@ func Test_GetLogs_CanHandleEmptyTextPlainLogResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/logs",
 							},
 						},
-						Headers: map[string][]v2.MatcherViewV5{
+						Headers: map[string][]v2.MatcherViewV6{
 							"Accept": {
 								{
 									Matcher: matchers.Exact,
@@ -90,7 +90,7 @@ func Test_GetLogs_CanHandleEmptyTextPlainLogResponse(t *testing.T) {
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body:   ``,
 					},
@@ -111,24 +111,24 @@ func Test_GetLogs_CanHandleEmptyLineAtEndOfTextPlainLogResponse(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/logs",
 							},
 						},
-						Headers: map[string][]v2.MatcherViewV5{
+						Headers: map[string][]v2.MatcherViewV6{
 							"Accept": {
 								{
 									Matcher: matchers.Exact,
@@ -137,7 +137,7 @@ func Test_GetLogs_CanHandleEmptyLineAtEndOfTextPlainLogResponse(t *testing.T) {
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body:   "this is log message one\n",
 					},
@@ -160,24 +160,24 @@ func Test_GetLogs_GetsLogsWithCorrect_JSON_AcceptHeader(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/logs",
 							},
 						},
-						Headers: map[string][]v2.MatcherViewV5{
+						Headers: map[string][]v2.MatcherViewV6{
 							"Accept": {
 								{
 									Matcher: matchers.Exact,
@@ -186,7 +186,7 @@ func Test_GetLogs_GetsLogsWithCorrect_JSON_AcceptHeader(t *testing.T) {
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body:   `{"logs":[{"msg": "logs line 1"}]}`,
 					},
@@ -216,25 +216,25 @@ func Test_GetLogs_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/logs",
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 400,
 						Body:   "{\"error\":\"test error\"}",
 					},
@@ -255,25 +255,25 @@ func Test_GetLogs_FiltersByDateWhenFilterTimeProvided(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/logs",
 							},
 						},
-						Query: &v2.QueryMatcherViewV5{
-							"from": []v2.MatcherViewV5{
+						Query: &v2.QueryMatcherViewV6{
+							"from": []v2.MatcherViewV6{
 								{
 									Matcher: matchers.Exact,
 									Value:   "684552180",
@@ -281,7 +281,7 @@ func Test_GetLogs_FiltersByDateWhenFilterTimeProvided(t *testing.T) {
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body:   `{"logs":[{"msg": "filtered logs"}]}`,
 					},

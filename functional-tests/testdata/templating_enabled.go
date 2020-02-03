@@ -25,7 +25,7 @@ var TemplatingEnabled = `{
 		}
 	},
 	"meta": {
-		"schemaVersion": "v5",
+		"schemaVersion" : "v6",
 		"hoverflyVersion": "v0.17.0",
 		"timeExported": "2018-05-03T15:44:32+01:00"
 	}

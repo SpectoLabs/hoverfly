@@ -62,7 +62,7 @@
     }
   },
   "meta": {
-    "schemaVersion": "v5",
+    "schemaVersion" : "v6",
     "hoverflyVersion": "v1.0.0",
     "timeExported": "2019-06-14T12:00:42+01:00"
   }

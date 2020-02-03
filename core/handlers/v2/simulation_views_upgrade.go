@@ -7,28 +7,28 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 )
 
-func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
-	var pairs []RequestMatcherResponsePairViewV5
+func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV6 {
+	var pairs []RequestMatcherResponsePairViewV6
 	for _, pairV1 := range originalSimulation.RequestResponsePairViewV1 {
 
-		schemeMatchers := []MatcherViewV5{}
-		methodMatchers := []MatcherViewV5{}
-		destinationMatchers := []MatcherViewV5{}
-		pathMatchers := []MatcherViewV5{}
-		queryMatchers := []MatcherViewV5{}
-		bodyMatchers := []MatcherViewV5{}
+		schemeMatchers := []MatcherViewV6{}
+		methodMatchers := []MatcherViewV6{}
+		destinationMatchers := []MatcherViewV6{}
+		pathMatchers := []MatcherViewV6{}
+		queryMatchers := []MatcherViewV6{}
+		bodyMatchers := []MatcherViewV6{}
 
 		isNotRecording := pairV1.Request.RequestType != nil && *pairV1.Request.RequestType != "recording"
 
 		if pairV1.Request.Scheme != nil {
 
 			if isNotRecording {
-				schemeMatchers = append(schemeMatchers, MatcherViewV5{
+				schemeMatchers = append(schemeMatchers, MatcherViewV6{
 					Matcher: matchers.Glob,
 					Value:   *pairV1.Request.Scheme,
 				})
 			} else {
-				schemeMatchers = append(schemeMatchers, MatcherViewV5{
+				schemeMatchers = append(schemeMatchers, MatcherViewV6{
 					Matcher: matchers.Exact,
 					Value:   *pairV1.Request.Scheme,
 				})
@@ -37,12 +37,12 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 
 		if pairV1.Request.Method != nil {
 			if isNotRecording {
-				methodMatchers = append(methodMatchers, MatcherViewV5{
+				methodMatchers = append(methodMatchers, MatcherViewV6{
 					Matcher: matchers.Glob,
 					Value:   *pairV1.Request.Method,
 				})
 			} else {
-				methodMatchers = append(methodMatchers, MatcherViewV5{
+				methodMatchers = append(methodMatchers, MatcherViewV6{
 					Matcher: matchers.Exact,
 					Value:   *pairV1.Request.Method,
 				})
@@ -51,12 +51,12 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 
 		if pairV1.Request.Destination != nil {
 			if isNotRecording {
-				destinationMatchers = append(destinationMatchers, MatcherViewV5{
+				destinationMatchers = append(destinationMatchers, MatcherViewV6{
 					Matcher: matchers.Glob,
 					Value:   *pairV1.Request.Destination,
 				})
 			} else {
-				destinationMatchers = append(destinationMatchers, MatcherViewV5{
+				destinationMatchers = append(destinationMatchers, MatcherViewV6{
 					Matcher: matchers.Exact,
 					Value:   *pairV1.Request.Destination,
 				})
@@ -65,12 +65,12 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 
 		if pairV1.Request.Path != nil {
 			if isNotRecording {
-				pathMatchers = append(pathMatchers, MatcherViewV5{
+				pathMatchers = append(pathMatchers, MatcherViewV6{
 					Matcher: matchers.Glob,
 					Value:   *pairV1.Request.Path,
 				})
 			} else {
-				pathMatchers = append(pathMatchers, MatcherViewV5{
+				pathMatchers = append(pathMatchers, MatcherViewV6{
 					Matcher: matchers.Exact,
 					Value:   *pairV1.Request.Path,
 				})
@@ -80,12 +80,12 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 		if pairV1.Request.Query != nil {
 			query, _ := url.QueryUnescape(*pairV1.Request.Query)
 			if isNotRecording {
-				queryMatchers = append(queryMatchers, MatcherViewV5{
+				queryMatchers = append(queryMatchers, MatcherViewV6{
 					Matcher: matchers.Glob,
 					Value:   query,
 				})
 			} else {
-				queryMatchers = append(queryMatchers, MatcherViewV5{
+				queryMatchers = append(queryMatchers, MatcherViewV6{
 					Matcher: matchers.Exact,
 					Value:   query,
 				})
@@ -94,12 +94,12 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 
 		if pairV1.Request.Body != nil {
 			if isNotRecording {
-				bodyMatchers = append(bodyMatchers, MatcherViewV5{
+				bodyMatchers = append(bodyMatchers, MatcherViewV6{
 					Matcher: matchers.Glob,
 					Value:   *pairV1.Request.Body,
 				})
 			} else {
-				bodyMatchers = append(bodyMatchers, MatcherViewV5{
+				bodyMatchers = append(bodyMatchers, MatcherViewV6{
 					Matcher: matchers.Exact,
 					Value:   *pairV1.Request.Body,
 				})
@@ -108,8 +108,8 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 
 		headersWithMatchers := getMatchersFromRequestHeaders(pairV1.Request.Headers)
 
-		pair := RequestMatcherResponsePairViewV5{
-			RequestMatcher: RequestMatcherViewV5{
+		pair := RequestMatcherResponsePairViewV6{
+			RequestMatcher: RequestMatcherViewV6{
 				Scheme:          schemeMatchers,
 				Method:          methodMatchers,
 				Destination:     destinationMatchers,
@@ -119,7 +119,7 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 				RequiresState:   nil,
 				DeprecatedQuery: queryMatchers,
 			},
-			Response: ResponseDetailsViewV5{
+			Response: ResponseDetailsViewV6{
 				Body:             pairV1.Response.Body,
 				EncodedBody:      pairV1.Response.EncodedBody,
 				Headers:          pairV1.Response.Headers,
@@ -132,24 +132,24 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 		pairs = append(pairs, pair)
 	}
 
-	return SimulationViewV5{
-		DataViewV5{
+	return SimulationViewV6{
+		DataViewV6{
 			RequestResponsePairs: pairs,
 		},
 		newMetaView(originalSimulation.MetaView),
 	}
 }
 
-func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
-	requestReponsePairs := []RequestMatcherResponsePairViewV5{}
+func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV6 {
+	requestReponsePairs := []RequestMatcherResponsePairViewV6{}
 
 	for _, requestResponsePairV2 := range originalSimulation.DataViewV2.RequestResponsePairs {
-		schemeMatchers := []MatcherViewV5{}
-		methodMatchers := []MatcherViewV5{}
-		destinationMatchers := []MatcherViewV5{}
-		pathMatchers := []MatcherViewV5{}
-		queryMatchers := []MatcherViewV5{}
-		bodyMatchers := []MatcherViewV5{}
+		schemeMatchers := []MatcherViewV6{}
+		methodMatchers := []MatcherViewV6{}
+		destinationMatchers := []MatcherViewV6{}
+		pathMatchers := []MatcherViewV6{}
+		queryMatchers := []MatcherViewV6{}
+		bodyMatchers := []MatcherViewV6{}
 
 		schemeMatchers = v2GetMatchersFromRequestFieldMatchersView(requestResponsePairV2.RequestMatcher.Scheme)
 		methodMatchers = v2GetMatchersFromRequestFieldMatchersView(requestResponsePairV2.RequestMatcher.Method)
@@ -160,14 +160,14 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
 		if requestResponsePairV2.RequestMatcher.Query != nil {
 			if requestResponsePairV2.RequestMatcher.Query.ExactMatch != nil {
 				unescapedQuery, _ := url.QueryUnescape(*requestResponsePairV2.RequestMatcher.Query.ExactMatch)
-				queryMatchers = append(queryMatchers, MatcherViewV5{
+				queryMatchers = append(queryMatchers, MatcherViewV6{
 					Matcher: matchers.Exact,
 					Value:   unescapedQuery,
 				})
 			}
 			if requestResponsePairV2.RequestMatcher.Query.GlobMatch != nil {
 				unescapedQuery, _ := url.QueryUnescape(*requestResponsePairV2.RequestMatcher.Query.GlobMatch)
-				queryMatchers = append(queryMatchers, MatcherViewV5{
+				queryMatchers = append(queryMatchers, MatcherViewV6{
 					Matcher: matchers.Glob,
 					Value:   unescapedQuery,
 				})
@@ -176,8 +176,8 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
 
 		headersWithMatchers := getMatchersFromRequestHeaders(requestResponsePairV2.RequestMatcher.Headers)
 
-		requestResponsePair := RequestMatcherResponsePairViewV5{
-			RequestMatcher: RequestMatcherViewV5{
+		requestResponsePair := RequestMatcherResponsePairViewV6{
+			RequestMatcher: RequestMatcherViewV6{
 				Destination:     destinationMatchers,
 				Headers:         headersWithMatchers,
 				Method:          methodMatchers,
@@ -187,7 +187,7 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
 				RequiresState:   nil,
 				DeprecatedQuery: queryMatchers,
 			},
-			Response: ResponseDetailsViewV5{
+			Response: ResponseDetailsViewV6{
 				Body:             requestResponsePairV2.Response.Body,
 				EncodedBody:      requestResponsePairV2.Response.EncodedBody,
 				Headers:          requestResponsePairV2.Response.Headers,
@@ -201,8 +201,8 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
 		requestReponsePairs = append(requestReponsePairs, requestResponsePair)
 	}
 
-	return SimulationViewV5{
-		DataViewV5{
+	return SimulationViewV6{
+		DataViewV6{
 			RequestResponsePairs: requestReponsePairs,
 			GlobalActions:        originalSimulation.GlobalActions,
 		},
@@ -210,16 +210,16 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
 	}
 }
 
-func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
-	requestReponsePairs := []RequestMatcherResponsePairViewV5{}
+func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV6 {
+	requestResponsePairs := []RequestMatcherResponsePairViewV6{}
 
 	for _, requestResponsePairV2 := range originalSimulation.DataViewV4.RequestResponsePairs {
-		schemeMatchers := []MatcherViewV5{}
-		methodMatchers := []MatcherViewV5{}
-		destinationMatchers := []MatcherViewV5{}
-		pathMatchers := []MatcherViewV5{}
-		queryMatchers := []MatcherViewV5{}
-		bodyMatchers := []MatcherViewV5{}
+		schemeMatchers := []MatcherViewV6{}
+		methodMatchers := []MatcherViewV6{}
+		destinationMatchers := []MatcherViewV6{}
+		pathMatchers := []MatcherViewV6{}
+		queryMatchers := []MatcherViewV6{}
+		bodyMatchers := []MatcherViewV6{}
 
 		schemeMatchers = v2GetMatchersFromRequestFieldMatchersView(requestResponsePairV2.RequestMatcher.Scheme)
 		methodMatchers = v2GetMatchersFromRequestFieldMatchersView(requestResponsePairV2.RequestMatcher.Method)
@@ -230,14 +230,14 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 		if requestResponsePairV2.RequestMatcher.Query != nil {
 			if requestResponsePairV2.RequestMatcher.Query.ExactMatch != nil {
 				unescapedQuery, _ := url.QueryUnescape(*requestResponsePairV2.RequestMatcher.Query.ExactMatch)
-				queryMatchers = append(queryMatchers, MatcherViewV5{
+				queryMatchers = append(queryMatchers, MatcherViewV6{
 					Matcher: matchers.Exact,
 					Value:   unescapedQuery,
 				})
 			}
 			if requestResponsePairV2.RequestMatcher.Query.GlobMatch != nil {
 				unescapedQuery, _ := url.QueryUnescape(*requestResponsePairV2.RequestMatcher.Query.GlobMatch)
-				queryMatchers = append(queryMatchers, MatcherViewV5{
+				queryMatchers = append(queryMatchers, MatcherViewV6{
 					Matcher: matchers.Glob,
 					Value:   unescapedQuery,
 				})
@@ -255,16 +255,16 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 			}
 		}
 
-		var queriesWithMatchers *QueryMatcherViewV5
+		var queriesWithMatchers *QueryMatcherViewV6
 		if requestResponsePairV2.RequestMatcher.QueriesWithMatchers != nil {
-			queriesWithMatchers = &QueryMatcherViewV5{}
+			queriesWithMatchers = &QueryMatcherViewV6{}
 			for key, value := range *requestResponsePairV2.RequestMatcher.QueriesWithMatchers {
 				(*queriesWithMatchers)[key] = v2GetMatchersFromRequestFieldMatchersView(value)
 			}
 		}
 
-		requestResponsePair := RequestMatcherResponsePairViewV5{
-			RequestMatcher: RequestMatcherViewV5{
+		requestResponsePair := RequestMatcherResponsePairViewV6{
+			RequestMatcher: RequestMatcherViewV6{
 				Destination:     destinationMatchers,
 				Method:          methodMatchers,
 				Path:            pathMatchers,
@@ -275,7 +275,7 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 				RequiresState:   requestResponsePairV2.RequestMatcher.RequiresState,
 				DeprecatedQuery: queryMatchers,
 			},
-			Response: ResponseDetailsViewV5{
+			Response: ResponseDetailsViewV6{
 				Body:             requestResponsePairV2.Response.Body,
 				EncodedBody:      requestResponsePairV2.Response.EncodedBody,
 				Headers:          requestResponsePairV2.Response.Headers,
@@ -286,22 +286,22 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 			},
 		}
 
-		requestReponsePairs = append(requestReponsePairs, requestResponsePair)
+		requestResponsePairs = append(requestResponsePairs, requestResponsePair)
 	}
 
-	return SimulationViewV5{
-		DataViewV5{
-			RequestResponsePairs: requestReponsePairs,
+	return SimulationViewV6{
+		DataViewV6{
+			RequestResponsePairs: requestResponsePairs,
 			GlobalActions:        originalSimulation.GlobalActions,
 		},
 		newMetaView(originalSimulation.MetaView),
 	}
 }
 
-func getMatchersFromRequestHeaders(headers map[string][]string) map[string][]MatcherViewV5 {
-	requestHeaders := map[string][]MatcherViewV5{}
+func getMatchersFromRequestHeaders(headers map[string][]string) map[string][]MatcherViewV6 {
+	requestHeaders := map[string][]MatcherViewV6{}
 	for headerKey, headerValues := range headers {
-		requestHeaders[headerKey] = []MatcherViewV5{
+		requestHeaders[headerKey] = []MatcherViewV6{
 			{
 				Matcher: matchers.Glob,
 				Value:   strings.Join(headerValues, ";"),
@@ -311,47 +311,47 @@ func getMatchersFromRequestHeaders(headers map[string][]string) map[string][]Mat
 	return requestHeaders
 }
 
-func v2GetMatchersFromRequestFieldMatchersView(requestFieldMatchers *RequestFieldMatchersView) []MatcherViewV5 {
-	matcherViews := []MatcherViewV5{}
+func v2GetMatchersFromRequestFieldMatchersView(requestFieldMatchers *RequestFieldMatchersView) []MatcherViewV6 {
+	matcherViews := []MatcherViewV6{}
 	if requestFieldMatchers != nil {
 		if requestFieldMatchers.ExactMatch != nil {
-			matcherViews = append(matcherViews, MatcherViewV5{
+			matcherViews = append(matcherViews, MatcherViewV6{
 				Matcher: matchers.Exact,
 				Value:   *requestFieldMatchers.ExactMatch,
 			})
 		}
 		if requestFieldMatchers.GlobMatch != nil {
-			matcherViews = append(matcherViews, MatcherViewV5{
+			matcherViews = append(matcherViews, MatcherViewV6{
 				Matcher: matchers.Glob,
 				Value:   *requestFieldMatchers.GlobMatch,
 			})
 		}
 		if requestFieldMatchers.JsonMatch != nil {
-			matcherViews = append(matcherViews, MatcherViewV5{
+			matcherViews = append(matcherViews, MatcherViewV6{
 				Matcher: matchers.Json,
 				Value:   *requestFieldMatchers.JsonMatch,
 			})
 		}
 		if requestFieldMatchers.JsonPathMatch != nil {
-			matcherViews = append(matcherViews, MatcherViewV5{
+			matcherViews = append(matcherViews, MatcherViewV6{
 				Matcher: matchers.JsonPath,
 				Value:   *requestFieldMatchers.JsonPathMatch,
 			})
 		}
 		if requestFieldMatchers.RegexMatch != nil {
-			matcherViews = append(matcherViews, MatcherViewV5{
+			matcherViews = append(matcherViews, MatcherViewV6{
 				Matcher: matchers.Regex,
 				Value:   *requestFieldMatchers.RegexMatch,
 			})
 		}
 		if requestFieldMatchers.XmlMatch != nil {
-			matcherViews = append(matcherViews, MatcherViewV5{
+			matcherViews = append(matcherViews, MatcherViewV6{
 				Matcher: matchers.Xml,
 				Value:   *requestFieldMatchers.XmlMatch,
 			})
 		}
 		if requestFieldMatchers.XpathMatch != nil {
-			matcherViews = append(matcherViews, MatcherViewV5{
+			matcherViews = append(matcherViews, MatcherViewV6{
 				Matcher: matchers.Xpath,
 				Value:   *requestFieldMatchers.XpathMatch,
 			})
@@ -362,7 +362,7 @@ func v2GetMatchersFromRequestFieldMatchersView(requestFieldMatchers *RequestFiel
 
 func newMetaView(originalMeta MetaView) MetaView {
 	return MetaView{
-		SchemaVersion:   "v5",
+		SchemaVersion:   "v6",
 		HoverflyVersion: originalMeta.HoverflyVersion,
 		TimeExported:    originalMeta.TimeExported,
 	}

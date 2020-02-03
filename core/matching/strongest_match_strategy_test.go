@@ -1411,53 +1411,53 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 			"key1": "value2",
 			"key3": "value4",
 		},
-		Response: v2.ResponseDetailsViewV5{
+		Response: v2.ResponseDetailsViewV6{
 			Body: "hello world",
 			Headers: map[string][]string{
 				"hello": {"world"},
 			},
 			Status: 200,
 		},
-		RequestMatcher: v2.RequestMatcherViewV5{
-			Body: []v2.MatcherViewV5{
+		RequestMatcher: v2.RequestMatcherViewV6{
+			Body: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Glob,
 					Value:   "hit",
 				},
 			},
-			Path: []v2.MatcherViewV5{
+			Path: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "hit",
 				},
 			},
-			Method: []v2.MatcherViewV5{
+			Method: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "miss",
 				},
 			},
-			Destination: []v2.MatcherViewV5{
+			Destination: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "miss",
 				},
 			},
-			Query: &v2.QueryMatcherViewV5{
-				"query": []v2.MatcherViewV5{
+			Query: &v2.QueryMatcherViewV6{
+				"query": []v2.MatcherViewV6{
 					{
 						Matcher: matchers.Exact,
 						Value:   "hit",
 					},
 				},
 			},
-			Scheme: []v2.MatcherViewV5{
+			Scheme: []v2.MatcherViewV6{
 				{
 					Matcher: matchers.Exact,
 					Value:   "hit",
 				},
 			},
-			Headers: map[string][]v2.MatcherViewV5{
+			Headers: map[string][]v2.MatcherViewV6{
 				"miss": {
 					{
 						Matcher: matchers.Exact,

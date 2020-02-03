@@ -204,6 +204,6 @@ var TemplatingHelpers = `{
 		}
 	},
 	"meta": {
-		"schemaVersion": "v5"
+		"schemaVersion": "v6"
 	}
 }`

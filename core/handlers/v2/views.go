@@ -73,14 +73,14 @@ type CacheView struct {
 
 type CachedResponseView struct {
 	Key          string                            `json:"key"`
-	MatchingPair *RequestMatcherResponsePairViewV5 `json:"matchingPair,omitempty"`
+	MatchingPair *RequestMatcherResponsePairViewV6 `json:"matchingPair,omitempty"`
 	HeaderMatch  bool                              `json:"headerMatch"`
 	ClosestMiss  *ClosestMissView                  `json:"closestMiss"`
 }
 
 type ClosestMissView struct {
-	Response       ResponseDetailsViewV5 `json:"response"`
-	RequestMatcher RequestMatcherViewV5  `json:"requestMatcher"`
+	Response       ResponseDetailsViewV6 `json:"response"`
+	RequestMatcher RequestMatcherViewV6  `json:"requestMatcher"`
 	MissedFields   []string              `json:"missedFields"`
 }
 
@@ -100,7 +100,7 @@ type JournalEntryView struct {
 }
 
 type JournalEntryFilterView struct {
-	Request *RequestMatcherViewV5 `json:"request"`
+	Request *RequestMatcherViewV6 `json:"request"`
 }
 
 type StateView struct {

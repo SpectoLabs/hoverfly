@@ -245,8 +245,8 @@ func (hf Hoverfly) GetStats() metrics.Stats {
 	return hf.Counter.Flush()
 }
 
-func (hf Hoverfly) GetSimulation() (v2.SimulationViewV5, error) {
-	pairViews := make([]v2.RequestMatcherResponsePairViewV5, 0)
+func (hf Hoverfly) GetSimulation() (v2.SimulationViewV6, error) {
+	pairViews := make([]v2.RequestMatcherResponsePairViewV6, 0)
 
 	for _, v := range hf.Simulation.GetMatchingPairs() {
 		pairViews = append(pairViews, v.BuildView())
@@ -258,12 +258,12 @@ func (hf Hoverfly) GetSimulation() (v2.SimulationViewV5, error) {
 		hf.version), nil
 }
 
-func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV5, error) {
-	pairViews := make([]v2.RequestMatcherResponsePairViewV5, 0)
+func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV6, error) {
+	pairViews := make([]v2.RequestMatcherResponsePairViewV6, 0)
 	regexPattern, err := regexp.Compile(urlPattern)
 
 	if err != nil {
-		return v2.SimulationViewV5{}, err
+		return v2.SimulationViewV6{}, err
 	}
 
 	for _, v := range hf.Simulation.GetMatchingPairs() {
@@ -287,8 +287,8 @@ func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV5
 		hf.version), nil
 }
 
-func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV5) v2.SimulationImportResult {
-	result := this.importRequestResponsePairViews(simulationView.DataViewV5.RequestResponsePairs)
+func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV6) v2.SimulationImportResult {
+	result := this.importRequestResponsePairViews(simulationView.DataViewV6.RequestResponsePairs)
 
 	if err := this.SetResponseDelays(v1.ResponseDelayPayloadView{Data: simulationView.GlobalActions.Delays}); err != nil {
 		result.SetError(err)

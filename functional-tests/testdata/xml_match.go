@@ -26,7 +26,7 @@ var XmlMatch = `{
 		}
 	},
 	"meta": {
-		"schemaVersion": "v5",
+		"schemaVersion" : "v6",
 		"hoverflyVersion": "v0.17.0",
 		"timeExported": "2018-05-03T14:45:16+01:00"
 	}

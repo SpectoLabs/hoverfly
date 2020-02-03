@@ -122,7 +122,7 @@ var SequencedCustom = `{
 		}
 	},
 	"meta": {
-		"schemaVersion": "v5",
+		"schemaVersion" : "v6",
 		"hoverflyVersion": "v0.17.0",
 		"timeExported": "2018-05-24T14:20:55+01:00"
 	}

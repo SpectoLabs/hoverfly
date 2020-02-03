@@ -12,25 +12,25 @@ func Test_GetMode_GetsModeFromHoverfly(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/mode",
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body: `{
 							"mode": "test-mode",
@@ -71,25 +71,25 @@ func Test_GetMode_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "GET",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/mode",
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 400,
 						Body:   `{"error": "test error"}`,
 					},
@@ -110,31 +110,31 @@ func Test_SetMode_SendsCorrectHTTPRequest(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "PUT",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/mode",
 							},
 						},
-						Body: []v2.MatcherViewV5{
+						Body: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Json,
 								Value:   `{"mode":"capture","arguments":{}}`,
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
 						Body:   `{"mode": "capture"}`,
 					},
@@ -169,25 +169,25 @@ func Test_SetMode_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	RegisterTestingT(t)
 
 	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
-			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
+	hoverfly.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{
 				{
-					RequestMatcher: v2.RequestMatcherViewV5{
-						Method: []v2.MatcherViewV5{
+					RequestMatcher: v2.RequestMatcherViewV6{
+						Method: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "PUT",
 							},
 						},
-						Path: []v2.MatcherViewV5{
+						Path: []v2.MatcherViewV6{
 							{
 								Matcher: matchers.Exact,
 								Value:   "/api/v2/hoverfly/mode",
 							},
 						},
 					},
-					Response: v2.ResponseDetailsViewV5{
+					Response: v2.ResponseDetailsViewV6{
 						Status: 400,
 						Body:   `{"error": "test error"}`,
 					},
