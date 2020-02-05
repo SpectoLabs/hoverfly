@@ -40,13 +40,6 @@ type MatcherViewV5 struct {
 	Config  map[string]interface{} `json:"config,omitempty"`
 }
 
-func NewMatcherViewV5(matcher string, value interface{}) MatcherViewV5 {
-	return MatcherViewV5{
-		Matcher: matcher,
-		Value:   value,
-	}
-}
-
 //Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestMatcherResponsePairViewV5) GetResponse() interfaces.Response { return this.Response }
 
