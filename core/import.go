@@ -133,7 +133,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 }
 
 // importRequestResponsePairViews - a function to save given pairs into the database.
-func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcherResponsePairViewV6) v2.SimulationImportResult {
+func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcherResponsePairViewV6) (v2.SimulationImportResult, error) {
 	importResult := v2.SimulationImportResult{}
 	initialStates := map[string]string{}
 	if len(pairViews) > 0 {
@@ -141,7 +141,10 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 		failed := 0
 		for i, pairView := range pairViews {
 
-			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
+			pair, err := models.NewRequestMatcherResponsePairFromView(&pairView)
+			if err != nil {
+				return importResult, err
+			}
 
 			var isPairAdded bool
 			if hf.Cfg.NoImportCheck {
@@ -188,8 +191,9 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 			"successful": success,
 			"failed":     failed,
 		}).Info("payloads imported")
-		return importResult
+
+		return importResult, nil
 	}
 
-	return importResult
+	return importResult, nil
 }
