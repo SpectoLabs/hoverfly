@@ -33,11 +33,16 @@ func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestRe
 	return v2.RequestResponsePairViewV1{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
 }
 
-func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.RequestResponsePair) RequestResponsePair {
-	return RequestResponsePair{
-		Response: NewResponseDetailsFromResponse(pairView.GetResponse()),
-		Request:  NewRequestDetailsFromRequest(pairView.GetRequest()),
+func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.RequestResponsePair) (RequestResponsePair, error) {
+	response, err := NewResponseDetailsFromResponse(pairView.GetResponse())
+	if err != nil {
+		return RequestResponsePair{}, nil
 	}
+
+	return RequestResponsePair{
+		Response: response,
+		Request:  NewRequestDetailsFromRequest(pairView.GetRequest()),
+	}, nil
 }
 
 func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
@@ -205,13 +210,15 @@ type ResponseDetails struct {
 	LogNormalDelay   *ResponseDetailsLogNormal
 }
 
-func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
+func NewResponseDetailsFromResponse(data interfaces.Response) (ResponseDetails, error) {
 	var body string
 
 	if len(data.GetBodyFile()) > 0 {
-		if b, err := ioutil.ReadFile(data.GetBodyFile()); err == nil {
-			body = string(b[:])
+		fileContents, err := ioutil.ReadFile(data.GetBodyFile())
+		if err != nil {
+			return ResponseDetails{}, err
 		}
+		body = string(fileContents[:])
 	} else {
 		body = data.GetBody()
 	}

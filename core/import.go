@@ -142,7 +142,11 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 		failed := 0
 		for i, pairView := range pairViews {
 
-			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
+			pair, err := models.NewRequestMatcherResponsePairFromView(&pairView)
+			if err != nil {
+				importResult.SetError(err)
+				return importResult
+			}
 
 			if pairView.Response.LogNormalDelay != nil {
 				d := *pairView.Response.LogNormalDelay
@@ -198,6 +202,7 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 			"successful": success,
 			"failed":     failed,
 		}).Info("payloads imported")
+
 		return importResult
 	}
 
