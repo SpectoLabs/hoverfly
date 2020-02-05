@@ -234,7 +234,9 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 				},
 			}}}
 
-	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{originalPair})
+	result, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{originalPair})
+
+	Expect(err).To(BeNil())
 	Expect(result.WarningMessages).To(HaveLen(0))
 
 	Expect(hv.Simulation.GetMatchingPairs()[0]).To(Equal(models.RequestMatcherResponsePair{
@@ -360,7 +362,9 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 	}
 	originalPair3.Response.Templated = true
 
-	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{originalPair1, originalPair2, originalPair3})
+	result, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{originalPair1, originalPair2, originalPair3})
+
+	Expect(err).To(BeNil())
 	Expect(result.WarningMessages).To(HaveLen(0))
 
 	Expect(hv.Simulation.GetMatchingPairs()).To(HaveLen(3))
@@ -541,7 +545,9 @@ func TestImportImportRequestResponsePairs_CanImportARequestResponsePairView(t *t
 		RequestMatcher: request,
 	}
 
-	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{requestResponsePair})
+	result, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{requestResponsePair})
+
+	Expect(err).To(BeNil())
 	Expect(result.WarningMessages).To(HaveLen(0))
 
 	Expect(len(hv.Simulation.GetMatchingPairs())).To(Equal(1))
@@ -616,7 +622,9 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 		},
 	}
 
-	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
+	result, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
+
+	Expect(err).To(BeNil())
 	Expect(result.WarningMessages).To(HaveLen(0))
 
 	Expect(hv.Simulation.GetMatchingPairs()[0]).ToNot(Equal(models.RequestResponsePair{
@@ -661,7 +669,9 @@ func TestImportImportRequestResponsePairs_SetsState(t *testing.T) {
 		},
 	}
 
-	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
+	result, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
+
+	Expect(err).To(BeNil())
 	Expect(result.WarningMessages).To(HaveLen(0))
 
 	Eventually(func() string {
@@ -711,9 +721,12 @@ func TestImportImportRequestResponsePairsMultipleTimes_SetsAllStates(t *testing.
 		},
 	}
 
-	result1 := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{pair1})
+	result1, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{pair1})
+	Expect(err).To(BeNil())
 	Expect(result1.WarningMessages).To(HaveLen(0))
-	result2 := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{pair2})
+
+	result2, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{pair2})
+	Expect(err).To(BeNil())
 	Expect(result2.WarningMessages).To(HaveLen(0))
 
 	Eventually(func() string {
@@ -750,8 +763,9 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsIfDeprecatedQuerytSet(t
 		},
 	}
 
-	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
+	result, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
 
+	Expect(err).To(BeNil())
 	Expect(result.WarningMessages).To(HaveLen(1))
 	Expect(result.WarningMessages[0].Message).To(ContainSubstring("data.pairs[0].request.deprecatedQuery"))
 }
@@ -784,8 +798,9 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthAndTransfe
 		},
 	}
 
-	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
+	result, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
 
+	Expect(err).To(BeNil())
 	Expect(result.WarningMessages).To(HaveLen(1))
 	Expect(result.WarningMessages[0].Message).To(ContainSubstring("Response contains both Content-Length and Transfer-Encoding headers on data.pairs[0].response"))
 }
@@ -817,8 +832,9 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthMismatch(t
 		},
 	}
 
-	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
+	result, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
 
+	Expect(err).To(BeNil())
 	Expect(result.WarningMessages).To(HaveLen(1))
 	Expect(result.WarningMessages[0].Message).To(ContainSubstring("Response contains incorrect Content-Length header on data.pairs[0].response, please correct or remove header"))
 }
@@ -847,11 +863,13 @@ func TestImportRequestResponsePairs_ReturnsWarningsIfAPairIsNotAddedDueToConflic
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
 	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation()}
 
-	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{pair})
+	result, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{pair})
+	Expect(err).To(BeNil())
 	Expect(result.WarningMessages).To(HaveLen(0))
 
 	// Importing it the second time
-	result = hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{pair})
+	result, err = hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{pair})
+	Expect(err).To(BeNil())
 	Expect(result.WarningMessages).To(HaveLen(1))
 	Expect(result.WarningMessages[0].Message).To(ContainSubstring("data.pairs[0] is not added due to a conflict with the existing simulation"))
 }
@@ -882,8 +900,9 @@ func TestImportImportRequestResponsePairs_ReturnsNoWarnings(t *testing.T) {
 		},
 	}
 
-	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
+	result, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
 
+	Expect(err).To(BeNil())
 	Expect(result.WarningMessages).To(HaveLen(0))
 }
 
@@ -914,7 +933,8 @@ func TestImportImportRequestResponsePairs_ReturnsNoWarnings_Encoded(t *testing.T
 		},
 	}
 
-	result := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
+	result, err := hv.importRequestResponsePairViews([]v2.RequestMatcherResponsePairViewV6{encodedPair})
 
+	Expect(err).To(BeNil())
 	Expect(result.WarningMessages).To(HaveLen(0))
 }

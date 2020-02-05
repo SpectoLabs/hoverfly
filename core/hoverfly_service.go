@@ -284,7 +284,11 @@ func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV6
 }
 
 func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV6) v2.SimulationImportResult {
-	result := this.importRequestResponsePairViews(simulationView.DataViewV6.RequestResponsePairs)
+	result, err := this.importRequestResponsePairViews(simulationView.DataViewV6.RequestResponsePairs)
+	if err != nil {
+		result.SetError(err)
+		return result
+	}
 
 	if err := this.SetResponseDelays(v1.ResponseDelayPayloadView{Data: simulationView.GlobalActions.Delays}); err != nil {
 		result.SetError(err)
