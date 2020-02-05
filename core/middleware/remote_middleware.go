@@ -91,5 +91,5 @@ func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair
 			Stdout:        string(returnedPairViewBytes),
 		}
 	}
-	return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
+	return models.NewRequestResponsePairFromRequestResponsePairView(newPairView)
 }
