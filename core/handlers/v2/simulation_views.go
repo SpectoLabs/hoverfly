@@ -161,6 +161,7 @@ func BuildSimulationView(
 const deprecatedQueryMessage = "Usage of deprecated field `deprecatedQuery` on data.pairs[%v].request.deprecatedQuery, please update your simulation to use `query` field"
 const deprecatedQueryDocs = "https://hoverfly.readthedocs.io/en/latest/pages/troubleshooting/troubleshooting.html#why-does-my-simulation-have-a-deprecatedquery-field"
 const ContentLengthAndTransferEncodingMessage = "Response contains both Content-Length and Transfer-Encoding headers on data.pairs[%v].response, please remove one of these headers"
+const BodyAndBodyFileMessage = "Response contains both `body` and `bodyFile` in data.pairs[%v].response, please remove one of them otherwise `body` is used if non empty"
 const ContentLengthMismatchMessage = "Response contains incorrect Content-Length header on data.pairs[%v].response, please correct or remove header"
 const pairIgnoredMessage = "data.pairs[%v] is not added due to a conflict with the existing simulation"
 
@@ -192,6 +193,14 @@ func (s *SimulationImportResult) AddDeprecatedQueryWarning(requestNumber int) {
 
 func (s *SimulationImportResult) AddContentLengthAndTransferEncodingWarning(requestNumber int) {
 	warning := fmt.Sprintf("WARNING: %s", fmt.Sprintf(ContentLengthAndTransferEncodingMessage, requestNumber))
+	if s.WarningMessages == nil {
+		s.WarningMessages = []SimulationImportWarning{}
+	}
+	s.WarningMessages = append(s.WarningMessages, SimulationImportWarning{Message: warning})
+}
+
+func (s *SimulationImportResult) AddBodyAndBodyFileWarning(requestNumber int) {
+	warning := fmt.Sprintf("WARNING: %s", fmt.Sprintf(BodyAndBodyFileMessage, requestNumber))
 	if s.WarningMessages == nil {
 		s.WarningMessages = []SimulationImportWarning{}
 	}

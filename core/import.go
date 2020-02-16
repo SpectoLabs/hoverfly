@@ -182,6 +182,10 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 				importResult.AddContentLengthAndTransferEncodingWarning(i)
 			}
 
+			if len(pairView.Response.BodyFile) > 0 && len(pairView.Response.Body) > 0 {
+				importResult.AddBodyAndBodyFileWarning(i)
+			}
+
 			if len(pairView.Response.Headers["Content-Length"]) > 0 {
 				contentLength, err := strconv.Atoi(pairView.Response.Headers["Content-Length"][0])
 				if err == nil && contentLength != len(pair.Response.Body) {
