@@ -204,14 +204,14 @@ type ResponseDetails struct {
 func NewResponseDetailsFromResponse(data interfaces.Response) (ResponseDetails, error) {
 	var body string
 
-	if len(data.GetBodyFile()) > 0 {
+	if len(data.GetBody()) > 0 {
+		body = data.GetBody()
+	} else if len(data.GetBodyFile()) > 0 {
 		fileContents, err := ioutil.ReadFile(data.GetBodyFile())
 		if err != nil {
 			return ResponseDetails{}, err
 		}
 		body = string(fileContents[:])
-	} else {
-		body = data.GetBody()
 	}
 
 	if data.GetEncodedBody() == true {
