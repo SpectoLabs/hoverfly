@@ -13,8 +13,15 @@ var v1Meta = MetaView{
 	HoverflyVersion: "test",
 	TimeExported:    "today",
 }
+
 var v2Meta = MetaView{
 	SchemaVersion:   "v2",
+	HoverflyVersion: "test",
+	TimeExported:    "today",
+}
+
+var v5Meta = MetaView{
+	SchemaVersion:   "v5",
 	HoverflyVersion: "test",
 	TimeExported:    "today",
 }
@@ -87,6 +94,7 @@ func Test_upgradeV1_ReturnsAnUpgradedSimulation(t *testing.T) {
 		},
 	}))
 
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(""))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Templated).To(BeFalse())
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("body"))
@@ -195,6 +203,7 @@ func Test_upgradeV1_HandlesIncompleteRequest(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Value).To(Equal("POST"))
 
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(""))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("body"))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
@@ -305,6 +314,7 @@ func Test_upgradeV2_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("query=query"))
 
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(""))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Templated).To(BeFalse())
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("body"))
@@ -415,6 +425,7 @@ func Test_upgradeV2_Upgrade_KeepsEncodedResponsesEncoded(t *testing.T) {
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeTrue())
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(""))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("YmFzZTY0IGVuY29kZWQ="))
 }
 
@@ -528,6 +539,7 @@ func Test_upgradeV4_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal("exact"))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("query=query"))
 
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(""))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Templated).To(BeFalse())
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("body"))
@@ -569,6 +581,7 @@ func Test_upgradeV4_Upgrade_KeepsEncodedResponsesEncoded(t *testing.T) {
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeTrue())
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(""))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("YmFzZTY0IGVuY29kZWQ="))
 }
 
@@ -845,4 +858,70 @@ func Test_upgradeV4_HandlesNewQueries(t *testing.T) {
 	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)["test"][0].Value).To(Equal("testexact"))
 	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)["test"][1].Matcher).To(Equal("glob"))
 	Expect((*upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Query)["test"][1].Value).To(Equal("testglob"))
+}
+
+func Test_upgradeV5_ReturnsAnUpgradedSimulation(t *testing.T) {
+	RegisterTestingT(t)
+
+	v5Simulation := SimulationViewV5{
+		DataViewV5{
+			RequestResponsePairs: []RequestMatcherResponsePairViewV5{
+				{
+					RequestMatcher: RequestMatcherViewV5{
+						Path:            []MatcherViewV5{{Value: "*", Matcher: "json"}},
+						Method:          []MatcherViewV5{{Value: "*", Matcher: "xpath"}},
+						Destination:     []MatcherViewV5{{Value: "*", Matcher: "glob"}},
+						Scheme:          []MatcherViewV5{{Value: "http", Matcher: "regex"}},
+						Body:            []MatcherViewV5{{Value: "*", Matcher: "xml"}},
+						Headers:         map[string][]MatcherViewV5{"Test": {{Value: "headers", Matcher: "exact"}}},
+						Query:           &QueryMatcherViewV5{"query": []MatcherViewV5{{Value: "query", Matcher: "exact"}}},
+					},
+					Response: ResponseDetailsViewV5{
+						Status:      200,
+						Body:        "body",
+						EncodedBody: false,
+						Headers: map[string][]string{
+							"Test": {"headers"},
+						},
+					},
+				},
+			},
+		},
+		v5Meta,
+	}
+
+	upgradedSimulation := upgradeV5(v5Simulation)
+
+	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme[0].Matcher).To(Equal("regex"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Scheme[0].Value).To(Equal("http"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body[0].Matcher).To(Equal("xml"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body[0].Value).To(Equal("*"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Matcher).To(Equal("glob"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination[0].Value).To(Equal("*"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Matcher).To(Equal("xpath"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Value).To(Equal("*"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path).To(HaveLen(1))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal("json"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("*"))
+
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(""))
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Templated).To(BeFalse())
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Body).To(Equal("body"))
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
+	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Test", []string{"headers"}))
+
+	Expect(upgradedSimulation.SchemaVersion).To(Equal("v6"))
+	Expect(upgradedSimulation.HoverflyVersion).To(Equal("test"))
+	Expect(upgradedSimulation.TimeExported).To(Equal("today"))
 }
