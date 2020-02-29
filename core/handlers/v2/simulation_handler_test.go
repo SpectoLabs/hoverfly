@@ -68,6 +68,13 @@ func (this *HoverflySimulationStub) DeleteSimulation() {
 
 func (this *HoverflySimulationStub) PutSimulation(simulation SimulationViewV5) SimulationImportResult {
 	this.Simulation = simulation
+	this.Deleted = false
+	return SimulationImportResult{}
+}
+
+func (this *HoverflySimulationStub) ReplaceSimulation(simulation SimulationViewV6) SimulationImportResult {
+	this.Simulation = simulation
+	this.Deleted = true
 	return SimulationImportResult{}
 }
 
@@ -89,6 +96,10 @@ func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationView
 	}
 }
 
+func (this *HoverflySimulationErrorStub) ReplaceSimulation(simulation SimulationViewV6) SimulationImportResult {
+	return this.PutSimulation(simulation)
+}
+
 type HoverflySimulationWarningStub struct{}
 
 func (this HoverflySimulationWarningStub) GetSimulation() (SimulationViewV5, error) {
@@ -105,6 +116,10 @@ func (this *HoverflySimulationWarningStub) PutSimulation(simulation SimulationVi
 	return SimulationImportResult{
 		WarningMessages: []SimulationImportWarning{{"This is a warning", "url"}},
 	}
+}
+
+func (this *HoverflySimulationWarningStub) ReplaceSimulation(simulation SimulationViewV6) SimulationImportResult {
+	return this.PutSimulation(simulation)
 }
 
 func TestSimulationHandler_Get_ReturnsSimulation(t *testing.T) {

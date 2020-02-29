@@ -33,16 +33,11 @@ func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestRe
 	return v2.RequestResponsePairViewV1{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
 }
 
-func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.RequestResponsePair) (RequestResponsePair, error) {
-	response, err := NewResponseDetailsFromResponse(pairView.GetResponse())
-	if err != nil {
-		return RequestResponsePair{}, nil
-	}
-
+func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.RequestResponsePair) RequestResponsePair {
 	return RequestResponsePair{
-		Response: response,
+		Response: NewResponseDetailsFromResponse(pairView.GetResponse()),
 		Request:  NewRequestDetailsFromRequest(pairView.GetRequest()),
-	}, nil
+	}
 }
 
 func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
@@ -210,21 +205,11 @@ type ResponseDetails struct {
 	LogNormalDelay   *ResponseDetailsLogNormal
 }
 
-func NewResponseDetailsFromResponse(data interfaces.Response) (ResponseDetails, error) {
-	var body string
-
-	if len(data.GetBody()) > 0 {
-		body = data.GetBody()
-	} else if len(data.GetBodyFile()) > 0 {
-		fileContents, err := ioutil.ReadFile(data.GetBodyFile())
-		if err != nil {
-			return ResponseDetails{}, err
-		}
-		body = string(fileContents[:])
-	}
+func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
+	body := data.GetBody()
 
 	if data.GetEncodedBody() == true {
-		decoded, _ := base64.StdEncoding.DecodeString(body)
+		decoded, _ := base64.StdEncoding.DecodeString(data.GetBody())
 		body = string(decoded)
 	}
 
