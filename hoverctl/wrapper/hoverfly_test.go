@@ -104,7 +104,7 @@ func Test_Stop_SendsCorrectHTTPRequest(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}, false)
 
 	err := Stop(target)
 	Expect(err).To(BeNil())
@@ -151,7 +151,7 @@ func Test_Stop_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}, false)
 
 	err := Stop(target)
 	Expect(err).ToNot(BeNil())
@@ -191,7 +191,7 @@ func Test_CheckIfRunning_ReturnsNilWhen_HoverflyAccessible(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}, false)
 
 	err := CheckIfRunning(target)
 
@@ -262,7 +262,7 @@ func Test_GetHoverfly_GetsHoverfly(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}, false)
 
 	hoverfly, err := GetHoverfly(target)
 	Expect(err).To(BeNil())

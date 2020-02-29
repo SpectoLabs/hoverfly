@@ -269,7 +269,7 @@ func Test_Hoverfly_GetResponse_WillCacheClosestMiss(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v3",
 		},
-	})
+	}, false)
 
 	requestDetails := models.RequestDetails{
 		Destination: "somehost.com",
@@ -596,7 +596,7 @@ func Test_Hoverfly_GetResponse_TransitioningBetweenStatesWhenSimulating(t *testi
 	hoverfly.CacheMatcher = matching.CacheMatcher{
 		RequestCache: cache.NewDefaultLRUCache(),
 	}
-	hoverfly.PutSimulation(*v6)
+	hoverfly.PutSimulation(*v6, false)
 
 	hoverfly.SetModeWithArguments(v2.ModeView{Mode: "simulate"})
 
