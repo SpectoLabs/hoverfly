@@ -872,3 +872,7 @@ Gets all reports containing response differences from Hoverfly. The diffs are re
 DELETE /api/v2/diff
 """"""""""""""""""""
 Deletes all reports containing differences from Hoverfly.
+
+DELETE /api/v2/shutdown
+""""""""""""""""""""
+Shuts down the hoverfly instance.
