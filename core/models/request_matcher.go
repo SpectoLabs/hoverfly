@@ -65,7 +65,7 @@ type RequestMatcherResponsePair struct {
 	Response       ResponseDetails
 }
 
-func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV6) (*RequestMatcherResponsePair, error) {
+func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV6) *RequestMatcherResponsePair {
 	for i, matcher := range view.RequestMatcher.DeprecatedQuery {
 		if matcher.Matcher == matchers.Exact {
 			sortedQuery := util.SortQueryString(matcher.Value.(string))
@@ -73,10 +73,7 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 		}
 	}
 
-	response, err := NewResponseDetailsFromResponse(view.Response)
-	if err != nil {
-		return &RequestMatcherResponsePair{}, err
-	}
+	response := NewResponseDetailsFromResponse(view.Response)
 
 	return &RequestMatcherResponsePair{
 		RequestMatcher: RequestMatcher{
@@ -91,7 +88,7 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 			RequiresState:   view.RequestMatcher.RequiresState,
 		},
 		Response: response,
-	}, nil
+	}
 }
 
 func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePairViewV6 {

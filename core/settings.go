@@ -51,6 +51,8 @@ type Configuration struct {
 	ClientAuthenticationClientKey   string
 	ClientAuthenticationCACert      string
 
+	ResponsesBodyFilesPath string
+
 	ProxyControlWG sync.WaitGroup
 
 	mu sync.Mutex

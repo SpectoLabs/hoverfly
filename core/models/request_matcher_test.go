@@ -49,7 +49,7 @@ func Test_NewRequestFieldMatchers_BuildView(t *testing.T) {
 func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit, err := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
 		RequestMatcher: v2.RequestMatcherViewV6{
 			Path: []v2.MatcherViewV6{
 				{
@@ -79,7 +79,6 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 		},
 	})
 
-	Expect(err).To(BeNil())
 	Expect(unit.RequestMatcher.Path).To(HaveLen(1))
 	Expect(unit.RequestMatcher.Path[0].Matcher).To(Equal("exact"))
 	Expect(unit.RequestMatcher.Path[0].Value).To(Equal("/"))
@@ -95,7 +94,7 @@ func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
 func Test_NewRequestMatcherResponsePairFromView_LeavesHeadersWithMatchersNil(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit, err := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
 		RequestMatcher: v2.RequestMatcherViewV6{
 			Path: []v2.MatcherViewV6{
 				{
@@ -107,14 +106,13 @@ func Test_NewRequestMatcherResponsePairFromView_LeavesHeadersWithMatchersNil(t *
 		Response: v2.ResponseDetailsViewV6{},
 	})
 
-	Expect(err).To(BeNil())
 	Expect(unit.RequestMatcher.Headers).To(BeNil())
 }
 
 func Test_NewRequestMatcherResponsePairFromView_LeavesQueriesWithMatchersNil(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit, err := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
 		RequestMatcher: v2.RequestMatcherViewV6{
 			Path: []v2.MatcherViewV6{
 				{
@@ -126,14 +124,13 @@ func Test_NewRequestMatcherResponsePairFromView_LeavesQueriesWithMatchersNil(t *
 		Response: v2.ResponseDetailsViewV6{},
 	})
 
-	Expect(err).To(BeNil())
 	Expect(unit.RequestMatcher.Query).To(BeNil())
 }
 
 func Test_NewRequestMatcherResponsePairFromView_SortsDeprecatedQuery(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit, err := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
 		RequestMatcher: v2.RequestMatcherViewV6{
 			DeprecatedQuery: []v2.MatcherViewV6{
 				{
@@ -147,14 +144,13 @@ func Test_NewRequestMatcherResponsePairFromView_SortsDeprecatedQuery(t *testing.
 		},
 	})
 
-	Expect(err).To(BeNil())
 	Expect(unit.RequestMatcher.DeprecatedQuery[0].Value).To(Equal("a=a&b=b"))
 }
 
 func Test_NewRequestMatcherResponsePairFromView_StoresTemplated(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit, err := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
+	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV6{
 		RequestMatcher: v2.RequestMatcherViewV6{
 			Path: []v2.MatcherViewV6{
 				{
@@ -169,7 +165,6 @@ func Test_NewRequestMatcherResponsePairFromView_StoresTemplated(t *testing.T) {
 		},
 	})
 
-	Expect(err).To(BeNil())
 	Expect(unit.Response.Templated).To(BeTrue())
 }
 

@@ -287,7 +287,16 @@ func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV6
 		hf.version), nil
 }
 
-func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV6) v2.SimulationImportResult {
+func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV6, overrideExisting bool) v2.SimulationImportResult {
+	bodyFilesResult := this.readResponseBodyFiles(simulationView.RequestResponsePairs)
+	if bodyFilesResult.GetError() != nil {
+		return bodyFilesResult
+	}
+
+	if overrideExisting {
+		this.DeleteSimulation()
+	}
+
 	result := this.importRequestResponsePairViews(simulationView.DataViewV6.RequestResponsePairs)
 	if result.GetError() != nil {
 		return result
@@ -301,6 +310,10 @@ func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV6) v2.Simul
 	if err := this.SetResponseDelaysLogNormal(v1.ResponseDelayLogNormalPayloadView{Data: simulationView.GlobalActions.DelaysLogNormal}); err != nil {
 		result.SetError(err)
 		return result
+	}
+
+	for _, warning := range bodyFilesResult.WarningMessages {
+		result.WarningMessages = append(result.WarningMessages, warning)
 	}
 
 	return result
