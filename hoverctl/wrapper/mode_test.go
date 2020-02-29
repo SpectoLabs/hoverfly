@@ -47,7 +47,7 @@ func Test_GetMode_GetsModeFromHoverfly(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}, false)
 
 	mode, err := GetMode(target)
 	Expect(err).To(BeNil())
@@ -99,7 +99,7 @@ func Test_GetMode_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}, false)
 
 	_, err := GetMode(target)
 	Expect(err).ToNot(BeNil())
@@ -144,7 +144,7 @@ func Test_SetMode_SendsCorrectHTTPRequest(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}, false)
 
 	mode, err := SetModeWithArguments(target, &v2.ModeView{
 		Mode: "capture",
@@ -197,7 +197,7 @@ func Test_SetMode_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}, false)
 
 	_, err := SetModeWithArguments(target, &v2.ModeView{
 		Mode: "capture",

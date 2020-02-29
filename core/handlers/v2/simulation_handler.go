@@ -3,9 +3,8 @@ package v2
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-
 	"io/ioutil"
+	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -18,7 +17,7 @@ import (
 type HoverflySimulation interface {
 	GetSimulation() (SimulationViewV6, error)
 	GetFilteredSimulation(string) (SimulationViewV6, error)
-	PutSimulation(SimulationViewV6) SimulationImportResult
+	PutSimulation(SimulationViewV6, bool) SimulationImportResult
 	DeleteSimulation()
 }
 
@@ -124,11 +123,7 @@ func (this *SimulationHandler) addSimulation(w http.ResponseWriter, req *http.Re
 		return err
 	}
 
-	if overrideExisting {
-		this.Hoverfly.DeleteSimulation()
-	}
-
-	result := this.Hoverfly.PutSimulation(simulationView)
+	result := this.Hoverfly.PutSimulation(simulationView, overrideExisting)
 	if result.err != nil {
 
 		log.WithFields(log.Fields{
