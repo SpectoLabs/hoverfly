@@ -141,12 +141,7 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 		success := 0
 		failed := 0
 		for i, pairView := range pairViews {
-
-			pair, err := models.NewRequestMatcherResponsePairFromView(&pairView)
-			if err != nil {
-				importResult.SetError(err)
-				return importResult
-			}
+			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
 
 			if pairView.Response.LogNormalDelay != nil {
 				d := *pairView.Response.LogNormalDelay
@@ -180,10 +175,6 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 
 			if len(pairView.Response.Headers["Content-Length"]) > 0 && len(pairView.Response.Headers["Transfer-Encoding"]) > 0 {
 				importResult.AddContentLengthAndTransferEncodingWarning(i)
-			}
-
-			if len(pairView.Response.BodyFile) > 0 && len(pairView.Response.Body) > 0 {
-				importResult.AddBodyAndBodyFileWarning(i)
 			}
 
 			if len(pairView.Response.Headers["Content-Length"]) > 0 {

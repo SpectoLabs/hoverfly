@@ -293,9 +293,8 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithoutEncoding(t *
 		},
 	}
 
-	requestResponsePair, err := models.NewRequestResponsePairFromRequestResponsePairView(view)
+	requestResponsePair := models.NewRequestResponsePairFromRequestResponsePairView(view)
 
-	Expect(err).To(BeNil())
 	Expect(requestResponsePair).To(Equal(models.RequestResponsePair{
 		Request: models.RequestDetails{
 			Path:        "A",
@@ -335,9 +334,8 @@ func TestRequestResponsePairView_ConvertToRequestResponsePairWithEncoding(t *tes
 		},
 	}
 
-	pair, err := models.NewRequestResponsePairFromRequestResponsePairView(view)
+	pair := models.NewRequestResponsePairFromRequestResponsePairView(view)
 
-	Expect(err).To(BeNil())
 	Expect(pair.Response.Body).To(Equal("encoded"))
 }
 

@@ -99,7 +99,7 @@ func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair)
 				}).Debug("payload after modifications")
 			}
 			// payload unmarshalled into RequestResponsePair struct, returning it
-			return models.NewRequestResponsePairFromRequestResponsePairView(newPairView)
+			return models.NewRequestResponsePairFromRequestResponsePairView(newPairView), nil
 		}
 	} else {
 		log.WithFields(log.Fields{
