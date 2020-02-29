@@ -104,7 +104,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.PutSimulation(simulation).GetError()
+	return hf.PutSimulation(simulation, false).GetError()
 }
 
 // ImportFromURL - takes one string value and tries connect to a remote server, then parse response body into
@@ -129,7 +129,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.PutSimulation(simulation).GetError()
+	return hf.PutSimulation(simulation, false).GetError()
 }
 
 // importRequestResponsePairViews - a function to save given pairs into the database.
@@ -140,12 +140,7 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 		success := 0
 		failed := 0
 		for i, pairView := range pairViews {
-
-			pair, err := models.NewRequestMatcherResponsePairFromView(&pairView)
-			if err != nil {
-				importResult.SetError(err)
-				return importResult
-			}
+			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
 
 			var isPairAdded bool
 			if hf.Cfg.NoImportCheck {
@@ -170,10 +165,6 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 
 			if len(pairView.Response.Headers["Content-Length"]) > 0 && len(pairView.Response.Headers["Transfer-Encoding"]) > 0 {
 				importResult.AddContentLengthAndTransferEncodingWarning(i)
-			}
-
-			if len(pairView.Response.BodyFile) > 0 && len(pairView.Response.Body) > 0 {
-				importResult.AddBodyAndBodyFileWarning(i)
 			}
 
 			if len(pairView.Response.Headers["Content-Length"]) > 0 {

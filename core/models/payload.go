@@ -33,16 +33,13 @@ func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestRe
 	return v2.RequestResponsePairViewV1{Response: this.Response.ConvertToResponseDetailsView(), Request: this.Request.ConvertToRequestDetailsView()}
 }
 
-func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.RequestResponsePair) (RequestResponsePair, error) {
-	response, err := NewResponseDetailsFromResponse(pairView.GetResponse())
-	if err != nil {
-		return RequestResponsePair{}, nil
-	}
+func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.RequestResponsePair) RequestResponsePair {
+	response := NewResponseDetailsFromResponse(pairView.GetResponse())
 
 	return RequestResponsePair{
 		Response: response,
 		Request:  NewRequestDetailsFromRequest(pairView.GetRequest()),
-	}, nil
+	}
 }
 
 func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
@@ -201,21 +198,11 @@ type ResponseDetails struct {
 	RemovesState     []string
 }
 
-func NewResponseDetailsFromResponse(data interfaces.Response) (ResponseDetails, error) {
-	var body string
-
-	if len(data.GetBody()) > 0 {
-		body = data.GetBody()
-	} else if len(data.GetBodyFile()) > 0 {
-		fileContents, err := ioutil.ReadFile(data.GetBodyFile())
-		if err != nil {
-			return ResponseDetails{}, err
-		}
-		body = string(fileContents[:])
-	}
+func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
+	body := data.GetBody()
 
 	if data.GetEncodedBody() == true {
-		decoded, _ := base64.StdEncoding.DecodeString(body)
+		decoded, _ := base64.StdEncoding.DecodeString(data.GetBody())
 		body = string(decoded)
 	}
 
@@ -227,7 +214,7 @@ func NewResponseDetailsFromResponse(data interfaces.Response) (ResponseDetails, 
 		Templated:        data.GetTemplated(),
 		TransitionsState: data.GetTransitionsState(),
 		RemovesState:     data.GetRemovesState(),
-	}, nil
+	}
 }
 
 // This function will create a JSON appropriate version of ResponseDetails for the v2 API

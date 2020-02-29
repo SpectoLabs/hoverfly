@@ -40,7 +40,7 @@ func Test_SetPACFile_CanSetPACFile(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}, false)
 
 	err := SetPACFile(target)
 	Expect(err).To(BeNil())
@@ -78,7 +78,7 @@ func Test_SetPACFile_ServerError(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}, false)
 
 	err := SetPACFile(target)
 	Expect(err).To(Not(BeNil()))

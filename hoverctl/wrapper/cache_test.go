@@ -39,7 +39,7 @@ func Test_FlushCache_GetsMiddlewareFromHoverfly(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}, false)
 
 	err := FlushCache(target)
 	Expect(err).To(BeNil())
@@ -86,7 +86,7 @@ func Test_FlushCache_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}, false)
 
 	err := FlushCache(target)
 	Expect(err).ToNot(BeNil())

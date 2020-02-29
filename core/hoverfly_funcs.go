@@ -1,8 +1,11 @@
 package hoverfly
 
 import (
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/aymerick/raymond"
+	"io/ioutil"
 	"net/http"
+	"path/filepath"
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/errors"
@@ -112,6 +115,29 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	}
 
 	return &response, nil
+}
+
+func (hf *Hoverfly) readResponseBodyFiles(pairs []v2.RequestMatcherResponsePairViewV6) v2.SimulationImportResult {
+	result := v2.SimulationImportResult{}
+
+	for i, pair := range pairs {
+		if len(pair.Response.GetBody()) > 0 && len(pair.Response.GetBodyFile()) > 0 {
+			result.AddBodyAndBodyFileWarning(i)
+			continue
+		}
+
+		if len(pair.Response.GetBody()) == 0 && len(pair.Response.GetBodyFile()) > 0 {
+			fileContents, err := ioutil.ReadFile(filepath.Join(hf.Cfg.ResponsesBodyFilesPath, pair.Response.GetBodyFile()))
+			if err != nil {
+				result.SetError(err)
+				return result
+			}
+
+			pairs[i].Response.Body = string(fileContents[:])
+		}
+	}
+
+	return result
 }
 
 func (hf *Hoverfly) applyBodyTemplating(requestDetails *models.RequestDetails, response *models.ResponseDetails, cachedResponse *models.CachedResponse) (string, error) {
