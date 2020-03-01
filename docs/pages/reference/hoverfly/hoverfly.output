@@ -65,6 +65,8 @@ Usage of hoverfly:
         Set middleware by passing the name of the binary and the path of the middleware script separated by space. (i.e. '-middleware "python script.py"')
   -modify
         Start Hoverfly in modify mode - applies middleware (required) to both outgoing and incoming HTTP traffic
+  -no-colors
+        Disable colors for logging
   -no-import-check
         Skip duplicate request check when importing simulations
   -password string
