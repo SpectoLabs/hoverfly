@@ -55,6 +55,8 @@ Usage of hoverfly:
         Specify which network interface to bind to, eg. 0.0.0.0 will bind to all interfaces. By default hoverfly will only bind ports to loopback interface
   -log-level string
         Set log level (panic, fatal, error, warn, info or debug) (default "info")
+  -log-no-color
+        Disable colors for logging
   -logs string
         Specify format for logs, options are "plaintext" and "json" (default "plaintext")
   -logs-size int

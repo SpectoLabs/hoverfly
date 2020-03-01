@@ -103,6 +103,7 @@ var (
 
 	logsFormat = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\"")
 	logsSize   = flag.Int("logs-size", 1000, "Set the amount of logs to be stored in memory")
+	logNoColor = flag.Bool("log-no-color", false, "Disable colors for logging")
 
 	journalSize   = flag.Int("journal-size", 1000, "Set the size of request/response journal")
 	cacheSize     = flag.Int("cache-size", 1000, "Set the size of request/response cache")
@@ -189,6 +190,7 @@ func main() {
 			ForceColors:      true,
 			DisableTimestamp: false,
 			FullTimestamp:    true,
+			DisableColors:    *logNoColor,
 		})
 	}
 
