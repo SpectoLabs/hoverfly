@@ -38,15 +38,24 @@ When Hoverfly cannot match a response to an incoming request, it will return inf
     The matcher which came closest was:
 
     {
-        "path": {
-            "exactMatch": "/closest-miss"
-        },
-        "destination": {
-            "exactMatch": "destination.com"
-        },
-        "body": {
-            "exactMatch": "body"
-        }
+        "path": [
+            {
+                "matcher": "exact",
+                "value": "/closest-miss"
+            }
+        ],
+        "destination": [
+            {
+                "matcher": "exact",
+                "value": "destination.com"
+            }
+        ],
+        "body": [
+            {
+                "matcher": "exact",
+                "value": "body"
+            }
+        ]
     }
 
     But it did not match on the following fields:
