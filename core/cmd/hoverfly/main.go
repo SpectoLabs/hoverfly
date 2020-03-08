@@ -181,15 +181,9 @@ func init() {
 func main() {
 	hoverfly := hv.NewHoverfly()
 
-	dir, err := os.Getwd()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
 	flag.Var(&importFlags, "import", "Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
 	flag.Var(&destinationFlags, "dest", "Specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
-	flag.StringVar(&responseBodyFilesPath, "response-body-files-path", dir, "When a response contains a relative bodyFile, it will be resolved against this path")
+	flag.StringVar(&responseBodyFilesPath, "response-body-files-path", "", "When a response contains a relative bodyFile, it will be resolved against this path (default is CWD)")
 
 	flag.Parse()
 
