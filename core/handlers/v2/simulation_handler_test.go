@@ -66,9 +66,15 @@ func (this *HoverflySimulationStub) DeleteSimulation() {
 	this.Deleted = true
 }
 
-func (this *HoverflySimulationStub) PutSimulation(simulation SimulationViewV6, overrideExisting bool) SimulationImportResult {
+func (this *HoverflySimulationStub) PutSimulation(simulation SimulationViewV6) SimulationImportResult {
 	this.Simulation = simulation
-	this.Deleted = overrideExisting
+	this.Deleted = false
+	return SimulationImportResult{}
+}
+
+func (this *HoverflySimulationStub) ReplaceSimulation(simulation SimulationViewV6) SimulationImportResult {
+	this.Simulation = simulation
+	this.Deleted = true
 	return SimulationImportResult{}
 }
 
@@ -84,10 +90,14 @@ func (this HoverflySimulationErrorStub) GetFilteredSimulation(urlPattern string)
 
 func (this *HoverflySimulationErrorStub) DeleteSimulation() {}
 
-func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationViewV6, overrideExisting bool) SimulationImportResult {
+func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationViewV6) SimulationImportResult {
 	return SimulationImportResult{
 		err: fmt.Errorf("error"),
 	}
+}
+
+func (this *HoverflySimulationErrorStub) ReplaceSimulation(simulation SimulationViewV6) SimulationImportResult {
+	return this.PutSimulation(simulation)
 }
 
 type HoverflySimulationWarningStub struct{}
@@ -102,10 +112,14 @@ func (this HoverflySimulationWarningStub) GetFilteredSimulation(urlPattern strin
 
 func (this *HoverflySimulationWarningStub) DeleteSimulation() {}
 
-func (this *HoverflySimulationWarningStub) PutSimulation(simulation SimulationViewV6, overrideExisting bool) SimulationImportResult {
+func (this *HoverflySimulationWarningStub) PutSimulation(simulation SimulationViewV6) SimulationImportResult {
 	return SimulationImportResult{
 		WarningMessages: []SimulationImportWarning{{"This is a warning", "url"}},
 	}
+}
+
+func (this *HoverflySimulationWarningStub) ReplaceSimulation(simulation SimulationViewV6) SimulationImportResult {
+	return this.PutSimulation(simulation)
 }
 
 func TestSimulationHandler_Get_ReturnsSimulation(t *testing.T) {

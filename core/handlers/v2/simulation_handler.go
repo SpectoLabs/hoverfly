@@ -17,7 +17,8 @@ import (
 type HoverflySimulation interface {
 	GetSimulation() (SimulationViewV6, error)
 	GetFilteredSimulation(string) (SimulationViewV6, error)
-	PutSimulation(SimulationViewV6, bool) SimulationImportResult
+	PutSimulation(SimulationViewV6) SimulationImportResult
+	ReplaceSimulation(SimulationViewV6) SimulationImportResult
 	DeleteSimulation()
 }
 
@@ -123,7 +124,14 @@ func (this *SimulationHandler) addSimulation(w http.ResponseWriter, req *http.Re
 		return err
 	}
 
-	result := this.Hoverfly.PutSimulation(simulationView, overrideExisting)
+	var result SimulationImportResult
+
+	if overrideExisting {
+		result = this.Hoverfly.ReplaceSimulation(simulationView)
+	} else {
+		result = this.Hoverfly.PutSimulation(simulationView)
+	}
+
 	if result.err != nil {
 
 		log.WithFields(log.Fields{
