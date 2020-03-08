@@ -40,7 +40,7 @@ func Test_GetDestination_GetsDestinationFromHoverfly(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	destination, err := GetDestination(target)
 	Expect(err).To(BeNil())
@@ -89,7 +89,7 @@ func Test_GetDestination_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	_, err := GetDestination(target)
 	Expect(err).ToNot(BeNil())
@@ -128,7 +128,7 @@ func Test_SetDestination_SetsDestinationAndPrintsDestination(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	destination, err := SetDestination(target, "new.com")
 	Expect(err).To(BeNil())
@@ -177,7 +177,7 @@ func Test_SetDestination_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	_, err := SetDestination(target, "new.com")
 	Expect(err).ToNot(BeNil())

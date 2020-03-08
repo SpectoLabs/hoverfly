@@ -287,7 +287,7 @@ func (hf Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV6
 		hf.version), nil
 }
 
-func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV6, overrideExisting bool) v2.SimulationImportResult {
+func (this *Hoverfly) putOrReplaceSimulation(simulationView v2.SimulationViewV6, overrideExisting bool) v2.SimulationImportResult {
 	bodyFilesResult := this.readResponseBodyFiles(simulationView.RequestResponsePairs)
 	if bodyFilesResult.GetError() != nil {
 		return bodyFilesResult
@@ -317,6 +317,14 @@ func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV6, override
 	}
 
 	return result
+}
+
+func (this *Hoverfly) ReplaceSimulation(simulationView v2.SimulationViewV6) v2.SimulationImportResult {
+	return this.putOrReplaceSimulation(simulationView, true)
+}
+
+func (this *Hoverfly) PutSimulation(simulationView v2.SimulationViewV6) v2.SimulationImportResult {
+	return this.putOrReplaceSimulation(simulationView, false)
 }
 
 func (this *Hoverfly) DeleteSimulation() {

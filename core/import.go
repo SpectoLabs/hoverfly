@@ -104,7 +104,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.PutSimulation(simulation, false).GetError()
+	return hf.PutSimulation(simulation).GetError()
 }
 
 // ImportFromURL - takes one string value and tries connect to a remote server, then parse response body into
@@ -129,7 +129,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
 
-	return hf.PutSimulation(simulation, false).GetError()
+	return hf.PutSimulation(simulation).GetError()
 }
 
 // importRequestResponsePairViews - a function to save given pairs into the database.

@@ -34,10 +34,8 @@ func (this *RequestResponsePair) ConvertToRequestResponsePairView() v2.RequestRe
 }
 
 func NewRequestResponsePairFromRequestResponsePairView(pairView interfaces.RequestResponsePair) RequestResponsePair {
-	response := NewResponseDetailsFromResponse(pairView.GetResponse())
-
 	return RequestResponsePair{
-		Response: response,
+		Response: NewResponseDetailsFromResponse(pairView.GetResponse()),
 		Request:  NewRequestDetailsFromRequest(pairView.GetRequest()),
 	}
 }
