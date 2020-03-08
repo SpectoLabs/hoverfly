@@ -40,7 +40,7 @@ func Test_ExportSimulation_GetsModeFromHoverfly(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	simulation, err := ExportSimulation(target, "")
 	Expect(err).To(BeNil())
@@ -88,7 +88,7 @@ func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	simulation, err := ExportSimulation(target, "test-(.+).com")
 	Expect(err).To(BeNil())
@@ -137,7 +137,7 @@ func Test_ExportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	_, err := ExportSimulation(target, "")
 	Expect(err).ToNot(BeNil())
@@ -182,7 +182,7 @@ func Test_ImportSimulation_SendsCorrectHTTPRequest(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	err := ImportSimulation(target, `{"simulation": true}`)
 	Expect(err).To(BeNil())
@@ -229,7 +229,7 @@ func Test_ImportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	err := ImportSimulation(target, "")
 	Expect(err).ToNot(BeNil())
@@ -273,7 +273,7 @@ func Test_AddSimulation_SendsCorrectHTTPRequest(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	err := AddSimulation(target, `{"simulation": true}`)
 	Expect(err).To(BeNil())
@@ -311,7 +311,7 @@ func Test_DeleteSimulations_SendsCorrectHTTPRequest(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	err := DeleteSimulations(target)
 	Expect(err).To(BeNil())
@@ -358,7 +358,7 @@ func Test_DeleteSimulations_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	err := DeleteSimulations(target)
 	Expect(err).ToNot(BeNil())

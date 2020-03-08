@@ -530,7 +530,7 @@ func Test_Hoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 		v2.MetaView{},
 	}
 
-	unit.PutSimulation(simulationToImport, false)
+	unit.PutSimulation(simulationToImport)
 
 	importedSimulation, err := unit.GetSimulation()
 	Expect(err).To(BeNil())
@@ -563,7 +563,7 @@ func Test_Hoverfly_PutSimulation_ImportsSimulationViews(t *testing.T) {
 		v2.MetaView{},
 	}
 
-	unit.PutSimulation(simulationToImport, false)
+	unit.PutSimulation(simulationToImport)
 
 	importedSimulation, err := unit.GetSimulation()
 	Expect(err).To(BeNil())
@@ -595,7 +595,7 @@ func Test_Hoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 		v2.MetaView{},
 	}
 
-	err := unit.PutSimulation(simulationToImport, false)
+	err := unit.PutSimulation(simulationToImport)
 	Expect(err.GetError()).To(BeNil())
 
 	delays := unit.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()
@@ -626,7 +626,7 @@ func Test_Hoverfly_PutSimulation_ImportsDelaysWithValidationError(t *testing.T) 
 		v2.MetaView{},
 	}
 
-	err := unit.PutSimulation(simulationToImport, false)
+	err := unit.PutSimulation(simulationToImport)
 	Expect(err.GetError()).NotTo(BeNil())
 
 	delays := unit.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView()
@@ -648,7 +648,7 @@ func Test_Hoverfly_PutSimulation_ImportsDelaysLogNormal(t *testing.T) {
 		v2.MetaView{},
 	}
 
-	err := unit.PutSimulation(simulationToImport, false)
+	err := unit.PutSimulation(simulationToImport)
 	Expect(err.GetError()).To(BeNil())
 
 	delays := unit.Simulation.ResponseDelaysLogNormal.ConvertToResponseDelayLogNormalPayloadView()

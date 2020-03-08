@@ -176,7 +176,7 @@ func BenchmarkProcessRequest(b *testing.B) {
 
 	for _, bm := range benchmarks {
 		hoverfly.DeleteSimulation()
-		hoverfly.PutSimulation(bm.simulation, false)
+		hoverfly.PutSimulation(bm.simulation)
 
 		b.Run(bm.name, func(b *testing.B) {
 
