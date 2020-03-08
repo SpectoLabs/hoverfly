@@ -40,7 +40,7 @@ func Test_GetMiddleware_GetsMiddlewareFromHoverfly(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	response, err := GetMiddleware(target)
 	Expect(err).To(BeNil())
@@ -91,7 +91,7 @@ func Test_GetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	_, err := GetMiddleware(target)
 	Expect(err).ToNot(BeNil())
@@ -139,7 +139,7 @@ func Test_SetMiddleware_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	_, err := SetMiddleware(target, "", "", "")
 	Expect(err).ToNot(BeNil())

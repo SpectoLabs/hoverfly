@@ -50,7 +50,7 @@ func Test_GetLogs_GetsLogsWithCorrect_Text_Plain_AcceptHeader(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	logs, err := GetLogs(target, "plain", nil)
 	Expect(err).To(BeNil())
@@ -100,7 +100,7 @@ func Test_GetLogs_CanHandleEmptyTextPlainLogResponse(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	logs, err := GetLogs(target, "plain", nil)
 	Expect(err).To(BeNil())
@@ -147,7 +147,7 @@ func Test_GetLogs_CanHandleEmptyLineAtEndOfTextPlainLogResponse(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	logs, err := GetLogs(target, "plain", nil)
 
@@ -196,7 +196,7 @@ func Test_GetLogs_GetsLogsWithCorrect_JSON_AcceptHeader(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	logs, err := GetLogs(target, "json", nil)
 	Expect(err).To(BeNil())
@@ -244,7 +244,7 @@ func Test_GetLogs_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 
 	_, err := GetLogs(target, "plain", nil)
 	Expect(err).ToNot(BeNil())
@@ -291,7 +291,7 @@ func Test_GetLogs_FiltersByDateWhenFilterTimeProvided(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}, false)
+	})
 	fromTime := time.Unix(int64(684552180), 0)
 
 	logs, err := GetLogs(target, "json", &fromTime)
