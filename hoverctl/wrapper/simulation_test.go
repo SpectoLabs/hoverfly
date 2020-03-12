@@ -1,6 +1,7 @@
 package wrapper
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -32,7 +33,7 @@ func Test_ExportSimulation_GetsModeFromHoverfly(t *testing.T) {
 					},
 					Response: v2.ResponseDetailsViewV5{
 						Status: 200,
-						Body:   `{"simulation": true}`,
+						Body: responseBody,
 					},
 				},
 			},
@@ -40,12 +41,21 @@ func Test_ExportSimulation_GetsModeFromHoverfly(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}
 
-	simulation, err := ExportSimulation(target, "")
+	simulationListBytes, err := json.Marshal(simulationList)
 	Expect(err).To(BeNil())
 
-	Expect(string(simulation)).To(Equal("{\n\t\"simulation\": true\n}"))
+	simulationList.RequestResponsePairs[0].Response.Body = string(simulationListBytes[:])
+	hoverfly.ReplaceSimulation(simulationList)
+	simulationList.RequestResponsePairs[0].Response.Body = responseBody
+
+	simulationBytes, err := ExportSimulation(target, "")
+	Expect(err).To(BeNil())
+
+	var view v2.SimulationViewV6
+	Expect(json.Unmarshal(simulationBytes, &view)).To(BeNil())
+	Expect(view).To(Equal(simulationList))
 }
 
 func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
@@ -80,7 +90,7 @@ func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 					},
 					Response: v2.ResponseDetailsViewV5{
 						Status: 200,
-						Body:   `{"simulation": true}`,
+						Body: responseBody,
 					},
 				},
 			},
@@ -88,12 +98,21 @@ func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}
 
-	simulation, err := ExportSimulation(target, "test-(.+).com")
+	simulationListBytes, err := json.Marshal(simulationList)
 	Expect(err).To(BeNil())
 
-	Expect(string(simulation)).To(Equal("{\n\t\"simulation\": true\n}"))
+	simulationList.RequestResponsePairs[0].Response.Body = string(simulationListBytes[:])
+	hoverfly.ReplaceSimulation(simulationList)
+	simulationList.RequestResponsePairs[0].Response.Body = responseBody
+
+	simulationBytes, err := ExportSimulation(target, "test-(.+).com")
+	Expect(err).To(BeNil())
+
+	var view v2.SimulationViewV6
+	Expect(json.Unmarshal(simulationBytes, &view)).To(BeNil())
+	Expect(view).To(Equal(simulationList))
 }
 
 func Test_ExportSimulation_ErrorsWhen_HoverflyNotAccessible(t *testing.T) {
@@ -129,7 +148,7 @@ func Test_ExportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 					},
 					Response: v2.ResponseDetailsViewV5{
 						Status: 400,
-						Body:   "{\"error\":\"test error\"}",
+						Body: `{"error":"test error"}`,
 					},
 				},
 			},
@@ -137,7 +156,9 @@ func Test_ExportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	})
+	}
+
+	hoverfly.ReplaceSimulation(simulationList)
 
 	_, err := ExportSimulation(target, "")
 	Expect(err).ToNot(BeNil())
@@ -235,6 +256,7 @@ func Test_ImportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("Could not import simulation\n\ntest error"))
 }
+
 func Test_AddSimulation_SendsCorrectHTTPRequest(t *testing.T) {
 	RegisterTestingT(t)
 
