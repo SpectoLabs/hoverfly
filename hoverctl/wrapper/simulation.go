@@ -1,9 +1,7 @@
 package wrapper
 
 import (
-	"bytes"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 
 	"fmt"
@@ -32,20 +30,27 @@ func ExportSimulation(target configuration.Target, urlPattern string) ([]byte, e
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
+	var view v2.SimulationViewV6
+	if err := json.NewDecoder(response.Body).Decode(&view); err != nil {
 		log.Debug(err.Error())
-		return nil, errors.New("Could not export from Hoverfly")
+		return nil, err
 	}
 
-	var jsonBytes bytes.Buffer
-	err = json.Indent(&jsonBytes, body, "", "\t")
-	if err != nil {
-		log.Debug(err.Error())
-		return nil, errors.New("Could not export from Hoverfly")
+	for i, pair := range view.DataViewV6.RequestResponsePairs {
+		bodyFile := pair.Response.GetBodyFile()
+		if len(bodyFile) == 0 {
+			continue
+		}
+
+		if err := configuration.WriteFile(bodyFile, []byte(pair.Response.GetBody())); err != nil {
+			log.Debug(err.Error())
+			return nil, err
+		}
+
+		view.DataViewV6.RequestResponsePairs[i].Response.Body = ""
 	}
 
-	return jsonBytes.Bytes(), nil
+	return json.MarshalIndent(view, "", "\t")
 }
 
 func ImportSimulation(target configuration.Target, simulationData string) error {

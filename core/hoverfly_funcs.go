@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"fmt"
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/aymerick/raymond"
 	"io/ioutil"
@@ -127,7 +128,17 @@ func (hf *Hoverfly) readResponseBodyFiles(pairs []v2.RequestMatcherResponsePairV
 		}
 
 		if len(pair.Response.GetBody()) == 0 && len(pair.Response.GetBodyFile()) > 0 {
-			fileContents, err := ioutil.ReadFile(filepath.Join(hf.Cfg.ResponsesBodyFilesPath, pair.Response.GetBodyFile()))
+			bodyFile := pair.Response.GetBodyFile()
+			if filepath.IsAbs(bodyFile) {
+				err := fmt.Errorf(
+					"data.pairs[%d].response bodyFile contains absolute path (%s). only relative is supported",
+					i, bodyFile,
+				)
+				result.SetError(err)
+				return result
+			}
+
+			fileContents, err := ioutil.ReadFile(filepath.Join(hf.Cfg.ResponsesBodyFilesPath, bodyFile))
 			if err != nil {
 				result.SetError(err)
 				return result
