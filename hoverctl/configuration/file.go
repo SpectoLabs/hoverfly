@@ -18,7 +18,7 @@ func WriteFile(filePath string, data []byte) error {
 	fileName := filepath.Base(filePath)
 	log.Debug(basePath)
 
-	err := os.MkdirAll(basePath, 0644)
+	err := os.MkdirAll(basePath, 0744)
 	if err != nil {
 		return err
 	}
