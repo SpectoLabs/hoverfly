@@ -2,7 +2,6 @@ package wrapper
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 
 	"fmt"
@@ -31,14 +30,8 @@ func ExportSimulation(target configuration.Target, urlPattern string) ([]byte, e
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Debug(err.Error())
-		return nil, errors.New("Could not export from Hoverfly")
-	}
-
 	var view v2.SimulationViewV6
-	if err := json.Unmarshal(body, &view); err != nil {
+	if err := json.NewDecoder(response.Body).Decode(&view); err != nil {
 		log.Debug(err.Error())
 		return nil, err
 	}
