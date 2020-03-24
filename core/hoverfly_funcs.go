@@ -1,7 +1,6 @@
 package hoverfly
 
 import (
-	"errors"
 	"fmt"
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/aymerick/raymond"
@@ -10,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	herrors "github.com/SpectoLabs/hoverfly/core/errors"
+	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -46,7 +45,7 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 }
 
 // GetResponse returns stored response from cache
-func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *herrors.HoverflyError) {
+func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError) {
 
 	var response models.ResponseDetails
 	var cachedResponse *models.CachedResponse
@@ -55,7 +54,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 
 	// Get the cached response and return if there is a miss
 	if cacheErr == nil && cachedResponse.MatchingPair == nil {
-		return nil, herrors.MatchingFailedError(cachedResponse.ClosestMiss)
+		return nil, errors.MatchingFailedError(cachedResponse.ClosestMiss)
 		// If it's cached, use that response
 	} else if cacheErr == nil {
 		response = cachedResponse.MatchingPair.Response
@@ -81,7 +80,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 				"method":      requestDetails.Method,
 			}).Warn("Failed to find matching request from simulation")
 
-			return nil, herrors.MatchingFailedError(result.Error.ClosestMiss)
+			return nil, errors.MatchingFailedError(result.Error.ClosestMiss)
 		} else {
 			response = result.Pair.Response
 		}
@@ -131,10 +130,10 @@ func (hf *Hoverfly) readResponseBodyFiles(pairs []v2.RequestMatcherResponsePairV
 		if len(pair.Response.GetBody()) == 0 && len(pair.Response.GetBodyFile()) > 0 {
 			bodyFile := pair.Response.GetBodyFile()
 			if filepath.IsAbs(bodyFile) {
-				err := errors.New(fmt.Sprintf(
+				err := fmt.Errorf(
 					"data.pairs[%d].response bodyFile contains absolute path (%s). only relative is supported",
 					i, bodyFile,
-				))
+				)
 				result.SetError(err)
 				return result
 			}
