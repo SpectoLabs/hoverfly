@@ -3,7 +3,7 @@
 Simulation schema
 =================
 
-This is the JSON schema for v5 Hoverfly simulations.
+This is the JSON schema for v6 Hoverfly simulations.
 
 .. code:: json
 
@@ -156,6 +156,9 @@ This is the JSON schema for v5 Hoverfly simulations.
       "response": {
         "properties": {
           "body": {
+            "type": "string"
+          },
+          "bodyFile": {
             "type": "string"
           },
           "encodedBody": {

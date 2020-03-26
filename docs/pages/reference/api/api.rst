@@ -99,7 +99,7 @@ Gets all simulation data. The simulation JSON contains all the information Hover
             },
             "response": {
               "status": 200,
-              "body": "<h1>Matched on template</h1>",
+              "bodyFile": "responses/200-success.json",
               "encodedBody": false,
               "headers": {
                 "Content-Type": [

@@ -138,3 +138,24 @@ JSON is a text-based file format so it has no intrinsic support for binary data.
    :language: javascript
 
 :ref:`View entire simulation file <basic_encoded_simulation>`
+
+Serving response bodies from files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Starting from version **1.2.0** hoverfly can return response body from a specific file:
+
+.. code:: json
+
+  "response": {
+    "status": 200,
+    "encodedBody": false,
+    "templated": false,
+    "bodyFile": "responses/200-success.json"
+  }
+
+**response/200-success.json** is resolved against the directory specified in :code:`-response-body-files-path`
+which is your `current working directory <https://en.wikipedia.org/wiki/Working_directory>`_ by default.
+
+When both :code:`body` and :code:`bodyFile` are specified, :code:`body` takes precedence.
+
+:code:`bodyFile` is read into memory only on simulation import, not in runtime.
