@@ -44,9 +44,9 @@
             },
             "response": {
                "status": 200,
-               "body": "base64 encoded",
+               "body": "YmFzZTY0IGVuY29kZWQ=",
                "bodyFile": "",
-               "encodedBody": false,
+               "encodedBody": true,
                "headers": {
                   "Hoverfly": [
                      "Was-Here"
