@@ -227,7 +227,7 @@ func Test_Middleware_GetScript_DoesNotErrorIfScriptIsNotSet(t *testing.T) {
 	Expect(result).To(Equal(""))
 }
 
-func Test_Middleware_DeleteScripts_WillDeleteScriptAndSetScriptToNil(t *testing.T) {
+func Test_Middleware_DeleteScript_WillDeleteScriptAndSetScriptToNil(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := Middleware{}
@@ -237,7 +237,7 @@ func Test_Middleware_DeleteScripts_WillDeleteScriptAndSetScriptToNil(t *testing.
 
 	firstScript := unit.Script
 
-	err = unit.DeleteScripts(path.Join(os.TempDir(), "hoverfly"))
+	err = unit.DeleteScript()
 	Expect(err).To(BeNil())
 	Expect(unit.Script).To(BeNil())
 
@@ -245,7 +245,7 @@ func Test_Middleware_DeleteScripts_WillDeleteScriptAndSetScriptToNil(t *testing.
 	Expect(err).ToNot(BeNil())
 }
 
-func Test_Middleware_DeleteScripts_WillDeletePreviousScripts(t *testing.T) {
+func Test_Middleware_DeleteScript_WillNotDeleteOtherScriptInTheTempFolder(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := Middleware{}
@@ -255,27 +255,28 @@ func Test_Middleware_DeleteScripts_WillDeletePreviousScripts(t *testing.T) {
 
 	firstScript := unit.Script
 
-	err = ioutil.WriteFile(path.Join(os.TempDir(), "hoverfly", "test"), []byte("test"), 0644)
+	scriptCreatedByOtherTarget := path.Join(os.TempDir(), "hoverfly", "test")
+	err = ioutil.WriteFile(scriptCreatedByOtherTarget, []byte("test"), 0644)
 	Expect(err).To(BeNil())
 
-	err = unit.DeleteScripts(path.Join(os.TempDir(), "hoverfly"))
+	err = unit.DeleteScript()
 	Expect(err).To(BeNil())
 	Expect(unit.Script).To(BeNil())
 
 	_, err = ioutil.ReadFile(firstScript.Name())
 	Expect(err).ToNot(BeNil())
 
-	_, err = ioutil.ReadFile(path.Join(os.TempDir(), "hoverfly", "test"))
-	Expect(err).ToNot(BeNil())
+	_, err = ioutil.ReadFile(scriptCreatedByOtherTarget)
+	Expect(err).To(BeNil())
 
 }
 
-func Test_Middleware_DeleteScripts_DoesNotErrorIfNoScriptWasSet(t *testing.T) {
+func Test_Middleware_DeleteScript_DoesNotErrorIfNoScriptWasSet(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := Middleware{}
 
-	err := unit.DeleteScripts(path.Join(os.TempDir(), "hoverfly"))
+	err := unit.DeleteScript()
 	Expect(err).To(BeNil())
 }
 
