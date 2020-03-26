@@ -45,6 +45,7 @@
             "response": {
                "status": 200,
                "body": "YmFzZTY0IGVuY29kZWQ=",
+               "bodyFile": "",
                "encodedBody": true,
                "headers": {
                   "Hoverfly": [
@@ -57,7 +58,8 @@
          }
       ],
       "globalActions": {
-         "delays": []
+         "delays": [],
+         "delaysLogNormal": []
       }
    },
    "meta": {
