@@ -13,6 +13,7 @@
             "response": {
                "status": 200,
                "body": "Delayed response",
+               "bodyFile": "",
                "encodedBody": false,
                "headers": {
                   "Hoverfly": [
@@ -41,7 +42,8 @@
                "httpMethod": "",
                "delay": 3000
             }
-         ]
+         ],
+         "delaysLogNormal": []
       }
    },
    "meta": {

@@ -13,6 +13,7 @@
             "response": {
                "status": 200,
                "body": "Response from docs.hoverfly.io/pages/keyconcepts/templates.html",
+               "bodyFile": "",
                "encodedBody": false,
                "headers": {
                   "Hoverfly": [
@@ -35,6 +36,7 @@
             "response": {
                "status": 200,
                "body": "Response from docs.hoverfly.io/pages/keyconcepts/templates.html",
+               "bodyFile": "",
                "encodedBody": false,
                "headers": {
                   "Hoverfly": [
@@ -61,6 +63,7 @@
             "response": {
                "status": 200,
                "body": "Response from docs.hoverfly.io/pages/keyconcepts/templates.html",
+               "bodyFile": "",
                "encodedBody": false,
                "headers": {
                   "Hoverfly": [
@@ -73,7 +76,8 @@
          }
       ],
       "globalActions": {
-         "delays": []
+         "delays": [],
+         "delaysLogNormal": []
       }
    },
    "meta": {
