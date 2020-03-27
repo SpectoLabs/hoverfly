@@ -1,6 +1,7 @@
 package wrapper
 
 import (
+	"encoding/json"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 )
@@ -31,7 +32,12 @@ func GetDestination(target configuration.Target) (string, error) {
 
 // SetDestination will go the destination endpoint in Hoverfly, sending JSON that will set the destination of Hoverfly
 func SetDestination(target configuration.Target, destination string) (string, error) {
-	response, err := doRequest(target, "PUT", v2ApiDestination, `{"destination":"`+destination+`"}`, nil)
+
+	destinationReq := map[string]string{"destination": destination}
+	bytes, _ := json.Marshal(destinationReq)	// JSON encode in case there are special chars
+	reqBody := string(bytes)
+
+	response, err := doRequest(target, "PUT", v2ApiDestination, reqBody, nil)
 	if err != nil {
 		return "", err
 	}

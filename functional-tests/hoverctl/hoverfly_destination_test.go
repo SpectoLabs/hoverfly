@@ -42,6 +42,14 @@ var _ = Describe("When I use hoverctl", func() {
 				output = functional_tests.Run(hoverctlBinary, "destination")
 				Expect(output).To(ContainSubstring("Current Hoverfly destination is set to example.org"))
 			})
+
+			It("sets the destination with regex escape characters", func() {
+				output := functional_tests.Run(hoverctlBinary, "destination", `example\.org`)
+				Expect(output).To(ContainSubstring(`Hoverfly destination has been set to example\.org`))
+
+				output = functional_tests.Run(hoverctlBinary, "destination", `example\\.org`)
+				Expect(output).To(ContainSubstring(`Hoverfly destination has been set to example\\.org`))
+			})
 		})
 
 		Context("I cannot set hoverfly's destination", func() {
