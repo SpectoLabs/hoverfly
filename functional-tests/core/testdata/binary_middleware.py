@@ -17,8 +17,8 @@ def main():
 
     payload_dict = json.loads(payload)
 
-    bytes = open(os.getcwd() + "/testdata/1x1.png").read()
-    responseBody = base64.b64encode(bytes) # We need to base 64 encode binary data
+    bytes = open(os.getcwd() + "/testdata/1x1.png", "rb").read()
+    responseBody = base64.b64encode(bytes).decode('utf-8') # We need to base 64 encode binary data
     contentLength = len(bytes) # Content length should be what we expect the unencoded binary data to be
 
     payload_dict['request']['body'] = "CHANGED_REQUEST_BODY"
