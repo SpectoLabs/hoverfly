@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.14
       - image: circleci/node:6.10.3
 
     environment:
@@ -27,7 +27,7 @@ jobs:
 
   deploy-master:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.14
 
     environment:
       GOPATH: /go
@@ -79,7 +79,7 @@ jobs:
 
   deploy-release:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.14
 
     environment:
       GOPATH: /go

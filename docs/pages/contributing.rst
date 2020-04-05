@@ -16,7 +16,7 @@ Learn more about the `forking workflow here <https://www.atlassian.com/git/tutor
 Building, running & testing
 ---------------------------
 
-You will need `Go 1.11 <https://golang.org>`_ . Instructions on how to set up your Go environment can be `found here <https://golang.org/doc/install>`_.
+You will need `Go 1.14 <https://golang.org>`_ . Instructions on how to set up your Go environment can be `found here <https://golang.org/doc/install>`_.
 
 .. code:: bash
 
