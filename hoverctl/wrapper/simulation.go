@@ -9,48 +9,28 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
-	log "github.com/sirupsen/logrus"
 )
 
-func ExportSimulation(target configuration.Target, urlPattern string) ([]byte, error) {
-
+func ExportSimulation(target configuration.Target, urlPattern string) (v2.SimulationViewV6, error) {
+	view := v2.SimulationViewV6{}
 	requestUrl := v2ApiSimulation
 	if len(urlPattern) > 0 {
 		requestUrl = fmt.Sprintf("%s?urlPattern=%s", requestUrl, url.QueryEscape(urlPattern))
 	}
 	response, err := doRequest(target, "GET", requestUrl, "", nil)
 	if err != nil {
-		return nil, err
+		return view, err
 	}
 
 	defer response.Body.Close()
 
 	err = handleResponseError(response, "Could not retrieve simulation")
 	if err != nil {
-		return nil, err
+		return view, err
 	}
 
-	var view v2.SimulationViewV6
-	if err := json.NewDecoder(response.Body).Decode(&view); err != nil {
-		log.Debug(err.Error())
-		return nil, err
-	}
-
-	for i, pair := range view.DataViewV6.RequestResponsePairs {
-		bodyFile := pair.Response.GetBodyFile()
-		if len(bodyFile) == 0 {
-			continue
-		}
-
-		if err := configuration.WriteFile(bodyFile, []byte(pair.Response.GetBody())); err != nil {
-			log.Debug(err.Error())
-			return nil, err
-		}
-
-		view.DataViewV6.RequestResponsePairs[i].Response.Body = ""
-	}
-
-	return json.MarshalIndent(view, "", "\t")
+	err = json.NewDecoder(response.Body).Decode(&view)
+	return view, err
 }
 
 func ImportSimulation(target configuration.Target, simulationData string) error {
