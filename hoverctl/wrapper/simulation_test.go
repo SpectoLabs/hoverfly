@@ -50,11 +50,8 @@ func Test_ExportSimulation_GetsModeFromHoverfly(t *testing.T) {
 	hoverfly.ReplaceSimulation(simulationList)
 	simulationList.RequestResponsePairs[0].Response.Body = responseBody
 
-	simulationBytes, err := ExportSimulation(target, "")
+	view, err := ExportSimulation(target, "")
 	Expect(err).To(BeNil())
-
-	var view v2.SimulationViewV6
-	Expect(json.Unmarshal(simulationBytes, &view)).To(BeNil())
 	Expect(view).To(Equal(simulationList))
 }
 
@@ -107,11 +104,8 @@ func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 	hoverfly.ReplaceSimulation(simulationList)
 	simulationList.RequestResponsePairs[0].Response.Body = responseBody
 
-	simulationBytes, err := ExportSimulation(target, "test-(.+).com")
+	view, err := ExportSimulation(target, "test-(.+).com")
 	Expect(err).To(BeNil())
-
-	var view v2.SimulationViewV6
-	Expect(json.Unmarshal(simulationBytes, &view)).To(BeNil())
 	Expect(view).To(Equal(simulationList))
 }
 
@@ -148,7 +142,7 @@ func Test_ExportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 					},
 					Response: v2.ResponseDetailsViewV5{
 						Status: 400,
-						Body: `{"error":"test error"}`,
+						Body:   "{\"error\":\"test error\"}",
 					},
 				},
 			},
@@ -156,9 +150,7 @@ func Test_ExportSimulation_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 		v2.MetaView{
 			SchemaVersion: "v2",
 		},
-	}
-
-	hoverfly.ReplaceSimulation(simulationList)
+	})
 
 	_, err := ExportSimulation(target, "")
 	Expect(err).ToNot(BeNil())
