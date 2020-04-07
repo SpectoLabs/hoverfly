@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
@@ -22,7 +23,23 @@ will be written to the file path provided.
 
 		checkArgAndExit(args, "You have not provided a path to simulation", "export")
 
-		simulationData, err := wrapper.ExportSimulation(*target, urlPattern)
+		simulationView, err := wrapper.ExportSimulation(*target, urlPattern)
+		handleIfError(err)
+
+		for i, pair := range simulationView.DataViewV6.RequestResponsePairs {
+			bodyFile := pair.Response.GetBodyFile()
+			if len(bodyFile) == 0 {
+				continue
+			}
+
+			if err := configuration.WriteFile(bodyFile, []byte(pair.Response.GetBody())); err != nil {
+				handleIfError(err)
+			}
+
+			simulationView.DataViewV6.RequestResponsePairs[i].Response.Body = ""
+		}
+
+		simulationData, err := json.MarshalIndent(simulationView, "", "\t")
 		handleIfError(err)
 
 		err = configuration.WriteFile(args[0], simulationData)
