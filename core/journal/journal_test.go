@@ -409,6 +409,16 @@ func Test_Journal_GetEntries_ReturnEmptyPageIfOffsetIsLargerThanTotalElements(t 
 	Expect(journalView.Journal).To(HaveLen(0))
 }
 
+func Test_Journal_GetEntries_ReturnRightLimitWhenEmpty(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+	journalView, err := unit.GetEntries(0, 100, nil, nil, "")
+	Expect(err).To(BeNil())
+	Expect(journalView.Journal).To(HaveLen(0))
+	Expect(journalView.Limit).To(Equal(100))
+}
+
 func Test_Journal_GetEntries_FilteredByTimeWindow(t *testing.T) {
 	RegisterTestingT(t)
 
