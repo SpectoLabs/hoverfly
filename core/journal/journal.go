@@ -74,7 +74,7 @@ func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.
 	journalView := v2.JournalView{
 		Journal: []v2.JournalEntryView{},
 		Offset:  0,
-		Limit:   v2.DefaultJournalLimit,
+		Limit:   limit,
 		Total:   0,
 	}
 
@@ -135,7 +135,6 @@ func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.
 
 	journalView.Journal = convertJournalEntries(selectedEntries[offset:endIndex])
 	journalView.Offset = offset
-	journalView.Limit = limit
 	journalView.Total = totalElements
 	return journalView, nil
 }
