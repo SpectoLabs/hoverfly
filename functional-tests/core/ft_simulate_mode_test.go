@@ -204,7 +204,8 @@ Which if hit would have given the following response:
     "body": "",
     "bodyFile": "",
     "encodedBody": false,
-    "templated": false
+    "templated": false,
+    "fixedDelay": 0
 }`
 		Expect(string(body)).To(Equal(expected))
 
@@ -277,7 +278,8 @@ Which if hit would have given the following response:
     "body": "",
     "bodyFile": "",
     "encodedBody": false,
-    "templated": false
+    "templated": false,
+    "fixedDelay": 0
 }`
 		Expect(string(body)).To(Equal(expected))
 	})

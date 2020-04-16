@@ -25,7 +25,7 @@ func (this *ModifyMode) View() v2.ModeView {
 
 func (this *ModifyMode) SetArguments(arguments ModeArguments) {}
 
-func (this ModifyMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
+func (this ModifyMode) Process(request *http.Request, details models.RequestDetails) (ProcessResult, error) {
 	pair, err := this.Hoverfly.ApplyMiddleware(models.RequestResponsePair{Request: details})
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Modify)
@@ -57,5 +57,5 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Modify)
 	}
 
-	return ReconstructResponse(modifiedRequest, pair), nil
+	return newProcessResult(ReconstructResponse(modifiedRequest, pair), pair.Response.FixedDelay), nil
 }

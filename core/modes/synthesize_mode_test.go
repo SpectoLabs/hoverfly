@@ -46,12 +46,12 @@ func Test_SynthesizeMode_WhenGivenARequestItWillUseMiddlewareToGenerateAResponse
 	request, err := http.NewRequest("GET", "http://positive-match.com", nil)
 	Expect(err).To(BeNil())
 
-	response, err := unit.Process(request, requestDetails)
+	result, err := unit.Process(request, requestDetails)
 	Expect(err).To(BeNil())
 
-	Expect(response.StatusCode).To(Equal(http.StatusCreated))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusCreated))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("modified by middleware"))
@@ -75,12 +75,12 @@ func Test_SynthesizeMode_IfMiddlewareFailsThenModeReturnsNiceError(t *testing.T)
 	request, err := http.NewRequest("GET", "http://error.com", nil)
 	Expect(err).To(BeNil())
 
-	response, err := unit.Process(request, requestDetails)
+	result, err := unit.Process(request, requestDetails)
 	Expect(err).ToNot(BeNil())
 
-	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when executing middleware"))
@@ -103,12 +103,12 @@ func Test_SynthesizeMode_IfMiddlewareNotSetModeReturnsNiceError(t *testing.T) {
 	request, err := http.NewRequest("GET", "http://test.com", nil)
 	Expect(err).To(BeNil())
 
-	response, err := unit.Process(request, requestDetails)
+	result, err := unit.Process(request, requestDetails)
 	Expect(err).ToNot(BeNil())
 
-	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when creating a synthetic response"))

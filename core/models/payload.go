@@ -194,6 +194,7 @@ type ResponseDetails struct {
 	Templated        bool
 	TransitionsState map[string]string
 	RemovesState     []string
+	FixedDelay       int
 }
 
 func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
@@ -212,6 +213,7 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 		Templated:        data.GetTemplated(),
 		TransitionsState: data.GetTransitionsState(),
 		RemovesState:     data.GetRemovesState(),
+		FixedDelay:       data.GetFixedDelay(),
 	}
 }
 
@@ -283,6 +285,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV6() v2.ResponseDetailsVie
 		Templated:        r.Templated,
 		RemovesState:     r.RemovesState,
 		TransitionsState: r.TransitionsState,
+		FixedDelay:       r.FixedDelay,
 	}
 }
 
