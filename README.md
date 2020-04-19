@@ -51,16 +51,8 @@ To read more about forking model, check out this link: [forking workflow](https:
 ### Build
 1. Install Go. You should follow the download and installation instructions for your OS from [official Go website](https://golang.org/dl). If you have installed Go before 
 using either `apt-get` or `homebrew`, you should uninstall those first.
-1. After the installation, find out the `GOPATH` using `go env`, and then setup a source folder there
-
+1. Clone the hoverfly project:
     ```bash
-    mkdir $GOPATH/src
-    ```
-1. Clone the hoverfly project into your Go source folder:
-    ```bash
-    cd $GOPATH/src
-    mkdir -p github.com/SpectoLabs/
-    cd github.com/SpectoLabs/
     git clone https://github.com/SpectoLabs/hoverfly.git
     # or: git clone https://github.com/<your_username>/hoverfly.git
     ```
