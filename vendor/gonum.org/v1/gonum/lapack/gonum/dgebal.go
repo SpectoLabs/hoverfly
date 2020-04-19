@@ -15,10 +15,10 @@ import (
 // and scaling. Both steps are optional and depend on the value of job.
 //
 // Permuting consists of applying a permutation matrix P such that the matrix
-// that results from P^T*A*P takes the upper block triangular form
-//            [ T1  X  Y  ]
-//  P^T A P = [  0  B  Z  ],
-//            [  0  0  T2 ]
+// that results from Pᵀ*A*P takes the upper block triangular form
+//           [ T1  X  Y  ]
+//  Pᵀ A P = [  0  B  Z  ],
+//           [  0  0  T2 ]
 // where T1 and T2 are upper triangular matrices and B contains at least one
 // nonzero off-diagonal element in each row and column. The indices ilo and ihi
 // mark the starting and ending columns of the submatrix B. The eigenvalues of A
@@ -55,24 +55,35 @@ import (
 //
 // Dgebal is an internal routine. It is exported for testing purposes.
 func (impl Implementation) Dgebal(job lapack.BalanceJob, n int, a []float64, lda int, scale []float64) (ilo, ihi int) {
-	switch job {
-	default:
+	switch {
+	case job != lapack.BalanceNone && job != lapack.Permute && job != lapack.Scale && job != lapack.PermuteScale:
 		panic(badBalanceJob)
-	case lapack.BalanceNone, lapack.Permute, lapack.Scale, lapack.PermuteScale:
-	}
-	checkMatrix(n, n, a, lda)
-	if len(scale) != n {
-		panic("lapack: bad length of scale")
+	case n < 0:
+		panic(nLT0)
+	case lda < max(1, n):
+		panic(badLdA)
 	}
 
 	ilo = 0
 	ihi = n - 1
 
-	if n == 0 || job == lapack.BalanceNone {
+	if n == 0 {
+		return ilo, ihi
+	}
+
+	if len(scale) != n {
+		panic(shortScale)
+	}
+
+	if job == lapack.BalanceNone {
 		for i := range scale {
 			scale[i] = 1
 		}
 		return ilo, ihi
+	}
+
+	if len(a) < (n-1)*lda+n {
+		panic(shortA)
 	}
 
 	bi := blas64.Implementation()

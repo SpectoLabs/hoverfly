@@ -5,10 +5,9 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/tdewolff/buffer"
+	"github.com/tdewolff/parse"
+	"github.com/tdewolff/parse/buffer"
 )
-
-////////////////////////////////////////////////////////////////
 
 // TokenType determines the type of token, eg. a number or a semicolon.
 type TokenType uint32
@@ -64,7 +63,9 @@ func (tt TokenType) String() string {
 
 // Lexer is the state for the lexer.
 type Lexer struct {
-	r     *buffer.Lexer
+	r   *buffer.Lexer
+	err error
+
 	inTag bool
 
 	text    []byte
@@ -80,12 +81,15 @@ func NewLexer(r io.Reader) *Lexer {
 
 // Err returns the error encountered during lexing, this is often io.EOF but also other errors can be returned.
 func (l *Lexer) Err() error {
+	if l.err != nil {
+		return l.err
+	}
 	return l.r.Err()
 }
 
-// Free frees up bytes of length n from previously shifted tokens.
-func (l *Lexer) Free(n int) {
-	l.r.Free(n)
+// Restore restores the NULL byte at the end of the buffer.
+func (l *Lexer) Restore() {
+	l.r.Restore()
 }
 
 // Next returns the next Token. It returns ErrorToken when an error was encountered. Using Err() one can retrieve the error message.
@@ -102,6 +106,9 @@ func (l *Lexer) Next() (TokenType, []byte) {
 			break
 		}
 		if c == 0 {
+			if l.r.Err() == nil {
+				l.err = parse.NewErrorLexer("unexpected null character", l.r)
+			}
 			return ErrorToken, nil
 		} else if c != '>' && (c != '/' && c != '?' || l.r.Peek(1) != '>') {
 			return AttributeToken, l.shiftAttribute()
@@ -142,7 +149,7 @@ func (l *Lexer) Next() (TokenType, []byte) {
 					l.r.Move(7)
 					return CDATAToken, l.shiftCDATAText()
 				} else if l.at('D', 'O', 'C', 'T', 'Y', 'P', 'E') {
-					l.r.Move(8)
+					l.r.Move(7)
 					return DOCTYPEToken, l.shiftDOCTYPEText()
 				}
 				l.r.Move(-2)
@@ -157,6 +164,9 @@ func (l *Lexer) Next() (TokenType, []byte) {
 		} else if c == 0 {
 			if l.r.Pos() > 0 {
 				return TextToken, l.r.Shift()
+			}
+			if l.r.Err() == nil {
+				l.err = parse.NewErrorLexer("unexpected null character", l.r)
 			}
 			return ErrorToken, nil
 		}

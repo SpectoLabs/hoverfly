@@ -19,8 +19,8 @@ import (
 // is defined by
 //  A v_j = λ_j v_j,
 // and the left eigenvector u_j corresponding to an eigenvalue λ_j is defined by
-//  u_j^H A = λ_j u_j^H,
-// where u_j^H is the conjugate transpose of u_j.
+//  u_jᴴ A = λ_j u_jᴴ,
+// where u_jᴴ is the conjugate transpose of u_j.
 //
 // On return, A will be overwritten and the left and right eigenvectors will be
 // stored, respectively, in the columns of the n×n matrices VL and VR in the
@@ -53,7 +53,7 @@ import (
 // larger.  On return, optimal value of lwork will be stored in work[0].
 //
 // If lwork == -1, instead of performing Dgeev, the function only calculates the
-// optimal vaule of lwork and stores it into work[0].
+// optimal value of lwork and stores it into work[0].
 //
 // On return, first is the index of the first valid eigenvalue. If first == 0,
 // all eigenvalues and eigenvectors have been computed. If first is positive,
@@ -61,50 +61,31 @@ import (
 // computed and wr[first:] and wi[first:] contain those eigenvalues which have
 // converged.
 func (impl Implementation) Dgeev(jobvl lapack.LeftEVJob, jobvr lapack.RightEVJob, n int, a []float64, lda int, wr, wi []float64, vl []float64, ldvl int, vr []float64, ldvr int, work []float64, lwork int) (first int) {
-	var wantvl bool
-	switch jobvl {
-	default:
-		panic("lapack: invalid LeftEVJob")
-	case lapack.LeftEVCompute:
-		wantvl = true
-	case lapack.LeftEVNone:
-	}
-	var wantvr bool
-	switch jobvr {
-	default:
-		panic("lapack: invalid RightEVJob")
-	case lapack.RightEVCompute:
-		wantvr = true
-	case lapack.RightEVNone:
-	}
-	switch {
-	case n < 0:
-		panic(nLT0)
-	case len(work) < lwork:
-		panic(shortWork)
-	}
+	wantvl := jobvl == lapack.LeftEVCompute
+	wantvr := jobvr == lapack.RightEVCompute
 	var minwrk int
 	if wantvl || wantvr {
 		minwrk = max(1, 4*n)
 	} else {
 		minwrk = max(1, 3*n)
 	}
-	if lwork != -1 {
-		checkMatrix(n, n, a, lda)
-		if wantvl {
-			checkMatrix(n, n, vl, ldvl)
-		}
-		if wantvr {
-			checkMatrix(n, n, vr, ldvr)
-		}
-		switch {
-		case len(wr) != n:
-			panic("lapack: bad length of wr")
-		case len(wi) != n:
-			panic("lapack: bad length of wi")
-		case lwork < minwrk:
-			panic(badWork)
-		}
+	switch {
+	case jobvl != lapack.LeftEVCompute && jobvl != lapack.LeftEVNone:
+		panic(badLeftEVJob)
+	case jobvr != lapack.RightEVCompute && jobvr != lapack.RightEVNone:
+		panic(badRightEVJob)
+	case n < 0:
+		panic(nLT0)
+	case lda < max(1, n):
+		panic(badLdA)
+	case ldvl < 1 || (ldvl < n && wantvl):
+		panic(badLdVL)
+	case ldvr < 1 || (ldvr < n && wantvr):
+		panic(badLdVR)
+	case lwork < minwrk && lwork != -1:
+		panic(badLWork)
+	case len(work) < lwork:
+		panic(shortWork)
 	}
 
 	// Quick return if possible.
@@ -117,19 +98,19 @@ func (impl Implementation) Dgeev(jobvl lapack.LeftEVJob, jobvr lapack.RightEVJob
 	if wantvl || wantvr {
 		maxwrk = max(maxwrk, 2*n+(n-1)*impl.Ilaenv(1, "DORGHR", " ", n, 1, n, -1))
 		impl.Dhseqr(lapack.EigenvaluesAndSchur, lapack.SchurOrig, n, 0, n-1,
-			nil, 1, nil, nil, nil, 1, work, -1)
+			a, lda, wr, wi, nil, n, work, -1)
 		maxwrk = max(maxwrk, max(n+1, n+int(work[0])))
 		side := lapack.EVLeft
 		if wantvr {
 			side = lapack.EVRight
 		}
-		impl.Dtrevc3(side, lapack.EVAllMulQ, nil, n, nil, 1, nil, 1, nil, 1,
+		impl.Dtrevc3(side, lapack.EVAllMulQ, nil, n, a, lda, vl, ldvl, vr, ldvr,
 			n, work, -1)
 		maxwrk = max(maxwrk, n+int(work[0]))
 		maxwrk = max(maxwrk, 4*n)
 	} else {
 		impl.Dhseqr(lapack.EigenvaluesOnly, lapack.SchurNone, n, 0, n-1,
-			nil, 1, nil, nil, nil, 1, work, -1)
+			a, lda, wr, wi, vr, ldvr, work, -1)
 		maxwrk = max(maxwrk, max(n+1, n+int(work[0])))
 	}
 	maxwrk = max(maxwrk, minwrk)
@@ -137,6 +118,19 @@ func (impl Implementation) Dgeev(jobvl lapack.LeftEVJob, jobvr lapack.RightEVJob
 	if lwork == -1 {
 		work[0] = float64(maxwrk)
 		return 0
+	}
+
+	switch {
+	case len(a) < (n-1)*lda+n:
+		panic(shortA)
+	case len(wr) != n:
+		panic(badLenWr)
+	case len(wi) != n:
+		panic(badLenWi)
+	case len(vl) < (n-1)*ldvl+n && wantvl:
+		panic(shortVL)
+	case len(vr) < (n-1)*ldvr+n && wantvr:
+		panic(shortVR)
 	}
 
 	// Get machine constants.
