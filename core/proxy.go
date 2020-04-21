@@ -169,7 +169,6 @@ func unauthorizedError(request *http.Request, realm, message string) *http.Respo
 func proxyBasicAndBearer(proxy *goproxy.ProxyHttpServer, realm string, basicFunc func(user, passwd string) bool, bearerFunc func(token string) bool) {
 
 	proxy.OnRequest().Do(goproxy.FuncReqHandler(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-		// IN HTTPS CASE AUTH HEADERS ARE IN CONNECT REQUEST, BUT NOT IN REQUEST TO DESTINATION
 		if strings.HasSuffix(req.URL.Host, ":443") {
 			return req, nil
 		}
@@ -180,7 +179,6 @@ func proxyBasicAndBearer(proxy *goproxy.ProxyHttpServer, realm string, basicFunc
 		return req, nil
 	}))
 
-	// THIS CONNECT HANDLER WAS UNREACHABLE
 	proxy.OnRequest().HandleConnect(goproxy.FuncHttpsHandler(func(host string, ctx *goproxy.ProxyCtx) (*goproxy.ConnectAction, string) {
 		err := authFromHeader(ctx.Req, basicFunc, bearerFunc)
 		if err != nil {
