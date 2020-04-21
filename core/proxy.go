@@ -30,14 +30,6 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 
-	proxy.OnRequest(matchesFilter(hoverfly.Cfg.Destination)).
-		HandleConnect(goproxy.FuncHttpsHandler(func(host string, ctx *goproxy.ProxyCtx) (*goproxy.ConnectAction, string) {
-			if hoverfly.Cfg.PlainHttpTunneling && !strings.HasSuffix(host, ":443") {
-				return goproxy.HTTPMitmConnect, host
-			}
-			return goproxy.MitmConnect, host
-		}))
-
 	if hoverfly.Cfg.HttpsOnly {
 		log.Info("Disabling HTTP")
 		proxy.DisableNonTls(true)
@@ -59,6 +51,14 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 			return authentication.IsJwtTokenValid(headerToken, hoverfly.Authentication, hoverfly.Cfg.SecretKey, hoverfly.Cfg.JWTExpirationDelta)
 		})
 	}
+
+	proxy.OnRequest(matchesFilter(hoverfly.Cfg.Destination)).
+		HandleConnect(goproxy.FuncHttpsHandler(func(host string, ctx *goproxy.ProxyCtx) (*goproxy.ConnectAction, string) {
+			if hoverfly.Cfg.PlainHttpTunneling && !strings.HasSuffix(host, ":443") {
+				return goproxy.HTTPMitmConnect, host
+			}
+			return goproxy.MitmConnect, host
+		}))
 
 	// processing connections
 	proxy.OnRequest(matchesFilter(hoverfly.Cfg.Destination)).DoFunc(
@@ -169,6 +169,9 @@ func unauthorizedError(request *http.Request, realm, message string) *http.Respo
 func proxyBasicAndBearer(proxy *goproxy.ProxyHttpServer, realm string, basicFunc func(user, passwd string) bool, bearerFunc func(token string) bool) {
 
 	proxy.OnRequest().Do(goproxy.FuncReqHandler(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+		if strings.HasSuffix(req.URL.Host, ":443") {
+			return req, nil
+		}
 		err := authFromHeader(req, basicFunc, bearerFunc)
 		if err != nil {
 			return nil, unauthorizedError(req, realm, err.Error())
