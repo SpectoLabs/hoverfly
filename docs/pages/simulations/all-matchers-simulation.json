@@ -20,7 +20,8 @@
                      "Was-Here"
                   ]
                },
-               "templated": false
+               "templated": false,
+               "fixedDelay": 0
             }
          },
          {
@@ -42,7 +43,8 @@
                      "Was-Here"
                   ]
                },
-               "templated": false
+               "templated": false,
+               "fixedDelay": 0
             }
          },
          {
@@ -68,7 +70,8 @@
                      "Was-Here"
                   ]
                },
-               "templated": false
+               "templated": false,
+               "fixedDelay": 0
             }
          }
       ],
@@ -80,6 +83,6 @@
    "meta": {
       "schemaVersion": "v6",
       "hoverflyVersion": "v1.2.0",
-      "timeExported": "2020-03-26T22:44:43+03:00"
+      "timeExported": "2020-04-25T17:56:32+03:00"
    }
 }
