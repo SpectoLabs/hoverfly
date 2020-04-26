@@ -51,8 +51,12 @@ func (this *JournalHandler) Get(response http.ResponseWriter, request *http.Requ
 	toTime := util.GetUnixTimeQueryParam(request, "to")
 	sort := queryParams.Get("sort")
 
-	if limit == 0 {
+	if limit <= 0 {
 		limit = DefaultJournalLimit
+	}
+
+	if offset < 0 {
+		offset = 0
 	}
 
 	journalView, err := this.Hoverfly.GetEntries(offset, limit, fromTime, toTime, sort)

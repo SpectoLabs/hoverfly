@@ -113,6 +113,24 @@ func Test_JournalHandler_Get_SetDefaultPagingQueryIfNotSpecified(t *testing.T) {
 	Expect(stubHoverfly.offset).To(Equal(0))
 }
 
+func Test_JournalHandler_Get_SanitizePagingQuery(t *testing.T) {
+	RegisterTestingT(t)
+
+	stubHoverfly := &HoverflyJournalStub{}
+
+	unit := JournalHandler{Hoverfly: stubHoverfly}
+
+	request, err := http.NewRequest("GET", "/api/v2/journal?offset=-1&limit=-2", nil)
+	Expect(err).To(BeNil())
+
+	response := makeRequestOnHandler(unit.Get, request)
+
+	Expect(response.Code).To(Equal(http.StatusOK))
+
+	Expect(stubHoverfly.limit).To(Equal(25))
+	Expect(stubHoverfly.offset).To(Equal(0))
+}
+
 func Test_JournalHandler_Get_WithPagingQuery(t *testing.T) {
 	RegisterTestingT(t)
 

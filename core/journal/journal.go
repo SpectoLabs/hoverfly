@@ -3,8 +3,8 @@ package journal
 import (
 	"fmt"
 	"net/http"
-	"time"
 	"sync"
+	"time"
 
 	sorting "sort"
 	"strings"
@@ -15,7 +15,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
-var RFC3339Milli = "2006-01-02T15:04:05.000Z07:00"
+const RFC3339Milli = "2006-01-02T15:04:05.000Z07:00"
 
 type JournalEntry struct {
 	Request     *models.RequestDetails
@@ -49,7 +49,7 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 
 	payloadResponse := &models.ResponseDetails{
 		Status:  response.StatusCode,
-		Body:    string(respBody),
+		Body:    respBody,
 		Headers: response.Header,
 	}
 
@@ -70,10 +70,11 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 	return nil
 }
 
-func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.Time, sort string) (v2.JournalView, error) {
+func (this *Journal) GetEntries(offset int, limit int, from *time.Time, to *time.Time, sort string) (v2.JournalView, error) {
+
 	journalView := v2.JournalView{
 		Journal: []v2.JournalEntryView{},
-		Offset:  0,
+		Offset:  offset,
 		Limit:   limit,
 		Total:   0,
 	}
@@ -88,7 +89,7 @@ func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.
 		return journalView, err
 	}
 
-	selectedEntries := []JournalEntry{}
+	var selectedEntries []JournalEntry
 
 	// Filtering
 	if from != nil || to != nil {
@@ -122,9 +123,7 @@ func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.
 
 	totalElements := len(selectedEntries)
 
-	if offset < 0 {
-		offset = 0
-	} else if offset >= totalElements {
+	if offset >= totalElements {
 		return journalView, nil
 	}
 
@@ -134,13 +133,12 @@ func (this Journal) GetEntries(offset int, limit int, from *time.Time, to *time.
 	}
 
 	journalView.Journal = convertJournalEntries(selectedEntries[offset:endIndex])
-	journalView.Offset = offset
 	journalView.Total = totalElements
 	return journalView, nil
 }
 
-func (this Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFilterView) ([]v2.JournalEntryView, error) {
-	filteredEntries := []v2.JournalEntryView{}
+func (this *Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFilterView) ([]v2.JournalEntryView, error) {
+	var filteredEntries []v2.JournalEntryView
 	if this.EntryLimit == 0 {
 		return filteredEntries, fmt.Errorf("Journal disabled")
 	}
@@ -207,7 +205,7 @@ func (this *Journal) DeleteEntries() error {
 
 func convertJournalEntries(entries []JournalEntry) []v2.JournalEntryView {
 
-	journalEntryViews := []v2.JournalEntryView{}
+	var journalEntryViews []v2.JournalEntryView
 
 	for _, journalEntry := range entries {
 		journalEntryViews = append(journalEntryViews, v2.JournalEntryView{
