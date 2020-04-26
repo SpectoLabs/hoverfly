@@ -707,9 +707,11 @@ Gets the logs from Hoverfly.
 
 GET /api/v2/journal
 """""""""""""""""""
-Gets the journal from Hoverfly. Each journal entry contains both the request Hoverfly recieved and the response 
-it served along with the mode Hoverfly was in, the time the request was recieved and the time taken for Hoverfly
+Gets the journal from Hoverfly. Each journal entry contains both the request Hoverfly received and the response
+it served along with the mode Hoverfly was in, the time the request was received and the time taken for Hoverfly
 to process the request. Latency is in milliseconds.
+
+It supports paging using the ``offset`` and ``limit`` query parameters.
 
 **Example response body**
 ::
@@ -749,7 +751,10 @@ to process the request. Latency is in milliseconds.
         "timeStarted": "2017-07-17T10:41:59.168+01:00",
         "latency": 0.61334
       }
-    ]
+    ],
+    "offset": 0,
+    "limit": 25,
+    "total": 1
   }
 
 

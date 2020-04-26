@@ -247,6 +247,20 @@ func Test_Journal_GetEntries_WhenDisabledReturnsError(t *testing.T) {
 	Expect(err.Error()).To(Equal("Journal disabled"))
 }
 
+func Test_Journal_GetEntries_WhenErrorShouldReturnDefaultJournalView(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+	unit.EntryLimit = 0
+
+	journalView, err := unit.GetEntries(10, 35, nil, nil, "")
+	Expect(err).ToNot(BeNil())
+	Expect(journalView.Journal).To(BeEmpty())
+	Expect(journalView.Offset).To(Equal(10))
+	Expect(journalView.Limit).To(Equal(35))
+	Expect(journalView.Total).To(Equal(0))
+}
+
 func Test_Journal_GetEntries_WithInvalidSortKeyReturnsError(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -382,7 +396,7 @@ func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
 	Expect(journalView.Offset).To(Equal(4))
 	Expect(journalView.Total).To(Equal(5))
 
-	journalView, err = unit.GetEntries(-1, 2, nil, nil, "")
+	journalView, err = unit.GetEntries(0, 2, nil, nil, "")
 	Expect(err).To(BeNil())
 	Expect(journalView.Journal).To(HaveLen(2))
 	Expect(*journalView.Journal[0].Request.Query).To(Equal("id=0"))
