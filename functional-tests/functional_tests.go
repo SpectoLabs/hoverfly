@@ -258,17 +258,18 @@ func (this Hoverfly) ProxyRequest(req *http.Request) *http.Response {
 	return response
 }
 
-func (this Hoverfly) ProxyWithAuth(r *sling.Sling, user, password string) *http.Response {
+func (this Hoverfly) ProxyWithAuth(r *sling.Sling, user, password string) (*http.Response, error) {
 	req, err := r.Request()
 	Expect(err).To(BeNil())
 
 	proxy, _ := url.Parse(fmt.Sprintf("http://%s:%s@localhost:%v", user, password, this.proxyPort))
-	proxyHttpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxy), TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}, CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }}
-	response, err := proxyHttpClient.Do(req)
-
-	Expect(err).To(BeNil())
-
-	return response
+	proxyHttpClient := &http.Client{
+		Transport: &http.Transport{
+			Proxy: http.ProxyURL(proxy),
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
+			CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
+	}
+	return proxyHttpClient.Do(req)
 }
 
 func (this Hoverfly) GetAPIToken(username, password string) string {
