@@ -15,14 +15,14 @@ import (
 // Dtrevc3 computes some or all of the right and/or left eigenvectors of an n×n
 // upper quasi-triangular matrix T in Schur canonical form. Matrices of this
 // type are produced by the Schur factorization of a real general matrix A
-//  A = Q T Q^T,
+//  A = Q T Qᵀ,
 // as computed by Dhseqr.
 //
 // The right eigenvector x of T corresponding to an
 // eigenvalue λ is defined by
 //  T x = λ x,
 // and the left eigenvector y is defined by
-//  y^T T = λ y^T.
+//  yᵀ T = λ yᵀ.
 //
 // The eigenvalues are read directly from the diagonal blocks of T.
 //
@@ -62,7 +62,7 @@ import (
 //
 // On entry, if howmny is lapack.EVAllMulQ, it is assumed that VL (if side
 // is lapack.EVLeft or lapack.EVBoth) contains an n×n matrix QL,
-// and that VR (if side is lapack.EVLeft or lapack.EVBoth) contains
+// and that VR (if side is lapack.EVRight or lapack.EVBoth) contains
 // an n×n matrix QR. QL and QR are typically the orthogonal matrix Q of Schur
 // vectors returned by Dhseqr.
 //
@@ -106,86 +106,110 @@ import (
 //
 // Dtrevc3 is an internal routine. It is exported for testing purposes.
 func (impl Implementation) Dtrevc3(side lapack.EVSide, howmny lapack.EVHowMany, selected []bool, n int, t []float64, ldt int, vl []float64, ldvl int, vr []float64, ldvr int, mm int, work []float64, lwork int) (m int) {
-	switch side {
-	default:
-		panic(badEVSide)
-	case lapack.EVRight, lapack.EVLeft, lapack.EVBoth:
-	}
-	switch howmny {
-	default:
-		panic(badEVHowMany)
-	case lapack.EVAll, lapack.EVAllMulQ, lapack.EVSelected:
-	}
+	bothv := side == lapack.EVBoth
+	rightv := side == lapack.EVRight || bothv
+	leftv := side == lapack.EVLeft || bothv
 	switch {
+	case !rightv && !leftv:
+		panic(badEVSide)
+	case howmny != lapack.EVAll && howmny != lapack.EVAllMulQ && howmny != lapack.EVSelected:
+		panic(badEVHowMany)
 	case n < 0:
 		panic(nLT0)
-	case len(work) < lwork:
-		panic(shortWork)
+	case ldt < max(1, n):
+		panic(badLdT)
+	case mm < 0:
+		panic(mmLT0)
+	case ldvl < 1:
+		// ldvl and ldvr are also checked below after the computation of
+		// m (number of columns of VL and VR) in case of howmny == EVSelected.
+		panic(badLdVL)
+	case ldvr < 1:
+		panic(badLdVR)
 	case lwork < max(1, 3*n) && lwork != -1:
-		panic(badWork)
-	}
-	if lwork != -1 {
-		if howmny == lapack.EVSelected {
-			if len(selected) != n {
-				panic("lapack: bad selected length")
-			}
-			// Set m to the number of columns required to store the
-			// selected eigenvectors, and standardize the slice
-			// selected.
-			for j := 0; j < n; {
-				if j == n-1 || t[(j+1)*ldt+j] == 0 {
-					// Diagonal 1×1 block corresponding to a
-					// real eigenvalue.
-					if selected[j] {
-						m++
-					}
-					j++
-				} else {
-					// Diagonal 2×2 block corresponding to a
-					// complex eigenvalue.
-					if selected[j] || selected[j+1] {
-						selected[j] = true
-						selected[j+1] = false
-						m += 2
-					}
-					j += 2
-				}
-			}
-		} else {
-			m = n
-		}
-		if m > mm {
-			panic("lapack: insufficient number of columns")
-		}
-		checkMatrix(n, n, t, ldt)
-		if (side == lapack.EVRight || side == lapack.EVBoth) && m > 0 {
-			checkMatrix(n, m, vr, ldvr)
-		}
-		if (side == lapack.EVLeft || side == lapack.EVBoth) && m > 0 {
-			checkMatrix(n, m, vl, ldvl)
-		}
+		panic(badLWork)
+	case len(work) < max(1, lwork):
+		panic(shortWork)
 	}
 
 	// Quick return if possible.
 	if n == 0 {
 		work[0] = 1
-		return m
+		return 0
 	}
 
-	const (
-		nbmin = 8
-		nbmax = 128
-	)
-	nb := impl.Ilaenv(1, "DTREVC", string(side)+string(howmny), n, -1, -1, -1)
+	// Normally we don't check slice lengths until after the workspace
+	// query. However, even in case of the workspace query we need to
+	// compute and return the value of m, and since the computation accesses t,
+	// we put the length check of t here.
+	if len(t) < (n-1)*ldt+n {
+		panic(shortT)
+	}
+
+	if howmny == lapack.EVSelected {
+		if len(selected) != n {
+			panic(badLenSelected)
+		}
+		// Set m to the number of columns required to store the selected
+		// eigenvectors, and standardize the slice selected.
+		// Each selected real eigenvector occupies one column and each
+		// selected complex eigenvector occupies two columns.
+		for j := 0; j < n; {
+			if j == n-1 || t[(j+1)*ldt+j] == 0 {
+				// Diagonal 1×1 block corresponding to a
+				// real eigenvalue.
+				if selected[j] {
+					m++
+				}
+				j++
+			} else {
+				// Diagonal 2×2 block corresponding to a
+				// complex eigenvalue.
+				if selected[j] || selected[j+1] {
+					selected[j] = true
+					selected[j+1] = false
+					m += 2
+				}
+				j += 2
+			}
+		}
+	} else {
+		m = n
+	}
+	if mm < m {
+		panic(badMm)
+	}
 
 	// Quick return in case of a workspace query.
+	nb := impl.Ilaenv(1, "DTREVC", string(side)+string(howmny), n, -1, -1, -1)
 	if lwork == -1 {
 		work[0] = float64(n + 2*n*nb)
 		return m
 	}
 
+	// Quick return if no eigenvectors were selected.
+	if m == 0 {
+		return 0
+	}
+
+	switch {
+	case leftv && ldvl < mm:
+		panic(badLdVL)
+	case leftv && len(vl) < (n-1)*ldvl+mm:
+		panic(shortVL)
+
+	case rightv && ldvr < mm:
+		panic(badLdVR)
+	case rightv && len(vr) < (n-1)*ldvr+mm:
+		panic(shortVR)
+	}
+
 	// Use blocked version of back-transformation if sufficient workspace.
 	// Zero-out the workspace to avoid potential NaN propagation.
+	const (
+		nbmin = 8
+		nbmax = 128
+	)
 	if howmny == lapack.EVAllMulQ && lwork >= n+2*n*nbmin {
 		nb = min((lwork-n)/(2*n), nbmax)
 		impl.Dlaset(blas.All, n, 1+2*nb, 0, 0, work[:n+2*nb*n], 1+2*nb)
@@ -590,7 +614,7 @@ leftev:
 				b[k*ldb+iv] = -t[ki*ldt+k]
 			}
 			// Solve transposed quasi-triangular system:
-			//  [ T[ki+1:n,ki+1:n] - wr ]^T * X = scale*b
+			//  [ T[ki+1:n,ki+1:n] - wr ]ᵀ * X = scale*b
 			vmax := 1.0
 			vcrit := bignum
 			for j := ki + 1; j < n; {
@@ -603,10 +627,9 @@ leftev:
 						rec := 1 / vmax
 						bi.Dscal(n-ki, rec, b[ki*ldb+iv:], ldb)
 						vmax = 1
-						vcrit = bignum
 					}
 					b[j*ldb+iv] -= bi.Ddot(j-ki-1, t[(ki+1)*ldt+j:], ldt, b[(ki+1)*ldb+iv:], ldb)
-					// Solve [ T[j,j] - wr ]^T * X = b.
+					// Solve [ T[j,j] - wr ]ᵀ * X = b.
 					scale, _, _ := impl.Dlaln2(false, 1, 1, smin, 1, t[j*ldt+j:], ldt,
 						1, 1, b[j*ldb+iv:], ldb, wr, 0, x[:1], 2)
 					// Scale if necessary.
@@ -624,15 +647,14 @@ leftev:
 					// when forming the right-hand side.
 					beta := math.Max(norms[j], norms[j+1])
 					if beta > vcrit {
-						bi.Dscal(n-ki+1, 1/vmax, b[ki*ldb+iv:], 1)
+						bi.Dscal(n-ki, 1/vmax, b[ki*ldb+iv:], ldb)
 						vmax = 1
-						vcrit = bignum
 					}
 					b[j*ldb+iv] -= bi.Ddot(j-ki-1, t[(ki+1)*ldt+j:], ldt, b[(ki+1)*ldb+iv:], ldb)
 					b[(j+1)*ldb+iv] -= bi.Ddot(j-ki-1, t[(ki+1)*ldt+j+1:], ldt, b[(ki+1)*ldb+iv:], ldb)
 					// Solve
-					//  [ T[j,j]-wr  T[j,j+1]      ]^T * X = scale*[ b1 ]
-					//  [ T[j+1,j]   T[j+1,j+1]-wr ]               [ b2 ]
+					//  [ T[j,j]-wr  T[j,j+1]      ]ᵀ * X = scale*[ b1 ]
+					//  [ T[j+1,j]   T[j+1,j+1]-wr ]              [ b2 ]
 					scale, _, _ := impl.Dlaln2(true, 2, 1, smin, 1, t[j*ldt+j:], ldt,
 						1, 1, b[j*ldb+iv:], ldb, wr, 0, x[:3], 2)
 					// Scale if necessary.
@@ -680,8 +702,8 @@ leftev:
 			// Complex left eigenvector.
 
 			// Initial solve:
-			// [ [ T[ki,ki]   T[ki,ki+1]   ]^T - (wr - i* wi) ]*X = 0.
-			// [ [ T[ki+1,ki] T[ki+1,ki+1] ]                  ]
+			// [ [ T[ki,ki]   T[ki,ki+1]   ]ᵀ - (wr - i* wi) ]*X = 0.
+			// [ [ T[ki+1,ki] T[ki+1,ki+1] ]                 ]
 			if math.Abs(t[ki*ldt+ki+1]) >= math.Abs(t[(ki+1)*ldt+ki]) {
 				b[ki*ldb+iv] = wi / t[ki*ldt+ki+1]
 				b[(ki+1)*ldb+iv+1] = 1
@@ -697,7 +719,7 @@ leftev:
 				b[k*ldb+iv+1] = -b[(ki+1)*ldb+iv+1] * t[(ki+1)*ldt+k]
 			}
 			// Solve transposed quasi-triangular system:
-			// [ T[ki+2:n,ki+2:n]^T - (wr-i*wi) ]*X = b1+i*b2
+			// [ T[ki+2:n,ki+2:n]ᵀ - (wr-i*wi) ]*X = b1+i*b2
 			vmax := 1.0
 			vcrit := bignum
 			for j := ki + 2; j < n; {
@@ -711,7 +733,6 @@ leftev:
 						bi.Dscal(n-ki, rec, b[ki*ldb+iv:], ldb)
 						bi.Dscal(n-ki, rec, b[ki*ldb+iv+1:], ldb)
 						vmax = 1
-						vcrit = bignum
 					}
 					b[j*ldb+iv] -= bi.Ddot(j-ki-2, t[(ki+2)*ldt+j:], ldt, b[(ki+2)*ldb+iv:], ldb)
 					b[j*ldb+iv+1] -= bi.Ddot(j-ki-2, t[(ki+2)*ldt+j:], ldt, b[(ki+2)*ldb+iv+1:], ldb)
@@ -738,15 +759,14 @@ leftev:
 						bi.Dscal(n-ki, rec, b[ki*ldb+iv:], ldb)
 						bi.Dscal(n-ki, rec, b[ki*ldb+iv+1:], ldb)
 						vmax = 1
-						vcrit = bignum
 					}
 					b[j*ldb+iv] -= bi.Ddot(j-ki-2, t[(ki+2)*ldt+j:], ldt, b[(ki+2)*ldb+iv:], ldb)
 					b[j*ldb+iv+1] -= bi.Ddot(j-ki-2, t[(ki+2)*ldt+j:], ldt, b[(ki+2)*ldb+iv+1:], ldb)
 					b[(j+1)*ldb+iv] -= bi.Ddot(j-ki-2, t[(ki+2)*ldt+j+1:], ldt, b[(ki+2)*ldb+iv:], ldb)
 					b[(j+1)*ldb+iv+1] -= bi.Ddot(j-ki-2, t[(ki+2)*ldt+j+1:], ldt, b[(ki+2)*ldb+iv+1:], ldb)
 					// Solve 2×2 complex linear equation
-					//  [ [T[j,j]   T[j,j+1]  ]^T - (wr-i*wi)*I ]*X = scale*b
-					//  [ [T[j+1,j] T[j+1,j+1]]                 ]
+					//  [ [T[j,j]   T[j,j+1]  ]ᵀ - (wr-i*wi)*I ]*X = scale*b
+					//  [ [T[j+1,j] T[j+1,j+1]]                ]
 					scale, _, _ := impl.Dlaln2(true, 2, 2, smin, 1, t[j*ldt+j:], ldt,
 						1, 1, b[j*ldb+iv:], ldb, wr, -wi, x[:], 2)
 					// Scale if necessary.

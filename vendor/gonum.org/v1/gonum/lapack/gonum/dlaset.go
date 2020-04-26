@@ -14,27 +14,45 @@ import "gonum.org/v1/gonum/blas"
 //
 // Dlaset is an internal routine. It is exported for testing purposes.
 func (impl Implementation) Dlaset(uplo blas.Uplo, m, n int, alpha, beta float64, a []float64, lda int) {
-	checkMatrix(m, n, a, lda)
-	if uplo == blas.Upper {
+	switch {
+	case m < 0:
+		panic(mLT0)
+	case n < 0:
+		panic(nLT0)
+	case lda < max(1, n):
+		panic(badLdA)
+	}
+
+	minmn := min(m, n)
+	if minmn == 0 {
+		return
+	}
+
+	if len(a) < (m-1)*lda+n {
+		panic(shortA)
+	}
+
+	switch uplo {
+	case blas.Upper:
 		for i := 0; i < m; i++ {
 			for j := i + 1; j < n; j++ {
 				a[i*lda+j] = alpha
 			}
 		}
-	} else if uplo == blas.Lower {
+	case blas.Lower:
 		for i := 0; i < m; i++ {
-			for j := 0; j < min(i+1, n); j++ {
+			for j := 0; j < min(i, n); j++ {
 				a[i*lda+j] = alpha
 			}
 		}
-	} else {
+	default:
 		for i := 0; i < m; i++ {
 			for j := 0; j < n; j++ {
 				a[i*lda+j] = alpha
 			}
 		}
 	}
-	for i := 0; i < min(m, n); i++ {
+	for i := 0; i < minmn; i++ {
 		a[i*lda+i] = beta
 	}
 }

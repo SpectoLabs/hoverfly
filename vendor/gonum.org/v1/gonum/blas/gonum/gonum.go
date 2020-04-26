@@ -6,7 +6,11 @@
 
 package gonum
 
-import "math"
+import (
+	"math"
+
+	"gonum.org/v1/gonum/internal/math32"
+)
 
 type Implementation struct{}
 
@@ -37,115 +41,6 @@ func min(a, b int) int {
 	return a
 }
 
-func checkSMatrix(name byte, m, n int, a []float32, lda int) {
-	if m < 0 {
-		panic(mLT0)
-	}
-	if n < 0 {
-		panic(nLT0)
-	}
-	if lda < n {
-		panic("blas: illegal stride of " + string(name))
-	}
-	if len(a) < (m-1)*lda+n {
-		panic("blas: index of " + string(name) + " out of range")
-	}
-}
-
-func checkDMatrix(name byte, m, n int, a []float64, lda int) {
-	if m < 0 {
-		panic(mLT0)
-	}
-	if n < 0 {
-		panic(nLT0)
-	}
-	if lda < n {
-		panic("blas: illegal stride of " + string(name))
-	}
-	if len(a) < (m-1)*lda+n {
-		panic("blas: index of " + string(name) + " out of range")
-	}
-}
-
-func checkZMatrix(name byte, m, n int, a []complex128, lda int) {
-	if m < 0 {
-		panic(mLT0)
-	}
-	if n < 0 {
-		panic(nLT0)
-	}
-	if lda < max(1, n) {
-		panic("blas: illegal stride of " + string(name))
-	}
-	if len(a) < (m-1)*lda+n {
-		panic("blas: insufficient " + string(name) + " matrix slice length")
-	}
-}
-
-func checkZBandMatrix(name byte, m, n, kL, kU int, ab []complex128, ldab int) {
-	if m < 0 {
-		panic(mLT0)
-	}
-	if n < 0 {
-		panic(nLT0)
-	}
-	if kL < 0 {
-		panic(kLLT0)
-	}
-	if kU < 0 {
-		panic(kULT0)
-	}
-	if ldab < kL+kU+1 {
-		panic("blas: illegal stride of band matrix " + string(name))
-	}
-	nRow := min(m, n+kL)
-	if len(ab) < (nRow-1)*ldab+kL+1+kU {
-		panic("blas: insufficient " + string(name) + " band matrix slice length")
-	}
-}
-
-func checkZhbMatrix(name byte, n, k int, ab []complex128, ldab int) {
-	if n < 0 {
-		panic(nLT0)
-	}
-	if k < 0 {
-		panic(kLT0)
-	}
-	if ldab < k+1 {
-		panic("blas: illegal stride of Hermitian band matrix " + string(name))
-	}
-	if len(ab) < (n-1)*ldab+k+1 {
-		panic("blas: insufficient " + string(name) + " Hermitian band matrix slice length")
-	}
-}
-
-func checkZtbMatrix(name byte, n, k int, ab []complex128, ldab int) {
-	if n < 0 {
-		panic(nLT0)
-	}
-	if k < 0 {
-		panic(kLT0)
-	}
-	if ldab < k+1 {
-		panic("blas: illegal stride of triangular band matrix " + string(name))
-	}
-	if len(ab) < (n-1)*ldab+k+1 {
-		panic("blas: insufficient " + string(name) + " triangular band matrix slice length")
-	}
-}
-
-func checkZVector(name byte, n int, x []complex128, incX int) {
-	if n < 0 {
-		panic(nLT0)
-	}
-	if incX == 0 {
-		panic(zeroIncX)
-	}
-	if (incX > 0 && (n-1)*incX >= len(x)) || (incX < 0 && (1-n)*incX >= len(x)) {
-		panic("blas: insufficient " + string(name) + " vector slice length")
-	}
-}
-
 // blocks returns the number of divisions of the dimension length with the given
 // block size.
 func blocks(dim, bsize int) int {
@@ -155,4 +50,9 @@ func blocks(dim, bsize int) int {
 // dcabs1 returns |real(z)|+|imag(z)|.
 func dcabs1(z complex128) float64 {
 	return math.Abs(real(z)) + math.Abs(imag(z))
+}
+
+// scabs1 returns |real(z)|+|imag(z)|.
+func scabs1(z complex64) float32 {
+	return math32.Abs(real(z)) + math32.Abs(imag(z))
 }

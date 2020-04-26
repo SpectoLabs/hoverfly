@@ -1,59 +1,78 @@
-# Minify [![Build Status](https://travis-ci.org/tdewolff/minify.svg?branch=master)](https://travis-ci.org/tdewolff/minify) [![GoDoc](http://godoc.org/github.com/tdewolff/minify?status.svg)](http://godoc.org/github.com/tdewolff/minify) [![Join the chat at https://gitter.im/tdewolff/minify](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/tdewolff/minify?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# Minify <a name="minify"></a> [![Build Status](https://travis-ci.org/tdewolff/minify.svg?branch=master)](https://travis-ci.org/tdewolff/minify) [![GoDoc](http://godoc.org/github.com/tdewolff/minify?status.svg)](http://godoc.org/github.com/tdewolff/minify) [![Coverage Status](https://coveralls.io/repos/github/tdewolff/minify/badge.svg?branch=master)](https://coveralls.io/github/tdewolff/minify?branch=master) [![Join the chat at https://gitter.im/tdewolff/minify](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/tdewolff/minify?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-**I will be away for 5 months, starting May. v2 should be the preferred stable release to use. Master has some new changes for SVG that haven't yet endured the test of time, bug reports are appreciated.**
+**[Online demo](https://go.tacodewolff.nl/minify) if you need to minify files *now*.**
 
-Minify is a minifier package written in [Go][1]. It has build-in HTML5, CSS3, JS, JSON, SVG and XML minifiers and provides an interface to implement any minifier. Minification is the process of removing bytes from a file (such as whitespace) without changing its output and therefore speeding up transmission over the internet. The implemented minifiers are high performance and streaming (which implies O(n)).
+**[Command line tool](https://github.com/tdewolff/minify/tree/master/cmd/minify) that minifies concurrently and supports watching file changes.**
 
-It associates minification functions with mimetypes, allowing embedded resources (like CSS or JS in HTML files) to be minified too. The user can add any mime-based implementation. Users can also implement a mimetype using an external command (like the ClosureCompiler, UglifyCSS, ...). It is possible to pass parameters through the mediatype to specify the charset for example.
+**[All releases](https://github.com/tdewolff/minify/releases) for various platforms.**
 
-[Demo](http://go.tacodewolff.nl/) · [CLI](https://github.com/tdewolff/minify/tree/master/cmd/minify) · [Download](https://dl.equinox.io/tdewolff/minify/stable)
+---
+
+Minify is a minifier package written in [Go][1]. It provides HTML5, CSS3, JS, JSON, SVG and XML minifiers and an interface to implement any other minifier. Minification is the process of removing bytes from a file (such as whitespace) without changing its output and therefore shrinking its size and speeding up transmission over the internet and possibly parsing. The implemented minifiers are designed for high performance.
+
+The core functionality associates mimetypes with minification functions, allowing embedded resources (like CSS or JS within HTML files) to be minified as well. Users can add new implementations that are triggered based on a mimetype (or pattern), or redirect to an external command (like ClosureCompiler, UglifyCSS, ...).
 
 #### Table of Contents
 
-- [Minify](#minify---)
+- [Minify](#minify)
 	- [Prologue](#prologue)
 	- [Installation](#installation)
 	- [API stability](#api-stability)
 	- [Testing](#testing)
-	- [HTML](#html--)
+	- [Performance](#performance)
+	- [HTML](#html)
 		- [Whitespace removal](#whitespace-removal)
-	- [CSS](#css--)
-	- [JS](#js--)
-	- [JSON](#json--)
-	- [SVG](#svg--)
-	- [XML](#xml--)
+	- [CSS](#css)
+	- [JS](#js)
+	- [JSON](#json)
+	- [SVG](#svg)
+	- [XML](#xml)
 	- [Usage](#usage)
 		- [New](#new)
 		- [From reader](#from-reader)
 		- [From bytes](#from-bytes)
 		- [From string](#from-string)
+		- [To reader](#to-reader)
+		- [To writer](#to-writer)
+		- [Middleware](#middleware)
 		- [Custom minifier](#custom-minifier)
 		- [Mediatypes](#mediatypes)
 	- [Examples](#examples)
 		- [Common minifiers](#common-minifiers)
-		- [Custom minifier](#custom-minifier-1)
+		- [Custom minifier](#custom-minifier-example)
 		- [ResponseWriter](#responsewriter)
 		- [Templates](#templates)
 	- [License](#license)
 
-#### Status
+### Status
 
 * CSS: **fully implemented**
 * HTML: **fully implemented**
-* JS: basic JSmin-like implementation
+* JS: improved JSmin implementation
 * JSON: **fully implemented**
 * SVG: partially implemented; in development
 * XML: **fully implemented**
 
-## Prologue
-Minifiers or bindings to minifiers exist in almost all programming languages. Some implementations are merely using several regular-expressions to trim whitespace and comments (even though regex for parsing HTML/XML is ill-advised, for a good read see [Regular Expressions: Now You Have Two Problems](http://blog.codinghorror.com/regular-expressions-now-you-have-two-problems/)). Some implementations are much more profound, such as the [YUI Compressor](http://yui.github.io/yuicompressor/) and [Google Closure Compiler](https://github.com/google/closure-compiler) for JS. As most existing implementations either use Java or JavaScript and don't focus on performance, they are pretty slow. And loading the whole file into memory is bad for really large files (or impossible for infinite streams).
+### Roadmap
 
-This minifier proves to be that fast and extensive minifier that can handle HTML and any other filetype it may contain (CSS, JS, ...). It streams the input and output and can minify files concurrently.
+- [ ] General speed-up of all minifiers (use ASM for whitespace funcs)
+- [ ] Improve JS minifiers by shortening variables and proper semicolon omission
+- [ ] Speed-up SVG minifier, it is very slow
+- [x] Proper parser error reporting and line number + column information
+- [ ] Generation of source maps (uncertain, might slow down parsers too much if it cannot run separately nicely)
+- [ ] Look into compression of images, fonts and other web resources (into package `compress`)?
+- [ ] Create a cmd to pack webfiles (much like webpack), ie. merging CSS and JS files, inlining small external files, minification and gzipping. This would work on HTML files.
+- [ ] Create a package to format files, much like `gofmt` for Go files?
+
+## Prologue
+Minifiers or bindings to minifiers exist in almost all programming languages. Some implementations are merely using several regular-expressions to trim whitespace and comments (even though regex for parsing HTML/XML is ill-advised, for a good read see [Regular Expressions: Now You Have Two Problems](http://blog.codinghorror.com/regular-expressions-now-you-have-two-problems/)). Some implementations are much more profound, such as the [YUI Compressor](http://yui.github.io/yuicompressor/) and [Google Closure Compiler](https://github.com/google/closure-compiler) for JS. As most existing implementations either use JavaScript, use regexes, and don't focus on performance, they are pretty slow.
+
+This minifier proves to be that fast and extensive minifier that can handle HTML and any other filetype it may contain (CSS, JS, ...). It is usually orders of magnitude faster than existing minifiers.
 
 ## Installation
 Run the following command
 
-	go get github.com/tdewolff/minify
+	go get -u github.com/tdewolff/minify
 
 or add the following imports and run the project with `go get`
 ``` go
@@ -71,36 +90,67 @@ import (
 ## API stability
 There is no guarantee for absolute stability, but I take issues and bugs seriously and don't take API changes lightly. The library will be maintained in a compatible way unless vital bugs prevent me from doing so. There has been one API change after v1 which added options support and I took the opportunity to push through some more API clean up as well. There are no plans whatsoever for future API changes.
 
-- minify-v1.0.0 depends on parse-v1.0.0
-- minify-v1.1.0 depends on parse-v1.1.0
-- minify-v2.0.0 depends on parse-v2.0.0
-- minify-tip will always compile with my other packages on tip
-
-The API differences between v1 and v2 are listed below. If `m := minify.New()` and `w` and `r` are your writer and reader respectfully, then **v1** &#8594; **v2**:
- - `minify.Bytes(m, ...)` &#8594; `m.Bytes(...)`
- - `minify.String(m, ...)` &#8594; `m.String(...)`
- - `html.Minify(m, "text/html", w, r)` &#8594; `html.Minify(m, w, r, nil)` also for `css`, `js`, ...
- - `css.Minify(m, "text/css;inline=1", w, r)` &#8594; `css.Minify(m, w, r, map[string]string{"inline":"1"})`
-
 ## Testing
 For all subpackages and the imported `parse` and `buffer` packages, test coverage of 100% is pursued. Besides full coverage, the minifiers are [fuzz tested](https://github.com/tdewolff/fuzz) using [github.com/dvyukov/go-fuzz](http://www.github.com/dvyukov/go-fuzz), see [the wiki](https://github.com/tdewolff/minify/wiki) for the most important bugs found by fuzz testing. Furthermore am I working on adding visual testing to ensure that minification doesn't change anything visually. By using the WebKit browser to render the original and minified pages we can check whether any pixel is different.
 
 These tests ensure that everything works as intended, the code does not crash (whatever the input) and that it doesn't change the final result visually. If you still encounter a bug, please report [here](https://github.com/tdewolff/minify/issues)!
 
+## Performance
+The benchmarks directory contains a number of standardized samples used to compare performance between changes. To give an indication of the speed of this library, I've ran the tests on my Thinkpad T460 (i5-6300U quad-core 2.4GHz running Arch Linux) using Go 1.9.2.
+
+```
+name                              time/op
+CSS/sample_bootstrap.css-4          2.26ms ± 0%
+CSS/sample_gumby.css-4              2.92ms ± 1%
+HTML/sample_amazon.html-4           2.33ms ± 2%
+HTML/sample_bbc.html-4              1.02ms ± 1%
+HTML/sample_blogpost.html-4          171µs ± 2%
+HTML/sample_es6.html-4              14.5ms ± 0%
+HTML/sample_stackoverflow.html-4    2.41ms ± 1%
+HTML/sample_wikipedia.html-4        4.76ms ± 0%
+JS/sample_ace.js-4                  7.41ms ± 0%
+JS/sample_dot.js-4                  63.7µs ± 0%
+JS/sample_jquery.js-4               2.99ms ± 0%
+JS/sample_jqueryui.js-4             5.92ms ± 2%
+JS/sample_moment.js-4               1.09ms ± 1%
+JSON/sample_large.json-4            2.95ms ± 0%
+JSON/sample_testsuite.json-4        1.51ms ± 1%
+JSON/sample_twitter.json-4          6.75µs ± 1%
+SVG/sample_arctic.svg-4             62.3ms ± 1%
+SVG/sample_gopher.svg-4              218µs ± 0%
+SVG/sample_usa.svg-4                33.1ms ± 3%
+XML/sample_books.xml-4              36.2µs ± 0%
+XML/sample_catalog.xml-4            14.9µs ± 0%
+XML/sample_omg.xml-4                6.31ms ± 1%
+
+name                              speed
+CSS/sample_bootstrap.css-4        60.8MB/s ± 0%
+CSS/sample_gumby.css-4            63.9MB/s ± 1%
+HTML/sample_amazon.html-4          203MB/s ± 2%
+HTML/sample_bbc.html-4             113MB/s ± 1%
+HTML/sample_blogpost.html-4        123MB/s ± 2%
+HTML/sample_es6.html-4            70.7MB/s ± 0%
+HTML/sample_stackoverflow.html-4  85.2MB/s ± 1%
+HTML/sample_wikipedia.html-4      93.6MB/s ± 0%
+JS/sample_ace.js-4                86.9MB/s ± 0%
+JS/sample_dot.js-4                81.0MB/s ± 0%
+JS/sample_jquery.js-4             82.8MB/s ± 0%
+JS/sample_jqueryui.js-4           79.3MB/s ± 2%
+JS/sample_moment.js-4             91.2MB/s ± 1%
+JSON/sample_large.json-4           258MB/s ± 0%
+JSON/sample_testsuite.json-4       457MB/s ± 1%
+JSON/sample_twitter.json-4         226MB/s ± 1%
+SVG/sample_arctic.svg-4           23.6MB/s ± 1%
+SVG/sample_gopher.svg-4           26.7MB/s ± 0%
+SVG/sample_usa.svg-4              30.9MB/s ± 3%
+XML/sample_books.xml-4             122MB/s ± 0%
+XML/sample_catalog.xml-4           130MB/s ± 0%
+XML/sample_omg.xml-4               180MB/s ± 1%
+```
+
 ## HTML
 
-HTML (with JS and CSS) minification typically runs at about 40MB/s ~= 140GB/h, depending on the composition of the file.
-
-Website | Original | Minified | Ratio | Time<sup>&#42;</sup>
-------- | -------- | -------- | ----- | -----------------------
-[Amazon](http://www.amazon.com/) | 463kB | **414kB** | 90% | 11ms
-[BBC](http://www.bbc.com/) | 113kB | **96kB** | 85% | 3ms
-[StackOverflow](http://stackoverflow.com/) | 201kB | **182kB** | 91% | 5ms
-[Wikipedia](http://en.wikipedia.org/wiki/President_of_the_United_States) | 435kB | **410kB** | 94%<sup>&#42;&#42;</sup> | 10ms
-
-<sup>&#42;</sup>These times are measured on my home computer which is an average development computer. The duration varies a lot but it's important to see it's in the 10ms range! The benchmark uses all the minifiers and excludes reading from and writing to the file from the measurement.
-
-<sup>&#42;&#42;</sup>Is already somewhat minified, so this doesn't reflect the full potential of this minifier.
+HTML (with JS and CSS) minification typically shaves off about 10%.
 
 The HTML5 minifier uses these minifications:
 
@@ -111,14 +161,17 @@ The HTML5 minifier uses these minifications:
 - strip unrequired tags (`html`, `head`, `body`, ...)
 - strip unrequired end tags (`tr`, `td`, `li`, ... and often `p`)
 - strip default protocols (`http:`, `https:` and `javascript:`)
-- strip comments (except conditional comments)
+- strip all comments (including conditional comments, old IE versions are not supported anymore by Microsoft)
 - shorten `doctype` and `meta` charset
 - lowercase tags, attributes and some values to enhance gzip compression
 
 Options:
 
-- `KeepDefaultAttrVals` do not remove default attribute value such as `<script type="text/javascript">`
-- `KeepWhitespace` do not remove whitespace between inline tags but still collapse multiple whitespace characters into one
+- `KeepConditionalComments` preserve all IE conditional comments such as `<!--[if IE 6]><![endif]-->` and `<![if IE 6]><![endif]>`, see https://msdn.microsoft.com/en-us/library/ms537512(v=vs.85).aspx#syntax
+- `KeepDefaultAttrVals` preserve default attribute values such as `<script type="application/javascript">`
+- `KeepDocumentTags` preserve `html`, `head` and `body` tags
+- `KeepEndTags` preserve all end tags
+- `KeepWhitespace` preserve whitespace between inline tags but still collapse multiple whitespace characters into one
 
 After recent benchmarking and profiling it became really fast and minifies pages in the 10ms range, making it viable for on-the-fly minification.
 
@@ -131,32 +184,27 @@ Make sure your HTML doesn't depend on whitespace between `block` elements that h
 
 ## CSS
 
-Minification typically runs at about 25MB/s ~= 90GB/h.
-
-Library | Original | Minified | Ratio | Time<sup>&#42;</sup>
-------- | -------- | -------- | ----- | -----------------------
-[Bootstrap](http://getbootstrap.com/) | 134kB | **111kB** | 83% | 5ms
-[Gumby](http://gumbyframework.com/) | 182kB | **167kB** | 90% | 7ms
-
-<sup>&#42;</sup>The benchmark excludes the time reading from and writing to a file from the measurement.
+Minification typically shaves off about 10%-15%. This CSS minifier will _not_ do structural changes to your stylesheets. Although this could result in smaller files, the complexity is quite high and the risk of breaking website is high too.
 
 The CSS minifier will only use safe minifications:
 
-- remove comments and unnecessary whitespace
+- remove comments and unnecessary whitespace (but keep `/*! ... */` which usually contains the license)
 - remove trailing semicolons
 - optimize `margin`, `padding` and `border-width` number of sides
 - shorten numbers by removing unnecessary `+` and zeros and rewriting with/without exponent
 - remove dimension and percentage for zero values
 - remove quotes for URLs
 - remove quotes for font families and make lowercase
-- rewrite hex colors to/from color names, or to 3 digit hex
+- rewrite hex colors to/from color names, or to three digit hex
 - rewrite `rgb(`, `rgba(`, `hsl(` and `hsla(` colors to hex or name
+- use four digit hex for alpha values (`transparent` &#8594; `#0000`)
 - replace `normal` and `bold` by numbers for `font-weight` and `font`
 - replace `none` &#8594; `0` for `border`, `background` and `outline`
 - lowercase all identifiers except classes, IDs and URLs to enhance gzip compression
 - shorten MS alpha function
 - rewrite data URIs with base64 or ASCII whichever is shorter
 - calls minifier for data URI mediatypes, thus you can compress embedded SVG files if you have that minifier attached
+- shorten aggregate declarations such as `background` and `font`
 
 It does purposely not use the following techniques:
 
@@ -169,22 +217,18 @@ It does purposely not use the following techniques:
 - rewrite attribute selectors for IDs and classes (`div[id=a]` &#8594; `div#a`)
 - put space after pseudo-selectors (IE6 is old, move on!)
 
-It's great that so many other tools make comparison tables: [CSS Minifier Comparison](http://www.codenothing.com/benchmarks/css-compressor-3.0/full.html), [CSS minifiers comparison](http://www.phpied.com/css-minifiers-comparison/) and [CleanCSS tests](http://goalsmashers.github.io/css-minification-benchmark/). From the last link, this CSS minifier is almost without doubt the fastest and has near-perfect minification rates. It falls short with the purposely not implemented and often unsafe techniques, so that's fine.
+There are a couple of comparison tables online, such as [CSS Minifier Comparison](http://www.codenothing.com/benchmarks/css-compressor-3.0/full.html), [CSS minifiers comparison](http://www.phpied.com/css-minifiers-comparison/) and [CleanCSS tests](http://goalsmashers.github.io/css-minification-benchmark/). Comparing speed between each, this minifier will usually be between 10x-300x faster than existing implementations, and even rank among the top for minification ratios. It falls short with the purposely not implemented and often unsafe techniques.
+
+Options:
+
+- `Decimals` number of decimals to preserve for numbers, `-1` means no trimming
+- `KeepCSS2` prohibits using CSS3 syntax (such as exponents in numbers, or `rgba(` &#8594; `rgb(`), might be incomplete
 
 ## JS
 
 The JS minifier is pretty basic. It removes comments, whitespace and line breaks whenever it can. It employs all the rules that [JSMin](http://www.crockford.com/javascript/jsmin.html) does too, but has additional improvements. For example the prefix-postfix bug is fixed.
 
-Minification typically runs at about 45MB/s ~= 160GB/h. Common speeds of PHP and JS implementations are about 100-300kB/s (see [Uglify2](http://lisperator.net/uglifyjs/), [Adventures in PHP web asset minimization](https://www.happyassassin.net/2014/12/29/adventures-in-php-web-asset-minimization/)).
-
-Library | Original | Minified | Ratio | Time<sup>&#42;</sup>
-------- | -------- | -------- | ----- | -----------------------
-[ACE](https://github.com/ajaxorg/ace-builds) | 630kB | **442kB** | 70% | 14ms
-[jQuery](http://jquery.com/download/) | 242kB | **130kB** | 54% | 5ms
-[jQuery UI](http://jqueryui.com/download/) | 459kB | **300kB** | 65% | 11ms
-[Moment](http://momentjs.com/) | 97kB | **51kB** | 52% | 2ms
-
-<sup>&#42;</sup>The benchmark excludes the time reading from and writing to a file from the measurement.
+Common speeds of PHP and JS implementations are about 100-300kB/s (see [Uglify2](http://lisperator.net/uglifyjs/), [Adventures in PHP web asset minimization](https://www.happyassassin.net/2014/12/29/adventures-in-php-web-asset-minimization/)). This implementation or orders of magnitude faster, around ~80MB/s.
 
 TODO:
 - shorten local variables / function parameters names
@@ -192,13 +236,11 @@ TODO:
 
 ## JSON
 
-Minification typically runs at about 95MB/s ~= 340GB/h. It shaves off about 15% of filesize for common indented JSON such as generated by [JSON Generator](http://www.json-generator.com/).
+Minification typically shaves off about 15% of filesize for common indented JSON such as generated by [JSON Generator](http://www.json-generator.com/).
 
 The JSON minifier only removes whitespace, which is the only thing that can be left out.
 
 ## SVG
-
-Minification typically runs at about 15MB/s ~= 55GB/h. Performance improvement are due.
 
 The SVG minifier uses these minifications:
 
@@ -207,7 +249,6 @@ The SVG minifier uses these minifications:
 - strip SVG version
 - strip CDATA sections wherever possible
 - collapse tags with no content to a void tag
-- collapse empty container tags (`g`, `svg`, ...)
 - minify style tag and attributes with the CSS minifier
 - minify colors
 - shorten lengths and numbers and remove default `px` unit
@@ -218,11 +259,12 @@ The SVG minifier uses these minifications:
 TODO:
 - convert attributes to style attribute whenever shorter
 - merge path data? (same style and no intersection -- the latter is difficult)
-- truncate decimals
+
+Options:
+
+- `Decimals` number of decimals to preserve for numbers, `-1` means no trimming
 
 ## XML
-
-Minification typically runs at about 70MB/s ~= 250GB/h.
 
 The XML minifier uses these minifications:
 
@@ -233,10 +275,10 @@ The XML minifier uses these minifications:
 
 Options:
 
-- `KeepWhitespace` do not remove whitespace between inline tags but still collapse multiple whitespace characters into one
+- `KeepWhitespace` preserve whitespace between inline tags but still collapse multiple whitespace characters into one
 
 ## Usage
-Any input stream is being buffered by the minification functions. This is how the underlying buffer package inherently works to ensure high performance. The output stream however is not buffer. It is wise to preallocate a buffer as big as the input to which the output is written, or otherwise use `bufio` to buffer to a streaming writer.
+Any input stream is being buffered by the minification functions. This is how the underlying buffer package inherently works to ensure high performance. The output stream however is not buffered. It is wise to preallocate a buffer as big as the input to which the output is written, or otherwise use `bufio` to buffer to a streaming writer.
 
 ### New
 Retrieve a minifier struct which holds a map of mediatype &#8594; minifier functions.
@@ -249,8 +291,8 @@ The following loads all provided minifiers.
 m := minify.New()
 m.AddFunc("text/css", css.Minify)
 m.AddFunc("text/html", html.Minify)
-m.AddFunc("text/javascript", js.Minify)
 m.AddFunc("image/svg+xml", svg.Minify)
+m.AddFuncRegexp(regexp.MustCompile("^(application|text)/(x-)?(java|ecma)script$"), js.Minify)
 m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
 m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
 ```
@@ -267,33 +309,6 @@ m.Add("text/html", &html.Minifier{
 Minify from an `io.Reader` to an `io.Writer` for a specific mediatype.
 ``` go
 if err := m.Minify(mediatype, w, r); err != nil {
-	panic(err)
-}
-```
-
-Minify formats directly from an `io.Reader` to an `io.Writer`. The `params map[string]string` would contain the mediatype parameters, pass `nil` if non-existent.
-``` go
-if err := css.Minify(m, w, r, params); err != nil {
-	panic(err)
-}
-
-if err := html.Minify(m, w, r, params); err != nil {
-	panic(err)
-}
-
-if err := js.Minify(m, w, r, params); err != nil {
-	panic(err)
-}
-
-if err := json.Minify(m, w, r, params); err != nil {
-	panic(err)
-}
-
-if err := svg.Minify(m, w, r, params); err != nil {
-	panic(err)
-}
-
-if err := xml.Minify(m, w, r, params); err != nil {
 	panic(err)
 }
 ```
@@ -316,7 +331,7 @@ if err != nil {
 }
 ```
 
-### From reader
+### To reader
 Get a minifying reader for a specific mediatype.
 ``` go
 mr := m.Reader(mediatype, r)
@@ -325,14 +340,23 @@ if _, err := mr.Read(b); err != nil {
 }
 ```
 
-### From writer
+### To writer
 Get a minifying writer for a specific mediatype. Must be explicitly closed because it uses an `io.Pipe` underneath.
 ``` go
 mw := m.Writer(mediatype, w)
-mw.Write([]byte("input"))
+if mw.Write([]byte("input")); err != nil {
+	panic(err)
+}
 if err := mw.Close(); err != nil {
 	panic(err)
 }
+```
+
+### Middleware
+Minify resources on the fly using middleware. It passes a wrapped response writer to the handler that removes the Content-Length header. The minifier is chosen based on the Content-Type header or, if the header is empty, by the request URI file extension. This is on-the-fly processing, you should preferably cache the results though!
+``` go
+fs := http.FileServer(http.Dir("www/"))
+http.Handle("/", m.Middleware(fs))
 ```
 
 ### Custom minifier
@@ -399,13 +423,13 @@ func main() {
 	m := minify.New()
 	m.AddFunc("text/css", css.Minify)
 	m.AddFunc("text/html", html.Minify)
-	m.AddFunc("text/javascript", js.Minify)
 	m.AddFunc("image/svg+xml", svg.Minify)
+	m.AddFuncRegexp(regexp.MustCompile("^(application|text)/(x-)?(java|ecma)script$"), js.Minify)
 	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
 	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
 
 	// Or use the following for better minification of JS but lower speed:
-	// m.AddCmd("text/javascript", exec.Command("java", "-jar", "build/compiler.jar"))
+	// m.AddCmdRegexp(regexp.MustCompile("^(application|text)/(x-)?(java|ecma)script$"), exec.Command("java", "-jar", "build/compiler.jar"))
 
 	if err := m.Minify("text/html", os.Stdout, os.Stdin); err != nil {
 		panic(err)
@@ -413,7 +437,7 @@ func main() {
 }
 ```
 
-### Custom minifier
+### <a name="custom-minifier-example"></a> Custom minifier
 Custom minifier showing an example that implements the minifier function interface. Within a custom minifier, it is possible to call any minifier function (through `m minify.Minifier`) recursively when dealing with embedded resources.
 ``` go
 package main
@@ -459,6 +483,34 @@ func main() {
 ```
 
 ### ResponseWriter
+#### Middleware
+``` go
+func main() {
+	m := minify.New()
+	m.AddFunc("text/css", css.Minify)
+	m.AddFunc("text/html", html.Minify)
+	m.AddFunc("image/svg+xml", svg.Minify)
+	m.AddFuncRegexp(regexp.MustCompile("^(application|text)/(x-)?(java|ecma)script$"), js.Minify)
+	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), json.Minify)
+	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
+
+	fs := http.FileServer(http.Dir("www/"))
+	http.Handle("/", m.Middleware(fs))
+}
+```
+
+#### ResponseWriter
+``` go
+func Serve(w http.ResponseWriter, r *http.Request) {
+	mw := m.ResponseWriter(w, r)
+	defer mw.Close()
+	w = mw
+
+	http.ServeFile(w, r, path.Join("www", r.URL.Path))
+}
+```
+
+#### Custom response writer
 ResponseWriter example which returns a ResponseWriter that minifies the content and then writes to the original ResponseWriter. Any write after applying this filter will be minified.
 ``` go
 type MinifyResponseWriter struct {
@@ -484,7 +536,12 @@ func MinifyFilter(mediatype string, res http.ResponseWriter) MinifyResponseWrite
 // Usage
 func(w http.ResponseWriter, req *http.Request) {
 	w = MinifyFilter("text/html", w)
-	io.WriteString(w, "<p class="message"> This HTTP response will be minified. </p>")
+	if _, err := io.WriteString(w, "<p class="message"> This HTTP response will be minified. </p>"); err != nil {
+		panic(err)
+	}
+	if err := w.Close(); err != nil {
+		panic(err)
+	}
 	// Output: <p class=message>This HTTP response will be minified.
 }
 ```

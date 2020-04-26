@@ -2,13 +2,13 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.14
       - image: circleci/node:6.10.3
 
     environment:
       GOPATH: /go
 
-    working_directory: /go/src/github.com/SpectoLabs/hoverfly
+    working_directory: ~/hoverfly
 
     steps:
       - checkout
@@ -27,12 +27,12 @@ jobs:
 
   deploy-master:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.14
 
     environment:
       GOPATH: /go
 
-    working_directory: /go/src/github.com/SpectoLabs/hoverfly
+    working_directory: ~/hoverfly
 
     steps:
       - setup_remote_docker
@@ -50,7 +50,7 @@ jobs:
       - run:
           name: Install gox
           command: |
-            go get github.com/mitchellh/gox
+            GO111MODULE=off go get github.com/mitchellh/gox
       - run:
           name: Install gcloud
           command: |
@@ -63,15 +63,15 @@ jobs:
       - run:
           name: Build cross platform releases
           command: |
-            GIT_TAG_NAME=master-$CIRCLE_BUILD_NUM SHELL=/bin/bash $GOPATH/src/github.com/SpectoLabs/hoverfly/build-release.sh
+            GIT_TAG_NAME=master-$CIRCLE_BUILD_NUM SHELL=/bin/bash ./build-release.sh
       - run:
           name: Upload dated cross platform releases to GCS
           command: |
-            cd $GOPATH/src/github.com/SpectoLabs/hoverfly/target && for f in hoverfly_bundle*;do ../google-cloud-sdk/bin/gsutil cp $f gs://hoverfly-master-builds/$(date +%Y%m%d%H%M)/$f; done
+            cd ./target && for f in hoverfly_bundle*;do ../google-cloud-sdk/bin/gsutil cp $f gs://hoverfly-master-builds/$(date +%Y%m%d%H%M)/$f; done
       - run:
           name: Upload latest cross platform releases to GCS
           command: |
-            cd $GOPATH/src/github.com/SpectoLabs/hoverfly/target && for f in hoverfly_bundle*;do ../google-cloud-sdk/bin/gsutil cp $f gs://hoverfly-master-builds/latest/$f; done
+            cd ./target && for f in hoverfly_bundle*;do ../google-cloud-sdk/bin/gsutil cp $f gs://hoverfly-master-builds/latest/$f; done
       - run:
           name: Set read access in GCS            
           command: |
@@ -79,12 +79,12 @@ jobs:
 
   deploy-release:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.14
 
     environment:
       GOPATH: /go
 
-    working_directory: /go/src/github.com/SpectoLabs/hoverfly
+    working_directory: ~/hoverfly
 
     steps:
       - setup_remote_docker
@@ -104,19 +104,19 @@ jobs:
       - run:
           name: Install gox
           command: |
-            go get github.com/mitchellh/gox
+            GO111MODULE=off go get github.com/mitchellh/gox
       - run:
           name: Install github-release
           command: |
-            go get github.com/aktau/github-release
+            GO111MODULE=off go get github.com/aktau/github-release
       - run:
           name: Build cross platform releases
           command: |
-            GIT_TAG_NAME=master-$CIRCLE_BUILD_NUM SHELL=/bin/bash $GOPATH/src/github.com/SpectoLabs/hoverfly/build-release.sh
+            GIT_TAG_NAME=master-$CIRCLE_BUILD_NUM SHELL=/bin/bash ./build-release.sh
       - run:
           name: Upload latest cross platform releases to Github
           command: |
-            cd $GOPATH/src/github.com/SpectoLabs/hoverfly/target && for f in hoverfly_bundle*;do github-release upload  --user SpectoLabs --repo hoverfly --tag "$CIRCLE_TAG" --name "$f" --file "$f"; done
+            cd ./target && for f in hoverfly_bundle*;do github-release upload  --user SpectoLabs --repo hoverfly --tag "$CIRCLE_TAG" --name "$f" --file "$f"; done
 
 workflows:
   version: 2

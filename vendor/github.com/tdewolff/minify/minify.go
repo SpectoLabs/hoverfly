@@ -4,13 +4,16 @@ package minify // import "github.com/tdewolff/minify"
 import (
 	"errors"
 	"io"
+	"mime"
+	"net/http"
 	"net/url"
 	"os/exec"
+	"path"
 	"regexp"
 	"sync"
 
-	"github.com/tdewolff/buffer"
 	"github.com/tdewolff/parse"
+	"github.com/tdewolff/parse/buffer"
 )
 
 // ErrNotExist is returned when no minifier exists for a given mimetype.
@@ -18,9 +21,11 @@ var ErrNotExist = errors.New("minifier does not exist for mimetype")
 
 ////////////////////////////////////////////////////////////////
 
-type minifierFunc func(*M, io.Writer, io.Reader, map[string]string) error
+// MinifierFunc is a function that implements Minifer.
+type MinifierFunc func(*M, io.Writer, io.Reader, map[string]string) error
 
-func (f minifierFunc) Minify(m *M, w io.Writer, r io.Reader, params map[string]string) error {
+// Minify calls f(m, w, r, params)
+func (f MinifierFunc) Minify(m *M, w io.Writer, r io.Reader, params map[string]string) error {
 	return f(m, w, r, params)
 }
 
@@ -74,7 +79,7 @@ func (m *M) Add(mimetype string, minifier Minifier) {
 }
 
 // AddFunc adds a minify function to the mimetype => function map (unsafe for concurrent use).
-func (m *M) AddFunc(mimetype string, minifier minifierFunc) {
+func (m *M) AddFunc(mimetype string, minifier MinifierFunc) {
 	m.literal[mimetype] = minifier
 }
 
@@ -84,7 +89,7 @@ func (m *M) AddRegexp(pattern *regexp.Regexp, minifier Minifier) {
 }
 
 // AddFuncRegexp adds a minify function to the mimetype => function map (unsafe for concurrent use).
-func (m *M) AddFuncRegexp(pattern *regexp.Regexp, minifier minifierFunc) {
+func (m *M) AddFuncRegexp(pattern *regexp.Regexp, minifier MinifierFunc) {
 	m.pattern = append(m.pattern, patternMinifier{pattern, minifier})
 }
 
@@ -98,6 +103,23 @@ func (m *M) AddCmd(mimetype string, cmd *exec.Cmd) {
 // It allows the use of external tools like ClosureCompiler, UglifyCSS, etc. for a specific mimetype regular expression.
 func (m *M) AddCmdRegexp(pattern *regexp.Regexp, cmd *exec.Cmd) {
 	m.pattern = append(m.pattern, patternMinifier{pattern, &cmdMinifier{cmd}})
+}
+
+// Match returns the pattern and minifier that gets matched with the mediatype.
+// It returns nil when no matching minifier exists.
+// It has the same matching algorithm as Minify.
+func (m *M) Match(mediatype string) (string, map[string]string, MinifierFunc) {
+	mimetype, params := parse.Mediatype([]byte(mediatype))
+	if minifier, ok := m.literal[string(mimetype)]; ok { // string conversion is optimized away
+		return string(mimetype), params, minifier.Minify
+	}
+
+	for _, minifier := range m.pattern {
+		if minifier.pattern.Match(mimetype) {
+			return minifier.pattern.String(), params, minifier.Minify
+		}
+	}
+	return string(mimetype), params, nil
 }
 
 // Minify minifies the content of a Reader and writes it to a Writer (safe for concurrent use).
@@ -160,39 +182,98 @@ func (m *M) Reader(mediatype string, r io.Reader) io.Reader {
 	return pr
 }
 
-// minifyWriter makes sure that errors from the minifier are passed down through Close.
-// It also makes sure that all data has been written on calling Close, it flushes.
+// minifyWriter makes sure that errors from the minifier are passed down through Close (can be blocking).
 type minifyWriter struct {
 	pw  *io.PipeWriter
 	wg  sync.WaitGroup
 	err error
 }
 
-func (mw *minifyWriter) Write(b []byte) (int, error) {
-	return mw.pw.Write(b)
+// Write intercepts any writes to the writer.
+func (w *minifyWriter) Write(b []byte) (int, error) {
+	return w.pw.Write(b)
 }
 
-func (mw *minifyWriter) Close() error {
-	mw.pw.Close()
-	mw.wg.Wait()
-	return mw.err
+// Close must be called when writing has finished. It returns the error from the minifier.
+func (w *minifyWriter) Close() error {
+	w.pw.Close()
+	w.wg.Wait()
+	return w.err
 }
 
 // Writer wraps a Writer interface and minifies the stream.
-// Errors from the minifier are returned by the writer.
+// Errors from the minifier are returned by Close on the writer.
 // The writer must be closed explicitly.
-func (m *M) Writer(mediatype string, w io.Writer) io.WriteCloser {
+func (m *M) Writer(mediatype string, w io.Writer) *minifyWriter {
 	pr, pw := io.Pipe()
 	mw := &minifyWriter{pw, sync.WaitGroup{}, nil}
 	mw.wg.Add(1)
 	go func() {
+		defer mw.wg.Done()
+
 		if err := m.Minify(mediatype, w, pr); err != nil {
+			io.Copy(w, pr)
 			mw.err = err
-			pr.CloseWithError(err)
-		} else {
-			pr.Close()
 		}
-		mw.wg.Done()
+		pr.Close()
 	}()
 	return mw
+}
+
+// minifyResponseWriter wraps an http.ResponseWriter and makes sure that errors from the minifier are passed down through Close (can be blocking).
+// All writes to the response writer are intercepted and minified on the fly.
+// http.ResponseWriter loses all functionality such as Pusher, Hijacker, Flusher, ...
+type minifyResponseWriter struct {
+	http.ResponseWriter
+
+	writer    *minifyWriter
+	m         *M
+	mediatype string
+}
+
+// WriteHeader intercepts any header writes and removes the Content-Length header.
+func (w *minifyResponseWriter) WriteHeader(status int) {
+	w.ResponseWriter.Header().Del("Content-Length")
+	w.ResponseWriter.WriteHeader(status)
+}
+
+// Write intercepts any writes to the response writer.
+// The first write will extract the Content-Type as the mediatype. Otherwise it falls back to the RequestURI extension.
+func (w *minifyResponseWriter) Write(b []byte) (int, error) {
+	if w.writer == nil {
+		// first write
+		if mediatype := w.ResponseWriter.Header().Get("Content-Type"); mediatype != "" {
+			w.mediatype = mediatype
+		}
+		w.writer = w.m.Writer(w.mediatype, w.ResponseWriter)
+	}
+	return w.writer.Write(b)
+}
+
+// Close must be called when writing has finished. It returns the error from the minifier.
+func (w *minifyResponseWriter) Close() error {
+	if w.writer != nil {
+		return w.writer.Close()
+	}
+	return nil
+}
+
+// ResponseWriter minifies any writes to the http.ResponseWriter.
+// http.ResponseWriter loses all functionality such as Pusher, Hijacker, Flusher, ...
+// Minification might be slower than just sending the original file! Caching is advised.
+func (m *M) ResponseWriter(w http.ResponseWriter, r *http.Request) *minifyResponseWriter {
+	mediatype := mime.TypeByExtension(path.Ext(r.RequestURI))
+	return &minifyResponseWriter{w, nil, m, mediatype}
+}
+
+// Middleware provides a middleware function that minifies content on the fly by intercepting writes to http.ResponseWriter.
+// http.ResponseWriter loses all functionality such as Pusher, Hijacker, Flusher, ...
+// Minification might be slower than just sending the original file! Caching is advised.
+func (m *M) Middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mw := m.ResponseWriter(w, r)
+		defer mw.Close()
+
+		next.ServeHTTP(mw, r)
+	})
 }

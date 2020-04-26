@@ -6,14 +6,14 @@ import (
 	"net/url"
 
 	"github.com/tdewolff/parse"
-	"github.com/tdewolff/strconv"
+	"github.com/tdewolff/parse/strconv"
 )
 
 // Epsilon is the closest number to zero that is not considered to be zero.
 var Epsilon = 0.00001
 
-// ContentType minifies a given mediatype by removing all whitespace.
-func ContentType(b []byte) []byte {
+// Mediatype minifies a given mediatype by removing all whitespace.
+func Mediatype(b []byte) []byte {
 	j := 0
 	start := 0
 	inString := false
@@ -78,6 +78,107 @@ func DataURI(m *M, dataURI []byte) []byte {
 
 const MaxInt = int(^uint(0) >> 1)
 const MinInt = -MaxInt - 1
+
+// Decimal minifies a given byte slice containing a number (see parse.Number) and removes superfluous characters.
+// It does not parse or output exponents.
+func Decimal(num []byte, prec int) []byte {
+	// omit first + and register mantissa start and end, whether it's negative and the exponent
+	neg := false
+	start := 0
+	dot := -1
+	end := len(num)
+	if 0 < end && (num[0] == '+' || num[0] == '-') {
+		if num[0] == '-' {
+			neg = true
+		}
+		start++
+	}
+	for i, c := range num[start:] {
+		if c == '.' {
+			dot = start + i
+			break
+		}
+	}
+	if dot == -1 {
+		dot = end
+	}
+
+	// trim leading zeros but leave at least one digit
+	for start < end-1 && num[start] == '0' {
+		start++
+	}
+	// trim trailing zeros
+	i := end - 1
+	for ; i > dot; i-- {
+		if num[i] != '0' {
+			end = i + 1
+			break
+		}
+	}
+	if i == dot {
+		end = dot
+		if start == end {
+			num[start] = '0'
+			return num[start : start+1]
+		}
+	} else if start == end-1 && num[start] == '0' {
+		return num[start:end]
+	}
+
+	// apply precision
+	if prec > -1 && dot+1+prec < end {
+		end = dot + 1 + prec
+		inc := num[end] >= '5'
+		if inc || num[end-1] == '0' {
+			for i := end - 1; i > start; i-- {
+				if i == dot {
+					end--
+				} else if inc {
+					if num[i] == '9' {
+						if i > dot {
+							end--
+						} else {
+							num[i] = '0'
+						}
+					} else {
+						num[i]++
+						inc = false
+						break
+					}
+				} else if i > dot && num[i] == '0' {
+					end--
+				}
+			}
+		}
+		if dot == start && end == start+1 {
+			if inc {
+				num[start] = '1'
+			} else {
+				num[start] = '0'
+			}
+		} else {
+			if dot+1 == end {
+				end--
+			}
+			if inc {
+				if num[start] == '9' {
+					num[start] = '0'
+					copy(num[start+1:], num[start:end])
+					end++
+					num[start] = '1'
+				} else {
+					num[start]++
+				}
+			}
+		}
+	}
+
+	if neg {
+		start--
+		num[start] = '-'
+	}
+	return num[start:end]
+}
 
 // Number minifies a given byte slice containing a number (see parse.Number) and removes superfluous characters.
 func Number(num []byte, prec int) []byte {
@@ -186,7 +287,6 @@ func Number(num []byte, prec int) []byte {
 				start = end - n
 			} else {
 				// TODO: copy the other part if shorter?
-				//fmt.Println("COPY1", end-dot-1)
 				copy(num[dot:], num[dot+1:end])
 				end--
 			}
@@ -219,16 +319,13 @@ func Number(num []byte, prec int) []byte {
 				if d > 0 {
 					if dot < end {
 						// copy original digits behind the dot backwards
-						//fmt.Println("COPY2", end-dot-1)
 						copy(num[dot+1+d:], num[dot+1:end])
 						if dot > start {
 							// copy original digits before the dot backwards
-							//fmt.Println("COPY3a", dot-start)
 							copy(num[start+d+1:], num[start:dot])
 						}
 					} else if dot > start {
 						// copy original digits before the dot backwards
-						//fmt.Println("COPY3b", dot-start)
 						copy(num[start+d:], num[start:dot])
 					}
 					newDot = start
@@ -257,11 +354,9 @@ func Number(num []byte, prec int) []byte {
 			newDot = start + normExp
 			if newDot > dot {
 				// copy digits forwards
-				//fmt.Println("COPY4", newDot-dot)
 				copy(num[dot:], num[dot+1:newDot+1])
 			} else if newDot < dot {
 				// copy digits backwards
-				//fmt.Println("COPY5", dot-newDot)
 				copy(num[newDot+1:], num[newDot:dot])
 			}
 			num[newDot] = '.'
@@ -278,7 +373,11 @@ func Number(num []byte, prec int) []byte {
 						end--
 					} else if inc {
 						if num[i] == '9' {
-							end--
+							if i > dot {
+								end--
+							} else {
+								num[i] = '0'
+							}
 						} else {
 							num[i]++
 							inc = false
@@ -295,39 +394,64 @@ func Number(num []byte, prec int) []byte {
 				} else {
 					num[start] = '0'
 				}
-			} else if inc {
-				if num[start] == '9' {
-					num[start] = '0'
-					copy(num[start+1:], num[start:end])
-					end++
-					num[start] = '1'
-				} else {
-					num[start]++
+			} else {
+				if dot+1 == end {
+					end--
+				}
+				if inc {
+					if num[start] == '9' {
+						num[start] = '0'
+						copy(num[start+1:], num[start:end])
+						end++
+						num[start] = '1'
+					} else {
+						num[start]++
+					}
 				}
 			}
 		}
 	} else {
 		// case 3
-		if dot < end {
-			if dot == start {
-				//fmt.Println("COPY6", n)
-				copy(num[start:], num[end-n:end])
-				end = start + n
-			} else {
-				//fmt.Println("COPY7", end-dot-1)
-				copy(num[dot:], num[dot+1:end])
-				end--
+
+		// find new end, considering moving numbers to the front, removing the dot and increasing the length of the exponent
+		newEnd := end
+		if dot == start {
+			newEnd = start + n
+		} else {
+			newEnd--
+		}
+		newEnd += 2 + lenIntExp
+
+		exp := intExp
+		lenExp := lenIntExp
+		if newEnd < len(num) {
+			// it saves space to convert the decimal to an integer and decrease the exponent
+			if dot < end {
+				if dot == start {
+					copy(num[start:], num[end-n:end])
+					end = start + n
+				} else {
+					copy(num[dot:], num[dot+1:end])
+					end--
+				}
+			}
+		} else {
+			// it does not save space and will panic, so we revert to the original representation
+			exp = origExp
+			lenExp = 1
+			if origExp <= -10 || origExp >= 10 {
+				lenExp = strconv.LenInt(int64(origExp))
 			}
 		}
 		num[end] = 'e'
 		num[end+1] = '-'
 		end += 2
-		intExp = -intExp
-		for i := end + lenIntExp - 1; i >= end; i-- {
-			num[i] = byte(intExp%10) + '0'
-			intExp /= 10
+		exp = -exp
+		for i := end + lenExp - 1; i >= end; i-- {
+			num[i] = byte(exp%10) + '0'
+			exp /= 10
 		}
-		end += lenIntExp
+		end += lenExp
 	}
 
 	if neg {
