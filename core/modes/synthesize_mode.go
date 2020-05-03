@@ -27,7 +27,7 @@ func (this *SynthesizeMode) View() v2.ModeView {
 	}
 }
 
-func (this SynthesizeMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
+func (this SynthesizeMode) Process(request *http.Request, details models.RequestDetails) (ProcessResult, error) {
 	pair := models.RequestResponsePair{Request: details}
 
 	log.WithFields(log.Fields{
@@ -52,5 +52,5 @@ func (this SynthesizeMode) Process(request *http.Request, details models.Request
 		"request": GetRequestLogFields(&pair.Request),
 	}).Info("synthetic response created successfuly")
 
-	return ReconstructResponse(request, pair), nil
+	return newProcessResult(ReconstructResponse(request, pair), pair.Response.FixedDelay), nil
 }

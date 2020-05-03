@@ -44,10 +44,10 @@ func Test_SimulateMode_WhenGivenAMatchingRequestItReturnsTheCorrectResponse(t *t
 		Destination: "positive-match.com",
 	}
 
-	response, err := unit.Process(nil, request)
+	result, err := unit.Process(nil, request)
 	Expect(err).To(BeNil())
 
-	Expect(response.StatusCode).To(Equal(200))
+	Expect(result.Response.StatusCode).To(Equal(200))
 }
 
 func Test_SimulateMode_WhenGivenANonMatchingRequestItReturnsAnError(t *testing.T) {
@@ -61,12 +61,12 @@ func Test_SimulateMode_WhenGivenANonMatchingRequestItReturnsAnError(t *testing.T
 		Destination: "negative-match.com",
 	}
 
-	response, err := unit.Process(&http.Request{}, request)
+	result, err := unit.Process(&http.Request{}, request)
 	Expect(err).ToNot(BeNil())
 
-	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when matching"))
@@ -85,12 +85,12 @@ func Test_SimulateMode_WhenGivenAMatchingRequesAndMiddlewareFaislItReturnsAnErro
 		Path:        "middleware-error",
 	}
 
-	response, err := unit.Process(&http.Request{}, request)
+	result, err := unit.Process(&http.Request{}, request)
 	Expect(err).ToNot(BeNil())
 
-	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when executing middleware"))

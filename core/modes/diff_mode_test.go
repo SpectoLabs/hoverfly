@@ -100,19 +100,19 @@ func Test_DiffMode_WhenGivenAMatchingRequestReturningTheSameResponse(t *testing.
 	}
 
 	// when
-	response, err := unit.Process(nil, request)
+	result, err := unit.Process(nil, request)
 
 	// then
 	Expect(err).To(BeNil())
-	Expect(response.StatusCode).To(Equal(http.StatusOK))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("expected"))
-	Expect(len(response.Header)).To(Equal(2))
-	Expect(response.Header["header"]).To(Equal([]string{"expected"}))
-	Expect(response.Header["source"]).To(Equal([]string{"service"}))
+	Expect(len(result.Response.Header)).To(Equal(2))
+	Expect(result.Response.Header["header"]).To(Equal([]string{"expected"}))
+	Expect(result.Response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(len(unit.DiffReport.DiffEntries)).To(Equal(0))
 }
 
@@ -130,19 +130,19 @@ func Test_DiffMode_WhenGivenAMatchingRequestReturningDifferentResponse(t *testin
 	}
 
 	// when
-	response, err := unit.Process(nil, request)
+	result, err := unit.Process(nil, request)
 
 	// then
 	Expect(err).To(BeNil())
-	Expect(response.StatusCode).To(Equal(http.StatusOK))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("actual"))
-	Expect(len(response.Header)).To(Equal(2))
-	Expect(response.Header["header"]).To(Equal([]string{"actual"}))
-	Expect(response.Header["source"]).To(Equal([]string{"service"}))
+	Expect(len(result.Response.Header)).To(Equal(2))
+	Expect(result.Response.Header["header"]).To(Equal([]string{"actual"}))
+	Expect(result.Response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
 		v2.DiffReportEntry{Field: "header/source", Expected: "[simulation]", Actual: "[service]"},
 		v2.DiffReportEntry{Field: "header/header", Expected: "[simulated]", Actual: "[actual]"},
@@ -163,14 +163,14 @@ func Test_DiffMode_IncludeResponseTrailerForDiffing(t *testing.T) {
 	}
 
 	// when
-	response, err := unit.Process(nil, request)
+	result, err := unit.Process(nil, request)
 
 	// then
 	Expect(err).To(BeNil())
-	Expect(response.StatusCode).To(Equal(http.StatusOK))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	Expect(len(response.Header)).To(Equal(1))
-	Expect(response.Header["header"]).To(Equal([]string{"actual"}))
+	Expect(len(result.Response.Header)).To(Equal(1))
+	Expect(result.Response.Header["header"]).To(Equal([]string{"actual"}))
 	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
 		v2.DiffReportEntry{Field: "header/header", Expected: "[simulated]", Actual: "[actual]"},
 		v2.DiffReportEntry{Field: "header/trailer1", Expected: "[simulated]", Actual: "[actual]"},
@@ -196,19 +196,19 @@ func Test_DiffMode_BlacklistAllHeaders(t *testing.T) {
 	}
 
 	// when
-	response, err := unit.Process(nil, request)
+	result, err := unit.Process(nil, request)
 
 	// then
 	Expect(err).To(BeNil())
-	Expect(response.StatusCode).To(Equal(http.StatusOK))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("actual"))
-	Expect(len(response.Header)).To(Equal(2))
-	Expect(response.Header["header"]).To(Equal([]string{"actual"}))
-	Expect(response.Header["source"]).To(Equal([]string{"service"}))
+	Expect(len(result.Response.Header)).To(Equal(2))
+	Expect(result.Response.Header["header"]).To(Equal([]string{"actual"}))
+	Expect(result.Response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
 		v2.DiffReportEntry{"body", "simulated", "actual"}))
 }
@@ -232,19 +232,19 @@ func Test_DiffMode_BlacklistOneHeader(t *testing.T) {
 	}
 
 	// when
-	response, err := unit.Process(nil, request)
+	result, err := unit.Process(nil, request)
 
 	// then
 	Expect(err).To(BeNil())
-	Expect(response.StatusCode).To(Equal(http.StatusOK))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("actual"))
-	Expect(len(response.Header)).To(Equal(2))
-	Expect(response.Header["header"]).To(Equal([]string{"actual"}))
-	Expect(response.Header["source"]).To(Equal([]string{"service"}))
+	Expect(len(result.Response.Header)).To(Equal(2))
+	Expect(result.Response.Header["header"]).To(Equal([]string{"actual"}))
+	Expect(result.Response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
 		v2.DiffReportEntry{"header/source", "[simulation]", "[service]"},
 		v2.DiffReportEntry{"body", "simulated", "actual"}))
@@ -269,19 +269,19 @@ func Test_DiffMode_BlacklistlistTwoHeaders(t *testing.T) {
 	}
 
 	// when
-	response, err := unit.Process(nil, request)
+	result, err := unit.Process(nil, request)
 
 	// then
 	Expect(err).To(BeNil())
-	Expect(response.StatusCode).To(Equal(http.StatusOK))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("actual"))
-	Expect(len(response.Header)).To(Equal(2))
-	Expect(response.Header["header"]).To(Equal([]string{"actual"}))
-	Expect(response.Header["source"]).To(Equal([]string{"service"}))
+	Expect(len(result.Response.Header)).To(Equal(2))
+	Expect(result.Response.Header["header"]).To(Equal([]string{"actual"}))
+	Expect(result.Response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
 		v2.DiffReportEntry{"body", "simulated", "actual"}))
 }
@@ -301,19 +301,19 @@ func Test_DiffMode_WhenGivenANonMatchingRequestDiffIsEmpty(t *testing.T) {
 	}
 
 	// when
-	response, err := unit.Process(nil, request)
+	result, err := unit.Process(nil, request)
 
 	// then
 	Expect(err).To(BeNil())
-	Expect(response.StatusCode).To(Equal(http.StatusOK))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("actual"))
-	Expect(len(response.Header)).To(Equal(2))
-	Expect(response.Header["header"]).To(Equal([]string{"actual"}))
-	Expect(response.Header["source"]).To(Equal([]string{"service"}))
+	Expect(len(result.Response.Header)).To(Equal(2))
+	Expect(result.Response.Header["header"]).To(Equal([]string{"actual"}))
+	Expect(result.Response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(unit.DiffReport.DiffEntries).To(BeEmpty())
 }
 

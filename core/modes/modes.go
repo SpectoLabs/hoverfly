@@ -35,7 +35,7 @@ const Spy = "spy"
 const Diff = "diff"
 
 type Mode interface {
-	Process(*http.Request, models.RequestDetails) (*http.Response, error)
+	Process(*http.Request, models.RequestDetails) (ProcessResult, error)
 	SetArguments(arguments ModeArguments)
 	View() v2.ModeView
 }
@@ -45,6 +45,19 @@ type ModeArguments struct {
 	MatchingStrategy   *string
 	Stateful           bool
 	OverwriteDuplicate bool
+}
+
+type ProcessResult struct {
+	Response *http.Response
+	FixedDelay int
+}
+
+func (p ProcessResult) IsResponseDelayable() bool {
+	return p.FixedDelay > 0
+}
+
+func newProcessResult(response *http.Response, fixedDelay int) ProcessResult {
+	return ProcessResult{Response: response, FixedDelay: fixedDelay}
 }
 
 // ReconstructRequest replaces original request with details provided in Constructor Payload.RequestMatcher
@@ -144,7 +157,7 @@ func GetResponseLogFields(response *models.ResponseDetails) *logrus.Fields {
 	}
 }
 
-func ReturnErrorAndLog(request *http.Request, err error, pair *models.RequestResponsePair, msg, mode string) (*http.Response, error) {
+func ReturnErrorAndLog(request *http.Request, err error, pair *models.RequestResponsePair, msg, mode string) (ProcessResult, error) {
 	log.WithFields(log.Fields{
 		"error":    err.Error(),
 		"mode":     mode,
@@ -155,8 +168,8 @@ func ReturnErrorAndLog(request *http.Request, err error, pair *models.RequestRes
 	return ErrorResponse(request, err, msg), err
 }
 
-func ErrorResponse(req *http.Request, err error, msg string) *http.Response {
-	return goproxy.NewResponse(req,
+func ErrorResponse(req *http.Request, err error, msg string) ProcessResult {
+	return newProcessResult(goproxy.NewResponse(req,
 		goproxy.ContentTypeText, http.StatusBadGateway,
-		fmt.Sprintf("Hoverfly Error!\n\n%s\n\nGot error: %s", msg, err.Error()))
+		fmt.Sprintf("Hoverfly Error!\n\n%s\n\nGot error: %s", msg, err.Error())), 0)
 }

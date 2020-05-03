@@ -42,7 +42,7 @@ func (this *CaptureMode) GetArguments(arguments ModeArguments) {
 	this.Arguments = arguments
 }
 
-func (this CaptureMode) Process(request *http.Request, details models.RequestDetails) (*http.Response, error) {
+func (this CaptureMode) Process(request *http.Request, details models.RequestDetails) (ProcessResult, error) {
 	// this is mainly for testing, since when you create
 	if request.Body == nil {
 		request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
@@ -68,7 +68,7 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 
 	responseObj := &models.ResponseDetails{
 		Status:  response.StatusCode,
-		Body:    string(respBody),
+		Body:    respBody,
 		Headers: respHeaders,
 	}
 
@@ -88,5 +88,5 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		"response": GetResponseLogFields(&pair.Response),
 	}).Info("request and response captured")
 
-	return response, nil
+	return newProcessResult(response, pair.Response.FixedDelay), nil
 }

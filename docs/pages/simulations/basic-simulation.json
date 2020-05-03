@@ -51,7 +51,8 @@
                      "Was-Here"
                   ]
                },
-               "templated": false
+               "templated": false,
+               "fixedDelay": 0
             }
          }
       ],
@@ -61,8 +62,8 @@
       }
    },
    "meta": {
-      "schemaVersion": "v5",
-      "hoverflyVersion": "v0.17.0",
-      "timeExported": "2018-06-04T10:29:57+01:00"
+      "schemaVersion": "v6",
+      "hoverflyVersion": "v1.2.0",
+      "timeExported": "2020-04-25T17:56:32+03:00"
    }
 }
