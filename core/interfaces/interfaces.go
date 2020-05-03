@@ -23,4 +23,5 @@ type Response interface {
 	GetHeaders() map[string][]string
 	GetTransitionsState() map[string]string
 	GetRemovesState() []string
+	GetFixedDelay() int
 }

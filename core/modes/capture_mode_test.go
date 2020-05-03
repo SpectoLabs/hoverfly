@@ -86,12 +86,12 @@ func Test_CaptureMode_WhenGivenARequestItWillMakeTheRequestAndSaveIt(t *testing.
 	request, err := http.NewRequest("GET", "http://positive-match.com", nil)
 	Expect(err).To(BeNil())
 
-	response, err := unit.Process(request, requestDetails)
+	result, err := unit.Process(request, requestDetails)
 	Expect(err).To(BeNil())
 
-	Expect(response.StatusCode).To(Equal(200))
+	Expect(result.Response.StatusCode).To(Equal(200))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("test"))
@@ -193,12 +193,12 @@ func Test_CaptureMode_WhenGivenABadRequestItWillError(t *testing.T) {
 	request, err := http.NewRequest("GET", "http://error.com", nil)
 	Expect(err).To(BeNil())
 
-	response, err := unit.Process(request, requestDetails)
+	result, err := unit.Process(request, requestDetails)
 	Expect(err).ToNot(BeNil())
 
-	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended destination"))
@@ -224,11 +224,11 @@ func Test_CaptureMode_SavesResponseTrailersIfPresent(t *testing.T) {
 
 	request, _ := http.NewRequest("GET", "http://trailer.com", nil)
 
-	response, err := unit.Process(request, requestDetails)
+	result, err := unit.Process(request, requestDetails)
 	Expect(err).To(BeNil())
 
-	Expect(response.Header).To(HaveLen(1))
-	Expect(response.Trailer).To(HaveLen(2))
+	Expect(result.Response.Header).To(HaveLen(1))
+	Expect(result.Response.Trailer).To(HaveLen(2))
 
 	Expect(hoverflyStub.SavedResponse.Headers).To(HaveLen(4))
 	Expect(hoverflyStub.SavedResponse.Headers["Content-Type"]).To(ConsistOf("application/json"))

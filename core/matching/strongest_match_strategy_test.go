@@ -1566,7 +1566,8 @@ Which if hit would have given the following response:
             "world"
         ]
     },
-    "templated": false
+    "templated": false,
+    "fixedDelay": 0
 }`))
 }
 

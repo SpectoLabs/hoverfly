@@ -53,13 +53,13 @@ func Test_ModifyMode_WhenGivenARequestItWillModifyTheRequestAndExecuteIt(t *test
 	request, err := http.NewRequest("GET", "http://positive-match.com", nil)
 	Expect(err).To(BeNil())
 
-	response, err := unit.Process(request, requestDetails)
+	result, err := unit.Process(request, requestDetails)
 	Expect(err).To(BeNil())
 
-	Expect(response.StatusCode).To(Equal(200))
-	Expect(response.Request.Host).To(Equal("modified.com"))
+	Expect(result.Response.StatusCode).To(Equal(200))
+	Expect(result.Response.Request.Host).To(Equal("modified.com"))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("modified by test middleware"))
@@ -82,12 +82,12 @@ func Test_ModifyMode_WhenGivenABadRequestItWillError(t *testing.T) {
 	request, err := http.NewRequest("GET", "http://error.com", nil)
 	Expect(err).To(BeNil())
 
-	response, err := unit.Process(request, requestDetails)
+	result, err := unit.Process(request, requestDetails)
 	Expect(err).ToNot(BeNil())
 
-	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended destination"))
@@ -112,12 +112,12 @@ func Test_ModifyMode_WillErrorWhenMiddlewareFails(t *testing.T) {
 	request, err := http.NewRequest("GET", "http://test.com/middleware-error", nil)
 	Expect(err).To(BeNil())
 
-	response, err := unit.Process(request, requestDetails)
+	result, err := unit.Process(request, requestDetails)
 	Expect(err).ToNot(BeNil())
 
-	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when executing middleware"))

@@ -387,17 +387,17 @@ func Test_ReconstructResponse_CanReturnACompleteHttpResponseWithAllFieldsFilled(
 func Test_errorResponse_ShouldAlwaysBeABadGatway(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := modes.ErrorResponse(&http.Request{}, errors.New(""), "An error was got")
+	result := modes.ErrorResponse(&http.Request{}, errors.New(""), "An error was got")
 
-	Expect(response.StatusCode).To(Equal(http.StatusBadGateway))
+	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 }
 
 func Test_errorResponse_ShouldAlwaysIncludeBothMessageAndErrorInResponseBody(t *testing.T) {
 	RegisterTestingT(t)
 
-	response := modes.ErrorResponse(&http.Request{}, errors.New("error doing something"), "This is a test error")
+	result := modes.ErrorResponse(&http.Request{}, errors.New("error doing something"), "This is a test error")
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := ioutil.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("Hoverfly Error!"))

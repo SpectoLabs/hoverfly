@@ -152,6 +152,9 @@
 				"encodedBody": {
 					"type": "boolean"
 				},
+				"fixedDelay": {
+					"type": "integer"
+				},
 				"headers": {
 					"$ref": "#/definitions/headers"
 				},

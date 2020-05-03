@@ -58,3 +58,6 @@ func (this ResponseDetailsViewV3) GetHeaders() map[string][]string { return this
 func (this ResponseDetailsViewV3) GetTransitionsState() map[string]string { return nil }
 
 func (this ResponseDetailsViewV3) GetRemovesState() []string { return nil }
+
+// Gets FixedDelay - required for interfaces.Response
+func (this ResponseDetailsViewV3) GetFixedDelay() int { return 0 }
