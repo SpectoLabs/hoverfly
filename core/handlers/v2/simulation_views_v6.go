@@ -59,6 +59,7 @@ type ResponseDetailsViewV6 struct {
 	Templated        bool                `json:"templated"`
 	TransitionsState map[string]string   `json:"transitionsState,omitempty"`
 	RemovesState     []string            `json:"removesState,omitempty"`
+	FixedDelay       int                 `json:"fixedDelay"`
 }
 
 //Gets Status - required for interfaces.Response
@@ -83,3 +84,6 @@ func (this ResponseDetailsViewV6) GetRemovesState() []string { return this.Remov
 
 // Gets Headers - required for interfaces.Response
 func (this ResponseDetailsViewV6) GetHeaders() map[string][]string { return this.Headers }
+
+// Gets FixedDelay - required for interfaces.Response
+func (this ResponseDetailsViewV6) GetFixedDelay() int { return this.FixedDelay }

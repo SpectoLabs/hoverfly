@@ -14,6 +14,7 @@ can be applied selectively according to request URL pattern and/or HTTP method.
     :maxdepth: 3
 
     allresponses/allresponses
+    specificresponses/specificresponses
     multiplehosts/multiplehosts
     multiplelocations/multiplelocations
     httpmethods/httpmethods

@@ -75,3 +75,6 @@ func (this ResponseDetailsViewV5) GetRemovesState() []string { return this.Remov
 
 // Gets Headers - required for interfaces.Response
 func (this ResponseDetailsViewV5) GetHeaders() map[string][]string { return this.Headers }
+
+// Gets FixedDelay - required for interfaces.Response
+func (this ResponseDetailsViewV5) GetFixedDelay() int { return 0 }

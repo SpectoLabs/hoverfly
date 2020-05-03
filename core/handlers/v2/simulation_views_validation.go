@@ -614,6 +614,9 @@ var responseDefinitionV6 = map[string]interface{}{
 		"encodedBody": map[string]interface{}{
 			"type": "boolean",
 		},
+		"fixedDelay": map[string]interface{}{
+			"type": "integer",
+		},
 		"headers": map[string]interface{}{
 			"$ref": "#/definitions/headers",
 		},

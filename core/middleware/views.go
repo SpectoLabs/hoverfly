@@ -55,6 +55,7 @@ type ResponseDetailsView struct {
 	BodyFile    string              `json:"bodyFile"`
 	EncodedBody bool                `json:"encodedBody"`
 	Headers     map[string][]string `json:"headers"`
+	FixedDelay  int                 `json:"fixedDelay"`
 }
 
 func (this ResponseDetailsView) GetStatus() int { return this.Status }
@@ -72,3 +73,5 @@ func (this ResponseDetailsView) GetTransitionsState() map[string]string { return
 func (this ResponseDetailsView) GetRemovesState() []string { return nil }
 
 func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.Headers }
+
+func (this ResponseDetailsView) GetFixedDelay() int { return this.FixedDelay }

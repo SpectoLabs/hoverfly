@@ -57,6 +57,9 @@ func (this ResponseDetailsView) GetRemovesState() []string { return nil }
 // Gets Headers - required for interfaces.Response
 func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.Headers }
 
+// Gets FixedDelay - required for interfaces.Response
+func (this ResponseDetailsView) GetFixedDelay() int { return 0 }
+
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsView struct {
 	RequestType *string             `json:"requestType,omitempty"`
@@ -96,3 +99,6 @@ func (this RequestDetailsView) GetBody() *string { return this.Body }
 
 //Gets Headers - required for interfaces.RequestMatcher
 func (this RequestDetailsView) GetHeaders() map[string][]string { return this.Headers }
+
+// Gets FixedDelay - required for interfaces.Response
+func (this RequestDetailsView) GetFixedDelay() int { return 0 }
