@@ -213,19 +213,18 @@ func (hf *Hoverfly) SetResponseDelaysLogNormal(payloadView v1.ResponseDelayLogNo
 	var responseDelaysLogNormal models.ResponseDelayLogNormalList
 
 	for _, responseDelayView := range payloadView.Data {
+		logNormalOptions := delay.LogNormalDelayOptions{
+			Min:    responseDelayView.Min,
+			Max:    responseDelayView.Max,
+			Mean:   responseDelayView.Mean,
+			Median: responseDelayView.Median,
+		}
+
 		responseDelaysLogNormal = append(responseDelaysLogNormal, models.ResponseDelayLogNormal{
 			UrlPattern: responseDelayView.UrlPattern,
 			HttpMethod: responseDelayView.HttpMethod,
-			Min:        responseDelayView.Min,
-			Max:        responseDelayView.Max,
-			Mean:       responseDelayView.Mean,
-			Median:     responseDelayView.Median,
-			DelayGenerator: delay.NewLogNormalGenerator(
-				responseDelayView.Min,
-				responseDelayView.Max,
-				responseDelayView.Mean,
-				responseDelayView.Median,
-			),
+			LogNormalDelayOptions: &logNormalOptions,
+			DelayGenerator: delay.NewLogNormalGenerator(logNormalOptions),
 		})
 	}
 

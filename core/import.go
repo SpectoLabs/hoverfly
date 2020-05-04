@@ -3,6 +3,7 @@ package hoverfly
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/delay"
 	"github.com/SpectoLabs/hoverfly/core/state"
 	"net/url"
 	"os"
@@ -141,6 +142,14 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 		failed := 0
 		for i, pairView := range pairViews {
 			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
+
+			if pairView.Response.LogNormalDelay != nil {
+				if err := delay.ValidateLogNormalDelayOptions(*pairView.Response.LogNormalDelay); err != nil {
+					failed++
+					importResult.SetError(err)
+					break
+				}
+			}
 
 			var isPairAdded bool
 			if hf.Cfg.NoImportCheck {

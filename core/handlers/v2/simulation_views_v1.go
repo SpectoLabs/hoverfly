@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"github.com/SpectoLabs/hoverfly/core/delay"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
@@ -59,6 +60,9 @@ func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.H
 
 // Gets FixedDelay - required for interfaces.Response
 func (this ResponseDetailsView) GetFixedDelay() int { return 0 }
+
+// Gets LogNormalDelay - required for interfaces.Response
+func (this ResponseDetailsView) GetLogNormalDelay() *delay.LogNormalDelayOptions { return nil }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsView struct {

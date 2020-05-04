@@ -1,5 +1,7 @@
 package interfaces
 
+import "github.com/SpectoLabs/hoverfly/core/delay"
+
 type RequestResponsePair interface {
 	GetRequest() Request
 	GetResponse() Response
@@ -25,4 +27,5 @@ type Response interface {
 	GetTransitionsState() map[string]string
 	GetRemovesState() []string
 	GetFixedDelay() int
+	GetLogNormalDelay() *delay.LogNormalDelayOptions
 }

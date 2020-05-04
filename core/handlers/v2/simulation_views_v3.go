@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"github.com/SpectoLabs/hoverfly/core/delay"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 )
 
@@ -64,3 +65,6 @@ func (this ResponseDetailsViewV3) GetRemovesState() []string { return nil }
 
 // Gets FixedDelay - required for interfaces.Response
 func (this ResponseDetailsViewV3) GetFixedDelay() int { return 0 }
+
+// Gets LogNormalDelay - required for interfaces.Response
+func (this ResponseDetailsViewV3) GetLogNormalDelay() *delay.LogNormalDelayOptions { return nil }

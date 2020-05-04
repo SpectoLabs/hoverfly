@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"github.com/SpectoLabs/hoverfly/core/delay"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 )
 
@@ -51,15 +52,16 @@ func NewMatcherViewV6(matcher string, value interface{}) MatcherViewV6 {
 func (this RequestMatcherResponsePairViewV6) GetResponse() interfaces.Response { return this.Response }
 
 type ResponseDetailsViewV6 struct {
-	Status           int                 `json:"status"`
-	Body             string              `json:"body"`
-	BodyFile         string              `json:"bodyFile"`
-	EncodedBody      bool                `json:"encodedBody"`
-	Headers          map[string][]string `json:"headers,omitempty"`
-	Templated        bool                `json:"templated"`
-	TransitionsState map[string]string   `json:"transitionsState,omitempty"`
-	RemovesState     []string            `json:"removesState,omitempty"`
-	FixedDelay       int                 `json:"fixedDelay"`
+	Status           int                          `json:"status"`
+	Body             string                       `json:"body"`
+	BodyFile         string                       `json:"bodyFile"`
+	EncodedBody      bool                         `json:"encodedBody"`
+	Headers          map[string][]string          `json:"headers,omitempty"`
+	Templated        bool                         `json:"templated"`
+	TransitionsState map[string]string            `json:"transitionsState,omitempty"`
+	RemovesState     []string                     `json:"removesState,omitempty"`
+	FixedDelay       int                          `json:"fixedDelay"`
+	LogNormalDelay   *delay.LogNormalDelayOptions `json:"logNormalDelay,omitempty"`
 }
 
 //Gets Status - required for interfaces.Response
@@ -87,3 +89,6 @@ func (this ResponseDetailsViewV6) GetHeaders() map[string][]string { return this
 
 // Gets FixedDelay - required for interfaces.Response
 func (this ResponseDetailsViewV6) GetFixedDelay() int { return this.FixedDelay }
+
+// Gets LogNormalDelay - required for interfaces.Response
+func (this ResponseDetailsViewV6) GetLogNormalDelay() *delay.LogNormalDelayOptions { return this.LogNormalDelay }

@@ -3,6 +3,7 @@ package modes
 import (
 	"bytes"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/delay"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -49,14 +50,15 @@ type ModeArguments struct {
 type ProcessResult struct {
 	Response *http.Response
 	FixedDelay int
+	LogNormalDelay *delay.LogNormalDelayOptions
 }
 
 func (p ProcessResult) IsResponseDelayable() bool {
-	return p.FixedDelay > 0
+	return p.FixedDelay > 0 || p.LogNormalDelay != nil
 }
 
-func newProcessResult(response *http.Response, fixedDelay int) ProcessResult {
-	return ProcessResult{Response: response, FixedDelay: fixedDelay}
+func newProcessResult(response *http.Response, fixedDelay int, logNormalDelay *delay.LogNormalDelayOptions) ProcessResult {
+	return ProcessResult{Response: response, FixedDelay: fixedDelay, LogNormalDelay: logNormalDelay}
 }
 
 // ReconstructRequest replaces original request with details provided in Constructor Payload.RequestMatcher
@@ -170,5 +172,5 @@ func ReturnErrorAndLog(request *http.Request, err error, pair *models.RequestRes
 func ErrorResponse(req *http.Request, err error, msg string) ProcessResult {
 	return newProcessResult(goproxy.NewResponse(req,
 		goproxy.ContentTypeText, http.StatusBadGateway,
-		fmt.Sprintf("Hoverfly Error!\n\n%s\n\nGot error: %s", msg, err.Error())), 0)
+		fmt.Sprintf("Hoverfly Error!\n\n%s\n\nGot error: %s", msg, err.Error())), 0, nil)
 }

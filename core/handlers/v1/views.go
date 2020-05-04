@@ -3,6 +3,7 @@ package v1
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/delay"
 )
 
 type MessageResponse struct {
@@ -36,8 +37,5 @@ type ResponseDelayLogNormalPayloadView struct {
 type ResponseDelayLogNormalView struct {
 	UrlPattern string `json:"urlPattern"`
 	HttpMethod string `json:"httpMethod"`
-	Min        int    `json:"min"`
-	Max        int    `json:"max"`
-	Mean       int    `json:"mean"`
-	Median     int    `json:"median"`
+	*delay.LogNormalDelayOptions
 }
