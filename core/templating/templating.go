@@ -17,7 +17,7 @@ type TemplatingData struct {
 
 type Request struct {
 	QueryParam map[string][]string
-	Header	   map[string][]string
+	Header     map[string][]string
 	Path       []string
 	Scheme     string
 	Body       func(queryType, query string, options *raymond.Options) string
@@ -79,7 +79,7 @@ func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails, state m
 		Request: Request{
 			Path:       strings.Split(requestDetails.Path, "/")[1:],
 			QueryParam: requestDetails.Query,
-			Header: 	requestDetails.Headers,
+			Header:     requestDetails.Headers,
 			Scheme:     requestDetails.Scheme,
 			Body:       templateHelpers{}.requestBody,
 			body:       requestDetails.Body,
