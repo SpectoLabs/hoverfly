@@ -9,6 +9,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 var startCmd = &cobra.Command{
@@ -114,6 +115,20 @@ hoverctl configuration file.
 			target.Password = password
 		}
 
+		target.LogOutput, _ = cmd.Flags().GetString("logs-output")
+		target.LogFile, _ = cmd.Flags().GetString("logs-file")
+
+		if target.LogOutput != "file" {
+			cmd.Flags().Visit(func(f *pflag.Flag) {
+				if f.Name == "logs-file" {
+					handleIfError(fmt.Errorf("-logs-file is not allowed unless -logs-output is set to 'file'."))
+				}
+			})
+		}
+		if target.LogOutput != "console" && target.LogOutput != "file" {
+			handleIfError(fmt.Errorf("Unknown logs-output value: " + target.LogOutput))
+		}
+
 		err = wrapper.Start(target)
 		handleIfError(err)
 
@@ -166,4 +181,7 @@ func init() {
 	startCmd.Flags().String("password", "", "Password to authenticate Hoverfly")
 
 	startCmd.Flags().StringSlice("import", []string{}, "Simulations to import")
+
+	startCmd.Flags().String("logs-output", "console", "Location for log output, \"console\"(default) or \"file\"")
+	startCmd.Flags().String("logs-file", "", "Log file name. Use \"hoverfly-<target name>.log\" if not provided")
 }

@@ -103,6 +103,8 @@ var (
 
 	logsFormat = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\"")
 	logsSize   = flag.Int("logs-size", 1000, "Set the amount of logs to be stored in memory")
+	logsOutput = flag.String("logs-output", "console", "Specify \"console\" or \"file\" for output logs, default is \"console\"")
+	logsFile   = flag.String("logs-file", "hoverfly.log", "Specify log file name for output logs, default is \"hoverfly.log\"")
 	logNoColor = flag.Bool("log-no-color", false, "Disable colors for logging")
 
 	journalSize   = flag.Int("journal-size", 1000, "Set the size of request/response journal")
@@ -177,6 +179,16 @@ func init() {
 	goproxy.GoproxyCa = tlsc
 }
 
+func isFlagPassed(name string) bool {
+	found := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == name {
+			found = true
+		}
+	})
+	return found
+}
+
 func main() {
 	hoverfly := hv.NewHoverfly()
 
@@ -192,6 +204,28 @@ func main() {
 			FullTimestamp:    true,
 			DisableColors:    *logNoColor,
 		})
+	}
+
+	if *logsOutput == "file" {
+		file, err := os.OpenFile(*logsFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		if err == nil {
+			log.SetOutput(file)
+		} else {
+			log.Fatal("Failed to write log file:" + *logsFile)
+		}
+	} else {
+		if isFlagPassed("logs-file") {
+			log.WithFields(log.Fields{
+				"logs-file": *logsFile,
+			}).Fatal("-logs-file is not allowed unless -logs-output is set to 'file'.")
+		}
+		if *logsOutput == "console" {
+			log.SetOutput(os.Stdout)
+		} else {
+			log.WithFields(log.Fields{
+				"logs-output": *logsOutput,
+			}).Fatal("Unknown logs output type")
+		}
 	}
 
 	if *version {
