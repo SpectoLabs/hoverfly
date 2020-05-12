@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/delay"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
@@ -51,13 +51,13 @@ func (this RequestDetailsView) GetBody() *string { return this.Body }
 func (this RequestDetailsView) GetHeaders() map[string][]string { return this.Headers }
 
 type ResponseDetailsView struct {
-	Status         int                          `json:"status"`
-	Body           string                       `json:"body"`
-	BodyFile       string                       `json:"bodyFile"`
-	EncodedBody    bool                         `json:"encodedBody"`
-	Headers        map[string][]string          `json:"headers"`
-	FixedDelay     int                          `json:"fixedDelay"`
-	LogNormalDelay *delay.LogNormalDelayOptions `json:"logNormalDelay"`
+	Status         int                         `json:"status"`
+	Body           string                      `json:"body"`
+	BodyFile       string                      `json:"bodyFile"`
+	EncodedBody    bool                        `json:"encodedBody"`
+	Headers        map[string][]string         `json:"headers"`
+	FixedDelay     int                         `json:"fixedDelay"`
+	LogNormalDelay *v2.LogNormalDelayOptionsV6 `json:"logNormalDelay"`
 }
 
 func (this ResponseDetailsView) GetStatus() int { return this.Status }
@@ -78,4 +78,6 @@ func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.H
 
 func (this ResponseDetailsView) GetFixedDelay() int { return this.FixedDelay }
 
-func (this ResponseDetailsView) GetLogNormalDelay() *delay.LogNormalDelayOptions { return this.LogNormalDelay }
+func (this ResponseDetailsView) GetLogNormalDelay() interfaces.ResponseDelay { return this.LogNormalDelay }
+
+func (this ResponseDetailsView) HasLogNormalDelay() bool { return this.LogNormalDelay != nil }

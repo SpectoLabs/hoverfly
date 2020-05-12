@@ -225,7 +225,10 @@ func (hf *Hoverfly) applyResponseDelay(result modes.ProcessResult) {
 	}
 
 	if result.LogNormalDelay != nil {
-		logNormalDelay := delay.NewLogNormalGenerator(*result.LogNormalDelay).GenerateDelay()
+		logNormalDelay := delay.NewLogNormalGenerator(
+			result.LogNormalDelay.Min, result.LogNormalDelay.Max,
+			result.LogNormalDelay.Mean, result.LogNormalDelay.Median,
+		).GenerateDelay()
 
 		time.Sleep(time.Duration(logNormalDelay) * time.Millisecond)
 	}

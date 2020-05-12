@@ -16,7 +16,10 @@ type ResponseDelayLogNormal struct {
 	UrlPattern     string         `json:"urlPattern"`
 	HttpMethod     string         `json:"httpMethod"`
 	DelayGenerator DelayGenerator `json:"-"`
-	*coreDelay.LogNormalDelayOptions
+	Min            int            `json:"min"`
+	Max            int            `json:"max"`
+	Mean           int            `json:"mean"`
+	Median         int            `json:"median"`
 }
 
 type ResponseDelayLogNormalList []ResponseDelayLogNormal
@@ -41,7 +44,7 @@ func ValidateResponseDelayLogNormalPayload(j v1.ResponseDelayLogNormalPayloadVie
 				return errors.New(fmt.Sprintf("Response delay entry skipped due to invalid pattern : %s", delay.UrlPattern))
 			}
 
-			if err := coreDelay.ValidateLogNormalDelayOptions(*delay.LogNormalDelayOptions); err != nil {
+			if err := coreDelay.ValidateLogNormalDelayOptions(delay.Min, delay.Max, delay.Mean, delay.Median); err != nil {
 				return err
 			}
 		}
@@ -78,12 +81,10 @@ func (this ResponseDelayLogNormalList) ConvertToResponseDelayLogNormalPayloadVie
 		responseDelayLogNormalView := v1.ResponseDelayLogNormalView{
 			UrlPattern: responseDelayLogNormal.UrlPattern,
 			HttpMethod: responseDelayLogNormal.HttpMethod,
-			LogNormalDelayOptions: &coreDelay.LogNormalDelayOptions{
-				Min:    responseDelayLogNormal.Min,
-				Max:    responseDelayLogNormal.Max,
-				Mean:   responseDelayLogNormal.Mean,
-				Median: responseDelayLogNormal.Median,
-			},
+			Min: responseDelayLogNormal.Min,
+			Max: responseDelayLogNormal.Max,
+			Mean: responseDelayLogNormal.Mean,
+			Median: responseDelayLogNormal.Median,
 		}
 
 		payloadView.Data = append(payloadView.Data, responseDelayLogNormalView)

@@ -13,9 +13,9 @@ const tolerance = 10
 func TestLogNormalGenerator_GenerateDelay(t *testing.T) {
 	RegisterTestingT(t)
 
+	min, max, mean, median := 100, 20000, 1000, 500
 
-	opts := LogNormalDelayOptions{Median: 500, Mean: 1000, Max: 20000, Min: 100}
-	gen := NewLogNormalGenerator(opts)
+	gen := NewLogNormalGenerator(min, max, mean, median)
 
 	const n = 1e5
 	sample := make([]float64, n)
@@ -25,12 +25,12 @@ func TestLogNormalGenerator_GenerateDelay(t *testing.T) {
 	sort.Float64s(sample)
 
 	actualMean := stat.Mean(sample, nil)
-	Expect(opts.Mean).To(BeNumerically("~", actualMean, tolerance), "mean diff must be less than tolerance")
+	Expect(mean).To(BeNumerically("~", actualMean, tolerance), "mean diff must be less than tolerance")
 
 	actualMedian := stat.Quantile(0.5, stat.Empirical, sample, nil)
-	Expect(opts.Median).To(BeNumerically("~", actualMedian, tolerance), "median diff must be less than tolerance")
+	Expect(median).To(BeNumerically("~", actualMedian, tolerance), "median diff must be less than tolerance")
 
-	Expect(opts.Max).To(BeNumerically(">=", floats.Max(sample)), "max generated value must be less or equal than `max`")
-	Expect(opts.Min).To(BeNumerically("<=", floats.Min(sample)), "min generated value must be less or equal than `min`")
+	Expect(max).To(BeNumerically(">=", floats.Max(sample)), "max generated value must be less or equal than `max`")
+	Expect(min).To(BeNumerically("<=", floats.Min(sample)), "min generated value must be less or equal than `min`")
 
 }

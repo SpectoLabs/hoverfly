@@ -3,7 +3,6 @@ package modes
 import (
 	"bytes"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/delay"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -50,14 +49,14 @@ type ModeArguments struct {
 type ProcessResult struct {
 	Response *http.Response
 	FixedDelay int
-	LogNormalDelay *delay.LogNormalDelayOptions
+	LogNormalDelay *models.ResponseDetailsLogNormal
 }
 
 func (p ProcessResult) IsResponseDelayable() bool {
 	return p.FixedDelay > 0 || p.LogNormalDelay != nil
 }
 
-func newProcessResult(response *http.Response, fixedDelay int, logNormalDelay *delay.LogNormalDelayOptions) ProcessResult {
+func newProcessResult(response *http.Response, fixedDelay int, logNormalDelay *models.ResponseDetailsLogNormal) ProcessResult {
 	return ProcessResult{Response: response, FixedDelay: fixedDelay, LogNormalDelay: logNormalDelay}
 }
 

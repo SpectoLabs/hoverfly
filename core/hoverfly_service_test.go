@@ -2,7 +2,6 @@ package hoverfly
 
 import (
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/delay"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -64,22 +63,18 @@ var (
 	delayLogNormalOne = v1.ResponseDelayLogNormalView{
 		UrlPattern: ".",
 		HttpMethod: "GET",
-		LogNormalDelayOptions: &delay.LogNormalDelayOptions{
-			Min:    100,
-			Max:    400,
-			Mean:   300,
-			Median: 200,
-		},
+		Min:    100,
+		Max:    400,
+		Mean:   300,
+		Median: 200,
 	}
 
 	delayLogNormalTwo = v1.ResponseDelayLogNormalView{
 		UrlPattern: "test.com",
-		LogNormalDelayOptions: &delay.LogNormalDelayOptions{
-			Min:    101,
-			Max:    401,
-			Mean:   301,
-			Median: 201,
-		},
+		Min:    101,
+		Max:    401,
+		Mean:   301,
+		Median: 201,
 	}
 )
 
@@ -287,22 +282,18 @@ func Test_Hoverfly_GetSimulation_ReturnsMultipleDelaysLogNormal(t *testing.T) {
 
 	delay1 := models.ResponseDelayLogNormal{
 		UrlPattern: "test-pattern",
-		LogNormalDelayOptions: &delay.LogNormalDelayOptions{
-			Min:    100,
-			Max:    400,
-			Mean:   300,
-			Median: 200,
-		},
+		Min:    100,
+		Max:    400,
+		Mean:   300,
+		Median: 200,
 	}
 
 	delay2 := models.ResponseDelayLogNormal{
 		HttpMethod: "test",
-		LogNormalDelayOptions: &delay.LogNormalDelayOptions{
-			Min:    101,
-			Max:    401,
-			Mean:   301,
-			Median: 201,
-		},
+		Min:    101,
+		Max:    401,
+		Mean:   301,
+		Median: 201,
 	}
 
 	responseDelays := models.ResponseDelayLogNormalList{delay1, delay2}

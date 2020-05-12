@@ -144,7 +144,8 @@ func (hf *Hoverfly) importRequestResponsePairViews(pairViews []v2.RequestMatcher
 			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
 
 			if pairView.Response.LogNormalDelay != nil {
-				if err := delay.ValidateLogNormalDelayOptions(*pairView.Response.LogNormalDelay); err != nil {
+				d := *pairView.Response.LogNormalDelay
+				if err := delay.ValidateLogNormalDelayOptions(d.Min, d.Max, d.Mean, d.Median); err != nil {
 					failed++
 					importResult.SetError(err)
 					break

@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/delay"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 )
 
@@ -81,4 +80,7 @@ func (this ResponseDetailsViewV5) GetHeaders() map[string][]string { return this
 func (this ResponseDetailsViewV5) GetFixedDelay() int { return 0 }
 
 // Gets LogNormalDelay - required for interfaces.Response
-func (this ResponseDetailsViewV5) GetLogNormalDelay() *delay.LogNormalDelayOptions { return nil }
+func (this ResponseDetailsViewV5) GetLogNormalDelay() interfaces.ResponseDelay { return nil }
+
+// Has a LogNormalDelay - required for interfaces.Response
+func (this ResponseDetailsViewV5) HasLogNormalDelay() bool { return false }

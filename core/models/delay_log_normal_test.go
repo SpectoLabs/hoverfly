@@ -3,7 +3,6 @@ package models_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/delay"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
@@ -237,10 +236,8 @@ func TestDelayLogNormalGetDelayLogNormalWithRegexMatch(t *testing.T) {
 
 	delayLogNormal := models.ResponseDelayLogNormal{
 		UrlPattern: "example(.+)",
-		LogNormalDelayOptions: &delay.LogNormalDelayOptions{
-			Mean:   5000,
-			Median: 500,
-		},
+		Mean:   5000,
+		Median: 500,
 	}
 	delayLogNormals := models.ResponseDelayLogNormalList{delayLogNormal}
 
@@ -266,17 +263,13 @@ func TestDelayLogNormalMultipleMatchingDelayLogNormalsReturnsTheFirst(t *testing
 
 	delayLogNormalOne := models.ResponseDelayLogNormal{
 		UrlPattern: "example.com",
-		LogNormalDelayOptions: &delay.LogNormalDelayOptions{
-			Mean:   5000,
-			Median: 500,
-		},
+		Mean:   5000,
+		Median: 500,
 	}
 	delayLogNormalTwo := models.ResponseDelayLogNormal{
 		UrlPattern: "example",
-		LogNormalDelayOptions: &delay.LogNormalDelayOptions{
-			Mean:   5000,
-			Median: 500,
-		},
+		Mean:   5000,
+		Median: 500,
 	}
 	delayLogNormals := models.ResponseDelayLogNormalList{delayLogNormalOne, delayLogNormalTwo}
 
@@ -294,10 +287,8 @@ func TestDelayLogNormalNoMatchIfMethodsDontMatch(t *testing.T) {
 
 	delayLogNormal := models.ResponseDelayLogNormal{
 		UrlPattern: "example.com",
-		LogNormalDelayOptions: &delay.LogNormalDelayOptions{
-			Mean:   5000,
-			Median: 500,
-		},
+		Mean:   5000,
+		Median: 500,
 		HttpMethod: "PURPLE",
 	}
 	delayLogNormals := models.ResponseDelayLogNormalList{delayLogNormal}
@@ -316,10 +307,8 @@ func TestDelayLogNormalReturnMatchIfMethodsMatch(t *testing.T) {
 
 	delayLogNormal := models.ResponseDelayLogNormal{
 		UrlPattern: "example.com",
-		LogNormalDelayOptions: &delay.LogNormalDelayOptions{
-			Mean:   5000,
-			Median: 500,
-		},
+		Mean:   5000,
+		Median: 500,
 		HttpMethod: "GET",
 	}
 	delayLogNormals := models.ResponseDelayLogNormalList{delayLogNormal}
@@ -338,10 +327,8 @@ func TestDelayLogNormalIfDelayLogNormalMethodBlankThenMatchesAnyMethod(t *testin
 
 	delayLogNormal := models.ResponseDelayLogNormal{
 		UrlPattern: "example(.+)",
-		LogNormalDelayOptions: &delay.LogNormalDelayOptions{
-			Mean:   5000,
-			Median: 500,
-		},
+		Mean:   5000,
+		Median: 500,
 	}
 	delayLogNormals := models.ResponseDelayLogNormalList{delayLogNormal}
 
@@ -359,10 +346,8 @@ func TestDelayLogNormalResponseDelayLogNormalList_ConvertToPayloadView(t *testin
 
 	delayLogNormal := models.ResponseDelayLogNormal{
 		UrlPattern: "example(.+)",
-		LogNormalDelayOptions: &delay.LogNormalDelayOptions{
-			Mean:   5000,
-			Median: 500,
-		},
+		Mean:   5000,
+		Median: 500,
 	}
 	delayLogNormals := models.ResponseDelayLogNormalList{delayLogNormal}
 
