@@ -226,7 +226,7 @@ var _ = Describe("When I use hoverctl", func() {
 				},
 				"response": {
 					"status": 200,
-					"bodyFile": "`+bodyFileName+`"
+					"bodyFile": "` + bodyFileName + `"
 				}
 			}
 		]
@@ -275,7 +275,7 @@ var _ = Describe("When I use hoverctl", func() {
 				},
 				"response": {
 					"status": 200,
-					"bodyFile": "`+bodyFileName+`",
+					"bodyFile": "` + bodyFileName + `",
 					"body": "testing content"
 				}
 			}

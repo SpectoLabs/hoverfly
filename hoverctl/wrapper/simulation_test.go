@@ -33,7 +33,7 @@ func Test_ExportSimulation_GetsModeFromHoverfly(t *testing.T) {
 					},
 					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
-						Body: responseBody,
+						Body:   responseBody,
 					},
 				},
 			},
@@ -87,7 +87,7 @@ func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 					},
 					Response: v2.ResponseDetailsViewV6{
 						Status: 200,
-						Body: responseBody,
+						Body:   responseBody,
 					},
 				},
 			},

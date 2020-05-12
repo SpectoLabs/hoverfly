@@ -868,13 +868,13 @@ func Test_upgradeV5_ReturnsAnUpgradedSimulation(t *testing.T) {
 			RequestResponsePairs: []RequestMatcherResponsePairViewV5{
 				{
 					RequestMatcher: RequestMatcherViewV5{
-						Path:            []MatcherViewV5{{Value: "*", Matcher: "json"}},
-						Method:          []MatcherViewV5{{Value: "*", Matcher: "xpath"}},
-						Destination:     []MatcherViewV5{{Value: "*", Matcher: "glob"}},
-						Scheme:          []MatcherViewV5{{Value: "http", Matcher: "regex"}},
-						Body:            []MatcherViewV5{{Value: "*", Matcher: "xml"}},
-						Headers:         map[string][]MatcherViewV5{"Test": {{Value: "headers", Matcher: "exact"}}},
-						Query:           &QueryMatcherViewV5{"query": []MatcherViewV5{{Value: "query", Matcher: "exact"}}},
+						Path:        []MatcherViewV5{{Value: "*", Matcher: "json"}},
+						Method:      []MatcherViewV5{{Value: "*", Matcher: "xpath"}},
+						Destination: []MatcherViewV5{{Value: "*", Matcher: "glob"}},
+						Scheme:      []MatcherViewV5{{Value: "http", Matcher: "regex"}},
+						Body:        []MatcherViewV5{{Value: "*", Matcher: "xml"}},
+						Headers:     map[string][]MatcherViewV5{"Test": {{Value: "headers", Matcher: "exact"}}},
+						Query:       &QueryMatcherViewV5{"query": []MatcherViewV5{{Value: "query", Matcher: "exact"}}},
 					},
 					Response: ResponseDetailsViewV5{
 						Status:      200,

@@ -78,6 +78,8 @@ func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.H
 
 func (this ResponseDetailsView) GetFixedDelay() int { return this.FixedDelay }
 
-func (this ResponseDetailsView) GetLogNormalDelay() interfaces.ResponseDelay { return this.LogNormalDelay }
+func (this ResponseDetailsView) GetLogNormalDelay() interfaces.ResponseDelay {
+	return this.LogNormalDelay
+}
 
 func (this ResponseDetailsView) HasLogNormalDelay() bool { return this.LogNormalDelay != nil }

@@ -265,9 +265,9 @@ func (this Hoverfly) ProxyWithAuth(r *sling.Sling, user, password string) (*http
 	proxy, _ := url.Parse(fmt.Sprintf("http://%s:%s@localhost:%v", user, password, this.proxyPort))
 	proxyHttpClient := &http.Client{
 		Transport: &http.Transport{
-			Proxy: http.ProxyURL(proxy),
+			Proxy:           http.ProxyURL(proxy),
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
-			CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
+		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
 	}
 	return proxyHttpClient.Do(req)
 }

@@ -34,7 +34,7 @@ func GetDestination(target configuration.Target) (string, error) {
 func SetDestination(target configuration.Target, destination string) (string, error) {
 
 	destinationReq := map[string]string{"destination": destination}
-	bytes, _ := json.Marshal(destinationReq)	// JSON encode in case there are special chars
+	bytes, _ := json.Marshal(destinationReq) // JSON encode in case there are special chars
 	reqBody := string(bytes)
 
 	response, err := doRequest(target, "PUT", v2ApiDestination, reqBody, nil)

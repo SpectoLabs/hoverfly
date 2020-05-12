@@ -100,7 +100,9 @@ func (this ResponseDetailsViewV6) GetEncodedBody() bool { return this.EncodedBod
 
 func (this ResponseDetailsViewV6) GetTemplated() bool { return this.Templated }
 
-func (this ResponseDetailsViewV6) GetTransitionsState() map[string]string { return this.TransitionsState }
+func (this ResponseDetailsViewV6) GetTransitionsState() map[string]string {
+	return this.TransitionsState
+}
 
 func (this ResponseDetailsViewV6) GetRemovesState() []string { return this.RemovesState }
 
@@ -111,7 +113,9 @@ func (this ResponseDetailsViewV6) GetHeaders() map[string][]string { return this
 func (this ResponseDetailsViewV6) GetFixedDelay() int { return this.FixedDelay }
 
 // Gets LogNormalDelay - required for interfaces.Response
-func (this ResponseDetailsViewV6) GetLogNormalDelay() interfaces.ResponseDelay { return this.LogNormalDelay }
+func (this ResponseDetailsViewV6) GetLogNormalDelay() interfaces.ResponseDelay {
+	return this.LogNormalDelay
+}
 
 // Has a LogNormalDelay - required for interfaces.Response
 func (this ResponseDetailsViewV6) HasLogNormalDelay() bool { return this.LogNormalDelay != nil }

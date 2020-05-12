@@ -236,8 +236,8 @@ func TestDelayLogNormalGetDelayLogNormalWithRegexMatch(t *testing.T) {
 
 	delayLogNormal := models.ResponseDelayLogNormal{
 		UrlPattern: "example(.+)",
-		Mean:   5000,
-		Median: 500,
+		Mean:       5000,
+		Median:     500,
 	}
 	delayLogNormals := models.ResponseDelayLogNormalList{delayLogNormal}
 
@@ -263,13 +263,13 @@ func TestDelayLogNormalMultipleMatchingDelayLogNormalsReturnsTheFirst(t *testing
 
 	delayLogNormalOne := models.ResponseDelayLogNormal{
 		UrlPattern: "example.com",
-		Mean:   5000,
-		Median: 500,
+		Mean:       5000,
+		Median:     500,
 	}
 	delayLogNormalTwo := models.ResponseDelayLogNormal{
 		UrlPattern: "example",
-		Mean:   5000,
-		Median: 500,
+		Mean:       5000,
+		Median:     500,
 	}
 	delayLogNormals := models.ResponseDelayLogNormalList{delayLogNormalOne, delayLogNormalTwo}
 
@@ -287,8 +287,8 @@ func TestDelayLogNormalNoMatchIfMethodsDontMatch(t *testing.T) {
 
 	delayLogNormal := models.ResponseDelayLogNormal{
 		UrlPattern: "example.com",
-		Mean:   5000,
-		Median: 500,
+		Mean:       5000,
+		Median:     500,
 		HttpMethod: "PURPLE",
 	}
 	delayLogNormals := models.ResponseDelayLogNormalList{delayLogNormal}
@@ -307,8 +307,8 @@ func TestDelayLogNormalReturnMatchIfMethodsMatch(t *testing.T) {
 
 	delayLogNormal := models.ResponseDelayLogNormal{
 		UrlPattern: "example.com",
-		Mean:   5000,
-		Median: 500,
+		Mean:       5000,
+		Median:     500,
 		HttpMethod: "GET",
 	}
 	delayLogNormals := models.ResponseDelayLogNormalList{delayLogNormal}
@@ -327,8 +327,8 @@ func TestDelayLogNormalIfDelayLogNormalMethodBlankThenMatchesAnyMethod(t *testin
 
 	delayLogNormal := models.ResponseDelayLogNormal{
 		UrlPattern: "example(.+)",
-		Mean:   5000,
-		Median: 500,
+		Mean:       5000,
+		Median:     500,
 	}
 	delayLogNormals := models.ResponseDelayLogNormalList{delayLogNormal}
 
@@ -346,8 +346,8 @@ func TestDelayLogNormalResponseDelayLogNormalList_ConvertToPayloadView(t *testin
 
 	delayLogNormal := models.ResponseDelayLogNormal{
 		UrlPattern: "example(.+)",
-		Mean:   5000,
-		Median: 500,
+		Mean:       5000,
+		Median:     500,
 	}
 	delayLogNormals := models.ResponseDelayLogNormalList{delayLogNormal}
 

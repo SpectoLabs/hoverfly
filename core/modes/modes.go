@@ -47,8 +47,8 @@ type ModeArguments struct {
 }
 
 type ProcessResult struct {
-	Response *http.Response
-	FixedDelay int
+	Response       *http.Response
+	FixedDelay     int
 	LogNormalDelay *models.ResponseDetailsLogNormal
 }
 

@@ -81,10 +81,10 @@ func (this ResponseDelayLogNormalList) ConvertToResponseDelayLogNormalPayloadVie
 		responseDelayLogNormalView := v1.ResponseDelayLogNormalView{
 			UrlPattern: responseDelayLogNormal.UrlPattern,
 			HttpMethod: responseDelayLogNormal.HttpMethod,
-			Min: responseDelayLogNormal.Min,
-			Max: responseDelayLogNormal.Max,
-			Mean: responseDelayLogNormal.Mean,
-			Median: responseDelayLogNormal.Median,
+			Min:        responseDelayLogNormal.Min,
+			Max:        responseDelayLogNormal.Max,
+			Mean:       responseDelayLogNormal.Mean,
+			Median:     responseDelayLogNormal.Median,
 		}
 
 		payloadView.Data = append(payloadView.Data, responseDelayLogNormalView)
