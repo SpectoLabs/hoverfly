@@ -224,9 +224,7 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 		FixedDelay:       data.GetFixedDelay(),
 	}
 
-	if data.HasLogNormalDelay() {
-		d := data.GetLogNormalDelay()
-
+	if d := data.GetLogNormalDelay(); d != nil {
 		details.LogNormalDelay = &ResponseDetailsLogNormal{
 			Min:    d.GetMin(),
 			Max:    d.GetMax(),

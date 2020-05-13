@@ -63,9 +63,6 @@ func (this ResponseDetailsView) GetFixedDelay() int { return 0 }
 // Gets LogNormalDelay - required for interfaces.Response
 func (this ResponseDetailsView) GetLogNormalDelay() interfaces.ResponseDelay { return nil }
 
-// Has a LogNormalDelay - required for interfaces.Response
-func (this ResponseDetailsView) HasLogNormalDelay() bool { return false }
-
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsView struct {
 	RequestType *string             `json:"requestType,omitempty"`

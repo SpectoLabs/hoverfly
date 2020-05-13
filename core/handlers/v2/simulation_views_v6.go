@@ -113,9 +113,11 @@ func (this ResponseDetailsViewV6) GetHeaders() map[string][]string { return this
 func (this ResponseDetailsViewV6) GetFixedDelay() int { return this.FixedDelay }
 
 // Gets LogNormalDelay - required for interfaces.Response
+// The trick here to return nil with the right type to compare later.
 func (this ResponseDetailsViewV6) GetLogNormalDelay() interfaces.ResponseDelay {
-	return this.LogNormalDelay
-}
+	if this.LogNormalDelay != nil {
+		return this.LogNormalDelay
+	}
 
-// Has a LogNormalDelay - required for interfaces.Response
-func (this ResponseDetailsViewV6) HasLogNormalDelay() bool { return this.LogNormalDelay != nil }
+	return nil
+}
