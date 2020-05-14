@@ -619,6 +619,22 @@ var responseDefinitionV6 = map[string]interface{}{
 		"fixedDelay": map[string]interface{}{
 			"type": "integer",
 		},
+		"logNormalDelay": map[string]interface{}{
+			"properties": map[string]interface{}{
+				"min": map[string]interface{}{
+					"type": "integer",
+				},
+				"max": map[string]interface{}{
+					"type": "integer",
+				},
+				"mean": map[string]interface{}{
+					"type": "integer",
+				},
+				"median": map[string]interface{}{
+					"type": "integer",
+				},
+			},
+		},
 		"headers": map[string]interface{}{
 			"$ref": "#/definitions/headers",
 		},

@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"fmt"
+	coreDelay "github.com/SpectoLabs/hoverfly/core/delay"
 	"regexp"
 	"strings"
 	"time"
@@ -14,11 +15,11 @@ import (
 type ResponseDelayLogNormal struct {
 	UrlPattern     string         `json:"urlPattern"`
 	HttpMethod     string         `json:"httpMethod"`
+	DelayGenerator DelayGenerator `json:"-"`
 	Min            int            `json:"min"`
 	Max            int            `json:"max"`
 	Mean           int            `json:"mean"`
 	Median         int            `json:"median"`
-	DelayGenerator DelayGenerator `json:"-"`
 }
 
 type ResponseDelayLogNormalList []ResponseDelayLogNormal
@@ -38,39 +39,13 @@ func ValidateResponseDelayLogNormalPayload(j v1.ResponseDelayLogNormalPayloadVie
 			if delay.UrlPattern == "" {
 				return errors.New("Config error - Missing urlPattern")
 			}
+
 			if _, err := regexp.Compile(delay.UrlPattern); err != nil {
 				return errors.New(fmt.Sprintf("Response delay entry skipped due to invalid pattern : %s", delay.UrlPattern))
 			}
-			if delay.Max < 0 || delay.Min < 0 {
-				return errors.New("Config error - delay min and max can't be less than 0")
-			}
-			if delay.Mean <= 0 || delay.Median <= 0 {
-				return errors.New("Config error - delay mean and median params can't be less or equals 0")
-			}
 
-			if delay.Max != 0 {
-				if delay.Max < delay.Min {
-					return errors.New("Config error - min delay must be less than max one")
-				}
-				if delay.Mean > delay.Max {
-					return errors.New("Config error - mean delay can't be greather than max one")
-				}
-				if delay.Median > delay.Max {
-					return errors.New("Config error - median delay can't be and greather than max one")
-				}
-			}
-
-			if delay.Min != 0 {
-				if delay.Mean < delay.Min {
-					return errors.New("Config error - mean delay can't be less than min one")
-				}
-				if delay.Median < delay.Min {
-					return errors.New("Config error - median delay can't be less than min one")
-				}
-			}
-
-			if delay.Median > delay.Mean {
-				return errors.New("Config error - mean delay can't be less than median one")
+			if err := coreDelay.ValidateLogNormalDelayOptions(delay.Min, delay.Max, delay.Mean, delay.Median); err != nil {
+				return err
 			}
 		}
 	}

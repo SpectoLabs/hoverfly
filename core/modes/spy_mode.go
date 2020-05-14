@@ -56,7 +56,7 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 		response, err := this.Hoverfly.DoRequest(modifiedRequest)
 		if err == nil {
 			log.Info("Going to return response from real server")
-			return newProcessResult(response, 0), nil
+			return newProcessResult(response, 0, nil), nil
 		} else {
 			return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended destination", Spy)
 		}
@@ -69,5 +69,9 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Spy)
 	}
 
-	return newProcessResult(ReconstructResponse(request, pair), pair.Response.FixedDelay), nil
+	return newProcessResult(
+		ReconstructResponse(request, pair),
+		pair.Response.FixedDelay,
+		pair.Response.LogNormalDelay,
+	), nil
 }

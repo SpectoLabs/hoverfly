@@ -1115,3 +1115,137 @@ func Test_Hoverfly_DeletePACFile(t *testing.T) {
 
 	Expect(unit.Cfg.PACFile).To(BeNil())
 }
+
+func Test_Hoverfly_ReplaceSimulation_OverridesSimulation(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	importResult := unit.ReplaceSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{pairOne},
+		},
+		v2.MetaView{},
+	})
+	Expect(importResult.GetError()).To(BeNil())
+
+	importResult = unit.ReplaceSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{pairTwo},
+		},
+		v2.MetaView{},
+	})
+	Expect(importResult.GetError()).To(BeNil())
+
+	simulation, err := unit.GetSimulation()
+	Expect(err).To(BeNil())
+
+	Expect(simulation.RequestResponsePairs).To(HaveLen(1))
+	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal(pairTwo.Response.Body))
+}
+
+func Test_Hoverfly_PutSimulation_NotOverridesSimulation(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	importResult := unit.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{pairOne},
+		},
+		v2.MetaView{},
+	})
+	Expect(importResult.GetError()).To(BeNil())
+
+	importResult = unit.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{pairTwo},
+		},
+		v2.MetaView{},
+	})
+	Expect(importResult.GetError()).To(BeNil())
+
+	simulation, err := unit.GetSimulation()
+	Expect(err).To(BeNil())
+
+	Expect(simulation.RequestResponsePairs).To(HaveLen(2))
+	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal(pairOne.Response.Body))
+	Expect(simulation.RequestResponsePairs[1].Response.Body).To(Equal(pairTwo.Response.Body))
+}
+
+func Test_Hoverfly_PutSimulation_BodyAndBodyFileWarning(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	importResult := unit.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{{
+				RequestMatcher: v2.RequestMatcherViewV6{
+					Path: []v2.MatcherViewV6{
+						v2.NewMatcherViewV6(matchers.Exact, "/testing"),
+					},
+				},
+				Response: v2.ResponseDetailsViewV6{
+					Body:     "test-body",
+					BodyFile: "test-file",
+				},
+			}},
+		},
+		v2.MetaView{},
+	})
+	Expect(importResult.GetError()).To(BeNil())
+
+	Expect(importResult.WarningMessages).To(HaveLen(1))
+	Expect(importResult.WarningMessages[0].Message).To(ContainSubstring("Response contains both `body` and `bodyFile`"))
+}
+
+func Test_Hoverfly_PutSimulation_AbsoluteBodyFilePathNotAllowed(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	importResult := unit.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{{
+				RequestMatcher: v2.RequestMatcherViewV6{
+					Path: []v2.MatcherViewV6{
+						v2.NewMatcherViewV6(matchers.Exact, "/testing"),
+					},
+				},
+				Response: v2.ResponseDetailsViewV6{
+					BodyFile: "/tmp/test-file",
+				},
+			}},
+		},
+		v2.MetaView{},
+	})
+
+	err := importResult.GetError()
+	Expect(err).To(MatchError("data.pairs[0].response bodyFile contains absolute path (/tmp/test-file). only relative is supported"))
+}
+
+func Test_Hoverfly_PutSimulation_ImportsBodyFile(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{ResponsesBodyFilesPath: "../functional-tests/core/testdata/"})
+	importResult := unit.PutSimulation(v2.SimulationViewV6{
+		v2.DataViewV6{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV6{{
+				RequestMatcher: v2.RequestMatcherViewV6{
+					Path: []v2.MatcherViewV6{
+						v2.NewMatcherViewV6(matchers.Exact, "/testing"),
+					},
+				},
+				Response: v2.ResponseDetailsViewV6{
+					BodyFile: "key.pem",
+				},
+			}},
+		},
+		v2.MetaView{},
+	})
+
+	Expect(importResult.GetError()).To(BeNil())
+
+	simulation, err := unit.GetSimulation()
+	Expect(err).To(BeNil())
+
+	Expect(simulation.RequestResponsePairs[0].Response.Body).To(HavePrefix("-----BEGIN RSA PRIVATE KEY-----"))
+	Expect(simulation.RequestResponsePairs[0].Response.BodyFile).To(Equal("key.pem"))
+}

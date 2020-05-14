@@ -13,10 +13,8 @@ const tolerance = 10
 func TestLogNormalGenerator_GenerateDelay(t *testing.T) {
 	RegisterTestingT(t)
 
-	median := 500
-	mean := 1000
-	max := 20000
-	min := 100
+	min, max, mean, median := 100, 20000, 1000, 500
+
 	gen := NewLogNormalGenerator(min, max, mean, median)
 
 	const n = 1e5

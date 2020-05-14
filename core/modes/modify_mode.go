@@ -57,5 +57,6 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Modify)
 	}
 
-	return newProcessResult(ReconstructResponse(modifiedRequest, pair), pair.Response.FixedDelay), nil
+	response := ReconstructResponse(modifiedRequest, pair)
+	return newProcessResult(response, pair.Response.FixedDelay, pair.Response.LogNormalDelay), nil
 }

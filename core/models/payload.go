@@ -183,6 +183,13 @@ func (r *RequestDetails) HashWithoutHost() string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
+type ResponseDetailsLogNormal struct {
+	Min    int
+	Max    int
+	Mean   int
+	Median int
+}
+
 // ResponseDetails structure hold response body from external service, body is not decoded and is supposed
 // to be bytes, however headers should provide all required information for later decoding
 // by the client.
@@ -194,6 +201,7 @@ type ResponseDetails struct {
 	TransitionsState map[string]string
 	RemovesState     []string
 	FixedDelay       int
+	LogNormalDelay   *ResponseDetailsLogNormal
 }
 
 func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
@@ -204,7 +212,7 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 		body = string(decoded)
 	}
 
-	return ResponseDetails{
+	details := ResponseDetails{
 		Status:           data.GetStatus(),
 		Body:             body,
 		Headers:          data.GetHeaders(),
@@ -213,6 +221,17 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 		RemovesState:     data.GetRemovesState(),
 		FixedDelay:       data.GetFixedDelay(),
 	}
+
+	if d := data.GetLogNormalDelay(); d != nil {
+		details.LogNormalDelay = &ResponseDetailsLogNormal{
+			Min:    d.GetMin(),
+			Max:    d.GetMax(),
+			Mean:   d.GetMean(),
+			Median: d.GetMedian(),
+		}
+	}
+
+	return details
 }
 
 // This function will create a JSON appriopriate version of ResponseDetails for the v2 API
@@ -274,7 +293,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
 	}
 
-	return v2.ResponseDetailsViewV5{
+	view := v2.ResponseDetailsViewV6{
 		Status:           r.Status,
 		Body:             body,
 		Headers:          r.Headers,
@@ -284,6 +303,17 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 		TransitionsState: r.TransitionsState,
 		FixedDelay:       r.FixedDelay,
 	}
+
+	if r.LogNormalDelay != nil {
+		view.LogNormalDelay = &v2.LogNormalDelayOptionsV6{
+			Min:    r.LogNormalDelay.Min,
+			Max:    r.LogNormalDelay.Max,
+			Mean:   r.LogNormalDelay.Mean,
+			Median: r.LogNormalDelay.Median,
+		}
+	}
+
+	return view
 }
 
 func (this RequestDetails) GetRawQuery() string {
