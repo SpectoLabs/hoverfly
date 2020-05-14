@@ -98,7 +98,7 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 		}).Info("There was no simulation matched for the request")
 	}
 
-	return newProcessResult(actualResponse, actualPair.Response.FixedDelay), nil
+	return newProcessResult(actualResponse, actualPair.Response.FixedDelay, actualPair.Response.LogNormalDelay), nil
 }
 
 func (this *DiffMode) diffResponse(expected *models.ResponseDetails, actual *models.ResponseDetails, headersBlacklist []string) {
