@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
 )
@@ -50,12 +51,13 @@ func (this RequestDetailsView) GetBody() *string { return this.Body }
 func (this RequestDetailsView) GetHeaders() map[string][]string { return this.Headers }
 
 type ResponseDetailsView struct {
-	Status      int                 `json:"status"`
-	Body        string              `json:"body"`
-	BodyFile    string              `json:"bodyFile"`
-	EncodedBody bool                `json:"encodedBody"`
-	Headers     map[string][]string `json:"headers"`
-	FixedDelay  int                 `json:"fixedDelay"`
+	Status         int                         `json:"status"`
+	Body           string                      `json:"body"`
+	BodyFile       string                      `json:"bodyFile"`
+	EncodedBody    bool                        `json:"encodedBody"`
+	Headers        map[string][]string         `json:"headers"`
+	FixedDelay     int                         `json:"fixedDelay"`
+	LogNormalDelay *v2.LogNormalDelayOptionsV6 `json:"logNormalDelay"`
 }
 
 func (this ResponseDetailsView) GetStatus() int { return this.Status }
@@ -75,3 +77,12 @@ func (this ResponseDetailsView) GetRemovesState() []string { return nil }
 func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.Headers }
 
 func (this ResponseDetailsView) GetFixedDelay() int { return this.FixedDelay }
+
+// The trick here to return nil with the right type to compare later.
+func (this ResponseDetailsView) GetLogNormalDelay() interfaces.ResponseDelay {
+	if this.LogNormalDelay != nil {
+		return nil
+	}
+
+	return nil
+}

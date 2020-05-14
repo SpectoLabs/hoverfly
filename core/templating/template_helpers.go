@@ -72,23 +72,23 @@ func (t templateHelpers) nowHelper(offset string, format string) string {
 			now = now.Add(duration)
 		}
 	}
-	
+
 	var formatted string
 	if format == "" {
 		formatted = now.UTC().Format(defaultDateTimeFormat)
 	} else if format == "unix" {
 		formatted = strconv.FormatInt(now.Unix(), 10)
 	} else if format == "epoch" {
-		formatted = strconv.FormatInt(now.UnixNano() / 1000000, 10)
+		formatted = strconv.FormatInt(now.UnixNano()/1000000, 10)
 	} else {
-		formatted = now.UTC().Format(format)	
+		formatted = now.UTC().Format(format)
 	}
 
 	// when format is invalid
 	if formatted == format {
 		return now.UTC().Format(defaultDateTimeFormat)
 	}
-	
+
 	return formatted
 }
 

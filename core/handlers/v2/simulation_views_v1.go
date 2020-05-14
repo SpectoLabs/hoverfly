@@ -60,6 +60,9 @@ func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.H
 // Gets FixedDelay - required for interfaces.Response
 func (this ResponseDetailsView) GetFixedDelay() int { return 0 }
 
+// Gets LogNormalDelay - required for interfaces.Response
+func (this ResponseDetailsView) GetLogNormalDelay() interfaces.ResponseDelay { return nil }
+
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
 type RequestDetailsView struct {
 	RequestType *string             `json:"requestType,omitempty"`
@@ -102,3 +105,9 @@ func (this RequestDetailsView) GetHeaders() map[string][]string { return this.He
 
 // Gets FixedDelay - required for interfaces.Response
 func (this RequestDetailsView) GetFixedDelay() int { return 0 }
+
+// Gets LogNormalDelay - required for interfaces.Response
+func (this RequestDetailsView) GetLogNormalDelay() interfaces.ResponseDelay { return nil }
+
+// Has a LogNormalDelay - required for interfaces.Response
+func (this RequestDetailsView) HasLogNormalDelay() bool { return false }

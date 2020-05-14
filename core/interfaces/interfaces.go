@@ -15,6 +15,13 @@ type Request interface {
 	GetHeaders() map[string][]string
 }
 
+type ResponseDelay interface {
+	GetMin() int
+	GetMax() int
+	GetMedian() int
+	GetMean() int
+}
+
 type Response interface {
 	GetStatus() int
 	GetBody() string
@@ -25,4 +32,5 @@ type Response interface {
 	GetTransitionsState() map[string]string
 	GetRemovesState() []string
 	GetFixedDelay() int
+	GetLogNormalDelay() ResponseDelay
 }

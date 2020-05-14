@@ -50,16 +50,40 @@ func NewMatcherViewV6(matcher string, value interface{}) MatcherViewV6 {
 // Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestMatcherResponsePairViewV6) GetResponse() interfaces.Response { return this.Response }
 
+type LogNormalDelayOptionsV6 struct {
+	Min    int `json:"min"`
+	Max    int `json:"max"`
+	Mean   int `json:"mean"`
+	Median int `json:"median"`
+}
+
+func (l *LogNormalDelayOptionsV6) GetMin() int {
+	return l.Min
+}
+
+func (l *LogNormalDelayOptionsV6) GetMax() int {
+	return l.Max
+}
+
+func (l *LogNormalDelayOptionsV6) GetMean() int {
+	return l.Mean
+}
+
+func (l *LogNormalDelayOptionsV6) GetMedian() int {
+	return l.Median
+}
+
 type ResponseDetailsViewV6 struct {
-	Status           int                 `json:"status"`
-	Body             string              `json:"body"`
-	BodyFile         string              `json:"bodyFile"`
-	EncodedBody      bool                `json:"encodedBody"`
-	Headers          map[string][]string `json:"headers,omitempty"`
-	Templated        bool                `json:"templated"`
-	TransitionsState map[string]string   `json:"transitionsState,omitempty"`
-	RemovesState     []string            `json:"removesState,omitempty"`
-	FixedDelay       int                 `json:"fixedDelay"`
+	Status           int                      `json:"status"`
+	Body             string                   `json:"body"`
+	BodyFile         string                   `json:"bodyFile"`
+	EncodedBody      bool                     `json:"encodedBody"`
+	Headers          map[string][]string      `json:"headers,omitempty"`
+	Templated        bool                     `json:"templated"`
+	TransitionsState map[string]string        `json:"transitionsState,omitempty"`
+	RemovesState     []string                 `json:"removesState,omitempty"`
+	FixedDelay       int                      `json:"fixedDelay"`
+	LogNormalDelay   *LogNormalDelayOptionsV6 `json:"logNormalDelay,omitempty"`
 }
 
 //Gets Status - required for interfaces.Response
@@ -87,3 +111,13 @@ func (this ResponseDetailsViewV6) GetHeaders() map[string][]string { return this
 
 // Gets FixedDelay - required for interfaces.Response
 func (this ResponseDetailsViewV6) GetFixedDelay() int { return this.FixedDelay }
+
+// Gets LogNormalDelay - required for interfaces.Response
+// The trick here to return nil with the right type to compare later.
+func (this ResponseDetailsViewV6) GetLogNormalDelay() interfaces.ResponseDelay {
+	if this.LogNormalDelay != nil {
+		return this.LogNormalDelay
+	}
+
+	return nil
+}

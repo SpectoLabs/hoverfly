@@ -161,6 +161,22 @@
 				"headers": {
 					"$ref": "#/definitions/headers"
 				},
+				"logNormalDelay": {
+					"properties": {
+						"max": {
+							"type": "integer"
+						},
+						"mean": {
+							"type": "integer"
+						},
+						"median": {
+							"type": "integer"
+						},
+						"min": {
+							"type": "integer"
+						}
+					}
+				},
 				"removesState": {
 					"type": "array"
 				},

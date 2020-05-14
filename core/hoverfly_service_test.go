@@ -1184,7 +1184,7 @@ func Test_Hoverfly_PutSimulation_BodyAndBodyFileWarning(t *testing.T) {
 					},
 				},
 				Response: v2.ResponseDetailsViewV6{
-					Body: "test-body",
+					Body:     "test-body",
 					BodyFile: "test-file",
 				},
 			}},

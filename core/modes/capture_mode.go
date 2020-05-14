@@ -88,5 +88,5 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		"response": GetResponseLogFields(&pair.Response),
 	}).Info("request and response captured")
 
-	return newProcessResult(response, pair.Response.FixedDelay), nil
+	return newProcessResult(response, pair.Response.FixedDelay, pair.Response.LogNormalDelay), nil
 }

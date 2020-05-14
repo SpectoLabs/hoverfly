@@ -52,5 +52,6 @@ func (this SynthesizeMode) Process(request *http.Request, details models.Request
 		"request": GetRequestLogFields(&pair.Request),
 	}).Info("synthetic response created successfuly")
 
-	return newProcessResult(ReconstructResponse(request, pair), pair.Response.FixedDelay), nil
+	response := ReconstructResponse(request, pair)
+	return newProcessResult(response, pair.Response.FixedDelay, pair.Response.LogNormalDelay), nil
 }
