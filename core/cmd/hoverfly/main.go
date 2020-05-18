@@ -24,6 +24,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -38,6 +39,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	mw "github.com/SpectoLabs/hoverfly/core/middleware"
 	"github.com/SpectoLabs/hoverfly/core/modes"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -54,6 +56,7 @@ func (i *arrayFlags) Set(value string) error {
 
 var importFlags arrayFlags
 var destinationFlags arrayFlags
+var logOutputFlags arrayFlags
 
 const boltBackend = "boltdb"
 const inmemoryBackend = "memory"
@@ -103,8 +106,7 @@ var (
 
 	logsFormat = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\"")
 	logsSize   = flag.Int("logs-size", 1000, "Set the amount of logs to be stored in memory")
-	logsOutput = flag.String("logs-output", "console", "Specify \"console\" or \"file\" for output logs, default is \"console\"")
-	logsFile   = flag.String("logs-file", "hoverfly.log", "Specify log file name for output logs, default is \"hoverfly.log\"")
+	logsFile   = flag.String("logs-file", "hoverfly.log", "Specify log file name for output logs")
 	logNoColor = flag.Bool("log-no-color", false, "Disable colors for logging")
 
 	journalSize   = flag.Int("journal-size", 1000, "Set the size of request/response journal")
@@ -179,6 +181,36 @@ func init() {
 	goproxy.GoproxyCa = tlsc
 }
 
+func removeDuplicates(elements []string) []string { // change string to int here if required
+	// Use map to record duplicates as we find them.
+	encountered := map[string]bool{} // change string to int here if required
+	result := []string{}             // change string to int here if required
+
+	for v := range elements {
+		if encountered[elements[v]] == true {
+			// Do not add duplicate.
+		} else {
+			// Record this element as an encountered element.
+			encountered[elements[v]] = true
+			// Append to result slice.
+			result = append(result, elements[v])
+		}
+	}
+	// Return the new slice.
+	return result
+}
+
+// Find takes a slice and looks for an element in it. If found it will
+// return it's key, otherwise it will return -1 and a bool of false.
+func Find(slice []string, val string) (int, bool) {
+	for i, item := range slice {
+		if item == val {
+			return i, true
+		}
+	}
+	return -1, false
+}
+
 func isFlagPassed(name string) bool {
 	found := false
 	flag.Visit(func(f *flag.Flag) {
@@ -194,6 +226,7 @@ func main() {
 
 	flag.Var(&importFlags, "import", "Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
 	flag.Var(&destinationFlags, "dest", "Specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
+	flag.Var(&logOutputFlags, "logs-output", "Specify locations for output logs, options are \"console\" and \"file\" (default \"console\")")
 	flag.Parse()
 	if *logsFormat == "json" {
 		log.SetFormatter(&log.JSONFormatter{})
@@ -204,28 +237,6 @@ func main() {
 			FullTimestamp:    true,
 			DisableColors:    *logNoColor,
 		})
-	}
-
-	if *logsOutput == "file" {
-		file, err := os.OpenFile(*logsFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-		if err == nil {
-			log.SetOutput(file)
-		} else {
-			log.Fatal("Failed to write log file:" + *logsFile)
-		}
-	} else {
-		if isFlagPassed("logs-file") {
-			log.WithFields(log.Fields{
-				"logs-file": *logsFile,
-			}).Fatal("-logs-file is not allowed unless -logs-output is set to 'file'.")
-		}
-		if *logsOutput == "console" {
-			log.SetOutput(os.Stdout)
-		} else {
-			log.WithFields(log.Fields{
-				"logs-output": *logsOutput,
-			}).Fatal("Unknown logs output type")
-		}
 	}
 
 	if *version {
@@ -260,6 +271,56 @@ func main() {
 		}).Fatal("Unknown log-level value")
 	}
 	log.SetLevel(logLevel)
+
+	if len(logOutputFlags) == 0 {
+		// default logging on console when no flag given
+		log.SetOutput(os.Stdout)
+	} else {
+
+		logOutputFlags = removeDuplicates(logOutputFlags)
+
+		_, isLogFile := Find(logOutputFlags, "file")
+		if !isLogFile && isFlagPassed("logs-file") {
+			log.WithFields(log.Fields{
+				"logs-file": *logsFile,
+			}).Fatal("-logs-file is not allowed unless -logs-output is set to 'file'.")
+		}
+
+		writers := make([]io.Writer, 0)
+		for _, logsOutput := range logOutputFlags {
+			if logsOutput == "file" {
+				var formatter log.Formatter
+				if *logsFormat == "json" {
+					formatter = &log.JSONFormatter{}
+				} else {
+					formatter = &log.TextFormatter{
+						ForceColors:      true,
+						DisableTimestamp: false,
+						FullTimestamp:    true,
+						DisableColors:    true,
+					}
+				}
+				logFileHook, err := util.NewLogFileHook(util.LogFileConfig{
+					Filename:  *logsFile,
+					Level:     logLevel,
+					Formatter: formatter,
+				})
+				if err == nil {
+					// add hook to write logs into file
+					log.AddHook(logFileHook)
+				} else {
+					log.Fatal("Failed to write log file:" + *logsFile)
+				}
+			} else if logsOutput == "console" {
+				writers = append(writers, os.Stdout)
+			} else {
+				log.WithFields(log.Fields{
+					"logs-output": logsOutput,
+				}).Fatal("Unknown logs output type")
+			}
+		}
+		log.SetOutput(io.MultiWriter(writers...))
+	}
 
 	if *verbose {
 		// Only log the warning severity or above.

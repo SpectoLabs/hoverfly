@@ -115,18 +115,24 @@ hoverctl configuration file.
 			target.Password = password
 		}
 
-		target.LogOutput, _ = cmd.Flags().GetString("logs-output")
+		target.LogOutput, _ = cmd.Flags().GetStringSlice("logs-output")
 		target.LogFile, _ = cmd.Flags().GetString("logs-file")
 
-		if target.LogOutput != "file" {
+		hasLogOutputFile := false
+		for _, logOutput := range target.LogOutput {
+			if logOutput == "file" {
+				hasLogOutputFile = true
+			}
+			if logOutput != "console" && logOutput != "file" {
+				handleIfError(fmt.Errorf("Unknown logs-output value: " + logOutput))
+			}
+		}
+		if !hasLogOutputFile {
 			cmd.Flags().Visit(func(f *pflag.Flag) {
 				if f.Name == "logs-file" {
-					handleIfError(fmt.Errorf("-logs-file is not allowed unless -logs-output is set to 'file'."))
+					handleIfError(fmt.Errorf("Flag -logs-file is not allowed unless -logs-output is set to 'file'."))
 				}
 			})
-		}
-		if target.LogOutput != "console" && target.LogOutput != "file" {
-			handleIfError(fmt.Errorf("Unknown logs-output value: " + target.LogOutput))
 		}
 
 		err = wrapper.Start(target)
@@ -182,6 +188,6 @@ func init() {
 
 	startCmd.Flags().StringSlice("import", []string{}, "Simulations to import")
 
-	startCmd.Flags().String("logs-output", "console", "Location for log output, \"console\"(default) or \"file\"")
+	startCmd.Flags().StringSlice("logs-output", []string{}, "Locations for log output, \"console\"(default) or \"file\"")
 	startCmd.Flags().String("logs-file", "", "Log file name. Use \"hoverfly-<target name>.log\" if not provided")
 }
