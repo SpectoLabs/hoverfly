@@ -40,8 +40,8 @@ type Target struct {
 
 	Simulations []string `yaml:",omitempty"`
 
-	LogOutput string `yaml:",omitempty"`
-	LogFile   string `yaml:",omitempty"`
+	LogOutput []string `yaml:",omitempty"`
+	LogFile   string   `yaml:",omitempty"`
 }
 
 func NewDefaultTarget() *Target {
@@ -77,13 +77,17 @@ func NewTarget(name, host string, adminPort, proxyPort int) *Target {
 func (this Target) BuildFlags() Flags {
 	flags := Flags{}
 
-	if this.LogOutput != "" {
-		flags = append(flags, "-logs-output="+this.LogOutput)
+	hasLogOutputFile := false
+	for _, logOutput := range this.LogOutput {
+		flags = append(flags, "-logs-output="+logOutput)
+		if logOutput == "file" {
+			hasLogOutputFile = true
+		}
 	}
 
 	if this.LogFile != "" {
 		flags = append(flags, "-logs-file="+this.LogFile)
-	} else if this.LogOutput == "file" {
+	} else if hasLogOutputFile {
 		flags = append(flags, "-logs-file=hoverfly-"+this.Name+".log")
 	}
 
