@@ -40,7 +40,7 @@ type Target struct {
 
 	Simulations []string `yaml:",omitempty"`
 
-	LogHttpRequestResponse bool   `yaml:",omitempty"`
+	LogHttpRequestResponse bool `yaml:",omitempty"`
 }
 
 func NewDefaultTarget() *Target {

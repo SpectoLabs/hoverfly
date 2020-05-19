@@ -114,9 +114,8 @@ hoverctl configuration file.
 			target.Password = password
 		}
 
-
 		target.LogHttpRequestResponse, _ = cmd.Flags().GetBool("log-http")
-		
+
 		err = wrapper.Start(target)
 		handleIfError(err)
 
