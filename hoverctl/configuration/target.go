@@ -39,6 +39,8 @@ type Target struct {
 	Password    string
 
 	Simulations []string `yaml:",omitempty"`
+
+	LogHttpRequestResponse bool   `yaml:",omitempty"`
 }
 
 func NewDefaultTarget() *Target {
@@ -73,6 +75,10 @@ func NewTarget(name, host string, adminPort, proxyPort int) *Target {
 
 func (this Target) BuildFlags() Flags {
 	flags := Flags{}
+
+	if this.LogHttpRequestResponse {
+		flags = append(flags, "-log-http")
+	}
 
 	if this.AdminPort != 0 {
 		flags = append(flags, "-ap="+strconv.Itoa(this.AdminPort))

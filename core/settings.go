@@ -46,6 +46,8 @@ type Configuration struct {
 
 	NoImportCheck bool
 
+	LogHttpRequestResponse bool
+
 	ClientAuthenticationDestination string
 	ClientAuthenticationClientCert  string
 	ClientAuthenticationClientKey   string
@@ -202,6 +204,8 @@ func InitSettings() *Configuration {
 	appConfig.ProxyAuthorizationHeader = "Proxy-Authorization"
 
 	appConfig.CacheSize = 1000
+
+	appConfig.LogHttpRequestResponse = false
 
 	return &appConfig
 }

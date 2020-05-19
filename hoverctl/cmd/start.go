@@ -114,6 +114,9 @@ hoverctl configuration file.
 			target.Password = password
 		}
 
+
+		target.LogHttpRequestResponse, _ = cmd.Flags().GetBool("log-http")
+		
 		err = wrapper.Start(target)
 		handleIfError(err)
 
@@ -166,4 +169,6 @@ func init() {
 	startCmd.Flags().String("password", "", "Password to authenticate Hoverfly")
 
 	startCmd.Flags().StringSlice("import", []string{}, "Simulations to import")
+
+	startCmd.Flags().Bool("log-http", false, "Enable log HTTP request/response")
 }

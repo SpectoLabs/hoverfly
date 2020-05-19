@@ -130,6 +130,10 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 		w.WriteHeader(resp.StatusCode)
 		w.Write([]byte(body))
 
+		if hoverfly.Cfg.LogHttpRequestResponse {
+		    writeRequestResponseIntoLog(r, resp, body)
+		}
+
 		hoverfly.Counter.Count(hoverfly.Cfg.GetMode())
 	})
 
@@ -154,6 +158,30 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	}).Info("Webserver prepared...")
 
 	return proxy
+}
+
+func writeRequestResponseIntoLog(request *http.Request, response *http.Response, resp_body string) {
+	req_body, err := util.GetRequestBody(request)
+	if err != nil {
+		req_body = "Unable read request body"
+	}
+
+	log.WithFields(log.Fields{
+		// "request": 
+		"Scheme"     : request.URL.Scheme,
+		"Destination": request.Host,
+		"Path":        request.URL.Path,
+		"Query":       request.URL.Query,
+		"Method":      request.Method,
+		"RequestHeader": request.Header,
+		"RequestBody": req_body,
+
+		// "response": 
+		"Status": response.StatusCode,
+		"ResponseHeader": response.Header,
+		"ResponseBody": resp_body,
+
+	}).Info("HTTP Message:")
 }
 
 func unauthorizedError(request *http.Request, realm, message string) *http.Response {
