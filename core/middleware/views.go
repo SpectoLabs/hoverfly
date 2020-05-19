@@ -79,7 +79,7 @@ func (this ResponseDetailsView) GetFixedDelay() int { return this.FixedDelay }
 // The trick here to return nil with the right type to compare later.
 func (this ResponseDetailsView) GetLogNormalDelay() interfaces.ResponseDelay {
 	if this.LogNormalDelay != nil {
-		return nil
+		return this.LogNormalDelay
 	}
 
 	return nil

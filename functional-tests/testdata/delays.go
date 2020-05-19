@@ -114,7 +114,7 @@ var Delays = `{
 	}
 }`
 
-var ResponseDelays = `{
+var ResponseFixedDelays = `{
     "data": {
         "pairs": [
             {
@@ -136,8 +136,7 @@ var ResponseDelays = `{
             },
             {
                 "response": {
-                    "status": 200,
-                    "fixedDelay": 130
+                    "status": 200
                 },
                 "request": {
                     "path": [
@@ -149,6 +148,53 @@ var ResponseDelays = `{
         "globalActions": {
             "delays": [
             ]
+        }
+    },
+    "meta": {
+        "schemaVersion": "v6",
+        "hoverflyVersion": "v1.2.0",
+        "timeExported": "2017-02-23T12:43:48Z"
+    }
+}`
+
+var ResponseLogNormalDelays = `{
+    "data": {
+        "pairs": [
+            {
+                "response": {
+                    "status": 200,
+                    "body": "Page is slow",
+                    "logNormalDelay": {
+						"min": 100,
+						"max": 150,
+						"mean": 130,
+						"median": 110
+					}
+                },
+                "request": {
+                    "path": [
+                        {"matcher": "exact", "value": "/api/profile"}
+                    ],
+                    "headers": {
+                        "X-API-Version": [
+                            {"matcher": "exact", "value": "v1"}
+                        ]
+                    }
+                }
+            },
+            {
+                "response": {
+                    "status": 200
+                },
+                "request": {
+                    "path": [
+                        {"matcher": "exact", "value": "/api/settings"}
+                    ]
+                }
+            }
+        ],
+        "globalActions": {
+            "delays": []
         }
     },
     "meta": {
