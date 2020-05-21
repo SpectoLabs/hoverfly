@@ -181,36 +181,6 @@ func init() {
 	goproxy.GoproxyCa = tlsc
 }
 
-func removeDuplicates(elements []string) []string { // change string to int here if required
-	// Use map to record duplicates as we find them.
-	encountered := map[string]bool{} // change string to int here if required
-	result := []string{}             // change string to int here if required
-
-	for v := range elements {
-		if encountered[elements[v]] == true {
-			// Do not add duplicate.
-		} else {
-			// Record this element as an encountered element.
-			encountered[elements[v]] = true
-			// Append to result slice.
-			result = append(result, elements[v])
-		}
-	}
-	// Return the new slice.
-	return result
-}
-
-// Find takes a slice and looks for an element in it. If found it will
-// return it's key, otherwise it will return -1 and a bool of false.
-func Find(slice []string, val string) (int, bool) {
-	for i, item := range slice {
-		if item == val {
-			return i, true
-		}
-	}
-	return -1, false
-}
-
 func isFlagPassed(name string) bool {
 	found := false
 	flag.Visit(func(f *flag.Flag) {
@@ -277,9 +247,12 @@ func main() {
 		log.SetOutput(os.Stdout)
 	} else {
 
-		logOutputFlags = removeDuplicates(logOutputFlags)
-
-		_, isLogFile := Find(logOutputFlags, "file")
+		// remove duplicates
+		logOutputMap := map[string]string{}
+		for _, val := range logOutputFlags {
+			logOutputMap[val] = val
+		}
+		_, isLogFile := logOutputMap["file"]
 		if !isLogFile && isFlagPassed("logs-file") {
 			log.WithFields(log.Fields{
 				"logs-file": *logsFile,
