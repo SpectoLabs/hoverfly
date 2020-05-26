@@ -283,9 +283,9 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 	return nil
 }
 
-func (this Hoverfly) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	if this.Cfg.Middleware.IsSet() {
-		return this.Cfg.Middleware.Execute(pair)
+func (hf Hoverfly) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+	if hf.Cfg.Middleware.IsSet() {
+		return hf.Cfg.Middleware.Execute(pair)
 	}
 
 	return pair, nil
