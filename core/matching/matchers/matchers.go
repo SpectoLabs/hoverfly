@@ -14,4 +14,5 @@ var Matchers = map[string]MatcherFunc{
 	Regex:       RegexMatch,
 	Xml:         XmlMatch,
 	Xpath:       XpathMatch,
+	XmlPartial:  XmlPartialMatch,
 }
