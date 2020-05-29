@@ -2,6 +2,10 @@ package hoverfly
 
 import (
 	"fmt"
+	"net"
+	"net/http"
+	"sync"
+
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
@@ -14,9 +18,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/state"
 	"github.com/SpectoLabs/hoverfly/core/templating"
 	log "github.com/sirupsen/logrus"
-	"net"
-	"net/http"
-	"sync"
 )
 
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access

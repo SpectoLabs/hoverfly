@@ -8,6 +8,7 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -115,8 +116,6 @@ hoverctl configuration file.
 			target.Password = password
 		}
 
-		target.LogHttpRequestResponse, _ = cmd.Flags().GetBool("log-http")
-		
 		target.LogOutput, _ = cmd.Flags().GetStringSlice("logs-output")
 		target.LogFile, _ = cmd.Flags().GetString("logs-file")
 
@@ -136,6 +135,15 @@ hoverctl configuration file.
 				}
 			})
 		}
+
+		logLevelFlag, _ := cmd.Flags().GetString("log-level")
+		logLevel, err := log.ParseLevel(logLevelFlag)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"log-level": logLevelFlag,
+			}).Fatal("Unknown log-level value")
+		}
+		target.LogLevel = logLevel.String()
 
 		err = wrapper.Start(target)
 		handleIfError(err)
@@ -190,8 +198,7 @@ func init() {
 
 	startCmd.Flags().StringSlice("import", []string{}, "Simulations to import")
 
-	startCmd.Flags().Bool("log-http", false, "Enable log HTTP request/response")
-	
 	startCmd.Flags().StringSlice("logs-output", []string{}, "Locations for log output, \"console\"(default) or \"file\"")
 	startCmd.Flags().String("logs-file", "", "Log file name. Use \"hoverfly-<target name>.log\" if not provided")
+	startCmd.Flags().String("log-level", "info", "Set log level (panic, fatal, error, warn, info or debug)")
 }
