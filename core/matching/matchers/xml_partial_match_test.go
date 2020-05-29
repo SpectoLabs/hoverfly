@@ -1,4 +1,3 @@
-// パッケージ内の関数をテストするために、XmlPartialMatchと同じなパッケージを使う。
 package matchers
 
 import (
@@ -7,6 +6,10 @@ import (
 	. "github.com/beevik/etree"
 	. "github.com/onsi/gomega"
 )
+
+// NOTICE: test_cases advanced feature is comment out temporarily
+// 1. <items x-match="allow-unknown-children"> </items>
+// 2. <item x-match-times="5"></item>
 
 /////////////////////////////////////////
 // isLeaf
@@ -124,7 +127,7 @@ func Test_compareValue_3(t *testing.T) {
 
 func Test_compareValue_4(t *testing.T) {
 	RegisterTestingT(t)
-	// 全角スペース	vs 半角スペース
+	// full-width space	vs half-width space
 	Expect(compareValue("　", " ")).To(BeFalse())
 }
 
