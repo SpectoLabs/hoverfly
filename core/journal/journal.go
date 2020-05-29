@@ -1,6 +1,8 @@
 package journal
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"sync"
@@ -13,6 +15,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
+	log "github.com/sirupsen/logrus"
 )
 
 const RFC3339Milli = "2006-01-02T15:04:05.000Z07:00"
@@ -58,13 +61,33 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 		this.entries = append(this.entries[:0], this.entries[1:]...)
 	}
 
-	this.entries = append(this.entries, JournalEntry{
+	entry := JournalEntry{
 		Request:     &payloadRequest,
 		Response:    payloadResponse,
 		Mode:        mode,
 		TimeStarted: started,
 		Latency:     time.Since(started),
-	})
+	}
+
+	this.entries = append(this.entries, entry)
+
+	if log.IsLevelEnabled(log.DebugLevel) {
+		buf := new(bytes.Buffer)
+		enc := json.NewEncoder(buf)
+		// do not escape characters in HTML like < and >
+		enc.SetEscapeHTML(false)
+		err := enc.Encode(convertJournalEntry(entry))
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("invalid journal entry")
+		} else {
+			log.WithFields(log.Fields{
+				"json": buf.String(),
+			}).Debug("journal entry")
+		}
+	}
+
 	this.mutex.Unlock()
 
 	return nil
@@ -218,6 +241,17 @@ func convertJournalEntries(entries []JournalEntry) []v2.JournalEntryView {
 	}
 
 	return journalEntryViews
+}
+
+func convertJournalEntry(entry JournalEntry) v2.JournalEntryView {
+
+	return v2.JournalEntryView{
+		Request:     entry.Request.ConvertToRequestDetailsView(),
+		Response:    entry.Response.ConvertToResponseDetailsView(),
+		Mode:        entry.Mode,
+		TimeStarted: entry.TimeStarted.Format(RFC3339Milli),
+		Latency:     entry.Latency.Seconds() * 1e3,
+	}
 }
 
 func getSortParameters(sort string) (string, string, error) {

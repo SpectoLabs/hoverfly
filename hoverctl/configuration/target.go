@@ -38,6 +38,8 @@ type Target struct {
 	Username    string
 	Password    string
 
+	LogLevel string
+
 	Simulations []string `yaml:",omitempty"`
 
 	LogOutput []string `yaml:",omitempty"`
@@ -83,6 +85,10 @@ func (this Target) BuildFlags() Flags {
 		if logOutput == "file" {
 			hasLogOutputFile = true
 		}
+	}
+
+	if this.LogLevel != "" {
+		flags = append(flags, "-log-level="+this.LogLevel)
 	}
 
 	if this.LogFile != "" {
