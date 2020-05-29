@@ -71,19 +71,21 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 
 	this.entries = append(this.entries, entry)
 
-	buf := new(bytes.Buffer)
-	enc := json.NewEncoder(buf)
-	// do not escape characters in HTML like < and >
-	enc.SetEscapeHTML(false)
-	err := enc.Encode(convertJournalEntry(entry))
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err.Error(),
-		}).Error("invalid journal entry")
-	} else {
-		log.WithFields(log.Fields{
-			"json": buf.String(),
-		}).Debug("journal entry")
+	if log.IsLevelEnabled(log.DebugLevel) {
+		buf := new(bytes.Buffer)
+		enc := json.NewEncoder(buf)
+		// do not escape characters in HTML like < and >
+		enc.SetEscapeHTML(false)
+		err := enc.Encode(convertJournalEntry(entry))
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("invalid journal entry")
+		} else {
+			log.WithFields(log.Fields{
+				"json": buf.String(),
+			}).Debug("journal entry")
+		}
 	}
 
 	this.mutex.Unlock()
