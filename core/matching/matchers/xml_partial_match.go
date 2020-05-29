@@ -46,7 +46,7 @@ func compareTree(expected *etree.Element, actual *etree.Element) bool {
 		return compareValue(expected.Text(), actual.Text())
 	}
 	// case 2: children element matching
-	actual_children := actual.ChildElements();
+	actual_children := actual.ChildElements()
 	// for each expected tag
 	for _, match := range expected.ChildElements() {
 		// find one in actual
@@ -56,7 +56,7 @@ func compareTree(expected *etree.Element, actual *etree.Element) bool {
 				matched = true
 				// remove matched
 				actual_children = append(actual_children[:i], actual_children[i+1:]...)
-				break;
+				break
 			}
 		}
 		// all elements in actual data is not matched
@@ -82,14 +82,14 @@ func compareValue(expected string, actual string) bool {
 	// parse node content
 	group := regExpr.FindStringSubmatch(expected)
 	// if it matchs the grammer like {{regex: ... }}  ==> otherwise, take it as plain text
-	if len(group) > 1 { 
+	if len(group) > 1 {
 		matcher, err := regexp.Compile(group[1])
 		// can not compile regular expression --> invalid regex --> false
-		if err != nil { 
+		if err != nil {
 			return false
 		}
 		// use regular expression to match actual value
-		return matcher.MatchString(actual) 
+		return matcher.MatchString(actual)
 	}
 	// pattern 3: exact equal
 	return expected == actual

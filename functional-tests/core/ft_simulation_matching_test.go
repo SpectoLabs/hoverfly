@@ -81,6 +81,33 @@ var _ = Describe("	When using different matchers", func() {
 		})
 	})
 
+	Context("Using `xmlPartialMatch`", func() {
+
+		BeforeEach(func() {
+			hoverfly.ImportSimulation(testdata.XmlPartialMatch)
+		})
+
+		It("should match on the body", func() {
+			req := sling.New().Get("http://test.com")
+			req.Body(bytes.NewBufferString("<items><item>A12345</item><item>here can be any string</item><item>123</item></items>"))
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("xml match")))
+		})
+
+		It("should not match on wrong body", func() {
+			req := sling.New().Get("http://test.com")
+			req.Body(bytes.NewBufferString("<items><item>A1234</item><item>here can be any string</item><item>123</item></items>"))
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(502))
+
+			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+		})
+	})
+
 	Context("Using `jsonMatch`", func() {
 
 		BeforeEach(func() {
