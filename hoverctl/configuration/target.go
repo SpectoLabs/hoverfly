@@ -41,6 +41,9 @@ type Target struct {
 	Simulations []string `yaml:",omitempty"`
 
 	LogHttpRequestResponse bool `yaml:",omitempty"`
+	
+	LogOutput []string `yaml:",omitempty"`
+	LogFile   string   `yaml:",omitempty"`
 }
 
 func NewDefaultTarget() *Target {
@@ -78,6 +81,20 @@ func (this Target) BuildFlags() Flags {
 
 	if this.LogHttpRequestResponse {
 		flags = append(flags, "-log-http")
+	}
+	
+	hasLogOutputFile := false
+	for _, logOutput := range this.LogOutput {
+		flags = append(flags, "-logs-output="+logOutput)
+		if logOutput == "file" {
+			hasLogOutputFile = true
+		}
+	}
+
+	if this.LogFile != "" {
+		flags = append(flags, "-logs-file="+this.LogFile)
+	} else if hasLogOutputFile {
+		flags = append(flags, "-logs-file=hoverfly-"+this.Name+".log")
 	}
 
 	if this.AdminPort != 0 {

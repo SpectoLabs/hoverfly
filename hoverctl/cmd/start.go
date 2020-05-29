@@ -9,6 +9,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 var startCmd = &cobra.Command{
@@ -115,6 +116,26 @@ hoverctl configuration file.
 		}
 
 		target.LogHttpRequestResponse, _ = cmd.Flags().GetBool("log-http")
+		
+		target.LogOutput, _ = cmd.Flags().GetStringSlice("logs-output")
+		target.LogFile, _ = cmd.Flags().GetString("logs-file")
+
+		hasLogOutputFile := false
+		for _, logOutput := range target.LogOutput {
+			if logOutput == "file" {
+				hasLogOutputFile = true
+			}
+			if logOutput != "console" && logOutput != "file" {
+				handleIfError(fmt.Errorf("Unknown logs-output value: " + logOutput))
+			}
+		}
+		if !hasLogOutputFile {
+			cmd.Flags().Visit(func(f *pflag.Flag) {
+				if f.Name == "logs-file" {
+					handleIfError(fmt.Errorf("Flag -logs-file is not allowed unless -logs-output is set to 'file'."))
+				}
+			})
+		}
 
 		err = wrapper.Start(target)
 		handleIfError(err)
@@ -170,4 +191,7 @@ func init() {
 	startCmd.Flags().StringSlice("import", []string{}, "Simulations to import")
 
 	startCmd.Flags().Bool("log-http", false, "Enable log HTTP request/response")
+	
+	startCmd.Flags().StringSlice("logs-output", []string{}, "Locations for log output, \"console\"(default) or \"file\"")
+	startCmd.Flags().String("logs-file", "", "Log file name. Use \"hoverfly-<target name>.log\" if not provided")
 }

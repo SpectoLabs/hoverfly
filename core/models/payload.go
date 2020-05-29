@@ -99,7 +99,7 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 		Destination: strings.ToLower(req.Host),
 		Scheme:      scheme,
 		Query:       req.URL.Query(),
-		Body:        string(reqBody),
+		Body:        reqBody,
 		Headers:     req.Header,
 		rawQuery:    req.URL.RawQuery,
 	}

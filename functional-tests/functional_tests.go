@@ -66,6 +66,7 @@ type Hoverfly struct {
 	proxyUrl  string
 	process   *exec.Cmd
 	commands  []string
+	sandbox   string
 }
 
 func NewHoverfly() *Hoverfly {
@@ -90,6 +91,7 @@ func (this *Hoverfly) Start(commands ...string) {
 
 func (this Hoverfly) Stop() {
 	this.process.Process.Kill()
+	os.RemoveAll(this.sandbox) // clean up
 }
 
 func (this Hoverfly) StopAPIAuthenticated(username, password string) {
@@ -316,7 +318,91 @@ func (this Hoverfly) GetPid() int {
 	return this.process.Process.Pid
 }
 
-func (this Hoverfly) startHoverflyInternal(adminPort, proxyPort int, additionalCommands ...string) *exec.Cmd {
+func (this Hoverfly) GetLogFile(logFile string) (string, error) {
+	path := filepath.Join(this.process.Dir, logFile)
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	b, err := ioutil.ReadAll(file)
+	return string(b), err
+}
+
+func (this Hoverfly) GetStdOut() (string, error) {
+	path := filepath.Join(this.process.Dir, "stdout")
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	b, err := ioutil.ReadAll(file)
+	return string(b), err
+}
+
+// File copies a single file from src to dst
+func CopyFile(src, dst string) error {
+	var err error
+	var srcfd *os.File
+	var dstfd *os.File
+	var srcinfo os.FileInfo
+
+	if srcfd, err = os.Open(src); err != nil {
+		return err
+	}
+	defer srcfd.Close()
+
+	if dstfd, err = os.Create(dst); err != nil {
+		return err
+	}
+	defer dstfd.Close()
+
+	if _, err = io.Copy(dstfd, srcfd); err != nil {
+		return err
+	}
+	if srcinfo, err = os.Stat(src); err != nil {
+		return err
+	}
+	return os.Chmod(dst, srcinfo.Mode())
+}
+
+// Dir copies a whole directory recursively
+func CopyDir(src string, dst string) error {
+	var err error
+	var fds []os.FileInfo
+	var srcinfo os.FileInfo
+
+	if srcinfo, err = os.Stat(src); err != nil {
+		return err
+	}
+
+	if err = os.MkdirAll(dst, srcinfo.Mode()); err != nil {
+		return err
+	}
+
+	if fds, err = ioutil.ReadDir(src); err != nil {
+		return err
+	}
+	for _, fd := range fds {
+		srcfp := filepath.Join(src, fd.Name())
+		dstfp := filepath.Join(dst, fd.Name())
+
+		if fd.IsDir() {
+			if err = CopyDir(srcfp, dstfp); err != nil {
+				fmt.Println(err)
+			}
+		} else {
+			if err = CopyFile(srcfp, dstfp); err != nil {
+				fmt.Println(err)
+			}
+		}
+	}
+	return nil
+}
+
+func (this *Hoverfly) startHoverflyInternal(adminPort, proxyPort int, additionalCommands ...string) *exec.Cmd {
 	hoverflyBinaryUri := BuildBinaryPath()
 
 	commands := []string{
@@ -329,7 +415,29 @@ func (this Hoverfly) startHoverflyInternal(adminPort, proxyPort int, additionalC
 	commands = append(commands, additionalCommands...)
 	this.commands = commands
 	hoverflyCmd := exec.Command(hoverflyBinaryUri, commands...)
-	err := hoverflyCmd.Start()
+
+	var err error
+	// create directory as sanbox for current test
+	workingDirectory, _ := os.Getwd()
+	this.sandbox, err = ioutil.TempDir(workingDirectory, "sandbox-*")
+	if err != nil {
+		os.Exit(1)
+	}
+	// prepare test data
+	CopyDir("testdata", this.sandbox+"/testdata")
+
+	// change work directory to sandbox
+	hoverflyCmd.Dir = this.sandbox
+
+	// redirect console output to file
+	f, e := os.Create(filepath.Join(this.sandbox, "stdout"))
+	if e != nil {
+		os.Exit(1)
+	}
+	defer f.Close()
+	hoverflyCmd.Stdout = f
+
+	err = hoverflyCmd.Start()
 
 	BinaryErrorCheck(err, hoverflyBinaryUri)
 

@@ -24,6 +24,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -38,6 +39,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	mw "github.com/SpectoLabs/hoverfly/core/middleware"
 	"github.com/SpectoLabs/hoverfly/core/modes"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -54,6 +56,7 @@ func (i *arrayFlags) Set(value string) error {
 
 var importFlags arrayFlags
 var destinationFlags arrayFlags
+var logOutputFlags arrayFlags
 
 const boltBackend = "boltdb"
 const inmemoryBackend = "memory"
@@ -101,9 +104,10 @@ var (
 	database     = flag.String("db", inmemoryBackend, "Storage to use - 'boltdb' or 'memory' which will not write anything to disk (DEPRECATED)")
 	disableCache = flag.Bool("disable-cache", false, "Disable the request/response cache (the cache that sits in front of matching)")
 
-	logsFormat             = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\"")
-	logsSize               = flag.Int("logs-size", 1000, "Set the amount of logs to be stored in memory")
-	logNoColor             = flag.Bool("log-no-color", false, "Disable colors for logging")
+	logsFormat = flag.String("logs", "plaintext", "Specify format for logs, options are \"plaintext\" and \"json\"")
+	logsSize   = flag.Int("logs-size", 1000, "Set the amount of logs to be stored in memory")
+	logsFile   = flag.String("logs-file", "hoverfly.log", "Specify log file name for output logs")
+	logNoColor = flag.Bool("log-no-color", false, "Disable colors for logging")
 	logHttpRequestResponse = flag.Bool("log-http", false, "Enable log HTTP request/response")
 
 	journalSize   = flag.Int("journal-size", 1000, "Set the size of request/response journal")
@@ -178,11 +182,22 @@ func init() {
 	goproxy.GoproxyCa = tlsc
 }
 
+func isFlagPassed(name string) bool {
+	found := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == name {
+			found = true
+		}
+	})
+	return found
+}
+
 func main() {
 	hoverfly := hv.NewHoverfly()
 
 	flag.Var(&importFlags, "import", "Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
 	flag.Var(&destinationFlags, "dest", "Specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
+	flag.Var(&logOutputFlags, "logs-output", "Specify locations for output logs, options are \"console\" and \"file\" (default \"console\")")
 	flag.Parse()
 	if *logsFormat == "json" {
 		log.SetFormatter(&log.JSONFormatter{})
@@ -227,6 +242,59 @@ func main() {
 		}).Fatal("Unknown log-level value")
 	}
 	log.SetLevel(logLevel)
+
+	if len(logOutputFlags) == 0 {
+		// default logging on console when no flag given
+		log.SetOutput(os.Stdout)
+	} else {
+
+		// remove duplicates
+		logOutputMap := map[string]string{}
+		for _, val := range logOutputFlags {
+			logOutputMap[val] = val
+		}
+		_, isLogFile := logOutputMap["file"]
+		if !isLogFile && isFlagPassed("logs-file") {
+			log.WithFields(log.Fields{
+				"logs-file": *logsFile,
+			}).Fatal("-logs-file is not allowed unless -logs-output is set to 'file'.")
+		}
+
+		writers := make([]io.Writer, 0)
+		for _, logsOutput := range logOutputFlags {
+			if logsOutput == "file" {
+				var formatter log.Formatter
+				if *logsFormat == "json" {
+					formatter = &log.JSONFormatter{}
+				} else {
+					formatter = &log.TextFormatter{
+						ForceColors:      true,
+						DisableTimestamp: false,
+						FullTimestamp:    true,
+						DisableColors:    true,
+					}
+				}
+				logFileHook, err := util.NewLogFileHook(util.LogFileConfig{
+					Filename:  *logsFile,
+					Level:     logLevel,
+					Formatter: formatter,
+				})
+				if err == nil {
+					// add hook to write logs into file
+					log.AddHook(logFileHook)
+				} else {
+					log.Fatal("Failed to write log file:" + *logsFile)
+				}
+			} else if logsOutput == "console" {
+				writers = append(writers, os.Stdout)
+			} else {
+				log.WithFields(log.Fields{
+					"logs-output": logsOutput,
+				}).Fatal("Unknown logs output type")
+			}
+		}
+		log.SetOutput(io.MultiWriter(writers...))
+	}
 
 	if *verbose {
 		// Only log the warning severity or above.
