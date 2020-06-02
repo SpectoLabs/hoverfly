@@ -1519,9 +1519,9 @@ func Test_compareTree_51(t *testing.T) {
 
 //////////////////////////////////////////////////////
 
-// XMLPartialMatch
+// XmlTemplatedMatch
 
-func Test_XmlPartialMatch_1(t *testing.T) {
+func Test_XmlTemplatedMatch_1(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -1537,10 +1537,10 @@ func Test_XmlPartialMatch_1(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_2(t *testing.T) {
+func Test_XmlTemplatedMatch_2(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -1556,10 +1556,10 @@ func Test_XmlPartialMatch_2(t *testing.T) {
 			bbb check</bbb>	
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_3(t *testing.T) {
+func Test_XmlTemplatedMatch_3(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -1576,10 +1576,10 @@ func Test_XmlPartialMatch_3(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_4(t *testing.T) {
+func Test_XmlTemplatedMatch_4(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -1596,10 +1596,10 @@ func Test_XmlPartialMatch_4(t *testing.T) {
 		</xml>								
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_5(t *testing.T) {
+func Test_XmlTemplatedMatch_5(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -1616,10 +1616,10 @@ func Test_XmlPartialMatch_5(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_6(t *testing.T) {
+func Test_XmlTemplatedMatch_6(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -1636,10 +1636,10 @@ func Test_XmlPartialMatch_6(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_7(t *testing.T) {
+func Test_XmlTemplatedMatch_7(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -1657,12 +1657,12 @@ func Test_XmlPartialMatch_7(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
 /*
 
-func Test_XmlPartialMatch_8(t *testing.T) {
+func Test_XmlTemplatedMatch_8(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1681,10 +1681,10 @@ func Test_XmlPartialMatch_8(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_9(t *testing.T) {
+func Test_XmlTemplatedMatch_9(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1703,10 +1703,10 @@ func Test_XmlPartialMatch_9(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_10(t *testing.T) {
+func Test_XmlTemplatedMatch_10(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1725,10 +1725,10 @@ func Test_XmlPartialMatch_10(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_11(t *testing.T) {
+func Test_XmlTemplatedMatch_11(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1749,10 +1749,10 @@ func Test_XmlPartialMatch_11(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_12(t *testing.T) {
+func Test_XmlTemplatedMatch_12(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1772,10 +1772,10 @@ func Test_XmlPartialMatch_12(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_13(t *testing.T) {
+func Test_XmlTemplatedMatch_13(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1794,10 +1794,10 @@ func Test_XmlPartialMatch_13(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_14(t *testing.T) {
+func Test_XmlTemplatedMatch_14(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1817,10 +1817,10 @@ func Test_XmlPartialMatch_14(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_15(t *testing.T) {
+func Test_XmlTemplatedMatch_15(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1842,10 +1842,10 @@ func Test_XmlPartialMatch_15(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_16(t *testing.T) {
+func Test_XmlTemplatedMatch_16(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1865,10 +1865,10 @@ func Test_XmlPartialMatch_16(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_17(t *testing.T) {
+func Test_XmlTemplatedMatch_17(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1895,10 +1895,10 @@ func Test_XmlPartialMatch_17(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_18(t *testing.T) {
+func Test_XmlTemplatedMatch_18(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1925,10 +1925,10 @@ func Test_XmlPartialMatch_18(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_19(t *testing.T) {
+func Test_XmlTemplatedMatch_19(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1957,10 +1957,10 @@ func Test_XmlPartialMatch_19(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_20(t *testing.T) {
+func Test_XmlTemplatedMatch_20(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -1989,10 +1989,10 @@ func Test_XmlPartialMatch_20(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_21(t *testing.T) {
+func Test_XmlTemplatedMatch_21(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -2021,10 +2021,10 @@ func Test_XmlPartialMatch_21(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_22(t *testing.T) {
+func Test_XmlTemplatedMatch_22(t *testing.T) {
 	RegisterTestingT(t)
 
 
@@ -2053,12 +2053,12 @@ func Test_XmlPartialMatch_22(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
 */
 
-func Test_XmlPartialMatch_23(t *testing.T) {
+func Test_XmlTemplatedMatch_23(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2077,10 +2077,10 @@ func Test_XmlPartialMatch_23(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_24(t *testing.T) {
+func Test_XmlTemplatedMatch_24(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2099,10 +2099,10 @@ func Test_XmlPartialMatch_24(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_25(t *testing.T) {
+func Test_XmlTemplatedMatch_25(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2121,10 +2121,10 @@ func Test_XmlPartialMatch_25(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_26(t *testing.T) {
+func Test_XmlTemplatedMatch_26(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2141,10 +2141,10 @@ func Test_XmlPartialMatch_26(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_27(t *testing.T) {
+func Test_XmlTemplatedMatch_27(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2159,10 +2159,10 @@ func Test_XmlPartialMatch_27(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_28(t *testing.T) {
+func Test_XmlTemplatedMatch_28(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2177,10 +2177,10 @@ func Test_XmlPartialMatch_28(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_29(t *testing.T) {
+func Test_XmlTemplatedMatch_29(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2195,10 +2195,10 @@ func Test_XmlPartialMatch_29(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_30(t *testing.T) {
+func Test_XmlTemplatedMatch_30(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2213,10 +2213,10 @@ func Test_XmlPartialMatch_30(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_31(t *testing.T) {
+func Test_XmlTemplatedMatch_31(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2231,10 +2231,10 @@ func Test_XmlPartialMatch_31(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_32(t *testing.T) {
+func Test_XmlTemplatedMatch_32(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2249,10 +2249,10 @@ func Test_XmlPartialMatch_32(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_33(t *testing.T) {
+func Test_XmlTemplatedMatch_33(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2267,10 +2267,10 @@ func Test_XmlPartialMatch_33(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_34(t *testing.T) {
+func Test_XmlTemplatedMatch_34(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2285,10 +2285,10 @@ func Test_XmlPartialMatch_34(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_35(t *testing.T) {
+func Test_XmlTemplatedMatch_35(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2303,10 +2303,10 @@ func Test_XmlPartialMatch_35(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_36(t *testing.T) {
+func Test_XmlTemplatedMatch_36(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2321,10 +2321,10 @@ func Test_XmlPartialMatch_36(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_37(t *testing.T) {
+func Test_XmlTemplatedMatch_37(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2339,10 +2339,10 @@ func Test_XmlPartialMatch_37(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_38(t *testing.T) {
+func Test_XmlTemplatedMatch_38(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2357,10 +2357,10 @@ func Test_XmlPartialMatch_38(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_39(t *testing.T) {
+func Test_XmlTemplatedMatch_39(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2375,10 +2375,10 @@ func Test_XmlPartialMatch_39(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_40(t *testing.T) {
+func Test_XmlTemplatedMatch_40(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2393,10 +2393,10 @@ func Test_XmlPartialMatch_40(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_41(t *testing.T) {
+func Test_XmlTemplatedMatch_41(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2411,10 +2411,10 @@ func Test_XmlPartialMatch_41(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_42(t *testing.T) {
+func Test_XmlTemplatedMatch_42(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2429,10 +2429,10 @@ func Test_XmlPartialMatch_42(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_43(t *testing.T) {
+func Test_XmlTemplatedMatch_43(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2447,10 +2447,10 @@ func Test_XmlPartialMatch_43(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_44(t *testing.T) {
+func Test_XmlTemplatedMatch_44(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2465,10 +2465,10 @@ func Test_XmlPartialMatch_44(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_45(t *testing.T) {
+func Test_XmlTemplatedMatch_45(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2483,10 +2483,10 @@ func Test_XmlPartialMatch_45(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_46(t *testing.T) {
+func Test_XmlTemplatedMatch_46(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2501,10 +2501,10 @@ func Test_XmlPartialMatch_46(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_47(t *testing.T) {
+func Test_XmlTemplatedMatch_47(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2519,10 +2519,10 @@ func Test_XmlPartialMatch_47(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeTrue())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
 }
 
-func Test_XmlPartialMatch_48(t *testing.T) {
+func Test_XmlTemplatedMatch_48(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2537,10 +2537,10 @@ func Test_XmlPartialMatch_48(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_49(t *testing.T) {
+func Test_XmlTemplatedMatch_49(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2555,10 +2555,10 @@ func Test_XmlPartialMatch_49(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_50(t *testing.T) {
+func Test_XmlTemplatedMatch_50(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2573,10 +2573,10 @@ func Test_XmlPartialMatch_50(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_51(t *testing.T) {
+func Test_XmlTemplatedMatch_51(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2591,10 +2591,10 @@ func Test_XmlPartialMatch_51(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_52(t *testing.T) {
+func Test_XmlTemplatedMatch_52(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2612,10 +2612,10 @@ func Test_XmlPartialMatch_52(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_53(t *testing.T) {
+func Test_XmlTemplatedMatch_53(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := `
@@ -2635,10 +2635,10 @@ func Test_XmlPartialMatch_53(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }
 
-func Test_XmlPartialMatch_54(t *testing.T) {
+func Test_XmlTemplatedMatch_54(t *testing.T) {
 	RegisterTestingT(t)
 
 	expect := 53
@@ -2651,5 +2651,5 @@ func Test_XmlPartialMatch_54(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlPartialMatch(expect, actual)).To(BeFalse())
+	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
 }

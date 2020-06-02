@@ -6,12 +6,12 @@ import (
 	"github.com/beevik/etree"
 )
 
-var XmlPartial = "xmlpartial"
+var XmlTemplated = "xmltemplated"
 
 var ignoreExpr = regexp.MustCompile("^\\s*\\{\\{\\s*ignore\\s*\\}\\}\\s*$")
 var regExpr = regexp.MustCompile("^\\s*\\{\\{\\s*regex:(.*)\\}\\}\\s*$")
 
-func XmlPartialMatch(match interface{}, toMatch string) bool {
+func XmlTemplatedMatch(match interface{}, toMatch string) bool {
 	matchString, ok := match.(string)
 	if !ok {
 		return false

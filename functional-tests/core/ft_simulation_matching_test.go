@@ -81,10 +81,10 @@ var _ = Describe("	When using different matchers", func() {
 		})
 	})
 
-	Context("Using `xmlPartialMatch`", func() {
+	Context("Using `xmlTemplatedMatch`", func() {
 
 		BeforeEach(func() {
-			hoverfly.ImportSimulation(testdata.XmlPartialMatch)
+			hoverfly.ImportSimulation(testdata.XmlTemplatedMatch)
 		})
 
 		It("should match on the body", func() {

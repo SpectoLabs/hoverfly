@@ -1,13 +1,13 @@
 package testdata
 
-var XmlPartialMatch = `{
+var XmlTemplatedMatch = `{
 	"data": {
 		"pairs": [
 			{
 				"request": {
 					"body": [
 						{
-							"matcher": "xmlpartial",
+							"matcher": "xmltemplated",
 							"value": "<items><item>123</item><item>{{regex:^[A-Z]\\d{5}$}}</item><item>{{ignore}}</item></items>"
 						}
 					]
@@ -31,4 +31,3 @@ var XmlPartialMatch = `{
 		"timeExported": "2018-05-03T14:45:16+01:00"
 	}
 }`
-
