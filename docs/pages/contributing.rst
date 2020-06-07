@@ -20,9 +20,6 @@ You will need `Go 1.14 <https://golang.org>`_ . Instructions on how to set up yo
 
 .. code:: bash
 
-    cd $GOPATH/src
-    mkdir -p github.com/SpectoLabs/
-    cd github.com/SpectoLabs/
     git clone https://github.com/SpectoLabs/hoverfly.git
     # or: git clone https://github.com/<your_username>/hoverfly.git
     cd hoverfly
