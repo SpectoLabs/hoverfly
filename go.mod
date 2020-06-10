@@ -8,6 +8,7 @@ require (
 	github.com/SpectoLabs/goproxy v0.0.0-20200304143951-5f8c6dc15bd5
 	github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496
 	github.com/aymerick/raymond v2.0.2+incompatible
+	github.com/beevik/etree v1.1.0
 	github.com/boltdb/bolt v1.2.1-0.20160424201119-d97499360d1e
 	github.com/codegangsta/negroni v0.1.1-0.20160503152438-24bf3506bb5e
 	github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86 // indirect

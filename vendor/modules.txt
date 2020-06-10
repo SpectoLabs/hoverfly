@@ -30,6 +30,9 @@ github.com/aymerick/raymond
 github.com/aymerick/raymond/ast
 github.com/aymerick/raymond/lexer
 github.com/aymerick/raymond/parser
+# github.com/beevik/etree v1.1.0
+## explicit
+github.com/beevik/etree
 # github.com/boltdb/bolt v1.2.1-0.20160424201119-d97499360d1e
 ## explicit
 github.com/boltdb/bolt

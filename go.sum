@@ -10,6 +10,8 @@ github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496 h1:dESITduf
 github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496/go.mod h1:+GxMEKI0Va2U8h3os6oiUAetHAlGMvxjdpAH/9uvUMA=
 github.com/aymerick/raymond v2.0.2+incompatible h1:VEp3GpgdAnv9B2GFyTvqgcKvY+mfKMjPOA3SbKLtnU0=
 github.com/aymerick/raymond v2.0.2+incompatible/go.mod h1:osfaiScAUVup+UC9Nfq76eWqDhXlp+4UYaA8uhTBO6g=
+github.com/beevik/etree v1.1.0 h1:T0xke/WvNtMoCqgzPhkX2r4rjY3GDZFi+FjpRZY2Jbs=
+github.com/beevik/etree v1.1.0/go.mod h1:r8Aw8JqVegEf0w2fDnATrX9VpkMcyFeM0FhwO62wh+A=
 github.com/boltdb/bolt v1.2.1-0.20160424201119-d97499360d1e h1:ZjpTXDvUplNMT6aktSoMffTkAGIQJGNGPQW/xL4kPwA=
 github.com/boltdb/bolt v1.2.1-0.20160424201119-d97499360d1e/go.mod h1:clJnj/oiGkjum5o1McbSZDSLxVThjynRyGBgiAx27Ps=
 github.com/codegangsta/negroni v0.1.1-0.20160503152438-24bf3506bb5e h1:2Ic1pGNC0EZvHLeWg8N2x3SDWACFj9PKRD4nqSoJzPA=
