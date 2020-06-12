@@ -293,7 +293,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
 	}
 
-	view := v2.ResponseDetailsViewV6{
+	view := v2.ResponseDetailsViewV5{
 		Status:           r.Status,
 		Body:             body,
 		Headers:          r.Headers,
@@ -305,7 +305,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 	}
 
 	if r.LogNormalDelay != nil {
-		view.LogNormalDelay = &v2.LogNormalDelayOptionsV6{
+		view.LogNormalDelay = &v2.LogNormalDelayOptions{
 			Min:    r.LogNormalDelay.Min,
 			Max:    r.LogNormalDelay.Max,
 			Mean:   r.LogNormalDelay.Mean,

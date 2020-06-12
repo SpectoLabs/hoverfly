@@ -432,6 +432,58 @@ var responseDefinitionV4 = map[string]interface{}{
 	},
 }
 
+var responseDefinitionV5 = map[string]interface{}{
+	"type": "object",
+	"properties": map[string]interface{}{
+		"body": map[string]interface{}{
+			"type": "string",
+		},
+		"encodedBody": map[string]interface{}{
+			"type": "boolean",
+		},
+		"headers": map[string]interface{}{
+			"$ref": "#/definitions/headers",
+		},
+		"status": map[string]interface{}{
+			"type": "integer",
+		},
+		"templated": map[string]interface{}{
+			"type": "boolean",
+		},
+		"removesState": map[string]interface{}{
+			"type": "array",
+		},
+		"transitionsState": map[string]interface{}{
+			"type": "object",
+			"patternProperties": map[string]interface{}{
+				".{1,}": map[string]interface{}{"type": "string"},
+			},
+		},
+		"fixedDelay": map[string]interface{}{
+			"type": "integer",
+		},
+		"logNormalDelay": map[string]interface{}{
+			"properties": map[string]interface{}{
+				"min": map[string]interface{}{
+					"type": "integer",
+				},
+				"max": map[string]interface{}{
+					"type": "integer",
+				},
+				"mean": map[string]interface{}{
+					"type": "integer",
+				},
+				"median": map[string]interface{}{
+					"type": "integer",
+				},
+			},
+		},
+	},
+}
+
+
+
+
 // V5 Schema
 
 var SimulationViewV5Schema = map[string]interface{}{
@@ -477,7 +529,7 @@ var SimulationViewV5Schema = map[string]interface{}{
 	"definitions": map[string]interface{}{
 		"request-response-pair": requestResponsePairDefinition,
 		"request":               requestV5Definition,
-		"response":              responseDefinitionV4,
+		"response":              responseDefinitionV5,
 		"field-matchers":        requestFieldMatchersV5Definition,
 		"headers":               headersDefinition,
 		"request-headers":       v5MatchersMapDefinition,
@@ -550,108 +602,3 @@ var v5MatchersMapDefinition = map[string]interface{}{
 	},
 }
 
-var SimulationViewV6Schema = map[string]interface{}{
-	"description": "Hoverfly simulation schema",
-	"type":        "object",
-	"required": []string{
-		"data", "meta",
-	},
-	"additionalProperties": false,
-	"properties": map[string]interface{}{
-		"data": map[string]interface{}{
-			"type": "object",
-			"properties": map[string]interface{}{
-				"pairs": map[string]interface{}{
-					"type": "array",
-					"items": map[string]interface{}{
-						"$ref": "#/definitions/request-response-pair",
-					},
-				},
-				"globalActions": map[string]interface{}{
-					"type": "object",
-					"properties": map[string]interface{}{
-						"delays": map[string]interface{}{
-							"type": "array",
-							"items": map[string]interface{}{
-								"$ref": "#/definitions/delay",
-							},
-						},
-						"delaysLogNormal": map[string]interface{}{
-							"type": "array",
-							"items": map[string]interface{}{
-								"$ref": "#/definitions/delay-log-normal",
-							},
-						},
-					},
-				},
-			},
-		},
-		"meta": map[string]interface{}{
-			"$ref": "#/definitions/meta",
-		},
-	},
-	"definitions": map[string]interface{}{
-		"request-response-pair": requestResponsePairDefinition,
-		"request":               requestV5Definition,
-		"response":              responseDefinitionV6,
-		"field-matchers":        requestFieldMatchersV5Definition,
-		"headers":               headersDefinition,
-		"request-headers":       v5MatchersMapDefinition,
-		"request-queries":       v5MatchersMapDefinition,
-		"delay":                 delaysDefinition,
-		"delay-log-normal":      delaysLogNormalDefinition,
-		"meta":                  metaDefinition,
-	},
-}
-
-var responseDefinitionV6 = map[string]interface{}{
-	"type": "object",
-	"properties": map[string]interface{}{
-		"body": map[string]interface{}{
-			"type": "string",
-		},
-		"bodyFile": map[string]interface{}{
-			"type": "string",
-		},
-		"encodedBody": map[string]interface{}{
-			"type": "boolean",
-		},
-		"fixedDelay": map[string]interface{}{
-			"type": "integer",
-		},
-		"logNormalDelay": map[string]interface{}{
-			"properties": map[string]interface{}{
-				"min": map[string]interface{}{
-					"type": "integer",
-				},
-				"max": map[string]interface{}{
-					"type": "integer",
-				},
-				"mean": map[string]interface{}{
-					"type": "integer",
-				},
-				"median": map[string]interface{}{
-					"type": "integer",
-				},
-			},
-		},
-		"headers": map[string]interface{}{
-			"$ref": "#/definitions/headers",
-		},
-		"status": map[string]interface{}{
-			"type": "integer",
-		},
-		"templated": map[string]interface{}{
-			"type": "boolean",
-		},
-		"removesState": map[string]interface{}{
-			"type": "array",
-		},
-		"transitionsState": map[string]interface{}{
-			"type": "object",
-			"patternProperties": map[string]interface{}{
-				".{1,}": map[string]interface{}{"type": "string"},
-			},
-		},
-	},
-}
