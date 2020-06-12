@@ -287,8 +287,20 @@ func (hf *Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV
 		hf.version), nil
 }
 
-func (hf *Hoverfly) PutSimulation(simulationView v2.SimulationViewV5) v2.SimulationImportResult {
-	result := hf.importRequestResponsePairViews(simulationView.DataViewV5.RequestResponsePairs)
+func (hf *Hoverfly) putOrReplaceSimulation(simulationView v2.SimulationViewV6, overrideExisting bool) v2.SimulationImportResult {
+	bodyFilesResult := hf.readResponseBodyFiles(simulationView.RequestResponsePairs)
+	if bodyFilesResult.GetError() != nil {
+		return bodyFilesResult
+	}
+
+	if overrideExisting {
+		hf.DeleteSimulation()
+	}
+
+	result := hf.importRequestResponsePairViews(simulationView.DataViewV6.RequestResponsePairs)
+	if result.GetError() != nil {
+		return result
+	}
 
 	if err := hf.SetResponseDelays(v1.ResponseDelayPayloadView{Data: simulationView.GlobalActions.Delays}); err != nil {
 		result.SetError(err)
@@ -301,6 +313,15 @@ func (hf *Hoverfly) PutSimulation(simulationView v2.SimulationViewV5) v2.Simulat
 	}
 
 	return result
+}
+
+
+func (hf *Hoverfly) ReplaceSimulation(simulationView v2.SimulationViewV6) v2.SimulationImportResult {
+	return hf.putOrReplaceSimulation(simulationView, true)
+}
+
+func (hf *Hoverfly) PutSimulation(simulationView v2.SimulationViewV6) v2.SimulationImportResult {
+	return hf.putOrReplaceSimulation(simulationView, false)
 }
 
 func (hf *Hoverfly) DeleteSimulation() {
