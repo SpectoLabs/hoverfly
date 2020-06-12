@@ -58,6 +58,8 @@ type ResponseDetailsViewV5 struct {
 	Templated        bool                `json:"templated"`
 	TransitionsState map[string]string   `json:"transitionsState,omitempty"`
 	RemovesState     []string            `json:"removesState,omitempty"`
+	FixedDelay       int                      `json:"fixedDelay"`
+	LogNormalDelay   *LogNormalDelayOptions `json:"logNormalDelay,omitempty"`
 }
 
 //Gets Status - required for interfaces.Response
@@ -81,7 +83,37 @@ func (this ResponseDetailsViewV5) GetRemovesState() []string { return this.Remov
 func (this ResponseDetailsViewV5) GetHeaders() map[string][]string { return this.Headers }
 
 // Gets FixedDelay - required for interfaces.Response
-func (this ResponseDetailsViewV5) GetFixedDelay() int { return 0 }
+func (this ResponseDetailsViewV5) GetFixedDelay() int { return this.FixedDelay }
 
 // Gets LogNormalDelay - required for interfaces.Response
-func (this ResponseDetailsViewV5) GetLogNormalDelay() interfaces.ResponseDelay { return nil }
+// The trick here to return nil with the right type to compare later.
+func (this ResponseDetailsViewV5) GetLogNormalDelay() interfaces.ResponseDelay {
+	if this.LogNormalDelay != nil {
+		return this.LogNormalDelay
+	}
+
+	return nil
+}
+
+type LogNormalDelayOptions struct {
+	Min    int `json:"min"`
+	Max    int `json:"max"`
+	Mean   int `json:"mean"`
+	Median int `json:"median"`
+}
+
+func (l *LogNormalDelayOptions) GetMin() int {
+	return l.Min
+}
+
+func (l *LogNormalDelayOptions) GetMax() int {
+	return l.Max
+}
+
+func (l *LogNormalDelayOptions) GetMean() int {
+	return l.Mean
+}
+
+func (l *LogNormalDelayOptions) GetMedian() int {
+	return l.Median
+}

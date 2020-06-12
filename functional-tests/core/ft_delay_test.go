@@ -108,7 +108,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
         ],
         "globalActions": {"delays": [{"urlPattern": "test-server\\.com", "delay": 10000}]}
     },
-    "meta": {"schemaVersion": "v6", "hoverflyVersion": "v1.2.0"}
+    "meta": {"schemaVersion": "v5", "hoverflyVersion": "v1.2.0"}
 }`
 			hoverfly.ImportSimulation(simulation)
 
@@ -146,7 +146,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
         ],
         "globalActions": {"delays": [{"urlPattern": "test-server\\.com", "delay": 10000}]}
     },
-    "meta": {"schemaVersion": "v6", "hoverflyVersion": "v1.2.0"}
+    "meta": {"schemaVersion": "v5", "hoverflyVersion": "v1.2.0"}
 }`
 			hoverfly.ImportSimulation(simulation)
 
@@ -172,7 +172,7 @@ var _ = Describe("Running Hoverfly with delays", func() {
         ],
         "globalActions": {"delays": []}
     },
-    "meta": {"schemaVersion": "v6", "hoverflyVersion": "v1.2.0"}
+    "meta": {"schemaVersion": "v5", "hoverflyVersion": "v1.2.0"}
 }`
 			hoverfly.ImportSimulation(simulation)
 
