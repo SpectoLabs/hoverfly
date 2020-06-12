@@ -209,10 +209,10 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	}
 
 	if result.IsResponseDelayable() {
-		log.Info("Pausing for applying response delay")
+		log.Debug("Applying response delay")
 		hf.applyResponseDelay(result)
-		log.Info("Response delay completed")
 	} else {
+		log.Debug("Applying global delay")
 		hf.applyGlobalDelay(requestDetails)
 	}
 

@@ -32,7 +32,8 @@ func NewSimulationViewFromRequestBody(responseBody []byte) (SimulationViewV5, er
 
 	schemaVersion := jsonMap["meta"].(map[string]interface{})["schemaVersion"].(string)
 
-	if schemaVersion == "v5" {
+	if schemaVersion == "v5" || schemaVersion == "v5.1" {
+
 		err := ValidateSimulation(jsonMap, SimulationViewV5Schema)
 		if err != nil {
 			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation: ", schemaVersion) + err.Error())
@@ -130,7 +131,7 @@ type MetaView struct {
 func NewMetaView(version string) *MetaView {
 	return &MetaView{
 		HoverflyVersion: version,
-		SchemaVersion:   "v5",
+		SchemaVersion:   "v5.1",
 		TimeExported:    time.Now().Format(time.RFC3339),
 	}
 }
