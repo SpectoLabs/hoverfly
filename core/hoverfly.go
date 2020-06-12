@@ -2,10 +2,6 @@ package hoverfly
 
 import (
 	"fmt"
-	"net"
-	"net/http"
-	"sync"
-
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"

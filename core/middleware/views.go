@@ -57,7 +57,7 @@ type ResponseDetailsView struct {
 	EncodedBody    bool                        `json:"encodedBody"`
 	Headers        map[string][]string         `json:"headers"`
 	FixedDelay     int                         `json:"fixedDelay"`
-	LogNormalDelay *v2.LogNormalDelayOptionsV6 `json:"logNormalDelay"`
+	LogNormalDelay *v2.LogNormalDelayOptions `json:"logNormalDelay"`
 }
 
 func (this ResponseDetailsView) GetStatus() int { return this.Status }

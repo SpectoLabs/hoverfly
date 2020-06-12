@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-
 	"net/http"
 	"net/http/httptest"
 
@@ -183,7 +182,7 @@ var _ = Describe("When I use hoverctl", func() {
 				}
 			}`
 
-		hoverflySimulation = `"pairs":[{"request":{"path":[{"matcher":"exact","value":"/api/bookings"}],"method":[{"matcher":"exact","value":"POST"}],"destination":[{"matcher":"exact","value":"www.my-test.com"}],"scheme":[{"matcher":"exact","value":"http"}],"body":[{"matcher":"exact","value":"{\"flightId\": \"1\"}"}],"headers":{"Content-Type":[{"matcher":"exact","value":"application/json"}]}},"response":{"status":201,"body":"","bodyFile":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]},"templated":false,"fixedDelay":0}}],"globalActions":{"delays":[],"delaysLogNormal":[]}}`
+		hoverflySimulation = `"pairs":[{"request":{"path":[{"matcher":"exact","value":"/api/bookings"}],"method":[{"matcher":"exact","value":"POST"}],"destination":[{"matcher":"exact","value":"www.my-test.com"}],"scheme":[{"matcher":"exact","value":"http"}],"body":[{"matcher":"exact","value":"{\"flightId\": \"1\"}"}],"headers":{"Content-Type":[{"matcher":"exact","value":"application/json"}]}},"response":{"status":201,"body":"","encodedBody":false,"headers":{"Location":["http://localhost/api/bookings/1"]},"templated":false,"fixedDelay":0}}],"globalActions":{"delays":[],"delaysLogNormal":[]}}`
 
 		hoverflyMeta = `"meta":{"schemaVersion":"v5","hoverflyVersion":"v\d+.\d+.\d+(-rc.\d)*","timeExported":`
 	)
@@ -199,102 +198,6 @@ var _ = Describe("When I use hoverctl", func() {
 
 		AfterEach(func() {
 			hoverfly.Stop()
-		})
-
-		Describe("Exporting simulation with bodyFile", func() {
-			It("can export bodyFile fields", func() {
-				fileName := functional_tests.GenerateFileName()
-				bodyFileName := functional_tests.GenerateFileName()
-				bodyFileContent := `{"success": true}`
-
-				err := ioutil.WriteFile(bodyFileName, []byte(bodyFileContent), 0644)
-				Expect(err).To(BeNil())
-
-				hoverfly.ImportSimulation(`{
-	"data": {
-		"pairs": [
-			{
-				"request": {
-					"path": [
-						{
-							"matcher": "exact",
-							"value": "/api/v1/booking"
-						}
-					]
-				},
-				"response": {
-					"status": 200,
-					"bodyFile": "` + bodyFileName + `"
-				}
-			}
-		]
-	},
-	"meta": {
-		"schemaVersion": "v6"
-	}
-}`)
-				// remove bodyFile to be restored by export command later
-				Expect(os.Remove(bodyFileName)).To(BeNil())
-
-				output := functional_tests.Run(hoverctlBinary, "export", fileName)
-				Expect(output).To(ContainSubstring("Successfully exported simulation to " + fileName))
-
-				data, err := ioutil.ReadFile(fileName)
-				Expect(err).To(BeNil())
-
-				var view v2.SimulationViewV6
-				functional_tests.Unmarshal(data, &view)
-
-				Expect(view.DataViewV6.RequestResponsePairs[0].Response.BodyFile).To(Equal(bodyFileName))
-
-				data, err = ioutil.ReadFile(bodyFileName)
-				Expect(err).To(BeNil())
-				Expect(string(data)).To(Equal(bodyFileContent))
-			})
-
-			It("resets body when bodyFile is provided", func() {
-				fileName := functional_tests.GenerateFileName()
-				bodyFileName := functional_tests.GenerateFileName()
-
-				err := ioutil.WriteFile(bodyFileName, []byte(`{"success": true}`), 0644)
-				Expect(err).To(BeNil())
-
-				hoverfly.ImportSimulation(`{
-	"data": {
-		"pairs": [
-			{
-				"request": {
-					"path": [
-						{
-							"matcher": "exact",
-							"value": "/api/v1/booking"
-						}
-					]
-				},
-				"response": {
-					"status": 200,
-					"bodyFile": "` + bodyFileName + `",
-					"body": "testing content"
-				}
-			}
-		]
-	},
-	"meta": {
-		"schemaVersion": "v6"
-	}
-}`)
-				output := functional_tests.Run(hoverctlBinary, "export", fileName)
-				Expect(output).To(ContainSubstring("Successfully exported simulation to " + fileName))
-
-				data, err := ioutil.ReadFile(fileName)
-				Expect(err).To(BeNil())
-
-				var view v2.SimulationViewV6
-				functional_tests.Unmarshal(data, &view)
-
-				Expect(view.DataViewV6.RequestResponsePairs[0].Response.Body).To(BeEmpty())
-				Expect(view.DataViewV6.RequestResponsePairs[0].Response.BodyFile).To(Equal(bodyFileName))
-			})
 		})
 
 		Describe("Managing Hoverflies data using the CLI", func() {
