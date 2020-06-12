@@ -105,6 +105,3 @@ func (this RequestDetailsView) GetFixedDelay() int { return 0 }
 
 // Gets LogNormalDelay - required for interfaces.Response
 func (this RequestDetailsView) GetLogNormalDelay() interfaces.ResponseDelay { return nil }
-
-// Has a LogNormalDelay - required for interfaces.Response
-func (this RequestDetailsView) HasLogNormalDelay() bool { return false }

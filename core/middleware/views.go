@@ -51,12 +51,12 @@ func (this RequestDetailsView) GetBody() *string { return this.Body }
 func (this RequestDetailsView) GetHeaders() map[string][]string { return this.Headers }
 
 type ResponseDetailsView struct {
-	Status         int                         `json:"status"`
-	Body           string                      `json:"body"`
-	BodyFile       string                      `json:"bodyFile"`
-	EncodedBody    bool                        `json:"encodedBody"`
-	Headers        map[string][]string         `json:"headers"`
-	FixedDelay     int                         `json:"fixedDelay"`
+	Status         int                       `json:"status"`
+	Body           string                    `json:"body"`
+	BodyFile       string                    `json:"bodyFile"`
+	EncodedBody    bool                      `json:"encodedBody"`
+	Headers        map[string][]string       `json:"headers"`
+	FixedDelay     int                       `json:"fixedDelay"`
 	LogNormalDelay *v2.LogNormalDelayOptions `json:"logNormalDelay"`
 }
 

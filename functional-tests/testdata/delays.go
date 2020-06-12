@@ -151,7 +151,7 @@ var ResponseFixedDelays = `{
         }
     },
     "meta": {
-        "schemaVersion": "v5",
+        "schemaVersion": "v5.1",
         "hoverflyVersion": "v1.2.0",
         "timeExported": "2017-02-23T12:43:48Z"
     }
@@ -198,7 +198,7 @@ var ResponseLogNormalDelays = `{
         }
     },
     "meta": {
-        "schemaVersion": "v5",
+        "schemaVersion": "v5.1",
         "hoverflyVersion": "v1.2.0",
         "timeExported": "2017-02-23T12:43:48Z"
     }

@@ -51,14 +51,14 @@ func NewMatcherView(matcher string, value interface{}) MatcherViewV5 {
 func (this RequestMatcherResponsePairViewV5) GetResponse() interfaces.Response { return this.Response }
 
 type ResponseDetailsViewV5 struct {
-	Status           int                 `json:"status"`
-	Body             string              `json:"body"`
-	EncodedBody      bool                `json:"encodedBody"`
-	Headers          map[string][]string `json:"headers,omitempty"`
-	Templated        bool                `json:"templated"`
-	TransitionsState map[string]string   `json:"transitionsState,omitempty"`
-	RemovesState     []string            `json:"removesState,omitempty"`
-	FixedDelay       int                      `json:"fixedDelay"`
+	Status           int                    `json:"status"`
+	Body             string                 `json:"body"`
+	EncodedBody      bool                   `json:"encodedBody"`
+	Headers          map[string][]string    `json:"headers,omitempty"`
+	Templated        bool                   `json:"templated"`
+	TransitionsState map[string]string      `json:"transitionsState,omitempty"`
+	RemovesState     []string               `json:"removesState,omitempty"`
+	FixedDelay       int                    `json:"fixedDelay"`
 	LogNormalDelay   *LogNormalDelayOptions `json:"logNormalDelay,omitempty"`
 }
 
