@@ -26,7 +26,7 @@ will be written to the file path provided.
 		simulationView, err := wrapper.ExportSimulation(*target, urlPattern)
 		handleIfError(err)
 
-		for i, pair := range simulationView.DataViewV6.RequestResponsePairs {
+		for i, pair := range simulationView.DataViewV5.RequestResponsePairs {
 			bodyFile := pair.Response.GetBodyFile()
 			if len(bodyFile) == 0 {
 				continue
@@ -36,7 +36,7 @@ will be written to the file path provided.
 				handleIfError(err)
 			}
 
-			simulationView.DataViewV6.RequestResponsePairs[i].Response.Body = ""
+			simulationView.DataViewV5.RequestResponsePairs[i].Response.Body = ""
 		}
 
 		simulationData, err := json.MarshalIndent(simulationView, "", "\t")

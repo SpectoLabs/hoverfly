@@ -39,14 +39,10 @@ func NewSimulationViewFromRequestBody(responseBody []byte) (SimulationViewV5, er
 			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation: ", schemaVersion) + err.Error())
 		}
 
-		var simulationViewV5 SimulationViewV5
-
-		err = json.Unmarshal(responseBody, &simulationViewV5)
+		err = json.Unmarshal(responseBody, &simulationView)
 		if err != nil {
 			return SimulationViewV5{}, err
 		}
-
-		simulationView = upgradeV5(simulationViewV5)
 	} else if schemaVersion == "v4" || schemaVersion == "v3" {
 		err := ValidateSimulation(jsonMap, SimulationViewV4Schema)
 		if err != nil {

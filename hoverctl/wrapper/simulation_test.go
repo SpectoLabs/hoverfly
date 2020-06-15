@@ -12,9 +12,9 @@ import (
 func Test_ExportSimulation_GetsModeFromHoverfly(t *testing.T) {
 	RegisterTestingT(t)
 
-	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+	responseBody := `{"simulation": true}`
+	simulationList := v2.SimulationViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
 				{
 					RequestMatcher: v2.RequestMatcherViewV5{
@@ -33,12 +33,12 @@ func Test_ExportSimulation_GetsModeFromHoverfly(t *testing.T) {
 					},
 					Response: v2.ResponseDetailsViewV5{
 						Status: 200,
-						Body: responseBody,
+						Body:   responseBody,
 					},
 				},
 			},
 		},
-		v2.MetaView{
+		MetaView: v2.MetaView{
 			SchemaVersion: "v2",
 		},
 	}
@@ -58,9 +58,9 @@ func Test_ExportSimulation_GetsModeFromHoverfly(t *testing.T) {
 func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 	RegisterTestingT(t)
 
-	hoverfly.DeleteSimulation()
-	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+	responseBody := `{"simulation": true}`
+	simulationList := v2.SimulationViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
 				{
 					RequestMatcher: v2.RequestMatcherViewV5{
@@ -87,12 +87,12 @@ func Test_ExportSimulation_WithUrlPattern(t *testing.T) {
 					},
 					Response: v2.ResponseDetailsViewV5{
 						Status: 200,
-						Body: responseBody,
+						Body:   responseBody,
 					},
 				},
 			},
 		},
-		v2.MetaView{
+		MetaView: v2.MetaView{
 			SchemaVersion: "v2",
 		},
 	}

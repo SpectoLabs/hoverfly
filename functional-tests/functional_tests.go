@@ -162,10 +162,10 @@ func (this Hoverfly) GetSimulation() io.Reader {
 func (this Hoverfly) ImportSimulation(simulation string) {
 	req := sling.New().Put(this.adminUrl + "/api/v2/simulation").Body(bytes.NewBufferString(simulation))
 	response := DoRequest(req)
-	Expect(response.StatusCode).To(Equal(http.StatusOK), "Failed to import simulation")
 	importedSimulationBytes, err := ioutil.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 	ginkgo.GinkgoWriter.Write(importedSimulationBytes)
+	Expect(response.StatusCode).To(Equal(http.StatusOK), "Failed to import simulation")
 }
 
 // Used for debugging when trying to find out why a functional test is failing

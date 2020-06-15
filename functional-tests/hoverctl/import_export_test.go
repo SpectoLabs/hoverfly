@@ -6,10 +6,9 @@ import (
 	"fmt"
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"io/ioutil"
-	"os"
-
 	"net/http"
 	"net/http/httptest"
+	"os"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
@@ -194,7 +193,7 @@ var _ = Describe("When I use hoverctl", func() {
 
 		BeforeEach(func() {
 			hoverfly = functional_tests.NewHoverfly()
-			hoverfly.Start()
+			hoverfly.Start("-response-body-files-path", workingDirectory)
 
 			functional_tests.Run(hoverctlBinary, "targets", "update", "local", "--admin-port", hoverfly.GetAdminPort())
 		})
@@ -232,7 +231,7 @@ var _ = Describe("When I use hoverctl", func() {
 		]
 	},
 	"meta": {
-		"schemaVersion": "v6"
+		"schemaVersion": "v5.1"
 	}
 }`)
 				// remove bodyFile to be restored by export command later
@@ -244,10 +243,10 @@ var _ = Describe("When I use hoverctl", func() {
 				data, err := ioutil.ReadFile(fileName)
 				Expect(err).To(BeNil())
 
-				var view v2.SimulationViewV6
+				var view v2.SimulationViewV5
 				functional_tests.Unmarshal(data, &view)
 
-				Expect(view.DataViewV6.RequestResponsePairs[0].Response.BodyFile).To(Equal(bodyFileName))
+				Expect(view.DataViewV5.RequestResponsePairs[0].Response.BodyFile).To(Equal(bodyFileName))
 
 				data, err = ioutil.ReadFile(bodyFileName)
 				Expect(err).To(BeNil())
@@ -282,7 +281,7 @@ var _ = Describe("When I use hoverctl", func() {
 		]
 	},
 	"meta": {
-		"schemaVersion": "v6"
+		"schemaVersion": "v5.1"
 	}
 }`)
 				output := functional_tests.Run(hoverctlBinary, "export", fileName)
@@ -291,11 +290,11 @@ var _ = Describe("When I use hoverctl", func() {
 				data, err := ioutil.ReadFile(fileName)
 				Expect(err).To(BeNil())
 
-				var view v2.SimulationViewV6
+				var view v2.SimulationViewV5
 				functional_tests.Unmarshal(data, &view)
 
-				Expect(view.DataViewV6.RequestResponsePairs[0].Response.Body).To(BeEmpty())
-				Expect(view.DataViewV6.RequestResponsePairs[0].Response.BodyFile).To(Equal(bodyFileName))
+				Expect(view.DataViewV5.RequestResponsePairs[0].Response.Body).To(BeEmpty())
+				Expect(view.DataViewV5.RequestResponsePairs[0].Response.BodyFile).To(Equal(bodyFileName))
 			})
 		})
 

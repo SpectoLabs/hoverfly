@@ -3,7 +3,7 @@
 Simulation schema
 =================
 
-This is the JSON schema for v6 Hoverfly simulations.
+This is the JSON schema for v5 Hoverfly simulations.
 
 .. code:: json
 
@@ -26,8 +26,8 @@ This is the JSON schema for v6 Hoverfly simulations.
       },
       "delay-log-normal": {
         "properties": {
-          "min": {
-            "type": "integer"
+          "httpMethod": {
+            "type": "string"
           },
           "max": {
             "type": "integer"
@@ -38,8 +38,8 @@ This is the JSON schema for v6 Hoverfly simulations.
           "median": {
             "type": "integer"
           },
-          "httpMethod": {
-            "type": "string"
+          "min": {
+            "type": "integer"
           },
           "urlPattern": {
             "type": "string"
@@ -164,8 +164,27 @@ This is the JSON schema for v6 Hoverfly simulations.
           "encodedBody": {
             "type": "boolean"
           },
+          "fixedDelay": {
+            "type": "integer"
+          },
           "headers": {
             "$ref": "#/definitions/headers"
+          },
+          "logNormalDelay": {
+            "properties": {
+              "max": {
+                "type": "integer"
+              },
+              "mean": {
+                "type": "integer"
+              },
+              "median": {
+                "type": "integer"
+              },
+              "min": {
+                "type": "integer"
+              }
+            }
           },
           "removesState": {
             "type": "array"

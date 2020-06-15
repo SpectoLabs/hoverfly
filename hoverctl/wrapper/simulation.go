@@ -11,8 +11,8 @@ import (
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
 )
 
-func ExportSimulation(target configuration.Target, urlPattern string) (v2.SimulationViewV6, error) {
-	view := v2.SimulationViewV6{}
+func ExportSimulation(target configuration.Target, urlPattern string) (v2.SimulationViewV5, error) {
+	view := v2.SimulationViewV5{}
 	requestUrl := v2ApiSimulation
 	if len(urlPattern) > 0 {
 		requestUrl = fmt.Sprintf("%s?urlPattern=%s", requestUrl, url.QueryEscape(urlPattern))
