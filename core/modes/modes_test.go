@@ -277,7 +277,6 @@ func Test_ReconstructResponse_AddsMultipleHeaderValuesToResponse(t *testing.T) {
 	pair.Response.Headers = headers
 
 	response := modes.ReconstructResponse(req, pair)
-
 	values, ok := response.Header["Header"]
 	Expect(ok).To(BeTrue())
 

@@ -142,7 +142,7 @@ JSON is a text-based file format so it has no intrinsic support for binary data.
 Serving response bodies from files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Starting from version **1.2.0** hoverfly can return response body from a specific file:
+Starting from version **1.3.0** hoverfly can return response body from a specific file:
 
 .. code:: json
 

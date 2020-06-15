@@ -40,12 +40,20 @@ type MatcherViewV5 struct {
 	Config  map[string]interface{} `json:"config,omitempty"`
 }
 
+func NewMatcherView(matcher string, value interface{}) MatcherViewV5 {
+	return MatcherViewV5{
+		Matcher: matcher,
+		Value:   value,
+	}
+}
+
 //Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestMatcherResponsePairViewV5) GetResponse() interfaces.Response { return this.Response }
 
 type ResponseDetailsViewV5 struct {
 	Status           int                    `json:"status"`
 	Body             string                 `json:"body"`
+	BodyFile         string              `json:"bodyFile"`
 	EncodedBody      bool                   `json:"encodedBody"`
 	Headers          map[string][]string    `json:"headers,omitempty"`
 	Templated        bool                   `json:"templated"`
@@ -62,7 +70,7 @@ func (this ResponseDetailsViewV5) GetStatus() int { return this.Status }
 func (this ResponseDetailsViewV5) GetBody() string { return this.Body }
 
 // Gets BodyFile - required for interfaces.Response
-func (this ResponseDetailsViewV5) GetBodyFile() string { return "" }
+func (this ResponseDetailsViewV5) GetBodyFile() string { return this.BodyFile }
 
 // Gets EncodedBody - required for interfaces.Response
 func (this ResponseDetailsViewV5) GetEncodedBody() bool { return this.EncodedBody }

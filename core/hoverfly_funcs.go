@@ -118,7 +118,7 @@ func (hf *Hoverfly) GetResponse(requestDetails models.RequestDetails) (*models.R
 	return &response, nil
 }
 
-func (hf *Hoverfly) readResponseBodyFiles(pairs []v2.RequestMatcherResponsePairViewV6) v2.SimulationImportResult {
+func (hf *Hoverfly) readResponseBodyFiles(pairs []v2.RequestMatcherResponsePairViewV5) v2.SimulationImportResult {
 	result := v2.SimulationImportResult{}
 
 	for i, pair := range pairs {
