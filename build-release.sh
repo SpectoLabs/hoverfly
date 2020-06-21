@@ -20,9 +20,9 @@ for OSARCH in "${OSARCH_LIST[@]}"; do
 
   mkdir -p ${BIN_TARGET_DIR}
   cd ${HF_BUILD_DIR}
-  env CGO_ENABLED=0 ${GOX} -osarch="${OSARCH}" -output="${HF_BIN}"
+  env CGO_ENABLED=0 ${GOX} -ldflags "-s -w" -osarch="${OSARCH}" -output="${HF_BIN}"
   cd ${HCTL_BUILD_DIR}
-  env CGO_ENABLED=0 ${GOX} -ldflags "-X main.hoverctlVersion=${GIT_TAG_NAME}" -osarch="${OSARCH}" -output="${HCTL_BIN}"
+  env CGO_ENABLED=0 ${GOX} -ldflags "-X main.hoverctlVersion=${GIT_TAG_NAME} -s -w" -osarch="${OSARCH}" -output="${HCTL_BIN}"
   echo "${GIT_TAG_NAME} ${SUFFIX}" > ${VERSION_FILE}
   cp ${LICENSE} ${BIN_TARGET_DIR}/LICENSE.txt
   zip -j ${ZIP_FILE} ${BIN_TARGET_DIR}/*
