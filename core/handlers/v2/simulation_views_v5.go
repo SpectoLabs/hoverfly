@@ -53,13 +53,13 @@ func (this RequestMatcherResponsePairViewV5) GetResponse() interfaces.Response {
 type ResponseDetailsViewV5 struct {
 	Status           int                    `json:"status"`
 	Body             string                 `json:"body"`
-	BodyFile         string              `json:"bodyFile"`
+	BodyFile         string              `json:"bodyFile,omitempty"`
 	EncodedBody      bool                   `json:"encodedBody"`
 	Headers          map[string][]string    `json:"headers,omitempty"`
 	Templated        bool                   `json:"templated"`
 	TransitionsState map[string]string      `json:"transitionsState,omitempty"`
 	RemovesState     []string               `json:"removesState,omitempty"`
-	FixedDelay       int                    `json:"fixedDelay"`
+	FixedDelay       int                    `json:"fixedDelay,omitempty"`
 	LogNormalDelay   *LogNormalDelayOptions `json:"logNormalDelay,omitempty"`
 }
 

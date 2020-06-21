@@ -13,15 +13,13 @@
             "response": {
                "status": 200,
                "body": "Delayed response",
-               "bodyFile": "",
                "encodedBody": false,
                "headers": {
                   "Hoverfly": [
                      "Was-Here"
                   ]
                },
-               "templated": false,
-               "fixedDelay": 0
+               "templated": false
             }
          }
       ],

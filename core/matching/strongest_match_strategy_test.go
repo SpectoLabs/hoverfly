@@ -1560,15 +1560,13 @@ Which if hit would have given the following response:
 {
     "status": 200,
     "body": "hello world",
-    "bodyFile": "",
     "encodedBody": false,
     "headers": {
         "hello": [
             "world"
         ]
     },
-    "templated": false,
-    "fixedDelay": 0
+    "templated": false
 }`))
 }
 
