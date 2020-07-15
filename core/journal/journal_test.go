@@ -460,6 +460,35 @@ func Test_Journal_GetEntries_FilteredByTimeWindow(t *testing.T) {
 	Expect(entries[2].TimeStarted).To(Equal("2018-02-01T02:00:03.000Z"))
 }
 
+func Test_Journal_GetFilteredEntries_WillReturnEmptySliceIfNoJournalFound(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	request, _ := http.NewRequest("GET", "http://hoverfly.io/path/one?one=1&two=2", bytes.NewBufferString(`{"meta:{"field": "value"}}`))
+	request.Header.Add("Accept", "application/json")
+
+	unit.NewEntry(request, &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+	}, "test-mode", time.Now())
+
+	// Body
+	entries, err := unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV5{
+			Body: []v2.MatcherViewV5{
+				{
+					Matcher: matchers.Exact,
+					Value:   `{"meta:{"field": "other-value"}}`,
+				},
+			},
+		},
+	})
+	Expect(err).To(BeNil())
+	Expect(entries).ToNot(BeNil())
+	Expect(entries).To(HaveLen(0))
+}
+
 func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 	RegisterTestingT(t)
 

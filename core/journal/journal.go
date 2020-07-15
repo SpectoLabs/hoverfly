@@ -161,8 +161,10 @@ func (this *Journal) GetEntries(offset int, limit int, from *time.Time, to *time
 }
 
 func (this *Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFilterView) ([]v2.JournalEntryView, error) {
-	var filteredEntries []v2.JournalEntryView
+	// init an empty slice to prevent serializing to a null value
+	filteredEntries := []v2.JournalEntryView{}
 	if this.EntryLimit == 0 {
+
 		return filteredEntries, fmt.Errorf("Journal disabled")
 	}
 
