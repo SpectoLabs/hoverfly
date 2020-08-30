@@ -66,6 +66,69 @@ var _ = Describe("Running Hoverfly in various modes", func() {
 		})
 	})
 
+	Context("When running in spy mode", func() {
+
+		var fakeServer *httptest.Server
+
+		Context("Without middleware", func() {
+
+			BeforeEach(func() {
+				hoverfly.Start()
+
+				fakeServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "text/plain")
+					w.Header().Set("Date", "date")
+					w.Write([]byte("Hello world"))
+				}))
+
+				hoverfly.SetMode("spy")
+				hoverfly.ImportSimulation(`{
+				"data": {
+					"pairs": [
+						{
+							"request" : {
+								"headers" : {
+								  "X-API-TEST" : [ {
+									"value" : "test",
+									"matcher" : "exact"
+								  } ]
+								}
+							},
+							"response": {
+								"status": 200,
+								"body": "Simulated"
+							}
+						}
+					]
+				},
+				"meta": {
+					"schemaVersion": "v5"
+				}
+			}`)
+			})
+
+			AfterEach(func() {
+				fakeServer.Close()
+			})
+
+			It("Should forward the request and get response from destination if match not found", func() {
+				resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL))
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(string(body)).To(Equal("Hello world"))
+			})
+
+			It("Should simulate if match found", func() {
+				resp := hoverfly.Proxy(sling.New().Get(fakeServer.URL).Set("X-API-TEST", "test"))
+				Expect(resp.StatusCode).To(Equal(http.StatusOK))
+				body, err := ioutil.ReadAll(resp.Body)
+				Expect(err).To(BeNil())
+				Expect(string(body)).To(Equal("Simulated"))
+			})
+		})
+	})
+
 	Context("When running in synthesise mode", func() {
 
 		Context("With middleware", func() {
