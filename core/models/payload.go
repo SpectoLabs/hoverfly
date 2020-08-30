@@ -100,7 +100,7 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 		Scheme:      scheme,
 		Query:       req.URL.Query(),
 		Body:        reqBody,
-		Headers:     req.Header,
+		Headers:     req.Header.Clone(),
 		rawQuery:    req.URL.RawQuery,
 	}
 
