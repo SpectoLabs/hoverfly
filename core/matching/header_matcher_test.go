@@ -177,3 +177,29 @@ func Test_HeaderMatching(t *testing.T) {
 	}
 
 }
+
+
+func Test_HeaderMatching_NotModifyingOriginalRequestHeaders(t *testing.T) {
+	RegisterTestingT(t)
+
+	requestHeaders := map[string][]string{
+		"Header1": {"val1"},
+	}
+	result := matching.HeaderMatching(models.RequestMatcher{
+		Headers: map[string][]models.RequestFieldMatchers{
+			"HEADER1": {
+				{
+					Matcher: matchers.Exact,
+					Value:   "val1",
+				},
+			},
+		},
+	},
+		requestHeaders)
+
+	Expect(result.Matched).To(BeTrue())
+	Expect(requestHeaders).To(Equal(map[string][]string{
+		"Header1": {"val1"},
+	}))
+
+}
