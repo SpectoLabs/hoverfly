@@ -21,13 +21,13 @@ func HeaderMatching(requestMatcher models.RequestMatcher, toMatch map[string][]s
 
 	for matcherHeaderKey, matcherHeaderValue := range requestMatcherHeadersWithMatchers {
 		// Make everything lowercase, as headers are case insensitive
-		for requestHeaderKey, requestHeaderValues := range toMatch {
-			delete(toMatch, requestHeaderKey)
-			toMatch[strings.ToLower(requestHeaderKey)] = requestHeaderValues
+		toMatchWithLowerCaseKeys := make(map[string][]string)
+		for key, value := range toMatch {
+			toMatchWithLowerCaseKeys[strings.ToLower(key)] = value
 		}
 		matcherHeaderValueMatched := false
 
-		toMatchHeaderValues, found := toMatch[strings.ToLower(matcherHeaderKey)]
+		toMatchHeaderValues, found := toMatchWithLowerCaseKeys[strings.ToLower(matcherHeaderKey)]
 		if !found {
 			matched = false
 			continue
