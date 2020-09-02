@@ -49,7 +49,11 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 
 	if matchingErr != nil {
 		log.Info("Going to call real server")
-		response, err := this.Hoverfly.DoRequest(request)
+		modifiedRequest, err := ReconstructRequest(pair)
+		if err != nil {
+			return ReturnErrorAndLog(request, err, &pair, "There was an error when reconstructing the request.", Spy)
+		}
+		response, err := this.Hoverfly.DoRequest(modifiedRequest)
 		if err == nil {
 			log.Info("Going to return response from real server")
 			return newProcessResult(response, 0, nil), nil
