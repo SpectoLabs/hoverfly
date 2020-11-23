@@ -15,25 +15,35 @@ Once Hoverfly has reached the end of the sequence, it will continue to return th
 .. code:: json
 
     {
-        "request": {
-            "requiresState": {
+      "data": {
+        "pairs": [{
+            "request": {
+              "requiresState": {
                 "sequence:1": "1"
-            }
-        },
-        "response": {
-            "status": 200,
-            "body": "First response",
-            "transitionsState" : {
-                "sequence:1" : "2",
-            }
-        }
-        "request": {
-            "requiresState": {
+              }
+            },
+            "response": {
+              "status": 200,
+              "body": "First response",
+              "transitionsState": {
                 "sequence:1": "2"
+              }
             }
-        },
-        "response": {
-            "status": 200,
-            "body": "Second response",
-        }
+          },
+          {
+            "request": {
+              "requiresState": {
+                "sequence:1": "2"
+              }
+            },
+            "response": {
+              "status": 200,
+              "body": "Second response"
+            }
+          }
+        ]
+      },
+      "meta": {
+        "schemaVersion": "v5.1"
+      }
     }
