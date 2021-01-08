@@ -45,7 +45,7 @@ Alternatively, applications themselves can usually be configured to use a proxy.
 The difference between a proxy server and a webserver
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A proxy server is a type of webserver. The main difference is that when a webserver recieves a request from a client, it is expected to respond with whatever the intended response is (an HTML page, for example). The data it responds with is generally expected to reside on that server, or within the same network.
+A proxy server is a type of webserver. The main difference is that when a webserver receives a request from a client, it is expected to respond with whatever the intended response is (an HTML page, for example). The data it responds with is generally expected to reside on that server, or within the same network.
 
 A proxy server is expected to pass the incoming request on to another server (the "destination"). It is also expected to set some appropriate headers along the way, such as `X-Forwarded-For <https://en.wikipedia.org/wiki/X-Forwarded-For>`_, `X-Real-IP <https://en.wikipedia.org/wiki/X-Real-IP>`_, `X-Forwarded-Proto <https://en.wikipedia.org/wiki/X-Forwarded-Proto>`_ etc. Once the proxy server receives a response from the destination, it is expected to pass it back to the client.
 
