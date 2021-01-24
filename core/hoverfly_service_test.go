@@ -1222,7 +1222,7 @@ func Test_Hoverfly_PutSimulation_AbsoluteBodyFilePathNotAllowed(t *testing.T) {
 	Expect(err).To(MatchError("data.pairs[0].response bodyFile contains absolute path (/tmp/test-file). only relative is supported"))
 }
 
-func Test_Hoverfly_PutSimulation_ImportsBodyFile(t *testing.T) {
+func Test_Hoverfly_PutSimulation_ImportsBodyFileFromFile(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{ResponsesBodyFilesPath: "../functional-tests/core/testdata/"})
@@ -1249,4 +1249,40 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFile(t *testing.T) {
 
 	Expect(simulation.RequestResponsePairs[0].Response.Body).To(HavePrefix("-----BEGIN RSA PRIVATE KEY-----"))
 	Expect(simulation.RequestResponsePairs[0].Response.BodyFile).To(Equal("key.pem"))
+}
+
+func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	muxRouter := mux.NewRouter()
+	muxRouter.HandleFunc("/key.pem", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "../functional-tests/core/testdata/key.pem")
+	})
+	server := httptest.NewServer(muxRouter)
+	defer server.Close()
+
+	importResult := unit.PutSimulation(v2.SimulationViewV5{
+		v2.DataViewV5{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{{
+				RequestMatcher: v2.RequestMatcherViewV5{
+					Path: []v2.MatcherViewV5{
+						v2.NewMatcherView(matchers.Exact, "/testing"),
+					},
+				},
+				Response: v2.ResponseDetailsViewV5{
+					BodyFile: server.URL+"/key.pem",
+				},
+			}},
+		},
+		v2.MetaView{},
+	})
+
+	Expect(importResult.GetError()).To(BeNil())
+
+	simulation, err := unit.GetSimulation()
+	Expect(err).To(BeNil())
+
+	Expect(simulation.RequestResponsePairs[0].Response.Body).To(HavePrefix("-----BEGIN RSA PRIVATE KEY-----"))
+	Expect(simulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(server.URL+"/key.pem"))
 }
