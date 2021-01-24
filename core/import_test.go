@@ -13,6 +13,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
 )
 
@@ -23,14 +24,14 @@ func TestIsURLHTTP(t *testing.T) {
 
 	url := "http://somehost.com"
 
-	b := isURL(url)
+	b := util.IsURL(url)
 	Expect(b).To(BeTrue())
 }
 
 func TestIsURLEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
-	b := isURL("")
+	b := util.IsURL("")
 	Expect(b).To(BeFalse())
 }
 
@@ -39,7 +40,7 @@ func TestIsURLHTTPS(t *testing.T) {
 
 	url := "https://somehost.com"
 
-	b := isURL(url)
+	b := util.IsURL(url)
 	Expect(b).To(BeTrue())
 }
 
@@ -48,7 +49,7 @@ func TestIsURLWrong(t *testing.T) {
 
 	url := "somehost.com"
 
-	b := isURL(url)
+	b := util.IsURL(url)
 	Expect(b).To(BeFalse())
 }
 
@@ -57,7 +58,7 @@ func TestIsURLWrongTLD(t *testing.T) {
 
 	url := "http://somehost."
 
-	b := isURL(url)
+	b := util.IsURL(url)
 	Expect(b).To(BeFalse())
 }
 

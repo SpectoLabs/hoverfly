@@ -128,27 +128,56 @@ func (hf *Hoverfly) readResponseBodyFiles(pairs []v2.RequestMatcherResponsePairV
 		}
 
 		if len(pair.Response.GetBody()) == 0 && len(pair.Response.GetBodyFile()) > 0 {
+			var content string
+			var err error
+
 			bodyFile := pair.Response.GetBodyFile()
-			if filepath.IsAbs(bodyFile) {
-				err := fmt.Errorf(
-					"data.pairs[%d].response bodyFile contains absolute path (%s). only relative is supported",
-					i, bodyFile,
-				)
-				result.SetError(err)
-				return result
+
+			if util.IsURL(bodyFile) {
+				content, err = hf.readResponseBodyURL(bodyFile)
+			} else {
+				content, err = hf.readResponseBodyFile(bodyFile)
 			}
 
-			fileContents, err := ioutil.ReadFile(filepath.Join(hf.Cfg.ResponsesBodyFilesPath, bodyFile))
 			if err != nil {
-				result.SetError(err)
+				result.SetError(fmt.Errorf("data.pairs[%d].response %s", i, err.Error()))
 				return result
 			}
 
-			pairs[i].Response.Body = string(fileContents[:])
+			pairs[i].Response.Body = content
 		}
 	}
 
 	return result
+}
+
+func (hf *Hoverfly) readResponseBodyURL(fileURL string) (string, error) {
+	resp, err := http.DefaultClient.Get(fileURL)
+	if err != nil {
+		err := fmt.Errorf("bodyFile \"%s\" cannot be downloaded: %s", fileURL, err.Error())
+		return "", err
+	}
+
+	content, err := util.GetResponseBody(resp)
+	if err != nil {
+		err := fmt.Errorf("response from bodyFile \"%s\" cannot be read: %s", fileURL, err.Error())
+		return "", err
+	}
+
+	return content, nil
+}
+
+func (hf *Hoverfly) readResponseBodyFile(filePath string) (string, error) {
+	if filepath.IsAbs(filePath) {
+		return "", fmt.Errorf("bodyFile contains absolute path (%s). only relative is supported", filePath)
+	}
+
+	fileContents, err := ioutil.ReadFile(filepath.Join(hf.Cfg.ResponsesBodyFilesPath, filePath))
+	if err != nil {
+		return "", err
+	}
+
+	return string(fileContents[:]), nil
 }
 
 func (hf *Hoverfly) applyBodyTemplating(requestDetails *models.RequestDetails, response *models.ResponseDetails, cachedResponse *models.CachedResponse) (string, error) {

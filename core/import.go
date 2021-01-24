@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/delay"
 	"github.com/SpectoLabs/hoverfly/core/state"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"net/url"
 	"os"
 	"path"
@@ -26,9 +27,9 @@ import (
 func (hf *Hoverfly) Import(uri string) error {
 
 	// assuming file URI is URL:
-	if isURL(uri) {
+	if util.IsURL(uri) {
 		log.WithFields(log.Fields{
-			"isURL":      isURL(uri),
+			"isURL":      util.IsURL(uri),
 			"importFrom": uri,
 		}).Info("URL")
 		return hf.ImportFromURL(uri)
@@ -71,7 +72,6 @@ func isURL(str string) bool {
 	}
 
 	return rxURL.MatchString(str)
-
 }
 
 func exists(path string) (bool, error) {
