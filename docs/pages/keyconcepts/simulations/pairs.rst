@@ -159,3 +159,18 @@ which is your `current working directory <https://en.wikipedia.org/wiki/Working_
 When both :code:`body` and :code:`bodyFile` are specified, :code:`body` takes precedence.
 
 :code:`bodyFile` is read into memory only on simulation import, not in runtime.
+
+Reading response bodies sometimes might not be comfortable. Imagine a developer team that needs a single updating
+"files provider". Syncing to this provider can be a challenge and that's why hoverfly supports downloading
+response bodies from external urls:
+
+.. code:: json
+
+  "response": {
+    "status": 200,
+    "encodedBody": false,
+    "templated": false,
+    "bodyFile": "https://raw.githubusercontent.com/SpectoLabs/hoverfly/master/schema.json"
+  }
+
+Like local files, this feature is supported only on simulation import.
