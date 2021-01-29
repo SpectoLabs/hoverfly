@@ -1254,7 +1254,6 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromFile(t *testing.T) {
 func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL(t *testing.T) {
 	RegisterTestingT(t)
 
-	unit := NewHoverflyWithConfiguration(&Configuration{})
 	muxRouter := mux.NewRouter()
 	muxRouter.HandleFunc("/key.pem", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "../functional-tests/core/testdata/key.pem")
@@ -1262,6 +1261,7 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL(t *testing.T) {
 	server := httptest.NewServer(muxRouter)
 	defer server.Close()
 
+	unit := NewHoverflyWithConfiguration(&Configuration{ResponsesBodyFilesAllowedOrigins: []string{server.URL}})
 	importResult := unit.PutSimulation(v2.SimulationViewV5{
 		v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{{
@@ -1285,4 +1285,66 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL(t *testing.T) {
 
 	Expect(simulation.RequestResponsePairs[0].Response.Body).To(HavePrefix("-----BEGIN RSA PRIVATE KEY-----"))
 	Expect(simulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(server.URL+"/key.pem"))
+}
+
+func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL_NoOrigins(t *testing.T) {
+	RegisterTestingT(t)
+
+	muxRouter := mux.NewRouter()
+	muxRouter.HandleFunc("/key.pem", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "../functional-tests/core/testdata/key.pem")
+	})
+	server := httptest.NewServer(muxRouter)
+	defer server.Close()
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	importResult := unit.PutSimulation(v2.SimulationViewV5{
+		v2.DataViewV5{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{{
+				RequestMatcher: v2.RequestMatcherViewV5{
+					Path: []v2.MatcherViewV5{
+						v2.NewMatcherView(matchers.Exact, "/testing"),
+					},
+				},
+				Response: v2.ResponseDetailsViewV5{
+					BodyFile: server.URL+"/key.pem",
+				},
+			}},
+		},
+		v2.MetaView{},
+	})
+
+	Expect(importResult.GetError()).NotTo(BeNil())
+	Expect(importResult.GetError().Error()).To(MatchRegexp(`bodyFile http:\/\/.+/key.pem is not allowed`))
+}
+
+func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL_NoMatchingOrigins(t *testing.T) {
+	RegisterTestingT(t)
+
+	muxRouter := mux.NewRouter()
+	muxRouter.HandleFunc("/key.pem", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "../functional-tests/core/testdata/key.pem")
+	})
+	server := httptest.NewServer(muxRouter)
+	defer server.Close()
+
+	unit := NewHoverflyWithConfiguration(&Configuration{ResponsesBodyFilesAllowedOrigins: []string{"http://192.168.142.11"}})
+	importResult := unit.PutSimulation(v2.SimulationViewV5{
+		v2.DataViewV5{
+			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{{
+				RequestMatcher: v2.RequestMatcherViewV5{
+					Path: []v2.MatcherViewV5{
+						v2.NewMatcherView(matchers.Exact, "/testing"),
+					},
+				},
+				Response: v2.ResponseDetailsViewV5{
+					BodyFile: server.URL+"/key.pem",
+				},
+			}},
+		},
+		v2.MetaView{},
+	})
+
+	Expect(importResult.GetError()).NotTo(BeNil())
+	Expect(importResult.GetError().Error()).To(MatchRegexp(`bodyFile http:\/\/.+/key.pem is not allowed`))
 }
