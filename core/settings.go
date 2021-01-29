@@ -52,6 +52,7 @@ type Configuration struct {
 	ClientAuthenticationCACert      string
 
 	ResponsesBodyFilesPath string
+	ResponsesBodyFilesAllowedOrigins []string
 
 	ProxyControlWG sync.WaitGroup
 

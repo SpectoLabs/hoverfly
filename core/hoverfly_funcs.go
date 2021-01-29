@@ -152,15 +152,27 @@ func (hf *Hoverfly) readResponseBodyFiles(pairs []v2.RequestMatcherResponsePairV
 }
 
 func (hf *Hoverfly) readResponseBodyURL(fileURL string) (string, error) {
+	isAllowed := false
+	for _, allowedOrigin := range hf.Cfg.ResponsesBodyFilesAllowedOrigins {
+		if strings.HasPrefix(fileURL, allowedOrigin) {
+			isAllowed = true
+			break
+		}
+	}
+
+	if !isAllowed {
+		return "", fmt.Errorf("bodyFile %s is not allowed. To allow this origin run hoverfly with -response-body-files-allowed-origin", fileURL)
+	}
+
 	resp, err := http.DefaultClient.Get(fileURL)
 	if err != nil {
-		err := fmt.Errorf("bodyFile \"%s\" cannot be downloaded: %s", fileURL, err.Error())
+		err := fmt.Errorf("bodyFile %s cannot be downloaded: %s", fileURL, err.Error())
 		return "", err
 	}
 
 	content, err := util.GetResponseBody(resp)
 	if err != nil {
-		err := fmt.Errorf("response from bodyFile \"%s\" cannot be read: %s", fileURL, err.Error())
+		err := fmt.Errorf("response from bodyFile %s cannot be read: %s", fileURL, err.Error())
 		return "", err
 	}
 

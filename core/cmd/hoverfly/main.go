@@ -58,6 +58,7 @@ var importFlags arrayFlags
 var destinationFlags arrayFlags
 var logOutputFlags arrayFlags
 var responseBodyFilesPath string
+var responseBodyFilesAllowedOriginFlags arrayFlags
 
 const boltBackend = "boltdb"
 const inmemoryBackend = "memory"
@@ -199,6 +200,7 @@ func main() {
 	flag.Var(&destinationFlags, "dest", "Specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
 	flag.Var(&logOutputFlags, "logs-output", "Specify locations for output logs, options are \"console\" and \"file\" (default \"console\")")
 	flag.StringVar(&responseBodyFilesPath, "response-body-files-path", "", "When a response contains a relative bodyFile, it will be resolved against this path (default is CWD)")
+	flag.Var(&responseBodyFilesAllowedOriginFlags, "response-body-files-allowed-origin", "When a response contains a url in bodyFile, it will be loaded only if the origin is allowed")
 
 	flag.Parse()
 
@@ -419,6 +421,14 @@ func main() {
 	}
 
 	cfg.ResponsesBodyFilesPath = responseBodyFilesPath
+
+	for _, allowedOrigin := range responseBodyFilesAllowedOriginFlags {
+		if !util.IsURL(allowedOrigin) {
+			log.WithFields(log.Fields{"origin": allowedOrigin}).Fatal("Origin is not a valid url")
+		}
+	}
+
+	cfg.ResponsesBodyFilesAllowedOrigins = responseBodyFilesAllowedOriginFlags
 
 	var requestCache cache.FastCache
 	var tokenCache cache.Cache
