@@ -83,6 +83,8 @@ Usage of hoverfly:
         Proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)
   -proxy-auth Proxy-Authorization
         Switch the Proxy-Authorization header from proxy-auth Proxy-Authorization to header-auth `X-HOVERFLY-AUTHORIZATION`. Switching to header-auth will auto enable -https-only (default "proxy-auth")
+  -response-body-files-allow-origin value
+        When a response contains a url in bodyFile, it will be loaded only if the origin is allowed
   -response-body-files-path string
         When a response contains a relative bodyFile, it will be resolved against this path (default is CWD)
   -spy

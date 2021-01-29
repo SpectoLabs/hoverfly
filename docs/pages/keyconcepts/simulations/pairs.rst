@@ -173,4 +173,10 @@ response bodies from external urls:
     "bodyFile": "https://raw.githubusercontent.com/SpectoLabs/hoverfly/master/schema.json"
   }
 
-Like local files, this feature is supported only on simulation import.
+Like local files, this feature is supported only on simulation import. To escape security issues there's another
+mandatory option to specify :code:`-response-body-files-allow-origin` that lets you explicitly set the collections of
+urls to allow body files to be downloaded from. For the above to work you need to run hoverfly like this:
+
+.. code:: bash
+
+    hoverfly -response-body-files-allow-origin="https://raw.githubusercontent.com/"

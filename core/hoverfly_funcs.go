@@ -161,7 +161,7 @@ func (hf *Hoverfly) readResponseBodyURL(fileURL string) (string, error) {
 	}
 
 	if !isAllowed {
-		return "", fmt.Errorf("bodyFile %s is not allowed. To allow this origin run hoverfly with -response-body-files-allowed-origin", fileURL)
+		return "", fmt.Errorf("bodyFile %s is not allowed. To allow this origin run hoverfly with -response-body-files-allow-origin", fileURL)
 	}
 
 	resp, err := http.DefaultClient.Get(fileURL)
