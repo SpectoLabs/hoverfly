@@ -32,9 +32,9 @@ Currently, you can get the following data from request to the response via templ
 +------------------------------+----------------------------------------------+----------------------------------------------+--------+
 | Method                       | {{ Request.Method }}                         | http://www.foo.com/zero/one/two              | GET    |
 +------------------------------+----------------------------------------------+----------------------------------------------+--------+
-| jsonpath on body             | {{ Request.Body "jsonpath" "$.id" }}         | { "id": 123, "username": "hoverfly" }        | 123    |
+| jsonpath on body             | {{ Request.Body 'jsonpath' '$.id' }}         | { "id": 123, "username": "hoverfly" }        | 123    |
 +------------------------------+----------------------------------------------+----------------------------------------------+--------+
-| xpath on body                | {{ Request.Body "xpath" "/root/id" }}        | <root><id>123</id></root>                    | 123    |
+| xpath on body                | {{ Request.Body 'xpath' '/root/id' }}        | <root><id>123</id></root>                    | 123    |
 +------------------------------+----------------------------------------------+----------------------------------------------+--------+
 | Header value                 | {{ Request.Header.X-Header-Id }}             | { "X-Header-Id": ["bar"] }                   | bar    |
 +------------------------------+----------------------------------------------+----------------------------------------------+--------+
@@ -55,9 +55,9 @@ Additional data can come from helper methods. These are the ones Hoverfly curren
 |                                                           |                                                           |                                         |
 | For example:                                              |                                                           |                                         |
 |                                                           |                                                           |                                         |
-| - The current date time plus 1 day in unix timestamp      | - {{ now "1d" "unix" }}                                   |  - 1136300645                           |
-| - The current date time in ISO 8601 format                | - {{ now "" "" }}                                         |  - 2006-01-02T15:04:05Z                 |
-| - The current date time minus 1 day in custom format      | - {{ now "-1d" "2006-Jan-02" }}                           |  - 2006-Jan-01                          |
+| - The current date time plus 1 day in unix timestamp      | - {{ now '1d' 'unix' }}                                   |  - 1136300645                           |
+| - The current date time in ISO 8601 format                | - {{ now '' '' }}                                         |  - 2006-01-02T15:04:05Z                 |
+| - The current date time minus 1 day in custom format      | - {{ now '-1d' '2006-Jan-02' }}                           |  - 2006-Jan-01                          |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | A random string                                           | {{ randomString }}                                        |  hGfclKjnmwcCds                         |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
@@ -81,7 +81,7 @@ Additional data can come from helper methods. These are the ones Hoverfly curren
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | A random UUID                                             | {{ randomUuid }}                                          |  7b791f3d-d7f4-4635-8ea1-99568d821562   |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-| Replace all occurrences of the old value with the new     | {{ replace Request.Body "be" "mock" }}                    |                                         |
+| Replace all occurrences of the old value with the new     | {{ replace Request.Body 'be' 'mock' }}                    |                                         |
 |                                                           |                                                           |                                         |
 | value in the target string                                | (where Request.Body has the value of "to be or not to be" |  to mock or not to mock                 |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+

@@ -171,7 +171,7 @@ func (t templateHelpers) replace(target, oldValue, newValue string) string {
 }
 
 func prepareJsonPathQuery(query string) string {
-	if string(query[0:1]) != "{" && string(query[len(query)-1:]) != "}" {
+	if query[0:1] != "{" && query[len(query)-1:] != "}" {
 		query = fmt.Sprintf("{%s}", query)
 	}
 

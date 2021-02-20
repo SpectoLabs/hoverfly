@@ -414,14 +414,28 @@ func Test_ApplyTemplate_randomUuid(t *testing.T) {
 	Expect(template).To(Not(Equal(ContainSubstring(`{{randomUuid}}`))))
 }
 
-func Test_ApplyTemplate_Request_Body(t *testing.T) {
+func Test_ApplyTemplate_Request_Body_Jsonpath(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ Request.Body jsonPath "$.test" }}`)
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Body: `{ "name": "Ben" }`,
+	}, make(map[string]string), `{{ Request.Body 'jsonpath' '$.name' }}`)
 
 	Expect(err).To(BeNil())
 
-	Expect(template).To(Not(Equal(ContainSubstring(`{{Request.Body jsonPath \"$.test\"}}`))))
+	Expect(template).To(Equal("Ben"))
+}
+
+func Test_ApplyTemplate_Request_Body_JsonPath_Unescaped(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Body: `{ "name": "O'Reilly" }`,
+	}, make(map[string]string), `{{{ Request.Body 'jsonpath' '$.name' }}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("O'Reilly"))
 }
 
 func Test_ApplyTemplate_ReplaceStringInQueryParams(t *testing.T) {
@@ -431,7 +445,7 @@ func Test_ApplyTemplate_ReplaceStringInQueryParams(t *testing.T) {
 		Query: map[string][]string{
 			"sound": {"oink,oink,oink"},
 		},
-	}, make(map[string]string), `{{ replace Request.QueryParam.sound "oink" "moo" }}`)
+	}, make(map[string]string), `{{ replace Request.QueryParam.sound 'oink' 'moo' }}`)
 
 	Expect(err).To(BeNil())
 
