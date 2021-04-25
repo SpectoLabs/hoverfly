@@ -2,6 +2,7 @@ package modes_test
 
 import (
 	"errors"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -78,6 +79,32 @@ func Test_ReconstructRequest_BodyRequestResponsePair(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(string(body)).To(Equal("new request body here"))
+}
+
+func Test_ReconstructRequest_ShouldRecompressGzipBody(t *testing.T) {
+	RegisterTestingT(t)
+
+	request := models.RequestDetails{
+		Scheme:      "http",
+		Path:        "/another-path",
+		Method:      "POST",
+		Destination: "test-destination.com",
+		Body:        "new request body here",
+		Headers: 	 map[string][]string{"Content-Encoding": {"gzip"}},
+	}
+	pair := models.RequestResponsePair{Request: request}
+
+	newRequest, err := modes.ReconstructRequest(pair)
+	Expect(err).To(BeNil())
+
+	body, err := ioutil.ReadAll(newRequest.Body)
+	Expect(err).To(BeNil())
+
+	Expect(string(body)).To(Not(Equal("new request body here")))
+
+	decompressedBody, err := util.DecompressGzip(body)
+	Expect(err).To(BeNil())
+	Expect(string(decompressedBody)).To(Equal("new request body here"))
 }
 
 func Test_ReconstructRequest_HeadersInPair(t *testing.T) {

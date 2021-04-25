@@ -1,26 +1,22 @@
 package modes
 
 import (
-	"net/http"
-
-	"github.com/SpectoLabs/hoverfly/core/errors"
-
-	log "github.com/sirupsen/logrus"
-
 	"bytes"
 	"compress/flate"
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
-	"reflect"
-	"time"
-
+	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/dsnet/compress/brotli"
+	log "github.com/sirupsen/logrus"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"reflect"
+	"time"
 )
 
 type HoverflyDiff interface {
@@ -203,45 +199,6 @@ func unmarshalResponseToInterface(response *models.ResponseDetails, output inter
 	return err
 }
 
-func decompress(body []byte, encodings []string) ([]byte, error) {
-	var err error
-	var reader io.ReadCloser
-	if len(encodings) > 0 {
-		for index := range encodings {
-			switch encodings[index] {
-			case "gzip":
-				reader, err = gzip.NewReader(ioutil.NopCloser(bytes.NewBuffer(body)))
-				if err != nil {
-					return body, err
-				}
-				body, err = ioutil.ReadAll(reader)
-				if err != nil {
-					return body, err
-				}
-
-			case "br":
-				reader, err = brotli.NewReader(ioutil.NopCloser(bytes.NewBuffer(body)), &brotli.ReaderConfig{})
-				if err != nil {
-					return body, err
-				}
-				body, err = ioutil.ReadAll(reader)
-				if err != nil {
-					return body, err
-				}
-
-			case "deflate":
-				reader = flate.NewReader(ioutil.NopCloser(bytes.NewBuffer(body)))
-				body, err = ioutil.ReadAll(reader)
-				if err != nil {
-					return body, err
-				}
-			}
-			reader.Close()
-		}
-	}
-	return body, err
-}
-
 func (this *DiffMode) JsonDiff(prefix string, expected map[string]interface{}, actual map[string]interface{}) bool {
 	same := true
 	for k := range expected {
@@ -273,4 +230,43 @@ func (this *DiffMode) JsonDiff(prefix string, expected map[string]interface{}, a
 	}
 
 	return same
+}
+
+func decompress(body []byte, encodings []string) ([]byte, error) {
+	var err error
+	var reader io.ReadCloser
+	if len(encodings) > 0 {
+		for index := range encodings {
+			switch encodings[index] {
+			case "gzip":
+				reader, err = gzip.NewReader(bytes.NewBuffer(body))
+				if err != nil {
+					return body, err
+				}
+				body, err = ioutil.ReadAll(reader)
+				if err != nil {
+					return body, err
+				}
+
+			case "br":
+				reader, err = brotli.NewReader(ioutil.NopCloser(bytes.NewBuffer(body)), &brotli.ReaderConfig{})
+				if err != nil {
+					return body, err
+				}
+				body, err = ioutil.ReadAll(reader)
+				if err != nil {
+					return body, err
+				}
+
+			case "deflate":
+				reader = flate.NewReader(ioutil.NopCloser(bytes.NewBuffer(body)))
+				body, err = ioutil.ReadAll(reader)
+				if err != nil {
+					return body, err
+				}
+			}
+			reader.Close()
+		}
+	}
+	return body, err
 }

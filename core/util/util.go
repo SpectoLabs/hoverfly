@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -20,10 +21,19 @@ import (
 // GetRequestBody will read the http.Request body io.ReadCloser
 // and will also set the buffer to the original value as the
 // buffer will be empty after reading it.
+// It also decompress if any Content-Encoding is applied
 func GetRequestBody(request *http.Request) (string, error) {
 	bodyBytes, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		return "", err
+	}
+
+	// Will add more compression support in the future
+	if request.Header.Get("Content-Encoding") == "gzip" {
+		decompressedBody, err := DecompressGzip(bodyBytes)
+		if err == nil {
+			bodyBytes = decompressedBody
+		}
 	}
 
 	request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
@@ -210,4 +220,34 @@ func IsURL(str string) bool {
 	}
 
 	return rxURL.MatchString(str)
+}
+
+func DecompressGzip(body []byte) ([]byte, error) {
+	reader, err := gzip.NewReader(bytes.NewBuffer(body))
+	if err != nil {
+		return body, err
+	}
+	defer reader.Close()
+	body, err = ioutil.ReadAll(reader)
+	if err != nil {
+		return body, err
+	}
+	return body, err
+}
+
+func CompressGzip(body []byte) ([]byte, error) {
+	var byteBuffer bytes.Buffer
+	var err error
+	gzWriter := gzip.NewWriter(&byteBuffer)
+	if _, err := gzWriter.Write(body); err != nil {
+		return body, err
+	}
+	if err := gzWriter.Flush(); err != nil {
+		return body, err
+	}
+	if err := gzWriter.Close(); err != nil {
+		return body, err
+	}
+
+	return byteBuffer.Bytes(), err
 }

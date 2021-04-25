@@ -3,6 +3,7 @@ package modes
 import (
 	"bytes"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -66,14 +67,33 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 		return nil, fmt.Errorf("failed to reconstruct request, destination not specified")
 	}
 
+	bodyBytes := []byte(pair.Request.Body)
+	// recompress the request body if the original was encoded
+	if values, found := pair.Request.Headers["Content-Encoding"]; found {
+		for _, value := range values {
+			// Only gzip is supported at the moment
+			if value == "gzip" {
+				compressedBody, err := util.CompressGzip(bodyBytes)
+				if err == nil {
+					bodyBytes = compressedBody
+				} else {
+					// Fail to compress, we should remove the encoding header
+					delete(pair.Request.Headers, "Content-Encoding")
+				}
+				break
+			}
+		}
+	}
+
 	newRequest, err := http.NewRequest(
 		pair.Request.Method,
 		fmt.Sprintf("%s://%s%s", pair.Request.Scheme, pair.Request.Destination, pair.Request.Path),
-		bytes.NewBuffer([]byte(pair.Request.Body)))
+		bytes.NewBuffer(bodyBytes))
 
 	if err != nil {
 		return nil, err
 	}
+
 
 	newRequest.Method = pair.Request.Method
 	newRequest.Header = pair.Request.Headers

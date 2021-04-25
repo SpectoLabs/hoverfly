@@ -36,6 +36,28 @@ func Test_GetRequestBody_GettingTheRequestBodySetsTheSameBodyAgain(t *testing.T)
 	Expect(string(newRequestBody)).To(Equal("test-preserve"))
 }
 
+func Test_GetRequestBody_DecompressGzipContent(t *testing.T) {
+	RegisterTestingT(t)
+
+	request, _ := http.NewRequest("POST", "", nil)
+	request.Header.Set("Content-Encoding", "gzip")
+	originalBody := "hello_world"
+
+	compressedBody, err := CompressGzip([]byte(originalBody))
+	Expect(err).To(BeNil())
+	Expect(string(compressedBody)).To(Not(Equal(originalBody)))
+	request.Body = ioutil.NopCloser(bytes.NewBuffer(compressedBody))
+
+	_, err = GetRequestBody(request)
+	Expect(err).To(BeNil())
+
+	newRequestBody, err := ioutil.ReadAll(request.Body)
+	Expect(err).To(BeNil())
+
+	Expect(string(newRequestBody)).To(Equal(originalBody))
+}
+
+
 func Test_GetResponseBody_GettingTheResponseBodyGetsTheCorrectData(t *testing.T) {
 	RegisterTestingT(t)
 
