@@ -84,3 +84,23 @@ func Test_JsonMatch_MatchesFalseWithEmptyString(t *testing.T) {
 		}
 	}`)).To(BeFalse())
 }
+
+// Should not ignore JSON array order by default
+func Test_JsonMatch_MatchesFalseWithJSONRootAsArray_InADifferentOrder(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonMatch(`[{"minified": true}, {"json": true}]`, `[{"json":true},{"minified":true}]`)).To(BeFalse())
+}
+
+func Test_JsonMatch_MatchesTrueWithUnminifiedJSONRootAsArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonMatch(`[{"minified": true}, {"json": true}]`, `[
+		{
+			"minified": true
+		}, {
+			"json": true
+		}
+	]`)).To(BeTrue())
+}
+
