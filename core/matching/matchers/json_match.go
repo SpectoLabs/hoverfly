@@ -16,13 +16,13 @@ func JsonMatch(match interface{}, toMatch string) bool {
 	if matchString == toMatch {
 		return true
 	}
-	var matchingObject map[string]interface{}
+	var matchingObject interface{}
 	err := json.Unmarshal([]byte(matchString), &matchingObject)
 	if err != nil {
 		return false
 	}
 
-	var toMatchObject map[string]interface{}
+	var toMatchObject interface{}
 	err = json.Unmarshal([]byte(toMatch), &toMatchObject)
 	if err != nil {
 		return false
