@@ -233,7 +233,7 @@ func Test_JsonPartialMatch_MatchesFalseDeepComplexWithArray(t *testing.T) {
 }`)).To(BeFalse())
 }
 
-func Test_JsonPartialMatch_MatchesTrueWithJSONRootAsArray(t *testing.T) {
+func Test_JsonPartialMatch_MatchesTrueAgainstJSONRootAsArray(t *testing.T) {
 	RegisterTestingT(t)
 
 	Expect(matchers.JsonPartialMatch(`
@@ -242,14 +242,141 @@ func Test_JsonPartialMatch_MatchesTrueWithJSONRootAsArray(t *testing.T) {
         "set": false,
         "age": 400
     }`, `[{
-"objects": [
-    {
+	"objects": [
+		{
+			"name": "Object 1",
+			"set": true
+		},{
+			"name": "Object 2",
+			"set": false,
+			"age": 400
+		}]
+	}]`)).To(BeTrue())
+}
+
+func Test_JsonPartialMatch_MatchesTrueWithJSONRootAsArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonPartialMatch(`
+	[{
         "name": "Object 1",
         "set": true
     },{
         "name": "Object 2",
         "set": false,
         "age": 400
-    }]
-}]`)).To(BeTrue())
+	}]`, `
+	{
+		"objects": [
+		{
+			"name": "Object 1",
+			"set": true
+		},{
+			"name": "Object 2",
+			"set": false,
+			"age": 400
+		}]
+	}`)).To(BeTrue())
+}
+
+func Test_JsonPartialMatch_MatchesTrueWithJSONRootAsPartialArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonPartialMatch(`
+	[{
+        "name": "Object 1",
+        "set": true
+    }]`, `
+	{
+		"objects": [
+		{
+			"name": "Object 1",
+			"set": true
+		},{
+			"name": "Object 2",
+			"set": false,
+			"age": 400
+		}]
+	}`)).To(BeTrue())
+}
+
+func Test_JsonPartialMatch_MatchesTrueWithJSONRootAsPartialArrayWithPartialObject(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonPartialMatch(`
+	[{
+        "name": "Object 2",
+        "set": false
+    }]`, `
+	{
+		"objects": [
+		{
+			"name": "Object 1",
+			"set": true
+		},{
+			"name": "Object 2",
+			"set": false,
+			"age": 400
+		}]
+	}`)).To(BeTrue())
+}
+
+func Test_JsonPartialMatch_MatchesFalseWithJSONRootAsArrayWithDifferentElement(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonPartialMatch(`
+	[{
+        "name": "Object 3",
+        "set": true
+    }]`, `
+	{
+		"objects": [
+		{
+			"name": "Object 1",
+			"set": true
+		},{
+			"name": "Object 2",
+			"set": false,
+			"age": 400
+		}]
+	}`)).To(BeFalse())
+}
+
+func Test_JsonPartialMatch_MatchesTrueWithJSONRootAsArrayAgainstJSONRootAsArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonPartialMatch(`
+	[{
+        "name": "Object 1",
+        "set": true
+    }]`,
+		`[
+	{
+		"name": "Object 1",
+		"set": true
+	},{
+		"name": "Object 2",
+		"set": false,
+		"age": 400
+	}]`)).To(BeTrue())
+}
+
+
+func Test_JsonPartialMatch_MatchesFalseWithJSONRootAsArrayAgainstJSONRootAsArrayWithDifferentElement(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonPartialMatch(`
+	[{
+        "name": "Object 3",
+        "set": false
+    }]`,
+		`[
+	{
+		"name": "Object 1",
+		"set": true
+	},{
+		"name": "Object 2",
+		"set": false,
+		"age": 400
+	}]`)).To(BeFalse())
 }
