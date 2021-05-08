@@ -7,7 +7,7 @@ import (
 var JsonPartial = "jsonpartial"
 
 func JsonPartialMatch(match interface{}, toMatch string) bool {
-	var expected map[string]interface{}
+	var expected interface{}
 	var toMatchType interface{}
 	matchString, ok := match.(string)
 	if !ok {
@@ -21,20 +21,21 @@ func JsonPartialMatch(match interface{}, toMatch string) bool {
 	}
 
 	actual, ok := toMatchType.(map[string]interface{})
+	var allNodes []interface{}
 	if ok {
-		// has type interface{}
-		nodes := getAllNodesFromMap(actual)
-		for _, node := range nodes {
-			if mapContainsMap(expected, node) {
+		allNodes = getAllNodesFromMap(actual)
+	} else {
+		actual := toMatchType.([]interface{})
+		allNodes = getAllNodesFromArray(actual)
+	}
+
+	for _, node := range allNodes {
+		if expectedMap, ok := expected.(map[string]interface{}); ok {
+			if mapContainsMap(expectedMap, node) {
 				return true
 			}
-		}
-	} else {
-		// has type []interface{}
-		actual := toMatchType.([]interface{})
-		nodes := getAllNodesFromArray(actual)
-		for _, node := range nodes {
-			if mapContainsMap(expected, node) {
+		} else if expectedArray, ok := expected.([]interface{}); ok {
+			if arrayContainsArray(expectedArray, node) {
 				return true
 			}
 		}
@@ -121,8 +122,8 @@ func arrContainsMap(arr []interface{}, mp map[string]interface{}) bool {
 	return false
 }
 
-func getAllNodesFromMap(current map[string]interface{}) []map[string]interface{} {
-	var allNodes = make([]map[string]interface{}, 0, 0)
+func getAllNodesFromMap(current map[string]interface{}) []interface{} {
+	var allNodes = make([]interface{}, 0, 0)
 	allNodes = append(allNodes, current)
 	for _, val := range current {
 		if innerMap, ok := val.(map[string]interface{}); ok {
@@ -134,8 +135,9 @@ func getAllNodesFromMap(current map[string]interface{}) []map[string]interface{}
 	return allNodes
 }
 
-func getAllNodesFromArray(current []interface{}) []map[string]interface{} {
-	var allNodes = make([]map[string]interface{}, 0, 0)
+func getAllNodesFromArray(current []interface{}) []interface{} {
+	var allNodes = make([]interface{}, 0, 0)
+	allNodes = append(allNodes, current)
 	for _, val := range current {
 		if innerMap, ok := val.(map[string]interface{}); ok {
 			allNodes = append(allNodes, getAllNodesFromMap(innerMap)...)
