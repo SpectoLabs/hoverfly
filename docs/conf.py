@@ -15,7 +15,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = u'Hoverfly'
-copyright = u'2017, SpectoLabs'
+copyright = u'2021, SpectoLabs'
 author = u'SpectoLabs'
 
 
