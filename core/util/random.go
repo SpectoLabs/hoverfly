@@ -15,7 +15,7 @@ const (
 )
 
 func RandomString() string {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().UnixNano())
 	return RandomStringWithLength(RandomIntegerRange(3, 16))
 }
 
@@ -37,22 +37,22 @@ func RandomStringWithLength(length int) string {
 }
 
 func RandomInteger() int {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().UnixNano())
 	return rand.Int()
 }
 
 func RandomIntegerRange(min, max int) int {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().UnixNano())
 	return rand.Intn(max-min) + min
 }
 
 func RandomFloat() float64 {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().UnixNano())
 	return rand.Float64()
 }
 
 func RandomFloatRange(min, max float64) float64 {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().UnixNano())
 	return min + rand.Float64()*(max-min)
 }
 
