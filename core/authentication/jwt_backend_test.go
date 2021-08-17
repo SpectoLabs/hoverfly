@@ -6,7 +6,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/authentication"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
-	"github.com/dgrijalva/jwt-go"
 	. "github.com/onsi/gomega"
 )
 
@@ -59,9 +58,8 @@ func TestLogout(t *testing.T) {
 	jwtBackend := authentication.InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 
 	tokenString := "exampletokenstring"
-	token := jwt.New(jwt.SigningMethodHS512)
 
-	Expect(jwtBackend.Logout(tokenString, token)).To(BeNil())
+	Expect(jwtBackend.Logout(tokenString)).To(BeNil())
 
 	// checking whether token is in blacklist
 	Expect(jwtBackend.IsInBlacklist(tokenString)).To(BeTrue())
