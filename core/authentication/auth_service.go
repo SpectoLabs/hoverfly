@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type TokenAuthentication struct {
