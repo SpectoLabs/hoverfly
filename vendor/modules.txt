@@ -47,7 +47,7 @@ github.com/corpix/uarand
 # github.com/dghubble/sling v1.2.0
 ## explicit
 github.com/dghubble/sling
-# github.com/dgrijalva/jwt-go v2.6.1-0.20160504172548-40bd0f3b4891+incompatible
+# github.com/dgrijalva/jwt-go v3.2.0+incompatible
 ## explicit
 github.com/dgrijalva/jwt-go
 # github.com/dsnet/compress v0.0.0-20171208185109-cc9eb1d7ad76

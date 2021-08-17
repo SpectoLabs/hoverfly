@@ -47,10 +47,11 @@ func InitJWTAuthenticationBackend(ab backends.Authentication, secret []byte, exp
 
 func (backend *JWTAuthenticationBackend) GenerateToken(userUUID, username string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS512)
-	token.Claims["exp"] = time.Now().Add(time.Hour * time.Duration(backend.JWTExpirationDelta)).Unix()
-	token.Claims["iat"] = time.Now().Unix()
-	token.Claims["username"] = username
-	token.Claims["sub"] = userUUID
+	claims := token.Claims.(jwt.MapClaims)
+	claims["exp"] = time.Now().Add(time.Hour * time.Duration(backend.JWTExpirationDelta)).Unix()
+	claims["iat"] = time.Now().Unix()
+	claims["username"] = username
+	claims["sub"] = userUUID
 	tokenString, err := token.SignedString(backend.SecretKey)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -93,7 +94,7 @@ func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp int
 	return expireOffset
 }
 
-func (backend *JWTAuthenticationBackend) Logout(tokenString string, token *jwt.Token) error {
+func (backend *JWTAuthenticationBackend) Logout(tokenString string) error {
 	return backend.AuthBackend.InvalidateToken(tokenString)
 }
 
