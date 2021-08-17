@@ -14,10 +14,10 @@ require (
 	github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86 // indirect
 	github.com/daryl/zeus v0.0.0-20160924022305-49dfdf6c9496 // indirect
 	github.com/dghubble/sling v1.2.0
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dsnet/compress v0.0.0-20171208185109-cc9eb1d7ad76
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
 	github.com/go-zoo/bone v0.0.0-20160419201406-2b727a8601bc
+	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/golang/protobuf v1.4.0 // indirect
 	github.com/google/go-querystring v0.0.0-20160401233042-9235644dd9e5 // indirect
 	github.com/gorilla/context v0.0.0-20160422134237-a8d44e7d8e4d // indirect
