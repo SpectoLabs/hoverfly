@@ -26,7 +26,7 @@ func (this *AdminApi) StartAdminInterface(hoverfly *Hoverfly) {
 
 	mux := this.addAdminApiRoutes(router, hoverfly)
 	mux = this.addDashboardRoutes(router)
-	n := negroni.New(negroni.NewRecovery(), negroni.NewStatic(http.Dir("public")))
+	n := negroni.New(negroni.NewRecovery())
 
 	n.UseHandler(mux)
 
