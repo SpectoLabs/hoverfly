@@ -47,9 +47,6 @@ github.com/corpix/uarand
 # github.com/dghubble/sling v1.2.0
 ## explicit
 github.com/dghubble/sling
-# github.com/dgrijalva/jwt-go v3.2.0+incompatible
-## explicit
-github.com/dgrijalva/jwt-go
 # github.com/dsnet/compress v0.0.0-20171208185109-cc9eb1d7ad76
 ## explicit
 github.com/dsnet/compress/brotli
@@ -61,6 +58,9 @@ github.com/fsnotify/fsnotify
 # github.com/go-zoo/bone v0.0.0-20160419201406-2b727a8601bc
 ## explicit
 github.com/go-zoo/bone
+# github.com/golang-jwt/jwt/v4 v4.0.0
+## explicit
+github.com/golang-jwt/jwt/v4
 # github.com/golang/protobuf v1.4.0
 ## explicit
 # github.com/google/go-querystring v0.0.0-20160401233042-9235644dd9e5
