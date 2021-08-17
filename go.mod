@@ -1,6 +1,6 @@
 module github.com/SpectoLabs/hoverfly
 
-go 1.14
+go 1.16
 
 require (
 	github.com/BurntSushi/toml v0.2.1-0.20160426202516-f0aeabca5a12 // indirect
@@ -14,7 +14,7 @@ require (
 	github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86 // indirect
 	github.com/daryl/zeus v0.0.0-20160924022305-49dfdf6c9496 // indirect
 	github.com/dghubble/sling v1.2.0
-	github.com/dgrijalva/jwt-go v2.6.1-0.20160504172548-40bd0f3b4891+incompatible
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dsnet/compress v0.0.0-20171208185109-cc9eb1d7ad76
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
 	github.com/go-zoo/bone v0.0.0-20160419201406-2b727a8601bc
@@ -50,7 +50,7 @@ require (
 	github.com/spf13/cast v0.0.0-20160314192028-27b586b42e29 // indirect
 	github.com/spf13/cobra v0.0.0-20160517171929-f36824430130
 	github.com/spf13/jwalterweatherman v0.0.0-20160311093646-33c24e77fb80 // indirect
-	github.com/spf13/pflag v1.0.3 // indirect
+	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v0.0.0-20160508180713-d8a428b8a306
 	github.com/tdewolff/minify v2.3.6+incompatible
 	github.com/tdewolff/parse v2.3.4+incompatible // indirect
