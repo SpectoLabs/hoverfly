@@ -51,8 +51,8 @@ github.com/gorilla/mux v0.0.0-20160502175624-9c19ed558d5d h1:AegJdPZEQ6uNJobPN8B
 github.com/gorilla/mux v0.0.0-20160502175624-9c19ed558d5d/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
 github.com/gorilla/pat v1.0.1 h1:OeSoj6sffw4/majibAY2BAUsXjNP7fEE+w30KickaL4=
 github.com/gorilla/pat v1.0.1/go.mod h1:YeAe0gNeiNT5hoiZRI4yiOky6jVdNvfO2N6Kav/HmxY=
-github.com/gorilla/websocket v1.0.0 h1:J/mA+d2LqcDKjAEhQjXDHt9/e7Cnm+oBUwgHp5C6XDg=
-github.com/gorilla/websocket v1.0.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
+github.com/gorilla/websocket v1.4.1 h1:q7AeDBpnBk8AogcD4DSag/Ukw/KV+YhzLj2bP5HvKCM=
+github.com/gorilla/websocket v1.4.1/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/hashicorp/golang-lru v0.5.0 h1:CL2msUPvZTLb5O648aiLNJw3hnBxN2+1Jq8rCOH9wdo=
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/hcl v0.0.0-20160426221300-9a905a34e628 h1:79lPy9LYAtihGQvcubOdkAol0FbhRAJ2BjXbiy8jDvM=
