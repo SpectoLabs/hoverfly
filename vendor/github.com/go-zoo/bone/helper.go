@@ -13,6 +13,11 @@ import (
 	"strings"
 )
 
+// ListenAndServe wrapper
+func (m *Mux) ListenAndServe(port string) error {
+	return http.ListenAndServe(port, m)
+}
+
 func (m *Mux) parse(rw http.ResponseWriter, req *http.Request) bool {
 	for _, r := range m.Routes[req.Method] {
 		ok := r.parse(rw, req)
@@ -48,7 +53,6 @@ func (m *Mux) staticRoute(rw http.ResponseWriter, req *http.Request) bool {
 // HandleNotFound handle when a request does not match a registered handler.
 func (m *Mux) HandleNotFound(rw http.ResponseWriter, req *http.Request) {
 	if m.notFound != nil {
-		rw.WriteHeader(http.StatusNotFound)
 		m.notFound.ServeHTTP(rw, req)
 	} else {
 		http.NotFound(rw, req)
@@ -89,31 +93,16 @@ func cleanURL(url *string) {
 
 // GetValue return the key value, of the current *http.Request
 func GetValue(req *http.Request, key string) string {
-	vars.RLock()
-	value := vars.v[req][key]
-	vars.RUnlock()
-	return value
+	return GetAllValues(req)[key]
 }
 
-// GetAllValues return the req PARAMs
-func GetAllValues(req *http.Request) map[string]string {
-	vars.RLock()
-	values := vars.v[req]
-	vars.RUnlock()
-	return values
-}
-
-// This function returns the route of given Request
+// GetRequestRoute returns the route of given Request
 func (m *Mux) GetRequestRoute(req *http.Request) string {
 	cleanURL(&req.URL.Path)
 	for _, r := range m.Routes[req.Method] {
 		if r.Atts != 0 {
 			if r.Atts&SUB != 0 {
-				if len(req.URL.Path) >= r.Size {
-					if req.URL.Path[:r.Size] == r.Path {
-						return r.Path
-					}
-				}
+				return r.Handler.(*Mux).GetRequestRoute(req)
 			}
 			if r.Match(req) {
 				return r.Path
@@ -163,4 +152,19 @@ func extractQueries(req *http.Request) (bool, map[string][]string) {
 		return true, queries
 	}
 	return false, nil
+}
+
+func (m *Mux) otherMethods(rw http.ResponseWriter, req *http.Request) bool {
+	for _, met := range method {
+		if met != req.Method {
+			for _, r := range m.Routes[met] {
+				ok := r.exists(rw, req)
+				if ok {
+					rw.WriteHeader(http.StatusMethodNotAllowed)
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
