@@ -18,8 +18,6 @@ github.com/codegangsta/negroni v0.1.1-0.20160503152438-24bf3506bb5e h1:2Ic1pGNC0
 github.com/codegangsta/negroni v0.1.1-0.20160503152438-24bf3506bb5e/go.mod h1:v0y3T5G7Y1UlFfyxFn/QLRU4a2EuNau2iZY63YTKWo0=
 github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86 h1:kRNlij/Yv/baHnXYdNqr+8ch5tLYAWS/VRaJ2ZvFgu0=
 github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86/go.mod h1:JSm890tOkDN+M1jqN8pUGDKnzJrsVbJwSMHBY4zwz7M=
-github.com/daryl/zeus v0.0.0-20160924022305-49dfdf6c9496 h1:I85+ndwWQaJAfSmmsGQf1fzwec0+sUXWi/Rs1IJ3wt8=
-github.com/daryl/zeus v0.0.0-20160924022305-49dfdf6c9496/go.mod h1:Ghmd9WJB1hsq83OUybMocmYCbLn31XHNn1jINYBtvDo=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dghubble/sling v1.2.0 h1:PYGS9ofwbV9nfhB1kYjB1vtXshMxlp2oQxTMMXVJ5pE=
@@ -29,8 +27,8 @@ github.com/dsnet/compress v0.0.0-20171208185109-cc9eb1d7ad76/go.mod h1:KjxHHirfL
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
-github.com/go-zoo/bone v0.0.0-20160419201406-2b727a8601bc h1:cfpByHzWQH1UEn+nXNgqGhGBzscP96t/t99zPlv8YWw=
-github.com/go-zoo/bone v0.0.0-20160419201406-2b727a8601bc/go.mod h1:oqsroXM1ZcoSPNsxaSy2JNMJMSC/A463LSB0Vnoa2SI=
+github.com/go-zoo/bone v1.3.0 h1:PY6sHq37FnQhj+4ZyqFIzJQHvrrGx0GEc3vTZZC/OsI=
+github.com/go-zoo/bone v1.3.0/go.mod h1:HI3Lhb7G3UQcAwEhOJ2WyNcsFtQX1WYHa0Hl4OBbhW8=
 github.com/golang-jwt/jwt/v4 v4.0.0 h1:RAqyYixv1p7uEnocuy8P1nru5wprCh/MH2BIlW5z5/o=
 github.com/golang-jwt/jwt/v4 v4.0.0/go.mod h1:/xlHOz8bRuivTWchD4jCa+NbatV+wEUSzwAxVc6locg=
 github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0/go.mod h1:E/TSTwGwJL78qG/PmXZO1EjYhfJinVAhrmmHX6Z8B9k=
@@ -49,8 +47,6 @@ github.com/gorilla/context v0.0.0-20160422134237-a8d44e7d8e4d h1:BuwODXV4sNFjaSR
 github.com/gorilla/context v0.0.0-20160422134237-a8d44e7d8e4d/go.mod h1:kBGZzfjB9CEq2AlWe17Uuf7NDRt0dE0s8S51q0aT7Yg=
 github.com/gorilla/mux v0.0.0-20160502175624-9c19ed558d5d h1:AegJdPZEQ6uNJobPN8BiOYffHTAyJyTlyhO7Hn33SHY=
 github.com/gorilla/mux v0.0.0-20160502175624-9c19ed558d5d/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
-github.com/gorilla/pat v1.0.1 h1:OeSoj6sffw4/majibAY2BAUsXjNP7fEE+w30KickaL4=
-github.com/gorilla/pat v1.0.1/go.mod h1:YeAe0gNeiNT5hoiZRI4yiOky6jVdNvfO2N6Kav/HmxY=
 github.com/gorilla/websocket v1.4.1 h1:q7AeDBpnBk8AogcD4DSag/Ukw/KV+YhzLj2bP5HvKCM=
 github.com/gorilla/websocket v1.4.1/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/hashicorp/golang-lru v0.5.0 h1:CL2msUPvZTLb5O648aiLNJw3hnBxN2+1Jq8rCOH9wdo=
@@ -63,8 +59,6 @@ github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NH
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/jackwakefield/gopac v1.0.3-0.20180823145755-c4d2e0b9a672 h1:8gMw+o9GKWC1Ml6pUbcdy3E1Nydvh6wasZiXmqKvYP4=
 github.com/jackwakefield/gopac v1.0.3-0.20180823145755-c4d2e0b9a672/go.mod h1:yR1sfJXcndScUFYPx7Xqxj7bkNlCWw9AMmuJFMHLXm8=
-github.com/julienschmidt/httprouter v1.3.0 h1:U0609e9tgbseu3rBINet9P48AI/D3oJs4dN7jwJOQ1U=
-github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8IZAc4RVcycCCAKdM=
 github.com/jung-kurt/gofpdf v1.0.3-0.20190309125859-24315acbbda5/go.mod h1:7Id9E/uU8ce6rXgefFLlgrJj/GYY22cpxn+r32jIOes=
 github.com/kardianos/osext v0.0.0-20151222153229-29ae4ffbc9a6 h1:yZAE+xNuc/2gmWV+s5UAb43LYLZQiqyngl6IUCQGJg0=
 github.com/kardianos/osext v0.0.0-20151222153229-29ae4ffbc9a6/go.mod h1:1NbS8ALrpOvjt0rHPNLyCIeMtbizbir8U//inJ+zuB8=
@@ -125,8 +119,6 @@ github.com/tdewolff/parse v2.3.4+incompatible h1:x05/cnGwIMf4ceLuDMBOdQ1qGniMoxp
 github.com/tdewolff/parse v2.3.4+incompatible/go.mod h1:8oBwCsVmUkgHO8M5iCzSIDtpzXOT0WXX9cWhz+bIzJQ=
 github.com/tdewolff/test v1.0.6 h1:76mzYJQ83Op284kMT+63iCNCI7NEERsIN8dLM+RiKr4=
 github.com/tdewolff/test v1.0.6/go.mod h1:6DAvZliBAAnD7rhVgwaM7DE5/d9NMOAJ09SqYqeK4QE=
-github.com/ursiform/bear v1.0.1 h1:77/y+Hiir4LyLTyUdj0MmxpcW6rYLgeX8WLLxM7e7uY=
-github.com/ursiform/bear v1.0.1/go.mod h1:AYsqyNUafOkYwqZV0zZeBkTOpfCRfWCNWvO5CnO7Tv4=
 github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35 h1:0TnXeVP6mx+A4CBf8cQVkQfkhyGBQCmJcT4g6zKzm7M=
 github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35/go.mod h1:N2zxlSyiKSe5eX1tZViRH5QA0qijqEDrYZiPEAiq3wU=
 github.com/xeipuuv/gojsonreference v0.0.0-20150808065054-e02fc20de94c h1:XZWnr3bsDQWAZg4Ne+cPoXRPILrNlPNQfxBuwLl43is=

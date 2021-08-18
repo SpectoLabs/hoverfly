@@ -42,8 +42,6 @@ github.com/codegangsta/negroni
 # github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86
 ## explicit
 github.com/corpix/uarand
-# github.com/daryl/zeus v0.0.0-20160924022305-49dfdf6c9496
-## explicit
 # github.com/dghubble/sling v1.2.0
 ## explicit
 github.com/dghubble/sling
@@ -55,7 +53,7 @@ github.com/dsnet/compress/internal/errors
 # github.com/fsnotify/fsnotify v1.4.7
 ## explicit
 github.com/fsnotify/fsnotify
-# github.com/go-zoo/bone v0.0.0-20160419201406-2b727a8601bc
+# github.com/go-zoo/bone v1.3.0
 ## explicit
 github.com/go-zoo/bone
 # github.com/golang-jwt/jwt/v4 v4.0.0
@@ -72,8 +70,6 @@ github.com/gorilla/context
 # github.com/gorilla/mux v0.0.0-20160502175624-9c19ed558d5d
 ## explicit
 github.com/gorilla/mux
-# github.com/gorilla/pat v1.0.1
-## explicit
 # github.com/gorilla/websocket v1.4.1
 ## explicit
 github.com/gorilla/websocket
@@ -101,8 +97,6 @@ github.com/inconshreveable/mousetrap
 # github.com/jackwakefield/gopac v1.0.3-0.20180823145755-c4d2e0b9a672
 ## explicit
 github.com/jackwakefield/gopac
-# github.com/julienschmidt/httprouter v1.3.0
-## explicit
 # github.com/kardianos/osext v0.0.0-20151222153229-29ae4ffbc9a6
 ## explicit
 github.com/kardianos/osext
@@ -214,8 +208,6 @@ github.com/tdewolff/parse/json
 github.com/tdewolff/parse/strconv
 github.com/tdewolff/parse/xml
 # github.com/tdewolff/test v1.0.6
-## explicit
-# github.com/ursiform/bear v1.0.1
 ## explicit
 # github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35
 ## explicit
