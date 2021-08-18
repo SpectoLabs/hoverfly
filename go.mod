@@ -12,24 +12,21 @@ require (
 	github.com/boltdb/bolt v1.2.1-0.20160424201119-d97499360d1e
 	github.com/codegangsta/negroni v0.1.1-0.20160503152438-24bf3506bb5e
 	github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86 // indirect
-	github.com/daryl/zeus v0.0.0-20160924022305-49dfdf6c9496 // indirect
 	github.com/dghubble/sling v1.2.0
 	github.com/dsnet/compress v0.0.0-20171208185109-cc9eb1d7ad76
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
-	github.com/go-zoo/bone v0.0.0-20160419201406-2b727a8601bc
+	github.com/go-zoo/bone v1.3.0
 	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/golang/protobuf v1.4.0 // indirect
 	github.com/google/go-querystring v0.0.0-20160401233042-9235644dd9e5 // indirect
 	github.com/gorilla/context v0.0.0-20160422134237-a8d44e7d8e4d // indirect
 	github.com/gorilla/mux v0.0.0-20160502175624-9c19ed558d5d
-	github.com/gorilla/pat v1.0.1 // indirect
 	github.com/gorilla/websocket v1.4.1
 	github.com/hashicorp/golang-lru v0.5.0
 	github.com/hashicorp/hcl v0.0.0-20160426221300-9a905a34e628 // indirect
 	github.com/icrowley/fake v0.0.0-20180203215853-4178557ae428
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jackwakefield/gopac v1.0.3-0.20180823145755-c4d2e0b9a672
-	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/kardianos/osext v0.0.0-20151222153229-29ae4ffbc9a6
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/magiconair/properties v1.7.0 // indirect
@@ -55,7 +52,6 @@ require (
 	github.com/tdewolff/minify v2.3.6+incompatible
 	github.com/tdewolff/parse v2.3.4+incompatible // indirect
 	github.com/tdewolff/test v1.0.6 // indirect
-	github.com/ursiform/bear v1.0.1 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35 // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20150808065054-e02fc20de94c // indirect
 	github.com/xeipuuv/gojsonschema v0.0.0-20170225172124-ff0417f4272e
