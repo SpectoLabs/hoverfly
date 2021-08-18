@@ -23,7 +23,7 @@ require (
 	github.com/gorilla/context v0.0.0-20160422134237-a8d44e7d8e4d // indirect
 	github.com/gorilla/mux v0.0.0-20160502175624-9c19ed558d5d
 	github.com/gorilla/pat v1.0.1 // indirect
-	github.com/gorilla/websocket v1.0.0
+	github.com/gorilla/websocket v1.4.1
 	github.com/hashicorp/golang-lru v0.5.0
 	github.com/hashicorp/hcl v0.0.0-20160426221300-9a905a34e628 // indirect
 	github.com/icrowley/fake v0.0.0-20180203215853-4178557ae428
