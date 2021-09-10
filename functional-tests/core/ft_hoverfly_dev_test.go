@@ -19,7 +19,6 @@ var _ = Describe("hoverfly -dev", func() {
 
 		BeforeEach(func() {
 			hoverfly = functional_tests.NewHoverfly()
-			hoverfly.Start("-dev")
 		})
 
 		AfterEach(func() {
@@ -27,11 +26,24 @@ var _ = Describe("hoverfly -dev", func() {
 		})
 
 		It("should add CORS headers to API responses", func() {
+			hoverfly.Start("-dev")
 			req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly")
 			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(http.StatusOK))
 
 			Expect(res.Header.Get("Access-Control-Allow-Origin")).To(Equal("http://localhost:4200"))
+			Expect(res.Header.Get("Access-Control-Allow-Methods")).To(Equal("GET, PUT, POST, OPTIONS, DELETE"))
+			Expect(res.Header.Get("Access-Control-Allow-Headers")).To(Equal("Origin, X-Requested-With, Content-Type, Accept, Authorization"))
+			Expect(res.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
+		})
+
+		It("should add CORS headers with custom allowed origin to API responses", func() {
+			hoverfly.Start("-dev", "-dev-cors-origin=http://localhost:3000")
+			req := sling.New().Get("http://localhost:" + hoverfly.GetAdminPort() + "/api/v2/hoverfly")
+			res := functional_tests.DoRequest(req)
+			Expect(res.StatusCode).To(Equal(http.StatusOK))
+
+			Expect(res.Header.Get("Access-Control-Allow-Origin")).To(Equal("http://localhost:3000"))
 			Expect(res.Header.Get("Access-Control-Allow-Methods")).To(Equal("GET, PUT, POST, OPTIONS, DELETE"))
 			Expect(res.Header.Get("Access-Control-Allow-Headers")).To(Equal("Origin, X-Requested-With, Content-Type, Accept, Authorization"))
 			Expect(res.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
