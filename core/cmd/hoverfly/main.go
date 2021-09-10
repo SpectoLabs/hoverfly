@@ -64,22 +64,23 @@ const boltBackend = "boltdb"
 const inmemoryBackend = "memory"
 
 var (
-	version      = flag.Bool("version", false, "Get the version of hoverfly")
-	verbose      = flag.Bool("v", false, "Should every proxy request be logged to stdout")
-	logLevelFlag = flag.String("log-level", "info", "Set log level (panic, fatal, error, warn, info or debug)")
-	capture      = flag.Bool("capture", false, "Start Hoverfly in capture mode - transparently intercepts and saves requests/response")
-	synthesize   = flag.Bool("synthesize", false, "Start Hoverfly in synthesize mode (middleware is required)")
-	modify       = flag.Bool("modify", false, "Start Hoverfly in modify mode - applies middleware (required) to both outgoing and incoming HTTP traffic")
-	spy          = flag.Bool("spy", false, "Start Hoverfly in spy mode, similar to simulate but calls real server when cache miss")
-	diff         = flag.Bool("diff", false, "Start Hoverfly in diff mode - calls real server and compares the actual response with the expected simulation config if present")
-	middleware   = flag.String("middleware", "", "Set middleware by passing the name of the binary and the path of the middleware script separated by space. (i.e. '-middleware \"python script.py\"')")
-	proxyPort    = flag.String("pp", "", "Proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
-	adminPort    = flag.String("ap", "", "Admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
-	listenOnHost = flag.String("listen-on-host", "", "Specify which network interface to bind to, eg. 0.0.0.0 will bind to all interfaces. By default hoverfly will only bind ports to loopback interface")
-	metrics      = flag.Bool("metrics", false, "Enable metrics logging to stdout")
-	dev          = flag.Bool("dev", false, "Enable CORS headers to allow Hoverfly Admin UI development")
-	destination  = flag.String("destination", ".", "Control which URLs Hoverfly should intercept and process, it can be string or regex")
-	webserver    = flag.Bool("webserver", false, "Start Hoverfly in webserver mode (simulate mode)")
+	version       = flag.Bool("version", false, "Get the version of hoverfly")
+	verbose       = flag.Bool("v", false, "Should every proxy request be logged to stdout")
+	logLevelFlag  = flag.String("log-level", "info", "Set log level (panic, fatal, error, warn, info or debug)")
+	capture       = flag.Bool("capture", false, "Start Hoverfly in capture mode - transparently intercepts and saves requests/response")
+	synthesize    = flag.Bool("synthesize", false, "Start Hoverfly in synthesize mode (middleware is required)")
+	modify        = flag.Bool("modify", false, "Start Hoverfly in modify mode - applies middleware (required) to both outgoing and incoming HTTP traffic")
+	spy           = flag.Bool("spy", false, "Start Hoverfly in spy mode, similar to simulate but calls real server when cache miss")
+	diff          = flag.Bool("diff", false, "Start Hoverfly in diff mode - calls real server and compares the actual response with the expected simulation config if present")
+	middleware    = flag.String("middleware", "", "Set middleware by passing the name of the binary and the path of the middleware script separated by space. (i.e. '-middleware \"python script.py\"')")
+	proxyPort     = flag.String("pp", "", "Proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)")
+	adminPort     = flag.String("ap", "", "Admin port - run admin interface on another port (i.e. '-ap 1234' to run admin UI on port 1234)")
+	listenOnHost  = flag.String("listen-on-host", "", "Specify which network interface to bind to, eg. 0.0.0.0 will bind to all interfaces. By default hoverfly will only bind ports to loopback interface")
+	metrics       = flag.Bool("metrics", false, "Enable metrics logging to stdout")
+	dev           = flag.Bool("dev", false, "Enable CORS headers to allow Hoverfly Admin UI development")
+	devCorsOrigin = flag.String("dev-cors-origin", "http://localhost:4200", "Custom CORS origin for dev mode")
+	destination   = flag.String("destination", ".", "Control which URLs Hoverfly should intercept and process, it can be string or regex")
+	webserver     = flag.Bool("webserver", false, "Start Hoverfly in webserver mode (simulate mode)")
 
 	addNew          = flag.Bool("add", false, "Add new user '-add -username hfadmin -password hfpass'")
 	addUser         = flag.String("username", "", "Username for new user")
@@ -310,6 +311,9 @@ func main() {
 
 	if *dev {
 		handlers.EnableCors = true
+		handlers.CorsOrigin = *devCorsOrigin
+
+		log.WithField("allowOrigin", *devCorsOrigin).Warn("Dev mode is enabled")
 	}
 
 	if *generateCA {

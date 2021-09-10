@@ -12,7 +12,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var EnableCors bool
+var (
+	EnableCors bool
+	CorsOrigin string
+)
 
 type ErrorView struct {
 	Error string `json:"error"`
@@ -62,7 +65,7 @@ func WriteErrorResponse(response http.ResponseWriter, message string, code int) 
 
 func writeCorsHeadersIfEnabled(response http.ResponseWriter) {
 	if EnableCors {
-		response.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+		response.Header().Set("Access-Control-Allow-Origin", CorsOrigin)
 		response.Header().Set("Access-Control-Allow-Methods", "GET, PUT, POST, OPTIONS, DELETE")
 		response.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
 		response.Header().Set("Access-Control-Allow-Credentials", "true")

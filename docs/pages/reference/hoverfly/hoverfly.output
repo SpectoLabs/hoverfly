@@ -37,6 +37,8 @@ Usage of hoverfly:
         Control which URLs Hoverfly should intercept and process, it can be string or regex (default ".")
   -dev
         Enable CORS headers to allow Hoverfly Admin UI development
+  -dev-cors-origin string
+        Custom CORS origin for dev mode (default "http://localhost:4200")
   -diff
         Start Hoverfly in diff mode - calls real server and compares the actual response with the expected simulation config if present
   -disable-cache
