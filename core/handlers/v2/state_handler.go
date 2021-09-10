@@ -54,6 +54,8 @@ func (this *StateHandler) Get(w http.ResponseWriter, req *http.Request, next htt
 
 func (this *StateHandler) Delete(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	this.Hoverfly.ClearState()
+
+	handlers.WriteResponse(w, []byte(""))
 	w.WriteHeader(http.StatusOK)
 }
 
