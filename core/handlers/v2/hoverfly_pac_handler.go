@@ -43,8 +43,8 @@ func (this *HoverflyPACHandler) Get(w http.ResponseWriter, req *http.Request, ne
 	if pacFile == nil {
 		handlers.WriteErrorResponse(w, "Not found", 404)
 	}
-	handlers.WriteResponse(w, pacFile)
-	w.Header().Set("Content-Type", "application/x-ns-proxy-autoconfig")
+
+	handlers.WriteResponseWithContentType(w, pacFile, "application/x-ns-proxy-autoconfig")
 }
 
 func (this *HoverflyPACHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
