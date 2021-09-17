@@ -51,7 +51,6 @@ func (this *DiffHandler) Get(w http.ResponseWriter, req *http.Request, next http
 	}
 
 	handlers.WriteResponse(w, marshal)
-	w.WriteHeader(http.StatusOK)
 }
 
 func (this *DiffHandler) Delete(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
