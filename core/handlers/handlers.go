@@ -38,11 +38,19 @@ func ReadFromRequest(request *http.Request, v interface{}) error {
 	return nil
 }
 
-func WriteResponse(response http.ResponseWriter, bytes []byte) {
-	response.Header().Set("Content-Type", detectContentType(bytes))
+func writeResponse(response http.ResponseWriter, bytes []byte, contentType string) {
+	response.Header().Set("Content-Type", contentType)
 	writeCorsHeadersIfEnabled(response)
 
 	response.Write(bytes)
+}
+
+func WriteResponse(response http.ResponseWriter, bytes []byte) {
+	writeResponse(response, bytes, detectContentType(bytes))
+}
+
+func WriteResponseWithContentType(response http.ResponseWriter, bytes []byte, contentType string) {
+	writeResponse(response, bytes, contentType)
 }
 
 func WriteErrorResponse(response http.ResponseWriter, message string, code int) {
