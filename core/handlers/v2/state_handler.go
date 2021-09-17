@@ -49,14 +49,12 @@ func (this *StateHandler) Get(w http.ResponseWriter, req *http.Request, next htt
 	}
 
 	handlers.WriteResponse(w, marshal)
-	w.WriteHeader(http.StatusOK)
 }
 
 func (this *StateHandler) Delete(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	this.Hoverfly.ClearState()
 
 	handlers.WriteResponse(w, []byte(""))
-	w.WriteHeader(http.StatusOK)
 }
 
 func (this *StateHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
@@ -79,7 +77,6 @@ func (this *StateHandler) Put(w http.ResponseWriter, req *http.Request, next htt
 	})
 
 	handlers.WriteResponse(w, marshal)
-	w.WriteHeader(http.StatusOK)
 }
 
 func (this *StateHandler) Patch(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
@@ -102,8 +99,6 @@ func (this *StateHandler) Patch(w http.ResponseWriter, req *http.Request, next h
 	})
 
 	handlers.WriteResponse(w, marshal)
-
-	w.WriteHeader(http.StatusOK)
 }
 
 func (this *StateHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
