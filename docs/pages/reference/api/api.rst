@@ -386,7 +386,10 @@ Gets configuration information from the running instance of Hoverfly.
         "cors": {
             "enabled": true,
             "allowOrigin": "*",
-            "allowMethods": "GET,POST,PUT,OPTIONS"
+            "allowMethods": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS",
+            "allowHeaders": "Content-Type,Origin,Accept,Authorization,Content-Length,X-Requested-With",
+            "preflightMaxAge": 1800,
+            "allowCredentials": true
         },
         "destination": ".",
         "middleware": {
@@ -395,6 +398,10 @@ Gets configuration information from the running instance of Hoverfly.
             "remote": ""
         },
         "mode": "simulate",
+        "arguments": {
+            "matchingStrategy": "strongest"
+        },
+        "isWebServer": false,
         "usage": {
             "counters": {
                 "capture": 0,
@@ -402,7 +409,9 @@ Gets configuration information from the running instance of Hoverfly.
                 "simulate": 0,
                 "synthesize": 0
             }
-        }
+        },
+        "version": "v1.3.3",
+        "upstreamProxy": ""
     }
 
 -------------------------------------------------------------------------------------------------------------
@@ -599,7 +608,15 @@ Gets the upstream proxy configured for Hoverfly.
 GET /api/v2/hoverfly/pac
 """"""""""""""""""""""""
 
-Gets the PAC file configured for Hoverfly.
+Gets the PAC file configured for Hoverfly. The response contains plain text with PAC file.
+If no PAC was provided before, the response is 404 with contents:
+
+::
+
+    {
+        "error": "Not found"
+    }
+
 
 
 -------------------------------------------------------------------------------------------------------------
@@ -672,6 +689,20 @@ GET /api/v2/logs
 """"""""""""""""""""
 Gets the logs from Hoverfly.
 
+It supports multiple parameters to limit the amount of entries returned:
+
+- ``limit`` - Maximum amount of entries. 500 by default;
+- ``from`` - Timestamp to start filtering from.
+
+Running hoverfly with ``-logs-size=0`` disables logging and 500 response is returned with body:
+
+::
+
+    {
+        "error": "Logs disabled"
+    }
+
+
 **Example response body**
 ::
 
@@ -712,6 +743,23 @@ it served along with the mode Hoverfly was in, the time the request was received
 to process the request. Latency is in milliseconds.
 
 It supports paging using the ``offset`` and ``limit`` query parameters.
+
+It supports multiple parameters to limit the amount of entries returned:
+
+- ``limit`` - Maximum amount of entries. 500 by default;
+- ``offset`` - Offset of the first element;
+- ``to`` - Timestamp to start filtering to;
+- ``from`` - Timestamp to start filtering from;
+- ``sort`` - Sort results in format "field:order". Supported fields: ``timestarted`` and ``latency``. Supported orders: ``asc`` and ``desc``.
+
+Running hoverfly with ``-journal-size=0`` disables logging and 500 response is returned with body:
+
+::
+
+    {
+        "error": "Journal disabled"
+    }
+
 
 **Example response body**
 ::
