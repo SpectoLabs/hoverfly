@@ -34,6 +34,7 @@ jobs:
 
     environment:
       GOPATH: /go
+      CLOUDSDK_PYTHON: python2.7
 
     working_directory: ~/hoverfly
 
