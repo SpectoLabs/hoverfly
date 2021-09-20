@@ -3,7 +3,6 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.16
-      - image: circleci/node:6.10.3
 
     environment:
       GOPATH: /go
@@ -16,6 +15,10 @@ jobs:
           name: Install Ruby
           command: |
             sudo apt-get --allow-releaseinfo-change update && sudo apt-get install ruby -f
+      - run:
+          name: Install Python
+          command: |
+            sudo apt-get install python -f
       - run:
           name: Install Node
           command: |
