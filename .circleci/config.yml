@@ -3,7 +3,6 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.16
-      - image: circleci/node:6.10.3
 
     environment:
       GOPATH: /go
