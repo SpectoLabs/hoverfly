@@ -60,6 +60,8 @@ func (this *HoverflyPACHandler) Put(w http.ResponseWriter, req *http.Request, ne
 
 func (this *HoverflyPACHandler) Delete(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	this.Hoverfly.DeletePACFile()
+
+	handlers.WriteResponse(w, []byte(""))
 }
 
 func (this *HoverflyPACHandler) Options(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
