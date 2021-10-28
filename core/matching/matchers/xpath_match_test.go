@@ -61,3 +61,22 @@ func Test_XpathMatch_MatchesTrue_WithoutHeader(t *testing.T) {
 
 	Expect(matchers.XpathMatch("/list/item/field", "<list><item><field></field></item></list>")).To(BeTrue())
 }
+
+func Test_XpathMatch_MatchesTrue_WithNameSpacePrefix(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.XpathMatch("/soapenv:Envelope/soapenv:Header/head:MessageHeader/head:From/head:Id",
+		`<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:head="http://www.test.com/Header_01" xmlns:v1="http://www.test.com/GetStatement/v1">
+			   <soapenv:Header>
+				  <head:MessageHeader>
+					 <head:From>
+						<head:Id>Test</head:Id>
+					 </head:From>
+				  </head:MessageHeader>
+			   </soapenv:Header>
+			   <soapenv:Body>
+				  <v1:GetCMSAccountStatementReq>         
+				  </v1:GetCMSAccountStatementReq>
+			   </soapenv:Body>
+			</soapenv:Envelope>`)).To(BeTrue())
+}
