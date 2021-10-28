@@ -3,9 +3,10 @@ package matchers
 import (
 	"bytes"
 
-	"github.com/ChrisTrenkamp/goxpath"
-	"github.com/ChrisTrenkamp/goxpath/tree"
-	"github.com/ChrisTrenkamp/goxpath/tree/xmltree"
+	"github.com/ChrisTrenkamp/xsel/exec"
+	"github.com/ChrisTrenkamp/xsel/grammar"
+	"github.com/ChrisTrenkamp/xsel/parser"
+	"github.com/ChrisTrenkamp/xsel/store"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -22,26 +23,15 @@ func XpathMatch(match interface{}, toMatch string) bool {
 		return false
 	}
 
-	return len(results) > 0
+	return results.Bool()
 }
 
-func XpathExecution(matchString, toMatch string) (tree.NodeSet, error) {
-	xpathRule, err := goxpath.Parse(matchString)
-	if err != nil {
-		log.Errorf("Failed to parse xpath query %s: %s", matchString, err.Error())
-		return nil, err
-	}
+func XpathExecution(matchString, toMatch string) (exec.Result, error) {
+	xpath := grammar.MustBuild(matchString)
+	parsedXml := parser.ReadXml(bytes.NewBufferString(toMatch))
+	cursor, _ := store.CreateInMemory(parsedXml)
 
-	xTree, err := xmltree.ParseXML(bytes.NewBufferString(toMatch), func(s *xmltree.ParseOptions) {
-		s.Strict = false
-	})
-
-	if err != nil {
-		log.Errorf("Failed to load XML tree: %s", err.Error())
-		return nil, err
-	}
-
-	results, err := xpathRule.ExecNode(xTree)
+	results, err := exec.Exec(cursor, &xpath)
 	if err != nil {
 		log.Errorf("Failed to execute xpath match: %s", err.Error())
 		return nil, err
