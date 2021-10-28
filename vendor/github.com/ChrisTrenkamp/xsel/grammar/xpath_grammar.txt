@@ -1,0 +1,307 @@
+package "github.com/ChrisTrenkamp/xsel/grammar"
+
+OrExpr :
+	AndExpr
+	| OrExprOr
+	;
+
+OrExprOr : OrExpr "or" AndExpr;
+
+AndExpr :
+	EqualityExpr
+	| AndExprAnd
+	;
+
+AndExprAnd : AndExpr "and" EqualityExpr;
+
+EqualityExpr :
+	RelationalExpr
+	| EqualityExprEqual
+	| EqualityExprNotEqual
+	;
+
+EqualityExprEqual : EqualityExpr "=" RelationalExpr;
+EqualityExprNotEqual : EqualityExpr "!=" RelationalExpr;
+
+RelationalExpr :
+	AdditiveExpr
+	| RelationalExprLessThan
+	| RelationalExprGreaterThan
+	| RelationalExprLessThanOrEqual
+	| RelationalExprGreaterThanOrEqual
+	;
+
+RelationalExprLessThan : RelationalExpr "<" AdditiveExpr;
+RelationalExprGreaterThan : RelationalExpr ">" AdditiveExpr;
+RelationalExprLessThanOrEqual : RelationalExpr "<=" AdditiveExpr;
+RelationalExprGreaterThanOrEqual : RelationalExpr ">=" AdditiveExpr;
+
+AdditiveExpr :
+	MultiplicativeExpr
+	| AdditiveExprAdd
+	| AdditiveExprSubtract
+	;
+
+AdditiveExprAdd : AdditiveExpr "+" MultiplicativeExpr;
+AdditiveExprSubtract : AdditiveExpr "-" MultiplicativeExpr;
+
+MultiplicativeExpr :
+	UnaryExpr
+	| MultiplicativeExprMultiply
+	| MultiplicativeExprDivide
+	| MultiplicativeExprMod
+	;
+
+MultiplicativeExprMultiply : MultiplicativeExpr "*" UnaryExpr;
+MultiplicativeExprDivide : MultiplicativeExpr "div" UnaryExpr;
+MultiplicativeExprMod : MultiplicativeExpr "mod" UnaryExpr;
+
+UnaryExpr :
+	UnionExpr
+	| UnaryExprNegate
+	;
+
+UnaryExprNegate : "-" UnaryExpr;
+
+UnionExpr :
+	PathExpr
+	| UnionExprUnion
+	;
+
+UnionExprUnion : UnionExpr "|" PathExpr;
+
+PathExpr :
+	LocationPath
+	| FilterExpr
+	| PathExprFilterWithPath
+	| PathExprFilterWithAbbreviatedPath
+	;
+
+PathExprFilterWithPath : FilterExpr "/" RelativeLocationPath;
+PathExprFilterWithAbbreviatedPath : FilterExpr "//" RelativeLocationPath;
+
+LocationPath :
+	RelativeLocationPath
+	| AbsoluteLocationPath
+	;
+
+AbsoluteLocationPath :
+	AbsoluteLocationPathOnly
+	| AbsoluteLocationPathWithRelative
+	| AbbreviatedAbsoluteLocationPath
+	;
+
+AbsoluteLocationPathOnly : "/";
+AbsoluteLocationPathWithRelative : "/" RelativeLocationPath;
+
+RelativeLocationPath :
+	Step
+	| RelativeLocationPathWithStep
+	| AbbreviatedRelativeLocationPath
+	;
+
+RelativeLocationPathWithStep : RelativeLocationPath "/" Step;
+
+AbbreviatedAbsoluteLocationPath :
+	"//" RelativeLocationPath
+	;
+
+AbbreviatedRelativeLocationPath :
+	RelativeLocationPath "//" Step
+	;
+
+Step :
+	NodeTestAndPredicate
+	| NodeTest
+	| StepWithAxisAndNodeTestAndPredicate
+	| StepWithAxisAndNodeTest
+	| AbbreviatedStep
+	| FunctionCall
+	;
+
+NodeTestAndPredicate : NodeTest StepWithPredicate;
+StepWithAxisAndNodeTestAndPredicate : StepWithAxisAndNodeTest StepWithPredicate;
+StepWithAxisAndNodeTest : AxisSpecifier NodeTest;
+
+AxisSpecifier :
+	AxisSpecifierWithAxisName
+	| AbbreviatedAxisSpecifier
+	;
+
+AxisSpecifierWithAxisName : AxisName "::";
+
+AbbreviatedAxisSpecifier :
+	"@"
+	;
+
+AxisName :
+	"ancestor"
+	| "ancestor-or-self"
+	| "attribute"
+	| "child"
+	| "descendant"
+	| "descendant-or-self"
+	| "following"
+	| "following-sibling"
+	| "namespace"
+	| "parent"
+	| "preceding"
+	| "preceding-sibling"
+	| "self"
+	;
+
+Predicate :
+	"[" OrExpr "]"
+	;
+
+StepWithPredicate :
+	StepWithPredicateWithAnotherPredicate
+	| Predicate
+	;
+
+StepWithPredicateWithAnotherPredicate : Predicate StepWithPredicate;
+
+AbbreviatedStep :
+	AbbreviatedStepSelf
+	| AbbreviatedStepParent
+	;
+
+AbbreviatedStepSelf : ".";
+AbbreviatedStepParent : "..";
+
+NodeTest :
+	NodeTestNodeTypeNoArgTest
+	| NodeTestProcInstTargetTest
+	| NameTestAnyElement
+	| NameTestNamespaceAnyLocal
+	| NameTestNamespaceAnyLocalReservedNameConflict
+	| NameTestLocalAnyNamespace
+	| NameTestLocalAnyNamespaceReservedNameConflict
+	| NameTestQNameNamespaceWithLocal
+	| NameTestQNameNamespaceWithLocalReservedNameConflictNamespace
+	| NameTestQNameNamespaceWithLocalReservedNameConflictLocal
+	| NameTestQNameNamespaceWithLocalReservedNameConflictBoth
+	| NameTestQNameLocalOnly
+	| NameTestQNameLocalOnlyReservedNameConflict
+	;
+
+NodeTestNodeTypeNoArgTest : NodeType "(" ")";
+NodeTestProcInstTargetTest : "processing-instruction" "(" Literal ")";
+NameTestAnyElement : "*";
+NameTestNamespaceAnyLocal : ncname ":" "*";
+NameTestNamespaceAnyLocalReservedNameConflict : ReservedNameConflictResolver ":" "*";
+NameTestLocalAnyNamespace : "*" ":" ncname;
+NameTestLocalAnyNamespaceReservedNameConflict : "*" ":" ReservedNameConflictResolver;
+NameTestQNameNamespaceWithLocal : ncname ":" ncname;
+NameTestQNameNamespaceWithLocalReservedNameConflictNamespace : ReservedNameConflictResolver ":" ncname;
+NameTestQNameNamespaceWithLocalReservedNameConflictLocal : ncname ":" ReservedNameConflictResolver;
+NameTestQNameNamespaceWithLocalReservedNameConflictBoth : ReservedNameConflictResolver ":" ReservedNameConflictResolver;
+NameTestQNameLocalOnly : ncname;
+NameTestQNameLocalOnlyReservedNameConflict : ReservedNameConflictResolver;
+
+ReservedNameConflictResolver : 
+	"ancestor"
+	| "ancestor-or-self"
+	| "attribute"
+	| "child"
+	| "descendant"
+	| "descendant-or-self"
+	| "following"
+	| "following-sibling"
+	| "namespace"
+	| "parent"
+	| "preceding"
+	| "preceding-sibling"
+	| "self"
+	| "comment"
+	| "text"
+	| "processing-instruction"
+	| "node"
+	;
+
+ncname :
+	<letter> { <letter> | any "_℮ↀↁↂ〇〡〢〣〤〥〦〧〨〩-.0123456789·̴̵̶̷̸̡̢̧̨̛̖̗̘̙̜̝̞̟̠̣̤̥̦̩̪̫̬̭̮̯̰̱̲̳̹̺̻̼̀́̂̃̄̅̆̇̈̉̊̋̌̍̎̏̐̑̒̓̔̽̾̿̀́͂̓̈́̕̚͠͡ͅ·ְֱֲֳִֵֶַָֹֻּֽֿׁׂًٌٍَُِّْ֑֖֛֣֤֥֦֧֪֚֭֮҃҄҅҆֒֓֔֕֗֘֙֜֝֞֟֠֡֨֩֫֬֯ׄ٠١٢٣٤٥٦٧٨٩ٰۖۗۘۙۚۛۜ۝۞ۣ۪ۭ۟۠ۡۢۤۧۨ۫۬۰۱۲۳۴۵۶۷۸۹ँंः़ािीुूृॄॅॆेैॉॊोौ्॒॑॓॔ॢॣ०१२३४५६७८९ঁংঃ়ািীুূৃৄেৈোৌ্ৗৢৣ০১২৩৪৫৬৭৮৯ਂ਼ਾਿੀੁੂੇੈੋੌ੍੦੧੨੩੪੫੬੭੮੯ੰੱઁંઃ઼ાિીુૂૃૄૅેૈૉોૌ્૦૧૨૩૪૫૬૭૮૯ଁଂଃ଼ାିୀୁୂୃେୈୋୌ୍ୖୗ୦୧୨୩୪୫୬୭୮୯ஂாிீுூெேைொோௌ்ௗ௧௨௩௪௫௬௭௮௯ఁంఃాిీుూృౄెేైొోౌ్ౕౖ౦౧౨౩౪౫౬౭౮౯ಂಃಾಿೀುೂೃೄೆೇೈೊೋೌ್ೕೖ೦೧೨೩೪೫೬೭೮೯ംഃാിീുൂൃെേൈൊോൌ്ൗ൦൧൨൩൪൫൬൭൮൯ัิีึืฺุู็่้๊๋์ํ๎๐๑๒๓๔๕๖๗๘๙ັິີຶືຸູົຼ່້໊໋໌ໍ໐໑໒໓໔໕໖໗໘໙༘༙༠༡༢༣༤༥༦༧༨༩༹༵༷༾༿ཱཱཱིིུུྲྀཷླྀཹེཻོཽཾཿ྄ཱྀྀྂྃ྆྇ྐྑྒྒྷྔྕྗྙྚྛྜྜྷྞྟྠྡྡྷྣྤྥྦྦྷྨྩྪྫྫྷྭྱྲླྴྵྶྷྐྵ⃒⃓⃘⃙⃚゙゚〪〭〮〯〫⃐⃑⃔⃕⃖⃗⃛⃜⃡〬" }
+	;
+
+NodeType :
+	"comment"
+	| "text"
+	| "processing-instruction"
+	| "node"
+	;
+
+Literal :
+	singlequote
+	| doublequote
+	;
+
+singlequote :
+	'\'' {not "'" | '\\' any "\\'nrt"} '\''
+	;
+
+doublequote :
+	'"' {not "\\\"" | '\\' any "\\\"nrt"} '"'
+	;
+
+FilterExpr :
+	PrimaryExpr
+	| FilterExprWithPredicate
+	;
+
+FilterExprWithPredicate : FilterExpr Predicate;
+
+PrimaryExpr :
+	PrimaryExprParenthetic
+	| Literal
+	| Number
+	| VariableReference
+	| FunctionCall
+	;
+
+PrimaryExprParenthetic : "(" OrExpr ")";
+
+Number :
+	digits
+	| "." digits
+	| digits "." digits
+	;
+
+digits :
+	<'0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'>
+	;
+
+VariableReference : variableReference;
+
+variableReference :
+	any "$"
+	<letter>
+	{ <letter> | any "_℮ↀↁↂ〇〡〢〣〤〥〦〧〨〩-.0123456789·̴̵̶̷̸̡̢̧̨̛̖̗̘̙̜̝̞̟̠̣̤̥̦̩̪̫̬̭̮̯̰̱̲̳̹̺̻̼̀́̂̃̄̅̆̇̈̉̊̋̌̍̎̏̐̑̒̓̔̽̾̿̀́͂̓̈́̕̚͠͡ͅ·ְֱֲֳִֵֶַָֹֻּֽֿׁׂًٌٍَُِّْ֑֖֛֣֤֥֦֧֪֚֭֮҃҄҅҆֒֓֔֕֗֘֙֜֝֞֟֠֡֨֩֫֬֯ׄ٠١٢٣٤٥٦٧٨٩ٰۖۗۘۙۚۛۜ۝۞ۣ۪ۭ۟۠ۡۢۤۧۨ۫۬۰۱۲۳۴۵۶۷۸۹ँंः़ािीुूृॄॅॆेैॉॊोौ्॒॑॓॔ॢॣ०१२३४५६७८९ঁংঃ়ািীুূৃৄেৈোৌ্ৗৢৣ০১২৩৪৫৬৭৮৯ਂ਼ਾਿੀੁੂੇੈੋੌ੍੦੧੨੩੪੫੬੭੮੯ੰੱઁંઃ઼ાિીુૂૃૄૅેૈૉોૌ્૦૧૨૩૪૫૬૭૮૯ଁଂଃ଼ାିୀୁୂୃେୈୋୌ୍ୖୗ୦୧୨୩୪୫୬୭୮୯ஂாிீுூெேைொோௌ்ௗ௧௨௩௪௫௬௭௮௯ఁంఃాిీుూృౄెేైొోౌ్ౕౖ౦౧౨౩౪౫౬౭౮౯ಂಃಾಿೀುೂೃೄೆೇೈೊೋೌ್ೕೖ೦೧೨೩೪೫೬೭೮೯ംഃാിീുൂൃെേൈൊോൌ്ൗ൦൧൨൩൪൫൬൭൮൯ัิีึืฺุู็่้๊๋์ํ๎๐๑๒๓๔๕๖๗๘๙ັິີຶືຸູົຼ່້໊໋໌ໍ໐໑໒໓໔໕໖໗໘໙༘༙༠༡༢༣༤༥༦༧༨༩༹༵༷༾༿ཱཱཱིིུུྲྀཷླྀཹེཻོཽཾཿ྄ཱྀྀྂྃ྆྇ྐྑྒྒྷྔྕྗྙྚྛྜྜྷྞྟྠྡྡྷྣྤྥྦྦྷྨྩྪྫྫྷྭྱྲླྴྵྶྷྐྵ⃒⃓⃘⃙⃚゙゚〪〭〮〯〫⃐⃑⃔⃕⃖⃗⃛⃜⃡〬" }
+	[ any ":" <letter> | any "_℮ↀↁↂ〇〡〢〣〤〥〦〧〨〩-.0123456789·̴̵̶̷̸̡̢̧̨̛̖̗̘̙̜̝̞̟̠̣̤̥̦̩̪̫̬̭̮̯̰̱̲̳̹̺̻̼̀́̂̃̄̅̆̇̈̉̊̋̌̍̎̏̐̑̒̓̔̽̾̿̀́͂̓̈́̕̚͠͡ͅ·ְֱֲֳִֵֶַָֹֻּֽֿׁׂًٌٍَُِّْ֑֖֛֣֤֥֦֧֪֚֭֮҃҄҅҆֒֓֔֕֗֘֙֜֝֞֟֠֡֨֩֫֬֯ׄ٠١٢٣٤٥٦٧٨٩ٰۖۗۘۙۚۛۜ۝۞ۣ۪ۭ۟۠ۡۢۤۧۨ۫۬۰۱۲۳۴۵۶۷۸۹ँंः़ािीुूृॄॅॆेैॉॊोौ्॒॑॓॔ॢॣ०१२३४५६७८९ঁংঃ়ািীুূৃৄেৈোৌ্ৗৢৣ০১২৩৪৫৬৭৮৯ਂ਼ਾਿੀੁੂੇੈੋੌ੍੦੧੨੩੪੫੬੭੮੯ੰੱઁંઃ઼ાિીુૂૃૄૅેૈૉોૌ્૦૧૨૩૪૫૬૭૮૯ଁଂଃ଼ାିୀୁୂୃେୈୋୌ୍ୖୗ୦୧୨୩୪୫୬୭୮୯ஂாிீுூெேைொோௌ்ௗ௧௨௩௪௫௬௭௮௯ఁంఃాిీుూృౄెేైొోౌ్ౕౖ౦౧౨౩౪౫౬౭౮౯ಂಃಾಿೀುೂೃೄೆೇೈೊೋೌ್ೕೖ೦೧೨೩೪೫೬೭೮೯ംഃാിീുൂൃെേൈൊോൌ്ൗ൦൧൨൩൪൫൬൭൮൯ัิีึืฺุู็่้๊๋์ํ๎๐๑๒๓๔๕๖๗๘๙ັິີຶືຸູົຼ່້໊໋໌ໍ໐໑໒໓໔໕໖໗໘໙༘༙༠༡༢༣༤༥༦༧༨༩༹༵༷༾༿ཱཱཱིིུུྲྀཷླྀཹེཻོཽཾཿ྄ཱྀྀྂྃ྆྇ྐྑྒྒྷྔྕྗྙྚྛྜྜྷྞྟྠྡྡྷྣྤྥྦྦྷྨྩྪྫྫྷྭྱྲླྴྵྶྷྐྵ⃒⃓⃘⃙⃚゙゚〪〭〮〯〫⃐⃑⃔⃕⃖⃗⃛⃜⃡〬" ]
+	;
+
+FunctionCall :
+	QName "(" FunctionSignature
+	;
+
+QName :
+	QNameLocalOnly
+	| QNameNamespaceWithLocal
+	;
+
+QNameLocalOnly : ncname;
+QNameNamespaceWithLocal : ncname ":" ncname;
+
+FunctionSignature :
+	FunctionSignatureNoArgs
+	| FunctionCallArgumentList
+	;
+
+FunctionSignatureNoArgs : ")";
+
+FunctionCallArgumentList :
+	FunctionCallArgumentListArgWithNext
+	| FunctionCallArgumentListEndArg
+	;
+
+FunctionCallArgumentListArgWithNext : OrExpr "," FunctionCallArgumentList;
+FunctionCallArgumentListEndArg : OrExpr ")";
