@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/BurntSushi/toml v0.2.1-0.20160426202516-f0aeabca5a12 // indirect
-	github.com/ChrisTrenkamp/goxpath v0.0.0-20160627023518-2ad3b31cf4a2
+	github.com/ChrisTrenkamp/xsel v0.9.6
 	github.com/SpectoLabs/goproxy v0.0.0-20200304143951-5f8c6dc15bd5
 	github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496
 	github.com/aymerick/raymond v2.0.2+incompatible
