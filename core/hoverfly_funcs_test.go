@@ -391,6 +391,65 @@ func Test_Hoverfly_GetResponse_WillCacheHeaderTemplateIfNotInCache(t *testing.T)
 	Expect(cachedRequestResponsePair.(*models.CachedResponse).ResponseTemplate).NotTo(BeNil())
 }
 
+func Test_Hoverfly_GetResponse_WillCacheTransitionStateTemplateIfNotInCache(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	unit.Simulation.AddPair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "somehost.com",
+				},
+			},
+			Query: &models.QueryRequestFieldMatchers {
+				"status": []models.RequestFieldMatchers {
+					{
+						Matcher: matchers.Exact,
+						Value:   "connected",
+					},
+				},
+			},
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "POST",
+				},
+			},
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "http",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Status:    200,
+			Templated: true,
+			TransitionsState: map[string]string{
+				"status": "{{ Request.QueryParam.status }}",
+			},
+		},
+	})
+
+	unit.GetResponse(models.RequestDetails{
+		Destination: "somehost.com",
+		Method:      "POST",
+		Scheme:      "http",
+		Query:       map[string][]string{"status": {"connected"}},
+	})
+
+	Expect(unit.CacheMatcher.RequestCache.RecordsCount()).Should(Equal(1))
+
+	cachedRequestResponsePair, found := unit.CacheMatcher.RequestCache.Get("18349e17236c980b2e2e9ee6ea084028")
+	Expect(found).To(BeTrue())
+
+	Expect(cachedRequestResponsePair.(*models.CachedResponse).MatchingPair.Response.TransitionsState["status"]).To(Equal("{{ Request.QueryParam.status }}"))
+	Expect(cachedRequestResponsePair.(*models.CachedResponse).ResponseTemplate).NotTo(BeNil())
+}
+
 func Test_Hoverfly_GetResponse_ShouldReturnEmptyTextIfResponseTemplateIsNotRenderable(t *testing.T) {
 	RegisterTestingT(t)
 

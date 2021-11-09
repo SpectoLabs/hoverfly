@@ -114,3 +114,65 @@ var V3TemplatingEnabledWithStateInBody = `{
 		"timeExported": "2017-02-23T12:43:48Z"
 	}
 }`
+
+var TemplatingEnabledWithStateInTransitionsState = `{
+	"data": {
+		"pairs": [
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
+							"value": "/one"
+						}
+					],
+					"method": [
+						{
+							"matcher": "exact",
+							"value": "GET"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "setting state",
+					"encodedBody": false,
+					"templated": true,
+					"transitionsState": {
+						"status": "{{ Request.QueryParam.status }}"
+					}
+				}
+			},
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
+							"value": "/two"
+						}
+					],
+					"method": [
+						{
+							"matcher": "exact",
+							"value": "GET"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "status is {{ State.status }}",
+					"encodedBody": false,
+                    "templated": true
+				}
+			}
+		],
+		"globalActions": {
+			"delays": []
+		}
+	},
+	"meta": {
+		"schemaVersion": "v5",
+		"hoverflyVersion": "v0.17.0",
+		"timeExported": "2018-05-03T15:45:52+01:00"
+	}
+}`
