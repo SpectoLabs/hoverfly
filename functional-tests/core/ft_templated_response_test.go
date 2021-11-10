@@ -107,6 +107,19 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			Expect(string(body)).To(Equal(""))
 		})
+
+		It("should be able to use state in templating state transitions", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingEnabledWithStateInTransitionsState)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/one?status=connected"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/two"))
+			Expect(resp.StatusCode).To(Equal(200))
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+			Expect(string(body)).To(Equal("status is connected"))
+		})
 	})
 
 	Context("in simulate mode, template helpers", func() {
