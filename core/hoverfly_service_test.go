@@ -521,13 +521,12 @@ func Test_Hoverfly_PutSimulation_ImportsRecordings(t *testing.T) {
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	simulationToImport := v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{pairOne},
 			GlobalActions: v2.GlobalActionsView{
 				Delays: []v1.ResponseDelayView{},
 			},
 		},
-		v2.MetaView{},
 	}
 
 	unit.PutSimulation(simulationToImport)
@@ -554,13 +553,12 @@ func Test_Hoverfly_PutSimulation_ImportsSimulationViews(t *testing.T) {
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	simulationToImport := v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{pairTwo},
 			GlobalActions: v2.GlobalActionsView{
 				Delays: []v1.ResponseDelayView{},
 			},
 		},
-		v2.MetaView{},
 	}
 
 	unit.PutSimulation(simulationToImport)
@@ -586,13 +584,12 @@ func Test_Hoverfly_PutSimulation_ImportsDelays(t *testing.T) {
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	simulationToImport := v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{},
 			GlobalActions: v2.GlobalActionsView{
 				Delays: []v1.ResponseDelayView{delayOne, delayTwo},
 			},
 		},
-		v2.MetaView{},
 	}
 
 	err := unit.PutSimulation(simulationToImport)
@@ -618,12 +615,11 @@ func Test_Hoverfly_PutSimulation_ImportsDelaysWithValidationError(t *testing.T) 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	simulationToImport := v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			GlobalActions: v2.GlobalActionsView{
 				Delays: []v1.ResponseDelayView{delayOne, invalidDelay},
 			},
 		},
-		v2.MetaView{},
 	}
 
 	err := unit.PutSimulation(simulationToImport)
@@ -639,13 +635,12 @@ func Test_Hoverfly_PutSimulation_ImportsDelaysLogNormal(t *testing.T) {
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
 	simulationToImport := v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{},
 			GlobalActions: v2.GlobalActionsView{
 				DelaysLogNormal: []v1.ResponseDelayLogNormalView{delayLogNormalOne, delayLogNormalTwo},
 			},
 		},
-		v2.MetaView{},
 	}
 
 	err := unit.PutSimulation(simulationToImport)
@@ -1121,18 +1116,16 @@ func Test_Hoverfly_ReplaceSimulation_OverridesSimulation(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 	importResult := unit.ReplaceSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{pairOne},
 		},
-		v2.MetaView{},
 	})
 	Expect(importResult.GetError()).To(BeNil())
 
 	importResult = unit.ReplaceSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{pairTwo},
 		},
-		v2.MetaView{},
 	})
 	Expect(importResult.GetError()).To(BeNil())
 
@@ -1148,18 +1141,16 @@ func Test_Hoverfly_PutSimulation_NotOverridesSimulation(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 	importResult := unit.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{pairOne},
 		},
-		v2.MetaView{},
 	})
 	Expect(importResult.GetError()).To(BeNil())
 
 	importResult = unit.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{pairTwo},
 		},
-		v2.MetaView{},
 	})
 	Expect(importResult.GetError()).To(BeNil())
 
@@ -1177,7 +1168,7 @@ func Test_Hoverfly_PutSimulation_BodyAndBodyFileWarning(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 	importResult := unit.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{{
 				RequestMatcher: v2.RequestMatcherViewV5{
 					Path: []v2.MatcherViewV5{
@@ -1190,7 +1181,6 @@ func Test_Hoverfly_PutSimulation_BodyAndBodyFileWarning(t *testing.T) {
 				},
 			}},
 		},
-		v2.MetaView{},
 	})
 	Expect(importResult.GetError()).To(BeNil())
 
@@ -1203,7 +1193,7 @@ func Test_Hoverfly_PutSimulation_AbsoluteBodyFilePathNotAllowed(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 	importResult := unit.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{{
 				RequestMatcher: v2.RequestMatcherViewV5{
 					Path: []v2.MatcherViewV5{
@@ -1215,7 +1205,6 @@ func Test_Hoverfly_PutSimulation_AbsoluteBodyFilePathNotAllowed(t *testing.T) {
 				},
 			}},
 		},
-		v2.MetaView{},
 	})
 
 	err := importResult.GetError()
@@ -1227,7 +1216,7 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromFile(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{ResponsesBodyFilesPath: "../functional-tests/core/testdata/"})
 	importResult := unit.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{{
 				RequestMatcher: v2.RequestMatcherViewV5{
 					Path: []v2.MatcherViewV5{
@@ -1239,7 +1228,6 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromFile(t *testing.T) {
 				},
 			}},
 		},
-		v2.MetaView{},
 	})
 
 	Expect(importResult.GetError()).To(BeNil())
@@ -1263,7 +1251,7 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{ResponsesBodyFilesAllowedOrigins: []string{server.URL}})
 	importResult := unit.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{{
 				RequestMatcher: v2.RequestMatcherViewV5{
 					Path: []v2.MatcherViewV5{
@@ -1275,7 +1263,6 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL(t *testing.T) {
 				},
 			}},
 		},
-		v2.MetaView{},
 	})
 
 	Expect(importResult.GetError()).To(BeNil())
@@ -1299,7 +1286,7 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL_NoOrigins(t *testing.T) 
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 	importResult := unit.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{{
 				RequestMatcher: v2.RequestMatcherViewV5{
 					Path: []v2.MatcherViewV5{
@@ -1311,7 +1298,6 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL_NoOrigins(t *testing.T) 
 				},
 			}},
 		},
-		v2.MetaView{},
 	})
 
 	Expect(importResult.GetError()).NotTo(BeNil())
@@ -1330,7 +1316,7 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL_NoMatchingOrigins(t *tes
 
 	unit := NewHoverflyWithConfiguration(&Configuration{ResponsesBodyFilesAllowedOrigins: []string{"http://192.168.142.11"}})
 	importResult := unit.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{{
 				RequestMatcher: v2.RequestMatcherViewV5{
 					Path: []v2.MatcherViewV5{
@@ -1342,7 +1328,6 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL_NoMatchingOrigins(t *tes
 				},
 			}},
 		},
-		v2.MetaView{},
 	})
 
 	Expect(importResult.GetError()).NotTo(BeNil())

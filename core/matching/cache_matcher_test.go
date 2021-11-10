@@ -63,7 +63,8 @@ func Test_CacheMatcher_PreloadCache_WillReturnErrorIfCacheIsNil(t *testing.T) {
 	RegisterTestingT(t)
 	unit := matching.CacheMatcher{}
 
-	err := unit.PreloadCache(models.Simulation{})
+	simulation := models.Simulation{}
+	err := unit.PreloadCache(&simulation)
 	Expect(err).ToNot(BeNil())
 	Expect(err.Error()).To(Equal("No cache set"))
 }
@@ -91,7 +92,7 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheIncompleteRequestMatchers(t *tes
 		},
 	})
 
-	err := unit.PreloadCache(*simulation)
+	err := unit.PreloadCache(simulation)
 
 	Expect(err).To(BeNil())
 	Expect(unit.RequestCache.RecordsCount()).To(Equal(0))
@@ -151,7 +152,7 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMa
 		},
 	})
 
-	err := unit.PreloadCache(*simulation)
+	err := unit.PreloadCache(simulation)
 
 	Expect(err).To(BeNil())
 	Expect(unit.RequestCache.RecordsCount()).To(Equal(1))
@@ -180,7 +181,7 @@ func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWitho
 		},
 	})
 
-	err := unit.PreloadCache(*simulation)
+	err := unit.PreloadCache(simulation)
 
 	Expect(err).To(BeNil())
 	Expect(unit.RequestCache.RecordsCount()).To(Equal(0))
@@ -254,7 +255,7 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 		},
 	})
 
-	err := unit.PreloadCache(*simulation)
+	err := unit.PreloadCache(simulation)
 
 	Expect(err).To(BeNil())
 	Expect(unit.RequestCache.RecordsCount()).To(Equal(1))
@@ -336,7 +337,7 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 		},
 	})
 
-	err := unit.PreloadCache(*simulation)
+	err := unit.PreloadCache(simulation)
 
 	Expect(err).To(BeNil())
 	Expect(unit.RequestCache.RecordsCount()).To(Equal(0))

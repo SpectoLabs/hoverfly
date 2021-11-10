@@ -1,7 +1,6 @@
 package matching_test
 
 import (
-	"sync"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -1840,7 +1839,7 @@ func Test_MatchingStrategyRunner_RequestMatchersShouldMatchOnStateAndNotBeCachab
 		r,
 		false,
 		simulation,
-		&state.State{map[string]string{"key1": "value1", "key2": "value2"}, sync.RWMutex{}},
+		&state.State{State: map[string]string{"key1": "value1", "key2": "value2"}},
 		&matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).To(BeNil())
@@ -1921,7 +1920,7 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateA
 		Path:   "/foo",
 	}
 
-	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}, sync.RWMutex{}}, &matching.StrongestMatchStrategy{})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeFalse())
@@ -2000,7 +1999,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "/foo",
 	}
 
-	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}, sync.RWMutex{}}, &matching.StrongestMatchStrategy{})
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -2016,7 +2015,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "/foo",
 	}
 
-	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}, sync.RWMutex{}}, &matching.StrongestMatchStrategy{})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -2032,7 +2031,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "/foo",
 	}
 
-	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}, sync.RWMutex{}}, &matching.StrongestMatchStrategy{})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -2048,7 +2047,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "/foo",
 	}
 
-	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}, sync.RWMutex{}}, &matching.StrongestMatchStrategy{})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())
@@ -2064,7 +2063,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 		Path:   "miss",
 	}
 
-	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}, sync.RWMutex{}}, &matching.StrongestMatchStrategy{})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())

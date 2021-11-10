@@ -13,7 +13,7 @@ func Test_SetPACFile_CanSetPACFile(t *testing.T) {
 
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
 				{
 					RequestMatcher: v2.RequestMatcherViewV5{
@@ -37,7 +37,7 @@ func Test_SetPACFile_CanSetPACFile(t *testing.T) {
 				},
 			},
 		},
-		v2.MetaView{
+		MetaView: v2.MetaView{
 			SchemaVersion: "v2",
 		},
 	})
@@ -51,7 +51,7 @@ func Test_SetPACFile_ServerError(t *testing.T) {
 
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
 				{
 					RequestMatcher: v2.RequestMatcherViewV5{
@@ -75,7 +75,7 @@ func Test_SetPACFile_ServerError(t *testing.T) {
 				},
 			},
 		},
-		v2.MetaView{
+		MetaView: v2.MetaView{
 			SchemaVersion: "v2",
 		},
 	})

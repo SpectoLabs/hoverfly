@@ -361,7 +361,7 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 	return nil
 }
 
-func (hf Hoverfly) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+func (hf *Hoverfly) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	if hf.Cfg.Middleware.IsSet() {
 		return hf.Cfg.Middleware.Execute(pair)
 	}

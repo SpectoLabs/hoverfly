@@ -1,7 +1,6 @@
 package matching_test
 
 import (
-	"sync"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/matching"
@@ -1107,7 +1106,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 		Path:   "miss",
 	}
 
-	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{map[string]string{"miss": "me"}, sync.RWMutex{}}, &matching.FirstMatchStrategy{})
+	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
 	Expect(result.Cachable).To(BeTrue())

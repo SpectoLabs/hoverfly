@@ -161,7 +161,7 @@ const ContentLengthMismatchMessage = "Response contains incorrect Content-Length
 const pairIgnoredMessage = "data.pairs[%v] is not added due to a conflict with the existing simulation"
 
 type SimulationImportResult struct {
-	err             error                     `json:"error,omitempty"`
+	Err             error                     `json:"error,omitempty"`
 	WarningMessages []SimulationImportWarning `json:"warnings,omitempty"`
 }
 
@@ -171,11 +171,11 @@ type SimulationImportWarning struct {
 }
 
 func (s *SimulationImportResult) SetError(err error) {
-	s.err = err
+	s.Err = err
 }
 
 func (s SimulationImportResult) GetError() error {
-	return s.err
+	return s.Err
 }
 
 func (s *SimulationImportResult) AddDeprecatedQueryWarning(requestNumber int) {

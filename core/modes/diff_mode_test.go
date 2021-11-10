@@ -210,7 +210,7 @@ func Test_DiffMode_BlacklistAllHeaders(t *testing.T) {
 	Expect(result.Response.Header["header"]).To(Equal([]string{"actual"}))
 	Expect(result.Response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
-		v2.DiffReportEntry{"body", "simulated", "actual"}))
+		v2.DiffReportEntry{Field: "body", Expected: "simulated", Actual: "actual"}))
 }
 
 func Test_DiffMode_BlacklistOneHeader(t *testing.T) {
@@ -246,8 +246,8 @@ func Test_DiffMode_BlacklistOneHeader(t *testing.T) {
 	Expect(result.Response.Header["header"]).To(Equal([]string{"actual"}))
 	Expect(result.Response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
-		v2.DiffReportEntry{"header/source", "[simulation]", "[service]"},
-		v2.DiffReportEntry{"body", "simulated", "actual"}))
+		v2.DiffReportEntry{Field: "header/source", Expected: "[simulation]", Actual: "[service]"},
+		v2.DiffReportEntry{Field: "body", Expected: "simulated", Actual: "actual"}))
 }
 
 func Test_DiffMode_BlacklistlistTwoHeaders(t *testing.T) {
@@ -283,7 +283,7 @@ func Test_DiffMode_BlacklistlistTwoHeaders(t *testing.T) {
 	Expect(result.Response.Header["header"]).To(Equal([]string{"actual"}))
 	Expect(result.Response.Header["source"]).To(Equal([]string{"service"}))
 	Expect(unit.DiffReport.DiffEntries).To(ConsistOf(
-		v2.DiffReportEntry{"body", "simulated", "actual"}))
+		v2.DiffReportEntry{Field: "body", Expected: "simulated", Actual: "actual"}))
 }
 
 func Test_DiffMode_WhenGivenANonMatchingRequestDiffIsEmpty(t *testing.T) {
@@ -354,17 +354,17 @@ func Test_JsonDiff_WhenDifferentThenCreatesErrorMessage(t *testing.T) {
 	Expect(result).To(Equal(false))
 	Expect(len(diffMode.DiffReport.DiffEntries)).To(Equal(6))
 	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
-		v2.DiffReportEntry{"test/foo", "bar", "baz"}))
+		v2.DiffReportEntry{Field: "test/foo", Expected: "bar", Actual: "baz"}))
 	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
-		v2.DiffReportEntry{"test/fooInt", "1", "2"}))
+		v2.DiffReportEntry{Field: "test/fooInt", Expected: "1", Actual: "2"}))
 	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
-		v2.DiffReportEntry{"test/fooDouble", "0", "0.1"}))
+		v2.DiffReportEntry{Field: "test/fooDouble", Expected: "0", Actual: "0.1"}))
 	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
-		v2.DiffReportEntry{"test/fooBool", "true", "false"}))
+		v2.DiffReportEntry{Field: "test/fooBool", Expected: "true", Actual: "false"}))
 	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
-		v2.DiffReportEntry{"test/anotherExpFoo", "foo", "null"}))
+		v2.DiffReportEntry{Field: "test/anotherExpFoo", Expected: "foo", Actual: "null"}))
 	Expect(diffMode.DiffReport.DiffEntries).To(ContainElement(
-		v2.DiffReportEntry{"test/nested/baz", "boo", "bar"}))
+		v2.DiffReportEntry{Field: "test/nested/baz", Expected: "boo", Actual: "bar"}))
 }
 
 func Test_JsonDiff_WhenExpectedEmptyThenReturnsTrue(t *testing.T) {
