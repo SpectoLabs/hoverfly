@@ -26,7 +26,10 @@ hoverctl-functional-test:
 	cd functional-tests/hoverctl && \
 	go test -v $(go list ./... | grep -v -E 'vendor')
 
-test: hoverfly-functional-test hoverctl-test hoverctl-functional-test
+vet:
+	go vet ./...
+
+test: vet hoverfly-functional-test hoverctl-test hoverctl-functional-test
 
 build:
 	cd core/cmd/hoverfly && \
