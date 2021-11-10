@@ -97,7 +97,7 @@ func (hf *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 	if hf.Cfg.GetMode() == "capture" {
 		hf.CacheMatcher.FlushCache()
 	} else if hf.Cfg.GetMode() == "simulate" || hf.Cfg.GetMode() == "spy" {
-		hf.CacheMatcher.PreloadCache(*hf.Simulation)
+		hf.CacheMatcher.PreloadCache(hf.Simulation)
 	}
 
 	modeArguments := modes.ModeArguments{

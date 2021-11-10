@@ -12,7 +12,7 @@ func Test_FlushCache_GetsMiddlewareFromHoverfly(t *testing.T) {
 	RegisterTestingT(t)
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
 				{
 					RequestMatcher: v2.RequestMatcherViewV5{
@@ -36,7 +36,7 @@ func Test_FlushCache_GetsMiddlewareFromHoverfly(t *testing.T) {
 				},
 			},
 		},
-		v2.MetaView{
+		MetaView: v2.MetaView{
 			SchemaVersion: "v2",
 		},
 	})
@@ -59,7 +59,7 @@ func Test_FlushCache_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 
 	hoverfly.DeleteSimulation()
 	hoverfly.PutSimulation(v2.SimulationViewV5{
-		v2.DataViewV5{
+		DataViewV5: v2.DataViewV5{
 			RequestResponsePairs: []v2.RequestMatcherResponsePairViewV5{
 				{
 					RequestMatcher: v2.RequestMatcherViewV5{
@@ -83,7 +83,7 @@ func Test_FlushCache_ErrorsWhen_HoverflyReturnsNon200(t *testing.T) {
 				},
 			},
 		},
-		v2.MetaView{
+		MetaView: v2.MetaView{
 			SchemaVersion: "v2",
 		},
 	})

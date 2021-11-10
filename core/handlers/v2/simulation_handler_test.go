@@ -85,7 +85,7 @@ func (this *HoverflySimulationErrorStub) DeleteSimulation() {}
 
 func (this *HoverflySimulationErrorStub) PutSimulation(simulation SimulationViewV5) SimulationImportResult {
 	return SimulationImportResult{
-		err: fmt.Errorf("error"),
+		Err: fmt.Errorf("error"),
 	}
 }
 

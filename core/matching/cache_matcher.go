@@ -138,7 +138,7 @@ func (this *CacheMatcher) FlushCache() error {
 	return this.RequestCache.DeleteData()
 }
 
-func (this *CacheMatcher) PreloadCache(simulation models.Simulation) error {
+func (this *CacheMatcher) PreloadCache(simulation *models.Simulation) error {
 	if this.RequestCache == nil {
 		return errors.NoCacheSetError()
 	}

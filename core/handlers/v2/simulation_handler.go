@@ -129,13 +129,13 @@ func (this *SimulationHandler) addSimulation(w http.ResponseWriter, req *http.Re
 	}
 
 	result := this.Hoverfly.PutSimulation(simulationView)
-	if result.err != nil {
+	if result.Err != nil {
 
 		log.WithFields(log.Fields{
 			"body": string(body),
-		}).Debug(result.err.Error())
+		}).Debug(result.Err.Error())
 
-		handlers.WriteErrorResponse(w, "An error occurred: "+result.err.Error(), http.StatusInternalServerError)
+		handlers.WriteErrorResponse(w, "An error occurred: "+result.Err.Error(), http.StatusInternalServerError)
 		return err
 	}
 	if len(result.WarningMessages) > 0 {
