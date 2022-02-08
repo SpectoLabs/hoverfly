@@ -267,3 +267,109 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissing
 
 	Expect(unit.ToEagerlyCacheable()).To(BeNil())
 }
+
+func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_WithQuery_GeneratesARequestDetails(t *testing.T) {
+	RegisterTestingT(t)
+	query := &models.QueryRequestFieldMatchers{}
+	query.Add("key1", []models.RequestFieldMatchers{
+		{
+			Matcher: matchers.Exact,
+			Value:   "one",
+		},
+	})
+	query.Add("key2", []models.RequestFieldMatchers{
+		{
+			Matcher: matchers.Exact,
+			Value:   "two",
+		},
+	})
+	unit := models.RequestMatcher{
+		Body: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "body",
+			},
+		},
+		Destination: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "destination",
+			},
+		},
+		Method: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "method",
+			},
+		},
+		Path: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "path",
+			},
+		},
+		Query: query,
+		Scheme: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "scheme",
+			},
+		},
+	}
+
+	Expect(unit.ToEagerlyCacheable()).ToNot(BeNil())
+	Expect(unit.ToEagerlyCacheable()).To(Equal(&models.RequestDetails{
+		Body:        "body",
+		Destination: "destination",
+		Method:      "method",
+		Path:        "path",
+		Query:       map[string][]string{"key1": {"one"}, "key2": {"two"}},
+		Scheme:      "scheme",
+	}))
+}
+
+func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_WithQuery_ReturnsNilIfNotAnExactMatch(t *testing.T) {
+	RegisterTestingT(t)
+	query := &models.QueryRequestFieldMatchers{}
+	query.Add("query", []models.RequestFieldMatchers{
+		{
+			Matcher: matchers.Glob,
+			Value:   "*",
+		},
+	})
+	unit := models.RequestMatcher{
+		Body: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "body",
+			},
+		},
+		Destination: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "destination",
+			},
+		},
+		Method: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "method",
+			},
+		},
+		Path: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "path",
+			},
+		},
+		Query: query,
+		Scheme: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "scheme",
+			},
+		},
+	}
+
+	Expect(unit.ToEagerlyCacheable()).To(BeNil())
+}
