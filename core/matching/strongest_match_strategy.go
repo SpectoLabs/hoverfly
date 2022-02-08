@@ -74,15 +74,15 @@ func (s *StrongestMatchStrategy) PostMatching(req models.RequestDetails, request
 }
 
 func (s *StrongestMatchStrategy) Result() *MatchingResult {
-	cachable := isCachable(s.requestMatch, s.matchedOnAllButHeadersAtLeastOnce, s.matchedOnAllButStateAtLeastOnce)
+	cacheable := isCacheable(s.requestMatch, s.matchedOnAllButHeadersAtLeastOnce, s.matchedOnAllButStateAtLeastOnce)
 	var err *models.MatchError
 	if s.requestMatch == nil {
 		err = models.NewMatchErrorWithClosestMiss(s.closestMiss, "No match found")
 	}
 
 	return &MatchingResult{
-		Pair:     s.requestMatch,
-		Error:    err,
-		Cachable: cachable,
+		Pair:      s.requestMatch,
+		Error:     err,
+		Cacheable: cacheable,
 	}
 }

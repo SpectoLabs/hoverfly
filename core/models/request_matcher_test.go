@@ -210,8 +210,8 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDe
 		},
 	}
 
-	Expect(unit.ToEagerlyCachable()).ToNot(BeNil())
-	Expect(unit.ToEagerlyCachable()).To(Equal(&models.RequestDetails{
+	Expect(unit.ToEagerlyCacheable()).ToNot(BeNil())
+	Expect(unit.ToEagerlyCacheable()).To(Equal(&models.RequestDetails{
 		Body:        "body",
 		Destination: "destination",
 		Method:      "method",
@@ -226,7 +226,7 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfEmpty(t
 
 	unit := models.RequestMatcher{}
 
-	Expect(unit.ToEagerlyCachable()).To(BeNil())
+	Expect(unit.ToEagerlyCacheable()).To(BeNil())
 }
 
 func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissingAnExactMatch(t *testing.T) {
@@ -265,5 +265,5 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissing
 		},
 	}
 
-	Expect(unit.ToEagerlyCachable()).To(BeNil())
+	Expect(unit.ToEagerlyCacheable()).To(BeNil())
 }

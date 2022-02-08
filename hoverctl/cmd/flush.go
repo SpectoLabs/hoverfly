@@ -17,7 +17,7 @@ requests against matching requests and responses. This cache is flushed
 when changing mode.
 
 When changing the mode to simulate, the cache will be
-flushed and rebuilt, pre-caching cachable matching requests.
+flushed and rebuilt, pre-caching cacheable matching requests.
 
 This command will flush this cache regardless of mode.
 	`,

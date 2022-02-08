@@ -782,7 +782,7 @@ func Test_ShouldNotReturnClosestMissWhenThereIsAMatch(t *testing.T) {
 	Expect(result.Pair).ToNot(BeNil())
 }
 
-func Test__NotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
+func Test__NotBeCacheableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -866,10 +866,10 @@ func Test__NotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *test
 	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeFalse())
+	Expect(result.Cacheable).To(BeFalse())
 }
 
-func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
+func Test__ShouldBeCacheableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -953,7 +953,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -972,7 +972,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -991,7 +991,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1010,7 +1010,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1029,7 +1029,7 @@ func Test__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *tes
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 }
 
 func Test_ShouldSetClosestMissBackToNilIfThereIsAMatchLaterOn(t *testing.T) {
@@ -1569,7 +1569,7 @@ Which if hit would have given the following response:
 }`))
 }
 
-func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
+func Test_StrongestMatch_ShouldNotBeCacheableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -1653,10 +1653,10 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromHeader
 	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeFalse())
+	Expect(result.Cacheable).To(BeFalse())
 }
 
-func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
+func Test_StrongestMatch__ShouldBeCacheableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -1740,7 +1740,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1759,7 +1759,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1778,7 +1778,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1797,7 +1797,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1816,10 +1816,10 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromHeadersZ
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 }
 
-func Test_MatchingStrategyRunner_RequestMatchersShouldMatchOnStateAndNotBeCachable(t *testing.T) {
+func Test_MatchingStrategyRunner_RequestMatchersShouldMatchOnStateAndNotBeCacheable(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -1843,11 +1843,11 @@ func Test_MatchingStrategyRunner_RequestMatchersShouldMatchOnStateAndNotBeCachab
 		&matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).To(BeNil())
-	Expect(result.Cachable).To(BeFalse())
+	Expect(result.Cacheable).To(BeFalse())
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
-func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeastOnce(t *testing.T) {
+func Test_StrongestMatch_ShouldNotBeCacheableIfMatchedOnEverythingApartFromStateAtLeastOnce(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -1923,10 +1923,10 @@ func Test_StrongestMatch_ShouldNotBeCachableIfMatchedOnEverythingApartFromStateA
 	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeFalse())
+	Expect(result.Cacheable).To(BeFalse())
 }
 
-func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes(t *testing.T) {
+func Test_StrongestMatch__ShouldBeCacheableIfMatchedOnEverythingApartFromStateZeroTimes(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -2002,7 +2002,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -2018,7 +2018,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -2034,7 +2034,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -2050,7 +2050,7 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -2066,5 +2066,5 @@ func Test_StrongestMatch__ShouldBeCachableIfMatchedOnEverythingApartFromStateZer
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.StrongestMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 }
