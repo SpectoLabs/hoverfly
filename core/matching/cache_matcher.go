@@ -143,7 +143,7 @@ func (this *CacheMatcher) PreloadCache(simulation *models.Simulation) error {
 		return errors.NoCacheSetError()
 	}
 	for _, pair := range simulation.GetMatchingPairs() {
-		if requestDetails := pair.RequestMatcher.ToEagerlyCachable(); requestDetails != nil {
+		if requestDetails := pair.RequestMatcher.ToEagerlyCacheable(); requestDetails != nil {
 			this.SaveRequestMatcherResponsePair(*requestDetails, &pair, nil)
 		}
 	}

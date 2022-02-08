@@ -204,7 +204,7 @@ func (this RequestMatcher) IncludesStateMatching() bool {
 	return this.RequiresState != nil && len(this.RequiresState) > 0
 }
 
-func (this RequestMatcher) ToEagerlyCachable() *RequestDetails {
+func (this RequestMatcher) ToEagerlyCacheable() *RequestDetails {
 	if this.Body == nil || len(this.Body) != 1 || this.Body[0].Matcher != matchers.Exact ||
 		this.Destination == nil || len(this.Destination) != 1 || this.Destination[0].Matcher != matchers.Exact ||
 		this.Method == nil || len(this.Method) != 1 || this.Method[0].Matcher != matchers.Exact ||

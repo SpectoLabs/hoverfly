@@ -61,15 +61,15 @@ func (s *FirstMatchStrategy) Result() *MatchingResult {
 	if s.matchingPair != nil {
 
 		return &MatchingResult{
-			Pair:     s.matchingPair,
-			Error:    nil,
-			Cachable: isCachable(s.matchingPair, s.matchedOnAllButHeadersAtLeastOnce, s.matchedOnAllButStateAtLeastOnce),
+			Pair:      s.matchingPair,
+			Error:     nil,
+			Cacheable: isCacheable(s.matchingPair, s.matchedOnAllButHeadersAtLeastOnce, s.matchedOnAllButStateAtLeastOnce),
 		}
 	}
 
 	return &MatchingResult{
-		Pair:     nil,
-		Error:    models.NewMatchError("No match found"),
-		Cachable: isCachable(nil, s.matchedOnAllButHeadersAtLeastOnce, s.matchedOnAllButStateAtLeastOnce),
+		Pair:      nil,
+		Error:     models.NewMatchError("No match found"),
+		Cacheable: isCacheable(nil, s.matchedOnAllButHeadersAtLeastOnce, s.matchedOnAllButStateAtLeastOnce),
 	}
 }

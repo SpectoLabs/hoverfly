@@ -612,7 +612,7 @@ func Test_FirstMatchStrategy_RequestMatcherResponsePair_ConvertToRequestResponse
 	Expect(pairView.Response.Body).To(Equal("request matched"))
 }
 
-func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
+func Test_FirstMatchShouldNotBeCacheableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -696,10 +696,10 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromHeadersAtLe
 	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: make(map[string]string)}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeFalse())
+	Expect(result.Cacheable).To(BeFalse())
 }
 
-func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
+func Test_FirstMatchShouldBeCacheableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -783,7 +783,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: make(map[string]string)}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -802,7 +802,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: make(map[string]string)}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -821,7 +821,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: make(map[string]string)}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -840,7 +840,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: make(map[string]string)}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -859,10 +859,10 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromHeadersZeroTim
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: make(map[string]string)}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 }
 
-func Test_FirstMatchStrategy_RequestMatchersShouldMatchOnStateAndNotBeCachable(t *testing.T) {
+func Test_FirstMatchStrategy_RequestMatchersShouldMatchOnStateAndNotBeCacheable(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -886,11 +886,11 @@ func Test_FirstMatchStrategy_RequestMatchersShouldMatchOnStateAndNotBeCachable(t
 		&matching.FirstMatchStrategy{})
 
 	Expect(result.Error).To(BeNil())
-	Expect(result.Cachable).To(BeFalse())
+	Expect(result.Cacheable).To(BeFalse())
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
 }
 
-func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeastOnce(t *testing.T) {
+func Test_FirstMatchShouldNotBeCacheableIfMatchedOnEverythingApartFromStateAtLeastOnce(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -966,10 +966,10 @@ func Test_FirstMatchShouldNotBeCachableIfMatchedOnEverythingApartFromStateAtLeas
 	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeFalse())
+	Expect(result.Cacheable).To(BeFalse())
 }
 
-func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes(t *testing.T) {
+func Test_FirstMatchShouldBeCacheableIfMatchedOnEverythingApartFromStateZeroTimes(t *testing.T) {
 	RegisterTestingT(t)
 
 	simulation := models.NewSimulation()
@@ -1045,7 +1045,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1061,7 +1061,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1077,7 +1077,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1093,7 +1093,7 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 
 	r = models.RequestDetails{
 		Method:      "POST",
@@ -1109,5 +1109,5 @@ func Test_FirstMatchShouldBeCachableIfMatchedOnEverythingApartFromStateZeroTimes
 	result = matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{"miss": "me"}}, &matching.FirstMatchStrategy{})
 
 	Expect(result.Error).ToNot(BeNil())
-	Expect(result.Cachable).To(BeTrue())
+	Expect(result.Cacheable).To(BeTrue())
 }

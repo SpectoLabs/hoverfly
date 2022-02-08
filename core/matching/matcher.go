@@ -16,12 +16,12 @@ func Match(strongestMatch string, req models.RequestDetails, webserver bool, sim
 }
 
 type MatchingResult struct {
-	Pair     *models.RequestMatcherResponsePair
-	Error    *models.MatchError
-	Cachable bool
+	Pair      *models.RequestMatcherResponsePair
+	Error     *models.MatchError
+	Cacheable bool
 }
 
-func isCachable(requestMatch *models.RequestMatcherResponsePair, matchedOnAllButHeadersAtLeastOnce bool, matchedOnAllButStateAtLeastOnce bool) bool {
+func isCacheable(requestMatch *models.RequestMatcherResponsePair, matchedOnAllButHeadersAtLeastOnce bool, matchedOnAllButStateAtLeastOnce bool) bool {
 	// Do not cache misses if the only thing they missed on was headers/state because a subsequent request which is the same
 	// but with different headers/state will need to go through matching
 	if requestMatch == nil && (matchedOnAllButHeadersAtLeastOnce || matchedOnAllButStateAtLeastOnce) {
