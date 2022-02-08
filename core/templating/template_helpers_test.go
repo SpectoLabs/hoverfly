@@ -59,7 +59,7 @@ func Test_currentDateTime_failure(t *testing.T) {
 		now: testNow,
 	}
 
-	Expect(unit.currentDateTime("cat")).To(Equal("2018-01-01T00:00:00Z"))
+	Expect(unit.currentDateTime("cat")).To(Equal("cat"))
 }
 
 func Test_currentDateTimeAdd(t *testing.T) {
@@ -85,8 +85,8 @@ func Test_currentDateTimeAdd_failure(t *testing.T) {
 	}
 
 	Expect(unit.currentDateTimeAdd("cat", "Mon Jan 2 15:04:05 MST 2006")).To(Equal("Mon Jan 1 00:00:00 UTC 2018"))
-	Expect(unit.currentDateTimeAdd("1s", "cat")).To(Equal("2018-01-01T00:00:01Z"))
-	Expect(unit.currentDateTimeAdd("cat", "cat")).To(Equal("2018-01-01T00:00:00Z"))
+	Expect(unit.currentDateTimeAdd("1s", "cat")).To(Equal("cat"))
+	Expect(unit.currentDateTimeAdd("cat", "cat")).To(Equal("cat"))
 }
 
 func Test_currentDateTimeSubtract(t *testing.T) {
@@ -112,8 +112,8 @@ func Test_currentDateTimeSubtract_failure(t *testing.T) {
 	}
 
 	Expect(unit.currentDateTimeSubtract("cat", "Mon Jan 2 15:04:05 MST 2006")).To(Equal("Mon Jan 1 00:00:00 UTC 2018"))
-	Expect(unit.currentDateTimeSubtract("1s", "cat")).To(Equal("2017-12-31T23:59:59Z"))
-	Expect(unit.currentDateTimeSubtract("cat", "cat")).To(Equal("2018-01-01T00:00:00Z"))
+	Expect(unit.currentDateTimeSubtract("1s", "cat")).To(Equal("cat"))
+	Expect(unit.currentDateTimeSubtract("cat", "cat")).To(Equal("cat"))
 }
 
 func Test_now_withEmptyOffsetAndEmptyFormat(t *testing.T) {
@@ -177,7 +177,7 @@ func Test_now_withInvalidFormat(t *testing.T) {
 
 	unit := templateHelpers{now: testNow}
 
-	Expect(unit.nowHelper("", "dog")).To(Equal("2018-01-01T00:00:00Z"))
+	Expect(unit.nowHelper("", "dog")).To(Equal("dog"))
 }
 
 func Test_replace(t *testing.T) {
