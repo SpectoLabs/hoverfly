@@ -31,11 +31,7 @@ func (t templateHelpers) iso8601DateTimePlusDays(days string) string {
 }
 
 func (t templateHelpers) currentDateTime(format string) string {
-	formatted := t.now().UTC().Format(format)
-	if formatted == format {
-		return t.now().UTC().Format(defaultDateTimeFormat)
-	}
-	return formatted
+	return t.now().UTC().Format(format)
 }
 
 func (t templateHelpers) currentDateTimeAdd(addTime string, format string) string {
@@ -44,11 +40,7 @@ func (t templateHelpers) currentDateTimeAdd(addTime string, format string) strin
 	if err == nil {
 		now = now.Add(duration)
 	}
-	formatted := now.UTC().Format(format)
-	if formatted == format {
-		return now.UTC().Format(defaultDateTimeFormat)
-	}
-	return formatted
+	return now.UTC().Format(format)
 }
 
 func (t templateHelpers) currentDateTimeSubtract(subtractTime string, format string) string {
@@ -57,11 +49,7 @@ func (t templateHelpers) currentDateTimeSubtract(subtractTime string, format str
 	if err == nil {
 		now = now.Add(-duration)
 	}
-	formatted := now.UTC().Format(format)
-	if formatted == format {
-		return now.UTC().Format(defaultDateTimeFormat)
-	}
-	return formatted
+	return now.UTC().Format(format)
 }
 
 func (t templateHelpers) nowHelper(offset string, format string) string {
@@ -82,11 +70,6 @@ func (t templateHelpers) nowHelper(offset string, format string) string {
 		formatted = strconv.FormatInt(now.UnixNano()/1000000, 10)
 	} else {
 		formatted = now.UTC().Format(format)
-	}
-
-	// when format is invalid
-	if formatted == format {
-		return now.UTC().Format(defaultDateTimeFormat)
 	}
 
 	return formatted
