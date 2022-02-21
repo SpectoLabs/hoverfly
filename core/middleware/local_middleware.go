@@ -11,9 +11,12 @@ import (
 
 // ExecuteMiddleware - takes command (middleware string) and payload, which is passed to middleware
 func (this Middleware) executeMiddlewareLocally(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	commandAndArgs := []string{this.Binary, this.Script.Name()}
-
-	middlewareCommand := exec.Command(commandAndArgs[0], commandAndArgs[1:]...)
+	var middlewareCommand *exec.Cmd
+	if this.Script == nil {
+		middlewareCommand = exec.Command(this.Binary)
+	} else {
+		middlewareCommand = exec.Command(this.Binary, this.Script.Name())
+	}
 
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 	if err != nil {
