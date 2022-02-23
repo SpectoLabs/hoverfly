@@ -1,0 +1,26 @@
+name: Bump Homebrew formula
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "greet"
+  run:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - name: Update Homebrew formula
+      uses: dawidd6/action-homebrew-bump-formula@v3
+      with:
+       # Required, custom GitHub access token with the 'public_repo' and 'workflow' scopes
+       token: ${{secrets.HOME_BREW_PAT}}
+       # Optional, will create tap repo fork in organization
+       org: SpectoLabs
+       tap: SpectoLabs/homebrew-tap
+       # Formula name, required
+       formula: Hoverfly
