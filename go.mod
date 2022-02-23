@@ -60,6 +60,6 @@ require (
 	gonum.org/v1/netlib v0.0.0-20200317120129-c5a04cffd98a // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
-	gopkg.in/yaml.v2 v2.0.0-20160301204022-a83829b6f129
+	gopkg.in/yaml.v2 v2.2.8
 	k8s.io/client-go v6.0.0+incompatible
 )
