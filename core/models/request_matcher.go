@@ -195,6 +195,10 @@ func (q *QueryRequestFieldMatchers) Add(k string, v []RequestFieldMatchers) {
 	(*q)[k] = v
 }
 
+func (q *QueryRequestFieldMatchers) Get(k string) []RequestFieldMatchers {
+	return (*q)[k]
+}
+
 func (this RequestMatcher) IncludesHeaderMatching() bool {
 	return this.Headers != nil && len(this.Headers) > 0
 }
