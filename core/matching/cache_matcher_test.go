@@ -106,7 +106,7 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMa
 
 	simulation := models.NewSimulation()
 
-	simulation.AddPair(&models.RequestMatcherResponsePair{
+	pair1 := &models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
@@ -148,14 +148,79 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMa
 		},
 		Response: models.ResponseDetails{
 			Status: 200,
-			Body:   "body",
+			Body:   "body 1",
 		},
-	})
+	}
+
+	pair2 := &models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "body",
+				},
+			},
+
+			Destination: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "destination",
+				},
+			},
+			Method: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "method",
+				},
+			},
+			Path: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "path",
+				},
+			},
+			Query: &models.QueryRequestFieldMatchers{
+				"queryKey": {
+					{
+						Matcher: matchers.Exact,
+						Value:   "queryValue",
+					},
+				},
+			},
+			Scheme: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.Exact,
+					Value:   "scheme",
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Status: 200,
+			Body:   "body 2",
+		},
+	}
+	simulation.AddPair(pair1)
+	simulation.AddPair(pair2)
 
 	err := unit.PreloadCache(simulation)
 
 	Expect(err).To(BeNil())
-	Expect(unit.RequestCache.RecordsCount()).To(Equal(1))
+	Expect(unit.RequestCache.RecordsCount()).To(Equal(2))
+
+	cacheable1 := *pair1.RequestMatcher.ToEagerlyCacheable()
+	cached1, _ := unit.RequestCache.Get(cacheable1.Hash())
+	var cachedResponse1 *models.CachedResponse
+	cachedResponse1 = cached1.(*models.CachedResponse)
+	Expect(cachedResponse1.MatchingPair.Response.Body).To(Equal("body 1"))
+	Expect(cachedResponse1.MatchingPair.RequestMatcher.Query).To(BeNil())
+
+	cacheable2 := *pair2.RequestMatcher.ToEagerlyCacheable()
+	cached2, _ := unit.RequestCache.Get(cacheable2.Hash())
+	var cachedResponse2 *models.CachedResponse
+	cachedResponse2 = cached2.(*models.CachedResponse)
+	Expect(cachedResponse2.MatchingPair.Response.Body).To(Equal("body 2"))
+	Expect(cachedResponse2.MatchingPair.RequestMatcher.Query.Get("queryKey")[0].Matcher).To(Equal(matchers.Exact))
+	Expect(cachedResponse2.MatchingPair.RequestMatcher.Query.Get("queryKey")[0].Value).To(Equal("queryValue"))
 }
 
 func Test_CacheMatcher_PreloadCache_WillNotPreemptivelyCacheRequestMatchersWithoutExactMatches(t *testing.T) {
