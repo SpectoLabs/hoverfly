@@ -103,7 +103,7 @@ func NewCertificatePair(name, organization string, validity time.Duration) (*x50
 		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
-		NotBefore:             time.Now().Add(-validity),
+		NotBefore:             time.Now(),
 		NotAfter:              time.Now().Add(validity),
 		DNSNames:              []string{name},
 		IsCA:                  true,
