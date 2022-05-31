@@ -25,6 +25,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"strings"
 	"time"
@@ -116,6 +117,8 @@ var (
 	cacheSize     = flag.Int("cache-size", 1000, "Set the size of request/response cache")
 	cors          = flag.Bool("cors", false, "Enable CORS support")
 	noImportCheck = flag.Bool("no-import-check", false, "Skip duplicate request check when importing simulations")
+
+	pacFile = flag.String("pac-file", "", "Path to the pac file to be imported on startup")
 
 	clientAuthenticationDestination = flag.String("client-authentication-destination", "", "Regular expression of destination with client authentication")
 	clientAuthenticationClientCert  = flag.String("client-authentication-client-cert", "", "Path to the client certification file used for authentication")
@@ -567,6 +570,17 @@ func main() {
 	}
 
 	cfg.Webserver = *webserver
+
+	if *pacFile != "" {
+		pacFileContent, err := ioutil.ReadFile(*pacFile)
+		if err != nil {
+			log.WithFields(log.Fields{"error": err.Error(), "pacFile": *pacFile}).
+				Fatal("Failed to import pac file")
+		}
+
+		log.WithField("pacFile", *pacFile).Infoln("Using provided pac file")
+		hoverfly.SetPACFile(pacFileContent)
+	}
 
 	err = hoverfly.StartProxy()
 	if err != nil {
