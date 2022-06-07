@@ -8,7 +8,7 @@ HF_BUILD_DIR=${DIR}/core/cmd/hoverfly
 HCTL_BUILD_DIR=${DIR}/hoverctl
 LICENSE=${DIR}/LICENSE
 GOX="${GOPATH}/bin/gox"
-declare -a OSARCH_LIST=("darwin/amd64" "windows/amd64" "windows/386" "linux/amd64" "linux/386" "linux/arm64")
+declare -a OSARCH_LIST=("darwin/amd64" "darwin/arm64" "windows/amd64" "windows/386" "linux/amd64" "linux/386" "linux/arm64")
 
 for OSARCH in "${OSARCH_LIST[@]}"; do
   SUFFIX=$(echo ${OSARCH//darwin/OSX} | tr / _ )
