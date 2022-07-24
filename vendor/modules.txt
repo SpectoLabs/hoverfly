@@ -14,9 +14,11 @@ github.com/ChrisTrenkamp/xsel/grammar/token
 github.com/ChrisTrenkamp/xsel/node
 github.com/ChrisTrenkamp/xsel/parser
 github.com/ChrisTrenkamp/xsel/store
-# github.com/SpectoLabs/goproxy v0.0.0-20200304143951-5f8c6dc15bd5
+# github.com/SpectoLabs/goproxy v0.0.0-20220724221645-71c396c297b7
 ## explicit
 github.com/SpectoLabs/goproxy
+# github.com/SpectoLabs/goproxy/ext v0.0.0-20220724221645-71c396c297b7
+## explicit
 github.com/SpectoLabs/goproxy/ext/auth
 # github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496
 ## explicit
