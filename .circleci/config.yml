@@ -47,8 +47,8 @@ jobs:
       - run:
           name: Build and push master Docker image
           command: |
-            docker build -t spectolabs/hoverfly:master .
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker buildx build --platform=linux/arm64,linux/amd64 --no-cache --tag spectolabs/hoverfly:master --push .
+            docker login --username $DOCKER_USER --password $DOCKER_PASS
             docker push spectolabs/hoverfly:master
       - run:
           name: Install gox
@@ -99,9 +99,9 @@ jobs:
       - run:
           name: Build and push master Docker image
           command: |
-            docker build -t spectolabs/hoverfly:$CIRCLE_TAG .
+            docker buildx build --platform=linux/arm64,linux/amd64 --no-cache --tag spectolabs/hoverfly:$CIRCLE_TAG --push .
             docker tag spectolabs/hoverfly:$CIRCLE_TAG spectolabs/hoverfly:latest
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker login --username $DOCKER_USER --password $DOCKER_PASS
             docker push spectolabs/hoverfly:$CIRCLE_TAG
             docker push spectolabs/hoverfly:latest
       - run:
