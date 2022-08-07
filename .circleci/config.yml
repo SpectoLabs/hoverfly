@@ -1,8 +1,8 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.16
+      - image: cimg/go:1.16
 
     environment:
       GOPATH: /go
@@ -10,6 +10,8 @@ jobs:
     working_directory: ~/hoverfly
 
     steps:
+      - setup_remote_docker:
+          version: 20.10.14
       - checkout
       - run:
           name: Install Ruby
@@ -30,7 +32,7 @@ jobs:
 
   deploy-master:
     docker:
-      - image: circleci/golang:1.16
+      - image: cimg/go:1.16
 
     environment:
       GOPATH: /go
@@ -76,13 +78,13 @@ jobs:
           command: |
             cd ./target && for f in hoverfly_bundle*;do ../google-cloud-sdk/bin/gsutil cp $f gs://hoverfly-master-builds/latest/$f; done
       - run:
-          name: Set read access in GCS            
+          name: Set read access in GCS
           command: |
             ./google-cloud-sdk/bin/gsutil -m acl set -R -a public-read gs://hoverfly-master-builds
 
   deploy-release:
     docker:
-      - image: circleci/golang:1.16
+      - image: cimg/go:1.16
 
     environment:
       GOPATH: /go
