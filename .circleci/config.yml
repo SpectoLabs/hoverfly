@@ -83,6 +83,8 @@ jobs:
           name: Set read access in GCS
           command: |
             ./google-cloud-sdk/bin/gsutil -m acl set -R -a public-read gs://hoverfly-master-builds
+    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
+    resource_class: large
 
   deploy-release:
     docker:
