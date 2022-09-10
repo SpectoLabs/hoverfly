@@ -94,6 +94,9 @@ github.com/inconshreveable/mousetrap
 # github.com/jackwakefield/gopac v1.0.3-0.20180823145755-c4d2e0b9a672
 ## explicit
 github.com/jackwakefield/gopac
+# github.com/jaswdr/faker v1.15.0
+## explicit
+github.com/jaswdr/faker
 # github.com/kardianos/osext v0.0.0-20151222153229-29ae4ffbc9a6
 ## explicit
 github.com/kardianos/osext

@@ -54,6 +54,7 @@ func NewTemplator() *Templator {
 		raymond.RegisterHelper("randomIPv6", t.randomIPv6)
 		raymond.RegisterHelper("randomUuid", t.randomUuid)
 		raymond.RegisterHelper("replace", t.replace)
+		raymond.RegisterHelper("faker", t.faker)
 
 		helpersRegistered = true
 	}
