@@ -12,8 +12,8 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/icrowley/fake"
-	"github.com/jaswdr/faker"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -163,13 +163,11 @@ func prepareJsonPathQuery(query string) string {
 	return query
 }
 
-func (t templateHelpers) faker(fakerType, funcName string) []reflect.Value {
-	faker := faker.New()
+func (t templateHelpers) faker(fakerType string) []reflect.Value {
+
+	faker := gofakeit.New(0)
 	if reflect.ValueOf(faker).MethodByName(fakerType).IsValid() {
-		fakerInstance := reflect.ValueOf(faker).MethodByName(fakerType).Call([]reflect.Value{})[0].Interface()
-		if reflect.ValueOf(fakerInstance).MethodByName(funcName).IsValid() {
-			return reflect.ValueOf(fakerInstance).MethodByName(funcName).Call([]reflect.Value{})
-		}
+		return reflect.ValueOf(faker).MethodByName(fakerType).Call([]reflect.Value{})
 	}
 	return []reflect.Value{}
 }

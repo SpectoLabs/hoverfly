@@ -13,6 +13,22 @@ Enabling Templating
 
 By default templating is disabled. In order to enable it, set the ``templated`` field to true in the response of a simulation.
 
+Faker (NEW)
+-----------
+
+Support for `go-fakeit <https://github.com/brianvoe/gofakeit>`_ was recently added in order to extend the templating capabilities of Hoverfly. 
+Faker covers many different test data requirements and it can be used within
+Hoverfly templated responses by using the ``faker`` helper, followed by the faker type (e.g. ``Name``, ``Email``)
+As an example, to generate a random fake name you can use the following expression:
+
+.. code:: json
+
+    {
+        "body": "{\n  \"name\": \"{{faker 'Name'}}\"}"
+    }
+
+Fakers that require arguments are currently not supported.
+
 
 Getting data from the request
 -----------------------------

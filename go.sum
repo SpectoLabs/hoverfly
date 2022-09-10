@@ -14,6 +14,8 @@ github.com/beevik/etree v1.1.0 h1:T0xke/WvNtMoCqgzPhkX2r4rjY3GDZFi+FjpRZY2Jbs=
 github.com/beevik/etree v1.1.0/go.mod h1:r8Aw8JqVegEf0w2fDnATrX9VpkMcyFeM0FhwO62wh+A=
 github.com/boltdb/bolt v1.2.1-0.20160424201119-d97499360d1e h1:ZjpTXDvUplNMT6aktSoMffTkAGIQJGNGPQW/xL4kPwA=
 github.com/boltdb/bolt v1.2.1-0.20160424201119-d97499360d1e/go.mod h1:clJnj/oiGkjum5o1McbSZDSLxVThjynRyGBgiAx27Ps=
+github.com/brianvoe/gofakeit/v6 v6.19.0 h1:g+yJ+meWVEsAmR+bV4mNM/eXI0N+0pZ3D+Mi+G5+YQo=
+github.com/brianvoe/gofakeit/v6 v6.19.0/go.mod h1:Ow6qC71xtwm79anlwKRlWZW6zVq9D2XHE4QSSMP/rU8=
 github.com/codegangsta/negroni v0.1.1-0.20160503152438-24bf3506bb5e h1:2Ic1pGNC0EZvHLeWg8N2x3SDWACFj9PKRD4nqSoJzPA=
 github.com/codegangsta/negroni v0.1.1-0.20160503152438-24bf3506bb5e/go.mod h1:v0y3T5G7Y1UlFfyxFn/QLRU4a2EuNau2iZY63YTKWo0=
 github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86 h1:kRNlij/Yv/baHnXYdNqr+8ch5tLYAWS/VRaJ2ZvFgu0=
@@ -59,8 +61,6 @@ github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NH
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/jackwakefield/gopac v1.0.3-0.20180823145755-c4d2e0b9a672 h1:8gMw+o9GKWC1Ml6pUbcdy3E1Nydvh6wasZiXmqKvYP4=
 github.com/jackwakefield/gopac v1.0.3-0.20180823145755-c4d2e0b9a672/go.mod h1:yR1sfJXcndScUFYPx7Xqxj7bkNlCWw9AMmuJFMHLXm8=
-github.com/jaswdr/faker v1.15.0 h1:wcEVaPKFE53NvdT4fl+w3b0IXdefp1Yk0BdBs0APCoA=
-github.com/jaswdr/faker v1.15.0/go.mod h1:x7ZlyB1AZqwqKZgyQlnqEG8FDptmHlncA5u2zY/yi6w=
 github.com/jung-kurt/gofpdf v1.0.3-0.20190309125859-24315acbbda5/go.mod h1:7Id9E/uU8ce6rXgefFLlgrJj/GYY22cpxn+r32jIOes=
 github.com/kardianos/osext v0.0.0-20151222153229-29ae4ffbc9a6 h1:yZAE+xNuc/2gmWV+s5UAb43LYLZQiqyngl6IUCQGJg0=
 github.com/kardianos/osext v0.0.0-20151222153229-29ae4ffbc9a6/go.mod h1:1NbS8ALrpOvjt0rHPNLyCIeMtbizbir8U//inJ+zuB8=

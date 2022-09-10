@@ -10,6 +10,7 @@ require (
 	github.com/aymerick/raymond v2.0.2+incompatible
 	github.com/beevik/etree v1.1.0
 	github.com/boltdb/bolt v1.2.1-0.20160424201119-d97499360d1e
+	github.com/brianvoe/gofakeit/v6 v6.19.0
 	github.com/codegangsta/negroni v0.1.1-0.20160503152438-24bf3506bb5e
 	github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86 // indirect
 	github.com/dghubble/sling v1.2.0
@@ -27,7 +28,6 @@ require (
 	github.com/icrowley/fake v0.0.0-20180203215853-4178557ae428
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jackwakefield/gopac v1.0.3-0.20180823145755-c4d2e0b9a672
-	github.com/jaswdr/faker v1.15.0
 	github.com/kardianos/osext v0.0.0-20151222153229-29ae4ffbc9a6
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/magiconair/properties v1.7.0 // indirect
