@@ -27,6 +27,7 @@ require (
 	github.com/icrowley/fake v0.0.0-20180203215853-4178557ae428
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jackwakefield/gopac v1.0.3-0.20180823145755-c4d2e0b9a672
+	github.com/jaswdr/faker v1.15.0
 	github.com/kardianos/osext v0.0.0-20151222153229-29ae4ffbc9a6
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/magiconair/properties v1.7.0 // indirect
