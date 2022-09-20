@@ -209,7 +209,7 @@ var TemplatingHelpers = `{
 				},
 				"response": {
 					"status": 200,
-					"body": "{{ faker JobTitle }}",
+					"body": "{{ faker 'JobTitle'' }}",
 					"encodedBody": false,
 					"templated": true
 				}
