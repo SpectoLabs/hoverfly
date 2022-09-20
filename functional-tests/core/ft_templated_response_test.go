@@ -297,7 +297,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Not(BeEmpty()))
-			Expect(string(body)).To(Not(Equal("{{ faker 'JobTitle'' }}")))
+			Expect(string(body)).To(Not(Equal("{{ faker 'JobTitle' }}")))
 		})
 	})
 
