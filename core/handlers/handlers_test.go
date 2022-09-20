@@ -44,9 +44,9 @@ func Test_WriteResponseError_WritesErrorMessage(t *testing.T) {
 
 	response := httptest.NewRecorder()
 
-	handlers.WriteErrorResponse(response, "This is an error", 5555)
+	handlers.WriteErrorResponse(response, "This is an error", 500)
 
-	Expect(response.Code).To(Equal(5555))
+	Expect(response.Code).To(Equal(500))
 	Expect(response.Header()["Content-Type"]).To(ContainElement("application/json; charset=utf-8"))
 
 	errorView, err := unmarshalErrorView(response.Body)
