@@ -286,6 +286,19 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			Expect(returnedUuid).To(Not(BeNil()))
 		})
+
+		It("faker", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingHelpers)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/faker"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := ioutil.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Not(BeNil()))
+			Expect(string(body)).To(Not(Equal("{{ faker JobTitle }}")))
+		})
 	})
 
 	Context("in simulate mode, template request", func() {
