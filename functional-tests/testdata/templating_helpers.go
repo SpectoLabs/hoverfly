@@ -197,6 +197,22 @@ var TemplatingHelpers = `{
 					"encodedBody": false,
 					"templated": true
 				}
+			},
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
+							"value": "/faker"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "{{ faker 'JobTitle' }}",
+					"encodedBody": false,
+					"templated": true
+				}
 			}
 		],
 		"globalActions": {
