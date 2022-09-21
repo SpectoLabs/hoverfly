@@ -2,6 +2,7 @@ package templating
 
 import (
 	"fmt"
+	"github.com/brianvoe/gofakeit/v6"
 	"strings"
 	"time"
 
@@ -32,7 +33,8 @@ var helpersRegistered = false
 
 func NewTemplator() *Templator {
 	t := templateHelpers{
-		now: time.Now,
+		now:         time.Now,
+		fakerSource: gofakeit.New(0),
 	}
 
 	if !helpersRegistered {

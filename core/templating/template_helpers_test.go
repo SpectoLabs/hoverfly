@@ -188,7 +188,7 @@ func Test_replace(t *testing.T) {
 	Expect(unit.replace("oink, oink, oink", "oink", "moo")).To(Equal("moo, moo, moo"))
 }
 
-func Test_gofakeit(t *testing.T) {
+func Test_faker(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := templateHelpers{}

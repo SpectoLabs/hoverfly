@@ -20,7 +20,8 @@ import (
 const defaultDateTimeFormat = "2006-01-02T15:04:05Z07:00"
 
 type templateHelpers struct {
-	now func() time.Time
+	now         func() time.Time
+	fakerSource *gofakeit.Faker
 }
 
 func (t templateHelpers) iso8601DateTime() string {
@@ -165,9 +166,11 @@ func prepareJsonPathQuery(query string) string {
 
 func (t templateHelpers) faker(fakerType string) []reflect.Value {
 
-	faker := gofakeit.New(0)
-	if reflect.ValueOf(faker).MethodByName(fakerType).IsValid() {
-		return reflect.ValueOf(faker).MethodByName(fakerType).Call([]reflect.Value{})
+	if t.fakerSource == nil {
+		t.fakerSource = gofakeit.New(0)
+	}
+	if reflect.ValueOf(t.fakerSource).MethodByName(fakerType).IsValid() {
+		return reflect.ValueOf(t.fakerSource).MethodByName(fakerType).Call([]reflect.Value{})
 	}
 	return []reflect.Value{}
 }
