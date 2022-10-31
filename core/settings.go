@@ -39,8 +39,6 @@ type Configuration struct {
 
 	ProxyAuthorizationHeader string
 
-	HttpsOnly bool
-
 	PlainHttpTunneling bool
 	CORS               cors.Configs
 
@@ -51,7 +49,7 @@ type Configuration struct {
 	ClientAuthenticationClientKey   string
 	ClientAuthenticationCACert      string
 
-	ResponsesBodyFilesPath string
+	ResponsesBodyFilesPath           string
 	ResponsesBodyFilesAllowedOrigins []string
 
 	ProxyControlWG sync.WaitGroup

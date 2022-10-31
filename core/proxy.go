@@ -30,11 +30,6 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	// creating proxy
 	proxy := goproxy.NewProxyHttpServer()
 
-	if hoverfly.Cfg.HttpsOnly {
-		log.Info("Disabling HTTP")
-		proxy.DisableNonTls(true)
-	}
-
 	if hoverfly.Cfg.AuthEnabled {
 		log.Info("Enabling proxy authentication")
 		proxyBasicAndBearer(proxy, "hoverfly", func(user, password string) bool {
