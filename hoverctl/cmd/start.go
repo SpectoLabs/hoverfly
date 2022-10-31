@@ -73,7 +73,6 @@ hoverctl configuration file.
 		target.DisableTls, _ = cmd.Flags().GetBool("disable-tls")
 
 		target.UpstreamProxyUrl, _ = cmd.Flags().GetString("upstream-proxy")
-		target.HttpsOnly, _ = cmd.Flags().GetBool("https-only")
 		target.CORS, _ = cmd.Flags().GetBool("cors")
 		target.NoImportCheck, _ = cmd.Flags().GetBool("no-import-check")
 
@@ -182,7 +181,6 @@ func init() {
 	startCmd.Flags().Bool("disable-tls", false, "Disable TLS verification")
 	startCmd.Flags().String("upstream-proxy", "", "A host for which Hoverfly will proxy its requests to")
 	startCmd.Flags().String("pac-file", "", "Configure upstream proxy by PAC file")
-	startCmd.Flags().Bool("https-only", false, "Disable insecure HTTP traffic in Hoverfly")
 	startCmd.Flags().String("listen-on-host", "", "Bind hoverfly listener to a host")
 	startCmd.Flags().Bool("cors", false, "Enable CORS support")
 	startCmd.Flags().Bool("no-import-check", false, "Skip duplicate request check when importing simulations")

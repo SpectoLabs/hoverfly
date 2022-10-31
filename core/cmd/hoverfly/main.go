@@ -90,8 +90,6 @@ var (
 	isAdmin         = flag.Bool("admin", true, "Supply '-admin=false' to make this non admin user")
 	authEnabled     = flag.Bool("auth", false, "Enable authentication")
 
-	proxyAuthorizationHeader = flag.String("proxy-auth", "proxy-auth", "Switch the Proxy-Authorization header from proxy-auth `Proxy-Authorization` to header-auth `X-HOVERFLY-AUTHORIZATION`. Switching to header-auth will auto enable -https-only")
-
 	generateCA = flag.Bool("generate-ca-cert", false, "Generate CA certificate and private key for MITM")
 	certName   = flag.String("cert-name", "hoverfly.proxy", "Cert name")
 	certOrg    = flag.String("cert-org", "Hoverfly Authority", "Organisation name for new cert")
@@ -102,7 +100,6 @@ var (
 	plainHttpTunneling = flag.Bool("plain-http-tunneling", false, "Use plain http tunneling to host with non-443 port")
 
 	upstreamProxy = flag.String("upstream-proxy", "", "Specify an upstream proxy for hoverfly to route traffic through")
-	httpsOnly     = flag.Bool("https-only", false, "Allow only secure secure requests to be proxied by hoverfly")
 
 	databasePath = flag.String("db-path", "", "A path to a BoltDB file with persisted user and token data for authentication (DEPRECATED)")
 	database     = flag.String("db", inmemoryBackend, "Storage to use - 'boltdb' or 'memory' which will not write anything to disk (DEPRECATED)")
@@ -377,7 +374,6 @@ func main() {
 		}).Info("Upstream proxy has been set")
 	}
 
-	cfg.HttpsOnly = *httpsOnly
 	cfg.PlainHttpTunneling = *plainHttpTunneling
 
 	if *cors {
@@ -475,13 +471,6 @@ func main() {
 				"cache-size": cfg.CacheSize,
 			}).Fatal("Failed to create cache")
 		}
-	}
-
-	if *proxyAuthorizationHeader == "header-auth" {
-		log.Warnf("Proxy authentication will use `X-HOVERFLY-AUTHORIZATION` instead of `Proxy-Authorization`")
-		cfg.ProxyAuthorizationHeader = "X-HOVERFLY-AUTHORIZATION"
-		log.Warnf("Setting Hoverfly to only proxy HTTPS requests")
-		cfg.HttpsOnly = true
 	}
 
 	authBackend := backends.NewCacheBasedAuthBackend(tokenCache, userCache)

@@ -45,8 +45,6 @@ Usage of hoverfly:
         Disable the request/response cache (the cache that sits in front of matching)
   -generate-ca-cert
         Generate CA certificate and private key for MITM
-  -https-only
-        Allow only secure secure requests to be proxied by hoverfly
   -import value
         Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'
   -journal-size int
@@ -83,8 +81,6 @@ Usage of hoverfly:
         Use plain http tunneling to host with non-443 port
   -pp string
         Proxy port - run proxy on another port (i.e. '-pp 9999' to run proxy on port 9999)
-  -proxy-auth Proxy-Authorization
-        Switch the Proxy-Authorization header from proxy-auth Proxy-Authorization to header-auth `X-HOVERFLY-AUTHORIZATION`. Switching to header-auth will auto enable -https-only (default "proxy-auth")
   -response-body-files-allow-origin value
         When a response contains a url in bodyFile, it will be loaded only if the origin is allowed
   -response-body-files-path string

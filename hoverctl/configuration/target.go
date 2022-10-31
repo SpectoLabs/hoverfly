@@ -25,7 +25,6 @@ type Target struct {
 
 	UpstreamProxyUrl string `yaml:",omitempty"`
 	PACFile          string `yaml:",omitempty"`
-	HttpsOnly        bool   `yaml:",omitempty"`
 	CORS             bool   `yaml:",omitempty"`
 	NoImportCheck    bool   `yaml:",omitempty"`
 
@@ -135,10 +134,6 @@ func (this Target) BuildFlags() Flags {
 
 	if this.UpstreamProxyUrl != "" {
 		flags = append(flags, "-upstream-proxy="+this.UpstreamProxyUrl)
-	}
-
-	if this.HttpsOnly {
-		flags = append(flags, "-https-only")
 	}
 
 	if this.AuthEnabled {

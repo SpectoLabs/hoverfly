@@ -171,17 +171,6 @@ func Test_Target_BuildFlags_UpstreamProxySetsUpstreamProxyFlag(t *testing.T) {
 	Expect(unit.BuildFlags()[0]).To(Equal("-upstream-proxy=hoverfly.io:8080"))
 }
 
-func Test_Target_BuildFlags_HttpsOnlySetsTheFlag(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := Target{
-		HttpsOnly: true,
-	}
-
-	Expect(unit.BuildFlags()).To(HaveLen(1))
-	Expect(unit.BuildFlags()[0]).To(Equal("-https-only"))
-}
-
 func Test_Target_BuildFlags_IfAuthEnabledThenIncludesUsernameAndPassword(t *testing.T) {
 	RegisterTestingT(t)
 
