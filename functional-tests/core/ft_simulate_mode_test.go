@@ -4,9 +4,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/SpectoLabs/hoverfly/functional-tests"
+	functional_tests "github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -156,6 +156,7 @@ The following request was made, but was not matched by Hoverfly:
     "Scheme": "http",
     "Query": {},
     "Body": "",
+    "FormData": {},
     "Headers": {
         "Accept-Encoding": [
             "gzip"
@@ -228,6 +229,7 @@ The following request was made, but was not matched by Hoverfly:
     "Scheme": "http",
     "Query": {},
     "Body": "",
+    "FormData": {},
     "Headers": {
         "Accept-Encoding": [
             "gzip"

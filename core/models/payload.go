@@ -12,7 +12,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/interfaces"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	log "github.com/sirupsen/logrus"
@@ -61,11 +61,13 @@ type RequestDetails struct {
 	Scheme      string
 	Query       map[string][]string
 	Body        string
+	FormData    map[string][]string
 	Headers     map[string][]string
 	rawQuery    string
 }
 
 func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error) {
+	req.ParseForm()
 	if req.Body == nil {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 	}
@@ -100,6 +102,7 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 		Scheme:      scheme,
 		Query:       req.URL.Query(),
 		Body:        reqBody,
+		FormData:    req.PostForm,
 		Headers:     req.Header.Clone(),
 		rawQuery:    req.URL.RawQuery,
 	}
@@ -125,6 +128,7 @@ func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsView 
 		Query:       &queryString,
 		QueryMap:    this.Query,
 		Body:        &this.Body,
+		FormData:    this.FormData,
 		Headers:     this.Headers,
 	}
 }

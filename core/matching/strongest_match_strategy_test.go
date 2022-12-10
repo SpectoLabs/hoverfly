@@ -3,7 +3,7 @@ package matching_test
 import (
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -1401,7 +1401,8 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 			Query: map[string][]string{
 				"query": {""},
 			},
-			Body: "body",
+			Body:     "body",
+			FormData: map[string][]string{"email": {"foo"}},
 			Headers: map[string][]string{
 				"miss": {"miss"},
 			},
@@ -1485,6 +1486,11 @@ The following request was made, but was not matched by Hoverfly:
         ]
     },
     "Body": "body",
+    "FormData": {
+        "email": [
+            "foo"
+        ]
+    },
     "Headers": {
         "miss": [
             "miss"

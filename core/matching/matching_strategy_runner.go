@@ -21,7 +21,7 @@ func MatchingStrategyRunner(req models.RequestDetails, webserver bool, simulatio
 		requestMatcher := matchingPair.RequestMatcher
 		strategy.PreMatching()
 
-		strategy.Matching(FieldMatcher(requestMatcher.Body, req.Body), "body")
+		strategy.Matching(BodyMatching(requestMatcher.Body, req), "body")
 
 		if !webserver {
 			strategy.Matching(FieldMatcher(requestMatcher.Destination, req.Destination), "destination")

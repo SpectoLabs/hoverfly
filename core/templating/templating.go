@@ -2,9 +2,10 @@ package templating
 
 import (
 	"fmt"
-	"github.com/brianvoe/gofakeit/v6"
 	"strings"
 	"time"
+
+	"github.com/brianvoe/gofakeit/v6"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/aymerick/raymond"
@@ -22,6 +23,7 @@ type Request struct {
 	Path       []string
 	Scheme     string
 	Body       func(queryType, query string, options *raymond.Options) string
+	FormData   map[string][]string
 	body       string
 	Method     string
 }
@@ -85,6 +87,7 @@ func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails, state m
 			Header:     requestDetails.Headers,
 			Scheme:     requestDetails.Scheme,
 			Body:       templateHelpers{}.requestBody,
+			FormData:   requestDetails.FormData,
 			body:       requestDetails.Body,
 			Method:     requestDetails.Method,
 		},

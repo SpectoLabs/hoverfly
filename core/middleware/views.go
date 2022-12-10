@@ -27,6 +27,7 @@ type RequestDetailsView struct {
 	Scheme      *string             `json:"scheme"`
 	Query       *string             `json:"query"`
 	Body        *string             `json:"body"`
+	FormData    map[string][]string `json:"formData"`
 	Headers     map[string][]string `json:"headers"`
 }
 
@@ -67,6 +68,8 @@ func (this ResponseDetailsView) GetBody() string { return this.Body }
 func (this ResponseDetailsView) GetBodyFile() string { return this.BodyFile }
 
 func (this ResponseDetailsView) GetEncodedBody() bool { return this.EncodedBody }
+
+func (this RequestDetailsView) GetFormData() map[string][]string { return this.FormData }
 
 func (this ResponseDetailsView) GetTemplated() bool { return false }
 

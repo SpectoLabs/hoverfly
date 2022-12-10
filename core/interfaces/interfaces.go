@@ -12,6 +12,7 @@ type Request interface {
 	GetScheme() *string
 	GetQuery() *string
 	GetBody() *string
+	GetFormData() map[string][]string
 	GetHeaders() map[string][]string
 }
 
