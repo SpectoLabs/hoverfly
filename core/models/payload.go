@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -164,7 +165,10 @@ func (r *RequestDetails) concatenate(withHost bool) string {
 	if withHost {
 		buffer.WriteString(r.Destination)
 	}
-
+	if len(r.FormData) > 0 {
+		formData, _ := json.Marshal(r.FormData)
+		buffer.WriteString(bytes.NewBuffer(formData).String())
+	}
 	buffer.WriteString(r.Path)
 	buffer.WriteString(r.Method)
 	buffer.WriteString(r.QueryString())
