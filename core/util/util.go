@@ -11,11 +11,12 @@ import (
 	"sort"
 	"strings"
 
+	"strconv"
+	"time"
+
 	"github.com/tdewolff/minify"
 	mjson "github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
-	"strconv"
-	"time"
 )
 
 // GetRequestBody will read the http.Request body io.ReadCloser
@@ -199,6 +200,7 @@ func CopyMap(originalMap map[string]string) map[string]string {
 
 // URL is regexp to match http urls
 const urlPattern = `^((ftp|https?):\/\/)(\S+(:\S*)?@)?((([1-9]\d?|1\d\d|2[01]\d|22[0-3])(\.(1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.([0-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(([a-zA-Z0-9]+([-\.][a-zA-Z0-9]+)*)|((www\.)?))?(([a-z\x{00a1}-\x{ffff}0-9]+-?-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.([a-z\x{00a1}-\x{ffff}]{2,}))?))(:(\d{1,5}))?((\/|\?|#)[^\s]*)?$`
+
 var rxURL = regexp.MustCompile(urlPattern)
 
 func IsURL(str string) bool {
@@ -250,4 +252,31 @@ func CompressGzip(body []byte) ([]byte, error) {
 	}
 
 	return byteBuffer.Bytes(), err
+}
+
+func Identical(first, second []string) bool {
+	if len(first) != len(second) {
+		return false
+	}
+	for i, v := range first {
+		if v != second[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func Contains(first, second []string) bool {
+	set := make(map[string]bool)
+	for _, value := range second {
+		set[value] = true
+	}
+
+	for _, value := range first {
+		if _, found := set[value]; !found {
+			return false
+		}
+	}
+
+	return true
 }

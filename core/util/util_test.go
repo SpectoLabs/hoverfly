@@ -57,7 +57,6 @@ func Test_GetRequestBody_DecompressGzipContent(t *testing.T) {
 	Expect(string(newRequestBody)).To(Equal(originalBody))
 }
 
-
 func Test_GetResponseBody_GettingTheResponseBodyGetsTheCorrectData(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -231,4 +230,31 @@ func Test_CopyMap(t *testing.T) {
 	Expect(newMap).To(HaveLen(2))
 	Expect(newMap["first"]).To(Equal("1"))
 	Expect(newMap["second"]).To(Equal("2"))
+}
+
+func Test_Identical_WithExactlySameArray(t *testing.T) {
+	RegisterTestingT(t)
+	first := [2]string{"q1", "q2"}
+	second := [2]string{"q1", "q2"}
+
+	Expect(Identical(first[:], second[:])).To(BeTrue())
+
+}
+
+func Test_Identical_WithDifferentArrayOfDifferentLength(t *testing.T) {
+	RegisterTestingT(t)
+	first := [2]string{"q1", "q2"}
+	second := [3]string{"q1", "q2", "q3"}
+
+	Expect(Identical(first[:], second[:])).To(BeFalse())
+
+}
+
+func Test_Identical_WithDifferentArrayOfSameLength(t *testing.T) {
+	RegisterTestingT(t)
+	first := [3]string{"q1", "q2", "q3"}
+	second := [3]string{"q1", "q2", "q4"}
+
+	Expect(Identical(first[:], second[:])).To(BeFalse())
+
 }

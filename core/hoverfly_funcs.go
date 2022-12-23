@@ -2,12 +2,13 @@ package hoverfly
 
 import (
 	"fmt"
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/aymerick/raymond"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
 	"strings"
+
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/aymerick/raymond"
 
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/matching"
@@ -345,10 +346,19 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 	if len(request.Query) > 0 {
 		queries = &models.QueryRequestFieldMatchers{}
 		for key, values := range request.Query {
+			var matcher string
+			var value interface{}
+			if len(values) > 1 {
+				matcher = matchers.ContainsExactly
+				value = values
+			} else {
+				matcher = matchers.Exact
+				value = strings.Join(values, ";")
+			}
 			queries.Add(key, []models.RequestFieldMatchers{
 				{
-					Matcher: matchers.Exact,
-					Value:   strings.Join(values, ";"),
+					Matcher: matcher,
+					Value:   value,
 				},
 			})
 		}

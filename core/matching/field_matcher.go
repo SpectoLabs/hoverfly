@@ -1,9 +1,10 @@
 package matching
 
 import (
+	"strings"
+
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"strings"
 )
 
 func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMatch {
@@ -16,7 +17,7 @@ func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMa
 
 	for _, field := range fields {
 		if matchers.Matchers[strings.ToLower(field.Matcher)](field.Value, toMatch) {
-			if field.Matcher == matchers.Exact {
+			if field.Matcher == matchers.Exact || field.Matcher == matchers.ContainsExactly {
 				fieldMatch.Score = fieldMatch.Score + 2
 			} else {
 				fieldMatch.Score = fieldMatch.Score + 1

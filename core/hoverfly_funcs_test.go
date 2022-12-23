@@ -3,13 +3,14 @@ package hoverfly
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/modes"
 	"io/ioutil"
 	"net/http"
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/modes"
+
 	"github.com/SpectoLabs/hoverfly/core/cache"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -404,8 +405,8 @@ func Test_Hoverfly_GetResponse_WillCacheTransitionStateTemplateIfNotInCache(t *t
 					Value:   "somehost.com",
 				},
 			},
-			Query: &models.QueryRequestFieldMatchers {
-				"status": []models.RequestFieldMatchers {
+			Query: &models.QueryRequestFieldMatchers{
+				"status": []models.RequestFieldMatchers{
 					{
 						Matcher: matchers.Exact,
 						Value:   "connected",
@@ -837,11 +838,38 @@ func Test_Hoverfly_Save_SavesRequestContainsMultiValueQuery(t *testing.T) {
 
 	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
 
+	expectedValues := [2]string{"value1", "value2"}
+	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveLen(1))
+	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveKeyWithValue("query", []models.RequestFieldMatchers{
+		{
+			Matcher: matchers.ContainsExactly,
+			Value:   expectedValues[:],
+		},
+	}))
+}
+
+func Test_Hoverfly_Save_SavesRequestContainsSingleQuery(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	_ = unit.Save(&models.RequestDetails{
+		Query: map[string][]string{
+			"query": {"value1"},
+		},
+	}, &models.ResponseDetails{
+		Body:    "testresponsebody",
+		Headers: map[string][]string{"testheader": {"testvalue"}},
+		Status:  200,
+	}, &modes.ModeArguments{})
+
+	Expect(unit.Simulation.GetMatchingPairs()).To(HaveLen(1))
+
 	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveLen(1))
 	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveKeyWithValue("query", []models.RequestFieldMatchers{
 		{
 			Matcher: matchers.Exact,
-			Value:   "value1;value2",
+			Value:   "value1",
 		},
 	}))
 }
