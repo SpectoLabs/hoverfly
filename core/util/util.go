@@ -199,6 +199,7 @@ func CopyMap(originalMap map[string]string) map[string]string {
 
 // URL is regexp to match http urls
 const urlPattern = `^((ftp|https?):\/\/)(\S+(:\S*)?@)?((([1-9]\d?|1\d\d|2[01]\d|22[0-3])(\.(1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.([0-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(([a-zA-Z0-9]+([-\.][a-zA-Z0-9]+)*)|((www\.)?))?(([a-z\x{00a1}-\x{ffff}0-9]+-?-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.([a-z\x{00a1}-\x{ffff}]{2,}))?))(:(\d{1,5}))?((\/|\?|#)[^\s]*)?$`
+
 var rxURL = regexp.MustCompile(urlPattern)
 
 func IsURL(str string) bool {
@@ -250,4 +251,57 @@ func CompressGzip(body []byte) ([]byte, error) {
 	}
 
 	return byteBuffer.Bytes(), err
+}
+
+func Identical(first, second []string) bool {
+	if len(first) != len(second) {
+		return false
+	}
+	for i, v := range first {
+		if v != second[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func Contains(first, second []string) bool {
+	set := make(map[string]bool)
+	for _, value := range first {
+		set[value] = true
+	}
+
+	for _, value := range second {
+		if _, found := set[value]; !found {
+			return false
+		}
+	}
+
+	return true
+}
+
+func ContainsOnly(first, second []string) bool {
+	firstSet := make(map[string]bool)
+	secondSet := make(map[string]bool)
+
+	for _, value := range first {
+		firstSet[value] = true
+	}
+
+	for _, value := range second {
+		secondSet[value] = true
+	}
+
+	if len(firstSet) != len(secondSet) {
+		return false
+	}
+
+	for key, _ := range firstSet {
+
+		if _, found := secondSet[key]; !found {
+			return false
+		}
+
+	}
+	return true
 }
