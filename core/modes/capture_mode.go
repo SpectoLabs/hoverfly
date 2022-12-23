@@ -8,7 +8,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -43,6 +43,7 @@ func (this *CaptureMode) GetArguments(arguments ModeArguments) {
 }
 
 func (this CaptureMode) Process(request *http.Request, details models.RequestDetails) (ProcessResult, error) {
+	request.ParseForm()
 	// this is mainly for testing, since when you create
 	if request.Body == nil {
 		request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
