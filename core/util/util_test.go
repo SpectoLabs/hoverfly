@@ -232,7 +232,7 @@ func Test_CopyMap(t *testing.T) {
 	Expect(newMap["second"]).To(Equal("2"))
 }
 
-func Test_Identical_WithExactlySameArray(t *testing.T) {
+func Test_Identical_ReturnsTrue_WithExactlySameArray(t *testing.T) {
 	RegisterTestingT(t)
 	first := [2]string{"q1", "q2"}
 	second := [2]string{"q1", "q2"}
@@ -241,7 +241,7 @@ func Test_Identical_WithExactlySameArray(t *testing.T) {
 
 }
 
-func Test_Identical_WithDifferentArrayOfDifferentLength(t *testing.T) {
+func Test_Identical_ReturnsFalse_WithDifferentArrayOfDifferentLength(t *testing.T) {
 	RegisterTestingT(t)
 	first := [2]string{"q1", "q2"}
 	second := [3]string{"q1", "q2", "q3"}
@@ -250,7 +250,34 @@ func Test_Identical_WithDifferentArrayOfDifferentLength(t *testing.T) {
 
 }
 
-func Test_Identical_WithDifferentArrayOfSameLength(t *testing.T) {
+func Test_Identical_ReturnsFalse_WithDifferentArrayOfSameLength(t *testing.T) {
+	RegisterTestingT(t)
+	first := [3]string{"q1", "q2", "q3"}
+	second := [3]string{"q1", "q2", "q4"}
+
+	Expect(Identical(first[:], second[:])).To(BeFalse())
+
+}
+
+func Test_Contains_ReturnsTrue_WithExactlySameArray(t *testing.T) {
+	RegisterTestingT(t)
+	first := [2]string{"q1", "q2"}
+	second := [2]string{"q1", "q2"}
+
+	Expect(Contains(first[:], second[:])).To(BeTrue())
+
+}
+
+func Test_Contains_ReturnsTrue_WithArraySubset(t *testing.T) {
+	RegisterTestingT(t)
+	first := [2]string{"q1", "q2"}
+	second := [3]string{"q1", "q2", "q3"}
+
+	Expect(Contains(first[:], second[:])).To(BeTrue())
+
+}
+
+func Test_Contains_WithDifferentArrayOfSameLength(t *testing.T) {
 	RegisterTestingT(t)
 	first := [3]string{"q1", "q2", "q3"}
 	second := [3]string{"q1", "q2", "q4"}
