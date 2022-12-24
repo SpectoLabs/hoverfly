@@ -11,12 +11,11 @@ import (
 	"sort"
 	"strings"
 
-	"strconv"
-	"time"
-
 	"github.com/tdewolff/minify"
 	mjson "github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
+	"strconv"
+	"time"
 )
 
 // GetRequestBody will read the http.Request body io.ReadCloser

@@ -3,14 +3,13 @@ package hoverfly
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/modes"
 	"io/ioutil"
 	"net/http"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/modes"
-
 	"github.com/SpectoLabs/hoverfly/core/cache"
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"

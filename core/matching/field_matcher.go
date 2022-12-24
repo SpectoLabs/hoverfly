@@ -1,10 +1,9 @@
 package matching
 
 import (
-	"strings"
-
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"strings"
 )
 
 func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMatch {

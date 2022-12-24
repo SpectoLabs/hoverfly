@@ -2,13 +2,12 @@ package hoverfly
 
 import (
 	"fmt"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/aymerick/raymond"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
 	"strings"
-
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/aymerick/raymond"
 
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/matching"

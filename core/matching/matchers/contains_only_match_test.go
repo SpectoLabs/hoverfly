@@ -20,14 +20,14 @@ func Test_ContainsOnlyMatch_MatchesTrueWithIdenticalArray(t *testing.T) {
 	Expect(matchers.ContainsOnlyMatch(arr[:], "q1;q2;q3")).To(BeTrue())
 }
 
-func Test_ContainsOnlyMatch_MatchesTrueSameArrayInDifferentOrder(t *testing.T) {
+func Test_ContainsOnlyMatch_MatchesTrueWithSameArrayInDifferentOrder(t *testing.T) {
 	RegisterTestingT(t)
 
 	arr := [3]string{"q1", "q2", "q3"}
 	Expect(matchers.ContainsOnlyMatch(arr[:], "q1;q3;q2")).To(BeTrue())
 }
 
-func Test_ContainsOnlyMatch_MatchesTrueSameArrayInDifferentOrderWithDuplicates(t *testing.T) {
+func Test_ContainsOnlyMatch_MatchesTrueWithSameArrayInDifferentOrderWithDups(t *testing.T) {
 	RegisterTestingT(t)
 
 	arr := [3]string{"q1", "q2", "q3"}
