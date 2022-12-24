@@ -507,3 +507,129 @@ Example
             <tr/>
         </tbody>
     </table>
+
+ContainsExactly matcher
+-----------------------
+
+Verifies that the matcher group contains exactly the given values and nothing else in array to match, in order. This matcher is case-sensitive.
+
+
+Example
+"""""""
+
+.. code:: json
+   
+   "matcher": "containsexactly"
+   "value": "[?]"
+
+.. raw:: html
+    
+    <table border="1" class="docutils matcher-examples">
+        <thead>
+            <tr class="row-odd">
+                <th class="head">Array to match</th>
+                <th class="head">Matcher value</th>
+                <th class="head">Match</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="row-even">
+                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
+            <tr/>
+            <tr class="row-odd">
+                <td>["query-param-value2", "query-param-value1", "query-param-value3"]</td>
+                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td class="example-icon"><span class="fa fa-times fa-failure"></span></td>
+            <tr/>
+        </tbody>
+    </table>
+
+|
+|
+
+ContainsOnly matcher
+-----------------------
+
+Verifies that the matcher list contains only the given values and nothing else, in any order along with duplicates in array to match. This is also case sensitive.
+
+Example
+"""""""
+
+.. code:: json
+   
+   "matcher": "containsonly"
+   "value": "[?]"
+
+.. raw:: html
+    
+    <table border="1" class="docutils matcher-examples">
+        <thead>
+            <tr class="row-odd">
+                <th class="head">Array to match</th>
+                <th class="head">Matcher value</th>
+                <th class="head">Match</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="row-even">
+                <td>["query-param-value2", "query-param-value1", "query-param-value3"]</td>
+                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
+            <tr/>
+            <tr class="row-odd">
+                <td>["query-param-value1", "query-param-value2", "query-param-value3", "query-param-value2"]</td>
+                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
+            <tr/>
+            <tr class="row-even">
+                <td>["query-param-value2", "query-param-value1", "query-param-value1"]</td>
+                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td class="example-icon"><span class="fa fa-times fa-failure"></span></td>
+            <tr/>
+        </tbody>
+    </table>
+
+|
+|
+
+Contains matcher
+-----------------------
+
+Verifies that the matcher list contains the given values in array to match, in any order. This is case-sensitive.
+
+Example
+"""""""
+
+.. code:: json
+   
+   "matcher": "contains"
+   "value": "[?]"
+
+.. raw:: html
+    
+    <table border="1" class="docutils matcher-examples">
+        <thead>
+            <tr class="row-odd">
+                <th class="head">Array to match</th>
+                <th class="head">Matcher value</th>
+                <th class="head">Match</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="row-even">
+                <td>["query-param-value1", "query-param-value2", "query-param-value2"]</td>
+                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
+            <tr/>
+            <tr class="row-odd">
+                <td>["query-param-value2", "query-param-value1", "query-param-value4"]</td>
+                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td class="example-icon"><span class="fa fa-times fa-failure"></span></td>
+            <tr/>
+        </tbody>
+    </table>
+
+|
+|
