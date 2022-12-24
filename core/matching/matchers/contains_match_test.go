@@ -38,5 +38,5 @@ func Test_ContainsMatch_MatchesFalseArrayIsEmpty(t *testing.T) {
 	RegisterTestingT(t)
 
 	arr := [0]string{}
-	Expect(matchers.ExactMatch(arr, "q5;q5")).To(BeFalse())
+	Expect(matchers.ExactMatch(arr, "q5;q6")).To(BeFalse())
 }

@@ -268,15 +268,41 @@ func Identical(first, second []string) bool {
 
 func Contains(first, second []string) bool {
 	set := make(map[string]bool)
-	for _, value := range second {
+	for _, value := range first {
 		set[value] = true
 	}
 
-	for _, value := range first {
+	for _, value := range second {
 		if _, found := set[value]; !found {
 			return false
 		}
 	}
 
+	return true
+}
+
+func ContainsOnly(first, second []string) bool {
+	firstSet := make(map[string]bool)
+	secondSet := make(map[string]bool)
+
+	for _, value := range first {
+		firstSet[value] = true
+	}
+
+	for _, value := range second {
+		secondSet[value] = true
+	}
+
+	if len(firstSet) != len(secondSet) {
+		return false
+	}
+
+	for key, _ := range firstSet {
+
+		if _, found := secondSet[key]; !found {
+			return false
+		}
+
+	}
 	return true
 }

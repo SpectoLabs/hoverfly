@@ -1,7 +1,6 @@
 package matchers
 
 import (
-	"sort"
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -15,7 +14,5 @@ func ContainsOnlyMatch(match interface{}, toMatch string) bool {
 		return false
 	}
 	toMatchArr := strings.Split(toMatch, ";")
-	sort.Strings(matchStringArr)
-	sort.Strings(toMatchArr)
-	return util.Identical(matchStringArr, toMatchArr)
+	return util.ContainsOnly(matchStringArr, toMatchArr)
 }

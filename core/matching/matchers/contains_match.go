@@ -14,5 +14,5 @@ func ContainsMatch(match interface{}, toMatch string) bool {
 		return false
 	}
 	toMatchArr := strings.Split(toMatch, ";")
-	return util.Contains(toMatchArr, matchStringArr)
+	return util.Contains(matchStringArr, toMatchArr)
 }

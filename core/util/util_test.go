@@ -241,7 +241,7 @@ func Test_Identical_ReturnsTrue_WithExactlySameArray(t *testing.T) {
 
 }
 
-func Test_Identical_ReturnsFalse_WithDifferentArrayOfDifferentLength(t *testing.T) {
+func Test_Identical_ReturnsFalseWithDifferentArrayOfDifferentLength(t *testing.T) {
 	RegisterTestingT(t)
 	first := [2]string{"q1", "q2"}
 	second := [3]string{"q1", "q2", "q3"}
@@ -250,7 +250,7 @@ func Test_Identical_ReturnsFalse_WithDifferentArrayOfDifferentLength(t *testing.
 
 }
 
-func Test_Identical_ReturnsFalse_WithDifferentArrayOfSameLength(t *testing.T) {
+func Test_Identical_ReturnsFalseWithDifferentArrayOfSameLength(t *testing.T) {
 	RegisterTestingT(t)
 	first := [3]string{"q1", "q2", "q3"}
 	second := [3]string{"q1", "q2", "q4"}
@@ -259,7 +259,7 @@ func Test_Identical_ReturnsFalse_WithDifferentArrayOfSameLength(t *testing.T) {
 
 }
 
-func Test_Contains_ReturnsTrue_WithExactlySameArray(t *testing.T) {
+func Test_Contains_ReturnsTrueWithExactlySameArray(t *testing.T) {
 	RegisterTestingT(t)
 	first := [2]string{"q1", "q2"}
 	second := [2]string{"q1", "q2"}
@@ -268,20 +268,57 @@ func Test_Contains_ReturnsTrue_WithExactlySameArray(t *testing.T) {
 
 }
 
-func Test_Contains_ReturnsTrue_WithArraySubset(t *testing.T) {
+func Test_Contains_ReturnsTrueWithArrayContainingValuesWithDups(t *testing.T) {
 	RegisterTestingT(t)
-	first := [2]string{"q1", "q2"}
-	second := [3]string{"q1", "q2", "q3"}
+	first := [3]string{"q1", "q2", "q3"}
+	second := [4]string{"q1", "q2", "q1", "q2"}
 
 	Expect(Contains(first[:], second[:])).To(BeTrue())
 
 }
 
-func Test_Contains_WithDifferentArrayOfSameLength(t *testing.T) {
+func Test_Contains_ReturnsFalseWithArrayHavingOneValueMisMatch(t *testing.T) {
 	RegisterTestingT(t)
 	first := [3]string{"q1", "q2", "q3"}
-	second := [3]string{"q1", "q2", "q4"}
+	second := [5]string{"q1", "q2", "q4", "q1", "q2"}
 
-	Expect(Identical(first[:], second[:])).To(BeFalse())
+	Expect(Contains(first[:], second[:])).To(BeFalse())
+
+}
+
+func Test_ContainsOnly_ReturnsTrueWithArrayContainingOnlyValuesWithDups(t *testing.T) {
+	RegisterTestingT(t)
+	first := [3]string{"a", "b", "c"}
+	second := [5]string{"a", "b", "b", "c", "b"}
+
+	Expect(ContainsOnly(first[:], second[:])).To(BeTrue())
+
+}
+
+func Test_ContainsOnly_ReturnsTrueWithArrayInDifferentOrder(t *testing.T) {
+	RegisterTestingT(t)
+	first := [3]string{"c", "b", "a"}
+	second := [3]string{"a", "b", "c"}
+
+	Expect(ContainsOnly(first[:], second[:])).To(BeTrue())
+
+}
+
+func Test_ContainsOnly_ReturnsTrueWithIdenticalArray(t *testing.T) {
+	RegisterTestingT(t)
+	first := [3]string{"a", "b", "c"}
+	second := [3]string{"a", "b", "c"}
+
+	Expect(ContainsOnly(first[:], second[:])).To(BeTrue())
+
+}
+
+func Test_ContainsOnly_ReturnsFalseWithOneMissingValue(t *testing.T) {
+
+	RegisterTestingT(t)
+	first := [3]string{"a", "b", "c"}
+	second := [4]string{"a", "b", "d", "a"}
+
+	Expect(ContainsOnly(first[:], second[:])).To(BeFalse())
 
 }
