@@ -9,7 +9,7 @@ import (
 
 	"net/http"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
@@ -349,6 +349,7 @@ func TestRequestDetailsView_ConvertToRequestDetails(t *testing.T) {
 		Scheme:      StringToPointer("scheme"),
 		Query:       StringToPointer(""),
 		Body:        StringToPointer(""),
+		FormData:    map[string][]string{"user": {"foo"}},
 		Headers:     map[string][]string{"Content-Encoding": {"gzip"}}}
 
 	requestDetails := models.NewRequestDetailsFromRequest(requestDetailsView)

@@ -2,19 +2,19 @@ package hoverfly
 
 import (
 	"fmt"
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/aymerick/raymond"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/errors"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/aymerick/raymond"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -309,6 +309,24 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 				Matcher: matchers.Xml,
 				Value:   request.Body,
 			},
+		}
+	} else if contentType == "form" {
+		if len(request.FormData) > 0 {
+			form := make(map[string]interface{})
+			for formKey, formValue := range request.FormData {
+				form[formKey] = []models.RequestFieldMatchers{
+					{
+						Matcher: matchers.Exact,
+						Value:   formValue[0],
+					},
+				}
+			}
+			body = []models.RequestFieldMatchers{
+				{
+					Matcher: "form",
+					Value:   form,
+				},
+			}
 		}
 	}
 
