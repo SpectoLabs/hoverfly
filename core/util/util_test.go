@@ -259,6 +259,16 @@ func Test_Identical_ReturnsFalseWithDifferentArrayOfSameLength(t *testing.T) {
 
 }
 
+func Test_Contains_ReturnsFalseWithEmptyArrayMatcher(t *testing.T) {
+
+	RegisterTestingT(t)
+	first := [0]string{}
+	second := [2]string{"q1", "q2"}
+
+	Expect(Contains(first[:], second[:])).To(BeFalse())
+
+}
+
 func Test_Contains_ReturnsTrueWithContainingBothValues(t *testing.T) {
 	RegisterTestingT(t)
 	first := [2]string{"q1", "q2"}
@@ -281,6 +291,16 @@ func Test_Contains_ReturnsFalseWithContainingNoneOfValuesSpecified(t *testing.T)
 	RegisterTestingT(t)
 	first := [3]string{"q1", "q2", "q3"}
 	second := [5]string{"q5", "q6", "q7", "q8", "q9"}
+
+	Expect(Contains(first[:], second[:])).To(BeFalse())
+
+}
+
+func Test_ContainsOnly_ReturnsFalseWithEmptyArrayMatcher(t *testing.T) {
+
+	RegisterTestingT(t)
+	first := [0]string{}
+	second := [2]string{"q1", "q2"}
 
 	Expect(Contains(first[:], second[:])).To(BeFalse())
 
