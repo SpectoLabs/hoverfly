@@ -267,9 +267,6 @@ func Identical(first, second []string) bool {
 }
 
 func Contains(first, second []string) bool {
-	if len(first) == 0 {
-		return false
-	}
 
 	set := make(map[string]bool)
 	for _, value := range first {
@@ -287,9 +284,6 @@ func Contains(first, second []string) bool {
 }
 
 func ContainsOnly(first, second []string) bool {
-	if len(first) == 0 {
-		return false
-	}
 
 	set := make(map[string]bool)
 
