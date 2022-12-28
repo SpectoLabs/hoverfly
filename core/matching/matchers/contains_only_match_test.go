@@ -34,9 +34,23 @@ func Test_ContainsOnlyMatch_MatchesTrueWithSameArrayInDifferentOrderWithDups(t *
 	Expect(matchers.ContainsOnlyMatch(arr[:], "q1;q3;q2;q1;q3;q1")).To(BeTrue())
 }
 
-func Test_ContainsOnlyMatch_MatchesFalseWithArrayHavingOneValueMissing(t *testing.T) {
+func Test_ContainsOnlyMatch_MatchesTrueWithSubsetOfValues(t *testing.T) {
+	RegisterTestingT(t)
+
+	arr := [4]string{"q1", "q2", "q3", "q4"}
+	Expect(matchers.ContainsOnlyMatch(arr[:], "q2;q1;q3;q1")).To(BeTrue())
+}
+
+func Test_ContainsOnlyMatch_MatchesFalseWithValuesOutOfSet(t *testing.T) {
 	RegisterTestingT(t)
 
 	arr := [4]string{"q1", "q2", "q3", "q4"}
 	Expect(matchers.ContainsOnlyMatch(arr[:], "q2;q1;q3;q5")).To(BeFalse())
+}
+
+func Test_ContainsOnlyMatch_MatchesFalseWithCompletelyDifferentValues(t *testing.T) {
+	RegisterTestingT(t)
+
+	arr := [4]string{"q1", "q2", "q3", "q4"}
+	Expect(matchers.ContainsOnlyMatch(arr[:], "q6;q7;q8;q9")).To(BeFalse())
 }

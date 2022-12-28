@@ -11,11 +11,12 @@ import (
 	"sort"
 	"strings"
 
+	"strconv"
+	"time"
+
 	"github.com/tdewolff/minify"
 	mjson "github.com/tdewolff/minify/json"
 	"github.com/tdewolff/minify/xml"
-	"strconv"
-	"time"
 )
 
 // GetRequestBody will read the http.Request body io.ReadCloser
@@ -272,36 +273,27 @@ func Contains(first, second []string) bool {
 	}
 
 	for _, value := range second {
-		if _, found := set[value]; !found {
-			return false
+
+		if _, found := set[value]; found {
+			return true
 		}
 	}
 
-	return true
+	return false
 }
 
 func ContainsOnly(first, second []string) bool {
-	firstSet := make(map[string]bool)
-	secondSet := make(map[string]bool)
+	set := make(map[string]bool)
 
 	for _, value := range first {
-		firstSet[value] = true
+		set[value] = true
 	}
 
 	for _, value := range second {
-		secondSet[value] = true
-	}
 
-	if len(firstSet) != len(secondSet) {
-		return false
-	}
-
-	for key, _ := range firstSet {
-
-		if _, found := secondSet[key]; !found {
+		if _, found := set[value]; !found {
 			return false
 		}
-
 	}
 	return true
 }
