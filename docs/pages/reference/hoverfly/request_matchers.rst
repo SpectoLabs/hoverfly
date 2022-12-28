@@ -554,7 +554,7 @@ Example
 ContainsOnly matcher
 -----------------------
 
-Verifies that matcher group has all the values which are being passed in the request in any order or with duplicates. This is case-sensitive.
+Verifies that matcher group contains all those values which are being passed in the request in any order or with duplicates. This is case-sensitive.
 
 Example
 """""""
