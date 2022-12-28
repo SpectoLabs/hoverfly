@@ -513,7 +513,7 @@ Example
 ContainsExactly matcher
 -----------------------
 
-Verifies that the matcher group contains exactly the given values and nothing else in array to match, in order. This matcher is case-sensitive.
+Verifies that the matcher group contains exactly the given values and nothing else in passed in request to match, in the same order. This matcher is case-sensitive.
 
 
 Example
@@ -536,13 +536,13 @@ Example
         </thead>
         <tbody>
             <tr class="row-even">
-                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
-                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td>["param1", "param2", "param3"]</td>
+                <td>["param1", "param2", "param3"]</td>
                 <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
             <tr/>
             <tr class="row-odd">
-                <td>["query-param-value2", "query-param-value1", "query-param-value3"]</td>
-                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td>["param2", "param1", "param3"]</td>
+                <td>["param1", "param2", "param3"]</td>
                 <td class="example-icon"><span class="fa fa-times fa-failure"></span></td>
             <tr/>
         </tbody>
@@ -554,7 +554,7 @@ Example
 ContainsOnly matcher
 -----------------------
 
-Verifies that the matcher list contains only the given values and nothing else, in any order along with duplicates in array to match. This is also case sensitive.
+Verifies that matcher group contains all those values which are being passed in the request in any order or with duplicates. This is case-sensitive.
 
 Example
 """""""
@@ -576,19 +576,29 @@ Example
         </thead>
         <tbody>
             <tr class="row-even">
-                <td>["query-param-value2", "query-param-value1", "query-param-value3"]</td>
-                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td>["param2", "param1", "param3"]</td>
+                <td>["param1", "param2", "param3"]</td>
                 <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
             <tr/>
             <tr class="row-odd">
-                <td>["query-param-value1", "query-param-value2", "query-param-value3", "query-param-value2"]</td>
-                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td>["param1", "param2", "param3", "param2"]</td>
+                <td>["param1", "param2", "param3"]</td>
                 <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
             <tr/>
             <tr class="row-even">
-                <td>["query-param-value2", "query-param-value1", "query-param-value1"]</td>
-                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
-                <td class="example-icon"><span class="fa fa-times fa-failure"></span></td>
+                <td>["param2", "param1", "param1", "param1"]</td>
+                <td>["param1", "param2", "param3"]</td>
+                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
+            <tr/>
+            <tr class="row-even">
+                <td>["param2", "param1", "param1", "param5"]</td>
+                <td>["param1", "param2", "param3"]</td>
+                <td class="example-icon"><span class="fa fa fa-times fa-failure"></span></td>
+            <tr/>
+            <tr class="row-even">
+                <td>["param5","param6", "param7"]</td>
+                <td>["param1", "param2", "param3"]</td>
+                <td class="example-icon"><span class="fa fa fa-times fa-failure"></span></td>
             <tr/>
         </tbody>
     </table>
@@ -599,7 +609,7 @@ Example
 Contains matcher
 -----------------------
 
-Verifies that the matcher list contains the given values in array to match, in any order. This is case-sensitive.
+Verifies that the matcher group contains atleast one of value passed in request array. This is case-sensitive.
 
 Example
 """""""
@@ -621,13 +631,13 @@ Example
         </thead>
         <tbody>
             <tr class="row-even">
-                <td>["query-param-value1", "query-param-value2", "query-param-value2"]</td>
-                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td>["param1", "param5", "param6"]</td>
+                <td>["param1", "param2", "param3"]</td>
                 <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
             <tr/>
             <tr class="row-odd">
-                <td>["query-param-value2", "query-param-value1", "query-param-value4"]</td>
-                <td>["query-param-value1", "query-param-value2", "query-param-value3"]</td>
+                <td>["param5", "param6", "param7"]</td>
+                <td>["param1", "param2", "param3"]</td>
                 <td class="example-icon"><span class="fa fa-times fa-failure"></span></td>
             <tr/>
         </tbody>

@@ -259,7 +259,17 @@ func Test_Identical_ReturnsFalseWithDifferentArrayOfSameLength(t *testing.T) {
 
 }
 
-func Test_Contains_ReturnsTrueWithExactlySameArray(t *testing.T) {
+func Test_Contains_ReturnsFalseWithEmptyArrayMatcher(t *testing.T) {
+
+	RegisterTestingT(t)
+	first := [0]string{}
+	second := [2]string{"q1", "q2"}
+
+	Expect(Contains(first[:], second[:])).To(BeFalse())
+
+}
+
+func Test_Contains_ReturnsTrueWithContainingBothValues(t *testing.T) {
 	RegisterTestingT(t)
 	first := [2]string{"q1", "q2"}
 	second := [2]string{"q1", "q2"}
@@ -268,19 +278,29 @@ func Test_Contains_ReturnsTrueWithExactlySameArray(t *testing.T) {
 
 }
 
-func Test_Contains_ReturnsTrueWithArrayContainingValuesWithDups(t *testing.T) {
+func Test_Contains_ReturnsTrueWithContainingOneOfValues(t *testing.T) {
 	RegisterTestingT(t)
 	first := [3]string{"q1", "q2", "q3"}
-	second := [4]string{"q1", "q2", "q1", "q2"}
+	second := [4]string{"q5", "q6", "q7", "q1"}
 
 	Expect(Contains(first[:], second[:])).To(BeTrue())
 
 }
 
-func Test_Contains_ReturnsFalseWithArrayHavingOneValueMisMatch(t *testing.T) {
+func Test_Contains_ReturnsFalseWithContainingNoneOfValuesSpecified(t *testing.T) {
 	RegisterTestingT(t)
 	first := [3]string{"q1", "q2", "q3"}
-	second := [5]string{"q1", "q2", "q4", "q1", "q2"}
+	second := [5]string{"q5", "q6", "q7", "q8", "q9"}
+
+	Expect(Contains(first[:], second[:])).To(BeFalse())
+
+}
+
+func Test_ContainsOnly_ReturnsFalseWithEmptyArrayMatcher(t *testing.T) {
+
+	RegisterTestingT(t)
+	first := [0]string{}
+	second := [2]string{"q1", "q2"}
 
 	Expect(Contains(first[:], second[:])).To(BeFalse())
 
@@ -288,7 +308,7 @@ func Test_Contains_ReturnsFalseWithArrayHavingOneValueMisMatch(t *testing.T) {
 
 func Test_ContainsOnly_ReturnsTrueWithArrayContainingOnlyValuesWithDups(t *testing.T) {
 	RegisterTestingT(t)
-	first := [3]string{"a", "b", "c"}
+	first := [4]string{"a", "b", "c", "d"}
 	second := [5]string{"a", "b", "b", "c", "b"}
 
 	Expect(ContainsOnly(first[:], second[:])).To(BeTrue())
@@ -297,8 +317,8 @@ func Test_ContainsOnly_ReturnsTrueWithArrayContainingOnlyValuesWithDups(t *testi
 
 func Test_ContainsOnly_ReturnsTrueWithArrayInDifferentOrder(t *testing.T) {
 	RegisterTestingT(t)
-	first := [3]string{"c", "b", "a"}
-	second := [3]string{"a", "b", "c"}
+	first := [4]string{"c", "b", "a", "d"}
+	second := [4]string{"a", "b", "c", "d"}
 
 	Expect(ContainsOnly(first[:], second[:])).To(BeTrue())
 
@@ -313,11 +333,21 @@ func Test_ContainsOnly_ReturnsTrueWithIdenticalArray(t *testing.T) {
 
 }
 
-func Test_ContainsOnly_ReturnsFalseWithOneMissingValue(t *testing.T) {
+func Test_ContainsOnly_ReturnsTrueWithSubsetOfValues(t *testing.T) {
 
 	RegisterTestingT(t)
 	first := [3]string{"a", "b", "c"}
-	second := [4]string{"a", "b", "d", "a"}
+	second := [3]string{"a", "b", "a"}
+
+	Expect(ContainsOnly(first[:], second[:])).To(BeTrue())
+
+}
+
+func Test_ContainsOnly_ReturnFalseWithOneExtraValue(t *testing.T) {
+
+	RegisterTestingT(t)
+	first := [3]string{"a", "b", "c"}
+	second := [4]string{"a", "b", "a", "d"}
 
 	Expect(ContainsOnly(first[:], second[:])).To(BeFalse())
 
