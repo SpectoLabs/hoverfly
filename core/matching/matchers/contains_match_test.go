@@ -20,6 +20,13 @@ func Test_ContainsMatch_MatchesTrueWithArrayContainingAllValues(t *testing.T) {
 	Expect(matchers.ContainsMatch(arr[:], "q1;q2")).To(BeTrue())
 }
 
+func Test_ContainsMatch_MatchesTrueWithArrayContainingAllValuesWithMatcherAsArrayOfInterface(t *testing.T) {
+	RegisterTestingT(t)
+
+	arr := [3]interface{}{"q1", "q2", "q3"}
+	Expect(matchers.ContainsMatch(arr[:], "q1;q2")).To(BeTrue())
+}
+
 func Test_ContainsMatch_MatchesTrueWithArrayContainingSomeValues(t *testing.T) {
 	RegisterTestingT(t)
 

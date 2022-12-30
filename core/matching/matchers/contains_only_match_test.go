@@ -20,6 +20,13 @@ func Test_ContainsOnlyMatch_MatchesTrueWithIdenticalArray(t *testing.T) {
 	Expect(matchers.ContainsOnlyMatch(arr[:], "q1;q2;q3")).To(BeTrue())
 }
 
+func Test_ContainsOnlyMatch_MatchesTrueWithIdenticalArrayWithMatcherAsArrayOfInterface(t *testing.T) {
+	RegisterTestingT(t)
+
+	arr := [3]interface{}{"q1", "q2", "q3"}
+	Expect(matchers.ContainsOnlyMatch(arr[:], "q1;q2;q3")).To(BeTrue())
+}
+
 func Test_ContainsOnlyMatch_MatchesTrueWithSameArrayInDifferentOrder(t *testing.T) {
 	RegisterTestingT(t)
 
