@@ -40,6 +40,17 @@ type MatcherViewV5 struct {
 	Config  map[string]interface{} `json:"config,omitempty"`
 }
 
+type LiteralViewV5 struct {
+	Name  string      `json:"name"`
+	Value interface{} `json:"value"`
+}
+
+type VariableViewV5 struct {
+	Name       string `json:"name"`
+	Method     string `json:"method"`
+	Expression string `json:"expression"`
+}
+
 func NewMatcherView(matcher string, value interface{}) MatcherViewV5 {
 	return MatcherViewV5{
 		Matcher: matcher,
@@ -47,13 +58,13 @@ func NewMatcherView(matcher string, value interface{}) MatcherViewV5 {
 	}
 }
 
-//Gets Response - required for interfaces.RequestResponsePairView
+// Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestMatcherResponsePairViewV5) GetResponse() interfaces.Response { return this.Response }
 
 type ResponseDetailsViewV5 struct {
 	Status           int                    `json:"status"`
 	Body             string                 `json:"body"`
-	BodyFile         string              	`json:"bodyFile,omitempty"`
+	BodyFile         string                 `json:"bodyFile,omitempty"`
 	EncodedBody      bool                   `json:"encodedBody"`
 	Headers          map[string][]string    `json:"headers,omitempty"`
 	Templated        bool                   `json:"templated"`
@@ -61,9 +72,11 @@ type ResponseDetailsViewV5 struct {
 	RemovesState     []string               `json:"removesState,omitempty"`
 	FixedDelay       int                    `json:"fixedDelay,omitempty"`
 	LogNormalDelay   *LogNormalDelayOptions `json:"logNormalDelay,omitempty"`
+	Literals         []LiteralViewV5        `json:"literals,omitempty"`
+	Variables        []VariableViewV5       `json:"variables,omitempty"`
 }
 
-//Gets Status - required for interfaces.Response
+// Gets Status - required for interfaces.Response
 func (this ResponseDetailsViewV5) GetStatus() int { return this.Status }
 
 // Gets Body - required for interfaces.Response
@@ -97,6 +110,51 @@ func (this ResponseDetailsViewV5) GetLogNormalDelay() interfaces.ResponseDelay {
 	}
 
 	return nil
+}
+
+func (this ResponseDetailsViewV5) GetLiterals() []interfaces.Literal {
+
+	if this.Literals != nil {
+		var literals []interfaces.Literal
+		for _, literal := range this.Literals {
+			literals = append(literals, literal)
+		}
+		return literals
+
+	}
+	return nil
+}
+
+func (this ResponseDetailsViewV5) GetVariables() []interfaces.Variable {
+
+	if this.Variables != nil {
+		var variables []interfaces.Variable
+		for _, variable := range this.Variables {
+			variables = append(variables, variable)
+		}
+		return variables
+	}
+	return nil
+}
+
+func (this LiteralViewV5) GetName() string {
+	return this.Name
+}
+
+func (this LiteralViewV5) GetValue() interface{} {
+	return this.Value
+}
+
+func (this VariableViewV5) GetName() string {
+	return this.Name
+}
+
+func (this VariableViewV5) GetMethod() string {
+	return this.Method
+}
+
+func (this VariableViewV5) GetExpression() string {
+	return this.Expression
 }
 
 type LogNormalDelayOptions struct {

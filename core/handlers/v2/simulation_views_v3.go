@@ -30,7 +30,7 @@ type RequestMatcherViewV3 struct {
 	Headers     map[string][]string       `json:"headers,omitempty"`
 }
 
-//Gets Response - required for interfaces.RequestResponsePairView
+// Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestMatcherResponsePairViewV3) GetResponse() interfaces.Response { return this.Response }
 
 type ResponseDetailsViewV3 struct {
@@ -41,7 +41,7 @@ type ResponseDetailsViewV3 struct {
 	Templated   bool                `json:"templated"`
 }
 
-//Gets Status - required for interfaces.Response
+// Gets Status - required for interfaces.Response
 func (this ResponseDetailsViewV3) GetStatus() int { return this.Status }
 
 // Gets Body - required for interfaces.Response
@@ -67,3 +67,7 @@ func (this ResponseDetailsViewV3) GetFixedDelay() int { return 0 }
 
 // Gets LogNormalDelay - required for interfaces.Response
 func (this ResponseDetailsViewV3) GetLogNormalDelay() interfaces.ResponseDelay { return nil }
+
+func (this ResponseDetailsViewV3) GetLiterals() []interfaces.Literal { return nil }
+
+func (this ResponseDetailsViewV3) GetVariables() []interfaces.Variable { return nil }

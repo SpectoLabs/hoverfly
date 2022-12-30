@@ -13,12 +13,13 @@ import (
 func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplatingDataFromRequest(
+	actual := templating.NewTemplatingDataFromRequestAndResponse(
 		&models.RequestDetails{
 			Scheme:      "http",
 			Destination: "test.com",
 			Path:        "/foo/bar",
 		},
+		&models.ResponseDetails{},
 		make(map[string]string),
 	)
 
@@ -28,11 +29,12 @@ func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 func Test_ShouldCreateTemplatingDataPathsFromRequestWithNoPaths(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplatingDataFromRequest(
+	actual := templating.NewTemplatingDataFromRequestAndResponse(
 		&models.RequestDetails{
 			Scheme:      "http",
 			Destination: "test.com",
 		},
+		&models.ResponseDetails{},
 		make(map[string]string),
 	)
 
@@ -62,10 +64,11 @@ func Test_ShouldCreateTemplatingDataQueryParamsFromRequest(t *testing.T) {
 func Test_ShouldCreateTemplatingDataQueryParamsFromRequestWithNoQueryParams(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
+	actual := templating.NewTemplatingDataFromRequestAndResponse(&models.RequestDetails{
 		Scheme:      "http",
 		Destination: "test.com",
 	},
+		&models.ResponseDetails{},
 		make(map[string]string),
 	)
 
@@ -75,10 +78,11 @@ func Test_ShouldCreateTemplatingDataQueryParamsFromRequestWithNoQueryParams(t *t
 func Test_ShouldCreateTemplatingDataHttpScheme(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
+	actual := templating.NewTemplatingDataFromRequestAndResponse(&models.RequestDetails{
 		Scheme:      "http",
 		Destination: "test.com",
 	},
+		&models.ResponseDetails{},
 		make(map[string]string),
 	)
 
@@ -88,7 +92,7 @@ func Test_ShouldCreateTemplatingDataHttpScheme(t *testing.T) {
 func Test_ShouldCreateTemplatingDataHeaderFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplatingDataFromRequest(
+	actual := templating.NewTemplatingDataFromRequestAndResponse(
 		&models.RequestDetails{
 			Scheme:      "http",
 			Destination: "test.com",
@@ -97,6 +101,7 @@ func Test_ShouldCreateTemplatingDataHeaderFromRequest(t *testing.T) {
 				"ham":    {"2"},
 			},
 		},
+		&models.ResponseDetails{},
 		make(map[string]string),
 	)
 
@@ -108,14 +113,88 @@ func Test_ShouldCreateTemplatingDataHeaderFromRequest(t *testing.T) {
 func Test_ShouldCreateTemplatingDataHeaderFromRequestWithNoHeader(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplatingDataFromRequest(&models.RequestDetails{
+	actual := templating.NewTemplatingDataFromRequestAndResponse(&models.RequestDetails{
 		Scheme:      "http",
 		Destination: "test.com",
 	},
+		&models.ResponseDetails{},
 		make(map[string]string),
 	)
 
 	Expect(actual.Request.Header).To(BeEmpty())
+}
+
+func Test_ShouldAddLiteralsFromResponse(t *testing.T) {
+	RegisterTestingT(t)
+
+	actual := templating.NewTemplatingDataFromRequestAndResponse(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+	},
+		&models.ResponseDetails{
+			Literals: []*models.LiteralDetails{
+				{Name: "literal1", Value: "l1"},
+				{Name: "literal2", Value: []interface{}{"l1", "l2", "l3"}},
+				{Name: "literal3", Value: map[string]interface{}{
+					"k1": "l1",
+					"k2": "l2",
+				}},
+			},
+		},
+		make(map[string]string),
+	)
+
+	Expect(actual.Literals).Should(HaveLen(3))
+	Expect(actual.Literals).Should(HaveKeyWithValue("literal1", "l1"))
+	Expect(actual.Literals).Should(HaveKeyWithValue("literal2", []interface{}{"l1", "l2", "l3"}))
+	Expect(actual.Literals).Should(HaveKeyWithValue("literal3", map[string]interface{}{
+		"k1": "l1",
+		"k2": "l2",
+	}))
+}
+
+func Test_ShouldAddVariablesFromJsonResponse(t *testing.T) {
+	RegisterTestingT(t)
+
+	actual := templating.NewTemplatingDataFromRequestAndResponse(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+		Body:        "{\n    \"id\": 123,\n    \"username\": \"hoverfly\"\n}",
+	},
+		&models.ResponseDetails{
+			Variables: []*models.VariableDetails{
+				{Name: "var1", Method: "jsonpath", Expression: "$.id"},
+				{Name: "var2", Method: "jsonpath", Expression: "$.username"},
+			},
+		},
+		make(map[string]string),
+	)
+
+	Expect(actual.Variables).Should(HaveLen(2))
+	Expect(actual.Variables).Should(HaveKeyWithValue("var1", "123"))
+	Expect(actual.Variables).Should(HaveKeyWithValue("var2", "hoverfly"))
+}
+
+func Test_ShouldAddVariablesFromXMLResponse(t *testing.T) {
+	RegisterTestingT(t)
+
+	actual := templating.NewTemplatingDataFromRequestAndResponse(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+		Body:        "<root>\n    <id>123</id>\n    <username>Hoverfly</username>\n</root>",
+	},
+		&models.ResponseDetails{
+			Variables: []*models.VariableDetails{
+				{Name: "var1", Method: "xpath", Expression: "/root/id"},
+				{Name: "var2", Method: "xpath", Expression: "/root/username"},
+			},
+		},
+		make(map[string]string),
+	)
+
+	Expect(actual.Variables).Should(HaveLen(2))
+	Expect(actual.Variables).Should(HaveKeyWithValue("var1", "123"))
+	Expect(actual.Variables).Should(HaveKeyWithValue("var2", "Hoverfly"))
 }
 
 func TestApplyTemplateWithRequestDetails(t *testing.T) {
@@ -456,5 +535,5 @@ func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]strin
 	templator := templating.NewTemplator()
 	template, _ := templator.ParseTemplate(responseBody)
 
-	return templator.RenderTemplate(template, requestDetails, state)
+	return templator.RenderTemplateWithCustomDetails(template, requestDetails, &models.ResponseDetails{}, state)
 }

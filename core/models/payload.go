@@ -211,6 +211,36 @@ type ResponseDetails struct {
 	RemovesState     []string
 	FixedDelay       int
 	LogNormalDelay   *ResponseDetailsLogNormal
+	Literals         []*LiteralDetails
+	Variables        []*VariableDetails
+}
+
+type LiteralDetails struct {
+	Name  string
+	Value interface{}
+}
+
+type VariableDetails struct {
+	Name       string
+	Method     string
+	Expression string
+}
+
+func GetLiterals(view *v2.LiteralViewV5) *LiteralDetails {
+
+	return &LiteralDetails{
+		Name:  view.Name,
+		Value: view.Value,
+	}
+}
+
+func GetVariables(view *v2.VariableViewV5) *VariableDetails {
+
+	return &VariableDetails{
+		Name:       view.Name,
+		Method:     view.Method,
+		Expression: view.Expression,
+	}
 }
 
 func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
@@ -241,6 +271,34 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 		}
 	}
 
+	if literals := data.GetLiterals(); literals != nil {
+		var allLiteralDetails []*LiteralDetails
+		for _, literal := range literals {
+			literalDetails := &LiteralDetails{
+				Name:  literal.GetName(),
+				Value: literal.GetValue(),
+			}
+			allLiteralDetails = append(allLiteralDetails, literalDetails)
+
+		}
+		details.Literals = allLiteralDetails
+
+	}
+
+	if variables := data.GetVariables(); variables != nil {
+
+		var allVariableDetails []*VariableDetails
+		for _, variable := range variables {
+			variableDetails := &VariableDetails{
+				Name:       variable.GetName(),
+				Method:     variable.GetMethod(),
+				Expression: variable.GetExpression(),
+			}
+			allVariableDetails = append(allVariableDetails, variableDetails)
+		}
+		details.Variables = allVariableDetails
+
+	}
 	return details
 }
 
@@ -303,6 +361,33 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 		body = base64.StdEncoding.EncodeToString([]byte(r.Body))
 	}
 
+	var allLiteralDetails []v2.LiteralViewV5
+	if literals := r.Literals; literals != nil {
+
+		for _, literal := range literals {
+			literalDetail := v2.LiteralViewV5{
+				Name:  literal.Name,
+				Value: literal.Value,
+			}
+			allLiteralDetails = append(allLiteralDetails, literalDetail)
+		}
+
+	}
+
+	var allVariableDetails []v2.VariableViewV5
+	if variables := r.Variables; variables != nil {
+
+		for _, variable := range variables {
+			variableDetails := v2.VariableViewV5{
+				Name:       variable.Name,
+				Method:     variable.Method,
+				Expression: variable.Expression,
+			}
+			allVariableDetails = append(allVariableDetails, variableDetails)
+		}
+
+	}
+
 	view := v2.ResponseDetailsViewV5{
 		Status:           r.Status,
 		Body:             body,
@@ -313,6 +398,8 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 		RemovesState:     r.RemovesState,
 		TransitionsState: r.TransitionsState,
 		FixedDelay:       r.FixedDelay,
+		Literals:         allLiteralDetails,
+		Variables:        allVariableDetails,
 	}
 
 	if r.LogNormalDelay != nil {
@@ -323,7 +410,6 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 			Median: r.LogNormalDelay.Median,
 		}
 	}
-
 	return view
 }
 

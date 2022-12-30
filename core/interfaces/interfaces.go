@@ -23,6 +23,17 @@ type ResponseDelay interface {
 	GetMean() int
 }
 
+type Literal interface {
+	GetName() string
+	GetValue() interface{}
+}
+
+type Variable interface {
+	GetName() string
+	GetMethod() string
+	GetExpression() string
+}
+
 type Response interface {
 	GetStatus() int
 	GetBody() string
@@ -34,4 +45,6 @@ type Response interface {
 	GetRemovesState() []string
 	GetFixedDelay() int
 	GetLogNormalDelay() ResponseDelay
+	GetLiterals() []Literal
+	GetVariables() []Variable
 }

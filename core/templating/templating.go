@@ -15,6 +15,8 @@ type TemplatingData struct {
 	Request         Request
 	State           map[string]string
 	CurrentDateTime func(string, string, string) string
+	Literals        map[string]interface{}
+	Variables       map[string]interface{}
 }
 
 type Request struct {
@@ -71,6 +73,7 @@ func (*Templator) ParseTemplate(responseBody string) (*raymond.Template, error) 
 	return raymond.Parse(responseBody)
 }
 
+// Deprecated
 func (*Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.RequestDetails, state map[string]string) (string, error) {
 	if tpl == nil {
 		return "", fmt.Errorf("template cannot be nil")
@@ -79,7 +82,17 @@ func (*Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.R
 	return tpl.Exec(ctx)
 }
 
+func (*Templator) RenderTemplateWithCustomDetails(tpl *raymond.Template, requestDetails *models.RequestDetails, responseDetails *models.ResponseDetails, state map[string]string) (string, error) {
+	if tpl == nil {
+		return "", fmt.Errorf("template cannot be nil")
+	}
+	ctx := NewTemplatingDataFromRequestAndResponse(requestDetails, responseDetails, state)
+	return tpl.Exec(ctx)
+}
+
+// Deprecated
 func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails, state map[string]string) *TemplatingData {
+
 	return &TemplatingData{
 		Request: Request{
 			Path:       strings.Split(requestDetails.Path, "/")[1:],
@@ -92,6 +105,49 @@ func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails, state m
 			Method:     requestDetails.Method,
 		},
 		State: state,
+		CurrentDateTime: func(a1, a2, a3 string) string {
+			return a1 + " " + a2 + " " + a3
+		},
+	}
+
+}
+
+func NewTemplatingDataFromRequestAndResponse(requestDetails *models.RequestDetails, responseDetails *models.ResponseDetails, state map[string]string) *TemplatingData {
+
+	literalMap := make(map[string]interface{})
+
+	if literals := responseDetails.Literals; literals != nil {
+		for _, literal := range literals {
+			literalMap[literal.Name] = literal.Value
+		}
+	}
+
+	variableMap := make(map[string]interface{})
+
+	if variables := responseDetails.Variables; variables != nil {
+		for _, variableDetails := range variables {
+			if strings.ToLower(variableDetails.Method) == "jsonpath" {
+				variableMap[variableDetails.Name] = jsonPath(variableDetails.Expression, requestDetails.Body)
+			} else if strings.ToLower(variableDetails.Method) == "xpath" {
+				variableMap[variableDetails.Name] = xPath(variableDetails.Expression, requestDetails.Body)
+			}
+		}
+	}
+
+	return &TemplatingData{
+		Request: Request{
+			Path:       strings.Split(requestDetails.Path, "/")[1:],
+			QueryParam: requestDetails.Query,
+			Header:     requestDetails.Headers,
+			Scheme:     requestDetails.Scheme,
+			Body:       templateHelpers{}.requestBody,
+			FormData:   requestDetails.FormData,
+			body:       requestDetails.Body,
+			Method:     requestDetails.Method,
+		},
+		Literals:  literalMap,
+		Variables: variableMap,
+		State:     state,
 		CurrentDateTime: func(a1, a2, a3 string) string {
 			return a1 + " " + a2 + " " + a3
 		},
