@@ -2,6 +2,8 @@ package matchers
 
 type MatcherFunc func(data interface{}, toMatch string) bool
 
+type MatcherFuncWithConfig func(data interface{}, toMatch string, config map[string]interface{}) bool
+
 var Matchers = map[string]MatcherFunc{
 	// Default matcher
 	"": ExactMatch,
@@ -18,4 +20,9 @@ var Matchers = map[string]MatcherFunc{
 	ContainsExactly: ContainsExactlyMatch,
 	ContainsOnly:    ContainsOnlyMatch,
 	Contains:        ContainsMatch,
+	Array:           ContainsExactlyMatch,
+}
+
+var MatchersWithConfig = map[string]MatcherFuncWithConfig{
+	Array: ArrayMatch,
 }
