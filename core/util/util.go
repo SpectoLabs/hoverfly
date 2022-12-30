@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"reflect"
 	"regexp"
 	"sort"
 	"strings"
@@ -301,4 +302,30 @@ func ContainsOnly(first, second []string) bool {
 		}
 	}
 	return true
+}
+
+func GetStringArray(data interface{}) ([]string, bool) {
+	val := reflect.ValueOf(data)
+	if val.Kind() != reflect.Slice {
+		return nil, false
+	}
+	var dataArr []string
+	for i := 0; i < val.Len(); i++ {
+		currentValue := val.Index(i)
+		if currentValue.Kind() == reflect.Interface {
+			dataArr = append(dataArr, currentValue.Elem().String())
+		} else {
+			dataArr = append(dataArr, currentValue.String())
+		}
+
+	}
+	return dataArr, true
+}
+
+func GetBoolOrDefault(data map[string]interface{}, key string, defaultValue bool) bool {
+	genericValue, found := data[key]
+	if !found {
+		return defaultValue
+	}
+	return genericValue.(bool)
 }
