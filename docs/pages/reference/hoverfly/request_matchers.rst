@@ -645,3 +645,32 @@ Example
 
 |
 |
+Generic Array matcher
+-----------------------
+
+Matches the matcher group with value passed in request array based on the configuration passed.
+
+ignoreorder - ignore order in which values that are passed.
+ignoreunknowns - ignore unknowns in the values that are passed
+
+Example
+"""""""
+
+.. code:: json
+   
+   "matcher": "contains"
+   "value": "[?]"
+   "configuration": "{}"
+{
+    "matcher": "array",
+    "config": {
+        "ignoreunknown": <true/false>,
+        "ignoreorder": <true/false>,
+        "ignoreoccurrences": <true/false>
+    }
+    "value": [
+        "access:vod",
+        "order:latest",
+        "profile:vd"
+    ]
+}

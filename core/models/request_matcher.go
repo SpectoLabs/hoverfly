@@ -1,15 +1,17 @@
 package models
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"net/url"
+
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"net/url"
 )
 
 type RequestFieldMatchers struct {
 	Matcher string
 	Value   interface{}
+	Config  map[string]interface{}
 }
 
 func NewRequestFieldMatchersFromView(matchers []v2.MatcherViewV5) []RequestFieldMatchers {
@@ -21,6 +23,7 @@ func NewRequestFieldMatchersFromView(matchers []v2.MatcherViewV5) []RequestField
 		convertedMatchers = append(convertedMatchers, RequestFieldMatchers{
 			Matcher: matcher.Matcher,
 			Value:   matcher.Value,
+			Config:  matcher.Config,
 		})
 	}
 	return convertedMatchers
@@ -56,6 +59,7 @@ func (this RequestFieldMatchers) BuildView() v2.MatcherViewV5 {
 	return v2.MatcherViewV5{
 		Matcher: this.Matcher,
 		Value:   this.Value,
+		Config:  this.Config,
 	}
 }
 
