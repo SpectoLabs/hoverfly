@@ -37,28 +37,21 @@ func ImportVariables(variables []v2.GlobalVariableViewV5) *Variables {
 	}
 	return &allVariables
 }
-func (variables *Variables) GetVariable(name string) (*Variable, bool) {
-
-	for _, variable := range *variables {
-
-		if variable.Name == name {
-			return &variable, true
-		}
-	}
-	return &Variable{}, false
-}
 
 func (variables *Variables) ConvertToGlobalVariablesPayloadView() []v2.GlobalVariableViewV5 {
 
 	var allVariablesView []v2.GlobalVariableViewV5
-	for _, variable := range *variables {
-		variableView := v2.GlobalVariableViewV5{
-			Name:      variable.Name,
-			Function:  variable.Function,
-			Arguments: variable.Arguments,
-		}
-		allVariablesView = append(allVariablesView, variableView)
+	if variables != nil {
+		for _, variable := range *variables {
+			variableView := v2.GlobalVariableViewV5{
+				Name:      variable.Name,
+				Function:  variable.Function,
+				Arguments: variable.Arguments,
+			}
+			allVariablesView = append(allVariablesView, variableView)
 
+		}
 	}
+
 	return allVariablesView
 }

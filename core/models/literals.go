@@ -24,13 +24,15 @@ func ImportLiterals(literals []v2.GlobalLiteralViewV5) *Literals {
 func (literals *Literals) ConvertToGlobalLiteralsPayloadView() []v2.GlobalLiteralViewV5 {
 
 	var allLiterals []v2.GlobalLiteralViewV5
-	for _, literal := range *literals {
+	if literals != nil {
+		for _, literal := range *literals {
 
-		allLiterals = append(allLiterals, v2.GlobalLiteralViewV5{
-			Name:  literal.Name,
-			Value: literal.Value,
-		})
+			allLiterals = append(allLiterals, v2.GlobalLiteralViewV5{
+				Name:  literal.Name,
+				Value: literal.Value,
+			})
 
+		}
 	}
 	return allLiterals
 }
