@@ -84,20 +84,24 @@ func (t *Templator) SetLiteralsAndRequestIndependentVariables(literals *models.L
 
 	literalMap := make(map[string]interface{})
 
-	for _, literal := range *literals {
-		literalMap[literal.Name] = literal.Value
+	if literals != nil {
+		for _, literal := range *literals {
+			literalMap[literal.Name] = literal.Value
+		}
 	}
 
 	variableMap := make(map[string]interface{})
-	for _, variable := range *vars {
-		if variable.Function != REQUEST_BODY_HELPER {
-			value, error := t.callHelper(variable)
-			if error != nil {
-				return error
+	if vars != nil {
+		for _, variable := range *vars {
+			if variable.Function != REQUEST_BODY_HELPER {
+				value, error := t.callHelper(variable)
+				if error != nil {
+					return error
+				}
+				variableMap[variable.Name] = value
 			}
-			variableMap[variable.Name] = value
-		}
 
+		}
 	}
 	t.literals = literalMap
 	t.requestIndependentVars = variableMap
@@ -107,14 +111,6 @@ func (t *Templator) SetLiteralsAndRequestIndependentVariables(literals *models.L
 func (*Templator) ParseTemplate(responseBody string) (*raymond.Template, error) {
 
 	return raymond.Parse(responseBody)
-}
-
-func (*Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.RequestDetails, state map[string]string) (string, error) {
-	if tpl == nil {
-		return "", fmt.Errorf("template cannot be nil")
-	}
-	ctx := NewTemplatingDataFromRequest(requestDetails, state)
-	return tpl.Exec(ctx)
 }
 
 func (t *Templator) RenderTemplateWithRequestRelatedVars(tpl *raymond.Template, requestDetails *models.RequestDetails, vars *models.Variables, state map[string]string) (string, error) {
@@ -152,14 +148,7 @@ func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails, state m
 
 func (t *Templator) NewTemplatingDataFromRequestAndRequestRelatedVars(requestDetails *models.RequestDetails, vars *models.Variables, state map[string]string) *TemplatingData {
 
-	variableMap := make(map[string]interface{})
-	for _, variable := range *vars {
-		if variable.Function == REQUEST_BODY_HELPER {
-			variableMap[variable.Name] = fetchFromRequestBody(variable.Arguments[0], variable.Arguments[1], requestDetails.Body)
-		} else {
-			variableMap[variable.Name] = t.requestIndependentVars[variable.Name]
-		}
-	}
+	variableMap := t.getVariables(vars, requestDetails)
 
 	return &TemplatingData{
 		Request: Request{
@@ -182,14 +171,32 @@ func (t *Templator) NewTemplatingDataFromRequestAndRequestRelatedVars(requestDet
 
 }
 
+func (t *Templator) getVariables(vars *models.Variables, requestDetails *models.RequestDetails) map[string]interface{} {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Error("panic occurred:", err)
+		}
+	}()
+	variableMap := make(map[string]interface{})
+	if vars != nil {
+		for _, variable := range *vars {
+			if variable.Function == REQUEST_BODY_HELPER {
+				variableMap[variable.Name] = fetchFromRequestBody(variable.Arguments[0], variable.Arguments[1], requestDetails.Body)
+			} else {
+				variableMap[variable.Name] = t.requestIndependentVars[variable.Name]
+			}
+		}
+	}
+
+	return variableMap
+}
+
 func (t *Templator) callHelper(variable models.Variable) (output interface{}, err error) {
 
 	defer func() {
-		if err := recover(); err != nil {
-			log.Println("panic occurred:", err)
-			output = nil
-			err = fmt.Errorf("invalid method/args passed for variable %s", variable.Name)
-			return
+		if recover() != nil {
+			log.Error("panic occurred:", err)
+			err = fmt.Errorf("error occurred while fetching value for variable %s", variable.Name)
 		}
 	}()
 	val := reflect.ValueOf(t.SupportedMethodMap[variable.Function])
@@ -198,6 +205,5 @@ func (t *Templator) callHelper(variable models.Variable) (output interface{}, er
 		arguments[index] = reflect.ValueOf(value)
 	}
 	output = val.Call(arguments)[0]
-	err = nil
 	return
 }
