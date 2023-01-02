@@ -125,6 +125,11 @@ func (t templateHelpers) randomUuid() string {
 func (t templateHelpers) requestBody(queryType, query string, options *raymond.Options) string {
 	toMatch := options.Value("request").(Request).body
 	queryType = strings.ToLower(queryType)
+	return fetchFromRequestBody(queryType, query, toMatch)
+}
+
+func fetchFromRequestBody(queryType, query, toMatch string) string {
+
 	if queryType == "jsonpath" {
 		return jsonPath(query, toMatch)
 	} else if queryType == "xpath" {

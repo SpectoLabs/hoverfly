@@ -13,6 +13,8 @@ type Simulation struct {
 	matchingPairs           []RequestMatcherResponsePair
 	ResponseDelays          ResponseDelays
 	ResponseDelaysLogNormal ResponseDelaysLogNormal
+	Vars                    *Variables
+	Literals                *Literals
 	RWMutex                 sync.RWMutex
 }
 

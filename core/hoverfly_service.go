@@ -204,6 +204,16 @@ func (hf *Hoverfly) SetResponseDelays(payloadView v1.ResponseDelayPayloadView) e
 	return nil
 }
 
+func (hf *Hoverfly) SetVariables(variables []v2.GlobalVariableViewV5) error {
+	err := models.ValidateVariablePayload(variables, hf.templator.GetSupportedMethodMap())
+	if err != nil {
+		return err
+	}
+
+	hf.Simulation.Vars = models.ImportVariables(variables)
+	return nil
+}
+
 func (hf *Hoverfly) SetResponseDelaysLogNormal(payloadView v1.ResponseDelayLogNormalPayloadView) error {
 	err := models.ValidateResponseDelayLogNormalPayload(payloadView)
 	if err != nil {
@@ -255,6 +265,8 @@ func (hf *Hoverfly) GetSimulation() (v2.SimulationViewV5, error) {
 	return v2.BuildSimulationView(pairViews,
 		hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView(),
 		hf.Simulation.ResponseDelaysLogNormal.ConvertToResponseDelayLogNormalPayloadView(),
+		hf.Simulation.Vars.ConvertToGlobalVariablesPayloadView(),
+		hf.Simulation.Literals.ConvertToGlobalLiteralsPayloadView(),
 		hf.version), nil
 }
 
@@ -284,6 +296,8 @@ func (hf *Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV
 	return v2.BuildSimulationView(pairViews,
 		hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView(),
 		hf.Simulation.ResponseDelaysLogNormal.ConvertToResponseDelayLogNormalPayloadView(),
+		hf.Simulation.Vars.ConvertToGlobalVariablesPayloadView(),
+		hf.Simulation.Literals.ConvertToGlobalLiteralsPayloadView(),
 		hf.version), nil
 }
 
@@ -312,13 +326,24 @@ func (hf *Hoverfly) putOrReplaceSimulation(simulationView v2.SimulationViewV5, o
 		return result
 	}
 
+	if err := hf.SetVariables(simulationView.GlobalVariables); err != nil {
+		result.SetError(err)
+		return result
+	}
+
+	hf.Simulation.Literals = models.ImportLiterals(simulationView.GlobalLiterals)
+
+	if err := hf.templator.SetLiteralsAndRequestIndependentVariables(hf.Simulation.Literals, hf.Simulation.Vars); err != nil {
+		result.SetError(err)
+		return result
+	}
+
 	for _, warning := range bodyFilesResult.WarningMessages {
 		result.WarningMessages = append(result.WarningMessages, warning)
 	}
 
 	return result
 }
-
 
 func (hf *Hoverfly) ReplaceSimulation(simulationView v2.SimulationViewV5) v2.SimulationImportResult {
 	return hf.putOrReplaceSimulation(simulationView, true)

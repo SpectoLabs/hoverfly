@@ -139,6 +139,8 @@ func BuildSimulationView(
 	pairViews []RequestMatcherResponsePairViewV5,
 	delayView v1.ResponseDelayPayloadView,
 	delayLogNormalView v1.ResponseDelayLogNormalPayloadView,
+	variables []GlobalVariableViewV5,
+	literals []GlobalLiteralViewV5,
 	version string,
 ) SimulationViewV5 {
 	return SimulationViewV5{
@@ -148,6 +150,8 @@ func BuildSimulationView(
 				Delays:          delayView.Data,
 				DelaysLogNormal: delayLogNormalView.Data,
 			},
+			GlobalVariables: variables,
+			GlobalLiterals:  literals,
 		},
 		*NewMetaView(version),
 	}

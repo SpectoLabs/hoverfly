@@ -67,7 +67,3 @@ func (this ResponseDetailsViewV3) GetFixedDelay() int { return 0 }
 
 // Gets LogNormalDelay - required for interfaces.Response
 func (this ResponseDetailsViewV3) GetLogNormalDelay() interfaces.ResponseDelay { return nil }
-
-func (this ResponseDetailsViewV3) GetLiterals() []interfaces.Literal { return nil }
-
-func (this ResponseDetailsViewV3) GetVariables() []interfaces.Variable { return nil }
