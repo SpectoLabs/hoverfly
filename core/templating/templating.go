@@ -127,26 +127,6 @@ func (templator *Templator) GetSupportedMethodMap() map[string]interface{} {
 	return templator.SupportedMethodMap
 }
 
-func NewTemplatingDataFromRequest(requestDetails *models.RequestDetails, state map[string]string) *TemplatingData {
-	return &TemplatingData{
-		Request: Request{
-			Path:       strings.Split(requestDetails.Path, "/")[1:],
-			QueryParam: requestDetails.Query,
-			Header:     requestDetails.Headers,
-			Scheme:     requestDetails.Scheme,
-			Body:       templateHelpers{}.requestBody,
-			FormData:   requestDetails.FormData,
-			body:       requestDetails.Body,
-			Method:     requestDetails.Method,
-		},
-		State: state,
-		CurrentDateTime: func(a1, a2, a3 string) string {
-			return a1 + " " + a2 + " " + a3
-		},
-	}
-
-}
-
 func (t *Templator) NewTemplatingDataFromRequestAndRequestRelatedVars(requestDetails *models.RequestDetails, vars *models.Variables, state map[string]string) *TemplatingData {
 
 	variableMap := t.getVariables(vars, requestDetails)
