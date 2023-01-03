@@ -80,8 +80,7 @@ func NewTemplator() *Templator {
 	}
 }
 
-func (t *Templator) SetLiteralsAndRequestIndependentVariables(literals *models.Literals, vars *models.Variables) error {
-
+func (t *Templator) SetLiterals(literals *models.Literals) {
 	literalMap := make(map[string]interface{})
 
 	if literals != nil {
@@ -89,6 +88,10 @@ func (t *Templator) SetLiteralsAndRequestIndependentVariables(literals *models.L
 			literalMap[literal.Name] = literal.Value
 		}
 	}
+	t.literals = literalMap
+
+}
+func (t *Templator) SetRequestIndependentVariables(vars *models.Variables) error {
 
 	variableMap := make(map[string]interface{})
 	if vars != nil {
@@ -100,10 +103,8 @@ func (t *Templator) SetLiteralsAndRequestIndependentVariables(literals *models.L
 				}
 				variableMap[variable.Name] = value
 			}
-
 		}
 	}
-	t.literals = literalMap
 	t.requestIndependentVars = variableMap
 	return nil
 }
@@ -172,16 +173,11 @@ func (t *Templator) NewTemplatingDataFromRequestAndRequestRelatedVars(requestDet
 }
 
 func (t *Templator) getVariables(vars *models.Variables, requestDetails *models.RequestDetails) map[string]interface{} {
-	defer func() {
-		if err := recover(); err != nil {
-			log.Error("panic occurred:", err)
-		}
-	}()
 	variableMap := make(map[string]interface{})
 	if vars != nil {
 		for _, variable := range *vars {
 			if variable.Function == REQUEST_BODY_HELPER {
-				variableMap[variable.Name] = fetchFromRequestBody(variable.Arguments[0], variable.Arguments[1], requestDetails.Body)
+				variableMap[variable.Name] = getDataFromRequestBody(variable, requestDetails.Body)
 			} else {
 				variableMap[variable.Name] = t.requestIndependentVars[variable.Name]
 			}
@@ -191,19 +187,36 @@ func (t *Templator) getVariables(vars *models.Variables, requestDetails *models.
 	return variableMap
 }
 
+func getDataFromRequestBody(variable models.Variable, body string) string {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Error("panic occurred:", err)
+		}
+	}()
+	return fetchFromRequestBody(variable.Arguments[0].(string), variable.Arguments[1].(string), body)
+}
+
 func (t *Templator) callHelper(variable models.Variable) (output interface{}, err error) {
 
 	defer func() {
-		if recover() != nil {
-			log.Error("panic occurred:", err)
+		if rec := recover(); rec != nil {
+			log.Error("panic occurred:", rec)
 			err = fmt.Errorf("error occurred while fetching value for variable %s", variable.Name)
 		}
 	}()
-	val := reflect.ValueOf(t.SupportedMethodMap[variable.Function])
-	arguments := make([]reflect.Value, len(variable.Arguments))
-	for index, value := range variable.Arguments {
-		arguments[index] = reflect.ValueOf(value)
+	function := reflect.ValueOf(t.SupportedMethodMap[variable.Function])
+	functionType := function.Type()
+	arguments := make([]reflect.Value, functionType.NumIn())
+	for i := range arguments {
+		// validate the type of argument - as of now just passing string and int, so just converted those
+		if functionType.In(i).Kind() == reflect.String {
+			arguments[i] = reflect.ValueOf(variable.Arguments[i].(string))
+		} else if functionType.In(i).Kind() == reflect.Int {
+			arguments[i] = reflect.ValueOf(int(variable.Arguments[i].(float64)))
+		} else {
+			arguments[i] = reflect.ValueOf(variable.Arguments[i])
+		}
 	}
-	output = val.Call(arguments)[0]
+	output = function.Call(arguments)[0]
 	return
 }

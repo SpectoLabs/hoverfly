@@ -3,13 +3,14 @@ package hoverfly
 import (
 	"errors"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/delay"
 	"regexp"
+
+	"github.com/SpectoLabs/hoverfly/core/delay"
 
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v1 "github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/middleware"
@@ -210,6 +211,10 @@ func (hf *Hoverfly) SetVariables(variables []v2.GlobalVariableViewV5) error {
 		return err
 	}
 
+	if err := hf.templator.SetRequestIndependentVariables(hf.Simulation.Vars); err != nil {
+		return err
+	}
+
 	hf.Simulation.Vars = models.ImportVariables(variables)
 	return nil
 }
@@ -332,11 +337,7 @@ func (hf *Hoverfly) putOrReplaceSimulation(simulationView v2.SimulationViewV5, o
 	}
 
 	hf.Simulation.Literals = models.ImportLiterals(simulationView.GlobalLiterals)
-
-	if err := hf.templator.SetLiteralsAndRequestIndependentVariables(hf.Simulation.Literals, hf.Simulation.Vars); err != nil {
-		result.SetError(err)
-		return result
-	}
+	hf.templator.SetLiterals(hf.Simulation.Literals)
 
 	for _, warning := range bodyFilesResult.WarningMessages {
 		result.WarningMessages = append(result.WarningMessages, warning)

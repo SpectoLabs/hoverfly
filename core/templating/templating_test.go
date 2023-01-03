@@ -472,7 +472,7 @@ func Test_SetVarsReturnErrorInCaseOfInvalidArgsPassed(t *testing.T) {
 			Function: "faker",
 		},
 	}
-	err := templator.SetLiteralsAndRequestIndependentVariables(nil, vars)
+	err := templator.SetRequestIndependentVariables(vars)
 	Expect(err).ToNot(BeNil())
 
 }
@@ -500,7 +500,8 @@ func Test_NewTemplateRequestWithLiteralsAndVarsPopulated(t *testing.T) {
 		},
 	}
 
-	templator.SetLiteralsAndRequestIndependentVariables(literals, vars)
+	templator.SetLiterals(literals)
+	templator.SetRequestIndependentVariables(vars)
 	actual := templator.NewTemplatingDataFromRequestAndRequestRelatedVars(
 		&models.RequestDetails{
 			Scheme:      "http",

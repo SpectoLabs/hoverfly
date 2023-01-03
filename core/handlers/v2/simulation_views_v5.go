@@ -43,9 +43,9 @@ type MatcherViewV5 struct {
 }
 
 type GlobalVariableViewV5 struct {
-	Name      string   `json:"name"`
-	Function  string   `json:"function"`
-	Arguments []string `json:"arguments"`
+	Name      string        `json:"name"`
+	Function  string        `json:"function"`
+	Arguments []interface{} `json:"arguments,omitempty"`
 }
 
 type GlobalLiteralViewV5 struct {

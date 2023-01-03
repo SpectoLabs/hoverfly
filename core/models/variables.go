@@ -9,7 +9,7 @@ import (
 type Variable struct {
 	Name      string
 	Function  string
-	Arguments []string
+	Arguments []interface{}
 }
 
 type Variables []Variable
