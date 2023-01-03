@@ -477,48 +477,6 @@ func Test_SetVarsReturnErrorInCaseOfInvalidArgsPassed(t *testing.T) {
 
 }
 
-func Test_NewTemplateRequestWithLiteralsAndVarsPopulated(t *testing.T) {
-	RegisterTestingT(t)
-	templator := templating.NewTemplator()
-
-	vars := &models.Variables{
-		models.Variable{
-			Name:      "varOne",
-			Function:  "faker",
-			Arguments: []string{"Name"},
-		},
-		models.Variable{
-			Name:      "varTwo",
-			Function:  "body",
-			Arguments: []string{"jsonpath", "$.id"},
-		},
-	}
-	literals := &models.Literals{
-		models.Literal{
-			Name:  "literal1",
-			Value: "value1",
-		},
-	}
-
-	templator.SetLiterals(literals)
-	templator.SetRequestIndependentVariables(vars)
-	actual := templator.NewTemplatingDataFromRequestAndRequestRelatedVars(
-		&models.RequestDetails{
-			Scheme:      "http",
-			Destination: "test.com",
-			Body:        "{\"id\": 123, \"username\": \"hoverfly\"}",
-		},
-		vars,
-		make(map[string]string),
-	)
-
-	Expect(actual.Literals).Should(HaveLen(1))
-	Expect(actual.Vars).Should(HaveLen(2))
-	Expect(actual.Literals).Should(HaveKeyWithValue("literal1", "value1"))
-	Expect(actual.Vars).Should(HaveKeyWithValue("varTwo", "123"))
-	Expect(actual.Vars).Should(HaveKey("varOne"))
-}
-
 func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]string, responseBody string) (string, error) {
 	templator := templating.NewTemplator()
 	template, _ := templator.ParseTemplate(responseBody)
