@@ -243,12 +243,12 @@ Variables
 
             },
             {
-                "name":"idFromRequestBody",
+                "name":"idFromJSONRequestBody",
                 "function":"body",
                 "arguments":["jsonpath", "$.id"]
             },
             {
-                "name":"idFromRequestBody",
+                "name":"idFromXMLRequestBody",
                 "function":"body",
                 "arguments":["xpath", "/root/id"]
             }
