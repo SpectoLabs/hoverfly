@@ -188,13 +188,13 @@ func (t *Templator) callHelper(variable models.Variable) (output interface{}, er
 	functionType := function.Type()
 	arguments := make([]reflect.Value, functionType.NumIn())
 	for i := range arguments {
-		// validate the type of argument - as of now just passing string and int, so just converted those
+		// validate the type of argument - as of now just passing string, int, float, so just converted those
 		if functionType.In(i).Kind() == reflect.String {
 			arguments[i] = reflect.ValueOf(variable.Arguments[i].(string))
 		} else if functionType.In(i).Kind() == reflect.Int {
 			arguments[i] = reflect.ValueOf(int(variable.Arguments[i].(float64)))
-		} else {
-			arguments[i] = reflect.ValueOf(variable.Arguments[i])
+		} else if functionType.In(i).Kind() == reflect.Float64 {
+			arguments[i] = reflect.ValueOf(variable.Arguments[i].(float64))
 		}
 	}
 	output = function.Call(arguments)[0]
