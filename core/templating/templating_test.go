@@ -462,7 +462,7 @@ func Test_ApplyTemplate_ReplaceStringInQueryParams(t *testing.T) {
 	Expect(template).To(Equal(`moo,moo,moo`))
 }
 
-func Test_SetVarsReturnErrorInCaseOfInvalidArgsPassed(t *testing.T) {
+func Test_VarSetToNilInCaseOfInvalidArgsPassed(t *testing.T) {
 	RegisterTestingT(t)
 	templator := templating.NewTemplator()
 
