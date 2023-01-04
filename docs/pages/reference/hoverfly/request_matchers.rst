@@ -552,8 +552,9 @@ Generic Array matcher
 
 Matches the matcher group with value passed in request array based on the configuration passed.
 
-ignoreorder - ignore order in which values that are passed.
-ignoreunknowns - ignore unknowns in the values that are passed
+- ignoreorder - ignore order in which values that are passed.
+- ignoreunknowns - ignore unknowns in the values that are passed.
+- ignoreoccurrences - ignore number of occurrences of elements that are passed with respect to matcher value.
 
 Example
 """""""
