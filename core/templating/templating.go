@@ -14,7 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const REQUEST_BODY_HELPER = "body"
+const REQUEST_BODY_HELPER = "requestBody"
 
 type TemplatingData struct {
 	Request         Request
@@ -36,9 +36,8 @@ type Request struct {
 }
 
 type Templator struct {
-	SupportedMethodMap     map[string]interface{}
-	literals               map[string]interface{}
-	requestIndependentVars map[string]interface{}
+	SupportedMethodMap map[string]interface{}
+	literals           map[string]interface{}
 }
 
 var helpersRegistered = false
@@ -69,7 +68,7 @@ func NewTemplator() *Templator {
 		helperMethodMap["randomUuid"] = t.randomUuid
 		helperMethodMap["replace"] = t.replace
 		helperMethodMap["faker"] = t.faker
-		helperMethodMap["body"] = t.requestBody
+		helperMethodMap["requestBody"] = t.requestBody
 
 		raymond.RegisterHelpers(helperMethodMap)
 		helpersRegistered = true
@@ -90,23 +89,6 @@ func (t *Templator) SetLiterals(literals *models.Literals) {
 	}
 	t.literals = literalMap
 
-}
-func (t *Templator) SetRequestIndependentVariables(vars *models.Variables) error {
-
-	variableMap := make(map[string]interface{})
-	if vars != nil {
-		for _, variable := range *vars {
-			if variable.Function != REQUEST_BODY_HELPER {
-				value, error := t.callHelper(variable)
-				if error != nil {
-					return error
-				}
-				variableMap[variable.Name] = value
-			}
-		}
-	}
-	t.requestIndependentVars = variableMap
-	return nil
 }
 
 func (*Templator) ParseTemplate(responseBody string) (*raymond.Template, error) {
@@ -159,7 +141,7 @@ func (t *Templator) getVariables(vars *models.Variables, requestDetails *models.
 			if variable.Function == REQUEST_BODY_HELPER {
 				variableMap[variable.Name] = getDataFromRequestBody(variable, requestDetails.Body)
 			} else {
-				variableMap[variable.Name] = t.requestIndependentVars[variable.Name]
+				variableMap[variable.Name] = t.callHelper(variable)
 			}
 		}
 	}
@@ -176,12 +158,11 @@ func getDataFromRequestBody(variable models.Variable, body string) string {
 	return fetchFromRequestBody(variable.Arguments[0].(string), variable.Arguments[1].(string), body)
 }
 
-func (t *Templator) callHelper(variable models.Variable) (output interface{}, err error) {
+func (t *Templator) callHelper(variable models.Variable) interface{} {
 
 	defer func() {
 		if rec := recover(); rec != nil {
 			log.Error("panic occurred:", rec)
-			err = fmt.Errorf("error occurred while fetching value for variable %s", variable.Name)
 		}
 	}()
 	function := reflect.ValueOf(t.SupportedMethodMap[variable.Function])
@@ -197,6 +178,5 @@ func (t *Templator) callHelper(variable models.Variable) (output interface{}, er
 			arguments[i] = reflect.ValueOf(variable.Arguments[i].(float64))
 		}
 	}
-	output = function.Call(arguments)[0]
-	return
+	return function.Call(arguments)[0]
 }

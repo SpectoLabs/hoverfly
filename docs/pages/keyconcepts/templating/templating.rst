@@ -183,7 +183,7 @@ We can define global literals and variables which can be used in any of response
 
 Literals
 
-- Format to define literals under data is as follow. Literals can be accessed in any of responses as {{Literals.<literal name>}}
+- Format to define literals under data is as follow. 
 
 ::
 
@@ -211,7 +211,7 @@ Literals
 
 Variables
 
-- Format to define variables under data is as follow. Variable can be accessed in any of response as {{Vars.<variable name>}}. 
+- Format to define variables under data is as follow. 
 
 - Variables can be value fetched any helper function described in above section.
   
@@ -254,6 +254,17 @@ Variables
             }
         ]
     }
+
+Getting data for defined Literals and Variables
+
+Defined literals and variables can be accessed in any of responses using below way via templating.
+
++-----------+-------------------------------------+
+| Literals  | {{Literals.<literal name>}}         |
++-----------+-------------------------------------+
+| Variables | {{Vars.<variable name>}}            |
++-----------+-------------------------------------+
+
 
 Conditional Templating, Looping and More
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

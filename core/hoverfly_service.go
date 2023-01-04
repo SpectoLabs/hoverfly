@@ -211,10 +211,6 @@ func (hf *Hoverfly) SetVariables(variables []v2.GlobalVariableViewV5) error {
 		return err
 	}
 
-	if err := hf.templator.SetRequestIndependentVariables(hf.Simulation.Vars); err != nil {
-		return err
-	}
-
 	hf.Simulation.Vars = models.ImportVariables(variables)
 	return nil
 }

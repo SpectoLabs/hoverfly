@@ -472,8 +472,17 @@ func Test_SetVarsReturnErrorInCaseOfInvalidArgsPassed(t *testing.T) {
 			Function: "faker",
 		},
 	}
-	err := templator.SetRequestIndependentVariables(vars)
-	Expect(err).ToNot(BeNil())
+
+	actual := templator.NewTemplatingDataFromRequestAndRequestRelatedVars(
+		&models.RequestDetails{
+			Scheme:      "http",
+			Destination: "test.com",
+		},
+		vars,
+		make(map[string]string),
+	)
+
+	Expect(actual.Vars["varOne"]).To(BeNil())
 
 }
 
