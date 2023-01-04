@@ -213,7 +213,7 @@ Variables
 
 - Format to define variables under data is as follow. 
 
-- Variables can be value fetched any helper function described in above section.
+- Variables can be value fetched using any helper function described in above section.
   
 - We can also fetch anything from request body to variable using jsonpath or xpath.
 
@@ -244,12 +244,12 @@ Variables
             },
             {
                 "name":"idFromJSONRequestBody",
-                "function":"body",
+                "function":"requestBody",
                 "arguments":["jsonpath", "$.id"]
             },
             {
                 "name":"idFromXMLRequestBody",
-                "function":"body",
+                "function":"requestBody",
                 "arguments":["xpath", "/root/id"]
             }
         ]
