@@ -13,12 +13,13 @@ import (
 func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingDataFromRequestAndRequestRelatedVars(
+	actual := templating.NewTemplator().NewTemplatingData(
 		&models.RequestDetails{
 			Scheme:      "http",
 			Destination: "test.com",
 			Path:        "/foo/bar",
 		},
+		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
 	)
@@ -29,11 +30,12 @@ func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 func Test_ShouldCreateTemplatingDataPathsFromRequestWithNoPaths(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingDataFromRequestAndRequestRelatedVars(
+	actual := templating.NewTemplator().NewTemplatingData(
 		&models.RequestDetails{
 			Scheme:      "http",
 			Destination: "test.com",
 		},
+		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
 	)
@@ -44,7 +46,7 @@ func Test_ShouldCreateTemplatingDataPathsFromRequestWithNoPaths(t *testing.T) {
 func Test_ShouldCreateTemplatingDataQueryParamsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingDataFromRequestAndRequestRelatedVars(
+	actual := templating.NewTemplator().NewTemplatingData(
 		&models.RequestDetails{
 			Scheme:      "http",
 			Destination: "test.com",
@@ -53,6 +55,7 @@ func Test_ShouldCreateTemplatingDataQueryParamsFromRequest(t *testing.T) {
 				"ham":    {"2"},
 			},
 		},
+		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
 	)
@@ -65,11 +68,12 @@ func Test_ShouldCreateTemplatingDataQueryParamsFromRequest(t *testing.T) {
 func Test_ShouldCreateTemplatingDataQueryParamsFromRequestWithNoQueryParams(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingDataFromRequestAndRequestRelatedVars(
+	actual := templating.NewTemplator().NewTemplatingData(
 		&models.RequestDetails{
 			Scheme:      "http",
 			Destination: "test.com",
 		},
+		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
 	)
@@ -80,11 +84,12 @@ func Test_ShouldCreateTemplatingDataQueryParamsFromRequestWithNoQueryParams(t *t
 func Test_ShouldCreateTemplatingDataHttpScheme(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingDataFromRequestAndRequestRelatedVars(
+	actual := templating.NewTemplator().NewTemplatingData(
 		&models.RequestDetails{
 			Scheme:      "http",
 			Destination: "test.com",
 		},
+		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
 	)
@@ -95,7 +100,7 @@ func Test_ShouldCreateTemplatingDataHttpScheme(t *testing.T) {
 func Test_ShouldCreateTemplatingDataHeaderFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingDataFromRequestAndRequestRelatedVars(
+	actual := templating.NewTemplator().NewTemplatingData(
 		&models.RequestDetails{
 			Scheme:      "http",
 			Destination: "test.com",
@@ -104,6 +109,7 @@ func Test_ShouldCreateTemplatingDataHeaderFromRequest(t *testing.T) {
 				"ham":    {"2"},
 			},
 		},
+		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
 	)
@@ -116,11 +122,12 @@ func Test_ShouldCreateTemplatingDataHeaderFromRequest(t *testing.T) {
 func Test_ShouldCreateTemplatingDataHeaderFromRequestWithNoHeader(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingDataFromRequestAndRequestRelatedVars(
+	actual := templating.NewTemplator().NewTemplatingData(
 		&models.RequestDetails{
 			Scheme:      "http",
 			Destination: "test.com",
 		},
+		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
 	)
@@ -473,11 +480,12 @@ func Test_VarSetToNilInCaseOfInvalidArgsPassed(t *testing.T) {
 		},
 	}
 
-	actual := templator.NewTemplatingDataFromRequestAndRequestRelatedVars(
+	actual := templator.NewTemplatingData(
 		&models.RequestDetails{
 			Scheme:      "http",
 			Destination: "test.com",
 		},
+		&models.Literals{},
 		vars,
 		make(map[string]string),
 	)
@@ -490,5 +498,5 @@ func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]strin
 	templator := templating.NewTemplator()
 	template, _ := templator.ParseTemplate(responseBody)
 
-	return templator.RenderTemplateWithRequestRelatedVars(template, requestDetails, &models.Variables{}, state)
+	return templator.RenderTemplate(template, requestDetails, &models.Literals{}, &models.Variables{}, state)
 }

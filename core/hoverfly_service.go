@@ -211,8 +211,13 @@ func (hf *Hoverfly) SetVariables(variables []v2.GlobalVariableViewV5) error {
 		return err
 	}
 
-	hf.Simulation.Vars = models.ImportVariables(variables)
+	hf.Simulation.AddVariables(models.ImportVariables(variables))
 	return nil
+}
+
+func (hf *Hoverfly) SetLiterals(literals []v2.GlobalLiteralViewV5) {
+
+	hf.Simulation.AddLiterals(models.ImportLiterals(literals))
 }
 
 func (hf *Hoverfly) SetResponseDelaysLogNormal(payloadView v1.ResponseDelayLogNormalPayloadView) error {
@@ -332,8 +337,7 @@ func (hf *Hoverfly) putOrReplaceSimulation(simulationView v2.SimulationViewV5, o
 		return result
 	}
 
-	hf.Simulation.Literals = models.ImportLiterals(simulationView.GlobalLiterals)
-	hf.templator.SetLiterals(hf.Simulation.Literals)
+	hf.SetLiterals(simulationView.GlobalLiterals)
 
 	for _, warning := range bodyFilesResult.WarningMessages {
 		result.WarningMessages = append(result.WarningMessages, warning)
@@ -352,10 +356,11 @@ func (hf *Hoverfly) PutSimulation(simulationView v2.SimulationViewV5) v2.Simulat
 
 func (hf *Hoverfly) DeleteSimulation() {
 	hf.Simulation.DeleteMatchingPairs()
+	hf.Simulation.DeleteLiterals()
+	hf.Simulation.DeleteVariables()
 	hf.DeleteResponseDelays()
 	hf.DeleteResponseDelaysLogNormal()
 	hf.FlushCache()
-	hf.templator.UnSetLiterals()
 }
 
 func (hf *Hoverfly) GetVersion() string {

@@ -37,7 +37,6 @@ type Request struct {
 
 type Templator struct {
 	SupportedMethodMap map[string]interface{}
-	literals           map[string]interface{}
 }
 
 var helpersRegistered = false
@@ -79,34 +78,17 @@ func NewTemplator() *Templator {
 	}
 }
 
-func (t *Templator) SetLiterals(literals *models.Literals) {
-	literalMap := make(map[string]interface{})
-
-	if literals != nil {
-		for _, literal := range *literals {
-			literalMap[literal.Name] = literal.Value
-		}
-	}
-	t.literals = literalMap
-
-}
-
-func (t *Templator) UnSetLiterals() {
-
-	t.literals = nil
-}
-
 func (*Templator) ParseTemplate(responseBody string) (*raymond.Template, error) {
 
 	return raymond.Parse(responseBody)
 }
 
-func (t *Templator) RenderTemplateWithRequestRelatedVars(tpl *raymond.Template, requestDetails *models.RequestDetails, vars *models.Variables, state map[string]string) (string, error) {
+func (t *Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.RequestDetails, literals *models.Literals, vars *models.Variables, state map[string]string) (string, error) {
 	if tpl == nil {
 		return "", fmt.Errorf("template cannot be nil")
 	}
 
-	ctx := t.NewTemplatingDataFromRequestAndRequestRelatedVars(requestDetails, vars, state)
+	ctx := t.NewTemplatingData(requestDetails, literals, vars, state)
 	return tpl.Exec(ctx)
 }
 
@@ -114,7 +96,14 @@ func (templator *Templator) GetSupportedMethodMap() map[string]interface{} {
 	return templator.SupportedMethodMap
 }
 
-func (t *Templator) NewTemplatingDataFromRequestAndRequestRelatedVars(requestDetails *models.RequestDetails, vars *models.Variables, state map[string]string) *TemplatingData {
+func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, literals *models.Literals, vars *models.Variables, state map[string]string) *TemplatingData {
+
+	literalMap := make(map[string]interface{})
+	if literals != nil {
+		for _, literal := range *literals {
+			literalMap[literal.Name] = literal.Value
+		}
+	}
 
 	variableMap := t.getVariables(vars, requestDetails)
 
@@ -129,7 +118,7 @@ func (t *Templator) NewTemplatingDataFromRequestAndRequestRelatedVars(requestDet
 			body:       requestDetails.Body,
 			Method:     requestDetails.Method,
 		},
-		Literals: t.literals,
+		Literals: literalMap,
 		Vars:     variableMap,
 		State:    state,
 		CurrentDateTime: func(a1, a2, a3 string) string {

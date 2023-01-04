@@ -150,3 +150,27 @@ func (this *Simulation) DeleteMatchingPairs() {
 	this.matchingPairs = pairs
 	this.RWMutex.Unlock()
 }
+
+func (this *Simulation) DeleteLiterals() {
+	this.RWMutex.Lock()
+	this.Literals = &Literals{}
+	this.RWMutex.Unlock()
+}
+
+func (this *Simulation) DeleteVariables() {
+	this.RWMutex.Lock()
+	this.Vars = &Variables{}
+	this.RWMutex.Unlock()
+}
+
+func (this *Simulation) AddVariables(variables *Variables) {
+	this.RWMutex.Lock()
+	this.Vars = variables
+	this.RWMutex.Unlock()
+}
+
+func (this *Simulation) AddLiterals(literals *Literals) {
+	this.RWMutex.Lock()
+	this.Literals = literals
+	this.RWMutex.Unlock()
+}
