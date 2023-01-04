@@ -355,6 +355,7 @@ func (hf *Hoverfly) DeleteSimulation() {
 	hf.DeleteResponseDelays()
 	hf.DeleteResponseDelaysLogNormal()
 	hf.FlushCache()
+	hf.templator.UnSetLiterals()
 }
 
 func (hf *Hoverfly) GetVersion() string {

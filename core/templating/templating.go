@@ -91,6 +91,11 @@ func (t *Templator) SetLiterals(literals *models.Literals) {
 
 }
 
+func (t *Templator) UnSetLiterals() {
+
+	t.literals = nil
+}
+
 func (*Templator) ParseTemplate(responseBody string) (*raymond.Template, error) {
 
 	return raymond.Parse(responseBody)
