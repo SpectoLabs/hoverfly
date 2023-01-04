@@ -24,6 +24,8 @@ func NewSimulation() *Simulation {
 		matchingPairs:           []RequestMatcherResponsePair{},
 		ResponseDelays:          &ResponseDelayList{},
 		ResponseDelaysLogNormal: &ResponseDelayLogNormalList{},
+		Literals:                &Literals{},
+		Vars:                    &Variables{},
 	}
 }
 
@@ -144,21 +146,11 @@ func (this *Simulation) GetMatchingPairs() []RequestMatcherResponsePair {
 	return pairs
 }
 
-func (this *Simulation) DeleteMatchingPairs() {
+func (this *Simulation) DeleteMatchingPairsAlongWithCustomData() {
 	var pairs []RequestMatcherResponsePair
 	this.RWMutex.Lock()
 	this.matchingPairs = pairs
-	this.RWMutex.Unlock()
-}
-
-func (this *Simulation) DeleteLiterals() {
-	this.RWMutex.Lock()
 	this.Literals = &Literals{}
-	this.RWMutex.Unlock()
-}
-
-func (this *Simulation) DeleteVariables() {
-	this.RWMutex.Lock()
 	this.Vars = &Variables{}
 	this.RWMutex.Unlock()
 }

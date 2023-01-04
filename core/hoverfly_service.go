@@ -348,9 +348,7 @@ func (hf *Hoverfly) PutSimulation(simulationView v2.SimulationViewV5) v2.Simulat
 }
 
 func (hf *Hoverfly) DeleteSimulation() {
-	hf.Simulation.DeleteMatchingPairs()
-	hf.Simulation.DeleteLiterals()
-	hf.Simulation.DeleteVariables()
+	hf.Simulation.DeleteMatchingPairsAlongWithCustomData()
 	hf.DeleteResponseDelays()
 	hf.DeleteResponseDelaysLogNormal()
 	hf.FlushCache()
