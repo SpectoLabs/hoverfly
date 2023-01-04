@@ -323,6 +323,10 @@ func GetStringArray(data interface{}) ([]string, bool) {
 }
 
 func GetBoolOrDefault(data map[string]interface{}, key string, defaultValue bool) bool {
+	if data == nil {
+		return defaultValue
+	}
+
 	genericValue, found := data[key]
 	if !found {
 		return defaultValue
