@@ -317,7 +317,7 @@ func (hf *Hoverfly) putOrReplaceSimulation(simulationView v2.SimulationViewV5, o
 		hf.DeleteSimulation()
 	}
 
-	result := hf.importRequestResponsePairViews(simulationView.DataViewV5.RequestResponsePairs)
+	result := hf.importRequestResponsePairViewsWithCustomData(simulationView.DataViewV5.RequestResponsePairs, simulationView.GlobalLiterals, simulationView.GlobalVariables)
 	if result.GetError() != nil {
 		return result
 	}
@@ -331,13 +331,6 @@ func (hf *Hoverfly) putOrReplaceSimulation(simulationView v2.SimulationViewV5, o
 		result.SetError(err)
 		return result
 	}
-
-	if err := hf.SetVariables(simulationView.GlobalVariables); err != nil {
-		result.SetError(err)
-		return result
-	}
-
-	hf.SetLiterals(simulationView.GlobalLiterals)
 
 	for _, warning := range bodyFilesResult.WarningMessages {
 		result.WarningMessages = append(result.WarningMessages, warning)
