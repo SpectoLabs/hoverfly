@@ -508,8 +508,6 @@ Example
         </tbody>
     </table>
 
-|
-|
 ContainsExactly matcher
 -----------------------
 
@@ -548,129 +546,36 @@ Example
         </tbody>
     </table>
 
-|
-|
 
-ContainsOnly matcher
------------------------
-
-Verifies that matcher group contains all those values which are being passed in the request in any order or with duplicates. This is case-sensitive.
-
-Example
-"""""""
-
-.. code:: json
-   
-   "matcher": "containsonly"
-   "value": "[?]"
-
-.. raw:: html
-    
-    <table border="1" class="docutils matcher-examples">
-        <thead>
-            <tr class="row-odd">
-                <th class="head">Array to match</th>
-                <th class="head">Matcher value</th>
-                <th class="head">Match</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="row-even">
-                <td>["param2", "param1", "param3"]</td>
-                <td>["param1", "param2", "param3"]</td>
-                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
-            <tr/>
-            <tr class="row-odd">
-                <td>["param1", "param2", "param3", "param2"]</td>
-                <td>["param1", "param2", "param3"]</td>
-                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
-            <tr/>
-            <tr class="row-even">
-                <td>["param2", "param1", "param1", "param1"]</td>
-                <td>["param1", "param2", "param3"]</td>
-                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
-            <tr/>
-            <tr class="row-even">
-                <td>["param2", "param1", "param1", "param5"]</td>
-                <td>["param1", "param2", "param3"]</td>
-                <td class="example-icon"><span class="fa fa fa-times fa-failure"></span></td>
-            <tr/>
-            <tr class="row-even">
-                <td>["param5","param6", "param7"]</td>
-                <td>["param1", "param2", "param3"]</td>
-                <td class="example-icon"><span class="fa fa fa-times fa-failure"></span></td>
-            <tr/>
-        </tbody>
-    </table>
-
-|
-|
-
-Contains matcher
------------------------
-
-Verifies that the matcher group contains atleast one of value passed in request array. This is case-sensitive.
-
-Example
-"""""""
-
-.. code:: json
-   
-   "matcher": "contains"
-   "value": "[?]"
-
-.. raw:: html
-    
-    <table border="1" class="docutils matcher-examples">
-        <thead>
-            <tr class="row-odd">
-                <th class="head">Array to match</th>
-                <th class="head">Matcher value</th>
-                <th class="head">Match</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="row-even">
-                <td>["param1", "param5", "param6"]</td>
-                <td>["param1", "param2", "param3"]</td>
-                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
-            <tr/>
-            <tr class="row-odd">
-                <td>["param5", "param6", "param7"]</td>
-                <td>["param1", "param2", "param3"]</td>
-                <td class="example-icon"><span class="fa fa-times fa-failure"></span></td>
-            <tr/>
-        </tbody>
-    </table>
-
-|
-|
 Generic Array matcher
 -----------------------
 
 Matches the matcher group with value passed in request array based on the configuration passed.
 
-ignoreorder - ignore order in which values that are passed.
-ignoreunknowns - ignore unknowns in the values that are passed
+- ignoreorder - ignore order in which values that are passed.
+- ignoreunknowns - ignore unknowns in the values that are passed.
+- ignoreoccurrences - ignore number of occurrences of elements that are passed with respect to matcher value.
 
 Example
 """""""
 
 .. code:: json
    
-   "matcher": "contains"
+   "matcher": "array"
    "value": "[?]"
    "configuration": "{}"
-{
-    "matcher": "array",
-    "config": {
-        "ignoreunknown": <true/false>,
-        "ignoreorder": <true/false>,
-        "ignoreoccurrences": <true/false>
-    }
-    "value": [
-        "access:vod",
-        "order:latest",
-        "profile:vd"
+   
+   Example:
+
+   {
+        "matcher": "array",
+        "config": {
+            "ignoreunknown": <true/false>,
+            "ignoreorder": <true/false>,
+            "ignoreoccurrences": <true/false>
+        },
+        "value": [
+            "access:vod",
+            "order:latest",
+            "profile:vd"
     ]
-}

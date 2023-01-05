@@ -18,8 +18,6 @@ var Matchers = map[string]MatcherFunc{
 	Xpath:           XpathMatch,
 	XmlTemplated:    XmlTemplatedMatch,
 	ContainsExactly: ContainsExactlyMatch,
-	ContainsOnly:    ContainsOnlyMatch,
-	Contains:        ContainsMatch,
 	Array:           ContainsExactlyMatch,
 }
 
