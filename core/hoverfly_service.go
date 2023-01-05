@@ -3,13 +3,14 @@ package hoverfly
 import (
 	"errors"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/delay"
 	"regexp"
+
+	"github.com/SpectoLabs/hoverfly/core/delay"
 
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v1 "github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
 	"github.com/SpectoLabs/hoverfly/core/middleware"
@@ -204,6 +205,21 @@ func (hf *Hoverfly) SetResponseDelays(payloadView v1.ResponseDelayPayloadView) e
 	return nil
 }
 
+func (hf *Hoverfly) SetVariables(variables []v2.GlobalVariableViewV5) error {
+	err := models.ValidateVariablePayload(variables, hf.templator.GetSupportedMethodMap())
+	if err != nil {
+		return err
+	}
+
+	hf.Simulation.AddVariables(models.ImportVariables(variables))
+	return nil
+}
+
+func (hf *Hoverfly) SetLiterals(literals []v2.GlobalLiteralViewV5) {
+
+	hf.Simulation.AddLiterals(models.ImportLiterals(literals))
+}
+
 func (hf *Hoverfly) SetResponseDelaysLogNormal(payloadView v1.ResponseDelayLogNormalPayloadView) error {
 	err := models.ValidateResponseDelayLogNormalPayload(payloadView)
 	if err != nil {
@@ -255,6 +271,8 @@ func (hf *Hoverfly) GetSimulation() (v2.SimulationViewV5, error) {
 	return v2.BuildSimulationView(pairViews,
 		hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView(),
 		hf.Simulation.ResponseDelaysLogNormal.ConvertToResponseDelayLogNormalPayloadView(),
+		hf.Simulation.Vars.ConvertToGlobalVariablesPayloadView(),
+		hf.Simulation.Literals.ConvertToGlobalLiteralsPayloadView(),
 		hf.version), nil
 }
 
@@ -284,6 +302,8 @@ func (hf *Hoverfly) GetFilteredSimulation(urlPattern string) (v2.SimulationViewV
 	return v2.BuildSimulationView(pairViews,
 		hf.Simulation.ResponseDelays.ConvertToResponseDelayPayloadView(),
 		hf.Simulation.ResponseDelaysLogNormal.ConvertToResponseDelayLogNormalPayloadView(),
+		hf.Simulation.Vars.ConvertToGlobalVariablesPayloadView(),
+		hf.Simulation.Literals.ConvertToGlobalLiteralsPayloadView(),
 		hf.version), nil
 }
 
@@ -297,7 +317,7 @@ func (hf *Hoverfly) putOrReplaceSimulation(simulationView v2.SimulationViewV5, o
 		hf.DeleteSimulation()
 	}
 
-	result := hf.importRequestResponsePairViews(simulationView.DataViewV5.RequestResponsePairs)
+	result := hf.importRequestResponsePairViewsWithCustomData(simulationView.DataViewV5.RequestResponsePairs, simulationView.GlobalLiterals, simulationView.GlobalVariables)
 	if result.GetError() != nil {
 		return result
 	}
@@ -319,7 +339,6 @@ func (hf *Hoverfly) putOrReplaceSimulation(simulationView v2.SimulationViewV5, o
 	return result
 }
 
-
 func (hf *Hoverfly) ReplaceSimulation(simulationView v2.SimulationViewV5) v2.SimulationImportResult {
 	return hf.putOrReplaceSimulation(simulationView, true)
 }
@@ -329,7 +348,7 @@ func (hf *Hoverfly) PutSimulation(simulationView v2.SimulationViewV5) v2.Simulat
 }
 
 func (hf *Hoverfly) DeleteSimulation() {
-	hf.Simulation.DeleteMatchingPairs()
+	hf.Simulation.DeleteMatchingPairsAlongWithCustomData()
 	hf.DeleteResponseDelays()
 	hf.DeleteResponseDelaysLogNormal()
 	hf.FlushCache()

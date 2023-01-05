@@ -177,6 +177,95 @@ Example date time formats
     - ``epoch``: UNIX timestamp in milliseconds
 
 
+Global Literals and Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We can define global literals and variables which can be used in any of responses. 
+
+Literals
+
+- Format to define literals under data is as follow. 
+
+::
+
+    {
+      "data": {
+      ...
+      "literals": [
+            {
+                "name":"literal1",
+                "value":"value1"
+            },
+            { 
+                "name":"literal2",
+                "value":["value1", "value2", "value3"]
+            },
+            {
+                "name":"literal3",
+                "value": {
+                    "key": "value"
+                }
+            }
+        ]
+    }
+
+
+Variables
+
+- Format to define variables under data is as follow. 
+
+- Variables can be value fetched using any helper function described in above section.
+  
+- We can also fetch anything from request body to variable using jsonpath or xpath.
+
+::
+
+    {
+      "data": {
+      ...
+      "variables": [
+            {
+                "name":"<variable name>",
+                "function":"<helper method name>",
+                "arguments":["arg1", "arg2"]
+
+            }
+        ]
+    }
+
+    {
+      "data": {
+      ...
+      "variables": [
+            {
+                "name":"varOne",
+                "function":"faker",
+                "arguments":["Name"]
+
+            },
+            {
+                "name":"idFromJSONRequestBody",
+                "function":"requestBody",
+                "arguments":["jsonpath", "$.id"]
+            },
+            {
+                "name":"idFromXMLRequestBody",
+                "function":"requestBody",
+                "arguments":["xpath", "/root/id"]
+            }
+        ]
+    }
+
+Getting data for defined Literals and Variables
+
+Defined literals and variables can be accessed in any of responses using below way via templating.
+
++-----------+-------------------------------------+
+| Literals  | {{Literals.<literal name>}}         |
++-----------+-------------------------------------+
+| Variables | {{Vars.<variable name>}}            |
++-----------+-------------------------------------+
+
+
 Conditional Templating, Looping and More
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

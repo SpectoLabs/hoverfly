@@ -12,6 +12,8 @@ type SimulationViewV5 struct {
 type DataViewV5 struct {
 	RequestResponsePairs []RequestMatcherResponsePairViewV5 `json:"pairs"`
 	GlobalActions        GlobalActionsView                  `json:"globalActions"`
+	GlobalLiterals       []GlobalLiteralViewV5              `json:"literals,omitempty"`
+	GlobalVariables      []GlobalVariableViewV5             `json:"variables,omitempty"`
 }
 
 type RequestMatcherResponsePairViewV5 struct {
@@ -40,6 +42,17 @@ type MatcherViewV5 struct {
 	Config  map[string]interface{} `json:"config,omitempty"`
 }
 
+type GlobalVariableViewV5 struct {
+	Name      string        `json:"name"`
+	Function  string        `json:"function"`
+	Arguments []interface{} `json:"arguments,omitempty"`
+}
+
+type GlobalLiteralViewV5 struct {
+	Name  string      `json:"name"`
+	Value interface{} `json:"value"`
+}
+
 func NewMatcherView(matcher string, value interface{}) MatcherViewV5 {
 	return MatcherViewV5{
 		Matcher: matcher,
@@ -47,13 +60,13 @@ func NewMatcherView(matcher string, value interface{}) MatcherViewV5 {
 	}
 }
 
-//Gets Response - required for interfaces.RequestResponsePairView
+// Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestMatcherResponsePairViewV5) GetResponse() interfaces.Response { return this.Response }
 
 type ResponseDetailsViewV5 struct {
 	Status           int                    `json:"status"`
 	Body             string                 `json:"body"`
-	BodyFile         string              	`json:"bodyFile,omitempty"`
+	BodyFile         string                 `json:"bodyFile,omitempty"`
 	EncodedBody      bool                   `json:"encodedBody"`
 	Headers          map[string][]string    `json:"headers,omitempty"`
 	Templated        bool                   `json:"templated"`
@@ -63,7 +76,7 @@ type ResponseDetailsViewV5 struct {
 	LogNormalDelay   *LogNormalDelayOptions `json:"logNormalDelay,omitempty"`
 }
 
-//Gets Status - required for interfaces.Response
+// Gets Status - required for interfaces.Response
 func (this ResponseDetailsViewV5) GetStatus() int { return this.Status }
 
 // Gets Body - required for interfaces.Response

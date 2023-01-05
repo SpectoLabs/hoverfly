@@ -136,7 +136,7 @@ func (this *SimulationHandler) addSimulation(w http.ResponseWriter, req *http.Re
 		}).Debug(result.Err.Error())
 
 		handlers.WriteErrorResponse(w, "An error occurred: "+result.Err.Error(), http.StatusInternalServerError)
-		return err
+		return result.Err
 	}
 	if len(result.WarningMessages) > 0 {
 		bytes, _ := util.JSONMarshal(result)

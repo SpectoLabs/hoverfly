@@ -35,7 +35,7 @@ type RequestMatcherViewV4 struct {
 
 type QueryMatcherViewV4 map[string]*RequestFieldMatchersView
 
-//Gets Response - required for interfaces.RequestResponsePairView
+// Gets Response - required for interfaces.RequestResponsePairView
 func (this RequestMatcherResponsePairViewV4) GetResponse() interfaces.Response { return this.Response }
 
 type ResponseDetailsViewV4 struct {
@@ -48,7 +48,7 @@ type ResponseDetailsViewV4 struct {
 	RemovesState     []string            `json:"removesState,omitempty"`
 }
 
-//Gets Status - required for interfaces.Response
+// Gets Status - required for interfaces.Response
 func (this ResponseDetailsViewV4) GetStatus() int { return this.Status }
 
 // Gets Body - required for interfaces.Response

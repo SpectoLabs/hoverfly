@@ -125,16 +125,21 @@ func (t templateHelpers) randomUuid() string {
 func (t templateHelpers) requestBody(queryType, query string, options *raymond.Options) string {
 	toMatch := options.Value("request").(Request).body
 	queryType = strings.ToLower(queryType)
+	return fetchFromRequestBody(queryType, query, toMatch)
+}
+
+func fetchFromRequestBody(queryType, query, toMatch string) string {
+
 	if queryType == "jsonpath" {
-		return t.jsonPath(query, toMatch)
+		return jsonPath(query, toMatch)
 	} else if queryType == "xpath" {
-		return t.xPath(query, toMatch)
+		return xPath(query, toMatch)
 	}
 	log.Errorf("Unknown query type \"%s\" for templating Request.Body", queryType)
 	return ""
 }
 
-func (t templateHelpers) jsonPath(query, toMatch string) string {
+func jsonPath(query, toMatch string) string {
 	query = prepareJsonPathQuery(query)
 
 	result, err := matchers.JsonPathExecution(query, toMatch)
@@ -144,7 +149,7 @@ func (t templateHelpers) jsonPath(query, toMatch string) string {
 	return result
 }
 
-func (t templateHelpers) xPath(query, toMatch string) string {
+func xPath(query, toMatch string) string {
 	result, err := matchers.XpathExecution(query, toMatch)
 	if err != nil {
 		return ""

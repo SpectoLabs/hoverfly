@@ -681,7 +681,7 @@ func Test_Simulation_DeleteMatchingPairs(t *testing.T) {
 		models.ResponseDetails{},
 	})
 
-	unit.DeleteMatchingPairs()
+	unit.DeleteMatchingPairsAlongWithCustomData()
 
 	Expect(unit.GetMatchingPairs()).To(HaveLen(0))
 }

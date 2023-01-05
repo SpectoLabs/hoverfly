@@ -13,6 +13,8 @@ type Simulation struct {
 	matchingPairs           []RequestMatcherResponsePair
 	ResponseDelays          ResponseDelays
 	ResponseDelaysLogNormal ResponseDelaysLogNormal
+	Vars                    *Variables
+	Literals                *Literals
 	RWMutex                 sync.RWMutex
 }
 
@@ -22,6 +24,8 @@ func NewSimulation() *Simulation {
 		matchingPairs:           []RequestMatcherResponsePair{},
 		ResponseDelays:          &ResponseDelayList{},
 		ResponseDelaysLogNormal: &ResponseDelayLogNormalList{},
+		Literals:                &Literals{},
+		Vars:                    &Variables{},
 	}
 }
 
@@ -142,9 +146,23 @@ func (this *Simulation) GetMatchingPairs() []RequestMatcherResponsePair {
 	return pairs
 }
 
-func (this *Simulation) DeleteMatchingPairs() {
+func (this *Simulation) DeleteMatchingPairsAlongWithCustomData() {
 	var pairs []RequestMatcherResponsePair
 	this.RWMutex.Lock()
 	this.matchingPairs = pairs
+	this.Literals = &Literals{}
+	this.Vars = &Variables{}
+	this.RWMutex.Unlock()
+}
+
+func (this *Simulation) AddVariables(variables *Variables) {
+	this.RWMutex.Lock()
+	this.Vars = variables
+	this.RWMutex.Unlock()
+}
+
+func (this *Simulation) AddLiterals(literals *Literals) {
+	this.RWMutex.Lock()
+	this.Literals = literals
 	this.RWMutex.Unlock()
 }

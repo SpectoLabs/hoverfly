@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v1 "github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
@@ -1162,7 +1162,6 @@ func Test_Hoverfly_PutSimulation_NotOverridesSimulation(t *testing.T) {
 	Expect(simulation.RequestResponsePairs[1].Response.Body).To(Equal(pairTwo.Response.Body))
 }
 
-
 func Test_Hoverfly_PutSimulation_BodyAndBodyFileWarning(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -1176,7 +1175,7 @@ func Test_Hoverfly_PutSimulation_BodyAndBodyFileWarning(t *testing.T) {
 					},
 				},
 				Response: v2.ResponseDetailsViewV5{
-					Body: "test-body",
+					Body:     "test-body",
 					BodyFile: "test-file",
 				},
 			}},
@@ -1259,7 +1258,7 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL(t *testing.T) {
 					},
 				},
 				Response: v2.ResponseDetailsViewV5{
-					BodyFile: server.URL+"/key.pem",
+					BodyFile: server.URL + "/key.pem",
 				},
 			}},
 		},
@@ -1271,7 +1270,7 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	Expect(simulation.RequestResponsePairs[0].Response.Body).To(HavePrefix("-----BEGIN RSA PRIVATE KEY-----"))
-	Expect(simulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(server.URL+"/key.pem"))
+	Expect(simulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(server.URL + "/key.pem"))
 }
 
 func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL_NoOrigins(t *testing.T) {
@@ -1294,7 +1293,7 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL_NoOrigins(t *testing.T) 
 					},
 				},
 				Response: v2.ResponseDetailsViewV5{
-					BodyFile: server.URL+"/key.pem",
+					BodyFile: server.URL + "/key.pem",
 				},
 			}},
 		},
@@ -1324,7 +1323,7 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL_NoMatchingOrigins(t *tes
 					},
 				},
 				Response: v2.ResponseDetailsViewV5{
-					BodyFile: server.URL+"/key.pem",
+					BodyFile: server.URL + "/key.pem",
 				},
 			}},
 		},
