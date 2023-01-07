@@ -31,13 +31,24 @@ func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMa
 }
 
 func isMatching(field models.RequestFieldMatchers, toMatch string) bool {
-	isMatched := false
-	if len(field.Config) > 0 {
-		isMatched = matchers.MatchersWithConfig[strings.ToLower(field.Matcher)](field.Value, toMatch, field.Config)
-	} else {
-		isMatched = matchers.Matchers[strings.ToLower(field.Matcher)](field.Value, toMatch)
+
+	matcher := field
+	actual := toMatch
+	result := false
+	for {
+		matchedValue, isMatched := matchers.Matchers[strings.ToLower(matcher.Matcher)](matcher.Value, actual, matcher.Config)
+		if !isMatched {
+			return false
+		}
+		if matcher.DoMatch == nil {
+			result = isMatched
+			break
+		}
+		matcher = *matcher.DoMatch
+		actual = matchedValue
 	}
-	return isMatched
+
+	return result
 }
 
 type FieldMatch struct {

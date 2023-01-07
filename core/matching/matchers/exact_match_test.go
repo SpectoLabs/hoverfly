@@ -10,34 +10,40 @@ import (
 func Test_ExactMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.ExactMatch(1, "yes")).To(BeFalse())
+	_, isMatched := matchers.ExactMatch(1, "yes", nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_ExactMatch_MatchesTrueWithExactMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.ExactMatch("yes", "yes")).To(BeTrue())
+	matchedValue, isMatched := matchers.ExactMatch("yes", "yes", nil)
+	Expect(isMatched).To(BeTrue())
+	Expect(matchedValue).Should(Equal("yes"))
 }
 
 func Test_ExactMatch_MatchesFalseWithIncorrectExactMatch(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.ExactMatch("yes", "no")).To(BeFalse())
+	_, isMatched := matchers.ExactMatch("yes", "no", nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_ExactMatch_MatchesTrueWithJSON(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.ExactMatch(`{"test":{"json":true,"minified":true}}`, `{"test":{"json":true,"minified":true}}`)).To(BeTrue())
+	_, isMatched := matchers.ExactMatch(`{"test":{"json":true,"minified":true}}`, `{"test":{"json":true,"minified":true}}`, nil)
+	Expect(isMatched).To(BeTrue())
 }
 
 func Test_ExactMatch_MatchesTrueWithUnminifiedJSON(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.ExactMatch(`{"test":{"json":true,"minified":true}}`, `{
+	_, isMatchedValue := matchers.ExactMatch(`{"test":{"json":true,"minified":true}}`, `{
 		"test": {
 			"json": true,
 			"minified": true
 		}
-	}`)).To(BeFalse())
+	}`, nil)
+	Expect(isMatchedValue).To(BeFalse())
 }

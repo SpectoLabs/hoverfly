@@ -130,29 +130,41 @@ var fieldMatcherTests = []fieldMatcherTest{
 		equals:  BeFalse(),
 	},
 	{
-		name: "FieldMatcher_WithMultipleMatchers_ScoresDouble",
+		name: "MatcherChaining1",
 		matchers: []models.RequestFieldMatchers{
 			{
-				Matcher: matchers.Exact,
-				Value:   "test",
-			},
-			{
-				Matcher: matchers.Exact,
-				Value:   "test",
+				Matcher: "xpath",
+				Value:   "/document/id",
+				DoMatch: &models.RequestFieldMatchers{
+					Matcher: "exact",
+					Value:   "12345",
+				},
 			},
 		},
-		toMatch:     "test",
-		scoreEquals: Equal(4),
+		toMatch: "<document><id>12345</id><name>Test</name></document>",
+		equals:  BeTrue(),
 	},
 	{
-		name: "MatcherNameShouldBeCaseInsensitive",
+		name: "MatcherChaining2",
 		matchers: []models.RequestFieldMatchers{
 			{
-				Matcher: "XML",
-				Value:   `<document></document>`,
+				Matcher: "xpath",
+				Value:   "/document/details",
+				DoMatch: &models.RequestFieldMatchers{
+					Matcher: "jsonpath",
+					Value:   "$.name",
+					DoMatch: &models.RequestFieldMatchers{
+						Matcher: "glob",
+						Value:   "*es*",
+						DoMatch: &models.RequestFieldMatchers{
+							Matcher: "exact",
+							Value:   "Test",
+						},
+					},
+				},
 			},
 		},
-		toMatch: `<document></document>`,
+		toMatch: `<document><details>{"name":"Test", "id":"12345"}</details></document>`,
 		equals:  BeTrue(),
 	},
 }

@@ -3,6 +3,7 @@ package matchers
 import (
 	"bytes"
 	"encoding/xml"
+
 	"github.com/ChrisTrenkamp/xsel/exec"
 	"github.com/ChrisTrenkamp/xsel/grammar"
 	"github.com/ChrisTrenkamp/xsel/parser"
@@ -12,19 +13,18 @@ import (
 
 var Xpath = "xpath"
 
-
-func XpathMatch(match interface{}, toMatch string) bool {
+func XpathMatch(match interface{}, toMatch string, config map[string]interface{}) (string, bool) {
 	matchString, ok := match.(string)
 	if !ok {
-		return false
+		return "", false
 	}
 
 	results, err := XpathExecution(matchString, toMatch)
 	if err != nil {
-		return false
+		return "", false
 	}
 
-	return results.Bool()
+	return results.String(), results.Bool()
 }
 
 func XpathExecution(matchString, toMatch string) (exec.Result, error) {
@@ -48,7 +48,6 @@ func XpathExecution(matchString, toMatch string) (exec.Result, error) {
 
 	return results, nil
 }
-
 
 type xmlns struct {
 	Namespaces map[string]string

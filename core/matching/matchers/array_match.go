@@ -14,19 +14,23 @@ const (
 
 var Array = "array"
 
-func ArrayMatch(match interface{}, toMatch string, config map[string]interface{}) bool {
+func ArrayMatch(match interface{}, toMatch string, config map[string]interface{}) (string, bool) {
 	matchStringArr, ok := util.GetStringArray(match)
 	if !ok {
-		return false
+		return "", false
 	}
 	toMatchArr := strings.Split(toMatch, ";")
 	ignoreUnknown := util.GetBoolOrDefault(config, IGNORE_UNKNOWN, false)
 	ignoreOrder := util.GetBoolOrDefault(config, IGNORE_ORDER, false)
 	ignoreOccurrences := util.GetBoolOrDefault(config, IGNORE_OCCURRENCES, false)
 
-	return (ignoreUnknown || hasAllKnown(matchStringArr, toMatchArr)) &&
+	isMatched := (ignoreUnknown || hasAllKnown(matchStringArr, toMatchArr)) &&
 		(ignoreOccurrences || hasSameNoOfOccurrences(matchStringArr, toMatchArr)) &&
 		(ignoreOrder || isInSameOrder(matchStringArr, toMatchArr))
+	if isMatched {
+		return toMatch, isMatched
+	}
+	return "", false
 }
 
 func hasSameNoOfOccurrences(matchGroup, toMatch []string) bool {

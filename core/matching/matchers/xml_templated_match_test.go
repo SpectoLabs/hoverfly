@@ -1537,7 +1537,8 @@ func Test_XmlTemplatedMatch_1(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_2(t *testing.T) {
@@ -1556,7 +1557,8 @@ func Test_XmlTemplatedMatch_2(t *testing.T) {
 			bbb check</bbb>	
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_3(t *testing.T) {
@@ -1576,7 +1578,8 @@ func Test_XmlTemplatedMatch_3(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
 }
 
 func Test_XmlTemplatedMatch_4(t *testing.T) {
@@ -1596,7 +1599,8 @@ func Test_XmlTemplatedMatch_4(t *testing.T) {
 		</xml>								
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_5(t *testing.T) {
@@ -1616,7 +1620,8 @@ func Test_XmlTemplatedMatch_5(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
 }
 
 func Test_XmlTemplatedMatch_6(t *testing.T) {
@@ -1636,7 +1641,8 @@ func Test_XmlTemplatedMatch_6(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_7(t *testing.T) {
@@ -1657,7 +1663,8 @@ func Test_XmlTemplatedMatch_7(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 /*
@@ -2076,8 +2083,9 @@ func Test_XmlTemplatedMatch_23(t *testing.T) {
 			<aaa>test</aaa>							
 		</xml>
 	`
-
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	matchedValue, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
+	Expect(matchedValue).Should(Equal(actual))
 }
 
 func Test_XmlTemplatedMatch_24(t *testing.T) {
@@ -2099,7 +2107,9 @@ func Test_XmlTemplatedMatch_24(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	matchedValue, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
+	Expect(matchedValue).Should(Equal(actual))
 }
 
 func Test_XmlTemplatedMatch_25(t *testing.T) {
@@ -2121,7 +2131,8 @@ func Test_XmlTemplatedMatch_25(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_26(t *testing.T) {
@@ -2141,7 +2152,8 @@ func Test_XmlTemplatedMatch_26(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_27(t *testing.T) {
@@ -2159,7 +2171,8 @@ func Test_XmlTemplatedMatch_27(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_28(t *testing.T) {
@@ -2177,7 +2190,8 @@ func Test_XmlTemplatedMatch_28(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_29(t *testing.T) {
@@ -2195,7 +2209,9 @@ func Test_XmlTemplatedMatch_29(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	matchedValue, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
+	Expect(matchedValue).Should(Equal(matchedValue))
 }
 
 func Test_XmlTemplatedMatch_30(t *testing.T) {
@@ -2213,7 +2229,9 @@ func Test_XmlTemplatedMatch_30(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	matchedValue, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
+	Expect(matchedValue).Should(Equal(actual))
 }
 
 func Test_XmlTemplatedMatch_31(t *testing.T) {
@@ -2231,7 +2249,8 @@ func Test_XmlTemplatedMatch_31(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
 }
 
 func Test_XmlTemplatedMatch_32(t *testing.T) {
@@ -2249,7 +2268,8 @@ func Test_XmlTemplatedMatch_32(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_33(t *testing.T) {
@@ -2267,7 +2287,8 @@ func Test_XmlTemplatedMatch_33(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_34(t *testing.T) {
@@ -2284,8 +2305,8 @@ func Test_XmlTemplatedMatch_34(t *testing.T) {
 			<aaa>xxx</aaa>					
 		</xml>
 	`
-
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_35(t *testing.T) {
@@ -2303,7 +2324,8 @@ func Test_XmlTemplatedMatch_35(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_36(t *testing.T) {
@@ -2321,7 +2343,8 @@ func Test_XmlTemplatedMatch_36(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_37(t *testing.T) {
@@ -2338,8 +2361,8 @@ func Test_XmlTemplatedMatch_37(t *testing.T) {
 			<aaa>12345</aaa>				
 		</xml>
 	`
-
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
 }
 
 func Test_XmlTemplatedMatch_38(t *testing.T) {
@@ -2357,7 +2380,8 @@ func Test_XmlTemplatedMatch_38(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
 }
 
 func Test_XmlTemplatedMatch_39(t *testing.T) {
@@ -2375,7 +2399,8 @@ func Test_XmlTemplatedMatch_39(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
 }
 
 func Test_XmlTemplatedMatch_40(t *testing.T) {
@@ -2393,7 +2418,8 @@ func Test_XmlTemplatedMatch_40(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
 }
 
 func Test_XmlTemplatedMatch_41(t *testing.T) {
@@ -2411,7 +2437,8 @@ func Test_XmlTemplatedMatch_41(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_42(t *testing.T) {
@@ -2429,7 +2456,8 @@ func Test_XmlTemplatedMatch_42(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
 }
 
 func Test_XmlTemplatedMatch_43(t *testing.T) {
@@ -2446,8 +2474,8 @@ func Test_XmlTemplatedMatch_43(t *testing.T) {
 			<aaa>12345</aaa>				
 		</xml>
 	`
-
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_44(t *testing.T) {
@@ -2465,7 +2493,8 @@ func Test_XmlTemplatedMatch_44(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	_, matchedValue := XmlTemplatedMatch(expect, actual, nil)
+	Expect(matchedValue).To(BeTrue())
 }
 
 func Test_XmlTemplatedMatch_45(t *testing.T) {
@@ -2483,7 +2512,8 @@ func Test_XmlTemplatedMatch_45(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_46(t *testing.T) {
@@ -2501,7 +2531,8 @@ func Test_XmlTemplatedMatch_46(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_47(t *testing.T) {
@@ -2519,7 +2550,8 @@ func Test_XmlTemplatedMatch_47(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeTrue())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeTrue())
 }
 
 func Test_XmlTemplatedMatch_48(t *testing.T) {
@@ -2537,7 +2569,8 @@ func Test_XmlTemplatedMatch_48(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_49(t *testing.T) {
@@ -2555,7 +2588,8 @@ func Test_XmlTemplatedMatch_49(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_50(t *testing.T) {
@@ -2573,7 +2607,8 @@ func Test_XmlTemplatedMatch_50(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_51(t *testing.T) {
@@ -2591,7 +2626,8 @@ func Test_XmlTemplatedMatch_51(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_52(t *testing.T) {
@@ -2612,7 +2648,8 @@ func Test_XmlTemplatedMatch_52(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_53(t *testing.T) {
@@ -2635,7 +2672,8 @@ func Test_XmlTemplatedMatch_53(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatched := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatched).To(BeFalse())
 }
 
 func Test_XmlTemplatedMatch_54(t *testing.T) {
@@ -2651,5 +2689,6 @@ func Test_XmlTemplatedMatch_54(t *testing.T) {
 		</xml>
 	`
 
-	Expect(XmlTemplatedMatch(expect, actual)).To(BeFalse())
+	_, isMatch := XmlTemplatedMatch(expect, actual, nil)
+	Expect(isMatch).To(BeFalse())
 }

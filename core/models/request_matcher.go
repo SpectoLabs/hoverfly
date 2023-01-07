@@ -12,6 +12,7 @@ type RequestFieldMatchers struct {
 	Matcher string
 	Value   interface{}
 	Config  map[string]interface{}
+	DoMatch *RequestFieldMatchers
 }
 
 func NewRequestFieldMatchersFromView(matchers []v2.MatcherViewV5) []RequestFieldMatchers {
@@ -20,13 +21,30 @@ func NewRequestFieldMatchersFromView(matchers []v2.MatcherViewV5) []RequestField
 	}
 	convertedMatchers := []RequestFieldMatchers{}
 	for _, matcher := range matchers {
+		doMatch := getDoMatchRequestFromMatcherView(matcher.DoMatch)
 		convertedMatchers = append(convertedMatchers, RequestFieldMatchers{
 			Matcher: matcher.Matcher,
 			Value:   matcher.Value,
 			Config:  matcher.Config,
+			DoMatch: doMatch,
 		})
 	}
 	return convertedMatchers
+}
+
+func getDoMatchRequestFromMatcherView(matcher *v2.MatcherViewV5) *RequestFieldMatchers {
+
+	if matcher == nil {
+		return nil
+	}
+	matcherValue := *matcher
+	return &RequestFieldMatchers{
+		Matcher: matcherValue.Matcher,
+		Value:   matcherValue.Value,
+		Config:  matcherValue.Config,
+		DoMatch: getDoMatchRequestFromMatcherView(matcherValue.DoMatch),
+	}
+
 }
 
 func NewRequestFieldMatchersFromMapView(mapMatchers map[string][]v2.MatcherViewV5) map[string][]RequestFieldMatchers {
@@ -56,10 +74,26 @@ func NewQueryRequestFieldMatchersFromMapView(mapMatchers *v2.QueryMatcherViewV5)
 }
 
 func (this RequestFieldMatchers) BuildView() v2.MatcherViewV5 {
+	doMatch := getViewFromRequestFieldMatcher(this.DoMatch)
 	return v2.MatcherViewV5{
 		Matcher: this.Matcher,
 		Value:   this.Value,
 		Config:  this.Config,
+		DoMatch: doMatch,
+	}
+}
+
+func getViewFromRequestFieldMatcher(matcher *RequestFieldMatchers) *v2.MatcherViewV5 {
+
+	if matcher == nil {
+		return nil
+	}
+	matcherValue := *matcher
+	return &v2.MatcherViewV5{
+		Matcher: matcherValue.Matcher,
+		Value:   matcherValue.Value,
+		Config:  matcherValue.Config,
+		DoMatch: getViewFromRequestFieldMatcher(matcherValue.DoMatch),
 	}
 }
 

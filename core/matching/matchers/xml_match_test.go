@@ -10,28 +10,34 @@ import (
 func Test_XmlMatch_MatchesFalseWithIncorrectDataType(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.XmlMatch(1, "yes")).To(BeFalse())
+	_, isMatched := matchers.XmlMatch(1, "yes", nil)
+	Expect(isMatched).To(BeFalse())
 }
 func Test_XmlMatch_MatchesTrueWithXML(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.XmlMatch(`<xml><document><test></document>`, `<xml><document><test></document>`)).To(BeTrue())
+	matchedValue, isMatched := matchers.XmlMatch(`<xml><document><test></document>`, `<xml><document><test></document>`, nil)
+	Expect(isMatched).To(BeTrue())
+	Expect(matchedValue).Should(Equal(`<xml><document><test></document>`))
 }
 
 func Test_XmlMatch_MatchesTrueWithUnminifiedXml(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.XmlMatch(`<xml>
-		<document>
-			<test key="value">cat</test>
-		</document>`, `<xml><document><test key="value">cat</test></document>`)).To(BeTrue())
+	matchedValue, isMatched := matchers.XmlMatch(`<xml>
+	<document>
+		<test key="value">cat</test>
+	</document>`, `<xml><document><test key="value">cat</test></document>`, nil)
+	Expect(isMatched).To(BeTrue())
+	Expect(matchedValue).Should(Equal(`<xml><document><test key="value">cat</test></document>`))
 }
 
 func Test_XmlMatch_MatchesFalseWithNotMatchingXml(t *testing.T) {
 	RegisterTestingT(t)
 
-	Expect(matchers.XmlMatch(`<xml>
-		<document>
-			<test key="value">cat</test>
-		</document>`, `<xml><document><test key="different">cat</test></document>`)).To(BeFalse())
+	_, isMatched := matchers.XmlMatch(`<xml>
+	<document>
+		<test key="value">cat</test>
+	</document>`, `<xml><document><test key="different">cat</test></document>`, nil)
+	Expect(isMatched).To(BeFalse())
 }

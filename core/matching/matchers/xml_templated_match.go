@@ -11,26 +11,29 @@ var XmlTemplated = "xmltemplated"
 var ignoreExpr = regexp.MustCompile("^\\s*{{\\s*ignore\\s*}}\\s*$")
 var regExpr = regexp.MustCompile("^\\s*{{\\s*regex:(.*)}}\\s*$")
 
-func XmlTemplatedMatch(match interface{}, toMatch string) bool {
+func XmlTemplatedMatch(match interface{}, toMatch string, config map[string]interface{}) (string, bool) {
 	matchString, ok := match.(string)
 	if !ok {
-		return false
+		return "", false
 	}
 
 	// parse xml in mock data into dom tree
 	expected := etree.NewDocument()
 	if err := expected.ReadFromString(matchString); err != nil {
-		return false
+		return "", false
 	}
 
 	// parse xml in actual request body into dom tree
 	actual := etree.NewDocument()
 	if err := actual.ReadFromString(toMatch); err != nil {
-		return false
+		return "", false
 	}
 
 	// tree matching
-	return compareTree(expected.Root(), actual.Root())
+	if isMatched := compareTree(expected.Root(), actual.Root()); isMatched {
+		return toMatch, true
+	}
+	return "", false
 }
 
 func compareTree(expected *etree.Element, actual *etree.Element) bool {

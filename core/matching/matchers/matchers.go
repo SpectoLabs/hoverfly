@@ -1,26 +1,19 @@
 package matchers
 
-type MatcherFunc func(data interface{}, toMatch string) bool
-
-type MatcherFuncWithConfig func(data interface{}, toMatch string, config map[string]interface{}) bool
+type MatcherFunc func(data interface{}, toMatch string, config map[string]interface{}) (string, bool)
 
 var Matchers = map[string]MatcherFunc{
-	// Default matcher
-	"": ExactMatch,
 
+	"":              ExactMatch,
 	Exact:           ExactMatch,
 	Glob:            GlobMatch,
-	Json:            JsonMatch,
-	JsonPath:        JsonPathMatch,
-	JsonPartial:     JsonPartialMatch,
 	Regex:           RegexMatch,
-	Xml:             XmlMatch,
+	JsonPath:        JsonPathMatch,
 	Xpath:           XpathMatch,
-	XmlTemplated:    XmlTemplatedMatch,
+	Array:           ArrayMatch,
 	ContainsExactly: ContainsExactlyMatch,
-	Array:           ContainsExactlyMatch,
-}
-
-var MatchersWithConfig = map[string]MatcherFuncWithConfig{
-	Array: ArrayMatch,
+	Json:            JsonMatch,
+	Xml:             XmlMatch,
+	JsonPartial:     JsonPartialMatch,
+	XmlTemplated:    XmlTemplatedMatch,
 }
