@@ -40,6 +40,7 @@ type MatcherViewV5 struct {
 	Matcher string                 `json:"matcher"`
 	Value   interface{}            `json:"value"`
 	Config  map[string]interface{} `json:"config,omitempty"`
+	DoMatch *MatcherViewV5         `json:"doMatch,omitempty"`
 }
 
 type GlobalVariableViewV5 struct {

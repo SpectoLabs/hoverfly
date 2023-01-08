@@ -31,13 +31,37 @@ func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMa
 }
 
 func isMatching(field models.RequestFieldMatchers, toMatch string) bool {
-	isMatched := false
-	if len(field.Config) > 0 {
-		isMatched = matchers.MatchersWithConfig[strings.ToLower(field.Matcher)](field.Value, toMatch, field.Config)
-	} else {
-		isMatched = matchers.Matchers[strings.ToLower(field.Matcher)](field.Value, toMatch)
+	currentMatcher := field
+	actual := toMatch
+	result := false
+	for {
+
+		var matcherDetails matchers.MatcherDetails
+		isMatched := false
+		if currentMatcher.Config == nil {
+			matcherDetails = matchers.Matchers[strings.ToLower(currentMatcher.Matcher)]
+			isMatched = matcherDetails.MatcherFunction.(func(interface{}, string) bool)(currentMatcher.Value, actual)
+
+		} else {
+			matcherDetails = matchers.MatchersWithConfig[strings.ToLower(currentMatcher.Matcher)]
+			isMatched = matcherDetails.MatcherFunction.(func(interface{}, string, map[string]interface{}) bool)(currentMatcher.Value, actual, currentMatcher.Config)
+
+		}
+		if !isMatched {
+			return false
+		}
+		/* it ll break if match value generator is nil.. incase where we are matching complete details(exact match, containsexactlymatch, jsonmatch or xmlmatch)
+		no need of matcher chaining in such scenarios and if it is there then it will be ignored
+		*/
+		if currentMatcher.DoMatch == nil || matcherDetails.MatchValueGenerator == nil {
+			result = isMatched
+			break
+		}
+		actual = matcherDetails.MatchValueGenerator(currentMatcher.Value, actual)
+		currentMatcher = *currentMatcher.DoMatch
+
 	}
-	return isMatched
+	return result
 }
 
 type FieldMatch struct {
