@@ -589,12 +589,12 @@ Matcher Chaining
 
 - It can be combine any of matchers.
 
-
 For an example, with matcher chaining, one can use JSONPath to get a JSON node, and use other matcher to compare its value as mentioned below. 
 
 Example
 """""""
 .. code:: json
+    
     "matcher":<any matcher>,
     "value":?,
     "doMatch": {
