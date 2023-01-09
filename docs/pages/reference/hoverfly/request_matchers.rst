@@ -579,3 +579,38 @@ Example
             "order:latest",
             "profile:vd"
     ]
+
+Matcher Chaining
+----------------
+
+- Matcher chaining helps to chain multiple matchers. MatchedValue of parent matcher is feed into child matcher and further matching is done.
+  
+- It typically removes the stress of composing and testing complex expressions and make matchers more readable.
+
+- It can be combine any of matchers.
+
+For an example, with matcher chaining, one can use JSONPath to get a JSON node, and use other matcher to compare its value as mentioned below. 
+
+Example
+"""""""
+.. code:: json
+    
+    "matcher":<any matcher>,
+    "value":?,
+    "doMatch": {
+        "matcher": <any matcher>
+        "value":?
+    }
+
+    {
+        body : [
+            {
+                "matcher": "jsonpath",
+                "value": "$.user.id",
+                "doMatch": {
+                    matcher: "exact",
+                    value: "1"
+                }
+            }
+        ]
+
