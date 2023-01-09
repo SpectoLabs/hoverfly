@@ -177,11 +177,19 @@ Example date time formats
     - ``epoch``: UNIX timestamp in milliseconds
 
 
+Conditional Templating, Looping and More
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Hoverfly uses the https://github.com/aymerick/raymond library for templating, which is based on http://handlebarsjs.com/
+
+To learn about more advanced templating functionality, such as looping and conditionals, read the documentation for these projects.
+
 Global Literals and Variables
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 We can define global literals and variables which can be used in any of responses. 
 
 Literals
+~~~~~~~~
 
 - Format to define literals under data is as follow. 
 
@@ -210,6 +218,7 @@ Literals
 
 
 Variables
+~~~~~~~~~
 
 - Format to define variables under data is as follow. 
 
@@ -256,6 +265,7 @@ Variables
     }
 
 Getting data for defined Literals and Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Defined literals and variables can be accessed in any of responses using below way via templating.
 
@@ -264,11 +274,3 @@ Defined literals and variables can be accessed in any of responses using below w
 +-----------+-------------------------------------+
 | Variables | {{Vars.<variable name>}}            |
 +-----------+-------------------------------------+
-
-
-Conditional Templating, Looping and More
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Hoverfly uses the https://github.com/aymerick/raymond library for templating, which is based on http://handlebarsjs.com/
-
-To learn about more advanced templating functionality, such as looping and conditionals, read the documentation for these projects.

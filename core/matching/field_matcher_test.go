@@ -193,22 +193,6 @@ var fieldMatcherTests = []fieldMatcherTest{
 		toMatch: `<document><details>{"name":"Test", "id":"12345"}</details></document>`,
 		equals:  BeTrue(),
 	},
-	{
-		// exactmatch, containsexactly, jsonmatch, xmlmatch match exact details
-		name: "IgnoreDoMatchIncaseOfExactMatcher",
-		matchers: []models.RequestFieldMatchers{
-			{
-				Matcher: "exact",
-				Value:   "test",
-				DoMatch: &models.RequestFieldMatchers{
-					Matcher: "glob",
-					Value:   "*es*",
-				},
-			},
-		},
-		toMatch: "test",
-		equals:  BeTrue(),
-	},
 }
 
 func Test_FieldMatcher(t *testing.T) {

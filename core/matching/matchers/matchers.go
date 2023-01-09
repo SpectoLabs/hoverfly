@@ -13,17 +13,20 @@ type MatcherValueGenerator func(data interface{}, toMatch string) string
 var Matchers = map[string]MatcherDetails{
 	// Default matcher
 	"": {
-		MatcherFunction: ExactMatch,
+		MatcherFunction:     ExactMatch,
+		MatchValueGenerator: IdentityValueGenerator,
 	},
 	Exact: {
-		MatcherFunction: ExactMatch,
+		MatcherFunction:     ExactMatch,
+		MatchValueGenerator: IdentityValueGenerator,
 	},
 	Glob: {
 		MatcherFunction:     GlobMatch,
 		MatchValueGenerator: IdentityValueGenerator,
 	},
 	Json: {
-		MatcherFunction: JsonMatch,
+		MatcherFunction:     JsonMatch,
+		MatchValueGenerator: IdentityValueGenerator,
 	},
 	JsonPath: {
 		MatcherFunction:     JsonPathMatch,
@@ -38,7 +41,8 @@ var Matchers = map[string]MatcherDetails{
 		MatchValueGenerator: IdentityValueGenerator,
 	},
 	Xml: {
-		MatcherFunction: XmlMatch,
+		MatcherFunction:     XmlMatch,
+		MatchValueGenerator: IdentityValueGenerator,
 	},
 	Xpath: {
 		MatcherFunction:     XpathMatch,
@@ -49,7 +53,8 @@ var Matchers = map[string]MatcherDetails{
 		MatchValueGenerator: IdentityValueGenerator,
 	},
 	ContainsExactly: {
-		MatcherFunction: ContainsExactlyMatch,
+		MatcherFunction:     ContainsExactlyMatch,
+		MatchValueGenerator: IdentityValueGenerator,
 	},
 	Array: {
 		MatcherFunction:     ContainsExactlyMatch,
