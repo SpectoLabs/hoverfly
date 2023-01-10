@@ -171,26 +171,23 @@ var fieldMatcherTests = []fieldMatcherTest{
 		equals:  BeTrue(),
 	},
 	{
-		name: "MatcherChaining2",
+		name: "MatcherChaining3",
 		matchers: []models.RequestFieldMatchers{
 			{
-				Matcher: "xpath",
-				Value:   "/document/details",
+				Matcher: "jsonpath",
+				Value:   "$.testArr",
 				DoMatch: &models.RequestFieldMatchers{
-					Matcher: "jsonpath",
-					Value:   "$.name",
-					DoMatch: &models.RequestFieldMatchers{
-						Matcher: "glob",
-						Value:   "*es*",
-						DoMatch: &models.RequestFieldMatchers{
-							Matcher: "exact",
-							Value:   "Test",
-						},
+					Matcher: "array",
+					Value:   []string{"q1", "q2", "q3"},
+					Config: map[string]interface{}{
+						matchers.IGNORE_OCCURRENCES: false,
+						matchers.IGNORE_ORDER:       false,
+						matchers.IGNORE_UNKNOWN:     false,
 					},
 				},
 			},
 		},
-		toMatch: `<document><details>{"name":"Test", "id":"12345"}</details></document>`,
+		toMatch: `{"testArr":["q1", "q2", "q3"]}`,
 		equals:  BeTrue(),
 	},
 }

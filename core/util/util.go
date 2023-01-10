@@ -306,7 +306,7 @@ func ContainsOnly(first, second []string) bool {
 
 func GetStringArray(data interface{}) ([]string, bool) {
 	val := reflect.ValueOf(data)
-	if val.Kind() != reflect.Slice {
+	if val.Kind() != reflect.Slice && val.Kind() != reflect.Array {
 		return nil, false
 	}
 	var dataArr []string
