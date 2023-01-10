@@ -8,7 +8,7 @@ import (
 
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	v1 "github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	log "github.com/sirupsen/logrus"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -130,7 +130,7 @@ type MetaView struct {
 func NewMetaView(version string) *MetaView {
 	return &MetaView{
 		HoverflyVersion: version,
-		SchemaVersion:   "v5.1",
+		SchemaVersion:   "v5.2",
 		TimeExported:    time.Now().Format(time.RFC3339),
 	}
 }

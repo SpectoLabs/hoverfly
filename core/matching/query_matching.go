@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/core/util"
 )
 
 func QueryMatching(requestMatcher models.RequestMatcher, toMatch map[string][]string) *FieldMatch {
@@ -45,7 +46,7 @@ func QueryMatching(requestMatcher models.RequestMatcher, toMatch map[string][]st
 			continue
 		}
 
-		fieldMatch := FieldMatcher(matcherQueryValue, strings.Join(toMatchQueryValues, ";"))
+		fieldMatch := FieldMatcher(matcherQueryValue, getStringToBePassedForMatching(toMatchQueryValues))
 		matcherHeaderValueMatched = fieldMatch.Matched
 		score += fieldMatch.Score
 
@@ -58,4 +59,16 @@ func QueryMatching(requestMatcher models.RequestMatcher, toMatch map[string][]st
 		Matched: matched,
 		Score:   score,
 	}
+}
+
+func getStringToBePassedForMatching(strArr []string) string {
+
+	if len(strArr) <= 1 {
+		return strings.Join(strArr, ";")
+	}
+	byteArr, err := util.JSONMarshal(strArr)
+	if err != nil {
+		return strings.Join(strArr, ";")
+	}
+	return string(byteArr[:])
 }

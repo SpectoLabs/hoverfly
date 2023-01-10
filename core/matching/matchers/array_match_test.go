@@ -19,7 +19,16 @@ func Test_ArrayMatch_ReturnsTrueWithIdenticalArray(t *testing.T) {
 
 	configMap := getConfiguration(false, false, false)
 	arr := [3]string{"q1", "q2", "q3"}
-	Expect(matchers.ArrayMatch(arr[:], "q1;q2;q3", configMap)).To(BeTrue())
+	Expect(matchers.ArrayMatch(arr[:], `["q1", "q2", "q3"]`, configMap)).To(BeTrue())
+}
+
+func Test_ArrayMatch_ReturnsTrueWithIdenticalIntegerArray(t *testing.T) {
+	RegisterTestingT(t)
+
+	configMap := getConfiguration(false, false, false)
+	arr := [3]string{"1", "2", "3"}
+	isMatched := matchers.ArrayMatch(arr[:], `[1, 2, 3]`, configMap)
+	Expect(isMatched).To(BeTrue())
 }
 
 func Test_ArrayMatch_ReturnsTrueWithAllKnownsInArrayAndNotIgnoringUnkowns(t *testing.T) {
@@ -27,14 +36,14 @@ func Test_ArrayMatch_ReturnsTrueWithAllKnownsInArrayAndNotIgnoringUnkowns(t *tes
 
 	configMap := getConfiguration(false, true, true)
 	arr := [3]string{"q1", "q2", "q3"}
-	Expect(matchers.ArrayMatch(arr[:], "q1;q3;q2;q1;q3", configMap)).To(BeTrue())
+	Expect(matchers.ArrayMatch(arr[:], `["q1","q3","q2","q1","q3"]`, configMap)).To(BeTrue())
 }
 func Test_ArrayMatch_ReturnsFalseWithUnkownsInArrayAndNotIgnoringUnkowns(t *testing.T) {
 	RegisterTestingT(t)
 
 	configMap := getConfiguration(false, true, true)
 	arr := [3]string{"q1", "q2", "q3"}
-	Expect(matchers.ArrayMatch(arr[:], "q1;q4;q3;q2", configMap)).To(BeFalse())
+	Expect(matchers.ArrayMatch(arr[:], `["q1", "q4", "q3", "q2"]`, configMap)).To(BeFalse())
 }
 
 func Test_ArrayMatch_ReturnsTrueWithInSameOrderAndNotIgnoringOrder(t *testing.T) {
@@ -42,7 +51,7 @@ func Test_ArrayMatch_ReturnsTrueWithInSameOrderAndNotIgnoringOrder(t *testing.T)
 
 	configMap := getConfiguration(true, true, false)
 	arr := [3]string{"q1", "q2", "q3"}
-	Expect(matchers.ArrayMatch(arr[:], "q1;q2;q3;q2;q4", configMap)).To(BeTrue())
+	Expect(matchers.ArrayMatch(arr[:], `["q1","q2","q3","q2","q4"]`, configMap)).To(BeTrue())
 }
 
 func Test_ArrayMatch_ReturnsFalseWithOutOfOrderAndNotIgnoringOrder(t *testing.T) {
@@ -50,7 +59,7 @@ func Test_ArrayMatch_ReturnsFalseWithOutOfOrderAndNotIgnoringOrder(t *testing.T)
 
 	configMap := getConfiguration(true, true, false)
 	arr := [3]string{"q1", "q2", "q3"}
-	Expect(matchers.ArrayMatch(arr[:], "q1;q3;q3;q2;q4", configMap)).To(BeFalse())
+	Expect(matchers.ArrayMatch(arr[:], `["q1","q3","q3","q2","q4"]`, configMap)).To(BeFalse())
 }
 
 func Test_ArrayMatch_ReturnsTrueWithSameOccurrencesAndNotIgnoringOccurrences(t *testing.T) {
@@ -58,7 +67,7 @@ func Test_ArrayMatch_ReturnsTrueWithSameOccurrencesAndNotIgnoringOccurrences(t *
 
 	configMap := getConfiguration(true, false, true)
 	arr := [3]string{"q1", "q2", "q3"}
-	Expect(matchers.ArrayMatch(arr[:], "q1;q3;q0;q2;q4", configMap)).To(BeTrue())
+	Expect(matchers.ArrayMatch(arr[:], `["q1","q3","q0","q2","q4"]`, configMap)).To(BeTrue())
 }
 
 func Test_ArrayMatch_ReturnsFalseWithDifferentNoOfOccurrencesAndNotIgnoringOccurrences(t *testing.T) {
@@ -66,7 +75,7 @@ func Test_ArrayMatch_ReturnsFalseWithDifferentNoOfOccurrencesAndNotIgnoringOccur
 
 	configMap := getConfiguration(true, false, true)
 	arr := [3]string{"q1", "q2", "q3"}
-	Expect(matchers.ArrayMatch(arr[:], "q1;q3;q3;q2;q4", configMap)).To(BeFalse())
+	Expect(matchers.ArrayMatch(arr[:], `["q1","q3","q3","q2","q4"]`, configMap)).To(BeFalse())
 }
 
 func getConfiguration(ignoreUnknown, ignoreOccurrences, ignoreOrder bool) map[string]interface{} {

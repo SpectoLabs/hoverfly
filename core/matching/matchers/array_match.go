@@ -1,9 +1,11 @@
 package matchers
 
 import (
-	"strings"
+	"encoding/json"
+	"fmt"
 
 	"github.com/SpectoLabs/hoverfly/core/util"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -19,7 +21,10 @@ func ArrayMatch(match interface{}, toMatch string, config map[string]interface{}
 	if !ok {
 		return false
 	}
-	toMatchArr := strings.Split(toMatch, ";")
+	toMatchArr, err := unMarshalArray(toMatch)
+	if err != nil {
+		return false
+	}
 	ignoreUnknown := util.GetBoolOrDefault(config, IGNORE_UNKNOWN, false)
 	ignoreOrder := util.GetBoolOrDefault(config, IGNORE_ORDER, false)
 	ignoreOccurrences := util.GetBoolOrDefault(config, IGNORE_OCCURRENCES, false)
@@ -29,6 +34,19 @@ func ArrayMatch(match interface{}, toMatch string, config map[string]interface{}
 		(ignoreOrder || isInSameOrder(matchStringArr, toMatchArr))
 }
 
+func unMarshalArray(jsonArrStr string) ([]string, error) {
+
+	var arr []interface{}
+	if err := json.Unmarshal([]byte(jsonArrStr), &arr); err != nil {
+		log.Errorf("Cannot unmarshal to array %s", err.Error())
+		return []string{}, err
+	}
+	var strArr []string
+	for _, value := range arr {
+		strArr = append(strArr, fmt.Sprint(value))
+	}
+	return strArr, nil
+}
 func hasSameNoOfOccurrences(matchGroup, toMatch []string) bool {
 
 	matchGroupSet := make(map[string]int)
