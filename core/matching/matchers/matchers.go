@@ -60,6 +60,10 @@ var Matchers = map[string]MatcherDetails{
 		MatcherFunction:     ContainsExactlyMatch,
 		MatchValueGenerator: IdentityValueGenerator,
 	},
+	JWT: {
+		MatcherFunction:     JwtMatcher,
+		MatchValueGenerator: JwtMatchValueGenerator,
+	},
 }
 
 type MatcherDetails struct {
