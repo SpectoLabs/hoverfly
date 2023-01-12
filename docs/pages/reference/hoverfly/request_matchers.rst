@@ -580,6 +580,21 @@ Example
             "profile:vd"
     ]
 
+JWT Matcher
+-----------
+
+This matcher is primarily used for matching JWT tokens. This matcher converts base64 encoded JWT to JSON document ({"header": {}, "payload": ""}) and does partial match with the matcher value. 
+
+Matcher value contains only keys that they want to match in JWT.
+
+Example
+"""""""
+    .. code:: json
+
+        "matcher": "jwt"
+        "value": "{\"header\":{\"alg\":\"HS256\"},\"payload\":{\"sub\":\"1234567890\",\"name\":\"John Doe\"}}"
+
+
 Matcher Chaining
 ----------------
 

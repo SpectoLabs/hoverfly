@@ -53,3 +53,10 @@ func Test_XPathValueGenerator_ReturnsEmbeddedJson(t *testing.T) {
 	value := matchers.XPathMatchValueGenerator("/document/details", `<document><details>{"id":1234,"name":"test"}</details></document>`)
 	Expect(value).Should(Equal(`{"id":1234,"name":"test"}`))
 }
+
+func TestJwtMatchValueGenerator_ReturnsJWTAsJson(t *testing.T) {
+	RegisterTestingT(t)
+	value := matchers.JwtMatchValueGenerator(`{"header":{"alg":"HS256"},"payload":{"sub":"1234567890","name":"John Doe"}}`,
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
+	Expect(value).Should(Equal(`{"header":{"alg":"HS256","typ":"JWT"},"payload":{"iat":1516239022,"name":"John Doe","sub":"1234567890"}}`))
+}
