@@ -13,17 +13,16 @@ var JWT = "jwt"
 
 func JwtMatcher(data interface{}, toMatch string) bool {
 
-	jwt, err := GetJWT(toMatch)
+	jwt, err := ParseJWT(toMatch)
 	if err != nil {
 		log.Errorf("Error occurred while fetching jwt token %s", err.Error())
 		return false
 	}
-	fmt.Println(jwt)
 	return JsonPartialMatch(data, jwt)
 
 }
 
-func GetJWT(str string) (string, error) {
+func ParseJWT(str string) (string, error) {
 	toMatchArr := strings.Split(str, ".")
 	if len(toMatchArr) != 3 {
 		//invalid json token

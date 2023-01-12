@@ -79,10 +79,10 @@ func XPathMatchValueGenerator(match interface{}, toMatch string) string {
 
 func JwtMatchValueGenerator(match interface{}, toMatch string) string {
 
-	if jwt, err := GetJWT(toMatch); err == nil {
+	if jwt, err := ParseJWT(toMatch); err == nil {
 		return jwt
 	} else {
-		log.Errorf("Failed to generate jwt value %s", err.Error())
+		log.Errorf("Failed to parse JWT %s", err.Error())
 		return ""
 	}
 }

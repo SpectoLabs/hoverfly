@@ -590,9 +590,6 @@ Matcher value contains only keys that they want to match in JWT.
 Example
 """""""
     .. code:: json
-        
-        "matcher": "jwt"
-        "value": "?"
 
         "matcher": "jwt"
         "value": "{\"header\":{\"alg\":\"HS256\"},\"payload\":{\"sub\":\"1234567890\",\"name\":\"John Doe\"}}"
