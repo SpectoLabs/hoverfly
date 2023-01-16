@@ -17,13 +17,13 @@ hoverctl-build: hoverctl-test
 CORE_FUNCTIONAL_TESTS = $(shell cd functional-tests/core && go list ./...)
 
 hoverfly-functional-test: hoverfly-build
-	rm functional-tests/core/bin/hoverfly
+	rm -f functional-tests/core/bin/hoverfly
 	cp target/hoverfly functional-tests/core/bin/hoverfly
 	cd functional-tests/core && \
 	go test -v $(CORE_FUNCTIONAL_TESTS)
 
 hoverctl-functional-test:
-	rm functional-tests/hoverctl/bin/hoverfly
+	rm -f functional-tests/hoverctl/bin/hoverfly
 	cp target/hoverfly functional-tests/hoverctl/bin/hoverfly
 	cd functional-tests/hoverctl && \
 	go test -v $(go list ./... | grep -v -E 'vendor')
