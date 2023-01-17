@@ -362,7 +362,7 @@ func v2GetMatchersFromRequestFieldMatchersView(requestFieldMatchers *RequestFiel
 
 func newMetaView(originalMeta MetaView) MetaView {
 	return MetaView{
-		SchemaVersion:   "v5.1",
+		SchemaVersion:   "v5.2",
 		HoverflyVersion: originalMeta.HoverflyVersion,
 		TimeExported:    originalMeta.TimeExported,
 	}

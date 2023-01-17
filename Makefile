@@ -17,11 +17,13 @@ hoverctl-build: hoverctl-test
 CORE_FUNCTIONAL_TESTS = $(shell cd functional-tests/core && go list ./...)
 
 hoverfly-functional-test: hoverfly-build
+	rm -f functional-tests/core/bin/hoverfly
 	cp target/hoverfly functional-tests/core/bin/hoverfly
 	cd functional-tests/core && \
 	go test -v $(CORE_FUNCTIONAL_TESTS)
 
 hoverctl-functional-test:
+	rm -f functional-tests/hoverctl/bin/hoverfly
 	cp target/hoverfly functional-tests/hoverctl/bin/hoverfly
 	cd functional-tests/hoverctl && \
 	go test -v $(go list ./... | grep -v -E 'vendor')
@@ -40,7 +42,7 @@ build:
 
 build-ui:
 	wget https://github.com/SpectoLabs/hoverfly-ui/releases/download/$(GIT_TAG_NAME)/$(GIT_TAG_NAME).zip
-	unzip $(GIT_TAG_NAME).zip -d hoverfly-ui	
+	unzip $(GIT_TAG_NAME).zip -d hoverfly-ui
 	cd core && \
 	statik -src=../hoverfly-ui
 	rm -rf $(GIT_TAG_NAME).zip

@@ -95,7 +95,7 @@ func Test_upgradeV1_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Test", []string{"headers"}))
 
-	Expect(upgradedSimulation.SchemaVersion).To(Equal("v5.1"))
+	Expect(upgradedSimulation.SchemaVersion).To(Equal("v5.2"))
 	Expect(upgradedSimulation.HoverflyVersion).To(Equal("test"))
 	Expect(upgradedSimulation.TimeExported).To(Equal("today"))
 }
@@ -315,7 +315,7 @@ func Test_upgradeV2_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Test", []string{"headers"}))
 
-	Expect(upgradedSimulation.SchemaVersion).To(Equal("v5.1"))
+	Expect(upgradedSimulation.SchemaVersion).To(Equal("v5.2"))
 	Expect(upgradedSimulation.HoverflyVersion).To(Equal("test"))
 	Expect(upgradedSimulation.TimeExported).To(Equal("today"))
 }
@@ -540,7 +540,7 @@ func Test_upgradeV4_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.EncodedBody).To(BeFalse())
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Headers).To(HaveKeyWithValue("Test", []string{"headers"}))
 
-	Expect(upgradedSimulation.SchemaVersion).To(Equal("v5.1"))
+	Expect(upgradedSimulation.SchemaVersion).To(Equal("v5.2"))
 	Expect(upgradedSimulation.HoverflyVersion).To(Equal("test"))
 	Expect(upgradedSimulation.TimeExported).To(Equal("today"))
 }

@@ -3,10 +3,10 @@
 
 Sequences
 =========
-Using state, it is possible to recreate a sequence of different responses that may come back given a single request. 
+Using state, it is possible to recreate a sequence of different responses that may come back given a single request.
 This can be useful when trying to test stateful endpoints.
 
-When defining state for request response pairs, if you prefix your state key with the string ``sequence:``, Hoverfly 
+When defining state for request response pairs, if you prefix your state key with the string ``sequence:``, Hoverfly
 will acknowledge the pair as being part of a stateful sequence. When simulating this sequence, Hoverfly will keep track
 of the user's position in the sequence and move them forwards.
 
@@ -44,6 +44,6 @@ Once Hoverfly has reached the end of the sequence, it will continue to return th
         ]
       },
       "meta": {
-        "schemaVersion": "v5.1"
+        "schemaVersion": "v5.2"
       }
     }
