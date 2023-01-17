@@ -133,3 +133,8 @@ type DiffReportEntry struct {
 	Expected string `json:"expected"`
 	Actual   string `json:"actual"`
 }
+
+type DiffFilterView struct {
+	ExcludedHeaders        []string `json:"excludedHeaders"`
+	ExcludedResponseFields []string `json:"excludedResponseFields"`
+}
