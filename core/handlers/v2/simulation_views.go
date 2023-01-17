@@ -34,7 +34,7 @@ func NewSimulationViewFromRequestBody(requestBody []byte) (SimulationViewV5, err
 
 	if schemaVersion == "v5" || schemaVersion == "v5.1" || schemaVersion == "v5.2" {
 
-		err := ValidateSimulation(jsonMap, SimulationViewV5Schema)
+		err := ValidateSimulationSchemaFromFile(jsonMap, SimulationViewV5Schema)
 		if err != nil {
 			return simulationView, errors.New(fmt.Sprintf("Invalid %s simulation: ", schemaVersion) + err.Error())
 		}
@@ -96,6 +96,17 @@ func ValidateSimulation(json, schema map[string]interface{}) error {
 	jsonLoader := gojsonschema.NewGoLoader(json)
 	schemaLoader := gojsonschema.NewGoLoader(schema)
 
+	return validateSimulation(schemaLoader, jsonLoader)
+}
+
+func ValidateSimulationSchemaFromFile(json map[string]interface{}, schema []byte) error {
+	jsonLoader := gojsonschema.NewGoLoader(json)
+	schemaLoader := gojsonschema.NewBytesLoader(schema)
+
+	return validateSimulation(schemaLoader, jsonLoader)
+}
+
+func validateSimulation(schemaLoader, jsonLoader gojsonschema.JSONLoader) error {
 	result, err := gojsonschema.Validate(schemaLoader, jsonLoader)
 	if err != nil {
 		log.Error("Error when validating simulation: " + err.Error())

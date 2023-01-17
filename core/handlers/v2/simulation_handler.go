@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -106,9 +105,8 @@ func (this *SimulationHandler) Options(w http.ResponseWriter, r *http.Request, n
 }
 
 func (this *SimulationHandler) GetSchema(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	bytes, _ := json.Marshal(SimulationViewV5Schema)
 
-	handlers.WriteResponse(w, bytes)
+	handlers.WriteResponse(w, SimulationViewV5Schema)
 }
 
 func (this *SimulationHandler) OptionsSchema(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
