@@ -1,9 +1,8 @@
 package api_test
 
 import (
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
+	"io"
+	"os"
 
 	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
@@ -33,16 +32,13 @@ var _ = Describe("/api/v2/simulation/schema", func() {
 			res := functional_tests.DoRequest(req)
 			Expect(res.StatusCode).To(Equal(200))
 
-			fileBytes, err := ioutil.ReadFile("../../../schema.json")
+			fileBytes, err := os.ReadFile("../../../core/handlers/v2/schema.json")
 			Expect(err).To(BeNil(), "schema.json not found")
 
-			fileBuffer := new(bytes.Buffer)
-			json.Compact(fileBuffer, fileBytes)
-
-			responseJson, err := ioutil.ReadAll(res.Body)
+			responseJson, err := io.ReadAll(res.Body)
 			Expect(err).To(BeNil())
 
-			Expect(responseJson).To(Equal(fileBuffer.Bytes()))
+			Expect(responseJson).To(Equal(fileBytes))
 		})
 	})
 })
