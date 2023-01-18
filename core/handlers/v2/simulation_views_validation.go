@@ -1,5 +1,7 @@
 package v2
 
+import _ "embed"
+
 var requestResponsePairDefinition = map[string]interface{}{
 	"type": "object",
 	"required": []string{
@@ -60,27 +62,6 @@ var requestV3Definition = map[string]interface{}{
 		},
 		"headers": map[string]interface{}{
 			"$ref": "#/definitions/headers",
-		},
-	},
-}
-
-var responseDefinitionV3 = map[string]interface{}{
-	"type": "object",
-	"properties": map[string]interface{}{
-		"body": map[string]interface{}{
-			"type": "string",
-		},
-		"encodedBody": map[string]interface{}{
-			"type": "boolean",
-		},
-		"headers": map[string]interface{}{
-			"$ref": "#/definitions/headers",
-		},
-		"status": map[string]interface{}{
-			"type": "integer",
-		},
-		"templated": map[string]interface{}{
-			"type": "boolean",
 		},
 	},
 }
@@ -149,30 +130,6 @@ var delaysDefinition = map[string]interface{}{
 	},
 }
 
-var delaysLogNormalDefinition = map[string]interface{}{
-	"type": "object",
-	"properties": map[string]interface{}{
-		"urlPattern": map[string]interface{}{
-			"type": "string",
-		},
-		"httpMethod": map[string]interface{}{
-			"type": "string",
-		},
-		"min": map[string]interface{}{
-			"type": "integer",
-		},
-		"max": map[string]interface{}{
-			"type": "integer",
-		},
-		"mean": map[string]interface{}{
-			"type": "integer",
-		},
-		"median": map[string]interface{}{
-			"type": "integer",
-		},
-	},
-}
-
 var metaDefinition = map[string]interface{}{
 	"type": "object",
 	"required": []string{
@@ -188,51 +145,6 @@ var metaDefinition = map[string]interface{}{
 		"timeExported": map[string]interface{}{
 			"type": "string",
 		},
-	},
-}
-
-var SimulationViewV3Schema = map[string]interface{}{
-	"description": "Hoverfly simulation schema",
-	"type":        "object",
-	"required": []string{
-		"data", "meta",
-	},
-	"additionalProperties": false,
-	"properties": map[string]interface{}{
-		"data": map[string]interface{}{
-			"type": "object",
-			"properties": map[string]interface{}{
-				"pairs": map[string]interface{}{
-					"type": "array",
-					"items": map[string]interface{}{
-						"$ref": "#/definitions/request-response-pair",
-					},
-				},
-				"globalActions": map[string]interface{}{
-					"type": "object",
-					"properties": map[string]interface{}{
-						"delays": map[string]interface{}{
-							"type": "array",
-							"items": map[string]interface{}{
-								"$ref": "#/definitions/delay",
-							},
-						},
-					},
-				},
-			},
-		},
-		"meta": map[string]interface{}{
-			"$ref": "#/definitions/meta",
-		},
-	},
-	"definitions": map[string]interface{}{
-		"request-response-pair": requestResponsePairDefinition,
-		"request":               requestV3Definition,
-		"response":              responseDefinitionV3,
-		"field-matchers":        requestFieldMatchersV3Definition,
-		"headers":               headersDefinition,
-		"delay":                 delaysDefinition,
-		"meta":                  metaDefinition,
 	},
 }
 
@@ -432,176 +344,7 @@ var responseDefinitionV4 = map[string]interface{}{
 	},
 }
 
-var responseDefinitionV5 = map[string]interface{}{
-	"type": "object",
-	"properties": map[string]interface{}{
-		"body": map[string]interface{}{
-			"type": "string",
-		},
-		"bodyFile": map[string]interface{}{
-			"type": "string",
-		},
-		"encodedBody": map[string]interface{}{
-			"type": "boolean",
-		},
-		"headers": map[string]interface{}{
-			"$ref": "#/definitions/headers",
-		},
-		"status": map[string]interface{}{
-			"type": "integer",
-		},
-		"templated": map[string]interface{}{
-			"type": "boolean",
-		},
-		"removesState": map[string]interface{}{
-			"type": "array",
-		},
-		"transitionsState": map[string]interface{}{
-			"type": "object",
-			"patternProperties": map[string]interface{}{
-				".{1,}": map[string]interface{}{"type": "string"},
-			},
-		},
-		"fixedDelay": map[string]interface{}{
-			"type": "integer",
-		},
-		"logNormalDelay": map[string]interface{}{
-			"properties": map[string]interface{}{
-				"min": map[string]interface{}{
-					"type": "integer",
-				},
-				"max": map[string]interface{}{
-					"type": "integer",
-				},
-				"mean": map[string]interface{}{
-					"type": "integer",
-				},
-				"median": map[string]interface{}{
-					"type": "integer",
-				},
-			},
-		},
-	},
-}
-
-
-
-
 // V5 Schema
-
-var SimulationViewV5Schema = map[string]interface{}{
-	"description": "Hoverfly simulation schema",
-	"type":        "object",
-	"required": []string{
-		"data", "meta",
-	},
-	"additionalProperties": false,
-	"properties": map[string]interface{}{
-		"data": map[string]interface{}{
-			"type": "object",
-			"properties": map[string]interface{}{
-				"pairs": map[string]interface{}{
-					"type": "array",
-					"items": map[string]interface{}{
-						"$ref": "#/definitions/request-response-pair",
-					},
-				},
-				"globalActions": map[string]interface{}{
-					"type": "object",
-					"properties": map[string]interface{}{
-						"delays": map[string]interface{}{
-							"type": "array",
-							"items": map[string]interface{}{
-								"$ref": "#/definitions/delay",
-							},
-						},
-						"delaysLogNormal": map[string]interface{}{
-							"type": "array",
-							"items": map[string]interface{}{
-								"$ref": "#/definitions/delay-log-normal",
-							},
-						},
-					},
-				},
-			},
-		},
-		"meta": map[string]interface{}{
-			"$ref": "#/definitions/meta",
-		},
-	},
-	"definitions": map[string]interface{}{
-		"request-response-pair": requestResponsePairDefinition,
-		"request":               requestV5Definition,
-		"response":              responseDefinitionV5,
-		"field-matchers":        requestFieldMatchersV5Definition,
-		"headers":               headersDefinition,
-		"request-headers":       v5MatchersMapDefinition,
-		"request-queries":       v5MatchersMapDefinition,
-		"delay":                 delaysDefinition,
-		"delay-log-normal":      delaysLogNormalDefinition,
-		"meta":                  metaDefinition,
-	},
-}
-
-var requestV5Definition = map[string]interface{}{
-	"type": "object",
-	"properties": map[string]interface{}{
-		"scheme": map[string]interface{}{
-			"type": "array",
-			"items": map[string]interface{}{
-				"$ref": "#/definitions/field-matchers",
-			},
-		},
-		"destination": map[string]interface{}{
-			"type": "array",
-			"items": map[string]interface{}{
-				"$ref": "#/definitions/field-matchers",
-			},
-		},
-		"path": map[string]interface{}{
-			"type": "array",
-			"items": map[string]interface{}{
-				"$ref": "#/definitions/field-matchers",
-			},
-		},
-		"query": map[string]interface{}{
-			"$ref": "#/definitions/request-queries",
-		},
-		"body": map[string]interface{}{
-			"type": "array",
-			"items": map[string]interface{}{
-				"$ref": "#/definitions/field-matchers",
-			},
-		},
-		"headers": map[string]interface{}{
-			"$ref": "#/definitions/request-headers",
-		},
-		"requiresState": map[string]interface{}{
-			"type": "object",
-			"patternProperties": map[string]interface{}{
-				".{1,}": map[string]interface{}{"type": "string"},
-			},
-		},
-	},
-}
-
-var requestFieldMatchersV5Definition = map[string]interface{}{
-	"type": "object",
-	"properties": map[string]interface{}{
-		"matcher": map[string]interface{}{
-			"type": "string",
-		},
-		"value": map[string]interface{}{},
-	},
-}
-
-var v5MatchersMapDefinition = map[string]interface{}{
-	"type": "object",
-	"additionalProperties": map[string]interface{}{
-		"type": "array",
-		"items": map[string]interface{}{
-			"$ref": "#/definitions/field-matchers",
-		},
-	},
-}
-
+//
+//go:embed schema.json
+var SimulationViewV5Schema []byte

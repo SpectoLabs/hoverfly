@@ -4,9 +4,9 @@ Request Responses Pairs
 =======================
 
 Hoverfly simulates APIs by matching **incoming requests** from the client to **stored requests**. Stored requests have an associated
-**stored response** which is returned to the client if the match is successful.  
+**stored response** which is returned to the client if the match is successful.
 
-The matching logic that Hoverfly uses to compare incoming requests with stored requests can be configured using **Request Matchers**. 
+The matching logic that Hoverfly uses to compare incoming requests with stored requests can be configured using **Request Matchers**.
 
 .. _matchers:
 
@@ -16,8 +16,8 @@ Request Matchers
 When Hoverfly captures a request, it creates a Request Matcher for each field in the request. A Request Matcher consists of
 the request field name, the type of match which will be used to compare the field in the incoming request to the field in the stored
 request, and the request field value.
- 
-By default, Hoverfly will set the type of match to :code:`exact` for each field. 
+
+By default, Hoverfly will set the type of match to :code:`exact` for each field.
 
 .. seealso::
 
@@ -25,9 +25,9 @@ By default, Hoverfly will set the type of match to :code:`exact` for each field.
     examples of how to use them.
 
     There alse are two different matching strategies: **strongest match** (default) and **first match** (legacy). Please refer to
-    :ref:`matching` for more information. 
+    :ref:`matching` for more information.
 
-    
+
 An example Request Matcher Set might look like this:
 
 +-------------+-------------+------------------------------------+
@@ -37,7 +37,7 @@ An example Request Matcher Set might look like this:
 +-------------+-------------+------------------------------------+
 | method      | exact       | "GET"                              |
 +-------------+-------------+------------------------------------+
-| destination | exact       | "docs.hoverfly.io"                 |         
+| destination | exact       | "docs.hoverfly.io"                 |
 +-------------+-------------+------------------------------------+
 | path        | exact       | "/pages/keyconcepts/templates.html"|
 +-------------+-------------+------------------------------------+
@@ -48,7 +48,7 @@ An example Request Matcher Set might look like this:
 | headers     | exact       |                                    |
 +-------------+-------------+------------------------------------+
 
-In the Hoverfly simulation JSON file, this Request Matcher Set would be represented like this: 
+In the Hoverfly simulation JSON file, this Request Matcher Set would be represented like this:
 
 .. literalinclude:: ../../simulations/basic-simulation.json
    :lines: 5-44
@@ -59,10 +59,10 @@ In the Hoverfly simulation JSON file, this Request Matcher Set would be represen
 :ref:`View entire simulation file <basic_simulation>`
 
 The matching logic that Hoverfly uses to compare an incoming request to a stored request can be changed by editing the Request Matchers in the simulation
-JSON file. 
+JSON file.
 
 It is not necessary to have a Request Matcher for every request field. By omitting Request Matchers, it is possible to implement **partial matching** - meaning
-that Hoverfly will return one stored response for multiple incoming requests. 
+that Hoverfly will return one stored response for multiple incoming requests.
 
 For example, this Request Matcher will match any incoming request to the :code:`docs.hoverfly.io` destination:
 
@@ -81,23 +81,23 @@ In the example below, the :code:`globMatch` Request Matcher type is used to matc
    :lines: 27-32
    :linenos:
    :language: javascript
-   
+
 
 :ref:`View entire simulation file <all_matchers_simulation>`
 
 It is also possible to use more than one Request Matcher for each field.
 
-In the example below, a :code:`regexMatch` **and** a :code:`globMatch` are used on the :code:`destination` field. 
+In the example below, a :code:`regexMatch` **and** a :code:`globMatch` are used on the :code:`destination` field.
 
 This will match on any subdomain of :code:`hoverfly.io` which begins with the letter :code:`d`. This means that
-incoming requests to :code:`docs.hoverfly.io` and :code:`dogs.hoverfly.io` will be matched, but requests to 
+incoming requests to :code:`docs.hoverfly.io` and :code:`dogs.hoverfly.io` will be matched, but requests to
 :code:`cats.hoverfly.io` will not be matched.
 
 .. literalinclude:: ../../simulations/all-matchers-simulation.json
    :lines: 48-57
    :linenos:
    :language: javascript
-   
+
 
 :ref:`View entire simulation file <all_matchers_simulation>`
 
@@ -110,7 +110,7 @@ incoming requests to :code:`docs.hoverfly.io` and :code:`dogs.hoverfly.io` will 
     For a practical example of how to use a Request Matcher, please refer to :ref:`loosematching` in the tutorials section.
 
     There alse are two different matching strategies: **strongest match** (default) and **first match** (legacy). Please refer to
-    :ref:`matching` for more information. 
+    :ref:`matching` for more information.
 
 
 Responses
@@ -125,7 +125,7 @@ Each Request Matcher Set has a response associated with is. If the request match
 
 :ref:`View entire simulation file <basic_simulation>`
 
-Editing the fields in response, combined with editing the Request Matcher set, makes it possible to configure complex request/response logic. 
+Editing the fields in response, combined with editing the Request Matcher set, makes it possible to configure complex request/response logic.
 
 Binary data in responses
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -170,7 +170,7 @@ response bodies from external urls:
     "status": 200,
     "encodedBody": false,
     "templated": false,
-    "bodyFile": "https://raw.githubusercontent.com/SpectoLabs/hoverfly/master/schema.json"
+    "bodyFile": "https://raw.githubusercontent.com/SpectoLabs/hoverfly/master/core/handlers/v2/schema.json"
   }
 
 Like local files, this feature is supported only on simulation import. To escape security issues there's another

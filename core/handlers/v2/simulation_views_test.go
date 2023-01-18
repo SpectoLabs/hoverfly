@@ -70,7 +70,7 @@ func Test_NewSimulationViewFromRequestBody_CanCreateSimulationFromV3Payload(t *t
 	Expect(simulation.GlobalActions.DelaysLogNormal[0].Mean).To(Equal(3))
 	Expect(simulation.GlobalActions.DelaysLogNormal[0].Median).To(Equal(2))
 
-	Expect(simulation.SchemaVersion).To(Equal("v5.1"))
+	Expect(simulation.SchemaVersion).To(Equal("v5.2"))
 	Expect(simulation.HoverflyVersion).To(Equal("v0.11.0"))
 	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
 }
@@ -137,7 +137,7 @@ func Test_NewSimulationViewFromRequestBody_CanCreateSimulationFromV2Payload(t *t
 	Expect(simulation.GlobalActions.DelaysLogNormal[0].Mean).To(Equal(3))
 	Expect(simulation.GlobalActions.DelaysLogNormal[0].Median).To(Equal(2))
 
-	Expect(simulation.SchemaVersion).To(Equal("v5.1"))
+	Expect(simulation.SchemaVersion).To(Equal("v5.2"))
 	Expect(simulation.HoverflyVersion).To(Equal("v0.11.0"))
 	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
 }
@@ -230,7 +230,7 @@ func Test_NewSimulationViewFromRequestBody_CanCreateSimulationFromV1Payload(t *t
 	Expect(simulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(simulation.RequestResponsePairs[0].Response.Templated).To(BeFalse())
 
-	Expect(simulation.SchemaVersion).To(Equal("v5.1"))
+	Expect(simulation.SchemaVersion).To(Equal("v5.2"))
 	Expect(simulation.HoverflyVersion).To(Equal("v0.11.0"))
 	Expect(simulation.TimeExported).To(Equal("2017-02-23T12:43:48Z"))
 }
