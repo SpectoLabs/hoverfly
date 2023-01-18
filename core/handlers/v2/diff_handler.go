@@ -40,7 +40,7 @@ func (this *DiffHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler)
 
 func (this *DiffHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	diffsToReturn := ConvertToResponseDiffView(this.Hoverfly.GetDiff())
+	diffsToReturn := convertToResponseDiffView(this.Hoverfly.GetDiff())
 	marshal, err := json.Marshal(DiffView{
 		Diff: diffsToReturn,
 	})
@@ -71,7 +71,7 @@ func (this *DiffHandler) GetFilteredData(w http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	diffsToReturn := ConvertToResponseDiffView(this.Hoverfly.GetFilteredDiff(diffFilterView))
+	diffsToReturn := convertToResponseDiffView(this.Hoverfly.GetFilteredDiff(diffFilterView))
 	marshal, err := json.Marshal(DiffView{
 		Diff: diffsToReturn,
 	})
@@ -82,7 +82,7 @@ func (this *DiffHandler) GetFilteredData(w http.ResponseWriter, req *http.Reques
 	handlers.WriteResponse(w, marshal)
 }
 
-func ConvertToResponseDiffView(responsesDiff map[SimpleRequestDefinitionView][]DiffReport) []ResponseDiffForRequestView {
+func convertToResponseDiffView(responsesDiff map[SimpleRequestDefinitionView][]DiffReport) []ResponseDiffForRequestView {
 
 	var diffsToReturn []ResponseDiffForRequestView
 	for request, value := range responsesDiff {

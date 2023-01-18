@@ -925,6 +925,21 @@ Gets all reports containing response differences from Hoverfly. The diffs are re
 
 -------------------------------------------------------------------------------------------------------------
 
+
+POST /api/v2/diff
+"""""""""""""""""
+Gets reports containing response differences from Hoverfly filtered on basis of excluded criteria provided(i.e. headers and response keys in jsonpath format to exclude). The diffs are in same format as we receive in GET request.
+
+**Example request body**
+::
+  {
+    "excludedHeaders":["Date"],
+    "excludedResponseFields":["$.time"]
+  }
+
+
+-------------------------------------------------------------------------------------------------------------
+
 DELETE /api/v2/diff
 """"""""""""""""""""
 Deletes all reports containing differences from Hoverfly.
