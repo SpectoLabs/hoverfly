@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	IGNORE_UNKNOWN     = "ignoreunknown"
-	IGNORE_ORDER       = "ignoreorder"
-	IGNORE_OCCURRENCES = "ignoreoccurrences"
+	IgnoreUnknown     = "ignoreUnknown"
+	IgnoreOrder       = "ignoreOrder"
+	IgnoreOccurrences = "ignoreOccurrences"
 )
 
 var Array = "array"
@@ -20,9 +20,9 @@ func ArrayMatch(match interface{}, toMatch string, config map[string]interface{}
 		return false
 	}
 	toMatchArr := strings.Split(toMatch, ";")
-	ignoreUnknown := util.GetBoolOrDefault(config, IGNORE_UNKNOWN, false)
-	ignoreOrder := util.GetBoolOrDefault(config, IGNORE_ORDER, false)
-	ignoreOccurrences := util.GetBoolOrDefault(config, IGNORE_OCCURRENCES, false)
+	ignoreUnknown := util.GetBoolOrDefault(config, IgnoreUnknown, false)
+	ignoreOrder := util.GetBoolOrDefault(config, IgnoreOrder, false)
+	ignoreOccurrences := util.GetBoolOrDefault(config, IgnoreOccurrences, false)
 
 	return (ignoreUnknown || hasAllKnown(matchStringArr, toMatchArr)) &&
 		(ignoreOccurrences || hasSameNoOfOccurrences(matchStringArr, toMatchArr)) &&
