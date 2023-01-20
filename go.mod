@@ -16,7 +16,6 @@ require (
 	github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86 // indirect
 	github.com/dghubble/sling v1.2.0
 	github.com/dsnet/compress v0.0.0-20171208185109-cc9eb1d7ad76
-	github.com/fsnotify/fsnotify v1.4.7 // indirect
 	github.com/go-zoo/bone v1.3.0
 	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/golang/protobuf v1.4.0 // indirect
@@ -49,11 +48,9 @@ require (
 	github.com/spf13/cast v0.0.0-20160314192028-27b586b42e29 // indirect
 	github.com/spf13/cobra v0.0.0-20160517171929-f36824430130
 	github.com/spf13/jwalterweatherman v0.0.0-20160311093646-33c24e77fb80 // indirect
-	github.com/spf13/pflag v1.0.3
+	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v0.0.0-20160508180713-d8a428b8a306
-	github.com/tdewolff/minify v2.3.6+incompatible
-	github.com/tdewolff/parse v2.3.4+incompatible // indirect
-	github.com/tdewolff/test v1.0.6 // indirect
+	github.com/tdewolff/minify/v2 v2.12.4
 	github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35 // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20150808065054-e02fc20de94c // indirect
 	github.com/xeipuuv/gojsonschema v0.0.0-20170225172124-ff0417f4272e
