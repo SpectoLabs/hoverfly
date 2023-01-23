@@ -30,6 +30,7 @@ type Response interface {
 	GetEncodedBody() bool
 	GetTemplated() bool
 	GetHeaders() map[string][]string
+	GetPostActionHooks() []interface{}
 	GetTransitionsState() map[string]string
 	GetRemovesState() []string
 	GetFixedDelay() int

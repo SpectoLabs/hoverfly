@@ -206,6 +206,7 @@ type ResponseDetails struct {
 	Body             string
 	BodyFile         string
 	Headers          map[string][]string
+	PostActionHooks  []interface{}
 	Templated        bool
 	TransitionsState map[string]string
 	RemovesState     []string
@@ -226,6 +227,7 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 		Body:             body,
 		BodyFile:         data.GetBodyFile(),
 		Headers:          data.GetHeaders(),
+		PostActionHooks:  data.GetPostActionHooks(),
 		Templated:        data.GetTemplated(),
 		TransitionsState: data.GetTransitionsState(),
 		RemovesState:     data.GetRemovesState(),
@@ -308,6 +310,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 		Body:             body,
 		BodyFile:         r.BodyFile,
 		Headers:          r.Headers,
+		PostActionHooks:  r.PostActionHooks,
 		EncodedBody:      needsEncoding,
 		Templated:        r.Templated,
 		RemovesState:     r.RemovesState,

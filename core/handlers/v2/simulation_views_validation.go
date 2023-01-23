@@ -115,6 +115,36 @@ var headersDefinition = map[string]interface{}{
 	},
 }
 
+var postActionHooks = map[string]interface{}{
+	"type": "array",
+	"items": map[string]interface{}{
+		"name": map[string]interface{}{
+			"type": "string",
+		},
+		"parameters": map[string]interface{}{
+			"type": "object",
+			"properties": map[string]interface{}{
+				"method": map[string]interface{}{
+					"type": "string",
+				},
+				"scheme": map[string]interface{}{
+					"type": "string",
+					"enum": []string{
+						"http",
+						"https",
+					},
+				},
+				"destination": map[string]interface{}{
+					"type": "string",
+				},
+				"body": map[string]interface{}{
+					"type": "string",
+				},
+			},
+		},
+	},
+}
+
 var delaysDefinition = map[string]interface{}{
 	"type": "object",
 	"properties": map[string]interface{}{
@@ -188,6 +218,7 @@ var SimulationViewV2Schema = map[string]interface{}{
 		"response":              responseDefinitionV1,
 		"field-matchers":        requestFieldMatchersV3Definition,
 		"headers":               headersDefinition,
+		"post-action-hooks":     postActionHooks,
 		"delay":                 delaysDefinition,
 		"meta":                  metaDefinition,
 	},
@@ -232,6 +263,7 @@ var SimulationViewV1Schema = map[string]interface{}{
 		"request":               requestV1Definition,
 		"response":              responseDefinitionV1,
 		"headers":               headersDefinition,
+		"post-action-hooks":     postActionHooks,
 		"delay":                 delaysDefinition,
 		"meta":                  metaDefinition,
 	},
@@ -279,6 +311,7 @@ var SimulationViewV4Schema = map[string]interface{}{
 		"response":              responseDefinitionV4,
 		"field-matchers":        requestFieldMatchersV3Definition,
 		"headers":               headersDefinition,
+		"post-action-hooks":     postActionHooks,
 		"delay":                 delaysDefinition,
 		"meta":                  metaDefinition,
 	},
@@ -325,6 +358,9 @@ var responseDefinitionV4 = map[string]interface{}{
 		},
 		"headers": map[string]interface{}{
 			"$ref": "#/definitions/headers",
+		},
+		"postActionHooks": map[string]interface{}{
+			"$ref": "#/definitions/postActionHooks",
 		},
 		"status": map[string]interface{}{
 			"type": "integer",

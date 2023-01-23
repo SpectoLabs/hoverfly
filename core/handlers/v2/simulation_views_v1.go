@@ -30,10 +30,11 @@ func (this RequestResponsePairViewV1) GetRequest() interfaces.Request { return t
 // unmarshalling requests. This struct's Body may be Base64
 // encoded based on the EncodedBody field.
 type ResponseDetailsView struct {
-	Status      int                 `json:"status"`
-	Body        string              `json:"body"`
-	EncodedBody bool                `json:"encodedBody"`
-	Headers     map[string][]string `json:"headers,omitempty"`
+	Status          int                 `json:"status"`
+	Body            string              `json:"body"`
+	EncodedBody     bool                `json:"encodedBody"`
+	Headers         map[string][]string `json:"headers,omitempty"`
+	PostActionHooks []interface{}       `json:"postActionHooks,omitempty"`
 }
 
 // Gets Status - required for interfaces.Response
@@ -48,8 +49,6 @@ func (this ResponseDetailsView) GetBodyFile() string { return "" }
 // Gets EncodedBody - required for interfaces.Response
 func (this ResponseDetailsView) GetEncodedBody() bool { return this.EncodedBody }
 
-func (this RequestDetailsView) GetFormData() map[string][]string { return this.FormData }
-
 func (this ResponseDetailsView) GetTemplated() bool { return false }
 
 func (this ResponseDetailsView) GetTransitionsState() map[string]string { return nil }
@@ -58,6 +57,11 @@ func (this ResponseDetailsView) GetRemovesState() []string { return nil }
 
 // Gets Headers - required for interfaces.Response
 func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.Headers }
+
+// Gets PostActionHooks
+func (this ResponseDetailsView) GetPostActionHooks() []interface{} {
+	return this.PostActionHooks
+}
 
 // Gets FixedDelay - required for interfaces.Response
 func (this ResponseDetailsView) GetFixedDelay() int { return 0 }
@@ -90,6 +94,9 @@ func (this RequestDetailsView) GetDestination() *string { return this.Destinatio
 
 // Gets Scheme - required for interfaces.RequestMatcher
 func (this RequestDetailsView) GetScheme() *string { return this.Scheme }
+
+// Gets the parsed Form data
+func (this RequestDetailsView) GetFormData() map[string][]string { return this.FormData }
 
 // Gets Query - required for interfaces.RequestMatcher
 func (this RequestDetailsView) GetQuery() *string {

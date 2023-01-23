@@ -52,13 +52,14 @@ func (this RequestDetailsView) GetBody() *string { return this.Body }
 func (this RequestDetailsView) GetHeaders() map[string][]string { return this.Headers }
 
 type ResponseDetailsView struct {
-	Status         int                       `json:"status"`
-	Body           string                    `json:"body"`
-	BodyFile       string                    `json:"bodyFile"`
-	EncodedBody    bool                      `json:"encodedBody"`
-	Headers        map[string][]string       `json:"headers"`
-	FixedDelay     int                       `json:"fixedDelay"`
-	LogNormalDelay *v2.LogNormalDelayOptions `json:"logNormalDelay"`
+	Status          int                       `json:"status"`
+	Body            string                    `json:"body"`
+	BodyFile        string                    `json:"bodyFile"`
+	EncodedBody     bool                      `json:"encodedBody"`
+	Headers         map[string][]string       `json:"headers"`
+	PostActionHooks []interface{}             `json:"postActionHooks"`
+	FixedDelay      int                       `json:"fixedDelay"`
+	LogNormalDelay  *v2.LogNormalDelayOptions `json:"logNormalDelay"`
 }
 
 func (this ResponseDetailsView) GetStatus() int { return this.Status }
@@ -78,6 +79,10 @@ func (this ResponseDetailsView) GetTransitionsState() map[string]string { return
 func (this ResponseDetailsView) GetRemovesState() []string { return nil }
 
 func (this ResponseDetailsView) GetHeaders() map[string][]string { return this.Headers }
+
+func (this ResponseDetailsView) GetPostActionHooks() []interface{} {
+	return this.PostActionHooks
+}
 
 func (this ResponseDetailsView) GetFixedDelay() int { return this.FixedDelay }
 

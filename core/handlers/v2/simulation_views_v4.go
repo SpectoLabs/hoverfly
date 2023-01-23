@@ -43,6 +43,7 @@ type ResponseDetailsViewV4 struct {
 	Body             string              `json:"body"`
 	EncodedBody      bool                `json:"encodedBody"`
 	Headers          map[string][]string `json:"headers,omitempty"`
+	PostActionHooks  []interface{}       `json:"postActionHooks,omitempty"`
 	Templated        bool                `json:"templated"`
 	TransitionsState map[string]string   `json:"transitionsState,omitempty"`
 	RemovesState     []string            `json:"removesState,omitempty"`
@@ -70,6 +71,11 @@ func (this ResponseDetailsViewV4) GetRemovesState() []string { return this.Remov
 
 // Gets Headers - required for interfaces.Response
 func (this ResponseDetailsViewV4) GetHeaders() map[string][]string { return this.Headers }
+
+// Gets PostActionHooks
+func (this ResponseDetailsViewV4) GetPostActionHooks() []interface{} {
+	return this.PostActionHooks
+}
 
 // Gets FixedDelay - required for interfaces.Response
 func (this ResponseDetailsViewV4) GetFixedDelay() int { return 0 }

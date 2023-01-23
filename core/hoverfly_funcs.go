@@ -287,6 +287,13 @@ func (hf *Hoverfly) applyHeadersTemplating(requestDetails *models.RequestDetails
 	return headers, nil
 }
 
+// Triggers the related webhooks
+func (hf *Hoverfly) executePostHooks(postActionHooks models.PostActionHooks) {
+	for _, postActionHook := range postActionHooks {
+		postActionHook.Execute()
+	}
+}
+
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails, modeArgs *modes.ModeArguments) error {
 	body := []models.RequestFieldMatchers{

@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/errors"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
@@ -35,7 +35,7 @@ func (this *SimulateMode) SetArguments(arguments ModeArguments) {
 	}
 }
 
-//TODO: We should only need one of these two parameters
+// TODO: We should only need one of these two parameters
 func (this SimulateMode) Process(request *http.Request, details models.RequestDetails) (ProcessResult, error) {
 	pair := models.RequestResponsePair{
 		Request: details,

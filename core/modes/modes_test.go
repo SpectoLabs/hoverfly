@@ -2,10 +2,11 @@ package modes_test
 
 import (
 	"errors"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/util"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
@@ -90,7 +91,7 @@ func Test_ReconstructRequest_ShouldRecompressGzipBody(t *testing.T) {
 		Method:      "POST",
 		Destination: "test-destination.com",
 		Body:        "new request body here",
-		Headers: 	 map[string][]string{"Content-Encoding": {"gzip"}},
+		Headers:     map[string][]string{"Content-Encoding": {"gzip"}},
 	}
 	pair := models.RequestResponsePair{Request: request}
 

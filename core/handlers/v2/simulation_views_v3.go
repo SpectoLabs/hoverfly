@@ -34,11 +34,12 @@ type RequestMatcherViewV3 struct {
 func (this RequestMatcherResponsePairViewV3) GetResponse() interfaces.Response { return this.Response }
 
 type ResponseDetailsViewV3 struct {
-	Status      int                 `json:"status"`
-	Body        string              `json:"body"`
-	EncodedBody bool                `json:"encodedBody"`
-	Headers     map[string][]string `json:"headers,omitempty"`
-	Templated   bool                `json:"templated"`
+	Status          int                 `json:"status"`
+	Body            string              `json:"body"`
+	EncodedBody     bool                `json:"encodedBody"`
+	Headers         map[string][]string `json:"headers,omitempty"`
+	PostActionHooks []interface{}       `json:"postActionHooks,omitempty"`
+	Templated       bool                `json:"templated"`
 }
 
 // Gets Status - required for interfaces.Response
@@ -57,6 +58,11 @@ func (this ResponseDetailsViewV3) GetTemplated() bool { return this.Templated }
 
 // Gets Headers - required for interfaces.Response
 func (this ResponseDetailsViewV3) GetHeaders() map[string][]string { return this.Headers }
+
+// Gets PostActionHooks
+func (this ResponseDetailsViewV3) GetPostActionHooks() []interface{} {
+	return this.PostActionHooks
+}
 
 func (this ResponseDetailsViewV3) GetTransitionsState() map[string]string { return nil }
 

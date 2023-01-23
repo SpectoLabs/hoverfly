@@ -124,6 +124,7 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 				EncodedBody:      pairV1.Response.EncodedBody,
 				Headers:          pairV1.Response.Headers,
 				Status:           pairV1.Response.Status,
+				PostActionHooks:  pairV1.Response.PostActionHooks,
 				Templated:        false,
 				TransitionsState: nil,
 				RemovesState:     nil,
@@ -192,6 +193,7 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
 				EncodedBody:      requestResponsePairV2.Response.EncodedBody,
 				Headers:          requestResponsePairV2.Response.Headers,
 				Status:           requestResponsePairV2.Response.Status,
+				PostActionHooks:  requestResponsePairV2.Response.PostActionHooks,
 				Templated:        false,
 				TransitionsState: nil,
 				RemovesState:     nil,
@@ -282,6 +284,7 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 				Status:           requestResponsePairV2.Response.Status,
 				Templated:        requestResponsePairV2.Response.Templated,
 				TransitionsState: requestResponsePairV2.Response.TransitionsState,
+				PostActionHooks:  requestResponsePairV2.Response.PostActionHooks,
 				RemovesState:     requestResponsePairV2.Response.RemovesState,
 			},
 		}
