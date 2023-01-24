@@ -15,8 +15,10 @@ sphinx:
   configuration: docs/conf.py
 
 #Breaking latest readthedocs build, turning it off for now
-#formats:
+formats:
 #  - pdf
+  - htmlzip
+  - epub
 
 # Optionally declare the Python requirements required to build your docs
 python:
