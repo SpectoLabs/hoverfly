@@ -127,6 +127,9 @@ var postActionHooks = map[string]interface{}{
 				"method": map[string]interface{}{
 					"type": "string",
 				},
+				"destination": map[string]interface{}{
+					"type": "string",
+				},
 				"scheme": map[string]interface{}{
 					"type": "string",
 					"enum": []string{
@@ -134,11 +137,26 @@ var postActionHooks = map[string]interface{}{
 						"https",
 					},
 				},
-				"destination": map[string]interface{}{
+				"path": map[string]interface{}{
 					"type": "string",
+				},
+				"query": map[string]interface{}{
+					"type": "object",
+					"additionalProperties": map[string]interface{}{
+						"type": "array",
+						"items": map[string]interface{}{
+							"type": "string",
+						},
+					},
+				},
+				"headers": map[string]interface{}{
+					"$ref": "#/definitions/headers",
 				},
 				"body": map[string]interface{}{
 					"type": "string",
+				},
+				"encodedBody": map[string]interface{}{
+					"type": "boolean",
 				},
 			},
 		},

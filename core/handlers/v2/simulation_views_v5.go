@@ -70,7 +70,7 @@ type ResponseDetailsViewV5 struct {
 	BodyFile         string                 `json:"bodyFile,omitempty"`
 	EncodedBody      bool                   `json:"encodedBody"`
 	Headers          map[string][]string    `json:"headers,omitempty"`
-	PostActionHooks  []interface{}          `json:"postActionHooks"`
+	PostActionHooks  []interface{}          `json:"postActionHooks,omitempty"`
 	Templated        bool                   `json:"templated"`
 	TransitionsState map[string]string      `json:"transitionsState,omitempty"`
 	RemovesState     []string               `json:"removesState,omitempty"`

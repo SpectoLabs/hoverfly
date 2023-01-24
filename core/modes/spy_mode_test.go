@@ -2,6 +2,7 @@ package modes_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -43,6 +44,33 @@ func (this hoverflySpyStub) GetResponse(requestDetails models.RequestDetails) (*
 func (this hoverflySpyStub) ApplyMiddleware(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
 	if pair.Request.Path == "middleware-error" {
 		return pair, fmt.Errorf("middleware-error")
+	}
+	return pair, nil
+}
+
+func (hf hoverflySpyStub) ApplyPostHooks(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+	if pair.Response.PostActionHooks != nil {
+		for _, postActionHook := range pair.Response.PostActionHooks {
+			hookMap, ok := postActionHook.(map[string]interface{})
+			if !ok {
+				fmt.Println("Unable to convert post action hook to map[string]interface{}")
+				continue
+			}
+
+			postActionHookStruct := &models.PostActionHook{}
+			jsonBytes, err := json.Marshal(hookMap)
+			if err != nil {
+				fmt.Println("Unable to convert post action hook to json")
+				continue
+			}
+
+			err = json.Unmarshal(jsonBytes, postActionHookStruct)
+			if err != nil {
+				fmt.Println("Unable to unmarshal json into struct")
+				continue
+			}
+			postActionHookStruct.Execute()
+		}
 	}
 	return pair, nil
 }

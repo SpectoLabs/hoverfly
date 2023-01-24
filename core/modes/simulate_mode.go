@@ -11,6 +11,7 @@ import (
 type HoverflySimulate interface {
 	GetResponse(models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError)
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
+	ApplyPostHooks(models.RequestResponsePair) (models.RequestResponsePair, error)
 }
 
 type SimulateMode struct {
@@ -52,6 +53,11 @@ func (this SimulateMode) Process(request *http.Request, details models.RequestDe
 	pair, err := this.Hoverfly.ApplyMiddleware(pair)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Simulate)
+	}
+
+	pair, err = this.Hoverfly.ApplyPostHooks(pair)
+	if err != nil {
+		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing the post hooks", Spy)
 	}
 
 	return newProcessResult(

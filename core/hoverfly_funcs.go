@@ -1,6 +1,7 @@
 package hoverfly
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -287,13 +288,6 @@ func (hf *Hoverfly) applyHeadersTemplating(requestDetails *models.RequestDetails
 	return headers, nil
 }
 
-// Triggers the related webhooks
-func (hf *Hoverfly) executePostHooks(postActionHooks models.PostActionHooks) {
-	for _, postActionHook := range postActionHooks {
-		postActionHook.Execute()
-	}
-}
-
 // save gets request fingerprint, extracts request body, status code and headers, then saves it to cache
 func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.ResponseDetails, modeArgs *modes.ModeArguments) error {
 	body := []models.RequestFieldMatchers{
@@ -436,5 +430,32 @@ func (hf *Hoverfly) ApplyMiddleware(pair models.RequestResponsePair) (models.Req
 		return hf.Cfg.Middleware.Execute(pair)
 	}
 
+	return pair, nil
+}
+
+func (hf *Hoverfly) ApplyPostHooks(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
+	if pair.Response.PostActionHooks != nil {
+		log.Debug("Post action hooks detected")
+		for _, postActionHook := range pair.Response.PostActionHooks {
+			postActionHookStruct := &models.PostActionHook{}
+			jsonBytes, err := json.Marshal(postActionHook)
+			if err != nil {
+				log.Error("Unable to convert post action hook to json")
+				continue
+			}
+
+			err = json.Unmarshal(jsonBytes, postActionHookStruct)
+			if err != nil {
+				log.Error("Unable to unmarshal json post action hook into struct")
+				continue
+			}
+			// For now response is not needed, see what else we could need from it.
+			_, err = postActionHookStruct.Execute()
+			if err != nil {
+				return pair, err
+			}
+			log.Debug("Executed Post action hook")
+		}
+	}
 	return pair, nil
 }
