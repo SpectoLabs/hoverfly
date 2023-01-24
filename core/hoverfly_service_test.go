@@ -1332,3 +1332,24 @@ func Test_Hoverfly_PutSimulation_ImportsBodyFileFromURL_NoMatchingOrigins(t *tes
 	Expect(importResult.GetError()).NotTo(BeNil())
 	Expect(importResult.GetError().Error()).To(MatchRegexp(`bodyFile http:\/\/.+/key.pem is not allowed`))
 }
+
+func TestHoverfly_GetFilteredDiff(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	key := v2.SimpleRequestDefinitionView{
+		Host: "test.com",
+	}
+	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{{Field: "header/test1", Actual: "1"}}})
+	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{{Field: "body/test1", Actual: "2"}}})
+	unit.AddDiff(key, v2.DiffReport{Timestamp: "now", DiffEntries: []v2.DiffReportEntry{{Field: "body/test2", Actual: "3"}}})
+
+	filteredResponses := unit.GetFilteredDiff(v2.DiffFilterView{ExcludedResponseFields: []string{"$.test1"}})
+
+	Expect(filteredResponses).To(HaveLen(1))
+	Expect(filteredResponses[key]).To(HaveLen(2))
+	Expect(filteredResponses[key][0].DiffEntries[0].Field).Should(Equal("header/test1"))
+	Expect(filteredResponses[key][1].DiffEntries[0].Field).Should(Equal("body/test2"))
+}

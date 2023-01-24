@@ -429,3 +429,55 @@ func (hf *Hoverfly) SetPACFile(pacFile []byte) {
 func (hf *Hoverfly) DeletePACFile() {
 	hf.Cfg.PACFile = nil
 }
+
+func (hf *Hoverfly) GetFilteredDiff(diffFilterView v2.DiffFilterView) map[v2.SimpleRequestDefinitionView][]v2.DiffReport {
+	responsesDiff := hf.responsesDiff
+	filteredResponsesDiff := make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport)
+	for request, diffReports := range responsesDiff {
+		for _, diffReport := range diffReports {
+			var filteredDiffEntries []v2.DiffReportEntry
+			for _, diffEntry := range diffReport.DiffEntries {
+				if !needsToExcludeDiffEntry(&diffEntry, &diffFilterView) {
+					filteredDiffEntries = append(filteredDiffEntries, diffEntry)
+				}
+			}
+			if len(filteredDiffEntries) == 0 {
+				continue
+			}
+			filteredDiffReport := v2.DiffReport{
+				Timestamp:   diffReport.Timestamp,
+				DiffEntries: filteredDiffEntries,
+			}
+			if diffReportArr, ok := filteredResponsesDiff[request]; !ok {
+				filteredResponsesDiff[request] = []v2.DiffReport{filteredDiffReport}
+			} else {
+				diffReportArr = append(diffReportArr, filteredDiffReport)
+				filteredResponsesDiff[request] = diffReportArr
+			}
+		}
+	}
+	return filteredResponsesDiff
+}
+
+func needsToExcludeDiffEntry(diffReportEntry *v2.DiffReportEntry, diffFilterView *v2.DiffFilterView) bool {
+
+	//check for header... headers which are ignored during configuration
+	for _, header := range (*diffFilterView).ExcludedHeaders {
+		headerField := "header/" + header
+		if (*diffReportEntry).Field == headerField {
+			return true
+		}
+	}
+
+	for _, responseField := range (*diffFilterView).ExcludedResponseFields {
+		relativeResponseField := getRelativeFieldFromJsonPath(responseField)
+		if (*diffReportEntry).Field == relativeResponseField {
+			return true
+		}
+	}
+	return false
+}
+
+func getRelativeFieldFromJsonPath(responseField string) string {
+	return strings.Replace(strings.Replace(responseField, "$.", "body/", -1), ".", "/", -1)
+}
