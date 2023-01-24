@@ -72,8 +72,8 @@ func Test_ArrayMatch_ReturnsFalseWithDifferentNoOfOccurrencesAndNotIgnoringOccur
 func getConfiguration(ignoreUnknown, ignoreOccurrences, ignoreOrder bool) map[string]interface{} {
 
 	configMap := make(map[string]interface{})
-	configMap[matchers.IGNORE_UNKNOWN] = ignoreUnknown
-	configMap[matchers.IGNORE_ORDER] = ignoreOrder
-	configMap[matchers.IGNORE_OCCURRENCES] = ignoreOccurrences
+	configMap[matchers.IgnoreUnknown] = ignoreUnknown
+	configMap[matchers.IgnoreOrder] = ignoreOrder
+	configMap[matchers.IgnoreOccurrences] = ignoreOccurrences
 	return configMap
 }
