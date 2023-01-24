@@ -15,9 +15,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/tdewolff/minify"
-	mjson "github.com/tdewolff/minify/json"
-	"github.com/tdewolff/minify/xml"
+	"github.com/tdewolff/minify/v2"
+	mjson "github.com/tdewolff/minify/v2/json"
+	"github.com/tdewolff/minify/v2/xml"
 )
 
 // GetRequestBody will read the http.Request body io.ReadCloser

@@ -53,8 +53,7 @@ github.com/dghubble/sling
 github.com/dsnet/compress/brotli
 github.com/dsnet/compress/internal
 github.com/dsnet/compress/internal/errors
-# github.com/fsnotify/fsnotify v1.4.7
-## explicit
+# github.com/fsnotify/fsnotify v1.5.4
 github.com/fsnotify/fsnotify
 # github.com/go-zoo/bone v1.3.0
 ## explicit
@@ -100,8 +99,6 @@ github.com/inconshreveable/mousetrap
 # github.com/jackwakefield/gopac v1.0.3-0.20180823145755-c4d2e0b9a672
 ## explicit
 github.com/jackwakefield/gopac
-# github.com/jaswdr/faker v1.15.0
-## explicit
 # github.com/kardianos/osext v0.0.0-20151222153229-29ae4ffbc9a6
 ## explicit
 github.com/kardianos/osext
@@ -196,26 +193,23 @@ github.com/spf13/cobra
 # github.com/spf13/jwalterweatherman v0.0.0-20160311093646-33c24e77fb80
 ## explicit
 github.com/spf13/jwalterweatherman
-# github.com/spf13/pflag v1.0.3
+# github.com/spf13/pflag v1.0.5
 ## explicit
 github.com/spf13/pflag
 # github.com/spf13/viper v0.0.0-20160508180713-d8a428b8a306
 ## explicit
 github.com/spf13/viper
-# github.com/tdewolff/minify v2.3.6+incompatible
+# github.com/tdewolff/minify/v2 v2.12.4
 ## explicit
-github.com/tdewolff/minify
-github.com/tdewolff/minify/json
-github.com/tdewolff/minify/xml
-# github.com/tdewolff/parse v2.3.4+incompatible
-## explicit
-github.com/tdewolff/parse
-github.com/tdewolff/parse/buffer
-github.com/tdewolff/parse/json
-github.com/tdewolff/parse/strconv
-github.com/tdewolff/parse/xml
-# github.com/tdewolff/test v1.0.6
-## explicit
+github.com/tdewolff/minify/v2
+github.com/tdewolff/minify/v2/json
+github.com/tdewolff/minify/v2/xml
+# github.com/tdewolff/parse/v2 v2.6.4
+github.com/tdewolff/parse/v2
+github.com/tdewolff/parse/v2/buffer
+github.com/tdewolff/parse/v2/json
+github.com/tdewolff/parse/v2/strconv
+github.com/tdewolff/parse/v2/xml
 # github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35
 ## explicit
 github.com/xeipuuv/gojsonpointer
@@ -236,7 +230,7 @@ golang.org/x/exp/rand
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
-# golang.org/x/sys v0.0.0-20210330210617-4fbd30eecc44
+# golang.org/x/sys v0.0.0-20220412211240-33da011f77ad
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
