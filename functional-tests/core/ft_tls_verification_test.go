@@ -50,7 +50,10 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			Expect(string(responseBody)).To(ContainSubstring("Hoverfly Error!"))
 			Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended destination"))
-			Expect(string(responseBody)).To(ContainSubstring("x509: certificate signed by unknown authority"))
+			Expect(string(responseBody)).To(SatisfyAny(
+				ContainSubstring("certificate is not trusted"),
+				ContainSubstring("x509: certificate signed by unknown authority")),
+			)
 		})
 	})
 
@@ -79,7 +82,10 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			Expect(string(responseBody)).To(ContainSubstring("Hoverfly Error!"))
 			Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended destination"))
-			Expect(string(responseBody)).To(ContainSubstring("x509: certificate signed by unknown authority"))
+			Expect(string(responseBody)).To(SatisfyAny(
+				ContainSubstring("certificate is not trusted"),
+				ContainSubstring("x509: certificate signed by unknown authority")),
+			)
 		})
 	})
 
