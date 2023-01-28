@@ -4,9 +4,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"runtime"
 
-	"github.com/SpectoLabs/hoverfly/functional-tests"
+	functional_tests "github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -51,11 +50,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			Expect(string(responseBody)).To(ContainSubstring("Hoverfly Error!"))
 			Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended destination"))
-			if runtime.GOOS == "darwin" {
-				Expect(string(responseBody)).To(ContainSubstring("certificate is not trusted"))
-			} else {
-				Expect(string(responseBody)).To(ContainSubstring("x509: certificate signed by unknown authority"))
-			}
+			Expect(string(responseBody)).To(ContainSubstring("x509: certificate signed by unknown authority"))
 		})
 	})
 
@@ -84,12 +79,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			Expect(string(responseBody)).To(ContainSubstring("Hoverfly Error!"))
 			Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended destination"))
-			if runtime.GOOS == "darwin" {
-				Expect(string(responseBody)).To(ContainSubstring("certificate is not trusted"))
-			} else {
-				Expect(string(responseBody)).To(ContainSubstring("x509: certificate signed by unknown authority"))
-			}
-
+			Expect(string(responseBody)).To(ContainSubstring("x509: certificate signed by unknown authority"))
 		})
 	})
 
