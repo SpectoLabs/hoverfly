@@ -220,6 +220,24 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	return result.Response
 }
 
+// postProcessRequest - after a response, fire any webhooks that the user has configured.
+func (hf *Hoverfly) postProcessRequest(req *http.Request) *http.Response {
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
+	if err != nil {
+		log.Debug("Failed to process request for postProcessRequest")
+	}
+	response, matchingErr := hf.GetResponse(requestDetails)
+	// We really don't need to do anything here, if there is match just return
+	if matchingErr != nil {
+		return req.Response
+	}
+	_, err = hf.ApplyPostHooks(response)
+	if err != nil {
+		return modes.ErrorResponse(req, err, "There was an error when executing the post hooks").Response
+	}
+	return req.Response
+}
+
 func (hf *Hoverfly) applyResponseDelay(result modes.ProcessResult) {
 	if result.FixedDelay > 0 {
 		time.Sleep(time.Duration(result.FixedDelay) * time.Millisecond)

@@ -433,10 +433,10 @@ func (hf *Hoverfly) ApplyMiddleware(pair models.RequestResponsePair) (models.Req
 	return pair, nil
 }
 
-func (hf *Hoverfly) ApplyPostHooks(pair models.RequestResponsePair) (models.RequestResponsePair, error) {
-	if pair.Response.PostActionHooks != nil {
-		log.Debug("Post action hooks detected")
-		for _, postActionHook := range pair.Response.PostActionHooks {
+func (hf *Hoverfly) ApplyPostHooks(resp *models.ResponseDetails) (*models.ResponseDetails, error) {
+	if resp.PostActionHooks != nil {
+		log.Info("Post action hooks detected")
+		for _, postActionHook := range resp.PostActionHooks {
 			postActionHookStruct := &models.PostActionHook{}
 			jsonBytes, err := json.Marshal(postActionHook)
 			if err != nil {
@@ -452,10 +452,13 @@ func (hf *Hoverfly) ApplyPostHooks(pair models.RequestResponsePair) (models.Requ
 			// For now response is not needed, see what else we could need from it.
 			_, err = postActionHookStruct.Execute()
 			if err != nil {
-				return pair, err
+				log.Debug("There was an error executing the post hook")
+				return resp, err
 			}
 			log.Debug("Executed Post action hook")
 		}
+	} else {
+		log.Debug("No post hooks found")
 	}
-	return pair, nil
+	return resp, nil
 }

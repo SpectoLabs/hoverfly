@@ -14,7 +14,6 @@ import (
 type HoverflySpy interface {
 	GetResponse(models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError)
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
-	ApplyPostHooks(models.RequestResponsePair) (models.RequestResponsePair, error)
 	DoRequest(*http.Request) (*http.Response, error)
 }
 
@@ -68,10 +67,6 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 	pair, err := this.Hoverfly.ApplyMiddleware(pair)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Spy)
-	}
-	pair, err = this.Hoverfly.ApplyPostHooks(pair)
-	if err != nil {
-		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing the post hooks", Spy)
 	}
 
 	return newProcessResult(

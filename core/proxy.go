@@ -64,6 +64,15 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 			return r, resp
 		})
 
+	// Fire Post processing events
+	proxy.OnRequest(matchesFilter(hoverfly.Cfg.Destination)).DoFunc(
+		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+			// Important, clone the request as use of pointers lead to flaky behaviors
+			reqClone := r.Clone(ctx.Req.Context())
+			go hoverfly.postProcessRequest(reqClone)
+			return r, ctx.Resp
+		})
+
 	if hoverfly.Cfg.Verbose {
 		proxy.OnRequest().DoFunc(
 			func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
@@ -126,6 +135,11 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 		w.Write([]byte(body))
 
 		hoverfly.Counter.Count(hoverfly.Cfg.GetMode())
+		go func() {
+			// Important, clone the request as use of pointers lead to flaky behaviors
+			reqClone := r.Clone(r.Context())
+			hoverfly.postProcessRequest(reqClone)
+		}()
 	})
 
 	if hoverfly.Cfg.Verbose {

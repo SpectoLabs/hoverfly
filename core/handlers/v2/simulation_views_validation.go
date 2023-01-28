@@ -378,7 +378,7 @@ var responseDefinitionV4 = map[string]interface{}{
 			"$ref": "#/definitions/headers",
 		},
 		"postActionHooks": map[string]interface{}{
-			"$ref": "#/definitions/postActionHooks",
+			"$ref": "#/definitions/post-action-hooks",
 		},
 		"status": map[string]interface{}{
 			"type": "integer",

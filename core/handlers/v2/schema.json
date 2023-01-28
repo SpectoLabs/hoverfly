@@ -220,6 +220,12 @@
 						}
 					},
 					"type": "object"
+				},
+				"postActionHooks": {
+					"items": {
+						"$ref": "#/definitions/post-action-hooks"						
+					},
+					"type": "array"
 				}
 			},
 			"type": "object"
@@ -237,6 +243,53 @@
 				}
 			},
 			"required": ["name", "function"],
+			"type": "object"
+		},
+		"post-action-hooks": {
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"parameters": {
+					"properties": {
+						"method": {
+							"type": "string"
+						},
+						"destination": {
+							"type": "string"
+						},
+						"scheme": {
+							"type": "string",
+							"enum": [
+								"http",
+								"https"
+							]
+						},
+						"path": {
+							"type": "string"
+						},
+						"query": {
+							"additionalProperties": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"type": "object"
+						},
+						"headers": {
+							"$ref": "#/definitions/headers"
+						},
+						"body": {
+							"type": "string"
+						},
+						"encodedBody": {
+							"type": "boolean"
+						}
+					},
+					"type": "object"
+				}
+			},
 			"type": "object"
 		}
 	},
