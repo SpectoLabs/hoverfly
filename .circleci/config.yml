@@ -18,7 +18,7 @@ jobs:
       - run:
           name: Install Python
           command: |
-            sudo apt-get install python3.9 -f
+            sudo apt-get install python-is-python3 -f
       - run:
           name: Install Node
           command: |
