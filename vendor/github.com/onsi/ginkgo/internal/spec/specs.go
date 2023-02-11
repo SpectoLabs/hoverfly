@@ -4,28 +4,30 @@ import (
 	"math/rand"
 	"regexp"
 	"sort"
+	"strings"
 )
 
 type Specs struct {
-	specs                 []*Spec
-	numberOfOriginalSpecs int
-	hasProgrammaticFocus  bool
-	RegexScansFilePath    bool
+	specs []*Spec
+	names []string
+
+	hasProgrammaticFocus bool
+	RegexScansFilePath   bool
 }
 
 func NewSpecs(specs []*Spec) *Specs {
+	names := make([]string, len(specs))
+	for i, spec := range specs {
+		names[i] = spec.ConcatenatedString()
+	}
 	return &Specs{
 		specs: specs,
-		numberOfOriginalSpecs: len(specs),
+		names: names,
 	}
 }
 
 func (e *Specs) Specs() []*Spec {
 	return e.specs
-}
-
-func (e *Specs) NumberOfOriginalSpecs() int {
-	return e.numberOfOriginalSpecs
 }
 
 func (e *Specs) HasProgrammaticFocus() bool {
@@ -36,17 +38,20 @@ func (e *Specs) Shuffle(r *rand.Rand) {
 	sort.Sort(e)
 	permutation := r.Perm(len(e.specs))
 	shuffledSpecs := make([]*Spec, len(e.specs))
+	names := make([]string, len(e.specs))
 	for i, j := range permutation {
 		shuffledSpecs[i] = e.specs[j]
+		names[i] = e.names[j]
 	}
 	e.specs = shuffledSpecs
+	e.names = names
 }
 
-func (e *Specs) ApplyFocus(description string, focusString string, skipString string) {
-	if focusString == "" && skipString == "" {
+func (e *Specs) ApplyFocus(description string, focus, skip []string) {
+	if len(focus)+len(skip) == 0 {
 		e.applyProgrammaticFocus()
 	} else {
-		e.applyRegExpFocusAndSkip(description, focusString, skipString)
+		e.applyRegExpFocusAndSkip(description, focus, skip)
 	}
 }
 
@@ -70,34 +75,43 @@ func (e *Specs) applyProgrammaticFocus() {
 
 // toMatch returns a byte[] to be used by regex matchers.  When adding new behaviours to the matching function,
 // this is the place which we append to.
-func (e *Specs) toMatch(description string, spec *Spec) []byte {
+func (e *Specs) toMatch(description string, i int) []byte {
+	if i > len(e.names) {
+		return nil
+	}
 	if e.RegexScansFilePath {
 		return []byte(
 			description + " " +
-				spec.ConcatenatedString() + " " +
-				spec.subject.CodeLocation().FileName)
+				e.names[i] + " " +
+				e.specs[i].subject.CodeLocation().FileName)
 	} else {
 		return []byte(
 			description + " " +
-				spec.ConcatenatedString())
+				e.names[i])
 	}
 }
 
-func (e *Specs) applyRegExpFocusAndSkip(description string, focusString string, skipString string) {
-	for _, spec := range e.specs {
+func (e *Specs) applyRegExpFocusAndSkip(description string, focus, skip []string) {
+	var focusFilter, skipFilter *regexp.Regexp
+	if len(focus) > 0 {
+		focusFilter = regexp.MustCompile(strings.Join(focus, "|"))
+	}
+	if len(skip) > 0 {
+		skipFilter = regexp.MustCompile(strings.Join(skip, "|"))
+	}
+
+	for i, spec := range e.specs {
 		matchesFocus := true
 		matchesSkip := false
 
-		toMatch := e.toMatch(description, spec)
+		toMatch := e.toMatch(description, i)
 
-		if focusString != "" {
-			focusFilter := regexp.MustCompile(focusString)
-			matchesFocus = focusFilter.Match([]byte(toMatch))
+		if focusFilter != nil {
+			matchesFocus = focusFilter.Match(toMatch)
 		}
 
-		if skipString != "" {
-			skipFilter := regexp.MustCompile(skipString)
-			matchesSkip = skipFilter.Match([]byte(toMatch))
+		if skipFilter != nil {
+			matchesSkip = skipFilter.Match(toMatch)
 		}
 
 		if !matchesFocus || matchesSkip {
@@ -114,15 +128,6 @@ func (e *Specs) SkipMeasurements() {
 	}
 }
 
-func (e *Specs) TrimForParallelization(total int, node int) {
-	startIndex, count := ParallelizedIndexRange(len(e.specs), total, node)
-	if count == 0 {
-		e.specs = make([]*Spec, 0)
-	} else {
-		e.specs = e.specs[startIndex : startIndex+count]
-	}
-}
-
 //sort.Interface
 
 func (e *Specs) Len() int {
@@ -130,9 +135,10 @@ func (e *Specs) Len() int {
 }
 
 func (e *Specs) Less(i, j int) bool {
-	return e.specs[i].ConcatenatedString() < e.specs[j].ConcatenatedString()
+	return e.names[i] < e.names[j]
 }
 
 func (e *Specs) Swap(i, j int) {
+	e.names[i], e.names[j] = e.names[j], e.names[i]
 	e.specs[i], e.specs[j] = e.specs[j], e.specs[i]
 }

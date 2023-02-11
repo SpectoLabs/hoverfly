@@ -37,7 +37,6 @@ type Parser struct {
 	Name  string
 	Root  *ListNode
 	input string
-	cur   *ListNode
 	pos   int
 	start int
 	width int
@@ -46,7 +45,7 @@ type Parser struct {
 var (
 	ErrSyntax        = errors.New("invalid syntax")
 	dictKeyRex       = regexp.MustCompile(`^'([^']*)'$`)
-	sliceOperatorRex = regexp.MustCompile(`^(-?[\d]*)(:-?[\d]*)?(:[\d]*)?$`)
+	sliceOperatorRex = regexp.MustCompile(`^(-?[\d]*)(:-?[\d]*)?(:-?[\d]*)?$`)
 )
 
 // Parse parsed the given text and return a node Parser.
@@ -94,7 +93,7 @@ func (p *Parser) consumeText() string {
 
 // next returns the next rune in the input.
 func (p *Parser) next() rune {
-	if int(p.pos) >= len(p.input) {
+	if p.pos >= len(p.input) {
 		p.width = 0
 		return eof
 	}
@@ -186,8 +185,7 @@ func (p *Parser) parseInsideAction(cur *ListNode) error {
 func (p *Parser) parseRightDelim(cur *ListNode) error {
 	p.pos += len(rightDelim)
 	p.consumeText()
-	cur = p.Root
-	return p.parseText(cur)
+	return p.parseText(p.Root)
 }
 
 // parseIdentifier scans build-in keywords, like "range" "end"
@@ -216,8 +214,11 @@ func (p *Parser) parseIdentifier(cur *ListNode) error {
 	return p.parseInsideAction(cur)
 }
 
-// parseRecursive scans the recursive desent operator ..
+// parseRecursive scans the recursive descent operator ..
 func (p *Parser) parseRecursive(cur *ListNode) error {
+	if lastIndex := len(cur.Nodes) - 1; lastIndex >= 0 && cur.Nodes[lastIndex].Type() == NodeRecursive {
+		return fmt.Errorf("invalid multiple recursive descent")
+	}
 	p.pos += len("..")
 	p.consumeText()
 	cur.append(newRecursive())
@@ -231,7 +232,7 @@ func (p *Parser) parseRecursive(cur *ListNode) error {
 func (p *Parser) parseNumber(cur *ListNode) error {
 	r := p.peek()
 	if r == '+' || r == '-' {
-		r = p.next()
+		p.next()
 	}
 	for {
 		r = p.next()
@@ -266,7 +267,7 @@ Loop:
 		}
 	}
 	text := p.consumeText()
-	text = string(text[1 : len(text)-1])
+	text = text[1 : len(text)-1]
 	if text == "*" {
 		text = ":"
 	}
@@ -325,6 +326,7 @@ Loop:
 			if i == 1 {
 				params[i].Known = true
 				params[i].Value = params[0].Value + 1
+				params[i].Derived = true
 			} else {
 				params[i].Known = false
 				params[i].Value = 0
@@ -373,7 +375,7 @@ Loop:
 	}
 	reg := regexp.MustCompile(`^([^!<>=]+)([!<>=]+)(.+?)$`)
 	text := p.consumeText()
-	text = string(text[:len(text)-2])
+	text = text[:len(text)-2]
 	value := reg.FindStringSubmatch(text)
 	if value == nil {
 		parser, err := parseAction("text", text)
@@ -476,7 +478,7 @@ func isBool(s string) bool {
 	return s == "true" || s == "false"
 }
 
-//UnquoteExtend is almost same as strconv.Unquote(), but it support parse single quotes as a string
+// UnquoteExtend is almost same as strconv.Unquote(), but it support parse single quotes as a string
 func UnquoteExtend(s string) (string, error) {
 	n := len(s)
 	if n < 2 {
