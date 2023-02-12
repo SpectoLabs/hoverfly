@@ -52,12 +52,8 @@ var Matchers = map[string]MatcherDetails{
 		MatcherFunction:     XmlTemplatedMatch,
 		MatchValueGenerator: IdentityValueGenerator,
 	},
-	ContainsExactly: {
-		MatcherFunction:     ContainsExactlyMatch,
-		MatchValueGenerator: IdentityValueGenerator,
-	},
 	Array: {
-		MatcherFunction:     ContainsExactlyMatch,
+		MatcherFunction:     ArrayMatchWithoutConfig,
 		MatchValueGenerator: IdentityValueGenerator,
 	},
 	JWT: {

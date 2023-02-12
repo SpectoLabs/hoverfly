@@ -508,44 +508,6 @@ Example
         </tbody>
     </table>
 
-ContainsExactly matcher
------------------------
-
-Verifies that the matcher group contains exactly the given values and nothing else in passed in request to match, in the same order. This matcher is case-sensitive.
-
-
-Example
-"""""""
-
-.. code:: json
-
-   "matcher": "containsexactly"
-   "value": "[?]"
-
-.. raw:: html
-
-    <table border="1" class="docutils matcher-examples">
-        <thead>
-            <tr class="row-odd">
-                <th class="head">Array to match</th>
-                <th class="head">Matcher value</th>
-                <th class="head">Match</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="row-even">
-                <td>["param1", "param2", "param3"]</td>
-                <td>["param1", "param2", "param3"]</td>
-                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
-            <tr/>
-            <tr class="row-odd">
-                <td>["param2", "param1", "param3"]</td>
-                <td>["param1", "param2", "param3"]</td>
-                <td class="example-icon"><span class="fa fa-times fa-failure"></span></td>
-            <tr/>
-        </tbody>
-    </table>
-
 
 Generic Array matcher
 -----------------------
