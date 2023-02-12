@@ -366,7 +366,7 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 			var matcher string
 			var value interface{}
 			if len(values) > 1 {
-				matcher = matchers.ContainsExactly
+				matcher = matchers.Array
 				value = values
 			} else {
 				matcher = matchers.Exact

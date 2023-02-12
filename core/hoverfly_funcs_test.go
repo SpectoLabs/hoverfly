@@ -3,13 +3,14 @@ package hoverfly
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/modes"
 	"io/ioutil"
 	"net/http"
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/modes"
+
 	"github.com/SpectoLabs/hoverfly/core/cache"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -841,7 +842,7 @@ func Test_Hoverfly_Save_SavesRequestContainsMultiValueQuery(t *testing.T) {
 	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveLen(1))
 	Expect(*unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Query).To(HaveKeyWithValue("query", []models.RequestFieldMatchers{
 		{
-			Matcher: matchers.ContainsExactly,
+			Matcher: matchers.Array,
 			Value:   expectedValues[:],
 		},
 	}))

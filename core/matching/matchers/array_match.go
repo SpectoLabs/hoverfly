@@ -14,6 +14,11 @@ const (
 
 var Array = "array"
 
+func ArrayMatchWithoutConfig(match interface{}, toMatch string) bool {
+
+	return ArrayMatch(match, toMatch, nil)
+}
+
 func ArrayMatch(match interface{}, toMatch string, config map[string]interface{}) bool {
 	matchStringArr, ok := util.GetStringArray(match)
 	if !ok {

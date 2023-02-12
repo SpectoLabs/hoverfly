@@ -17,7 +17,7 @@ func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMa
 
 	for _, field := range fields {
 		if isMatching(field, toMatch) {
-			if field.Matcher == matchers.Exact || field.Matcher == matchers.ContainsExactly {
+			if field.Matcher == matchers.Exact || (field.Matcher == matchers.Array && field.Config == nil) {
 				fieldMatch.Score = fieldMatch.Score + 2
 			} else {
 				fieldMatch.Score = fieldMatch.Score + 1
