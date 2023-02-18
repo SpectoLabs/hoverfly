@@ -1,6 +1,7 @@
 package hook
 
 import (
+	"bytes"
 	"errors"
 	"io/ioutil"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	log "github.com/sirupsen/logrus"
 )
 
 type Hook struct {
@@ -106,12 +108,18 @@ func (hook *Hook) ExecuteLocally() error {
 	time.Sleep(time.Duration(200+hook.DelayInMilliSeconds) * time.Millisecond)
 
 	hookCommand := exec.Command(hook.Binary, hook.Script.Name())
+	var stdout bytes.Buffer
+	hookCommand.Stdout = &stdout
 	if err := hookCommand.Start(); err != nil {
 		return err
 	}
 
 	if err := hookCommand.Wait(); err != nil {
 		return err
+	}
+
+	if len(stdout.Bytes()) > 0 {
+		log.Info("Output from post serve action hook" + stdout.String())
 	}
 	return nil
 }
