@@ -1,6 +1,6 @@
 package testdata
 
-var ArrayMatcherForHeaders = `{
+var ArrayMatcher = `{
 	"data": {
 		"pairs": [
 			{

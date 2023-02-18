@@ -316,7 +316,7 @@ var _ = Describe("	When using different matchers", func() {
 	Context("Using array matchers", func() {
 
 		BeforeEach(func() {
-			hoverfly.ImportSimulation(testdata.ArrayMatcherForHeaders)
+			hoverfly.ImportSimulation(testdata.ArrayMatcher)
 		})
 
 		It("should match multiple header values with array matcher", func() {
@@ -336,6 +336,23 @@ var _ = Describe("	When using different matchers", func() {
 			Expect(response.StatusCode).To(Equal(200))
 
 			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("array matchers matches query")))
+		})
+	})
+
+	Context("Using JWT matchers", func() {
+
+		BeforeEach(func() {
+			hoverfly.ImportSimulation(testdata.JwtMatcher)
+		})
+
+		It("should match JWT token in header with JWT matcher", func() {
+			req := sling.New().Get("http://test.com")
+			req.Set("Authorisation", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("jwt matchers matches")))
 		})
 	})
 })
