@@ -24,37 +24,6 @@ type templateHelpers struct {
 	fakerSource *gofakeit.Faker
 }
 
-func (t templateHelpers) iso8601DateTime() string {
-	return t.now().UTC().Format(defaultDateTimeFormat)
-}
-
-func (t templateHelpers) iso8601DateTimePlusDays(days string) string {
-	atoi, _ := strconv.Atoi(days)
-	return t.now().AddDate(0, 0, atoi).UTC().Format(defaultDateTimeFormat)
-}
-
-func (t templateHelpers) currentDateTime(format string) string {
-	return t.now().UTC().Format(format)
-}
-
-func (t templateHelpers) currentDateTimeAdd(addTime string, format string) string {
-	now := t.now()
-	duration, err := ParseDuration(addTime)
-	if err == nil {
-		now = now.Add(duration)
-	}
-	return now.UTC().Format(format)
-}
-
-func (t templateHelpers) currentDateTimeSubtract(subtractTime string, format string) string {
-	now := t.now()
-	duration, err := ParseDuration(subtractTime)
-	if err == nil {
-		now = now.Add(-duration)
-	}
-	return now.UTC().Format(format)
-}
-
 func (t templateHelpers) nowHelper(offset string, format string) string {
 	now := t.now()
 	if offset != "" {

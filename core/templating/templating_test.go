@@ -3,8 +3,6 @@ package templating_test
 import (
 	"testing"
 
-	"time"
-
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/templating"
 	. "github.com/onsi/gomega"
@@ -259,56 +257,6 @@ Looping through path params:
 
 State One: A
 State Two: B`))
-}
-
-func TestTemplatingWithHelperMethodsForDates(t *testing.T) {
-	RegisterTestingT(t)
-
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{iso8601DateTime}}`)
-
-	Expect(err).To(BeNil())
-
-	Expect(template).To(Equal(time.Now().UTC().Format("2006-01-02T15:04:05Z07:00")))
-
-	template, err = ApplyTemplate(&models.RequestDetails{
-		Query: map[string][]string{
-			"plusDays": {"2"},
-		},
-	}, make(map[string]string), `{{iso8601DateTimePlusDays Request.QueryParam.plusDays}}`)
-
-	Expect(err).To(BeNil())
-
-	Expect(template).To(Equal(time.Now().AddDate(0, 0, 2).UTC().Format("2006-01-02T15:04:05Z07:00")))
-}
-
-func Test_ApplyTemplate_currentDateTime(t *testing.T) {
-	RegisterTestingT(t)
-
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{currentDateTime "2006-01-02T15:04:05Z07:00"}}`)
-
-	Expect(err).To(BeNil())
-
-	Expect(template).To(Not(Equal(ContainSubstring(`{{currentDateTime "2006-01-02T15:04:05Z07:00"}}`))))
-}
-
-func Test_ApplyTemplate_currentDateTimeAdd(t *testing.T) {
-	RegisterTestingT(t)
-
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{currentDateTimeAdd "5m" "2006-01-02T15:04:05Z07:00"}}`)
-
-	Expect(err).To(BeNil())
-
-	Expect(template).To(Not(Equal(ContainSubstring(`{{currentDateTimeAdd "5m" "2006-01-02T15:04:05Z07:00"}}`))))
-}
-
-func Test_ApplyTemplate_currentDateTimeSubtract(t *testing.T) {
-	RegisterTestingT(t)
-
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{currentDateTimeSubtract "5m" "2006-01-02T15:04:05Z07:00"}}`)
-
-	Expect(err).To(BeNil())
-
-	Expect(template).To(Not(Equal(ContainSubstring(`{{currentDateTimeSubtract "5m" "2006-01-02T15:04:05Z07:00"}}`))))
 }
 
 func Test_ApplyTemplate_now(t *testing.T) {

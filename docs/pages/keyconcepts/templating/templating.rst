@@ -83,20 +83,11 @@ Additional data can come from helper methods. These are the ones Hoverfly curren
 | A random UUID                                             | {{ randomUuid }}                                          |  7b791f3d-d7f4-4635-8ea1-99568d821562   |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Replace all occurrences of the old value with the new     | {{ replace Request.Body 'be' 'mock' }}                    |                                         |
+|                                                           |                                                           |                                         |
 | value in the target string                                | (where Request.Body has the value of "to be or not to be" |  to mock or not to mock                 |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Generate random data using go-fakeit                      | {{ faker 'Name' }}                                        |  John Smith                             |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-
-.. note::
-
-    The following helper methods will be deprecated, please use ``now`` helper for date time:
-        - ``iso8601DateTime``
-        - ``iso8601DateTimePlusDays``
-        - ``currentDateTime``
-        - ``currentDateTimeAdd``
-        - ``currentDateTimeSubtract``
-
 
 Time offset
 ~~~~~~~~~~~
