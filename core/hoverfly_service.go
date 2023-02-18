@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"github.com/SpectoLabs/hoverfly/core/delay"
+	"github.com/SpectoLabs/hoverfly/core/hook"
 
 	"strings"
 
@@ -457,6 +458,38 @@ func (hf *Hoverfly) GetFilteredDiff(diffFilterView v2.DiffFilterView) map[v2.Sim
 		}
 	}
 	return filteredResponsesDiff
+}
+
+func (hf *Hoverfly) GetPostServeActionDetails() v2.PostServeActionDetailsView {
+	var hooks []v2.HookView
+	for hookName, hook := range hf.PostServeActionDetails.Hooks {
+		hooks = append(hooks, hook.GetHookView(hookName))
+	}
+	return v2.PostServeActionDetailsView{
+		Hooks: hooks,
+	}
+}
+
+func (hf *Hoverfly) RegisterPostServeActionHook(hookName string, binary string, scriptContent string, delayInMilliSeconds int) error {
+
+	hook, err := hook.NewHook(hookName, binary, scriptContent, delayInMilliSeconds)
+	if err != nil {
+		return err
+	}
+	err = hf.PostServeActionDetails.AddHook(hookName, hook)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (hf *Hoverfly) DeletePostServeActionHook(hookName string) error {
+
+	err := hf.PostServeActionDetails.DeleteHook(hookName)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func needsToExcludeDiffEntry(diffReportEntry *v2.DiffReportEntry, diffFilterView *v2.DiffFilterView) bool {

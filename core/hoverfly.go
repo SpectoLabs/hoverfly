@@ -2,11 +2,17 @@ package hoverfly
 
 import (
 	"fmt"
+	"net"
+	"net/http"
+	"sync"
+	"time"
+
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/delay"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/hook"
 	"github.com/SpectoLabs/hoverfly/core/journal"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
@@ -15,10 +21,6 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/state"
 	"github.com/SpectoLabs/hoverfly/core/templating"
 	log "github.com/sirupsen/logrus"
-	"net"
-	"net/http"
-	"sync"
-	"time"
 )
 
 // Hoverfly provides access to hoverfly - updating/starting/stopping proxy, http client and configuration, cache access
@@ -39,12 +41,12 @@ type Hoverfly struct {
 
 	state *state.State
 
-	Simulation    *models.Simulation
-	StoreLogsHook *StoreLogsHook
-	Journal       *journal.Journal
-	templator     *templating.Templator
-
-	responsesDiff map[v2.SimpleRequestDefinitionView][]v2.DiffReport
+	Simulation             *models.Simulation
+	StoreLogsHook          *StoreLogsHook
+	Journal                *journal.Journal
+	templator              *templating.Templator
+	PostServeActionDetails *hook.PostServeActionDetails
+	responsesDiff          map[v2.SimpleRequestDefinitionView][]v2.DiffReport
 }
 
 func NewHoverfly() *Hoverfly {
@@ -52,15 +54,16 @@ func NewHoverfly() *Hoverfly {
 	authBackend := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
 
 	hoverfly := &Hoverfly{
-		Simulation:     models.NewSimulation(),
-		Authentication: authBackend,
-		Counter:        metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture, modes.Spy, modes.Diff}),
-		StoreLogsHook:  NewStoreLogsHook(),
-		Journal:        journal.NewJournal(),
-		Cfg:            InitSettings(),
-		state:          state.NewState(),
-		templator:      templating.NewTemplator(),
-		responsesDiff:  make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport),
+		Simulation:             models.NewSimulation(),
+		Authentication:         authBackend,
+		Counter:                metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture, modes.Spy, modes.Diff}),
+		StoreLogsHook:          NewStoreLogsHook(),
+		Journal:                journal.NewJournal(),
+		Cfg:                    InitSettings(),
+		state:                  state.NewState(),
+		templator:              templating.NewTemplator(),
+		responsesDiff:          make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport),
+		PostServeActionDetails: hook.NewPostServeActionDetails(),
 	}
 
 	hoverfly.version = "v1.4.0"
@@ -214,6 +217,10 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	} else {
 		log.Debug("Applying global delay")
 		hf.applyGlobalDelay(requestDetails)
+	}
+
+	if postServeActionHook, ok := hf.PostServeActionDetails.Hooks[result.PostServeActionHookName]; ok {
+		go postServeActionHook.ExecuteLocally()
 	}
 
 	return result.Response

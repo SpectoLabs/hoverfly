@@ -65,16 +65,17 @@ func NewMatcherView(matcher string, value interface{}) MatcherViewV5 {
 func (this RequestMatcherResponsePairViewV5) GetResponse() interfaces.Response { return this.Response }
 
 type ResponseDetailsViewV5 struct {
-	Status           int                    `json:"status"`
-	Body             string                 `json:"body"`
-	BodyFile         string                 `json:"bodyFile,omitempty"`
-	EncodedBody      bool                   `json:"encodedBody"`
-	Headers          map[string][]string    `json:"headers,omitempty"`
-	Templated        bool                   `json:"templated"`
-	TransitionsState map[string]string      `json:"transitionsState,omitempty"`
-	RemovesState     []string               `json:"removesState,omitempty"`
-	FixedDelay       int                    `json:"fixedDelay,omitempty"`
-	LogNormalDelay   *LogNormalDelayOptions `json:"logNormalDelay,omitempty"`
+	Status                 int                    `json:"status"`
+	Body                   string                 `json:"body"`
+	BodyFile               string                 `json:"bodyFile,omitempty"`
+	EncodedBody            bool                   `json:"encodedBody"`
+	Headers                map[string][]string    `json:"headers,omitempty"`
+	Templated              bool                   `json:"templated"`
+	TransitionsState       map[string]string      `json:"transitionsState,omitempty"`
+	RemovesState           []string               `json:"removesState,omitempty"`
+	FixedDelay             int                    `json:"fixedDelay,omitempty"`
+	LogNormalDelay         *LogNormalDelayOptions `json:"logNormalDelay,omitempty"`
+	PostSimulationHookName string                 `json:"postSimulationHookName,omitempty"`
 }
 
 // Gets Status - required for interfaces.Response
@@ -111,6 +112,11 @@ func (this ResponseDetailsViewV5) GetLogNormalDelay() interfaces.ResponseDelay {
 	}
 
 	return nil
+}
+
+func (this ResponseDetailsViewV5) GetPostSimulationHookName() string {
+
+	return this.PostSimulationHookName
 }
 
 type LogNormalDelayOptions struct {
