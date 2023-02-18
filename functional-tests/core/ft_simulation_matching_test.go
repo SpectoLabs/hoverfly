@@ -3,7 +3,6 @@ package hoverfly_test
 import (
 	"encoding/xml"
 	"io"
-	"io/ioutil"
 
 	"bytes"
 
@@ -42,7 +41,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("xpath match")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("xpath match")))
 		})
 
 		It("should not match on no body", func() {
@@ -51,7 +50,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(502))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+			Expect(io.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
 		})
 	})
 
@@ -68,7 +67,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("xml match")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("xml match")))
 		})
 
 		It("should not match on wrong body", func() {
@@ -78,7 +77,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(502))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+			Expect(io.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
 		})
 	})
 
@@ -95,7 +94,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("xml match")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("xml match")))
 		})
 
 		It("should not match on wrong body", func() {
@@ -105,7 +104,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(502))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+			Expect(io.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
 		})
 	})
 
@@ -124,7 +123,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("json match")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("json match")))
 		})
 
 		It("should not match on no body", func() {
@@ -134,7 +133,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(502))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+			Expect(io.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
 		})
 	})
 
@@ -151,7 +150,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("json match")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("json match")))
 		})
 
 		It("should not match on no body", func() {
@@ -160,7 +159,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(502))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+			Expect(io.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
 		})
 	})
 
@@ -177,7 +176,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("regex match")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("regex match")))
 		})
 
 		It("should not match on no body", func() {
@@ -186,7 +185,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(502))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+			Expect(io.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
 		})
 	})
 
@@ -203,7 +202,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("glob match")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("glob match")))
 		})
 
 		It("should not match on no body", func() {
@@ -212,7 +211,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(502))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+			Expect(io.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
 		})
 	})
 
@@ -229,7 +228,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("multiple matches")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("multiple matches")))
 		})
 
 		It("should not match on wrong body", func() {
@@ -239,7 +238,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(502))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+			Expect(io.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
 		})
 
 		It("should match on the destination", func() {
@@ -248,7 +247,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("multiple matches 2")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("multiple matches 2")))
 		})
 
 		It("should not match on wrong destination", func() {
@@ -257,7 +256,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(502))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
+			Expect(io.ReadAll(response.Body)).Should(ContainSubstring("There was an error when matching"))
 		})
 	})
 
@@ -274,7 +273,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("header matchers matches")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("header matchers matches")))
 		})
 
 		It("should match on the headers", func() {
@@ -284,7 +283,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("header matchers matches")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("header matchers matches")))
 		})
 	})
 
@@ -300,7 +299,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("query matchers matches")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("query matchers matches")))
 		})
 
 		It("should match on the queries", func() {
@@ -309,7 +308,7 @@ var _ = Describe("	When using different matchers", func() {
 			response := hoverfly.Proxy(req)
 			Expect(response.StatusCode).To(Equal(200))
 
-			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("query matchers matches")))
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("query matchers matches")))
 		})
 	})
 
@@ -354,5 +353,23 @@ var _ = Describe("	When using different matchers", func() {
 
 			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("jwt matchers matches")))
 		})
+	})
+
+	Context("Using matcher chaining", func() {
+
+		BeforeEach(func() {
+			hoverfly.ImportSimulation(testdata.MatcherChaining)
+		})
+
+		It("should match on the body", func() {
+			req := sling.New().Get("http://test.com")
+			req.Body(bytes.NewBufferString(`{"items": [{}, {}, {}, {}, {"name": "pineapple", "price": 1.99}]}`))
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("matcher chaining")))
+		})
+
 	})
 })
