@@ -48,11 +48,6 @@ func NewTemplator() *Templator {
 	}
 	helperMethodMap := make(map[string]interface{})
 	if !helpersRegistered {
-		helperMethodMap["iso8601DateTime"] = t.iso8601DateTime
-		helperMethodMap["iso8601DateTimePlusDays"] = t.iso8601DateTimePlusDays
-		helperMethodMap["currentDateTime"] = t.currentDateTime
-		helperMethodMap["currentDateTimeAdd"] = t.currentDateTimeAdd
-		helperMethodMap["currentDateTimeSubtract"] = t.currentDateTimeSubtract
 		helperMethodMap["now"] = t.nowHelper
 		helperMethodMap["randomString"] = t.randomString
 		helperMethodMap["randomStringLength"] = t.randomStringLength
