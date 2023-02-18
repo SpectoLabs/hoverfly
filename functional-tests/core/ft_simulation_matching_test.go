@@ -2,6 +2,7 @@ package hoverfly_test
 
 import (
 	"encoding/xml"
+	"io"
 	"io/ioutil"
 
 	"bytes"
@@ -309,6 +310,32 @@ var _ = Describe("	When using different matchers", func() {
 			Expect(response.StatusCode).To(Equal(200))
 
 			Expect(ioutil.ReadAll(response.Body)).Should(Equal([]byte("query matchers matches")))
+		})
+	})
+
+	Context("Using array matchers", func() {
+
+		BeforeEach(func() {
+			hoverfly.ImportSimulation(testdata.ArrayMatcherForHeaders)
+		})
+
+		It("should match multiple header values with array matcher", func() {
+			req := sling.New().Get("http://test.com")
+			req.Set("test1", "a;b;c")
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("array matchers matches")))
+		})
+
+		It("should match multiple query values with array matcher ignoring orders", func() {
+			req := sling.New().Get("http://test.com?test=value3&test=value1&test=value2")
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("array matchers matches query")))
 		})
 	})
 })
