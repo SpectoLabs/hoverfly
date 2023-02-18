@@ -13,23 +13,6 @@ Enabling Templating
 
 By default templating is disabled. In order to enable it, set the ``templated`` field to true in the response of a simulation.
 
-Faker (NEW)
------------
-
-Support for `go-fakeit <https://github.com/brianvoe/gofakeit>`_ was recently added in order to extend the templating capabilities of Hoverfly. 
-Faker covers many different test data requirements and it can be used within
-Hoverfly templated responses by using the ``faker`` helper, followed by the faker type (e.g. ``Name``, ``Email``)
-As an example, to generate a random fake name you can use the following expression:
-
-.. code:: json
-
-    {
-        "body": "{\n  \"name\": \"{{faker 'Name'}}\"}"
-    }
-
-Fakers that require arguments are currently not supported.
-
-
 Getting data from the request
 -----------------------------
 
@@ -100,8 +83,9 @@ Additional data can come from helper methods. These are the ones Hoverfly curren
 | A random UUID                                             | {{ randomUuid }}                                          |  7b791f3d-d7f4-4635-8ea1-99568d821562   |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Replace all occurrences of the old value with the new     | {{ replace Request.Body 'be' 'mock' }}                    |                                         |
-|                                                           |                                                           |                                         |
 | value in the target string                                | (where Request.Body has the value of "to be or not to be" |  to mock or not to mock                 |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Generate random data using go-fakeit                      | {{ faker 'Name' }}                                        |  John Smith                             |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 
 .. note::
@@ -176,6 +160,21 @@ Example date time formats
     - ``unix``: UNIX timestamp in seconds
     - ``epoch``: UNIX timestamp in milliseconds
 
+Faker
+~~~~~
+
+Support for `go-fakeit <https://github.com/brianvoe/gofakeit>`_ was added in order to extend the
+templating capabilities of Hoverfly. Faker covers many different test data requirements and it can be used within
+Hoverfly templated responses by using the ``faker`` helper followed by the faker type (e.g. ``Name``, ``Email``)
+For example, you can generate a random name using the following expression:
+
+.. code:: json
+
+    {
+        "body": "{\"name\": \"{{faker 'Name'}}\"}"
+    }
+
+Fakers that require arguments are currently not supported.
 
 Conditional Templating, Looping and More
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -186,12 +185,13 @@ To learn about more advanced templating functionality, such as looping and condi
 
 Global Literals and Variables
 -----------------------------
-We can define global literals and variables which can be used in any of responses. 
+You can define global literals and variables for templated response. This comes in handy when you
+have a lot of templated responses that share the same constant values or helper methods.
 
 Literals
 ~~~~~~~~
 
-- Format to define literals under data is as follow. 
+Literals are constant values. You can declare literals as follows and then reference it in templated response as ``{{ Literals.<literal name> }}``.
 
 ::
 
@@ -203,7 +203,7 @@ Literals
                 "name":"literal1",
                 "value":"value1"
             },
-            { 
+            {
                 "name":"literal2",
                 "value":["value1", "value2", "value3"]
             },
@@ -220,11 +220,8 @@ Literals
 Variables
 ~~~~~~~~~
 
-- Format to define variables under data is as follow. 
-
-- Variables can be value fetched using any helper function described in above section.
-  
-- We can also fetch anything from request body to variable using jsonpath or xpath.
+Variable lets you define a helper method that can be shared among templated responses.
+You can associate the helper method with a name and then reference it in templated response as ``{{ Vars.<variable name> }}``.
 
 ::
 
@@ -264,13 +261,3 @@ Variables
         ]
     }
 
-Getting data for defined Literals and Variables
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Defined literals and variables can be accessed in any of responses using below way via templating.
-
-+-----------+-------------------------------------+
-| Literals  | {{Literals.<literal name>}}         |
-+-----------+-------------------------------------+
-| Variables | {{Vars.<variable name>}}            |
-+-----------+-------------------------------------+
