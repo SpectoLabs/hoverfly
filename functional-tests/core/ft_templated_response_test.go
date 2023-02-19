@@ -2,7 +2,7 @@ package hoverfly_test
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net"
 	"regexp"
 	"strconv"
@@ -37,25 +37,25 @@ var _ = Describe("When I run Hoverfly", func() {
 			hoverfly.SetMode("simulate")
 		})
 
-		It("should not template response if templating is disabled explicitely", func() {
+		It("should not template response if templating is disabled explicitly", func() {
 			hoverfly.ImportSimulation(testdata.TemplatingDisabled)
 
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com?one=foo"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal("{{ Request.QueryParam.singular }}"))
 		})
 
-		It("should not template response if templating is not explcitely enabled or disabled", func() {
+		It("should not template response if templating is not explicitly enabled or disabled", func() {
 			hoverfly.ImportSimulation(testdata.TemplatingDisabledByDefault)
 
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com?one=foo"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal("{{ Request.QueryParam.one }}"))
@@ -69,7 +69,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com?one=foo"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal("foo"))
@@ -77,7 +77,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp = hoverfly.Proxy(sling.New().Get("http://test-server.com?one=bar"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err = ioutil.ReadAll(resp.Body)
+			body, err = io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal("bar"))
@@ -91,7 +91,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/two"))
 			Expect(resp.StatusCode).To(Equal(200))
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 			Expect(string(body)).To(Equal("state for eggs"))
 		})
@@ -102,7 +102,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com?wrong=foo"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal(""))
@@ -116,7 +116,7 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			resp = hoverfly.Proxy(sling.New().Get("http://test-server.com/two"))
 			Expect(resp.StatusCode).To(Equal(200))
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 			Expect(string(body)).To(Equal("status is connected"))
 		})
@@ -135,7 +135,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomString"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			_, err := ioutil.ReadAll(resp.Body)
+			_, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 		})
 
@@ -145,7 +145,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomStringLength10"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(len(string(body))).To(Equal(10))
@@ -157,7 +157,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomBoolean"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			_, err = strconv.ParseBool(string(body))
@@ -170,7 +170,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomInteger"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			parsedInt, err := strconv.ParseInt(string(body), 10, 0)
@@ -200,7 +200,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomIntegerRange1-10"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			parsedInt, err := strconv.ParseInt(string(body), 10, 0)
@@ -214,7 +214,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomFloat"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			parsedFloat, err := strconv.ParseFloat(string(body), 1)
@@ -229,7 +229,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomFloatRange1-10"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			parsedFloat, err := strconv.ParseFloat(string(body), 1)
@@ -244,7 +244,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomEmail"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(IsEmail(string(body))).To(BeTrue())
@@ -256,7 +256,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomIPv4"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(IsIPv4(string(body))).To(BeTrue())
@@ -268,7 +268,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomIPv6"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(IsIPv6(string(body))).To(BeTrue())
@@ -280,7 +280,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/randomuuid"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 			returnedUuid := uuid.Parse(string(body))
 
@@ -293,7 +293,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/faker"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Not(BeEmpty()))
@@ -314,7 +314,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			// TODO: Handle this?
@@ -328,20 +328,20 @@ var _ = Describe("When I run Hoverfly", func() {
 			}))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal("value"))
 		})
 
-		It("Request.Body jsonpath incorect", func() {
+		It("Request.Body jsonpath incorrect", func() {
 			hoverfly.ImportSimulation(testdata.TemplatingRequest)
 			resp := hoverfly.Proxy(sling.New().Post("http://test-server.com/Request.Body_jsonpath").BodyJSON(map[string]string{
 				"nottest": "value",
 			}))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal(""))
@@ -352,7 +352,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Post("http://test-server.com/Request.Body_xpath").Body(bytes.NewBuffer([]byte(`<?xml version="1.0" encoding="UTF-8"?><root><text>value</text></root>`))))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal("value"))
@@ -363,7 +363,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Post("http://test-server.com/Request.Body_xpath").Body(bytes.NewBuffer([]byte(`<?xml version="1.0" encoding="UTF-8"?><root><nottext>test</text></root>`))))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal(""))
@@ -375,7 +375,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request.Method"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal("GET"))
@@ -387,7 +387,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request.Scheme"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal("http"))
@@ -399,7 +399,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/one/two/three/Request.Path"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			// TODO: Handle this?
@@ -412,7 +412,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/one/two/three/Request.Path0"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			// TODO: Handle this?
@@ -425,7 +425,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request.QueryParam?query=param"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			// TODO: Handle this?
@@ -438,10 +438,23 @@ var _ = Describe("When I run Hoverfly", func() {
 			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request.QueryParam.query?query=param"))
 			Expect(resp.StatusCode).To(Equal(200))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
 			Expect(string(body)).To(Equal("param"))
+		})
+
+		It("Gloabl literals and variables", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+			resp := hoverfly.Proxy(sling.New().Post("http://test-server.com/global").BodyJSON(map[string]string{
+				"city": "London",
+			}))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := io.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Equal(`{"destination":"London"}`))
 		})
 
 	})
