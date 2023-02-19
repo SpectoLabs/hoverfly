@@ -20,7 +20,16 @@ func SetPostServeActionHook(hookName, binary, scriptContent string, delayInMilli
 		return err
 	}
 
-	_, err = doRequest(target, "POST", v2ApiRegisterPostServeActionHook, string(marshalledHook), nil)
+	_, err = doRequest(target, "POST", v2ApiPostServeActionHook, string(marshalledHook), nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeletePostServeActionHook(hookName string, target configuration.Target) error {
+
+	_, err := doRequest(target, "DELETE", v2ApiPostServeActionHook+"?name="+hookName, "", nil)
 	if err != nil {
 		return err
 	}

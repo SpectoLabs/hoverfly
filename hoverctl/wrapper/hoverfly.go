@@ -20,17 +20,17 @@ import (
 )
 
 const (
-	v2ApiSimulation                  = "/api/v2/simulation"
-	v2ApiMode                        = "/api/v2/hoverfly/mode"
-	v2ApiDestination                 = "/api/v2/hoverfly/destination"
-	v2ApiState                       = "/api/v2/state"
-	v2ApiMiddleware                  = "/api/v2/hoverfly/middleware"
-	v2ApiRegisterPostServeActionHook = "/api/v2/hoverfly/post-serve-actions/hook"
-	v2ApiPac                         = "/api/v2/hoverfly/pac"
-	v2ApiCache                       = "/api/v2/cache"
-	v2ApiLogs                        = "/api/v2/logs"
-	v2ApiHoverfly                    = "/api/v2/hoverfly"
-	v2ApiDiff                        = "/api/v2/diff"
+	v2ApiSimulation          = "/api/v2/simulation"
+	v2ApiMode                = "/api/v2/hoverfly/mode"
+	v2ApiDestination         = "/api/v2/hoverfly/destination"
+	v2ApiState               = "/api/v2/state"
+	v2ApiMiddleware          = "/api/v2/hoverfly/middleware"
+	v2ApiPostServeActionHook = "/api/v2/hoverfly/post-serve-actions/hook"
+	v2ApiPac                 = "/api/v2/hoverfly/pac"
+	v2ApiCache               = "/api/v2/cache"
+	v2ApiLogs                = "/api/v2/logs"
+	v2ApiHoverfly            = "/api/v2/hoverfly"
+	v2ApiDiff                = "/api/v2/diff"
 
 	v2ApiShutdown = "/api/v2/shutdown"
 	v2ApiHealth   = "/api/health"
