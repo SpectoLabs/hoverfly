@@ -898,7 +898,7 @@ func Test_Hoverfly_Save_SavesAllRequestHeadersWhenGivenAnAsterisk(t *testing.T) 
 	_ = unit.Save(&models.RequestDetails{
 		Headers: map[string][]string{
 			"testheader":  {"testvalue"},
-			"testheader2": {"testvalue2"},
+			"testheader2": {"testvalue2", "testvalue3"},
 		},
 	}, &models.ResponseDetails{
 		Body:    "testresponsebody",
@@ -914,8 +914,8 @@ func Test_Hoverfly_Save_SavesAllRequestHeadersWhenGivenAnAsterisk(t *testing.T) 
 	}))
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["testheader2"]).To(HaveLen(1))
 	Expect(unit.Simulation.GetMatchingPairs()[0].RequestMatcher.Headers["testheader2"][0]).To(Equal(models.RequestFieldMatchers{
-		Matcher: "exact",
-		Value:   "testvalue2",
+		Matcher: "array",
+		Value:   []string{"testvalue2", "testvalue3"},
 	}))
 }
 
