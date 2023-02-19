@@ -33,7 +33,7 @@ func NewHook(hookName, binary, scriptContent string, delayInMilliSeconds int) (*
 		return nil, err
 	}
 
-	if err := setScript(scriptInfo, hookName, scriptContent); err != nil {
+	if err := setScript(scriptInfo, scriptContent); err != nil {
 		return nil, err
 	}
 	return scriptInfo, nil
@@ -48,11 +48,11 @@ func setBinary(hook *Hook, binary string) error {
 	return nil
 }
 
-func setScript(hook *Hook, hookName, scriptContent string) error {
+func setScript(hook *Hook, scriptContent string) error {
 	tempDir := path.Join(os.TempDir(), "hoverfly")
 	os.Mkdir(tempDir, 0777)
 
-	newScript, err := ioutil.TempFile(tempDir, "hoverfly_"+hookName)
+	newScript, err := ioutil.TempFile(tempDir, "hoverflyhook_")
 	if err != nil {
 		return err
 	}

@@ -7,6 +7,6 @@ type PostServeActionDetailsView struct {
 type HookView struct {
 	HookName            string `json:"hookName"`
 	Binary              string `json:"binary"`
-	ScriptContent       string `json:"scriptContent"`
+	ScriptContent       string `json:"script"`
 	DelayInMilliSeconds int    `json:"delayInMilliSeconds,omitempty"`
 }
