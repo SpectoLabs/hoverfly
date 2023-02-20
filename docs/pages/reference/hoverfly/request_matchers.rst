@@ -510,9 +510,38 @@ Example
         </tbody>
     </table>
 
+Form matcher
+-------------
+
+Matches form data posted in the request payload with content type ``application/x-www-form-urlencoded``.
+You can match only the form params you are interested in regardless of the order. You can also leverage
+``jwt`` or ``jsonpath`` matchers if your form params contains JWT tokens or JSON document.
+
+Please note that this matcher only works for ``body`` field.
+
+Example
+"""""""
+
+.. code:: json
+
+    "matcher": "form",
+    "value": {
+        "grant_type": [
+          {
+            "matcher": "exact",
+            "value": "authorization_code"
+          }
+        ],
+      "client_assertion": [
+        {
+          "matcher": "jwt",
+          "value": "{\"header\":{\"alg\":\"HS256\"},\"payload\":{\"sub\":\"1234567890\",\"name\":\"John Doe\"}}"
+        }
+      ]
+    }
 
 Array matcher
------------------------
+-------------
 
 Matches an array contains exactly the given values and nothing else. This can be used to match
 multi-value query param or header in the request data.
@@ -540,7 +569,7 @@ Example
         "profile:vd"
     ]
 
-JWT Matcher
+JWT matcher
 -----------
 
 This matcher is primarily used for matching JWT tokens. This matcher converts base64 encoded JWT to
@@ -556,7 +585,7 @@ Example
     "value": "{\"header\":{\"alg\":\"HS256\"},\"payload\":{\"sub\":\"1234567890\",\"name\":\"John Doe\"}}"
 
 
-Matcher Chaining
+Matcher chaining
 ----------------
 
 Matcher chaining allows you to pass a matched value into another matcher to do further matching.

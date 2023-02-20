@@ -372,4 +372,70 @@ var _ = Describe("	When using different matchers", func() {
 		})
 
 	})
+
+	Context("Using form matcher for request body", func() {
+
+		type PseudoOauthParams struct {
+			ClientAssertion string `url:"client_assertion,omitempty"`
+			GrantType       string `url:"grant_type,omitempty"`
+			Code            string `url:"code,omitempty"`
+		}
+
+		BeforeEach(func() {
+			hoverfly.ImportSimulation(testdata.FormDataMatch)
+		})
+
+		It("should match some form data", func() {
+			req := sling.New().Post("http://test.com/test").BodyForm(&PseudoOauthParams{
+				ClientAssertion: "some-client-assertion",
+				GrantType:       "authorization_code",
+				Code:            "some-auth-code",
+			})
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("form data matches")))
+		})
+
+		It("should match all form data", func() {
+			req := sling.New().Post("http://test.com/test").BodyForm(&PseudoOauthParams{
+				ClientAssertion: "fake-client-assertion",
+				GrantType:       "authorization_code",
+				Code:            "fake-auth-code-1",
+			})
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("all form data matches")))
+		})
+
+		It("should match jwt in form data", func() {
+			req := sling.New().Post("http://test.com/test").BodyForm(&PseudoOauthParams{
+				ClientAssertion: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+				GrantType:       "authorization_code",
+				Code:            "fake-auth-code-2",
+			})
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("jwt in form data matches")))
+		})
+
+		It("should match jwt in form data using matcher chaining", func() {
+			req := sling.New().Post("http://test.com/test").BodyForm(&PseudoOauthParams{
+				ClientAssertion: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+				GrantType:       "authorization_code",
+				Code:            "fake-auth-code-3",
+			})
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("jwt in form data matches with chaining")))
+		})
+
+	})
 })
