@@ -106,14 +106,14 @@ var FormDataMatch = `{
 								}],
 								"client_assertion": [{
 									"matcher": "jwt", 
-									"value": "{\"header\":{\"alg\":\"HS256\"},\"payload\":{\"sub\":\"1234567890\",\"name\":\"John Doe\"}}",
-									"doMatching": {
+									"value": "{\"header\":{\"alg\":\"HS256\"},\"payload\":{}}",
+									"doMatch": {
 										"matcher": "jsonpath", 
 										"value": "$.payload",
-										"doMatching": {
+										"doMatch": {
 											"matcher": "jsonpath", 
 											"value": "$.name",
-											"doMatching": {
+											"doMatch": {
 												"matcher": "exact", 
 												"value": "John Doe"
 											}
