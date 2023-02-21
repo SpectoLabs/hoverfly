@@ -9,9 +9,9 @@ var MatcherChaining = `{
 						{
 							"matcher": "jsonpath",
 							"value": "$.items[4]",
-							"doMatching": {
+							"doMatch": {
 								"matcher": "jsonPartial",
-								"value": "{\"fruit\": \"pineapple\"}"
+								"value": "{\"name\": \"pineapple\"}"
 							}
 						}
 					]
