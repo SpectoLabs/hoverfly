@@ -93,7 +93,7 @@ func getScriptShorthand(script string) string {
 		if verbose || len(middlewareScript) < 5 {
 			return script
 		} else {
-			return fmt.Sprintln(scriptArr[0], scriptArr[1], scriptArr[2], scriptArr[3], scriptArr[4])
+			return fmt.Sprintln(scriptArr[0], scriptArr[1], scriptArr[2], scriptArr[3], scriptArr[4], "...")
 		}
 	}
 	return ""
