@@ -348,7 +348,9 @@ Example
 
 JSON partial matcher
 --------------------
-Unlike a JSON matcher which does the full matching of two JSON documents, this matcher evaluates if the matcher value is a subset of the incoming JSON document. The matcher ignores any absent fields and lets you match only the part of JSON document you care about.
+Unlike a JSON matcher which does the full matching of two JSON documents, this matcher evaluates
+if the matcher value is a subset of the incoming JSON document. The matcher ignores any absent fields
+and lets you match only the part of JSON document you care about.
 
 Example
 """""""
@@ -508,86 +510,98 @@ Example
         </tbody>
     </table>
 
+Form matcher
+-------------
 
-Generic Array matcher
------------------------
+Matches form data posted in the request payload with content type ``application/x-www-form-urlencoded``.
+You can match only the form params you are interested in regardless of the order. You can also leverage
+``jwt`` or ``jsonpath`` matchers if your form params contains JWT tokens or JSON document.
 
-Matches the matcher group with value passed in request array based on the configuration passed.
-
-- ignoreOrder - ignore order in which values that are passed.
-- ignoreUnknown - ignore unknowns in the values that are passed.
-- ignoreOccurrences - ignore number of occurrences of elements that are passed with respect to matcher value.
+Please note that this matcher only works for ``body`` field.
 
 Example
 """""""
 
 .. code:: json
 
-   "matcher": "array"
-   "value": "[?]"
-   "configuration": "{}"
+    "matcher": "form",
+    "value": {
+        "grant_type": [
+          {
+            "matcher": "exact",
+            "value": "authorization_code"
+          }
+        ],
+      "client_assertion": [
+        {
+          "matcher": "jwt",
+          "value": "{\"header\":{\"alg\":\"HS256\"},\"payload\":{\"sub\":\"1234567890\",\"name\":\"John Doe\"}}"
+        }
+      ]
+    }
 
-   Example:
+Array matcher
+-------------
 
-   {
-        "matcher": "array",
-        "config": {
-            "ignoreUnknown": <true/false>,
-            "ignoreOrder": <true/false>,
-            "ignoreOccurrences": <true/false>
-        },
-        "value": [
-            "access:vod",
-            "order:latest",
-            "profile:vd"
+Matches an array contains exactly the given values and nothing else. This can be used to match
+multi-value query param or header in the request data.
+
+The following configuration options are available to change the behaviour of the matcher:
+
+- ignoreOrder - ignore the order of the values.
+- ignoreUnknown - ignore any extra values.
+- ignoreOccurrences - ignore any duplicated values.
+
+Example
+"""""""
+
+.. code:: json
+
+    "matcher": "array",
+    "config": {
+        "ignoreUnknown": <true/false>,
+        "ignoreOrder": <true/false>,
+        "ignoreOccurrences": <true/false>
+    },
+    "value": [
+        "access:vod",
+        "order:latest",
+        "profile:vd"
     ]
 
-JWT Matcher
+JWT matcher
 -----------
 
-This matcher is primarily used for matching JWT tokens. This matcher converts base64 encoded JWT to JSON document ({"header": {}, "payload": ""}) and does partial match with the matcher value.
+This matcher is primarily used for matching JWT tokens. This matcher converts base64 encoded JWT to
+JSON document ({"header": {}, "payload": ""}) and does JSON partial match with the matcher value.
 
 Matcher value contains only keys that they want to match in JWT.
 
 Example
 """""""
-    .. code:: json
+.. code:: json
 
-        "matcher": "jwt"
-        "value": "{\"header\":{\"alg\":\"HS256\"},\"payload\":{\"sub\":\"1234567890\",\"name\":\"John Doe\"}}"
+    "matcher": "jwt"
+    "value": "{\"header\":{\"alg\":\"HS256\"},\"payload\":{\"sub\":\"1234567890\",\"name\":\"John Doe\"}}"
 
 
-Matcher Chaining
+Matcher chaining
 ----------------
 
-- Matcher chaining helps to chain multiple matchers. MatchedValue of parent matcher is feed into child matcher and further matching is done.
+Matcher chaining allows you to pass a matched value into another matcher to do further matching.
 
-- It typically removes the stress of composing and testing complex expressions and make matchers more readable.
+It typically removes the stress of composing and testing complex expressions and make matchers more readable.
 
-- It can be combine any of matchers.
-
-For an example, with matcher chaining, one can use JSONPath to get a JSON node, and use other matcher to compare its value as mentioned below.
+For an example, one can use JSONPath to get a JSON node, then use another matcher to match the JSON node value as follows.
 
 Example
 """""""
 .. code:: json
 
-    "matcher":<any matcher>,
-    "value":?,
+    "matcher": "jsonpath",
+    "value": "$.user.id",
     "doMatch": {
-        "matcher": <any matcher>
-        "value":?
+        matcher: "exact",
+        value: "1"
     }
-
-    {
-        body : [
-            {
-                "matcher": "jsonpath",
-                "value": "$.user.id",
-                "doMatch": {
-                    matcher: "exact",
-                    value: "1"
-                }
-            }
-        ]
 

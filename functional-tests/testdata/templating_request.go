@@ -146,13 +146,42 @@ var TemplatingRequest = `{
 					"encodedBody": false,
 					"templated": true
 				}
+			}, 
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
+							"value": "/global"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "{\"{{ Literals.fieldName }}\":\"{{ Vars.getCityFromJsonBody }}\"}",
+					"encodedBody": false,
+					"templated": true
+				}
 			}
 		],
 		"globalActions": {
 			"delays": []
-		}
+		}, 
+		"literals": [
+			{
+				"name": "fieldName",
+				"value": "destination"
+		 	}
+		],
+		"variables": [
+			{
+				"name": "getCityFromJsonBody",
+				"function": "requestBody",
+				"arguments": ["jsonpath", "$.city"]
+		 	}
+		]
 	},
 	"meta": {
-		"schemaVersion": "v5"
+		"schemaVersion": "v5.2"
 	}
 }`

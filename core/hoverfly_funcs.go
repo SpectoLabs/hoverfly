@@ -349,13 +349,8 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 	var requestHeaders map[string][]models.RequestFieldMatchers
 	if len(headers) > 0 {
 		requestHeaders = map[string][]models.RequestFieldMatchers{}
-		for headerKey, headerValues := range headers {
-			requestHeaders[headerKey] = []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   strings.Join(headerValues, ";"),
-				},
-			}
+		for key, values := range headers {
+			requestHeaders[key] = getRequestMatcherForMultipleValues(values)
 		}
 	}
 
@@ -363,21 +358,7 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 	if len(request.Query) > 0 {
 		queries = &models.QueryRequestFieldMatchers{}
 		for key, values := range request.Query {
-			var matcher string
-			var value interface{}
-			if len(values) > 1 {
-				matcher = matchers.Array
-				value = values
-			} else {
-				matcher = matchers.Exact
-				value = strings.Join(values, ";")
-			}
-			queries.Add(key, []models.RequestFieldMatchers{
-				{
-					Matcher: matcher,
-					Value:   value,
-				},
-			})
+			queries.Add(key, getRequestMatcherForMultipleValues(values))
 		}
 	}
 
@@ -430,4 +411,22 @@ func (hf *Hoverfly) ApplyMiddleware(pair models.RequestResponsePair) (models.Req
 	}
 
 	return pair, nil
+}
+
+func getRequestMatcherForMultipleValues(values []string) []models.RequestFieldMatchers {
+	var matcher string
+	var value interface{}
+	if len(values) > 1 {
+		matcher = matchers.Array
+		value = values
+	} else {
+		matcher = matchers.Exact
+		value = strings.Join(values, ";")
+	}
+	return []models.RequestFieldMatchers{
+		{
+			Matcher: matcher,
+			Value:   value,
+		},
+	}
 }

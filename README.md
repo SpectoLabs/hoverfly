@@ -85,7 +85,7 @@ brew install python
 
 Apache License version 2.0 [See LICENSE for details](https://github.com/SpectoLabs/hoverfly/blob/master/LICENSE).
 
-(c) [SpectoLabs](https://specto.io) 2017.
+(c) [SpectoLabs](https://specto.io) 2023.
 
 [CircleCI-Image]: https://circleci.com/gh/SpectoLabs/hoverfly.svg?style=shield
 [CircleCI-Url]: https://circleci.com/gh/SpectoLabs/hoverfly
