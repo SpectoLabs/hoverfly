@@ -54,6 +54,7 @@ func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) Put(
 	err = postServeActionDetailsHandler.Hoverfly.SetPostServeAction(actionRequest.ActionName, actionRequest.Binary, actionRequest.ScriptContent, actionRequest.DelayInMs)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), 400)
+		return
 	}
 
 	postServeActionDetailsHandler.Get(w, req, next)
@@ -64,6 +65,7 @@ func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) Dele
 	err := postServeActionDetailsHandler.Hoverfly.DeletePostServeAction(actionName)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), 400)
+		return
 	}
 
 	postServeActionDetailsHandler.Get(w, req, next)

@@ -16,7 +16,7 @@ func GetAllPostServeActions(target configuration.Target) (v2.PostServeActionDeta
 
 	defer response.Body.Close()
 
-	err = handleResponseError(response, "Could not retrieve middleware")
+	err = handleResponseError(response, "Could not retrieve all post serve actions")
 	if err != nil {
 		return v2.PostServeActionDetailsView{}, err
 	}
@@ -44,7 +44,14 @@ func SetPostServeAction(actionName, binary, scriptContent string, delayInMs int,
 		return err
 	}
 
-	_, err = doRequest(target, "PUT", v2ApiPostServeAction, string(marshalledAction), nil)
+	response, err := doRequest(target, "PUT", v2ApiPostServeAction, string(marshalledAction), nil)
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+
+	err = handleResponseError(response, "Could not set post serve action")
 	if err != nil {
 		return err
 	}
@@ -53,9 +60,17 @@ func SetPostServeAction(actionName, binary, scriptContent string, delayInMs int,
 
 func DeletePostServeAction(actionName string, target configuration.Target) error {
 
-	_, err := doRequest(target, "DELETE", v2ApiPostServeAction+"/"+actionName, "", nil)
+	response, err := doRequest(target, "DELETE", v2ApiPostServeAction+"/"+actionName, "", nil)
 	if err != nil {
 		return err
 	}
+
+	defer response.Body.Close()
+
+	err = handleResponseError(response, "Could not delete post serve action")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

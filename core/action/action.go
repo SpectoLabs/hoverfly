@@ -17,9 +17,9 @@ import (
 )
 
 type Action struct {
-	Binary              string
-	Script              *os.File
-	DelayInMilliSeconds int
+	Binary    string
+	Script    *os.File
+	DelayInMs int
 }
 
 func NewAction(actionName, binary, scriptContent string, delayInMs int) (*Action, error) {
@@ -29,7 +29,7 @@ func NewAction(actionName, binary, scriptContent string, delayInMs int) (*Action
 		return nil, errors.New("empty action name passed")
 	}
 
-	scriptInfo.DelayInMilliSeconds = delayInMs
+	scriptInfo.DelayInMs = delayInMs
 
 	if err := setBinary(scriptInfo, binary); err != nil {
 		return nil, err
@@ -100,14 +100,11 @@ func (action *Action) GetActionView(actionName string) v2.ActionView {
 		ActionName:    actionName,
 		Binary:        action.Binary,
 		ScriptContent: scriptContent,
-		DelayInMs:     action.DelayInMilliSeconds,
+		DelayInMs:     action.DelayInMs,
 	}
 }
 
 func (action *Action) ExecuteLocally(pair *models.RequestResponsePair) error {
-
-	//adding 400 ms to include some buffer for it to return response
-	time.Sleep(time.Duration(400+action.DelayInMilliSeconds) * time.Millisecond)
 
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 	if err != nil {
@@ -116,7 +113,10 @@ func (action *Action) ExecuteLocally(pair *models.RequestResponsePair) error {
 
 	log.WithFields(log.Fields{
 		"stdin": string(pairViewBytes),
-	}).Info("Preparing to execute post serve action")
+	}).Info("Delaying to execute post serve action")
+
+	//adding 200 ms to include some buffer for it to return response
+	time.Sleep(time.Duration(200+action.DelayInMs) * time.Millisecond)
 
 	actionCommand := exec.Command(action.Binary, action.Script.Name())
 	actionCommand.Stdin = bytes.NewReader(pairViewBytes)
