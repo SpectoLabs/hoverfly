@@ -123,10 +123,11 @@ func (hf *Hoverfly) importRequestResponsePairViewsWithCustomData(pairViews []v2.
 		failed := 0
 		for i, pairView := range pairViews {
 
-			if _, ok := hf.PostServeActionDetails.Actions[pairView.Response.PostServeAction]; !ok {
+			if _, ok := hf.PostServeActionDetails.Actions[pairView.Response.PostServeAction]; pairView.Response.PostServeAction != "" && !ok {
 				importResult.SetError(fmt.Errorf("invalid post server action name provided"))
 				break
 			}
+
 			pair := models.NewRequestMatcherResponsePairFromView(&pairView)
 
 			if pairView.Response.LogNormalDelay != nil {

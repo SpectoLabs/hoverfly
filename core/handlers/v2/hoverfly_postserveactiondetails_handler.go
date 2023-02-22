@@ -36,22 +36,22 @@ func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) Regi
 }
 func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	postSimulationDetailsView := postServeActionDetailsHandler.Hoverfly.GetAllPostServeActions()
-	bytes, _ := json.Marshal(postSimulationDetailsView)
+	postServeActionsDetailsView := postServeActionDetailsHandler.Hoverfly.GetAllPostServeActions()
+	bytes, _ := json.Marshal(postServeActionsDetailsView)
 
 	handlers.WriteResponse(w, bytes)
 }
 
 func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var hookReq ActionView
-	err := handlers.ReadFromRequest(req, &hookReq)
+	var actionRequest ActionView
+	err := handlers.ReadFromRequest(req, &actionRequest)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), 400)
 		return
 	}
 
-	err = postServeActionDetailsHandler.Hoverfly.SetPostServeAction(hookReq.ActionName, hookReq.Binary, hookReq.ScriptContent, hookReq.DelayInMs)
+	err = postServeActionDetailsHandler.Hoverfly.SetPostServeAction(actionRequest.ActionName, actionRequest.Binary, actionRequest.ScriptContent, actionRequest.DelayInMs)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), 400)
 	}
