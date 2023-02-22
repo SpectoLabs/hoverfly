@@ -123,8 +123,8 @@ func (hf *Hoverfly) importRequestResponsePairViewsWithCustomData(pairViews []v2.
 		failed := 0
 		for i, pairView := range pairViews {
 
-			if _, ok := hf.PostServeActionDetails.Hooks[pairView.Response.PostSimulationHookName]; !ok {
-				importResult.SetError(fmt.Errorf("invalid post simulation hook name passed"))
+			if _, ok := hf.PostServeActionDetails.Actions[pairView.Response.PostServeAction]; !ok {
+				importResult.SetError(fmt.Errorf("invalid post server action name provided"))
 				break
 			}
 			pair := models.NewRequestMatcherResponsePairFromView(&pairView)

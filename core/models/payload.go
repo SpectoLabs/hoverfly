@@ -202,16 +202,16 @@ type ResponseDetailsLogNormal struct {
 // to be bytes, however headers should provide all required information for later decoding
 // by the client.
 type ResponseDetails struct {
-	Status                 int
-	Body                   string
-	BodyFile               string
-	Headers                map[string][]string
-	Templated              bool
-	TransitionsState       map[string]string
-	RemovesState           []string
-	FixedDelay             int
-	LogNormalDelay         *ResponseDetailsLogNormal
-	PostSimulationHookName string
+	Status           int
+	Body             string
+	BodyFile         string
+	Headers          map[string][]string
+	Templated        bool
+	TransitionsState map[string]string
+	RemovesState     []string
+	FixedDelay       int
+	LogNormalDelay   *ResponseDetailsLogNormal
+	PostServeAction  string
 }
 
 func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
@@ -223,15 +223,15 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 	}
 
 	details := ResponseDetails{
-		Status:                 data.GetStatus(),
-		Body:                   body,
-		BodyFile:               data.GetBodyFile(),
-		Headers:                data.GetHeaders(),
-		Templated:              data.GetTemplated(),
-		TransitionsState:       data.GetTransitionsState(),
-		RemovesState:           data.GetRemovesState(),
-		FixedDelay:             data.GetFixedDelay(),
-		PostSimulationHookName: data.GetPostSimulationHookName(),
+		Status:           data.GetStatus(),
+		Body:             body,
+		BodyFile:         data.GetBodyFile(),
+		Headers:          data.GetHeaders(),
+		Templated:        data.GetTemplated(),
+		TransitionsState: data.GetTransitionsState(),
+		RemovesState:     data.GetRemovesState(),
+		FixedDelay:       data.GetFixedDelay(),
+		PostServeAction:  data.GetPostServeAction(),
 	}
 
 	if d := data.GetLogNormalDelay(); d != nil {
@@ -306,16 +306,16 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 	}
 
 	view := v2.ResponseDetailsViewV5{
-		Status:                 r.Status,
-		Body:                   body,
-		BodyFile:               r.BodyFile,
-		Headers:                r.Headers,
-		EncodedBody:            needsEncoding,
-		Templated:              r.Templated,
-		RemovesState:           r.RemovesState,
-		TransitionsState:       r.TransitionsState,
-		FixedDelay:             r.FixedDelay,
-		PostSimulationHookName: r.PostSimulationHookName,
+		Status:           r.Status,
+		Body:             body,
+		BodyFile:         r.BodyFile,
+		Headers:          r.Headers,
+		EncodedBody:      needsEncoding,
+		Templated:        r.Templated,
+		RemovesState:     r.RemovesState,
+		TransitionsState: r.TransitionsState,
+		FixedDelay:       r.FixedDelay,
+		PostServeAction:  r.PostServeAction,
 	}
 
 	if r.LogNormalDelay != nil {

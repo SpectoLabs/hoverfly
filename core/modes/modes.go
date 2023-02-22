@@ -49,10 +49,15 @@ type ModeArguments struct {
 }
 
 type ProcessResult struct {
-	Response                *http.Response
-	FixedDelay              int
-	LogNormalDelay          *models.ResponseDetailsLogNormal
-	PostServeActionHookName string
+	Response                    *http.Response
+	FixedDelay                  int
+	LogNormalDelay              *models.ResponseDetailsLogNormal
+	PostServeActionInputDetails *PostServeActionInputDetails
+}
+
+type PostServeActionInputDetails struct {
+	PostServeAction string
+	Pair            *models.RequestResponsePair
 }
 
 func (p ProcessResult) IsResponseDelayable() bool {
@@ -63,8 +68,8 @@ func newProcessResult(response *http.Response, fixedDelay int, logNormalDelay *m
 	return ProcessResult{Response: response, FixedDelay: fixedDelay, LogNormalDelay: logNormalDelay}
 }
 
-func newProcessResultWithHook(response *http.Response, fixedDelay int, logNormalDelay *models.ResponseDetailsLogNormal, postServeActionHookName string) ProcessResult {
-	return ProcessResult{Response: response, FixedDelay: fixedDelay, LogNormalDelay: logNormalDelay, PostServeActionHookName: postServeActionHookName}
+func newProcessResultWithPostServeActionInputDetails(response *http.Response, fixedDelay int, logNormalDelay *models.ResponseDetailsLogNormal, postServeActionInputDetails *PostServeActionInputDetails) ProcessResult {
+	return ProcessResult{Response: response, FixedDelay: fixedDelay, LogNormalDelay: logNormalDelay, PostServeActionInputDetails: postServeActionInputDetails}
 }
 
 // ReconstructRequest replaces original request with details provided in Constructor Payload.RequestMatcher

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/SpectoLabs/hoverfly/core/action"
 	"github.com/SpectoLabs/hoverfly/core/delay"
-	"github.com/SpectoLabs/hoverfly/core/hook"
 
 	"strings"
 
@@ -460,32 +460,32 @@ func (hf *Hoverfly) GetFilteredDiff(diffFilterView v2.DiffFilterView) map[v2.Sim
 	return filteredResponsesDiff
 }
 
-func (hf *Hoverfly) GetPostServeActionDetails() v2.PostServeActionDetailsView {
-	var hooks []v2.HookView
-	for hookName, hook := range hf.PostServeActionDetails.Hooks {
-		hooks = append(hooks, hook.GetHookView(hookName))
+func (hf *Hoverfly) GetAllPostServeActions() v2.PostServeActionDetailsView {
+	var actions []v2.ActionView
+	for actionName, action := range hf.PostServeActionDetails.Actions {
+		actions = append(actions, action.GetActionView(actionName))
 	}
 	return v2.PostServeActionDetailsView{
-		Hooks: hooks,
+		Actions: actions,
 	}
 }
 
-func (hf *Hoverfly) RegisterPostServeActionHook(hookName string, binary string, scriptContent string, delayInMilliSeconds int) error {
+func (hf *Hoverfly) SetPostServeAction(actionName string, binary string, scriptContent string, delayInMs int) error {
 
-	hook, err := hook.NewHook(hookName, binary, scriptContent, delayInMilliSeconds)
+	action, err := action.NewAction(actionName, binary, scriptContent, delayInMs)
 	if err != nil {
 		return err
 	}
-	err = hf.PostServeActionDetails.AddHook(hookName, hook)
+	err = hf.PostServeActionDetails.SetAction(actionName, action)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (hf *Hoverfly) DeletePostServeActionHook(hookName string) error {
+func (hf *Hoverfly) DeletePostServeAction(actionName string) error {
 
-	err := hf.PostServeActionDetails.DeleteHook(hookName)
+	err := hf.PostServeActionDetails.DeleteAction(actionName)
 	if err != nil {
 		return err
 	}

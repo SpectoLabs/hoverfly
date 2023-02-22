@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/SpectoLabs/goproxy"
+	"github.com/SpectoLabs/hoverfly/core/action"
 	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/delay"
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/hook"
 	"github.com/SpectoLabs/hoverfly/core/journal"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/metrics"
@@ -45,7 +45,7 @@ type Hoverfly struct {
 	StoreLogsHook          *StoreLogsHook
 	Journal                *journal.Journal
 	templator              *templating.Templator
-	PostServeActionDetails *hook.PostServeActionDetails
+	PostServeActionDetails *action.PostServeActionDetails
 	responsesDiff          map[v2.SimpleRequestDefinitionView][]v2.DiffReport
 }
 
@@ -63,7 +63,7 @@ func NewHoverfly() *Hoverfly {
 		state:                  state.NewState(),
 		templator:              templating.NewTemplator(),
 		responsesDiff:          make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport),
-		PostServeActionDetails: hook.NewPostServeActionDetails(),
+		PostServeActionDetails: action.NewPostServeActionDetails(),
 	}
 
 	hoverfly.version = "v1.4.0"
@@ -219,8 +219,10 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 		hf.applyGlobalDelay(requestDetails)
 	}
 
-	if postServeActionHook, ok := hf.PostServeActionDetails.Hooks[result.PostServeActionHookName]; ok {
-		go postServeActionHook.ExecuteLocally()
+	if result.PostServeActionInputDetails != nil {
+		if postServeAction, ok := hf.PostServeActionDetails.Actions[result.PostServeActionInputDetails.PostServeAction]; ok {
+			go postServeAction.ExecuteLocally(result.PostServeActionInputDetails.Pair)
+		}
 	}
 
 	return result.Response

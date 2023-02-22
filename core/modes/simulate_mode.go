@@ -54,10 +54,13 @@ func (this SimulateMode) Process(request *http.Request, details models.RequestDe
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Simulate)
 	}
 
-	return newProcessResultWithHook(
+	return newProcessResultWithPostServeActionInputDetails(
 		ReconstructResponse(request, pair),
 		pair.Response.FixedDelay,
 		pair.Response.LogNormalDelay,
-		pair.Response.PostSimulationHookName,
+		&PostServeActionInputDetails{
+			PostServeAction: pair.Response.PostServeAction,
+			Pair:            &pair,
+		},
 	), nil
 }

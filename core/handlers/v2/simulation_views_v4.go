@@ -77,6 +77,6 @@ func (this ResponseDetailsViewV4) GetFixedDelay() int { return 0 }
 // Gets LogNormalDelay - required for interfaces.Response
 func (this ResponseDetailsViewV4) GetLogNormalDelay() interfaces.ResponseDelay { return nil }
 
-func (this ResponseDetailsViewV4) GetPostSimulationHookName() string {
+func (this ResponseDetailsViewV4) GetPostServeAction() string {
 	return ""
 }

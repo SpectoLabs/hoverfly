@@ -90,6 +90,6 @@ func (this ResponseDetailsView) GetLogNormalDelay() interfaces.ResponseDelay {
 	return nil
 }
 
-func (this ResponseDetailsView) GetPostSimulationHookName() string {
+func (this ResponseDetailsView) GetPostServeAction() string {
 	return ""
 }

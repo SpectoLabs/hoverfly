@@ -10,9 +10,9 @@ import (
 )
 
 type HoverflyPostServeActionDetails interface {
-	GetPostServeActionDetails() PostServeActionDetailsView
-	RegisterPostServeActionHook(string, string, string, int) error
-	DeletePostServeActionHook(string) error
+	GetAllPostServeActions() PostServeActionDetailsView
+	SetPostServeAction(string, string, string, int) error
+	DeletePostServeAction(string) error
 }
 
 type HoverflyPostServeActionDetailsHandler struct {
@@ -25,33 +25,33 @@ func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) Regi
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(postServeActionDetailsHandler.Get),
 	))
-	mux.Post("/api/v2/hoverfly/post-serve-actions/hook", negroni.New(
+	mux.Put("/api/v2/hoverfly/post-serve-actions", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
-		negroni.HandlerFunc(postServeActionDetailsHandler.Post),
+		negroni.HandlerFunc(postServeActionDetailsHandler.Put),
 	))
-	mux.Delete("/api/v2/hoverfly/post-serve-actions/hook", negroni.New(
+	mux.Delete("/api/v2/hoverfly/post-serve-actions/:actionName", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(postServeActionDetailsHandler.Delete),
 	))
 }
 func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) Get(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	postSimulationDetailsView := postServeActionDetailsHandler.Hoverfly.GetPostServeActionDetails()
+	postSimulationDetailsView := postServeActionDetailsHandler.Hoverfly.GetAllPostServeActions()
 	bytes, _ := json.Marshal(postSimulationDetailsView)
 
 	handlers.WriteResponse(w, bytes)
 }
 
-func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) Post(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 
-	var hookReq HookView
+	var hookReq ActionView
 	err := handlers.ReadFromRequest(req, &hookReq)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), 400)
 		return
 	}
 
-	err = postServeActionDetailsHandler.Hoverfly.RegisterPostServeActionHook(hookReq.HookName, hookReq.Binary, hookReq.ScriptContent, hookReq.DelayInMilliSeconds)
+	err = postServeActionDetailsHandler.Hoverfly.SetPostServeAction(hookReq.ActionName, hookReq.Binary, hookReq.ScriptContent, hookReq.DelayInMs)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), 400)
 	}
@@ -60,10 +60,8 @@ func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) Post
 }
 
 func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) Delete(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	queryParams := req.URL.Query()
-	hookName := queryParams.Get("name")
-
-	err := postServeActionDetailsHandler.Hoverfly.DeletePostServeActionHook(hookName)
+	actionName := bone.GetValue(req, "actionName")
+	err := postServeActionDetailsHandler.Hoverfly.DeletePostServeAction(actionName)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), 400)
 	}

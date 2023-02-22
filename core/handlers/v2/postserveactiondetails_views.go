@@ -1,12 +1,12 @@
 package v2
 
 type PostServeActionDetailsView struct {
-	Hooks []HookView `json:"hooks,omitempty"`
+	Actions []ActionView `json:"actions,omitempty"`
 }
 
-type HookView struct {
-	HookName            string `json:"hookName"`
-	Binary              string `json:"binary"`
-	ScriptContent       string `json:"script"`
-	DelayInMilliSeconds int    `json:"delayInMilliSeconds,omitempty"`
+type ActionView struct {
+	ActionName    string `json:"actionName"`
+	Binary        string `json:"binary"`
+	ScriptContent string `json:"script"`
+	DelayInMs     int    `json:"delayInMs,omitempty"`
 }
