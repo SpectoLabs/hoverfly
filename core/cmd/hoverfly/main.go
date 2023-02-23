@@ -27,6 +27,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -56,6 +57,7 @@ func (i *arrayFlags) Set(value string) error {
 }
 
 var importFlags arrayFlags
+var postServeActionFlags arrayFlags
 var destinationFlags arrayFlags
 var logOutputFlags arrayFlags
 var responseBodyFilesPath string
@@ -198,6 +200,7 @@ func main() {
 	hoverfly := hv.NewHoverfly()
 
 	flag.Var(&importFlags, "import", "Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
+	flag.Var(&postServeActionFlags, "post-serve-action", "Set post serve action by passing the action name, binary and the path of the action script and delay in Ms separated by space. (i.e. i.e. '-post-serve-actions \"webhook python script.py 2000\"')")
 	flag.Var(&destinationFlags, "dest", "Specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
 	flag.Var(&logOutputFlags, "logs-output", "Specify locations for output logs, options are \"console\" and \"file\" (default \"console\")")
 	flag.StringVar(&responseBodyFilesPath, "response-body-files-path", "", "When a response contains a relative bodyFile, it will be resolved against this path (default is CWD)")
@@ -532,6 +535,26 @@ func main() {
 				"error":  err.Error(),
 				"import": ev,
 			}).Fatal("Environment variable for importing was set but failed to import this resource")
+		}
+	}
+
+	fmt.Println("Captured post serve action flag ", len(postServeActionFlags), "   ", postServeActionFlags)
+	//import post serve actions
+	if len(postServeActionFlags) > 0 {
+
+		for _, v := range postServeActionFlags {
+			if v != "" {
+				splitPostServeAction := strings.Split(v, " ")
+				delayInMs, err := strconv.Atoi(splitPostServeAction[3])
+				if err != nil {
+					//default to 1000 incase of error
+					delayInMs = 1000
+				}
+
+				if fileContents, err := ioutil.ReadFile(splitPostServeAction[2]); err == nil {
+					hoverfly.SetPostServeAction(splitPostServeAction[0], splitPostServeAction[1], string(fileContents), delayInMs)
+				}
+			}
 		}
 	}
 
