@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/v2/core/util"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 )

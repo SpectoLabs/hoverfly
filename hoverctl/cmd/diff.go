@@ -5,8 +5,8 @@ import (
 
 	"bytes"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
 

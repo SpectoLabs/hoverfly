@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
+	"github.com/SpectoLabs/hoverfly/v2/hoverctl/configuration"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

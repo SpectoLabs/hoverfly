@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
 	log "github.com/sirupsen/logrus"
 )
 

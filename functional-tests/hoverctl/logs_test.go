@@ -3,7 +3,7 @@ package hoverctl_suite
 import (
 	"strconv"
 
-	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/v2/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phayes/freeport"

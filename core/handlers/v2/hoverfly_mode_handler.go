@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 )

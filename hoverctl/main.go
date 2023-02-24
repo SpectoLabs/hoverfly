@@ -1,6 +1,6 @@
 package main
 
-import "github.com/SpectoLabs/hoverfly/hoverctl/cmd"
+import "github.com/SpectoLabs/hoverfly/v2/hoverctl/cmd"
 
 var (
 	hoverctlVersion = "0.0.1"

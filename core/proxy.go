@@ -14,9 +14,9 @@ import (
 
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/goproxy/ext/auth"
-	"github.com/SpectoLabs/hoverfly/core/authentication"
-	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
-	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/v2/core/authentication"
+	"github.com/SpectoLabs/hoverfly/v2/core/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/v2/core/util"
 	log "github.com/sirupsen/logrus"
 )
 

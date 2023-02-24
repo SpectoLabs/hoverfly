@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
-	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
+	"github.com/SpectoLabs/hoverfly/v2/hoverctl/configuration"
+	"github.com/SpectoLabs/hoverfly/v2/hoverctl/wrapper"
 	"github.com/spf13/cobra"
 )
 

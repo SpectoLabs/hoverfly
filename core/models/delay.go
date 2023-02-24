@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v1"
 	log "github.com/sirupsen/logrus"
 )
 

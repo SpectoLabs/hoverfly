@@ -3,7 +3,7 @@ package cache_test
 import (
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/v2/core/cache"
 	. "github.com/onsi/gomega"
 )
 

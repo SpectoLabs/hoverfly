@@ -1,9 +1,9 @@
 package hoverfly
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/functional-tests"
-	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/functional-tests"
+	"github.com/SpectoLabs/hoverfly/v2/functional-tests/testdata"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

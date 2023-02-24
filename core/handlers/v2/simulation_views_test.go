@@ -3,7 +3,7 @@ package v2_test
 import (
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
 	. "github.com/onsi/gomega"
 )
 

@@ -1,6 +1,6 @@
 package models
 
-import v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
+import v2 "github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
 
 type Literal struct {
 	Name  string

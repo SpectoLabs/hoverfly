@@ -3,7 +3,7 @@ package middleware
 import (
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 	. "github.com/onsi/gomega"
 )
 

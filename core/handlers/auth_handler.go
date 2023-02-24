@@ -8,8 +8,8 @@ import (
 
 	"encoding/json"
 
-	"github.com/SpectoLabs/hoverfly/core/authentication"
-	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/v2/core/authentication"
+	"github.com/SpectoLabs/hoverfly/v2/core/authentication/backends"
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 )

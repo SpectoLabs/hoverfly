@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"os/exec"
 
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 	log "github.com/sirupsen/logrus"
 )
 

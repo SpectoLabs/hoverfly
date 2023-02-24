@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
+	"github.com/SpectoLabs/hoverfly/v2/core/matching/matchers"
 )
 
 func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {

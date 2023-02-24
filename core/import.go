@@ -9,12 +9,12 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/SpectoLabs/hoverfly/core/delay"
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/state"
-	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/v2/core/delay"
+	v2 "github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/state"
+	"github.com/SpectoLabs/hoverfly/v2/core/util"
 
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 	log "github.com/sirupsen/logrus"
 )
 

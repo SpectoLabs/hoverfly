@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 	. "github.com/onsi/gomega"
 )
 

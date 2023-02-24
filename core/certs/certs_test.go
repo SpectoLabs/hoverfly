@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SpectoLabs/hoverfly/core/certs"
+	"github.com/SpectoLabs/hoverfly/v2/core/certs"
 )
 
 func TestNewCert(t *testing.T) {

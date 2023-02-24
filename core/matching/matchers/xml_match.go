@@ -3,7 +3,7 @@ package matchers
 import (
 	"reflect"
 
-	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/v2/core/util"
 )
 
 var Xml = "xml"

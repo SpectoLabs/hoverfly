@@ -7,11 +7,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	v1 "github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/modes"
+	v1 "github.com/SpectoLabs/hoverfly/v2/core/handlers/v1"
+	v2 "github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/matching/matchers"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/modes"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/gomega"
 )

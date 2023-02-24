@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/hoverctl/configuration"
 	"github.com/kardianos/osext"
 	log "github.com/sirupsen/logrus"
 )

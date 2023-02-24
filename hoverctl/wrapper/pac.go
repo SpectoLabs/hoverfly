@@ -1,7 +1,7 @@
 package wrapper
 
 import (
-	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
+	"github.com/SpectoLabs/hoverfly/v2/hoverctl/configuration"
 )
 
 func SetPACFile(target configuration.Target) error {

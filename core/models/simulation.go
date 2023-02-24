@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/SpectoLabs/hoverfly/core/state"
+	"github.com/SpectoLabs/hoverfly/v2/core/state"
 )
 
 type Simulation struct {

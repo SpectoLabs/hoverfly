@@ -7,7 +7,7 @@ import (
 
 	"time"
 
-	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/v2/core/authentication/backends"
 	"github.com/golang-jwt/jwt/v4"
 )
 

@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/SpectoLabs/hoverfly/core/delay"
+	"github.com/SpectoLabs/hoverfly/v2/core/delay"
 
 	"strings"
 
-	v1 "github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
-	"github.com/SpectoLabs/hoverfly/core/metrics"
-	"github.com/SpectoLabs/hoverfly/core/middleware"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/modes"
-	"github.com/SpectoLabs/hoverfly/core/state"
-	"github.com/SpectoLabs/hoverfly/core/util"
+	v1 "github.com/SpectoLabs/hoverfly/v2/core/handlers/v1"
+	v2 "github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/matching/matchers"
+	"github.com/SpectoLabs/hoverfly/v2/core/metrics"
+	"github.com/SpectoLabs/hoverfly/v2/core/middleware"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/modes"
+	"github.com/SpectoLabs/hoverfly/v2/core/state"
+	"github.com/SpectoLabs/hoverfly/v2/core/util"
 	log "github.com/sirupsen/logrus"
 )
 

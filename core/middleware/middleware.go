@@ -7,8 +7,8 @@ import (
 
 	"io/ioutil"
 
-	"github.com/SpectoLabs/hoverfly/core/errors"
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/errors"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 )
 
 type Middleware struct {

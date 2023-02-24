@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	hf "github.com/SpectoLabs/hoverfly/core"
-	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
+	hf "github.com/SpectoLabs/hoverfly/v2/core"
+	"github.com/SpectoLabs/hoverfly/v2/hoverctl/configuration"
 )
 
 var hoverfly *hf.Hoverfly

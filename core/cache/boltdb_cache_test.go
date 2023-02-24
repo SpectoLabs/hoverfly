@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/v2/core/cache"
 	. "github.com/onsi/gomega"
 
 	"github.com/boltdb/bolt"

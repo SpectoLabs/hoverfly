@@ -3,8 +3,8 @@ package v2
 import (
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
-	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/v2/core/matching/matchers"
+	"github.com/SpectoLabs/hoverfly/v2/core/util"
 	. "github.com/onsi/gomega"
 )
 

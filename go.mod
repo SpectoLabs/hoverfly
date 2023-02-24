@@ -1,4 +1,4 @@
-module github.com/SpectoLabs/hoverfly
+module github.com/SpectoLabs/hoverfly/v2
 
 go 1.18
 

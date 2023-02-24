@@ -3,8 +3,8 @@ package matching
 import (
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/state"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/state"
 )
 
 func Match(strongestMatch string, req models.RequestDetails, webserver bool, simulation *models.Simulation, state *state.State) *MatchingResult {

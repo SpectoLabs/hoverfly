@@ -11,10 +11,10 @@ import (
 	sorting "sort"
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/matching"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/matching"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/util"
 	log "github.com/sirupsen/logrus"
 )
 

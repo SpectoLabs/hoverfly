@@ -3,8 +3,8 @@ package templating_test
 import (
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/templating"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/templating"
 	. "github.com/onsi/gomega"
 )
 

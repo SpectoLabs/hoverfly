@@ -3,7 +3,7 @@ package state_test
 import (
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/state"
+	"github.com/SpectoLabs/hoverfly/v2/core/state"
 	. "github.com/onsi/gomega"
 )
 

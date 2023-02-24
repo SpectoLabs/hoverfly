@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/v2/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
@@ -46,7 +46,7 @@ var _ = BeforeSuite(func() {
 	os.Setenv("PATH", fmt.Sprintf("%v:%v", binDirectory, os.Getenv("PATH")))
 
 	var err error
-	hoverctlBinary, err = gexec.Build("github.com/SpectoLabs/hoverfly/hoverctl")
+	hoverctlBinary, err = gexec.Build("github.com/SpectoLabs/hoverfly/v2/hoverctl")
 	Expect(err).ShouldNot(HaveOccurred())
 })
 

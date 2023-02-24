@@ -2,9 +2,9 @@ package hoverfly_test
 
 import (
 	"encoding/json"
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/functional-tests"
-	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
+	v2 "github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/functional-tests"
+	"github.com/SpectoLabs/hoverfly/v2/functional-tests/testdata"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"

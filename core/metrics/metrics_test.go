@@ -3,7 +3,7 @@ package metrics_test
 import (
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/metrics"
+	"github.com/SpectoLabs/hoverfly/v2/core/metrics"
 	. "github.com/onsi/gomega"
 )
 

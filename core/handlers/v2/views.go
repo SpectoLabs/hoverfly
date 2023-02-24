@@ -1,7 +1,7 @@
 package v2
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/metrics"
+	"github.com/SpectoLabs/hoverfly/v2/core/metrics"
 )
 
 type DestinationView struct {

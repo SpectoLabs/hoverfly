@@ -3,11 +3,11 @@ package matching_test
 import (
 	"testing"
 
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/matching"
-	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/state"
+	v2 "github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/matching"
+	"github.com/SpectoLabs/hoverfly/v2/core/matching/matchers"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/state"
 	. "github.com/onsi/gomega"
 )
 

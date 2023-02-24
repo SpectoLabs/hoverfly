@@ -13,9 +13,9 @@ import (
 	"sort"
 	"strings"
 
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/interfaces"
-	"github.com/SpectoLabs/hoverfly/core/util"
+	v2 "github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/interfaces"
+	"github.com/SpectoLabs/hoverfly/v2/core/util"
 	log "github.com/sirupsen/logrus"
 )
 

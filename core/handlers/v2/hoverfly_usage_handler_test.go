@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/metrics"
+	"github.com/SpectoLabs/hoverfly/v2/core/metrics"
 	. "github.com/onsi/gomega"
 )
 

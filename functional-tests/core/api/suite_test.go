@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/v2/functional-tests"
 	"github.com/phayes/freeport"
 )
 

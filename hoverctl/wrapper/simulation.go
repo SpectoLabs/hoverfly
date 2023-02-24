@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/hoverctl/configuration"
 )
 
 func ExportSimulation(target configuration.Target, urlPattern string) (v2.SimulationViewV5, error) {

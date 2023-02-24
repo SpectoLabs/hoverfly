@@ -6,15 +6,15 @@ import (
 	"net/http"
 
 	// static assets
-	_ "github.com/SpectoLabs/hoverfly/core/statik"
+	_ "github.com/SpectoLabs/hoverfly/v2/core/statik"
 	"github.com/rakyll/statik/fs"
 
 	"github.com/codegangsta/negroni"
 	"github.com/go-zoo/bone"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
 )
 
 type AdminApi struct{}

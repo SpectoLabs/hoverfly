@@ -3,7 +3,7 @@ package matching
 import (
 	"encoding/json"
 
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 )
 
 func BodyMatching(fields []models.RequestFieldMatchers, req models.RequestDetails) *FieldMatch {

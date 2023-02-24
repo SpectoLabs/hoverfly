@@ -1,14 +1,14 @@
 package hoverfly
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/cors"
+	"github.com/SpectoLabs/hoverfly/v2/core/cors"
 	"os"
 	"strconv"
 	"sync"
 
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/middleware"
+	"github.com/SpectoLabs/hoverfly/v2/core/middleware"
 	log "github.com/sirupsen/logrus"
 )
 

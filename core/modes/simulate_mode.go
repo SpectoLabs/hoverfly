@@ -3,9 +3,9 @@ package modes
 import (
 	"net/http"
 
-	"github.com/SpectoLabs/hoverfly/core/errors"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/errors"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 )
 
 type HoverflySimulate interface {

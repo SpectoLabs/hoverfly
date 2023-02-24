@@ -5,7 +5,7 @@ import (
 
 	"encoding/base64"
 
-	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/v2/functional-tests"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

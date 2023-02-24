@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SpectoLabs/hoverfly/core/authentication"
+	"github.com/SpectoLabs/hoverfly/v2/core/authentication"
 	. "github.com/onsi/gomega"
 )
 

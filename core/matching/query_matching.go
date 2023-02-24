@@ -3,7 +3,7 @@ package matching
 import (
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 )
 
 func QueryMatching(requestMatcher models.RequestMatcher, toMatch map[string][]string) *FieldMatch {

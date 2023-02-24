@@ -1,10 +1,10 @@
 package matching_test
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/cache"
-	"github.com/SpectoLabs/hoverfly/core/matching"
-	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/cache"
+	"github.com/SpectoLabs/hoverfly/v2/core/matching"
+	"github.com/SpectoLabs/hoverfly/v2/core/matching/matchers"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 	. "github.com/onsi/gomega"
 	"testing"
 )

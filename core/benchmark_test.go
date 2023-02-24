@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"

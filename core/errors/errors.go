@@ -1,6 +1,6 @@
 package errors
 
-import "github.com/SpectoLabs/hoverfly/core/models"
+import "github.com/SpectoLabs/hoverfly/v2/core/models"
 
 type HoverflyError struct {
 	Message string

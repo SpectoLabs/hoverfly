@@ -7,7 +7,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
+	"github.com/SpectoLabs/hoverfly/v2/hoverctl/configuration"
 	"github.com/olekukonko/tablewriter"
 	"golang.org/x/crypto/ssh/terminal"
 )

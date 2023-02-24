@@ -3,7 +3,7 @@ package matchers_test
 import (
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
+	"github.com/SpectoLabs/hoverfly/v2/core/matching/matchers"
 	. "github.com/onsi/gomega"
 )
 

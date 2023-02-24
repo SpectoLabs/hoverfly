@@ -3,18 +3,18 @@ package hoverfly
 import (
 	"bytes"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/cors"
-	"github.com/SpectoLabs/hoverfly/core/modes"
+	"github.com/SpectoLabs/hoverfly/v2/core/cors"
+	"github.com/SpectoLabs/hoverfly/v2/core/modes"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/authentication/backends"
-	"github.com/SpectoLabs/hoverfly/core/cache"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v1"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/authentication/backends"
+	"github.com/SpectoLabs/hoverfly/v2/core/cache"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v1"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 	. "github.com/onsi/gomega"
 )
 

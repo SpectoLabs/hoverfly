@@ -10,8 +10,8 @@ import (
 	"github.com/aymerick/raymond"
 	"github.com/pborman/uuid"
 
-	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
-	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/v2/core/matching/matchers"
+	"github.com/SpectoLabs/hoverfly/v2/core/util"
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/icrowley/fake"
 	log "github.com/sirupsen/logrus"

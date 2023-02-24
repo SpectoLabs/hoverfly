@@ -8,7 +8,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 	"github.com/aymerick/raymond"
 
 	log "github.com/sirupsen/logrus"

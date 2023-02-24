@@ -3,7 +3,7 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/SpectoLabs/hoverfly/core/handlers"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers"
 	"github.com/codegangsta/negroni"
 	"io/ioutil"
 	"net/http"

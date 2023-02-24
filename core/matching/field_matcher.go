@@ -3,8 +3,8 @@ package matching
 import (
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/matching/matchers"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 )
 
 func FieldMatcher(fields []models.RequestFieldMatchers, toMatch string) *FieldMatch {

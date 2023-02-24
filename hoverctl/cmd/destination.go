@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
+	"github.com/SpectoLabs/hoverfly/v2/hoverctl/wrapper"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

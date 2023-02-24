@@ -10,7 +10,7 @@ import (
 
 	"net/url"
 
-	"github.com/SpectoLabs/hoverfly/core/cache"
+	"github.com/SpectoLabs/hoverfly/v2/core/cache"
 	"github.com/boltdb/bolt"
 	log "github.com/sirupsen/logrus"
 )

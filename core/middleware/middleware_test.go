@@ -9,8 +9,8 @@ import (
 	"path"
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/gomega"
 )

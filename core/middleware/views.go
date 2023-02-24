@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	"github.com/SpectoLabs/hoverfly/core/interfaces"
-	"github.com/SpectoLabs/hoverfly/core/util"
+	v2 "github.com/SpectoLabs/hoverfly/v2/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/v2/core/interfaces"
+	"github.com/SpectoLabs/hoverfly/v2/core/util"
 )
 
 // This is a JSON serializable representation of the internal

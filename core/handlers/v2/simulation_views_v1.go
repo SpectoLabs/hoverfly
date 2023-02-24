@@ -1,8 +1,8 @@
 package v2
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/interfaces"
-	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/v2/core/interfaces"
+	"github.com/SpectoLabs/hoverfly/v2/core/util"
 )
 
 type SimulationViewV1 struct {

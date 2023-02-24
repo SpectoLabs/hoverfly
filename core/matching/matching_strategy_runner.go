@@ -1,9 +1,9 @@
 package matching
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/SpectoLabs/hoverfly/core/state"
-	"github.com/SpectoLabs/hoverfly/core/util"
+	"github.com/SpectoLabs/hoverfly/v2/core/models"
+	"github.com/SpectoLabs/hoverfly/v2/core/state"
+	"github.com/SpectoLabs/hoverfly/v2/core/util"
 )
 
 type MatchingStrategy interface {

@@ -3,7 +3,7 @@ package hoverctl_suite
 import (
 	"io/ioutil"
 
-	"github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/v2/functional-tests"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
