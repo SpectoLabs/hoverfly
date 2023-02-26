@@ -14,7 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 )
 
 type AdminApi struct{}
@@ -112,6 +112,7 @@ func getAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 		&v2.ShutdownHandler{},
 		&v2.StateHandler{Hoverfly: hoverfly},
 		&v2.DiffHandler{Hoverfly: hoverfly},
+		&v2.HoverflyPostServeActionDetailsHandler{Hoverfly: hoverfly},
 	}
 
 	return list

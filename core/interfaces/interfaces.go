@@ -34,4 +34,5 @@ type Response interface {
 	GetRemovesState() []string
 	GetFixedDelay() int
 	GetLogNormalDelay() ResponseDelay
+	GetPostServeAction() string
 }

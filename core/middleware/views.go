@@ -89,3 +89,7 @@ func (this ResponseDetailsView) GetLogNormalDelay() interfaces.ResponseDelay {
 
 	return nil
 }
+
+func (this ResponseDetailsView) GetPostServeAction() string {
+	return ""
+}
