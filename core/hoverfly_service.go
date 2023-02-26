@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/SpectoLabs/hoverfly/core/action"
 	"github.com/SpectoLabs/hoverfly/core/delay"
 
 	"strings"
@@ -457,6 +458,38 @@ func (hf *Hoverfly) GetFilteredDiff(diffFilterView v2.DiffFilterView) map[v2.Sim
 		}
 	}
 	return filteredResponsesDiff
+}
+
+func (hf *Hoverfly) GetAllPostServeActions() v2.PostServeActionDetailsView {
+	var actions []v2.ActionView
+	for actionName, action := range hf.PostServeActionDetails.Actions {
+		actions = append(actions, action.GetActionView(actionName))
+	}
+	return v2.PostServeActionDetailsView{
+		Actions: actions,
+	}
+}
+
+func (hf *Hoverfly) SetPostServeAction(actionName string, binary string, scriptContent string, delayInMs int) error {
+
+	action, err := action.NewAction(actionName, binary, scriptContent, delayInMs)
+	if err != nil {
+		return err
+	}
+	err = hf.PostServeActionDetails.SetAction(actionName, action)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (hf *Hoverfly) DeletePostServeAction(actionName string) error {
+
+	err := hf.PostServeActionDetails.DeleteAction(actionName)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func needsToExcludeDiffEntry(diffReportEntry *v2.DiffReportEntry, diffFilterView *v2.DiffFilterView) bool {

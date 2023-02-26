@@ -8,6 +8,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/action"
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
@@ -186,7 +187,7 @@ func TestImportRequestResponsePairs_CanImportASinglePair(t *testing.T) {
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
 
 	originalPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -295,7 +296,7 @@ func TestImportImportRequestResponsePairs_CanImportAMultiplePairsAndSetTemplateE
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
 
 	originalPair1 := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -520,7 +521,7 @@ func TestImportImportRequestResponsePairs_CanImportARequestResponsePairView(t *t
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
 
 	request := v2.RequestMatcherViewV5{
 		Method: []v2.MatcherViewV5{
@@ -568,7 +569,7 @@ func TestImportImportRequestResponsePairs_CanImportASingleBase64EncodedPair(t *t
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
 
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -642,7 +643,7 @@ func TestImportImportRequestResponsePairs_SetsState(t *testing.T) {
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
 
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -678,7 +679,7 @@ func TestImportImportRequestResponsePairsMultipleTimes_SetsAllStates(t *testing.
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
 
 	pair1 := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -734,7 +735,7 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsIfDeprecatedQuerytSet(t
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
 
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -764,7 +765,7 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthAndTransfe
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
 
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -798,7 +799,7 @@ func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthMismatch(t
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
 
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -847,7 +848,7 @@ func TestImportRequestResponsePairs_ReturnsWarningsIfAPairIsNotAddedDueToConflic
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
 
 	result := hv.importRequestResponsePairViewsWithCustomData([]v2.RequestMatcherResponsePairViewV5{pair}, []v2.GlobalLiteralViewV5{}, []v2.GlobalVariableViewV5{})
 	Expect(result.WarningMessages).To(HaveLen(0))
@@ -864,7 +865,7 @@ func TestImportImportRequestResponsePairs_ReturnsNoWarnings(t *testing.T) {
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
 
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
@@ -895,7 +896,7 @@ func TestImportImportRequestResponsePairs_ReturnsNoWarnings_Encoded(t *testing.T
 	cache := cache.NewDefaultLRUCache()
 	cfg := Configuration{Webserver: false}
 	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator()}
+	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
 
 	encodedPair := v2.RequestMatcherResponsePairViewV5{
 		Response: v2.ResponseDetailsViewV5{
