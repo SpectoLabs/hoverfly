@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/errors"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
@@ -39,7 +39,7 @@ func (this *SpyMode) SetArguments(arguments ModeArguments) {
 	}
 }
 
-//TODO: We should only need one of these two parameters
+// TODO: We should only need one of these two parameters
 func (this SpyMode) Process(request *http.Request, details models.RequestDetails) (ProcessResult, error) {
 	pair := models.RequestResponsePair{
 		Request: details,
@@ -69,9 +69,13 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when executing middleware", Spy)
 	}
 
-	return newProcessResult(
+	return newProcessResultWithPostServeActionInputDetails(
 		ReconstructResponse(request, pair),
 		pair.Response.FixedDelay,
 		pair.Response.LogNormalDelay,
+		&PostServeActionInputDetails{
+			PostServeAction: pair.Response.PostServeAction,
+			Pair:            &pair,
+		},
 	), nil
 }

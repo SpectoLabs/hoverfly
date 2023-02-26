@@ -75,6 +75,7 @@ type ResponseDetailsViewV5 struct {
 	RemovesState     []string               `json:"removesState,omitempty"`
 	FixedDelay       int                    `json:"fixedDelay,omitempty"`
 	LogNormalDelay   *LogNormalDelayOptions `json:"logNormalDelay,omitempty"`
+	PostServeAction  string                 `json:"postServeAction,omitempty"`
 }
 
 // Gets Status - required for interfaces.Response
@@ -111,6 +112,11 @@ func (this ResponseDetailsViewV5) GetLogNormalDelay() interfaces.ResponseDelay {
 	}
 
 	return nil
+}
+
+func (this ResponseDetailsViewV5) GetPostServeAction() string {
+
+	return this.PostServeAction
 }
 
 type LogNormalDelayOptions struct {
