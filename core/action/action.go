@@ -42,10 +42,6 @@ func NewAction(actionName, binary, scriptContent string, delayInMs int) (*Action
 }
 
 func setBinary(action *Action, binary string) error {
-	if binary == "" {
-		action.Binary = ""
-		return nil
-	}
 	action.Binary = binary
 	return nil
 }
