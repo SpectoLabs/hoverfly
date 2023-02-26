@@ -200,7 +200,7 @@ func main() {
 	hoverfly := hv.NewHoverfly()
 
 	flag.Var(&importFlags, "import", "Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'")
-	flag.Var(&postServeActionFlags, "post-serve-action", "Set post serve action by passing the action name, binary and the path of the action script and delay in Ms separated by space. (i.e. i.e. '-post-serve-actions \"webhook python script.py 2000\"')")
+	flag.Var(&postServeActionFlags, "post-serve-action", "Set post serve action by passing the action name, binary and the path of the action script and delay in Ms separated by space. (i.e. i.e. '-post-serve-action \"webhook python script.py 2000\"')")
 	flag.Var(&destinationFlags, "dest", "Specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
 	flag.Var(&logOutputFlags, "logs-output", "Specify locations for output logs, options are \"console\" and \"file\" (default \"console\")")
 	flag.StringVar(&responseBodyFilesPath, "response-body-files-path", "", "When a response contains a relative bodyFile, it will be resolved against this path (default is CWD)")
@@ -538,21 +538,32 @@ func main() {
 		}
 	}
 
-	fmt.Println("Captured post serve action flag ", len(postServeActionFlags), "   ", postServeActionFlags)
-	//import post serve actions
+	//Note: import post serve actions before importing simulation schema
 	if len(postServeActionFlags) > 0 {
 
 		for _, v := range postServeActionFlags {
 			if v != "" {
 				splitPostServeAction := strings.Split(v, " ")
-				delayInMs, err := strconv.Atoi(splitPostServeAction[3])
-				if err != nil {
-					//default to 1000 incase of error
-					delayInMs = 1000
-				}
+				if len(splitPostServeAction) == 4 {
+					delayInMs, err := strconv.Atoi(splitPostServeAction[3])
+					if err != nil {
+						//default to 1000 incase of error
+						delayInMs = 1000
+					}
 
-				if fileContents, err := ioutil.ReadFile(splitPostServeAction[2]); err == nil {
-					hoverfly.SetPostServeAction(splitPostServeAction[0], splitPostServeAction[1], string(fileContents), delayInMs)
+					if fileContents, err := ioutil.ReadFile(splitPostServeAction[2]); err == nil {
+						err = hoverfly.SetPostServeAction(splitPostServeAction[0], splitPostServeAction[1], string(fileContents), delayInMs)
+						if err != nil {
+							log.WithFields(log.Fields{
+								"error":  err.Error(),
+								"import": v,
+							}).Fatal("Failed to import post serve action")
+						}
+					}
+				} else {
+					log.WithFields(log.Fields{
+						"import": v,
+					}).Fatal("Failed to import post serve action due to invalid input passed")
 				}
 			}
 		}

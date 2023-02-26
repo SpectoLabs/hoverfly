@@ -15,7 +15,7 @@ Available Commands:
   login               Login to Hoverfly
   logs                Get the logs from Hoverfly
   middleware          Get and set Hoverfly middleware
-  post-serve-action   Get, set and delete hoverfly post serve action
+  post-serve-action   Manage post serve action for Hoverfly
   mode                Get and set the Hoverfly mode
   simulation          Manage the simulation for Hoverfly
   start               Start Hoverfly
