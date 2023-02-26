@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -53,5 +53,12 @@ func (this SynthesizeMode) Process(request *http.Request, details models.Request
 	}).Info("synthetic response created successfully")
 
 	response := ReconstructResponse(request, pair)
-	return newProcessResult(response, pair.Response.FixedDelay, pair.Response.LogNormalDelay), nil
+	return newProcessResultWithPostServeActionInputDetails(response,
+		pair.Response.FixedDelay,
+		pair.Response.LogNormalDelay,
+		&PostServeActionInputDetails{
+			PostServeAction: pair.Response.PostServeAction,
+			Pair:            &pair,
+		},
+	), nil
 }
