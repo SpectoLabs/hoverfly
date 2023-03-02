@@ -42,7 +42,7 @@ func Test_GetActionViewMethod(t *testing.T) {
 
 func Test_ExecuteLocallyPostServeAction(t *testing.T) {
 	RegisterTestingT(t)
-	newAction, err := action.NewAction("test-callback", "python3", pythonBasicScript, 0)
+	newAction, err := action.NewAction("test-callback", "python", pythonBasicScript, 0)
 
 	Expect(err).To(BeNil())
 
