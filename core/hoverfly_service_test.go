@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/SpectoLabs/hoverfly/core/action"
 	v1 "github.com/SpectoLabs/hoverfly/core/handlers/v1"
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
@@ -1352,4 +1353,67 @@ func TestHoverfly_GetFilteredDiff(t *testing.T) {
 	Expect(filteredResponses[key]).To(HaveLen(2))
 	Expect(filteredResponses[key][0].DiffEntries[0].Field).Should(Equal("header/test1"))
 	Expect(filteredResponses[key][1].DiffEntries[0].Field).Should(Equal("body/test2"))
+}
+
+func TestHoverfly_GetPostServeActions(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	actionDetails := action.Action{Binary: "python3", DelayInMs: 1900}
+	actionMap := map[string]action.Action{
+		"test-callback": actionDetails,
+	}
+
+	unit.PostServeActionDetails.Actions = actionMap
+	postServeActions := unit.GetAllPostServeActions()
+
+	Expect(postServeActions).NotTo(BeNil())
+	Expect(postServeActions.Actions).To(HaveLen(1))
+	Expect(postServeActions.Actions[0].ActionName).To(Equal("test-callback"))
+	Expect(postServeActions.Actions[0].Binary).To(Equal("python3"))
+	Expect(postServeActions.Actions[0].DelayInMs).To(Equal(1900))
+}
+
+func TestHoverfly_SetPostServeAction(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	err := unit.SetPostServeAction("test-callback", "script", "dummy script", 1800)
+
+	Expect(err).To(BeNil())
+	Expect(unit.PostServeActionDetails.Actions).NotTo(BeNil())
+	Expect(unit.PostServeActionDetails.Actions).To(HaveLen(1))
+	Expect(unit.PostServeActionDetails.Actions["test-callback"].Binary).To(Equal("script"))
+	Expect(unit.PostServeActionDetails.Actions["test-callback"].DelayInMs).To(Equal(1800))
+}
+
+func TestHoverfly_DeletePostServeAction(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	err := unit.SetPostServeAction("test-callback", "script", "dummy script", 1800)
+
+	Expect(err).To(BeNil())
+
+	err = unit.DeletePostServeAction("test-callback")
+
+	Expect(err).To(BeNil())
+	Expect(unit.PostServeActionDetails.Actions).To(HaveLen(0))
+}
+
+func TestHoverfly_DeletePostServeAction_ReturnsErrorIfActionDoesNotExist(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	err := unit.DeletePostServeAction("test-callback")
+
+	Expect(err).NotTo(BeNil())
+	Expect(err.Error()).To(Equal("invalid action name passed"))
 }
