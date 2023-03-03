@@ -158,3 +158,35 @@ var V3JsonPayload = `{
         "timeExported": "2017-02-23T12:43:48Z"
     }
 }`
+
+var SimulationWithPostServeAction = `{
+	"data": {
+		"pairs": [
+			{
+				"request": {
+					"destination": [
+						{
+							"matcher": "exact",
+							"value": "destination-server.com"
+						}
+					]
+				},
+				"response": {
+					"postServeAction":"test-callback",
+					"status": 200,
+					"body": "destination matched",
+					"encodedBody": false,
+					"templated": false
+				}
+			}
+		],
+		"globalActions": {
+			"delays": []
+		}
+	},
+	"meta": {
+		"schemaVersion": "v5.2",
+		"hoverflyVersion": "v0.17.0",
+		"timeExported": "2018-05-03T15:25:06+01:00"
+	}
+}`
