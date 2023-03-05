@@ -4,25 +4,26 @@ Usage:
   hoverctl [command]
 
 Available Commands:
-  completion  Create Bash completion file for hoverctl
-  config      Show hoverctl configuration information
-  delete      Delete Hoverfly simulation
-  destination Get and set Hoverfly destination
-  diff        Manage the diffs for Hoverfly
-  export      Export a simulation from Hoverfly
-  flush       Flush the internal cache in Hoverfly
-  import      Import a simulation into Hoverfly
-  login       Login to Hoverfly
-  logs        Get the logs from Hoverfly
-  middleware  Get and set Hoverfly middleware
-  mode        Get and set the Hoverfly mode
-  simulation  Manage the simulation for Hoverfly
-  start       Start Hoverfly
-  state       Manage the state for Hoverfly
-  status      Get the current status of Hoverfly
-  stop        Stop Hoverfly
-  targets     Get the current targets registered with hoverctl
-  version     Get the version of hoverctl
+  completion        Create Bash completion file for hoverctl
+  config            Show hoverctl configuration information
+  delete            Delete Hoverfly simulation
+  destination       Get and set Hoverfly destination
+  diff              Manage the diffs for Hoverfly
+  export            Export a simulation from Hoverfly
+  flush             Flush the internal cache in Hoverfly
+  import            Import a simulation into Hoverfly
+  login             Login to Hoverfly
+  logs              Get the logs from Hoverfly
+  middleware        Get and set Hoverfly middleware
+  mode              Get and set the Hoverfly mode
+  post-serve-action Manage the post-serve-action for Hoverfly
+  simulation        Manage the simulation for Hoverfly
+  start             Start Hoverfly
+  state             Manage the state for Hoverfly
+  status            Get the current status of Hoverfly
+  stop              Stop Hoverfly
+  targets           Get the current targets registered with hoverctl
+  version           Get the version of hoverctl
 
 Flags:
   -f, --force           Bypass any confirmation when using hoverctl
