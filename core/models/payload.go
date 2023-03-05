@@ -68,13 +68,14 @@ type RequestDetails struct {
 }
 
 func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error) {
-	req.ParseForm()
+
 	if req.Body == nil {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
 	}
 
 	reqBody, err := util.GetRequestBody(req)
 
+	req.ParseForm()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),

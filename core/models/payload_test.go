@@ -5,9 +5,11 @@ import (
 	"compress/gzip"
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 
 	"net/http"
+	"net/url"
 
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -227,6 +229,21 @@ func Test_NewRequestDetailsFromHttpRequest_SortsQueryString(t *testing.T) {
 	Expect(requestDetails.QueryString()).To(Equal("a=a&a=b"))
 }
 
+func Test_NewRequestDetailsFromHttpRequest_WithFormDataHavingNonEmptyBody(t *testing.T) {
+	RegisterTestingT(t)
+	form := url.Values{}
+	form.Add("key1", "value1")
+	form.Add("key2", "value2")
+	request, _ := http.NewRequest("POST", "http://test.org", strings.NewReader(form.Encode()))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
+	Expect(err).To(BeNil())
+
+	Expect(requestDetails.FormData).To(HaveLen(2))
+	Expect(requestDetails.FormData["key1"][0]).To(Equal("value1"))
+	Expect(requestDetails.FormData["key2"][0]).To(Equal("value2"))
+	Expect(requestDetails.Body).NotTo(Equal(""))
+}
 func Test_NewRequestDetailsFromHttpRequest_StripsArbitaryGolangColonEscaping(t *testing.T) {
 	RegisterTestingT(t)
 	request, _ := http.NewRequest("GET", "http://test.org/?a=b:c", nil)
