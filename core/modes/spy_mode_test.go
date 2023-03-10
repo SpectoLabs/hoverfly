@@ -47,6 +47,10 @@ func (this hoverflySpyStub) ApplyMiddleware(pair models.RequestResponsePair) (mo
 	return pair, nil
 }
 
+func (this hoverflySpyStub) Save(request *models.RequestDetails, response *models.ResponseDetails, arguments *modes.ModeArguments) error {
+	return nil
+}
+
 func Test_SpyMode_WhenGivenAMatchingRequestItReturnsTheCorrectResponse(t *testing.T) {
 	RegisterTestingT(t)
 
