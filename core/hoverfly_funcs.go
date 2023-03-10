@@ -312,7 +312,7 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		}
 	} else if contentType == "form" {
 		if len(request.FormData) > 0 {
-			form := make(map[string]interface{})
+			form := make(map[string][]models.RequestFieldMatchers)
 			for formKey, formValue := range request.FormData {
 				form[formKey] = []models.RequestFieldMatchers{
 					{

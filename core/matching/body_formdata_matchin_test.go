@@ -1,7 +1,6 @@
 package matching_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/matching"
@@ -59,11 +58,11 @@ var bodyMatchingTests = []bodyMatchingTest{
 		matchers: []models.RequestFieldMatchers{
 			{
 				Matcher: "form",
-				Value: map[string]interface{}{
-					"name": []map[string]interface{}{
+				Value: map[string][]models.RequestFieldMatchers{
+					"name": {
 						{
-							"matcher": matchers.Exact,
-							"value":   "foo",
+							Matcher: matchers.Exact,
+							Value:   "foo",
 						},
 					},
 				},
@@ -79,11 +78,11 @@ var bodyMatchingTests = []bodyMatchingTest{
 		matchers: []models.RequestFieldMatchers{
 			{
 				Matcher: "form",
-				Value: map[string]interface{}{
-					"name": []map[string]interface{}{
+				Value: map[string][]models.RequestFieldMatchers{
+					"name": {
 						{
-							"matcher": matchers.Exact,
-							"value":   "foo",
+							Matcher: matchers.Exact,
+							Value:   "foo",
 						},
 					},
 				},
@@ -100,7 +99,6 @@ func Test_BodyMatching(t *testing.T) {
 	RegisterTestingT(t)
 
 	for _, test := range bodyMatchingTests {
-		fmt.Println("Test matchers is ", test.matchers)
 		result := matching.BodyMatching(test.matchers, test.toMatch)
 
 		Expect(result.Matched).To(test.equals, test.name)
