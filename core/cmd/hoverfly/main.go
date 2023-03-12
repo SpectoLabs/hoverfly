@@ -549,9 +549,6 @@ func main() {
 						"import": v,
 					}).Fatal("Failed to import given resource")
 				}
-				if mode == modes.Simulate || mode == modes.Spy {
-					hoverfly.CacheMatcher.PreloadCache(hoverfly.Simulation)
-				}
 			}
 		}
 	}

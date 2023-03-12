@@ -3,7 +3,7 @@ package matching
 import (
 	"github.com/SpectoLabs/hoverfly/core/cache"
 	"github.com/SpectoLabs/hoverfly/core/errors"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	log "github.com/sirupsen/logrus"
 )
@@ -139,6 +139,7 @@ func (this *CacheMatcher) FlushCache() error {
 }
 
 func (this *CacheMatcher) PreloadCache(simulation *models.Simulation) error {
+	log.Info("Entered for preloading cache")
 	if this.RequestCache == nil {
 		return errors.NoCacheSetError()
 	}
@@ -150,5 +151,6 @@ func (this *CacheMatcher) PreloadCache(simulation *models.Simulation) error {
 		}
 	}
 
+	log.Info("Exiting after preloading cache")
 	return nil
 }

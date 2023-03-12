@@ -313,7 +313,7 @@ func (this RequestMatcher) ToEagerlyCacheable() *RequestDetails {
 	if this.Query != nil && len(*this.Query) > 0 {
 		for key, valueMatchers := range *this.Query {
 			for _, valueMatcher := range valueMatchers {
-				if valueMatcher.Matcher != matchers.Exact {
+				if valueMatcher.Matcher != matchers.Exact || valueMatcher.Matcher != matchers.Array {
 					return nil
 				}
 				query[key] = []string{valueMatcher.Value.(string)}
