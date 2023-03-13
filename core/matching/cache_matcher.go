@@ -139,7 +139,7 @@ func (this *CacheMatcher) FlushCache() error {
 }
 
 func (this *CacheMatcher) PreloadCache(simulation *models.Simulation) error {
-	log.Info("Entered for preloading cache")
+
 	if this.RequestCache == nil {
 		return errors.NoCacheSetError()
 	}
@@ -151,6 +151,6 @@ func (this *CacheMatcher) PreloadCache(simulation *models.Simulation) error {
 		}
 	}
 
-	log.Info("Exiting after preloading cache")
+	log.Info("Cache preloaded")
 	return nil
 }
