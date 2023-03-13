@@ -3,7 +3,7 @@ package hoverfly_test
 import (
 	"io/ioutil"
 
-	"github.com/SpectoLabs/hoverfly/functional-tests"
+	functional_tests "github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
@@ -19,7 +19,6 @@ var _ = Describe("Hoverfly cache", func() {
 	BeforeEach(func() {
 		hoverfly = functional_tests.NewHoverfly()
 		hoverfly.Start()
-		hoverfly.ImportSimulation(testdata.JsonPayload)
 		hoverfly.Proxy(sling.New().Get("http://destination-server.com"))
 	})
 
@@ -29,7 +28,7 @@ var _ = Describe("Hoverfly cache", func() {
 
 	It("should be flushed when changing to capture mode", func() {
 		hoverfly.SetMode("capture")
-
+		hoverfly.ImportSimulation(testdata.JsonPayload)
 		cacheView := hoverfly.GetCache()
 
 		Expect(cacheView.Cache).To(HaveLen(0))
