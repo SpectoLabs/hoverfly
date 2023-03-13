@@ -316,7 +316,12 @@ func (this RequestMatcher) ToEagerlyCacheable() *RequestDetails {
 				if valueMatcher.Matcher != matchers.Exact && !(valueMatcher.Matcher == matchers.Array && (valueMatcher.Config == nil || len(valueMatcher.Config) == 0)) {
 					return nil
 				}
-				query[key] = []string{valueMatcher.Value.(string)}
+				if valueMatcher.Matcher == matchers.Array {
+					query[key] = valueMatcher.Value.([]string)
+				} else {
+					query[key] = []string{valueMatcher.Value.(string)}
+				}
+
 			}
 		}
 	} else if this.DeprecatedQuery != nil && len(this.DeprecatedQuery) == 1 {
