@@ -336,7 +336,6 @@ func (hf *Hoverfly) putOrReplaceSimulation(simulationView v2.SimulationViewV5, o
 		result.WarningMessages = append(result.WarningMessages, warning)
 	}
 
-	hf.CacheMatcher.PreloadCache(hf.Simulation)
 	return result
 }
 

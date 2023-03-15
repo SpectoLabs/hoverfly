@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
-	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
-	functional_tests "github.com/SpectoLabs/hoverfly/functional-tests"
+	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/functional-tests"
 	"github.com/SpectoLabs/hoverfly/functional-tests/testdata"
 	"github.com/antonholmquist/jason"
 	"github.com/dghubble/sling"
@@ -156,7 +156,7 @@ var _ = Describe("/api/v2/logs", func() {
 
 				Expect(len(logsArray)).To(Equal(1))
 
-				Expect(logsArray[0].GetString("msg")).Should(Equal("Cache preloaded"))
+				Expect(logsArray[0].GetString("msg")).Should(Equal("payloads imported"))
 			})
 
 			It("should query the logs by from time", func() {
@@ -203,14 +203,14 @@ var _ = Describe("/api/v2/logs", func() {
 			})
 
 			It("should limit the logs it returns", func() {
-				req := sling.New().Get("http://localhost:"+hoverfly.GetAdminPort()+"/api/v2/logs?limit=2").Add("Accept", "text/plain")
+				req := sling.New().Get("http://localhost:"+hoverfly.GetAdminPort()+"/api/v2/logs?limit=1").Add("Accept", "text/plain")
 				res := functional_tests.DoRequest(req)
 				Expect(res.StatusCode).To(Equal(200))
 				responseBody, err := ioutil.ReadAll(res.Body)
 				Expect(err).To(BeNil())
 
-				Expect(responseBody).To(ContainSubstring("Cache preloaded"))
 				Expect(responseBody).To(ContainSubstring("payloads imported"))
+
 				Expect(responseBody).ToNot(ContainSubstring("Using memory backend"))
 				Expect(responseBody).ToNot(ContainSubstring("Proxy prepared"))
 				Expect(responseBody).ToNot(ContainSubstring("current proxy configuration"))
@@ -234,14 +234,14 @@ var _ = Describe("/api/v2/logs", func() {
 			})
 
 			It("should limit the logs it returns", func() {
-				req := sling.New().Get("http://localhost:"+hoverfly.GetAdminPort()+"/api/v2/logs?limit=2").Add("Content-Type", "text/plain")
+				req := sling.New().Get("http://localhost:"+hoverfly.GetAdminPort()+"/api/v2/logs?limit=1").Add("Content-Type", "text/plain")
 				res := functional_tests.DoRequest(req)
 				Expect(res.StatusCode).To(Equal(200))
 				responseBody, err := ioutil.ReadAll(res.Body)
 				Expect(err).To(BeNil())
 
-				Expect(responseBody).To(ContainSubstring("Cache preloaded"))
 				Expect(responseBody).To(ContainSubstring("payloads imported"))
+
 				Expect(responseBody).ToNot(ContainSubstring("Using memory backend"))
 				Expect(responseBody).ToNot(ContainSubstring("Proxy prepared"))
 				Expect(responseBody).ToNot(ContainSubstring("current proxy configuration"))
