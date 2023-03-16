@@ -143,14 +143,21 @@ func (this *CacheMatcher) PreloadCache(simulation *models.Simulation) error {
 	if this.RequestCache == nil {
 		return errors.NoCacheSetError()
 	}
+	cacheRequestCount := 0
 	for _, pair := range simulation.GetMatchingPairs() {
 
 		if requestDetails := pair.RequestMatcher.ToEagerlyCacheable(); requestDetails != nil {
 			pairCopy := pair
 			this.SaveRequestMatcherResponsePair(*requestDetails, &pairCopy, nil)
+			cacheRequestCount = cacheRequestCount + 1
 		}
 	}
 
-	log.Info("Cache preloaded")
+	if cacheRequestCount > 0 && cacheRequestCount == len(simulation.GetMatchingPairs()) {
+		log.Info("cache preloaded completely")
+	} else if cacheRequestCount > 0 {
+		log.Info("cache preloaded partially")
+	}
+
 	return nil
 }

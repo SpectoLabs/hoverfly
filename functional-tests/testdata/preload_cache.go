@@ -40,6 +40,12 @@ var PreloadCache = `{
 							"matcher": "exact",
 							"value": ""
 						}
+					],
+					"params": [
+						{
+							"matcher":"key1",
+							"value": ["one", "two", "three"]
+						}
 					]
 				},
 				"response": {

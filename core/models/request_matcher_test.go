@@ -431,6 +431,12 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactAndArrayMatchers_WithQuery_
 			Value:   []string{"one", "two", "three"},
 		},
 	})
+	query.Add("key3", []models.RequestFieldMatchers{
+		{
+			Matcher: matchers.Array,
+			Value:   []interface{}{"four", "five", "six"},
+		},
+	})
 	unit := models.RequestMatcher{
 		Body: []models.RequestFieldMatchers{
 			{
@@ -471,7 +477,7 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactAndArrayMatchers_WithQuery_
 		Destination: "destination",
 		Method:      "method",
 		Path:        "path",
-		Query:       map[string][]string{"key1": {"one"}, "key2": {"one", "two", "three"}},
+		Query:       map[string][]string{"key1": {"one"}, "key2": {"one", "two", "three"}, "key3": {"four", "five", "six"}},
 		Scheme:      "scheme",
 	}))
 }

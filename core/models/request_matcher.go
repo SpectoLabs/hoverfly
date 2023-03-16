@@ -317,7 +317,13 @@ func (this RequestMatcher) ToEagerlyCacheable() *RequestDetails {
 					return nil
 				}
 				if valueMatcher.Matcher == matchers.Array {
-					query[key] = valueMatcher.Value.([]string)
+					if value, ok := util.GetStringArray(valueMatcher.Value); ok {
+						query[key] = value
+					} else {
+						//ll hardly the case
+						query[key] = []string{}
+					}
+
 				} else {
 					query[key] = []string{valueMatcher.Value.(string)}
 				}
