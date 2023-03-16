@@ -551,6 +551,7 @@ func main() {
 				}
 			}
 		}
+		hoverfly.CacheMatcher.PreloadCache(hoverfly.Simulation)
 	}
 
 	// start metrics registry flush
