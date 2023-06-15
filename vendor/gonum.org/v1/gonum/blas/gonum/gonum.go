@@ -15,17 +15,11 @@ import (
 type Implementation struct{}
 
 // [SD]gemm behavior constants. These are kept here to keep them out of the
-// way during single precision code genration.
+// way during single precision code generation.
 const (
 	blockSize   = 64 // b x b matrix
 	minParBlock = 4  // minimum number of blocks needed to go parallel
-	buffMul     = 4  // how big is the buffer relative to the number of workers
 )
-
-// subMul is a common type shared by [SD]gemm.
-type subMul struct {
-	i, j int // index of block
-}
 
 func max(a, b int) int {
 	if a > b {

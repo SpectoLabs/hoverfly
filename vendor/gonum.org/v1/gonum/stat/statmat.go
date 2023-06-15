@@ -29,7 +29,7 @@ func CovarianceMatrix(dst *mat.SymDense, x mat.Matrix, weights []float64) {
 
 	if dst.IsEmpty() {
 		*dst = *(dst.GrowSym(c).(*mat.SymDense))
-	} else if n := dst.Symmetric(); n != c {
+	} else if n := dst.SymmetricDim(); n != c {
 		panic(mat.ErrShape)
 	}
 
@@ -86,7 +86,7 @@ func CorrelationMatrix(dst *mat.SymDense, x mat.Matrix, weights []float64) {
 
 // covToCorr converts a covariance matrix to a correlation matrix.
 func covToCorr(c *mat.SymDense) {
-	r := c.Symmetric()
+	r := c.SymmetricDim()
 
 	s := make([]float64, r)
 	for i := 0; i < r; i++ {
@@ -123,7 +123,9 @@ func corrToCov(c *mat.SymDense, sigma []float64) {
 }
 
 // Mahalanobis computes the Mahalanobis distance
-//  D = sqrt((x-y)ᵀ * Σ^-1 * (x-y))
+//
+//	D = sqrt((x-y)ᵀ * Σ^-1 * (x-y))
+//
 // between the column vectors x and y given the cholesky decomposition of Σ.
 // Mahalanobis returns NaN if the linear solve fails.
 //

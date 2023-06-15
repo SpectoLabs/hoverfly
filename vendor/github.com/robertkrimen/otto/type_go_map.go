@@ -6,7 +6,7 @@ import (
 
 func (runtime *_runtime) newGoMapObject(value reflect.Value) *_object {
 	self := runtime.newObject()
-	self.class = "Object" // TODO Should this be something else?
+	self.class = classObject // TODO Should this be something else?
 	self.objectClass = _classGoMap
 	self.value = _newGoMapObject(value)
 	return self
@@ -14,8 +14,8 @@ func (runtime *_runtime) newGoMapObject(value reflect.Value) *_object {
 
 type _goMapObject struct {
 	value     reflect.Value
-	keyKind   reflect.Kind
-	valueKind reflect.Kind
+	keyType   reflect.Type
+	valueType reflect.Type
 }
 
 func _newGoMapObject(value reflect.Value) *_goMapObject {
@@ -24,14 +24,14 @@ func _newGoMapObject(value reflect.Value) *_goMapObject {
 	}
 	self := &_goMapObject{
 		value:     value,
-		keyKind:   value.Type().Key().Kind(),
-		valueKind: value.Type().Elem().Kind(),
+		keyType:   value.Type().Key(),
+		valueType: value.Type().Elem(),
 	}
 	return self
 }
 
 func (self _goMapObject) toKey(name string) reflect.Value {
-	reflectValue, err := stringToReflectValue(name, self.keyKind)
+	reflectValue, err := stringToReflectValue(name, self.keyType.Kind())
 	if err != nil {
 		panic(err)
 	}
@@ -39,7 +39,7 @@ func (self _goMapObject) toKey(name string) reflect.Value {
 }
 
 func (self _goMapObject) toValue(value Value) reflect.Value {
-	reflectValue, err := value.toReflectValue(self.valueKind)
+	reflectValue, err := value.toReflectValue(self.valueType)
 	if err != nil {
 		panic(err)
 	}
@@ -54,7 +54,7 @@ func goMapGetOwnProperty(self *_object, name string) *_property {
 	}
 
 	// Other methods
-	if method := self.value.(*_goMapObject).value.MethodByName(name); (method != reflect.Value{}) {
+	if method := self.value.(*_goMapObject).value.MethodByName(name); method.IsValid() {
 		return &_property{
 			value: self.runtime.toValue(method.Interface()),
 			mode:  0110,

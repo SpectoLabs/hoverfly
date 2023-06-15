@@ -3,6 +3,10 @@ package otto
 import (
 	"math"
 	"strconv"
+
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
+	"golang.org/x/text/number"
 )
 
 // Number
@@ -24,7 +28,7 @@ func builtinNewNumber(self *_object, argumentList []Value) Value {
 
 func builtinNumber_toString(call FunctionCall) Value {
 	// Will throw a TypeError if ThisObject is not a Number
-	value := call.thisClassObject("Number").primitiveValue()
+	value := call.thisClassObject(classNumber).primitiveValue()
 	radix := 10
 	radixArgument := call.Argument(0)
 	if radixArgument.IsDefined() {
@@ -41,7 +45,7 @@ func builtinNumber_toString(call FunctionCall) Value {
 }
 
 func builtinNumber_valueOf(call FunctionCall) Value {
-	return call.thisClassObject("Number").primitiveValue()
+	return call.thisClassObject(classNumber).primitiveValue()
 }
 
 func builtinNumber_toFixed(call FunctionCall) Value {
@@ -88,6 +92,21 @@ func builtinNumber_toPrecision(call FunctionCall) Value {
 	return toValue_string(strconv.FormatFloat(call.This.float64(), 'g', int(precision), 64))
 }
 
+func builtinNumber_isNaN(call FunctionCall) Value {
+	if len(call.ArgumentList) < 1 {
+		return toValue_bool(false)
+	}
+	return toValue_bool(call.Argument(0).IsNaN())
+}
+
 func builtinNumber_toLocaleString(call FunctionCall) Value {
-	return builtinNumber_toString(call)
+	value := call.thisClassObject(classNumber).primitiveValue()
+	locale := call.Argument(0)
+	lang := defaultLanguage
+	if locale.IsDefined() {
+		lang = language.MustParse(locale.string())
+	}
+
+	p := message.NewPrinter(lang)
+	return toValue_string(p.Sprintf("%v", number.Decimal(value.value)))
 }

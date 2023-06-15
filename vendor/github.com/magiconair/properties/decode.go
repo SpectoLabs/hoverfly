@@ -1,4 +1,4 @@
-// Copyright 2016 Frank Schroeder. All rights reserved.
+// Copyright 2013-2022 Frank Schroeder. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -48,49 +48,49 @@ import (
 //
 // Examples:
 //
-//     // Field is ignored.
-//     Field int `properties:"-"`
+//	// Field is ignored.
+//	Field int `properties:"-"`
 //
-//     // Field is assigned value of 'Field'.
-//     Field int
+//	// Field is assigned value of 'Field'.
+//	Field int
 //
-//     // Field is assigned value of 'myName'.
-//     Field int `properties:"myName"`
+//	// Field is assigned value of 'myName'.
+//	Field int `properties:"myName"`
 //
-//     // Field is assigned value of key 'myName' and has a default
-//     // value 15 if the key does not exist.
-//     Field int `properties:"myName,default=15"`
+//	// Field is assigned value of key 'myName' and has a default
+//	// value 15 if the key does not exist.
+//	Field int `properties:"myName,default=15"`
 //
-//     // Field is assigned value of key 'Field' and has a default
-//     // value 15 if the key does not exist.
-//     Field int `properties:",default=15"`
+//	// Field is assigned value of key 'Field' and has a default
+//	// value 15 if the key does not exist.
+//	Field int `properties:",default=15"`
 //
-//     // Field is assigned value of key 'date' and the date
-//     // is in format 2006-01-02
-//     Field time.Time `properties:"date,layout=2006-01-02"`
+//	// Field is assigned value of key 'date' and the date
+//	// is in format 2006-01-02
+//	Field time.Time `properties:"date,layout=2006-01-02"`
 //
-//     // Field is assigned the non-empty and whitespace trimmed
-//     // values of key 'Field' split by commas.
-//     Field []string
+//	// Field is assigned the non-empty and whitespace trimmed
+//	// values of key 'Field' split by commas.
+//	Field []string
 //
-//     // Field is assigned the non-empty and whitespace trimmed
-//     // values of key 'Field' split by commas and has a default
-//     // value ["a", "b", "c"] if the key does not exist.
-//     Field []string `properties:",default=a;b;c"`
+//	// Field is assigned the non-empty and whitespace trimmed
+//	// values of key 'Field' split by commas and has a default
+//	// value ["a", "b", "c"] if the key does not exist.
+//	Field []string `properties:",default=a;b;c"`
 //
-//     // Field is decoded recursively with "Field." as key prefix.
-//     Field SomeStruct
+//	// Field is decoded recursively with "Field." as key prefix.
+//	Field SomeStruct
 //
-//     // Field is decoded recursively with "myName." as key prefix.
-//     Field SomeStruct `properties:"myName"`
+//	// Field is decoded recursively with "myName." as key prefix.
+//	Field SomeStruct `properties:"myName"`
 //
-//     // Field is decoded recursively with "Field." as key prefix
-//     // and the next dotted element of the key as map key.
-//     Field map[string]string
+//	// Field is decoded recursively with "Field." as key prefix
+//	// and the next dotted element of the key as map key.
+//	Field map[string]string
 //
-//     // Field is decoded recursively with "myName." as key prefix
-//     // and the next dotted element of the key as map key.
-//     Field map[string]string `properties:"myName"`
+//	// Field is decoded recursively with "myName." as key prefix
+//	// and the next dotted element of the key as map key.
+//	Field map[string]string `properties:"myName"`
 func (p *Properties) Decode(x interface{}) error {
 	t, v := reflect.TypeOf(x), reflect.ValueOf(x)
 	if t.Kind() != reflect.Ptr || v.Elem().Type().Kind() != reflect.Struct {
@@ -158,16 +158,16 @@ func dec(p *Properties, key string, def *string, opts map[string]string, v refle
 	// keydef returns the property key and the default value based on the
 	// name of the struct field and the options in the tag.
 	keydef := func(f reflect.StructField) (string, *string, map[string]string) {
-		key, opts := parseTag(f.Tag.Get("properties"))
+		_key, _opts := parseTag(f.Tag.Get("properties"))
 
-		var def *string
-		if d, ok := opts["default"]; ok {
-			def = &d
+		var _def *string
+		if d, ok := _opts["default"]; ok {
+			_def = &d
 		}
-		if key != "" {
-			return key, def, opts
+		if _key != "" {
+			return _key, _def, _opts
 		}
-		return f.Name, def, opts
+		return f.Name, _def, _opts
 	}
 
 	switch {
@@ -190,7 +190,7 @@ func dec(p *Properties, key string, def *string, opts map[string]string, v refle
 			fv := v.Field(i)
 			fk, def, opts := keydef(t.Field(i))
 			if !fv.CanSet() {
-				return fmt.Errorf("cannot set ", t.Field(i).Name)
+				return fmt.Errorf("cannot set %s", t.Field(i).Name)
 			}
 			if fk == "-" {
 				continue
@@ -223,7 +223,7 @@ func dec(p *Properties, key string, def *string, opts map[string]string, v refle
 	case isMap(t):
 		valT := t.Elem()
 		m := reflect.MakeMap(t)
-		for postfix, _ := range p.FilterStripPrefix(key + ".").m {
+		for postfix := range p.FilterStripPrefix(key + ".").m {
 			pp := strings.SplitN(postfix, ".", 2)
 			mk, mv := pp[0], reflect.New(valT)
 			if err := dec(p, key+"."+mk, nil, nil, mv); err != nil {
@@ -274,7 +274,6 @@ func isArray(t reflect.Type) bool    { return t.Kind() == reflect.Array || t.Kin
 func isBool(t reflect.Type) bool     { return t.Kind() == reflect.Bool }
 func isDuration(t reflect.Type) bool { return t == reflect.TypeOf(time.Second) }
 func isMap(t reflect.Type) bool      { return t.Kind() == reflect.Map }
-func isNumeric(t reflect.Type) bool  { return isInt(t) || isUint(t) || isFloat(t) }
 func isPtr(t reflect.Type) bool      { return t.Kind() == reflect.Ptr }
 func isString(t reflect.Type) bool   { return t.Kind() == reflect.String }
 func isStruct(t reflect.Type) bool   { return t.Kind() == reflect.Struct }

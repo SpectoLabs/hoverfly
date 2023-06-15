@@ -19,6 +19,21 @@ _cgo_export.*
 
 _testmain.go
 
-*.exe
+# Vim files https://github.com/github/gitignore/blob/master/Global/Vim.gitignore
+# swap
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+# session
+Session.vim
+# temporary
+.netrwhist
+*~
+# auto-generated tag files
+tags
 
+*.exe
 cobra.test
+bin
+
+.idea/
+*.iml

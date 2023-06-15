@@ -42,7 +42,6 @@ var (
 )
 
 func newContext() *_runtime {
-
 	self := &_runtime{}
 
 	self.globalStash = self.newObjectStash(nil, nil)
@@ -90,7 +89,7 @@ func (self *_object) hasPrimitive() bool {
 }
 
 func (runtime *_runtime) newObject() *_object {
-	self := runtime.newClassObject("Object")
+	self := runtime.newClassObject(classObject)
 	self.prototype = runtime.global.ObjectPrototype
 	return self
 }
@@ -131,10 +130,9 @@ func (runtime *_runtime) newNumber(value Value) *_object {
 }
 
 func (runtime *_runtime) newRegExp(patternValue Value, flagsValue Value) *_object {
-
 	pattern := ""
 	flags := ""
-	if object := patternValue._object(); object != nil && object.class == "RegExp" {
+	if object := patternValue._object(); object != nil && object.class == classRegExp {
 		if flagsValue.IsDefined() {
 			panic(runtime.panicTypeError("Cannot supply flags when constructing one RegExp from another"))
 		}
@@ -167,7 +165,6 @@ func (runtime *_runtime) newDate(epoch float64) *_object {
 }
 
 func (runtime *_runtime) newError(name string, message Value, stackFramesToPop int) *_object {
-	var self *_object
 	switch name {
 	case "EvalError":
 		return runtime.newEvalError(message)
@@ -183,7 +180,7 @@ func (runtime *_runtime) newError(name string, message Value, stackFramesToPop i
 		return runtime.newURIError(message)
 	}
 
-	self = runtime.newErrorObject(name, message, stackFramesToPop)
+	self := runtime.newErrorObject(name, message, stackFramesToPop)
 	self.prototype = runtime.global.ErrorPrototype
 	if name != "" {
 		self.defineProperty("name", toValue_string(name), 0111, false)

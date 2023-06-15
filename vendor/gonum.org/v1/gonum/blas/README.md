@@ -1,4 +1,7 @@
-# Gonum BLAS [![GoDoc](https://godoc.org/gonum.org/v1/gonum/blas?status.svg)](https://godoc.org/gonum.org/v1/gonum/blas)
+# Gonum BLAS
+
+[![go.dev reference](https://pkg.go.dev/badge/gonum.org/v1/gonum/blas)](https://pkg.go.dev/gonum.org/v1/gonum/blas)
+[![GoDoc](https://godocs.io/gonum.org/v1/gonum/blas?status.svg)](https://godocs.io/gonum.org/v1/gonum/blas)
 
 A collection of packages to provide BLAS functionality for the [Go programming
 language](http://golang.org)
@@ -35,7 +38,8 @@ import (
 
 func main() {
 	v := blas64.Vector{Inc: 1, Data: []float64{1, 1, 1}}
-	fmt.Println("v has length:", blas64.Nrm2(len(v.Data), v))
+	v.N = len(v.Data)
+	fmt.Println("v has length:", blas64.Nrm2(v))
 }
 ```
 

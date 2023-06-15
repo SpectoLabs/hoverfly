@@ -100,8 +100,7 @@ type Error struct {
 
 // Error returns a description of the error
 //
-//    TypeError: 'def' is not a function
-//
+//	TypeError: 'def' is not a function
 func (err Error) Error() string {
 	return err.format()
 }
@@ -109,11 +108,16 @@ func (err Error) Error() string {
 // String returns a description of the error and a trace of where the
 // error occurred.
 //
-//    TypeError: 'def' is not a function
-//        at xyz (<anonymous>:3:9)
-//        at <anonymous>:7:1/
-//
+//	TypeError: 'def' is not a function
+//	    at xyz (<anonymous>:3:9)
+//	    at <anonymous>:7:1/
 func (err Error) String() string {
+	return err.formatWithStack()
+}
+
+// GoString returns a description of the error and a trace of where the
+// error occurred. Printing with %#v will trigger this behaviour.
+func (err Error) GoString() string {
 	return err.formatWithStack()
 }
 

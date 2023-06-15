@@ -49,7 +49,6 @@ func (self *_parser) parseStatementList() (list []ast.Statement) {
 }
 
 func (self *_parser) parseStatement() ast.Statement {
-
 	if self.token == token.EOF {
 		self.errorUnexpectedToken(self.token)
 		return &ast.BadStatement{From: self.idx, To: self.idx + 1}
@@ -271,7 +270,6 @@ func (self *_parser) parseFunctionStatement() *ast.FunctionStatement {
 }
 
 func (self *_parser) parseFunction(declaration bool) *ast.FunctionLiteral {
-
 	node := &ast.FunctionLiteral{
 		Function: self.expect(token.FUNCTION),
 	}
@@ -455,7 +453,6 @@ func (self *_parser) parseWithStatement() ast.Statement {
 	self.expect(token.RIGHT_PARENTHESIS)
 
 	if self.mode&StoreComments != 0 {
-		//comments = append(comments, self.comments.FetchAll()...)
 		self.comments.CommentMap.AddComments(node, comments, ast.LEADING)
 		self.comments.CommentMap.AddComments(node, withComments, ast.WITH)
 	}
@@ -517,7 +514,6 @@ func (self *_parser) parseIterationStatement() ast.Statement {
 }
 
 func (self *_parser) parseForIn(into ast.Expression) *ast.ForInStatement {
-
 	// Already have consumed "<into> in"
 
 	source := self.parseExpression()
@@ -534,7 +530,6 @@ func (self *_parser) parseForIn(into ast.Expression) *ast.ForInStatement {
 }
 
 func (self *_parser) parseFor(initializer ast.Expression) *ast.ForStatement {
-
 	// Already have consumed "<initializer> ;"
 
 	var test, update ast.Expression
@@ -579,7 +574,6 @@ func (self *_parser) parseForOrForInStatement() ast.Statement {
 
 	forIn := false
 	if self.token != token.SEMICOLON {
-
 		allowIn := self.scope.allowIn
 		self.scope.allowIn = false
 		if self.token == token.VAR {
@@ -700,6 +694,9 @@ func (self *_parser) parseDoWhileStatement() ast.Statement {
 	node.Test = self.parseExpression()
 	self.expect(token.RIGHT_PARENTHESIS)
 
+	self.implicitSemicolon = true
+	self.optionalSemicolon()
+
 	if self.mode&StoreComments != 0 {
 		self.comments.CommentMap.AddComments(node, comments, ast.LEADING)
 		self.comments.CommentMap.AddComments(node, doComments, ast.DO)
@@ -774,7 +771,6 @@ func (self *_parser) parseIfStatement() ast.Statement {
 
 func (self *_parser) parseSourceElement() ast.Statement {
 	statement := self.parseStatement()
-	//self.comments.Unset()
 	return statement
 }
 

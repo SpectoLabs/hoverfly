@@ -104,15 +104,19 @@ func (l Laplace) LogProb(x float64) float64 {
 	return -math.Ln2 - math.Log(l.Scale) - math.Abs(x-l.Mu)/l.Scale
 }
 
-// MarshalParameters implements the ParameterMarshaler interface
-func (l Laplace) MarshalParameters(p []Parameter) {
-	if len(p) != l.NumParameters() {
+// parameters returns the parameters of the distribution.
+func (l Laplace) parameters(p []Parameter) []Parameter {
+	nParam := l.NumParameters()
+	if p == nil {
+		p = make([]Parameter, nParam)
+	} else if len(p) != nParam {
 		panic(badLength)
 	}
 	p[0].Name = "Mu"
 	p[0].Value = l.Mu
 	p[1].Name = "Scale"
 	p[1].Value = l.Scale
+	return p
 }
 
 // Mean returns the mean of the probability distribution.
@@ -169,7 +173,9 @@ func (l Laplace) Rand() float64 {
 // Score returns the score function with respect to the parameters of the
 // distribution at the input location x. The score function is the derivative
 // of the log-likelihood at x with respect to the parameters
-//  (∂/∂θ) log(p(x;θ))
+//
+//	(∂/∂θ) log(p(x;θ))
+//
 // If deriv is non-nil, len(deriv) must equal the number of parameters otherwise
 // Score will panic, and the derivative is stored in-place into deriv. If deriv
 // is nil a new slice will be allocated and returned.
@@ -179,7 +185,8 @@ func (l Laplace) Rand() float64 {
 // For more information, see https://en.wikipedia.org/wiki/Score_%28statistics%29.
 //
 // Special cases:
-//  Score(0) = [0, -0.5/l.Scale]
+//
+//	Score(l.Mu) = [NaN, -1/l.Scale]
 func (l Laplace) Score(deriv []float64, x float64) []float64 {
 	if deriv == nil {
 		deriv = make([]float64, l.NumParameters())
@@ -192,27 +199,28 @@ func (l Laplace) Score(deriv []float64, x float64) []float64 {
 		deriv[0] = 1 / l.Scale
 	} else if diff < 0 {
 		deriv[0] = -1 / l.Scale
-	} else if diff == 0 {
-		deriv[0] = 0
 	} else {
 		// must be NaN
 		deriv[0] = math.NaN()
 	}
 
-	deriv[1] = math.Abs(diff)/(l.Scale*l.Scale) - 0.5/(l.Scale)
+	deriv[1] = math.Abs(diff)/(l.Scale*l.Scale) - 1/l.Scale
 	return deriv
 }
 
 // ScoreInput returns the score function with respect to the input of the
 // distribution at the input location specified by x. The score function is the
 // derivative of the log-likelihood
-//  (d/dx) log(p(x)) .
+//
+//	(d/dx) log(p(x)) .
+//
 // Special cases:
-//  ScoreInput(l.Mu) = 0
+//
+//	ScoreInput(l.Mu) = NaN
 func (l Laplace) ScoreInput(x float64) float64 {
 	diff := x - l.Mu
 	if diff == 0 {
-		return 0
+		return math.NaN()
 	}
 	if diff > 0 {
 		return -1 / l.Scale
@@ -238,8 +246,8 @@ func (l Laplace) Survival(x float64) float64 {
 	return 0.5 * math.Exp(-(x-l.Mu)/l.Scale)
 }
 
-// UnmarshalParameters implements the ParameterMarshaler interface
-func (l *Laplace) UnmarshalParameters(p []Parameter) {
+// setParameters modifies the parameters of the distribution.
+func (l *Laplace) setParameters(p []Parameter) {
 	if len(p) != l.NumParameters() {
 		panic(badLength)
 	}

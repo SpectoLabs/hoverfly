@@ -1,9 +1,10 @@
 package fake
 
 import (
-	"strings"
-
+	"fmt"
+	"sort"
 	"strconv"
+	"strings"
 )
 
 type creditCard struct {
@@ -12,11 +13,27 @@ type creditCard struct {
 	prefixes []int
 }
 
-var creditCards = map[string]creditCard{
-	"visa":       {"VISA", 16, []int{4539, 4556, 4916, 4532, 4929, 40240071, 4485, 4716, 4}},
-	"mastercard": {"MasterCard", 16, []int{51, 52, 53, 54, 55}},
-	"amex":       {"American Express", 15, []int{34, 37}},
-	"discover":   {"Discover", 16, []int{6011}},
+func (c creditCard) RandomPrefix() int {
+	return c.prefixes[r.Intn(len(c.prefixes))]
+}
+
+var (
+	creditCards = map[string]creditCard{
+		"visa":       {"VISA", 16, []int{4539, 4556, 4916, 4532, 4929, 40240071, 4485, 4716, 4}},
+		"mastercard": {"MasterCard", 16, []int{51, 52, 53, 54, 55}},
+		"amex":       {"American Express", 15, []int{34, 37}},
+		"discover":   {"Discover", 16, []int{6011}},
+	}
+	creditCardsKeys = make([]string, len(creditCards))
+)
+
+func init() {
+	n := 0
+	for key := range creditCards {
+		creditCardsKeys[n] = key
+		n++
+	}
+	sort.Strings(creditCardsKeys)
 }
 
 // CreditCardType returns one of the following credit values:
@@ -36,34 +53,40 @@ func CreditCardNum(vendor string) string {
 	if vendor != "" {
 		vendor = strings.ToLower(vendor)
 	} else {
-		var vendors []string
-		for v := range creditCards {
-			vendors = append(vendors, v)
-		}
-		vendor = vendors[r.Intn(len(vendors))]
+		vendor = creditCardsKeys[r.Intn(len(creditCardsKeys))]
 	}
-	card := creditCards[vendor]
-	prefix := strconv.Itoa(card.prefixes[r.Intn(len(card.prefixes))])
+	card, ok := creditCards[vendor]
+	if !ok {
+		panic(fmt.Sprintf("unsupported vendor %q", vendor))
+	}
+
+	prefix := strconv.Itoa(card.RandomPrefix())
 	num := []rune(prefix)
-	for i := 0; i < card.length-len(prefix); i++ {
-		num = append(num, genCCDigit(num))
+	for i := 0; i < card.length-len(prefix)-1; i++ {
+		num = append(num, rune(strconv.Itoa(r.Intn(10))[0]))
 	}
+	num = append(num, creditCardNumChecksum(num))
+
 	return string(num)
 }
 
-func genCCDigit(num []rune) rune {
+func creditCardNumChecksum(num []rune) rune {
+	// See: https://en.wikipedia.org/wiki/Luhn_algorithm
 	sum := 0
+	pos := 0
 	for i := len(num) - 1; i >= 0; i-- {
-		n := int(num[i])
-		if i%2 != 0 {
-			sum += n
-		} else {
-			if n*2 > 9 {
-				sum += n*2 - 9
-			} else {
-				sum += n * 2
+		n := int(num[i] - '0')
+		if pos%2 == 0 {
+			n *= 2
+			if n > 9 {
+				n -= 9
 			}
 		}
+		sum += n
+		pos++
 	}
-	return rune(((sum/10+1)*10 - sum) % 10)
+
+	// https://en.wikipedia.org/wiki/Talk:Luhn_algorithm#Formula_error
+	checksum := 10 - (sum%10)%10
+	return rune(strconv.Itoa(checksum)[0])
 }

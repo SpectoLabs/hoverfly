@@ -2,6 +2,7 @@ package otto
 
 import (
 	"strconv"
+	"unicode/utf16"
 	"unicode/utf8"
 )
 
@@ -26,20 +27,22 @@ func (str _stringASCII) String() string {
 }
 
 type _stringWide struct {
-	string string
-	length int
-	runes  []rune
+	string  string
+	value16 []uint16
 }
 
 func (str _stringWide) Length() int {
-	return str.length
+	if str.value16 == nil {
+		str.value16 = utf16.Encode([]rune(str.string))
+	}
+	return len(str.value16)
 }
 
 func (str _stringWide) At(at int) rune {
-	if str.runes == nil {
-		str.runes = []rune(str.string)
+	if str.value16 == nil {
+		str.value16 = utf16.Encode([]rune(str.string))
 	}
-	return str.runes[at]
+	return rune(str.value16[at])
 }
 
 func (str _stringWide) String() string {
@@ -58,7 +61,6 @@ func _newStringObject(str string) _stringObject {
 wide:
 	return &_stringWide{
 		string: str,
-		length: utf8.RuneCountInString(str),
 	}
 }
 
@@ -72,8 +74,8 @@ func stringAt(str _stringObject, index int) rune {
 func (runtime *_runtime) newStringObject(value Value) *_object {
 	str := _newStringObject(value.string())
 
-	self := runtime.newClassObject("String")
-	self.defineProperty("length", toValue_int(str.Length()), 0, false)
+	self := runtime.newClassObject(classString)
+	self.defineProperty(propertyLength, toValue_int(str.Length()), 0, false)
 	self.objectClass = _classString
 	self.value = str
 	return self

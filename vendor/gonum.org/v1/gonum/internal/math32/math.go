@@ -24,6 +24,7 @@ const (
 // Abs returns the absolute value of x.
 //
 // Special cases are:
+//
 //	Abs(±Inf) = +Inf
 //	Abs(NaN) = NaN
 func Abs(x float32) float32 {
@@ -47,6 +48,7 @@ func Copysign(x, y float32) float32 {
 // unnecessary overflow and underflow.
 //
 // Special cases are:
+//
 //	Hypot(±Inf, q) = +Inf
 //	Hypot(p, ±Inf) = +Inf
 //	Hypot(NaN, q) = NaN
@@ -98,7 +100,7 @@ func IsInf(f float32, sign int) bool {
 	return sign >= 0 && f > math.MaxFloat32 || sign <= 0 && f < -math.MaxFloat32
 }
 
-// IsNaN reports whether f is an IEEE 754 ``not-a-number'' value.
+// IsNaN reports whether f is an IEEE 754 “not-a-number” value.
 func IsNaN(f float32) (is bool) {
 	// IEEE 754 says that only NaNs satisfy f != f.
 	// To avoid the floating-point hardware, could use:
@@ -107,5 +109,58 @@ func IsNaN(f float32) (is bool) {
 	return f != f
 }
 
-// NaN returns an IEEE 754 ``not-a-number'' value.
+// Max returns the larger of x or y.
+//
+// Special cases are:
+//
+//	Max(x, +Inf) = Max(+Inf, x) = +Inf
+//	Max(x, NaN) = Max(NaN, x) = NaN
+//	Max(+0, ±0) = Max(±0, +0) = +0
+//	Max(-0, -0) = -0
+func Max(x, y float32) float32 {
+	// special cases
+	switch {
+	case IsInf(x, 1) || IsInf(y, 1):
+		return Inf(1)
+	case IsNaN(x) || IsNaN(y):
+		return NaN()
+	case x == 0 && x == y:
+		if Signbit(x) {
+			return y
+		}
+		return x
+	}
+	if x > y {
+		return x
+	}
+	return y
+}
+
+// Min returns the smaller of x or y.
+//
+// Special cases are:
+//
+//	Min(x, -Inf) = Min(-Inf, x) = -Inf
+//	Min(x, NaN) = Min(NaN, x) = NaN
+//	Min(-0, ±0) = Min(±0, -0) = -0
+func Min(x, y float32) float32 {
+	// special cases
+	switch {
+	case IsInf(x, -1) || IsInf(y, -1):
+		return Inf(-1)
+	case IsNaN(x) || IsNaN(y):
+		return NaN()
+	case x == 0 && x == y:
+		if Signbit(x) {
+			return x
+		}
+		return y
+	}
+	if x < y {
+		return x
+	}
+	return y
+}
+
+// NaN returns an IEEE 754 “not-a-number” value.
 func NaN() float32 { return math.Float32frombits(unan) }

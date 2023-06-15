@@ -2,16 +2,18 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build !amd64 noasm appengine safe
+//go:build !amd64 || noasm || gccgo || safe
+// +build !amd64 noasm gccgo safe
 
 package c128
 
 import "math/cmplx"
 
 // AxpyUnitary is
-//  for i, v := range x {
-//  	y[i] += alpha * v
-//  }
+//
+//	for i, v := range x {
+//		y[i] += alpha * v
+//	}
 func AxpyUnitary(alpha complex128, x, y []complex128) {
 	for i, v := range x {
 		y[i] += alpha * v
@@ -19,9 +21,10 @@ func AxpyUnitary(alpha complex128, x, y []complex128) {
 }
 
 // AxpyUnitaryTo is
-//  for i, v := range x {
-//  	dst[i] = alpha*v + y[i]
-//  }
+//
+//	for i, v := range x {
+//		dst[i] = alpha*v + y[i]
+//	}
 func AxpyUnitaryTo(dst []complex128, alpha complex128, x, y []complex128) {
 	for i, v := range x {
 		dst[i] = alpha*v + y[i]
@@ -29,11 +32,12 @@ func AxpyUnitaryTo(dst []complex128, alpha complex128, x, y []complex128) {
 }
 
 // AxpyInc is
-//  for i := 0; i < int(n); i++ {
-//  	y[iy] += alpha * x[ix]
-//  	ix += incX
-//  	iy += incY
-//  }
+//
+//	for i := 0; i < int(n); i++ {
+//		y[iy] += alpha * x[ix]
+//		ix += incX
+//		iy += incY
+//	}
 func AxpyInc(alpha complex128, x, y []complex128, n, incX, incY, ix, iy uintptr) {
 	for i := 0; i < int(n); i++ {
 		y[iy] += alpha * x[ix]
@@ -43,12 +47,13 @@ func AxpyInc(alpha complex128, x, y []complex128, n, incX, incY, ix, iy uintptr)
 }
 
 // AxpyIncTo is
-//  for i := 0; i < int(n); i++ {
-//  	dst[idst] = alpha*x[ix] + y[iy]
-//  	ix += incX
-//  	iy += incY
-//  	idst += incDst
-//  }
+//
+//	for i := 0; i < int(n); i++ {
+//		dst[idst] = alpha*x[ix] + y[iy]
+//		ix += incX
+//		iy += incY
+//		idst += incDst
+//	}
 func AxpyIncTo(dst []complex128, incDst, idst uintptr, alpha complex128, x, y []complex128, n, incX, incY, ix, iy uintptr) {
 	for i := 0; i < int(n); i++ {
 		dst[idst] = alpha*x[ix] + y[iy]
@@ -59,9 +64,10 @@ func AxpyIncTo(dst []complex128, incDst, idst uintptr, alpha complex128, x, y []
 }
 
 // DscalUnitary is
-//  for i, v := range x {
-//  	x[i] = complex(real(v)*alpha, imag(v)*alpha)
-//  }
+//
+//	for i, v := range x {
+//		x[i] = complex(real(v)*alpha, imag(v)*alpha)
+//	}
 func DscalUnitary(alpha float64, x []complex128) {
 	for i, v := range x {
 		x[i] = complex(real(v)*alpha, imag(v)*alpha)
@@ -69,11 +75,12 @@ func DscalUnitary(alpha float64, x []complex128) {
 }
 
 // DscalInc is
-//  var ix uintptr
-//  for i := 0; i < int(n); i++ {
-//  	x[ix] = complex(real(x[ix])*alpha, imag(x[ix])*alpha)
-//  	ix += inc
-//  }
+//
+//	var ix uintptr
+//	for i := 0; i < int(n); i++ {
+//		x[ix] = complex(real(x[ix])*alpha, imag(x[ix])*alpha)
+//		ix += inc
+//	}
 func DscalInc(alpha float64, x []complex128, n, inc uintptr) {
 	var ix uintptr
 	for i := 0; i < int(n); i++ {
@@ -83,11 +90,12 @@ func DscalInc(alpha float64, x []complex128, n, inc uintptr) {
 }
 
 // ScalInc is
-//  var ix uintptr
-//  for i := 0; i < int(n); i++ {
-//  	x[ix] *= alpha
-//  	ix += incX
-//  }
+//
+//	var ix uintptr
+//	for i := 0; i < int(n); i++ {
+//		x[ix] *= alpha
+//		ix += incX
+//	}
 func ScalInc(alpha complex128, x []complex128, n, inc uintptr) {
 	var ix uintptr
 	for i := 0; i < int(n); i++ {
@@ -97,9 +105,10 @@ func ScalInc(alpha complex128, x []complex128, n, inc uintptr) {
 }
 
 // ScalUnitary is
-//  for i := range x {
-//  	x[i] *= alpha
-//  }
+//
+//	for i := range x {
+//		x[i] *= alpha
+//	}
 func ScalUnitary(alpha complex128, x []complex128) {
 	for i := range x {
 		x[i] *= alpha
@@ -107,10 +116,11 @@ func ScalUnitary(alpha complex128, x []complex128) {
 }
 
 // DotcUnitary is
-//  for i, v := range x {
-//  	sum += y[i] * cmplx.Conj(v)
-//  }
-//  return sum
+//
+//	for i, v := range x {
+//		sum += y[i] * cmplx.Conj(v)
+//	}
+//	return sum
 func DotcUnitary(x, y []complex128) (sum complex128) {
 	for i, v := range x {
 		sum += y[i] * cmplx.Conj(v)
@@ -119,12 +129,13 @@ func DotcUnitary(x, y []complex128) (sum complex128) {
 }
 
 // DotcInc is
-//  for i := 0; i < int(n); i++ {
-//  	sum += y[iy] * cmplx.Conj(x[ix])
-//  	ix += incX
-//  	iy += incY
-//  }
-//  return sum
+//
+//	for i := 0; i < int(n); i++ {
+//		sum += y[iy] * cmplx.Conj(x[ix])
+//		ix += incX
+//		iy += incY
+//	}
+//	return sum
 func DotcInc(x, y []complex128, n, incX, incY, ix, iy uintptr) (sum complex128) {
 	for i := 0; i < int(n); i++ {
 		sum += y[iy] * cmplx.Conj(x[ix])
@@ -135,10 +146,11 @@ func DotcInc(x, y []complex128, n, incX, incY, ix, iy uintptr) (sum complex128) 
 }
 
 // DotuUnitary is
-//  for i, v := range x {
-//  	sum += y[i] * v
-//  }
-//  return sum
+//
+//	for i, v := range x {
+//		sum += y[i] * v
+//	}
+//	return sum
 func DotuUnitary(x, y []complex128) (sum complex128) {
 	for i, v := range x {
 		sum += y[i] * v
@@ -147,12 +159,13 @@ func DotuUnitary(x, y []complex128) (sum complex128) {
 }
 
 // DotuInc is
-//  for i := 0; i < int(n); i++ {
-//  	sum += y[iy] * x[ix]
-//  	ix += incX
-//  	iy += incY
-//  }
-//  return sum
+//
+//	for i := 0; i < int(n); i++ {
+//		sum += y[iy] * x[ix]
+//		ix += incX
+//		iy += incY
+//	}
+//	return sum
 func DotuInc(x, y []complex128, n, incX, incY, ix, iy uintptr) (sum complex128) {
 	for i := 0; i < int(n); i++ {
 		sum += y[iy] * x[ix]

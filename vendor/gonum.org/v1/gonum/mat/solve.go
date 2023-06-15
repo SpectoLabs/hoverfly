@@ -10,14 +10,28 @@ import (
 	"gonum.org/v1/gonum/lapack/lapack64"
 )
 
-// Solve finds a minimum-norm solution to a system of linear equations defined
-// by the matrices A and B. If A is singular or near-singular, a Condition error
-// is returned. See the documentation for Condition for more information.
+// Solve solves the linear least squares problem
 //
-// The minimization problem solved depends on the input parameters:
-//  - if m >= n, find X such that ||A*X - B||_2 is minimized,
-//  - if m < n, find the minimum norm solution of A * X = B.
-// The solution matrix, X, is stored in-place into the receiver.
+//	minimize over x |b - A*x|_2
+//
+// where A is an m×n matrix, b is a given m element vector and x is n element
+// solution vector. Solve assumes that A has full rank, that is
+//
+//	rank(A) = min(m,n)
+//
+// If m >= n, Solve finds the unique least squares solution of an overdetermined
+// system.
+//
+// If m < n, there is an infinite number of solutions that satisfy b-A*x=0. In
+// this case Solve finds the unique solution of an underdetermined system that
+// minimizes |x|_2.
+//
+// Several right-hand side vectors b and solution vectors x can be handled in a
+// single call. Vectors b are stored in the columns of the m×k matrix B. Vectors
+// x will be stored in-place into the n×k receiver.
+//
+// If A does not have full rank, a Condition error is returned. See the
+// documentation for Condition for more information.
 func (m *Dense) Solve(a, b Matrix) error {
 	ar, ac := a.Dims()
 	br, bc := b.Dims()
@@ -41,10 +55,10 @@ func (m *Dense) Solve(a, b Matrix) error {
 		case RawMatrixer:
 			if m != bU || bTrans {
 				if m == bU || m.checkOverlap(rm.RawMatrix()) {
-					tmp := getWorkspace(br, bc, false)
+					tmp := getDenseWorkspace(br, bc, false)
 					tmp.Copy(b)
 					m.Copy(tmp)
-					putWorkspace(tmp)
+					putDenseWorkspace(tmp)
 					break
 				}
 				m.Copy(b)
@@ -54,19 +68,19 @@ func (m *Dense) Solve(a, b Matrix) error {
 				m.Copy(b)
 			} else if bTrans {
 				// m and b share data so Copy cannot be used directly.
-				tmp := getWorkspace(br, bc, false)
+				tmp := getDenseWorkspace(br, bc, false)
 				tmp.Copy(b)
 				m.Copy(tmp)
-				putWorkspace(tmp)
+				putDenseWorkspace(tmp)
 			}
 		}
 
 		rm := rma.RawTriangular()
 		blas64.Trsm(side, tA, 1, rm, m.mat)
-		work := getFloats(3*rm.N, false)
+		work := getFloat64s(3*rm.N, false)
 		iwork := getInts(rm.N, false)
 		cond := lapack64.Trcon(CondNorm, rm, work, iwork)
-		putFloats(work)
+		putFloat64s(work)
 		putInts(iwork)
 		if cond > ConditionTolerance {
 			return Condition(cond)
@@ -103,10 +117,26 @@ func (m *Dense) Solve(a, b Matrix) error {
 	}
 }
 
-// SolveVec finds a minimum-norm solution to a system of linear equations defined
-// by the matrix a and the right-hand side column vector b. If A is singular or
-// near-singular, a Condition error is returned. See the documentation for
-// Dense.Solve for more information.
+// SolveVec solves the linear least squares problem
+//
+//	minimize over x |b - A*x|_2
+//
+// where A is an m×n matrix, b is a given m element vector and x is n element
+// solution vector. Solve assumes that A has full rank, that is
+//
+//	rank(A) = min(m,n)
+//
+// If m >= n, Solve finds the unique least squares solution of an overdetermined
+// system.
+//
+// If m < n, there is an infinite number of solutions that satisfy b-A*x=0. In
+// this case Solve finds the unique solution of an underdetermined system that
+// minimizes |x|_2.
+//
+// The solution vector x will be stored in-place into the receiver.
+//
+// If A does not have full rank, a Condition error is returned. See the
+// documentation for Condition for more information.
 func (v *VecDense) SolveVec(a Matrix, b Vector) error {
 	if _, bc := b.Dims(); bc != 1 {
 		panic(ErrShape)

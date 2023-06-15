@@ -3,3 +3,5 @@
 /otto/otto-*
 /test/test-*.js
 /test/tester
+.idea
+dist/

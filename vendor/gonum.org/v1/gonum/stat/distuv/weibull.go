@@ -6,7 +6,6 @@ package distuv
 
 import (
 	"math"
-	"math/cmplx"
 
 	"golang.org/x/exp/rand"
 )
@@ -28,7 +27,7 @@ func (w Weibull) CDF(x float64) float64 {
 	if x < 0 {
 		return 0
 	}
-	return 1 - cmplx.Abs(cmplx.Exp(w.LogCDF(x)))
+	return -math.Expm1(-math.Pow(x/w.Lambda, w.K))
 }
 
 // Entropy returns the entropy of the distribution.
@@ -46,24 +45,20 @@ func (w Weibull) gammaIPow(i, pow float64) float64 {
 	return math.Pow(math.Gamma(1+i/w.K), pow)
 }
 
-// LogCDF computes the value of the log of the cumulative density function at x.
-func (w Weibull) LogCDF(x float64) complex128 {
-	if x < 0 {
-		return 0
-	}
-	return cmplx.Log(-1) + complex(-math.Pow(x/w.Lambda, w.K), 0)
-}
-
 // LogProb computes the natural logarithm of the value of the probability
-// density function at x. Zero is returned if x is less than zero.
+// density function at x. -Inf is returned if x is less than zero.
 //
 // Special cases occur when x == 0, and the result depends on the shape
 // parameter as follows:
-//  If 0 < K < 1, LogProb returns +Inf.
-//  If K == 1, LogProb returns 0.
-//  If K > 1, LogProb returns -Inf.
+//
+//	If 0 < K < 1, LogProb returns +Inf.
+//	If K == 1, LogProb returns 0.
+//	If K > 1, LogProb returns -Inf.
 func (w Weibull) LogProb(x float64) float64 {
 	if x < 0 {
+		return math.Inf(-1)
+	}
+	if x == 0 && w.K == 1 {
 		return 0
 	}
 	return math.Log(w.K) - math.Log(w.Lambda) + (w.K-1)*(math.Log(x)-math.Log(w.Lambda)) - math.Pow(x/w.Lambda, w.K)
@@ -94,11 +89,8 @@ func (w Weibull) Median() float64 {
 func (w Weibull) Mode() float64 {
 	if w.K > 1 {
 		return w.Lambda * math.Pow((w.K-1)/w.K, 1/w.K)
-	} else if w.K == 1 {
-		return 0
-	} else {
-		return math.NaN()
 	}
+	return 0
 }
 
 // NumParameters returns the number of parameters in the distribution.
@@ -136,7 +128,9 @@ func (w Weibull) Rand() float64 {
 // Score returns the score function with respect to the parameters of the
 // distribution at the input location x. The score function is the derivative
 // of the log-likelihood at x with respect to the parameters
-//  (∂/∂θ) log(p(x;θ))
+//
+//	(∂/∂θ) log(p(x;θ))
+//
 // If deriv is non-nil, len(deriv) must equal the number of parameters otherwise
 // Score will panic, and the derivative is stored in-place into deriv. If deriv
 // is nil a new slice will be allocated and returned.
@@ -146,7 +140,8 @@ func (w Weibull) Rand() float64 {
 // For more information, see https://en.wikipedia.org/wiki/Score_%28statistics%29.
 //
 // Special cases:
-//  Score(0) = [NaN, NaN]
+//
+//	Score(x) = [NaN, NaN] for x <= 0
 func (w Weibull) Score(deriv []float64, x float64) []float64 {
 	if deriv == nil {
 		deriv = make([]float64, w.NumParameters())
@@ -159,11 +154,6 @@ func (w Weibull) Score(deriv []float64, x float64) []float64 {
 		deriv[1] = (w.K * (math.Pow(x/w.Lambda, w.K) - 1)) / w.Lambda
 		return deriv
 	}
-	if x < 0 {
-		deriv[0] = 0
-		deriv[1] = 0
-		return deriv
-	}
 	deriv[0] = math.NaN()
 	deriv[1] = math.NaN()
 	return deriv
@@ -172,16 +162,15 @@ func (w Weibull) Score(deriv []float64, x float64) []float64 {
 // ScoreInput returns the score function with respect to the input of the
 // distribution at the input location specified by x. The score function is the
 // derivative of the log-likelihood
-//  (d/dx) log(p(x)) .
+//
+//	(d/dx) log(p(x)) .
 //
 // Special cases:
-//  ScoreInput(0) = NaN
+//
+//	ScoreInput(x) = NaN for x <= 0
 func (w Weibull) ScoreInput(x float64) float64 {
 	if x > 0 {
 		return (-w.K*math.Pow(x/w.Lambda, w.K) + w.K - 1) / x
-	}
-	if x < 0 {
-		return 0
 	}
 	return math.NaN()
 }

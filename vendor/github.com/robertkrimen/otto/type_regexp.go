@@ -3,7 +3,6 @@ package otto
 import (
 	"fmt"
 	"regexp"
-	"unicode/utf8"
 
 	"github.com/robertkrimen/otto/parser"
 )
@@ -19,7 +18,7 @@ type _regExpObject struct {
 
 func (runtime *_runtime) newRegExpObject(pattern string, flags string) *_object {
 	self := runtime.newObject()
-	self.class = "RegExp"
+	self.class = classRegExp
 
 	global := false
 	ignoreCase := false
@@ -85,7 +84,7 @@ func (self *_object) regExpValue() _regExpObject {
 }
 
 func execRegExp(this *_object, target string) (match bool, result []int) {
-	if this.class != "RegExp" {
+	if this.class != classRegExp {
 		panic(this.runtime.panicTypeError("Calling RegExp.exec on a non-RegExp object"))
 	}
 	lastIndex := this.get("lastIndex").number().int64
@@ -99,7 +98,6 @@ func execRegExp(this *_object, target string) (match bool, result []int) {
 		result = this.regExpValue().regularExpression.FindStringSubmatchIndex(target[index:])
 	}
 	if result == nil {
-		//this.defineProperty("lastIndex", toValue_(0), 0111, true)
 		this.put("lastIndex", toValue_int(0), true)
 		return // !match
 	}
@@ -108,11 +106,12 @@ func execRegExp(this *_object, target string) (match bool, result []int) {
 	endIndex := int(lastIndex) + result[1]
 	// We do this shift here because the .FindStringSubmatchIndex above
 	// was done on a local subordinate slice of the string, not the whole string
-	for index, _ := range result {
-		result[index] += int(startIndex)
+	for index, offset := range result {
+		if offset != -1 {
+			result[index] += int(startIndex)
+		}
 	}
 	if global {
-		//this.defineProperty("lastIndex", toValue_(endIndex), 0111, true)
 		this.put("lastIndex", toValue_int(endIndex), true)
 	}
 	return // match
@@ -131,13 +130,8 @@ func execResultToArray(runtime *_runtime, target string, result []int) *_object 
 	}
 	matchIndex := result[0]
 	if matchIndex != 0 {
-		matchIndex = 0
-		// Find the rune index in the string, not the byte index
-		for index := 0; index < result[0]; {
-			_, size := utf8.DecodeRuneInString(target[index:])
-			matchIndex += 1
-			index += size
-		}
+		// Find the utf16 index in the string, not the byte index.
+		matchIndex = utf16Length(target[:matchIndex])
 	}
 	match := runtime.newArrayOf(valueArray)
 	match.defineProperty("input", toValue_string(target), 0111, false)

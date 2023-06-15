@@ -8,7 +8,7 @@ Random data generator written in go
 
 ## Features
 
-- [160+ Functions!!!](#functions)
+- [260+ Functions!!!](#functions)
 - [Random Sources](#random-sources)
 - [Global Rand](#global-rand-set)
 - [Struct Generator](#struct)
@@ -18,6 +18,14 @@ Random data generator written in go
 - Zero dependencies
 - [Benchmarks](https://github.com/brianvoe/gofakeit/blob/master/BENCHMARKS.md)
 - [Issue](https://github.com/brianvoe/gofakeit/issues)
+
+## Contributors
+
+Thanks to everyone who has contributed to Gofakeit!
+
+<a href="https://github.com/brianvoe/gofakeit/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=brianvoe/gofakeit" />
+</a>
 
 ## Installation
 
@@ -101,7 +109,7 @@ gofakeit.SetGlobalFaker(faker)
 ## Struct
 
 Gofakeit can generate random data for struct fields. For the most part it covers all the basic type
-as well as some non basic like time.Time.
+as well as some non-basic like time.Time.
 
 Struct fields can also use tags to more specifically generate data for that field type.
 
@@ -110,20 +118,21 @@ import "github.com/brianvoe/gofakeit/v6"
 
 // Create structs with random injected data
 type Foo struct {
-	Str      string
-	Int      int
-	Pointer  *int
-	Name     string         `fake:"{firstname}"`         // Any available function all lowercase
-	Sentence string         `fake:"{sentence:3}"`        // Can call with parameters
-	RandStr  string         `fake:"{randomstring:[hello,world]}"`
-	Number   string         `fake:"{number:1,10}"`       // Comma separated for multiple values
-	Regex    string         `fake:"{regex:[abcdef]{5}}"` // Generate string from regex
-	Map      map[string]int `fakesize:"2"`
-	Array    []string       `fakesize:"2"`
-	Bar 	 Bar
-	Skip     *string        `fake:"skip"`                // Set to "skip" to not generate data for
-	Created  time.Time								     // Can take in a fake tag as well as a format tag
-	CreatedFormat  time.Time `fake:"{year}-{month}-{day}" format:"2006-01-02"`
+	Str           string
+	Int           int
+	Pointer       *int
+	Name          string         `fake:"{firstname}"`         // Any available function all lowercase
+	Sentence      string         `fake:"{sentence:3}"`        // Can call with parameters
+	RandStr       string         `fake:"{randomstring:[hello,world]}"`
+	Number        string         `fake:"{number:1,10}"`       // Comma separated for multiple values
+	Regex         string         `fake:"{regex:[abcdef]{5}}"` // Generate string from regex
+	Map           map[string]int `fakesize:"2"`
+	Array         []string       `fakesize:"2"`
+	ArrayRange    []string       `fakesize:"2,6"`
+    Bar           Bar
+	Skip          *string        `fake:"skip"`                // Set to "skip" to not generate data for
+	Created       time.Time                                   // Can take in a fake tag as well as a format tag
+	CreatedFormat time.Time      `fake:"{year}-{month}-{day}" format:"2006-01-02"`
 }
 
 type Bar struct {
@@ -157,12 +166,53 @@ fmt.Println(f.Created.String()) // 1908-12-07 04:14:25.685339029 +0000 UTC
 // bool, string,
 // array, pointers, map
 // time.Time // If setting time you can also set a format tag
-// Nested Struct Fields and Embeded Fields
+// Nested Struct Fields and Embedded Fields
+```
+
+## Fakeable types
+
+It is possible to extend a struct by implementing the `Fakeable` interface
+in order to control the generation.
+
+For example, this is useful when it is not possible to modify the struct that you want to fake by adding struct tags to a field but you still need to be able to control the generation process.
+
+```go
+// Custom string that you want to generate your own data for
+// or just return a static value
+type CustomString string
+
+func (c *CustomString) Fake(faker *gofakeit.Faker) interface{} {
+	return CustomString("my custom string")
+}
+
+// Imagine a CustomTime type that is needed to support a custom JSON Marshaler
+type CustomTime time.Time
+
+func (c *CustomTime) Fake(faker *gofakeit.Faker) interface{} {
+	return CustomTime(time.Now())
+}
+
+func (c *CustomTime) MarshalJSON() ([]byte, error) {
+	//...
+}
+
+// This is the struct that we cannot modify to add struct tags
+type NotModifiable struct {
+	Token string
+	Value CustomString
+	Creation *CustomTime
+}
+
+var f NotModifiable
+gofakeit.Struct(&f)
+fmt.Printf("%s", f.Token) // yvqqdH
+fmt.Printf("%s", f.Value) // my custom string
+fmt.Printf("%s", f.Creation) // 2023-04-02 23:00:00 +0000 UTC m=+0.000000001
 ```
 
 ## Custom Functions
 
-In a lot of sitations you may need to use your own random function usage for your specific needs.
+In a lot of situations you may need to use your own random function usage for your specific needs.
 
 If you would like to extend the usage of struct tags, generate function, available usages in the gofakeit server
 or gofakeit command sub packages. You can do so via the AddFuncLookup. Each function has their own lookup, if
@@ -170,33 +220,33 @@ you need more reference examples you can look at each files lookups.
 
 ```go
 // Simple
-gofakeit.AddFuncLookup("friendname", Info{
+gofakeit.AddFuncLookup("friendname", gofakeit.Info{
 	Category:    "custom",
 	Description: "Random friend name",
 	Example:     "bill",
 	Output:      "string",
-	Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
-		return RandomString([]string{"bill", "bob", "sally"}), nil
+	Generate: func(r *rand.Rand, m *gofakeit.MapParams, info *gofakeit.Info) (interface{}, error) {
+		return gofakeit.RandomString([]string{"bill", "bob", "sally"}), nil
 	},
 })
 
 // With Params
-gofakeit.AddFuncLookup("jumbleword", Info{
+gofakeit.AddFuncLookup("jumbleword", gofakeit.Info{
 	Category:    "jumbleword",
-	Description: "Take a word and jumple it up",
+	Description: "Take a word and jumble it up",
 	Example:     "loredlowlh",
 	Output:      "string",
-	Params: []Param{
+	Params: []gofakeit.Param{
 		{Field: "word", Type: "string", Description: "Word you want to jumble"},
 	},
-	Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+	Generate: func(r *rand.Rand, m *gofakeit.MapParams, info *gofakeit.Info) (interface{}, error) {
 		word, err := info.GetString(m, "word")
 		if err != nil {
 			return nil, err
 		}
 
 		split := strings.Split(word, "")
-		ShuffleStrings(split)
+		gofakeit.ShuffleStrings(split)
 		return strings.Join(split, ""), nil
 	},
 })
@@ -218,7 +268,10 @@ All functions also exist as methods on the Faker struct
 
 ### File
 
+Passing `nil` to `CSV`, `JSON` or `XML` it will auto generate data using a random set of generators.
+
 ```go
+CSV(co *CSVOptions) ([]byte, error)
 JSON(jo *JSONOptions) ([]byte, error)
 XML(xo *XMLOptions) ([]byte, error)
 FileExtension() string
@@ -233,6 +286,7 @@ Name() string
 NamePrefix() string
 NameSuffix() string
 FirstName() string
+MiddleName() string
 LastName() string
 Gender() string
 SSN() string
@@ -379,7 +433,7 @@ AdjectiveIndefinite() string
 Pronoun() string
 PronounPersonal() string
 PronounObject() string
-PronounPosessive() string
+PronounPossessive() string
 PronounReflective() string
 PronounDemonstrative() string
 PronounInterrogative() string
@@ -446,6 +500,16 @@ Color() string
 HexColor() string
 RGBColor() []int
 SafeColor() string
+NiceColors() string
+```
+
+### Images
+
+```go
+ImageURL(width int, height int) string
+Image(width int, height int) *img.RGBA
+ImageJpeg(width int, height int) []byte
+ImagePng(width int, height int) []byte
 ```
 
 ### Internet
@@ -467,6 +531,13 @@ ChromeUserAgent() string
 FirefoxUserAgent() string
 OperaUserAgent() string
 SafariUserAgent() string
+```
+
+### HTML
+
+```go
+InputName() string
+Svg(options *SVGOptions) string
 ```
 
 ### Date/Time
@@ -508,10 +579,18 @@ BitcoinAddress() string
 BitcoinPrivateKey() string
 ```
 
+### Finance
+
+```go
+Cusip() string
+Isin() string
+```
+
 ### Company
 
 ```go
 BS() string
+Blurb() string
 BuzzWord() string
 Company() string
 CompanySuffix() string
@@ -519,6 +598,7 @@ Job() *JobInfo
 JobDescriptor() string
 JobLevel() string
 JobTitle() string
+Slogan() string
 ```
 
 ### Hacker
@@ -557,6 +637,7 @@ AnimalType() string
 FarmAnimal() string
 Cat() string
 Dog() string
+Bird() string
 ```
 
 ### Emoji
@@ -646,4 +727,36 @@ MinecraftMobHostile() string
 MinecraftMobBoss() string
 MinecraftBiome() string
 MinecraftWeather() string
+```
+
+### Book
+
+```go
+Book() *BookInfo
+BookTitle() string
+BookAuthor() string
+BookGenre() string
+```
+
+### Movie
+
+```go
+Movie() *MovieInfo
+MovieName() string
+MovieGenre() string
+```
+
+### Error
+
+Unlike most `gofakeit` methods which return a `string`, the error methods return a Go `error`. Access the error message as a string by chaining the `.Error()` method.
+
+```go
+Error() error
+ErrorDatabase() error
+ErrorGRPC() error
+ErrorHTTP() error
+ErrorHTTPClient() error
+ErrorHTTPServer() error
+ErrorInput() error
+ErrorRuntime() error
 ```

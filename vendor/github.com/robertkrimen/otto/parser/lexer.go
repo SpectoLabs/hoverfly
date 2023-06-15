@@ -119,7 +119,6 @@ func isLineTerminator(chr rune) bool {
 }
 
 func (self *_parser) scan() (tkn token.Token, literal string, idx file.Idx) {
-
 	self.implicitSemicolon = false
 
 	for {
@@ -142,7 +141,6 @@ func (self *_parser) scan() (tkn token.Token, literal string, idx file.Idx) {
 				tkn, strict = token.IsKeyword(literal)
 
 				switch tkn {
-
 				case 0: // Not a keyword
 					if literal == "true" || literal == "false" {
 						self.insertSemicolon = true
@@ -174,7 +172,6 @@ func (self *_parser) scan() (tkn token.Token, literal string, idx file.Idx) {
 
 				default:
 					return
-
 				}
 			}
 			self.insertSemicolon = true
@@ -522,7 +519,6 @@ func (self *_parser) scanMantissa(base int) {
 }
 
 func (self *_parser) scanEscape(quote rune) {
-
 	var length, base uint32
 	switch self.chr {
 	//case '0', '1', '2', '3', '4', '5', '6', '7':
@@ -628,14 +624,14 @@ func parseNumberLiteral(literal string) (value interface{}, err error) {
 	// TODO Is Uint okay? What about -MAX_UINT
 	value, err = strconv.ParseInt(literal, 0, 64)
 	if err == nil {
-		return
+		return value, nil
 	}
 
 	parseIntErr := err // Save this first error, just in case
 
 	value, err = strconv.ParseFloat(literal, 64)
 	if err == nil {
-		return
+		return value, nil
 	} else if err.(*strconv.NumError).Err == strconv.ErrRange {
 		// Infinity, etc.
 		return value, nil
@@ -651,7 +647,7 @@ func parseNumberLiteral(literal string) (value interface{}, err error) {
 			for _, chr := range literal {
 				digit := digitValue(chr)
 				if digit >= 16 {
-					goto error
+					return nil, errors.New("Illegal numeric literal")
 				}
 				value = value*16 + float64(digit)
 			}
@@ -659,7 +655,6 @@ func parseNumberLiteral(literal string) (value interface{}, err error) {
 		}
 	}
 
-error:
 	return nil, errors.New("Illegal numeric literal")
 }
 
@@ -789,7 +784,6 @@ func parseStringLiteral(literal string) (string, error) {
 }
 
 func (self *_parser) scanNumericLiteral(decimalPoint bool) (token.Token, string) {
-
 	offset := self.chrOffset
 	tkn := token.NUMBER
 
