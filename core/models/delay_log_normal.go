@@ -41,7 +41,7 @@ func ValidateResponseDelayLogNormalPayload(j v1.ResponseDelayLogNormalPayloadVie
 			}
 
 			if _, err := regexp.Compile(delay.UrlPattern); err != nil {
-				return errors.New(fmt.Sprintf("Response delay entry skipped due to invalid pattern : %s", delay.UrlPattern))
+				return fmt.Errorf("Response delay entry skipped due to invalid pattern : %s", delay.UrlPattern)
 			}
 
 			if err := coreDelay.ValidateLogNormalDelayOptions(delay.Min, delay.Max, delay.Mean, delay.Median); err != nil {

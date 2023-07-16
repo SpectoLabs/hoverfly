@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -29,10 +28,10 @@ func ValidateResponseDelayPayload(j v1.ResponseDelayPayloadView) (err error) {
 		for _, delay := range j.Data {
 			if delay.UrlPattern != "" && delay.Delay != 0 {
 				if _, err := regexp.Compile(delay.UrlPattern); err != nil {
-					return errors.New(fmt.Sprintf("Response delay entry skipped due to invalid pattern : %s", delay.UrlPattern))
+					return fmt.Errorf("Response delay entry skipped due to invalid pattern : %s", delay.UrlPattern)
 				}
 			} else {
-				return errors.New(fmt.Sprintf("Config error - Missing values found in: %v", delay))
+				return fmt.Errorf("Config error - Missing values found in: %v", delay)
 			}
 		}
 	}
