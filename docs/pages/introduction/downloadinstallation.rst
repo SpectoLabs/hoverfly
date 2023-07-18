@@ -20,7 +20,7 @@ If you have `homebrew <http://brew.sh/>`_, you can install Hoverfly using the ``
 
 .. code:: bash
 
-    brew install SpectoLabs/tap/hoverfly
+    brew install hoverfly
 
 To upgrade your existing hoverfly to the latest release:
 
