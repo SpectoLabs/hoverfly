@@ -50,7 +50,7 @@ func (this SynthesizeMode) Process(request *http.Request, details models.Request
 		"mode": Synthesize,
 		// "middleware":  this.hoverfly.Cfg.Middleware,
 		"request": GetRequestLogFields(&pair.Request),
-	}).Info("synthetic response created successfuly")
+	}).Info("synthetic response created successfully")
 
 	response := ReconstructResponse(request, pair)
 	return newProcessResult(response, pair.Response.FixedDelay, pair.Response.LogNormalDelay), nil
