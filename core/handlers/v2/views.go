@@ -38,6 +38,7 @@ type ModeArgumentsView struct {
 	MatchingStrategy   *string  `json:"matchingStrategy,omitempty"`
 	Stateful           bool     `json:"stateful,omitempty"`
 	OverwriteDuplicate bool     `json:"overwriteDuplicate,omitempty"`
+	CaptureOnMiss      bool     `json:"captureOnMiss,omitempty"`
 }
 
 type IsWebServerView struct {

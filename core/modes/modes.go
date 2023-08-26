@@ -3,15 +3,16 @@ package modes
 import (
 	"bytes"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/util"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
 
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/util"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/SpectoLabs/goproxy"
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
@@ -44,6 +45,7 @@ type ModeArguments struct {
 	MatchingStrategy   *string
 	Stateful           bool
 	OverwriteDuplicate bool
+	CaptureOnMiss      bool
 }
 
 type ProcessResult struct {
@@ -92,7 +94,6 @@ func ReconstructRequest(pair models.RequestResponsePair) (*http.Request, error) 
 	if err != nil {
 		return nil, err
 	}
-
 
 	newRequest.Method = pair.Request.Method
 	newRequest.Header = pair.Request.Headers

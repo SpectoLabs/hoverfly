@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/hoverctl/wrapper"
 	"github.com/spf13/cobra"
@@ -15,6 +15,7 @@ var allHeaders bool
 var stateful bool
 var overwriteDuplicate bool
 var matchingStrategy string
+var captureOnMiss bool
 
 var modeCmd = &cobra.Command{
 	Use:   "mode [capture|diff|simulate|spy|modify|synthesize (optional)]",
@@ -53,6 +54,13 @@ mode is shown.
 				setHeaderArgument(modeView)
 				break
 			case modes.Diff:
+				setHeaderArgument(modeView)
+				break
+			case modes.Spy:
+				modeView.Arguments.MatchingStrategy = &matchingStrategy
+				modeView.Arguments.Stateful = stateful
+				modeView.Arguments.OverwriteDuplicate = overwriteDuplicate
+				modeView.Arguments.CaptureOnMiss = captureOnMiss
 				setHeaderArgument(modeView)
 				break
 			}
@@ -100,6 +108,18 @@ func getExtraInfo(mode *v2.ModeView) string {
 			}
 		}
 		break
+	case modes.Spy:
+		if mode.Arguments.CaptureOnMiss {
+			extraInfo = "and will capture on not finding the match"
+		}
+		if len(mode.Arguments.Headers) > 0 {
+			if len(mode.Arguments.Headers) == 1 && mode.Arguments.Headers[0] == "*" {
+				extraInfo = "and also will capture all request headers"
+			} else {
+				extraInfo = fmt.Sprintf("and also will capture the following request headers: %s", mode.Arguments.Headers)
+			}
+		}
+		break
 	}
 
 	return extraInfo
@@ -111,11 +131,12 @@ func init() {
 	modeCmd.PersistentFlags().StringVar(&specificHeaders, "headers", "",
 		"A comma separated list of request headers to record (for capture mode) or response headers to ignore (for diff mode) `Content-Type,Authorization`")
 	modeCmd.PersistentFlags().BoolVar(&allHeaders, "all-headers", false,
-		"Record all request headers (for capture mode) or ignore all response headers (for diff mode)")
+		"Record all request headers (for capture/spy mode) or ignore all response headers (for diff mode)")
 	modeCmd.PersistentFlags().StringVar(&matchingStrategy, "matching-strategy", "strongest",
 		"Sets the matching strategy - 'strongest | first'")
 	modeCmd.PersistentFlags().BoolVar(&stateful, "stateful", false,
 		"Record stateful responses as a sequence in capture mode")
 	modeCmd.PersistentFlags().BoolVar(&overwriteDuplicate, "overwrite-duplicate", false,
 		"Overwrite duplicate requests in capture mode")
+	modeCmd.PersistentFlags().BoolVar(&captureOnMiss, "capture-on-miss", false, "Capture the request on miss in spy mode")
 }
