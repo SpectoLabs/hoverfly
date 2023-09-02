@@ -1,8 +1,6 @@
 package matching
 
 import (
-	"encoding/json"
-
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
 
@@ -22,7 +20,7 @@ func BodyMatching(fields []models.RequestFieldMatchers, req models.RequestDetail
 	for _, field := range fields {
 		if field.Matcher == "form" {
 			hasForm = true
-			formMatchers := field.Value.(map[string]interface{})
+			formMatchers := field.Value.(map[string][]models.RequestFieldMatchers)
 			formMatched := processFormMatcher(formMatchers, req.FormData)
 			if !formMatched.Matched {
 				matched = false
@@ -44,20 +42,17 @@ func BodyMatching(fields []models.RequestFieldMatchers, req models.RequestDetail
 	}
 }
 
-func processFormMatcher(formFields map[string]interface{}, formData map[string][]string) *FieldMatch {
+func processFormMatcher(formFields map[string][]models.RequestFieldMatchers, formData map[string][]string) *FieldMatch {
 	matched := true
 	var score int
 
-	var matchers []models.RequestFieldMatchers
 	for formField, formMatchers := range formFields {
 		formValue, ok := formData[formField]
 		if !ok {
 			matched = false
 			continue
 		}
-		marshaledFormMatchers, _ := json.Marshal(formMatchers)
-		json.Unmarshal(marshaledFormMatchers, &matchers)
-		formMatched := FieldMatcher(matchers, formValue[0])
+		formMatched := FieldMatcher(formMatchers, formValue[0])
 		if !formMatched.Matched {
 			matched = false
 		}

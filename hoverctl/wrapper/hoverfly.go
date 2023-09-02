@@ -189,7 +189,7 @@ func Start(target *configuration.Target) error {
 			if err != nil {
 				log.Debug(err)
 			}
-			return errors.New(fmt.Sprintf("Timed out waiting for Hoverfly to become healthy, returns status: %v", statusCode))
+			return fmt.Errorf("Timed out waiting for Hoverfly to become healthy, returns status: %v", statusCode)
 		case <-tick:
 			resp, err := http.Get(fmt.Sprintf("http://localhost:%v/api/health", target.AdminPort))
 			if err == nil {

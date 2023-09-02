@@ -14,7 +14,6 @@ import (
 
 	"github.com/SpectoLabs/goproxy"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/sirupsen/logrus"
 )
 
 // SimulateMode - default mode when Hoverfly looks for captured requests to respond
@@ -155,7 +154,7 @@ func ReconstructResponse(request *http.Request, pair models.RequestResponsePair)
 	return response
 }
 
-func GetRequestLogFields(request *models.RequestDetails) *logrus.Fields {
+func GetRequestLogFields(request *models.RequestDetails) *log.Fields {
 	if request == nil {
 		return &log.Fields{
 			"error": "nil request",
@@ -173,7 +172,7 @@ func GetRequestLogFields(request *models.RequestDetails) *logrus.Fields {
 	}
 }
 
-func GetResponseLogFields(response *models.ResponseDetails) *logrus.Fields {
+func GetResponseLogFields(response *models.ResponseDetails) *log.Fields {
 	if response == nil || response.Status == 0 {
 		return &log.Fields{
 			"error": "nil response",

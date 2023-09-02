@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"net/url"
 
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -22,14 +23,40 @@ func NewRequestFieldMatchersFromView(matchers []v2.MatcherViewV5) []RequestField
 	convertedMatchers := []RequestFieldMatchers{}
 	for _, matcher := range matchers {
 		doMatch := getDoMatchRequestFromMatcherView(matcher.DoMatch)
+		value := getValueFromMatcherView(&matcher)
 		convertedMatchers = append(convertedMatchers, RequestFieldMatchers{
 			Matcher: matcher.Matcher,
-			Value:   matcher.Value,
+			Value:   value,
 			Config:  matcher.Config,
 			DoMatch: doMatch,
 		})
 	}
 	return convertedMatchers
+}
+
+func getValueFromMatcherView(matcher *v2.MatcherViewV5) interface{} {
+
+	if matcher.Matcher == "form" {
+		formFieldsMap, ok := matcher.Value.(map[string]interface{})
+		if !ok {
+			//return default value incase of any issue
+			return matcher.Value
+		}
+		returnValue := make(map[string][]RequestFieldMatchers)
+		for formField, formMatchers := range formFieldsMap {
+			marshalledFormMatcherValue, _ := json.Marshal(formMatchers)
+			var matchers []RequestFieldMatchers
+			err := json.Unmarshal(marshalledFormMatcherValue, &matchers)
+			if err != nil {
+				//return default value incase of any issue
+				return matcher.Value
+			}
+			returnValue[formField] = matchers
+		}
+		return returnValue
+	} else {
+		return matcher.Value
+	}
 }
 
 func getDoMatchRequestFromMatcherView(matcher *v2.MatcherViewV5) *RequestFieldMatchers {
@@ -75,11 +102,30 @@ func NewQueryRequestFieldMatchersFromMapView(mapMatchers *v2.QueryMatcherViewV5)
 
 func (this RequestFieldMatchers) BuildView() v2.MatcherViewV5 {
 	doMatch := getViewFromRequestFieldMatcher(this.DoMatch)
+	value := getValueFromRequestFieldMatcher(&this)
 	return v2.MatcherViewV5{
 		Matcher: this.Matcher,
-		Value:   this.Value,
+		Value:   value,
 		Config:  this.Config,
 		DoMatch: doMatch,
+	}
+}
+
+func getValueFromRequestFieldMatcher(matcher *RequestFieldMatchers) interface{} {
+
+	if matcher.Matcher == "form" {
+		formFieldMatchers := matcher.Value.(map[string][]RequestFieldMatchers)
+		returnValue := make(map[string][]v2.MatcherViewV5)
+		for formField, matchers := range formFieldMatchers {
+			var matchersView []v2.MatcherViewV5
+			for _, matcher := range matchers {
+				matchersView = append(matchersView, matcher.BuildView())
+			}
+			returnValue[formField] = matchersView
+		}
+		return returnValue
+	} else {
+		return matcher.Value
 	}
 }
 
@@ -267,10 +313,21 @@ func (this RequestMatcher) ToEagerlyCacheable() *RequestDetails {
 	if this.Query != nil && len(*this.Query) > 0 {
 		for key, valueMatchers := range *this.Query {
 			for _, valueMatcher := range valueMatchers {
-				if valueMatcher.Matcher != matchers.Exact {
+				if valueMatcher.Matcher != matchers.Exact && !(valueMatcher.Matcher == matchers.Array && (valueMatcher.Config == nil || len(valueMatcher.Config) == 0)) {
 					return nil
 				}
-				query[key] = []string{valueMatcher.Value.(string)}
+				if valueMatcher.Matcher == matchers.Array {
+					if value, ok := util.GetStringArray(valueMatcher.Value); ok {
+						query[key] = value
+					} else {
+						//ll hardly the case
+						query[key] = []string{}
+					}
+
+				} else {
+					query[key] = []string{valueMatcher.Value.(string)}
+				}
+
 			}
 		}
 	} else if this.DeprecatedQuery != nil && len(this.DeprecatedQuery) == 1 {

@@ -3,7 +3,7 @@ package models_test
 import (
 	"testing"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	. "github.com/onsi/gomega"
@@ -33,6 +33,37 @@ func Test_NewRequestFieldMatchersFromView_WillReturnNilIfGivenNil(t *testing.T) 
 	Expect(unit).To(BeNil())
 }
 
+func Test_NewRequestFieldMatchersFromView_WithFormMatchers(t *testing.T) {
+
+	RegisterTestingT(t)
+	value := make(map[string]interface{})
+	valueMatcher := []map[string]interface{}{
+		{
+			"matcher": matchers.Exact,
+			"value":   "foo",
+		},
+		{
+			"matcher": matchers.Glob,
+			"value":   "*",
+		},
+	}
+	value["test-key"] = valueMatcher
+	unit := models.NewRequestFieldMatchersFromView([]v2.MatcherViewV5{
+		{
+			Matcher: "form",
+			Value:   value,
+		},
+	})
+	Expect(unit).NotTo(BeNil())
+	Expect(unit).To(HaveLen(1))
+	Expect(unit[0].Matcher).To(Equal("form"))
+	Expect(unit[0].Value.(map[string][]models.RequestFieldMatchers)["test-key"]).To(HaveLen(2))
+	Expect(unit[0].Value.(map[string][]models.RequestFieldMatchers)["test-key"][0].Matcher).To(Equal("exact"))
+	Expect(unit[0].Value.(map[string][]models.RequestFieldMatchers)["test-key"][1].Matcher).To(Equal("glob"))
+	Expect(unit[0].Value.(map[string][]models.RequestFieldMatchers)["test-key"][0].Value).To(Equal("foo"))
+	Expect(unit[0].Value.(map[string][]models.RequestFieldMatchers)["test-key"][1].Value).To(Equal("*"))
+}
+
 func Test_NewRequestFieldMatchers_BuildView(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -44,6 +75,63 @@ func Test_NewRequestFieldMatchers_BuildView(t *testing.T) {
 	view := unit.BuildView()
 	Expect(view.Matcher).To(Equal("exact"))
 	Expect(view.Value).To(Equal("exactly"))
+}
+
+func Test_NewRequestFormMatchers_WithMultipleMatchersForSingleKey_BuildView(t *testing.T) {
+	RegisterTestingT(t)
+	formValue := make(map[string][]models.RequestFieldMatchers)
+	formValue["test-key"] = []models.RequestFieldMatchers{
+		{
+			Matcher: matchers.Exact,
+			Value:   "foo",
+		},
+		{
+			Matcher: matchers.Glob,
+			Value:   "*",
+		},
+	}
+	unit := models.RequestFieldMatchers{
+		Matcher: "form",
+		Value:   formValue,
+	}
+	view := unit.BuildView()
+	Expect(view).NotTo(BeNil())
+	Expect(view.Matcher).To(Equal("form"))
+	Expect(view.Value.(map[string][]v2.MatcherViewV5)).To(HaveLen(1))
+	Expect(view.Value.(map[string][]v2.MatcherViewV5)["test-key"]).To(HaveLen(2))
+	Expect(view.Value.(map[string][]v2.MatcherViewV5)["test-key"][0].Matcher).To(Equal("exact"))
+	Expect(view.Value.(map[string][]v2.MatcherViewV5)["test-key"][1].Matcher).To(Equal("glob"))
+	Expect(view.Value.(map[string][]v2.MatcherViewV5)["test-key"][0].Value).To(Equal("foo"))
+	Expect(view.Value.(map[string][]v2.MatcherViewV5)["test-key"][1].Value).To(Equal("*"))
+
+}
+
+func Test_NewRequestFormMatchers_WithMatcherChainingForSingleKey_BuildView(t *testing.T) {
+	RegisterTestingT(t)
+	formValue := make(map[string][]models.RequestFieldMatchers)
+	formValue["test-key"] = []models.RequestFieldMatchers{
+		{
+			Matcher: "exact",
+			Value:   "foo",
+			DoMatch: &models.RequestFieldMatchers{
+				Matcher: "glob",
+				Value:   "*",
+			},
+		},
+	}
+	unit := models.RequestFieldMatchers{
+		Matcher: "form",
+		Value:   formValue,
+	}
+	view := unit.BuildView()
+	Expect(view).NotTo(BeNil())
+	Expect(view.Matcher).To(Equal("form"))
+	Expect(view.Value.(map[string][]v2.MatcherViewV5)).To(HaveLen(1))
+	Expect(view.Value.(map[string][]v2.MatcherViewV5)["test-key"]).To(HaveLen(1))
+	Expect(view.Value.(map[string][]v2.MatcherViewV5)["test-key"][0].Matcher).To(Equal("exact"))
+	Expect(view.Value.(map[string][]v2.MatcherViewV5)["test-key"][0].DoMatch.Matcher).To(Equal("glob"))
+	Expect(view.Value.(map[string][]v2.MatcherViewV5)["test-key"][0].Value).To(Equal("foo"))
+	Expect(view.Value.(map[string][]v2.MatcherViewV5)["test-key"][0].DoMatch.Value).To(Equal("*"))
 }
 
 func Test_NewRequestMatcherResponsePairFromView_BuildsPair(t *testing.T) {
@@ -328,6 +416,71 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_WithQuery_Generates
 	}))
 }
 
+func Test_RequestMatcher_BuildRequestDetailsFromExactAndArrayMatchers_WithQuery_GeneratesARequestDetails(t *testing.T) {
+	RegisterTestingT(t)
+	query := &models.QueryRequestFieldMatchers{}
+	query.Add("key1", []models.RequestFieldMatchers{
+		{
+			Matcher: matchers.Exact,
+			Value:   "one",
+		},
+	})
+	query.Add("key2", []models.RequestFieldMatchers{
+		{
+			Matcher: matchers.Array,
+			Value:   []string{"one", "two", "three"},
+		},
+	})
+	query.Add("key3", []models.RequestFieldMatchers{
+		{
+			Matcher: matchers.Array,
+			Value:   []interface{}{"four", "five", "six"},
+		},
+	})
+	unit := models.RequestMatcher{
+		Body: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "body",
+			},
+		},
+		Destination: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "destination",
+			},
+		},
+		Method: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "method",
+			},
+		},
+		Path: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "path",
+			},
+		},
+		Query: query,
+		Scheme: []models.RequestFieldMatchers{
+			{
+				Matcher: matchers.Exact,
+				Value:   "scheme",
+			},
+		},
+	}
+
+	Expect(unit.ToEagerlyCacheable()).ToNot(BeNil())
+	Expect(unit.ToEagerlyCacheable()).To(Equal(&models.RequestDetails{
+		Body:        "body",
+		Destination: "destination",
+		Method:      "method",
+		Path:        "path",
+		Query:       map[string][]string{"key1": {"one"}, "key2": {"one", "two", "three"}, "key3": {"four", "five", "six"}},
+		Scheme:      "scheme",
+	}))
+}
 func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_WithQuery_ReturnsNilIfNotAnExactMatch(t *testing.T) {
 	RegisterTestingT(t)
 	query := &models.QueryRequestFieldMatchers{}
