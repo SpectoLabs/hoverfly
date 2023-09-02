@@ -505,6 +505,51 @@ and the binary to execute it or the URL to a remote middleware.
 
 -------------------------------------------------------------------------------------------------------------
 
+GET /api/v2/hoverfly/post-serve-actions
+"""""""""""""""""""""""""""""""""""""""
+
+Get all the post serve actions for the running instance of Hoverfly.
+It will return list of scripts that can be executed with a binary after response is served back.
+
+**Example response body**
+::
+
+    {
+        "actions": [
+            {
+                "actionName": "<post serve action name>",
+                "binary": "python",
+                "script": "#python code goes here",
+                "delayInMs":"#delay(in ms) post which script will be executed after serving the request"
+            }
+        ]
+    }
+
+
+PUT /api/v2/hoverfly/post-serve-actions
+"""""""""""""""""""""""""""""""""""""""
+
+Sets new post serve action, overwriting the existing post serve action for the running instance of Hoverfly.
+The post serve action being set is an executable binary located on the host. We can set multiple post serve actions.
+It returns all the post serve actions.
+
+**Example request body**
+::
+
+    {
+        "actionName": "#post serve action names goes here",
+        "binary": "python",
+        "script": "#python code goes here",
+        "delayInMs": "#delay(in ms) post which script will be executed after serving the request"
+    }
+
+DELETE /api/v2/hoverfly/post-serve-actions/:actionName
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Delete a particular post serve action for the running instance of Hoverfly. It returns all the remaining post serve actions.
+
+-------------------------------------------------------------------------------------------------------------
+
 
 GET /api/v2/hoverfly/mode
 """""""""""""""""""""""""

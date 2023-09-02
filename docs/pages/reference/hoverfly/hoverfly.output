@@ -68,8 +68,9 @@ Usage of hoverfly:
   -metrics
         Enable metrics logging to stdout
   -post-serve-action string
-        Set post serve action by passing the action name, binary and the path of the action script and delay in Ms separated by space. (i.e. i.e. '-post-serve-actions \"webhook python script.py 2000\"')
-        We can set multiple post serve actions and use in our simulation schema file 
+        Set post serve action by passing the action name, binary and the path of the action script and delay in Ms separated by space.
+        (i.e. -post-serve-action "<action name> python3 <script path to load> 1000" -post-serve-action "<action name> python3 <script path to load> 3000")
+        We can set multiple post serve actions and use in our simulation schema file.
   -middleware string
         Set middleware by passing the name of the binary and the path of the middleware script separated by space. (i.e. '-middleware "python script.py"')
   -modify
