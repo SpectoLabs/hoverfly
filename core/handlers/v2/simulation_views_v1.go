@@ -30,10 +30,11 @@ func (this RequestResponsePairViewV1) GetRequest() interfaces.Request { return t
 // unmarshalling requests. This struct's Body may be Base64
 // encoded based on the EncodedBody field.
 type ResponseDetailsView struct {
-	Status      int                 `json:"status"`
-	Body        string              `json:"body"`
-	EncodedBody bool                `json:"encodedBody"`
-	Headers     map[string][]string `json:"headers,omitempty"`
+	Status          int                 `json:"status"`
+	Body            string              `json:"body"`
+	EncodedBody     bool                `json:"encodedBody"`
+	Headers         map[string][]string `json:"headers,omitempty"`
+	PostServeAction string              `json:"postServeAction,omitempty"`
 }
 
 // Gets Status - required for interfaces.Response
@@ -66,7 +67,7 @@ func (this ResponseDetailsView) GetFixedDelay() int { return 0 }
 func (this ResponseDetailsView) GetLogNormalDelay() interfaces.ResponseDelay { return nil }
 
 func (this ResponseDetailsView) GetPostServeAction() string {
-	return ""
+	return this.PostServeAction
 }
 
 // RequestDetailsView is used when marshalling and unmarshalling RequestDetails
