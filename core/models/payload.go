@@ -275,10 +275,11 @@ func (r *ResponseDetails) ConvertToResponseDetailsView() v2.ResponseDetailsView 
 	}
 
 	return v2.ResponseDetailsView{
-		Status:      r.Status,
-		Body:        body,
-		Headers:     r.Headers,
-		EncodedBody: needsEncoding,
+		Status:          r.Status,
+		Body:            body,
+		Headers:         r.Headers,
+		EncodedBody:     needsEncoding,
+		PostServeAction: r.PostServeAction,
 	}
 }
 
