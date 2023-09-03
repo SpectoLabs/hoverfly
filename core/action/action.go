@@ -117,13 +117,19 @@ func (action *Action) ExecuteLocally(pair *models.RequestResponsePair) error {
 	actionCommand := exec.Command(action.Binary, action.Script.Name())
 	actionCommand.Stdin = bytes.NewReader(pairViewBytes)
 	var stdout bytes.Buffer
+	var stderr bytes.Buffer
 	actionCommand.Stdout = &stdout
+	actionCommand.Stderr = &stderr
 	if err := actionCommand.Start(); err != nil {
 		return err
 	}
 
 	if err := actionCommand.Wait(); err != nil {
 		return err
+	}
+
+	if len(stderr.Bytes()) > 0 {
+		log.Error("Error occurred while executing script " + stderr.String())
 	}
 
 	if len(stdout.Bytes()) > 0 {
