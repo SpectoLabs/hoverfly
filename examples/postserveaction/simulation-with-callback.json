@@ -1,0 +1,27 @@
+{
+  "data": {
+    "pairs": [
+      {
+        "request": {
+          "destination": [
+            {
+              "matcher": "exact",
+              "value": "helloworld-test.com"
+            }
+          ]
+        },
+        "response": {
+          "status": 200,
+          "postServeAction": "outbound-http",
+          "body": "Hello World",
+          "encodedBody": false
+        }
+      }
+    ]
+  },
+  "meta": {
+    "schemaVersion": "v5.2",
+    "hoverflyVersion": "v1.6.0",
+    "timeExported": "2023-09-02T13:10:04+05:30"
+  }
+}
