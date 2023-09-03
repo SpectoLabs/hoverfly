@@ -172,11 +172,11 @@ var SimulationWithPostServeAction = `{
 					]
 				},
 				"response": {
-					"postServeAction":"test-callback",
 					"status": 200,
 					"body": "destination matched",
 					"encodedBody": false,
-					"templated": false
+					"templated": false,
+					"postServeAction":"test-callback"
 				}
 			}
 		],

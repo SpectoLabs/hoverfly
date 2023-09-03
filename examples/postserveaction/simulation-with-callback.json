@@ -12,9 +12,9 @@
         },
         "response": {
           "status": 200,
-          "postServeAction": "outbound-http",
           "body": "Hello World",
-          "encodedBody": false
+          "encodedBody": false,
+          "postServeAction": "outbound-http"
         }
       }
     ]
