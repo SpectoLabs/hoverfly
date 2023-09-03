@@ -197,7 +197,6 @@ This is the JSON schema for v5 Hoverfly simulations.
           "headers": {
             "$ref": "#/definitions/headers"
           },
-          "postServeAction": "#post serve action name that will be executed post serving response"
           "logNormalDelay": {
             "properties": {
               "max": {
@@ -213,6 +212,9 @@ This is the JSON schema for v5 Hoverfly simulations.
                 "type": "integer"
               }
             }
+          },
+          "postServeAction": {
+            "type": "string"
           },
           "removesState": {
             "type": "array"
