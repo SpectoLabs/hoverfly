@@ -213,6 +213,9 @@
 				"templated": {
 					"type": "boolean"
 				},
+				"postServeAction": {
+					"type": "string"
+				},
 				"transitionsState": {
 					"patternProperties": {
 						".{1,}": {
