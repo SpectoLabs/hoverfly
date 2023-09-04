@@ -204,6 +204,9 @@
 						}
 					}
 				},
+				"postServeAction": {
+					"type": "string"
+				},
 				"removesState": {
 					"type": "array"
 				},
@@ -212,9 +215,6 @@
 				},
 				"templated": {
 					"type": "boolean"
-				},
-				"postServeAction": {
-					"type": "string"
 				},
 				"transitionsState": {
 					"patternProperties": {

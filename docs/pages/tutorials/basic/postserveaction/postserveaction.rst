@@ -11,22 +11,25 @@ PostServeAction allows you to execute custom code after a response has been serv
 
 In this tutorial, we will help you to setup post serve action and execute it after particular response is served.
 
-Let's begin by writing our post serve action. This script just makes HTTP call to find outbound IP.
+Let's begin by writing our post serve action. The following python script makes an HTTP call to http://ip.jsontest.com and prints out your IP address.
 
-We can make call to any other URL as well in order to send webhook or initiate some processing once response is served. Save the following as ``post_serve_action.py``:
+We can make a call to any other URL as well in order to send webhook or initiate some processing once response is served.
+Although the example script is written in python, you can also write an action using any other language as long as you have provided a binary in your local environment to execute the code.
+
+Save the following as ``post_serve_action.py``:
 
 .. literalinclude:: post_serve_action.py
     :language: python
 
-Start Hoverfly and register post serve action
+Start Hoverfly and register a post serve action:
 
 .. code:: bash
 
     hoverctl start
-    hoverctl post-serve-action set --binary python3 --name callback-script --script <path to script directory>/post_serve_action.py --delay #delay_in_ms
+    hoverctl post-serve-action set --binary python3 --name callback-script --script <path to script directory>/post_serve_action.py --delay 3000
 
 
-Once post serve action is registered, you can check registered post serve action using below hoverctl command.
+Once the post serve action is registered, you can confirm using below hoverctl command.
 
 .. code::bash
 
@@ -42,7 +45,7 @@ Once post serve action is registered, you can check registered post serve action
     |                 |         | ...                            |           |
     +-----------------+---------+--------------------------------+-----------+
 
-Copy below simulation JSON content in a file ``simulation.json``:
+Copy this simulation JSON content to a file called ``simulation.json``:
 
 .. code::json
     {
@@ -85,39 +88,11 @@ Copy below simulation JSON content in a file ``simulation.json``:
               "status": 200,
               "body": "01-01-1111",
               "encodedBody": false,
-              "headers": {
-                "Access-Control-Allow-Origin": [
-                  "*"
-                ],
-                "Content-Type": [
-                  "application/json"
-                ],
-                "Date": [
-                  "Mon, 04 Sep 2023 06:20:32 GMT"
-                ],
-                "Hoverfly": [
-                  "Was-Here"
-                ],
-                "Server": [
-                  "Google Frontend"
-                ],
-                "X-Cloud-Trace-Context": [
-                  "9325c9ca551f725586fc96cc65a4aae0"
-                ]
-              },
               "templated": false,
               "postServeAction": "callback-script"
             }
           }
-        ],
-        "globalActions": {
-          "delays": [
-
-          ],
-          "delaysLogNormal": [
-
-          ]
-        }
+        ]
       },
       "meta": {
         "schemaVersion": "v5.2",
@@ -126,17 +101,18 @@ Copy below simulation JSON content in a file ``simulation.json``:
       }
     }
 
- Run below hoverctl command to import simulation file.
+ Run this hoverctl command to import the simulation file.
 
 .. code:: bash
     hoverctl import <path-to-simulation-file>
 
-Once done, make a curl call to date.jsontest.com using below curl call.
+The simulation sets hoverfly to return a successful response and 3 seconds after that invokes the "callback-script" action.
+You can try it out by making the following request to http://date.jsontest.com using cURL.
 
 .. code::bash
     curl --proxy http://localhost:8500 http://date.jsontest.com
 
-Check the logs using hoverctl that post serve action was invoked. You will see the message - `Output from post serve action HTTP call invoked from IP Address`.
+You should see the message in the hoverfly logs - `Output from post serve action HTTP call invoked from IP Address`.
 
 .. code::bash
 
