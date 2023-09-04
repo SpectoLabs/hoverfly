@@ -97,6 +97,63 @@ func (t templateHelpers) requestBody(queryType, query string, options *raymond.O
 	return fetchFromRequestBody(queryType, query, toMatch)
 }
 
+func (t templateHelpers) parseCsv(dataSourceName, searchFieldName, searchFieldValue, returnFieldName string, options *raymond.Options) string {
+
+	templateDataSources := options.Value("TemplateDataSources").(map[string]*DataSource)
+	source, exists := templateDataSources[dataSourceName]
+	if exists {
+		searchIndex, err := getHeaderIndex(source.Data, searchFieldName)
+		if err != nil {
+			log.Error(err)
+			getCSVEvaluationString(options)
+		}
+		returnIndex, err := getHeaderIndex(source.Data, returnFieldName)
+		if err != nil {
+			log.Error(err)
+			return getCSVEvaluationString(options)
+		}
+		var fallbackString string
+		for i := 1; i < len(source.Data); i++ {
+			record := source.Data[i]
+			if strings.ToLower(record[searchIndex]) == strings.ToLower(searchFieldValue) {
+				return record[returnIndex]
+			} else if record[searchIndex] == "*" {
+				fallbackString = record[returnIndex]
+			}
+		}
+
+		if fallbackString != "" {
+			return fallbackString
+		}
+
+	}
+	return getCSVEvaluationString(options)
+
+}
+
+func getCSVEvaluationString(options *raymond.Options) string {
+
+	evaluationString := "{{ csv "
+	for _, params := range options.Params() {
+		evaluationString = evaluationString + params.(string) + ` `
+	}
+	return evaluationString + "}}"
+}
+
+func getHeaderIndex(data [][]string, headerName string) (int, error) {
+
+	if len(data) == 0 {
+		return -1, fmt.Errorf("empty file provided")
+	}
+	headerRecord := data[0]
+	for index, fieldName := range headerRecord {
+		if strings.ToLower(fieldName) == strings.ToLower(headerName) {
+			return index, nil
+		}
+	}
+	return -1, fmt.Errorf("search field %s does not found", headerName)
+}
+
 func fetchFromRequestBody(queryType, query, toMatch string) string {
 
 	if queryType == "jsonpath" {
