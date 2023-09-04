@@ -112,7 +112,9 @@ func (t templateHelpers) parseCsv(dataSourceName, searchFieldName, searchFieldVa
 			log.Error(err)
 			return getCSVEvaluationString(options)
 		}
+
 		var fallbackString string
+		searchFieldValue := getSearchFieldValue(options, searchFieldValue)
 		for i := 1; i < len(source.Data); i++ {
 			record := source.Data[i]
 			if strings.ToLower(record[searchIndex]) == strings.ToLower(searchFieldValue) {
@@ -129,6 +131,16 @@ func (t templateHelpers) parseCsv(dataSourceName, searchFieldName, searchFieldVa
 	}
 	return getCSVEvaluationString(options)
 
+}
+
+func getSearchFieldValue(options *raymond.Options, value string) string {
+
+	if tpl, err := raymond.Parse("{{ " + value + " }}"); err == nil {
+		if returnValue, err := tpl.Exec(options.Ctx()); err == nil {
+			return returnValue
+		}
+	}
+	return value
 }
 
 func getCSVEvaluationString(options *raymond.Options) string {
