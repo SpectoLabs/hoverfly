@@ -23,44 +23,124 @@ Start Hoverfly and register post serve action
 .. code:: bash
 
     hoverctl start
-    hoverctl post-serve-action set --binary python3 --name outbound-http-call --script <path to script directory>/post_serve_action.py --delay #delay_in_ms
+    hoverctl post-serve-action set --binary python3 --name callback-script --script <path to script directory>/post_serve_action.py --delay #delay_in_ms
 
-Now, you need to import simulation file containing post serve action details in response part.  Once done, you need to make API call that you stubbed. Custom code will get executed with delay provided post serving the response.
 
-.. code:: json
+Once post serve action is registered, you can check registered post serve action using below hoverctl command.
+
+.. code::bash
+
+    hoverctl post-serve-action get-all
+
+    Sample output
+    +-----------------+---------+--------------------------------+-----------+
+    |   ACTION NAME   | BINARY  |             SCRIPT             | DELAY(MS) |
+    +-----------------+---------+--------------------------------+-----------+
+    | callback-script | python3 | #!/usr/bin/env python import   |      3000 |
+    |                 |         | sys import logging import      |           |
+    |                 |         | random from time import sleep  |           |
+    |                 |         | ...                            |           |
+    +-----------------+---------+--------------------------------+-----------+
+
+Copy below simulation JSON content in a file ``simulation.json``:
+
+.. code::json
     {
-        "data": {
-            "pairs": [
+      "data": {
+        "pairs": [
+          {
+            "request": {
+              "path": [
                 {
-                    "request": {
-                        ...
-                        "destination": [
-                            {
-                                "matcher": "exact",
-                                "value": "helloworld-test.com"
-                            }
-                        ]
-                        ...
-                    },
-                    "response": {
-                        "status": 200,
-                        "postServeAction": "outbound-http-call",
-                        "body": "Hello World",
-                        "encodedBody": false,
-                        ...
-                    }
+                  "matcher": "exact",
+                  "value": "/"
                 }
-            ],
-        ...
-        },
-        "meta": {
-            "schemaVersion": "v5.2",
-            "hoverflyVersion": "v1.6.0",
-            "timeExported": "2023-09-02T13:10:04+05:30"
+              ],
+              "method": [
+                {
+                  "matcher": "exact",
+                  "value": "GET"
+                }
+              ],
+              "destination": [
+                {
+                  "matcher": "exact",
+                  "value": "date.jsontest.com"
+                }
+              ],
+              "scheme": [
+                {
+                  "matcher": "exact",
+                  "value": "http"
+                }
+              ],
+              "body": [
+                {
+                  "matcher": "exact",
+                  "value": ""
+                }
+              ]
+            },
+            "response": {
+              "status": 200,
+              "body": "01-01-1111",
+              "encodedBody": false,
+              "headers": {
+                "Access-Control-Allow-Origin": [
+                  "*"
+                ],
+                "Content-Type": [
+                  "application/json"
+                ],
+                "Date": [
+                  "Mon, 04 Sep 2023 06:20:32 GMT"
+                ],
+                "Hoverfly": [
+                  "Was-Here"
+                ],
+                "Server": [
+                  "Google Frontend"
+                ],
+                "X-Cloud-Trace-Context": [
+                  "9325c9ca551f725586fc96cc65a4aae0"
+                ]
+              },
+              "templated": false,
+              "postServeAction": "callback-script"
+            }
+          }
+        ],
+        "globalActions": {
+          "delays": [
+
+          ],
+          "delaysLogNormal": [
+
+          ]
         }
+      },
+      "meta": {
+        "schemaVersion": "v5.2",
+        "hoverflyVersion": "v1.5.3",
+        "timeExported": "2023-09-04T11:50:40+05:30"
+      }
     }
 
+ Run below hoverctl command to import simulation file.
 
+.. code:: bash
+    hoverctl import <path-to-simulation-file>
+
+Once done, make a curl call to date.jsontest.com using below curl call.
+
+.. code::bash
+    curl --proxy http://localhost:8500 http://date.jsontest.com
+
+Check the logs using hoverctl that post serve action was invoked. You will see the message - `Output from post serve action HTTP call invoked from IP Address`.
+
+.. code::bash
+
+    hoverctl logs
 
 
 
