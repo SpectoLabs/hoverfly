@@ -3,6 +3,7 @@ package hoverfly
 import (
 	"errors"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/templating"
 	"regexp"
 
 	"github.com/SpectoLabs/hoverfly/core/action"
@@ -513,4 +514,14 @@ func needsToExcludeDiffEntry(diffReportEntry *v2.DiffReportEntry, diffFilterView
 
 func getRelativeFieldFromJsonPath(responseField string) string {
 	return strings.Replace(strings.Replace(responseField, "$.", "body/", -1), ".", "/", -1)
+}
+
+func (hf *Hoverfly) SetCsvDataSource(dataSourceName, dataSourceContent string) error {
+
+	dataStore, err := templating.NewCsvDataSource(dataSourceName, dataSourceContent)
+	if err != nil {
+		return err
+	}
+	hf.templator.TemplateDataSource.SetDataSource(dataSourceName, dataStore)
+	return nil
 }

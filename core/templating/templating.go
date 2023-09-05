@@ -17,11 +17,12 @@ import (
 const REQUEST_BODY_HELPER = "requestBody"
 
 type TemplatingData struct {
-	Request         Request
-	State           map[string]string
-	CurrentDateTime func(string, string, string) string
-	Literals        map[string]interface{}
-	Vars            map[string]interface{}
+	Request             Request
+	State               map[string]string
+	CurrentDateTime     func(string, string, string) string
+	Literals            map[string]interface{}
+	Vars                map[string]interface{}
+	TemplateDataSources map[string]*DataSource
 }
 
 type Request struct {
@@ -38,6 +39,7 @@ type Request struct {
 
 type Templator struct {
 	SupportedMethodMap map[string]interface{}
+	TemplateDataSource *TemplateDataSource
 }
 
 var helpersRegistered = false
@@ -64,13 +66,14 @@ func NewTemplator() *Templator {
 		helperMethodMap["replace"] = t.replace
 		helperMethodMap["faker"] = t.faker
 		helperMethodMap["requestBody"] = t.requestBody
-
+		helperMethodMap["csv"] = t.parseCsv
 		raymond.RegisterHelpers(helperMethodMap)
 		helpersRegistered = true
 	}
 
 	return &Templator{
 		SupportedMethodMap: helperMethodMap,
+		TemplateDataSource: NewTemplateDataSource(),
 	}
 }
 
@@ -115,9 +118,10 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 			Method:     requestDetails.Method,
 			Host:       requestDetails.Destination,
 		},
-		Literals: literalMap,
-		Vars:     variableMap,
-		State:    state,
+		Literals:            literalMap,
+		Vars:                variableMap,
+		State:               state,
+		TemplateDataSources: t.TemplateDataSource.DataSources,
 		CurrentDateTime: func(a1, a2, a3 string) string {
 			return a1 + " " + a2 + " " + a3
 		},

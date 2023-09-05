@@ -1416,3 +1416,35 @@ func TestHoverfly_DeletePostServeAction_ReturnsErrorIfActionDoesNotExist(t *test
 	Expect(err).NotTo(BeNil())
 	Expect(err.Error()).To(Equal("invalid action name passed"))
 }
+
+func TestHoverfly_SetMultipleTemplateDataSource(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	err1 := unit.SetCsvDataSource("test-csv1", "id,name,marks\n1,Test1,55\n2,Test2,56")
+	err2 := unit.SetCsvDataSource("test-csv2", "id,name,city\n21,Test3,London\n22,Test4,New York\n31,Test4,Delhi")
+	Expect(err1).To(BeNil())
+	Expect(err2).To(BeNil())
+
+	Expect(unit.templator.TemplateDataSource.DataSources).ToNot(BeNil())
+
+	Expect(unit.templator.TemplateDataSource.DataSources["test-csv1"]).NotTo(BeNil())
+	Expect(unit.templator.TemplateDataSource.DataSources["test-csv2"]).NotTo(BeNil())
+
+	Expect(unit.templator.TemplateDataSource.DataSources["test-csv1"].Name).To(Equal("test-csv1"))
+	Expect(unit.templator.TemplateDataSource.DataSources["test-csv2"].Name).To(Equal("test-csv2"))
+
+	Expect(unit.templator.TemplateDataSource.DataSources["test-csv1"].SourceType).To(Equal("csv"))
+	Expect(unit.templator.TemplateDataSource.DataSources["test-csv2"].SourceType).To(Equal("csv"))
+
+	Expect(unit.templator.TemplateDataSource.DataSources["test-csv1"].Data).To(HaveLen(3))
+	Expect(unit.templator.TemplateDataSource.DataSources["test-csv2"].Data).To(HaveLen(4))
+
+	Expect(unit.templator.TemplateDataSource.DataSources["test-csv1"].Data[1][2]).To(Equal("55"))
+	Expect(unit.templator.TemplateDataSource.DataSources["test-csv2"].Data[2][2]).To(Equal("New York"))
+
+	Expect(unit.templator.TemplateDataSource.DataSources["test-csv1"].Data[2][1]).To(Equal("Test2"))
+	Expect(unit.templator.TemplateDataSource.DataSources["test-csv2"].Data[3][0]).To(Equal("31"))
+}
