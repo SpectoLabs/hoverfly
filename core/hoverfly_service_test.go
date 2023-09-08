@@ -1448,3 +1448,36 @@ func TestHoverfly_SetMultipleTemplateDataSource(t *testing.T) {
 	Expect(unit.templator.TemplateDataSource.DataSources["test-csv1"].Data[2][1]).To(Equal("Test2"))
 	Expect(unit.templator.TemplateDataSource.DataSources["test-csv2"].Data[3][0]).To(Equal("31"))
 }
+
+func TestHoverfly_DeleteTemplateDataSource(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	err := unit.SetCsvDataSource("test-csv1", "id,name,marks\n1,Test1,55\n2,Test2,56\n")
+
+	Expect(err).To(BeNil())
+
+	unit.DeleteDataSource("test-csv1")
+
+	Expect(err).To(BeNil())
+	Expect(unit.templator.TemplateDataSource.DataSources).To(HaveLen(0))
+}
+
+func TestHoverfly_GetTemplateDataSources(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+	content := "id,name,marks\n1,Test1,55\n2,Test2,56\n"
+	err := unit.SetCsvDataSource("test-csv1", content)
+	Expect(err).To(BeNil())
+
+	templateDataSourceView := unit.GetAllDataSources()
+
+	Expect(templateDataSourceView).NotTo(BeNil())
+	Expect(templateDataSourceView.DataSources).To(HaveLen(1))
+	Expect(templateDataSourceView.DataSources[0].Name).To(Equal("test-csv1"))
+	Expect(templateDataSourceView.DataSources[0].Data).To(Equal(content))
+}

@@ -585,3 +585,45 @@ func TableToSliceMapStringString(table string) map[string]map[string]string {
 
 	return results
 }
+
+func (this Hoverfly) GetAllDataSources() *v2.TemplateDataSourceView {
+	templateDataSourceView := &v2.TemplateDataSourceView{}
+	resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/templating-data-source/csv", this.adminPort)))
+
+	body, err := ioutil.ReadAll(resp.Body)
+	Expect(err).To(BeNil())
+
+	err = json.Unmarshal(body, templateDataSourceView)
+	Expect(err).To(BeNil())
+
+	return templateDataSourceView
+}
+
+func (this Hoverfly) SetTemplateDataSource(dataSourceName, content string) *v2.TemplateDataSourceView {
+	csvDataSource := v2.CSVDataSourceView{Data: content, Name: dataSourceName}
+
+	resp := DoRequest(sling.New().Put(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/templating-data-source/csv", this.adminPort)).BodyJSON(csvDataSource))
+
+	templateDataSourceView := &v2.TemplateDataSourceView{}
+	body, err := ioutil.ReadAll(resp.Body)
+	Expect(err).To(BeNil())
+
+	err = json.Unmarshal(body, templateDataSourceView)
+	Expect(err).To(BeNil())
+
+	return templateDataSourceView
+}
+
+func (this Hoverfly) DeleteDataSource(name string) *v2.TemplateDataSourceView {
+
+	resp := DoRequest(sling.New().Delete(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/templating-data-source/csv/%v", this.adminPort, name)))
+
+	templateDataSourceView := &v2.TemplateDataSourceView{}
+	body, err := ioutil.ReadAll(resp.Body)
+	Expect(err).To(BeNil())
+
+	err = json.Unmarshal(body, templateDataSourceView)
+	Expect(err).To(BeNil())
+
+	return templateDataSourceView
+}

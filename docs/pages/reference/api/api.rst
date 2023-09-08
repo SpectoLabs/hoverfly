@@ -989,6 +989,53 @@ DELETE /api/v2/diff
 """""""""""""""""""
 Deletes all reports containing differences from Hoverfly.
 
+-------------------------------------------------------------------------------------------------------------
+
+
+GET /api/v2/hoverfly/templating-data-source/csv
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+Get all the templating data source for the running instance of Hoverfly.
+It will return list of data sources that has been uploaded by the user to be queried by the template function in the response.
+
+**Example response body**
+::
+
+    {
+      "csvDataSources": [
+        {
+          "name": "student-marks",
+          "data": "id,name,marks\n1,Test1,300\n2,Test2,600\n"
+        }
+      ]
+    }
+
+
+PUT /api/v2/hoverfly/templating-data-source/csv
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+Sets new template data source, overwriting the existing template data source for the running instance of Hoverfly.
+The template CSV data source being set is being queried via template function to generate the response.
+This API call returns back all the templating data source that have been set.
+
+**Example request body**
+::
+
+    {
+        "name":"student-marks",
+        "data":"id,name,marks\n1,Test1,55\n2,Test2,56\n*,Dummy,ABSENT"
+    }
+
+DELETE /api/v2/hoverfly/templating-data-source/csv/:data-source-name
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Delete a particular data source for the running instance of Hoverfly. It returns all the remaining template data sources.
+
+-------------------------------------------------------------------------------------------------------------
+
+
+
 DELETE /api/v2/shutdown
 """""""""""""""""""""""
 Shuts down the hoverfly instance.
+

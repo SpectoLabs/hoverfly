@@ -525,3 +525,18 @@ func (hf *Hoverfly) SetCsvDataSource(dataSourceName, dataSourceContent string) e
 	hf.templator.TemplateDataSource.SetDataSource(dataSourceName, dataStore)
 	return nil
 }
+
+func (hf *Hoverfly) DeleteDataSource(dataSourceName string) {
+
+	hf.templator.TemplateDataSource.DeleteDataSource(dataSourceName)
+}
+
+func (hf *Hoverfly) GetAllDataSources() v2.TemplateDataSourceView {
+
+	var csvDataSourceViews []v2.CSVDataSourceView
+	for _, value := range hf.templator.TemplateDataSource.GetAllDataSources() {
+		csvDataSource, _ := value.GetDataSourceView()
+		csvDataSourceViews = append(csvDataSourceViews, csvDataSource)
+	}
+	return v2.TemplateDataSourceView{DataSources: csvDataSourceViews}
+}

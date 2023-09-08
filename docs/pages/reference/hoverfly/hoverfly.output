@@ -93,6 +93,10 @@ Usage of hoverfly:
         Start Hoverfly in spy mode, similar to simulate but calls real server when cache miss
   -synthesize
         Start Hoverfly in synthesize mode (middleware is required)
+  -templating-data-source
+        Set templating CSV data source by passing data source name and CSV data file path separated by space.
+        (i.e. -templating-data-source "<data source name> <file path>")
+        We can set multiple template CSV data source and then we can query data by using templating csv helper method
   -tls-verification
         Turn on/off tls verification for outgoing requests (will not try to verify certificates) (default true)
   -upstream-proxy string

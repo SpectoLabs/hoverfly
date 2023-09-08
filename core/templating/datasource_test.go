@@ -1,6 +1,7 @@
 package templating
 
 import (
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	. "github.com/onsi/gomega"
 	"testing"
 )
@@ -26,4 +27,13 @@ func Test_NewDataSourceMethod(t *testing.T) {
 	Expect(dataSource.Data[2][0]).To(Equal("2"))
 	Expect(dataSource.Data[2][1]).To(Equal("Test2"))
 	Expect(dataSource.Data[2][2]).To(Equal("56"))
+}
+
+func Test_GetDataSourceView(t *testing.T) {
+	RegisterTestingT(t)
+	dataSource, err := NewCsvDataSource("test-csv", "id,name,marks\n1,Test1,55\n2,Test2,56\n")
+
+	Expect(err).To(BeNil())
+	Expect(dataSource.GetDataSourceView()).To(Equal(v2.CSVDataSourceView{Name: "test-csv", Data: "id,name,marks\n1,Test1,55\n2,Test2,56\n"}))
+
 }

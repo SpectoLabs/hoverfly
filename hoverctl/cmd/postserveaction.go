@@ -96,7 +96,7 @@ func getPostServeActionsTabularData(postServeActions v2.PostServeActionDetailsVi
 
 	postServeActionsData := [][]string{{"Action Name", "Binary", "Script", "Delay(Ms)"}}
 	for _, action := range postServeActions.Actions {
-		actionData := []string{action.ActionName, action.Binary, getScriptShorthand(action.ScriptContent), fmt.Sprint(action.DelayInMs)}
+		actionData := []string{action.ActionName, action.Binary, getContentShorthand(action.ScriptContent), fmt.Sprint(action.DelayInMs)}
 		postServeActionsData = append(postServeActionsData, actionData)
 	}
 	return postServeActionsData

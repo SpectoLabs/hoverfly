@@ -87,11 +87,11 @@ func drawTable(data [][]string, header bool) {
 	table.Render()
 }
 
-func getScriptShorthand(script string) string {
-	if script != "" {
-		scriptArr := strings.Split(script, "\n")
+func getContentShorthand(content string) string {
+	if content != "" {
+		scriptArr := strings.Split(content, "\n")
 		if verbose || len(scriptArr) < 5 {
-			return script
+			return content
 		} else {
 			return fmt.Sprintln(scriptArr[0], scriptArr[1], scriptArr[2], scriptArr[3], scriptArr[4], "...")
 		}

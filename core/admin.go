@@ -113,6 +113,7 @@ func getAllHandlers(hoverfly *Hoverfly) []handlers.AdminHandler {
 		&v2.StateHandler{Hoverfly: hoverfly},
 		&v2.DiffHandler{Hoverfly: hoverfly},
 		&v2.HoverflyPostServeActionDetailsHandler{Hoverfly: hoverfly},
+		&v2.HoverflyTemplateDataSourceHandler{Hoverfly: hoverfly},
 	}
 
 	return list

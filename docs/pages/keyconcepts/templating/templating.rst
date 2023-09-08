@@ -92,6 +92,8 @@ Additional data can come from helper methods. These are the ones Hoverfly curren
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Generate random data using go-fakeit                      | ``{{ faker 'Name' }}``                                    |  John Smith                             |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Query CSV data source where ID = 3 and return its name    | ``{{csv 'test-csv' 'id' '3' 'name'}}``                    |  John Smith                             |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 
 Time offset
 ~~~~~~~~~~~
@@ -170,6 +172,66 @@ For example, you can generate a random name using the following expression:
     }
 
 Fakers that require arguments are currently not supported.
+
+Templating Data Source
+~~~~~~~~~~~~~~~~~~~~~~
+
+User can upload CSV data file using hoverfly/hoverctl CLI or Admin API that can be queried via templating function.
+
+.. code:: json
+
+    {
+        "body": "{\"name\": \"{{csv '(data-source-name)' '(column-name)' '(query-value)' '(selected-column)' }}\"}"
+    }
+
+.. note::
+
+    Data source name is case sensitive whereas other parameters in this function are case insensitive.
+    Secondly, you can refer hoverfly/hoverctl options or Admin API docs in order to upload CSV data source to running hoverfly instance.
+
+
+Example: Start hoverfly with templating CSV datasource(student-marks.csv) provided below.
+
+.. code:: bash
+
+    hoverfly -templating-data-source "student-marks <path to below CSV file>"
+
+
++-----------+-------------------+
+| ID        | Name    |  Marks  |
++-----------+-------------------+
+| 1         |  Test1  |    55   |
++-----------+-------------------+
+| 2         |  Test2  |    65   |
++-----------+-------------------+
+| 3         |  Test3  |    98   |
++-----------+-------------------+
+| 4         |  Test4  |    23   |
++-----------+-------------------+
+| 5         |  Test5  |    15   |
++-----------+-------------------+
+| *         |  NA     |    0    |
++-----------+-------------------+
+
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Description                                               | Example                                                   |  Result                                 |
++===========================================================+===========================================================+=========================================+
+| Search where ID = 3 and return name                       | csv 'student-marks' 'Id' '3' 'Name'                       |  Test3                                  |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Search where ID = 4 and return its marks                  | csv 'student-marks' 'Id' '4' 'Marks'                      |  Test23                                 |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Search where Name = Test1 and return marks                | csv 'student-marks' 'Name' 'Test1' 'Marks'                |  55                                     |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Search where Id is not match and return marks             | csv 'student-marks' 'Id' 'Test100' 'Marks'                |  0                                      |
+| (in this scenario, it matches wildcard * and returns)     |                                                           |                                         |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Search where Id = first path param and return marks       | csv 'student-marks' 'Id' 'Request.Path.[0]' 'Marks'       |  15                                     |
+| URL looks like - http://test.com/students/5/marks         |                                                           |                                         |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+
+
+
+
 
 Conditional Templating, Looping and More
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

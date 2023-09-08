@@ -22,3 +22,17 @@ func (templateDataSource *TemplateDataSource) SetDataSource(dataSourceName strin
 	templateDataSource.DataSources[dataSourceName] = dataSource
 	templateDataSource.RWMutex.Unlock()
 }
+
+func (templateDataSource *TemplateDataSource) DeleteDataSource(dataSourceName string) {
+
+	templateDataSource.RWMutex.Lock()
+	if _, ok := templateDataSource.DataSources[dataSourceName]; ok {
+		delete(templateDataSource.DataSources, dataSourceName)
+	}
+	templateDataSource.RWMutex.Unlock()
+}
+
+func (templateDataSource *TemplateDataSource) GetAllDataSources() map[string]*DataSource {
+
+	return templateDataSource.DataSources
+}
