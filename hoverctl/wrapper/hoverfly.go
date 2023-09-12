@@ -25,7 +25,7 @@ const (
 	v2ApiDestination     = "/api/v2/hoverfly/destination"
 	v2ApiState           = "/api/v2/state"
 	v2ApiMiddleware      = "/api/v2/hoverfly/middleware"
-	v2ApiPostServeAction = "/api/v2/hoverfly/post-serve-actions"
+	v2ApiPostServeAction = "/api/v2/hoverfly/post-serve-action"
 	v2ApiPac             = "/api/v2/hoverfly/pac"
 	v2ApiCache           = "/api/v2/cache"
 	v2ApiLogs            = "/api/v2/logs"

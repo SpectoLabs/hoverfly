@@ -125,7 +125,7 @@ func (this Hoverfly) GetMode() *v2.ModeView {
 
 func (this Hoverfly) GetAllPostServeAction() *v2.PostServeActionDetailsView {
 	PostServeActionDetailsView := &v2.PostServeActionDetailsView{}
-	resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/post-serve-actions", this.adminPort)))
+	resp := DoRequest(sling.New().Get(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/post-serve-action", this.adminPort)))
 
 	body, err := ioutil.ReadAll(resp.Body)
 	Expect(err).To(BeNil())
@@ -139,7 +139,7 @@ func (this Hoverfly) GetAllPostServeAction() *v2.PostServeActionDetailsView {
 func (this Hoverfly) SetPostServeAction(actionName, binary, scriptContent string, delayInMs int) *v2.PostServeActionDetailsView {
 	actionView := v2.ActionView{ActionName: actionName, Binary: binary, DelayInMs: delayInMs, ScriptContent: scriptContent}
 
-	resp := DoRequest(sling.New().Put(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/post-serve-actions", this.adminPort)).BodyJSON(actionView))
+	resp := DoRequest(sling.New().Put(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/post-serve-action", this.adminPort)).BodyJSON(actionView))
 
 	PostServeActionDetailsView := &v2.PostServeActionDetailsView{}
 	body, err := ioutil.ReadAll(resp.Body)
@@ -153,7 +153,7 @@ func (this Hoverfly) SetPostServeAction(actionName, binary, scriptContent string
 
 func (this Hoverfly) DeletePostServeAction(actionName string) *v2.PostServeActionDetailsView {
 
-	resp := DoRequest(sling.New().Delete(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/post-serve-actions/%v", this.adminPort, actionName)))
+	resp := DoRequest(sling.New().Delete(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/post-serve-action/%v", this.adminPort, actionName)))
 
 	PostServeActionDetailsView := &v2.PostServeActionDetailsView{}
 	body, err := ioutil.ReadAll(resp.Body)

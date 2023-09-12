@@ -472,7 +472,7 @@ GET /api/v2/hoverfly/middleware
 """""""""""""""""""""""""""""""
 
 Gets the middleware settings for the running instance of Hoverfly. This
-could be either an executable binary, a script that can be executed with 
+could be either an executable binary, a script that can be executed with
 a binary or a URL to remote middleware.
 
 **Example response body**
@@ -505,7 +505,7 @@ and the binary to execute it or the URL to a remote middleware.
 
 -------------------------------------------------------------------------------------------------------------
 
-GET /api/v2/hoverfly/post-serve-actions
+GET /api/v2/hoverfly/post-serve-action
 """""""""""""""""""""""""""""""""""""""
 
 Get all the post serve actions for the running instance of Hoverfly.
@@ -526,7 +526,7 @@ It will return list of scripts that can be executed with a binary after response
     }
 
 
-PUT /api/v2/hoverfly/post-serve-actions
+PUT /api/v2/hoverfly/post-serve-action
 """""""""""""""""""""""""""""""""""""""
 
 Sets new post serve action, overwriting the existing post serve action for the running instance of Hoverfly.
@@ -543,7 +543,7 @@ It returns all the post serve actions.
         "delayInMs": "#delay(in ms) post which script will be executed after serving the request"
     }
 
-DELETE /api/v2/hoverfly/post-serve-actions/:actionName
+DELETE /api/v2/hoverfly/post-serve-action/:actionName
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Delete a particular post serve action for the running instance of Hoverfly. It returns all the remaining post serve actions.
@@ -757,7 +757,7 @@ Running hoverfly with ``-logs-size=0`` disables logging and 500 response is retu
                 "level": "info",
                 "msg": "serving proxy",
                 "time": "2017-03-13T12:22:39Z"
-            },  
+            },
             {
                 "destination": ".",
                 "level": "info",
@@ -765,7 +765,7 @@ Running hoverfly with ``-logs-size=0`` disables logging and 500 response is retu
                 "msg": "current proxy configuration",
                 "port": "8500",
                 "time": "2017-03-13T12:22:39Z"
-            },  
+            },
             {
                 "destination": ".",
                 "Mode": "simulate",
@@ -773,7 +773,7 @@ Running hoverfly with ``-logs-size=0`` disables logging and 500 response is retu
                 "level": "info",
                 "msg": "Proxy prepared...",
                 "time": "2017-03-13T12:22:39Z"
-            },  
+            },
         ]
     }
 
@@ -918,7 +918,7 @@ Deletes all state from Hoverfly and then sets the state to match the state in th
 
 PATCH /api/v2/state
 """""""""""""""""""
-Updates state in Hoverfly. Will update each state key referenced in the request body. 
+Updates state in Hoverfly. Will update each state key referenced in the request body.
 
 **Example request body**
 ::

@@ -8,7 +8,7 @@
  ```shell
     hoverfly -post-serve-action "outbound-http python3 examples/postserveaction/outboundhttpaction.py 1000" -import examples/postserveaction/simulation-with-callback.json
 ```
-- You can verify that the post serve action is registered by using the admin endpoint: http://localhost:8888/api/v2/hoverfly/post-serve-actions
+- You can verify that the post serve action is registered by using the admin endpoint: http://localhost:8888/api/v2/hoverfly/post-serve-action
 
 - Proxying a request to http://helloworld-test.com should trigger a callback to http://ip.jsontest.com,
   and the log from the post serve action script should be printed out to the hoverfly logs: 

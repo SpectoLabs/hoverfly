@@ -21,15 +21,15 @@ type HoverflyPostServeActionDetailsHandler struct {
 
 func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) RegisterRoutes(mux *bone.Mux, am *handlers.AuthHandler) {
 
-	mux.Get("/api/v2/hoverfly/post-serve-actions", negroni.New(
+	mux.Get("/api/v2/hoverfly/post-serve-action", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(postServeActionDetailsHandler.Get),
 	))
-	mux.Put("/api/v2/hoverfly/post-serve-actions", negroni.New(
+	mux.Put("/api/v2/hoverfly/post-serve-action", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(postServeActionDetailsHandler.Put),
 	))
-	mux.Delete("/api/v2/hoverfly/post-serve-actions/:actionName", negroni.New(
+	mux.Delete("/api/v2/hoverfly/post-serve-action/:actionName", negroni.New(
 		negroni.HandlerFunc(am.RequireTokenAuthentication),
 		negroni.HandlerFunc(postServeActionDetailsHandler.Delete),
 	))

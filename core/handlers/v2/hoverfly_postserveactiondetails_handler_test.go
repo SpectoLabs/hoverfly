@@ -34,7 +34,7 @@ func Test_PostServeActionHandler_DeletePostServeAction(t *testing.T) {
 	stubHoverfly := &HoverflyPostServeActionDetailsStub{}
 	unit := HoverflyPostServeActionDetailsHandler{Hoverfly: stubHoverfly}
 
-	request, err := http.NewRequest("DELETE", "/api/v2/hoverfly/post-serve-actions/test-action", nil)
+	request, err := http.NewRequest("DELETE", "/api/v2/hoverfly/post-serve-action/test-action", nil)
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Delete, request)
@@ -52,7 +52,7 @@ func Test_PostServeActionHandler_SetPostServeAction(t *testing.T) {
 	bodyBytes, err := json.Marshal(actionView)
 	Expect(err).To(BeNil())
 
-	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/post-serve-actions", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/post-serve-action", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -64,7 +64,7 @@ func Test_PostServeActionHandler_GetAllPostServeActions(t *testing.T) {
 	stubHoverfly := &HoverflyPostServeActionDetailsStub{}
 	unit := HoverflyPostServeActionDetailsHandler{Hoverfly: stubHoverfly}
 
-	request, err := http.NewRequest("GET", "/api/v2/hoverfly/post-serve-actions", nil)
+	request, err := http.NewRequest("GET", "/api/v2/hoverfly/post-serve-action", nil)
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Get, request)
