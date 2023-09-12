@@ -19,11 +19,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var (
-	// mime types which will not be base 64 encoded when exporting as JSON
-	supportedMimeTypes = [...]string{"text", "plain", "css", "html", "json", "xml", "js", "javascript"}
-)
-
 // Payload structure holds request and response structure
 type RequestResponsePair struct {
 	Response ResponseDetails
@@ -122,6 +117,11 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsView {
 	queryString := this.QueryString()
 
+	body := this.Body
+	if util.NeedsEncoding(this.Headers, this.Body) {
+		body = base64.StdEncoding.EncodeToString([]byte(this.Body))
+	}
+
 	return v2.RequestDetailsView{
 		Path:        &this.Path,
 		Method:      &this.Method,
@@ -129,7 +129,7 @@ func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsView 
 		Scheme:      &this.Scheme,
 		Query:       &queryString,
 		QueryMap:    this.Query,
-		Body:        &this.Body,
+		Body:        &body,
 		FormData:    this.FormData,
 		Headers:     this.Headers,
 	}
@@ -251,22 +251,7 @@ func NewResponseDetailsFromResponse(data interfaces.Response) ResponseDetails {
 // If the response headers indicate that the content is encoded, or it has a non-matching
 // supported mimetype, we base64 encode it.
 func (r *ResponseDetails) ConvertToResponseDetailsView() v2.ResponseDetailsView {
-	needsEncoding := false
-
-	// Check headers for gzip
-	contentEncodingValues := r.Headers["Content-Encoding"]
-	if len(contentEncodingValues) > 0 {
-		needsEncoding = true
-	} else {
-		mimeType := http.DetectContentType([]byte(r.Body))
-		needsEncoding = true
-		for _, v := range supportedMimeTypes {
-			if strings.Contains(mimeType, v) {
-				needsEncoding = false
-				break
-			}
-		}
-	}
+	needsEncoding := util.NeedsEncoding(r.Headers, r.Body)
 
 	// If contains gzip, base64 encode
 	body := r.Body
@@ -293,7 +278,7 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 	} else {
 		mimeType := http.DetectContentType([]byte(r.Body))
 		needsEncoding = true
-		for _, v := range supportedMimeTypes {
+		for _, v := range util.SupportedMimeTypes {
 			if strings.Contains(mimeType, v) {
 				needsEncoding = false
 				break

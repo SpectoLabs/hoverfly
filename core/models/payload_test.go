@@ -35,6 +35,26 @@ func TestResponseDetails_ConvertToResponseDetailsView_WithPlainTextResponseDetai
 	Expect(respView.Body).To(Equal(body))
 }
 
+func TestRequestDetails_ConvertToRequestDetailsView_WithGzipContentEncodedHeader(t *testing.T) {
+	RegisterTestingT(t)
+
+	originalBody := "hello_world"
+	body := GzipString(originalBody)
+	headers := map[string][]string{"Content-Encoding": {"gzip"}}
+
+	originalRequest := models.RequestDetails{Method: "POST", Headers: headers, Body: body}
+
+	requestView := originalRequest.ConvertToRequestDetailsView()
+
+	Expect(requestView.Headers).To(Equal(headers))
+	Expect(requestView.Body).NotTo(Equal(body))
+	Expect(requestView.Body).NotTo(Equal(originalBody))
+
+	base64EncodedBody := "H4sIAAAAAAAA/w=="
+
+	Expect(*requestView.Body).To(Equal(base64EncodedBody))
+}
+
 func TestResponseDetails_ConvertToResponseDetailsView_WithGzipContentEncodedHeader(t *testing.T) {
 	RegisterTestingT(t)
 
