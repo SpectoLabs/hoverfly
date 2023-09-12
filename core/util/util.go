@@ -20,6 +20,11 @@ import (
 	"github.com/tdewolff/minify/v2/xml"
 )
 
+var (
+	// mime types which will not be base 64 encoded when exporting as JSON
+	SupportedMimeTypes = [...]string{"text", "plain", "css", "html", "json", "xml", "js", "javascript"}
+)
+
 // GetRequestBody will read the http.Request body io.ReadCloser
 // and will also set the buffer to the original value as the
 // buffer will be empty after reading it.
@@ -332,4 +337,24 @@ func GetBoolOrDefault(data map[string]interface{}, key string, defaultValue bool
 		return defaultValue
 	}
 	return genericValue.(bool)
+}
+
+func NeedsEncoding(headers map[string][]string, body string) bool {
+	needsEncoding := false
+
+	// Check headers for gzip
+	contentEncodingValues := headers["Content-Encoding"]
+	if len(contentEncodingValues) > 0 {
+		needsEncoding = true
+	} else {
+		mimeType := http.DetectContentType([]byte(body))
+		needsEncoding = true
+		for _, v := range SupportedMimeTypes {
+			if strings.Contains(mimeType, v) {
+				needsEncoding = false
+				break
+			}
+		}
+	}
+	return needsEncoding
 }
