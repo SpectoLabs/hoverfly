@@ -102,7 +102,8 @@ Copy this simulation JSON content to a file called ``simulation.json``:
       }
     }
 
- Run this hoverctl command to import the simulation file.
+
+Run this hoverctl command to import the simulation file.
 
 .. code:: bash
 
