@@ -31,7 +31,7 @@ Start Hoverfly and register a post serve action:
 
 Once the post serve action is registered, you can confirm using below hoverctl command.
 
-.. code::bash
+.. code:: bash
 
     hoverctl post-serve-action get-all
 
@@ -47,7 +47,8 @@ Once the post serve action is registered, you can confirm using below hoverctl c
 
 Copy this simulation JSON content to a file called ``simulation.json``:
 
-.. code::json
+.. code:: json
+
     {
       "data": {
         "pairs": [
@@ -104,17 +105,19 @@ Copy this simulation JSON content to a file called ``simulation.json``:
  Run this hoverctl command to import the simulation file.
 
 .. code:: bash
+
     hoverctl import <path-to-simulation-file>
 
 The simulation sets hoverfly to return a successful response and 3 seconds after that invokes the "callback-script" action.
 You can try it out by making the following request to http://date.jsontest.com using cURL.
 
-.. code::bash
+.. code:: bash
+
     curl --proxy http://localhost:8500 http://date.jsontest.com
 
 You should see the message in the hoverfly logs - `Output from post serve action HTTP call invoked from IP Address`.
 
-.. code::bash
+.. code:: bash
 
     hoverctl logs
 

@@ -1,7 +1,7 @@
 .. _post_serve_action:
 
-PostServeAction
-===============
+Post Serve Action
+=================
 
 Overview
 ========
@@ -14,8 +14,8 @@ Overview
 
 - In order to register post serve action, it takes mainly four parameters - binary to invoke script, script content/location, delay(in ms) post which it will be executed and name of that action.
 
-Ways to register PostServeAction
-================================
+Ways to register a Post Serve Action
+==================================
 
 - At time of startup by passing single/multiple -post-serve-action flag(s) as mentioned in the `hoverfly command page <https://docs.hoverfly.io/en/latest/pages/reference/hoverfly/hoverflycommands.html>`_.
 

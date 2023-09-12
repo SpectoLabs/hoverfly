@@ -18,6 +18,7 @@ Hoverfly's functionality is quite broad. You are encouraged to take the time to 
    state/state
    destinationfiltering
    middleware
+   postserveaction
    hoverctl
 
 .. raw:: html
