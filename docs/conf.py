@@ -21,6 +21,7 @@ release = version
 
 extensions = [
     'sphinxcontrib.mermaid',
+    'sphinxcontrib.jquery',
     'sphinx.ext.extlinks',
     'sphinx.ext.todo'
 ]
