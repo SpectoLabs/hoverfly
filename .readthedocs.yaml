@@ -16,7 +16,7 @@ sphinx:
 
 #Breaking latest readthedocs build, turning it off for now
 formats:
-#  - pdf
+  - pdf
   - htmlzip
   - epub
 
