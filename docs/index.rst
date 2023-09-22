@@ -1,4 +1,4 @@
-.. image:: logo-large.png
+.. image:: _static/logo-large.png
 
 |
 |
@@ -8,7 +8,7 @@
     :target: https://circleci.com/gh/SpectoLabs/hoverfly
 
 .. image:: https://badges.gitter.im/SpectoLabs/hoverfly.svg
-    :target: https://gitter.im/SpectoLabs/hoverfly 
+    :target: https://gitter.im/SpectoLabs/hoverfly
 
 
 |

@@ -1,6 +1,23 @@
-import sys
 import os
-import shlex
+
+# Configuration file for the Sphinx documentation builder.
+#
+# For the full list of built-in configuration values, see the documentation:
+  # https://www.sphinx-doc.org/en/master/usage/configuration.html
+
+# -- Project information -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+
+project = 'Hoverfly'
+copyright = '2023, SpectoLabs'
+author = 'SpectoLabs'
+
+version = 'v1.6.0'
+# The full version, including alpha/beta/rc tags.
+release = version
+
+# -- General configuration ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
     'sphinxcontrib.mermaid',
@@ -13,26 +30,15 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 
 master_doc = 'index'
-
-project = u'Hoverfly'
-copyright = u'2023, SpectoLabs'
-author = u'SpectoLabs'
-
-
-version = 'v1.6.0'
-# The full version, including alpha/beta/rc tags.
-release = version
-
 zip_base_url = 'https://github.com/SpectoLabs/hoverfly/releases/download/' + version + '/'
 
 extlinks = {'zip_bundle_os_arch': (zip_base_url + 'hoverfly_bundle_%s.zip', 'zip_bundle_os_arch')}
 
-language = None
-
-exclude_patterns = ['_build']
-
-
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 pygments_style = 'sphinx'
+
+# -- Options for HTML output -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 todo_include_todos = False
 
@@ -53,20 +59,6 @@ html_context = {
 
 
 htmlhelp_basename = 'hoverflydoc'
-
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #'papersize': 'letterpaper',
-
-    # The font size ('10pt', '11pt' or '12pt').
-    #'pointsize': '10pt',
-
-    # Additional stuff for the LaTeX preamble.
-    #'preamble': '',
-
-    # Latex figure (float) alignment
-    #'figure_align': 'htbp',
-}
 
 latex_documents = [
     (master_doc, 'hoverfly.tex', u'Hoverfly Documentation',
