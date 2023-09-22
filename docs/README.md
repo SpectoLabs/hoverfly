@@ -13,3 +13,11 @@ $ open _builds/html/index.html
 ```shell script
 $ ./pages/simulations/update.sh
 ```
+
+## Pinning the dependencies
+
+Run the following command after all python dependencies are installed:
+
+```shell script
+$ pip freeze > requirements.txt
+```
