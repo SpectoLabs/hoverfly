@@ -253,15 +253,15 @@ div.wy-menu.rst-pro {
 
 
 /*Temporary fix for this sphinx-rtd-theme issue: https://github.com/readthedocs/sphinx_rtd_theme/issues/1145*/
-.rst-content section ul {
-    margin-bottom:24px
-}
+/*.rst-content section ul {*/
+/*    margin-bottom:24px*/
+/*}*/
 
-.rst-content section ul li {
-    list-style:disc;
-    margin-left:24px
-}
+/*.rst-content section ul li {*/
+/*    list-style:disc;*/
+/*    margin-left:24px*/
+/*}*/
 
-.rst-content section ul li p {
-    margin-bottom: 0;
-}
+/*.rst-content section ul li p {*/
+/*    margin-bottom: 0;*/
+/*}*/
