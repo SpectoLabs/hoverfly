@@ -4,7 +4,7 @@ Post Serve Action
 =================
 
 Overview
-========
+--------
 
 - PostServeAction allows you to execute custom code after a response has been served in simulate or spy mode.
 
@@ -15,7 +15,7 @@ Overview
 - In order to register post serve action, it takes mainly four parameters - binary to invoke script, script content/location, delay(in ms) post which it will be executed and name of that action.
 
 Ways to register a Post Serve Action
-==================================
+------------------------------------
 
 - At time of startup by passing single/multiple -post-serve-action flag(s) as mentioned in the `hoverfly command page <https://docs.hoverfly.io/en/latest/pages/reference/hoverfly/hoverflycommands.html>`_.
 
@@ -27,13 +27,12 @@ Ways to register a Post Serve Action
 - Once post serve action is registered, we can trigger particular post serve action by putting it in response part of request-response pair in simulation JSON.
 
 **Example Simulation JSON**
-::
+
+.. code:: json
+
     {
-        ...
         "response": {
-            ...
             "postServeAction": "<name of post serve action we want to invoke>"
-            ...
         }
     }
 

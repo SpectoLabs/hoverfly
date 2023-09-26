@@ -71,14 +71,14 @@ When Hoverfly cannot match a response to an incoming request, it will return inf
         "headers": null
     }`
 
-Here, you can see which fields did not match. In this case, it was the ``body``. 
+Here, you can see which fields did not match. In this case, it was the ``body``.
 You can also view this information by running ``hoverctl logs``.
 
 Why isn't Hoverfly returning the closest match when it cannot match a request?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Hoverfly will only provide this information when the matching strategy is set to **strongest match** 
-(the default). If you are using the **first match** matching strategy, the closet match information 
+Hoverfly will only provide this information when the matching strategy is set to **strongest match**
+(the default). If you are using the **first match** matching strategy, the closet match information
 will not be returned.
 
 How can I view the Hoverfly logs?
@@ -90,9 +90,9 @@ How can I view the Hoverfly logs?
 
 
 Why does my simulation have a ``deprecatedQuery`` field?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Older simulations that have been upgraded through newer versions of Hoverfly may now contain a field 
+Older simulations that have been upgraded through newer versions of Hoverfly may now contain a field
 on requests called ``deprecatedQuery``. With the v5 simulation schema, the request query field was
 updated to more fully represent request query paramters. This involves storing queries based on
 query keys, similarly to how headers are stored in a simulation.
@@ -124,14 +124,14 @@ If you have ``deprecatedQuery`` field, you should remove it by splitting it by q
         ],
     }
 
-If you cannot update your ``deprecatedQuery`` from your simulation for a technical reason, feel free to 
+If you cannot update your ``deprecatedQuery`` from your simulation for a technical reason, feel free to
 raise an issue on Hoverfly.
 
 Why am I not able to access my Hoverfly remotely?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-That's because Hoverfly is bind to loopback interface by default, meaning that you can only access 
-to it on localhost. To access it remotely, you can specify the IP address it listens on. For example, 
+That's because Hoverfly is bind to loopback interface by default, meaning that you can only access
+to it on localhost. To access it remotely, you can specify the IP address it listens on. For example,
 setting ``0.0.0.0`` to listen on all network interfaces.
 
 .. code:: bash
@@ -139,7 +139,7 @@ setting ``0.0.0.0`` to listen on all network interfaces.
     hoverfly -listen-on-host 0.0.0.0
 
 My simulation file is very large because of response bodies, what can I do with that?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can move those response bodies into separate files and specify :code:`bodyFile` in the response instead of
 :code:`body`. Please refer to :ref:`pairs`.

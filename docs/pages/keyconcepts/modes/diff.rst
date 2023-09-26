@@ -1,10 +1,10 @@
 .. _diff_mode:
 
 Diff mode
-========
+=========
 
 In this mode, Hoverfly forwards a request to an external service and compares a response with currently stored simulation.
-With both the stored simulation response and the real response from the external service, Hoverfly is able to detect 
+With both the stored simulation response and the real response from the external service, Hoverfly is able to detect
 differences between the two. When Hoverfly has finished comparing the two responses, the difference is stored and the
 incoming request is served the real response from the external service.
 
