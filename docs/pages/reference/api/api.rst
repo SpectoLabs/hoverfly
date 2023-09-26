@@ -677,7 +677,7 @@ Sets the PAC file for Hoverfly.
 
 
 DELETE /api/v2/hoverfly/pac
-""""""""""""""""""""""""
+"""""""""""""""""""""""""""
 
 Unsets the PAC file configured for Hoverfly.
 
@@ -685,7 +685,7 @@ Unsets the PAC file configured for Hoverfly.
 
 
 GET /api/v2/cache
-""""""""""""""""""""
+"""""""""""""""""
 Gets the requests and responses stored in the cache.
 
 **Example response body**
@@ -986,9 +986,9 @@ Gets reports containing response differences from Hoverfly filtered on basis of 
 -------------------------------------------------------------------------------------------------------------
 
 DELETE /api/v2/diff
-""""""""""""""""""""
+"""""""""""""""""""
 Deletes all reports containing differences from Hoverfly.
 
 DELETE /api/v2/shutdown
-""""""""""""""""""""
+"""""""""""""""""""""""
 Shuts down the hoverfly instance.

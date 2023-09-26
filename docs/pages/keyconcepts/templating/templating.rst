@@ -86,7 +86,7 @@ Additional data can come from helper methods. These are the ones Hoverfly curren
 |                                                           |    ``'be' 'mock' }}``                                     |                                         |
 | value in the target string                                | (where Request.Body has the value of                      |                                         |
 |                                                           |                                                           |                                         |
-|                                                           | {"text":"to be or not to be"}                             |  to mock or not to mock                 |
+|                                                           | ``{"text":"to be or not to be"}``                         |  to mock or not to mock                 |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Generate random data using go-fakeit                      | ``{{ faker 'Name' }}``                                    |  John Smith                             |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+

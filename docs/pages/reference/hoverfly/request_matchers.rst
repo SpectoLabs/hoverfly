@@ -559,9 +559,9 @@ Example
 
     "matcher": "array",
     "config": {
-        "ignoreUnknown": <true/false>,
-        "ignoreOrder": <true/false>,
-        "ignoreOccurrences": <true/false>
+        "ignoreUnknown": "<true/false>",
+        "ignoreOrder": "<true/false>",
+        "ignoreOccurrences": "<true/false>"
     },
     "value": [
         "access:vod",
@@ -601,7 +601,6 @@ Example
     "matcher": "jsonpath",
     "value": "$.user.id",
     "doMatch": {
-        matcher: "exact",
-        value: "1"
+        "matcher": "exact",
+        "value": "1"
     }
-

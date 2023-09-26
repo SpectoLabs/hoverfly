@@ -11,6 +11,7 @@ If need you can adjust response time by min and max parameters.
 .. _Log-normal distribution: https://en.wikipedia.org/wiki/Log-normal_distribution
 .. _mean: https://en.wikipedia.org/wiki/Expected_value
 .. _median: https://en.wikipedia.org/wiki/Median
+
 Let's apply a random log-normal distributed delay to all responses. First, we need to create and export a simulation.
 
 .. literalinclude:: delays-capture.sh
