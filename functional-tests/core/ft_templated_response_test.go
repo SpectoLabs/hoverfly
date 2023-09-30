@@ -357,7 +357,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			body, err := io.ReadAll(resp.Body)
 			Expect(err).To(BeNil())
 
-			Expect(string(body)).To(Equal("value"))
+			Expect(string(body)).To(Equal(" 0 : GBP \n 1 : USD \n 2 : EUR \n"))
 		})
 
 		It("Request.Body xpath", func() {

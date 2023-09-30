@@ -1,6 +1,7 @@
 package templating
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -91,16 +92,25 @@ func (t templateHelpers) randomUuid() string {
 	return uuid.New()
 }
 
-func (t templateHelpers) requestBody(queryType, query string, options *raymond.Options) string {
+func (t templateHelpers) requestBody(queryType, query string, options *raymond.Options) interface{} {
 	toMatch := options.Value("request").(Request).body
 	queryType = strings.ToLower(queryType)
 	return fetchFromRequestBody(queryType, query, toMatch)
 }
 
-func fetchFromRequestBody(queryType, query, toMatch string) string {
+func fetchFromRequestBody(queryType, query, toMatch string) interface{} {
 
 	if queryType == "jsonpath" {
-		return jsonPath(query, toMatch)
+		result := jsonPath(query, toMatch)
+		var data interface{}
+		err := json.Unmarshal([]byte(result), &data)
+
+		arrayData, ok := data.([]interface{})
+
+		if err != nil || !ok {
+			return result
+		}
+		return arrayData
 	} else if queryType == "xpath" {
 		return xPath(query, toMatch)
 	}

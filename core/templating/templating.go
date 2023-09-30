@@ -30,7 +30,7 @@ type Request struct {
 	Header     map[string][]string
 	Path       []string
 	Scheme     string
-	Body       func(queryType, query string, options *raymond.Options) string
+	Body       func(queryType, query string, options *raymond.Options) interface{}
 	FormData   map[string][]string
 	body       string
 	Method     string
@@ -144,7 +144,7 @@ func (t *Templator) getVariables(vars *models.Variables, requestDetails *models.
 	return variableMap
 }
 
-func getDataFromRequestBody(variable models.Variable, body string) string {
+func getDataFromRequestBody(variable models.Variable, body string) interface{} {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Error("panic occurred:", err)
