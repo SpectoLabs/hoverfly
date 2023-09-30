@@ -40,6 +40,22 @@ var TemplatingRequest = `{
 					"path": [
 						{
 							"matcher": "exact",
+							"value": "/Request.Body_jsonpath_with_each"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "{{#each (Request.Body 'jsonpath' '$.currencies')}} {{@index}} : {{this}} \n {{/each}}",
+					"encodedBody": false,
+					"templated": true
+				}
+			},
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
 							"value": "/Request.Body_xpath"
 						}
 					]
@@ -147,6 +163,22 @@ var TemplatingRequest = `{
 					"templated": true
 				}
 			}, 
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
+							"value": "/Request.QueryParam_with_each"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "{{#each Request.QueryParam}}{{@index}}:{{@key}}:{{this}} {{/each}}",
+					"encodedBody": false,
+					"templated": true
+				}
+			},
 			{
 				"request": {
 					"path": [

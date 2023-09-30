@@ -347,6 +347,19 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(string(body)).To(Equal(""))
 		})
 
+		It("Request.Body jsonpath with for loop", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+			resp := hoverfly.Proxy(sling.New().Post("http://test-server.com/Request.Body_jsonpath_with_each").BodyJSON(map[string][]string{
+				"currencies": {"GBP", "USD", "EUR"},
+			}))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := io.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Equal("value"))
+		})
+
 		It("Request.Body xpath", func() {
 			hoverfly.ImportSimulation(testdata.TemplatingRequest)
 			resp := hoverfly.Proxy(sling.New().Post("http://test-server.com/Request.Body_xpath").Body(bytes.NewBuffer([]byte(`<?xml version="1.0" encoding="UTF-8"?><root><text>value</text></root>`))))
@@ -358,7 +371,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(string(body)).To(Equal("value"))
 		})
 
-		It("Request.Body xpath incorect", func() {
+		It("Request.Body xpath incorrect", func() {
 			hoverfly.ImportSimulation(testdata.TemplatingRequest)
 			resp := hoverfly.Proxy(sling.New().Post("http://test-server.com/Request.Body_xpath").Body(bytes.NewBuffer([]byte(`<?xml version="1.0" encoding="UTF-8"?><root><nottext>test</text></root>`))))
 			Expect(resp.StatusCode).To(Equal(200))
@@ -430,6 +443,18 @@ var _ = Describe("When I run Hoverfly", func() {
 
 			// TODO: Handle this?
 			Expect(string(body)).To(Equal("map[query:[param]]"))
+		})
+
+		It("Request.QueryParam with for loop", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request.QueryParam_with_each?param1=foo&param2=bar"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := io.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Or(Equal("0:param2:bar 1:param1:foo "), Equal("0:param1:foo 1:param2:bar ")))
 		})
 
 		It("Request.QueryParam.query", func() {
