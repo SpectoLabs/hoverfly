@@ -84,6 +84,14 @@ func Test_replace(t *testing.T) {
 	Expect(unit.replace("oink, oink, oink", "oink", "moo")).To(Equal("moo, moo, moo"))
 }
 
+func Test_split(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := templateHelpers{}
+
+	Expect(unit.split("one,two,three", ",")).To(ConsistOf("one", "two", "three"))
+}
+
 func Test_faker(t *testing.T) {
 	RegisterTestingT(t)
 

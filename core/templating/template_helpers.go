@@ -150,6 +150,10 @@ func (t templateHelpers) replace(target, oldValue, newValue string) string {
 	return strings.Replace(target, oldValue, newValue, -1)
 }
 
+func (t templateHelpers) split(target, separator string) []string {
+	return strings.Split(target, separator)
+}
+
 func prepareJsonPathQuery(query string) string {
 	if query[0:1] != "{" && query[len(query)-1:] != "}" {
 		query = fmt.Sprintf("{%s}", query)

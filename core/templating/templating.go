@@ -64,6 +64,7 @@ func NewTemplator() *Templator {
 		helperMethodMap["randomIPv6"] = t.randomIPv6
 		helperMethodMap["randomUuid"] = t.randomUuid
 		helperMethodMap["replace"] = t.replace
+		helperMethodMap["split"] = t.split
 		helperMethodMap["faker"] = t.faker
 		helperMethodMap["requestBody"] = t.requestBody
 		helperMethodMap["csv"] = t.parseCsv

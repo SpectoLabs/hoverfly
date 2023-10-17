@@ -55,6 +55,22 @@ var TemplatingRequest = `{
 				"request": {
 					"path": [
 						{
+							"matcher": "glob",
+							"value": "/Request.Path_with_each/*"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "{{#each Vars.splitRequestPath}} {{@index}} : {{this}} \n {{/each}}",
+					"encodedBody": false,
+					"templated": true
+				}
+			},
+			{
+				"request": {
+					"path": [
+						{
 							"matcher": "exact",
 							"value": "/Request.Body_xpath"
 						}
@@ -226,6 +242,11 @@ var TemplatingRequest = `{
 				"name": "getCityFromJsonBody",
 				"function": "requestBody",
 				"arguments": ["jsonpath", "$.city"]
+		 	}, 
+			{
+				"name": "splitRequestPath",
+				"function": "split",
+				"arguments": ["Request.Path.[1]", ","]
 		 	}
 		]
 	},

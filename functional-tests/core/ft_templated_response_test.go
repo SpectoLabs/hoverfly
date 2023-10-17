@@ -432,6 +432,18 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(string(body)).To(Equal("one"))
 		})
 
+		It("Request.Path with for loop", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request.Path_with_each/foo,bar"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := io.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Or(Equal("0:bar 1:foo "), Equal("0:foo 1:bar ")))
+		})
+
 		It("Request.QueryParam", func() {
 			hoverfly.ImportSimulation(testdata.TemplatingRequest)
 
