@@ -75,6 +75,7 @@ type RequestDetailsView struct {
 	RequestType *string             `json:"requestType,omitempty"`
 	Path        *string             `json:"path"`
 	Method      *string             `json:"method"`
+	Host        *string             `json:"host"`
 	Destination *string             `json:"destination"`
 	Scheme      *string             `json:"scheme"`
 	Query       *string             `json:"query"`
@@ -89,6 +90,9 @@ func (this RequestDetailsView) GetPath() *string { return this.Path }
 
 // Gets Method - required for interfaces.RequestMatcher
 func (this RequestDetailsView) GetMethod() *string { return this.Method }
+
+// Gets Host - required for interfaces.RequestMatcher
+func (this RequestDetailsView) GetHost() *string { return this.Host }
 
 // Gets Destination - required for interfaces.RequestMatcher
 func (this RequestDetailsView) GetDestination() *string { return this.Destination }

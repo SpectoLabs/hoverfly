@@ -33,6 +33,7 @@ type Request struct {
 	FormData   map[string][]string
 	body       string
 	Method     string
+	Host       string
 }
 
 type Templator struct {
@@ -112,6 +113,7 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 			FormData:   requestDetails.FormData,
 			body:       requestDetails.Body,
 			Method:     requestDetails.Method,
+			Host:       requestDetails.Host,
 		},
 		Literals: literalMap,
 		Vars:     variableMap,
