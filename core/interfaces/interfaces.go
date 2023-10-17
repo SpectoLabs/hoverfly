@@ -8,6 +8,7 @@ type RequestResponsePair interface {
 type Request interface {
 	GetPath() *string
 	GetMethod() *string
+	GetHost() *string
 	GetDestination() *string
 	GetScheme() *string
 	GetQuery() *string

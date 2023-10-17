@@ -41,6 +41,7 @@ func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 	return RequestDetails{
 		Path:        util.PointerToString(data.GetPath()),
 		Method:      util.PointerToString(data.GetMethod()),
+		Host:        util.PointerToString(data.GetHost()),
 		Destination: util.PointerToString(data.GetDestination()),
 		Scheme:      util.PointerToString(data.GetScheme()),
 		Query:       query,
@@ -53,6 +54,7 @@ func NewRequestDetailsFromRequest(data interfaces.Request) RequestDetails {
 type RequestDetails struct {
 	Path        string
 	Method      string
+	Host        string
 	Destination string
 	Scheme      string
 	Query       map[string][]string
@@ -95,6 +97,7 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 	requestDetails := RequestDetails{
 		Path:        urlPath,
 		Method:      req.Method,
+		Host:        req.Host,
 		Destination: strings.ToLower(req.Host),
 		Scheme:      scheme,
 		Query:       req.URL.Query(),
@@ -125,6 +128,7 @@ func (this *RequestDetails) ConvertToRequestDetailsView() v2.RequestDetailsView 
 	return v2.RequestDetailsView{
 		Path:        &this.Path,
 		Method:      &this.Method,
+		Host:        &this.Host,
 		Destination: &this.Destination,
 		Scheme:      &this.Scheme,
 		Query:       &queryString,
