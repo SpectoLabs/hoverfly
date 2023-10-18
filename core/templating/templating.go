@@ -50,24 +50,24 @@ func NewTemplator() *Templator {
 		fakerSource: gofakeit.New(0),
 	}
 	helperMethodMap := make(map[string]interface{})
+	helperMethodMap["now"] = t.nowHelper
+	helperMethodMap["randomString"] = t.randomString
+	helperMethodMap["randomStringLength"] = t.randomStringLength
+	helperMethodMap["randomBoolean"] = t.randomBoolean
+	helperMethodMap["randomInteger"] = t.randomInteger
+	helperMethodMap["randomIntegerRange"] = t.randomIntegerRange
+	helperMethodMap["randomFloat"] = t.randomFloat
+	helperMethodMap["randomFloatRange"] = t.randomFloatRange
+	helperMethodMap["randomEmail"] = t.randomEmail
+	helperMethodMap["randomIPv4"] = t.randomIPv4
+	helperMethodMap["randomIPv6"] = t.randomIPv6
+	helperMethodMap["randomUuid"] = t.randomUuid
+	helperMethodMap["replace"] = t.replace
+	helperMethodMap["split"] = t.split
+	helperMethodMap["faker"] = t.faker
+	helperMethodMap["requestBody"] = t.requestBody
+	helperMethodMap["csv"] = t.parseCsv
 	if !helpersRegistered {
-		helperMethodMap["now"] = t.nowHelper
-		helperMethodMap["randomString"] = t.randomString
-		helperMethodMap["randomStringLength"] = t.randomStringLength
-		helperMethodMap["randomBoolean"] = t.randomBoolean
-		helperMethodMap["randomInteger"] = t.randomInteger
-		helperMethodMap["randomIntegerRange"] = t.randomIntegerRange
-		helperMethodMap["randomFloat"] = t.randomFloat
-		helperMethodMap["randomFloatRange"] = t.randomFloatRange
-		helperMethodMap["randomEmail"] = t.randomEmail
-		helperMethodMap["randomIPv4"] = t.randomIPv4
-		helperMethodMap["randomIPv6"] = t.randomIPv6
-		helperMethodMap["randomUuid"] = t.randomUuid
-		helperMethodMap["replace"] = t.replace
-		helperMethodMap["split"] = t.split
-		helperMethodMap["faker"] = t.faker
-		helperMethodMap["requestBody"] = t.requestBody
-		helperMethodMap["csv"] = t.parseCsv
 		raymond.RegisterHelpers(helperMethodMap)
 		helpersRegistered = true
 	}
@@ -108,17 +108,7 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 	variableMap := t.getVariables(vars, requestDetails)
 
 	return &TemplatingData{
-		Request: Request{
-			Path:       strings.Split(requestDetails.Path, "/")[1:],
-			QueryParam: requestDetails.Query,
-			Header:     requestDetails.Headers,
-			Scheme:     requestDetails.Scheme,
-			Body:       templateHelpers{}.requestBody,
-			FormData:   requestDetails.FormData,
-			body:       requestDetails.Body,
-			Method:     requestDetails.Method,
-			Host:       requestDetails.Destination,
-		},
+		Request:             getRequest(requestDetails),
 		Literals:            literalMap,
 		Vars:                variableMap,
 		State:               state,
@@ -130,6 +120,20 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 
 }
 
+func getRequest(requestDetails *models.RequestDetails) Request {
+	return Request{
+		Path:       strings.Split(requestDetails.Path, "/")[1:],
+		QueryParam: requestDetails.Query,
+		Header:     requestDetails.Headers,
+		Scheme:     requestDetails.Scheme,
+		Body:       templateHelpers{}.requestBody,
+		FormData:   requestDetails.FormData,
+		body:       requestDetails.Body,
+		Method:     requestDetails.Method,
+		Host:       requestDetails.Destination,
+	}
+}
+
 func (t *Templator) getVariables(vars *models.Variables, requestDetails *models.RequestDetails) map[string]interface{} {
 	variableMap := make(map[string]interface{})
 	if vars != nil {
@@ -137,7 +141,10 @@ func (t *Templator) getVariables(vars *models.Variables, requestDetails *models.
 			if variable.Function == REQUEST_BODY_HELPER {
 				variableMap[variable.Name] = getDataFromRequestBody(variable, requestDetails.Body)
 			} else {
-				variableMap[variable.Name] = t.callHelper(variable)
+				resultValue := t.callHelper(variable, requestDetails)
+				if resultValue != nil {
+					variableMap[variable.Name] = resultValue.(reflect.Value).Interface()
+				}
 			}
 		}
 	}
@@ -154,7 +161,12 @@ func getDataFromRequestBody(variable models.Variable, body string) interface{} {
 	return fetchFromRequestBody(variable.Arguments[0].(string), variable.Arguments[1].(string), body)
 }
 
-func (t *Templator) callHelper(variable models.Variable) interface{} {
+/*
+*
+This method is basically invoking helper function via reflection and returning the value.
+Disclaimer: we cannot use helper functions that are taking *raymond.Options as an argument
+*/
+func (t *Templator) callHelper(variable models.Variable, requestDetails *models.RequestDetails) interface{} {
 
 	defer func() {
 		if rec := recover(); rec != nil {
@@ -165,9 +177,8 @@ func (t *Templator) callHelper(variable models.Variable) interface{} {
 	functionType := function.Type()
 	arguments := make([]reflect.Value, functionType.NumIn())
 	for i := range arguments {
-		// validate the type of argument - as of now just passing string, int, float, so just converted those
 		if functionType.In(i).Kind() == reflect.String {
-			arguments[i] = reflect.ValueOf(variable.Arguments[i].(string))
+			arguments[i] = reflect.ValueOf(parseValidRequestTemplate(variable.Arguments[i].(string), requestDetails))
 		} else if functionType.In(i).Kind() == reflect.Int {
 			arguments[i] = reflect.ValueOf(int(variable.Arguments[i].(float64)))
 		} else if functionType.In(i).Kind() == reflect.Float64 {
@@ -175,4 +186,15 @@ func (t *Templator) callHelper(variable models.Variable) interface{} {
 		}
 	}
 	return function.Call(arguments)[0]
+}
+
+func parseValidRequestTemplate(source string, details *models.RequestDetails) string {
+
+	if tpl, err := raymond.Parse("{{" + source + "}}"); err == nil {
+		ctx := &TemplatingData{Request: getRequest(details)}
+		if parsedValue, execErr := tpl.Exec(ctx); execErr == nil {
+			return parsedValue
+		}
+	}
+	return source
 }

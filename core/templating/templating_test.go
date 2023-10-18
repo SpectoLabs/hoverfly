@@ -492,6 +492,43 @@ func Test_VarSetToNilInCaseOfInvalidArgsPassed(t *testing.T) {
 
 }
 
+func Test_VarSetToProperValueInCaseOfRequestDetailsPassedAsArgument(t *testing.T) {
+	RegisterTestingT(t)
+	templator := templating.NewTemplator()
+	argumentsArray := toInterfaceSlice([]string{"Request.Path.[1]", ","})
+	vars := &models.Variables{
+		models.Variable{
+			Name:      "splitRequestPath",
+			Function:  "split",
+			Arguments: argumentsArray,
+		},
+	}
+
+	actual := templator.NewTemplatingData(
+		&models.RequestDetails{
+			Path: "/part1/foo,bar",
+		},
+		&models.Literals{},
+		vars,
+		make(map[string]string),
+	)
+
+	Expect(actual.Vars["splitRequestPath"]).ToNot(BeNil())
+	Expect(len(actual.Vars["splitRequestPath"].([]string))).To(Equal(2))
+	Expect(actual.Vars["splitRequestPath"].([]string)[0]).To(Equal("foo"))
+	Expect(actual.Vars["splitRequestPath"].([]string)[1]).To(Equal("bar"))
+
+}
+
+func toInterfaceSlice(arguments []string) []interface{} {
+	argumentsArray := make([]interface{}, len(arguments))
+
+	for i, s := range arguments {
+		argumentsArray[i] = s
+	}
+	return argumentsArray
+}
+
 func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]string, responseBody string) (string, error) {
 	templator := templating.NewTemplator()
 	dataSource1, _ := templating.NewCsvDataSource("test-csv1", "id,name,marks\n1,Test1,55\n2,Test2,56\n*,Dummy,ABSENT")
