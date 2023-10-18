@@ -23,7 +23,6 @@ type RequestDetailsView struct {
 	RequestType *string             `json:"requestType"`
 	Path        *string             `json:"path"`
 	Method      *string             `json:"method"`
-	Host        *string             `json:"host"`
 	Destination *string             `json:"destination"`
 	Scheme      *string             `json:"scheme"`
 	Query       *string             `json:"query"`
@@ -35,8 +34,6 @@ type RequestDetailsView struct {
 func (this RequestDetailsView) GetPath() *string { return this.Path }
 
 func (this RequestDetailsView) GetMethod() *string { return this.Method }
-
-func (this RequestDetailsView) GetHost() *string { return this.Host }
 
 func (this RequestDetailsView) GetDestination() *string { return this.Destination }
 

@@ -141,7 +141,6 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 		Request: models.RequestDetails{
 			Path:        "/",
 			Method:      "GET",
-			Host:        "www.foo.com",
 			Destination: "/",
 			Scheme:      "scheme",
 			Query:       map[string][]string{},
@@ -160,7 +159,6 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithPlainTextRespo
 		Request: v2.RequestDetailsView{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
-			Host:        StringToPointer("www.foo.com"),
 			Destination: StringToPointer("/"),
 			Scheme:      StringToPointer("scheme"),
 			Query:       StringToPointer(""),
@@ -181,7 +179,6 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 		Request: models.RequestDetails{
 			Path:        "/",
 			Method:      "GET",
-			Host:        "www.foo.com",
 			Destination: "/",
 			Scheme:      "scheme",
 			Query:       map[string][]string{},
@@ -201,7 +198,6 @@ func TestRequestResponsePair_ConvertToRequestResponsePairView_WithGzippedRespons
 		Request: v2.RequestDetailsView{
 			Path:        StringToPointer("/"),
 			Method:      StringToPointer("GET"),
-			Host:        StringToPointer("www.foo.com"),
 			Destination: StringToPointer("/"),
 			Scheme:      StringToPointer("scheme"),
 			Query:       StringToPointer(""),

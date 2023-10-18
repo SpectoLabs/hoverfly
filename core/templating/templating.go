@@ -113,7 +113,7 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 			FormData:   requestDetails.FormData,
 			body:       requestDetails.Body,
 			Method:     requestDetails.Method,
-			Host:       requestDetails.Host,
+			Host:       requestDetails.Destination,
 		},
 		Literals: literalMap,
 		Vars:     variableMap,

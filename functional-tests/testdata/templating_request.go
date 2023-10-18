@@ -152,6 +152,22 @@ var TemplatingRequest = `{
 					"path": [
 						{
 							"matcher": "exact",
+							"value": "/Request.Host"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "{{ Request.Host }}",
+					"encodedBody": false,
+					"templated": true
+				}
+			},
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
 							"value": "/global"
 						}
 					]
