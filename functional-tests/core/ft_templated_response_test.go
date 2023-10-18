@@ -444,6 +444,18 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(string(body)).To(Equal("param"))
 		})
 
+		It("Request.Host", func() {
+			hoverfly.ImportSimulation(testdata.TemplatingRequest)
+
+			resp := hoverfly.Proxy(sling.New().Get("http://test-server.com/Request.Host"))
+			Expect(resp.StatusCode).To(Equal(200))
+
+			body, err := io.ReadAll(resp.Body)
+			Expect(err).To(BeNil())
+
+			Expect(string(body)).To(Equal("test-server.com"))
+		})
+
 		It("Gloabl literals and variables", func() {
 			hoverfly.ImportSimulation(testdata.TemplatingRequest)
 			resp := hoverfly.Proxy(sling.New().Post("http://test-server.com/global").BodyJSON(map[string]string{

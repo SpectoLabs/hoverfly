@@ -1396,7 +1396,6 @@ func Test_ShouldReturnMessageForClosestMiss(t *testing.T) {
 		RequestDetails: models.RequestDetails{
 			Path:        "path",
 			Method:      "method",
-			Host:        "host",
 			Destination: "destination",
 			Scheme:      "scheme",
 			Query: map[string][]string{
@@ -1479,7 +1478,6 @@ The following request was made, but was not matched by Hoverfly:
 {
     "Path": "path",
     "Method": "method",
-    "Host": "host",
     "Destination": "destination",
     "Scheme": "scheme",
     "Query": {
