@@ -62,7 +62,7 @@ var TemplatingRequest = `{
 				},
 				"response": {
 					"status": 200,
-					"body": "{{#each Vars.splitRequestPath}} {{@index}} : {{this}} \n {{/each}}",
+					"body": "{{#each Vars.splitRequestPath}}{{@index}}:{{this}} {{/each}}",
 					"encodedBody": false,
 					"templated": true
 				}
