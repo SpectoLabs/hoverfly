@@ -358,3 +358,12 @@ func NeedsEncoding(headers map[string][]string, body string) bool {
 	}
 	return needsEncoding
 }
+
+func IsJsonData(data string) bool {
+	var jsonData map[string]interface{}
+	if err := json.Unmarshal([]byte(data), &jsonData); err == nil {
+		return true
+	} else {
+		return false
+	}
+}

@@ -30,6 +30,7 @@ type JournalEntry struct {
 
 type Journal struct {
 	entries    []JournalEntry
+	indexes    []Index
 	EntryLimit int
 	mutex      sync.Mutex
 }
@@ -37,8 +38,31 @@ type Journal struct {
 func NewJournal() *Journal {
 	return &Journal{
 		entries:    []JournalEntry{},
+		indexes:    []Index{},
 		EntryLimit: 1000,
 	}
+}
+
+func (this *Journal) AddIndex(indexKey string) error {
+
+	this.mutex.Lock()
+	for _, index := range this.indexes {
+		if index.name == indexKey {
+			return fmt.Errorf("index %s has been already set", indexKey)
+		}
+	}
+	indexMap := make(map[string]*JournalEntry)
+
+	index := Index{
+		name:    indexKey,
+		entries: indexMap,
+	}
+	for _, journalEntry := range this.entries {
+		index.AddJournalEntry(&journalEntry)
+	}
+	this.indexes = append(this.indexes, index)
+	this.mutex.Unlock()
+	return nil
 }
 
 func (this *Journal) NewEntry(request *http.Request, response *http.Response, mode string, started time.Time) error {
@@ -70,6 +94,9 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 	}
 
 	this.entries = append(this.entries, entry)
+	for _, index := range this.indexes {
+		index.AddJournalEntry(&entry)
+	}
 
 	if log.IsLevelEnabled(log.DebugLevel) {
 		buf := new(bytes.Buffer)
@@ -219,8 +246,21 @@ func (this *Journal) DeleteEntries() error {
 	}
 
 	this.entries = []JournalEntry{}
+	this.indexes = []Index{}
 
 	return nil
+}
+
+func (this *Journal) GetIndexEntry(indexName, indexValue string) (*JournalEntry, error) {
+
+	for _, index := range this.indexes {
+		if index.name == indexName {
+			if journalEntry, exists := index.entries[indexValue]; exists {
+				return journalEntry, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("no entry found for index %s", indexName)
 }
 
 func convertJournalEntries(entries []JournalEntry) []v2.JournalEntryView {

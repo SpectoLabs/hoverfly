@@ -2,6 +2,7 @@ package templating
 
 import (
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/journal"
 	"reflect"
 	"strings"
 	"time"
@@ -23,6 +24,7 @@ type TemplatingData struct {
 	Literals            map[string]interface{}
 	Vars                map[string]interface{}
 	TemplateDataSources map[string]*DataSource
+	Journal             *journal.Journal
 }
 
 type Request struct {
@@ -67,6 +69,7 @@ func NewTemplator() *Templator {
 	helperMethodMap["faker"] = t.faker
 	helperMethodMap["requestBody"] = t.requestBody
 	helperMethodMap["csv"] = t.parseCsv
+	helperMethodMap["journal"] = t.parseJournalBasedOnIndex
 	if !helpersRegistered {
 		raymond.RegisterHelpers(helperMethodMap)
 		helpersRegistered = true
@@ -83,12 +86,12 @@ func (*Templator) ParseTemplate(responseBody string) (*raymond.Template, error) 
 	return raymond.Parse(responseBody)
 }
 
-func (t *Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.RequestDetails, literals *models.Literals, vars *models.Variables, state map[string]string) (string, error) {
+func (t *Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.RequestDetails, literals *models.Literals, vars *models.Variables, state map[string]string, journal *journal.Journal) (string, error) {
 	if tpl == nil {
 		return "", fmt.Errorf("template cannot be nil")
 	}
 
-	ctx := t.NewTemplatingData(requestDetails, literals, vars, state)
+	ctx := t.NewTemplatingData(requestDetails, literals, vars, state, journal)
 	return tpl.Exec(ctx)
 }
 
@@ -96,7 +99,7 @@ func (templator *Templator) GetSupportedMethodMap() map[string]interface{} {
 	return templator.SupportedMethodMap
 }
 
-func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, literals *models.Literals, vars *models.Variables, state map[string]string) *TemplatingData {
+func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, literals *models.Literals, vars *models.Variables, state map[string]string, journal *journal.Journal) *TemplatingData {
 
 	literalMap := make(map[string]interface{})
 	if literals != nil {
@@ -113,6 +116,7 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 		Vars:                variableMap,
 		State:               state,
 		TemplateDataSources: t.TemplateDataSource.DataSources,
+		Journal:             journal,
 		CurrentDateTime: func(a1, a2, a3 string) string {
 			return a1 + " " + a2 + " " + a3
 		},

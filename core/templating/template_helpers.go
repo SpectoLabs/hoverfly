@@ -3,6 +3,7 @@ package templating
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/journal"
 	"reflect"
 	"strconv"
 	"strings"
@@ -181,12 +182,12 @@ func (t templateHelpers) parseCsv(dataSourceName, searchFieldName, searchFieldVa
 		searchIndex, err := getHeaderIndex(source.Data, searchFieldName)
 		if err != nil {
 			log.Error(err)
-			getCSVEvaluationString(options)
+			getEvaluationString("csv", options)
 		}
 		returnIndex, err := getHeaderIndex(source.Data, returnFieldName)
 		if err != nil {
 			log.Error(err)
-			return getCSVEvaluationString(options)
+			return getEvaluationString("csv", options)
 		}
 
 		var fallbackString string
@@ -205,8 +206,33 @@ func (t templateHelpers) parseCsv(dataSourceName, searchFieldName, searchFieldVa
 		}
 
 	}
-	return getCSVEvaluationString(options)
+	return getEvaluationString("csv", options)
 
+}
+
+func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSource, lookupQuery string, options *raymond.Options) interface{} {
+	journalDetails := options.Value("Journal").(journal.Journal)
+	if journalEntry, err := journalDetails.GetIndexEntry(indexName, keyValue); err == nil {
+		if body := getBodyDataToParse(dataSource, journalEntry); body != "" {
+			if util.IsJsonData(body) {
+				return fetchFromRequestBody("jsonpath", lookupQuery, body)
+			} else {
+				return fetchFromRequestBody("xpath", lookupQuery, body)
+			}
+		}
+	}
+	return getEvaluationString("journal", options)
+}
+
+func getBodyDataToParse(source string, journalEntry *journal.JournalEntry) string {
+
+	if strings.EqualFold(source, "request") {
+		return journalEntry.Request.Body
+	}
+	if strings.EqualFold(source, "response") {
+		return journalEntry.Response.Body
+	}
+	return ""
 }
 
 func getSearchFieldValue(options *raymond.Options, value string) string {
@@ -219,9 +245,9 @@ func getSearchFieldValue(options *raymond.Options, value string) string {
 	return value
 }
 
-func getCSVEvaluationString(options *raymond.Options) string {
+func getEvaluationString(helperName string, options *raymond.Options) string {
 
-	evaluationString := "{{ csv "
+	evaluationString := "{{ " + helperName + " "
 	for _, params := range options.Params() {
 		evaluationString = evaluationString + params.(string) + ` `
 	}

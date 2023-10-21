@@ -219,7 +219,7 @@ func (hf *Hoverfly) applyTransitionsStateTemplating(requestDetails *models.Reque
 	state := make(map[string]string)
 
 	for k, v := range stateTemplates {
-		state[k], err = hf.templator.RenderTemplate(v, requestDetails, hf.Simulation.Literals, hf.Simulation.Vars, hf.state.State)
+		state[k], err = hf.templator.RenderTemplate(v, requestDetails, hf.Simulation.Literals, hf.Simulation.Vars, hf.state.State, hf.Journal)
 		if err != nil {
 			return nil, err
 		}
@@ -240,7 +240,7 @@ func (hf *Hoverfly) applyBodyTemplating(requestDetails *models.RequestDetails, r
 		}
 	}
 
-	return hf.templator.RenderTemplate(template, requestDetails, hf.Simulation.Literals, hf.Simulation.Vars, hf.state.State)
+	return hf.templator.RenderTemplate(template, requestDetails, hf.Simulation.Literals, hf.Simulation.Vars, hf.state.State, hf.Journal)
 }
 
 func (hf *Hoverfly) applyHeadersTemplating(requestDetails *models.RequestDetails, response *models.ResponseDetails, cachedResponse *models.CachedResponse) (map[string][]string, error) {
@@ -275,7 +275,7 @@ func (hf *Hoverfly) applyHeadersTemplating(requestDetails *models.RequestDetails
 	for k, v := range headersTemplates {
 		header = make([]string, len(v))
 		for i, h := range v {
-			header[i], err = hf.templator.RenderTemplate(h, requestDetails, hf.Simulation.Literals, hf.Simulation.Vars, hf.state.State)
+			header[i], err = hf.templator.RenderTemplate(h, requestDetails, hf.Simulation.Literals, hf.Simulation.Vars, hf.state.State, hf.Journal)
 
 			if err != nil {
 				return nil, err

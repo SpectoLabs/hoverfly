@@ -63,6 +63,7 @@ var destinationFlags arrayFlags
 var logOutputFlags arrayFlags
 var responseBodyFilesPath string
 var responseBodyFilesAllowedOriginFlags arrayFlags
+var journalIndexingKeyFlags arrayFlags
 
 const boltBackend = "boltdb"
 const inmemoryBackend = "memory"
@@ -208,6 +209,7 @@ func main() {
 	flag.Var(&logOutputFlags, "logs-output", "Specify locations for output logs, options are \"console\" and \"file\" (default \"console\")")
 	flag.StringVar(&responseBodyFilesPath, "response-body-files-path", "", "When a response contains a relative bodyFile, it will be resolved against this path (default is CWD)")
 	flag.Var(&responseBodyFilesAllowedOriginFlags, "response-body-files-allow-origin", "When a response contains a url in bodyFile, it will be loaded only if the origin is allowed")
+	flag.Var(&journalIndexingKeyFlags, "journal-indexing-key", "Key to setup indexing on journal")
 
 	flag.Parse()
 
@@ -600,6 +602,21 @@ func main() {
 			}
 		}
 
+	}
+
+	if len(journalIndexingKeyFlags) > 0 {
+
+		for _, indexKey := range journalIndexingKeyFlags {
+			if indexKey != "" {
+
+				if err = hoverfly.AddIndex(indexKey); err != nil {
+					log.WithFields(log.Fields{
+						"error":  err.Error(),
+						"import": indexKey,
+					}).Fatal("Failed to index journal")
+				}
+			}
+		}
 	}
 
 	// importing stuff

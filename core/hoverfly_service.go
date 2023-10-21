@@ -540,3 +540,7 @@ func (hf *Hoverfly) GetAllDataSources() v2.TemplateDataSourceView {
 	}
 	return v2.TemplateDataSourceView{DataSources: csvDataSourceViews}
 }
+
+func (hf *Hoverfly) AddIndex(indexKey string) error {
+	return hf.Journal.AddIndex(indexKey)
+}
