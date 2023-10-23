@@ -65,7 +65,7 @@ var JournalTemplatingEnabled = `{
             {
                 "response": {
                     "status": 200,
-                    "body": "{{ journal 'Request.QueryParam.id' '123' 'Response' '$.name' }}",
+                    "body": "{{ journal 'Request.QueryParam.id' '123' 'Response' 'jsonpath' '$.name' }}",
                     "encodedBody": false,
                     "templated" : true
                 },

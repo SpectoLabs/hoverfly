@@ -24,7 +24,7 @@ type TemplatingData struct {
 	Literals            map[string]interface{}
 	Vars                map[string]interface{}
 	TemplateDataSources map[string]*DataSource
-	Journal             *journal.Journal
+	Journal             Journal
 }
 
 type Request struct {
@@ -37,6 +37,20 @@ type Request struct {
 	body       string
 	Method     string
 	Host       string
+}
+
+type JournalEntry struct {
+	requestBody  string
+	responseBody string
+}
+
+type Journal struct {
+	indexes []JournalIndex
+}
+
+type JournalIndex struct {
+	name    string
+	entries map[string]JournalEntry
 }
 
 type Templator struct {
@@ -109,6 +123,32 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 	}
 
 	variableMap := t.getVariables(vars, requestDetails)
+	templateJournal := Journal{}
+	if journal != nil {
+
+		indexes := make([]JournalIndex, len(journal.Indexes))
+		for _, index := range journal.Indexes {
+
+			journalIndexEntries := make(map[string]JournalEntry)
+			for indexKey, entry := range index.Entries {
+
+				journalEntry := JournalEntry{
+					requestBody:  entry.Request.Body,
+					responseBody: entry.Response.Body,
+				}
+				journalIndexEntries[indexKey] = journalEntry
+			}
+			journalIndex := JournalIndex{
+				name:    index.Name,
+				entries: journalIndexEntries,
+			}
+			indexes = append(indexes, journalIndex)
+		}
+		templateJournal = Journal{
+			indexes: indexes,
+		}
+
+	}
 
 	return &TemplatingData{
 		Request:             getRequest(requestDetails),
@@ -116,7 +156,7 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 		Vars:                variableMap,
 		State:               state,
 		TemplateDataSources: t.TemplateDataSource.DataSources,
-		Journal:             journal,
+		Journal:             templateJournal,
 		CurrentDateTime: func(a1, a2, a3 string) string {
 			return a1 + " " + a2 + " " + a3
 		},

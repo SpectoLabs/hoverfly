@@ -7,8 +7,8 @@ import (
 )
 
 type Index struct {
-	name    string
-	entries map[string]*JournalEntry
+	Name    string
+	Entries map[string]*JournalEntry
 }
 
 type Request struct {
@@ -23,10 +23,10 @@ type Request struct {
 
 func (index Index) AddJournalEntry(entry *JournalEntry) {
 
-	indexKey := parseIndexKey(index.name, entry.Request)
+	indexKey := parseIndexKey(index.Name, entry.Request)
 	//it will be same in the condition when raymond(i.e. templating library) unable to parse it
-	if indexKey != index.name {
-		index.entries[indexKey] = entry
+	if indexKey != index.Name {
+		index.Entries[indexKey] = entry
 	}
 }
 

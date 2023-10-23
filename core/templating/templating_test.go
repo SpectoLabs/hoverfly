@@ -1,6 +1,7 @@
 package templating_test
 
 import (
+	"github.com/SpectoLabs/hoverfly/core/journal"
 	"testing"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -20,6 +21,7 @@ func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
+		&journal.Journal{},
 	)
 
 	Expect(actual.Request.Path).To(ConsistOf("foo", "bar"))
@@ -36,6 +38,7 @@ func Test_ShouldCreateTemplatingDataPathsFromRequestWithNoPaths(t *testing.T) {
 		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
+		&journal.Journal{},
 	)
 
 	Expect(actual.Request.Path).To(BeEmpty())
@@ -56,6 +59,7 @@ func Test_ShouldCreateTemplatingDataQueryParamsFromRequest(t *testing.T) {
 		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
+		&journal.Journal{},
 	)
 
 	Expect(actual.Request.QueryParam).To(HaveKeyWithValue("cheese", []string{"1", "3"}))
@@ -74,6 +78,7 @@ func Test_ShouldCreateTemplatingDataQueryParamsFromRequestWithNoQueryParams(t *t
 		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
+		&journal.Journal{},
 	)
 
 	Expect(actual.Request.QueryParam).To(BeEmpty())
@@ -90,6 +95,7 @@ func Test_ShouldCreateTemplatingDataHttpScheme(t *testing.T) {
 		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
+		&journal.Journal{},
 	)
 
 	Expect(actual.Request.Scheme).To(Equal("http"))
@@ -110,6 +116,7 @@ func Test_ShouldCreateTemplatingDataHeaderFromRequest(t *testing.T) {
 		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
+		&journal.Journal{},
 	)
 
 	Expect(actual.Request.Header).To(HaveKeyWithValue("cheese", []string{"1", "3"}))
@@ -128,6 +135,7 @@ func Test_ShouldCreateTemplatingDataHeaderFromRequestWithNoHeader(t *testing.T) 
 		&models.Literals{},
 		&models.Variables{},
 		make(map[string]string),
+		&journal.Journal{},
 	)
 
 	Expect(actual.Request.Header).To(BeEmpty())
@@ -486,6 +494,7 @@ func Test_VarSetToNilInCaseOfInvalidArgsPassed(t *testing.T) {
 		&models.Literals{},
 		vars,
 		make(map[string]string),
+		&journal.Journal{},
 	)
 
 	Expect(actual.Vars["varOne"]).To(BeNil())
@@ -511,6 +520,7 @@ func Test_VarSetToProperValueInCaseOfRequestDetailsPassedAsArgument(t *testing.T
 		&models.Literals{},
 		vars,
 		make(map[string]string),
+		&journal.Journal{},
 	)
 
 	Expect(actual.Vars["splitRequestPath"]).ToNot(BeNil())
@@ -537,5 +547,5 @@ func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]strin
 	templator.TemplateDataSource.SetDataSource("test-csv2", dataSource2)
 
 	template, _ := templator.ParseTemplate(responseBody)
-	return templator.RenderTemplate(template, requestDetails, &models.Literals{}, &models.Variables{}, state)
+	return templator.RenderTemplate(template, requestDetails, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
 }

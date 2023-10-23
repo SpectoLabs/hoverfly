@@ -609,7 +609,7 @@ func main() {
 		for _, indexKey := range journalIndexingKeyFlags {
 			if indexKey != "" {
 
-				if err = hoverfly.AddIndex(indexKey); err != nil {
+				if err = hoverfly.AddJournalIndex(indexKey); err != nil {
 					log.WithFields(log.Fields{
 						"error":  err.Error(),
 						"import": indexKey,

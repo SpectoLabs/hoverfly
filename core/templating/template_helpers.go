@@ -3,7 +3,6 @@ package templating
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/journal"
 	"reflect"
 	"strconv"
 	"strings"
@@ -210,27 +209,41 @@ func (t templateHelpers) parseCsv(dataSourceName, searchFieldName, searchFieldVa
 
 }
 
-func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSource, lookupQuery string, options *raymond.Options) interface{} {
-	journalDetails := options.Value("Journal").(journal.Journal)
-	if journalEntry, err := journalDetails.GetIndexEntry(indexName, keyValue); err == nil {
+func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSource, queryType, lookupQuery string, options *raymond.Options) interface{} {
+	journalDetails := options.Value("Journal").(Journal)
+	if journalEntry, err := getIndexEntry(journalDetails, indexName, keyValue); err == nil {
 		if body := getBodyDataToParse(dataSource, journalEntry); body != "" {
-			if util.IsJsonData(body) {
-				return fetchFromRequestBody("jsonpath", lookupQuery, body)
+			data := fetchFromRequestBody(queryType, lookupQuery, body)
+			if _, ok := data.(error); ok {
+				// The interface is an error
+				return getEvaluationString("journal", options)
 			} else {
-				return fetchFromRequestBody("xpath", lookupQuery, body)
+				return data
 			}
 		}
 	}
 	return getEvaluationString("journal", options)
 }
 
-func getBodyDataToParse(source string, journalEntry *journal.JournalEntry) string {
+func getIndexEntry(journalIndexDetails Journal, indexName, indexValue string) (*JournalEntry, error) {
+
+	for _, index := range journalIndexDetails.indexes {
+		if index.name == indexName {
+			if journalEntry, exists := index.entries[indexValue]; exists {
+				return &journalEntry, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("no entry found for index %s", indexName)
+}
+
+func getBodyDataToParse(source string, journalEntry *JournalEntry) string {
 
 	if strings.EqualFold(source, "request") {
-		return journalEntry.Request.Body
+		return journalEntry.requestBody
 	}
 	if strings.EqualFold(source, "response") {
-		return journalEntry.Response.Body
+		return journalEntry.responseBody
 	}
 	return ""
 }
