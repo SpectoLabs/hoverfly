@@ -21,8 +21,9 @@ import (
 const defaultDateTimeFormat = "2006-01-02T15:04:05Z07:00"
 
 type templateHelpers struct {
-	now         func() time.Time
-	fakerSource *gofakeit.Faker
+	now                func() time.Time
+	fakerSource        *gofakeit.Faker
+	TemplateDataSource *TemplateDataSource
 }
 
 func (t templateHelpers) nowHelper(offset string, format string) string {
@@ -175,7 +176,7 @@ func (t templateHelpers) faker(fakerType string) []reflect.Value {
 
 func (t templateHelpers) parseCsv(dataSourceName, searchFieldName, searchFieldValue, returnFieldName string, options *raymond.Options) string {
 
-	templateDataSources := options.Value("TemplateDataSources").(map[string]*DataSource)
+	templateDataSources := t.TemplateDataSource.DataSources
 	source, exists := templateDataSources[dataSourceName]
 	if exists {
 		searchIndex, err := getHeaderIndex(source.Data, searchFieldName)

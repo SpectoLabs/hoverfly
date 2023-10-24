@@ -18,13 +18,12 @@ import (
 const REQUEST_BODY_HELPER = "requestBody"
 
 type TemplatingData struct {
-	Request             Request
-	State               map[string]string
-	CurrentDateTime     func(string, string, string) string
-	Literals            map[string]interface{}
-	Vars                map[string]interface{}
-	TemplateDataSources map[string]*DataSource
-	Journal             Journal
+	Request         Request
+	State           map[string]string
+	CurrentDateTime func(string, string, string) string
+	Literals        map[string]interface{}
+	Vars            map[string]interface{}
+	Journal         Journal
 }
 
 type Request struct {
@@ -55,15 +54,18 @@ type JournalIndex struct {
 
 type Templator struct {
 	SupportedMethodMap map[string]interface{}
-	TemplateDataSource *TemplateDataSource
+	TemplateHelper     templateHelpers
 }
 
 var helpersRegistered = false
 
 func NewTemplator() *Templator {
+
+	templateDataSource := NewTemplateDataSource()
 	t := templateHelpers{
-		now:         time.Now,
-		fakerSource: gofakeit.New(0),
+		now:                time.Now,
+		fakerSource:        gofakeit.New(0),
+		TemplateDataSource: templateDataSource,
 	}
 	helperMethodMap := make(map[string]interface{})
 	helperMethodMap["now"] = t.nowHelper
@@ -91,7 +93,7 @@ func NewTemplator() *Templator {
 
 	return &Templator{
 		SupportedMethodMap: helperMethodMap,
-		TemplateDataSource: NewTemplateDataSource(),
+		TemplateHelper:     t,
 	}
 }
 
@@ -151,12 +153,11 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 	}
 
 	return &TemplatingData{
-		Request:             getRequest(requestDetails),
-		Literals:            literalMap,
-		Vars:                variableMap,
-		State:               state,
-		TemplateDataSources: t.TemplateDataSource.DataSources,
-		Journal:             templateJournal,
+		Request:  getRequest(requestDetails),
+		Literals: literalMap,
+		Vars:     variableMap,
+		State:    state,
+		Journal:  templateJournal,
 		CurrentDateTime: func(a1, a2, a3 string) string {
 			return a1 + " " + a2 + " " + a3
 		},
