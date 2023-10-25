@@ -1,0 +1,35 @@
+{
+  "data": {
+    "pairs": [
+      {
+        "request": {
+          "method": [
+            {
+              "matcher": "exact",
+              "value": "GET"
+            }],
+          "path": [
+            {
+              "matcher": "exact",
+              "value": "/stateful"
+            }
+          ]
+        },
+        "response": {
+          "status": 200,
+          "body": "{{ journal 'Request.QueryParam.id' '123' 'Response' 'jsonpath' '$.time' }}",
+          "encodedBody": false,
+          "templated" : true
+        }
+      }
+    ],
+    "globalActions": {
+      "delays": []
+    }
+  },
+  "meta": {
+    "schemaVersion": "v5.2",
+    "hoverflyVersion": "v0.10.2",
+    "timeExported": "2017-02-23T12:43:48Z"
+  }
+}
