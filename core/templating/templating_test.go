@@ -49,6 +49,17 @@ func Test_ApplyTemplate_ParseCsvByPassingRequestParamAndReturnMatchValue(t *test
 	Expect(template).To(Equal(`55`))
 }
 
+func Test_ApplyTemplate_EachBlockWithCsvTemplatingFunction(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Query: map[string][]string{"Ids": {"1", "2"}},
+	}, make(map[string]string), `{{#each (Request.QueryParam.Ids) }}{{csv 'test-csv2' 'Id' this 'Marks'}} | {{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`55 | 56 | `))
+}
+
 func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
