@@ -9,6 +9,46 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+// We need to run the csv templating tests first because the datasource is part of the templatingHelper which can be registered only once
+// for each runtime, raymond unfortunately doesn't provide a way to unregister helpers for us to isolate the test data.
+func Test_ApplyTemplate_ParseCsvAndReturnMatchedString(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csv 'test-csv1' 'Id' '2' 'Marks'}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`56`))
+}
+
+func Test_ApplyTemplate_ParseCsvAndReturnFallbackStringIfNoMatchFound(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csv 'test-csv1' 'Id' '51' 'Marks'}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`ABSENT`))
+}
+
+func Test_ApplyTemplate_ParseCsvAndReturnQueryStringIfNoMatchFound(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csv 'test-csv2' 'Id' '51' 'Marks'}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`{{ csv test-csv2 Id 51 Marks }}`))
+}
+
+func Test_ApplyTemplate_ParseCsvByPassingRequestParamAndReturnMatchValue(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Query: map[string][]string{"Id": {"1"}},
+	}, make(map[string]string), `{{csv 'test-csv2' 'Id' 'Request.QueryParam.Id.[0]' 'Marks'}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`55`))
+}
+
 func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -437,44 +477,6 @@ func Test_ApplyTemplate_ReplaceStringInQueryParams(t *testing.T) {
 	Expect(template).To(Equal(`moo,moo,moo`))
 }
 
-func Test_ApplyTemplate_ParseCsvAndReturnMatchedString(t *testing.T) {
-	RegisterTestingT(t)
-
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csv 'test-csv1' 'Id' '2' 'Marks'}}`)
-
-	Expect(err).To(BeNil())
-	Expect(template).To(Equal(`56`))
-}
-
-func Test_ApplyTemplate_ParseCsvAndReturnFallbackStringIfNoMatchFound(t *testing.T) {
-	RegisterTestingT(t)
-
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csv 'test-csv1' 'Id' '51' 'Marks'}}`)
-
-	Expect(err).To(BeNil())
-	Expect(template).To(Equal(`ABSENT`))
-}
-
-func Test_ApplyTemplate_ParseCsvAndReturnQueryStringIfNoMatchFound(t *testing.T) {
-	RegisterTestingT(t)
-
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csv 'test-csv2' 'Id' '51' 'Marks'}}`)
-
-	Expect(err).To(BeNil())
-	Expect(template).To(Equal(`{{ csv test-csv2 Id 51 Marks }}`))
-}
-
-func Test_ApplyTemplate_ParseCsvByPassingRequestParamAndReturnMatchValue(t *testing.T) {
-	RegisterTestingT(t)
-
-	template, err := ApplyTemplate(&models.RequestDetails{
-		Query: map[string][]string{"Id": {"1"}},
-	}, make(map[string]string), `{{csv 'test-csv2' 'Id' 'Request.QueryParam.Id.[0]' 'Marks'}}`)
-
-	Expect(err).To(BeNil())
-	Expect(template).To(Equal(`55`))
-}
-
 func Test_VarSetToNilInCaseOfInvalidArgsPassed(t *testing.T) {
 	RegisterTestingT(t)
 	templator := templating.NewTemplator()
@@ -543,8 +545,8 @@ func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]strin
 	templator := templating.NewTemplator()
 	dataSource1, _ := templating.NewCsvDataSource("test-csv1", "id,name,marks\n1,Test1,55\n2,Test2,56\n*,Dummy,ABSENT")
 	dataSource2, _ := templating.NewCsvDataSource("test-csv2", "id,name,marks\n1,Test1,55\n2,Test2,56\n")
-	templator.TemplateDataSource.SetDataSource("test-csv1", dataSource1)
-	templator.TemplateDataSource.SetDataSource("test-csv2", dataSource2)
+	templator.TemplateHelper.TemplateDataSource.SetDataSource("test-csv1", dataSource1)
+	templator.TemplateHelper.TemplateDataSource.SetDataSource("test-csv2", dataSource2)
 
 	template, _ := templator.ParseTemplate(responseBody)
 	return templator.RenderTemplate(template, requestDetails, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
