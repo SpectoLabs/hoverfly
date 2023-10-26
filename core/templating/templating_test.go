@@ -60,6 +60,17 @@ func Test_ApplyTemplate_EachBlockWithCsvTemplatingFunction(t *testing.T) {
 	Expect(template).To(Equal(`55 | 56 | `))
 }
 
+func Test_ApplyTemplate_EachBlockWithCsvTemplatingFunctionAndLargeInteger(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Body: `{"ids": [1, 5553686208582]}`,
+	}, make(map[string]string), `{{#each (Request.Body 'jsonpath' '$.ids') }}{{csv 'test-csv2' 'Id' this 'Marks'}} | {{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`55 | 66 | `))
+}
+
 func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -555,7 +566,7 @@ func toInterfaceSlice(arguments []string) []interface{} {
 func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]string, responseBody string) (string, error) {
 	templator := templating.NewTemplator()
 	dataSource1, _ := templating.NewCsvDataSource("test-csv1", "id,name,marks\n1,Test1,55\n2,Test2,56\n*,Dummy,ABSENT")
-	dataSource2, _ := templating.NewCsvDataSource("test-csv2", "id,name,marks\n1,Test1,55\n2,Test2,56\n")
+	dataSource2, _ := templating.NewCsvDataSource("test-csv2", "id,name,marks\n1,Test1,55\n2,Test2,56\n5553686208582,Test3,66\n")
 	templator.TemplateHelper.TemplateDataSource.SetDataSource("test-csv1", dataSource1)
 	templator.TemplateHelper.TemplateDataSource.SetDataSource("test-csv2", dataSource2)
 
