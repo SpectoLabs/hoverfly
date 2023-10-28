@@ -3,8 +3,18 @@ package util
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/base64"
 	"encoding/json"
+	encoding_xml "encoding/xml"
+	"fmt"
+	"github.com/ChrisTrenkamp/xsel/exec"
+	"github.com/ChrisTrenkamp/xsel/grammar"
+	"github.com/ChrisTrenkamp/xsel/parser"
+	"github.com/ChrisTrenkamp/xsel/store"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
+	"k8s.io/client-go/util/jsonpath"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -337,6 +347,146 @@ func GetBoolOrDefault(data map[string]interface{}, key string, defaultValue bool
 		return defaultValue
 	}
 	return genericValue.(bool)
+}
+
+func RandStringFromTimestamp(length int) string {
+	timestamp := time.Now()
+	randomBytes := make([]byte, length)
+
+	// Combine timestamp seconds and microseconds
+	seed := timestamp.UnixNano()
+
+	// Use the timestamp as a seed for the random number generator
+	rand.Seed(seed)
+
+	// Generate random bytes
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		return strconv.FormatInt(seed, 10)
+	}
+
+	// Encode the random bytes as a string
+	randomString := base64.RawURLEncoding.EncodeToString(randomBytes)
+
+	return randomString
+}
+
+func FetchFromRequestBody(queryType, query, toMatch string) interface{} {
+
+	if queryType == "jsonpath" {
+		result := jsonPath(query, toMatch)
+		var data interface{}
+		err := json.Unmarshal([]byte(result), &data)
+
+		arrayData, ok := data.([]interface{})
+
+		if err != nil || !ok {
+			return result
+		}
+		return arrayData
+	} else if queryType == "xpath" {
+		return xPath(query, toMatch)
+	}
+	log.Errorf("Unknown query type \"%s\" for templating Request.Body", queryType)
+	return ""
+}
+
+func jsonPath(query, toMatch string) string {
+	query = PrepareJsonPathQuery(query)
+
+	result, err := JsonPathExecution(query, toMatch)
+	if err != nil {
+		return ""
+	}
+
+	// Jsonpath library converts large int into a string with scientific notion, the following
+	// reverts that process to avoid mismatching when using the jsonpath result for csv data lookup
+	floatResult, err := strconv.ParseFloat(result, 64)
+	// if the string is a float and a whole number
+	if err == nil && floatResult == float64(int64(floatResult)) {
+		intResult := int(floatResult)
+		result = strconv.Itoa(intResult)
+	}
+
+	return result
+}
+
+func xPath(query, toMatch string) string {
+	result, err := XpathExecution(query, toMatch)
+	if err != nil {
+		return ""
+	}
+	return result.String()
+}
+
+func PrepareJsonPathQuery(query string) string {
+	if query[0:1] != "{" && query[len(query)-1:] != "}" {
+		query = fmt.Sprintf("{%s}", query)
+	}
+
+	return query
+}
+
+func JsonPathExecution(matchString, toMatch string) (string, error) {
+	jsonPath := jsonpath.New("")
+
+	err := jsonPath.Parse(matchString)
+	if err != nil {
+		log.Errorf("Failed to parse json path query %s: %s", matchString, err.Error())
+		return "", err
+	}
+
+	var data interface{}
+	if err := json.Unmarshal([]byte(toMatch), &data); err != nil {
+		log.Errorf("Failed to unmarshal body to JSON: %s", err.Error())
+		return "", err
+	}
+
+	buf := new(bytes.Buffer)
+
+	err = jsonPath.Execute(buf, data)
+	if err != nil {
+		log.Errorf("err to execute json path match: %s", err.Error())
+		return "", err
+	}
+
+	return buf.String(), nil
+}
+
+func XpathExecution(matchString, toMatch string) (exec.Result, error) {
+
+	contextSettings := func(c *exec.ContextSettings) {
+		xmlns := xmlns{}
+		_ = encoding_xml.Unmarshal([]byte(toMatch), &xmlns)
+		for key, value := range xmlns.Namespaces {
+			c.NamespaceDecls[key] = value
+		}
+	}
+	xpath := grammar.MustBuild(matchString)
+	parsedXml := parser.ReadXml(bytes.NewBufferString(toMatch))
+	cursor, _ := store.CreateInMemory(parsedXml)
+
+	results, err := exec.Exec(cursor, &xpath, contextSettings)
+	if err != nil {
+		log.Errorf("Failed to execute xpath match: %s", err.Error())
+		return nil, err
+	}
+
+	return results, nil
+}
+
+type xmlns struct {
+	Namespaces map[string]string
+}
+
+func (a *xmlns) UnmarshalXML(_ *encoding_xml.Decoder, start encoding_xml.StartElement) error {
+	a.Namespaces = map[string]string{}
+	for _, attr := range start.Attr {
+		if attr.Name.Space == "xmlns" {
+			a.Namespaces[attr.Name.Local] = attr.Value
+		}
+	}
+	return nil
 }
 
 func NeedsEncoding(headers map[string][]string, body string) bool {

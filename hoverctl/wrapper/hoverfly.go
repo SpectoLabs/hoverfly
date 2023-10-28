@@ -35,6 +35,8 @@ const (
 
 	v2ApiShutdown = "/api/v2/shutdown"
 	v2ApiHealth   = "/api/health"
+
+	v2JournalIndex = "/api/v2/journal/index"
 )
 
 type APIStateSchema struct {

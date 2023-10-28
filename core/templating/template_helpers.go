@@ -1,8 +1,8 @@
 package templating
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/SpectoLabs/hoverfly/core/journal"
 	"reflect"
 	"strconv"
 	"strings"
@@ -11,7 +11,6 @@ import (
 	"github.com/aymerick/raymond"
 	"github.com/pborman/uuid"
 
-	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/icrowley/fake"
@@ -94,57 +93,15 @@ func (t templateHelpers) randomUuid() string {
 }
 
 func (t templateHelpers) requestBody(queryType, query string, options *raymond.Options) interface{} {
-	toMatch := options.Value("request").(Request).body
+	body := ""
+	if toMatch, exists := options.Value("request").(Request); exists {
+		body = toMatch.body
+	} else {
+		journalToMatch := options.Value("Request").(journal.Request)
+		body = journalToMatch.BodyStr
+	}
 	queryType = strings.ToLower(queryType)
-	return fetchFromRequestBody(queryType, query, toMatch)
-}
-
-func fetchFromRequestBody(queryType, query, toMatch string) interface{} {
-
-	if queryType == "jsonpath" {
-		result := jsonPath(query, toMatch)
-		var data interface{}
-		err := json.Unmarshal([]byte(result), &data)
-
-		arrayData, ok := data.([]interface{})
-
-		if err != nil || !ok {
-			return result
-		}
-		return arrayData
-	} else if queryType == "xpath" {
-		return xPath(query, toMatch)
-	}
-	log.Errorf("Unknown query type \"%s\" for templating Request.Body", queryType)
-	return ""
-}
-
-func jsonPath(query, toMatch string) string {
-	query = prepareJsonPathQuery(query)
-
-	result, err := matchers.JsonPathExecution(query, toMatch)
-	if err != nil {
-		return ""
-	}
-
-	// Jsonpath library converts large int into a string with scientific notion, the following
-	// reverts that process to avoid mismatching when using the jsonpath result for csv data lookup
-	floatResult, err := strconv.ParseFloat(result, 64)
-	// if the string is a float and a whole number
-	if err == nil && floatResult == float64(int64(floatResult)) {
-		intResult := int(floatResult)
-		result = strconv.Itoa(intResult)
-	}
-
-	return result
-}
-
-func xPath(query, toMatch string) string {
-	result, err := matchers.XpathExecution(query, toMatch)
-	if err != nil {
-		return ""
-	}
-	return result.String()
+	return util.FetchFromRequestBody(queryType, query, body)
 }
 
 func (t templateHelpers) replace(target, oldValue, newValue string) string {
@@ -214,7 +171,7 @@ func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSourc
 	journalDetails := options.Value("Journal").(Journal)
 	if journalEntry, err := getIndexEntry(journalDetails, indexName, keyValue); err == nil {
 		if body := getBodyDataToParse(dataSource, journalEntry); body != "" {
-			data := fetchFromRequestBody(queryType, lookupQuery, body)
+			data := util.FetchFromRequestBody(queryType, lookupQuery, body)
 			if _, ok := data.(error); ok {
 				// The interface is an error
 				return getEvaluationString("journal", options)

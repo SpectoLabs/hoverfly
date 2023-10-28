@@ -2,6 +2,7 @@ package matchers
 
 import (
 	"encoding/json"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"reflect"
 
 	log "github.com/sirupsen/logrus"
@@ -15,7 +16,7 @@ func IdentityValueGenerator(match interface{}, toMatch string) string {
 
 func JsonPathMatcherValueGenerator(match interface{}, toMatch string) string {
 
-	matchString := prepareJsonPathQuery(match.(string))
+	matchString := util.PrepareJsonPathQuery(match.(string))
 
 	jsonPath := jsonpath.New("")
 
@@ -69,7 +70,7 @@ func getResult(results [][]reflect.Value) string {
 
 func XPathMatchValueGenerator(match interface{}, toMatch string) string {
 
-	results, err := XpathExecution(match.(string), toMatch)
+	results, err := util.XpathExecution(match.(string), toMatch)
 	if err != nil {
 		log.Errorf("Failed to generate xpath value: %s", err.Error())
 		return ""

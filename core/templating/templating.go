@@ -3,6 +3,7 @@ package templating
 import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/journal"
+	"github.com/SpectoLabs/hoverfly/core/util"
 	"reflect"
 	"strings"
 	"time"
@@ -203,7 +204,7 @@ func getDataFromRequestBody(variable models.Variable, body string) interface{} {
 			log.Error("panic occurred:", err)
 		}
 	}()
-	return fetchFromRequestBody(variable.Arguments[0].(string), variable.Arguments[1].(string), body)
+	return util.FetchFromRequestBody(variable.Arguments[0].(string), variable.Arguments[1].(string), body)
 }
 
 /*

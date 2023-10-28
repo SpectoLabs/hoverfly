@@ -26,6 +26,7 @@ type JournalEntry struct {
 	Mode        string
 	TimeStarted time.Time
 	Latency     time.Duration
+	Id          string
 }
 
 type Journal struct {
@@ -65,6 +66,27 @@ func (this *Journal) AddIndex(indexKey string) error {
 	return nil
 }
 
+func (this *Journal) DeleteIndex(indexKey string) {
+
+	var indexes []Index
+	for _, index := range this.Indexes {
+		if index.Name != indexKey {
+			indexes = append(indexes, index)
+		}
+	}
+	this.Indexes = indexes
+}
+
+func (this *Journal) GetAllIndexes() []v2.JournalIndexView {
+
+	var journalIndexViews []v2.JournalIndexView
+	for _, index := range this.Indexes {
+
+		journalIndexViews = append(journalIndexViews, index.getIndexView())
+	}
+	return journalIndexViews
+}
+
 func (this *Journal) NewEntry(request *http.Request, response *http.Response, mode string, started time.Time) error {
 	if this.EntryLimit == 0 {
 		return fmt.Errorf("Journal disabled")
@@ -91,6 +113,7 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 		Mode:        mode,
 		TimeStarted: started,
 		Latency:     time.Since(started),
+		Id:          util.RandStringFromTimestamp(15),
 	}
 
 	this.entries = append(this.entries, entry)
@@ -124,6 +147,7 @@ func (this *Journal) GetEntries(offset int, limit int, from *time.Time, to *time
 
 	journalView := v2.JournalView{
 		Journal: []v2.JournalEntryView{},
+		Index:   []v2.JournalIndexView{},
 		Offset:  offset,
 		Limit:   limit,
 		Total:   0,
@@ -183,6 +207,7 @@ func (this *Journal) GetEntries(offset int, limit int, from *time.Time, to *time
 	}
 
 	journalView.Journal = convertJournalEntries(selectedEntries[offset:endIndex])
+	journalView.Index = convertJournalIndexes(this.Indexes, selectedEntries[offset:endIndex])
 	journalView.Total = totalElements
 	return journalView, nil
 }
@@ -251,6 +276,19 @@ func (this *Journal) DeleteEntries() error {
 	return nil
 }
 
+func convertJournalIndexes(indexes []Index, entries []JournalEntry) []v2.JournalIndexView {
+	filteredJournalEntries := util.NewHashSet()
+	for _, entry := range entries {
+		filteredJournalEntries.Add(entry.Id)
+	}
+	var journalIndexViews []v2.JournalIndexView
+	for _, index := range indexes {
+
+		journalIndexViews = append(journalIndexViews, index.convertIndex(filteredJournalEntries))
+	}
+	return journalIndexViews
+}
+
 func convertJournalEntries(entries []JournalEntry) []v2.JournalEntryView {
 
 	var journalEntryViews []v2.JournalEntryView
@@ -262,6 +300,7 @@ func convertJournalEntries(entries []JournalEntry) []v2.JournalEntryView {
 			Mode:        journalEntry.Mode,
 			TimeStarted: journalEntry.TimeStarted.Format(RFC3339Milli),
 			Latency:     journalEntry.Latency.Seconds() * 1e3,
+			Id:          journalEntry.Id,
 		})
 	}
 

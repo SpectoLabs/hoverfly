@@ -86,6 +86,7 @@ type ClosestMissView struct {
 
 type JournalView struct {
 	Journal []JournalEntryView `json:"journal"`
+	Index   []JournalIndexView `json:"indexes"`
 	Offset  int                `json:"offset"`
 	Limit   int                `json:"limit"`
 	Total   int                `json:"total"`
@@ -97,6 +98,7 @@ type JournalEntryView struct {
 	Mode        string              `json:"mode"`
 	TimeStarted string              `json:"timeStarted"`
 	Latency     float64             `json:"latency"`
+	Id          string              `json:"id"`
 }
 
 type JournalEntryFilterView struct {
@@ -137,4 +139,18 @@ type DiffReportEntry struct {
 type DiffFilterView struct {
 	ExcludedHeaders        []string `json:"excludedHeaders"`
 	ExcludedResponseFields []string `json:"excludedResponseFields"`
+}
+
+type JournalIndexView struct {
+	Name    string                  `json:"name"`
+	Entries []JournalIndexEntryView `json:"entries,omitempty"`
+}
+
+type JournalIndexEntryView struct {
+	Key            string `json:"key"`
+	JournalEntryId string `json:"journalEntryId"`
+}
+
+type JournalIndexRequestView struct {
+	Name string `json:"name"`
 }

@@ -544,3 +544,11 @@ func (hf *Hoverfly) GetAllDataSources() v2.TemplateDataSourceView {
 func (hf *Hoverfly) AddJournalIndex(indexKey string) error {
 	return hf.Journal.AddIndex(indexKey)
 }
+
+func (hf *Hoverfly) DeleteJournalIndex(indexKey string) {
+	hf.Journal.DeleteIndex(indexKey)
+}
+
+func (hf *Hoverfly) GetAllIndexes() []v2.JournalIndexView {
+	return hf.Journal.GetAllIndexes()
+}
