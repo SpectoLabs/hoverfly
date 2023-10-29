@@ -68,7 +68,7 @@ func (this *Journal) AddIndex(indexKey string) error {
 
 func (this *Journal) DeleteIndex(indexKey string) {
 
-	var indexes []Index
+	indexes := []Index{}
 	for _, index := range this.Indexes {
 		if index.Name != indexKey {
 			indexes = append(indexes, index)

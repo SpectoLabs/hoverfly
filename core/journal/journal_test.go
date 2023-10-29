@@ -24,10 +24,13 @@ func Test_NewJournal_ProducesAJournalWithAnEmptyArray(t *testing.T) {
 
 	journalView, err := unit.GetEntries(0, 25, nil, nil, "")
 	entries := journalView.Journal
+	indexes := journalView.Index
 	Expect(err).To(BeNil())
 
 	Expect(entries).ToNot(BeNil())
 	Expect(entries).To(HaveLen(0))
+	Expect(indexes).ToNot(BeNil())
+	Expect(indexes).To(HaveLen(0))
 
 	Expect(unit.EntryLimit).To(Equal(1000))
 }
@@ -71,6 +74,104 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 	Expect(entries[0].Mode).To(Equal("test-mode"))
 	Expect(entries[0].TimeStarted).To(Equal(nowTime.Format(journal.RFC3339Milli)))
 	Expect(entries[0].Latency).To(BeNumerically("<", 1))
+}
+
+func Test_JournalIndex_NewEntryAfterAddingIndex_AddsJournalIndexEntryToIndexes(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	request, _ := http.NewRequest("GET", "http://hoverfly.io?id=1234", nil)
+
+	nowTime := time.Now()
+
+	indexName := "Request.QueryParam.id"
+	indexErr := unit.AddIndex(indexName)
+	Expect(indexErr).To(BeNil())
+
+	err := unit.NewEntry(request, &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Header: http.Header{
+			"test-header": []string{
+				"one", "two",
+			},
+		},
+	}, "test-mode", nowTime)
+
+	Expect(err).To(BeNil())
+	indexes := unit.Indexes
+	Expect(indexes).ToNot(BeNil())
+	Expect(indexes).To(HaveLen(1))
+	Expect(indexes[0].Name).To(Equal(indexName))
+	Expect(indexes[0].Entries).To(HaveKey("1234"))
+}
+
+func Test_JournalIndex_NewEntryBeforeAddingIndex_AddsJournalIndexEntryToIndexes(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	request, _ := http.NewRequest("GET", "http://hoverfly.io?id=1234", nil)
+
+	nowTime := time.Now()
+
+	err := unit.NewEntry(request, &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Header: http.Header{
+			"test-header": []string{
+				"one", "two",
+			},
+		},
+	}, "test-mode", nowTime)
+
+	Expect(err).To(BeNil())
+
+	indexName := "Request.QueryParam.id"
+	indexErr := unit.AddIndex(indexName)
+	Expect(indexErr).To(BeNil())
+
+	indexes := unit.Indexes
+	Expect(indexes).ToNot(BeNil())
+	Expect(indexes).To(HaveLen(1))
+	Expect(indexes[0].Name).To(Equal(indexName))
+	Expect(indexes[0].Entries).To(HaveKey("1234"))
+}
+
+func Test_DeleteJournalIndex(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	indexName := "Request.QueryParam.id"
+	indexErr := unit.AddIndex(indexName)
+	Expect(indexErr).To(BeNil())
+
+	unit.DeleteIndex(indexName)
+
+	indexes := unit.Indexes
+	Expect(indexes).ToNot(BeNil())
+	Expect(indexes).To(HaveLen(0))
+}
+
+func Test_DeleteAndAddIndexBack(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	indexName := "Request.QueryParam.id"
+	indexErr := unit.AddIndex(indexName)
+	Expect(indexErr).To(BeNil())
+
+	unit.DeleteIndex(indexName)
+	indexErr = unit.AddIndex(indexName)
+	Expect(indexErr).To(BeNil())
+
+	indexes := unit.Indexes
+	Expect(indexes).ToNot(BeNil())
+	Expect(indexes).To(HaveLen(1))
+	Expect(indexes[0].Name).To(Equal(indexName))
 }
 
 func Test_Journal_NewEntry_RespectsEntryLimit(t *testing.T) {
