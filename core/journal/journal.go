@@ -55,8 +55,9 @@ func (this *Journal) AddIndex(indexKey string) error {
 	indexMap := make(map[string]*JournalEntry)
 
 	index := Index{
-		Name:    indexKey,
-		Entries: indexMap,
+		Name:     strings.Replace(indexKey, "'", "", -1),
+		template: indexKey,
+		Entries:  indexMap,
 	}
 	for _, journalEntry := range this.entries {
 		index.AddJournalEntry(&journalEntry)

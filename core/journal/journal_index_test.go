@@ -11,8 +11,9 @@ func TestIndex_AddJournalEntry(t *testing.T) {
 	RegisterTestingT(t)
 
 	index := Index{
-		Name:    "Request.QueryParam.id",
-		Entries: make(map[string]*JournalEntry),
+		Name:     "Request.QueryParam.id",
+		template: "Request.QueryParam.id",
+		Entries:  make(map[string]*JournalEntry),
 	}
 
 	queryParams := make(map[string][]string)
@@ -33,8 +34,9 @@ func TestIndex_AddJournalEntryWithJsonRequestBody(t *testing.T) {
 	RegisterTestingT(t)
 
 	index := Index{
-		Name:    "Request.Body 'jsonpath' '$.name'",
-		Entries: make(map[string]*JournalEntry),
+		Name:     "Request.Body jsonpath $.name",
+		template: "Request.Body 'jsonpath' '$.name'",
+		Entries:  make(map[string]*JournalEntry),
 	}
 
 	journalEntry := JournalEntry{
@@ -53,8 +55,9 @@ func TestIndex_AddJournalEntryWithXMLRequestBody(t *testing.T) {
 	RegisterTestingT(t)
 
 	index := Index{
-		Name:    "Request.Body 'xpath' '/document/id'",
-		Entries: make(map[string]*JournalEntry),
+		Name:     "Request.Body xpath /document/id",
+		template: "Request.Body 'xpath' '/document/id'",
+		Entries:  make(map[string]*JournalEntry),
 	}
 
 	journalEntry := JournalEntry{
