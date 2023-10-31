@@ -1487,26 +1487,26 @@ func TestHoverfly_AddAndGetJournalIndex(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 	indexName1 := "Request.QueryParam.id"
-	indexName2 := "Request.Body jsonpath $.id"
+	indexName2 := "Request.Body 'jsonpath' '$.id'"
 	addIndexes(unit, indexName1, indexName2)
 	journalIndexes := unit.Journal.GetAllIndexes()
 	Expect(journalIndexes).ToNot(BeNil())
 	Expect(journalIndexes).To(HaveLen(2))
 	Expect(journalIndexes[0].Name).To(Equal(indexName1))
-	Expect(journalIndexes[1].Name).To(Equal(indexName2))
+	Expect(journalIndexes[1].Name).To(Equal("Request.Body jsonpath $.id"))
 }
 
 func TestHoverfly_DeleteJournalIndex(t *testing.T) {
 	RegisterTestingT(t)
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 	indexName1 := "Request.QueryParam.id"
-	indexName2 := "Request.Body jsonpath $.id"
+	indexName2 := "Request.Body 'jsonpath' '$.id'"
 	addIndexes(unit, indexName1, indexName2)
 	unit.Journal.DeleteIndex(indexName1)
 	journalIndexes := unit.Journal.GetAllIndexes()
 	Expect(journalIndexes).ToNot(BeNil())
 	Expect(journalIndexes).To(HaveLen(1))
-	Expect(journalIndexes[0].Name).To(Equal(indexName2))
+	Expect(journalIndexes[0].Name).To(Equal("Request.Body jsonpath $.id"))
 }
 
 func addIndexes(unit *Hoverfly, indexName1, indexName2 string) (string, string) {
