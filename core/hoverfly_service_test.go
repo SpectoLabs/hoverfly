@@ -1487,7 +1487,7 @@ func TestHoverfly_AddAndGetJournalIndex(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 	indexName1 := "Request.QueryParam.id"
-	indexName2 := "Request.Body 'jsonpath' '$.id'"
+	indexName2 := "Request.Body jsonpath $.id"
 	addIndexes(unit, indexName1, indexName2)
 	journalIndexes := unit.Journal.GetAllIndexes()
 	Expect(journalIndexes).ToNot(BeNil())
@@ -1500,7 +1500,7 @@ func TestHoverfly_DeleteJournalIndex(t *testing.T) {
 	RegisterTestingT(t)
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 	indexName1 := "Request.QueryParam.id"
-	indexName2 := "Request.Body 'jsonpath' '$.id'"
+	indexName2 := "Request.Body jsonpath $.id"
 	addIndexes(unit, indexName1, indexName2)
 	unit.Journal.DeleteIndex(indexName1)
 	journalIndexes := unit.Journal.GetAllIndexes()

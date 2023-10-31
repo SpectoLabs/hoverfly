@@ -37,12 +37,12 @@ var journalIndexSetCommand = &cobra.Command{
 	Short: "Set journal index for Hoverfly",
 	Long: `
 Hoverfly journal index can be set using the following flags: 
-	 --name
+	 --key
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		checkTargetAndExit(target)
 		if indexName == "" {
-			fmt.Println("Name is compulsory to set journal index")
+			fmt.Println("Key is compulsory to set journal index")
 		} else {
 			err := wrapper.SetJournalIndex(indexName, *target)
 			handleIfError(err)
@@ -56,12 +56,12 @@ var journalIndexDeleteCommand = &cobra.Command{
 	Short: "Delete journal index for Hoverfly",
 	Long: `
 Hoverfly journal index can be deleted using the following flags: 
-	 --name
+	 --key
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		checkTargetAndExit(target)
 		if indexName == "" {
-			fmt.Println("Name is compulsory to delete journal index")
+			fmt.Println("Key is compulsory to delete journal index")
 		} else {
 			err := wrapper.DeleteJournalIndex(indexName, *target)
 			handleIfError(err)
@@ -75,8 +75,8 @@ func init() {
 	journalIndexCommand.AddCommand(journalIndexGetCommand)
 	journalIndexCommand.AddCommand(journalIndexSetCommand)
 	journalIndexCommand.AddCommand(journalIndexDeleteCommand)
-	journalIndexSetCommand.PersistentFlags().StringVar(&indexName, "name", "", "Index Key to be set")
-	journalIndexDeleteCommand.PersistentFlags().StringVar(&indexName, "name", "", "Index Key to be deleted")
+	journalIndexSetCommand.PersistentFlags().StringVar(&indexName, "key", "", "Index Key to be set")
+	journalIndexDeleteCommand.PersistentFlags().StringVar(&indexName, "key", "", "Index Key to be deleted")
 }
 
 func getJournalIndexesTabularData(indexes []v2.JournalIndexView) [][]string {

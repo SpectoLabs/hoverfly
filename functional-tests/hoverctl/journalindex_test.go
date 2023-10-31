@@ -25,7 +25,7 @@ var _ = Describe("When I use hoverctl", func() {
 		})
 
 		It("should return success on setting journal index", func() {
-			output := functional_tests.Run(hoverctlBinary, "journal-index", "set", "--name", "Request.QueryParam.id")
+			output := functional_tests.Run(hoverctlBinary, "journal-index", "set", "--key", "Request.QueryParam.id")
 
 			Expect(output).To(ContainSubstring("Success"))
 		})
@@ -45,7 +45,7 @@ var _ = Describe("When I use hoverctl", func() {
 		})
 
 		It("should return success on deleting journal", func() {
-			output := functional_tests.Run(hoverctlBinary, "journal-index", "delete", "--name", "Request.QueryParam.id")
+			output := functional_tests.Run(hoverctlBinary, "journal-index", "delete", "--key", "Request.QueryParam.id")
 
 			Expect(output).To(ContainSubstring("Success"))
 		})
@@ -65,11 +65,11 @@ var _ = Describe("When I use hoverctl", func() {
 		})
 
 		It("should return template data source", func() {
-			output := functional_tests.Run(hoverctlBinary, "journal-index", "set", "--name", "Request.QueryParam.id")
+			output := functional_tests.Run(hoverctlBinary, "journal-index", "set", "--key", "Request.QueryParam.id")
 
 			Expect(output).To(ContainSubstring("Success"))
 
-			output = functional_tests.Run(hoverctlBinary, "journal-index", "set", "--name", "Request.Body 'jsonpath' '$.id'")
+			output = functional_tests.Run(hoverctlBinary, "journal-index", "set", "--key", "Request.Body 'jsonpath' '$.id'")
 
 			output = functional_tests.Run(hoverctlBinary, "journal-index", "get-all")
 			Expect(output).To(ContainSubstring("Request.QueryParam.id"))
