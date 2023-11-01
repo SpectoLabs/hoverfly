@@ -49,6 +49,9 @@ Usage of hoverfly:
         Import from file or from URL (i.e. '-import my_service.json' or '-import http://mypage.com/service_x.json'
   -journal-size int
         Set the size of request/response journal (default 1000)
+  -journal-indexing-key string
+        Specify the index key using which you want to index journal. Index shares same syntax as the one for templating, such as Request.QueryParam.myParam or Request.Header.X-Header-Id.[1].
+        It is used for extracting the data from the journal entry to use as a key for that entry.
   -key string
         Private key of the CA used to sign MITM certificates
   -listen-on-host string

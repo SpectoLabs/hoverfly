@@ -785,7 +785,7 @@ GET /api/v2/journal
 """""""""""""""""""
 Gets the journal from Hoverfly. Each journal entry contains both the request Hoverfly received and the response
 it served along with the mode Hoverfly was in, the time the request was received and the time taken for Hoverfly
-to process the request. Latency is in milliseconds.
+to process the request. Latency is in milliseconds.  It also returns its corresponding indexes.
 
 It supports paging using the ``offset`` and ``limit`` query parameters.
 
@@ -840,11 +840,22 @@ Running hoverfly with ``-journal-size=0`` disables logging and 500 response is r
             ]
           }
         },
+        "id":"mOBdPSIIBbjNqBvpZ8H-",
         "mode": "simulate",
         "timeStarted": "2017-07-17T10:41:59.168+01:00",
         "latency": 0.61334
       }
     ],
+    "indexes": [
+    {
+      "name": "Request.destination",
+      "entries": [
+        {
+          "key": "hoverfly.io",
+          "journalEntryId": "mOBdPSIIBbjNqBvpZ8H-"
+        }
+      ]
+    }],
     "offset": 0,
     "limit": 25,
     "total": 1
@@ -877,6 +888,69 @@ Filter and search entries stored in the journal.
         }
     }
 
+-------------------------------------------------------------------------------------------------------------
+
+
+GET /api/v2/journal/index
+"""""""""""""""""""""""""
+Gets all the journal indexes from Hoverfly. Each Index contains key, extracted value for that particular key
+and journal index id to which it is pointing to.
+
+
+**Example response body**
+::
+    [
+      {
+        "name": "Request.QueryParam.id",
+        "entries": [
+          {
+            "key": "100",
+            "journalEntryId": "ZCyiQtamEtwi-NNU9RT1"
+          },
+          {
+            "key": "101",
+            "journalEntryId": "YFU5dm2uDZ4UStX3ldkX"
+          }
+        ]
+      },
+      {
+        "name": "Request.QueryParam.name",
+        "entries": [
+          {
+            "key": "Test1",
+            "journalEntryId": "ZCyiQtamEtwi-NNU9RT1"
+          },
+          {
+            "key": "Test2",
+            "journalEntryId": "YFU5dm2uDZ4UStX3ldkX"
+          }
+        ]
+      },
+    ]
+
+
+-------------------------------------------------------------------------------------------------------------
+
+
+POST /api/v2/journal/index
+""""""""""""""""""""""""""
+
+Allow a user to set journal indexing by specifying index key/name. Index name is "request-query" shares the same syntax as the one for templating, such as Request.QueryParam.myParam or Request.Header.X-Header-Id.[1]
+It’s used for extracting the data from the journal entry to use as a key for that entry.  It returns all the journal indexes that have been set.  It indexes pre-existing or new journal entries.
+
+**Example request body**
+::
+    {
+        "name":"Request.QueryParam.myParam"
+    }
+
+-------------------------------------------------------------------------------------------------------------
+
+
+DELETE /api/v2/journal/index/:index-name
+""""""""""""""""""""""""""""""""""""""""
+
+Deletes journal index from hoverfly.
 
 -------------------------------------------------------------------------------------------------------------
 

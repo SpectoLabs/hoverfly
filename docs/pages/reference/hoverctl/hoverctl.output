@@ -11,6 +11,7 @@ Available Commands:
   diff              Manage the diffs for Hoverfly
   export            Export a simulation from Hoverfly
   flush             Flush the internal cache in Hoverfly
+  journal-index     Manage index for journal in Hoverfly
   import            Import a simulation into Hoverfly
   login             Login to Hoverfly
   logs              Get the logs from Hoverfly

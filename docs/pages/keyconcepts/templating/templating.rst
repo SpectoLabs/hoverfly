@@ -94,6 +94,10 @@ Additional data can come from helper methods. These are the ones Hoverfly curren
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Query CSV data source where ID = 3 and return its name    | ``{{csv 'test-csv' 'id' '3' 'name'}}``                    |  John Smith                             |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Query Journal index where index value = 1 and return Name |                                                           |                                         |
+|  from associated Response body in journal entry.          | ``{{journal "Request.QueryParam.id" "1"                   |                                         |
+|                                                           |     "response" "jsonpath" "$.name"}}                      |  John Smith                             |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 
 Time offset
 ~~~~~~~~~~~
@@ -228,6 +232,33 @@ Example: Start hoverfly with templating CSV datasource(student-marks.csv) provid
 | Search where Id = first path param and return marks       | csv 'student-marks' 'Id' 'Request.Path.[0]' 'Marks'       |  15                                     |
 | URL looks like - http://test.com/students/5/marks         |                                                           |                                         |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+
+
+Journal
+~~~~~~~
+
+Journal Entry can be queried using its index and its extracted value.
+
+Syntax
+.. code-block::
+    journal "index name" "extracted value" "request/response" "xpath/jsonpath" "lookup query"
+
+
+"index name" should be the same key expression you have specified when you enable the journal index.
+"extracted value" is for doing a key lookup for the journal entry from that index.
+"request/response" specify if you want to get data from the request or response.
+"xpath/jsonpath" specify whether you want to extract it from xpath or json path expression.
+"lookup query" either jsonpath or xpath expressions to parse the request/response data.
+
+Example:
+.. code:: json
+
+    {
+        "body": "{\"name\": \"{{{{journal "Request.QueryParam.id" "1" "response" "jsonpath" "$.name"}}\"}"
+    }
+
+In above example, we are querying name from JSON response in the journal entry where index QueryParam.id that has value 1 will be pointing to.
+
 
 
 
