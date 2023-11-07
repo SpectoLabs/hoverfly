@@ -20,7 +20,7 @@ A response includes two fields, `transitionsState` and `removesState` which alte
         "status": 200,
         "body": "eggs and large bacon",
         "transitionsState" : {
-            "payment-flow" : "complete",
+            "payment-flow" : "complete"
         },
         "removesState" : [
             "basket"
