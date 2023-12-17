@@ -403,6 +403,18 @@ func Test_ApplyTemplate_Request_Body_JsonPath_Unescaped(t *testing.T) {
 	Expect(template).To(Equal("O'Reilly"))
 }
 
+func Test_ApplyTemplate_Request_Body_Jsonpath_LargeInt(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Body: `{ "id": 5553686208582 }`,
+	}, make(map[string]string), `{{ Request.Body 'jsonpath' '$.id' }}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("5553686208582"))
+}
+
 func Test_ApplyTemplate_ReplaceStringInQueryParams(t *testing.T) {
 	RegisterTestingT(t)
 
