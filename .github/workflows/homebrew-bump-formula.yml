@@ -28,8 +28,7 @@ jobs:
       with:
        # Required, custom GitHub access token with the 'public_repo' and 'workflow' scopes
        token: ${{secrets.HOME_BREW_PAT}}
-       # Optional, will create tap repo fork in organization
-       org: SpectoLabs
+       no_fork: true
        tap: SpectoLabs/homebrew-tap
        # Formula name, required
        formula: Hoverfly
