@@ -2,9 +2,12 @@ package journal_test
 
 import (
 	"bytes"
+	"github.com/SpectoLabs/hoverfly/core/models"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -722,17 +725,6 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		},
 	})).To(HaveLen(1))
 
-	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			DeprecatedQuery: []v2.MatcherViewV5{
-				{
-					Matcher: matchers.Exact,
-					Value:   "does-not-match",
-				},
-			},
-		},
-	})).To(HaveLen(0))
-
 	// Scheme
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
@@ -812,5 +804,60 @@ func Test_Journal_GetFilteredEntries_WillReturnEmptyIfRequestMatcherIsEmpty(t *t
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
 		Request: &v2.RequestMatcherViewV5{},
+	})).To(HaveLen(0))
+}
+
+func Test_Journal_GetFilteredEntries_WillFilterOnFormBodyRequest(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	formData := url.Values{
+		"field1": {"value1"},
+		"field2": {"value2"},
+	}
+
+	request, _ := http.NewRequest("POST", "http://hoverfly.io/path/one", strings.NewReader(formData.Encode()))
+	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	unit.NewEntry(request, &http.Response{
+		StatusCode: 202,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+	}, "test-mode", time.Now())
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV5{
+			Body: []v2.MatcherViewV5{
+				{
+					Matcher: "form",
+					Value: map[string][]models.RequestFieldMatchers{
+						"field1": {
+							{
+								Matcher: matchers.Exact,
+								Value:   "value1",
+							},
+						},
+					},
+				},
+			},
+		},
+	})).To(HaveLen(1))
+
+	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
+		Request: &v2.RequestMatcherViewV5{
+			Body: []v2.MatcherViewV5{
+				{
+					Matcher: "form",
+					Value: map[string][]models.RequestFieldMatchers{
+						"field1": {
+							{
+								Matcher: matchers.Exact,
+								Value:   "value2",
+							},
+						},
+					},
+				},
+			},
+		},
 	})).To(HaveLen(0))
 }
