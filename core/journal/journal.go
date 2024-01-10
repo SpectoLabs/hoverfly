@@ -179,40 +179,36 @@ func (this *Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFi
 		Headers:         models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Headers),
 	}
 
-	allEntries := convertJournalEntries(this.entries)
-
-	for _, entry := range allEntries {
+	for _, entry := range this.entries {
 		if requestMatcher.Body == nil && requestMatcher.Destination == nil &&
 			requestMatcher.Headers == nil && requestMatcher.Method == nil &&
 			requestMatcher.Path == nil && requestMatcher.DeprecatedQuery == nil &&
 			requestMatcher.Scheme == nil && requestMatcher.Query == nil {
 			continue
 		}
-		if !matching.FieldMatcher(requestMatcher.Body, *entry.Request.Body).Matched {
+
+		if !matching.BodyMatching(requestMatcher.Body, *entry.Request).Matched {
 			continue
 		}
-		if !matching.FieldMatcher(requestMatcher.Destination, *entry.Request.Destination).Matched {
+		if !matching.FieldMatcher(requestMatcher.Destination, entry.Request.Destination).Matched {
 			continue
 		}
-		if !matching.FieldMatcher(requestMatcher.Method, *entry.Request.Method).Matched {
+		if !matching.FieldMatcher(requestMatcher.Method, entry.Request.Method).Matched {
 			continue
 		}
-		if !matching.FieldMatcher(requestMatcher.Path, *entry.Request.Path).Matched {
+		if !matching.FieldMatcher(requestMatcher.Path, entry.Request.Path).Matched {
 			continue
 		}
-		if !matching.FieldMatcher(requestMatcher.DeprecatedQuery, *entry.Request.Query).Matched {
+		if !matching.FieldMatcher(requestMatcher.Scheme, entry.Request.Scheme).Matched {
 			continue
 		}
-		if !matching.FieldMatcher(requestMatcher.Scheme, *entry.Request.Scheme).Matched {
-			continue
-		}
-		if !matching.QueryMatching(requestMatcher, entry.Request.QueryMap).Matched {
+		if !matching.QueryMatching(requestMatcher, entry.Request.Query).Matched {
 			continue
 		}
 		if !matching.HeaderMatching(requestMatcher, entry.Request.Headers).Matched {
 			continue
 		}
-		filteredEntries = append(filteredEntries, entry)
+		filteredEntries = append(filteredEntries, convertJournalEntry(entry))
 	}
 
 	return filteredEntries, nil
