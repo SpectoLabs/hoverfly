@@ -8,6 +8,7 @@ require (
 	github.com/SpectoLabs/goproxy/ext v0.0.0-20220724221645-71c396c297b7
 	github.com/SpectoLabs/raymond v2.0.3-0.20240313210732-e0e216cf0920+incompatible
 	github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496
+	github.com/basgys/goxml2json v1.1.0
 	github.com/beevik/etree v1.1.0
 	github.com/boltdb/bolt v1.2.1-0.20160424201119-d97499360d1e
 	github.com/brianvoe/gofakeit/v6 v6.19.0
@@ -46,6 +47,7 @@ require (
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/aymerick/raymond v2.0.2+incompatible // indirect
+	github.com/bitly/go-simplejson v0.5.1 // indirect
 	github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect

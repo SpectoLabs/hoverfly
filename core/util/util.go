@@ -25,6 +25,7 @@ import (
 	"strconv"
 	"time"
 
+	xj "github.com/basgys/goxml2json"
 	"github.com/tdewolff/minify/v2"
 	mjson "github.com/tdewolff/minify/v2/json"
 	"github.com/tdewolff/minify/v2/xml"
@@ -374,24 +375,22 @@ func RandStringFromTimestamp(length int) string {
 func FetchFromRequestBody(queryType, query, toMatch string) interface{} {
 
 	if queryType == "jsonpath" {
-		result := jsonPath(query, toMatch)
-		var data interface{}
-		err := json.Unmarshal([]byte(result), &data)
-
-		arrayData, ok := data.([]interface{})
-
-		if err != nil || !ok {
-			return result
-		}
-		return arrayData
+		return jsonPath(query, toMatch)
 	} else if queryType == "xpath" {
 		return xPath(query, toMatch)
+	} else if queryType == "jsonpathfromxml" {
+		xmlReader := strings.NewReader(toMatch)
+		jsonBytes, err := xj.Convert(xmlReader)
+		if err != nil {
+			return ""
+		}
+		return jsonPath(query, jsonBytes.String())
 	}
 	log.Errorf("Unknown query type \"%s\" for templating Request.Body", queryType)
 	return ""
 }
 
-func jsonPath(query, toMatch string) string {
+func jsonPath(query, toMatch string) interface{} {
 	query = PrepareJsonPathQuery(query)
 
 	result, err := JsonPathExecution(query, toMatch)
@@ -408,7 +407,16 @@ func jsonPath(query, toMatch string) string {
 		result = strconv.Itoa(intResult)
 	}
 
-	return result
+	// convert to array data if applicable
+	var data interface{}
+	err = json.Unmarshal([]byte(result), &data)
+
+	arrayData, ok := data.([]interface{})
+
+	if err != nil || !ok {
+		return result
+	}
+	return arrayData
 }
 
 func xPath(query, toMatch string) string {

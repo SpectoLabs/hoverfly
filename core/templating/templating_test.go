@@ -495,6 +495,18 @@ func Test_ApplyTemplate_Request_Body_Jsonpath_LargeInt(t *testing.T) {
 	Expect(template).To(Equal("5553686208582"))
 }
 
+func Test_ApplyTemplate_Request_Body_Jsonpath_From_Xml(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Body: `<?xml version="1.0" encoding="UTF-8"?><name>Johnny</name>`,
+	}, make(map[string]string), `{{ Request.Body 'jsonpathfromxml' '$.name' }}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("Johnny"))
+}
+
 func Test_ApplyTemplate_ReplaceStringInQueryParams(t *testing.T) {
 	RegisterTestingT(t)
 
