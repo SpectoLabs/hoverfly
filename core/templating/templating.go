@@ -87,6 +87,11 @@ func NewTemplator() *Templator {
 	helperMethodMap["requestBody"] = t.requestBody
 	helperMethodMap["csv"] = t.parseCsv
 	helperMethodMap["journal"] = t.parseJournalBasedOnIndex
+	helperMethodMap["sum"] = t.sum
+	helperMethodMap["add"] = t.add
+	helperMethodMap["subtract"] = t.subtract
+	helperMethodMap["multiply"] = t.multiply
+	helperMethodMap["divide"] = t.divide
 	if !helpersRegistered {
 		raymond.RegisterHelpers(helperMethodMap)
 		helpersRegistered = true

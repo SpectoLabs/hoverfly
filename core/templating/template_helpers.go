@@ -3,6 +3,7 @@ package templating
 import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/journal"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
@@ -181,6 +182,71 @@ func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSourc
 		}
 	}
 	return getEvaluationString("journal", options)
+}
+
+func (t templateHelpers) sum(numbers []string, format string) string {
+	return sumNumbers(numbers, format)
+}
+
+func (t templateHelpers) add(val1 string, val2 string, format string) string {
+	return sumNumbers([]string{val1, val2}, format)
+}
+
+func (t templateHelpers) subtract(val1 string, val2 string, format string) string {
+	f1, err1 := strconv.ParseFloat(val1, 64)
+	f2, err2 := strconv.ParseFloat(val2, 64)
+	if err1 != nil || err2 != nil {
+		return "NaN"
+	}
+	return formatNumber(f1-f2, format)
+}
+
+func (t templateHelpers) multiply(val1 string, val2 string, format string) string {
+	f1, err1 := strconv.ParseFloat(val1, 64)
+	f2, err2 := strconv.ParseFloat(val2, 64)
+	if err1 != nil || err2 != nil {
+		return "NaN"
+	}
+	return formatNumber(f1*f2, format)
+}
+
+func (t templateHelpers) divide(val1 string, val2 string, format string) string {
+	f1, err1 := strconv.ParseFloat(val1, 64)
+	f2, err2 := strconv.ParseFloat(val2, 64)
+	if err1 != nil || err2 != nil {
+		return "NaN"
+	}
+	return formatNumber(f1/f2, format)
+}
+
+func sumNumbers(numbers []string, format string) string {
+	var sum float64 = 0
+	for _, number := range numbers {
+		value, err := strconv.ParseFloat(number, 64)
+		if err != nil {
+			log.Error(err)
+			return "NaN"
+		}
+		sum += value
+	}
+
+	return formatNumber(sum, format)
+}
+
+func formatNumber(number float64, format string) string {
+	if format == "" {
+		return strings.TrimRight(strings.TrimRight(fmt.Sprintf("%f", number), "0"), ".")
+	}
+
+	decimalPlaces := 0
+	parts := strings.Split(format, ".")
+	if len(parts) == 2 {
+		decimalPlaces = len(parts[1])
+	}
+
+	multiplier := math.Pow(10, float64(decimalPlaces))
+	rounded := math.Round(number*multiplier) / multiplier
+	return fmt.Sprintf("%."+strconv.Itoa(decimalPlaces)+"f", rounded)
 }
 
 func getIndexEntry(journalIndexDetails Journal, indexName, indexValue string) (*JournalEntry, error) {

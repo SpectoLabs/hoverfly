@@ -554,6 +554,86 @@ func Test_VarSetToProperValueInCaseOfRequestDetailsPassedAsArgument(t *testing.T
 
 }
 
+func Test_ApplyTemplate_add_integers(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add '1' '2' '0'}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("3"))
+}
+
+func Test_ApplyTemplate_add_floats(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add '0.1' '1.34' '0.00'}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("1.44"))
+}
+
+func Test_ApplyTemplate_add_floats_withRoundUp(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add '0.1' '1.34' '0.0'}} and {{ add '0.1' '1.56' '0.0'}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("1.4 and 1.7"))
+}
+
+func Test_ApplyTemplate_add_number_without_format(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add '0.1' '1.34' ''}} and {{ add '1' '2' ''}} and {{ add '0' '0' ''}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("1.44 and 3 and 0"))
+}
+
+func Test_ApplyTemplate_add_NotNumber(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add 'a' 'b' '0.00'}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("NaN"))
+}
+
+func Test_ApplyTemplate_subtract_numbers(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ subtract '10' '0.99' ''}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("9.01"))
+}
+
+func Test_ApplyTemplate_mutiply_numbers(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ multiply '10' '0.99' ''}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("9.9"))
+}
+
+func Test_ApplyTemplate_divide_numbers(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ divide '10' '2.5' ''}}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("4"))
+}
+
 func toInterfaceSlice(arguments []string) []interface{} {
 	argumentsArray := make([]interface{}, len(arguments))
 
