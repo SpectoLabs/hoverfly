@@ -63,10 +63,13 @@ var helpersRegistered = false
 func NewTemplator() *Templator {
 
 	templateDataSource := NewTemplateDataSource()
+	arrayData := make(map[string][]string)
+
 	t := templateHelpers{
 		now:                time.Now,
 		fakerSource:        gofakeit.New(0),
 		TemplateDataSource: templateDataSource,
+		ArrayData:          arrayData,
 	}
 	helperMethodMap := make(map[string]interface{})
 	helperMethodMap["now"] = t.nowHelper
@@ -92,6 +95,8 @@ func NewTemplator() *Templator {
 	helperMethodMap["subtract"] = t.subtract
 	helperMethodMap["multiply"] = t.multiply
 	helperMethodMap["divide"] = t.divide
+	helperMethodMap["addToArray"] = t.addToArray
+	helperMethodMap["getArray"] = t.getArray
 	if !helpersRegistered {
 		raymond.RegisterHelpers(helperMethodMap)
 		helpersRegistered = true

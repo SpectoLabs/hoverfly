@@ -557,7 +557,7 @@ func Test_VarSetToProperValueInCaseOfRequestDetailsPassedAsArgument(t *testing.T
 func Test_ApplyTemplate_add_integers(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add '1' '2' '0'}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add 1 2 '0'}}`)
 
 	Expect(err).To(BeNil())
 
@@ -567,7 +567,7 @@ func Test_ApplyTemplate_add_integers(t *testing.T) {
 func Test_ApplyTemplate_add_floats(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add '0.1' '1.34' '0.00'}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add 0.1 1.34 '0.00'}}`)
 
 	Expect(err).To(BeNil())
 
@@ -577,7 +577,7 @@ func Test_ApplyTemplate_add_floats(t *testing.T) {
 func Test_ApplyTemplate_add_floats_withRoundUp(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add '0.1' '1.34' '0.0'}} and {{ add '0.1' '1.56' '0.0'}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add 0.1 1.34 '0.0'}} and {{ add 0.1 1.56 '0.0'}}`)
 
 	Expect(err).To(BeNil())
 
@@ -587,7 +587,7 @@ func Test_ApplyTemplate_add_floats_withRoundUp(t *testing.T) {
 func Test_ApplyTemplate_add_number_without_format(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add '0.1' '1.34' ''}} and {{ add '1' '2' ''}} and {{ add '0' '0' ''}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ add 0.1 1.34 ''}} and {{ add 1 2 ''}} and {{ add 0 0 ''}}`)
 
 	Expect(err).To(BeNil())
 
@@ -607,7 +607,7 @@ func Test_ApplyTemplate_add_NotNumber(t *testing.T) {
 func Test_ApplyTemplate_subtract_numbers(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ subtract '10' '0.99' ''}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ subtract 10 0.99 ''}}`)
 
 	Expect(err).To(BeNil())
 
@@ -617,7 +617,7 @@ func Test_ApplyTemplate_subtract_numbers(t *testing.T) {
 func Test_ApplyTemplate_mutiply_numbers(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ multiply '10' '0.99' ''}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ multiply 10 0.99 ''}}`)
 
 	Expect(err).To(BeNil())
 
@@ -627,11 +627,22 @@ func Test_ApplyTemplate_mutiply_numbers(t *testing.T) {
 func Test_ApplyTemplate_divide_numbers(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ divide '10' '2.5' ''}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ divide 10 2.5 ''}}`)
 
 	Expect(err).To(BeNil())
 
 	Expect(template).To(Equal("4"))
+}
+
+func Test_ApplyTemplate_Arithmetic_Ops_With_Each_Block(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Body: `{"lineitems":{"lineitem":[{"upc":"1001","quantity":"1","price":"3.50"},{"upc":"1002","quantity":"2","price":"4.50"}]}}`,
+	}, make(map[string]string), `{{#each (Request.Body 'jsonpath' '$.lineitems.lineitem') }} {{ addToArray 'subtotal' (multiply (this.price) (this.quantity) '') }} {{/each}} total: {{ sum (getArray 'subtotal') '0.00' }}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(` 3.5  9  total: 12.50`))
 }
 
 func toInterfaceSlice(arguments []string) []interface{} {
