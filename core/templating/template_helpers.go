@@ -220,9 +220,9 @@ func (t templateHelpers) divide(val1 string, val2 string, format string) string 
 }
 
 func (t templateHelpers) addToArray(key string, value string, options *raymond.Options) string {
-	arrayData := options.ValueFromAllCtx("ArrayData").(map[string][]string)
+	arrayData := options.ValueFromAllCtx("Kvs").(map[string]interface{})
 	if array, ok := arrayData[key]; ok {
-		arrayData[key] = append(array, value)
+		arrayData[key] = append(array.([]string), value)
 	} else {
 		arrayData[key] = []string{value}
 	}
@@ -230,9 +230,9 @@ func (t templateHelpers) addToArray(key string, value string, options *raymond.O
 }
 
 func (t templateHelpers) getArray(key string, options *raymond.Options) []string {
-	arrayData := options.ValueFromAllCtx("ArrayData").(map[string][]string)
+	arrayData := options.ValueFromAllCtx("Kvs").(map[string]interface{})
 	if array, ok := arrayData[key]; ok {
-		return array
+		return array.([]string)
 	} else {
 		return []string{}
 	}

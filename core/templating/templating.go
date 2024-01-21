@@ -25,7 +25,7 @@ type TemplatingData struct {
 	Literals        map[string]interface{}
 	Vars            map[string]interface{}
 	Journal         Journal
-	ArrayData       map[string][]string
+	Kvs             map[string]interface{}
 }
 
 type Request struct {
@@ -162,7 +162,7 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 
 	}
 
-	arrayData := make(map[string][]string)
+	kvs := make(map[string]interface{})
 	return &TemplatingData{
 		Request:  getRequest(requestDetails),
 		Literals: literalMap,
@@ -172,7 +172,7 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 		CurrentDateTime: func(a1, a2, a3 string) string {
 			return a1 + " " + a2 + " " + a3
 		},
-		ArrayData: arrayData,
+		Kvs: kvs,
 	}
 
 }
