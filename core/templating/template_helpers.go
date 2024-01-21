@@ -24,7 +24,6 @@ type templateHelpers struct {
 	now                func() time.Time
 	fakerSource        *gofakeit.Faker
 	TemplateDataSource *TemplateDataSource
-	ArrayData          map[string][]string
 }
 
 func (t templateHelpers) nowHelper(offset string, format string) string {
@@ -220,17 +219,19 @@ func (t templateHelpers) divide(val1 string, val2 string, format string) string 
 	return formatNumber(f1/f2, format)
 }
 
-func (t templateHelpers) addToArray(key string, value string) string {
-	if array, ok := t.ArrayData[key]; ok {
-		t.ArrayData[key] = append(array, value)
+func (t templateHelpers) addToArray(key string, value string, options *raymond.Options) string {
+	arrayData := options.ValueFromAllCtx("ArrayData").(map[string][]string)
+	if array, ok := arrayData[key]; ok {
+		arrayData[key] = append(array, value)
 	} else {
-		t.ArrayData[key] = []string{value}
+		arrayData[key] = []string{value}
 	}
 	return value
 }
 
-func (t templateHelpers) getArray(key string) []string {
-	if array, ok := t.ArrayData[key]; ok {
+func (t templateHelpers) getArray(key string, options *raymond.Options) []string {
+	arrayData := options.ValueFromAllCtx("ArrayData").(map[string][]string)
+	if array, ok := arrayData[key]; ok {
 		return array
 	} else {
 		return []string{}

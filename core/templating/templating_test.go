@@ -637,12 +637,24 @@ func Test_ApplyTemplate_divide_numbers(t *testing.T) {
 func Test_ApplyTemplate_Arithmetic_Ops_With_Each_Block(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{
+	templator := templating.NewTemplator()
+
+	requestDetails := &models.RequestDetails{
 		Body: `{"lineitems":{"lineitem":[{"upc":"1001","quantity":"1","price":"3.50"},{"upc":"1002","quantity":"2","price":"4.50"}]}}`,
-	}, make(map[string]string), `{{#each (Request.Body 'jsonpath' '$.lineitems.lineitem') }} {{ addToArray 'subtotal' (multiply (this.price) (this.quantity) '') }} {{/each}} total: {{ sum (getArray 'subtotal') '0.00' }}`)
+	}
+	responseBody := `{{#each (Request.Body 'jsonpath' '$.lineitems.lineitem') }} {{ addToArray 'subtotal' (multiply (this.price) (this.quantity) '') }} {{/each}} total: {{ sum (getArray 'subtotal') '0.00' }}`
+
+	template, _ := templator.ParseTemplate(responseBody)
+	state := make(map[string]string)
+	result, err := templator.RenderTemplate(template, requestDetails, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
 
 	Expect(err).To(BeNil())
-	Expect(template).To(Equal(` 3.5  9  total: 12.50`))
+	Expect(result).To(Equal(` 3.5  9  total: 12.50`))
+
+	// Running the second time should produce the same result because each execution has its own context data.
+	result, err = templator.RenderTemplate(template, requestDetails, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
+	Expect(err).To(BeNil())
+	Expect(result).To(Equal(` 3.5  9  total: 12.50`))
 }
 
 func toInterfaceSlice(arguments []string) []interface{} {

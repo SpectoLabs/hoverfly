@@ -25,6 +25,7 @@ type TemplatingData struct {
 	Literals        map[string]interface{}
 	Vars            map[string]interface{}
 	Journal         Journal
+	ArrayData       map[string][]string
 }
 
 type Request struct {
@@ -63,13 +64,11 @@ var helpersRegistered = false
 func NewTemplator() *Templator {
 
 	templateDataSource := NewTemplateDataSource()
-	arrayData := make(map[string][]string)
 
 	t := templateHelpers{
 		now:                time.Now,
 		fakerSource:        gofakeit.New(0),
 		TemplateDataSource: templateDataSource,
-		ArrayData:          arrayData,
 	}
 	helperMethodMap := make(map[string]interface{})
 	helperMethodMap["now"] = t.nowHelper
@@ -163,6 +162,7 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 
 	}
 
+	arrayData := make(map[string][]string)
 	return &TemplatingData{
 		Request:  getRequest(requestDetails),
 		Literals: literalMap,
@@ -172,6 +172,7 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 		CurrentDateTime: func(a1, a2, a3 string) string {
 			return a1 + " " + a2 + " " + a3
 		},
+		ArrayData: arrayData,
 	}
 
 }
