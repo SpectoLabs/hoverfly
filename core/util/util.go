@@ -25,7 +25,7 @@ import (
 	"strconv"
 	"time"
 
-	xj "github.com/basgys/goxml2json"
+	xj "github.com/SpectoLabs/goxml2json"
 	"github.com/tdewolff/minify/v2"
 	mjson "github.com/tdewolff/minify/v2/json"
 	"github.com/tdewolff/minify/v2/xml"

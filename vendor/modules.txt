@@ -21,6 +21,9 @@ github.com/SpectoLabs/goproxy
 # github.com/SpectoLabs/goproxy/ext v0.0.0-20220724221645-71c396c297b7
 ## explicit
 github.com/SpectoLabs/goproxy/ext/auth
+# github.com/SpectoLabs/goxml2json v0.0.0-20240121223617-8e03292c14ea
+## explicit; go 1.16
+github.com/SpectoLabs/goxml2json
 # github.com/SpectoLabs/raymond v2.0.3-0.20240313210732-e0e216cf0920+incompatible
 ## explicit
 github.com/SpectoLabs/raymond
@@ -32,14 +35,9 @@ github.com/antonholmquist/jason
 github.com/aymerick/raymond/ast
 github.com/aymerick/raymond/lexer
 github.com/aymerick/raymond/parser
-# github.com/basgys/goxml2json v1.1.0
-## explicit
-github.com/basgys/goxml2json
 # github.com/beevik/etree v1.1.0
 ## explicit
 github.com/beevik/etree
-# github.com/bitly/go-simplejson v0.5.1
-## explicit; go 1.17
 # github.com/boltdb/bolt v1.2.1-0.20160424201119-d97499360d1e
 ## explicit
 github.com/boltdb/bolt
