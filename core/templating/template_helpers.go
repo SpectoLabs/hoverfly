@@ -238,6 +238,23 @@ func (t templateHelpers) getArray(key string, options *raymond.Options) []string
 	}
 }
 
+func (t templateHelpers) putValue(key string, value string, options *raymond.Options) string {
+	kvs := options.ValueFromAllCtx("Kvs").(map[string]interface{})
+	kvs[key] = value
+	return value
+}
+
+func (t templateHelpers) getValue(key string, options *raymond.Options) string {
+	kvs := options.ValueFromAllCtx("Kvs").(map[string]interface{})
+	value, exits := kvs[key]
+
+	if exits {
+		return value.(string)
+	} else {
+		return ""
+	}
+}
+
 func sumNumbers(numbers []string, format string) string {
 	var sum float64 = 0
 	for _, number := range numbers {

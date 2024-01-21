@@ -96,6 +96,8 @@ func NewTemplator() *Templator {
 	helperMethodMap["divide"] = t.divide
 	helperMethodMap["addToArray"] = t.addToArray
 	helperMethodMap["getArray"] = t.getArray
+	helperMethodMap["putValue"] = t.putValue
+	helperMethodMap["getValue"] = t.getValue
 	if !helpersRegistered {
 		raymond.RegisterHelpers(helperMethodMap)
 		helpersRegistered = true

@@ -657,6 +657,18 @@ func Test_ApplyTemplate_Arithmetic_Ops_With_Each_Block(t *testing.T) {
 	Expect(result).To(Equal(` 3.5  9  total: 12.50`))
 }
 
+func Test_ApplyTemplate_PutAndGetValue(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Body: `{ "id": 5553686208582 }`,
+	}, make(map[string]string), `{{ putValue 'id' (Request.Body 'jsonpath' '$.id') }} The ID was {{ getValue 'id' }}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("5553686208582 The ID was 5553686208582"))
+}
+
 func toInterfaceSlice(arguments []string) []interface{} {
 	argumentsArray := make([]interface{}, len(arguments))
 
