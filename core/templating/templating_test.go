@@ -642,7 +642,7 @@ func Test_ApplyTemplate_Arithmetic_Ops_With_Each_Block(t *testing.T) {
 	requestDetails := &models.RequestDetails{
 		Body: `{"lineitems":{"lineitem":[{"upc":"1001","quantity":"1","price":"3.50"},{"upc":"1002","quantity":"2","price":"4.50"}]}}`,
 	}
-	responseBody := `{{#each (Request.Body 'jsonpath' '$.lineitems.lineitem') }} {{ addToArray 'subtotal' (multiply (this.price) (this.quantity) '') }} {{/each}} total: {{ sum (getArray 'subtotal') '0.00' }}`
+	responseBody := `{{#each (Request.Body 'jsonpath' '$.lineitems.lineitem') }} {{ addToArray 'subtotal' (multiply (this.price) (this.quantity) '') true }} {{/each}} total: {{ sum (getArray 'subtotal') '0.00' }}`
 
 	template, _ := templator.ParseTemplate(responseBody)
 	state := make(map[string]string)
@@ -662,11 +662,23 @@ func Test_ApplyTemplate_PutAndGetValue(t *testing.T) {
 
 	template, err := ApplyTemplate(&models.RequestDetails{
 		Body: `{ "id": 5553686208582 }`,
-	}, make(map[string]string), `{{ putValue 'id' (Request.Body 'jsonpath' '$.id') }} The ID was {{ getValue 'id' }}`)
+	}, make(map[string]string), `{{ putValue 'id' (Request.Body 'jsonpath' '$.id') true }} The ID was {{ getValue 'id' }}`)
 
 	Expect(err).To(BeNil())
 
 	Expect(template).To(Equal("5553686208582 The ID was 5553686208582"))
+}
+
+func Test_ApplyTemplate_PutAndGetValue_SuppressOutput(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Body: `{ "id": 5553686208582 }`,
+	}, make(map[string]string), `{{ putValue 'id' (Request.Body 'jsonpath' '$.id') false }}The ID was {{ getValue 'id' }}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal("The ID was 5553686208582"))
 }
 
 func toInterfaceSlice(arguments []string) []interface{} {

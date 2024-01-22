@@ -219,14 +219,19 @@ func (t templateHelpers) divide(val1 string, val2 string, format string) string 
 	return formatNumber(f1/f2, format)
 }
 
-func (t templateHelpers) addToArray(key string, value string, options *raymond.Options) string {
+func (t templateHelpers) addToArray(key string, value string, output bool, options *raymond.Options) string {
 	arrayData := options.ValueFromAllCtx("Kvs").(map[string]interface{})
 	if array, ok := arrayData[key]; ok {
 		arrayData[key] = append(array.([]string), value)
 	} else {
 		arrayData[key] = []string{value}
 	}
-	return value
+
+	if output {
+		return value
+	} else {
+		return ""
+	}
 }
 
 func (t templateHelpers) getArray(key string, options *raymond.Options) []string {
@@ -238,10 +243,14 @@ func (t templateHelpers) getArray(key string, options *raymond.Options) []string
 	}
 }
 
-func (t templateHelpers) putValue(key string, value string, options *raymond.Options) string {
+func (t templateHelpers) putValue(key string, value string, output bool, options *raymond.Options) string {
 	kvs := options.ValueFromAllCtx("Kvs").(map[string]interface{})
 	kvs[key] = value
-	return value
+	if output {
+		return value
+	} else {
+		return ""
+	}
 }
 
 func (t templateHelpers) getValue(key string, options *raymond.Options) string {
