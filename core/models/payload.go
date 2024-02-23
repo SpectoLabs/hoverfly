@@ -97,7 +97,7 @@ func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error)
 		Method:      req.Method,
 		Destination: strings.ToLower(req.Host),
 		Scheme:      scheme,
-		Query:       req.URL.Query(),
+		Query:       parseQuery(req.URL.RawQuery),
 		Body:        reqBody,
 		FormData:    req.PostForm,
 		Headers:     req.Header.Clone(),
@@ -319,4 +319,27 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 
 func (this *RequestDetails) GetRawQuery() string {
 	return this.rawQuery
+}
+
+// Similar to req.URL.Query() but allowing compound query params like qq=country=BEL;postalCode=1234;city=SomeCity;street=SomeStreet;houseNumber=25%20a
+func parseQuery(query string) map[string][]string {
+	m := make(map[string][]string)
+	for query != "" {
+		var key string
+		key, query, _ = strings.Cut(query, "&")
+		if key == "" {
+			continue
+		}
+		key, value, _ := strings.Cut(key, "=")
+		key, err := url.QueryUnescape(key)
+		if err != nil {
+			continue
+		}
+		value, err = url.QueryUnescape(value)
+		if err != nil {
+			continue
+		}
+		m[key] = append(m[key], value)
+	}
+	return m
 }
