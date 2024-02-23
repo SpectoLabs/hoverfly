@@ -249,6 +249,15 @@ func Test_NewRequestDetailsFromHttpRequest_SortsQueryString(t *testing.T) {
 	Expect(requestDetails.QueryString()).To(Equal("a=a&a=b"))
 }
 
+func Test_NewRequestDetailsFromHttpRequest_ParseCompoundQueryParam(t *testing.T) {
+	RegisterTestingT(t)
+	request, _ := http.NewRequest("GET", "http://test.org/?qq=country=BEL;postalCode=1234;city=SomeCity;street=SomeStreet;houseNumber=25%20a", nil)
+	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
+	Expect(err).To(BeNil())
+
+	Expect(requestDetails.Query["qq"]).To(ContainElement("country=BEL;postalCode=1234;city=SomeCity;street=SomeStreet;houseNumber=25 a"))
+}
+
 func Test_NewRequestDetailsFromHttpRequest_WithFormDataHavingNonEmptyBody(t *testing.T) {
 	RegisterTestingT(t)
 	form := url.Values{}
