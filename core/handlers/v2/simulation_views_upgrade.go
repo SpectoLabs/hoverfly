@@ -110,14 +110,13 @@ func upgradeV1(originalSimulation SimulationViewV1) SimulationViewV5 {
 
 		pair := RequestMatcherResponsePairViewV5{
 			RequestMatcher: RequestMatcherViewV5{
-				Scheme:          schemeMatchers,
-				Method:          methodMatchers,
-				Destination:     destinationMatchers,
-				Path:            pathMatchers,
-				Body:            bodyMatchers,
-				Headers:         headersWithMatchers,
-				RequiresState:   nil,
-				DeprecatedQuery: queryMatchers,
+				Scheme:        schemeMatchers,
+				Method:        methodMatchers,
+				Destination:   destinationMatchers,
+				Path:          pathMatchers,
+				Body:          bodyMatchers,
+				Headers:       headersWithMatchers,
+				RequiresState: nil,
 			},
 			Response: ResponseDetailsViewV5{
 				Body:             pairV1.Response.Body,
@@ -178,14 +177,13 @@ func upgradeV2(originalSimulation SimulationViewV2) SimulationViewV5 {
 
 		requestResponsePair := RequestMatcherResponsePairViewV5{
 			RequestMatcher: RequestMatcherViewV5{
-				Destination:     destinationMatchers,
-				Headers:         headersWithMatchers,
-				Method:          methodMatchers,
-				Path:            pathMatchers,
-				Scheme:          schemeMatchers,
-				Body:            bodyMatchers,
-				RequiresState:   nil,
-				DeprecatedQuery: queryMatchers,
+				Destination:   destinationMatchers,
+				Headers:       headersWithMatchers,
+				Method:        methodMatchers,
+				Path:          pathMatchers,
+				Scheme:        schemeMatchers,
+				Body:          bodyMatchers,
+				RequiresState: nil,
 			},
 			Response: ResponseDetailsViewV5{
 				Body:             requestResponsePairV2.Response.Body,
@@ -265,15 +263,14 @@ func upgradeV4(originalSimulation SimulationViewV4) SimulationViewV5 {
 
 		requestResponsePair := RequestMatcherResponsePairViewV5{
 			RequestMatcher: RequestMatcherViewV5{
-				Destination:     destinationMatchers,
-				Method:          methodMatchers,
-				Path:            pathMatchers,
-				Scheme:          schemeMatchers,
-				Body:            bodyMatchers,
-				Headers:         headersWithMatchers,
-				Query:           queriesWithMatchers,
-				RequiresState:   requestResponsePairV2.RequestMatcher.RequiresState,
-				DeprecatedQuery: queryMatchers,
+				Destination:   destinationMatchers,
+				Method:        methodMatchers,
+				Path:          pathMatchers,
+				Scheme:        schemeMatchers,
+				Body:          bodyMatchers,
+				Headers:       headersWithMatchers,
+				Query:         queriesWithMatchers,
+				RequiresState: requestResponsePairV2.RequestMatcher.RequiresState,
 			},
 			Response: ResponseDetailsViewV5{
 				Body:             requestResponsePairV2.Response.Body,

@@ -169,20 +169,19 @@ func (this *Journal) GetFilteredEntries(journalEntryFilterView v2.JournalEntryFi
 	}
 
 	requestMatcher := models.RequestMatcher{
-		Path:            models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Path),
-		Method:          models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Method),
-		Destination:     models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Destination),
-		Scheme:          models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Scheme),
-		DeprecatedQuery: models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.DeprecatedQuery),
-		Body:            models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
-		Query:           models.NewQueryRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Query),
-		Headers:         models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Headers),
+		Path:        models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Path),
+		Method:      models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Method),
+		Destination: models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Destination),
+		Scheme:      models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Scheme),
+		Body:        models.NewRequestFieldMatchersFromView(journalEntryFilterView.Request.Body),
+		Query:       models.NewQueryRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Query),
+		Headers:     models.NewRequestFieldMatchersFromMapView(journalEntryFilterView.Request.Headers),
 	}
 
 	for _, entry := range this.entries {
 		if requestMatcher.Body == nil && requestMatcher.Destination == nil &&
 			requestMatcher.Headers == nil && requestMatcher.Method == nil &&
-			requestMatcher.Path == nil && requestMatcher.DeprecatedQuery == nil &&
+			requestMatcher.Path == nil &&
 			requestMatcher.Scheme == nil && requestMatcher.Query == nil {
 			continue
 		}

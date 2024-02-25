@@ -729,36 +729,6 @@ func TestImportImportRequestResponsePairsMultipleTimes_SetsAllStates(t *testing.
 	}).Should(Equal("1"))
 }
 
-func TestImportImportRequestResponsePairs_ReturnsWarningsIfDeprecatedQuerytSet(t *testing.T) {
-	RegisterTestingT(t)
-
-	cache := cache.NewDefaultLRUCache()
-	cfg := Configuration{Webserver: false}
-	cacheMatcher := matching.CacheMatcher{RequestCache: cache, Webserver: cfg.Webserver}
-	hv := Hoverfly{Cfg: &cfg, CacheMatcher: cacheMatcher, Simulation: models.NewSimulation(), templator: templating.NewTemplator(), PostServeActionDetails: action.NewPostServeActionDetails()}
-
-	encodedPair := v2.RequestMatcherResponsePairViewV5{
-		Response: v2.ResponseDetailsViewV5{
-			Status:      200,
-			Body:        base64String("hello_world"),
-			EncodedBody: true,
-			Headers:     map[string][]string{"Content-Encoding": {"gzip"}}},
-		RequestMatcher: v2.RequestMatcherViewV5{
-			DeprecatedQuery: []v2.MatcherViewV5{
-				{
-					Matcher: "exact",
-					Value:   "deprecated",
-				},
-			},
-		},
-	}
-
-	result := hv.importRequestResponsePairViewsWithCustomData([]v2.RequestMatcherResponsePairViewV5{encodedPair}, []v2.GlobalLiteralViewV5{}, []v2.GlobalVariableViewV5{})
-
-	Expect(result.WarningMessages).To(HaveLen(1))
-	Expect(result.WarningMessages[0].Message).To(ContainSubstring("data.pairs[0].request.deprecatedQuery"))
-}
-
 func TestImportImportRequestResponsePairs_ReturnsWarningsContentLengthAndTransferEncodingSet(t *testing.T) {
 	RegisterTestingT(t)
 

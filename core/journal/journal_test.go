@@ -703,28 +703,6 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 		},
 	})).To(HaveLen(0))
 
-	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			DeprecatedQuery: []v2.MatcherViewV5{
-				{
-					Matcher: matchers.Exact,
-					Value:   "one=1&two=2",
-				},
-			},
-		},
-	})).To(HaveLen(1))
-
-	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
-		Request: &v2.RequestMatcherViewV5{
-			DeprecatedQuery: []v2.MatcherViewV5{
-				{
-					Matcher: matchers.Glob,
-					Value:   "one=1*",
-				},
-			},
-		},
-	})).To(HaveLen(1))
-
 	// Scheme
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
