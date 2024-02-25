@@ -77,10 +77,6 @@ func Test_upgradeV1_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal(matchers.Exact))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("/path"))
 
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal(matchers.Exact))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("query=query"))
-
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveKeyWithValue("Test", []MatcherViewV5{
 		{
 			Matcher: matchers.Glob,
@@ -153,10 +149,6 @@ func Test_upgradeV1_HandlesTemplates(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal(matchers.Glob))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("/path"))
 
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal(matchers.Glob))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("query=query"))
-
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Headers).To(BeEmpty())
 }
 func Test_upgradeV1_HandlesIncompleteRequest(t *testing.T) {
@@ -191,7 +183,6 @@ func Test_upgradeV1_HandlesIncompleteRequest(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Body).To(HaveLen(0))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Destination).To(HaveLen(0))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path).To(HaveLen(0))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(0))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method).To(HaveLen(1))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Method[0].Matcher).To(Equal(matchers.Exact))
@@ -231,9 +222,6 @@ func Test_upgradeV1_Upgrade_UnescapesRequestQueryParameters(t *testing.T) {
 	upgradedSimulation := upgradeV1(v1Simulation)
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal("exact"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("q=10 Downing Street London"))
 }
 
 func Test_upgradeV2_ReturnsAnUpgradedSimulation(t *testing.T) {
@@ -304,10 +292,6 @@ func Test_upgradeV2_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal("json"))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("*"))
 
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal(matchers.Exact))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("query=query"))
-
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(""))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Templated).To(BeFalse())
@@ -349,9 +333,6 @@ func Test_upgradeV2_UnescapesExactMatchRequestQueryParameters(t *testing.T) {
 	upgradedSimulation := upgradeV2(v2Simulation)
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal(matchers.Exact))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("q=10 Downing Street London"))
 }
 
 func Test_upgradeV2_UnescapesGlobMatchRequestQueryParameters(t *testing.T) {
@@ -383,10 +364,6 @@ func Test_upgradeV2_UnescapesGlobMatchRequestQueryParameters(t *testing.T) {
 	upgradedSimulation := upgradeV2(v2Simulation)
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
-
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal(matchers.Glob))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("q=* London"))
 }
 
 func Test_upgradeV2_Upgrade_KeepsEncodedResponsesEncoded(t *testing.T) {
@@ -453,12 +430,6 @@ func Test_upgradeV2_HandlesMultipleMatchers(t *testing.T) {
 	upgradedSimulation := upgradeV2(v2Simulation)
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
-
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(2))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal(matchers.Exact))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("testexact"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[1].Matcher).To(Equal(matchers.Glob))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[1].Value).To(Equal("testglob"))
 }
 
 func Test_upgradeV4_ReturnsAnUpgradedSimulation(t *testing.T) {
@@ -528,10 +499,6 @@ func Test_upgradeV4_ReturnsAnUpgradedSimulation(t *testing.T) {
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path).To(HaveLen(1))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Matcher).To(Equal("json"))
 	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.Path[0].Value).To(Equal("*"))
-
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal("exact"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("query=query"))
 
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.BodyFile).To(Equal(""))
 	Expect(upgradedSimulation.RequestResponsePairs[0].Response.Status).To(Equal(200))
@@ -608,9 +575,6 @@ func Test_upgradeV4_UnescapesExactMatchRequestQueryParameters(t *testing.T) {
 	upgradedSimulation := upgradeV4(v4Simulation)
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal("exact"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("q=10 Downing Street London"))
 }
 
 func Test_upgradeV4_UnescapesGlobMatchRequestQueryParameters(t *testing.T) {
@@ -642,10 +606,6 @@ func Test_upgradeV4_UnescapesGlobMatchRequestQueryParameters(t *testing.T) {
 	upgradedSimulation := upgradeV4(v4Simulation)
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
-
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(1))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal("glob"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("q=* London"))
 }
 
 func Test_upgradeV4_HandlesMultipleMatchers(t *testing.T) {
@@ -678,12 +638,6 @@ func Test_upgradeV4_HandlesMultipleMatchers(t *testing.T) {
 	upgradedSimulation := upgradeV4(v4Simulation)
 
 	Expect(upgradedSimulation.RequestResponsePairs).To(HaveLen(1))
-
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(2))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Matcher).To(Equal("exact"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[0].Value).To(Equal("testexact"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[1].Matcher).To(Equal("glob"))
-	Expect(upgradedSimulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery[1].Value).To(Equal("testglob"))
 }
 
 func Test_upgradeV4_HandlesNewHeaders(t *testing.T) {

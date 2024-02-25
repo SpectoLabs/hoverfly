@@ -56,7 +56,6 @@ func Test_NewSimulationViewFromRequestBody_CanCreateSimulationFromV3Payload(t *t
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Method).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path).To(HaveLen(0))
-	Expect(simulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(HaveLen(0))
 
 	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal("exact match"))
@@ -123,7 +122,6 @@ func Test_NewSimulationViewFromRequestBody_CanCreateSimulationFromV2Payload(t *t
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Method).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path).To(HaveLen(0))
-	Expect(simulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(HaveLen(0))
 
 	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal("exact match"))
@@ -221,7 +219,6 @@ func Test_NewSimulationViewFromRequestBody_CanCreateSimulationFromV1Payload(t *t
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Headers).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Method).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Path).To(HaveLen(0))
-	Expect(simulation.RequestResponsePairs[0].RequestMatcher.DeprecatedQuery).To(HaveLen(0))
 	Expect(simulation.RequestResponsePairs[0].RequestMatcher.Scheme).To(HaveLen(0))
 
 	Expect(simulation.RequestResponsePairs[0].Response.Body).To(Equal("exact match"))
@@ -326,28 +323,28 @@ func Test_NewSimulationViewFromRequestBody_WontCreateSimulationFromInvalidJson(t
 	Expect(simulation.GlobalActions.DelaysLogNormal).To(HaveLen(0))
 }
 
-func Test_SimulationImportResult_AddDeprecatedQueryWarning_AddsWarning(t *testing.T) {
+func Test_SimulationImportResult_AddPairIgnoredWarning_AddsWarning(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := v2.SimulationImportResult{}
-	unit.AddDeprecatedQueryWarning(15)
+	unit.AddPairIgnoredWarning(15)
 
 	Expect(unit.WarningMessages).To(HaveLen(1))
 
 	Expect(unit.WarningMessages[0].Message).To(ContainSubstring("WARNING"))
-	Expect(unit.WarningMessages[0].Message).To(ContainSubstring("deprecatedQuery"))
-	Expect(unit.WarningMessages[0].Message).To(ContainSubstring("data.pairs[15].request.deprecatedQuery"))
+	Expect(unit.WarningMessages[0].Message).To(ContainSubstring("conflict with the existing simulation"))
+	Expect(unit.WarningMessages[0].Message).To(ContainSubstring("data.pairs[15]"))
 }
 
 func Test_SimulationImportResult_WriteResponse_IncludesMultipleWarnings(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := v2.SimulationImportResult{}
-	unit.AddDeprecatedQueryWarning(15)
-	unit.AddDeprecatedQueryWarning(30)
-	unit.AddDeprecatedQueryWarning(45)
+	unit.AddPairIgnoredWarning(15)
+	unit.AddPairIgnoredWarning(30)
+	unit.AddPairIgnoredWarning(45)
 
-	Expect(unit.WarningMessages[0].Message).To(ContainSubstring("data.pairs[15].request.deprecatedQuery"))
-	Expect(unit.WarningMessages[1].Message).To(ContainSubstring("data.pairs[30].request.deprecatedQuery"))
-	Expect(unit.WarningMessages[2].Message).To(ContainSubstring("data.pairs[45].request.deprecatedQuery"))
+	Expect(unit.WarningMessages[0].Message).To(ContainSubstring("data.pairs[15]"))
+	Expect(unit.WarningMessages[1].Message).To(ContainSubstring("data.pairs[30]"))
+	Expect(unit.WarningMessages[2].Message).To(ContainSubstring("data.pairs[45]"))
 }

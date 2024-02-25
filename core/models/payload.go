@@ -317,6 +317,6 @@ func (r *ResponseDetails) ConvertToResponseDetailsViewV5() v2.ResponseDetailsVie
 	return view
 }
 
-func (this RequestDetails) GetRawQuery() string {
+func (this *RequestDetails) GetRawQuery() string {
 	return this.rawQuery
 }

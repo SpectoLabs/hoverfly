@@ -306,12 +306,6 @@ func Test_FirstMatchStrategy_EndpointMatchWithHeaders(t *testing.T) {
 					Value:   "GET",
 				},
 			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "q=test",
-				},
-			},
 		},
 		Response: testResponse,
 	})
@@ -374,12 +368,6 @@ func Test_FirstMatchStrategy_EndpointMismatchWithHeadersReturnsNil(t *testing.T)
 					Value:   "GET",
 				},
 			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "q=test",
-				},
-			},
 		},
 		Response: testResponse,
 	})
@@ -425,12 +413,6 @@ func Test_FirstMatchStrategy_AbleToMatchAnEmptyPathInAReasonableWay(t *testing.T
 				{
 					Matcher: matchers.Exact,
 					Value:   "GET",
-				},
-			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "q=test",
 				},
 			},
 		},
@@ -637,12 +619,6 @@ func Test_FirstMatchShouldNotBeCacheableIfMatchedOnEverythingApartFromHeadersAtL
 					Value:   "http",
 				},
 			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "foo=bar",
-				},
-			},
 			Path: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -724,10 +700,12 @@ func Test_FirstMatchShouldBeCacheableIfMatchedOnEverythingApartFromHeadersZeroTi
 					Value:   "http",
 				},
 			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "?foo=bar",
+			Query: &models.QueryRequestFieldMatchers{
+				"foo": []models.RequestFieldMatchers{
+					{
+						Matcher: matchers.Exact,
+						Value:   "bar",
+					},
 				},
 			},
 			Path: []models.RequestFieldMatchers{
@@ -915,12 +893,6 @@ func Test_FirstMatchShouldNotBeCacheableIfMatchedOnEverythingApartFromStateAtLea
 					Value:   "http",
 				},
 			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "foo=bar",
-				},
-			},
 			Path: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -994,10 +966,12 @@ func Test_FirstMatchShouldBeCacheableIfMatchedOnEverythingApartFromStateZeroTime
 					Value:   "http",
 				},
 			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "?foo=bar",
+			Query: &models.QueryRequestFieldMatchers{
+				"foo": []models.RequestFieldMatchers{
+					{
+						Matcher: matchers.Exact,
+						Value:   "bar",
+					},
 				},
 			},
 			Path: []models.RequestFieldMatchers{

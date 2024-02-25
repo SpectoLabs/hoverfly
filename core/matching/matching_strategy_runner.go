@@ -29,8 +29,6 @@ func MatchingStrategyRunner(req models.RequestDetails, webserver bool, simulatio
 
 		strategy.Matching(FieldMatcher(requestMatcher.Path, req.Path), "path")
 
-		strategy.Matching(FieldMatcher(requestMatcher.DeprecatedQuery, req.QueryString()), "query")
-
 		strategy.Matching(FieldMatcher(requestMatcher.Method, req.Method), "method")
 
 		strategy.Matching(HeaderMatching(requestMatcher, req.Headers), "headers")

@@ -156,10 +156,6 @@ func (hf *Hoverfly) importRequestResponsePairViewsWithCustomData(pairViews []v2.
 				importResult.AddPairIgnoredWarning(i)
 			}
 
-			if pairView.RequestMatcher.DeprecatedQuery != nil && len(pairView.RequestMatcher.DeprecatedQuery) != 0 {
-				importResult.AddDeprecatedQueryWarning(i)
-			}
-
 			if len(pairView.Response.Headers["Content-Length"]) > 0 && len(pairView.Response.Headers["Transfer-Encoding"]) > 0 {
 				importResult.AddContentLengthAndTransferEncodingWarning(i)
 			}

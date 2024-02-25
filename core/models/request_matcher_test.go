@@ -215,26 +215,6 @@ func Test_NewRequestMatcherResponsePairFromView_LeavesQueriesWithMatchersNil(t *
 	Expect(unit.RequestMatcher.Query).To(BeNil())
 }
 
-func Test_NewRequestMatcherResponsePairFromView_SortsDeprecatedQuery(t *testing.T) {
-	RegisterTestingT(t)
-
-	unit := models.NewRequestMatcherResponsePairFromView(&v2.RequestMatcherResponsePairViewV5{
-		RequestMatcher: v2.RequestMatcherViewV5{
-			DeprecatedQuery: []v2.MatcherViewV5{
-				{
-					Matcher: matchers.Exact,
-					Value:   "b=b&a=a",
-				},
-			},
-		},
-		Response: v2.ResponseDetailsViewV5{
-			Body: "body",
-		},
-	})
-
-	Expect(unit.RequestMatcher.DeprecatedQuery[0].Value).To(Equal("a=a&b=b"))
-}
-
 func Test_NewRequestMatcherResponsePairFromView_StoresTemplated(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -284,12 +264,6 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDe
 				Value:   "path",
 			},
 		},
-		DeprecatedQuery: []models.RequestFieldMatchers{
-			{
-				Matcher: matchers.Exact,
-				Value:   "query=two",
-			},
-		},
 		Scheme: []models.RequestFieldMatchers{
 			{
 				Matcher: matchers.Exact,
@@ -304,7 +278,7 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_GeneratesARequestDe
 		Destination: "destination",
 		Method:      "method",
 		Path:        "path",
-		Query:       map[string][]string{"query": {"two"}},
+		Query:       map[string][]string{},
 		Scheme:      "scheme",
 	}))
 }
@@ -337,12 +311,6 @@ func Test_RequestMatcher_BuildRequestDetailsFromExactMatches_ReturnsNilIfMissing
 			{
 				Matcher: matchers.Exact,
 				Value:   "path",
-			},
-		},
-		DeprecatedQuery: []models.RequestFieldMatchers{
-			{
-				Matcher: matchers.Exact,
-				Value:   "query",
 			},
 		},
 		Scheme: []models.RequestFieldMatchers{

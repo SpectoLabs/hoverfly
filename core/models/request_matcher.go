@@ -2,8 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"net/url"
-
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching/matchers"
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -149,24 +147,17 @@ type RequestMatcherResponsePair struct {
 }
 
 func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV5) *RequestMatcherResponsePair {
-	for i, matcher := range view.RequestMatcher.DeprecatedQuery {
-		if matcher.Matcher == matchers.Exact {
-			sortedQuery := util.SortQueryString(matcher.Value.(string))
-			view.RequestMatcher.DeprecatedQuery[i].Value = sortedQuery
-		}
-	}
 
 	return &RequestMatcherResponsePair{
 		RequestMatcher: RequestMatcher{
-			Path:            NewRequestFieldMatchersFromView(view.RequestMatcher.Path),
-			Method:          NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
-			Destination:     NewRequestFieldMatchersFromView(view.RequestMatcher.Destination),
-			Scheme:          NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
-			DeprecatedQuery: NewRequestFieldMatchersFromView(view.RequestMatcher.DeprecatedQuery),
-			Body:            NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
-			Headers:         NewRequestFieldMatchersFromMapView(view.RequestMatcher.Headers),
-			Query:           NewQueryRequestFieldMatchersFromMapView(view.RequestMatcher.Query),
-			RequiresState:   view.RequestMatcher.RequiresState,
+			Path:          NewRequestFieldMatchersFromView(view.RequestMatcher.Path),
+			Method:        NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
+			Destination:   NewRequestFieldMatchersFromView(view.RequestMatcher.Destination),
+			Scheme:        NewRequestFieldMatchersFromView(view.RequestMatcher.Scheme),
+			Body:          NewRequestFieldMatchersFromView(view.RequestMatcher.Body),
+			Headers:       NewRequestFieldMatchersFromMapView(view.RequestMatcher.Headers),
+			Query:         NewQueryRequestFieldMatchersFromMapView(view.RequestMatcher.Query),
+			RequiresState: view.RequestMatcher.RequiresState,
 		},
 		Response: NewResponseDetailsFromResponse(view.Response),
 	}
@@ -174,7 +165,7 @@ func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairVi
 
 func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePairViewV5 {
 
-	var path, method, destination, scheme, query, body []v2.MatcherViewV5
+	var path, method, destination, scheme, body []v2.MatcherViewV5
 
 	if this.RequestMatcher.Path != nil && len(this.RequestMatcher.Path) != 0 {
 		views := []v2.MatcherViewV5{}
@@ -216,14 +207,6 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 		body = views
 	}
 
-	if this.RequestMatcher.DeprecatedQuery != nil && len(this.RequestMatcher.DeprecatedQuery) != 0 {
-		views := []v2.MatcherViewV5{}
-		for _, matcher := range this.RequestMatcher.DeprecatedQuery {
-			views = append(views, matcher.BuildView())
-		}
-		query = views
-	}
-
 	headersWithMatchers := map[string][]v2.MatcherViewV5{}
 	for key, matchers := range this.RequestMatcher.Headers {
 		views := []v2.MatcherViewV5{}
@@ -247,30 +230,28 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 
 	return v2.RequestMatcherResponsePairViewV5{
 		RequestMatcher: v2.RequestMatcherViewV5{
-			Path:            path,
-			Method:          method,
-			Destination:     destination,
-			Scheme:          scheme,
-			DeprecatedQuery: query,
-			Body:            body,
-			Headers:         headersWithMatchers,
-			Query:           queriesWithMatchers,
-			RequiresState:   this.RequestMatcher.RequiresState,
+			Path:          path,
+			Method:        method,
+			Destination:   destination,
+			Scheme:        scheme,
+			Body:          body,
+			Headers:       headersWithMatchers,
+			Query:         queriesWithMatchers,
+			RequiresState: this.RequestMatcher.RequiresState,
 		},
 		Response: this.Response.ConvertToResponseDetailsViewV5(),
 	}
 }
 
 type RequestMatcher struct {
-	Path            []RequestFieldMatchers
-	Method          []RequestFieldMatchers
-	Destination     []RequestFieldMatchers
-	Scheme          []RequestFieldMatchers
-	DeprecatedQuery []RequestFieldMatchers
-	Body            []RequestFieldMatchers
-	Headers         map[string][]RequestFieldMatchers
-	Query           *QueryRequestFieldMatchers
-	RequiresState   map[string]string
+	Path          []RequestFieldMatchers
+	Method        []RequestFieldMatchers
+	Destination   []RequestFieldMatchers
+	Scheme        []RequestFieldMatchers
+	Body          []RequestFieldMatchers
+	Headers       map[string][]RequestFieldMatchers
+	Query         *QueryRequestFieldMatchers
+	RequiresState map[string]string
 }
 
 type QueryRequestFieldMatchers map[string][]RequestFieldMatchers
@@ -296,7 +277,6 @@ func (this RequestMatcher) ToEagerlyCacheable() *RequestDetails {
 		this.Destination == nil || len(this.Destination) != 1 || this.Destination[0].Matcher != matchers.Exact ||
 		this.Method == nil || len(this.Method) != 1 || this.Method[0].Matcher != matchers.Exact ||
 		this.Path == nil || len(this.Path) != 1 || this.Path[0].Matcher != matchers.Exact ||
-		this.DeprecatedQuery != nil && len(this.DeprecatedQuery) == 1 && this.DeprecatedQuery[0].Matcher != matchers.Exact ||
 		this.Scheme == nil || len(this.Scheme) != 1 || this.Scheme[0].Matcher != matchers.Exact {
 		return nil
 	}
@@ -330,8 +310,6 @@ func (this RequestMatcher) ToEagerlyCacheable() *RequestDetails {
 
 			}
 		}
-	} else if this.DeprecatedQuery != nil && len(this.DeprecatedQuery) == 1 {
-		query, _ = url.ParseQuery(this.DeprecatedQuery[0].Value.(string))
 	}
 
 	return &RequestDetails{

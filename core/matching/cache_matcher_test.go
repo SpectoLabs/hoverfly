@@ -133,12 +133,6 @@ func Test_CacheMatcher_PreloadCache_WillPreemptivelyCacheFullExactMatchRequestMa
 					Value:   "path",
 				},
 			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "query",
-				},
-			},
 			Scheme: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -301,12 +295,6 @@ func Test_CacheMatcher_PreloadCache_WillCheckAllRequestMatchersInSimulation(t *t
 					Value:   "path",
 				},
 			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "query",
-				},
-			},
 			Scheme: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -381,12 +369,6 @@ func Test_CacheMatcher_PreloadCache_WillNotCacheMatchersWithHeaders(t *testing.T
 				{
 					Matcher: matchers.Exact,
 					Value:   "path",
-				},
-			},
-			DeprecatedQuery: []models.RequestFieldMatchers{
-				{
-					Matcher: matchers.Exact,
-					Value:   "query",
 				},
 			},
 			Scheme: []models.RequestFieldMatchers{
