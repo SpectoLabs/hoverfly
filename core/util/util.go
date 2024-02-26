@@ -112,7 +112,7 @@ func SortQueryString(query string) string {
 	keyValues := make(url.Values)
 	for query != "" {
 		key := query
-		if i := strings.IndexAny(key, "&;"); i >= 0 {
+		if i := strings.IndexAny(key, "&"); i >= 0 {
 			key, query = key[:i], key[i+1:]
 		} else {
 			query = ""
