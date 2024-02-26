@@ -240,13 +240,14 @@ func GzipString(s string) string {
 
 func Test_NewRequestDetailsFromHttpRequest_SortsQueryString(t *testing.T) {
 	RegisterTestingT(t)
-	request, _ := http.NewRequest("GET", "http://test.org/?a=b&a=a", nil)
+	request, _ := http.NewRequest("GET", "http://test.org/?b=a&a=b&a=a", nil)
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(request)
 	Expect(err).To(BeNil())
 
 	Expect(requestDetails.Query["a"]).To(ContainElement("a"))
 	Expect(requestDetails.Query["a"]).To(ContainElement("b"))
-	Expect(requestDetails.QueryString()).To(Equal("a=a&a=b"))
+	Expect(requestDetails.Query["b"]).To(ContainElement("a"))
+	Expect(requestDetails.QueryString()).To(Equal("a=a&a=b&b=a"))
 }
 
 func Test_NewRequestDetailsFromHttpRequest_ParseCompoundQueryParam(t *testing.T) {
@@ -256,6 +257,7 @@ func Test_NewRequestDetailsFromHttpRequest_ParseCompoundQueryParam(t *testing.T)
 	Expect(err).To(BeNil())
 
 	Expect(requestDetails.Query["qq"]).To(ContainElement("country=BEL;postalCode=1234;city=SomeCity;street=SomeStreet;houseNumber=25 a"))
+	Expect(requestDetails.QueryString()).To(Equal("qq=country=BEL;postalCode=1234;city=SomeCity;street=SomeStreet;houseNumber=25 a"))
 }
 
 func Test_NewRequestDetailsFromHttpRequest_WithFormDataHavingNonEmptyBody(t *testing.T) {
