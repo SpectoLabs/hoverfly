@@ -12,7 +12,7 @@ project = 'Hoverfly'
 copyright = '2023, SpectoLabs'
 author = 'SpectoLabs'
 
-version = 'v1.6.3'
+version = 'v1.7.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 

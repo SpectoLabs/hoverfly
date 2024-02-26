@@ -23,7 +23,6 @@ Available Commands:
   status            Get the current status of Hoverfly
   stop              Stop Hoverfly
   targets           Get the current targets registered with hoverctl
-  templating-data-source Manage templating CSV data source for Hoverfly
   version           Get the version of hoverctl
 
 Flags:
