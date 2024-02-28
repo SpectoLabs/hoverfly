@@ -92,6 +92,14 @@ func Test_split(t *testing.T) {
 	Expect(unit.split("one,two,three", ",")).To(ConsistOf("one", "two", "three"))
 }
 
+func Test_concat(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := templateHelpers{}
+
+	Expect(unit.concat("one", " two")).To(Equal("one two"))
+}
+
 func Test_faker(t *testing.T) {
 	RegisterTestingT(t)
 

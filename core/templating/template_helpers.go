@@ -113,6 +113,10 @@ func (t templateHelpers) split(target, separator string) []string {
 	return strings.Split(target, separator)
 }
 
+func (t templateHelpers) concat(val1, val2 string) string {
+	return val1 + val2
+}
+
 func prepareJsonPathQuery(query string) string {
 	if query[0:1] != "{" && query[len(query)-1:] != "}" {
 		query = fmt.Sprintf("{%s}", query)

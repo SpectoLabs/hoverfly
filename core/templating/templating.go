@@ -85,6 +85,7 @@ func NewTemplator() *Templator {
 	helperMethodMap["randomUuid"] = t.randomUuid
 	helperMethodMap["replace"] = t.replace
 	helperMethodMap["split"] = t.split
+	helperMethodMap["concat"] = t.concat
 	helperMethodMap["faker"] = t.faker
 	helperMethodMap["requestBody"] = t.requestBody
 	helperMethodMap["csv"] = t.parseCsv
