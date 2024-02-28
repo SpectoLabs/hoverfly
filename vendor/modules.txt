@@ -109,9 +109,6 @@ github.com/jackwakefield/gopac
 # github.com/kardianos/osext v0.0.0-20151222153229-29ae4ffbc9a6
 ## explicit
 github.com/kardianos/osext
-# github.com/konsorten/go-windows-terminal-sequences v1.0.1
-## explicit
-github.com/konsorten/go-windows-terminal-sequences
 # github.com/magiconair/properties v1.7.0
 ## explicit
 github.com/magiconair/properties
@@ -197,8 +194,8 @@ github.com/robertkrimen/otto/token
 # github.com/ryanuber/go-glob v0.0.0-20170128012129-256dc444b735
 ## explicit
 github.com/ryanuber/go-glob
-# github.com/sirupsen/logrus v1.1.1
-## explicit
+# github.com/sirupsen/logrus v1.9.3
+## explicit; go 1.13
 github.com/sirupsen/logrus
 # github.com/spf13/cast v0.0.0-20160314192028-27b586b42e29
 ## explicit
