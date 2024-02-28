@@ -11,10 +11,7 @@ func BodyMatching(fields []models.RequestFieldMatchers, req models.RequestDetail
 	var score int
 
 	if len(fields) == 0 {
-		return &FieldMatch{
-			Matched: matched,
-			Score:   1,
-		}
+		return &FieldMatch{Matched: true}
 	}
 
 	for _, field := range fields {

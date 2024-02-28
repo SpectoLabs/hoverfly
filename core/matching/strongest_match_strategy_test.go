@@ -18,7 +18,9 @@ func Test_ClosestRequestMatcherRequestMatcher_EmptyRequestMatchersShouldMatchOnA
 
 	simulation.AddPair(&models.RequestMatcherResponsePair{
 		RequestMatcher: models.RequestMatcher{},
-		Response:       testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -48,7 +50,9 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersShouldMatchOnBody(t
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -58,6 +62,42 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersShouldMatchOnBody(t
 	Expect(result.Error).To(BeNil())
 
 	Expect(result.Pair.Response.Body).To(Equal("request matched"))
+}
+
+func Test_StrongestMatch_RequestMatchersShouldMatchOnBodyPrioritizingNotNilMatcher(t *testing.T) {
+	RegisterTestingT(t)
+
+	simulation := models.NewSimulation()
+
+	simulation.AddPair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{
+			Body: []models.RequestFieldMatchers{
+				{
+					Matcher: matchers.JsonPartial,
+					Value:   `{"bot": true}`,
+				},
+			},
+		},
+		Response: models.ResponseDetails{
+			Body: "json partial body matched",
+		},
+	})
+
+	// if both matchers have the same score, this one will be picked because it's the most recent one.
+	simulation.AddPair(&models.RequestMatcherResponsePair{
+		RequestMatcher: models.RequestMatcher{},
+		Response: models.ResponseDetails{
+			Body: "absent body matched",
+		},
+	})
+
+	r := models.RequestDetails{
+		Body: `{"bot": true, "name": "chatty"}`,
+	}
+	result := matching.MatchingStrategyRunner(r, false, simulation, &state.State{State: map[string]string{}}, &matching.StrongestMatchStrategy{})
+	Expect(result.Error).To(BeNil())
+
+	Expect(result.Pair.Response.Body).To(Equal("json partial body matched"))
 }
 
 func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWhenAllHeadersMatch(t *testing.T) {
@@ -84,7 +124,9 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWhenAllHeadersMatch(
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -125,7 +167,9 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderNotPresentIn
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -165,7 +209,9 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWhenOneHeaderValueDiffere
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -205,7 +251,9 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnResponseWithMultiValuedHeade
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -245,7 +293,9 @@ func Test_ClosestRequestMatcherRequestMatcher_ReturnNilWithDifferentMultiValuedH
 		RequestMatcher: models.RequestMatcher{
 			Headers: headers,
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -304,7 +354,9 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMatchWithHeaders(t *testin
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -366,7 +418,9 @@ func Test_ClosestRequestMatcherRequestMatcher_EndpointMismatchWithHeadersReturns
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -413,7 +467,9 @@ func Test_ClosestRequestMatcherRequestMatcher_AbleToMatchAnEmptyPathInAReasonabl
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -455,7 +511,9 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsAndBeMat
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	request := models.RequestDetails{
@@ -484,7 +542,9 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnScheme
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	request := models.RequestDetails{
@@ -516,7 +576,9 @@ func Test_ClosestRequestMatcherRequestMatcher_RequestMatchersCanUseGlobsOnHeader
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	request := models.RequestDetails{
@@ -810,7 +872,9 @@ func Test__NotBeCacheableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *tes
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	simulation.AddPair(&models.RequestMatcherResponsePair{
@@ -822,7 +886,9 @@ func Test__NotBeCacheableIfMatchedOnEverythingApartFromHeadersAtLeastOnce(t *tes
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -899,7 +965,9 @@ func Test__ShouldBeCacheableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *te
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	simulation.AddPair(&models.RequestMatcherResponsePair{
@@ -911,7 +979,9 @@ func Test__ShouldBeCacheableIfMatchedOnEverythingApartFromHeadersZeroTimes(t *te
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -1594,7 +1664,9 @@ func Test_StrongestMatch_ShouldNotBeCacheableIfMatchedOnEverythingApartFromHeade
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	simulation.AddPair(&models.RequestMatcherResponsePair{
@@ -1606,7 +1678,9 @@ func Test_StrongestMatch_ShouldNotBeCacheableIfMatchedOnEverythingApartFromHeade
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -1683,7 +1757,9 @@ func Test_StrongestMatch__ShouldBeCacheableIfMatchedOnEverythingApartFromHeaders
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	simulation.AddPair(&models.RequestMatcherResponsePair{
@@ -1695,7 +1771,9 @@ func Test_StrongestMatch__ShouldBeCacheableIfMatchedOnEverythingApartFromHeaders
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -1803,7 +1881,9 @@ func Test_MatchingStrategyRunner_RequestMatchersShouldMatchOnStateAndNotBeCachea
 		RequestMatcher: models.RequestMatcher{
 			RequiresState: map[string]string{"key1": "value1", "key2": "value2"},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -1863,7 +1943,9 @@ func Test_StrongestMatch_ShouldNotBeCacheableIfMatchedOnEverythingApartFromState
 				"foo": "bar",
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	simulation.AddPair(&models.RequestMatcherResponsePair{
@@ -1875,7 +1957,9 @@ func Test_StrongestMatch_ShouldNotBeCacheableIfMatchedOnEverythingApartFromState
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
@@ -1944,7 +2028,9 @@ func Test_StrongestMatch__ShouldBeCacheableIfMatchedOnEverythingApartFromStateZe
 				"foo": "bar",
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	simulation.AddPair(&models.RequestMatcherResponsePair{
@@ -1956,7 +2042,9 @@ func Test_StrongestMatch__ShouldBeCacheableIfMatchedOnEverythingApartFromStateZe
 				},
 			},
 		},
-		Response: testResponse,
+		Response: models.ResponseDetails{
+			Body: "request matched",
+		},
 	})
 
 	r := models.RequestDetails{
