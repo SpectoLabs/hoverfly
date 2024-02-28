@@ -57,6 +57,8 @@ Usage of hoverfly:
         Set log level (panic, fatal, error, warn, info or debug) (default "info")
   -log-no-color
         Disable colors for logging
+  -log-no-quotes
+        Disable quoting and escaping of logged fields
   -logs string
         Specify format for logs, options are "plaintext" and "json" (default "plaintext")
   -logs-file string
