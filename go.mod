@@ -31,7 +31,7 @@ require (
 	github.com/rakyll/statik v0.1.1-0.20160322004535-2940084503a4
 	github.com/rcrowley/go-metrics v0.0.0-20160226052904-eeba7bd0dd01
 	github.com/ryanuber/go-glob v0.0.0-20170128012129-256dc444b735
-	github.com/sirupsen/logrus v1.1.1
+	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v0.0.0-20160517171929-f36824430130
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v0.0.0-20160508180713-d8a428b8a306
@@ -52,7 +52,6 @@ require (
 	github.com/gorilla/context v0.0.0-20160422134237-a8d44e7d8e4d // indirect
 	github.com/hashicorp/hcl v0.0.0-20160426221300-9a905a34e628 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/magiconair/properties v1.7.0 // indirect
 	github.com/mattn/go-runewidth v0.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
