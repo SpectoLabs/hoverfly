@@ -60,6 +60,10 @@ var Matchers = map[string]MatcherDetails{
 		MatcherFunction:     JwtMatcher,
 		MatchValueGenerator: JwtMatchValueGenerator,
 	},
+	Negation: {
+		MatcherFunction:     NegationMatch,
+		MatchValueGenerator: IdentityValueGenerator,
+	},
 }
 
 type MatcherDetails struct {
