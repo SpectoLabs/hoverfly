@@ -11,7 +11,7 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"github.com/aymerick/raymond"
+	"github.com/SpectoLabs/raymond"
 
 	log "github.com/sirupsen/logrus"
 )

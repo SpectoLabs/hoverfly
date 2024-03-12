@@ -14,7 +14,7 @@ import (
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/aymerick/raymond"
+	"github.com/SpectoLabs/raymond"
 	log "github.com/sirupsen/logrus"
 )
 

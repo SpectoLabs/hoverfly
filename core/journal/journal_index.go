@@ -4,7 +4,7 @@ import (
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"github.com/aymerick/raymond"
+	"github.com/SpectoLabs/raymond"
 	"strings"
 )
 

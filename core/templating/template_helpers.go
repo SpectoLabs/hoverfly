@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aymerick/raymond"
+	"github.com/SpectoLabs/raymond"
 	"github.com/pborman/uuid"
 
 	"github.com/SpectoLabs/hoverfly/core/util"

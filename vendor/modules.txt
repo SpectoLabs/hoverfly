@@ -21,12 +21,14 @@ github.com/SpectoLabs/goproxy
 # github.com/SpectoLabs/goproxy/ext v0.0.0-20220724221645-71c396c297b7
 ## explicit
 github.com/SpectoLabs/goproxy/ext/auth
+# github.com/SpectoLabs/raymond v2.0.2+incompatible
+## explicit
+github.com/SpectoLabs/raymond
 # github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496
 ## explicit
 github.com/antonholmquist/jason
 # github.com/aymerick/raymond v2.0.2+incompatible
 ## explicit
-github.com/aymerick/raymond
 github.com/aymerick/raymond/ast
 github.com/aymerick/raymond/lexer
 github.com/aymerick/raymond/parser

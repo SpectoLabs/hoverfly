@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/aymerick/raymond"
+	"github.com/SpectoLabs/raymond"
 )
 
 type CachedResponse struct {
