@@ -438,4 +438,30 @@ var _ = Describe("	When using different matchers", func() {
 		})
 
 	})
+
+	Context("Using negate match", func() {
+
+		BeforeEach(func() {
+			hoverfly.ImportSimulation(testdata.NegationMatch)
+		})
+
+		It("path should not match with different path passed", func() {
+			req := sling.New().Get("http://test.com/path2")
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("destination matched")))
+		})
+
+		It("path should not match with no path passed", func() {
+			req := sling.New().Get("http://test.com")
+
+			response := hoverfly.Proxy(req)
+			Expect(response.StatusCode).To(Equal(200))
+
+			Expect(io.ReadAll(response.Body)).Should(Equal([]byte("destination matched")))
+		})
+
+	})
 })
