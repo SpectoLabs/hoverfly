@@ -1,6 +1,6 @@
 package matchers
 
-var Negation = "negation"
+var Negation = "negate"
 
 func NegationMatch(match interface{}, toMatch string) bool {
 	matchString, ok := match.(string)
