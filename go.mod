@@ -6,7 +6,7 @@ require (
 	github.com/ChrisTrenkamp/xsel v0.9.6
 	github.com/SpectoLabs/goproxy v0.0.0-20220724221645-71c396c297b7
 	github.com/SpectoLabs/goproxy/ext v0.0.0-20220724221645-71c396c297b7
-	github.com/SpectoLabs/raymond v2.0.3-0.20240313203747-f578a6519e58+incompatible
+	github.com/SpectoLabs/raymond v2.0.3-0.20240313210732-e0e216cf0920+incompatible
 	github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496
 	github.com/beevik/etree v1.1.0
 	github.com/boltdb/bolt v1.2.1-0.20160424201119-d97499360d1e

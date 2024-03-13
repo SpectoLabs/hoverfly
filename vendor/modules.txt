@@ -21,7 +21,7 @@ github.com/SpectoLabs/goproxy
 # github.com/SpectoLabs/goproxy/ext v0.0.0-20220724221645-71c396c297b7
 ## explicit
 github.com/SpectoLabs/goproxy/ext/auth
-# github.com/SpectoLabs/raymond v2.0.3-0.20240313203747-f578a6519e58+incompatible
+# github.com/SpectoLabs/raymond v2.0.3-0.20240313210732-e0e216cf0920+incompatible
 ## explicit
 github.com/SpectoLabs/raymond
 # github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496
