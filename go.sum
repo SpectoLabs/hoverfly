@@ -7,8 +7,8 @@ github.com/SpectoLabs/goproxy v0.0.0-20220724221645-71c396c297b7 h1:TTZvVLRa0sjo
 github.com/SpectoLabs/goproxy v0.0.0-20220724221645-71c396c297b7/go.mod h1:tj8G0iNIS9fkG5PSrzQYLUXcvhtqI8XbIld9PqpYaFw=
 github.com/SpectoLabs/goproxy/ext v0.0.0-20220724221645-71c396c297b7 h1:MxMvFwL66nKnrmjHhp9GODbHVZ+/qS2MmvnXz/nDdR4=
 github.com/SpectoLabs/goproxy/ext v0.0.0-20220724221645-71c396c297b7/go.mod h1:rnDN1CpKP9iJXwxRtnvM7d5wdPHQY0K5NkHeXWPlQ+o=
-github.com/SpectoLabs/raymond v2.0.2+incompatible h1:75q2/r2f6U38xSTDHUbJWZnkVY9dKUeQi8M9HMa1icc=
-github.com/SpectoLabs/raymond v2.0.2+incompatible/go.mod h1:Cv+3TFLm3T7C7ML7gEK4HnHcTpfc4HjJFWvS91cc6tw=
+github.com/SpectoLabs/raymond v2.0.3-0.20240313203747-f578a6519e58+incompatible h1:Oa+gbcUjsRQAiFZHmTesK1Py0FWBmHUNoXtBUz9oqvk=
+github.com/SpectoLabs/raymond v2.0.3-0.20240313203747-f578a6519e58+incompatible/go.mod h1:Cv+3TFLm3T7C7ML7gEK4HnHcTpfc4HjJFWvS91cc6tw=
 github.com/ajstarks/svgo v0.0.0-20180226025133-644b8db467af/go.mod h1:K08gAheRH3/J6wwsYMMT4xOr94bZjxIelGM0+d/wbFw=
 github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496 h1:dESITdufxuiwgQh1YPiPupEXORHTYvY8tr40nvrWelo=
 github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496/go.mod h1:+GxMEKI0Va2U8h3os6oiUAetHAlGMvxjdpAH/9uvUMA=

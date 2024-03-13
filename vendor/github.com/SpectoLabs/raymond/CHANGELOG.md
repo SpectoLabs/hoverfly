@@ -1,5 +1,9 @@
 # Raymond Changelog
 
+### HEAD
+
+- [IMPROVEMENT] Add `RemoveHelper` and `RemoveAllHelpers` functions
+
 ### Raymond 2.0.2 _(March 22, 2018)_
 
 - [IMPROVEMENT] Add the #equal helper (#7)

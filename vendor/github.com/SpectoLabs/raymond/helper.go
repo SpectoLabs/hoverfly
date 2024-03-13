@@ -56,6 +56,22 @@ func RegisterHelpers(helpers map[string]interface{}) {
 	}
 }
 
+// RemoveHelper unregisters a global helper
+func RemoveHelper(name string) {
+	helpersMutex.Lock()
+	defer helpersMutex.Unlock()
+
+	delete(helpers, name)
+}
+
+// RemoveAllHelpers unregisters all global helpers
+func RemoveAllHelpers() {
+	helpersMutex.Lock()
+	defer helpersMutex.Unlock()
+
+	helpers = make(map[string]reflect.Value)
+}
+
 // ensureValidHelper panics if given helper is not valid
 func ensureValidHelper(name string, funcValue reflect.Value) {
 	if funcValue.Kind() != reflect.Func {
@@ -99,6 +115,19 @@ func newEmptyOptions(eval *evalVisitor) *Options {
 //
 // Context Values
 //
+
+// ValueFromAllCtx returns the first occurence of field value from all the contexts in the stack. The search occurs backwards from the current context, ending at the root context.
+func (options *Options) ValueFromAllCtx(name string) interface{} {
+	// Loop through all contexts in the stack
+	for index := range options.eval.ctx {
+		value := options.eval.evalField(options.eval.ancestorCtx(index), name, false)
+		if value.IsValid() {
+			return value.Interface()
+		}
+	}
+
+	return nil
+}
 
 // Value returns field value from current context.
 func (options *Options) Value(name string) interface{} {

@@ -62,6 +62,22 @@ func RegisterPartialTemplate(name string, tpl *Template) {
 	partials[name] = newPartial(name, "", tpl)
 }
 
+// RemovePartial removes the partial registered under the given name. The partial will not be available globally anymore. This does not affect partials registered on a specific template.
+func RemovePartial(name string) {
+	partialsMutex.Lock()
+	defer partialsMutex.Unlock()
+
+	delete(partials, name)
+}
+
+// RemoveAllPartials removes all globally registered partials. This does not affect partials registered on a specific template.
+func RemoveAllPartials() {
+	partialsMutex.Lock()
+	defer partialsMutex.Unlock()
+
+	partials = make(map[string]*partial)
+}
+
 // findPartial finds a registered global partial
 func findPartial(name string) *partial {
 	partialsMutex.RLock()
