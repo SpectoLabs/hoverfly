@@ -113,11 +113,11 @@ jobs:
       - run:
           name: Install gox
           command: |
-            GO111MODULE=off go get github.com/mitchellh/gox
+            go install github.com/mitchellh/gox@latest
       - run:
           name: Install github-release
           command: |
-            GO111MODULE=off go get github.com/aktau/github-release
+            go install github.com/aktau/github-release@latest
       - run:
           name: Build cross platform releases
           command: |
