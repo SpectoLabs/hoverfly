@@ -1,6 +1,7 @@
 package journal
 
 import (
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
 	. "github.com/onsi/gomega"
@@ -93,10 +94,13 @@ func TestIndex_ConvertToIndexView(t *testing.T) {
 	Expect(indexView).ToNot(BeNil())
 	Expect(indexView.Name).To(Equal("Request.QueryParam.id"))
 	Expect(indexView.Entries).To(HaveLen(2))
-	Expect(indexView.Entries[0].Key).To(Equal("a"))
-	Expect(indexView.Entries[0].JournalEntryId).To(Equal("1"))
-	Expect(indexView.Entries[1].Key).To(Equal("b"))
-	Expect(indexView.Entries[1].JournalEntryId).To(Equal("2"))
+	Expect(indexView.Entries).To(ConsistOf(v2.JournalIndexEntryView{
+		Key:            "a",
+		JournalEntryId: "1",
+	}, v2.JournalIndexEntryView{
+		Key:            "b",
+		JournalEntryId: "2",
+	}))
 }
 
 func TestIndex_FilteredConversionIndexView(t *testing.T) {
