@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"path"
@@ -19,10 +20,11 @@ import (
 type Action struct {
 	Binary    string
 	Script    *os.File
+	Remote    string
 	DelayInMs int
 }
 
-func NewAction(actionName, binary, scriptContent string, delayInMs int) (*Action, error) {
+func NewLocalAction(actionName, binary, scriptContent string, delayInMs int) (*Action, error) {
 
 	scriptInfo := &Action{}
 	if strings.TrimSpace(actionName) == "" {
@@ -39,6 +41,19 @@ func NewAction(actionName, binary, scriptContent string, delayInMs int) (*Action
 		return nil, err
 	}
 	return scriptInfo, nil
+}
+
+func NewRemoteAction(actionName, host string, delayInMs int) (*Action, error) {
+
+	if strings.TrimSpace(actionName) == "" {
+		return nil, errors.New("empty action name passed")
+	}
+
+	if !hasHttpPrefix(host) {
+		return nil, errors.New("remote host is invalid")
+	}
+
+	return &Action{Remote: host, DelayInMs: delayInMs}, nil
 }
 
 func setBinary(action *Action, binary string) error {
@@ -96,11 +111,12 @@ func (action *Action) GetActionView(actionName string) v2.ActionView {
 		ActionName:    actionName,
 		Binary:        action.Binary,
 		ScriptContent: scriptContent,
+		Remote:        action.Remote,
 		DelayInMs:     action.DelayInMs,
 	}
 }
 
-func (action *Action) ExecuteLocally(pair *models.RequestResponsePair) error {
+func (action *Action) Execute(pair *models.RequestResponsePair) error {
 
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 	if err != nil {
@@ -113,6 +129,35 @@ func (action *Action) ExecuteLocally(pair *models.RequestResponsePair) error {
 
 	//adding 200 ms to include some buffer for it to return response
 	time.Sleep(time.Duration(200+action.DelayInMs) * time.Millisecond)
+
+	//if it is remote callback
+	if action.Remote != "" {
+
+		req, err := http.NewRequest("POST", action.Remote, bytes.NewBuffer(pairViewBytes))
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Error when building request to remote post serve action")
+			return err
+		}
+
+		req.Header.Add("Content-Type", "application/json")
+
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err.Error(),
+			}).Error("Error when communicating with remote post serve action")
+			return err
+		}
+
+		if resp.StatusCode != 200 {
+			log.Error("Remote post serve action did not process payload")
+			return nil
+		}
+		log.Info("Remote post serve action invoked successfully")
+		return nil
+	}
 
 	actionCommand := exec.Command(action.Binary, action.Script.Name())
 	actionCommand.Stdin = bytes.NewReader(pairViewBytes)
@@ -136,4 +181,8 @@ func (action *Action) ExecuteLocally(pair *models.RequestResponsePair) error {
 		log.Info("Output from post serve action " + stdout.String())
 	}
 	return nil
+}
+
+func hasHttpPrefix(host string) bool {
+	return strings.HasPrefix(host, "http") || strings.HasPrefix(host, "https")
 }

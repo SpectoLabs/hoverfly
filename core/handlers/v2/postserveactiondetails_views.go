@@ -6,7 +6,8 @@ type PostServeActionDetailsView struct {
 
 type ActionView struct {
 	ActionName    string `json:"actionName"`
-	Binary        string `json:"binary"`
-	ScriptContent string `json:"script"`
+	Binary        string `json:"binary,omitempty"`
+	ScriptContent string `json:"script,omitempty"`
+	Remote        string `json:"remote,omitempty"`
 	DelayInMs     int    `json:"delayInMs,omitempty"`
 }

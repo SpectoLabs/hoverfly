@@ -559,13 +559,26 @@ func main() {
 					}
 
 					if fileContents, err := ioutil.ReadFile(splitPostServeAction[2]); err == nil {
-						err = hoverfly.SetPostServeAction(splitPostServeAction[0], splitPostServeAction[1], string(fileContents), delayInMs)
+						err = hoverfly.SetLocalPostServeAction(splitPostServeAction[0], splitPostServeAction[1], string(fileContents), delayInMs)
 						if err != nil {
 							log.WithFields(log.Fields{
 								"error":  err.Error(),
 								"import": v,
 							}).Fatal("Failed to import post serve action")
 						}
+					}
+				} else if len(splitPostServeAction) == 3 {
+					delayInMs, err := strconv.Atoi(splitPostServeAction[2])
+					if err != nil {
+						//default to 1000 incase of error
+						delayInMs = 1000
+					}
+					err = hoverfly.SetRemotePostServeAction(splitPostServeAction[0], splitPostServeAction[1], delayInMs)
+					if err != nil {
+						log.WithFields(log.Fields{
+							"error":  err.Error(),
+							"import": v,
+						}).Fatal("Failed to import post serve action")
 					}
 				} else {
 					log.WithFields(log.Fields{

@@ -471,9 +471,22 @@ func (hf *Hoverfly) GetAllPostServeActions() v2.PostServeActionDetailsView {
 	}
 }
 
-func (hf *Hoverfly) SetPostServeAction(actionName string, binary string, scriptContent string, delayInMs int) error {
+func (hf *Hoverfly) SetLocalPostServeAction(actionName string, binary string, scriptContent string, delayInMs int) error {
 
-	action, err := action.NewAction(actionName, binary, scriptContent, delayInMs)
+	action, err := action.NewLocalAction(actionName, binary, scriptContent, delayInMs)
+	if err != nil {
+		return err
+	}
+	err = hf.PostServeActionDetails.SetAction(actionName, action)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (hf *Hoverfly) SetRemotePostServeAction(actionName, remote string, delayInMs int) error {
+
+	action, err := action.NewRemoteAction(actionName, remote, delayInMs)
 	if err != nil {
 		return err
 	}

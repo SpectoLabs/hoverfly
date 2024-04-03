@@ -31,7 +31,7 @@ func GetAllPostServeActions(target configuration.Target) (v2.PostServeActionDeta
 	return postServeActionDetailsView, nil
 }
 
-func SetPostServeAction(actionName, binary, scriptContent string, delayInMs int, target configuration.Target) error {
+func SetLocalPostServeAction(actionName, binary, scriptContent string, delayInMs int, target configuration.Target) error {
 
 	actionRequest := v2.ActionView{
 		ActionName:    actionName,
@@ -51,7 +51,33 @@ func SetPostServeAction(actionName, binary, scriptContent string, delayInMs int,
 
 	defer response.Body.Close()
 
-	err = handleResponseError(response, "Could not set post serve action")
+	err = handleResponseError(response, "Could not set local post serve action")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetRemotePostServeAction(actionName, remote string, delayInMs int, target configuration.Target) error {
+
+	actionRequest := v2.ActionView{
+		ActionName: actionName,
+		Remote:     remote,
+		DelayInMs:  delayInMs,
+	}
+	marshalledAction, err := json.Marshal(actionRequest)
+	if err != nil {
+		return err
+	}
+
+	response, err := doRequest(target, "PUT", v2ApiPostServeAction, string(marshalledAction), nil)
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+
+	err = handleResponseError(response, "Could not set remote post serve action")
 	if err != nil {
 		return err
 	}

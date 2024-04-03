@@ -136,8 +136,23 @@ func (this Hoverfly) GetAllPostServeAction() *v2.PostServeActionDetailsView {
 	return PostServeActionDetailsView
 }
 
-func (this Hoverfly) SetPostServeAction(actionName, binary, scriptContent string, delayInMs int) *v2.PostServeActionDetailsView {
+func (this Hoverfly) SetLocalPostServeAction(actionName, binary, scriptContent string, delayInMs int) *v2.PostServeActionDetailsView {
 	actionView := v2.ActionView{ActionName: actionName, Binary: binary, DelayInMs: delayInMs, ScriptContent: scriptContent}
+
+	resp := DoRequest(sling.New().Put(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/post-serve-action", this.adminPort)).BodyJSON(actionView))
+
+	PostServeActionDetailsView := &v2.PostServeActionDetailsView{}
+	body, err := ioutil.ReadAll(resp.Body)
+	Expect(err).To(BeNil())
+
+	err = json.Unmarshal(body, PostServeActionDetailsView)
+	Expect(err).To(BeNil())
+
+	return PostServeActionDetailsView
+}
+
+func (this Hoverfly) SetRemotePostServeAction(actionName, remote string, delayInMs int) *v2.PostServeActionDetailsView {
+	actionView := v2.ActionView{ActionName: actionName, DelayInMs: delayInMs, Remote: remote}
 
 	resp := DoRequest(sling.New().Put(fmt.Sprintf("http://localhost:%v/api/v2/hoverfly/post-serve-action", this.adminPort)).BodyJSON(actionView))
 

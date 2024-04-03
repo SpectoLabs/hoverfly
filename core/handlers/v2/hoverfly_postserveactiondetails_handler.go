@@ -11,7 +11,8 @@ import (
 
 type HoverflyPostServeActionDetails interface {
 	GetAllPostServeActions() PostServeActionDetailsView
-	SetPostServeAction(string, string, string, int) error
+	SetLocalPostServeAction(string, string, string, int) error
+	SetRemotePostServeAction(string, string, int) error
 	DeletePostServeAction(string) error
 }
 
@@ -51,12 +52,15 @@ func (postServeActionDetailsHandler *HoverflyPostServeActionDetailsHandler) Put(
 		return
 	}
 
-	err = postServeActionDetailsHandler.Hoverfly.SetPostServeAction(actionRequest.ActionName, actionRequest.Binary, actionRequest.ScriptContent, actionRequest.DelayInMs)
+	if actionRequest.Remote != "" {
+		err = postServeActionDetailsHandler.Hoverfly.SetRemotePostServeAction(actionRequest.ActionName, actionRequest.Remote, actionRequest.DelayInMs)
+	} else {
+		err = postServeActionDetailsHandler.Hoverfly.SetLocalPostServeAction(actionRequest.ActionName, actionRequest.Binary, actionRequest.ScriptContent, actionRequest.DelayInMs)
+	}
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), 400)
 		return
 	}
-
 	postServeActionDetailsHandler.Get(w, req, next)
 }
 

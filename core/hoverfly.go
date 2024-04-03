@@ -221,7 +221,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 
 	if result.PostServeActionInputDetails != nil {
 		if postServeAction, ok := hf.PostServeActionDetails.Actions[result.PostServeActionInputDetails.PostServeAction]; ok {
-			go postServeAction.ExecuteLocally(result.PostServeActionInputDetails.Pair)
+			go postServeAction.Execute(result.PostServeActionInputDetails.Pair)
 		}
 	}
 
