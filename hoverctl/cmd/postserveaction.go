@@ -41,8 +41,10 @@ var postServeActionSetCommand = &cobra.Command{
 	Use:   "set",
 	Short: "Set postServeAction for Hoverfly",
 	Long: `
-Hoverfly PostServeAction can be set using the following flags: 
-	 --name --binary --script --delay --remote
+Hoverfly Local PostServeAction can be set using the following flags: 
+	 --name --binary --script --delay
+Hoverfly Remote PostServeAction can be set using the following flags:
+	 --name --remote --delay
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		checkTargetAndExit(target)
