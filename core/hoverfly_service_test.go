@@ -1359,28 +1359,33 @@ func TestHoverfly_GetPostServeActions(t *testing.T) {
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
-	actionDetails := action.Action{Binary: "python3", DelayInMs: 1900}
+	localActionDetails := action.Action{Binary: "python3", DelayInMs: 1900}
+	remoteActionDetails := action.Action{Remote: "http://localhost", DelayInMs: 1800}
 	actionMap := map[string]action.Action{
-		"test-callback": actionDetails,
+		"test-local-callback":  localActionDetails,
+		"test-remote-callback": remoteActionDetails,
 	}
 
 	unit.PostServeActionDetails.Actions = actionMap
 	postServeActions := unit.GetAllPostServeActions()
 
 	Expect(postServeActions).NotTo(BeNil())
-	Expect(postServeActions.Actions).To(HaveLen(1))
-	Expect(postServeActions.Actions[0].ActionName).To(Equal("test-callback"))
+	Expect(postServeActions.Actions).To(HaveLen(2))
+	Expect(postServeActions.Actions[0].ActionName).To(Equal("test-local-callback"))
 	Expect(postServeActions.Actions[0].Binary).To(Equal("python3"))
 	Expect(postServeActions.Actions[0].DelayInMs).To(Equal(1900))
+	Expect(postServeActions.Actions[1].ActionName).To(Equal("test-remote-callback"))
+	Expect(postServeActions.Actions[1].Remote).To(Equal("http://localhost"))
+	Expect(postServeActions.Actions[1].DelayInMs).To(Equal(1800))
 }
 
-func TestHoverfly_SetPostServeAction(t *testing.T) {
+func TestHoverfly_SetLocalPostServeAction(t *testing.T) {
 
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	err := unit.SetPostServeAction("test-callback", "script", "dummy script", 1800)
+	err := unit.SetLocalPostServeAction("test-callback", "script", "dummy script", 1800)
 
 	Expect(err).To(BeNil())
 	Expect(unit.PostServeActionDetails.Actions).NotTo(BeNil())
@@ -1389,13 +1394,44 @@ func TestHoverfly_SetPostServeAction(t *testing.T) {
 	Expect(unit.PostServeActionDetails.Actions["test-callback"].DelayInMs).To(Equal(1800))
 }
 
-func TestHoverfly_DeletePostServeAction(t *testing.T) {
+func TestHoverfly_SetRemotePostServeAction(t *testing.T) {
 
 	RegisterTestingT(t)
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	err := unit.SetPostServeAction("test-callback", "script", "dummy script", 1800)
+	err := unit.SetRemotePostServeAction("test-callback", "http://localhost:8080", 1800)
+
+	Expect(err).To(BeNil())
+	Expect(unit.PostServeActionDetails.Actions).NotTo(BeNil())
+	Expect(unit.PostServeActionDetails.Actions).To(HaveLen(1))
+	Expect(unit.PostServeActionDetails.Actions["test-callback"].Remote).To(Equal("http://localhost:8080"))
+	Expect(unit.PostServeActionDetails.Actions["test-callback"].DelayInMs).To(Equal(1800))
+}
+
+func TestHoverfly_DeleteLocalPostServeAction(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	err := unit.SetLocalPostServeAction("test-callback", "script", "dummy script", 1800)
+
+	Expect(err).To(BeNil())
+
+	err = unit.DeletePostServeAction("test-callback")
+
+	Expect(err).To(BeNil())
+	Expect(unit.PostServeActionDetails.Actions).To(HaveLen(0))
+}
+
+func TestHoverfly_DeleteRemotePostServeAction(t *testing.T) {
+
+	RegisterTestingT(t)
+
+	unit := NewHoverflyWithConfiguration(&Configuration{})
+
+	err := unit.SetRemotePostServeAction("test-callback", "http://localhost", 1800)
 
 	Expect(err).To(BeNil())
 

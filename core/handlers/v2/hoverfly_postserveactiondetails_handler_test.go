@@ -20,7 +20,11 @@ func (HoverflyPostServeActionDetailsStub) GetAllPostServeActions() PostServeActi
 	return PostServeActionDetailsView{Actions: actions}
 }
 
-func (HoverflyPostServeActionDetailsStub) SetPostServeAction(string, string, string, int) error {
+func (HoverflyPostServeActionDetailsStub) SetLocalPostServeAction(string, string, string, int) error {
+	return nil
+}
+
+func (HoverflyPostServeActionDetailsStub) SetRemotePostServeAction(string, string, int) error {
 	return nil
 }
 

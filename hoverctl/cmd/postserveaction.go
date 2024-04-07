@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var binary, scriptPath, actionNameToBeSet, actionNameToBeDeleted string
+var binary, scriptPath, actionNameToBeSet, actionNameToBeDeleted, remote string
 var delayInMs int
 
 var postServeActionCommand = &cobra.Command{
@@ -30,7 +30,9 @@ var postServeActionGetCommand = &cobra.Command{
 		if len(args) == 0 {
 			postServeActions, err := wrapper.GetAllPostServeActions(*target)
 			handleIfError(err)
-			drawTable(getPostServeActionsTabularData(postServeActions), true)
+			localPostServeActionData, remotePostServeActionData := getPostServeActionsTabularData(postServeActions)
+			drawTable(localPostServeActionData, true)
+			drawTable(remotePostServeActionData, true)
 		}
 	},
 }
@@ -39,19 +41,25 @@ var postServeActionSetCommand = &cobra.Command{
 	Use:   "set",
 	Short: "Set postServeAction for Hoverfly",
 	Long: `
-Hoverfly PostServeAction can be set using the following flags: 
+Hoverfly Local PostServeAction can be set using the following flags: 
 	 --name --binary --script --delay
+Hoverfly Remote PostServeAction can be set using the following flags:
+	 --name --remote --delay
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		checkTargetAndExit(target)
-		if binary == "" || scriptPath == "" || actionNameToBeSet == "" {
-			fmt.Println("Binary, script path and action name are compulsory to set post serve action")
-		} else {
-			script, err := configuration.ReadFile(scriptPath)
-			handleIfError(err)
-			err = wrapper.SetPostServeAction(actionNameToBeSet, binary, string(script), delayInMs, *target)
+		if remote != "" && actionNameToBeSet != "" {
+			err := wrapper.SetRemotePostServeAction(actionNameToBeSet, remote, delayInMs, *target)
 			handleIfError(err)
 			fmt.Println("Success")
+		} else if binary != "" && scriptPath != "" && actionNameToBeSet != "" {
+			script, err := configuration.ReadFile(scriptPath)
+			handleIfError(err)
+			err = wrapper.SetLocalPostServeAction(actionNameToBeSet, binary, string(script), delayInMs, *target)
+			handleIfError(err)
+			fmt.Println("Success")
+		} else {
+			fmt.Println("(Binary and script path/remote) and action name are compulsory to set post serve action")
 		}
 	},
 }
@@ -87,17 +95,23 @@ func init() {
 	postServeActionSetCommand.PersistentFlags().StringVar(&scriptPath, "script", "",
 		"An absolute or relative path to a script that will be executed by the binary")
 	postServeActionSetCommand.PersistentFlags().IntVar(&delayInMs, "delay", 0, "Delay in milli seconds after which action needs to be executed")
+	postServeActionSetCommand.PersistentFlags().StringVar(&remote, "remote", "", "Remote host to be set for triggering post serve action")
 
 	postServeActionDeleteCommand.PersistentFlags().StringVar(&actionNameToBeDeleted, "name", "", "Action Name to be deleted")
 
 }
 
-func getPostServeActionsTabularData(postServeActions v2.PostServeActionDetailsView) [][]string {
-
-	postServeActionsData := [][]string{{"Action Name", "Binary", "Script", "Delay(Ms)"}}
+func getPostServeActionsTabularData(postServeActions v2.PostServeActionDetailsView) ([][]string, [][]string) {
+	localPostServeActionsData := [][]string{{"Action Name", "Binary", "Script", "Delay(Ms)"}}
+	remotePostServeActionData := [][]string{{"Action Name", "Remote", "Delay(Ms)"}}
 	for _, action := range postServeActions.Actions {
-		actionData := []string{action.ActionName, action.Binary, getContentShorthand(action.ScriptContent), fmt.Sprint(action.DelayInMs)}
-		postServeActionsData = append(postServeActionsData, actionData)
+		if action.Remote == "" {
+			actionData := []string{action.ActionName, action.Binary, getContentShorthand(action.ScriptContent), fmt.Sprint(action.DelayInMs)}
+			localPostServeActionsData = append(localPostServeActionsData, actionData)
+		} else {
+			actionData := []string{action.ActionName, action.Remote, fmt.Sprint(action.DelayInMs)}
+			remotePostServeActionData = append(remotePostServeActionData, actionData)
+		}
 	}
-	return postServeActionsData
+	return localPostServeActionsData, remotePostServeActionData
 }
