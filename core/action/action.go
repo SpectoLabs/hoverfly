@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path"
@@ -49,7 +50,7 @@ func NewRemoteAction(actionName, host string, delayInMs int) (*Action, error) {
 		return nil, errors.New("empty action name passed")
 	}
 
-	if !hasHttpPrefix(host) {
+	if !isValidURL(host) {
 		return nil, errors.New("remote host is invalid")
 	}
 
@@ -183,6 +184,10 @@ func (action *Action) Execute(pair *models.RequestResponsePair) error {
 	return nil
 }
 
-func hasHttpPrefix(host string) bool {
-	return strings.HasPrefix(host, "http") || strings.HasPrefix(host, "https")
+func isValidURL(host string) bool {
+
+	if _, err := url.ParseRequestURI(host); err == nil {
+		return true
+	}
+	return false
 }
