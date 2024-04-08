@@ -335,11 +335,12 @@ func getPostServeActionEntryView(entry *PostServeActionEntry) *v2.PostServeActio
 func convertJournalEntry(entry JournalEntry) v2.JournalEntryView {
 
 	return v2.JournalEntryView{
-		Request:     entry.Request.ConvertToRequestDetailsView(),
-		Response:    entry.Response.ConvertToResponseDetailsView(),
-		Mode:        entry.Mode,
-		TimeStarted: entry.TimeStarted.Format(RFC3339Milli),
-		Latency:     entry.Latency.Seconds() * 1e3,
+		Request:              entry.Request.ConvertToRequestDetailsView(),
+		Response:             entry.Response.ConvertToResponseDetailsView(),
+		Mode:                 entry.Mode,
+		TimeStarted:          entry.TimeStarted.Format(RFC3339Milli),
+		Latency:              entry.Latency.Seconds() * 1e3,
+		PostServeActionEntry: getPostServeActionEntryView(entry.PostServeActionEntry),
 	}
 }
 
