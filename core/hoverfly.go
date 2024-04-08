@@ -221,7 +221,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Response, chan stri
 
 	if result.PostServeActionInputDetails != nil {
 
-		journalIDChannel := make(chan string)
+		journalIDChannel := make(chan string, 1)
 		if postServeAction, ok := hf.PostServeActionDetails.Actions[result.PostServeActionInputDetails.PostServeAction]; ok {
 			go postServeAction.Execute(result.PostServeActionInputDetails.Pair, journalIDChannel, hf.Journal)
 		}

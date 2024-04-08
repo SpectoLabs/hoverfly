@@ -112,9 +112,9 @@ func Test_ExecuteLocalPostServeAction(t *testing.T) {
 	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
 	//not adding entry as update journal method will be tested in its file
-	journalIDChannel := make(chan string)
+	journalIDChannel := make(chan string, 1)
 	newJournal := journal.NewJournal()
-	journalIDChannel <- "1"
+	journalIDChannel <- "demo-id"
 	err = newAction.Execute(&originalPair, journalIDChannel, newJournal)
 	Expect(err).To(BeNil())
 }
@@ -132,10 +132,9 @@ func Test_ExecuteRemotePostServeAction(t *testing.T) {
 		},
 	}
 	//not adding entry as update journal method will be tested in its file
-	journalIDChannel := make(chan string)
+	journalIDChannel := make(chan string, 1)
 	newJournal := journal.NewJournal()
 	journalIDChannel <- "1"
-
 	newAction, err := action.NewRemoteAction("test-callback", server.URL+"/process", 0)
 	Expect(err).To(BeNil())
 	err = newAction.Execute(&originalPair, journalIDChannel, newJournal)
@@ -153,7 +152,7 @@ func Test_ExecuteRemotePostServeAction_WithUnReachableHost(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	//not adding entry as update journal method will be tested in its file
-	journalIDChannel := make(chan string)
+	journalIDChannel := make(chan string, 1)
 	newJournal := journal.NewJournal()
 	journalIDChannel <- "1"
 	err = newAction.Execute(&originalPair, journalIDChannel, newJournal)

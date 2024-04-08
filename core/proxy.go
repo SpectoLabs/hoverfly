@@ -61,9 +61,7 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 			startTime := time.Now()
 			resp, journalIDChannel := hoverfly.processRequest(r)
 			id, _ := hoverfly.Journal.NewEntry(r, resp, hoverfly.Cfg.Mode, startTime)
-			if journalIDChannel != nil {
-				journalIDChannel <- id
-			}
+			sendJournalIDToPostServeAction(journalIDChannel, id)
 			return r, resp
 		})
 
@@ -99,6 +97,12 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	return proxy
 }
 
+func sendJournalIDToPostServeAction(journalIDChannel chan string, id string) {
+	if journalIDChannel != nil {
+		journalIDChannel <- id
+	}
+}
+
 // Creates goproxy.ProxyHttpServer and configures it to be used as a webserver for Hoverfly
 // goproxy is given a non proxy handler that uses the Hoverfly request processing
 func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
@@ -109,9 +113,7 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 		r.URL.Scheme = "http"
 		resp, journalIDChannel := hoverfly.processRequest(r)
 		id, _ := hoverfly.Journal.NewEntry(r, resp, hoverfly.Cfg.Mode, startTime)
-		if journalIDChannel != nil {
-			journalIDChannel <- id
-		}
+		sendJournalIDToPostServeAction(journalIDChannel, id)
 		body, err := util.GetResponseBody(resp)
 
 		if err != nil {

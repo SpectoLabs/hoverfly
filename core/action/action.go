@@ -134,6 +134,7 @@ func (action *Action) Execute(pair *models.RequestResponsePair, journalIDChannel
 	time.Sleep(time.Duration(200+action.DelayInMs) * time.Millisecond)
 
 	journalID := <-journalIDChannel
+	close(journalIDChannel)
 	log.Info("Journal ID received ", journalID)
 
 	//if it is remote callback
