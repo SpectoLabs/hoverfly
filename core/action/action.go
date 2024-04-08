@@ -14,7 +14,9 @@ import (
 	"time"
 
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	"github.com/SpectoLabs/hoverfly/core/journal"
 	"github.com/SpectoLabs/hoverfly/core/models"
+	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -117,7 +119,7 @@ func (action *Action) GetActionView(actionName string) v2.ActionView {
 	}
 }
 
-func (action *Action) Execute(pair *models.RequestResponsePair) error {
+func (action *Action) Execute(pair *models.RequestResponsePair, journalIDChannel chan string, journal *journal.Journal) error {
 
 	pairViewBytes, err := json.Marshal(pair.ConvertToRequestResponsePairView())
 	if err != nil {
@@ -131,6 +133,9 @@ func (action *Action) Execute(pair *models.RequestResponsePair) error {
 	//adding 200 ms to include some buffer for it to return response
 	time.Sleep(time.Duration(200+action.DelayInMs) * time.Millisecond)
 
+	journalID := <-journalIDChannel
+	log.Info("Journal ID received ", journalID)
+
 	//if it is remote callback
 	if action.Remote != "" {
 
@@ -142,7 +147,10 @@ func (action *Action) Execute(pair *models.RequestResponsePair) error {
 			return err
 		}
 
+		correlationID := uuid.New()
+		invokedTime := time.Now()
 		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("X-CORRELATION-ID", correlationID)
 
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
@@ -152,16 +160,24 @@ func (action *Action) Execute(pair *models.RequestResponsePair) error {
 			return err
 		}
 
+		completionTime := time.Now()
+		journal.UpdatePostServeActionDetailsInJournal(journalID, pair.Response.PostServeAction, correlationID, invokedTime, completionTime, resp.StatusCode)
 		if resp.StatusCode != 200 {
 			log.Error("Remote post serve action did not process payload")
+
 			return nil
 		}
 		log.Info("Remote post serve action invoked successfully")
 		return nil
 	}
 
+	invokedTime := time.Now()
 	actionCommand := exec.Command(action.Binary, action.Script.Name())
 	actionCommand.Stdin = bytes.NewReader(pairViewBytes)
+	completionTime := time.Now()
+
+	journal.UpdatePostServeActionDetailsInJournal(journalID, pair.Response.PostServeAction, "", invokedTime, completionTime, 0)
+
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	actionCommand.Stdout = &stdout

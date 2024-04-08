@@ -11,7 +11,7 @@ import (
 	sorting "sort"
 	"strings"
 
-	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
+	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/core/matching"
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -21,12 +21,21 @@ import (
 const RFC3339Milli = "2006-01-02T15:04:05.000Z07:00"
 
 type JournalEntry struct {
-	Request     *models.RequestDetails
-	Response    *models.ResponseDetails
-	Mode        string
-	TimeStarted time.Time
-	Latency     time.Duration
-	Id          string
+	Request              *models.RequestDetails
+	Response             *models.ResponseDetails
+	Mode                 string
+	TimeStarted          time.Time
+	Latency              time.Duration
+	Id                   string
+	PostServeActionEntry *PostServeActionEntry
+}
+
+type PostServeActionEntry struct {
+	ActionName    string
+	InvokedTime   time.Time
+	CompletedTime time.Time
+	CorrelationId string
+	HttpStatus    int
 }
 
 type Journal struct {
@@ -88,9 +97,9 @@ func (this *Journal) GetAllIndexes() []v2.JournalIndexView {
 	return journalIndexViews
 }
 
-func (this *Journal) NewEntry(request *http.Request, response *http.Response, mode string, started time.Time) error {
+func (this *Journal) NewEntry(request *http.Request, response *http.Response, mode string, started time.Time) (string, error) {
 	if this.EntryLimit == 0 {
-		return fmt.Errorf("Journal disabled")
+		return "", fmt.Errorf("Journal disabled")
 	}
 
 	payloadRequest, _ := models.NewRequestDetailsFromHttpRequest(request)
@@ -141,7 +150,7 @@ func (this *Journal) NewEntry(request *http.Request, response *http.Response, mo
 
 	this.mutex.Unlock()
 
-	return nil
+	return entry.Id, nil
 }
 
 func (this *Journal) GetEntries(offset int, limit int, from *time.Time, to *time.Time, sort string) (v2.JournalView, error) {
@@ -296,16 +305,31 @@ func convertJournalEntries(entries []JournalEntry) []v2.JournalEntryView {
 
 	for _, journalEntry := range entries {
 		journalEntryViews = append(journalEntryViews, v2.JournalEntryView{
-			Request:     journalEntry.Request.ConvertToRequestDetailsView(),
-			Response:    journalEntry.Response.ConvertToResponseDetailsView(),
-			Mode:        journalEntry.Mode,
-			TimeStarted: journalEntry.TimeStarted.Format(RFC3339Milli),
-			Latency:     journalEntry.Latency.Seconds() * 1e3,
-			Id:          journalEntry.Id,
+			Request:              journalEntry.Request.ConvertToRequestDetailsView(),
+			Response:             journalEntry.Response.ConvertToResponseDetailsView(),
+			PostServeActionEntry: getPostServeActionEntryView(journalEntry.PostServeActionEntry),
+			Mode:                 journalEntry.Mode,
+			TimeStarted:          journalEntry.TimeStarted.Format(RFC3339Milli),
+			Latency:              journalEntry.Latency.Seconds() * 1e3,
+			Id:                   journalEntry.Id,
 		})
 	}
 
 	return journalEntryViews
+}
+
+func getPostServeActionEntryView(entry *PostServeActionEntry) *v2.PostServeActionEntryView {
+
+	if entry != nil {
+		return &v2.PostServeActionEntryView{
+			ActionName:    entry.ActionName,
+			InvokedTime:   entry.InvokedTime.Format(RFC3339Milli),
+			CompletedTime: entry.CompletedTime.Format(RFC3339Milli),
+			CorrelationId: entry.CorrelationId,
+			HttpStatus:    entry.HttpStatus,
+		}
+	}
+	return nil
 }
 
 func convertJournalEntry(entry JournalEntry) v2.JournalEntryView {
@@ -341,4 +365,21 @@ func getSortParameters(sort string) (string, string, error) {
 	}
 
 	return sortKey, sortOrder, nil
+}
+
+func (journal *Journal) UpdatePostServeActionDetailsInJournal(id string, actionName, correlationID string, invokedTime, completedTime time.Time, httpStatus int) {
+
+	for i, _ := range journal.entries {
+
+		if journal.entries[i].Id == id {
+			journal.entries[i].PostServeActionEntry = &PostServeActionEntry{
+				ActionName:    actionName,
+				CorrelationId: correlationID,
+				InvokedTime:   invokedTime,
+				CompletedTime: completedTime,
+				HttpStatus:    httpStatus,
+			}
+
+		}
+	}
 }

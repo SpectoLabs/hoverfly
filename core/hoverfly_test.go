@@ -23,53 +23,37 @@ const pythonMiddlewareBasic = "import sys\nprint(sys.stdin.readlines()[0])"
 const pythonModifyResponse = "#!/usr/bin/env python\n" +
 	"import sys\n" +
 	"import json\n" +
-
 	"def main():\n" +
 	"	data = sys.stdin.readlines()\n" +
 	"	payload = data[0]\n" +
-
 	"	payload_dict = json.loads(payload)\n" +
-
 	"	payload_dict['response']['status'] = 201\n" +
 	"	payload_dict['response']['body'] = \"body was replaced by middleware\"\n" +
-
 	"	print(json.dumps(payload_dict))\n" +
-
 	"if __name__ == \"__main__\":\n" +
 	"	main()\n"
 
 const rubyModifyResponse = "#!/usr/bin/env ruby\n" +
 	"# encoding: utf-8\n\n" +
-
 	"require 'rubygems'\n" +
 	"require 'json'\n\n" +
-
 	"while payload = STDIN.gets\n" +
 	"  next unless payload\n\n" +
-
 	"  jsonPayload = JSON.parse(payload)\n\n" +
-
 	"  jsonPayload[\"response\"][\"body\"] = \"body was replaced by middleware\\n\"\n\n" +
-
 	"  STDOUT.puts jsonPayload.to_json\n\n" +
-
 	"end"
 
 const pythonReflectBody = "#!/usr/bin/env python\n" +
 	"import sys\n" +
 	"import json\n" +
-
 	"def main():\n" +
 	"	data = sys.stdin.readlines()\n" +
 	"	payload = data[0]\n" +
-
 	"	payload_dict = json.loads(payload)\n" +
-
 	"	payload_dict['response']['status'] = 201\n" +
 	"	payload_dict['response']['body'] = payload_dict['request']['body']\n" +
-
 	"	print(json.dumps(payload_dict))\n" +
-
 	"if __name__ == \"__main__\":\n" +
 	"	main()\n"
 
@@ -152,7 +136,7 @@ func Test_Hoverfly_processRequest_CaptureModeReturnsResponseAndSavesIt(t *testin
 
 	unit.Cfg.SetMode("capture")
 
-	resp := unit.processRequest(r)
+	resp, _ := unit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
@@ -172,14 +156,14 @@ func Test_Hoverfly_processRequest_CanSimulateRequest(t *testing.T) {
 
 	// capturing
 	unit.Cfg.SetMode("capture")
-	resp := unit.processRequest(r)
+	resp, _ := unit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
 	// virtualizing
 	unit.Cfg.SetMode("simulate")
-	newResp := unit.processRequest(r)
+	newResp, _ := unit.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
@@ -196,14 +180,14 @@ func Test_Hoverfly_processRequest_CanSimulateRequestInSpyMode(t *testing.T) {
 
 	// capturing
 	unit.Cfg.SetMode("capture")
-	resp := unit.processRequest(r)
+	resp, _ := unit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
 	// virtualizing
 	unit.Cfg.SetMode("spy")
-	newResp := unit.processRequest(r)
+	newResp, _ := unit.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
@@ -221,7 +205,7 @@ func Test_Hoverfly_processRequest_CanSpyRequest(t *testing.T) {
 
 	// virtualizing
 	unit.Cfg.SetMode("spy")
-	resp := unit.processRequest(r)
+	resp, _ := unit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
@@ -246,7 +230,7 @@ func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeResponse(t *testin
 	Expect(err).To(BeNil())
 
 	unit.Cfg.SetMode("synthesize")
-	newResp := unit.processRequest(r)
+	newResp, _ := unit.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
@@ -271,7 +255,7 @@ func Test_Hoverfly_processRequest_CanModifyResponse(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	unit.Cfg.SetMode("modify")
-	newResp := unit.processRequest(r)
+	newResp, _ := unit.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
 
@@ -332,7 +316,7 @@ func Test_Hoverfly_processRequest_DelayAppliedToSuccessfulSimulateRequest(t *tes
 
 	// capturing
 	unit.Cfg.SetMode("capture")
-	resp := unit.processRequest(r)
+	resp, _ := unit.processRequest(r)
 
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
@@ -344,7 +328,7 @@ func Test_Hoverfly_processRequest_DelayAppliedToSuccessfulSimulateRequest(t *tes
 	stubLogNormal := ResponseDelayLogNormalListStub{}
 	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
 
-	newResp := unit.processRequest(r)
+	newResp, _ := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
@@ -369,7 +353,7 @@ func Test_Hoverfly_processRequest_DelayNotAppliedToFailedSimulateRequest(t *test
 	stubLogNormal := ResponseDelayLogNormalListStub{}
 	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
 
-	newResp := unit.processRequest(r)
+	newResp, _ := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
@@ -393,7 +377,7 @@ func Test_Hoverfly_processRequest_DelayNotAppliedToCaptureRequest(t *testing.T) 
 	stubLogNormal := ResponseDelayLogNormalListStub{}
 	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
 
-	resp := unit.processRequest(r)
+	resp, _ := unit.processRequest(r)
 
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
 
@@ -423,7 +407,7 @@ func Test_Hoverfly_processRequest_DelayAppliedToSynthesizeRequest(t *testing.T) 
 	unit.Simulation.ResponseDelays = &stub
 	stubLogNormal := ResponseDelayLogNormalListStub{}
 	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
-	newResp := unit.processRequest(r)
+	newResp, _ := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
@@ -454,7 +438,7 @@ func Test_Hoverfly_processRequest_DelayNotAppliedToFailedSynthesizeRequest(t *te
 	unit.Simulation.ResponseDelays = &stub
 	stubLogNormal := ResponseDelayLogNormalListStub{}
 	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
-	newResp := unit.processRequest(r)
+	newResp, _ := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
@@ -483,7 +467,7 @@ func Test_Hoverfly_processRequest_DelayAppliedToSuccessfulMiddleware(t *testing.
 	unit.Simulation.ResponseDelays = &stub
 	stubLogNormal := ResponseDelayLogNormalListStub{}
 	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
-	newResp := unit.processRequest(r)
+	newResp, _ := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
 
@@ -511,7 +495,7 @@ func Test_Hoverfly_processRequest_DelayNotAppliedToFailedModifyRequest(t *testin
 	unit.Simulation.ResponseDelays = &stub
 	stubLogNormal := ResponseDelayLogNormalListStub{}
 	unit.Simulation.ResponseDelaysLogNormal = &stubLogNormal
-	newResp := unit.processRequest(r)
+	newResp, _ := unit.processRequest(r)
 
 	Expect(newResp.StatusCode).To(Equal(http.StatusBadGateway))
 
@@ -529,7 +513,7 @@ func Test_Hoverfly_processRequest_CanHandleResponseDiff(t *testing.T) {
 
 	// capturing
 	expectedUnit.Cfg.SetMode("capture")
-	resp := expectedUnit.processRequest(r)
+	resp, _ := expectedUnit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
@@ -541,7 +525,7 @@ func Test_Hoverfly_processRequest_CanHandleResponseDiff(t *testing.T) {
 	// comparing
 	actualUnit.Cfg.SetMode("diff")
 	actualUnit.Simulation = expectedUnit.Simulation
-	newResp := actualUnit.processRequest(r)
+	newResp, _ := actualUnit.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
@@ -569,7 +553,7 @@ func Test_Hoverfly_processRequest_CanHandlePreflightRequestWhenCORSEnabled(t *te
 	r.Header.Set("Access-Control-Request-Headers", "X-PINGOTHER,Content-Type")
 
 	unit.Cfg.CORS = *cors.DefaultCORSConfigs()
-	resp := unit.processRequest(r)
+	resp, _ := unit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusOK))
@@ -596,7 +580,7 @@ func Test_Hoverfly_processRequest_IgnoreInvalidPreflightRequestWhenCORSEnabled(t
 	unit.Cfg.CORS = *cors.DefaultCORSConfigs()
 	unit.Cfg.SetMode("capture")
 
-	resp := unit.processRequest(r)
+	resp, _ := unit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
@@ -616,7 +600,7 @@ func Test_Hoverfly_processRequest_AddCORSHeadersToResponseWhenCORSEnabled(t *tes
 
 	// capturing
 	unit.Cfg.SetMode("capture")
-	resp := unit.processRequest(r)
+	resp, _ := unit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
@@ -624,7 +608,7 @@ func Test_Hoverfly_processRequest_AddCORSHeadersToResponseWhenCORSEnabled(t *tes
 	// virtualizing
 	unit.Cfg.CORS = *cors.DefaultCORSConfigs()
 	unit.Cfg.SetMode("simulate")
-	newResp := unit.processRequest(r)
+	newResp, _ := unit.processRequest(r)
 
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
@@ -645,7 +629,7 @@ func Test_Hoverfly_processRequest_ShouldNotAddCORSHeadersIfRequestHasNoOriginWhe
 	// capturing
 	unit.Cfg.CORS = *cors.DefaultCORSConfigs()
 	unit.Cfg.SetMode("capture")
-	resp := unit.processRequest(r)
+	resp, _ := unit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))
@@ -665,7 +649,7 @@ func Test_Hoverfly_processRequest_ShouldNotCaptureCORSHeadersAddedByHoverfly(t *
 	// capturing
 	unit.Cfg.CORS = *cors.DefaultCORSConfigs()
 	unit.Cfg.SetMode("capture")
-	resp := unit.processRequest(r)
+	resp, _ := unit.processRequest(r)
 
 	Expect(resp).ToNot(BeNil())
 	Expect(resp.StatusCode).To(Equal(http.StatusCreated))

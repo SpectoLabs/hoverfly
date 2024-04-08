@@ -59,8 +59,11 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	proxy.OnRequest(matchesFilter(hoverfly.Cfg.Destination)).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			startTime := time.Now()
-			resp := hoverfly.processRequest(r)
-			hoverfly.Journal.NewEntry(r, resp, hoverfly.Cfg.Mode, startTime)
+			resp, journalIDChannel := hoverfly.processRequest(r)
+			id, _ := hoverfly.Journal.NewEntry(r, resp, hoverfly.Cfg.Mode, startTime)
+			if journalIDChannel != nil {
+				journalIDChannel <- id
+			}
 			return r, resp
 		})
 
@@ -104,8 +107,11 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 	proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
 		r.URL.Scheme = "http"
-		resp := hoverfly.processRequest(r)
-		hoverfly.Journal.NewEntry(r, resp, hoverfly.Cfg.Mode, startTime)
+		resp, journalIDChannel := hoverfly.processRequest(r)
+		id, _ := hoverfly.Journal.NewEntry(r, resp, hoverfly.Cfg.Mode, startTime)
+		if journalIDChannel != nil {
+			journalIDChannel <- id
+		}
 		body, err := util.GetResponseBody(resp)
 
 		if err != nil {

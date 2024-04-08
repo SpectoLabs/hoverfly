@@ -44,7 +44,7 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 
 	nowTime := time.Now()
 
-	err := unit.NewEntry(request, &http.Response{
+	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -89,7 +89,7 @@ func Test_JournalIndex_NewEntryAfterAddingIndex_AddsJournalIndexEntryToIndexes(t
 	indexErr := unit.AddIndex(indexName)
 	Expect(indexErr).To(BeNil())
 
-	err := unit.NewEntry(request, &http.Response{
+	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -116,7 +116,7 @@ func Test_JournalIndex_NewEntryBeforeAddingIndex_AddsJournalIndexEntryToIndexes(
 
 	nowTime := time.Now()
 
-	err := unit.NewEntry(request, &http.Response{
+	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -183,7 +183,7 @@ func Test_Journal_NewEntry_RespectsEntryLimit(t *testing.T) {
 	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
 
 	for i := 1; i < 8; i++ {
-		err := unit.NewEntry(request, &http.Response{
+		_, err := unit.NewEntry(request, &http.Response{
 			StatusCode: 200,
 			Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 			Header: http.Header{
@@ -219,7 +219,7 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 
 	nowTime := time.Now()
 
-	err := unit.NewEntry(request, &http.Response{
+	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -231,7 +231,7 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	request.Method = "DELETE"
-	err = unit.NewEntry(request, &http.Response{
+	_, err = unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -260,7 +260,7 @@ func Test_Journal_NewEntry_WhenDisabledReturnsError(t *testing.T) {
 	unit.EntryLimit = 0
 
 	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
-	err := unit.NewEntry(request, &http.Response{
+	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -319,7 +319,7 @@ func Test_Journal_GetEntries_TurnsTimeDurationToMilliseconds(t *testing.T) {
 	unit := journal.NewJournal()
 
 	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
-	err := unit.NewEntry(request, &http.Response{
+	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
