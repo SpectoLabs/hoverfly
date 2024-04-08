@@ -103,7 +103,7 @@ type JournalEntryView struct {
 }
 
 type PostServeActionEntryView struct {
-	ActionName    string `json:"actionName"`
+	ActionName    string `json:"name"`
 	InvokedTime   string `json:"invoked"`
 	CompletedTime string `json:"completed"`
 	CorrelationId string `json:"correlationId,omitempty"`
