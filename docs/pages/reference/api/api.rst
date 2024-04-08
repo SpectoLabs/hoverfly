@@ -797,6 +797,8 @@ It supports multiple parameters to limit the amount of entries returned:
 - ``from`` - Timestamp to start filtering from;
 - ``sort`` - Sort results in format "field:order". Supported fields: ``timestarted`` and ``latency``. Supported orders: ``asc`` and ``desc``.
 
+It also returns post serve action details containing action name, when it was invoked, completed, correlation ID and HTTP status.
+
 Running hoverfly with ``-journal-size=0`` disables logging and 500 response is returned with body:
 
 ::
@@ -840,6 +842,13 @@ Running hoverfly with ``-journal-size=0`` disables logging and 500 response is r
             ]
           }
         },
+        "postServeAction": {
+            "name": "test-callback",
+            "invoked": "2024-04-09T00:56:11.606+00:30",
+            "completed": "2024-04-09T00:56:12.619+00:30",
+            "correlationId": "9a935ec9-fe65-40d8-9ae6-d9d43dabf679",
+            "status": 200
+        }
         "id":"mOBdPSIIBbjNqBvpZ8H-",
         "mode": "simulate",
         "timeStarted": "2017-07-17T10:41:59.168+01:00",
