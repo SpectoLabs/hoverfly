@@ -154,14 +154,16 @@ func (action *Action) Execute(pair *models.RequestResponsePair, journalIDChannel
 		req.Header.Add("X-CORRELATION-ID", correlationID)
 
 		resp, err := http.DefaultClient.Do(req)
+		completionTime := time.Now()
+
 		if err != nil {
+			journal.UpdatePostServeActionDetailsInJournal(journalID, pair.Response.PostServeAction, correlationID, invokedTime, completionTime, 0)
 			log.WithFields(log.Fields{
 				"error": err.Error(),
 			}).Error("Error when communicating with remote post serve action")
 			return err
 		}
 
-		completionTime := time.Now()
 		journal.UpdatePostServeActionDetailsInJournal(journalID, pair.Response.PostServeAction, correlationID, invokedTime, completionTime, resp.StatusCode)
 		if resp.StatusCode != 200 {
 			log.Error("Remote post serve action did not process payload")
