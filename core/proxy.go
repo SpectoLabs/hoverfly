@@ -100,6 +100,7 @@ func NewProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 func sendJournalIDToPostServeAction(journalIDChannel chan string, id string) {
 	if journalIDChannel != nil {
 		journalIDChannel <- id
+		close(journalIDChannel)
 	}
 }
 

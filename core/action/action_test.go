@@ -116,6 +116,7 @@ func Test_ExecuteLocalPostServeAction(t *testing.T) {
 	newJournal := journal.NewJournal()
 	journalIDChannel <- "demo-id"
 	err = newAction.Execute(&originalPair, journalIDChannel, newJournal)
+	close(journalIDChannel)
 	Expect(err).To(BeNil())
 }
 
@@ -136,6 +137,7 @@ func Test_ExecuteRemotePostServeAction(t *testing.T) {
 	newJournal := journal.NewJournal()
 	journalIDChannel <- "1"
 	newAction, err := action.NewRemoteAction("test-callback", server.URL+"/process", 0)
+	close(journalIDChannel)
 	Expect(err).To(BeNil())
 	err = newAction.Execute(&originalPair, journalIDChannel, newJournal)
 	Expect(err).To(BeNil())
@@ -156,6 +158,7 @@ func Test_ExecuteRemotePostServeAction_WithUnReachableHost(t *testing.T) {
 	newJournal := journal.NewJournal()
 	journalIDChannel <- "1"
 	err = newAction.Execute(&originalPair, journalIDChannel, newJournal)
+	close(journalIDChannel)
 	Expect(err).NotTo(BeNil())
 }
 
