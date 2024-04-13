@@ -133,9 +133,6 @@ func (action *Action) Execute(pair *models.RequestResponsePair, journalIDChannel
 	//adding 200 ms to include some buffer for it to return response
 	time.Sleep(time.Duration(200+action.DelayInMs) * time.Millisecond)
 
-	journalID := <-journalIDChannel
-	log.Info("Journal ID received ", journalID)
-
 	//if it is remote callback
 	if action.Remote != "" {
 
@@ -154,16 +151,18 @@ func (action *Action) Execute(pair *models.RequestResponsePair, journalIDChannel
 
 		resp, err := http.DefaultClient.Do(req)
 		completionTime := time.Now()
+		journalID, received := receiveJournalIdWithTimeout(journalIDChannel, time.Second)
+		log.Info("Journal ID received ", journalID)
 
 		if err != nil {
-			journal.UpdatePostServeActionDetailsInJournal(journalID, pair.Response.PostServeAction, correlationID, invokedTime, completionTime, 0)
+			updateJournal(pair, received, journal, journalID, correlationID, invokedTime, completionTime, 0)
 			log.WithFields(log.Fields{
 				"error": err.Error(),
 			}).Error("Error when communicating with remote post serve action")
 			return err
 		}
 
-		journal.UpdatePostServeActionDetailsInJournal(journalID, pair.Response.PostServeAction, correlationID, invokedTime, completionTime, resp.StatusCode)
+		updateJournal(pair, received, journal, journalID, correlationID, invokedTime, completionTime, resp.StatusCode)
 		if resp.StatusCode != 200 {
 			log.Error("Remote post serve action did not process payload")
 
@@ -176,10 +175,6 @@ func (action *Action) Execute(pair *models.RequestResponsePair, journalIDChannel
 	invokedTime := time.Now()
 	actionCommand := exec.Command(action.Binary, action.Script.Name())
 	actionCommand.Stdin = bytes.NewReader(pairViewBytes)
-	completionTime := time.Now()
-
-	journal.UpdatePostServeActionDetailsInJournal(journalID, pair.Response.PostServeAction, "", invokedTime, completionTime, 0)
-
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	actionCommand.Stdout = &stdout
@@ -191,6 +186,9 @@ func (action *Action) Execute(pair *models.RequestResponsePair, journalIDChannel
 	if err := actionCommand.Wait(); err != nil {
 		return err
 	}
+	completionTime := time.Now()
+	journalID, received := receiveJournalIdWithTimeout(journalIDChannel, time.Second)
+	updateJournal(pair, received, journal, journalID, "", invokedTime, completionTime, 0)
 
 	if len(stderr.Bytes()) > 0 {
 		log.Error("Error occurred while executing script " + stderr.String())
@@ -200,6 +198,34 @@ func (action *Action) Execute(pair *models.RequestResponsePair, journalIDChannel
 		log.Info("Output from post serve action " + stdout.String())
 	}
 	return nil
+}
+
+func updateJournal(pair *models.RequestResponsePair,
+	received bool,
+	journal *journal.Journal,
+	journalID string,
+	correlationID string,
+	invokedTime time.Time,
+	completionTime time.Time,
+	httpStatus int) {
+
+	if received {
+		journal.UpdatePostServeActionDetailsInJournal(journalID,
+			pair.Response.PostServeAction,
+			correlationID,
+			invokedTime,
+			completionTime,
+			httpStatus)
+	}
+}
+
+func receiveJournalIdWithTimeout(journalIDChannel chan string, timeout time.Duration) (string, bool) {
+	select {
+	case msg := <-journalIDChannel:
+		return msg, true
+	case <-time.After(timeout):
+		return "", false
+	}
 }
 
 func isValidURL(host string) bool {
