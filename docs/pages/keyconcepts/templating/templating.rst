@@ -84,6 +84,8 @@ Additional data can come from helper methods. These are the ones Hoverfly curren
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | A random UUID                                             | ``{{ randomUuid }}``                                      |  7b791f3d-d7f4-4635-8ea1-99568d821562   |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Maths operations (add, subtract, multiply, divide, sum)   | ``{{ divide 10 3 '0.00' }}``                              |  3.33                                   |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Replace all occurrences of the old value with the new     | ``{{ replace (Request.Body 'jsonpath' '$.text')``         |                                         |
 |                                                           |    ``'be' 'mock' }}``                                     |                                         |
 | value in the target string                                | (where Request.Body has the value of                      |                                         |
@@ -94,9 +96,8 @@ Additional data can come from helper methods. These are the ones Hoverfly curren
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Query CSV data source where ID = 3 and return its name    | ``{{csv 'test-csv' 'id' '3' 'name'}}``                    |  John Smith                             |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-| Query Journal index where index value = 1 and return Name |                                                           |                                         |
-|  from associated Response body in journal entry.          | ``{{journal "Request.QueryParam.id" "1"``                 |                                         |
-|                                                           |    ``"response" "jsonpath" "$.name"}}``                   |  John Smith                             |
+| Query Journal index where index value = 1 and return Name | ``{{journal "Request.QueryParam.id" "1"``                 |                                         |
+|  from associated Response body in journal entry.          |    ``"response" "jsonpath" "$.name"}}``                   |  John Smith                             |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 
 Time offset
@@ -176,6 +177,17 @@ For example, you can generate a random name using the following expression:
     }
 
 Fakers that require arguments are currently not supported.
+
+Maths Operation
+~~~~~~~~~~~~~~~
+
+The basic maths operations are currently supported: add, subtract, multiply and divide. These functions
+take three parameters: two values it operates on and the precision. The precision is given in a string
+format such as ``'0.00'``. For example ``{{ add 3 2.5 '0.00' }}`` should give you ``5.50``.
+
+A math functions for summing an array of numbers is also supported, but it's usually used in conjunction
+with the ``#each`` block helper.
+
 
 Templating Data Source
 ~~~~~~~~~~~~~~~~~~~~~~
