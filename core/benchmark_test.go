@@ -181,7 +181,7 @@ func BenchmarkProcessRequest(b *testing.B) {
 		b.Run(bm.name, func(b *testing.B) {
 
 			for n := 0; n < b.N; n++ {
-				resp = hoverfly.processRequest(request)
+				resp, _ = hoverfly.processRequest(request)
 			}
 		})
 	}

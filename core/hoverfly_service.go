@@ -481,6 +481,7 @@ func (hf *Hoverfly) SetLocalPostServeAction(actionName string, binary string, sc
 	if err != nil {
 		return err
 	}
+	log.Info("Local post serve action is set")
 	return nil
 }
 
@@ -494,6 +495,7 @@ func (hf *Hoverfly) SetRemotePostServeAction(actionName, remote string, delayInM
 	if err != nil {
 		return err
 	}
+	log.Info("Remote post serve action is set")
 	return nil
 }
 

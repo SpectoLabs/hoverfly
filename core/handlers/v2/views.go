@@ -93,12 +93,21 @@ type JournalView struct {
 }
 
 type JournalEntryView struct {
-	Request     RequestDetailsView  `json:"request"`
-	Response    ResponseDetailsView `json:"response"`
-	Mode        string              `json:"mode"`
-	TimeStarted string              `json:"timeStarted"`
-	Latency     float64             `json:"latency"`
-	Id          string              `json:"id"`
+	Request              RequestDetailsView        `json:"request"`
+	Response             ResponseDetailsView       `json:"response"`
+	Mode                 string                    `json:"mode"`
+	TimeStarted          string                    `json:"timeStarted"`
+	Latency              float64                   `json:"latency"`
+	Id                   string                    `json:"id"`
+	PostServeActionEntry *PostServeActionEntryView `json:"postServeAction,omitEmpty"`
+}
+
+type PostServeActionEntryView struct {
+	ActionName    string `json:"name"`
+	InvokedTime   string `json:"invoked"`
+	CompletedTime string `json:"completed"`
+	CorrelationId string `json:"correlationId,omitempty"`
+	HttpStatus    int    `json:"status,omitempty"`
 }
 
 type JournalEntryFilterView struct {

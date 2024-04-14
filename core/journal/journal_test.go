@@ -44,7 +44,7 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 
 	nowTime := time.Now()
 
-	err := unit.NewEntry(request, &http.Response{
+	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -76,6 +76,102 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 	Expect(entries[0].Latency).To(BeNumerically("<", 1))
 }
 
+func Test_Journal_UpdateEntry_AddsRemotePostServeActionToJournalEntry(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
+
+	nowTime := time.Now()
+
+	id, err := unit.NewEntry(request, &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Header: http.Header{
+			"test-header": []string{
+				"one", "two",
+			},
+		},
+	}, "test-mode", nowTime)
+	Expect(err).To(BeNil())
+	unit.UpdatePostServeActionDetailsInJournal(id, "outbound-http", "dummy-tracing-id", nowTime, nowTime, 200)
+
+	journalView, err := unit.GetEntries(0, 25, nil, nil, "")
+	entries := journalView.Journal
+	expectedTime := nowTime.Format(journal.RFC3339Milli)
+	Expect(err).To(BeNil())
+
+	Expect(entries).ToNot(BeNil())
+	Expect(entries).To(HaveLen(1))
+
+	Expect(*entries[0].Request.Method).To(Equal("GET"))
+	Expect(*entries[0].Request.Destination).To(Equal("hoverfly.io"))
+	Expect(*entries[0].Request.Body).To(Equal(""))
+
+	Expect(entries[0].Response.Status).To(Equal(200))
+	Expect(entries[0].Response.Body).To(Equal("test body"))
+	Expect(entries[0].Response.Headers["test-header"]).To(ContainElement("one"))
+	Expect(entries[0].Response.Headers["test-header"]).To(ContainElement("two"))
+
+	Expect(entries[0].Mode).To(Equal("test-mode"))
+	Expect(entries[0].TimeStarted).To(Equal(expectedTime))
+	Expect(entries[0].PostServeActionEntry.ActionName).To(Equal("outbound-http"))
+	Expect(entries[0].PostServeActionEntry.CorrelationId).To(Equal("dummy-tracing-id"))
+	Expect(entries[0].PostServeActionEntry.InvokedTime).To(Equal(expectedTime))
+	Expect(entries[0].PostServeActionEntry.CompletedTime).To(Equal(expectedTime))
+	Expect(entries[0].PostServeActionEntry.HttpStatus).To(Equal(200))
+	Expect(entries[0].Latency).To(BeNumerically("<", 1))
+}
+
+func Test_Journal_UpdateEntry_AddsLocalPostServeActionToJournalEntry(t *testing.T) {
+	RegisterTestingT(t)
+
+	unit := journal.NewJournal()
+
+	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
+
+	nowTime := time.Now()
+
+	id, err := unit.NewEntry(request, &http.Response{
+		StatusCode: 200,
+		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Header: http.Header{
+			"test-header": []string{
+				"one", "two",
+			},
+		},
+	}, "test-mode", nowTime)
+	Expect(err).To(BeNil())
+	unit.UpdatePostServeActionDetailsInJournal(id, "outbound-http", "", nowTime, nowTime, 0)
+
+	journalView, err := unit.GetEntries(0, 25, nil, nil, "")
+	entries := journalView.Journal
+	expectedTime := nowTime.Format(journal.RFC3339Milli)
+	Expect(err).To(BeNil())
+
+	Expect(entries).ToNot(BeNil())
+	Expect(entries).To(HaveLen(1))
+
+	Expect(*entries[0].Request.Method).To(Equal("GET"))
+	Expect(*entries[0].Request.Destination).To(Equal("hoverfly.io"))
+	Expect(*entries[0].Request.Body).To(Equal(""))
+
+	Expect(entries[0].Response.Status).To(Equal(200))
+	Expect(entries[0].Response.Body).To(Equal("test body"))
+	Expect(entries[0].Response.Headers["test-header"]).To(ContainElement("one"))
+	Expect(entries[0].Response.Headers["test-header"]).To(ContainElement("two"))
+
+	Expect(entries[0].Mode).To(Equal("test-mode"))
+	Expect(entries[0].TimeStarted).To(Equal(expectedTime))
+	Expect(entries[0].PostServeActionEntry.ActionName).To(Equal("outbound-http"))
+	Expect(entries[0].PostServeActionEntry.CorrelationId).To(Equal(""))
+	Expect(entries[0].PostServeActionEntry.InvokedTime).To(Equal(expectedTime))
+	Expect(entries[0].PostServeActionEntry.CompletedTime).To(Equal(expectedTime))
+	Expect(entries[0].PostServeActionEntry.HttpStatus).To(Equal(0))
+	Expect(entries[0].Latency).To(BeNumerically("<", 1))
+}
+
 func Test_JournalIndex_NewEntryAfterAddingIndex_AddsJournalIndexEntryToIndexes(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -89,7 +185,7 @@ func Test_JournalIndex_NewEntryAfterAddingIndex_AddsJournalIndexEntryToIndexes(t
 	indexErr := unit.AddIndex(indexName)
 	Expect(indexErr).To(BeNil())
 
-	err := unit.NewEntry(request, &http.Response{
+	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -116,7 +212,7 @@ func Test_JournalIndex_NewEntryBeforeAddingIndex_AddsJournalIndexEntryToIndexes(
 
 	nowTime := time.Now()
 
-	err := unit.NewEntry(request, &http.Response{
+	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -183,7 +279,7 @@ func Test_Journal_NewEntry_RespectsEntryLimit(t *testing.T) {
 	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
 
 	for i := 1; i < 8; i++ {
-		err := unit.NewEntry(request, &http.Response{
+		_, err := unit.NewEntry(request, &http.Response{
 			StatusCode: 200,
 			Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 			Header: http.Header{
@@ -219,7 +315,7 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 
 	nowTime := time.Now()
 
-	err := unit.NewEntry(request, &http.Response{
+	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -231,7 +327,7 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 	Expect(err).To(BeNil())
 
 	request.Method = "DELETE"
-	err = unit.NewEntry(request, &http.Response{
+	_, err = unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -260,7 +356,7 @@ func Test_Journal_NewEntry_WhenDisabledReturnsError(t *testing.T) {
 	unit.EntryLimit = 0
 
 	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
-	err := unit.NewEntry(request, &http.Response{
+	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
@@ -319,7 +415,7 @@ func Test_Journal_GetEntries_TurnsTimeDurationToMilliseconds(t *testing.T) {
 	unit := journal.NewJournal()
 
 	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
-	err := unit.NewEntry(request, &http.Response{
+	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{

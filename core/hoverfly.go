@@ -185,16 +185,16 @@ func (hf *Hoverfly) StopProxy() {
 
 // processRequest - processes incoming requests and based on proxy state (record/playback)
 // returns HTTP response.
-func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
+func (hf *Hoverfly) processRequest(req *http.Request) (*http.Response, chan string) {
 	if hf.Cfg.CORS.Enabled {
 		response := hf.Cfg.CORS.InterceptPreflightRequest(req)
 		if response != nil {
-			return response
+			return response, nil
 		}
 	}
 	requestDetails, err := models.NewRequestDetailsFromHttpRequest(req)
 	if err != nil {
-		return modes.ErrorResponse(req, err, "Could not interpret HTTP request").Response
+		return modes.ErrorResponse(req, err, "Could not interpret HTTP request").Response, nil
 	}
 
 	modeName := hf.Cfg.GetMode()
@@ -208,7 +208,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 	// and definitely don't delay people in capture mode
 	// Don't delete the error
 	if err != nil || modeName == modes.Capture {
-		return result.Response
+		return result.Response, nil
 	}
 
 	if result.IsResponseDelayable() {
@@ -221,11 +221,13 @@ func (hf *Hoverfly) processRequest(req *http.Request) *http.Response {
 
 	if result.PostServeActionInputDetails != nil {
 		if postServeAction, ok := hf.PostServeActionDetails.Actions[result.PostServeActionInputDetails.PostServeAction]; ok {
-			go postServeAction.Execute(result.PostServeActionInputDetails.Pair)
+			journalIDChannel := make(chan string, 1)
+			go postServeAction.Execute(result.PostServeActionInputDetails.Pair, journalIDChannel, hf.Journal)
+			return result.Response, journalIDChannel
 		}
 	}
 
-	return result.Response
+	return result.Response, nil
 }
 
 func (hf *Hoverfly) applyResponseDelay(result modes.ProcessResult) {

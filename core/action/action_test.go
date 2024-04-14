@@ -1,6 +1,7 @@
 package action_test
 
 import (
+	"github.com/SpectoLabs/hoverfly/core/journal"
 	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
@@ -110,7 +111,12 @@ func Test_ExecuteLocalPostServeAction(t *testing.T) {
 
 	originalPair := models.RequestResponsePair{Response: resp, Request: req}
 
-	err = newAction.Execute(&originalPair)
+	//not adding entry as update journal method will be tested in its file
+	journalIDChannel := make(chan string, 1)
+	newJournal := journal.NewJournal()
+	journalIDChannel <- "demo-id"
+	err = newAction.Execute(&originalPair, journalIDChannel, newJournal)
+	close(journalIDChannel)
 	Expect(err).To(BeNil())
 }
 
@@ -126,10 +132,14 @@ func Test_ExecuteRemotePostServeAction(t *testing.T) {
 			Body: "Normal body",
 		},
 	}
-
+	//not adding entry as update journal method will be tested in its file
+	journalIDChannel := make(chan string, 1)
+	newJournal := journal.NewJournal()
+	journalIDChannel <- "1"
 	newAction, err := action.NewRemoteAction("test-callback", server.URL+"/process", 0)
+	close(journalIDChannel)
 	Expect(err).To(BeNil())
-	err = newAction.Execute(&originalPair)
+	err = newAction.Execute(&originalPair, journalIDChannel, newJournal)
 	Expect(err).To(BeNil())
 }
 
@@ -143,7 +153,12 @@ func Test_ExecuteRemotePostServeAction_WithUnReachableHost(t *testing.T) {
 	newAction, err := action.NewRemoteAction("test-callback", "http://test", 0)
 	Expect(err).To(BeNil())
 
-	err = newAction.Execute(&originalPair)
+	//not adding entry as update journal method will be tested in its file
+	journalIDChannel := make(chan string, 1)
+	newJournal := journal.NewJournal()
+	journalIDChannel <- "1"
+	err = newAction.Execute(&originalPair, journalIDChannel, newJournal)
+	close(journalIDChannel)
 	Expect(err).NotTo(BeNil())
 }
 
