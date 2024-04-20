@@ -84,18 +84,6 @@ Additional data can come from helper methods. These are the ones Hoverfly curren
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | A random UUID                                             | ``{{ randomUuid }}``                                      |  7b791f3d-d7f4-4635-8ea1-99568d821562   |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-| Maths operations (add, subtract, multiply, divide, sum)   | ``{{ divide 10 3 '0.00' }}``                              |  3.33                                   |
-+-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-| String concatenate                                        | ``{{ concat 'bee' 'hive' }}``                             |  beehive                                |
-+-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-| String splitting                                          | ``{{ split 'bee,hive' ',' }}``                            |  []string{"bee", "hive"}                |
-+-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-| Replace all occurrences of the old value with the new     | ``{{ replace (Request.Body 'jsonpath' '$.text')``         |                                         |
-|                                                           |    ``'be' 'mock' }}``                                     |                                         |
-| value in the target string                                | (where Request.Body has the value of                      |                                         |
-|                                                           |                                                           |                                         |
-|                                                           | ``{"text":"to be or not to be"}``                         |  to mock or not to mock                 |
-+-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Generate random data using go-fakeit                      | ``{{ faker 'Name' }}``                                    |  John Smith                             |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 | Query CSV data source where ID = 3 and return its name    | ``{{csv 'test-csv' 'id' '3' 'name'}}``                    |  John Smith                             |
@@ -188,10 +176,69 @@ Maths Operation
 The basic maths operations are currently supported: add, subtract, multiply and divide. These functions
 take three parameters: two values it operates on and the precision. The precision is given in a string
 format such as ``'0.00'``. For example ``{{ add 3 2.5 '0.00' }}`` should give you ``5.50``.
+If no format is given, the exact value will be printed with up to 6 decimal places.
+
++------------+---------------------------------+---------------+
+| Description| Example                         |  Result       |
++============+=================================+===============+
+| Add        | ``{{ add 10 3 '0.00' }}``       |  13.33        |
++------------+---------------------------------+---------------+
+| Subtract   | ``{{ subtract 10 3 '' }}``      |  7            |
++------------+---------------------------------+---------------+
+| Multiply   | ``{{ multiply 10 3 '' }}``      |  30           |
++------------+---------------------------------+---------------+
+| Divide     | ``{{ divide 10 3 '' }}``        |  3.333333     |
++------------+---------------------------------+---------------+
 
 A math functions for summing an array of numbers is also supported, but it's usually used in conjunction
-with the ``#each`` block helper.
+with the ``#each`` block helper. For example:
 
+With the request payload of
+
+.. code:: json
+
+    {
+        "lineitems": {
+            "lineitem": [
+                {
+                    "upc": "1001",
+                    "quantity": "1",
+                    "price": "3.50"
+                },
+                {
+                    "upc": "1002",
+                    "quantity": "2",
+                    "price": "4.50"
+                }
+            ]
+        }
+    }
+
+We can get the total price of all the line items using this templating function:
+
+
+``{{#each (Request.Body 'jsonpath' '$.lineitems.lineitem') }}``
+``{{ addToArray 'subtotal' (multiply (this.price) (this.quantity) '') false }} {{/each}}``
+``total: {{ sum (getArray 'subtotal') '0.00' }}``
+
+String Operation
+~~~~~~~~~~~~~~~~
+
+You can use the following helper methods to join, split or replace string values.
+
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Description                                               | Example                                                   |  Result                                 |
++===========================================================+===========================================================+=========================================+
+| String concatenate                                        | ``{{ concat 'bee' 'hive' }}``                             |  beehive                                |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| String splitting                                          | ``{{ split 'bee,hive' ',' }}``                            |  []string{"bee", "hive"}                |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Replace all occurrences of the old value with the new     | ``{{ replace (Request.Body 'jsonpath' '$.text')``         |                                         |
+|                                                           |    ``'be' 'mock' }}``                                     |                                         |
+| value in the target string                                | (where Request.Body has the value of                      |                                         |
+|                                                           |                                                           |                                         |
+|                                                           | ``{"text":"to be or not to be"}``                         |  to mock or not to mock                 |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 
 Templating Data Source
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -207,7 +254,7 @@ User can upload CSV data file using hoverfly/hoverctl CLI or Admin API that can 
 .. note::
 
     Data source name is case sensitive whereas other parameters in this function are case insensitive.
-    Secondly, you can refer hoverfly/hoverctl options or Admin API docs in order to upload CSV data source to running hoverfly instance.
+    You can use hoverctl or call the Admin API to upload CSV data source to a running hoverfly instance.
 
 
 Example: Start hoverfly with templating CSV datasource(student-marks.csv) provided below.
