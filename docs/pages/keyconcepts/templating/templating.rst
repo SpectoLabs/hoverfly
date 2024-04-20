@@ -170,6 +170,117 @@ For example, you can generate a random name using the following expression:
 
 Fakers that require arguments are currently not supported.
 
+CSV Data Source
+~~~~~~~~~~~~~~~
+
+You can query data from a CSV data source.
+
+.. code:: json
+
+    {
+        "body": "{\"name\": \"{{csv '(data-source-name)' '(column-name)' '(query-value)' '(selected-column)' }}\"}"
+    }
+
+.. note::
+
+    The data source name is case sensitive whereas other parameters in this function are case insensitive.
+    You can use hoverctl or call the Admin API to upload CSV data source to a running Hoverfly instance.
+
+
+Example: Start Hoverfly with a CSV data source (student-marks.csv) provided below.
+
+.. code:: bash
+
+    hoverfly -templating-data-source "student-marks <path to below CSV file>"
+
+
++-----------+-------------------+
+| ID        | Name    |  Marks  |
++-----------+-------------------+
+| 1         |  Test1  |    55   |
++-----------+-------------------+
+| 2         |  Test2  |    65   |
++-----------+-------------------+
+| 3         |  Test3  |    98   |
++-----------+-------------------+
+| 4         |  Test4  |    23   |
++-----------+-------------------+
+| 5         |  Test5  |    15   |
++-----------+-------------------+
+| *         |  NA     |    0    |
++-----------+-------------------+
+
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Description                                               | Example                                                   |  Result                                 |
++===========================================================+===========================================================+=========================================+
+| Search where ID = 3 and return name                       | csv 'student-marks' 'Id' '3' 'Name'                       |  Test3                                  |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Search where ID = 4 and return its marks                  | csv 'student-marks' 'Id' '4' 'Marks'                      |  Test23                                 |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Search where Name = Test1 and return marks                | csv 'student-marks' 'Name' 'Test1' 'Marks'                |  55                                     |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Search where Id is not match and return marks             | csv 'student-marks' 'Id' 'Test100' 'Marks'                |  0                                      |
+| (in this scenario, it matches wildcard * and returns)     |                                                           |                                         |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Search where Id = first path param and return marks       | csv 'student-marks' 'Id' 'Request.Path.[0]' 'Marks'       |  15                                     |
+| URL looks like - http://test.com/students/5/marks         |                                                           |                                         |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+
+
+Journal Entry Data
+~~~~~~~~~~~~~~~~~~
+
+Journal Entry can be queried using its index and its extracted value.
+
+Syntax
+
+.. code:: bash
+
+    journal "index name" "extracted value" "request/response" "xpath/jsonpath" "lookup query"
+
+
+``index name`` should be the same key expression you have specified when you enable the journal index.
+``extracted value`` is for doing a key lookup for the journal entry from that index.
+``request/response`` specifies if you want to get data from the request or response.
+``xpath/jsonpath`` specifies whether you want to extract it using xpath or json path expression.
+``lookup query`` is either jsonpath or xpath expressions to parse the request/response data.
+
+Example:
+
+.. code:: json
+
+    {
+        "body": "{\"name\": \"{{ journal 'Request.QueryParam.id' '1' 'response' 'jsonpath' '$.name' }}\"}"
+    }
+
+In the above example, we are querying the name from JSON response in the journal entry where index ``Request.QueryParam.id`` has a key value of 1.
+
+Key Value Data Store
+~~~~~~~~~~~~~~~~~~~~
+
+Sometimes you may need to store a temporary variable and retrieve it later in other part of the templated response.
+In this case, you can use the internal key value data store. The following helper methods are available:
+
++----------------------------+--------------------------------------------+-----------------------+
+| Description                | Example                                    |  Result               |
++============================+============================================+=======================+
+| Put an entry               | ``{{ putValue 'id' 123 true }}``           |  123                  |
++----------------------------+--------------------------------------------+-----------------------+
+| Get an entry               | ``{{ getValue 'id' }}``                    |  123                  |
++----------------------------+--------------------------------------------+-----------------------+
+| Add a value to an arra     | ``{{ addToArray 'names' 'John' true }}``   |  John                 |
++----------------------------+--------------------------------------------+-----------------------+
+| Get an array               | ``{{ getArray 'names' }}``                 |  []string{"John"      |
++----------------------------+--------------------------------------------+-----------------------+
+
+``addToArray`` will create a new array if one doesn't exist. The boolean argument in ``putValue`` and ``addToArray``
+is used to control whether the set value is returned.
+
+.. note::
+
+    Each templating session has its own key value store, which means all the data you set will be cleared after the current response is rendered.
+
+
 Maths Operation
 ~~~~~~~~~~~~~~~
 
@@ -190,7 +301,7 @@ If no format is given, the exact value will be printed with up to 6 decimal plac
 | Divide     | ``{{ divide 10 3 '' }}``        |  3.333333     |
 +------------+---------------------------------+---------------+
 
-A math functions for summing an array of numbers is also supported, but it's usually used in conjunction
+A math functions for summing an array of numbers is also supported; it's usually used in conjunction
 with the ``#each`` block helper. For example:
 
 With the request payload of
@@ -240,90 +351,6 @@ You can use the following helper methods to join, split or replace string values
 |                                                           | ``{"text":"to be or not to be"}``                         |  to mock or not to mock                 |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 
-Templating Data Source
-~~~~~~~~~~~~~~~~~~~~~~
-
-User can upload CSV data file using hoverfly/hoverctl CLI or Admin API that can be queried via templating function.
-
-.. code:: json
-
-    {
-        "body": "{\"name\": \"{{csv '(data-source-name)' '(column-name)' '(query-value)' '(selected-column)' }}\"}"
-    }
-
-.. note::
-
-    Data source name is case sensitive whereas other parameters in this function are case insensitive.
-    You can use hoverctl or call the Admin API to upload CSV data source to a running hoverfly instance.
-
-
-Example: Start hoverfly with templating CSV datasource(student-marks.csv) provided below.
-
-.. code:: bash
-
-    hoverfly -templating-data-source "student-marks <path to below CSV file>"
-
-
-+-----------+-------------------+
-| ID        | Name    |  Marks  |
-+-----------+-------------------+
-| 1         |  Test1  |    55   |
-+-----------+-------------------+
-| 2         |  Test2  |    65   |
-+-----------+-------------------+
-| 3         |  Test3  |    98   |
-+-----------+-------------------+
-| 4         |  Test4  |    23   |
-+-----------+-------------------+
-| 5         |  Test5  |    15   |
-+-----------+-------------------+
-| *         |  NA     |    0    |
-+-----------+-------------------+
-
-+-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-| Description                                               | Example                                                   |  Result                                 |
-+===========================================================+===========================================================+=========================================+
-| Search where ID = 3 and return name                       | csv 'student-marks' 'Id' '3' 'Name'                       |  Test3                                  |
-+-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-| Search where ID = 4 and return its marks                  | csv 'student-marks' 'Id' '4' 'Marks'                      |  Test23                                 |
-+-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-| Search where Name = Test1 and return marks                | csv 'student-marks' 'Name' 'Test1' 'Marks'                |  55                                     |
-+-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-| Search where Id is not match and return marks             | csv 'student-marks' 'Id' 'Test100' 'Marks'                |  0                                      |
-| (in this scenario, it matches wildcard * and returns)     |                                                           |                                         |
-+-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-| Search where Id = first path param and return marks       | csv 'student-marks' 'Id' 'Request.Path.[0]' 'Marks'       |  15                                     |
-| URL looks like - http://test.com/students/5/marks         |                                                           |                                         |
-+-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-
-
-Journal
-~~~~~~~
-
-Journal Entry can be queried using its index and its extracted value.
-
-Syntax
-
-.. code:: bash
-
-    journal "index name" "extracted value" "request/response" "xpath/jsonpath" "lookup query"
-
-
-``index name`` should be the same key expression you have specified when you enable the journal index.
-``extracted value`` is for doing a key lookup for the journal entry from that index.
-``request/response`` specifies if you want to get data from the request or response.
-``xpath/jsonpath`` specifies whether you want to extract it using xpath or json path expression.
-``lookup query`` is either jsonpath or xpath expressions to parse the request/response data.
-
-Example:
-
-.. code:: json
-
-    {
-        "body": "{\"name\": \"{{ journal 'Request.QueryParam.id' '1' 'response' 'jsonpath' '$.name' }}\"}"
-    }
-
-In the above example, we are querying the name from JSON response in the journal entry where index ``Request.QueryParam.id`` has a key value of 1.
 
 Conditional Templating, Looping and More
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
