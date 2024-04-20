@@ -49,6 +49,16 @@ func Test_ApplyTemplate_ParseCsvByPassingRequestParamAndReturnMatchValue(t *test
 	Expect(template).To(Equal(`55`))
 }
 
+func Test_ApplyTemplate_EachBlockWithSplitTemplatingFunction(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string),
+		`{{#each (split 'one,two,three' ',') }}{{this}} | {{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`one | two | three | `))
+}
+
 func Test_ApplyTemplate_EachBlockWithCsvTemplatingFunction(t *testing.T) {
 	RegisterTestingT(t)
 

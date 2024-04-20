@@ -117,14 +117,6 @@ func (t templateHelpers) concat(val1, val2 string) string {
 	return val1 + val2
 }
 
-func prepareJsonPathQuery(query string) string {
-	if query[0:1] != "{" && query[len(query)-1:] != "}" {
-		query = fmt.Sprintf("{%s}", query)
-	}
-
-	return query
-}
-
 func (t templateHelpers) faker(fakerType string) []reflect.Value {
 
 	if t.fakerSource == nil {
