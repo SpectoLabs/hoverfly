@@ -47,6 +47,55 @@ Example
 |
 |
 
+Negation matcher
+-------------
+The opposite of the Exact matcher. This matcher will evaluate to true if the values being compared are not the same.
+
+Example
+"""""""
+
+.. code:: json
+
+   "matcher": "negate"
+   "value": "?"
+
+.. raw:: html
+
+    <table border="1" class="docutils matcher-examples">
+        <thead>
+            <tr class="row-odd">
+                <th class="head">String to match</th>
+                <th class="head">Matcher value</th>
+                <th class="head">Match</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="row-even">
+                <td>cloud.hoverfly.io</td>
+                <td>docs.hoverfly.io</td>
+                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
+            <tr/>
+            <tr class="row-odd">
+                <td></td>
+                <td>cloud.hoverfly.io</td>
+                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
+            <tr/>
+            <tr class="row-even">
+                <td>cloud.hoverfly.io</td>
+                <td></td>
+                <td class="example-icon"><span class="fa fa-check fa-success"></span></td>
+            <tr/>
+            <tr class="row-odd">
+                <td>cloud.hoverfly.io</td>
+                <td>cloud.hoverfly.io</td>
+                <td class="example-icon"><span class="fa fa-times fa-failure"></span></td>
+            <tr/>
+        </tbody>
+    </table>
+
+|
+|
+
 Glob matcher
 ------------
 
@@ -573,7 +622,7 @@ JWT matcher
 -----------
 
 This matcher is primarily used for matching JWT tokens. This matcher converts base64 encoded JWT to
-JSON document ({"header": {}, "payload": ""}) and does JSON partial match with the matcher value.
+JSON document ``{"header": {}, "payload": ""}`` and does JSON partial match with the matcher value.
 
 Matcher value contains only keys that they want to match in JWT.
 
@@ -592,7 +641,7 @@ Matcher chaining allows you to pass a matched value into another matcher to do f
 
 It typically removes the stress of composing and testing complex expressions and make matchers more readable.
 
-For an example, one can use JSONPath to get a JSON node, then use another matcher to match the JSON node value as follows.
+For example, one can use JSONPath to get a JSON node, then use another matcher to match the JSON node value as follows.
 
 Example
 """""""
