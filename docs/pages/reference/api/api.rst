@@ -520,7 +520,8 @@ It will return list of scripts that can be executed with a binary after response
                 "actionName": "<post serve action name>",
                 "binary": "python",
                 "script": "#python code goes here",
-                "delayInMs":"#delay(in ms) post which script will be executed after serving the request"
+                "delayInMs":"#delay(in ms) post which script will be executed after serving the request",
+                "remote": "<url of the remote action webserver if set>"
             }
         ]
     }
@@ -541,6 +542,7 @@ It returns all the post serve actions.
         "binary": "python",
         "script": "#python code goes here",
         "delayInMs": "#delay(in ms) post which script will be executed after serving the request"
+        "remote": "<url of the remote action webserver>"
     }
 
 DELETE /api/v2/hoverfly/post-serve-action/:actionName
