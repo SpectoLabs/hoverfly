@@ -49,6 +49,28 @@ func Test_ApplyTemplate_ParseCsvByPassingRequestParamAndReturnMatchValue(t *test
 	Expect(template).To(Equal(`55`))
 }
 
+func Test_ApplyTemplate_ParseCsv_WithMissingDataSource(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Query: map[string][]string{"Id": {"1"}},
+	}, make(map[string]string), `{{csv 'test-csv3' 'Id' 55 'Marks'}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`{{ csv test-csv3 Id 55 Marks }}`))
+}
+
+func Test_ApplyTemplate_ParseCsv_WithEachBlockAndMissingDataSource(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{
+		Body: `{"products": [1, 2]}`,
+	}, make(map[string]string), `{{#each (Request.Body 'jsonpath' '$.products')}} {{@index}} : Product Name with productId {{this}} is {{csv 'products' 'productId' this 'productName'}} {{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(` 0 : Product Name with productId 1 is {{ csv products productId 1 productName }}  1 : Product Name with productId 2 is {{ csv products productId 2 productName }} `))
+}
+
 func Test_ApplyTemplate_EachBlockWithSplitTemplatingFunction(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -719,6 +741,7 @@ func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]strin
 	templator.TemplateHelper.TemplateDataSource.SetDataSource("test-csv1", dataSource1)
 	templator.TemplateHelper.TemplateDataSource.SetDataSource("test-csv2", dataSource2)
 
-	template, _ := templator.ParseTemplate(responseBody)
+	template, err := templator.ParseTemplate(responseBody)
+	Expect(err).To(BeNil())
 	return templator.RenderTemplate(template, requestDetails, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
 }

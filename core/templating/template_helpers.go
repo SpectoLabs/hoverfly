@@ -327,11 +327,7 @@ func getEvaluationString(helperName string, options *raymond.Options) string {
 
 	evaluationString := "{{ " + helperName + " "
 	for _, params := range options.Params() {
-		value, ok := params.(string)
-		if !ok {
-			value = ""
-		}
-		evaluationString = evaluationString + value + ` `
+		evaluationString = evaluationString + fmt.Sprint(params) + ` `
 	}
 	return evaluationString + "}}"
 }
