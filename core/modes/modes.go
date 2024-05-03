@@ -45,6 +45,7 @@ type ModeArguments struct {
 	MatchingStrategy   *string
 	Stateful           bool
 	OverwriteDuplicate bool
+	CaptureOnMiss      bool
 }
 
 type ProcessResult struct {

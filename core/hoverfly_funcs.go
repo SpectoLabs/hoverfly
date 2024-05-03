@@ -402,6 +402,10 @@ func (hf *Hoverfly) Save(request *models.RequestDetails, response *models.Respon
 		hf.Simulation.AddPair(&pair)
 	}
 
+	if hf.Cfg.GetMode() == modes.Spy {
+		_, _ = hf.CacheMatcher.SaveRequestMatcherResponsePair(*request, &pair, nil)
+	}
+
 	return nil
 }
 
