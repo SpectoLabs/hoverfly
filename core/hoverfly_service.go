@@ -108,6 +108,7 @@ func (hf *Hoverfly) SetModeWithArguments(modeView v2.ModeView) error {
 		MatchingStrategy:   matchingStrategy,
 		Stateful:           modeView.Arguments.Stateful,
 		OverwriteDuplicate: modeView.Arguments.OverwriteDuplicate,
+		CaptureOnMiss:      modeView.Arguments.CaptureOnMiss,
 	}
 
 	hf.modeMap[hf.Cfg.GetMode()].SetArguments(modeArguments)
