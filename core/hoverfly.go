@@ -224,6 +224,10 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Response, chan stri
 			journalIDChannel := make(chan string, 1)
 			go postServeAction.Execute(result.PostServeActionInputDetails.Pair, journalIDChannel, hf.Journal)
 			return result.Response, journalIDChannel
+		} else if hf.PostServeActionDetails.FallbackAction != nil {
+			journalIDChannel := make(chan string, 1)
+			go hf.PostServeActionDetails.FallbackAction.Execute(result.PostServeActionInputDetails.Pair, journalIDChannel, hf.Journal)
+			return result.Response, journalIDChannel
 		}
 	}
 

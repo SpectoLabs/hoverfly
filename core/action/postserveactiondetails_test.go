@@ -10,7 +10,7 @@ import (
 func Test_SetPostServeActionMethod(t *testing.T) {
 	RegisterTestingT(t)
 
-	newAction, err := action.NewLocalAction("test-callback", "python3", "dummy script", 1800)
+	newAction, err := action.NewLocalAction("python3", "dummy script", 1800)
 	Expect(err).To(BeNil())
 
 	unit := action.NewPostServeActionDetails()
@@ -22,10 +22,23 @@ func Test_SetPostServeActionMethod(t *testing.T) {
 	Expect(unit.Actions["test-callback"].DelayInMs).To(Equal(1800))
 }
 
+func Test_SetPostServeActionMethod_WithEmptyActionName(t *testing.T) {
+	RegisterTestingT(t)
+
+	newAction, err := action.NewLocalAction("python3", "dummy script", 1800)
+	Expect(err).To(BeNil())
+
+	unit := action.NewPostServeActionDetails()
+	err = unit.SetAction("", newAction)
+
+	Expect(err).To(BeNil())
+	Expect(unit.FallbackAction).NotTo(BeNil())
+}
+
 func Test_DeletePostServeActionMethod(t *testing.T) {
 	RegisterTestingT(t)
 
-	newAction, err := action.NewLocalAction("test-callback", "python3", "dummy script", 1800)
+	newAction, err := action.NewLocalAction("python3", "dummy script", 1800)
 	Expect(err).To(BeNil())
 
 	unit := action.NewPostServeActionDetails()

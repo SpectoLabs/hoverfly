@@ -17,7 +17,7 @@ const pythonBasicScript = "import sys\nprint(sys.stdin.readlines()[0])"
 func Test_NewLocalActionMethod(t *testing.T) {
 	RegisterTestingT(t)
 
-	newAction, err := action.NewLocalAction("test-callback", "python3", "dummy-script", 1800)
+	newAction, err := action.NewLocalAction("python3", "dummy-script", 1800)
 
 	Expect(err).To(BeNil())
 	Expect(newAction).NotTo(BeNil())
@@ -33,7 +33,7 @@ func Test_NewLocalActionMethod(t *testing.T) {
 func Test_NewRemoteActionMethodWithEmptyHost(t *testing.T) {
 	RegisterTestingT(t)
 
-	newAction, err := action.NewRemoteAction("test-callback", "", 1800)
+	newAction, err := action.NewRemoteAction("", 1800)
 
 	Expect(err).NotTo(BeNil())
 	Expect(newAction).To(BeNil())
@@ -42,7 +42,7 @@ func Test_NewRemoteActionMethodWithEmptyHost(t *testing.T) {
 func Test_NewRemoteActionMethodWithInvalidHost(t *testing.T) {
 	RegisterTestingT(t)
 
-	newAction, err := action.NewRemoteAction("test-callback", "testing", 1800)
+	newAction, err := action.NewRemoteAction("testing", 1800)
 
 	Expect(err).NotTo(BeNil())
 	Expect(err.Error()).To(Equal("remote host is invalid"))
@@ -52,7 +52,7 @@ func Test_NewRemoteActionMethodWithInvalidHost(t *testing.T) {
 func Test_NewRemoteActionMethodWithHttpHost(t *testing.T) {
 	RegisterTestingT(t)
 
-	newAction, err := action.NewRemoteAction("test-callback", "http://localhost", 1800)
+	newAction, err := action.NewRemoteAction("http://localhost", 1800)
 
 	Expect(err).To(BeNil())
 	Expect(newAction).NotTo(BeNil())
@@ -63,7 +63,7 @@ func Test_NewRemoteActionMethodWithHttpHost(t *testing.T) {
 func Test_NewRemoteActionMethodWithHttpsHost(t *testing.T) {
 	RegisterTestingT(t)
 
-	newAction, err := action.NewRemoteAction("test-callback", "https://test.com", 1800)
+	newAction, err := action.NewRemoteAction("https://test.com", 1800)
 
 	Expect(err).To(BeNil())
 	Expect(newAction).NotTo(BeNil())
@@ -74,7 +74,7 @@ func Test_NewRemoteActionMethodWithHttpsHost(t *testing.T) {
 func Test_GetLocalActionViewMethod(t *testing.T) {
 	RegisterTestingT(t)
 
-	newAction, err := action.NewLocalAction("test-callback", "python3", "dummy-script", 1800)
+	newAction, err := action.NewLocalAction("python3", "dummy-script", 1800)
 
 	Expect(err).To(BeNil())
 	actionView := newAction.GetActionView("test-callback")
@@ -88,7 +88,7 @@ func Test_GetLocalActionViewMethod(t *testing.T) {
 func Test_GetRemoteActionViewMethod(t *testing.T) {
 	RegisterTestingT(t)
 
-	newAction, err := action.NewRemoteAction("test-callback", "http://localhost:8000", 1800)
+	newAction, err := action.NewRemoteAction("http://localhost:8000", 1800)
 
 	Expect(err).To(BeNil())
 	actionView := newAction.GetActionView("test-callback")
@@ -102,7 +102,7 @@ func Test_GetRemoteActionViewMethod(t *testing.T) {
 
 func Test_ExecuteLocalPostServeAction(t *testing.T) {
 	RegisterTestingT(t)
-	newAction, err := action.NewLocalAction("test-callback", "python3", pythonBasicScript, 0)
+	newAction, err := action.NewLocalAction("python3", pythonBasicScript, 0)
 
 	Expect(err).To(BeNil())
 
@@ -136,7 +136,7 @@ func Test_ExecuteRemotePostServeAction(t *testing.T) {
 	journalIDChannel := make(chan string, 1)
 	newJournal := journal.NewJournal()
 	journalIDChannel <- "1"
-	newAction, err := action.NewRemoteAction("test-callback", server.URL+"/process", 0)
+	newAction, err := action.NewRemoteAction(server.URL+"/process", 0)
 	close(journalIDChannel)
 	Expect(err).To(BeNil())
 	err = newAction.Execute(&originalPair, journalIDChannel, newJournal)
@@ -150,7 +150,7 @@ func Test_ExecuteRemotePostServeAction_WithUnReachableHost(t *testing.T) {
 		},
 	}
 
-	newAction, err := action.NewRemoteAction("test-callback", "http://test", 0)
+	newAction, err := action.NewRemoteAction("http://test", 0)
 	Expect(err).To(BeNil())
 
 	//not adding entry as update journal method will be tested in its file

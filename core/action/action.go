@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"strings"
 	"time"
 
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -27,12 +26,9 @@ type Action struct {
 	DelayInMs int
 }
 
-func NewLocalAction(actionName, binary, scriptContent string, delayInMs int) (*Action, error) {
+func NewLocalAction(binary, scriptContent string, delayInMs int) (*Action, error) {
 
 	scriptInfo := &Action{}
-	if strings.TrimSpace(actionName) == "" {
-		return nil, errors.New("empty action name passed")
-	}
 
 	scriptInfo.DelayInMs = delayInMs
 
@@ -46,11 +42,7 @@ func NewLocalAction(actionName, binary, scriptContent string, delayInMs int) (*A
 	return scriptInfo, nil
 }
 
-func NewRemoteAction(actionName, host string, delayInMs int) (*Action, error) {
-
-	if strings.TrimSpace(actionName) == "" {
-		return nil, errors.New("empty action name passed")
-	}
+func NewRemoteAction(host string, delayInMs int) (*Action, error) {
 
 	if !isValidURL(host) {
 		return nil, errors.New("remote host is invalid")

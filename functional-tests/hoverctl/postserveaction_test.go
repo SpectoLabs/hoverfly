@@ -36,6 +36,12 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(ContainSubstring("Success"))
 		})
 
+		It("should return success on setting fallback remote post-serve-action", func() {
+			output := functional_tests.Run(hoverctlBinary, "post-serve-action", "set", "--remote", "http://localhost", "--delay", "1500")
+
+			Expect(output).To(ContainSubstring("Success"))
+		})
+
 	})
 
 	Describe("delete post-serve-action", func() {
@@ -102,6 +108,17 @@ var _ = Describe("When I use hoverctl", func() {
 
 			output = functional_tests.Run(hoverctlBinary, "post-serve-action", "get-all")
 			Expect(output).To(ContainSubstring("test-callback"))
+			Expect(output).To(ContainSubstring("http://localhost"))
+			Expect(output).To(ContainSubstring("1700"))
+		})
+
+		It("should return remote default post-serve-action", func() {
+			output := functional_tests.Run(hoverctlBinary, "post-serve-action", "set", "--remote", "http://localhost", "--delay", "1700")
+
+			Expect(output).To(ContainSubstring("Success"))
+
+			output = functional_tests.Run(hoverctlBinary, "post-serve-action", "get-all")
+			Expect(output).To(ContainSubstring("default"))
 			Expect(output).To(ContainSubstring("http://localhost"))
 			Expect(output).To(ContainSubstring("1700"))
 		})

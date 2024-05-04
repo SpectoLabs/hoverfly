@@ -2,12 +2,14 @@ package action
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 )
 
 type PostServeActionDetails struct {
-	Actions map[string]Action
-	RWMutex sync.RWMutex
+	Actions        map[string]Action
+	FallbackAction *Action
+	RWMutex        sync.RWMutex
 }
 
 func NewPostServeActionDetails() *PostServeActionDetails {
@@ -20,12 +22,18 @@ func NewPostServeActionDetails() *PostServeActionDetails {
 func (postServeActionDetails *PostServeActionDetails) SetAction(actionName string, newAction *Action) error {
 
 	postServeActionDetails.RWMutex.Lock()
-	//cleanup
-	if existingAction, ok := postServeActionDetails.Actions[actionName]; ok {
-		existingAction.DeleteScript()
-		delete(postServeActionDetails.Actions, actionName)
+	if strings.TrimSpace(actionName) == "" {
+		if postServeActionDetails.FallbackAction != nil {
+			postServeActionDetails.FallbackAction.DeleteScript()
+		}
+		postServeActionDetails.FallbackAction = newAction
+	} else {
+		if existingAction, ok := postServeActionDetails.Actions[actionName]; ok {
+			existingAction.DeleteScript()
+			delete(postServeActionDetails.Actions, actionName)
+		}
+		postServeActionDetails.Actions[actionName] = *newAction
 	}
-	postServeActionDetails.Actions[actionName] = *newAction
 	postServeActionDetails.RWMutex.Unlock()
 	return nil
 }

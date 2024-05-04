@@ -48,18 +48,18 @@ Hoverfly Remote PostServeAction can be set using the following flags:
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		checkTargetAndExit(target)
-		if remote != "" && actionNameToBeSet != "" {
+		if remote != "" {
 			err := wrapper.SetRemotePostServeAction(actionNameToBeSet, remote, delayInMs, *target)
 			handleIfError(err)
 			fmt.Println("Success")
-		} else if binary != "" && scriptPath != "" && actionNameToBeSet != "" {
+		} else if binary != "" && scriptPath != "" {
 			script, err := configuration.ReadFile(scriptPath)
 			handleIfError(err)
 			err = wrapper.SetLocalPostServeAction(actionNameToBeSet, binary, string(script), delayInMs, *target)
 			handleIfError(err)
 			fmt.Println("Success")
 		} else {
-			fmt.Println("(Binary and script path/remote) and action name are compulsory to set post serve action")
+			fmt.Println("(Binary and script path/remote) are compulsory to set post serve action")
 		}
 	},
 }
@@ -112,6 +112,15 @@ func getPostServeActionsTabularData(postServeActions v2.PostServeActionDetailsVi
 			actionData := []string{action.ActionName, action.Remote, fmt.Sprint(action.DelayInMs)}
 			remotePostServeActionData = append(remotePostServeActionData, actionData)
 		}
+	}
+	action := *postServeActions.FallbackAction
+	const defaultActionName = "default"
+	if action.Remote == "" {
+		actionData := []string{defaultActionName, action.Binary, getContentShorthand(action.ScriptContent), fmt.Sprint(action.DelayInMs)}
+		localPostServeActionsData = append(localPostServeActionsData, actionData)
+	} else {
+		actionData := []string{defaultActionName, action.Remote, fmt.Sprint(action.DelayInMs)}
+		remotePostServeActionData = append(remotePostServeActionData, actionData)
 	}
 	return localPostServeActionsData, remotePostServeActionData
 }
