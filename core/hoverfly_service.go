@@ -467,6 +467,11 @@ func (hf *Hoverfly) GetAllPostServeActions() v2.PostServeActionDetailsView {
 	for actionName, action := range hf.PostServeActionDetails.Actions {
 		actions = append(actions, action.GetActionView(actionName))
 	}
+
+	if hf.PostServeActionDetails.FallbackAction != nil {
+		actions = append(actions, hf.PostServeActionDetails.FallbackAction.GetActionView(""))
+	}
+
 	return v2.PostServeActionDetailsView{
 		Actions: actions,
 	}
@@ -474,7 +479,7 @@ func (hf *Hoverfly) GetAllPostServeActions() v2.PostServeActionDetailsView {
 
 func (hf *Hoverfly) SetLocalPostServeAction(actionName string, binary string, scriptContent string, delayInMs int) error {
 
-	action, err := action.NewLocalAction(actionName, binary, scriptContent, delayInMs)
+	action, err := action.NewLocalAction(binary, scriptContent, delayInMs)
 	if err != nil {
 		return err
 	}
@@ -488,7 +493,7 @@ func (hf *Hoverfly) SetLocalPostServeAction(actionName string, binary string, sc
 
 func (hf *Hoverfly) SetRemotePostServeAction(actionName, remote string, delayInMs int) error {
 
-	action, err := action.NewRemoteAction(actionName, remote, delayInMs)
+	action, err := action.NewRemoteAction(remote, delayInMs)
 	if err != nil {
 		return err
 	}

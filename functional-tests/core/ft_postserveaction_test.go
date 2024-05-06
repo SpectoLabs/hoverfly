@@ -103,6 +103,26 @@ var _ = Describe("Manage post serve actions in hoverfly", func() {
 				Expect(postServeActionDetails.Actions[0].DelayInMs).To(Equal(1400))
 			})
 		})
+
+		Context("start hoverfly and set fallback remote post serve action", func() {
+
+			BeforeEach(func() {
+				hoverfly.Start()
+			})
+
+			AfterEach(func() {
+				hoverfly.Stop()
+			})
+
+			It("Should set post serve action", func() {
+				postServeActionDetails := hoverfly.SetRemotePostServeAction("", "http://localhost:8080", 1600)
+				Expect(postServeActionDetails).NotTo(BeNil())
+				Expect(postServeActionDetails.Actions).NotTo(BeNil())
+				Expect(postServeActionDetails.Actions[0].ActionName).To(Equal(""))
+				Expect(postServeActionDetails.Actions[0].Remote).To(Equal("http://localhost:8080"))
+				Expect(postServeActionDetails.Actions[0].DelayInMs).To(Equal(1600))
+			})
+		})
 	})
 
 	Context("delete post serve action", func() {
