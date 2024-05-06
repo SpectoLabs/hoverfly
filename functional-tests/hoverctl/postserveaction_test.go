@@ -118,7 +118,7 @@ var _ = Describe("When I use hoverctl", func() {
 			Expect(output).To(ContainSubstring("Success"))
 
 			output = functional_tests.Run(hoverctlBinary, "post-serve-action", "get-all")
-			Expect(output).To(ContainSubstring("default"))
+			Expect(output).To(ContainSubstring("fallback"))
 			Expect(output).To(ContainSubstring("http://localhost"))
 			Expect(output).To(ContainSubstring("1700"))
 		})

@@ -59,22 +59,6 @@ var _ = Describe("Manage post serve actions in hoverfly", func() {
 				Expect(postServeActionDetails.Actions[0].DelayInMs).To(Equal(1300))
 			})
 		})
-
-		Context("hoverfly with fallback remote post-serve-action", func() {
-
-			BeforeEach(func() {
-				hoverfly.Start("-fallback-post-serve-action", "http://localhost:8080 1300")
-			})
-
-			It("Should return post serve action details", func() {
-				postServeActionDetails := hoverfly.GetAllPostServeAction()
-				Expect(postServeActionDetails).NotTo(BeNil())
-				Expect(postServeActionDetails.FallbackAction).NotTo(BeNil())
-				Expect(postServeActionDetails.FallbackAction.ActionName).To(Equal(""))
-				Expect(postServeActionDetails.FallbackAction.Remote).To(Equal("http://localhost:8080"))
-				Expect(postServeActionDetails.FallbackAction.DelayInMs).To(Equal(1300))
-			})
-		})
 	})
 
 	Context("set local post serve action", func() {
@@ -133,10 +117,10 @@ var _ = Describe("Manage post serve actions in hoverfly", func() {
 			It("Should set post serve action", func() {
 				postServeActionDetails := hoverfly.SetRemotePostServeAction("", "http://localhost:8080", 1600)
 				Expect(postServeActionDetails).NotTo(BeNil())
-				Expect(postServeActionDetails.FallbackAction).NotTo(BeNil())
-				Expect(postServeActionDetails.FallbackAction.ActionName).To(Equal(""))
-				Expect(postServeActionDetails.FallbackAction.Remote).To(Equal("http://localhost:8080"))
-				Expect(postServeActionDetails.FallbackAction.DelayInMs).To(Equal(1600))
+				Expect(postServeActionDetails.Actions).NotTo(BeNil())
+				Expect(postServeActionDetails.Actions[0].ActionName).To(Equal(""))
+				Expect(postServeActionDetails.Actions[0].Remote).To(Equal("http://localhost:8080"))
+				Expect(postServeActionDetails.Actions[0].DelayInMs).To(Equal(1600))
 			})
 		})
 	})

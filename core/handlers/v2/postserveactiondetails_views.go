@@ -1,8 +1,7 @@
 package v2
 
 type PostServeActionDetailsView struct {
-	Actions        []ActionView `json:"actions,omitempty"`
-	FallbackAction *ActionView  `json:"fallbackAction,omitempty"`
+	Actions []ActionView `json:"actions,omitempty"`
 }
 
 type ActionView struct {

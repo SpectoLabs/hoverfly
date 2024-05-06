@@ -109,18 +109,16 @@ func getPostServeActionsTabularData(postServeActions v2.PostServeActionDetailsVi
 			actionData := []string{action.ActionName, action.Binary, getContentShorthand(action.ScriptContent), fmt.Sprint(action.DelayInMs)}
 			localPostServeActionsData = append(localPostServeActionsData, actionData)
 		} else {
-			actionData := []string{action.ActionName, action.Remote, fmt.Sprint(action.DelayInMs)}
+			var actionName string
+			if action.ActionName == "" {
+				actionName = "fallback"
+			} else {
+				actionName = action.ActionName
+			}
+			actionData := []string{actionName, action.Remote, fmt.Sprint(action.DelayInMs)}
 			remotePostServeActionData = append(remotePostServeActionData, actionData)
 		}
 	}
-	action := *postServeActions.FallbackAction
-	const defaultActionName = "default"
-	if action.Remote == "" {
-		actionData := []string{defaultActionName, action.Binary, getContentShorthand(action.ScriptContent), fmt.Sprint(action.DelayInMs)}
-		localPostServeActionsData = append(localPostServeActionsData, actionData)
-	} else {
-		actionData := []string{defaultActionName, action.Remote, fmt.Sprint(action.DelayInMs)}
-		remotePostServeActionData = append(remotePostServeActionData, actionData)
-	}
+
 	return localPostServeActionsData, remotePostServeActionData
 }

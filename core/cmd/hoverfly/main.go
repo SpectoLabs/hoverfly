@@ -120,8 +120,7 @@ var (
 	cors          = flag.Bool("cors", false, "Enable CORS support")
 	noImportCheck = flag.Bool("no-import-check", false, "Skip duplicate request check when importing simulations")
 
-	pacFile                 = flag.String("pac-file", "", "Path to the pac file to be imported on startup")
-	fallbackPostServeAction = flag.String("fallback-post-serve-action", "", "Set fallback post serve action by passing the binary and the path of the action script and delay in Ms separated by space or remote and deply in Ms separated by space. (i.e. '-fallback-post-serve-action \"http://localhost:8080 2000\"')")
+	pacFile = flag.String("pac-file", "", "Path to the pac file to be imported on startup")
 
 	clientAuthenticationDestination = flag.String("client-authentication-destination", "", "Regular expression of destination with client authentication")
 	clientAuthenticationClientCert  = flag.String("client-authentication-client-cert", "", "Path to the client certification file used for authentication")
@@ -587,44 +586,6 @@ func main() {
 					}).Fatal("Failed to import post serve action due to invalid input passed")
 				}
 			}
-		}
-	}
-
-	if *fallbackPostServeAction != "" {
-		splitPostServeAction := strings.Split(*fallbackPostServeAction, " ")
-		if len(splitPostServeAction) == 3 {
-			delayInMs, err := strconv.Atoi(splitPostServeAction[2])
-			if err != nil {
-				//default to 1000 incase of error
-				delayInMs = 1000
-			}
-
-			if fileContents, err := ioutil.ReadFile(splitPostServeAction[1]); err == nil {
-				err = hoverfly.SetLocalPostServeAction("", splitPostServeAction[0], string(fileContents), delayInMs)
-				if err != nil {
-					log.WithFields(log.Fields{
-						"error":  err.Error(),
-						"import": *fallbackPostServeAction,
-					}).Fatal("Failed to import fallback post serve action")
-				}
-			}
-		} else if len(splitPostServeAction) == 2 {
-			delayInMs, err := strconv.Atoi(splitPostServeAction[1])
-			if err != nil {
-				//default to 1000 in case of error
-				delayInMs = 1000
-			}
-			err = hoverfly.SetRemotePostServeAction(" ", splitPostServeAction[0], delayInMs)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"error":  err.Error(),
-					"import": *fallbackPostServeAction,
-				}).Fatal("Failed to import fallback post serve action")
-			}
-		} else {
-			log.WithFields(log.Fields{
-				"import": *fallbackPostServeAction,
-			}).Fatal("Failed to import fallback post serve action due to invalid input passed")
 		}
 	}
 

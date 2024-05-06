@@ -468,14 +468,12 @@ func (hf *Hoverfly) GetAllPostServeActions() v2.PostServeActionDetailsView {
 		actions = append(actions, action.GetActionView(actionName))
 	}
 
-	var fallbackActionView v2.ActionView
 	if hf.PostServeActionDetails.FallbackAction != nil {
-		fallbackActionView = hf.PostServeActionDetails.FallbackAction.GetActionView("")
+		actions = append(actions, hf.PostServeActionDetails.FallbackAction.GetActionView(""))
 	}
 
 	return v2.PostServeActionDetailsView{
-		Actions:        actions,
-		FallbackAction: &fallbackActionView,
+		Actions: actions,
 	}
 }
 
