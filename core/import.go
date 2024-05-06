@@ -66,6 +66,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 	if err != nil {
 		return fmt.Errorf("Got error while opening payloads file, error %s", err.Error())
 	}
+	defer pairsFile.Close()
 
 	var simulation v2.SimulationViewV5
 
