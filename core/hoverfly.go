@@ -219,7 +219,7 @@ func (hf *Hoverfly) processRequest(req *http.Request) (*http.Response, chan stri
 		hf.applyGlobalDelay(requestDetails)
 	}
 
-	if result.PostServeActionInputDetails != nil {
+	if result.PostServeActionInputDetails != nil && result.PostServeActionInputDetails.PostServeAction != "" {
 		if postServeAction, ok := hf.PostServeActionDetails.Actions[result.PostServeActionInputDetails.PostServeAction]; ok {
 			journalIDChannel := make(chan string, 1)
 			go postServeAction.Execute(result.PostServeActionInputDetails.Pair, journalIDChannel, hf.Journal)
