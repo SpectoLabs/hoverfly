@@ -12,6 +12,7 @@ Available Commands:
   export                 Export a simulation from Hoverfly
   flush                  Flush the internal cache in Hoverfly
   import                 Import a simulation into Hoverfly
+  journal-index          Manage the journal index for Hoverfly
   login                  Login to Hoverfly
   logs                   Get the logs from Hoverfly
   middleware             Get and set Hoverfly middleware
