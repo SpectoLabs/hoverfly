@@ -40,8 +40,7 @@ jobs:
     working_directory: ~/hoverfly
 
     steps:
-      - setup_remote_docker:
-          version: 20.10.14
+      - setup_remote_docker
       - checkout
       - run:
           name: Make build
@@ -96,8 +95,7 @@ jobs:
     working_directory: ~/hoverfly
 
     steps:
-      - setup_remote_docker:
-          version: 20.10.14
+      - setup_remote_docker
       - checkout
       - run:
           name: Make build
