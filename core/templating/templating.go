@@ -141,7 +141,7 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 	templateJournal := Journal{}
 	if journal != nil {
 
-		indexes := make([]JournalIndex, len(journal.Indexes))
+		indexes := make([]JournalIndex, 0, len(journal.Indexes))
 		for _, index := range journal.Indexes {
 
 			journalIndexEntries := make(map[string]JournalEntry)
