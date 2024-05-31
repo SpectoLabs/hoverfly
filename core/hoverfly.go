@@ -66,7 +66,7 @@ func NewHoverfly() *Hoverfly {
 		PostServeActionDetails: action.NewPostServeActionDetails(),
 	}
 
-	hoverfly.version = "v1.9.4"
+	hoverfly.version = "v1.9.5"
 
 	log.AddHook(hoverfly.StoreLogsHook)
 
