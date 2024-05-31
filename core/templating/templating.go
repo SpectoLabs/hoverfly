@@ -91,6 +91,7 @@ func NewTemplator() *Templator {
 	helperMethodMap["requestBody"] = t.requestBody
 	helperMethodMap["csv"] = t.parseCsv
 	helperMethodMap["journal"] = t.parseJournalBasedOnIndex
+	helperMethodMap["hasJournalKey"] = t.hasJournalKey
 	helperMethodMap["setStatusCode"] = t.setStatusCode
 	helperMethodMap["sum"] = t.sum
 	helperMethodMap["add"] = t.add

@@ -60,31 +60,56 @@ var V3TemplatingEnabled = `{
 }`
 
 var JournalTemplatingWithQueryParamIndexEnabled = `{
-    "data": {
-        "pairs": [
-            {
-                "response": {
-                    "status": 200,
-                    "body": "{{ journal 'Request.QueryParam.id' '123' 'Response' 'jsonpath' '$.name' }}",
-                    "encodedBody": false,
-                    "templated" : true
-                },
-                "request": {
-                    "method": {
-						"exactMatch": "GET"
-                    }
-                }
-            }
-        ],
-        "globalActions": {
-            "delays": []
-        }
-    },
-    "meta": {
-        "schemaVersion": "v3",
-        "hoverflyVersion": "v0.10.2",
-        "timeExported": "2017-02-23T12:43:48Z"
-    }
+	"data": {
+		"pairs": [
+			{
+				"request": {
+					"method": [
+						{
+							"matcher": "exact",
+							"value": "GET"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "{{ journal 'Request.QueryParam.id' '123' 'Response' 'jsonpath' '$.name' }}",
+					"encodedBody": false,
+					"templated": true
+				}
+			},
+			{
+				"request": {
+					"method": [
+						{
+							"matcher": "exact",
+							"value": "GET"
+						}
+					],
+					"path": [
+						{
+							"matcher": "exact",
+							"value": "/checkJournalKey"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "123: {{ hasJournalKey 'Request.QueryParam.id' '123' }} 345: {{ hasJournalKey 'Request.QueryParam.id' '345' }}",
+					"encodedBody": false,
+					"templated": true
+				}
+			}
+		],
+		"globalActions": {
+			"delays": [],
+			"delaysLogNormal": []
+		}
+	},
+	"meta": {
+		"schemaVersion": "v5.2",
+		"hoverflyVersion": "v1.9.3"
+	}
 }`
 
 var JournalTemplatingWithBodyIndexEnabled = `{

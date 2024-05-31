@@ -6,6 +6,7 @@ import (
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -56,6 +57,15 @@ var _ = Describe("Manage journal indexing in hoverfly", func() {
 				Expect(err).To(BeNil())
 
 				Expect(string(body)).To(Equal("Application Testing"))
+
+				// hasJournalKey function should return true
+				simulationResponse = hoverfly.Proxy(sling.New().Get("http://test-server.com/checkJournalKey"))
+				Expect(simulationResponse.StatusCode).To(Equal(200))
+
+				body, err = io.ReadAll(simulationResponse.Body)
+				Expect(err).To(BeNil())
+
+				Expect(string(body)).To(Equal("123: true 345: false"))
 
 			})
 		})

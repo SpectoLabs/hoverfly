@@ -180,6 +180,13 @@ func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSourc
 	return getEvaluationString("journal", options)
 }
 
+func (t templateHelpers) hasJournalKey(indexName, keyValue string, options *raymond.Options) bool {
+	journalDetails := options.Value("Journal").(Journal)
+	journalEntry, _ := getIndexEntry(journalDetails, indexName, keyValue)
+
+	return journalEntry != nil
+}
+
 func (t templateHelpers) setStatusCode(statusCode int, options *raymond.Options) string {
 	internalVars := options.ValueFromAllCtx("InternalVars").(map[string]interface{})
 	internalVars["statusCode"] = statusCode
