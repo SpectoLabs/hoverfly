@@ -106,17 +106,11 @@ func Test_ApplyTemplate_EachBlockWithCsvTemplatingFunctionAndLargeInteger(t *tes
 func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingData(
-		&models.RequestDetails{
-			Scheme:      "http",
-			Destination: "test.com",
-			Path:        "/foo/bar",
-		},
-		&models.Literals{},
-		&models.Variables{},
-		make(map[string]string),
-		&journal.Journal{},
-	)
+	actual := templating.NewTemplator().NewTemplatingData(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+		Path:        "/foo/bar",
+	}, nil, &models.Literals{}, &models.Variables{}, make(map[string]string), &journal.Journal{})
 
 	Expect(actual.Request.Path).To(ConsistOf("foo", "bar"))
 }
@@ -124,16 +118,10 @@ func Test_ShouldCreateTemplatingDataPathsFromRequest(t *testing.T) {
 func Test_ShouldCreateTemplatingDataPathsFromRequestWithNoPaths(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingData(
-		&models.RequestDetails{
-			Scheme:      "http",
-			Destination: "test.com",
-		},
-		&models.Literals{},
-		&models.Variables{},
-		make(map[string]string),
-		&journal.Journal{},
-	)
+	actual := templating.NewTemplator().NewTemplatingData(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+	}, nil, &models.Literals{}, &models.Variables{}, make(map[string]string), &journal.Journal{})
 
 	Expect(actual.Request.Path).To(BeEmpty())
 }
@@ -141,20 +129,14 @@ func Test_ShouldCreateTemplatingDataPathsFromRequestWithNoPaths(t *testing.T) {
 func Test_ShouldCreateTemplatingDataQueryParamsFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingData(
-		&models.RequestDetails{
-			Scheme:      "http",
-			Destination: "test.com",
-			Query: map[string][]string{
-				"cheese": {"1", "3"},
-				"ham":    {"2"},
-			},
+	actual := templating.NewTemplator().NewTemplatingData(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+		Query: map[string][]string{
+			"cheese": {"1", "3"},
+			"ham":    {"2"},
 		},
-		&models.Literals{},
-		&models.Variables{},
-		make(map[string]string),
-		&journal.Journal{},
-	)
+	}, nil, &models.Literals{}, &models.Variables{}, make(map[string]string), &journal.Journal{})
 
 	Expect(actual.Request.QueryParam).To(HaveKeyWithValue("cheese", []string{"1", "3"}))
 	Expect(actual.Request.QueryParam).To(HaveKeyWithValue("ham", []string{"2"}))
@@ -164,16 +146,10 @@ func Test_ShouldCreateTemplatingDataQueryParamsFromRequest(t *testing.T) {
 func Test_ShouldCreateTemplatingDataQueryParamsFromRequestWithNoQueryParams(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingData(
-		&models.RequestDetails{
-			Scheme:      "http",
-			Destination: "test.com",
-		},
-		&models.Literals{},
-		&models.Variables{},
-		make(map[string]string),
-		&journal.Journal{},
-	)
+	actual := templating.NewTemplator().NewTemplatingData(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+	}, nil, &models.Literals{}, &models.Variables{}, make(map[string]string), &journal.Journal{})
 
 	Expect(actual.Request.QueryParam).To(BeEmpty())
 }
@@ -181,16 +157,10 @@ func Test_ShouldCreateTemplatingDataQueryParamsFromRequestWithNoQueryParams(t *t
 func Test_ShouldCreateTemplatingDataHttpScheme(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingData(
-		&models.RequestDetails{
-			Scheme:      "http",
-			Destination: "test.com",
-		},
-		&models.Literals{},
-		&models.Variables{},
-		make(map[string]string),
-		&journal.Journal{},
-	)
+	actual := templating.NewTemplator().NewTemplatingData(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+	}, nil, &models.Literals{}, &models.Variables{}, make(map[string]string), &journal.Journal{})
 
 	Expect(actual.Request.Scheme).To(Equal("http"))
 }
@@ -198,20 +168,14 @@ func Test_ShouldCreateTemplatingDataHttpScheme(t *testing.T) {
 func Test_ShouldCreateTemplatingDataHeaderFromRequest(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingData(
-		&models.RequestDetails{
-			Scheme:      "http",
-			Destination: "test.com",
-			Headers: map[string][]string{
-				"cheese": {"1", "3"},
-				"ham":    {"2"},
-			},
+	actual := templating.NewTemplator().NewTemplatingData(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+		Headers: map[string][]string{
+			"cheese": {"1", "3"},
+			"ham":    {"2"},
 		},
-		&models.Literals{},
-		&models.Variables{},
-		make(map[string]string),
-		&journal.Journal{},
-	)
+	}, nil, &models.Literals{}, &models.Variables{}, make(map[string]string), &journal.Journal{})
 
 	Expect(actual.Request.Header).To(HaveKeyWithValue("cheese", []string{"1", "3"}))
 	Expect(actual.Request.Header).To(HaveKeyWithValue("ham", []string{"2"}))
@@ -221,16 +185,10 @@ func Test_ShouldCreateTemplatingDataHeaderFromRequest(t *testing.T) {
 func Test_ShouldCreateTemplatingDataHeaderFromRequestWithNoHeader(t *testing.T) {
 	RegisterTestingT(t)
 
-	actual := templating.NewTemplator().NewTemplatingData(
-		&models.RequestDetails{
-			Scheme:      "http",
-			Destination: "test.com",
-		},
-		&models.Literals{},
-		&models.Variables{},
-		make(map[string]string),
-		&journal.Journal{},
-	)
+	actual := templating.NewTemplator().NewTemplatingData(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+	}, nil, &models.Literals{}, &models.Variables{}, make(map[string]string), &journal.Journal{})
 
 	Expect(actual.Request.Header).To(BeEmpty())
 }
@@ -554,16 +512,10 @@ func Test_VarSetToNilInCaseOfInvalidArgsPassed(t *testing.T) {
 		},
 	}
 
-	actual := templator.NewTemplatingData(
-		&models.RequestDetails{
-			Scheme:      "http",
-			Destination: "test.com",
-		},
-		&models.Literals{},
-		vars,
-		make(map[string]string),
-		&journal.Journal{},
-	)
+	actual := templator.NewTemplatingData(&models.RequestDetails{
+		Scheme:      "http",
+		Destination: "test.com",
+	}, nil, &models.Literals{}, vars, make(map[string]string), &journal.Journal{})
 
 	Expect(actual.Vars["varOne"]).To(BeNil())
 
@@ -581,15 +533,9 @@ func Test_VarSetToProperValueInCaseOfRequestDetailsPassedAsArgument(t *testing.T
 		},
 	}
 
-	actual := templator.NewTemplatingData(
-		&models.RequestDetails{
-			Path: "/part1/foo,bar",
-		},
-		&models.Literals{},
-		vars,
-		make(map[string]string),
-		&journal.Journal{},
-	)
+	actual := templator.NewTemplatingData(&models.RequestDetails{
+		Path: "/part1/foo,bar",
+	}, nil, &models.Literals{}, vars, make(map[string]string), &journal.Journal{})
 
 	Expect(actual.Vars["splitRequestPath"]).ToNot(BeNil())
 	Expect(len(actual.Vars["splitRequestPath"].([]string))).To(Equal(2))
@@ -690,13 +636,13 @@ func Test_ApplyTemplate_Arithmetic_Ops_With_Each_Block(t *testing.T) {
 
 	template, _ := templator.ParseTemplate(responseBody)
 	state := make(map[string]string)
-	result, err := templator.RenderTemplate(template, requestDetails, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
+	result, err := templator.RenderTemplate(template, requestDetails, nil, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
 
 	Expect(err).To(BeNil())
 	Expect(result).To(Equal(` 3.5  9  total: 12.50`))
 
 	// Running the second time should produce the same result because each execution has its own context data.
-	result, err = templator.RenderTemplate(template, requestDetails, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
+	result, err = templator.RenderTemplate(template, requestDetails, nil,  &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
 	Expect(err).To(BeNil())
 	Expect(result).To(Equal(` 3.5  9  total: 12.50`))
 }
@@ -743,5 +689,5 @@ func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]strin
 
 	template, err := templator.ParseTemplate(responseBody)
 	Expect(err).To(BeNil())
-	return templator.RenderTemplate(template, requestDetails, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
+	return templator.RenderTemplate(template, requestDetails, nil, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
 }

@@ -216,6 +216,22 @@ var TemplatingRequest = `{
 					"path": [
 						{
 							"matcher": "exact",
+							"value": "/SetStatusCode"
+						}
+					]
+				},
+				"response": {
+					"status": 200,
+					"body": "{{ setStatusCode 202 }}",
+					"encodedBody": false,
+					"templated": true
+				}
+			},
+			{
+				"request": {
+					"path": [
+						{
+							"matcher": "exact",
 							"value": "/global"
 						}
 					]

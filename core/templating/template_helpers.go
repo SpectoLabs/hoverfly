@@ -180,6 +180,12 @@ func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSourc
 	return getEvaluationString("journal", options)
 }
 
+func (t templateHelpers) setStatusCode(statusCode int, options *raymond.Options) string {
+	internalVars := options.ValueFromAllCtx("InternalVars").(map[string]interface{})
+	internalVars["statusCode"] = statusCode
+	return ""
+}
+
 func (t templateHelpers) sum(numbers []string, format string) string {
 	return sumNumbers(numbers, format)
 }

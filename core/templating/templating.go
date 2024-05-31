@@ -26,6 +26,7 @@ type TemplatingData struct {
 	Vars            map[string]interface{}
 	Journal         Journal
 	Kvs             map[string]interface{}
+	InternalVars	map[string]interface{}		// data store used internally by templating helpers
 }
 
 type Request struct {
@@ -90,6 +91,7 @@ func NewTemplator() *Templator {
 	helperMethodMap["requestBody"] = t.requestBody
 	helperMethodMap["csv"] = t.parseCsv
 	helperMethodMap["journal"] = t.parseJournalBasedOnIndex
+	helperMethodMap["setStatusCode"] = t.setStatusCode
 	helperMethodMap["sum"] = t.sum
 	helperMethodMap["add"] = t.add
 	helperMethodMap["subtract"] = t.subtract
@@ -115,20 +117,27 @@ func (*Templator) ParseTemplate(responseBody string) (*raymond.Template, error) 
 	return raymond.Parse(responseBody)
 }
 
-func (t *Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.RequestDetails, literals *models.Literals, vars *models.Variables, state map[string]string, journal *journal.Journal) (string, error) {
+func (t *Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.RequestDetails, response *models.ResponseDetails, literals *models.Literals, vars *models.Variables, state map[string]string, journal *journal.Journal) (string, error) {
 	if tpl == nil {
 		return "", fmt.Errorf("template cannot be nil")
 	}
 
-	ctx := t.NewTemplatingData(requestDetails, literals, vars, state, journal)
-	return tpl.Exec(ctx)
+	ctx := t.NewTemplatingData(requestDetails, response, literals, vars, state, journal)
+	result, err := tpl.Exec(ctx)
+	if err == nil {
+		statusCode, ok := ctx.InternalVars["statusCode"]
+		if ok {
+			response.Status = statusCode.(int)
+		}
+	}
+	return result, err
 }
 
 func (templator *Templator) GetSupportedMethodMap() map[string]interface{} {
 	return templator.SupportedMethodMap
 }
 
-func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, literals *models.Literals, vars *models.Variables, state map[string]string, journal *journal.Journal) *TemplatingData {
+func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, response *models.ResponseDetails, literals *models.Literals, vars *models.Variables, state map[string]string, journal *journal.Journal) *TemplatingData {
 
 	literalMap := make(map[string]interface{})
 	if literals != nil {
@@ -176,6 +185,7 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, lit
 			return a1 + " " + a2 + " " + a3
 		},
 		Kvs: kvs,
+		InternalVars: make(map[string]interface{}),
 	}
 
 }
