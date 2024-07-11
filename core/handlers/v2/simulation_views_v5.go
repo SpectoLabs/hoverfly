@@ -17,6 +17,7 @@ type DataViewV5 struct {
 }
 
 type RequestMatcherResponsePairViewV5 struct {
+	Labels         []string              `json:"labels,omitempty"`
 	RequestMatcher RequestMatcherViewV5  `json:"request"`
 	Response       ResponseDetailsViewV5 `json:"response"`
 }
