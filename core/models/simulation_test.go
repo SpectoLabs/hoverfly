@@ -15,7 +15,7 @@ func Test_Simulation_AddPair_CanAddAPairToTheArray(t *testing.T) {
 	unit := models.NewSimulation()
 
 	unit.AddPair(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -23,7 +23,7 @@ func Test_Simulation_AddPair_CanAddAPairToTheArray(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{},
+		Response: models.ResponseDetails{},
 	})
 
 	Expect(unit.GetMatchingPairs()).To(HaveLen(1))
@@ -37,7 +37,7 @@ func Test_Simulation_AddPair_CanAddAFullPairToTheArray(t *testing.T) {
 	unit := models.NewSimulation()
 
 	unit.AddPair(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -75,7 +75,7 @@ func Test_Simulation_AddPair_CanAddAFullPairToTheArray(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "testresponsebody",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -112,7 +112,7 @@ func Test_Simulation_AddPairInSequence_CanAddAFullPairToTheArray(t *testing.T) {
 	unit := models.NewSimulation()
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Body: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -150,7 +150,7 @@ func Test_Simulation_AddPairInSequence_CanAddAFullPairToTheArray(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "testresponsebody",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -187,7 +187,7 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 	unit := models.NewSimulation()
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -195,7 +195,7 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "1",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -203,7 +203,7 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 	}, &state.State{State: map[string]string{}})
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -211,7 +211,7 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "2",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -219,7 +219,7 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 	}, &state.State{State: map[string]string{}})
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -227,7 +227,7 @@ func Test_Simulation_AddPairInSequence_CanSequence(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "3",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -264,7 +264,7 @@ func Test_Simulation_AddPairInSequence_CanBeUsedWithAddPair(t *testing.T) {
 	unit := models.NewSimulation()
 
 	unit.AddPair(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -272,7 +272,7 @@ func Test_Simulation_AddPairInSequence_CanBeUsedWithAddPair(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "1",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -280,7 +280,7 @@ func Test_Simulation_AddPairInSequence_CanBeUsedWithAddPair(t *testing.T) {
 	})
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -288,7 +288,7 @@ func Test_Simulation_AddPairInSequence_CanBeUsedWithAddPair(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "2",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -319,7 +319,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 	state := state.NewState()
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -327,7 +327,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "1",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -335,7 +335,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 	}, state)
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -343,7 +343,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "2",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -351,7 +351,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 	}, state)
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -359,7 +359,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "different1",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -367,7 +367,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 	}, state)
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -375,7 +375,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceTwoDifferentSequences(t *testi
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "different2",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -419,7 +419,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 	state := state.NewState()
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -427,7 +427,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "1",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -435,7 +435,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 	}, state)
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -443,7 +443,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "2",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -451,7 +451,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 	}, state)
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -459,7 +459,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "different1",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -467,7 +467,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 	}, state)
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -475,7 +475,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "different2",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -483,7 +483,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 	}, state)
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -491,7 +491,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "third1",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -499,7 +499,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 	}, state)
 
 	unit.AddPairInSequence(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -507,7 +507,7 @@ func Test_Simulation_AddPairInSequence_CanSequenceThreeDifferentSequences(t *tes
 				},
 			},
 		},
-		models.ResponseDetails{
+		Response: models.ResponseDetails{
 			Body:    "third2",
 			Headers: map[string][]string{"testheader": {"testvalue"}},
 			Status:  200,
@@ -562,7 +562,7 @@ func Test_Simulation_AddPair_WillNotSaveDuplicates(t *testing.T) {
 	unit := models.NewSimulation()
 
 	isAdded := unit.AddPair(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -570,13 +570,13 @@ func Test_Simulation_AddPair_WillNotSaveDuplicates(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{},
+		Response: models.ResponseDetails{},
 	})
 
 	Expect(isAdded).To(BeTrue())
 
 	isAdded = unit.AddPair(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -584,7 +584,7 @@ func Test_Simulation_AddPair_WillNotSaveDuplicates(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{},
+		Response: models.ResponseDetails{},
 	})
 
 	Expect(isAdded).To(BeFalse())
@@ -597,7 +597,7 @@ func Test_Simulation_AddPair_WillSaveTwoWhenNotDuplicates(t *testing.T) {
 	unit := models.NewSimulation()
 
 	isAdded := unit.AddPair(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -605,12 +605,12 @@ func Test_Simulation_AddPair_WillSaveTwoWhenNotDuplicates(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{},
+		Response: models.ResponseDetails{},
 	})
 	Expect(isAdded).To(BeTrue())
 
 	isAdded = unit.AddPair(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -618,7 +618,7 @@ func Test_Simulation_AddPair_WillSaveTwoWhenNotDuplicates(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{},
+		Response: models.ResponseDetails{},
 	})
 	Expect(isAdded).To(BeTrue())
 
@@ -633,7 +633,7 @@ func Test_Simulation_GetMatchingPairs(t *testing.T) {
 	unit := models.NewSimulation()
 
 	unit.AddPair(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -641,7 +641,7 @@ func Test_Simulation_GetMatchingPairs(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{},
+		Response: models.ResponseDetails{},
 	})
 
 	Expect(unit.GetMatchingPairs()).To(HaveLen(1))
@@ -654,7 +654,7 @@ func Test_Simulation_DeleteMatchingPairs(t *testing.T) {
 	unit := models.NewSimulation()
 
 	unit.AddPair(&models.RequestMatcherResponsePair{
-		models.RequestMatcher{
+		RequestMatcher: models.RequestMatcher{
 			Destination: []models.RequestFieldMatchers{
 				{
 					Matcher: matchers.Exact,
@@ -662,7 +662,7 @@ func Test_Simulation_DeleteMatchingPairs(t *testing.T) {
 				},
 			},
 		},
-		models.ResponseDetails{},
+		Response: models.ResponseDetails{},
 	})
 
 	unit.DeleteMatchingPairsAlongWithCustomData()

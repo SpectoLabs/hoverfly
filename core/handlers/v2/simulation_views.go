@@ -32,7 +32,7 @@ func NewSimulationViewFromRequestBody(requestBody []byte) (SimulationViewV5, err
 
 	schemaVersion := jsonMap["meta"].(map[string]interface{})["schemaVersion"].(string)
 
-	if schemaVersion == "v5" || schemaVersion == "v5.1" || schemaVersion == "v5.2" {
+	if strings.HasPrefix(schemaVersion, "v5") {
 
 		err := ValidateSimulationSchemaFromFile(jsonMap, SimulationViewV5Schema)
 		if err != nil {

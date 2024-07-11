@@ -142,6 +142,7 @@ func getViewFromRequestFieldMatcher(matcher *RequestFieldMatchers) *v2.MatcherVi
 }
 
 type RequestMatcherResponsePair struct {
+	Labels         []string
 	RequestMatcher RequestMatcher
 	Response       ResponseDetails
 }
@@ -149,6 +150,7 @@ type RequestMatcherResponsePair struct {
 func NewRequestMatcherResponsePairFromView(view *v2.RequestMatcherResponsePairViewV5) *RequestMatcherResponsePair {
 
 	return &RequestMatcherResponsePair{
+		Labels: view.Labels,
 		RequestMatcher: RequestMatcher{
 			Path:          NewRequestFieldMatchersFromView(view.RequestMatcher.Path),
 			Method:        NewRequestFieldMatchersFromView(view.RequestMatcher.Method),
@@ -229,6 +231,7 @@ func (this *RequestMatcherResponsePair) BuildView() v2.RequestMatcherResponsePai
 	}
 
 	return v2.RequestMatcherResponsePairViewV5{
+		Labels: this.Labels,
 		RequestMatcher: v2.RequestMatcherViewV5{
 			Path:          path,
 			Method:        method,
