@@ -170,6 +170,12 @@ This is the JSON schema for v5 Hoverfly simulations.
       },
       "request-response-pair": {
         "properties": {
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "request": {
             "$ref": "#/definitions/request"
           },
