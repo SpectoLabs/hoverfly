@@ -2,11 +2,12 @@ package templating
 
 import (
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/journal"
-	"github.com/SpectoLabs/hoverfly/core/util"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/SpectoLabs/hoverfly/core/journal"
+	"github.com/SpectoLabs/hoverfly/core/util"
 
 	"github.com/brianvoe/gofakeit/v6"
 
@@ -26,7 +27,7 @@ type TemplatingData struct {
 	Vars            map[string]interface{}
 	Journal         Journal
 	Kvs             map[string]interface{}
-	InternalVars	map[string]interface{}		// data store used internally by templating helpers
+	InternalVars    map[string]interface{} // data store used internally by templating helpers
 }
 
 type Request struct {
@@ -87,6 +88,16 @@ func NewTemplator() *Templator {
 	helperMethodMap["replace"] = t.replace
 	helperMethodMap["split"] = t.split
 	helperMethodMap["concat"] = t.concat
+	helperMethodMap["length"] = t.length
+	helperMethodMap["substring"] = t.substring
+	helperMethodMap["rightmostCharacters"] = t.rightmostCharacters
+	helperMethodMap["isNumeric"] = t.isNumeric
+	helperMethodMap["isAlphanumeric"] = t.isAlphanumeric
+	helperMethodMap["isBool"] = t.isBool
+	helperMethodMap["isGreaterThan"] = t.isGreaterThan
+	helperMethodMap["isLessThan"] = t.isLessThan
+	helperMethodMap["isBetween"] = t.isBetween
+	helperMethodMap["matchesRegex"] = t.matchesRegex
 	helperMethodMap["faker"] = t.faker
 	helperMethodMap["requestBody"] = t.requestBody
 	helperMethodMap["csv"] = t.parseCsv
@@ -185,7 +196,7 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, res
 		CurrentDateTime: func(a1, a2, a3 string) string {
 			return a1 + " " + a2 + " " + a3
 		},
-		Kvs: kvs,
+		Kvs:          kvs,
 		InternalVars: make(map[string]interface{}),
 	}
 

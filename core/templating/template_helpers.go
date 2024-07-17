@@ -2,12 +2,14 @@ package templating
 
 import (
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/journal"
 	"math"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/SpectoLabs/hoverfly/core/journal"
 
 	"github.com/SpectoLabs/raymond"
 	"github.com/pborman/uuid"
@@ -115,6 +117,88 @@ func (t templateHelpers) split(target, separator string) []string {
 
 func (t templateHelpers) concat(val1, val2 string) string {
 	return val1 + val2
+}
+
+func (t templateHelpers) isNumeric(stringToCheck string) bool {
+	_, err := strconv.ParseFloat(stringToCheck, 64)
+	//return fmt.Sprintf("%t", err == nil)
+	return err == nil
+}
+
+func (t templateHelpers) isAlphanumeric(s string) bool {
+	regex := regexp.MustCompile("^[a-zA-Z0-9]+$")
+	return regex.MatchString(s)
+}
+
+func (t templateHelpers) isBool(s string) bool {
+	_, err := strconv.ParseBool(s)
+	return err == nil
+}
+
+func (t templateHelpers) isGreaterThan(valueToCheck, minimumValue string) bool {
+	num1, err := strconv.ParseFloat(valueToCheck, 64)
+	if err != nil {
+		return false
+	}
+	num2, err := strconv.ParseFloat(minimumValue, 64)
+	if err != nil {
+		return false
+	}
+	return num1 > num2
+}
+
+func (t templateHelpers) isLessThan(valueToCheck, maximumValue string) bool {
+	num1, err := strconv.ParseFloat(valueToCheck, 64)
+	if err != nil {
+		return false
+	}
+	num2, err := strconv.ParseFloat(maximumValue, 64)
+	if err != nil {
+		return false
+	}
+	return num1 < num2
+}
+
+func (t templateHelpers) isBetween(valueToCheck, minimumValue, maximumValue string) bool {
+	return t.isGreaterThan(valueToCheck, minimumValue) && t.isLessThan(valueToCheck, maximumValue)
+}
+
+func (t templateHelpers) matchesRegex(valueToCheck, pattern string) bool {
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return false
+	}
+	return re.MatchString(valueToCheck)
+}
+
+func (t templateHelpers) length(stringToCheck string) string {
+	return strconv.Itoa(len(stringToCheck))
+}
+
+func (t templateHelpers) substring(str, startStr, endStr string) string {
+	start, err := strconv.Atoi(startStr)
+	if err != nil {
+		return ""
+	}
+	end, err := strconv.Atoi(endStr)
+	if err != nil {
+		return ""
+	}
+	if start < 0 || end > len(str) || start > end {
+		return ""
+	}
+	return str[start:end]
+}
+
+func (t templateHelpers) rightmostCharacters(str, countStr string) string {
+	count, err := strconv.Atoi(countStr)
+	if err != nil {
+		return ""
+	}
+	if count < 0 || count > len(str) {
+		return ""
+	}
+	return str[len(str)-count:]
 }
 
 func (t templateHelpers) faker(fakerType string) []reflect.Value {
