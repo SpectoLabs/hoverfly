@@ -281,8 +281,8 @@ is used to control whether the set value is returned.
     Each templating session has its own key value store, which means all the data you set will be cleared after the current response is rendered.
 
 
-Maths Operation
-~~~~~~~~~~~~~~~
+Maths Operations
+~~~~~~~~~~~~~~~~
 
 The basic maths operations are currently supported: add, subtract, multiply and divide. These functions
 take three parameters: two values it operates on and the precision. The precision is given in a string
@@ -332,8 +332,8 @@ We can get the total price of all the line items using this templating function:
 ``{{ addToArray 'subtotal' (multiply (this.price) (this.quantity) '') false }} {{/each}}``
 ``total: {{ sum (getArray 'subtotal') '0.00' }}``
 
-String Operation
-~~~~~~~~~~~~~~~~
+String Operations
+~~~~~~~~~~~~~~~~~
 
 You can use the following helper methods to join, split or replace string values.
 
@@ -350,7 +350,39 @@ You can use the following helper methods to join, split or replace string values
 |                                                           |                                                           |                                         |
 |                                                           | ``{"text":"to be or not to be"}``                         |  to mock or not to mock                 |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Return a substring of a string                            | ``{{substring 'thisisalongstring' 7 11}}``                |  long                                   |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Return the length of a string                             | ``{{length 'thisisaverylongstring'}}``                    |  21                                     |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Return the rightmost characters of a string               | ``{{rightmostCharacters 'thisisalongstring' 3}}``         |  ing                                    |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 
+Validation Operations
+~~~~~~~~~~~~~~~~~~~~~
+
+You can use the following helper methods to validate various types, compare value, and perform regular expression matching on strings.
+
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Description                                               | Example                                                   |  Result                                 |
++===========================================================+===========================================================+=========================================+
+| Is the value numeric                                      | ``{{isNumeric '12.3'}}``                                  |  true                                   |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Is the value alphanumeric                                 | ``{{isAlphanumeric 'abc!@123'}}``                         |  false                                  |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Is the value a boolean                                    | ``{{isBool (Request.Body 'jsonpath' '$.paidInFull')}}``   |  true                                   |
+|                                                           |  Where the payload is {"paidInFull":"false"}              |                                         |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Is one value greater than another                         | ``{{isGreater (Request.Body 'jsonpath' '$.age') 25}``     |  false                                  |
+|                                                           |  Where the payload is {"age":"19"}                        |                                         |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Is one value less than another                            | ``{{isLess (Request.Body 'jsonpath' '$.age') 25}``        |  true                                   |
+|                                                           |  Where the payload is {"age":"19"}                        |                                         |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Is a value between two values                             | ``{{isBetween (Request.Body 'jsonpath' '$.age') 25 35}``  |  false                                  |
+|                                                           |  Where the payload is {"age":"19"}                        |                                         |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
+| Does a string match a regular expression                  | ``{{matchesRegex '2022-09-27' '^\d{4}-\d{2}-\d{2}$'}}``   |  true                                   |
++-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 
 Conditional Templating, Looping and More
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
