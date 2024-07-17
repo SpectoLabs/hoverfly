@@ -267,7 +267,7 @@ func (proxy *ProxyHttpServer) handleHttps(w http.ResponseWriter, r *http.Request
 					return
 				}
 
-				if resp.Request.Method == "HEAD" {
+				if resp.Request.Method == "HEAD" || resp.StatusCode == 204 {
 					// don't change Content-Length for HEAD request
 				} else {
 					// Since we don't know the length of resp, return chunked encoded response
@@ -286,7 +286,7 @@ func (proxy *ProxyHttpServer) handleHttps(w http.ResponseWriter, r *http.Request
 					return
 				}
 
-				if resp.Request.Method == "HEAD" {
+				if resp.Request.Method == "HEAD" || resp.StatusCode == 204 {
 					// Don't write out a response body for HEAD request
 				} else {
 					chunked := newChunkedWriter(rawClientTls)
