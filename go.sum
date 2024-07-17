@@ -3,10 +3,10 @@ github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbi
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/ChrisTrenkamp/xsel v0.9.6 h1:0TmX81Wq2v2SnssP9SwBzz68KArsj5a8Dt9Ppj095QM=
 github.com/ChrisTrenkamp/xsel v0.9.6/go.mod h1:72u+GN8aQUQNyZ5B+QIqWy7WPUey921sjN1k9FJ6Hbo=
-github.com/SpectoLabs/goproxy v0.0.0-20220724221645-71c396c297b7 h1:TTZvVLRa0sjoFrxBOQdmuktR/IueSVyPA1Q+D8pHr9w=
-github.com/SpectoLabs/goproxy v0.0.0-20220724221645-71c396c297b7/go.mod h1:tj8G0iNIS9fkG5PSrzQYLUXcvhtqI8XbIld9PqpYaFw=
-github.com/SpectoLabs/goproxy/ext v0.0.0-20220724221645-71c396c297b7 h1:MxMvFwL66nKnrmjHhp9GODbHVZ+/qS2MmvnXz/nDdR4=
-github.com/SpectoLabs/goproxy/ext v0.0.0-20220724221645-71c396c297b7/go.mod h1:rnDN1CpKP9iJXwxRtnvM7d5wdPHQY0K5NkHeXWPlQ+o=
+github.com/SpectoLabs/goproxy v0.0.0-20240717215706-55e01f38b2c9 h1:KLYZMZu6prwwPmCalgoE+ah7FxANPjMH9kERMN9TMfc=
+github.com/SpectoLabs/goproxy v0.0.0-20240717215706-55e01f38b2c9/go.mod h1:43+j4Hye/DLXHbJHM0O5dcwOkQp7zGCgDKTq6nzGXQM=
+github.com/SpectoLabs/goproxy/ext v0.0.0-20220724222243-c982a2c966ae h1:3Qfw4yZArPnqymR+G9sHRNBXHbrtj84wXaj6+EGkBjs=
+github.com/SpectoLabs/goproxy/ext v0.0.0-20220724222243-c982a2c966ae/go.mod h1:rnDN1CpKP9iJXwxRtnvM7d5wdPHQY0K5NkHeXWPlQ+o=
 github.com/SpectoLabs/goxml2json v0.0.0-20240121223617-8e03292c14ea h1:VAu3xT0OShIqnm4K3TdPpxCd3k4uyXq/H6W76ueIWf0=
 github.com/SpectoLabs/goxml2json v0.0.0-20240121223617-8e03292c14ea/go.mod h1:P8Yk6l9gKxTfgnJeXVEQKCH7nGgvhNdeLs0zVs2h2KM=
 github.com/SpectoLabs/raymond v2.0.3-0.20240313210732-e0e216cf0920+incompatible h1:qI0OVNVzpRLUMHD3lxGOXSHsH87xHp09IuQm9hjTfTA=

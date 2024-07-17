@@ -4,8 +4,8 @@ go 1.22.4
 
 require (
 	github.com/ChrisTrenkamp/xsel v0.9.6
-	github.com/SpectoLabs/goproxy v0.0.0-20220724221645-71c396c297b7
-	github.com/SpectoLabs/goproxy/ext v0.0.0-20220724221645-71c396c297b7
+	github.com/SpectoLabs/goproxy v0.0.0-20240717215706-55e01f38b2c9
+	github.com/SpectoLabs/goproxy/ext v0.0.0-20220724222243-c982a2c966ae
 	github.com/SpectoLabs/goxml2json v0.0.0-20240121223617-8e03292c14ea
 	github.com/SpectoLabs/raymond v2.0.3-0.20240313210732-e0e216cf0920+incompatible
 	github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496

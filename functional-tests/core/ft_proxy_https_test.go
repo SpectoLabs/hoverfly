@@ -5,7 +5,7 @@ import (
 	"github.com/dghubble/sling"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 )
@@ -87,7 +87,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			response := hoverfly.Proxy(sling.New().Get("https://hoverfly.io/path"))
 			Expect(response.StatusCode).To(Equal(http.StatusOK))
 
-			body, err := ioutil.ReadAll(response.Body)
+			body, err := io.ReadAll(response.Body)
 			Expect(err).To(BeNil())
 			Expect(string(body)).To(Equal("OK"))
 
@@ -131,7 +131,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			response := hoverfly.Proxy(sling.New().Get("https://hoverfly.io/path"))
 			Expect(response.StatusCode).To(Equal(http.StatusOK))
 
-			body, err := ioutil.ReadAll(response.Body)
+			body, err := io.ReadAll(response.Body)
 			Expect(err).To(BeNil())
 			Expect(string(body)).To(Equal("OK"))
 
@@ -173,7 +173,7 @@ var _ = Describe("When I run Hoverfly", func() {
 			response := hoverfly.Proxy(sling.New().Get("https://hoverfly.io/path"))
 			Expect(response.StatusCode).To(Equal(http.StatusOK))
 
-			body, err := ioutil.ReadAll(response.Body)
+			body, err := io.ReadAll(response.Body)
 			Expect(err).To(BeNil())
 			Expect(string(body)).To(Equal("OK"))
 
@@ -182,6 +182,51 @@ var _ = Describe("When I run Hoverfly", func() {
 			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
 			Expect(response.ContentLength).To(Equal(int64(-1)))
 			Expect(response.TransferEncoding).To(Equal([]string{"chunked"}))
+		})
+
+		It("should not set transfer encoding header for 204 response", func() {
+
+			hoverfly.ImportSimulation(`{
+				"data": {
+					"pairs": [
+						{
+							"request": {
+								"path": [
+									{
+										"matcher": "exact",
+										"value": "/path"
+									}
+								],
+								"scheme": [
+									{
+										"matcher": "exact",
+										"value": "https"
+									}
+								]
+							},
+							"response": {
+								"status": 204,
+								"body": ""
+							}
+						}
+					]
+				},
+				"meta": {
+					"schemaVersion": "v5.2"
+				}
+			}`)
+			response := hoverfly.Proxy(sling.New().Get("https://hoverfly.io/path"))
+			Expect(response.StatusCode).To(Equal(http.StatusNoContent))
+
+			body, err := io.ReadAll(response.Body)
+			Expect(err).To(BeNil())
+			Expect(string(body)).To(Equal(""))
+
+			Expect(response.Header.Get("Content-Length")).To(Equal(""))
+			Expect(response.Header.Get("Transfer-Encoding")).To(Equal(""))
+
+			Expect(response.ContentLength).To(Equal(int64(0)))
+			Expect(response.TransferEncoding).To(BeNil())
 		})
 	})
 
