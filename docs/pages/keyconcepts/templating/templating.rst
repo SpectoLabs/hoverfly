@@ -236,7 +236,7 @@ Syntax
 
 .. code:: bash
 
-    journal "index name" "extracted value" "request/response" "xpath/jsonpath" "lookup query"
+    {{ journal "index name" "extracted value" "request/response" "xpath/jsonpath" "lookup query" }}
 
 
 ``index name`` should be the same key expression you have specified when you enable the journal index.
@@ -254,6 +254,13 @@ Example:
     }
 
 In the above example, we are querying the name from JSON response in the journal entry where index ``Request.QueryParam.id`` has a key value of 1.
+
+If you only need to check if a journal contains a particular key, you can do so using the following function:
+
+.. code:: bash
+
+    {{ hasJournalKey "index name" "key name" }}
+
 
 Key Value Data Store
 ~~~~~~~~~~~~~~~~~~~~

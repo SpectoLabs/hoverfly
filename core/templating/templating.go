@@ -138,7 +138,7 @@ func (t *Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models
 	result, err := tpl.Exec(ctx)
 	if err == nil {
 		statusCode, ok := ctx.InternalVars["statusCode"]
-		if ok {
+		if ok && response != nil {
 			response.Status = statusCode.(int)
 		}
 	}

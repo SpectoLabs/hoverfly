@@ -671,6 +671,49 @@ func Test_ApplyTemplate_PutAndGetValue_SuppressOutput(t *testing.T) {
 	Expect(template).To(Equal("The ID was 5553686208582"))
 }
 
+func Test_ApplyTemplate_setStatusCode(t *testing.T) {
+	RegisterTestingT(t)
+
+	templator := templating.NewTemplator()
+
+	template, err := templator.ParseTemplate(`{{ setStatusCode 400 }}`)
+	Expect(err).To(BeNil())
+
+	response := &models.ResponseDetails{}
+	result, err := templator.RenderTemplate(template, &models.RequestDetails{}, response, &models.Literals{}, &models.Variables{}, make(map[string]string), &journal.Journal{})
+
+	Expect(err).To(BeNil())
+	Expect(result).To(Equal(""))
+	Expect(response.Status).To(Equal(400))
+}
+
+func Test_ApplyTemplate_setStatusCode_should_ignore_invalid_code(t *testing.T) {
+	RegisterTestingT(t)
+
+	templator := templating.NewTemplator()
+
+	template, err := templator.ParseTemplate(`{{ setStatusCode 600 }}`)
+	Expect(err).To(BeNil())
+
+	response := &models.ResponseDetails{}
+	result, err := templator.RenderTemplate(template, &models.RequestDetails{}, response, &models.Literals{}, &models.Variables{}, make(map[string]string), &journal.Journal{})
+
+	Expect(err).To(BeNil())
+	Expect(result).To(Equal(""))
+	Expect(response.Status).To(Equal(0))
+}
+
+func Test_ApplyTemplate_setStatusCode_should_handle_nil_response(t *testing.T) {
+	RegisterTestingT(t)
+
+	// ApplyTemplate pass a nil response value to RenderTemplate
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{ setStatusCode 400 }}`)
+
+	Expect(err).To(BeNil())
+
+	Expect(template).To(Equal(""))
+}
+
 func toInterfaceSlice(arguments []string) []interface{} {
 	argumentsArray := make([]interface{}, len(arguments))
 

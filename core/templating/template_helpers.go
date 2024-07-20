@@ -274,8 +274,15 @@ func (t templateHelpers) hasJournalKey(indexName, keyValue string, options *raym
 func (t templateHelpers) setStatusCode(statusCode string, options *raymond.Options) string {
 	intStatusCode, err := strconv.Atoi(statusCode)
 	if err != nil {
+		log.Error("status code is not a valid integer")
 		return ""
 	}
+
+	if intStatusCode < 100 || intStatusCode > 599 {
+		log.Error("status code is not valid")
+		return ""
+	}
+
 	internalVars := options.ValueFromAllCtx("InternalVars").(map[string]interface{})
 	internalVars["statusCode"] = intStatusCode
 	return ""
