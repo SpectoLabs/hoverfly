@@ -20,6 +20,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+type FormData struct {
+	FirstName string `url:"first_name"`
+	LastName string `url:"last_name"`
+}
+
+
 var _ = Describe("When I run Hoverfly", func() {
 
 	var (
@@ -432,6 +438,91 @@ var _ = Describe("When I run Hoverfly", func() {
 
 				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body[0].Matcher).To(Equal(`xml`))
 				Expect(payload.RequestResponsePairs[0].RequestMatcher.Body[0].Value).To(Equal(`<document/>`))
+			})
+
+			It("Should capture a form request as a form matcher ", func() {
+
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "text/plain")
+					w.Header().Set("Date", "date")
+					w.Write([]byte("Hello world"))
+				}))
+
+				defer fakeServer.Close()
+
+				formData := &FormData{
+					FirstName: "John",
+					LastName:  "Doe",
+				}
+
+
+				resp := hoverfly.Proxy(sling.New().Post(fakeServer.URL).BodyForm(formData))
+				Expect(resp.StatusCode).To(Equal(200))
+
+				expectedDestination := strings.Replace(fakeServer.URL, "http://", "", 1)
+
+				payload := hoverfly.ExportSimulation()
+
+				Expect(payload.RequestResponsePairs).To(HaveLen(1))
+
+				Expect(payload.RequestResponsePairs[0].RequestMatcher).To(Equal(v2.RequestMatcherViewV5{
+					Path: []v2.MatcherViewV5{
+						{
+							Matcher: matchers.Exact,
+							Value:   "/",
+						},
+					},
+					Method: []v2.MatcherViewV5{
+						{
+							Matcher: matchers.Exact,
+							Value:   "POST",
+						},
+					},
+					Destination: []v2.MatcherViewV5{
+						{
+							Matcher: matchers.Exact,
+							Value:   expectedDestination,
+						},
+					},
+					Scheme: []v2.MatcherViewV5{
+						{
+							Matcher: matchers.Exact,
+							Value:   "http",
+						},
+					},
+					Body: []v2.MatcherViewV5{
+						{
+							Matcher: "form",
+							Value: map[string]interface{}{
+								"first_name":[]interface{}{
+									map[string]interface{}{
+										"matcher": matchers.Exact,
+										"value":   "John",
+									},
+								},
+								"last_name": []interface{}{
+									map[string]interface{}{
+										"matcher": matchers.Exact,
+										"value":   "Doe",
+									},
+								},
+							},
+						},
+					},
+				}))
+
+				Expect(payload.RequestResponsePairs[0].Response).To(Equal(v2.ResponseDetailsViewV5{
+					Status:      200,
+					Body:        "Hello world",
+					EncodedBody: false,
+					Headers: map[string][]string{
+						"Content-Length": {"11"},
+						"Content-Type":   {"text/plain"},
+						"Date":           {"date"},
+						"Hoverfly":       {"Was-Here"},
+					},
+					Templated: false,
+				}))
 			})
 
 			It("Should pass through the original query", func() {
