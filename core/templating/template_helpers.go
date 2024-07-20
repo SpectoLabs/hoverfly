@@ -2,12 +2,13 @@ package templating
 
 import (
 	"fmt"
-	"github.com/SpectoLabs/hoverfly/core/journal"
 	"math"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/SpectoLabs/hoverfly/core/journal"
 
 	"github.com/SpectoLabs/raymond"
 	"github.com/pborman/uuid"
@@ -187,9 +188,13 @@ func (t templateHelpers) hasJournalKey(indexName, keyValue string, options *raym
 	return journalEntry != nil
 }
 
-func (t templateHelpers) setStatusCode(statusCode int, options *raymond.Options) string {
+func (t templateHelpers) setStatusCode(statusCode string, options *raymond.Options) string {
+	intStatusCode, err := strconv.Atoi(statusCode)
+	if err != nil {
+		return ""
+	}
 	internalVars := options.ValueFromAllCtx("InternalVars").(map[string]interface{})
-	internalVars["statusCode"] = statusCode
+	internalVars["statusCode"] = intStatusCode
 	return ""
 }
 
