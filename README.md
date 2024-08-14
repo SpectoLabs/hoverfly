@@ -17,7 +17,7 @@ Hoverfly is a lightweight, open source API simulation tool. Using Hoverfly, you 
 * Lightweight, high-performance, run anywhere
 * Apache 2 license
 
-Hoverfly is developed and maintained by [SpectoLabs](https://specto.io).
+Hoverfly is developed and maintained by [iOCO Solutions](https://ioco.uk/).
 
 ## Quickstart
 
