@@ -1,8 +1,9 @@
 package templating_test
 
 import (
-	"github.com/SpectoLabs/hoverfly/core/journal"
 	"testing"
+
+	"github.com/SpectoLabs/hoverfly/core/journal"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/templating"
@@ -70,6 +71,74 @@ func Test_ApplyTemplate_ParseCsv_WithEachBlockAndMissingDataSource(t *testing.T)
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(` 0 : Product Name with productId 1 is {{ csv products productId 1 productName }}  1 : Product Name with productId 2 is {{ csv products productId 2 productName }} `))
 }
+
+// --------------------------------------
+func Test_ApplyTemplate_MatchingRowsCsvAndReturnMatchedString(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvMatchingRows 'test-csv1' 'id' '2')}}{{this.name}}{{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`Test2`))
+}
+
+func Test_ApplyTemplate_MatchingRowsCsvMissingDataSource(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvMatchingRows 'test-csv99' 'id' '2')}}{{this.name}}{{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(``))
+}
+
+func Test_ApplyTemplate_MatchingRowsCsvInvalidKey(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvMatchingRows 'test-csv1' 'id' '99')}}{{this.name}}{{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(``))
+}
+
+// -------------------------------
+func Test_ApplyTemplate_CsvAsArrayAndReturnMatchedString(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvAsArray 'test-csv1')}}{{#each this}}{{this}}{{/each}}{{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`idnamemarks1Test1552Test256*DummyABSENT`))
+}
+
+func Test_ApplyTemplate_CsvAsArrayMissingDataSource(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvAsArray 'test-csv99')}}{{#each this}}{{this}}{{/each}}{{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(``))
+}
+
+// -------------------------------
+func Test_ApplyTemplate_CsvAsMapAndReturnMatchedString(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvAsMap 'test-csv1')}}{{this.name}}{{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`Test1Test2Dummy`))
+}
+
+func Test_ApplyTemplate_CsvAsMapMissingDataSource(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvAsMap 'test-csv99')}}{{this.name}}{{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(``))
+}
+
+// -------------------------------
 
 func Test_ApplyTemplate_EachBlockWithSplitTemplatingFunction(t *testing.T) {
 	RegisterTestingT(t)
@@ -642,7 +711,7 @@ func Test_ApplyTemplate_Arithmetic_Ops_With_Each_Block(t *testing.T) {
 	Expect(result).To(Equal(` 3.5  9  total: 12.50`))
 
 	// Running the second time should produce the same result because each execution has its own context data.
-	result, err = templator.RenderTemplate(template, requestDetails, nil,  &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
+	result, err = templator.RenderTemplate(template, requestDetails, nil, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
 	Expect(err).To(BeNil())
 	Expect(result).To(Equal(` 3.5  9  total: 12.50`))
 }
