@@ -100,7 +100,10 @@ func NewTemplator() *Templator {
 	helperMethodMap["matchesRegex"] = t.matchesRegex
 	helperMethodMap["faker"] = t.faker
 	helperMethodMap["requestBody"] = t.requestBody
-	helperMethodMap["csv"] = t.parseCsv
+	helperMethodMap["csv"] = t.fetchSingleFieldCsv
+	helperMethodMap["csvMatchingRows"] = t.fetchMatchingRowsCsv
+	helperMethodMap["csvAsArray"] = t.csvAsArray
+	helperMethodMap["csvAsMap"] = t.csvAsMap
 	helperMethodMap["journal"] = t.parseJournalBasedOnIndex
 	helperMethodMap["hasJournalKey"] = t.hasJournalKey
 	helperMethodMap["setStatusCode"] = t.setStatusCode

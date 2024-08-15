@@ -212,7 +212,7 @@ func (t templateHelpers) faker(fakerType string) []reflect.Value {
 	return []reflect.Value{}
 }
 
-func (t templateHelpers) parseCsv(dataSourceName, searchFieldName, searchFieldValue, returnFieldName string, options *raymond.Options) string {
+func (t templateHelpers) fetchSingleFieldCsv(dataSourceName, searchFieldName, searchFieldValue, returnFieldName string, options *raymond.Options) string {
 
 	templateDataSources := t.TemplateDataSource.DataSources
 	source, exists := templateDataSources[dataSourceName]
@@ -246,6 +246,81 @@ func (t templateHelpers) parseCsv(dataSourceName, searchFieldName, searchFieldVa
 	}
 	return getEvaluationString("csv", options)
 
+}
+
+func (t templateHelpers) fetchMatchingRowsCsv(dataSourceName string, searchFieldName string, searchFieldValue string) []map[string]string {
+	templateDataSources := t.TemplateDataSource.DataSources
+	source, exists := templateDataSources[dataSourceName]
+	if !exists {
+		log.Debug("could not find datasource " + dataSourceName)
+		return []map[string]string{}
+	}
+	if len(source.Data) < 1 {
+		log.Debug("no data available in datasource " + dataSourceName)
+		return []map[string]string{}
+	}
+	headers := source.Data[0]
+	fieldIndex := -1
+	for i, header := range headers {
+		if header == searchFieldName {
+			fieldIndex = i
+			break
+		}
+	}
+	if fieldIndex == -1 {
+		log.Debug("could not find search field name " + searchFieldName)
+		return []map[string]string{}
+	}
+	var result []map[string]string
+	for _, row := range source.Data[1:] {
+		if fieldIndex < len(row) && row[fieldIndex] == searchFieldValue {
+			rowMap := make(map[string]string)
+			for i, cell := range row {
+				if i < len(headers) {
+					rowMap[headers[i]] = cell
+				}
+			}
+			result = append(result, rowMap)
+		}
+	}
+
+	return result
+}
+
+func (t templateHelpers) csvAsArray(dataSourceName string) [][]string {
+	templateDataSources := t.TemplateDataSource.DataSources
+	source, exists := templateDataSources[dataSourceName]
+	if exists {
+		return source.Data
+	} else {
+		log.Debug("could not find datasource " + dataSourceName)
+		return [][]string{}
+	}
+}
+
+func (t templateHelpers) csvAsMap(dataSourceName string) []map[string]string {
+	templateDataSources := t.TemplateDataSource.DataSources
+	source, exists := templateDataSources[dataSourceName]
+	if !exists {
+		log.Debug("could not find datasource " + dataSourceName)
+		return []map[string]string{}
+	}
+	if len(source.Data) < 1 {
+		log.Debug("no data available in datasource " + dataSourceName)
+		return []map[string]string{}
+	}
+	headers := source.Data[0]
+	var result []map[string]string
+	for _, row := range source.Data[1:] {
+		rowMap := make(map[string]string)
+		for i, cell := range row {
+			if i < len(headers) {
+				rowMap[headers[i]] = cell
+			}
+		}
+		result = append(result, rowMap)
+	}
+	return result
 }
 
 func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSource, queryType, lookupQuery string, options *raymond.Options) interface{} {
