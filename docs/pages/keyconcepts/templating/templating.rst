@@ -222,7 +222,7 @@ Example: Start Hoverfly with a CSV data source (student-marks.csv) provided belo
 | Search where Id is not match and return marks             | csv 'student-marks' 'Id' 'Test100' 'Marks'                |  0                                      |
 | (in this scenario, it matches wildcard * and returns)     |                                                           |                                         |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
-| Search where Id = first path param and return marks       | csv 'student-marks' 'Id' 'Request.Path.[0]' 'Marks'       |  15                                     |
+| Search where Id = first path param and return marks       | csv 'student-marks' 'Id' 'Request.Path.[1]' 'Marks'       |  15                                     |
 | URL looks like - http://test.com/students/5/marks         |                                                           |                                         |
 +-----------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------+
 
