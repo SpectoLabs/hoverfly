@@ -2,15 +2,18 @@ package templating
 
 import (
 	"encoding/csv"
+	"strings"
+	"sync"
+
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	log "github.com/sirupsen/logrus"
-	"strings"
 )
 
 type DataSource struct {
 	SourceType string
 	Name       string
 	Data       [][]string
+	mu         sync.Mutex
 }
 
 func NewCsvDataSource(fileName, fileContent string) (*DataSource, error) {
@@ -21,7 +24,7 @@ func NewCsvDataSource(fileName, fileContent string) (*DataSource, error) {
 		return nil, err
 	}
 
-	return &DataSource{"csv", fileName, records}, nil
+	return &DataSource{"csv", fileName, records, sync.Mutex{}}, nil
 }
 
 func (dataSource DataSource) GetDataSourceView() (v2.CSVDataSourceView, error) {

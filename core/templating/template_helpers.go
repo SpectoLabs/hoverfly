@@ -213,39 +213,38 @@ func (t templateHelpers) faker(fakerType string) []reflect.Value {
 }
 
 func (t templateHelpers) fetchSingleFieldCsv(dataSourceName, searchFieldName, searchFieldValue, returnFieldName string, options *raymond.Options) string {
-
 	templateDataSources := t.TemplateDataSource.DataSources
 	source, exists := templateDataSources[dataSourceName]
-	if exists {
-		searchIndex, err := getHeaderIndex(source.Data, searchFieldName)
-		if err != nil {
-			log.Error(err)
-			getEvaluationString("csv", options)
+	if !exists {
+		log.Debug("could not find datasource " + dataSourceName)
+		return getEvaluationString("csv", options)
+	}
+	source.mu.Lock()
+	defer source.mu.Unlock()
+	searchIndex, err := getHeaderIndex(source.Data, searchFieldName)
+	if err != nil {
+		log.Error(err)
+		return getEvaluationString("csv", options)
+	}
+	returnIndex, err := getHeaderIndex(source.Data, returnFieldName)
+	if err != nil {
+		log.Error(err)
+		return getEvaluationString("csv", options)
+	}
+	searchValue := getSearchFieldValue(options, searchFieldValue)
+	var fallbackString string
+	for i := 1; i < len(source.Data); i++ {
+		record := source.Data[i]
+		if strings.ToLower(record[searchIndex]) == strings.ToLower(searchValue) {
+			return record[returnIndex]
+		} else if record[searchIndex] == "*" {
+			fallbackString = record[returnIndex]
 		}
-		returnIndex, err := getHeaderIndex(source.Data, returnFieldName)
-		if err != nil {
-			log.Error(err)
-			return getEvaluationString("csv", options)
-		}
-
-		var fallbackString string
-		searchFieldValue := getSearchFieldValue(options, searchFieldValue)
-		for i := 1; i < len(source.Data); i++ {
-			record := source.Data[i]
-			if strings.ToLower(record[searchIndex]) == strings.ToLower(searchFieldValue) {
-				return record[returnIndex]
-			} else if record[searchIndex] == "*" {
-				fallbackString = record[returnIndex]
-			}
-		}
-
-		if fallbackString != "" {
-			return fallbackString
-		}
-
+	}
+	if fallbackString != "" {
+		return fallbackString
 	}
 	return getEvaluationString("csv", options)
-
 }
 
 func (t templateHelpers) fetchMatchingRowsCsv(dataSourceName string, searchFieldName string, searchFieldValue string) []map[string]string {
@@ -259,6 +258,8 @@ func (t templateHelpers) fetchMatchingRowsCsv(dataSourceName string, searchField
 		log.Debug("no data available in datasource " + dataSourceName)
 		return []map[string]string{}
 	}
+	source.mu.Lock()
+	defer source.mu.Unlock()
 	headers := source.Data[0]
 	fieldIndex := -1
 	for i, header := range headers {
@@ -291,6 +292,8 @@ func (t templateHelpers) csvAsArray(dataSourceName string) [][]string {
 	templateDataSources := t.TemplateDataSource.DataSources
 	source, exists := templateDataSources[dataSourceName]
 	if exists {
+		source.mu.Lock()
+		defer source.mu.Unlock()
 		return source.Data
 	} else {
 		log.Debug("could not find datasource " + dataSourceName)
@@ -305,6 +308,8 @@ func (t templateHelpers) csvAsMap(dataSourceName string) []map[string]string {
 		log.Debug("could not find datasource " + dataSourceName)
 		return []map[string]string{}
 	}
+	source.mu.Lock()
+	defer source.mu.Unlock()
 	if len(source.Data) < 1 {
 		log.Debug("no data available in datasource " + dataSourceName)
 		return []map[string]string{}
@@ -321,6 +326,76 @@ func (t templateHelpers) csvAsMap(dataSourceName string) []map[string]string {
 		result = append(result, rowMap)
 	}
 	return result
+}
+
+func (t templateHelpers) csvAddRow(dataSourceName string, newRow []string) string {
+	templateDataSources := t.TemplateDataSource.DataSources
+	source, exists := templateDataSources[dataSourceName]
+	if exists {
+		source.mu.Lock()
+		defer source.mu.Unlock()
+		source.Data = append(source.Data, newRow)
+	} else {
+		log.Debug("could not find datasource " + dataSourceName)
+	}
+	return ""
+}
+
+func (t templateHelpers) csvDeleteRows(dataSourceName, searchFieldName, searchFieldValue string, output bool) string {
+	templateDataSources := t.TemplateDataSource.DataSources
+	source, exists := templateDataSources[dataSourceName]
+	if !exists {
+		log.Debug("could not find datasource " + dataSourceName)
+		return ""
+	}
+	source.mu.Lock()
+	defer source.mu.Unlock()
+	if len(source.Data) == 0 {
+		log.Debug("datasource " + dataSourceName + " is empty")
+		return ""
+	}
+	header := source.Data[0]
+	fieldIndex := -1
+	for i, fieldName := range header {
+		if fieldName == searchFieldName {
+			fieldIndex = i
+			break
+		}
+	}
+	if fieldIndex == -1 {
+		log.Debug("could not find field name " + searchFieldName + " in datasource " + dataSourceName)
+		return ""
+	}
+	filteredData := [][]string{header}
+	rowsDeleted := 0
+	for _, row := range source.Data[1:] {
+		if row[fieldIndex] != searchFieldValue {
+			filteredData = append(filteredData, row)
+		} else {
+			rowsDeleted++
+		}
+	}
+	source.Data = filteredData
+	if output {
+		return fmt.Sprintf("%d", rowsDeleted)
+	}
+	return ""
+}
+
+func (t templateHelpers) csvCountRows(dataSourceName string) string {
+	templateDataSources := t.TemplateDataSource.DataSources
+	source, exists := templateDataSources[dataSourceName]
+	if !exists {
+		log.Debug("could not find datasource " + dataSourceName)
+		return ""
+	}
+	source.mu.Lock()
+	defer source.mu.Unlock()
+	if len(source.Data) == 0 {
+		return "0"
+	}
+	numRows := len(source.Data) - 1 // The number of rows is len(source.Data) - 1 (subtracting 1 for the header row)
+	return fmt.Sprintf("%d", numRows)
 }
 
 func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSource, queryType, lookupQuery string, options *raymond.Options) interface{} {

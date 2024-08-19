@@ -104,6 +104,9 @@ func NewTemplator() *Templator {
 	helperMethodMap["csvMatchingRows"] = t.fetchMatchingRowsCsv
 	helperMethodMap["csvAsArray"] = t.csvAsArray
 	helperMethodMap["csvAsMap"] = t.csvAsMap
+	helperMethodMap["csvAddRow"] = t.csvAddRow
+	helperMethodMap["csvDeleteRows"] = t.csvDeleteRows
+	helperMethodMap["csvCountRows"] = t.csvCountRows
 	helperMethodMap["journal"] = t.parseJournalBasedOnIndex
 	helperMethodMap["hasJournalKey"] = t.hasJournalKey
 	helperMethodMap["setStatusCode"] = t.setStatusCode
