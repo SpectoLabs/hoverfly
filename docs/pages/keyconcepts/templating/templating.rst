@@ -173,7 +173,12 @@ Fakers that require arguments are currently not supported.
 CSV Data Source
 ~~~~~~~~~~~~~~~
 
-You can query data from a CSV data source in a number of ways.
+You can both query data from a CSV data source as well as manipulate data within a data source byadding to it and deleting from it.
+
+Reading from a CSV Data Source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can read data from a CSV data source in a number of ways.
 
 The most basic is to return the value of one field (selected-column) given a field name to search (column-name) and 
 a value to search for in that field (query-value). Of course the query-value would normally be pulled from the request.
@@ -328,7 +333,76 @@ Example: Start Hoverfly with a CSV data source (pets.csv) provided below.
 |                          |                                                            | 1002 dogs Teddy sold                    |
 +--------------------------+------------------------------------------------------------+-----------------------------------------+
 
+Adding data to a CSV Data Source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+While the service is running you can add new rows of data into the data source. This is not peristent, it is only manipulated in memory
+and so it only lasts for as long as the service is running. The rows are not actually written to the file.
+
+.. code:: json
+
+    {
+        "body": "{\"name\": \"{{csvAddRow '(data-source-name)' (array-of-values)}}\"}"
+    }
+
+
+To use this function you first need to construct an array containing the row of string values to store in the csv data source.
+For example say you had a csv called pets with the columns id, category, name and status.
+
+1. You would first add each of the 4 values into an array of 4 items to match the number of columns:
+
+``{{ addToArray 'newPet' '2000' false }}``
+``{{ addToArray 'newPet' 'dogs' false }}``
+``{{ addToArray 'newPet' 'Violet' false }}``
+``{{ addToArray 'newPet' 'sold' false }}``
+
+2. You then call the csvAddRow function to add the row into the csv data store:
+
+``{{csvAddRow 'pets' (getArray 'newPet') }}``
+
+
+Deleting data from a CSV Data Source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+While the service is running you can delete rows of data from the data source. This is not peristent, it is only manipulated in memory
+and so it only lasts for as long as the service is running. The rows are not actually deleted from the file.
+
+.. code:: json
+
+    {
+        "body": "{\"name\": \"{{csvDeleteRows '(data-source-name)' '(column-name)' '(query-value)' (output-result)}}\"}"
+    }
+
+To delete rows from the csv data source your specify the value that a specific column must have to be deleted.
+
+To delete all the pets where the category is cats from the pets csv data store:
+
+``{{ csvDeleteRows 'pets' 'category' 'cats' false }}``
+
+Note that the last parameter of "output-result" is a boolean. It is not enclosed in quotes. The function will return the number of rows
+affected which can either be suppressed by passing false, or passed into another function if you need to make logical decisions based on the number of 
+rows affected by passing in true. If csvDeleteRows is not enclosed within another function it will output the number of rows
+deleted to the template.
+
+``{{#equal (csvDeleteRows 'pets' 'category' 'cats' true) '0'}}``
+``    {{ setStatusCode '404' }}``
+``    {"Message":"Error no cats found"}``
+``{{else}}``
+``    {{ setStatusCode '200' }}``
+``    {"Message":"All cats deleted"}``
+``{{/equal}}``
+
+
+Counting the rows in a CSV Data Source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can return the number of rows in a csv dataset. This will be 1 less than the number of rows as the first row contains the column names.
+
+.. code:: json
+
+    {
+        "body": "{\"name\": \"{{csvCountRows '(data-source-name)'}}\"}"
+    }
 
 
 Journal Entry Data

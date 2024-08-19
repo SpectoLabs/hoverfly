@@ -140,6 +140,60 @@ func Test_ApplyTemplate_CsvAsMapMissingDataSource(t *testing.T) {
 
 // -------------------------------
 
+func Test_ApplyTemplate_CsvAddRow(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{addToArray 'newMark' '99' false}}{{addToArray 'newMark' 'Violet' false}}{{addToArray 'newMark' '55' false}}{{csvAddRow 'test-csv1' (getArray 'newMark')}}{{csv 'test-csv1' 'id' '99' 'name'}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`Violet`))
+}
+
+func Test_ApplyTemplate_CsvDeleteRows(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvDeleteRows 'test-csv1' 'id' '2' true}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`1`))
+}
+
+func Test_ApplyTemplate_CsvDeleteMissingDataset(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvDeleteRows 'test-csv99' 'id' '2' true}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(``))
+}
+
+func Test_ApplyTemplate_CsvDeleteMissingField(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvDeleteRows 'test-csv1' 'identity' '2' true}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(``))
+}
+
+func Test_ApplyTemplate_CsvCountRows(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvCountRows 'test-csv1'}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`3`))
+}
+
+func Test_ApplyTemplate_CsvCountRowsMissingDataset(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvCountRows 'test-csv99'}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(``))
+}
+
 func Test_ApplyTemplate_EachBlockWithSplitTemplatingFunction(t *testing.T) {
 	RegisterTestingT(t)
 
