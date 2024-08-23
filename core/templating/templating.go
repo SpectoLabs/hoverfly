@@ -95,7 +95,9 @@ func NewTemplator() *Templator {
 	helperMethodMap["isAlphanumeric"] = t.isAlphanumeric
 	helperMethodMap["isBool"] = t.isBool
 	helperMethodMap["isGreaterThan"] = t.isGreaterThan
+	helperMethodMap["isGreaterThanOrEqual"] = t.isGreaterThanOrEqual
 	helperMethodMap["isLessThan"] = t.isLessThan
+	helperMethodMap["isLessThanOrEqual"] = t.isLessThanOrEqual
 	helperMethodMap["isBetween"] = t.isBetween
 	helperMethodMap["matchesRegex"] = t.matchesRegex
 	helperMethodMap["faker"] = t.faker
