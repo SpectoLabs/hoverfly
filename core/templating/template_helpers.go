@@ -247,19 +247,20 @@ func (t templateHelpers) fetchSingleFieldCsv(dataSourceName, searchFieldName, se
 	return getEvaluationString("csv", options)
 }
 
-func (t templateHelpers) fetchMatchingRowsCsv(dataSourceName string, searchFieldName string, searchFieldValue string) []map[string]string {
+func (t templateHelpers) fetchMatchingRowsCsv(dataSourceName string, searchFieldName string, searchFieldValue string) []RowMap {
 	templateDataSources := t.TemplateDataSource.DataSources
 	source, exists := templateDataSources[dataSourceName]
 	if !exists {
 		log.Debug("could not find datasource " + dataSourceName)
-		return []map[string]string{}
+		return []RowMap{}
 	}
 	if len(source.Data) < 1 {
 		log.Debug("no data available in datasource " + dataSourceName)
-		return []map[string]string{}
+		return []RowMap{}
 	}
 	source.mu.Lock()
 	defer source.mu.Unlock()
+
 	headers := source.Data[0]
 	fieldIndex := -1
 	for i, header := range headers {
@@ -270,12 +271,13 @@ func (t templateHelpers) fetchMatchingRowsCsv(dataSourceName string, searchField
 	}
 	if fieldIndex == -1 {
 		log.Debug("could not find search field name " + searchFieldName)
-		return []map[string]string{}
+		return []RowMap{}
 	}
-	var result []map[string]string
+
+	var result []RowMap
 	for _, row := range source.Data[1:] {
 		if fieldIndex < len(row) && row[fieldIndex] == searchFieldValue {
-			rowMap := make(map[string]string)
+			rowMap := make(RowMap)
 			for i, cell := range row {
 				if i < len(headers) {
 					rowMap[headers[i]] = cell
@@ -284,7 +286,6 @@ func (t templateHelpers) fetchMatchingRowsCsv(dataSourceName string, searchField
 			result = append(result, rowMap)
 		}
 	}
-
 	return result
 }
 
@@ -301,23 +302,23 @@ func (t templateHelpers) csvAsArray(dataSourceName string) [][]string {
 	}
 }
 
-func (t templateHelpers) csvAsMap(dataSourceName string) []map[string]string {
+func (t templateHelpers) csvAsMap(dataSourceName string) []RowMap {
 	templateDataSources := t.TemplateDataSource.DataSources
 	source, exists := templateDataSources[dataSourceName]
 	if !exists {
 		log.Debug("could not find datasource " + dataSourceName)
-		return []map[string]string{}
+		return []RowMap{}
 	}
 	source.mu.Lock()
 	defer source.mu.Unlock()
 	if len(source.Data) < 1 {
 		log.Debug("no data available in datasource " + dataSourceName)
-		return []map[string]string{}
+		return []RowMap{}
 	}
 	headers := source.Data[0]
-	var result []map[string]string
+	var result []RowMap
 	for _, row := range source.Data[1:] {
-		rowMap := make(map[string]string)
+		rowMap := make(RowMap)
 		for i, cell := range row {
 			if i < len(headers) {
 				rowMap[headers[i]] = cell
@@ -396,6 +397,25 @@ func (t templateHelpers) csvCountRows(dataSourceName string) string {
 	}
 	numRows := len(source.Data) - 1 // The number of rows is len(source.Data) - 1 (subtracting 1 for the header row)
 	return fmt.Sprintf("%d", numRows)
+}
+
+func (t templateHelpers) csvSQL(dataSourceName, queryString string) []RowMap {
+	//queryString := "SELECT age, city WHERE age!='30' AND city=='New York'"
+	templateDataSources := t.TemplateDataSource.DataSources
+	source, exists := templateDataSources[dataSourceName]
+	if !exists {
+		log.Debug("could not find datasource " + dataSourceName)
+		return []RowMap{}
+	}
+	query, err := ParseQuery(queryString)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return []RowMap{}
+	}
+	source.mu.Lock()
+	defer source.mu.Unlock()
+	results := ExecuteQuery(source.Data, query)
+	return results
 }
 
 func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSource, queryType, lookupQuery string, options *raymond.Options) interface{} {
