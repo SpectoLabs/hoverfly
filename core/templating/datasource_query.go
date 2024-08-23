@@ -4,15 +4,9 @@ import (
 	"errors"
 	"regexp"
 	"strings"
-)
 
-// A mock structure representing your CSV data
-// var data = [][]string{
-// 	{"id", "name", "age", "city"},
-// 	{"1", "John", "30", "New York"},
-// 	{"2", "Jane", "25", "Los Angeles"},
-// 	{"3", "Doe", "40", "New York"},
-// }
+	log "github.com/sirupsen/logrus"
+)
 
 // RowMap represents a single row in the result set
 type RowMap map[string]string
@@ -25,45 +19,102 @@ type Condition struct {
 }
 
 // SelectQuery represents a simple SQL-like SELECT query
+//
+//	type SelectQuery struct {
+//		Columns    []string
+//		Conditions []Condition
+//	}
 type SelectQuery struct {
-	Columns    []string
-	Conditions []Condition
+	Columns        []string
+	Conditions     []Condition
+	DataSourceName string
 }
 
 // ParseQuery parses a query string into a SelectQuery struct
-func ParseQuery(query string) (SelectQuery, error) {
+// func ParseQuery(query string, headers []string) (SelectQuery, error) {
+// 	query = strings.TrimSpace(query)
+
+// 	selectRegex := regexp.MustCompile(`(?i)^SELECT\s+(.+)\s+WHERE\s+(.+)$`)
+// 	matches := selectRegex.FindStringSubmatch(query)
+// 	if len(matches) != 3 {
+// 		return SelectQuery{}, errors.New("invalid query format")
+// 	}
+
+// 	columnsPart := matches[1]
+// 	wherePart := matches[2]
+
+// 	columns := parseColumns(columnsPart, headers)
+// 	conditions, err := parseConditions(wherePart)
+// 	if err != nil {
+// 		return SelectQuery{}, err
+// 	}
+
+//		return SelectQuery{
+//			Columns:    columns,
+//			Conditions: conditions,
+//		}, nil
+//	}
+func ParseQuery(query string, datasource map[string]*DataSource) (SelectQuery, error) {
 	query = strings.TrimSpace(query)
 
-	selectRegex := regexp.MustCompile(`(?i)^SELECT\s+(.+)\s+WHERE\s+(.+)$`)
+	// Regular expression to match SELECT, FROM, and WHERE clauses
+	selectRegex := regexp.MustCompile(`(?i)^SELECT\s+(.+)\s+FROM\s+(\w+)\s*(?:WHERE\s+(.+))?$`)
 	matches := selectRegex.FindStringSubmatch(query)
-	if len(matches) != 3 {
+	if len(matches) < 3 {
 		return SelectQuery{}, errors.New("invalid query format")
 	}
 
 	columnsPart := matches[1]
-	wherePart := matches[2]
+	dataSourceName := matches[2]
+	wherePart := ""
+	if len(matches) == 4 {
+		wherePart = matches[3]
+	}
 
+	// Assuming headers can be retrieved from the data source at a later stage
+	//headers := []string{} // This will be populated once the data source is retrieved
+	headers := datasource[dataSourceName].Data[0]
+	log.Debug("###################")
+	log.Debug(headers)
+	log.Debug("###################")
+	// Determine the columns to select
+	columns := parseColumns(columnsPart, headers)
+
+	// Parse the WHERE clause if present
+	var conditions []Condition
+	var err error
+	if wherePart != "" {
+		conditions, err = parseConditions(wherePart)
+		if err != nil {
+			return SelectQuery{}, err
+		}
+	}
+
+	return SelectQuery{
+		Columns:        columns,
+		Conditions:     conditions,
+		DataSourceName: dataSourceName,
+	}, nil
+}
+
+// parseColumns determines the columns to select based on the query part and headers
+func parseColumns(columnsPart string, headers []string) []string {
+	columnsPart = strings.TrimSpace(columnsPart)
+	if columnsPart == "*" {
+		return headers
+	}
 	columns := strings.Split(columnsPart, ",")
 	for i, column := range columns {
 		columns[i] = strings.TrimSpace(column)
 	}
-
-	conditions, err := parseConditions(wherePart)
-	if err != nil {
-		return SelectQuery{}, err
-	}
-
-	return SelectQuery{
-		Columns:    columns,
-		Conditions: conditions,
-	}, nil
+	return columns
 }
 
 // parseConditions parses the WHERE part of the query into a slice of Conditions
 func parseConditions(wherePart string) ([]Condition, error) {
 	conditions := []Condition{}
 
-	conditionRegex := regexp.MustCompile(`(\w+)\s*(==|!=)\s*'([^']*)'`)
+	conditionRegex := regexp.MustCompile(`(\w+)\s*(==|!=|<=|>=|<|>)\s*'([^']*)'`)
 	conditionMatches := conditionRegex.FindAllStringSubmatch(wherePart, -1)
 
 	if len(conditionMatches) == 0 {
@@ -88,7 +139,6 @@ func parseConditions(wherePart string) ([]Condition, error) {
 func ExecuteQuery(data [][]string, query SelectQuery) []RowMap {
 	headers := data[0] // first row as header
 	results := []RowMap{}
-
 	for _, row := range data[1:] {
 		rowMap := mapRow(headers, row)
 		if matchesConditions(rowMap, query.Conditions) {
@@ -138,25 +188,25 @@ func matchesConditions(row RowMap, conditions []Condition) bool {
 			if val == condition.Value {
 				return false
 			}
+		case "<":
+			if isGreaterThanOrEqual(val, condition.Value) {
+				return false
+			}
+		case "<=":
+			if isGreaterThan(val, condition.Value) {
+				return false
+			}
+		case ">":
+			if isLessThanOrEqual(val, condition.Value) {
+				return false
+			}
+		case ">=":
+			if isLessThan(val, condition.Value) {
+				return false
+			}
 		default:
 			return false // Unsupported operator
 		}
 	}
 	return true // All conditions matched
 }
-
-// Example usage
-// func main() {
-// 	queryStr := "SELECT age, city WHERE age!='30' AND city=='New York'"
-
-// 	query, err := ParseQuery(queryStr)
-// 	if err != nil {
-// 		fmt.Println("Error:", err)
-// 		return
-// 	}
-
-// 	results := ExecuteQuery(data, query)
-// 	for _, row := range results {
-// 		fmt.Println(row)
-// 	}
-// }
