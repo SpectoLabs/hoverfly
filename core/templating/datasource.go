@@ -27,7 +27,7 @@ func NewCsvDataSource(fileName, fileContent string) (*DataSource, error) {
 	return &DataSource{"csv", fileName, records, sync.Mutex{}}, nil
 }
 
-func (dataSource DataSource) GetDataSourceView() (v2.CSVDataSourceView, error) {
+func (dataSource *DataSource) GetDataSourceView() (v2.CSVDataSourceView, error) {
 
 	content, err := getData(dataSource)
 	if err != nil {
@@ -36,7 +36,7 @@ func (dataSource DataSource) GetDataSourceView() (v2.CSVDataSourceView, error) {
 	return v2.CSVDataSourceView{Name: dataSource.Name, Data: content}, nil
 }
 
-func getData(source DataSource) (string, error) {
+func getData(source *DataSource) (string, error) {
 
 	var csvData strings.Builder
 	csvWriter := csv.NewWriter(&csvData)
