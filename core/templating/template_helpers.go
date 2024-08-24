@@ -135,74 +135,130 @@ func (t templateHelpers) isBool(s string) bool {
 	return err == nil
 }
 
-func isGreaterThan(valueToCheck, minimumValue string) bool {
-	num1, err := strconv.ParseFloat(valueToCheck, 64)
+// func isGreaterThan(valueToCheck, minimumValue string) bool {
+// 	num1, err := strconv.ParseFloat(valueToCheck, 64)
+// 	if err != nil {
+// 		return false
+// 	}
+// 	num2, err := strconv.ParseFloat(minimumValue, 64)
+// 	if err != nil {
+// 		return false
+// 	}
+// 	return num1 > num2
+// }
+
+// func (t templateHelpers) isGreaterThan(valueToCheck, minimumValue string) bool {
+// 	return isGreaterThan(valueToCheck, minimumValue)
+// }
+
+// func isGreaterThanOrEqual(valueToCheck, minimumValue string) bool {
+// 	num1, err := strconv.ParseFloat(valueToCheck, 64)
+// 	if err != nil {
+// 		return false
+// 	}
+// 	num2, err := strconv.ParseFloat(minimumValue, 64)
+// 	if err != nil {
+// 		return false
+// 	}
+// 	return num1 >= num2
+// }
+
+// func (t templateHelpers) isGreaterThanOrEqual(valueToCheck, minimumValue string) bool {
+// 	return isGreaterThan(valueToCheck, minimumValue)
+// }
+
+// func isLessThan(valueToCheck, maximumValue string) bool {
+// 	num1, err := strconv.ParseFloat(valueToCheck, 64)
+// 	if err != nil {
+// 		return false
+// 	}
+// 	num2, err := strconv.ParseFloat(maximumValue, 64)
+// 	if err != nil {
+// 		return false
+// 	}
+// 	return num1 < num2
+// }
+
+// func (t templateHelpers) isLessThan(valueToCheck, maximumValue string) bool {
+// 	return isLessThan(valueToCheck, maximumValue)
+// }
+
+// func isLessThanOrEqual(valueToCheck, maximumValue string) bool {
+// 	num1, err := strconv.ParseFloat(valueToCheck, 64)
+// 	if err != nil {
+// 		return false
+// 	}
+// 	num2, err := strconv.ParseFloat(maximumValue, 64)
+// 	if err != nil {
+// 		return false
+// 	}
+// 	return num1 <= num2
+// }
+
+// func (t templateHelpers) isLessThanOrEqual(valueToCheck, maximumValue string) bool {
+// 	return isLessThan(valueToCheck, maximumValue)
+// }
+
+// func (t templateHelpers) isBetween(valueToCheck, minimumValue, maximumValue string) bool {
+// 	return t.isGreaterThan(valueToCheck, minimumValue) && t.isLessThan(valueToCheck, maximumValue)
+// }
+
+//########################
+
+// Comparison function type that takes two float64 values and returns a boolean.
+type comparator func(float64, float64) bool
+
+// Generic comparison function that parses strings to floats and applies the given comparison function.
+func compareValues(value1, value2 string, comp comparator) bool {
+	num1, err := strconv.ParseFloat(value1, 64)
 	if err != nil {
 		return false
 	}
-	num2, err := strconv.ParseFloat(minimumValue, 64)
+	num2, err := strconv.ParseFloat(value2, 64)
 	if err != nil {
 		return false
 	}
-	return num1 > num2
+	return comp(num1, num2)
 }
 
-func (t templateHelpers) isGreaterThan(valueToCheck, minimumValue string) bool {
-	return isGreaterThan(valueToCheck, minimumValue)
+// Specific comparison functions using the generic compareValues function.
+func isGreaterThan(value1, value2 string) bool {
+	return compareValues(value1, value2, func(a, b float64) bool { return a > b })
 }
 
-func isGreaterThanOrEqual(valueToCheck, minimumValue string) bool {
-	num1, err := strconv.ParseFloat(valueToCheck, 64)
-	if err != nil {
-		return false
-	}
-	num2, err := strconv.ParseFloat(minimumValue, 64)
-	if err != nil {
-		return false
-	}
-	return num1 >= num2
+func isGreaterThanOrEqual(value1, value2 string) bool {
+	return compareValues(value1, value2, func(a, b float64) bool { return a >= b })
 }
 
-func (t templateHelpers) isGreaterThanOrEqual(valueToCheck, minimumValue string) bool {
-	return isGreaterThan(valueToCheck, minimumValue)
+func isLessThan(value1, value2 string) bool {
+	return compareValues(value1, value2, func(a, b float64) bool { return a < b })
 }
 
-func isLessThan(valueToCheck, maximumValue string) bool {
-	num1, err := strconv.ParseFloat(valueToCheck, 64)
-	if err != nil {
-		return false
-	}
-	num2, err := strconv.ParseFloat(maximumValue, 64)
-	if err != nil {
-		return false
-	}
-	return num1 < num2
+func isLessThanOrEqual(value1, value2 string) bool {
+	return compareValues(value1, value2, func(a, b float64) bool { return a <= b })
 }
 
-func (t templateHelpers) isLessThan(valueToCheck, maximumValue string) bool {
-	return isLessThan(valueToCheck, maximumValue)
+func (t templateHelpers) isGreaterThan(value1, value2 string) bool {
+	return isGreaterThan(value1, value2)
 }
 
-func isLessThanOrEqual(valueToCheck, maximumValue string) bool {
-	num1, err := strconv.ParseFloat(valueToCheck, 64)
-	if err != nil {
-		return false
-	}
-	num2, err := strconv.ParseFloat(maximumValue, 64)
-	if err != nil {
-		return false
-	}
-	return num1 <= num2
+func (t templateHelpers) isGreaterThanOrEqual(value1, value2 string) bool {
+	return isGreaterThanOrEqual(value1, value2)
 }
 
-func (t templateHelpers) isLessThanOrEqual(valueToCheck, maximumValue string) bool {
-	return isLessThan(valueToCheck, maximumValue)
+func (t templateHelpers) isLessThan(value1, value2 string) bool {
+	return isLessThan(value1, value2)
 }
 
-func (t templateHelpers) isBetween(valueToCheck, minimumValue, maximumValue string) bool {
-	return t.isGreaterThan(valueToCheck, minimumValue) && t.isLessThan(valueToCheck, maximumValue)
+func (t templateHelpers) isLessThanOrEqual(value1, value2 string) bool {
+	return isLessThanOrEqual(value1, value2)
 }
 
+func (t templateHelpers) isBetween(value, min, max string) bool {
+	return t.isGreaterThan(value, min) && t.isLessThan(value, max)
+}
+
+// ########################
 func (t templateHelpers) matchesRegex(valueToCheck, pattern string) bool {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
@@ -439,28 +495,11 @@ func (t templateHelpers) csvCountRows(dataSourceName string) string {
 	return fmt.Sprintf("%d", numRows)
 }
 
-//	func (t templateHelpers) csvSQL(dataSourceName, queryString string) []RowMap {
-//		templateDataSources := t.TemplateDataSource.DataSources
-//		source, exists := templateDataSources[dataSourceName]
-//		if !exists {
-//			log.Debug("could not find datasource " + dataSourceName)
-//			return []RowMap{}
-//		}
-//		source.mu.Lock()
-//		defer source.mu.Unlock()
-//		query, err := ParseQuery(queryString, source.Data[0])
-//		if err != nil {
-//			log.Error("Error:", err)
-//			return []RowMap{}
-//		}
-//		results := ExecuteQuery(source.Data, query)
-//		return results
-//	}
 func (t templateHelpers) csvSQL(queryString string) []RowMap {
 	templateDataSources := t.TemplateDataSource.DataSources
 
 	// Parse the query string to get the SelectQuery
-	query, err := ParseQuery(queryString, templateDataSources)
+	query, err := parseQuery(strings.TrimSpace(queryString), templateDataSources)
 	if err != nil {
 		log.Debug("Error parsing query:", err)
 		return []RowMap{}
@@ -476,9 +515,33 @@ func (t templateHelpers) csvSQL(queryString string) []RowMap {
 	source.mu.Lock()
 	defer source.mu.Unlock()
 
-	// Execute the query against the data source
-	results := ExecuteQuery(source.Data, query)
-	return results
+	var results []RowMap
+	var execErr error
+
+	switch query.Type {
+	case "SELECT":
+		results = executeSelectQuery(source.Data, query) //This is not by reference as we are not changing the data
+	case "UPDATE":
+		execErr = executeUpdateQuery(&source.Data, query) //This must be by reference as we are not changing the data
+	case "DELETE":
+		execErr = executeDeleteQuery(&source.Data, query) //This must be by reference as we are not changing the data
+	default:
+		log.Debug(fmt.Errorf("unsupported query type %s", query.Type))
+		return nil
+	}
+
+	if execErr != nil {
+		log.Debug(fmt.Errorf("error executing query: %w", execErr))
+		return nil
+	}
+
+	// For SELECT queries, return results
+	if query.Type == "SELECT" {
+		return results
+	}
+
+	// No results to return for UPDATE and DELETE queries
+	return nil
 }
 
 func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSource, queryType, lookupQuery string, options *raymond.Options) interface{} {
