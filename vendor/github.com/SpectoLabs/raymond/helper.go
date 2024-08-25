@@ -29,6 +29,7 @@ func init() {
 	RegisterHelper("unless", unlessHelper)
 	RegisterHelper("with", withHelper)
 	RegisterHelper("each", eachHelper)
+	RegisterHelper("first", firstHelper)
 	RegisterHelper("log", logHelper)
 	RegisterHelper("lookup", lookupHelper)
 	RegisterHelper("equal", equalHelper)
@@ -383,6 +384,57 @@ func eachHelper(context interface{}, options *Options) interface{} {
 
 			// evaluates block
 			result += options.evalBlock(ctx, data, key)
+		}
+	}
+
+	return result
+}
+
+func firstHelper(context interface{}, options *Options) interface{} {
+	if !IsTrue(context) {
+		return options.Inverse()
+	}
+
+	val := reflect.ValueOf(context)
+	var result string
+
+	switch val.Kind() {
+	case reflect.Array, reflect.Slice:
+		if val.Len() > 0 {
+			// computes private data
+			data := options.newIterDataFrame(val.Len(), 0, nil)
+
+			// evaluates block
+			result = options.evalBlock(val.Index(0).Interface(), data, 0)
+		}
+	case reflect.Map:
+		keys := val.MapKeys()
+		if len(keys) > 0 {
+			key := keys[0].Interface()
+			ctx := val.MapIndex(keys[0]).Interface()
+
+			// computes private data
+			data := options.newIterDataFrame(len(keys), 0, key)
+
+			// evaluates block
+			result = options.evalBlock(ctx, data, key)
+		}
+	case reflect.Struct:
+		if val.NumField() > 0 {
+			// get the first exported field
+			for i := 0; i < val.NumField(); i++ {
+				if tField := val.Type().Field(i); tField.PkgPath == "" {
+					key := tField.Name
+					ctx := val.Field(i).Interface()
+
+					// computes private data
+					data := options.newIterDataFrame(1, 0, key)
+
+					// evaluates block
+					result = options.evalBlock(ctx, data, key)
+					break // only process the first field
+				}
+			}
 		}
 	}
 
