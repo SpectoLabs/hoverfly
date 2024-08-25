@@ -17,6 +17,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"sort"
@@ -517,11 +518,31 @@ func NeedsEncoding(headers map[string][]string, body string) bool {
 	return needsEncoding
 }
 
-func IsJsonData(data string) bool {
-	var jsonData map[string]interface{}
-	if err := json.Unmarshal([]byte(data), &jsonData); err == nil {
-		return true
-	} else {
-		return false
+// Resolves a relative path from basePath, and fails if the relative path starts with ".."
+func ResolveAndValidatePath(basePath, relativePath string) (string, error) {
+	absBasePath, err := filepath.Abs(basePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to get absolute base path: %v", err)
 	}
+
+	cleanRelativePath := filepath.Clean(relativePath)
+
+	// Check if the relative path starts with ".."
+	if strings.HasPrefix(cleanRelativePath, "..") {
+		return "", fmt.Errorf("relative path is invalid as it attempts to backtrack")
+	}
+
+	resolvedPath := filepath.Join(absBasePath, cleanRelativePath)
+
+	// Verify that the resolved path is indeed a subpath of the base path
+	finalPath, err := filepath.Rel(absBasePath, resolvedPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to get relative path: %v", err)
+	}
+
+	if strings.HasPrefix(finalPath, "..") {
+		return "", fmt.Errorf("resolved path is outside the base path")
+	}
+
+	return resolvedPath, nil
 }
