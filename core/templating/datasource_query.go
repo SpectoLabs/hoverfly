@@ -2,8 +2,11 @@ package templating
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // RowMap represents a single row in the result set
@@ -16,8 +19,8 @@ type Condition struct {
 	Value    string
 }
 
-// SelectQuery represents a simple SQL-like SELECT query
-type SelectQuery struct {
+// SQLStatement represents a simple SQL-like query
+type SQLStatement struct {
 	Type           string // "SELECT", "UPDATE", or "DELETE"
 	Columns        []string
 	Conditions     []Condition
@@ -25,9 +28,8 @@ type SelectQuery struct {
 	DataSourceName string
 }
 
-func parseQuery(query string, datasource map[string]*DataSource) (SelectQuery, error) {
+func parseQuery(query string, datasource map[string]*DataSource) (SQLStatement, error) {
 	query = strings.TrimSpace(query)
-
 	var queryType string
 	if strings.HasPrefix(strings.ToUpper(query), "SELECT") {
 		queryType = "SELECT"
@@ -36,7 +38,7 @@ func parseQuery(query string, datasource map[string]*DataSource) (SelectQuery, e
 	} else if strings.HasPrefix(strings.ToUpper(query), "DELETE") {
 		queryType = "DELETE"
 	} else {
-		return SelectQuery{}, errors.New("invalid query type")
+		return SQLStatement{}, errors.New("invalid query type")
 	}
 
 	var selectRegex *regexp.Regexp
@@ -45,44 +47,61 @@ func parseQuery(query string, datasource map[string]*DataSource) (SelectQuery, e
 
 	switch queryType {
 	case "SELECT":
-		selectRegex = regexp.MustCompile(`(?i)^SELECT\s+(.+)\s+FROM\s+(\w+)\s*(?:WHERE\s+(.+))?$`)
+		selectRegex = regexp.MustCompile(`(?i)^SELECT\s+(.+)\s+FROM\s+([\w-]+)\s*(?:WHERE\s+(.+))?$`)
 		matches = selectRegex.FindStringSubmatch(query)
+		for i, _ := range matches {
+			log.Debug(fmt.Sprint(":", matches[i]))
+		}
+
 		if len(matches) < 3 {
-			return SelectQuery{}, errors.New("invalid query format")
+
+			return SQLStatement{}, errors.New("invalid query format")
+
 		}
 		columnsPart = matches[1]
 		dataSourceName = matches[2]
+		if !dataSourceExists(datasource, dataSourceName) {
+			return SQLStatement{}, errors.New("data source does not exist")
+		}
+		//if len(matches) == 4 && len(matches[3]) > 0 {
 		if len(matches) == 4 {
 			wherePart = matches[3]
 		}
-	case "UPDATE":
-		//selectRegex = regexp.MustCompile(`(?i)^UPDATE\s+(\w+)\s+SET\s+(.+)\s*(?:WHERE\s+(.+))?$`)
-		selectRegex = regexp.MustCompile(`(?i)^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(.+))?$`)
+		headers := datasource[dataSourceName].Data[0]
+		columns := parseColumns(columnsPart, headers)
 
+		conditions, err := parseConditions(wherePart)
+		if err != nil {
+			return SQLStatement{}, err
+		}
+
+		return SQLStatement{
+			Type:           queryType,
+			Columns:        columns,
+			Conditions:     conditions,
+			DataSourceName: dataSourceName,
+		}, nil
+	case "UPDATE":
+		selectRegex = regexp.MustCompile(`(?i)^UPDATE\s+([\w-]+)\s+SET\s+(.+?)(?:\s+WHERE\s+(.+))?$`)
 		matches = selectRegex.FindStringSubmatch(query)
 		if len(matches) < 3 {
-			return SelectQuery{}, errors.New("invalid UPDATE query format")
+			return SQLStatement{}, errors.New("invalid UPDATE query format")
 		}
 		dataSourceName = matches[1]
+		if !dataSourceExists(datasource, dataSourceName) {
+			return SQLStatement{}, errors.New("data source does not exist")
+		}
 		setPart := matches[2]
 		if len(matches) == 4 {
 			wherePart = matches[3]
 		}
-		// log.Debug("########## ParseQuery ############")
-		// logMessage := fmt.Sprintf("len(matches)=%d", len(matches))
-		// log.Debug(logMessage)
-		// logMessage = fmt.Sprintf("matches[3]=" + matches[3])
-		// log.Debug(logMessage)
-		// formattedMatches := strings.Join(matches, " --- ")
-		// logMessage = fmt.Sprintf("matches=%v", formattedMatches)
-		// log.Debug(logMessage)
-		// log.Debug("######################")
+
 		setClauses := parseSetClauses(setPart)
 		conditions, err := parseConditions(wherePart)
 		if err != nil {
-			return SelectQuery{}, err
+			return SQLStatement{}, err
 		}
-		return SelectQuery{
+		return SQLStatement{
 			Type:           "UPDATE",
 			Conditions:     conditions,
 			SetClauses:     setClauses,
@@ -90,40 +109,29 @@ func parseQuery(query string, datasource map[string]*DataSource) (SelectQuery, e
 		}, nil
 
 	case "DELETE":
-		selectRegex = regexp.MustCompile(`(?i)^DELETE\s+FROM\s+(\w+)\s*(?:WHERE\s+(.+))?$`)
+		selectRegex = regexp.MustCompile(`(?i)^DELETE\s+FROM\s+([\w-]+)\s*(?:WHERE\s+(.+))?$`)
 		matches = selectRegex.FindStringSubmatch(query)
 		if len(matches) < 2 {
-			return SelectQuery{}, errors.New("invalid DELETE query format")
+			return SQLStatement{}, errors.New("invalid DELETE query format")
 		}
 		dataSourceName = matches[1]
+		if !dataSourceExists(datasource, dataSourceName) {
+			return SQLStatement{}, errors.New("data source does not exist")
+		}
 		if len(matches) == 3 {
 			wherePart = matches[2]
 		}
 		conditions, err := parseConditions(wherePart)
 		if err != nil {
-			return SelectQuery{}, err
+			return SQLStatement{}, err
 		}
-		return SelectQuery{
+		return SQLStatement{
 			Type:           "DELETE",
 			Conditions:     conditions,
 			DataSourceName: dataSourceName,
 		}, nil
 	}
-
-	headers := datasource[dataSourceName].Data[0]
-	columns := parseColumns(columnsPart, headers)
-
-	conditions, err := parseConditions(wherePart)
-	if err != nil {
-		return SelectQuery{}, err
-	}
-
-	return SelectQuery{
-		Type:           queryType,
-		Columns:        columns,
-		Conditions:     conditions,
-		DataSourceName: dataSourceName,
-	}, nil
+	return SQLStatement{}, errors.New("invalid query format")
 }
 
 // parseColumns determines the columns to select based on the query part and headers
@@ -180,7 +188,7 @@ func parseConditions(wherePart string) ([]Condition, error) {
 	conditionMatches := conditionRegex.FindAllStringSubmatch(wherePart, -1)
 
 	if len(conditionMatches) == 0 {
-		return nil, errors.New("no valid conditions found")
+		return conditions, nil
 	}
 
 	for _, match := range conditionMatches {
@@ -197,28 +205,8 @@ func parseConditions(wherePart string) ([]Condition, error) {
 	return conditions, nil
 }
 
-// ExecuteQuery processes different types of SQL-like queries based on the query type
-// func executeQuery(data *[][]string, query SelectQuery) ([]RowMap, error) {
-// 	switch query.Type {
-// 	case "SELECT":
-// 		return executeSelectQuery(*data, query), nil
-// 	case "UPDATE":
-// 		if err := executeUpdateQuery(data, query); err != nil {
-// 			return nil, err
-// 		}
-// 		return nil, nil // UPDATE doesn't return rows
-// 	case "DELETE":
-// 		if err := executeDeleteQuery(data, query); err != nil {
-// 			return nil, err
-// 		}
-// 		return nil, nil // DELETE doesn't return rows
-// 	default:
-// 		return nil, errors.New("unsupported query type")
-// 	}
-// }
-
 // ExecuteSelectQuery executes a SELECT query and returns the results as a slice of RowMaps
-func executeSelectQuery(data [][]string, query SelectQuery) []RowMap {
+func executeSelectQuery(data [][]string, query SQLStatement) []RowMap {
 	headers := data[0] // First row as header
 	results := []RowMap{}
 	for _, row := range data[1:] {
@@ -231,7 +219,7 @@ func executeSelectQuery(data [][]string, query SelectQuery) []RowMap {
 }
 
 // ExecuteUpdateQuery executes an UPDATE query and modifies the data in-place
-func executeUpdateQuery(data *[][]string, query SelectQuery) error {
+func executeUpdateQuery(data *[][]string, query SQLStatement) error {
 	if len(*data) < 2 {
 		return errors.New("no data available to update")
 	}
@@ -254,7 +242,7 @@ func executeUpdateQuery(data *[][]string, query SelectQuery) error {
 }
 
 // ExecuteDeleteQuery executes a DELETE query and modifies the data in-place
-func executeDeleteQuery(data *[][]string, query SelectQuery) error {
+func executeDeleteQuery(data *[][]string, query SQLStatement) error {
 	if len(*data) < 2 {
 		return errors.New("no data available to delete")
 	}
@@ -290,15 +278,6 @@ func mapRow(headers, row []string) RowMap {
 	}
 	return rowMap
 }
-
-// mapToRow converts a map back to a CSV row
-// func mapToRow(headers []string, rowMap RowMap) []string {
-// 	row := make([]string, len(headers))
-// 	for i, header := range headers {
-// 		row[i] = rowMap[header]
-// 	}
-// 	return row
-// }
 
 // projectRow filters the row based on the selected columns
 func projectRow(row RowMap, columns []string) RowMap {

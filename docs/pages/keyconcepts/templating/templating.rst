@@ -173,7 +173,9 @@ Fakers that require arguments are currently not supported.
 CSV Data Source
 ~~~~~~~~~~~~~~~
 
-You can both query data from a CSV data source as well as manipulate data within a data source byadding to it and deleting from it.
+You can both query data from a CSV data source as well as manipulate data within a data source by adding to it and deleting from it.
+Hoverfly supports a number of templating methods for simple read, update and delete functions.
+In addition Hoverfly supports a templating function that allows simple SQL like commands for SELECT, UPDATE and DELETE.
 
 Reading from a CSV Data Source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -183,11 +185,9 @@ You can read data from a CSV data source in a number of ways.
 The most basic is to return the value of one field (selected-column) given a field name to search (column-name) and 
 a value to search for in that field (query-value). Of course the query-value would normally be pulled from the request.
 
-.. code:: json
+.. code:: handlebars
 
-    {
-        "body": "{\"name\": \"{{csv '(data-source-name)' '(column-name)' '(query-value)' '(selected-column)' }}\"}"
-    }
+    {{csv '(data-source-name)' '(column-name)' '(query-value)' '(selected-column)' }}
 
 .. note::
 
@@ -239,30 +239,30 @@ Additional functions are avaiable to query the CSV data source to return all or 
 This makes it simpler to render back into the template, as you can use the {{this}} expression with the column names to identify
 which fields you want to render.
 
-To return all the data from the csv as an array of maps:
+To return all the data from the csv as an array of maps. (Note that you would need to wrap this in an #each block. See examples below.):
 
-.. code:: json
+.. code:: handlebars
 
-    {
-        "body": "{\"name\": \"{{csvAsMap '(data-source-name)' }}\"}"
-    }
+    {{csvAsMap '(data-source-name)' }}
+    
 
-To return filtered data from the csv as an array of maps:
+To return filtered data from the csv as an array of maps (Note that you would need to wrap this in an #each block. See examples below.):
 
-.. code:: json
+.. code:: handlebars
 
-    {
-        "body": "{\"name\": \"{{csvMatchingRows '(data-source-name)' '(column-name)' '(query-value)' '(selected-column)'}}\"}"
-    }
+    {{csvMatchingRows '(data-source-name)' '(column-name)' '(query-value)' '(selected-column)'}}
 
-To return all the data from the csv as an array arrays:
+To return all the data from the csv as an array arrays (Note that you would need to wrap this in an #each block. See examples below.):
 
-.. code:: json
+.. code:: handlebars
 
-    {
-        "body": "{\"name\": \"{{csvAsArray '(data-source-name)' }}\"}"
-    }
+    {{csvAsArray '(data-source-name)' }}
 
+To return filtered data from the csv as an array of maps using the SQL like dialect. Again this needs to be wrapped in an #each block:
+
+.. code:: handlebars
+
+    {{csvSQL '(sql-select-query)'}}
 
 Example: Start Hoverfly with a CSV data source (pets.csv) provided below.
 
@@ -280,70 +280,85 @@ Example: Start Hoverfly with a CSV data source (pets.csv) provided below.
 +-----------+-----------+---------+-----------+
 
 
++--------------------------+------------------------------------------+-----------------------------------------+
+| Description              | Example                                  | Result                                  |
++--------------------------+------------------------------------------+-----------------------------------------+
+| Return all the results   | {                                        | {                                       |
+| in an array of maps      |   "All-The-Pets": [                      |   "All-The-Pets": [                     |
+| and render them in JSON  |   {{#each (csvAsMap 'pets')}}            |       {                                 |
+| *Note the use of         |   {                                      |           "id": 1000,                   |
+|  this.column-name        |       "id":{{this.id}},                  |           "category": "cats",           |
+|  as we have map          |       "category":"{{this.category}}",    |           "name": "Sylvester",          |
+|                          |       "name":"{{this.name}}",            |           "status": "available"         |
+|                          |       "status":"{{this.status}}"         |       },                                |
+|                          |   }{{#unless @last}},{{/unless}}         |       {                                 |
+|                          |   {{/each}}                              |           "id": 1001,                   |
+|                          |   ]                                      |           "category": "dogs",           |
+|                          | }                                        |           "name": "Zipper",             |
+|                          |                                          |           "status": "available"         |
+|                          |                                          |       },                                |
+|                          |                                          |       {                                 |
+|                          |                                          |           "id": 1002,                   |
+|                          |                                          |           "category": "dogs",           |
+|                          |                                          |           "name": "Teddy",              |
+|                          |                                          |           "status": "sold"              |
+|                          |                                          |       }                                 |
+|                          |                                          |   ]                                     |
+|                          |                                          | }                                       |
++--------------------------+------------------------------------------+-----------------------------------------+
+| Return filtered data as  | {                                        | {                                       |
+| an array of maps         |   "Dogs-Only": [                         |   "Dogs-Only": [                        |
+| and render them in JSON  |   {{#each (csvMatchingRows 'pets'        |       {                                 |
+| *Note the use of         |   'category' 'dogs')}}                   |           "id": 1001,                   |
+|  this.column-name        |   {                                      |           "category": "dogs",           |
+|  as we have a map        |       "id":{{this.id}},                  |           "name": "Zipper",             |
+|                          |       "category":"{{this.category}}",    |           "status": "available"         |
+|                          |       "name":"{{this.name}}",            |       },                                |
+|                          |       "status":"{{this.status}}"         |       {                                 |
+|                          |   }{{#unless @last}},{{/unless}}         |           "id": 1002,                   |
+|                          |   {{/each}}                              |           "category": "dogs",           |
+|                          |   ]                                      |           "name": "Teddy",              |
+|                          | }                                        |           "status": "sold"              |
+|                          |                                          |       }                                 |
+|                          |                                          |   ]                                     |
+|                          |                                          | }                                       |
++--------------------------+------------------------------------------+-----------------------------------------+
+| SELECT data using a SQL  | {                                        | {                                       |
+| like syntax.             |   "Dogs-With-Big-Ids-Only": [            |   "Dogs-With-Big-Ids-Only": [           |
+|                          | {{#each (csvSQL "SELECT * FROM pets      |   {                                     |
+|                          | WHERE category == 'dogs' AND id >=       |       "id":2000,                        |
+|                          | '2000'")}}                               |       "category":"dogs",                |
+|                          |   {                                      |       "name":"Violet",                  |
+|                          |       "id":{{this.id}},                  |       "status":"sold"                   |
+|                          |       "category":"{{this.category}}",    |   }                                     |
+|                          |       "name":"{{this.name}}",            |   ]                                     |
+|                          |       "status":"{{this.status}}"         | }                                       |
+|                          |   }{{#unless @last}},{{/unless}}         |                                         |
+|                          | {{/each}}                                |                                         |
+|                          |   ]                                      |                                         |
+|                          | }                                        |                                         |
++--------------------------+------------------------------------------+-----------------------------------------+
+| Return all the data as   | {{#each (csvAsArray 'pets')}}            | id category name status                 |
+| an array of arrays       | {{#each this}}{{this}} {{/each}}         |                                         |
+|                          |                                          | 1000 cats Sylvester available           |
+|                          |                                          |                                         |
+|                          |                                          | 1001 dogs Zipper available              |
+|                          |                                          |                                         |
+|                          |                                          | 1002 dogs Teddy sold                    |
++--------------------------+------------------------------------------+-----------------------------------------+
 
-+--------------------------+------------------------------------------------------------+-----------------------------------------+
-| Description              | Example                                                    | Result                                  |
-+--------------------------+------------------------------------------------------------+-----------------------------------------+
-| Return all the results   | {                                                          | {                                       |
-| in an array of maps      |     "All-The-Pets": [                                      |     "All-The-Pets": [                   |
-| and render them in JSON  |     {{#each (csvAsMap 'pets')}}                            |         {                               |
-| *Note the use of         |     {                                                      |             "id": 1000,                 |
-|  this.column-name        |         "id":{{this.id}},                                  |             "category": "cats",         |
-|  as we have map          |         "category":"{{this.category}}",                    |             "name": "Sylvester",        |
-|                          |         "name":"{{this.name}}",                            |             "status": "available"       |
-|                          |         "status":"{{this.status}}"                         |         },                              |
-|                          |     }{{#unless @last}},{{/unless}}                         |         {                               |
-|                          |     {{/each}}                                              |             "id": 1001,                 |
-|                          |     ]                                                      |             "category": "dogs",         |
-|                          | }                                                          |             "name": "Zipper",           |
-|                          |                                                            |             "status": "available"       |
-|                          |                                                            |         },                              |
-|                          |                                                            |         {                               |
-|                          |                                                            |             "id": 1002,                 |
-|                          |                                                            |             "category": "dogs",         |
-|                          |                                                            |             "name": "Teddy",            |
-|                          |                                                            |             "status": "sold"            |
-|                          |                                                            |         }                               |
-|                          |                                                            |     ]                                   |
-|                          |                                                            | }                                       |
-+--------------------------+------------------------------------------------------------+-----------------------------------------+
-| Return filtered data as  | {                                                          | {                                       |
-| an array of maps         |     "Dogs-Only": [                                         |     "Dogs-Only": [                      |
-| and render them in JSON  | {{#each (csvMatchingRows 'pets' 'category' 'dogs')}}       |         {                               |
-| *Note the use of         |     {                                                      |             "id": 1001,                 |
-|  this.column-name        |         "id":{{this.id}},                                  |             "category": "dogs",         |
-|  as we have map          |         "category":"{{this.category}}",                    |             "name": "Zipper",           |
-|                          |         "name":"{{this.name}}",                            |             "status": "available"       |
-|                          |         "status":"{{this.status}}"                         |         },                              |
-|                          |     }{{#unless @last}},{{/unless}}                         |         {                               |
-|                          | {{/each}}                                                  |             "id": 1002,                 |
-|                          |     ]                                                      |             "category": "dogs",         |
-|                          | }                                                          |             "name": "Teddy",            |
-|                          |                                                            |             "status": "sold"            |
-|                          |                                                            |         }                               |
-|                          |                                                            |     ]                                   |
-|                          |                                                            | }                                       |
-+--------------------------+------------------------------------------------------------+-----------------------------------------+
-| Return all the data as   | {{#each (csvAsArray 'pets')}}                              | id category name status                 |
-| an array of arrays       | {{#each this}}{{this}} {{/each}}                           |                                         |
-|                          |                                                            | 1000 cats Sylvester available           |
-|                          |                                                            |                                         |
-|                          |                                                            | 1001 dogs Zipper available              |
-|                          |                                                            |                                         |
-|                          |                                                            | 1002 dogs Teddy sold                    |
-+--------------------------+------------------------------------------------------------+-----------------------------------------+
 
 Adding data to a CSV Data Source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 While the service is running you can add new rows of data into the data source. This is not peristent, it is only manipulated in memory
-and so it only lasts for as long as the service is running. The rows are not actually written to the file.
+and so it only lasts for as long as the service is running and between calls. The rows are not actually written to the file.
 
-.. code:: json
+This is currently the only way to add rows to the datasource. There is no support for SQL INSERT statements.
 
-    {
-        "body": "{\"name\": \"{{csvAddRow '(data-source-name)' (array-of-values)}}\"}"
-    }
+.. code:: handlebars
+
+    {{csvAddRow '(data-source-name)' (array-of-values)}}
 
 
 To use this function you first need to construct an array containing the row of string values to store in the csv data source.
@@ -365,13 +380,14 @@ Deleting data from a CSV Data Source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 While the service is running you can delete rows of data from the data source. This is not peristent, it is only manipulated in memory
-and so it only lasts for as long as the service is running. The rows are not actually deleted from the file.
+and so it only lasts for as long as the service is running and between calls. The rows are not actually deleted from the file.
 
-.. code:: json
+There are two ways to delete rows. This first simple method will delete rows that match one exact condition.
 
-    {
-        "body": "{\"name\": \"{{csvDeleteRows '(data-source-name)' '(column-name)' '(query-value)' (output-result)}}\"}"
-    }
+.. code:: handlebars
+
+    {{csvDeleteRows '(data-source-name)' '(column-name)' '(query-value)' (output-result)}}
+
 
 To delete rows from the csv data source your specify the value that a specific column must have to be deleted.
 
@@ -380,9 +396,9 @@ To delete all the pets where the category is cats from the pets csv data store:
 ``{{ csvDeleteRows 'pets' 'category' 'cats' false }}``
 
 Note that the last parameter of "output-result" is a boolean. It is not enclosed in quotes. The function will return the number of rows
-affected which can either be suppressed by passing false, or passed into another function if you need to make logical decisions based on the number of 
-rows affected by passing in true. If csvDeleteRows is not enclosed within another function it will output the number of rows
-deleted to the template.
+affected which can either be suppressed by passing false to this parameter, or passed into another function if you need to make logical 
+decisions based on the number of rows affected by passing in true as the last parameter. If csvDeleteRows is not enclosed within another 
+function it will output the number of rows deleted to the template.
 
 ``{{#equal (csvDeleteRows 'pets' 'category' 'cats' true) '0'}}``
 ``    {{ setStatusCode '404' }}``
@@ -392,17 +408,59 @@ deleted to the template.
 ``    {"Message":"All cats deleted"}``
 ``{{/equal}}``
 
+Deleting data from a CSV Data Source using SQL like syntax
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: handlebars
+
+    {{csvSQL '(sql-delete-statement)'}}
+
+Example:
+``{{ csvSQL "DELETE FROM pets WHERE id > '20'" }}``
+
+Update the data in a CSV Data Source using SQL like syntax
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: handlebars
+
+    {{csvSQL '(sql-update-statement)'}}
+
+Example:
+``{{ csvSQL "UPDATE pets SET status = 'sold' WHERE id > '20' AND category == 'cats'" }}``
+
+Using SQL like syntax to query and manipulate data sources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You can use a simplified SQL like syntax to select, update and delete rows.
+
+INSERT is not supported. To add data you must use the csvAddRow template function.
+SELECT [column-names] FROM [data-source-name] WHERE [conditions] (* can be used to indicate all colmuns)
+UPDATE [data-source-name] SET [[column-name] = '[value]',] WHERE [conditions]
+DELETE FROM [data-source-name] WHERE [conditions]
+
+Only simple conditions are supported.
+
+You can chain conditions using AND. OR is not supported.
+
+The following comparison operators are supported in conditions:
+== equals
+>= greater than or equal to
+<= less than or equal to
+!= not equal to
+
+Capitalisation of SQL keywords is required.
+Spaces between components of the SQL statement are required.
+Every value provided to a condition whether a number or a string must be enclosed in quotes.
+Joins across different data sources are not supported.
+
 
 Counting the rows in a CSV Data Source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can return the number of rows in a csv dataset. This will be 1 less than the number of rows as the first row contains the column names.
 
-.. code:: json
+.. code:: handlebars
 
-    {
-        "body": "{\"name\": \"{{csvCountRows '(data-source-name)'}}\"}"
-    }
+    {{csvCountRows '(data-source-name)'}}
 
 
 Journal Entry Data

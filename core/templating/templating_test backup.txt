@@ -147,19 +147,15 @@ func Test_ApplyTemplate_CsvAddRow(t *testing.T) {
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`Violet`))
-	//Revert the data to original state
-	_, _ = ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvDeleteRows 'test-csv' 'id' '99' false}}`)
 }
 
 func Test_ApplyTemplate_CsvDeleteRows(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvDeleteRows 'test-csv' 'id' '*' true}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvDeleteRows 'test-csv' 'id' '2' true}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`1`))
-	//Revert the data to original state
-	_, _ = ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{addToArray 'newMark' '*' false}}{{addToArray 'newMark' 'Dummy' false}}{{addToArray 'newMark' 'ABSENT' false}}{{csvAddRow 'test-csv' (getArray 'newMark')}}`)
 }
 
 func Test_ApplyTemplate_CsvDeleteMissingDataset(t *testing.T) {
@@ -228,7 +224,7 @@ func Test_ApplyTemplate_CsvAsMapAndReturnMatchedString2(t *testing.T) {
 func Test_ApplyTemplate_CsvSQL_SelectAll(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSQL "SELECT * FROM test-csv WHERE 1==1")}}{{this.id}},{{this.name}},{{this.marks}};{{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSQL "SELECT * FROM test-csv")}}{{this.id}},{{this.name}},{{this.marks}};{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`1,Test1,55;2,Test2,56;*,Dummy,ABSENT;`))
@@ -266,7 +262,7 @@ func Test_ApplyTemplate_CsvSQL_InvalidQuery(t *testing.T) {
 	RegisterTestingT(t)
 
 	// An invalid query that should fail
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSQL "SELECT foo FROM bar WHERE id == '1'")}} {{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvSQL "SELECT foo FROM bar WHERE id == '1'"}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(``)) // No valid data should be returned

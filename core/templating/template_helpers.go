@@ -399,6 +399,7 @@ func (t templateHelpers) csvAsArray(dataSourceName string) [][]string {
 }
 
 func (t templateHelpers) csvAsMap(dataSourceName string) []RowMap {
+
 	templateDataSources := t.TemplateDataSource.DataSources
 	source, exists := templateDataSources[dataSourceName]
 	if !exists {
@@ -497,10 +498,11 @@ func (t templateHelpers) csvCountRows(dataSourceName string) string {
 
 func (t templateHelpers) csvSQL(queryString string) []RowMap {
 	templateDataSources := t.TemplateDataSource.DataSources
-
 	// Parse the query string to get the SelectQuery
 	query, err := parseQuery(strings.TrimSpace(queryString), templateDataSources)
 	if err != nil {
+		// Debugging: Print the parsed query
+		fmt.Printf("Error parsing query:: %+v\n", err)
 		log.Debug("Error parsing query:", err)
 		return []RowMap{}
 	}
