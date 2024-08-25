@@ -518,12 +518,8 @@ func NeedsEncoding(headers map[string][]string, body string) bool {
 	return needsEncoding
 }
 
-// Resolves a relative path from basePath, and fails if the relative path starts with ".."
-func ResolveAndValidatePath(basePath, relativePath string) (string, error) {
-	absBasePath, err := filepath.Abs(basePath)
-	if err != nil {
-		return "", fmt.Errorf("failed to get absolute base path: %v", err)
-	}
+// Resolves a relative path from an absolute basePath, and fails if the relative path starts with ".."
+func ResolveAndValidatePath(absBasePath, relativePath string) (string, error) {
 
 	cleanRelativePath := filepath.Clean(relativePath)
 

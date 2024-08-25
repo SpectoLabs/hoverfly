@@ -27,6 +27,8 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -207,7 +209,7 @@ func main() {
 	flag.Var(&templatingDataSourceFlags, "templating-data-source", "Set template data source (i.e. '-templating-data-source \"<datasource name> <file path>\"')")
 	flag.Var(&destinationFlags, "dest", "Specify which hosts to process (i.e. '-dest fooservice.org -dest barservice.org -dest catservice.org') - other hosts will be ignored will passthrough'")
 	flag.Var(&logOutputFlags, "logs-output", "Specify locations for output logs, options are \"console\" and \"file\" (default \"console\")")
-	flag.StringVar(&responseBodyFilesPath, "response-body-files-path", "", "When a response contains a relative bodyFile, it will be resolved against this path (default is CWD)")
+	flag.StringVar(&responseBodyFilesPath, "response-body-files-path", "", "When a response contains a relative bodyFile, it will be resolved against this absolute path (default is CWD)")
 	flag.Var(&responseBodyFilesAllowedOriginFlags, "response-body-files-allow-origin", "When a response contains a url in bodyFile, it will be loaded only if the origin is allowed")
 	flag.Var(&journalIndexingKeyFlags, "journal-indexing-key", "Key to setup indexing on journal")
 
@@ -433,7 +435,24 @@ func main() {
 		cfg.Destination = *destination
 	}
 
-	cfg.ResponsesBodyFilesPath = responseBodyFilesPath
+
+	if len(responseBodyFilesPath) > 0 {
+		// Ensure file path is absolute and exists in the file system
+		if !path.IsAbs(responseBodyFilesPath) {
+			log.Fatal("Response body files path should be absolute")
+		}
+		absBasePath, err := filepath.Abs(responseBodyFilesPath)
+		if err != nil {
+			log.Fatal("Invalid response body files path")
+		}
+		if _, err := os.Stat(absBasePath); os.IsNotExist(err) {
+			log.Fatal("Response body files path does not exist")
+		}
+
+		cfg.ResponsesBodyFilesPath = absBasePath
+	}
+
+
 
 	for _, allowedOrigin := range responseBodyFilesAllowedOriginFlags {
 		if !util.IsURL(allowedOrigin) {
