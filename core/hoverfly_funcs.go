@@ -2,8 +2,8 @@ package hoverfly
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -188,7 +188,12 @@ func (hf *Hoverfly) readResponseBodyFile(filePath string) (string, error) {
 		return "", fmt.Errorf("bodyFile contains absolute path (%s). only relative is supported", filePath)
 	}
 
-	fileContents, err := ioutil.ReadFile(filepath.Join(hf.Cfg.ResponsesBodyFilesPath, filePath))
+	resolvedPath, err := util.ResolveAndValidatePath(hf.Cfg.ResponsesBodyFilesPath, filePath)
+	if err != nil {
+		return "", err
+	}
+
+	fileContents, err := os.ReadFile(resolvedPath)
 	if err != nil {
 		return "", err
 	}
