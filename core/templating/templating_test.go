@@ -15,7 +15,7 @@ import (
 func Test_ApplyTemplate_ParseCsvAndReturnMatchedString(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csv 'test-csv' 'Id' '2' 'Marks'}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csv 'test-csv1' 'Id' '2' 'Marks'}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`56`))
@@ -24,7 +24,7 @@ func Test_ApplyTemplate_ParseCsvAndReturnMatchedString(t *testing.T) {
 func Test_ApplyTemplate_ParseCsvAndReturnFallbackStringIfNoMatchFound(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csv 'test-csv' 'Id' '51' 'Marks'}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csv 'test-csv1' 'Id' '51' 'Marks'}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`ABSENT`))
@@ -76,7 +76,7 @@ func Test_ApplyTemplate_ParseCsv_WithEachBlockAndMissingDataSource(t *testing.T)
 func Test_ApplyTemplate_MatchingRowsCsvAndReturnMatchedString(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvMatchingRows 'test-csv' 'id' '2')}}{{this.name}}{{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvMatchingRows 'test-csv1' 'id' '2')}}{{this.name}}{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`Test2`))
@@ -94,7 +94,7 @@ func Test_ApplyTemplate_MatchingRowsCsvMissingDataSource(t *testing.T) {
 func Test_ApplyTemplate_MatchingRowsCsvInvalidKey(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvMatchingRows 'test-csv' 'id' '99')}}{{this.name}}{{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvMatchingRows 'test-csv1' 'id' '99')}}{{this.name}}{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(``))
@@ -104,7 +104,7 @@ func Test_ApplyTemplate_MatchingRowsCsvInvalidKey(t *testing.T) {
 func Test_ApplyTemplate_CsvAsArrayAndReturnMatchedString(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvAsArray 'test-csv')}}{{#each this}}{{this}}{{/each}}{{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvAsArray 'test-csv1')}}{{#each this}}{{this}}{{/each}}{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`idnamemarks1Test1552Test256*DummyABSENT`))
@@ -123,7 +123,7 @@ func Test_ApplyTemplate_CsvAsArrayMissingDataSource(t *testing.T) {
 func Test_ApplyTemplate_CsvAsMapAndReturnMatchedString(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvAsMap 'test-csv')}}{{this.name}}{{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvAsMap 'test-csv1')}}{{this.name}}{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`Test1Test2Dummy`))
@@ -143,23 +143,23 @@ func Test_ApplyTemplate_CsvAsMapMissingDataSource(t *testing.T) {
 func Test_ApplyTemplate_CsvAddRow(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{addToArray 'newMark' '99' false}}{{addToArray 'newMark' 'Violet' false}}{{addToArray 'newMark' '55' false}}{{csvAddRow 'test-csv' (getArray 'newMark')}}{{csv 'test-csv' 'id' '99' 'name'}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{addToArray 'newMark' '99' false}}{{addToArray 'newMark' 'Violet' false}}{{addToArray 'newMark' '55' false}}{{csvAddRow 'test-csv1' (getArray 'newMark')}}{{csv 'test-csv1' 'id' '99' 'name'}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`Violet`))
 	//Revert the data to original state
-	_, _ = ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvDeleteRows 'test-csv' 'id' '99' false}}`)
+	_, _ = ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvDeleteRows 'test-csv1' 'id' '99' false}}`)
 }
 
 func Test_ApplyTemplate_CsvDeleteRows(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvDeleteRows 'test-csv' 'id' '*' true}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvDeleteRows 'test-csv1' 'id' '*' true}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`1`))
 	//Revert the data to original state
-	_, _ = ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{addToArray 'newMark' '*' false}}{{addToArray 'newMark' 'Dummy' false}}{{addToArray 'newMark' 'ABSENT' false}}{{csvAddRow 'test-csv' (getArray 'newMark')}}`)
+	_, _ = ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{addToArray 'newMark' '*' false}}{{addToArray 'newMark' 'Dummy' false}}{{addToArray 'newMark' 'ABSENT' false}}{{csvAddRow 'test-csv1' (getArray 'newMark')}}`)
 }
 
 func Test_ApplyTemplate_CsvDeleteMissingDataset(t *testing.T) {
@@ -174,7 +174,7 @@ func Test_ApplyTemplate_CsvDeleteMissingDataset(t *testing.T) {
 func Test_ApplyTemplate_CsvDeleteMissingField(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvDeleteRows 'test-csv' 'identity' '2' true}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvDeleteRows 'test-csv1' 'identity' '2' true}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(``))
@@ -183,7 +183,7 @@ func Test_ApplyTemplate_CsvDeleteMissingField(t *testing.T) {
 func Test_ApplyTemplate_CsvCountRows(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvCountRows 'test-csv'}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvCountRows 'test-csv1'}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`3`))
@@ -201,34 +201,16 @@ func Test_ApplyTemplate_CsvCountRowsMissingDataset(t *testing.T) {
 func Test_ApplyTemplate_CsvSQL_Select(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT name FROM test-csv WHERE id == '1'")}}{{this.name}}{{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT name FROM test-csv1 WHERE id == '1'")}}{{this.name}}{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`Test1`))
 }
 
-// func Test_ApplyTemplate_CsvSQL_Select(t *testing.T) {
-// 	RegisterTestingT(t)
-
-// 	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSQL 'SELECT * FROM test-csv')}}{{this.name}}{{/each}}`)
-
-// 	Expect(err).To(BeNil())
-// 	Expect(template).To(Equal(`Test1Test2Dummy`))
-// }
-
-func Test_ApplyTemplate_CsvAsMapAndReturnMatchedString2(t *testing.T) {
-	RegisterTestingT(t)
-
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvAsMap 'test-csv')}}{{this.name}}{{/each}}`)
-
-	Expect(err).To(BeNil())
-	Expect(template).To(Equal(`Test1Test2Dummy`))
-}
-
 func Test_ApplyTemplate_CsvSQL_SelectAll(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT * FROM test-csv WHERE 1==1")}}{{this.id}},{{this.name}},{{this.marks}};{{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT * FROM test-csv1 WHERE 1==1")}}{{this.id}},{{this.name}},{{this.marks}};{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`1,Test1,55;2,Test2,56;*,Dummy,ABSENT;`))
@@ -238,11 +220,11 @@ func Test_ApplyTemplate_CsvSQL_Update(t *testing.T) {
 	RegisterTestingT(t)
 
 	// First, update the data
-	_, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvSqlCommand "UPDATE test-csv SET marks = '60' WHERE id == '1'"}}`)
+	_, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvSqlCommand "UPDATE test-csv1 SET marks = '60' WHERE id == '1'"}}`)
 	Expect(err).To(BeNil())
 
 	// Then, check the result
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT marks FROM test-csv WHERE id == '1'")}}{{this.marks}}{{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT marks FROM test-csv1 WHERE id == '1'")}}{{this.marks}}{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`60`))
@@ -927,9 +909,9 @@ func toInterfaceSlice(arguments []string) []interface{} {
 func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]string, responseBody string) (string, error) {
 
 	templator := templating.NewTemplator()
-	dataSource1, _ := templating.NewCsvDataSource("test-csv", "id,name,marks\n1,Test1,55\n2,Test2,56\n*,Dummy,ABSENT")
+	dataSource1, _ := templating.NewCsvDataSource("test-csv1", "id,name,marks\n1,Test1,55\n2,Test2,56\n*,Dummy,ABSENT")
 	dataSource2, _ := templating.NewCsvDataSource("test-csv2", "id,name,marks\n1,Test1,55\n2,Test2,56\n5553686208582,Test3,66\n")
-	templator.TemplateHelper.TemplateDataSource.SetDataSource("test-csv", dataSource1)
+	templator.TemplateHelper.TemplateDataSource.SetDataSource("test-csv1", dataSource1)
 	templator.TemplateHelper.TemplateDataSource.SetDataSource("test-csv2", dataSource2)
 
 	template, err := templator.ParseTemplate(responseBody)

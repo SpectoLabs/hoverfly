@@ -445,32 +445,20 @@ func (t templateHelpers) csvSqlCommand(commandString string) []RowMap {
 	defer source.mu.Unlock()
 
 	var results []RowMap
-	var execErr error
 
 	switch command.Type {
 	case "SELECT":
 		results = executeSqlSelectQuery(&source.Data, command)
 	case "UPDATE":
-		execErr = executeSqlUpdateCommand(&source.Data, command)
+		results = executeSqlUpdateCommand(&source.Data, command)
 	case "DELETE":
-		execErr = executeSqlDeleteCommand(&source.Data, command)
+		results = executeSqlDeleteCommand(&source.Data, command)
 	default:
 		log.Error(fmt.Errorf("unsupported query type %s", command.Type))
 		return nil
 	}
 
-	if execErr != nil {
-		log.Error(fmt.Errorf("error executing query: %w", execErr))
-		return nil
-	}
-
-	// For SELECT queries, return results
-	if command.Type == "SELECT" {
-		return results
-	}
-
-	// No results to return for UPDATE and DELETE queries
-	return nil
+	return results
 }
 
 func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSource, queryType, lookupQuery string, options *raymond.Options) interface{} {

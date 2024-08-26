@@ -3,7 +3,10 @@ package templating
 import (
 	"errors"
 	"regexp"
+	"strconv"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // RowMap represents a single row in the result set
@@ -61,7 +64,10 @@ func parseSqlCommand(query string, datasource *TemplateDataSource) (SQLStatement
 			wherePart = matches[3]
 		}
 		headers := datasource.DataSources[dataSourceName].Data[0]
-		columns := parseColumns(columnsPart, headers)
+		columns, err := parseColumns(columnsPart, headers)
+		if err != nil {
+			return SQLStatement{}, err
+		}
 
 		conditions, err := parseConditions(wherePart)
 		if err != nil {
@@ -128,16 +134,28 @@ func parseSqlCommand(query string, datasource *TemplateDataSource) (SQLStatement
 }
 
 // parseColumns determines the columns to select based on the query part and headers
-func parseColumns(columnsPart string, headers []string) []string {
+func parseColumns(columnsPart string, headers []string) ([]string, error) {
 	columnsPart = strings.TrimSpace(columnsPart)
 	if columnsPart == "*" {
-		return headers
+		return headers, nil
 	}
 	columns := strings.Split(columnsPart, ",")
 	for i, column := range columns {
+		if !stringExists(headers, strings.TrimSpace(column)) {
+			return nil, errors.New("invalid column provided: " + strings.TrimSpace(column))
+		}
 		columns[i] = strings.TrimSpace(column)
 	}
-	return columns
+	return columns, nil
+}
+
+func stringExists(slice []string, target string) bool {
+	for _, s := range slice {
+		if s == target {
+			return true
+		}
+	}
+	return false
 }
 
 // TrimQuotes trims matching single or double quotes from the outer edges of a string.
@@ -212,17 +230,24 @@ func executeSqlSelectQuery(data *[][]string, query SQLStatement) []RowMap {
 }
 
 // ExecuteUpdateQuery executes an UPDATE query and modifies the data in-place
-func executeSqlUpdateCommand(data *[][]string, query SQLStatement) error {
+func executeSqlUpdateCommand(data *[][]string, query SQLStatement) []RowMap {
 	if len(*data) < 2 {
-		return errors.New("no data available to update")
+		log.Error("no data available to update")
+		return []RowMap{
+			{
+				"rowsAffected": "0",
+			},
+		}
 	}
 
 	headers := (*data)[0]
 	conditions := query.Conditions
 	setClauses := query.SetClauses
+	rowsAffected := 0
 	for i, row := range (*data)[1:] {
 		rowMap := mapRow(headers, row)
 		if matchesConditions(rowMap, conditions) {
+			rowsAffected += 1
 			for column, newValue := range setClauses {
 				colIndex := indexOf(headers, column)
 				if colIndex != -1 {
@@ -231,26 +256,52 @@ func executeSqlUpdateCommand(data *[][]string, query SQLStatement) error {
 			}
 		}
 	}
-	return nil
+	return []RowMap{
+		{
+			"rowsAffected": strconv.Itoa(rowsAffected),
+		},
+	}
 }
 
-// ExecuteDeleteQuery executes a DELETE query and modifies the data in-place
-func executeSqlDeleteCommand(data *[][]string, query SQLStatement) error {
+// executeSqlDeleteCommand executes a DELETE query and modifies the data in-place
+func executeSqlDeleteCommand(data *[][]string, query SQLStatement) []RowMap {
 	if len(*data) < 2 {
-		return errors.New("no data available to delete")
-	}
-
-	headers := (*data)[0]
-	conditions := query.Conditions
-	filteredData := [][]string{headers}
-	for _, row := range (*data)[1:] {
-		rowMap := mapRow(headers, row)
-		if !matchesConditions(rowMap, conditions) {
-			filteredData = append(filteredData, row)
+		log.Println("no data available to delete")
+		return []RowMap{
+			{
+				"rowsAffected": "0",
+			},
 		}
 	}
-	*data = filteredData
-	return nil
+	headers := (*data)[0]
+	conditions := query.Conditions
+	rowsAffected := 0
+	// Iterate in reverse to avoid index shifting issues
+	for i := len(*data) - 1; i > 0; i-- {
+		row := (*data)[i]
+		rowMap := mapRow(headers, row)
+		if matchesConditions(rowMap, conditions) {
+			removeRow(data, i)
+			rowsAffected++
+		}
+	}
+	return []RowMap{
+		{
+			"rowsAffected": strconv.Itoa(rowsAffected),
+		},
+	}
+}
+
+// removeRow removes the row at index rowIndex from the data.
+func removeRow(data *[][]string, rowIndex int) {
+	if rowIndex < 0 || rowIndex >= len(*data) {
+		// Return early if rowIndex is out of bounds
+		return
+	}
+	// Overwrite the row at rowIndex with the next rows
+	copy((*data)[rowIndex:], (*data)[rowIndex+1:])
+	// Truncate the slice to remove the last row which is now duplicate
+	(*data) = (*data)[:len(*data)-1]
 }
 
 // Helper function to find the index of a column header
