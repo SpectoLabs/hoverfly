@@ -6,8 +6,9 @@ import (
 	"testing"
 )
 
-func TestParseQuery(t *testing.T) {
-	dataSource := map[string]*DataSource{
+func TestParseCommand(t *testing.T) {
+
+	dataSources := map[string]*DataSource{
 		"employees": {
 			SourceType: "csv",
 			Name:       "employees",
@@ -19,6 +20,8 @@ func TestParseQuery(t *testing.T) {
 			mu: sync.Mutex{},
 		},
 	}
+	templateDataSource := NewTemplateDataSource()
+	templateDataSource.DataSources = dataSources
 
 	tests := []struct {
 		query       string
@@ -57,7 +60,7 @@ func TestParseQuery(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result, err := parseQuery(test.query, dataSource)
+		result, err := parseSqlCommand(test.query, templateDataSource)
 		if test.expectError {
 			if err == nil {
 				t.Errorf("expected error but got none for query: %s", test.query)
@@ -175,7 +178,7 @@ func TestParseConditions_MultipleConditions(t *testing.T) {
 	}
 }
 
-func TestExecuteSelectQuery(t *testing.T) {
+func TestExecuteSqlSelectQuery(t *testing.T) {
 	data := [][]string{
 		{"id", "name", "age", "department"},
 		{"1", "John Doe", "30", "Engineering"},
@@ -193,13 +196,13 @@ func TestExecuteSelectQuery(t *testing.T) {
 		{"name": "John Doe", "age": "30"},
 	}
 
-	result := executeSelectQuery(data, query)
+	result := executeSqlSelectQuery(&data, query)
 	if !reflect.DeepEqual(result, expected) {
 		t.Errorf("expected %v, got %v", expected, result)
 	}
 }
 
-func TestExecuteUpdateQuery(t *testing.T) {
+func TestExecuteSqlUpdateCommand(t *testing.T) {
 	data := [][]string{
 		{"id", "name", "age", "department"},
 		{"1", "John Doe", "30", "Engineering"},
@@ -219,7 +222,7 @@ func TestExecuteUpdateQuery(t *testing.T) {
 		{"2", "Jane Smith", "40", "Marketing"},
 	}
 
-	err := executeUpdateQuery(&data, query)
+	err := executeSqlUpdateCommand(&data, query)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -228,7 +231,7 @@ func TestExecuteUpdateQuery(t *testing.T) {
 	}
 }
 
-func TestExecuteDeleteQuery(t *testing.T) {
+func TestExecuteSqlDeleteCommand(t *testing.T) {
 	data := [][]string{
 		{"id", "name", "age", "department"},
 		{"1", "John Doe", "30", "Engineering"},
@@ -246,7 +249,7 @@ func TestExecuteDeleteQuery(t *testing.T) {
 		{"2", "Jane Smith", "40", "Marketing"},
 	}
 
-	err := executeDeleteQuery(&data, query)
+	err := executeSqlDeleteCommand(&data, query)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}

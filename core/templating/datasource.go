@@ -53,12 +53,3 @@ func getData(source *DataSource) (string, error) {
 	}
 	return csvData.String(), nil
 }
-
-func dataSourceExists(dataSources map[string]*DataSource, name string) bool {
-	for _, dataSource := range dataSources {
-		if dataSource.Name == name {
-			return true
-		}
-	}
-	return false
-}

@@ -262,7 +262,7 @@ To return filtered data from the csv as an array of maps using the SQL like dial
 
 .. code:: handlebars
 
-    {{csvSQL '(sql-select-query)'}}
+    {{csvSqlCommand '(sql-select-query)'}}
 
 Example: Start Hoverfly with a CSV data source (pets.csv) provided below.
 
@@ -325,8 +325,8 @@ Example: Start Hoverfly with a CSV data source (pets.csv) provided below.
 +--------------------------+------------------------------------------+-----------------------------------------+
 | SELECT data using a SQL  | {                                        | {                                       |
 | like syntax.             |   "Dogs-With-Big-Ids-Only": [            |   "Dogs-With-Big-Ids-Only": [           |
-|                          | {{#each (csvSQL "SELECT * FROM pets      |   {                                     |
-|                          | WHERE category == 'dogs' AND id >=       |       "id":2000,                        |
+|                          | {{#each (csvSqlCommand "SELECT * FROM    |   {                                     |
+|                          | pets WHERE category == 'dogs' AND id >=  |       "id":2000,                        |
 |                          | '2000'")}}                               |       "category":"dogs",                |
 |                          |   {                                      |       "name":"Violet",                  |
 |                          |       "id":{{this.id}},                  |       "status":"sold"                   |
@@ -413,20 +413,20 @@ Deleting data from a CSV Data Source using SQL like syntax
 
 .. code:: handlebars
 
-    {{csvSQL '(sql-delete-statement)'}}
+    {{csvSqlCommand '(sql-delete-statement)'}}
 
 Example:
-``{{ csvSQL "DELETE FROM pets WHERE id > '20'" }}``
+``{{ csvSqlCommand "DELETE FROM pets WHERE id > '20'" }}``
 
 Update the data in a CSV Data Source using SQL like syntax
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: handlebars
 
-    {{csvSQL '(sql-update-statement)'}}
+    {{csvSqlCommand '(sql-update-statement)'}}
 
 Example:
-``{{ csvSQL "UPDATE pets SET status = 'sold' WHERE id > '20' AND category == 'cats'" }}``
+``{{ csvSqlCommand "UPDATE pets SET status = 'sold' WHERE id > '20' AND category == 'cats'" }}``
 
 Using SQL like syntax to query and manipulate data sources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

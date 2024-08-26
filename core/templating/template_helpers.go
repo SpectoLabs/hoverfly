@@ -135,76 +135,6 @@ func (t templateHelpers) isBool(s string) bool {
 	return err == nil
 }
 
-// func isGreaterThan(valueToCheck, minimumValue string) bool {
-// 	num1, err := strconv.ParseFloat(valueToCheck, 64)
-// 	if err != nil {
-// 		return false
-// 	}
-// 	num2, err := strconv.ParseFloat(minimumValue, 64)
-// 	if err != nil {
-// 		return false
-// 	}
-// 	return num1 > num2
-// }
-
-// func (t templateHelpers) isGreaterThan(valueToCheck, minimumValue string) bool {
-// 	return isGreaterThan(valueToCheck, minimumValue)
-// }
-
-// func isGreaterThanOrEqual(valueToCheck, minimumValue string) bool {
-// 	num1, err := strconv.ParseFloat(valueToCheck, 64)
-// 	if err != nil {
-// 		return false
-// 	}
-// 	num2, err := strconv.ParseFloat(minimumValue, 64)
-// 	if err != nil {
-// 		return false
-// 	}
-// 	return num1 >= num2
-// }
-
-// func (t templateHelpers) isGreaterThanOrEqual(valueToCheck, minimumValue string) bool {
-// 	return isGreaterThan(valueToCheck, minimumValue)
-// }
-
-// func isLessThan(valueToCheck, maximumValue string) bool {
-// 	num1, err := strconv.ParseFloat(valueToCheck, 64)
-// 	if err != nil {
-// 		return false
-// 	}
-// 	num2, err := strconv.ParseFloat(maximumValue, 64)
-// 	if err != nil {
-// 		return false
-// 	}
-// 	return num1 < num2
-// }
-
-// func (t templateHelpers) isLessThan(valueToCheck, maximumValue string) bool {
-// 	return isLessThan(valueToCheck, maximumValue)
-// }
-
-// func isLessThanOrEqual(valueToCheck, maximumValue string) bool {
-// 	num1, err := strconv.ParseFloat(valueToCheck, 64)
-// 	if err != nil {
-// 		return false
-// 	}
-// 	num2, err := strconv.ParseFloat(maximumValue, 64)
-// 	if err != nil {
-// 		return false
-// 	}
-// 	return num1 <= num2
-// }
-
-// func (t templateHelpers) isLessThanOrEqual(valueToCheck, maximumValue string) bool {
-// 	return isLessThan(valueToCheck, maximumValue)
-// }
-
-// func (t templateHelpers) isBetween(valueToCheck, minimumValue, maximumValue string) bool {
-// 	return t.isGreaterThan(valueToCheck, minimumValue) && t.isLessThan(valueToCheck, maximumValue)
-// }
-
-//########################
-
 // Comparison function type that takes two float64 values and returns a boolean.
 type comparator func(float64, float64) bool
 
@@ -258,7 +188,6 @@ func (t templateHelpers) isBetween(value, min, max string) bool {
 	return t.isGreaterThan(value, min) && t.isLessThan(value, max)
 }
 
-// ########################
 func (t templateHelpers) matchesRegex(valueToCheck, pattern string) bool {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
@@ -312,7 +241,7 @@ func (t templateHelpers) fetchSingleFieldCsv(dataSourceName, searchFieldName, se
 	templateDataSources := t.TemplateDataSource.DataSources
 	source, exists := templateDataSources[dataSourceName]
 	if !exists {
-		log.Debug("could not find datasource " + dataSourceName)
+		log.Error("could not find datasource " + dataSourceName)
 		return getEvaluationString("csv", options)
 	}
 	source.mu.Lock()
@@ -347,11 +276,11 @@ func (t templateHelpers) fetchMatchingRowsCsv(dataSourceName string, searchField
 	templateDataSources := t.TemplateDataSource.DataSources
 	source, exists := templateDataSources[dataSourceName]
 	if !exists {
-		log.Debug("could not find datasource " + dataSourceName)
+		log.Error("could not find datasource " + dataSourceName)
 		return []RowMap{}
 	}
 	if len(source.Data) < 1 {
-		log.Debug("no data available in datasource " + dataSourceName)
+		log.Error("no data available in datasource " + dataSourceName)
 		return []RowMap{}
 	}
 	source.mu.Lock()
@@ -366,7 +295,7 @@ func (t templateHelpers) fetchMatchingRowsCsv(dataSourceName string, searchField
 		}
 	}
 	if fieldIndex == -1 {
-		log.Debug("could not find search field name " + searchFieldName)
+		log.Error("could not find search field name " + searchFieldName)
 		return []RowMap{}
 	}
 
@@ -393,7 +322,7 @@ func (t templateHelpers) csvAsArray(dataSourceName string) [][]string {
 		defer source.mu.Unlock()
 		return source.Data
 	} else {
-		log.Debug("could not find datasource " + dataSourceName)
+		log.Error("could not find datasource " + dataSourceName)
 		return [][]string{}
 	}
 }
@@ -403,13 +332,13 @@ func (t templateHelpers) csvAsMap(dataSourceName string) []RowMap {
 	templateDataSources := t.TemplateDataSource.DataSources
 	source, exists := templateDataSources[dataSourceName]
 	if !exists {
-		log.Debug("could not find datasource " + dataSourceName)
+		log.Error("could not find datasource " + dataSourceName)
 		return []RowMap{}
 	}
 	source.mu.Lock()
 	defer source.mu.Unlock()
 	if len(source.Data) < 1 {
-		log.Debug("no data available in datasource " + dataSourceName)
+		log.Error("no data available in datasource " + dataSourceName)
 		return []RowMap{}
 	}
 	headers := source.Data[0]
@@ -434,7 +363,7 @@ func (t templateHelpers) csvAddRow(dataSourceName string, newRow []string) strin
 		defer source.mu.Unlock()
 		source.Data = append(source.Data, newRow)
 	} else {
-		log.Debug("could not find datasource " + dataSourceName)
+		log.Error("could not find datasource " + dataSourceName)
 	}
 	return ""
 }
@@ -443,13 +372,13 @@ func (t templateHelpers) csvDeleteRows(dataSourceName, searchFieldName, searchFi
 	templateDataSources := t.TemplateDataSource.DataSources
 	source, exists := templateDataSources[dataSourceName]
 	if !exists {
-		log.Debug("could not find datasource " + dataSourceName)
+		log.Error("could not find datasource " + dataSourceName)
 		return ""
 	}
 	source.mu.Lock()
 	defer source.mu.Unlock()
 	if len(source.Data) == 0 {
-		log.Debug("datasource " + dataSourceName + " is empty")
+		log.Error("datasource " + dataSourceName + " is empty")
 		return ""
 	}
 	header := source.Data[0]
@@ -461,7 +390,7 @@ func (t templateHelpers) csvDeleteRows(dataSourceName, searchFieldName, searchFi
 		}
 	}
 	if fieldIndex == -1 {
-		log.Debug("could not find field name " + searchFieldName + " in datasource " + dataSourceName)
+		log.Error("could not find field name " + searchFieldName + " in datasource " + dataSourceName)
 		return ""
 	}
 	filteredData := [][]string{header}
@@ -484,7 +413,7 @@ func (t templateHelpers) csvCountRows(dataSourceName string) string {
 	templateDataSources := t.TemplateDataSource.DataSources
 	source, exists := templateDataSources[dataSourceName]
 	if !exists {
-		log.Debug("could not find datasource " + dataSourceName)
+		log.Error("could not find datasource " + dataSourceName)
 		return ""
 	}
 	source.mu.Lock()
@@ -496,21 +425,19 @@ func (t templateHelpers) csvCountRows(dataSourceName string) string {
 	return fmt.Sprintf("%d", numRows)
 }
 
-func (t templateHelpers) csvSQL(queryString string) []RowMap {
-	templateDataSources := t.TemplateDataSource.DataSources
-	// Parse the query string to get the SelectQuery
-	query, err := parseQuery(strings.TrimSpace(queryString), templateDataSources)
+func (t templateHelpers) csvSqlCommand(commandString string) []RowMap {
+
+	// Parse the command string to get the Sql command
+	command, err := parseSqlCommand(strings.TrimSpace(commandString), t.TemplateDataSource)
 	if err != nil {
-		// Debugging: Print the parsed query
-		fmt.Printf("Error parsing query:: %+v\n", err)
-		log.Debug("Error parsing query:", err)
+		log.Error("Error parsing sql command:", err)
 		return []RowMap{}
 	}
 
 	// Find the data source by name
-	source, exists := templateDataSources[query.DataSourceName]
+	source, exists := t.TemplateDataSource.DataSources[command.DataSourceName]
 	if !exists {
-		log.Debug("Could not find datasource " + query.DataSourceName)
+		log.Error("Could not find datasource " + command.DataSourceName)
 		return []RowMap{}
 	}
 
@@ -520,25 +447,25 @@ func (t templateHelpers) csvSQL(queryString string) []RowMap {
 	var results []RowMap
 	var execErr error
 
-	switch query.Type {
+	switch command.Type {
 	case "SELECT":
-		results = executeSelectQuery(source.Data, query) //This is not by reference as we are not changing the data
+		results = executeSqlSelectQuery(&source.Data, command)
 	case "UPDATE":
-		execErr = executeUpdateQuery(&source.Data, query) //This must be by reference as we are not changing the data
+		execErr = executeSqlUpdateCommand(&source.Data, command)
 	case "DELETE":
-		execErr = executeDeleteQuery(&source.Data, query) //This must be by reference as we are not changing the data
+		execErr = executeSqlDeleteCommand(&source.Data, command)
 	default:
-		log.Debug(fmt.Errorf("unsupported query type %s", query.Type))
+		log.Error(fmt.Errorf("unsupported query type %s", command.Type))
 		return nil
 	}
 
 	if execErr != nil {
-		log.Debug(fmt.Errorf("error executing query: %w", execErr))
+		log.Error(fmt.Errorf("error executing query: %w", execErr))
 		return nil
 	}
 
 	// For SELECT queries, return results
-	if query.Type == "SELECT" {
+	if command.Type == "SELECT" {
 		return results
 	}
 

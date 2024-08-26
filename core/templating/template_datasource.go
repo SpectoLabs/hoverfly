@@ -26,6 +26,7 @@ func (templateDataSource *TemplateDataSource) SetDataSource(dataSourceName strin
 func (templateDataSource *TemplateDataSource) DeleteDataSource(dataSourceName string) {
 
 	templateDataSource.RWMutex.Lock()
+
 	if _, ok := templateDataSource.DataSources[dataSourceName]; ok {
 		delete(templateDataSource.DataSources, dataSourceName)
 	}
@@ -35,4 +36,16 @@ func (templateDataSource *TemplateDataSource) DeleteDataSource(dataSourceName st
 func (templateDataSource *TemplateDataSource) GetAllDataSources() map[string]*DataSource {
 
 	return templateDataSource.DataSources
+}
+
+func dataSourceExists(templateDataSource *TemplateDataSource, name string) bool {
+	templateDataSource.RWMutex.Lock()
+	defer templateDataSource.RWMutex.Unlock()
+
+	for _, dataSource := range templateDataSource.DataSources {
+		if dataSource.Name == name {
+			return true
+		}
+	}
+	return false
 }
