@@ -2,11 +2,8 @@ package templating
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strings"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // RowMap represents a single row in the result set
@@ -28,15 +25,15 @@ type SQLStatement struct {
 	DataSourceName string
 }
 
-func parseQuery(query string, datasource map[string]*DataSource) (SQLStatement, error) {
+func parseSqlCommand(query string, datasource *TemplateDataSource) (SQLStatement, error) {
 	query = strings.TrimSpace(query)
-	var queryType string
+	var commandType string
 	if strings.HasPrefix(strings.ToUpper(query), "SELECT") {
-		queryType = "SELECT"
+		commandType = "SELECT"
 	} else if strings.HasPrefix(strings.ToUpper(query), "UPDATE") {
-		queryType = "UPDATE"
+		commandType = "UPDATE"
 	} else if strings.HasPrefix(strings.ToUpper(query), "DELETE") {
-		queryType = "DELETE"
+		commandType = "DELETE"
 	} else {
 		return SQLStatement{}, errors.New("invalid query type")
 	}
@@ -45,14 +42,10 @@ func parseQuery(query string, datasource map[string]*DataSource) (SQLStatement, 
 	var matches []string
 	var columnsPart, dataSourceName, wherePart string
 
-	switch queryType {
+	switch commandType {
 	case "SELECT":
 		selectRegex = regexp.MustCompile(`(?i)^SELECT\s+(.+)\s+FROM\s+([\w-]+)\s*(?:WHERE\s+(.+))?$`)
 		matches = selectRegex.FindStringSubmatch(query)
-		for i, _ := range matches {
-			log.Debug(fmt.Sprint(":", matches[i]))
-		}
-
 		if len(matches) < 3 {
 
 			return SQLStatement{}, errors.New("invalid query format")
@@ -63,11 +56,11 @@ func parseQuery(query string, datasource map[string]*DataSource) (SQLStatement, 
 		if !dataSourceExists(datasource, dataSourceName) {
 			return SQLStatement{}, errors.New("data source does not exist")
 		}
-		//if len(matches) == 4 && len(matches[3]) > 0 {
+
 		if len(matches) == 4 {
 			wherePart = matches[3]
 		}
-		headers := datasource[dataSourceName].Data[0]
+		headers := datasource.DataSources[dataSourceName].Data[0]
 		columns := parseColumns(columnsPart, headers)
 
 		conditions, err := parseConditions(wherePart)
@@ -76,7 +69,7 @@ func parseQuery(query string, datasource map[string]*DataSource) (SQLStatement, 
 		}
 
 		return SQLStatement{
-			Type:           queryType,
+			Type:           commandType,
 			Columns:        columns,
 			Conditions:     conditions,
 			DataSourceName: dataSourceName,
@@ -206,10 +199,10 @@ func parseConditions(wherePart string) ([]Condition, error) {
 }
 
 // ExecuteSelectQuery executes a SELECT query and returns the results as a slice of RowMaps
-func executeSelectQuery(data [][]string, query SQLStatement) []RowMap {
-	headers := data[0] // First row as header
+func executeSqlSelectQuery(data *[][]string, query SQLStatement) []RowMap {
+	headers := (*data)[0] // First row as header
 	results := []RowMap{}
-	for _, row := range data[1:] {
+	for _, row := range (*data)[1:] {
 		rowMap := mapRow(headers, row)
 		if matchesConditions(rowMap, query.Conditions) {
 			results = append(results, projectRow(rowMap, query.Columns))
@@ -219,7 +212,7 @@ func executeSelectQuery(data [][]string, query SQLStatement) []RowMap {
 }
 
 // ExecuteUpdateQuery executes an UPDATE query and modifies the data in-place
-func executeUpdateQuery(data *[][]string, query SQLStatement) error {
+func executeSqlUpdateCommand(data *[][]string, query SQLStatement) error {
 	if len(*data) < 2 {
 		return errors.New("no data available to update")
 	}
@@ -242,7 +235,7 @@ func executeUpdateQuery(data *[][]string, query SQLStatement) error {
 }
 
 // ExecuteDeleteQuery executes a DELETE query and modifies the data in-place
-func executeDeleteQuery(data *[][]string, query SQLStatement) error {
+func executeSqlDeleteCommand(data *[][]string, query SQLStatement) error {
 	if len(*data) < 2 {
 		return errors.New("no data available to delete")
 	}

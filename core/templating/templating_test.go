@@ -201,7 +201,7 @@ func Test_ApplyTemplate_CsvCountRowsMissingDataset(t *testing.T) {
 func Test_ApplyTemplate_CsvSQL_Select(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSQL "SELECT name FROM test-csv WHERE id == '1'")}}{{this.name}}{{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT name FROM test-csv WHERE id == '1'")}}{{this.name}}{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`Test1`))
@@ -228,7 +228,7 @@ func Test_ApplyTemplate_CsvAsMapAndReturnMatchedString2(t *testing.T) {
 func Test_ApplyTemplate_CsvSQL_SelectAll(t *testing.T) {
 	RegisterTestingT(t)
 
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSQL "SELECT * FROM test-csv WHERE 1==1")}}{{this.id}},{{this.name}},{{this.marks}};{{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT * FROM test-csv WHERE 1==1")}}{{this.id}},{{this.name}},{{this.marks}};{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`1,Test1,55;2,Test2,56;*,Dummy,ABSENT;`))
@@ -238,11 +238,11 @@ func Test_ApplyTemplate_CsvSQL_Update(t *testing.T) {
 	RegisterTestingT(t)
 
 	// First, update the data
-	_, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvSQL "UPDATE test-csv SET marks = '60' WHERE id == '1'"}}`)
+	_, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvSqlCommand "UPDATE test-csv SET marks = '60' WHERE id == '1'"}}`)
 	Expect(err).To(BeNil())
 
 	// Then, check the result
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSQL "SELECT marks FROM test-csv WHERE id == '1'")}}{{this.marks}}{{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT marks FROM test-csv WHERE id == '1'")}}{{this.marks}}{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`60`))
@@ -252,11 +252,11 @@ func Test_ApplyTemplate_CsvSQL_Delete(t *testing.T) {
 	RegisterTestingT(t)
 
 	// First, delete the row
-	_, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvSQL "DELETE FROM test-csv2 WHERE id == '5553686208582'"}}`)
+	_, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvSqlCommand "DELETE FROM test-csv2 WHERE id == '5553686208582'"}}`)
 	Expect(err).To(BeNil())
 
 	// Then, check the result
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSQL "SELECT * FROM test-csv2")}}{{this.id}},{{this.name}},{{this.marks}};{{/each}}`)
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT * FROM test-csv2")}}{{this.id}},{{this.name}},{{this.marks}};{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`1,Test1,55;2,Test2,56;`)) // Test3 entry should be deleted
