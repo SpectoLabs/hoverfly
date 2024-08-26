@@ -54,6 +54,10 @@ func TestParseCommand(t *testing.T) {
 			expectError: false,
 		},
 		{
+			query:       "SELECT * FROM chillieplants WHERE department == 'Engineering'",
+			expectError: true,
+		},
+		{
 			query:       "INVALID QUERY",
 			expectError: true,
 		},
@@ -202,7 +206,7 @@ func TestExecuteSqlSelectQuery(t *testing.T) {
 	}
 }
 
-func TestExecuteSqlUpdateCommand(t *testing.T) {
+func TestExecuteSqlUpdateCommand_DataResult(t *testing.T) {
 	data := [][]string{
 		{"id", "name", "age", "department"},
 		{"1", "John Doe", "30", "Engineering"},
@@ -222,16 +226,37 @@ func TestExecuteSqlUpdateCommand(t *testing.T) {
 		{"2", "Jane Smith", "40", "Marketing"},
 	}
 
-	err := executeSqlUpdateCommand(&data, query)
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
+	_ = executeSqlUpdateCommand(&data, query)
+
 	if !reflect.DeepEqual(data, expected) {
 		t.Errorf("expected %v, got %v", expected, data)
 	}
 }
 
-func TestExecuteSqlDeleteCommand(t *testing.T) {
+func TestExecuteSqlUpdateCommand_RowCountResult(t *testing.T) {
+	data := [][]string{
+		{"id", "name", "age", "department"},
+		{"1", "John Doe", "30", "Engineering"},
+		{"2", "Jane Smith", "40", "Marketing"},
+	}
+
+	query := SQLStatement{
+		Type:           "UPDATE",
+		Conditions:     []Condition{{Column: "name", Operator: "==", Value: "John Doe"}},
+		SetClauses:     map[string]string{"age": "35"},
+		DataSourceName: "employees",
+	}
+
+	expected := "1"
+
+	result := executeSqlUpdateCommand(&data, query)
+
+	if result[0]["rowsAffected"] != expected {
+		t.Errorf("expected %v, got %v", expected, result[0]["rowsAffected"])
+	}
+}
+
+func TestExecuteSqlDeleteCommand_DataResult(t *testing.T) {
 	data := [][]string{
 		{"id", "name", "age", "department"},
 		{"1", "John Doe", "30", "Engineering"},
@@ -249,11 +274,31 @@ func TestExecuteSqlDeleteCommand(t *testing.T) {
 		{"2", "Jane Smith", "40", "Marketing"},
 	}
 
-	err := executeSqlDeleteCommand(&data, query)
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
+	_ = executeSqlDeleteCommand(&data, query)
+
 	if !reflect.DeepEqual(data, expected) {
 		t.Errorf("expected %v, got %v", expected, data)
+	}
+}
+
+func TestExecuteSqlDeleteCommand_RowCountResult(t *testing.T) {
+	data := [][]string{
+		{"id", "name", "age", "department"},
+		{"1", "John Doe", "30", "Engineering"},
+		{"2", "Jane Smith", "40", "Marketing"},
+	}
+
+	query := SQLStatement{
+		Type:           "DELETE",
+		Conditions:     []Condition{{Column: "age", Operator: "==", Value: "30"}},
+		DataSourceName: "employees",
+	}
+
+	expected := "1"
+
+	result := executeSqlDeleteCommand(&data, query)
+
+	if result[0]["rowsAffected"] != expected {
+		t.Errorf("expected %v, got %v", expected, result[0]["rowsAffected"])
 	}
 }
