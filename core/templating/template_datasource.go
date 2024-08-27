@@ -38,7 +38,7 @@ func (templateDataSource *TemplateDataSource) GetAllDataSources() map[string]*Da
 	return templateDataSource.DataSources
 }
 
-func dataSourceExists(templateDataSource *TemplateDataSource, name string) bool {
+func (templateDataSource *TemplateDataSource) DataSourceExists(name string) bool {
 	templateDataSource.RWMutex.Lock()
 	defer templateDataSource.RWMutex.Unlock()
 

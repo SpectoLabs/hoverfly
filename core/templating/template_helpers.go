@@ -450,9 +450,13 @@ func (t templateHelpers) csvSqlCommand(commandString string) []RowMap {
 	case "SELECT":
 		results = executeSqlSelectQuery(&source.Data, command)
 	case "UPDATE":
-		results = executeSqlUpdateCommand(&source.Data, command)
+		rowsAffected := executeSqlUpdateCommand(&source.Data, command)
+		log.Debug(strconv.Itoa(rowsAffected) + " rows affected by " + commandString)
+		return nil
 	case "DELETE":
-		results = executeSqlDeleteCommand(&source.Data, command)
+		rowsAffected := executeSqlDeleteCommand(&source.Data, command)
+		log.Debug(strconv.Itoa(rowsAffected) + " rows affected by " + commandString)
+		return nil
 	default:
 		log.Error(fmt.Errorf("unsupported query type %s", command.Type))
 		return nil
