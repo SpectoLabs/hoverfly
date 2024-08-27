@@ -2302,21 +2302,25 @@ type crfNode struct {
 /*
 suppose that L is Y ::=αX ·β
 if there is no CRF node labelled (L,i)
+
 	create one let u be the CRF node labelled (L,i)
+
 if there is no CRF node labelled (X, j) {
-	create a CRF node v labelled (X, j)
-	create an edge from v to u
-	ntAdd(X, j)
-} else {
-	let v be the CRF node labelled (X, j)
-	if there is not an edge from v to u {
+
+		create a CRF node v labelled (X, j)
 		create an edge from v to u
-		for all ((X, j,h)∈P) {
-			dscAdd(L, i, h);
-			bsrAdd(L, i, j, h)
+		ntAdd(X, j)
+	} else {
+
+		let v be the CRF node labelled (X, j)
+		if there is not an edge from v to u {
+			create an edge from v to u
+			for all ((X, j,h)∈P) {
+				dscAdd(L, i, h);
+				bsrAdd(L, i, j, h)
+			}
 		}
 	}
-}
 */
 func (p *parser) call(L slot.Label, i, j int) {
 	// fmt.Printf("p.call(%s,%d,%d)\n", L,i,j)

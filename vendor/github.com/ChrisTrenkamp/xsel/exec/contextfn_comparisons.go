@@ -57,7 +57,7 @@ func execEqualityExprEqual(context *exprContext, expr *grammar.Grammar) error {
 	if leftNodeSetOk && rightNodeSetOk {
 		for _, leftNode := range leftNodeSet {
 			for _, rightNode := range rightNodeSet {
-				if getCursorString(leftNode) == getCursorString(rightNode) {
+				if GetCursorString(leftNode) == GetCursorString(rightNode) {
 					context.result = Bool(true)
 					return nil
 				}
@@ -72,7 +72,7 @@ func execEqualityExprEqual(context *exprContext, expr *grammar.Grammar) error {
 
 	if leftNumberOk && rightNodeSetOk {
 		for _, rightNode := range rightNodeSet {
-			if leftNumber == Number(getStringNumber(getCursorString(rightNode))) {
+			if leftNumber == Number(getStringNumber(GetCursorString(rightNode))) {
 				context.result = Bool(true)
 				return nil
 			}
@@ -86,7 +86,7 @@ func execEqualityExprEqual(context *exprContext, expr *grammar.Grammar) error {
 
 	if leftNodeSetOk && rightNumberOk {
 		for _, leftNode := range leftNodeSet {
-			if Number(getStringNumber(getCursorString(leftNode))) == rightNumber {
+			if Number(getStringNumber(GetCursorString(leftNode))) == rightNumber {
 				context.result = Bool(true)
 				return nil
 			}
@@ -100,7 +100,7 @@ func execEqualityExprEqual(context *exprContext, expr *grammar.Grammar) error {
 
 	if leftStringOk && rightNodeSetOk {
 		for _, rightNode := range rightNodeSet {
-			if leftString == String(getCursorString(rightNode)) {
+			if leftString == String(GetCursorString(rightNode)) {
 				context.result = Bool(true)
 				return nil
 			}
@@ -114,7 +114,7 @@ func execEqualityExprEqual(context *exprContext, expr *grammar.Grammar) error {
 
 	if leftNodeSetOk && rightStringOk {
 		for _, leftNode := range leftNodeSet {
-			if String(getCursorString(leftNode)) == rightString {
+			if String(GetCursorString(leftNode)) == rightString {
 				context.result = Bool(true)
 				return nil
 			}
@@ -165,7 +165,7 @@ func execEqualityExprNotEqual(context *exprContext, expr *grammar.Grammar) error
 	if leftNodeSetOk && rightNodeSetOk {
 		for _, leftNode := range leftNodeSet {
 			for _, rightNode := range rightNodeSet {
-				if getCursorString(leftNode) != getCursorString(rightNode) {
+				if GetCursorString(leftNode) != GetCursorString(rightNode) {
 					context.result = Bool(true)
 					return nil
 				}
@@ -180,7 +180,7 @@ func execEqualityExprNotEqual(context *exprContext, expr *grammar.Grammar) error
 
 	if leftNumberOk && rightNodeSetOk {
 		for _, rightNode := range rightNodeSet {
-			if leftNumber != Number(getStringNumber(getCursorString(rightNode))) {
+			if leftNumber != Number(getStringNumber(GetCursorString(rightNode))) {
 				context.result = Bool(true)
 				return nil
 			}
@@ -194,7 +194,7 @@ func execEqualityExprNotEqual(context *exprContext, expr *grammar.Grammar) error
 
 	if leftNodeSetOk && rightNumberOk {
 		for _, leftNode := range leftNodeSet {
-			if Number(getStringNumber(getCursorString(leftNode))) != rightNumber {
+			if Number(getStringNumber(GetCursorString(leftNode))) != rightNumber {
 				context.result = Bool(true)
 				return nil
 			}
@@ -208,7 +208,7 @@ func execEqualityExprNotEqual(context *exprContext, expr *grammar.Grammar) error
 
 	if leftStringOk && rightNodeSetOk {
 		for _, rightNode := range rightNodeSet {
-			if leftString != String(getCursorString(rightNode)) {
+			if leftString != String(GetCursorString(rightNode)) {
 				context.result = Bool(true)
 				return nil
 			}
@@ -222,7 +222,7 @@ func execEqualityExprNotEqual(context *exprContext, expr *grammar.Grammar) error
 
 	if leftNodeSetOk && rightStringOk {
 		for _, leftNode := range leftNodeSet {
-			if String(getCursorString(leftNode)) != rightString {
+			if String(GetCursorString(leftNode)) != rightString {
 				context.result = Bool(true)
 				return nil
 			}
@@ -273,7 +273,7 @@ func execRelationalExprLessThan(context *exprContext, expr *grammar.Grammar) err
 	if leftNodeSetOk && rightNodeSetOk {
 		for _, leftNode := range leftNodeSet {
 			for _, rightNode := range rightNodeSet {
-				if getCursorString(leftNode) < getCursorString(rightNode) {
+				if GetCursorString(leftNode) < GetCursorString(rightNode) {
 					context.result = Bool(true)
 					return nil
 				}
@@ -288,7 +288,7 @@ func execRelationalExprLessThan(context *exprContext, expr *grammar.Grammar) err
 
 	if leftNumberOk && rightNodeSetOk {
 		for _, rightNode := range rightNodeSet {
-			if leftNumber < Number(getStringNumber(getCursorString(rightNode))) {
+			if leftNumber < Number(getStringNumber(GetCursorString(rightNode))) {
 				context.result = Bool(true)
 				return nil
 			}
@@ -302,7 +302,7 @@ func execRelationalExprLessThan(context *exprContext, expr *grammar.Grammar) err
 
 	if leftNodeSetOk && rightNumberOk {
 		for _, leftNode := range leftNodeSet {
-			if Number(getStringNumber(getCursorString(leftNode))) < rightNumber {
+			if Number(getStringNumber(GetCursorString(leftNode))) < rightNumber {
 				context.result = Bool(true)
 				return nil
 			}
@@ -316,7 +316,7 @@ func execRelationalExprLessThan(context *exprContext, expr *grammar.Grammar) err
 
 	if leftStringOk && rightNodeSetOk {
 		for _, rightNode := range rightNodeSet {
-			if leftString < String(getCursorString(rightNode)) {
+			if leftString < String(GetCursorString(rightNode)) {
 				context.result = Bool(true)
 				return nil
 			}
@@ -330,7 +330,7 @@ func execRelationalExprLessThan(context *exprContext, expr *grammar.Grammar) err
 
 	if leftNodeSetOk && rightStringOk {
 		for _, leftNode := range leftNodeSet {
-			if String(getCursorString(leftNode)) < rightString {
+			if String(GetCursorString(leftNode)) < rightString {
 				context.result = Bool(true)
 				return nil
 			}
@@ -357,7 +357,7 @@ func execRelationalExprLessThanOrEqual(context *exprContext, expr *grammar.Gramm
 	if leftNodeSetOk && rightNodeSetOk {
 		for _, leftNode := range leftNodeSet {
 			for _, rightNode := range rightNodeSet {
-				if getCursorString(leftNode) <= getCursorString(rightNode) {
+				if GetCursorString(leftNode) <= GetCursorString(rightNode) {
 					context.result = Bool(true)
 					return nil
 				}
@@ -372,7 +372,7 @@ func execRelationalExprLessThanOrEqual(context *exprContext, expr *grammar.Gramm
 
 	if leftNumberOk && rightNodeSetOk {
 		for _, rightNode := range rightNodeSet {
-			if leftNumber <= Number(getStringNumber(getCursorString(rightNode))) {
+			if leftNumber <= Number(getStringNumber(GetCursorString(rightNode))) {
 				context.result = Bool(true)
 				return nil
 			}
@@ -386,7 +386,7 @@ func execRelationalExprLessThanOrEqual(context *exprContext, expr *grammar.Gramm
 
 	if leftNodeSetOk && rightNumberOk {
 		for _, leftNode := range leftNodeSet {
-			if Number(getStringNumber(getCursorString(leftNode))) <= rightNumber {
+			if Number(getStringNumber(GetCursorString(leftNode))) <= rightNumber {
 				context.result = Bool(true)
 				return nil
 			}
@@ -400,7 +400,7 @@ func execRelationalExprLessThanOrEqual(context *exprContext, expr *grammar.Gramm
 
 	if leftStringOk && rightNodeSetOk {
 		for _, rightNode := range rightNodeSet {
-			if leftString <= String(getCursorString(rightNode)) {
+			if leftString <= String(GetCursorString(rightNode)) {
 				context.result = Bool(true)
 				return nil
 			}
@@ -414,7 +414,7 @@ func execRelationalExprLessThanOrEqual(context *exprContext, expr *grammar.Gramm
 
 	if leftNodeSetOk && rightStringOk {
 		for _, leftNode := range leftNodeSet {
-			if String(getCursorString(leftNode)) <= rightString {
+			if String(GetCursorString(leftNode)) <= rightString {
 				context.result = Bool(true)
 				return nil
 			}
@@ -441,7 +441,7 @@ func execRelationalExprGreaterThan(context *exprContext, expr *grammar.Grammar) 
 	if leftNodeSetOk && rightNodeSetOk {
 		for _, leftNode := range leftNodeSet {
 			for _, rightNode := range rightNodeSet {
-				if getCursorString(leftNode) > getCursorString(rightNode) {
+				if GetCursorString(leftNode) > GetCursorString(rightNode) {
 					context.result = Bool(true)
 					return nil
 				}
@@ -456,7 +456,7 @@ func execRelationalExprGreaterThan(context *exprContext, expr *grammar.Grammar) 
 
 	if leftNumberOk && rightNodeSetOk {
 		for _, rightNode := range rightNodeSet {
-			if leftNumber > Number(getStringNumber(getCursorString(rightNode))) {
+			if leftNumber > Number(getStringNumber(GetCursorString(rightNode))) {
 				context.result = Bool(true)
 				return nil
 			}
@@ -470,7 +470,7 @@ func execRelationalExprGreaterThan(context *exprContext, expr *grammar.Grammar) 
 
 	if leftNodeSetOk && rightNumberOk {
 		for _, leftNode := range leftNodeSet {
-			if Number(getStringNumber(getCursorString(leftNode))) > rightNumber {
+			if Number(getStringNumber(GetCursorString(leftNode))) > rightNumber {
 				context.result = Bool(true)
 				return nil
 			}
@@ -484,7 +484,7 @@ func execRelationalExprGreaterThan(context *exprContext, expr *grammar.Grammar) 
 
 	if leftStringOk && rightNodeSetOk {
 		for _, rightNode := range rightNodeSet {
-			if leftString > String(getCursorString(rightNode)) {
+			if leftString > String(GetCursorString(rightNode)) {
 				context.result = Bool(true)
 				return nil
 			}
@@ -498,7 +498,7 @@ func execRelationalExprGreaterThan(context *exprContext, expr *grammar.Grammar) 
 
 	if leftNodeSetOk && rightStringOk {
 		for _, leftNode := range leftNodeSet {
-			if String(getCursorString(leftNode)) > rightString {
+			if String(GetCursorString(leftNode)) > rightString {
 				context.result = Bool(true)
 				return nil
 			}
@@ -525,7 +525,7 @@ func execRelationalExprGreaterThanOrEqual(context *exprContext, expr *grammar.Gr
 	if leftNodeSetOk && rightNodeSetOk {
 		for _, leftNode := range leftNodeSet {
 			for _, rightNode := range rightNodeSet {
-				if getCursorString(leftNode) >= getCursorString(rightNode) {
+				if GetCursorString(leftNode) >= GetCursorString(rightNode) {
 					context.result = Bool(true)
 					return nil
 				}
@@ -540,7 +540,7 @@ func execRelationalExprGreaterThanOrEqual(context *exprContext, expr *grammar.Gr
 
 	if leftNumberOk && rightNodeSetOk {
 		for _, rightNode := range rightNodeSet {
-			if leftNumber >= Number(getStringNumber(getCursorString(rightNode))) {
+			if leftNumber >= Number(getStringNumber(GetCursorString(rightNode))) {
 				context.result = Bool(true)
 				return nil
 			}
@@ -554,7 +554,7 @@ func execRelationalExprGreaterThanOrEqual(context *exprContext, expr *grammar.Gr
 
 	if leftNodeSetOk && rightNumberOk {
 		for _, leftNode := range leftNodeSet {
-			if Number(getStringNumber(getCursorString(leftNode))) >= rightNumber {
+			if Number(getStringNumber(GetCursorString(leftNode))) >= rightNumber {
 				context.result = Bool(true)
 				return nil
 			}
@@ -568,7 +568,7 @@ func execRelationalExprGreaterThanOrEqual(context *exprContext, expr *grammar.Gr
 
 	if leftStringOk && rightNodeSetOk {
 		for _, rightNode := range rightNodeSet {
-			if leftString >= String(getCursorString(rightNode)) {
+			if leftString >= String(GetCursorString(rightNode)) {
 				context.result = Bool(true)
 				return nil
 			}
@@ -582,7 +582,7 @@ func execRelationalExprGreaterThanOrEqual(context *exprContext, expr *grammar.Gr
 
 	if leftNodeSetOk && rightStringOk {
 		for _, leftNode := range leftNodeSet {
-			if String(getCursorString(leftNode)) >= rightString {
+			if String(GetCursorString(leftNode)) >= rightString {
 				context.result = Bool(true)
 				return nil
 			}

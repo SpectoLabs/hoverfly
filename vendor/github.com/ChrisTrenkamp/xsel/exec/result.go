@@ -86,7 +86,7 @@ func (n NodeSet) String() string {
 		return ""
 	}
 
-	return getCursorString(n[0])
+	return GetCursorString(n[0])
 }
 
 func (n NodeSet) Number() float64 {
@@ -107,7 +107,7 @@ func getStringNumber(str string) float64 {
 	return ret
 }
 
-func getCursorString(c store.Cursor) string {
+func GetCursorString(c store.Cursor) string {
 	buf := strings.Builder{}
 	getCursorStringValue(&buf, c)
 	return buf.String()

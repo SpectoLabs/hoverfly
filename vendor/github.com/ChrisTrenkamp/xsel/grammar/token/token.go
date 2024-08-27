@@ -49,7 +49,7 @@ func (t *Token) GetInput() []rune {
     return t.input
 }
 
-// Lext returns the left extent of t
+// Lext returns the left extent of t in the input stream of runes
 func (t *Token) Lext() int {
     return t.lext
 }
@@ -93,7 +93,7 @@ func (t *Token) LiteralStringStripEscape() string {
 	return string(t.LiteralStripEscape())
 }
 
-// Rext returns the right extent of t in the input
+// Rext returns the right extent of t in the input stream of runes
 func (t *Token) Rext() int {
     return t.rext
 }
@@ -342,6 +342,59 @@ var TypeToID = []string {
     "text", 
     "variableReference", 
     "|", 
+}
+
+var IDToType = map[string]Type { 
+    "Error": 0, 
+    "$": 1, 
+    "!=": 2, 
+    "(": 3, 
+    ")": 4, 
+    "*": 5, 
+    "+": 6, 
+    ",": 7, 
+    "-": 8, 
+    ".": 9, 
+    "..": 10, 
+    "/": 11, 
+    "//": 12, 
+    ":": 13, 
+    "::": 14, 
+    "<": 15, 
+    "<=": 16, 
+    "=": 17, 
+    ">": 18, 
+    ">=": 19, 
+    "@": 20, 
+    "[": 21, 
+    "]": 22, 
+    "ancestor": 23, 
+    "ancestor-or-self": 24, 
+    "and": 25, 
+    "attribute": 26, 
+    "child": 27, 
+    "comment": 28, 
+    "descendant": 29, 
+    "descendant-or-self": 30, 
+    "digits": 31, 
+    "div": 32, 
+    "doublequote": 33, 
+    "following": 34, 
+    "following-sibling": 35, 
+    "mod": 36, 
+    "namespace": 37, 
+    "ncname": 38, 
+    "node": 39, 
+    "or": 40, 
+    "parent": 41, 
+    "preceding": 42, 
+    "preceding-sibling": 43, 
+    "processing-instruction": 44, 
+    "self": 45, 
+    "singlequote": 46, 
+    "text": 47, 
+    "variableReference": 48, 
+    "|": 49, 
 }
 
 var Suppress = []bool { 

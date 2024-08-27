@@ -11,25 +11,19 @@ func unique(s []store.Cursor) []store.Cursor {
 		return s
 	}
 
-	seen := make([]store.Cursor, 0, len(s))
+	ret := make([]store.Cursor, 0, len(s))
+	ret = append(ret, s[0])
 
-slice:
-	for i, n := range s {
-		if i == 0 {
-			s = s[:0]
+	// The fowardSort and backwardSort interfaces will put the duplicates
+	// next to each other, so we can just look at the last element in the
+	// de-duplicated list.
+	for i := 1; i < len(s); i++ {
+		if ret[len(ret)-1].Pos() != s[i].Pos() {
+			ret = append(ret, s[i])
 		}
-
-		for _, t := range seen {
-			if n.Pos() == t.Pos() {
-				continue slice
-			}
-		}
-
-		seen = append(seen, n)
-		s = append(s, n)
 	}
 
-	return s
+	return ret
 }
 
 type forwardSort []store.Cursor
@@ -58,9 +52,7 @@ func selectChild(nodeSet NodeSet) Result {
 	result := make([]store.Cursor, 0)
 
 	for _, i := range nodeSet {
-		for _, j := range i.Children() {
-			result = append(result, j)
-		}
+		result = append(result, i.Children()...)
 	}
 
 	return cleanupForwardAxis(result)
@@ -70,9 +62,7 @@ func selectAttributes(nodeSet NodeSet) Result {
 	result := make([]store.Cursor, 0)
 
 	for _, i := range nodeSet {
-		for _, j := range i.Attributes() {
-			result = append(result, j)
-		}
+		result = append(result, i.Attributes()...)
 	}
 
 	return NodeSet(result)
@@ -205,9 +195,7 @@ func selectNamespace(nodeSet NodeSet) Result {
 	result := make([]store.Cursor, 0)
 
 	for _, i := range nodeSet {
-		for _, j := range i.Namespaces() {
-			result = append(result, j)
-		}
+		result = append(result, i.Namespaces()...)
 	}
 
 	return cleanupForwardAxis(result)

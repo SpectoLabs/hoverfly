@@ -47,7 +47,10 @@ func execUnionExprUnion(context *exprContext, expr *grammar.Grammar) error {
 }
 
 func unionCleanup(nextResult NodeSet) NodeSet {
-	return unique(nextResult)
+	// Technically, the XPath 1.0 specification leaves the order of a
+	// union operator undefined, but I think it's reasonable to return
+	// the result in document order.
+	return unique(cleanupForwardAxis(nextResult))
 }
 
 func execFunctionCall(context *exprContext, expr *grammar.Grammar) error {
@@ -130,10 +133,7 @@ func gatherFunctionArgs(b *bsr.BSR, args *[]*bsr.BSR) {
 func execVariableReference(context *exprContext, expr *grammar.Grammar) error {
 	variableStr := expr.Next(expr.BSR).GetString()
 	variableStr = strings.TrimSpace(variableStr)
-
-	if strings.HasPrefix(variableStr, "$") {
-		variableStr = variableStr[1:]
-	}
+	variableStr = strings.TrimPrefix(variableStr, "$")
 
 	qname, err := GetQName(variableStr, context.NamespaceDecls)
 

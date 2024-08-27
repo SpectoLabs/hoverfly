@@ -8,13 +8,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Executes an XPath query against the given Cursor that is pointing to the node.Root.
+// Executes an XPath query against the given Cursor and returns the result.
 func Exec(cursor store.Cursor, expr *grammar.Grammar, settings ...ContextApply) (Result, error) {
 	contextSettings := ContextSettings{
 		Variables:       make(map[XmlName]Result),
 		FunctionLibrary: make(map[XmlName]Function),
 		NamespaceDecls:  make(map[string]string),
-		Context:         cursor,
 	}
 
 	for _, i := range settings {
@@ -23,7 +22,7 @@ func Exec(cursor store.Cursor, expr *grammar.Grammar, settings ...ContextApply) 
 
 	context := &exprContext{
 		root:             cursor,
-		result:           Result(NodeSet{contextSettings.Context}),
+		result:           Result(NodeSet{cursor}),
 		contextPosition:  0,
 		builtinFunctions: builtinFunctions,
 		ContextSettings:  contextSettings,

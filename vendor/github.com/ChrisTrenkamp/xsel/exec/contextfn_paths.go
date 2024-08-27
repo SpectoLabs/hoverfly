@@ -32,6 +32,9 @@ func init() {
 	contextFunctions[symbols.NT_NameTestQNameLocalOnly] = execNameTestQNameLocalOnly
 	contextFunctions[symbols.NT_NameTestQNameLocalOnlyReservedNameConflict] = execNameTestQNameLocalOnly
 	contextFunctions[symbols.NT_StepWithAxisAndNodeTest] = leftRightDependentResult
+	contextFunctions[symbols.NT_StepWithAxisAndNodeTestAndPredicate] = leftRightDependentResult
+	contextFunctions[symbols.NT_StepWithPredicateWithAnotherPredicate] = leftRightDependentResult
+	contextFunctions[symbols.NT_FilterExprWithPredicate] = leftRightDependentResult
 	contextFunctions[symbols.NT_AxisName] = execAxisName
 	contextFunctions[symbols.NT_AbbreviatedStepParent] = execAbbreviatedStepParent
 	contextFunctions[symbols.NT_AbbreviatedAxisSpecifier] = execAbbreviatedAxisSpecifier

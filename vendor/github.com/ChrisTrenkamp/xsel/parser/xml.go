@@ -8,6 +8,8 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
+const xmlns = "xmlns"
+
 type XmlElement struct {
 	space, local string
 }
@@ -76,82 +78,70 @@ func (x XmlProcInst) ProcInstValue() string {
 	return x.value
 }
 
-var emptyAttrs = make([]XmlAttribute, 0)
-var emptyNamespaces = make([]XmlNamespace, 0)
+var emptyXmlAttrs = make([]XmlAttribute, 0)
+var emptyXmlNamespaces = make([]XmlNamespace, 0)
 
-type XmlParseOptions func(d *xml.Decoder)
-
-// Creates a Parser that reads the given XML document.
-func ReadXml(in io.Reader, opts ...XmlParseOptions) Parser {
-	xmlReader := xml.NewDecoder(in)
-	xmlReader.CharsetReader = charset.NewReaderLabel
-
-	for _, i := range opts {
-		i(xmlReader)
-	}
-
-	namespaces := emptyNamespaces
-	nsPos := 0
-
-	attrs := emptyAttrs
-	attrPos := 0
-
-	return func() (node.Node, bool, error) {
-		if nsPos < len(namespaces) {
-			n := namespaces[nsPos]
-			nsPos++
-
-			return n, false, nil
-		}
-
-		if attrPos < len(attrs) {
-			a := attrs[attrPos]
-			attrPos++
-
-			return a, false, nil
-		}
-
-		attrs = emptyAttrs
-		attrPos = 0
-		namespaces = emptyNamespaces
-		nsPos = 0
-		tok, err := xmlReader.Token()
-
-		if err != nil {
-			return nil, false, err
-		}
-
-		switch n := tok.(type) {
-		case xml.StartElement:
-			namespaces = createNamespaces(n.Attr)
-			attrs = createAttrs(n.Attr)
-			return XmlElement{
-				space: n.Name.Space,
-				local: n.Name.Local,
-			}, false, nil
-		case xml.CharData:
-			return XmlCharData{
-				value: (string)(n),
-			}, false, nil
-		case xml.Comment:
-			return XmlComment{
-				value: (string)(n),
-			}, false, nil
-		case xml.ProcInst:
-			return XmlProcInst{
-				target: n.Target,
-				value:  string(n.Inst),
-			}, false, nil
-		}
-
-		//case xml.EndElement:
-		return nil, true, nil
-	}
+type xmlParser struct {
+	xmlReader  *xml.Decoder
+	namespaces []XmlNamespace
+	nsPos      int
+	attrs      []XmlAttribute
+	attrPos    int
 }
 
-const XMLNS = "xmlns"
+func (x *xmlParser) Pull() (node.Node, bool, error) {
+	if x.nsPos < len(x.namespaces) {
+		n := x.namespaces[x.nsPos]
+		x.nsPos++
 
-func createNamespaces(attrs []xml.Attr) []XmlNamespace {
+		return n, false, nil
+	}
+
+	if x.attrPos < len(x.attrs) {
+		a := x.attrs[x.attrPos]
+		x.attrPos++
+
+		return a, false, nil
+	}
+
+	x.attrs = emptyXmlAttrs
+	x.attrPos = 0
+	x.namespaces = emptyXmlNamespaces
+	x.nsPos = 0
+	tok, err := x.xmlReader.Token()
+
+	if err != nil {
+		return nil, false, err
+	}
+
+	switch n := tok.(type) {
+	case xml.StartElement:
+		x.namespaces = createXmlNamespaces(n.Attr)
+		x.attrs = createXmlAttrs(n.Attr)
+		return XmlElement{
+			space: n.Name.Space,
+			local: n.Name.Local,
+		}, false, nil
+	case xml.CharData:
+		return XmlCharData{
+			value: (string)(n),
+		}, false, nil
+	case xml.Comment:
+		return XmlComment{
+			value: (string)(n),
+		}, false, nil
+	case xml.ProcInst:
+		return XmlProcInst{
+			target: n.Target,
+			value:  string(n.Inst),
+		}, false, nil
+	}
+
+	//case xml.EndElement:
+	return nil, true, nil
+}
+
+func createXmlNamespaces(attrs []xml.Attr) []XmlNamespace {
 	ret := make([]XmlNamespace, 0, 1)
 	ns := XmlNamespace{
 		prefix: "xml",
@@ -161,7 +151,7 @@ func createNamespaces(attrs []xml.Attr) []XmlNamespace {
 	ret = append(ret, ns)
 
 	for _, i := range attrs {
-		if i.Name.Space == "" && i.Name.Local == XMLNS {
+		if i.Name.Space == "" && i.Name.Local == xmlns {
 			ns = XmlNamespace{
 				prefix: "",
 				value:  i.Value,
@@ -170,7 +160,7 @@ func createNamespaces(attrs []xml.Attr) []XmlNamespace {
 			ret = append(ret, ns)
 		}
 
-		if i.Name.Local == XMLNS {
+		if i.Name.Local == xmlns {
 			ns = XmlNamespace{
 				prefix: i.Name.Space,
 				value:  i.Value,
@@ -183,11 +173,11 @@ func createNamespaces(attrs []xml.Attr) []XmlNamespace {
 	return ret
 }
 
-func createAttrs(attrs []xml.Attr) []XmlAttribute {
+func createXmlAttrs(attrs []xml.Attr) []XmlAttribute {
 	ret := make([]XmlAttribute, 0, len(attrs))
 
 	for _, i := range attrs {
-		if i.Name.Space == XMLNS || i.Name.Local == XMLNS {
+		if i.Name.Space == xmlns || i.Name.Local == xmlns {
 			continue
 		}
 
@@ -201,4 +191,24 @@ func createAttrs(attrs []xml.Attr) []XmlAttribute {
 	}
 
 	return ret
+}
+
+type XmlParseOptions func(d *xml.Decoder)
+
+// Creates a Parser that reads the given XML document.
+func ReadXml(in io.Reader, opts ...XmlParseOptions) Parser {
+	xmlReader := xml.NewDecoder(in)
+	xmlReader.CharsetReader = charset.NewReaderLabel
+
+	for _, i := range opts {
+		i(xmlReader)
+	}
+
+	return &xmlParser{
+		xmlReader:  xmlReader,
+		namespaces: emptyXmlNamespaces,
+		nsPos:      0,
+		attrs:      emptyXmlAttrs,
+		attrPos:    0,
+	}
 }

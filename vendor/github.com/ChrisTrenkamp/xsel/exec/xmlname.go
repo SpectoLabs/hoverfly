@@ -10,11 +10,12 @@ type XmlName struct {
 	Local string
 }
 
-func Name(space, local string) XmlName {
-	return XmlName{
-		Space: space,
-		Local: local,
+func (n XmlName) String() string {
+	if n.Space == "" {
+		return n.Local
 	}
+
+	return "{" + n.Space + "}" + n.Local
 }
 
 func GetQName(input string, namespaces map[string]string) (XmlName, error) {
@@ -36,12 +37,4 @@ func GetQName(input string, namespaces map[string]string) (XmlName, error) {
 
 	ret.Local = strings.TrimSpace(ret.Local)
 	return ret, nil
-}
-
-func (n XmlName) String() string {
-	if n.Space == "" {
-		return n.Local
-	}
-
-	return "{" + n.Space + "}" + n.Local
 }

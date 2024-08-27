@@ -3,7 +3,7 @@ module github.com/SpectoLabs/hoverfly
 go 1.22.4
 
 require (
-	github.com/ChrisTrenkamp/xsel v0.9.6
+	github.com/ChrisTrenkamp/xsel v0.9.16
 	github.com/SpectoLabs/goproxy v0.0.0-20240717215706-55e01f38b2c9
 	github.com/SpectoLabs/goproxy/ext v0.0.0-20220724222243-c982a2c966ae
 	github.com/SpectoLabs/goxml2json v0.0.0-20240121223617-8e03292c14ea
@@ -38,7 +38,7 @@ require (
 	github.com/spf13/viper v0.0.0-20160508180713-d8a428b8a306
 	github.com/tdewolff/minify/v2 v2.12.4
 	github.com/xeipuuv/gojsonschema v0.0.0-20170225172124-ff0417f4272e
-	golang.org/x/crypto v0.21.0
+	golang.org/x/crypto v0.26.0
 	gonum.org/v1/gonum v0.7.0
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/client-go v0.26.1
@@ -49,6 +49,7 @@ require (
 	github.com/aymerick/raymond v2.0.2+incompatible // indirect
 	github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
+	github.com/goccmack/goutil v1.2.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/go-querystring v0.0.0-20160401233042-9235644dd9e5 // indirect
 	github.com/gorilla/context v0.0.0-20160422134237-a8d44e7d8e4d // indirect
@@ -67,9 +68,9 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20150808065054-e02fc20de94c // indirect
 	golang.org/x/exp v0.0.0-20190312203227-4b39c73a6495 // indirect
 	golang.org/x/net v0.23.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
-	golang.org/x/term v0.18.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sys v0.23.0 // indirect
+	golang.org/x/term v0.23.0 // indirect
+	golang.org/x/text v0.17.0 // indirect
 	gonum.org/v1/netlib v0.0.0-20200317120129-c5a04cffd98a // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect

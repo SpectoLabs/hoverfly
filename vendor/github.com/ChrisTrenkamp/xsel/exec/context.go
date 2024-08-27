@@ -8,10 +8,6 @@ type ContextSettings struct {
 	NamespaceDecls  map[string]string
 	FunctionLibrary map[XmlName]Function
 	Variables       map[XmlName]Result
-	// Context is the initial position to run XPath queries.  This is initialized to the root of
-	// the document.  This may be overridden to point to a different position in the document.
-	// When overriding the Context, it must be a Cursor contained within the root, or bad things can happen!
-	Context store.Cursor
 }
 
 type ContextApply func(c *ContextSettings)

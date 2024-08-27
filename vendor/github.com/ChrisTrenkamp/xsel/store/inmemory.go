@@ -48,7 +48,7 @@ func CreateInMemory(parse parser.Parser) (*InMemory, error) {
 }
 
 func createInMemory(cursor *InMemory, parse parser.Parser, pos int) error {
-	n, isEnd, err := parse()
+	n, isEnd, err := parse.Pull()
 
 	if errors.Is(err, io.EOF) {
 		return nil
