@@ -7,7 +7,7 @@ require (
 	github.com/SpectoLabs/goproxy v0.0.0-20240717215706-55e01f38b2c9
 	github.com/SpectoLabs/goproxy/ext v0.0.0-20220724222243-c982a2c966ae
 	github.com/SpectoLabs/goxml2json v0.0.0-20240121223617-8e03292c14ea
-	github.com/SpectoLabs/raymond v2.0.3-0.20240313210732-e0e216cf0920+incompatible
+	github.com/SpectoLabs/raymond v2.0.3-0.20240827093205-07f3a7bebd7d+incompatible
 	github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496
 	github.com/beevik/etree v1.1.0
 	github.com/boltdb/bolt v1.2.1-0.20160424201119-d97499360d1e

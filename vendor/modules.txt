@@ -24,7 +24,7 @@ github.com/SpectoLabs/goproxy/ext/auth
 # github.com/SpectoLabs/goxml2json v0.0.0-20240121223617-8e03292c14ea
 ## explicit; go 1.16
 github.com/SpectoLabs/goxml2json
-# github.com/SpectoLabs/raymond v2.0.3-0.20240313210732-e0e216cf0920+incompatible
+# github.com/SpectoLabs/raymond v2.0.3-0.20240827093205-07f3a7bebd7d+incompatible
 ## explicit
 github.com/SpectoLabs/raymond
 # github.com/antonholmquist/jason v1.0.1-0.20160829104012-962e09b85496
