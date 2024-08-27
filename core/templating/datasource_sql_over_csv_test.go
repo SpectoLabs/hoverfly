@@ -100,16 +100,27 @@ func TestTrimQuotes(t *testing.T) {
 	}
 }
 
-func TestParseSetClauses(t *testing.T) {
+func TestParseSetClauses_ValidInput(t *testing.T) {
 	input := "age = '35', department = 'Engineering'"
+	inputHeaders := []string{"age", "department"}
 	expected := map[string]string{
 		"age":        "35",
 		"department": "Engineering",
 	}
 
-	result := parseSetClauses(input)
+	result, _ := parseSetClauses(input, inputHeaders)
 	if !reflect.DeepEqual(result, expected) {
 		t.Errorf("expected %v, got %v", expected, result)
+	}
+}
+
+func TestParseSetClauses_InvalidInput(t *testing.T) {
+	input := "age = '35', department = 'Engineering'"
+	inputHeaders := []string{"fruit", "category"}
+
+	_, err := parseSetClauses(input, inputHeaders)
+	if err == nil {
+		t.Errorf("expected error but got none.")
 	}
 }
 
@@ -247,12 +258,12 @@ func TestExecuteSqlUpdateCommand_RowCountResult(t *testing.T) {
 		DataSourceName: "employees",
 	}
 
-	expected := "1"
+	expected := 1
 
 	result := executeSqlUpdateCommand(&data, query)
 
-	if result[0]["rowsAffected"] != expected {
-		t.Errorf("expected %v, got %v", expected, result[0]["rowsAffected"])
+	if result != expected {
+		t.Errorf("expected %v, got %v", expected, result)
 	}
 }
 
@@ -294,11 +305,11 @@ func TestExecuteSqlDeleteCommand_RowCountResult(t *testing.T) {
 		DataSourceName: "employees",
 	}
 
-	expected := "1"
+	expected := 1
 
 	result := executeSqlDeleteCommand(&data, query)
 
-	if result[0]["rowsAffected"] != expected {
-		t.Errorf("expected %v, got %v", expected, result[0]["rowsAffected"])
+	if result != expected {
+		t.Errorf("expected %v, got %v", expected, result)
 	}
 }

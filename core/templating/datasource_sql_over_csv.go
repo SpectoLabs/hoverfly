@@ -3,7 +3,6 @@ package templating
 import (
 	"errors"
 	"regexp"
-	"strconv"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
@@ -56,7 +55,7 @@ func parseSqlCommand(query string, datasource *TemplateDataSource) (SQLStatement
 		}
 		columnsPart = matches[1]
 		dataSourceName = matches[2]
-		if !dataSourceExists(datasource, dataSourceName) {
+		if !datasource.DataSourceExists(dataSourceName) {
 			return SQLStatement{}, errors.New("data source does not exist")
 		}
 
@@ -87,15 +86,18 @@ func parseSqlCommand(query string, datasource *TemplateDataSource) (SQLStatement
 			return SQLStatement{}, errors.New("invalid UPDATE query format")
 		}
 		dataSourceName = matches[1]
-		if !dataSourceExists(datasource, dataSourceName) {
+		if !datasource.DataSourceExists(dataSourceName) {
 			return SQLStatement{}, errors.New("data source does not exist")
 		}
 		setPart := matches[2]
 		if len(matches) == 4 {
 			wherePart = matches[3]
 		}
-
-		setClauses := parseSetClauses(setPart)
+		headers := datasource.DataSources[dataSourceName].Data[0]
+		setClauses, err := parseSetClauses(setPart, headers)
+		if err != nil {
+			return SQLStatement{}, err
+		}
 		conditions, err := parseConditions(wherePart)
 		if err != nil {
 			return SQLStatement{}, err
@@ -114,7 +116,7 @@ func parseSqlCommand(query string, datasource *TemplateDataSource) (SQLStatement
 			return SQLStatement{}, errors.New("invalid DELETE query format")
 		}
 		dataSourceName = matches[1]
-		if !dataSourceExists(datasource, dataSourceName) {
+		if !datasource.DataSourceExists(dataSourceName) {
 			return SQLStatement{}, errors.New("data source does not exist")
 		}
 		if len(matches) == 3 {
@@ -179,16 +181,18 @@ func trimQuotes(s string) string {
 }
 
 // parseSetClauses parses the SET part of an UPDATE query
-func parseSetClauses(setPart string) map[string]string {
+func parseSetClauses(setPart string, headers []string) (map[string]string, error) {
 	setClauses := make(map[string]string)
 	parts := strings.Split(setPart, ",")
 	for _, part := range parts {
 		keyValue := strings.Split(strings.TrimSpace(part), "=")
-		if len(keyValue) == 2 {
+		if !stringExists(headers, strings.TrimSpace(keyValue[0])) {
+			return nil, errors.New("invalid column provided: " + strings.TrimSpace(keyValue[0]))
+		} else if len(keyValue) == 2 {
 			setClauses[strings.TrimSpace(keyValue[0])] = trimQuotes(strings.TrimSpace(keyValue[1]))
 		}
 	}
-	return setClauses
+	return setClauses, nil
 }
 
 // parseConditions parses the WHERE part of the query into a slice of Conditions and returns an error if any issues are found.
@@ -230,14 +234,10 @@ func executeSqlSelectQuery(data *[][]string, query SQLStatement) []RowMap {
 }
 
 // ExecuteUpdateQuery executes an UPDATE query and modifies the data in-place
-func executeSqlUpdateCommand(data *[][]string, query SQLStatement) []RowMap {
+func executeSqlUpdateCommand(data *[][]string, query SQLStatement) int {
 	if len(*data) < 2 {
-		log.Error("no data available to update")
-		return []RowMap{
-			{
-				"rowsAffected": "0",
-			},
-		}
+		log.Debug("no data available to update")
+		return 0
 	}
 
 	headers := (*data)[0]
@@ -256,23 +256,16 @@ func executeSqlUpdateCommand(data *[][]string, query SQLStatement) []RowMap {
 			}
 		}
 	}
-	return []RowMap{
-		{
-			"rowsAffected": strconv.Itoa(rowsAffected),
-		},
-	}
+	return rowsAffected
 }
 
 // executeSqlDeleteCommand executes a DELETE query and modifies the data in-place
-func executeSqlDeleteCommand(data *[][]string, query SQLStatement) []RowMap {
+func executeSqlDeleteCommand(data *[][]string, query SQLStatement) int {
 	if len(*data) < 2 {
-		log.Println("no data available to delete")
-		return []RowMap{
-			{
-				"rowsAffected": "0",
-			},
-		}
+		log.Debug("no data available to delete")
+		return 0
 	}
+
 	headers := (*data)[0]
 	conditions := query.Conditions
 	rowsAffected := 0
@@ -285,11 +278,7 @@ func executeSqlDeleteCommand(data *[][]string, query SQLStatement) []RowMap {
 			rowsAffected++
 		}
 	}
-	return []RowMap{
-		{
-			"rowsAffected": strconv.Itoa(rowsAffected),
-		},
-	}
+	return rowsAffected
 }
 
 // removeRow removes the row at index rowIndex from the data.
