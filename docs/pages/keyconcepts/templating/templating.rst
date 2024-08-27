@@ -418,15 +418,10 @@ Deleting data from a CSV Data Source using SQL like syntax
 Example:
 ``{{ csvSqlCommand "DELETE FROM pets WHERE id > '20'" }}``
 
-Calling the csvSqlCommand for Delete and Update commands will return a map with a single value in it called rowsAffected. 
-If you call it without wrapping it in an #each block or a #first block then you will have the map written into your template. 
+Calling the csvSqlCommand for Delete and Update commands will execute the statements without outputting anything to the template. 
+The rows affected will be logged for debugging purposes. 
 
-To call it with {{#first}}, and to do something with the resultant map you can do so like this: 
-(You can also simply ignore the rows affected)
 
-``{{#first (csvSqlCommand ("DELETE FROM pets WHERE category == 'birds'")}}
-Rows Affected: {{this.rowsAffected}}
-{{/first}}``
 
 Update the data in a CSV Data Source using SQL like syntax
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -438,11 +433,6 @@ Update the data in a CSV Data Source using SQL like syntax
 Example:
 ``{{ csvSqlCommand "UPDATE pets SET status = 'sold' WHERE id > '20' AND category == 'cats'" }}``
 
-Again, you probably don't want the raw map rendered into your template so you can wrap it in a #first block which will allow
-you to do something with the resultant map or ignore it completely as below:
-
-``{{#first (csvSqlCommand ("UPDATE pets SET price = '10000', name = 'LIONEL' WHERE category == 'cats'")}}
-{{/first}}``
 
 
 Using SQL like syntax to query and manipulate data sources
