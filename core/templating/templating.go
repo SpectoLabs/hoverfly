@@ -62,6 +62,7 @@ type Templator struct {
 }
 
 var helpersRegistered = false
+var helperMethodMap = make(map[string]interface{})
 
 func NewTemplator() *Templator {
 
@@ -72,7 +73,7 @@ func NewTemplator() *Templator {
 		fakerSource:        gofakeit.New(0),
 		TemplateDataSource: templateDataSource,
 	}
-	helperMethodMap := make(map[string]interface{})
+
 	helperMethodMap["now"] = t.nowHelper
 	helperMethodMap["randomString"] = t.randomString
 	helperMethodMap["randomStringLength"] = t.randomStringLength
@@ -131,6 +132,15 @@ func NewTemplator() *Templator {
 		SupportedMethodMap: helperMethodMap,
 		TemplateHelper:     t,
 	}
+}
+
+// ResetTemplateHelpers re-register all the helpers, this is useful for testing when we initialize the
+// templator on every test, and they need a fresh copy of the data source in templatingHelpers
+func (*Templator) ResetTemplateHelpers() {
+	for key := range helperMethodMap {
+		raymond.RemoveHelper(key)
+	}
+	raymond.RegisterHelpers(helperMethodMap)
 }
 
 func (*Templator) ParseTemplate(responseBody string) (*raymond.Template, error) {

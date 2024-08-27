@@ -219,12 +219,14 @@ func Test_ApplyTemplate_CsvSQL_SelectAll(t *testing.T) {
 func Test_ApplyTemplate_CsvSQL_Update(t *testing.T) {
 	RegisterTestingT(t)
 
+	templator := initiateTemplator()
+
 	// First, update the data
-	_, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvSqlCommand "UPDATE test-csv1 SET marks = '60' WHERE id == '1'"}}`)
+	_, err := renderTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvSqlCommand "UPDATE test-csv1 SET marks = '60' WHERE id == '1'"}}`, templator)
 	Expect(err).To(BeNil())
 
 	// Then, check the result
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT marks FROM test-csv1 WHERE id == '1'")}}{{this.marks}}{{/each}}`)
+	template, err := renderTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT marks FROM test-csv1 WHERE id == '1'")}}{{this.marks}}{{/each}}`, templator)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`60`))
@@ -233,12 +235,14 @@ func Test_ApplyTemplate_CsvSQL_Update(t *testing.T) {
 func Test_ApplyTemplate_CsvSQL_Delete(t *testing.T) {
 	RegisterTestingT(t)
 
+	templator := initiateTemplator()
+
 	// First, delete the row
-	_, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvSqlCommand "DELETE FROM test-csv2 WHERE id == '5553686208582'"}}`)
+	_, err := renderTemplate(&models.RequestDetails{}, make(map[string]string), `{{csvSqlCommand "DELETE FROM test-csv2 WHERE id == '5553686208582'"}}`, templator)
 	Expect(err).To(BeNil())
 
 	// Then, check the result
-	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT * FROM test-csv2")}}{{this.id}},{{this.name}},{{this.marks}};{{/each}}`)
+	template, err := renderTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT * FROM test-csv2")}}{{this.id}},{{this.name}},{{this.marks}};{{/each}}`, templator)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`1,Test1,55;2,Test2,56;`)) // Test3 entry should be deleted
@@ -908,13 +912,23 @@ func toInterfaceSlice(arguments []string) []interface{} {
 
 func ApplyTemplate(requestDetails *models.RequestDetails, state map[string]string, responseBody string) (string, error) {
 
+	templator := initiateTemplator()
+
+	return renderTemplate(requestDetails, state, responseBody, templator)
+}
+
+func renderTemplate(requestDetails *models.RequestDetails, state map[string]string, responseBody string, templator *templating.Templator) (string, error) {
+	template, err := templator.ParseTemplate(responseBody)
+	Expect(err).To(BeNil())
+	return templator.RenderTemplate(template, requestDetails, nil, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
+}
+
+func initiateTemplator() *templating.Templator {
 	templator := templating.NewTemplator()
+	templator.ResetTemplateHelpers()
 	dataSource1, _ := templating.NewCsvDataSource("test-csv1", "id,name,marks\n1,Test1,55\n2,Test2,56\n*,Dummy,ABSENT")
 	dataSource2, _ := templating.NewCsvDataSource("test-csv2", "id,name,marks\n1,Test1,55\n2,Test2,56\n5553686208582,Test3,66\n")
 	templator.TemplateHelper.TemplateDataSource.SetDataSource("test-csv1", dataSource1)
 	templator.TemplateHelper.TemplateDataSource.SetDataSource("test-csv2", dataSource2)
-
-	template, err := templator.ParseTemplate(responseBody)
-	Expect(err).To(BeNil())
-	return templator.RenderTemplate(template, requestDetails, nil, &models.Literals{}, &models.Variables{}, state, &journal.Journal{})
+	return templator
 }
