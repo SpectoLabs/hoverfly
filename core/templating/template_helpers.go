@@ -239,8 +239,7 @@ func (t templateHelpers) faker(fakerType string) []reflect.Value {
 }
 
 func (t templateHelpers) fetchSingleFieldCsv(dataSourceName, searchFieldName, searchFieldValue, returnFieldName string, options *raymond.Options) string {
-	templateDataSources := t.TemplateDataSource.DataSources
-	source, exists := templateDataSources[dataSourceName]
+	source, exists := t.TemplateDataSource.GetDataSource(dataSourceName)
 	if !exists {
 		log.Error("could not find datasource " + dataSourceName)
 		return getEvaluationString("csv", options)
@@ -274,8 +273,7 @@ func (t templateHelpers) fetchSingleFieldCsv(dataSourceName, searchFieldName, se
 }
 
 func (t templateHelpers) fetchMatchingRowsCsv(dataSourceName string, searchFieldName string, searchFieldValue string) []RowMap {
-	templateDataSources := t.TemplateDataSource.DataSources
-	source, exists := templateDataSources[dataSourceName]
+	source, exists := t.TemplateDataSource.GetDataSource(dataSourceName)
 	if !exists {
 		log.Error("could not find datasource " + dataSourceName)
 		return []RowMap{}
@@ -316,8 +314,7 @@ func (t templateHelpers) fetchMatchingRowsCsv(dataSourceName string, searchField
 }
 
 func (t templateHelpers) csvAsArray(dataSourceName string) [][]string {
-	templateDataSources := t.TemplateDataSource.DataSources
-	source, exists := templateDataSources[dataSourceName]
+	source, exists := t.TemplateDataSource.GetDataSource(dataSourceName)
 	if exists {
 		source.mu.Lock()
 		defer source.mu.Unlock()
@@ -330,8 +327,7 @@ func (t templateHelpers) csvAsArray(dataSourceName string) [][]string {
 
 func (t templateHelpers) csvAsMap(dataSourceName string) []RowMap {
 
-	templateDataSources := t.TemplateDataSource.DataSources
-	source, exists := templateDataSources[dataSourceName]
+	source, exists := t.TemplateDataSource.GetDataSource(dataSourceName)
 	if !exists {
 		log.Error("could not find datasource " + dataSourceName)
 		return []RowMap{}
@@ -357,8 +353,7 @@ func (t templateHelpers) csvAsMap(dataSourceName string) []RowMap {
 }
 
 func (t templateHelpers) csvAddRow(dataSourceName string, newRow []string) string {
-	templateDataSources := t.TemplateDataSource.DataSources
-	source, exists := templateDataSources[dataSourceName]
+	source, exists := t.TemplateDataSource.GetDataSource(dataSourceName)
 	if exists {
 		source.mu.Lock()
 		defer source.mu.Unlock()
@@ -370,8 +365,7 @@ func (t templateHelpers) csvAddRow(dataSourceName string, newRow []string) strin
 }
 
 func (t templateHelpers) csvDeleteRows(dataSourceName, searchFieldName, searchFieldValue string, output bool) string {
-	templateDataSources := t.TemplateDataSource.DataSources
-	source, exists := templateDataSources[dataSourceName]
+	source, exists := t.TemplateDataSource.GetDataSource(dataSourceName)
 	if !exists {
 		log.Error("could not find datasource " + dataSourceName)
 		return ""
@@ -411,8 +405,7 @@ func (t templateHelpers) csvDeleteRows(dataSourceName, searchFieldName, searchFi
 }
 
 func (t templateHelpers) csvCountRows(dataSourceName string) string {
-	templateDataSources := t.TemplateDataSource.DataSources
-	source, exists := templateDataSources[dataSourceName]
+	source, exists := t.TemplateDataSource.GetDataSource(dataSourceName)
 	if !exists {
 		log.Error("could not find datasource " + dataSourceName)
 		return ""
@@ -436,7 +429,7 @@ func (t templateHelpers) csvSqlCommand(commandString string) []RowMap {
 	}
 
 	// Find the data source by name
-	source, exists := t.TemplateDataSource.DataSources[command.DataSourceName]
+	source, exists := t.TemplateDataSource.GetDataSource(command.DataSourceName)
 	if !exists {
 		log.Error("Could not find datasource " + command.DataSourceName)
 		return []RowMap{}

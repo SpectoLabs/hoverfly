@@ -1523,25 +1523,30 @@ func TestHoverfly_SetMultipleTemplateDataSource(t *testing.T) {
 	Expect(err1).To(BeNil())
 	Expect(err2).To(BeNil())
 
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources).ToNot(BeNil())
+	Expect(unit.templator.TemplateHelper.TemplateDataSource.GetAllDataSources()).ToNot(BeNil())
 
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources["test-csv1"]).NotTo(BeNil())
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources["test-csv2"]).NotTo(BeNil())
+	csv1, exists1:= unit.templator.TemplateHelper.TemplateDataSource.GetDataSource("test-csv1")
+	Expect(csv1).NotTo(BeNil())
+	Expect(exists1).To(BeTrue())
 
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources["test-csv1"].Name).To(Equal("test-csv1"))
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources["test-csv2"].Name).To(Equal("test-csv2"))
+	csv2, exists2:= unit.templator.TemplateHelper.TemplateDataSource.GetDataSource("test-csv2")
+	Expect(csv2).NotTo(BeNil())
+	Expect(exists2).To(BeTrue())
 
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources["test-csv1"].SourceType).To(Equal("csv"))
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources["test-csv2"].SourceType).To(Equal("csv"))
+	Expect(csv1.Name).To(Equal("test-csv1"))
+	Expect(csv2.Name).To(Equal("test-csv2"))
 
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources["test-csv1"].Data).To(HaveLen(3))
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources["test-csv2"].Data).To(HaveLen(4))
+	Expect(csv1.SourceType).To(Equal("csv"))
+	Expect(csv2.SourceType).To(Equal("csv"))
 
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources["test-csv1"].Data[1][2]).To(Equal("55"))
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources["test-csv2"].Data[2][2]).To(Equal("New York"))
+	Expect(csv1.Data).To(HaveLen(3))
+	Expect(csv2.Data).To(HaveLen(4))
 
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources["test-csv1"].Data[2][1]).To(Equal("Test2"))
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources["test-csv2"].Data[3][0]).To(Equal("31"))
+	Expect(csv1.Data[1][2]).To(Equal("55"))
+	Expect(csv2.Data[2][2]).To(Equal("New York"))
+
+	Expect(csv1.Data[2][1]).To(Equal("Test2"))
+	Expect(csv2.Data[3][0]).To(Equal("31"))
 }
 
 func TestHoverfly_DeleteTemplateDataSource(t *testing.T) {
@@ -1557,7 +1562,7 @@ func TestHoverfly_DeleteTemplateDataSource(t *testing.T) {
 	unit.DeleteDataSource("test-csv1")
 
 	Expect(err).To(BeNil())
-	Expect(unit.templator.TemplateHelper.TemplateDataSource.DataSources).To(HaveLen(0))
+	Expect(unit.templator.TemplateHelper.TemplateDataSource.GetAllDataSources()).To(HaveLen(0))
 }
 
 func TestHoverfly_GetTemplateDataSources(t *testing.T) {
