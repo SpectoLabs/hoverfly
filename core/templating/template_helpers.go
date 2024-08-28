@@ -26,6 +26,7 @@ type templateHelpers struct {
 	now                func() time.Time
 	fakerSource        *gofakeit.Faker
 	TemplateDataSource *TemplateDataSource
+	journal            *journal.Journal
 }
 
 func (t templateHelpers) nowHelper(offset string, format string) string {
@@ -466,8 +467,7 @@ func (t templateHelpers) csvSqlCommand(commandString string) []RowMap {
 }
 
 func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSource, queryType, lookupQuery string, options *raymond.Options) interface{} {
-	journalDetails := options.Value("Journal").(Journal)
-	if journalEntry, err := getIndexEntry(journalDetails, indexName, keyValue); err == nil {
+	if journalEntry, err := getIndexEntry(t.journal, indexName, keyValue); err == nil {
 		if body := getBodyDataToParse(dataSource, journalEntry); body != "" {
 			data := util.FetchFromRequestBody(queryType, lookupQuery, body)
 			if _, ok := data.(error); ok {
@@ -481,9 +481,9 @@ func (t templateHelpers) parseJournalBasedOnIndex(indexName, keyValue, dataSourc
 	return getEvaluationString("journal", options)
 }
 
-func (t templateHelpers) hasJournalKey(indexName, keyValue string, options *raymond.Options) bool {
-	journalDetails := options.Value("Journal").(Journal)
-	journalEntry, _ := getIndexEntry(journalDetails, indexName, keyValue)
+func (t templateHelpers) hasJournalKey(indexName, keyValue string) bool {
+
+	journalEntry, _ := getIndexEntry(t.journal, indexName, keyValue)
 
 	return journalEntry != nil
 }
@@ -615,25 +615,25 @@ func formatNumber(number float64, format string) string {
 	return fmt.Sprintf("%."+strconv.Itoa(decimalPlaces)+"f", rounded)
 }
 
-func getIndexEntry(journalIndexDetails Journal, indexName, indexValue string) (*JournalEntry, error) {
+func getIndexEntry(journal *journal.Journal, indexName, indexValue string) (*journal.JournalEntry, error) {
 
-	for _, index := range journalIndexDetails.indexes {
-		if index.name == indexName {
-			if journalEntry, exists := index.entries[indexValue]; exists {
-				return &journalEntry, nil
+	for _, index := range journal.Indexes {
+		if index.Name == indexName {
+			if journalEntry, exists := index.Entries[indexValue]; exists {
+				return journalEntry, nil
 			}
 		}
 	}
 	return nil, fmt.Errorf("no entry found for index %s", indexName)
 }
 
-func getBodyDataToParse(source string, journalEntry *JournalEntry) string {
+func getBodyDataToParse(source string, journalEntry *journal.JournalEntry) string {
 
 	if strings.EqualFold(source, "request") {
-		return journalEntry.requestBody
+		return journalEntry.Request.Body
 	}
 	if strings.EqualFold(source, "response") {
-		return journalEntry.responseBody
+		return journalEntry.Response.Body
 	}
 	return ""
 }

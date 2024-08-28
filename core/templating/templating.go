@@ -25,7 +25,6 @@ type TemplatingData struct {
 	CurrentDateTime func(string, string, string) string
 	Literals        map[string]interface{}
 	Vars            map[string]interface{}
-	Journal         Journal
 	Kvs             map[string]interface{}
 	InternalVars    map[string]interface{} // data store used internally by templating helpers
 }
@@ -42,19 +41,6 @@ type Request struct {
 	Host       string
 }
 
-type JournalEntry struct {
-	requestBody  string
-	responseBody string
-}
-
-type Journal struct {
-	indexes []JournalIndex
-}
-
-type JournalIndex struct {
-	name    string
-	entries map[string]JournalEntry
-}
 
 type Templator struct {
 	SupportedMethodMap map[string]interface{}
@@ -65,6 +51,10 @@ var helpersRegistered = false
 var helperMethodMap = make(map[string]interface{})
 
 func NewTemplator() *Templator {
+	return NewEnrichedTemplator(journal.NewJournal())
+}
+
+func NewEnrichedTemplator(journal *journal.Journal) *Templator {
 
 	templateDataSource := NewTemplateDataSource()
 
@@ -72,6 +62,7 @@ func NewTemplator() *Templator {
 		now:                time.Now,
 		fakerSource:        gofakeit.New(0),
 		TemplateDataSource: templateDataSource,
+		journal: journal,
 	}
 
 	helperMethodMap["now"] = t.nowHelper
@@ -148,12 +139,12 @@ func (*Templator) ParseTemplate(responseBody string) (*raymond.Template, error) 
 	return raymond.Parse(responseBody)
 }
 
-func (t *Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.RequestDetails, response *models.ResponseDetails, literals *models.Literals, vars *models.Variables, state map[string]string, journal *journal.Journal) (string, error) {
+func (t *Templator) RenderTemplate(tpl *raymond.Template, requestDetails *models.RequestDetails, response *models.ResponseDetails, literals *models.Literals, vars *models.Variables, state map[string]string) (string, error) {
 	if tpl == nil {
 		return "", fmt.Errorf("template cannot be nil")
 	}
 
-	ctx := t.NewTemplatingData(requestDetails, response, literals, vars, state, journal)
+	ctx := t.NewTemplatingData(requestDetails, literals, vars, state)
 	result, err := tpl.Exec(ctx)
 	if err == nil {
 		statusCode, ok := ctx.InternalVars["statusCode"]
@@ -168,7 +159,7 @@ func (templator *Templator) GetSupportedMethodMap() map[string]interface{} {
 	return templator.SupportedMethodMap
 }
 
-func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, response *models.ResponseDetails, literals *models.Literals, vars *models.Variables, state map[string]string, journal *journal.Journal) *TemplatingData {
+func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, literals *models.Literals, vars *models.Variables, state map[string]string) *TemplatingData {
 
 	literalMap := make(map[string]interface{})
 	if literals != nil {
@@ -178,32 +169,6 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, res
 	}
 
 	variableMap := t.getVariables(vars, requestDetails)
-	templateJournal := Journal{}
-	if journal != nil {
-
-		indexes := make([]JournalIndex, 0, len(journal.Indexes))
-		for _, index := range journal.Indexes {
-
-			journalIndexEntries := make(map[string]JournalEntry)
-			for indexKey, entry := range index.Entries {
-
-				journalEntry := JournalEntry{
-					requestBody:  entry.Request.Body,
-					responseBody: entry.Response.Body,
-				}
-				journalIndexEntries[indexKey] = journalEntry
-			}
-			journalIndex := JournalIndex{
-				name:    index.Name,
-				entries: journalIndexEntries,
-			}
-			indexes = append(indexes, journalIndex)
-		}
-		templateJournal = Journal{
-			indexes: indexes,
-		}
-
-	}
 
 	kvs := make(map[string]interface{})
 	return &TemplatingData{
@@ -211,7 +176,6 @@ func (t *Templator) NewTemplatingData(requestDetails *models.RequestDetails, res
 		Literals: literalMap,
 		Vars:     variableMap,
 		State:    state,
-		Journal:  templateJournal,
 		CurrentDateTime: func(a1, a2, a3 string) string {
 			return a1 + " " + a2 + " " + a3
 		},
