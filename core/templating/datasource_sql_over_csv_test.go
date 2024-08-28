@@ -21,7 +21,7 @@ func TestParseCommand(t *testing.T) {
 		},
 	}
 	templateDataSource := NewTemplateDataSource()
-	templateDataSource.DataSources = dataSources
+	templateDataSource.dataSources = dataSources
 
 	tests := []struct {
 		query       string

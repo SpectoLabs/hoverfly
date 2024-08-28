@@ -55,14 +55,16 @@ func parseSqlCommand(query string, datasource *TemplateDataSource) (SQLStatement
 		}
 		columnsPart = matches[1]
 		dataSourceName = matches[2]
-		if !datasource.DataSourceExists(dataSourceName) {
+		source, exits := datasource.GetDataSource(dataSourceName)
+		if !exits {
 			return SQLStatement{}, errors.New("data source does not exist")
 		}
 
 		if len(matches) == 4 {
 			wherePart = matches[3]
 		}
-		headers := datasource.DataSources[dataSourceName].Data[0]
+
+		headers := source.Data[0]
 		columns, err := parseColumns(columnsPart, headers)
 		if err != nil {
 			return SQLStatement{}, err
@@ -86,14 +88,15 @@ func parseSqlCommand(query string, datasource *TemplateDataSource) (SQLStatement
 			return SQLStatement{}, errors.New("invalid UPDATE query format")
 		}
 		dataSourceName = matches[1]
-		if !datasource.DataSourceExists(dataSourceName) {
+		source, exits := datasource.GetDataSource(dataSourceName)
+		if !exits {
 			return SQLStatement{}, errors.New("data source does not exist")
 		}
 		setPart := matches[2]
 		if len(matches) == 4 {
 			wherePart = matches[3]
 		}
-		headers := datasource.DataSources[dataSourceName].Data[0]
+		headers := source.Data[0]
 		setClauses, err := parseSetClauses(setPart, headers)
 		if err != nil {
 			return SQLStatement{}, err
@@ -116,7 +119,7 @@ func parseSqlCommand(query string, datasource *TemplateDataSource) (SQLStatement
 			return SQLStatement{}, errors.New("invalid DELETE query format")
 		}
 		dataSourceName = matches[1]
-		if !datasource.DataSourceExists(dataSourceName) {
+		if _, exits := datasource.GetDataSource(dataSourceName); !exits {
 			return SQLStatement{}, errors.New("data source does not exist")
 		}
 		if len(matches) == 3 {

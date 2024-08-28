@@ -5,47 +5,45 @@ import (
 )
 
 type TemplateDataSource struct {
-	DataSources map[string]*DataSource
-	RWMutex     sync.RWMutex
+	dataSources map[string]*DataSource
+	rwMutex     sync.RWMutex
 }
 
 func NewTemplateDataSource() *TemplateDataSource {
 
 	return &TemplateDataSource{
-		DataSources: make(map[string]*DataSource),
+		dataSources: make(map[string]*DataSource),
 	}
 }
 
-func (templateDataSource *TemplateDataSource) SetDataSource(dataSourceName string, dataSource *DataSource) {
+func (t *TemplateDataSource) SetDataSource(dataSourceName string, dataSource *DataSource) {
 
-	templateDataSource.RWMutex.Lock()
-	templateDataSource.DataSources[dataSourceName] = dataSource
-	templateDataSource.RWMutex.Unlock()
+	t.rwMutex.Lock()
+	defer t.rwMutex.Unlock()
+
+	t.dataSources[dataSourceName] = dataSource
 }
 
-func (templateDataSource *TemplateDataSource) DeleteDataSource(dataSourceName string) {
+func (t *TemplateDataSource) DeleteDataSource(dataSourceName string) {
 
-	templateDataSource.RWMutex.Lock()
+	t.rwMutex.Lock()
+	defer t.rwMutex.Unlock()
 
-	if _, ok := templateDataSource.DataSources[dataSourceName]; ok {
-		delete(templateDataSource.DataSources, dataSourceName)
-	}
-	templateDataSource.RWMutex.Unlock()
+	delete(t.dataSources, dataSourceName)
 }
 
-func (templateDataSource *TemplateDataSource) GetAllDataSources() map[string]*DataSource {
+func (t *TemplateDataSource) GetAllDataSources() map[string]*DataSource {
 
-	return templateDataSource.DataSources
+	t.rwMutex.RLock()
+	defer t.rwMutex.RUnlock()
+
+	return t.dataSources
 }
 
-func (templateDataSource *TemplateDataSource) DataSourceExists(name string) bool {
-	templateDataSource.RWMutex.Lock()
-	defer templateDataSource.RWMutex.Unlock()
+func (t *TemplateDataSource) GetDataSource(name string) (*DataSource, bool) {
+	t.rwMutex.RLock()
+	defer t.rwMutex.RUnlock()
 
-	for _, dataSource := range templateDataSource.DataSources {
-		if dataSource.Name == name {
-			return true
-		}
-	}
-	return false
+	source, exits := t.dataSources[name]
+	return source, exits
 }
