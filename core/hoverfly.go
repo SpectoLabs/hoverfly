@@ -53,15 +53,16 @@ func NewHoverfly() *Hoverfly {
 
 	authBackend := backends.NewCacheBasedAuthBackend(cache.NewInMemoryCache(), cache.NewInMemoryCache())
 
+	newJournal := journal.NewJournal()
 	hoverfly := &Hoverfly{
 		Simulation:             models.NewSimulation(),
 		Authentication:         authBackend,
 		Counter:                metrics.NewModeCounter([]string{modes.Simulate, modes.Synthesize, modes.Modify, modes.Capture, modes.Spy, modes.Diff}),
 		StoreLogsHook:          NewStoreLogsHook(),
-		Journal:                journal.NewJournal(),
+		Journal:                newJournal,
 		Cfg:                    InitSettings(),
 		state:                  state.NewState(),
-		templator:              templating.NewTemplator(),
+		templator:              templating.NewEnrichedTemplator(newJournal),
 		responsesDiff:          make(map[v2.SimpleRequestDefinitionView][]v2.DiffReport),
 		PostServeActionDetails: action.NewPostServeActionDetails(),
 	}
