@@ -49,6 +49,11 @@ func TestParseCommand(t *testing.T) {
 			expectError: false,
 		},
 		{
+			query:       "UPDATE employees SET department = 'Engineering, Marketing' WHERE name == 'John Doe'",
+			expected:    SQLStatement{Type: "UPDATE", Conditions: []Condition{{Column: "name", Operator: "==", Value: "John Doe"}}, SetClauses: map[string]string{"department": "Engineering, Marketing"}, DataSourceName: "employees"},
+			expectError: false,
+		},
+		{
 			query:       "DELETE FROM employees WHERE age < '30'",
 			expected:    SQLStatement{Type: "DELETE", Conditions: []Condition{{Column: "age", Operator: "<", Value: "30"}}, DataSourceName: "employees"},
 			expectError: false,

@@ -186,16 +186,58 @@ func trimQuotes(s string) string {
 // parseSetClauses parses the SET part of an UPDATE query
 func parseSetClauses(setPart string, headers []string) (map[string]string, error) {
 	setClauses := make(map[string]string)
-	parts := strings.Split(setPart, ",")
+	parts, err := splitOnCommasOutsideQuotes(setPart)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, part := range parts {
-		keyValue := strings.Split(strings.TrimSpace(part), "=")
-		if !stringExists(headers, strings.TrimSpace(keyValue[0])) {
-			return nil, errors.New("invalid column provided: " + strings.TrimSpace(keyValue[0]))
-		} else if len(keyValue) == 2 {
-			setClauses[strings.TrimSpace(keyValue[0])] = trimQuotes(strings.TrimSpace(keyValue[1]))
+		keyValue := strings.SplitN(strings.TrimSpace(part), "=", 2)
+		if len(keyValue) != 2 {
+			return nil, errors.New("invalid SET clause: " + part)
 		}
+		key := strings.TrimSpace(keyValue[0])
+		value := strings.TrimSpace(keyValue[1])
+
+		if !stringExists(headers, key) {
+			return nil, errors.New("invalid column provided: " + key)
+		}
+		setClauses[key] = trimQuotes(value)
 	}
 	return setClauses, nil
+}
+
+// splitOnCommasOutsideQuotes splits a string by commas only if the commas are outside of quotes
+func splitOnCommasOutsideQuotes(s string) ([]string, error) {
+	var parts []string
+	var sb strings.Builder
+	var inQuotes bool
+	var quoteChar rune
+
+	for _, r := range s {
+		switch {
+		case r == '\'' || r == '"':
+			if inQuotes {
+				if r == quoteChar {
+					inQuotes = false
+				}
+			} else {
+				inQuotes = true
+				quoteChar = r
+			}
+			sb.WriteRune(r)
+		case r == ',' && !inQuotes:
+			parts = append(parts, sb.String())
+			sb.Reset()
+		default:
+			sb.WriteRune(r)
+		}
+	}
+
+	// Add the last part
+	parts = append(parts, sb.String())
+
+	return parts, nil
 }
 
 // parseConditions parses the WHERE part of the query into a slice of Conditions and returns an error if any issues are found.
