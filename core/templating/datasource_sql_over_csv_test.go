@@ -44,6 +44,11 @@ func TestParseCommand(t *testing.T) {
 			expectError: false,
 		},
 		{
+			query:       "SELECT * FROM employees WHERE department = 'Engineering'",
+			expected:    SQLStatement{Type: "SELECT", Columns: []string{"id", "name", "age", "department"}, Conditions: []Condition{{Column: "department", Operator: "=", Value: "Engineering"}}, DataSourceName: "employees"},
+			expectError: false,
+		},
+		{
 			query:       "UPDATE employees SET age = '35' WHERE name == 'John Doe'",
 			expected:    SQLStatement{Type: "UPDATE", Conditions: []Condition{{Column: "name", Operator: "==", Value: "John Doe"}}, SetClauses: map[string]string{"age": "35"}, DataSourceName: "employees"},
 			expectError: false,

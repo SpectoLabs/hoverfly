@@ -244,7 +244,7 @@ func splitOnCommasOutsideQuotes(s string) ([]string, error) {
 func parseConditions(wherePart string) ([]Condition, error) {
 	conditions := []Condition{}
 
-	conditionRegex := regexp.MustCompile(`(\w+)\s*(==|!=|<=|>=|<|>)\s*'([^']*)'`)
+	conditionRegex := regexp.MustCompile(`(\w+)\s*(==|=|!=|<=|>=|<|>)\s*'([^']*)'`)
 	conditionMatches := conditionRegex.FindAllStringSubmatch(wherePart, -1)
 
 	if len(conditionMatches) == 0 {
@@ -379,7 +379,7 @@ func matchesConditions(row RowMap, conditions []Condition) bool {
 			return false
 		}
 		switch condition.Operator {
-		case "==":
+		case "==", "=":
 			if val != condition.Value {
 				return false
 			}
