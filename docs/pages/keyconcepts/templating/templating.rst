@@ -326,7 +326,7 @@ Example: Start Hoverfly with a CSV data source (pets.csv) provided below.
 | SELECT data using a SQL  | {                                        | {                                       |
 | like syntax.             |   "Dogs-With-Big-Ids-Only": [            |   "Dogs-With-Big-Ids-Only": [           |
 |                          | {{#each (csvSqlCommand "SELECT * FROM    |   {                                     |
-|                          | pets WHERE category == 'dogs' AND id >=  |       "id":2000,                        |
+|                          | pets WHERE category = 'dogs' AND id >=   |       "id":2000,                        |
 |                          | '2000'")}}                               |       "category":"dogs",                |
 |                          |   {                                      |       "name":"Violet",                  |
 |                          |       "id":{{this.id}},                  |       "status":"sold"                   |
@@ -431,7 +431,7 @@ Update the data in a CSV Data Source using SQL like syntax
     {{csvSqlCommand '(sql-update-statement)'}}
 
 Example:
-``{{ csvSqlCommand "UPDATE pets SET status = 'sold' WHERE id > '20' AND category == 'cats'" }}``
+``{{ csvSqlCommand "UPDATE pets SET status = 'sold' WHERE id > '20' AND category = 'cats'" }}``
 
 
 
@@ -449,7 +449,9 @@ Only simple conditions are supported.
 You can chain conditions using AND. OR is not supported.
 
 The following comparison operators are supported in conditions:
-== equals
+=  equals
+>  greater than
+<  less than
 >= greater than or equal to
 <= less than or equal to
 != not equal to
