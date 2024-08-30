@@ -196,7 +196,7 @@ func Test_ApplyTemplate_CsvCountRowsMissingDataset(t *testing.T) {
 	Expect(template).To(Equal(``))
 }
 
-func Test_ApplyTemplate_CsvSQL_Select(t *testing.T) {
+func Test_ApplyTemplate_CsvSQL_Select_Double_Equal(t *testing.T) {
 	RegisterTestingT(t)
 
 	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT name FROM test-csv1 WHERE id == '1'")}}{{this.name}}{{/each}}`)
@@ -205,10 +205,28 @@ func Test_ApplyTemplate_CsvSQL_Select(t *testing.T) {
 	Expect(template).To(Equal(`Test1`))
 }
 
-func Test_ApplyTemplate_CsvSQL_SelectAll(t *testing.T) {
+func Test_ApplyTemplate_CsvSQL_Select_Single_Equal(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT name FROM test-csv1 WHERE id = '1'")}}{{this.name}}{{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`Test1`))
+}
+
+func Test_ApplyTemplate_CsvSQL_SelectAllWithNumbersNoQuotes(t *testing.T) {
 	RegisterTestingT(t)
 
 	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT * FROM test-csv1 WHERE 1==1")}}{{this.id}},{{this.name}},{{this.marks}};{{/each}}`)
+
+	Expect(err).To(BeNil())
+	Expect(template).To(Equal(`1,Test1,55;2,Test2,56;*,Dummy,ABSENT;`))
+}
+
+func Test_ApplyTemplate_CsvSQL_SelectAllWithNumbersInQuotes(t *testing.T) {
+	RegisterTestingT(t)
+
+	template, err := ApplyTemplate(&models.RequestDetails{}, make(map[string]string), `{{#each (csvSqlCommand "SELECT * FROM test-csv1 WHERE '1'=='1'")}}{{this.id}},{{this.name}},{{this.marks}};{{/each}}`)
 
 	Expect(err).To(BeNil())
 	Expect(template).To(Equal(`1,Test1,55;2,Test2,56;*,Dummy,ABSENT;`))
