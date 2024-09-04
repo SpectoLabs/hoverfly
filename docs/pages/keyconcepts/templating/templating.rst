@@ -182,7 +182,7 @@ Reading from a CSV Data Source
 
 You can read data from a CSV data source in a number of ways.
 
-The most basic is to ise the ``csv`` function to return the value of one field (selected-column) given a field name to search (column-name) and 
+The most basic is to use the ``csv`` function to return the value of one field (selected-column) given a field name to search (column-name) and 
 a value to search for in that field (query-value). Of course the query-value would normally be pulled from the request.
 
 .. code:: handlebars
