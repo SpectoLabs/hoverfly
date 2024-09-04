@@ -182,7 +182,7 @@ Reading from a CSV Data Source
 
 You can read data from a CSV data source in a number of ways.
 
-The most basic is to return the value of one field (selected-column) given a field name to search (column-name) and 
+The most basic is to ise the ``csv`` function to return the value of one field (selected-column) given a field name to search (column-name) and 
 a value to search for in that field (query-value). Of course the query-value would normally be pulled from the request.
 
 .. code:: handlebars
@@ -239,26 +239,30 @@ Additional functions are avaiable to query the CSV data source to return all or 
 This makes it simpler to render back into the template, as you can use the {{this}} expression with the column names to identify
 which fields you want to render.
 
-To return all the data from the csv as an array of maps. (Note that you would need to wrap this in an #each block. See examples below.):
+To return all the data from the csv as an array of maps, you use the ``csvAsMap`` function.
+(Note that you would need to wrap this in an #each block. See examples below.):
 
 .. code:: handlebars
 
     {{csvAsMap '(data-source-name)' }}
     
 
-To return filtered data from the csv as an array of maps (Note that you would need to wrap this in an #each block. See examples below.):
+To return filtered data from the csv as an array of maps, you use the ``csvMatchingRows``function. 
+(Note that you would need to wrap this in an #each block. See examples below.):
 
 .. code:: handlebars
 
     {{csvMatchingRows '(data-source-name)' '(column-name)' '(query-value)' '(selected-column)'}}
 
-To return all the data from the csv as an array arrays (Note that you would need to wrap this in an #each block. See examples below.):
+To return all the data from the csv as an array arrays, you use the ``csvAsArray`` function.
+(Note that you would need to wrap this in an #each block. See examples below.):
 
 .. code:: handlebars
 
     {{csvAsArray '(data-source-name)' }}
 
-To return filtered data from the csv as an array of maps using the SQL like dialect. Again this needs to be wrapped in an #each block:
+To return filtered data from the csv as an array of maps using the SQL like dialect, you use the ``csvSqlCommand`` function. 
+Again this needs to be wrapped in an #each block:
 
 .. code:: handlebars
 
@@ -354,6 +358,7 @@ Adding data to a CSV Data Source
 While the service is running you can add new rows of data into the data source. This is not peristent, it is only manipulated in memory
 and so it only lasts for as long as the service is running and between calls. The rows are not actually written to the file.
 
+You use the ``csvAddRow`` function to add a row to the data source.
 This is currently the only way to add rows to the datasource. There is no support for SQL INSERT statements.
 
 .. code:: handlebars
@@ -366,12 +371,12 @@ For example say you had a csv called pets with the columns id, category, name an
 
 1. You would first add each of the 4 values into an array of 4 items to match the number of columns:
 
-``{{ addToArray 'newPet' '2000' false }}``
-``{{ addToArray 'newPet' 'dogs' false }}``
-``{{ addToArray 'newPet' 'Violet' false }}``
-``{{ addToArray 'newPet' 'sold' false }}``
+``{{ addToArray 'newPet' '2000' false }}
+{{ addToArray 'newPet' 'dogs' false }}
+{{ addToArray 'newPet' 'Violet' false }}
+{{ addToArray 'newPet' 'sold' false }}``
 
-2. You then call the csvAddRow function to add the row into the csv data store:
+2. You then call the ``csvAddRow`` function to add the row into the csv data store:
 
 ``{{csvAddRow 'pets' (getArray 'newPet') }}``
 
@@ -382,7 +387,7 @@ Deleting data from a CSV Data Source
 While the service is running you can delete rows of data from the data source. This is not peristent, it is only manipulated in memory
 and so it only lasts for as long as the service is running and between calls. The rows are not actually deleted from the file.
 
-There are two ways to delete rows. This first simple method will delete rows that match one exact condition.
+There are two ways to delete rows. This first simple method using ``csvDeleteRows`` will delete rows that match one exact condition.
 
 .. code:: handlebars
 
@@ -397,16 +402,16 @@ To delete all the pets where the category is cats from the pets csv data store:
 
 Note that the last parameter of "output-result" is a boolean. It is not enclosed in quotes. The function will return the number of rows
 affected which can either be suppressed by passing false to this parameter, or passed into another function if you need to make logical 
-decisions based on the number of rows affected by passing in true as the last parameter. If csvDeleteRows is not enclosed within another 
+decisions based on the number of rows affected by passing in true as the last parameter. If ``csvDeleteRows`` is not enclosed within another 
 function it will output the number of rows deleted to the template.
 
-``{{#equal (csvDeleteRows 'pets' 'category' 'cats' true) '0'}}``
-``    {{ setStatusCode '404' }}``
-``    {"Message":"Error no cats found"}``
-``{{else}}``
-``    {{ setStatusCode '200' }}``
-``    {"Message":"All cats deleted"}``
-``{{/equal}}``
+``{{#equal (csvDeleteRows 'pets' 'category' 'cats' true) '0'}}
+    {{ setStatusCode '404' }}
+    {"Message":"Error no cats found"}
+{{else}}
+    {{ setStatusCode '200' }}
+    {"Message":"All cats deleted"}
+{{/equal}}``
 
 Deleting data from a CSV Data Source using SQL like syntax
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -439,10 +444,13 @@ Using SQL like syntax to query and manipulate data sources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 You can use a simplified SQL like syntax to select, update and delete rows.
 
-INSERT is not supported. To add data you must use the csvAddRow template function.
-SELECT [column-names] FROM [data-source-name] WHERE [conditions] (* can be used to indicate all colmuns)
-UPDATE [data-source-name] SET [[column-name] = '[value]',] WHERE [conditions]
-DELETE FROM [data-source-name] WHERE [conditions]
+- INSERT is not supported. To add data you must use the csvAddRow template function.
+
+- SELECT [column-names] FROM [data-source-name] WHERE [conditions] (* can be used to indicate all colmuns)
+
+- UPDATE [data-source-name] SET [[column-name] = '[value]',] WHERE [conditions]
+
+- DELETE FROM [data-source-name] WHERE [conditions]
 
 Only simple conditions are supported.
 
@@ -465,7 +473,8 @@ Joins across different data sources are not supported.
 Counting the rows in a CSV Data Source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can return the number of rows in a csv dataset. This will be 1 less than the number of rows as the first row contains the column names.
+You can return the number of rows in a csv dataset using ``csvCountRows``. 
+This will be 1 less than the number of rows as the first row contains the column names.
 
 .. code:: handlebars
 
