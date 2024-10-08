@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -19,19 +20,20 @@ import (
 )
 
 // DoRequest - performs request and returns response that should be returned to client and error
-func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
+func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, *time.Duration, error) {
 
 	// We can't have this set. And it only contains "/pkg/net/http/" anyway
 	request.RequestURI = ""
 
 	client, err := GetHttpClient(hf, request.Host)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
+	start := time.Now()
 	resp, err := client.Do(request)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	resp.Header.Set("Hoverfly", "Was-Here")
@@ -40,8 +42,8 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, error) {
 		resp.Header.Add("Hoverfly", "Forwarded")
 	}
 
-	return resp, nil
-
+	elapsed := time.Since(start)
+	return resp, &elapsed, nil
 }
 
 // GetResponse returns stored response from cache

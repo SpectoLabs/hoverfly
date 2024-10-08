@@ -3,7 +3,9 @@ package modes
 import (
 	"bytes"
 	"io/ioutil"
+	"math"
 	"net/http"
+	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -14,7 +16,7 @@ import (
 
 type HoverflyCapture interface {
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
-	DoRequest(*http.Request) (*http.Response, error)
+	DoRequest(*http.Request) (*http.Response, *time.Duration, error)
 	Save(*models.RequestDetails, *models.ResponseDetails, *ModeArguments) error
 }
 
@@ -59,7 +61,7 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when preparing request for pass through", Capture)
 	}
 
-	response, err := this.Hoverfly.DoRequest(modifiedRequest)
+	response, duration, err := this.Hoverfly.DoRequest(modifiedRequest)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended destination", Capture)
 	}
@@ -68,9 +70,10 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 	respHeaders := util.GetResponseHeaders(response)
 
 	responseObj := &models.ResponseDetails{
-		Status:  response.StatusCode,
-		Body:    respBody,
-		Headers: respHeaders,
+		Status:     response.StatusCode,
+		Body:       respBody,
+		Headers:    respHeaders,
+		FixedDelay: int(math.Ceil(duration.Seconds())),
 	}
 
 	if this.Arguments.Headers == nil {

@@ -1,7 +1,9 @@
 package modes
 
 import (
+	"math"
 	"net/http"
+	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	v2 "github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -15,7 +17,7 @@ import (
 type HoverflySpy interface {
 	GetResponse(models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError)
 	ApplyMiddleware(models.RequestResponsePair) (models.RequestResponsePair, error)
-	DoRequest(*http.Request) (*http.Response, error)
+	DoRequest(*http.Request) (*http.Response, *time.Duration, error)
 	Save(*models.RequestDetails, *models.ResponseDetails, *ModeArguments) error
 }
 
@@ -67,7 +69,7 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 		if err != nil {
 			return ReturnErrorAndLog(request, err, &pair, "There was an error when reconstructing the request.", Spy)
 		}
-		response, err := this.Hoverfly.DoRequest(modifiedRequest)
+		response, duration, err := this.Hoverfly.DoRequest(modifiedRequest)
 		if err == nil {
 
 			if this.Arguments.CaptureOnMiss {
@@ -75,9 +77,10 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 				respHeaders := util.GetResponseHeaders(response)
 
 				responseObj := &models.ResponseDetails{
-					Status:  response.StatusCode,
-					Body:    respBody,
-					Headers: respHeaders,
+					Status:     response.StatusCode,
+					Body:       respBody,
+					Headers:    respHeaders,
+					FixedDelay: int(math.Ceil(duration.Seconds())),
 				}
 				if this.Arguments.Headers == nil {
 					this.Arguments.Headers = []string{}
