@@ -1,7 +1,6 @@
 package modes
 
 import (
-	"math"
 	"net/http"
 	"time"
 
@@ -80,7 +79,7 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 					Status:     response.StatusCode,
 					Body:       respBody,
 					Headers:    respHeaders,
-					FixedDelay: int(math.Ceil(duration.Seconds())),
+					FixedDelay: int(duration.Milliseconds()),
 				}
 				if this.Arguments.Headers == nil {
 					this.Arguments.Headers = []string{}

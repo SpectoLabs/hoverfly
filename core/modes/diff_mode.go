@@ -14,7 +14,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
-	"math"
 	"net/http"
 	"reflect"
 	"time"
@@ -78,7 +77,7 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 			Status:     actualResponse.StatusCode,
 			Body:       respBody,
 			Headers:    respHeaders,
-			FixedDelay: int(math.Ceil(duration.Seconds())),
+			FixedDelay: int(duration.Milliseconds()),
 		}
 
 		this.diffResponse(simResponse, actualResponseDetails, this.Arguments.Headers)
