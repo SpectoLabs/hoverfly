@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -16,16 +17,17 @@ import (
 type hoverflySpyStub struct{}
 
 // DoRequest - Stub implementation of modes.HoverflySpy interface
-func (this hoverflySpyStub) DoRequest(request *http.Request) (*http.Response, error) {
+func (this hoverflySpyStub) DoRequest(request *http.Request) (*http.Response, *time.Duration, error) {
 	response := &http.Response{}
 	if request.Host == "error.com" {
-		return nil, fmt.Errorf("Could not reach error.com")
+		return nil, nil, fmt.Errorf("Could not reach error.com")
 	}
 
 	response.StatusCode = 200
 	response.Body = ioutil.NopCloser(bytes.NewBufferString("test"))
 
-	return response, nil
+	duration := 1 * time.Second
+	return response, &duration, nil
 }
 
 func (this hoverflySpyStub) GetResponse(requestDetails models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError) {

@@ -14,6 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"reflect"
 	"time"
@@ -21,7 +22,7 @@ import (
 
 type HoverflyDiff interface {
 	GetResponse(models.RequestDetails) (*models.ResponseDetails, *errors.HoverflyError)
-	DoRequest(*http.Request) (*http.Response, error)
+	DoRequest(*http.Request) (*http.Response, *time.Duration, error)
 	AddDiff(requestView v2.SimpleRequestDefinitionView, diffReport v2.DiffReport)
 }
 
@@ -44,7 +45,7 @@ func (this *DiffMode) SetArguments(arguments ModeArguments) {
 	this.Arguments = arguments
 }
 
-//TODO: We should only need one of these two parameters
+// TODO: We should only need one of these two parameters
 func (this *DiffMode) Process(request *http.Request, details models.RequestDetails) (ProcessResult, error) {
 	this.DiffReport = v2.DiffReport{Timestamp: time.Now().Format(time.RFC3339)}
 
@@ -60,7 +61,7 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 		return ReturnErrorAndLog(request, err, &actualPair, "There was an error when reconstructing the request.", Diff)
 	}
 
-	actualResponse, err := this.Hoverfly.DoRequest(modifiedRequest)
+	actualResponse, duration, err := this.Hoverfly.DoRequest(modifiedRequest)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &actualPair, "There was an error when forwarding the request to the intended destination", Diff)
 	}
@@ -74,9 +75,10 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 		respHeaders := util.GetResponseHeaders(actualResponse)
 
 		actualResponseDetails := &models.ResponseDetails{
-			Status:  actualResponse.StatusCode,
-			Body:    respBody,
-			Headers: respHeaders,
+			Status:     actualResponse.StatusCode,
+			Body:       respBody,
+			Headers:    respHeaders,
+			FixedDelay: int(math.Ceil(duration.Seconds())),
 		}
 
 		this.diffResponse(simResponse, actualResponseDetails, this.Arguments.Headers)

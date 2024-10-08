@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
 	"github.com/SpectoLabs/hoverfly/core/modes"
@@ -25,10 +26,10 @@ func (this hoverflyCaptureStub) ApplyMiddleware(pair models.RequestResponsePair)
 }
 
 // DoRequest - Stub implementation of modes.HoverflyCapture interface
-func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Response, error) {
+func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Response, *time.Duration, error) {
 	response := &http.Response{}
 	if request.Host == "error.com" {
-		return nil, errors.New("Could not reach error.com")
+		return nil, nil, errors.New("Could not reach error.com")
 	}
 
 	response.StatusCode = 200
@@ -42,7 +43,8 @@ func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Response
 		response.Trailer.Set("X-Bin-Id", "xyz")
 	}
 
-	return response, nil
+	duration := 1 * time.Second
+	return response, &duration, nil
 }
 
 // Save - Stub implementation of modes.HoverflyCapture interface

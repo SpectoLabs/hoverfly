@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 
 	"bytes"
 	"encoding/json"
@@ -17,40 +18,41 @@ import (
 
 type hoverflyDiffStub struct{}
 
-func (this hoverflyDiffStub) DoRequest(request *http.Request) (*http.Response, error) {
+func (this hoverflyDiffStub) DoRequest(request *http.Request) (*http.Response, *time.Duration, error) {
+	duration := 1 * time.Second
 	switch request.Host {
 	case "error.com":
-		return nil, fmt.Errorf("Could not reach error.com")
+		return nil, nil, fmt.Errorf("Could not reach error.com")
 	case "positive-match-with-same-response.com":
 		return &http.Response{
 			StatusCode: 200,
 			Body:       ioutil.NopCloser(bytes.NewBufferString("expected")),
 			Header:     map[string][]string{"header": {"expected"}, "source": {"service"}},
-		}, nil
+		}, &duration, nil
 	case "positive-match-with-different-response.com":
 		return &http.Response{
 			StatusCode: 200,
 			Body:       ioutil.NopCloser(bytes.NewBufferString("actual")),
 			Header:     map[string][]string{"header": {"actual"}, "source": {"service"}},
-		}, nil
+		}, &duration, nil
 	case "negative-match.com":
 		return &http.Response{
 			StatusCode: 200,
 			Body:       ioutil.NopCloser(bytes.NewBufferString("actual")),
 			Header:     map[string][]string{"header": {"actual"}, "source": {"service"}},
-		}, nil
+		}, &duration, nil
 	case "positive-match-with-different-trailers.com":
 		return &http.Response{
 			StatusCode: 200,
 			Body:       ioutil.NopCloser(bytes.NewBufferString("actual")),
 			Header:     map[string][]string{"header": {"actual"}},
 			Trailer:    map[string][]string{"trailer1": {"actual"}},
-		}, nil
+		}, &duration, nil
 	default:
 		return &http.Response{
 			StatusCode: 200,
 			Body:       ioutil.NopCloser(bytes.NewBufferString("test")),
-		}, nil
+		}, &duration, nil
 	}
 }
 

@@ -22,9 +22,8 @@ import (
 
 type FormData struct {
 	FirstName string `url:"first_name"`
-	LastName string `url:"last_name"`
+	LastName  string `url:"last_name"`
 }
-
 
 var _ = Describe("When I run Hoverfly", func() {
 
@@ -111,7 +110,8 @@ var _ = Describe("When I run Hoverfly", func() {
 						"Date":           {"date"},
 						"Hoverfly":       {"Was-Here"},
 					},
-					Templated: false,
+					FixedDelay: 1,
+					Templated:  false,
 				}))
 			})
 
@@ -455,7 +455,6 @@ var _ = Describe("When I run Hoverfly", func() {
 					LastName:  "Doe",
 				}
 
-
 				resp := hoverfly.Proxy(sling.New().Post(fakeServer.URL).BodyForm(formData))
 				Expect(resp.StatusCode).To(Equal(200))
 
@@ -494,7 +493,7 @@ var _ = Describe("When I run Hoverfly", func() {
 						{
 							Matcher: "form",
 							Value: map[string]interface{}{
-								"first_name":[]interface{}{
+								"first_name": []interface{}{
 									map[string]interface{}{
 										"matcher": matchers.Exact,
 										"value":   "John",
@@ -521,7 +520,8 @@ var _ = Describe("When I run Hoverfly", func() {
 						"Date":           {"date"},
 						"Hoverfly":       {"Was-Here"},
 					},
-					Templated: false,
+					FixedDelay: 1,
+					Templated:  false,
 				}))
 			})
 
