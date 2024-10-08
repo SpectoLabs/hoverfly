@@ -110,8 +110,7 @@ var _ = Describe("When I run Hoverfly", func() {
 						"Date":           {"date"},
 						"Hoverfly":       {"Was-Here"},
 					},
-					FixedDelay: 1,
-					Templated:  false,
+					Templated: false,
 				}))
 			})
 
@@ -520,8 +519,7 @@ var _ = Describe("When I run Hoverfly", func() {
 						"Date":           {"date"},
 						"Hoverfly":       {"Was-Here"},
 					},
-					FixedDelay: 1,
-					Templated:  false,
+					Templated: false,
 				}))
 			})
 
