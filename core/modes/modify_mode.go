@@ -2,7 +2,6 @@ package modes
 
 import (
 	"io/ioutil"
-	"math"
 	"net/http"
 	"time"
 
@@ -52,7 +51,7 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 		Status:     resp.StatusCode,
 		Body:       string(bodyBytes),
 		Headers:    resp.Header,
-		FixedDelay: int(math.Ceil(duration.Seconds())),
+		FixedDelay: int(duration.Milliseconds()),
 	}
 
 	pair, err = this.Hoverfly.ApplyMiddleware(pair)

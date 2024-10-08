@@ -3,7 +3,6 @@ package modes
 import (
 	"bytes"
 	"io/ioutil"
-	"math"
 	"net/http"
 	"time"
 
@@ -73,7 +72,7 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 		Status:     response.StatusCode,
 		Body:       respBody,
 		Headers:    respHeaders,
-		FixedDelay: int(math.Ceil(duration.Seconds())),
+		FixedDelay: int(duration.Milliseconds()),
 	}
 
 	if this.Arguments.Headers == nil {
