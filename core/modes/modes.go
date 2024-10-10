@@ -46,6 +46,7 @@ type ModeArguments struct {
 	Stateful           bool
 	OverwriteDuplicate bool
 	CaptureOnMiss      bool
+	CaptureDelay       bool
 }
 
 type ProcessResult struct {

@@ -31,6 +31,7 @@ func (this *CaptureMode) View() v2.ModeView {
 			Headers:            this.Arguments.Headers,
 			Stateful:           this.Arguments.Stateful,
 			OverwriteDuplicate: this.Arguments.OverwriteDuplicate,
+			CaptureDelay:       this.Arguments.CaptureDelay,
 		},
 	}
 }
@@ -68,11 +69,16 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 	respBody, _ := util.GetResponseBody(response)
 	respHeaders := util.GetResponseHeaders(response)
 
+	delayInMs := 0
+	if this.Arguments.CaptureDelay {
+		delayInMs = int(duration.Milliseconds())
+	}
+
 	responseObj := &models.ResponseDetails{
 		Status:     response.StatusCode,
 		Body:       respBody,
 		Headers:    respHeaders,
-		FixedDelay: int(duration.Milliseconds()),
+		FixedDelay: delayInMs,
 	}
 
 	if this.Arguments.Headers == nil {

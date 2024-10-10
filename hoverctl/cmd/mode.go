@@ -16,6 +16,7 @@ var stateful bool
 var overwriteDuplicate bool
 var matchingStrategy string
 var captureOnMiss bool
+var captureDelay bool
 
 var modeCmd = &cobra.Command{
 	Use:   "mode [capture|diff|simulate|spy|modify|synthesize (optional)]",
@@ -51,6 +52,7 @@ mode is shown.
 			case modes.Capture:
 				modeView.Arguments.Stateful = stateful
 				modeView.Arguments.OverwriteDuplicate = overwriteDuplicate
+				modeView.Arguments.CaptureDelay = captureDelay
 				setHeaderArgument(modeView)
 				break
 			case modes.Diff:
@@ -61,6 +63,7 @@ mode is shown.
 				modeView.Arguments.Stateful = stateful
 				modeView.Arguments.OverwriteDuplicate = overwriteDuplicate
 				modeView.Arguments.CaptureOnMiss = captureOnMiss
+				modeView.Arguments.CaptureDelay = captureDelay
 				setHeaderArgument(modeView)
 				break
 			}
@@ -98,6 +101,9 @@ func getExtraInfo(mode *v2.ModeView) string {
 				extraInfo = fmt.Sprintf("and will capture the following request headers: %s", mode.Arguments.Headers)
 			}
 		}
+		if captureDelay {
+			extraInfo = fmt.Sprintf(" and will also capture the delay")
+		}
 		break
 	case modes.Diff:
 		if len(mode.Arguments.Headers) > 0 {
@@ -119,6 +125,9 @@ func getExtraInfo(mode *v2.ModeView) string {
 				extraInfo = fmt.Sprintf("and also will capture the following request headers: %s", mode.Arguments.Headers)
 			}
 		}
+		if captureDelay {
+			extraInfo = fmt.Sprintf(" and will also capture the delay")
+		}
 		break
 	}
 
@@ -139,4 +148,5 @@ func init() {
 	modeCmd.PersistentFlags().BoolVar(&overwriteDuplicate, "overwrite-duplicate", false,
 		"Overwrite duplicate requests in capture mode")
 	modeCmd.PersistentFlags().BoolVar(&captureOnMiss, "capture-on-miss", false, "Capture the request on miss in spy mode")
+	modeCmd.PersistentFlags().BoolVar(&captureDelay, "capture-delay", false, "Capture the request delay in capture and spy mode")
 }

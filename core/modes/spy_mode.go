@@ -34,6 +34,7 @@ func (this *SpyMode) View() v2.ModeView {
 			Stateful:           this.Arguments.Stateful,
 			Headers:            this.Arguments.Headers,
 			OverwriteDuplicate: this.Arguments.OverwriteDuplicate,
+			CaptureDelay:       this.Arguments.CaptureDelay,
 		},
 	}
 }
@@ -51,6 +52,7 @@ func (this *SpyMode) SetArguments(arguments ModeArguments) {
 		Stateful:           arguments.Stateful,
 		OverwriteDuplicate: arguments.OverwriteDuplicate,
 		CaptureOnMiss:      arguments.CaptureOnMiss,
+		CaptureDelay:       arguments.CaptureDelay,
 	}
 }
 
@@ -74,12 +76,15 @@ func (this SpyMode) Process(request *http.Request, details models.RequestDetails
 			if this.Arguments.CaptureOnMiss {
 				respBody, _ := util.GetResponseBody(response)
 				respHeaders := util.GetResponseHeaders(response)
-
+				delayInMs := 0
+				if this.Arguments.CaptureDelay {
+					delayInMs = int(duration.Milliseconds())
+				}
 				responseObj := &models.ResponseDetails{
 					Status:     response.StatusCode,
 					Body:       respBody,
 					Headers:    respHeaders,
-					FixedDelay: int(duration.Milliseconds()),
+					FixedDelay: delayInMs,
 				}
 				if this.Arguments.Headers == nil {
 					this.Arguments.Headers = []string{}

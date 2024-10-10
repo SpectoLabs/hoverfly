@@ -31,6 +31,7 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, *time.Dura
 	}
 	start := time.Now()
 	resp, err := client.Do(request)
+	elapsed := time.Since(start)
 
 	if err != nil {
 		return nil, nil, err
@@ -42,7 +43,6 @@ func (hf *Hoverfly) DoRequest(request *http.Request) (*http.Response, *time.Dura
 		resp.Header.Add("Hoverfly", "Forwarded")
 	}
 
-	elapsed := time.Since(start)
 	return resp, &elapsed, nil
 }
 

@@ -37,7 +37,7 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when rebuilding the modified http request", Modify)
 	}
 
-	resp, duration, err := this.Hoverfly.DoRequest(modifiedRequest)
+	resp, _, err := this.Hoverfly.DoRequest(modifiedRequest)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended destination", Modify)
 	}
@@ -48,10 +48,9 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 	}
 
 	pair.Response = models.ResponseDetails{
-		Status:     resp.StatusCode,
-		Body:       string(bodyBytes),
-		Headers:    resp.Header,
-		FixedDelay: int(duration.Milliseconds()),
+		Status:  resp.StatusCode,
+		Body:    string(bodyBytes),
+		Headers: resp.Header,
 	}
 
 	pair, err = this.Hoverfly.ApplyMiddleware(pair)

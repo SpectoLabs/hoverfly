@@ -60,7 +60,7 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 		return ReturnErrorAndLog(request, err, &actualPair, "There was an error when reconstructing the request.", Diff)
 	}
 
-	actualResponse, duration, err := this.Hoverfly.DoRequest(modifiedRequest)
+	actualResponse, _, err := this.Hoverfly.DoRequest(modifiedRequest)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &actualPair, "There was an error when forwarding the request to the intended destination", Diff)
 	}
@@ -74,10 +74,9 @@ func (this *DiffMode) Process(request *http.Request, details models.RequestDetai
 		respHeaders := util.GetResponseHeaders(actualResponse)
 
 		actualResponseDetails := &models.ResponseDetails{
-			Status:     actualResponse.StatusCode,
-			Body:       respBody,
-			Headers:    respHeaders,
-			FixedDelay: int(duration.Milliseconds()),
+			Status:  actualResponse.StatusCode,
+			Body:    respBody,
+			Headers: respHeaders,
 		}
 
 		this.diffResponse(simResponse, actualResponseDetails, this.Arguments.Headers)
