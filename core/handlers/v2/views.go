@@ -39,6 +39,7 @@ type ModeArgumentsView struct {
 	Stateful           bool     `json:"stateful,omitempty"`
 	OverwriteDuplicate bool     `json:"overwriteDuplicate,omitempty"`
 	CaptureOnMiss      bool     `json:"captureOnMiss,omitempty"`
+	CaptureDelay       bool     `json:"captureDelay,omitempty"`
 }
 
 type IsWebServerView struct {
