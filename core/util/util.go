@@ -402,13 +402,10 @@ func jsonPath(query, toMatch string) interface{} {
 
 	// Jsonpath library converts large int into a string with scientific notion, the following
 	// reverts that process to avoid mismatching when using the jsonpath result for csv data lookup
-	// Handle large integers in scientific notation by converting back to big.Int
-	if isScientific(result) {
-		// If result is in scientific notation, try converting to a big.Int
-		bigInt := new(big.Int)
-		bigInt, success := bigIntFromString(result)
-		if success {
-			result = bigInt.String() // Convert back to string representation of the big integer
+	if containScientificNotation(result) {
+		plainNotation, ok := convertToPlainNotation(result)
+		if ok {
+			result = plainNotation
 		}
 	}
 
@@ -425,24 +422,17 @@ func jsonPath(query, toMatch string) interface{} {
 }
 
 // isScientific checks if a string is in scientific notation (e.g., "1.349599e+37")
-func isScientific(value string) bool {
+func containScientificNotation(value string) bool {
 	return strings.Contains(value, "e") || strings.Contains(value, "E")
 }
 
-// bigIntFromString converts a string representing a number (potentially in scientific notation) to big.Int
-func bigIntFromString(value string) (*big.Int, bool) {
-	// Parse the string as a big.Float to handle scientific notation
-	flt := new(big.Float)
-	flt, _, err := big.ParseFloat(value, 10, 0, big.ToNearestEven)
+func convertToPlainNotation(scientific string) (string, bool) {
+	floatVal, _, err := big.ParseFloat(scientific, 10, 0, big.ToNearestEven)
 	if err != nil {
-		return nil, false
+		return scientific, false
 	}
 
-	// Convert the big.Float to big.Int (rounding down)
-	bigInt := new(big.Int)
-	flt.Int(bigInt)
-
-	return bigInt, true
+	return floatVal.Text('f', -1) , true
 }
 
 func xPath(query, toMatch string) string {

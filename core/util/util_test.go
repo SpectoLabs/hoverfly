@@ -237,18 +237,18 @@ func Test_CopyMap(t *testing.T) {
 func Test_JsonPathMethod_WithBigFloatingNumber(t *testing.T) {
 
 	RegisterTestingT(t)
-	res := jsonPath("$.registrant", `{"registrant":"13495985898986869898697879879987978978.12345566777"}`)
-	Expect(res).To(Equal("13495985898986869898697879879987978978.12345566777"))
+	res := jsonPath("$.registrant", `{"registrant":2343534534534.345}`)
+	Expect(res).To(Equal("2343534534534.345"))
 }
 
-func Test_JsonPathMethod_WithBigIntegerUserProvidedNumber(t *testing.T) {
+func Test_JsonPathMethod_WithStringContainingLargeNumber(t *testing.T) {
 
 	RegisterTestingT(t)
 	res := jsonPath("$.registrant", `{"registrant":"0009007199254740999"}`)
 	Expect(res).To(Equal("0009007199254740999"))
 }
 
-func Test_JsonPathMethod_WithWordContainingEe(t *testing.T) {
+func Test_JsonPathMethod_WithWordContainingLetterE(t *testing.T) {
 
 	RegisterTestingT(t)
 	res := jsonPath("$.registrant", `{"registrant":"ETest"}`)
