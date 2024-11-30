@@ -234,6 +234,22 @@ func Test_CopyMap(t *testing.T) {
 	Expect(newMap["second"]).To(Equal("2"))
 }
 
+func Test_JsonPathMethod_WithBigFloatingNumber(t *testing.T) {
+
+	RegisterTestingT(t)
+	res := jsonPath(PrepareJsonPathQuery("$.registrant"),
+		`{"registrant":"13495985898986869898697879879987978978.12345566777"}`)
+	Expect(res).To(Equal("13495985898986869898697879879987978978.12345566777"))
+}
+
+func Test_JsonPathMethod_WithBigIntegerNumber(t *testing.T) {
+
+	RegisterTestingT(t)
+	res := jsonPath(PrepareJsonPathQuery("$.registrant"),
+		`{"registrant":"13495985898986869898697879879987978978"}`)
+	Expect(res).To(Equal("13495985898986869898697879879987978978"))
+}
+
 func Test_Identical_ReturnsTrue_WithExactlySameArray(t *testing.T) {
 	RegisterTestingT(t)
 	first := [2]string{"q1", "q2"}
