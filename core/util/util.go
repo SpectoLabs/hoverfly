@@ -14,7 +14,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"k8s.io/client-go/util/jsonpath"
-	"math/big"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -402,14 +401,11 @@ func jsonPath(query, toMatch string) interface{} {
 
 	// Jsonpath library converts large int into a string with scientific notion, the following
 	// reverts that process to avoid mismatching when using the jsonpath result for csv data lookup
-	// Handle large integers in scientific notation by converting back to big.Int
-	if isScientific(result) {
-		// If result is in scientific notation, try converting to a big.Int
-		bigInt := new(big.Int)
-		bigInt, success := bigIntFromString(result)
-		if success {
-			result = bigInt.String() // Convert back to string representation of the big integer
-		}
+	floatResult, err := strconv.ParseFloat(result, 64)
+	// if the string is a float and a whole number
+	if err == nil && floatResult == float64(int64(floatResult)) {
+		intResult := int(floatResult)
+		result = strconv.Itoa(intResult)
 	}
 
 	// convert to array data if applicable
@@ -422,27 +418,6 @@ func jsonPath(query, toMatch string) interface{} {
 		return result
 	}
 	return arrayData
-}
-
-// isScientific checks if a string is in scientific notation (e.g., "1.349599e+37")
-func isScientific(value string) bool {
-	return strings.Contains(value, "e") || strings.Contains(value, "E")
-}
-
-// bigIntFromString converts a string representing a number (potentially in scientific notation) to big.Int
-func bigIntFromString(value string) (*big.Int, bool) {
-	// Parse the string as a big.Float to handle scientific notation
-	flt := new(big.Float)
-	flt, _, err := big.ParseFloat(value, 10, 0, big.ToNearestEven)
-	if err != nil {
-		return nil, false
-	}
-
-	// Convert the big.Float to big.Int (rounding down)
-	bigInt := new(big.Int)
-	flt.Int(bigInt)
-
-	return bigInt, true
 }
 
 func xPath(query, toMatch string) string {
