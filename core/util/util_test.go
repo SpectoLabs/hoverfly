@@ -241,11 +241,11 @@ func Test_JsonPathMethod_WithBigFloatingNumber(t *testing.T) {
 	Expect(res).To(Equal("13495985898986869898697879879987978978.12345566777"))
 }
 
-func Test_JsonPathMethod_WithBigIntegerNumber(t *testing.T) {
+func Test_JsonPathMethod_WithBigIntegerUserProvidedNumber(t *testing.T) {
 
 	RegisterTestingT(t)
-	res := jsonPath("$.registrant", `{"registrant":5553686208582}`)
-	Expect(res).To(Equal(5553686208582))
+	res := jsonPath("$.registrant", `{"registrant":"0009007199254740999"}`)
+	Expect(res).To(Equal("0009007199254740999"))
 }
 
 func Test_JsonPathMethod_WithWordContainingEe(t *testing.T) {
