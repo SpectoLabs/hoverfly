@@ -14,6 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"k8s.io/client-go/util/jsonpath"
+	"math/big"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -399,14 +400,12 @@ func jsonPath(query, toMatch string) interface{} {
 		return ""
 	}
 
-	//// Jsonpath library converts large int into a string with scientific notion, the following
-	//// reverts that process to avoid mismatching when using the jsonpath result for csv data lookup
-	//floatResult, err := strconv.ParseFloat(result, 64)
-	//// if the string is a float and a whole number
-	//if err == nil && floatResult == float64(int64(floatResult)) {
-	//	intResult := int(floatResult)
-	//	result = strconv.Itoa(intResult)
-	//}
+	// Jsonpath library converts large int into a string with scientific notion, the following
+	// reverts that process to avoid mismatching when using the jsonpath result for csv data lookup
+	bigInt := new(big.Int)
+	if _, ok := bigInt.SetString(result, 10); ok {
+		result = fmt.Sprint(bigInt)
+	}
 
 	// convert to array data if applicable
 	var data interface{}
