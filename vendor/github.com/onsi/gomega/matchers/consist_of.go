@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/onsi/gomega/format"
+	"github.com/onsi/gomega/matchers/internal/miter"
 	"github.com/onsi/gomega/matchers/support/goraph/bipartitegraph"
 )
 
@@ -17,8 +18,8 @@ type ConsistOfMatcher struct {
 }
 
 func (matcher *ConsistOfMatcher) Match(actual interface{}) (success bool, err error) {
-	if !isArrayOrSlice(actual) && !isMap(actual) {
-		return false, fmt.Errorf("ConsistOf matcher expects an array/slice/map.  Got:\n%s", format.Object(actual, 1))
+	if !isArrayOrSlice(actual) && !isMap(actual) && !miter.IsIter(actual) {
+		return false, fmt.Errorf("ConsistOf matcher expects an array/slice/map/iter.Seq/iter.Seq2.  Got:\n%s", format.Object(actual, 1))
 	}
 
 	matchers := matchers(matcher.Elements)
@@ -48,18 +49,31 @@ func neighbours(value, matcher interface{}) (bool, error) {
 
 func equalMatchersToElements(matchers []interface{}) (elements []interface{}) {
 	for _, matcher := range matchers {
-		equalMatcher, ok := matcher.(*EqualMatcher)
-		if ok {
-			matcher = equalMatcher.Expected
+		if equalMatcher, ok := matcher.(*EqualMatcher); ok {
+			elements = append(elements, equalMatcher.Expected)
+		} else if _, ok := matcher.(*BeNilMatcher); ok {
+			elements = append(elements, nil)
+		} else {
+			elements = append(elements, matcher)
 		}
-		elements = append(elements, matcher)
 	}
 	return
 }
 
 func flatten(elems []interface{}) []interface{} {
-	if len(elems) != 1 || !isArrayOrSlice(elems[0]) {
+	if len(elems) != 1 ||
+		!(isArrayOrSlice(elems[0]) ||
+			(miter.IsIter(elems[0]) && !miter.IsSeq2(elems[0]))) {
 		return elems
+	}
+
+	if miter.IsIter(elems[0]) {
+		flattened := []any{}
+		miter.IterateV(elems[0], func(v reflect.Value) bool {
+			flattened = append(flattened, v.Interface())
+			return true
+		})
+		return flattened
 	}
 
 	value := reflect.ValueOf(elems[0])
@@ -72,11 +86,13 @@ func flatten(elems []interface{}) []interface{} {
 
 func matchers(expectedElems []interface{}) (matchers []interface{}) {
 	for _, e := range flatten(expectedElems) {
-		matcher, isMatcher := e.(omegaMatcher)
-		if !isMatcher {
-			matcher = &EqualMatcher{Expected: e}
+		if e == nil {
+			matchers = append(matchers, &BeNilMatcher{})
+		} else if matcher, isMatcher := e.(omegaMatcher); isMatcher {
+			matchers = append(matchers, matcher)
+		} else {
+			matchers = append(matchers, &EqualMatcher{Expected: e})
 		}
-		matchers = append(matchers, matcher)
 	}
 	return
 }
@@ -89,9 +105,14 @@ func presentable(elems []interface{}) interface{} {
 	}
 
 	sv := reflect.ValueOf(elems)
-	tt := sv.Index(0).Elem().Type()
+	firstEl := sv.Index(0)
+	if firstEl.IsNil() {
+		return elems
+	}
+	tt := firstEl.Elem().Type()
 	for i := 1; i < sv.Len(); i++ {
-		if sv.Index(i).Elem().Type() != tt {
+		el := sv.Index(i)
+		if el.IsNil() || (sv.Index(i).Elem().Type() != tt) {
 			return elems
 		}
 	}
@@ -107,7 +128,19 @@ func presentable(elems []interface{}) interface{} {
 func valuesOf(actual interface{}) []interface{} {
 	value := reflect.ValueOf(actual)
 	values := []interface{}{}
-	if isMap(actual) {
+	if miter.IsIter(actual) {
+		if miter.IsSeq2(actual) {
+			miter.IterateKV(actual, func(k, v reflect.Value) bool {
+				values = append(values, v.Interface())
+				return true
+			})
+		} else {
+			miter.IterateV(actual, func(v reflect.Value) bool {
+				values = append(values, v.Interface())
+				return true
+			})
+		}
+	} else if isMap(actual) {
 		keys := value.MapKeys()
 		for i := 0; i < value.Len(); i++ {
 			values = append(values, value.MapIndex(keys[i]).Interface())

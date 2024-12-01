@@ -16,7 +16,7 @@ require (
 	github.com/dghubble/sling v1.2.0
 	github.com/dsnet/compress v0.0.0-20171208185109-cc9eb1d7ad76
 	github.com/go-zoo/bone v1.3.0
-	github.com/golang-jwt/jwt/v4 v4.0.0
+	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/gorilla/mux v0.0.0-20160502175624-9c19ed558d5d
 	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/golang-lru v0.5.1
@@ -26,7 +26,7 @@ require (
 	github.com/mitchellh/go-homedir v0.0.0-20161203194507-b8bc1bf76747
 	github.com/olekukonko/tablewriter v0.0.0-20170128050532-febf2d34b54a
 	github.com/onsi/ginkgo v1.16.4
-	github.com/onsi/gomega v1.23.0
+	github.com/onsi/gomega v1.36.0
 	github.com/pborman/uuid v0.0.0-20160216163710-c55201b03606
 	github.com/phayes/freeport v0.0.0-20141201041908-e7681b376149
 	github.com/rakyll/statik v0.1.1-0.20160322004535-2940084503a4
@@ -38,7 +38,7 @@ require (
 	github.com/spf13/viper v0.0.0-20160508180713-d8a428b8a306
 	github.com/tdewolff/minify/v2 v2.12.4
 	github.com/xeipuuv/gojsonschema v0.0.0-20170225172124-ff0417f4272e
-	golang.org/x/crypto v0.26.0
+	golang.org/x/crypto v0.29.0
 	gonum.org/v1/gonum v0.7.0
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/client-go v0.26.1
@@ -50,7 +50,7 @@ require (
 	github.com/corpix/uarand v0.0.0-20170903190822-2b8494104d86 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/goccmack/goutil v1.2.3 // indirect
-	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/go-querystring v0.0.0-20160401233042-9235644dd9e5 // indirect
 	github.com/gorilla/context v0.0.0-20160422134237-a8d44e7d8e4d // indirect
 	github.com/hashicorp/hcl v0.0.0-20160426221300-9a905a34e628 // indirect
@@ -67,10 +67,10 @@ require (
 	github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35 // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20150808065054-e02fc20de94c // indirect
 	golang.org/x/exp v0.0.0-20190312203227-4b39c73a6495 // indirect
-	golang.org/x/net v0.23.0 // indirect
-	golang.org/x/sys v0.23.0 // indirect
-	golang.org/x/term v0.23.0 // indirect
-	golang.org/x/text v0.17.0 // indirect
+	golang.org/x/net v0.31.0 // indirect
+	golang.org/x/sys v0.27.0 // indirect
+	golang.org/x/term v0.26.0 // indirect
+	golang.org/x/text v0.20.0 // indirect
 	gonum.org/v1/netlib v0.0.0-20200317120129-c5a04cffd98a // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
