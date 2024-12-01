@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/templating"
 	"regexp"
+	"sort"
 
 	"github.com/SpectoLabs/hoverfly/core/action"
 	"github.com/SpectoLabs/hoverfly/core/delay"
@@ -465,7 +466,19 @@ func (hf *Hoverfly) GetFilteredDiff(diffFilterView v2.DiffFilterView) map[v2.Sim
 
 func (hf *Hoverfly) GetAllPostServeActions() v2.PostServeActionDetailsView {
 	var actions []v2.ActionView
-	for actionName, action := range hf.PostServeActionDetails.Actions {
+	actionNames := make([]string, 0, len(hf.PostServeActionDetails.Actions))
+
+	// Collect all action names
+	for actionName := range hf.PostServeActionDetails.Actions {
+		actionNames = append(actionNames, actionName)
+	}
+
+	// Sort action names to enforce natural order
+	sort.Strings(actionNames)
+
+	// Append actions in sorted order
+	for _, actionName := range actionNames {
+		action := hf.PostServeActionDetails.Actions[actionName]
 		actions = append(actions, action.GetActionView(actionName))
 	}
 
