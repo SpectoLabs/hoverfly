@@ -24,7 +24,7 @@ func (e Exponential) CDF(x float64) float64 {
 	if x < 0 {
 		return 0
 	}
-	return 1 - math.Exp(-e.Rate*x)
+	return -math.Expm1(-e.Rate * x)
 }
 
 // ConjugateUpdate updates the parameters of the distribution from the sufficient
@@ -38,12 +38,13 @@ func (e Exponential) CDF(x float64) float64 {
 // As a result of this function, Exponential.Rate is updated based on the weighted
 // samples, and priorStrength is modified to include the new number of samples observed.
 //
-// This function panics if len(suffStat) != 1 or len(priorStrength) != 1.
+// This function panics if len(suffStat) != e.NumSuffStat() or
+// len(priorStrength) != e.NumSuffStat().
 func (e *Exponential) ConjugateUpdate(suffStat []float64, nSamples float64, priorStrength []float64) {
-	if len(suffStat) != 1 {
+	if len(suffStat) != e.NumSuffStat() {
 		panic("exponential: incorrect suffStat length")
 	}
-	if len(priorStrength) != 1 {
+	if len(priorStrength) != e.NumSuffStat() {
 		panic("exponential: incorrect priorStrength length")
 	}
 
@@ -137,7 +138,9 @@ func (e Exponential) Rand() float64 {
 // Score returns the score function with respect to the parameters of the
 // distribution at the input location x. The score function is the derivative
 // of the log-likelihood at x with respect to the parameters
-//  (∂/∂θ) log(p(x;θ))
+//
+//	(∂/∂θ) log(p(x;θ))
+//
 // If deriv is non-nil, len(deriv) must equal the number of parameters otherwise
 // Score will panic, and the derivative is stored in-place into deriv. If deriv
 // is nil a new slice will be allocated and returned.
@@ -147,7 +150,8 @@ func (e Exponential) Rand() float64 {
 // For more information, see https://en.wikipedia.org/wiki/Score_%28statistics%29.
 //
 // Special cases:
-//  Score(0) = [NaN]
+//
+//	Score(0) = [NaN]
 func (e Exponential) Score(deriv []float64, x float64) []float64 {
 	if deriv == nil {
 		deriv = make([]float64, e.NumParameters())
@@ -170,9 +174,12 @@ func (e Exponential) Score(deriv []float64, x float64) []float64 {
 // ScoreInput returns the score function with respect to the input of the
 // distribution at the input location specified by x. The score function is the
 // derivative of the log-likelihood
-//  (d/dx) log(p(x)) .
+//
+//	(d/dx) log(p(x)) .
+//
 // Special cases:
-//  ScoreInput(0) = NaN
+//
+//	ScoreInput(0) = NaN
 func (e Exponential) ScoreInput(x float64) float64 {
 	if x > 0 {
 		return -e.Rate

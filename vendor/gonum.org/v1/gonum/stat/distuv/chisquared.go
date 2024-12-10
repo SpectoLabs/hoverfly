@@ -16,7 +16,9 @@ import (
 // with support on the positive numbers.
 //
 // The density function is given by
-//  1/(2^{k/2} * Γ(k/2)) * x^{k/2 - 1} * e^{-x/2}
+//
+//	1/(2^{k/2} * Γ(k/2)) * x^{k/2 - 1} * e^{-x/2}
+//
 // It is a special case of the Gamma distribution, Γ(k/2, 1/2).
 //
 // For more information, see https://en.wikipedia.org/wiki/Chi-squared_distribution.
@@ -55,7 +57,7 @@ func (c ChiSquared) Mean() float64 {
 
 // Mode returns the mode of the distribution.
 func (c ChiSquared) Mode() float64 {
-	return math.Min(c.K-2, 0)
+	return math.Max(c.K-2, 0)
 }
 
 // NumParameters returns the number of parameters in the distribution.

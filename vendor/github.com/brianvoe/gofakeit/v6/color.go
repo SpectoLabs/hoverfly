@@ -1,6 +1,10 @@
 package gofakeit
 
-import "math/rand"
+import (
+	"math/rand"
+
+	"github.com/brianvoe/gofakeit/v6/data"
+)
 
 // Color will generate a random color string
 func Color() string { return color(globalFaker.Rand) }
@@ -9,6 +13,16 @@ func Color() string { return color(globalFaker.Rand) }
 func (f *Faker) Color() string { return color(f.Rand) }
 
 func color(r *rand.Rand) string { return getRandValue(r, []string{"color", "full"}) }
+
+// NiceColor will generate a random safe color string
+func NiceColors() []string { return niceColors(globalFaker.Rand) }
+
+// NiceColor will generate a random safe color string
+func (f *Faker) NiceColors() []string { return niceColors(f.Rand) }
+
+func niceColors(r *rand.Rand) []string {
+	return data.ColorsNice[randIntRange(r, 0, len(data.ColorsNice)-1)]
+}
 
 // SafeColor will generate a random safe color string
 func SafeColor() string { return safeColor(globalFaker.Rand) }
@@ -48,10 +62,22 @@ func addColorLookup() {
 	AddFuncLookup("color", Info{
 		Display:     "Color",
 		Category:    "color",
-		Description: "Random color",
+		Description: "Hue seen by the eye, returns the name of the color like red or blue",
 		Example:     "MediumOrchid",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
+			return color(r), nil
+		},
+	})
+
+	AddFuncLookup("nicecolors", Info{
+		Display:     "Nice Colors",
+		Category:    "color",
+		Description: "Attractive and appealing combinations of colors, returns an list of color hex codes",
+		Example:     `["#cfffdd","#b4dec1","#5c5863","#a85163","#ff1f4c"]`,
+		Output:      "[]string",
+		ContentType: "application/json",
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return color(r), nil
 		},
 	})
@@ -59,10 +85,10 @@ func addColorLookup() {
 	AddFuncLookup("safecolor", Info{
 		Display:     "Safe Color",
 		Category:    "color",
-		Description: "Random safe color",
+		Description: "Colors displayed consistently on different web browsers and devices",
 		Example:     "black",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return safeColor(r), nil
 		},
 	})
@@ -70,10 +96,10 @@ func addColorLookup() {
 	AddFuncLookup("hexcolor", Info{
 		Display:     "Hex Color",
 		Category:    "color",
-		Description: "Random hex color",
+		Description: "Six-digit code representing a color in the color model",
 		Example:     "#a99fb4",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return hexColor(r), nil
 		},
 	})
@@ -81,10 +107,11 @@ func addColorLookup() {
 	AddFuncLookup("rgbcolor", Info{
 		Display:     "RGB Color",
 		Category:    "color",
-		Description: "Random rgb color",
-		Example:     "[152 23 53]",
-		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Description: "Color defined by red, green, and blue light values",
+		Example:     "[85, 224, 195]",
+		Output:      "[]int",
+		ContentType: "application/json",
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return rgbColor(r), nil
 		},
 	})

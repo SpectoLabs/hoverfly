@@ -17,12 +17,14 @@ import (
 // that expresses the probability of a given number of successful Bernoulli trials
 // out of a total of n, each with success probability p.
 // The binomial distribution has the density function:
-//  f(k) = (n choose k) p^k (1-p)^(n-k)
+//
+//	f(k) = (n choose k) p^k (1-p)^(n-k)
+//
 // For more information, see https://en.wikipedia.org/wiki/Binomial_distribution.
 type Binomial struct {
 	// N is the total number of Bernoulli trials. N must be greater than 0.
 	N float64
-	// P is the probablity of success in any given trial. P must be in [0, 1].
+	// P is the probability of success in any given trial. P must be in [0, 1].
 	P float64
 
 	Src rand.Source
@@ -138,7 +140,7 @@ func (b Binomial) Rand() float64 {
 	// appropriate expected value. However, the Poisson approximation is
 	// asymptotic such that the absolute deviation in probability is O(1/n).
 	// Rejection sampling produces exact variates with at worst less than 3%
-	// rejection with miminal additional computation.
+	// rejection with minimal additional computation.
 
 	// Use rejection method with Cauchy proposal.
 	g, _ := math.Lgamma(b.N + 1)

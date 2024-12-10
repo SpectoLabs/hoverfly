@@ -7,6 +7,8 @@ package mat
 import (
 	"gonum.org/v1/gonum/blas"
 	"gonum.org/v1/gonum/blas/blas64"
+	"gonum.org/v1/gonum/lapack"
+	"gonum.org/v1/gonum/lapack/lapack64"
 )
 
 var (
@@ -97,7 +99,7 @@ func (m *Dense) reuseAsNonZeroed(r, c int) {
 	// reuseAs must be kept in sync with reuseAsZeroed.
 	if m.mat.Rows > m.capRows || m.mat.Cols > m.capCols {
 		// Panic as a string, not a mat.Error.
-		panic("mat: caps not correctly set")
+		panic(badCap)
 	}
 	if r == 0 || c == 0 {
 		panic(ErrZeroLength)
@@ -125,7 +127,7 @@ func (m *Dense) reuseAsZeroed(r, c int) {
 	// reuseAsZeroed must be kept in sync with reuseAsNonZeroed.
 	if m.mat.Rows > m.capRows || m.mat.Cols > m.capCols {
 		// Panic as a string, not a mat.Error.
-		panic("mat: caps not correctly set")
+		panic(badCap)
 	}
 	if r == 0 || c == 0 {
 		panic(ErrZeroLength)
@@ -164,10 +166,10 @@ func (m *Dense) isolatedWorkspace(a Matrix) (w *Dense, restore func()) {
 	if r == 0 || c == 0 {
 		panic(ErrZeroLength)
 	}
-	w = getWorkspace(r, c, false)
+	w = getDenseWorkspace(r, c, false)
 	return w, func() {
 		m.Copy(w)
-		putWorkspace(w)
+		putDenseWorkspace(w)
 	}
 }
 
@@ -571,11 +573,17 @@ func (m *Dense) Augment(a, b Matrix) {
 	w.Copy(b)
 }
 
-// Trace returns the trace of the matrix. The matrix must be square or Trace
-// will panic.
+// Trace returns the trace of the matrix.
+//
+// Trace will panic with ErrSquare if the matrix is not square and with
+// ErrZeroLength if the matrix has zero size.
 func (m *Dense) Trace() float64 {
-	if m.mat.Rows != m.mat.Cols {
+	r, c := m.Dims()
+	if r != c {
 		panic(ErrSquare)
+	}
+	if m.IsEmpty() {
+		panic(ErrZeroLength)
 	}
 	// TODO(btracey): could use internal asm sum routine.
 	var v float64
@@ -583,4 +591,80 @@ func (m *Dense) Trace() float64 {
 		v += m.mat.Data[i*m.mat.Stride+i]
 	}
 	return v
+}
+
+// Norm returns the specified norm of the receiver. Valid norms are:
+//
+//	1 - The maximum absolute column sum
+//	2 - The Frobenius norm, the square root of the sum of the squares of the elements
+//	Inf - The maximum absolute row sum
+//
+// Norm will panic with ErrNormOrder if an illegal norm is specified and with
+// ErrShape if the matrix has zero size.
+func (m *Dense) Norm(norm float64) float64 {
+	if m.IsEmpty() {
+		panic(ErrZeroLength)
+	}
+	lnorm := normLapack(norm, false)
+	if lnorm == lapack.MaxColumnSum {
+		work := getFloat64s(m.mat.Cols, false)
+		defer putFloat64s(work)
+		return lapack64.Lange(lnorm, m.mat, work)
+	}
+	return lapack64.Lange(lnorm, m.mat, nil)
+}
+
+// Permutation constructs an n×n permutation matrix P from the given
+// row permutation such that the nonzero entries are P[i,p[i]] = 1.
+func (m *Dense) Permutation(n int, p []int) {
+	if len(p) != n {
+		panic(badSliceLength)
+	}
+	m.reuseAsZeroed(n, n)
+	for i, v := range p {
+		if v < 0 || v >= n {
+			panic(ErrRowAccess)
+		}
+		m.mat.Data[i*m.mat.Stride+v] = 1
+	}
+}
+
+// PermuteRows rearranges the rows of the m×n matrix A in the receiver as
+// specified by the permutation p[0],p[1],...,p[m-1] of the integers 0,...,m-1.
+//
+// If inverse is false, the given permutation is applied:
+//
+//	A[p[i],0:n] is moved to A[i,0:n] for i=0,1,...,m-1.
+//
+// If inverse is true, the inverse permutation is applied:
+//
+//	A[i,0:n] is moved to A[p[i],0:n] for i=0,1,...,m-1.
+//
+// p must have length m, otherwise PermuteRows will panic.
+func (m *Dense) PermuteRows(p []int, inverse bool) {
+	r, _ := m.Dims()
+	if len(p) != r {
+		panic(badSliceLength)
+	}
+	lapack64.Lapmr(!inverse, m.mat, p)
+}
+
+// PermuteCols rearranges the columns of the m×n matrix A in the reciever as
+// specified by the permutation p[0],p[1],...,p[n-1] of the integers 0,...,n-1.
+//
+// If inverse is false, the given permutation is applied:
+//
+//	A[0:m,p[j]] is moved to A[0:m,j] for j = 0, 1, ..., n-1.
+//
+// If inverse is true, the inverse permutation is applied:
+//
+//	A[0:m,j] is moved to A[0:m,p[j]] for j = 0, 1, ..., n-1.
+//
+// p must have length n, otherwise PermuteCols will panic.
+func (m *Dense) PermuteCols(p []int, inverse bool) {
+	_, c := m.Dims()
+	if len(p) != c {
+		panic(badSliceLength)
+	}
+	lapack64.Lapmt(!inverse, m.mat, p)
 }

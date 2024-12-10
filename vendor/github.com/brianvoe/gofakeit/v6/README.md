@@ -1,23 +1,34 @@
 ![alt text](https://raw.githubusercontent.com/brianvoe/gofakeit/master/logo.png)
 
-# Gofakeit [![Go Report Card](https://goreportcard.com/badge/github.com/brianvoe/gofakeit)](https://goreportcard.com/report/github.com/brianvoe/gofakeit) ![Test](https://github.com/brianvoe/gofakeit/workflows/Test/badge.svg?branch=master) [![codecov.io](https://codecov.io/github/brianvoe/gofakeit/branch/master/graph/badge.svg)](https://codecov.io/github/brianvoe/gofakeit) [![GoDoc](https://godoc.org/github.com/brianvoe/gofakeit/v6?status.svg)](https://godoc.org/github.com/brianvoe/gofakeit/v6) [![license](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/brianvoe/gofakeit/master/LICENSE.txt)
+# Gofakeit [![Go Report Card](https://goreportcard.com/badge/github.com/brianvoe/gofakeit)](https://goreportcard.com/report/github.com/brianvoe/gofakeit) ![Test](https://github.com/brianvoe/gofakeit/workflows/Test/badge.svg?branch=master) [![GoDoc](https://godoc.org/github.com/brianvoe/gofakeit/v6?status.svg)](https://godoc.org/github.com/brianvoe/gofakeit/v6) [![license](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/brianvoe/gofakeit/master/LICENSE.txt)
 
 Random data generator written in go
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G0R5EJT)
 
 <a href="https://www.buymeacoffee.com/brianvoe" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
 
 ## Features
 
-- [160+ Functions!!!](#functions)
+- [310+ Functions!!!](#functions)
 - [Random Sources](#random-sources)
 - [Global Rand](#global-rand-set)
 - [Struct Generator](#struct)
 - [Custom Functions](#custom-functions)
+- [Templates](#templates)
 - [Http Server](https://github.com/brianvoe/gofakeit/tree/master/cmd/gofakeitserver)
 - [Command Line Tool](https://github.com/brianvoe/gofakeit/tree/master/cmd/gofakeit)
 - Zero dependencies
 - [Benchmarks](https://github.com/brianvoe/gofakeit/blob/master/BENCHMARKS.md)
 - [Issue](https://github.com/brianvoe/gofakeit/issues)
+
+## Contributors
+
+Thank you to all our Gofakeit contributors!
+
+<a href="https://github.com/brianvoe/gofakeit/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=brianvoe/gofakeit" />
+</a>
 
 ## Installation
 
@@ -101,7 +112,7 @@ gofakeit.SetGlobalFaker(faker)
 ## Struct
 
 Gofakeit can generate random data for struct fields. For the most part it covers all the basic type
-as well as some non basic like time.Time.
+as well as some non-basic like time.Time.
 
 Struct fields can also use tags to more specifically generate data for that field type.
 
@@ -110,20 +121,22 @@ import "github.com/brianvoe/gofakeit/v6"
 
 // Create structs with random injected data
 type Foo struct {
-	Str      string
-	Int      int
-	Pointer  *int
-	Name     string         `fake:"{firstname}"`         // Any available function all lowercase
-	Sentence string         `fake:"{sentence:3}"`        // Can call with parameters
-	RandStr  string         `fake:"{randomstring:[hello,world]}"`
-	Number   string         `fake:"{number:1,10}"`       // Comma separated for multiple values
-	Regex    string         `fake:"{regex:[abcdef]{5}}"` // Generate string from regex
-	Map      map[string]int `fakesize:"2"`
-	Array    []string       `fakesize:"2"`
-	Bar 	 Bar
-	Skip     *string        `fake:"skip"`                // Set to "skip" to not generate data for
-	Created  time.Time								     // Can take in a fake tag as well as a format tag
-	CreatedFormat  time.Time `fake:"{year}-{month}-{day}" format:"2006-01-02"`
+	Str           string
+	Int           int
+	Pointer       *int
+	Name          string         `fake:"{firstname}"`         // Any available function all lowercase
+	Sentence      string         `fake:"{sentence:3}"`        // Can call with parameters
+	RandStr       string         `fake:"{randomstring:[hello,world]}"`
+	Number        string         `fake:"{number:1,10}"`       // Comma separated for multiple values
+	Regex         string         `fake:"{regex:[abcdef]{5}}"` // Generate string from regex
+	Map           map[string]int `fakesize:"2"`
+	Array         []string       `fakesize:"2"`
+	ArrayRange    []string       `fakesize:"2,6"`
+    Bar           Bar
+	Skip          *string        `fake:"skip"`                // Set to "skip" to not generate data for
+	SkipAlt       *string        `fake:"-"`                   // Set to "-" to not generate data for
+	Created       time.Time                                   // Can take in a fake tag as well as a format tag
+	CreatedFormat time.Time      `fake:"{year}-{month}-{day}" format:"2006-01-02"`
 }
 
 type Bar struct {
@@ -157,12 +170,53 @@ fmt.Println(f.Created.String()) // 1908-12-07 04:14:25.685339029 +0000 UTC
 // bool, string,
 // array, pointers, map
 // time.Time // If setting time you can also set a format tag
-// Nested Struct Fields and Embeded Fields
+// Nested Struct Fields and Embedded Fields
+```
+
+## Fakeable types
+
+It is possible to extend a struct by implementing the `Fakeable` interface
+in order to control the generation.
+
+For example, this is useful when it is not possible to modify the struct that you want to fake by adding struct tags to a field but you still need to be able to control the generation process.
+
+```go
+// Custom string that you want to generate your own data for
+// or just return a static value
+type CustomString string
+
+func (c *CustomString) Fake(faker *gofakeit.Faker) (any, error) {
+	return CustomString("my custom string")
+}
+
+// Imagine a CustomTime type that is needed to support a custom JSON Marshaler
+type CustomTime time.Time
+
+func (c *CustomTime) Fake(faker *gofakeit.Faker) (any, error) {
+	return CustomTime(time.Now())
+}
+
+func (c *CustomTime) MarshalJSON() ([]byte, error) {
+	//...
+}
+
+// This is the struct that we cannot modify to add struct tags
+type NotModifiable struct {
+	Token string
+	Value CustomString
+	Creation *CustomTime
+}
+
+var f NotModifiable
+gofakeit.Struct(&f)
+fmt.Printf("%s", f.Token) // yvqqdH
+fmt.Printf("%s", f.Value) // my custom string
+fmt.Printf("%s", f.Creation) // 2023-04-02 23:00:00 +0000 UTC m=+0.000000001
 ```
 
 ## Custom Functions
 
-In a lot of sitations you may need to use your own random function usage for your specific needs.
+In a lot of situations you may need to use your own random function usage for your specific needs.
 
 If you would like to extend the usage of struct tags, generate function, available usages in the gofakeit server
 or gofakeit command sub packages. You can do so via the AddFuncLookup. Each function has their own lookup, if
@@ -170,33 +224,33 @@ you need more reference examples you can look at each files lookups.
 
 ```go
 // Simple
-gofakeit.AddFuncLookup("friendname", Info{
+gofakeit.AddFuncLookup("friendname", gofakeit.Info{
 	Category:    "custom",
 	Description: "Random friend name",
 	Example:     "bill",
 	Output:      "string",
-	Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
-		return RandomString([]string{"bill", "bob", "sally"}), nil
+	Generate: func(r *rand.Rand, m *gofakeit.MapParams, info *gofakeit.Info) (any, error) {
+		return gofakeit.RandomString([]string{"bill", "bob", "sally"}), nil
 	},
 })
 
 // With Params
-gofakeit.AddFuncLookup("jumbleword", Info{
+gofakeit.AddFuncLookup("jumbleword", gofakeit.Info{
 	Category:    "jumbleword",
-	Description: "Take a word and jumple it up",
+	Description: "Take a word and jumble it up",
 	Example:     "loredlowlh",
 	Output:      "string",
-	Params: []Param{
+	Params: []gofakeit.Param{
 		{Field: "word", Type: "string", Description: "Word you want to jumble"},
 	},
-	Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+	Generate: func(r *rand.Rand, m *gofakeit.MapParams, info *gofakeit.Info) (any, error) {
 		word, err := info.GetString(m, "word")
 		if err != nil {
 			return nil, err
 		}
 
 		split := strings.Split(word, "")
-		ShuffleStrings(split)
+		gofakeit.ShuffleStrings(split)
 		return strings.Join(split, ""), nil
 	},
 })
@@ -212,17 +266,123 @@ fmt.Printf("%s", f.FriendName) // bill
 fmt.Printf("%s", f.JumbleWord) // loredlowlh
 ```
 
+## Templates
+
+Generate custom outputs using golang's template engine [https://pkg.go.dev/text/template](https://pkg.go.dev/text/template).
+
+We have added all the available functions to the template engine as well as some additional ones that are useful for template building.
+
+Additional Available Functions
+```go
+- ToUpper(s string) string   // Make string upper case
+- ToLower(s string) string   // Make string lower case
+- ToString(s any)            // Convert to string
+- ToDate(s string) time.Time // Convert string to date
+- SpliceAny(args ...any) []any // Build a slice of anys, used with Weighted
+- SpliceString(args ...string) []string // Build a slice of strings, used with Teams and RandomString
+- SpliceUInt(args ...uint) []uint // Build a slice of uint, used with Dice and RandomUint
+- SpliceInt(args ...int) []int // Build a slice of int, used with RandomInt
+```
+
+<details>
+  <summary>Unavailable Gofakeit functions</summary>
+
+```go
+// Any functions that dont have a return value
+- AnythingThatReturnsVoid(): void
+
+// Not available to use in templates
+- Template(co *TemplateOptions) ([]byte, error)
+- RandomMapKey(mapI any) any
+```
+</details>
+
+
+### Example Usages
+
+```go
+import "github.com/brianvoe/gofakeit/v6"
+
+func main() {
+	// Accessing the Lines variable from within the template.
+	template := `
+	Subject: {{RandomString (SliceString "Greetings" "Hello" "Hi")}}
+
+	Dear {{LastName}},
+
+	{{RandomString (SliceString "Greetings!" "Hello there!" "Hi, how are you?")}}
+
+	{{Paragraph 1 5 10 "\n\n"}}
+
+	{{RandomString (SliceString "Warm regards" "Best wishes" "Sincerely")}}
+	{{$person:=Person}}
+	{{$person.FirstName}} {{$person.LastName}}
+	{{$person.Email}}
+	{{$person.Phone}}
+	`
+
+	value, err := gofakeit.Template(template, &TemplateOptions{Data: 5})
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(string(value))
+}
+```
+
+Output:
+```text
+Subject: Hello
+
+Dear Krajcik,
+
+Greetings!
+
+Quia voluptatem voluptatem voluptatem. Quia voluptatem voluptatem voluptatem. Quia voluptatem voluptatem voluptatem.
+
+Warm regards
+Kaitlyn Krajcik
+kaitlynkrajcik@krajcik
+570-245-7485
+```
+
 ## Functions
 
 All functions also exist as methods on the Faker struct
 
 ### File
 
+Passing `nil` to `CSV`, `JSON` or `XML` will auto generate data using default values.
+
 ```go
+CSV(co *CSVOptions) ([]byte, error)
 JSON(jo *JSONOptions) ([]byte, error)
 XML(xo *XMLOptions) ([]byte, error)
 FileExtension() string
 FileMimeType() string
+```
+
+### Template
+
+Passing `nil` will auto generate data using default values.
+
+```go
+Template(co *TemplateOptions) (string, error)
+Markdown(co *MarkdownOptions) (string, error)
+EmailText(co *EmailOptions) (string, error)
+FixedWidth(co *FixedWidthOptions) (string, error)
+```
+
+### Product
+
+```go
+Product() *ProductInfo
+ProductName() string
+ProductDescription() string
+ProductCategory() string
+ProductFeature() string
+ProductMaterial() string
 ```
 
 ### Person
@@ -233,6 +393,7 @@ Name() string
 NamePrefix() string
 NameSuffix() string
 FirstName() string
+MiddleName() string
 LastName() string
 Gender() string
 SSN() string
@@ -247,9 +408,9 @@ Teams(peopleArray []string, teamsArray []string) map[string][]string
 ### Generate
 
 ```go
-Struct(v interface{})
-Slice(v interface{})
-Map() map[string]interface{}
+Struct(v any)
+Slice(v any)
+Map() map[string]any
 Generate(value string) string
 Regex(value string) string
 ```
@@ -315,9 +476,8 @@ CarTransmissionType() string
 
 ### Words
 
-#### Noun
-
 ```go
+// Nouns
 Noun() string
 NounCommon() string
 NounConcrete() string
@@ -327,20 +487,14 @@ NounCollectiveAnimal() string
 NounCollectiveThing() string
 NounCountable() string
 NounUncountable() string
-```
 
-#### Verb
-
-```go
+// Verbs
 Verb() string
 VerbAction() string
 VerbLinking() string
 VerbHelping() string
-```
 
-#### Adverb
-
-```go
+// Adverbs
 Adverb() string
 AdverbManner() string
 AdverbDegree() string
@@ -349,20 +503,14 @@ AdverbTimeDefinite() string
 AdverbTimeIndefinite() string
 AdverbFrequencyDefinite() string
 AdverbFrequencyIndefinite() string
-```
 
-#### Proposition
-
-```go
+// Propositions
 Preposition() string
 PrepositionSimple() string
 PrepositionDouble() string
 PrepositionCompound() string
-```
 
-#### Adjective
-
-```go
+// Adjectives
 Adjective() string
 AdjectiveDescriptive() string
 AdjectiveQuantitative() string
@@ -371,24 +519,18 @@ AdjectiveDemonstrative() string
 AdjectivePossessive() string
 AdjectiveInterrogative() string
 AdjectiveIndefinite() string
-```
 
-#### Pronoun
-
-```go
+// Pronouns
 Pronoun() string
 PronounPersonal() string
 PronounObject() string
-PronounPosessive() string
+PronounPossessive() string
 PronounReflective() string
 PronounDemonstrative() string
 PronounInterrogative() string
 PronounRelative() string
-```
 
-#### Connective
-
-```go
+// Connectives
 Connective() string
 ConnectiveTime() string
 ConnectiveComparative() string
@@ -396,17 +538,11 @@ ConnectiveComplaint() string
 ConnectiveListing() string
 ConnectiveCasual() string
 ConnectiveExamplify() string
-```
 
-#### Word
-
-```go
+// Words
 Word() string
-```
 
-#### Sentences
-
-```go
+// Sentences
 Sentence(wordCount int) string
 Paragraph(paragraphCount int, sentenceCount int, wordCount int, separator string) string
 LoremIpsumWord() string
@@ -434,9 +570,10 @@ Dessert() string
 ```go
 Bool() bool
 UUID() string
+Weighted(options []any, weights []float32) (any, error)
 FlipACoin() string
-RandomMapKey(mapI interface{}) interface{}
-ShuffleAnySlice(v interface{})
+RandomMapKey(mapI any) any
+ShuffleAnySlice(v any)
 ```
 
 ### Colors
@@ -446,6 +583,16 @@ Color() string
 HexColor() string
 RGBColor() []int
 SafeColor() string
+NiceColors() string
+```
+
+### Images
+
+```go
+ImageURL(width int, height int) string
+Image(width int, height int) *img.RGBA
+ImageJpeg(width int, height int) []byte
+ImagePng(width int, height int) []byte
 ```
 
 ### Internet
@@ -469,10 +616,19 @@ OperaUserAgent() string
 SafariUserAgent() string
 ```
 
+### HTML
+
+```go
+InputName() string
+Svg(options *SVGOptions) string
+```
+
 ### Date/Time
 
 ```go
 Date() time.Time
+PastDate() time.Time
+FutureDate() time.Time
 DateRange(start, end time.Time) time.Time
 NanoSecond() int
 Second() int
@@ -508,10 +664,18 @@ BitcoinAddress() string
 BitcoinPrivateKey() string
 ```
 
+### Finance
+
+```go
+Cusip() string
+Isin() string
+```
+
 ### Company
 
 ```go
 BS() string
+Blurb() string
 BuzzWord() string
 Company() string
 CompanySuffix() string
@@ -519,6 +683,7 @@ Job() *JobInfo
 JobDescriptor() string
 JobLevel() string
 JobTitle() string
+Slogan() string
 ```
 
 ### Hacker
@@ -557,6 +722,7 @@ AnimalType() string
 FarmAnimal() string
 Cat() string
 Dog() string
+Bird() string
 ```
 
 ### Emoji
@@ -646,4 +812,40 @@ MinecraftMobHostile() string
 MinecraftMobBoss() string
 MinecraftBiome() string
 MinecraftWeather() string
+```
+
+### Book
+
+```go
+Book() *BookInfo
+BookTitle() string
+BookAuthor() string
+BookGenre() string
+```
+
+### Movie
+
+```go
+Movie() *MovieInfo
+MovieName() string
+MovieGenre() string
+```
+
+### Error
+
+```go
+Error() error
+ErrorDatabase() error
+ErrorGRPC() error
+ErrorHTTP() error
+ErrorHTTPClient() error
+ErrorHTTPServer() error
+ErrorInput() error
+ErrorRuntime() error
+```
+
+### School
+
+```go
+School() string
 ```

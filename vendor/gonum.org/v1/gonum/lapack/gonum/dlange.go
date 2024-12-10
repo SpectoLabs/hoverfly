@@ -11,10 +11,12 @@ import (
 )
 
 // Dlange returns the value of the specified norm of a general m×n matrix A:
-//  lapack.MaxAbs:       the maximum absolute value of any element.
-//  lapack.MaxColumnSum: the maximum column sum of the absolute values of the elements (1-norm).
-//  lapack.MaxRowSum:    the maximum row sum of the absolute values of the elements (infinity-norm).
-//  lapack.Frobenius:    the square root of the sum of the squares of the elements (Frobenius norm).
+//
+//	lapack.MaxAbs:       the maximum absolute value of any element.
+//	lapack.MaxColumnSum: the maximum column sum of the absolute values of the elements (1-norm).
+//	lapack.MaxRowSum:    the maximum row sum of the absolute values of the elements (infinity-norm).
+//	lapack.Frobenius:    the square root of the sum of the squares of the elements (Frobenius norm).
+//
 // If norm == lapack.MaxColumnSum, work must be of length n, and this function will
 // panic otherwise. There are no restrictions on work for the other matrix norms.
 func (impl Implementation) Dlange(norm lapack.MatrixNorm, m, n int, a []float64, lda int, work []float64) float64 {
@@ -80,8 +82,7 @@ func (impl Implementation) Dlange(norm lapack.MatrixNorm, m, n int, a []float64,
 		scale := 0.0
 		sum := 1.0
 		for i := 0; i < m; i++ {
-			rowscale, rowsum := impl.Dlassq(n, a[i*lda:], 1, 0, 1)
-			scale, sum = impl.Dcombssq(scale, sum, rowscale, rowsum)
+			scale, sum = impl.Dlassq(n, a[i*lda:], 1, scale, sum)
 		}
 		return scale * math.Sqrt(sum)
 	}

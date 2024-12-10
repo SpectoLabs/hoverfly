@@ -7,65 +7,63 @@ import (
 	"github.com/robertkrimen/otto/file"
 )
 
-type _exception struct {
+type exception struct {
 	value interface{}
 }
 
-func newException(value interface{}) *_exception {
-	return &_exception{
+func newException(value interface{}) *exception {
+	return &exception{
 		value: value,
 	}
 }
 
-func (self *_exception) eject() interface{} {
-	value := self.value
-	self.value = nil // Prevent Go from holding on to the value, whatever it is
+func (e *exception) eject() interface{} {
+	value := e.value
+	e.value = nil // Prevent Go from holding on to the value, whatever it is
 	return value
 }
 
-type _error struct {
+type ottoError struct {
 	name    string
 	message string
-	trace   []_frame
+	trace   []frame
 
 	offset int
 }
 
-func (err _error) format() string {
-	if len(err.name) == 0 {
-		return err.message
+func (e ottoError) format() string {
+	if len(e.name) == 0 {
+		return e.message
 	}
-	if len(err.message) == 0 {
-		return err.name
+	if len(e.message) == 0 {
+		return e.name
 	}
-	return fmt.Sprintf("%s: %s", err.name, err.message)
+	return fmt.Sprintf("%s: %s", e.name, e.message)
 }
 
-func (err _error) formatWithStack() string {
-	str := err.format() + "\n"
-	for _, frame := range err.trace {
-		str += "    at " + frame.location() + "\n"
+func (e ottoError) formatWithStack() string {
+	str := e.format() + "\n"
+	for _, frm := range e.trace {
+		str += "    at " + frm.location() + "\n"
 	}
 	return str
 }
 
-type _frame struct {
-	native     bool
-	nativeFile string
-	nativeLine int
-	file       *file.File
-	offset     int
-	callee     string
+type frame struct {
 	fn         interface{}
+	file       *file.File
+	nativeFile string
+	callee     string
+	nativeLine int
+	offset     int
+	native     bool
 }
 
-var (
-	nativeFrame = _frame{}
-)
+var nativeFrame = frame{}
 
-type _at int
+type at int
 
-func (fr _frame) location() string {
+func (fr frame) location() string {
 	str := "<unknown>"
 
 	switch {
@@ -95,48 +93,52 @@ func (fr _frame) location() string {
 
 // An Error represents a runtime error, e.g. a TypeError, a ReferenceError, etc.
 type Error struct {
-	_error
+	ottoError
 }
 
 // Error returns a description of the error
 //
-//    TypeError: 'def' is not a function
-//
-func (err Error) Error() string {
-	return err.format()
+//	TypeError: 'def' is not a function
+func (e Error) Error() string {
+	return e.format()
 }
 
 // String returns a description of the error and a trace of where the
 // error occurred.
 //
-//    TypeError: 'def' is not a function
-//        at xyz (<anonymous>:3:9)
-//        at <anonymous>:7:1/
-//
-func (err Error) String() string {
-	return err.formatWithStack()
+//	TypeError: 'def' is not a function
+//	    at xyz (<anonymous>:3:9)
+//	    at <anonymous>:7:1/
+func (e Error) String() string {
+	return e.formatWithStack()
 }
 
-func (err _error) describe(format string, in ...interface{}) string {
+// GoString returns a description of the error and a trace of where the
+// error occurred. Printing with %#v will trigger this behaviour.
+func (e Error) GoString() string {
+	return e.formatWithStack()
+}
+
+func (e ottoError) describe(format string, in ...interface{}) string {
 	return fmt.Sprintf(format, in...)
 }
 
-func (self _error) messageValue() Value {
-	if self.message == "" {
+func (e ottoError) messageValue() Value {
+	if e.message == "" {
 		return Value{}
 	}
-	return toValue_string(self.message)
+	return stringValue(e.message)
 }
 
-func (rt *_runtime) typeErrorResult(throw bool) bool {
+func (rt *runtime) typeErrorResult(throw bool) bool {
 	if throw {
 		panic(rt.panicTypeError())
 	}
 	return false
 }
 
-func newError(rt *_runtime, name string, stackFramesToPop int, in ...interface{}) _error {
-	err := _error{
+func newError(rt *runtime, name string, stackFramesToPop int, in ...interface{}) ottoError {
+	err := ottoError{
 		name:   name,
 		offset: -1,
 	}
@@ -144,21 +146,21 @@ func newError(rt *_runtime, name string, stackFramesToPop int, in ...interface{}
 	length := len(in)
 
 	if rt != nil && rt.scope != nil {
-		scope := rt.scope
+		curScope := rt.scope
 
-		for i := 0; i < stackFramesToPop; i++ {
-			if scope.outer != nil {
-				scope = scope.outer
+		for range stackFramesToPop {
+			if curScope.outer != nil {
+				curScope = curScope.outer
 			}
 		}
 
-		frame := scope.frame
+		frm := curScope.frame
 
 		if length > 0 {
-			if at, ok := in[length-1].(_at); ok {
+			if atv, ok := in[length-1].(at); ok {
 				in = in[0 : length-1]
-				if scope != nil {
-					frame.offset = int(at)
+				if curScope != nil {
+					frm.offset = int(atv)
 				}
 				length--
 			}
@@ -169,54 +171,52 @@ func newError(rt *_runtime, name string, stackFramesToPop int, in ...interface{}
 
 		limit := rt.traceLimit
 
-		err.trace = append(err.trace, frame)
-		if scope != nil {
-			for scope = scope.outer; scope != nil; scope = scope.outer {
+		err.trace = append(err.trace, frm)
+		if curScope != nil {
+			for curScope = curScope.outer; curScope != nil; curScope = curScope.outer {
 				if limit--; limit == 0 {
 					break
 				}
 
-				if scope.frame.offset >= 0 {
-					err.trace = append(err.trace, scope.frame)
+				if curScope.frame.offset >= 0 {
+					err.trace = append(err.trace, curScope.frame)
 				}
 			}
 		}
-	} else {
-		if length > 0 {
-			description, in = in[0].(string), in[1:]
-		}
+	} else if length > 0 {
+		description, in = in[0].(string), in[1:]
 	}
 	err.message = err.describe(description, in...)
 
 	return err
 }
 
-func (rt *_runtime) panicTypeError(argumentList ...interface{}) *_exception {
-	return &_exception{
+func (rt *runtime) panicTypeError(argumentList ...interface{}) *exception {
+	return &exception{
 		value: newError(rt, "TypeError", 0, argumentList...),
 	}
 }
 
-func (rt *_runtime) panicReferenceError(argumentList ...interface{}) *_exception {
-	return &_exception{
+func (rt *runtime) panicReferenceError(argumentList ...interface{}) *exception {
+	return &exception{
 		value: newError(rt, "ReferenceError", 0, argumentList...),
 	}
 }
 
-func (rt *_runtime) panicURIError(argumentList ...interface{}) *_exception {
-	return &_exception{
+func (rt *runtime) panicURIError(argumentList ...interface{}) *exception {
+	return &exception{
 		value: newError(rt, "URIError", 0, argumentList...),
 	}
 }
 
-func (rt *_runtime) panicSyntaxError(argumentList ...interface{}) *_exception {
-	return &_exception{
+func (rt *runtime) panicSyntaxError(argumentList ...interface{}) *exception {
+	return &exception{
 		value: newError(rt, "SyntaxError", 0, argumentList...),
 	}
 }
 
-func (rt *_runtime) panicRangeError(argumentList ...interface{}) *_exception {
-	return &_exception{
+func (rt *runtime) panicRangeError(argumentList ...interface{}) *exception {
+	return &exception{
 		value: newError(rt, "RangeError", 0, argumentList...),
 	}
 }
@@ -224,20 +224,19 @@ func (rt *_runtime) panicRangeError(argumentList ...interface{}) *_exception {
 func catchPanic(function func()) (err error) {
 	defer func() {
 		if caught := recover(); caught != nil {
-			if exception, ok := caught.(*_exception); ok {
-				caught = exception.eject()
+			if excep, ok := caught.(*exception); ok {
+				caught = excep.eject()
 			}
 			switch caught := caught.(type) {
 			case *Error:
 				err = caught
 				return
-			case _error:
+			case ottoError:
 				err = &Error{caught}
 				return
 			case Value:
-				if vl := caught._object(); vl != nil {
-					switch vl := vl.value.(type) {
-					case _error:
+				if vl := caught.object(); vl != nil {
+					if vl, ok := vl.value.(ottoError); ok {
 						err = &Error{vl}
 						return
 					}

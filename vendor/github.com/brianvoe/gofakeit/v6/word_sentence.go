@@ -124,13 +124,13 @@ func addWordSentenceLookup() {
 	AddFuncLookup("sentence", Info{
 		Display:     "Sentence",
 		Category:    "word",
-		Description: "Random sentence",
+		Description: "Set of words expressing a statement, question, exclamation, or command",
 		Example:     "Interpret context record river mind.",
 		Output:      "string",
 		Params: []Param{
 			{Field: "wordcount", Display: "Word Count", Type: "int", Default: "5", Description: "Number of words in a sentence"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			wordCount, err := info.GetInt(m, "wordcount")
 			if err != nil {
 				return nil, err
@@ -146,8 +146,8 @@ func addWordSentenceLookup() {
 	AddFuncLookup("paragraph", Info{
 		Display:     "Paragraph",
 		Category:    "word",
-		Description: "Random paragraph",
-		Example:     "Interpret context record river mind press self should compare property outcome divide. Combine approach sustain consult discover explanation direct address church husband seek army. Begin own act welfare replace press suspect stay link place manchester specialist. Arrive price satisfy sign force application hair train provide basis right pay. Close mark teacher strengthen information attempt head touch aim iron tv take. Handle wait begin look speech trust cancer visit capacity disease chancellor clean. Race aim function gain couple push faith enjoy admit ring attitude develop. Edge game prevent cast mill favour father star live search aim guess. West heart item adopt compete equipment miss output report communicate model cabinet. Seek worker variety step argue air improve give succeed relief artist suffer. Hide finish insist knowledge thatcher make research chance structure proportion husband implement. Town crown restaurant cost material compete lady climb football region discussion order. Place lee market ice like display mind stress compete weather station raise. Democracy college major recall struggle use cut intention accept period generation strike. Benefit defend recommend conclude justify result depend succeed address owner fill interpret.",
+		Description: "Distinct section of writing covering a single theme, composed of multiple sentences",
+		Example:     "Interpret context record river mind press self should compare property outcome divide. Combine approach sustain consult discover explanation direct address church husband seek army. Begin own act welfare replace press suspect stay link place manchester specialist. Arrive price satisfy sign force application hair train provide basis right pay. Close mark teacher strengthen information attempt head touch aim iron tv take.",
 		Output:      "string",
 		Params: []Param{
 			{Field: "paragraphcount", Display: "Paragraph Count", Type: "int", Default: "2", Description: "Number of paragraphs"},
@@ -155,7 +155,7 @@ func addWordSentenceLookup() {
 			{Field: "wordcount", Display: "Word Count", Type: "int", Default: "5", Description: "Number of words in a sentence"},
 			{Field: "paragraphseparator", Display: "Paragraph Separator", Type: "string", Default: "<br />", Description: "String value to add between paragraphs"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			paragraphCount, err := info.GetInt(m, "paragraphcount")
 			if err != nil {
 				return nil, err
@@ -192,21 +192,21 @@ func addWordSentenceLookup() {
 	AddFuncLookup("question", Info{
 		Display:     "Question",
 		Category:    "word",
-		Description: "Random question",
+		Description: "Statement formulated to inquire or seek clarification",
 		Example:     "Roof chia echo?",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return question(r), nil
 		},
 	})
 
 	AddFuncLookup("quote", Info{
-		Display:     "Qoute",
+		Display:     "Quote",
 		Category:    "word",
-		Description: "Random quote",
+		Description: "Direct repetition of someone else's words",
 		Example:     `"Roof chia echo." - Lura Lockman`,
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return quote(r), nil
 		},
 	})

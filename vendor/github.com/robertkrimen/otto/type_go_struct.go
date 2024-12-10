@@ -13,36 +13,39 @@ import (
 // 1. Creating a new struct every time
 // 2. Creating an addressable? struct in the constructor
 
-func (runtime *_runtime) newGoStructObject(value reflect.Value) *_object {
-	self := runtime.newObject()
-	self.class = "Object" // TODO Should this be something else?
-	self.objectClass = _classGoStruct
-	self.value = _newGoStructObject(value)
-	return self
+func (rt *runtime) newGoStructObject(value reflect.Value) *object {
+	o := rt.newObject()
+	o.class = classObjectName // TODO Should this be something else?
+	o.objectClass = classGoStruct
+	o.value = newGoStructObject(value)
+	return o
 }
 
-type _goStructObject struct {
+type goStructObject struct {
 	value reflect.Value
 }
 
-func _newGoStructObject(value reflect.Value) *_goStructObject {
+func newGoStructObject(value reflect.Value) *goStructObject {
 	if reflect.Indirect(value).Kind() != reflect.Struct {
 		dbgf("%/panic//%@: %v != reflect.Struct", value.Kind())
 	}
-	self := &_goStructObject{
+	return &goStructObject{
 		value: value,
 	}
-	return self
 }
 
-func (self _goStructObject) getValue(name string) reflect.Value {
+func (o goStructObject) getValue(name string) reflect.Value {
+	if idx := fieldIndexByName(reflect.Indirect(o.value).Type(), name); len(idx) > 0 {
+		return reflect.Indirect(o.value).FieldByIndex(idx)
+	}
+
 	if validGoStructName(name) {
-		// Do not reveal hidden or unexported fields
-		if field := reflect.Indirect(self.value).FieldByName(name); (field != reflect.Value{}) {
+		// Do not reveal hidden or unexported fields.
+		if field := reflect.Indirect(o.value).FieldByName(name); field.IsValid() {
 			return field
 		}
 
-		if method := self.value.MethodByName(name); (method != reflect.Value{}) {
+		if method := o.value.MethodByName(name); method.IsValid() {
 			return method
 		}
 	}
@@ -50,37 +53,37 @@ func (self _goStructObject) getValue(name string) reflect.Value {
 	return reflect.Value{}
 }
 
-func (self _goStructObject) field(name string) (reflect.StructField, bool) {
-	return reflect.Indirect(self.value).Type().FieldByName(name)
+func (o goStructObject) fieldIndex(name string) []int { //nolint:unused
+	return fieldIndexByName(reflect.Indirect(o.value).Type(), name)
 }
 
-func (self _goStructObject) method(name string) (reflect.Method, bool) {
-	return reflect.Indirect(self.value).Type().MethodByName(name)
+func (o goStructObject) method(name string) (reflect.Method, bool) { //nolint:unused
+	return reflect.Indirect(o.value).Type().MethodByName(name)
 }
 
-func (self _goStructObject) setValue(name string, value Value) bool {
-	field, exists := self.field(name)
-	if !exists {
+func (o goStructObject) setValue(rt *runtime, name string, value Value) bool {
+	if idx := fieldIndexByName(reflect.Indirect(o.value).Type(), name); len(idx) == 0 {
 		return false
 	}
-	fieldValue := self.getValue(name)
-	reflectValue, err := value.toReflectValue(field.Type.Kind())
+
+	fieldValue := o.getValue(name)
+	converted, err := rt.convertCallParameter(value, fieldValue.Type())
 	if err != nil {
-		panic(err)
+		panic(rt.panicTypeError("Object.setValue convertCallParameter: %s", err))
 	}
-	fieldValue.Set(reflectValue)
+	fieldValue.Set(converted)
 
 	return true
 }
 
-func goStructGetOwnProperty(self *_object, name string) *_property {
-	object := self.value.(*_goStructObject)
-	value := object.getValue(name)
+func goStructGetOwnProperty(obj *object, name string) *property {
+	goObj := obj.value.(*goStructObject)
+	value := goObj.getValue(name)
 	if value.IsValid() {
-		return &_property{self.runtime.toValue(value.Interface()), 0110}
+		return &property{obj.runtime.toValue(value), 0o110}
 	}
 
-	return objectGetOwnProperty(self, name)
+	return objectGetOwnProperty(obj, name)
 }
 
 func validGoStructName(name string) bool {
@@ -90,12 +93,12 @@ func validGoStructName(name string) bool {
 	return 'A' <= name[0] && name[0] <= 'Z' // TODO What about Unicode?
 }
 
-func goStructEnumerate(self *_object, all bool, each func(string) bool) {
-	object := self.value.(*_goStructObject)
+func goStructEnumerate(obj *object, all bool, each func(string) bool) {
+	goObj := obj.value.(*goStructObject)
 
 	// Enumerate fields
-	for index := 0; index < reflect.Indirect(object.value).NumField(); index++ {
-		name := reflect.Indirect(object.value).Type().Field(index).Name
+	for index := range reflect.Indirect(goObj.value).NumField() {
+		name := reflect.Indirect(goObj.value).Type().Field(index).Name
 		if validGoStructName(name) {
 			if !each(name) {
 				return
@@ -104,8 +107,8 @@ func goStructEnumerate(self *_object, all bool, each func(string) bool) {
 	}
 
 	// Enumerate methods
-	for index := 0; index < object.value.NumMethod(); index++ {
-		name := object.value.Type().Method(index).Name
+	for index := range goObj.value.NumMethod() {
+		name := goObj.value.Type().Method(index).Name
 		if validGoStructName(name) {
 			if !each(name) {
 				return
@@ -113,34 +116,31 @@ func goStructEnumerate(self *_object, all bool, each func(string) bool) {
 		}
 	}
 
-	objectEnumerate(self, all, each)
+	objectEnumerate(obj, all, each)
 }
 
-func goStructCanPut(self *_object, name string) bool {
-	object := self.value.(*_goStructObject)
-	value := object.getValue(name)
+func goStructCanPut(obj *object, name string) bool {
+	goObj := obj.value.(*goStructObject)
+	value := goObj.getValue(name)
 	if value.IsValid() {
 		return true
 	}
 
-	return objectCanPut(self, name)
+	return objectCanPut(obj, name)
 }
 
-func goStructPut(self *_object, name string, value Value, throw bool) {
-	object := self.value.(*_goStructObject)
-	if object.setValue(name, value) {
+func goStructPut(obj *object, name string, value Value, throw bool) {
+	goObj := obj.value.(*goStructObject)
+	if goObj.setValue(obj.runtime, name, value) {
 		return
 	}
 
-	objectPut(self, name, value, throw)
+	objectPut(obj, name, value, throw)
 }
 
-func goStructMarshalJSON(self *_object) json.Marshaler {
-	object := self.value.(*_goStructObject)
-	goValue := reflect.Indirect(object.value).Interface()
-	switch marshaler := goValue.(type) {
-	case json.Marshaler:
-		return marshaler
-	}
-	return nil
+func goStructMarshalJSON(obj *object) json.Marshaler {
+	goObj := obj.value.(*goStructObject)
+	goValue := reflect.Indirect(goObj.value).Interface()
+	marshaler, _ := goValue.(json.Marshaler)
+	return marshaler
 }

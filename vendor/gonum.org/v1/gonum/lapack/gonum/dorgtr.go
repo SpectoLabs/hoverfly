@@ -10,8 +10,10 @@ import "gonum.org/v1/gonum/blas"
 // of n-1 elementary reflectors of order n as returned by Dsytrd.
 //
 // The construction of Q depends on the value of uplo:
-//  Q = H_{n-1} * ... * H_1 * H_0  if uplo == blas.Upper
-//  Q = H_0 * H_1 * ... * H_{n-1}  if uplo == blas.Lower
+//
+//	Q = H_{n-1} * ... * H_1 * H_0  if uplo == blas.Upper
+//	Q = H_0 * H_1 * ... * H_{n-1}  if uplo == blas.Lower
+//
 // where H_i is constructed from the elementary reflectors as computed by Dsytrd.
 // See the documentation for Dsytrd for more information.
 //
@@ -97,7 +99,7 @@ func (impl Implementation) Dorgtr(uplo blas.Uplo, n int, a []float64, lda int, t
 		}
 		if n > 1 {
 			// Generate Q[1:n, 1:n].
-			impl.Dorgqr(n-1, n-1, n-1, a[lda+1:], lda, tau, work, lwork)
+			impl.Dorgqr(n-1, n-1, n-1, a[lda+1:], lda, tau[:n-1], work, lwork)
 		}
 	}
 	work[0] = float64(lworkopt)

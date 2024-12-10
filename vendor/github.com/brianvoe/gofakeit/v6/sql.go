@@ -90,7 +90,7 @@ func sqlFunc(r *rand.Rand, so *SQLOptions) (string, error) {
 }
 
 // sqlConvertType will take in a type and value and convert it to the proper SQL type
-func sqlConvertType(t string, val interface{}) string {
+func sqlConvertType(t string, val any) string {
 	switch t {
 	case "string":
 		return `'` + fmt.Sprintf("%v", val) + `'`
@@ -105,12 +105,12 @@ func addDatabaseSQLLookup() {
 	AddFuncLookup("sql", Info{
 		Display:     "SQL",
 		Category:    "database",
-		Description: "Generates an object or an array of objects in json format",
+		Description: "Command in SQL used to add new data records into a database table",
 		Example: `INSERT INTO people 
-				(id, first_name, price, age, created_at) 
-			VALUES 
-				(1, 'Markus', 804.92, 21, '1937-01-30 07:58:01'),
-				(2, 'Santino', 235.13, 40, '1964-07-07 22:25:40');`,
+	(id, first_name, price, age, created_at) 
+VALUES 
+	(1, 'Markus', 804.92, 21, '1937-01-30 07:58:01'),
+	(2, 'Santino', 235.13, 40, '1964-07-07 22:25:40');`,
 		Output:      "string",
 		ContentType: "application/sql",
 		Params: []Param{
@@ -118,7 +118,7 @@ func addDatabaseSQLLookup() {
 			{Field: "count", Display: "Count", Type: "int", Default: "100", Description: "Number of inserts to generate"},
 			{Field: "fields", Display: "Fields", Type: "[]Field", Description: "Fields containing key name and function to run in json format"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			so := SQLOptions{}
 
 			table, err := info.GetString(m, "table")

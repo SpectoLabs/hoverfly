@@ -48,10 +48,10 @@ func addLanguagesLookup() {
 	AddFuncLookup("language", Info{
 		Display:     "Language",
 		Category:    "language",
-		Description: "Random language",
+		Description: "System of communication using symbols, words, and grammar to convey meaning between individuals",
 		Example:     "Kazakh",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return language(r), nil
 		},
 	})
@@ -59,10 +59,10 @@ func addLanguagesLookup() {
 	AddFuncLookup("languageabbreviation", Info{
 		Display:     "Language Abbreviation",
 		Category:    "language",
-		Description: "Random abbreviated language",
+		Description: "Shortened form of a language's name",
 		Example:     "kk",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return languageAbbreviation(r), nil
 		},
 	})
@@ -70,10 +70,10 @@ func addLanguagesLookup() {
 	AddFuncLookup("languagebcp", Info{
 		Display:     "Language BCP",
 		Category:    "language",
-		Description: "Random language BCP (Best Current Practices)",
+		Description: "Set of guidelines and standards for identifying and representing languages in computing and internet protocols",
 		Example:     "en-US",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return languageBCP(r), nil
 		},
 	})
@@ -81,10 +81,10 @@ func addLanguagesLookup() {
 	AddFuncLookup("programminglanguage", Info{
 		Display:     "Programming Language",
 		Category:    "language",
-		Description: "Random programming language",
+		Description: "Formal system of instructions used to create software and perform computational tasks",
 		Example:     "Go",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return programmingLanguage(r), nil
 		},
 	})

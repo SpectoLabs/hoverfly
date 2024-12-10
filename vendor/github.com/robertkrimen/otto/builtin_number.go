@@ -3,6 +3,10 @@ package otto
 import (
 	"math"
 	"strconv"
+
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
+	"golang.org/x/text/number"
 )
 
 // Number
@@ -11,20 +15,20 @@ func numberValueFromNumberArgumentList(argumentList []Value) Value {
 	if len(argumentList) > 0 {
 		return argumentList[0].numberValue()
 	}
-	return toValue_int(0)
+	return intValue(0)
 }
 
 func builtinNumber(call FunctionCall) Value {
 	return numberValueFromNumberArgumentList(call.ArgumentList)
 }
 
-func builtinNewNumber(self *_object, argumentList []Value) Value {
-	return toValue_object(self.runtime.newNumber(numberValueFromNumberArgumentList(argumentList)))
+func builtinNewNumber(obj *object, argumentList []Value) Value {
+	return objectValue(obj.runtime.newNumber(numberValueFromNumberArgumentList(argumentList)))
 }
 
-func builtinNumber_toString(call FunctionCall) Value {
+func builtinNumberToString(call FunctionCall) Value {
 	// Will throw a TypeError if ThisObject is not a Number
-	value := call.thisClassObject("Number").primitiveValue()
+	value := call.thisClassObject(classNumberName).primitiveValue()
 	radix := 10
 	radixArgument := call.Argument(0)
 	if radixArgument.IsDefined() {
@@ -35,33 +39,32 @@ func builtinNumber_toString(call FunctionCall) Value {
 		radix = int(integer)
 	}
 	if radix == 10 {
-		return toValue_string(value.string())
+		return stringValue(value.string())
 	}
-	return toValue_string(numberToStringRadix(value, radix))
+	return stringValue(numberToStringRadix(value, radix))
 }
 
-func builtinNumber_valueOf(call FunctionCall) Value {
-	return call.thisClassObject("Number").primitiveValue()
+func builtinNumberValueOf(call FunctionCall) Value {
+	return call.thisClassObject(classNumberName).primitiveValue()
 }
 
-func builtinNumber_toFixed(call FunctionCall) Value {
+func builtinNumberToFixed(call FunctionCall) Value {
 	precision := toIntegerFloat(call.Argument(0))
 	if 20 < precision || 0 > precision {
 		panic(call.runtime.panicRangeError("toFixed() precision must be between 0 and 20"))
 	}
 	if call.This.IsNaN() {
-		return toValue_string("NaN")
+		return stringValue("NaN")
 	}
-	value := call.This.float64()
-	if math.Abs(value) >= 1e21 {
-		return toValue_string(floatToString(value, 64))
+	if value := call.This.float64(); math.Abs(value) >= 1e21 {
+		return stringValue(floatToString(value, 64))
 	}
-	return toValue_string(strconv.FormatFloat(call.This.float64(), 'f', int(precision), 64))
+	return stringValue(strconv.FormatFloat(call.This.float64(), 'f', int(precision), 64))
 }
 
-func builtinNumber_toExponential(call FunctionCall) Value {
+func builtinNumberToExponential(call FunctionCall) Value {
 	if call.This.IsNaN() {
-		return toValue_string("NaN")
+		return stringValue("NaN")
 	}
 	precision := float64(-1)
 	if value := call.Argument(0); value.IsDefined() {
@@ -70,24 +73,39 @@ func builtinNumber_toExponential(call FunctionCall) Value {
 			panic(call.runtime.panicRangeError("toString() radix must be between 2 and 36"))
 		}
 	}
-	return toValue_string(strconv.FormatFloat(call.This.float64(), 'e', int(precision), 64))
+	return stringValue(strconv.FormatFloat(call.This.float64(), 'e', int(precision), 64))
 }
 
-func builtinNumber_toPrecision(call FunctionCall) Value {
+func builtinNumberToPrecision(call FunctionCall) Value {
 	if call.This.IsNaN() {
-		return toValue_string("NaN")
+		return stringValue("NaN")
 	}
 	value := call.Argument(0)
 	if value.IsUndefined() {
-		return toValue_string(call.This.string())
+		return stringValue(call.This.string())
 	}
 	precision := toIntegerFloat(value)
 	if 1 > precision {
 		panic(call.runtime.panicRangeError("toPrecision() precision must be greater than 1"))
 	}
-	return toValue_string(strconv.FormatFloat(call.This.float64(), 'g', int(precision), 64))
+	return stringValue(strconv.FormatFloat(call.This.float64(), 'g', int(precision), 64))
 }
 
-func builtinNumber_toLocaleString(call FunctionCall) Value {
-	return builtinNumber_toString(call)
+func builtinNumberIsNaN(call FunctionCall) Value {
+	if len(call.ArgumentList) < 1 {
+		return boolValue(false)
+	}
+	return boolValue(call.Argument(0).IsNaN())
+}
+
+func builtinNumberToLocaleString(call FunctionCall) Value {
+	value := call.thisClassObject(classNumberName).primitiveValue()
+	locale := call.Argument(0)
+	lang := defaultLanguage
+	if locale.IsDefined() {
+		lang = language.MustParse(locale.string())
+	}
+
+	p := message.NewPrinter(lang)
+	return stringValue(p.Sprintf("%v", number.Decimal(value.value)))
 }

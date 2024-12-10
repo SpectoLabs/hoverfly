@@ -2,12 +2,15 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build !amd64 noasm appengine safe
+//go:build !amd64 || noasm || gccgo || safe
+// +build !amd64 noasm gccgo safe
 
 package f32
 
 // Ger performs the rank-one operation
-//  A += alpha * x * yᵀ
+//
+//	A += alpha * x * yᵀ
+//
 // where A is an m×n dense matrix, x and y are vectors, and alpha is a scalar.
 func Ger(m, n uintptr, alpha float32, x []float32, incX uintptr, y []float32, incY uintptr, a []float32, lda uintptr) {
 

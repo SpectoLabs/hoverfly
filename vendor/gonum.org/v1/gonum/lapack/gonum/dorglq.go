@@ -9,22 +9,24 @@ import (
 	"gonum.org/v1/gonum/lapack"
 )
 
-// Dorglq generates an m×n matrix Q with orthonormal columns defined by the
-// product of elementary reflectors as computed by Dgelqf.
-//  Q = H_0 * H_1 * ... * H_{k-1}
-// Dorglq is the blocked version of Dorgl2 that makes greater use of level-3 BLAS
-// routines.
+// Dorglq generates an m×n matrix Q with orthonormal rows defined as the first m
+// rows of a product of k elementary reflectors of order n
 //
-// len(tau) >= k, 0 <= k <= m, and 0 <= m <= n.
+//	Q = H_{k-1} * ... * H_0
 //
-// work is temporary storage, and lwork specifies the usable memory length. At minimum,
-// lwork >= m, and the amount of blocking is limited by the usable length.
-// If lwork == -1, instead of computing Dorglq the optimal work length is stored
-// into work[0].
+// as returned by Dgelqf.
 //
-// Dorglq will panic if the conditions on input values are not met.
+// On entry, tau and the first k rows of A must contain the scalar factors and
+// the vectors, respectively, which define the elementary reflectors H_i,
+// i=0,...,k-1, as returned by Dgelqf. On return, A contains the matrix Q.
 //
-// Dorglq is an internal routine. It is exported for testing purposes.
+// tau must have length at least k, work must have length at least lwork and
+// lwork must be at least max(1,m). On return, optimal value of lwork will be
+// stored in work[0]. It must also hold that 0 <= k <= m <= n, otherwise Dorglq
+// will panic.
+//
+// If lwork == -1, instead of performing Dorglq, the function only calculates
+// the optimal value of lwork and stores it into work[0].
 func (impl Implementation) Dorglq(m, n, k int, a []float64, lda int, tau, work []float64, lwork int) {
 	switch {
 	case m < 0:
@@ -62,7 +64,7 @@ func (impl Implementation) Dorglq(m, n, k int, a []float64, lda int, tau, work [
 	}
 
 	nbmin := 2 // Minimum block size
-	var nx int // Crossover size from blocked to unbloked code
+	var nx int // Crossover size from blocked to unblocked code
 	iws := m   // Length of work needed
 	var ldwork int
 	if 1 < nb && nb < k {
@@ -90,7 +92,7 @@ func (impl Implementation) Dorglq(m, n, k int, a []float64, lda int, tau, work [
 		}
 	}
 	if kk < m {
-		// Perform the operation on colums kk to the end.
+		// Perform the operation on columns kk to the end.
 		impl.Dorgl2(m-kk, n-kk, k-kk, a[kk*lda+kk:], lda, tau[kk:], work)
 	}
 	if kk > 0 {

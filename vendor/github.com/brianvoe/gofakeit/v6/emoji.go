@@ -46,10 +46,10 @@ func addEmojiLookup() {
 	AddFuncLookup("emoji", Info{
 		Display:     "Emoji",
 		Category:    "emoji",
-		Description: "Random emoji",
+		Description: "Digital symbol expressing feelings or ideas in text messages and online chats",
 		Example:     "🤣",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return emoji(r), nil
 		},
 	})
@@ -57,10 +57,10 @@ func addEmojiLookup() {
 	AddFuncLookup("emojidescription", Info{
 		Display:     "Emoji Description",
 		Category:    "emoji",
-		Description: "Random emoji description",
+		Description: "Brief explanation of the meaning or emotion conveyed by an emoji",
 		Example:     "face vomiting",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return emojiDescription(r), nil
 		},
 	})
@@ -68,10 +68,10 @@ func addEmojiLookup() {
 	AddFuncLookup("emojicategory", Info{
 		Display:     "Emoji Category",
 		Category:    "emoji",
-		Description: "Random emoji category",
+		Description: "Group or classification of emojis based on their common theme or use, like 'smileys' or 'animals'",
 		Example:     "Smileys & Emotion",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return emojiCategory(r), nil
 		},
 	})
@@ -79,10 +79,10 @@ func addEmojiLookup() {
 	AddFuncLookup("emojialias", Info{
 		Display:     "Emoji Alias",
 		Category:    "emoji",
-		Description: "Random emoji alias",
+		Description: "Alternative name or keyword used to represent a specific emoji in text or code",
 		Example:     "smile",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return emojiAlias(r), nil
 		},
 	})
@@ -90,10 +90,10 @@ func addEmojiLookup() {
 	AddFuncLookup("emojitag", Info{
 		Display:     "Emoji Tag",
 		Category:    "emoji",
-		Description: "Random emoji tag",
+		Description: "Label or keyword associated with an emoji to categorize or search for it easily",
 		Example:     "happy",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return emojiTag(r), nil
 		},
 	})

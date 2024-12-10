@@ -9,6 +9,7 @@ import (
 
 	"gonum.org/v1/gonum/blas"
 	"gonum.org/v1/gonum/blas/blas64"
+	"gonum.org/v1/gonum/lapack"
 	"gonum.org/v1/gonum/lapack/lapack64"
 )
 
@@ -25,8 +26,6 @@ var (
 	_ RowNonZeroDoer = triDense
 	_ ColNonZeroDoer = triDense
 )
-
-const badTriCap = "mat: bad capacity for TriDense"
 
 // TriDense represents an upper or lower triangular matrix in dense storage
 // format.
@@ -257,8 +256,8 @@ func (t *TriDense) IsEmpty() bool {
 	return t.mat.Stride == 0
 }
 
-// untranspose untransposes a matrix if applicable. If a is an Untransposer, then
-// untranspose returns the underlying matrix and true. If it is not, then it returns
+// untransposeTri untransposes a matrix if applicable. If a is an UntransposeTrier, then
+// untransposeTri returns the underlying matrix and true. If it is not, then it returns
 // the input matrix and false.
 func untransposeTri(a Triangular) (Triangular, bool) {
 	if ut, ok := a.(UntransposeTrier); ok {
@@ -288,8 +287,8 @@ func (t *TriDense) ReuseAsTri(n int, kind TriKind) {
 	t.reuseAsZeroed(n, kind)
 }
 
-// reuseAsNonZeroed resizes a zero receiver to an n×n triangular matrix with the given
-// orientation. If the receiver is non-zero, reuseAsNonZeroed checks that the receiver
+// reuseAsNonZeroed resizes an empty receiver to an n×n triangular matrix with the given
+// orientation. If the receiver is not empty, reuseAsNonZeroed checks that the receiver
 // is the correct size and orientation.
 func (t *TriDense) reuseAsNonZeroed(n int, kind TriKind) {
 	// reuseAsNonZeroed must be kept in sync with reuseAsZeroed.
@@ -301,7 +300,8 @@ func (t *TriDense) reuseAsNonZeroed(n int, kind TriKind) {
 		ul = blas.Upper
 	}
 	if t.mat.N > t.cap {
-		panic(badTriCap)
+		// Panic as a string, not a mat.Error.
+		panic(badCap)
 	}
 	if t.IsEmpty() {
 		t.mat = blas64.Triangular{
@@ -322,8 +322,8 @@ func (t *TriDense) reuseAsNonZeroed(n int, kind TriKind) {
 	}
 }
 
-// reuseAsZeroed resizes a zero receiver to an n×n triangular matrix with the given
-// orientation. If the receiver is non-zero, reuseAsZeroed checks that the receiver
+// reuseAsZeroed resizes an empty receiver to an n×n triangular matrix with the given
+// orientation. If the receiver is not empty, reuseAsZeroed checks that the receiver
 // is the correct size and orientation. It then zeros out the matrix data.
 func (t *TriDense) reuseAsZeroed(n int, kind TriKind) {
 	// reuseAsZeroed must be kept in sync with reuseAsNonZeroed.
@@ -335,7 +335,8 @@ func (t *TriDense) reuseAsZeroed(n int, kind TriKind) {
 		ul = blas.Upper
 	}
 	if t.mat.N > t.cap {
-		panic(badTriCap)
+		// Panic as a string, not a mat.Error.
+		panic(badCap)
 	}
 	if t.IsEmpty() {
 		t.mat = blas64.Triangular{
@@ -365,10 +366,10 @@ func (t *TriDense) isolatedWorkspace(a Triangular) (w *TriDense, restore func())
 	if n == 0 {
 		panic(ErrZeroLength)
 	}
-	w = getWorkspaceTri(n, kind, false)
+	w = getTriDenseWorkspace(n, kind, false)
 	return w, func() {
 		t.Copy(w)
-		putWorkspaceTri(w)
+		putTriWorkspace(w)
 	}
 }
 
@@ -458,10 +459,10 @@ func (t *TriDense) InverseTri(a Triangular) error {
 	n, _ := a.Triangle()
 	t.reuseAsNonZeroed(a.Triangle())
 	t.Copy(a)
-	work := getFloats(3*n, false)
+	work := getFloat64s(3*n, false)
 	iwork := getInts(n, false)
 	cond := lapack64.Trcon(CondNorm, t.mat, work, iwork)
-	putFloats(work)
+	putFloat64s(work)
 	putInts(iwork)
 	if math.IsInf(cond, 1) {
 		return Condition(cond)
@@ -600,8 +601,54 @@ func (t *TriDense) ScaleTri(f float64, a Triangular) {
 	}
 }
 
+// SliceTri returns a new Triangular that shares backing data with the receiver.
+// The returned matrix starts at {i,i} of the receiver and extends k-i rows and
+// columns. The final row and column in the resulting matrix is k-1.
+// SliceTri panics with ErrIndexOutOfRange if the slice is outside the capacity
+// of the receiver.
+func (t *TriDense) SliceTri(i, k int) Triangular {
+	return t.sliceTri(i, k)
+}
+
+func (t *TriDense) sliceTri(i, k int) *TriDense {
+	if i < 0 || t.cap < i || k < i || t.cap < k {
+		panic(ErrIndexOutOfRange)
+	}
+	v := *t
+	v.mat.Data = t.mat.Data[i*t.mat.Stride+i : (k-1)*t.mat.Stride+k]
+	v.mat.N = k - i
+	v.cap = t.cap - i
+	return &v
+}
+
+// Norm returns the specified norm of the receiver. Valid norms are:
+//
+//	1 - The maximum absolute column sum
+//	2 - The Frobenius norm, the square root of the sum of the squares of the elements
+//	Inf - The maximum absolute row sum
+//
+// Norm will panic with ErrNormOrder if an illegal norm is specified and with
+// ErrZeroLength if the matrix has zero size.
+func (t *TriDense) Norm(norm float64) float64 {
+	if t.IsEmpty() {
+		panic(ErrZeroLength)
+	}
+	lnorm := normLapack(norm, false)
+	if lnorm == lapack.MaxColumnSum {
+		work := getFloat64s(t.mat.N, false)
+		defer putFloat64s(work)
+		return lapack64.Lantr(lnorm, t.mat, work)
+	}
+	return lapack64.Lantr(lnorm, t.mat, nil)
+}
+
 // Trace returns the trace of the matrix.
+//
+// Trace will panic with ErrZeroLength if the matrix has zero size.
 func (t *TriDense) Trace() float64 {
+	if t.IsEmpty() {
+		panic(ErrZeroLength)
+	}
 	// TODO(btracey): could use internal asm sum routine.
 	var v float64
 	for i := 0; i < t.mat.N; i++ {
@@ -613,7 +660,7 @@ func (t *TriDense) Trace() float64 {
 // copySymIntoTriangle copies a symmetric matrix into a TriDense
 func copySymIntoTriangle(t *TriDense, s Symmetric) {
 	n, upper := t.Triangle()
-	ns := s.Symmetric()
+	ns := s.SymmetricDim()
 	if n != ns {
 		panic("mat: triangle size mismatch")
 	}
@@ -731,4 +778,55 @@ func (t *TriDense) DoColNonZero(j int, fn func(i, j int, v float64)) {
 			fn(i, j, v)
 		}
 	}
+}
+
+// SolveTo solves a triangular system T * X = B or Tᵀ * X = B where T is an n×n
+// triangular matrix represented by the receiver and B is a given n×nrhs matrix.
+// If T is non-singular, the result will be stored into dst and nil will be
+// returned. If T is singular, the contents of dst will be undefined and a
+// Condition error will be returned.
+//
+// If dst is empty, SolveTo will resize it to n×nrhs. If dst is not empty,
+// SolveTo will panic if dst is not n×nrhs.
+func (t *TriDense) SolveTo(dst *Dense, trans bool, b Matrix) error {
+	n, nrhs := b.Dims()
+	if n != t.mat.N {
+		panic(ErrShape)
+	}
+
+	dst.reuseAsNonZeroed(n, nrhs)
+	bU, bTrans := untranspose(b)
+	if dst == bU {
+		if bTrans {
+			work := getDenseWorkspace(n, nrhs, false)
+			defer putDenseWorkspace(work)
+			work.Copy(b)
+			dst.Copy(work)
+		}
+	} else {
+		if rm, ok := bU.(RawMatrixer); ok {
+			dst.checkOverlap(rm.RawMatrix())
+		}
+		dst.Copy(b)
+	}
+
+	transT := blas.NoTrans
+	if trans {
+		transT = blas.Trans
+	}
+	ok := lapack64.Trtrs(transT, t.mat, dst.mat)
+	if !ok {
+		return Condition(math.Inf(1))
+	}
+
+	work := getFloat64s(3*n, false)
+	iwork := getInts(n, false)
+	cond := lapack64.Trcon(CondNorm, t.mat, work, iwork)
+	putFloat64s(work)
+	putInts(iwork)
+	if cond > ConditionTolerance {
+		return Condition(cond)
+	}
+
+	return nil
 }

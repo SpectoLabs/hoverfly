@@ -22,10 +22,10 @@ func addFileLookup() {
 	AddFuncLookup("fileextension", Info{
 		Display:     "File Extension",
 		Category:    "file",
-		Description: "Random file extension",
+		Description: "Suffix appended to a filename indicating its format or type",
 		Example:     "nes",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return fileExtension(r), nil
 		},
 	})
@@ -33,10 +33,10 @@ func addFileLookup() {
 	AddFuncLookup("filemimetype", Info{
 		Display:     "File Mime Type",
 		Category:    "file",
-		Description: "Random file mime type",
+		Description: "Defines file format and nature for browsers and email clients using standardized identifiers",
 		Example:     "application/json",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return fileMimeType(r), nil
 		},
 	})

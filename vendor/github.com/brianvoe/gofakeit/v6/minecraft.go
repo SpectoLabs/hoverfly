@@ -170,10 +170,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftore", Info{
 		Display:     "Minecraft ore",
 		Category:    "minecraft",
-		Description: "Random Minecraft ore",
+		Description: "Naturally occurring minerals found in the game Minecraft, used for crafting purposes",
 		Example:     "coal",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftOre(r), nil
 		},
 	})
@@ -181,10 +181,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftwood", Info{
 		Display:     "Minecraft wood",
 		Category:    "minecraft",
-		Description: "Random Minecraft wood",
+		Description: "Natural resource in Minecraft, used for crafting various items and building structures",
 		Example:     "oak",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftWood(r), nil
 		},
 	})
@@ -192,10 +192,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftarmortier", Info{
 		Display:     "Minecraft armor tier",
 		Category:    "minecraft",
-		Description: "Random Minecraft armor tier",
+		Description: "Classification system for armor sets in Minecraft, indicating their effectiveness and protection level",
 		Example:     "iron",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftArmorTier(r), nil
 		},
 	})
@@ -203,10 +203,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftarmorpart", Info{
 		Display:     "Minecraft armor part",
 		Category:    "minecraft",
-		Description: "Random Minecraft armor part",
+		Description: "Component of an armor set in Minecraft, such as a helmet, chestplate, leggings, or boots",
 		Example:     "helmet",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftArmorPart(r), nil
 		},
 	})
@@ -214,10 +214,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftweapon", Info{
 		Display:     "Minecraft weapon",
 		Category:    "minecraft",
-		Description: "Random Minecraft weapon",
+		Description: "Tools and items used in Minecraft for combat and defeating hostile mobs",
 		Example:     "bow",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftWeapon(r), nil
 		},
 	})
@@ -225,10 +225,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecrafttool", Info{
 		Display:     "Minecraft tool",
 		Category:    "minecraft",
-		Description: "Random Minecraft tool",
+		Description: "Items in Minecraft designed for specific tasks, including mining, digging, and building",
 		Example:     "shovel",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftTool(r), nil
 		},
 	})
@@ -236,10 +236,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftdye", Info{
 		Display:     "Minecraft dye",
 		Category:    "minecraft",
-		Description: "Random Minecraft dye",
+		Description: "Items used to change the color of various in-game objects",
 		Example:     "white",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftDye(r), nil
 		},
 	})
@@ -247,10 +247,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftfood", Info{
 		Display:     "Minecraft food",
 		Category:    "minecraft",
-		Description: "Random Minecraft food",
+		Description: "Consumable items in Minecraft that provide nourishment to the player character",
 		Example:     "apple",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftFood(r), nil
 		},
 	})
@@ -258,10 +258,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftanimal", Info{
 		Display:     "Minecraft animal",
 		Category:    "minecraft",
-		Description: "Random Minecraft animal",
+		Description: "Non-hostile creatures in Minecraft, often used for resources and farming",
 		Example:     "chicken",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftAnimal(r), nil
 		},
 	})
@@ -269,10 +269,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftvillagerjob", Info{
 		Display:     "Minecraft villager job",
 		Category:    "minecraft",
-		Description: "Random Minecraft villager job",
+		Description: "The profession or occupation assigned to a villager character in the game",
 		Example:     "farmer",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftVillagerJob(r), nil
 		},
 	})
@@ -280,10 +280,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftvillagerstation", Info{
 		Display:     "Minecraft villager station",
 		Category:    "minecraft",
-		Description: "Random Minecraft villager station",
+		Description: "Designated area or structure in Minecraft where villagers perform their job-related tasks and trading",
 		Example:     "furnace",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftVillagerStation(r), nil
 		},
 	})
@@ -291,10 +291,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftvillagerlevel", Info{
 		Display:     "Minecraft villager level",
 		Category:    "minecraft",
-		Description: "Random Minecraft villager level",
+		Description: "Measure of a villager's experience and proficiency in their assigned job or profession",
 		Example:     "master",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftVillagerLevel(r), nil
 		},
 	})
@@ -302,10 +302,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftmobpassive", Info{
 		Display:     "Minecraft mob passive",
 		Category:    "minecraft",
-		Description: "Random Minecraft mob passive",
+		Description: "Non-aggressive creatures in the game that do not attack players",
 		Example:     "cow",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftMobPassive(r), nil
 		},
 	})
@@ -313,10 +313,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftmobneutral", Info{
 		Display:     "Minecraft mob neutral",
 		Category:    "minecraft",
-		Description: "Random Minecraft mob neutral",
+		Description: "Creature in the game that only becomes hostile if provoked, typically defending itself when attacked",
 		Example:     "bee",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftMobNeutral(r), nil
 		},
 	})
@@ -324,10 +324,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftmobhostile", Info{
 		Display:     "Minecraft mob hostile",
 		Category:    "minecraft",
-		Description: "Random Minecraft mob hostile",
+		Description: "Aggressive creatures in the game that actively attack players when encountered",
 		Example:     "spider",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftMobHostile(r), nil
 		},
 	})
@@ -335,10 +335,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftmobboss", Info{
 		Display:     "Minecraft mob boss",
 		Category:    "minecraft",
-		Description: "Random Minecraft mob boss",
+		Description: "Powerful hostile creature in the game, often found in challenging dungeons or structures",
 		Example:     "ender dragon",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftMobBoss(r), nil
 		},
 	})
@@ -346,10 +346,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftbiome", Info{
 		Display:     "Minecraft biome",
 		Category:    "minecraft",
-		Description: "Random Minecraft biome",
+		Description: "Distinctive environmental regions in the game, characterized by unique terrain, vegetation, and weather",
 		Example:     "forest",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftBiome(r), nil
 		},
 	})
@@ -357,10 +357,10 @@ func addMinecraftLookup() {
 	AddFuncLookup("minecraftweather", Info{
 		Display:     "Minecraft weather",
 		Category:    "minecraft",
-		Description: "Random Minecraft weather",
+		Description: "Atmospheric conditions in the game that include rain, thunderstorms, and clear skies, affecting gameplay and ambiance",
 		Example:     "rain",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minecraftWeather(r), nil
 		},
 	})

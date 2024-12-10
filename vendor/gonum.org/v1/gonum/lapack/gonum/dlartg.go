@@ -7,74 +7,67 @@ package gonum
 import "math"
 
 // Dlartg generates a plane rotation so that
-//  [ cs sn] * [f] = [r]
-//  [-sn cs]   [g] = [0]
-// This is a more accurate version of BLAS drotg, with the other differences that
-// if g = 0, then cs = 1 and sn = 0, and if f = 0 and g != 0, then cs = 0 and sn = 1.
-// If abs(f) > abs(g), cs will be positive.
+//
+//	[ cs sn] * [f] = [r]
+//	[-sn cs]   [g] = [0]
+//
+// where cs*cs + sn*sn = 1.
+//
+// This is a more accurate version of BLAS Drotg that uses scaling to avoid
+// overflow or underflow, with the other differences that
+//   - cs >= 0
+//   - if g = 0, then cs = 1 and sn = 0
+//   - if f = 0 and g != 0, then cs = 0 and sn = sign(1,g)
 //
 // Dlartg is an internal routine. It is exported for testing purposes.
 func (impl Implementation) Dlartg(f, g float64) (cs, sn, r float64) {
-	safmn2 := math.Pow(dlamchB, math.Trunc(math.Log(dlamchS/dlamchE)/math.Log(dlamchB)/2))
-	safmx2 := 1 / safmn2
+	// Implementation based on Supplemental Material to:
+	//
+	// Edward Anderson
+	// Algorithm 978: Safe Scaling in the Level 1 BLAS
+	// ACM Trans. Math. Softw. 44, 1, Article 12 (2017)
+	// DOI: https://doi.org/10.1145/3061665
+	//
+	// For further details see:
+	//
+	// W. Pereira, A. Lotfi, J. Langou
+	// Numerical analysis of Givens rotation
+	// DOI: https://doi.org/10.48550/arXiv.2211.04010
+
 	if g == 0 {
-		cs = 1
-		sn = 0
-		r = f
-		return cs, sn, r
+		return 1, 0, f
 	}
+
+	g1 := math.Abs(g)
+
 	if f == 0 {
-		cs = 0
-		sn = 1
-		r = g
+		return 0, math.Copysign(1, g), g1
+	}
+
+	const safmin = dlamchS
+	const safmax = 1 / safmin
+	rtmin := math.Sqrt(safmin)
+	rtmax := math.Sqrt(safmax / 2)
+
+	f1 := math.Abs(f)
+
+	if rtmin < f1 && f1 < rtmax && rtmin < g1 && g1 < rtmax {
+		d := math.Sqrt(f*f + g*g)
+		cs = f1 / d
+		r = math.Copysign(d, f)
+		sn = g / r
+
 		return cs, sn, r
 	}
-	f1 := f
-	g1 := g
-	scale := math.Max(math.Abs(f1), math.Abs(g1))
-	if scale >= safmx2 {
-		var count int
-		for {
-			count++
-			f1 *= safmn2
-			g1 *= safmn2
-			scale = math.Max(math.Abs(f1), math.Abs(g1))
-			if scale < safmx2 {
-				break
-			}
-		}
-		r = math.Sqrt(f1*f1 + g1*g1)
-		cs = f1 / r
-		sn = g1 / r
-		for i := 0; i < count; i++ {
-			r *= safmx2
-		}
-	} else if scale <= safmn2 {
-		var count int
-		for {
-			count++
-			f1 *= safmx2
-			g1 *= safmx2
-			scale = math.Max(math.Abs(f1), math.Abs(g1))
-			if scale >= safmn2 {
-				break
-			}
-		}
-		r = math.Sqrt(f1*f1 + g1*g1)
-		cs = f1 / r
-		sn = g1 / r
-		for i := 0; i < count; i++ {
-			r *= safmn2
-		}
-	} else {
-		r = math.Sqrt(f1*f1 + g1*g1)
-		cs = f1 / r
-		sn = g1 / r
-	}
-	if math.Abs(f) > math.Abs(g) && cs < 0 {
-		cs *= -1
-		sn *= -1
-		r *= -1
-	}
+
+	u := math.Min(math.Max(safmin, math.Max(f1, g1)), safmax)
+	fs := f / u
+	gs := g / u
+	d := math.Sqrt(fs*fs + gs*gs)
+	cs = math.Abs(fs) / d
+	r = math.Copysign(d, f)
+	sn = gs / r
+	r *= u
+
 	return cs, sn, r
 }

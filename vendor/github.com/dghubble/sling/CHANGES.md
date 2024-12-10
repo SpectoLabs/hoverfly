@@ -4,6 +4,24 @@ Notable changes between releases.
 
 ## Latest
 
+## v1.4.2
+
+* Update Go module dependencies
+
+## v1.4.1
+
+* Update minimum Go version to v1.18 ([#76](https://github.com/dghubble/sling/pull/76))
+
+## v1.4.0
+
+* `Do` reads Body to reuse HTTP/1.x "keep-alive" TCP connections ([#59](https://github.com/dghubble/sling/pull/59))
+* `Receive` skips decoding if status is 204 (no content) ([#63](https://github.com/dghubble/sling/pull/63))
+
+## v1.3.0
+
+* Add Sling `ResponseDecoder` setter for receiving responses with a custom `ResponseDecoder` ([#49](https://github.com/dghubble/sling/pull/49))
+* Add Go module support (i.e. `go.mod`). Exclude `examples` (multi-module). ([#52](https://github.com/dghubble/sling/pull/52))
+
 ## v1.2.0
 
 * Add `Connect`, `Options`, and `Trace` HTTP methods ([c51967](https://github.com/dghubble/sling/commit/c519674860ff275e0ceb12caf5d87b31765c4e71))

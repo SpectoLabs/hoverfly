@@ -2,7 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build !amd64,!arm64 noasm appengine safe
+//go:build (!amd64 && !arm64) || noasm || gccgo || safe
+// +build !amd64,!arm64 noasm gccgo safe
 
 package math32
 
@@ -13,6 +14,7 @@ import (
 // Sqrt returns the square root of x.
 //
 // Special cases are:
+//
 //	Sqrt(+Inf) = +Inf
 //	Sqrt(±0) = ±0
 //	Sqrt(x < 0) = NaN

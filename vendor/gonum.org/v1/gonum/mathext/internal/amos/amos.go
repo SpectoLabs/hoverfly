@@ -28,20 +28,6 @@ func abs(a int) int {
 	return -a
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 func Zairy(ZR, ZI float64, ID, KODE int) (AIR, AII float64, NZ, IERR int) {
 	// zairy is adapted from the original Netlib code by Donald Amos.
 	// http://www.netlib.no/netlib/amos/zairy.f
@@ -1381,7 +1367,9 @@ FourtyFive:
 // underflow when y is scaled by tol.
 //
 // y enters as a scaled quantity whose magnitude is greater than
-//  1e3 + 3*dmach(1)/tol
+//
+//	1e3 + 3*dmach(1)/tol
+//
 // y is accepted if the underflow is at least one precision below the magnitude
 // of the largest component. Otherwise an underflow is assumed as the phase angle
 // does not have sufficient accuracy.
@@ -1402,8 +1390,8 @@ func Zuchk(y complex128, scale, tol float64) int {
 
 // ZACAI APPLIES THE ANALYTIC CONTINUATION FORMULA
 //
-//  K(FNU,ZN*EXP(MP))=K(FNU,ZN)*EXP(-MP*FNU) - MP*I(FNU,ZN)
-//        MP=PI*MR*CMPLX(0.0,1.0)
+//	K(FNU,ZN*EXP(MP))=K(FNU,ZN)*EXP(-MP*FNU) - MP*I(FNU,ZN)
+//	      MP=PI*MR*CMPLX(0.0,1.0)
 //
 // TO CONTINUE THE K FUNCTION FROM THE RIGHT HALF TO THE LEFT
 // HALF Z PLANE FOR USE WITH ZAIRY WHERE FNU=1/3 OR 2/3 AND N=1.

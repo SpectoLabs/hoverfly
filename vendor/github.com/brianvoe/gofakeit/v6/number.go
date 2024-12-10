@@ -253,14 +253,14 @@ func addNumberLookup() {
 	AddFuncLookup("number", Info{
 		Display:     "Number",
 		Category:    "number",
-		Description: "Random number between given range",
+		Description: "Mathematical concept used for counting, measuring, and expressing quantities or values",
 		Example:     "14866",
 		Output:      "int",
 		Params: []Param{
 			{Field: "min", Display: "Min", Type: "int", Default: "-2147483648", Description: "Minimum integer value"},
 			{Field: "max", Display: "Max", Type: "int", Default: "2147483647", Description: "Maximum integer value"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			min, err := info.GetInt(m, "min")
 			if err != nil {
 				return nil, err
@@ -278,10 +278,10 @@ func addNumberLookup() {
 	AddFuncLookup("uint8", Info{
 		Display:     "Uint8",
 		Category:    "number",
-		Description: "Random uint8 value",
+		Description: "Unsigned 8-bit integer, capable of representing values from 0 to 255",
 		Example:     "152",
 		Output:      "uint8",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return uint8Func(r), nil
 		},
 	})
@@ -289,10 +289,10 @@ func addNumberLookup() {
 	AddFuncLookup("uint16", Info{
 		Display:     "Uint16",
 		Category:    "number",
-		Description: "Random uint16 value",
+		Description: "Unsigned 16-bit integer, capable of representing values from 0 to 65,535",
 		Example:     "34968",
 		Output:      "uint16",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return uint16Func(r), nil
 		},
 	})
@@ -300,10 +300,10 @@ func addNumberLookup() {
 	AddFuncLookup("uint32", Info{
 		Display:     "Uint32",
 		Category:    "number",
-		Description: "Random uint32 value",
+		Description: "Unsigned 32-bit integer, capable of representing values from 0 to 4,294,967,295",
 		Example:     "1075055705",
 		Output:      "uint32",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return uint32Func(r), nil
 		},
 	})
@@ -311,10 +311,10 @@ func addNumberLookup() {
 	AddFuncLookup("uint64", Info{
 		Display:     "Uint64",
 		Category:    "number",
-		Description: "Random uint64 value",
+		Description: "Unsigned 64-bit integer, capable of representing values from 0 to 18,446,744,073,709,551,615",
 		Example:     "843730692693298265",
 		Output:      "uint64",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return uint64Func(r), nil
 		},
 	})
@@ -322,14 +322,14 @@ func addNumberLookup() {
 	AddFuncLookup("uintrange", Info{
 		Display:     "UintRange",
 		Category:    "number",
-		Description: "Random uint value between given range",
+		Description: "Non-negative integer value between given range",
 		Example:     "1075055705",
 		Output:      "uint",
 		Params: []Param{
 			{Field: "min", Display: "Min", Type: "uint", Default: "0", Description: "Minimum uint value"},
 			{Field: "max", Display: "Max", Type: "uint", Default: "4294967295", Description: "Maximum uint value"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			min, err := info.GetUint(m, "min")
 			if err != nil {
 				return nil, err
@@ -347,10 +347,10 @@ func addNumberLookup() {
 	AddFuncLookup("int8", Info{
 		Display:     "Int8",
 		Category:    "number",
-		Description: "Random int8 value",
+		Description: "Signed 8-bit integer, capable of representing values from -128 to 127",
 		Example:     "24",
 		Output:      "int8",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return int8Func(r), nil
 		},
 	})
@@ -358,10 +358,10 @@ func addNumberLookup() {
 	AddFuncLookup("int16", Info{
 		Display:     "Int16",
 		Category:    "number",
-		Description: "Random int16 value",
+		Description: "Signed 16-bit integer, capable of representing values from 32,768 to 32,767",
 		Example:     "2200",
 		Output:      "int16",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return int16Func(r), nil
 		},
 	})
@@ -369,10 +369,10 @@ func addNumberLookup() {
 	AddFuncLookup("int32", Info{
 		Display:     "Int32",
 		Category:    "number",
-		Description: "Random int32 value",
+		Description: "Signed 32-bit integer, capable of representing values from -2,147,483,648 to 2,147,483,647",
 		Example:     "-1072427943",
 		Output:      "int32",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return int32Func(r), nil
 		},
 	})
@@ -380,10 +380,10 @@ func addNumberLookup() {
 	AddFuncLookup("int64", Info{
 		Display:     "Int64",
 		Category:    "number",
-		Description: "Random int64 value",
+		Description: "Signed 64-bit integer, capable of representing values from -9,223,372,036,854,775,808 to -9,223,372,036,854,775,807",
 		Example:     "-8379641344161477543",
 		Output:      "int64",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return int64Func(r), nil
 		},
 	})
@@ -391,14 +391,14 @@ func addNumberLookup() {
 	AddFuncLookup("intrange", Info{
 		Display:     "IntRange",
 		Category:    "number",
-		Description: "Random int value between min and max",
+		Description: "Integer value between given range",
 		Example:     "-8379477543",
 		Output:      "int",
 		Params: []Param{
 			{Field: "min", Display: "Min", Type: "int", Description: "Minimum int value"},
 			{Field: "max", Display: "Max", Type: "int", Description: "Maximum int value"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			min, err := info.GetInt(m, "min")
 			if err != nil {
 				return nil, err
@@ -416,10 +416,10 @@ func addNumberLookup() {
 	AddFuncLookup("float32", Info{
 		Display:     "Float32",
 		Category:    "number",
-		Description: "Random float32 value",
+		Description: "Data type representing floating-point numbers with 32 bits of precision in computing",
 		Example:     "3.1128167e+37",
 		Output:      "float32",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return float32Func(r), nil
 		},
 	})
@@ -427,14 +427,14 @@ func addNumberLookup() {
 	AddFuncLookup("float32range", Info{
 		Display:     "Float32 Range",
 		Category:    "number",
-		Description: "Random float32 between given range",
+		Description: "Float32 value between given range",
 		Example:     "914774.6",
 		Output:      "float32",
 		Params: []Param{
 			{Field: "min", Display: "Min", Type: "float", Description: "Minimum float32 value"},
 			{Field: "max", Display: "Max", Type: "float", Description: "Maximum float32 value"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			min, err := info.GetFloat32(m, "min")
 			if err != nil {
 				return nil, err
@@ -452,10 +452,10 @@ func addNumberLookup() {
 	AddFuncLookup("float64", Info{
 		Display:     "Float64",
 		Category:    "number",
-		Description: "Random float64 value",
+		Description: "Data type representing floating-point numbers with 64 bits of precision in computing",
 		Example:     "1.644484108270445e+307",
 		Output:      "float64",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return float64Func(r), nil
 		},
 	})
@@ -463,14 +463,14 @@ func addNumberLookup() {
 	AddFuncLookup("float64range", Info{
 		Display:     "Float64 Range",
 		Category:    "number",
-		Description: "Random float64 between given range",
+		Description: "Float64 value between given range",
 		Example:     "914774.5585333086",
 		Output:      "float64",
 		Params: []Param{
 			{Field: "min", Display: "Min", Type: "float", Description: "Minimum float64 value"},
 			{Field: "max", Display: "Max", Type: "float", Description: "Maximum float64 value"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			min, err := info.GetFloat64(m, "min")
 			if err != nil {
 				return nil, err
@@ -488,13 +488,13 @@ func addNumberLookup() {
 	AddFuncLookup("shuffleints", Info{
 		Display:     "Shuffle Ints",
 		Category:    "number",
-		Description: "Shuffle an array of ints",
+		Description: "Shuffles an array of ints",
 		Example:     "1,2,3,4 => 3,1,4,2",
 		Output:      "[]int",
 		Params: []Param{
 			{Field: "ints", Display: "Integers", Type: "[]int", Description: "Delimited separated integers"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			ints, err := info.GetIntArray(m, "ints")
 			if err != nil {
 				return nil, err
@@ -506,13 +506,51 @@ func addNumberLookup() {
 		},
 	})
 
+	AddFuncLookup("randomint", Info{
+		Display:     "Random Int",
+		Category:    "number",
+		Description: "Randomly selected value from a slice of int",
+		Example:     "-1,2,-3,4 => -3",
+		Output:      "int",
+		Params: []Param{
+			{Field: "ints", Display: "Integers", Type: "[]int", Description: "Delimited separated integers"},
+		},
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
+			ints, err := info.GetIntArray(m, "ints")
+			if err != nil {
+				return nil, err
+			}
+
+			return randomInt(r, ints), nil
+		},
+	})
+
+	AddFuncLookup("randomuint", Info{
+		Display:     "Random Uint",
+		Category:    "number",
+		Description: "Randomly selected value from a slice of uint",
+		Example:     "1,2,3,4 => 4",
+		Output:      "uint",
+		Params: []Param{
+			{Field: "uints", Display: "Unsigned Integers", Type: "[]uint", Description: "Delimited separated unsigned integers"},
+		},
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
+			uints, err := info.GetUintArray(m, "uints")
+			if err != nil {
+				return nil, err
+			}
+
+			return randomUint(r, uints), nil
+		},
+	})
+
 	AddFuncLookup("hexuint8", Info{
 		Display:     "HexUint8",
 		Category:    "number",
-		Description: "Random uint8 hex value",
+		Description: "Hexadecimal representation of an 8-bit unsigned integer",
 		Example:     "0x87",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return hexUint(r, 8), nil
 		},
 	})
@@ -520,10 +558,10 @@ func addNumberLookup() {
 	AddFuncLookup("hexuint16", Info{
 		Display:     "HexUint16",
 		Category:    "number",
-		Description: "Random uint16 hex value",
+		Description: "Hexadecimal representation of an 16-bit unsigned integer",
 		Example:     "0x8754",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return hexUint(r, 16), nil
 		},
 	})
@@ -531,10 +569,10 @@ func addNumberLookup() {
 	AddFuncLookup("hexuint32", Info{
 		Display:     "HexUint32",
 		Category:    "number",
-		Description: "Random uint32 hex value",
+		Description: "Hexadecimal representation of an 32-bit unsigned integer",
 		Example:     "0x87546957",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return hexUint(r, 32), nil
 		},
 	})
@@ -542,10 +580,10 @@ func addNumberLookup() {
 	AddFuncLookup("hexuint64", Info{
 		Display:     "HexUint64",
 		Category:    "number",
-		Description: "Random uint64 hex value",
+		Description: "Hexadecimal representation of an 64-bit unsigned integer",
 		Example:     "0x875469578e51b5e5",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return hexUint(r, 64), nil
 		},
 	})
@@ -553,10 +591,10 @@ func addNumberLookup() {
 	AddFuncLookup("hexuint128", Info{
 		Display:     "HexUint128",
 		Category:    "number",
-		Description: "Random uint128 hex value",
+		Description: "Hexadecimal representation of an 128-bit unsigned integer",
 		Example:     "0x875469578e51b5e56c95b64681d147a1",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return hexUint(r, 128), nil
 		},
 	})
@@ -564,10 +602,10 @@ func addNumberLookup() {
 	AddFuncLookup("hexuint256", Info{
 		Display:     "HexUint256",
 		Category:    "number",
-		Description: "Random uint256 hex value",
+		Description: "Hexadecimal representation of an 256-bit unsigned integer",
 		Example:     "0x875469578e51b5e56c95b64681d147a12cde48a4f417231b0c486abbc263e48d",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return hexUint(r, 256), nil
 		},
 	})

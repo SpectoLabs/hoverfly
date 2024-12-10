@@ -111,14 +111,22 @@ func nounProper(r *rand.Rand) string {
 	return getRandValue(r, []string{"person", "first"})
 }
 
+// NounDeterminer will generate a random noun determiner
+func NounDeterminer() string { return nounDeterminer(globalFaker.Rand) }
+
+// NounDeterminer will generate a random noun determiner
+func (f *Faker) NounDeterminer() string { return nounDeterminer(f.Rand) }
+
+func nounDeterminer(r *rand.Rand) string { return getRandValue(r, []string{"word", "noun_determiner"}) }
+
 func addWordNounLookup() {
 	AddFuncLookup("noun", Info{
 		Display:     "Noun",
 		Category:    "word",
-		Description: "Random noun",
+		Description: "Person, place, thing, or idea, named or referred to in a sentence",
 		Example:     "aunt",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return noun(r), nil
 		},
 	})
@@ -126,10 +134,10 @@ func addWordNounLookup() {
 	AddFuncLookup("nouncommon", Info{
 		Display:     "Noun Common",
 		Category:    "word",
-		Description: "Random common noun",
+		Description: "General name for people, places, or things, not specific or unique",
 		Example:     "part",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return nounCommon(r), nil
 		},
 	})
@@ -137,10 +145,10 @@ func addWordNounLookup() {
 	AddFuncLookup("nounconcrete", Info{
 		Display:     "Noun Concrete",
 		Category:    "word",
-		Description: "Random concrete noun",
+		Description: "Names for physical entities experienced through senses like sight, touch, smell, or taste",
 		Example:     "snowman",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return nounConcrete(r), nil
 		},
 	})
@@ -148,10 +156,10 @@ func addWordNounLookup() {
 	AddFuncLookup("nounabstract", Info{
 		Display:     "Noun Abstract",
 		Category:    "word",
-		Description: "Random abstract noun",
+		Description: "Ideas, qualities, or states that cannot be perceived with the five senses",
 		Example:     "confusion",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return nounAbstract(r), nil
 		},
 	})
@@ -159,10 +167,10 @@ func addWordNounLookup() {
 	AddFuncLookup("nouncollectivepeople", Info{
 		Display:     "Noun Collective People",
 		Category:    "word",
-		Description: "Random collective noun person",
+		Description: "Group of people or things regarded as a unit",
 		Example:     "body",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return nounCollectivePeople(r), nil
 		},
 	})
@@ -170,10 +178,10 @@ func addWordNounLookup() {
 	AddFuncLookup("nouncollectiveanimal", Info{
 		Display:     "Noun Collective Animal",
 		Category:    "word",
-		Description: "Random collective noun animal",
+		Description: "Group of animals, like a 'pack' of wolves or a 'flock' of birds",
 		Example:     "party",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return nounCollectiveAnimal(r), nil
 		},
 	})
@@ -181,10 +189,10 @@ func addWordNounLookup() {
 	AddFuncLookup("nouncollectivething", Info{
 		Display:     "Noun Collective Thing",
 		Category:    "word",
-		Description: "Random collective noun thing",
+		Description: "Group of objects or items, such as a 'bundle' of sticks or a 'cluster' of grapes",
 		Example:     "hand",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return nounCollectiveThing(r), nil
 		},
 	})
@@ -192,10 +200,10 @@ func addWordNounLookup() {
 	AddFuncLookup("nouncountable", Info{
 		Display:     "Noun Countable",
 		Category:    "word",
-		Description: "Random countable noun",
+		Description: "Items that can be counted individually",
 		Example:     "neck",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return nounCountable(r), nil
 		},
 	})
@@ -203,10 +211,10 @@ func addWordNounLookup() {
 	AddFuncLookup("noununcountable", Info{
 		Display:     "Noun Uncountable",
 		Category:    "word",
-		Description: "Random uncountable noun",
+		Description: "Items that can't be counted individually",
 		Example:     "seafood",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return nounUncountable(r), nil
 		},
 	})
@@ -214,11 +222,22 @@ func addWordNounLookup() {
 	AddFuncLookup("nounproper", Info{
 		Display:     "Noun Proper",
 		Category:    "word",
-		Description: "Random proper noun",
+		Description: "Specific name for a particular person, place, or organization",
 		Example:     "John",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return nounProper(r), nil
+		},
+	})
+
+	AddFuncLookup("noundeterminer", Info{
+		Display:     "Noun Determiner",
+		Category:    "word",
+		Description: "Word that introduces a noun and identifies it as a noun",
+		Example:     "your",
+		Output:      "string",
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
+			return nounDeterminer(r), nil
 		},
 	})
 }

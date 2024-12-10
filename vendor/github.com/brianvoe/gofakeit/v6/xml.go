@@ -11,12 +11,12 @@ import (
 
 // XMLOptions defines values needed for json generation
 type XMLOptions struct {
-	Type          string  `json:"type" xml:"type"` // single or multiple
+	Type          string  `json:"type" xml:"type" fake:"{randomstring:[array,single]}"` // single or array
 	RootElement   string  `json:"root_element" xml:"root_element"`
 	RecordElement string  `json:"record_element" xml:"record_element"`
-	RowCount      int     `json:"row_count" xml:"row_count"`
-	Fields        []Field `json:"fields" xml:"fields"`
+	RowCount      int     `json:"row_count" xml:"row_count" fake:"{number:1,10}"`
 	Indent        bool    `json:"indent" xml:"indent"`
+	Fields        []Field `json:"fields" xml:"fields" fake:"{fields}"`
 }
 
 type xmlArray struct {
@@ -27,12 +27,12 @@ type xmlArray struct {
 type xmlMap struct {
 	XMLName  xml.Name
 	KeyOrder []string
-	Map      map[string]interface{} `xml:",chardata"`
+	Map      map[string]any `xml:",chardata"`
 }
 
 type xmlEntry struct {
 	XMLName xml.Name
-	Value   interface{} `xml:",chardata"`
+	Value   any `xml:",chardata"`
 }
 
 func (m xmlMap) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
@@ -97,15 +97,15 @@ func xmlMapLoop(e *xml.Encoder, m *xmlMap) error {
 		case reflect.Map:
 			err = e.Encode(xmlMap{
 				XMLName: xml.Name{Local: key},
-				Map:     m.Map[key].(map[string]interface{}),
+				Map:     m.Map[key].(map[string]any),
 			})
 			if err != nil {
 				return err
 			}
 		case reflect.Struct:
-			// Convert struct to map[string]interface{}
+			// Convert struct to map[string]any
 			// So we can rewrap element
-			var inInterface map[string]interface{}
+			var inInterface map[string]any
 			inrec, _ := json.Marshal(m.Map[key])
 			json.Unmarshal(inrec, &inInterface)
 
@@ -128,12 +128,22 @@ func xmlMapLoop(e *xml.Encoder, m *xmlMap) error {
 }
 
 // XML generates an object or an array of objects in json format
-func XML(xo *XMLOptions) ([]byte, error) { return xmlFunc(globalFaker.Rand, xo) }
+// A nil XMLOptions returns a randomly structured XML.
+func XML(xo *XMLOptions) ([]byte, error) { return xmlFunc(globalFaker, xo) }
 
 // XML generates an object or an array of objects in json format
-func (f *Faker) XML(xo *XMLOptions) ([]byte, error) { return xmlFunc(f.Rand, xo) }
+// A nil XMLOptions returns a randomly structured XML.
+func (f *Faker) XML(xo *XMLOptions) ([]byte, error) { return xmlFunc(f, xo) }
 
-func xmlFunc(r *rand.Rand, xo *XMLOptions) ([]byte, error) {
+func xmlFunc(f *Faker, xo *XMLOptions) ([]byte, error) {
+	if xo == nil {
+		// We didn't get a XMLOptions, so create a new random one
+		err := f.Struct(&xo)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// Check to make sure they passed in a type
 	if xo.Type != "single" && xo.Type != "array" {
 		return nil, errors.New("invalid type, must be array or object")
@@ -164,10 +174,10 @@ func xmlFunc(r *rand.Rand, xo *XMLOptions) ([]byte, error) {
 		v := xmlMap{
 			XMLName:  xml.Name{Local: xo.RootElement},
 			KeyOrder: keyOrder,
-			Map:      make(map[string]interface{}),
+			Map:      make(map[string]any),
 		}
 
-		// Loop through fields and add to them to map[string]interface{}
+		// Loop through fields and add to them to map[string]any
 		for _, field := range xo.Fields {
 			// Get function info
 			funcInfo := GetFuncLookup(field.Function)
@@ -175,7 +185,7 @@ func xmlFunc(r *rand.Rand, xo *XMLOptions) ([]byte, error) {
 				return nil, errors.New("invalid function, " + field.Function + " does not exist")
 			}
 
-			value, err := funcInfo.Generate(r, &field.Params, funcInfo)
+			value, err := funcInfo.Generate(f.Rand, &field.Params, funcInfo)
 			if err != nil {
 				return nil, err
 			}
@@ -212,10 +222,10 @@ func xmlFunc(r *rand.Rand, xo *XMLOptions) ([]byte, error) {
 			v := xmlMap{
 				XMLName:  xml.Name{Local: xo.RecordElement},
 				KeyOrder: keyOrder,
-				Map:      make(map[string]interface{}),
+				Map:      make(map[string]any),
 			}
 
-			// Loop through fields and add to them to map[string]interface{}
+			// Loop through fields and add to them to map[string]any
 			for _, field := range xo.Fields {
 				if field.Function == "autoincrement" {
 					v.Map[field.Name] = i
@@ -228,7 +238,7 @@ func xmlFunc(r *rand.Rand, xo *XMLOptions) ([]byte, error) {
 					return nil, errors.New("invalid function, " + field.Function + " does not exist")
 				}
 
-				value, err := funcInfo.Generate(r, &field.Params, funcInfo)
+				value, err := funcInfo.Generate(f.Rand, &field.Params, funcInfo)
 				if err != nil {
 					return nil, err
 				}
@@ -261,20 +271,18 @@ func addFileXMLLookup() {
 		Display:     "XML",
 		Category:    "file",
 		Description: "Generates an single or an array of elements in xml format",
-		Example: `
-			<xml>
-				<record>
-					<first_name>Markus</first_name>
-					<last_name>Moen</last_name>
-					<password>Dc0VYXjkWABx</password>
-				</record>
-				<record>
-					<first_name>Osborne</first_name>
-					<last_name>Hilll</last_name>
-					<password>XPJ9OVNbs5lm</password>
-				</record>
-			</xml>
-		`,
+		Example: `<xml>
+	<record>
+		<first_name>Markus</first_name>
+		<last_name>Moen</last_name>
+		<password>Dc0VYXjkWABx</password>
+	</record>
+	<record>
+		<first_name>Osborne</first_name>
+		<last_name>Hilll</last_name>
+		<password>XPJ9OVNbs5lm</password>
+	</record>
+</xml>`,
 		Output:      "[]byte",
 		ContentType: "application/xml",
 		Params: []Param{
@@ -282,10 +290,10 @@ func addFileXMLLookup() {
 			{Field: "rootelement", Display: "Root Element", Type: "string", Default: "xml", Description: "Root element wrapper name"},
 			{Field: "recordelement", Display: "Record Element", Type: "string", Default: "record", Description: "Record element for each record row"},
 			{Field: "rowcount", Display: "Row Count", Type: "int", Default: "100", Description: "Number of rows in JSON array"},
-			{Field: "fields", Display: "Fields", Type: "[]Field", Description: "Fields containing key name and function to run in json format"},
 			{Field: "indent", Display: "Indent", Type: "bool", Default: "false", Description: "Whether or not to add indents and newlines"},
+			{Field: "fields", Display: "Fields", Type: "[]Field", Description: "Fields containing key name and function to run in json format"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			xo := XMLOptions{}
 
 			typ, err := info.GetString(m, "type")
@@ -317,6 +325,12 @@ func addFileXMLLookup() {
 				return nil, err
 			}
 
+			indent, err := info.GetBool(m, "indent")
+			if err != nil {
+				return nil, err
+			}
+			xo.Indent = indent
+
 			// Check to make sure fields has length
 			if len(fieldsStr) > 0 {
 				xo.Fields = make([]Field, len(fieldsStr))
@@ -330,13 +344,8 @@ func addFileXMLLookup() {
 				}
 			}
 
-			indent, err := info.GetBool(m, "indent")
-			if err != nil {
-				return nil, err
-			}
-			xo.Indent = indent
-
-			return xmlFunc(r, &xo)
+			f := &Faker{Rand: r}
+			return xmlFunc(f, &xo)
 		},
 	})
 }

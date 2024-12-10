@@ -15,8 +15,10 @@ import (
 // Gumbel distribution is also sometimes known as the Extreme Value distribution.
 //
 // The right-skewed Gumbel distribution has density function
-//  1/beta * exp(-(z + exp(-z)))
-//  z = (x - mu)/beta
+//
+//	1/beta * exp(-(z + exp(-z)))
+//	z = (x - mu)/beta
+//
 // Beta must be greater than 0.
 //
 // For more information, see https://en.wikipedia.org/wiki/Gumbel_distribution.
@@ -57,7 +59,7 @@ func (g GumbelRight) Mean() float64 {
 	return g.Mu + g.Beta*eulerMascheroni
 }
 
-// Median returns the median of the normal distribution.
+// Median returns the median of the Gumbel distribution.
 func (g GumbelRight) Median() float64 {
 	return g.Mu - g.Beta*math.Log(math.Ln2)
 }

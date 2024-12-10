@@ -10,10 +10,10 @@ func (f *Faker) Letter() string { return letter(f.Rand) }
 
 func letter(r *rand.Rand) string { return string(randLetter(r)) }
 
-// LetterN will generate a random ASCII string with length N
+// LetterN will generate a random ASCII string with length N. Note that this function returns a string with a length of 1 when 0 is passed.
 func LetterN(n uint) string { return letterN(globalFaker.Rand, n) }
 
-// LetterN will generate a random ASCII string with length N
+// LetterN will generate a random ASCII string with length N. Note that this function returns a string with a length of 1 when 0 is passed.
 func (f *Faker) LetterN(n uint) string { return letterN(f.Rand, n) }
 
 func letterN(r *rand.Rand, n uint) string {
@@ -44,10 +44,10 @@ func (f *Faker) Digit() string { return digit(f.Rand) }
 
 func digit(r *rand.Rand) string { return string(randDigit(r)) }
 
-// DigitN will generate a random string of length N consists of ASCII digits (note it can start with 0).
+// DigitN will generate a random string of length N consists of ASCII digits. Note that the string generated can start with 0 and this function returns a string with a length of 1 when 0 is passed.
 func DigitN(n uint) string { return digitN(globalFaker.Rand, n) }
 
-// DigitN will generate a random string of length N consists of ASCII digits (note it can start with 0).
+// DigitN will generate a random string of length N consists of ASCII digits. Note that the string generated can start with 0 and this function returns a string with a length of 1 when 0 is passed.
 func (f *Faker) DigitN(n uint) string { return digitN(f.Rand, n) }
 
 func digitN(r *rand.Rand, n uint) string {
@@ -123,10 +123,10 @@ func addStringLookup() {
 	AddFuncLookup("letter", Info{
 		Display:     "Letter",
 		Category:    "string",
-		Description: "Generate a single random lower case ASCII letter",
+		Description: "Character or symbol from the American Standard Code for Information Interchange (ASCII) character set",
 		Example:     "g",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return letter(r), nil
 		},
 	})
@@ -134,13 +134,13 @@ func addStringLookup() {
 	AddFuncLookup("lettern", Info{
 		Display:     "LetterN",
 		Category:    "string",
-		Description: "Generate a random ASCII string with length N",
+		Description: "ASCII string with length N",
 		Example:     "gbRMaRxHki",
 		Output:      "string",
 		Params: []Param{
 			{Field: "count", Display: "Count", Type: "uint", Description: "Number of digits to generate"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			ui, err := info.GetUint(m, "count")
 			if err != nil {
 				return nil, err
@@ -153,10 +153,10 @@ func addStringLookup() {
 	AddFuncLookup("vowel", Info{
 		Display:     "Vowel",
 		Category:    "string",
-		Description: "Generate a single random lower case vowel",
+		Description: "Speech sound produced with an open vocal tract",
 		Example:     "a",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return vowel(r), nil
 		},
 	})
@@ -164,10 +164,10 @@ func addStringLookup() {
 	AddFuncLookup("digit", Info{
 		Display:     "Digit",
 		Category:    "string",
-		Description: "Generate a single ASCII digit",
+		Description: "Numerical symbol used to represent numbers",
 		Example:     "0",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return digit(r), nil
 		},
 	})
@@ -175,13 +175,13 @@ func addStringLookup() {
 	AddFuncLookup("digitn", Info{
 		Display:     "DigitN",
 		Category:    "string",
-		Description: "Generate a random string of length N consists of ASCII digits",
+		Description: "string of length N consisting of ASCII digits",
 		Example:     "0136459948",
 		Output:      "string",
 		Params: []Param{
 			{Field: "count", Display: "Count", Type: "uint", Description: "Number of digits to generate"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			ui, err := info.GetUint(m, "count")
 			if err != nil {
 				return nil, err
@@ -200,7 +200,7 @@ func addStringLookup() {
 		Params: []Param{
 			{Field: "str", Display: "String", Type: "string", Description: "String value to replace #'s"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			str, err := info.GetString(m, "str")
 			if err != nil {
 				return nil, err
@@ -219,7 +219,7 @@ func addStringLookup() {
 		Params: []Param{
 			{Field: "str", Display: "String", Type: "string", Description: "String value to replace ?'s"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			str, err := info.GetString(m, "str")
 			if err != nil {
 				return nil, err
@@ -239,7 +239,7 @@ func addStringLookup() {
 		Params: []Param{
 			{Field: "strs", Display: "Strings", Type: "[]string", Description: "Delimited separated strings"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			strs, err := info.GetStringArray(m, "strs")
 			if err != nil {
 				return nil, err
@@ -254,13 +254,13 @@ func addStringLookup() {
 	AddFuncLookup("randomstring", Info{
 		Display:     "Random String",
 		Category:    "string",
-		Description: "Randomly grab one string from array",
+		Description: "Return a random string from a string array",
 		Example:     "hello,world,whats,up => world",
 		Output:      "[]string",
 		Params: []Param{
 			{Field: "strs", Display: "Strings", Type: "[]string", Description: "Delimited separated strings"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			strs, err := info.GetStringArray(m, "strs")
 			if err != nil {
 				return nil, err

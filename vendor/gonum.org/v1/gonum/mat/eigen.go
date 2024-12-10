@@ -14,8 +14,12 @@ const (
 	noVectors = "mat: eigenvectors not computed"
 )
 
-// EigenSym is a type for creating and manipulating the Eigen decomposition of
-// symmetric matrices.
+// EigenSym is a type for computing all eigenvalues and, optionally,
+// eigenvectors of a symmetric matrix A.
+//
+// It is a Symmetric matrix represented by its spectral factorization. Once
+// computed, this representation is useful for extracting eigenvalues and
+// eigenvector, but At is slow.
 type EigenSym struct {
 	vectorsComputed bool
 
@@ -23,22 +27,65 @@ type EigenSym struct {
 	vectors *Dense
 }
 
-// Factorize computes the eigenvalue decomposition of the symmetric matrix a.
-// The Eigen decomposition is defined as
-//  A = P * D * P^-1
-// where D is a diagonal matrix containing the eigenvalues of the matrix, and
-// P is a matrix of the eigenvectors of A. Factorize computes the eigenvalues
-// in ascending order. If the vectors input argument is false, the eigenvectors
-// are not computed.
+// Dims returns the dimensions of the matrix.
+func (e *EigenSym) Dims() (r, c int) {
+	n := e.SymmetricDim()
+	return n, n
+}
+
+// SymmetricDim implements the Symmetric interface.
+func (e *EigenSym) SymmetricDim() int {
+	return len(e.values)
+}
+
+// At returns the element at row i, column j of the matrix A.
 //
-// Factorize returns whether the decomposition succeeded. If the decomposition
-// failed, methods that require a successful factorization will panic.
+// At will panic if the eigenvectors have not been computed.
+func (e *EigenSym) At(i, j int) float64 {
+	if !e.vectorsComputed {
+		panic(noVectors)
+	}
+	n, _ := e.Dims()
+	if uint(i) >= uint(n) {
+		panic(ErrRowAccess)
+	}
+	if uint(j) >= uint(n) {
+		panic(ErrColAccess)
+	}
+
+	var val float64
+	for k := 0; k < n; k++ {
+		val += e.values[k] * e.vectors.at(i, k) * e.vectors.at(j, k)
+	}
+	return val
+}
+
+// T returns the receiver, the transpose of a symmetric matrix.
+func (e *EigenSym) T() Matrix {
+	return e
+}
+
+// Factorize computes the spectral factorization (eigendecomposition) of the
+// symmetric matrix A.
+//
+// The spectral factorization of A can be written as
+//
+//	A = Q * Λ * Qᵀ
+//
+// where Λ is a diagonal matrix whose entries are the eigenvalues, and Q is an
+// orthogonal matrix whose columns are the eigenvectors.
+//
+// If vectors is false, the eigenvectors are not computed and later calls to
+// VectorsTo and At will panic.
+//
+// Factorize returns whether the factorization succeeded. If it returns false,
+// methods that require a successful factorization will panic.
 func (e *EigenSym) Factorize(a Symmetric, vectors bool) (ok bool) {
 	// kill previous decomposition
 	e.vectorsComputed = false
 	e.values = e.values[:]
 
-	n := a.Symmetric()
+	n := a.SymmetricDim()
 	sd := NewSymDense(n, nil)
 	sd.CopySym(a)
 
@@ -50,9 +97,9 @@ func (e *EigenSym) Factorize(a Symmetric, vectors bool) (ok bool) {
 	work := []float64{0}
 	lapack64.Syev(jobz, sd.mat, w, work, -1)
 
-	work = getFloats(int(work[0]), false)
+	work = getFloat64s(int(work[0]), false)
 	ok = lapack64.Syev(jobz, sd.mat, w, work, len(work))
-	putFloats(work)
+	putFloat64s(work)
 	if !ok {
 		e.vectorsComputed = false
 		e.values = nil
@@ -70,13 +117,15 @@ func (e *EigenSym) succFact() bool {
 	return len(e.values) != 0
 }
 
-// Values extracts the eigenvalues of the factorized matrix. If dst is
-// non-nil, the values are stored in-place into dst. In this case
-// dst must have length n, otherwise Values will panic. If dst is
-// nil, then a new slice will be allocated of the proper length and filled
-// with the eigenvalues.
+// Values extracts the eigenvalues of the factorized n×n matrix A in ascending
+// order.
 //
-// Values panics if the Eigen decomposition was not successful.
+// If dst is not nil, the values are stored in-place into dst and returned,
+// otherwise a new slice is allocated first. If dst is not nil, it must have
+// length equal to n.
+//
+// If the receiver does not contain a successful factorization, Values will
+// panic.
 func (e *EigenSym) Values(dst []float64) []float64 {
 	if !e.succFact() {
 		panic(badFact)
@@ -91,13 +140,27 @@ func (e *EigenSym) Values(dst []float64) []float64 {
 	return dst
 }
 
-// VectorsTo stores the eigenvectors of the decomposition into the columns of
-// dst.
+// RawValues returns the slice storing the eigenvalues of A in ascending order.
 //
-// If dst is empty, VectorsTo will resize dst to be n×n. When dst is
-// non-empty, VectorsTo will panic if dst is not n×n. VectorsTo will also
-// panic if the eigenvectors were not computed during the factorization,
-// or if the receiver does not contain a successful factorization.
+// If the returned slice is modified, the factorization is invalid and should
+// not be used.
+//
+// If the receiver does not contain a successful factorization, RawValues will
+// return nil.
+func (e *EigenSym) RawValues() []float64 {
+	if !e.succFact() {
+		return nil
+	}
+	return e.values
+}
+
+// VectorsTo stores the orthonormal eigenvectors of the factorized n×n matrix A
+// into the columns of dst.
+//
+// If dst is empty, VectorsTo will resize dst to be n×n. When dst is non-empty,
+// VectorsTo will panic if dst is not n×n. VectorsTo will also panic if the
+// eigenvectors were not computed during the factorization, or if the receiver
+// does not contain a successful factorization.
 func (e *EigenSym) VectorsTo(dst *Dense) {
 	if !e.succFact() {
 		panic(badFact)
@@ -115,6 +178,25 @@ func (e *EigenSym) VectorsTo(dst *Dense) {
 		}
 	}
 	dst.Copy(e.vectors)
+}
+
+// RawQ returns the orthogonal matrix Q from the spectral factorization of the
+// original matrix A
+//
+//	A = Q * Λ * Qᵀ
+//
+// The columns of Q contain the eigenvectors of A.
+//
+// If the returned matrix is modified, the factorization is invalid and should
+// not be used.
+//
+// If the receiver does not contain a successful factorization or eigenvectors
+// not computed, RawU will return nil.
+func (e *EigenSym) RawQ() Matrix {
+	if !e.succFact() || !e.vectorsComputed {
+		return nil
+	}
+	return e.vectors
 }
 
 // EigenKind specifies the computation of eigenvectors during factorization.
@@ -151,12 +233,16 @@ func (e *Eigen) succFact() bool {
 // the eigenvectors.
 //
 // A right eigenvalue/eigenvector combination is defined by
-//  A * x_r = λ * x_r
+//
+//	A * x_r = λ * x_r
+//
 // where x_r is the column vector called an eigenvector, and λ is the corresponding
 // eigenvalue.
 //
 // Similarly, a left eigenvalue/eigenvector combination is defined by
-//  x_l * A = λ * x_l
+//
+//	x_l * A = λ * x_l
+//
 // The eigenvalues, but not the eigenvectors, are the same for both decompositions.
 //
 // Typically eigenvectors refer to right eigenvectors.
@@ -195,16 +281,16 @@ func (e *Eigen) Factorize(a Matrix, kind EigenKind) (ok bool) {
 		jobvr = lapack.RightEVCompute
 	}
 
-	wr := getFloats(c, false)
-	defer putFloats(wr)
-	wi := getFloats(c, false)
-	defer putFloats(wi)
+	wr := getFloat64s(c, false)
+	defer putFloat64s(wr)
+	wi := getFloat64s(c, false)
+	defer putFloat64s(wi)
 
 	work := []float64{0}
 	lapack64.Geev(jobvl, jobvr, sd.mat, wr, wi, vl.mat, vr.mat, work, -1)
-	work = getFloats(int(work[0]), false)
+	work = getFloat64s(int(work[0]), false)
 	first := lapack64.Geev(jobvl, jobvr, sd.mat, wr, wi, vl.mat, vr.mat, work, len(work))
-	putFloats(work)
+	putFloat64s(work)
 
 	if first != 0 {
 		e.values = nil
@@ -275,11 +361,15 @@ func (e *Eigen) Values(dst []complex128) []complex128 {
 // The columns of the returned n×n dense matrix contain the eigenvectors of the
 // decomposition in the same order as the eigenvalues.
 // If the j-th eigenvalue is real, then
-//  dst[:,j] = d[:,j],
+//
+//	dst[:,j] = d[:,j],
+//
 // and if it is not real, then the elements of the j-th and (j+1)-th columns of d
 // form complex conjugate pairs and the eigenvectors are recovered as
-//  dst[:,j]   = d[:,j] + i*d[:,j+1],
-//  dst[:,j+1] = d[:,j] - i*d[:,j+1],
+//
+//	dst[:,j]   = d[:,j] + i*d[:,j+1],
+//	dst[:,j+1] = d[:,j] - i*d[:,j+1],
+//
 // where i is the imaginary unit.
 func (e *Eigen) complexEigenTo(dst *CDense, d *Dense) {
 	r, c := d.Dims()

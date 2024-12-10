@@ -30,7 +30,7 @@ func phraseNoun(r *rand.Rand) string {
 	}
 
 	// Add determiner from weighted list
-	prob, _ := weighted(r, []interface{}{1, 2, 3}, []float32{2, 1.5, 1})
+	prob, _ := weighted(r, []any{1, 2, 3}, []float32{2, 1.5, 1})
 	if prob == 1 {
 		str = getArticle(str) + " " + str
 	} else if prob == 2 {
@@ -109,10 +109,10 @@ func addWordPhraseLookup() {
 	AddFuncLookup("phrase", Info{
 		Display:     "Phrase",
 		Category:    "word",
-		Description: "Random phrase",
+		Description: "A small group of words standing together",
 		Example:     "time will tell",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return phrase(r), nil
 		},
 	})
@@ -120,10 +120,10 @@ func addWordPhraseLookup() {
 	AddFuncLookup("phrasenoun", Info{
 		Display:     "Noun Phrase",
 		Category:    "word",
-		Description: "Random noun phrase",
+		Description: "Phrase with a noun as its head, functions within sentence like a noun",
 		Example:     "a tribe",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return phraseNoun(r), nil
 		},
 	})
@@ -131,10 +131,10 @@ func addWordPhraseLookup() {
 	AddFuncLookup("phraseverb", Info{
 		Display:     "Verb Phrase",
 		Category:    "word",
-		Description: "Random verb phrase",
+		Description: "Phrase that Consists of a verb and its modifiers, expressing an action or state",
 		Example:     "a tribe",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return phraseVerb(r), nil
 		},
 	})
@@ -142,10 +142,10 @@ func addWordPhraseLookup() {
 	AddFuncLookup("phraseadverb", Info{
 		Display:     "Adverb Phrase",
 		Category:    "word",
-		Description: "Random adverb phrase",
+		Description: "Phrase that modifies a verb, adjective, or another adverb, providing additional information.",
 		Example:     "fully gladly",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return phraseAdverb(r), nil
 		},
 	})
@@ -153,10 +153,10 @@ func addWordPhraseLookup() {
 	AddFuncLookup("phrasepreposition", Info{
 		Display:     "Preposition Phrase",
 		Category:    "word",
-		Description: "Random preposition phrase",
+		Description: "Phrase starting with a preposition, showing relation between elements in a sentence.",
 		Example:     "out the black thing",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return phrasePreposition(r), nil
 		},
 	})

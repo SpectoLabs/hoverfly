@@ -1,12 +1,8 @@
-/*
-Package ast declares types representing a JavaScript AST.
-
-Warning
-
-The parser and AST interfaces are still works-in-progress (particularly where
-node types are concerned) and may change in the future.
-
-*/
+// Package ast declares types representing a JavaScript AST.
+//
+// # Warning
+// The parser and AST interfaces are still works-in-progress (particularly where
+// node types are concerned) and may change in the future.
 package ast
 
 import (
@@ -14,502 +10,955 @@ import (
 	"github.com/robertkrimen/otto/token"
 )
 
-// All nodes implement the Node interface.
+// Node is implemented by types that represent a node.
 type Node interface {
 	Idx0() file.Idx // The index of the first character belonging to the node
 	Idx1() file.Idx // The index of the first character immediately after the node
 }
 
-// ========== //
-// Expression //
-// ========== //
+// Expression is implemented by types that represent an Expression.
+type Expression interface {
+	Node
+	expression()
+}
 
-type (
-	// All expression nodes implement the Expression interface.
-	Expression interface {
-		Node
-		_expressionNode()
-	}
+// ArrayLiteral represents an array literal.
+type ArrayLiteral struct {
+	Value        []Expression
+	LeftBracket  file.Idx
+	RightBracket file.Idx
+}
 
-	ArrayLiteral struct {
-		LeftBracket  file.Idx
-		RightBracket file.Idx
-		Value        []Expression
-	}
+// Idx0 implements Node.
+func (al *ArrayLiteral) Idx0() file.Idx {
+	return al.LeftBracket
+}
 
-	AssignExpression struct {
-		Operator token.Token
-		Left     Expression
-		Right    Expression
-	}
+// Idx1 implements Node.
+func (al *ArrayLiteral) Idx1() file.Idx {
+	return al.RightBracket + 1
+}
 
-	BadExpression struct {
-		From file.Idx
-		To   file.Idx
-	}
+// expression implements Expression.
+func (*ArrayLiteral) expression() {}
 
-	BinaryExpression struct {
-		Operator   token.Token
-		Left       Expression
-		Right      Expression
-		Comparison bool
-	}
+// AssignExpression represents an assignment expression.
+type AssignExpression struct {
+	Left     Expression
+	Right    Expression
+	Operator token.Token
+}
 
-	BooleanLiteral struct {
-		Idx     file.Idx
-		Literal string
-		Value   bool
-	}
+// Idx0 implements Node.
+func (ae *AssignExpression) Idx0() file.Idx {
+	return ae.Left.Idx0()
+}
 
-	BracketExpression struct {
-		Left         Expression
-		Member       Expression
-		LeftBracket  file.Idx
-		RightBracket file.Idx
-	}
+// Idx1 implements Node.
+func (ae *AssignExpression) Idx1() file.Idx {
+	return ae.Right.Idx1()
+}
 
-	CallExpression struct {
-		Callee           Expression
-		LeftParenthesis  file.Idx
-		ArgumentList     []Expression
-		RightParenthesis file.Idx
-	}
+// expression implements Expression.
+func (*AssignExpression) expression() {}
 
-	ConditionalExpression struct {
-		Test       Expression
-		Consequent Expression
-		Alternate  Expression
-	}
+// BadExpression represents a bad expression.
+type BadExpression struct {
+	From file.Idx
+	To   file.Idx
+}
 
-	DotExpression struct {
-		Left       Expression
-		Identifier *Identifier
-	}
+// Idx0 implements Node.
+func (be *BadExpression) Idx0() file.Idx {
+	return be.From
+}
 
-	EmptyExpression struct {
-		Begin file.Idx
-		End   file.Idx
-	}
+// Idx1 implements Node.
+func (be *BadExpression) Idx1() file.Idx {
+	return be.To
+}
 
-	FunctionLiteral struct {
-		Function      file.Idx
-		Name          *Identifier
-		ParameterList *ParameterList
-		Body          Statement
-		Source        string
+// expression implements Expression.
+func (*BadExpression) expression() {}
 
-		DeclarationList []Declaration
-	}
+// BinaryExpression represents a binary expression.
+type BinaryExpression struct {
+	Left       Expression
+	Right      Expression
+	Operator   token.Token
+	Comparison bool
+}
 
-	Identifier struct {
-		Name string
-		Idx  file.Idx
-	}
+// Idx0 implements Node.
+func (be *BinaryExpression) Idx0() file.Idx {
+	return be.Left.Idx0()
+}
 
-	NewExpression struct {
-		New              file.Idx
-		Callee           Expression
-		LeftParenthesis  file.Idx
-		ArgumentList     []Expression
-		RightParenthesis file.Idx
-	}
+// Idx1 implements Node.
+func (be *BinaryExpression) Idx1() file.Idx {
+	return be.Right.Idx1()
+}
 
-	NullLiteral struct {
-		Idx     file.Idx
-		Literal string
-	}
+// expression implements Expression.
+func (*BinaryExpression) expression() {}
 
-	NumberLiteral struct {
-		Idx     file.Idx
-		Literal string
-		Value   interface{}
-	}
+// BooleanLiteral represents a boolean expression.
+type BooleanLiteral struct {
+	Literal string
+	Idx     file.Idx
+	Value   bool
+}
 
-	ObjectLiteral struct {
-		LeftBrace  file.Idx
-		RightBrace file.Idx
-		Value      []Property
-	}
+// Idx0 implements Node.
+func (bl *BooleanLiteral) Idx0() file.Idx {
+	return bl.Idx
+}
 
-	ParameterList struct {
-		Opening file.Idx
-		List    []*Identifier
-		Closing file.Idx
-	}
+// Idx1 implements Node.
+func (bl *BooleanLiteral) Idx1() file.Idx {
+	return file.Idx(int(bl.Idx) + len(bl.Literal))
+}
 
-	Property struct {
-		Key   string
-		Kind  string
-		Value Expression
-	}
+// expression implements Expression.
+func (*BooleanLiteral) expression() {}
 
-	RegExpLiteral struct {
-		Idx     file.Idx
-		Literal string
-		Pattern string
-		Flags   string
-		Value   string
-	}
+// BracketExpression represents a bracketed expression.
+type BracketExpression struct {
+	Left         Expression
+	Member       Expression
+	LeftBracket  file.Idx
+	RightBracket file.Idx
+}
 
-	SequenceExpression struct {
-		Sequence []Expression
-	}
+// Idx0 implements Node.
+func (be *BracketExpression) Idx0() file.Idx {
+	return be.Left.Idx0()
+}
 
-	StringLiteral struct {
-		Idx     file.Idx
-		Literal string
-		Value   string
-	}
+// Idx1 implements Node.
+func (be *BracketExpression) Idx1() file.Idx {
+	return be.RightBracket + 1
+}
 
-	ThisExpression struct {
-		Idx file.Idx
-	}
+// expression implements Expression.
+func (*BracketExpression) expression() {}
 
-	UnaryExpression struct {
-		Operator token.Token
-		Idx      file.Idx // If a prefix operation
-		Operand  Expression
-		Postfix  bool
-	}
+// CallExpression represents a call expression.
+type CallExpression struct {
+	Callee           Expression
+	ArgumentList     []Expression
+	LeftParenthesis  file.Idx
+	RightParenthesis file.Idx
+}
 
-	VariableExpression struct {
-		Name        string
-		Idx         file.Idx
-		Initializer Expression
-	}
-)
+// Idx0 implements Node.
+func (ce *CallExpression) Idx0() file.Idx {
+	return ce.Callee.Idx0()
+}
 
-// _expressionNode
+// Idx1 implements Node.
+func (ce *CallExpression) Idx1() file.Idx {
+	return ce.RightParenthesis + 1
+}
 
-func (*ArrayLiteral) _expressionNode()          {}
-func (*AssignExpression) _expressionNode()      {}
-func (*BadExpression) _expressionNode()         {}
-func (*BinaryExpression) _expressionNode()      {}
-func (*BooleanLiteral) _expressionNode()        {}
-func (*BracketExpression) _expressionNode()     {}
-func (*CallExpression) _expressionNode()        {}
-func (*ConditionalExpression) _expressionNode() {}
-func (*DotExpression) _expressionNode()         {}
-func (*EmptyExpression) _expressionNode()       {}
-func (*FunctionLiteral) _expressionNode()       {}
-func (*Identifier) _expressionNode()            {}
-func (*NewExpression) _expressionNode()         {}
-func (*NullLiteral) _expressionNode()           {}
-func (*NumberLiteral) _expressionNode()         {}
-func (*ObjectLiteral) _expressionNode()         {}
-func (*RegExpLiteral) _expressionNode()         {}
-func (*SequenceExpression) _expressionNode()    {}
-func (*StringLiteral) _expressionNode()         {}
-func (*ThisExpression) _expressionNode()        {}
-func (*UnaryExpression) _expressionNode()       {}
-func (*VariableExpression) _expressionNode()    {}
+// expression implements Expression.
+func (*CallExpression) expression() {}
 
-// ========= //
-// Statement //
-// ========= //
+// ConditionalExpression represents a conditional expression.
+type ConditionalExpression struct {
+	Test       Expression
+	Consequent Expression
+	Alternate  Expression
+}
 
-type (
-	// All statement nodes implement the Statement interface.
-	Statement interface {
-		Node
-		_statementNode()
-	}
+// Idx0 implements Node.
+func (ce *ConditionalExpression) Idx0() file.Idx {
+	return ce.Test.Idx0()
+}
 
-	BadStatement struct {
-		From file.Idx
-		To   file.Idx
-	}
+// Idx1 implements Node.
+func (ce *ConditionalExpression) Idx1() file.Idx {
+	return ce.Alternate.Idx1()
+}
 
-	BlockStatement struct {
-		LeftBrace  file.Idx
-		List       []Statement
-		RightBrace file.Idx
-	}
+// expression implements Expression.
+func (*ConditionalExpression) expression() {}
 
-	BranchStatement struct {
-		Idx   file.Idx
-		Token token.Token
-		Label *Identifier
-	}
+// DotExpression represents a dot expression.
+type DotExpression struct {
+	Left       Expression
+	Identifier *Identifier
+}
 
-	CaseStatement struct {
-		Case       file.Idx
-		Test       Expression
-		Consequent []Statement
-	}
+// Idx0 implements Node.
+func (de *DotExpression) Idx0() file.Idx {
+	return de.Left.Idx0()
+}
 
-	CatchStatement struct {
-		Catch     file.Idx
-		Parameter *Identifier
-		Body      Statement
-	}
+// Idx1 implements Node.
+func (de *DotExpression) Idx1() file.Idx {
+	return de.Identifier.Idx1()
+}
 
-	DebuggerStatement struct {
-		Debugger file.Idx
-	}
+// expression implements Expression.
+func (*DotExpression) expression() {}
 
-	DoWhileStatement struct {
-		Do   file.Idx
-		Test Expression
-		Body Statement
-	}
+// EmptyExpression represents an empty expression.
+type EmptyExpression struct {
+	Begin file.Idx
+	End   file.Idx
+}
 
-	EmptyStatement struct {
-		Semicolon file.Idx
-	}
+// Idx0 implements Node.
+func (ee *EmptyExpression) Idx0() file.Idx {
+	return ee.Begin
+}
 
-	ExpressionStatement struct {
-		Expression Expression
-	}
+// Idx1 implements Node.
+func (ee *EmptyExpression) Idx1() file.Idx {
+	return ee.End
+}
 
-	ForInStatement struct {
-		For    file.Idx
-		Into   Expression
-		Source Expression
-		Body   Statement
-	}
+// expression implements Expression.
+func (*EmptyExpression) expression() {}
 
-	ForStatement struct {
-		For         file.Idx
-		Initializer Expression
-		Update      Expression
-		Test        Expression
-		Body        Statement
-	}
-
-	FunctionStatement struct {
-		Function *FunctionLiteral
-	}
-
-	IfStatement struct {
-		If         file.Idx
-		Test       Expression
-		Consequent Statement
-		Alternate  Statement
-	}
-
-	LabelledStatement struct {
-		Label     *Identifier
-		Colon     file.Idx
-		Statement Statement
-	}
-
-	ReturnStatement struct {
-		Return   file.Idx
-		Argument Expression
-	}
-
-	SwitchStatement struct {
-		Switch       file.Idx
-		Discriminant Expression
-		Default      int
-		Body         []*CaseStatement
-	}
-
-	ThrowStatement struct {
-		Throw    file.Idx
-		Argument Expression
-	}
-
-	TryStatement struct {
-		Try     file.Idx
-		Body    Statement
-		Catch   *CatchStatement
-		Finally Statement
-	}
-
-	VariableStatement struct {
-		Var  file.Idx
-		List []Expression
-	}
-
-	WhileStatement struct {
-		While file.Idx
-		Test  Expression
-		Body  Statement
-	}
-
-	WithStatement struct {
-		With   file.Idx
-		Object Expression
-		Body   Statement
-	}
-)
-
-// _statementNode
-
-func (*BadStatement) _statementNode()        {}
-func (*BlockStatement) _statementNode()      {}
-func (*BranchStatement) _statementNode()     {}
-func (*CaseStatement) _statementNode()       {}
-func (*CatchStatement) _statementNode()      {}
-func (*DebuggerStatement) _statementNode()   {}
-func (*DoWhileStatement) _statementNode()    {}
-func (*EmptyStatement) _statementNode()      {}
-func (*ExpressionStatement) _statementNode() {}
-func (*ForInStatement) _statementNode()      {}
-func (*ForStatement) _statementNode()        {}
-func (*FunctionStatement) _statementNode()   {}
-func (*IfStatement) _statementNode()         {}
-func (*LabelledStatement) _statementNode()   {}
-func (*ReturnStatement) _statementNode()     {}
-func (*SwitchStatement) _statementNode()     {}
-func (*ThrowStatement) _statementNode()      {}
-func (*TryStatement) _statementNode()        {}
-func (*VariableStatement) _statementNode()   {}
-func (*WhileStatement) _statementNode()      {}
-func (*WithStatement) _statementNode()       {}
-
-// =========== //
-// Declaration //
-// =========== //
-
-type (
-	// All declaration nodes implement the Declaration interface.
-	Declaration interface {
-		_declarationNode()
-	}
-
-	FunctionDeclaration struct {
-		Function *FunctionLiteral
-	}
-
-	VariableDeclaration struct {
-		Var  file.Idx
-		List []*VariableExpression
-	}
-)
-
-// _declarationNode
-
-func (*FunctionDeclaration) _declarationNode() {}
-func (*VariableDeclaration) _declarationNode() {}
-
-// ==== //
-// Node //
-// ==== //
-
-type Program struct {
-	Body []Statement
-
+// FunctionLiteral represents a function literal.
+type FunctionLiteral struct {
+	Body            Statement
+	Name            *Identifier
+	ParameterList   *ParameterList
+	Source          string
 	DeclarationList []Declaration
-
-	File *file.File
-
-	Comments CommentMap
+	Function        file.Idx
 }
 
-// ==== //
-// Idx0 //
-// ==== //
+// Idx0 implements Node.
+func (fl *FunctionLiteral) Idx0() file.Idx {
+	return fl.Function
+}
 
-func (self *ArrayLiteral) Idx0() file.Idx          { return self.LeftBracket }
-func (self *AssignExpression) Idx0() file.Idx      { return self.Left.Idx0() }
-func (self *BadExpression) Idx0() file.Idx         { return self.From }
-func (self *BinaryExpression) Idx0() file.Idx      { return self.Left.Idx0() }
-func (self *BooleanLiteral) Idx0() file.Idx        { return self.Idx }
-func (self *BracketExpression) Idx0() file.Idx     { return self.Left.Idx0() }
-func (self *CallExpression) Idx0() file.Idx        { return self.Callee.Idx0() }
-func (self *ConditionalExpression) Idx0() file.Idx { return self.Test.Idx0() }
-func (self *DotExpression) Idx0() file.Idx         { return self.Left.Idx0() }
-func (self *EmptyExpression) Idx0() file.Idx       { return self.Begin }
-func (self *FunctionLiteral) Idx0() file.Idx       { return self.Function }
-func (self *Identifier) Idx0() file.Idx            { return self.Idx }
-func (self *NewExpression) Idx0() file.Idx         { return self.New }
-func (self *NullLiteral) Idx0() file.Idx           { return self.Idx }
-func (self *NumberLiteral) Idx0() file.Idx         { return self.Idx }
-func (self *ObjectLiteral) Idx0() file.Idx         { return self.LeftBrace }
-func (self *RegExpLiteral) Idx0() file.Idx         { return self.Idx }
-func (self *SequenceExpression) Idx0() file.Idx    { return self.Sequence[0].Idx0() }
-func (self *StringLiteral) Idx0() file.Idx         { return self.Idx }
-func (self *ThisExpression) Idx0() file.Idx        { return self.Idx }
-func (self *UnaryExpression) Idx0() file.Idx       { return self.Idx }
-func (self *VariableExpression) Idx0() file.Idx    { return self.Idx }
+// Idx1 implements Node.
+func (fl *FunctionLiteral) Idx1() file.Idx {
+	return fl.Body.Idx1()
+}
 
-func (self *BadStatement) Idx0() file.Idx        { return self.From }
-func (self *BlockStatement) Idx0() file.Idx      { return self.LeftBrace }
-func (self *BranchStatement) Idx0() file.Idx     { return self.Idx }
-func (self *CaseStatement) Idx0() file.Idx       { return self.Case }
-func (self *CatchStatement) Idx0() file.Idx      { return self.Catch }
-func (self *DebuggerStatement) Idx0() file.Idx   { return self.Debugger }
-func (self *DoWhileStatement) Idx0() file.Idx    { return self.Do }
-func (self *EmptyStatement) Idx0() file.Idx      { return self.Semicolon }
-func (self *ExpressionStatement) Idx0() file.Idx { return self.Expression.Idx0() }
-func (self *ForInStatement) Idx0() file.Idx      { return self.For }
-func (self *ForStatement) Idx0() file.Idx        { return self.For }
-func (self *FunctionStatement) Idx0() file.Idx   { return self.Function.Idx0() }
-func (self *IfStatement) Idx0() file.Idx         { return self.If }
-func (self *LabelledStatement) Idx0() file.Idx   { return self.Label.Idx0() }
-func (self *Program) Idx0() file.Idx             { return self.Body[0].Idx0() }
-func (self *ReturnStatement) Idx0() file.Idx     { return self.Return }
-func (self *SwitchStatement) Idx0() file.Idx     { return self.Switch }
-func (self *ThrowStatement) Idx0() file.Idx      { return self.Throw }
-func (self *TryStatement) Idx0() file.Idx        { return self.Try }
-func (self *VariableStatement) Idx0() file.Idx   { return self.Var }
-func (self *WhileStatement) Idx0() file.Idx      { return self.While }
-func (self *WithStatement) Idx0() file.Idx       { return self.With }
+// expression implements Expression.
+func (*FunctionLiteral) expression() {}
 
-// ==== //
-// Idx1 //
-// ==== //
+// Identifier represents an identifier.
+type Identifier struct {
+	Name string
+	Idx  file.Idx
+}
 
-func (self *ArrayLiteral) Idx1() file.Idx          { return self.RightBracket }
-func (self *AssignExpression) Idx1() file.Idx      { return self.Right.Idx1() }
-func (self *BadExpression) Idx1() file.Idx         { return self.To }
-func (self *BinaryExpression) Idx1() file.Idx      { return self.Right.Idx1() }
-func (self *BooleanLiteral) Idx1() file.Idx        { return file.Idx(int(self.Idx) + len(self.Literal)) }
-func (self *BracketExpression) Idx1() file.Idx     { return self.RightBracket + 1 }
-func (self *CallExpression) Idx1() file.Idx        { return self.RightParenthesis + 1 }
-func (self *ConditionalExpression) Idx1() file.Idx { return self.Test.Idx1() }
-func (self *DotExpression) Idx1() file.Idx         { return self.Identifier.Idx1() }
-func (self *EmptyExpression) Idx1() file.Idx       { return self.End }
-func (self *FunctionLiteral) Idx1() file.Idx       { return self.Body.Idx1() }
-func (self *Identifier) Idx1() file.Idx            { return file.Idx(int(self.Idx) + len(self.Name)) }
-func (self *NewExpression) Idx1() file.Idx         { return self.RightParenthesis + 1 }
-func (self *NullLiteral) Idx1() file.Idx           { return file.Idx(int(self.Idx) + 4) } // "null"
-func (self *NumberLiteral) Idx1() file.Idx         { return file.Idx(int(self.Idx) + len(self.Literal)) }
-func (self *ObjectLiteral) Idx1() file.Idx         { return self.RightBrace }
-func (self *RegExpLiteral) Idx1() file.Idx         { return file.Idx(int(self.Idx) + len(self.Literal)) }
-func (self *SequenceExpression) Idx1() file.Idx    { return self.Sequence[0].Idx1() }
-func (self *StringLiteral) Idx1() file.Idx         { return file.Idx(int(self.Idx) + len(self.Literal)) }
-func (self *ThisExpression) Idx1() file.Idx        { return self.Idx + 4 }
-func (self *UnaryExpression) Idx1() file.Idx {
-	if self.Postfix {
-		return self.Operand.Idx1() + 2 // ++ --
+// Idx0 implements Node.
+func (i *Identifier) Idx0() file.Idx {
+	return i.Idx
+}
+
+// Idx1 implements Node.
+func (i *Identifier) Idx1() file.Idx {
+	return file.Idx(int(i.Idx) + len(i.Name))
+}
+
+// expression implements Expression.
+func (*Identifier) expression() {}
+
+// NewExpression represents a new expression.
+type NewExpression struct {
+	Callee           Expression
+	ArgumentList     []Expression
+	New              file.Idx
+	LeftParenthesis  file.Idx
+	RightParenthesis file.Idx
+}
+
+// Idx0 implements Node.
+func (ne *NewExpression) Idx0() file.Idx {
+	return ne.New
+}
+
+// Idx1 implements Node.
+func (ne *NewExpression) Idx1() file.Idx {
+	if ne.RightParenthesis > 0 {
+		return ne.RightParenthesis + 1
 	}
-	return self.Operand.Idx1()
-}
-func (self *VariableExpression) Idx1() file.Idx {
-	if self.Initializer == nil {
-		return file.Idx(int(self.Idx) + len(self.Name) + 1)
-	}
-	return self.Initializer.Idx1()
+	return ne.Callee.Idx1()
 }
 
-func (self *BadStatement) Idx1() file.Idx        { return self.To }
-func (self *BlockStatement) Idx1() file.Idx      { return self.RightBrace + 1 }
-func (self *BranchStatement) Idx1() file.Idx     { return self.Idx }
-func (self *CaseStatement) Idx1() file.Idx       { return self.Consequent[len(self.Consequent)-1].Idx1() }
-func (self *CatchStatement) Idx1() file.Idx      { return self.Body.Idx1() }
-func (self *DebuggerStatement) Idx1() file.Idx   { return self.Debugger + 8 }
-func (self *DoWhileStatement) Idx1() file.Idx    { return self.Test.Idx1() }
-func (self *EmptyStatement) Idx1() file.Idx      { return self.Semicolon + 1 }
-func (self *ExpressionStatement) Idx1() file.Idx { return self.Expression.Idx1() }
-func (self *ForInStatement) Idx1() file.Idx      { return self.Body.Idx1() }
-func (self *ForStatement) Idx1() file.Idx        { return self.Body.Idx1() }
-func (self *FunctionStatement) Idx1() file.Idx   { return self.Function.Idx1() }
-func (self *IfStatement) Idx1() file.Idx {
-	if self.Alternate != nil {
-		return self.Alternate.Idx1()
-	}
-	return self.Consequent.Idx1()
+// expression implements Expression.
+func (*NewExpression) expression() {}
+
+// NullLiteral represents a null literal.
+type NullLiteral struct {
+	Literal string
+	Idx     file.Idx
 }
-func (self *LabelledStatement) Idx1() file.Idx { return self.Colon + 1 }
-func (self *Program) Idx1() file.Idx           { return self.Body[len(self.Body)-1].Idx1() }
-func (self *ReturnStatement) Idx1() file.Idx   { return self.Return }
-func (self *SwitchStatement) Idx1() file.Idx   { return self.Body[len(self.Body)-1].Idx1() }
-func (self *ThrowStatement) Idx1() file.Idx    { return self.Throw }
-func (self *TryStatement) Idx1() file.Idx      { return self.Try }
-func (self *VariableStatement) Idx1() file.Idx { return self.List[len(self.List)-1].Idx1() }
-func (self *WhileStatement) Idx1() file.Idx    { return self.Body.Idx1() }
-func (self *WithStatement) Idx1() file.Idx     { return self.Body.Idx1() }
+
+// Idx0 implements Node.
+func (nl *NullLiteral) Idx0() file.Idx {
+	return nl.Idx
+}
+
+// Idx1 implements Node.
+func (nl *NullLiteral) Idx1() file.Idx {
+	return file.Idx(int(nl.Idx) + 4)
+}
+
+// expression implements Expression.
+func (*NullLiteral) expression() {}
+
+// NumberLiteral represents a number literal.
+type NumberLiteral struct {
+	Value   interface{}
+	Literal string
+	Idx     file.Idx
+}
+
+// Idx0 implements Node.
+func (nl *NumberLiteral) Idx0() file.Idx {
+	return nl.Idx
+}
+
+// Idx1 implements Node.
+func (nl *NumberLiteral) Idx1() file.Idx {
+	return file.Idx(int(nl.Idx) + len(nl.Literal))
+}
+
+// expression implements Expression.
+func (*NumberLiteral) expression() {}
+
+// ObjectLiteral represents an object literal.
+type ObjectLiteral struct {
+	Value      []Property
+	LeftBrace  file.Idx
+	RightBrace file.Idx
+}
+
+// Idx0 implements Node.
+func (ol *ObjectLiteral) Idx0() file.Idx {
+	return ol.LeftBrace
+}
+
+// Idx1 implements Node.
+func (ol *ObjectLiteral) Idx1() file.Idx {
+	return ol.RightBrace + 1
+}
+
+// expression implements Expression.
+func (*ObjectLiteral) expression() {}
+
+// ParameterList represents a parameter list.
+type ParameterList struct {
+	List    []*Identifier
+	Opening file.Idx
+	Closing file.Idx
+}
+
+// Property represents a property.
+type Property struct {
+	Value Expression
+	Key   string
+	Kind  string
+}
+
+// RegExpLiteral represents a regular expression literal.
+type RegExpLiteral struct {
+	Literal string
+	Pattern string
+	Flags   string
+	Value   string
+	Idx     file.Idx
+}
+
+// Idx0 implements Node.
+func (rl *RegExpLiteral) Idx0() file.Idx {
+	return rl.Idx
+}
+
+// Idx1 implements Node.
+func (rl *RegExpLiteral) Idx1() file.Idx {
+	return file.Idx(int(rl.Idx) + len(rl.Literal))
+}
+
+// expression implements Expression.
+func (*RegExpLiteral) expression() {}
+
+// SequenceExpression represents a sequence literal.
+type SequenceExpression struct {
+	Sequence []Expression
+}
+
+// Idx0 implements Node.
+func (se *SequenceExpression) Idx0() file.Idx {
+	return se.Sequence[0].Idx0()
+}
+
+// Idx1 implements Node.
+func (se *SequenceExpression) Idx1() file.Idx {
+	return se.Sequence[len(se.Sequence)-1].Idx1()
+}
+
+// expression implements Expression.
+func (*SequenceExpression) expression() {}
+
+// StringLiteral represents a string literal.
+type StringLiteral struct {
+	Literal string
+	Value   string
+	Idx     file.Idx
+}
+
+// Idx0 implements Node.
+func (sl *StringLiteral) Idx0() file.Idx {
+	return sl.Idx
+}
+
+// Idx1 implements Node.
+func (sl *StringLiteral) Idx1() file.Idx {
+	return file.Idx(int(sl.Idx) + len(sl.Literal))
+}
+
+// expression implements Expression.
+func (*StringLiteral) expression() {}
+
+// ThisExpression represents a this expression.
+type ThisExpression struct {
+	Idx file.Idx
+}
+
+// Idx0 implements Node.
+func (te *ThisExpression) Idx0() file.Idx {
+	return te.Idx
+}
+
+// Idx1 implements Node.
+func (te *ThisExpression) Idx1() file.Idx {
+	return te.Idx + 4
+}
+
+// expression implements Expression.
+func (*ThisExpression) expression() {}
+
+// UnaryExpression represents a unary expression.
+type UnaryExpression struct {
+	Operand  Expression
+	Operator token.Token
+	Idx      file.Idx
+	Postfix  bool
+}
+
+// Idx0 implements Node.
+func (ue *UnaryExpression) Idx0() file.Idx {
+	if ue.Postfix {
+		return ue.Operand.Idx0()
+	}
+	return ue.Idx
+}
+
+// Idx1 implements Node.
+func (ue *UnaryExpression) Idx1() file.Idx {
+	if ue.Postfix {
+		return ue.Operand.Idx1() + 2 // ++ --
+	}
+	return ue.Operand.Idx1()
+}
+
+// expression implements Expression.
+func (*UnaryExpression) expression() {}
+
+// VariableExpression represents a variable expression.
+type VariableExpression struct {
+	Initializer Expression
+	Name        string
+	Idx         file.Idx
+}
+
+// Idx0 implements Node.
+func (ve *VariableExpression) Idx0() file.Idx {
+	return ve.Idx
+}
+
+// Idx1 implements Node.
+func (ve *VariableExpression) Idx1() file.Idx {
+	if ve.Initializer == nil {
+		return file.Idx(int(ve.Idx) + len(ve.Name))
+	}
+	return ve.Initializer.Idx1()
+}
+
+// expression implements Expression.
+func (*VariableExpression) expression() {}
+
+// Statement is implemented by types which represent a statement.
+type Statement interface {
+	Node
+	statement()
+}
+
+// BadStatement represents a bad statement.
+type BadStatement struct {
+	From file.Idx
+	To   file.Idx
+}
+
+// Idx0 implements Node.
+func (bs *BadStatement) Idx0() file.Idx {
+	return bs.From
+}
+
+// Idx1 implements Node.
+func (bs *BadStatement) Idx1() file.Idx {
+	return bs.To
+}
+
+// expression implements Statement.
+func (*BadStatement) statement() {}
+
+// BlockStatement represents a block statement.
+type BlockStatement struct {
+	List       []Statement
+	LeftBrace  file.Idx
+	RightBrace file.Idx
+}
+
+// Idx0 implements Node.
+func (bs *BlockStatement) Idx0() file.Idx {
+	return bs.LeftBrace
+}
+
+// Idx1 implements Node.
+func (bs *BlockStatement) Idx1() file.Idx {
+	return bs.RightBrace + 1
+}
+
+// expression implements Statement.
+func (*BlockStatement) statement() {}
+
+// BranchStatement represents a branch statement.
+type BranchStatement struct {
+	Label *Identifier
+	Idx   file.Idx
+	Token token.Token
+}
+
+// Idx0 implements Node.
+func (bs *BranchStatement) Idx0() file.Idx {
+	return bs.Idx
+}
+
+// Idx1 implements Node.
+func (bs *BranchStatement) Idx1() file.Idx {
+	if bs.Label == nil {
+		return file.Idx(int(bs.Idx) + len(bs.Token.String()))
+	}
+	return bs.Label.Idx1()
+}
+
+// expression implements Statement.
+func (*BranchStatement) statement() {}
+
+// CaseStatement represents a case statement.
+type CaseStatement struct {
+	Test       Expression
+	Consequent []Statement
+	Case       file.Idx
+}
+
+// Idx0 implements Node.
+func (cs *CaseStatement) Idx0() file.Idx {
+	return cs.Case
+}
+
+// Idx1 implements Node.
+func (cs *CaseStatement) Idx1() file.Idx {
+	return cs.Consequent[len(cs.Consequent)-1].Idx1()
+}
+
+// expression implements Statement.
+func (*CaseStatement) statement() {}
+
+// CatchStatement represents a catch statement.
+type CatchStatement struct {
+	Body      Statement
+	Parameter *Identifier
+	Catch     file.Idx
+}
+
+// Idx0 implements Node.
+func (cs *CatchStatement) Idx0() file.Idx {
+	return cs.Catch
+}
+
+// Idx1 implements Node.
+func (cs *CatchStatement) Idx1() file.Idx {
+	return cs.Body.Idx1()
+}
+
+// expression implements Statement.
+func (*CatchStatement) statement() {}
+
+// DebuggerStatement represents a debugger statement.
+type DebuggerStatement struct {
+	Debugger file.Idx
+}
+
+// Idx0 implements Node.
+func (ds *DebuggerStatement) Idx0() file.Idx {
+	return ds.Debugger
+}
+
+// Idx1 implements Node.
+func (ds *DebuggerStatement) Idx1() file.Idx {
+	return ds.Debugger + 8
+}
+
+// expression implements Statement.
+func (*DebuggerStatement) statement() {}
+
+// DoWhileStatement represents a do while statement.
+type DoWhileStatement struct {
+	Test             Expression
+	Body             Statement
+	Do               file.Idx
+	RightParenthesis file.Idx
+}
+
+// Idx0 implements Node.
+func (dws *DoWhileStatement) Idx0() file.Idx {
+	return dws.Do
+}
+
+// Idx1 implements Node.
+func (dws *DoWhileStatement) Idx1() file.Idx {
+	return dws.RightParenthesis + 1
+}
+
+// expression implements Statement.
+func (*DoWhileStatement) statement() {}
+
+// EmptyStatement represents a empty statement.
+type EmptyStatement struct {
+	Semicolon file.Idx
+}
+
+// Idx0 implements Node.
+func (es *EmptyStatement) Idx0() file.Idx {
+	return es.Semicolon
+}
+
+// Idx1 implements Node.
+func (es *EmptyStatement) Idx1() file.Idx {
+	return es.Semicolon + 1
+}
+
+// expression implements Statement.
+func (*EmptyStatement) statement() {}
+
+// ExpressionStatement represents a expression statement.
+type ExpressionStatement struct {
+	Expression Expression
+}
+
+// Idx0 implements Node.
+func (es *ExpressionStatement) Idx0() file.Idx {
+	return es.Expression.Idx0()
+}
+
+// Idx1 implements Node.
+func (es *ExpressionStatement) Idx1() file.Idx {
+	return es.Expression.Idx1()
+}
+
+// expression implements Statement.
+func (*ExpressionStatement) statement() {}
+
+// ForInStatement represents a for in statement.
+type ForInStatement struct {
+	Into   Expression
+	Source Expression
+	Body   Statement
+	For    file.Idx
+}
+
+// Idx0 implements Node.
+func (fis *ForInStatement) Idx0() file.Idx {
+	return fis.For
+}
+
+// Idx1 implements Node.
+func (fis *ForInStatement) Idx1() file.Idx {
+	return fis.Body.Idx1()
+}
+
+// expression implements Statement.
+func (*ForInStatement) statement() {}
+
+// ForStatement represents a for statement.
+type ForStatement struct {
+	Initializer Expression
+	Update      Expression
+	Test        Expression
+	Body        Statement
+	For         file.Idx
+}
+
+// Idx0 implements Node.
+func (fs *ForStatement) Idx0() file.Idx {
+	return fs.For
+}
+
+// Idx1 implements Node.
+func (fs *ForStatement) Idx1() file.Idx {
+	return fs.Body.Idx1()
+}
+
+// expression implements Statement.
+func (*ForStatement) statement() {}
+
+// FunctionStatement represents a function statement.
+type FunctionStatement struct {
+	Function *FunctionLiteral
+}
+
+// Idx0 implements Node.
+func (fs *FunctionStatement) Idx0() file.Idx {
+	return fs.Function.Idx0()
+}
+
+// Idx1 implements Node.
+func (fs *FunctionStatement) Idx1() file.Idx {
+	return fs.Function.Idx1()
+}
+
+// expression implements Statement.
+func (*FunctionStatement) statement() {}
+
+// IfStatement represents a if statement.
+type IfStatement struct {
+	Test       Expression
+	Consequent Statement
+	Alternate  Statement
+	If         file.Idx
+}
+
+// Idx0 implements Node.
+func (is *IfStatement) Idx0() file.Idx {
+	return is.If
+}
+
+// Idx1 implements Node.
+func (is *IfStatement) Idx1() file.Idx {
+	if is.Alternate != nil {
+		return is.Alternate.Idx1()
+	}
+	return is.Consequent.Idx1()
+}
+
+// expression implements Statement.
+func (*IfStatement) statement() {}
+
+// LabelledStatement represents a labelled statement.
+type LabelledStatement struct {
+	Statement Statement
+	Label     *Identifier
+	Colon     file.Idx
+}
+
+// Idx0 implements Node.
+func (ls *LabelledStatement) Idx0() file.Idx {
+	return ls.Label.Idx0()
+}
+
+// Idx1 implements Node.
+func (ls *LabelledStatement) Idx1() file.Idx {
+	return ls.Statement.Idx1()
+}
+
+// expression implements Statement.
+func (*LabelledStatement) statement() {}
+
+// ReturnStatement represents a return statement.
+type ReturnStatement struct {
+	Argument Expression
+	Return   file.Idx
+}
+
+// Idx0 implements Node.
+func (rs *ReturnStatement) Idx0() file.Idx {
+	return rs.Return
+}
+
+// Idx1 implements Node.
+func (rs *ReturnStatement) Idx1() file.Idx {
+	if rs.Argument != nil {
+		return rs.Argument.Idx1()
+	}
+	return rs.Return + 6
+}
+
+// expression implements Statement.
+func (*ReturnStatement) statement() {}
+
+// SwitchStatement represents a switch statement.
+type SwitchStatement struct {
+	Discriminant Expression
+	Body         []*CaseStatement
+	Switch       file.Idx
+	Default      int
+	RightBrace   file.Idx
+}
+
+// Idx0 implements Node.
+func (ss *SwitchStatement) Idx0() file.Idx {
+	return ss.Switch
+}
+
+// Idx1 implements Node.
+func (ss *SwitchStatement) Idx1() file.Idx {
+	return ss.RightBrace + 1
+}
+
+// expression implements Statement.
+func (*SwitchStatement) statement() {}
+
+// ThrowStatement represents a throw statement.
+type ThrowStatement struct {
+	Argument Expression
+	Throw    file.Idx
+}
+
+// Idx0 implements Node.
+func (ts *ThrowStatement) Idx0() file.Idx {
+	return ts.Throw
+}
+
+// Idx1 implements Node.
+func (ts *ThrowStatement) Idx1() file.Idx {
+	return ts.Argument.Idx1()
+}
+
+// expression implements Statement.
+func (*ThrowStatement) statement() {}
+
+// TryStatement represents a try statement.
+type TryStatement struct {
+	Body    Statement
+	Finally Statement
+	Catch   *CatchStatement
+	Try     file.Idx
+}
+
+// Idx0 implements Node.
+func (ts *TryStatement) Idx0() file.Idx {
+	return ts.Try
+}
+
+// Idx1 implements Node.
+func (ts *TryStatement) Idx1() file.Idx {
+	if ts.Finally != nil {
+		return ts.Finally.Idx1()
+	}
+	return ts.Catch.Idx1()
+}
+
+// expression implements Statement.
+func (*TryStatement) statement() {}
+
+// VariableStatement represents a variable statement.
+type VariableStatement struct {
+	List []Expression
+	Var  file.Idx
+}
+
+// Idx0 implements Node.
+func (vs *VariableStatement) Idx0() file.Idx {
+	return vs.Var
+}
+
+// Idx1 implements Node.
+func (vs *VariableStatement) Idx1() file.Idx {
+	return vs.List[len(vs.List)-1].Idx1()
+}
+
+// expression implements Statement.
+func (*VariableStatement) statement() {}
+
+// WhileStatement represents a while statement.
+type WhileStatement struct {
+	Test  Expression
+	Body  Statement
+	While file.Idx
+}
+
+// Idx0 implements Node.
+func (ws *WhileStatement) Idx0() file.Idx {
+	return ws.While
+}
+
+// Idx1 implements Node.
+func (ws *WhileStatement) Idx1() file.Idx {
+	return ws.Body.Idx1()
+}
+
+// expression implements Statement.
+func (*WhileStatement) statement() {}
+
+// WithStatement represents a with statement.
+type WithStatement struct {
+	Object Expression
+	Body   Statement
+	With   file.Idx
+}
+
+// Idx0 implements Node.
+func (ws *WithStatement) Idx0() file.Idx {
+	return ws.With
+}
+
+// Idx1 implements Node.
+func (ws *WithStatement) Idx1() file.Idx {
+	return ws.Body.Idx1()
+}
+
+// expression implements Statement.
+func (*WithStatement) statement() {}
+
+// Declaration is implemented by type which represent declarations.
+type Declaration interface {
+	declaration()
+}
+
+// FunctionDeclaration represents a function declaration.
+type FunctionDeclaration struct {
+	Function *FunctionLiteral
+}
+
+func (*FunctionDeclaration) declaration() {}
+
+// VariableDeclaration represents a variable declaration.
+type VariableDeclaration struct {
+	List []*VariableExpression
+	Var  file.Idx
+}
+
+// declaration implements Declaration.
+func (*VariableDeclaration) declaration() {}
+
+// Program represents a full program.
+type Program struct {
+	File            *file.File
+	Comments        CommentMap
+	Body            []Statement
+	DeclarationList []Declaration
+}
+
+// Idx0 implements Node.
+func (p *Program) Idx0() file.Idx {
+	return p.Body[0].Idx0()
+}
+
+// Idx1 implements Node.
+func (p *Program) Idx1() file.Idx {
+	return p.Body[len(p.Body)-1].Idx1()
+}

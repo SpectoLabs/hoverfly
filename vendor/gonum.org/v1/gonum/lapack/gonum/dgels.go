@@ -23,6 +23,7 @@ import (
 //     Aᵀ * X = B.
 //  4. If m < n and trans == blas.Trans, Dgels finds X such that || A*X - B||_2
 //     is minimized.
+//
 // Note that the least-squares solutions (cases 1 and 3) perform the minimization
 // per column of B. This is not the same as finding the minimum-norm matrix.
 //
@@ -130,7 +131,7 @@ func (impl Implementation) Dgels(trans blas.Transpose, m, n, nrhs int, a []float
 	// Solve the minimization problem using a QR or an LQ decomposition.
 	var scllen int
 	if m >= n {
-		impl.Dgeqrf(m, n, a, lda, work, work[mn:], lwork-mn)
+		impl.Dgeqrf(m, n, a, lda, work[:n], work[mn:], lwork-mn)
 		if trans == blas.NoTrans {
 			impl.Dormqr(blas.Left, blas.Trans, m, nrhs, n,
 				a, lda,

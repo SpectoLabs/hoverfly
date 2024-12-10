@@ -18,8 +18,40 @@ const badLQ = "mat: invalid LQ factorization"
 // LQ is a type for creating and using the LQ factorization of a matrix.
 type LQ struct {
 	lq   *Dense
+	q    *Dense
 	tau  []float64
 	cond float64
+}
+
+// Dims returns the dimensions of the matrix.
+func (lq *LQ) Dims() (r, c int) {
+	if lq.lq == nil {
+		return 0, 0
+	}
+	return lq.lq.Dims()
+}
+
+// At returns the element at row i, column j.
+func (lq *LQ) At(i, j int) float64 {
+	m, n := lq.Dims()
+	if uint(i) >= uint(m) {
+		panic(ErrRowAccess)
+	}
+	if uint(j) >= uint(n) {
+		panic(ErrColAccess)
+	}
+
+	var val float64
+	for k := 0; k <= i; k++ {
+		val += lq.lq.at(i, k) * lq.q.at(k, j)
+	}
+	return val
+}
+
+// T performs an implicit transpose by returning the receiver inside a
+// Transpose.
+func (lq *LQ) T() Matrix {
+	return Transpose{lq}
 }
 
 func (lq *LQ) updateCond(norm lapack.MatrixNorm) {
@@ -31,12 +63,12 @@ func (lq *LQ) updateCond(norm lapack.MatrixNorm) {
 	// is not the case for CondNorm. Hopefully the error is negligible: κ
 	// is only a qualitative measure anyway.
 	m := lq.lq.mat.Rows
-	work := getFloats(3*m, false)
+	work := getFloat64s(3*m, false)
 	iwork := getInts(m, false)
 	l := lq.lq.asTriDense(m, blas.NonUnit, blas.Lower)
 	v := lapack64.Trcon(norm, l.mat, work, iwork)
 	lq.cond = 1 / v
-	putFloats(work)
+	putFloat64s(work)
 	putInts(iwork)
 }
 
@@ -55,18 +87,34 @@ func (lq *LQ) factorize(a Matrix, norm lapack.MatrixNorm) {
 	if m > n {
 		panic(ErrShape)
 	}
-	k := min(m, n)
 	if lq.lq == nil {
 		lq.lq = &Dense{}
 	}
 	lq.lq.CloneFrom(a)
 	work := []float64{0}
-	lq.tau = make([]float64, k)
+	lq.tau = make([]float64, m)
 	lapack64.Gelqf(lq.lq.mat, lq.tau, work, -1)
-	work = getFloats(int(work[0]), false)
+	work = getFloat64s(int(work[0]), false)
 	lapack64.Gelqf(lq.lq.mat, lq.tau, work, len(work))
-	putFloats(work)
+	putFloat64s(work)
 	lq.updateCond(norm)
+	lq.updateQ()
+}
+
+func (lq *LQ) updateQ() {
+	_, n := lq.Dims()
+	if lq.q == nil {
+		lq.q = NewDense(n, n, nil)
+	} else {
+		lq.q.reuseAsNonZeroed(n, n)
+	}
+	// Construct Q from the elementary reflectors.
+	lq.q.Copy(lq.lq)
+	work := []float64{0}
+	lapack64.Orglq(lq.q.mat, lq.tau, work, -1)
+	work = getFloat64s(int(work[0]), false)
+	lapack64.Orglq(lq.q.mat, lq.tau, work, len(work))
+	putFloat64s(work)
 }
 
 // isValid returns whether the receiver contains a factorization.
@@ -130,38 +178,24 @@ func (lq *LQ) LTo(dst *Dense) {
 
 // QTo extracts the n×n orthonormal matrix Q from an LQ decomposition.
 //
-// If dst is empty, QTo will resize dst to be c×c. When dst is
-// non-empty, QTo will panic if dst is not c×c. QTo will also panic
+// If dst is empty, QTo will resize dst to be n×n. When dst is
+// non-empty, QTo will panic if dst is not n×n. QTo will also panic
 // if the receiver does not contain a successful factorization.
 func (lq *LQ) QTo(dst *Dense) {
 	if !lq.isValid() {
 		panic(badLQ)
 	}
 
-	_, c := lq.lq.Dims()
+	_, n := lq.lq.Dims()
 	if dst.IsEmpty() {
-		dst.ReuseAs(c, c)
+		dst.ReuseAs(n, n)
 	} else {
-		r2, c2 := dst.Dims()
-		if c != r2 || c != c2 {
+		m2, n2 := dst.Dims()
+		if n != m2 || n != n2 {
 			panic(ErrShape)
 		}
-		dst.Zero()
 	}
-	q := dst.mat
-
-	// Set Q = I.
-	ldq := q.Stride
-	for i := 0; i < c; i++ {
-		q.Data[i*ldq+i] = 1
-	}
-
-	// Construct Q from the elementary reflectors.
-	work := []float64{0}
-	lapack64.Ormlq(blas.Left, blas.NoTrans, lq.lq.mat, lq.tau, q, work, -1)
-	work = getFloats(int(work[0]), false)
-	lapack64.Ormlq(blas.Left, blas.NoTrans, lq.lq.mat, lq.tau, q, work, len(work))
-	putFloats(work)
+	dst.Copy(lq.q)
 }
 
 // SolveTo finds a minimum-norm solution to a system of linear equations defined
@@ -170,8 +204,10 @@ func (lq *LQ) QTo(dst *Dense) {
 // See the documentation for Condition for more information.
 //
 // The minimization problem solved depends on the input parameters.
-//  If trans == false, find the minimum norm solution of A * X = B.
-//  If trans == true, find X such that ||A*X - B||_2 is minimized.
+//
+//	If trans == false, find the minimum norm solution of A * X = B.
+//	If trans == true, find X such that ||A*X - B||_2 is minimized.
+//
 // The solution matrix, X, is stored in place into dst.
 // SolveTo will panic if the receiver does not contain a factorization.
 func (lq *LQ) SolveTo(dst *Dense, trans bool, b Matrix) error {
@@ -199,15 +235,15 @@ func (lq *LQ) SolveTo(dst *Dense, trans bool, b Matrix) error {
 	}
 	// Do not need to worry about overlap between x and b because w has its own
 	// independent storage.
-	w := getWorkspace(max(r, c), bc, false)
+	w := getDenseWorkspace(max(r, c), bc, false)
 	w.Copy(b)
 	t := lq.lq.asTriDense(lq.lq.mat.Rows, blas.NonUnit, blas.Lower).mat
 	if trans {
 		work := []float64{0}
 		lapack64.Ormlq(blas.Left, blas.NoTrans, lq.lq.mat, lq.tau, w.mat, work, -1)
-		work = getFloats(int(work[0]), false)
+		work = getFloat64s(int(work[0]), false)
 		lapack64.Ormlq(blas.Left, blas.NoTrans, lq.lq.mat, lq.tau, w.mat, work, len(work))
-		putFloats(work)
+		putFloat64s(work)
 
 		ok := lapack64.Trtrs(blas.Trans, t, w.mat)
 		if !ok {
@@ -223,13 +259,13 @@ func (lq *LQ) SolveTo(dst *Dense, trans bool, b Matrix) error {
 		}
 		work := []float64{0}
 		lapack64.Ormlq(blas.Left, blas.Trans, lq.lq.mat, lq.tau, w.mat, work, -1)
-		work = getFloats(int(work[0]), false)
+		work = getFloat64s(int(work[0]), false)
 		lapack64.Ormlq(blas.Left, blas.Trans, lq.lq.mat, lq.tau, w.mat, work, len(work))
-		putFloats(work)
+		putFloat64s(work)
 	}
 	// x was set above to be the correct size for the result.
 	dst.Copy(w)
-	putWorkspace(w)
+	putDenseWorkspace(w)
 	if lq.cond > ConditionTolerance {
 		return Condition(lq.cond)
 	}

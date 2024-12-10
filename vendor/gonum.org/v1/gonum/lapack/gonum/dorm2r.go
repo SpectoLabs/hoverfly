@@ -8,14 +8,16 @@ import "gonum.org/v1/gonum/blas"
 
 // Dorm2r multiplies a general matrix C by an orthogonal matrix from a QR factorization
 // determined by Dgeqrf.
-//  C = Q * C   if side == blas.Left and trans == blas.NoTrans
-//  C = Qᵀ * C  if side == blas.Left and trans == blas.Trans
-//  C = C * Q   if side == blas.Right and trans == blas.NoTrans
-//  C = C * Qᵀ  if side == blas.Right and trans == blas.Trans
+//
+//	C = Q * C   if side == blas.Left and trans == blas.NoTrans
+//	C = Qᵀ * C  if side == blas.Left and trans == blas.Trans
+//	C = C * Q   if side == blas.Right and trans == blas.NoTrans
+//	C = C * Qᵀ  if side == blas.Right and trans == blas.Trans
+//
 // If side == blas.Left, a is a matrix of size m×k, and if side == blas.Right
 // a is of size n×k.
 //
-// tau contains the Householder factors and is of length at least k and this function
+// tau contains the Householder factors and must have length k and this function
 // will panic otherwise.
 //
 // work is temporary storage of length at least n if side == blas.Left
@@ -57,8 +59,8 @@ func (impl Implementation) Dorm2r(side blas.Side, trans blas.Transpose, m, n, k 
 		panic(shortA)
 	case len(c) < (m-1)*ldc+n:
 		panic(shortC)
-	case len(tau) < k:
-		panic(shortTau)
+	case len(tau) != k:
+		panic(badLenTau)
 	case left && len(work) < n:
 		panic(shortWork)
 	case !left && len(work) < m:

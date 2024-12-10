@@ -4,20 +4,23 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"math/rand"
+	"reflect"
+	"strconv"
 )
 
 // JSONOptions defines values needed for json generation
 type JSONOptions struct {
-	Type     string  `json:"type" xml:"type"` // array or object
-	RowCount int     `json:"row_count" xml:"row_count"`
-	Fields   []Field `json:"fields" xml:"fields"`
+	Type     string  `json:"type" xml:"type" fake:"{randomstring:[array,object]}"` // array or object
+	RowCount int     `json:"row_count" xml:"row_count" fake:"{number:1,10}"`
 	Indent   bool    `json:"indent" xml:"indent"`
+	Fields   []Field `json:"fields" xml:"fields" fake:"{fields}"`
 }
 
 type jsonKeyVal struct {
 	Key   string
-	Value interface{}
+	Value any
 }
 
 type jsonOrderedKeyVal []*jsonKeyVal
@@ -54,14 +57,24 @@ func (okv jsonOrderedKeyVal) MarshalJSON() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// JSON generates an object or an array of objects in json format
-func JSON(jo *JSONOptions) ([]byte, error) { return jsonFunc(globalFaker.Rand, jo) }
+// JSON generates an object or an array of objects in json format.
+// A nil JSONOptions returns a randomly structured JSON.
+func JSON(jo *JSONOptions) ([]byte, error) { return jsonFunc(globalFaker, jo) }
+
+// JSON generates an object or an array of objects in json format.
+// A nil JSONOptions returns a randomly structured JSON.
+func (f *Faker) JSON(jo *JSONOptions) ([]byte, error) { return jsonFunc(f, jo) }
 
 // JSON generates an object or an array of objects in json format
-func (f *Faker) JSON(jo *JSONOptions) ([]byte, error) { return jsonFunc(f.Rand, jo) }
+func jsonFunc(f *Faker, jo *JSONOptions) ([]byte, error) {
+	if jo == nil {
+		// We didn't get a JSONOptions, so create a new random one
+		err := f.Struct(&jo)
+		if err != nil {
+			return nil, err
+		}
+	}
 
-// JSON generates an object or an array of objects in json format
-func jsonFunc(r *rand.Rand, jo *JSONOptions) ([]byte, error) {
 	// Check to make sure they passed in a type
 	if jo.Type != "array" && jo.Type != "object" {
 		return nil, errors.New("invalid type, must be array or object")
@@ -74,7 +87,7 @@ func jsonFunc(r *rand.Rand, jo *JSONOptions) ([]byte, error) {
 	if jo.Type == "object" {
 		v := make(jsonOrderedKeyVal, len(jo.Fields))
 
-		// Loop through fields and add to them to map[string]interface{}
+		// Loop through fields and add to them to map[string]any
 		for i, field := range jo.Fields {
 			if field.Function == "autoincrement" {
 				// Object only has one
@@ -89,14 +102,14 @@ func jsonFunc(r *rand.Rand, jo *JSONOptions) ([]byte, error) {
 			}
 
 			// Call function value
-			value, err := funcInfo.Generate(r, &field.Params, funcInfo)
+			value, err := funcInfo.Generate(f.Rand, &field.Params, funcInfo)
 			if err != nil {
 				return nil, err
 			}
 
 			if _, ok := value.([]byte); ok {
 				// If it's a slice, unmarshal it into an interface
-				var val interface{}
+				var val any
 				err := json.Unmarshal(value.([]byte), &val)
 				if err != nil {
 					return nil, err
@@ -129,7 +142,7 @@ func jsonFunc(r *rand.Rand, jo *JSONOptions) ([]byte, error) {
 		for i := 0; i < int(jo.RowCount); i++ {
 			vr := make(jsonOrderedKeyVal, len(jo.Fields))
 
-			// Loop through fields and add to them to map[string]interface{}
+			// Loop through fields and add to them to map[string]any
 			for ii, field := range jo.Fields {
 				if field.Function == "autoincrement" {
 					vr[ii] = &jsonKeyVal{Key: field.Name, Value: i + 1} // +1 because index starts with 0
@@ -143,14 +156,14 @@ func jsonFunc(r *rand.Rand, jo *JSONOptions) ([]byte, error) {
 				}
 
 				// Call function value
-				value, err := funcInfo.Generate(r, &field.Params, funcInfo)
+				value, err := funcInfo.Generate(f.Rand, &field.Params, funcInfo)
 				if err != nil {
 					return nil, err
 				}
 
 				if _, ok := value.([]byte); ok {
 					// If it's a slice, unmarshal it into an interface
-					var val interface{}
+					var val any
 					err := json.Unmarshal(value.([]byte), &val)
 					if err != nil {
 						return nil, err
@@ -181,21 +194,21 @@ func addFileJSONLookup() {
 	AddFuncLookup("json", Info{
 		Display:     "JSON",
 		Category:    "file",
-		Description: "Generates an object or an array of objects in json format",
+		Description: "Format for structured data interchange used in programming, returns an object or an array of objects",
 		Example: `[
-			{ "id": 1, "first_name": "Markus", "last_name": "Moen" },
-			{ "id": 2, "first_name": "Alayna", "last_name": "Wuckert" },
-			{ "id": 3, "first_name": "Lura", "last_name": "Lockman" }
+			{ "first_name": "Markus", "last_name": "Moen", "password": "Dc0VYXjkWABx" },
+			{ "first_name": "Osborne", "last_name": "Hilll", "password": "XPJ9OVNbs5lm" },
+			{ "first_name": "Mertie", "last_name": "Halvorson", "password": "eyl3bhwfV8wA" }
 		]`,
 		Output:      "[]byte",
 		ContentType: "application/json",
 		Params: []Param{
 			{Field: "type", Display: "Type", Type: "string", Default: "object", Options: []string{"object", "array"}, Description: "Type of JSON, object or array"},
 			{Field: "rowcount", Display: "Row Count", Type: "int", Default: "100", Description: "Number of rows in JSON array"},
-			{Field: "fields", Display: "Fields", Type: "[]Field", Description: "Fields containing key name and function to run in json format"},
 			{Field: "indent", Display: "Indent", Type: "bool", Default: "false", Description: "Whether or not to add indents and newlines"},
+			{Field: "fields", Display: "Fields", Type: "[]Field", Description: "Fields containing key name and function to run in json format"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			jo := JSONOptions{}
 
 			typ, err := info.GetString(m, "type")
@@ -209,6 +222,12 @@ func addFileJSONLookup() {
 				return nil, err
 			}
 			jo.RowCount = rowcount
+
+			indent, err := info.GetBool(m, "indent")
+			if err != nil {
+				return nil, err
+			}
+			jo.Indent = indent
 
 			fieldsStr, err := info.GetStringArray(m, "fields")
 			if err != nil {
@@ -228,13 +247,89 @@ func addFileJSONLookup() {
 				}
 			}
 
-			indent, err := info.GetBool(m, "indent")
-			if err != nil {
-				return nil, err
-			}
-			jo.Indent = indent
-
-			return jsonFunc(r, &jo)
+			f := &Faker{Rand: r}
+			return jsonFunc(f, &jo)
 		},
 	})
+}
+
+// encoding/json.RawMessage is a special case of []byte
+// it cannot be handled as a reflect.Array/reflect.Slice
+// because it needs additional structure in the output
+func rJsonRawMessage(f *Faker, t reflect.Type, v reflect.Value, tag string, size int) error {
+	b, err := f.JSON(nil)
+	if err != nil {
+		return err
+	}
+
+	v.SetBytes(b)
+	return nil
+}
+
+// encoding/json.Number is a special case of string
+// that represents a JSON number literal.
+// It cannot be handled as a string because it needs to
+// represent an integer or a floating-point number.
+func rJsonNumber(f *Faker, t reflect.Type, v reflect.Value, tag string, size int) error {
+	var ret json.Number
+
+	var numberType string
+
+	if tag == "" {
+		numberType = f.RandomString([]string{"int", "float"})
+
+		switch numberType {
+		case "int":
+			retInt := f.Int16()
+			ret = json.Number(strconv.Itoa(int(retInt)))
+		case "float":
+			retFloat := f.Float64()
+			ret = json.Number(strconv.FormatFloat(retFloat, 'f', -1, 64))
+		}
+	} else {
+		fName, fParams := parseNameAndParamsFromTag(tag)
+		info := GetFuncLookup(fName)
+		if info == nil {
+			return fmt.Errorf("invalid function, %s does not exist", fName)
+		}
+
+		// Parse map params
+		mapParams := parseMapParams(info, fParams)
+
+		valueIface, err := info.Generate(f.Rand, mapParams, info)
+		if err != nil {
+			return err
+		}
+
+		switch value := valueIface.(type) {
+		case int:
+			ret = json.Number(strconv.FormatInt(int64(value), 10))
+		case int8:
+			ret = json.Number(strconv.FormatInt(int64(value), 10))
+		case int16:
+			ret = json.Number(strconv.FormatInt(int64(value), 10))
+		case int32:
+			ret = json.Number(strconv.FormatInt(int64(value), 10))
+		case int64:
+			ret = json.Number(strconv.FormatInt(int64(value), 10))
+		case uint:
+			ret = json.Number(strconv.FormatUint(uint64(value), 10))
+		case uint8:
+			ret = json.Number(strconv.FormatUint(uint64(value), 10))
+		case uint16:
+			ret = json.Number(strconv.FormatUint(uint64(value), 10))
+		case uint32:
+			ret = json.Number(strconv.FormatUint(uint64(value), 10))
+		case uint64:
+			ret = json.Number(strconv.FormatUint(uint64(value), 10))
+		case float32:
+			ret = json.Number(strconv.FormatFloat(float64(value), 'f', -1, 64))
+		case float64:
+			ret = json.Number(strconv.FormatFloat(float64(value), 'f', -1, 64))
+		default:
+			return fmt.Errorf("invalid type, %s is not a valid type for json.Number", reflect.TypeOf(value))
+		}
+	}
+	v.Set(reflect.ValueOf(ret))
+	return nil
 }

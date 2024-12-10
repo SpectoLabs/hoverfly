@@ -121,10 +121,10 @@ func addBeerLookup() {
 	AddFuncLookup("beername", Info{
 		Display:     "Beer Name",
 		Category:    "beer",
-		Description: "Random beer name",
+		Description: "Specific brand or variety of beer",
 		Example:     "Duvel",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return beerName(r), nil
 		},
 	})
@@ -132,10 +132,10 @@ func addBeerLookup() {
 	AddFuncLookup("beerstyle", Info{
 		Display:     "Beer Style",
 		Category:    "beer",
-		Description: "Random beer style",
+		Description: "Distinct characteristics and flavors of beer",
 		Example:     "European Amber Lager",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return beerStyle(r), nil
 		},
 	})
@@ -143,10 +143,10 @@ func addBeerLookup() {
 	AddFuncLookup("beerhop", Info{
 		Display:     "Beer Hop",
 		Category:    "beer",
-		Description: "Random beer hop type",
+		Description: "The flower used in brewing to add flavor, aroma, and bitterness to beer",
 		Example:     "Glacier",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return beerHop(r), nil
 		},
 	})
@@ -154,10 +154,10 @@ func addBeerLookup() {
 	AddFuncLookup("beeryeast", Info{
 		Display:     "Beer Yeast",
 		Category:    "beer",
-		Description: "Random beer yeast value",
+		Description: "Microorganism used in brewing to ferment sugars, producing alcohol and carbonation in beer",
 		Example:     "1388 - Belgian Strong Ale",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return beerYeast(r), nil
 		},
 	})
@@ -165,10 +165,10 @@ func addBeerLookup() {
 	AddFuncLookup("beermalt", Info{
 		Display:     "Beer Malt",
 		Category:    "beer",
-		Description: "Random beer malt",
+		Description: "Processed barley or other grains, provides sugars for fermentation and flavor to beer",
 		Example:     "Munich",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return beerMalt(r), nil
 		},
 	})
@@ -176,10 +176,10 @@ func addBeerLookup() {
 	AddFuncLookup("beeralcohol", Info{
 		Display:     "Beer Alcohol",
 		Category:    "beer",
-		Description: "Random alcohol percentage",
+		Description: "Measures the alcohol content in beer",
 		Example:     "2.7%",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return beerAlcohol(r), nil
 		},
 	})
@@ -187,10 +187,10 @@ func addBeerLookup() {
 	AddFuncLookup("beeribu", Info{
 		Display:     "Beer IBU",
 		Category:    "beer",
-		Description: "Random beer ibu",
+		Description: "Scale measuring bitterness of beer from hops",
 		Example:     "29 IBU",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return beerIbu(r), nil
 		},
 	})
@@ -198,10 +198,10 @@ func addBeerLookup() {
 	AddFuncLookup("beerblg", Info{
 		Display:     "Beer BLG",
 		Category:    "beer",
-		Description: "Random beer blg",
+		Description: "Scale indicating the concentration of extract in worts",
 		Example:     "6.4°Blg",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return beerBlg(r), nil
 		},
 	})

@@ -22,13 +22,14 @@ import (
 // symmetric tridiagonal to which it is similar.
 //
 // info returns a status error. The return codes mean as follows:
-//  0: The algorithm completed successfully.
-//  1: A split was marked by a positive value in e.
-//  2: Current block of Z not diagonalized after 100*n iterations (in inner
-//     while loop). On exit Z holds a qd array with the same eigenvalues as
-//     the given Z.
-//  3: Termination criterion of outer while loop not met (program created more
-//     than N unreduced blocks).
+//
+//	0: The algorithm completed successfully.
+//	1: A split was marked by a positive value in e.
+//	2: Current block of Z not diagonalized after 100*n iterations (in inner
+//	   while loop). On exit Z holds a qd array with the same eigenvalues as
+//	   the given Z.
+//	3: Termination criterion of outer while loop not met (program created more
+//	   than N unreduced blocks).
 //
 // z must have length at least 4*n, and must not contain any negative elements.
 // Dlasq2 will panic otherwise.
@@ -287,8 +288,8 @@ outer:
 		// Now i0:n0 is unreduced.
 		// PP = 0 for ping, PP = 1 for pong.
 		// PP = 2 indicates that flipping was applied to the Z array and
-		// 		and that the tests for deflation upon entry in Dlasq3
-		// 		should not be performed.
+		// 		that the tests for deflation upon entry in Dlasq3 should
+		// 		not be performed.
 		nbig := 100 * (n0 - i0 + 1)
 		for iwhilb := 0; iwhilb < nbig; iwhilb++ {
 			if i0 > n0 {

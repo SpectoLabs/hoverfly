@@ -86,14 +86,28 @@ func dog(r *rand.Rand) string {
 	return getRandValue(r, []string{"animal", "dog"})
 }
 
+// Bird will return a random bird species
+func Bird() string {
+	return bird(globalFaker.Rand)
+}
+
+// Bird will return a random bird species
+func (f *Faker) Bird() string {
+	return bird(f.Rand)
+}
+
+func bird(r *rand.Rand) string {
+	return getRandValue(r, []string{"animal", "bird"})
+}
+
 func addAnimalLookup() {
 	AddFuncLookup("petname", Info{
 		Display:     "Pet Name",
 		Category:    "animal",
-		Description: "Random pet name",
+		Description: "Affectionate nickname given to a pet",
 		Example:     "Ozzy Pawsborne",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return petName(r), nil
 		},
 	})
@@ -101,10 +115,10 @@ func addAnimalLookup() {
 	AddFuncLookup("animal", Info{
 		Display:     "Animal",
 		Category:    "animal",
-		Description: "Random animal",
+		Description: "Living creature with the ability to move, eat, and interact with its environment",
 		Example:     "elk",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return animal(r), nil
 		},
 	})
@@ -112,10 +126,10 @@ func addAnimalLookup() {
 	AddFuncLookup("animaltype", Info{
 		Display:     "Animal Type",
 		Category:    "animal",
-		Description: "Random animal type",
+		Description: "Type of animal, such as mammals, birds, reptiles, etc.",
 		Example:     "amphibians",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return animalType(r), nil
 		},
 	})
@@ -123,10 +137,10 @@ func addAnimalLookup() {
 	AddFuncLookup("farmanimal", Info{
 		Display:     "Farm Animal",
 		Category:    "animal",
-		Description: "Random farm animal",
+		Description: "Animal name commonly found on a farm",
 		Example:     "Chicken",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return farmAnimal(r), nil
 		},
 	})
@@ -134,10 +148,10 @@ func addAnimalLookup() {
 	AddFuncLookup("cat", Info{
 		Display:     "Cat",
 		Category:    "animal",
-		Description: "Random cat type",
+		Description: "Various breeds that define different cats",
 		Example:     "Chausie",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return cat(r), nil
 		},
 	})
@@ -145,11 +159,22 @@ func addAnimalLookup() {
 	AddFuncLookup("dog", Info{
 		Display:     "Dog",
 		Category:    "animal",
-		Description: "Random dog type",
+		Description: "Various breeds that define different dogs",
 		Example:     "Norwich Terrier",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return dog(r), nil
+		},
+	})
+
+	AddFuncLookup("bird", Info{
+		Display:     "Bird",
+		Category:    "animal",
+		Description: "Distinct species of birds",
+		Example:     "goose",
+		Output:      "string",
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
+			return bird(r), nil
 		},
 	})
 }

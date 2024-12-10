@@ -1,6 +1,7 @@
 package gofakeit
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
@@ -45,6 +46,11 @@ func generate(r *rand.Rand, dataVal string) string {
 	// Replace # with numbers and ? with letters
 	dataVal = replaceWithNumbers(r, dataVal)
 	dataVal = replaceWithLetters(r, dataVal)
+
+	// Check if string has any replaceable values
+	if !strings.Contains(dataVal, "{") && !strings.Contains(dataVal, "}") {
+		return dataVal
+	}
 
 	// Variables to identify the index in which it exists
 	startCurly := -1
@@ -146,22 +152,147 @@ func generate(r *rand.Rand, dataVal string) string {
 	return dataVal
 }
 
+// FixedWidthOptions defines values needed for csv generation
+type FixedWidthOptions struct {
+	RowCount int     `json:"row_count" xml:"row_count" fake:"{number:1,10}"`
+	Fields   []Field `json:"fields" xml:"fields" fake:"{fields}"`
+}
+
+// FixedWidth generates an table of random data in fixed width format
+// A nil FixedWidthOptions returns a randomly structured FixedWidth.
+func FixedWidth(co *FixedWidthOptions) (string, error) { return fixeWidthFunc(globalFaker.Rand, co) }
+
+// FixedWidth generates an table of random data in fixed width format
+// A nil FixedWidthOptions returns a randomly structured FixedWidth.
+func (f *Faker) FixedWidth(co *FixedWidthOptions) (string, error) { return fixeWidthFunc(f.Rand, co) }
+
+// Function to generate a fixed width document
+func fixeWidthFunc(r *rand.Rand, co *FixedWidthOptions) (string, error) {
+	// If we didn't get FixedWidthOptions, create a new random one
+	if co == nil {
+		co = &FixedWidthOptions{}
+	}
+
+	// Make sure you set a row count
+	if co.RowCount <= 0 {
+		co.RowCount = r.Intn(10) + 1
+	}
+
+	// Check fields
+	if len(co.Fields) <= 0 {
+		// Create random fields
+		co.Fields = []Field{
+			{Name: "Name", Function: "{firstname} {lastname}"},
+			{Name: "Email", Function: "email"},
+			{Name: "Password", Function: "password", Params: MapParams{"special": {"false"}, "space": {"false"}}},
+		}
+	}
+
+	data := [][]string{}
+	hasHeader := false
+
+	// Loop through fields, generate data and add to data array
+	for _, field := range co.Fields {
+		// Start new row
+		row := []string{}
+
+		// Add name to first value
+		if field.Name != "" {
+			hasHeader = true
+		}
+		row = append(row, field.Name)
+
+		// Get function
+		funcInfo := GetFuncLookup(field.Function)
+		var value any
+		if funcInfo == nil {
+			// Try to run the function through generate
+			for i := 0; i < co.RowCount; i++ {
+				row = append(row, generate(r, field.Function))
+			}
+		} else {
+			// Generate function value
+			var err error
+			for i := 0; i < co.RowCount; i++ {
+				value, err = funcInfo.Generate(r, &field.Params, funcInfo)
+				if err != nil {
+					value = ""
+				}
+
+				// Add value to row
+				row = append(row, anyToString(value))
+			}
+		}
+
+		// Add row to data
+		data = append(data, row)
+	}
+
+	var result strings.Builder
+
+	// Calculate column widths
+	colWidths := make([]int, len(data))
+	for i, row := range data {
+		for _, value := range row {
+			width := len(value) + 5
+			if width > colWidths[i] {
+				colWidths[i] = width
+			}
+		}
+	}
+
+	// Append table rows to the string, excluding the entire row if the first value is empty
+	for i := 0; i < len(data[0]); i++ {
+		if !hasHeader && i == 0 {
+			continue // Skip the entire column if the first value is empty
+		}
+
+		var resultRow strings.Builder
+		for j, row := range data {
+			resultRow.WriteString(fmt.Sprintf("%-*s", colWidths[j], row[i]))
+		}
+
+		// Trim trailing spaces
+		result.WriteString(strings.TrimRight(resultRow.String(), " "))
+
+		// Only add new line if not the last row
+		if i != len(data[0])-1 {
+			result.WriteString("\n")
+		}
+	}
+
+	return result.String(), nil
+}
+
 // Regex will generate a string based upon a RE2 syntax
 func Regex(regexStr string) string { return regex(globalFaker.Rand, regexStr) }
 
 // Regex will generate a string based upon a RE2 syntax
 func (f *Faker) Regex(regexStr string) string { return regex(f.Rand, regexStr) }
 
-func regex(r *rand.Rand, regexStr string) string {
+func regex(r *rand.Rand, regexStr string) (gen string) {
 	re, err := syntax.Parse(regexStr, syntax.Perl)
 	if err != nil {
 		return "Could not parse regex string"
 	}
 
-	return regexGenerate(r, re)
+	// Panic catch
+	defer func() {
+		if r := recover(); r != nil {
+			gen = fmt.Sprint(r)
+			return
+
+		}
+	}()
+
+	return regexGenerate(r, re, len(regexStr)*100)
 }
 
-func regexGenerate(ra *rand.Rand, re *syntax.Regexp) string {
+func regexGenerate(ra *rand.Rand, re *syntax.Regexp, limit int) string {
+	if limit <= 0 {
+		panic("Length limit reached when generating output")
+	}
+
 	op := re.Op
 	switch op {
 	case syntax.OpNoMatch: // matches no strings
@@ -226,12 +357,12 @@ func regexGenerate(ra *rand.Rand, re *syntax.Regexp) string {
 	case syntax.OpWordBoundary: // matches word boundary `\b`
 	case syntax.OpNoWordBoundary: // matches word non-boundary `\B`
 	case syntax.OpCapture: // capturing subexpression with index Cap, optional name Name
-		return regexGenerate(ra, re.Sub0[0])
+		return regexGenerate(ra, re.Sub0[0], limit)
 	case syntax.OpStar: // matches Sub[0] zero or more times
 		var b strings.Builder
 		for i := 0; i < number(ra, 0, 10); i++ {
 			for _, rs := range re.Sub {
-				b.WriteString(regexGenerate(ra, rs))
+				b.WriteString(regexGenerate(ra, rs, limit-b.Len()))
 			}
 		}
 		return b.String()
@@ -239,7 +370,7 @@ func regexGenerate(ra *rand.Rand, re *syntax.Regexp) string {
 		var b strings.Builder
 		for i := 0; i < number(ra, 1, 10); i++ {
 			for _, rs := range re.Sub {
-				b.WriteString(regexGenerate(ra, rs))
+				b.WriteString(regexGenerate(ra, rs, limit-b.Len()))
 			}
 		}
 		return b.String()
@@ -247,7 +378,7 @@ func regexGenerate(ra *rand.Rand, re *syntax.Regexp) string {
 		var b strings.Builder
 		for i := 0; i < number(ra, 0, 1); i++ {
 			for _, rs := range re.Sub {
-				b.WriteString(regexGenerate(ra, rs))
+				b.WriteString(regexGenerate(ra, rs, limit-b.Len()))
 			}
 		}
 		return b.String()
@@ -260,31 +391,31 @@ func regexGenerate(ra *rand.Rand, re *syntax.Regexp) string {
 		}
 		for i := 0; i < re.Min || i < (re.Min+count); i++ {
 			for _, rs := range re.Sub {
-				b.WriteString(regexGenerate(ra, rs))
+				b.WriteString(regexGenerate(ra, rs, limit-b.Len()))
 			}
 		}
 		return b.String()
 	case syntax.OpConcat: // matches concatenation of Subs
 		var b strings.Builder
 		for _, rs := range re.Sub {
-			b.WriteString(regexGenerate(ra, rs))
+			b.WriteString(regexGenerate(ra, rs, limit-b.Len()))
 		}
 		return b.String()
 	case syntax.OpAlternate: // matches alternation of Subs
-		return regexGenerate(ra, re.Sub[number(ra, 0, len(re.Sub)-1)])
+		return regexGenerate(ra, re.Sub[number(ra, 0, len(re.Sub)-1)], limit)
 	}
 
 	return ""
 }
 
 // Map will generate a random set of map data
-func Map() map[string]interface{} { return mapFunc(globalFaker.Rand) }
+func Map() map[string]any { return mapFunc(globalFaker.Rand) }
 
 // Map will generate a random set of map data
-func (f *Faker) Map() map[string]interface{} { return mapFunc(f.Rand) }
+func (f *Faker) Map() map[string]any { return mapFunc(f.Rand) }
 
-func mapFunc(r *rand.Rand) map[string]interface{} {
-	m := map[string]interface{}{}
+func mapFunc(r *rand.Rand) map[string]any {
+	m := map[string]any{}
 
 	randWordType := func() string {
 		s := randomString(r, []string{"lorem", "bs", "job", "name", "address"})
@@ -321,7 +452,7 @@ func mapFunc(r *rand.Rand) map[string]interface{} {
 		case "slice":
 			m[word(r)] = randSlice()
 		case "map":
-			mm := map[string]interface{}{}
+			mm := map[string]any{}
 			tt := randomString(r, []string{"string", "int", "float", "slice"})
 			switch tt {
 			case "string":
@@ -350,7 +481,7 @@ func addGenerateLookup() {
 		Params: []Param{
 			{Field: "str", Display: "String", Type: "string", Description: "String value to generate from"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			str, err := info.GetString(m, "str")
 			if err != nil {
 				return nil, err
@@ -358,23 +489,72 @@ func addGenerateLookup() {
 
 			// Limit the length of the string passed
 			if len(str) > 1000 {
-				return nil, errors.New("string length is too large. Limit to 1000 characters")
+				return nil, errors.New("string length is too large. limit to 1000 characters")
 			}
 
 			return generate(r, str), nil
 		},
 	})
 
+	AddFuncLookup("fixed_width", Info{
+		Display:     "Fixed Width",
+		Category:    "generate",
+		Description: "Fixed width rows of output data based on input fields",
+		Example: `Name               Email                          Password         Age
+Markus Moen        sylvanmraz@murphy.net          6VlvH6qqXc7g     13
+Alayna Wuckert     santinostanton@carroll.biz     g7sLrS0gEwLO     46
+Lura Lockman       zacherykuhic@feil.name         S8gV7Z64KlHG     12`,
+		Output:      "[]byte",
+		ContentType: "text/plain",
+		Params: []Param{
+			{Field: "rowcount", Display: "Row Count", Type: "int", Default: "10", Description: "Number of rows"},
+			{Field: "fields", Display: "Fields", Type: "[]Field", Description: "Fields name, function and params"},
+		},
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
+			co := FixedWidthOptions{}
+
+			rowCount, err := info.GetInt(m, "rowcount")
+			if err != nil {
+				return nil, err
+			}
+
+			co.RowCount = rowCount
+
+			fields, _ := info.GetStringArray(m, "fields")
+
+			// Check to make sure fields has length
+			if len(fields) > 0 {
+				co.Fields = make([]Field, len(fields))
+				for i, f := range fields {
+					// Unmarshal fields string into fields array
+					err = json.Unmarshal([]byte(f), &co.Fields[i])
+					if err != nil {
+						return nil, err
+					}
+				}
+			} else {
+				return nil, errors.New("missing fields")
+			}
+
+			out, err := fixeWidthFunc(r, &co)
+			if err != nil {
+				return nil, err
+			}
+
+			return out, nil
+		},
+	})
+
 	AddFuncLookup("regex", Info{
 		Display:     "Regex",
 		Category:    "generate",
-		Description: "Random string generated from regex RE2 syntax string",
+		Description: "Pattern-matching tool used in text processing to search and manipulate strings",
 		Example:     "[abcdef]{5} - affec",
 		Output:      "string",
 		Params: []Param{
 			{Field: "str", Display: "String", Type: "string", Description: "Regex RE2 syntax string"},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			str, err := info.GetString(m, "str")
 			if err != nil {
 				return nil, err
@@ -382,7 +562,7 @@ func addGenerateLookup() {
 
 			// Limit the length of the string passed
 			if len(str) > 500 {
-				return nil, errors.New("string length is too large. Limit to 500 characters")
+				return nil, errors.New("string length is too large. limit to 500 characters")
 			}
 
 			return regex(r, str), nil
@@ -392,11 +572,17 @@ func addGenerateLookup() {
 	AddFuncLookup("map", Info{
 		Display:     "Map",
 		Category:    "generate",
-		Description: "Random map of generated data",
-		Example:     `map[consult:respond context:9285735]`,
-		Output:      "map[string]interface{}",
+		Description: "Data structure that stores key-value pairs",
+		Example: `{
+	"software": 7518355,
+	"that": ["despite", "pack", "whereas", "recently", "there", "anyone", "time", "read"],
+	"use": 683598,
+	"whom": "innovate",
+	"yourselves": 1987784
+}`,
+		Output:      "map[string]any",
 		ContentType: "application/json",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return mapFunc(r), nil
 		},
 	})

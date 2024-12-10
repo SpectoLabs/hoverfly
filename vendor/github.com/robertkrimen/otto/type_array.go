@@ -4,34 +4,43 @@ import (
 	"strconv"
 )
 
-func (runtime *_runtime) newArrayObject(length uint32) *_object {
-	self := runtime.newObject()
-	self.class = "Array"
-	self.defineProperty("length", toValue_uint32(length), 0100, false)
-	self.objectClass = _classArray
-	return self
+func (rt *runtime) newArrayObject(length uint32) *object {
+	obj := rt.newObject()
+	obj.class = classArrayName
+	obj.defineProperty(propertyLength, uint32Value(length), 0o100, false)
+	obj.objectClass = classArray
+	return obj
 }
 
-func isArray(object *_object) bool {
-	return object != nil && (object.class == "Array" || object.class == "GoArray")
+func isArray(obj *object) bool {
+	if obj == nil {
+		return false
+	}
+
+	switch obj.class {
+	case classArrayName, classGoArrayName, classGoSliceName:
+		return true
+	default:
+		return false
+	}
 }
 
-func objectLength(object *_object) uint32 {
-	if object == nil {
+func objectLength(obj *object) uint32 {
+	if obj == nil {
 		return 0
 	}
-	switch object.class {
-	case "Array":
-		return object.get("length").value.(uint32)
-	case "String":
-		return uint32(object.get("length").value.(int))
-	case "GoArray":
-		return uint32(object.get("length").value.(int))
+	switch obj.class {
+	case classArrayName:
+		return obj.get(propertyLength).value.(uint32)
+	case classStringName:
+		return uint32(obj.get(propertyLength).value.(int))
+	case classGoArrayName, classGoSliceName:
+		return uint32(obj.get(propertyLength).value.(int))
 	}
 	return 0
 }
 
-func arrayUint32(rt *_runtime, value Value) uint32 {
+func arrayUint32(rt *runtime, value Value) uint32 {
 	nm := value.number()
 	if nm.kind != numberInteger || !isUint32(nm.int64) {
 		// FIXME
@@ -40,70 +49,72 @@ func arrayUint32(rt *_runtime, value Value) uint32 {
 	return uint32(nm.int64)
 }
 
-func arrayDefineOwnProperty(self *_object, name string, descriptor _property, throw bool) bool {
-	lengthProperty := self.getOwnProperty("length")
+func arrayDefineOwnProperty(obj *object, name string, descriptor property, throw bool) bool {
+	lengthProperty := obj.getOwnProperty(propertyLength)
 	lengthValue, valid := lengthProperty.value.(Value)
 	if !valid {
 		panic("Array.length != Value{}")
 	}
+
+	reject := func(reason string) bool {
+		if throw {
+			panic(obj.runtime.panicTypeError("Array.DefineOwnProperty %s", reason))
+		}
+		return false
+	}
 	length := lengthValue.value.(uint32)
-	if name == "length" {
+	if name == propertyLength {
 		if descriptor.value == nil {
-			return objectDefineOwnProperty(self, name, descriptor, throw)
+			return objectDefineOwnProperty(obj, name, descriptor, throw)
 		}
 		newLengthValue, isValue := descriptor.value.(Value)
 		if !isValue {
-			panic(self.runtime.panicTypeError())
+			panic(obj.runtime.panicTypeError("Array.DefineOwnProperty %q is not a value", descriptor.value))
 		}
-		newLength := arrayUint32(self.runtime, newLengthValue)
-		descriptor.value = toValue_uint32(newLength)
+		newLength := arrayUint32(obj.runtime, newLengthValue)
+		descriptor.value = uint32Value(newLength)
 		if newLength > length {
-			return objectDefineOwnProperty(self, name, descriptor, throw)
+			return objectDefineOwnProperty(obj, name, descriptor, throw)
 		}
 		if !lengthProperty.writable() {
-			goto Reject
+			return reject("property length for not writable")
 		}
 		newWritable := true
-		if descriptor.mode&0700 == 0 {
+		if descriptor.mode&0o700 == 0 {
 			// If writable is off
 			newWritable = false
-			descriptor.mode |= 0100
+			descriptor.mode |= 0o100
 		}
-		if !objectDefineOwnProperty(self, name, descriptor, throw) {
+		if !objectDefineOwnProperty(obj, name, descriptor, throw) {
 			return false
 		}
 		for newLength < length {
 			length--
-			if !self.delete(strconv.FormatInt(int64(length), 10), false) {
-				descriptor.value = toValue_uint32(length + 1)
+			if !obj.delete(strconv.FormatInt(int64(length), 10), false) {
+				descriptor.value = uint32Value(length + 1)
 				if !newWritable {
-					descriptor.mode &= 0077
+					descriptor.mode &= 0o077
 				}
-				objectDefineOwnProperty(self, name, descriptor, false)
-				goto Reject
+				objectDefineOwnProperty(obj, name, descriptor, false)
+				return reject("delete failed")
 			}
 		}
 		if !newWritable {
-			descriptor.mode &= 0077
-			objectDefineOwnProperty(self, name, descriptor, false)
+			descriptor.mode &= 0o077
+			objectDefineOwnProperty(obj, name, descriptor, false)
 		}
 	} else if index := stringToArrayIndex(name); index >= 0 {
 		if index >= int64(length) && !lengthProperty.writable() {
-			goto Reject
+			return reject("property length not writable")
 		}
-		if !objectDefineOwnProperty(self, strconv.FormatInt(index, 10), descriptor, false) {
-			goto Reject
+		if !objectDefineOwnProperty(obj, strconv.FormatInt(index, 10), descriptor, false) {
+			return reject("Object.DefineOwnProperty failed")
 		}
 		if index >= int64(length) {
-			lengthProperty.value = toValue_uint32(uint32(index + 1))
-			objectDefineOwnProperty(self, "length", *lengthProperty, false)
+			lengthProperty.value = uint32Value(uint32(index + 1))
+			objectDefineOwnProperty(obj, propertyLength, *lengthProperty, false)
 			return true
 		}
 	}
-	return objectDefineOwnProperty(self, name, descriptor, throw)
-Reject:
-	if throw {
-		panic(self.runtime.panicTypeError())
-	}
-	return false
+	return objectDefineOwnProperty(obj, name, descriptor, throw)
 }

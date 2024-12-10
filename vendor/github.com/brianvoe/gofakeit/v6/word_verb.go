@@ -63,10 +63,10 @@ func addWordVerbLookup() {
 	AddFuncLookup("verb", Info{
 		Display:     "Verb",
 		Category:    "word",
-		Description: "Random verb",
+		Description: "Word expressing an action, event or state",
 		Example:     "release",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return verb(r), nil
 		},
 	})
@@ -74,10 +74,10 @@ func addWordVerbLookup() {
 	AddFuncLookup("verbaction", Info{
 		Display:     "Action Verb",
 		Category:    "word",
-		Description: "Random action verb",
+		Description: "Verb Indicating a physical or mental action",
 		Example:     "close",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return verbAction(r), nil
 		},
 	})
@@ -85,10 +85,10 @@ func addWordVerbLookup() {
 	AddFuncLookup("verbtransitive", Info{
 		Display:     "Transitive Verb",
 		Category:    "word",
-		Description: "Random transitive verb",
+		Description: "Verb that requires a direct object to complete its meaning",
 		Example:     "follow",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return verbTransitive(r), nil
 		},
 	})
@@ -96,10 +96,10 @@ func addWordVerbLookup() {
 	AddFuncLookup("verbintransitive", Info{
 		Display:     "Intransitive Verb",
 		Category:    "word",
-		Description: "Random intransitive verb",
+		Description: "Verb that does not require a direct object to complete its meaning",
 		Example:     "laugh",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return verbIntransitive(r), nil
 		},
 	})
@@ -107,10 +107,10 @@ func addWordVerbLookup() {
 	AddFuncLookup("verblinking", Info{
 		Display:     "Linking Verb",
 		Category:    "word",
-		Description: "Random linking verb",
+		Description: "Verb that Connects the subject of a sentence to a subject complement",
 		Example:     "was",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return verbLinking(r), nil
 		},
 	})
@@ -118,10 +118,10 @@ func addWordVerbLookup() {
 	AddFuncLookup("verbhelping", Info{
 		Display:     "Helping Verb",
 		Category:    "word",
-		Description: "Random helping verb",
+		Description: "Auxiliary verb that helps the main verb complete the sentence",
 		Example:     "be",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return verbHelping(r), nil
 		},
 	})

@@ -7,8 +7,10 @@ package gonum
 import "math"
 
 // Dlanv2 computes the Schur factorization of a real 2×2 matrix:
-//  [ a b ] = [ cs -sn ] * [ aa bb ] * [ cs sn ]
-//  [ c d ]   [ sn  cs ]   [ cc dd ] * [-sn cs ]
+//
+//	[ a b ] = [ cs -sn ] * [ aa bb ] * [ cs sn ]
+//	[ c d ]   [ sn  cs ]   [ cc dd ] * [-sn cs ]
+//
 // If cc is zero, aa and dd are real eigenvalues of the matrix. Otherwise it
 // holds that aa = dd and bb*cc < 0, and aa ± sqrt(bb*cc) are complex conjugate
 // eigenvalues. The real and imaginary parts of the eigenvalues are returned in
@@ -66,7 +68,24 @@ func (impl Implementation) Dlanv2(a, b, c, d float64) (aa, bb, cc, dd float64, r
 		} else {
 			// Complex eigenvalues, or real (almost) equal eigenvalues.
 			// Make diagonal elements equal.
+			safmn2 := math.Pow(dlamchB, math.Log(dlamchS/dlamchE)/math.Log(dlamchB)/2)
+			safmx2 := 1 / safmn2
 			sigma := b + c
+		loop:
+			for iter := 0; iter < 20; iter++ {
+				scale = math.Max(math.Abs(temp), math.Abs(sigma))
+				switch {
+				case scale >= safmx2:
+					sigma *= safmn2
+					temp *= safmn2
+				case scale <= safmn2:
+					sigma *= safmx2
+					temp *= safmx2
+				default:
+					break loop
+				}
+			}
+			p = temp / 2
 			tau := impl.Dlapy2(sigma, temp)
 			cs = math.Sqrt((1 + math.Abs(sigma)/tau) / 2)
 			sn = -p / (tau * cs)

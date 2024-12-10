@@ -14,7 +14,27 @@ func Date() time.Time { return date(globalFaker.Rand) }
 func (f *Faker) Date() time.Time { return date(f.Rand) }
 
 func date(r *rand.Rand) time.Time {
-	return time.Date(year(r), time.Month(number(r, 1, 12)), day(r), hour(r), minute(r), second(r), nanoSecond(r), time.UTC)
+	return time.Date(year(r), time.Month(month(r)), day(r), hour(r), minute(r), second(r), nanoSecond(r), time.UTC)
+}
+
+// FutureDate will generate a random past time.Time struct
+func PastDate() time.Time { return pastDate(globalFaker.Rand) }
+
+// FutureDate will generate a random past time.Time struct
+func (f *Faker) PastDate() time.Time { return pastDate(f.Rand) }
+
+func pastDate(r *rand.Rand) time.Time {
+	return time.Now().Add(time.Hour * -time.Duration(number(r, 1, 12)))
+}
+
+// FutureDate will generate a random future time.Time struct
+func FutureDate() time.Time { return futureDate(globalFaker.Rand) }
+
+// FutureDate will generate a random future time.Time struct
+func (f *Faker) FutureDate() time.Time { return futureDate(f.Rand) }
+
+func futureDate(r *rand.Rand) time.Time {
+	return time.Now().Add(time.Hour * time.Duration(number(r, 1, 12)))
 }
 
 // DateRange will generate a random time.Time struct between a start and end date
@@ -193,7 +213,7 @@ func addDateTimeLookup() {
 	AddFuncLookup("date", Info{
 		Display:     "Date",
 		Category:    "time",
-		Description: "Random date",
+		Description: "Representation of a specific day, month, and year, often used for chronological reference",
 		Example:     "2006-01-02T15:04:05Z07:00",
 		Output:      "string",
 		Params: []Param{
@@ -206,7 +226,7 @@ func addDateTimeLookup() {
 				Description: "Date time string format output. You may also use golang time format or java time format",
 			},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			format, err := info.GetString(m, "format")
 			if err != nil {
 				return nil, err
@@ -272,7 +292,7 @@ func addDateTimeLookup() {
 				Description: "Date time string format",
 			},
 		},
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			format, err := info.GetString(m, "format")
 			if err != nil {
 				return nil, err
@@ -301,13 +321,35 @@ func addDateTimeLookup() {
 		},
 	})
 
+	AddFuncLookup("pasttime", Info{
+		Display:     "PastTime",
+		Category:    "time",
+		Description: "Date that has occurred before the current moment in time",
+		Example:     "2007-01-24 13:00:35.820738079 +0000 UTC",
+		Output:      "string",
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
+			return pastDate(r), nil
+		},
+	})
+
+	AddFuncLookup("futuretime", Info{
+		Display:     "FutureTime",
+		Category:    "time",
+		Description: "Date that has occurred after the current moment in time",
+		Example:     "2107-01-24 13:00:35.820738079 +0000 UTC",
+		Output:      "string",
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
+			return futureDate(r), nil
+		},
+	})
+
 	AddFuncLookup("nanosecond", Info{
 		Display:     "Nanosecond",
 		Category:    "time",
-		Description: "Random nanosecond",
+		Description: "Unit of time equal to One billionth (10^-9) of a second",
 		Example:     "196446360",
 		Output:      "int",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return nanoSecond(r), nil
 		},
 	})
@@ -315,10 +357,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("second", Info{
 		Display:     "Second",
 		Category:    "time",
-		Description: "Random second",
+		Description: "Unit of time equal to 1/60th of a minute",
 		Example:     "43",
 		Output:      "int",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return second(r), nil
 		},
 	})
@@ -326,10 +368,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("minute", Info{
 		Display:     "Minute",
 		Category:    "time",
-		Description: "Random minute",
+		Description: "Unit of time equal to 60 seconds",
 		Example:     "34",
 		Output:      "int",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return minute(r), nil
 		},
 	})
@@ -337,10 +379,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("hour", Info{
 		Display:     "Hour",
 		Category:    "time",
-		Description: "Random hour",
+		Description: "Unit of time equal to 60 minutes",
 		Example:     "8",
 		Output:      "int",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return hour(r), nil
 		},
 	})
@@ -348,10 +390,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("day", Info{
 		Display:     "Day",
 		Category:    "time",
-		Description: "Random day",
+		Description: "24-hour period equivalent to one rotation of Earth on its axis",
 		Example:     "12",
 		Output:      "int",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return day(r), nil
 		},
 	})
@@ -359,10 +401,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("weekday", Info{
 		Display:     "Weekday",
 		Category:    "time",
-		Description: "Random week day",
+		Description: "Day of the week excluding the weekend",
 		Example:     "Friday",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return weekDay(r), nil
 		},
 	})
@@ -370,10 +412,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("month", Info{
 		Display:     "Month",
 		Category:    "time",
-		Description: "Random month",
+		Description: "Division of the year, typically 30 or 31 days long",
 		Example:     "1",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return month(r), nil
 		},
 	})
@@ -381,10 +423,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("monthstring", Info{
 		Display:     "Month String",
 		Category:    "time",
-		Description: "Random month in string output",
+		Description: "String Representation of a month name",
 		Example:     "September",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return monthString(r), nil
 		},
 	})
@@ -392,10 +434,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("year", Info{
 		Display:     "Year",
 		Category:    "time",
-		Description: "Random year",
+		Description: "Period of 365 days, the time Earth takes to orbit the Sun",
 		Example:     "1900",
 		Output:      "int",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return year(r), nil
 		},
 	})
@@ -403,10 +445,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("timezone", Info{
 		Display:     "Timezone",
 		Category:    "time",
-		Description: "Random timezone",
+		Description: "Region where the same standard time is used, based on longitudinal divisions of the Earth",
 		Example:     "Kaliningrad Standard Time",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return timeZone(r), nil
 		},
 	})
@@ -414,10 +456,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("timezoneabv", Info{
 		Display:     "Timezone Abbreviation",
 		Category:    "time",
-		Description: "Random abbreviated timezone",
+		Description: "Abbreviated 3-letter word of a timezone",
 		Example:     "KST",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return timeZoneAbv(r), nil
 		},
 	})
@@ -425,10 +467,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("timezonefull", Info{
 		Display:     "Timezone Full",
 		Category:    "time",
-		Description: "Random full timezone",
+		Description: "Full name of a timezone",
 		Example:     "(UTC+03:00) Kaliningrad, Minsk",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return timeZoneFull(r), nil
 		},
 	})
@@ -436,10 +478,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("timezoneoffset", Info{
 		Display:     "Timezone Offset",
 		Category:    "time",
-		Description: "Random timezone offset",
+		Description: "The difference in hours from Coordinated Universal Time (UTC) for a specific region",
 		Example:     "3",
 		Output:      "float32",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return timeZoneOffset(r), nil
 		},
 	})
@@ -447,10 +489,10 @@ func addDateTimeLookup() {
 	AddFuncLookup("timezoneregion", Info{
 		Display:     "Timezone Region",
 		Category:    "time",
-		Description: "Random region timezone",
+		Description: "Geographic area sharing the same standard time",
 		Example:     "America/Alaska",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return timeZoneRegion(r), nil
 		},
 	})

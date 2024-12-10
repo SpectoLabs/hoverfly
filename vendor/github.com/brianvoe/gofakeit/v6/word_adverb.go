@@ -89,10 +89,10 @@ func addWordAdverbLookup() {
 	AddFuncLookup("adverb", Info{
 		Display:     "Adverb",
 		Category:    "word",
-		Description: "Random adverb",
+		Description: "Word that modifies verbs, adjectives, or other adverbs",
 		Example:     "smoothly",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return adverb(r), nil
 		},
 	})
@@ -100,10 +100,10 @@ func addWordAdverbLookup() {
 	AddFuncLookup("adverbmanner", Info{
 		Display:     "Adverb Manner",
 		Category:    "word",
-		Description: "Random manner adverb",
+		Description: "Adverb that describes how an action is performed",
 		Example:     "stupidly",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return adverbManner(r), nil
 		},
 	})
@@ -111,10 +111,10 @@ func addWordAdverbLookup() {
 	AddFuncLookup("adverbdegree", Info{
 		Display:     "Adverb Degree",
 		Category:    "word",
-		Description: "Random degree adverb",
+		Description: "Adverb that indicates the degree or intensity of an action or adjective",
 		Example:     "intensely",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return adverbDegree(r), nil
 		},
 	})
@@ -122,10 +122,10 @@ func addWordAdverbLookup() {
 	AddFuncLookup("adverbplace", Info{
 		Display:     "Adverb Place",
 		Category:    "word",
-		Description: "Random place adverb",
+		Description: "Adverb that indicates the location or direction of an action",
 		Example:     "east",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return adverbPlace(r), nil
 		},
 	})
@@ -133,10 +133,10 @@ func addWordAdverbLookup() {
 	AddFuncLookup("adverbtimedefinite", Info{
 		Display:     "Adverb Time Definite",
 		Category:    "word",
-		Description: "Random time definite adverb",
+		Description: "Adverb that specifies the exact time an action occurs",
 		Example:     "now",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return adverbTimeDefinite(r), nil
 		},
 	})
@@ -144,10 +144,10 @@ func addWordAdverbLookup() {
 	AddFuncLookup("adverbtimeindefinite", Info{
 		Display:     "Adverb Time Indefinite",
 		Category:    "word",
-		Description: "Random time indefinite adverb",
+		Description: "Adverb that gives a general or unspecified time frame",
 		Example:     "already",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return adverbTimeIndefinite(r), nil
 		},
 	})
@@ -155,10 +155,10 @@ func addWordAdverbLookup() {
 	AddFuncLookup("adverbfrequencydefinite", Info{
 		Display:     "Adverb Frequency Definite",
 		Category:    "word",
-		Description: "Random frequency definite adverb",
+		Description: "Adverb that specifies how often an action occurs with a clear frequency",
 		Example:     "hourly",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return adverbFrequencyDefinite(r), nil
 		},
 	})
@@ -166,10 +166,10 @@ func addWordAdverbLookup() {
 	AddFuncLookup("adverbfrequencyindefinite", Info{
 		Display:     "Adverb Frequency Indefinite",
 		Category:    "word",
-		Description: "Random frequency indefinite adverb",
+		Description: "Adverb that specifies how often an action occurs without specifying a particular frequency",
 		Example:     "occasionally",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return adverbFrequencyIndefinite(r), nil
 		},
 	})

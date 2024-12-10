@@ -51,10 +51,10 @@ func addWordPrepositionLookup() {
 	AddFuncLookup("preposition", Info{
 		Display:     "Preposition",
 		Category:    "word",
-		Description: "Random preposition",
+		Description: "Words used to express the relationship of a noun or pronoun to other words in a sentence",
 		Example:     "other than",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return preposition(r), nil
 		},
 	})
@@ -62,10 +62,10 @@ func addWordPrepositionLookup() {
 	AddFuncLookup("prepositionsimple", Info{
 		Display:     "Preposition Simple",
 		Category:    "word",
-		Description: "Random simple preposition",
+		Description: "Single-word preposition showing relationships between 2 parts of a sentence",
 		Example:     "out",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return prepositionSimple(r), nil
 		},
 	})
@@ -73,10 +73,10 @@ func addWordPrepositionLookup() {
 	AddFuncLookup("prepositiondouble", Info{
 		Display:     "Preposition Double",
 		Category:    "word",
-		Description: "Random double preposition",
+		Description: "Two-word combination preposition, indicating a complex relation",
 		Example:     "before",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return prepositionDouble(r), nil
 		},
 	})
@@ -84,10 +84,10 @@ func addWordPrepositionLookup() {
 	AddFuncLookup("prepositioncompound", Info{
 		Display:     "Preposition Compound",
 		Category:    "word",
-		Description: "Random compound preposition",
+		Description: "Preposition that can be formed by combining two or more prepositions",
 		Example:     "according to",
 		Output:      "string",
-		Generate: func(r *rand.Rand, m *MapParams, info *Info) (interface{}, error) {
+		Generate: func(r *rand.Rand, m *MapParams, info *Info) (any, error) {
 			return prepositionCompound(r), nil
 		},
 	})

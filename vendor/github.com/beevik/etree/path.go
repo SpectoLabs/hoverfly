@@ -19,66 +19,73 @@ be modified by one or more bracket-enclosed "filters". Selectors are used to
 traverse the etree from element to element, while filters are used to narrow
 the list of candidate elements at each node.
 
-Although etree Path strings are similar to XPath strings
-(https://www.w3.org/TR/1999/REC-xpath-19991116/), they have a more limited set
-of selectors and filtering options.
+Although etree Path strings are structurally and behaviorally similar to XPath
+strings (https://www.w3.org/TR/1999/REC-xpath-19991116/), they have a more
+limited set of selectors and filtering options.
 
-The following selectors are supported by etree Path strings:
+The following selectors are supported by etree paths:
 
-    .               Select the current element.
-    ..              Select the parent of the current element.
-    *               Select all child elements of the current element.
-    /               Select the root element when used at the start of a path.
-    //              Select all descendants of the current element.
-    tag             Select all child elements with a name matching the tag.
+	.               Select the current element.
+	..              Select the parent of the current element.
+	*               Select all child elements of the current element.
+	/               Select the root element when used at the start of a path.
+	//              Select all descendants of the current element.
+	tag             Select all child elements with a name matching the tag.
 
-The following basic filters are supported by etree Path strings:
+The following basic filters are supported:
 
-    [@attrib]       Keep elements with an attribute named attrib.
-    [@attrib='val'] Keep elements with an attribute named attrib and value matching val.
-    [tag]           Keep elements with a child element named tag.
-    [tag='val']     Keep elements with a child element named tag and text matching val.
-    [n]             Keep the n-th element, where n is a numeric index starting from 1.
+	[@attrib]       Keep elements with an attribute named attrib.
+	[@attrib='val'] Keep elements with an attribute named attrib and value matching val.
+	[tag]           Keep elements with a child element named tag.
+	[tag='val']     Keep elements with a child element named tag and text matching val.
+	[n]             Keep the n-th element, where n is a numeric index starting from 1.
 
-The following function filters are also supported:
+The following function-based filters are supported:
 
-    [text()]                    Keep elements with non-empty text.
-    [text()='val']              Keep elements whose text matches val.
-    [local-name()='val']        Keep elements whose un-prefixed tag matches val.
-    [name()='val']              Keep elements whose full tag exactly matches val.
-    [namespace-prefix()='val']  Keep elements whose namespace prefix matches val.
-    [namespace-uri()='val']     Keep elements whose namespace URI matches val.
+	[text()]                    Keep elements with non-empty text.
+	[text()='val']              Keep elements whose text matches val.
+	[local-name()='val']        Keep elements whose un-prefixed tag matches val.
+	[name()='val']              Keep elements whose full tag exactly matches val.
+	[namespace-prefix()]        Keep elements with non-empty namespace prefixes.
+	[namespace-prefix()='val']  Keep elements whose namespace prefix matches val.
+	[namespace-uri()]           Keep elements with non-empty namespace URIs.
+	[namespace-uri()='val']     Keep elements whose namespace URI matches val.
 
-Here are some examples of Path strings:
+Below are some examples of etree path strings.
 
-- Select the bookstore child element of the root element:
-    /bookstore
+Select the bookstore child element of the root element:
 
-- Beginning from the root element, select the title elements of all
-descendant book elements having a 'category' attribute of 'WEB':
-    //book[@category='WEB']/title
+	/bookstore
 
-- Beginning from the current element, select the first descendant
-book element with a title child element containing the text 'Great
-Expectations':
-    .//book[title='Great Expectations'][1]
+Beginning from the root element, select the title elements of all descendant
+book elements having a 'category' attribute of 'WEB':
 
-- Beginning from the current element, select all child elements of
-book elements with an attribute 'language' set to 'english':
-    ./book/*[@language='english']
+	//book[@category='WEB']/title
 
-- Beginning from the current element, select all child elements of
-book elements containing the text 'special':
-    ./book/*[text()='special']
+Beginning from the current element, select the first descendant book element
+with a title child element containing the text 'Great Expectations':
 
-- Beginning from the current element, select all descendant book
-elements whose title child element has a 'language' attribute of 'french':
-    .//book/title[@language='french']/..
+	.//book[title='Great Expectations'][1]
 
-- Beginning from the current element, select all book elements
+Beginning from the current element, select all child elements of book elements
+with an attribute 'language' set to 'english':
+
+	./book/*[@language='english']
+
+Beginning from the current element, select all child elements of book elements
+containing the text 'special':
+
+	./book/*[text()='special']
+
+Beginning from the current element, select all descendant book elements whose
+title child element has a 'language' attribute of 'french':
+
+	.//book/title[@language='french']/..
+
+Beginning from the current element, select all descendant book elements
 belonging to the http://www.w3.org/TR/html4/ namespace:
-	.//book[namespace-uri()='http://www.w3.org/TR/html4/']
 
+	.//book[namespace-uri()='http://www.w3.org/TR/html4/']
 */
 type Path struct {
 	segments []segment
@@ -145,7 +152,7 @@ type filter interface {
 // a Path object.  It collects and deduplicates all elements matching
 // the path query.
 type pather struct {
-	queue      fifo
+	queue      queue[node]
 	results    []*Element
 	inResults  map[*Element]bool
 	candidates []*Element
@@ -173,12 +180,12 @@ func newPather() *pather {
 // and filters.
 func (p *pather) traverse(e *Element, path Path) []*Element {
 	for p.queue.add(node{e, path.segments}); p.queue.len() > 0; {
-		p.eval(p.queue.remove().(node))
+		p.eval(p.queue.remove())
 	}
 	return p.results
 }
 
-// eval evalutes the current path node by applying the remaining
+// eval evaluates the current path node by applying the remaining
 // path's selector rules against the node's element.
 func (p *pather) eval(n node) {
 	p.candidates = p.candidates[0:0]
@@ -210,7 +217,7 @@ type compiler struct {
 func (c *compiler) parsePath(path string) []segment {
 	// If path ends with //, fix it
 	if strings.HasSuffix(path, "//") {
-		path = path + "*"
+		path += "*"
 	}
 
 	var segments []segment
@@ -232,15 +239,20 @@ func (c *compiler) parsePath(path string) []segment {
 }
 
 func splitPath(path string) []string {
-	pieces := make([]string, 0)
+	var pieces []string
 	start := 0
 	inquote := false
+	var quote byte
 	for i := 0; i+1 <= len(path); i++ {
-		if path[i] == '\'' {
-			inquote = !inquote
-		} else if path[i] == '/' && !inquote {
-			pieces = append(pieces, path[start:i])
-			start = i + 1
+		if !inquote {
+			if path[i] == '\'' || path[i] == '"' {
+				inquote, quote = true, path[i]
+			} else if path[i] == '/' {
+				pieces = append(pieces, path[start:i])
+				start = i + 1
+			}
+		} else if path[i] == quote {
+			inquote = false
 		}
 	}
 	return append(pieces, path[start:])
@@ -255,7 +267,7 @@ func (c *compiler) parseSegment(path string) segment {
 	}
 	for i := 1; i < len(pieces); i++ {
 		fpath := pieces[i]
-		if fpath[len(fpath)-1] != ']' {
+		if len(fpath) == 0 || fpath[len(fpath)-1] != ']' {
 			c.err = ErrPath("path has invalid filter [brackets].")
 			break
 		}
@@ -280,15 +292,12 @@ func (c *compiler) parseSelector(path string) selector {
 	}
 }
 
-var fnTable = map[string]struct {
-	hasFn    func(e *Element) bool
-	getValFn func(e *Element) string
-}{
-	"local-name":       {nil, (*Element).name},
-	"name":             {nil, (*Element).FullTag},
-	"namespace-prefix": {nil, (*Element).namespacePrefix},
-	"namespace-uri":    {nil, (*Element).NamespaceURI},
-	"text":             {(*Element).hasText, (*Element).Text},
+var fnTable = map[string]func(e *Element) string{
+	"local-name":       (*Element).name,
+	"name":             (*Element).FullTag,
+	"namespace-prefix": (*Element).namespacePrefix,
+	"namespace-uri":    (*Element).NamespaceURI,
+	"text":             (*Element).Text,
 }
 
 // parseFilter parses a path filter contained within [brackets].
@@ -298,30 +307,34 @@ func (c *compiler) parseFilter(path string) filter {
 		return nil
 	}
 
-	// Filter contains [@attr='val'], [fn()='val'], or [tag='val']?
-	eqindex := strings.Index(path, "='")
-	if eqindex >= 0 {
-		rindex := nextIndex(path, "'", eqindex+2)
-		if rindex != len(path)-1 {
-			c.err = ErrPath("path has mismatched filter quotes.")
-			return nil
-		}
-
-		key := path[:eqindex]
-		value := path[eqindex+2 : rindex]
-
-		switch {
-		case key[0] == '@':
-			return newFilterAttrVal(key[1:], value)
-		case strings.HasSuffix(key, "()"):
-			fn := key[:len(key)-2]
-			if t, ok := fnTable[fn]; ok && t.getValFn != nil {
-				return newFilterFuncVal(t.getValFn, value)
+	// Filter contains [@attr='val'], [@attr="val"], [fn()='val'],
+	// [fn()="val"], [tag='val'] or [tag="val"]?
+	eqindex := strings.IndexByte(path, '=')
+	if eqindex >= 0 && eqindex+1 < len(path) {
+		quote := path[eqindex+1]
+		if quote == '\'' || quote == '"' {
+			rindex := nextIndex(path, quote, eqindex+2)
+			if rindex != len(path)-1 {
+				c.err = ErrPath("path has mismatched filter quotes.")
+				return nil
 			}
-			c.err = ErrPath("path has unknown function " + fn)
-			return nil
-		default:
-			return newFilterChildText(key, value)
+
+			key := path[:eqindex]
+			value := path[eqindex+2 : rindex]
+
+			switch {
+			case key[0] == '@':
+				return newFilterAttrVal(key[1:], value)
+			case strings.HasSuffix(key, "()"):
+				name := key[:len(key)-2]
+				if fn, ok := fnTable[name]; ok {
+					return newFilterFuncVal(fn, value)
+				}
+				c.err = ErrPath("path has unknown function " + name)
+				return nil
+			default:
+				return newFilterChildText(key, value)
+			}
 		}
 	}
 
@@ -330,11 +343,11 @@ func (c *compiler) parseFilter(path string) filter {
 	case path[0] == '@':
 		return newFilterAttr(path[1:])
 	case strings.HasSuffix(path, "()"):
-		fn := path[:len(path)-2]
-		if t, ok := fnTable[fn]; ok && t.hasFn != nil {
-			return newFilterFunc(t.hasFn)
+		name := path[:len(path)-2]
+		if fn, ok := fnTable[name]; ok {
+			return newFilterFunc(fn)
 		}
-		c.err = ErrPath("path has unknown function " + fn)
+		c.err = ErrPath("path has unknown function " + name)
 		return nil
 	case isInteger(path):
 		pos, _ := strconv.Atoi(path)
@@ -393,9 +406,9 @@ func (s *selectChildren) apply(e *Element, p *pather) {
 type selectDescendants struct{}
 
 func (s *selectDescendants) apply(e *Element, p *pather) {
-	var queue fifo
+	var queue queue[*Element]
 	for queue.add(e); queue.len() > 0; {
-		e := queue.remove().(*Element)
+		e := queue.remove()
 		p.candidates = append(p.candidates, e)
 		for _, c := range e.Child {
 			if c, ok := c.(*Element); ok {
@@ -496,16 +509,16 @@ func (f *filterAttrVal) apply(p *pather) {
 // filterFunc filters the candidate list for elements satisfying a custom
 // boolean function.
 type filterFunc struct {
-	fn func(e *Element) bool
+	fn func(e *Element) string
 }
 
-func newFilterFunc(fn func(e *Element) bool) *filterFunc {
+func newFilterFunc(fn func(e *Element) string) *filterFunc {
 	return &filterFunc{fn}
 }
 
 func (f *filterFunc) apply(p *pather) {
 	for _, c := range p.candidates {
-		if f.fn(c) {
+		if f.fn(c) != "" {
 			p.scratch = append(p.scratch, c)
 		}
 	}

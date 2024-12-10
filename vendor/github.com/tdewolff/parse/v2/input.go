@@ -2,7 +2,6 @@ package parse
 
 import (
 	"io"
-	"io/ioutil"
 )
 
 var nullBuffer = []byte{0}
@@ -18,7 +17,7 @@ type Input struct {
 	restore func()
 }
 
-// NewInput returns a new Input for a given io.Input and uses ioutil.ReadAll to read it into a byte slice.
+// NewInput returns a new Input for a given io.Input and uses io.ReadAll to read it into a byte slice.
 // If the io.Input implements Bytes, that is used instead. It will append a NULL at the end of the buffer.
 func NewInput(r io.Reader) *Input {
 	var b []byte
@@ -29,7 +28,7 @@ func NewInput(r io.Reader) *Input {
 			b = buffer.Bytes()
 		} else {
 			var err error
-			b, err = ioutil.ReadAll(r)
+			b, err = io.ReadAll(r)
 			if err != nil {
 				return &Input{
 					buf: nullBuffer,
@@ -92,7 +91,7 @@ func (z *Input) Err() error {
 func (z *Input) PeekErr(pos int) error {
 	if z.err != nil {
 		return z.err
-	} else if z.pos+pos >= len(z.buf)-1 {
+	} else if len(z.buf)-1 <= z.pos+pos {
 		return io.EOF
 	}
 	return nil
@@ -109,11 +108,11 @@ func (z *Input) Peek(pos int) byte {
 func (z *Input) PeekRune(pos int) (rune, int) {
 	// from unicode/utf8
 	c := z.Peek(pos)
-	if c < 0xC0 || z.Peek(pos+1) == 0 {
+	if c < 0xC0 || len(z.buf)-1-z.pos < 2 {
 		return rune(c), 1
-	} else if c < 0xE0 || z.Peek(pos+2) == 0 {
+	} else if c < 0xE0 || len(z.buf)-1-z.pos < 3 {
 		return rune(c&0x1F)<<6 | rune(z.Peek(pos+1)&0x3F), 2
-	} else if c < 0xF0 || z.Peek(pos+3) == 0 {
+	} else if c < 0xF0 || len(z.buf)-1-z.pos < 4 {
 		return rune(c&0x0F)<<12 | rune(z.Peek(pos+1)&0x3F)<<6 | rune(z.Peek(pos+2)&0x3F), 3
 	}
 	return rune(c&0x07)<<18 | rune(z.Peek(pos+1)&0x3F)<<12 | rune(z.Peek(pos+2)&0x3F)<<6 | rune(z.Peek(pos+3)&0x3F), 4
@@ -122,6 +121,20 @@ func (z *Input) PeekRune(pos int) (rune, int) {
 // Move advances the position.
 func (z *Input) Move(n int) {
 	z.pos += n
+}
+
+// MoveRune advances the position by the length of the current rune.
+func (z *Input) MoveRune() {
+	c := z.Peek(0)
+	if c < 0xC0 || len(z.buf)-1-z.pos < 2 {
+		z.pos++
+	} else if c < 0xE0 || len(z.buf)-1-z.pos < 3 {
+		z.pos += 2
+	} else if c < 0xF0 || len(z.buf)-1-z.pos < 4 {
+		z.pos += 3
+	} else {
+		z.pos += 4
+	}
 }
 
 // Pos returns a mark to which can be rewinded.

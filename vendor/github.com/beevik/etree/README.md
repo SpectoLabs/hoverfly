@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/beevik/etree.svg?branch=master)](https://travis-ci.org/beevik/etree)
 [![GoDoc](https://godoc.org/github.com/beevik/etree?status.svg)](https://godoc.org/github.com/beevik/etree)
+[![Go](https://github.com/beevik/etree/actions/workflows/go.yml/badge.svg)](https://github.com/beevik/etree/actions/workflows/go.yml)
 
 etree
 =====

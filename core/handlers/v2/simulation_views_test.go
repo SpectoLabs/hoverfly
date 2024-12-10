@@ -251,7 +251,7 @@ func Test_NewSimulationViewFromRequestBody_WontCreateSimulationFromInvalidV1Simu
 	}`))
 
 	Expect(err).ToNot(BeNil())
-	Expect(err.Error()).To(Equal("Invalid v1 simulation: [Error for <request>: request is required; Error for <response>: response is required]"))
+	Expect(err.Error()).To(Equal("Invalid v1 simulation: [Error for <data.pairs.0>: request is required; Error for <data.pairs.0>: response is required]"))
 
 	Expect(simulation).ToNot(BeNil())
 	Expect(simulation.RequestResponsePairs).To(HaveLen(0))
