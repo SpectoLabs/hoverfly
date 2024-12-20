@@ -38,7 +38,7 @@ require (
 	github.com/spf13/viper v0.0.0-20160508180713-d8a428b8a306
 	github.com/tdewolff/minify/v2 v2.21.2
 	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/crypto v0.30.0
+	golang.org/x/crypto v0.31.0
 	gonum.org/v1/gonum v0.15.1
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/client-go v0.31.3
