@@ -15,6 +15,7 @@ require (
 	github.com/codegangsta/negroni v1.0.0
 	github.com/dghubble/sling v1.4.2
 	github.com/dsnet/compress v0.0.1
+	github.com/go-playground/validator/v10 v10.23.0
 	github.com/go-zoo/bone v1.3.0
 	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/gorilla/mux v1.8.1
@@ -49,12 +50,16 @@ require (
 	github.com/aymerick/raymond v2.0.2+incompatible // indirect
 	github.com/corpix/uarand v0.2.0 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/goccmack/goutil v1.2.3 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/magiconair/properties v1.8.9 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
