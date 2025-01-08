@@ -117,7 +117,7 @@ type JournalEntryFilterView struct {
 }
 
 type StateView struct {
-	State map[string]string `json:"state"`
+	State map[string]string `json:"state" validate:"required"`
 }
 
 type DiffView struct {

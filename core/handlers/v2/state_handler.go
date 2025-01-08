@@ -8,8 +8,11 @@ import (
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
+	"github.com/go-playground/validator/v10"
 	"github.com/go-zoo/bone"
 )
+
+var validate = validator.New()
 
 type StateHandler struct {
 	Hoverfly Hoverfly
@@ -61,10 +64,14 @@ func (this *StateHandler) Put(w http.ResponseWriter, req *http.Request, next htt
 
 	toPut := &StateView{}
 
-	responseBody, err := ioutil.ReadAll(req.Body)
+	err := json.NewDecoder(req.Body).Decode(toPut)
 
-	err = json.Unmarshal(responseBody, &toPut)
+	if err != nil {
+		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
+	err = validate.Struct(toPut)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
