@@ -9,7 +9,7 @@ import sphinx_rtd_theme
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Hoverfly'
-copyright = '2025, iOCO Solutions,
+copyright = '2025, iOCO Solutions'
 author = 'iOCO Solutions'
 
 version = 'v1.10.7'
