@@ -9,8 +9,8 @@ import sphinx_rtd_theme
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Hoverfly'
-copyright = '2023, SpectoLabs'
-author = 'SpectoLabs'
+copyright = '2025, iOCO Solutions'
+author = 'iOCO Solutions'
 
 version = 'v1.10.7'
 # The full version, including alpha/beta/rc tags.
@@ -61,7 +61,7 @@ htmlhelp_basename = 'hoverflydoc'
 
 latex_documents = [
     (master_doc, 'hoverfly.tex', u'Hoverfly Documentation',
-     u'SpectoLabs', 'manual'),
+     u'iOCO Solutions', 'manual'),
 ]
 
 man_pages = [

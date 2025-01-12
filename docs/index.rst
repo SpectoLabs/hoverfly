@@ -34,7 +34,7 @@ Source
 
 The Hoverfly source code is available on `GitHub <https://github.com/SpectoLabs/hoverfly>`_.
 
-Hoverfly is developed and maintained by `SpectoLabs <https://specto.io>`_.
+Hoverfly is developed and maintained by `iOCO Solutions <https://ioco.uk>`_.
 
 Contents
 --------
