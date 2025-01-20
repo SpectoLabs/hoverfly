@@ -361,7 +361,6 @@ func Test_JsonPartialMatch_MatchesTrueWithJSONRootAsArrayAgainstJSONRootAsArray(
 	}]`)).To(BeTrue())
 }
 
-
 func Test_JsonPartialMatch_MatchesFalseWithJSONRootAsArrayAgainstJSONRootAsArrayWithDifferentElement(t *testing.T) {
 	RegisterTestingT(t)
 
@@ -379,4 +378,16 @@ func Test_JsonPartialMatch_MatchesFalseWithJSONRootAsArrayAgainstJSONRootAsArray
 		"set": false,
 		"age": 400
 	}]`)).To(BeFalse())
+}
+
+func Test_JsonPartialMatch_MatchesFalseWithJSON_WithInt64(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonMatch(`{"test":{"id":112769992360719990160}}`, `{"test":{"id":112769992360719990161}}`)).To(BeFalse())
+}
+
+func Test_JsonPartialMatch_MatchesTrueWithJSON_WithInt64(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonMatch(`{"test":{"id":112769992360719990160}}`, `{"test":{"id":112769992360719990160}}`)).To(BeTrue())
 }

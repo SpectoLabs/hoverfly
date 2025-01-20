@@ -1,6 +1,7 @@
 package matchers
 
 import (
+	"bytes"
 	"encoding/json"
 )
 
@@ -14,8 +15,12 @@ func JsonPartialMatch(match interface{}, toMatch string) bool {
 		return false
 	}
 
-	err0 := json.Unmarshal([]byte(toMatch), &toMatchType)
-	err1 := json.Unmarshal([]byte(matchString), &expected)
+	d := json.NewDecoder(bytes.NewBuffer([]byte(toMatch)))
+	d.UseNumber()
+	err0 := d.Decode(&toMatchType)
+	d = json.NewDecoder(bytes.NewBuffer([]byte(matchString)))
+	d.UseNumber()
+	err1 := d.Decode(&expected)
 	if err0 != nil || err1 != nil {
 		return false
 	}
