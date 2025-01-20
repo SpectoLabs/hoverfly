@@ -391,3 +391,15 @@ func Test_JsonPartialMatch_MatchesTrueWithJSON_WithInt64(t *testing.T) {
 
 	Expect(matchers.JsonMatch(`{"test":{"id":112769992360719990160}}`, `{"test":{"id":112769992360719990160}}`)).To(BeTrue())
 }
+
+func Test_JsonPartialMatch_MatchesFalseWithJSON_WithFloat64(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonMatch(`{"test":{"id":11.2769992360719990160}}`, `{"test":{"id":11.2769992360719990161}}`)).To(BeFalse())
+}
+
+func Test_JsonPartialMatch_MatchesTrueWithJSON_WithFloat64(t *testing.T) {
+	RegisterTestingT(t)
+
+	Expect(matchers.JsonMatch(`{"test":{"id":11.2769992360719990160}}`, `{"test":{"id":11.2769992360719990160}}`)).To(BeTrue())
+}
