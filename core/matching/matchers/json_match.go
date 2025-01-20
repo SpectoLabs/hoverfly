@@ -1,6 +1,7 @@
 package matchers
 
 import (
+	"bytes"
 	"encoding/json"
 	"reflect"
 )
@@ -17,13 +18,17 @@ func JsonMatch(match interface{}, toMatch string) bool {
 		return true
 	}
 	var matchingObject interface{}
-	err := json.Unmarshal([]byte(matchString), &matchingObject)
+	d := json.NewDecoder(bytes.NewBuffer([]byte(matchString)))
+	d.UseNumber()
+	err := d.Decode(&matchingObject)
 	if err != nil {
 		return false
 	}
 
 	var toMatchObject interface{}
-	err = json.Unmarshal([]byte(toMatch), &toMatchObject)
+	d = json.NewDecoder(bytes.NewBuffer([]byte(toMatch)))
+	d.UseNumber()
+	err = d.Decode(&toMatchObject)
 	if err != nil {
 		return false
 	}
