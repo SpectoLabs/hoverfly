@@ -12,7 +12,7 @@ project = 'Hoverfly'
 copyright = '2025, iOCO Solutions'
 author = 'iOCO Solutions'
 
-version = 'v1.10.8'
+version = 'v1.10.9'
 # The full version, including alpha/beta/rc tags.
 release = version
 
