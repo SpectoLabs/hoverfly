@@ -129,11 +129,11 @@ var _ = Describe("When I use hoverctl", func() {
 		})
 
 		It("I cannae set the hoverfly's middleware when specifying non-existing remote middleware", func() {
-			output := functional_tests.Run(hoverctlBinary, "middleware", "--remote", "http://specto.io/404/nothere")
+			output := functional_tests.Run(hoverctlBinary, "middleware", "--remote", "http://hoverfly.io/404/nothere")
 
 			Expect(output).To(ContainSubstring("Could not set middleware, it may have failed the test"))
 			Expect(output).To(ContainSubstring("Error when communicating with remote middleware: received 404"))
-			Expect(output).To(ContainSubstring("URL: http://specto.io/404/nothere"))
+			Expect(output).To(ContainSubstring("URL: http://hoverfly.io/404/nothere"))
 			Expect(output).To(ContainSubstring("STDIN:"))
 			Expect(output).To(ContainSubstring(`{"response":{"status":200,"body":"ok","encodedBody":false,"headers":{"test_header":["true"]}},"request":{"path":"/","method":"GET","destination":"www.test.com","scheme":"","query":"","formData":null,"body":"","headers":{"test_header":["true"]}}}`))
 		})
