@@ -27,7 +27,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -438,7 +437,7 @@ func main() {
 
 	if len(responseBodyFilesPath) > 0 {
 		// Ensure file path is absolute and exists in the file system
-		if !path.IsAbs(responseBodyFilesPath) {
+		if !filepath.IsAbs(responseBodyFilesPath) {
 			log.Fatal("Response body files path should be absolute")
 		}
 		absBasePath, err := filepath.Abs(responseBodyFilesPath)
