@@ -1,6 +1,6 @@
-FROM golang:1.22.10 AS build-env
+FROM golang:1.23.5 AS build-env
 WORKDIR /usr/local/go/src/github.com/SpectoLabs/hoverfly
-COPY . /usr/local/go/src/github.com/SpectoLabs/hoverfly    
+COPY . /usr/local/go/src/github.com/SpectoLabs/hoverfly
 RUN cd core/cmd/hoverfly && CGO_ENABLED=0 GOOS=linux go install -ldflags "-s -w"
 
 FROM alpine:latest
