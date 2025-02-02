@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -152,7 +152,7 @@ func Test_CacheHandler_Options_GetsOptions(t *testing.T) {
 }
 
 func unmarshalCacheView(buffer *bytes.Buffer) (CacheView, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return CacheView{}, err
 	}

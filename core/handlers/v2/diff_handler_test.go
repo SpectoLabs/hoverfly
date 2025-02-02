@@ -8,7 +8,6 @@ import (
 
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"time"
 
 	. "github.com/onsi/gomega"
@@ -144,7 +143,7 @@ func initializeDiff() {
 }
 
 func unmarshalDiffView(buffer *bytes.Buffer) (DiffView, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return DiffView{}, err
 	}

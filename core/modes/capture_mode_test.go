@@ -3,7 +3,7 @@ package modes_test
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 	"time"
@@ -33,7 +33,7 @@ func (this hoverflyCaptureStub) DoRequest(request *http.Request) (*http.Response
 	}
 
 	response.StatusCode = 200
-	response.Body = ioutil.NopCloser(bytes.NewBufferString("test"))
+	response.Body = io.NopCloser(bytes.NewBufferString("test"))
 
 	if request.Host == "trailer.com" {
 		response.Header = make(http.Header)
@@ -93,7 +93,7 @@ func Test_CaptureMode_WhenGivenARequestItWillMakeTheRequestAndSaveIt(t *testing.
 
 	Expect(result.Response.StatusCode).To(Equal(200))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("test"))
@@ -200,7 +200,7 @@ func Test_CaptureMode_WhenGivenABadRequestItWillError(t *testing.T) {
 
 	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended destination"))

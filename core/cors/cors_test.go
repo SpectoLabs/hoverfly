@@ -2,7 +2,7 @@ package cors
 
 import (
 	. "github.com/onsi/gomega"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 )
@@ -25,7 +25,7 @@ func Test_InterceptPreflightRequest_ReturnSuccessResponseWithDefaultHeaders(t *t
 	Expect(resp.Header.Get("Access-Control-Max-Age")).To(Equal("1800"))
 	Expect(resp.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
 	Expect(resp.Header.Get("Access-Control-Allow-Headers")).To(Equal("Content-Type,Origin,Accept,Authorization,Content-Length,X-Requested-With"))
-	responseBody, err := ioutil.ReadAll(resp.Body)
+	responseBody, err := io.ReadAll(resp.Body)
 	Expect(string(responseBody)).To(Equal(""))
 }
 

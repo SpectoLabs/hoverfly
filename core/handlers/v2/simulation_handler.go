@@ -2,9 +2,8 @@ package v2
 
 import (
 	"fmt"
+	"io"
 	"net/http"
-
-	"io/ioutil"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/SpectoLabs/hoverfly/core/util"
@@ -114,7 +113,7 @@ func (this *SimulationHandler) OptionsSchema(w http.ResponseWriter, r *http.Requ
 }
 
 func (this *SimulationHandler) addSimulation(w http.ResponseWriter, req *http.Request, overrideExisting bool) error {
-	body, _ := ioutil.ReadAll(req.Body)
+	body, _ := io.ReadAll(req.Body)
 
 	simulationView, err := NewSimulationViewFromRequestBody(body)
 	if err != nil {

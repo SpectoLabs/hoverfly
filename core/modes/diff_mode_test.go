@@ -2,7 +2,7 @@ package modes
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 	"time"
@@ -26,32 +26,32 @@ func (this hoverflyDiffStub) DoRequest(request *http.Request) (*http.Response, *
 	case "positive-match-with-same-response.com":
 		return &http.Response{
 			StatusCode: 200,
-			Body:       ioutil.NopCloser(bytes.NewBufferString("expected")),
+			Body:       io.NopCloser(bytes.NewBufferString("expected")),
 			Header:     map[string][]string{"header": {"expected"}, "source": {"service"}},
 		}, &duration, nil
 	case "positive-match-with-different-response.com":
 		return &http.Response{
 			StatusCode: 200,
-			Body:       ioutil.NopCloser(bytes.NewBufferString("actual")),
+			Body:       io.NopCloser(bytes.NewBufferString("actual")),
 			Header:     map[string][]string{"header": {"actual"}, "source": {"service"}},
 		}, &duration, nil
 	case "negative-match.com":
 		return &http.Response{
 			StatusCode: 200,
-			Body:       ioutil.NopCloser(bytes.NewBufferString("actual")),
+			Body:       io.NopCloser(bytes.NewBufferString("actual")),
 			Header:     map[string][]string{"header": {"actual"}, "source": {"service"}},
 		}, &duration, nil
 	case "positive-match-with-different-trailers.com":
 		return &http.Response{
 			StatusCode: 200,
-			Body:       ioutil.NopCloser(bytes.NewBufferString("actual")),
+			Body:       io.NopCloser(bytes.NewBufferString("actual")),
 			Header:     map[string][]string{"header": {"actual"}},
 			Trailer:    map[string][]string{"trailer1": {"actual"}},
 		}, &duration, nil
 	default:
 		return &http.Response{
 			StatusCode: 200,
-			Body:       ioutil.NopCloser(bytes.NewBufferString("test")),
+			Body:       io.NopCloser(bytes.NewBufferString("test")),
 		}, &duration, nil
 	}
 }
@@ -108,7 +108,7 @@ func Test_DiffMode_WhenGivenAMatchingRequestReturningTheSameResponse(t *testing.
 	Expect(err).To(BeNil())
 	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("expected"))
@@ -138,7 +138,7 @@ func Test_DiffMode_WhenGivenAMatchingRequestReturningDifferentResponse(t *testin
 	Expect(err).To(BeNil())
 	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("actual"))
@@ -204,7 +204,7 @@ func Test_DiffMode_BlacklistAllHeaders(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("actual"))
@@ -240,7 +240,7 @@ func Test_DiffMode_BlacklistOneHeader(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("actual"))
@@ -277,7 +277,7 @@ func Test_DiffMode_BlacklistlistTwoHeaders(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("actual"))
@@ -309,7 +309,7 @@ func Test_DiffMode_WhenGivenANonMatchingRequestDiffIsEmpty(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(result.Response.StatusCode).To(Equal(http.StatusOK))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("actual"))

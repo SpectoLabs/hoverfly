@@ -2,7 +2,7 @@ package hoverfly
 
 import (
 	"encoding/base64"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -117,7 +117,7 @@ func TestImportFromURL(t *testing.T) {
 	// reading file and preparing json payload
 	pairFile, err := os.Open(hoverflyIoSimulationPath)
 	Expect(err).To(BeNil())
-	pairFileBytes, err := ioutil.ReadAll(pairFile)
+	pairFileBytes, err := io.ReadAll(pairFile)
 	Expect(err).To(BeNil())
 
 	// pretending this is the endpoint with given json
@@ -137,7 +137,7 @@ func TestImportFromURLRedirect(t *testing.T) {
 	// reading file and preparing json payload
 	pairFile, err := os.Open(hoverflyIoSimulationPath)
 	Expect(err).To(BeNil())
-	pairFileBytes, err := ioutil.ReadAll(pairFile)
+	pairFileBytes, err := io.ReadAll(pairFile)
 	Expect(err).To(BeNil())
 
 	// pretending this is the endpoint with given json

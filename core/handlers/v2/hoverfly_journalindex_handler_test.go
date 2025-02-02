@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 )
@@ -54,7 +54,7 @@ func Test_JournalIndexHandler_SetJournalIndex(t *testing.T) {
 	}
 	bodyBytes, err := json.Marshal(journalIndexRequest)
 	Expect(err).To(BeNil())
-	request, err := http.NewRequest("POST", "/api/v2/journal/index", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err := http.NewRequest("POST", "/api/v2/journal/index", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 
 	Expect(err).To(BeNil())
 	response := makeRequestOnHandler(unit.Post, request)

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/cors"
 	"github.com/SpectoLabs/hoverfly/core/modes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"testing"
@@ -58,17 +58,6 @@ const pythonReflectBody = "#!/usr/bin/env python\n" +
 	"	main()\n"
 
 const pythonMiddlewareBad = "this shouldn't work"
-
-const rubyEcho = "#!/usr/bin/env ruby\n" +
-	"# encoding: utf-8\n" +
-	"while payload = STDIN.gets\n" +
-	"  next unless payload\n" +
-	"\n" +
-	"  STDOUT.puts payload\n" +
-	"\n" +
-	"  STDERR.puts \"Payload data: #{payload}\"\n" +
-	"\n" +
-	"end"
 
 // TestMain prepares database for testing and then performs a cleanup
 func TestMain(m *testing.M) {
@@ -226,7 +215,7 @@ func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeResponse(t *testin
 
 	bodyBytes := []byte("request_body_here")
 
-	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	r, err := http.NewRequest("GET", "http://somehost.com", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	unit.Cfg.SetMode("synthesize")
@@ -234,7 +223,7 @@ func Test_Hoverfly_processRequest_CanUseMiddlewareToSynthesizeResponse(t *testin
 
 	Expect(newResp).ToNot(BeNil())
 	Expect(newResp.StatusCode).To(Equal(http.StatusCreated))
-	b, err := ioutil.ReadAll(newResp.Body)
+	b, err := io.ReadAll(newResp.Body)
 	Expect(err).To(BeNil())
 	Expect(string(b)).To(Equal(string(bodyBytes)))
 }
@@ -398,7 +387,7 @@ func Test_Hoverfly_processRequest_DelayAppliedToSynthesizeRequest(t *testing.T) 
 
 	bodyBytes := []byte("request_body_here")
 
-	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	r, err := http.NewRequest("GET", "http://somehost.com", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	unit.Cfg.SetMode("synthesize")
@@ -429,7 +418,7 @@ func Test_Hoverfly_processRequest_DelayNotAppliedToFailedSynthesizeRequest(t *te
 
 	bodyBytes := []byte("request_body_here")
 
-	r, err := http.NewRequest("GET", "http://somehost.com", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	r, err := http.NewRequest("GET", "http://somehost.com", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	unit.Cfg.SetMode("synthesize")
@@ -562,7 +551,7 @@ func Test_Hoverfly_processRequest_CanHandlePreflightRequestWhenCORSEnabled(t *te
 	Expect(resp.Header.Get("Access-Control-Max-Age")).To(Equal("1800"))
 	Expect(resp.Header.Get("Access-Control-Allow-Credentials")).To(Equal("true"))
 	Expect(resp.Header.Get("Access-Control-Allow-Headers")).To(Equal("X-PINGOTHER,Content-Type"))
-	responseBody, err := ioutil.ReadAll(resp.Body)
+	responseBody, err := io.ReadAll(resp.Body)
 	Expect(string(responseBody)).To(Equal(""))
 }
 
@@ -691,7 +680,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 	// now getting responses
 	for i := 0; i < 5; i++ {
 		requestBody := []byte(fmt.Sprintf("fizz=buzz, number=%d", i))
-		body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+		body := io.NopCloser(bytes.NewBuffer(requestBody))
 
 		request, err := http.NewRequest("POST", "http://capture_body.com", body)
 		Expect(err).To(BeNil())
@@ -727,7 +716,7 @@ func TestMatchOnRequestBody(t *testing.T) {
 
 // 	response := unit.processRequest(req)
 
-// 	responseBody, err := ioutil.ReadAll(response.Body)
+// 	responseBody, err := io.ReadAll(response.Body)
 
 // 	Expect(responseBody).To(Equal("THIS TEST IS BROKEN AND NEEDS FIXING"))
 

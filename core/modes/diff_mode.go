@@ -13,7 +13,6 @@ import (
 	"github.com/dsnet/compress/brotli"
 	log "github.com/sirupsen/logrus"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"reflect"
 	"time"
@@ -243,24 +242,24 @@ func decompress(body []byte, encodings []string) ([]byte, error) {
 				if err != nil {
 					return body, err
 				}
-				body, err = ioutil.ReadAll(reader)
+				body, err = io.ReadAll(reader)
 				if err != nil {
 					return body, err
 				}
 
 			case "br":
-				reader, err = brotli.NewReader(ioutil.NopCloser(bytes.NewBuffer(body)), &brotli.ReaderConfig{})
+				reader, err = brotli.NewReader(io.NopCloser(bytes.NewBuffer(body)), &brotli.ReaderConfig{})
 				if err != nil {
 					return body, err
 				}
-				body, err = ioutil.ReadAll(reader)
+				body, err = io.ReadAll(reader)
 				if err != nil {
 					return body, err
 				}
 
 			case "deflate":
-				reader = flate.NewReader(ioutil.NopCloser(bytes.NewBuffer(body)))
-				body, err = ioutil.ReadAll(reader)
+				reader = flate.NewReader(io.NopCloser(bytes.NewBuffer(body)))
+				body, err = io.ReadAll(reader)
 				if err != nil {
 					return body, err
 				}

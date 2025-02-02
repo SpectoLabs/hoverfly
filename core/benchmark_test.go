@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 )
@@ -21,7 +21,7 @@ func BenchmarkPutSimulationAPI(b *testing.B) {
 		Mode:      "simulate",
 	})
 
-	data, _ := ioutil.ReadFile("../testdata/large_file.json")
+	data, _ := os.ReadFile("../testdata/large_file.json")
 
 	adminApi := AdminApi{}
 
@@ -156,7 +156,7 @@ func BenchmarkProcessRequest(b *testing.B) {
 	}
 }`), &templated)
 
-	bytes, _ := ioutil.ReadFile("../testdata/large_response_body.json")
+	bytes, _ := os.ReadFile("../testdata/large_response_body.json")
 	largeResponse := v2.SimulationViewV5{}
 	_ = json.Unmarshal(bytes, &largeResponse)
 

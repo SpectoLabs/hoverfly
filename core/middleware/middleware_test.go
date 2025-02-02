@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -14,8 +14,6 @@ import (
 	"github.com/gorilla/mux"
 	. "github.com/onsi/gomega"
 )
-
-const pythonMiddlewareBasic = "import sys\nprint(sys.stdin.readlines()[0])"
 
 const pythonModifyResponse = "#!/usr/bin/env python\n" +
 	"import sys\n" +
@@ -33,23 +31,6 @@ const pythonModifyResponse = "#!/usr/bin/env python\n" +
 
 	"if __name__ == \"__main__\":\n" +
 	"	main()\n"
-
-const rubyModifyResponse = "#!/usr/bin/env ruby\n" +
-	"# encoding: utf-8\n\n" +
-
-	"require 'rubygems'\n" +
-	"require 'json'\n\n" +
-
-	"while payload = STDIN.gets\n" +
-	"  next unless payload\n\n" +
-
-	"  jsonPayload = JSON.parse(payload)\n\n" +
-
-	"  jsonPayload[\"response\"][\"body\"] = \"body was replaced by middleware\\n\"\n\n" +
-
-	"  STDOUT.puts jsonPayload.to_json\n\n" +
-
-	"end"
 
 const pythonReflectBody = "#!/usr/bin/env python\n" +
 	"import sys\n" +
@@ -69,8 +50,6 @@ const pythonReflectBody = "#!/usr/bin/env python\n" +
 	"if __name__ == \"__main__\":\n" +
 	"	main()\n"
 
-const pythonMiddlewareBad = "this shouldn't work"
-
 const rubyEcho = "#!/usr/bin/env ruby\n" +
 	"# encoding: utf-8\n" +
 	"while payload = STDIN.gets\n" +
@@ -83,7 +62,7 @@ const rubyEcho = "#!/usr/bin/env ruby\n" +
 	"end"
 
 func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
-	body, _ := ioutil.ReadAll(r.Body)
+	body, _ := io.ReadAll(r.Body)
 
 	var newPairView v2.RequestResponsePairViewV1
 
@@ -178,7 +157,7 @@ func Test_Middleware_SetScript_WritesScriptToFile(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(unit.Script).ToNot(BeNil())
 
-	fileContents, err := ioutil.ReadFile(unit.Script.Name())
+	fileContents, err := os.ReadFile(unit.Script.Name())
 	Expect(err).To(BeNil())
 
 	Expect(string(fileContents)).To(Equal("just a test"))
@@ -199,7 +178,7 @@ func Test_Middleware_SetScript_DeletesPreviousScript(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(unit.Script).ToNot(BeNil())
 
-	_, err = ioutil.ReadFile(firstScript.Name())
+	_, err = os.ReadFile(firstScript.Name())
 	Expect(err).ToNot(BeNil())
 }
 
@@ -241,7 +220,7 @@ func Test_Middleware_DeleteScript_WillDeleteScriptAndSetScriptToNil(t *testing.T
 	Expect(err).To(BeNil())
 	Expect(unit.Script).To(BeNil())
 
-	_, err = ioutil.ReadFile(firstScript.Name())
+	_, err = os.ReadFile(firstScript.Name())
 	Expect(err).ToNot(BeNil())
 }
 
@@ -256,17 +235,17 @@ func Test_Middleware_DeleteScript_WillNotDeleteOtherScriptInTheTempFolder(t *tes
 	firstScript := unit.Script
 
 	scriptCreatedByOtherTarget := path.Join(os.TempDir(), "hoverfly", "test")
-	err = ioutil.WriteFile(scriptCreatedByOtherTarget, []byte("test"), 0644)
+	err = os.WriteFile(scriptCreatedByOtherTarget, []byte("test"), 0644)
 	Expect(err).To(BeNil())
 
 	err = unit.DeleteScript()
 	Expect(err).To(BeNil())
 	Expect(unit.Script).To(BeNil())
 
-	_, err = ioutil.ReadFile(firstScript.Name())
+	_, err = os.ReadFile(firstScript.Name())
 	Expect(err).ToNot(BeNil())
 
-	_, err = ioutil.ReadFile(scriptCreatedByOtherTarget)
+	_, err = os.ReadFile(scriptCreatedByOtherTarget)
 	Expect(err).To(BeNil())
 
 }
@@ -289,7 +268,7 @@ func Test_Middleware_SetScript_WritesMultiLineStringScriptToFile(t *testing.T) {
 	Expect(err).To(BeNil())
 	Expect(unit.Script).ToNot(BeNil())
 
-	fileContents, err := ioutil.ReadFile(unit.Script.Name())
+	fileContents, err := os.ReadFile(unit.Script.Name())
 	Expect(err).To(BeNil())
 
 	Expect(string(fileContents)).To(Equal(rubyEcho))
@@ -353,7 +332,7 @@ func Test_Middleware_SetRemote_CanSetRemote(t *testing.T) {
 	RegisterTestingT(t)
 
 	remoteMiddleware := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		var newPairView v2.RequestResponsePairViewV1
 
 		json.Unmarshal(body, &newPairView)
@@ -388,7 +367,7 @@ func Test_Middleware_Execute_RunsRemoteMiddlewareCorrectly(t *testing.T) {
 	RegisterTestingT(t)
 
 	middlewareServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		var newPairView v2.RequestResponsePairViewV1
 
 		json.Unmarshal(body, &newPairView)

@@ -3,7 +3,7 @@ package modes_test
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 	"time"
@@ -24,7 +24,7 @@ func (this hoverflyModifyStub) DoRequest(request *http.Request) (*http.Response,
 	request.Host = "modified.com"
 
 	response.StatusCode = 200
-	response.Body = ioutil.NopCloser(bytes.NewBufferString("test"))
+	response.Body = io.NopCloser(bytes.NewBufferString("test"))
 
 	duration := 1 * time.Second
 	return response, &duration, nil
@@ -61,7 +61,7 @@ func Test_ModifyMode_WhenGivenARequestItWillModifyTheRequestAndExecuteIt(t *test
 	Expect(result.Response.StatusCode).To(Equal(200))
 	Expect(result.Response.Request.Host).To(Equal("modified.com"))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("modified by test middleware"))
@@ -89,7 +89,7 @@ func Test_ModifyMode_WhenGivenABadRequestItWillError(t *testing.T) {
 
 	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when forwarding the request to the intended destination"))
@@ -119,7 +119,7 @@ func Test_ModifyMode_WillErrorWhenMiddlewareFails(t *testing.T) {
 
 	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when executing middleware"))

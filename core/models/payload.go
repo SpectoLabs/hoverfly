@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"sort"
@@ -65,7 +64,7 @@ type RequestDetails struct {
 func NewRequestDetailsFromHttpRequest(req *http.Request) (RequestDetails, error) {
 
 	if req.Body == nil {
-		req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+		req.Body = io.NopCloser(bytes.NewBuffer([]byte("")))
 	}
 
 	reqBody, err := util.GetRequestBody(req)

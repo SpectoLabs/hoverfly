@@ -12,7 +12,7 @@ import (
 func NewBoltDBCache(db *bolt.DB, bucket []byte) *BoltCache {
 	return &BoltCache{
 		DS:            db,
-		CurrentBucket: []byte(bucket),
+		CurrentBucket: bucket,
 	}
 }
 

@@ -3,7 +3,7 @@ package handlers_test
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http/httptest"
 	"testing"
 
@@ -20,7 +20,7 @@ func Test_WriteResponse_WritesResponseToBody(t *testing.T) {
 	Expect(response.Code).To(Equal(200))
 	Expect(response.Header()["Content-Type"]).To(ContainElement("text/plain; charset=utf-8"))
 
-	bodyBytes, err := ioutil.ReadAll(response.Body)
+	bodyBytes, err := io.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 	Expect(string(bodyBytes)).Should(Equal("Test body"))
 }
@@ -56,7 +56,7 @@ func Test_WriteResponseError_WritesErrorMessage(t *testing.T) {
 }
 
 func unmarshalErrorView(buffer *bytes.Buffer) (handlers.ErrorView, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return handlers.ErrorView{}, err
 	}

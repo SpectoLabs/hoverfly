@@ -2,7 +2,7 @@ package modes_test
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -51,7 +51,7 @@ func Test_SynthesizeMode_WhenGivenARequestItWillUseMiddlewareToGenerateAResponse
 
 	Expect(result.Response.StatusCode).To(Equal(http.StatusCreated))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("modified by middleware"))
@@ -80,7 +80,7 @@ func Test_SynthesizeMode_IfMiddlewareFailsThenModeReturnsNiceError(t *testing.T)
 
 	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when executing middleware"))
@@ -108,7 +108,7 @@ func Test_SynthesizeMode_IfMiddlewareNotSetModeReturnsNiceError(t *testing.T) {
 
 	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when creating a synthetic response"))

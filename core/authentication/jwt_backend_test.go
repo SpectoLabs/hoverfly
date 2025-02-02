@@ -27,8 +27,8 @@ func TestAuthenticate(t *testing.T) {
 	ab.AddUser(username, passw, true)
 	jwtBackend := authentication.InitJWTAuthenticationBackend(ab, []byte("verysecret"), 100)
 	user := &backends.User{
-		Username: string(username),
-		Password: string(passw),
+		Username: username,
+		Password: passw,
 		UUID:     "uuid_here",
 		IsAdmin:  true}
 

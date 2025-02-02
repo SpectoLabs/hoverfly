@@ -2,9 +2,8 @@ package v2
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
-
-	"io/ioutil"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
@@ -90,7 +89,7 @@ func (this *StateHandler) Patch(w http.ResponseWriter, req *http.Request, next h
 
 	toPatch := &StateView{}
 
-	body, err := ioutil.ReadAll(req.Body)
+	body, err := io.ReadAll(req.Body)
 
 	err = json.Unmarshal(body, &toPatch)
 

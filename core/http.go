@@ -4,9 +4,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
-	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"strings"
 
@@ -80,7 +80,7 @@ func GetHttpClient(hf *Hoverfly, host string) (*http.Client, error) {
 
 			if hf.Cfg.ClientAuthenticationCACert != "" {
 				// Load CA cert
-				caCert, err := ioutil.ReadFile(hf.Cfg.ClientAuthenticationCACert)
+				caCert, err := os.ReadFile(hf.Cfg.ClientAuthenticationCACert)
 
 				if err != nil {
 					return nil, errors.New("Unable to load ca certs file\n\n" + err.Error())

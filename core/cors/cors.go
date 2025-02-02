@@ -2,7 +2,7 @@ package cors
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 )
@@ -55,7 +55,7 @@ func (c *Configs) InterceptPreflightRequest(r *http.Request) *http.Response {
 	resp.StatusCode = http.StatusOK
 	buf := bytes.NewBufferString("")
 	resp.ContentLength = 0
-	resp.Body = ioutil.NopCloser(buf)
+	resp.Body = io.NopCloser(buf)
 	return resp
 }
 

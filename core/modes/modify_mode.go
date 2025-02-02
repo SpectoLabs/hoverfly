@@ -1,7 +1,7 @@
 package modes
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -42,7 +42,7 @@ func (this ModifyMode) Process(request *http.Request, details models.RequestDeta
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when forwarding the request to the intended destination", Modify)
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return ReturnErrorAndLog(request, err, &pair, "There was an error when reading the http response body", Modify)
 	}

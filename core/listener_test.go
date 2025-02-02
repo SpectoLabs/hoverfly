@@ -2,7 +2,7 @@ package hoverfly
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -27,7 +27,7 @@ func TestHoverflyListener(t *testing.T) {
 
 	Expect(response.StatusCode).To(Equal(http.StatusInternalServerError))
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 	Expect(string(body)).To(ContainSubstring("is a proxy server"))
 }

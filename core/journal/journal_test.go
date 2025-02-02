@@ -3,7 +3,7 @@ package journal_test
 import (
 	"bytes"
 	"github.com/SpectoLabs/hoverfly/core/models"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -46,7 +46,7 @@ func Test_Journal_NewEntry_AddsJournalEntryToEntries(t *testing.T) {
 
 	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
 			"test-header": []string{
 				"one", "two",
@@ -87,7 +87,7 @@ func Test_Journal_UpdateEntry_AddsRemotePostServeActionToJournalEntry(t *testing
 
 	id, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
 			"test-header": []string{
 				"one", "two",
@@ -135,7 +135,7 @@ func Test_Journal_UpdateEntry_AddsLocalPostServeActionToJournalEntry(t *testing.
 
 	id, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
 			"test-header": []string{
 				"one", "two",
@@ -187,7 +187,7 @@ func Test_JournalIndex_NewEntryAfterAddingIndex_AddsJournalIndexEntryToIndexes(t
 
 	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
 			"test-header": []string{
 				"one", "two",
@@ -214,7 +214,7 @@ func Test_JournalIndex_NewEntryBeforeAddingIndex_AddsJournalIndexEntryToIndexes(
 
 	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
 			"test-header": []string{
 				"one", "two",
@@ -281,7 +281,7 @@ func Test_Journal_NewEntry_RespectsEntryLimit(t *testing.T) {
 	for i := 1; i < 8; i++ {
 		_, err := unit.NewEntry(request, &http.Response{
 			StatusCode: 200,
-			Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+			Body:       io.NopCloser(bytes.NewBufferString("test body")),
 			Header: http.Header{
 				"test-header": []string{
 					"one", "two",
@@ -317,7 +317,7 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 
 	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
 			"test-header": []string{
 				"one", "two",
@@ -329,7 +329,7 @@ func Test_Journal_NewEntry_KeepsOrder(t *testing.T) {
 	request.Method = "DELETE"
 	_, err = unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
 			"test-header": []string{
 				"one", "two",
@@ -358,7 +358,7 @@ func Test_Journal_NewEntry_WhenDisabledReturnsError(t *testing.T) {
 	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
 	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
 			"test-header": []string{
 				"one", "two",
@@ -381,7 +381,7 @@ func Test_Journal_DeleteEntries_DeletesAllEntries(t *testing.T) {
 
 	unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
 			"test-header": []string{
 				"one", "two",
@@ -417,7 +417,7 @@ func Test_Journal_GetEntries_TurnsTimeDurationToMilliseconds(t *testing.T) {
 	request, _ := http.NewRequest("GET", "http://hoverfly.io", nil)
 	_, err := unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 		Header: http.Header{
 			"test-header": []string{
 				"one", "two",
@@ -489,7 +489,7 @@ func Test_Journal_GetEntries_ReturnResultsSortedDescendinglyByTimeStarted(t *tes
 
 	response := &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 	}
 
 	for i := 0; i < 5; i++ {
@@ -520,7 +520,7 @@ func Test_Journal_GetEntries_ReturnResultsSortedAscendinglyByLatency(t *testing.
 
 	response := &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 	}
 
 	for i := 0; i < 3; i++ {
@@ -542,7 +542,7 @@ func Test_Journal_GetEntries_ReturnResultsSortedDescendinglyByLatency(t *testing
 
 	response := &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 	}
 
 	for i := 0; i < 3; i++ {
@@ -564,7 +564,7 @@ func Test_Journal_GetEntries_ReturnPaginationResults(t *testing.T) {
 
 	response := &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 	}
 
 	for i := 0; i < 5; i++ {
@@ -610,7 +610,7 @@ func Test_Journal_GetEntries_ReturnEmptyPageIfOffsetIsLargerThanTotalElements(t 
 
 	response := &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 	}
 
 	for i := 0; i < 5; i++ {
@@ -640,7 +640,7 @@ func Test_Journal_GetEntries_FilteredByTimeWindow(t *testing.T) {
 
 	response := &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 	}
 
 	for i := 0; i < 5; i++ {
@@ -670,7 +670,7 @@ func Test_Journal_GetFilteredEntries_WillReturnEmptySliceIfNoJournalFound(t *tes
 
 	unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 	}, "test-mode", time.Now())
 
 	// Body
@@ -699,7 +699,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnRequestFields(t *testing.T) {
 
 	unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 	}, "test-mode", time.Now())
 
 	// Body
@@ -974,7 +974,7 @@ func Test_Journal_GetFilteredEntries_WillReturnEmptyIfRequestMatcherIsEmpty(t *t
 
 	unit.NewEntry(request, &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 	}, "test-mode", time.Now())
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{
@@ -997,7 +997,7 @@ func Test_Journal_GetFilteredEntries_WillFilterOnFormBodyRequest(t *testing.T) {
 
 	unit.NewEntry(request, &http.Response{
 		StatusCode: 202,
-		Body:       ioutil.NopCloser(bytes.NewBufferString("test body")),
+		Body:       io.NopCloser(bytes.NewBufferString("test body")),
 	}, "test-mode", time.Now())
 
 	Expect(unit.GetFilteredEntries(v2.JournalEntryFilterView{

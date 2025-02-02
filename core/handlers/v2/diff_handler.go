@@ -2,7 +2,7 @@ package v2
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
@@ -59,7 +59,7 @@ func (this *DiffHandler) Delete(w http.ResponseWriter, req *http.Request, next h
 }
 
 func (this *DiffHandler) GetFilteredData(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	requestBody, err := ioutil.ReadAll(req.Body)
+	requestBody, err := io.ReadAll(req.Body)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return

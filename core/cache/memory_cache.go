@@ -41,7 +41,7 @@ func (c *InMemoryCache) GetAllValues() (values [][]byte, err error) {
 	values = make([][]byte, len(c.elements), len(c.elements))
 	index := 0
 	for _, v := range c.elements {
-		values[index] = []byte(v)
+		values[index] = v
 		index++
 	}
 	c.RUnlock()

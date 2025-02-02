@@ -2,7 +2,7 @@ package hoverfly
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -80,7 +80,7 @@ var (
 )
 
 func processHandlerOkay(w http.ResponseWriter, r *http.Request) {
-	body, _ := ioutil.ReadAll(r.Body)
+	body, _ := io.ReadAll(r.Body)
 
 	var newPairView v2.RequestResponsePairViewV1
 

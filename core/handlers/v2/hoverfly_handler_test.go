@@ -3,7 +3,7 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -114,7 +114,7 @@ func Test_HoverflyHandler_Options_GetsOptions(t *testing.T) {
 }
 
 func unmarshalHoverflyView(buffer *bytes.Buffer) (HoverflyView, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return HoverflyView{}, err
 	}

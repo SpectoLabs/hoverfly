@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -60,7 +59,7 @@ func setScript(action *Action, scriptContent string) error {
 	tempDir := path.Join(os.TempDir(), "hoverfly")
 	os.Mkdir(tempDir, 0777)
 
-	newScript, err := ioutil.TempFile(tempDir, "hoverfly_")
+	newScript, err := os.CreateTemp(tempDir, "hoverfly_")
 	if err != nil {
 		return err
 	}
@@ -91,7 +90,7 @@ func (action *Action) GetScript() (string, error) {
 	if action.Script == nil {
 		return "", nil
 	}
-	contents, err := ioutil.ReadFile(action.Script.Name())
+	contents, err := os.ReadFile(action.Script.Name())
 	if err != nil {
 		return "", err
 	}

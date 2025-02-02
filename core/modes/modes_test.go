@@ -3,7 +3,7 @@ package modes_test
 import (
 	"errors"
 	"github.com/SpectoLabs/hoverfly/core/util"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -75,7 +75,7 @@ func Test_ReconstructRequest_BodyRequestResponsePair(t *testing.T) {
 	Expect(newRequest.Method).To(Equal("POST"))
 	Expect(newRequest.Host).To(Equal("test-destination.com"))
 
-	body, err := ioutil.ReadAll(newRequest.Body)
+	body, err := io.ReadAll(newRequest.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(body)).To(Equal("new request body here"))
@@ -97,7 +97,7 @@ func Test_ReconstructRequest_ShouldRecompressGzipBody(t *testing.T) {
 	newRequest, err := modes.ReconstructRequest(pair)
 	Expect(err).To(BeNil())
 
-	body, err := ioutil.ReadAll(newRequest.Body)
+	body, err := io.ReadAll(newRequest.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(body)).To(Not(Equal("new request body here")))
@@ -160,7 +160,7 @@ func Test_ReconstructResponse_ReturnsAResponseWithBody(t *testing.T) {
 
 	response := modes.ReconstructResponse(req, pair)
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := io.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("test body"))
@@ -402,7 +402,7 @@ func Test_ReconstructResponse_CanReturnACompleteHttpResponseWithAllFieldsFilled(
 
 	Expect(response.StatusCode).To(Equal(201))
 
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := io.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(Equal("test body"))
@@ -424,7 +424,7 @@ func Test_errorResponse_ShouldAlwaysIncludeBothMessageAndErrorInResponseBody(t *
 
 	result := modes.ErrorResponse(&http.Request{}, errors.New("error doing something"), "This is a test error")
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("Hoverfly Error!"))

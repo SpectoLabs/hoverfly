@@ -3,7 +3,7 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -54,7 +54,7 @@ func Test_TemplateDataSourceHandler_SetDataSource(t *testing.T) {
 	bodyBytes, err := json.Marshal(csvDataSource)
 	Expect(err).To(BeNil())
 
-	request, err := http.NewRequest("PUT", path, ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err := http.NewRequest("PUT", path, io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)

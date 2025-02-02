@@ -370,7 +370,7 @@ func getSortParameters(sort string) (string, string, error) {
 
 func (journal *Journal) UpdatePostServeActionDetailsInJournal(id string, actionName, correlationID string, invokedTime, completedTime time.Time, httpStatus int) {
 
-	for i, _ := range journal.entries {
+	for i := range journal.entries {
 
 		if journal.entries[i].Id == id {
 			journal.entries[i].PostServeActionEntry = &PostServeActionEntry{

@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 
-	"io/ioutil"
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/models"
@@ -59,7 +59,7 @@ func (this Middleware) executeMiddlewareRemotely(pair models.RequestResponsePair
 		}
 	}
 
-	returnedPairViewBytes, err := ioutil.ReadAll(resp.Body)
+	returnedPairViewBytes, err := io.ReadAll(resp.Body)
 	if len(returnedPairViewBytes) == 0 {
 		returnedPairViewBytes = []byte(" ")
 	}

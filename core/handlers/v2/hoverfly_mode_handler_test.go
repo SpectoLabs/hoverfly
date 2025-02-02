@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -63,7 +63,7 @@ func TestPutSetsTheNewModeAndReplacesTheTestMode(t *testing.T) {
 	bodyBytes, err := json.Marshal(modeView)
 	Expect(err).To(BeNil())
 
-	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/mode", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/mode", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -95,7 +95,7 @@ func TestPutSetsTheArguments(t *testing.T) {
 	bodyBytes, err := json.Marshal(modeView)
 	Expect(err).To(BeNil())
 
-	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/mode", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/mode", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -125,7 +125,7 @@ func TestPutResetsTheArgumentsWhenNotSet(t *testing.T) {
 	bodyBytes, err := json.Marshal(modeView)
 	Expect(err).To(BeNil())
 
-	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/mode", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/mode", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -135,7 +135,7 @@ func TestPutResetsTheArgumentsWhenNotSet(t *testing.T) {
 	bodyBytes, err = json.Marshal(modeView)
 	Expect(err).To(BeNil())
 
-	request, err = http.NewRequest("PUT", "/api/v2/hoverfly/mode", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err = http.NewRequest("PUT", "/api/v2/hoverfly/mode", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	response = makeRequestOnHandler(unit.Put, request)
@@ -158,7 +158,7 @@ func TestPutWill422ErrorIfHoverflyErrors(t *testing.T) {
 	bodyBytes, err := json.Marshal(modeView)
 	Expect(err).To(BeNil())
 
-	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/mode", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/mode", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -178,7 +178,7 @@ func TestPutWill400ErrorIfJsonIsBad(t *testing.T) {
 
 	bodyBytes := []byte("{{}{}}")
 
-	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/mode", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/mode", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -206,7 +206,7 @@ func Test_HoverflyModeHandler_Options_GetsOptions(t *testing.T) {
 }
 
 func unmarshalModeView(buffer *bytes.Buffer) (ModeView, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return ModeView{}, err
 	}

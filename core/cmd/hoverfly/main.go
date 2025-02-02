@@ -25,7 +25,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -576,7 +575,7 @@ func main() {
 						delayInMs = 1000
 					}
 
-					if fileContents, err := ioutil.ReadFile(splitPostServeAction[2]); err == nil {
+					if fileContents, err := os.ReadFile(splitPostServeAction[2]); err == nil {
 						err = hoverfly.SetLocalPostServeAction(splitPostServeAction[0], splitPostServeAction[1], string(fileContents), delayInMs)
 						if err != nil {
 							log.WithFields(log.Fields{
@@ -615,7 +614,7 @@ func main() {
 
 				splitTemplateDataSource := strings.Split(v, " ")
 				if len(splitTemplateDataSource) == 2 {
-					if fileContents, err := ioutil.ReadFile(splitTemplateDataSource[1]); err == nil {
+					if fileContents, err := os.ReadFile(splitTemplateDataSource[1]); err == nil {
 						err = hoverfly.SetCsvDataSource(splitTemplateDataSource[0], string(fileContents))
 						if err != nil {
 							log.WithFields(log.Fields{
@@ -677,7 +676,7 @@ func main() {
 	cfg.Webserver = *webserver
 
 	if *pacFile != "" {
-		pacFileContent, err := ioutil.ReadFile(*pacFile)
+		pacFileContent, err := os.ReadFile(*pacFile)
 		if err != nil {
 			log.WithFields(log.Fields{"error": err.Error(), "pacFile": *pacFile}).
 				Fatal("Failed to import pac file")

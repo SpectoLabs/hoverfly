@@ -3,7 +3,7 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -396,7 +396,7 @@ func Test_JournalHandler_Options_GetsOptions(t *testing.T) {
 }
 
 func unmarshalJournalView(buffer *bytes.Buffer) (JournalView, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return JournalView{}, err
 	}

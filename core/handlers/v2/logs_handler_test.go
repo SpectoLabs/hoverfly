@@ -3,7 +3,7 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -127,7 +127,7 @@ func Test_LogsHandler_Get_ReturnsLogsInPlaintext_UsingAcceptHeader(t *testing.T)
 	response := makeRequestOnHandler(unit.Get, request)
 	Expect(response.Code).To(Equal(http.StatusOK))
 
-	logs, _ := ioutil.ReadAll(response.Body)
+	logs, _ := io.ReadAll(response.Body)
 
 	Expect(string(logs)).To(ContainSubstring("INFO"))
 	Expect(string(logs)).To(ContainSubstring("a line of logs"))
@@ -150,7 +150,7 @@ func Test_LogsHandler_Get_ReturnsLogsInPlaintext_UsingContentTypeHeader(t *testi
 	response := makeRequestOnHandler(unit.Get, request)
 	Expect(response.Code).To(Equal(http.StatusOK))
 
-	logs, _ := ioutil.ReadAll(response.Body)
+	logs, _ := io.ReadAll(response.Body)
 
 	Expect(string(logs)).To(ContainSubstring("INFO"))
 	Expect(string(logs)).To(ContainSubstring("a line of logs"))
@@ -228,7 +228,7 @@ func Test_LogsHandler_Options_GetsOptions(t *testing.T) {
 }
 
 func unmarshalLogsView(buffer *bytes.Buffer) (LogsView, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return LogsView{}, err
 	}

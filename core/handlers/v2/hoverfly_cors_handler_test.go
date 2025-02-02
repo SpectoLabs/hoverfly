@@ -3,7 +3,7 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -55,7 +55,7 @@ func Test_HoverflyCORSHandler_Options_GetsOptions(t *testing.T) {
 }
 
 func unmarshalCORSView(buffer *bytes.Buffer) (CORSView, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return CORSView{}, err
 	}

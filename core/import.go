@@ -3,7 +3,7 @@ package hoverfly
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path"
@@ -70,7 +70,7 @@ func (hf *Hoverfly) ImportFromDisk(path string) error {
 
 	var simulation v2.SimulationViewV5
 
-	body, err := ioutil.ReadAll(pairsFile)
+	body, err := io.ReadAll(pairsFile)
 	if err != nil {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}
@@ -95,7 +95,7 @@ func (hf *Hoverfly) ImportFromURL(url string) error {
 
 	var simulation v2.SimulationViewV5
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("Got error while parsing payloads, error %s", err.Error())
 	}

@@ -3,7 +3,7 @@ package hoverfly
 import (
 	"bytes"
 	"encoding/base64"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -162,7 +162,7 @@ func NewWebserverProxy(hoverfly *Hoverfly) *goproxy.ProxyHttpServer {
 
 func unauthorizedError(request *http.Request, realm, message string) *http.Response {
 	response := auth.BasicUnauthorized(request, realm)
-	response.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(message)))
+	response.Body = io.NopCloser(bytes.NewBuffer([]byte(message)))
 	response.ContentLength = int64(len(message))
 
 	return response

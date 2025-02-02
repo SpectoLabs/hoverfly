@@ -1,7 +1,7 @@
 package v2
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers"
@@ -48,7 +48,7 @@ func (this *HoverflyPACHandler) Get(w http.ResponseWriter, req *http.Request, ne
 }
 
 func (this *HoverflyPACHandler) Put(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	bodyBytes, err := ioutil.ReadAll(req.Body)
+	bodyBytes, err := io.ReadAll(req.Body)
 	if err != nil {
 		handlers.WriteErrorResponse(w, err.Error(), 400)
 		return

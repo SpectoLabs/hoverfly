@@ -2,7 +2,7 @@ package modes
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -48,7 +48,7 @@ func (this CaptureMode) Process(request *http.Request, details models.RequestDet
 	request.ParseForm()
 	// this is mainly for testing, since when you create
 	if request.Body == nil {
-		request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+		request.Body = io.NopCloser(bytes.NewBuffer([]byte("")))
 	}
 
 	pair, err := this.Hoverfly.ApplyMiddleware(models.RequestResponsePair{Request: details})

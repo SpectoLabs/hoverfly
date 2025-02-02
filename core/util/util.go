@@ -12,7 +12,7 @@ import (
 	"github.com/ChrisTrenkamp/xsel/parser"
 	"github.com/ChrisTrenkamp/xsel/store"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
+	"io"
 	"k8s.io/client-go/util/jsonpath"
 	"math/big"
 	"math/rand"
@@ -43,7 +43,7 @@ var (
 // buffer will be empty after reading it.
 // It also decompress if any Content-Encoding is applied
 func GetRequestBody(request *http.Request) (string, error) {
-	bodyBytes, err := ioutil.ReadAll(request.Body)
+	bodyBytes, err := io.ReadAll(request.Body)
 	if err != nil {
 		return "", err
 	}
@@ -56,7 +56,7 @@ func GetRequestBody(request *http.Request) (string, error) {
 		}
 	}
 
-	request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 	return string(bodyBytes), nil
 }
@@ -65,12 +65,12 @@ func GetRequestBody(request *http.Request) (string, error) {
 // and will also set the buffer to the original value as the
 // buffer will be empty after reading it.
 func GetResponseBody(response *http.Response) (string, error) {
-	bodyBytes, err := ioutil.ReadAll(response.Body)
+	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
 		return "", err
 	}
 
-	response.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	response.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 	return string(bodyBytes), nil
 }
@@ -252,7 +252,7 @@ func DecompressGzip(body []byte) ([]byte, error) {
 		return body, err
 	}
 	defer reader.Close()
-	body, err = ioutil.ReadAll(reader)
+	body, err = io.ReadAll(reader)
 	if err != nil {
 		return body, err
 	}

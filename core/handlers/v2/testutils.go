@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"github.com/SpectoLabs/hoverfly/core/handlers"
 	"github.com/codegangsta/negroni"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 )
@@ -18,7 +18,7 @@ func makeRequestOnHandler(handlerFunc negroni.HandlerFunc, request *http.Request
 }
 
 func unmarshalErrorView(buffer *bytes.Buffer) (handlers.ErrorView, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return handlers.ErrorView{}, err
 	}

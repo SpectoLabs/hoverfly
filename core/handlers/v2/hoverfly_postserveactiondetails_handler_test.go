@@ -3,7 +3,7 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -56,7 +56,7 @@ func Test_PostServeActionHandler_SetPostServeAction(t *testing.T) {
 	bodyBytes, err := json.Marshal(actionView)
 	Expect(err).To(BeNil())
 
-	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/post-serve-action", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/post-serve-action", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)

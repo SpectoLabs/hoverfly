@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -68,7 +68,7 @@ func TestHoverflyMiddlewareHandlerPutSetsTheNewMiddlewarendReplacesTheTestMiddle
 	bodyBytes, err := json.Marshal(middlewareView)
 	Expect(err).To(BeNil())
 
-	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err := http.NewRequest("PUT", "", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -94,7 +94,7 @@ func TestHoverflyMiddlewareHandlerPutWill422ErrorIfHoverflyErrors(t *testing.T) 
 	bodyBytes, err := json.Marshal(middlewareView)
 	Expect(err).To(BeNil())
 
-	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err := http.NewRequest("PUT", "", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -114,7 +114,7 @@ func TestHoverflyMiddlewareHandlerPutWill400ErrorIfJsonIsBad(t *testing.T) {
 
 	bodyBytes := []byte("{{}{}}")
 
-	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/middleware", ioutil.NopCloser(bytes.NewBuffer(bodyBytes)))
+	request, err := http.NewRequest("PUT", "/api/v2/hoverfly/middleware", io.NopCloser(bytes.NewBuffer(bodyBytes)))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -142,7 +142,7 @@ func Test_HoverflyMiddlewareHandler_Options_GetsOptions(t *testing.T) {
 }
 
 func unmarshalMiddlewareView(buffer *bytes.Buffer) (MiddlewareView, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return MiddlewareView{}, err
 	}

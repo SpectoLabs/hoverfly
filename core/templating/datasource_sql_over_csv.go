@@ -335,7 +335,7 @@ func removeRow(data *[][]string, rowIndex int) {
 	// Overwrite the row at rowIndex with the next rows
 	copy((*data)[rowIndex:], (*data)[rowIndex+1:])
 	// Truncate the slice to remove the last row which is now duplicate
-	(*data) = (*data)[:len(*data)-1]
+	*data = (*data)[:len(*data)-1]
 }
 
 // Helper function to find the index of a column header

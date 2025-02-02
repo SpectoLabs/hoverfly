@@ -2,7 +2,7 @@ package v2
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -42,7 +42,7 @@ func Test_HoverflyPACHandler_Get_ReturnsPACfile(t *testing.T) {
 	Expect(response.Code).To(Equal(http.StatusOK))
 	Expect(response.Header().Get("Content-Type")).To(Equal("application/x-ns-proxy-autoconfig"))
 
-	bodyBytes, err := ioutil.ReadAll(response.Body)
+	bodyBytes, err := io.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(bodyBytes)).To(Equal("PACFILE"))
@@ -75,7 +75,7 @@ func Test_HoverflyPACHandler_Put_ReturnsPACfile(t *testing.T) {
 
 	unit := HoverflyPACHandler{Hoverfly: stubHoverfly}
 
-	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte("PACFILE"))))
+	request, err := http.NewRequest("PUT", "", io.NopCloser(bytes.NewBuffer([]byte("PACFILE"))))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -83,7 +83,7 @@ func Test_HoverflyPACHandler_Put_ReturnsPACfile(t *testing.T) {
 	Expect(response.Code).To(Equal(http.StatusOK))
 	Expect(response.Header().Get("Content-Type")).To(Equal("application/x-ns-proxy-autoconfig"))
 
-	bodyBytes, err := ioutil.ReadAll(response.Body)
+	bodyBytes, err := io.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(bodyBytes)).To(Equal("PACFILE"))
@@ -106,7 +106,7 @@ func Test_HoverflyPACHandler_Delete_DeletesPACfile(t *testing.T) {
 
 	Expect(response.Code).To(Equal(http.StatusOK))
 
-	bodyBytes, err := ioutil.ReadAll(response.Body)
+	bodyBytes, err := io.ReadAll(response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(bodyBytes)).To(Equal(""))

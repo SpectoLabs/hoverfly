@@ -5,8 +5,6 @@ import (
 	"path"
 	"strings"
 
-	"io/ioutil"
-
 	"github.com/SpectoLabs/hoverfly/core/errors"
 	"github.com/SpectoLabs/hoverfly/core/models"
 )
@@ -29,7 +27,7 @@ func ConvertToNewMiddleware(middleware string) (*Middleware, error) {
 		return newMiddleware, nil
 	} else if strings.Contains(middleware, " ") {
 		splitMiddleware := strings.Split(middleware, " ")
-		fileContents, _ := ioutil.ReadFile(splitMiddleware[1])
+		fileContents, _ := os.ReadFile(splitMiddleware[1])
 
 		newMiddleware.SetBinary(splitMiddleware[0])
 		newMiddleware.SetScript(string(fileContents))
@@ -51,7 +49,7 @@ func (this *Middleware) SetScript(scriptContent string) error {
 	//We ignore the error it outputs as this directory may already exist
 	os.Mkdir(tempDir, 0777)
 
-	newScript, err := ioutil.TempFile(tempDir, "hoverfly_")
+	newScript, err := os.CreateTemp(tempDir, "hoverfly_")
 	if err != nil {
 		return err
 	}
@@ -71,7 +69,7 @@ func (this Middleware) GetScript() (string, error) {
 	if this.Script == nil {
 		return "", nil
 	}
-	contents, err := ioutil.ReadFile(this.Script.Name())
+	contents, err := os.ReadFile(this.Script.Name())
 	if err != nil {
 		return "", err
 	}

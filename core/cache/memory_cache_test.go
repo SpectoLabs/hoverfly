@@ -188,7 +188,7 @@ func Test_InMemoryCache_DeleteKey(t *testing.T) {
 	unit.Set(expectedKey1, expectedValue1)
 	unit.Set(expectedKey2, expectedValue2)
 
-	unit.Delete([]byte(expectedKey1))
+	unit.Delete(expectedKey1)
 
 	value, err := unit.Get(expectedKey1)
 	Expect(err).ToNot(BeNil())

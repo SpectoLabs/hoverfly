@@ -3,7 +3,7 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -51,7 +51,7 @@ func Test_HoverflyVersionHandler_Options_GetsOptions(t *testing.T) {
 }
 
 func unmarshalVersionView(buffer *bytes.Buffer) (VersionView, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return VersionView{}, err
 	}

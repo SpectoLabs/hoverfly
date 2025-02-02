@@ -2,7 +2,7 @@ package modes_test
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -66,7 +66,7 @@ func Test_SimulateMode_WhenGivenANonMatchingRequestItReturnsAnError(t *testing.T
 
 	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when matching"))
@@ -90,7 +90,7 @@ func Test_SimulateMode_WhenGivenAMatchingRequesAndMiddlewareFaislItReturnsAnErro
 
 	Expect(result.Response.StatusCode).To(Equal(http.StatusBadGateway))
 
-	responseBody, err := ioutil.ReadAll(result.Response.Body)
+	responseBody, err := io.ReadAll(result.Response.Body)
 	Expect(err).To(BeNil())
 
 	Expect(string(responseBody)).To(ContainSubstring("There was an error when executing middleware"))

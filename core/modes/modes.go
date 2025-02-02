@@ -3,7 +3,7 @@ package modes
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -127,7 +127,7 @@ func ReconstructResponse(request *http.Request, pair models.RequestResponsePair)
 	response.Request = request
 
 	response.ContentLength = int64(len(pair.Response.Body))
-	response.Body = ioutil.NopCloser(strings.NewReader(pair.Response.Body))
+	response.Body = io.NopCloser(strings.NewReader(pair.Response.Body))
 	response.StatusCode = pair.Response.Status
 	response.Status = http.StatusText(pair.Response.Status)
 

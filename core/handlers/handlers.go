@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -28,7 +28,7 @@ type AdminHandler interface {
 func ReadFromRequest(request *http.Request, v interface{}) error {
 	defer request.Body.Close()
 
-	body, _ := ioutil.ReadAll(request.Body)
+	body, _ := io.ReadAll(request.Body)
 
 	err := json.Unmarshal(body, &v)
 	if err != nil {
@@ -123,7 +123,7 @@ func NewWebsocket(handler WebSocketHandler, w http.ResponseWriter, r *http.Reque
 			"message": string(p),
 		}).Debug("Got message...")
 
-		for _ = range time.Tick(1 * time.Second) {
+		for range time.Tick(1 * time.Second) {
 
 			updateBytes, err := handler()
 

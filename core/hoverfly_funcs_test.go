@@ -3,7 +3,7 @@ package hoverfly
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -22,8 +22,8 @@ func Test_Hoverfly_DoRequest_DoesNotPanicWhenCannotMakeRequest(t *testing.T) {
 
 	unit := NewHoverflyWithConfiguration(&Configuration{})
 
-	ioutil.NopCloser(bytes.NewBuffer([]byte("")))
-	request, err := http.NewRequest("GET", "w.specto.fake", ioutil.NopCloser(bytes.NewBuffer([]byte(""))))
+	io.NopCloser(bytes.NewBuffer([]byte("")))
+	request, err := http.NewRequest("GET", "w.specto.fake", io.NopCloser(bytes.NewBuffer([]byte(""))))
 	Expect(err).To(BeNil())
 
 	response, time, err := unit.DoRequest(request)
@@ -39,7 +39,7 @@ func Test_Hoverfly_DoRequest_FailedHTTP(t *testing.T) {
 
 	requestBody := []byte("fizz=buzz")
 
-	body := ioutil.NopCloser(bytes.NewBuffer(requestBody))
+	body := io.NopCloser(bytes.NewBuffer(requestBody))
 
 	req, err := http.NewRequest("POST", "http://capture_body.com", body)
 	Expect(err).To(BeNil())
@@ -664,93 +664,93 @@ func Test_Hoverfly_GetResponse_TransitioningBetweenStatesWhenSimulating(t *testi
 	response, _ := hoverfly.GetResponse(models.RequestDetails{
 		Path: "/basket",
 	})
-	Expect(string(response.Body)).To(Equal(`empty`))
+	Expect(response.Body).To(Equal(`empty`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/add-eggs",
 	})
-	Expect(string(response.Body)).To(Equal(`added eggs`))
+	Expect(response.Body).To(Equal(`added eggs`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/basket",
 	})
-	Expect(string(response.Body)).To(Equal(`eggs`))
+	Expect(response.Body).To(Equal(`eggs`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/add-bacon",
 	})
-	Expect(string(response.Body)).To(Equal(`added bacon`))
+	Expect(response.Body).To(Equal(`added bacon`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/basket",
 	})
-	Expect(string(response.Body)).To(Equal(`eggs, bacon`))
+	Expect(response.Body).To(Equal(`eggs, bacon`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/remove-eggs",
 	})
-	Expect(string(response.Body)).To(Equal(`removed eggs`))
+	Expect(response.Body).To(Equal(`removed eggs`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/basket",
 	})
-	Expect(string(response.Body)).To(Equal(`bacon`))
+	Expect(response.Body).To(Equal(`bacon`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/remove-bacon",
 	})
-	Expect(string(response.Body)).To(Equal(`removed bacon`))
+	Expect(response.Body).To(Equal(`removed bacon`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/basket",
 	})
-	Expect(string(response.Body)).To(Equal(`empty`))
+	Expect(response.Body).To(Equal(`empty`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/basket",
 	})
-	Expect(string(response.Body)).To(Equal(`empty`))
+	Expect(response.Body).To(Equal(`empty`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/add-eggs",
 	})
-	Expect(string(response.Body)).To(Equal(`added eggs`))
+	Expect(response.Body).To(Equal(`added eggs`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/basket",
 	})
-	Expect(string(response.Body)).To(Equal(`eggs`))
+	Expect(response.Body).To(Equal(`eggs`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/add-bacon",
 	})
-	Expect(string(response.Body)).To(Equal(`added bacon`))
+	Expect(response.Body).To(Equal(`added bacon`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/basket",
 	})
 
-	Expect(string(response.Body)).To(Equal(`eggs, bacon`))
+	Expect(response.Body).To(Equal(`eggs, bacon`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/remove-eggs",
 	})
-	Expect(string(response.Body)).To(Equal(`removed eggs`))
+	Expect(response.Body).To(Equal(`removed eggs`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/basket",
 	})
-	Expect(string(response.Body)).To(Equal(`bacon`))
+	Expect(response.Body).To(Equal(`bacon`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/remove-bacon",
 	})
-	Expect(string(response.Body)).To(Equal(`removed bacon`))
+	Expect(response.Body).To(Equal(`removed bacon`))
 
 	response, _ = hoverfly.GetResponse(models.RequestDetails{
 		Path: "/basket",
 	})
-	Expect(string(response.Body)).To(Equal(`empty`))
+	Expect(response.Body).To(Equal(`empty`))
 }
 
 func Test_Hoverfly_GetResponse_GetNotRecordedRequest(t *testing.T) {

@@ -3,7 +3,7 @@ package models_test
 import (
 	"bytes"
 	"compress/gzip"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 	"testing"
@@ -111,7 +111,7 @@ func TestResponseDetails_ConvertToResponseDetailsView_WithImageBody(t *testing.T
 	file, _ := os.Open("../../functional-tests/core" + imageUri)
 	defer file.Close()
 
-	originalImageBytes, _ := ioutil.ReadAll(file)
+	originalImageBytes, _ := io.ReadAll(file)
 
 	originalResp := models.ResponseDetails{
 		Status: 200,

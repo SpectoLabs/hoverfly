@@ -128,7 +128,7 @@ func arrContainsMap(arr []interface{}, mp map[string]interface{}) bool {
 }
 
 func getAllNodesFromMap(current map[string]interface{}) []interface{} {
-	var allNodes = make([]interface{}, 0, 0)
+	var allNodes = make([]interface{}, 0)
 	allNodes = append(allNodes, current)
 	for _, val := range current {
 		if innerMap, ok := val.(map[string]interface{}); ok {
@@ -141,7 +141,7 @@ func getAllNodesFromMap(current map[string]interface{}) []interface{} {
 }
 
 func getAllNodesFromArray(current []interface{}) []interface{} {
-	var allNodes = make([]interface{}, 0, 0)
+	var allNodes = make([]interface{}, 0)
 	allNodes = append(allNodes, current)
 	for _, val := range current {
 		if innerMap, ok := val.(map[string]interface{}); ok {

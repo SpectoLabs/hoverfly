@@ -3,7 +3,7 @@ package v2
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -277,7 +277,7 @@ func TestSimulationHandler_Put_PassesDataIntoHoverfly(t *testing.T) {
 
 	unit := SimulationHandler{Hoverfly: stubHoverfly}
 
-	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`
+	request, err := http.NewRequest("PUT", "", io.NopCloser(bytes.NewBuffer([]byte(`
 	{
 		"data": {
 			"pairs": [
@@ -331,7 +331,7 @@ func TestSimulationHandler_Put_CallsDelete(t *testing.T) {
 
 	unit := SimulationHandler{Hoverfly: stubHoverfly}
 
-	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`
+	request, err := http.NewRequest("PUT", "", io.NopCloser(bytes.NewBuffer([]byte(`
 	{
 		"data": {
 			"pairs": [
@@ -376,7 +376,7 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonDoesntMatchSchema_MissingDataKe
 
 	unit := SimulationHandler{Hoverfly: stubHoverfly}
 
-	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`{"meta": {"schemaVersion": "v3"}}`))))
+	request, err := http.NewRequest("PUT", "", io.NopCloser(bytes.NewBuffer([]byte(`{"meta": {"schemaVersion": "v3"}}`))))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -395,7 +395,7 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonDoesntMatchSchema_EmptyObject(t
 
 	unit := SimulationHandler{Hoverfly: stubHoverfly}
 
-	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`{}`))))
+	request, err := http.NewRequest("PUT", "", io.NopCloser(bytes.NewBuffer([]byte(`{}`))))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -414,7 +414,7 @@ func TestSimulationHandler_Put_ReturnsErrorIfJsonIsNotValid(t *testing.T) {
 
 	unit := SimulationHandler{Hoverfly: stubHoverfly}
 
-	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`{notdata: {{]]}[}]}""}`))))
+	request, err := http.NewRequest("PUT", "", io.NopCloser(bytes.NewBuffer([]byte(`{notdata: {{]]}[}]}""}`))))
 	Expect(err).To(BeNil())
 
 	response := makeRequestOnHandler(unit.Put, request)
@@ -433,7 +433,7 @@ func TestSimulationHandler_Put_ReturnsWarnings(t *testing.T) {
 
 	unit := SimulationHandler{Hoverfly: stubHoverfly}
 
-	request, err := http.NewRequest("PUT", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`
+	request, err := http.NewRequest("PUT", "", io.NopCloser(bytes.NewBuffer([]byte(`
 		{
 			"data": {
 				"pairs": [
@@ -484,7 +484,7 @@ func TestSimulationHandler_Post_PassesDataIntoHoverfly(t *testing.T) {
 
 	unit := SimulationHandler{Hoverfly: stubHoverfly}
 
-	request, err := http.NewRequest("POST", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`
+	request, err := http.NewRequest("POST", "", io.NopCloser(bytes.NewBuffer([]byte(`
 	{
 		"data": {
 			"pairs": [
@@ -538,7 +538,7 @@ func TestSimulationHandler_Post_NotCallsDelete(t *testing.T) {
 
 	unit := SimulationHandler{Hoverfly: stubHoverfly}
 
-	request, err := http.NewRequest("POST", "", ioutil.NopCloser(bytes.NewBuffer([]byte(`
+	request, err := http.NewRequest("POST", "", io.NopCloser(bytes.NewBuffer([]byte(`
 	{
 		"data": {
 			"pairs": [
@@ -607,7 +607,7 @@ func Test_SimulationHandler_OptionsSchema_GetsOptions(t *testing.T) {
 }
 
 func unmarshalSimulationViewV5(buffer *bytes.Buffer) (SimulationViewV5, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return SimulationViewV5{}, err
 	}
@@ -623,7 +623,7 @@ func unmarshalSimulationViewV5(buffer *bytes.Buffer) (SimulationViewV5, error) {
 }
 
 func unmarshalResultView(buffer *bytes.Buffer) (SimulationImportResult, error) {
-	body, err := ioutil.ReadAll(buffer)
+	body, err := io.ReadAll(buffer)
 	if err != nil {
 		return SimulationImportResult{}, err
 	}
