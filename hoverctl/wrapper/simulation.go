@@ -2,9 +2,8 @@ package wrapper
 
 import (
 	"encoding/json"
-	"io/ioutil"
-
 	"fmt"
+	"io"
 	"net/url"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
@@ -44,7 +43,7 @@ func ImportSimulation(target configuration.Target, simulationData string) error 
 		return err
 	}
 
-	responseBytes, _ := ioutil.ReadAll(response.Body)
+	responseBytes, _ := io.ReadAll(response.Body)
 
 	result := &v2.SimulationImportResult{}
 	json.Unmarshal(responseBytes, result)
@@ -68,7 +67,7 @@ func AddSimulation(target configuration.Target, simulationData string) error {
 		return err
 	}
 
-	responseBytes, _ := ioutil.ReadAll(response.Body)
+	responseBytes, _ := io.ReadAll(response.Body)
 
 	result := &v2.SimulationImportResult{}
 	json.Unmarshal(responseBytes, result)

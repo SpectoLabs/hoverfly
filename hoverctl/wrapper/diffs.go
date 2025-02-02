@@ -2,7 +2,7 @@ package wrapper
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
@@ -18,7 +18,7 @@ func GetAllDiffs(target configuration.Target) ([]v2.ResponseDiffForRequestView, 
 
 	defer res.Body.Close()
 
-	responseBody, err := ioutil.ReadAll(res.Body)
+	responseBody, err := io.ReadAll(res.Body)
 
 	if err != nil {
 		return nil, err

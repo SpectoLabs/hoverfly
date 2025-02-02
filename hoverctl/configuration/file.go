@@ -2,7 +2,7 @@ package configuration
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -23,14 +23,14 @@ func WriteFile(filePath string, data []byte) error {
 		return err
 	}
 
-	return ioutil.WriteFile(basePath+"/"+fileName, data, 0644)
+	return os.WriteFile(basePath+"/"+fileName, data, 0644)
 }
 
 func ReadFile(filePath string) ([]byte, error) {
 	if strings.HasPrefix(filePath, "http://") || strings.HasPrefix(filePath, "https://") {
 		return DownloadFile(filePath)
 	}
-	data, err := ioutil.ReadFile(filePath)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, errors.New("File not found: " + filePath)
 	}
@@ -47,7 +47,7 @@ func DownloadFile(filePath string) ([]byte, error) {
 
 	defer response.Body.Close()
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Info(err.Error())
 		return nil, errors.New("Could not download simulation")

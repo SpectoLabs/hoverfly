@@ -3,7 +3,7 @@ package wrapper
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"strings"
 	"time"
 
@@ -37,7 +37,7 @@ func GetLogs(target configuration.Target, format string, filterTime *time.Time) 
 		return nil, err
 	}
 
-	responseBody, _ := ioutil.ReadAll(response.Body)
+	responseBody, _ := io.ReadAll(response.Body)
 	if format == "json" {
 		var logsView v2.LogsView
 

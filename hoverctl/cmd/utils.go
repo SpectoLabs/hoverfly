@@ -59,7 +59,7 @@ func askForInput(value string, sensitive bool) string {
 	for {
 		fmt.Printf(value + ": ")
 		if sensitive {
-			responseBytes, err := terminal.ReadPassword(int(syscall.Stdin))
+			responseBytes, err := terminal.ReadPassword(syscall.Stdin)
 			handleIfError(err)
 			fmt.Println("")
 

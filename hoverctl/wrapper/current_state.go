@@ -2,10 +2,9 @@ package wrapper
 
 import (
 	"encoding/json"
-	"io/ioutil"
-
 	"github.com/SpectoLabs/hoverfly/core/handlers/v2"
 	"github.com/SpectoLabs/hoverfly/hoverctl/configuration"
+	"io"
 )
 
 func GetCurrentState(target configuration.Target) (map[string]string, error) {
@@ -18,7 +17,7 @@ func GetCurrentState(target configuration.Target) (map[string]string, error) {
 
 	defer res.Body.Close()
 
-	responseBody, err := ioutil.ReadAll(res.Body)
+	responseBody, err := io.ReadAll(res.Body)
 
 	if err != nil {
 		return nil, err

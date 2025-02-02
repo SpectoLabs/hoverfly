@@ -1,7 +1,7 @@
 package configuration
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
@@ -113,7 +113,7 @@ func (c *Config) WriteToFile(hoverflyDirectory HoverflyDirectory) error {
 
 	configPath := filepath.Join(hoverflyDirectory.Path, "config.yaml")
 
-	err = ioutil.WriteFile(configPath, data, 0644)
+	err = os.WriteFile(configPath, data, 0644)
 
 	if err != nil {
 		log.Debug(err.Error())

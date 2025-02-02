@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"os/exec"
@@ -72,7 +72,7 @@ type ErrorSchema struct {
 }
 
 func UnmarshalToInterface(response *http.Response, v interface{}) error {
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func Login(target configuration.Target, username, password string) (string, erro
 		return "", fmt.Errorf("Incorrect username or password")
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return "", fmt.Errorf("There was an error when logging in")
 	}
@@ -308,7 +308,7 @@ func checkPorts(ports ...int) error {
 func handleResponseError(response *http.Response, errorMessage string) error {
 	if response.StatusCode != 200 {
 		defer response.Body.Close()
-		responseError, _ := ioutil.ReadAll(response.Body)
+		responseError, _ := io.ReadAll(response.Body)
 
 		errSchema := &ErrorSchema{}
 

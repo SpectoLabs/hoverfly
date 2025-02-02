@@ -3,7 +3,6 @@ package configuration
 import (
 	"bytes"
 	"github.com/spf13/viper"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -152,7 +151,7 @@ func Test_Config_WriteToFile_WritesTheConfigObjectToAFileInAYamlFormat(t *testin
 
 	Expect(err).To(BeNil())
 
-	data, _ := ioutil.ReadFile(hoverflyDirectory.Path + "/config.yaml")
+	data, _ := os.ReadFile(hoverflyDirectory.Path + "/config.yaml")
 	_ = os.Remove(hoverflyDirectory.Path + "/config.yaml")
 
 	Expect(string(data)).To(ContainSubstring(`targets:`))
