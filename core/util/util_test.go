@@ -416,3 +416,67 @@ func TestResolveAndValidatePath(t *testing.T) {
 		})
 	}
 }
+
+
+func TestTruncateStringWithEllipsis(t *testing.T) {
+
+	tests := []struct {
+		name     string
+		input    string
+		maxSize  int
+		expected string
+	}{
+		{
+			name:     "No truncation required",
+			input:    "Hello",
+			maxSize:  10,
+			expected: "Hello",
+		},
+		{
+			name:     "Truncate with ellipsis",
+			input:    "Hello, World!",
+			maxSize:  10,
+			expected: "Hello, ...",
+		},
+		{
+			name:     "String exactly maxSize",
+			input:    "Hello, World!",
+			maxSize:  13,
+			expected: "Hello, World!",
+		},
+		{
+			name:     "Small maxSize adds ellipsis only",
+			input:    "Hello",
+			maxSize:  3,
+			expected: "...",
+		},
+		{
+			name:     "UTF-8 truncation valid",
+			input:    "你好，世界", // "Hello, World" in Chinese
+			maxSize:  8,
+			expected: "你...",
+		},
+		{
+			name:     "Empty string",
+			input:    "",
+			maxSize:  5,
+			expected: "",
+		},
+		{
+			name:     "UTF-8 truncation with invalid byte",
+			input:    "Hello, 世界\xef\xbf\xbd", // Invalid UTF-8 at the end
+			maxSize:  10,
+			expected: "Hello, ...",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			g := NewWithT(t)
+			result := truncateStringWithEllipsis(test.input, test.maxSize)
+			g.Expect(result).To(Equal(test.expected), "Expected %q but got %q for input %q with maxSize %d", test.expected, result, test.input, test.maxSize)
+		})
+	}
+}
+
+

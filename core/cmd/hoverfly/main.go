@@ -252,6 +252,7 @@ func main() {
 
 	hoverfly.StoreLogsHook.LogsLimit = *logsSize
 	hoverfly.Journal.EntryLimit = *journalSize
+	hoverfly.Journal.BodyMemoryLimit = journalBodyMemoryLimit
 
 	// getting settings
 	cfg := hv.InitSettings()

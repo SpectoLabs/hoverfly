@@ -61,8 +61,8 @@ func TestMemorySize_AsBytes(t *testing.T) {
 
 	// Set a value and check its string representation
 	ms = 128 * 1024
-	Expect(ms.ToBytes()).To(Equal(int64(131072)))
+	Expect(ms.ToBytes()).To(Equal(131072))
 
 	ms = 2 * 1024 * 1024
-	Expect(ms.ToBytes()).To(Equal(int64(2097152)))
+	Expect(ms.ToBytes()).To(Equal(2097152))
 }

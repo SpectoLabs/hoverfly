@@ -22,10 +22,10 @@ import (
 	"reflect"
 	"regexp"
 	"sort"
-	"strings"
-
 	"strconv"
+	"strings"
 	"time"
+	"unicode/utf8"
 
 	xj "github.com/SpectoLabs/goxml2json"
 	"github.com/tdewolff/minify/v2"
@@ -557,3 +557,21 @@ func ResolveAndValidatePath(absBasePath, relativePath string) (string, error) {
 
 	return resolvedPath, nil
 }
+
+func truncateStringWithEllipsis(input string, maxSize int) string {
+	ellipsis := "..."
+
+	if len(input) <= maxSize{
+		return input
+	}
+
+	truncated := input[:maxSize-len(ellipsis)]
+
+	// Ensure valid UTF-8 after truncation
+	for !utf8.ValidString(truncated) {
+		truncated = truncated[:len(truncated)-1]
+	}
+
+	return truncated + ellipsis
+}
+

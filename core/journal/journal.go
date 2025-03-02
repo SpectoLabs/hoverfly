@@ -39,10 +39,11 @@ type PostServeActionEntry struct {
 }
 
 type Journal struct {
-	entries    []JournalEntry
-	Indexes    []Index
-	EntryLimit int
-	mutex      sync.Mutex
+	entries         []JournalEntry
+	Indexes         []Index
+	EntryLimit      int
+	BodyMemoryLimit util.MemorySize
+	mutex           sync.Mutex
 }
 
 func NewJournal() *Journal {
