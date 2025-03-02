@@ -11,7 +11,7 @@ type MemorySize int64
 
 // String returns the string representation of the memory size
 func (m *MemorySize) String() string {
-	return fmt.Sprintf("%d", *m)
+	return fmt.Sprintf("%d bytes", *m)
 }
 
 // ToBytes returns the memory size as an int64 in bytes.
