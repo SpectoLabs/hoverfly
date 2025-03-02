@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -53,7 +52,7 @@ var _ = Describe("Manage journal indexing in hoverfly", func() {
 				simulationResponse := hoverfly.Proxy(sling.New().Get("http://test-server.com/journaltest"))
 				Expect(resp.StatusCode).To(Equal(200))
 
-				body, err := ioutil.ReadAll(simulationResponse.Body)
+				body, err := io.ReadAll(simulationResponse.Body)
 				Expect(err).To(BeNil())
 
 				Expect(string(body)).To(Equal("Application Testing"))
@@ -98,7 +97,7 @@ var _ = Describe("Manage journal indexing in hoverfly", func() {
 				simulationResponse := hoverfly.Proxy(sling.New().Get("http://test-server.com/journaltest"))
 				Expect(resp.StatusCode).To(Equal(200))
 
-				body, err := ioutil.ReadAll(simulationResponse.Body)
+				body, err := io.ReadAll(simulationResponse.Body)
 				Expect(err).To(BeNil())
 
 				Expect(string(body)).To(Equal("Application Testing"))
